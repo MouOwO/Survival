@@ -35,6 +35,12 @@ local function normalize_state(payload, unit)
             or previous.tower_class,
         tower_class_name = payload.tower_class_name ~= nil
             and payload.tower_class_name or previous.tower_class_name,
+        city_level = payload.city_level ~= nil
+            and payload.city_level or previous.city_level or 0,
+        mine_level = payload.mine_level ~= nil
+            and payload.mine_level or previous.mine_level or 1,
+        crit_level = payload.crit_level ~= nil
+            and payload.crit_level or previous.crit_level or 0,
     }
 end
 
@@ -141,6 +147,8 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)
     event_bus.subscribe(events.BUILDING_DESTROYED, clear_unit)
+    event_bus.subscribe(events.BUILDER_UNLOCK_CHANGED, publish_unit)
+    event_bus.subscribe(events.GOLD_MINE_CHANGED, publish_unit)
     event_bus.subscribe(events.RESOURCE_CHANGED, on_resource_changed)
 end
 

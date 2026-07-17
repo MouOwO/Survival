@@ -1,5 +1,5 @@
-local M = class({})
-_G.modifier_building_no_health_bar = M
+modifier_building_no_health_bar = class({})
+local M = modifier_building_no_health_bar
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end

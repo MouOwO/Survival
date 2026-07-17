@@ -1,5 +1,5 @@
-local M = class({})
-_G.modifier_building_stationary = M
+modifier_building_stationary = class({})
+local M = modifier_building_stationary
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end

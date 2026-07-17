@@ -143,4 +143,40 @@
         "AbilityCooldown"    "0.5"
         "AbilityManaCost"    "0"
     }
+
+    "ability_build_gold_mine"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_gold_mine"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "alchemist_goblins_greed"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_gold_mine"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_gold_mine"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "alchemist_goblins_greed"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.2"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_gold_mine_crit"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_gold_mine_crit"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "phantom_assassin_coup_de_grace"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.2"
+        "AbilityManaCost"    "0"
+    }
 }

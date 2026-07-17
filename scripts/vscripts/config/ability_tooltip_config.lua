@@ -17,6 +17,24 @@ local M = {
         abilitydesc = "建造可自动攻击敌人的防御塔。防御塔5级后可以选择一个转职方向。",
         abilityicon = "drow_ranger_marksmanship",
     },
+    ability_build_gold_mine = {
+        abilityid = "ability_build_gold_mine",
+        abilityname = "建造金矿",
+        abilitydesc = "主城达到3级后解锁。建造后每秒自动产出金币，并可升级采集效率和暴击率。",
+        abilityicon = "alchemist_goblins_greed",
+    },
+    ability_upgrade_gold_mine = {
+        abilityid = "ability_upgrade_gold_mine",
+        abilityname = "提升采集效率",
+        abilitydesc = "提高金矿采集效率等级。每级使每秒基础金币产量增加5点，最高10级。",
+        abilityicon = "alchemist_goblins_greed",
+    },
+    ability_upgrade_gold_mine_crit = {
+        abilityid = "ability_upgrade_gold_mine_crit",
+        abilityname = "提升采集暴击率",
+        abilitydesc = "暴击率共10级，每级增加2%。暴击时本次金币产量为正常产量的150%。",
+        abilityicon = "phantom_assassin_coup_de_grace",
+    },
     ability_upgrade_wall = {
         abilityid = "ability_upgrade_wall",
         abilityname = "升级城墙",

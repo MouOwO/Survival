@@ -26,6 +26,15 @@ local function publish_player(player_id)
         "player_" .. tostring(player_id),
         snapshot
     )
+
+    local player = PlayerResource:GetPlayer(player_id)
+    if player then
+        CustomGameEventManager:Send_ServerToPlayer(
+            player,
+            "ui_state_snapshot",
+            snapshot
+        )
+    end
     return true
 end
 
@@ -64,7 +73,7 @@ function M.init()
     dirty_teams = { all = true }
     event_bus.subscribe(events.UI_DIRTY, on_dirty)
     event_bus.subscribe(events.UI_SNAPSHOT_REQUESTED, on_snapshot_requested)
-    scheduler.every(0.25, function()
+    scheduler.every(0.10, function()
         flush_dirty()
         return true
     end, "ui_snapshot_flush")

@@ -1,5 +1,5 @@
-local M = class({})
-_G.modifier_enemy_wall_ai = M
+modifier_enemy_wall_ai = class({})
+local M = modifier_enemy_wall_ai
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end

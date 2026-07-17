@@ -25,6 +25,12 @@ local M = {
     WORKER_TRAIN_REQUEST = "worker.train.request",
     WORKER_CHANGED = "worker.changed",
 
+    BUILDER_UNLOCK_CHANGED = "builder.unlock.changed",
+
+    GOLD_MINE_UPGRADE_REQUEST = "gold_mine.upgrade.request",
+    GOLD_MINE_CRIT_UPGRADE_REQUEST = "gold_mine.crit_upgrade.request",
+    GOLD_MINE_CHANGED = "gold_mine.changed",
+
     TREE_SPAWNED = "tree.spawned",
     TREE_HIT = "tree.hit",
     TREE_DESTROYED = "tree.destroyed",

@@ -11,6 +11,8 @@ local building_system = require("systems/building_system")
 local building_upgrade_system = require("systems/building_upgrade_system")
 local tree_system = require("systems/tree_system")
 local worker_system = require("systems/worker_system")
+local builder_unlock_system = require("systems/builder_unlock_system")
+local gold_mine_system = require("systems/gold_mine_system")
 local wave_system = require("systems/wave_system")
 local shop_system = require("systems/shop_system")
 local ui_projection = require("ui/ui_projection")
@@ -18,14 +20,18 @@ local ui_snapshot_service = require("ui/ui_snapshot_service")
 local ui_request_router = require("ui/ui_request_router")
 local client_data_service = require("ui/client_data_service")
 local ability_runtime_service = require("ui/ability_runtime_service")
+local shop_debug_command_service = require("ui/shop_debug_command_service")
 
 require("abilities/ability_build_wall")
 require("abilities/ability_build_main_city")
 require("abilities/ability_build_arrow_tower")
+require("abilities/ability_build_gold_mine")
 require("abilities/ability_upgrade_wall")
 require("abilities/ability_upgrade_city")
 require("abilities/ability_train_lumberjack")
 require("abilities/ability_upgrade_tower")
+require("abilities/ability_upgrade_gold_mine")
+require("abilities/ability_upgrade_gold_mine_crit")
 require("abilities/ability_tower_class_1")
 require("abilities/ability_tower_class_2")
 require("abilities/ability_tower_class_3")
@@ -55,6 +61,14 @@ local function configure_game_rules()
     GameRules:SetPreGameTime(5)
     GameRules:SetCustomGameSetupAutoLaunchDelay(0)
     GameRules:SetGoldPerTick(0)
+
+    -- This survival mode uses full-map information rather than Dota fog.
+    if game_mode.SetFogOfWarDisabled then
+        game_mode:SetFogOfWarDisabled(true)
+    end
+    if game_mode.SetUnseenFogOfWarEnabled then
+        game_mode:SetUnseenFogOfWarEnabled(false)
+    end
 end
 
 local function clear_hero_abilities(hero)
@@ -74,6 +88,7 @@ local function on_hero_picked(keys)
     add_hero_ability(hero, "ability_build_wall")
     add_hero_ability(hero, "ability_build_main_city")
     add_hero_ability(hero, "ability_build_arrow_tower")
+    add_hero_ability(hero, "ability_build_gold_mine")
     hero:SetGold(0, false)
     FindClearSpaceForUnit(hero, Vector(0, 0, 256), true)
 
@@ -109,6 +124,7 @@ function M.precache(context)
         "building_wall",
         "building_main_city",
         "building_arrow_tower",
+        "building_gold_mine",
         "npc_survival_lumberjack",
         "enemy_tree",
         "zombie_basic",
@@ -133,19 +149,22 @@ function M.activate()
     ability_runtime_service.init()
     ui_snapshot_service.init()
     ui_request_router.init()
+    shop_debug_command_service.init()
     grid_system.init()
     resource_system.init()
     building_system.init()
     building_upgrade_system.init()
     tree_system.init()
     worker_system.init()
+    builder_unlock_system.init()
+    gold_mine_system.init()
     wave_system.init()
     shop_system.init()
 
     ListenToGameEvent("game_rules_state_change", on_game_state_changed, nil)
     ListenToGameEvent("dota_player_pick_hero", on_hero_picked, nil)
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
-    logger.info("Addon", "initialized V1.3 shop shelf UI")
+    logger.info("Addon", "initialized V1.4 realtime HUD and gold mine")
 end
 
 -- Dota engine adapter globals. No business state is stored globally.

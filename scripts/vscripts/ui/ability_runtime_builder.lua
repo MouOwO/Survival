@@ -1,5 +1,7 @@
 local buildings = require("config/buildings_config")
 local workers = require("config/workers_config")
+local builder_config = require("config/builder_config")
+local gold_mine = require("config/gold_mine_config")
 
 local M = {}
 
@@ -32,19 +34,28 @@ local function with_affordability(data, cost, population_cost, resources)
     return data
 end
 
-local function build_ability(ability_name, resources)
+local function build_ability(ability_name, state, resources)
     local definition_by_ability = {
         ability_build_wall = buildings.wall,
         ability_build_main_city = buildings.main_city,
         ability_build_arrow_tower = buildings.arrow_tower,
+        ability_build_gold_mine = buildings.gold_mine,
     }
     local definition = definition_by_ability[ability_name]
     if not definition then return nil end
 
+    local required_level = definition.unlock_city_level or 0
+    local city_level = state and state.city_level or 0
+    local unlocked = city_level >= required_level
     local cost = definition.build_cost
     local data = merge({
-        available = 1,
-        status_text = "可建造",
+        available = unlocked and 1 or 0,
+        current_level = city_level,
+        status_text = unlocked and "可建造"
+            or ("主城达到Lv." .. tostring(required_level) .. "后解锁"),
+        fields = required_level > 0 and {
+            { label = "解锁条件", value = "主城Lv." .. tostring(required_level) },
+        } or nil,
     }, cost_data(cost))
     return with_affordability(data, cost, 0, resources)
 end
@@ -120,8 +131,66 @@ local function tower_class(state, resources)
     return with_affordability(result, cost, 0, resources)
 end
 
+local function mine_efficiency(state, resources)
+    local level = state.mine_level or 1
+    if level >= gold_mine.max_level then
+        return {
+            available = 0,
+            can_afford = 0,
+            current_level = level,
+            status_text = "采集效率已满级",
+            fields = {
+                { label = "每秒金币", value = gold_mine.normal_income(level) },
+            },
+        }
+    end
+
+    local cost = gold_mine.efficiency_upgrade_cost(level)
+    local result = merge({
+        available = 1,
+        current_level = level,
+        next_level = level + 1,
+        status_text = "提升每秒金币产量",
+        fields = {
+            { label = "当前每秒金币", value = gold_mine.normal_income(level) },
+            { label = "升级后每秒金币", value = gold_mine.normal_income(level + 1) },
+        },
+    }, cost_data(cost))
+    return with_affordability(result, cost, 0, resources)
+end
+
+local function mine_crit(state, resources)
+    local level = state.crit_level or 0
+    if level >= gold_mine.max_crit_level then
+        return {
+            available = 0,
+            can_afford = 0,
+            current_level = level,
+            status_text = "暴击率已满级",
+            fields = {
+                { label = "当前暴击率", value = gold_mine.crit_chance(level) .. "%" },
+                { label = "暴击倍率", value = "150%" },
+            },
+        }
+    end
+
+    local cost = gold_mine.crit_upgrade_cost(level)
+    local result = merge({
+        available = 1,
+        current_level = level,
+        next_level = level + 1,
+        status_text = "每级增加2%暴击率",
+        fields = {
+            { label = "当前暴击率", value = gold_mine.crit_chance(level) .. "%" },
+            { label = "升级后暴击率", value = gold_mine.crit_chance(level + 1) .. "%" },
+            { label = "暴击倍率", value = "150%" },
+        },
+    }, cost_data(cost))
+    return with_affordability(result, cost, 0, resources)
+end
+
 function M.build(ability_name, state, resources)
-    local build = build_ability(ability_name, resources)
+    local build = build_ability(ability_name, state, resources)
     if build then return build end
     if not state then return { available = 1, can_afford = 1, status_text = "" } end
 
@@ -138,16 +207,11 @@ function M.build(ability_name, state, resources)
                 .. tostring(workers.wood_per_hit or 1) .. "木材",
             population = workers.cost.population or 0,
         }, cost_data(workers.cost))
-        return with_affordability(
-            result,
-            workers.cost,
-            workers.cost.population or 0,
-            resources
-        )
+        return with_affordability(result, workers.cost, workers.cost.population or 0, resources)
     end
-    if ability_name == "ability_upgrade_tower" then
-        return tower_upgrade(state, resources)
-    end
+    if ability_name == "ability_upgrade_tower" then return tower_upgrade(state, resources) end
+    if ability_name == "ability_upgrade_gold_mine" then return mine_efficiency(state, resources) end
+    if ability_name == "ability_upgrade_gold_mine_crit" then return mine_crit(state, resources) end
     if string.match(ability_name, "^ability_tower_class_[1-5]$") then
         return tower_class(state, resources)
     end

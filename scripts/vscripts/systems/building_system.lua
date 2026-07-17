@@ -30,6 +30,17 @@ local function change_count(team, building_id, delta)
     counts[team][building_id] = math.max(0, (counts[team][building_id] or 0) + delta)
 end
 
+local function main_city_level(team)
+    for _, state in pairs(buildings) do
+        if state.team == team
+            and state.building_id == "main_city"
+            and valid_entity(state.unit) then
+            return state.level or 0
+        end
+    end
+    return 0
+end
+
 local function set_attack_range(unit, attack_range)
     if unit.Script_SetAttackRange then
         unit:Script_SetAttackRange(attack_range)
@@ -101,6 +112,13 @@ local function can_place(payload)
     end
     if definition.max_count > 0 and count_for(team, definition.id) >= definition.max_count then
         return { ok = false, error = "建筑数量已达上限" }
+    end
+    if definition.unlock_city_level
+        and main_city_level(team) < definition.unlock_city_level then
+        return {
+            ok = false,
+            error = "主城达到Lv." .. tostring(definition.unlock_city_level) .. "后解锁",
+        }
     end
 
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {

@@ -1,8 +1,11 @@
-"custom_net_tables"
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
 {
-    "survival_ui_state"        "1"
-    "survival_ability_data"    "1"
-    "survival_ability_runtime" "1"
-    "survival_shop_config"     "1"
-    "survival_item_config"     "1"
+    custom_net_tables =
+    [
+        "survival_ui_state",
+        "survival_ability_data",
+        "survival_ability_runtime",
+        "survival_shop_config",
+        "survival_item_config",
+    ]
 }

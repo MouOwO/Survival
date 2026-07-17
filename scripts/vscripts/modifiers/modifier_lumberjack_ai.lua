@@ -1,8 +1,8 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 
-local M = class({})
-_G.modifier_lumberjack_ai = M
+modifier_lumberjack_ai = class({})
+local M = modifier_lumberjack_ai
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end
@@ -26,6 +26,10 @@ function M:OnIntervalThink()
 
     local tree = EntIndexToHScript(self.tree_entindex)
     if not tree or tree:IsNull() or not tree:IsAlive() then return end
+    if parent.CanEntityBeSeenByMyTeam
+        and not parent:CanEntityBeSeenByMyTeam(tree) then
+        return
+    end
     if parent:GetAttackTarget() == tree then return end
 
     ExecuteOrderFromTable({

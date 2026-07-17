@@ -93,4 +93,23 @@ M.arrow_tower = {
     },
 }
 
+M.gold_mine = {
+    id = "gold_mine",
+    display_name = "金矿",
+    unit_name = "building_gold_mine",
+    build_cost = { wood = 300, gold = 100 },
+    footprint = { x = 2, y = 2 },
+    max_count = 1,
+    unlock_city_level = 3,
+    show_health_bar = true,
+    selectable = true,
+    abilities = {
+        "ability_upgrade_gold_mine",
+        "ability_upgrade_gold_mine_crit",
+    },
+    levels = {
+        [1] = { health = 3000, armor = 8 },
+    },
+}
+
 return M
