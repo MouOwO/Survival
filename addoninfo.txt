@@ -1,0 +1,11 @@
+"AddonInfo"
+{
+    "TeamCount"         "2"
+    "maps"              "survival"
+    "IsPlayable"        "1"
+    "EnablePickRules"   "0"
+    "survival"
+    {
+        "MaxPlayers"    "1"
+    }
+}

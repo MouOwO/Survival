@@ -1,0 +1,20 @@
+"lang"
+{
+    "Language" "english"
+    "Tokens"
+    {
+        "addon_game_name" "Survival Defense"
+        "DOTA_Tooltip_ability_ability_build_wall" "Build Wall"
+        "DOTA_Tooltip_ability_ability_build_main_city" "Build Main City"
+        "DOTA_Tooltip_ability_ability_build_arrow_tower" "Build Defense Tower"
+        "DOTA_Tooltip_ability_ability_upgrade_wall" "Upgrade Wall"
+        "DOTA_Tooltip_ability_ability_upgrade_city" "Upgrade Main City"
+        "DOTA_Tooltip_ability_ability_train_lumberjack" "Train Lumberjack"
+        "DOTA_Tooltip_ability_ability_upgrade_tower" "Upgrade Defense Tower"
+        "DOTA_Tooltip_ability_ability_tower_class_1" "Class One"
+        "DOTA_Tooltip_ability_ability_tower_class_2" "Class Two"
+        "DOTA_Tooltip_ability_ability_tower_class_3" "Class Three"
+        "DOTA_Tooltip_ability_ability_tower_class_4" "Class Four"
+        "DOTA_Tooltip_ability_ability_tower_class_5" "Class Five"
+    }
+}

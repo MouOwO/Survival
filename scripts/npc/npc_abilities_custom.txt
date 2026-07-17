@@ -1,0 +1,146 @@
+"DOTAAbilities"
+{
+    "ability_build_wall"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_wall"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "tusk_ice_shards"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_build_main_city"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_main_city"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "keeper_of_the_light_will_o_wisp"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_build_arrow_tower"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_arrow_tower"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_wall"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_wall"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ogre_magi_bloodlust"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_city"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_city"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "alchemist_goblins_greed"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_train_lumberjack"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_train_lumberjack"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "1.0"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_tower"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_tower"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "drow_ranger_multishot"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_1"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_1"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "axe_battle_hunger"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_2"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_2"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "drow_ranger_frost_arrows"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_3"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_3"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "windrunner_focusfire"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_4"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_4"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "sniper_take_aim"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_5"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_5"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "zuus_arc_lightning"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+}

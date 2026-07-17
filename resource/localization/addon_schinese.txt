@@ -1,0 +1,27 @@
+"lang"
+{
+    "Language" "schinese"
+    "Tokens"
+    {
+        "addon_game_name" "生存防守"
+        "DOTA_Tooltip_ability_ability_build_wall" "建造城墙"
+        "DOTA_Tooltip_ability_ability_build_main_city" "建造主城"
+        "DOTA_Tooltip_ability_ability_build_arrow_tower" "建造防御塔"
+        "DOTA_Tooltip_ability_ability_upgrade_wall" "升级城墙"
+        "DOTA_Tooltip_ability_ability_upgrade_city" "升级主城"
+        "DOTA_Tooltip_ability_ability_train_lumberjack" "训练伐木工"
+        "DOTA_Tooltip_ability_ability_upgrade_tower" "升级防御塔"
+        "DOTA_Tooltip_ability_ability_tower_class_1" "转职一"
+        "DOTA_Tooltip_ability_ability_tower_class_2" "转职二"
+        "DOTA_Tooltip_ability_ability_tower_class_3" "转职三"
+        "DOTA_Tooltip_ability_ability_tower_class_4" "转职四"
+        "DOTA_Tooltip_ability_ability_tower_class_5" "转职五"
+        "npc_dota_unit_building_wall" "城墙"
+        "npc_dota_unit_building_main_city" "主城"
+        "npc_dota_unit_building_arrow_tower" "防御塔"
+        "npc_dota_unit_npc_survival_lumberjack" "伐木工"
+        "npc_dota_unit_enemy_tree" "资源树"
+        "npc_dota_unit_zombie_basic" "普通怪物"
+        "npc_dota_unit_zombie_boss" "Boss怪物"
+    }
+}

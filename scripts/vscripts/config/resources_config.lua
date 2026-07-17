@@ -1,0 +1,8 @@
+local M = {
+    initial_wood = 500,
+    initial_gold = 200,
+    initial_population = 0,
+    initial_max_population = 0,
+}
+
+return M
