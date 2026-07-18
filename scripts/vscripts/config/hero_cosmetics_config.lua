@@ -1,0 +1,55 @@
+local M = {
+    hero_axe = {
+        material_group = "1",
+        hide_default_wearables = true,
+        wearables = {
+            "models/items/axe/searing_annihilator_head/searing_annihilator_head.vmdl",
+            "models/items/axe/searing_annihilator_armor/searing_annihilator_armor.vmdl",
+            "models/items/axe/searing_annihilator_weapon/searing_annihilator_weapon.vmdl",
+            "models/items/axe/searing_annihilator_belt/searing_annihilator_belt.vmdl",
+            "models/items/axe/searing_annihilator_arms/searing_annihilator_arms.vmdl",
+        },
+    },
+    hero_slark = {
+        material_group = "1",
+        hide_default_wearables = true,
+        wearables = {
+            "models/items/slark/dark_reef_head/dark_reef_head.vmdl",
+            "models/items/slark/dark_reef_back/dark_reef_back.vmdl",
+            "models/items/slark/dark_reef_arms/dark_reef_arms.vmdl",
+            "models/items/slark/dark_reef_shoulders/dark_reef_shoulders.vmdl",
+            "models/items/slark/dark_reef_weapon/dark_reef_weapon.vmdl",
+        },
+    },
+    hero_juggernaut = {
+        material_group = "1",
+        hide_default_wearables = true,
+        wearables = {
+            "models/items/juggernaut/wandering_demon_mask/wandering_demon_mask.vmdl",
+            "models/items/juggernaut/wandering_demon_arms/wandering_demon_arms.vmdl",
+            "models/items/juggernaut/wandering_demon_top/wandering_demon_top.vmdl",
+            "models/items/juggernaut/wandering_demon_legs/wandering_demon_legs.vmdl",
+            "models/items/juggernaut/wandering_demon_sword/wandering_demon_sword.vmdl",
+        },
+    },
+    hero_monkey_king = {
+        material_group = "1",
+        hide_default_wearables = false,
+        wearables = {
+            "models/items/monkey_king/monkey_king_immortal_weapon/monkey_king_immortal_weapon.vmdl",
+        },
+    },
+    hero_blademaster = {
+        material_group = "1",
+        hide_default_wearables = true,
+        wearables = {
+            "models/items/sven/gaze_cyclopean_marauder/gaze_cyclopean_marauder.vmdl",
+            "models/items/sven/pauldron_cyclopean_marauder/pauldron_cyclopean_marauder.vmdl",
+            "models/items/sven/gauntlet_cyclopean_marauder/gauntlet_cyclopean_marauder.vmdl",
+            "models/items/sven/fauld_cyclopean_marauder/fauld_cyclopean_marauder.vmdl",
+            "models/items/sven/greatsword_cyclopean_marauder/greatsword_cyclopean_marauder.vmdl",
+        },
+    },
+}
+
+return M

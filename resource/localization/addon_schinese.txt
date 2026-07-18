@@ -1,4 +1,4 @@
-"lang"
+﻿"lang"
 {
     "Language" "schinese"
     "Tokens"
@@ -23,5 +23,17 @@
         "npc_dota_unit_enemy_tree" "资源树"
         "npc_dota_unit_zombie_basic" "普通怪物"
         "npc_dota_unit_zombie_boss" "Boss怪物"
+        "DOTA_Tooltip_ability_ability_build_hero_altar" "建造英雄祭坛"
+        "DOTA_Tooltip_ability_ability_summon_axe" "召唤斧王"
+        "DOTA_Tooltip_ability_ability_summon_axe_Description" "召唤斧王。清除原版技能后初始获得1个专属项目技能。"
+        "DOTA_Tooltip_ability_ability_summon_slark" "召唤斯拉克"
+        "DOTA_Tooltip_ability_ability_summon_slark_Description" "召唤斯拉克。清除原版技能后初始获得1个专属项目技能。"
+        "DOTA_Tooltip_ability_ability_summon_juggernaut" "召唤主宰"
+        "DOTA_Tooltip_ability_ability_summon_juggernaut_Description" "召唤主宰。清除原版技能后初始获得1个专属项目技能。"
+        "DOTA_Tooltip_ability_ability_summon_monkey_king" "召唤齐天大圣（VIP）"
+        "DOTA_Tooltip_ability_ability_summon_monkey_king_Description" "需要VIP权限。当前使用Sven作为测试载体，召唤后获得4个项目初始技能。"
+        "DOTA_Tooltip_ability_ability_summon_blademaster" "召唤剑圣（VIP）"
+        "DOTA_Tooltip_ability_ability_summon_blademaster_Description" "需要VIP权限。当前使用Sven作为测试载体，召唤后获得4个项目初始技能。"
+        "npc_dota_unit_building_hero_altar" "英雄祭坛"
     }
 }

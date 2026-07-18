@@ -3,56 +3,76 @@ local events = require("core/events")
 
 local M = {}
 
-local function grant_resource(team, definition)
-    local grant = definition.grant or {}
-    return event_bus.request(events.RESOURCE_ADD_REQUEST, {
-        team = team,
-        wood = grant.wood or 0,
-        gold = grant.gold or 0,
-        max_population = grant.max_population or 0,
-        reason = "shop_grant:" .. definition.itemid,
-    })
-end
+local function grant_native_item(player_id, entry)
+    local summoned = event_bus.request(
+        events.HERO_SUMMON_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local hero = summoned and summoned.unit
+        or PlayerResource:GetSelectedHeroEntity(player_id)
+    if not hero or hero:IsNull() then
+        return { ok = false, error = "hero_not_ready" }
+    end
 
-local function grant_native_item(player_id, definition)
-    local hero = PlayerResource:GetSelectedHeroEntity(player_id)
-    if not hero or hero:IsNull() then return { ok = false, error = "hero_not_ready" } end
-    if not definition.native_item_name or definition.native_item_name == "" then
+    local native_name = entry.definition.native_item_name
+    if not native_name or native_name == "" then
         return { ok = false, error = "native_item_missing" }
     end
-    local item = CreateItem(definition.native_item_name, hero, hero)
-    if not item then return { ok = false, error = "item_create_failed" } end
+    local item = CreateItem(native_name, hero, hero)
+    if not item then
+        return { ok = false, error = "item_create_failed" }
+    end
     hero:AddItem(item)
     return { ok = true }
 end
 
-local function grant_virtual_item(player_id, definition, inventory_by_player)
-    inventory_by_player[player_id] = inventory_by_player[player_id] or {}
-    local amount = math.max(1, tonumber(definition.stack_count) or 1)
-    inventory_by_player[player_id][definition.itemid] =
-        (inventory_by_player[player_id][definition.itemid] or 0) + amount
+local function grant_virtual_item(player_id, entry, state)
+    state.inventory_by_player[player_id] =
+        state.inventory_by_player[player_id] or {}
+    local inventory = state.inventory_by_player[player_id]
+    inventory[entry.contentid] =
+        (inventory[entry.contentid] or 0) + 1
     return { ok = true }
 end
 
-local function grant_technology(player_id, definition, technology_by_player)
-    technology_by_player[player_id] = technology_by_player[player_id] or {}
-    local current = technology_by_player[player_id][definition.technologyid] or 0
-    local maximum = math.max(1, tonumber(definition.max_level) or 1)
-    if current >= maximum then return { ok = false, error = "technology_max_level" } end
-    technology_by_player[player_id][definition.technologyid] = current + 1
+local function grant_technology(player_id, entry, state)
+    state.technology_by_player[player_id] =
+        state.technology_by_player[player_id] or {}
+    local technologies = state.technology_by_player[player_id]
+    if technologies[entry.contentid] then
+        return { ok = false, error = "technology_already_owned" }
+    end
+    technologies[entry.contentid] = true
     return { ok = true }
 end
 
-function M.grant(player_id, team, entry, definition, state)
-    if entry.contenttype == "technology" then
-        return grant_technology(player_id, definition, state.technology_by_player)
+local function start_encounter(player_id, team, entry)
+    local result = event_bus.request(
+        events.MONSTER_ENCOUNTER_START_REQUEST,
+        {
+            player_id = player_id,
+            team = team,
+            encounter_id = entry.encounter_id,
+        }
+    )
+    return result or {
+        ok = false,
+        error = "encounter_handler_missing",
+    }
+end
+
+function M.grant(player_id, team, entry, state)
+    if entry.grant_type == "technology_level" then
+        return grant_technology(player_id, entry, state)
     end
-    if definition.grant_type == "resource" then return grant_resource(team, definition) end
-    if definition.grant_type == "native_item" then
-        return grant_native_item(player_id, definition)
+    if entry.grant_type == "start_encounter" then
+        return start_encounter(player_id, team, entry)
     end
-    if definition.grant_type == "virtual_item" then
-        return grant_virtual_item(player_id, definition, state.inventory_by_player)
+    if entry.grant_type == "native_item" then
+        return grant_native_item(player_id, entry)
+    end
+    if entry.grant_type == "virtual_item" then
+        return grant_virtual_item(player_id, entry, state)
     end
     return { ok = false, error = "unsupported_grant_type" }
 end

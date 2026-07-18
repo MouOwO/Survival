@@ -1,123 +1,284 @@
-local shop_config = require("config/shop_config")
-local item_config = require("config/item_config")
-local technology_config = require("config/technology_config")
+local content_catalog = require("config/generated/content_catalog")
+local categories = require("config/generated/shop_categories")
+local aggregation = require("config/generated/shop_aggregation_rules")
+local evaluator = require("systems/shop_condition_evaluator")
 
 local M = {}
 
-function M.find_entry(entry_id)
-    for _, entry in ipairs(shop_config.entries or {}) do
-        if entry.entryid == entry_id then return entry end
+local source_cache = {}
+local entries = {}
+local entries_by_id = {}
+
+local function number(value)
+    return tonumber(value) or 0
+end
+
+local function load_source(module_name)
+    if not source_cache[module_name] then
+        source_cache[module_name] =
+            require("config/generated/" .. module_name)
     end
-    return nil
+    return source_cache[module_name]
+end
+
+local function field(row, name, fallback)
+    local value = row and row[name]
+    if value == nil or value == "" then
+        return fallback
+    end
+    return value
+end
+
+local function content_name(content_id, row, rule)
+    local catalog = content_catalog.by_id[content_id]
+    if catalog and catalog.name and catalog.name ~= "" then
+        return catalog.name
+    end
+    local value = field(row, rule.name_field, "")
+    if value ~= "" and value ~= content_id then
+        return value
+    end
+    if row.technology_group and row.level then
+        local prefix = row.technology_group == "gold_mine_crit"
+            and "金矿暴击率" or "金矿采集效率"
+        return prefix .. " Lv." .. tostring(row.level)
+    end
+    return content_id
+end
+
+local function description(content_id, row, rule)
+    local catalog = content_catalog.by_id[content_id]
+    if catalog and catalog.description
+        and catalog.description ~= "" then
+        return catalog.description
+    end
+    return field(row, rule.description_field, row.notes or "")
+end
+
+local function condition_text(row)
+    local parts = {}
+    local function add(value)
+        table.insert(parts, value)
+    end
+
+    if row.requires_hero_summoned == true then
+        add("已召唤英雄")
+    end
+    if number(row.required_city_level) > 0 then
+        add("主城Lv." .. tostring(number(row.required_city_level)))
+    end
+    if row.requires_vip == true then
+        add("VIP权限")
+    end
+    if number(row.required_rebirth_level) > 0 then
+        add("已完成"
+            .. tostring(number(row.required_rebirth_level))
+            .. "转")
+    end
+    if row.requires_building_id
+        and row.requires_building_id ~= "" then
+        add("建筑：" .. row.requires_building_id)
+    end
+    if row.requires_content_id
+        and row.requires_content_id ~= "" then
+        add("前置：" .. row.requires_content_id)
+    end
+    return #parts > 0 and table.concat(parts, " · ") or "无"
+end
+
+local function fields_for(row, source_id)
+    local result = {}
+    local function add(label, value)
+        if value ~= nil and value ~= "" then
+            table.insert(result, { label = label, value = value })
+        end
+    end
+
+    if source_id == "weapon" then
+        add("系列", row.series_id)
+        add("阶段", row.stage)
+        add("成长方式", row.progression_type)
+        add("成长要求", row.progression_value)
+    elseif source_id == "item" then
+        add("类型", row.item_subtype)
+        add("效果", row.effect_type)
+        add("效果值", row.effect_value)
+    elseif source_id == "technology" then
+        add("科技组", row.technology_group)
+        add("等级", row.level)
+        add("效果", row.effect_type)
+        add("效果值", row.effect_value)
+    elseif source_id == "rebirth" then
+        add("转职等级", row.rebirth_level)
+    end
+    return result
+end
+
+local function make_entry(rule, row)
+    local content_id = tostring(field(row, rule.id_field, ""))
+    local wood = number(field(row, rule.wood_cost_field, 0))
+    local gold = number(field(row, rule.gold_cost_field, 0))
+    if content_id == "" or (wood <= 0 and gold <= 0) then
+        return nil
+    end
+
+    local category_id = field(
+        row,
+        "shop_category_id",
+        rule.category_default
+    )
+    local icon_type = rule.icon_type_default or "item"
+    return {
+        entryid = rule.source_id .. ":" .. content_id,
+        shopid = category_id,
+        contenttype = rule.content_type,
+        contentid = content_id,
+        name = content_name(content_id, row, rule),
+        description = description(content_id, row, rule),
+        icon = field(
+            row,
+            "icon_name",
+            icon_type == "ability"
+                and "ability_upgrade_wall" or "item_branches"
+        ),
+        icon_type = icon_type,
+        woodcost = wood,
+        goldcost = gold,
+        visible = true,
+        enabled = row.shop_enabled ~= false,
+        disabled_reason_text =
+            field(row, "disabled_reason_text", ""),
+        purchase_limit = number(field(row, "purchase_limit", 0)),
+        order = number(field(row, "shop_sort_order", 0)),
+        min_city_level =
+            number(field(row, "required_city_level", 0)),
+        requires_vip = field(row, "requires_vip", false) == true,
+        requires_hero_summoned =
+            field(row, "requires_hero_summoned", false) == true,
+        required_rebirth_level =
+            number(field(row, "required_rebirth_level", 0)),
+        requires_building_id =
+            tostring(field(row, "requires_building_id", "")),
+        requires_content_id =
+            tostring(field(row, "requires_content_id", "")),
+        grant_type = tostring(field(
+            row,
+            "grant_type",
+            rule.grant_type_default or "virtual_item"
+        )),
+        encounter_id = tostring(field(row, "encounter_id", "")),
+        condition_text = condition_text(row),
+        fields = fields_for(row, rule.source_id),
+        definition = row,
+    }
+end
+
+local function rebuild()
+    source_cache = {}
+    entries = {}
+    entries_by_id = {}
+    for _, rule in ipairs(aggregation.rows or {}) do
+        if rule.enabled ~= false then
+            for _, row in ipairs(
+                load_source(rule.module_name).rows or {}
+            ) do
+                local entry = make_entry(rule, row)
+                if entry then
+                    table.insert(entries, entry)
+                    entries_by_id[entry.entryid] = entry
+                end
+            end
+        end
+    end
+    table.sort(entries, function(a, b)
+        return a.shopid == b.shopid
+            and a.order < b.order
+            or a.shopid < b.shopid
+    end)
+end
+
+function M.find_entry(entry_id)
+    return entries_by_id[entry_id]
 end
 
 function M.definition_for(entry)
-    if entry.contenttype == "technology" then
-        return technology_config.technologies
-            and technology_config.technologies[entry.contentid] or nil
-    end
-    return item_config.items and item_config.items[entry.contentid] or nil
+    return entry and entry.definition or nil
 end
 
-function M.content_name(entry, definition)
-    if entry.contenttype == "technology" then
-        return definition.technologyname or entry.contentid
-    end
-    return definition.itemname or entry.contentid
-end
-
-local function content_description(entry, definition)
-    if entry.itemdesc and entry.itemdesc ~= "" then return entry.itemdesc end
-    if entry.contenttype == "technology" then
-        return definition.technologydesc or ""
-    end
-    return definition.itemdesc or ""
-end
-
-local function content_icon(entry, definition)
-    if entry.contenttype == "technology" then
-        return definition.iconability or "ability_upgrade_wall", "ability"
-    end
-    return definition.iconitem or "item_branches", "item"
+function M.content_name(entry)
+    return entry and entry.name or ""
 end
 
 function M.evaluate(player_id, entry, context)
-    local definition = M.definition_for(entry)
-    local count = context.purchased_count[player_id]
-        and context.purchased_count[player_id][entry.entryid] or 0
-    local limit = math.max(0, tonumber(entry.purchase_limit) or 0)
-    local city_level = context.city_level or 0
-    local resources = context.resources or {}
-
-    if entry.enabled == false then return false, "商品已停用", definition, count end
-    if not definition then return false, "商品配置缺失", nil, count end
-    if limit > 0 and count >= limit then
-        return false, "已达到购买上限", definition, count
-    end
-    if city_level < math.max(0, tonumber(entry.min_city_level) or 0) then
-        return false, "主城等级不足", definition, count
-    end
-    if (resources.wood or 0) < math.max(0, tonumber(entry.woodcost) or 0) then
-        return false, "木材不足", definition, count
-    end
-    if (resources.gold or 0) < math.max(0, tonumber(entry.goldcost) or 0) then
-        return false, "金币不足", definition, count
-    end
-    return true, "", definition, count
+    local ok, reason, count =
+        evaluator.evaluate(player_id, entry, context)
+    return ok, reason, entry.definition, count
 end
 
 local function project_entry(player_id, entry, context)
-    if entry.visible == false then return nil end
-    local purchasable, reason, definition, count = M.evaluate(
-        player_id,
-        entry,
-        context
-    )
-    local icon, icon_type = content_icon(entry, definition or {})
+    local ok, reason, _, count =
+        M.evaluate(player_id, entry, context)
     return {
         entry_id = entry.entryid,
         shop_id = entry.shopid,
-        content_type = entry.contenttype or "item",
+        content_type = entry.contenttype,
         content_id = entry.contentid,
-        name = definition and M.content_name(entry, definition) or entry.contentid,
-        description = definition and content_description(entry, definition)
-            or (entry.itemdesc or ""),
-        icon = icon,
-        icon_type = icon_type,
-        wood_cost = math.max(0, tonumber(entry.woodcost) or 0),
-        gold_cost = math.max(0, tonumber(entry.goldcost) or 0),
+        grant_type = entry.grant_type,
+        name = entry.name,
+        description = entry.description,
+        icon = entry.icon,
+        icon_type = entry.icon_type,
+        wood_cost = entry.woodcost,
+        gold_cost = entry.goldcost,
         visible = 1,
-        purchasable = purchasable and 1 or 0,
+        purchasable = ok and 1 or 0,
         disabled_reason = reason,
-        purchase_condition_text = entry.condition_text or "",
+        purchase_condition_text = entry.condition_text,
         owned_count = count,
-        purchase_limit = math.max(0, tonumber(entry.purchase_limit) or 0),
-        sort_order = tonumber(entry.order) or 0,
-        fields = entry.fields or (definition and definition.fields) or {},
+        purchase_limit = entry.purchase_limit,
+        sort_order = entry.order,
+        fields = entry.fields,
     }
+end
+
+local function projected_categories()
+    local result = {}
+    for _, category in ipairs(categories.rows or {}) do
+        if category.enabled ~= false then
+            table.insert(result, {
+                shopid = category.category_id,
+                shopname = category.name,
+                order = tonumber(category.sort_order) or 0,
+                description = category.description or "",
+            })
+        end
+    end
+    table.sort(result, function(a, b)
+        return a.order < b.order
+    end)
+    return result
 end
 
 function M.build_snapshot(player_id, context)
-    local entries = {}
-    for _, entry in ipairs(shop_config.entries or {}) do
-        local projection = project_entry(player_id, entry, context)
-        if projection then table.insert(entries, projection) end
+    local projected = {}
+    for _, entry in ipairs(entries) do
+        table.insert(
+            projected,
+            project_entry(player_id, entry, context)
+        )
     end
-    table.sort(entries, function(a, b)
-        if a.shop_id == b.shop_id then return a.sort_order < b.sort_order end
-        return a.shop_id < b.shop_id
-    end)
-
     return {
-        schema_version = 1,
+        schema_version = 2,
         sequence = context.sequence,
-        config_version = shop_config.version or 1,
+        config_version = 2,
         player_id = player_id,
         reason = context.reason or "open",
         resources = context.resources or {},
-        categories = shop_config.categories or shop_config.shops or {},
-        entries = entries,
+        categories = projected_categories(),
+        entries = projected,
     }
 end
+
+rebuild()
 
 return M

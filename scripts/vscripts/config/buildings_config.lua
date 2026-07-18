@@ -112,4 +112,26 @@ M.gold_mine = {
     },
 }
 
+M.hero_altar = {
+    id = "hero_altar",
+    display_name = "英雄祭坛",
+    unit_name = "building_hero_altar",
+    build_cost = { wood = 300, gold = 100 },
+    footprint = { x = 2, y = 2 },
+    max_count = 1,
+    unlock_city_level = 3,
+    show_health_bar = false,
+    selectable = true,
+    abilities = {
+        "ability_summon_axe",
+        "ability_summon_slark",
+        "ability_summon_juggernaut",
+        "ability_summon_monkey_king",
+        "ability_summon_blademaster",
+    },
+    levels = {
+        [1] = { health = 2500, armor = 8 },
+    },
+}
+
 return M

@@ -1,6 +1,7 @@
 local M = {
     GAME_STARTED = "game.started",
     HERO_READY = "player.hero_ready",
+    HERO_SUMMONED = "hero.summoned",
     ENGINE_ENTITY_KILLED = "engine.entity_killed",
 
     GRID_CAN_PLACE_REQUEST = "grid.can_place.request",
@@ -26,6 +27,7 @@ local M = {
     WORKER_CHANGED = "worker.changed",
 
     BUILDER_UNLOCK_CHANGED = "builder.unlock.changed",
+    BUILDER_STAGE_CHANGED = "builder.stage.changed",
 
     GOLD_MINE_UPGRADE_REQUEST = "gold_mine.upgrade.request",
     GOLD_MINE_CRIT_UPGRADE_REQUEST = "gold_mine.crit_upgrade.request",
@@ -46,6 +48,38 @@ local M = {
     SHOP_CLOSE_REQUEST = "shop.close.request",
     SHOP_PURCHASE_REQUEST = "shop.purchase.request",
     SHOP_STATE_CHANGED = "shop.state.changed",
+    SHOP_UNLOCK_CHANGED = "shop.unlock.changed",
+
+    HERO_ALTAR_OPEN_REQUEST = "hero.altar.open.request",
+    HERO_SUMMON_SNAPSHOT_REQUEST = "hero.summon.snapshot.request",
+    HERO_SUMMON_REQUEST = "hero.summon.request",
+    HERO_SUMMON_GET_REQUEST = "hero.summon.get.request",
+    HERO_SUMMON_STATE_CHANGED = "hero.summon.state.changed",
+
+    PLAYER_ENTITLEMENT_GET_REQUEST = "player.entitlement.get.request",
+    PLAYER_ENTITLEMENT_SET_REQUEST = "player.entitlement.set.request",
+    PLAYER_ENTITLEMENT_CHANGED = "player.entitlement.changed",
+
+    HERO_PROGRESSION_GET_REQUEST = "hero.progression.get.request",
+    HERO_PROGRESSION_APPLY_REQUEST = "hero.progression.apply.request",
+    HERO_PROGRESSION_CHANGED = "hero.progression.changed",
+    HERO_SKILL_REWARD_REQUEST = "hero.skill_reward.request",
+
+    HERO_SKILL_STATE_GET_REQUEST = "hero.skill.state.get.request",
+    HERO_SKILL_GRANT_REQUEST = "hero.skill.grant.request",
+    HERO_SKILL_CHANGED = "hero.skill.changed",
+    HERO_SKILL_POOL_DRAW_REQUEST = "hero.skill.pool.draw.request",
+    HERO_SKILL_CHOICE_CREATE_REQUEST = "hero.skill.choice.create.request",
+    HERO_SKILL_CHOICE_GET_REQUEST = "hero.skill.choice.get.request",
+    HERO_SKILL_CHOICE_SELECT_REQUEST = "hero.skill.choice.select.request",
+    HERO_SKILL_CHOICE_CHANGED = "hero.skill.choice.changed",
+
+    MONSTER_ENCOUNTER_START_REQUEST = "monster.encounter.start.request",
+    MONSTER_ENCOUNTER_QUERY_REQUEST = "monster.encounter.query.request",
+    MONSTER_ENCOUNTER_CHANGED = "monster.encounter.changed",
+    MONSTER_SPAWNED = "monster.spawned",
+    MONSTER_KILLED = "monster.killed",
+    MONSTER_REWARD_GRANTED = "monster.reward.granted",
 }
 
 return M

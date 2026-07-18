@@ -1,6 +1,9 @@
+local logger = require("core/logger")
+
 local M = {}
 
 local registered = false
+
 local modifiers = {
     {
         name = "modifier_building_stationary",
@@ -18,21 +21,42 @@ local modifiers = {
         name = "modifier_enemy_wall_ai",
         path = "modifiers/modifier_enemy_wall_ai",
     },
+    {
+        name = "modifier_survival_hero_skill",
+        path = "modifiers/modifier_survival_hero_skill",
+    },
 }
 
-function M.register()
-    if registered then return end
-    registered = true
+local function link(definition)
+    LinkLuaModifier(
+        definition.name,
+        definition.path,
+        LUA_MODIFIER_MOTION_NONE
+    )
+    require(definition.path)
 
-    for _, definition in ipairs(modifiers) do
-        -- Force the engine adapter class to exist before any AddNewModifier call.
-        require(definition.path)
-        LinkLuaModifier(
-            definition.name,
-            definition.path,
-            LUA_MODIFIER_MOTION_NONE
+    if _G[definition.name] == nil then
+        error(
+            "modifier class was not created: "
+            .. definition.name
+            .. " from "
+            .. definition.path
         )
     end
+end
+
+function M.register()
+    if registered then
+        return
+    end
+    for _, definition in ipairs(modifiers) do
+        link(definition)
+    end
+    registered = true
+    logger.info(
+        "ModifierRegistry",
+        "registered " .. tostring(#modifiers) .. " modifiers"
+    )
 end
 
 return M

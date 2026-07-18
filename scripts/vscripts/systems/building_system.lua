@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/buildings_config")
 local logger = require("core/logger")
+local modifier_registry = require("core/modifier_registry")
 
 local M = {}
 local buildings = {}
@@ -178,9 +179,20 @@ local function create_building(payload)
     end
 
     unit:SetControllableByPlayer(check.player_id, true)
-    unit:AddNewModifier(unit, nil, "modifier_building_stationary", {})
+    modifier_registry.register()
+    unit:AddNewModifier(
+        unit,
+        nil,
+        "modifier_building_stationary",
+        {}
+    )
     if not check.definition.show_health_bar then
-        unit:AddNewModifier(unit, nil, "modifier_building_no_health_bar", {})
+        unit:AddNewModifier(
+            unit,
+            nil,
+            "modifier_building_no_health_bar",
+            {}
+        )
     end
     add_building_abilities(unit, check.definition)
     apply_initial_stats(unit, check.definition)
@@ -258,6 +270,7 @@ local function on_entity_killed(payload)
 end
 
 function M.init()
+    modifier_registry.register()
     buildings = {}
     counts = {}
     wall_ever_built = {}

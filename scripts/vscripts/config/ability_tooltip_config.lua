@@ -89,6 +89,50 @@ local M = {
         abilitydesc = "选择防御塔转职方向五。五个方向当前消耗相同。",
         abilityicon = "zuus_arc_lightning",
     },
+
+    ability_build_hero_altar = {
+        abilityid = "ability_build_hero_altar",
+        abilityname = "建造英雄祭坛",
+        abilitydesc = "主城达到3级后可建造。祭坛可以召唤一个战斗英雄；召唤完成后祭坛停止工作，并解锁商店。",
+        abilityicon = "omniknight_guardian_angel",
+    },
+    ability_open_hero_altar = {
+        abilityid = "ability_open_hero_altar",
+        abilityname = "召唤英雄",
+        abilitydesc = "从斧王、斯拉克、主宰、齐天大圣和宙斯中选择一个英雄。每位玩家只能选择一次，齐天大圣和宙斯需要VIP。",
+        abilityicon = "chen_holy_persuasion",
+    },
+
+ability_summon_axe = {
+    abilityid = "ability_summon_axe",
+    abilityname = "召唤斧王",
+    abilitydesc = "召唤斧王作为战斗英雄。清除原版技能后，初始获得1个斧王专属项目技能。",
+    abilityicon = "axe_berserkers_call",
+},
+ability_summon_slark = {
+    abilityid = "ability_summon_slark",
+    abilityname = "召唤斯拉克",
+    abilitydesc = "召唤斯拉克作为战斗英雄。清除原版技能后，初始获得1个斯拉克专属项目技能。",
+    abilityicon = "slark_dark_pact",
+},
+ability_summon_juggernaut = {
+    abilityid = "ability_summon_juggernaut",
+    abilityname = "召唤主宰",
+    abilitydesc = "召唤主宰作为战斗英雄。清除原版技能后，初始获得1个主宰专属项目技能。",
+    abilityicon = "juggernaut_blade_fury",
+},
+ability_summon_monkey_king = {
+    abilityid = "ability_summon_monkey_king",
+    abilityname = "召唤齐天大圣（VIP）",
+    abilitydesc = "召唤齐天大圣。需要VIP权限，攻击距离1000，清除原版技能后初始获得4个项目技能。",
+    abilityicon = "monkey_king_boundless_strike",
+},
+ability_summon_blademaster = {
+    abilityid = "ability_summon_blademaster",
+    abilityname = "召唤剑圣（VIP）",
+    abilitydesc = "召唤剑圣。需要VIP权限；当前使用Sven作为测试载体，初始获得4个项目技能。",
+    abilityicon = "sven_gods_strength",
+},
 }
 
 return M

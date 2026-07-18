@@ -1,4 +1,4 @@
-"lang"
+﻿"lang"
 {
     "Language" "english"
     "Tokens"
@@ -16,5 +16,17 @@
         "DOTA_Tooltip_ability_ability_tower_class_3" "Class Three"
         "DOTA_Tooltip_ability_ability_tower_class_4" "Class Four"
         "DOTA_Tooltip_ability_ability_tower_class_5" "Class Five"
+        "DOTA_Tooltip_ability_ability_build_hero_altar" "Build Hero Altar"
+        "DOTA_Tooltip_ability_ability_summon_axe" "Summon Axe"
+        "DOTA_Tooltip_ability_ability_summon_axe_Description" "Summon Axe with basic attacks only."
+        "DOTA_Tooltip_ability_ability_summon_slark" "Summon Slark"
+        "DOTA_Tooltip_ability_ability_summon_slark_Description" "Summon Slark with basic attacks only."
+        "DOTA_Tooltip_ability_ability_summon_juggernaut" "Summon Juggernaut"
+        "DOTA_Tooltip_ability_ability_summon_juggernaut_Description" "Summon Juggernaut with basic attacks only."
+        "DOTA_Tooltip_ability_ability_summon_monkey_king" "Summon Monkey King (VIP)"
+        "DOTA_Tooltip_ability_ability_summon_monkey_king_Description" "VIP required. Uses Sven as a temporary carrier and starts with four project skills."
+        "DOTA_Tooltip_ability_ability_summon_blademaster" "Summon Blademaster (VIP)"
+        "DOTA_Tooltip_ability_ability_summon_blademaster_Description" "VIP required. Uses Sven as a temporary carrier and starts with four project skills."
+        "npc_dota_unit_building_hero_altar" "Hero Altar"
     }
 }
