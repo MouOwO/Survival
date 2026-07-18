@@ -13,7 +13,6 @@ local function grant_native_item(player_id, entry)
     if not hero or hero:IsNull() then
         return { ok = false, error = "hero_not_ready" }
     end
-
     local native_name = entry.definition.native_item_name
     if not native_name or native_name == "" then
         return { ok = false, error = "native_item_missing" }
@@ -26,13 +25,17 @@ local function grant_native_item(player_id, entry)
     return { ok = true }
 end
 
-local function grant_virtual_item(player_id, entry, state)
-    state.inventory_by_player[player_id] =
-        state.inventory_by_player[player_id] or {}
-    local inventory = state.inventory_by_player[player_id]
-    inventory[entry.contentid] =
-        (inventory[entry.contentid] or 0) + 1
-    return { ok = true }
+local function grant_virtual_item(player_id, entry)
+    local result = event_bus.request(
+        events.CONTENT_INVENTORY_GRANT_REQUEST,
+        {
+            player_id = player_id,
+            content_id = entry.contentid,
+            count = 1,
+            reason = "shop_purchase:" .. entry.entryid,
+        }
+    )
+    return result or { ok = false, error = "inventory_handler_missing" }
 end
 
 local function grant_technology(player_id, entry, state)
@@ -55,10 +58,7 @@ local function start_encounter(player_id, team, entry)
             encounter_id = entry.encounter_id,
         }
     )
-    return result or {
-        ok = false,
-        error = "encounter_handler_missing",
-    }
+    return result or { ok = false, error = "encounter_handler_missing" }
 end
 
 function M.grant(player_id, team, entry, state)
@@ -72,7 +72,7 @@ function M.grant(player_id, team, entry, state)
         return grant_native_item(player_id, entry)
     end
     if entry.grant_type == "virtual_item" then
-        return grant_virtual_item(player_id, entry, state)
+        return grant_virtual_item(player_id, entry)
     end
     return { ok = false, error = "unsupported_grant_type" }
 end

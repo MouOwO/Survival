@@ -6,7 +6,6 @@ local M = {}
 local state = {}
 local function reset_state()
     state = {
-        inventory_by_player = {},
         technology_by_player = {},
         purchased_count = {},
         processed_requests = {},
@@ -38,9 +37,13 @@ local function building_counts(team)
 end
 local function owned_content(player_id)
     local result = {}
-    for content_id, count in pairs(
-        state.inventory_by_player[player_id] or {}
-    ) do
+    local inventory = event_bus.request(
+        events.CONTENT_INVENTORY_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local counts = inventory and inventory.snapshot
+        and inventory.snapshot.counts or {}
+    for content_id, count in pairs(counts) do
         if count > 0 then
             result[content_id] = true
         end
@@ -275,5 +278,6 @@ function M.init()
     event_bus.subscribe(events.HERO_SUMMON_STATE_CHANGED, on_player_changed)
     event_bus.subscribe(events.PLAYER_ENTITLEMENT_CHANGED, on_player_changed)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_player_changed)
+    event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_player_changed)
 end
 return M

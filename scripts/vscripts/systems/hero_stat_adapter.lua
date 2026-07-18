@@ -44,8 +44,6 @@ local function apply_primary_stats(unit, definition)
 end
 
 local function apply_combat_stats(unit, definition)
-    set_if_present(unit, definition, "base_damage_min", "SetBaseDamageMin")
-    set_if_present(unit, definition, "base_damage_max", "SetBaseDamageMax")
     set_if_present(unit, definition, "base_attack_time", "SetBaseAttackTime")
     set_if_present(
         unit,
@@ -136,24 +134,6 @@ local function apply_all_attributes(unit, amount)
 end
 
 local function apply_multipliers(unit, definition)
-    local damage = number(definition, "damage_multiplier") or 1
-    if damage ~= 1 then
-        local minimum = safe_get(unit, "GetBaseDamageMin")
-        local maximum = safe_get(unit, "GetBaseDamageMax")
-        if minimum and maximum then
-            safe_call(
-                unit,
-                "SetBaseDamageMin",
-                math.floor(minimum * damage)
-            )
-            safe_call(
-                unit,
-                "SetBaseDamageMax",
-                math.floor(maximum * damage)
-            )
-        end
-    end
-
     local health = number(definition, "max_health_multiplier") or 1
     if health ~= 1 then
         local maximum = safe_get(unit, "GetMaxHealth")
@@ -205,16 +185,10 @@ function M.apply(unit, definition)
         return
     end
 
-    apply_primary_stats(unit, definition)
     apply_combat_stats(unit, definition)
     apply_range(unit, definition)
     apply_resource_stats(unit, definition)
     apply_misc(unit, definition)
-    safe_call(unit, "CalculateStatBonus", true)
-    apply_all_attributes(
-        unit,
-        number(definition, "all_attributes_bonus") or 0
-    )
     safe_call(unit, "CalculateStatBonus", true)
     apply_multipliers(unit, definition)
     apply_level(unit, definition)

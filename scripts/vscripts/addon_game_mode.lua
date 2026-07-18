@@ -32,6 +32,16 @@ local monster_reward_service =
 local monster_spawn_service =
     require("systems/monster_spawn_service")
 local wave_system = require("systems/wave_system")
+local content_inventory_service =
+    require("systems/content_inventory_service")
+local weapon_equipment_service =
+    require("systems/weapon_equipment_service")
+local weapon_synthesis_service =
+    require("systems/weapon_synthesis_service")
+local weapon_growth_service =
+    require("systems/weapon_growth_service")
+local hero_combat_stat_service =
+    require("systems/hero_combat_stat_service")
 local shop_system = require("systems/shop_system")
 
 local ui_projection = require("ui/ui_projection")
@@ -46,6 +56,8 @@ local hero_skill_ui_service =
     require("ui/hero_skill_ui_service")
 local monster_encounter_ui_service =
     require("ui/monster_encounter_ui_service")
+local combat_stats_ui_service =
+    require("ui/combat_stats_ui_service")
 local cheat_command_service =
     require("debug/cheat_command_service")
 
@@ -184,6 +196,7 @@ function M.activate()
     hero_summon_ui_service.init()
     hero_skill_ui_service.init()
     monster_encounter_ui_service.init()
+    combat_stats_ui_service.init()
 
     grid_system.init()
     resource_system.init()
@@ -196,6 +209,11 @@ function M.activate()
     hero_skill_system.init()
     hero_skill_pool_service.init()
     hero_skill_choice_service.init()
+    content_inventory_service.init()
+    weapon_equipment_service.init()
+    weapon_synthesis_service.init()
+    weapon_growth_service.init()
+    hero_combat_stat_service.init()
     hero_summon_system.init()
     builder_progression_system.init()
     gold_mine_system.init()
@@ -218,7 +236,7 @@ function M.activate()
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
     logger.info(
         "Addon",
-        "initialized V1.5c hero data and skill core"
+        "initialized V1.6 logical weapon growth core"
     )
 end
 

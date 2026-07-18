@@ -25,6 +25,14 @@ local modifiers = {
         name = "modifier_survival_hero_skill",
         path = "modifiers/modifier_survival_hero_skill",
     },
+    {
+        name = "modifier_weapon_attack_tracker",
+        path = "modifiers/modifier_weapon_attack_tracker",
+    },
+    {
+        name = "modifier_weapon_stat_projection",
+        path = "modifiers/modifier_weapon_stat_projection",
+    },
 }
 
 local function link(definition)

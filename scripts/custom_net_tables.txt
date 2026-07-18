@@ -9,5 +9,8 @@
         "survival_item_config",
         "survival_hero_skills",
         "survival_hero_skill_choice",
+        "survival_combat_stats",
+        "survival_content_inventory",
+        "survival_weapon_state",
     ]
 }

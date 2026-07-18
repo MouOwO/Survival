@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local logger = require("core/logger")
+local weapon_cheats = require("debug/weapon_cheat_handlers")
 
 local M = {}
 
@@ -229,6 +230,9 @@ local COMMANDS = {
     skilloffer = skill_offer,
     skillchoose = skill_choose,
     skills = list_skills,
+    givegrowthsword = weapon_cheats.give_growth_sword,
+    weapongrow = weapon_cheats.grow_weapon,
+    weaponstats = weapon_cheats.weapon_stats,
 }
 
 local function on_player_chat(keys)
@@ -268,7 +272,7 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: resource, vip, summon, boss, skill offer/choose"
+        "ready: resource, hero, skill, weapon growth"
     )
 end
 

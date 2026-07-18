@@ -74,6 +74,22 @@ local M = {
     HERO_SKILL_CHOICE_SELECT_REQUEST = "hero.skill.choice.select.request",
     HERO_SKILL_CHOICE_CHANGED = "hero.skill.choice.changed",
 
+    CONTENT_INVENTORY_GRANT_REQUEST = "content.inventory.grant.request",
+    CONTENT_INVENTORY_TRANSACTION_REQUEST = "content.inventory.transaction.request",
+    CONTENT_INVENTORY_GET_REQUEST = "content.inventory.get.request",
+    CONTENT_INVENTORY_CHANGED = "content.inventory.changed",
+
+    WEAPON_EQUIPMENT_GET_REQUEST = "weapon.equipment.get.request",
+    WEAPON_EQUIPPED_CHANGED = "weapon.equipped.changed",
+    WEAPON_ATTACK_LANDED = "weapon.attack.landed",
+    WEAPON_GROWTH_GET_REQUEST = "weapon.growth.get.request",
+    WEAPON_GROWTH_DEBUG_REQUEST = "weapon.growth.debug.request",
+    WEAPON_GROWTH_CHANGED = "weapon.growth.changed",
+    WEAPON_SYNTHESIZED = "weapon.synthesized",
+
+    HERO_COMBAT_STATS_GET_REQUEST = "hero.combat_stats.get.request",
+    HERO_COMBAT_STATS_CHANGED = "hero.combat_stats.changed",
+
     MONSTER_ENCOUNTER_START_REQUEST = "monster.encounter.start.request",
     MONSTER_ENCOUNTER_QUERY_REQUEST = "monster.encounter.query.request",
     MONSTER_ENCOUNTER_CHANGED = "monster.encounter.changed",
