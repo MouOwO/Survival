@@ -1,3 +1,0 @@
-﻿record_id,record_type,class_id,tower_id,name,level,base_attack_damage,attack_speed,critical_chance_pct,critical_damage_multiplier,attack_armor_reduction,class_change_gold,class_change_wood,population_cost,class_description,passive_name,passive_level,passive_description,upgrade_ability_name,upgrade_target_id,upgrade_gold,upgrade_wood,upgrade_description,enabled,notes
-#types:string,string,string,string,string,number,number,number,number,number,number,number,number,number,string,string,number,string,string,string,number,number,string,boolean,string
-lightning_tower_class,class_change,lightning_tower,lightning_tower,闪电塔,,,,,,,,,,,,,,,,,,,0,待填写转职和等级数据；填写完成后将enabled改为1。

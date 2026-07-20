@@ -1,4 +1,0 @@
-﻿record_id,record_type,class_id,tower_id,name,level,base_attack_damage,attack_speed,critical_chance_pct,critical_damage_multiplier,attack_armor_reduction,class_change_gold,class_change_wood,population_cost,class_description,passive_name,passive_level,passive_description,upgrade_ability_name,upgrade_target_id,upgrade_gold,upgrade_wood,upgrade_description,enabled,notes
-#types:string,string,string,string,string,number,number,number,number,number,number,number,number,number,string,string,number,string,string,string,number,number,string,boolean,string
-death_tower_class,class_change,death_tower,death_tower,死亡之塔,,,,10,5,,20,1000,1,攻击有10%的几率触发5倍暴击，每次升级几率+3%,,,,,,,,,1,箭塔转职时显示class_description以及转职消耗。
-death_tower_lv01,level,death_tower,death_tower_lv01,死亡之塔LV1,1,1200,,13,5,0,,,,,致命一击,2,13%的概率使得攻击能造成5倍于一般攻击的伤害值 每次升级几率+3%,升级到死亡之塔lv2,death_tower_lv02,50,1500,攻击有16%几率触发5倍暴击，每次升级几率+3%,1,
