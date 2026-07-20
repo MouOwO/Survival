@@ -33,4 +33,11 @@ function modifier_weapon_attack_tracker:OnAttackLanded(params)
         target = target,
         record = params.record,
     })
+    event_bus.emit(events.TREE_HIT, {
+        player_id = self.player_id,
+        attacker = self:GetParent(),
+        target = target,
+        team = self:GetParent():GetTeamNumber(),
+        source = "hero",
+    })
 end

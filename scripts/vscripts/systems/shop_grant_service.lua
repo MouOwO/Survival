@@ -25,7 +25,23 @@ local function grant_native_item(player_id, entry)
     return { ok = true }
 end
 
-local function grant_virtual_item(player_id, entry)
+local function grant_virtual_item(player_id, entry, state)
+    local definition = entry.definition or {}
+    if definition.progression_type == "repeat_purchase" and definition.series_id then
+        local inv = event_bus.request(events.CONTENT_INVENTORY_GET_REQUEST, { player_id = player_id })
+        local counts = inv and inv.snapshot and inv.snapshot.counts or {}
+        for id, count in pairs(counts) do
+            if count > 0 and string.find(id, definition.series_id, 1, true) then
+                local defs = require("config/generated/weapon_definitions")
+                local current = defs.by_id[id]
+                local next_id = current and current.next_content_id or entry.contentid
+                return event_bus.request(events.CONTENT_INVENTORY_TRANSACTION_REQUEST, {
+                    player_id = player_id, consume = {[id] = 1}, grant = {[next_id] = 1},
+                    reason = "shop_repeat_upgrade:" .. entry.entryid,
+                })
+            end
+        end
+    end
     local result = event_bus.request(
         events.CONTENT_INVENTORY_GRANT_REQUEST,
         {
@@ -72,7 +88,7 @@ function M.grant(player_id, team, entry, state)
         return grant_native_item(player_id, entry)
     end
     if entry.grant_type == "virtual_item" then
-        return grant_virtual_item(player_id, entry)
+        return grant_virtual_item(player_id, entry, state)
     end
     return { ok = false, error = "unsupported_grant_type" }
 end

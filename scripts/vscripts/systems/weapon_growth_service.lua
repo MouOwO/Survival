@@ -4,6 +4,8 @@ local weapons = require("config/generated/weapon_definitions")
 
 local M = {}
 local state_by_player = {}
+local FORGING_HAMMER_ID = "item_forging_hammer"
+local FORGING_HAMMER_LIMIT = 4
 
 local function state(player_id)
     state_by_player[player_id] = state_by_player[player_id] or {
@@ -23,6 +25,16 @@ local function snapshot(player_id)
     local current = state(player_id)
     local definition = weapons.by_id[current.content_id] or {}
     local target = tonumber(definition.progression_value) or 0
+    local inventory = event_bus.request(
+        events.CONTENT_INVENTORY_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local counts = inventory and inventory.snapshot
+        and inventory.snapshot.counts or {}
+    local hammer_count = math.min(FORGING_HAMMER_LIMIT, math.max(
+        0,
+        math.floor(tonumber(counts[FORGING_HAMMER_ID]) or 0)
+    ))
     return {
         player_id = player_id,
         content_id = current.content_id,
@@ -30,6 +42,9 @@ local function snapshot(player_id)
         stage = tonumber(definition.stage) or 0,
         stage_attack_count = current.stage_attack_count,
         stage_attack_target = target,
+        stage_attack_remaining = math.max(0, target - current.stage_attack_count),
+        forging_hammer_count = hammer_count,
+        progress_per_attack = 1 + hammer_count,
         lifetime_attack_count = current.lifetime_attack_count,
         growth_attack = current.growth_attack,
         growth_strength = current.growth_strength,
@@ -141,7 +156,9 @@ local function add_attacks(player_id, amount, reason)
 end
 
 local function on_attack_landed(payload)
-    add_attacks(tonumber(payload.player_id), 1, "attack_landed")
+    local player_id = tonumber(payload.player_id)
+    local data = snapshot(player_id)
+    add_attacks(player_id, data.progress_per_attack, "attack_landed")
 end
 
 local function on_hero_summoned(payload)
@@ -159,6 +176,12 @@ local function get_growth(payload)
     return { ok = true, snapshot = snapshot(tonumber(payload.player_id)) }
 end
 
+local function on_inventory_changed(payload)
+    if payload.changes and payload.changes[FORGING_HAMMER_ID] then
+        publish(tonumber(payload.player_id), "forging_hammer_changed")
+    end
+end
+
 local function debug_add(payload)
     return add_attacks(
         tonumber(payload.player_id),
@@ -173,6 +196,7 @@ function M.init()
     event_bus.handle_request(events.WEAPON_GROWTH_DEBUG_REQUEST, debug_add)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_equipped)
     event_bus.subscribe(events.WEAPON_ATTACK_LANDED, on_attack_landed)
+    event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_inventory_changed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
 end
 

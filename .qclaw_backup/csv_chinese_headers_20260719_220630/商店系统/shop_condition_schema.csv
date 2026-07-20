@@ -1,0 +1,11 @@
+﻿field_name,value_type,evaluation_order,disabled_reason_template,notes
+#types:string,enum,number,string,string
+requires_hero_summoned,boolean,10,请先在英雄祭坛召唤英雄,商店整体也会在英雄召唤前隐藏。
+required_city_level,number,20,需要主城达到Lv.{value},
+requires_vip,boolean,30,需要VIP权限,
+required_rebirth_level,number,40,需要完成{value}转,
+requires_building_id,string,50,需要建筑：{value},
+requires_content_id,string,60,需要前置内容：{value},
+purchase_limit,number,70,已达到购买上限,
+encounter_id,string,80,遭遇或出生点尚未配置,grant_type=start_encounter时不能为空。
+resource,number,90,木材或金币不足,

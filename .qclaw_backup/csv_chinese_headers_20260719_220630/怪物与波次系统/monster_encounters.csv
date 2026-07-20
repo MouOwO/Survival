@@ -1,0 +1,13 @@
+﻿encounter_id,encounter_type,display_name,spawn_point_id,archetype_id,reward_profile_id,rebirth_level,difficulty_level,max_alive,auto_spawn,respawn_policy,respawn_seconds,shop_entry_id,enabled,notes
+#types:string,enum,string,string,string,string,number,number,number,boolean,enum,number,string,boolean,string
+encounter_wild_boss,wild_boss,野外Boss,spawn_wild_boss,wild_boss_common,reward_wild_boss_default,0,1,1,0,none,0,,1,未指定自动刷新和普通野外Boss掉落，当前由服务端请求或作弊码触发。
+encounter_rebirth_01,rebirth_boss,一转Boss,spawn_rebirth_01,wild_boss_common,reward_rebirth_01,1,1,1,0,none,0,shop_rebirth_challenge_01,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_02,rebirth_boss,二转Boss,spawn_rebirth_02,wild_boss_common,reward_rebirth_02,2,2,1,0,none,0,shop_rebirth_challenge_02,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_03,rebirth_boss,三转Boss,spawn_rebirth_03,wild_boss_common,reward_rebirth_03,3,3,1,0,none,0,shop_rebirth_challenge_03,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_04,rebirth_boss,四转Boss,spawn_rebirth_04,wild_boss_common,reward_rebirth_04,4,4,1,0,none,0,shop_rebirth_challenge_04,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_05,rebirth_boss,五转Boss,spawn_rebirth_05,wild_boss_common,reward_rebirth_05,5,5,1,0,none,0,shop_rebirth_challenge_05,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_06,rebirth_boss,六转Boss,spawn_rebirth_06,wild_boss_common,reward_rebirth_06,6,6,1,0,none,0,shop_rebirth_challenge_06,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_07,rebirth_boss,七转Boss,spawn_rebirth_07,wild_boss_common,reward_rebirth_07,7,7,1,0,none,0,shop_rebirth_challenge_07,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_08,rebirth_boss,八转Boss,spawn_rebirth_08,wild_boss_common,reward_rebirth_08,8,8,1,0,none,0,shop_rebirth_challenge_08,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_09,rebirth_boss,九转Boss,spawn_rebirth_09,wild_boss_common,reward_rebirth_09,9,9,1,0,none,0,shop_rebirth_challenge_09,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。
+encounter_rebirth_10,rebirth_boss,十转Boss,spawn_rebirth_10,wild_boss_common,reward_rebirth_10,10,10,1,0,none,0,shop_rebirth_challenge_10,1,由转职挑战商店项目触发；服务端验证当前转职等级、费用和该位置是否已有Boss。

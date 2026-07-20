@@ -1,0 +1,13 @@
+﻿pool_member_id,pool_id,skill_id,weight,min_rebirth_level,max_rebirth_level,enabled,notes
+#中文名:技能池成员ID,池ID,技能ID,权重,最低转生等级,最高转生等级,是否启用,备注
+#types:string,string,string,number,number,number,boolean,string
+public_01,public_pool,skill_power_training,100,2,10,1,二转及以后公共随机池。
+public_02,public_pool,skill_vitality_training,100,2,10,1,二转及以后公共随机池。
+public_03,public_pool,skill_agility_training,100,2,10,1,二转及以后公共随机池。
+public_04,public_pool,skill_intellect_training,100,2,10,1,二转及以后公共随机池。
+public_05,public_pool,skill_armor_training,100,2,10,1,二转及以后公共随机池。
+public_06,public_pool,skill_attack_speed_training,100,2,10,1,二转及以后公共随机池。
+public_07,public_pool,skill_move_speed_training,100,2,10,1,二转及以后公共随机池。
+public_08,public_pool,skill_attack_range_training,80,2,10,1,二转及以后公共随机池。
+public_09,public_pool,skill_health_regen_training,100,2,10,1,二转及以后公共随机池。
+public_10,public_pool,skill_mana_regen_training,100,2,10,1,二转及以后公共随机池。

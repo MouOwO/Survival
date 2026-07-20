@@ -1,0 +1,54 @@
+(function () {
+    "use strict";
+
+    function rootPanel(panel) {
+        var current = panel || $.GetContextPanel();
+        while (current && current.GetParent()) current = current.GetParent();
+        return current;
+    }
+
+    function numberOr(value, fallback) {
+        return typeof value === "number" && isFinite(value) ? value : fallback;
+    }
+
+    function absoluteOffset(panel) {
+        var x = 0;
+        var y = 0;
+        var current = panel;
+        while (current) {
+            x += numberOr(current.actualxoffset, 0);
+            y += numberOr(current.actualyoffset, 0);
+            current = current.GetParent ? current.GetParent() : null;
+        }
+        return { x: x, y: y };
+    }
+
+    function placeRight(tooltip, source, width, height) {
+        if (!tooltip || !source) return;
+        var root = rootPanel(source);
+        var rootWidth = numberOr(root && root.actuallayoutwidth, 1920);
+        var rootHeight = numberOr(root && root.actuallayoutheight, 1080);
+        var sourcePosition = absoluteOffset(source);
+        var sourceWidth = numberOr(source.actuallayoutwidth, 64);
+        var tooltipWidth = numberOr(width, tooltip.actuallayoutwidth || 430);
+        var tooltipHeight = numberOr(height, tooltip.actuallayoutheight || 260);
+        var gap = 14;
+
+        var x = sourcePosition.x + sourceWidth + gap;
+        if (x + tooltipWidth > rootWidth - 12) {
+            x = sourcePosition.x - tooltipWidth - gap;
+        }
+        x = Math.max(12, Math.min(x, rootWidth - tooltipWidth - 12));
+
+        var y = sourcePosition.y;
+        if (y + tooltipHeight > rootHeight - 12) {
+            y = rootHeight - tooltipHeight - 12;
+        }
+        y = Math.max(12, y);
+        tooltip.style.position = Math.round(x) + "px " + Math.round(y) + "px 0px";
+    }
+
+    GameUI.CustomUIConfig().SurvivalTooltipPosition = {
+        PlaceRight: placeRight
+    };
+})();

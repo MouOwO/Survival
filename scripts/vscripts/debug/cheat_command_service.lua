@@ -2,10 +2,12 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local logger = require("core/logger")
 local weapon_cheats = require("debug/weapon_cheat_handlers")
+local attack_speed_cheat = require("debug/attack_speed_cheat")
+local wave_system = require("systems/wave_system")
 
 local M = {}
 
-local RESOURCE_AMOUNT = 100000
+local RESOURCE_AMOUNT = 100000000
 
 local HERO_ALIASES = {
     axe = "hero_axe",
@@ -77,6 +79,25 @@ local function show_shop(context)
         { source = "cheat_command_service" }
     )
     return true
+end
+
+local function enable_dev(context)
+    local result = event_bus.request(events.RESOURCE_DEBUG_SET_REQUEST, {
+        team = context.team, amount = 100000000, reason = "cheat_dev"
+    })
+    if not result or not result.ok then
+        return false, result and result.error or "debug_resource_failed"
+    end
+    wave_system.set_dev_mode(true)
+    notify(context, "开发者模式已开启：停止自动出怪，资源已设为100000000")
+    return true
+end
+
+local function spawn_wave(context)
+    local number = tonumber(context.command_suffix) or tonumber(context.args[1])
+    if not number then return false, "usage: monster1 ... monster25" end
+    local ok, err = wave_system.debug_spawn_wave(number)
+    return ok, err
 end
 
 local function add_resource(context)
@@ -222,8 +243,10 @@ local function list_skills(context)
 end
 
 local COMMANDS = {
+    dev = enable_dev,
     shopshow = show_shop,
     addresource = add_resource,
+    addspeed = attack_speed_cheat.execute,
     setvip = set_vip,
     summonhero = summon_hero,
     spawnboss = spawn_boss,
@@ -231,6 +254,7 @@ local COMMANDS = {
     skillchoose = skill_choose,
     skills = list_skills,
     givegrowthsword = weapon_cheats.give_growth_sword,
+    givehammer = weapon_cheats.give_forging_hammer,
     weapongrow = weapon_cheats.grow_weapon,
     weaponstats = weapon_cheats.weapon_stats,
 }
@@ -239,6 +263,12 @@ local function on_player_chat(keys)
     local args = words(keys and keys.text)
     local command = string.gsub(args[1] or "", "^%-", "")
     local handler = COMMANDS[command]
+    local command_suffix = nil
+    local monster_number = string.match(command, "^monster(%d+)$")
+    if monster_number then
+        handler = spawn_wave
+        command_suffix = monster_number
+    end
     if not handler then
         return
     end
@@ -257,6 +287,7 @@ local function on_player_chat(keys)
         player_id = player_id,
         team = PlayerResource:GetTeam(player_id),
         args = args,
+        command_suffix = command_suffix,
     })
     if ok then
         logger.info("CheatCommand", command .. " executed")
@@ -269,10 +300,11 @@ local function on_player_chat(keys)
 end
 
 function M.init()
+    attack_speed_cheat.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: resource, hero, skill, weapon growth"
+        "ready: resource, hero, skill, weapon growth, dev, monsterN"
     )
 end
 

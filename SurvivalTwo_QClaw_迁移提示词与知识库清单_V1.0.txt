@@ -1,0 +1,911 @@
+# SurvivalTwo /《我在僵尸岛苟发育》QClaw 迁移提示词与知识库清单 V1.0
+
+更新日期：2026-07-18  
+当前最新交付包：`Survival_V1.6_WeaponGrowthLogicalStats.zip`
+
+---
+
+# 一、提交给 QClaw 的主提示词
+
+下面整段可直接作为 QClaw 项目的长期系统提示词、项目说明或首条任务提示词。
+
+```text
+你现在接管一个 Dota 2 Workshop Tools 自定义游戏项目。
+
+项目名称：
+- SurvivalTwo
+- 游戏名：《我在僵尸岛苟发育》
+- 当前 Addon 目录名：survival
+- 不要使用旧目录名 survival_two
+
+本机路径：
+- Dota 根目录：
+  D:\steam\steamapps\common\dota 2 beta
+- 服务端游戏目录：
+  D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival
+- 客户端内容目录：
+  D:\steam\steamapps\common\dota 2 beta\content\dota_addons\survival
+
+当前事实来源优先级：
+1. 用户当前机器上的实际 survival 工程目录。
+2. 最新交付包 Survival_V1.6_WeaponGrowthLogicalStats.zip。
+3. Survival_ContentData_Design_V1.3_HeroDataSkillCore.xlsx。
+4. 当前最新运行日志和控制台报错。
+5. V1.5c、V1.5b 和 V1.4c 仅作为历史与回退参考。
+6. 更旧的 V1.2、V1.3、V1.4 UI 补丁不得被当作当前代码基线。
+
+严格禁止把多个旧版本混合成“当前版本”。
+发现同名文件冲突时，以当前实际工程和 V1.6 为准，并明确报告冲突。
+
+============================================================
+一、长期代码规范
+============================================================
+
+1. 文件即模块
+- 每个 Lua 文件是独立模块。
+- 普通业务模块采用：
+  local M = {}
+  ...
+  return M
+- 单个 Lua 文件原则上不超过 300 行。
+- 超过 300 行必须按职责拆分，不能仅压缩代码行规避限制。
+
+2. 组合根
+- addon_game_mode.lua 是唯一组合根。
+- 只负责 require、初始化、Precache 和引擎入口适配。
+- 禁止持续把业务逻辑堆入 addon_game_mode.lua。
+
+3. 事件驱动
+- 玩法模块通过 core/event_bus.lua 订阅、分发和请求。
+- 禁止玩法模块之间直接调用业务函数。
+- 服务端必须是玩法状态的唯一权威来源。
+
+4. 变量与全局
+- 业务变量必须使用 local。
+- 禁止新增业务全局状态。
+- 只允许 Dota 引擎要求的 Precache、Activate、Ability 类和 Modifier 类暴露在引擎适配层。
+- keys 只能在当前回调参数作用域使用。
+
+5. 实体操作
+- 优先使用实体句柄 API。
+- 不要通过单位名称进行不可靠的全局实体操作。
+- 优先 EntFireByHandle，而不是按名称 DoEntFire。
+- 所有实体必须先检查 nil 和 IsNull。
+
+6. 客户端安全
+- 客户端只提交意图和 ID。
+- 客户端不能提交价格、等级、奖励、概率、最终属性和伤害结果。
+- 资源消耗、VIP、前置条件、配方、技能候选、技能升级和奖励全部由服务端验证。
+
+7. 数据配置
+- 策划数据优先存入 CSV。
+- CSV 通过 tools/csv_to_lua/build_configs.sh 生成 LuaConfig。
+- 禁止直接修改 scripts/vscripts/config/generated 下的 Lua。
+- 生成文件必须可重复生成。
+
+8. 编码
+- Lua、KV、XML、JS、CSS 使用 UTF-8。
+- PowerShell 安装器优先纯 ASCII。
+- PowerShell 禁止通过 Get-Content / Set-Content 拼接或重写含中文源码。
+- 安装器应使用 Copy-Item 按原始字节复制完整文件。
+- 已乱码文件不能通过“转为 UTF-8”修复，必须从干净文件恢复。
+
+9. 交付方式
+- 每次修改应给出完整更新包或明确 patch。
+- 提供一个可直接执行的 PowerShell 命令。
+- 自动备份现有文件。
+- 给出日志和状态文件路径。
+- 报告修改文件清单。
+- 报告 Lua 语法检查、文件行数、require 检查、KV/XML/JS 检查。
+- 必须区分：
+  【源码确认】
+  【静态检查通过】
+  【待 Dota 2 实机验证】
+- 没有经过 Dota 2 Workshop Tools 实机测试，不得宣称运行成功。
+
+============================================================
+二、当前已经完成和确认的基础系统
+============================================================
+
+1. 建造者
+- 初始英雄使用 Undying 作为建造者。
+- Undying 只承担建造和经营功能。
+- Undying 与祭坛召唤出的战斗英雄必须完全隔离。
+- 战斗英雄不能获得 Undying 的建造技能。
+
+2. 建造流程
+- 初始只有“建造城墙”。
+- 城墙完成后替换为“建造主城”。
+- 主城完成后获得：
+  - 建造箭塔
+  - 建造英雄祭坛
+- 金矿运行时代码可以保留，但当前默认建造阶段可关闭。
+- 城墙整局只能建造一次。
+- 城墙可选择、显示血条、有升级技能。
+- 除城墙外的建筑默认不显示头顶血条。
+- 主城拥有：
+  - 升级主城
+  - 训练伐木工
+- 主城被摧毁时游戏失败。
+
+3. 工人和资源
+- 伐木工在主城附近生成，避免与主城碰撞。
+- 自动攻击树木并增加木材。
+- 木材、金币、人口和主城状态由服务端同步。
+- 波次、等待时间、存活怪物等数据由服务端同步。
+- 战争迷雾应关闭。
+
+4. 防御塔
+- 防御塔升级到 5 级后，从五个相同成本的转职方向中选择。
+- 转职后可以继续升级。
+- 转职和升级由服务端验证。
+
+============================================================
+三、英雄祭坛与英雄系统
+============================================================
+
+1. 祭坛前置
+- 主城达到 3 级后才能建造英雄祭坛。
+- 每位玩家整局只能成功召唤一个战斗英雄。
+- 召唤后五个召唤按钮全部禁用。
+- 祭坛保留为无行为建筑。
+
+2. 祭坛技能按钮
+当前不依赖英雄选择 Panorama 面板，祭坛直接放置五个召唤技能：
+
+技能 1：斧王，普通英雄
+技能 2：斯拉克，普通英雄
+技能 3：主宰，普通英雄
+技能 4：齐天大圣，VIP 英雄
+技能 5：剑圣，VIP 英雄
+
+当前项目英雄 ID：
+- hero_axe
+- hero_slark
+- hero_juggernaut
+- hero_monkey_king
+- hero_blademaster
+
+当前剑圣为了与主宰保持独立，暂用 npc_dota_hero_sven 作为测试载体。
+后续若建立 npc_survival_hero_blademaster，应同步修改：
+- hero_definitions.csv
+- npc_units_custom.txt
+- Precache
+- hero_cosmetics_config.lua
+- 祭坛召唤能力
+- 本地化
+
+3. VIP
+- 测试阶段 playerdata / entitlement 默认 VIP=true。
+- setvip 1 和 setvip 0 可用于测试。
+- 正式发布前必须改回真实平台或持久化权限来源。
+- VIP 不能只靠客户端控制。
+
+4. 英雄初始化
+正确顺序：
+- 创建战斗英雄
+- 设置玩家控制权
+- 不把 Undying 设置为战斗英雄 Owner
+- 清除原版英雄技能
+- 应用完整属性配置
+- 应用非原皮饰品
+- 发放项目初始技能
+- 发送 HERO_SUMMONED
+- 延迟再次清理原版和非法技能
+
+5. 英雄属性
+主编辑文件：
+data/csv/hero_definitions.csv
+
+已支持完整字段：
+- base_strength
+- strength_gain
+- base_agility
+- agility_gain
+- base_intellect
+- intellect_gain
+- base_damage_min
+- base_damage_max
+- base_attack_time
+- base_armor
+- magic_resistance
+- move_speed
+- attack_range
+- acquisition_range
+- projectile_speed
+- base_health
+- base_health_regen
+- base_mana
+- base_mana_regen
+- turn_rate
+- vision_day
+- vision_night
+- all_attributes_bonus
+- damage_multiplier
+- max_health_multiplier
+- max_mana_multiplier
+- move_speed_bonus
+- initial_skill_count
+- skill_capacity
+- public_skill_pool_id
+- exclusive_skill_group_id
+
+字段为空时沿用引擎默认值。
+属性应用逻辑集中在 systems/hero_stat_adapter.lua。
+禁止在 hero_summon_system.lua 中散落具体英雄平衡数值。
+
+============================================================
+四、英雄技能池
+============================================================
+
+1. 基本规则
+- 每名战斗英雄最多保存 10 个项目技能。
+- 所有英雄共享一个公共技能池。
+- 技能可以设置为某个英雄专属。
+- 普通英雄初始获得 1 个专属技能。
+- VIP 英雄初始获得 4 个明确配置的技能。
+- VIP 初始技能不要在代码中随机写死，应从 hero_initial_skills.csv 读取。
+
+2. 配置表
+- hero_skill_definitions.csv
+- hero_skill_pool_members.csv
+- hero_exclusive_skills.csv
+- hero_initial_skills.csv
+- hero_skill_choice_rules.csv
+
+3. 转职随机技能
+- 击败二转 Boss 后由服务端生成 3 个随机技能候选。
+- 同一轮候选不能重复。
+- 满级技能不能进入候选。
+- 已拥有技能再次被选择时升级。
+- 未拥有技能且技能数小于 10 时新增。
+- 已有 10 个技能时，只能提供可升级技能，不能给出无法选择的新技能。
+- 服务端保存 choice_token 和 pending_choice。
+- 客户端只能提交 choice_token 和 skill_id。
+- 服务端必须验证该技能属于当前候选。
+
+4. 推荐模块职责
+- systems/hero_skill_system.lua
+  保存、增加、升级、恢复和投影英雄技能。
+- systems/hero_skill_pool_service.lua
+  筛选公共池、专属池、转职范围、VIP 和随机权重。
+- systems/hero_skill_choice_service.lua
+  生成三选一、保存令牌、验证最终选择。
+- ui/hero_skill_ui_service.lua
+  只负责网络事件和候选快照。
+- 不允许把上述职责重新合并到 addon_game_mode.lua。
+
+5. 当前边界
+- 服务端三选一核心已经设计并接入测试指令。
+- 最终三选一 Panorama 面板仍属于待完成项。
+- 原生 Dota 技能栏不适合稳定显示 10 个可见技能。
+- 正式版本需要自定义技能面板；隐藏被动可继续由能力/Modifier 执行。
+
+============================================================
+五、武器、物品、商店和合成
+============================================================
+
+1. 服务端权威
+- 商店条目从配置表聚合。
+- 客户端只提交购买 item_id。
+- 服务端验证：
+  - 木材
+  - 金币
+  - VIP
+  - 主城等级
+  - 转职
+  - 建筑
+  - 前置内容
+  - 购买次数
+  - 其他条件
+- 购买成功后写入服务端内容背包。
+- 需要显示在物品栏的武器，创建一个无原生属性的 Dota 物品壳并挂到战斗英雄。
+- 真正属性和成长由服务端 Lua 计算，避免 KV 与 Lua 重复加成。
+
+2. 成长之剑
+当前需求：
+- 每次有效普通攻击命中敌人，成长攻击力增加。
+- 初始阶段每次攻击逻辑攻击 +1。
+- 后续阶段可以在 weapon_definitions.csv 配置不同的 attack_gain_per_attack。
+- 阶段进化时保留累计成长攻击。
+- 成长记录必须保存在服务端，不能由客户端累加。
+
+当前建议阶段：
+- 成长之剑 Lv1：每击 +1，攻击 200 次进化
+- Lv2：每击 +2，攻击 200 次进化
+- Lv3：每击 +3，攻击 200 次进化
+- Lv4：每击 +4，攻击 200 次进化
+- MAX：每击 +5
+
+3. 武器基础字段
+主编辑文件：
+data/csv/weapon_definitions.csv
+
+核心字段：
+- engine_item_name
+- base_attack_min
+- base_attack_max
+- base_strength
+- base_agility
+- base_intellect
+- attack_gain_per_attack
+- strength_gain_per_attack
+- agility_gain_per_attack
+- intellect_gain_per_attack
+- preserve_growth_on_upgrade
+- auto_equip
+
+4. 武器总属性
+英雄逻辑总攻击：
+英雄逻辑基础攻击
++ 武器基础攻击
++ 武器成长攻击
++ 其他服务端项目加成
+
+逻辑三围：
+英雄基础三围
++ 武器基础三围
++ 武器成长三围
++ 其他项目加成
+
+必须避免主属性自动增加攻击造成重复计算。
+
+5. 自动合成
+- 每次服务端内容背包变化后检查启用的武器配方。
+- 满足配方后原子消耗材料。
+- 发放合成结果。
+- 移除旧物品壳。
+- 创建新物品壳并自动装备。
+- 根据配置保留成长值。
+- 合成资格和结果完全由服务端决定。
+
+============================================================
+六、逻辑数值缩放与 UI
+============================================================
+
+用户实测：
+- 英雄可直接设置的攻击力高值大约在 3200 附近出现限制。
+- 英雄和武器总攻击接近 20～30 亿时出现上限或异常。
+
+当前架构推测：
+- 3200 附近可能与较窄的底层定点或整数表示有关。
+- 20～30 亿接近有符号 32 位整数范围。
+- 这是根据实测反推，不是 Valve 源码确认。
+
+当前方案：
+逻辑数值 : Dota 引擎数值 = 10 : 1
+
+例如：
+- UI 逻辑攻击 +1
+- 引擎投影攻击 +0.1
+- UI 逻辑攻击 10 亿
+- 引擎投影约 1 亿
+
+要求：
+- 服务端保存逻辑值。
+- 服务端将逻辑值缩放后投影到 Dota 实体。
+- 客户端 UI 显示逻辑值。
+- 客户端不得用引擎面板值反推权威逻辑值。
+
+大数字格式：
+- 9999 → 9999
+- 10000 → 1万
+- 102000 → 10.2万
+- 100000000 → 1亿
+- 1020000000 → 10.2亿
+
+UI 策略：
+- 不优先直接修改 Valve 官方 HUD 的内部攻击力节点。
+- 使用项目自己的权威战斗属性面板覆盖显示。
+- 原因是官方节点容易随更新变化，并且显示的是缩放后的引擎值。
+- 武器、英雄属性、资源和商店价格共用统一大数字格式化工具。
+
+当前尚未完全迁移到逻辑层的项目：
+- 敌人生命
+- 建筑生命
+- 技能伤害
+- 暴击伤害
+- 吸血
+- 护甲与减伤
+- 最终伤害飘字
+
+在继续扩大攻击数值前，应逐步把生命、伤害和减伤也迁入同一逻辑数值系统。
+
+============================================================
+七、当前版本状态
+============================================================
+
+当前最新交付：
+Survival_V1.6_WeaponGrowthLogicalStats.zip
+
+V1.6 已完成的源码与静态内容：
+- 英雄完整属性系统
+- 英雄技能池核心
+- 宙斯替换 VIP 剑圣
+- 战斗英雄与 Undying 技能隔离设计
+- 成长之剑每次攻击成长
+- 武器基础攻击和基础三围
+- 武器成长值
+- 逻辑数值 10:1 投影
+- 大数字 UI
+- 服务端内容背包
+- 武器物品壳
+- 武器自动合成
+- 商店和战斗属性快照
+- 配置 CSV 到 LuaConfig
+
+已知验证层级：
+- V1.5b：用户实机确认祭坛召唤英雄正常。
+- V1.5c：完成英雄完整属性和技能池核心，主要为静态检查。
+- V1.6：最新累计更新包，目前需要在用户机器进行 Dota 2 实机验证。
+- 不得把 V1.6 写成“已经实机全部通过”。
+
+V1.6 首轮必须验证：
+1. addon_game_mode.lua 能正常加载。
+2. 没有 unknown modifier。
+3. Undying 只显示建造技能。
+4. 战斗英雄不显示 Undying 技能。
+5. 战斗英雄原版技能被清除。
+6. 普通英雄初始 1 个项目技能。
+7. VIP 英雄初始 4 个项目技能。
+8. 剑圣按钮替换宙斯。
+9. 成长之剑正确挂入战斗英雄物品栏。
+10. 每次普通攻击只增加一次成长值。
+11. 攻击 200 次后正确进化且保留成长值。
+12. 武器自动合成正确消耗和替换物品。
+13. UI 显示逻辑值而不是引擎缩放值。
+14. 10.2万、10.2亿格式正确。
+15. Panorama 编译和运行无错误。
+
+============================================================
+八、已发生过的严重问题，禁止回归
+============================================================
+
+1. PowerShell 中文乱码
+- Windows PowerShell 5.1 把无 BOM UTF-8 按 ANSI 读取。
+- 导致 XML、Lua 和 PowerShell 脚本中的中文变成乱码。
+- 严重时破坏字符串引号并产生 unfinished string。
+- 禁止用 PowerShell 读写方式修改中文源码。
+
+2. XML 根节点
+- Panorama XML 根 Panel 曾错误添加 id，Resource Compiler 不允许。
+- 修改 XML 时必须先做严格 XML 解析检查。
+
+3. Modifier 注册
+曾出现：
+- modifier_building_stationary unknown
+- modifier_building_no_health_bar unknown
+- modifier_enemy_wall_ai unknown
+- modifier_lumberjack_ai unknown
+
+必须在业务系统加载和实体创建前完成 LinkLuaModifier 和 Modifier 注册。
+
+4. require 伪装成 module not found
+Lua 文件内部语法损坏时，Dota 可能先显示：
+module 'config/xxx' not found
+但真正原因是后面的 unfinished string 或语法错误。
+诊断时必须读取整条错误链。
+
+5. UI 与服务器不同步
+曾出现：
+- Unknown custom nettable survival_ui_state
+- Unknown custom nettable survival_ability_runtime
+- UI Snapshot service nil
+- 商店仍打开原生 Dota 商店
+- shopshow 不工作
+- 服务端没有推送资源和波次数据
+
+新增 NetTable 时必须同步更新 custom_net_tables.txt，并确保服务初始化顺序正确。
+
+============================================================
+九、工作方式
+============================================================
+
+用户希望：
+- 使用中文沟通。
+- 直接生成代码、更新包和一条 PowerShell 命令。
+- 不要要求用户手动搜索大量文件。
+- 修改前自动备份。
+- 交付中列出具体文件、测试命令和日志位置。
+- 发现问题时先定位根因，不要不断在损坏文件上叠加小补丁。
+- 大改动从最近干净基线重新集成。
+
+每次接到新任务时：
+1. 先读取当前实际工程。
+2. 对照最新 CSV 和 README。
+3. 列出将修改的模块和事件。
+4. 保持 event_bus 解耦。
+5. 编写或更新测试作弊码。
+6. 运行静态检查。
+7. 生成完整更新包。
+8. 明确要求用户进行哪些 Dota 2 实机测试。
+9. 根据用户实际日志继续修复。
+
+不要：
+- 把旧版 V1.2/V1.3 当当前代码。
+- 在没有读取实际文件时猜测行号和文件内容。
+- 直接修改 generated Lua。
+- 把客户端数据当服务端权威。
+- 把多个业务模块重新耦合。
+- 未实机验证就声称成功。
+```
+
+---
+
+# 二、建议 QClaw 首次执行的任务提示词
+
+将知识库上传完毕并让 QClaw 能读取当前工程后，再提交下面这段：
+
+```text
+请先不要修改代码。
+
+第一步，扫描当前 SurvivalTwo 工程和知识库，输出：
+1. 当前实际目录树。
+2. addon_game_mode.lua 的初始化顺序。
+3. event_bus 的全部事件和请求。
+4. 所有 Lua 模块的行数。
+5. 所有 require 是否能解析。
+6. 所有 LinkLuaModifier 是否在使用前注册。
+7. custom_net_tables.txt 与代码中使用的 NetTable 是否一致。
+8. 当前五个祭坛英雄和召唤能力。
+9. hero_definitions.csv、weapon_definitions.csv 和技能池 CSV 的字段。
+10. V1.6 武器成长、逻辑数值和自动合成的完整调用链。
+11. 当前 Panorama manifest、HUD、JS 和 CSS 的依赖关系。
+12. 当前代码与知识库描述之间的差异。
+
+输出结果必须区分：
+【当前工程事实】
+【知识库设计要求】
+【冲突】
+【缺失文件】
+【待实机验证】
+
+扫描完成后先提交审计报告，不要自动覆盖文件。
+```
+
+---
+
+# 三、必须上传给 QClaw 的知识库文件
+
+## A. 当前核心文件：必须上传
+
+### 1. 当前实际工程源码压缩包
+
+这是最重要的文件。
+
+请从本机实际工程打包：
+
+```text
+D:\steam\steamapps\common\dota 2 beta\
+game\dota_addons\survival
+```
+
+以及：
+
+```text
+D:\steam\steamapps\common\dota 2 beta\
+content\dota_addons\survival
+```
+
+推荐压缩为：
+
+```text
+Survival_CurrentLiveProject_20260718.zip
+```
+
+应保留目录结构：
+
+```text
+game\dota_addons\survival\...
+content\dota_addons\survival\...
+```
+
+QClaw 应将这个文件视为当前机器上的最高优先级事实。
+
+### 2. 最新累计更新包
+
+```text
+Survival_V1.6_WeaponGrowthLogicalStats.zip
+```
+
+用途：
+- V1.6 完整源码；
+- 英雄完整属性；
+- 技能池核心；
+- 武器成长；
+- 逻辑数值投影；
+- 大数字 UI；
+- 自动合成；
+- 安装脚本和 README。
+
+### 3. 最新英雄和技能策划表
+
+```text
+Survival_ContentData_Design_V1.3_HeroDataSkillCore.xlsx
+```
+
+用途：
+- 五个英雄定义；
+- 完整英雄属性字段；
+- 公共技能池；
+- 专属技能；
+- 初始技能；
+- 三选一规则；
+- 数据审核状态。
+
+### 4. 最新武器和内容 CSV
+
+这些文件已经包含在 V1.6 压缩包中，但建议 QClaw 能单独索引：
+
+```text
+data/csv/weapon_definitions.csv
+data/csv/hero_definitions.csv
+data/csv/hero_skill_definitions.csv
+data/csv/hero_skill_pool_members.csv
+data/csv/hero_exclusive_skills.csv
+data/csv/hero_initial_skills.csv
+data/csv/hero_skill_choice_rules.csv
+data/csv/recipes.csv
+data/csv/item_definitions.csv
+data/csv/shop_aggregation_rules.csv
+data/csv/monster_encounters.csv
+data/csv/reward_profiles.csv
+data/csv/reward_effects.csv
+```
+
+### 5. 英雄配置说明手册
+
+优先上传 Markdown：
+
+```text
+SurvivalTwo_英雄属性与技能池配置说明手册_V1.0.md
+```
+
+Word 版可作为备用：
+
+```text
+SurvivalTwo_英雄属性与技能池配置说明手册_V1.0.docx
+```
+
+### 6. 本迁移提示词
+
+```text
+SurvivalTwo_QClaw_迁移提示词与知识库清单_V1.0.md
+```
+
+---
+
+## B. 玩法与数据来源：建议上传
+
+### 7. 怪物、转职和奖励策划表
+
+```text
+Survival_ContentData_Design_V1.1_MonsterEncounter.xlsx
+```
+
+用途：
+- 0～10 转怪物；
+- Boss 遭遇；
+- 转职奖励；
+- 奖励配置；
+- 武器和内容关联。
+
+### 8. 六大模块策划案
+
+```text
+我在僵尸岛苟发育_Dota2六大模块系统策划案_V1.0_正式版.docx
+```
+
+用途：
+- UI 管理；
+- 资源采集；
+- 建筑升级；
+- 怪物波次；
+- 英雄武器成长；
+- 难度系统。
+
+### 9. 原始数值逆向数据
+
+只上传已经清洗、可以作为数据依据的文件，例如：
+
+```text
+建筑内容数据.xlsx
+武器合成.xlsx
+效果变量字典_数值变量.csv
+```
+
+不要把未经标注的猜测数据当成已确认游戏规则。
+表格中应保留：
+- 已确认
+- 推测
+- 待源码确认
+- 待实机验证
+
+---
+
+## C. 运行证据：每次测试后上传
+
+### 10. 最新控制台日志
+
+进入地图测试后，把完整控制台日志保存为：
+
+```text
+Survival_RuntimeConsole_YYYYMMDD_HHMM.txt
+```
+
+至少包含：
+- 第一个 Script Runtime Error 前后约 100 行；
+- Panorama 报错；
+- Resource Compiler 报错；
+- Custom NetTable 报错；
+- Modifier 报错；
+- require 和 stack traceback。
+
+### 11. 安装日志和状态文件
+
+当前 V1.6 测试后上传：
+
+```text
+survival_v1.6_weapon_install.log
+survival_v1.6_weapon_status.txt
+```
+
+若安装脚本生成新的编译日志，也一并上传。
+
+### 12. 实机测试结果
+
+建议维护：
+
+```text
+Survival_Runtime_TestReport_Current.md
+```
+
+固定记录：
+- 测试版本；
+- 安装时间；
+- Dota/Workshop Tools 是否完全重启；
+- 测试英雄；
+- 测试命令；
+- 预期结果；
+- 实际结果；
+- 控制台错误；
+- 截图；
+- 结论。
+
+---
+
+# 四、只作为回退或历史上传的文件
+
+不要把这些文件放在“当前版本”目录。
+
+## 已验证功能参考
+
+```text
+Survival_V1.5b_AltarHeroButtons_ModifierFix.zip
+```
+
+用途：
+- 用户实机确认祭坛召唤英雄正常；
+- 可用于对比 V1.6 的英雄召唤回归问题。
+
+## 中间累计版本
+
+```text
+Survival_V1.5c_HeroDataSkillCore.zip
+```
+
+用途：
+- 英雄完整属性；
+- 技能池核心；
+- 宙斯替换剑圣；
+- V1.6 的直接前置版本。
+
+## 紧急回退基线
+
+```text
+Survival_EmergencyRollback_V1.4c_Clean.zip
+```
+
+用途：
+- 当前代码严重损坏时的灾难回退；
+- 不应作为新功能开发基线，除非 V1.6 工程无法恢复。
+
+## 更旧版本
+
+V1.2、V1.3、V1.4a/b/c 的补丁、UI Repair 和 UTF-8 Hotfix：
+- 只用于排查历史问题；
+- 默认不上传；
+- 只有需要追踪某个旧 bug 时才放入 `history/legacy_patches`；
+- 必须明确标注“非当前版本”。
+
+---
+
+# 五、推荐的 QClaw 知识库目录
+
+```text
+SurvivalTwo_KnowledgeBase/
+├─ 00_CONTEXT/
+│  ├─ SurvivalTwo_QClaw_迁移提示词与知识库清单_V1.0.md
+│  └─ SurvivalTwo_英雄属性与技能池配置说明手册_V1.0.md
+│
+├─ 01_CURRENT_SOURCE/
+│  ├─ Survival_CurrentLiveProject_20260718.zip
+│  └─ Survival_V1.6_WeaponGrowthLogicalStats.zip
+│
+├─ 02_CURRENT_DATA/
+│  ├─ Survival_ContentData_Design_V1.3_HeroDataSkillCore.xlsx
+│  ├─ Survival_ContentData_Design_V1.1_MonsterEncounter.xlsx
+│  ├─ weapon_definitions.csv
+│  ├─ hero_definitions.csv
+│  ├─ hero_skill_definitions.csv
+│  ├─ hero_skill_pool_members.csv
+│  ├─ hero_exclusive_skills.csv
+│  ├─ hero_initial_skills.csv
+│  ├─ hero_skill_choice_rules.csv
+│  └─ recipes.csv
+│
+├─ 03_DESIGN/
+│  └─ 我在僵尸岛苟发育_Dota2六大模块系统策划案_V1.0_正式版.docx
+│
+├─ 04_RUNTIME_EVIDENCE/
+│  ├─ Survival_RuntimeConsole_Current.txt
+│  ├─ survival_v1.6_weapon_install.log
+│  ├─ survival_v1.6_weapon_status.txt
+│  └─ Survival_Runtime_TestReport_Current.md
+│
+└─ 99_HISTORY/
+   ├─ Survival_V1.5b_AltarHeroButtons_ModifierFix.zip
+   ├─ Survival_V1.5c_HeroDataSkillCore.zip
+   └─ Survival_EmergencyRollback_V1.4c_Clean.zip
+```
+
+---
+
+# 六、OpenAI API Key 注意事项
+
+QClaw 应使用你自己的 OpenAI API Key。
+
+不要把 API Key 写入：
+- 本提示词；
+- QClaw 知识库文件；
+- Git 仓库；
+- Lua、JS、PowerShell 源码；
+- 上传给模型的日志；
+- zip 更新包；
+- README；
+- 截图。
+
+推荐在运行 QClaw 的机器上使用环境变量：
+
+```text
+OPENAI_API_KEY
+```
+
+Windows 可在用户环境变量中设置，或者使用 QClaw 自己的秘密凭据配置。
+
+知识库中只写：
+
+```text
+OpenAI provider is enabled.
+Read the credential from OPENAI_API_KEY.
+Never print or persist the key.
+```
+
+不要记录真实 Key。
+
+---
+
+# 七、提交前检查
+
+上传前确认：
+
+- [ ] 当前 live project 已重新压缩。
+- [ ] V1.6 最新包已上传。
+- [ ] V1.3 英雄技能策划表已上传。
+- [ ] 本迁移提示词已上传。
+- [ ] 英雄技能说明手册已上传。
+- [ ] 最新运行日志已上传。
+- [ ] 旧版本放在 99_HISTORY，不作为当前事实。
+- [ ] 所有 API Key 已从文档、日志和代码中删除。
+- [ ] `.env`、私钥、Steam 登录信息没有进入知识库。
+- [ ] QClaw 首次任务是“只审计，不修改”。

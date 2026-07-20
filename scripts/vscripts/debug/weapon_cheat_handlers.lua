@@ -37,6 +37,21 @@ function M.grow_weapon(context)
         result and result.error or "weapon_growth_failed"
 end
 
+function M.give_forging_hammer(context)
+    local count = math.max(1, math.floor(tonumber(context.args[1]) or 1))
+    local result = event_bus.request(
+        events.CONTENT_INVENTORY_GRANT_REQUEST,
+        {
+            player_id = context.player_id,
+            content_id = "item_forging_hammer",
+            count = count,
+            reason = "cheat_give_forging_hammer",
+        }
+    )
+    return result and result.ok == true,
+        result and result.error or "forging_hammer_grant_failed"
+end
+
 function M.weapon_stats(context)
     local result = event_bus.request(
         events.HERO_COMBAT_STATS_GET_REQUEST,

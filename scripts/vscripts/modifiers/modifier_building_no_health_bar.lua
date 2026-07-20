@@ -1,5 +1,7 @@
+﻿LinkLuaModifier("modifier_building_no_health_bar", "modifiers/modifier_building_no_health_bar", LUA_MODIFIER_MOTION_NONE)
 modifier_building_no_health_bar = class({})
 local M = modifier_building_no_health_bar
+_G.modifier_building_no_health_bar = M
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end

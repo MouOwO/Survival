@@ -11,11 +11,27 @@ function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 function M:OnCreated(params)
     if not IsServer() then return end
     self.tree_entindex = tonumber(params.tree_entindex) or -1
+    self.base_lumber_efficiency = tonumber(params.base_lumber_efficiency) or 1
+    self.tree_lumber_efficiency_buff = tonumber(
+        params.tree_lumber_efficiency_buff
+    ) or 0
+    self.lumber_efficiency = self.base_lumber_efficiency
+        + self.tree_lumber_efficiency_buff
     self:StartIntervalThink(0.5)
 end
 
 function M:SetTreeEntIndex(entindex)
     self.tree_entindex = tonumber(entindex) or -1
+end
+
+function M:SetTreeLumberEfficiency(buff)
+    self.tree_lumber_efficiency_buff = math.max(0, tonumber(buff) or 0)
+    self.lumber_efficiency = self.base_lumber_efficiency
+        + self.tree_lumber_efficiency_buff
+end
+
+function M:GetLumberEfficiency()
+    return self.lumber_efficiency or self.base_lumber_efficiency or 1
 end
 
 function M:OnIntervalThink()
@@ -53,9 +69,11 @@ function M:OnAttackLanded(keys)
     if target:entindex() ~= self.tree_entindex then return end
 
     event_bus.emit(events.TREE_HIT, {
-        worker = parent,
+        attacker = parent,
         target = target,
         team = parent:GetTeamNumber(),
+        base_lumber_efficiency = self.base_lumber_efficiency,
+        source = "lumberjack",
     })
 end
 

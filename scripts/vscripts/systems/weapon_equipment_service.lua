@@ -48,6 +48,21 @@ local function remove_shell(current, slot)
     current.item_by_slot[slot] = nil
 end
 
+local function set_item_counter(item, growth)
+    if not valid_entity(item) or not item.SetCurrentCharges then
+        return
+    end
+    local target = tonumber(growth and growth.stage_attack_target) or 0
+    if target <= 0 then
+        item:SetCurrentCharges(0)
+        return
+    end
+    item:SetCurrentCharges(math.max(
+        0,
+        math.floor(tonumber(growth.stage_attack_remaining) or target)
+    ))
+end
+
 local function add_shell(current, definition, slot)
     if not valid_entity(current.hero) then
         return nil
@@ -63,7 +78,24 @@ local function add_shell(current, definition, slot)
     end
     current.hero:AddItem(item)
     current.item_by_slot[slot] = item
+    if slot == "main_hand" and current.hero.GetPlayerOwnerID then
+        local growth = event_bus.request(
+            events.WEAPON_GROWTH_GET_REQUEST,
+            { player_id = current.hero:GetPlayerOwnerID() }
+        )
+        if growth and growth.snapshot then
+            set_item_counter(item, growth.snapshot)
+        end
+    end
     return item
+end
+
+local function set_main_hand_counter(player_id, growth)
+    local item = state(player_id).item_by_slot.main_hand
+    if not valid_entity(item) or not item.SetCurrentCharges then
+        return
+    end
+    set_item_counter(item, growth)
 end
 
 local function equip(player_id, content_id, reason)
@@ -147,6 +179,12 @@ local function on_hero_summoned(payload)
     end
 end
 
+local function on_growth_changed(payload)
+    if payload.snapshot then
+        set_main_hand_counter(tonumber(payload.player_id), payload.snapshot)
+    end
+end
+
 local function get_equipment(payload)
     return { ok = true, snapshot = snapshot(tonumber(payload.player_id)) }
 end
@@ -155,6 +193,7 @@ function M.init()
     state_by_player = {}
     event_bus.handle_request(events.WEAPON_EQUIPMENT_GET_REQUEST, get_equipment)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_inventory_changed)
+    event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_growth_changed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
 end
 

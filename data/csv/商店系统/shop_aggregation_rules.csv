@@ -1,0 +1,8 @@
+﻿source_id,module_name,content_type,id_field,name_field,description_field,category_default,wood_cost_field,gold_cost_field,grant_type_default,icon_type_default,enabled,notes
+#中文名:来源ID,模块名称,内容类型,ID字段,名称字段,描述字段,默认分类,木材消耗字段,金币消耗字段,默认发放类型,默认图标类型,是否启用,备注
+#types:string,string,enum,string,string,string,enum,string,string,enum,enum,boolean,string
+weapon,weapon_definitions,weapon,content_id,content_id,description,weapon,wood_cost,gold_cost,virtual_item,item,1,wood_cost或gold_cost任一大于0时进入商店；shop_enabled=0仍显示但置灰。
+item,item_definitions,item,content_id,content_id,description,item,wood_cost,gold_cost,virtual_item,item,1,包含材料、消耗品、BUFF类项目。
+technology,technology_definitions,technology,technology_id,technology_id,notes,technology,wood_cost,gold_cost,technology_level,ability,1,按科技等级行展示；前置科技由requires_content_id验证。
+challenge,challenge_definitions,challenge,challenge_id,name,description,challenge,wood_cost,gold_cost,start_encounter,item,1,未配置encounter_id时显示但置灰。
+rebirth,rebirth_challenges,rebirth,challenge_id,name,description,rebirth,wood_cost,gold_cost,start_encounter,item,1,一至十转直接映射MonsterEncounters。

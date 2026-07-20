@@ -1,5 +1,6 @@
 modifier_enemy_wall_ai = class({})
 local M = modifier_enemy_wall_ai
+local team_alignment = require("core/team_alignment")
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end
@@ -35,6 +36,12 @@ function M:OnIntervalThink()
         self:SetWallEntIndex(-1)
         return
     end
+
+    team_alignment.enforce(parent, DOTA_TEAM_BADGUYS, "wave_enemy_ai")
+    if not team_alignment.are_enemies(parent, wall) then
+        team_alignment.enforce(wall, DOTA_TEAM_GOODGUYS, "wall_target")
+    end
+    if not team_alignment.are_enemies(parent, wall) then return end
 
     parent:SetForceAttackTarget(wall)
     if parent:GetAttackTarget() ~= wall then

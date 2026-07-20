@@ -1,8 +1,18 @@
-local event_bus = require("core/event_bus")
+﻿local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
+print("[SURVIVAL_FINGERPRINT] addon_game_mode=20260720_1045_direct_building_path")
 local modifier_registry = require("core/modifier_registry")
+-- Explicit modifier links must execute during addon VM bootstrap, before any building is created.
+LinkLuaModifier("modifier_building_stationary", "modifiers/modifier_building_stationary", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_building_no_health_bar", "modifiers/modifier_building_no_health_bar", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_tower_attack_effects", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_building_blink_move", "modifiers/modifier_building_blink_move", LUA_MODIFIER_MOTION_NONE)
+require("modifiers/modifier_building_stationary")
+require("modifiers/modifier_building_no_health_bar")
+require("modifiers/modifier_tower_attack_effects")
+require("modifiers/modifier_building_blink_move")
 modifier_registry.register()
 local ability_utils = require("core/ability_utils")
 
@@ -32,6 +42,7 @@ local monster_reward_service =
 local monster_spawn_service =
     require("systems/monster_spawn_service")
 local wave_system = require("systems/wave_system")
+local monster_archetypes = require("config/generated/monster_archetypes")
 local content_inventory_service =
     require("systems/content_inventory_service")
 local weapon_equipment_service =
@@ -65,6 +76,7 @@ require("abilities/survival_hero_skill")
 require("abilities/ability_build_wall")
 require("abilities/ability_build_main_city")
 require("abilities/ability_build_arrow_tower")
+require("abilities/ability_building_blink")
 require("abilities/ability_build_gold_mine")
 require("abilities/ability_build_hero_altar")
 require("abilities/ability_summon_axe")
@@ -77,6 +89,10 @@ require("abilities/ability_upgrade_wall")
 require("abilities/ability_upgrade_city")
 require("abilities/ability_train_lumberjack")
 require("abilities/ability_upgrade_tower")
+require("abilities/ability_upgrade_tower_lv01")
+require("abilities/ability_upgrade_tower_max")
+require("abilities/tower_upgrade_ability_factory")
+require("abilities/ability_tower_passive")
 require("abilities/ability_upgrade_gold_mine")
 require("abilities/ability_upgrade_gold_mine_crit")
 require("abilities/ability_tower_class_1")
@@ -84,6 +100,8 @@ require("abilities/ability_tower_class_2")
 require("abilities/ability_tower_class_3")
 require("abilities/ability_tower_class_4")
 require("abilities/ability_tower_class_5")
+require("abilities/ability_tower_class_6")
+require("abilities/ability_tower_class_7")
 
 local M = {}
 local initialized = false
@@ -93,10 +111,12 @@ local function configure_game_rules()
     game_mode:SetCustomGameForceHero("npc_dota_hero_undying")
     game_mode:SetBuybackEnabled(false)
     game_mode:SetCameraDistanceOverride(1500)
-    game_mode:SetFixedRespawnTime(99999)
+    game_mode:SetFixedRespawnTime(2)
+    -- Human players must never occupy the enemy team. Allowing Badguys
+    -- player slots made early Workshop runs assign the local player there.
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 1)
-    GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 10)
-    GameRules:SetHeroRespawnEnabled(false)
+    GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
+    GameRules:SetHeroRespawnEnabled(true)
     GameRules:SetHeroSelectionTime(0)
     GameRules:SetShowcaseTime(0)
     GameRules:SetStrategyTime(0)
@@ -168,12 +188,46 @@ function M.precache(context)
         "building_gold_mine",
         "building_hero_altar",
         "npc_survival_lumberjack",
+        "npc_dota_hero_doom",
+        "npc_dota_hero_sven",
+        "npc_dota_hero_abyssal_underlord",
+        "npc_dota_hero_keeper_of_the_light",
+        "npc_dota_hero_obsidian_destroyer",
+        "npc_dota_hero_zuus",
+        "npc_dota_hero_razor",
+        "npc_dota_hero_storm_spirit",
+        "npc_dota_hero_sniper",
+        "npc_dota_hero_gyrocopter",
+        "npc_dota_hero_tinker",
+        "npc_dota_hero_drow_ranger",
+        "npc_dota_hero_windrunner",
+        "npc_dota_hero_clinkz",
+        "npc_dota_hero_lich",
+        "npc_dota_hero_crystal_maiden",
+        "npc_dota_hero_ancient_apparition",
+        "npc_dota_hero_skywrath_mage",
+        "npc_dota_hero_vengefulspirit",
         "enemy_tree",
         "zombie_basic",
         "zombie_boss",
+        "npc_survival_wave_monster",
     }
     for _, unit_name in ipairs(units) do
         PrecacheUnitByNameSync(unit_name, context)
+    end
+    -- These models are assigned directly to the arrow-tower entity, so
+    -- precache the model resources explicitly instead of relying only on
+    -- hero unit precaching.
+    PrecacheModel("models/heroes/zuus/zuus.vmdl", context)
+    PrecacheModel("models/heroes/drow_ranger/drow_ranger.vmdl", context)
+    PrecacheModel("models/props_structures/radiant_tower001.vmdl", context)
+    local precached_models = {}
+    for _, archetype in ipairs(monster_archetypes.rows or {}) do
+        if archetype.enabled ~= false and archetype.model_path
+            and archetype.model_path ~= "" and not precached_models[archetype.model_path] then
+            PrecacheModel(archetype.model_path, context)
+            precached_models[archetype.model_path] = true
+        end
     end
     hero_cosmetic_service.precache(context)
 end

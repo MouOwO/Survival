@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local building_system = require("systems/building_system")
 
 local M = {}
 
@@ -91,6 +92,30 @@ local function register_shop_purchase_request()
     end)
 end
 
+local function register_building_move_request()
+    CustomGameEventManager:RegisterListener("ui_building_move_request", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        local x, y, z = tonumber(payload.x), tonumber(payload.y), tonumber(payload.z)
+        if not x or not y or not z then
+            send_to_player("ui_building_move_result", player_id, {
+                success = 0, error = "invalid_position",
+            })
+            return
+        end
+        local ok, error_code = building_system.relocate_for_player(
+            player_id,
+            tonumber(payload.entindex),
+            Vector(x, y, z)
+        )
+        send_to_player("ui_building_move_result", player_id, {
+            success = ok and 1 or 0,
+            error = error_code or "",
+            entindex = tonumber(payload.entindex) or -1,
+        })
+    end)
+end
+
 local function on_notification(payload)
     send_to_player("ui_notification", payload.player_id, {
         message = payload.message or "",
@@ -108,6 +133,7 @@ function M.init()
     register_shop_open_request()
     register_shop_close_request()
     register_shop_purchase_request()
+    register_building_move_request()
     event_bus.subscribe(events.UI_NOTIFICATION, on_notification)
     event_bus.subscribe(events.SHOP_STATE_CHANGED, on_shop_state_changed)
 end

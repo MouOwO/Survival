@@ -126,6 +126,10 @@ local function make_entry(rule, row)
     if content_id == "" or (wood <= 0 and gold <= 0) then
         return nil
     end
+    if row.progression_type == "repeat_purchase"
+        and (tonumber(row.stage) or 0) > 1 then
+        return nil
+    end
 
     local category_id = field(
         row,
@@ -153,7 +157,7 @@ local function make_entry(rule, row)
         enabled = row.shop_enabled ~= false,
         disabled_reason_text =
             field(row, "disabled_reason_text", ""),
-        purchase_limit = number(field(row, "purchase_limit", 0)),
+        purchase_limit = content_id == "item_forging_hammer" and 4 or number(field(row, "purchase_limit", 0)),
         order = number(field(row, "shop_sort_order", 0)),
         min_city_level =
             number(field(row, "required_city_level", 0)),
@@ -241,6 +245,9 @@ local function project_entry(player_id, entry, context)
         purchase_condition_text = entry.condition_text,
         owned_count = count,
         purchase_limit = entry.purchase_limit,
+        progression_type = entry.definition.progression_type or "",
+        series_id = entry.definition.series_id or "",
+        stage = tonumber(entry.definition.stage) or 0,
         sort_order = entry.order,
         fields = entry.fields,
     }
@@ -267,10 +274,10 @@ end
 function M.build_snapshot(player_id, context)
     local projected = {}
     for _, entry in ipairs(entries) do
-        table.insert(
-            projected,
-            project_entry(player_id, entry, context)
-        )
+        local item = project_entry(player_id, entry, context)
+        if item and item.purchasable == 1 then
+            table.insert(projected, item)
+        end
     end
     return {
         schema_version = 2,

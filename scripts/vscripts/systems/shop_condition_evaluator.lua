@@ -6,7 +6,19 @@ end
 
 local function owned(context, content_id)
     return context.owned_content
-        and context.owned_content[content_id] == true
+        and (context.owned_content[content_id] == true or (tonumber(context.owned_content[content_id]) or 0) > 0)
+end
+
+local function series_stage(context, series_id)
+    local stage = 0
+    for id, count in pairs(context.owned_content or {}) do
+        if (tonumber(count) or 0) > 0 and string.find(id, series_id, 1, true) then
+            local n = string.match(id, "_max$") and 99
+                or tonumber(string.match(id, "_(%d+)$")) or 0
+            if n > stage then stage = n end
+        end
+    end
+    return stage
 end
 
 function M.evaluate(player_id, entry, context)
@@ -28,6 +40,14 @@ function M.evaluate(player_id, entry, context)
     end
     if limit > 0 and count >= limit then
         return false, "已达到购买上限", count
+    end
+    local definition = entry.definition or {}
+    if definition.progression_type == "repeat_purchase"
+        and definition.series_id and definition.series_id ~= "" then
+        local current_stage = series_stage(context, definition.series_id)
+        if current_stage >= 99 then
+            return false, "已达到最高等级", count
+        end
     end
     if context.city_level < entry.min_city_level then
         return false,

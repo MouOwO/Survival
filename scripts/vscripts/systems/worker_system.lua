@@ -5,6 +5,7 @@ local config = require("config/workers_config")
 local M = {}
 local workers = {}
 local current_tree_entindex = -1
+local tree_lumber_efficiency_buff = 0
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -81,6 +82,26 @@ local function notify(player_id, message, level)
     })
 end
 
+local function update_worker_efficiency()
+    for entindex, state in pairs(workers) do
+        if valid_entity(state.unit) then
+            state.tree_lumber_efficiency_buff = tree_lumber_efficiency_buff
+            state.lumber_efficiency = (state.base_lumber_efficiency or 0)
+                + tree_lumber_efficiency_buff
+            local modifier = state.unit:FindModifierByName(
+                "modifier_lumberjack_ai"
+            )
+            if modifier and modifier.SetTreeLumberEfficiency then
+                modifier:SetTreeLumberEfficiency(
+                    tree_lumber_efficiency_buff
+                )
+            end
+        else
+            workers[entindex] = nil
+        end
+    end
+end
+
 local function update_worker_targets()
     for entindex, state in pairs(workers) do
         if valid_entity(state.unit) then
@@ -153,6 +174,8 @@ local function train_worker(payload)
     worker:SetBaseMoveSpeed(config.move_speed)
     worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
         tree_entindex = current_tree_entindex,
+        base_lumber_efficiency = config.wood_per_hit or 1,
+        tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
     })
 
     workers[worker:entindex()] = {
@@ -160,6 +183,10 @@ local function train_worker(payload)
         team = city_state.team,
         player_id = city_state.player_id,
         population = config.cost.population,
+        base_lumber_efficiency = config.wood_per_hit or 1,
+        tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
+        lumber_efficiency = (config.wood_per_hit or 1)
+            + tree_lumber_efficiency_buff,
     }
     notify(city_state.player_id, "伐木工训练完成")
     event_bus.emit(events.WORKER_CHANGED, {
@@ -171,12 +198,20 @@ end
 
 local function on_tree_spawned(payload)
     current_tree_entindex = payload.entindex or -1
+    tree_lumber_efficiency_buff = math.max(
+        0, tonumber(payload.lumber_efficiency_buff) or 0
+    )
     update_worker_targets()
+    update_worker_efficiency()
 end
 
-local function on_tree_destroyed()
+local function on_tree_destroyed(payload)
     current_tree_entindex = -1
+    tree_lumber_efficiency_buff = math.max(
+        0, tonumber(payload and payload.lumber_efficiency_buff) or 0
+    )
     update_worker_targets()
+    update_worker_efficiency()
 end
 
 local function on_entity_killed(payload)
@@ -200,6 +235,7 @@ end
 function M.init()
     workers = {}
     current_tree_entindex = -1
+    tree_lumber_efficiency_buff = 0
     event_bus.subscribe(events.WORKER_TRAIN_REQUEST, train_worker)
     event_bus.subscribe(events.TREE_SPAWNED, on_tree_spawned)
     event_bus.subscribe(events.TREE_DESTROYED, on_tree_destroyed)

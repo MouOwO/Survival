@@ -1,3 +1,4 @@
+﻿require("modifiers/modifier_building_blink_move")
 local logger = require("core/logger")
 
 local M = {}
@@ -5,6 +6,10 @@ local M = {}
 local registered = false
 
 local modifiers = {
+    {
+        name = "modifier_building_blink_move",
+        path = "modifiers/modifier_building_blink_move",
+    },
     {
         name = "modifier_building_stationary",
         path = "modifiers/modifier_building_stationary",
@@ -32,6 +37,14 @@ local modifiers = {
     {
         name = "modifier_weapon_stat_projection",
         path = "modifiers/modifier_weapon_stat_projection",
+    },
+    {
+        name = "modifier_debug_fixed_attack_rate",
+        path = "modifiers/modifier_debug_fixed_attack_rate",
+    },
+    {
+        name = "modifier_tower_attack_effects",
+        path = "modifiers/modifier_tower_attack_effects",
     },
 }
 
@@ -61,6 +74,7 @@ function M.register()
         link(definition)
     end
     registered = true
+    print("[ModifierRegistry] LinkLuaModifier complete count=" .. tostring(#modifiers))
     logger.info(
         "ModifierRegistry",
         "registered " .. tostring(#modifiers) .. " modifiers"

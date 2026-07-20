@@ -1,0 +1,4 @@
+﻿rule_id,trigger_type,min_trigger_level,max_trigger_level,pool_id,choice_count,allow_owned_skill,owned_skill_action,exclude_max_level,unique_within_offer,skill_capacity,enabled,notes
+#中文名:规则ID,触发类型,最低触发等级,最高触发等级,池ID,选择数量,允许选择已拥有技能,已拥有技能处理方式,排除满级技能,同次选项内不重复,技能容量,是否启用,备注
+#types:string,enum,number,number,string,number,boolean,enum,boolean,boolean,number,boolean,string
+rebirth_random_skill,rebirth_complete,2,10,public_pool,3,1,upgrade,1,1,10,1,二转到十转的随机三选一；已有技能再次选择时升级。

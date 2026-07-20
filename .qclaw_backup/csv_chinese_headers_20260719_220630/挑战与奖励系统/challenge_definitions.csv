@@ -1,0 +1,13 @@
+﻿challenge_id,name,wood_cost,gold_cost,visible_condition,prerequisite_condition,description,enabled,source,shop_enabled,shop_category_id,shop_sort_order,required_city_level,requires_vip,requires_hero_summoned,required_rebirth_level,requires_building_id,requires_content_id,purchase_limit,disabled_reason_text,grant_type,icon_name,encounter_id
+#types:string,string,number,number,string,string,string,boolean,string,boolean,enum,number,number,boolean,boolean,number,string,string,number,string,enum,string,string
+challenge_01,木材练功房,2000,0,altar_used==true,,击杀每个怪物获得100木材。,1,英雄相关建筑/行22,1,challenge,10,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_02,金币练功房,10000,50,altar_used==true,,击杀每个怪物获得100金币。,1,英雄相关建筑/行23,1,challenge,20,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_03,属性练功房,10000,500,altar_used==true,,击杀每个怪物获得10点全属性。,1,英雄相关建筑/行24,1,challenge,30,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_04,大属性练功房,10000,2000,altar_used==true,,"击杀每个怪物获得100点全属性,1000金币。",1,英雄相关建筑/行25,1,challenge,40,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_05,挑战合成宝石,5000,0,altar_used==true,,击败BOSS后掉落合成宝石。,1,英雄相关建筑/行26,1,challenge,50,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_06,进入冰霜之地,5000,0,altar_used==true,,升级小极地晶石。,1,英雄相关建筑/行27,1,challenge,60,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_07,挑战熔火核心lv1-3宝石,20000,0,altar_used==true,,可升级浴火熔铠到lv4。,1,英雄相关建筑/行28,1,challenge,70,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_08,挑战熔火核心lv4宝石,40000,0,altar_used==true,,可升级浴火熔铠到lvmax。,1,英雄相关建筑/行29,1,challenge,80,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_09,挑战冰烬挽歌,50000,0,altar_used==true,,击败BOSS后掉落冰魂焰魄。,1,英雄相关建筑/行30,1,challenge,90,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_10,进入罪渊,100000,0,altar_used==true,,挑战七宗罪，概率掉落精华，可以强化【史诗：冰火裁决】,1,英雄相关建筑/行31,1,challenge,100,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,
+challenge_11,进入十戒,100000,0,altar_used==true,,挑战十戒，击杀BOSS可强化【传说：深渊审判】,1,英雄相关建筑/行32,1,challenge,110,3,0,1,0,hero_altar,,0,挑战出生点和怪物遭遇尚未配置,start_encounter,item_demon_edge,

@@ -1,0 +1,29 @@
+#CustomAbilityTooltip {
+    width: 430px;
+    min-height: 250px;
+    padding: 14px;
+    flow-children: down;
+    background-color: #101820f8;
+    border: 1px solid #8799a8;
+    box-shadow: #000000cc 0px 0px 12px 0px;
+    z-index: 101;
+}
+
+#CustomAbilityTooltip.Hidden { visibility: collapse; }
+#CustomAbilityTooltip.Unavailable { wash-color: #8b8b8b; }
+#AbilityTooltipHeader { width: 100%; height: 62px; flow-children: right; }
+#CustomAbilityIcon { width: 58px; height: 58px; margin-right: 12px; }
+#AbilityTooltipTitleBlock { flow-children: down; vertical-align: center; }
+#CustomAbilityTitle { color: #ffffff; font-size: 24px; }
+#CustomAbilityStatus { color: #8fd28f; font-size: 15px; margin-top: 2px; }
+.Unavailable #CustomAbilityStatus { color: #d28f8f; }
+#CustomAbilityDescription {
+    color: #d8e0e8;
+    font-size: 17px;
+    margin-top: 10px;
+    white-space: normal;
+}
+#CustomAbilityFields { width: 100%; flow-children: down; margin-top: 8px; }
+.AbilityFieldRow { width: 100%; flow-children: right; margin-top: 3px; }
+.AbilityFieldLabel { width: 150px; color: #9db0bf; font-size: 16px; }
+.AbilityFieldValue { color: #f0d48a; font-size: 16px; }

@@ -1,0 +1,1096 @@
+﻿"DOTAAbilities"
+{
+    "ability_build_wall"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_wall"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "tusk_ice_shards"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_build_main_city"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_main_city"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "keeper_of_the_light_will_o_wisp"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_build_arrow_tower"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_arrow_tower"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_wall"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_wall"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ogre_magi_bloodlust"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_city"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_city"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "alchemist_goblins_greed"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_train_lumberjack"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_train_lumberjack"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "1.0"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_tower"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_tower"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "drow_ranger_multishot"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_tower_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_tower_lv01"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "drow_ranger_multishot"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_tower_max"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_tower_max"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "alchemist_goblins_greed"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_1"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_1"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "axe_battle_hunger"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_2"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_2"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "drow_ranger_frost_arrows"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_3"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_3"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "windrunner_focusfire"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_4"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_4"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "sniper_take_aim"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_5"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_5"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "zuus_arc_lightning"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_6"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_6"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "lich_frost_nova"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_tower_class_7"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_class_7"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "sniper_assassinate"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_build_gold_mine"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_gold_mine"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "alchemist_goblins_greed"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_gold_mine"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_gold_mine"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "alchemist_goblins_greed"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.2"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_gold_mine_crit"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_gold_mine_crit"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "phantom_assassin_coup_de_grace"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.2"
+        "AbilityManaCost"    "0"
+    }
+
+"ability_build_hero_altar"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_hero_altar"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "omniknight_guardian_angel"
+        "MaxLevel"           "1"
+        "AbilityCastRange"   "1200"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_open_hero_altar"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_open_hero_altar"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "chen_holy_persuasion"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.2"
+        "AbilityManaCost"    "0"
+    }
+
+"ability_summon_axe"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/ability_summon_axe"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+    "AbilityTextureName" "axe_berserkers_call"
+    "MaxLevel"           "1"
+    "AbilityCastPoint"   "0.0"
+    "AbilityCooldown"    "0.2"
+    "AbilityManaCost"    "0"
+}
+
+"ability_summon_slark"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/ability_summon_slark"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+    "AbilityTextureName" "slark_dark_pact"
+    "MaxLevel"           "1"
+    "AbilityCastPoint"   "0.0"
+    "AbilityCooldown"    "0.2"
+    "AbilityManaCost"    "0"
+}
+
+"ability_summon_juggernaut"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/ability_summon_juggernaut"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+    "AbilityTextureName" "juggernaut_blade_fury"
+    "MaxLevel"           "1"
+    "AbilityCastPoint"   "0.0"
+    "AbilityCooldown"    "0.2"
+    "AbilityManaCost"    "0"
+}
+
+"ability_summon_monkey_king"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/ability_summon_monkey_king"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+    "AbilityTextureName" "monkey_king_boundless_strike"
+    "MaxLevel"           "1"
+    "AbilityCastPoint"   "0.0"
+    "AbilityCooldown"    "0.2"
+    "AbilityManaCost"    "0"
+}
+
+"ability_summon_blademaster"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/ability_summon_blademaster"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+    "AbilityTextureName" "sven_gods_strength"
+    "MaxLevel"           "1"
+    "AbilityCastPoint"   "0.0"
+    "AbilityCooldown"    "0.2"
+    "AbilityManaCost"    "0"
+}
+
+
+"ability_survival_power_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_blades_of_attack"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_vitality_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_vitality_booster"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_agility_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_eagle"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_intellect_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_mystic_staff"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_armor_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_chainmail"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_attack_speed_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_gloves"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_move_speed_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_boots"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_attack_range_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "sniper_take_aim"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_health_regen_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_ring_of_regen"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_mana_regen_training"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "item_void_stone"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_axe_exclusive"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "axe_counter_helix"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_slark_exclusive"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "slark_essence_shift"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_juggernaut_exclusive"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "juggernaut_blade_dance"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_monkey_king_exclusive"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "monkey_king_jingu_mastery"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_blademaster_exclusive"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "sven_gods_strength"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+    "critical_strike_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "critical_strike_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "critical_strike_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "critical_strike_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "bone_cannon_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "bone_cannon_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "bone_cannon_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "bone_cannon_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "death_grenade_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "laser_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "laser_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "laser_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "laser_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "arcane_cannon_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "arcane_cannon_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "arcane_cannon_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "arcane_cannon_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "arcane_eye_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_strike_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_strike_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_strike_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_strike_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_storm_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_storm_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_storm_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_storm_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "lightning_diffusion_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "machine_gun_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "machine_gun_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "machine_gun_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "machine_gun_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "bounty_machine_gun_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "bounty_machine_gun_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "bounty_machine_gun_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "bounty_machine_gun_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "explosive_gatling_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "multi_attack_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "multi_attack_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "multi_attack_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "multi_attack_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "piercing_ballista_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "piercing_ballista_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "piercing_ballista_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "piercing_ballista_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "burning_great_arrow_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "frost_attack_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "frost_attack_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "frost_attack_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "frost_attack_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "ice_spire_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "ice_spire_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "ice_spire_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "ice_spire_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "polar_obelisk_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "anti_air_cannon_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "anti_air_cannon_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "anti_air_cannon_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "anti_air_cannon_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "anti_air_artillery_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "anti_air_artillery_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "anti_air_artillery_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "anti_air_artillery_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+    "airspace_overlord_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
+    }
+
+}

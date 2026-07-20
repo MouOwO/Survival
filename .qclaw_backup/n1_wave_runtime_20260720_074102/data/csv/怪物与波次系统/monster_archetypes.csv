@@ -1,0 +1,4 @@
+﻿archetype_id,unit_name,display_group,rank,base_stats_profile,model_source,model_path,team_name,considered_boss,enabled,notes
+#中文名:怪物原型ID,单位名称ID,显示分组,级别,基础属性方案,模型来源,模型路径,队伍名称,是否视为Boss,是否启用,备注
+#types:string,string,string,enum,string,string,string,string,boolean,boolean,string
+wild_boss_common,zombie_boss,野外Boss通用模板,boss,zombie_boss,npc_units_custom,models/heroes/undying/undying_flesh_golem.vmdl,DOTA_TEAM_BADGUYS,1,1,11个出生位置共用此模板。模型和基础数值集中在zombie_boss单位/野外Boss配置中，不在每个遭遇重复填写。

@@ -12,6 +12,7 @@ local function new_account()
         gold = config.initial_gold,
         population = config.initial_population,
         max_population = config.initial_max_population,
+        debug_mode = false,
     }
 end
 
@@ -52,15 +53,16 @@ local function handle_spend(payload)
     local gold = math.max(0, payload.gold or 0)
     local population = math.max(0, payload.population or 0)
 
-    if account.wood < wood then return { ok = false, error = "wood_not_enough" } end
-    if account.gold < gold then return { ok = false, error = "gold_not_enough" } end
-    if account.population + population > account.max_population then
-        return { ok = false, error = "population_not_enough" }
+    if not account.debug_mode then
+        if account.wood < wood then return { ok = false, error = "wood_not_enough" } end
+        if account.gold < gold then return { ok = false, error = "gold_not_enough" } end
+        if account.population + population > account.max_population then
+            return { ok = false, error = "population_not_enough" }
+        end
+        account.wood = account.wood - wood
+        account.gold = account.gold - gold
+        account.population = account.population + population
     end
-
-    account.wood = account.wood - wood
-    account.gold = account.gold - gold
-    account.population = account.population + population
     publish(payload.team, payload.reason or "spend")
     return { ok = true, snapshot = snapshot(payload.team) }
 end
@@ -71,6 +73,18 @@ local function handle_add(payload)
     account.gold = math.max(0, account.gold + (payload.gold or 0))
     account.max_population = math.max(0, account.max_population + (payload.max_population or 0))
     publish(payload.team, payload.reason or "add")
+    return { ok = true, snapshot = snapshot(payload.team) }
+end
+
+local function handle_debug_set(payload)
+    local account = get_account(payload.team)
+    local amount = math.max(0, tonumber(payload.amount) or 100000000)
+    account.wood = amount
+    account.gold = amount
+    account.population = amount
+    account.max_population = amount
+    account.debug_mode = true
+    publish(payload.team, payload.reason or "debug_set")
     return { ok = true, snapshot = snapshot(payload.team) }
 end
 
@@ -88,9 +102,12 @@ function M.init()
     event_bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST, handle_spend)
     event_bus.handle_request(events.RESOURCE_ADD_REQUEST, handle_add)
     event_bus.handle_request(events.RESOURCE_RELEASE_POP_REQUEST, handle_release_pop)
+    event_bus.handle_request(events.RESOURCE_DEBUG_SET_REQUEST, handle_debug_set)
 
     get_account(DOTA_TEAM_GOODGUYS)
+    get_account(DOTA_TEAM_BADGUYS)
     publish(DOTA_TEAM_GOODGUYS, "initial")
+    publish(DOTA_TEAM_BADGUYS, "initial")
 end
 
 return M

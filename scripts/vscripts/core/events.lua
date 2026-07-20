@@ -12,6 +12,7 @@ local M = {
     RESOURCE_TRY_SPEND_REQUEST = "resource.try_spend.request",
     RESOURCE_ADD_REQUEST = "resource.add.request",
     RESOURCE_RELEASE_POP_REQUEST = "resource.release_pop.request",
+    RESOURCE_DEBUG_SET_REQUEST = "resource.debug_set.request",
     RESOURCE_CHANGED = "resource.changed",
 
     BUILD_CAN_PLACE_REQUEST = "building.can_place.request",
@@ -36,9 +37,11 @@ local M = {
     TREE_SPAWNED = "tree.spawned",
     TREE_HIT = "tree.hit",
     TREE_DESTROYED = "tree.destroyed",
+    TREE_CHANGED = "tree.changed",
 
     WAVE_CHANGED = "wave.changed",
     WAVE_START_NEXT = "wave.internal.start_next",
+    WAVE_DIFFICULTY_SET_REQUEST = "wave.difficulty.set.request",
 
     UI_NOTIFICATION = "ui.notification",
     UI_DIRTY = "ui.dirty",
@@ -89,6 +92,7 @@ local M = {
 
     HERO_COMBAT_STATS_GET_REQUEST = "hero.combat_stats.get.request",
     HERO_COMBAT_STATS_CHANGED = "hero.combat_stats.changed",
+    COMBAT_DAMAGE_RESOLVED = "combat.damage.resolved",
 
     MONSTER_ENCOUNTER_START_REQUEST = "monster.encounter.start.request",
     MONSTER_ENCOUNTER_QUERY_REQUEST = "monster.encounter.query.request",

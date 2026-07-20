@@ -1,0 +1,124 @@
+<root>
+    <styles>
+        <include src="file://{resources}/styles/custom_game/survival_hud.css" />
+        <include src="file://{resources}/styles/custom_game/ability_tooltip.css" />
+        <include src="file://{resources}/styles/custom_game/shop.css" />
+        <include src="file://{resources}/styles/custom_game/combat_stats.css" />
+    </styles>
+    <scripts>
+        <include src="file://{resources}/scripts/custom_game/ui_bootstrap.js" />
+        <include src="file://{resources}/scripts/custom_game/survival_ui.js" />
+        <include src="file://{resources}/scripts/custom_game/tooltip_position.js" />
+        <include src="file://{resources}/scripts/custom_game/ability_tooltip.js" />
+        <include src="file://{resources}/scripts/custom_game/shop_tooltip.js" />
+        <include src="file://{resources}/scripts/custom_game/shop_ui.js" />
+        <include src="file://{resources}/scripts/custom_game/shop_debug.js" />
+        <include src="file://{resources}/scripts/custom_game/combat_stats.js" />
+    </scripts>
+    <Panel class="SurvivalHUDRoot" hittest="false">
+        <Panel id="TopBar">
+            <Label id="WoodValue" text="木材 0" />
+            <Label id="GoldValue" text="金币 0" />
+            <Label id="PopulationValue" text="人口 0/0" />
+            <Label id="CityLevelValue" text="主城 Lv.0" />
+        </Panel>
+        <Panel id="WaveBar">
+            <Label id="WaveNumber" text="波次 0/30" />
+            <Label id="WaveState" text="等待" />
+            <Label id="WaveTimer" text="30" />
+            <Label id="AliveValue" text="存活 0" />
+            <Label id="PendingValue" text="待生成 0" />
+        </Panel>
+
+        <!-- This project-owned launcher replaces the hidden Valve inventory shop. -->
+        <Button id="CustomShopButton" hittest="true" onactivate="GameUI.CustomUIConfig().SurvivalShop.Open()">
+            <DOTAItemImage id="CustomShopButtonIcon" itemname="item_ironwood_tree" />
+            <Label text="商店" />
+        </Button>
+
+        <Panel id="CustomShopWindow" class="Hidden" hittest="true">
+            <Panel id="ShopHeader">
+                <Panel id="ShopTitleBlock">
+                    <Label id="ShopTitle" text="生存商店" />
+                    <Label id="ShopSubtitle" text="右键购买 · 每次打开均从服务器同步" />
+                </Panel>
+                <Button id="ShopRefreshButton" onactivate="GameUI.CustomUIConfig().SurvivalShop.Refresh()">
+                    <Label text="刷新" />
+                </Button>
+                <Button id="ShopCloseButton" onactivate="GameUI.CustomUIConfig().SurvivalShop.Close()">
+                    <Label text="×" />
+                </Button>
+            </Panel>
+            <Panel id="ShopBody">
+                <Panel id="ShopCategoryList" />
+                <Panel id="ShopShelfArea">
+                    <Panel id="ShopLoading">
+                        <Label text="正在向服务器请求商店数据……" />
+                    </Panel>
+                    <Panel id="ShopItemList" />
+                </Panel>
+            </Panel>
+            <Panel id="ShopFooter">
+                <Label id="ShopResourceSummary" text="木材 0 · 金币 0" />
+                <Label id="ShopStatus" text="" />
+            </Panel>
+        </Panel>
+
+        <Panel id="ShopEntryTooltip" class="Hidden" hittest="false">
+            <Panel id="ShopTooltipHeader">
+                <Panel id="ShopTooltipIconHost" />
+                <Panel id="ShopTooltipTitleBlock">
+                    <Label id="ShopTooltipTitle" text="商品" />
+                    <Label id="ShopTooltipType" text="物品" />
+                </Panel>
+            </Panel>
+            <Label id="ShopTooltipDescription" text="" />
+            <Panel id="ShopTooltipCostRow">
+                <Panel class="TooltipCostBlock">
+                    <DOTAItemImage class="TooltipCostIcon" itemname="item_ironwood_tree" />
+                    <Label id="ShopTooltipWoodCost" class="TooltipCostValue" text="0" />
+                </Panel>
+                <Panel class="TooltipCostBlock">
+                    <DOTAItemImage class="TooltipCostIcon" itemname="item_hand_of_midas" />
+                    <Label id="ShopTooltipGoldCost" class="TooltipCostValue" text="0" />
+                </Panel>
+            </Panel>
+            <Label id="ShopTooltipCondition" text="" />
+            <Label id="ShopTooltipOwned" text="" />
+            <Panel id="ShopTooltipFields" />
+            <Label id="ShopTooltipStatus" text="" />
+        </Panel>
+
+        <Panel id="CustomAbilityTooltip" class="Hidden" hittest="false">
+            <Panel id="AbilityTooltipHeader">
+                <Panel id="AbilityTooltipTitleBlock">
+                    <Label id="CustomAbilityTitle" text="技能" />
+                </Panel>
+            </Panel>
+            <Label id="CustomAbilityDescription" text="" />
+            <Panel id="CustomAbilityFields" />
+        </Panel>
+
+        <Panel id="CombatStatsPanel">
+            <Label id="CombatStatsTitle" text="英雄战斗数据" />
+            <Panel class="CombatStatsRow">
+                <Label class="CombatStatsKey" text="攻击" />
+                <Label id="CombatAttackValue" class="CombatStatsValue" text="0" />
+            </Panel>
+            <Panel class="CombatStatsRow">
+                <Label class="CombatStatsKey" text="力量" />
+                <Label id="CombatStrengthValue" class="CombatStatsValue" text="0" />
+                <Label class="CombatStatsKey SmallGap" text="敏捷" />
+                <Label id="CombatAgilityValue" class="CombatStatsValue" text="0" />
+                <Label class="CombatStatsKey SmallGap" text="智力" />
+                <Label id="CombatIntellectValue" class="CombatStatsValue" text="0" />
+            </Panel>
+            <Label id="CombatWeaponValue" text="未装备武器" />
+            <Label id="CombatGrowthValue" text="成长攻击 +0" />
+            <Label id="CombatProgressValue" text="攻击次数 0/0" />
+            <Label id="CombatScaleValue" text="战斗缩放 1:10" />
+        </Panel>
+
+        <Panel id="NotificationContainer" />
+    </Panel>
+</root>

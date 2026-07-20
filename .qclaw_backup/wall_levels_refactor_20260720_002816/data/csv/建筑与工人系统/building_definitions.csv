@@ -1,0 +1,11 @@
+﻿building_id,name,unit_name,max_count,requires_city_level,build_wood,build_gold,population_cost,unlock_condition,builder_ability,disable_after_built,shop_visibility_condition,notes
+#中文名:建筑ID,名称,单位名称ID,最大数量,所需主城等级,建造木材消耗,建造金币消耗,人口消耗,解锁条件,建造技能ID,建成后禁用,商店显示条件,备注
+#types:string,string,string,number,number,number,number,number,string,string,boolean,string,string
+wall,城墙,building_wall,1,0,30,0,0,,ability_build_wall,1,,建造成功后Undying的建造城墙技能在客户端置灰；服务端仍验证max_count=1。
+main_city,主城,building_main_city,1,0,100,50,0,,ability_build_main_city,1,,建造成功后Undying的建造主城技能在客户端置灰；服务端仍验证max_count=1。
+arrow_tower,箭塔,building_arrow_tower,0,1,80,20,0,main_city_level>=1,ability_build_arrow_tower,0,,箭塔5级后进入五选一转职。
+building_farm,人口农场,building_farm,0,1,100,0,0,main_city_level>=1,ability_build_farm,0,,
+building_research_lab,研究所,building_research_lab,1,1,,,0,main_city_level>=1,ability_build_research_lab,1,,
+building_advanced_research_lab,高级研究所,building_advanced_research_lab,1,4,,,0,main_city_level>=4,ability_build_advanced_research_lab,1,,
+gold_mine,金矿,building_gold_mine,1,3,300,100,0,main_city_level>=3,ability_build_gold_mine,1,,主城3级解锁；具体建造费用由building_levels或正式配置补充。
+hero_altar,英雄祭坛,building_hero_altar,1,3,300,100,0,main_city_level>=3,ability_build_hero_altar,1,,主城3级后可建造；每位玩家只能召唤一个英雄。英雄召唤完成后祭坛仅作为普通建筑，商店UI同时解锁。建造费用300木材+100金币为暂定值。

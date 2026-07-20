@@ -1,0 +1,7 @@
+record_id,tower_id,name,level,base_attack_damage,attack_speed,critical_chance_pct,critical_damage_multiplier,attack_armor_reduction,notes
+#types:string,string,string,number,number,number,number,number,number,string
+arrow_tower_lv01,arrow_tower,箭塔lv1,1,230,1,0,1,0,attack_speed表示每秒攻击次数；基础数值按当前运行配置录入，后续可继续补全箭塔LV2-LV5。
+arrow_tower_lv02,arrow_tower,箭塔lv2,2,330,1,0,1,0,
+arrow_tower_lv03,arrow_tower,箭塔lv3,3,430,1,0,1,0,
+arrow_tower_lv04,arrow_tower,箭塔lv4,4,530,1,0,1,0,
+arrow_tower_lv05,arrow_tower,箭塔lv5,5,630,1,0,1,0,

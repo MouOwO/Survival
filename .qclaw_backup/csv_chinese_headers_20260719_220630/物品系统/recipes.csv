@@ -1,0 +1,12 @@
+﻿recipe_id,result_content_id,result_count,recipe_type,enabled,review_status,notes
+#types:string,string,number,enum,boolean,enum,string
+recipe_growth_max_mask_to_frost_01,weapon_frost_blade_01,1,auto_synthesis,1,needs_confirmation,成长之剑MAX+死亡面罩；源表同时出现“幻影之剑/霜之剑刃”命名冲突。
+recipe_equipment_set_to_infernal_01,equipment_infernal_armor_01,1,synthesis,1,ok,
+recipe_molten_core_01_to_02,material_molten_core_02,1,combine_3_to_1,1,ok,
+recipe_molten_core_02_to_03,material_molten_core_03,1,combine_3_to_1,1,ok,
+recipe_infernal_01_to_02,equipment_infernal_armor_02,1,equipment_upgrade,1,description_inferred,
+recipe_infernal_02_to_03,equipment_infernal_armor_03,1,equipment_upgrade,1,description_inferred,
+recipe_infernal_03_to_04,equipment_infernal_armor_04,1,equipment_upgrade,1,description_inferred,
+recipe_infernal_04_to_max,equipment_infernal_armor_max,1,equipment_upgrade,1,description_inferred,原表Lv4描述中核心等级疑似笔误，需确认。
+recipe_frost_max_crystal_gem_to_ice_01,weapon_ice_blade_01,1,synthesis,1,ok,
+recipe_ice_infernal_ember_to_epic,weapon_epic_icefire_00,1,synthesis,1,ok,

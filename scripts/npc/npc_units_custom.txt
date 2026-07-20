@@ -3,7 +3,7 @@
     "building_wall"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/props_structures/radiant_wall001.vmdl"
+        "Model"                  "models/props_structures/radiant_tower001.vmdl"
         "ModelScale"             "0.8"
         "Level"                  "1"
         "ConsideredHero"         "1"
@@ -55,14 +55,15 @@
         "StatusHealth"           "1500"
         "StatusMana"             "0"
         "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_RANGED_ATTACK"
+        // Lightning towers use the attack event only as a timing trigger.
+        // Melee capability prevents the engine from creating a ranged arrow.
+        "AttackCapabilities"     "DOTA_UNIT_CAP_MELEE_ATTACK"
         "AttackDamageMin"        "20"
         "AttackDamageMax"        "20"
         "AttackRange"            "600"
         "AttackRate"             "1.0"
         "AttackAnimationPoint"   "0.3"
-        "ProjectileModel"        "particles/units/heroes/hero_drow/drow_base_attack.vpcf"
-        "ProjectileSpeed"        "900"
+        "AttackAcquisitionRange" "10"
         "ArmorPhysical"          "5"
         "MagicalResistance"      "0"
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
@@ -111,6 +112,29 @@
         "VisionNighttimeRange"   "400"
     }
 
+    "npc_survival_wave_monster"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/undying/undying.vmdl"
+        "ModelScale"             "1.0"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "StatusHealth"           "200"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_GROUND"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_MELEE_ATTACK"
+        "AttackDamageMin"        "10"
+        "AttackDamageMax"        "10"
+        "AttackRange"            "128"
+        "AttackRate"             "1.0"
+        "MovementSpeed"          "250"
+        "ArmorPhysical"          "1"
+        "MagicalResistance"      "0"
+        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
+        "VisionDaytimeRange"     "800"
+        "VisionNighttimeRange"   "600"
+    }
     "zombie_basic"
     {
         "BaseClass"              "npc_dota_creature"

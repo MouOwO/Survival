@@ -7,6 +7,16 @@ local number_config = require("config/combat_number_config")
 local M = {}
 local state_by_player = {}
 
+local function on_damage(payload)
+    local player_id = tonumber(payload.player_id)
+    local state = state_by_player[player_id]
+    if not state or not state.snapshot then return end
+    state.snapshot.last_damage = payload
+    event_bus.emit(events.HERO_COMBAT_STATS_CHANGED, {
+        player_id = player_id, snapshot = state.snapshot,
+    })
+end
+
 local function value(definition, key, fallback)
     local number = tonumber(definition and definition[key])
     return number ~= nil and number or fallback or 0
@@ -104,7 +114,7 @@ end
 
 local function apply_base_projection(state)
     local unit = state.unit
-    local scale = number_config.logical_to_engine_scale or 10
+    local scale = 1
     local projected = {
         strength = state.base.strength / scale,
         agility = state.base.agility / scale,
@@ -117,9 +127,6 @@ local function apply_base_projection(state)
     local primary = primary_engine_attribute(unit, projected)
     local minimum = state.base.attack_min / scale - primary
     local maximum = state.base.attack_max / scale - primary
-    local limit = number_config.engine_base_damage_limit or 3200
-    minimum = math.max(-limit, math.min(limit, minimum))
-    maximum = math.max(minimum, math.max(-limit, math.min(limit, maximum)))
     safe_call(unit, "SetBaseDamageMin", minimum)
     safe_call(unit, "SetBaseDamageMax", maximum)
     safe_call(unit, "CalculateStatBonus", true)
@@ -142,7 +149,7 @@ local function recalculate(player_id, reason)
         + value(growth, "growth_agility", 0)
     local weapon_intellect = value(definition, "base_intellect", 0)
         + value(growth, "growth_intellect", 0)
-    local scale = number_config.logical_to_engine_scale or 10
+    local scale = 1
     state.snapshot = {
         player_id = player_id,
         hero_id = state.hero_id,
@@ -153,6 +160,8 @@ local function recalculate(player_id, reason)
             and equipment.main_hand_name or "未装备武器",
         attack_min = state.base.attack_min + weapon_attack_min,
         attack_max = state.base.attack_max + weapon_attack_max,
+        armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
+        attack_speed = safe_get(state.unit, "GetAttackSpeed", 100),
         strength = state.base.strength + weapon_strength,
         agility = state.base.agility + weapon_agility,
         intellect = state.base.intellect + weapon_intellect,
@@ -163,14 +172,17 @@ local function recalculate(player_id, reason)
         weapon_growth_attack = value(growth, "growth_attack", 0),
         stage_attack_count = value(growth, "stage_attack_count", 0),
         stage_attack_target = value(growth, "stage_attack_target", 0),
+        stage_attack_remaining = value(growth, "stage_attack_remaining", 0),
+        forging_hammer_count = value(growth, "forging_hammer_count", 0),
+        progress_per_attack = value(growth, "progress_per_attack", 1),
         attack_gain_per_attack = value(growth, "attack_gain_per_attack", 0),
         engine_weapon_attack_bonus =
-            (((weapon_attack_min + weapon_attack_max) * 0.5)
+            ((weapon_attack_min + weapon_attack_max) * 0.5)
                 - primary_logical_attribute(state.unit, state.definition, {
                     strength = weapon_strength,
                     agility = weapon_agility,
                     intellect = weapon_intellect,
-                })) / scale,
+                }),
         engine_weapon_strength_bonus = weapon_strength / scale,
         engine_weapon_agility_bonus = weapon_agility / scale,
         engine_weapon_intellect_bonus = weapon_intellect / scale,
@@ -228,6 +240,7 @@ end
 function M.init()
     state_by_player = {}
     event_bus.handle_request(events.HERO_COMBAT_STATS_GET_REQUEST, get_stats)
+    event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_changed)
     event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_changed)

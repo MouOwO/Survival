@@ -7,6 +7,7 @@
         "survival_ability_runtime",
         "survival_shop_config",
         "survival_item_config",
+        "survival_item_tooltips",
         "survival_hero_skills",
         "survival_hero_skill_choice",
         "survival_combat_stats",

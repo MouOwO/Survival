@@ -45,13 +45,18 @@ end
 
 local function build_snapshot(payload)
     local team = payload.team
-    local resource = resource_by_team[team] or {
-        wood = 0,
-        gold = 0,
-        population = 0,
-        max_population = 0,
-        version = 0,
-    }
+    local resource = resource_by_team[team]
+    if not resource then
+        local requested = event_bus.request(events.RESOURCE_GET_REQUEST, { team = team })
+        resource = requested or {
+            wood = 0,
+            gold = 0,
+            population = 0,
+            max_population = 0,
+            version = 0,
+        }
+        resource_by_team[team] = resource
+    end
     return {
         schema_version = 2,
         player_id = payload.player_id,

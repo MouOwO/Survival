@@ -45,14 +45,14 @@ local function owned_content(player_id)
         and inventory.snapshot.counts or {}
     for content_id, count in pairs(counts) do
         if count > 0 then
-            result[content_id] = true
+            result[content_id] = count
         end
     end
     for content_id, value in pairs(
         state.technology_by_player[player_id] or {}
     ) do
         if value then
-            result[content_id] = true
+            result[content_id] = count
         end
     end
     return result
