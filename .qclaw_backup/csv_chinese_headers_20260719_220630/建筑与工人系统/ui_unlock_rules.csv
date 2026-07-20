@@ -1,8 +1,0 @@
-﻿rule_id,condition,description,enabled
-#types:string,string,string,boolean
-shop_root_visible,altar_used==true,英雄祭坛完成选择/使用后显示商店UI。,1
-shop_category_challenge,altar_used==true,显示挑战商店分栏。,1
-shop_category_rebirth,altar_used==true,显示转职挑战分栏。,1
-ability_build_wall_enabled,building_count(building_wall)<1,建造一次后客户端置灰。,1
-ability_build_main_city_enabled,building_count(building_main_city)<1,建造一次后客户端置灰。,1
-ability_build_hero_altar_enabled,main_city_level>=3 and building_count(building_hero_altar)<1,主城3级解锁祭坛。,1

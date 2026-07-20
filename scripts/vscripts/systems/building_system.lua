@@ -7,7 +7,8 @@ local modifier_registry = require("core/modifier_registry")
 local team_alignment = require("core/team_alignment")
 local tower_skills = require("systems/tower_skill_runtime")
 local M = {}
-print("[SURVIVAL_FINGERPRINT] building_system=20260720_1045_no_building_modifiers")
+local RELOCATION_RANGE = 1000
+print("[SURVIVAL_FINGERPRINT] building_system=20260720_2128_relocation_validation")
 local buildings = {}
 local counts = {}
 local wall_ever_built = {}
@@ -55,6 +56,21 @@ local function arrow_data(level)
     end
     return nil
 end
+local function apply_attack_speed(unit, attacks_per_second)
+    local speed = tonumber(attacks_per_second) or 1
+    speed = math.max(0.01, speed)
+    unit.survival_attack_speed = speed
+    unit:SetBaseAttackTime(1 / speed)
+    if not unit:HasModifier("modifier_debug_attack_cap") then
+        unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+    end
+end
+local function apply_projectile(unit, projectile_model)
+    if projectile_model and projectile_model ~= ""
+        and unit.SetRangedProjectileName then
+        unit:SetRangedProjectileName(projectile_model)
+    end
+end
 local function apply_initial_stats(unit, definition)
     local data = definition.id == "arrow_tower"
         and definition.pre_class_levels[1]
@@ -71,7 +87,10 @@ local function apply_initial_stats(unit, definition)
         local combat = arrow_data(1) or {}
         unit:SetBaseDamageMin(combat.base_attack_damage or data.damage)
         unit:SetBaseDamageMax(combat.base_attack_damage or data.damage)
-        unit:SetBaseAttackTime(combat.attack_speed or data.attack_rate)
+        unit.survival_level = 1
+        unit.survival_display_name = combat.name or definition.display_name
+        apply_attack_speed(unit, combat.base_attack_speed or 1)
+        apply_projectile(unit, combat.projectile_model)
         set_attack_range(unit, data.attack_range)
     end
 end
@@ -116,6 +135,10 @@ local function public_state(state)
             or (state.building_id == "arrow_tower"
                 and ((arrow_data(state.level) or {}).name)
                 or state.definition.display_name),
+        configured_attack_damage = state.building_id == "arrow_tower"
+            and (arrow_data(state.level) or {}).base_attack_damage or nil,
+        configured_attack_speed = state.building_id == "arrow_tower"
+            and (arrow_data(state.level) or {}).base_attack_speed or nil,
     }
 end
 require("systems/building_relocation").bind(
@@ -196,6 +219,8 @@ local function create_building(payload)
         return { ok = false, error = "building_create_failed" }
     end
     team_alignment.enforce(unit, check.team, "building")
+    unit.survival_level = 1
+    unit.survival_display_name = check.definition.display_name
     unit:SetOwner(payload.caster)
     unit:SetControllableByPlayer(check.player_id, true)
     -- Attach the attack listener to the tower instance.
@@ -291,7 +316,23 @@ function M.relocate_for_player(player_id, entindex, position)
     if state.building_id ~= "wall" and state.building_id ~= "arrow_tower" then
         return false, "building_not_movable"
     end
-    return M.relocate_building(state.unit, position)
+    local origin = state.unit:GetAbsOrigin()
+    local dx = position.x - origin.x
+    local dy = position.y - origin.y
+    if (dx * dx + dy * dy) > (RELOCATION_RANGE * RELOCATION_RANGE) then
+        notify(player_id, "超出范围", "error")
+        return false, "relocation_out_of_range"
+    end
+    local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
+        position = position,
+        footprint = state.definition.footprint,
+        ignore_entindex = state.unit:entindex(),
+    })
+    if not grid or not grid.ok then
+        notify(player_id, grid and grid.error or "移动位置不可用", "error")
+        return false, grid and grid.error or "relocation_position_invalid"
+    end
+    return M.relocate_building(state.unit, grid.world_position)
 end
 
 function M.init()

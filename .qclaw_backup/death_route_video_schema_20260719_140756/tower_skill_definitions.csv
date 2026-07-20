@@ -1,9 +1,0 @@
-﻿skill_id,skill_name,description,target_scope,area_shape,area,damage_timing,duration,damage_interval,damage_multiplier,max_targets,attack_armor_reduction,enabled,notes
-#中文名:技能ID,技能名称,技能描述,目标范围,范围形状,范围,伤害时机,持续时间,伤害间隔,伤害倍率,最大目标数,攻击减甲,是否启用,备注
-#types:string,string,string,string,string,list,string,number,number,number,number,number,boolean,string
-critical_strike_lv01,致命一击LV1,攻击有几率造成暴击；概率在对应防御塔等级表填写,single,none,,instant,,,5,1,,1,伤害按普通攻击伤害×伤害倍率计算。
-area_attack_lv01,范围攻击LV1,攻击命中后对范围内敌人造成与普通攻击相同的伤害,multi,circle,600,instant,,,1,0,,0,圆形范围填写半径。
-sword_line_lv01,剑形攻击LV1,沿攻击路径射出宽剑体；路径上的敌人接触剑体时受到伤害,multi,rectangle,"200,900",instant,,,1,0,,0,矩形范围填写“宽度,长度”。
-poison_field_lv01,持续范围伤害LV1,范围内敌人持续受到与普通攻击相同的伤害,multi,circle,500,damage_over_time,5,1,1,0,,0,持续伤害按普通攻击伤害×伤害倍率×跳数计算。
-chain_lightning_lv01,闪电链LV1,攻击命中后向多个目标传导与普通攻击相同的伤害,multi,none,,instant,,,1,4,,0,最大目标数包含主目标还是仅包含传导目标由程序约定。
-armor_break_lv01,破甲攻击LV1,攻击命中后降低目标护甲并造成普通攻击伤害,single,none,,instant,,,1,1,10,0,减甲数值填写在attack_armor_reduction。

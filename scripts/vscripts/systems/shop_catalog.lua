@@ -139,6 +139,7 @@ local function make_entry(rule, row)
     local icon_type = rule.icon_type_default or "item"
     return {
         entryid = rule.source_id .. ":" .. content_id,
+        tooltip_id = "shop_item:" .. rule.source_id .. ":" .. content_id,
         shopid = category_id,
         contenttype = rule.content_type,
         contentid = content_id,
@@ -229,6 +230,8 @@ local function project_entry(player_id, entry, context)
         M.evaluate(player_id, entry, context)
     return {
         entry_id = entry.entryid,
+        tooltip_id = entry.tooltip_id
+            or ("shop_item:" .. entry.entryid),
         shop_id = entry.shopid,
         content_type = entry.contenttype,
         content_id = entry.contentid,

@@ -11,6 +11,7 @@
         "survival_hero_skills",
         "survival_hero_skill_choice",
         "survival_combat_stats",
+        "survival_tooltips",
         "survival_content_inventory",
         "survival_weapon_state",
     ]

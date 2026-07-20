@@ -44,7 +44,17 @@ local function apply_primary_stats(unit, definition)
 end
 
 local function apply_combat_stats(unit, definition)
-    set_if_present(unit, definition, "base_attack_time", "SetBaseAttackTime")
+    set_if_present(unit, definition, "base_damage_min", "SetBaseDamageMin")
+    set_if_present(unit, definition, "base_damage_max", "SetBaseDamageMax")
+
+    local attack_speed = number(definition, "attack_speed")
+    if attack_speed and attack_speed > 0 then
+        safe_call(unit, "SetBaseAttackTime", 1 / attack_speed)
+        unit.survival_attack_speed = attack_speed
+        if not unit:HasModifier("modifier_debug_attack_cap") then
+            unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+        end
+    end
     set_if_present(
         unit,
         definition,
@@ -110,18 +120,6 @@ end
 
 local function apply_misc(unit, definition)
     set_if_present(unit, definition, "turn_rate", "SetTurnRate")
-    set_if_present(
-        unit,
-        definition,
-        "vision_day",
-        "SetDayTimeVisionRange"
-    )
-    set_if_present(
-        unit,
-        definition,
-        "vision_night",
-        "SetNightTimeVisionRange"
-    )
 end
 
 local function apply_all_attributes(unit, amount)
@@ -185,10 +183,16 @@ function M.apply(unit, definition)
         return
     end
 
+    -- 先写入 CSV 中的基础属性与成长；此前漏掉这一层，导致英雄部分回退到引擎默认值。
+    apply_primary_stats(unit, definition)
     apply_combat_stats(unit, definition)
     apply_range(unit, definition)
     apply_resource_stats(unit, definition)
     apply_misc(unit, definition)
+    apply_all_attributes(
+        unit,
+        number(definition, "all_attributes_bonus") or 0
+    )
     safe_call(unit, "CalculateStatBonus", true)
     apply_multipliers(unit, definition)
     apply_level(unit, definition)

@@ -1,8 +1,0 @@
-level_id,building_id,level,wood_cost,gold_cost,population_add,prerequisite_text,unlock_text,enabled,source,notes
-#中文名:等级ID,建筑ID,等级,木材消耗,金币消耗,增加人口上限,前置条件说明,解锁说明,是否启用,来源,备注
-#types:string,string,number,number,number,number,string,string,boolean,string,string
-building_main_city_lv01,building_main_city,1,0,0,10,城墙,解锁研究所、农场LV1、箭塔、挑战建筑（城墙、箭塔加成、金币、伐木效率挑战BOSS）,1,建筑/行4,
-building_main_city_lv02,building_main_city,2,600,0,5,基地LV1,,1,建筑/行5,
-building_main_city_lv03,building_main_city,3,3000,0,5,基地LV2,解锁金矿,1,建筑/行6,
-building_main_city_lv04,building_main_city,4,11000,100,5,基地LV3,解锁高级研究所,1,建筑/行7,解锁祭坛→装备商店→挑战商店、转升挑战
-building_main_city_lv05,building_main_city,5,30000,500,5,基地LV4,解锁挑战建筑额外内容（英雄攻击及属性挑战BOSS），解锁农民合成。,1,建筑/行8,

@@ -2,6 +2,7 @@
 from __future__ import annotations
 import csv
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -53,9 +54,30 @@ def build(source: Path, output: Path) -> None:
     if type_index is None:
         raise ValueError(f"CSV requires #types row: {source}")
     types = rows[type_index]
-    types[0] = types[0][7:]
+    if len(types) == 1 and types[0].startswith("#types:"):
+        types = [item.strip() for item in types[0][7:].split(",")]
+    else:
+        types[0] = types[0][7:]
     if len(headers) != len(types):
-        raise ValueError(f"header/type count mismatch: {source}")
+        raise ValueError(
+            f"header/type count mismatch: {source}"
+            f" (header line 1 has {len(headers)} columns;"
+            f" #types line {type_index + 1} has {len(types)} columns)\n"
+            f"header: {headers}\n"
+            f"types: {types}"
+        )
+    for row_number, fields in enumerate(rows[type_index + 1:], type_index + 2):
+        if not fields or (len(fields) == 1 and not fields[0].strip()):
+            continue
+        if fields[0].strip().startswith("#"):
+            continue
+        if len(fields) != len(headers):
+            raise ValueError(
+                f"CSV column count mismatch: {source}"
+                f" (line {row_number} has {len(fields)} columns;"
+                f" expected {len(headers)})\n"
+                f"row: {fields}"
+            )
     lines = [
         "-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.",
         f"-- Source: {source.name}",
@@ -89,6 +111,11 @@ def build(source: Path, output: Path) -> None:
 
 
 def main() -> int:
+    tooltip_builder = ROOT / "tools" / "build_tooltip_definitions.py"
+    if tooltip_builder.exists():
+        result = subprocess.run([sys.executable, str(tooltip_builder)], cwd=ROOT)
+        if result.returncode != 0:
+            return result.returncode
     files = sorted(CSV_ROOT.rglob("*.csv"))
     if not files:
         print(f"ERROR: no CSV files under {CSV_ROOT}", file=sys.stderr)

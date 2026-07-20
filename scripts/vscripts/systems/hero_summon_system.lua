@@ -98,6 +98,9 @@ local function create_hero(player_id, team, altar, definition)
     end
 
     stat_adapter.apply(unit, definition)
+    if not unit:HasModifier("modifier_debug_attack_cap") then
+        unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+    end
     cosmetic_service.apply(unit, definition.hero_id)
     return unit
 end

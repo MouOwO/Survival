@@ -170,7 +170,12 @@ local function train_worker(payload)
     worker:SetPhysicalArmorBaseValue(config.armor)
     worker:SetBaseDamageMin(config.damage_min)
     worker:SetBaseDamageMax(config.damage_max)
-    worker:SetBaseAttackTime(config.attack_rate)
+    local attack_speed = math.max(0.01, tonumber(config.attack_rate) or 0.5)
+    worker:SetBaseAttackTime(1 / attack_speed)
+    worker.survival_attack_speed = attack_speed
+    if not worker:HasModifier("modifier_debug_attack_cap") then
+        worker:AddNewModifier(worker, nil, "modifier_debug_attack_cap", {})
+    end
     worker:SetBaseMoveSpeed(config.move_speed)
     worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
         tree_entindex = current_tree_entindex,

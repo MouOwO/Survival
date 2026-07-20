@@ -1,5 +1,5 @@
-ï»¿exclusive_entry_id,exclusive_group_id,hero_id,skill_id,initial_level,guaranteed,enabled,notes
-#ä¸­æ–‡å:ä¸“å±æ¡ç›®ID,ä¸“å±æŠ€èƒ½ç»„ID,è‹±é›„ID,æŠ€èƒ½ID,åˆå§‹ç­‰çº§,æ˜¯å¦å¿…å®šè·å¾—,æ˜¯å¦å¯ç”¨,å¤‡æ³¨
+exclusive_entry_id,exclusive_group_id,hero_id,skill_id,initial_level,guaranteed,enabled,notes
+#ÖĞÎÄÃû:×¨ÊôÌõÄ¿ID,×¨Êô¼¼ÄÜ×éID,Ó¢ĞÛID,¼¼ÄÜID,³õÊ¼µÈ¼¶,ÊÇ·ñ±Ø¶¨»ñµÃ,ÊÇ·ñÆôÓÃ,±¸×¢
 #types:string,string,string,string,number,boolean,boolean,string
 exclusive_axe_01,exclusive_axe,hero_axe,skill_axe_exclusive,1,1,1,
 exclusive_slark_01,exclusive_slark,hero_slark,skill_slark_exclusive,1,1,1,

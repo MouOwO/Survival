@@ -8,10 +8,12 @@ local modifier_registry = require("core/modifier_registry")
 LinkLuaModifier("modifier_building_stationary", "modifiers/modifier_building_stationary", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_building_no_health_bar", "modifiers/modifier_building_no_health_bar", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_attack_effects", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_debug_attack_cap", "modifiers/modifier_debug_attack_cap", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_building_blink_move", "modifiers/modifier_building_blink_move", LUA_MODIFIER_MOTION_NONE)
 require("modifiers/modifier_building_stationary")
 require("modifiers/modifier_building_no_health_bar")
 require("modifiers/modifier_tower_attack_effects")
+require("modifiers/modifier_debug_attack_cap")
 require("modifiers/modifier_building_blink_move")
 modifier_registry.register()
 local ability_utils = require("core/ability_utils")
@@ -43,6 +45,8 @@ local monster_spawn_service =
     require("systems/monster_spawn_service")
 local wave_system = require("systems/wave_system")
 local monster_archetypes = require("config/generated/monster_archetypes")
+local arrow_tower_base = require("config/generated/arrow_tower_base")
+local tower_route_config = require("config/tower_route_config")
 local content_inventory_service =
     require("systems/content_inventory_service")
 local weapon_equipment_service =
@@ -222,6 +226,27 @@ function M.precache(context)
     PrecacheModel("models/heroes/drow_ranger/drow_ranger.vmdl", context)
     PrecacheModel("models/props_structures/radiant_tower001.vmdl", context)
     local precached_models = {}
+    local precached_projectiles = {}
+    local function precache_projectile(path)
+        if path and path ~= "" and not precached_projectiles[path] then
+            PrecacheResource("particle", path, context)
+            precached_projectiles[path] = true
+        end
+    end
+    for _, row in ipairs(arrow_tower_base.rows or {}) do
+        precache_projectile(row.projectile_model)
+        if row.model_name and row.model_name ~= "" then
+            PrecacheModel(row.model_name, context)
+        end
+    end
+    for class_id = 1, 7 do
+        for _, row in ipairs(tower_route_config.get_route("class_" .. class_id) or {}) do
+            precache_projectile(row.projectile_model)
+            if row.model_name and row.model_name ~= "" then
+                PrecacheModel(row.model_name, context)
+            end
+        end
+    end
     for _, archetype in ipairs(monster_archetypes.rows or {}) do
         if archetype.enabled ~= false and archetype.model_path
             and archetype.model_path ~= "" and not precached_models[archetype.model_path] then

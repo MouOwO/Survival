@@ -1,3 +1,0 @@
-﻿entitlement_id,display_name,default_unlocked,test_cheat_name,enabled,notes
-#types:string,string,boolean,string,boolean,string
-vip,VIP英雄召唤权限,1,setvip,1,测试阶段默认VIP=true；正式发布时接入存档/平台权益并改回false。

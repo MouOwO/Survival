@@ -75,7 +75,14 @@ local function apply_stats(unit, row, definition)
     unit:SetBaseDamageMax(row.attack)
     unit:SetPhysicalArmorBaseValue(row.armor)
     unit:SetBaseMoveSpeed(definition.move_speed or 250)
-    unit:SetBaseAttackTime(definition.attack_rate or 1.0)
+    -- attack_speed 表示每秒攻击次数；Dota 引擎需要基础攻击间隔。
+    local attack_speed = tonumber(row.attack_speed) or 0.5
+    attack_speed = math.max(0.01, attack_speed)
+    unit.survival_attack_speed = attack_speed
+    unit:SetBaseAttackTime(1 / attack_speed)
+    if not unit:HasModifier("modifier_debug_attack_cap") then
+        unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+    end
     if unit.Script_SetAttackRange then unit:Script_SetAttackRange(definition.attack_range or 128)
     elseif unit.SetAttackRange then unit:SetAttackRange(definition.attack_range or 128) end
     if definition.attack_type == "ranged" then

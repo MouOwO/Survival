@@ -1,8 +1,0 @@
-﻿record_id,tower_id,name,level,base_attack_damage,upgrade_gold,upgrade_wood,population_delta,skill_ids,attack_speed,critical_chance_pct,critical_damage_multiplier,attack_armor_reduction,enabled,notes
-#中文名:记录ID,防御塔ID,名称,等级,基础攻击力,升到本级所需金币,升到本级所需木材,升到本级人口增量,当前生效技能ID列表,每秒攻击次数,暴击几率(%),暴击伤害倍率,攻击减甲,是否启用,备注
-#types:string,string,string,number,number,number,number,number,list,number,number,number,number,boolean,string
-arrow_tower_lv01,arrow_tower,箭塔1-1,1,172,0,50,0,,1,0,1,0,1,初建成本按升到本级成本记录。
-arrow_tower_lv02,arrow_tower,箭塔1-2,2,251,0,100,0,,1,0,1,0,1,
-arrow_tower_lv03,arrow_tower,箭塔1-3,3,301,0,200,0,,1,0,1,0,1,
-arrow_tower_lv04,arrow_tower,箭塔1-4,4,401,0,250,0,,1,0,1,0,1,
-arrow_tower_lv05,arrow_tower,箭塔1-5,5,501,0,300,0,,1,0,1,0,1,下一阶段可转职为死亡之塔等方向。

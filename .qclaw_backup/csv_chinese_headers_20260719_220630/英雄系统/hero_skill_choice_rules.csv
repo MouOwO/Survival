@@ -1,3 +1,0 @@
-﻿rule_id,trigger_type,min_trigger_level,max_trigger_level,pool_id,choice_count,allow_owned_skill,owned_skill_action,exclude_max_level,unique_within_offer,skill_capacity,enabled,notes
-#types:string,enum,number,number,string,number,boolean,enum,boolean,boolean,number,boolean,string
-rebirth_random_skill,rebirth_complete,2,10,public_pool,3,1,upgrade,1,1,10,1,二转到十转的随机三选一；已有技能再次选择时升级。

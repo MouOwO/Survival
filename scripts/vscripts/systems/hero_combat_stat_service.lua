@@ -161,7 +161,10 @@ local function recalculate(player_id, reason)
         attack_min = state.base.attack_min + weapon_attack_min,
         attack_max = state.base.attack_max + weapon_attack_max,
         armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
-        attack_speed = safe_get(state.unit, "GetAttackSpeed", 100),
+        -- attack_speed 表示每秒攻击次数；引擎保存的是基础攻击间隔。
+        attack_speed = tonumber(state.unit.survival_attack_speed)
+            or (1 / math.max(0.01, safe_get(state.unit, "GetBaseAttackTime", 0.5))),
+        attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100),
         strength = state.base.strength + weapon_strength,
         agility = state.base.agility + weapon_agility,
         intellect = state.base.intellect + weapon_intellect,

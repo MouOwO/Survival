@@ -43,6 +43,10 @@ local modifiers = {
         path = "modifiers/modifier_debug_fixed_attack_rate",
     },
     {
+        name = "modifier_debug_attack_cap",
+        path = "modifiers/modifier_debug_attack_cap",
+    },
+    {
         name = "modifier_tower_attack_effects",
         path = "modifiers/modifier_tower_attack_effects",
     },

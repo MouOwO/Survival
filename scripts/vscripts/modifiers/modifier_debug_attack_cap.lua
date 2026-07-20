@@ -1,6 +1,5 @@
 modifier_debug_attack_cap = class({})
 
-local ATTACK_SPEED_BONUS = 10000
 local ATTACK_SPEED_MAX = 10000
 
 function modifier_debug_attack_cap:IsHidden()
@@ -17,17 +16,12 @@ end
 
 function modifier_debug_attack_cap:DeclareFunctions()
     return {
-        MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
         MODIFIER_PROPERTY_IGNORE_ATTACKSPEED_LIMIT,
         MODIFIER_PROPERTY_ATTACKSPEED_ABSOLUTE_MAX,
     }
 end
 
-function modifier_debug_attack_cap:GetModifierAttackSpeedBonus_Constant()
-    return ATTACK_SPEED_BONUS
-end
-
-function modifier_debug_attack_cap:GetModifierAttackSpeed_Limit()
+function modifier_debug_attack_cap:GetModifierIgnoreAttackSpeedLimit()
     return 1
 end
 

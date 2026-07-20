@@ -23,8 +23,9 @@ local function within_bounds(position)
        and position.y >= bounds.min_y and position.y <= bounds.max_y
 end
 
-local function cell_is_occupied(x, y)
-    return occupied[x] and occupied[x][y] ~= nil
+local function cell_is_occupied(x, y, ignored_entindex)
+    local occupant = occupied[x] and occupied[x][y] or nil
+    return occupant ~= nil and occupant ~= ignored_entindex
 end
 
 local function can_place(payload)
@@ -35,9 +36,10 @@ local function can_place(payload)
     end
 
     local grid_x, grid_y = world_to_grid(position)
+    local ignored_entindex = tonumber(payload.ignore_entindex)
     for x = grid_x, grid_x + footprint.x - 1 do
         for y = grid_y, grid_y + footprint.y - 1 do
-            if cell_is_occupied(x, y) then
+            if cell_is_occupied(x, y, ignored_entindex) then
                 return { ok = false, error = "build_cell_occupied" }
             end
         end

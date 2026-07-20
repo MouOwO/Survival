@@ -38,6 +38,7 @@ local function apply_common(unit, data)
     unit:SetMaxHealth(data.health)
     unit:SetHealth(data.health)
     unit:SetPhysicalArmorBaseValue(data.armor)
+    unit.survival_armor = tonumber(data.armor) or 0
     if data.model_name and data.model_name ~= "" then
         unit:SetModel(data.model_name)
         unit:SetOriginalModel(data.model_name)
@@ -54,9 +55,23 @@ end
 local function apply_tower(unit, data, level)
     apply_common(unit, data)
     local combat = arrow_data(level or 1) or {}
-    unit:SetBaseDamageMin(combat.base_attack_damage or data.damage)
-    unit:SetBaseDamageMax(combat.base_attack_damage or data.damage)
-    unit:SetBaseAttackTime(combat.attack_speed or data.attack_rate)
+    local damage = tonumber(combat.base_attack_damage or data.damage) or 0
+    unit:SetBaseDamageMin(damage)
+    unit:SetBaseDamageMax(damage)
+    unit.survival_attack_min = damage
+    unit.survival_attack_max = damage
+    local attacks_per_second = tonumber(data.base_attack_speed)
+        or tonumber(combat.base_attack_speed) or 1
+    attacks_per_second = math.max(0.01, attacks_per_second)
+    unit.survival_attack_speed = attacks_per_second
+    unit:SetBaseAttackTime(1 / attacks_per_second)
+    if not unit:HasModifier("modifier_debug_attack_cap") then
+        unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+    end
+    if data.projectile_model and data.projectile_model ~= ""
+        and unit.SetRangedProjectileName then
+        unit:SetRangedProjectileName(data.projectile_model)
+    end
     set_attack_range(unit, data.attack_range)
 end
 
@@ -74,6 +89,10 @@ local function set_class_buttons(unit, active)
 end
 
 local function publish(state, reason)
+    local display_name = state.unit.survival_display_name
+        or state.tower_class_name
+        or ((tower_routes.current(state) or {}).name)
+        or state.definition.display_name
     event_bus.emit(events.BUILDING_CHANGED, {
         entindex = state.unit:entindex(),
         team = state.team,
@@ -82,8 +101,11 @@ local function publish(state, reason)
         level = state.level,
         tower_class = state.tower_class,
         tower_class_name = state.tower_class_name,
-        display_name = state.tower_class_name
-            or ((tower_routes.current(state) or {}).name),
+        display_name = display_name,
+        attack_min = state.unit.survival_attack_min,
+        attack_max = state.unit.survival_attack_max,
+        armor = state.unit.survival_armor,
+        attack_speed = state.unit.survival_attack_speed,
         reason = reason,
     })
 end
@@ -124,6 +146,8 @@ local function upgrade_wall(state)
     local result = spend(state, data.upgrade_cost, "upgrade_wall")
     if not result or not result.ok then return result end
     state.level = next_level
+    state.unit.survival_level = next_level
+    state.unit.survival_display_name = state.definition.display_name
     apply_common(state.unit, data)
     publish(state, "wall_upgraded")
     return { ok = true }
@@ -136,6 +160,8 @@ local function upgrade_city(state)
     local result = spend(state, data.upgrade_cost, "upgrade_city")
     if not result or not result.ok then return result end
     state.level = next_level
+    state.unit.survival_level = next_level
+    state.unit.survival_display_name = state.definition.display_name
     apply_common(state.unit, data)
     if data.add_population then
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
@@ -154,8 +180,10 @@ local function route_unit_data(state, row)
         armor = state.unit:GetPhysicalArmorBaseValue(),
         damage = row.base_attack_damage,
         attack_range = 675,
-        attack_rate = row.attack_speed or 0.9,
+        attack_rate = row.base_attack_speed or 1,
+        base_attack_speed = row.base_attack_speed or 1,
         model_name = row.model_name,
+        projectile_model = row.projectile_model,
     }
 end
 
@@ -176,6 +204,8 @@ local function apply_tower_level(state, row, level, change_model)
     apply_model(state.unit, row)
     state.level = level
     state.tower_class_name = state.tower_class and tower_routes.display_name(row) or row.name
+    state.unit.survival_level = level
+    state.unit.survival_display_name = state.tower_class_name
     sync_tower_abilities(state, row)
     tower_skills.apply(state.unit, row.skill_ids)
 end

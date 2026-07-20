@@ -1,8 +1,0 @@
-﻿implementation_id,implementation_name,implementation_type,trigger_event,primary_damage_source,secondary_damage_source,target_selector,max_targets,radius,damage_type,can_crit,applies_attack_armor_reduction,handler_module,enabled,description,notes
-#中文名:实现ID,实现名称,实现类型,触发事件,主要伤害来源,次要伤害来源,目标选择方式,最大目标数,作用范围,伤害类型,是否可暴击,是否应用攻击减甲,处理模块,是否启用,描述,备注
-#types:string,string,string,string,string,string,string,number,number,string,boolean,boolean,string,boolean,string,string
-direct_attack,普通攻击结算,direct,attack_landed,engine_attack,,primary_target,1,,physical,1,1,tower_damage_service,1,由Dota引擎处理主目标普通攻击伤害；服务端可追加暴击和攻击减甲。,基础实现。
-area_damage,范围伤害,area,attack_landed,engine_attack,configured_damage,enemies_in_radius,,0,physical,0,0,tower_damage_service,0,普通攻击命中后对半径内敌人造成配置伤害。,填写radius和技能伤害后启用。
-chain_lightning,连锁伤害,chain,attack_landed,engine_attack,configured_damage,nearest_enemy_chain,0,,magical,0,0,tower_damage_service,0,从主目标开始按最近目标规则传导伤害。,填写max_targets和技能伤害后启用。
-armor_reduction,攻击减甲,debuff,attack_landed,engine_attack,,primary_target,1,,physical,0,1,tower_damage_service,0,普通攻击命中后向主目标施加配置的减甲效果。,减甲数值由塔等级或技能表提供。
-attack_speed_modifier,攻速修正,stat_projection,always,none,,self,1,,,,0,tower_stat_projection_service,0,将技能或塔等级配置的攻速修正投影到防御塔。,攻速字段统一使用每秒攻击次数。

@@ -1,7 +1,0 @@
-﻿exclusive_entry_id,exclusive_group_id,hero_id,skill_id,initial_level,guaranteed,enabled,notes
-#types:string,string,string,string,number,boolean,boolean,string
-exclusive_axe_01,exclusive_axe,hero_axe,skill_axe_exclusive,1,1,1,
-exclusive_slark_01,exclusive_slark,hero_slark,skill_slark_exclusive,1,1,1,
-exclusive_jugg_01,exclusive_juggernaut,hero_juggernaut,skill_juggernaut_exclusive,1,1,1,
-exclusive_monkey_01,exclusive_monkey_king,hero_monkey_king,skill_monkey_king_exclusive,1,1,1,
-exclusive_blademaster_01,exclusive_blademaster,hero_blademaster,skill_blademaster_exclusive,1,1,1,

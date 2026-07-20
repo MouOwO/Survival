@@ -1,7 +1,0 @@
-﻿category_id,name,sort_order,visible_condition,enabled,description
-#types:string,string,number,string,boolean,string
-weapon,武器与装备,10,altar_used==true,1,武器、护甲、饰品和可重复升级装备。
-item,道具与材料,20,altar_used==true,1,消耗品、BUFF道具与合成材料。
-technology,科技与服务,30,altar_used==true,1,科技升级和一次性服务。
-challenge,挑战商店,40,altar_used==true,1,原建筑表中的挑战商店内容迁入此分栏。
-rebirth,转职挑战,50,altar_used==true,1,原建筑表中的转升挑战内容迁入此分栏。

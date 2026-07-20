@@ -1,8 +1,0 @@
-﻿skill_id,skill_name,skill_type,description,level,max_level,damage_implementation_id,damage_target_type,damage_value,damage_multiplier,damage_radius,damage_count,attack_armor_reduction,attack_speed_modifier,critical_chance_modifier,critical_damage_modifier,enabled,notes
-#中文名:技能ID,技能名称,技能类型,描述,等级,最高等级,伤害实现ID,伤害目标类型,伤害数值,伤害倍率,伤害范围,伤害目标数,攻击减甲,攻速修正,暴击几率修正,暴击伤害修正,是否启用,备注
-#types:string,string,string,string,number,number,string,string,number,number,number,number,number,number,number,number,boolean,string
-critical_strike,致命一击,passive,攻击有几率造成暴击；具体概率和倍率由对应塔等级表提供,1,,direct_attack,,,,,,,,,,,1,被动技能只描述机制；数值在tower_class_*表中填写。
-area_damage,范围攻击,passive,攻击命中后对目标范围内敌人造成额外伤害,1,,area_damage,,,,,,,,,,,0,预留技能；damage_radius和damage_value待填写。
-chain_lightning,闪电链,passive,攻击命中后向多个目标传导闪电伤害,1,,chain_lightning,,,,,,0,,,0,预留技能；damage_count和damage_value待填写。
-rapid_fire,快速射击,passive,提高防御塔攻击速度,1,,attack_speed_modifier,,,,,,,,,,,0,预留技能；attack_speed_modifier待填写。
-armor_break,破甲攻击,passive,攻击命中后降低目标护甲,1,,armor_reduction,,,,,,,,,,,0,预留技能；attack_armor_reduction待填写。

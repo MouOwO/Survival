@@ -1,6 +1,25 @@
 local building_levels = require("config/generated/building_levels")
+local building_definitions = require("config/generated/building_definitions")
 
 local M = {}
+
+local function definition_row(building_id)
+    return (building_definitions.by_id or {})[building_id] or {}
+end
+
+local function configured_name(building_id, fallback)
+    local row = definition_row(building_id)
+    return row.name or fallback
+end
+
+local function configured_unit_name(building_id, fallback)
+    local row = definition_row(building_id)
+    local value = row.unit_name
+    if type(value) == "string" and string.match(value, "^[%a_][%w_]*$") then
+        return value
+    end
+    return fallback
+end
 
 local function level_rows(building_id)
     local result = {}
@@ -37,7 +56,8 @@ end
 
 local wall_levels = level_rows("building_wall")
 M.wall = {
-    id = "wall", display_name = "城墙", unit_name = "building_wall",
+    id = "wall", display_name = configured_name("wall", "城墙"),
+    unit_name = configured_unit_name("wall", "building_wall"),
     build_cost = build_cost("building_wall", 100, 0),
     footprint = { x = 1, y = 1 }, max_count = 1, build_once = true,
     show_health_bar = true, selectable = true,
@@ -45,7 +65,8 @@ M.wall = {
 }
 
 M.main_city = {
-    id = "main_city", display_name = "主城", unit_name = "building_main_city",
+    id = "main_city", display_name = configured_name("main_city", "主城"),
+    unit_name = configured_unit_name("main_city", "building_main_city"),
     build_cost = build_cost("building_main_city", 100, 50),
     footprint = { x = 2, y = 2 },
     max_count = 1, show_health_bar = false, selectable = true,
@@ -63,7 +84,8 @@ M.main_city = {
 }
 
 M.arrow_tower = {
-    id = "arrow_tower", display_name = "防御塔", unit_name = "building_arrow_tower",
+    id = "arrow_tower", display_name = configured_name("arrow_tower", "防御塔"),
+    unit_name = configured_unit_name("arrow_tower", "building_arrow_tower"),
     build_cost = build_cost("building_arrow_tower", 80, 20),
     footprint = { x = 1, y = 1 }, max_count = 0,
     show_health_bar = false, selectable = true, abilities = { "ability_upgrade_tower" },
@@ -86,6 +108,6 @@ M.arrow_tower = {
     },
 }
 
-M.gold_mine = { id = "gold_mine", display_name = "金矿", unit_name = "building_gold_mine", build_cost = build_cost("building_gold_mine", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_crit" }, levels = { [1] = { health = 3000, armor = 8 } } }
-M.hero_altar = { id = "hero_altar", display_name = "英雄祭坛", unit_name = "building_hero_altar", build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_summon_axe", "ability_summon_slark", "ability_summon_juggernaut", "ability_summon_monkey_king", "ability_summon_blademaster" }, levels = { [1] = { health = 2500, armor = 8 } } }
+M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_crit" }, levels = { [1] = { health = 3000, armor = 8 } } }
+M.hero_altar = { id = "hero_altar", display_name = configured_name("hero_altar", "英雄祭坛"), unit_name = configured_unit_name("hero_altar", "building_hero_altar"), build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_summon_axe", "ability_summon_slark", "ability_summon_juggernaut", "ability_summon_monkey_king", "ability_summon_blademaster" }, levels = { [1] = { health = 2500, armor = 8 } } }
 return M

@@ -150,6 +150,14 @@ local function start_encounter(payload)
         unit:SetForwardVector(marker:GetForwardVector())
     end
     FindClearSpaceForUnit(unit, origin, true)
+    local attack_speed = tonumber(archetype.attack_speed)
+        or tonumber(archetype.base_attack_speed) or 0.5
+    attack_speed = math.max(0.01, attack_speed)
+    unit.survival_attack_speed = attack_speed
+    unit:SetBaseAttackTime(1 / attack_speed)
+    if not unit:HasModifier("modifier_debug_attack_cap") then
+        unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+    end
 
     local player_id = tonumber(payload.player_id)
     local meta = {
