@@ -1,6 +1,19 @@
 "DOTAAbilities"
 {
     "Version" "1"
+    "item_survival_death_mask"
+    {
+        "BaseClass" "item_lua"
+        "ScriptFile" "items/item_survival_weapon_shell"
+        "AbilityTextureName" "item_lifesteal"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "ItemCost" "0"
+        "ItemPurchasable" "0"
+        "ItemSellable" "0"
+        "ItemDroppable" "0"
+        "ItemPermanent" "1"
+        "ItemStackable" "0"
+    }
     "item_survival_growth_sword_01"
     {
         "BaseClass" "item_lua"

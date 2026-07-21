@@ -1,4 +1,5 @@
 -- Visual inventory shells only. Gameplay stats are server-authoritative.
+item_survival_death_mask = item_survival_death_mask or class({})
 item_survival_growth_sword_01 = item_survival_growth_sword_01 or class({})
 item_survival_growth_sword_02 = item_survival_growth_sword_02 or class({})
 item_survival_growth_sword_03 = item_survival_growth_sword_03 or class({})

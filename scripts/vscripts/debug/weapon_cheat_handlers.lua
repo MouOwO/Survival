@@ -52,6 +52,30 @@ function M.give_forging_hammer(context)
         result and result.error or "forging_hammer_grant_failed"
 end
 
+function M.set_attack_40b(context)
+    local result = event_bus.request(
+        events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST,
+        { player_id = context.player_id, attack = 4000000000 }
+    )
+    if result and result.ok then
+        notify(context, "测试攻击力已设置为 4000000000")
+    end
+    return result and result.ok == true,
+        result and result.error or "debug_attack_failed"
+end
+
+function M.reset_attack(context)
+    local result = event_bus.request(
+        events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST,
+        { player_id = context.player_id, reset = true }
+    )
+    if result and result.ok then
+        notify(context, "测试攻击力覆盖已取消")
+    end
+    return result and result.ok == true,
+        result and result.error or "debug_attack_reset_failed"
+end
+
 function M.weapon_stats(context)
     local result = event_bus.request(
         events.HERO_COMBAT_STATS_GET_REQUEST,

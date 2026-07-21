@@ -1,8 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
-local recipes = require("config/generated/recipes")
-local ingredients = require("config/generated/recipe_ingredients")
-local content_effects = require("config/generated/content_effects")
+local recipe_config = require("config/recipe_definitions")
+local effect_config = require("config/item_level_effects")
 local levels = require("config/equipment_level_definitions")
 local effects = require("config/effect_dictionary")
 
@@ -55,17 +54,19 @@ end
 
 local function publish_catalog()
     local enabled_recipes = {}
-    local enabled_by_id = {}
-    for _, row in ipairs(recipes.rows or {}) do
+    for _, row in ipairs(recipe_config.rows or {}) do
         if row.enabled ~= false then
             enabled_recipes[#enabled_recipes + 1] = row
-            enabled_by_id[row.recipe_id] = true
         end
     end
     local enabled_ingredients = {}
-    for _, row in ipairs(ingredients.rows or {}) do
-        if enabled_by_id[row.recipe_id] then
-            enabled_ingredients[#enabled_ingredients + 1] = row
+    for _, recipe in ipairs(enabled_recipes) do
+        for _, ingredient in ipairs(recipe.ingredients or {}) do
+            enabled_ingredients[#enabled_ingredients + 1] = {
+                recipe_id = recipe.recipe_id,
+                content_id = ingredient.content_id,
+                quantity = ingredient.quantity,
+            }
         end
     end
     CustomNetTables:SetTableValue(
@@ -75,7 +76,7 @@ local function publish_catalog()
     CustomNetTables:SetTableValue("survival_weapon_effects", "root", {
         definitions = effects.definitions,
         unknown_policy = effects.unknown_policy,
-        rows = content_effects.rows or {},
+        rows = effect_config.by_content_id or {},
     })
     CustomNetTables:SetTableValue(
         "survival_equipment_levels", "root", { rows = levels.rows or {} })

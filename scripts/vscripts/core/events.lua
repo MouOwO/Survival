@@ -108,6 +108,7 @@ local M = {
     WEAPON_SYNTHESIZED = "weapon.synthesized",
 
     HERO_COMBAT_STATS_GET_REQUEST = "hero.combat_stats.get.request",
+    HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST = "hero.combat_stats.debug_attack.request",
     HERO_COMBAT_STATS_CHANGED = "hero.combat_stats.changed",
     COMBAT_DAMAGE_RESOLVED = "combat.damage.resolved",
 

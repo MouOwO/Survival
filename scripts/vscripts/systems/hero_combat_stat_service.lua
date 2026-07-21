@@ -162,6 +162,7 @@ local function recalculate(player_id, reason)
     local weapon_intellect = value(definition, "base_intellect", 0)
         + value(growth, "growth_intellect", 0)
     local scale = 1
+    local debug_attack = tonumber(state.debug_attack_override)
     state.snapshot = {
         player_id = player_id,
         hero_id = state.hero_id,
@@ -170,8 +171,9 @@ local function recalculate(player_id, reason)
         weapon_content_id = equipment.main_hand_content_id or "",
         weapon_name = equipment.main_hand_name ~= ""
             and equipment.main_hand_name or "未装备武器",
-        attack_min = state.base.attack_min + weapon_attack_min,
-        attack_max = state.base.attack_max + weapon_attack_max,
+        attack_min = debug_attack or (state.base.attack_min + weapon_attack_min),
+        attack_max = debug_attack or (state.base.attack_max + weapon_attack_max),
+        debug_attack_override = debug_attack or 0,
         armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
         -- attack_speed 表示每秒攻击次数；引擎保存的是基础攻击间隔。
         attack_speed = tonumber(state.unit.survival_attack_speed)
@@ -191,17 +193,20 @@ local function recalculate(player_id, reason)
         forging_hammer_count = value(growth, "forging_hammer_count", 0),
         progress_per_attack = value(growth, "progress_per_attack", 1),
         attack_gain_per_attack = value(growth, "attack_gain_per_attack", 0),
-        engine_weapon_attack_bonus =
-            ((weapon_attack_min + weapon_attack_max) * 0.5)
+        equipment_attack = value(effect_values, "attack_flat", 0),
+        engine_weapon_attack_bonus = debug_attack
+            and (debug_attack
+                - ((state.base.attack_min + state.base.attack_max) * 0.5)
+                - value(effect_values, "attack_flat", 0))
+            or (((weapon_attack_min + weapon_attack_max) * 0.5)
                 - primary_logical_attribute(state.unit, state.definition, {
                     strength = weapon_strength,
                     agility = weapon_agility,
                     intellect = weapon_intellect,
-                }),
+                })),
         engine_weapon_strength_bonus = weapon_strength / scale,
         engine_weapon_agility_bonus = weapon_agility / scale,
         engine_weapon_intellect_bonus = weapon_intellect / scale,
-        equipment_attack = value(effect_values, "attack_flat", 0),
         equipment_attack_speed_pct = value(effect_values, "attack_speed_pct", 0),
         equipment_health = value(effect_values, "health_flat", 0),
         equipment_armor = value(effect_values, "armor_flat", 0),
@@ -263,6 +268,26 @@ local function on_changed(payload)
     end
 end
 
+local function debug_set_attack(payload)
+    local player_id = tonumber(payload.player_id)
+    local state = current(player_id)
+    if not state or not state.unit or state.unit:IsNull() then
+        return { ok = false, error = "hero_not_summoned" }
+    end
+    if payload.reset == true then
+        state.debug_attack_override = nil
+    else
+        local attack = tonumber(payload.attack)
+        if not attack or attack < 0 or attack > 9000000000000000 then
+            return { ok = false, error = "debug_attack_invalid" }
+        end
+        state.debug_attack_override = attack
+    end
+    local snapshot = recalculate(player_id, payload.reset == true
+        and "debug_attack_reset" or "debug_attack_override")
+    return { ok = true, snapshot = snapshot }
+end
+
 local function get_stats(payload)
     local player_id = tonumber(payload.player_id)
     local state = current(player_id)
@@ -282,6 +307,10 @@ function M.init()
     equipment_effect_service.init()
     triggered_proc_service.init()
     event_bus.handle_request(events.HERO_COMBAT_STATS_GET_REQUEST, get_stats)
+    event_bus.handle_request(
+        events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST,
+        debug_set_attack
+    )
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_changed)

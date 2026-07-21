@@ -21,6 +21,8 @@ M.rows = {
     row("weapon_growth_sword_04", 4, { type = "normal_attack_count", required = 200 }, { attack_gain_on_attack = 4 }),
     row("weapon_growth_sword_max", 5, nil, { attack_gain_on_attack = 5 }),
 
+    row("item_death_mask", 1, nil, { lifesteal_pct = 50 }),
+
     row("weapon_frost_blade_01", 1, { type = "normal_attack_count", required = 200 }, { attack_gain_on_attack = 6, lifesteal_pct = 50 }),
     row("weapon_frost_blade_02", 2, { type = "normal_attack_count", required = 300 }, { attack_gain_on_attack = 7, lifesteal_pct = 50 }),
     row("weapon_frost_blade_03", 3, { type = "normal_attack_count", required = 400 }, { attack_gain_on_attack = 8, lifesteal_pct = 50 }),

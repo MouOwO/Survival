@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local weapons = require("config/generated/weapon_definitions")
 local content = require("config/generated/content_catalog")
+local equipment = require("config/equipment_definitions")
 local logger = require("core/logger")
 
 local M = {}
@@ -63,11 +64,11 @@ local function set_item_counter(item, growth)
     ))
 end
 
-local function add_shell(current, definition, slot)
+local function add_shell(current, definition, slot, explicit_item_name)
     if not valid_entity(current.hero) then
         return nil
     end
-    local item_name = tostring(definition.engine_item_name or "")
+    local item_name = tostring(explicit_item_name or definition.engine_item_name or "")
     if item_name == "" then
         return nil
     end
@@ -100,10 +101,15 @@ end
 
 local function equip(player_id, content_id, reason)
     local definition = weapons.by_id[content_id]
-    if not definition or definition.enabled == false then
+    local equipment_meta = equipment.by_content_id[content_id]
+    if not definition and not equipment_meta then
+        return { ok = false, error = "equipment_definition_missing" }
+    end
+    if definition and definition.enabled == false then
         return { ok = false, error = "weapon_definition_missing" }
     end
-    local slot = tostring(definition.equipment_slot or "")
+    local slot = tostring((definition and definition.equipment_slot)
+        or equipment_meta.slot or "")
     if slot == "" then
         return { ok = false, error = "equipment_slot_missing" }
     end
@@ -114,7 +120,8 @@ local function equip(player_id, content_id, reason)
     end
     remove_shell(current, slot)
     current.equipped_by_slot[slot] = content_id
-    add_shell(current, definition, slot)
+    add_shell(current, definition or {}, slot,
+        content_id == "item_death_mask" and "item_survival_death_mask" or nil)
     local data = snapshot(player_id)
     event_bus.emit(events.WEAPON_EQUIPPED_CHANGED, {
         player_id = player_id,
@@ -151,11 +158,13 @@ local function on_inventory_changed(payload)
     local replacements = {}
     for content_id, delta in pairs(payload.changes or {}) do
         local definition = weapons.by_id[content_id]
+        local equipment_meta = equipment.by_content_id[content_id]
+        local auto_equip = definition and definition.auto_equip == true
+        local virtual_equipment = equipment_meta and equipment_meta.virtual == true
         if tonumber(delta) and tonumber(delta) > 0
-            and definition and definition.enabled ~= false
-            and definition.auto_equip == true then
-            replacements[tostring(definition.equipment_slot or "")] =
-                content_id
+            and (auto_equip or virtual_equipment) then
+            replacements[tostring((definition and definition.equipment_slot)
+                or equipment_meta.slot or "")] = content_id
         end
     end
     for slot, content_id in pairs(replacements) do
@@ -175,7 +184,8 @@ local function on_hero_summoned(payload)
     current.hero = payload.unit
     for slot, content_id in pairs(current.equipped_by_slot) do
         remove_shell(current, slot)
-        add_shell(current, weapons.by_id[content_id] or {}, slot)
+        add_shell(current, weapons.by_id[content_id] or {}, slot,
+            content_id == "item_death_mask" and "item_survival_death_mask" or nil)
     end
 end
 

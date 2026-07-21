@@ -257,6 +257,8 @@ local COMMANDS = {
     givehammer = weapon_cheats.give_forging_hammer,
     weapongrow = weapon_cheats.grow_weapon,
     weaponstats = weapon_cheats.weapon_stats,
+    attack40b = weapon_cheats.set_attack_40b,
+    attackreset = weapon_cheats.reset_attack,
 }
 
 local function on_player_chat(keys)

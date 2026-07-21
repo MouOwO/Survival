@@ -31,7 +31,9 @@ M.series = {
     legend_abyss = { slot = "main_hand", stages = 11, first_id = "weapon_legend_abyss_00", progression = "戒_stage" },
 }
 
-M.by_content_id = {}
+M.by_content_id = {
+    item_death_mask = { series_id = "death_mask", level = 1, slot = "accessory", virtual = true },
+}
 local ids = {
     growth_sword = { "weapon_growth_sword_01", "weapon_growth_sword_02", "weapon_growth_sword_03", "weapon_growth_sword_04", "weapon_growth_sword_max" },
     frost_blade = { "weapon_frost_blade_01", "weapon_frost_blade_02", "weapon_frost_blade_03", "weapon_frost_blade_04", "weapon_frost_blade_max" },
