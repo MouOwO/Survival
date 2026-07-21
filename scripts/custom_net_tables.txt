@@ -14,5 +14,14 @@
         "survival_tooltips",
         "survival_content_inventory",
         "survival_weapon_state",
+        "survival_weapon_snapshot",
+        "survival_weapon_equipment",
+        "survival_weapon_growth",
+        "survival_equipment_instances",
+        "survival_equipment_growth",
+        "survival_weapon_recipes",
+        "survival_weapon_effects",
+        "survival_equipment_levels",
+        "survival_weapon_ui_schema",
     ]
 }

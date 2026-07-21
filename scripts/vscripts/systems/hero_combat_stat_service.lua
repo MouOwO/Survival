@@ -3,6 +3,12 @@ local events = require("core/events")
 local heroes = require("config/generated/hero_definitions")
 local weapons = require("config/generated/weapon_definitions")
 local number_config = require("config/combat_number_config")
+-- Composition-only bootstrap: services communicate exclusively through event_bus.
+local effect_handler_registry = require("systems/effect_handler_registry")
+local equipment_effect_service = require("systems/equipment_effect_service")
+local equipment_stat_aggregation_service =
+    require("systems/equipment_stat_aggregation_service")
+local triggered_proc_service = require("systems/triggered_proc_service")
 
 local M = {}
 local state_by_player = {}
@@ -138,6 +144,12 @@ local function recalculate(player_id, reason)
         return nil
     end
     local equipment, growth = weapon_snapshot(player_id)
+    local equipment_stats = event_bus.request(
+        events.EQUIPMENT_STATS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local effect_values = equipment_stats and equipment_stats.snapshot
+        and equipment_stats.snapshot.values or {}
     local definition = weapons.by_id[equipment.main_hand_content_id] or {}
     local weapon_attack_min = value(definition, "base_attack_min", 0)
         + value(growth, "growth_attack", 0)
@@ -189,6 +201,12 @@ local function recalculate(player_id, reason)
         engine_weapon_strength_bonus = weapon_strength / scale,
         engine_weapon_agility_bonus = weapon_agility / scale,
         engine_weapon_intellect_bonus = weapon_intellect / scale,
+        equipment_attack = value(effect_values, "attack_flat", 0),
+        equipment_attack_speed_pct = value(effect_values, "attack_speed_pct", 0),
+        equipment_health = value(effect_values, "health_flat", 0),
+        equipment_armor = value(effect_values, "armor_flat", 0),
+        equipment_all_attributes = value(effect_values, "all_attributes_flat", 0),
+        equipment_lifesteal_pct = value(effect_values, "lifesteal_pct", 0),
         reason = reason or "changed",
     }
     local modifier = state.unit:FindModifierByName(
@@ -215,17 +233,34 @@ local function on_hero_summoned(payload)
     }
     state_by_player[payload.player_id] = state
     apply_base_projection(state)
-    payload.unit:AddNewModifier(
-        payload.unit,
-        nil,
-        "modifier_weapon_stat_projection",
-        { player_id = payload.player_id }
-    )
+    local function ensure_modifier(name)
+        local existing = payload.unit:FindModifierByName(name)
+        if existing then return existing end
+        local created = payload.unit:AddNewModifier(
+            payload.unit, nil, name, { player_id = payload.player_id }
+        )
+        print(string.format(
+            "[SURVIVAL_MODIFIER_CREATE] name=%s entindex=%s created=%s",
+            name, tostring(payload.unit:entindex()), tostring(created ~= nil)
+        ))
+        return created
+    end
+    ensure_modifier("modifier_weapon_stat_projection")
+    ensure_modifier("modifier_equipment_effects")
     recalculate(payload.player_id, "hero_summoned")
 end
 
 local function on_changed(payload)
-    recalculate(tonumber(payload.player_id), payload.reason)
+    local player_id = tonumber(payload.player_id)
+    local state = current(player_id)
+    local modifier = state and state.unit and state.unit:FindModifierByName(
+        "modifier_equipment_effects"
+    )
+    if modifier and modifier.ForceRefresh then modifier:ForceRefresh() end
+    recalculate(player_id, payload.reason)
+    if state and state.unit then
+        safe_call(state.unit, "CalculateStatBonus", true)
+    end
 end
 
 local function get_stats(payload)
@@ -242,11 +277,16 @@ end
 
 function M.init()
     state_by_player = {}
+    effect_handler_registry.init()
+    equipment_stat_aggregation_service.init()
+    equipment_effect_service.init()
+    triggered_proc_service.init()
     event_bus.handle_request(events.HERO_COMBAT_STATS_GET_REQUEST, get_stats)
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_changed)
     event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_changed)
+    event_bus.subscribe(events.EQUIPMENT_STATS_CHANGED, on_changed)
 end
 
 return M

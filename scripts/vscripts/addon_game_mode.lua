@@ -10,11 +10,21 @@ LinkLuaModifier("modifier_building_no_health_bar", "modifiers/modifier_building_
 LinkLuaModifier("modifier_tower_attack_effects", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_debug_attack_cap", "modifiers/modifier_debug_attack_cap", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_building_blink_move", "modifiers/modifier_building_blink_move", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_weapon_attack_tracker", "modifiers/modifier_weapon_attack_tracker", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_weapon_stat_projection", "modifiers/modifier_weapon_stat_projection", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_equipment_effects", "modifiers/modifier_equipment_effects", LUA_MODIFIER_MOTION_NONE)
 require("modifiers/modifier_building_stationary")
 require("modifiers/modifier_building_no_health_bar")
 require("modifiers/modifier_tower_attack_effects")
 require("modifiers/modifier_debug_attack_cap")
 require("modifiers/modifier_building_blink_move")
+require("modifiers/modifier_weapon_attack_tracker")
+require("modifiers/modifier_weapon_stat_projection")
+require("modifiers/modifier_equipment_effects")
+assert(modifier_weapon_attack_tracker ~= nil, "modifier_weapon_attack_tracker bootstrap failed")
+assert(modifier_weapon_stat_projection ~= nil, "modifier_weapon_stat_projection bootstrap failed")
+assert(modifier_equipment_effects ~= nil, "modifier_equipment_effects bootstrap failed")
+print("[SURVIVAL_MODIFIER_BOOTSTRAP] weapon_attack_tracker=true weapon_stat_projection=true equipment_effects=true")
 modifier_registry.register()
 local ability_utils = require("core/ability_utils")
 
@@ -49,12 +59,18 @@ local arrow_tower_base = require("config/generated/arrow_tower_base")
 local tower_route_config = require("config/tower_route_config")
 local content_inventory_service =
     require("systems/content_inventory_service")
+local inventory_transaction_service =
+    require("systems/inventory_transaction_service")
 local weapon_equipment_service =
     require("systems/weapon_equipment_service")
 local weapon_synthesis_service =
     require("systems/weapon_synthesis_service")
 local weapon_growth_service =
     require("systems/weapon_growth_service")
+local equipment_instance_service =
+    require("systems/equipment_instance_service")
+local equipment_growth_service =
+    require("systems/equipment_growth_service")
 local hero_combat_stat_service =
     require("systems/hero_combat_stat_service")
 local shop_system = require("systems/shop_system")
@@ -63,6 +79,8 @@ local ui_projection = require("ui/ui_projection")
 local ui_snapshot_service = require("ui/ui_snapshot_service")
 local ui_request_router = require("ui/ui_request_router")
 local client_data_service = require("ui/client_data_service")
+local weapon_synthesis_snapshot_service =
+    require("ui/weapon_synthesis_snapshot_service")
 local ability_runtime_service =
     require("ui/ability_runtime_service")
 local hero_summon_ui_service =
@@ -289,9 +307,13 @@ function M.activate()
     hero_skill_pool_service.init()
     hero_skill_choice_service.init()
     content_inventory_service.init()
+    inventory_transaction_service.init()
+    equipment_instance_service.init()
+    equipment_growth_service.init()
     weapon_equipment_service.init()
     weapon_synthesis_service.init()
     weapon_growth_service.init()
+    weapon_synthesis_snapshot_service.init()
     hero_combat_stat_service.init()
     hero_summon_system.init()
     builder_progression_system.init()

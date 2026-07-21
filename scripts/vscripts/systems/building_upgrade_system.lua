@@ -208,6 +208,13 @@ local function apply_tower_level(state, row, level, change_model)
     state.unit.survival_display_name = state.tower_class_name
     sync_tower_abilities(state, row)
     tower_skills.apply(state.unit, row.skill_ids)
+    local auto_attack = state.unit:FindModifierByName("modifier_tower_auto_attack")
+    if not auto_attack then
+        auto_attack = state.unit:AddNewModifier(state.unit, nil, "modifier_tower_auto_attack", {})
+    end
+    if auto_attack and auto_attack.ResetTarget then
+        auto_attack:ResetTarget()
+    end
 end
 
 local function upgrade_tower(state, mode)

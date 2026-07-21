@@ -63,7 +63,9 @@
         "AttackRange"            "600"
         "AttackRate"             "1.0"
         "AttackAnimationPoint"   "0.3"
-        "AttackAcquisitionRange" "10"
+        // Attack acquisition must cover the real attack radius; the default 10
+        // prevents autonomous tower target search.
+        "AttackAcquisitionRange" "1000"
         "ArmorPhysical"          "5"
         "MagicalResistance"      "0"
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"

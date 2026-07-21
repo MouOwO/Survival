@@ -39,12 +39,20 @@ local modifiers = {
         path = "modifiers/modifier_weapon_stat_projection",
     },
     {
+        name = "modifier_equipment_effects",
+        path = "modifiers/modifier_equipment_effects",
+    },
+    {
         name = "modifier_debug_fixed_attack_rate",
         path = "modifiers/modifier_debug_fixed_attack_rate",
     },
     {
         name = "modifier_debug_attack_cap",
         path = "modifiers/modifier_debug_attack_cap",
+    },
+    {
+        name = "modifier_tower_auto_attack",
+        path = "modifiers/modifier_tower_auto_attack",
     },
     {
         name = "modifier_tower_attack_effects",

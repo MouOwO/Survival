@@ -225,6 +225,7 @@ local function create_building(payload)
     unit:SetControllableByPlayer(check.player_id, true)
     -- Attach the attack listener to the tower instance.
     if check.definition.id == "arrow_tower" then
+        unit:AddNewModifier(unit, nil, "modifier_tower_auto_attack", {})
         unit:AddNewModifier(unit, nil, "modifier_tower_attack_effects", {})
     end
     -- Do not make building creation depend on optional modifier registration.

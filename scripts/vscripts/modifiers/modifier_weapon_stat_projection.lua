@@ -1,3 +1,5 @@
+LinkLuaModifier("modifier_weapon_stat_projection", "modifiers/modifier_weapon_stat_projection", LUA_MODIFIER_MOTION_NONE)
+
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 

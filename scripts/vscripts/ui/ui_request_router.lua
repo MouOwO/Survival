@@ -1,8 +1,10 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local building_system = require("systems/building_system")
+local weapon_snapshot = require("ui/weapon_synthesis_snapshot_service")
 
 local M = {}
+local synthesis_requests = {}
 
 local function safe_number(entity, method_name, fallback, ...)
     local method = entity and entity[method_name]
@@ -30,6 +32,10 @@ local function unit_combat_snapshot(unit)
             or (unit.GetUnitName and unit:GetUnitName()) or "",
         level = tonumber(unit.survival_level)
             or safe_number(unit, "GetLevel", 1),
+        health = safe_number(unit, "GetHealth", 0),
+        max_health = safe_number(unit, "GetMaxHealth", 0),
+        mana = safe_number(unit, "GetMana", 0),
+        max_mana = safe_number(unit, "GetMaxMana", 0),
         attack_min = attack_min,
         attack_max = attack_max,
         armor = tonumber(unit.survival_armor)
@@ -192,6 +198,63 @@ local function register_shop_purchase_request()
             error = result and result.error or "unknown_error",
         })
     end)
+end
+
+local function synthesis_result(player_id, request_id, recipe_id, result)
+    send_to_player("ui_weapon_synthesis_result", player_id, {
+        request_id = request_id,
+        recipe_id = recipe_id,
+        success = result and result.ok and 1 or 0,
+        error = result and result.error or "synthesis_unknown_error",
+        result_content_id = result and result.result_content_id or "",
+    })
+end
+
+local function register_weapon_synthesis_request()
+    CustomGameEventManager:RegisterListener(
+        "ui_weapon_synthesis_request",
+        function(_, payload)
+            local player_id = source_player_id(payload)
+            local request_id = tostring(payload and payload.request_id or "")
+            local recipe_id = tostring(payload and payload.recipe_id or "")
+            if not valid_player_id(player_id) then return end
+            if request_id == "" or #request_id > 96 then
+                synthesis_result(player_id, request_id, recipe_id,
+                    { ok = false, error = "synthesis_request_id_invalid" })
+                return
+            end
+            if recipe_id == "" or #recipe_id > 128 then
+                synthesis_result(player_id, request_id, recipe_id,
+                    { ok = false, error = "synthesis_recipe_id_invalid" })
+                return
+            end
+            synthesis_requests[player_id] = synthesis_requests[player_id] or {}
+            if synthesis_requests[player_id][request_id] then
+                synthesis_result(player_id, request_id, recipe_id,
+                    { ok = false, error = "synthesis_duplicate_request" })
+                return
+            end
+            synthesis_requests[player_id][request_id] = true
+            local result = event_bus.request(events.WEAPON_SYNTHESIS_REQUEST, {
+                player_id = player_id,
+                recipe_id = recipe_id,
+                request_id = request_id,
+            })
+            synthesis_result(player_id, request_id, recipe_id, result)
+            weapon_snapshot.publish_player(player_id, "synthesis_result")
+        end
+    )
+end
+
+local function register_weapon_snapshot_request()
+    CustomGameEventManager:RegisterListener(
+        "ui_weapon_snapshot_request",
+        function(_, payload)
+            local player_id = source_player_id(payload)
+            if not valid_player_id(player_id) then return end
+            weapon_snapshot.publish_player(player_id, "client_request")
+        end
+    )
 end
 
 local function building_id_for_ability(ability_name)
@@ -385,12 +448,15 @@ local function on_shop_state_changed(payload)
 end
 
 function M.init()
+    synthesis_requests = {}
     register_selected_unit_stats_request()
     register_building_snapshot_push()
     register_snapshot_request()
     register_shop_open_request()
     register_shop_close_request()
     register_shop_purchase_request()
+    register_weapon_synthesis_request()
+    register_weapon_snapshot_request()
     register_ability_cast_request()
     register_ability_cast_position_request()
     register_building_move_request()

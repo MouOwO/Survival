@@ -151,12 +151,26 @@ local function publish_content_tooltips()
     end
 end
 
+local function publish_weapon_ui_schema()
+    -- Static protocol metadata is published here; player state remains owned
+    -- by weapon_synthesis_snapshot_service.
+    CustomNetTables:SetTableValue("survival_weapon_ui_schema", "root", {
+        version = 1,
+        snapshot_table = "survival_weapon_snapshot",
+        recipe_table = "survival_weapon_recipes",
+        effects_table = "survival_weapon_effects",
+        request_event = "ui_weapon_synthesis_request",
+        snapshot_event = "ui_weapon_snapshot_request",
+    })
+end
+
 function M.init()
     publish_tooltips()
     publish_abilities()
     publish_shop()
     publish_items()
     publish_content_tooltips()
+    publish_weapon_ui_schema()
     logger.info(
         "ClientDataService",
         "tooltip, ability, hero skill, shop and item data published"

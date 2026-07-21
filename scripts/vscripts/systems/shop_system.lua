@@ -207,6 +207,7 @@ local function purchase(payload)
         entry,
         state
     )
+    print(string.format("[SHOP_GRANT_RESULT] player=%s entry=%s content=%s ok=%s", tostring(player_id), tostring(entry.entryid), tostring(entry.contentid), tostring(granted and granted.ok == true)))
     if not granted or not granted.ok then
         grant_service.refund(team, entry)
         notify(
