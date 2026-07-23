@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local combat_events = require("combat/combat_events")
 
 local M = {}
 local seen_records, cooldowns = {}, {}
@@ -27,15 +28,19 @@ local function valid_target(attacker, target)
 end
 
 local function damage_area(attacker, target, value)
-    if not FindUnitsInRadius or not ApplyDamage then return end
+    if not FindUnitsInRadius then return end
     local damage = attribute_total(attacker) * (tonumber(value.multiplier) or 0)
     local units = FindUnitsInRadius(attacker:GetTeamNumber(), target:GetAbsOrigin(), nil,
         tonumber(value.range or value.radius), DOTA_UNIT_TARGET_TEAM_ENEMY,
         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
         DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false) or {}
     for _, victim in ipairs(units) do
-        ApplyDamage({ victim = victim, attacker = attacker, damage = damage,
-            damage_type = DAMAGE_TYPE_MAGICAL, ability = nil })
+        event_bus.request(combat_events.DEAL_REQUEST, {
+            attacker = attacker, victim = victim, ability = nil,
+            source_kind = "splash", base_damage = damage,
+            damage_type = DAMAGE_TYPE_MAGICAL, can_crit = false,
+            tags = { equipment_proc = true },
+        })
     end
 end
 
@@ -64,7 +69,8 @@ local function on_attack(payload)
                         + (tonumber(value.internal_cooldown or value.cooldown) or 0)
                     damage_area(payload.attacker, payload.target, value)
                     event_bus.emit(events.EQUIPMENT_PROC_TRIGGERED, {
-                        player_id = player_id, record = record, source_id = source.source_id,
+                        player_id = player_id, record = record,
+                        source_id = source.source_id,
                         effect_type = effect.effect_type, target = payload.target,
                     })
                 end

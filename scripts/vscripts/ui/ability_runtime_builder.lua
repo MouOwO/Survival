@@ -83,11 +83,12 @@ local function build_ability(ability_name, state, resources)
                 value = "主城Lv." .. tostring(required),
             },
         } or nil,
+        population = definition.population_cost or 0,
     }, cost_data(definition.build_cost))
     return with_affordability(
         data,
         definition.build_cost,
-        0,
+        definition.population_cost or 0,
         resources
     )
 end
@@ -142,14 +143,25 @@ local function tower_upgrade(ability_name, state, resources)
         upgrade_attack_delta = (row.base_attack_damage or 0)
             - (current_row and current_row.base_attack_damage or 0),
     }, cost_data(cost))
-    return with_affordability(result, cost, cost.population or 0, resources)
+    -- Tower upgrade abilities must remain clickable when resources are short.
+    -- The authoritative upgrade system validates and spends resources, then
+    -- reports the concrete failure to the player. Treating affordability as
+    -- availability here made both level-one buttons grey (especially the
+    -- cumulative "max" upgrade) and prevented players from requesting an
+    -- otherwise valid upgrade.
+    local affordable = can_afford(cost, cost.population or 0, resources)
+    result.can_afford = 1
+    if affordable == 0 then
+        result.status_text = result.status_text .. "（当前资源不足）"
+    end
+    return result
 end
 local function tower_class(ability_name, state, resources)
     local available = state.level >= 5 and not state.tower_class
     local class_index = tonumber(string.match(ability_name, "(%d+)$"))
     local class_id = class_index and "class_" .. tostring(class_index) or nil
     local row = class_id and tower_routes.get(class_id, 1) or nil
-    local cost = row and { wood = row.upgrade_wood, gold = row.upgrade_gold } or nil
+    local cost = tower_routes.class_change_cost(row)
     local result = merge({
         available = available and row and 1 or 0,
         current_level = state.level,
@@ -159,24 +171,45 @@ local function tower_class(ability_name, state, resources)
         tower_name = row and tower_routes.display_name(row) or "",
         skill_ids = row and row.skill_ids or nil,
     }, cost_data(cost))
-    return with_affordability(result, cost, row and row.population_delta or 0, resources)
+    -- population_delta increases max population after the class change; it is
+    -- not population consumed by the upgrade itself.
+    return with_affordability(result, cost, 0, resources)
 end
-local function mine_efficiency(state, resources)
-    local level = state.mine_level or 1
-    if level >= gold_mine.max_level then
+local function mine_level_upgrade(state, resources)
+    local level = state.mine_level or state.level or 1
+    if level >= gold_mine.max_mine_level then
         return {
             available = 0,
             can_afford = 0,
             current_level = level,
-            status_text = "采集效率已满级",
+            status_text = "金矿本体已满级",
         }
     end
-    local cost = gold_mine.efficiency_upgrade_cost(level)
+    local cost = gold_mine.mine_upgrade_cost(level)
     local result = merge({
         available = 1,
         current_level = level,
         next_level = level + 1,
-        status_text = "提升每秒金币产量",
+        status_text = "升级金矿本体至Lv." .. tostring(level + 1),
+    }, cost_data(cost))
+    return with_affordability(result, cost, 0, resources)
+end
+local function mine_efficiency(state, resources)
+    local level = state.efficiency_level or 0
+    if level >= gold_mine.max_efficiency_level then
+        return {
+            available = 0,
+            can_afford = 0,
+            current_level = level,
+            status_text = "金矿收益已满级",
+        }
+    end
+    local cost = gold_mine.efficiency_upgrade_cost(level)
+    local result = merge({
+        available = cost and 1 or 0,
+        current_level = level,
+        next_level = level + 1,
+        status_text = cost and "提升所有金矿收益" or "收益升级配置缺失",
     }, cost_data(cost))
     return with_affordability(result, cost, 0, resources)
 end
@@ -255,10 +288,31 @@ function M.build(ability_name, state, resources)
         return tower_upgrade(ability_name, state, resources)
     end
     if ability_name == "ability_upgrade_gold_mine" then
+        return mine_level_upgrade(state, resources)
+    end
+    if ability_name == "ability_upgrade_gold_mine_efficiency" then
         return mine_efficiency(state, resources)
     end
     if ability_name == "ability_upgrade_gold_mine_crit" then
         return mine_crit(state, resources)
+    end
+    if ability_name == "ability_gold_mine_auto_upgrade" then
+        return {
+            available = 1,
+            can_afford = 1,
+            current_level = state.mine_level or state.level or 1,
+            status_text = state.auto_upgrading == 1
+                and "停止自动升级"
+                or "自动升级：本体→收益→暴击",
+        }
+    end
+    if ability_name == "ability_gold_mine_stop_auto_upgrade" then
+        return {
+            available = state.auto_upgrading == 1 and 1 or 0,
+            can_afford = 1,
+            current_level = state.mine_level or state.level or 1,
+            status_text = "停止自动升级",
+        }
     end
     if string.match(
         ability_name,

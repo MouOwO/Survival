@@ -30,6 +30,8 @@ local M = {
     BUILDER_UNLOCK_CHANGED = "builder.unlock.changed",
     BUILDER_STAGE_CHANGED = "builder.stage.changed",
 
+    GOLD_MINE_LEVEL_UPGRADE_REQUEST = "gold_mine.level_upgrade.request",
+    GOLD_MINE_AUTO_UPGRADE_REQUEST = "gold_mine.auto_upgrade.request",
     GOLD_MINE_UPGRADE_REQUEST = "gold_mine.upgrade.request",
     GOLD_MINE_CRIT_UPGRADE_REQUEST = "gold_mine.crit_upgrade.request",
     GOLD_MINE_CHANGED = "gold_mine.changed",
@@ -52,6 +54,9 @@ local M = {
     SHOP_PURCHASE_REQUEST = "shop.purchase.request",
     SHOP_STATE_CHANGED = "shop.state.changed",
     SHOP_UNLOCK_CHANGED = "shop.unlock.changed",
+    TECHNOLOGY_STATE_GET_REQUEST = "technology.state.get.request",
+    TECHNOLOGY_PURCHASE_NEXT_REQUEST = "technology.purchase_next.request",
+    TECHNOLOGY_CHANGED = "technology.changed",
 
     HERO_ALTAR_OPEN_REQUEST = "hero.altar.open.request",
     HERO_SUMMON_SNAPSHOT_REQUEST = "hero.summon.snapshot.request",

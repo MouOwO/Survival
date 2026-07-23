@@ -1,0 +1,8 @@
+skill_id,particle_name,attack_point,beam_update_interval,visual_refresh_interval,visual_segment_duration,source_offset_z,target_offset_z,damage_increment_pct,max_damage_multiplier,enabled,notes
+#中文名:技能ID,特效资源,攻击前摇,光束坐标刷新间隔,视觉段重播间隔,视觉段保留时间,起点高度偏移,终点高度偏移,每秒递增伤害(%),最高伤害倍率,是否启用,备注
+#types:string,string,number,number,number,number,number,number,number,number,boolean,string
+laser_lv01,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
+laser_lv02,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
+laser_lv03,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
+laser_lv04,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
+laser_lv05,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。

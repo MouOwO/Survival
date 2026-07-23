@@ -1,7 +1,14 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local construction_rules = require(
+    "config/generated/building_construction_rules"
+)
 
 local M = {}
+local function build_cast_range(building_id)
+    local row = (construction_rules.by_id or {})[building_id] or {}
+    return tonumber(row.build_cast_range) or 200
+end
 
 function M.create(building_id)
     local Ability = class({})
@@ -12,6 +19,13 @@ function M.create(building_id)
 
     function Ability:GetManaCost()
         return 0
+    end
+
+    function Ability:GetCastRange(location, target)
+        -- The builder must be allowed to target a distant location. The
+        -- building system moves Undying to the configured working radius and
+        -- starts construction only after arrival.
+        return 10000
     end
 
     function Ability:CastFilterResultLocation(location)

@@ -53,6 +53,8 @@ function modifier_equipment_effects:OnIntervalThink()
                         DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false) or {}
                     local damage = attributes(parent) * (tonumber(value.multiplier) or 0)
                     for _, victim in ipairs(victims) do
+                        -- DAMAGE_MODULE_MIGRATION: legacy aura damage remains for compatibility;
+                        -- migrate after validating interval/aura transaction semantics.
                         ApplyDamage({ victim = victim, attacker = parent, damage = damage,
                             damage_type = DAMAGE_TYPE_MAGICAL, ability = nil })
                     end

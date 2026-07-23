@@ -1,5 +1,8 @@
 local building_levels = require("config/generated/building_levels")
 local building_definitions = require("config/generated/building_definitions")
+local construction_rules = require(
+    "config/generated/building_construction_rules"
+)
 
 local M = {}
 
@@ -19,6 +22,16 @@ local function configured_unit_name(building_id, fallback)
         return value
     end
     return fallback
+end
+
+local function apply_construction(definition, source_id)
+    local row = (construction_rules.by_id or {})[source_id]
+        or definition_row(source_id)
+    definition.build_time = tonumber(row.build_time) or 3
+    definition.build_particle = row.build_particle
+        or "particles/items_fx/repair_kit.vpcf"
+    definition.build_cast_range = tonumber(row.build_cast_range) or 200
+    return definition
 end
 
 local function level_rows(building_id)
@@ -70,17 +83,29 @@ M.main_city = {
     build_cost = build_cost("building_main_city", 100, 50),
     footprint = { x = 2, y = 2 },
     max_count = 1, show_health_bar = false, selectable = true,
-    abilities = { "ability_upgrade_city", "ability_train_lumberjack" },
-    levels = {
-        [1] = { health = 5000, armor = 10, add_population = 10 },
-        [2] = { health = 7000, armor = 12, add_population = 5, upgrade_cost = { wood = 200, gold = 100 } },
-        [3] = { health = 9000, armor = 14, add_population = 5, upgrade_cost = { wood = 400, gold = 200 } },
-        [4] = { health = 11000, armor = 16, add_population = 10, upgrade_cost = { wood = 600, gold = 300 } },
-        [5] = { health = 13000, armor = 18, add_population = 10, upgrade_cost = { wood = 800, gold = 400 } },
-        [6] = { health = 15000, armor = 20, add_population = 10, upgrade_cost = { wood = 1200, gold = 600 } },
-        [7] = { health = 17000, armor = 22, add_population = 15, upgrade_cost = { wood = 1600, gold = 800 } },
-        [8] = { health = 19000, armor = 24, add_population = 15, upgrade_cost = { wood = 2000, gold = 1000 } },
+    abilities = {
+        "ability_upgrade_city",
+        "ability_train_lumberjack",
+        "ability_train_repairer",
     },
+    levels = level_rows("building_main_city"),
+}
+
+local farm_levels = level_rows("building_farm")
+farm_levels[1] = farm_levels[1] or {}
+farm_levels[1].health = farm_levels[1].health or 2500
+farm_levels[1].armor = farm_levels[1].armor or 5
+M.building_farm = {
+    id = "building_farm", display_name = configured_name("building_farm", "人口农场"),
+    unit_name = configured_unit_name("building_farm", "building_farm"),
+    build_cost = build_cost("building_farm", 100, 0),
+    footprint = { x = 2, y = 2 }, max_count = 0,
+    unlock_city_level = 1, show_health_bar = true, selectable = true,
+    abilities = {
+        "ability_upgrade_farm",
+        "ability_train_population",
+    },
+    levels = farm_levels,
 }
 
 M.arrow_tower = {
@@ -88,7 +113,10 @@ M.arrow_tower = {
     unit_name = configured_unit_name("arrow_tower", "building_arrow_tower"),
     build_cost = build_cost("building_arrow_tower", 80, 20),
     footprint = { x = 1, y = 1 }, max_count = 0,
-    show_health_bar = false, selectable = true, abilities = { "ability_upgrade_tower" },
+    show_health_bar = false, selectable = true, abilities = {
+        "ability_upgrade_tower_lv01",
+        "ability_upgrade_tower_max",
+    },
     pre_class_levels = {
         [1] = { health = 1500, armor = 5, damage = 172, attack_range = 600, attack_rate = 1.0, upgrade_cost = { wood = 50, gold = 0 } },
         [2] = { health = 2000, armor = 6, damage = 251, attack_range = 600, attack_rate = 1.0, upgrade_cost = { wood = 100, gold = 0 } },
@@ -108,6 +136,40 @@ M.arrow_tower = {
     },
 }
 
-M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_crit" }, levels = { [1] = { health = 3000, armor = 8 } } }
+local research_lab_levels = level_rows("building_research_lab")
+research_lab_levels[1] = research_lab_levels[1] or {}
+research_lab_levels[1].health = research_lab_levels[1].health or 2500
+research_lab_levels[1].armor = research_lab_levels[1].armor or 8
+M.building_research_lab = {
+    id = "building_research_lab",
+    display_name = configured_name("building_research_lab", "研究所"),
+    unit_name = configured_unit_name(
+        "building_research_lab",
+        "building_research_lab"
+    ),
+    build_cost = build_cost("building_research_lab", 0, 0),
+    footprint = { x = 2, y = 2 },
+    max_count = 1,
+    unlock_city_level = 1,
+    show_health_bar = false,
+    selectable = true,
+    abilities = {},
+    levels = research_lab_levels,
+}
+
+M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
 M.hero_altar = { id = "hero_altar", display_name = configured_name("hero_altar", "英雄祭坛"), unit_name = configured_unit_name("hero_altar", "building_hero_altar"), build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_summon_axe", "ability_summon_slark", "ability_summon_juggernaut", "ability_summon_monkey_king", "ability_summon_blademaster" }, levels = { [1] = { health = 2500, armor = 8 } } }
+
+M.wall = apply_construction(M.wall, "wall")
+M.main_city = apply_construction(M.main_city, "main_city")
+M.building_farm = apply_construction(M.building_farm, "building_farm")
+-- 兼容仍持有旧模块缓存或旧建造请求的测试会话；新代码统一使用 building_farm。
+M.farm = M.building_farm
+M.arrow_tower = apply_construction(M.arrow_tower, "arrow_tower")
+M.building_research_lab = apply_construction(
+    M.building_research_lab,
+    "building_research_lab"
+)
+M.gold_mine = apply_construction(M.gold_mine, "gold_mine")
+M.hero_altar = apply_construction(M.hero_altar, "hero_altar")
 return M

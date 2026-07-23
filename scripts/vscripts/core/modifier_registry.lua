@@ -19,8 +19,16 @@ local modifiers = {
         path = "modifiers/modifier_building_no_health_bar",
     },
     {
+        name = "modifier_building_under_construction",
+        path = "modifiers/modifier_building_under_construction",
+    },
+    {
         name = "modifier_lumberjack_ai",
         path = "modifiers/modifier_lumberjack_ai",
+    },
+    {
+        name = "modifier_repair_worker_ai",
+        path = "modifiers/modifier_repair_worker_ai",
     },
     {
         name = "modifier_enemy_wall_ai",
@@ -57,6 +65,22 @@ local modifiers = {
     {
         name = "modifier_tower_attack_effects",
         path = "modifiers/modifier_tower_attack_effects",
+    },
+    {
+        name = "modifier_survival_managed_buff",
+        path = "modifiers/modifier_survival_managed_buff",
+    },
+    {
+        name = "modifier_survival_managed_aura",
+        path = "modifiers/modifier_survival_managed_buff",
+    },
+    {
+        name = "modifier_research_technology",
+        path = "modifiers/modifier_research_technology",
+    },
+    {
+        name = "modifier_research_armor_reduction",
+        path = "modifiers/modifier_research_technology",
     },
 }
 

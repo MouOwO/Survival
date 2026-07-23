@@ -7,6 +7,8 @@ local state = {}
 local function reset_state()
     state = {
         technology_by_player = {},
+        research_unlocked = {},
+        advanced_researcher_unlocked = {},
         purchased_count = {},
         processed_requests = {},
         opened_players = {},
@@ -52,7 +54,7 @@ local function owned_content(player_id)
         state.technology_by_player[player_id] or {}
     ) do
         if value then
-            result[content_id] = count
+            result[content_id] = 1
         end
     end
     return result
@@ -78,7 +80,7 @@ local function progression_snapshot(player_id)
     )
     return result and result.snapshot or {}
 end
-local function snapshot_context(player_id, reason)
+local function snapshot_context(player_id, reason, mode)
     local team = player_team(player_id)
     local summon = summon_snapshot(player_id)
     local entitlement = entitlement_snapshot(player_id)
@@ -99,12 +101,16 @@ local function snapshot_context(player_id, reason)
         vip = entitlement.vip == 1,
         rebirth_level = tonumber(progression.rebirth_level) or 0,
         owned_content = owned_content(player_id),
+        technology_levels = state.technology_by_player,
+        research_unlocked = state.research_unlocked[player_id] == true,
+        advanced_researcher_unlocked = state.advanced_researcher_unlocked[player_id] == true,
+        ui_mode = mode or state.opened_players[player_id] or "shop",
     }
 end
-local function build_snapshot(player_id, reason)
+local function build_snapshot(player_id, reason, mode)
     return catalog.build_snapshot(
         player_id,
-        snapshot_context(player_id, reason or "open")
+        snapshot_context(player_id, reason or "open", mode)
     )
 end
 local function push_snapshot(player_id, reason)
@@ -113,7 +119,11 @@ local function push_snapshot(player_id, reason)
     end
     event_bus.emit(events.SHOP_STATE_CHANGED, {
         player_id = player_id,
-        snapshot = build_snapshot(player_id, reason),
+        snapshot = build_snapshot(
+            player_id,
+            reason,
+            state.opened_players[player_id]
+        ),
     })
 end
 local function push_team(team, reason)
@@ -128,14 +138,33 @@ local function open_shop(payload)
     if not valid_player_id(player_id) then
         return { ok = false, error = "player_id_invalid" }
     end
-    local summon = summon_snapshot(player_id)
-    if summon.hero_summoned ~= 1 then
-        return { ok = false, error = "请先在英雄祭坛召唤英雄" }
+    local mode = payload.mode == "research" and "research" or "shop"
+    if mode == "research" then
+        local team = player_team(player_id)
+        if (building_counts(team).building_research_lab or 0) < 1 then
+            return { ok = false, error = "请先建造研究所" }
+        end
+        local source_entindex = tonumber(payload.source_entindex)
+        if source_entindex and source_entindex > 0 then
+            local building = event_bus.request(events.BUILDING_QUERY_REQUEST, {
+                entindex = source_entindex,
+            })
+            if not building
+                or building.building_id ~= "building_research_lab"
+                or tonumber(building.player_id) ~= player_id then
+                return { ok = false, error = "研究所归属验证失败" }
+            end
+        end
+    else
+        local summon = summon_snapshot(player_id)
+        if summon.hero_summoned ~= 1 then
+            return { ok = false, error = "请先在英雄祭坛召唤英雄" }
+        end
     end
-    state.opened_players[player_id] = true
+    state.opened_players[player_id] = mode
     return {
         ok = true,
-        snapshot = build_snapshot(player_id, "opened"),
+        snapshot = build_snapshot(player_id, "opened", mode),
     }
 end
 local function close_shop(payload)
@@ -159,6 +188,9 @@ local function remember_result(player_id, request_id, result)
 end
 local function purchase(payload)
     local player_id = tonumber(payload.player_id)
+    if not valid_player_id(player_id) then
+        return { ok = false, error = "player_id_invalid" }
+    end
     local request_id = tostring(payload.request_id or "")
     local cached = cached_result(player_id, request_id)
     if cached then
@@ -170,11 +202,32 @@ local function purchase(payload)
     if not entry then
         return { ok = false, error = "shop_entry_invalid" }
     end
+    local gold_mine_ability = payload.source == "gold_mine_ability"
+    if gold_mine_ability then
+        local group = entry.definition and entry.definition.technology_group
+        if group ~= "gold_mine_efficiency" and group ~= "gold_mine_crit" then
+            return { ok = false, error = "gold_mine_technology_invalid" }
+        end
+        local building = event_bus.request(events.BUILDING_QUERY_REQUEST, {
+            entindex = tonumber(payload.entindex),
+        })
+        if not building or building.building_id ~= "gold_mine"
+            or tonumber(building.player_id) ~= player_id then
+            return { ok = false, error = "gold_mine_not_owned" }
+        end
+    elseif entry.definition
+        and (entry.definition.technology_group == "gold_mine_efficiency"
+            or entry.definition.technology_group == "gold_mine_crit") then
+        return { ok = false, error = "金矿科技只能通过金矿技能升级" }
+    end
     local team = player_team(player_id)
     local context = snapshot_context(
         player_id,
-        "purchase_validation"
+        "purchase_validation",
+        gold_mine_ability and "gold_mine"
+            or state.opened_players[player_id] or "shop"
     )
+    context.gold_mine_ability = gold_mine_ability
     local purchasable, reason = catalog.evaluate(
         player_id,
         entry,
@@ -231,6 +284,28 @@ local function purchase(payload)
     remember_result(player_id, request_id, result)
     return result
 end
+
+local function purchase_next_technology(payload)
+    local player_id = tonumber(payload.player_id)
+    local group = tostring(payload.technology_group or "")
+    if not valid_player_id(player_id) or group == "" then
+        return { ok = false, error = "technology_request_invalid" }
+    end
+    local levels = state.technology_by_player[player_id] or {}
+    local target_level = (tonumber(levels[group]) or 0) + 1
+    local entry = catalog.find_technology_entry(group, target_level)
+    if not entry then
+        return { ok = false, error = "升级费用尚未确认或科技已满级" }
+    end
+    return purchase({
+        player_id = player_id,
+        entry_id = entry.entryid,
+        request_id = tostring(payload.request_id or ""),
+        source = payload.source,
+        entindex = payload.entindex,
+    })
+end
+
 local function change_building_count(payload, delta)
     local counts = building_counts(payload.team)
     local building_id = tostring(payload.building_id or "")
@@ -244,6 +319,12 @@ local function on_building_created(payload)
     if payload.building_id == "main_city" then
         state.city_level_by_team[payload.team] =
             tonumber(payload.level) or 1
+    end
+    if payload.building_id == "building_research_lab" then
+        local player_id = tonumber(payload.player_id)
+        if valid_player_id(player_id) then
+            state.research_unlocked[player_id] = true
+        end
     end
     push_team(payload.team, "building_created")
 end
@@ -259,6 +340,15 @@ local function on_building_destroyed(payload)
     if payload.building_id == "main_city" then
         state.city_level_by_team[payload.team] = 0
     end
+    if payload.building_id == "building_research_lab" then
+        local player_id = tonumber(payload.player_id)
+        if valid_player_id(player_id) then
+            state.research_unlocked[player_id] = false
+            if state.opened_players[player_id] == "research" then
+                state.opened_players[player_id] = nil
+            end
+        end
+    end
     push_team(payload.team, "building_destroyed")
 end
 local function on_player_changed(payload)
@@ -267,11 +357,31 @@ end
 local function on_resource_changed(payload)
     push_team(payload.team, "resource_changed")
 end
+local function get_technology_state(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if not valid_player_id(player_id) then
+        return { ok = false, error = "player_id_invalid" }
+    end
+    return {
+        ok = true,
+        research_unlocked = state.research_unlocked[player_id] == true,
+        levels = state.technology_by_player[player_id] or {},
+    }
+end
+
 function M.init()
     reset_state()
     event_bus.handle_request(events.SHOP_OPEN_REQUEST, open_shop)
     event_bus.handle_request(events.SHOP_CLOSE_REQUEST, close_shop)
     event_bus.handle_request(events.SHOP_PURCHASE_REQUEST, purchase)
+    event_bus.handle_request(
+        events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,
+        purchase_next_technology
+    )
+    event_bus.handle_request(
+        events.TECHNOLOGY_STATE_GET_REQUEST,
+        get_technology_state
+    )
     event_bus.subscribe(events.RESOURCE_CHANGED, on_resource_changed)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)

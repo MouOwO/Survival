@@ -4,5 +4,7 @@
 wall_pending,10,wall_not_built,ability_build_wall,1,0,wall,1,0,1,游戏开始只显示建造城墙。
 city_pending,20,wall_built_city_not_built,ability_build_main_city,1,0,main_city,1,0,1,城墙完成后，同一建造链技能替换为建造主城。
 city_built,30,main_city_built,ability_build_arrow_tower,1,1,arrow_tower,0,0,1,主城完成后常驻显示，可重复建造。
-city_built,30,main_city_built,ability_build_hero_altar,2,3,hero_altar,1,1,1,祭坛显示在技能列表中；主城不足3级时置灰；召唤英雄后永久置灰。
-city_built,30,main_city_built,ability_build_gold_mine,3,3,gold_mine,1,0,0,当前建造阶段按最新需求只显示箭塔和祭坛，因此默认停用。金矿系统与配置保留，策划将enabled改为1即可恢复。
+city_built,30,main_city_built,ability_build_research_lab,2,1,building_research_lab,1,0,1,主城完成后W技能解锁建造研究所；研究所最多建造1座。
+city_built,30,main_city_built,ability_build_farm,3,1,building_farm,0,0,1,主城完成后解锁人口农场，可重复建造。
+city_built,30,main_city_built,ability_build_hero_altar,4,3,hero_altar,1,1,1,祭坛显示在技能列表中；主城不足3级时置灰；召唤英雄后永久置灰。
+city_built,30,main_city_built,ability_build_gold_mine,5,3,gold_mine,5,0,1,主城3级后显示，最多建造5座金矿。

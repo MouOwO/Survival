@@ -1,10 +1,13 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local building_system = require("systems/building_system")
 local weapon_snapshot = require("ui/weapon_synthesis_snapshot_service")
+local unit_display_names = require("config/generated/unit_display_names")
 
 local M = {}
 local synthesis_requests = {}
+local building_snapshot_sequence = 0
 
 local function safe_number(entity, method_name, fallback, ...)
     local method = entity and entity[method_name]
@@ -24,12 +27,16 @@ local function unit_combat_snapshot(unit)
         or safe_number(unit, "GetDamageMax", nil)
     if attack_min == nil then attack_min = safe_number(unit, "GetBaseDamageMin", 0) end
     if attack_max == nil then attack_max = safe_number(unit, "GetBaseDamageMax", attack_min) end
+    local internal_name = (unit.GetUnitName and unit:GetUnitName()) or ""
+    local configured_name = (unit_display_names.by_id or {})[internal_name]
+    local display_name = unit.survival_display_name
+        or (configured_name and configured_name.enabled ~= false
+            and configured_name.display_name)
+        or internal_name
     return {
         entindex = unit:entindex(),
-        unit_name = unit.survival_display_name
-            or (unit.GetUnitName and unit:GetUnitName()) or "",
-        display_name = unit.survival_display_name
-            or (unit.GetUnitName and unit:GetUnitName()) or "",
+        unit_name = internal_name,
+        display_name = display_name,
         level = tonumber(unit.survival_level)
             or safe_number(unit, "GetLevel", 1),
         health = safe_number(unit, "GetHealth", 0),
@@ -109,14 +116,16 @@ local function register_selected_unit_stats_request()
     end)
 end
 
-local function publish_building_snapshot(payload)
+local function send_building_snapshot(payload, phase)
     local player_id = tonumber(payload and payload.player_id)
     local entindex = tonumber(payload and payload.entindex)
     if not valid_player_id(player_id) or not entindex then return end
     local ok, unit = pcall(EntIndexToHScript, entindex)
     if not ok or not unit or unit:IsNull() then return end
     local snapshot = unit_combat_snapshot(unit)
+    building_snapshot_sequence = building_snapshot_sequence + 1
     snapshot.success = 1
+    snapshot.refresh_sequence = building_snapshot_sequence
     snapshot.reason = payload.reason or "building_changed"
     snapshot.display_name = payload.display_name or snapshot.display_name
     snapshot.unit_name = snapshot.display_name
@@ -125,7 +134,26 @@ local function publish_building_snapshot(payload)
     snapshot.attack_max = tonumber(payload.attack_max) or snapshot.attack_max
     snapshot.armor = tonumber(payload.armor) or snapshot.armor
     snapshot.attack_speed = tonumber(payload.attack_speed) or snapshot.attack_speed
+    snapshot.push_phase = phase or "immediate"
+    print(string.format(
+        "[SURVIVAL_STATS][SERVER] BUILDING_PUSH player=%s unit=%s phase=%s sequence=%s level=%s attack=%s-%s armor=%s",
+        tostring(player_id), tostring(entindex), tostring(snapshot.push_phase),
+        tostring(snapshot.refresh_sequence), tostring(snapshot.level),
+        tostring(snapshot.attack_min), tostring(snapshot.attack_max),
+        tostring(snapshot.armor)
+    ))
     send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
+end
+
+local function publish_building_snapshot(payload)
+    send_building_snapshot(payload, "immediate")
+    local entindex = tonumber(payload and payload.entindex)
+    if not entindex then return end
+    local delayed_payload = {}
+    for key, value in pairs(payload) do delayed_payload[key] = value end
+    scheduler.after(0.15, function()
+        send_building_snapshot(delayed_payload, "delayed")
+    end, "building_snapshot_refresh_" .. tostring(entindex))
 end
 
 local function register_building_snapshot_push()
@@ -156,6 +184,8 @@ local function register_shop_open_request()
             player_id = player_id,
             request_id = payload.request_id,
             known_sequence = tonumber(payload.known_sequence) or 0,
+            mode = payload.mode,
+            source_entindex = tonumber(payload.source_entindex),
         })
         if result and result.ok and result.snapshot then
             send_to_player("ui_shop_snapshot", player_id, result.snapshot)
@@ -262,6 +292,7 @@ local function building_id_for_ability(ability_name)
         ability_build_wall = "wall",
         ability_build_main_city = "main_city",
         ability_build_arrow_tower = "arrow_tower",
+        ability_build_research_lab = "building_research_lab",
         ability_build_gold_mine = "gold_mine",
         ability_build_hero_altar = "hero_altar",
     }
@@ -376,10 +407,48 @@ local function register_ability_cast_request()
             and bit.band(behavior, DOTA_ABILITY_BEHAVIOR_POINT) ~= 0
         local ok = unit_valid and ability_valid and caster_matches
             and owner_matches and not passive and not is_point_target
+        local tower_upgrade_mode = ({
+            ability_upgrade_tower = "one",
+            ability_upgrade_tower_lv01 = "one",
+            ability_upgrade_tower_max = "max",
+        })[ability_name]
+        local tower_class_index = tonumber(string.match(
+            ability_name,
+            "^ability_tower_class_(%d+)$"
+        ))
+        local tower_action = tower_upgrade_mode ~= nil or tower_class_index ~= nil
+        local tower_ability_matches = tower_action and unit_valid
+            and ability_valid and unit:FindAbilityByName(ability_name) == ability
+        local handled_directly = false
+        if tower_ability_matches and owner_matches and not passive
+            and not is_point_target and tower_upgrade_mode then
+            -- Dynamic Lua abilities on npc_dota_creature buildings do not
+            -- reliably enter OnSpellStart through CastAbilityNoTarget. Route
+            -- tower UI actions straight to the authoritative building system;
+            -- ownership/ability validation above and resource/level validation
+            -- in building_upgrade_system remain unchanged.
+            event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
+                building = unit,
+                upgrade_mode = tower_upgrade_mode,
+            })
+            handled_directly = true
+            print("[SURVIVAL_CAST][SERVER] TOWER_UPGRADE_DISPATCHED mode="
+                .. tostring(tower_upgrade_mode))
+        elseif tower_ability_matches and owner_matches and not passive
+            and not is_point_target and tower_class_index and tower_class_index >= 1
+            and tower_class_index <= 7 then
+            event_bus.emit(events.TOWER_CLASS_REQUEST, {
+                tower = unit,
+                class_index = tower_class_index,
+            })
+            handled_directly = true
+            print("[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index="
+                .. tostring(tower_class_index))
+        end
         if is_point_target then
             print("[SURVIVAL_CAST][SERVER] REJECT point_target_requires_client_position name="
                 .. tostring(ability_name))
-        elseif ok then
+        elseif ok and not handled_directly then
             -- 这里只处理无目标技能；点目标技能必须由客户端先进入选点模式。
             unit:CastAbilityNoTarget(ability, player_id)
             print("[SURVIVAL_CAST][SERVER] CAST_ISSUED name=" .. tostring(ability_name))
@@ -395,16 +464,17 @@ local function register_ability_cast_request()
                 end,
                 0.10
             )
-        elseif not is_point_target then
+        elseif not is_point_target and not handled_directly then
             print("[SURVIVAL_CAST][SERVER] REJECT ability_cast_rejected")
         end
+        local request_accepted = ok or handled_directly
         send_to_player("ui_ability_cast_result", player_id, {
-            success = ok and 1 or 0,
+            success = request_accepted and 1 or 0,
             entindex = entindex or -1,
             ability_entindex = ability_entindex or -1,
             ability_name = ability_name,
             behavior = behavior,
-            error = ok and "" or (is_point_target
+            error = request_accepted and "" or (is_point_target
                 and "point_target_requires_client_position"
                 or "ability_cast_rejected"),
         })
@@ -449,6 +519,7 @@ end
 
 function M.init()
     synthesis_requests = {}
+    building_snapshot_sequence = 0
     register_selected_unit_stats_request()
     register_building_snapshot_push()
     register_snapshot_request()

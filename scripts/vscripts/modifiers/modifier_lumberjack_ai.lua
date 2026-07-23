@@ -15,8 +15,19 @@ function M:OnCreated(params)
     self.tree_lumber_efficiency_buff = tonumber(
         params.tree_lumber_efficiency_buff
     ) or 0
+    self.technology_lumber_efficiency = tonumber(
+        params.technology_lumber_efficiency
+    ) or 0
+    self.player_id = tonumber(params.player_id) or -1
+    self.technology_crit_chance = math.max(
+        0, tonumber(params.technology_crit_chance) or 0
+    )
+    self.technology_armor_reduction = math.max(
+        0, tonumber(params.technology_armor_reduction) or 0
+    )
     self.lumber_efficiency = self.base_lumber_efficiency
         + self.tree_lumber_efficiency_buff
+        + self.technology_lumber_efficiency
     self:StartIntervalThink(0.5)
 end
 
@@ -28,6 +39,21 @@ function M:SetTreeLumberEfficiency(buff)
     self.tree_lumber_efficiency_buff = math.max(0, tonumber(buff) or 0)
     self.lumber_efficiency = self.base_lumber_efficiency
         + self.tree_lumber_efficiency_buff
+        + self.technology_lumber_efficiency
+end
+
+function M:SetTechnologyLumberEfficiency(value)
+    self.technology_lumber_efficiency = math.max(0, tonumber(value) or 0)
+    self.lumber_efficiency = self.base_lumber_efficiency
+        + self.tree_lumber_efficiency_buff
+        + self.technology_lumber_efficiency
+end
+function M:SetTechnologyCritChance(value)
+    self.technology_crit_chance = math.max(0, tonumber(value) or 0)
+end
+
+function M:SetTechnologyArmorReduction(value)
+    self.technology_armor_reduction = math.max(0, tonumber(value) or 0)
 end
 
 function M:GetLumberEfficiency()
@@ -66,13 +92,29 @@ function M:OnAttackLanded(keys)
     if keys.attacker ~= parent then return end
     local target = keys.target
     if not target or target:IsNull() then return end
+    if self.technology_armor_reduction > 0
+        and target:GetTeamNumber() ~= parent:GetTeamNumber() then
+        local modifier = target:AddNewModifier(
+            parent,
+            nil,
+            "modifier_research_armor_reduction",
+            { armor_reduction = self.technology_armor_reduction }
+        )
+        if modifier and modifier.SetArmorReduction then
+            modifier:SetArmorReduction(self.technology_armor_reduction)
+        end
+    end
     if target:entindex() ~= self.tree_entindex then return end
 
+    local critical = RandomFloat(0, 100) < (self.technology_crit_chance or 0)
     event_bus.emit(events.TREE_HIT, {
         attacker = parent,
         target = target,
         team = parent:GetTeamNumber(),
-        base_lumber_efficiency = self.base_lumber_efficiency,
+        player_id = self.player_id,
+        base_lumber_efficiency = self.base_lumber_efficiency
+            + self.technology_lumber_efficiency,
+        critical = critical,
         source = "lumberjack",
     })
 end

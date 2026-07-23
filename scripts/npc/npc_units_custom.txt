@@ -55,9 +55,7 @@
         "StatusHealth"           "1500"
         "StatusMana"             "0"
         "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        // Lightning towers use the attack event only as a timing trigger.
-        // Melee capability prevents the engine from creating a ranged arrow.
-        "AttackCapabilities"     "DOTA_UNIT_CAP_MELEE_ATTACK"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_RANGED_ATTACK"
         "AttackDamageMin"        "20"
         "AttackDamageMax"        "20"
         "AttackRange"            "600"
@@ -71,6 +69,48 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "1000"
         "VisionNighttimeRange"   "800"
+    }
+
+    "building_research_lab"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/props_structures/radiant_ancient001.vmdl"
+        "ModelScale"             "0.32"
+        "Level"                  "1"
+        "ConsideredHero"         "1"
+        "HasInventory"           "0"
+        "AbilityLayout"          "6"
+        "HealthBarOffset"        "-1"
+        "StatusHealth"           "2500"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "ArmorPhysical"          "8"
+        "MagicalResistance"      "25"
+        "BoundsHullName"         "DOTA_HULL_SIZE_BARRACKS"
+        "VisionDaytimeRange"     "1000"
+        "VisionNighttimeRange"   "800"
+    }
+
+    "building_farm"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/props_structures/radiant_ancient001.vmdl"
+        "ModelScale"             "0.35"
+        "Level"                  "1"
+        "ConsideredHero"         "1"
+        "HasInventory"           "0"
+        "AbilityLayout"          "6"
+        "HealthBarOffset"        "180"
+        "StatusHealth"           "2500"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "ArmorPhysical"          "5"
+        "MagicalResistance"      "25"
+        "BoundsHullName"         "DOTA_HULL_SIZE_BARRACKS"
+        "VisionDaytimeRange"     "800"
+        "VisionNighttimeRange"   "600"
     }
 
     "npc_survival_lumberjack"
@@ -94,6 +134,30 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "600"
         "VisionNighttimeRange"   "400"
+    }
+
+    "npc_survival_repairer"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/undying/undying.vmdl"
+        "ModelScale"             "0.8"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "StatusHealth"           "1000"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_GROUND"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_MELEE_ATTACK"
+        "AttackDamageMin"        "0"
+        "AttackDamageMax"        "0"
+        "AttackRange"            "200"
+        "AttackRate"             "1.0"
+        "AttackAnimationPoint"   "0.4"
+        "MovementSpeed"          "300"
+        "ArmorPhysical"          "2"
+        "BoundsHullName"         "DOTA_HULL_SIZE_HERO"
+        "VisionDaytimeRange"     "800"
+        "VisionNighttimeRange"   "600"
     }
 
     "enemy_tree"

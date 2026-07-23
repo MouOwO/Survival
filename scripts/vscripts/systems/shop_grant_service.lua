@@ -55,14 +55,37 @@ local function grant_virtual_item(player_id, entry, state)
 end
 
 local function grant_technology(player_id, entry, state)
+    if entry.contenttype == "technology_service" then
+        if entry.contentid == "advanced_researcher_unlock" then
+            if state.advanced_researcher_unlocked[player_id] == true then
+                return { ok = false, error = "advanced_researcher_already_unlocked" }
+            end
+            state.advanced_researcher_unlocked[player_id] = true
+            return { ok = true, advanced_researcher_unlocked = true }
+        end
+        if state.research_unlocked[player_id] == true then
+            return { ok = false, error = "research_already_unlocked" }
+        end
+        state.research_unlocked[player_id] = true
+        return { ok = true, research_unlocked = true }
+    end
     state.technology_by_player[player_id] =
         state.technology_by_player[player_id] or {}
     local technologies = state.technology_by_player[player_id]
-    if technologies[entry.contentid] then
-        return { ok = false, error = "technology_already_owned" }
+    local group = entry.definition.technology_group or entry.contentid
+    local level = tonumber(entry.definition.level) or 1
+    local current = tonumber(technologies[group]) or 0
+    if level ~= current + 1 then
+        return { ok = false, error = "technology_level_invalid" }
     end
-    technologies[entry.contentid] = true
-    return { ok = true }
+    technologies[group] = level
+    event_bus.emit(events.TECHNOLOGY_CHANGED, {
+        player_id = player_id,
+        technology_group = group,
+        level = level,
+        levels = technologies,
+    })
+    return { ok = true, technology_group = group, level = level }
 end
 
 local function start_encounter(player_id, team, entry)
@@ -78,6 +101,9 @@ local function start_encounter(player_id, team, entry)
 end
 
 function M.grant(player_id, team, entry, state)
+    if entry.grant_type == "technology_unlock" then
+        return grant_technology(player_id, entry, state)
+    end
     if entry.grant_type == "technology_level" then
         return grant_technology(player_id, entry, state)
     end

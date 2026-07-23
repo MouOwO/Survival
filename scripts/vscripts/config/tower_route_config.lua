@@ -59,11 +59,22 @@ function M.cost_to(state, target_level)
     for level = state.level + 1, target_level do
         local row = M.row_at_level(state, level)
         if not row then return nil end
-        cost.wood = cost.wood + (row.upgrade_wood or 0)
-        cost.gold = cost.gold + (row.upgrade_gold or 0)
-        cost.population = cost.population + (row.population_delta or 0)
+        cost.wood = cost.wood + (tonumber(row.upgrade_wood) or 0)
+        cost.gold = cost.gold + (tonumber(row.upgrade_gold) or 0)
+        -- population_delta is a max-population reward granted after the
+        -- upgrade. It is deliberately kept separate from spend population.
+        cost.population = cost.population
+            + (tonumber(row.population_delta) or 0)
     end
     return cost
+end
+
+function M.class_change_cost(row)
+    if not row then return nil end
+    return {
+        wood = tonumber(row.upgrade_wood) or 0,
+        gold = tonumber(row.upgrade_gold) or 0,
+    }
 end
 
 function M.display_name(row)

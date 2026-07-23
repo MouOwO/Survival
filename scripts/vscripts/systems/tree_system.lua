@@ -101,6 +101,9 @@ local function on_tree_hit(payload)
         (tonumber(base_efficiency) or 0)
         + tree_snapshot().lumber_efficiency_buff
     ))
+    if payload.critical == true then
+        efficiency = efficiency * 2
+    end
     if efficiency <= 0 then return end
     local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
         team = payload.team,

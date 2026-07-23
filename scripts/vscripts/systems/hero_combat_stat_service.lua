@@ -3,6 +3,7 @@ local events = require("core/events")
 local heroes = require("config/generated/hero_definitions")
 local weapons = require("config/generated/weapon_definitions")
 local number_config = require("config/combat_number_config")
+local global_rules = require("config/global_rules")
 -- Composition-only bootstrap: services communicate exclusively through event_bus.
 local effect_handler_registry = require("systems/effect_handler_registry")
 local equipment_effect_service = require("systems/equipment_effect_service")
@@ -12,6 +13,20 @@ local triggered_proc_service = require("systems/triggered_proc_service")
 
 local M = {}
 local state_by_player = {}
+local technology_levels = {}
+
+local function technology_level(player_id, group)
+    local levels = technology_levels[player_id] or {}
+    return tonumber(levels[group]) or 0
+end
+
+local function sync_technology_levels(player_id)
+    local result = event_bus.request(
+        events.TECHNOLOGY_STATE_GET_REQUEST,
+        { player_id = player_id }
+    )
+    technology_levels[player_id] = result and result.levels or {}
+end
 
 local function on_damage(payload)
     local player_id = tonumber(payload.player_id)
@@ -76,6 +91,7 @@ end
 
 local function base_snapshot(unit, definition)
     local all_bonus = value(definition, "all_attributes_bonus", 0)
+        + global_rules.number("hero_meta_all_attributes_bonus", 0)
     local stats = {
         strength = value(
             definition,
@@ -93,10 +109,10 @@ local function base_snapshot(unit, definition)
             safe_get(unit, "GetBaseIntellect", safe_get(unit, "GetIntellect", 0))
         ) + all_bonus,
     }
-    local primary = primary_logical_attribute(unit, definition, stats)
     local damage_multiplier = value(definition, "damage_multiplier", 1)
-    local fallback_min = safe_get(unit, "GetBaseDamageMin", 0) + primary
-    local fallback_max = safe_get(unit, "GetBaseDamageMax", 0) + primary
+        * global_rules.number("hero_meta_damage_multiplier", 1)
+    local fallback_min = safe_get(unit, "GetBaseDamageMin", 0)
+    local fallback_max = safe_get(unit, "GetBaseDamageMax", 0)
     stats.attack_min = value(
         definition,
         "base_damage_min",
@@ -130,9 +146,11 @@ local function apply_base_projection(state)
     safe_call(unit, "SetBaseAgility", projected.agility)
     safe_call(unit, "SetBaseIntellect", projected.intellect)
     safe_call(unit, "CalculateStatBonus", true)
-    local primary = primary_engine_attribute(unit, projected)
-    local minimum = state.base.attack_min / scale - primary
-    local maximum = state.base.attack_max / scale - primary
+    -- CSV base_damage is engine base damage. Do not subtract the primary
+    -- attribute here: doing so produced negative base damage for heroes such
+    -- as Juggernaut (20 - 100 agility), which could resolve attacks as zero.
+    local minimum = math.max(0, state.base.attack_min / scale)
+    local maximum = math.max(minimum, state.base.attack_max / scale)
     safe_call(unit, "SetBaseDamageMin", minimum)
     safe_call(unit, "SetBaseDamageMax", maximum)
     safe_call(unit, "CalculateStatBonus", true)
@@ -163,6 +181,15 @@ local function recalculate(player_id, reason)
         + value(growth, "growth_intellect", 0)
     local scale = 1
     local debug_attack = tonumber(state.debug_attack_override)
+    local researcher_attack_pct = technology_level(
+        player_id, "researcher_hero_attack"
+    ) * 2
+    local researcher_final_damage_pct = technology_level(
+        player_id, "researcher_hero_final_damage"
+    )
+    local researcher_armor_reduction = technology_level(
+        player_id, "researcher_hero_armor_reduction"
+    ) * 0.5
     state.snapshot = {
         player_id = player_id,
         hero_id = state.hero_id,
@@ -171,8 +198,13 @@ local function recalculate(player_id, reason)
         weapon_content_id = equipment.main_hand_content_id or "",
         weapon_name = equipment.main_hand_name ~= ""
             and equipment.main_hand_name or "未装备武器",
-        attack_min = debug_attack or (state.base.attack_min + weapon_attack_min),
-        attack_max = debug_attack or (state.base.attack_max + weapon_attack_max),
+        attack_min = debug_attack or (state.base.attack_min + weapon_attack_min)
+            * (1 + researcher_attack_pct / 100),
+        attack_max = debug_attack or (state.base.attack_max + weapon_attack_max)
+            * (1 + researcher_attack_pct / 100),
+        researcher_attack_pct = researcher_attack_pct,
+        researcher_final_damage_pct = researcher_final_damage_pct,
+        researcher_armor_reduction = researcher_armor_reduction,
         debug_attack_override = debug_attack or 0,
         armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
         -- attack_speed 表示每秒攻击次数；引擎保存的是基础攻击间隔。
@@ -194,6 +226,9 @@ local function recalculate(player_id, reason)
         progress_per_attack = value(growth, "progress_per_attack", 1),
         attack_gain_per_attack = value(growth, "attack_gain_per_attack", 0),
         equipment_attack = value(effect_values, "attack_flat", 0),
+        engine_research_attack_bonus = ((state.base.attack_min
+            + state.base.attack_max + weapon_attack_min + weapon_attack_max)
+            * 0.5) * researcher_attack_pct / 100,
         engine_weapon_attack_bonus = debug_attack
             and (debug_attack
                 - ((state.base.attack_min + state.base.attack_max) * 0.5)
@@ -214,6 +249,18 @@ local function recalculate(player_id, reason)
         equipment_lifesteal_pct = value(effect_values, "lifesteal_pct", 0),
         reason = reason or "changed",
     }
+    local research_modifier = state.unit:FindModifierByName(
+        "modifier_research_technology"
+    ) or state.unit:AddNewModifier(
+        state.unit, nil, "modifier_research_technology", {}
+    )
+    if research_modifier and research_modifier.SetTechnologyValues then
+        research_modifier:SetTechnologyValues(
+            researcher_attack_pct,
+            researcher_final_damage_pct,
+            researcher_armor_reduction
+        )
+    end
     local modifier = state.unit:FindModifierByName(
         "modifier_weapon_stat_projection"
     )
@@ -237,6 +284,7 @@ local function on_hero_summoned(payload)
         snapshot = nil,
     }
     state_by_player[payload.player_id] = state
+    sync_technology_levels(payload.player_id)
     apply_base_projection(state)
     local function ensure_modifier(name)
         local existing = payload.unit:FindModifierByName(name)
@@ -252,7 +300,19 @@ local function on_hero_summoned(payload)
     end
     ensure_modifier("modifier_weapon_stat_projection")
     ensure_modifier("modifier_equipment_effects")
-    recalculate(payload.player_id, "hero_summoned")
+    local snapshot = recalculate(payload.player_id, "hero_summoned") or {}
+    print(string.format(
+        "[HeroCombatReady] hero=%s entindex=%s base_damage=%.1f-%.1f "
+            .. "engine_damage=%.1f-%.1f attack_range=%.1f move_capability=%s",
+        tostring(payload.hero_id),
+        tostring(payload.unit:entindex()),
+        tonumber(state.base.attack_min) or 0,
+        tonumber(state.base.attack_max) or 0,
+        safe_get(payload.unit, "GetBaseDamageMin", 0),
+        safe_get(payload.unit, "GetBaseDamageMax", 0),
+        safe_get(payload.unit, "GetAttackRange", 0),
+        tostring(safe_get(payload.unit, "GetMoveCapability", -1))
+    ))
 end
 
 local function on_changed(payload)
@@ -300,8 +360,15 @@ local function get_stats(payload)
     }
 end
 
+local function on_technology_changed(payload)
+    local player_id = tonumber(payload.player_id)
+    technology_levels[player_id] = payload.levels or {}
+    recalculate(player_id, "technology_changed")
+end
+
 function M.init()
     state_by_player = {}
+    technology_levels = {}
     effect_handler_registry.init()
     equipment_stat_aggregation_service.init()
     equipment_effect_service.init()
@@ -316,6 +383,7 @@ function M.init()
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_changed)
     event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_changed)
     event_bus.subscribe(events.EQUIPMENT_STATS_CHANGED, on_changed)
+    event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
 end
 
 return M

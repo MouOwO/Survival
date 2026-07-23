@@ -1,4 +1,8 @@
 local logger = require("core/logger")
+local projectile_config = require(
+    "config/generated/hero_attack_projectiles"
+)
+local global_rules = require("config/global_rules")
 
 local M = {}
 
@@ -68,12 +72,21 @@ local function apply_combat_stats(unit, definition)
         "SetBaseMagicalResistanceValue"
     )
     set_if_present(unit, definition, "move_speed", "SetBaseMoveSpeed")
-    set_if_present(
-        unit,
-        definition,
-        "projectile_speed",
-        "SetProjectileSpeed"
-    )
+    local projectile = (projectile_config.by_id or {})[definition.hero_id]
+    if projectile and projectile.enabled == false then projectile = nil end
+    projectile = projectile or definition
+    local projectile_speed = number(projectile, "projectile_speed")
+    local projectile_model = projectile.projectile_model
+    if projectile_speed and projectile_speed > 0 then
+        safe_call(unit, "SetProjectileSpeed", projectile_speed)
+        if projectile_model and projectile_model ~= "" then
+            safe_call(unit, "SetRangedProjectileName", projectile_model)
+        end
+        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_RANGED_ATTACK)
+    else
+        safe_call(unit, "SetRangedProjectileName", "")
+        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_MELEE_ATTACK)
+    end
 end
 
 local function apply_range(unit, definition)
@@ -132,7 +145,8 @@ local function apply_all_attributes(unit, amount)
 end
 
 local function apply_multipliers(unit, definition)
-    local health = number(definition, "max_health_multiplier") or 1
+    local health = (number(definition, "max_health_multiplier") or 1)
+        * global_rules.number("hero_meta_max_health_multiplier", 1)
     if health ~= 1 then
         local maximum = safe_get(unit, "GetMaxHealth")
         if maximum then
@@ -143,7 +157,8 @@ local function apply_multipliers(unit, definition)
         end
     end
 
-    local mana = number(definition, "max_mana_multiplier") or 1
+    local mana = (number(definition, "max_mana_multiplier") or 1)
+        * global_rules.number("hero_meta_max_mana_multiplier", 1)
     if mana ~= 1 then
         local maximum = safe_get(unit, "GetMaxMana")
         if maximum then
@@ -153,7 +168,8 @@ local function apply_multipliers(unit, definition)
         end
     end
 
-    local move_bonus = number(definition, "move_speed_bonus") or 0
+    local move_bonus = (number(definition, "move_speed_bonus") or 0)
+        + global_rules.number("hero_meta_move_speed_bonus", 0)
     if move_bonus ~= 0 then
         local base = safe_get(unit, "GetBaseMoveSpeed")
         if base then
@@ -191,7 +207,8 @@ function M.apply(unit, definition)
     apply_misc(unit, definition)
     apply_all_attributes(
         unit,
-        number(definition, "all_attributes_bonus") or 0
+        (number(definition, "all_attributes_bonus") or 0)
+            + global_rules.number("hero_meta_all_attributes_bonus", 0)
     )
     safe_call(unit, "CalculateStatBonus", true)
     apply_multipliers(unit, definition)

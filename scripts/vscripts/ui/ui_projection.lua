@@ -6,6 +6,8 @@ local resource_by_team = {}
 local city_level_by_team = {}
 local worker_count_by_team = {}
 local wave = {}
+local research_unlocked_by_team = {}
+local shop_unlocked_by_player = {}
 
 local function mark_dirty(team)
     event_bus.emit(events.UI_DIRTY, { team = team })
@@ -23,10 +25,25 @@ local function on_building_changed(payload)
     mark_dirty(payload.team)
 end
 
+local function on_building_created(payload)
+    if payload.building_id == "building_research_lab" then
+        research_unlocked_by_team[payload.team] = true
+    end
+    on_building_changed(payload)
+end
+
 local function on_building_destroyed(payload)
     if payload.building_id == "main_city" then
         city_level_by_team[payload.team] = 0
+    elseif payload.building_id == "building_research_lab" then
+        research_unlocked_by_team[payload.team] = false
     end
+    mark_dirty(payload.team)
+end
+
+local function on_hero_summon_changed(payload)
+    shop_unlocked_by_player[payload.player_id] = payload.shop_unlocked == 1
+        or payload.hero_summoned == 1
     mark_dirty(payload.team)
 end
 
@@ -65,6 +82,8 @@ local function build_snapshot(payload)
         resources = resource,
         city_level = city_level_by_team[team] or 0,
         worker_count = worker_count_by_team[team] or 0,
+        shop_unlocked = shop_unlocked_by_player[payload.player_id] and 1 or 0,
+        research_unlocked = research_unlocked_by_team[team] and 1 or 0,
         wave = wave,
     }
 end
@@ -74,11 +93,15 @@ function M.init()
     city_level_by_team = {}
     worker_count_by_team = {}
     wave = {}
+    research_unlocked_by_team = {}
+    shop_unlocked_by_player = {}
     event_bus.subscribe(events.RESOURCE_CHANGED, on_resource_changed)
+    event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.WORKER_CHANGED, on_worker_changed)
     event_bus.subscribe(events.WAVE_CHANGED, on_wave_changed)
+    event_bus.subscribe(events.HERO_SUMMON_STATE_CHANGED, on_hero_summon_changed)
     event_bus.handle_request("ui.projection.build_snapshot", build_snapshot)
 end
 

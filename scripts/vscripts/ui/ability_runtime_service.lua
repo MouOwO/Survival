@@ -44,7 +44,8 @@ local function normalize(payload, unit)
             or unit:GetTeamNumber(),
         building_id = payload.building_id
             or previous.building_id,
-        level = payload.level or previous.level or 1,
+        level = tonumber(payload.level)
+            or tonumber(previous.level) or 1,
         tower_class = payload.tower_class ~= nil
             and payload.tower_class
             or previous.tower_class,
@@ -61,9 +62,15 @@ local function normalize(payload, unit)
         mine_level = payload.mine_level ~= nil
             and payload.mine_level
             or previous.mine_level or 1,
+        efficiency_level = payload.efficiency_level ~= nil
+            and payload.efficiency_level
+            or previous.efficiency_level or 0,
         crit_level = payload.crit_level ~= nil
             and payload.crit_level
             or previous.crit_level or 0,
+        auto_upgrading = payload.auto_upgrading ~= nil
+            and payload.auto_upgrading
+            or previous.auto_upgrading or 0,
         builder_stage = payload.builder_stage
             or previous.builder_stage or "",
         hero_summoned = payload.hero_summoned ~= nil

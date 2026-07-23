@@ -38,7 +38,9 @@ local function snapshot(self)
 end
 
 function modifier_weapon_stat_projection:GetModifierPreAttack_BonusDamage()
-    return tonumber(snapshot(self).engine_weapon_attack_bonus) or 0
+    local stats = snapshot(self)
+    return (tonumber(stats.engine_weapon_attack_bonus) or 0)
+        + (tonumber(stats.engine_research_attack_bonus) or 0)
 end
 
 function modifier_weapon_stat_projection:OnTakeDamage(params)

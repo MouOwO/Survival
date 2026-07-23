@@ -2,10 +2,13 @@
 local events = require("core/events")
 local config = require("config/buildings_config")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
+local global_rules = require("config/global_rules")
 local logger = require("core/logger")
 local modifier_registry = require("core/modifier_registry")
 local team_alignment = require("core/team_alignment")
 local tower_skills = require("systems/tower_skill_runtime")
+local scheduler = require("core/scheduler")
+local grid_config = require("config/grid_config")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260720_2128_relocation_validation")
@@ -14,6 +17,53 @@ local counts = {}
 local wall_ever_built = {}
 local function valid_entity(entity)
     return entity and not entity:IsNull()
+end
+local function position_is_clear(position)
+    local traversable = true
+    local blocked = false
+    pcall(function() traversable = GridNav:IsTraversable(position) end)
+    pcall(function() blocked = GridNav:IsBlocked(position) end)
+    return traversable and not blocked
+end
+local function builder_work_position(caster, definition, origin)
+    if not valid_entity(caster) then return nil end
+    local footprint = definition.footprint or { x = 1, y = 1 }
+    local cell_size = tonumber(grid_config.cell_size) or 128
+    local building_radius = math.max(footprint.x, footprint.y) * cell_size * 0.5
+    local hull = caster.GetHullRadius and (caster:GetHullRadius() or 0) or 0
+    local safe_radius = building_radius + hull + 160
+    local direction = caster:GetAbsOrigin() - origin
+    direction.z = 0
+    if direction:Length2D() < 1 then
+        direction = caster:GetForwardVector()
+    end
+    direction = direction:Normalized()
+    for step = 0, 11 do
+        local angle = math.rad(step * 30)
+        local candidate_direction = Vector(
+            direction.x * math.cos(angle) - direction.y * math.sin(angle),
+            direction.x * math.sin(angle) + direction.y * math.cos(angle),
+            0
+        )
+        local candidate = origin + candidate_direction * safe_radius
+        candidate.z = GetGroundHeight(candidate, caster)
+        if position_is_clear(candidate) then
+            return candidate
+        end
+    end
+    return origin + Vector(safe_radius, 0, 0)
+end
+local function builder_ready(caster, definition, origin, work_position)
+    if not valid_entity(caster) then return false end
+    if not work_position then return false end
+    local distance = (caster:GetAbsOrigin() - origin):Length2D()
+    local work_distance = (caster:GetAbsOrigin() - work_position):Length2D()
+    local cell_size = tonumber(grid_config.cell_size) or 128
+    local footprint = definition.footprint or { x = 1, y = 1 }
+    local hull = caster.GetHullRadius and (caster:GetHullRadius() or 0) or 0
+    local safe_radius = math.max(footprint.x, footprint.y) * cell_size * 0.5
+        + hull + 160
+    return distance >= safe_radius - 48 and work_distance <= 48
 end
 local function notify(player_id, message, level)
     event_bus.emit(events.UI_NOTIFICATION, {
@@ -41,13 +91,14 @@ local function main_city_level(team)
     return 0
 end
 local function set_attack_range(unit, attack_range)
+    attack_range = global_rules.tower_attack_range
     if unit.Script_SetAttackRange then
         unit:Script_SetAttackRange(attack_range)
     elseif unit.SetAttackRange then
         unit:SetAttackRange(attack_range)
     end
     if unit.SetAcquisitionRange then
-            unit:SetAcquisitionRange(math.max(1000, attack_range or 0))
+            unit:SetAcquisitionRange(global_rules.tower_acquisition_range)
     end
 end
 local function arrow_data(level)
@@ -69,6 +120,7 @@ local function apply_projectile(unit, projectile_model)
     if projectile_model and projectile_model ~= ""
         and unit.SetRangedProjectileName then
         unit:SetRangedProjectileName(projectile_model)
+        unit.survival_projectile_model = projectile_model
     end
 end
 local function apply_initial_stats(unit, definition)
@@ -79,6 +131,9 @@ local function apply_initial_stats(unit, definition)
     unit:SetMaxHealth(data.health)
     unit:SetHealth(data.health)
     unit:SetPhysicalArmorBaseValue(data.armor)
+    if definition.id == "arrow_tower" and unit.SetAttackCapability then
+        unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
+    end
     if data.model_name and data.model_name ~= "" then
         unit:SetModel(data.model_name)
         unit:SetOriginalModel(data.model_name)
@@ -102,22 +157,23 @@ local function add_ability(unit, ability_name, active)
         return false
     end
     ability:SetLevel(1)
+    if ability.SetHidden then ability:SetHidden(false) end
     ability:SetActivated(active ~= false)
     print("[BuildingAbility] AddAbility OK unit=" .. tostring(unit:entindex()) .. " ability=" .. tostring(ability_name) .. " index=" .. tostring(ability:GetAbilityIndex()))
     return true
 end
-local function add_building_abilities(unit, definition)
+local function add_building_abilities(unit, definition, active)
     -- Building relocation is driven by Panorama; creature point abilities do
     -- not reliably enter OnSpellStart in this project.
     if definition.id == "arrow_tower" then
         local row = arrow_data(1)
         for _, ability_name in ipairs(row and row.active_skill_ids or {}) do
-            add_ability(unit, ability_name, true)
+            add_ability(unit, ability_name, active ~= false)
         end
         return
     end
     for _, ability_name in ipairs(definition.abilities or {}) do
-        add_ability(unit, ability_name, true)
+        add_ability(unit, ability_name, active ~= false)
     end
 end
 local function public_state(state)
@@ -139,6 +195,10 @@ local function public_state(state)
             and (arrow_data(state.level) or {}).base_attack_damage or nil,
         configured_attack_speed = state.building_id == "arrow_tower"
             and (arrow_data(state.level) or {}).base_attack_speed or nil,
+        base_health = state.unit:GetMaxHealth(),
+        base_attack_damage = state.building_id == "arrow_tower"
+            and tonumber((arrow_data(state.level) or {}).base_attack_damage)
+            or nil,
     }
 end
 require("systems/building_relocation").bind(
@@ -181,7 +241,7 @@ local function can_place(payload)
         grid = grid,
     }
 end
-local function create_building(payload)
+local function start_building(payload)
     print("[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path")
     local check = can_place(payload)
     if not check.ok then
@@ -193,7 +253,7 @@ local function create_building(payload)
         team = check.team,
         wood = cost.wood,
         gold = cost.gold,
-        population = 0,
+        population = check.definition.population_cost or 0,
         reason = "build:" .. check.definition.id,
     })
     if not spend or not spend.ok then
@@ -215,28 +275,21 @@ local function create_building(payload)
             gold = cost.gold,
             reason = "build_refund:" .. check.definition.id,
         })
+        event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+            team = check.team,
+            population = check.definition.population_cost or 0,
+            reason = "build_population_refund:" .. check.definition.id,
+        })
         notify(check.player_id, "建筑创建失败", "error")
         return { ok = false, error = "building_create_failed" }
     end
     team_alignment.enforce(unit, check.team, "building")
     unit.survival_level = 1
     unit.survival_display_name = check.definition.display_name
+    unit.survival_is_building = true
     unit:SetOwner(payload.caster)
-    unit:SetControllableByPlayer(check.player_id, true)
-    -- Attach the attack listener to the tower instance.
-    if check.definition.id == "arrow_tower" then
-        unit:AddNewModifier(unit, nil, "modifier_tower_auto_attack", {})
-        unit:AddNewModifier(unit, nil, "modifier_tower_attack_effects", {})
-    end
-    -- Do not make building creation depend on optional modifier registration.
-    -- These modifiers currently fail in the running VM with "unknown modifier type";
-    -- rooted behavior is not needed for direct SetAbsOrigin relocation.
-    add_building_abilities(unit, check.definition)
-    if check.definition.id == "arrow_tower" then
-        local initial_row = arrow_data(1)
-        tower_skills.apply(unit, initial_row and initial_row.skill_ids or {})
-    end
     apply_initial_stats(unit, check.definition)
+    add_building_abilities(unit, check.definition, false)
     local state = {
         unit = unit,
         definition = check.definition,
@@ -250,7 +303,6 @@ local function create_building(payload)
         tower_class_name = nil,
         tower_combat = arrow_data(1),
     }
-    buildings[unit:entindex()] = state
     change_count(check.team, check.definition.id, 1)
     if check.definition.build_once then wall_ever_built[check.team] = true end
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
@@ -259,19 +311,185 @@ local function create_building(payload)
         footprint = state.definition.footprint,
         entindex = unit:entindex(),
     })
-    if state.building_id == "main_city" then
-        event_bus.request(events.RESOURCE_ADD_REQUEST, {
-            team = state.team,
-            max_population = state.definition.levels[1].add_population or 0,
-            reason = "main_city_created",
-        })
+    unit:AddNewModifier(
+        unit,
+        nil,
+        "modifier_building_under_construction",
+        {}
+    )
+    local maximum_health = unit:GetMaxHealth()
+    local build_time = math.max(0.1, tonumber(check.definition.build_time) or 3)
+    local started_at = GameRules:GetGameTime()
+    unit:SetHealth(1)
+    local particle = nil
+    if check.definition.build_particle
+        and check.definition.build_particle ~= "" then
+        particle = ParticleManager:CreateParticle(
+            check.definition.build_particle,
+            PATTACH_ABSORIGIN_FOLLOW,
+            unit
+        )
     end
-    local data = public_state(state)
-    event_bus.emit(events.BUILDING_CREATED, data)
-    data.reason = "created"
-    event_bus.emit(events.BUILDING_CHANGED, data)
-    notify(state.player_id, state.definition.display_name .. "已建造")
-    return { ok = true, entindex = unit:entindex() }
+    if valid_entity(payload.caster) then
+        payload.caster:StartGesture(ACT_DOTA_ATTACK)
+        if payload.caster.survival_build_task == payload.build_task then
+            payload.caster.survival_build_task = nil
+        end
+    end
+    scheduler.every(0.1, function()
+        if not valid_entity(unit) then
+            if particle then
+                ParticleManager:DestroyParticle(particle, false)
+                ParticleManager:ReleaseParticleIndex(particle)
+            end
+            change_count(check.team, check.definition.id, -1)
+            event_bus.request(events.GRID_RELEASE_REQUEST, {
+                grid_x = state.grid_x,
+                grid_y = state.grid_y,
+                footprint = state.definition.footprint,
+            })
+            return false
+        end
+        local progress = math.min(
+            1,
+            (GameRules:GetGameTime() - started_at) / build_time
+        )
+        unit:SetHealth(math.max(1, math.floor(maximum_health * progress)))
+        if progress < 1 then return true end
+
+        if particle then
+            ParticleManager:DestroyParticle(particle, false)
+            ParticleManager:ReleaseParticleIndex(particle)
+        end
+        unit:RemoveModifierByName("modifier_building_under_construction")
+        local completed_level = state.definition.levels[state.level or 1] or {}
+        if completed_level.model_name and completed_level.model_name ~= "" then
+            unit:SetModel(completed_level.model_name)
+            unit:SetOriginalModel(completed_level.model_name)
+        end
+        unit:SetHealth(maximum_health)
+        unit:SetControllableByPlayer(check.player_id, true)
+        buildings[unit:entindex()] = state
+        -- Keep ability entity indexes stable for runtime tooltip data. Activate
+        -- once now and once after the construction modifier state has replicated.
+        add_building_abilities(unit, check.definition, true)
+        scheduler.after(0.1, function()
+            if valid_entity(unit) then
+                add_building_abilities(unit, check.definition, true)
+            end
+        end, "activate_building_abilities_" .. tostring(unit:entindex()))
+        if check.definition.id == "arrow_tower" then
+            for _, ability_name in ipairs({
+                "ability_upgrade_tower_lv01",
+                "ability_upgrade_tower_max",
+            }) do
+                local ability = unit:FindAbilityByName(ability_name)
+                print(string.format(
+                    "[TowerUpgradeReady] tower=%d ability=%s entindex=%s level=%s activated=%s",
+                    unit:entindex(), ability_name,
+                    ability and tostring(ability:entindex()) or "nil",
+                    ability and tostring(ability:GetLevel()) or "nil",
+                    ability and tostring(ability:IsActivated()) or "nil"
+                ))
+            end
+        end
+        local data = public_state(state)
+        event_bus.emit(events.BUILDING_CREATED, data)
+        if check.definition.id == "arrow_tower" then
+            unit:AddNewModifier(unit, nil, "modifier_tower_auto_attack", {})
+            unit:AddNewModifier(unit, nil, "modifier_tower_attack_effects", {})
+        end
+        if check.definition.id == "arrow_tower" then
+            local initial_row = arrow_data(1)
+            tower_skills.apply(
+                unit,
+                initial_row and initial_row.skill_ids or {}
+            )
+        end
+        if state.building_id == "main_city" then
+            event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                team = state.team,
+                max_population = state.definition.levels[1].add_population or 0,
+                reason = "main_city_created",
+            })
+        end
+        data.reason = "created"
+        event_bus.emit(events.BUILDING_CHANGED, data)
+        notify(state.player_id, state.definition.display_name .. "已建造")
+        return false
+    end, "construct_building_" .. tostring(unit:entindex()))
+    notify(check.player_id, check.definition.display_name .. "开始建造")
+    return {
+        ok = true,
+        entindex = unit:entindex(),
+        constructing = true,
+        build_time = build_time,
+    }
+end
+local function queue_building(payload)
+    local check = can_place(payload)
+    if not check.ok then
+        notify(payload.caster and payload.caster:GetPlayerOwnerID() or -1, check.error, "error")
+        return check
+    end
+    local caster = payload.caster
+    if caster.survival_build_task then
+        if caster.survival_build_task.constructing then
+            return { ok = false, error = "建筑正在施工中" }
+        end
+        caster.survival_build_task = nil
+    end
+    local target = check.grid.world_position
+    local work_position = builder_work_position(caster, check.definition, target)
+    if not work_position then
+        return { ok = false, error = "找不到可建造位置" }
+    end
+    local task = {
+        building_id = payload.building_id,
+        target = target,
+        work_position = work_position,
+    }
+    caster.survival_build_task = task
+    ExecuteOrderFromTable({
+        UnitIndex = caster:entindex(),
+        OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+        Position = work_position,
+        Queue = false,
+    })
+    scheduler.every(0.1, function()
+        if not valid_entity(caster) then return false end
+        if caster.survival_build_task ~= task then return false end
+        local current = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
+            caster = caster,
+            building_id = payload.building_id,
+            position = target,
+        })
+        if not current or not current.ok then
+            if caster.survival_build_task == task then
+                caster.survival_build_task = nil
+            end
+            notify(caster:GetPlayerOwnerID(), current and current.error or "建造位置失效", "error")
+            return false
+        end
+        if not builder_ready(
+            caster,
+            current.definition,
+            target,
+            work_position
+        ) then
+            return true
+        end
+        payload.build_task = task
+        local result = start_building(payload)
+        if not result or not result.ok then
+            if caster.survival_build_task == task then
+                caster.survival_build_task = nil
+            end
+        end
+        return false
+    end, "queue_building_" .. tostring(caster:entindex()))
+    notify(caster:GetPlayerOwnerID(), check.definition.display_name .. "正在前往建造位置")
+    return { ok = true, moving = true, target = target }
 end
 local function query_building(payload)
     local state = buildings[payload.entindex]
@@ -298,6 +516,13 @@ local function on_entity_killed(payload)
         footprint = state.definition.footprint,
     })
     event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
+    if (state.definition.population_cost or 0) > 0 then
+        event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+            team = state.team,
+            population = state.definition.population_cost,
+            reason = "building_destroyed:" .. state.building_id,
+        })
+    end
     if state.building_id == "main_city" then
         GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
     end
@@ -343,7 +568,7 @@ function M.init()
     wall_ever_built = {}
     event_bus.handle_request(events.BUILD_CAN_PLACE_REQUEST, can_place)
     event_bus.handle_request(events.BUILDING_QUERY_REQUEST, query_building)
-    event_bus.subscribe(events.BUILD_REQUEST, create_building)
+    event_bus.subscribe(events.BUILD_REQUEST, queue_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     logger.info("BuildingSystem", "initialized")

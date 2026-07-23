@@ -21,13 +21,36 @@ local function series_stage(context, series_id)
     return stage
 end
 
+local function hero_technology(entry)
+    local group = entry.definition
+        and entry.definition.technology_group or ""
+    return string.match(group, "^researcher_hero_") ~= nil
+end
+
 function M.evaluate(player_id, entry, context)
     local count = context.purchased_count[player_id]
         and context.purchased_count[player_id][entry.entryid] or 0
     local resources = context.resources or {}
     local limit = number(entry.purchase_limit)
 
-    if entry.enabled == false then
+    if not context.gold_mine_ability and context.ui_mode == "research" then
+        if entry.contenttype ~= "technology"
+            and entry.contenttype ~= "technology_service" then
+            return false, "该内容不属于研究所", count
+        end
+        if entry.contenttype == "technology" and hero_technology(entry) then
+            return false, "英雄科技请在商店中研究", count
+        end
+    elseif not context.gold_mine_ability then
+        if entry.contenttype == "technology_service" then
+            return false, "科技解锁服务请在研究所中使用", count
+        end
+        if entry.contenttype == "technology" and not hero_technology(entry) then
+            return false, "建筑与工人科技请在研究所中研究", count
+        end
+    end
+
+    if entry.enabled == false and not context.gold_mine_ability then
         return false,
             entry.disabled_reason_text ~= ""
                 and entry.disabled_reason_text
@@ -42,6 +65,46 @@ function M.evaluate(player_id, entry, context)
         return false, "已达到购买上限", count
     end
     local definition = entry.definition or {}
+    if entry.contenttype == "technology_service" then
+        if entry.contentid == "advanced_researcher_unlock" then
+            if context.advanced_researcher_unlocked == true then
+                return false, "高级研究员服务已解锁", count
+            end
+        elseif context.research_unlocked == true then
+            return false, "研究所科技服务已解锁", count
+        end
+    end
+    if entry.contenttype == "technology" then
+        if entry.technology_track == "advanced_researcher" then
+            if context.advanced_researcher_unlocked ~= true then
+                return false, "需要先解锁高级研究员服务", count
+            end
+        elseif context.research_unlocked ~= true then
+            return false, "需要先解锁研究所科技服务", count
+        end
+        local levels = context.technology_levels and context.technology_levels[player_id] or {}
+        local current = tonumber(levels[definition.technology_group]) or 0
+        local next_level = tonumber(definition.level) or 0
+        if next_level ~= current + 1 then
+            return false, current >= (tonumber(definition.max_level) or 0) and "已达到最高等级" or "请先完成前一级科技", current
+        end
+        if entry.technology_track == "advanced" then
+            local basic_level = tonumber(
+                levels[entry.unlock_technology_group] or 0
+            ) or 0
+            local required = tonumber(
+                definition.unlock_required_level
+            ) or 10
+            if basic_level < required then
+                return false,
+                    "需要对应普通科技达到Lv." .. required
+                        .. "（当前Lv." .. basic_level .. "）",
+                    current
+            end
+        elseif entry.technology_track == "advanced_researcher" then
+            -- 高级研究员服务已在科技入口处统一校验。
+        end
+    end
     if definition.progression_type == "repeat_purchase"
         and definition.series_id and definition.series_id ~= "" then
         local current_stage = series_stage(context, definition.series_id)

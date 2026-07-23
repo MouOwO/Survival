@@ -4,6 +4,8 @@ local scheduler = require("core/scheduler")
 local team_alignment = require("core/team_alignment")
 local wave_rows = require("config/generated/wave_definitions")
 local archetypes = require("config/generated/monster_archetypes")
+local spawn_points = require("config/generated/monster_spawn_points")
+local monster_spawn_marker_service = require("systems/monster_spawn_marker")
 
 local M = {}
 local state = {}
@@ -13,9 +15,14 @@ local generation_token = 0
 local difficulty_id = "N1"
 local waves = {}
 local dev_mode = false
+local monster_spawn_marker = nil
 
 local function valid(entity)
     return entity and not entity:IsNull()
+end
+
+local function find_monster_spawn_marker()
+    return monster_spawn_marker_service.find()
 end
 
 local function reset()
@@ -118,8 +125,14 @@ local function spawn_one(row, token)
     state.pending = math.max(0, state.pending - 1)
     local definition = archetypes.by_id[row.archetype_id]
     if not definition then state.failed_spawn = state.failed_spawn + 1; publish("archetype_missing"); return end
-    local point = { x = 0, y = 1600, z = 128 }
-    local position = Vector(point.x, point.y, point.z) + RandomVector(100)
+    local marker = monster_spawn_marker or find_monster_spawn_marker()
+    if not marker then
+        state.failed_spawn = state.failed_spawn + 1
+        publish("monster_spawn_marker_missing")
+        return
+    end
+    monster_spawn_marker = marker
+    local position = marker:GetAbsOrigin() + RandomVector(100)
     position.z = GetGroundHeight(position, nil) + 32
     local unit = CreateUnitByName(definition.unit_name, position, true, nil, nil, DOTA_TEAM_BADGUYS)
     if not valid(unit) then state.failed_spawn = state.failed_spawn + 1; publish("unit_create_failed"); return end
@@ -254,6 +267,7 @@ end
 function M.get_difficulty() return difficulty_id end
 
 function M.init()
+    monster_spawn_marker = nil
     reset(); enemies = {}; wall_entindex = -1; generation_token = 0; dev_mode = false
     rebuild_waves()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)

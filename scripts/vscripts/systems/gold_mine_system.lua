@@ -4,45 +4,109 @@ local scheduler = require("core/scheduler")
 local config = require("config/gold_mine_config")
 
 local M = {}
-local mines = {}
+local state_by_entindex = {}
+local technology_by_player = {}
+local auto_upgrade_by_entindex = {}
+local auto_sequence = 0
+local upgrade_mine
+local GOLD_MINE_ABILITIES = {
+    level = "ability_upgrade_gold_mine",
+    efficiency = "ability_upgrade_gold_mine_efficiency",
+    crit = "ability_upgrade_gold_mine_crit",
+    auto = "ability_gold_mine_auto_upgrade",
+    stop_auto = "ability_gold_mine_stop_auto_upgrade",
+}
 
-local function valid_entity(entity)
+local function valid(entity)
     return entity and not entity:IsNull()
 end
 
-local function notify(state, message, level)
-    event_bus.emit(events.UI_NOTIFICATION, {
+local function technology_level(player_id, group)
+    local levels = technology_by_player[player_id]
+    if not levels then
+        local result = event_bus.request(
+            events.TECHNOLOGY_STATE_GET_REQUEST,
+            { player_id = player_id }
+        )
+        levels = result and result.levels or {}
+        technology_by_player[player_id] = levels
+    end
+    return tonumber(levels[group]) or 0
+end
+
+local function set_ability_visible(unit, ability_name, visible)
+    local ability = unit:FindAbilityByName(ability_name)
+    if not ability then return end
+    ability:SetHidden(not visible)
+    ability:SetActivated(visible)
+end
+
+local function sync_abilities(state)
+    if not valid(state.unit) then return end
+    local entindex = state.unit:entindex()
+    local auto = auto_upgrade_by_entindex[entindex] == true
+    local efficiency_level = technology_level(
+        state.player_id, "gold_mine_efficiency"
+    )
+    local crit_level = technology_level(state.player_id, "gold_mine_crit")
+    local mine_pending = state.mine_level < config.max_mine_level
+    local efficiency_pending = efficiency_level < config.max_efficiency_level
+    local crit_pending = crit_level < config.max_crit_level
+    local anything_pending = mine_pending or efficiency_pending or crit_pending
+
+    set_ability_visible(
+        state.unit, GOLD_MINE_ABILITIES.level, not auto and mine_pending
+    )
+    set_ability_visible(
+        state.unit, GOLD_MINE_ABILITIES.efficiency,
+        not auto and efficiency_pending
+    )
+    set_ability_visible(
+        state.unit, GOLD_MINE_ABILITIES.crit, not auto and crit_pending
+    )
+    set_ability_visible(
+        state.unit, GOLD_MINE_ABILITIES.auto, not auto and anything_pending
+    )
+    set_ability_visible(state.unit, GOLD_MINE_ABILITIES.stop_auto, auto)
+end
+
+local function publish(state)
+    if not valid(state.unit) then return end
+    sync_abilities(state)
+    local efficiency_level = technology_level(
+        state.player_id,
+        "gold_mine_efficiency"
+    )
+    local crit_level = technology_level(
+        state.player_id,
+        "gold_mine_crit"
+    )
+    event_bus.emit(events.GOLD_MINE_CHANGED, {
+        unit = state.unit,
+        entindex = state.unit:entindex(),
         player_id = state.player_id,
-        message = message,
-        level = level or "info",
+        team = state.team,
+        building_id = "gold_mine",
+        level = state.mine_level,
+        mine_level = state.mine_level,
+        efficiency_level = efficiency_level,
+        crit_level = crit_level,
+        income_per_second = config.normal_income(state.mine_level, efficiency_level),
+        efficiency_percent = config.efficiency_percent(efficiency_level),
+        crit_chance = config.crit_chance(crit_level),
+        crit_multiplier = config.crit_multiplier(state.mine_level),
+        auto_upgrading = auto_upgrade_by_entindex[state.unit:entindex()]
+            and 1 or 0,
+        max_mine_level = config.max_mine_level,
+        max_efficiency_level = config.max_efficiency_level,
+        max_crit_level = config.max_crit_level,
     })
 end
 
-local function public_state(state, reason)
-    return {
-        unit = state.unit,
-        entindex = state.unit:entindex(),
-        team = state.team,
-        player_id = state.player_id,
-        building_id = "gold_mine",
-        level = 1,
-        mine_level = state.mine_level,
-        crit_level = state.crit_level,
-        efficiency = state.mine_level,
-        normal_income = config.normal_income(state.mine_level),
-        crit_chance = config.crit_chance(state.crit_level),
-        crit_multiplier = config.crit_multiplier,
-        reason = reason,
-    }
-end
-
-local function publish(state, reason)
-    event_bus.emit(events.GOLD_MINE_CHANGED, public_state(state, reason))
-end
-
-local function state_from_mine(mine)
-    if not valid_entity(mine) then return nil end
-    return mines[mine:entindex()]
+local function state_from_payload(payload)
+    local entindex = tonumber(payload.entindex)
+    if not entindex or not state_by_entindex[entindex] then return nil end
+    return state_by_entindex[entindex]
 end
 
 local function spend(state, cost, reason)
@@ -55,98 +119,219 @@ local function spend(state, cost, reason)
     })
 end
 
-local function upgrade_efficiency(payload)
-    local state = state_from_mine(payload.mine)
-    if not state then return end
-    if state.mine_level >= config.max_level then
-        notify(state, "金矿采集效率已达到最高等级", "error")
-        return
-    end
-
-    local cost = config.efficiency_upgrade_cost(state.mine_level)
-    local result = spend(state, cost, "gold_mine_efficiency_upgrade")
-    if not result or not result.ok then
-        notify(state, result and result.error or "金币不足", "error")
-        return
-    end
-
-    state.mine_level = state.mine_level + 1
-    publish(state, "efficiency_upgraded")
-    notify(state, "金矿采集效率提升至Lv." .. tostring(state.mine_level))
+local function player_id_for(state)
+    return tonumber(state.player_id)
 end
 
-local function upgrade_crit(payload)
-    local state = state_from_mine(payload.mine)
-    if not state then return end
-    if state.crit_level >= config.max_crit_level then
-        notify(state, "金矿暴击率已达到最高等级", "error")
-        return
-    end
-
-    local cost = config.crit_upgrade_cost(state.crit_level)
-    local result = spend(state, cost, "gold_mine_crit_upgrade")
-    if not result or not result.ok then
-        notify(state, result and result.error or "金币不足", "error")
-        return
-    end
-
-    state.crit_level = state.crit_level + 1
-    publish(state, "crit_upgraded")
-    notify(state, string.format(
-        "金矿暴击率提升至Lv.%d（%d%%）",
-        state.crit_level,
-        config.crit_chance(state.crit_level)
-    ))
-end
-
-local function produce_income(state)
-    if not valid_entity(state.unit) or not state.unit:IsAlive() then return false end
-
-    local amount = config.normal_income(state.mine_level)
-    local chance = config.crit_chance(state.crit_level)
-    local critical = chance > 0 and RandomFloat(0, 100) < chance
-    if critical then amount = amount * config.crit_multiplier end
-
-    event_bus.request(events.RESOURCE_ADD_REQUEST, {
-        team = state.team,
-        gold = amount,
-        reason = critical and "gold_mine_critical_income" or "gold_mine_income",
+local function purchase_technology(state, group)
+    auto_sequence = auto_sequence + 1
+    return event_bus.request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, {
+        player_id = player_id_for(state),
+        technology_group = group,
+        source = "gold_mine_ability",
+        entindex = state.unit:entindex(),
+        request_id = "gold_mine_auto_"
+            .. tostring(state.unit:entindex()) .. "_" .. tostring(auto_sequence),
     })
-    return true
 end
 
-local function production_tick()
-    for entindex, state in pairs(mines) do
-        if not produce_income(state) then mines[entindex] = nil end
+local function auto_upgrade_step(entindex)
+    local state = state_by_entindex[entindex]
+    if not auto_upgrade_by_entindex[entindex]
+        or not state or not valid(state.unit) then
+        return false
     end
-    return true
+
+    local technology = technology_by_player[player_id_for(state)]
+    if not technology then
+        local result = event_bus.request(
+            events.TECHNOLOGY_STATE_GET_REQUEST,
+            { player_id = player_id_for(state) }
+        )
+        technology = result and result.levels or {}
+        technology_by_player[player_id_for(state)] = technology
+    end
+
+    if state.mine_level < config.max_mine_level then
+        local result = upgrade_mine({ entindex = entindex })
+        if result and result.ok then return 1.0 end
+        return 2.0
+    end
+
+    local efficiency_level = tonumber(technology.gold_mine_efficiency) or 0
+    if efficiency_level < config.max_efficiency_level then
+        local result = purchase_technology(state, "gold_mine_efficiency")
+        if result and result.ok then
+            technology.gold_mine_efficiency = efficiency_level + 1
+            publish(state)
+            return 1.0
+        end
+        return 2.0
+    end
+
+    local crit_level = tonumber(technology.gold_mine_crit) or 0
+    if crit_level < config.max_crit_level then
+        local result = purchase_technology(state, "gold_mine_crit")
+        if result and result.ok then
+            technology.gold_mine_crit = crit_level + 1
+            publish(state)
+            return 1.0
+        end
+        return 2.0
+    end
+
+    auto_upgrade_by_entindex[entindex] = nil
+    publish(state)
+    event_bus.emit(events.UI_NOTIFICATION, {
+        player_id = player_id_for(state),
+        message = "金矿本体、收益和暴击科技均已满级",
+        level = "info",
+    })
+    return false
 end
 
-local function on_building_created(payload)
-    if payload.building_id ~= "gold_mine" or not valid_entity(payload.unit) then return end
-    local state = {
+local function toggle_auto_upgrade(payload)
+    local state = state_from_payload(payload)
+    if not state then return { ok = false, message = "金矿不存在" } end
+    local entindex = state.unit:entindex()
+    if auto_upgrade_by_entindex[entindex] then
+        auto_upgrade_by_entindex[entindex] = nil
+        scheduler.cancel("gold_mine_auto_upgrade_" .. tostring(entindex))
+        publish(state)
+        return { ok = true, message = "已停止金矿自动升级" }
+    end
+    auto_upgrade_by_entindex[entindex] = true
+    publish(state)
+    scheduler.after(
+        0,
+        function() return auto_upgrade_step(entindex) end,
+        "gold_mine_auto_upgrade_" .. tostring(entindex)
+    )
+    return { ok = true, message = "已开始金矿自动升级" }
+end
+
+local function apply_level_stats(state)
+    local data = config.level_data(state.mine_level)
+    if not data or not valid(state.unit) then return end
+    state.unit:SetBaseMaxHealth(data.health)
+    state.unit:SetMaxHealth(data.health)
+    state.unit:SetHealth(data.health)
+    state.unit:SetPhysicalArmorBaseValue(data.armor)
+    state.unit.survival_level = state.mine_level
+end
+
+upgrade_mine = function(payload)
+    local state = state_from_payload(payload)
+    if not state then return { ok = false, error = "金矿不存在" } end
+    if state.mine_level >= config.max_mine_level then
+        return { ok = false, error = "金矿已达到最高等级" }
+    end
+    local cost = config.mine_upgrade_cost(state.mine_level)
+    if not cost then
+        return { ok = false, error = "金矿下一等级升级费用未配置" }
+    end
+    local result = spend(state, cost, "gold_mine_level_upgrade")
+    if not result or not result.ok then return result end
+    state.mine_level = state.mine_level + 1
+    state.unit.__building_level = state.mine_level
+    apply_level_stats(state)
+    publish(state)
+    event_bus.emit(events.BUILDING_CHANGED, {
+        unit = state.unit, entindex = state.unit:entindex(),
+        player_id = state.player_id, team = state.team,
+        building_id = "gold_mine", level = state.mine_level,
+    })
+    return { ok = true, level = state.mine_level }
+end
+
+local function on_technology_changed(payload)
+    technology_by_player[payload.player_id] = payload.levels or {}
+    for _, state in pairs(state_by_entindex) do
+        if state.player_id == payload.player_id then
+            publish(state)
+        end
+    end
+end
+
+local function on_created(payload)
+    if payload.building_id ~= "gold_mine" or not valid(payload.unit) then return end
+    local entindex = payload.unit:entindex()
+    state_by_entindex[entindex] = {
         unit = payload.unit,
-        team = payload.team,
         player_id = payload.player_id,
-        mine_level = 1,
-        crit_level = 0,
+        team = payload.team,
+        mine_level = tonumber(payload.level) or 1,
     }
-    mines[payload.entindex] = state
-    publish(state, "created")
+    publish(state_by_entindex[entindex])
 end
 
-local function on_building_destroyed(payload)
-    if payload.building_id ~= "gold_mine" then return end
-    mines[payload.entindex] = nil
+local function on_destroyed(payload)
+    if payload.building_id == "gold_mine" then
+        local entindex = tonumber(payload.entindex)
+        auto_upgrade_by_entindex[entindex] = nil
+        scheduler.cancel("gold_mine_auto_upgrade_" .. tostring(entindex))
+        state_by_entindex[payload.entindex] = nil
+    end
+end
+
+local function tick()
+    for entindex, state in pairs(state_by_entindex) do
+        if not valid(state.unit) or not state.unit:IsAlive() then
+            state_by_entindex[entindex] = nil
+        else
+            local efficiency_level = technology_level(
+                state.player_id,
+                "gold_mine_efficiency"
+            )
+            local crit_level = technology_level(
+                state.player_id,
+                "gold_mine_crit"
+            )
+            local crit = RandomFloat(0, 100) < config.crit_chance(crit_level)
+            local amount = config.income_amount(
+                state.mine_level,
+                efficiency_level,
+                crit
+            )
+            local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                team = state.team, gold = amount,
+                reason = crit and "gold_mine_critical_income" or "gold_mine_income",
+            })
+            if result and result.ok then
+                local player = PlayerResource:GetPlayer(state.player_id)
+                SendOverheadEventMessage(
+                    player,
+                    OVERHEAD_ALERT_GOLD,
+                    state.unit,
+                    amount,
+                    nil
+                )
+                if crit then
+                    SendOverheadEventMessage(
+                        player,
+                        OVERHEAD_ALERT_CRITICAL,
+                        state.unit,
+                        amount,
+                        nil
+                    )
+                end
+            end
+        end
+    end
+    return config.production_interval
 end
 
 function M.init()
-    mines = {}
-    event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
-    event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
-    event_bus.subscribe(events.GOLD_MINE_UPGRADE_REQUEST, upgrade_efficiency)
-    event_bus.subscribe(events.GOLD_MINE_CRIT_UPGRADE_REQUEST, upgrade_crit)
-    scheduler.every(config.production_interval, production_tick, "gold_mine_production")
+    state_by_entindex = {}
+    technology_by_player = {}
+    auto_upgrade_by_entindex = {}
+    auto_sequence = 0
+    event_bus.handle_request(events.GOLD_MINE_AUTO_UPGRADE_REQUEST, toggle_auto_upgrade)
+    event_bus.handle_request(events.GOLD_MINE_LEVEL_UPGRADE_REQUEST, upgrade_mine)
+    event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
+    event_bus.subscribe(events.BUILDING_CREATED, on_created)
+    event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)
+    scheduler.every(config.production_interval, tick, "gold_mine_production")
 end
 
 return M

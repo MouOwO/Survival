@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local stages = require("config/generated/builder_ability_stages")
+local training = require("config/generated/training_definitions")
 
 local M = {}
 
@@ -150,6 +151,20 @@ local function on_hero_ready(payload)
     local state = ensure(payload.team)
     state.hero = payload.hero
     state.player_id = payload.player_id
+    local repair = (training.by_id or {}).train_repairer_01 or {}
+    if valid_entity(payload.hero)
+        and not payload.hero:HasModifier("modifier_repair_worker_ai") then
+        payload.hero:AddNewModifier(
+            payload.hero,
+            nil,
+            "modifier_repair_worker_ai",
+            {
+                repair_per_second = tonumber(repair.repair_per_second)
+                    or 10000,
+                repair_range = tonumber(repair.repair_range) or 200,
+            }
+        )
+    end
     managed_abilities = {}
     for _, row in ipairs(stages.rows or {}) do
         managed_abilities[row.ability_name] = true

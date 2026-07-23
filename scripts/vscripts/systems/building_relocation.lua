@@ -16,7 +16,22 @@ function building_system.move(unit, position)
         footprint = state.definition.footprint,
     })
     print(string.format("[BuildingBlink] SetAbsOrigin begin ent=%d target=(%.1f,%.1f,%.1f)", unit:entindex(), position.x, position.y, position.z))
+    unit:Stop()
+    if unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
+    if unit.survival_projectile_model and unit.SetRangedProjectileName then
+        unit:SetRangedProjectileName(unit.survival_projectile_model)
+    end
+    local auto_attack = unit:FindModifierByName("modifier_tower_auto_attack")
+    if auto_attack and auto_attack.ResetTarget then auto_attack:ResetTarget() end
+    local attack_effects = unit:FindModifierByName("modifier_tower_attack_effects")
+    if attack_effects and attack_effects.ResetAfterRelocation then
+        attack_effects:ResetAfterRelocation()
+    end
+    unit:RemoveModifierByName("modifier_building_stationary")
     unit:SetAbsOrigin(position)
+    unit:AddNewModifier(unit, nil, "modifier_building_blink_move", {
+        x = position.x, y = position.y, z = position.z,
+    })
     state.grid_x = math.floor(position.x / 128)
     state.grid_y = math.floor(position.y / 128)
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
@@ -25,6 +40,30 @@ function building_system.move(unit, position)
         entindex = unit:entindex(),
     })
     event_bus.emit(events.BUILDING_CHANGED, building_system.public_state(state))
+    GameRules:GetGameModeEntity():SetContextThink(
+        "building_relocation_refresh_" .. tostring(unit:entindex()),
+        function()
+            if not unit or unit:IsNull() then return nil end
+            unit:SetAbsOrigin(position)
+            unit:Stop()
+            if unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
+            if unit.survival_projectile_model
+                and unit.SetRangedProjectileName then
+                unit:SetRangedProjectileName(unit.survival_projectile_model)
+            end
+            local effects = unit:FindModifierByName("modifier_tower_attack_effects")
+            if effects and effects.ResetAfterRelocation then
+                effects:ResetAfterRelocation()
+            end
+            print(string.format(
+                "[BuildingBlink] network refresh ent=%d actual=(%.1f,%.1f,%.1f)",
+                unit:entindex(), unit:GetAbsOrigin().x,
+                unit:GetAbsOrigin().y, unit:GetAbsOrigin().z
+            ))
+            return nil
+        end,
+        0.06
+    )
     print(string.format("[BuildingBlink] SetAbsOrigin done ent=%d actual=(%.1f,%.1f,%.1f)", unit:entindex(), unit:GetAbsOrigin().x, unit:GetAbsOrigin().y, unit:GetAbsOrigin().z))
     return true
 end

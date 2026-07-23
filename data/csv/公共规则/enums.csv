@@ -1,5 +1,5 @@
-ï»¿enum_name,enum_value,sort_order,enabled,notes
-#ä¸­æ–‡å:æšä¸¾åç§°,æšä¸¾å€¼,æ’åº,æ˜¯å¦å¯ç”¨,å¤‡æ³¨
+enum_name,enum_value,sort_order,enabled,notes
+#ÖĞÎÄÃû:Ã¶¾ÙÃû³Æ,Ã¶¾ÙÖµ,ÅÅĞò,ÊÇ·ñÆôÓÃ,±¸×¢
 #types:string,string,number,boolean,string
 content_type,weapon,1,1,
 content_type,equipment,2,1,

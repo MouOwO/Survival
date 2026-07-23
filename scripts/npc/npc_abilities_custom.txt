@@ -36,6 +36,30 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_build_research_lab"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_research_lab"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "tinker_rearm"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_build_farm"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_farm"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "chen_holy_persuasion"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
     "ability_upgrade_wall"
     {
         "BaseClass"          "ability_lua"
@@ -60,12 +84,48 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_upgrade_farm"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_farm"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_sprout"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_train_population"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_train_population"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "chen_holy_persuasion"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
     "ability_train_lumberjack"
     {
         "BaseClass"          "ability_lua"
         "ScriptFile"         "abilities/ability_train_lumberjack"
         "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
         "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "1.0"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_train_repairer"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_train_repairer"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "wisp_tether"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
         "AbilityCooldown"    "1.0"
@@ -209,6 +269,18 @@
         "BaseClass"          "ability_lua"
         "ScriptFile"         "abilities/ability_upgrade_gold_mine"
         "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "tinker_rearm"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.2"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_upgrade_gold_mine_efficiency"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_upgrade_gold_mine_efficiency"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
         "AbilityTextureName" "alchemist_goblins_greed"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
@@ -222,6 +294,30 @@
         "ScriptFile"         "abilities/ability_upgrade_gold_mine_crit"
         "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
         "AbilityTextureName" "phantom_assassin_coup_de_grace"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.2"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_gold_mine_auto_upgrade"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_gold_mine_auto_upgrade"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "tinker_rearm"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.2"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_gold_mine_stop_auto_upgrade"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_gold_mine_auto_upgrade"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "tinker_rearm"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
         "AbilityCooldown"    "0.2"

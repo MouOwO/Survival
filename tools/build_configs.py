@@ -71,6 +71,11 @@ def build(source: Path, output: Path) -> None:
             continue
         if fields[0].strip().startswith("#"):
             continue
+        if len(fields) < len(headers):
+            # CSV schemas may add optional columns at the end. Older rows are
+            # equivalent to leaving those trailing cells empty, so normalize
+            # them without accepting missing or shifted columns in the middle.
+            fields.extend([""] * (len(headers) - len(fields)))
         if len(fields) != len(headers):
             raise ValueError(
                 f"CSV column count mismatch: {source}"

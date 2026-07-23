@@ -1,0 +1,8 @@
+hero_id,projectile_speed,projectile_model,enabled,notes
+#中文名:英雄ID,弹道速度,弹道特效资源,是否启用,备注
+#types:string,number,string,boolean,string
+hero_axe,,,1,速度为空时按近战攻击处理；攻击距离仍读取英雄表。
+hero_slark,900,particles/units/heroes/hero_drow/drow_base_attack.vpcf,1,远程箭矢弹道。
+hero_juggernaut,,,1,速度为空时按近战攻击处理；攻击距离仍读取英雄表。
+hero_monkey_king,900,particles/units/heroes/hero_drow/drow_base_attack.vpcf,1,远程箭矢弹道。
+hero_blademaster,900,particles/units/heroes/hero_drow/drow_base_attack.vpcf,1,远程箭矢弹道。

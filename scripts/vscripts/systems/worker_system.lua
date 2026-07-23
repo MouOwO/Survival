@@ -1,11 +1,25 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/workers_config")
+local training_definitions = require("config/generated/training_definitions")
+local global_rules = require("config/global_rules")
 
 local M = {}
 local workers = {}
 local current_tree_entindex = -1
 local tree_lumber_efficiency_buff = 0
+local technology_levels = {}
+local population_training_counts = {}
+
+local function sync_technology_levels(player_id)
+    local result = event_bus.request(
+        events.TECHNOLOGY_STATE_GET_REQUEST,
+        { player_id = player_id }
+    )
+    if result and result.levels then
+        technology_levels[player_id] = result.levels
+    end
+end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -82,19 +96,76 @@ local function notify(player_id, message, level)
     })
 end
 
+local function technology_level(player_id, group)
+    local levels = technology_levels[player_id] or {}
+    return tonumber(levels[group]) or 0
+end
+
+local function refresh_worker_technology(player_id)
+    local basic_efficiency = technology_level(player_id, "lumberjack_efficiency")
+    local advanced_efficiency = technology_level(player_id, "advanced_lumberjack_efficiency") * 3
+    local speed_pct = technology_level(player_id, "lumberjack_speed") * 5
+    local interval_reduction = technology_level(player_id, "advanced_lumberjack_speed") * 0.01
+    local crit_chance = technology_level(player_id, "lumberjack_crit") * 3
+    local attack_growth = technology_level(player_id, "researcher_lumberjack_attack_growth") * 2
+    local armor_reduction = technology_level(player_id, "researcher_lumberjack_armor_reduction") * 0.1
+    for entindex, state in pairs(workers) do
+        if state.worker_type == "lumberjack"
+            and state.player_id == player_id and valid_entity(state.unit) then
+            local speed = math.max(0.01, (tonumber(config.attack_rate) or 0.5) * (1 + speed_pct / 100))
+            local base_interval = 1 / speed
+            state.unit:SetBaseAttackTime(math.max(0.05, base_interval - interval_reduction))
+            local base_min = tonumber(state.base_damage_min)
+            local base_max = tonumber(state.base_damage_max)
+            if base_min ~= nil and base_max ~= nil then
+                state.unit:SetBaseDamageMin(base_min + attack_growth)
+                state.unit:SetBaseDamageMax(base_max + attack_growth)
+                state.unit.survival_attack_min = base_min + attack_growth
+                state.unit.survival_attack_max = base_max + attack_growth
+            end
+            state.technology_attack_growth = attack_growth
+            state.technology_armor_reduction = armor_reduction
+            state.technology_efficiency = basic_efficiency + advanced_efficiency
+            local modifier = state.unit:FindModifierByName("modifier_lumberjack_ai")
+            if modifier and modifier.SetTechnologyLumberEfficiency then
+                modifier:SetTechnologyLumberEfficiency(state.technology_efficiency)
+            end
+            if modifier and modifier.SetTechnologyCritChance then
+                modifier:SetTechnologyCritChance(crit_chance)
+            end
+            if modifier and modifier.SetTechnologyArmorReduction then
+                modifier:SetTechnologyArmorReduction(armor_reduction)
+            end
+        end
+    end
+end
+
+local function on_technology_changed(payload)
+    technology_levels[payload.player_id] = payload.levels or {}
+    refresh_worker_technology(payload.player_id)
+end
+
 local function update_worker_efficiency()
     for entindex, state in pairs(workers) do
         if valid_entity(state.unit) then
-            state.tree_lumber_efficiency_buff = tree_lumber_efficiency_buff
-            state.lumber_efficiency = (state.base_lumber_efficiency or 0)
-                + tree_lumber_efficiency_buff
-            local modifier = state.unit:FindModifierByName(
-                "modifier_lumberjack_ai"
-            )
-            if modifier and modifier.SetTreeLumberEfficiency then
-                modifier:SetTreeLumberEfficiency(
-                    tree_lumber_efficiency_buff
+            if state.worker_type == "lumberjack" then
+                state.tree_lumber_efficiency_buff = tree_lumber_efficiency_buff
+                state.lumber_efficiency = (state.base_lumber_efficiency or 0)
+                    + tree_lumber_efficiency_buff
+                    + (state.technology_efficiency or 0)
+                local modifier = state.unit:FindModifierByName(
+                    "modifier_lumberjack_ai"
                 )
+                if modifier and modifier.SetTreeLumberEfficiency then
+                    modifier:SetTreeLumberEfficiency(
+                        tree_lumber_efficiency_buff
+                    )
+                end
+                if modifier and modifier.SetTechnologyLumberEfficiency then
+                    modifier:SetTechnologyLumberEfficiency(
+                        state.technology_efficiency or 0
+                    )
+                end
             end
         else
             workers[entindex] = nil
@@ -105,9 +176,13 @@ end
 local function update_worker_targets()
     for entindex, state in pairs(workers) do
         if valid_entity(state.unit) then
-            local modifier = state.unit:FindModifierByName("modifier_lumberjack_ai")
-            if modifier and modifier.SetTreeEntIndex then
-                modifier:SetTreeEntIndex(current_tree_entindex)
+            if state.worker_type == "lumberjack" then
+                local modifier = state.unit:FindModifierByName(
+                    "modifier_lumberjack_ai"
+                )
+                if modifier and modifier.SetTreeEntIndex then
+                    modifier:SetTreeEntIndex(current_tree_entindex)
+                end
             end
         else
             workers[entindex] = nil
@@ -117,21 +192,89 @@ end
 
 local function train_worker(payload)
     local city = payload.city
-    if not valid_entity(city) then return { ok = false, error = "invalid_city" } end
+    if not valid_entity(city) then
+        print("[WorkerTrain] invalid city entity")
+        return { ok = false, error = "invalid_city" }
+    end
 
     local city_state = event_bus.request(events.BUILDING_QUERY_REQUEST, {
         entindex = city:entindex(),
     })
-    if not city_state or city_state.building_id ~= "main_city" then
+    if not city_state then
+        print("[WorkerTrain] main city state missing entindex="
+            .. tostring(city:entindex()))
+        notify(city:GetPlayerOwnerID(), "主城训练状态尚未初始化", "error")
+        return { ok = false, error = "training_building_missing" }
+    end
+
+    local training_id = tostring(
+        payload.training_id or "train_lumberjack_01"
+    )
+    if training_id == "train_population_auto" then
+        if city_state.building_id ~= "building_farm"
+            and city_state.building_id ~= "farm" then
+            return { ok = false, error = "not_population_farm" }
+        end
+        training_id = string.format(
+            "train_population_%02d",
+            math.max(2, math.min(6, (tonumber(city_state.level) or 1) + 1))
+        )
+    elseif city_state.building_id ~= "main_city" then
         return { ok = false, error = "not_main_city" }
+    end
+    local training = (training_definitions.by_id or {})[training_id]
+    if not training or training.enabled == false then
+        return { ok = false, error = "training_definition_invalid" }
+    end
+    if training.training_type == "population_upgrade" then
+        local team = city_state.team
+        population_training_counts[team] = population_training_counts[team] or {}
+        local count = population_training_counts[team][training_id] or 0
+        local maximum = tonumber(training.max_count) or 0
+        if maximum > 0 and count >= maximum then
+            return { ok = false, error = "该等级人口训练已达上限" }
+        end
+        local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+            team = team,
+            wood = (tonumber(training.wood_cost) or 0)
+                + count * (tonumber(training.wood_cost_increment) or 0),
+            gold = (tonumber(training.gold_cost) or 0)
+                + count * (tonumber(training.gold_cost_increment) or 0),
+            population = 0,
+            reason = "train:" .. training_id,
+        })
+        if not spend or not spend.ok then return spend end
+        population_training_counts[team][training_id] = count + 1
+        event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            team = team,
+            max_population = tonumber(training.population_add) or 0,
+            reason = "population_training:" .. training_id,
+        })
+        notify(city_state.player_id, tostring(training.name) .. "完成")
+        return { ok = true, population_add = training.population_add }
+    end
+    if training.training_type ~= "unit" then
+        return { ok = false, error = "training_type_invalid" }
+    end
+    sync_technology_levels(city_state.player_id)
+
+    local existing_count = 0
+    for _, state in pairs(workers) do
+        if state.training_id == training_id and valid_entity(state.unit) then
+            existing_count = existing_count + 1
+        end
+    end
+    local max_count = tonumber(training.max_count) or 0
+    if max_count > 0 and existing_count >= max_count then
+        return { ok = false, error = "training_max_count_reached" }
     end
 
     local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         team = city_state.team,
-        wood = config.cost.wood,
-        gold = config.cost.gold,
-        population = config.cost.population,
-        reason = "train_lumberjack",
+        wood = tonumber(training.wood_cost) or 0,
+        gold = tonumber(training.gold_cost) or 0,
+        population = tonumber(training.population_cost) or 0,
+        reason = "train:" .. training_id,
     })
     if not spend or not spend.ok then
         notify(city_state.player_id, spend and spend.error or "resource_error", "error")
@@ -140,7 +283,7 @@ local function train_worker(payload)
 
     local spawn_position = find_worker_spawn_position(city)
     local worker = CreateUnitByName(
-        config.unit_name,
+        training.unit_name or config.unit_name,
         spawn_position,
         true,
         city,
@@ -150,50 +293,92 @@ local function train_worker(payload)
     if not worker then
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
             team = city_state.team,
-            wood = config.cost.wood,
-            gold = config.cost.gold,
-            reason = "train_lumberjack_refund",
+            wood = tonumber(training.wood_cost) or 0,
+            gold = tonumber(training.gold_cost) or 0,
+            reason = "train_refund:" .. training_id,
         })
         event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
             team = city_state.team,
-            population = config.cost.population,
-            reason = "train_lumberjack_refund",
+            population = tonumber(training.population_cost) or 0,
+            reason = "train_refund:" .. training_id,
         })
         return { ok = false, error = "worker_create_failed" }
     end
 
     FindClearSpaceForUnit(worker, spawn_position, true)
     worker:SetControllableByPlayer(city_state.player_id, true)
-    worker:SetBaseMaxHealth(config.health)
-    worker:SetMaxHealth(config.health)
-    worker:SetHealth(config.health)
-    worker:SetPhysicalArmorBaseValue(config.armor)
-    worker:SetBaseDamageMin(config.damage_min)
-    worker:SetBaseDamageMax(config.damage_max)
-    local attack_speed = math.max(0.01, tonumber(config.attack_rate) or 0.5)
+    local health = tonumber(training.health) or config.health
+    worker:SetBaseMaxHealth(health)
+    worker:SetMaxHealth(health)
+    worker:SetHealth(health)
+    worker:SetPhysicalArmorBaseValue(tonumber(training.armor) or config.armor)
+    local base_attack = tonumber(training.base_attack)
+    if base_attack ~= nil then
+        worker:SetBaseDamageMin(base_attack)
+        worker:SetBaseDamageMax(base_attack)
+    end
+    local attack_speed = math.max(
+        0.01,
+        tonumber(training.attack_rate) or config.attack_rate or 0.5
+    )
     worker:SetBaseAttackTime(1 / attack_speed)
     worker.survival_attack_speed = attack_speed
     if not worker:HasModifier("modifier_debug_attack_cap") then
         worker:AddNewModifier(worker, nil, "modifier_debug_attack_cap", {})
     end
-    worker:SetBaseMoveSpeed(config.move_speed)
-    worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
-        tree_entindex = current_tree_entindex,
-        base_lumber_efficiency = config.wood_per_hit or 1,
-        tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
-    })
+    worker:SetBaseMoveSpeed(tonumber(training.move_speed) or config.move_speed)
+    local is_repairer = training_id:match("^train_repairer_") ~= nil
+    if is_repairer then
+        worker:SetBaseDamageMin(0)
+        worker:SetBaseDamageMax(0)
+        if worker.SetAttackCapability then
+            worker:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+        end
+        worker.survival_worker_type = "repairer"
+        if training.model_name and training.model_name ~= "" then
+            worker:SetModel(training.model_name)
+            worker:SetOriginalModel(training.model_name)
+        end
+        worker:AddNewModifier(worker, nil, "modifier_repair_worker_ai", {
+            repair_per_second = tonumber(training.repair_per_second) or 0,
+            repair_range = tonumber(training.repair_range) or 200,
+            detection_range = global_rules.repair_detection_range,
+        })
+    else
+        worker.survival_worker_type = "lumberjack"
+        worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
+            tree_entindex = current_tree_entindex,
+            base_lumber_efficiency = tonumber(training.wood_per_hit)
+                or config.wood_per_hit or 1,
+            tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
+            technology_lumber_efficiency = technology_level(city_state.player_id, "lumberjack_efficiency") + technology_level(city_state.player_id, "advanced_lumberjack_efficiency") * 3,
+            technology_crit_chance = technology_level(city_state.player_id, "lumberjack_crit") * 3,
+            technology_armor_reduction = technology_level(city_state.player_id, "researcher_lumberjack_armor_reduction") * 0.1,
+            player_id = city_state.player_id,
+        })
+    end
 
     workers[worker:entindex()] = {
         unit = worker,
         team = city_state.team,
         player_id = city_state.player_id,
-        population = config.cost.population,
-        base_lumber_efficiency = config.wood_per_hit or 1,
+        population = tonumber(training.population_cost) or 0,
+        training_id = training_id,
+        worker_type = is_repairer and "repairer" or "lumberjack",
+        base_damage_min = base_attack,
+        base_damage_max = base_attack,
+        base_lumber_efficiency = tonumber(training.wood_per_hit) or 0,
         tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
-        lumber_efficiency = (config.wood_per_hit or 1)
-            + tree_lumber_efficiency_buff,
+        technology_efficiency = technology_level(city_state.player_id, "lumberjack_efficiency") + technology_level(city_state.player_id, "advanced_lumberjack_efficiency") * 3,
+        lumber_efficiency = (tonumber(training.wood_per_hit) or 0)
+            + tree_lumber_efficiency_buff
+            + technology_level(city_state.player_id, "lumberjack_efficiency")
+            + technology_level(city_state.player_id, "advanced_lumberjack_efficiency") * 3,
     }
-    notify(city_state.player_id, "伐木工训练完成")
+    if not is_repairer then
+        refresh_worker_technology(city_state.player_id)
+    end
+    notify(city_state.player_id, tostring(training.name) .. "训练完成")
     event_bus.emit(events.WORKER_CHANGED, {
         team = city_state.team,
         count_delta = 1,
@@ -241,10 +426,13 @@ function M.init()
     workers = {}
     current_tree_entindex = -1
     tree_lumber_efficiency_buff = 0
+    technology_levels = {}
+    population_training_counts = {}
     event_bus.subscribe(events.WORKER_TRAIN_REQUEST, train_worker)
     event_bus.subscribe(events.TREE_SPAWNED, on_tree_spawned)
     event_bus.subscribe(events.TREE_DESTROYED, on_tree_destroyed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
+    event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
 end
 
 return M

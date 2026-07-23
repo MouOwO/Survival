@@ -1,14 +1,22 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
-local M = class({})
 
-function M:GetBehavior() return DOTA_ABILITY_BEHAVIOR_NO_TARGET end
-function M:GetManaCost() return 0 end
-function M:OnSpellStart()
-    event_bus.emit(events.GOLD_MINE_UPGRADE_REQUEST, {
-        mine = self:GetCaster(),
+local M = class({})
+ability_upgrade_gold_mine = M
+
+function ability_upgrade_gold_mine:OnSpellStart()
+    local caster = self:GetCaster()
+    local result = event_bus.request(events.GOLD_MINE_LEVEL_UPGRADE_REQUEST, {
+        entindex = caster:entindex(),
     })
+    if result and not result.ok then
+        local player_id = caster:GetPlayerOwnerID()
+        event_bus.emit(events.UI_NOTIFICATION, {
+            player_id = player_id,
+            message = result.error or "金矿升级失败",
+            level = "error",
+        })
+    end
 end
 
-_G.ability_upgrade_gold_mine = M
 return M

@@ -7,8 +7,6 @@ local wave_system = require("systems/wave_system")
 
 local M = {}
 
-local RESOURCE_AMOUNT = 100000000
-
 local HERO_ALIASES = {
     axe = "hero_axe",
     slark = "hero_slark",
@@ -82,14 +80,8 @@ local function show_shop(context)
 end
 
 local function enable_dev(context)
-    local result = event_bus.request(events.RESOURCE_DEBUG_SET_REQUEST, {
-        team = context.team, amount = 100000000, reason = "cheat_dev"
-    })
-    if not result or not result.ok then
-        return false, result and result.error or "debug_resource_failed"
-    end
     wave_system.set_dev_mode(true)
-    notify(context, "开发者模式已开启：停止自动出怪，资源已设为100000000")
+    notify(context, "开发者模式已开启：停止自动出怪，资源保持不变")
     return true
 end
 
@@ -100,15 +92,84 @@ local function spawn_wave(context)
     return ok, err
 end
 
-local function add_resource(context)
-    local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+local function signed_amount(context, command)
+    local amount = tonumber(context.args[1])
+    if not amount then
+        return nil, "usage: " .. command .. " <amount>"
+    end
+    if amount >= 0 then
+        return math.floor(amount)
+    end
+    return math.ceil(amount)
+end
+
+local function change_resource(context, resource_name, command)
+    local amount, error_code = signed_amount(context, command)
+    if amount == nil then
+        return false, error_code
+    end
+    local changes = {
         team = context.team,
-        wood = RESOURCE_AMOUNT,
-        gold = RESOURCE_AMOUNT,
-        reason = "cheat_addresource",
+        wood = 0,
+        gold = 0,
+        reason = "cheat_" .. command,
+    }
+    changes[resource_name] = amount
+    local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        team = changes.team,
+        wood = changes.wood,
+        gold = changes.gold,
+        reason = changes.reason,
     })
     return result and result.ok == true,
         result and result.error or "resource_request_failed"
+end
+
+local function add_gold(context)
+    return change_resource(context, "gold", "addgold")
+end
+
+local function add_wood(context)
+    return change_resource(context, "wood", "addwood")
+end
+
+local function add_monster(context)
+    local health = tonumber(context.args[1])
+    local armor = tonumber(context.args[2])
+    if not health or health <= 0 or not armor then
+        return false, "usage: addmonster <health> <armor>"
+    end
+    local marker_service = require("systems/monster_spawn_marker")
+    local marker, marker_name = marker_service.find()
+    if not marker or marker:IsNull() then
+        return false, marker_service.configured_name()
+            .. "_not_found_rebuild_map"
+    end
+    health = math.max(1, math.floor(health))
+    local unit = CreateUnitByName(
+        "npc_survival_wave_monster", marker:GetAbsOrigin(), true,
+        nil, nil, DOTA_TEAM_BADGUYS
+    )
+    if not unit or unit:IsNull() then return false, "unit_create_failed" end
+    unit:SetBaseMaxHealth(health)
+    unit:SetMaxHealth(health)
+    unit:SetHealth(health)
+    unit:SetPhysicalArmorBaseValue(armor)
+    unit:SetBaseMoveSpeed(0)
+    unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
+    unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+    unit:SetAbsOrigin(marker:GetAbsOrigin())
+    if marker.GetForwardVector and unit.SetForwardVector then
+        unit:SetForwardVector(marker:GetForwardVector())
+    end
+    notify(context, string.format(
+        "测试怪已生成：生命 %d，护甲 %.1f", health, armor
+    ))
+    logger.info("CheatCommand", string.format(
+        "addmonster entindex=%d health=%d armor=%.1f marker=%s",
+        unit:entindex(), health, armor, tostring(marker_name)
+    ))
+    return true
 end
 
 local function set_vip(context)
@@ -245,7 +306,9 @@ end
 local COMMANDS = {
     dev = enable_dev,
     shopshow = show_shop,
-    addresource = add_resource,
+    addgold = add_gold,
+    addwood = add_wood,
+    addmonster = add_monster,
     addspeed = attack_speed_cheat.execute,
     setvip = set_vip,
     summonhero = summon_hero,
@@ -306,7 +369,7 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: resource, hero, skill, weapon growth, dev, monsterN"
+        "ready: addgold, addwood, addmonster, hero, skill, weapon growth, dev, monsterN"
     )
 end
 

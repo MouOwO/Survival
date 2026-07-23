@@ -7,5 +7,5 @@ arrow_tower,箭塔,building_arrow_tower,0,1,0,main_city_level>=1,ability_build_a
 building_farm,人口农场,building_farm,0,1,0,main_city_level>=1,ability_build_farm,0,,
 building_research_lab,研究所,building_research_lab,1,1,0,main_city_level>=1,ability_build_research_lab,1,,
 building_advanced_research_lab,高级研究所,building_advanced_research_lab,1,4,0,main_city_level>=4,ability_build_advanced_research_lab,1,,
-gold_mine,金矿,building_gold_mine,1,3,0,main_city_level>=3,ability_build_gold_mine,1,,主城3级解锁；具体建造费用由building_levels或正式配置补充。
+gold_mine,金矿,building_gold_mine,5,3,2,main_city_level>=3,ability_build_gold_mine,0,,主城3级解锁；最多5个；建造消耗2000木材，占用2人口。
 hero_altar,英雄祭坛,building_hero_altar,1,3,0,main_city_level>=3,ability_build_hero_altar,1,,主城3级后可建造；每位玩家只能召唤一个英雄。英雄召唤完成后祭坛仅作为普通建筑，商店UI同时解锁。建造费用300木材+100金币为暂定值。

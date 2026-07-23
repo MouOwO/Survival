@@ -2,6 +2,7 @@
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
+local combat_bootstrap = require("bootstrap/combat_bootstrap")
 print("[SURVIVAL_FINGERPRINT] addon_game_mode=20260720_1045_direct_building_path")
 local modifier_registry = require("core/modifier_registry")
 -- Explicit modifier links must execute during addon VM bootstrap, before any building is created.
@@ -27,6 +28,7 @@ assert(modifier_equipment_effects ~= nil, "modifier_equipment_effects bootstrap 
 print("[SURVIVAL_MODIFIER_BOOTSTRAP] weapon_attack_tracker=true weapon_stat_projection=true equipment_effects=true")
 modifier_registry.register()
 local ability_utils = require("core/ability_utils")
+local unit_display_names = require("config/generated/unit_display_names")
 
 local grid_system = require("systems/grid_system")
 local resource_system = require("systems/resource_system")
@@ -98,6 +100,8 @@ require("abilities/survival_hero_skill")
 require("abilities/ability_build_wall")
 require("abilities/ability_build_main_city")
 require("abilities/ability_build_arrow_tower")
+require("abilities/ability_build_research_lab")
+require("abilities/ability_build_farm")
 require("abilities/ability_building_blink")
 require("abilities/ability_build_gold_mine")
 require("abilities/ability_build_hero_altar")
@@ -110,13 +114,18 @@ require("abilities/ability_open_hero_altar")
 require("abilities/ability_upgrade_wall")
 require("abilities/ability_upgrade_city")
 require("abilities/ability_train_lumberjack")
+require("abilities/ability_train_repairer")
+require("abilities/ability_upgrade_farm")
+require("abilities/ability_train_population")
 require("abilities/ability_upgrade_tower")
 require("abilities/ability_upgrade_tower_lv01")
 require("abilities/ability_upgrade_tower_max")
 require("abilities/tower_upgrade_ability_factory")
 require("abilities/ability_tower_passive")
 require("abilities/ability_upgrade_gold_mine")
+require("abilities/ability_upgrade_gold_mine_efficiency")
 require("abilities/ability_upgrade_gold_mine_crit")
+require("abilities/ability_gold_mine_auto_upgrade")
 require("abilities/ability_tower_class_1")
 require("abilities/ability_tower_class_2")
 require("abilities/ability_tower_class_3")
@@ -163,6 +172,11 @@ local function on_hero_picked(keys)
 
     ability_utils.remove_all(hero)
     hero:SetGold(0, false)
+    local unit_name = hero:GetUnitName()
+    local display = (unit_display_names.by_id or {})[unit_name]
+    if display and display.enabled ~= false then
+        hero.survival_display_name = display.display_name
+    end
     FindClearSpaceForUnit(hero, Vector(0, 0, 256), true)
 
     local player_id = hero:GetPlayerOwnerID()
@@ -207,6 +221,8 @@ function M.precache(context)
         "building_wall",
         "building_main_city",
         "building_arrow_tower",
+        "building_research_lab",
+        "building_farm",
         "building_gold_mine",
         "building_hero_altar",
         "npc_survival_lumberjack",
@@ -242,6 +258,18 @@ function M.precache(context)
     -- hero unit precaching.
     PrecacheModel("models/heroes/zuus/zuus.vmdl", context)
     PrecacheModel("models/heroes/drow_ranger/drow_ranger.vmdl", context)
+    PrecacheModel("models/heroes/gyro/gyro.vmdl", context)
+    PrecacheModel("models/heroes/vengeful/vengeful.vmdl", context)
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_drow/drow_base_attack.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
+        context
+    )
     PrecacheModel("models/props_structures/radiant_tower001.vmdl", context)
     local precached_models = {}
     local precached_projectiles = {}
@@ -284,6 +312,7 @@ function M.activate()
     event_bus.reset()
     configure_game_rules()
     scheduler.init()
+    combat_bootstrap.init()
 
     ui_projection.init()
     client_data_service.init()

@@ -1,0 +1,10 @@
+building_id,build_cast_range,build_time,build_particle,enabled,notes
+#中文名:建筑ID,建造施法距离,建造时间,施工特效,是否启用,备注
+#types:string,number,number,string,boolean,string
+wall,200,3,particles/items_fx/repair_kit.vpcf,1,Undying走到200范围内施法；完成前不可选择。
+main_city,200,3,particles/items_fx/repair_kit.vpcf,1,Undying走到200范围内施法；完成前不可选择。
+arrow_tower,200,3,particles/items_fx/repair_kit.vpcf,1,Undying走到200范围内施法；完成前不可选择。
+building_farm,200,3,particles/items_fx/repair_kit.vpcf,1,主城建成后可重复建造；完成前不可选择，完成后恢复模型与选择。
+building_research_lab,200,3,particles/items_fx/repair_kit.vpcf,1,主城建成后Undying通过W建造；费用读取building_levels.csv；完成前不可选择。
+gold_mine,200,3,particles/items_fx/repair_kit.vpcf,1,Undying走到200范围内施法；完成前不可选择。
+hero_altar,200,3,particles/items_fx/repair_kit.vpcf,1,Undying走到200范围内施法；完成前不可选择。
