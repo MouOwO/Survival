@@ -4,6 +4,8 @@
     "Tokens"
     {
         "addon_game_name" "生存防守"
+        "DOTA_Tooltip_ability_ability_survival_return_home" "回城"
+        "DOTA_Tooltip_ability_ability_survival_return_home_Description" "立即返回己方主城周围的安全位置。"
         "DOTA_Tooltip_ability_ability_build_wall" "建造城墙"
         "DOTA_Tooltip_ability_ability_build_main_city" "建造主城"
         "DOTA_Tooltip_ability_ability_build_arrow_tower" "建造防御塔"

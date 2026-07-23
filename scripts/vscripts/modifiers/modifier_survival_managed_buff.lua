@@ -37,6 +37,12 @@ function modifier_survival_managed_buff:GetEffectAttachType()
     end
     return PATTACH_ABSORIGIN_FOLLOW
 end
+function modifier_survival_managed_buff:GetStatusEffectName()
+    return self.definition and self.definition.status_effect_name or nil
+end
+function modifier_survival_managed_buff:StatusEffectPriority()
+    return tonumber(self.definition and self.definition.status_effect_priority) or 0
+end
 
 function modifier_survival_managed_buff:OnCreated(params)
     self.buff_id = params and params.buff_id or ""
@@ -45,12 +51,24 @@ function modifier_survival_managed_buff:OnCreated(params)
         or tonumber(self.definition.default_value) or 0
     self.expirations = {}
     if IsServer() then
+        local sound_name = self.definition.sound_name
+        if sound_name and sound_name ~= "" then
+            self.active_sound_name = sound_name
+            self:GetParent():EmitSound(sound_name)
+        end
         self:ApplyManaged(
             self.value,
             tonumber(params and params.managed_duration) or 0,
             tonumber(params and params.managed_max_stacks)
                 or tonumber(self.definition.max_stacks) or 1
         )
+    end
+end
+
+function modifier_survival_managed_buff:OnDestroy()
+    if IsServer() and self.active_sound_name then
+        self:GetParent():StopSound(self.active_sound_name)
+        self.active_sound_name = nil
     end
 end
 
@@ -82,6 +100,7 @@ function modifier_survival_managed_buff:ApplyManaged(value, duration, max_stacks
     else
         self:SetStackCount(1)
         if duration > 0 then self:SetDuration(duration, true) end
+    end
 end
 
 function modifier_survival_managed_buff:OnIntervalThink()
@@ -112,7 +131,7 @@ function modifier_survival_managed_buff:GetModifierAttackSpeedBonus_Constant()
 end
 function modifier_survival_managed_buff:GetModifierPhysicalArmorBonus()
     if self.definition.effect_type ~= "physical_armor_base_pct" then return 0 end
-    local base = self:GetParent():GetPhysicalArmorBaseValue()
+    local base = math.max(0, self:GetParent():GetPhysicalArmorBaseValue())
     return base * (self.value or 0) * 0.01
 end
 function modifier_survival_managed_buff:GetModifierTotalDamageOutgoing_Percentage()

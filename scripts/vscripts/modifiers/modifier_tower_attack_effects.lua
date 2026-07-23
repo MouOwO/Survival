@@ -14,6 +14,7 @@ local damage_service = require("combat/damage_service")
 local scheduler = require("core/scheduler")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local buff_manager = require("systems/buff_manager")
 
 local MULTI_DAMAGE_MULTIPLIER = 0.90
 local LIGHTNING_BOUNCE_RADIUS = 200
@@ -94,7 +95,6 @@ end
 
 function modifier_tower_attack_effects:OnCreated()
     if not IsServer() then return end
-    self.kill_expirations = {}
     self.gatling_target_entindex = nil
     self.gatling_target_hits = 0
     self.laser_target = nil
@@ -107,15 +107,15 @@ end
 
 local function sync_polar_obelisk_aura(tower)
     local skill = skill_matching(tower, "polar_obelisk_")
-    local modifier = tower:FindModifierByName("modifier_tower_polar_obelisk_aura")
-    if skill and not modifier then
+    if skill then
         local configured = skill.area
         if type(configured) == "table" then configured = configured[1] end
-        tower:AddNewModifier(tower, nil, "modifier_tower_polar_obelisk_aura", {
-            radius = math.max(1, tonumber(configured) or 400),
-        })
-    elseif not skill and modifier then
-        modifier:Destroy()
+        buff_manager.apply_aura(
+            tower, skill.buff_id,
+            math.max(1, tonumber(configured) or 400)
+        )
+    else
+        buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     end
 end
 
@@ -123,16 +123,10 @@ local function trigger_gatling_buff(tower, skill, reason)
     if not tower or tower:IsNull() or not skill then return end
     local duration = math.max(0.1, tonumber(skill.duration) or 3)
     local bonus_pct = math.max(0, (tonumber(skill.damage_multiplier) or 0) * 100)
-    local modifier = tower:FindModifierByName("modifier_tower_explosive_gatling_buff")
-    if modifier and not modifier:IsNull() then
-        modifier:SetDuration(duration, true)
-        modifier:ForceRefresh()
-    else
-        tower:AddNewModifier(tower, nil, "modifier_tower_explosive_gatling_buff", {
-            duration = duration,
-            bonus_pct = bonus_pct,
-        })
-    end
+    buff_manager.apply(tower, tower, skill.buff_id, {
+        duration = duration,
+        value = bonus_pct,
+    })
     print(string.format(
         "[TowerMachineGun] GATLING_BUFF tower=%d reason=%s bonus_pct=%.0f duration=%.1f",
         tower:entindex(), tostring(reason), bonus_pct, duration
@@ -145,10 +139,7 @@ function modifier_tower_attack_effects:GetModifierAttackPointConstant()
 end
 
 function modifier_tower_attack_effects:GetModifierTotalDamageOutgoing_Percentage()
-    if not IsServer() then return 0 end
-    local skill = skill_matching(self:GetParent(), "arcane_cannon_")
-    if not skill then return 0 end
-    return #self.kill_expirations * (tonumber(skill.damage_multiplier) or 0) * 100
+    return 0
 end
 
 function modifier_tower_attack_effects:OnDeath(params)
@@ -176,20 +167,16 @@ function modifier_tower_attack_effects:OnDeath(params)
 
     local skill = skill_matching(tower, "arcane_cannon_")
     if not skill then return end
-    local now = GameRules:GetGameTime()
     local duration = math.max(0.1, tonumber(skill.duration) or 5)
     local max_stacks = math.max(1, tonumber(skill.max_targets) or 4)
-    local active = {}
-    for _, expiry in ipairs(self.kill_expirations) do
-        if expiry > now then table.insert(active, expiry) end
-    end
-    self.kill_expirations = active
-    if #active < max_stacks then table.insert(active, now + duration) end
-    self:SetStackCount(#active)
+    local modifier = buff_manager.apply(tower, tower, skill.buff_id, {
+        duration = duration,
+        value = (tonumber(skill.damage_multiplier) or 0) * 100,
+        max_stacks = max_stacks,
+    })
     print(string.format(
-        "[TowerMystery] KILL_BUFF tower=%d stacks=%d bonus_pct=%.0f duration=%.1f",
-        tower:entindex(), #active,
-        #active * (tonumber(skill.damage_multiplier) or 0) * 100, duration
+        "[TowerMystery] KILL_BUFF tower=%d stacks=%d duration=%.1f",
+        tower:entindex(), modifier and modifier:GetStackCount() or 0, duration
     ))
 end
 
@@ -252,18 +239,11 @@ local function frost_impact_particle(caster, position, radius)
     ParticleManager:ReleaseParticleIndex(particle)
 end
 
-local function apply_slow(caster, target, modifier_name, duration, slow_pct)
+local function apply_slow(caster, target, buff_id, duration, slow_pct)
     if not valid(caster) or not valid(target) then return end
-    if modifier_name == "modifier_tower_frost_slow"
-        and target:HasModifier("modifier_tower_blizzard_slow") then
-        return
-    end
-    if modifier_name == "modifier_tower_blizzard_slow" then
-        target:RemoveModifierByName("modifier_tower_frost_slow")
-    end
-    target:AddNewModifier(caster, nil, modifier_name, {
+    buff_manager.apply(caster, target, buff_id, {
         duration = duration,
-        slow_pct = slow_pct,
+        value = -math.abs(slow_pct),
     })
 end
 
@@ -283,7 +263,7 @@ local function trigger_frost_attack(caster, primary, skill, damage)
                 deal(caster, target, damage, "splash", { "tower_frost_attack" })
             end
             apply_slow(
-                caster, target, "modifier_tower_frost_slow",
+                caster, target, skill.buff_id,
                 duration, FROST_SLOW_PCT
             )
             hit_count = hit_count + 1
@@ -354,7 +334,7 @@ local function start_blizzard(caster, position, skill)
                     "tick_" .. tostring(tick),
                 })
                 apply_slow(
-                    caster, target, "modifier_tower_blizzard_slow",
+                    caster, target, skill.buff_id,
                     slow_duration, BLIZZARD_SLOW_PCT
                 )
                 hit_count = hit_count + 1
@@ -615,13 +595,6 @@ function modifier_tower_attack_effects:OnIntervalThink()
     local now = GameRules:GetGameTime()
     local elapsed = math.max(0, now - (self.last_interval_time or now))
     self.last_interval_time = now
-    local active = {}
-    for _, expiry in ipairs(self.kill_expirations or {}) do
-        if expiry > now then table.insert(active, expiry) end
-    end
-    self.kill_expirations = active
-    self:SetStackCount(#active)
-
     local laser = skill_matching(caster, "laser_")
     local effect = laser_config(laser)
     local target = self.laser_target
@@ -675,7 +648,7 @@ function modifier_tower_attack_effects:OnIntervalThink()
     print(string.format(
         "[TowerMystery] LASER tower=%d target=%d tick=%d multiplier=%.2f raw_damage=%.1f buff_stacks=%d",
         caster:entindex(), target:entindex(), (self.laser_ticks or 0) + 1,
-        multiplier, amount, #(self.kill_expirations or {})
+        multiplier, amount, 0
     ))
     deal(caster, target, amount)
     self.laser_ticks = (self.laser_ticks or 0) + 1
@@ -746,6 +719,13 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         if RollPercentage(chance) then
             start_blizzard(caster, primary:GetAbsOrigin(), blizzard)
         end
+    end
+    local piercing = skill_matching(caster, "piercing_ballista_")
+    if piercing and piercing.buff_id then
+        buff_manager.apply(caster, primary, piercing.buff_id, {
+            duration = math.max(0.1, tonumber(piercing.duration) or 3),
+            value = -math.abs(tonumber(piercing.attack_armor_reduction) or 0),
+        })
     end
     local bounty = skill_matching(caster, "bounty_machine_gun_")
     if bounty then

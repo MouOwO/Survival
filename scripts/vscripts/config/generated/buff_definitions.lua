@@ -1,0 +1,17 @@
+-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.
+-- Source: buff_definitions.csv
+local M = {}
+M.rows = {
+    { buff_id = "buff_arcane_cannon_damage", buff_name = "魔能炮增伤", polarity = "positive", stacking_rule = "stack", refresh_rule = "independent", max_stacks = 4, purgable = false, remove_on_death = true, effect_type = "total_damage_outgoing_pct", default_value = 10, particle_name = "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_matter_buff.vpcf", particle_attach = "PATTACH_ABSORIGIN_FOLLOW", texture = "obsidian_destroyer_arcane_orb", priority = 0, enabled = true, notes = "每层独立计时；持续时间、单层数值和最大层数由技能表覆盖。" },
+    { buff_id = "buff_explosive_gatling_attack_speed", buff_name = "爆矢加特林攻速", polarity = "positive", stacking_rule = "none", refresh_rule = "refresh", max_stacks = 1, purgable = false, remove_on_death = true, effect_type = "attack_speed_bonus", default_value = 20, particle_name = "particles/units/heroes/hero_tinker/tinker_overclock_buff.vpcf", particle_attach = "PATTACH_ABSORIGIN_FOLLOW", texture = "drow_ranger_marksmanship", priority = 0, enabled = true, notes = "重复触发刷新持续时间。" },
+    { buff_id = "debuff_frost_move_slow", buff_name = "冰霜减速", polarity = "negative", stacking_rule = "none", refresh_rule = "refresh", max_stacks = 1, purgable = true, remove_on_death = true, effect_type = "move_speed_pct", default_value = -25, particle_name = "particles/units/heroes/hero_crystalmaiden/maiden_frostbite_buff.vpcf", particle_attach = "PATTACH_ABSORIGIN_FOLLOW", texture = "crystal_maiden_frostbite", exclusive_group = "frost_slow", priority = 10, enabled = true, notes = "普通冰霜攻击减速。", status_effect_name = "particles/status_fx/status_effect_frost.vpcf", status_effect_priority = 10, sound_name = "Hero_Crystal.Frostbite" },
+    { buff_id = "debuff_blizzard_move_slow", buff_name = "暴风雪减速", polarity = "negative", stacking_rule = "none", refresh_rule = "refresh", max_stacks = 1, purgable = true, remove_on_death = true, effect_type = "move_speed_pct", default_value = -30, particle_name = "particles/units/heroes/hero_crystalmaiden/maiden_frostbite_buff.vpcf", particle_attach = "PATTACH_ABSORIGIN_FOLLOW", texture = "crystal_maiden_freezing_field", exclusive_group = "frost_slow", priority = 20, enabled = true, notes = "优先级高于普通冰霜减速。", status_effect_name = "particles/status_fx/status_effect_frost.vpcf", status_effect_priority = 20, sound_name = "hero_Crystal.freezingField.wind" },
+    { buff_id = "debuff_polar_attack_slow", buff_name = "极地攻速降低", polarity = "negative", stacking_rule = "none", refresh_rule = "aura", max_stacks = 1, purgable = false, remove_on_death = true, effect_type = "attack_speed_bonus", default_value = -20, particle_name = "particles/units/heroes/hero_ancient_apparition/ancient_ice_vortex.vpcf", particle_attach = "PATTACH_ABSORIGIN_FOLLOW", texture = "ancient_apparition_chilling_touch", priority = 0, enabled = true, notes = "由受管光环施加；离开范围后自动移除。" },
+    { buff_id = "debuff_piercing_armor", buff_name = "穿透弩炮减甲", polarity = "negative", stacking_rule = "none", refresh_rule = "refresh", max_stacks = 1, purgable = true, remove_on_death = true, effect_type = "physical_armor_base_pct", default_value = -15, particle_name = "particles/units/heroes/hero_slardar/slardar_amp_damage.vpcf", particle_attach = "PATTACH_OVERHEAD_FOLLOW", texture = "slardar_amplify_damage", priority = 0, enabled = true, notes = "减甲百分比由技能表attack_armor_reduction覆盖。" },
+}
+M.by_id = {}
+for _, row in ipairs(M.rows) do
+    local key = row["buff_id"]
+    if key ~= nil then M.by_id[key] = row end
+end
+return M

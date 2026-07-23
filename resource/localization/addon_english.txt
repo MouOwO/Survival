@@ -4,6 +4,8 @@
     "Tokens"
     {
         "addon_game_name" "Survival Defense"
+        "DOTA_Tooltip_ability_ability_survival_return_home" "Return Home"
+        "DOTA_Tooltip_ability_ability_survival_return_home_Description" "Immediately returns to a safe position near your main city."
         "DOTA_Tooltip_ability_ability_build_wall" "Build Wall"
         "DOTA_Tooltip_ability_ability_build_main_city" "Build Main City"
         "DOTA_Tooltip_ability_ability_build_arrow_tower" "Build Defense Tower"

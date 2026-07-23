@@ -4,5 +4,5 @@ hero_id,projectile_speed,projectile_model,enabled,notes
 hero_axe,,,1,速度为空时按近战攻击处理；攻击距离仍读取英雄表。
 hero_slark,900,particles/units/heroes/hero_drow/drow_base_attack.vpcf,1,远程箭矢弹道。
 hero_juggernaut,,,1,速度为空时按近战攻击处理；攻击距离仍读取英雄表。
-hero_monkey_king,900,particles/units/heroes/hero_drow/drow_base_attack.vpcf,1,远程箭矢弹道。
+hero_monkey_king,,,1,无弹道；使用近战攻击能力，攻击距离仍读取英雄表。
 hero_blademaster,900,particles/units/heroes/hero_drow/drow_base_attack.vpcf,1,远程箭矢弹道。

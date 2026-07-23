@@ -1,18 +1,18 @@
-skill_id,ability_name,display_name,description,skill_type,max_level,base_weight,is_public,exclusive_hero_id,vip_only,effect_type,effect_value_per_level,icon_name,enabled,notes
-#ÖĞÎÄÃû:¼¼ÄÜID,¼¼ÄÜÃû³ÆID,ÏÔÊ¾Ãû³Æ,ÃèÊö,¼¼ÄÜÀàĞÍ,×î¸ßµÈ¼¶,»ù´¡È¨ÖØ,ÊÇ·ñ¹«¹²¼¼ÄÜ,×¨ÊôÓ¢ĞÛID,½öÏŞVIP,Ğ§¹ûÀàĞÍ,Ã¿¼¶Ğ§¹ûÊıÖµ,Í¼±êÃû³Æ,ÊÇ·ñÆôÓÃ,±¸×¢
+ï»¿skill_id,ability_name,display_name,description,skill_type,max_level,base_weight,is_public,exclusive_hero_id,vip_only,effect_type,effect_value_per_level,icon_name,enabled,notes
+#ä¸­æ–‡å:æŠ€èƒ½ID,æŠ€èƒ½åç§°ID,æ˜¾ç¤ºåç§°,æè¿°,æŠ€èƒ½ç±»å‹,æœ€é«˜ç­‰çº§,åŸºç¡€æƒé‡,æ˜¯å¦å…¬å…±æŠ€èƒ½,ä¸“å±è‹±é›„ID,ä»…é™VIP,æ•ˆæœç±»å‹,æ¯çº§æ•ˆæœæ•°å€¼,å›¾æ ‡åç§°,æ˜¯å¦å¯ç”¨,å¤‡æ³¨
 #types:string,string,string,string,enum,number,number,boolean,string,boolean,enum,number,string,boolean,string
-skill_power_training,ability_survival_power_training,Á¦Á¿ÑµÁ·,Ã¿¼¶Ôö¼ÓÆÕÍ¨¹¥»÷ÉËº¦¡£,passive,5,100,1,,0,pre_attack_damage,12,item_blades_of_attack,1,¹«¹²¼¼ÄÜÕ¼Î»ÊıÖµ£¬¿ÉÖ±½ÓĞŞ¸ÄCSV¡£
-skill_vitality_training,ability_survival_vitality_training,ÉúÃüÑµÁ·,Ã¿¼¶Ôö¼Ó×î´óÉúÃü¡£,passive,5,100,1,,0,health_bonus,250,item_vitality_booster,1,¹«¹²¼¼ÄÜ¡£
-skill_agility_training,ability_survival_agility_training,Ãô½İÑµÁ·,Ã¿¼¶Ôö¼ÓÃô½İ¡£,passive,5,100,1,,0,agility_bonus,6,item_eagle,1,¹«¹²¼¼ÄÜ¡£
-skill_intellect_training,ability_survival_intellect_training,ÖÇÁ¦ÑµÁ·,Ã¿¼¶Ôö¼ÓÖÇÁ¦¡£,passive,5,100,1,,0,intellect_bonus,6,item_mystic_staff,1,¹«¹²¼¼ÄÜ¡£
-skill_armor_training,ability_survival_armor_training,»¤¼×ÑµÁ·,Ã¿¼¶Ôö¼Ó»¤¼×¡£,passive,5,100,1,,0,armor_bonus,3,item_chainmail,1,¹«¹²¼¼ÄÜ¡£
-skill_attack_speed_training,ability_survival_attack_speed_training,¹¥ËÙÑµÁ·,Ã¿¼¶Ôö¼Ó¹¥»÷ËÙ¶È¡£,passive,5,100,1,,0,attack_speed_bonus,20,item_gloves,1,¹«¹²¼¼ÄÜ¡£
-skill_move_speed_training,ability_survival_move_speed_training,ÒÆ¶¯ÑµÁ·,Ã¿¼¶Ôö¼ÓÒÆ¶¯ËÙ¶È¡£,passive,5,100,1,,0,move_speed_bonus,12,item_boots,1,¹«¹²¼¼ÄÜ¡£
-skill_attack_range_training,ability_survival_attack_range_training,Éä³ÌÑµÁ·,Ã¿¼¶Ôö¼Ó¹¥»÷¾àÀë¡£,passive,5,80,1,,0,attack_range_bonus,60,sniper_take_aim,1,¹«¹²¼¼ÄÜ£¬½üÕ½Ó¢ĞÛÒ²¿É³éÈ¡¡£
-skill_health_regen_training,ability_survival_health_regen_training,ÉúÃü»Ö¸´,Ã¿¼¶Ôö¼ÓÉúÃü»Ö¸´¡£,passive,5,100,1,,0,health_regen,8,item_ring_of_regen,1,¹«¹²¼¼ÄÜ¡£
-skill_mana_regen_training,ability_survival_mana_regen_training,Ä§·¨»Ö¸´,Ã¿¼¶Ôö¼ÓÄ§·¨»Ö¸´¡£,passive,5,100,1,,0,mana_regen,4,item_void_stone,1,¹«¹²¼¼ÄÜ¡£
-skill_axe_exclusive,ability_survival_axe_exclusive,¸«Íõ×¨Êô£ºÕ½Òâ,Ã¿¼¶Ôö¼Ó¹¥»÷ÉËº¦¡£,passive,5,0,0,hero_axe,0,pre_attack_damage,20,axe_counter_helix,1,ÆÕÍ¨Ó¢ĞÛ³õÊ¼×¨Êô¼¼ÄÜ¡£
-skill_slark_exclusive,ability_survival_slark_exclusive,Ë¹À­¿Ë×¨Êô£ºÁÔÉ±,Ã¿¼¶Ôö¼Ó¹¥»÷ËÙ¶È¡£,passive,5,0,0,hero_slark,0,attack_speed_bonus,30,slark_essence_shift,1,ÆÕÍ¨Ó¢ĞÛ³õÊ¼×¨Êô¼¼ÄÜ¡£
-skill_juggernaut_exclusive,ability_survival_juggernaut_exclusive,Ö÷Ô××¨Êô£º½£Òâ,Ã¿¼¶Ôö¼ÓÃô½İ¡£,passive,5,0,0,hero_juggernaut,0,agility_bonus,10,juggernaut_blade_dance,1,ÆÕÍ¨Ó¢ĞÛ³õÊ¼×¨Êô¼¼ÄÜ¡£
-skill_monkey_king_exclusive,ability_survival_monkey_king_exclusive,ÆëÌì´óÊ¥×¨Êô£ºÈçÒâ,Ã¿¼¶Ôö¼Ó¹¥»÷¾àÀë¡£,passive,5,0,0,hero_monkey_king,1,attack_range_bonus,100,monkey_king_jingu_mastery,1,VIPÓ¢ĞÛ×¨Êô¼¼ÄÜ¡£
-skill_blademaster_exclusive,ability_survival_blademaster_exclusive,½£Ê¥×¨Êô£ºÎŞË«½£Òâ,Ã¿¼¶Ôö¼Ó¹¥»÷ÉËº¦¡£,passive,5,0,0,hero_blademaster,1,pre_attack_damage,28,sven_gods_strength,1,VIP½£Ê¥×¨Êô¼¼ÄÜ¡£
+skill_power_training,ability_survival_power_training,åŠ›é‡è®­ç»ƒ,æ¯çº§å¢åŠ æ™®é€šæ”»å‡»ä¼¤å®³ã€‚,passive,5,100,1,,0,pre_attack_damage,12,item_blades_of_attack,1,å…¬å…±æŠ€èƒ½å ä½æ•°å€¼ï¼Œå¯ç›´æ¥ä¿®æ”¹CSVã€‚
+skill_vitality_training,ability_survival_vitality_training,ç”Ÿå‘½è®­ç»ƒ,æ¯çº§å¢åŠ æœ€å¤§ç”Ÿå‘½ã€‚,passive,5,100,1,,0,health_bonus,250,item_vitality_booster,1,å…¬å…±æŠ€èƒ½ã€‚
+skill_agility_training,ability_survival_agility_training,æ•æ·è®­ç»ƒ,æ¯çº§å¢åŠ æ•æ·ã€‚,passive,5,100,1,,0,agility_bonus,6,item_eagle,1,å…¬å…±æŠ€èƒ½ã€‚
+skill_intellect_training,ability_survival_intellect_training,æ™ºåŠ›è®­ç»ƒ,æ¯çº§å¢åŠ æ™ºåŠ›ã€‚,passive,5,100,1,,0,intellect_bonus,6,item_mystic_staff,1,å…¬å…±æŠ€èƒ½ã€‚
+skill_armor_training,ability_survival_armor_training,æŠ¤ç”²è®­ç»ƒ,æ¯çº§å¢åŠ æŠ¤ç”²ã€‚,passive,5,100,1,,0,armor_bonus,3,item_chainmail,1,å…¬å…±æŠ€èƒ½ã€‚
+skill_attack_speed_training,ability_survival_attack_speed_training,æ”»é€Ÿè®­ç»ƒ,æ¯çº§å¢åŠ æ”»å‡»é€Ÿåº¦ã€‚,passive,5,100,1,,0,attack_speed_bonus,20,item_gloves,1,å…¬å…±æŠ€èƒ½ã€‚
+skill_move_speed_training,ability_survival_move_speed_training,ç§»åŠ¨è®­ç»ƒ,æ¯çº§å¢åŠ ç§»åŠ¨é€Ÿåº¦ã€‚,passive,5,100,1,,0,move_speed_bonus,12,item_boots,1,å…¬å…±æŠ€èƒ½ã€‚
+skill_attack_range_training,ability_survival_attack_range_training,å°„ç¨‹è®­ç»ƒ,æ¯çº§å¢åŠ æ”»å‡»è·ç¦»ã€‚,passive,5,80,1,,0,attack_range_bonus,60,sniper_take_aim,1,å…¬å…±æŠ€èƒ½ï¼Œè¿‘æˆ˜è‹±é›„ä¹Ÿå¯æŠ½å–ã€‚
+skill_health_regen_training,ability_survival_health_regen_training,ç”Ÿå‘½æ¢å¤,æ¯çº§å¢åŠ ç”Ÿå‘½æ¢å¤ã€‚,passive,5,100,1,,0,health_regen,8,item_ring_of_regen,1,å…¬å…±æŠ€èƒ½ã€‚
+skill_mana_regen_training,ability_survival_mana_regen_training,é­”æ³•æ¢å¤,æ¯çº§å¢åŠ é­”æ³•æ¢å¤ã€‚,passive,5,100,1,,0,mana_regen,4,item_void_stone,1,å…¬å…±æŠ€èƒ½ã€‚
+skill_axe_exclusive,ability_survival_axe_exclusive,æ–§ç‹ä¸“å±ï¼šæˆ˜æ„,æ¯çº§å¢åŠ æ”»å‡»ä¼¤å®³ã€‚,passive,5,0,0,hero_axe,0,pre_attack_damage,20,axe_counter_helix,1,æ™®é€šè‹±é›„åˆå§‹ä¸“å±æŠ€èƒ½ã€‚
+skill_slark_exclusive,ability_survival_slark_exclusive,æ–¯æ‹‰å…‹ä¸“å±ï¼šçŒæ€,æ¯çº§å¢åŠ æ”»å‡»é€Ÿåº¦ã€‚,passive,5,0,0,hero_slark,0,attack_speed_bonus,30,slark_essence_shift,1,æ™®é€šè‹±é›„åˆå§‹ä¸“å±æŠ€èƒ½ã€‚
+skill_juggernaut_exclusive,ability_survival_juggernaut_exclusive,ä¸»å®°ä¸“å±ï¼šå‰‘æ„,æ¯çº§å¢åŠ æ•æ·ã€‚,passive,5,0,0,hero_juggernaut,0,agility_bonus,10,juggernaut_blade_dance,1,æ™®é€šè‹±é›„åˆå§‹ä¸“å±æŠ€èƒ½ã€‚
+skill_monkey_king_exclusive,ability_survival_monkey_king_exclusive,é½å¤©å¤§åœ£ä¸“å±ï¼šå¦‚æ„,æ¯çº§å¢åŠ æ”»å‡»è·ç¦»ã€‚,passive,5,0,0,hero_monkey_king,1,attack_range_bonus,100,monkey_king_jingu_mastery,1,VIPè‹±é›„ä¸“å±æŠ€èƒ½ã€‚
+skill_blademaster_exclusive,ability_survival_blademaster_exclusive,å‰‘åœ£ä¸“å±ï¼šæ— åŒå‰‘æ„,æ¯çº§å¢åŠ æ”»å‡»ä¼¤å®³ã€‚,passive,5,0,0,hero_blademaster,1,pre_attack_damage,28,sven_gods_strength,1,VIPå‰‘åœ£ä¸“å±æŠ€èƒ½ã€‚

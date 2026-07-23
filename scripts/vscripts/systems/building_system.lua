@@ -531,6 +531,18 @@ function M.relocate_building(unit, position)
     return require("systems/building_relocation").move(unit, position)
 end
 
+function M.main_city_for_team(team)
+    for _, state in pairs(buildings) do
+        if state.team == team
+            and state.building_id == "main_city"
+            and valid_entity(state.unit)
+            and state.unit:IsAlive() then
+            return state.unit
+        end
+    end
+    return nil
+end
+
 function M.relocate_for_player(player_id, entindex, position)
     local state = buildings[tonumber(entindex) or -1]
     if not state or not valid_entity(state.unit) then

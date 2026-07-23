@@ -2,7 +2,6 @@
 -- Source: encounter_reward_links.csv
 local M = {}
 M.rows = {
-    { source_type = "wild_boss", source_id = "monsterorn", encounter_id = "encounter_wild_boss", reward_profile_id = "reward_wild_boss_default", spawn_point_id = "spawn_wild_boss", visible_condition = "true", purchasable_condition = "active_count(encounter_wild_boss)<1", enabled = true, notes = "野外Boss暂未绑定商店项目。" },
     { source_type = "challenge", source_id = "challenge_01", reward_profile_id = "reward_practice_wood_100", visible_condition = "altar_used==true", purchasable_condition = "challenge_room_active==true", enabled = true, notes = "练功房出生点尚未提供；奖励配置已完成。" },
     { source_type = "challenge", source_id = "challenge_02", reward_profile_id = "reward_practice_gold_100", visible_condition = "altar_used==true", purchasable_condition = "challenge_room_active==true", enabled = true, notes = "练功房出生点尚未提供；奖励配置已完成。" },
     { source_type = "challenge", source_id = "challenge_03", reward_profile_id = "reward_practice_attribute_10", visible_condition = "altar_used==true", purchasable_condition = "challenge_room_active==true", enabled = true, notes = "练功房出生点尚未提供；奖励配置已完成。" },

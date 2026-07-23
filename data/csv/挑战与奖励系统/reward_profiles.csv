@@ -1,7 +1,6 @@
 ﻿reward_profile_id,reward_group,trigger_type,display_name,reward_text,repeatable,enabled,notes
 #中文名:奖励方案ID,奖励组,触发类型,显示名称,奖励说明,是否可重复,是否启用,备注
 #types:string,enum,enum,string,string,boolean,boolean,string
-reward_wild_boss_default,wild_boss,on_encounter_complete,野外Boss默认奖励,待配置,1,0,用户尚未提供普通野外Boss掉落，默认停用。
 reward_practice_wood_100,practice_room,on_each_kill,木材练功房奖励,击杀每个怪物获得100木材。,1,1,练功房怪物每次死亡均调用同一个通用奖励服务。
 reward_practice_gold_100,practice_room,on_each_kill,金币练功房奖励,击杀每个怪物获得100金币。,1,1,练功房怪物每次死亡均调用同一个通用奖励服务。
 reward_practice_attribute_10,practice_room,on_each_kill,属性练功房奖励,击杀每个怪物获得10点全属性。,1,1,练功房怪物每次死亡均调用同一个通用奖励服务。

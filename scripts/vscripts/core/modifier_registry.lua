@@ -75,6 +75,10 @@ local modifiers = {
         path = "modifiers/modifier_survival_managed_buff",
     },
     {
+        name = "modifier_practice_monster_ai",
+        path = "modifiers/modifier_practice_monster_ai",
+    },
+    {
         name = "modifier_research_technology",
         path = "modifiers/modifier_research_technology",
     },

@@ -1,4 +1,4 @@
-rule_id,trigger_type,min_trigger_level,max_trigger_level,pool_id,choice_count,allow_owned_skill,owned_skill_action,exclude_max_level,unique_within_offer,skill_capacity,enabled,notes
-#ÖĞÎÄÃû:¹æÔòID,´¥·¢ÀàĞÍ,×îµÍ´¥·¢µÈ¼¶,×î¸ß´¥·¢µÈ¼¶,³ØID,Ñ¡ÔñÊıÁ¿,ÔÊĞíÑ¡ÔñÒÑÓµÓĞ¼¼ÄÜ,ÒÑÓµÓĞ¼¼ÄÜ´¦Àí·½Ê½,ÅÅ³ıÂú¼¶¼¼ÄÜ,Í¬´ÎÑ¡ÏîÄÚ²»ÖØ¸´,¼¼ÄÜÈİÁ¿,ÊÇ·ñÆôÓÃ,±¸×¢
+ï»¿rule_id,trigger_type,min_trigger_level,max_trigger_level,pool_id,choice_count,allow_owned_skill,owned_skill_action,exclude_max_level,unique_within_offer,skill_capacity,enabled,notes
+#ä¸­æ–‡å:è§„åˆ™ID,è§¦å‘ç±»å‹,æœ€ä½è§¦å‘ç­‰çº§,æœ€é«˜è§¦å‘ç­‰çº§,æ± ID,é€‰æ‹©æ•°é‡,å…è®¸é€‰æ‹©å·²æ‹¥æœ‰æŠ€èƒ½,å·²æ‹¥æœ‰æŠ€èƒ½å¤„ç†æ–¹å¼,æ’é™¤æ»¡çº§æŠ€èƒ½,åŒæ¬¡é€‰é¡¹å†…ä¸é‡å¤,æŠ€èƒ½å®¹é‡,æ˜¯å¦å¯ç”¨,å¤‡æ³¨
 #types:string,enum,number,number,string,number,boolean,enum,boolean,boolean,number,boolean,string
-rebirth_random_skill,rebirth_complete,2,10,public_pool,3,1,upgrade,1,1,10,1,¶ş×ªµ½Ê®×ªµÄËæ»úÈıÑ¡Ò»£»ÒÑÓĞ¼¼ÄÜÔÙ´ÎÑ¡ÔñÊ±Éı¼¶¡£
+rebirth_random_skill,rebirth_complete,2,10,public_pool,3,1,upgrade,1,1,10,1,äºŒè½¬åˆ°åè½¬çš„éšæœºä¸‰é€‰ä¸€ï¼›å·²æœ‰æŠ€èƒ½å†æ¬¡é€‰æ‹©æ—¶å‡çº§ã€‚

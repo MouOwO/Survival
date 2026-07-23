@@ -10,13 +10,13 @@ M.rows = {
     { content_id = "challenge_07", challenge_type = "upgrade_material", reward_content_id = "item_molten_upgrade_gem_01_03", review_status = "mapped" },
     { content_id = "challenge_08", challenge_type = "upgrade_material", reward_content_id = "item_molten_upgrade_gem_04", review_status = "mapped" },
     { content_id = "challenge_09", challenge_type = "boss_drop", reward_content_id = "material_ice_soul_ember", review_status = "mapped" },
-    { content_id = "challenge_10", challenge_type = "staged_boss", stage_count = 7, stages = {}, completion = { upgrade_from = "weapon_epic_icefire_00", upgrade_to = "weapon_epic_icefire_07" }, enabled = true, review_status = "structure_mapped_boss_values_unknown" },
-    { content_id = "challenge_11", challenge_type = "staged_boss", stage_count = 10, stages = {}, completion = { upgrade_from = "weapon_legend_abyss_00", upgrade_to = "weapon_legend_abyss_10" }, enabled = true, review_status = "structure_mapped_boss_values_unknown" },
+    { content_id = "challenge_10", challenge_type = "staged_boss", stage_count = 7, stages = {}, completion = { upgrade_series = "epic_icefire", upgrade_steps = 1 }, enabled = true, review_status = "test_balance_enabled" },
+    { content_id = "challenge_11", challenge_type = "simultaneous_boss", stage_count = 10, stages = {}, completion = { upgrade_series = "legend_abyss", upgrade_steps = 1 }, enabled = true, review_status = "test_balance_enabled" },
 }
 for _, challenge in ipairs(M.rows) do
     if challenge.stages then
         for stage = 1, challenge.stage_count do
-            challenge.stages[stage] = { stage = stage, boss_values_enabled = false, disabled_reason = "boss_values_unknown" }
+            challenge.stages[stage] = { stage = stage, boss_values_enabled = true, balance_status = "n1_curve_test_pending_balance" }
         end
     end
 end

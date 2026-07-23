@@ -5,7 +5,7 @@ M.rows = {
     { hero_id = "hero_axe", enabled = true, notes = "速度为空时按近战攻击处理；攻击距离仍读取英雄表。" },
     { hero_id = "hero_slark", projectile_speed = 900, projectile_model = "particles/units/heroes/hero_drow/drow_base_attack.vpcf", enabled = true, notes = "远程箭矢弹道。" },
     { hero_id = "hero_juggernaut", enabled = true, notes = "速度为空时按近战攻击处理；攻击距离仍读取英雄表。" },
-    { hero_id = "hero_monkey_king", projectile_speed = 900, projectile_model = "particles/units/heroes/hero_drow/drow_base_attack.vpcf", enabled = true, notes = "远程箭矢弹道。" },
+    { hero_id = "hero_monkey_king", enabled = true, notes = "无弹道；使用近战攻击能力，攻击距离仍读取英雄表。" },
     { hero_id = "hero_blademaster", projectile_speed = 900, projectile_model = "particles/units/heroes/hero_drow/drow_base_attack.vpcf", enabled = true, notes = "远程箭矢弹道。" },
 }
 M.by_id = {}

@@ -7,6 +7,7 @@ local spawn_points = require("config/generated/monster_spawn_points")
 local encounters = require("config/generated/monster_encounters")
 local reward_profiles = require("config/generated/reward_profiles")
 local reward_effects = require("config/generated/reward_effects")
+local challenge_sessions = require("systems/challenge_session_service")
 
 local M = {}
 
@@ -106,6 +107,9 @@ end
 
 local function start_encounter(payload)
     local encounter_id = tostring(payload.encounter_id or "")
+    if challenge_sessions.handles(encounter_id) then
+        return challenge_sessions.start(payload)
+    end
     local encounter = encounters.by_id[encounter_id]
     if not encounter or encounter.enabled == false then
         return { ok = false, error = "encounter_not_found" }
@@ -132,6 +136,19 @@ local function start_encounter(payload)
         }
     end
 
+    local hero_entry = nil
+    if encounter.encounter_type == "rebirth_boss" then
+        local suffix = string.match(encounter_id, "encounter_rebirth_(%d+)$")
+        local entry_name = suffix and ("rebirth_" .. suffix .. "_entry") or nil
+        hero_entry = entry_name and Entities:FindByName(nil, entry_name) or nil
+        if not valid_entity(hero_entry) then
+            return {
+                ok = false,
+                error = "hammer_marker_not_found:" .. tostring(entry_name),
+            }
+        end
+    end
+
     local team = TEAM_BY_NAME[spawn_point.team_name] or DOTA_TEAM_BADGUYS
     local origin = marker:GetAbsOrigin()
     local unit = CreateUnitByName(
@@ -150,6 +167,19 @@ local function start_encounter(payload)
         unit:SetForwardVector(marker:GetForwardVector())
     end
     FindClearSpaceForUnit(unit, origin, true)
+    local health = tonumber(archetype.health)
+    if health and health > 0 then
+        unit:SetBaseMaxHealth(health)
+        unit:SetMaxHealth(health)
+        unit:SetHealth(health)
+    end
+    local attack = tonumber(archetype.attack)
+    if attack then
+        unit:SetBaseDamageMin(attack)
+        unit:SetBaseDamageMax(attack)
+    end
+    local armor = tonumber(archetype.armor)
+    if armor then unit:SetPhysicalArmorBaseValue(armor) end
     local attack_speed = tonumber(archetype.attack_speed)
         or tonumber(archetype.base_attack_speed) or 0.5
     attack_speed = math.max(0.01, attack_speed)
@@ -157,6 +187,22 @@ local function start_encounter(payload)
     unit:SetBaseAttackTime(1 / attack_speed)
     if not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+    end
+
+    if hero_entry then
+        local player_id = tonumber(payload.player_id)
+        local summon = event_bus.request(
+            events.HERO_SUMMON_GET_REQUEST,
+            { player_id = player_id }
+        )
+        local hero = summon and summon.unit
+            or PlayerResource:GetSelectedHeroEntity(player_id)
+        if valid_entity(hero) and hero:IsAlive() then
+            local hero_origin = hero_entry:GetAbsOrigin()
+            hero:SetAbsOrigin(hero_origin)
+            FindClearSpaceForUnit(hero, hero_origin, true)
+            hero:Stop()
+        end
     end
 
     local player_id = tonumber(payload.player_id)
@@ -197,6 +243,9 @@ end
 
 local function query_encounter(payload)
     local encounter_id = tostring(payload.encounter_id or "")
+    if challenge_sessions.handles(encounter_id) then
+        return challenge_sessions.query(encounter_id, payload.player_id)
+    end
     local encounter = encounters.by_id[encounter_id]
     if not encounter then
         return { ok = false, error = "encounter_not_found" }

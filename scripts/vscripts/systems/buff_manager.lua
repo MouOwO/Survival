@@ -50,11 +50,18 @@ end
 function M.apply(caster, target, buff_id, options)
     if not IsServer() or not valid(target) then return nil end
     local def = definition(buff_id)
-    if not def or not remove_lower_priority_exclusive(target, def) then
+    if not def then return nil end
+
+    options = options or {}
+    if valid(caster) and not options.ignore_team then
+        local same_team = caster:GetTeamNumber() == target:GetTeamNumber()
+        if def.polarity == "negative" and same_team then return nil end
+        if def.polarity == "positive" and not same_team then return nil end
+    end
+    if not remove_lower_priority_exclusive(target, def) then
         return nil
     end
 
-    options = options or {}
     local duration = math.max(0, tonumber(options.duration) or 0)
     local value = tonumber(options.value) or tonumber(def.default_value) or 0
     local max_stacks = math.max(
@@ -77,8 +84,11 @@ function M.apply(caster, target, buff_id, options)
 end
 
 function M.remove(target, buff_id)
-    local modifier = find(target, buff_id)
-    if modifier and not modifier:IsNull() then modifier:Destroy() end
+    for _, modifier in ipairs(managed_modifiers(target)) do
+        if not modifier:IsNull() and modifier.buff_id == buff_id then
+            modifier:Destroy()
+        end
+    end
 end
 
 function M.has(target, buff_id)

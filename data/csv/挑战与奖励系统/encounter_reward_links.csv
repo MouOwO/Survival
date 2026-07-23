@@ -1,7 +1,6 @@
 ﻿source_type,source_id,encounter_id,reward_profile_id,spawn_point_id,visible_condition,purchasable_condition,enabled,notes
 #中文名:来源类型,来源ID,遭遇ID,奖励方案ID,生成点ID,显示条件,可购买条件,是否启用,备注
 #types:enum,string,string,string,string,string,string,boolean,string
-wild_boss,monsterorn,encounter_wild_boss,reward_wild_boss_default,spawn_wild_boss,true,active_count(encounter_wild_boss)<1,1,野外Boss暂未绑定商店项目。
 challenge,challenge_01,,reward_practice_wood_100,,altar_used==true,challenge_room_active==true,1,练功房出生点尚未提供；奖励配置已完成。
 challenge,challenge_02,,reward_practice_gold_100,,altar_used==true,challenge_room_active==true,1,练功房出生点尚未提供；奖励配置已完成。
 challenge,challenge_03,,reward_practice_attribute_10,,altar_used==true,challenge_room_active==true,1,练功房出生点尚未提供；奖励配置已完成。

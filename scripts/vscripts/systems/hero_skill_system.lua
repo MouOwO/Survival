@@ -10,6 +10,7 @@ local initial_skills = require("config/generated/hero_initial_skills")
 local M = {}
 
 local state_by_player = {}
+local RETURN_HOME_ABILITY = "ability_survival_return_home"
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -91,7 +92,7 @@ local function publish(player_id, reason)
 end
 
 local function ability_map(state)
-    local result = {}
+    local result = { [RETURN_HOME_ABILITY] = true }
     for skill_id, _ in pairs(state.levels) do
         local definition = skills.by_id[skill_id]
         if definition and definition.ability_name then
@@ -126,6 +127,15 @@ local function synchronize_unit(state)
                 ability:SetActivated(true)
             end
         end
+    end
+    local return_ability = state.unit:FindAbilityByName(RETURN_HOME_ABILITY)
+    if not return_ability then
+        return_ability = state.unit:AddAbility(RETURN_HOME_ABILITY)
+    end
+    if return_ability then
+        return_ability:SetLevel(1)
+        return_ability:SetHidden(false)
+        return_ability:SetActivated(true)
     end
     if state.unit.CalculateStatBonus then
         state.unit:CalculateStatBonus(true)

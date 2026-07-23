@@ -2,6 +2,7 @@ local M = {
     GAME_STARTED = "game.started",
     HERO_READY = "player.hero_ready",
     HERO_SUMMONED = "hero.summoned",
+    HERO_SUMMON_GET_REQUEST = "hero.summon.get.request",
     ENGINE_ENTITY_KILLED = "engine.entity_killed",
 
     GRID_CAN_PLACE_REQUEST = "grid.can_place.request",

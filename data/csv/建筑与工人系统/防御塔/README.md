@@ -8,6 +8,7 @@
 - `tower_class_death.csv`：死亡路线完整升级链，依次包含死亡之塔5级、碎骨重炮5级、死神榴弹炮10级。
 - `tower_class_mystery.csv`、`tower_class_lightning.csv`、`tower_class_machine_gun.csv`、`tower_class_multi.csv`、`tower_class_frost.csv`、`tower_class_anti_air.csv`：其他转职塔的策划数据。
 - `tower_skill_definitions.csv`：唯一的策划技能定义表。
+- `buff_definitions.csv`：正负面状态、叠加规则、刷新规则和表现定义表。
 
 ## 技能表设计原则
 
@@ -32,10 +33,11 @@ CSV 只填写策划可读的玩法数据：
 - `damage_multiplier`：伤害倍率。统一以普通攻击伤害作为基础伤害。
 - `max_targets`：最多目标数。
 - `attack_armor_reduction`：攻击减甲数值。
+- `buff_id`：技能施加的状态 ID，具体叠加、驱散和特效规则由 Buff 表管理。
 - `enabled`：是否启用。
 - `notes`：策划备注。
 
-特效、粒子、修改器名称、伤害实现模块、事件监听方式等程序字段均不放入技能表，由 Lua 根据 `skill_id` 自动对应维护。当前所有防御塔技能均为被动技能，因此不再设置重复的 `skill_type` 字段。
+技能表不直接保存特效或 Modifier 名称。状态类技能只引用 `buff_id`；特效、正负面类型、叠加和刷新规则统一放在 `buff_definitions.csv`。伤害实现模块和事件监听方式仍由 Lua 根据 `skill_id` 维护。
 
 ## 塔等级与技能继承
 

@@ -55,10 +55,15 @@ local monster_reward_service =
     require("systems/monster_reward_service")
 local monster_spawn_service =
     require("systems/monster_spawn_service")
+local challenge_session_service =
+    require("systems/challenge_session_service")
+local challenge_equipment_reward_service =
+    require("systems/challenge_equipment_reward_service")
 local wave_system = require("systems/wave_system")
 local monster_archetypes = require("config/generated/monster_archetypes")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
 local tower_route_config = require("config/tower_route_config")
+local buff_definitions = require("config/generated/buff_definitions")
 local content_inventory_service =
     require("systems/content_inventory_service")
 local inventory_transaction_service =
@@ -260,6 +265,8 @@ function M.precache(context)
     PrecacheModel("models/heroes/drow_ranger/drow_ranger.vmdl", context)
     PrecacheModel("models/heroes/gyro/gyro.vmdl", context)
     PrecacheModel("models/heroes/vengeful/vengeful.vmdl", context)
+    PrecacheModel("models/heroes/crystal_maiden/crystal_maiden.vmdl", context)
+    PrecacheModel("models/heroes/ancient_apparition/ancient_apparition.vmdl", context)
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_drow/drow_base_attack.vpcf",
@@ -270,6 +277,20 @@ function M.precache(context)
         "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
         context
     )
+    local precached_buff_particles = {}
+    for _, row in ipairs(buff_definitions.rows or {}) do
+        local particle = row.enabled ~= false and row.particle_name or nil
+        if particle and particle ~= "" and not precached_buff_particles[particle] then
+            PrecacheResource("particle", particle, context)
+            precached_buff_particles[particle] = true
+        end
+        local status_effect = row.enabled ~= false and row.status_effect_name or nil
+        if status_effect and status_effect ~= ""
+            and not precached_buff_particles[status_effect] then
+            PrecacheResource("particle", status_effect, context)
+            precached_buff_particles[status_effect] = true
+        end
+    end
     PrecacheModel("models/props_structures/radiant_tower001.vmdl", context)
     local precached_models = {}
     local precached_projectiles = {}
@@ -337,6 +358,7 @@ function M.activate()
     hero_skill_choice_service.init()
     content_inventory_service.init()
     inventory_transaction_service.init()
+    challenge_equipment_reward_service.init()
     equipment_instance_service.init()
     equipment_growth_service.init()
     weapon_equipment_service.init()
@@ -348,6 +370,7 @@ function M.activate()
     builder_progression_system.init()
     gold_mine_system.init()
     monster_reward_service.init()
+    challenge_session_service.init()
     monster_spawn_service.init()
     wave_system.init()
     shop_system.init()

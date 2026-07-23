@@ -1342,4 +1342,16 @@
         "AbilityCooldown"    "5.0"
         "AbilityManaCost"    "0"
     }
+
+    "ability_survival_return_home"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_return_home"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+        "AbilityTextureName" "item_tpscroll"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "1.0"
+        "AbilityManaCost"    "0"
+    }
 }

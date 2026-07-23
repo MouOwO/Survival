@@ -505,6 +505,46 @@ local function register_building_move_request()
     end)
 end
 
+local function register_return_home_request()
+    CustomGameEventManager:RegisterListener("ui_return_home_request", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+            player_id = player_id,
+        })
+        local result = { ok = false, error = "hero_not_summoned" }
+        if summoned and summoned.ok and summoned.unit
+            and not summoned.unit:IsNull() and summoned.unit:IsAlive() then
+            local ability = summoned.unit:FindAbilityByName(
+                "ability_survival_return_home"
+            )
+            if ability and not ability:IsNull() and ability:IsFullyCastable() then
+                summoned.unit:CastAbilityNoTarget(ability, player_id)
+                result = { ok = true }
+            else
+                result = { ok = false, error = "return_home_not_ready" }
+            end
+        end
+        if not result.ok and result.error == "hero_not_summoned" then
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = player_id,
+                message = "尚未召唤英雄",
+                level = "error",
+            })
+        elseif not result.ok and result.error == "return_home_not_ready" then
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = player_id,
+                message = "回城技能尚未就绪",
+                level = "error",
+            })
+        end
+        send_to_player("ui_return_home_result", player_id, {
+            success = result.ok and 1 or 0,
+            error = result.error or "",
+        })
+    end)
+end
+
 local function on_notification(payload)
     send_to_player("ui_notification", payload.player_id, {
         message = payload.message or "",
@@ -531,6 +571,7 @@ function M.init()
     register_ability_cast_request()
     register_ability_cast_position_request()
     register_building_move_request()
+    register_return_home_request()
     event_bus.subscribe(events.UI_NOTIFICATION, on_notification)
     event_bus.subscribe(events.SHOP_STATE_CHANGED, on_shop_state_changed)
 end
