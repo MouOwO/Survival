@@ -59,6 +59,14 @@ local modifiers = {
         path = "modifiers/modifier_debug_attack_cap",
     },
     {
+        name = "modifier_debug_attack_bonus",
+        path = "modifiers/modifier_debug_combat_bonus",
+    },
+    {
+        name = "modifier_debug_armor_bonus",
+        path = "modifiers/modifier_debug_combat_bonus",
+    },
+    {
         name = "modifier_tower_auto_attack",
         path = "modifiers/modifier_tower_auto_attack",
     },

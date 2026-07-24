@@ -11,6 +11,7 @@ local M = {}
 
 local state_by_player = {}
 local RETURN_HOME_ABILITY = "ability_survival_return_home"
+local PICKUP_MATERIALS_ABILITY = "ability_survival_pickup_materials"
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -92,7 +93,10 @@ local function publish(player_id, reason)
 end
 
 local function ability_map(state)
-    local result = { [RETURN_HOME_ABILITY] = true }
+    local result = {
+        [RETURN_HOME_ABILITY] = true,
+        [PICKUP_MATERIALS_ABILITY] = true,
+    }
     for skill_id, _ in pairs(state.levels) do
         local definition = skills.by_id[skill_id]
         if definition and definition.ability_name then
@@ -136,6 +140,21 @@ local function synchronize_unit(state)
         return_ability:SetLevel(1)
         return_ability:SetHidden(false)
         return_ability:SetActivated(true)
+        if return_ability.SetAbilityIndex then
+            return_ability:SetAbilityIndex(4)
+        end
+    end
+    local pickup_ability = state.unit:FindAbilityByName(PICKUP_MATERIALS_ABILITY)
+    if not pickup_ability then
+        pickup_ability = state.unit:AddAbility(PICKUP_MATERIALS_ABILITY)
+    end
+    if pickup_ability then
+        pickup_ability:SetLevel(1)
+        pickup_ability:SetHidden(false)
+        pickup_ability:SetActivated(true)
+        if pickup_ability.SetAbilityIndex then
+            pickup_ability:SetAbilityIndex(5)
+        end
     end
     if state.unit.CalculateStatBonus then
         state.unit:CalculateStatBonus(true)

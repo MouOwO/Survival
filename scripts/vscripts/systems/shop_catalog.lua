@@ -2,7 +2,6 @@ local content_catalog = require("config/generated/content_catalog")
 local categories = require("config/generated/shop_categories")
 local aggregation = require("config/generated/shop_aggregation_rules")
 local evaluator = require("systems/shop_condition_evaluator")
-local research_technology = require("config/research_technology_config")
 
 local M = {}
 
@@ -39,36 +38,6 @@ local function content_name(content_id, row, rule)
     if row.name and row.name ~= "" then value = row.name end
     if value ~= "" and value ~= content_id then
         return value
-    end
-    if row.technology_group then
-        local names = {
-            lumberjack_speed = "伐木工速度",
-            lumberjack_efficiency = "伐木效率",
-            tower_attack = "防御塔强化",
-            wall_health = "墙强化",
-            lumberjack_crit = "伐木工暴击",
-            advanced_lumberjack_speed = "高级伐木工速度",
-            advanced_lumberjack_efficiency = "高级伐木效率",
-            advanced_tower_attack = "高级防御塔强化",
-            advanced_wall_health = "高级墙强化",
-            researcher_lumberjack_attack_growth = "伐木工攻击成长",
-            researcher_lumberjack_armor_reduction = "伐木工攻击减甲",
-            researcher_super_wall_health = "超级墙强化",
-            researcher_super_wall_armor = "超级墙护甲强化",
-            researcher_super_tower_attack = "超级防御塔强化",
-            researcher_super_tower_range = "超级防御塔攻击范围",
-            researcher_super_tower_crit = "超级防御塔暴击",
-            researcher_hero_final_damage = "英雄最终伤害",
-            researcher_hero_armor_reduction = "英雄攻击减甲",
-            researcher_hero_attack = "英雄攻击",
-        }
-        local name = names[row.technology_group]
-        if name then return name .. " Lv." .. tostring(row.level) end
-    end
-    if row.technology_group and row.level then
-        local prefix = row.technology_group == "gold_mine_crit"
-            and "金矿暴击率" or "金矿采集效率"
-        return prefix .. " Lv." .. tostring(row.level)
     end
     return content_id
 end
@@ -150,7 +119,8 @@ local function make_entry(rule, row)
     local content_id = tostring(field(row, rule.id_field, ""))
     local wood = number(field(row, rule.wood_cost_field, 0))
     local gold = number(field(row, rule.gold_cost_field, 0))
-    if content_id == "" or (wood <= 0 and gold <= 0) then
+    if content_id == ""
+        or (wood <= 0 and gold <= 0) then
         return nil
     end
     if row.progression_type == "repeat_purchase"
@@ -222,36 +192,16 @@ local function rebuild()
             for _, row in ipairs(
                 load_source(rule.module_name).rows or {}
             ) do
-                local is_gold_mine_technology = rule.source_id == "technology"
-                    and (row.technology_group == "gold_mine_efficiency"
-                        or row.technology_group == "gold_mine_crit")
                 local entry = make_entry(rule, row)
                 if entry then
-                    if is_gold_mine_technology then
-                        entry.enabled = false
-                        entry.disabled_reason_text = "只能通过金矿技能升级"
-                    end
                     table.insert(entries, entry)
                     entries_by_id[entry.entryid] = entry
                 end
             end
         end
     end
-    local technology_rule = { source_id="technology", content_type="technology", id_field="technology_id", name_field="technology_id", description_field="notes", category_default="technology", wood_cost_field="wood_cost", gold_cost_field="gold_cost", grant_type_default="technology_level", icon_type_default="ability" }
     local advanced_unlock_entry = make_entry({ source_id="technology_service", content_type="technology_service", id_field="technology_id", name_field="technology_name", description_field="notes", category_default="technology", wood_cost_field="wood_cost", gold_cost_field="gold_cost", grant_type_default="technology_unlock", icon_type_default="ability" }, { technology_id="advanced_researcher_unlock", technology_name="高级研究员服务", notes="主城达到Lv.4后，支付100木材解锁高级研究员科技。", wood_cost=100, gold_cost=0, shop_sort_order=490, required_city_level=4, enabled=true, purchase_limit=1, icon_name="ability_build_research_lab" })
     if advanced_unlock_entry then table.insert(entries, advanced_unlock_entry); entries_by_id[advanced_unlock_entry.entryid] = advanced_unlock_entry end
-    for _, row in ipairs(research_technology.rows or {}) do
-        local entry = make_entry(technology_rule, row)
-        if entry then
-            if row.technology_group == "gold_mine_efficiency"
-                or row.technology_group == "gold_mine_crit" then
-                entry.enabled = false
-                entry.disabled_reason_text = "只能通过金矿技能升级"
-            end
-            table.insert(entries, entry)
-            entries_by_id[entry.entryid] = entry
-        end
-    end
     table.sort(entries, function(a, b)
         return a.shopid == b.shopid
             and a.order < b.order
@@ -273,6 +223,21 @@ function M.find_technology_entry(group, level)
         end
     end
     return nil
+end
+
+function M.max_technology_level(group)
+    local max_level = 0
+    for _, entry in ipairs(entries) do
+        local definition = entry.definition or {}
+        if entry.contenttype == "technology"
+            and definition.technology_group == group then
+            max_level = math.max(
+                max_level,
+                tonumber(definition.level) or 0
+            )
+        end
+    end
+    return max_level
 end
 
 function M.definition_for(entry)

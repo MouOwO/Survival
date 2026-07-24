@@ -1,13 +1,13 @@
 spawn_point_id,hammer_target_name,current_entity_class,recommended_entity_class,team_name,encounter_group,rebirth_level,archetype_id,enabled,notes
-#ä¸­æ–‡å:ç”Ÿæˆç‚¹ID,åœ°å›¾ç›®æ ‡åç§°,å½“å‰å®ä½“ç±»å‹,å»ºè®®å®ä½“ç±»å‹,é˜Ÿä¼åç§°,é­é‡ç»„,è½¬ç”Ÿç­‰çº§,æ€ªç‰©åŸå‹ID,æ˜¯å¦å¯ç”¨,å¤‡æ³¨
+#ÖĞÎÄÃû:Éú³ÉµãID,µØÍ¼Ä¿±êÃû³Æ,µ±Ç°ÊµÌåÀàĞÍ,½¨ÒéÊµÌåÀàĞÍ,¶ÓÎéÃû³Æ,ÔâÓö×é,×ªÉúµÈ¼¶,¹ÖÎïÔ­ĞÍID,ÊÇ·ñÆôÓÃ,±¸×¢
 #types:string,string,enum,enum,string,enum,number,string,boolean,string
-spawn_rebirth_01,rebirth_01_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,1,rebirth_boss_01,1,ä¸€è½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_01_entryã€‚
-spawn_rebirth_02,rebirth_02_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,2,rebirth_boss_02,1,äºŒè½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_02_entryã€‚
-spawn_rebirth_03,rebirth_03_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,3,rebirth_boss_03,1,ä¸‰è½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_03_entryã€‚
-spawn_rebirth_04,rebirth_04_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,4,rebirth_boss_04,1,å››è½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_04_entryã€‚
-spawn_rebirth_05,rebirth_05_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,5,rebirth_boss_05,1,äº”è½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_05_entryã€‚
-spawn_rebirth_06,rebirth_06_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,6,rebirth_boss_06,1,å…­è½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_06_entryã€‚
-spawn_rebirth_07,rebirth_07_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,7,rebirth_boss_07,1,ä¸ƒè½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_07_entryã€‚
-spawn_rebirth_08,rebirth_08_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,8,rebirth_boss_08,1,å…«è½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_08_entryã€‚
-spawn_rebirth_09,rebirth_09_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,9,rebirth_boss_09,1,ä¹è½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_09_entryã€‚
-spawn_rebirth_10,rebirth_10_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,10,rebirth_boss_10,1,åè½¬Bossä½ç½®ï¼›è‹±é›„å…¥å£ä¸ºrebirth_10_entryã€‚
+spawn_rebirth_01,rebirth_01_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,1,rebirth_boss_01,1,Ò»×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_01_entry¡£
+spawn_rebirth_02,rebirth_02_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,2,rebirth_boss_02,1,¶ş×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_02_entry¡£
+spawn_rebirth_03,rebirth_03_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,3,rebirth_boss_03,1,Èı×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_03_entry¡£
+spawn_rebirth_04,rebirth_04_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,4,rebirth_boss_04,1,ËÄ×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_04_entry¡£
+spawn_rebirth_05,rebirth_05_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,5,rebirth_boss_05,1,Îå×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_05_entry¡£
+spawn_rebirth_06,rebirth_06_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,6,rebirth_boss_06,1,Áù×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_06_entry¡£
+spawn_rebirth_07,rebirth_07_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,7,rebirth_boss_07,1,Æß×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_07_entry¡£
+spawn_rebirth_08,rebirth_08_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,8,rebirth_boss_08,1,°Ë×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_08_entry¡£
+spawn_rebirth_09,rebirth_09_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,9,rebirth_boss_09,1,¾Å×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_09_entry¡£
+spawn_rebirth_10,rebirth_10_boss_spawn,info_target,info_target,DOTA_TEAM_BADGUYS,rebirth_boss,10,rebirth_boss_10,1,Ê®×ªBossÎ»ÖÃ£»Ó¢ĞÛÈë¿ÚÎªrebirth_10_entry¡£

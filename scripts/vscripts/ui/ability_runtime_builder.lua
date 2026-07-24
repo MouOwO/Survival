@@ -183,6 +183,7 @@ local function mine_level_upgrade(state, resources)
             can_afford = 0,
             current_level = level,
             status_text = "金矿本体已满级",
+            upgrade_description = "金矿本体已经达到最高等级。",
         }
     end
     local cost = gold_mine.mine_upgrade_cost(level)
@@ -191,6 +192,7 @@ local function mine_level_upgrade(state, resources)
         current_level = level,
         next_level = level + 1,
         status_text = "升级金矿本体至Lv." .. tostring(level + 1),
+        upgrade_description = "提升金矿本体等级并提高基础金币产量。",
     }, cost_data(cost))
     return with_affordability(result, cost, 0, resources)
 end
@@ -202,6 +204,7 @@ local function mine_efficiency(state, resources)
             can_afford = 0,
             current_level = level,
             status_text = "金矿收益已满级",
+            upgrade_description = "采金效率已经达到最高等级。",
         }
     end
     local cost = gold_mine.efficiency_upgrade_cost(level)
@@ -209,7 +212,9 @@ local function mine_efficiency(state, resources)
         available = cost and 1 or 0,
         current_level = level,
         next_level = level + 1,
-        status_text = cost and "提升所有金矿收益" or "收益升级配置缺失",
+        status_text = cost and "所有金矿收益增加5%（额外收益至少1金币）"
+            or "收益升级配置缺失",
+        upgrade_description = "共50级，每级使所有金矿收益提高5%；额外金币不足1时按1金币计算。",
     }, cost_data(cost))
     return with_affordability(result, cost, 0, resources)
 end
@@ -221,6 +226,7 @@ local function mine_crit(state, resources)
             can_afford = 0,
             current_level = level,
             status_text = "暴击率已满级",
+            upgrade_description = "采金暴击已经达到最高等级。",
         }
     end
     local cost = gold_mine.crit_upgrade_cost(level)
@@ -228,7 +234,8 @@ local function mine_crit(state, resources)
         available = 1,
         current_level = level,
         next_level = level + 1,
-        status_text = "每级增加2%暴击率",
+        status_text = "每级增加3%采集暴击率",
+        upgrade_description = "共10级，每级增加3%采集暴击率；采集暴击时获得正常采集金币的3倍。",
     }, cost_data(cost))
     return with_affordability(result, cost, 0, resources)
 end
@@ -304,6 +311,7 @@ function M.build(ability_name, state, resources)
             status_text = state.auto_upgrading == 1
                 and "停止自动升级"
                 or "自动升级：本体→收益→暴击",
+            upgrade_description = "自动依次升级金矿本体、采金效率和采金暴击。",
         }
     end
     if ability_name == "ability_gold_mine_stop_auto_upgrade" then
@@ -312,6 +320,7 @@ function M.build(ability_name, state, resources)
             can_afford = 1,
             current_level = state.mine_level or state.level or 1,
             status_text = "停止自动升级",
+            upgrade_description = "停止自动升级并恢复尚未满级的金矿技能。",
         }
     end
     if string.match(

@@ -21,6 +21,20 @@ local function series_stage(context, series_id)
     return stage
 end
 
+local function exact_series_stage(context, prefix)
+    local result = nil
+    for id, count in pairs(context.owned_content or {}) do
+        if (tonumber(count) or 0) > 0
+            and tostring(id):find(prefix, 1, true) == 1 then
+            local stage = tonumber(tostring(id):match("_(%d+)$"))
+            if stage ~= nil and (result == nil or stage > result) then
+                result = stage
+            end
+        end
+    end
+    return result
+end
+
 local function hero_technology(entry)
     local group = entry.definition
         and entry.definition.technology_group or ""
@@ -75,12 +89,17 @@ function M.evaluate(player_id, entry, context)
         end
     end
     if entry.contenttype == "technology" then
-        if entry.technology_track == "advanced_researcher" then
-            if context.advanced_researcher_unlocked ~= true then
-                return false, "需要先解锁高级研究员服务", count
+        -- Gold-mine technologies are intentionally purchased from the mine's
+        -- W/E abilities. Ownership of the casting mine is validated by the
+        -- shop system, so they must not depend on the research service.
+        if not context.gold_mine_ability then
+            if entry.technology_track == "advanced_researcher" then
+                if context.advanced_researcher_unlocked ~= true then
+                    return false, "需要先解锁高级研究员服务", count
+                end
+            elseif context.research_unlocked ~= true then
+                return false, "需要先解锁研究所科技服务", count
             end
-        elseif context.research_unlocked ~= true then
-            return false, "需要先解锁研究所科技服务", count
         end
         local levels = context.technology_levels and context.technology_levels[player_id] or {}
         local current = tonumber(levels[definition.technology_group]) or 0
@@ -133,6 +152,7 @@ function M.evaluate(player_id, entry, context)
             count
     end
     if entry.requires_content_id ~= ""
+        and not context.gold_mine_ability
         and not owned(context, entry.requires_content_id) then
         return false,
             "需要前置内容：" .. entry.requires_content_id,
@@ -141,6 +161,19 @@ function M.evaluate(player_id, entry, context)
     if entry.grant_type == "start_encounter"
         and entry.encounter_id == "" then
         return false, "遭遇或出生点尚未配置", count
+    end
+    if entry.grant_type == "start_encounter"
+        and entry.encounter_id == "encounter_challenge_11" then
+        local abyss_stage = exact_series_stage(
+            context,
+            "weapon_legend_abyss_"
+        )
+        if abyss_stage == nil then
+            return false, "需要持有【传说：深渊审判】才能进入罪渊第一层", count
+        end
+        if abyss_stage >= 10 then
+            return false, "【传说：深渊审判】已达到+10，罪渊挑战已完成", count
+        end
     end
     if number(resources.wood) < entry.woodcost then
         return false, "木材不足", count

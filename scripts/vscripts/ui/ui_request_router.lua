@@ -8,6 +8,8 @@ local unit_display_names = require("config/generated/unit_display_names")
 local M = {}
 local synthesis_requests = {}
 local building_snapshot_sequence = 0
+local ability_request_sequence = 0
+local selected_unit_by_player = {}
 
 local function safe_number(entity, method_name, fallback, ...)
     local method = entity and entity[method_name]
@@ -45,9 +47,11 @@ local function unit_combat_snapshot(unit)
         max_mana = safe_number(unit, "GetMaxMana", 0),
         attack_min = attack_min,
         attack_max = attack_max,
-        armor = tonumber(unit.survival_armor)
-            or safe_number(unit, "GetPhysicalArmorBaseValue", nil)
-            or safe_number(unit, "GetPhysicalArmorValue", 0, false),
+        -- 必须读取包含 Modifier 加减值的当前有效护甲；基础护甲和配置缓存
+        -- 无法反映攻击减甲科技的实时叠层。
+        armor = safe_number(unit, "GetPhysicalArmorValue", nil, false)
+            or tonumber(unit.survival_armor)
+            or safe_number(unit, "GetPhysicalArmorBaseValue", 0),
         -- attack_speed 表示每秒攻击次数，不是 BAT，也不是 Dota 百分比攻速。
         -- 缺少显式配置时由引擎基础攻击间隔换算，默认 0.5 次/秒。
         attack_speed = tonumber(unit.survival_attack_speed)
@@ -88,6 +92,7 @@ local function register_selected_unit_stats_request()
         local entindex = tonumber(payload and payload.entindex)
         local ok, unit = pcall(EntIndexToHScript, entindex or -1)
         if not ok or not unit or unit:IsNull() then
+            selected_unit_by_player[player_id] = nil
             send_to_player("ui_selected_unit_stats_snapshot", player_id, {
                 success = 0,
                 entindex = entindex or -1,
@@ -95,6 +100,7 @@ local function register_selected_unit_stats_request()
             })
             return
         end
+        selected_unit_by_player[player_id] = entindex
         -- 英雄的攻击/属性可能还叠加武器成长和专属投影，必须优先使用
         -- hero_combat_stat_service 的权威快照，不能再用引擎临时值覆盖它。
         local hero_result = event_bus.request(
@@ -114,6 +120,26 @@ local function register_selected_unit_stats_request()
         snapshot.success = 1
         send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
     end)
+end
+
+local function on_unit_combat_stats_changed(payload)
+    local entindex = tonumber(payload and payload.entindex)
+    local unit = payload and payload.unit
+    if not entindex then return end
+    if not unit or unit:IsNull() then
+        local ok, resolved = pcall(EntIndexToHScript, entindex)
+        if not ok or not resolved or resolved:IsNull() then return end
+        unit = resolved
+    end
+    for player_id, selected_entindex in pairs(selected_unit_by_player) do
+        if tonumber(selected_entindex) == entindex and valid_player_id(player_id) then
+            local snapshot = unit_combat_snapshot(unit)
+            snapshot.success = 1
+            snapshot.reason = payload.reason or "unit_combat_stats_changed"
+            snapshot.push_phase = "immediate"
+            send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
+        end
+    end
 end
 
 local function send_building_snapshot(payload, phase)
@@ -220,12 +246,28 @@ local function register_shop_purchase_request()
             entry_id = tostring(payload.entry_id or ""),
             request_id = payload.request_id,
         })
+        local encounter_started = result and result.ok
+            and result.grant_result
+            and tostring(result.grant_result.encounter_id or "") ~= ""
+        local focus_hero_entindex = -1
+        if encounter_started then
+            local summon = event_bus.request(
+                events.HERO_SUMMON_GET_REQUEST,
+                { player_id = player_id }
+            )
+            local hero = summon and summon.unit or nil
+            if hero and not hero:IsNull() then
+                focus_hero_entindex = hero:entindex()
+            end
+        end
         send_to_player("ui_operation_result", player_id, {
             request_id = payload.request_id or "",
             success = result and result.ok and 1 or 0,
             operation = "shop_purchase",
             entry_id = payload.entry_id or "",
             error = result and result.error or "unknown_error",
+            close_shop_and_focus_hero = encounter_started and 1 or 0,
+            focus_hero_entindex = focus_hero_entindex,
         })
     end)
 end
@@ -419,7 +461,20 @@ local function register_ability_cast_request()
         local tower_action = tower_upgrade_mode ~= nil or tower_class_index ~= nil
         local tower_ability_matches = tower_action and unit_valid
             and ability_valid and unit:FindAbilityByName(ability_name) == ability
+        local gold_mine_actions = {
+            ability_upgrade_gold_mine = "level",
+            ability_upgrade_gold_mine_efficiency = "efficiency",
+            ability_upgrade_gold_mine_crit = "crit",
+            ability_gold_mine_auto_upgrade = "auto",
+            ability_gold_mine_stop_auto_upgrade = "auto",
+        }
+        local gold_mine_action = gold_mine_actions[ability_name]
+        local gold_mine_ability_matches = gold_mine_action and unit_valid
+            and ability_valid and unit:FindAbilityByName(ability_name) == ability
         local handled_directly = false
+        local direct_result_required = false
+        local direct_result = nil
+        local direct_error = nil
         if tower_ability_matches and owner_matches and not passive
             and not is_point_target and tower_upgrade_mode then
             -- Dynamic Lua abilities on npc_dota_creature buildings do not
@@ -444,6 +499,55 @@ local function register_ability_cast_request()
             handled_directly = true
             print("[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index="
                 .. tostring(tower_class_index))
+        elseif gold_mine_ability_matches and owner_matches and not passive
+            and not is_point_target then
+            handled_directly = true
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden() then
+                direct_result = { ok = false, error = "金矿技能当前不可用" }
+            else
+                ability_request_sequence = ability_request_sequence + 1
+                if gold_mine_action == "level" then
+                    direct_result, direct_error = event_bus.request(
+                        events.GOLD_MINE_LEVEL_UPGRADE_REQUEST,
+                        { entindex = entindex }
+                    )
+                elseif gold_mine_action == "efficiency"
+                    or gold_mine_action == "crit" then
+                    local group = gold_mine_action == "efficiency"
+                        and "gold_mine_efficiency" or "gold_mine_crit"
+                    direct_result, direct_error = event_bus.request(
+                        events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,
+                        {
+                            player_id = player_id,
+                            technology_group = group,
+                            source = "gold_mine_ability",
+                            entindex = entindex,
+                            request_id = "gold_mine_ui_" .. tostring(entindex)
+                                .. "_" .. tostring(ability_request_sequence),
+                        }
+                    )
+                else
+                    direct_result, direct_error = event_bus.request(
+                        events.GOLD_MINE_AUTO_UPGRADE_REQUEST,
+                        { entindex = entindex }
+                    )
+                end
+            end
+            local succeeded = direct_result and direct_result.ok == true
+            local message = direct_result
+                and (direct_result.error or direct_result.message)
+                or direct_error
+            if message and message ~= "" then
+                event_bus.emit(events.UI_NOTIFICATION, {
+                    player_id = player_id,
+                    message = message,
+                    level = succeeded and "info" or "error",
+                })
+            end
+            print("[SURVIVAL_CAST][SERVER] GOLD_MINE_DISPATCHED action="
+                .. tostring(gold_mine_action) .. " ok=" .. tostring(succeeded)
+                .. " error=" .. tostring(message or ""))
         end
         if is_point_target then
             print("[SURVIVAL_CAST][SERVER] REJECT point_target_requires_client_position name="
@@ -467,16 +571,28 @@ local function register_ability_cast_request()
         elseif not is_point_target and not handled_directly then
             print("[SURVIVAL_CAST][SERVER] REJECT ability_cast_rejected")
         end
-        local request_accepted = ok or handled_directly
+        local request_accepted
+        if direct_result_required then
+            request_accepted = direct_result ~= nil and direct_result.ok == true
+        elseif handled_directly then
+            request_accepted = true
+        else
+            request_accepted = ok
+        end
+        local response_error = ""
+        if not request_accepted then
+            response_error = direct_result and direct_result.error
+                or direct_error
+                or (is_point_target and "point_target_requires_client_position"
+                    or "ability_cast_rejected")
+        end
         send_to_player("ui_ability_cast_result", player_id, {
             success = request_accepted and 1 or 0,
             entindex = entindex or -1,
             ability_entindex = ability_entindex or -1,
             ability_name = ability_name,
             behavior = behavior,
-            error = request_accepted and "" or (is_point_target
-                and "point_target_requires_client_position"
-                or "ability_cast_rejected"),
+            error = response_error,
         })
     end)
 end
@@ -560,6 +676,8 @@ end
 function M.init()
     synthesis_requests = {}
     building_snapshot_sequence = 0
+    ability_request_sequence = 0
+    selected_unit_by_player = {}
     register_selected_unit_stats_request()
     register_building_snapshot_push()
     register_snapshot_request()
@@ -572,6 +690,7 @@ function M.init()
     register_ability_cast_position_request()
     register_building_move_request()
     register_return_home_request()
+    event_bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
     event_bus.subscribe(events.UI_NOTIFICATION, on_notification)
     event_bus.subscribe(events.SHOP_STATE_CHANGED, on_shop_state_changed)
 end

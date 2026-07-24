@@ -57,7 +57,11 @@ local M = {
     SHOP_UNLOCK_CHANGED = "shop.unlock.changed",
     TECHNOLOGY_STATE_GET_REQUEST = "technology.state.get.request",
     TECHNOLOGY_PURCHASE_NEXT_REQUEST = "technology.purchase_next.request",
+    TECHNOLOGY_CHEAT_SET_REQUEST = "technology.cheat_set.request",
     TECHNOLOGY_CHANGED = "technology.changed",
+    TECHNOLOGY_STATS_GET_REQUEST = "technology.stats.get.request",
+    TECHNOLOGY_STATS_GROWTH_ADD_REQUEST = "technology.stats.growth.add.request",
+    TECHNOLOGY_STATS_CHANGED = "technology.stats.changed",
 
     HERO_ALTAR_OPEN_REQUEST = "hero.altar.open.request",
     HERO_SUMMON_SNAPSHOT_REQUEST = "hero.summon.snapshot.request",
@@ -103,6 +107,10 @@ local M = {
     WEAPON_SYNTHESIS_REQUEST = "weapon.synthesis.request",
     SHOP_EQUIPMENT_UPGRADE_REQUEST = "shop.equipment_upgrade.request",
     CHALLENGE_EQUIPMENT_REWARD_REQUEST = "challenge.equipment_reward.request",
+    CHALLENGE_MATERIAL_DROP_REQUEST = "challenge.material.drop.request",
+    CHALLENGE_MATERIAL_PICKUP_REQUEST = "challenge.material.pickup.request",
+    POLAR_CRYSTAL_PROGRESS_GET_REQUEST = "polar_crystal.progress.get.request",
+    POLAR_CRYSTAL_PROGRESS_CHANGED = "polar_crystal.progress.changed",
 
     WEAPON_EQUIPMENT_GET_REQUEST = "weapon.equipment.get.request",
     WEAPON_EQUIPPED_CHANGED = "weapon.equipped.changed",
@@ -117,6 +125,7 @@ local M = {
     HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST = "hero.combat_stats.debug_attack.request",
     HERO_COMBAT_STATS_CHANGED = "hero.combat_stats.changed",
     COMBAT_DAMAGE_RESOLVED = "combat.damage.resolved",
+    UNIT_COMBAT_STATS_CHANGED = "unit.combat_stats.changed",
 
     MONSTER_ENCOUNTER_START_REQUEST = "monster.encounter.start.request",
     MONSTER_ENCOUNTER_QUERY_REQUEST = "monster.encounter.query.request",

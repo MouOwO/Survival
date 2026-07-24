@@ -62,13 +62,13 @@ local M = {
     ability_upgrade_gold_mine_efficiency = {
         abilityid = "ability_upgrade_gold_mine_efficiency",
         abilityname = "金矿收益",
-        abilitydesc = "提升玩家的金矿收益科技，对该玩家所有金矿生效。满级后技能自动隐藏。",
+        abilitydesc = "共50级，每级使该玩家所有金矿收益提高5%；额外金币不足1时按1金币计算。第1级消耗20000木材，之后每级增加20000木材。",
         abilityicon = "alchemist_goblins_greed",
     },
     ability_upgrade_gold_mine_crit = {
         abilityid = "ability_upgrade_gold_mine_crit",
         abilityname = "提升采集暴击率",
-        abilitydesc = "提升玩家的采集暴击率科技，对该玩家所有金矿生效。共10级，每级增加2%；暴击时本次金币产量为150%。",
+        abilitydesc = "共10级，每级增加3%采集暴击率。第1级消耗2000金币，之后每级增加10000金币；采集暴击时获得正常采集金币的3倍。",
         abilityicon = "phantom_assassin_coup_de_grace",
     },
     ability_gold_mine_auto_upgrade = {

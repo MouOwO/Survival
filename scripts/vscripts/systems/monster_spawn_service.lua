@@ -180,6 +180,7 @@ local function start_encounter(payload)
     end
     local armor = tonumber(archetype.armor)
     if armor then unit:SetPhysicalArmorBaseValue(armor) end
+    unit.survival_minimum_armor = tonumber(archetype.minimum_armor) or 1
     local attack_speed = tonumber(archetype.attack_speed)
         or tonumber(archetype.base_attack_speed) or 0.5
     attack_speed = math.max(0.01, attack_speed)

@@ -3,23 +3,13 @@ local events = require("core/events")
 local config = require("config/workers_config")
 local training_definitions = require("config/generated/training_definitions")
 local global_rules = require("config/global_rules")
+local technology_stat_manager = require("systems/technology_stat_manager")
 
 local M = {}
 local workers = {}
 local current_tree_entindex = -1
 local tree_lumber_efficiency_buff = 0
-local technology_levels = {}
 local population_training_counts = {}
-
-local function sync_technology_levels(player_id)
-    local result = event_bus.request(
-        events.TECHNOLOGY_STATE_GET_REQUEST,
-        { player_id = player_id }
-    )
-    if result and result.levels then
-        technology_levels[player_id] = result.levels
-    end
-end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -96,19 +86,15 @@ local function notify(player_id, message, level)
     })
 end
 
-local function technology_level(player_id, group)
-    local levels = technology_levels[player_id] or {}
-    return tonumber(levels[group]) or 0
-end
-
 local function refresh_worker_technology(player_id)
-    local basic_efficiency = technology_level(player_id, "lumberjack_efficiency")
-    local advanced_efficiency = technology_level(player_id, "advanced_lumberjack_efficiency") * 3
-    local speed_pct = technology_level(player_id, "lumberjack_speed") * 5
-    local interval_reduction = technology_level(player_id, "advanced_lumberjack_speed") * 0.01
-    local crit_chance = technology_level(player_id, "lumberjack_crit") * 3
-    local attack_growth = technology_level(player_id, "researcher_lumberjack_attack_growth") * 2
-    local armor_reduction = technology_level(player_id, "researcher_lumberjack_armor_reduction") * 0.1
+    local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
+    local efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
+    local speed_pct = tonumber(lumberjack.attack_speed_bonus_pct) or 0
+    local interval_reduction = tonumber(lumberjack.attack_interval_flat) or 0
+    local crit_chance = tonumber(lumberjack.critical_chance_pct) or 0
+    local attack_growth = tonumber(lumberjack.attack_flat) or 0
+    local attack_gain_per_attack = tonumber(lumberjack.attack_gain_per_attack) or 0
+    local armor_reduction = tonumber(lumberjack.armor_reduction_per_attack) or 0
     for entindex, state in pairs(workers) do
         if state.worker_type == "lumberjack"
             and state.player_id == player_id and valid_entity(state.unit) then
@@ -125,7 +111,8 @@ local function refresh_worker_technology(player_id)
             end
             state.technology_attack_growth = attack_growth
             state.technology_armor_reduction = armor_reduction
-            state.technology_efficiency = basic_efficiency + advanced_efficiency
+            state.technology_efficiency = efficiency
+            state.technology_attack_gain_per_attack = attack_gain_per_attack
             local modifier = state.unit:FindModifierByName("modifier_lumberjack_ai")
             if modifier and modifier.SetTechnologyLumberEfficiency then
                 modifier:SetTechnologyLumberEfficiency(state.technology_efficiency)
@@ -136,13 +123,33 @@ local function refresh_worker_technology(player_id)
             if modifier and modifier.SetTechnologyArmorReduction then
                 modifier:SetTechnologyArmorReduction(armor_reduction)
             end
+            if modifier and modifier.SetAttackGainPerAttack then
+                modifier:SetAttackGainPerAttack(attack_gain_per_attack)
+            end
         end
     end
 end
 
-local function on_technology_changed(payload)
-    technology_levels[payload.player_id] = payload.levels or {}
-    refresh_worker_technology(payload.player_id)
+local function on_technology_stats_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    refresh_worker_technology(player_id)
+end
+
+local function on_tree_hit(payload)
+    if not payload or payload.source ~= "lumberjack" then return end
+    local player_id = tonumber(payload.player_id)
+    if player_id == nil then return end
+    local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
+    local amount = tonumber(lumberjack.attack_gain_per_attack) or 0
+    if amount <= 0 then return end
+    event_bus.request(events.TECHNOLOGY_STATS_GROWTH_ADD_REQUEST, {
+        player_id = player_id,
+        section = "lumberjack",
+        field = "attack",
+        amount = amount,
+        reason = "lumberjack_attack_growth",
+    })
 end
 
 local function update_worker_efficiency()
@@ -256,8 +263,6 @@ local function train_worker(payload)
     if training.training_type ~= "unit" then
         return { ok = false, error = "training_type_invalid" }
     end
-    sync_technology_levels(city_state.player_id)
-
     local existing_count = 0
     for _, state in pairs(workers) do
         if state.training_id == training_id and valid_entity(state.unit) then
@@ -346,14 +351,17 @@ local function train_worker(payload)
         })
     else
         worker.survival_worker_type = "lumberjack"
+        local lumberjack = technology_stat_manager.get(city_state.player_id).final.lumberjack or {}
+        local technology_efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
         worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
             tree_entindex = current_tree_entindex,
             base_lumber_efficiency = tonumber(training.wood_per_hit)
                 or config.wood_per_hit or 1,
             tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
-            technology_lumber_efficiency = technology_level(city_state.player_id, "lumberjack_efficiency") + technology_level(city_state.player_id, "advanced_lumberjack_efficiency") * 3,
-            technology_crit_chance = technology_level(city_state.player_id, "lumberjack_crit") * 3,
-            technology_armor_reduction = technology_level(city_state.player_id, "researcher_lumberjack_armor_reduction") * 0.1,
+            technology_lumber_efficiency = technology_efficiency,
+            technology_crit_chance = tonumber(lumberjack.critical_chance_pct) or 0,
+            technology_armor_reduction = tonumber(lumberjack.armor_reduction_per_attack) or 0,
+            attack_gain_per_attack = tonumber(lumberjack.attack_gain_per_attack) or 0,
             player_id = city_state.player_id,
         })
     end
@@ -369,11 +377,10 @@ local function train_worker(payload)
         base_damage_max = base_attack,
         base_lumber_efficiency = tonumber(training.wood_per_hit) or 0,
         tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
-        technology_efficiency = technology_level(city_state.player_id, "lumberjack_efficiency") + technology_level(city_state.player_id, "advanced_lumberjack_efficiency") * 3,
+        technology_efficiency = technology_efficiency,
         lumber_efficiency = (tonumber(training.wood_per_hit) or 0)
             + tree_lumber_efficiency_buff
-            + technology_level(city_state.player_id, "lumberjack_efficiency")
-            + technology_level(city_state.player_id, "advanced_lumberjack_efficiency") * 3,
+            + technology_efficiency,
     }
     if not is_repairer then
         refresh_worker_technology(city_state.player_id)
@@ -426,13 +433,13 @@ function M.init()
     workers = {}
     current_tree_entindex = -1
     tree_lumber_efficiency_buff = 0
-    technology_levels = {}
     population_training_counts = {}
     event_bus.subscribe(events.WORKER_TRAIN_REQUEST, train_worker)
     event_bus.subscribe(events.TREE_SPAWNED, on_tree_spawned)
     event_bus.subscribe(events.TREE_DESTROYED, on_tree_destroyed)
+    event_bus.subscribe(events.TREE_HIT, on_tree_hit)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
-    event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
+    event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
 end
 
 return M

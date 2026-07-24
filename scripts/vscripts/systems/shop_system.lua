@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local catalog = require("systems/shop_catalog")
 local grant_service = require("systems/shop_grant_service")
 local M = {}
@@ -15,6 +16,8 @@ local function reset_state()
         city_level_by_team = {},
         building_counts_by_team = {},
         sequence_by_player = {},
+        snapshot_cache_by_player = {},
+        pending_push_reason = {},
     }
 end
 local function valid_player_id(player_id)
@@ -113,18 +116,101 @@ local function build_snapshot(player_id, reason, mode)
         snapshot_context(player_id, reason or "open", mode)
     )
 end
-local function push_snapshot(player_id, reason)
+
+local function values_equal(left, right)
+    if type(left) ~= type(right) then return false end
+    if type(left) ~= "table" then return left == right end
+    for key, value in pairs(left) do
+        if not values_equal(value, right[key]) then return false end
+    end
+    for key, _ in pairs(right) do
+        if left[key] == nil then return false end
+    end
+    return true
+end
+
+local function entries_by_id(entries)
+    local result = {}
+    for _, entry in ipairs(entries or {}) do
+        result[tostring(entry.entry_id or "")] = entry
+    end
+    return result
+end
+
+local function build_patch(previous, current)
+    local old_entries = entries_by_id(previous.entries)
+    local new_entries = entries_by_id(current.entries)
+    local changed = {}
+    local removed = {}
+    for entry_id, entry in pairs(new_entries) do
+        if not values_equal(entry, old_entries[entry_id]) then
+            table.insert(changed, entry)
+        end
+    end
+    for entry_id, _ in pairs(old_entries) do
+        if not new_entries[entry_id] then
+            table.insert(removed, entry_id)
+        end
+    end
+    table.sort(changed, function(left, right)
+        return (tonumber(left.sort_order) or 0)
+            < (tonumber(right.sort_order) or 0)
+    end)
+    table.sort(removed)
+
+    local patch = {
+        schema_version = current.schema_version,
+        config_version = current.config_version,
+        full = 0,
+        sequence = current.sequence,
+        base_sequence = previous.sequence,
+        reason = current.reason,
+        player_id = current.player_id,
+        ui_mode = current.ui_mode,
+        changed_entries = changed,
+        removed_entry_ids = removed,
+    }
+    if not values_equal(previous.resources or {}, current.resources or {}) then
+        patch.resources = current.resources
+    end
+    if previous.ui_mode ~= current.ui_mode
+        or previous.config_version ~= current.config_version
+        or not values_equal(previous.categories or {}, current.categories or {}) then
+        patch.categories = current.categories
+    end
+    local changed_any = patch.resources ~= nil or patch.categories ~= nil
+        or #changed > 0 or #removed > 0
+    return changed_any and patch or nil
+end
+
+local function publish_snapshot(player_id, reason)
     if not state.opened_players[player_id] then
         return
     end
+    local current = build_snapshot(
+        player_id,
+        reason,
+        state.opened_players[player_id]
+    )
+    local previous = state.snapshot_cache_by_player[player_id]
+    local outgoing = previous and build_patch(previous, current) or current
+    current.full = 1
+    if not outgoing then return end
+    state.snapshot_cache_by_player[player_id] = current
+    if outgoing == current then outgoing.full = 1 end
     event_bus.emit(events.SHOP_STATE_CHANGED, {
         player_id = player_id,
-        snapshot = build_snapshot(
-            player_id,
-            reason,
-            state.opened_players[player_id]
-        ),
+        snapshot = outgoing,
     })
+end
+local function push_snapshot(player_id, reason)
+    if not state.opened_players[player_id] then return end
+    state.pending_push_reason[player_id] = reason or "changed"
+    scheduler.after(0.05, function()
+        local pending_reason = state.pending_push_reason[player_id]
+        state.pending_push_reason[player_id] = nil
+        if pending_reason then publish_snapshot(player_id, pending_reason) end
+    end, "shop_snapshot_push_" .. tostring(player_id))
 end
 local function push_team(team, reason)
     for player_id, _ in pairs(state.opened_players) do
@@ -162,13 +248,19 @@ local function open_shop(payload)
         end
     end
     state.opened_players[player_id] = mode
+    local snapshot = build_snapshot(player_id, "opened", mode)
+    snapshot.full = 1
+    state.snapshot_cache_by_player[player_id] = snapshot
     return {
         ok = true,
-        snapshot = build_snapshot(player_id, "opened", mode),
+        snapshot = snapshot,
     }
 end
 local function close_shop(payload)
     state.opened_players[payload.player_id] = nil
+    state.snapshot_cache_by_player[payload.player_id] = nil
+    state.pending_push_reason[payload.player_id] = nil
+    scheduler.cancel("shop_snapshot_push_" .. tostring(payload.player_id))
     return { ok = true }
 end
 local function cached_result(player_id, request_id)
@@ -260,7 +352,6 @@ local function purchase(payload)
         entry,
         state
     )
-    print(string.format("[SHOP_GRANT_RESULT] player=%s entry=%s content=%s ok=%s", tostring(player_id), tostring(entry.entryid), tostring(entry.contentid), tostring(granted and granted.ok == true)))
     if not granted or not granted.ok then
         grant_service.refund(team, entry)
         notify(
@@ -295,7 +386,15 @@ local function purchase_next_technology(payload)
     local target_level = (tonumber(levels[group]) or 0) + 1
     local entry = catalog.find_technology_entry(group, target_level)
     if not entry then
-        return { ok = false, error = "升级费用尚未确认或科技已满级" }
+        local max_level = catalog.max_technology_level(group)
+        if max_level > 0 and target_level > max_level then
+            return { ok = false, error = "科技已满级" }
+        end
+        return {
+            ok = false,
+            error = "升级配置缺失：" .. group
+                .. " Lv." .. tostring(target_level),
+        }
     end
     return purchase({
         player_id = player_id,
@@ -371,6 +470,9 @@ end
 
 function M.init()
     reset_state()
+    require("debug/technology_cheat_handler").register(
+        state, push_snapshot
+    )
     event_bus.handle_request(events.SHOP_OPEN_REQUEST, open_shop)
     event_bus.handle_request(events.SHOP_CLOSE_REQUEST, close_shop)
     event_bus.handle_request(events.SHOP_PURCHASE_REQUEST, purchase)
@@ -392,3 +494,4 @@ function M.init()
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_player_changed)
 end
 return M
+--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

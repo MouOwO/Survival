@@ -59,6 +59,10 @@ local challenge_session_service =
     require("systems/challenge_session_service")
 local challenge_equipment_reward_service =
     require("systems/challenge_equipment_reward_service")
+local challenge_upgrade_material_service =
+    require("systems/challenge_upgrade_material_service")
+local polar_crystal_progression_service =
+    require("systems/polar_crystal_progression_service")
 local wave_system = require("systems/wave_system")
 local monster_archetypes = require("config/generated/monster_archetypes")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
@@ -80,6 +84,8 @@ local equipment_growth_service =
     require("systems/equipment_growth_service")
 local hero_combat_stat_service =
     require("systems/hero_combat_stat_service")
+local technology_stat_manager =
+    require("systems/technology_stat_manager")
 local shop_system = require("systems/shop_system")
 
 local ui_projection = require("ui/ui_projection")
@@ -131,6 +137,7 @@ require("abilities/ability_upgrade_gold_mine")
 require("abilities/ability_upgrade_gold_mine_efficiency")
 require("abilities/ability_upgrade_gold_mine_crit")
 require("abilities/ability_gold_mine_auto_upgrade")
+require("abilities/ability_survival_pickup_materials")
 require("abilities/ability_tower_class_1")
 require("abilities/ability_tower_class_2")
 require("abilities/ability_tower_class_3")
@@ -230,6 +237,7 @@ function M.precache(context)
         "building_farm",
         "building_gold_mine",
         "building_hero_altar",
+        "npc_survival_upgrade_material",
         "npc_survival_lumberjack",
         "npc_dota_hero_doom",
         "npc_dota_hero_sven",
@@ -345,6 +353,7 @@ function M.activate()
     monster_encounter_ui_service.init()
     combat_stats_ui_service.init()
 
+    technology_stat_manager.init()
     grid_system.init()
     resource_system.init()
     building_system.init()
@@ -358,6 +367,8 @@ function M.activate()
     hero_skill_choice_service.init()
     content_inventory_service.init()
     inventory_transaction_service.init()
+    polar_crystal_progression_service.init()
+    challenge_upgrade_material_service.init()
     challenge_equipment_reward_service.init()
     equipment_instance_service.init()
     equipment_growth_service.init()

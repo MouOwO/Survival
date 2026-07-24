@@ -19,9 +19,6 @@ end
 function modifier_weapon_stat_projection:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
-        MODIFIER_PROPERTY_STATS_STRENGTH_BONUS,
-        MODIFIER_PROPERTY_STATS_AGILITY_BONUS,
-        MODIFIER_PROPERTY_STATS_INTELLECT_BONUS,
         MODIFIER_EVENT_ON_TAKEDAMAGE,
     }
 end
@@ -60,16 +57,4 @@ function modifier_weapon_stat_projection:OnTakeDamage(params)
         ability_name = ability and not ability:IsNull()
             and ability:GetAbilityName() or "",
     })
-end
-
-function modifier_weapon_stat_projection:GetModifierBonusStats_Strength()
-    return tonumber(snapshot(self).engine_weapon_strength_bonus) or 0
-end
-
-function modifier_weapon_stat_projection:GetModifierBonusStats_Agility()
-    return tonumber(snapshot(self).engine_weapon_agility_bonus) or 0
-end
-
-function modifier_weapon_stat_projection:GetModifierBonusStats_Intellect()
-    return tonumber(snapshot(self).engine_weapon_intellect_bonus) or 0
 end

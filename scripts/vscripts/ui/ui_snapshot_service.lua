@@ -27,14 +27,9 @@ local function publish_player(player_id)
         snapshot
     )
 
-    local player = PlayerResource:GetPlayer(player_id)
-    if player then
-        CustomGameEventManager:Send_ServerToPlayer(
-            player,
-            "ui_state_snapshot",
-            snapshot
-        )
-    end
+    -- CustomNetTable 已足够同步常规 HUD 状态。此前每次 dirty 同时再
+    -- 发送一份相同的 CustomGameEvent，倒计时每秒都会触发所有玩家的双份
+    -- UI 更新，形成明显的周期性帧尖峰。
     return true
 end
 
@@ -73,7 +68,7 @@ function M.init()
     dirty_teams = { all = true }
     event_bus.subscribe(events.UI_DIRTY, on_dirty)
     event_bus.subscribe(events.UI_SNAPSHOT_REQUESTED, on_snapshot_requested)
-    scheduler.every(0.10, function()
+    scheduler.every(0.25, function()
         flush_dirty()
         return true
     end, "ui_snapshot_flush")

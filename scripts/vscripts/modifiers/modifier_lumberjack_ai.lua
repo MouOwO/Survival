@@ -25,6 +25,11 @@ function M:OnCreated(params)
     self.technology_armor_reduction = math.max(
         0, tonumber(params.technology_armor_reduction) or 0
     )
+    self.attack_gain_per_attack = math.max(
+        0, tonumber(params.attack_gain_per_attack) or 0
+    )
+    self.critical_records = {}
+    self.pending_critical = false
     self.lumber_efficiency = self.base_lumber_efficiency
         + self.tree_lumber_efficiency_buff
         + self.technology_lumber_efficiency
@@ -56,6 +61,10 @@ function M:SetTechnologyArmorReduction(value)
     self.technology_armor_reduction = math.max(0, tonumber(value) or 0)
 end
 
+function M:SetAttackGainPerAttack(value)
+    self.attack_gain_per_attack = math.max(0, tonumber(value) or 0)
+end
+
 function M:GetLumberEfficiency()
     return self.lumber_efficiency or self.base_lumber_efficiency or 1
 end
@@ -83,7 +92,29 @@ function M:OnIntervalThink()
 end
 
 function M:DeclareFunctions()
-    return { MODIFIER_EVENT_ON_ATTACK_LANDED }
+    return {
+        MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE,
+        MODIFIER_EVENT_ON_ATTACK_LANDED,
+        MODIFIER_EVENT_ON_ATTACK_RECORD_DESTROY,
+    }
+end
+
+function M:GetModifierPreAttack_CriticalStrike(keys)
+    if not IsServer() or keys.attacker ~= self:GetParent() then return end
+    local critical
+    if keys.record ~= nil and self.critical_records[keys.record] ~= nil then
+        critical = self.critical_records[keys.record]
+    else
+        critical = RandomFloat(0, 100)
+            < (self.technology_crit_chance or 0)
+        if keys.record ~= nil then
+            self.critical_records[keys.record] = critical
+        else
+            self.pending_critical = critical
+        end
+    end
+    -- Lumberjack critical damage is intentionally fixed at two times damage.
+    if critical then return 200 end
 end
 
 function M:OnAttackLanded(keys)
@@ -92,21 +123,21 @@ function M:OnAttackLanded(keys)
     if keys.attacker ~= parent then return end
     local target = keys.target
     if not target or target:IsNull() then return end
+    local critical = keys.record ~= nil
+        and self.critical_records[keys.record] == true
+        or self.pending_critical == true
+    self.pending_critical = false
     if self.technology_armor_reduction > 0
         and target:GetTeamNumber() ~= parent:GetTeamNumber() then
         local modifier = target:AddNewModifier(
             parent,
             nil,
             "modifier_research_armor_reduction",
-            { armor_reduction = self.technology_armor_reduction }
+            { armor_reduction_per_attack = self.technology_armor_reduction }
         )
-        if modifier and modifier.SetArmorReduction then
-            modifier:SetArmorReduction(self.technology_armor_reduction)
-        end
     end
     if target:entindex() ~= self.tree_entindex then return end
 
-    local critical = RandomFloat(0, 100) < (self.technology_crit_chance or 0)
     event_bus.emit(events.TREE_HIT, {
         attacker = parent,
         target = target,
@@ -117,6 +148,13 @@ function M:OnAttackLanded(keys)
         critical = critical,
         source = "lumberjack",
     })
+end
+
+function M:OnAttackRecordDestroy(keys)
+    if not IsServer() or keys.attacker ~= self:GetParent() then return end
+    if keys.record ~= nil then
+        self.critical_records[keys.record] = nil
+    end
 end
 
 return M

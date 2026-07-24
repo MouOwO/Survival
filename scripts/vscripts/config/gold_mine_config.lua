@@ -54,7 +54,8 @@ function M.mine_upgrade_cost(current_level)
 end
 
 function M.technology_upgrade_cost(group, current_level)
-    local row = (technology_rows[group] or {})[(tonumber(current_level) or 0) + 1]
+    local target_level = (tonumber(current_level) or 0) + 1
+    local row = (technology_rows[group] or {})[target_level]
     if not row then return nil end
     return {
         wood = tonumber(row.wood_cost) or 0,
@@ -71,15 +72,27 @@ function M.crit_upgrade_cost(current_level)
 end
 
 function M.efficiency_percent(efficiency_level)
-    local level = math.max(0, tonumber(efficiency_level) or 0)
-    return (technology_effects.gold_mine_efficiency or {})[level] or 0
+    local level = math.max(0, math.min(
+        M.max_efficiency_level,
+        tonumber(efficiency_level) or 0
+    ))
+    return tonumber((technology_effects.gold_mine_efficiency or {})[level]) or 0
+end
+
+function M.efficiency_bonus(base_income, efficiency_level)
+    if (tonumber(efficiency_level) or 0) <= 0 then return 0 end
+    local bonus = math.floor(
+        (tonumber(base_income) or 0)
+            * M.efficiency_percent(efficiency_level) / 100
+    )
+    return math.max(1, bonus)
 end
 
 function M.income_amount(mine_level, efficiency_level, critical)
     local level = math.max(1, math.min(M.max_mine_level, mine_level or 1))
     local row = level_by_number[level]
     local base_income = tonumber(row and row.base_income) or 0
-    local amount = base_income * (1 + M.efficiency_percent(efficiency_level) / 100)
+    local amount = base_income + M.efficiency_bonus(base_income, efficiency_level)
     if critical then
         amount = amount * M.crit_multiplier(level)
     end
@@ -91,12 +104,15 @@ function M.normal_income(mine_level, efficiency_level)
 end
 
 function M.crit_multiplier(mine_level)
-    return tonumber(rule.crit_multiplier) or 1.30
+    return tonumber(rule.crit_multiplier) or 3.0
 end
 
 function M.crit_chance(crit_level)
-    local level = math.max(0, tonumber(crit_level) or 0)
-    return (technology_effects.gold_mine_crit or {})[level] or 0
+    local level = math.max(0, math.min(
+        M.max_crit_level,
+        tonumber(crit_level) or 0
+    ))
+    return tonumber((technology_effects.gold_mine_crit or {})[level]) or 0
 end
 
 function M.level_data(level)

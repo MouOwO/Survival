@@ -17,8 +17,102 @@ local function state(player_id)
         hero = nil,
         equipped_by_slot = {},
         item_by_slot = {},
+        content_shells = {},
+        inventory_counts = {},
     }
     return state_by_player[player_id]
+end
+
+local function shell_item_name(definition)
+    local series_id = tostring(definition and definition.series_id or "")
+    local names = {
+        attack_gloves = "item_survival_attack_gloves_shell",
+        burning_blade = "item_survival_burning_blade_shell",
+        iron_armor = "item_survival_iron_armor_shell",
+        infernal_armor = "item_survival_infernal_armor_shell",
+    }
+    return names[series_id]
+end
+
+local function remove_content_shell(current, content_id)
+    local item = current.content_shells[content_id]
+    if not valid_entity(item) then
+        current.content_shells[content_id] = nil
+        return
+    end
+    if valid_entity(current.hero) and current.hero.RemoveItem then
+        pcall(current.hero.RemoveItem, current.hero, item)
+    end
+    if UTIL_Remove then pcall(UTIL_Remove, item) end
+    current.content_shells[content_id] = nil
+end
+
+local function add_content_shell(current, content_id, definition, quantity)
+    if not valid_entity(current.hero) then return nil end
+    local item = CreateItem(shell_item_name(definition), current.hero, current.hero)
+    if not valid_entity(item) then
+        logger.warn("WeaponEquipment", "content shell create failed: " .. content_id)
+        return nil
+    end
+    item.survival_content_id = content_id
+    if item.SetAbilityTextureName and tostring(definition.icon_name or "") ~= "" then
+        pcall(item.SetAbilityTextureName, item, tostring(definition.icon_name))
+    end
+    if item.SetCurrentCharges then
+        if content_id == "item_small_polar_crystal" then
+            local progress = event_bus.request(
+                events.POLAR_CRYSTAL_PROGRESS_GET_REQUEST,
+                { player_id = current.hero:GetPlayerOwnerID() }
+            )
+            item:SetCurrentCharges(math.max(
+                0,
+                math.floor(tonumber(progress and progress.remaining) or 200)
+            ))
+        else
+            item:SetCurrentCharges(math.max(1, math.floor(tonumber(quantity) or 1)))
+        end
+    end
+    current.hero:AddItem(item)
+    current.content_shells[content_id] = item
+    return item
+end
+
+local function should_use_content_shell(content_id, definition)
+    if not definition then return false end
+    if not weapons.by_id[content_id] then return false end
+    if not shell_item_name(definition) then return false end
+    if tostring(definition.engine_item_name or "") ~= "" then return false end
+    if content_id == "item_death_mask" then return false end
+    return tostring(definition.grant_type or "") == "virtual_item"
+end
+
+local function sync_content_shells(player_id, counts)
+    local current = state(player_id)
+    current.inventory_counts = counts or {}
+    for content_id in pairs(current.content_shells) do
+        local definition = weapons.by_id[content_id]
+        if (tonumber(current.inventory_counts[content_id]) or 0) <= 0
+            or not should_use_content_shell(content_id, definition) then
+            remove_content_shell(current, content_id)
+        end
+    end
+    if not valid_entity(current.hero) then return end
+    for content_id, quantity in pairs(current.inventory_counts) do
+        local definition = weapons.by_id[content_id]
+        if (tonumber(quantity) or 0) > 0
+            and should_use_content_shell(content_id, definition) then
+            local shell = current.content_shells[content_id]
+            if not valid_entity(shell) then
+                shell = add_content_shell(
+                    current, content_id, definition, quantity
+                )
+            elseif shell.SetCurrentCharges then
+                shell:SetCurrentCharges(math.max(
+                    1, math.floor(tonumber(quantity) or 1)
+                ))
+            end
+        end
+    end
 end
 
 local function snapshot(player_id)
@@ -87,6 +181,18 @@ local function add_shell(current, definition, slot, explicit_item_name)
         if growth and growth.snapshot then
             set_item_counter(item, growth.snapshot)
         end
+    elseif slot == "crystal" and current.hero.GetPlayerOwnerID
+        and item_name == "item_survival_small_polar_crystal" then
+        local progress = event_bus.request(
+            events.POLAR_CRYSTAL_PROGRESS_GET_REQUEST,
+            { player_id = current.hero:GetPlayerOwnerID() }
+        )
+        if item.SetCurrentCharges then
+            item:SetCurrentCharges(math.max(
+                0,
+                math.floor(tonumber(progress and progress.remaining) or 200)
+            ))
+        end
     end
     return item
 end
@@ -121,7 +227,11 @@ local function equip(player_id, content_id, reason)
     remove_shell(current, slot)
     current.equipped_by_slot[slot] = content_id
     add_shell(current, definition or {}, slot,
-        content_id == "item_death_mask" and "item_survival_death_mask" or nil)
+        ({
+            item_death_mask = "item_survival_death_mask",
+            item_small_polar_crystal = "item_survival_small_polar_crystal",
+            item_large_polar_crystal = "item_survival_large_polar_crystal",
+        })[content_id])
     local data = snapshot(player_id)
     event_bus.emit(events.WEAPON_EQUIPPED_CHANGED, {
         player_id = player_id,
@@ -155,6 +265,7 @@ end
 local function on_inventory_changed(payload)
     local player_id = tonumber(payload.player_id)
     local counts = payload.snapshot and payload.snapshot.counts or {}
+    sync_content_shells(player_id, counts)
     local replacements = {}
     for content_id, delta in pairs(payload.changes or {}) do
         local definition = weapons.by_id[content_id]
@@ -181,17 +292,40 @@ end
 
 local function on_hero_summoned(payload)
     local current = state(payload.player_id)
-    current.hero = payload.unit
+    for content_id in pairs(current.content_shells) do
+        remove_content_shell(current, content_id)
+    end
     for slot, content_id in pairs(current.equipped_by_slot) do
         remove_shell(current, slot)
-        add_shell(current, weapons.by_id[content_id] or {}, slot,
-            content_id == "item_death_mask" and "item_survival_death_mask" or nil)
     end
+    current.hero = payload.unit
+    for slot, content_id in pairs(current.equipped_by_slot) do
+        add_shell(current, weapons.by_id[content_id] or {}, slot, ({
+            item_death_mask = "item_survival_death_mask",
+            item_small_polar_crystal = "item_survival_small_polar_crystal",
+            item_large_polar_crystal = "item_survival_large_polar_crystal",
+        })[content_id])
+    end
+    sync_content_shells(payload.player_id, current.inventory_counts)
 end
 
 local function on_growth_changed(payload)
     if payload.snapshot then
         set_main_hand_counter(tonumber(payload.player_id), payload.snapshot)
+    end
+end
+
+local function on_polar_crystal_progress(payload)
+    local current = state(tonumber(payload.player_id))
+    if current.equipped_by_slot.crystal ~= "item_small_polar_crystal" then
+        return
+    end
+    local item = current.item_by_slot.crystal
+    if valid_entity(item) and item.SetCurrentCharges then
+        item:SetCurrentCharges(math.max(
+            0,
+            math.floor(tonumber(payload.remaining) or 200)
+        ))
     end
 end
 
@@ -204,6 +338,10 @@ function M.init()
     event_bus.handle_request(events.WEAPON_EQUIPMENT_GET_REQUEST, get_equipment)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_inventory_changed)
     event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_growth_changed)
+    event_bus.subscribe(
+        events.POLAR_CRYSTAL_PROGRESS_CHANGED,
+        on_polar_crystal_progress
+    )
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
 end
 

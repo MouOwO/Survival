@@ -23,10 +23,15 @@ local function game_time()
     return 0
 end
 
-local function attributes(unit)
-    return (tonumber(unit:GetStrength()) or 0)
-        + (tonumber(unit:GetAgility()) or 0)
-        + (tonumber(unit:GetIntellect()) or 0)
+local function attributes(player_id)
+    local response = event_bus.request(
+        events.HERO_COMBAT_STATS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local stats = response and response.snapshot or {}
+    return (tonumber(stats.strength) or 0)
+        + (tonumber(stats.agility) or 0)
+        + (tonumber(stats.intellect) or 0)
 end
 
 function modifier_equipment_effects:OnIntervalThink()
@@ -51,7 +56,8 @@ function modifier_equipment_effects:OnIntervalThink()
                         DOTA_UNIT_TARGET_TEAM_ENEMY,
                         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
                         DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false) or {}
-                    local damage = attributes(parent) * (tonumber(value.multiplier) or 0)
+                    local damage = attributes(self.player_id)
+                        * (tonumber(value.multiplier) or 0)
                     for _, victim in ipairs(victims) do
                         -- DAMAGE_MODULE_MIGRATION: legacy aura damage remains for compatibility;
                         -- migrate after validating interval/aura transaction semantics.
@@ -67,12 +73,9 @@ end
 function modifier_equipment_effects:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
-        MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE,
+        MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
         MODIFIER_PROPERTY_HEALTH_BONUS,
         MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
-        MODIFIER_PROPERTY_STATS_STRENGTH_BONUS,
-        MODIFIER_PROPERTY_STATS_AGILITY_BONUS,
-        MODIFIER_PROPERTY_STATS_INTELLECT_BONUS,
         MODIFIER_EVENT_ON_TAKEDAMAGE,
     }
 end
@@ -87,7 +90,7 @@ end
 function modifier_equipment_effects:GetModifierPreAttack_BonusDamage()
     return tonumber(values(self).attack_flat) or 0
 end
-function modifier_equipment_effects:GetModifierAttackSpeedPercentage()
+function modifier_equipment_effects:GetModifierAttackSpeedBonus_Constant()
     return tonumber(values(self).attack_speed_pct) or 0
 end
 function modifier_equipment_effects:GetModifierHealthBonus()
@@ -96,21 +99,12 @@ end
 function modifier_equipment_effects:GetModifierPhysicalArmorBonus()
     return tonumber(values(self).armor_flat) or 0
 end
-function modifier_equipment_effects:GetModifierBonusStats_Strength()
-    return tonumber(values(self).all_attributes_flat) or 0
-end
-function modifier_equipment_effects:GetModifierBonusStats_Agility()
-    return tonumber(values(self).all_attributes_flat) or 0
-end
-function modifier_equipment_effects:GetModifierBonusStats_Intellect()
-    return tonumber(values(self).all_attributes_flat) or 0
-end
-
 function modifier_equipment_effects:OnTakeDamage(params)
-    if not IsServer() or params.attacker ~= self:GetParent() or params.inflictor ~= nil then return end
+    if not IsServer() or params.attacker ~= self:GetParent() then return end
     local victim = params.unit
     if not victim or victim:IsNull() or victim:GetTeamNumber() == params.attacker:GetTeamNumber() then return end
     local percent = tonumber(values(self).lifesteal_pct) or 0
+    -- OnTakeDamage.damage is post-mitigation damage, for attacks and abilities.
     local amount = math.max(0, tonumber(params.damage) or 0) * percent / 100
     if amount > 0 and self:GetParent().Heal then self:GetParent():Heal(amount, nil) end
 end

@@ -101,6 +101,7 @@ local function grant_reward(payload)
 end
 
 local function on_monster_killed(payload)
+    if tostring(payload.reward_profile_id or "") == "" then return end
     grant_reward(payload)
 end
 

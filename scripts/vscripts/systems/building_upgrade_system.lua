@@ -5,10 +5,10 @@ local tower_routes = require("config/tower_route_config")
 local tower_skills = require("systems/tower_skill_runtime")
 local tower_ability_sync = require("systems/tower_ability_sync")
 local global_rules = require("config/global_rules")
+local technology_stat_manager = require("systems/technology_stat_manager")
 
 local M = {}
 local buildings = {}
-local technology_levels = {}
 local publish
 local sync_tower_abilities
 
@@ -25,16 +25,18 @@ local function notify(state, message, level)
 end
 
 local function set_attack_range(unit, attack_range)
-    attack_range = global_rules.tower_attack_range
+    attack_range = tonumber(attack_range) or global_rules.tower_attack_range
     if unit.Script_SetAttackRange then
         unit:Script_SetAttackRange(attack_range)
     elseif unit.SetAttackRange then
         unit:SetAttackRange(attack_range)
     end
     if unit.SetAcquisitionRange then
-        -- Keep autonomous tower aggro after route upgrades. The old value 10
-        -- effectively disabled automatic target acquisition.
-        unit:SetAcquisitionRange(global_rules.tower_acquisition_range)
+        -- Keep autonomous target acquisition at least as far as the attack range.
+        unit:SetAcquisitionRange(math.max(
+            global_rules.tower_acquisition_range,
+            attack_range
+        ))
     end
 end
 
@@ -57,47 +59,33 @@ local function arrow_data(level)
     return nil
 end
 
-local function technology_level(player_id, group)
-    local levels = technology_levels[player_id] or {}
-    return tonumber(levels[group]) or 0
-end
-
-local function sync_technology_levels(player_id)
-    local result = event_bus.request(
-        events.TECHNOLOGY_STATE_GET_REQUEST,
-        { player_id = player_id }
-    )
-    if result and result.levels then
-        technology_levels[player_id] = result.levels
-    end
-end
-
 local function apply_research_technology(state)
     local unit = state.unit
     if not valid_entity(unit) then return end
     local player_id = state.player_id
+    local technology = technology_stat_manager.get(player_id).final
     if state.building_id == "arrow_tower" then
         local base_damage = tonumber(state.research_base_attack_damage)
             or unit:GetBaseDamageMin()
-        local bonus = technology_level(player_id, "tower_attack") * 200
-            + technology_level(player_id, "advanced_tower_attack") * 1000
-            + technology_level(player_id, "researcher_super_tower_attack") * 30000
+        local tower = technology.tower or {}
+        local bonus = tonumber(tower.attack_flat) or 0
         local damage = base_damage + bonus
         unit:SetBaseDamageMin(damage)
         unit:SetBaseDamageMax(damage)
         unit.survival_attack_min = damage
         unit.survival_attack_max = damage
-        unit.survival_super_tower_crit_chance = technology_level(
-            player_id, "researcher_super_tower_crit"
-        )
-        set_attack_range(unit, global_rules.tower_attack_range)
+        unit.survival_super_tower_crit_chance =
+            tonumber(tower.critical_chance_pct) or 0
+        local attack_range = global_rules.tower_attack_range
+            + (tonumber(tower.attack_range_bonus) or 0)
+        set_attack_range(unit, attack_range)
     elseif state.building_id == "wall" then
         local data = state.definition.levels[state.level or 1] or {}
         local base_health = tonumber(data.health) or unit:GetMaxHealth()
-        local bonus_pct = technology_level(player_id, "wall_health") * 15
-            + technology_level(player_id, "advanced_wall_health") * 30
-            + technology_level(player_id, "researcher_super_wall_health") * 3
-        local armor_bonus = technology_level(player_id, "researcher_super_wall_armor") * 3
+        local wall = technology.wall or {}
+        local bonus_pct = (tonumber(wall.health_bonus_pct) or 0)
+            + (tonumber(wall.technology_health_bonus_pct) or 0)
+        local armor_bonus = tonumber(wall.technology_armor_bonus) or 0
         local old_max = math.max(1, unit:GetMaxHealth())
         local old_health = math.max(0, unit:GetHealth())
         local health_ratio = old_health / old_max
@@ -288,7 +276,6 @@ local function recover_state(unit)
     if state.building_id == "arrow_tower" then
         local row = tower_routes.current(state) or arrow_data(state.level)
         if row then sync_tower_abilities(state, row) end
-        sync_technology_levels(state.player_id)
         apply_research_technology(state)
         if not unit:HasModifier("modifier_tower_attack_effects") then
             unit:AddNewModifier(unit, nil, "modifier_tower_attack_effects", {})
@@ -314,13 +301,14 @@ local function recover_player_towers(player_id)
     end
 end
 
-local function on_technology_changed(payload)
-    technology_levels[payload.player_id] = payload.levels or {}
-    recover_player_towers(payload.player_id)
+local function on_technology_stats_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    recover_player_towers(player_id)
     for _, state in pairs(buildings) do
-        if state.player_id == payload.player_id then
+        if state.player_id == player_id then
             apply_research_technology(state)
-            publish(state, "technology_changed")
+            publish(state, "technology_stats_changed")
         end
     end
 end
@@ -579,7 +567,6 @@ local function on_created(payload)
             sync_tower_abilities(state, row)
         end
     end
-    sync_technology_levels(payload.player_id)
     apply_research_technology(state)
     if payload.building_id == "arrow_tower"
         and valid_entity(payload.unit)
@@ -607,13 +594,12 @@ end
 
 function M.init()
     buildings = {}
-    technology_levels = {}
     event_bus.subscribe(events.BUILDING_CREATED, on_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.BUILDING_UPGRADE_REQUEST, on_upgrade_request)
     event_bus.subscribe(events.TOWER_CLASS_REQUEST, on_class_request)
-    event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
+    event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
 end
 
 return M

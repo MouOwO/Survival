@@ -103,8 +103,8 @@ inventory_item:building_research_lab,inventory_item,building_research_lab,研究
 inventory_item:building_wall,inventory_item,building_wall,城墙,0,0,建造成功后Undying的建造城墙技能在客户端置灰；服务端仍验证max_count=1。,,building_wall
 inventory_item:challenge_01,inventory_item,challenge_01,木材练功房,0,0,击杀每个怪物获得100木材。,,challenge_01
 inventory_item:challenge_02,inventory_item,challenge_02,金币练功房,0,0,击杀每个怪物获得100金币。,,challenge_02
-inventory_item:challenge_03,inventory_item,challenge_03,属性练功房,0,0,击杀每个怪物获得10点全属性。,,challenge_03
-inventory_item:challenge_04,inventory_item,challenge_04,大属性练功房,0,0,"击杀每个怪物获得100点全属性,1000金币。",,challenge_04
+inventory_item:challenge_03,inventory_item,challenge_03,属性练功房,0,0,击杀每个怪物获得100点全属性。,,challenge_03
+inventory_item:challenge_04,inventory_item,challenge_04,大属性练功房,0,0,击杀每个怪物获得1000点全属性。,,challenge_04
 inventory_item:challenge_05,inventory_item,challenge_05,挑战合成宝石,0,0,击败BOSS后掉落合成宝石。,,challenge_05
 inventory_item:challenge_06,inventory_item,challenge_06,进入冰霜之地,0,0,升级小极地晶石。,,challenge_06
 inventory_item:challenge_07,inventory_item,challenge_07,挑战熔火核心lv1-3宝石,0,0,可升级浴火熔铠到lv4。,,challenge_07

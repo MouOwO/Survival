@@ -33,6 +33,8 @@ M.series = {
 
 M.by_content_id = {
     item_death_mask = { series_id = "death_mask", level = 1, slot = "accessory", virtual = true },
+    item_small_polar_crystal = { series_id = "polar_crystal", level = 1, slot = "crystal", virtual = true },
+    item_large_polar_crystal = { series_id = "polar_crystal", level = 2, slot = "crystal", virtual = true },
 }
 local ids = {
     growth_sword = { "weapon_growth_sword_01", "weapon_growth_sword_02", "weapon_growth_sword_03", "weapon_growth_sword_04", "weapon_growth_sword_max" },

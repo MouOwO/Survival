@@ -11,8 +11,16 @@ local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
 end
 
+local function current_attack_range(tower)
+    if tower and tower.GetAttackRange then
+        local attack_range = tonumber(tower:GetAttackRange())
+        if attack_range and attack_range > 0 then return attack_range end
+    end
+    return global_rules.tower_attack_range
+end
+
 local function find_target(tower)
-    local attack_range = global_rules.tower_attack_range
+    local attack_range = current_attack_range(tower)
     local radius = math.max(attack_range + 64, 700)
     local units = FindUnitsInRadius(
         tower:GetTeamNumber(), tower:GetAbsOrigin(), nil, radius,
@@ -36,13 +44,11 @@ function modifier_tower_auto_attack:OnCreated()
     self.forced_target = nil
     local tower = self:GetParent()
     if valid(tower) then
-        if tower.Script_SetAttackRange then
-            tower:Script_SetAttackRange(global_rules.tower_attack_range)
-        elseif tower.SetAttackRange then
-            tower:SetAttackRange(global_rules.tower_attack_range)
-        end
         if tower.SetAcquisitionRange then
-            tower:SetAcquisitionRange(global_rules.tower_acquisition_range)
+            tower:SetAcquisitionRange(math.max(
+                global_rules.tower_acquisition_range,
+                current_attack_range(tower)
+            ))
         end
     end
     self:StartIntervalThink(0.25)
@@ -64,7 +70,7 @@ function modifier_tower_auto_attack:OnIntervalThink()
     local distance = valid(target)
         and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
         or 99999
-    local attack_range = global_rules.tower_attack_range
+    local attack_range = current_attack_range(tower)
     if not valid(target) or target:GetTeamNumber() == tower:GetTeamNumber()
         or distance > attack_range + 96 then
         if self.forced_target ~= nil then

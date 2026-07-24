@@ -87,9 +87,34 @@ end
 
 local function spawn_wave(context)
     local number = tonumber(context.command_suffix) or tonumber(context.args[1])
-    if not number then return false, "usage: monster1 ... monster25" end
+    if not number then return false, "usage: monster <wave_number>" end
     local ok, err = wave_system.debug_spawn_wave(number)
     return ok, err
+end
+
+local function add_technology(context)
+    local technology_id = tostring(context.args[1] or "")
+    if technology_id == "" then
+        return false, "usage: addtechnology <technology_id>"
+    end
+    local result = event_bus.request(
+        events.TECHNOLOGY_CHEAT_SET_REQUEST,
+        {
+            player_id = context.player_id,
+            technology_id = technology_id,
+        }
+    )
+    if not result or result.ok ~= true then
+        return false, result and result.error
+            or "technology_cheat_handler_missing"
+    end
+    notify(
+        context,
+        "科技已添加：" .. tostring(result.display_name)
+            .. "（" .. tostring(result.technology_group)
+            .. " Lv." .. tostring(result.level) .. "）"
+    )
+    return true
 end
 
 local function signed_amount(context, command)
@@ -133,11 +158,68 @@ local function add_wood(context)
     return change_resource(context, "wood", "addwood")
 end
 
+local function summoned_hero(player_id)
+    local result = event_bus.request(
+        events.HERO_SUMMON_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local unit = result and result.ok and result.unit or nil
+    if not unit or unit:IsNull() then return nil end
+    return unit
+end
+
+local function add_hero_combat_bonus(context, command, modifier_name, label)
+    local amount = tonumber(context.args[1])
+    if not amount or amount ~= amount
+        or amount == math.huge or amount == -math.huge then
+        return false, "usage: " .. command .. " <amount>"
+    end
+    local hero = summoned_hero(context.player_id)
+    if not hero then return false, "hero_not_summoned" end
+
+    local modifier = hero:FindModifierByName(modifier_name)
+    if modifier and modifier.AddBonus then
+        modifier:AddBonus(amount)
+    else
+        modifier = hero:AddNewModifier(
+            hero, nil, modifier_name, { bonus = amount }
+        )
+    end
+    if not modifier then return false, modifier_name .. "_failed" end
+
+    if hero.CalculateStatBonus then hero:CalculateStatBonus(true) end
+    notify(context, string.format(
+        "英雄%s %+.1f，作弊累计值 %.1f",
+        label, amount, modifier.GetBonus and modifier:GetBonus() or amount
+    ))
+    return true
+end
+
+local function add_attack(context)
+    return add_hero_combat_bonus(
+        context, "addattack", "modifier_debug_attack_bonus", "攻击力"
+    )
+end
+
+local function add_armor(context)
+    return add_hero_combat_bonus(
+        context, "addarmor", "modifier_debug_armor_bonus", "护甲"
+    )
+end
+
 local function add_monster(context)
     local health = tonumber(context.args[1])
     local armor = tonumber(context.args[2])
-    if not health or health <= 0 or not armor then
-        return false, "usage: addmonster <health> <armor>"
+    local can_attack = context.args[3] == nil
+        and 0 or tonumber(context.args[3])
+    if not health or health <= 0 or not armor
+        or (can_attack ~= 0 and can_attack ~= 1) then
+        return false, "usage: addmonster <health> <armor> <0|1>"
+    end
+    local hero = nil
+    if can_attack == 1 then
+        hero = summoned_hero(context.player_id)
+        if not hero then return false, "hero_not_summoned" end
     end
     local marker_service = require("systems/monster_spawn_marker")
     local marker, marker_name = marker_service.find()
@@ -155,19 +237,37 @@ local function add_monster(context)
     unit:SetMaxHealth(health)
     unit:SetHealth(health)
     unit:SetPhysicalArmorBaseValue(armor)
-    unit:SetBaseMoveSpeed(0)
-    unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
-    unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
-    unit:SetAbsOrigin(marker:GetAbsOrigin())
+    unit.survival_minimum_armor = 1
+    FindClearSpaceForUnit(unit, marker:GetAbsOrigin(), true)
     if marker.GetForwardVector and unit.SetForwardVector then
         unit:SetForwardVector(marker:GetForwardVector())
     end
+    if can_attack == 1 then
+        unit:SetBaseMoveSpeed(250)
+        unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
+        unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
+        if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
+        local home = unit:GetAbsOrigin()
+        unit:AddNewModifier(unit, nil, "modifier_practice_monster_ai", {
+            hero_entindex = hero:entindex(),
+            home_x = home.x,
+            home_y = home.y,
+            home_z = home.z,
+            aggro_radius = 700,
+            leash_radius = 1200,
+        })
+    else
+        unit:SetBaseMoveSpeed(0)
+        unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
+        unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+    end
     notify(context, string.format(
-        "测试怪已生成：生命 %d，护甲 %.1f", health, armor
+        "测试怪已生成：生命 %d，护甲 %.1f，%s",
+        health, armor, can_attack == 1 and "会攻击英雄" or "不会攻击英雄"
     ))
     logger.info("CheatCommand", string.format(
-        "addmonster entindex=%d health=%d armor=%.1f marker=%s",
-        unit:entindex(), health, armor, tostring(marker_name)
+        "addmonster entindex=%d health=%d armor=%.1f can_attack=%d marker=%s",
+        unit:entindex(), health, armor, can_attack, tostring(marker_name)
     ))
     return true
 end
@@ -308,7 +408,11 @@ local COMMANDS = {
     shopshow = show_shop,
     addgold = add_gold,
     addwood = add_wood,
+    addattack = add_attack,
+    addarmor = add_armor,
     addmonster = add_monster,
+    addtechnology = add_technology,
+    monster = spawn_wave,
     addspeed = attack_speed_cheat.execute,
     setvip = set_vip,
     summonhero = summon_hero,
@@ -316,6 +420,8 @@ local COMMANDS = {
     skilloffer = skill_offer,
     skillchoose = skill_choose,
     skills = list_skills,
+    additem = weapon_cheats.add_item,
+    items = weapon_cheats.list_items,
     givegrowthsword = weapon_cheats.give_growth_sword,
     givehammer = weapon_cheats.give_forging_hammer,
     weapongrow = weapon_cheats.grow_weapon,
@@ -369,7 +475,7 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: addgold, addwood, addmonster, hero, skill, weapon growth, dev, monsterN"
+        "ready: addattack, addarmor, addmonster <health> <armor> <0|1>, addtechnology, monster, items, hero, skill, weapon growth"
     )
 end
 

@@ -81,6 +81,7 @@ local function apply_stats(unit, row, definition)
     unit:SetBaseDamageMin(row.attack)
     unit:SetBaseDamageMax(row.attack)
     unit:SetPhysicalArmorBaseValue(row.armor)
+    unit.survival_minimum_armor = tonumber(definition.minimum_armor) or 1
     unit:SetBaseMoveSpeed(definition.move_speed or 250)
     -- attack_speed 表示每秒攻击次数；Dota 引擎需要基础攻击间隔。
     local attack_speed = tonumber(row.attack_speed) or 0.5

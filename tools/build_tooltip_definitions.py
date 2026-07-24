@@ -61,18 +61,38 @@ def main():
         add(out, "ability:" + skill_id, "ability", skill_id, row.get("skill_name"), "0", "0", row.get("description"), "", skill_id)
 
     catalog = read_csv(CSV_ROOT / "物品系统" / "content_catalog.csv")
+    catalog_by_id = {clean(row.get("content_id")): row for row in catalog}
     for row in catalog:
         content_id = clean(row.get("content_id"))
         if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:
             continue
         add(out, "inventory_item:" + content_id, "inventory_item", content_id, row.get("name"), "0", "0", row.get("description"), row.get("icon"), content_id)
 
-    shops = read_csv(CSV_ROOT / "商店系统" / "shop_entries.csv")
-    for row in shops:
+    weapons = read_csv(CSV_ROOT / "物品系统" / "weapon_definitions.csv")
+    for row in weapons:
+        content_id = clean(row.get("content_id"))
         if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:
             continue
-        entry_id = clean(row.get("shop_entry_id"))
-        add(out, "shop_item:" + entry_id, "shop_item", clean(row.get("content_id")), row.get("display_name"), row.get("wood_cost"), row.get("gold_cost"), row.get("notes"), "", entry_id)
+        catalog_row = catalog_by_id.get(content_id, {})
+        descriptions = []
+        for field in ("description", "listed_stats", "recipe_summary"):
+            text = clean(row.get(field))
+            if text and text not in descriptions:
+                descriptions.append(text)
+        add(out, "inventory_item:" + content_id, "inventory_item", content_id,
+            row.get("display_name") or catalog_row.get("name"), "0", "0",
+            "\n".join(descriptions),
+            row.get("icon_name") or catalog_row.get("icon"), content_id)
+
+    items = read_csv(CSV_ROOT / "物品系统" / "item_definitions.csv")
+    for row in items:
+        content_id = clean(row.get("content_id"))
+        if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:
+            continue
+        catalog_row = catalog_by_id.get(content_id, {})
+        add(out, "inventory_item:" + content_id, "inventory_item", content_id,
+            catalog_row.get("name"), "0", "0", row.get("description"),
+            row.get("icon_name") or catalog_row.get("icon"), content_id)
 
     OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
     with OUT_CSV.open("w", encoding="utf-8-sig", newline="") as f:

@@ -81,6 +81,7 @@ local function publish(state)
         state.player_id,
         "gold_mine_crit"
     )
+    local level_data = config.level_data(state.mine_level) or {}
     event_bus.emit(events.GOLD_MINE_CHANGED, {
         unit = state.unit,
         entindex = state.unit:entindex(),
@@ -93,6 +94,10 @@ local function publish(state)
         crit_level = crit_level,
         income_per_second = config.normal_income(state.mine_level, efficiency_level),
         efficiency_percent = config.efficiency_percent(efficiency_level),
+        efficiency_bonus = config.efficiency_bonus(
+            tonumber(level_data.base_income) or 0,
+            efficiency_level
+        ),
         crit_chance = config.crit_chance(crit_level),
         crit_multiplier = config.crit_multiplier(state.mine_level),
         auto_upgrading = auto_upgrade_by_entindex[state.unit:entindex()]

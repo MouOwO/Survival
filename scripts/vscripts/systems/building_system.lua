@@ -91,14 +91,17 @@ local function main_city_level(team)
     return 0
 end
 local function set_attack_range(unit, attack_range)
-    attack_range = global_rules.tower_attack_range
+    attack_range = tonumber(attack_range) or global_rules.tower_attack_range
     if unit.Script_SetAttackRange then
         unit:Script_SetAttackRange(attack_range)
     elseif unit.SetAttackRange then
         unit:SetAttackRange(attack_range)
     end
     if unit.SetAcquisitionRange then
-            unit:SetAcquisitionRange(global_rules.tower_acquisition_range)
+        unit:SetAcquisitionRange(math.max(
+            global_rules.tower_acquisition_range,
+            attack_range
+        ))
     end
 end
 local function arrow_data(level)

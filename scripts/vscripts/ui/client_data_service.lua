@@ -4,6 +4,7 @@ local shop_config = require("config/shop_config")
 local item_config = require("config/item_config")
 local content_catalog = require("config/generated/content_catalog")
 local weapon_config = require("config/generated/weapon_definitions")
+local recipe_config = require("config/recipe_definitions")
 local tower_skill_config = require("config/generated/tower_skill_definitions")
 local tooltip_config = require("config/generated/tooltip_definitions")
 local logger = require("core/logger")
@@ -118,9 +119,68 @@ local function publish_content_tooltips()
             }
         end
     end
+    local recipe_text_by_content = {}
+    for _, recipe in ipairs(recipe_config.rows or {}) do
+        if recipe.enabled ~= false then
+            local parts = {}
+            for _, ingredient in ipairs(recipe.ingredients or {}) do
+                local content = published[ingredient.content_id] or {}
+                local name = content.name or ingredient.content_id
+                local quantity = math.max(1, math.floor(
+                    tonumber(ingredient.quantity) or 1
+                ))
+                parts[#parts + 1] = quantity > 1
+                    and name .. " x" .. tostring(quantity) or name
+            end
+            local result = published[recipe.result_content_id] or {}
+            local result_name = result.name or recipe.result_content_id
+            local summary = table.concat(parts, " + ") .. " -> " .. result_name
+            recipe_text_by_content[recipe.result_content_id] =
+                recipe_text_by_content[recipe.result_content_id] or {}
+            recipe_text_by_content[recipe.result_content_id][#recipe_text_by_content[
+                recipe.result_content_id
+            ] + 1] = "合成产物：" .. summary
+            for _, ingredient in ipairs(recipe.ingredients or {}) do
+                local content_id = ingredient.content_id
+                recipe_text_by_content[content_id] =
+                    recipe_text_by_content[content_id] or {}
+                recipe_text_by_content[content_id][#recipe_text_by_content[
+                    content_id
+                ] + 1] = "参与合成：" .. summary
+            end
+        end
+    end
     for _, definition in ipairs(weapon_config.rows or {}) do
         if definition.engine_item_name then
             local content = published[definition.content_id] or {}
+            local name = definition.display_name
+                or content.name or definition.content_id
+            local description = definition.description
+                or content.description or ""
+            local extra = {}
+            if definition.listed_stats and definition.listed_stats ~= ""
+                and definition.listed_stats ~= description then
+                extra[#extra + 1] = definition.listed_stats
+            end
+            if definition.stat_summary and definition.stat_summary ~= ""
+                and definition.stat_summary ~= description then
+                extra[#extra + 1] = "基础属性：" .. definition.stat_summary
+            end
+            if definition.recipe_summary and definition.recipe_summary ~= "" then
+                extra[#extra + 1] = "合成：" .. definition.recipe_summary
+            elseif recipe_text_by_content[definition.content_id] then
+                extra[#extra + 1] = table.concat(
+                    recipe_text_by_content[definition.content_id], "\n"
+                )
+            end
+            if #extra > 0 then
+                description = description .. "\n" .. table.concat(extra, "\n")
+            end
+            published[definition.content_id] = {
+                content_id = definition.content_id,
+                name = name,
+                description = description,
+            }
             CustomNetTables:SetTableValue(
                 "survival_item_tooltips",
                 definition.engine_item_name,
@@ -130,9 +190,8 @@ local function publish_content_tooltips()
                         "inventory_item",
                         definition.content_id
                     ),
-                    name = content.name or definition.content_id,
-                    description = content.description
-                        or definition.description or "",
+                    name = name,
+                    description = description,
                 }
             )
         end

@@ -8,5 +8,4 @@ ISSUE-004,medium,equipment_infernal_armor_04,核心等级疑似笔误,Lv4描述�
 ISSUE-005,medium,weapon_epic_icefire,缺少+7行,原表只包含基础到+6，但项目记录为+7后进入传说。,补充+7正式数据后再生成最终链。
 ISSUE-006,medium,weapon_legend_abyss,原始ID顺序异常,5003对应+10，5004对应+2，不能按数字ID排序。,系统必须按名称解析后的stage排序。
 ISSUE-007,low,shop_proxy_*,重复购买代理行,2101/2111/2121是购买代理，不应作为真实内容。,已分类shop_proxy并默认停用，指向真实content_id。
-ISSUE-008,medium,tech_gold_mine_efficiency,升级费用缺失,只明确效率每级+1，未提供升级金币/木材费用。,TechnologyDefinitions中费用留空，需策划填写。
 ISSUE-009,high,challenge_10|challenge_11,挑战Boss临时强度,七宗罪与十宗罪缺少正式生命攻击护甲攻速数据；当前按N1后期曲线配置测试值。,完成实机测试后由策划逐只确认并替换monster_archetypes中的临时数值。

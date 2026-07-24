@@ -113,6 +113,25 @@
         "VisionNighttimeRange"   "600"
     }
 
+    "npc_survival_upgrade_material"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/props_gameplay/rune_doubledamage01.vmdl"
+        "ModelScale"             "0.65"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "StatusHealth"           "1"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "UnitRelationshipClass"  "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
+        "HealthBarOffset"        "-1"
+        "VisionDaytimeRange"     "0"
+        "VisionNighttimeRange"   "0"
+    }
+
     "npc_survival_lumberjack"
     {
         "BaseClass"              "npc_dota_creature"

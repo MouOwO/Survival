@@ -7,14 +7,26 @@ local encounters = require("config/generated/monster_encounters")
 local locations = require("config/generated/challenge_locations")
 local members = require("config/generated/encounter_members")
 local archetypes = require("config/generated/monster_archetypes")
+local weapons = require("config/generated/weapon_definitions")
 
 local M = {}
 local sessions = {}
 local monster_meta = {}
 local auto_test_started = {}
+local abyss_cleared_stage_by_player = {}
 -- Set true only when validating the seven-sins / ten-sins map markers.
 -- Normal challenge purchases must not create unrelated boss encounters.
 local AUTO_START_CHALLENGE_TESTS = false
+local WOOD_STRENGTH_ENCOUNTERS = {
+    encounter_challenge_02 = true,
+    encounter_challenge_03 = true,
+    encounter_challenge_04 = true,
+    encounter_challenge_05 = true,
+    encounter_challenge_06 = true,
+    encounter_challenge_07 = true,
+    encounter_challenge_08 = true,
+    encounter_challenge_09 = true,
+}
 
 local function valid(unit)
     return unit and not unit:IsNull()
@@ -45,6 +57,28 @@ local function members_for(encounter_id)
             < (tonumber(b.sequence_index) or 0)
     end)
     return result
+end
+
+local function owned_series_stage(player_id, series_id)
+    local inventory = event_bus.request(
+        events.CONTENT_INVENTORY_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local counts = inventory and inventory.snapshot and inventory.snapshot.counts
+    if not counts then return nil, "challenge_inventory_unavailable" end
+
+    local current = nil
+    for _, definition in ipairs(weapons.rows or {}) do
+        if definition.enabled ~= false
+            and definition.series_id == series_id
+            and (tonumber(counts[definition.content_id]) or 0) > 0
+            and (not current
+                or (tonumber(definition.stage) or -1)
+                    > (tonumber(current.stage) or -1)) then
+            current = definition
+        end
+    end
+    return current and tonumber(current.stage) or nil, nil
 end
 
 local function hero_for(player_id)
@@ -144,12 +178,17 @@ local function apply_combat_stats(unit, archetype)
     end
     local armor = tonumber(archetype.armor)
     if armor then unit:SetPhysicalArmorBaseValue(armor) end
+    unit.survival_minimum_armor = tonumber(archetype.minimum_armor) or 1
     local attack_speed = math.max(0.01, tonumber(archetype.attack_speed) or 1)
     unit:SetBaseAttackTime(1 / attack_speed)
     unit.survival_attack_speed = attack_speed
 end
 
-local function spawn_point_for(member, location)
+local function spawn_point_for(session, member, location)
+    if session.local_spawn_fallback then
+        local expected = (location.spawn_target_names or {})[1] or "unknown"
+        return nil, expected
+    end
     if member.spawn_target_name and member.spawn_target_name ~= "" then
         return marker(member.spawn_target_name), member.spawn_target_name
     end
@@ -157,6 +196,9 @@ local function spawn_point_for(member, location)
     -- spread by FindClearSpaceForUnit after creation, so occupancy must not
     -- make the marker unavailable for the remaining configured count.
     local point = spawn_marker(location, member.spawn_mode == "maintain_count")
+    if not point and WOOD_STRENGTH_ENCOUNTERS[session.encounter_id] then
+        point = marker(location.entry_target_name)
+    end
     local expected = (location.spawn_target_names or {})[1] or "unknown"
     return point, expected
 end
@@ -169,13 +211,36 @@ local function spawn_member(session, member)
         return nil, "challenge_archetype_not_found:" .. tostring(member.archetype_id)
     end
 
-    local point, expected = spawn_point_for(member, location)
-    if not point then
+    local point, expected = spawn_point_for(session, member, location)
+    local position = point and point:GetAbsOrigin() or nil
+    if not position and WOOD_STRENGTH_ENCOUNTERS[session.encounter_id] then
+        local hero = hero_for(session.player_id)
+        if alive(hero) then
+            local origin = hero:GetAbsOrigin()
+            for _ = 1, 8 do
+                local candidate = GetGroundPosition(
+                    origin + RandomVector(RandomInt(240, 420)),
+                    hero
+                )
+                if not GridNav:IsBlocked(candidate)
+                    and GridNav:IsTraversable(candidate) then
+                    position = candidate
+                    break
+                end
+            end
+            if not position and not GridNav:IsBlocked(origin)
+                and GridNav:IsTraversable(origin) then
+                position = origin
+            end
+        end
+    end
+    if not position then
         return nil, "hammer_marker_not_found:" .. tostring(expected)
     end
-    local position = point:GetAbsOrigin()
     if GridNav:IsBlocked(position) or not GridNav:IsTraversable(position) then
-        return nil, "challenge_spawn_blocked:" .. tostring(point:GetName())
+        return nil, "challenge_spawn_blocked:" .. tostring(
+            point and point:GetName() or expected
+        )
     end
 
     local unit = CreateUnitByName(
@@ -188,13 +253,16 @@ local function spawn_member(session, member)
         unit:SetOriginalModel(archetype.model_path)
     end
     unit:SetModelScale(tonumber(archetype.model_scale) or 1)
-    if unit.SetBaseMoveSpeed and archetype.move_speed then
-        unit:SetBaseMoveSpeed(tonumber(archetype.move_speed) or 270)
+    local combat_archetype = archetypes.by_id[
+        tostring(member.combat_archetype_id or "")
+    ] or archetype
+    if unit.SetBaseMoveSpeed and combat_archetype.move_speed then
+        unit:SetBaseMoveSpeed(tonumber(combat_archetype.move_speed) or 270)
     end
-    if unit.Script_SetAttackRange and archetype.attack_range then
-        unit:Script_SetAttackRange(tonumber(archetype.attack_range) or 128)
+    if unit.Script_SetAttackRange and combat_archetype.attack_range then
+        unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
-    apply_combat_stats(unit, archetype)
+    apply_combat_stats(unit, combat_archetype)
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
 
     local home = nil
@@ -203,11 +271,11 @@ local function spawn_member(session, member)
         -- marker. Preserve each resolved position as its own leash origin so
         -- the AI does not repeatedly force all of them back into one point.
         home = unit:GetAbsOrigin()
-    elseif member.spawn_target_name and member.spawn_target_name ~= "" then
+    elseif member.spawn_target_name and member.spawn_target_name ~= "" and point then
         home = point:GetAbsOrigin()
     else
         local home_marker = marker(location.home_target_name) or point
-        home = home_marker:GetAbsOrigin()
+        home = home_marker and home_marker:GetAbsOrigin() or position
     end
     local hero = hero_for(session.player_id)
     unit:AddNewModifier(unit, nil, "modifier_practice_monster_ai", {
@@ -262,7 +330,12 @@ local function validate_session_markers(session)
     local location = current_location(session)
     if not location then return false, "challenge_location_not_found" end
     if session.teleport_hero and not marker(location.entry_target_name) then
-        return false, "hammer_marker_not_found:" .. location.entry_target_name
+        if WOOD_STRENGTH_ENCOUNTERS[session.encounter_id] then
+            session.teleport_hero = false
+            session.local_spawn_fallback = true
+        else
+            return false, "hammer_marker_not_found:" .. location.entry_target_name
+        end
     end
     for _, member in ipairs(session.members) do
         local ok, error_message = validate_member_marker(member)
@@ -337,8 +410,8 @@ local function publish(session, status, extra)
     local payload = {
         player_id = session.player_id,
         status = status or session.status,
-        stage = session.stage,
-        total_members = #session.members,
+        stage = session.display_stage or session.stage,
+        total_members = session.display_total_members or #session.members,
         killed_members = session.killed_members,
         alive = session.monster_count,
         encounter = {
@@ -353,16 +426,20 @@ end
 local function complete_session(session)
     if session.status == "completed" then return end
     session.status = "completed"
-    local reward_result = event_bus.request(
-        events.CHALLENGE_EQUIPMENT_REWARD_REQUEST,
-        {
-            player_id = session.player_id,
-            challenge_id = session.challenge.challenge_id,
-            encounter_id = session.encounter_id,
-            completion_id = session.encounter_id .. ":" .. session.generation,
-            authoritative = true,
-        }
-    )
+    local reward_result = { ok = true, handled_by = "challenge_material" }
+    if session.challenge.challenge_id ~= "challenge_10"
+        and session.challenge.challenge_id ~= "challenge_11" then
+        reward_result = event_bus.request(
+            events.CHALLENGE_EQUIPMENT_REWARD_REQUEST,
+            {
+                player_id = session.player_id,
+                challenge_id = session.challenge.challenge_id,
+                encounter_id = session.encounter_id,
+                completion_id = session.encounter_id .. ":" .. session.generation,
+                authoritative = true,
+            }
+        )
+    end
     publish(session, "completed", { reward_result = reward_result or {} })
 end
 
@@ -375,9 +452,10 @@ function M.query(encounter_id, player_id)
     return {
         ok = true,
         active = session ~= nil and session.status ~= "completed",
-        stage = session and session.stage or 0,
+        stage = session and (session.display_stage or session.stage) or 0,
         status = session and session.status or "inactive",
-        total_members = session and #session.members or 0,
+        total_members = session
+            and (session.display_total_members or #session.members) or 0,
         killed_members = session and session.killed_members or 0,
         alive = session and session.monster_count or 0,
         encounter = { encounter_id = encounter_id },
@@ -409,11 +487,47 @@ function M.start(payload)
             resumed = true,
             stage = existing.stage,
             alive = existing.monster_count,
+            encounter_id = encounter_id,
         }
     end
 
     local list = members_for(encounter_id)
     if #list == 0 then return { ok = false, error = "challenge_members_missing" } end
+    local display_stage = 1
+    local display_total_members = #list
+    if challenge.challenge_id == "challenge_11" then
+        local abyss_stage, inventory_error = owned_series_stage(
+            player_id,
+            "legend_abyss"
+        )
+        if inventory_error then return { ok = false, error = inventory_error } end
+        if abyss_stage == nil then
+            return {
+                ok = false,
+                error = "需要持有【传说：深渊审判】才能进入罪渊第一层",
+            }
+        end
+        if abyss_stage >= 10 then
+            return {
+                ok = false,
+                error = "【传说：深渊审判】已达到+10，罪渊挑战已完成",
+            }
+        end
+        if (tonumber(abyss_cleared_stage_by_player[player_id]) or -1)
+            >= abyss_stage then
+            return {
+                ok = false,
+                error = "本层罪渊已通关，请先完成地面材料自动合成后再进入下一层",
+            }
+        end
+        local target_member = list[abyss_stage + 1]
+        if not target_member then
+            return { ok = false, error = "abyss_stage_member_missing" }
+        end
+        list = { target_member }
+        display_stage = abyss_stage + 1
+        display_total_members = 10
+    end
     local session = {
         player_id = player_id,
         team = tonumber(payload.team) or PlayerResource:GetTeam(player_id),
@@ -422,6 +536,8 @@ function M.start(payload)
         encounter_id = encounter_id,
         members = list,
         stage = 1,
+        display_stage = display_stage,
+        display_total_members = display_total_members,
         monsters = {},
         monster_count = 0,
         killed_members = 0,
@@ -445,7 +561,7 @@ function M.start(payload)
     publish(session, "active")
     return {
         ok = true,
-        stage = 1,
+        stage = display_stage,
         alive = session.monster_count,
         encounter_id = encounter_id,
     }
@@ -484,9 +600,8 @@ local function on_killed(payload)
     session.monster_count = math.max(0, session.monster_count - 1)
     session.killed_members = session.killed_members + 1
 
-    if owner_killed(meta, payload.attacker)
-        and meta.member.reward_profile_id
-        and meta.member.reward_profile_id ~= "" then
+    local authorized_kill = owner_killed(meta, payload.attacker)
+    if authorized_kill then
         event_bus.emit(events.MONSTER_KILLED, {
             victim = victim,
             attacker = payload.attacker,
@@ -496,6 +611,43 @@ local function on_killed(payload)
             team = meta.team,
             reward_profile_id = meta.member.reward_profile_id,
         })
+    end
+
+    local challenge_id = session.challenge.challenge_id
+    if authorized_kill
+        and (challenge_id == "challenge_10" or challenge_id == "challenge_11") then
+        local required_stage = math.max(
+            0,
+            (tonumber(meta.member.sequence_index) or 1) - 1
+        )
+        local drop_result = event_bus.request(
+            events.CHALLENGE_MATERIAL_DROP_REQUEST,
+            {
+                player_id = meta.player_id,
+                team = meta.team,
+                challenge_id = challenge_id,
+                required_stage = required_stage,
+                position = victim:GetAbsOrigin(),
+                completion_id = session.encounter_id .. ":"
+                    .. session.generation .. ":" .. meta.member.member_id,
+                authoritative = true,
+            }
+        )
+        if challenge_id == "challenge_11" and drop_result
+            and (drop_result.ok or drop_result.material_retained) then
+            abyss_cleared_stage_by_player[meta.player_id] = math.max(
+                tonumber(abyss_cleared_stage_by_player[meta.player_id]) or -1,
+                required_stage
+            )
+        end
+        if not drop_result or not drop_result.ok then
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = meta.player_id,
+                message = "升阶材料生成或合成失败："
+                    .. tostring(drop_result and drop_result.error or "handler_missing"),
+                level = "error",
+            })
+        end
     end
 
     if session.spawn_mode == "maintain_count" then
@@ -594,6 +746,7 @@ function M.init()
     sessions = {}
     monster_meta = {}
     auto_test_started = {}
+    abyss_cleared_stage_by_player = {}
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
     event_bus.subscribe(events.HERO_READY, start_auto_tests)
 end

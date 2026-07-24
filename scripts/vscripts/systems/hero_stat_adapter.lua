@@ -39,12 +39,15 @@ local function set_if_present(unit, definition, key, method_name)
 end
 
 local function apply_primary_stats(unit, definition)
-    set_if_present(unit, definition, "base_strength", "SetBaseStrength")
-    set_if_present(unit, definition, "strength_gain", "SetStrengthGain")
-    set_if_present(unit, definition, "base_agility", "SetBaseAgility")
-    set_if_present(unit, definition, "agility_gain", "SetAgilityGain")
-    set_if_present(unit, definition, "base_intellect", "SetBaseIntellect")
-    set_if_present(unit, definition, "intellect_gain", "SetIntellectGain")
+    -- Survival attributes are logical combat values. Keeping native attributes
+    -- at zero prevents agility/strength/intellect from changing attack speed,
+    -- armor, health, mana, or primary-attribute damage behind the data model.
+    safe_call(unit, "SetBaseStrength", 0)
+    safe_call(unit, "SetStrengthGain", 0)
+    safe_call(unit, "SetBaseAgility", 0)
+    safe_call(unit, "SetAgilityGain", 0)
+    safe_call(unit, "SetBaseIntellect", 0)
+    safe_call(unit, "SetIntellectGain", 0)
 end
 
 local function apply_combat_stats(unit, definition)
@@ -135,15 +138,6 @@ local function apply_misc(unit, definition)
     set_if_present(unit, definition, "turn_rate", "SetTurnRate")
 end
 
-local function apply_all_attributes(unit, amount)
-    if not amount or amount == 0 then
-        return
-    end
-    safe_call(unit, "ModifyStrength", amount)
-    safe_call(unit, "ModifyAgility", amount)
-    safe_call(unit, "ModifyIntellect", amount)
-end
-
 local function apply_multipliers(unit, definition)
     local health = (number(definition, "max_health_multiplier") or 1)
         * global_rules.number("hero_meta_max_health_multiplier", 1)
@@ -199,17 +193,12 @@ function M.apply(unit, definition)
         return
     end
 
-    -- 先写入 CSV 中的基础属性与成长；此前漏掉这一层，导致英雄部分回退到引擎默认值。
+    -- Keep native attributes neutral before applying data-driven combat stats.
     apply_primary_stats(unit, definition)
     apply_combat_stats(unit, definition)
     apply_range(unit, definition)
     apply_resource_stats(unit, definition)
     apply_misc(unit, definition)
-    apply_all_attributes(
-        unit,
-        (number(definition, "all_attributes_bonus") or 0)
-            + global_rules.number("hero_meta_all_attributes_bonus", 0)
-    )
     safe_call(unit, "CalculateStatBonus", true)
     apply_multipliers(unit, definition)
     apply_level(unit, definition)

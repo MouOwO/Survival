@@ -1,6 +1,8 @@
 modifier_research_technology = class({})
 modifier_research_armor_reduction = class({})
 
+local event_bus = require("core/event_bus")
+local events = require("core/events")
 local M = modifier_research_technology
 
 function M:IsHidden() return true end
@@ -58,29 +60,44 @@ function M:OnAttackLanded(keys)
         keys.attacker,
         nil,
         "modifier_research_armor_reduction",
-        { armor_reduction = self.armor_reduction }
+        { armor_reduction_per_attack = self.armor_reduction }
     )
-    if modifier and modifier.SetArmorReduction then
-        modifier:SetArmorReduction(self.armor_reduction)
-    end
 end
 
 local D = modifier_research_armor_reduction
 
 function D:IsHidden() return false end
 function D:IsDebuff() return true end
-function D:IsPurgable() return true end
+function D:IsPurgable() return false end
+function D:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
 function D:OnCreated(params)
-    self:SetArmorReduction(params and params.armor_reduction or 0)
+    self.armor_reduction = 0
+    self:AddArmorReduction(params and params.armor_reduction_per_attack or 0)
 end
 
 function D:OnRefresh(params)
-    self:SetArmorReduction(params and params.armor_reduction or 0)
+    self:AddArmorReduction(params and params.armor_reduction_per_attack or 0)
 end
 
-function D:SetArmorReduction(value)
-    self.armor_reduction = math.max(0, tonumber(value) or 0)
+function D:AddArmorReduction(value)
+    if not IsServer() then return end
+    local increment = math.max(0, tonumber(value) or 0)
+    if increment <= 0 then return end
+    local parent = self:GetParent()
+    local minimum = tonumber(parent.survival_minimum_armor)
+    if minimum ~= nil then
+        local current = tonumber(parent:GetPhysicalArmorValue(false)) or minimum
+        increment = math.min(increment, math.max(0, current - minimum))
+    end
+    if increment <= 0 then return end
+    self.armor_reduction = (self.armor_reduction or 0) + increment
+    self:SetStackCount(math.floor(self.armor_reduction * 100 + 0.5))
+    event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+        entindex = parent:entindex(),
+        unit = parent,
+        reason = "research_armor_reduction",
+    })
 end
 
 function D:DeclareFunctions()
@@ -88,7 +105,7 @@ function D:DeclareFunctions()
 end
 
 function D:GetModifierPhysicalArmorBonus()
-    return -(self.armor_reduction or 0)
+    return -(self:GetStackCount() or 0) / 100
 end
 
 return M

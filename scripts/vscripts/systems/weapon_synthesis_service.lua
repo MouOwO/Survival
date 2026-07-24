@@ -1,15 +1,16 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/recipe_definitions")
+local content = require("config/generated/content_catalog")
 local M = {}
-local recipes, locks, done, auto_serial = {}, {}, {}, {}
-local pending_check, last_fingerprint = {}, {}
+local recipes, ordered_recipes, locks, done, auto_serial = {}, {}, {}, {}, {}
+local pending_check = {}
 local function index()
- recipes={}; for _,r in ipairs(config.rows or {}) do if r.enabled~=false then recipes[r.recipe_id]=r end end
+ recipes,ordered_recipes={},{}; for _,r in ipairs(config.rows or {}) do if r.enabled~=false then recipes[r.recipe_id]=r; ordered_recipes[#ordered_recipes+1]=r end end
 end
 local function maps(r)
- local c={}; for _,x in ipairs(r.ingredients or {}) do local id=tostring(x.content_id or ""); local n=math.floor(tonumber(x.quantity) or 0); if id=="" or n<1 then return nil end; c[id]=(c[id] or 0)+n end
- return c,{[r.result_content_id]=1}
+ local c={}; for _,x in ipairs(r.ingredients or {}) do local id=tostring(x.content_id or ""); local n=math.floor(tonumber(x.quantity) or 0); if id=="" or n<1 then return nil end; if x.consume~=false then c[id]=(c[id] or 0)+n end end
+ return c,{[r.result_content_id]=math.max(1,math.floor(tonumber(r.result_count) or 1))}
 end
 local function synth(x)
  local p=tonumber(x.player_id); local q=tostring(x.request_id or ""); local id=tostring(x.recipe_id or "")
@@ -28,37 +29,49 @@ local function schedule_auto_check(player_id, reason)
   if player_id == nil or pending_check[player_id] then return end
   pending_check[player_id] = true
   local function run()
-    pending_check[player_id] = nil
-    local inv = event_bus.request(events.CONTENT_INVENTORY_GET_REQUEST,
-      { player_id = player_id })
-    local counts = inv and inv.snapshot and inv.snapshot.counts or {}
-    local sword = tonumber(counts.weapon_growth_sword_max) or 0
-    local mask = tonumber(counts.item_death_mask) or 0
-    local fingerprint = tostring(sword) .. ":" .. tostring(mask)
-    print(string.format(
-      "[WEAPON_SYNTH_CHECK] player=%s reason=%s sword_max=%s death_mask=%s",
-      tostring(player_id), tostring(reason or "unknown"), tostring(sword), tostring(mask)
-    ))
-    if sword < 1 or mask < 1 or last_fingerprint[player_id] == fingerprint then return end
-    local recipe = recipes["recipe_growth_max_mask_to_frost_01"]
-    if not recipe then return end
-    last_fingerprint[player_id] = fingerprint
-    auto_serial[player_id] = (auto_serial[player_id] or 0) + 1
-    local result = synth({
-      player_id = player_id,
-      request_id = "auto:growth-mask:" .. tostring(auto_serial[player_id]),
-      recipe_id = recipe.recipe_id,
-    })
-    if result and result.ok then
-      event_bus.emit(events.UI_NOTIFICATION, {
-        player_id = player_id, message = "合成完成：霜之剑刃 Lv1", level = "info",
+    local completed_count = 0
+    for _ = 1, 100 do
+      local inv = event_bus.request(events.CONTENT_INVENTORY_GET_REQUEST,
+        { player_id = player_id })
+      local counts = inv and inv.snapshot and inv.snapshot.counts or {}
+      local matched = nil
+      for _, recipe in ipairs(ordered_recipes) do
+        local consume = maps(recipe)
+        local eligible = consume ~= nil
+        for content_id, quantity in pairs(consume or {}) do
+          if (tonumber(counts[content_id]) or 0) < quantity then
+            eligible = false
+            break
+          end
+        end
+        if eligible then matched = recipe; break end
+      end
+      if not matched then break end
+      auto_serial[player_id] = (auto_serial[player_id] or 0) + 1
+      local result = synth({
+        player_id = player_id,
+        request_id = "auto:" .. tostring(auto_serial[player_id]),
+        recipe_id = matched.recipe_id,
       })
-      print("[WEAPON_SYNTH_AUTO_COMMIT] player=" .. tostring(player_id))
-    else
-      last_fingerprint[player_id] = nil
-      print("[WEAPON_SYNTH_AUTO_RETRY] player=" .. tostring(player_id)
-        .. " error=" .. tostring(result and result.error or "unknown"))
+      if not result or not result.ok then
+        print("[WEAPON_SYNTH_AUTO_STOP] player=" .. tostring(player_id)
+          .. " recipe=" .. tostring(matched.recipe_id)
+          .. " error=" .. tostring(result and result.error or "unknown"))
+        break
+      end
+      completed_count = completed_count + 1
+      local catalog = (content.by_id or {})[matched.result_content_id] or {}
+      event_bus.emit(events.UI_NOTIFICATION, {
+        player_id = player_id,
+        message = "合成完成：" .. tostring(catalog.name or matched.result_content_id),
+        level = "info",
+      })
+      print("[WEAPON_SYNTH_AUTO_COMMIT] player=" .. tostring(player_id)
+        .. " recipe=" .. tostring(matched.recipe_id))
     end
+    pending_check[player_id] = nil
+    print(string.format("[WEAPON_SYNTH_CHECK] player=%s reason=%s completed=%s",
+      tostring(player_id), tostring(reason or "unknown"), tostring(completed_count)))
   end
   if GameRules and GameRules.GetGameModeEntity then
     local entity = GameRules:GetGameModeEntity()
@@ -79,5 +92,5 @@ end
 local function on_growth_changed(payload)
   schedule_auto_check(payload and payload.player_id, "weapon_growth_changed")
 end
-function M.init() locks,done,auto_serial,pending_check,last_fingerprint={}, {}, {}, {}, {}; index(); event_bus.handle_request(events.WEAPON_SYNTHESIS_REQUEST,synth); event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED,try_auto_growth_mask); event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED,on_equipped_changed); event_bus.subscribe(events.WEAPON_GROWTH_CHANGED,on_growth_changed); print("[WEAPON_SYNTH_INIT] config=recipe_definitions atomic=true auto_growth_mask=multi_entry_delayed") end
+function M.init() locks,done,auto_serial,pending_check={}, {}, {}, {}; index(); event_bus.handle_request(events.WEAPON_SYNTHESIS_REQUEST,synth); event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED,try_auto_growth_mask); event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED,on_equipped_changed); event_bus.subscribe(events.WEAPON_GROWTH_CHANGED,on_growth_changed); print("[WEAPON_SYNTH_INIT] config=generated_csv atomic=true auto_all_recipes=true") end
 return M
