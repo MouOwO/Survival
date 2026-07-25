@@ -16,7 +16,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local buff_manager = require("systems/buff_manager")
 
-local MULTI_DAMAGE_MULTIPLIER = 0.90
+local MULTI_DAMAGE_MULTIPLIER = 1.00
 local LIGHTNING_BOUNCE_RADIUS = 200
 local LIGHTNING_BOUNCE_DELAY = 0.10
 local SPLIT_ARROW_SPEED = 900
@@ -102,6 +102,9 @@ function modifier_tower_attack_effects:OnCreated()
     self.laser_visual_elapsed = 0
     self.laser_particles = {}
     self.last_interval_time = GameRules:GetGameTime()
+    self.current_attack_target = nil
+    self.pending_critical_multiplier = nil
+    self.pending_critical_source = nil
     self:StartIntervalThink(0.03)
 end
 
@@ -182,10 +185,32 @@ end
 
 function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
     if not IsServer() then return 0 end
-    local chance = math.max(
-        0, tonumber(self:GetParent().survival_super_tower_crit_chance) or 0
+    if self.pending_critical_multiplier then
+        return self.pending_critical_multiplier * 100
+    end
+    local tower = self:GetParent()
+    local special = event_bus.request(events.TOWER_CRITICAL_QUERY, {
+        tower = tower,
+        target = self.current_attack_target,
+        skills = tower_skills.get(tower),
+    })
+    local multiplier = special and tonumber(special.multiplier_pct) or 0
+    local source = special and special.source or nil
+    local research_chance = math.max(
+        0, tonumber(tower.survival_super_tower_crit_chance) or 0
     )
-    return RandomFloat(0, 100) < chance and 200 or 0
+    if RandomFloat(0, 100) < research_chance and multiplier < 200 then
+        multiplier = 200
+        source = "research_critical"
+    end
+    if multiplier > 100 then
+        self.pending_critical_multiplier = multiplier / 100
+        self.pending_critical_source = source
+        return multiplier
+    end
+    self.pending_critical_multiplier = nil
+    self.pending_critical_source = nil
+    return 0
 end
 
 local function exists(u) return u and not u:IsNull() end
@@ -396,6 +421,14 @@ local function strike_lightning_storm(caster, position, radius, damage,
             deal(caster, target, damage, "ability", {
                 "tower_lightning_storm", instance_id,
                 "tick_" .. tostring(tick),
+            })
+                        event_bus.emit(events.TOWER_LIGHTNING_HIT, {
+                tower = caster,
+                target = target,
+                damage = damage,
+                skills = tower_skills.get(caster),
+                instance_id = instance_id,
+                tick = tick,
             })
             hit_count = hit_count + 1
         end
@@ -657,7 +690,14 @@ end
 function modifier_tower_attack_effects:OnAttackStart(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
     local target = params.target
-    local laser = skill_matching(self:GetParent(), "laser_")
+    self.current_attack_target = target
+    self.pending_critical_multiplier = nil
+    self.pending_critical_source = nil
+    event_bus.emit(events.TOWER_ATTACK_START, {
+        tower = self:GetParent(),
+        target = target,
+        skills = tower_skills.get(self:GetParent()),
+    })    local laser = skill_matching(self:GetParent(), "laser_")
     local effect = laser_config(laser)
     if laser and effect and valid(target)
         and target:GetTeamNumber() ~= self:GetParent():GetTeamNumber() then
@@ -688,7 +728,7 @@ function modifier_tower_attack_effects:OnAttack(params)
     local count = 1
     for _, target in ipairs(units or {}) do
         if target ~= primary and count < max_targets then
-            -- outgoing modifier会统一将主箭和分裂箭调整为90%。
+            -- 主箭与每支分裂箭均按100%当前攻击力结算。
             split_arrow(caster, target, damage, caster.survival_projectile_model)
             count = count + 1
         end
@@ -707,7 +747,19 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
     end
     local skills = tower_skills.get(caster)
     local damage = caster:GetAverageTrueAttackDamage(caster)
-    local frost = skill_matching(caster, "frost_attack_")
+    local critical_multiplier = tonumber(self.pending_critical_multiplier) or 1
+    local landed_damage = tonumber(params.damage) or damage * critical_multiplier
+    event_bus.emit(events.TOWER_ATTACK_LANDED, {
+        tower = caster,
+        target = primary,
+        damage = landed_damage,
+        critical = critical_multiplier > 1,
+        critical_multiplier = critical_multiplier,
+        critical_source = self.pending_critical_source,
+        skills = skills,
+    })
+    self.pending_critical_multiplier = nil
+    self.pending_critical_source = nil    local frost = skill_matching(caster, "frost_attack_")
     if frost then
         trigger_frost_attack(caster, primary, frost, damage)
     end
@@ -792,6 +844,9 @@ function modifier_tower_attack_effects:ResetAfterRelocation()
     reset_laser(self)
     self.gatling_target_entindex = nil
     self.gatling_target_hits = 0
+    self.current_attack_target = nil
+    self.pending_critical_multiplier = nil
+    self.pending_critical_source = nil
     self.last_interval_time = GameRules:GetGameTime()
     self.current_update_interval = nil
     self:StartIntervalThink(0.03)

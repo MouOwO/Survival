@@ -25,6 +25,13 @@ local M = {
     BUILDING_CHANGED = "building.changed",
     BUILDING_DESTROYED = "building.destroyed",
 
+
+    TOWER_CRITICAL_QUERY = "tower.critical.query",
+    TOWER_ATTACK_START = "tower.attack.start",
+    TOWER_ATTACK_LANDED = "tower.attack.landed",
+    TOWER_LIGHTNING_HIT = "tower.lightning.hit",
+    TOWER_SKILL_DAMAGE_REQUEST = "tower.skill.damage.request",
+    TOWER_SKILL_BUFF_REQUEST = "tower.skill.buff.request",
     WORKER_TRAIN_REQUEST = "worker.train.request",
     WORKER_CHANGED = "worker.changed",
 

@@ -1,0 +1,21 @@
+每次命令前一定先执行
+git status --short
+git diff --stat
+git log -5 --oneline
+然后读取
+docs/ai/PROJECT_CONTEXT.md
+docs/ai/CURRENT_TASK.md
+docs/ai/DECISIONS.md
+docs/ai/KNOWN_ISSUES.md
+
+懒人版直接复制粘贴
+
+先执行
+git status --short
+git diff --stat
+git log -5 --oneline
+然后读取
+docs/ai/PROJECT_CONTEXT.md
+docs/ai/CURRENT_TASK.md
+docs/ai/DECISIONS.md
+docs/ai/KNOWN_ISSUES.md

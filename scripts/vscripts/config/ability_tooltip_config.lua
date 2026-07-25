@@ -110,8 +110,7 @@ local M = {
     ability_tower_class_4 = { abilityid = "ability_tower_class_4", abilityname = "【N】机枪塔", abilitydesc = "转职为【N】机枪塔；转职后技能全部为被动技能。", abilityicon = "sniper_take_aim" },
     ability_tower_class_5 = { abilityid = "ability_tower_class_5", abilityname = "【N】多重塔", abilitydesc = "转职为【N】多重塔；转职后技能全部为被动技能。", abilityicon = "zuus_arc_lightning" },
     ability_tower_class_6 = { abilityid = "ability_tower_class_6", abilityname = "【N】冰霜之塔", abilitydesc = "转职为【N】冰霜之塔；转职后技能全部为被动技能。", abilityicon = "lich_frost_nova" },
-    ability_tower_class_7 = { abilityid = "ability_tower_class_7", abilityname = "【N】防空炮", abilitydesc = "转职为【N】防空炮；转职后技能全部为被动技能。", abilityicon = "sniper_assassinate" },
-
+    ability_tower_class_7 = { abilityid = "ability_tower_class_7", abilityname = "【N】魔法塔", abilitydesc = "转职为【N】魔法塔；成长为大魔法塔与魔法至尊，使用魔法伤害克制高护甲敌人。", abilityicon = "rubick_arcane_supremacy" },
     ability_build_hero_altar = {
         abilityid = "ability_build_hero_altar",
         abilityname = "建造英雄祭坛",

@@ -1,5 +1,6 @@
 local M = {
-    cell_size = 128,
+    -- 与 grid_placement_config 保持一致：2x2 建筑总占地为 128x128。
+    cell_size = 64,
     build_z = 128,
     build_bounds = {
         min_x = -1800,

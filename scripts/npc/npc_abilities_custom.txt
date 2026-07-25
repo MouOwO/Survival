@@ -245,7 +245,7 @@
         "BaseClass"          "ability_lua"
         "ScriptFile"         "abilities/ability_tower_class_7"
         "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-        "AbilityTextureName" "sniper_assassinate"
+        "AbilityTextureName" "rubick_arcane_supremacy"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
         "AbilityCooldown"    "0.5"
@@ -1219,116 +1219,105 @@
         "AbilityManaCost"    "0"
     }
 
-    "anti_air_missile_lv01"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "anti_air_missile_lv02"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "anti_air_missile_lv03"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "anti_air_missile_lv04"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "anti_air_missile_lv05"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "drag_net_lv01"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "drag_net_lv02"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "drag_net_lv03"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "drag_net_lv04"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "drag_net_lv05"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
-    "airspace_overlord_lv01"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "drow_ranger_marksmanship"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "arcane_supremacy_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "rubick_arcane_supremacy"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-
     "ability_building_blink"
     {
         "BaseClass"          "ability_lua"

@@ -23,6 +23,10 @@ local modifiers = {
         path = "modifiers/modifier_building_under_construction",
     },
     {
+        name = "modifier_grid_building_preview",
+        path = "modifiers/modifier_grid_building_preview",
+    },
+    {
         name = "modifier_lumberjack_ai",
         path = "modifiers/modifier_lumberjack_ai",
     },

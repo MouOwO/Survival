@@ -72,7 +72,7 @@ M.wall = {
     id = "wall", display_name = configured_name("wall", "城墙"),
     unit_name = configured_unit_name("wall", "building_wall"),
     build_cost = build_cost("building_wall", 100, 0),
-    footprint = { x = 1, y = 1 }, max_count = 1, build_once = true,
+    footprint = { x = 2, y = 2 }, max_count = 1, build_once = true,
     show_health_bar = true, selectable = true,
     abilities = { "ability_upgrade_wall" }, levels = wall_levels,
 }
@@ -112,7 +112,7 @@ M.arrow_tower = {
     id = "arrow_tower", display_name = configured_name("arrow_tower", "防御塔"),
     unit_name = configured_unit_name("arrow_tower", "building_arrow_tower"),
     build_cost = build_cost("building_arrow_tower", 80, 20),
-    footprint = { x = 1, y = 1 }, max_count = 0,
+    footprint = { x = 2, y = 2 }, max_count = 0,
     show_health_bar = false, selectable = true, abilities = {
         "ability_upgrade_tower_lv01",
         "ability_upgrade_tower_max",
@@ -132,7 +132,7 @@ M.arrow_tower = {
         [4] = { id = "class_4", display_name = "【N】机枪塔", ability = "ability_tower_class_4" },
         [5] = { id = "class_5", display_name = "【N】多重塔", ability = "ability_tower_class_5" },
         [6] = { id = "class_6", display_name = "【N】冰霜之塔", ability = "ability_tower_class_6" },
-        [7] = { id = "class_7", display_name = "【N】防空炮", ability = "ability_tower_class_7" },
+    [7] = { id = "class_7", display_name = "【N】魔法塔", ability = "ability_tower_class_7" },
     },
 }
 
