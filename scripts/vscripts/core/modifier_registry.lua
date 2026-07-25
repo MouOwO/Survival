@@ -94,6 +94,10 @@ local modifiers = {
         name = "modifier_research_armor_reduction",
         path = "modifiers/modifier_research_technology",
     },
+    {
+        name = "modifier_single_health_bar",
+        path = "modifiers/modifier_single_health_bar",
+    },
 }
 
 local function link(definition)

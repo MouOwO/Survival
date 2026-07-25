@@ -20,5 +20,5 @@ encounter_challenge_06,challenge,冰霜之地,ice_room,,,0,6,8,1,maintain_count,
 encounter_challenge_07,challenge,熔火核心低阶房,fire_room,,,0,7,1,0,none,0,,1,具体怪物和地点由encounter_members与challenge_locations管理。
 encounter_challenge_08,challenge,熔火核心高阶房,big_fire_room,,,0,8,1,0,none,0,,1,具体怪物和地点由encounter_members与challenge_locations管理。
 encounter_challenge_09,challenge,冰烬挽歌Boss房,last_room,,,0,9,1,0,none,0,,1,具体怪物和地点由encounter_members与challenge_locations管理。
-encounter_challenge_10,challenge,七宗罪,seven_room,,,0,10,1,0,none,0,,1,同一位置顺序生成7只Boss；击杀后等待2秒生成下一只。
+encounter_challenge_10,challenge,七宗罪,seven_room,,,0,10,10,1,maintain_count,0.5,,1,场内维持10只相同小怪；死亡后0.5秒补满，每次击杀有40%概率按权重掉落七宗罪精华且数量不限。
 encounter_challenge_11,challenge,十宗罪,ten_room,,,0,11,10,0,none,0,,1,10只Boss在10个固定位置同时生成；全部击杀后完成。

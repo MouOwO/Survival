@@ -4,6 +4,7 @@ local heroes = require("config/generated/hero_definitions")
 local weapons = require("config/generated/weapon_definitions")
 local number_config = require("config/combat_number_config")
 local global_rules = require("config/global_rules")
+local hero_health_guard = require("core/hero_health_guard")
 -- Composition-only bootstrap: services communicate exclusively through event_bus.
 local effect_handler_registry = require("systems/effect_handler_registry")
 local equipment_effect_service = require("systems/equipment_effect_service")
@@ -151,18 +152,20 @@ end
 
 local function apply_base_projection(state)
     local unit = state.unit
-    safe_call(unit, "SetBaseStrength", 0)
-    safe_call(unit, "SetBaseAgility", 0)
-    safe_call(unit, "SetBaseIntellect", 0)
-    safe_call(unit, "CalculateStatBonus", true)
-    -- CSV base_damage is engine base damage. Do not subtract the primary
-    -- attribute here: doing so produced negative base damage for heroes such
-    -- as Juggernaut (20 - 100 agility), which could resolve attacks as zero.
-    local minimum = math.max(0, state.base.attack_min)
-    local maximum = math.max(minimum, state.base.attack_max)
-    safe_call(unit, "SetBaseDamageMin", minimum)
-    safe_call(unit, "SetBaseDamageMax", maximum)
-    safe_call(unit, "CalculateStatBonus", true)
+    hero_health_guard.preserve_current(unit, function()
+        safe_call(unit, "SetBaseStrength", 0)
+        safe_call(unit, "SetBaseAgility", 0)
+        safe_call(unit, "SetBaseIntellect", 0)
+        safe_call(unit, "CalculateStatBonus", true)
+        -- CSV base_damage is engine base damage. Do not subtract the primary
+        -- attribute here: doing so produced negative base damage for heroes such
+        -- as Juggernaut (20 - 100 agility), which could resolve attacks as zero.
+        local minimum = math.max(0, state.base.attack_min)
+        local maximum = math.max(minimum, state.base.attack_max)
+        safe_call(unit, "SetBaseDamageMin", minimum)
+        safe_call(unit, "SetBaseDamageMax", maximum)
+        safe_call(unit, "CalculateStatBonus", true)
+    end)
 end
 
 local function recalculate(player_id, reason)
@@ -170,6 +173,8 @@ local function recalculate(player_id, reason)
     if not state or not state.unit or state.unit:IsNull() then
         return nil
     end
+    local current_health = state.unit.IsAlive and state.unit:IsAlive()
+        and safe_get(state.unit, "GetHealth", nil) or nil
     local equipment, growth = weapon_snapshot(player_id)
     local equipment_stats = get_all_equipment_stats(player_id)
     local definition = weapons.by_id[equipment.main_hand_content_id] or {}
@@ -194,6 +199,36 @@ local function recalculate(player_id, reason)
         tonumber(hero_technology.armor_reduction_per_attack) or 0
     local researcher_critical_chance_pct =
         tonumber(hero_technology.critical_chance_pct) or 0
+    local essence_result = event_bus.request(
+        events.SEVEN_SINS_ESSENCE_STATS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local essence = essence_result and essence_result.snapshot or {}
+    local progression_result = event_bus.request(
+        events.HERO_PROGRESSION_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local progression = progression_result and progression_result.snapshot or {}
+    local progression_attributes = tonumber(progression.all_attributes) or 0
+    local essence_attack_pct = tonumber(essence.attack_bonus_pct) or 0
+    researcher_armor_reduction = researcher_armor_reduction
+        + (tonumber(essence.armor_reduction_per_attack) or 0)
+    local essence_attributes_pct = tonumber(essence.all_attributes_pct) or 0
+    local unscaled_strength = state.base.strength + weapon_strength
+        + progression_attributes
+        + equipment_stats.all_attributes_flat
+    local unscaled_agility = state.base.agility + weapon_agility
+        + progression_attributes
+        + equipment_stats.all_attributes_flat
+    local unscaled_intellect = state.base.intellect + weapon_intellect
+        + progression_attributes
+        + equipment_stats.all_attributes_flat
+    local strength_bonus = unscaled_strength * essence_attributes_pct / 100
+    local agility_bonus = unscaled_agility * essence_attributes_pct / 100
+    local intellect_bonus = unscaled_intellect * essence_attributes_pct / 100
+    local base_attack_time = math.max(0.1,
+        (tonumber(state.engine_base_attack_time) or 2)
+            - (tonumber(essence.attack_interval_flat) or 0))
     local seconds_per_attack = safe_get(state.unit, "GetSecondsPerAttack", 0)
     if seconds_per_attack <= 0 then
         local base_attack_time = math.max(
@@ -211,26 +246,38 @@ local function recalculate(player_id, reason)
         weapon_name = equipment.main_hand_name ~= ""
             and equipment.main_hand_name or "未装备武器",
         attack_min = debug_attack or ((state.base.attack_min + weapon_attack_min)
-            * (1 + researcher_attack_pct / 100) + equipment_stats.attack_flat
+            * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
+            + equipment_stats.attack_flat
             + researcher_attack_flat),
         attack_max = debug_attack or ((state.base.attack_max + weapon_attack_max)
-            * (1 + researcher_attack_pct / 100) + equipment_stats.attack_flat
+            * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
+            + equipment_stats.attack_flat
             + researcher_attack_flat),
         researcher_attack_pct = researcher_attack_pct,
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
         researcher_critical_chance_pct = researcher_critical_chance_pct,
+        seven_sins_attack_bonus_pct = essence_attack_pct,
+        seven_sins_final_damage_pct = tonumber(essence.final_damage_pct) or 0,
+        seven_sins_all_attributes_pct = essence_attributes_pct,
+        seven_sins_strength_bonus = strength_bonus,
+        seven_sins_agility_bonus = agility_bonus,
+        seven_sins_intellect_bonus = intellect_bonus,
+        seven_sins_attributes_per_kill = tonumber(essence.attributes_per_kill) or 0,
+        seven_sins_attack_interval_flat = tonumber(essence.attack_interval_flat) or 0,
+        seven_sins_attributes_per_attack = tonumber(essence.attributes_per_attack) or 0,
+        seven_sins_armor_reduction_per_attack =
+            tonumber(essence.armor_reduction_per_attack) or 0,
+        progression_all_attributes = progression_attributes,
+        base_attack_time = base_attack_time,
         debug_attack_override = debug_attack or 0,
         armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
         -- attack_speed 表示每秒攻击次数，与装备攻速百分比使用同一权威数据。
         attack_speed = 1 / math.max(0.01, seconds_per_attack),
         attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100),
-        strength = state.base.strength + weapon_strength
-            + equipment_stats.all_attributes_flat,
-        agility = state.base.agility + weapon_agility
-            + equipment_stats.all_attributes_flat,
-        intellect = state.base.intellect + weapon_intellect
-            + equipment_stats.all_attributes_flat,
+        strength = unscaled_strength + strength_bonus,
+        agility = unscaled_agility + agility_bonus,
+        intellect = unscaled_intellect + intellect_bonus,
         hero_base_attack_min = state.base.attack_min,
         hero_base_attack_max = state.base.attack_max,
         weapon_base_attack_min = value(definition, "base_attack_min", 0),
@@ -245,7 +292,8 @@ local function recalculate(player_id, reason)
         equipment_attack = equipment_stats.attack_flat,
         engine_research_attack_bonus = ((state.base.attack_min
             + state.base.attack_max + weapon_attack_min + weapon_attack_max)
-            * 0.5) * researcher_attack_pct / 100 + researcher_attack_flat,
+            * 0.5) * (researcher_attack_pct + essence_attack_pct) / 100
+            + researcher_attack_flat,
         engine_weapon_attack_bonus = debug_attack
             and (debug_attack
                 - ((state.base.attack_min + state.base.attack_max) * 0.5)
@@ -260,6 +308,8 @@ local function recalculate(player_id, reason)
     }
     local changed = not snapshot_equal(state.snapshot, next_snapshot)
     state.snapshot = next_snapshot
+    state.unit.survival_seven_sins_final_damage_pct =
+        tonumber(essence.final_damage_pct) or 0
     local research_modifier = state.unit:FindModifierByName(
         "modifier_research_technology"
     ) or state.unit:AddNewModifier(
@@ -276,7 +326,10 @@ local function recalculate(player_id, reason)
     local modifier = state.unit:FindModifierByName(
         "modifier_weapon_stat_projection"
     )
-    if modifier and modifier.ForceRefresh then
+    local projection_refresh_required =
+        tostring(reason or "") ~= "attack_all_attribute_growth"
+        or essence_attributes_pct ~= 0
+    if projection_refresh_required and modifier and modifier.ForceRefresh then
         modifier:ForceRefresh()
     end
     if changed then
@@ -284,6 +337,14 @@ local function recalculate(player_id, reason)
             player_id = player_id,
             snapshot = state.snapshot,
         })
+    end
+    if projection_refresh_required and current_health and current_health > 0
+        and state.unit:IsAlive() then
+        hero_health_guard.protect_value(
+            state.unit,
+            current_health,
+            "combat_recalculate:" .. tostring(reason or "changed")
+        )
     end
     return state.snapshot
 end
@@ -295,6 +356,7 @@ local function on_hero_summoned(payload)
         hero_id = payload.hero_id,
         definition = definition,
         base = base_snapshot(payload.unit, definition),
+        engine_base_attack_time = safe_get(payload.unit, "GetBaseAttackTime", 2),
         snapshot = nil,
     }
     state_by_player[payload.player_id] = state
@@ -334,11 +396,20 @@ local function on_changed(payload)
     local modifier = state and state.unit and state.unit:FindModifierByName(
         "modifier_equipment_effects"
     )
-    if modifier and modifier.ForceRefresh then modifier:ForceRefresh() end
     if state and state.unit then
-        safe_call(state.unit, "CalculateStatBonus", true)
+        hero_health_guard.preserve_current(state.unit, function()
+            if modifier and modifier.ForceRefresh then modifier:ForceRefresh() end
+            safe_call(state.unit, "CalculateStatBonus", true)
+        end, "equipment_refresh:" .. tostring(payload.reason or "changed"))
     end
     recalculate(player_id, payload.reason)
+end
+
+local function on_progression_changed(payload)
+    -- Per-attack attribute growth changes logical/native attributes, but it does
+    -- not change equipment health. Refreshing the health-bonus modifier here
+    -- made Dota recalculate maximum health on every landed attack.
+    recalculate(tonumber(payload.player_id), payload.reason)
 end
 
 local function debug_set_attack(payload)
@@ -396,6 +467,8 @@ function M.init()
     event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_changed)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_changed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
+    event_bus.subscribe(events.SEVEN_SINS_ESSENCE_CHANGED, on_progression_changed)
+    event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_progression_changed)
 end
 
 return M

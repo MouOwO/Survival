@@ -85,6 +85,15 @@ local function progression_snapshot(player_id)
     )
     return result and result.snapshot or {}
 end
+local function merge_technology_levels(player_id, incoming)
+    state.technology_by_player[player_id] =
+        state.technology_by_player[player_id] or {}
+    local levels = state.technology_by_player[player_id]
+    for group, level in pairs(incoming or {}) do
+        levels[group] = level
+    end
+    return levels
+end
 local function snapshot_context(player_id, reason, mode)
     local team = player_team(player_id)
     local summon = summon_snapshot(player_id)
@@ -95,8 +104,10 @@ local function snapshot_context(player_id, reason, mode)
         { player_id = player_id }
     )
     if research_state and research_state.ok == true then
-        state.technology_by_player[player_id] =
-            research_state.legacy_levels or {}
+        -- Research and gold-mine technologies share the legacy projection.
+        -- The research repository only returns groups it owns, so replacing
+        -- this table would erase gold-mine levels before purchase validation.
+        merge_technology_levels(player_id, research_state.legacy_levels)
     end
     state.sequence_by_player[player_id] =
         (state.sequence_by_player[player_id] or 0) + 1
@@ -514,7 +525,7 @@ end
 local function on_research_level_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if not valid_player_id(player_id) then return end
-    state.technology_by_player[player_id] = payload.legacy_levels or {}
+    merge_technology_levels(player_id, payload.legacy_levels)
     push_snapshot(player_id, "research_level_changed")
 end
 

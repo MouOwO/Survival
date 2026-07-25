@@ -251,6 +251,8 @@ local function register_shop_purchase_request()
             and result.grant_result
             and tostring(result.grant_result.encounter_id or "") ~= ""
         local focus_hero_entindex = -1
+        local camera_target = result and result.grant_result
+            and result.grant_result.camera_target or {}
         if encounter_started then
             local summon = event_bus.request(
                 events.HERO_SUMMON_GET_REQUEST,
@@ -269,6 +271,9 @@ local function register_shop_purchase_request()
             error = result and result.error or "unknown_error",
             close_shop_and_focus_hero = encounter_started and 1 or 0,
             focus_hero_entindex = focus_hero_entindex,
+            focus_target_x = tonumber(camera_target.x),
+            focus_target_y = tonumber(camera_target.y),
+            focus_target_z = tonumber(camera_target.z),
         })
     end)
 end

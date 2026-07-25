@@ -178,6 +178,16 @@ function M.evaluate(player_id, entry, context)
             return false, "【传说：深渊审判】已达到+10，罪渊挑战已完成", count
         end
     end
+    if entry.grant_type == "start_encounter"
+        and entry.encounter_id == "encounter_challenge_10" then
+        local abyss_stage = exact_series_stage(
+            context,
+            "weapon_legend_abyss_"
+        )
+        if abyss_stage ~= nil then
+            return false, "冰火裁决已升阶，七宗罪入口已关闭", count
+        end
+    end
     if not research_authoritative and number(resources.wood) < entry.woodcost then
         return false, "木材不足", count
     end

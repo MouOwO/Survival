@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local hero_health_guard = require("core/hero_health_guard")
 
 local M = {}
 
@@ -48,18 +49,12 @@ local function apply_attributes(player_id, amount)
         return
     end
 
-    if hero.ModifyStrength then
-        hero:ModifyStrength(amount)
-    end
-    if hero.ModifyAgility then
-        hero:ModifyAgility(amount)
-    end
-    if hero.ModifyIntellect then
-        hero:ModifyIntellect(amount)
-    end
-    if hero.CalculateStatBonus then
-        hero:CalculateStatBonus(true)
-    end
+    hero_health_guard.preserve_current(hero, function()
+        if hero.ModifyStrength then hero:ModifyStrength(amount) end
+        if hero.ModifyAgility then hero:ModifyAgility(amount) end
+        if hero.ModifyIntellect then hero:ModifyIntellect(amount) end
+        if hero.CalculateStatBonus then hero:CalculateStatBonus(true) end
+    end, "hero_progression_attributes")
 end
 
 local function append_skill_reward(state, effect)

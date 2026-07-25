@@ -8,21 +8,47 @@ local M = {}
 
 local by_legacy_id = {}
 local by_content_id = {}
+local by_engine_item_name = {}
 for _, definition in ipairs(weapons.rows or {}) do
     local legacy_id = tostring(definition.legacy_id or "")
-    by_content_id[tostring(definition.content_id or "")] = definition
+    local content_id = tostring(definition.content_id or "")
+    local engine_item_name = tostring(definition.engine_item_name or "")
+    by_content_id[content_id] = definition
     if legacy_id ~= "" and definition.enabled ~= false then
         by_legacy_id[legacy_id] = definition
+    end
+    if engine_item_name ~= "" and definition.enabled ~= false then
+        assert(by_engine_item_name[engine_item_name] == nil,
+            "duplicate engine item name: " .. engine_item_name)
+        by_engine_item_name[engine_item_name] = definition
     end
 end
 for _, definition in ipairs(items.rows or {}) do
     local legacy_id = tostring(definition.legacy_id or "")
-    by_content_id[tostring(definition.content_id or "")] = definition
+    local content_id = tostring(definition.content_id or "")
+    local engine_item_name = tostring(definition.engine_item_name or "")
+    by_content_id[content_id] = definition
     if legacy_id ~= "" and definition.enabled ~= false then
         assert(by_legacy_id[legacy_id] == nil,
             "duplicate legacy item id: " .. legacy_id)
         by_legacy_id[legacy_id] = definition
     end
+    if engine_item_name ~= "" and definition.enabled ~= false then
+        assert(by_engine_item_name[engine_item_name] == nil,
+            "duplicate engine item name: " .. engine_item_name)
+        by_engine_item_name[engine_item_name] = definition
+    end
+end
+
+local function resolve_definition(identifier)
+    identifier = tostring(identifier or "")
+    local definition = by_legacy_id[identifier]
+        or by_content_id[identifier]
+        or by_engine_item_name[identifier]
+    if definition and definition.enabled ~= false then
+        return definition
+    end
+    return nil
 end
 
 local function notify(context, message)
@@ -48,14 +74,15 @@ function M.give_growth_sword(context)
 end
 
 function M.add_item(context)
-    local legacy_id = tostring(context.args[1] or "")
+    local identifier = tostring(context.args[1] or "")
     local count = math.floor(tonumber(context.args[2]) or 1)
-    if legacy_id == "" or count < 1 then
-        return false, "usage: additem <legacy_id> [count]"
+    if identifier == "" or count < 1 then
+        return false,
+            "usage: additem <legacy_id|content_id|engine_item_name> [count]"
     end
-    local definition = by_legacy_id[legacy_id]
+    local definition = resolve_definition(identifier)
     if not definition then
-        return false, "legacy_item_id_not_found:" .. legacy_id
+        return false, "item_identifier_not_found:" .. identifier
     end
     local result = event_bus.request(
         events.CONTENT_INVENTORY_GRANT_REQUEST,
@@ -63,7 +90,7 @@ function M.add_item(context)
             player_id = context.player_id,
             content_id = definition.content_id,
             count = count,
-            reason = "cheat_additem:" .. legacy_id,
+            reason = "cheat_additem:" .. identifier,
         }
     )
     if not result or not result.ok then
@@ -71,10 +98,12 @@ function M.add_item(context)
     end
     local catalog = (content.by_id or {})[definition.content_id] or {}
     notify(context, string.format(
-        "已添加 %s ×%d（旧版ID %s）",
+        "已添加 %s ×%d（旧版ID %s / 内容ID %s / 引擎名 %s）",
         tostring(definition.display_name or catalog.name or definition.content_id),
         count,
-        legacy_id
+        tostring(definition.legacy_id or "-"),
+        tostring(definition.content_id or "-"),
+        tostring(definition.engine_item_name or "-")
     ))
     return true
 end

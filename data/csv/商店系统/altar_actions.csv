@@ -1,6 +1,6 @@
 ﻿action_id,name,ability_name,ability_texture,location_id,fallback_target_name,wood_cost,gold_cost,gold_cost_per_second,required_rebirth_level,training_room_income_multiplier,target_unit_name,target_health,target_armor,target_health_regen,prerequisite_text,visible_condition,description,enabled,source
 #中文名:操作ID,名称,技能名称,技能图标,地点ID,临时回退地图点,木材消耗,金币消耗,每秒金币消耗,要求转生等级,练功房收益倍数,目标单位名称,目标生命,目标护甲,目标每秒回血,前置条件说明,显示条件,描述,是否启用,来源
 #types:string,string,string,string,string,string,number,number,number,number,number,string,number,number,number,string,string,string,boolean,string
-altar_endless_training,无尽年轮圣殿,ability_enter_endless_training,faceless_void_time_walk,endless_cycle_sanctum,challenge_04_entry,0,50000,50000,6,15,building_endless_training_target,1000000000,100000,100000000,英雄6转,hero_summoned==true,传送至无尽年轮圣殿。每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。,1,英雄祭坛传送
+altar_endless_training,无尽年轮圣殿,ability_enter_endless_training,faceless_void_time_walk,endless_cycle_sanctum,challenge_04_entry,0,50000,50000,10,15,building_endless_training_target,1000000000,100000,100000000,英雄10转,hero_summoned==true,传送至无尽年轮圣殿。英雄达到10转后解锁；每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。,1,英雄祭坛传送
 altar_shadow_realm,暗影界前庭,ability_enter_shadow_realm,spectre_reality,shadow_realm_forecourt,challenge_09_entry,0,50000,0,10,1,,,,,英雄10转,hero_summoned==true,传送至暗影界前庭。当前版本仅开放传送，怪物与掉落逻辑暂不启用。,1,英雄祭坛传送
 altar_select_hero,选择英雄,,,,,0,0,0,0,1,,,,,,altar_used==true,根据设置的英雄，一个英雄一个选项框,1,英雄相关建筑/行5

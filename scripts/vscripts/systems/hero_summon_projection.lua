@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local heroes = require("config/generated/hero_definitions")
+local altar_actions = require("config/generated/altar_actions")
 
 local M = {}
 
@@ -15,9 +16,26 @@ local TRAVEL_ABILITIES = {
     "ability_enter_endless_training",
     "ability_enter_shadow_realm",
 }
+local TRAVEL_ACTION_BY_ABILITY = {}
+for _, action in ipairs(altar_actions.rows or {}) do
+    if action.enabled ~= false
+        and action.ability_name
+        and action.ability_name ~= "" then
+        TRAVEL_ACTION_BY_ABILITY[action.ability_name] = action
+    end
+end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
+end
+
+local function rebirth_level(player_id)
+    local result = event_bus.request(
+        events.HERO_PROGRESSION_GET_REQUEST,
+        { player_id = player_id }
+    )
+    return tonumber(result and result.snapshot
+        and result.snapshot.rebirth_level) or 0
 end
 
 function M.entitlements(player_id)
@@ -92,6 +110,7 @@ function M.update_altar(player_id, altar, already_summoned)
     end
 
     local entitlement = M.entitlements(player_id)
+    local current_rebirth_level = rebirth_level(player_id)
     for hero_id, ability_name in pairs(SUMMON_ABILITIES) do
         local ability = altar:FindAbilityByName(ability_name)
         local definition = heroes.by_id[hero_id]
@@ -107,8 +126,13 @@ function M.update_altar(player_id, altar, already_summoned)
     for _, ability_name in ipairs(TRAVEL_ABILITIES) do
         local ability = altar:FindAbilityByName(ability_name)
         if ability then
+            local action = TRAVEL_ACTION_BY_ABILITY[ability_name] or {}
+            local required_rebirth_level =
+                tonumber(action.required_rebirth_level) or 0
+            local unlocked = current_rebirth_level
+                >= required_rebirth_level
             ability:SetHidden(already_summoned ~= true)
-            ability:SetActivated(already_summoned == true)
+            ability:SetActivated(already_summoned == true and unlocked)
         end
     end
 end

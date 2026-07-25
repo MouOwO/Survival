@@ -118,6 +118,10 @@ local M = {
     CHALLENGE_EQUIPMENT_REWARD_REQUEST = "challenge.equipment_reward.request",
     CHALLENGE_MATERIAL_DROP_REQUEST = "challenge.material.drop.request",
     CHALLENGE_MATERIAL_PICKUP_REQUEST = "challenge.material.pickup.request",
+    SEVEN_SINS_ESSENCE_USE_REQUEST = "seven_sins.essence.use.request",
+    SEVEN_SINS_ESSENCE_STATS_GET_REQUEST = "seven_sins.essence.stats.get.request",
+    SEVEN_SINS_ESSENCE_CHANGED = "seven_sins.essence.changed",
+    SEVEN_SINS_COMPLETED = "seven_sins.completed",
     POLAR_CRYSTAL_PROGRESS_GET_REQUEST = "polar_crystal.progress.get.request",
     POLAR_CRYSTAL_PROGRESS_CHANGED = "polar_crystal.progress.changed",
 

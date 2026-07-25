@@ -128,14 +128,21 @@ local function start_fee_task(player_id, state)
             local distance = (state.hero:GetAbsOrigin() - state.room_origin):Length2D()
             if distance > state.room_radius then
                 clear_state(player_id, "training_room_left_area")
-                notify(player_id, "已离开无尽年轮圣殿，停止扣费")
+                notify(
+                    player_id,
+                    "已离开" .. tostring(state.action.name) .. "，停止扣费"
+                )
                 return false
             end
         end
         local result = spend(state.team, cost, "endless_training_periodic_fee")
         if not result or not result.ok then
             clear_state(player_id, "training_room_gold_not_enough")
-            notify(player_id, "金币不足，已离开无尽年轮圣殿", "error")
+            notify(
+                player_id,
+                "每秒费用不足，已离开" .. tostring(state.action.name),
+                "error"
+            )
             return_home.return_unit(state.hero, player_id)
             return false
         end
@@ -160,6 +167,29 @@ function M.enter(player_id, action_id)
         return { ok = false, error = "传送地点不存在：" .. tostring(marker_name) }
     end
     local team = hero:GetTeamNumber()
+    local entry_cost = math.max(0, tonumber(action.gold_cost) or 0)
+    local periodic_cost = math.max(
+        0,
+        tonumber(action.gold_cost_per_second) or 0
+    )
+    local minimum_gold = entry_cost + periodic_cost
+    local resources = event_bus.request(events.RESOURCE_GET_REQUEST, {
+        team = team,
+    })
+    if not resources then
+        return { ok = false, error = "资源状态暂不可用，请稍后再试" }
+    end
+    if (tonumber(resources.gold) or 0) < minimum_gold then
+        return {
+            ok = false,
+            error = "进入" .. tostring(action.name)
+                .. "至少需要" .. tostring(minimum_gold)
+                .. "金币（入场费" .. tostring(entry_cost)
+                .. (periodic_cost > 0
+                    and "，1秒后首笔扣费" .. tostring(periodic_cost)
+                    or "") .. "）",
+        }
+    end
     local target = nil
     if tostring(action.target_unit_name or "") ~= "" then
         target = spawn_target(player_id, action, marker)
@@ -167,7 +197,7 @@ function M.enter(player_id, action_id)
             return { ok = false, error = "练功目标生成失败" }
         end
     end
-    local paid = spend(team, action.gold_cost, "altar_travel_entry:" .. action.action_id)
+    local paid = spend(team, entry_cost, "altar_travel_entry:" .. action.action_id)
     if not paid or not paid.ok then
         if valid(target) then UTIL_Remove(target) end
         return { ok = false, error = "金币不足" }
@@ -206,7 +236,13 @@ function M.enter(player_id, action_id)
         "training_room_enter"
     )
     start_fee_task(player_id, state)
-    notify(player_id, "已进入" .. tostring(action.name))
+    notify(
+        player_id,
+        "已进入" .. tostring(action.name)
+            .. (periodic_cost > 0
+                and "，1秒后开始每秒消耗" .. tostring(periodic_cost) .. "金币"
+                or "")
+    )
     return { ok = true, action_id = action.action_id, marker_name = marker_name }
 end
 

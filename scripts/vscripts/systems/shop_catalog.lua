@@ -402,6 +402,12 @@ function M.build_snapshot(player_id, context)
                 include = not context.research_unlocked
                     and (tonumber(context.city_level) or 0) >= 1
             end
+        elseif entry.contenttype == "rebirth" then
+            -- Always project exactly the next rebirth challenge. Resource or
+            -- building failures are shown as a disabled card instead of making
+            -- 4-10 rebirth silently disappear from the shop.
+            include = (tonumber(entry.definition.rebirth_level) or 0)
+                == (tonumber(context.rebirth_level) or 0) + 1
         elseif entry.contenttype == "technology" then
             local current = tonumber(item.technology_level) or 0
             local level = tonumber(item.next_technology_level) or 0

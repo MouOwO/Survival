@@ -8,6 +8,8 @@ local locations = require("config/generated/challenge_locations")
 local members = require("config/generated/encounter_members")
 local archetypes = require("config/generated/monster_archetypes")
 local weapons = require("config/generated/weapon_definitions")
+local seven_sins_essences = require("config/seven_sins_essences")
+local hero_return_home = require("systems/hero_return_home_service")
 
 local M = {}
 local sessions = {}
@@ -213,6 +215,20 @@ local function spawn_member(session, member)
 
     local point, expected = spawn_point_for(session, member, location)
     local position = point and point:GetAbsOrigin() or nil
+    if position and session.challenge.challenge_id == "challenge_10" then
+        session.spawn_serial = (tonumber(session.spawn_serial) or 0) + 1
+        local slot = (session.spawn_serial - 1) % 10
+        local angle = math.rad(slot * 36)
+        local radius = slot % 2 == 0 and 300 or 460
+        local candidate = GetGroundPosition(position + Vector(
+            math.cos(angle) * radius,
+            math.sin(angle) * radius,
+            0
+        ), point)
+        if not GridNav:IsBlocked(candidate) and GridNav:IsTraversable(candidate) then
+            position = candidate
+        end
+    end
     if not position and WOOD_STRENGTH_ENCOUNTERS[session.encounter_id] then
         local hero = hero_for(session.player_id)
         if alive(hero) then
@@ -263,6 +279,9 @@ local function spawn_member(session, member)
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
     apply_combat_stats(unit, combat_archetype)
+    if not unit:HasModifier("modifier_single_health_bar") then
+        unit:AddNewModifier(unit, nil, "modifier_single_health_bar", {})
+    end
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
 
     local home = nil
@@ -357,6 +376,15 @@ local function teleport_to_current(session)
     return teleport(hero, entry), nil
 end
 
+local function camera_target_for_session(session)
+    if not session or not session.teleport_hero then return nil end
+    local location = current_location(session)
+    local entry = location and marker(location.entry_target_name) or nil
+    if not entry then return nil end
+    local position = entry:GetAbsOrigin()
+    return { x = position.x, y = position.y, z = position.z }
+end
+
 local function teleport_to_active_monster(session)
     local hero = hero_for(session.player_id)
     if not alive(hero) then return false, "hero_not_ready" end
@@ -436,6 +464,10 @@ local function complete_session(session)
                 challenge_id = session.challenge.challenge_id,
                 encounter_id = session.encounter_id,
                 completion_id = session.encounter_id .. ":" .. session.generation,
+                position = (
+                    session.challenge.challenge_id == "challenge_05"
+                    or session.challenge.challenge_id == "challenge_09"
+                ) and session.completion_drop_position or nil,
                 authoritative = true,
             }
         )
@@ -476,6 +508,17 @@ function M.start(payload)
     local hero = hero_for(player_id)
     if not alive(hero) then return { ok = false, error = "hero_not_ready" } end
 
+    if challenge.challenge_id == "challenge_10" then
+        local abyss_stage, inventory_error = owned_series_stage(player_id, "legend_abyss")
+        if inventory_error then return { ok = false, error = inventory_error } end
+        if abyss_stage ~= nil then
+            return {
+                ok = false,
+                error = "冰火裁决已升阶为深渊审判，七宗罪入口已关闭",
+            }
+        end
+    end
+
     local existing = get_session(player_id, encounter_id)
     if existing and existing.status ~= "completed" then
         if payload.teleport_hero ~= false then
@@ -488,6 +531,7 @@ function M.start(payload)
             stage = existing.stage,
             alive = existing.monster_count,
             encounter_id = encounter_id,
+            camera_target = camera_target_for_session(existing),
         }
     end
 
@@ -545,6 +589,10 @@ function M.start(payload)
         spawn_mode = list[1].spawn_mode or "single",
         teleport_hero = payload.teleport_hero ~= false,
         generation = DoUniqueString("challenge_completion"),
+        seven_sins_drop_total = 0,
+        seven_sins_drop_counts = {},
+        seven_sins_ground_items = {},
+        spawn_serial = 0,
     }
     local markers_ok, marker_error = validate_session_markers(session)
     if not markers_ok then return { ok = false, error = marker_error } end
@@ -564,6 +612,7 @@ function M.start(payload)
         stage = display_stage,
         alive = session.monster_count,
         encounter_id = encounter_id,
+        camera_target = camera_target_for_session(session),
     }
 end
 
@@ -587,6 +636,101 @@ local function block_session(session, error_message)
     })
 end
 
+local function seven_sins_drop_position(session, sequence_index)
+    local location = current_location(session)
+    local center_marker = location and (
+        marker(location.home_target_name)
+        or marker(location.entry_target_name)
+        or spawn_marker(location, true)
+    ) or nil
+    if not center_marker then return nil, "seven_sins_drop_center_missing" end
+    local center = center_marker:GetAbsOrigin()
+    local angle = math.rad((sequence_index - 1) * (360 / #seven_sins_essences.rows) - 90)
+    local position = GetGroundPosition(center + Vector(
+        math.cos(angle) * seven_sins_essences.drop_radius,
+        math.sin(angle) * seven_sins_essences.drop_radius,
+        0
+    ), center_marker)
+    if GridNav:IsBlocked(position) or not GridNav:IsTraversable(position) then
+        position = GetGroundPosition(center + Vector(
+            math.cos(angle) * 220,
+            math.sin(angle) * 220,
+            0
+        ), center_marker)
+    end
+    return position
+end
+
+local function drop_seven_sins_essence(session)
+    if RandomFloat(0, 100) >= seven_sins_essences.drop_chance_pct then
+        return { ok = true, dropped = false, chance_missed = true }
+    end
+    local total = tonumber(session.seven_sins_drop_total) or 0
+    local total_weight = 0
+    for _, row in ipairs(seven_sins_essences.rows) do
+        total_weight = total_weight + math.max(0, tonumber(row.drop_weight) or 0)
+    end
+    if total_weight <= 0 then return { ok = false, error = "essence_weights_invalid" } end
+    local roll = RandomFloat(0, total_weight)
+    local sequence_index = #seven_sins_essences.rows
+    local accumulated = 0
+    for index, row in ipairs(seven_sins_essences.rows) do
+        accumulated = accumulated + math.max(0, tonumber(row.drop_weight) or 0)
+        if roll < accumulated then
+            sequence_index = index
+            break
+        end
+    end
+    local definition = seven_sins_essences.rows[sequence_index]
+    local dropped = tonumber(session.seven_sins_drop_counts[definition.content_id]) or 0
+    local position, position_error = seven_sins_drop_position(session, sequence_index)
+    if not position then return { ok = false, error = position_error } end
+    local hero = hero_for(session.player_id)
+    if not valid(hero) then return { ok = false, error = "hero_not_ready" } end
+    local ground_item = session.seven_sins_ground_items[definition.content_id]
+    local ground_container = valid(ground_item) and ground_item.GetContainer
+        and ground_item:GetContainer() or nil
+    if valid(ground_item) and valid(ground_container) then
+        ground_item:SetCurrentCharges(
+            math.max(1, tonumber(ground_item:GetCurrentCharges()) or 1) + 1
+        )
+        session.seven_sins_drop_counts[definition.content_id] = dropped + 1
+        session.seven_sins_drop_total = total + 1
+        return {
+            ok = true,
+            content_id = definition.content_id,
+            legacy_id = definition.legacy_id,
+            drop_total = session.seven_sins_drop_total,
+            stacked = true,
+        }
+    end
+    local item = CreateItem(definition.engine_item_name, hero, hero)
+    if not valid(item) then return { ok = false, error = "essence_create_failed" } end
+    item.survival_content_id = definition.content_id
+    item.survival_owner_player_id = session.player_id
+    if item.SetPurchaser then item:SetPurchaser(hero) end
+    if item.SetCurrentCharges then item:SetCurrentCharges(1) end
+    local container = CreateItemOnPositionSync(position, item)
+    if not valid(container) then
+        UTIL_Remove(item)
+        return { ok = false, error = "essence_container_create_failed" }
+    end
+    session.seven_sins_ground_items[definition.content_id] = item
+    session.seven_sins_drop_counts[definition.content_id] = dropped + 1
+    session.seven_sins_drop_total = total + 1
+    CustomNetTables:SetTableValue(
+        "survival_inventory_item_identity",
+        tostring(item:entindex()),
+        { content_id = definition.content_id, removed = 0 }
+    )
+    return {
+        ok = true,
+        content_id = definition.content_id,
+        legacy_id = definition.legacy_id,
+        drop_total = session.seven_sins_drop_total,
+    }
+end
+
 local function on_killed(payload)
     local victim = payload.victim
     if not valid(victim) then return end
@@ -602,6 +746,9 @@ local function on_killed(payload)
 
     local authorized_kill = owner_killed(meta, payload.attacker)
     if authorized_kill then
+        session.completion_drop_position = victim:GetAbsOrigin()
+    end
+    if authorized_kill then
         event_bus.emit(events.MONSTER_KILLED, {
             victim = victim,
             attacker = payload.attacker,
@@ -614,8 +761,17 @@ local function on_killed(payload)
     end
 
     local challenge_id = session.challenge.challenge_id
-    if authorized_kill
-        and (challenge_id == "challenge_10" or challenge_id == "challenge_11") then
+    if authorized_kill and challenge_id == "challenge_10" then
+        local drop_result = drop_seven_sins_essence(session)
+        if not drop_result or not drop_result.ok then
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = meta.player_id,
+                message = "七宗罪精华掉落失败："
+                    .. tostring(drop_result and drop_result.error or "handler_missing"),
+                level = "error",
+            })
+        end
+    elseif authorized_kill and challenge_id == "challenge_11" then
         local required_stage = math.max(
             0,
             (tonumber(meta.member.sequence_index) or 1) - 1
@@ -633,8 +789,7 @@ local function on_killed(payload)
                 authoritative = true,
             }
         )
-        if challenge_id == "challenge_11" and drop_result
-            and (drop_result.ok or drop_result.material_retained) then
+        if drop_result and (drop_result.ok or drop_result.material_retained) then
             abyss_cleared_stage_by_player[meta.player_id] = math.max(
                 tonumber(abyss_cleared_stage_by_player[meta.player_id]) or -1,
                 required_stage
@@ -687,6 +842,28 @@ local function on_killed(payload)
         session.status = "active"
         publish(session, "active")
     end, "challenge_next:" .. meta.player_id .. ":" .. meta.encounter_id)
+end
+
+local function on_seven_sins_completed(payload)
+    local player_id = tonumber(payload.player_id)
+    local session = player_id and get_session(
+        player_id,
+        seven_sins_essences.encounter_id
+    ) or nil
+    if session and session.status ~= "completed" then
+        session.status = "completed"
+        destroy_session_monsters(session)
+        publish(session, "completed", { entrance_closed = true })
+    end
+    local hero = payload.hero or (player_id and hero_for(player_id))
+    if alive(hero) then
+        hero_return_home.return_unit(hero, player_id)
+    end
+    event_bus.emit(events.UI_NOTIFICATION, {
+        player_id = player_id,
+        message = "冰火裁决已升阶为深渊审判，七宗罪入口永久关闭。",
+        level = "success",
+    })
 end
 
 local function start_auto_tests(payload)
@@ -748,6 +925,7 @@ function M.init()
     auto_test_started = {}
     abyss_cleared_stage_by_player = {}
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
+    event_bus.subscribe(events.SEVEN_SINS_COMPLETED, on_seven_sins_completed)
     event_bus.subscribe(events.HERO_READY, start_auto_tests)
 end
 

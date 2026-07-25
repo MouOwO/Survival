@@ -98,6 +98,11 @@ local function create_hero(player_id, team, altar, definition)
     end
 
     stat_adapter.apply(unit, definition)
+    if not unit:HasModifier("modifier_single_health_bar") then
+        unit:AddNewModifier(unit, nil, "modifier_single_health_bar", {
+            player_id = player_id,
+        })
+    end
     if not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
@@ -243,6 +248,19 @@ local function on_entitlement_changed(payload)
     publish(payload.player_id, "entitlement_changed")
 end
 
+local function on_hero_progression_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if not valid_player_id(player_id) then
+        return
+    end
+    local team = PlayerResource:GetTeam(player_id)
+    projection.update_altar(
+        player_id,
+        altar_by_team[team],
+        current_summon(player_id) ~= nil
+    )
+end
+
 function M.init()
     altar_by_team = {}
     builder_by_player = {}
@@ -269,6 +287,10 @@ function M.init()
     event_bus.subscribe(
         events.PLAYER_ENTITLEMENT_CHANGED,
         on_entitlement_changed
+    )
+    event_bus.subscribe(
+        events.HERO_PROGRESSION_CHANGED,
+        on_hero_progression_changed
     )
 end
 
