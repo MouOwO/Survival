@@ -76,6 +76,10 @@ local function normalize(payload, unit)
         hero_summoned = payload.hero_summoned ~= nil
             and payload.hero_summoned
             or previous.hero_summoned or 0,
+        player_id = payload.player_id ~= nil
+            and tonumber(payload.player_id)
+            or previous.player_id
+            or unit:GetPlayerOwnerID(),
         building_counts = payload.building_counts
             or previous.building_counts or {},
     }
@@ -174,6 +178,14 @@ local function on_hero_summon_state(payload)
     end
 end
 
+local function on_hero_progression_changed(payload)
+    local player_id = tonumber(payload.player_id)
+    if player_id == nil or player_id < 0 then return end
+    for _, state in pairs(state_by_unit) do
+        if tonumber(state.player_id) == player_id then publish(state) end
+    end
+end
+
 
 local function on_hero_skill_changed(payload)
     local entindex = tonumber(payload.unit_entindex)
@@ -215,6 +227,10 @@ function M.init()
         on_hero_skill_changed
     )
     event_bus.subscribe(events.RESOURCE_CHANGED, on_resources)
+    event_bus.subscribe(
+        events.HERO_PROGRESSION_CHANGED,
+        on_hero_progression_changed
+    )
 end
 
 return M

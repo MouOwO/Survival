@@ -192,6 +192,8 @@ local function recalculate(player_id, reason)
         tonumber(hero_technology.final_damage_bonus_pct) or 0
     local researcher_armor_reduction =
         tonumber(hero_technology.armor_reduction_per_attack) or 0
+    local researcher_critical_chance_pct =
+        tonumber(hero_technology.critical_chance_pct) or 0
     local seconds_per_attack = safe_get(state.unit, "GetSecondsPerAttack", 0)
     if seconds_per_attack <= 0 then
         local base_attack_time = math.max(
@@ -217,6 +219,7 @@ local function recalculate(player_id, reason)
         researcher_attack_pct = researcher_attack_pct,
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
+        researcher_critical_chance_pct = researcher_critical_chance_pct,
         debug_attack_override = debug_attack or 0,
         armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
         -- attack_speed 表示每秒攻击次数，与装备攻速百分比使用同一权威数据。
@@ -266,7 +269,8 @@ local function recalculate(player_id, reason)
         research_modifier:SetTechnologyValues(
             researcher_attack_pct,
             researcher_final_damage_pct,
-            researcher_armor_reduction
+            researcher_armor_reduction,
+            researcher_critical_chance_pct
         )
     end
     local modifier = state.unit:FindModifierByName(

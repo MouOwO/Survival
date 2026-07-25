@@ -60,6 +60,18 @@ def main():
         skill_id = clean(row.get("skill_id"))
         add(out, "ability:" + skill_id, "ability", skill_id, row.get("skill_name"), "0", "0", row.get("description"), "", skill_id)
 
+    altar_actions = read_csv(CSV_ROOT / "商店系统" / "altar_actions.csv")
+    for row in altar_actions:
+        if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:
+            continue
+        ability = clean(row.get("ability_name"))
+        if not ability:
+            continue
+        add(out, "ability:" + ability, "ability", ability,
+            row.get("name"), row.get("wood_cost"), row.get("gold_cost"),
+            row.get("description"), row.get("ability_texture"),
+            row.get("action_id"))
+
     catalog = read_csv(CSV_ROOT / "物品系统" / "content_catalog.csv")
     catalog_by_id = {clean(row.get("content_id")): row for row in catalog}
     for row in catalog:

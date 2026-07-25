@@ -4,6 +4,7 @@ local logger = require("core/logger")
 local weapon_cheats = require("debug/weapon_cheat_handlers")
 local attack_speed_cheat = require("debug/attack_speed_cheat")
 local wave_system = require("systems/wave_system")
+local research_test = require("debug/research_technology_test")
 
 local M = {}
 
@@ -115,6 +116,12 @@ local function add_technology(context)
             .. " Lv." .. tostring(result.level) .. "）"
     )
     return true
+end
+
+local function run_research_test(context)
+    local ok, message = research_test.run()
+    notify(context, message)
+    return ok, ok and nil or message
 end
 
 local function signed_amount(context, command)
@@ -412,6 +419,7 @@ local COMMANDS = {
     addarmor = add_armor,
     addmonster = add_monster,
     addtechnology = add_technology,
+    research_test = run_research_test,
     monster = spawn_wave,
     addspeed = attack_speed_cheat.execute,
     setvip = set_vip,
@@ -475,7 +483,7 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: addattack, addarmor, addmonster <health> <armor> <0|1>, addtechnology, monster, items, hero, skill, weapon growth"
+        "ready: research_test, addtechnology, monster, items, hero, skill, weapon growth"
     )
 end
 

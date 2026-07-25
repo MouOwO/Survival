@@ -11,6 +11,10 @@ local SUMMON_ABILITIES = {
     hero_monkey_king = "ability_summon_monkey_king",
     hero_blademaster = "ability_summon_blademaster",
 }
+local TRAVEL_ABILITIES = {
+    "ability_enter_endless_training",
+    "ability_enter_shadow_realm",
+}
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -97,6 +101,14 @@ function M.update_altar(player_id, altar, already_summoned)
             ability:SetActivated(
                 not already_summoned and vip_ok
             )
+            ability:SetHidden(already_summoned == true)
+        end
+    end
+    for _, ability_name in ipairs(TRAVEL_ABILITIES) do
+        local ability = altar:FindAbilityByName(ability_name)
+        if ability then
+            ability:SetHidden(already_summoned ~= true)
+            ability:SetActivated(already_summoned == true)
         end
     end
 end

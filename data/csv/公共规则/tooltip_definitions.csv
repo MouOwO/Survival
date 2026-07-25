@@ -1,6 +1,8 @@
 ﻿tooltip_id,tooltip_type,id,name,needwood,needgold,desc,icon,source_id
 "#中文名:提示ID,提示分类,业务ID,名称,所需木材,所需金币,描述,图标,来源ID"
 "#types:string,enum,string,string,number,number,string,string,string"
+ability:ability_enter_endless_training,ability,ability_enter_endless_training,无尽年轮圣殿,0,50000,传送至无尽年轮圣殿。每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。,faceless_void_time_walk,altar_endless_training
+ability:ability_enter_shadow_realm,ability,ability_enter_shadow_realm,暗影界前庭,0,50000,传送至暗影界前庭。当前版本仅开放传送，怪物与掉落逻辑暂不启用。,spectre_reality,altar_shadow_realm
 ability:ability_survival_agility_training,ability,ability_survival_agility_training,敏捷训练,0,0,每级增加敏捷。,item_eagle,skill_agility_training
 ability:ability_survival_armor_training,ability,ability_survival_armor_training,护甲训练,0,0,每级增加护甲。,item_chainmail,skill_armor_training
 ability:ability_survival_attack_range_training,ability,ability_survival_attack_range_training,射程训练,0,0,每级增加攻击距离。,sniper_take_aim,skill_attack_range_training
@@ -103,8 +105,8 @@ inventory_item:building_research_lab,inventory_item,building_research_lab,研究
 inventory_item:building_wall,inventory_item,building_wall,城墙,0,0,建造成功后Undying的建造城墙技能在客户端置灰；服务端仍验证max_count=1。,,building_wall
 inventory_item:challenge_01,inventory_item,challenge_01,木材练功房,0,0,击杀每个怪物获得100木材。,,challenge_01
 inventory_item:challenge_02,inventory_item,challenge_02,金币练功房,0,0,击杀每个怪物获得100金币。,,challenge_02
-inventory_item:challenge_03,inventory_item,challenge_03,属性练功房,0,0,击杀每个怪物获得100点全属性。,,challenge_03
-inventory_item:challenge_04,inventory_item,challenge_04,大属性练功房,0,0,击杀每个怪物获得1000点全属性。,,challenge_04
+inventory_item:challenge_03,inventory_item,challenge_03,属性练功房,0,0,击杀每个怪物获得10点全属性。,,challenge_03
+inventory_item:challenge_04,inventory_item,challenge_04,大属性练功房,0,0,"击杀每个怪物获得100点全属性,1000金币。",,challenge_04
 inventory_item:challenge_05,inventory_item,challenge_05,挑战合成宝石,0,0,击败BOSS后掉落合成宝石。,,challenge_05
 inventory_item:challenge_06,inventory_item,challenge_06,进入冰霜之地,0,0,升级小极地晶石。,,challenge_06
 inventory_item:challenge_07,inventory_item,challenge_07,挑战熔火核心lv1-3宝石,0,0,可升级浴火熔铠到lv4。,,challenge_07

@@ -3,6 +3,8 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local catalog = require("systems/shop_catalog")
 local grant_service = require("systems/shop_grant_service")
+local research_config = require("config/research_technology_config")
+local research_events = require("research/research_event_names")
 local M = {}
 local state = {}
 local function reset_state()
@@ -88,6 +90,14 @@ local function snapshot_context(player_id, reason, mode)
     local summon = summon_snapshot(player_id)
     local entitlement = entitlement_snapshot(player_id)
     local progression = progression_snapshot(player_id)
+    local research_state = event_bus.request(
+        research_events.STATE_GET_REQUESTED,
+        { player_id = player_id }
+    )
+    if research_state and research_state.ok == true then
+        state.technology_by_player[player_id] =
+            research_state.legacy_levels or {}
+    end
     state.sequence_by_player[player_id] =
         (state.sequence_by_player[player_id] or 0) + 1
     return {
@@ -328,6 +338,37 @@ local function purchase(payload)
     if not purchasable then
         return { ok = false, error = reason or "not_purchasable" }
     end
+    local technology_group = entry.definition
+        and entry.definition.technology_group or ""
+    local research_definition = research_config.by_legacy_group[technology_group]
+    if entry.contenttype == "technology" and research_definition then
+        local current_level = tonumber((state.technology_by_player[player_id]
+            or {})[technology_group]) or 0
+        local requested_level = tonumber(entry.definition.level) or 0
+        if requested_level ~= current_level + 1 then
+            return { ok = false, error = "technology_level_invalid" }
+        end
+        local upgraded = event_bus.request(research_events.UPGRADE_REQUESTED, {
+            player_id = player_id,
+            tech_id = research_definition.tech_id,
+        })
+        if not upgraded or upgraded.success ~= true then
+            local failure = upgraded and upgraded.error_code
+                or "resource_commit_failed"
+            notify(player_id, failure, "error")
+            return { ok = false, error = failure, research_result = upgraded }
+        end
+        state.purchased_count[player_id] =
+            state.purchased_count[player_id] or {}
+        state.purchased_count[player_id][entry.entryid] = 1
+        notify(player_id, "研究成功：" .. research_definition.display_name
+            .. " Lv." .. tostring(upgraded.new_level))
+        push_snapshot(player_id, "research_upgrade_completed")
+        local result = { ok = true, entry_id = entry.entryid,
+            research_result = upgraded }
+        remember_result(player_id, request_id, result)
+        return result
+    end
     local spend = event_bus.request(
         events.RESOURCE_TRY_SPEND_REQUEST,
         {
@@ -464,8 +505,17 @@ local function get_technology_state(payload)
     return {
         ok = true,
         research_unlocked = state.research_unlocked[player_id] == true,
+        advanced_researcher_unlocked =
+            state.advanced_researcher_unlocked[player_id] == true,
         levels = state.technology_by_player[player_id] or {},
     }
+end
+
+local function on_research_level_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if not valid_player_id(player_id) then return end
+    state.technology_by_player[player_id] = payload.legacy_levels or {}
+    push_snapshot(player_id, "research_level_changed")
 end
 
 function M.init()
@@ -492,6 +542,7 @@ function M.init()
     event_bus.subscribe(events.PLAYER_ENTITLEMENT_CHANGED, on_player_changed)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_player_changed)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_player_changed)
+    event_bus.subscribe(research_events.LEVEL_CHANGED, on_research_level_changed)
 end
 return M
 --xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

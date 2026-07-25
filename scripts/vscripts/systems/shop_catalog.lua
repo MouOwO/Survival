@@ -2,6 +2,8 @@ local content_catalog = require("config/generated/content_catalog")
 local categories = require("config/generated/shop_categories")
 local aggregation = require("config/generated/shop_aggregation_rules")
 local evaluator = require("systems/shop_condition_evaluator")
+local research_config = require("config/research_technology_config")
+local research_description = require("research/research_technology_description")
 
 local M = {}
 
@@ -119,6 +121,14 @@ local function make_entry(rule, row)
     local content_id = tostring(field(row, rule.id_field, ""))
     local wood = number(field(row, rule.wood_cost_field, 0))
     local gold = number(field(row, rule.gold_cost_field, 0))
+    local research = research_config.by_legacy_group[row.technology_group]
+    local research_cost = research and research_config.cost_for_level(
+        research, tonumber(row.level) or 0
+    ) or nil
+    if research_cost then
+        wood = research_cost.wood
+        gold = research_cost.gold
+    end
     if content_id == ""
         or (wood <= 0 and gold <= 0) then
         return nil
@@ -249,6 +259,15 @@ function M.content_name(entry)
 end
 
 function M.evaluate(player_id, entry, context)
+    local group = entry and entry.definition
+        and entry.definition.technology_group or ""
+    local authoritative = research_config.by_legacy_group[group] ~= nil
+    if authoritative then
+        local adjusted = {}
+        for key, value in pairs(context or {}) do adjusted[key] = value end
+        adjusted.research_service_authoritative = true
+        context = adjusted
+    end
     local ok, reason, count =
         evaluator.evaluate(player_id, entry, context)
     return ok, reason, entry.definition, count
@@ -257,7 +276,7 @@ end
 local function project_entry(player_id, entry, context)
     local ok, reason, _, count =
         M.evaluate(player_id, entry, context)
-    return {
+    local item = {
         entry_id = entry.entryid,
         tooltip_id = entry.tooltip_id
             or ("shop_item:" .. entry.entryid),
@@ -289,6 +308,56 @@ local function project_entry(player_id, entry, context)
         sort_order = entry.order,
         fields = entry.fields,
     }
+    local research = research_config.by_legacy_group[
+        entry.definition.technology_group
+    ]
+    if research then
+        local target_level = tonumber(item.next_technology_level) or 0
+        local current_level = tonumber(item.technology_level) or 0
+        local cost = research_config.cost_for_level(research, target_level)
+        item.name = research.display_name .. " Lv."
+            .. tostring(target_level)
+        item.description = research_description.build(
+            research,
+            current_level,
+            target_level
+        )
+        item.purchase_condition_text = research_description.condition_text(research)
+        item.fields = research_description.fields(
+            research,
+            current_level,
+            target_level
+        )
+        item.technology_max_level = research.max_level
+        item.wood_cost = cost and cost.wood or 0
+        item.gold_cost = cost and cost.gold or 0
+        local required = research.prerequisite or {}
+        local levels = context.technology_levels
+            and context.technology_levels[player_id] or {}
+        local prerequisite_met = not required.tech_id
+            or (tonumber(levels[(research_config.by_id[required.tech_id]
+                or {}).legacy_group]) or 0) >= (required.required_level or 0)
+        local reincarnation_met = (tonumber(context.rebirth_level) or 0)
+            >= (required.reincarnation_level or 0)
+        local locked_reason = nil
+        if target_level ~= current_level + 1
+            or current_level >= research.max_level then
+            locked_reason = "已达到最高等级"
+        elseif not prerequisite_met then
+            locked_reason = "前置科技等级不足"
+        elseif not reincarnation_met then
+            locked_reason = "转生等级不足"
+        elseif number((context.resources or {}).gold) < item.gold_cost then
+            locked_reason = "金币不足"
+        elseif number((context.resources or {}).wood) < item.wood_cost then
+            locked_reason = "木材不足"
+        end
+        if item.purchasable == 1 and locked_reason then
+            item.purchasable = 0
+            item.disabled_reason = locked_reason
+        end
+    end
+    return item
 end
 
 local function projected_categories()
@@ -336,6 +405,7 @@ function M.build_snapshot(player_id, context)
         elseif entry.contenttype == "technology" then
             local current = tonumber(item.technology_level) or 0
             local level = tonumber(item.next_technology_level) or 0
+            local research = research_config.by_legacy_group[group]
             local phase = tonumber(entry.technology_phase) or 1
             local levels = context.technology_levels
                 and context.technology_levels[player_id] or {}
@@ -345,7 +415,8 @@ function M.build_snapshot(player_id, context)
             local prerequisite_required = tonumber(
                 entry.definition.unlock_required_level
             ) or 0
-            local prerequisite_ready = entry.technology_track ~= "advanced"
+            local prerequisite_ready = research ~= nil
+                or entry.technology_track ~= "advanced"
                 or prerequisite_level >= prerequisite_required
             local gold_mine_technology =
                 entry.definition.technology_group == "gold_mine_efficiency"
@@ -357,7 +428,8 @@ function M.build_snapshot(player_id, context)
             include = not gold_mine_technology and unlocked
                 and prerequisite_ready
                 and level == current + 1
-                and (entry.technology_track == "advanced_researcher"
+                and (research ~= nil
+                    or entry.technology_track == "advanced_researcher"
                     or phase == 0
                     or phase == 1 and current < 10
                     or phase == 2 and current >= 10)

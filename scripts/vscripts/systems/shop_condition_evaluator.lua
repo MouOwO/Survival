@@ -46,6 +46,8 @@ function M.evaluate(player_id, entry, context)
         and context.purchased_count[player_id][entry.entryid] or 0
     local resources = context.resources or {}
     local limit = number(entry.purchase_limit)
+    local research_authoritative = context.research_service_authoritative == true
+        and entry.contenttype == "technology"
 
     if not context.gold_mine_ability and context.ui_mode == "research" then
         if entry.contenttype ~= "technology"
@@ -104,10 +106,10 @@ function M.evaluate(player_id, entry, context)
         local levels = context.technology_levels and context.technology_levels[player_id] or {}
         local current = tonumber(levels[definition.technology_group]) or 0
         local next_level = tonumber(definition.level) or 0
-        if next_level ~= current + 1 then
+        if not research_authoritative and next_level ~= current + 1 then
             return false, current >= (tonumber(definition.max_level) or 0) and "已达到最高等级" or "请先完成前一级科技", current
         end
-        if entry.technology_track == "advanced" then
+        if not research_authoritative and entry.technology_track == "advanced" then
             local basic_level = tonumber(
                 levels[entry.unlock_technology_group] or 0
             ) or 0
@@ -139,7 +141,8 @@ function M.evaluate(player_id, entry, context)
     if entry.requires_vip and context.vip ~= true then
         return false, "需要VIP权限", count
     end
-    if context.rebirth_level < entry.required_rebirth_level then
+    if not research_authoritative
+        and context.rebirth_level < entry.required_rebirth_level then
         return false,
             "需要完成" ..
             tostring(entry.required_rebirth_level) .. "转",
@@ -175,10 +178,10 @@ function M.evaluate(player_id, entry, context)
             return false, "【传说：深渊审判】已达到+10，罪渊挑战已完成", count
         end
     end
-    if number(resources.wood) < entry.woodcost then
+    if not research_authoritative and number(resources.wood) < entry.woodcost then
         return false, "木材不足", count
     end
-    if number(resources.gold) < entry.goldcost then
+    if not research_authoritative and number(resources.gold) < entry.goldcost then
         return false, "金币不足", count
     end
     return true, "", count

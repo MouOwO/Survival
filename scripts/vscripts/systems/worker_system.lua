@@ -333,6 +333,7 @@ local function train_worker(payload)
     end
     worker:SetBaseMoveSpeed(tonumber(training.move_speed) or config.move_speed)
     local is_repairer = training_id:match("^train_repairer_") ~= nil
+    local technology_efficiency = 0
     if is_repairer then
         worker:SetBaseDamageMin(0)
         worker:SetBaseDamageMax(0)
@@ -352,7 +353,7 @@ local function train_worker(payload)
     else
         worker.survival_worker_type = "lumberjack"
         local lumberjack = technology_stat_manager.get(city_state.player_id).final.lumberjack or {}
-        local technology_efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
+        technology_efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
         worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
             tree_entindex = current_tree_entindex,
             base_lumber_efficiency = tonumber(training.wood_per_hit)

@@ -1366,4 +1366,28 @@
         "AbilityCooldown"    "0.5"
         "AbilityManaCost"    "0"
     }
+
+    "ability_enter_endless_training"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_enter_endless_training"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+        "AbilityTextureName" "faceless_void_time_walk"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "1.0"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_enter_shadow_realm"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_enter_shadow_realm"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+        "AbilityTextureName" "spectre_reality"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "1.0"
+        "AbilityManaCost"    "0"
+    }
 }

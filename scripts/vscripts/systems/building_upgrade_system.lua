@@ -69,7 +69,8 @@ local function apply_research_technology(state)
             or unit:GetBaseDamageMin()
         local tower = technology.tower or {}
         local bonus = tonumber(tower.attack_flat) or 0
-        local damage = base_damage + bonus
+        local bonus_pct = tonumber(tower.attack_bonus_pct) or 0
+        local damage = (base_damage + bonus) * (1 + bonus_pct / 100)
         unit:SetBaseDamageMin(damage)
         unit:SetBaseDamageMax(damage)
         unit.survival_attack_min = damage

@@ -2,6 +2,8 @@
 -- Source: tooltip_definitions.csv
 local M = {}
 M.rows = {
+    { tooltip_id = "ability:ability_enter_endless_training", tooltip_type = "ability", id = "ability_enter_endless_training", name = "无尽年轮圣殿", needwood = 0, needgold = 50000, desc = "传送至无尽年轮圣殿。每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。", icon = "faceless_void_time_walk", source_id = "altar_endless_training" },
+    { tooltip_id = "ability:ability_enter_shadow_realm", tooltip_type = "ability", id = "ability_enter_shadow_realm", name = "暗影界前庭", needwood = 0, needgold = 50000, desc = "传送至暗影界前庭。当前版本仅开放传送，怪物与掉落逻辑暂不启用。", icon = "spectre_reality", source_id = "altar_shadow_realm" },
     { tooltip_id = "ability:ability_survival_agility_training", tooltip_type = "ability", id = "ability_survival_agility_training", name = "敏捷训练", needwood = 0, needgold = 0, desc = "每级增加敏捷。", icon = "item_eagle", source_id = "skill_agility_training" },
     { tooltip_id = "ability:ability_survival_armor_training", tooltip_type = "ability", id = "ability_survival_armor_training", name = "护甲训练", needwood = 0, needgold = 0, desc = "每级增加护甲。", icon = "item_chainmail", source_id = "skill_armor_training" },
     { tooltip_id = "ability:ability_survival_attack_range_training", tooltip_type = "ability", id = "ability_survival_attack_range_training", name = "射程训练", needwood = 0, needgold = 0, desc = "每级增加攻击距离。", icon = "sniper_take_aim", source_id = "skill_attack_range_training" },

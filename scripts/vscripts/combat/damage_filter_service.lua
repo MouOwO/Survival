@@ -30,17 +30,23 @@ local function filter(_, keys)
     end
     local source_bonus = record and tonumber(record.post_damage_bonus_pct) or 0
     local global_bonus = tonumber(config.global_post_bonus_pct) or 0
+    local research_bonus = math.max(
+        0,
+        tonumber(attacker.survival_research_final_damage_pct) or 0
+    ) / 100
     local target_reduction = record and tonumber(record.target_post_reduction_pct) or 0
     local boss_multiplier = 1
     if config.boss_rules.enabled and victim:HasModifier("modifier_boss") then
         boss_multiplier = config.boss_rules.default_damage_taken_multiplier
     end
     local multiplier = math.max(config.minimum_post_multiplier,
-        1 + source_bonus + global_bonus - target_reduction) * boss_multiplier
+        1 + source_bonus + global_bonus + research_bonus - target_reduction)
+        * boss_multiplier
     keys.damage = math.max(0, keys.damage * multiplier)
     local payload = {
         transaction_id = transaction_id, engine_damage = keys.damage,
         post_multiplier = multiplier,
+        research_bonus_pct = research_bonus,
         final_damage = keys.damage, recursion_depth = record and record.recursion_depth or 0,
     }
     if record then

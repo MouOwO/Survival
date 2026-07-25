@@ -23,6 +23,8 @@ M.rows = {
     { location_id = "rebirth_08_room", location_set_id = "rebirth_08", sequence_index = 1, entry_target_name = "rebirth_08_entry", home_target_name = "rebirth_08_boss_spawn", spawn_target_names = {"rebirth_08_boss_spawn"}, room_radius = 1200, enabled = true, notes = "八转挑战" },
     { location_id = "rebirth_09_room", location_set_id = "rebirth_09", sequence_index = 1, entry_target_name = "rebirth_09_entry", home_target_name = "rebirth_09_boss_spawn", spawn_target_names = {"rebirth_09_boss_spawn"}, room_radius = 1200, enabled = true, notes = "九转挑战" },
     { location_id = "rebirth_10_room", location_set_id = "rebirth_10", sequence_index = 1, entry_target_name = "rebirth_10_entry", home_target_name = "rebirth_10_boss_spawn", spawn_target_names = {"rebirth_10_boss_spawn"}, room_radius = 1200, enabled = true, notes = "十转挑战" },
+    { location_id = "endless_cycle_sanctum", location_set_id = "endless_cycle_sanctum", sequence_index = 1, entry_target_name = "endless_cycle_sanctum_entry", home_target_name = "endless_cycle_sanctum_home", spawn_target_names = {"endless_cycle_sanctum_target"}, room_radius = 1200, enabled = true, notes = "无尽年轮圣殿；地图专用点缺失时由服务回退到祭坛动作表配置点。" },
+    { location_id = "shadow_realm_forecourt", location_set_id = "shadow_realm_forecourt", sequence_index = 1, entry_target_name = "shadow_realm_forecourt_entry", home_target_name = "shadow_realm_forecourt_home", room_radius = 1200, enabled = true, notes = "暗影界前庭；当前版本仅开放传送。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

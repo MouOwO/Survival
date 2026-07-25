@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local building_system = require("systems/building_system")
 local weapon_snapshot = require("ui/weapon_synthesis_snapshot_service")
 local unit_display_names = require("config/generated/unit_display_names")
+local research_events = require("research/research_event_names")
 
 local M = {}
 local synthesis_requests = {}
@@ -270,6 +271,34 @@ local function register_shop_purchase_request()
             focus_hero_entindex = focus_hero_entindex,
         })
     end)
+end
+
+local function register_research_requests()
+    CustomGameEventManager:RegisterListener(
+        "ui_research_snapshot_request",
+        function(_, payload)
+            local player_id = source_player_id(payload)
+            if not valid_player_id(player_id) then return end
+            event_bus.request(research_events.CLIENT_SNAPSHOT_REQUESTED, {
+                player_id = player_id,
+            })
+        end
+    )
+    CustomGameEventManager:RegisterListener(
+        "ui_research_upgrade_request",
+        function(_, payload)
+            local player_id = source_player_id(payload)
+            if not valid_player_id(player_id) then return end
+            local result = event_bus.request(research_events.UPGRADE_REQUESTED, {
+                player_id = player_id,
+                tech_id = tostring(payload.tech_id or ""),
+            })
+            send_to_player("ui_research_upgrade_result", player_id, result or {
+                success = false,
+                error_code = "resource_commit_failed",
+            })
+        end
+    )
 end
 
 local function synthesis_result(player_id, request_id, recipe_id, result)
@@ -684,6 +713,7 @@ function M.init()
     register_shop_open_request()
     register_shop_close_request()
     register_shop_purchase_request()
+    register_research_requests()
     register_weapon_synthesis_request()
     register_weapon_snapshot_request()
     register_ability_cast_request()

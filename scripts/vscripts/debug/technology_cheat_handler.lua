@@ -1,6 +1,8 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local definitions = require("config/generated/technology_definitions")
+local research_config = require("config/research_technology_config")
+local research_events = require("research/research_event_names")
 
 local M = {}
 
@@ -23,6 +25,26 @@ function M.register(state, push_snapshot)
                     ok = false,
                     error = "technology_cheat_request_invalid",
                 }
+            end
+
+            local research_definition = research_config.by_id[technology_id]
+            if research_definition then
+                local target_level = tonumber(payload and payload.level)
+                    or research_definition.max_level
+                local changed = event_bus.request(
+                    research_events.LEVEL_SET_REQUESTED,
+                    { player_id = player_id, tech_id = technology_id,
+                        level = target_level, reason = "cheat_addtechnology" }
+                )
+                if not changed or changed.ok ~= true then
+                    return { ok = false, error = changed and changed.error
+                        or "research_level_set_failed" }
+                end
+                push_snapshot(player_id, "research_cheat_changed")
+                return { ok = true, technology_id = technology_id,
+                    technology_group = research_definition.legacy_group,
+                    level = target_level,
+                    display_name = research_definition.display_name }
             end
 
             local definition = definitions.by_id[technology_id]

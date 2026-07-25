@@ -23,29 +23,42 @@ function M:ApplyValues(params)
         or self.final_damage_pct or 0
     self.armor_reduction = tonumber(params.armor_reduction)
         or self.armor_reduction or 0
+    if IsServer() then
+        self:GetParent().survival_research_final_damage_pct =
+            self.final_damage_pct
+    end
 end
 
-function M:SetTechnologyValues(attack_pct, final_damage_pct, armor_reduction)
+function M:SetTechnologyValues(attack_pct, final_damage_pct, armor_reduction,
+        critical_chance_pct)
     self.attack_pct = math.max(0, tonumber(attack_pct) or 0)
     self.final_damage_pct = math.max(0, tonumber(final_damage_pct) or 0)
     self.armor_reduction = math.max(0, tonumber(armor_reduction) or 0)
+    self.critical_chance_pct = math.max(
+        0, tonumber(critical_chance_pct) or 0
+    )
+    self:GetParent().survival_research_final_damage_pct =
+        self.final_damage_pct
     self:ForceRefresh()
+end
+
+function M:OnDestroy()
+    if IsServer() then
+        self:GetParent().survival_research_final_damage_pct = nil
+    end
 end
 
 function M:DeclareFunctions()
     return {
-        MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE,
-        MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE,
+        MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE,
         MODIFIER_EVENT_ON_ATTACK_LANDED,
     }
 end
 
-function M:GetModifierBaseDamageOutgoing_Percentage()
-    return self.attack_pct or 0
-end
-
-function M:GetModifierTotalDamageOutgoing_Percentage()
-    return self.final_damage_pct or 0
+function M:GetModifierPreAttack_CriticalStrike()
+    if not IsServer() then return 0 end
+    return RandomFloat(0, 100) < (self.critical_chance_pct or 0)
+        and 200 or 0
 end
 
 function M:OnAttackLanded(keys)
