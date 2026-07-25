@@ -74,6 +74,7 @@ local function spawn_tree(payload)
     tree:SetMaxHealth(health)
     tree:SetHealth(health)
     tree:SetPhysicalArmorBaseValue(config.armor)
+    tree.survival_minimum_armor = tonumber(config.minimum_armor) or 100
     tree:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
     current_tree = tree
 
@@ -101,7 +102,11 @@ local function on_tree_hit(payload)
         (tonumber(base_efficiency) or 0)
         + tree_snapshot().lumber_efficiency_buff
     ))
-    if payload.critical == true then
+    local critical = payload.critical == true
+        or payload.source == "lumberjack"
+        and RandomFloat(0, 100)
+            < math.max(0, tonumber(payload.critical_chance_pct) or 0)
+    if critical then
         efficiency = efficiency * 2
     end
     if efficiency <= 0 then return end

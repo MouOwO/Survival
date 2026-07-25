@@ -4,6 +4,7 @@ local logger = require("core/logger")
 local weapon_cheats = require("debug/weapon_cheat_handlers")
 local attack_speed_cheat = require("debug/attack_speed_cheat")
 local wave_system = require("systems/wave_system")
+local research_test = require("debug/research_technology_test")
 
 local M = {}
 
@@ -117,6 +118,12 @@ local function add_technology(context)
     return true
 end
 
+local function run_research_test(context)
+    local ok, message = research_test.run()
+    notify(context, message)
+    return ok, ok and nil or message
+end
+
 local function signed_amount(context, command)
     local amount = tonumber(context.args[1])
     if not amount then
@@ -207,17 +214,42 @@ local function add_armor(context)
     )
 end
 
+local function finite_number(value)
+    local number = tonumber(value)
+    if not number or number ~= number
+        or number == math.huge or number == -math.huge then
+        return nil
+    end
+    return number
+end
+
+local function attack_flag(value)
+    local normalized = string.lower(trim(value))
+    if normalized == "1" or normalized == "true"
+        or normalized == "yes" or normalized == "on"
+        or normalized == "是" then
+        return true
+    end
+    if normalized == "0" or normalized == "false"
+        or normalized == "no" or normalized == "off"
+        or normalized == "否" then
+        return false
+    end
+    return nil
+end
+
 local function add_monster(context)
-    local health = tonumber(context.args[1])
-    local armor = tonumber(context.args[2])
-    local can_attack = context.args[3] == nil
-        and 0 or tonumber(context.args[3])
-    if not health or health <= 0 or not armor
-        or (can_attack ~= 0 and can_attack ~= 1) then
-        return false, "usage: addmonster <health> <armor> <0|1>"
+    local health = finite_number(context.args[1])
+    local armor = finite_number(context.args[2])
+    local can_attack = attack_flag(context.args[3])
+    local attack = finite_number(context.args[4])
+    if not health or health <= 0 or not armor or can_attack == nil
+        or not attack or attack < 0 then
+        return false,
+            "usage: addmonster <health> <armor> <true|false> <attack>"
     end
     local hero = nil
-    if can_attack == 1 then
+    if can_attack then
         hero = summoned_hero(context.player_id)
         if not hero then return false, "hero_not_summoned" end
     end
@@ -237,12 +269,15 @@ local function add_monster(context)
     unit:SetMaxHealth(health)
     unit:SetHealth(health)
     unit:SetPhysicalArmorBaseValue(armor)
+    attack = math.floor(attack)
+    unit:SetBaseDamageMin(attack)
+    unit:SetBaseDamageMax(attack)
     unit.survival_minimum_armor = 1
     FindClearSpaceForUnit(unit, marker:GetAbsOrigin(), true)
     if marker.GetForwardVector and unit.SetForwardVector then
         unit:SetForwardVector(marker:GetForwardVector())
     end
-    if can_attack == 1 then
+    if can_attack then
         unit:SetBaseMoveSpeed(250)
         unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
         unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
@@ -262,12 +297,13 @@ local function add_monster(context)
         unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
     end
     notify(context, string.format(
-        "测试怪已生成：生命 %d，护甲 %.1f，%s",
-        health, armor, can_attack == 1 and "会攻击英雄" or "不会攻击英雄"
+        "测试怪已生成：生命 %d，护甲 %.1f，攻击力 %d，%s",
+        health, armor, attack, can_attack and "会攻击英雄" or "不会攻击英雄"
     ))
     logger.info("CheatCommand", string.format(
-        "addmonster entindex=%d health=%d armor=%.1f can_attack=%d marker=%s",
-        unit:entindex(), health, armor, can_attack, tostring(marker_name)
+        "addmonster entindex=%d health=%d armor=%.1f can_attack=%s attack=%d marker=%s",
+        unit:entindex(), health, armor, tostring(can_attack), attack,
+        tostring(marker_name)
     ))
     return true
 end
@@ -412,6 +448,7 @@ local COMMANDS = {
     addarmor = add_armor,
     addmonster = add_monster,
     addtechnology = add_technology,
+    research_test = run_research_test,
     monster = spawn_wave,
     addspeed = attack_speed_cheat.execute,
     setvip = set_vip,
@@ -475,7 +512,7 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: addattack, addarmor, addmonster <health> <armor> <0|1>, addtechnology, monster, items, hero, skill, weapon growth"
+        "ready: research_test, addtechnology, monster, items, hero, skill, weapon growth"
     )
 end
 

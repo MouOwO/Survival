@@ -1,9 +1,14 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/challenge_definitions")
+local catalog = require("config/generated/content_catalog")
 
 local M = {}
 local granted = {}
+
+local function valid(entity)
+    return entity and not entity:IsNull()
+end
 
 local function valid_owner(payload)
     local player_id = tonumber(payload.player_id)
@@ -42,6 +47,45 @@ local function grant(player_id, content_id, key)
     return result
 end
 
+local function drop(player_id, content_id, key, position)
+    granted[player_id] = granted[player_id] or {}
+    if granted[player_id][key] then return { ok = true, idempotent = true } end
+    local hero = PlayerResource:GetSelectedHeroEntity(player_id)
+    local definition = catalog.by_id[content_id]
+    if not valid(hero) or not position or not definition then
+        return { ok = false, error = "challenge_ground_reward_invalid" }
+    end
+    local item = CreateItem("item_survival_challenge_reward", hero, hero)
+    if not valid(item) then
+        return { ok = false, error = "challenge_ground_reward_create_failed" }
+    end
+    item.survival_content_id = content_id
+    item.survival_owner_player_id = player_id
+    if item.SetPurchaser then item:SetPurchaser(hero) end
+    local container = CreateItemOnPositionSync(position, item)
+    if not valid(container) then
+        UTIL_Remove(item)
+        return { ok = false, error = "challenge_ground_reward_container_failed" }
+    end
+    CustomNetTables:SetTableValue(
+        "survival_inventory_item_identity",
+        tostring(item:entindex()),
+        { content_id = content_id, removed = 0 }
+    )
+    granted[player_id][key] = true
+    event_bus.emit(events.UI_NOTIFICATION, {
+        player_id = player_id,
+        message = "掉落：" .. tostring(definition.name or content_id)
+            .. "（死亡位置，拾取后自动入库）",
+    })
+    return {
+        ok = true,
+        dropped = true,
+        content_id = content_id,
+        entindex = item:entindex(),
+    }
+end
+
 local function claim(payload)
     local player_id = valid_owner(payload)
     local challenge_id = tostring(payload.challenge_id or "")
@@ -57,6 +101,15 @@ local function claim(payload)
     end
     if not definition.reward_content_id then
         return { ok = false, error = "challenge_no_equipment_reward" }
+    end
+    if payload.position
+        and (challenge_id == "challenge_05" or challenge_id == "challenge_09") then
+        return drop(
+            player_id,
+            definition.reward_content_id,
+            key,
+            payload.position
+        )
     end
     return grant(player_id, definition.reward_content_id, key)
 end

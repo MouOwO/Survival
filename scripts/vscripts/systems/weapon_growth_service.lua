@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local weapons = require("config/generated/weapon_definitions")
+local technology_stat_manager = require("systems/technology_stat_manager")
 
 local M = {}
 local state_by_player = {}
@@ -120,7 +121,7 @@ local function upgrade_if_ready(player_id, current, definition)
     return true
 end
 
-local function add_attacks(player_id, amount, reason)
+local function add_attacks(player_id, amount, reason, income_multiplier)
     local current = state(player_id)
     local definition = weapons.by_id[current.content_id]
     if not definition or definition.enabled == false then
@@ -134,12 +135,13 @@ local function add_attacks(player_id, amount, reason)
     local strength_gain = tonumber(definition.strength_gain_per_attack) or 0
     local agility_gain = tonumber(definition.agility_gain_per_attack) or 0
     local intellect_gain = tonumber(definition.intellect_gain_per_attack) or 0
+    local multiplier = math.max(1, tonumber(income_multiplier) or 1)
     current.stage_attack_count = current.stage_attack_count + count
     current.lifetime_attack_count = current.lifetime_attack_count + count
-    current.growth_attack = current.growth_attack + attack_gain * count
-    current.growth_strength = current.growth_strength + strength_gain * count
-    current.growth_agility = current.growth_agility + agility_gain * count
-    current.growth_intellect = current.growth_intellect + intellect_gain * count
+    current.growth_attack = current.growth_attack + attack_gain * count * multiplier
+    current.growth_strength = current.growth_strength + strength_gain * count * multiplier
+    current.growth_agility = current.growth_agility + agility_gain * count * multiplier
+    current.growth_intellect = current.growth_intellect + intellect_gain * count * multiplier
     publish(player_id, reason or "attack_landed")
     local guard = 0
     while upgrade_if_ready(player_id, current, definition) do
@@ -158,7 +160,44 @@ end
 local function on_attack_landed(payload)
     local player_id = tonumber(payload.player_id)
     local data = snapshot(player_id)
-    add_attacks(player_id, data.progress_per_attack, "attack_landed")
+    if data.series_id == "epic_icefire" or data.series_id == "legend_abyss" then
+        return
+    end
+    local multiplier = technology_stat_manager.training_room_multiplier(
+        player_id,
+        payload.target
+    )
+    add_attacks(player_id, data.progress_per_attack, "attack_landed", multiplier)
+end
+
+local function on_damage_dealt(payload)
+    local player_id = tonumber(payload.player_id)
+    if player_id == nil or (tonumber(payload.final_damage) or 0) <= 0 then return end
+    local data = snapshot(player_id)
+    if data.series_id ~= "epic_icefire" and data.series_id ~= "legend_abyss" then
+        return
+    end
+    local multiplier = technology_stat_manager.training_room_multiplier(
+        player_id,
+        payload.target
+    )
+    local current = state(player_id)
+    local definition = weapons.by_id[current.content_id]
+    if not definition then return end
+    -- Icefire/Abyss explicitly grow from every successful allied damage event,
+    -- not only basic attacks. Keep these canonical values independent from the
+    -- legacy CSV columns, where Abyss stages previously contained zeroes.
+    local attack_gain = 20
+    local attribute_gain = 5
+    current.growth_attack = current.growth_attack
+        + attack_gain * multiplier
+    current.growth_strength = current.growth_strength
+        + attribute_gain * multiplier
+    current.growth_agility = current.growth_agility
+        + attribute_gain * multiplier
+    current.growth_intellect = current.growth_intellect
+        + attribute_gain * multiplier
+    publish(player_id, "damage_dealt")
 end
 
 local function on_hero_summoned(payload)
@@ -196,6 +235,7 @@ function M.init()
     event_bus.handle_request(events.WEAPON_GROWTH_DEBUG_REQUEST, debug_add)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_equipped)
     event_bus.subscribe(events.WEAPON_ATTACK_LANDED, on_attack_landed)
+    event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage_dealt)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_inventory_changed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
 end

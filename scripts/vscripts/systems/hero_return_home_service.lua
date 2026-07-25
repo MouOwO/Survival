@@ -80,6 +80,11 @@ function M.return_unit(hero, player_id)
         return { ok = false, error = "return_position_not_found" }
     end
 
+    event_bus.request(events.TRAINING_ROOM_EXIT_REQUEST, {
+        player_id = player_id,
+        reason = "return_home",
+    })
+
     hero:Stop()
     ProjectileManager:ProjectileDodge(hero)
     hero:SetAbsOrigin(position)

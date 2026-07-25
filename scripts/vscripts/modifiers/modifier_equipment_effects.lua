@@ -6,6 +6,20 @@ local events = require("core/events")
 local M = {}
 modifier_equipment_effects = class({})
 
+local function equipment_values(player_id)
+    local response = event_bus.request(events.EQUIPMENT_STATS_GET_REQUEST,
+        { player_id = player_id })
+    local current = response and response.snapshot
+        and response.snapshot.values or {}
+    return {
+        attack_flat = tonumber(current.attack_flat) or 0,
+        attack_speed_pct = tonumber(current.attack_speed_pct) or 0,
+        health_flat = tonumber(current.health_flat) or 0,
+        armor_flat = tonumber(current.armor_flat) or 0,
+        lifesteal_pct = tonumber(current.lifesteal_pct) or 0,
+    }
+end
+
 function modifier_equipment_effects:IsHidden() return true end
 function modifier_equipment_effects:IsPurgable() return false end
 function modifier_equipment_effects:RemoveOnDeath() return false end
@@ -14,7 +28,21 @@ function modifier_equipment_effects:OnCreated(kv)
     if IsServer() then
         self.player_id = tonumber(kv.player_id) or self:GetParent():GetPlayerOwnerID()
         self.aura_ready = {}
+        self.server_values = equipment_values(self.player_id)
+        self:SetHasCustomTransmitterData(true)
+        if self.SendBuffRefreshToClients then
+            self:SendBuffRefreshToClients()
+        end
         self:StartIntervalThink(0.25)
+    end
+end
+
+function modifier_equipment_effects:OnRefresh()
+    if IsServer() then
+        self.server_values = equipment_values(self.player_id)
+        if self.SendBuffRefreshToClients then
+            self:SendBuffRefreshToClients()
+        end
     end
 end
 
@@ -81,10 +109,23 @@ function modifier_equipment_effects:DeclareFunctions()
 end
 
 local function values(self)
-    if not IsServer() then return {} end
-    local response = event_bus.request(events.EQUIPMENT_STATS_GET_REQUEST,
-        { player_id = self.player_id })
-    return response and response.snapshot and response.snapshot.values or {}
+    if IsServer() then return self.server_values or {} end
+    return self.client_values or {}
+end
+
+function modifier_equipment_effects:AddCustomTransmitterData()
+    local current = values(self)
+    return {
+        attack_flat = tonumber(current.attack_flat) or 0,
+        attack_speed_pct = tonumber(current.attack_speed_pct) or 0,
+        health_flat = tonumber(current.health_flat) or 0,
+        armor_flat = tonumber(current.armor_flat) or 0,
+        lifesteal_pct = tonumber(current.lifesteal_pct) or 0,
+    }
+end
+
+function modifier_equipment_effects:HandleCustomTransmitterData(data)
+    self.client_values = data or {}
 end
 
 function modifier_equipment_effects:GetModifierPreAttack_BonusDamage()
@@ -103,8 +144,13 @@ function modifier_equipment_effects:OnTakeDamage(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
     local victim = params.unit
     if not victim or victim:IsNull() or victim:GetTeamNumber() == params.attacker:GetTeamNumber() then return end
+    -- Only real basic-attack damage may trigger equipment lifesteal. The
+    -- equipment aura also uses ApplyDamage with ability=nil, so checking only
+    -- inflictor would incorrectly turn its first proximity tick into a large
+    -- (often 20000+) heal before the monster's next attack lands.
+    if tonumber(params.damage_category) ~= DOTA_DAMAGE_CATEGORY_ATTACK then return end
     local percent = tonumber(values(self).lifesteal_pct) or 0
-    -- OnTakeDamage.damage is post-mitigation damage, for attacks and abilities.
+    -- OnTakeDamage.damage is post-mitigation basic-attack damage here.
     local amount = math.max(0, tonumber(params.damage) or 0) * percent / 100
     if amount > 0 and self:GetParent().Heal then self:GetParent():Heal(amount, nil) end
 end

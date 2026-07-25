@@ -312,4 +312,25 @@
         "VisionDaytimeRange"     "1000"
         "VisionNighttimeRange"   "800"
     }
+
+    "building_endless_training_target"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/props_structures/radiant_tower001.vmdl"
+        "ModelScale"             "0.8"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "HealthBarOffset"        "260"
+        "StatusHealth"           "1000000000"
+        "StatusHealthRegen"      "100000000"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "ArmorPhysical"          "100000"
+        "MagicalResistance"      "100"
+        "BoundsHullName"         "DOTA_HULL_SIZE_BUILDING"
+        "VisionDaytimeRange"     "800"
+        "VisionNighttimeRange"   "800"
+    }
 }

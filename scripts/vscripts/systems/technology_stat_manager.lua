@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local definitions = require("config/generated/technology_definitions")
+local research_events = require("research/research_event_names")
 
 local M = {}
 local state_by_player = {}
@@ -68,6 +69,11 @@ local function fresh_state()
         levels = {},
         technology = fresh_values(),
         growth = fresh_growth(),
+        runtime = {
+            training_room_active = false,
+            training_room_action_id = "",
+            training_room_income_multiplier = 1,
+        },
         snapshot = nil,
     }
 end
@@ -169,6 +175,12 @@ local function snapshot(state)
         technology = copy_values(state.technology),
         growth = copy_values(state.growth),
         final = copy_values(state.technology),
+        runtime = {
+            training_room_active = state.runtime.training_room_active == true,
+            training_room_action_id = state.runtime.training_room_action_id or "",
+            training_room_income_multiplier =
+                number(state.runtime.training_room_income_multiplier, 1),
+        },
     }
     for group, level in pairs(state.levels or {}) do
         result.levels[group] = level
@@ -192,10 +204,16 @@ local function ensure_state(player_id)
     if player_id == nil then return fresh_state() end
     if state_by_player[player_id] then return state_by_player[player_id] end
     local response = event_bus.request(
-        events.TECHNOLOGY_STATE_GET_REQUEST,
+        research_events.EFFECTS_GET_REQUESTED,
         { player_id = player_id }
     )
-    return rebuild(player_id, response and response.levels or {})
+    local state = fresh_state()
+    if response and response.snapshot then
+        state.levels = response.snapshot.levels or {}
+        state.technology = response.snapshot.legacy or fresh_values()
+    end
+    state_by_player[player_id] = state
+    return state
 end
 
 local function publish(player_id, reason)
@@ -210,8 +228,30 @@ end
 local function on_technology_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
-    rebuild(player_id, payload.levels or {})
+    local response = event_bus.request(
+        research_events.EFFECTS_GET_REQUESTED,
+        { player_id = player_id }
+    )
+    local state = state_by_player[player_id] or fresh_state()
+    if response and response.snapshot then
+        state.levels = response.snapshot.levels or {}
+        state.technology = response.snapshot.legacy or fresh_values()
+        state.snapshot = nil
+        state_by_player[player_id] = state
+    end
     publish(player_id, payload.reason or "technology_changed")
+end
+
+local function on_research_effects_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local projection = payload and payload.snapshot
+    if player_id == nil or not projection then return end
+    local state = state_by_player[player_id] or fresh_state()
+    state.levels = projection.levels or {}
+    state.technology = projection.legacy or fresh_values()
+    state.snapshot = nil
+    state_by_player[player_id] = state
+    publish(player_id, "research_effects_changed")
 end
 
 local function get_stats(payload)
@@ -242,11 +282,44 @@ function M.get(player_id)
     return snapshot(ensure_state(player_id))
 end
 
+function M.set_training_room_state(player_id, active, multiplier, action_id, reason)
+    player_id = tonumber(player_id)
+    if player_id == nil then return { ok = false, error = "player_id_invalid" } end
+    local state = ensure_state(player_id)
+    state.runtime = state.runtime or {}
+    state.runtime.training_room_active = active == true
+    state.runtime.training_room_action_id = active == true
+        and tostring(action_id or "") or ""
+    state.runtime.training_room_income_multiplier = active == true
+        and math.max(1, number(multiplier, 1)) or 1
+    state.snapshot = nil
+    publish(player_id, reason or "training_room_state_changed")
+    event_bus.emit(events.TRAINING_ROOM_STATE_CHANGED, {
+        player_id = player_id,
+        active = state.runtime.training_room_active,
+        action_id = state.runtime.training_room_action_id,
+        income_multiplier = state.runtime.training_room_income_multiplier,
+        reason = reason or "training_room_state_changed",
+    })
+    return { ok = true, snapshot = snapshot(state) }
+end
+
+function M.training_room_multiplier(player_id, target)
+    local runtime = snapshot(ensure_state(player_id)).runtime or {}
+    if runtime.training_room_active ~= true then return 1 end
+    if not target or target:IsNull()
+        or tonumber(target.survival_training_owner_player_id) ~= tonumber(player_id) then
+        return 1
+    end
+    return math.max(1, number(runtime.training_room_income_multiplier, 1))
+end
+
 function M.init()
     state_by_player = {}
     event_bus.handle_request(events.TECHNOLOGY_STATS_GET_REQUEST, get_stats)
     event_bus.handle_request(events.TECHNOLOGY_STATS_GROWTH_ADD_REQUEST, add_growth)
     event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
+    event_bus.subscribe(research_events.EFFECTS_CHANGED, on_research_effects_changed)
 end
 
 return M

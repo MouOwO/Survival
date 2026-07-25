@@ -22,3 +22,5 @@ rebirth_07_room,rebirth_07,1,rebirth_07_entry,rebirth_07_boss_spawn,rebirth_07_b
 rebirth_08_room,rebirth_08,1,rebirth_08_entry,rebirth_08_boss_spawn,rebirth_08_boss_spawn,1200,,1,八转挑战
 rebirth_09_room,rebirth_09,1,rebirth_09_entry,rebirth_09_boss_spawn,rebirth_09_boss_spawn,1200,,1,九转挑战
 rebirth_10_room,rebirth_10,1,rebirth_10_entry,rebirth_10_boss_spawn,rebirth_10_boss_spawn,1200,,1,十转挑战
+endless_cycle_sanctum,endless_cycle_sanctum,1,endless_cycle_sanctum_entry,endless_cycle_sanctum_home,endless_cycle_sanctum_target,1200,,1,无尽年轮圣殿；地图专用点缺失时由服务回退到祭坛动作表配置点。
+shadow_realm_forecourt,shadow_realm_forecourt,1,shadow_realm_forecourt_entry,shadow_realm_forecourt_home,,1200,,1,暗影界前庭；当前版本仅开放传送。

@@ -39,3 +39,5 @@ item_survival_attack_gloves_shell = item_survival_attack_gloves_shell or class({
 item_survival_burning_blade_shell = item_survival_burning_blade_shell or class({})
 item_survival_iron_armor_shell = item_survival_iron_armor_shell or class({})
 item_survival_infernal_armor_shell = item_survival_infernal_armor_shell or class({})
+item_survival_synthesis_gem_shell = item_survival_synthesis_gem_shell or class({})
+item_survival_ice_soul_ember_shell = item_survival_ice_soul_ember_shell or class({})

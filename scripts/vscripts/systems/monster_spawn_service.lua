@@ -237,8 +237,14 @@ local function start_encounter(payload)
 
     return {
         ok = true,
+        encounter_id = encounter_id,
         entindex = unit:entindex(),
         encounter = meta.projection,
+        camera_target = hero_entry and {
+            x = hero_entry:GetAbsOrigin().x,
+            y = hero_entry:GetAbsOrigin().y,
+            z = hero_entry:GetAbsOrigin().z,
+        } or nil,
     }
 end
 

@@ -9,7 +9,8 @@ M.rows = {
     { issue_id = "ISSUE-005", severity = "medium", content_id = "weapon_epic_icefire", issue_type = "缺少+7行", description = "原表只包含基础到+6，但项目记录为+7后进入传说。", recommended_action = "补充+7正式数据后再生成最终链。" },
     { issue_id = "ISSUE-006", severity = "medium", content_id = "weapon_legend_abyss", issue_type = "原始ID顺序异常", description = "5003对应+10，5004对应+2，不能按数字ID排序。", recommended_action = "系统必须按名称解析后的stage排序。" },
     { issue_id = "ISSUE-007", severity = "low", content_id = "shop_proxy_*", issue_type = "重复购买代理行", description = "2101/2111/2121是购买代理，不应作为真实内容。", recommended_action = "已分类shop_proxy并默认停用，指向真实content_id。" },
-    { issue_id = "ISSUE-009", severity = "high", affected_ids = {"challenge_10", "challenge_11"}, issue_type = "挑战Boss临时强度", description = "七宗罪与十宗罪缺少正式生命攻击护甲攻速数据；当前按N1后期曲线配置测试值。", proposed_resolution = "完成实机测试后由策划逐只确认并替换monster_archetypes中的临时数值。" },
+    { issue_id = "ISSUE-008", severity = "medium", content_id = "tech_gold_mine_efficiency", issue_type = "升级费用缺失", description = "只明确效率每级+1，未提供升级金币/木材费用。", recommended_action = "TechnologyDefinitions中费用留空，需策划填写。" },
+    { issue_id = "ISSUE-009", severity = "high", content_id = "challenge_10|challenge_11", issue_type = "挑战Boss临时强度", description = "七宗罪与十宗罪缺少正式生命攻击护甲攻速数据；当前按N1后期曲线配置测试值。", recommended_action = "完成实机测试后由策划逐只确认并替换monster_archetypes中的临时数值。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

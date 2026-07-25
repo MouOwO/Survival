@@ -3,8 +3,39 @@ local events = require("core/events")
 
 local reward_profiles = require("config/generated/reward_profiles")
 local reward_effects = require("config/generated/reward_effects")
+local return_home = require("systems/hero_return_home_service")
 
 local M = {}
+
+local function return_rebirth_hero_home(result)
+    if not string.match(
+        tostring(result.encounter_id or ""),
+        "^encounter_rebirth_%d+$"
+    ) then
+        return
+    end
+    local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+        player_id = result.player_id,
+    })
+    local hero = summoned and summoned.unit
+        or PlayerResource:GetSelectedHeroEntity(result.player_id)
+    local returned = return_home.return_unit(hero, result.player_id)
+    if not returned or not returned.ok then return end
+    local player = PlayerResource:GetPlayer(result.player_id)
+    local position = returned.position
+    if player and position then
+        CustomGameEventManager:Send_ServerToPlayer(
+            player,
+            "ui_camera_follow_hero",
+            {
+                entindex = hero:entindex(),
+                target_x = position.x,
+                target_y = position.y,
+                target_z = position.z,
+            }
+        )
+    end
+end
 
 local function effects_for(profile_id)
     local result = {}
@@ -90,6 +121,7 @@ local function grant_reward(payload)
     }
 
     event_bus.emit(events.MONSTER_REWARD_GRANTED, result)
+    return_rebirth_hero_home(result)
     if payload.player_id and payload.player_id >= 0 then
         event_bus.emit(events.UI_NOTIFICATION, {
             player_id = payload.player_id,

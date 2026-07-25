@@ -14,6 +14,8 @@ LinkLuaModifier("modifier_building_blink_move", "modifiers/modifier_building_bli
 LinkLuaModifier("modifier_weapon_attack_tracker", "modifiers/modifier_weapon_attack_tracker", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_weapon_stat_projection", "modifiers/modifier_weapon_stat_projection", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_equipment_effects", "modifiers/modifier_equipment_effects", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_endless_training_target", "modifiers/modifier_endless_training_target", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_single_health_bar", "modifiers/modifier_single_health_bar", LUA_MODIFIER_MOTION_NONE)
 require("modifiers/modifier_building_stationary")
 require("modifiers/modifier_building_no_health_bar")
 require("modifiers/modifier_tower_attack_effects")
@@ -22,6 +24,8 @@ require("modifiers/modifier_building_blink_move")
 require("modifiers/modifier_weapon_attack_tracker")
 require("modifiers/modifier_weapon_stat_projection")
 require("modifiers/modifier_equipment_effects")
+require("modifiers/modifier_endless_training_target")
+require("modifiers/modifier_single_health_bar")
 assert(modifier_weapon_attack_tracker ~= nil, "modifier_weapon_attack_tracker bootstrap failed")
 assert(modifier_weapon_stat_projection ~= nil, "modifier_weapon_stat_projection bootstrap failed")
 assert(modifier_equipment_effects ~= nil, "modifier_equipment_effects bootstrap failed")
@@ -57,10 +61,13 @@ local monster_spawn_service =
     require("systems/monster_spawn_service")
 local challenge_session_service =
     require("systems/challenge_session_service")
+local training_room_service = require("systems/training_room_service")
 local challenge_equipment_reward_service =
     require("systems/challenge_equipment_reward_service")
 local challenge_upgrade_material_service =
     require("systems/challenge_upgrade_material_service")
+local seven_sins_essence_service =
+    require("systems/seven_sins_essence_service")
 local polar_crystal_progression_service =
     require("systems/polar_crystal_progression_service")
 local wave_system = require("systems/wave_system")
@@ -86,6 +93,8 @@ local hero_combat_stat_service =
     require("systems/hero_combat_stat_service")
 local technology_stat_manager =
     require("systems/technology_stat_manager")
+local research_technology_bootstrap =
+    require("bootstrap/research_technology_bootstrap")
 local shop_system = require("systems/shop_system")
 
 local ui_projection = require("ui/ui_projection")
@@ -108,6 +117,8 @@ local cheat_command_service =
     require("debug/cheat_command_service")
 
 require("abilities/survival_hero_skill")
+require("items/item_survival_seven_sins_essence")
+require("items/item_survival_challenge_reward")
 require("abilities/ability_build_wall")
 require("abilities/ability_build_main_city")
 require("abilities/ability_build_arrow_tower")
@@ -121,6 +132,8 @@ require("abilities/ability_summon_slark")
 require("abilities/ability_summon_juggernaut")
 require("abilities/ability_summon_monkey_king")
 require("abilities/ability_summon_blademaster")
+require("abilities/ability_enter_endless_training")
+require("abilities/ability_enter_shadow_realm")
 require("abilities/ability_open_hero_altar")
 require("abilities/ability_upgrade_wall")
 require("abilities/ability_upgrade_city")
@@ -220,6 +233,23 @@ local function on_entity_killed(keys)
         attacker = attacker,
         keys = keys,
     })
+end
+
+local function on_item_picked_up(keys)
+    local item = keys.ItemEntityIndex
+        and EntIndexToHScript(keys.ItemEntityIndex) or nil
+    if not item or item:IsNull()
+        or item:GetAbilityName() ~= "item_survival_challenge_reward" then
+        return
+    end
+    local hero = keys.HeroEntityIndex
+        and EntIndexToHScript(keys.HeroEntityIndex) or nil
+    if hero and not hero:IsNull() and item.Claim then
+        local claimed = item:Claim(hero)
+        if not claimed and not item:IsNull() and hero.DropItemAtPositionImmediate then
+            hero:DropItemAtPositionImmediate(item, hero:GetAbsOrigin())
+        end
+    end
 end
 
 function M.precache(context)
@@ -353,15 +383,17 @@ function M.activate()
     monster_encounter_ui_service.init()
     combat_stats_ui_service.init()
 
-    technology_stat_manager.init()
     grid_system.init()
     resource_system.init()
+    player_entitlement_service.init()
+    hero_progression_system.init()
+    research_technology_bootstrap.init()
+    technology_stat_manager.init()
+    training_room_service.init()
     building_system.init()
     building_upgrade_system.init()
     tree_system.init()
     worker_system.init()
-    player_entitlement_service.init()
-    hero_progression_system.init()
     hero_skill_system.init()
     hero_skill_pool_service.init()
     hero_skill_choice_service.init()
@@ -369,6 +401,7 @@ function M.activate()
     inventory_transaction_service.init()
     polar_crystal_progression_service.init()
     challenge_upgrade_material_service.init()
+    seven_sins_essence_service.init()
     challenge_equipment_reward_service.init()
     equipment_instance_service.init()
     equipment_growth_service.init()
@@ -398,6 +431,7 @@ function M.activate()
         nil
     )
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
+    ListenToGameEvent("dota_item_picked_up", on_item_picked_up, nil)
     logger.info(
         "Addon",
         "initialized V1.6 logical weapon growth core"

@@ -2,6 +2,9 @@ local buildings = require("config/buildings_config")
 local workers = require("config/workers_config")
 local gold_mine = require("config/gold_mine_config")
 local tower_routes = require("config/tower_route_config")
+local altar_actions = require("config/generated/altar_actions")
+local event_bus = require("core/event_bus")
+local events = require("core/events")
 local M = {}
 local function cost_data(cost)
     return {
@@ -249,6 +252,52 @@ local function altar_open(state)
             or "打开英雄选择界面",
     }
 end
+local ALTAR_ACTION_BY_ABILITY = {}
+for _, action in ipairs(altar_actions.rows or {}) do
+    if action.enabled ~= false and action.ability_name then
+        ALTAR_ACTION_BY_ABILITY[action.ability_name] = action
+    end
+end
+local function altar_travel(ability_name, state, resources)
+    local action = ALTAR_ACTION_BY_ABILITY[ability_name]
+    if not action then return nil end
+    local player_id = tonumber(state and state.player_id)
+    local progression = player_id ~= nil and event_bus.request(
+        events.HERO_PROGRESSION_GET_REQUEST,
+        { player_id = player_id }
+    ) or nil
+    local rebirth = progression and progression.snapshot
+        and tonumber(progression.snapshot.rebirth_level) or 0
+    local required = tonumber(action.required_rebirth_level) or 0
+    local summoned = state and state.hero_summoned == 1
+    local enough_rebirth = rebirth >= required
+    local enough_gold = not resources
+        or (tonumber(resources.gold) or 0) >= (tonumber(action.gold_cost) or 0)
+    local status = "可施法"
+    if not summoned then
+        status = "前置条件：请先召唤英雄"
+    elseif not enough_rebirth then
+        status = "前置条件：英雄达到" .. tostring(required) .. "转"
+    elseif not enough_gold then
+        status = "前置条件：需要" .. tostring(action.gold_cost or 0) .. "金币"
+    end
+    return {
+        available = summoned and enough_rebirth and 1 or 0,
+        can_afford = enough_gold and 1 or 0,
+        status_text = status,
+        cost_wood = tonumber(action.wood_cost) or 0,
+        cost_gold = tonumber(action.gold_cost) or 0,
+        fields = {
+            { label = "技能状态", value = status },
+            { label = "解锁条件", value = required > 0
+                and ("英雄" .. tostring(required) .. "转") or "无" },
+            { label = "每秒消耗", value = (tonumber(action.gold_cost_per_second) or 0) > 0
+                and (tostring(action.gold_cost_per_second) .. "金币") or "无" },
+            { label = "成长收益", value = (tonumber(action.training_room_income_multiplier) or 1) > 1
+                and (tostring(action.training_room_income_multiplier) .. "倍") or "正常" },
+        },
+    }
+end
 function M.build(ability_name, state, resources)
     local build = build_ability(ability_name, state, resources)
     if build then
@@ -257,6 +306,8 @@ function M.build(ability_name, state, resources)
     if ability_name == "ability_open_hero_altar" then
         return altar_open(state)
     end
+    local travel = altar_travel(ability_name, state, resources)
+    if travel then return travel end
     if not state then
         return {
             available = 1,

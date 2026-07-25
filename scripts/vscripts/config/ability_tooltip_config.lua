@@ -124,6 +124,20 @@ local M = {
         abilitydesc = "从斧王、斯拉克、主宰、齐天大圣和宙斯中选择一个英雄。每位玩家只能选择一次，齐天大圣和宙斯需要VIP。",
         abilityicon = "chen_holy_persuasion",
     },
+    ability_enter_endless_training = {
+        abilityid = "ability_enter_endless_training",
+        abilityname = "进入无尽年轮圣殿",
+        abilitydesc = "消耗50000金币传送。每秒再消耗50000金币；攻击练功建筑时攻击力与三围成长收益为15倍。",
+        abilityicon = "faceless_void_time_walk",
+        is_active = true,
+    },
+    ability_enter_shadow_realm = {
+        abilityid = "ability_enter_shadow_realm",
+        abilityname = "进入暗影界前庭",
+        abilitydesc = "消耗50000金币传送至暗影界前庭。当前版本仅开放传送。",
+        abilityicon = "spectre_reality",
+        is_active = true,
+    },
 
 ability_summon_axe = {
     abilityid = "ability_summon_axe",

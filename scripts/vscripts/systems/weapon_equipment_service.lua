@@ -7,9 +7,25 @@ local logger = require("core/logger")
 
 local M = {}
 local state_by_player = {}
+local material_shells = {
+    material_synthesis_gem = "item_survival_synthesis_gem_shell",
+    material_ice_soul_ember = "item_survival_ice_soul_ember_shell",
+}
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
+end
+
+local function publish_item_identity(item, content_id, removed)
+    if not valid_entity(item) then return end
+    CustomNetTables:SetTableValue(
+        "survival_inventory_item_identity",
+        tostring(item:entindex()),
+        {
+            content_id = tostring(content_id or ""),
+            removed = removed == true and 1 or 0,
+        }
+    )
 end
 
 local function state(player_id)
@@ -23,7 +39,8 @@ local function state(player_id)
     return state_by_player[player_id]
 end
 
-local function shell_item_name(definition)
+local function shell_item_name(content_id, definition)
+    if material_shells[content_id] then return material_shells[content_id] end
     local series_id = tostring(definition and definition.series_id or "")
     local names = {
         attack_gloves = "item_survival_attack_gloves_shell",
@@ -40,6 +57,7 @@ local function remove_content_shell(current, content_id)
         current.content_shells[content_id] = nil
         return
     end
+    publish_item_identity(item, content_id, true)
     if valid_entity(current.hero) and current.hero.RemoveItem then
         pcall(current.hero.RemoveItem, current.hero, item)
     end
@@ -49,12 +67,15 @@ end
 
 local function add_content_shell(current, content_id, definition, quantity)
     if not valid_entity(current.hero) then return nil end
-    local item = CreateItem(shell_item_name(definition), current.hero, current.hero)
+    local item_name = shell_item_name(content_id, definition)
+    if not item_name then return nil end
+    local item = CreateItem(item_name, current.hero, current.hero)
     if not valid_entity(item) then
         logger.warn("WeaponEquipment", "content shell create failed: " .. content_id)
         return nil
     end
     item.survival_content_id = content_id
+    publish_item_identity(item, content_id, false)
     if item.SetAbilityTextureName and tostring(definition.icon_name or "") ~= "" then
         pcall(item.SetAbilityTextureName, item, tostring(definition.icon_name))
     end
@@ -79,8 +100,12 @@ end
 
 local function should_use_content_shell(content_id, definition)
     if not definition then return false end
+    if material_shells[content_id] then
+        return definition.enabled ~= false
+            and tostring(definition.content_type or "") == "material"
+    end
     if not weapons.by_id[content_id] then return false end
-    if not shell_item_name(definition) then return false end
+    if not shell_item_name(content_id, definition) then return false end
     if tostring(definition.engine_item_name or "") ~= "" then return false end
     if content_id == "item_death_mask" then return false end
     return tostring(definition.grant_type or "") == "virtual_item"
@@ -90,7 +115,7 @@ local function sync_content_shells(player_id, counts)
     local current = state(player_id)
     current.inventory_counts = counts or {}
     for content_id in pairs(current.content_shells) do
-        local definition = weapons.by_id[content_id]
+        local definition = weapons.by_id[content_id] or content.by_id[content_id]
         if (tonumber(current.inventory_counts[content_id]) or 0) <= 0
             or not should_use_content_shell(content_id, definition) then
             remove_content_shell(current, content_id)
@@ -98,7 +123,7 @@ local function sync_content_shells(player_id, counts)
     end
     if not valid_entity(current.hero) then return end
     for content_id, quantity in pairs(current.inventory_counts) do
-        local definition = weapons.by_id[content_id]
+        local definition = weapons.by_id[content_id] or content.by_id[content_id]
         if (tonumber(quantity) or 0) > 0
             and should_use_content_shell(content_id, definition) then
             local shell = current.content_shells[content_id]
@@ -134,6 +159,7 @@ local function remove_shell(current, slot)
         current.item_by_slot[slot] = nil
         return
     end
+    publish_item_identity(item, current.equipped_by_slot[slot], true)
     if valid_entity(current.hero) and current.hero.RemoveItem then
         pcall(current.hero.RemoveItem, current.hero, item)
     end
@@ -171,6 +197,8 @@ local function add_shell(current, definition, slot, explicit_item_name)
         logger.warn("WeaponEquipment", "item create failed: " .. item_name)
         return nil
     end
+    item.survival_content_id = definition.content_id
+    publish_item_identity(item, definition.content_id, false)
     current.hero:AddItem(item)
     current.item_by_slot[slot] = item
     if slot == "main_hand" and current.hero.GetPlayerOwnerID then

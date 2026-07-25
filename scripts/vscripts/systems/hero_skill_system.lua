@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local hero_health_guard = require("core/hero_health_guard")
 local scheduler = require("core/scheduler")
 local ability_utils = require("core/ability_utils")
 local logger = require("core/logger")
@@ -156,9 +157,11 @@ local function synchronize_unit(state)
             pickup_ability:SetAbilityIndex(5)
         end
     end
-    if state.unit.CalculateStatBonus then
-        state.unit:CalculateStatBonus(true)
-    end
+    hero_health_guard.preserve_current(state.unit, function()
+        if state.unit.CalculateStatBonus then
+            state.unit:CalculateStatBonus(true)
+        end
+    end)
 end
 
 local function grant_to_state(state, skill_id, levels)

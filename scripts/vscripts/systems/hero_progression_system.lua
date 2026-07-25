@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local hero_health_guard = require("core/hero_health_guard")
 
 local M = {}
 
@@ -48,18 +49,12 @@ local function apply_attributes(player_id, amount)
         return
     end
 
-    if hero.ModifyStrength then
-        hero:ModifyStrength(amount)
-    end
-    if hero.ModifyAgility then
-        hero:ModifyAgility(amount)
-    end
-    if hero.ModifyIntellect then
-        hero:ModifyIntellect(amount)
-    end
-    if hero.CalculateStatBonus then
-        hero:CalculateStatBonus(true)
-    end
+    hero_health_guard.preserve_current(hero, function()
+        if hero.ModifyStrength then hero:ModifyStrength(amount) end
+        if hero.ModifyAgility then hero:ModifyAgility(amount) end
+        if hero.ModifyIntellect then hero:ModifyIntellect(amount) end
+        if hero.CalculateStatBonus then hero:CalculateStatBonus(true) end
+    end, "hero_progression_attributes")
 end
 
 local function append_skill_reward(state, effect)
@@ -151,6 +146,26 @@ local function on_hero_summoned(payload)
     get_state(payload.player_id)
 end
 
+local function on_attack_landed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    local state = get_state(player_id)
+    local gain = tonumber(state.attack_all_attribute_gain) or 0
+    if gain <= 0 then return end
+    local technology_stat_manager = require("systems/technology_stat_manager")
+    local multiplier = technology_stat_manager.training_room_multiplier(
+        player_id,
+        payload.target
+    )
+    local amount = gain * multiplier
+    state.all_attributes = state.all_attributes + amount
+    state.version = state.version + 1
+    apply_attributes(player_id, amount)
+    local data = snapshot(player_id)
+    data.reason = "attack_all_attribute_growth"
+    event_bus.emit(events.HERO_PROGRESSION_CHANGED, data)
+end
+
 function M.init()
     state_by_player = {}
     hero_by_player = {}
@@ -164,6 +179,7 @@ function M.init()
     )
     event_bus.subscribe(events.HERO_READY, on_hero_ready)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    event_bus.subscribe(events.WEAPON_ATTACK_LANDED, on_attack_landed)
 end
 
 return M
