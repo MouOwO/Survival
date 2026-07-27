@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local choice_rules = require("config/generated/hero_skill_choice_rules")
 local exclusive = require("config/generated/hero_exclusive_skills")
 local heroes = require("config/generated/hero_definitions")
@@ -8,6 +9,7 @@ local M = {}
 
 local pending_by_player = {}
 local sequence = 0
+local reward_retry_by_player = {}
 
 local function state(player_id)
     local result = event_bus.request(
@@ -155,7 +157,50 @@ local function on_skill_reward(payload)
     if effect.effect_type == "grant_exclusive_skill" then
         grant_exclusive(payload.player_id)
     elseif effect.effect_type == "grant_random_skill_or_upgrade" then
-        create_offer(payload.player_id, "rebirth_reward")
+        local player_id = tonumber(payload.player_id)
+        local trigger_level = tonumber(payload.trigger_level)
+            or tonumber(progression(player_id).rebirth_level)
+        local result = create_offer(player_id, "rebirth_reward", trigger_level)
+        if result and result.ok then return end
+
+        reward_retry_by_player[player_id] = {
+            trigger_level = trigger_level,
+            attempts = 0,
+        }
+        scheduler.after(0.1, function()
+            local pending = reward_retry_by_player[player_id]
+            if not pending or pending_by_player[player_id] then
+                reward_retry_by_player[player_id] = nil
+                return
+            end
+            pending.attempts = pending.attempts + 1
+            local retry = create_offer(
+                player_id,
+                "rebirth_reward",
+                pending.trigger_level
+            )
+            if retry and retry.ok then
+                reward_retry_by_player[player_id] = nil
+                return
+            end
+            if pending.attempts < 10
+                and retry and retry.error == "combat_hero_not_ready" then
+                return 0.1
+            end
+            reward_retry_by_player[player_id] = nil
+            local error_message = retry and retry.error
+                or result and result.error or "skill_choice_create_failed"
+            print(string.format(
+                "[HERO_SKILL_CHOICE_CREATE_FAILED] player=%s level=%s error=%s",
+                tostring(player_id), tostring(pending.trigger_level),
+                tostring(error_message)
+            ))
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = player_id,
+                message = "转生技能选择生成失败：" .. tostring(error_message),
+                level = "error",
+            })
+        end, "rebirth_skill_choice_retry:" .. tostring(player_id))
     end
 end
 
@@ -221,6 +266,7 @@ end
 function M.init()
     pending_by_player = {}
     sequence = 0
+    reward_retry_by_player = {}
     event_bus.handle_request(
         events.HERO_SKILL_CHOICE_CREATE_REQUEST,
         create_request

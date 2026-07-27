@@ -1,11 +1,11 @@
-ï»¿building_id,name,unit_name,max_count,requires_city_level,population_cost,unlock_condition,builder_ability,disable_after_built,shop_visibility_condition,notes
-#ä¸­æ–‡å:å»ºç­‘ID,åç§°,å•ä½åç§°ID,æœ€å¤§æ•°é‡,æ‰€éœ€ä¸»åŸŽç­‰çº§,äººå£æ¶ˆè€—,è§£é”æ¡ä»¶,å»ºé€ æŠ€èƒ½ID,å»ºæˆåŽç¦ç”¨,å•†åº—æ˜¾ç¤ºæ¡ä»¶,å¤‡æ³¨
+building_id,name,unit_name,max_count,requires_city_level,population_cost,unlock_condition,builder_ability,disable_after_built,shop_visibility_condition,notes
+#ÖÐÎÄÃû:½¨ÖþID,Ãû³Æ,µ¥Î»Ãû³ÆID,×î´óÊýÁ¿,ËùÐèÖ÷³ÇµÈ¼¶,ÈË¿ÚÏûºÄ,½âËøÌõ¼þ,½¨Ôì¼¼ÄÜID,½¨³Éºó½ûÓÃ,ÉÌµêÏÔÊ¾Ìõ¼þ,±¸×¢
 #types:string,string,string,number,number,number,string,string,boolean,string,string
-wall,åŸŽå¢™,building_wall,1,0,0,,ability_build_wall,1,,å»ºé€ æˆåŠŸåŽUndyingçš„å»ºé€ åŸŽå¢™æŠ€èƒ½åœ¨å®¢æˆ·ç«¯ç½®ç°ï¼›æœåŠ¡ç«¯ä»éªŒè¯max_count=1ã€‚
-main_city,ä¸»åŸŽ,building_main_city,1,0,0,,ability_build_main_city,1,,å»ºé€ æˆåŠŸåŽUndyingçš„å»ºé€ ä¸»åŸŽæŠ€èƒ½åœ¨å®¢æˆ·ç«¯ç½®ç°ï¼›æœåŠ¡ç«¯ä»éªŒè¯max_count=1ã€‚
-arrow_tower,ç®­å¡”,building_arrow_tower,0,1,0,main_city_level>=1,ability_build_arrow_tower,0,,ç®­å¡”5çº§åŽè¿›å…¥äº”é€‰ä¸€è½¬èŒã€‚
-building_farm,äººå£å†œåœº,building_farm,0,1,0,main_city_level>=1,ability_build_farm,0,,
-building_research_lab,ç ”ç©¶æ‰€,building_research_lab,1,1,0,main_city_level>=1,ability_build_research_lab,1,,
-building_advanced_research_lab,é«˜çº§ç ”ç©¶æ‰€,building_advanced_research_lab,1,4,0,main_city_level>=4,ability_build_advanced_research_lab,1,,
-gold_mine,é‡‘çŸ¿,building_gold_mine,5,3,2,main_city_level>=3,ability_build_gold_mine,0,,ä¸»åŸŽ3çº§è§£é”ï¼›æœ€å¤š5ä¸ªï¼›å»ºé€ æ¶ˆè€—2000æœ¨æï¼Œå ç”¨2äººå£ã€‚
-hero_altar,è‹±é›„ç¥­å›,building_hero_altar,1,3,0,main_city_level>=3,ability_build_hero_altar,1,,ä¸»åŸŽ3çº§åŽå¯å»ºé€ ï¼›æ¯ä½çŽ©å®¶åªèƒ½å¬å”¤ä¸€ä¸ªè‹±é›„ã€‚è‹±é›„å¬å”¤å®ŒæˆåŽç¥­å›ä»…ä½œä¸ºæ™®é€šå»ºç­‘ï¼Œå•†åº—UIåŒæ—¶è§£é”ã€‚å»ºé€ è´¹ç”¨300æœ¨æ+100é‡‘å¸ä¸ºæš‚å®šå€¼ã€‚
+wall,³ÇÇ½,building_wall,1,0,0,,ability_build_wall,1,,½¨Ôì³É¹¦ºóUndyingµÄ½¨Ôì³ÇÇ½¼¼ÄÜÔÚ¿Í»§¶ËÖÃ»Ò£»·þÎñ¶ËÈÔÑéÖ¤max_count=1¡£
+main_city,Ö÷³Ç,building_main_city,1,0,0,,ability_build_main_city,1,,½¨Ôì³É¹¦ºóUndyingµÄ½¨ÔìÖ÷³Ç¼¼ÄÜÔÚ¿Í»§¶ËÖÃ»Ò£»·þÎñ¶ËÈÔÑéÖ¤max_count=1¡£
+arrow_tower,¼ýËþ,building_arrow_tower,7,1,0,main_city_level>=1,ability_build_arrow_tower,0,,¼ýËþ5¼¶ºó½øÈëÎåÑ¡Ò»×ªÖ°¡£
+building_farm,ÈË¿ÚÅ©³¡,building_farm,1,1,0,main_city_level>=1,ability_build_farm,0,,
+building_research_lab,ÑÐ¾¿Ëù,building_research_lab,1,1,0,main_city_level>=1,ability_build_research_lab,1,,
+building_advanced_research_lab,¸ß¼¶ÑÐ¾¿Ëù,building_advanced_research_lab,1,4,0,main_city_level>=4,ability_build_advanced_research_lab,1,,
+gold_mine,½ð¿ó,building_gold_mine,5,3,2,main_city_level>=3,ability_build_gold_mine,0,,Ö÷³Ç3¼¶½âËø£»×î¶à5¸ö£»½¨ÔìÏûºÄ2000Ä¾²Ä£¬Õ¼ÓÃ2ÈË¿Ú¡£
+hero_altar,Ó¢ÐÛ¼ÀÌ³,building_hero_altar,1,3,0,main_city_level>=3,ability_build_hero_altar,1,,Ö÷³Ç3¼¶ºó¿É½¨Ôì£»Ã¿Î»Íæ¼ÒÖ»ÄÜÕÙ»½Ò»¸öÓ¢ÐÛ¡£Ó¢ÐÛÕÙ»½Íê³Éºó¼ÀÌ³½ö×÷ÎªÆÕÍ¨½¨Öþ£¬ÉÌµêUIÍ¬Ê±½âËø¡£½¨Ôì·ÑÓÃ300Ä¾²Ä+100½ð±ÒÎªÔÝ¶¨Öµ¡£

@@ -342,6 +342,52 @@ local function summon_hero(context)
         result and result.error or "hero_summon_failed"
 end
 
+local function add_test_hero(context)
+    local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+        player_id = context.player_id,
+    })
+    if not summoned or not summoned.ok then
+        summoned = event_bus.request(events.HERO_SUMMON_REQUEST, {
+            player_id = context.player_id,
+            hero_id = "hero_monkey_king",
+            reason = "cheat_addhero",
+            debug_bypass = true,
+        })
+        if not summoned or not summoned.ok then
+            return false, summoned and summoned.error or "hero_summon_failed"
+        end
+    elseif summoned.hero_id ~= "hero_monkey_king" then
+        return false, "another_hero_already_summoned"
+    end
+
+    local resources = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        team = context.team,
+        wood = 100000000,
+        gold = 100000000,
+        reason = "cheat_addhero_test_resources",
+    })
+    if not resources or not resources.ok then
+        return false, resources and resources.error or "resource_request_failed"
+    end
+
+    local unlocked = event_bus.request(events.SHOP_DEBUG_UNLOCK_REQUEST, {
+        player_id = context.player_id,
+        unlocked = true,
+    })
+    if not unlocked or not unlocked.ok then
+        return false, unlocked and unlocked.error or "shop_debug_unlock_failed"
+    end
+
+    show_shop(context)
+    notify(context, "测试环境已就绪：齐天大圣、金币1亿、木材1亿、商城全解锁")
+    print(string.format(
+        "[CHEAT_ADDHERO_READY] player=%s team=%s hero=hero_monkey_king gold=%s wood=%s shop_unlocked=true",
+        tostring(context.player_id), tostring(context.team),
+        tostring(resources.snapshot and resources.snapshot.gold or ""),
+        tostring(resources.snapshot and resources.snapshot.wood or "")))
+    return true
+end
+
 local function spawn_boss(context)
     local level = tonumber(context.args[1]) or 0
     if level < 0 or level > 10 then
@@ -444,6 +490,7 @@ local COMMANDS = {
     shopshow = show_shop,
     addgold = add_gold,
     addwood = add_wood,
+    addhero = add_test_hero,
     addattack = add_attack,
     addarmor = add_armor,
     addmonster = add_monster,
@@ -512,7 +559,7 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: research_test, addtechnology, monster, items, hero, skill, weapon growth"
+        "ready: addhero, research_test, addtechnology, monster, items, hero, skill, weapon growth"
     )
 end
 

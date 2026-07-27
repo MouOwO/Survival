@@ -81,8 +81,8 @@ M.technologies = {
     technology("ARS-02", "伐木工攻击减甲", "advanced_research_lab", 30,
         "researcher_lumberjack_armor_reduction", 20000, 5000, 0, 0,
         prerequisite(), {
-            effect("tree_armor_shred_per_hit", -0.1),
-            effect("tree_armor_floor", 100, "constant"),
+            effect("war3_tree_armor_shred_per_hit", -0.1),
+            effect("minimum_war3_tree_armor", 100, "constant"),
         }),
     technology("ARS-03", "超级墙强化", "advanced_research_lab", 30,
         "researcher_super_wall_health", 30000, 20000, 100000, 30000,
@@ -93,7 +93,7 @@ M.technologies = {
     technology("ARS-04", "超级墙护甲强化", "advanced_research_lab", 30,
         "researcher_super_wall_armor", 30000, 20000, 100000, 30000,
         prerequisite("RS-09", 10), {
-            effect("wall_armor_flat", 10),
+            effect("war3_wall_armor_flat", 10),
             effect("wall_health_bonus_pct", 0.05),
         }),
     technology("ARS-05", "超级防御塔强化", "advanced_research_lab", 30,
@@ -122,7 +122,7 @@ M.technologies = {
     technology("ARS-09", "英雄攻击减甲", "advanced_research_lab", 19,
         "researcher_hero_armor_reduction", 10000, 10000, 50000, 50000,
         prerequisite(nil, 0, 3), {
-            effect("hero_armor_shred_flat", 0.5),
+            effect("war3_hero_armor_shred_flat", 0.5),
         }),
     technology("ARS-10", "英雄攻击", "advanced_research_lab", 19,
         "researcher_hero_attack", 10000, 10000, 50000, 50000,

@@ -8,7 +8,7 @@ M.rows = {
     { content_id = "challenge_05", challenge_type = "boss_drop", reward_content_id = "material_synthesis_gem", review_status = "mapped" },
     { content_id = "challenge_06", challenge_type = "virtual_kill_counter", counter = { enemy_tag = "ice_wraith", required = 200, event = "valid_enemy_death", attribution = "owner_player" }, requires_content_id = "item_small_polar_crystal", completion = { replace_content_id = "item_large_polar_crystal" }, enabled = true, review_status = "explicit_requirement" },
     { content_id = "challenge_07", challenge_type = "upgrade_material", reward_content_id = "item_molten_upgrade_gem_01_03", review_status = "mapped" },
-    { content_id = "challenge_08", challenge_type = "upgrade_material", reward_content_id = "item_molten_upgrade_gem_04", review_status = "mapped" },
+    { content_id = "challenge_08", challenge_type = "boss_drop", reward_content_id = "material_molten_core_04", review_status = "mapped" },
     { content_id = "challenge_09", challenge_type = "boss_drop", reward_content_id = "material_ice_soul_ember", review_status = "mapped" },
     { content_id = "challenge_10", challenge_type = "staged_boss", stage_count = 7, stages = {}, completion = { upgrade_series = "epic_icefire", upgrade_steps = 1 }, enabled = true, review_status = "test_balance_enabled" },
     { content_id = "challenge_11", challenge_type = "simultaneous_boss", stage_count = 10, stages = {}, completion = { upgrade_series = "legend_abyss", upgrade_steps = 1 }, enabled = true, review_status = "test_balance_enabled" },

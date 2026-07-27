@@ -6,6 +6,7 @@ local tower_skills = require("systems/tower_skill_runtime")
 local tower_ability_sync = require("systems/tower_ability_sync")
 local global_rules = require("config/global_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local building_population = require("systems/building_population_service")
 
 local M = {}
 local buildings = {}
@@ -203,7 +204,7 @@ publish = function(state, reason)
         display_name = display_name,
         attack_min = state.unit.survival_attack_min,
         attack_max = state.unit.survival_attack_max,
-        armor = state.unit.survival_armor,
+        runtime_armor = state.unit.survival_armor,
         attack_speed = state.unit.survival_attack_speed,
         base_health = tonumber(state.definition.levels[state.level]
             and state.definition.levels[state.level].health)
@@ -357,13 +358,11 @@ local function upgrade_city(state)
     state.unit.survival_level = next_level
     state.unit.survival_display_name = state.definition.display_name
     apply_common(state.unit, data)
-    if data.add_population then
-        event_bus.request(events.RESOURCE_ADD_REQUEST, {
-            team = state.team,
-            max_population = data.add_population,
-            reason = "city_level_population",
-        })
-    end
+    building_population.grant_level(
+        state,
+        next_level,
+        "city_level_population"
+    )
     publish(state, "city_upgraded")
     refresh_team_farms(state.team)
     return { ok = true }
@@ -384,6 +383,11 @@ local function upgrade_farm(state)
     state.unit.survival_display_name = data.display_name
         or state.definition.display_name
     apply_common(state.unit, data)
+    building_population.grant_level(
+        state,
+        next_level,
+        "farm_level_population"
+    )
     refresh_farm_upgrade_ability(state)
     publish(state, "farm_upgraded")
     return { ok = true }

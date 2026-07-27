@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local essences = require("config/seven_sins_essences")
 local weapons = require("config/generated/weapon_definitions")
 
@@ -86,8 +87,14 @@ local function consume_physical_item(caster, item)
         item:SetCurrentCharges(charges - 1)
         return
     end
-    caster:RemoveItem(item)
-    UTIL_Remove(item)
+    item.survival_consume_pending = true
+    scheduler.after(0, function()
+        if not item or item:IsNull() then return end
+        if caster and not caster:IsNull() then
+            caster:RemoveItem(item)
+        end
+        if not item:IsNull() then UTIL_Remove(item) end
+    end, "seven_sins_remove_item:" .. tostring(item:entindex()))
 end
 
 local function apply_effect(player_id, definition)
@@ -113,6 +120,9 @@ local function use_essence(payload)
     end
     if use_locked[player_id] then
         return { ok = false, error = "essence_use_in_progress" }
+    end
+    if item and item.survival_consume_pending then
+        return { ok = false, error = "essence_consume_pending" }
     end
     if not owns_item(caster, item) or caster:GetPlayerOwnerID() ~= player_id
         or item:GetAbilityName() ~= definition.engine_item_name then
@@ -150,10 +160,22 @@ local function use_essence(payload)
             .. tostring(transaction and transaction.error or "handler_missing"), "error")
         return transaction or { ok = false, error = "transaction_handler_missing" }
     end
+    local inventory_after = event_bus.request(
+        events.CONTENT_INVENTORY_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local counts_after = inventory_after and inventory_after.snapshot
+        and inventory_after.snapshot.counts or {}
+    if (tonumber(counts_after[next_content_id]) or 0) <= 0 then
+        use_locked[player_id] = nil
+        notify(player_id, "强化结果校验失败，精华已保留。", "error")
+        return { ok = false, error = "icefire_upgrade_not_committed" }
+    end
     consume_physical_item(caster, item)
     local data = apply_effect(player_id, definition)
     local ascended = next_content_id == "weapon_legend_abyss_00"
-    notify(player_id, definition.display_name .. "使用成功，冰火裁决已强化+1。")
+    notify(player_id, definition.display_name .. "已消耗，对应增益已生效；冰火裁决已强化为"
+        .. tostring(weapons.by_id[next_content_id].display_name or next_content_id) .. "。")
     if ascended then
         event_bus.emit(events.SEVEN_SINS_COMPLETED, {
             player_id = player_id,

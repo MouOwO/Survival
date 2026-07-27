@@ -1,3 +1,5 @@
+local armor_balance = require("config/armor_balance")
+
 local M = {}
 
 M.challenge_id = "challenge_10"
@@ -78,9 +80,9 @@ M.rows = {
         content_id = "item_seven_sins_lust_essence",
         engine_item_name = "item_survival_lust_essence",
         display_name = "色欲精华",
-        description = "点击使用强化冰火裁决+1，并且每次攻击减甲+3。",
+        description = "点击使用强化冰火裁决+1，并且每次攻击降低1点实际护甲。",
         effect_type = "armor_reduction_per_attack",
-        effect_value = 3,
+        war3_effect_value = 3,
         drop_weight = 12,
         icon_name = "item_blades_of_attack",
     },
@@ -89,6 +91,9 @@ M.rows = {
 M.by_content_id = {}
 M.by_engine_item_name = {}
 for index, row in ipairs(M.rows) do
+    if row.effect_type == "armor_reduction_per_attack" then
+        row.effect_value = armor_balance.from_war3(row.war3_effect_value)
+    end
     row.sequence_index = index
     M.by_content_id[row.content_id] = row
     M.by_engine_item_name[row.engine_item_name] = row

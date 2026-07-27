@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local logger = require("core/logger")
+local armor_balance = require("config/armor_balance")
 
 local archetypes = require("config/generated/monster_archetypes")
 local spawn_points = require("config/generated/monster_spawn_points")
@@ -178,9 +179,15 @@ local function start_encounter(payload)
         unit:SetBaseDamageMin(attack)
         unit:SetBaseDamageMax(attack)
     end
-    local armor = tonumber(archetype.armor)
-    if armor then unit:SetPhysicalArmorBaseValue(armor) end
-    unit.survival_minimum_armor = tonumber(archetype.minimum_armor) or 1
+    local war3_armor = tonumber(archetype.war3_armor or archetype.armor)
+    if war3_armor then
+        unit:SetPhysicalArmorBaseValue(armor_balance.from_war3(war3_armor))
+    end
+    local minimum_war3_armor = tonumber(
+        archetype.minimum_war3_armor or archetype.minimum_armor
+    )
+    unit.survival_minimum_armor = minimum_war3_armor ~= nil
+        and armor_balance.from_war3(minimum_war3_armor) or 1
     local attack_speed = tonumber(archetype.attack_speed)
         or tonumber(archetype.base_attack_speed) or 0.5
     attack_speed = math.max(0.01, attack_speed)

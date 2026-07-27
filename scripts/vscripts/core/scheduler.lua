@@ -2,7 +2,7 @@ local M = {}
 
 local tasks = {}
 local next_id = 0
-local initialized = false
+local generation = 0
 
 local function now()
     return GameRules:GetGameTime()
@@ -69,11 +69,21 @@ function M.think()
 end
 
 function M.init()
-    if initialized then return end
-    initialized = true
+    -- Workshop Tools can keep required Lua modules alive between Run sessions
+    -- while replacing the game-mode entity. Rebind the think every session and
+    -- discard callbacks that belong to the previous game.
+    tasks = {}
+    next_id = 0
+    generation = generation + 1
+    local current_generation = generation
     GameRules:GetGameModeEntity():SetContextThink(
         "SurvivalSchedulerThink",
-        function() return M.think() end,
+        function()
+            if current_generation ~= generation then
+                return nil
+            end
+            return M.think()
+        end,
         0.05
     )
 end

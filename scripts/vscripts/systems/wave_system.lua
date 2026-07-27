@@ -6,6 +6,7 @@ local wave_rows = require("config/generated/wave_definitions")
 local archetypes = require("config/generated/monster_archetypes")
 local spawn_points = require("config/generated/monster_spawn_points")
 local monster_spawn_marker_service = require("systems/monster_spawn_marker")
+local armor_balance = require("config/armor_balance")
 
 local M = {}
 local state = {}
@@ -80,8 +81,14 @@ local function apply_stats(unit, row, definition)
     unit:SetHealth(row.health)
     unit:SetBaseDamageMin(row.attack)
     unit:SetBaseDamageMax(row.attack)
-    unit:SetPhysicalArmorBaseValue(row.armor)
-    unit.survival_minimum_armor = tonumber(definition.minimum_armor) or 1
+    unit:SetPhysicalArmorBaseValue(
+        armor_balance.from_war3(row.war3_armor or row.armor)
+    )
+    local minimum_war3_armor = tonumber(
+        definition.minimum_war3_armor or definition.minimum_armor
+    )
+    unit.survival_minimum_armor = minimum_war3_armor ~= nil
+        and armor_balance.from_war3(minimum_war3_armor) or 1
     unit:SetBaseMoveSpeed(definition.move_speed or 250)
     -- attack_speed 表示每秒攻击次数；Dota 引擎需要基础攻击间隔。
     local attack_speed = tonumber(row.attack_speed) or 0.5

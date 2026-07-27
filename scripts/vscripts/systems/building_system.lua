@@ -9,9 +9,10 @@ local team_alignment = require("core/team_alignment")
 local tower_skills = require("systems/tower_skill_runtime")
 local scheduler = require("core/scheduler")
 local grid_config = require("config/grid_config")
+local building_population = require("systems/building_population_service")
 local M = {}
 local RELOCATION_RANGE = 1000
-print("[SURVIVAL_FINGERPRINT] building_system=20260720_2128_relocation_validation")
+print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
 local buildings = {}
 local counts = {}
 local wall_ever_built = {}
@@ -80,6 +81,10 @@ local function change_count(team, building_id, delta)
     counts[team] = counts[team] or {}
     counts[team][building_id] = math.max(0, (counts[team][building_id] or 0) + delta)
 end
+local function building_limit_reached(definition, existing_count)
+    local maximum = tonumber(definition and definition.max_count) or 0
+    return maximum > 0 and (tonumber(existing_count) or 0) >= maximum
+end
 local function main_city_level(team)
     for _, state in pairs(buildings) do
         if state.team == team
@@ -134,6 +139,7 @@ local function apply_initial_stats(unit, definition)
     unit:SetMaxHealth(data.health)
     unit:SetHealth(data.health)
     unit:SetPhysicalArmorBaseValue(data.armor)
+    unit.survival_armor = tonumber(data.armor) or 0
     if definition.id == "arrow_tower" and unit.SetAttackCapability then
         unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
     end
@@ -179,6 +185,11 @@ local function add_building_abilities(unit, definition, active)
         add_ability(unit, ability_name, active ~= false)
     end
 end
+local function completion_level_data(definition, level)
+    definition = definition or {}
+    local levels = definition.levels or definition.pre_class_levels or {}
+    return levels[tonumber(level) or 1] or {}
+end
 local function public_state(state)
     return {
         entindex = state.unit:entindex(),
@@ -199,6 +210,8 @@ local function public_state(state)
         configured_attack_speed = state.building_id == "arrow_tower"
             and (arrow_data(state.level) or {}).base_attack_speed or nil,
         base_health = state.unit:GetMaxHealth(),
+        runtime_armor = tonumber(state.unit.survival_armor)
+            or state.unit:GetPhysicalArmorBaseValue(),
         base_attack_damage = state.building_id == "arrow_tower"
             and tonumber((arrow_data(state.level) or {}).base_attack_damage)
             or nil,
@@ -219,7 +232,7 @@ local function can_place(payload)
     if definition.build_once and wall_ever_built[team] then
         return { ok = false, error = "城墙整局只能建造一次" }
     end
-    if definition.max_count > 0 and count_for(team, definition.id) >= definition.max_count then
+    if building_limit_reached(definition, count_for(team, definition.id)) then
         return { ok = false, error = "建筑数量已达上限" }
     end
     if definition.unlock_city_level
@@ -365,7 +378,15 @@ local function start_building(payload)
             ParticleManager:ReleaseParticleIndex(particle)
         end
         unit:RemoveModifierByName("modifier_building_under_construction")
-        local completed_level = state.definition.levels[state.level or 1] or {}
+        -- Restore construction-disabled abilities before applying optional
+        -- completion visuals. Arrow towers use pre_class_levels rather than
+        -- levels, and a malformed visual row must never leave their abilities
+        -- permanently deactivated.
+        add_building_abilities(unit, check.definition, true)
+        local completed_level = completion_level_data(
+            state.definition,
+            state.level
+        )
         if completed_level.model_name and completed_level.model_name ~= "" then
             unit:SetModel(completed_level.model_name)
             unit:SetOriginalModel(completed_level.model_name)
@@ -375,7 +396,6 @@ local function start_building(payload)
         buildings[unit:entindex()] = state
         -- Keep ability entity indexes stable for runtime tooltip data. Activate
         -- once now and once after the construction modifier state has replicated.
-        add_building_abilities(unit, check.definition, true)
         scheduler.after(0.1, function()
             if valid_entity(unit) then
                 add_building_abilities(unit, check.definition, true)
@@ -409,13 +429,11 @@ local function start_building(payload)
                 initial_row and initial_row.skill_ids or {}
             )
         end
-        if state.building_id == "main_city" then
-            event_bus.request(events.RESOURCE_ADD_REQUEST, {
-                team = state.team,
-                max_population = state.definition.levels[1].add_population or 0,
-                reason = "main_city_created",
-            })
-        end
+        building_population.grant_level(
+            state,
+            state.level,
+            state.building_id .. "_created_population"
+        )
         data.reason = "created"
         event_bus.emit(events.BUILDING_CHANGED, data)
         notify(state.player_id, state.definition.display_name .. "已建造")
@@ -588,4 +606,12 @@ function M.init()
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     logger.info("BuildingSystem", "initialized")
 end
+M._completion_level_data_for_test = completion_level_data
+M._public_state_for_test = public_state
+M._building_limit_for_test = {
+    reached = building_limit_reached,
+    count_for = count_for,
+    change_count = change_count,
+    reset = function() counts = {} end,
+}
 return M

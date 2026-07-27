@@ -7,6 +7,27 @@ local M = {}
 
 local state_by_unit = {}
 local ability_keys_by_unit = {}
+local tower_trace_by_ability = {}
+
+local function is_tower_upgrade(ability_name)
+    return ability_name == "ability_upgrade_tower"
+        or ability_name == "ability_upgrade_tower_lv01"
+        or ability_name == "ability_upgrade_tower_max"
+end
+
+local function ensure_tower_upgrade_active(ability, runtime)
+    if runtime.available ~= 1 then
+        return
+    end
+    if ability:GetLevel() < 1 then
+        ability:SetLevel(1)
+    end
+    if not ability:IsActivated() then
+        ability:SetActivated(true)
+    end
+    runtime.engine_level = ability:GetLevel()
+    runtime.engine_activated = ability:IsActivated() and 1 or 0
+end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -108,6 +129,7 @@ local function publish(state)
     state_by_unit[unit_key] = state
     local resource_state = resources(state.team)
     local current = {}
+    local tower_transitions = 0
 
     ability_utils.for_each(unit, function(ability)
         local ability_name = ability:GetAbilityName()
@@ -121,6 +143,39 @@ local function publish(state)
         runtime.ability_entindex = ability:entindex()
         runtime.resource_version =
             resource_state and resource_state.version or 0
+        if is_tower_upgrade(ability_name) then
+            ensure_tower_upgrade_active(ability, runtime)
+            local trace_key = ability:entindex()
+            local signature = table.concat({
+                tostring(state.level),
+                tostring(runtime.available),
+                tostring(runtime.can_afford),
+                tostring(runtime.cost_wood or 0),
+                tostring(runtime.cost_gold or 0),
+            }, ":")
+            local previous = tower_trace_by_ability[trace_key]
+            if previous ~= signature then
+                tower_transitions = tower_transitions + 1
+                tower_trace_by_ability[trace_key] = signature
+                print(string.format(
+                    "[TOWER_UPGRADE_RUNTIME] unit=%s ability=%s ability_entindex=%s level=%s resource_version=%s wood=%s gold=%s cost_wood=%s cost_gold=%s available=%s can_afford=%s engine_level=%s engine_activated=%s previous=%s reason=state_transition",
+                    tostring(unit_key),
+                    tostring(ability_name),
+                    tostring(trace_key),
+                    tostring(state.level),
+                    tostring(runtime.resource_version),
+                    tostring(resource_state and resource_state.wood or "nil"),
+                    tostring(resource_state and resource_state.gold or "nil"),
+                    tostring(runtime.cost_wood or 0),
+                    tostring(runtime.cost_gold or 0),
+                    tostring(runtime.available),
+                    tostring(runtime.can_afford),
+                    tostring(runtime.engine_level or 0),
+                    tostring(runtime.engine_activated or 0),
+                    tostring(previous or "none")
+                ))
+            end
+        end
         CustomNetTables:SetTableValue(
             "survival_ability_runtime",
             tostring(ability:entindex()),
@@ -131,6 +186,7 @@ local function publish(state)
 
     clear_removed(unit_key, current)
     ability_keys_by_unit[unit_key] = current
+    return tower_transitions
 end
 
 local function publish_unit(payload)
@@ -153,11 +209,37 @@ local function clear_unit(payload)
     end
     ability_keys_by_unit[entindex] = nil
     state_by_unit[entindex] = nil
+    for ability_entindex, _ in pairs(keys or {}) do
+        tower_trace_by_ability[ability_entindex] = nil
+    end
 end
 
 local function on_resources(payload)
+    local refreshed = 0
+    local tower_transitions = 0
     for _, state in pairs(state_by_unit) do
         if state.team == payload.team then
+            tower_transitions = tower_transitions + (publish(state) or 0)
+            refreshed = refreshed + 1
+        end
+    end
+    if tower_transitions > 0 then
+        print(string.format(
+            "[ABILITY_RUNTIME_RESOURCE_REFRESH] team=%s version=%s wood=%s gold=%s reason=%s units=%s tower_transitions=%s",
+            tostring(payload.team),
+            tostring(payload.version or 0),
+            tostring(payload.wood or 0),
+            tostring(payload.gold or 0),
+            tostring(payload.reason or "unknown"),
+            tostring(refreshed),
+            tostring(tower_transitions)
+        ))
+    end
+end
+
+local function on_worker_changed(payload)
+    for _, state in pairs(state_by_unit) do
+        if state.team == payload.team and state.building_id == "main_city" then
             publish(state)
         end
     end
@@ -211,6 +293,7 @@ end
 function M.init()
     state_by_unit = {}
     ability_keys_by_unit = {}
+    tower_trace_by_ability = {}
     event_bus.subscribe(events.HERO_READY, on_hero_ready)
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)
@@ -227,6 +310,7 @@ function M.init()
         on_hero_skill_changed
     )
     event_bus.subscribe(events.RESOURCE_CHANGED, on_resources)
+    event_bus.subscribe(events.WORKER_CHANGED, on_worker_changed)
     event_bus.subscribe(
         events.HERO_PROGRESSION_CHANGED,
         on_hero_progression_changed

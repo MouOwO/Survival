@@ -8,12 +8,28 @@ docs/ai/CURRENT_TASK.md
 docs/ai/DECISIONS.md
 docs/ai/KNOWN_ISSUES.md
 
+触发入口
+→ 客户端表现
+→ 服务端逻辑
+→ 配置数据
+→ UI/提示
+→ 验证方式
+
+六、为每个功能写“状态机”
+优先新增小模块和最小接线。
+禁止为了方便重写整个文件。
+如果必须修改稳定文件，只允许增加require、初始化、事件订阅或一小段适配代码。
+
 懒人版直接复制粘贴
 
-先执行
+修改前执行
 git status --short
 git diff --stat
 git log -5 --oneline
+修改后执行
+git diff --check
+git diff --stat
+git diff --name-only
 然后读取
 docs/ai/PROJECT_CONTEXT.md
 docs/ai/CURRENT_TASK.md

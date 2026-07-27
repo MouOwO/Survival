@@ -25,13 +25,32 @@ local function configured_unit_name(building_id, fallback)
 end
 
 local function apply_construction(definition, source_id)
-    local row = (construction_rules.by_id or {})[source_id]
-        or definition_row(source_id)
+    local configured = definition_row(source_id)
+    local row = (construction_rules.by_id or {})[source_id] or configured
+    -- building_definitions.csv is authoritative for generic building rules.
+    -- Keep the hand-written values only as compatibility fallbacks so changing
+    -- max_count, city prerequisite, or population cost does not require a
+    -- second edit in this runtime adapter.
+    definition.max_count = tonumber(configured.max_count)
+        or tonumber(definition.max_count)
+        or 0
+    definition.unlock_city_level = tonumber(configured.requires_city_level)
+        or tonumber(definition.unlock_city_level)
+        or 0
+    definition.population_cost = tonumber(configured.population_cost)
+        or tonumber(definition.population_cost)
+        or 0
     definition.build_time = tonumber(row.build_time) or 3
     definition.build_particle = row.build_particle
         or "particles/items_fx/repair_kit.vpcf"
     definition.build_cast_range = tonumber(row.build_cast_range) or 200
     return definition
+end
+
+local armor_balance = require("config/armor_balance")
+
+local function dota_armor(war3_armor)
+    return armor_balance.from_war3(war3_armor)
 end
 
 local function level_rows(building_id)
@@ -42,7 +61,7 @@ local function level_rows(building_id)
                 level = row.level,
                 display_name = row.display_name,
                 health = row.health,
-                armor = row.armor,
+                armor = dota_armor(row.war3_armor or row.armor),
                 requires_city_level = row.requires_city_level,
                 prerequisite_text = row.prerequisite_text,
                 model_name = row.model_name,
@@ -94,7 +113,7 @@ M.main_city = {
 local farm_levels = level_rows("building_farm")
 farm_levels[1] = farm_levels[1] or {}
 farm_levels[1].health = farm_levels[1].health or 2500
-farm_levels[1].armor = farm_levels[1].armor or 5
+farm_levels[1].armor = farm_levels[1].armor or dota_armor(5)
 M.building_farm = {
     id = "building_farm", display_name = configured_name("building_farm", "人口农场"),
     unit_name = configured_unit_name("building_farm", "building_farm"),
@@ -118,11 +137,11 @@ M.arrow_tower = {
         "ability_upgrade_tower_max",
     },
     pre_class_levels = {
-        [1] = { health = 1500, armor = 5, damage = 172, attack_range = 600, attack_rate = 1.0, upgrade_cost = { wood = 50, gold = 0 } },
-        [2] = { health = 2000, armor = 6, damage = 251, attack_range = 600, attack_rate = 1.0, upgrade_cost = { wood = 100, gold = 0 } },
-        [3] = { health = 2500, armor = 7, damage = 301, attack_range = 625, attack_rate = 1.0, upgrade_cost = { wood = 200, gold = 0 } },
-        [4] = { health = 3000, armor = 8, damage = 401, attack_range = 650, attack_rate = 0.95, upgrade_cost = { wood = 250, gold = 0 } },
-        [5] = { health = 3500, armor = 9, damage = 501, attack_range = 675, attack_rate = 0.9, upgrade_cost = { wood = 300, gold = 0 } },
+        [1] = { health = 1500, armor = dota_armor(5), damage = 172, attack_range = 600, attack_rate = 1.0, upgrade_cost = { wood = 50, gold = 0 } },
+        [2] = { health = 2000, armor = dota_armor(6), damage = 251, attack_range = 600, attack_rate = 1.0, upgrade_cost = { wood = 100, gold = 0 } },
+        [3] = { health = 2500, armor = dota_armor(7), damage = 301, attack_range = 625, attack_rate = 1.0, upgrade_cost = { wood = 200, gold = 0 } },
+        [4] = { health = 3000, armor = dota_armor(8), damage = 401, attack_range = 650, attack_rate = 0.95, upgrade_cost = { wood = 250, gold = 0 } },
+        [5] = { health = 3500, armor = dota_armor(9), damage = 501, attack_range = 675, attack_rate = 0.9, upgrade_cost = { wood = 300, gold = 0 } },
     },
     class_change_cost = { wood = 100, gold = 50 },
     class_options = {
@@ -139,7 +158,7 @@ M.arrow_tower = {
 local research_lab_levels = level_rows("building_research_lab")
 research_lab_levels[1] = research_lab_levels[1] or {}
 research_lab_levels[1].health = research_lab_levels[1].health or 2500
-research_lab_levels[1].armor = research_lab_levels[1].armor or 8
+research_lab_levels[1].armor = research_lab_levels[1].armor or dota_armor(8)
 M.building_research_lab = {
     id = "building_research_lab",
     display_name = configured_name("building_research_lab", "研究所"),
@@ -158,7 +177,7 @@ M.building_research_lab = {
 }
 
 M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
-M.hero_altar = { id = "hero_altar", display_name = configured_name("hero_altar", "英雄祭坛"), unit_name = configured_unit_name("hero_altar", "building_hero_altar"), build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_summon_axe", "ability_summon_slark", "ability_summon_juggernaut", "ability_summon_monkey_king", "ability_summon_blademaster", "ability_enter_endless_training", "ability_enter_shadow_realm" }, levels = { [1] = { health = 2500, armor = 8 } } }
+M.hero_altar = { id = "hero_altar", display_name = configured_name("hero_altar", "英雄祭坛"), unit_name = configured_unit_name("hero_altar", "building_hero_altar"), build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_summon_axe", "ability_summon_slark", "ability_summon_juggernaut", "ability_summon_monkey_king", "ability_summon_blademaster", "ability_enter_endless_training", "ability_enter_shadow_realm" }, levels = { [1] = { health = 2500, armor = dota_armor(8) } } }
 
 M.wall = apply_construction(M.wall, "wall")
 M.main_city = apply_construction(M.main_city, "main_city")

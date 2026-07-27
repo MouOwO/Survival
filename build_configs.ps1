@@ -16,6 +16,11 @@ function Resolve-PythonExecutable {
     if ($PythonPath) { $candidates += $PythonPath }
     if ($env:QCLAW_PYTHON_BINARY) { $candidates += $env:QCLAW_PYTHON_BINARY }
 
+    # Prefer the Python 3 installation registered on this workstation. Keep
+    # this as a candidate rather than a hard requirement so -PythonPath and
+    # QCLAW_PYTHON_BINARY can still override it on other machines.
+    $candidates += 'C:\Users\li\AppData\Local\Programs\Python\Python313\python.exe'
+
     $pythonCommand = Get-Command python.exe -ErrorAction SilentlyContinue
     if ($pythonCommand -and $pythonCommand.Source -notlike '*\Microsoft\WindowsApps\*') {
         $candidates += $pythonCommand.Source
@@ -32,24 +37,46 @@ function Resolve-PythonExecutable {
 
     foreach ($candidate in ($candidates | Select-Object -Unique)) {
         if (-not $candidate -or -not (Test-Path $candidate -PathType Leaf)) { continue }
-        & $candidate -c "import sys; print(sys.executable)" 2>$null | Out-Null
-        if ($LASTEXITCODE -eq 0) { return (Resolve-Path $candidate).Path }
+        & $candidate -c "import sys; sys.exit(0 if sys.version_info.major == 3 else 1)" 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            return [PSCustomObject]@{
+                Command = (Resolve-Path $candidate).Path
+                PrefixArgs = @()
+                Display = (Resolve-Path $candidate).Path
+            }
+        }
+    }
+
+    # The Python Launcher bypasses the non-functional Microsoft Store alias
+    # and selects the registered Python 3 runtime.
+    $pythonLauncher = Get-Command py.exe -ErrorAction SilentlyContinue
+    if ($pythonLauncher) {
+        & $pythonLauncher.Source -3 -c "import sys; sys.exit(0 if sys.version_info.major == 3 else 1)" 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            return [PSCustomObject]@{
+                Command = $pythonLauncher.Source
+                PrefixArgs = @('-3')
+                Display = "$($pythonLauncher.Source) -3"
+            }
+        }
     }
 
     throw "Python 3 executable not found. Pass it explicitly with -PythonPath 'C:\path\to\python.exe'. The Microsoft Store WindowsApps alias is not a real Python runtime."
 }
 
-$PythonExe = Resolve-PythonExecutable
-Write-Host "PYTHON: $PythonExe"
+$Python = Resolve-PythonExecutable
+$PythonCommand = $Python.Command
+$PythonPrefixArgs = @($Python.PrefixArgs)
+Write-Host "PYTHON: $($Python.Display)"
 
 Push-Location $AddonRoot
 try {
     if (-not $CheckOnly) {
-        & $PythonExe $Builder
+        & $PythonCommand @PythonPrefixArgs $Builder
         if ($LASTEXITCODE -ne 0) { throw "CSV to Lua failed: $LASTEXITCODE" }
     }
 
-    & $PythonExe -c "from pathlib import Path; import sys; r=Path(r'$Generated'); fs=list(r.glob('*.lua')); bad=[str(p) for p in fs if chr(0xfffd) in p.read_text(encoding='utf-8-sig')]; print(f'CONFIG_VERIFY files={len(fs)} bad_utf8={len(bad)}'); sys.exit(1 if len(fs)<47 or bad else 0)"
+    & $PythonCommand @PythonPrefixArgs -c "from pathlib import Path; import sys; r=Path(r'$Generated'); fs=list(r.glob('*.lua')); bad=[str(p) for p in fs if chr(0xfffd) in p.read_text(encoding='utf-8-sig')]; print(f'CONFIG_VERIFY files={len(fs)} bad_utf8={len(bad)}'); sys.exit(1 if len(fs)<47 or bad else 0)"
     if ($LASTEXITCODE -ne 0) { throw 'Generated Lua verification failed.' }
 
     Write-Host 'CONFIG_BUILD_PASS' -ForegroundColor Green

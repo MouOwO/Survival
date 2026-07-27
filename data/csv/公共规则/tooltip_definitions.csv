@@ -1,40 +1,21 @@
 ﻿tooltip_id,tooltip_type,id,name,needwood,needgold,desc,icon,source_id
 "#中文名:提示ID,提示分类,业务ID,名称,所需木材,所需金币,描述,图标,来源ID"
 "#types:string,enum,string,string,number,number,string,string,string"
+ability:,ability,,虚空震爆·被动,0,0,主攻击命中时概率产生中心强化的范围伤害。,faceless_void_time_dilation,proto_void_pulse
 ability:ability_enter_endless_training,ability,ability_enter_endless_training,无尽年轮圣殿,0,50000,传送至无尽年轮圣殿。英雄达到10转后解锁；每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。,faceless_void_time_walk,altar_endless_training
 ability:ability_enter_shadow_realm,ability,ability_enter_shadow_realm,暗影界前庭,0,50000,传送至暗影界前庭。当前版本仅开放传送，怪物与掉落逻辑暂不启用。,spectre_reality,altar_shadow_realm
-ability:ability_survival_agility_training,ability,ability_survival_agility_training,敏捷训练,0,0,每级增加敏捷。,item_eagle,skill_agility_training
-ability:ability_survival_armor_training,ability,ability_survival_armor_training,护甲训练,0,0,每级增加护甲。,item_chainmail,skill_armor_training
-ability:ability_survival_attack_range_training,ability,ability_survival_attack_range_training,射程训练,0,0,每级增加攻击距离。,sniper_take_aim,skill_attack_range_training
-ability:ability_survival_attack_speed_training,ability,ability_survival_attack_speed_training,攻速训练,0,0,每级增加攻击速度。,item_gloves,skill_attack_speed_training
 ability:ability_survival_axe_exclusive,ability,ability_survival_axe_exclusive,斧王专属：战意,0,0,每级增加攻击伤害。,axe_counter_helix,skill_axe_exclusive
 ability:ability_survival_blademaster_exclusive,ability,ability_survival_blademaster_exclusive,剑圣专属：无双剑意,0,0,每级增加攻击伤害。,sven_gods_strength,skill_blademaster_exclusive
-ability:ability_survival_health_regen_training,ability,ability_survival_health_regen_training,生命恢复,0,0,每级增加生命恢复。,item_ring_of_regen,skill_health_regen_training
-ability:ability_survival_intellect_training,ability,ability_survival_intellect_training,智力训练,0,0,每级增加智力。,item_mystic_staff,skill_intellect_training
 ability:ability_survival_juggernaut_exclusive,ability,ability_survival_juggernaut_exclusive,主宰专属：剑意,0,0,每级增加敏捷。,juggernaut_blade_dance,skill_juggernaut_exclusive
-ability:ability_survival_mana_regen_training,ability,ability_survival_mana_regen_training,魔法恢复,0,0,每级增加魔法恢复。,item_void_stone,skill_mana_regen_training
 ability:ability_survival_monkey_king_exclusive,ability,ability_survival_monkey_king_exclusive,齐天大圣专属：如意,0,0,每级增加攻击距离。,monkey_king_jingu_mastery,skill_monkey_king_exclusive
-ability:ability_survival_move_speed_training,ability,ability_survival_move_speed_training,移动训练,0,0,每级增加移动速度。,item_boots,skill_move_speed_training
-ability:ability_survival_power_training,ability,ability_survival_power_training,力量训练,0,0,每级增加普通攻击伤害。,item_blades_of_attack,skill_power_training
 ability:ability_survival_slark_exclusive,ability,ability_survival_slark_exclusive,斯拉克专属：猎杀,0,0,每级增加攻击速度。,slark_essence_shift,skill_slark_exclusive
-ability:ability_survival_vitality_training,ability,ability_survival_vitality_training,生命训练,0,0,每级增加最大生命。,item_vitality_booster,skill_vitality_training
-ability:magic_finger_lv01,ability,magic_finger_lv01,死亡一指LV1,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,lion_finger_of_death,magic_finger_lv01
-ability:magic_finger_lv02,ability,magic_finger_lv02,死亡一指LV2,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,lion_finger_of_death,magic_finger_lv02
-ability:magic_finger_lv03,ability,magic_finger_lv03,死亡一指LV3,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,lion_finger_of_death,magic_finger_lv03
-ability:magic_finger_lv04,ability,magic_finger_lv04,死亡一指LV4,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,lion_finger_of_death,magic_finger_lv04
-ability:magic_finger_lv05,ability,magic_finger_lv05,死亡一指LV5,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,lion_finger_of_death,magic_finger_lv05
-ability:magic_laguna_lv01,ability,magic_laguna_lv01,神灭斩LV1,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,lina_laguna_blade,magic_laguna_lv01
-ability:magic_laguna_lv02,ability,magic_laguna_lv02,神灭斩LV2,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,lina_laguna_blade,magic_laguna_lv02
-ability:magic_laguna_lv03,ability,magic_laguna_lv03,神灭斩LV3,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,lina_laguna_blade,magic_laguna_lv03
-ability:magic_laguna_lv04,ability,magic_laguna_lv04,神灭斩LV4,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,lina_laguna_blade,magic_laguna_lv04
-ability:magic_laguna_lv05,ability,magic_laguna_lv05,神灭斩LV5,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,lina_laguna_blade,magic_laguna_lv05
-ability:arcane_supremacy_lv01,ability,arcane_supremacy_lv01,奥术至尊LV1,0,0,每次普通攻击追加拉比克奥术能量打击并造成400%攻击力魔法伤害,rubick_arcane_supremacy,arcane_supremacy_lv01
 ability:arcane_cannon_lv01,ability,arcane_cannon_lv01,魔能炮LV1,0,0,击杀后5秒内伤害+10%，最多4层,,arcane_cannon_lv01
 ability:arcane_cannon_lv02,ability,arcane_cannon_lv02,魔能炮LV2,0,0,击杀后5秒内伤害+10%，最多5层,,arcane_cannon_lv02
 ability:arcane_cannon_lv03,ability,arcane_cannon_lv03,魔能炮LV3,0,0,击杀后5秒内伤害+10%，最多6层,,arcane_cannon_lv03
 ability:arcane_cannon_lv04,ability,arcane_cannon_lv04,魔能炮LV4,0,0,击杀后5秒内伤害+10%，最多7层,,arcane_cannon_lv04
 ability:arcane_cannon_lv05,ability,arcane_cannon_lv05,魔能炮LV5,0,0,击杀后5秒内伤害+10%，最多7层,,arcane_cannon_lv05
 ability:arcane_eye_lv01,ability,arcane_eye_lv01,魔能之眼LV1,0,0,目标与魔能之眼之间单位受到目标伤害的30%,,arcane_eye_lv01
+ability:arcane_supremacy_lv01,ability,arcane_supremacy_lv01,奥术至尊LV1,0,0,每次普通攻击追加一次拉比克奥术能量打击，造成400%攻击力魔法伤害,,arcane_supremacy_lv01
 ability:bone_cannon_lv01,ability,bone_cannon_lv01,碎骨重炮LV1,0,0,每攻击9次下一击必定造成10倍暴击,,bone_cannon_lv01
 ability:bone_cannon_lv02,ability,bone_cannon_lv02,碎骨重炮LV2,0,0,每攻击8次下一击必定造成10倍暴击,,bone_cannon_lv02
 ability:bone_cannon_lv03,ability,bone_cannon_lv03,碎骨重炮LV3,0,0,每攻击7次下一击必定造成10倍暴击,,bone_cannon_lv03
@@ -84,11 +65,21 @@ ability:machine_gun_lv02,ability,machine_gun_lv02,机枪LV2,0,0,攻击速度+60%
 ability:machine_gun_lv03,ability,machine_gun_lv03,机枪LV3,0,0,攻击速度+80%,,machine_gun_lv03
 ability:machine_gun_lv04,ability,machine_gun_lv04,机枪LV4,0,0,攻击速度+100%,,machine_gun_lv04
 ability:machine_gun_lv05,ability,machine_gun_lv05,机枪LV5,0,0,攻击速度+100%,,machine_gun_lv05
-ability:multi_attack_lv01,ability,multi_attack_lv01,多重攻击LV1,0,0,攻击时向射程内距离防御塔最近的最多4个敌人同步射出分裂箭，每个目标受到90%攻击力物理伤害,,multi_attack_lv01
-ability:multi_attack_lv02,ability,multi_attack_lv02,多重攻击LV2,0,0,攻击时向射程内距离防御塔最近的最多5个敌人同步射出分裂箭，每个目标受到90%攻击力物理伤害,,multi_attack_lv02
-ability:multi_attack_lv03,ability,multi_attack_lv03,多重攻击LV3,0,0,攻击时向射程内距离防御塔最近的最多6个敌人同步射出分裂箭，每个目标受到90%攻击力物理伤害,,multi_attack_lv03
-ability:multi_attack_lv04,ability,multi_attack_lv04,多重攻击LV4,0,0,攻击时向射程内距离防御塔最近的最多7个敌人同步射出分裂箭，每个目标受到90%攻击力物理伤害,,multi_attack_lv04
-ability:multi_attack_lv05,ability,multi_attack_lv05,多重攻击LV5,0,0,攻击时向射程内距离防御塔最近的最多7个敌人同步射出分裂箭，每个目标受到90%攻击力物理伤害,,multi_attack_lv05
+ability:magic_finger_lv01,ability,magic_finger_lv01,死亡一指LV1,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,,magic_finger_lv01
+ability:magic_finger_lv02,ability,magic_finger_lv02,死亡一指LV2,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,,magic_finger_lv02
+ability:magic_finger_lv03,ability,magic_finger_lv03,死亡一指LV3,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,,magic_finger_lv03
+ability:magic_finger_lv04,ability,magic_finger_lv04,死亡一指LV4,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,,magic_finger_lv04
+ability:magic_finger_lv05,ability,magic_finger_lv05,死亡一指LV5,0,0,普通攻击有20%概率触发莱恩死亡一指特效并造成90%攻击力魔法伤害,,magic_finger_lv05
+ability:magic_laguna_lv01,ability,magic_laguna_lv01,神灭斩LV1,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,,magic_laguna_lv01
+ability:magic_laguna_lv02,ability,magic_laguna_lv02,神灭斩LV2,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,,magic_laguna_lv02
+ability:magic_laguna_lv03,ability,magic_laguna_lv03,神灭斩LV3,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,,magic_laguna_lv03
+ability:magic_laguna_lv04,ability,magic_laguna_lv04,神灭斩LV4,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,,magic_laguna_lv04
+ability:magic_laguna_lv05,ability,magic_laguna_lv05,神灭斩LV5,0,0,普通攻击有20%概率触发莉娜神灭斩特效并造成100%攻击力魔法伤害,,magic_laguna_lv05
+ability:multi_attack_lv01,ability,multi_attack_lv01,多重攻击LV1,0,0,同步攻击最多4个敌人；主箭和分裂箭均造成100%攻击力物理伤害,,multi_attack_lv01
+ability:multi_attack_lv02,ability,multi_attack_lv02,多重攻击LV2,0,0,同步攻击最多5个敌人；主箭和分裂箭均造成100%攻击力物理伤害,,multi_attack_lv02
+ability:multi_attack_lv03,ability,multi_attack_lv03,多重攻击LV3,0,0,同步攻击最多6个敌人；主箭和分裂箭均造成100%攻击力物理伤害,,multi_attack_lv03
+ability:multi_attack_lv04,ability,multi_attack_lv04,多重攻击LV4,0,0,同步攻击最多7个敌人；主箭和分裂箭均造成100%攻击力物理伤害,,multi_attack_lv04
+ability:multi_attack_lv05,ability,multi_attack_lv05,多重攻击LV5,0,0,同步攻击最多7个敌人；主箭和分裂箭均造成100%攻击力物理伤害,,multi_attack_lv05
 ability:piercing_ballista_lv01,ability,piercing_ballista_lv01,穿透弩炮LV1,0,0,攻击无视敌人15%护甲,,piercing_ballista_lv01
 ability:piercing_ballista_lv02,ability,piercing_ballista_lv02,穿透弩炮LV2,0,0,攻击无视敌人20%护甲,,piercing_ballista_lv02
 ability:piercing_ballista_lv03,ability,piercing_ballista_lv03,穿透弩炮LV3,0,0,攻击无视敌人25%护甲,,piercing_ballista_lv03
@@ -107,11 +98,11 @@ inventory_item:challenge_01,inventory_item,challenge_01,木材练功房,0,0,击�
 inventory_item:challenge_02,inventory_item,challenge_02,金币练功房,0,0,击杀每个怪物获得100金币。,,challenge_02
 inventory_item:challenge_03,inventory_item,challenge_03,属性练功房,0,0,击杀每个怪物获得10点全属性。,,challenge_03
 inventory_item:challenge_04,inventory_item,challenge_04,大属性练功房,0,0,"击杀每个怪物获得100点全属性,1000金币。",,challenge_04
-inventory_item:challenge_05,inventory_item,challenge_05,挑战合成宝石,0,0,击败BOSS后掉落合成宝石。,,challenge_05
-inventory_item:challenge_06,inventory_item,challenge_06,进入冰霜之地,0,0,升级小极地晶石。,,challenge_06
-inventory_item:challenge_07,inventory_item,challenge_07,挑战熔火核心lv1-3宝石,0,0,可升级浴火熔铠到lv4。,,challenge_07
-inventory_item:challenge_08,inventory_item,challenge_08,挑战熔火核心lv4宝石,0,0,可升级浴火熔铠到lvmax。,,challenge_08
-inventory_item:challenge_09,inventory_item,challenge_09,挑战冰烬挽歌,0,0,击败BOSS后掉落冰魂焰魄。,,challenge_09
+inventory_item:challenge_05,inventory_item,challenge_05,挑战合成宝石,0,0,击败BOSS后掉落合成宝石。当满足装备升级进化条件时，拾取掉落精华即可升级进化。,,challenge_05
+inventory_item:challenge_06,inventory_item,challenge_06,进入冰霜之地,0,0,升级小极地晶石。当满足装备升级进化条件时，拾取掉落精华即可升级进化。,,challenge_06
+inventory_item:challenge_07,inventory_item,challenge_07,挑战熔火核心lv1-3宝石,0,0,场内维持10只熔火怪物；死亡后0.5秒补满，每只怪物独立有20%概率掉落熔火核心Lv1。,,challenge_07
+inventory_item:challenge_08,inventory_item,challenge_08,挑战熔火核心lv4宝石,0,0,击败BOSS后掉落熔火核心Lv4；狱火熔铠Lv4与熔火核心Lv4自动合成狱火熔铠Lvmax。,,challenge_08
+inventory_item:challenge_09,inventory_item,challenge_09,挑战冰烬挽歌,0,0,击败BOSS后掉落冰魂焰魄。当满足装备升级进化条件时，拾取掉落精华即可升级进化。,,challenge_09
 inventory_item:challenge_10,inventory_item,challenge_10,进入七宗罪,0,0,场内维持10只相同小怪；每只怪物死亡有40%概率按权重掉落七种精华，掉落数量不限。,,challenge_10
 inventory_item:challenge_11,inventory_item,challenge_11,进入罪渊（十宗罪）,0,0,持有深渊审判才能进入；武器+N进入第N+1层，击杀对应Boss后自动合成升阶。,,challenge_11
 inventory_item:challenge_synthesis_gem,inventory_item,challenge_synthesis_gem,挑战合成宝石,0,0,击败BOSS后掉落合成宝石,item_recipe,challenge_synthesis_gem
@@ -162,8 +153,8 @@ inventory_item:material_ice_soul_ember,inventory_item,material_ice_soul_ember,�
 inventory_item:material_molten_core_01,inventory_item,material_molten_core_01,熔火核心Lv1,0,0,熔火核心Lv1*3 合成熔火核心Lv2,item_recipe,material_molten_core_01
 inventory_item:material_molten_core_02,inventory_item,material_molten_core_02,熔火核心Lv2,0,0,熔火核心Lv2*3 合成熔火核心Lv3,item_recipe,material_molten_core_02
 inventory_item:material_molten_core_03,inventory_item,material_molten_core_03,熔火核心Lv3,0,0,可用熔火核心Lv3升级装备 狱火熔铠Lv1,item_recipe,material_molten_core_03
-inventory_item:material_molten_core_04,inventory_item,material_molten_core_04,熔火核心Lv4,0,0,可用熔火核心Lv3升级装备 狱火熔铠Lv4,item_recipe,material_molten_core_04
-inventory_item:material_synthesis_gem,inventory_item,material_synthesis_gem,合成宝石,0,0,加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1,item_recipe,material_synthesis_gem
+inventory_item:material_molten_core_04,inventory_item,material_molten_core_04,熔火核心Lv4,0,0,与狱火熔铠Lv4自动合成狱火熔铠Lvmax。拾取后保存在背包中，仅在合成成功时消耗。,item_recipe,material_molten_core_04
+inventory_item:material_synthesis_gem,inventory_item,material_synthesis_gem,合成宝石,0,0,加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1。拾取后保存在背包中，仅在合成成功时消耗。,item_recipe,material_synthesis_gem
 inventory_item:rebirth_challenge_01,inventory_item,rebirth_challenge_01,挑战1转,0,0,获得英雄专属技能/提高英雄2000全属性/增加攻击全属性+1/解锁分裂多重攻击,,rebirth_challenge_01
 inventory_item:rebirth_challenge_02,inventory_item,rebirth_challenge_02,挑战2转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄3000全属性/增加攻击全属性+2/多重攻击+1,,rebirth_challenge_02
 inventory_item:rebirth_challenge_03,inventory_item,rebirth_challenge_03,挑战3转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄5000全属性/增加攻击全属性+3/多重攻击+1,,rebirth_challenge_03

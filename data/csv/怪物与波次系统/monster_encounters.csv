@@ -17,7 +17,7 @@ encounter_challenge_03,challenge,属性练功房,atribute_room,,reward_practice_
 encounter_challenge_04,challenge,大属性练功房,big_atribute_room,,reward_practice_attribute_100_gold_1000,0,4,8,1,maintain_count,0.5,,1,具体怪物和地点由encounter_members与challenge_locations管理。
 encounter_challenge_05,challenge,合成宝石Boss房,combination_room,,,0,5,1,0,none,0,,1,具体怪物和地点由encounter_members与challenge_locations管理。
 encounter_challenge_06,challenge,冰霜之地,ice_room,,,0,6,8,1,maintain_count,0.5,,1,持续维持8只冰之幽魂；战斗数值与木材练功房一致。
-encounter_challenge_07,challenge,熔火核心低阶房,fire_room,,,0,7,1,0,none,0,,1,具体怪物和地点由encounter_members与challenge_locations管理。
+encounter_challenge_07,challenge,熔火核心低阶房,fire_room,,,0,7,10,1,maintain_count,0.5,,1,场内维持10只熔火怪物；死亡后0.5秒补满，每只授权击杀有20%概率掉落熔火核心Lv1。
 encounter_challenge_08,challenge,熔火核心高阶房,big_fire_room,,,0,8,1,0,none,0,,1,具体怪物和地点由encounter_members与challenge_locations管理。
 encounter_challenge_09,challenge,冰烬挽歌Boss房,last_room,,,0,9,1,0,none,0,,1,具体怪物和地点由encounter_members与challenge_locations管理。
 encounter_challenge_10,challenge,七宗罪,seven_room,,,0,10,10,1,maintain_count,0.5,,1,场内维持10只相同小怪；死亡后0.5秒补满，每次击杀有40%概率按权重掉落七宗罪精华且数量不限。

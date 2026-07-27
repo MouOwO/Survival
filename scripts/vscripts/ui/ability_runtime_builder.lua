@@ -1,8 +1,8 @@
 local buildings = require("config/buildings_config")
-local workers = require("config/workers_config")
 local gold_mine = require("config/gold_mine_config")
 local tower_routes = require("config/tower_route_config")
 local altar_actions = require("config/generated/altar_actions")
+local training_definitions = require("config/generated/training_definitions")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local M = {}
@@ -44,6 +44,62 @@ end
 local function count(state, building_id)
     return state.building_counts
         and state.building_counts[building_id] or 0
+end
+local function default_lumberjack_training()
+    local row = (training_definitions.by_id or {}).train_lumberjack_01 or {}
+    local level = tonumber(row.level) or 1
+    return {
+        training_id = row.training_id or "train_lumberjack_01",
+        level = level,
+        name = row.name or "农民LV1",
+        count = 0,
+        max_count = tonumber(row.max_count) or 0,
+        unlimited = (tonumber(row.max_count) or 0) < 0 and 1 or 0,
+        requires_city_level = tonumber(row.requires_city_level) or 1,
+        wood_cost = tonumber(row.wood_cost) or 0,
+        gold_cost = tonumber(row.gold_cost) or 0,
+        population_cost = tonumber(row.population_cost) or 0,
+        wood_per_hit = tonumber(row.wood_per_hit) or 0,
+        base_attack = tonumber(row.base_attack) or 0,
+    }
+end
+local function lumberjack_training(state, resources)
+    local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
+        team = state.team,
+    }) or default_lumberjack_training()
+    local required = tonumber(training.requires_city_level) or 1
+    local city_level = tonumber(state.level) or tonumber(state.city_level) or 1
+    local unlocked = city_level >= required
+    local maximum = tonumber(training.max_count) or 0
+    local trained = tonumber(training.count) or 0
+    local progress_text = maximum < 0 and "无限训练"
+        or (tostring(trained) .. "/" .. tostring(maximum))
+    local cost = {
+        wood = tonumber(training.wood_cost) or 0,
+        gold = tonumber(training.gold_cost) or 0,
+    }
+    local population = tonumber(training.population_cost) or 0
+    local status = unlocked
+        and ("当前等级训练进度 " .. progress_text)
+        or ("主城达到LV" .. tostring(required) .. "后解锁")
+    local result = merge({
+        available = unlocked and 1 or 0,
+        display_name = "训练" .. tostring(training.name or "农民LV1"),
+        current_level = tonumber(training.level) or 1,
+        status_text = status,
+        upgrade_description = "训练一名" .. tostring(training.name or "农民")
+            .. "，自动攻击资源树。每次有效攻击获得"
+            .. tostring(training.wood_per_hit or 0) .. "木材。",
+        population = population,
+        fields = {
+            { label = "训练进度", value = progress_text },
+            { label = "占用人口", value = population },
+            { label = "基础攻击力", value = training.base_attack or 0 },
+            { label = "每次伐木", value = tostring(training.wood_per_hit or 0) .. "木材" },
+            { label = "主城要求", value = "LV" .. tostring(required) },
+        },
+    }, cost_data(cost))
+    return with_affordability(result, cost, population, resources)
 end
 local function build_ability(ability_name, state, resources)
     local definitions = {
@@ -146,14 +202,11 @@ local function tower_upgrade(ability_name, state, resources)
         upgrade_attack_delta = (row.base_attack_damage or 0)
             - (current_row and current_row.base_attack_damage or 0),
     }, cost_data(cost))
-    -- Tower upgrade abilities must remain clickable when resources are short.
-    -- The authoritative upgrade system validates and spends resources, then
-    -- reports the concrete failure to the player. Treating affordability as
-    -- availability here made both level-one buttons grey (especially the
-    -- cumulative "max" upgrade) and prevented players from requesting an
-    -- otherwise valid upgrade.
-    local affordable = can_afford(cost, cost.population or 0, resources)
-    result.can_afford = 1
+    -- population_delta is granted as max population after an upgrade. The
+    -- authoritative spend path always uses population=0, so it must not make
+    -- an otherwise affordable tower upgrade appear disabled.
+    local affordable = can_afford(cost, 0, resources)
+    result.can_afford = affordable
     if affordable == 0 then
         result.status_text = result.status_text .. "（当前资源不足）"
     end
@@ -326,19 +379,7 @@ function M.build(ability_name, state, resources)
         )
     end
     if ability_name == "ability_train_lumberjack" then
-        local result = merge({
-            available = 1,
-            status_text = "每次有效攻击获得"
-                .. tostring(workers.wood_per_hit or 1)
-                .. "木材",
-            population = workers.cost.population or 0,
-        }, cost_data(workers.cost))
-        return with_affordability(
-            result,
-            workers.cost,
-            workers.cost.population or 0,
-            resources
-        )
+        return lumberjack_training(state, resources)
     end
     if ability_name == "ability_upgrade_tower"
         or ability_name == "ability_upgrade_tower_lv01"

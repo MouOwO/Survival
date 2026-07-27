@@ -1,8 +1,10 @@
+local armor_balance = require("config/armor_balance")
+
 local M = {
     unit_name = "npc_survival_lumberjack",
     cost = { wood = 50, gold = 20, population = 1 },
     health = 300,
-    armor = 1,
+    armor = armor_balance.from_war3(1),
     damage_min = 15,
     damage_max = 15,
     attack_rate = 1.0,

@@ -1,6 +1,7 @@
 local levels = require("config/generated/building_levels")
 local rules = require("config/generated/gold_mine_rules")
 local technologies = require("config/generated/technology_definitions")
+local armor_balance = require("config/armor_balance")
 local rule = (rules.by_id or {}).default or {}
 
 local level_by_number = {}
@@ -116,7 +117,14 @@ function M.crit_chance(crit_level)
 end
 
 function M.level_data(level)
-    return level_by_number[level]
+    local source = level_by_number[level]
+    if not source then return nil end
+    local result = {}
+    for key, value in pairs(source) do result[key] = value end
+    result.armor = armor_balance.from_war3(
+        source.war3_armor or source.armor
+    )
+    return result
 end
 
 return M

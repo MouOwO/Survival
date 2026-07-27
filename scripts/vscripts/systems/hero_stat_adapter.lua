@@ -3,6 +3,7 @@ local projectile_config = require(
     "config/generated/hero_attack_projectiles"
 )
 local global_rules = require("config/global_rules")
+local armor_balance = require("config/armor_balance")
 
 local M = {}
 
@@ -62,12 +63,12 @@ local function apply_combat_stats(unit, definition)
             unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
         end
     end
-    set_if_present(
-        unit,
-        definition,
-        "base_armor",
-        "SetPhysicalArmorBaseValue"
-    )
+    local base_war3_armor = number(definition, "base_war3_armor")
+        or number(definition, "base_armor")
+    if base_war3_armor ~= nil then
+        safe_call(unit, "SetPhysicalArmorBaseValue",
+            armor_balance.from_war3(base_war3_armor))
+    end
     set_if_present(
         unit,
         definition,

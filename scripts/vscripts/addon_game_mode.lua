@@ -1,4 +1,30 @@
-﻿local event_bus = require("core/event_bus")
+﻿local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
+
+local function configure_survival_launch_rules()
+    local game_mode = GameRules:GetGameModeEntity()
+    game_mode:SetCustomGameForceHero(SURVIVAL_FORCE_HERO)
+    GameRules:SetCustomGameSetupTimeout(0)
+    GameRules:SetHeroSelectionTime(0)
+    GameRules:SetShowcaseTime(0)
+    GameRules:SetStrategyTime(0)
+    GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 1)
+    GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
+    GameRules:EnableCustomGameSetupAutoLaunch(true)
+    GameRules:SetCustomGameSetupAutoLaunchDelay(0)
+end
+
+-- Apply launch-critical rules before loading the gameplay modules. A failure
+-- in an unrelated module must never make the engine fall back to native team
+-- setup and hero selection.
+local launch_rules_ok, launch_rules_error = pcall(configure_survival_launch_rules)
+local launch_map_name = GetMapName and GetMapName() or "unknown"
+print(
+    "[SURVIVAL_LAUNCH_RULES] map=" .. tostring(launch_map_name)
+        .. " ok=" .. tostring(launch_rules_ok)
+        .. " error=" .. tostring(launch_rules_error)
+)
+
+local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
@@ -33,6 +59,7 @@ print("[SURVIVAL_MODIFIER_BOOTSTRAP] weapon_attack_tracker=true weapon_stat_proj
 modifier_registry.register()
 local ability_utils = require("core/ability_utils")
 local unit_display_names = require("config/generated/unit_display_names")
+local seven_sins_essences = require("config/seven_sins_essences")
 
 local grid_system = require("systems/grid_placement_system")
 local resource_system = require("systems/resource_system")
@@ -52,6 +79,8 @@ local hero_skill_pool_service =
     require("systems/hero_skill_pool_service")
 local hero_skill_choice_service =
     require("systems/hero_skill_choice_service")
+local hero_passive_skill_service =
+    require("systems/hero_passive_skill_service")
 local hero_cosmetic_service =
     require("systems/hero_cosmetic_service")
 local hero_summon_system = require("systems/hero_summon_system")
@@ -165,10 +194,22 @@ require("abilities/ability_tower_class_7")
 
 local M = {}
 local initialized = false
+local replacing_forced_hero = {}
+local ready_hero_entindex_by_player = {}
+
+local function assign_player_to_survival_team(player_id)
+    if player_id == nil or player_id < 0 then
+        return
+    end
+    if GameRules:State_Get() >= DOTA_GAMERULES_STATE_HERO_SELECTION then
+        return
+    end
+    PlayerResource:SetCustomTeamAssignment(player_id, DOTA_TEAM_GOODGUYS)
+end
 
 local function configure_game_rules()
     local game_mode = GameRules:GetGameModeEntity()
-    game_mode:SetCustomGameForceHero("npc_dota_hero_undying")
+    configure_survival_launch_rules()
     game_mode:SetBuybackEnabled(false)
     game_mode:SetCameraDistanceOverride(1500)
     game_mode:SetFixedRespawnTime(2)
@@ -176,12 +217,9 @@ local function configure_game_rules()
     -- player slots made early Workshop runs assign the local player there.
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 1)
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
+    assign_player_to_survival_team(0)
     GameRules:SetHeroRespawnEnabled(true)
-    GameRules:SetHeroSelectionTime(0)
-    GameRules:SetShowcaseTime(0)
-    GameRules:SetStrategyTime(0)
     GameRules:SetPreGameTime(5)
-    GameRules:SetCustomGameSetupAutoLaunchDelay(0)
     GameRules:SetGoldPerTick(0)
 
     if game_mode.SetFogOfWarDisabled then
@@ -192,6 +230,40 @@ local function configure_game_rules()
     end
 end
 
+local function on_player_connected(keys)
+    assign_player_to_survival_team(tonumber(keys.PlayerID))
+end
+
+local function initialize_survival_hero(hero)
+    if not hero or hero:IsNull() then
+        return
+    end
+
+    local player_id = hero:GetPlayerOwnerID()
+    local unit_name = hero:GetUnitName()
+    local hero_entindex = hero:entindex()
+    if ready_hero_entindex_by_player[player_id] == hero_entindex then
+        return
+    end
+    ready_hero_entindex_by_player[player_id] = hero_entindex
+    replacing_forced_hero[player_id] = nil
+
+    ability_utils.remove_all(hero)
+    hero:SetGold(0, false)
+    local display = (unit_display_names.by_id or {})[unit_name]
+    if display and display.enabled ~= false then
+        hero.survival_display_name = display.display_name
+    end
+    FindClearSpaceForUnit(hero, Vector(0, 0, 256), true)
+
+    event_bus.emit(events.HERO_READY, {
+        hero = hero,
+        player_id = player_id,
+        team = hero:GetTeamNumber(),
+    })
+    ui_snapshot_service.publish_player(player_id)
+end
+
 local function on_hero_picked(keys)
     local hero = keys.heroindex
         and EntIndexToHScript(keys.heroindex) or nil
@@ -199,22 +271,29 @@ local function on_hero_picked(keys)
         return
     end
 
-    ability_utils.remove_all(hero)
-    hero:SetGold(0, false)
-    local unit_name = hero:GetUnitName()
-    local display = (unit_display_names.by_id or {})[unit_name]
-    if display and display.enabled ~= false then
-        hero.survival_display_name = display.display_name
-    end
-    FindClearSpaceForUnit(hero, Vector(0, 0, 256), true)
-
     local player_id = hero:GetPlayerOwnerID()
-    event_bus.emit(events.HERO_READY, {
-        hero = hero,
-        player_id = player_id,
-        team = hero:GetTeamNumber(),
-    })
-    ui_snapshot_service.publish_player(player_id)
+    local unit_name = hero:GetUnitName()
+    if unit_name ~= SURVIVAL_FORCE_HERO then
+        if player_id >= 0 and not replacing_forced_hero[player_id] then
+            replacing_forced_hero[player_id] = true
+            print(
+                "[SURVIVAL_FORCE_HERO] replacing player=" .. tostring(player_id)
+                    .. " native=" .. tostring(unit_name)
+            )
+            local replacement = PlayerResource:ReplaceHeroWith(
+                player_id,
+                SURVIVAL_FORCE_HERO,
+                0,
+                0
+            )
+            if replacement and not replacement:IsNull()
+                and replacement:GetUnitName() == SURVIVAL_FORCE_HERO then
+                initialize_survival_hero(replacement)
+            end
+        end
+        return
+    end
+    initialize_survival_hero(hero)
 end
 
 local function on_game_state_changed()
@@ -239,24 +318,94 @@ local function on_entity_killed(keys)
     })
 end
 
+local function resolve_item_pickup_hero(keys, item)
+    local hero = keys.HeroEntityIndex
+        and EntIndexToHScript(keys.HeroEntityIndex) or nil
+    if hero and not hero:IsNull() then
+        return hero, "event"
+    end
+
+    -- Altar heroes are created with CreateUnitByName, so the pickup event may
+    -- omit HeroEntityIndex. Resolve them from the authoritative summon state.
+    local player_id = tonumber(keys.PlayerID)
+        or tonumber(item and item.survival_owner_player_id)
+    if player_id ~= nil and player_id >= 0 then
+        local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+            player_id = player_id,
+        })
+        if summoned and summoned.ok and summoned.unit
+            and not summoned.unit:IsNull() then
+            return summoned.unit, "summoned"
+        end
+
+        local selected = PlayerResource:GetSelectedHeroEntity(player_id)
+        if selected and not selected:IsNull() then
+            return selected, "selected"
+        end
+    end
+    return nil, "missing"
+end
+
 local function on_item_picked_up(keys)
     local item = keys.ItemEntityIndex
         and EntIndexToHScript(keys.ItemEntityIndex) or nil
-    if not item or item:IsNull()
-        or item:GetAbilityName() ~= "item_survival_challenge_reward" then
+    if not item or item:IsNull() then return end
+    local item_name = item:GetAbilityName()
+    local is_challenge_reward = item_name == "item_survival_challenge_reward"
+    local is_seven_sins_essence =
+        seven_sins_essences.by_engine_item_name[item_name] ~= nil
+    if not is_challenge_reward and not is_seven_sins_essence then return end
+    local hero, hero_source = resolve_item_pickup_hero(keys, item)
+    if not hero then
+        print(string.format(
+            "[ITEM_PICKUP_HERO_MISSING] player=%s item=%s entindex=%s",
+            tostring(keys.PlayerID or item.survival_owner_player_id),
+            tostring(item_name),
+            tostring(item:entindex())
+        ))
         return
     end
-    local hero = keys.HeroEntityIndex
-        and EntIndexToHScript(keys.HeroEntityIndex) or nil
-    if hero and not hero:IsNull() and item.Claim then
-        local claimed = item:Claim(hero)
-        if not claimed and not item:IsNull() and hero.DropItemAtPositionImmediate then
+
+    local item_slot = -1
+    for slot = 0, 8 do
+        if hero:GetItemInSlot(slot) == item then
+            item_slot = slot
+            break
+        end
+    end
+    print(string.format(
+        "[ITEM_PICKUP_HERO_RESOLVED] player=%s hero=%s source=%s item=%s slot=%s",
+        tostring(hero:GetPlayerOwnerID()),
+        tostring(hero:entindex()),
+        tostring(hero_source),
+        tostring(item:entindex()),
+        tostring(item_slot)
+    ))
+    if item_slot < 0 or item_slot > 8 then
+        if hero.DropItemAtPositionImmediate then
             hero:DropItemAtPositionImmediate(item, hero:GetAbsOrigin())
         end
+        event_bus.emit(events.UI_NOTIFICATION, {
+            player_id = tonumber(item.survival_owner_player_id)
+                or hero:GetPlayerOwnerID(),
+            message = "装备栏已满，请腾出位置后再拾取",
+            level = "error",
+        })
+        return
+    end
+
+    -- Essences remain real items in equipment slots. Claim means "use now",
+    -- so calling it during pickup was the regression that dropped every essence
+    -- straight back onto the ground when its upgrade requirement was unmet.
+    if is_seven_sins_essence then return end
+    if item.Claim then
+        item:Claim(hero)
     end
 end
 
 function M.precache(context)
+    -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
+    tower_magic_supreme_system.precache(context)
     local units = {
         "npc_dota_hero_undying",
         "npc_dota_hero_axe",
@@ -371,6 +520,8 @@ function M.activate()
         return
     end
     initialized = true
+    replacing_forced_hero = {}
+    ready_hero_entindex_by_player = {}
 
     event_bus.reset()
     configure_game_rules()
@@ -418,6 +569,7 @@ function M.activate()
     weapon_growth_service.init()
     weapon_synthesis_snapshot_service.init()
     hero_combat_stat_service.init()
+    hero_passive_skill_service.init()
     hero_summon_system.init()
     builder_progression_system.init()
     gold_mine_system.init()
@@ -434,12 +586,20 @@ function M.activate()
         nil
     )
     ListenToGameEvent(
+        "player_connect_full",
+        on_player_connected,
+        nil
+    )
+    ListenToGameEvent(
         "dota_player_pick_hero",
         on_hero_picked,
         nil
     )
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
     ListenToGameEvent("dota_item_picked_up", on_item_picked_up, nil)
+    -- End setup only after every HERO_READY subscriber and engine listener is
+    -- installed; forced hero creation can happen synchronously from here.
+    GameRules:FinishCustomGameSetup()
     logger.info(
         "Addon",
         "initialized V1.6 logical weapon growth core"

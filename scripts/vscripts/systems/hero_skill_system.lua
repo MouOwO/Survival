@@ -6,6 +6,7 @@ local ability_utils = require("core/ability_utils")
 local logger = require("core/logger")
 local heroes = require("config/generated/hero_definitions")
 local skills = require("config/generated/hero_skill_definitions")
+local passive_skills = require("config/hero_passive_skill_definitions")
 local initial_skills = require("config/generated/hero_initial_skills")
 
 local M = {}
@@ -34,6 +35,10 @@ end
 
 local function skill_projection(skill_id, level)
     local definition = skills.by_id[skill_id]
+    local passive = passive_skills.by_id[skill_id]
+    local maximum = passive and passive.max_level
+        or (definition and tonumber(definition.max_level)) or 1
+    local next_level = math.min(maximum, level + 1)
     return {
         skill_id = skill_id,
         ability_name = definition and definition.ability_name or "",
@@ -41,8 +46,21 @@ local function skill_projection(skill_id, level)
         description = definition and definition.description or "",
         icon_name = definition and definition.icon_name or "",
         level = level,
-        max_level = definition
-            and (tonumber(definition.max_level) or 1) or 1,
+        max_level = maximum,
+        passive = passive and 1 or 0,
+        hidden = passive and 1 or 0,
+        trigger_type = passive and passive.trigger_type or "",
+        trigger_chance = passive and passive.trigger_chance[level] or 0,
+        damage_multiplier = passive and passive.damage_multiplier[level] or 0,
+        current_effect = passive and passive.level_text[level] or "",
+        next_level = level < maximum and next_level or 0,
+        next_trigger_chance = passive and level < maximum
+            and passive.trigger_chance[next_level] or 0,
+        next_damage_multiplier = passive and level < maximum
+            and passive.damage_multiplier[next_level] or 0,
+        next_effect = passive and level < maximum
+            and passive.level_text[next_level] or "",
+        is_max_level = level >= maximum and 1 or 0,
         effect_type = definition and definition.effect_type or "",
         effect_value_per_level = definition
             and (tonumber(definition.effect_value_per_level) or 0) or 0,
@@ -57,6 +75,7 @@ local function snapshot(player_id)
             hero_ready = 0,
             skill_count = 0,
             skill_capacity = 10,
+            skill_points = 0,
             skills = {},
         }
     end
@@ -77,6 +96,7 @@ local function snapshot(player_id)
             and state.unit:entindex() or -1,
         skill_count = #state.order,
         skill_capacity = state.capacity,
+        skill_points = state.skill_points or 0,
         skills = projected,
         version = state.version,
     }
@@ -100,7 +120,8 @@ local function ability_map(state)
     }
     for skill_id, _ in pairs(state.levels) do
         local definition = skills.by_id[skill_id]
-        if definition and definition.ability_name then
+        if definition and definition.ability_name
+            and definition.ability_name ~= "" then
             result[definition.ability_name] = true
         end
     end
@@ -119,7 +140,9 @@ local function synchronize_unit(state)
 
     for _, skill_id in ipairs(state.order) do
         local definition = skills.by_id[skill_id]
-        if definition and definition.enabled ~= false then
+        if definition and definition.enabled ~= false
+            and definition.ability_name
+            and definition.ability_name ~= "" then
             local ability = state.unit:FindAbilityByName(
                 definition.ability_name
             )
@@ -212,6 +235,57 @@ local function grant_request(payload)
     )
 end
 
+local function grant_skill_points_request(payload)
+    local player_id = tonumber(payload.player_id)
+    local state = state_by_player[player_id]
+    if not state then
+        return { ok = false, error = "combat_hero_not_ready" }
+    end
+    local amount = math.floor(tonumber(payload.points) or tonumber(payload.value) or 0)
+    if amount <= 0 then
+        return { ok = false, error = "skill_points_invalid" }
+    end
+    state.skill_points = (state.skill_points or 0) + amount
+    state.version = state.version + 1
+    publish(player_id, "skill_points_granted")
+    return { ok = true, skill_points = state.skill_points, snapshot = snapshot(player_id) }
+end
+
+local function upgrade_with_skill_point_request(payload)
+    local player_id = tonumber(payload.player_id)
+    local state = state_by_player[player_id]
+    if not state then
+        return { ok = false, error = "combat_hero_not_ready" }
+    end
+    local skill_id = tostring(payload.skill_id or "")
+    local definition = passive_skills.by_id[skill_id]
+    if not definition then
+        return { ok = false, error = "passive_skill_invalid" }
+    end
+    local current = tonumber(state.levels[skill_id]) or 0
+    if current <= 0 then
+        return { ok = false, error = "skill_not_owned" }
+    end
+    if current >= definition.max_level then
+        return { ok = false, error = "skill_already_max" }
+    end
+    if (state.skill_points or 0) < 1 then
+        return { ok = false, error = "skill_points_insufficient" }
+    end
+    state.skill_points = state.skill_points - 1
+    state.levels[skill_id] = current + 1
+    state.version = state.version + 1
+    synchronize_unit(state)
+    publish(player_id, "skill_point_upgrade")
+    return {
+        ok = true,
+        skill_id = skill_id,
+        level = state.levels[skill_id],
+        skill_points = state.skill_points,
+        snapshot = snapshot(player_id),
+    }
+end
+
 local function state_request(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil or player_id < 0 then
@@ -224,6 +298,14 @@ local function initialize_hero(payload)
     local definition = heroes.by_id[payload.hero_id]
     local capacity = definition
         and tonumber(definition.skill_capacity) or 10
+    local existing = state_by_player[payload.player_id]
+    if existing and existing.hero_id == payload.hero_id then
+        existing.unit = payload.unit
+        existing.capacity = math.max(1, capacity or 10)
+        synchronize_unit(existing)
+        publish(existing.player_id, "hero_rebound")
+        return
+    end
     local state = {
         player_id = payload.player_id,
         hero_id = payload.hero_id,
@@ -231,6 +313,7 @@ local function initialize_hero(payload)
         capacity = math.max(1, capacity or 10),
         levels = {},
         order = {},
+        skill_points = 0,
         version = 0,
     }
     state_by_player[payload.player_id] = state
@@ -279,6 +362,7 @@ local function on_hero_summoned(payload)
 end
 
 function M.init()
+    passive_skills.validate()
     state_by_player = {}
     event_bus.handle_request(
         events.HERO_SKILL_STATE_GET_REQUEST,
@@ -287,6 +371,14 @@ function M.init()
     event_bus.handle_request(
         events.HERO_SKILL_GRANT_REQUEST,
         grant_request
+    )
+    event_bus.handle_request(
+        events.HERO_SKILL_POINT_GRANT_REQUEST,
+        grant_skill_points_request
+    )
+    event_bus.handle_request(
+        events.HERO_SKILL_POINT_UPGRADE_REQUEST,
+        upgrade_with_skill_point_request
     )
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
 end

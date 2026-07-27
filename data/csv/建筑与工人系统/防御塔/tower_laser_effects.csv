@@ -1,8 +1,8 @@
 skill_id,particle_name,attack_point,beam_update_interval,visual_refresh_interval,visual_segment_duration,source_offset_z,target_offset_z,damage_increment_pct,max_damage_multiplier,enabled,notes
-#ä¸­æ–‡å:æŠ€èƒ½ID,ç‰¹æ•ˆèµ„æº,æ”»å‡»å‰æ‘‡,å…‰æŸåæ ‡åˆ·æ–°é—´éš”,è§†è§‰æ®µé‡æ’­é—´éš”,è§†è§‰æ®µä¿ç•™æ—¶é—´,èµ·ç‚¹é«˜åº¦åç§»,ç»ˆç‚¹é«˜åº¦åç§»,æ¯ç§’é€’å¢ä¼¤å®³(%),æœ€é«˜ä¼¤å®³å€ç‡,æ˜¯å¦å¯ç”¨,å¤‡æ³¨
+#ÖĞÎÄÃû:¼¼ÄÜID,ÌØĞ§×ÊÔ´,¹¥»÷Ç°Ò¡,¹âÊø×ø±êË¢ĞÂ¼ä¸ô,ÊÓ¾õ¶ÎÖØ²¥¼ä¸ô,ÊÓ¾õ¶Î±£ÁôÊ±¼ä,Æğµã¸ß¶ÈÆ«ÒÆ,ÖÕµã¸ß¶ÈÆ«ÒÆ,Ã¿ÃëµİÔöÉËº¦(%),×î¸ßÉËº¦±¶ÂÊ,ÊÇ·ñÆôÓÃ,±¸×¢
 #types:string,string,number,number,number,number,number,number,number,number,boolean,string
-laser_lv01,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
-laser_lv02,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
-laser_lv03,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
-laser_lv04,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
-laser_lv05,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
+laser_lv01,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
+laser_lv02,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
+laser_lv03,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
+laser_lv04,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
+laser_lv05,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£

@@ -1,7 +1,9 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
-local config = require("config/challenge_definitions")
+local config = require("config/generated/challenge_definitions")
 local catalog = require("config/generated/content_catalog")
+local content_id_aliases = require("config/content_id_aliases")
+local molten_core_rules = require("config/molten_core_challenge_rules")
 
 local M = {}
 local granted = {}
@@ -48,9 +50,20 @@ local function grant(player_id, content_id, key)
 end
 
 local function drop(player_id, content_id, key, position)
+    content_id = content_id_aliases.canonical(content_id)
     granted[player_id] = granted[player_id] or {}
-    if granted[player_id][key] then return { ok = true, idempotent = true } end
-    local hero = PlayerResource:GetSelectedHeroEntity(player_id)
+    if granted[player_id][key] then
+        print(string.format(
+            "[CHALLENGE_REWARD_DROP] player=%s key=%s content=%s action=idempotent_skip",
+            tostring(player_id), tostring(key), tostring(content_id)))
+        return { ok = true, idempotent = true }
+    end
+    local summoned = event_bus.request(
+        events.HERO_SUMMON_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local hero = summoned and summoned.unit
+        or PlayerResource:GetSelectedHeroEntity(player_id)
     local definition = catalog.by_id[content_id]
     if not valid(hero) or not position or not definition then
         return { ok = false, error = "challenge_ground_reward_invalid" }
@@ -61,6 +74,7 @@ local function drop(player_id, content_id, key, position)
     end
     item.survival_content_id = content_id
     item.survival_owner_player_id = player_id
+    item.survival_reward_key = key
     if item.SetPurchaser then item:SetPurchaser(hero) end
     local container = CreateItemOnPositionSync(position, item)
     if not valid(container) then
@@ -73,10 +87,14 @@ local function drop(player_id, content_id, key, position)
         { content_id = content_id, removed = 0 }
     )
     granted[player_id][key] = true
+    print(string.format(
+        "[CHALLENGE_REWARD_DROP] player=%s key=%s content=%s entindex=%s action=created",
+        tostring(player_id), tostring(key), tostring(content_id),
+        tostring(item:entindex())))
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = player_id,
-        message = "掉落：" .. tostring(definition.name or content_id)
-            .. "（死亡位置，拾取后自动入库）",
+        message = "挑战奖励已掉落：" .. tostring(definition.name or content_id)
+            .. "（拾取后保存在装备栏，满足配方时自动合成）",
     })
     return {
         ok = true,
@@ -84,6 +102,31 @@ local function drop(player_id, content_id, key, position)
         content_id = content_id,
         entindex = item:entindex(),
     }
+end
+
+local function drop_content(payload)
+    local player_id = valid_owner(payload)
+    local challenge_id = tostring(payload.challenge_id or "")
+    local content_id = content_id_aliases.canonical(payload.content_id)
+    if not player_id then return { ok = false, error = "challenge_player_invalid" } end
+    if payload.authoritative ~= true then
+        return { ok = false, error = "challenge_authority_required" }
+    end
+    -- This endpoint exists for per-monster molten-core drops. Keep the
+    -- accepted challenge/content pair fail-closed so callers cannot turn it
+    -- into an arbitrary inventory material generator.
+    if challenge_id ~= molten_core_rules.challenge_id
+        or content_id ~= molten_core_rules.content_id then
+        return { ok = false, error = "challenge_content_drop_not_allowed" }
+    end
+    local drop_id = tostring(payload.drop_id or "")
+    if drop_id == "" then return { ok = false, error = "challenge_drop_id_missing" } end
+    return drop(
+        player_id,
+        content_id,
+        challenge_id .. ":monster_drop:" .. drop_id,
+        payload.position
+    )
 end
 
 local function claim(payload)
@@ -103,7 +146,10 @@ local function claim(payload)
         return { ok = false, error = "challenge_no_equipment_reward" }
     end
     if payload.position
-        and (challenge_id == "challenge_05" or challenge_id == "challenge_09") then
+        and (challenge_id == "challenge_05"
+            or challenge_id == "challenge_08"
+            or challenge_id == "challenge_09") then
+
         return drop(
             player_id,
             definition.reward_content_id,
@@ -117,6 +163,7 @@ end
 function M.init()
     granted = {}
     event_bus.handle_request(events.CHALLENGE_EQUIPMENT_REWARD_REQUEST, claim)
+    event_bus.handle_request(events.CHALLENGE_CONTENT_DROP_REQUEST, drop_content)
     print("[CHALLENGE_EQUIP_INIT] challenge_stages_use_ground_materials=true")
 end
 

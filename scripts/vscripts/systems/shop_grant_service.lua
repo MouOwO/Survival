@@ -1,7 +1,41 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local weapon_definitions = require("config/generated/weapon_definitions")
 
 local M = {}
+
+local function series_inventory(counts, series_id)
+    local matches = {}
+    for content_id, count in pairs(counts or {}) do
+        local definition = weapon_definitions.by_id[content_id]
+        if (tonumber(count) or 0) > 0
+            and definition
+            and tostring(definition.series_id or "") == series_id then
+            matches[#matches + 1] = {
+                content_id = content_id,
+                count = tonumber(count) or 0,
+                stage = tonumber(definition.stage) or 0,
+                definition = definition,
+            }
+        end
+    end
+    table.sort(matches, function(left, right)
+        if left.stage == right.stage then
+            return left.content_id < right.content_id
+        end
+        return left.stage > right.stage
+    end)
+    return matches
+end
+
+local function series_snapshot(matches)
+    local values = {}
+    for _, match in ipairs(matches or {}) do
+        values[#values + 1] = string.format("%s(stage=%s,count=%s)",
+            tostring(match.content_id), tostring(match.stage), tostring(match.count))
+    end
+    return #values > 0 and table.concat(values, ",") or "empty"
+end
 
 local function grant_native_item(player_id, entry)
     local summoned = event_bus.request(
@@ -27,20 +61,68 @@ end
 
 local function grant_virtual_item(player_id, entry, state)
     local definition = entry.definition or {}
-    if definition.progression_type == "repeat_purchase" and definition.series_id then
-        local inv = event_bus.request(events.CONTENT_INVENTORY_GET_REQUEST, { player_id = player_id })
+    if definition.progression_type == "repeat_purchase"
+        and tostring(definition.series_id or "") ~= "" then
+        local series_id = tostring(definition.series_id)
+        local inv = event_bus.request(events.CONTENT_INVENTORY_GET_REQUEST,
+            { player_id = player_id })
         local counts = inv and inv.snapshot and inv.snapshot.counts or {}
-        for id, count in pairs(counts) do
-            if count > 0 and string.find(id, definition.series_id, 1, true) then
-                local defs = require("config/generated/weapon_definitions")
-                local current = defs.by_id[id]
-                local next_id = current and current.next_content_id or entry.contentid
-                return event_bus.request(events.CONTENT_INVENTORY_TRANSACTION_REQUEST, {
-                    player_id = player_id, consume = {[id] = 1}, grant = {[next_id] = 1},
-                    reason = "shop_repeat_upgrade:" .. entry.entryid,
-                })
-            end
+        local matches = series_inventory(counts, series_id)
+        print(string.format(
+            "[SHOP_REPEAT_SCAN] player=%s entry=%s requested=%s series=%s inventory=%s",
+            tostring(player_id), tostring(entry.entryid), tostring(entry.contentid),
+            series_id, series_snapshot(matches)))
+        if #matches > 1 then
+            print(string.format(
+                "[SHOP_REPEAT_AMBIGUOUS] player=%s series=%s matches=%s selected=%s",
+                tostring(player_id), series_id, series_snapshot(matches),
+                tostring(matches[1].content_id)))
         end
+        local selected = matches[1]
+        if selected then
+            local old_content_id = selected.content_id
+            local next_content_id = tostring(
+                selected.definition.next_content_id or "")
+            if next_content_id == "" then
+                print(string.format(
+                    "[SHOP_REPEAT_MAX] player=%s entry=%s content_id=%s stage=%s",
+                    tostring(player_id), tostring(entry.entryid), old_content_id,
+                    tostring(selected.stage)))
+                return { ok = false, error = "shop_equipment_already_max",
+                    content_id = old_content_id }
+            end
+            local next_definition = weapon_definitions.by_id[next_content_id]
+            if not next_definition
+                or tostring(next_definition.series_id or "") ~= series_id then
+                print(string.format(
+                    "[SHOP_REPEAT_CHAIN_INVALID] player=%s series=%s old=%s next=%s",
+                    tostring(player_id), series_id, old_content_id, next_content_id))
+                return { ok = false, error = "shop_equipment_upgrade_chain_invalid" }
+            end
+            local result = event_bus.request(
+                events.CONTENT_INVENTORY_TRANSACTION_REQUEST,
+                {
+                    player_id = player_id,
+                    consume = { [old_content_id] = 1 },
+                    grant = { [next_content_id] = 1 },
+                    reason = "shop_repeat_upgrade:" .. entry.entryid,
+                }
+            ) or { ok = false, error = "inventory_handler_missing" }
+            result.old_content_id = old_content_id
+            result.new_content_id = next_content_id
+            local after_counts = result.snapshot and result.snapshot.counts or {}
+            print(string.format(
+                "[SHOP_REPEAT_RESULT] player=%s entry=%s ok=%s old=%s new=%s after=%s error=%s",
+                tostring(player_id), tostring(entry.entryid), tostring(result.ok == true),
+                old_content_id, next_content_id,
+                series_snapshot(series_inventory(after_counts, series_id)),
+                tostring(result.error or "")))
+            return result
+        end
+        print(string.format(
+            "[SHOP_REPEAT_FIRST] player=%s entry=%s grant=%s series=%s",
+            tostring(player_id), tostring(entry.entryid), tostring(entry.contentid),
+            series_id))
     end
     local result = event_bus.request(
         events.CONTENT_INVENTORY_GRANT_REQUEST,
@@ -51,6 +133,10 @@ local function grant_virtual_item(player_id, entry, state)
             reason = "shop_purchase:" .. entry.entryid,
         }
     )
+    print(string.format(
+        "[SHOP_VIRTUAL_GRANT] player=%s entry=%s content_id=%s ok=%s error=%s",
+        tostring(player_id), tostring(entry.entryid), tostring(entry.contentid),
+        tostring(result and result.ok == true), tostring(result and result.error or "")))
     return result or { ok = false, error = "inventory_handler_missing" }
 end
 

@@ -2,6 +2,8 @@ LinkLuaModifier("modifier_equipment_effects", "modifiers/modifier_equipment_effe
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local hero_health_guard = require("core/hero_health_guard")
+local armor_balance = require("config/armor_balance")
 
 local M = {}
 modifier_equipment_effects = class({})
@@ -138,7 +140,7 @@ function modifier_equipment_effects:GetModifierHealthBonus()
     return tonumber(values(self).health_flat) or 0
 end
 function modifier_equipment_effects:GetModifierPhysicalArmorBonus()
-    return tonumber(values(self).armor_flat) or 0
+    return armor_balance.from_war3(values(self).armor_flat)
 end
 function modifier_equipment_effects:OnTakeDamage(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
@@ -152,7 +154,13 @@ function modifier_equipment_effects:OnTakeDamage(params)
     local percent = tonumber(values(self).lifesteal_pct) or 0
     -- OnTakeDamage.damage is post-mitigation basic-attack damage here.
     local amount = math.max(0, tonumber(params.damage) or 0) * percent / 100
-    if amount > 0 and self:GetParent().Heal then self:GetParent():Heal(amount, nil) end
+    if amount > 0 and self:GetParent().Heal then
+        -- Invalidate deferred CalculateStatBonus health rollbacks before this
+        -- legitimate heal. Otherwise a full lifesteal heal can be mistaken for
+        -- an engine refill and restored to the old damaged value 0.12s later.
+        hero_health_guard.allow_healing(self:GetParent())
+        self:GetParent():Heal(amount, nil)
+    end
 end
 
 return M

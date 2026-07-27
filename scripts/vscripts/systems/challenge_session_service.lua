@@ -1,14 +1,19 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
+local armor_balance = require("config/armor_balance")
 
-local challenges = require("config/generated/challenge_definitions")
+local challenge_runtime_rules = require("config/challenge_runtime_rules")
+local challenges = challenge_runtime_rules.apply(
+    require("config/generated/challenge_definitions")
+)
 local encounters = require("config/generated/monster_encounters")
 local locations = require("config/generated/challenge_locations")
 local members = require("config/generated/encounter_members")
 local archetypes = require("config/generated/monster_archetypes")
 local weapons = require("config/generated/weapon_definitions")
 local seven_sins_essences = require("config/seven_sins_essences")
+local molten_core_rules = require("config/molten_core_challenge_rules")
 local hero_return_home = require("systems/hero_return_home_service")
 
 local M = {}
@@ -178,9 +183,15 @@ local function apply_combat_stats(unit, archetype)
         unit:SetBaseDamageMin(attack)
         unit:SetBaseDamageMax(attack)
     end
-    local armor = tonumber(archetype.armor)
-    if armor then unit:SetPhysicalArmorBaseValue(armor) end
-    unit.survival_minimum_armor = tonumber(archetype.minimum_armor) or 1
+    local war3_armor = tonumber(archetype.war3_armor or archetype.armor)
+    if war3_armor then
+        unit:SetPhysicalArmorBaseValue(armor_balance.from_war3(war3_armor))
+    end
+    local minimum_war3_armor = tonumber(
+        archetype.minimum_war3_armor or archetype.minimum_armor
+    )
+    unit.survival_minimum_armor = minimum_war3_armor ~= nil
+        and armor_balance.from_war3(minimum_war3_armor) or 1
     local attack_speed = math.max(0.01, tonumber(archetype.attack_speed) or 1)
     unit:SetBaseAttackTime(1 / attack_speed)
     unit.survival_attack_speed = attack_speed
@@ -279,9 +290,6 @@ local function spawn_member(session, member)
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
     apply_combat_stats(unit, combat_archetype)
-    if not unit:HasModifier("modifier_single_health_bar") then
-        unit:AddNewModifier(unit, nil, "modifier_single_health_bar", {})
-    end
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
 
     local home = nil
@@ -335,6 +343,18 @@ local function current_location(session)
     return member and locations.by_id[member.location_id] or nil
 end
 
+local function current_entry_marker_name(session)
+    local member = current_member(session) or session.members[1]
+    if session.challenge.challenge_id == "challenge_11" and member then
+        return string.format(
+            "challenge_11_stage_%02d_entry",
+            math.max(1, tonumber(member.sequence_index) or 1)
+        )
+    end
+    local location = current_location(session)
+    return location and location.entry_target_name or nil
+end
+
 local function validate_member_marker(member)
     local location = locations.by_id[member.location_id]
     if not location then return false, "challenge_location_not_found" end
@@ -348,12 +368,13 @@ end
 local function validate_session_markers(session)
     local location = current_location(session)
     if not location then return false, "challenge_location_not_found" end
-    if session.teleport_hero and not marker(location.entry_target_name) then
+    local entry_target_name = current_entry_marker_name(session)
+    if session.teleport_hero and not marker(entry_target_name) then
         if WOOD_STRENGTH_ENCOUNTERS[session.encounter_id] then
             session.teleport_hero = false
             session.local_spawn_fallback = true
         else
-            return false, "hammer_marker_not_found:" .. location.entry_target_name
+            return false, "hammer_marker_not_found:" .. tostring(entry_target_name)
         end
     end
     for _, member in ipairs(session.members) do
@@ -369,17 +390,17 @@ local function teleport_to_current(session)
     local location = current_location(session)
     if not hero then return false, "hero_not_ready" end
     if not location then return false, "challenge_location_not_found" end
-    local entry = marker(location.entry_target_name)
+    local entry_target_name = current_entry_marker_name(session)
+    local entry = marker(entry_target_name)
     if not entry then
-        return false, "hammer_marker_not_found:" .. location.entry_target_name
+        return false, "hammer_marker_not_found:" .. tostring(entry_target_name)
     end
     return teleport(hero, entry), nil
 end
 
 local function camera_target_for_session(session)
     if not session or not session.teleport_hero then return nil end
-    local location = current_location(session)
-    local entry = location and marker(location.entry_target_name) or nil
+    local entry = marker(current_entry_marker_name(session))
     if not entry then return nil end
     local position = entry:GetAbsOrigin()
     return { x = position.x, y = position.y, z = position.z }
@@ -451,6 +472,8 @@ local function publish(session, status, extra)
     event_bus.emit(events.MONSTER_ENCOUNTER_CHANGED, payload)
 end
 
+local block_session
+
 local function complete_session(session)
     if session.status == "completed" then return end
     session.status = "completed"
@@ -466,13 +489,88 @@ local function complete_session(session)
                 completion_id = session.encounter_id .. ":" .. session.generation,
                 position = (
                     session.challenge.challenge_id == "challenge_05"
+                    or session.challenge.challenge_id == "challenge_08"
                     or session.challenge.challenge_id == "challenge_09"
                 ) and session.completion_drop_position or nil,
                 authoritative = true,
             }
         )
     end
-    publish(session, "completed", { reward_result = reward_result or {} })
+    local repeatable = session.challenge.repeatable == true
+    local delay = tonumber(session.challenge.respawn_seconds) or 2
+    local completion_limit = math.max(
+        1,
+        tonumber(session.challenge.completion_limit) or 10
+    )
+    if repeatable and session.challenge.challenge_id == "challenge_11" then
+        local abyss_stage, inventory_error = owned_series_stage(
+            session.player_id,
+            "legend_abyss"
+        )
+        if inventory_error then
+            block_session(session, inventory_error)
+            return
+        end
+        if abyss_stage == nil or abyss_stage >= completion_limit then
+            publish(session, "completed", {
+                reward_result = reward_result or {},
+                entrance_closed = abyss_stage ~= nil,
+            })
+            return
+        end
+        if (tonumber(abyss_cleared_stage_by_player[session.player_id]) or -1)
+            >= abyss_stage then
+            publish(session, "completed", {
+                reward_result = reward_result or {},
+                material_pending = true,
+            })
+            return
+        end
+        local list = members_for(session.encounter_id)
+        local target_member = list[abyss_stage + 1]
+        if not target_member then
+            block_session(session, "abyss_stage_member_missing")
+            return
+        end
+        session.members = { target_member }
+        session.stage = 1
+        session.display_stage = abyss_stage + 1
+        session.display_total_members = completion_limit
+        session.spawn_mode = target_member.spawn_mode or "single"
+    elseif repeatable then
+        session.stage = 1
+    else
+        publish(session, "completed", { reward_result = reward_result or {} })
+        return
+    end
+
+    session.status = "waiting_respawn"
+    session.generation = DoUniqueString("challenge_completion")
+    session.completion_drop_position = nil
+    publish(session, "waiting_respawn", {
+        reward_result = reward_result or {},
+        next_spawn_seconds = delay,
+    })
+    scheduler.after(delay, function()
+        if get_session(session.player_id, session.encounter_id) ~= session
+            or session.status ~= "waiting_respawn" then
+            return
+        end
+        session.killed_members = 0
+        local ok, error_message = fill_initial(session)
+        if not ok then
+            block_session(session, error_message)
+            return
+        end
+        ok, error_message = teleport_to_current(session)
+        if not ok then
+            destroy_session_monsters(session)
+            block_session(session, error_message)
+            return
+        end
+        session.status = "active"
+        publish(session, "active")
+    end, "challenge_respawn:" .. session.player_id .. ":" .. session.encounter_id)
 end
 
 function M.handles(encounter_id)
@@ -551,10 +649,15 @@ function M.start(payload)
                 error = "需要持有【传说：深渊审判】才能进入罪渊第一层",
             }
         end
-        if abyss_stage >= 10 then
+        local completion_limit = math.max(
+            1,
+            tonumber(challenge.completion_limit) or 10
+        )
+        if abyss_stage >= completion_limit then
             return {
                 ok = false,
-                error = "【传说：深渊审判】已达到+10，罪渊挑战已完成",
+                error = "【传说：深渊审判】已达到+"
+                    .. tostring(completion_limit) .. "，罪渊挑战已完成",
             }
         end
         if (tonumber(abyss_cleared_stage_by_player[player_id]) or -1)
@@ -570,7 +673,7 @@ function M.start(payload)
         end
         list = { target_member }
         display_stage = abyss_stage + 1
-        display_total_members = 10
+        display_total_members = completion_limit
     end
     local session = {
         player_id = player_id,
@@ -593,6 +696,7 @@ function M.start(payload)
         seven_sins_drop_counts = {},
         seven_sins_ground_items = {},
         spawn_serial = 0,
+        molten_core_kill_serial = 0,
     }
     local markers_ok, marker_error = validate_session_markers(session)
     if not markers_ok then return { ok = false, error = marker_error } end
@@ -626,7 +730,7 @@ local function owner_killed(meta, attacker)
         or attacker_team == meta.team
 end
 
-local function block_session(session, error_message)
+block_session = function(session, error_message)
     session.status = "blocked"
     publish(session, "blocked", { error = error_message })
     event_bus.emit(events.UI_NOTIFICATION, {
@@ -761,7 +865,38 @@ local function on_killed(payload)
     end
 
     local challenge_id = session.challenge.challenge_id
-    if authorized_kill and challenge_id == "challenge_10" then
+    if authorized_kill and challenge_id == molten_core_rules.challenge_id then
+        session.molten_core_kill_serial =
+            (tonumber(session.molten_core_kill_serial) or 0) + 1
+        local dropped, roll = molten_core_rules.roll(RandomFloat)
+        print(string.format(
+            "[MOLTEN_CORE_DROP_ROLL] player=%s kill=%s roll=%.2f chance=%s dropped=%s",
+            tostring(meta.player_id), tostring(session.molten_core_kill_serial),
+            tonumber(roll) or -1, tostring(molten_core_rules.drop_chance_pct),
+            tostring(dropped)))
+        if dropped then
+            local drop_result = event_bus.request(
+                events.CHALLENGE_CONTENT_DROP_REQUEST,
+                {
+                    player_id = meta.player_id,
+                    challenge_id = challenge_id,
+                    content_id = molten_core_rules.content_id,
+                    position = victim:GetAbsOrigin(),
+                    drop_id = session.encounter_id .. ":" .. session.generation
+                        .. ":" .. tostring(session.molten_core_kill_serial),
+                    authoritative = true,
+                }
+            )
+            if not drop_result or not drop_result.ok then
+                event_bus.emit(events.UI_NOTIFICATION, {
+                    player_id = meta.player_id,
+                    message = "熔火核心Lv1掉落失败："
+                        .. tostring(drop_result and drop_result.error or "handler_missing"),
+                    level = "error",
+                })
+            end
+        end
+    elseif authorized_kill and challenge_id == "challenge_10" then
         local drop_result = drop_seven_sins_essence(session)
         if not drop_result or not drop_result.ok then
             event_bus.emit(events.UI_NOTIFICATION, {
@@ -806,13 +941,21 @@ local function on_killed(payload)
     end
 
     if session.spawn_mode == "maintain_count" then
-        scheduler.after(tonumber(meta.member.respawn_seconds) or 0.5, function()
+        local delay = tonumber(meta.member.respawn_seconds)
+            or tonumber(session.challenge.respawn_seconds) or 2
+        publish(session, "active", { next_spawn_seconds = delay })
+        scheduler.after(delay, function()
             if get_session(meta.player_id, meta.encounter_id) == session
                 and session.status == "active" then
-                local ok, error_message = fill_current(session)
-                if not ok then block_session(session, error_message) end
+                local unit, error_message = spawn_member(session, meta.member)
+                if not unit then
+                    block_session(session, error_message)
+                    return
+                end
+                publish(session, "active")
             end
-        end)
+        end, "challenge_respawn:" .. meta.player_id .. ":"
+            .. meta.encounter_id .. ":" .. tostring(entindex))
         return
     end
 

@@ -43,6 +43,10 @@ local modifiers = {
         path = "modifiers/modifier_survival_hero_skill",
     },
     {
+        name = "modifier_hero_passive_skill_effect",
+        path = "modifiers/modifier_hero_passive_skill_effects",
+    },
+    {
         name = "modifier_weapon_attack_tracker",
         path = "modifiers/modifier_weapon_attack_tracker",
     },

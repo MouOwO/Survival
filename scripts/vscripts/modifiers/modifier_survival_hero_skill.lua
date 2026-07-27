@@ -4,7 +4,14 @@ modifier_survival_hero_skill = class({})
 
 local by_ability = {}
 for _, row in ipairs(definitions.rows or {}) do
-    by_ability[row.ability_name] = row
+    local ability_name = row.ability_name
+    -- Runtime passive-proc skills intentionally have no engine ability. They
+    -- are handled by hero_passive_skill_service instead of this modifier.
+    if row.enabled ~= false
+        and type(ability_name) == "string"
+        and ability_name ~= "" then
+        by_ability[ability_name] = row
+    end
 end
 
 local function modifier_value(self, effect_type)

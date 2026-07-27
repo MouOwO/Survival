@@ -26,6 +26,10 @@ local function snapshot(player_id)
     local current = state(player_id)
     local definition = weapons.by_id[current.content_id] or {}
     local target = tonumber(definition.progression_value) or 0
+    if current.series_id == "ice_blade" and target <= 0
+        and tostring(definition.next_content_id or "") ~= "" then
+        target = 200
+    end
     local inventory = event_bus.request(
         events.CONTENT_INVENTORY_GET_REQUEST,
         { player_id = player_id }
@@ -53,6 +57,10 @@ local function snapshot(player_id)
         growth_intellect = current.growth_intellect,
         attack_gain_per_attack =
             tonumber(definition.attack_gain_per_attack) or 0,
+        damage_gain_attack = (current.series_id == "epic_icefire"
+            or current.series_id == "legend_abyss") and 20 or 0,
+        damage_gain_all_attributes = (current.series_id == "epic_icefire"
+            or current.series_id == "legend_abyss") and 5 or 0,
     }
 end
 
@@ -160,7 +168,8 @@ end
 local function on_attack_landed(payload)
     local player_id = tonumber(payload.player_id)
     local data = snapshot(player_id)
-    if data.series_id == "epic_icefire" or data.series_id == "legend_abyss" then
+    if data.series_id == "ice_blade" or data.series_id == "epic_icefire"
+        or data.series_id == "legend_abyss" then
         return
     end
     local multiplier = technology_stat_manager.training_room_multiplier(

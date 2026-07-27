@@ -8,6 +8,6 @@ recipe_molten_core_02_to_03,material_molten_core_03,1,combine_3_to_1,1,ok,
 recipe_infernal_01_to_02,equipment_infernal_armor_02,1,equipment_upgrade,1,description_inferred,
 recipe_infernal_02_to_03,equipment_infernal_armor_03,1,equipment_upgrade,1,description_inferred,
 recipe_infernal_03_to_04,equipment_infernal_armor_04,1,equipment_upgrade,1,description_inferred,
-recipe_infernal_04_to_max,equipment_infernal_armor_max,1,equipment_upgrade,1,description_inferred,原表Lv4描述中核心等级疑似笔误，需确认。
+recipe_infernal_04_to_max,equipment_infernal_armor_max,1,equipment_upgrade,1,ok,需求已确认：狱火熔铠Lv4＋熔火核心Lv4自动合成狱火熔铠Lvmax。
 recipe_frost_max_crystal_gem_to_ice_01,weapon_ice_blade_01,1,synthesis,1,ok,
 recipe_ice_infernal_ember_to_epic,weapon_epic_icefire_00,1,synthesis,1,ok,

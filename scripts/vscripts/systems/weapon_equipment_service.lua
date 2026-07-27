@@ -9,6 +9,10 @@ local M = {}
 local state_by_player = {}
 local material_shells = {
     material_synthesis_gem = "item_survival_synthesis_gem_shell",
+    material_molten_core_01 = "item_survival_molten_core_01_shell",
+    material_molten_core_02 = "item_survival_molten_core_02_shell",
+    material_molten_core_03 = "item_survival_molten_core_03_shell",
+    material_molten_core_04 = "item_survival_molten_core_04_shell",
     material_ice_soul_ember = "item_survival_ice_soul_ember_shell",
 }
 
@@ -54,9 +58,13 @@ end
 local function remove_content_shell(current, content_id)
     local item = current.content_shells[content_id]
     if not valid_entity(item) then
+        print("[INVENTORY_SHELL_REMOVE_STALE] content_id=" .. tostring(content_id))
         current.content_shells[content_id] = nil
         return
     end
+    print(string.format(
+        "[INVENTORY_SHELL_REMOVE] content_id=%s entindex=%s",
+        tostring(content_id), tostring(item:entindex())))
     publish_item_identity(item, content_id, true)
     if valid_entity(current.hero) and current.hero.RemoveItem then
         pcall(current.hero.RemoveItem, current.hero, item)
@@ -95,7 +103,87 @@ local function add_content_shell(current, content_id, definition, quantity)
     end
     current.hero:AddItem(item)
     current.content_shells[content_id] = item
+    print(string.format(
+        "[INVENTORY_SHELL_ADD] player=%s content_id=%s entindex=%s item_name=%s quantity=%s",
+        tostring(current.hero:GetPlayerOwnerID()), tostring(content_id),
+        tostring(item:entindex()), tostring(item_name), tostring(quantity)))
     return item
+end
+
+local function visible_item_slot(hero, item)
+    if not valid_entity(hero) or not valid_entity(item) then return -1 end
+    for slot = 0, 8 do
+        if hero:GetItemInSlot(slot) == item then return slot end
+    end
+    return -1
+end
+
+-- A challenge reward has already occupied a visible equipment slot when the
+-- engine publishes dota_item_picked_up. Adopt that exact entity as the
+-- material shell instead of deleting it and hoping AddItem can create another
+-- visible shell. Logical inventory remains authoritative for quantity and
+-- recipe consumption.
+local function adopt_content_shell(payload)
+    local player_id = tonumber(payload.player_id)
+    local content_id = tostring(payload.content_id or "")
+    local hero = payload.hero
+    local item = payload.item
+    local definition = content.by_id[content_id]
+    if player_id == nil or player_id < 0 or not material_shells[content_id]
+        or not definition or not valid_entity(hero) or not valid_entity(item) then
+        return { ok = false, error = "content_shell_adopt_invalid" }
+    end
+    if hero:GetPlayerOwnerID() ~= player_id then
+        return { ok = false, error = "content_shell_adopt_owner_mismatch" }
+    end
+    local slot = visible_item_slot(hero, item)
+    if slot < 0 then
+        return { ok = false, error = "content_shell_adopt_not_visible" }
+    end
+
+    local current = state(player_id)
+    if valid_entity(current.hero) and current.hero ~= hero then
+        return { ok = false, error = "content_shell_adopt_hero_mismatch" }
+    end
+    current.hero = hero
+    local existing = current.content_shells[content_id]
+    if valid_entity(existing) and existing ~= item then
+        return {
+            ok = true,
+            adopted = false,
+            merged = true,
+            entindex = existing:entindex(),
+        }
+    end
+
+    item.survival_content_id = content_id
+    item.survival_owner_player_id = player_id
+    current.content_shells[content_id] = item
+    publish_item_identity(item, content_id, false)
+    if item.SetAbilityTextureName and tostring(definition.icon_name or "") ~= "" then
+        pcall(item.SetAbilityTextureName, item, tostring(definition.icon_name))
+    end
+    return {
+        ok = true,
+        adopted = true,
+        slot = slot,
+        entindex = item:entindex(),
+    }
+end
+
+local function release_content_shell(payload)
+    local player_id = tonumber(payload.player_id)
+    local content_id = tostring(payload.content_id or "")
+    local item = payload.item
+    if player_id == nil or player_id < 0 or content_id == "" then
+        return { ok = false, error = "content_shell_release_invalid" }
+    end
+    local current = state(player_id)
+    if current.content_shells[content_id] == item then
+        current.content_shells[content_id] = nil
+    end
+    if valid_entity(item) then publish_item_identity(item, content_id, false) end
+    return { ok = true }
 end
 
 local function should_use_content_shell(content_id, definition)
@@ -114,6 +202,12 @@ end
 local function sync_content_shells(player_id, counts)
     local current = state(player_id)
     current.inventory_counts = counts or {}
+    local before = {}
+    for content_id, item in pairs(current.content_shells) do
+        before[#before + 1] = tostring(content_id) .. "@"
+            .. tostring(valid_entity(item) and item:entindex() or "invalid")
+    end
+    table.sort(before)
     for content_id in pairs(current.content_shells) do
         local definition = weapons.by_id[content_id] or content.by_id[content_id]
         if (tonumber(current.inventory_counts[content_id]) or 0) <= 0
@@ -137,6 +231,18 @@ local function sync_content_shells(player_id, counts)
                 ))
             end
         end
+    end
+    local after = {}
+    for content_id, item in pairs(current.content_shells) do
+        after[#after + 1] = tostring(content_id) .. "@"
+            .. tostring(valid_entity(item) and item:entindex() or "invalid")
+    end
+    table.sort(after)
+    if table.concat(before, ",") ~= table.concat(after, ",") then
+        print(string.format(
+            "[INVENTORY_SHELL_SYNC] player=%s before=%s after=%s",
+            tostring(player_id), #before > 0 and table.concat(before, ",") or "empty",
+            #after > 0 and table.concat(after, ",") or "empty"))
     end
 end
 
@@ -364,8 +470,17 @@ end
 function M.init()
     state_by_player = {}
     event_bus.handle_request(events.WEAPON_EQUIPMENT_GET_REQUEST, get_equipment)
+    event_bus.handle_request(
+        events.INVENTORY_ITEM_SHELL_ADOPT_REQUEST,
+        adopt_content_shell
+    )
+    event_bus.handle_request(
+        events.INVENTORY_ITEM_SHELL_RELEASE_REQUEST,
+        release_content_shell
+    )
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_inventory_changed)
     event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_growth_changed)
+    event_bus.subscribe(events.EQUIPMENT_GROWTH_CHANGED, on_growth_changed)
     event_bus.subscribe(
         events.POLAR_CRYSTAL_PROGRESS_CHANGED,
         on_polar_crystal_progress

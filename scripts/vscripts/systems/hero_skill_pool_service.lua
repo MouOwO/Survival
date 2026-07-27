@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local skills = require("config/generated/hero_skill_definitions")
+local passive_skills = require("config/hero_passive_skill_definitions")
 local pool_members = require("config/generated/hero_skill_pool_members")
 
 local M = {}
@@ -113,6 +114,8 @@ end
 
 local function project(item)
     local definition = item.definition
+    local passive = passive_skills.by_id[definition.skill_id]
+    local next_level = item.current_level + 1
     return {
         skill_id = definition.skill_id,
         ability_name = definition.ability_name,
@@ -123,6 +126,17 @@ local function project(item)
         next_level = item.current_level + 1,
         max_level = tonumber(definition.max_level) or 1,
         is_upgrade = item.current_level > 0 and 1 or 0,
+        passive = passive and 1 or 0,
+        trigger_type = passive and passive.trigger_type or "",
+        trigger_chance = passive and passive.trigger_chance[next_level] or 0,
+        damage_multiplier = passive and passive.damage_multiplier[next_level] or 0,
+        effect = passive and passive.level_text[next_level] or definition.description,
+        current_trigger_chance = passive and item.current_level > 0
+            and passive.trigger_chance[item.current_level] or 0,
+        current_damage_multiplier = passive and item.current_level > 0
+            and passive.damage_multiplier[item.current_level] or 0,
+        current_effect = passive and item.current_level > 0
+            and passive.level_text[item.current_level] or "",
     }
 end
 

@@ -49,7 +49,8 @@ function M.evaluate(player_id, entry, context)
     local research_authoritative = context.research_service_authoritative == true
         and entry.contenttype == "technology"
 
-    if not context.gold_mine_ability and context.ui_mode == "research" then
+    if context.debug_all_unlocked ~= true
+        and not context.gold_mine_ability and context.ui_mode == "research" then
         if entry.contenttype ~= "technology"
             and entry.contenttype ~= "technology_service" then
             return false, "该内容不属于研究所", count
@@ -57,7 +58,8 @@ function M.evaluate(player_id, entry, context)
         if entry.contenttype == "technology" and hero_technology(entry) then
             return false, "英雄科技请在商店中研究", count
         end
-    elseif not context.gold_mine_ability then
+    elseif context.debug_all_unlocked ~= true
+        and not context.gold_mine_ability then
         if entry.contenttype == "technology_service" then
             return false, "科技解锁服务请在研究所中使用", count
         end
@@ -74,7 +76,8 @@ function M.evaluate(player_id, entry, context)
             count
     end
     if entry.requires_hero_summoned
-        and context.hero_summoned ~= true then
+        and context.hero_summoned ~= true
+        and context.debug_all_unlocked ~= true then
         return false, "请先在英雄祭坛召唤英雄", count
     end
     if limit > 0 and count >= limit then
@@ -94,7 +97,8 @@ function M.evaluate(player_id, entry, context)
         -- Gold-mine technologies are intentionally purchased from the mine's
         -- W/E abilities. Ownership of the casting mine is validated by the
         -- shop system, so they must not depend on the research service.
-        if not context.gold_mine_ability then
+        if not context.gold_mine_ability
+            and context.debug_all_unlocked ~= true then
             if entry.technology_track == "advanced_researcher" then
                 if context.advanced_researcher_unlocked ~= true then
                     return false, "需要先解锁高级研究员服务", count
@@ -106,10 +110,14 @@ function M.evaluate(player_id, entry, context)
         local levels = context.technology_levels and context.technology_levels[player_id] or {}
         local current = tonumber(levels[definition.technology_group]) or 0
         local next_level = tonumber(definition.level) or 0
-        if not research_authoritative and next_level ~= current + 1 then
+        if not research_authoritative
+            and context.debug_all_unlocked ~= true
+            and next_level ~= current + 1 then
             return false, current >= (tonumber(definition.max_level) or 0) and "已达到最高等级" or "请先完成前一级科技", current
         end
-        if not research_authoritative and entry.technology_track == "advanced" then
+        if not research_authoritative
+            and context.debug_all_unlocked ~= true
+            and entry.technology_track == "advanced" then
             local basic_level = tonumber(
                 levels[entry.unlock_technology_group] or 0
             ) or 0
@@ -133,28 +141,33 @@ function M.evaluate(player_id, entry, context)
             return false, "已达到最高等级", count
         end
     end
-    if context.city_level < entry.min_city_level then
+    if context.debug_all_unlocked ~= true
+        and context.city_level < entry.min_city_level then
         return false,
             "需要主城达到Lv." .. tostring(entry.min_city_level),
             count
     end
-    if entry.requires_vip and context.vip ~= true then
+    if context.debug_all_unlocked ~= true
+        and entry.requires_vip and context.vip ~= true then
         return false, "需要VIP权限", count
     end
-    if not research_authoritative
+    if context.debug_all_unlocked ~= true
+        and not research_authoritative
         and context.rebirth_level < entry.required_rebirth_level then
         return false,
             "需要完成" ..
             tostring(entry.required_rebirth_level) .. "转",
             count
     end
-    if entry.requires_building_id ~= ""
+    if context.debug_all_unlocked ~= true
+        and entry.requires_building_id ~= ""
         and (context.building_counts[entry.requires_building_id] or 0) < 1 then
         return false,
             "需要建筑：" .. entry.requires_building_id,
             count
     end
-    if entry.requires_content_id ~= ""
+    if context.debug_all_unlocked ~= true
+        and entry.requires_content_id ~= ""
         and not context.gold_mine_ability
         and not owned(context, entry.requires_content_id) then
         return false,
@@ -171,11 +184,16 @@ function M.evaluate(player_id, entry, context)
             context,
             "weapon_legend_abyss_"
         )
-        if abyss_stage == nil then
+        if abyss_stage == nil and context.debug_all_unlocked ~= true then
             return false, "需要持有【传说：深渊审判】才能进入罪渊第一层", count
         end
-        if abyss_stage >= 10 then
-            return false, "【传说：深渊审判】已达到+10，罪渊挑战已完成", count
+        local completion_limit = math.max(
+            1,
+            tonumber(definition.completion_limit) or 10
+        )
+        if abyss_stage ~= nil and abyss_stage >= completion_limit then
+            return false, "【传说：深渊审判】已达到+"
+                .. tostring(completion_limit) .. "，罪渊挑战已完成", count
         end
     end
     if entry.grant_type == "start_encounter"
@@ -184,9 +202,14 @@ function M.evaluate(player_id, entry, context)
             context,
             "weapon_legend_abyss_"
         )
-        if abyss_stage ~= nil then
+        if abyss_stage ~= nil and context.debug_all_unlocked ~= true then
             return false, "冰火裁决已升阶，七宗罪入口已关闭", count
         end
+    end
+    if entry.contenttype == "challenge"
+        and context.active_challenge_encounters
+        and context.active_challenge_encounters[entry.encounter_id] then
+        return true, "", count
     end
     if not research_authoritative and number(resources.wood) < entry.woodcost then
         return false, "木材不足", count

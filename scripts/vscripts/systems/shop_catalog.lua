@@ -4,6 +4,7 @@ local aggregation = require("config/generated/shop_aggregation_rules")
 local evaluator = require("systems/shop_condition_evaluator")
 local research_config = require("config/research_technology_config")
 local research_description = require("research/research_technology_description")
+local challenge_runtime_rules = require("config/challenge_runtime_rules")
 
 local M = {}
 
@@ -199,9 +200,11 @@ local function rebuild()
     entries_by_id = {}
     for _, rule in ipairs(aggregation.rows or {}) do
         if rule.enabled ~= false then
-            for _, row in ipairs(
-                load_source(rule.module_name).rows or {}
-            ) do
+            local source = load_source(rule.module_name)
+            if rule.source_id == "challenge" then
+                challenge_runtime_rules.apply(source)
+            end
+            for _, row in ipairs(source.rows or {}) do
                 local entry = make_entry(rule, row)
                 if entry then
                     table.insert(entries, entry)
@@ -307,7 +310,14 @@ local function project_entry(player_id, entry, context)
         stage = tonumber(entry.definition.stage) or 0,
         sort_order = entry.order,
         fields = entry.fields,
+        challenge_active = context.active_challenge_encounters
+            and context.active_challenge_encounters[entry.encounter_id]
+            and 1 or 0,
     }
+    if item.challenge_active == 1 then
+        item.wood_cost = 0
+        item.gold_cost = 0
+    end
     local research = research_config.by_legacy_group[
         entry.definition.technology_group
     ]
@@ -343,9 +353,9 @@ local function project_entry(player_id, entry, context)
         if target_level ~= current_level + 1
             or current_level >= research.max_level then
             locked_reason = "已达到最高等级"
-        elseif not prerequisite_met then
+        elseif not prerequisite_met and context.debug_all_unlocked ~= true then
             locked_reason = "前置科技等级不足"
-        elseif not reincarnation_met then
+        elseif not reincarnation_met and context.debug_all_unlocked ~= true then
             locked_reason = "转生等级不足"
         elseif number((context.resources or {}).gold) < item.gold_cost then
             locked_reason = "金币不足"
@@ -382,20 +392,30 @@ function M.build_snapshot(player_id, context)
     local projected = {}
     for _, entry in ipairs(entries) do
         local item = project_entry(player_id, entry, context)
-        local include = item and item.purchasable == 1
+        -- Challenge entrances remain visible while locked. Players can see
+        -- the abyss prerequisite/completion state instead of having its card
+        -- disappear before the first run or after the tenth clear.
+        -- Resource shortages and purchase limits change availability, not the
+        -- shop's structure. Keep ordinary entries projected as disabled cards;
+        -- otherwise spending the last resources makes the incremental patch
+        -- remove every unaffordable item and leaves the category visually empty.
+        local include = item ~= nil
         local group = entry.definition
             and entry.definition.technology_group or ""
         local hero_technology = string.match(
             group,
             "^researcher_hero_"
         ) ~= nil
-        local scope_allowed = context.ui_mode == "research"
+        local scope_allowed = context.debug_all_unlocked == true
+            or context.ui_mode == "research"
             and (entry.contenttype == "technology_service"
                 or entry.contenttype == "technology" and not hero_technology)
             or context.ui_mode ~= "research"
                 and (entry.contenttype ~= "technology" or hero_technology)
         if entry.contenttype == "technology_service" then
-            if entry.contentid == "advanced_researcher_unlock" then
+            if context.debug_all_unlocked == true then
+                include = true
+            elseif entry.contentid == "advanced_researcher_unlock" then
                 include = not context.advanced_researcher_unlocked
                     and (tonumber(context.city_level) or 0) >= 4
             else
@@ -406,8 +426,9 @@ function M.build_snapshot(player_id, context)
             -- Always project exactly the next rebirth challenge. Resource or
             -- building failures are shown as a disabled card instead of making
             -- 4-10 rebirth silently disappear from the shop.
-            include = (tonumber(entry.definition.rebirth_level) or 0)
-                == (tonumber(context.rebirth_level) or 0) + 1
+            include = context.debug_all_unlocked == true
+                or (tonumber(entry.definition.rebirth_level) or 0)
+                    == (tonumber(context.rebirth_level) or 0) + 1
         elseif entry.contenttype == "technology" then
             local current = tonumber(item.technology_level) or 0
             local level = tonumber(item.next_technology_level) or 0
@@ -431,7 +452,9 @@ function M.build_snapshot(player_id, context)
                 and context.advanced_researcher_unlocked == true
                 or entry.technology_track ~= "advanced_researcher"
                 and context.research_unlocked == true
-            include = not gold_mine_technology and unlocked
+            include = context.debug_all_unlocked == true
+                or not gold_mine_technology
+                and unlocked
                 and prerequisite_ready
                 and level == current + 1
                 and (research ~= nil

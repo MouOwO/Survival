@@ -74,7 +74,12 @@ foreach ($row in $rows) {
     }
     if ($endgameStats.ContainsKey($row.content_id)) {
         $row.base_health = [string]$endgameStats[$row.content_id][0]
-        $row.base_armor = [string]$endgameStats[$row.content_id][1]
+        $armorField = if ($headers -contains 'base_war3_armor') {
+            'base_war3_armor'
+        } else {
+            'base_armor'
+        }
+        $row.$armorField = [string]$endgameStats[$row.content_id][1]
         $row.base_attack_speed_pct = '400'
         $row.base_lifesteal_pct = '100'
     }
@@ -82,7 +87,12 @@ foreach ($row in $rows) {
     for ($column = 0; $column -lt $headers.Count; $column++) {
         $converted = Convert-LuaValue ([string]$row.($headers[$column])) $types[$column]
         if ($null -ne $converted) {
-            $parts.Add("$($headers[$column]) = $converted")
+            $luaHeader = if ($headers[$column] -eq 'base_armor') {
+                'base_war3_armor'
+            } else {
+                $headers[$column]
+            }
+            $parts.Add("$luaHeader = $converted")
         }
     }
     $lines.Add('    { ' + ($parts -join ', ') + ' },')

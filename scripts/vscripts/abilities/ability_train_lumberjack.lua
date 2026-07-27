@@ -9,7 +9,7 @@ function M:OnSpellStart()
         .. tostring(self:GetCaster():entindex()))
     event_bus.emit(events.WORKER_TRAIN_REQUEST, {
         city = self:GetCaster(),
-        training_id = "train_lumberjack_01",
+        training_id = "train_lumberjack_auto",
     })
 end
 

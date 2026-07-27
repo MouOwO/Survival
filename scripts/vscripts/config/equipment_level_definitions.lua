@@ -1,9 +1,15 @@
 -- 每个阶段都是完整效果快照；消费者不得从前级隐式继承。
+-- 护甲效果在配置、聚合和 UI 中始终保留 War3/CSV 单位，只有写入
+-- Dota Modifier 的引擎边界才允许换算。
+
 local M = {}
 
 local function effects(values)
     local result = {}
     for effect_type, value in pairs(values) do
+        if effect_type == "war3_armor_flat" then
+            effect_type = "armor_flat"
+        end
         result[#result + 1] = { effect_type = effect_type, value = value }
     end
     table.sort(result, function(a, b) return a.effect_type < b.effect_type end)
@@ -51,17 +57,17 @@ M.rows = {
     row("equipment_burning_blade_04", 4, nil, { attack_flat = 6000 }),
     row("equipment_burning_blade_max", 5, nil, { attack_flat = 8000 }),
 
-    row("equipment_iron_armor_01", 1, nil, { armor_flat = 10, health_flat = 5000 }),
-    row("equipment_iron_armor_02", 2, nil, { armor_flat = 30, health_flat = 10000 }),
-    row("equipment_iron_armor_03", 3, nil, { armor_flat = 50, health_flat = 20000 }),
-    row("equipment_iron_armor_04", 4, nil, { armor_flat = 70, health_flat = 30000 }),
-    row("equipment_iron_armor_max", 5, nil, { armor_flat = 100, health_flat = 50000 }),
+    row("equipment_iron_armor_01", 1, nil, { war3_armor_flat = 10, health_flat = 5000 }),
+    row("equipment_iron_armor_02", 2, nil, { war3_armor_flat = 30, health_flat = 10000 }),
+    row("equipment_iron_armor_03", 3, nil, { war3_armor_flat = 50, health_flat = 20000 }),
+    row("equipment_iron_armor_04", 4, nil, { war3_armor_flat = 70, health_flat = 30000 }),
+    row("equipment_iron_armor_max", 5, nil, { war3_armor_flat = 100, health_flat = 50000 }),
 
-    row("equipment_infernal_armor_01", 1, nil, { attack_flat = 20000, attack_speed_pct = 150, health_flat = 100000, armor_flat = 150, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
-    row("equipment_infernal_armor_02", 2, nil, { attack_flat = 30000, attack_speed_pct = 200, health_flat = 200000, armor_flat = 200, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
-    row("equipment_infernal_armor_03", 3, nil, { attack_flat = 50000, attack_speed_pct = 250, health_flat = 300000, armor_flat = 250, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
-    row("equipment_infernal_armor_04", 4, nil, { attack_flat = 70000, attack_speed_pct = 300, health_flat = 500000, armor_flat = 300, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
-    row("equipment_infernal_armor_max", 5, nil, { attack_flat = 100000, attack_speed_pct = 400, health_flat = 800000, armor_flat = 400, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
+    row("equipment_infernal_armor_01", 1, nil, { attack_flat = 20000, attack_speed_pct = 150, health_flat = 100000, war3_armor_flat = 150, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
+    row("equipment_infernal_armor_02", 2, nil, { attack_flat = 30000, attack_speed_pct = 200, health_flat = 200000, war3_armor_flat = 200, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
+    row("equipment_infernal_armor_03", 3, nil, { attack_flat = 50000, attack_speed_pct = 250, health_flat = 300000, war3_armor_flat = 250, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
+    row("equipment_infernal_armor_04", 4, nil, { attack_flat = 70000, attack_speed_pct = 300, health_flat = 500000, war3_armor_flat = 300, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
+    row("equipment_infernal_armor_max", 5, nil, { attack_flat = 100000, attack_speed_pct = 400, health_flat = 800000, war3_armor_flat = 400, aura_attribute_damage = { radius = 200, interval = 1, multiplier = 1 } }),
 }
 
 -- 完整阶段快照；史诗+7源数值缺失，保留ID但关闭，绝不外推。
@@ -70,7 +76,7 @@ local epic_health = { 800000, 850000, 900000, 1000000, 1000000, 1000000, 1000000
 local epic_armor = { 500, 550, 600, 650, 700, 750, 800 }
 local epic_attr = { 8000, 10000, 12000, 15000, 18000, 20000, 25000 }
 local function endgame_effects(attack, health, armor, attributes, source)
-    return effects({ attack_flat = attack, attack_speed_pct = 400, lifesteal_pct = 100, health_flat = health, armor_flat = armor, all_attributes_flat = attributes,
+    return effects({ attack_flat = attack, attack_speed_pct = 400, lifesteal_pct = 100, health_flat = health, war3_armor_flat = armor, all_attributes_flat = attributes,
         aura_attribute_damage = { range = 200, multiplier = 5, internal_cooldown = 1, stacking = "single_aura_per_source", source = source },
         attack_gain_on_attack = 20, attributes_gain_on_attack = 5,
         proc_attribute_damage = { probability = 10, range = 500, multiplier = 50, internal_cooldown = 0, stacking = "independent_proc_per_source", source = source } })

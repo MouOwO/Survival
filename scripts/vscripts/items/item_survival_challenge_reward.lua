@@ -20,9 +20,10 @@ function item_survival_challenge_reward:Claim(caster)
         })
         return false
     end
-    -- The native pickup has temporarily occupied an inventory slot. Free it
-    -- before publishing the authoritative grant so the visual material shell
-    -- can always use that same slot. Keep this entity alive for rollback.
+    -- The generic ground reward temporarily occupies an inventory slot. Free
+    -- that slot, grant the authoritative material, then let the equipment
+    -- service create its persistent material shell in the same backpack. The
+    -- shell remains visible until a successful recipe transaction consumes it.
     if caster.RemoveItem then caster:RemoveItem(self) end
     local result = event_bus.request(events.CONTENT_INVENTORY_GRANT_REQUEST, {
         player_id = player_id,
@@ -46,6 +47,10 @@ function item_survival_challenge_reward:Claim(caster)
         tostring(self:entindex()),
         { content_id = content_id, removed = 1 }
     )
+    event_bus.emit(events.UI_NOTIFICATION, {
+        player_id = player_id,
+        message = "挑战奖励已放入背包（合成成功时才会消耗）",
+    })
     UTIL_Remove(self)
     return true
 end

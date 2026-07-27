@@ -3,6 +3,7 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local catalog = require("systems/shop_catalog")
 local grant_service = require("systems/shop_grant_service")
+local challenge_definitions = require("config/generated/challenge_definitions")
 local research_config = require("config/research_technology_config")
 local research_events = require("research/research_event_names")
 local M = {}
@@ -20,6 +21,7 @@ local function reset_state()
         sequence_by_player = {},
         snapshot_cache_by_player = {},
         pending_push_reason = {},
+        debug_all_unlocked = {},
     }
 end
 local function valid_player_id(player_id)
@@ -94,6 +96,25 @@ local function merge_technology_levels(player_id, incoming)
     end
     return levels
 end
+local function active_challenge_encounters(player_id)
+    local result = {}
+    for _, challenge in ipairs(challenge_definitions.rows or {}) do
+        local encounter_id = tostring(challenge.encounter_id or "")
+        if challenge.enabled ~= false and encounter_id ~= "" then
+            local current = event_bus.request(
+                events.MONSTER_ENCOUNTER_QUERY_REQUEST,
+                {
+                    player_id = player_id,
+                    encounter_id = encounter_id,
+                }
+            )
+            if current and current.ok and current.active then
+                result[encounter_id] = true
+            end
+        end
+    end
+    return result
+end
 local function snapshot_context(player_id, reason, mode)
     local team = player_team(player_id)
     local summon = summon_snapshot(player_id)
@@ -125,9 +146,11 @@ local function snapshot_context(player_id, reason, mode)
         vip = entitlement.vip == 1,
         rebirth_level = tonumber(progression.rebirth_level) or 0,
         owned_content = owned_content(player_id),
+        active_challenge_encounters = active_challenge_encounters(player_id),
         technology_levels = state.technology_by_player,
         research_unlocked = state.research_unlocked[player_id] == true,
         advanced_researcher_unlocked = state.advanced_researcher_unlocked[player_id] == true,
+        debug_all_unlocked = state.debug_all_unlocked[player_id] == true,
         ui_mode = mode or state.opened_players[player_id] or "shop",
     }
 end
@@ -264,7 +287,8 @@ local function open_shop(payload)
         end
     else
         local summon = summon_snapshot(player_id)
-        if summon.hero_summoned ~= 1 then
+        if summon.hero_summoned ~= 1
+            and state.debug_all_unlocked[player_id] ~= true then
             return { ok = false, error = "请先在英雄祭坛召唤英雄" }
         end
     end
@@ -334,6 +358,29 @@ local function purchase(payload)
         return { ok = false, error = "金矿科技只能通过金矿技能升级" }
     end
     local team = player_team(player_id)
+    -- Re-entering an unfinished normal challenge only teleports the hero back
+    -- to its existing session. It must not charge the entrance fee again and
+    -- therefore runs before resource validation. Rebirth encounters retain
+    -- their one-completion flow.
+    if entry.contenttype == "challenge"
+        and entry.grant_type == "start_encounter" then
+        local current = event_bus.request(
+            events.MONSTER_ENCOUNTER_QUERY_REQUEST,
+            {
+                player_id = player_id,
+                encounter_id = entry.encounter_id,
+            }
+        )
+        if current and current.ok and current.active then
+            local resumed = grant_service.grant(player_id, team, entry, state)
+            return resumed and resumed.ok and {
+                ok = true,
+                entry_id = entry.entryid,
+                grant_result = resumed,
+                resumed_without_charge = true,
+            } or (resumed or { ok = false, error = "encounter_resume_failed" })
+        end
+    end
     local context = snapshot_context(
         player_id,
         "purchase_validation",
@@ -503,10 +550,35 @@ local function on_building_destroyed(payload)
     push_team(payload.team, "building_destroyed")
 end
 local function on_player_changed(payload)
+    -- Abyss weapon synthesis happens synchronously on the boss kill. Delay its
+    -- shop projection to the configured two-second kill refresh instead of
+    -- changing the entrance while the teleport/purchase flow is still closing.
+    if tostring(payload and payload.reason or ""):find(
+        "challenge_material_synthesis:",
+        1,
+        true
+    ) == 1 then
+        return
+    end
     push_snapshot(payload.player_id, payload.reason or "player_changed")
 end
 local function on_resource_changed(payload)
     push_team(payload.team, "resource_changed")
+end
+local function on_monster_killed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local encounter_id = tostring(payload and payload.encounter_id or "")
+    if not valid_player_id(player_id)
+        or not encounter_id:find("encounter_challenge_", 1, true) then
+        return
+    end
+    local victim = payload and payload.victim
+    local kill_id = victim and victim.entindex
+        and tostring(victim:entindex()) or DoUniqueString("challenge_kill")
+    scheduler.after(2, function()
+        push_snapshot(player_id, "challenge_kill_refresh")
+    end, "shop_challenge_kill_refresh:" .. tostring(player_id)
+        .. ":" .. encounter_id .. ":" .. kill_id)
 end
 local function get_technology_state(payload)
     local player_id = tonumber(payload and payload.player_id)
@@ -519,6 +591,22 @@ local function get_technology_state(payload)
         advanced_researcher_unlocked =
             state.advanced_researcher_unlocked[player_id] == true,
         levels = state.technology_by_player[player_id] or {},
+    }
+end
+
+local function set_debug_unlock(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if not valid_player_id(player_id) then
+        return { ok = false, error = "player_id_invalid" }
+    end
+    state.debug_all_unlocked[player_id] = payload.unlocked ~= false
+    push_snapshot(player_id, "cheat_shop_unlock")
+    print(string.format("[SHOP_DEBUG_UNLOCK] player=%s unlocked=%s",
+        tostring(player_id), tostring(state.debug_all_unlocked[player_id])))
+    return {
+        ok = true,
+        player_id = player_id,
+        unlocked = state.debug_all_unlocked[player_id],
     }
 end
 
@@ -537,6 +625,7 @@ function M.init()
     event_bus.handle_request(events.SHOP_OPEN_REQUEST, open_shop)
     event_bus.handle_request(events.SHOP_CLOSE_REQUEST, close_shop)
     event_bus.handle_request(events.SHOP_PURCHASE_REQUEST, purchase)
+    event_bus.handle_request(events.SHOP_DEBUG_UNLOCK_REQUEST, set_debug_unlock)
     event_bus.handle_request(
         events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,
         purchase_next_technology
@@ -553,6 +642,7 @@ function M.init()
     event_bus.subscribe(events.PLAYER_ENTITLEMENT_CHANGED, on_player_changed)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_player_changed)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_player_changed)
+    event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
     event_bus.subscribe(research_events.LEVEL_CHANGED, on_research_level_changed)
 end
 return M

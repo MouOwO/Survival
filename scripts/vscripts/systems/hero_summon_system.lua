@@ -69,10 +69,10 @@ local function publish(player_id, reason)
     })
 end
 
-local function summon_position(altar, definition)
+local function summon_position(anchor, definition)
     local offset = tonumber(definition.spawn_offset) or 260
-    return altar:GetAbsOrigin()
-        + altar:GetForwardVector() * offset
+    return anchor:GetAbsOrigin()
+        + anchor:GetForwardVector() * offset
 end
 
 local function create_hero(player_id, team, altar, definition)
@@ -89,8 +89,19 @@ local function create_hero(player_id, team, altar, definition)
         return nil
     end
 
+    -- CreateUnitByName gives control but does not reliably assign the player
+    -- identity used by GetPlayerOwnerID. Challenge pickup ownership and other
+    -- hero systems require the summoned hero to report the real player ID.
+    if unit.SetPlayerID then unit:SetPlayerID(player_id) end
+    local player = PlayerResource:GetPlayer(player_id)
+    if player and unit.SetOwner then unit:SetOwner(player) end
     unit:SetControllableByPlayer(player_id, true)
     FindClearSpaceForUnit(unit, position, true)
+
+    print(string.format(
+        "[HERO_SUMMON_OWNER_ASSIGNED] player=%s reported_owner=%s entindex=%s",
+        tostring(player_id), tostring(unit:GetPlayerOwnerID()),
+        tostring(unit:entindex())))
 
     ability_utils.remove_all(unit)
     if unit.SetAbilityPoints then
@@ -110,7 +121,7 @@ local function create_hero(player_id, team, altar, definition)
     return unit
 end
 
-local function validate(player_id, hero_id)
+local function validate(player_id, hero_id, debug_bypass)
     if not valid_player_id(player_id) then
         return nil, nil, "player_id_invalid"
     end
@@ -120,10 +131,16 @@ local function validate(player_id, hero_id)
 
     local team = PlayerResource:GetTeam(player_id)
     local altar = altar_by_team[team]
+    if debug_bypass and not valid_entity(altar) then
+        altar = builder_by_player[player_id]
+        if not valid_entity(altar) then
+            altar = PlayerResource:GetSelectedHeroEntity(player_id)
+        end
+    end
     if not valid_entity(altar) then
         return nil, nil, "英雄祭坛尚未建造"
     end
-    if (city_level_by_team[team] or 0)
+    if not debug_bypass and (city_level_by_team[team] or 0)
         < (tonumber(rule().requires_city_level) or 3) then
         return nil, nil, "主城等级不足"
     end
@@ -135,6 +152,7 @@ local function validate(player_id, hero_id)
 
     local entitlement = projection.entitlements(player_id)
     if definition.vip_required == true
+        and not debug_bypass
         and entitlement.vip ~= 1 then
         return nil, nil, "需要VIP权限"
     end
@@ -145,7 +163,7 @@ local function summon(payload)
     local player_id = tonumber(payload.player_id)
     local hero_id = tostring(payload.hero_id or "")
     local altar, definition, error_code =
-        validate(player_id, hero_id)
+        validate(player_id, hero_id, payload.debug_bypass == true)
     if error_code then
         return { ok = false, error = error_code }
     end
@@ -177,7 +195,8 @@ local function summon(payload)
         unit_name = definition.unit_name,
         display_name = definition.display_name,
     })
-    publish(player_id, "hero_summoned")
+    publish(player_id, payload.debug_bypass == true
+        and "cheat_hero_summoned" or "hero_summoned")
 
     return {
         ok = true,

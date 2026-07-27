@@ -12,6 +12,7 @@ local equipment_stat_aggregation_service =
     require("systems/equipment_stat_aggregation_service")
 local triggered_proc_service = require("systems/triggered_proc_service")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local hero_combat_stat_math = require("systems/hero_combat_stat_math")
 
 local M = {}
 local state_by_player = {}
@@ -125,21 +126,26 @@ local function base_snapshot(unit, definition)
             safe_get(unit, "GetBaseIntellect", safe_get(unit, "GetIntellect", 0))
         ) + all_bonus,
     }
-    local damage_multiplier = value(definition, "damage_multiplier", 1)
-        * global_rules.number("hero_meta_damage_multiplier", 1)
     local fallback_min = safe_get(unit, "GetBaseDamageMin", 0)
     local fallback_max = safe_get(unit, "GetBaseDamageMax", 0)
     stats.attack_min = value(
         definition,
         "base_damage_min",
         fallback_min
-    ) * damage_multiplier
+    )
     stats.attack_max = value(
         definition,
         "base_damage_max",
         fallback_max
-    ) * damage_multiplier
+    )
     return stats
+end
+
+local function configured_damage_multiplier(definition)
+    return hero_combat_stat_math.damage_multiplier(
+        definition,
+        global_rules.number("hero_meta_damage_multiplier", 1)
+    )
 end
 
 local function primary_engine_attribute(unit, projected)
@@ -157,11 +163,10 @@ local function apply_base_projection(state)
         safe_call(unit, "SetBaseAgility", 0)
         safe_call(unit, "SetBaseIntellect", 0)
         safe_call(unit, "CalculateStatBonus", true)
-        -- CSV base_damage is engine base damage. Do not subtract the primary
-        -- attribute here: doing so produced negative base damage for heroes such
-        -- as Juggernaut (20 - 100 agility), which could resolve attacks as zero.
-        local minimum = math.max(0, state.base.attack_min)
-        local maximum = math.max(minimum, state.base.attack_max)
+        -- Keep the legacy damage multiplier on native basic attacks while the
+        -- logical/UI attack remains the unmultiplied CSV value.
+        local minimum = math.max(0, state.engine_base_attack_min)
+        local maximum = math.max(minimum, state.engine_base_attack_max)
         safe_call(unit, "SetBaseDamageMin", minimum)
         safe_call(unit, "SetBaseDamageMax", maximum)
         safe_call(unit, "CalculateStatBonus", true)
@@ -227,16 +232,11 @@ local function recalculate(player_id, reason)
     local agility_bonus = unscaled_agility * essence_attributes_pct / 100
     local intellect_bonus = unscaled_intellect * essence_attributes_pct / 100
     local base_attack_time = math.max(0.1,
-        (tonumber(state.engine_base_attack_time) or 2)
-            - (tonumber(essence.attack_interval_flat) or 0))
-    local seconds_per_attack = safe_get(state.unit, "GetSecondsPerAttack", 0)
-    if seconds_per_attack <= 0 then
-        local base_attack_time = math.max(
-            0.01, safe_get(state.unit, "GetBaseAttackTime", 2)
-        )
-        seconds_per_attack = base_attack_time
-            / math.max(0.01, 1 + equipment_stats.attack_speed_pct / 100)
-    end
+        hero_combat_stat_math.configured_base_attack_time(
+            state.definition,
+            state.engine_base_attack_time
+        ) - (tonumber(essence.attack_interval_flat) or 0))
+    local hero_damage_multiplier = state.damage_multiplier
     local next_snapshot = {
         player_id = player_id,
         hero_id = state.hero_id,
@@ -270,10 +270,15 @@ local function recalculate(player_id, reason)
             tonumber(essence.armor_reduction_per_attack) or 0,
         progression_all_attributes = progression_attributes,
         base_attack_time = base_attack_time,
+        hero_damage_multiplier = hero_damage_multiplier,
         debug_attack_override = debug_attack or 0,
-        armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
-        -- attack_speed 表示每秒攻击次数，与装备攻速百分比使用同一权威数据。
-        attack_speed = 1 / math.max(0.01, seconds_per_attack),
+        runtime_armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
+        -- 配置值使用“每秒攻击次数”。由配置 BAT、固定间隔变化和装备
+        -- 攻速百分比直接投影，避免读取引擎当前帧临时攻击间隔。
+        attack_speed = hero_combat_stat_math.attacks_per_second(
+            base_attack_time,
+            equipment_stats.attack_speed_pct
+        ),
         attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100),
         strength = unscaled_strength + strength_bonus,
         agility = unscaled_agility + agility_bonus,
@@ -289,14 +294,22 @@ local function recalculate(player_id, reason)
         forging_hammer_count = value(growth, "forging_hammer_count", 0),
         progress_per_attack = value(growth, "progress_per_attack", 1),
         attack_gain_per_attack = value(growth, "attack_gain_per_attack", 0),
+        damage_gain_attack = value(growth, "damage_gain_attack", 0),
+        damage_gain_all_attributes = value(
+            growth,
+            "damage_gain_all_attributes",
+            0
+        ),
         equipment_attack = equipment_stats.attack_flat,
-        engine_research_attack_bonus = ((state.base.attack_min
-            + state.base.attack_max + weapon_attack_min + weapon_attack_max)
+        engine_research_attack_bonus = ((state.engine_base_attack_min
+            + state.engine_base_attack_max
+            + weapon_attack_min + weapon_attack_max)
             * 0.5) * (researcher_attack_pct + essence_attack_pct) / 100
             + researcher_attack_flat,
         engine_weapon_attack_bonus = debug_attack
             and (debug_attack
-                - ((state.base.attack_min + state.base.attack_max) * 0.5)
+                - ((state.engine_base_attack_min
+                    + state.engine_base_attack_max) * 0.5)
                 - equipment_stats.attack_flat)
             or ((weapon_attack_min + weapon_attack_max) * 0.5),
         equipment_attack_speed_pct = equipment_stats.attack_speed_pct,
@@ -351,11 +364,22 @@ end
 
 local function on_hero_summoned(payload)
     local definition = heroes.by_id[payload.hero_id] or {}
+    local base = base_snapshot(payload.unit, definition)
+    local damage_multiplier = configured_damage_multiplier(definition)
     local state = {
         unit = payload.unit,
         hero_id = payload.hero_id,
         definition = definition,
-        base = base_snapshot(payload.unit, definition),
+        base = base,
+        damage_multiplier = damage_multiplier,
+        engine_base_attack_min = hero_combat_stat_math.engine_base_damage(
+            base.attack_min,
+            damage_multiplier
+        ),
+        engine_base_attack_max = hero_combat_stat_math.engine_base_damage(
+            base.attack_max,
+            damage_multiplier
+        ),
         engine_base_attack_time = safe_get(payload.unit, "GetBaseAttackTime", 2),
         snapshot = nil,
     }
@@ -397,7 +421,7 @@ local function on_changed(payload)
         "modifier_equipment_effects"
     )
     if state and state.unit then
-        hero_health_guard.preserve_current(state.unit, function()
+        hero_health_guard.preserve_missing(state.unit, function()
             if modifier and modifier.ForceRefresh then modifier:ForceRefresh() end
             safe_call(state.unit, "CalculateStatBonus", true)
         end, "equipment_refresh:" .. tostring(payload.reason or "changed"))
@@ -465,10 +489,18 @@ function M.init()
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_changed)
     event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_changed)
-    event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_changed)
+    -- CONTENT_INVENTORY_CHANGED subscribers are unordered. Refresh only after
+    -- the equipment aggregator has published its completed snapshot; otherwise
+    -- this service can read the previous armor value and leave the HUD stale.
+    event_bus.subscribe(events.EQUIPMENT_STATS_CHANGED, on_changed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
     event_bus.subscribe(events.SEVEN_SINS_ESSENCE_CHANGED, on_progression_changed)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_progression_changed)
 end
+
+M._test = {
+    base_snapshot = base_snapshot,
+    configured_damage_multiplier = configured_damage_multiplier,
+}
 
 return M

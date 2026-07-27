@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local technology_definitions = require("config/generated/technology_definitions")
 local technology_effects = require("config/technology_effect_config")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local combat_stat_projection = require("ui/combat_stat_projection")
 
 local M = {}
 
@@ -209,7 +210,7 @@ local function publish(payload)
     CustomNetTables:SetTableValue(
         "survival_combat_stats",
         "player_" .. tostring(player_id),
-        payload.snapshot
+        combat_stat_projection.for_ui(payload.snapshot)
     )
     -- NetTable is the single regular synchronization path. Selected-unit
     -- requests still use their direct response event for immediate feedback.

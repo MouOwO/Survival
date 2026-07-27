@@ -98,6 +98,15 @@ local function apply_effect(state, player_id, effect)
         event_bus.emit(events.HERO_SKILL_REWARD_REQUEST, {
             player_id = player_id,
             effect = effect,
+            trigger_level = state.rebirth_level,
+        })
+        return
+    end
+    if effect_type == "grant_skill_points" then
+        event_bus.request(events.HERO_SKILL_POINT_GRANT_REQUEST, {
+            player_id = player_id,
+            points = value,
+            source = "rebirth_reward",
         })
     end
 end
@@ -179,7 +188,7 @@ function M.init()
     )
     event_bus.subscribe(events.HERO_READY, on_hero_ready)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
-    event_bus.subscribe(events.WEAPON_ATTACK_LANDED, on_attack_landed)
+    event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_attack_landed)
 end
 
 return M

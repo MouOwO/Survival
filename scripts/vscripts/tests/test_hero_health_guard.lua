@@ -58,4 +58,38 @@ local dead = unit(0, 1000, false)
 guard.preserve_current(dead, function() dead.health = 1000 end)
 assert(dead.health == 1000, "death/respawn initialization must remain engine-owned")
 
+local full_buyer = unit(1000, 1000)
+guard.preserve_missing(full_buyer, function()
+    full_buyer.maximum = 6000
+    full_buyer.health = 6000
+end, "equipment_purchase_test")
+assert(full_buyer.health == 6000, "full hero must remain full after max-health purchase")
+
+local damaged_buyer = unit(600, 1000)
+guard.preserve_missing(damaged_buyer, function()
+    damaged_buyer.maximum = 6000
+    damaged_buyer.health = 6000
+end, "equipment_purchase_test")
+assert(damaged_buyer.health == 5600,
+    "max-health purchase must preserve the amount of health already missing")
+
+local scheduled = {}
+local previous_game_rules = GameRules
+local previous_scheduler = package.loaded["core/scheduler"]
+GameRules = { GetGameTime = function() return 0 end }
+package.loaded["core/scheduler"] = {
+    after = function(_, callback)
+        scheduled[#scheduled + 1] = callback
+    end,
+}
+local lifesteal = unit(500, 1000)
+guard.protect_value(lifesteal, 500, "lifesteal_regression")
+guard.allow_healing(lifesteal)
+lifesteal.health = 1000
+for _, callback in ipairs(scheduled) do callback() end
+assert(lifesteal.health == 1000,
+    "legitimate lifesteal must invalidate deferred health rollback")
+GameRules = previous_game_rules
+package.loaded["core/scheduler"] = previous_scheduler
+
 print("HERO_HEALTH_GUARD_PASS")

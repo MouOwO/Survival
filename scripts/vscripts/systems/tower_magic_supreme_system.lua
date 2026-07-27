@@ -7,21 +7,35 @@ local EFFECTS = {
     finger = {
         particle = "particles/units/heroes/hero_lion/lion_spell_finger_of_death.vpcf",
         sound = "Hero_Lion.FingerOfDeath",
+        sound_file = "soundevents/game_sounds_heroes/game_sounds_lion.vsndevts",
+        -- 死亡一指的粒子控制点与常规光束相反：0为目标，1为施法者。
+        source_control = 1,
+        target_control = 0,
     },
     laguna = {
         particle = "particles/units/heroes/hero_lina/lina_spell_laguna_blade.vpcf",
         sound = "Ability.LagunaBlade",
+        sound_file = "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts",
+        source_control = 0,
+        target_control = 1,
     },
     arcane = {
         -- 奥术至尊本身是被动技能，没有单独的攻击弹道。
         -- 使用拉比克绿色奥术伤害弹道表现最终阶段的4倍魔法攻击。
         particle = "particles/units/heroes/hero_rubick/rubick_fade_bolt.vpcf",
         sound = "Hero_Rubick.FadeBolt.Cast",
+        sound_file = "soundevents/game_sounds_heroes/game_sounds_rubick.vsndevts",
+        source_control = 0,
+        target_control = 1,
     },
 }
 
+local function exists(unit)
+    return unit and not unit:IsNull()
+end
+
 local function valid(unit)
-    return unit and not unit:IsNull() and unit:IsAlive()
+    return exists(unit) and unit:IsAlive()
 end
 
 local function skill_matching(skills, prefix)
@@ -45,18 +59,17 @@ local function attack_damage(tower)
 end
 
 local function play_effect(caster, target, effect)
-    if not valid(caster) or not valid(target) or not effect then return end
-    local ok, particle = pcall(function()
-        return ParticleManager:CreateParticle(
+    if not valid(caster) or not exists(target) or not effect then return end
+    local particle = nil
+    local ok, error_message = pcall(function()
+        particle = ParticleManager:CreateParticle(
             effect.particle,
             PATTACH_CUSTOMORIGIN,
             caster
         )
-    end)
-    if ok and particle then
         ParticleManager:SetParticleControlEnt(
             particle,
-            0,
+            effect.source_control or 0,
             caster,
             PATTACH_POINT_FOLLOW,
             "attach_attack1",
@@ -65,7 +78,7 @@ local function play_effect(caster, target, effect)
         )
         ParticleManager:SetParticleControlEnt(
             particle,
-            1,
+            effect.target_control or 1,
             target,
             PATTACH_POINT_FOLLOW,
             "attach_hitloc",
@@ -73,6 +86,18 @@ local function play_effect(caster, target, effect)
             true
         )
         ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not ok then
+        print(string.format(
+            "[TowerMagic] particle failed path=%s error=%s",
+            tostring(effect.particle), tostring(error_message)
+        ))
+        if particle then
+            pcall(function()
+                ParticleManager:DestroyParticle(particle, true)
+                ParticleManager:ReleaseParticleIndex(particle)
+            end)
+        end
     end
     if effect.sound then
         pcall(function() EmitSoundOn(effect.sound, target) end)
@@ -115,7 +140,8 @@ end
 local function on_attack_landed(payload)
     local tower = payload and payload.tower
     local target = payload and payload.target
-    if not valid(tower) or not valid(target) then return end
+    -- 普攻可能先将目标击杀；死亡实体仍保留足够长时间用于播放命中特效。
+    if not valid(tower) or not exists(target) then return end
     if target:GetTeamNumber() == tower:GetTeamNumber() then return end
 
     local skills = payload.skills or {}
@@ -156,6 +182,21 @@ end
 
 function M.init()
     event_bus.subscribe(events.TOWER_ATTACK_LANDED, on_attack_landed)
+end
+
+function M.precache(context)
+    local particles = {}
+    local sound_files = {}
+    for _, effect in pairs(EFFECTS) do
+        if effect.particle and not particles[effect.particle] then
+            PrecacheResource("particle", effect.particle, context)
+            particles[effect.particle] = true
+        end
+        if effect.sound_file and not sound_files[effect.sound_file] then
+            PrecacheResource("soundfile", effect.sound_file, context)
+            sound_files[effect.sound_file] = true
+        end
+    end
 end
 
 return M

@@ -5,6 +5,7 @@ local building_system = require("systems/building_system")
 local weapon_snapshot = require("ui/weapon_synthesis_snapshot_service")
 local unit_display_names = require("config/generated/unit_display_names")
 local research_events = require("research/research_event_names")
+local combat_stat_projection = require("ui/combat_stat_projection")
 
 local M = {}
 local synthesis_requests = {}
@@ -50,7 +51,7 @@ local function unit_combat_snapshot(unit)
         attack_max = attack_max,
         -- 必须读取包含 Modifier 加减值的当前有效护甲；基础护甲和配置缓存
         -- 无法反映攻击减甲科技的实时叠层。
-        armor = safe_number(unit, "GetPhysicalArmorValue", nil, false)
+        runtime_armor = safe_number(unit, "GetPhysicalArmorValue", nil, false)
             or tonumber(unit.survival_armor)
             or safe_number(unit, "GetPhysicalArmorBaseValue", 0),
         -- attack_speed 表示每秒攻击次数，不是 BAT，也不是 Dota 百分比攻速。
@@ -86,6 +87,28 @@ local function send_to_player(event_name, player_id, payload)
     end
 end
 
+local function hero_ui_snapshot(player_id, entindex, unit)
+    local result = event_bus.request(
+        events.HERO_COMBAT_STATS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    if not result or not result.ok or not result.snapshot
+        or tonumber(result.snapshot.entindex) ~= tonumber(entindex) then
+        return nil
+    end
+    local snapshot = {}
+    for key, value in pairs(result.snapshot) do snapshot[key] = value end
+    if unit then
+        snapshot.runtime_armor = safe_number(
+            unit,
+            "GetPhysicalArmorValue",
+            snapshot.runtime_armor,
+            false
+        )
+    end
+    return combat_stat_projection.for_ui(snapshot)
+end
+
 local function register_selected_unit_stats_request()
     CustomGameEventManager:RegisterListener("ui_selected_unit_stats_request", function(_, payload)
         local player_id = source_player_id(payload)
@@ -104,20 +127,14 @@ local function register_selected_unit_stats_request()
         selected_unit_by_player[player_id] = entindex
         -- 英雄的攻击/属性可能还叠加武器成长和专属投影，必须优先使用
         -- hero_combat_stat_service 的权威快照，不能再用引擎临时值覆盖它。
-        local hero_result = event_bus.request(
-            events.HERO_COMBAT_STATS_GET_REQUEST,
-            { player_id = player_id }
-        )
-        if hero_result and hero_result.ok and hero_result.snapshot
-            and tonumber(hero_result.snapshot.entindex) == entindex then
-            local snapshot = {}
-            for key, value in pairs(hero_result.snapshot) do snapshot[key] = value end
+        local snapshot = hero_ui_snapshot(player_id, entindex, unit)
+        if snapshot then
             snapshot.success = 1
             snapshot.source = "hero_combat_stat_service"
             send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
             return
         end
-        local snapshot = unit_combat_snapshot(unit)
+        local snapshot = combat_stat_projection.for_ui(unit_combat_snapshot(unit))
         snapshot.success = 1
         send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
     end)
@@ -134,7 +151,8 @@ local function on_unit_combat_stats_changed(payload)
     end
     for player_id, selected_entindex in pairs(selected_unit_by_player) do
         if tonumber(selected_entindex) == entindex and valid_player_id(player_id) then
-            local snapshot = unit_combat_snapshot(unit)
+            local snapshot = hero_ui_snapshot(player_id, entindex, unit)
+                or combat_stat_projection.for_ui(unit_combat_snapshot(unit))
             snapshot.success = 1
             snapshot.reason = payload.reason or "unit_combat_stats_changed"
             snapshot.push_phase = "immediate"
@@ -159,9 +177,12 @@ local function send_building_snapshot(payload, phase)
     snapshot.level = tonumber(payload.level) or snapshot.level
     snapshot.attack_min = tonumber(payload.attack_min) or snapshot.attack_min
     snapshot.attack_max = tonumber(payload.attack_max) or snapshot.attack_max
-    snapshot.armor = tonumber(payload.armor) or snapshot.armor
+    snapshot.runtime_armor = tonumber(payload.runtime_armor)
+        or tonumber(payload.armor)
+        or snapshot.runtime_armor
     snapshot.attack_speed = tonumber(payload.attack_speed) or snapshot.attack_speed
     snapshot.push_phase = phase or "immediate"
+    snapshot = combat_stat_projection.for_ui(snapshot)
     print(string.format(
         "[SURVIVAL_STATS][SERVER] BUILDING_PUSH player=%s unit=%s phase=%s sequence=%s level=%s attack=%s-%s armor=%s",
         tostring(player_id), tostring(entindex), tostring(snapshot.push_phase),
@@ -495,6 +516,14 @@ local function register_ability_cast_request()
         local tower_action = tower_upgrade_mode ~= nil or tower_class_index ~= nil
         local tower_ability_matches = tower_action and unit_valid
             and ability_valid and unit:FindAbilityByName(ability_name) == ability
+        local building_upgrade_action = ({
+            ability_upgrade_wall = true,
+            ability_upgrade_city = true,
+            ability_upgrade_farm = true,
+        })[ability_name] == true
+        local building_upgrade_ability_matches = building_upgrade_action
+            and unit_valid and ability_valid
+            and unit:FindAbilityByName(ability_name) == ability
         local gold_mine_actions = {
             ability_upgrade_gold_mine = "level",
             ability_upgrade_gold_mine_efficiency = "efficiency",
@@ -523,6 +552,14 @@ local function register_ability_cast_request()
             handled_directly = true
             print("[SURVIVAL_CAST][SERVER] TOWER_UPGRADE_DISPATCHED mode="
                 .. tostring(tower_upgrade_mode))
+        elseif building_upgrade_ability_matches and owner_matches
+            and not passive and not is_point_target then
+            event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
+                building = unit,
+            })
+            handled_directly = true
+            print("[SURVIVAL_CAST][SERVER] BUILDING_UPGRADE_DISPATCHED name="
+                .. tostring(ability_name))
         elseif tower_ability_matches and owner_matches and not passive
             and not is_point_target and tower_class_index and tower_class_index >= 1
             and tower_class_index <= 7 then

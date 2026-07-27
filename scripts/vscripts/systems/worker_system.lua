@@ -4,12 +4,15 @@ local config = require("config/workers_config")
 local training_definitions = require("config/generated/training_definitions")
 local global_rules = require("config/global_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local worker_training_progress = require("systems/worker_training_progress")
+local armor_balance = require("config/armor_balance")
 
 local M = {}
 local workers = {}
 local current_tree_entindex = -1
 local tree_lumber_efficiency_buff = 0
 local population_training_counts = {}
+local lumberjack_training = worker_training_progress.create(training_definitions)
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -84,6 +87,19 @@ local function notify(player_id, message, level)
         message = message,
         level = level or "info",
     })
+end
+
+local function required_city_level(training)
+    local configured = tonumber(training and training.requires_city_level)
+    if configured then return configured end
+    return tonumber(string.match(
+        tostring(training and training.prerequisite_text or ""),
+        "LV(%d+)"
+    )) or 1
+end
+
+local function lumberjack_training_state(team)
+    return lumberjack_training:get(team)
 end
 
 local function refresh_worker_technology(player_id)
@@ -215,7 +231,7 @@ local function train_worker(payload)
     end
 
     local training_id = tostring(
-        payload.training_id or "train_lumberjack_01"
+        payload.training_id or "train_lumberjack_auto"
     )
     if training_id == "train_population_auto" then
         if city_state.building_id ~= "building_farm"
@@ -228,6 +244,15 @@ local function train_worker(payload)
         )
     elseif city_state.building_id ~= "main_city" then
         return { ok = false, error = "not_main_city" }
+    end
+    local is_lumberjack_request = training_id == "train_lumberjack_auto"
+        or string.match(training_id, "^train_lumberjack_") ~= nil
+    if is_lumberjack_request then
+        local current = lumberjack_training:current(city_state.team)
+        if not current then
+            return { ok = false, error = "lumberjack_training_missing" }
+        end
+        training_id = current.training_id
     end
     local training = (training_definitions.by_id or {})[training_id]
     if not training or training.enabled == false then
@@ -263,15 +288,26 @@ local function train_worker(payload)
     if training.training_type ~= "unit" then
         return { ok = false, error = "training_type_invalid" }
     end
-    local existing_count = 0
-    for _, state in pairs(workers) do
-        if state.training_id == training_id and valid_entity(state.unit) then
-            existing_count = existing_count + 1
+    local is_lumberjack = string.match(training_id, "^train_lumberjack_") ~= nil
+    if is_lumberjack then
+        local required_level = required_city_level(training)
+        if (tonumber(city_state.level) or 1) < required_level then
+            local error_message = "主城达到LV" .. tostring(required_level)
+                .. "后才能训练" .. tostring(training.name)
+            notify(city_state.player_id, error_message, "error")
+            return { ok = false, error = error_message }
         end
-    end
-    local max_count = tonumber(training.max_count) or 0
-    if max_count > 0 and existing_count >= max_count then
-        return { ok = false, error = "training_max_count_reached" }
+    else
+        local existing_count = 0
+        for _, state in pairs(workers) do
+            if state.training_id == training_id and valid_entity(state.unit) then
+                existing_count = existing_count + 1
+            end
+        end
+        local max_count = tonumber(training.max_count) or 0
+        if max_count > 0 and existing_count >= max_count then
+            return { ok = false, error = "training_max_count_reached" }
+        end
     end
 
     local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
@@ -316,7 +352,10 @@ local function train_worker(payload)
     worker:SetBaseMaxHealth(health)
     worker:SetMaxHealth(health)
     worker:SetHealth(health)
-    worker:SetPhysicalArmorBaseValue(tonumber(training.armor) or config.armor)
+    local war3_armor = tonumber(training.war3_armor or training.armor)
+    worker:SetPhysicalArmorBaseValue(war3_armor ~= nil
+        and armor_balance.from_war3(war3_armor)
+        or config.armor)
     local base_attack = tonumber(training.base_attack)
     if base_attack ~= nil then
         worker:SetBaseDamageMin(base_attack)
@@ -386,12 +425,25 @@ local function train_worker(payload)
     if not is_repairer then
         refresh_worker_technology(city_state.player_id)
     end
+    local training_progress = nil
+    if is_lumberjack then
+        training_progress = lumberjack_training:record_success(
+            city_state.team,
+            training_id
+        )
+    end
     notify(city_state.player_id, tostring(training.name) .. "训练完成")
-    event_bus.emit(events.WORKER_CHANGED, {
+    local changed = {
         team = city_state.team,
         count_delta = 1,
-    })
-    return { ok = true, entindex = worker:entindex() }
+        training = training_progress,
+    }
+    event_bus.emit(events.WORKER_CHANGED, changed)
+    return {
+        ok = true,
+        entindex = worker:entindex(),
+        training = training_progress,
+    }
 end
 
 local function on_tree_spawned(payload)
@@ -435,7 +487,14 @@ function M.init()
     current_tree_entindex = -1
     tree_lumber_efficiency_buff = 0
     population_training_counts = {}
+    lumberjack_training:reset()
     event_bus.subscribe(events.WORKER_TRAIN_REQUEST, train_worker)
+    event_bus.handle_request(
+        events.WORKER_TRAINING_GET_REQUEST,
+        function(payload)
+            return lumberjack_training_state(payload.team)
+        end
+    )
     event_bus.subscribe(events.TREE_SPAWNED, on_tree_spawned)
     event_bus.subscribe(events.TREE_DESTROYED, on_tree_destroyed)
     event_bus.subscribe(events.TREE_HIT, on_tree_hit)

@@ -9,7 +9,7 @@ M.rows = {
     { recipe_id = "recipe_infernal_01_to_02", result_content_id = "equipment_infernal_armor_02", result_count = 1, recipe_type = "equipment_upgrade", enabled = true, review_status = "description_inferred" },
     { recipe_id = "recipe_infernal_02_to_03", result_content_id = "equipment_infernal_armor_03", result_count = 1, recipe_type = "equipment_upgrade", enabled = true, review_status = "description_inferred" },
     { recipe_id = "recipe_infernal_03_to_04", result_content_id = "equipment_infernal_armor_04", result_count = 1, recipe_type = "equipment_upgrade", enabled = true, review_status = "description_inferred" },
-    { recipe_id = "recipe_infernal_04_to_max", result_content_id = "equipment_infernal_armor_max", result_count = 1, recipe_type = "equipment_upgrade", enabled = true, review_status = "description_inferred", notes = "原表Lv4描述中核心等级疑似笔误，需确认。" },
+    { recipe_id = "recipe_infernal_04_to_max", result_content_id = "equipment_infernal_armor_max", result_count = 1, recipe_type = "equipment_upgrade", enabled = true, review_status = "ok", notes = "需求已确认：狱火熔铠Lv4＋熔火核心Lv4自动合成狱火熔铠Lvmax。" },
     { recipe_id = "recipe_frost_max_crystal_gem_to_ice_01", result_content_id = "weapon_ice_blade_01", result_count = 1, recipe_type = "synthesis", enabled = true, review_status = "ok" },
     { recipe_id = "recipe_ice_infernal_ember_to_epic", result_content_id = "weapon_epic_icefire_00", result_count = 1, recipe_type = "synthesis", enabled = true, review_status = "ok" },
 }

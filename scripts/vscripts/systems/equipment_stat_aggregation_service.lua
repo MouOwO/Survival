@@ -12,10 +12,20 @@ local FIELD_MAP = {
     attack_flat = "base_attack_flat",
     attack_speed_pct = "base_attack_speed_pct",
     health_flat = "base_health",
-    armor_flat = "base_armor",
+    armor_flat = "base_war3_armor",
     all_attributes_flat = "base_all_attributes",
     lifesteal_pct = "base_lifesteal_pct",
 }
+
+local function configured_value(definition, stat, field)
+    local configured = definition[field]
+    if stat == "armor_flat" and configured == nil then
+        configured = definition.base_armor
+    end
+    -- armor_flat remains the authoritative War3/CSV value in this snapshot.
+    -- modifier_equipment_effects owns the only War3 -> Dota conversion.
+    return tonumber(configured)
+end
 
 local function rebuild_definitions()
     definitions = {}
@@ -62,8 +72,7 @@ local function build(player_id, counts, reason)
                 or tostring(content_id) == tostring(main_hand)
             if definition and definition.enabled ~= false and active then
                 for stat, field in pairs(FIELD_MAP) do
-                    local configured = definition[field]
-                    local amount = tonumber(configured)
+                    local amount = configured_value(definition, stat, field)
                     local legacy = tonumber((legacy_stats[content_id] or {})[stat])
                     if amount == nil or (stat ~= "attack_flat"
                         and amount == 0 and legacy and legacy ~= 0) then
