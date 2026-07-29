@@ -63,6 +63,11 @@
    - 技能接管不得再把稠密显示序号直接拼成 `AbilityN`；必须枚举有效官方按钮、按屏幕视觉位置排序，并在完整映射后原子提交。
    - 映射不完整时必须整批恢复官方 UI，禁止保留半项目、半官方状态。
 
+16. **当前 Shell 快照没有独立 Lua/LuaJIT 解释器，测试目录也与历史检查点不同。**
+    - `lua`、`luac`、`luajit` 当前均不在 PATH，常见安装路径也未找到；WSL 探测超时。
+    - 当前 `scripts/vscripts/tests` 只可见原 `test_hero_health_guard.lua` 与新建的 `test_hero_cosmetic_service.lua`，不能沿用旧文档中的 32 项数量声称全量通过。
+    - 本轮使用 VPK/源码 PowerShell 契约和 `git diff --check` 完成可执行验证；Lua 定向测试需在恢复解释器后补跑，或由 Workshop Tools 实际加载验证。
+
 14. **项目技能 cell 曾继承 Valve 动态按钮尺寸，第一版固定尺寸仍偏大。**
    - 实机确认 1～2 个技能时图标较大、7 个技能时图标较小。
    - 根因是 `applyOfficialGeometry()` 把官方锚点的动态 `geometry.width/height` 直接赋给项目按钮。
@@ -107,3 +112,4 @@
 26. 背包项目气泡现直接绑定官方槽及其 ItemImage 的悬停事件，但不改变命中和操作事件；不同 Valve HUD 版本中仍需实机确认原生物品 Tooltip 被完全压制且拖放不回归。
 27. 挑战材料已改为专属真实地面物品，自动测试确认映射、Claim、合并和防复制边界；最新实机已确认 Valve 世界物品 Tooltip 的名称/说明仍为空，因此 Tooltip 视觉问题重新列为当前未解决项。鼠标命中、装备栏满时回落，以及“已有材料丢下再捡不复制”也仍需完全重启后实机确认。
 28. Git Bash 终端桥接可能在清空 `.cline_tmp` 日志时报告 `Device or resource busy`，但后续测试循环仍会执行；最终结论必须以新日志中的逐项记录和末尾 `ALL_LUA_TESTS total=... failed=0` 为准，不要仅看开头重定向警告。
+29. `The Hallows Within` 大型 Head wearable 已由用户实机确认上线成功；后续不得回退为主体 `SetModel` 替换，也不得把该物品误拆成不存在的多身体槽组件。环境粒子、死亡/重生和第二次 Run 尚未被用户分别确认，继续作为防回归验收项。

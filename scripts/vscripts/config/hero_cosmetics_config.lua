@@ -1,4 +1,28 @@
 local M = {
+    builder_undying = {
+        -- The Hallows Within Bundle (21800): hero wearable 14963.
+        -- Valve packages the visible hero transformation as one oversized
+        -- Head-slot wearable rather than separate armor/arms/weapon pieces.
+        hide_default_wearables = true,
+        wearables = {
+            {
+                id = "hallows_head",
+                model = "models/items/undying/undying_fall20_immortal_head/undying_fall20_immortal_head.vmdl",
+            },
+        },
+        particles = {
+            {
+                id = "hallows_head_ambient",
+                path = "particles/econ/items/undying/fall20_undying_head/fall20_undying_head_ambient.vpcf",
+                owner = "hallows_head",
+                attach_type = "PATTACH_ABSORIGIN_FOLLOW",
+            },
+        },
+        -- Recorded but intentionally not applied in this task:
+        -- Tombstone item 14994 uses undying_fall20_immortal_tombstone.vmdl,
+        -- undying_fall20_immortal_minion.vmdl and
+        -- fall20_undying_tombstone_ambient.vpcf.
+    },
     hero_axe = {
         material_group = "1",
         hide_default_wearables = true,

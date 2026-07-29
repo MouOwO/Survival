@@ -4,21 +4,20 @@
 
 ## 当前活跃任务
 
-- 任务：为固定 52×52 技能行增加运行时锚点校准器，让用户在 Workshop Tools 中直接比较九宫格锚点并微调 X/Y。
-- 当前阶段：事件驱动选中切换、无闪过渡和带版本迁移的正式布局预设均已完成自动验证；等待 Workshop Tools 实机验收。
-- 最新实机证据：单技能与多技能图标大小相同、地面 Tooltip 成功；但以官方 `abilities` 容器左上角定位后，技能整体超出原范围，因此左上角方案已被实机否定。
-- 本轮边界：只修复重新 Run 后回退到 `top_left / 0 / 0` 的状态问题；不改变 52×52 cell、4px 间距、九宫格公式、视觉顺序、原子接管、v5 选择事件、技能输入或 Tooltip。
+- 当前没有活跃实施任务；等待用户提出下一项需求。
+- 最近完成：玩家开局的 `npc_dota_hero_undying` 建造者已成功应用 `The Hallows Within` 大型 Head wearable。
+- 用户实机确认：部件饰品上线成功。
+- 最近任务归档：`docs/ai/archive/2026-07-29-undying-hallows-within.md`。
 
 ## 最后可靠检查点
 
 - 日期：2026-07-29
-- 已确认：最终技能行位置集中由 `measureFixedRowGeometry()` 和 `row.style.position` 应用，现有 0.5 秒刷新可直接消费运行时校准状态，无需改服务端或技能输入链。
-- 已完成：正式 `middle_left / X=5 / Y=35` 预设、旧状态版本迁移，以及选中/查询单位事件即时刷新、0.10 秒轻量实体哨兵和 `0/0.016/0.05/0.10/0.20s` 有界无闪重试；版本为 `grid52_preset_v6`。
-- 已排除：当前异常不是动态几何公式随机失效，而是完全重新 Run 后运行时校准状态丢失并回到源码默认 `top_left / 0 / 0`；暂不需要 Panorama Debugger。
-- 自动验证：`ARROW_TOWER_COMPLETION_PASS`；`.cline_tmp/preset_v6_all_tests.txt` 末尾为 `ALL_LUA_TESTS total=32 failed=0`；`hud_takeover.js` 强制编译为 `1 compiled, 0 failed, 0 skipped`。
-- 用户正式批准参数：`middle_left / X=5 / Y=35`；启动默认值和重置必须共用该基线，并通过预设版本迁移旧 HUD 状态。
-- 尚未确认：正确预设下 1、3、5、7 技能的实机位置，以及切换响应速度与 Valve 原技能图标是否完全不再闪现。
-- 下一步唯一动作：完全停止 Workshop Tools 后重新 Run，确认首条校准日志为 `build=grid52_preset_v6 preset_version=1 source=preset_default ... alignment=middle_left offset_x=5 offset_y=35`，再验收 1、3、5、7 技能。
+- 已完成并实机确认：开局建造者的 `The Hallows Within` 部件饰品成功显示；模型路径、创建、Owner、`FollowEntity` 和开局应用链有效。
+- 已完成代码边界：饰品服务支持命名组件、粒子绑定、重复应用清理和显式清理；严格限定的 `npc_spawned` 重生恢复已接入；墓碑/专属僵尸未进入运行时。
+- 自动验证：`HALLOWS_WITHIN_CONTRACT_PASS`；目标 `git diff --check` 为 `TARGET_DIFF_CHECK_PASS`。
+- 环境限制：当前 Shell 没有 Lua/LuaJIT 可执行文件，新增 Lua 定向测试尚未在独立解释器中执行。
+- 尚未单独确认：环境粒子 attachment、死亡/重生和第二次 Run 是否完全无重复；不得把“部件饰品成功”扩大表述为这些细节全部验收。
+- 下一步唯一动作：等待用户的新任务；若继续做饰品，优先复用已记录的成功方案。
 
 ## 新会话恢复顺序
 

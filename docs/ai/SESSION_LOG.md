@@ -623,3 +623,44 @@
 - 工作区边界：未暂存、未提交、未清理、未回退任何既有修改；本轮只新增本检查点和测试日志，并刷新编译产物。
 - 尚未验证：Workshop Tools 完全重启后的首条校准日志，以及 1、3、5、7 技能位置、不同单位切换响应和 Valve 图标闪现情况。
 - 下一步唯一动作：用户完全停止 Workshop Tools 后重新 Run，执行 `survival_ability_calibration_dump`，确认 `grid52_preset_v6 / preset_version=1 / source=preset_default / middle_left / 5 / 35`，再进行实机验收。
+
+## 2026-07-29 — 检查点 063：新任务覆盖为 Undying 建造者 Immortal 外观
+
+- 用户最新要求：只给玩家开局的 Undying 建造者使用 `The Hallows Within Bundle`；本轮实现角色模型、环境特效和可安全恢复的姿势动画，墓碑/僵尸只记录资源。
+- 已确认物品定义：Bundle `21800`；`The Hallows Within` `14963`（Head）；`The Hallows Within Tombstone` `14994`（Tombstone）。
+- 关键语义：该 Bundle 不是多个身体槽组件；角色外观主要是单个大型 Head wearable。墓碑、墓碑环境特效和专属僵尸属于独立技能资产。
+- 代码证据：`addon_game_mode.lua` 强制 `npc_dota_hero_undying` 并在 `initialize_survival_hero()` 发布 `HERO_READY`；现有 `hero_cosmetic_service.lua` 已支持模型 wearable，但没有开局建造者接入、粒子生命周期和重复应用清理。
+- 用户批准：进入执行模式，按角色本体优先范围实施。
+- 安全边界：不影响修理工、波次怪、普通僵尸、Boss 或祭坛英雄；不强行替换主体骨骼模型；不修改建造者玩法属性。
+- 文档迁移：旧技能行任务已复制到 `docs/ai/archive/2026-07-29-ability-row-calibration.md`。
+- 尚未确认：本机 VPK 中 defindex `14963` 的模型、粒子、attachment 和动画 modifier 精确路径。
+- 下一步唯一动作：只读解析 VPK 中的 Undying 模型/粒子和物品 schema 候选，验证资源后再修改游戏运行逻辑。
+
+## 2026-07-29 — 检查点 064：The Hallows Within 代码与资源契约完成
+
+- 本机 VPK 取证：角色模型为 `models/items/undying/undying_fall20_immortal_head/undying_fall20_immortal_head.vmdl`；主环境粒子为 `particles/econ/items/undying/fall20_undying_head/fall20_undying_head_ambient.vpcf`。两者对应的编译资源均存在于当前 `pak01_dir.vpk`。
+- 已记录但未运行：`undying_fall20_immortal_tombstone.vmdl`、`undying_fall20_immortal_minion.vmdl`、`fall20_undying_tombstone_ambient.vpcf`。
+- 配置实施：`hero_cosmetics_config.lua` 增加独立 `builder_undying`，使用命名组件 `hallows_head`，主环境粒子绑定该 wearable。
+- 服务实施：`hero_cosmetic_service.lua` 保持旧字符串 wearable 配置兼容；新增命名组件、项目自有 wearable/粒子状态、重复应用清理、`DestroyParticle`、`ReleaseParticleIndex`、`UTIL_Remove` 回退和 `clear()`。
+- 开局接入：`addon_game_mode.lua::initialize_survival_hero()` 只在 `unit_name == SURVIVAL_FORCE_HERO` 时应用 `builder_undying`，且发生在 `HERO_READY` 前。普通 Undying 怪物不会进入该路径。
+- 重生恢复：新增 `npc_spawned` 监听；只有单位名是强制 Undying 且 `ready_hero_entindex_by_player[player_id]` 等于当前 entindex 时才幂等重建，初次未初始化英雄和普通 Undying 怪物均被排除。
+- 动画决策：官方页面确认 Head 饰品绑定轻微姿势调整，但没有找到可安全调用的独立 Lua 动画 modifier；不替换主体骨骼模型，不调用猜测接口，保留原版动画和 wearable 骨骼跟随。
+- 新增测试：`scripts/vscripts/tests/test_hero_cosmetic_service.lua` 覆盖模型/粒子预缓存、默认 wearable 隐藏、Owner/FollowEntity、命名粒子 owner、重复应用与显式清理。
+- 可执行验证：`.cline_tmp/test_hallows_within_contract.ps1` 返回 `HALLOWS_WITHIN_CONTRACT_PASS`；目标 `git diff --check` 返回 `TARGET_DIFF_CHECK_PASS`。
+- 环境限制：当前 PowerShell PATH 和常见安装路径均无 `lua`、`luac`、`luajit`；WSL 探测超时。未把无法执行的 Lua 测试和语法检查伪记为通过。当前磁盘中的测试目录只有原 `test_hero_health_guard.lua` 和本轮新增测试，与历史 32 项文档环境不同。
+- 尚未验证：Workshop Tools 中大型 wearable 的实际覆盖、环境粒子 attachment、移动/建造/死亡/重生动画，以及第二次 Run 是否无重复。
+- 下一步唯一动作：完全停止 Workshop Tools 后重新 Run，实机验收开局建造者；如异常，返回 `[Survival][INFO][HeroCosmetic] builder_undying applied wearables=... particles=...` 日志和截图。
+
+## 2026-07-29 — 检查点 065：用户实机确认部件饰品上线成功
+
+- 用户原话：`部件饰品上线成功，记录成功的经验`。
+- 实机确认范围：开局 Undying 建造者成功显示 `The Hallows Within` 部件饰品。
+- 由实机结果直接证明：`undying_fall20_immortal_head.vmdl` 路径正确；`SpawnEntityFromTableSynchronous("prop_dynamic")` 可创建该大型 Head wearable；`SetOwner` 与 `FollowEntity(hero, true)` 能让其跟随建造者骨骼；在 `HERO_READY` 前应用的时机有效。
+- 不扩大结论：用户没有在本次反馈中分别确认环境粒子、死亡/重生或第二次 Run，三项继续作为防回归检查，不写成已实机通过。
+- 可复用资源定位经验：先用公开 defindex 确认 Bundle/子物品和槽位，再从本机 `pak01_dir.vpk` 按英雄目录、发布时间开发代号和模型/材质/图标/粒子交叉验证；展示名与内部目录名不同是常态。
+- 可复用模型经验：商城视觉上像“全身套装”不代表存在多个身体组件。本套英雄外观实际是 Head 槽 defindex `14963` 的单个大型 wearable；墓碑 defindex `14994` 是独立技能槽资产。
+- 可复用运行时经验：保留原英雄主体骨骼与动画，以项目创建的 `prop_dynamic` 做 bone merge；不要用 `SetModel` 把英雄主体直接换成 wearable，也不要猜测官方 econ 动画 modifier。
+- 可复用生命周期经验：项目创建的 wearable/粒子必须按 hero entindex 保存；重复应用先清理项目自有实体和粒子；重生恢复必须同时校验强制英雄单位名、玩家 ID 和已初始化 entindex，避免影响外形相同的怪物。
+- 可复用粒子经验：粒子配置应通过命名 `owner` 绑定到对应 wearable，而不是一律绑定英雄原点；主粒子负责引用子粒子，运行时只需预缓存和创建已确认的入口 `.vpcf`。
+- 任务状态：角色部件饰品主目标完成并实机验收成功；任务归档到 `docs/ai/archive/2026-07-29-undying-hallows-within.md`。
+- 下一步唯一动作：等待用户新任务。
