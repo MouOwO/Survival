@@ -6,6 +6,7 @@ local weapon_snapshot = require("ui/weapon_synthesis_snapshot_service")
 local unit_display_names = require("config/generated/unit_display_names")
 local research_events = require("research/research_event_names")
 local combat_stat_projection = require("ui/combat_stat_projection")
+local asset_catalog = require("config/asset_catalog")
 
 local M = {}
 local synthesis_requests = {}
@@ -37,6 +38,8 @@ local function unit_combat_snapshot(unit)
         or (configured_name and configured_name.enabled ~= false
             and configured_name.display_name)
         or internal_name
+    local model_asset_id = unit.survival_model_asset_id or ""
+    local visual_asset = asset_catalog.get(model_asset_id)
     return {
         entindex = unit:entindex(),
         unit_name = internal_name,
@@ -63,6 +66,9 @@ local function unit_combat_snapshot(unit)
         strength = strength,
         agility = agility,
         intellect = intellect,
+        model_asset_id = model_asset_id,
+        portrait_unit_name = visual_asset and visual_asset.portrait_unit_name or "",
+        portrait_item_def = visual_asset and visual_asset.portrait_item_def or "",
         source = "selected_unit_runtime",
     }
 end

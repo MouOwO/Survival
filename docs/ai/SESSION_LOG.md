@@ -791,3 +791,19 @@
 - 保留边界：官方攻速/护甲 Text 继续永久隐藏；攻击力定位、护甲 War3 显示值、攻速每秒次数与 0.5 回退均未修改。
 - 编译证据：`resourcecompiler.exe -f` 返回 `OK: 1 compiled, 0 failed, 0 skipped`。
 - 下一步：完全停止当前 Workshop Tools Run 并重新启动，确认两个项目数字恢复显示，再检查其与攻击力数字的横向格式和各自行纵向位置。
+
+## 2026-07-30 — 检查点 075：炙热巨箭原生线性穿透方案实机验收成功
+
+- 用户最终实机确认：“终于成功了”。同一炙热巨箭特效路径上的第一、第二及后续敌方单位现在都能分别受到伤害。
+- 历史结论纠正：2026-07-29 检查点 073 记录的 `scheduler.every + tower_skill_geometry.enemies_in_path()` 手写二维移动扫描方案虽然 mock 测试通过，但实机仍只伤害第一个怪物；该方案已被实机证据否定，不再是炙热巨箭的有效实现基线。
+- 关键测试盲区：旧 `test_tower_wave_of_terror_visual.lua` 通过替换 `tower_skill_geometry`，人工让一次扫描返回多个单位，只证明 Lua `for` 循环会遍历数组；它没有证明 Dota 引擎会在同一移动视觉上连续报告第二、第三个单位，也没有覆盖投射物命中后的删除语义。
+- 粒子取证：本机原始 `vengeful_arcana_wave_of_terror_v2.vpcf` 使用 CP1 作为视觉速度；唯一碰撞相关操作器为 `C_OP_MovementPlaceOnGround` 和 `DEBRIS` 场景组，只负责地面贴合，不会检测敌方单位，也不会向 Lua 触发单位命中回调。视觉粒子不能直接作为伤害碰撞体。
+- 官方样例依据：Dota 自带 `conquest/scripts/vscripts/breathe_fire.lua`、`breathe_poison.lua` 通过 `ProjectileManager:CreateLinearProjectile()` 创建单位碰撞，并在 `OnProjectileHit` 末尾 `return false` 以继续穿透后续单位。
+- 最终实现：`tower_special_skill_system.lua` 的炙热巨箭改为原生线性投射物；使用 Wave of Terror 作为 `EffectName`，速度 `1200`、距离 `1200`、起止半径 `112`，敌方英雄与普通单位目标过滤，`bDeleteOnHit=false`，不提供视野。
+- 多目标命中：每次发射建立唯一 `burning_wave_id`，将权威 `payload.damage * damage_multiplier`、能力句柄和 `hit[entindex]` 保存到活动波状态；共享被动能力的 `OnProjectileHit_ExtraData` 按 `ExtraData` 分流，每次单位回调提交一次伤害并返回 `false`，不会在第一个单位处删除。
+- 伤害契约：路径伤害显式为 `DAMAGE_TYPE_PHYSICAL`，继续通过 `TOWER_SKILL_DAMAGE_REQUEST -> tower_skill_effect_adapter -> damage_service -> ApplyDamage`；所有目标基础公式相同，最终扣血分别由各自物理护甲决定。`tower_skill_effect_adapter` 现会继续传递 ability 句柄。
+- 时机与地形：命中由引擎线性投射物的空间碰撞前缘触发，不再使用固定提前 `0.3s`；投射方向清零 Z，单位过滤由投射物沿平面路径完成，不以地形高度差作为伤害延迟依据。
+- 生命周期：投射物终点、塔销毁和系统重载都会清理活动波；同一单位每支箭最多受伤一次。基于 `距离 / 速度 + grace` 的调度任务只用于状态兜底清理，不参与碰撞判断。
+- 回归：重写 `test_tower_wave_of_terror_visual.lua`，捕获真实 `CreateLinearProjectile` 参数，并用同一 `ExtraData` 依次调用第一、第二、第三个单位的能力命中回调；验证三次伤害、三次 `return false`、单波去重、致死主目标后继续命中、终点清理和塔销毁。
+- 自动验证：`TOWER_WAVE_OF_TERROR_VISUAL_PASS`、`TOWER_SKILL_GEOMETRY_PASS`、`TOWER_MULTI_VISUAL_CONFIG_PASS`、`SCHEDULER_RESTART_PASS` 及相关 Lua 语法检查通过；全量循环中的炙热巨箭测试通过。另有英雄攻速投影、召唤英雄血条、树等级配置三项既有无关失败。
+- 完整技术复盘：`docs/ai/archive/2026-07-30-burning-great-arrow-linear-projectile.md`。
