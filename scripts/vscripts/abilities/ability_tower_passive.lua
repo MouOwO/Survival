@@ -1,4 +1,5 @@
 local skill_config = require("config/generated/tower_skill_definitions")
+local tower_special_skill_system = require("systems/tower_special_skill_system")
 
 local M = class({})
 
@@ -8,6 +9,15 @@ end
 
 function M:GetManaCost()
     return 0
+end
+
+function M:OnProjectileHit_ExtraData(target, location, extra_data)
+    return tower_special_skill_system.on_burning_wave_projectile_hit(
+        self,
+        target,
+        location,
+        extra_data
+    )
 end
 
 -- 多个配置技能共用同一个实现。引擎按 Ability ID 查找 Lua 全局类，

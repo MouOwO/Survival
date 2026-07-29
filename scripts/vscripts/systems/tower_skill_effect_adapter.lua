@@ -16,6 +16,7 @@ local function deal_damage(payload)
     return damage_service:Deal({
         attacker = payload.attacker,
         victim = payload.victim,
+        ability = payload.ability,
         base_damage = math.max(0, tonumber(payload.damage) or 0),
         damage_type = payload.damage_type or DAMAGE_TYPE_PHYSICAL,
         damage_flags = payload.damage_flags,

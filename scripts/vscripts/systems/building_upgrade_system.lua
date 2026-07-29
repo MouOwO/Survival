@@ -400,6 +400,7 @@ local function route_unit_data(state, row)
         attack_range = global_rules.tower_attack_range,
         attack_rate = row.base_attack_speed or 1,
         base_attack_speed = row.base_attack_speed or 1,
+        model_asset_id = row.model_asset_id,
         model_name = row.model_name,
         projectile_model = row.projectile_model,
         projectile_speed = row.projectile_speed,
@@ -412,16 +413,21 @@ end
 
 local function apply_model(unit, row)
     if not row or not row.model_name or row.model_name == "" then return end
-    asset_preload.queue_model(row.model_name, {
-        urgent = true,
-        priority = 1900,
-    })
+    if row.model_asset_id and row.model_asset_id ~= "" then
+        -- apply_tower/apply_common already routed the complete model bundle
+        -- through building_visual. Do not respawn attachments a second time.
+    else
+        asset_preload.queue_model(row.model_name, {
+            urgent = true,
+            priority = 1900,
+        })
+        unit:SetModel(row.model_name)
+        unit:SetOriginalModel(row.model_name)
+    end
     asset_preload.queue_particle(row.projectile_model, {
         urgent = true,
         priority = 1900,
     })
-    unit:SetModel(row.model_name)
-    unit:SetOriginalModel(row.model_name)
 end
 
 local function apply_tower_level(state, row, level, change_model)

@@ -1,12 +1,30 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local geometry = require("systems/tower_skill_geometry")
 
 local M = {}
 local death_state = {}
+local active_waves = {}
+local next_wave_id = 0
+local WAVE_OF_TERROR_PARTICLE =
+    "particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_wave_of_terror_v2.vpcf"
+local WAVE_OF_TERROR_SPEED = 1200
+-- The root particle lives for one second and its visible core has a constant
+-- radius of 112. Keep the engine projectile aligned with those source values.
+local WAVE_OF_TERROR_DISTANCE = 1200
+local WAVE_OF_TERROR_HALF_WIDTH = 112
+local WAVE_CLEANUP_GRACE = 0.25
+local DROW_FROST_HIT_PARTICLE =
+    "particles/econ/items/drow/drow_arcana/drow_arcana_frost_arrow_debuff.vpcf"
+local DROW_TOWER_ASSET_ID = "tower_multi_drow_dread_retribution"
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
+end
+
+local function exists(unit)
+    return unit and not unit:IsNull()
 end
 
 local function skill_matching(skills, prefix)
@@ -30,11 +48,13 @@ local function configured_area(skill, fallback)
     return math.max(1, tonumber(value) or fallback)
 end
 
-local function deal(attacker, victim, damage, tag)
+local function deal(attacker, victim, damage, tag, ability)
     return event_bus.request(events.TOWER_SKILL_DAMAGE_REQUEST, {
         attacker = attacker,
         victim = victim,
         damage = damage,
+        ability = ability,
+        damage_type = DAMAGE_TYPE_PHYSICAL,
         damage_flags = DOTA_DAMAGE_FLAG_NO_DAMAGE_MULTIPLIERS,
         source_kind = "ability",
         tags = { "tower_special_skill", tag },
@@ -121,33 +141,182 @@ local function trigger_death_grenade(payload)
     end
 end
 
-local function trigger_path_skill(payload, prefix, fallback_width, tag)
+local function clear_wave(wave_id, destroy_projectile)
+    local wave = active_waves[wave_id]
+    if not wave then return end
+    active_waves[wave_id] = nil
+    if wave.cleanup_task_id then scheduler.cancel(wave.cleanup_task_id) end
+    if destroy_projectile and wave.projectile_id and ProjectileManager then
+        ProjectileManager:DestroyLinearProjectile(wave.projectile_id)
+    end
+end
+
+local function cancel_tower_waves(tower_entindex)
+    local wave_ids = {}
+    for wave_id, wave in pairs(active_waves) do
+        if wave.tower_entindex == tower_entindex then
+            wave_ids[#wave_ids + 1] = wave_id
+        end
+    end
+    for _, wave_id in ipairs(wave_ids) do clear_wave(wave_id, true) end
+end
+
+local function launch_burning_wave(payload, skill, fallback_width)
+    local tower = payload.tower
+    local target = payload.target
+    local ability = tower:FindAbilityByName(skill.skill_id)
+    if not ability or ability:IsNull() then return end
+    local start_pos = tower:GetAbsOrigin()
+    local target_pos = target:GetAbsOrigin()
+    local direction = target_pos - start_pos
+    direction.z = 0
+    if direction:Length2D() <= 0.001 then return end
+    direction = direction:Normalized()
+
+    local width = configured_area(skill, fallback_width)
+    local damage = math.max(0, tonumber(payload.damage) or 0)
+        * math.max(0, tonumber(skill.damage_multiplier) or 1)
+
+    next_wave_id = next_wave_id + 1
+    local wave_id = next_wave_id
+    local tower_entindex = tower:entindex()
+    local wave = {
+        tower = tower,
+        tower_entindex = tower_entindex,
+        ability = ability,
+        damage = damage,
+        hit = {},
+    }
+    active_waves[wave_id] = wave
+
+    wave.projectile_id = ProjectileManager:CreateLinearProjectile({
+        Ability = ability,
+        EffectName = WAVE_OF_TERROR_PARTICLE,
+        Source = tower,
+        vSpawnOrigin = start_pos,
+        vVelocity = direction * WAVE_OF_TERROR_SPEED,
+        fDistance = WAVE_OF_TERROR_DISTANCE,
+        fStartRadius = width,
+        fEndRadius = width,
+        iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+        iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+        iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+        bDeleteOnHit = false,
+        bProvidesVision = false,
+        ExtraData = {
+            burning_great_arrow = 1,
+            burning_wave_id = wave_id,
+        },
+    })
+
+    local task_id = "burning_great_arrow_cleanup_"
+        .. tostring(tower_entindex) .. "_" .. tostring(wave_id)
+    wave.cleanup_task_id = scheduler.after(
+        WAVE_OF_TERROR_DISTANCE / WAVE_OF_TERROR_SPEED + WAVE_CLEANUP_GRACE,
+        function()
+            clear_wave(wave_id, false)
+            return false
+        end,
+        task_id
+    )
+end
+
+function M.on_burning_wave_projectile_hit(ability, target, _, extra_data)
+    if type(extra_data) ~= "table"
+        or tonumber(extra_data.burning_great_arrow) ~= 1 then
+        return false
+    end
+    local wave_id = tonumber(extra_data.burning_wave_id)
+    local wave = wave_id and active_waves[wave_id] or nil
+    if not wave then return false end
+    if not target then
+        clear_wave(wave_id, false)
+        return false
+    end
+    if not valid(wave.tower) or not valid(target) then return false end
+    if ability ~= wave.ability then return false end
+
+    local enemy_index = target:entindex()
+    if not wave.hit[enemy_index] then
+        wave.hit[enemy_index] = true
+        deal(
+            wave.tower,
+            target,
+            wave.damage,
+            "burning_great_arrow",
+            wave.ability
+        )
+    end
+    -- A linear projectile only pierces subsequent units when every unit-hit
+    -- callback declines deletion.
+    return false
+end
+
+local function frost_arrow_hit_particle(tower, target)
+    if tower.survival_model_asset_id ~= DROW_TOWER_ASSET_ID then return end
+    local particle = ParticleManager:CreateParticle(
+        DROW_FROST_HIT_PARTICLE,
+        PATTACH_ABSORIGIN_FOLLOW,
+        target
+    )
+    local function cleanup()
+        ParticleManager:DestroyParticle(particle, false)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end
+    if target.SetContextThink then
+        target:SetContextThink(
+            "survival_drow_frost_hit_" .. tostring(particle),
+            cleanup,
+            0.45
+        )
+    else
+        cleanup()
+    end
+end
+
+local function trigger_path_skill(payload, prefix, fallback_width, tag,
+        particle_callback)
     local skill = skill_matching(payload.skills, prefix)
     if not skill or not owns_ability(payload.tower, skill) then return end
     local damage = math.max(0, tonumber(payload.damage) or 0)
         * math.max(0, tonumber(skill.damage_multiplier) or 1)
     local start_pos = payload.tower:GetAbsOrigin()
     local end_pos = payload.target:GetAbsOrigin()
+    local width = configured_area(skill, fallback_width)
+    if particle_callback then
+        particle_callback(payload.tower, start_pos, end_pos, width)
+    end
     for _, enemy in ipairs(geometry.enemies_in_path(
-        payload.tower, start_pos, end_pos, fallback_width, payload.target
+        payload.tower, start_pos, end_pos, width, payload.target
     )) do
         deal(payload.tower, enemy, damage, tag)
     end
 end
 
+local function trigger_burning_great_arrow(payload)
+    local skill = skill_matching(payload.skills, "burning_great_arrow_")
+    if not skill or not owns_ability(payload.tower, skill) then return end
+    launch_burning_wave(payload, skill, WAVE_OF_TERROR_HALF_WIDTH)
+end
+
 local function on_attack_landed(payload)
-    if not valid(payload.tower) or not valid(payload.target) then return end
+    -- The engine can report ON_ATTACK_LANDED after the same attack has already
+    -- killed its primary target. Path effects still need the target's final
+    -- position, so only the tower must remain alive here.
+    if not valid(payload.tower) or not exists(payload.target) then return end
+    frost_arrow_hit_particle(payload.tower, payload.target)
     update_bone_counter(payload)
     trigger_death_grenade(payload)
     trigger_path_skill(payload, "arcane_eye_", 96, "arcane_eye")
-    trigger_path_skill(
-        payload, "burning_great_arrow_", 110, "burning_great_arrow"
-    )
+    trigger_burning_great_arrow(payload)
 end
 
 local function on_building_destroyed(payload)
     local entindex = tonumber(payload and (payload.entindex or payload.unit_entindex))
-    if entindex then death_state[entindex] = nil end
+    if entindex then
+        death_state[entindex] = nil
+        cancel_tower_waves(entindex)
+    end
 end
 
 local function on_lightning_hit(payload)
@@ -171,7 +340,12 @@ local function on_lightning_hit(payload)
 end
 
 function M.init()
+    local wave_ids = {}
+    for wave_id in pairs(active_waves) do wave_ids[#wave_ids + 1] = wave_id end
+    for _, wave_id in ipairs(wave_ids) do clear_wave(wave_id, true) end
     death_state = {}
+    active_waves = {}
+    next_wave_id = 0
     event_bus.handle_request(events.TOWER_CRITICAL_QUERY, critical_query)
     event_bus.subscribe(events.TOWER_ATTACK_START, on_attack_start)
     event_bus.subscribe(events.TOWER_ATTACK_LANDED, on_attack_landed)

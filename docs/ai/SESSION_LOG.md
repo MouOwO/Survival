@@ -752,3 +752,22 @@
 - 长期禁止：对含中文的 Panorama/Lua 源码禁止再使用会隐式解码再整文件写回的 `Get-Content/Set-Content` 或默认编码路径；应使用字节级复制、明确 UTF-8 严格读取，或局部补丁工具。
 - 尚未验证：需完全停止当前 Run 并重新启动，确认异常消失、HUD 与网格恢复加载，再继续验收上一轮四项视觉/拾取行为。
 - 下一步唯一动作：用户完全重新启动地图并回报是否仍有 JS Exception。
+
+## 2026-07-29 — 检查点 073：炙热巨箭塔 LV1 完整路径碰撞伤害修复完成
+
+- 用户明确规则：炙热巨箭特效碰到任何敌方单位都造成伤害；碰撞面积与特效宽度一致；只计算 XY 平面、不考虑地形高低差；路径上的怪物全部受伤；伤害沿用已有攻击伤害计算链。
+- 根因一：旧移动波以普通攻击主目标位置作为 `max_distance`，到达主目标后立即结束；主目标后方仍被视觉波覆盖的怪物不再进入碰撞扫描。
+- 根因二：旧碰撞调用把普通攻击主目标作为 `excluded` 传入几何模块；如果主目标前没有其他怪，会表现为整条路径没有额外伤害。技能权威描述为“巨箭对路径上的敌人造成100%伤害”，没有主目标例外。
+- 根因三：旧碰撞间隔为 `0.03s`，而共享调度器实际以 `0.05s` 驱动；逻辑碰撞前沿可能落后于按 1200 速度移动的视觉特效。
+- 实施：`tower_special_skill_system.lua` 让巨箭从塔的位置沿本次目标方向移动到防御塔当前 `GetAttackRange()`，与 `modifier_tower_auto_attack` 的权威索敌范围一致；无有效接口时回退统一全局塔射程。
+- 宽度：视觉粒子 CP2 与碰撞扫描共用半宽 `110`；生产几何再叠加敌人模型 hull，表示敌人模型边缘碰到特效即可命中。
+- 地形：生产 `tower_skill_geometry.lua::distance_to_segment()` 只读取 `x/y`，不读取 `z`；正负高地单位均按俯视二维路径命中。
+- 伤害：继续使用 `modifier_tower_attack_effects::OnAttackLanded()` 已计算的 `payload.damage`，再乘技能配置 `damage_multiplier=1`，通过既有 `TOWER_SKILL_DAMAGE_REQUEST -> damage_service` 物理伤害链结算；未创建第二套攻击公式。
+- 命中：不再排除存活主目标；路径波接触主目标时也结算一次路径伤害。主目标若已被普通攻击击杀，则生产几何的存活过滤自然跳过。每支波通过 `hit[entindex]` 保证每个单位最多命中一次。
+- 生命周期：碰撞间隔改为与共享调度器一致的 `0.05s`，视觉速度和逻辑步长同步；波到达完整攻击距离后结束，塔被销毁时取消该塔全部活动波。
+- 回归：扩展 `test_tower_wave_of_terror_visual.lua`，覆盖延迟接触、主目标、主目标后方、不同 Z 高度、宽度边缘、范围外单位、单波去重、致死主目标和塔销毁取消。
+- 新增：`test_tower_skill_geometry.lua` 直接测试生产几何，确认中心线、高低差、宽度加模型 hull、主目标排除参数和路径终点边界。
+- 明确通过：`TOWER_WAVE_OF_TERROR_VISUAL_PASS`、`TOWER_SKILL_GEOMETRY_PASS`、`TOWER_MULTI_VISUAL_CONFIG_PASS`、`SCHEDULER_RESTART_PASS`。
+- 全量结果：41 项 Lua 测试中 38 项通过；3 项既有无关失败为 `test_hero_combat_stat_projection.lua`、`test_hero_summon_owner.lua`、`test_tree_progression.lua`，分别属于英雄攻速投影、召唤英雄血条和树木等级配置，与本次三个防御塔文件无代码关联。
+- 环境说明：Git 只读命令受已知终端桥接超时影响，未虚报 `diff --check` 或状态结果；最终源码、生产几何和测试均已通过 `read_files` 复核。
+- 下一步唯一动作：完全停止当前 Run 后重新启动，用同一路径放置主目标、主目标后方怪物和不同高地怪物，确认特效接触时各扣除一次现有攻击力伤害。
