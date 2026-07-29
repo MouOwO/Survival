@@ -36,6 +36,8 @@
 32. **项目技能接管使用固定 cell、左上角对齐的单行网格。** 每个技能 cell 固定 52×52、间距固定；技能数量只改变整行向右延伸的宽度。整行位置使用官方 `abilities` 容器左上角；Valve `AbilityN`/`AbilityButton` 只用于完整映射、视觉顺序和官方视觉压制，不得再次把官方动态宽高或随数量变化的按钮底边复制到项目行。历史 65×65 基线已被实机判定偏大，不得恢复。
 33. **Valve 物品 Tooltip 元数据必须来自静态注册资源。** Lua 实例字段只承载业务身份与权限，不得假设存在运行时名称、说明或图标 setter。排查世界 Tooltip 时必须同时记录 `CreateItem` 请求名、`GetAbilityName()` 实际名和客户端 `$.Localize()` 结果。
 34. **本地化文件必须进入引擎标准加载路径。** Valve 游戏/世界 Tooltip 使用 `game/dota_addons/survival/resource/addon_<language>.txt`；Panorama 诊断和自定义 UI 使用 `panorama/localization/addon_<language>.txt`。不得只修改不会被这些消费者加载的 `resource/localization/` 镜像。
+35. **英雄商城饰品使用“本机资源取证 + 基础骨骼上的命名 wearable”方案。** 先通过 defindex 确认 Bundle 子物品和槽位，再从当前 `pak01_dir.vpk` 以英雄目录、发布时间开发代号、模型/材质/图标/粒子交叉验证真实路径；展示名不得直接当资源目录名。运行时保留英雄主体骨骼与动画，以项目创建的 `prop_dynamic`、`SetOwner` 和 `FollowEntity(hero, true)` 挂载 wearable。商城视觉像全身套装时也必须尊重实际槽位：`The Hallows Within` 已实机证明是单个大型 Head wearable，不得虚构多个身体组件或用 `SetModel` 替换英雄主体。
+36. **项目饰品生命周期必须幂等且严格限定身份。** wearable 和粒子按英雄 entindex 保存；重复应用先销毁/释放项目粒子并删除项目 wearable；粒子通过命名 owner 绑定对应 wearable。开局/重生接入必须校验目标英雄单位名、玩家身份和已初始化 entindex，禁止仅按 Undying 模型或单位名批量应用到修理工、波次怪、僵尸和 Boss。
 
 ## 游戏行为决策
 

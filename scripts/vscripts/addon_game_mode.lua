@@ -256,6 +256,12 @@ local function initialize_survival_hero(hero)
     end
     FindClearSpaceForUnit(hero, Vector(0, 0, 256), true)
 
+    -- Only the forced builder receives The Hallows Within. Custom Undying
+    -- creatures use the same native model but never enter this hero-ready path.
+    if unit_name == SURVIVAL_FORCE_HERO then
+        hero_cosmetic_service.apply(hero, "builder_undying")
+    end
+
     event_bus.emit(events.HERO_READY, {
         hero = hero,
         player_id = player_id,
@@ -294,6 +300,25 @@ local function on_hero_picked(keys)
         return
     end
     initialize_survival_hero(hero)
+end
+
+local function on_npc_spawned(keys)
+    local unit = keys.entindex
+        and EntIndexToHScript(keys.entindex) or nil
+    if not unit or unit:IsNull()
+        or unit:GetUnitName() ~= SURVIVAL_FORCE_HERO then
+        return
+    end
+
+    local player_id = unit:GetPlayerOwnerID()
+    if ready_hero_entindex_by_player[player_id] ~= unit:entindex() then
+        return
+    end
+
+    -- Hero respawn can rebuild or detach cosmetic children depending on the
+    -- engine version. Reapplying is idempotent because the service first
+    -- removes only the addon-owned wearable and particles.
+    hero_cosmetic_service.apply(unit, "builder_undying")
 end
 
 local function on_game_state_changed()
@@ -601,6 +626,7 @@ function M.activate()
         on_hero_picked,
         nil
     )
+    ListenToGameEvent("npc_spawned", on_npc_spawned, nil)
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
     ListenToGameEvent("dota_item_picked_up", on_item_picked_up, nil)
     -- End setup only after every HERO_READY subscriber and engine listener is
