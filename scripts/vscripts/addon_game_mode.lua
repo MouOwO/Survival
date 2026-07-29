@@ -342,32 +342,47 @@ local function on_entity_killed(keys)
     })
 end
 
-local function resolve_item_pickup_hero(keys, item)
-    local hero = keys.HeroEntityIndex
-        and EntIndexToHScript(keys.HeroEntityIndex) or nil
-    if hero and not hero:IsNull() then
-        return hero, "event"
+local function item_slot_for(unit, item)
+    if not unit or unit:IsNull() or not item or item:IsNull() then return -1 end
+    for slot = 0, 8 do
+        if unit:GetItemInSlot(slot) == item then return slot end
     end
+    return -1
+end
 
-    -- Altar heroes are created with CreateUnitByName, so the pickup event may
-    -- omit HeroEntityIndex. Resolve them from the authoritative summon state.
+local function resolve_item_pickup_hero(keys, item)
     local player_id = tonumber(keys.PlayerID)
         or tonumber(item and item.survival_owner_player_id)
+    local candidates = {}
+    local seen = {}
+    local function add_candidate(unit, source)
+        if not unit or unit:IsNull() then return end
+        local entindex = unit:entindex()
+        if seen[entindex] then return end
+        seen[entindex] = true
+        candidates[#candidates + 1] = { unit = unit, source = source }
+    end
+
+    local event_hero = keys.HeroEntityIndex
+        and EntIndexToHScript(keys.HeroEntityIndex) or nil
+    add_candidate(event_hero, "event")
     if player_id ~= nil and player_id >= 0 then
         local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
             player_id = player_id,
         })
-        if summoned and summoned.ok and summoned.unit
-            and not summoned.unit:IsNull() then
-            return summoned.unit, "summoned"
-        end
+        add_candidate(summoned and summoned.unit, "summoned")
+        add_candidate(PlayerResource:GetSelectedHeroEntity(player_id), "selected")
+    end
 
-        local selected = PlayerResource:GetSelectedHeroEntity(player_id)
-        if selected and not selected:IsNull() then
-            return selected, "selected"
+    for _, candidate in ipairs(candidates) do
+        local slot = item_slot_for(candidate.unit, item)
+        if slot >= 0 then
+            return candidate.unit, candidate.source .. "_holder", slot
         end
     end
-    return nil, "missing"
+    local fallback = candidates[1]
+    return fallback and fallback.unit or nil,
+        fallback and fallback.source or "missing", -1
 end
 
 local function on_item_picked_up(keys)
@@ -381,7 +396,7 @@ local function on_item_picked_up(keys)
     local is_seven_sins_essence =
         seven_sins_essences.by_engine_item_name[item_name] ~= nil
     if not is_challenge_reward and not is_seven_sins_essence then return end
-    local hero, hero_source = resolve_item_pickup_hero(keys, item)
+    local hero, hero_source, item_slot = resolve_item_pickup_hero(keys, item)
     if not hero then
         print(string.format(
             "[ITEM_PICKUP_HERO_MISSING] player=%s item=%s entindex=%s",
@@ -392,13 +407,6 @@ local function on_item_picked_up(keys)
         return
     end
 
-    local item_slot = -1
-    for slot = 0, 8 do
-        if hero:GetItemInSlot(slot) == item then
-            item_slot = slot
-            break
-        end
-    end
     print(string.format(
         "[ITEM_PICKUP_HERO_RESOLVED] player=%s hero=%s source=%s item=%s slot=%s",
         tostring(hero:GetPlayerOwnerID()),
@@ -423,6 +431,8 @@ local function on_item_picked_up(keys)
     -- Essences remain real items in equipment slots. Claim means "use now",
     -- so calling it during pickup was the regression that dropped every essence
     -- straight back onto the ground when its upgrade requirement was unmet.
+    if item.SetPurchaser then item:SetPurchaser(hero) end
+
     if is_seven_sins_essence then return end
     if item.Claim then
         local claimed = item:Claim(hero)

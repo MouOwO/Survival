@@ -664,3 +664,91 @@
 - 可复用粒子经验：粒子配置应通过命名 `owner` 绑定到对应 wearable，而不是一律绑定英雄原点；主粒子负责引用子粒子，运行时只需预缓存和创建已确认的入口 `.vpcf`。
 - 任务状态：角色部件饰品主目标完成并实机验收成功；任务归档到 `docs/ai/archive/2026-07-29-undying-hallows-within.md`。
 - 下一步唯一动作：等待用户新任务。
+
+## 2026-07-29 — 检查点 066：血条与 Tooltip 最小修改方案获批
+
+- 用户最新要求：头顶血条长度改为原来的二分之一并整体上移约 20px；隐藏第一张图中的 Valve 官方“攻击 / 防御”属性汇总面板；技能与背包项目 Tooltip 统一为中心横坐标对齐，Tooltip 下锚点距图标上锚点 10px；多人协作中必须保持最小修改量。
+- 用户已确认官方 Tooltip 范围只指“攻击 / 防御”属性汇总面板，并明确批准开始修改。
+- 源码事实：`hero_world_health_bar.css` 当前宽 124px；`hero_world_health_bar.js` 以 `screenX - 62` 居中并使用 `screenY - 6`。最小修改为 62px、`screenX - 31` 和 `screenY - 26`。
+- 源码事实：技能 `hud_takeover.js` 和背包 `inventory_tooltip.js` 已共同调用 `tooltip_position.js::PlaceAbove()`；该函数仍含 `-78/-88` 历史位移和 14px 间距，可只改共享函数实现统一规则。
+- 源码事实：`combat_stats.js::updateOfficialStatsVisibility()` 已对 `Damage/AttackSpeed/Armor` 关闭命中，但共同 `stats_container` 仍可命中；最小修复是在同一路径关闭该只读父节点及子树命中，不增加遮罩或高频 Hide 事件。
+- 安全边界：不修改血条高度/颜色/逐帧更新，不改变 Tooltip 内容，不隐藏官方底栏，不修改技能输入，不触碰背包原生操作，不清理或回退工作区其他修改。
+- 尚未验证：资源编译器解析、编译产物、限定差异与 Workshop Tools 实机效果。
+- 下一步唯一动作：实施四个 Panorama 源文件的局部修改，随后强制定向编译和限定验证。
+
+## 2026-07-29 — 检查点 067：血条与 Tooltip 最小修改完成
+
+- 实施结果：头顶血条宽度由 124px 改为 62px；JS 半宽偏移由 62 改为 31，保持单位中心对齐；垂直偏移由 -6 改为 -26，整体上移 20px。
+- 实施结果：共享 `tooltip_position.js::PlaceAbove()` 删除历史 `-78/-88/14px` 定位，改为 Tooltip 与悬停图标中心 X 对齐，Tooltip 下边缘距图标上边缘 10px；仍在当前帧、下一布局帧和 0.03 秒后复测真实尺寸，并保留 12px 屏幕边界。
+- 实施结果：`combat_stats.js::updateOfficialStatsVisibility()` 在原有三个属性子节点关闭命中的基础上，补充关闭 `stats_container.hittest/hittestchildren`；不隐藏属性视觉，不修改技能或背包输入。
+- 编辑纠正：首次上下文补丁误命中同名 `statsContainer` 的权威数字写入函数；在编译前已发现、移除并移动到目标可见性函数。最终源码中该父节点命中关闭仅出现一次，位于正确函数。
+- 编译证据：`hero_world_health_bar.js`、`hero_world_health_bar.css`、`tooltip_position.js`、`combat_stats.js` 分别强制编译，四项均返回 `OK: 1 compiled, 0 failed, 0 skipped`。
+- 产物证据：`hero_world_health_bar.vjs_c` 6052 字节、`hero_world_health_bar.vcss_c` 2701 字节、`tooltip_position.vjs_c` 4635 字节、`combat_stats.vjs_c` 71739 字节，时间戳均在本轮刷新。
+- 自动验证：`UI_MINIMAL_CHANGE_CONTRACT_PASS`、`CONTENT_DIFF_CHECK_PASS`、`DOCS_DIFF_CHECK_PASS`。
+- 环境说明：并行启动资源编译器曾导致终端捕获超时，未把未捕获项记为成功；其后四项全部串行重跑并取得独立成功汇总。
+- 尚未验证：助手无法直接观察 Workshop Tools；需要完全停止当前 Run 并重新启动后实机确认视觉位置、边缘约束以及官方“攻击 / 防御”面板是否彻底消失。
+- 下一步唯一动作：用户实机验收血条、技能 Tooltip、背包 Tooltip、属性区域悬停和背包原生操作。
+
+## 2026-07-29 — 检查点 068：选择事件与属性文字定位修复获批
+
+- 用户实机反馈：频繁点击同一单位时名称会先空再恢复；切换多个角色后攻速图标对应的权威文字会越来越向上偏移；选择刷新不够即时，应由 UI 选择事件推动。
+- 用户批准最小方案，并确认攻速/护甲文字右端与对应图标左端间距先采用 4px。
+- 已确认名称根因：两个 Valve 选择事件无条件调用 `beginUnitNameTransition()`；该函数在判断 entindex 是否变化前先隐藏名称、写空名称并清空快照，因此同单位重复事件也制造空帧。
+- 已确认刷新事实：`refreshHeroPanel()` 末尾仍永久 `$.Schedule(0.25, refreshHeroPanel)`；已有 `ui_selected_unit_stats_request/snapshot` 即时链和 NetTable 更新链，可以让名称、头像和战斗属性改为事件驱动。
+- 已确认持续数据边界：生命/魔法没有等价的现成 Panorama 属性变化事件，保留仅更新生命/魔法的轻量循环；不得继续让该循环重做名称、头像、Tooltip 绑定和服务端属性请求。
+- 已确认定位事实：`positionRelativeToOfficialPanel()` 当前只锚定 `AttackSpeed/Armor` 外层面板，并使用固定右对齐、22px margin 和 180px 宽度，没有读取真实图标几何。切换时 Valve 复用/重建属性行会使该关系不稳定。
+- 实施决定：保留 `0/0.016/0.05/0.10/0.20s` 有限选择重试以等待 portrait unit 更新，但重试期间不清空 UI；只有 entindex 真正变化时刷新一次。攻速/护甲改为 `findIcon(statPanel)` 的窗口坐标转 `stats_container` 局部坐标，文字右端固定在图标左侧 4px并垂直居中。
+- 修改边界：只改 `content/.../combat_stats.js` 和对应 game 编译产物；不改 XML、CSS、Lua、服务端请求语义或其他 UI。
+- 尚未验证：JS 编译、源码契约、限定差异和 Workshop Tools 实机结果。
+- 下一步唯一动作：实施单文件局部修复并强制定向编译。
+
+## 2026-07-29 — 检查点 069：选择事件与属性文字定位修复完成
+
+- 名称闪空修复：新增 `observedSelectedUnit`；Valve `selected_unit/query_unit` 事件仍使用 `0/0.016/0.05/0.10/0.20s` 有限重试等待 portrait unit 更新，但只有当前 entindex 与已观察 entindex 不同时才执行一次完整刷新。同单位重复事件不再隐藏名称、不写空名称、不清空快照、不重绑 Tooltip，也不重新请求权威属性。
+- 事件驱动修复：`refreshHeroPanel()` 移除永久 `0.25s` 自调度，选择变化时立即同步解析名称/头像/等级/生命魔法，并发送 `ui_selected_unit_stats_request`；`ui_selected_unit_stats_snapshot` 和 NetTable 到达后继续即时覆盖权威属性。
+- 持续数据边界：新增 `refreshHeroVitalsTick()`，仅每 0.25 秒读取当前单位生命/魔法并更新文本和填充宽度；不执行名称、头像、Tooltip 绑定、属性定位或服务端请求。
+- 属性定位修复：`positionRelativeToOfficialPanel()` 改为通过现有 `damageIconAnchor(statPanel)` 找到攻速/护甲真实图标；图标窗口坐标和高度按 `stats_container` UI scale 转换为局部单位，文字右端固定在图标左侧 4px，并按图标垂直居中。移除固定 `horizontalAlign=right + marginRight=22px` 的不稳定布局。
+- Valve 布局兼容：同一选择事件的后续有限回调只调用 `writeOfficialAttackText()` 和 `writeOfficialSecondaryStats()` 重新定位，等待 Valve 属性行稳定；不会清空 UI、请求快照或形成永久扫描。
+- 编译验证：`combat_stats.js` 强制定向编译返回 `OK: 1 compiled, 0 failed, 0 skipped`；game 产物 `combat_stats.vjs_c` 为 72018 字节，时间 `2026-07-29 21:46:15`。
+- 源码验证：`FINAL_SELECTION_EVENT_ICON_ANCHOR_PASS`，逐项确认同单位守卫、旧名称清空路径删除、完整 0.25 秒轮询删除、生命/魔法轻量循环保留、真实图标锚定和 4px 间距。
+- 限定检查：`COMBAT_STATS_DIFF_CHECK_PASS`；未修改 XML、CSS、Lua 或服务端请求语义。
+- 尚未验证：助手无法直接观察 Workshop Tools；需要用户完全停止当前 Run 并重新启动后连续点击同一单位、快速往返切换英雄/建筑/农民，确认名称无空帧、属性即时切换且攻速/护甲文字不漂移。
+- 下一步唯一动作：用户实机验收上述三项行为。
+
+## 2026-07-29 — 检查点 070：属性原文闪烁、装备刷新与拾取归属修复获批
+
+- 用户实机反馈：当前名称刷新及时；攻速/护甲权威文字与可见图标视觉间距约 20px；切换单位时 Valve 原始攻速/护甲 Text 会短暂闪现；购买装备后选中英雄防御等属性不实时刷新；召唤英雄拾取物品时原生特效错误出现在建造者头顶。
+- 用户批准按调查方案开始修复，并要求继续保持最小修改量。
+- 间距调查结论：项目 Label 已内联 `textAlign=right`，不是未右对齐；当前 `damageIconAnchor()` 返回递归遇到的第一个 Image，可能命中大背景、外框或带透明留白的容器，导致数学 4px、视觉约 20px。修复为候选筛选，优先合理小尺寸且最靠右的真实图标，保留 4px 公式。
+- 原文闪烁根因：`writeOfficialSecondaryStats()` 在项目快照未匹配时显式恢复 Valve Label 为 visible。修复为官方攻速/护甲 Label 始终 collapse，项目值未准备好时只隐藏项目 Label。
+- 装备刷新结论：服务端装备聚合、`EQUIPMENT_STATS_CHANGED`、英雄战斗快照推送链存在；客户端 `combat_stats.js` 未监听最终 `ui_weapon_synthesis_snapshot`。修复为该事件到达后强制请求当前选中单位权威属性一次。
+- 拾取归属结论：`resolve_item_pickup_hero()` 当前无条件信任事件 `HeroEntityIndex`，召唤英雄场景可能返回玩家原生建造者，从而永远不进入 summon 回退。修复为枚举事件英雄、权威召唤英雄和原生英雄候选，优先返回实际持有 item 的 0～8 槽单位，并在 Claim/七宗罪返回前将 purchaser 绑定实际拾取者。
+- 修改边界：`content/.../combat_stats.js`、`scripts/vscripts/addon_game_mode.lua`、对应编译产物和定向契约；不改装备数值语义、库存事务、合成逻辑或显式创建新拾取粒子。
+- 下一步唯一动作：实施两个目标文件的局部修改，强制编译 JS 并执行源码/Lua 契约与限定差异检查。
+
+## 2026-07-29 — 检查点 071：属性原文、装备刷新与拾取归属修复完成
+
+- UI 图标锚点：`damageIconAnchor()` 不再返回递归遇到的第一个 Image；现在收集子树候选，限定可见且布局尺寸 6～40px，按窗口 X 从右到左、同 X 时面积从小到大选择。项目 Label 仍为右对齐，继续使用文字右端距真实图标左端 4px 的公式。
+- Valve 原文压制：`writeOfficialSecondaryStats()` 在项目快照未匹配时也调用 `setNativeStatLabelsVisible(..., false)`；攻速和护甲原始 Label 不再临时恢复，因此切换单位时不应闪现旧值。
+- 装备 UI 刷新：客户端新增 `ui_weapon_synthesis_snapshot` 监听；最终装备快照到达且属于本地玩家时，对当前选中单位调用 `requestSelectedUnitStats(unit, true)`，在装备聚合完成后重新拉取权威攻击/攻速/护甲。
+- 拾取实际持有者：`addon_game_mode.lua` 新增 `item_slot_for()`；`resolve_item_pickup_hero()` 枚举事件英雄、权威召唤英雄和玩家原生英雄并去重，优先返回 0～8 槽实际持有 item 的候选，日志 source 增加 `_holder`。
+- 拾取身份：槽位验证成功后、七宗罪直接返回或 Claim 前调用 `item:SetPurchaser(hero)`，把物品 purchaser 绑定到实际拾取者；未新增自定义拾取粒子，也未改变库存登记/Claim/合成语义。
+- 编译：`combat_stats.js` 最终强制定向编译返回 `OK: 1 compiled, 0 failed, 0 skipped`；产物已刷新。
+- 自动验证：`HUD_EQUIPMENT_PICKUP_CONTRACT_PASS`、`PICKUP_ACTUAL_HOLDER_CONTRACT_PASS`、`COMBAT_STATS_DIFF_CHECK_PASS`、`PICKUP_DOCS_DIFF_CHECK_PASS`。
+- 环境限制：当前 Shell 没有独立 Lua/LuaJIT 解释器，未虚报 Lua 运行测试；Lua 修复通过源码顺序契约和限定差异检查。
+- 尚未验证：Valve 原生拾取特效由引擎播放，代码只能修正实际拾取者解析和 purchaser；是否完全改变特效 attachment 必须由 Workshop Tools 实机确认。
+- 下一步唯一动作：完全停止当前 Run 并重新启动，验收四项实机行为。
+
+## 2026-07-29 — 检查点 072：combat_stats.js 编码事故恢复完成
+
+- 用户运行时报错：`combat_stats.js line 29` 的 `enemy_tree` 中文字符串变为 `鏍?` 且引号损坏，Panorama 报 `Invalid or unexpected token` 并跳过脚本剩余内容；后续 HUD/网格初始化同时缺失。
+- 根因确认：上一轮 PowerShell 整文件读写把 UTF-8 中文错误按 CP936/GBK 解码后重新写成 UTF-8，造成整文件乱码和 18 处不可逆替换字符；不是单独一行逻辑 Bug。损坏差异曾达到 `262 additions / 119 deletions`。
+- 安全措施：未执行整文件 Git checkout/reset，避免丢失多轮未提交协作修改；损坏文件备份为 `.cline_tmp/combat_stats_corrupt_20260729_2253.js`。
+- 恢复方法：对乱码执行 CP936 字节到 UTF-8 的逆向恢复，生成 `.cline_tmp/combat_stats_recovered_preview.js`；逐行修复 18 处不可逆字符和被注释吞并的语句，并整体重建 `bindHotkeys()`、`bindHeroPortrait()` 两个受损函数。
+- 保留内容：名称事件去重、生命/魔法轻量刷新、真实图标候选筛选、Valve 原始 Text 永久压制、`ui_weapon_synthesis_snapshot` 装备刷新监听等已确认逻辑全部保留。
+- 正式恢复：恢复预览以 UTF-8 无 BOM 覆盖 content 源文件；第29行现为合法的 `"enemy_tree": "树",`，第30行为 `"npc_dota_hero_undying": "建造者"`。
+- 编译证据：正式 `combat_stats.js` 强制定向编译返回 `OK: 1 compiled, 0 failed, 0 skipped`；game 产物 `combat_stats.vjs_c` 为 74645 字节，时间 `2026-07-29 23:10:13`。
+- 验证证据：`COMBAT_STATS_ENCODING_RECOVERY_PASS`、`COMBAT_STATS_RECOVERY_DIFF_CHECK_PASS`；全文件残留乱码/替换字符为 0，`bindHotkeys()` 与 `bindHeroPortrait()` 各仅一份。
+- 长期禁止：对含中文的 Panorama/Lua 源码禁止再使用会隐式解码再整文件写回的 `Get-Content/Set-Content` 或默认编码路径；应使用字节级复制、明确 UTF-8 严格读取，或局部补丁工具。
+- 尚未验证：需完全停止当前 Run 并重新启动，确认异常消失、HUD 与网格恢复加载，再继续验收上一轮四项视觉/拾取行为。
+- 下一步唯一动作：用户完全重新启动地图并回报是否仍有 JS Exception。
