@@ -752,3 +752,23 @@
 - 长期禁止：对含中文的 Panorama/Lua 源码禁止再使用会隐式解码再整文件写回的 `Get-Content/Set-Content` 或默认编码路径；应使用字节级复制、明确 UTF-8 严格读取，或局部补丁工具。
 - 尚未验证：需完全停止当前 Run 并重新启动，确认异常消失、HUD 与网格恢复加载，再继续验收上一轮四项视觉/拾取行为。
 - 下一步唯一动作：用户完全重新启动地图并回报是否仍有 JS Exception。
+
+## 2026-07-29 — 检查点 073：护甲与攻速完全统一攻击力数字格式
+
+- Git 检查：当前位于 `dev`，`dev/dev_jyd/origin/dev/origin/dev_jyd` 均指向 `35f27a8`，切换分支未丢失已提交工作；工作区实施前干净。
+- Stash 检查：`stash@{0}` 仅含 `tools_asset_info.bin`；`stash@{1}` 含较旧的 `combat_stats.vjs_c`、本地化和工具缓存。两项均未应用或删除，避免旧编译产物覆盖当前 HUD。
+- 用户确认：护甲和攻速完全照搬攻击力数字文本的样式与定位方式，但护甲 War3 显示值、攻速每秒攻击次数及默认值语义保持不变。
+- 源码修改：新增 `applyAuthoritativeNumberStyle()`，攻击、攻速、护甲统一复用 `MonoNumbersFont`、`StatRegionLabel`、14px、`#cccccc`、180px 宽度、右对齐和不可命中设置。
+- 定位修改：新增 `nativeNumberAnchor()` 与 `positionRelativeToNativeNumber()`；三项均根据各自原生数字 Label/LabelContainer 的窗口 Y 坐标，使用攻击力既有的 `horizontalAlign=right`、`marginRight=22px`、固定宽度和行高公式。删除攻速/护甲专用的图标左侧 4px 定位函数。
+- 数值边界：未修改 `attackText()`、护甲 `formatNumber(snapshot.armor)` 或攻速配置值与 `0.5` 回退逻辑；Valve 原生攻速/护甲 Label 等待期压制保持不变。
+- 编译证据：`resourcecompiler.exe -f` 返回 `OK: 1 compiled, 0 failed, 0 skipped`；game 产物 `combat_stats.vjs_c` 为 72432 字节，时间 `2026-07-29 23:52:24`。
+- 尚未验证：自动编译不能代替 Workshop Tools 视觉结果；需完全停止当前 Run 并重新启动，快速切换英雄、建筑和农民，确认三项文字格式一致且护甲/攻速行位置正确。
+
+## 2026-07-30 — 检查点 074：攻速与护甲自定义 Text 消失回归修复
+
+- 用户实机证据：属性区域只剩攻速与护甲图标，两个数字均完全消失；用户明确指出官方 Text 之前已隐藏，必须显示项目自己的 Text。
+- 根因确认：真正应显示的是 `stats_container` 下项目创建的 `SurvivalAuthoritativeAttackSpeedLabel` 和 `SurvivalAuthoritativeArmorLabel`。上一轮 `applyAuthoritativeNumberStyle()` 每次刷新都先将项目 Label 设为 collapse，随后又依赖已被 `setNativeStatLabelsVisible(..., false)` 隐藏的官方 Text 作为锚点；锚点失败会在写值和设 visible 前提前返回。
+- 修复：共享样式函数不再修改 visibility；项目 Label 只在首次创建或权威快照不匹配时 collapse。攻速/护甲改由 `positionRelativeToStatRow()` 使用官方 `AttackSpeed`/`Armor` 行面板的窗口 Y 坐标定位，但实际写值和显示的始终是两个 `SurvivalAuthoritative...Label`。
+- 保留边界：官方攻速/护甲 Text 继续永久隐藏；攻击力定位、护甲 War3 显示值、攻速每秒次数与 0.5 回退均未修改。
+- 编译证据：`resourcecompiler.exe -f` 返回 `OK: 1 compiled, 0 failed, 0 skipped`。
+- 下一步：完全停止当前 Workshop Tools Run 并重新启动，确认两个项目数字恢复显示，再检查其与攻击力数字的横向格式和各自行纵向位置。
