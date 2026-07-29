@@ -18,7 +18,7 @@
 14. **建筑数量上限按队伍共享。** 计数键保持为 `counts[team][building_id]`；施工开始后占用名额，建筑死亡或施工失败后释放。`max_count=0` 明确定义为无限制。
 15. **Panorama 源码与游戏产物严格分离。** 源码修改在 `content\dota_addons\survival\panorama` 中完成；`game\dota_addons\survival\panorama` 只存放游戏加载的 `.vjs_c`、`.vcss_c`、`.vxml_c` 等编译产物。
 16. **Panorama 修改必须强制定向编译并检查汇总。** 对已存在且时间戳可能混乱的产物使用 `resourcecompiler.exe -f`；只有 `compiled > 0` 且 `failed=0` 才作为本轮重新编译的明确证据，单独出现 `skipped` 不作为充分证据。
-17. **官方战斗属性覆盖层按字段独立定位。** 攻击力使用 `positionRelativeToStatsContainer()`；攻速与护甲使用 `positionRelativeToOfficialPanel()`。移动攻速/护甲时不得顺带改变攻击力、三围或原生图标。
+17. **官方攻击、攻速与护甲覆盖层统一采用攻击力数字格式。** 三项共用权威数字样式和原生数字 Label 定位规则；护甲与攻速不得再使用图标候选位置推算。统一仅限文本表现，不改变三项数值语义、三围或原生图标。
 18. **PowerShell 参数必须跟随可执行程序。** `-NoProfile -ExecutionPolicy ...` 不能作为独立命令；外部调用应以 `powershell.exe` 或可用的 `pwsh` 开头，已在 PowerShell 会话内时可使用调用运算符 `&` 执行脚本。
 19. **技能 Tooltip 由项目代理控制，角色属性 Tooltip 取消，背包只接管气泡表现。** 官方 AbilityN 仅作为技能几何/生命周期锚点；攻击、护甲和攻速节点保留显示但关闭命中；官方背包在完整物品输入链完成前不得隐藏或接管操作。
 20. **Tooltip 动态内容由权威状态变化驱动。** NetTable 和 CustomGameEvent 更新时只刷新当前可见 Tooltip；禁止使用固定 `0.03s`、`0.35s` 等循环持续重绘动态数据。

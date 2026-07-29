@@ -78,7 +78,7 @@
 13. 英雄和建筑战斗属性 UI 已统一单位投影：运行时护甲使用 Dota 单位，面板护甲使用 War3 显示单位；英雄面板攻击保持 CSV 值，原生普通攻击仍保留英雄倍率投影。
 14. 建筑的 `max_count`、`requires_city_level` 和 `population_cost` 已由生成的 `building_definitions.lua` 驱动；箭塔全队共享上限为 7。
 15. 建筑数量在施工单位创建后立即占位，建筑死亡或施工实体失效后释放；`max_count=0` 表示无限制。
-16. 官方 HUD 上的权威攻速与护甲数值由 `content/.../combat_stats.js` 动态覆盖；两项共用 `positionRelativeToOfficialPanel()`，当前相对旧位置统一向上移动 6px。
+16. 官方 HUD 上的权威攻击、攻速与护甲数值由 `content/.../combat_stats.js` 动态覆盖；三项共用攻击力数字的样式和原生数字 Label 定位规则，攻速与护甲不再按图标猜测位置。
 17. Tooltip 当前边界：技能完全由项目代理控制；背包显示项目物品气泡但操作仍由 Valve 负责；角色属性详细 Tooltip 已取消；所有动态字段使用事件驱动刷新。
 
 ## 当前熔火装备升级链

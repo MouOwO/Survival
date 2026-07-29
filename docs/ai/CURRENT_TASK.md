@@ -19,11 +19,11 @@
 - Panorama 源码只修改 content 目录；game 目录仅接收强制定向编译产物。
 - 选择事件先比较 portrait unit entindex；相同单位不清空名称或快照，真正切换才立即刷新并请求权威数据。
 - 移除人物面板永久 0.25 秒完整轮询；生命/魔法保留独立轻量刷新，名称、头像和战斗属性由选择/快照事件驱动。
-- 攻速与护甲文字使用各自真实图标作为几何锚点，文字右端距图标左端固定 4px。
+- 攻速与护甲文字完全复用攻击力数字文本的样式和原生数字 Label 定位规则；三项使用同一固定宽度、右对齐、右边距和行高公式。
 
 ## 当前状态
 
-**`combat_stats.js` 编码损坏已恢复并重新编译，等待完全重启后确认 HUD/网格恢复。**
+**攻速/护甲自定义 Label 消失回归已修复并重新编译，等待完全重启后实机验收。**
 
 ## 验收标准
 
@@ -31,7 +31,7 @@
 - 技能与背包项目 Tooltip 均按图标中心对齐，垂直间距为 10px，并保留屏幕边缘约束。
 - 悬停官方属性区域不再显示“攻击 / 防御”汇总面板，权威攻击、攻速和护甲数字仍可见。
 - 重复点击同一单位时名称不闪空；切换单位时由选择事件立即刷新并请求权威快照。
-- 多次切换后攻速/护甲文字不累积漂移，文字右端与对应图标左端保持 4px。
+- 多次切换后攻速/护甲文字不累积漂移，并与攻击力数字保持完全相同的文本样式和定位方式。
 - 所有修改资源强制编译为 `compiled > 0, failed=0, skipped=0`；限定差异检查通过。
 
 ## 下一步唯一动作
@@ -50,11 +50,13 @@
 - 四个 game 编译产物均已刷新；未修改 XML、Lua、CSV、技能输入或背包操作链。
 - `combat_stats.js` 选择事件现在使用 `observedSelectedUnit` 去重，并保留 `0/0.016/0.05/0.10/0.20s` 有限重试等待 portrait unit 与 Valve 属性行稳定；重试期间不再清空名称或快照。
 - `refreshHeroPanel()` 已改为一次性事件刷新；永久 0.25 秒循环仅由 `refreshHeroVitalsTick()` 更新生命/魔法，不再重做名称、头像、Tooltip 绑定或服务端请求。
-- 攻速/护甲权威文字改为各自真实图标锚定，文字右端距图标左端固定 4px，并按图标垂直居中。
-- `combat_stats.js` 强制编译：`OK: 1 compiled, 0 failed, 0 skipped`；产物 72018 字节，时间 2026-07-29 21:46:15。
-- 验证：`FINAL_SELECTION_EVENT_ICON_ANCHOR_PASS`、`COMBAT_STATS_DIFF_CHECK_PASS`。
-- 攻速/护甲图标锚点改为收集候选并筛选 6～40px 的可见小尺寸节点，优先选择最靠右、面积较小的真实图标；继续保持项目文字右对齐和 4px 间距公式。
+- 攻速/护甲权威文字最终改为与攻击力共用原生数字 Label 锚定、固定宽度、右对齐、右边距和行高规则；不再使用真实图标候选定位。
+- `combat_stats.js` 最新强制编译：`OK: 1 compiled, 0 failed, 0 skipped`；产物 72432 字节，时间 2026-07-29 23:52:24。
+- 历史 `FINAL_SELECTION_EVENT_ICON_ANCHOR_PASS` 方案已被本次原生数字 Label 统一定位方案替代。
+- 旧的攻速/护甲图标候选筛选仍供其他逻辑属性定位使用，但不再参与攻速或护甲权威数字定位。
 - Valve 攻速/护甲原始 Label 在项目快照等待期也始终 collapse，不再恢复可见。
 - `ui_weapon_synthesis_snapshot` 到达后强制请求当前选中单位权威属性，确保装备聚合完成后 UI 立即刷新。
 - `addon_game_mode.lua` 拾取解析改为事件英雄、权威召唤英雄和原生英雄候选中实际持有 item 的单位优先，并在 Claim 前绑定 purchaser 到实际拾取者。
 - 验证：`HUD_EQUIPMENT_PICKUP_CONTRACT_PASS`、`PICKUP_ACTUAL_HOLDER_CONTRACT_PASS`、`COMBAT_STATS_DIFF_CHECK_PASS`、`PICKUP_DOCS_DIFF_CHECK_PASS`；`combat_stats.js` 编译为 `1 compiled, 0 failed, 0 skipped`。
+- 最新文字格式修复：攻击、攻速、护甲共用 `applyAuthoritativeNumberStyle()` 和 `positionRelativeToNativeNumber()`；护甲、攻速数值语义保持不变。`combat_stats.vjs_c` 强制编译为 `1 compiled, 0 failed, 0 skipped`。
+- 消失回归修复：`applyAuthoritativeNumberStyle()` 不再在每次刷新时隐藏项目 Label；`SurvivalAuthoritativeAttackSpeedLabel` 与 `SurvivalAuthoritativeArmorLabel` 仅首次创建或快照不匹配时 collapse。二者使用官方属性行面板的纵向几何定位，不再依赖已隐藏的官方 Text，最终明确写值并设为 visible。
