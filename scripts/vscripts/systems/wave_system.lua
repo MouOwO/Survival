@@ -7,6 +7,7 @@ local archetypes = require("config/generated/monster_archetypes")
 local spawn_points = require("config/generated/monster_spawn_points")
 local monster_spawn_marker_service = require("systems/monster_spawn_marker")
 local armor_balance = require("config/armor_balance")
+local asset_preload = require("systems/asset_preload_service")
 
 local M = {}
 local state = {}
@@ -17,6 +18,23 @@ local difficulty_id = "N1"
 local waves = {}
 local dev_mode = false
 local monster_spawn_marker = nil
+
+local function queue_wave_assets(number)
+    local wave = waves[number]
+    if not wave then return end
+    local seen = {}
+    for _, row in ipairs(wave.batches or {}) do
+        local definition = archetypes.by_id[row.archetype_id]
+        local model_path = definition and definition.model_path or nil
+        if model_path and not seen[model_path] then
+            asset_preload.queue_model(model_path, {
+                urgent = true,
+                priority = 2000 - (tonumber(number) or 0),
+            })
+            seen[model_path] = true
+        end
+    end
+end
 
 local function valid(entity)
     return entity and not entity:IsNull()
@@ -158,6 +176,7 @@ local function start_countdown(seconds)
     if dev_mode then return end
     state.status = "countdown"
     state.timer = seconds
+    queue_wave_assets((state.current_wave or 0) + 1)
     publish("countdown_started")
     scheduler.cancel("wave_countdown")
     scheduler.every(1.0, function()

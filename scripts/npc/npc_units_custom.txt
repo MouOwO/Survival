@@ -335,4 +335,40 @@
         "VisionDaytimeRange"     "800"
         "VisionNighttimeRange"   "800"
     }
+
+    // Resource-only units: never spawned in gameplay. They give
+    // PrecacheUnitByNameAsync an exact KV dependency for each streamed model.
+    "asset_proxy_monster_doom" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/doom/doom.vmdl" }
+    "asset_proxy_monster_undying_golem" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/undying/undying_flesh_golem.vmdl" }
+    "asset_proxy_monster_underlord" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/abyssal_underlord/abyssal_underlord.vmdl" }
+    "asset_proxy_monster_vengefulspirit" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/vengefulspirit/vengefulspirit.vmdl" }
+    "asset_proxy_monster_dragon_knight" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/dragon_knight/dragon_knight.vmdl" }
+    "asset_proxy_monster_tusk" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tusk/tusk.vmdl" }
+    "asset_proxy_monster_visage" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/visage/visage.vmdl" }
+    "asset_proxy_monster_sniper" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/sniper/sniper.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
+    "asset_proxy_monster_ogre_magi" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/ogre_magi/ogre_magi.vmdl" }
+    "asset_proxy_monster_tiny" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tiny/tiny.vmdl" }
+    "asset_proxy_monster_ursa" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/ursa/ursa.vmdl" }
+    "asset_proxy_monster_terrorblade" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/terrorblade/terrorblade.vmdl" }
+    "asset_proxy_monster_tidehunter" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tidehunter/tidehunter.vmdl" }
+    "asset_proxy_monster_pudge" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/pudge/pudge.vmdl" }
+    "asset_proxy_monster_rubick" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/rubick/rubick.vmdl" "ProjectileModel" "particles/units/heroes/hero_rubick/rubick_base_attack.vpcf" }
+    "asset_proxy_monster_lich" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lich/lich.vmdl" }
+    "asset_proxy_monster_juggernaut" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/juggernaut/juggernaut.vmdl" }
+    "asset_proxy_monster_warlock" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/warlock/warlock.vmdl" }
+    "asset_proxy_tower_keeper_of_the_light" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/keeper_of_the_light/keeper_of_the_light.vmdl" "ProjectileModel" "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_base_attack.vpcf" }
+    "asset_proxy_tower_obsidian_destroyer" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/obsidian_destroyer/obsidian_destroyer.vmdl" "ProjectileModel" "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_base_attack.vpcf" }
+    "asset_proxy_tower_zuus" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/zuus/zuus.vmdl" }
+    "asset_proxy_tower_gyro" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/gyro/gyro.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
+    "asset_proxy_tower_tinker" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tinker/tinker.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
+    "asset_proxy_tower_crystal_maiden" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/crystal_maiden/crystal_maiden.vmdl" "ProjectileModel" "particles/units/heroes/hero_lich/lich_base_attack.vpcf" }
+    "asset_proxy_tower_ancient_apparition" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/ancient_apparition/ancient_apparition.vmdl" "ProjectileModel" "particles/units/heroes/hero_lich/lich_base_attack.vpcf" }
+    "asset_proxy_tower_lion" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lion/lion.vmdl" "ProjectileModel" "particles/units/heroes/hero_lion/lion_base_attack.vpcf" }
+    "asset_proxy_tower_lina" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lina/lina.vmdl" "ProjectileModel" "particles/units/heroes/hero_lina/lina_base_attack.vpcf" }
+    "asset_proxy_wall_tiny_large_form" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tiny/tiny_04/tiny_04.vmdl" "ProjectileModel" "particles/units/heroes/hero_tiny/tiny_ambient_lvl4.vpcf" }
+    "asset_proxy_wall_tiny_anthozoan_huge" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/tiny_anthozoa_giant_back/tiny_anthozoa_giant_back.vmdl" "ProjectileModel" "particles/econ/items/tiny/tiny_anthozoa/tiny_anthozoa_back.vpcf" }
+    "asset_proxy_wall_tiny_stronghold_fortress" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/lionheart_kings_moving_castle_t4/lionheart_kings_moving_castle_t4.vmdl" "ProjectileModel" "particles/econ/items/tiny/lionheart/lvl4/lionheart_lvl4_ambient.vpcf" }
+    "asset_proxy_wall_tiny_frostmoot_large" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/frozen_stonehenge/frozen_stonehenge_lvl_04.vmdl" "ProjectileModel" "particles/econ/items/tiny/tiny_frozen_stonehenge/tiny_stonehenge_ambient_lvl4.vpcf" }
+    "asset_proxy_wall_tiny_astral_origins_back" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/tiny_astral_order_back/tiny_astral_order_back.vmdl" "ProjectileModel" "particles/econ/items/tiny/tiny_astral_order/tiny_astral_order_back_ambient.vpcf" }
+    "asset_proxy_wall_tiny_colossus_monolith" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/tiny_prestige/tiny_prestige_lvl_04.vmdl" "ProjectileModel" "particles/econ/items/tiny/tiny_prestige/tiny_prestige_lvl4_ambient.vpcf" }
 }

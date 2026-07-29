@@ -3,6 +3,7 @@ local M = {}
 
 M["altar_actions"] = require("config/generated/altar_actions")
 M["arrow_tower_base"] = require("config/generated/arrow_tower_base")
+M["asset_catalog"] = require("config/generated/asset_catalog")
 M["buff_definitions"] = require("config/generated/buff_definitions")
 M["builder_ability_rules"] = require("config/generated/builder_ability_rules")
 M["builder_ability_stages"] = require("config/generated/builder_ability_stages")
@@ -57,6 +58,7 @@ M["tower_skill_definitions"] = require("config/generated/tower_skill_definitions
 M["training_definitions"] = require("config/generated/training_definitions")
 M["ui_unlock_rules"] = require("config/generated/ui_unlock_rules")
 M["unit_display_names"] = require("config/generated/unit_display_names")
+M["wall_visual_levels"] = require("config/generated/wall_visual_levels")
 M["wave_definitions"] = require("config/generated/wave_definitions")
 M["weapon_definitions"] = require("config/generated/weapon_definitions")
 

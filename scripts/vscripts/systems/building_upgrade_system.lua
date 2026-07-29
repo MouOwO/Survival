@@ -7,6 +7,8 @@ local tower_ability_sync = require("systems/tower_ability_sync")
 local global_rules = require("config/global_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local building_population = require("systems/building_population_service")
+local building_visual = require("systems/building_visual_service")
+local asset_preload = require("systems/asset_preload_service")
 
 local M = {}
 local buildings = {}
@@ -47,10 +49,7 @@ local function apply_common(unit, data)
     unit:SetHealth(data.health)
     unit:SetPhysicalArmorBaseValue(data.armor)
     unit.survival_armor = tonumber(data.armor) or 0
-    if data.model_name and data.model_name ~= "" then
-        unit:SetModel(data.model_name)
-        unit:SetOriginalModel(data.model_name)
-    end
+    building_visual.apply(unit, data)
 end
 
 local function arrow_data(level)
@@ -413,6 +412,14 @@ end
 
 local function apply_model(unit, row)
     if not row or not row.model_name or row.model_name == "" then return end
+    asset_preload.queue_model(row.model_name, {
+        urgent = true,
+        priority = 1900,
+    })
+    asset_preload.queue_particle(row.projectile_model, {
+        urgent = true,
+        priority = 1900,
+    })
     unit:SetModel(row.model_name)
     unit:SetOriginalModel(row.model_name)
 end

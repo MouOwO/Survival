@@ -91,6 +91,8 @@ local monster_reward_service =
     require("systems/monster_reward_service")
 local monster_spawn_service =
     require("systems/monster_spawn_service")
+local asset_preload_service = require("systems/asset_preload_service")
+local unit_health_bar_service = require("systems/unit_health_bar_service")
 local challenge_session_service =
     require("systems/challenge_session_service")
 local training_room_service = require("systems/training_room_service")
@@ -103,9 +105,6 @@ local seven_sins_essence_service =
 local polar_crystal_progression_service =
     require("systems/polar_crystal_progression_service")
 local wave_system = require("systems/wave_system")
-local monster_archetypes = require("config/generated/monster_archetypes")
-local arrow_tower_base = require("config/generated/arrow_tower_base")
-local tower_route_config = require("config/tower_route_config")
 local buff_definitions = require("config/generated/buff_definitions")
 local content_inventory_service =
     require("systems/content_inventory_service")
@@ -453,47 +452,12 @@ function M.precache(context)
         "building_hero_altar",
         "npc_survival_upgrade_material",
         "npc_survival_lumberjack",
-        "npc_dota_hero_doom",
-        "npc_dota_hero_sven",
-        "npc_dota_hero_abyssal_underlord",
-        "npc_dota_hero_keeper_of_the_light",
-        "npc_dota_hero_obsidian_destroyer",
-        "npc_dota_hero_zuus",
-        "npc_dota_hero_razor",
-        "npc_dota_hero_storm_spirit",
-        "npc_dota_hero_sniper",
-        "npc_dota_hero_gyrocopter",
-        "npc_dota_hero_tinker",
-        "npc_dota_hero_drow_ranger",
-        "npc_dota_hero_windrunner",
-        "npc_dota_hero_clinkz",
-        "npc_dota_hero_lich",
-        "npc_dota_hero_crystal_maiden",
-        "npc_dota_hero_ancient_apparition",
-        "npc_dota_hero_skywrath_mage",
-        "npc_dota_hero_vengefulspirit",
         "enemy_tree",
-        "zombie_basic",
-        "zombie_boss",
         "npc_survival_wave_monster",
     }
     for _, unit_name in ipairs(units) do
         PrecacheUnitByNameSync(unit_name, context)
     end
-    -- These models are assigned directly to the arrow-tower entity, so
-    -- precache the model resources explicitly instead of relying only on
-    -- hero unit precaching.
-    PrecacheModel("models/heroes/zuus/zuus.vmdl", context)
-    PrecacheModel("models/heroes/drow_ranger/drow_ranger.vmdl", context)
-    PrecacheModel("models/heroes/gyro/gyro.vmdl", context)
-    PrecacheModel("models/heroes/vengeful/vengeful.vmdl", context)
-    PrecacheModel("models/heroes/crystal_maiden/crystal_maiden.vmdl", context)
-    PrecacheModel("models/heroes/ancient_apparition/ancient_apparition.vmdl", context)
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_drow/drow_base_attack.vpcf",
-        context
-    )
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
@@ -513,36 +477,7 @@ function M.precache(context)
             precached_buff_particles[status_effect] = true
         end
     end
-    PrecacheModel("models/props_structures/radiant_tower001.vmdl", context)
-    local precached_models = {}
-    local precached_projectiles = {}
-    local function precache_projectile(path)
-        if path and path ~= "" and not precached_projectiles[path] then
-            PrecacheResource("particle", path, context)
-            precached_projectiles[path] = true
-        end
-    end
-    for _, row in ipairs(arrow_tower_base.rows or {}) do
-        precache_projectile(row.projectile_model)
-        if row.model_name and row.model_name ~= "" then
-            PrecacheModel(row.model_name, context)
-        end
-    end
-    for class_id = 1, 7 do
-        for _, row in ipairs(tower_route_config.get_route("class_" .. class_id) or {}) do
-            precache_projectile(row.projectile_model)
-            if row.model_name and row.model_name ~= "" then
-                PrecacheModel(row.model_name, context)
-            end
-        end
-    end
-    for _, archetype in ipairs(monster_archetypes.rows or {}) do
-        if archetype.enabled ~= false and archetype.model_path
-            and archetype.model_path ~= "" and not precached_models[archetype.model_path] then
-            PrecacheModel(archetype.model_path, context)
-            precached_models[archetype.model_path] = true
-        end
-    end
+    asset_preload_service.precache_initial(context)
     hero_cosmetic_service.precache(context)
 end
 
@@ -557,6 +492,8 @@ function M.activate()
     event_bus.reset()
     configure_game_rules()
     scheduler.init()
+    asset_preload_service.init()
+    unit_health_bar_service.init()
     combat_bootstrap.init()
 
     tower_magic_supreme_system.init()

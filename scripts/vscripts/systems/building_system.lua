@@ -10,6 +10,7 @@ local tower_skills = require("systems/tower_skill_runtime")
 local scheduler = require("core/scheduler")
 local grid_config = require("config/grid_config")
 local building_population = require("systems/building_population_service")
+local building_visual = require("systems/building_visual_service")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
@@ -387,10 +388,7 @@ local function start_building(payload)
             state.definition,
             state.level
         )
-        if completed_level.model_name and completed_level.model_name ~= "" then
-            unit:SetModel(completed_level.model_name)
-            unit:SetOriginalModel(completed_level.model_name)
-        end
+        building_visual.apply(unit, completed_level)
         unit:SetHealth(maximum_health)
         unit:SetControllableByPlayer(check.player_id, true)
         buildings[unit:entindex()] = state
@@ -529,6 +527,7 @@ local function on_entity_killed(payload)
     if not valid_entity(victim) then return end
     local state = buildings[victim:entindex()]
     if not state then return end
+    building_visual.clear(victim)
     buildings[victim:entindex()] = nil
     change_count(state.team, state.building_id, -1)
     event_bus.request(events.GRID_RELEASE_REQUEST, {

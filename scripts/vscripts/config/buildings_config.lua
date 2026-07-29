@@ -1,5 +1,6 @@
 local building_levels = require("config/generated/building_levels")
 local building_definitions = require("config/generated/building_definitions")
+local wall_visual_levels = require("config/generated/wall_visual_levels")
 local construction_rules = require(
     "config/generated/building_construction_rules"
 )
@@ -53,10 +54,17 @@ local function dota_armor(war3_armor)
     return armor_balance.from_war3(war3_armor)
 end
 
+local wall_visual_by_level = {}
+for _, row in ipairs(wall_visual_levels.rows or {}) do
+    if row.enabled ~= false then wall_visual_by_level[row.level] = row end
+end
+
 local function level_rows(building_id)
     local result = {}
     for _, row in ipairs(building_levels.rows or {}) do
         if row.enabled ~= false and row.building_id == building_id then
+            local visual = building_id == "building_wall"
+                and wall_visual_by_level[row.level] or nil
             result[row.level] = {
                 level = row.level,
                 display_name = row.display_name,
@@ -65,6 +73,7 @@ local function level_rows(building_id)
                 requires_city_level = row.requires_city_level,
                 prerequisite_text = row.prerequisite_text,
                 model_name = row.model_name,
+                model_asset_id = visual and visual.model_asset_id or nil,
                 add_population = row.population_add,
                 wood_cost = row.wood_cost or 0,
                 gold_cost = row.gold_cost or 0,

@@ -3,6 +3,9 @@ modifier_single_health_bar = class({})
 function modifier_single_health_bar:IsHidden() return true end
 function modifier_single_health_bar:IsPurgable() return false end
 function modifier_single_health_bar:RemoveOnDeath() return false end
+function modifier_single_health_bar:GetAttributes()
+    return MODIFIER_ATTRIBUTE_PERMANENT
+end
 
 local function valid(unit)
     return unit and not unit:IsNull()
@@ -10,25 +13,25 @@ end
 
 function modifier_single_health_bar:OnCreated(kv)
     if not IsServer() then return end
-    self.player_id = tonumber(kv.player_id)
-        or self:GetParent():GetPlayerOwnerID()
+    local parent = self:GetParent()
+    self.unit_key = "unit_" .. tostring(parent:entindex())
     self:StartIntervalThink(0.1)
     self:Publish(false)
 end
 
 function modifier_single_health_bar:CheckState()
-    -- Panorama owns this hero's overhead health bar. The native bar becomes
-    -- mostly black when survival-scale maximum health creates thousands of pips.
+    -- Panorama owns every combat unit's overhead health bar. Hiding the engine
+    -- bar prevents survival-scale health values from creating segmented pips.
     return { [MODIFIER_STATE_NO_HEALTH_BAR] = true }
 end
 
 function modifier_single_health_bar:Publish(removed)
-    if not IsServer() or self.player_id == nil or self.player_id < 0 then return end
+    if not IsServer() or not self.unit_key then return end
     local parent = self:GetParent()
     if removed or not valid(parent) then
         CustomNetTables:SetTableValue(
             "survival_hero_health_bar",
-            "player_" .. tostring(self.player_id),
+            self.unit_key,
             { removed = 1 }
         )
         return
@@ -41,8 +44,8 @@ function modifier_single_health_bar:Publish(removed)
         and health >= max_health - 0.5
         and health > self.last_health + 0.5 then
         print(string.format(
-            "[HERO_HEALTH_WATCH] entindex=%s player=%s health=%.1f->%.1f max=%.1f",
-            tostring(parent:entindex()), tostring(self.player_id),
+            "[UNIT_HEALTH_WATCH] entindex=%s health=%.1f->%.1f max=%.1f",
+            tostring(parent:entindex()),
             self.last_health, health, max_health
         ))
     end
@@ -53,12 +56,13 @@ function modifier_single_health_bar:Publish(removed)
     self.last_alive = alive
     CustomNetTables:SetTableValue(
         "survival_hero_health_bar",
-        "player_" .. tostring(self.player_id),
+        self.unit_key,
         {
             entindex = parent:entindex(),
             health = health,
             max_health = max_health,
             alive = alive,
+            team = parent:GetTeamNumber(),
             removed = 0,
         }
     )
