@@ -145,6 +145,7 @@ local monster_encounter_ui_service =
     require("ui/monster_encounter_ui_service")
 local combat_stats_ui_service =
     require("ui/combat_stats_ui_service")
+local game_info_service = require("ui/game_info_service")
 local cheat_command_service =
     require("debug/cheat_command_service")
 
@@ -547,6 +548,7 @@ function M.activate()
     weapon_growth_service.init()
     weapon_synthesis_snapshot_service.init()
     hero_combat_stat_service.init()
+    game_info_service.init()
     hero_passive_skill_service.init()
     hero_summon_system.init()
     builder_progression_system.init()
