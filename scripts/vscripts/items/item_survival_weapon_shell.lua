@@ -1,4 +1,5 @@
 -- Visual inventory shells only. Gameplay stats are server-authoritative.
+local ground_reward_claim = require("items/challenge_ground_reward_claim")
 item_survival_death_mask = item_survival_death_mask or class({})
 item_survival_growth_sword_01 = item_survival_growth_sword_01 or class({})
 item_survival_growth_sword_02 = item_survival_growth_sword_02 or class({})
@@ -45,3 +46,16 @@ item_survival_molten_core_02_shell = item_survival_molten_core_02_shell or class
 item_survival_molten_core_03_shell = item_survival_molten_core_03_shell or class({})
 item_survival_molten_core_04_shell = item_survival_molten_core_04_shell or class({})
 item_survival_ice_soul_ember_shell = item_survival_ice_soul_ember_shell or class({})
+
+local ground_reward_classes = {
+    item_survival_synthesis_gem_shell,
+    item_survival_molten_core_01_shell,
+    item_survival_molten_core_02_shell,
+    item_survival_molten_core_03_shell,
+    item_survival_molten_core_04_shell,
+    item_survival_ice_soul_ember_shell,
+}
+
+for _, item_class in ipairs(ground_reward_classes) do
+    item_class.Claim = ground_reward_claim.claim
+end

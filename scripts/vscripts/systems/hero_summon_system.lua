@@ -109,6 +109,10 @@ local function create_hero(player_id, team, altar, definition)
     end
 
     stat_adapter.apply(unit, definition)
+    -- Selected-unit UI must use the addon hero identity rather than the
+    -- native carrier identity (for example Sven or Undying).
+    unit.survival_display_name = definition.display_name
+    unit.survival_hero_id = definition.hero_id
     if not unit:HasModifier("modifier_single_health_bar") then
         unit:AddNewModifier(unit, nil, "modifier_single_health_bar", {
             player_id = player_id,

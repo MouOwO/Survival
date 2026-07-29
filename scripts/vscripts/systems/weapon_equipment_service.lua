@@ -1,21 +1,13 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local weapons = require("config/generated/weapon_definitions")
+local items = require("config/generated/item_definitions")
 local content = require("config/generated/content_catalog")
 local equipment = require("config/equipment_definitions")
 local logger = require("core/logger")
 
 local M = {}
 local state_by_player = {}
-local material_shells = {
-    material_synthesis_gem = "item_survival_synthesis_gem_shell",
-    material_molten_core_01 = "item_survival_molten_core_01_shell",
-    material_molten_core_02 = "item_survival_molten_core_02_shell",
-    material_molten_core_03 = "item_survival_molten_core_03_shell",
-    material_molten_core_04 = "item_survival_molten_core_04_shell",
-    material_ice_soul_ember = "item_survival_ice_soul_ember_shell",
-}
-
 local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
@@ -44,7 +36,11 @@ local function state(player_id)
 end
 
 local function shell_item_name(content_id, definition)
-    if material_shells[content_id] then return material_shells[content_id] end
+    local item_definition = items.by_id[content_id]
+    local engine_item_name = tostring(
+        item_definition and item_definition.engine_item_name or ""
+    )
+    if engine_item_name ~= "" then return engine_item_name end
     local series_id = tostring(definition and definition.series_id or "")
     local names = {
         attack_gloves = "item_survival_attack_gloves_shell",
@@ -129,7 +125,10 @@ local function adopt_content_shell(payload)
     local hero = payload.hero
     local item = payload.item
     local definition = content.by_id[content_id]
-    if player_id == nil or player_id < 0 or not material_shells[content_id]
+    local item_definition = items.by_id[content_id]
+    if player_id == nil or player_id < 0
+        or not item_definition
+        or tostring(item_definition.engine_item_name or "") == ""
         or not definition or not valid_entity(hero) or not valid_entity(item) then
         return { ok = false, error = "content_shell_adopt_invalid" }
     end
@@ -188,7 +187,9 @@ end
 
 local function should_use_content_shell(content_id, definition)
     if not definition then return false end
-    if material_shells[content_id] then
+    local item_definition = items.by_id[content_id]
+    if item_definition
+        and tostring(item_definition.engine_item_name or "") ~= "" then
         return definition.enabled ~= false
             and tostring(definition.content_type or "") == "material"
     end

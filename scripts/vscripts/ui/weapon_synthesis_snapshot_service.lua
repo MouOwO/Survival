@@ -4,6 +4,7 @@ local recipe_config = require("config/recipe_definitions")
 local effect_config = require("config/item_level_effects")
 local levels = require("config/equipment_level_definitions")
 local effects = require("config/effect_dictionary")
+local tooltip_view_model = require("ui/tooltip_view_model")
 
 local M = {}
 
@@ -46,6 +47,12 @@ local function publish(id, reason)
         growth = weapon_growth,
         instances = instances and instances.instances or {},
         equipment_growth = equipment_growth and equipment_growth.progress or {},
+        tooltip_view_model = tooltip_view_model.weapon_snapshot(
+            equipped,
+            weapon_growth,
+            instances and instances.instances or {},
+            equipment_growth and equipment_growth.progress or {}
+        ),
     })
     send(id, "ui_weapon_synthesis_snapshot", {
         player_id = id, reason = reason or "changed", success = 1,

@@ -35,3 +35,6 @@ docs/ai/PROJECT_CONTEXT.md
 docs/ai/CURRENT_TASK.md
 docs/ai/DECISIONS.md
 docs/ai/KNOWN_ISSUES.md
+
+开始说一转二转三转四转的配置，
+datamanager当中需要有英雄射程范围内攻击敌方单位数量，一开始是0，

@@ -351,7 +351,9 @@ local function on_item_picked_up(keys)
         and EntIndexToHScript(keys.ItemEntityIndex) or nil
     if not item or item:IsNull() then return end
     local item_name = item:GetAbilityName()
-    local is_challenge_reward = item_name == "item_survival_challenge_reward"
+    local is_challenge_reward = item.survival_ground_reward == true
+        or (item_name == "item_survival_challenge_reward"
+            and item.survival_claimed ~= true)
     local is_seven_sins_essence =
         seven_sins_essences.by_engine_item_name[item_name] ~= nil
     if not is_challenge_reward and not is_seven_sins_essence then return end
@@ -399,7 +401,11 @@ local function on_item_picked_up(keys)
     -- straight back onto the ground when its upgrade requirement was unmet.
     if is_seven_sins_essence then return end
     if item.Claim then
-        item:Claim(hero)
+        local claimed = item:Claim(hero)
+        if claimed == false and item and not item:IsNull()
+            and hero.DropItemAtPositionImmediate then
+            hero:DropItemAtPositionImmediate(item, hero:GetAbsOrigin())
+        end
     end
 end
 

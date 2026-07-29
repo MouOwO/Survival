@@ -8,6 +8,7 @@ local heroes = require("config/generated/hero_definitions")
 local skills = require("config/generated/hero_skill_definitions")
 local passive_skills = require("config/hero_passive_skill_definitions")
 local initial_skills = require("config/generated/hero_initial_skills")
+local tooltip_view_model = require("ui/hero_skill_tooltip_view_model")
 
 local M = {}
 
@@ -39,6 +40,7 @@ local function skill_projection(skill_id, level)
     local maximum = passive and passive.max_level
         or (definition and tonumber(definition.max_level)) or 1
     local next_level = math.min(maximum, level + 1)
+    local level_rows = tooltip_view_model.level_rows(passive, maximum)
     return {
         skill_id = skill_id,
         ability_name = definition and definition.ability_name or "",
@@ -60,6 +62,7 @@ local function skill_projection(skill_id, level)
             and passive.damage_multiplier[next_level] or 0,
         next_effect = passive and level < maximum
             and passive.level_text[next_level] or "",
+        level_rows = level_rows,
         is_max_level = level >= maximum and 1 or 0,
         effect_type = definition and definition.effect_type or "",
         effect_value_per_level = definition

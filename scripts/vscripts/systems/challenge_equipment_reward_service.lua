@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/generated/challenge_definitions")
 local catalog = require("config/generated/content_catalog")
+local items = require("config/generated/item_definitions")
 local content_id_aliases = require("config/content_id_aliases")
 local molten_core_rules = require("config/molten_core_challenge_rules")
 
@@ -65,16 +66,26 @@ local function drop(player_id, content_id, key, position)
     local hero = summoned and summoned.unit
         or PlayerResource:GetSelectedHeroEntity(player_id)
     local definition = catalog.by_id[content_id]
+    local item_definition = items.by_id[content_id]
+    local engine_item_name = tostring(
+        item_definition and item_definition.engine_item_name or ""
+    )
     if not valid(hero) or not position or not definition then
         return { ok = false, error = "challenge_ground_reward_invalid" }
     end
-    local item = CreateItem("item_survival_challenge_reward", hero, hero)
+    if engine_item_name == "" then
+        return { ok = false, error = "challenge_ground_reward_item_mapping_missing" }
+    end
+    local item = CreateItem(engine_item_name, hero, hero)
     if not valid(item) then
         return { ok = false, error = "challenge_ground_reward_create_failed" }
     end
+    local actual_engine_item_name = item.GetAbilityName and item:GetAbilityName()
+        or engine_item_name
     item.survival_content_id = content_id
     item.survival_owner_player_id = player_id
     item.survival_reward_key = key
+    item.survival_ground_reward = true
     if item.SetPurchaser then item:SetPurchaser(hero) end
     local container = CreateItemOnPositionSync(position, item)
     if not valid(container) then
@@ -88,8 +99,9 @@ local function drop(player_id, content_id, key, position)
     )
     granted[player_id][key] = true
     print(string.format(
-        "[CHALLENGE_REWARD_DROP] player=%s key=%s content=%s entindex=%s action=created",
+        "[CHALLENGE_REWARD_DROP] player=%s key=%s content=%s requested_item=%s actual_item=%s entindex=%s action=created",
         tostring(player_id), tostring(key), tostring(content_id),
+        tostring(engine_item_name), tostring(actual_engine_item_name),
         tostring(item:entindex())))
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = player_id,
@@ -100,6 +112,7 @@ local function drop(player_id, content_id, key, position)
         ok = true,
         dropped = true,
         content_id = content_id,
+        engine_item_name = actual_engine_item_name,
         entindex = item:entindex(),
     }
 end

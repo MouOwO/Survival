@@ -14,11 +14,58 @@ function modifier_weapon_attack_tracker:OnCreated(kv)
     if IsServer() then
         self.player_id = tonumber(kv.player_id)
             or self:GetParent():GetPlayerOwnerID()
+        self.diagnostic_count = 0
+        self.diagnostic_landed_count = 0
     end
 end
 
 function modifier_weapon_attack_tracker:DeclareFunctions()
-    return { MODIFIER_EVENT_ON_ATTACK_LANDED }
+    return {
+        MODIFIER_EVENT_ON_ATTACK_START,
+        MODIFIER_EVENT_ON_ATTACK_LANDED,
+    }
+end
+
+local function diagnostic_hero(attacker)
+    local hero_id = tostring(attacker and attacker.survival_hero_id or "")
+    return hero_id == "hero_slark" or hero_id == "hero_blademaster"
+end
+
+local function should_diagnose(modifier)
+    if not diagnostic_hero(modifier:GetParent()) then return false end
+    modifier.diagnostic_count = tonumber(modifier.diagnostic_count) or 0
+    if modifier.diagnostic_count >= 20 then return false end
+    modifier.diagnostic_count = modifier.diagnostic_count + 1
+    return true
+end
+
+local function should_diagnose_landed(modifier)
+    if not diagnostic_hero(modifier:GetParent()) then return false end
+    modifier.diagnostic_landed_count =
+        tonumber(modifier.diagnostic_landed_count) or 0
+    if modifier.diagnostic_landed_count >= 20 then return false end
+    modifier.diagnostic_landed_count = modifier.diagnostic_landed_count + 1
+    return true
+end
+
+function modifier_weapon_attack_tracker:OnAttackStart(params)
+    if not IsServer() or params.attacker ~= self:GetParent()
+        or not should_diagnose(self) then return end
+    local target = params.target
+    print(string.format(
+        "[HERO_ATTACK_START] player=%s hero=%s attacker=%s target=%s record=%s "
+            .. "base_damage=%s-%s range=%s capability=%s projectile_speed=%s",
+        tostring(self.player_id),
+        tostring(self:GetParent().survival_hero_id),
+        tostring(self:GetParent():entindex()),
+        tostring(target and not target:IsNull() and target:entindex() or -1),
+        tostring(params.record or "none"),
+        tostring(self:GetParent():GetBaseDamageMin()),
+        tostring(self:GetParent():GetBaseDamageMax()),
+        tostring(self:GetParent():GetAttackRange()),
+        tostring(self:GetParent():GetAttackCapability()),
+        tostring(self:GetParent():GetProjectileSpeed())
+    ))
 end
 
 function modifier_weapon_attack_tracker.MarkSecondaryAttackRecord(record)
@@ -55,6 +102,19 @@ function modifier_weapon_attack_tracker:OnAttackLanded(params)
         attack_sequence
     )
     local secondary = is_secondary_attack(params, self:GetParent())
+    if should_diagnose_landed(self) then
+        print(string.format(
+            "[HERO_ATTACK_LANDED] player=%s hero=%s attacker=%s target=%s "
+                .. "record=%s damage=%s secondary=%s",
+            tostring(self.player_id),
+            tostring(self:GetParent().survival_hero_id),
+            tostring(self:GetParent():entindex()),
+            tostring(target:entindex()),
+            tostring(params.record or "none"),
+            tostring(params.damage or "nil"),
+            tostring(secondary)
+        ))
+    end
     local payload = {
         player_id = self.player_id,
         attacker = self:GetParent(),

@@ -1,8 +1,5 @@
-﻿"lang"
+﻿"dota"
 {
-    "Language" "english"
-    "Tokens"
-    {
         "addon_game_name" "Survival Defense"
         "item_survival_challenge_reward" "Challenge Reward"
         "item_survival_challenge_reward_Description" "Pick up this challenge material to place it in the equipment bar. It is consumed only when the corresponding equipment recipe succeeds."
@@ -406,5 +403,4 @@
         "DOTA_Tooltip_ability_piercing_ballista_lv05_Description" "Custom survival building ability."
         "DOTA_Tooltip_ability_polar_obelisk_lv01" "Polar Obelisk Lv01"
         "DOTA_Tooltip_ability_polar_obelisk_lv01_Description" "Custom survival building ability."
-    }
 }

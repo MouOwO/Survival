@@ -241,6 +241,10 @@ local function recalculate(player_id, reason)
         player_id = player_id,
         hero_id = state.hero_id,
         entindex = state.unit:entindex(),
+        unit_name = tostring(state.definition.unit_name or ""),
+        display_name = tostring(state.definition.display_name
+            or state.definition.unit_name or ""),
+        level = safe_get(state.unit, "GetLevel", 1),
         scale = scale,
         weapon_content_id = equipment.main_hand_content_id or "",
         weapon_name = equipment.main_hand_name ~= ""
@@ -399,10 +403,12 @@ local function on_hero_summoned(payload)
     end
     ensure_modifier("modifier_weapon_stat_projection")
     ensure_modifier("modifier_equipment_effects")
+    ensure_modifier("modifier_weapon_attack_tracker")
     local snapshot = recalculate(payload.player_id, "hero_summoned") or {}
     print(string.format(
         "[HeroCombatReady] hero=%s entindex=%s base_damage=%.1f-%.1f "
-            .. "engine_damage=%.1f-%.1f attack_range=%.1f move_capability=%s",
+            .. "engine_damage=%.1f-%.1f attack_range=%.1f "
+            .. "attack_capability=%s projectile_speed=%s move_capability=%s",
         tostring(payload.hero_id),
         tostring(payload.unit:entindex()),
         tonumber(state.base.attack_min) or 0,
@@ -410,6 +416,8 @@ local function on_hero_summoned(payload)
         safe_get(payload.unit, "GetBaseDamageMin", 0),
         safe_get(payload.unit, "GetBaseDamageMax", 0),
         safe_get(payload.unit, "GetAttackRange", 0),
+        tostring(safe_get(payload.unit, "GetAttackCapability", -1)),
+        tostring(safe_get(payload.unit, "GetProjectileSpeed", 0)),
         tostring(safe_get(payload.unit, "GetMoveCapability", -1))
     ))
 end

@@ -119,11 +119,34 @@ local function clear_removed(unit_key, current)
     end
 end
 
+local function reconcile_authoritative_unit_state(state)
+    if state.building_id ~= "arrow_tower" then return end
+    local unit = state.unit
+    if not valid_entity(unit) then return end
+
+    -- BUILDING_CHANGED and RESOURCE_CHANGED are independent event streams. A
+    -- resource event can therefore republish an older cached tower snapshot
+    -- after the unit has already reached level 5. The upgrade system writes the
+    -- authoritative route state onto the entity before emitting its UI event,
+    -- so reconcile here before deriving class-button availability.
+    state.level = tonumber(unit.survival_level) or state.level
+    if unit.survival_tower_class ~= nil then
+        state.tower_class = unit.survival_tower_class
+    end
+    if unit.survival_display_name ~= nil then
+        state.tower_class_name = unit.survival_tower_class
+            and unit.survival_display_name or state.tower_class_name
+        state.display_name = unit.survival_display_name
+    end
+end
+
 local function publish(state)
     local unit = state.unit
     if not valid_entity(unit) then
         return
     end
+
+    reconcile_authoritative_unit_state(state)
 
     local unit_key = unit:entindex()
     state_by_unit[unit_key] = state

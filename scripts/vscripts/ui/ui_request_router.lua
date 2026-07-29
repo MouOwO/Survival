@@ -161,6 +161,20 @@ local function on_unit_combat_stats_changed(payload)
     end
 end
 
+local function on_hero_combat_stats_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local snapshot = payload and payload.snapshot
+    if not valid_player_id(player_id) or type(snapshot) ~= "table" then return end
+    if tonumber(selected_unit_by_player[player_id])
+        ~= tonumber(snapshot.entindex) then return end
+    local projected = combat_stat_projection.for_ui(snapshot)
+    projected.success = 1
+    projected.reason = payload.reason or snapshot.reason
+        or "hero_combat_stats_changed"
+    projected.push_phase = "immediate"
+    send_to_player("ui_selected_unit_stats_snapshot", player_id, projected)
+end
+
 local function send_building_snapshot(payload, phase)
     local player_id = tonumber(payload and payload.player_id)
     local entindex = tonumber(payload and payload.entindex)
@@ -763,6 +777,7 @@ function M.init()
     register_building_move_request()
     register_return_home_request()
     event_bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
+    event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, on_hero_combat_stats_changed)
     event_bus.subscribe(events.UI_NOTIFICATION, on_notification)
     event_bus.subscribe(events.SHOP_STATE_CHANGED, on_shop_state_changed)
 end

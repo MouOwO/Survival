@@ -4,6 +4,21 @@ local events = nil
 local repository = nil
 local config = nil
 local registered = false
+local diagnostic_count_by_attacker = {}
+
+local function diagnostic_hero(attacker)
+    local hero_id = tostring(attacker and attacker.survival_hero_id or "")
+    return hero_id == "hero_slark" or hero_id == "hero_blademaster"
+end
+
+local function should_diagnose(attacker)
+    if not diagnostic_hero(attacker) then return false end
+    local entindex = attacker:entindex()
+    local count = tonumber(diagnostic_count_by_attacker[entindex]) or 0
+    if count >= 20 then return false end
+    diagnostic_count_by_attacker[entindex] = count + 1
+    return true
+end
 
 local function valid(entity)
     return entity and not entity:IsNull()
@@ -26,6 +41,21 @@ local function filter(_, keys)
     -- reflection rule. Equipment auras submit their own independent damage.
     local attacker, victim = resolve_combatants(keys)
     if not valid(attacker) or not valid(victim) then return false end
+    local diagnostic = should_diagnose(attacker)
+    if diagnostic then
+        print(string.format(
+            "[HERO_DAMAGE_FILTER] hero=%s attacker=%s victim=%s incoming=%s "
+                .. "type=%s category=%s inflictor=%s",
+            tostring(attacker.survival_hero_id),
+            tostring(attacker:entindex()),
+            tostring(victim:entindex()),
+            tostring(keys.damage),
+            tostring(keys.damagetype_const or keys.damagetype),
+            tostring(keys.damage_category_const or keys.damage_category),
+            tostring(keys.entindex_inflictor_const
+                or keys.entindex_inflictor or -1)
+        ))
+    end
     local record = repository.consume_pending(attacker, victim)
     local transaction_id = record and record.transaction_id or nil
     if record and record.blocked then
@@ -59,6 +89,17 @@ local function filter(_, keys)
             - target_reduction)
         * boss_multiplier
     keys.damage = math.max(0, keys.damage * multiplier)
+    if diagnostic then
+        print(string.format(
+            "[HERO_DAMAGE_FILTER_RESULT] hero=%s attacker=%s victim=%s "
+                .. "multiplier=%s final=%s",
+            tostring(attacker.survival_hero_id),
+            tostring(attacker:entindex()),
+            tostring(victim:entindex()),
+            tostring(multiplier),
+            tostring(keys.damage)
+        ))
+    end
     local payload = {
         transaction_id = transaction_id, engine_damage = keys.damage,
         attacker_entindex = attacker:entindex(),
@@ -81,6 +122,7 @@ end
 function M.init(deps)
     event_bus, events, repository, config = deps.event_bus, deps.events, deps.repository, deps.config
     registered = false
+    diagnostic_count_by_attacker = {}
 end
 
 function M.register()

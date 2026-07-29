@@ -192,15 +192,27 @@ local function tower_upgrade(ability_name, state, resources)
     if target <= state.level or not row or not cost then
         return { available = 0, can_afford = 0, current_level = state.level, status_text = "已达最高等级" }
     end
+    local tower_name = tower_routes.display_name(row)
+    local attack_delta = (row.base_attack_damage or 0)
+        - (current_row and current_row.base_attack_damage or 0)
+    local description = (mode == "max"
+        and "一次升级至当前阶段允许的最高等级："
+        or "按当前路线升级至下一等级：")
+        .. tostring(tower_name) .. "。升级后攻击力 +"
+        .. tostring(attack_delta) .. "。"
     local result = merge({
         available = 1, current_level = state.level, next_level = target,
         status_text = (mode == "max" and "升满至" or "升级至")
-            .. tower_routes.display_name(row),
-        tower_name = tower_routes.display_name(row), skill_ids = row.skill_ids,
-        upgrade_description = row.upgrade_description,
+            .. tower_name,
+        tower_name = tower_name, skill_ids = row.skill_ids,
+        upgrade_description = description,
         target_level = target,
-        upgrade_attack_delta = (row.base_attack_damage or 0)
-            - (current_row and current_row.base_attack_damage or 0),
+        upgrade_attack_delta = attack_delta,
+        fields = {
+            { label = "目标等级", value = target },
+            { label = "升级目标", value = tower_name },
+            { label = "攻击提升", value = "+" .. tostring(attack_delta) },
+        },
     }, cost_data(cost))
     -- population_delta is granted as max population after an upgrade. The
     -- authoritative spend path always uses population=0, so it must not make

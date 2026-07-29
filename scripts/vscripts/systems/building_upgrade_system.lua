@@ -178,7 +178,7 @@ end
 local function set_class_buttons(unit, active)
     local state = buildings[unit:entindex()]
     if not state then return end
-    for _, class_data in pairs(state.definition.class_options) do
+    for _, class_data in ipairs(state.definition.class_options or {}) do
         local ability = unit:FindAbilityByName(class_data.ability)
         if active and not ability then
             ability = unit:AddAbility(class_data.ability)

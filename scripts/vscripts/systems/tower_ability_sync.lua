@@ -46,7 +46,7 @@ function M.sync(state, row)
         end
     end
     if state.tower_class then
-        for _, class_data in pairs(state.definition.class_options or {}) do
+        for _, class_data in ipairs(state.definition.class_options or {}) do
             if state.unit:FindAbilityByName(class_data.ability) then
                 state.unit:RemoveAbility(class_data.ability)
             end
