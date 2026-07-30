@@ -8,6 +8,9 @@ local research_test = require("debug/research_technology_test")
 
 local M = {}
 
+local ADD_MONSTER_POSITION = Vector(-1280, 1088, 64)
+local ADD_MONSTER_DEFAULT_ARGS = { "1000000000", "200", "1", "1" }
+
 local HERO_ALIASES = {
     axe = "hero_axe",
     slark = "hero_slark",
@@ -59,11 +62,11 @@ local function resolve_player_id(keys)
     return nil
 end
 
-local function notify(context, message)
+local function notify(context, message, level)
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = context.player_id,
         message = message,
-        level = "info",
+        level = level or "info",
     })
 end
 
@@ -239,10 +242,12 @@ local function attack_flag(value)
 end
 
 local function add_monster(context)
-    local health = finite_number(context.args[1])
-    local armor = finite_number(context.args[2])
-    local can_attack = attack_flag(context.args[3])
-    local attack = finite_number(context.args[4])
+    local args = context.args
+    if #args == 0 then args = ADD_MONSTER_DEFAULT_ARGS end
+    local health = finite_number(args[1])
+    local armor = finite_number(args[2])
+    local can_attack = attack_flag(args[3])
+    local attack = finite_number(args[4])
     if not health or health <= 0 or not armor or can_attack == nil
         or not attack or attack < 0 then
         return false,
@@ -251,20 +256,14 @@ local function add_monster(context)
     local hero = nil
     if can_attack then
         hero = summoned_hero(context.player_id)
-        if not hero then return false, "hero_not_summoned" end
-    end
-    local marker_service = require("systems/monster_spawn_marker")
-    local marker, marker_name = marker_service.find()
-    if not marker or marker:IsNull() then
-        return false, marker_service.configured_name()
-            .. "_not_found_rebuild_map"
     end
     health = math.max(1, math.floor(health))
     local unit = CreateUnitByName(
-        "npc_survival_wave_monster", marker:GetAbsOrigin(), true,
+        "npc_survival_wave_monster", ADD_MONSTER_POSITION, true,
         nil, nil, DOTA_TEAM_BADGUYS
     )
     if not unit or unit:IsNull() then return false, "unit_create_failed" end
+    FindClearSpaceForUnit(unit, ADD_MONSTER_POSITION, true)
     unit:SetBaseMaxHealth(health)
     unit:SetMaxHealth(health)
     unit:SetHealth(health)
@@ -273,24 +272,22 @@ local function add_monster(context)
     unit:SetBaseDamageMin(attack)
     unit:SetBaseDamageMax(attack)
     unit.survival_minimum_armor = 1
-    FindClearSpaceForUnit(unit, marker:GetAbsOrigin(), true)
-    if marker.GetForwardVector and unit.SetForwardVector then
-        unit:SetForwardVector(marker:GetForwardVector())
-    end
     if can_attack then
         unit:SetBaseMoveSpeed(250)
         unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
         unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
-        if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
-        local home = unit:GetAbsOrigin()
-        unit:AddNewModifier(unit, nil, "modifier_practice_monster_ai", {
-            hero_entindex = hero:entindex(),
-            home_x = home.x,
-            home_y = home.y,
-            home_z = home.z,
-            aggro_radius = 700,
-            leash_radius = 1200,
-        })
+        if hero then
+            if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
+            local home = unit:GetAbsOrigin()
+            unit:AddNewModifier(unit, nil, "modifier_practice_monster_ai", {
+                hero_entindex = hero:entindex(),
+                home_x = home.x,
+                home_y = home.y,
+                home_z = home.z,
+                aggro_radius = 700,
+                leash_radius = 1200,
+            })
+        end
     else
         unit:SetBaseMoveSpeed(0)
         unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
@@ -298,12 +295,15 @@ local function add_monster(context)
     end
     notify(context, string.format(
         "测试怪已生成：生命 %d，护甲 %.1f，攻击力 %d，%s",
-        health, armor, attack, can_attack and "会攻击英雄" or "不会攻击英雄"
+        health, armor, attack,
+        can_attack and hero and "会攻击英雄"
+            or can_attack and "有攻击能力（当前未召唤英雄）"
+            or "不会攻击英雄"
     ))
     logger.info("CheatCommand", string.format(
-        "addmonster entindex=%d health=%d armor=%.1f can_attack=%s attack=%d marker=%s",
+        "addmonster entindex=%d health=%d armor=%.1f can_attack=%s attack=%d position=(%.1f,%.1f,%.1f)",
         unit:entindex(), health, armor, tostring(can_attack), attack,
-        tostring(marker_name)
+        unit:GetAbsOrigin().x, unit:GetAbsOrigin().y, unit:GetAbsOrigin().z
     ))
     return true
 end
@@ -551,6 +551,8 @@ local function on_player_chat(keys)
             "CheatCommand",
             command .. " failed: " .. tostring(error_code)
         )
+        notify({ player_id = player_id },
+            "命令执行失败：" .. tostring(error_code), "error")
     end
 end
 
