@@ -18,6 +18,8 @@ local WAVE_CLEANUP_GRACE = 0.25
 local DROW_FROST_HIT_PARTICLE =
     "particles/econ/items/drow/drow_arcana/drow_arcana_frost_arrow_debuff.vpcf"
 local DROW_TOWER_ASSET_ID = "tower_multi_drow_dread_retribution"
+local DEATH_GRENADE_PARTICLE =
+    "particles/units/heroes/hero_death_prophet/death_prophet_silence.vpcf"
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
@@ -125,6 +127,17 @@ local function update_bone_counter(payload)
     end
 end
 
+local function death_grenade_particle(tower, position, radius)
+    local particle = ParticleManager:CreateParticle(
+        DEATH_GRENADE_PARTICLE,
+        PATTACH_WORLDORIGIN,
+        tower
+    )
+    ParticleManager:SetParticleControl(particle, 0, position)
+    ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
+    ParticleManager:ReleaseParticleIndex(particle)
+end
+
 local function trigger_death_grenade(payload)
     if not payload.critical then return end
     local skill = skill_matching(payload.skills, "death_grenade_")
@@ -132,10 +145,15 @@ local function trigger_death_grenade(payload)
     local radius = configured_area(skill, 300)
     local damage = math.max(0, tonumber(payload.damage) or 0)
         * math.max(0, tonumber(skill.damage_multiplier) or 2)
+    local position = payload.target:GetAbsOrigin()
+    death_grenade_particle(payload.tower, position, radius)
+    local hit = { [payload.target:entindex()] = true }
     for _, enemy in ipairs(geometry.enemies_in_circle(
-        payload.tower, payload.target:GetAbsOrigin(), radius
+        payload.tower, position, radius
     )) do
-        if enemy ~= payload.target then
+        local enemy_index = enemy:entindex()
+        if not hit[enemy_index] then
+            hit[enemy_index] = true
             deal(payload.tower, enemy, damage, "death_grenade")
         end
     end

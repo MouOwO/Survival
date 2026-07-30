@@ -807,3 +807,13 @@
 - 回归：重写 `test_tower_wave_of_terror_visual.lua`，捕获真实 `CreateLinearProjectile` 参数，并用同一 `ExtraData` 依次调用第一、第二、第三个单位的能力命中回调；验证三次伤害、三次 `return false`、单波去重、致死主目标后继续命中、终点清理和塔销毁。
 - 自动验证：`TOWER_WAVE_OF_TERROR_VISUAL_PASS`、`TOWER_SKILL_GEOMETRY_PASS`、`TOWER_MULTI_VISUAL_CONFIG_PASS`、`SCHEDULER_RESTART_PASS` 及相关 Lua 语法检查通过；全量循环中的炙热巨箭测试通过。另有英雄攻速投影、召唤英雄血条、树等级配置三项既有无关失败。
 - 完整技术复盘：`docs/ai/archive/2026-07-30-burning-great-arrow-linear-projectile.md`。
+
+## 2026-07-30 — 检查点 076：多重塔与穿透弩炮缺失饰品组修复完成
+
+- 用户实机截图：多重塔只显示 Medusa 主体，`Jewels of Anamnessa` 五件附件全部缺失；穿透弩炮只显示 Drow Arcana 主体，`Dread Retribution` 七件附件全部缺失；同一系统中的 Vengeful 四件 `prop_dynamic` 附件显示正常。
+- 根因：Medusa 与 Drow 资产把 `attachment_entity_class` 配成了 `dota_item_wearable`。当前自定义建筑附件生成链不能依赖该实体类型稳定创建饰品；服务已有失败回退，但只有生成调用抛错或返回无效实体时才触发，静默创建但不渲染时不会回退。
+- 修复：在权威源 `data/csv/资源系统/asset_catalog.csv` 中把 Medusa 五件组和 Drow 七件组的附件实体类型改为 `prop_dynamic`，并由真实 Python 3.13 解释器重新生成 `scripts/vscripts/config/generated/asset_catalog.lua`。附件模型路径、主体模型、弹道、环境粒子、技能和数值均未修改。
+- 已有生产契约继续复用：`building_visual_service.lua` 为每件附件执行 `SetOwner(unit)` 与 `FollowEntity(unit, true)`；该 `prop_dynamic` 骨骼跟随路径已由 Undying 和当前正常显示的 Vengeful 饰品实机证明。
+- 自动验证：配置生成器返回 `SUCCESS: generated 60 Lua config modules`；`BUILDING_VISUAL_SERVICE_PASS`、`TOWER_MULTI_VISUAL_CONFIG_PASS` 和目标 Lua 语法检查通过；目标 `git diff --check` 通过。
+- 全量回归：42 项中 39 项通过；3 项既有无关失败仍为英雄攻速投影、召唤英雄血条和树木等级配置，断言内容与检查点 075 记录一致。本任务直接相关测试全部通过。
+- 下一步唯一动作：完全停止当前 Workshop Tools Run 并重新启动，分别创建多重塔与穿透弩炮，实机确认 Medusa 五件和 Drow 七件均显示且随攻击、转向和死亡动画正确骨骼跟随。

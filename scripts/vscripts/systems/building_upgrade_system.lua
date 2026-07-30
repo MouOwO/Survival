@@ -187,6 +187,13 @@ local function set_class_buttons(unit, active)
     end
 end
 
+local function base_health(state)
+    local definition = state.definition or {}
+    local levels = definition.levels or definition.pre_class_levels or {}
+    local data = levels[state.level] or {}
+    return tonumber(data.health) or state.unit:GetMaxHealth()
+end
+
 publish = function(state, reason)
     local display_name = state.unit.survival_display_name
         or state.tower_class_name
@@ -205,9 +212,7 @@ publish = function(state, reason)
         attack_max = state.unit.survival_attack_max,
         runtime_armor = state.unit.survival_armor,
         attack_speed = state.unit.survival_attack_speed,
-        base_health = tonumber(state.definition.levels[state.level]
-            and state.definition.levels[state.level].health)
-            or state.unit:GetMaxHealth(),
+        base_health = base_health(state),
         base_attack_damage = state.building_id == "arrow_tower"
             and tonumber((arrow_data(state.level) or {}).base_attack_damage)
             or nil,
@@ -412,18 +417,11 @@ sync_tower_abilities = function(state, row)
 end
 
 local function apply_model(unit, row)
-    if not row or not row.model_name or row.model_name == "" then return end
-    if row.model_asset_id and row.model_asset_id ~= "" then
-        -- apply_tower/apply_common already routed the complete model bundle
-        -- through building_visual. Do not respawn attachments a second time.
-    else
-        asset_preload.queue_model(row.model_name, {
-            urgent = true,
-            priority = 1900,
-        })
-        unit:SetModel(row.model_name)
-        unit:SetOriginalModel(row.model_name)
-    end
+    if not row then return end
+    -- apply_tower/apply_common owns model application. Registered legacy model
+    -- paths are resolved to asset IDs there and are committed only after the
+    -- asynchronous preload is ready. Never SetModel directly in this path:
+    -- network replication of a nonresident model handle asserts the engine.
     asset_preload.queue_particle(row.projectile_model, {
         urgent = true,
         priority = 1900,
@@ -619,5 +617,7 @@ function M.init()
     event_bus.subscribe(events.TOWER_CLASS_REQUEST, on_class_request)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
 end
+
+M._base_health_for_test = base_health
 
 return M

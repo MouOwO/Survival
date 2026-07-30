@@ -32,7 +32,7 @@ ability:critical_strike_lv02,ability,critical_strike_lv02,致命一击LV2,0,0,16
 ability:critical_strike_lv03,ability,critical_strike_lv03,致命一击LV3,0,0,19%概率造成5倍普通攻击伤害,,critical_strike_lv03
 ability:critical_strike_lv04,ability,critical_strike_lv04,致命一击LV4,0,0,22%概率造成5倍普通攻击伤害,,critical_strike_lv04
 ability:critical_strike_lv05,ability,critical_strike_lv05,致命一击LV5,0,0,22%概率造成5倍普通攻击伤害,,critical_strike_lv05
-ability:death_grenade_lv01,ability,death_grenade_lv01,死神榴弹炮LV1,0,0,每次暴击对半径300码造成该次暴击伤害200%的范围伤害,,death_grenade_lv01
+ability:death_grenade_lv01,ability,death_grenade_lv01,死神榴弹炮Lv1,0,0,暴击时对800码范围造成该次暴击伤害200%,,death_grenade_lv01
 ability:explosive_gatling_lv01,ability,explosive_gatling_lv01,爆矢加特林LV1,0,0,同一目标攻击5次或击杀后攻速+20%，持续3秒，不可叠加可刷新,,explosive_gatling_lv01
 ability:frost_attack_lv01,ability,frost_attack_lv01,冰霜攻击LV1,0,0,攻击造成半径100码范围攻击并减速25%，持续2秒,,frost_attack_lv01
 ability:frost_attack_lv02,ability,frost_attack_lv02,冰霜攻击LV2,0,0,攻击造成半径150码范围攻击并减速25%，持续2秒,,frost_attack_lv02

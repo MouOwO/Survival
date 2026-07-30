@@ -5,6 +5,7 @@ local weapon_cheats = require("debug/weapon_cheat_handlers")
 local attack_speed_cheat = require("debug/attack_speed_cheat")
 local wave_system = require("systems/wave_system")
 local research_test = require("debug/research_technology_test")
+local dev_asset_preload = require("debug/dev_asset_preload")
 
 local M = {}
 
@@ -85,7 +86,49 @@ end
 
 local function enable_dev(context)
     wave_system.set_dev_mode(true)
-    notify(context, "开发者模式已开启：停止自动出怪，资源保持不变")
+    local ok, status, snapshot = dev_asset_preload.start({
+        on_dispatched = function(progress)
+            notify(context, "开发模型加载请求已全部发出："
+                .. tostring(progress.dispatched) .. " 个")
+        end,
+        on_window_complete = function(progress)
+            if progress.running then
+                notify(context, "10秒模型加载窗口结束：已完成 "
+                    .. tostring(progress.ready + progress.failed)
+                    .. "/" .. tostring(progress.total)
+                    .. "，剩余资源继续后台加载")
+            end
+        end,
+        on_complete = function(progress)
+            if progress.failed > 0 then
+                notify(context, "开发模型加载完成：成功 "
+                    .. tostring(progress.ready) .. "，失败 "
+                    .. tostring(progress.failed)
+                    .. "；再次输入 dev 可重试失败项")
+            else
+                notify(context, "开发模型加载完成："
+                    .. tostring(progress.ready) .. "/"
+                    .. tostring(progress.total))
+            end
+        end,
+    })
+    if not ok then
+        notify(context, "开发者模式已开启，但模型加载启动失败："
+            .. tostring(status))
+        return false, status
+    end
+
+    snapshot = snapshot or {}
+    if status == "already_running" then
+        notify(context, "开发者模式已开启：模型正在加载 "
+            .. tostring(snapshot.ready + snapshot.failed)
+            .. "/" .. tostring(snapshot.total))
+    elseif status == "complete" then
+        notify(context, "开发者模式已开启：目标模型均已加载")
+    else
+        notify(context, "开发者模式已开启：停止自动出怪，开始在10秒内渐进加载 "
+            .. tostring(snapshot.total or 0) .. " 个测试模型")
+    end
     return true
 end
 

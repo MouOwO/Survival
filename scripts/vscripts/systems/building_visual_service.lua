@@ -138,19 +138,25 @@ end
 
 function M.resolve(data)
     data = data or {}
+    local requested_asset_id = data.model_asset_id
+    if (not requested_asset_id or requested_asset_id == "")
+        and type(data.model_name) == "string" and data.model_name ~= ""
+        and type(catalog.for_model) == "function" then
+        local path_asset = catalog.for_model(data.model_name)
+        requested_asset_id = path_asset and path_asset.asset_id or nil
+    end
     local model_path, asset = catalog.model(
-        data.model_asset_id,
+        requested_asset_id,
         data.model_name
     )
-    return model_path, asset
+    return model_path, asset, requested_asset_id
 end
 
 function M.apply(unit, data)
     if not valid_entity(unit) then return false, "invalid_entity" end
-    local model_path, asset = M.resolve(data)
+    local model_path, asset, requested_asset_id = M.resolve(data)
     if not model_path or model_path == "" then return false, "model_missing" end
 
-    local requested_asset_id = data and data.model_asset_id or nil
     if requested_asset_id and asset and asset.asset_id == requested_asset_id
         and not preload.is_ready(requested_asset_id) then
         if unit.survival_pending_model_asset_id == requested_asset_id then
@@ -203,7 +209,7 @@ function M.apply(unit, data)
     end
     local components = apply_attachments(unit, asset)
     apply_particles(unit, asset, components)
-    unit.survival_model_asset_id = data and data.model_asset_id or nil
+    unit.survival_model_asset_id = requested_asset_id
     unit.survival_pending_model_asset_id = nil
     unit.survival_pending_previous_model_asset_id = nil
 

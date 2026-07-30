@@ -22,6 +22,28 @@ local function safe_number(entity, method_name, fallback, ...)
     return fallback
 end
 
+local function effective_attack_speed(unit)
+    -- 非英雄单位需要反映光环等临时 Modifier。false 表示不忽略临时攻速；
+    -- 自定义英雄仍由 hero_ui_snapshot 的配置权威链路接管。
+    local attacks_per_second = safe_number(
+        unit,
+        "GetAttacksPerSecond",
+        nil,
+        false
+    )
+    if attacks_per_second and attacks_per_second > 0 then
+        return attacks_per_second
+    end
+    -- 兼容尚未提供 GetAttacksPerSecond 的旧引擎环境。
+    local seconds_per_attack = safe_number(unit, "GetSecondsPerAttack", nil)
+    if seconds_per_attack and seconds_per_attack > 0 then
+        return 1 / seconds_per_attack
+    end
+    return tonumber(unit.survival_attack_speed)
+        or (1 / math.max(0.01,
+            safe_number(unit, "GetBaseAttackTime", 2)))
+end
+
 local function unit_combat_snapshot(unit)
     local strength = safe_number(unit, "GetStrength", 0)
     local agility = safe_number(unit, "GetAgility", 0)
@@ -57,11 +79,9 @@ local function unit_combat_snapshot(unit)
         runtime_armor = safe_number(unit, "GetPhysicalArmorValue", nil, false)
             or tonumber(unit.survival_armor)
             or safe_number(unit, "GetPhysicalArmorBaseValue", 0),
-        -- attack_speed 表示每秒攻击次数，不是 BAT，也不是 Dota 百分比攻速。
-        -- 缺少显式配置时由引擎基础攻击间隔换算，默认 0.5 次/秒。
-        attack_speed = tonumber(unit.survival_attack_speed)
-            or (1 / math.max(0.01,
-                safe_number(unit, "GetBaseAttackTime", 2))),
+        -- attack_speed 表示当前每秒攻击次数，不是 BAT，也不是 Dota
+        -- 百分比攻速；非英雄单位必须包含光环等临时 Modifier。
+        attack_speed = effective_attack_speed(unit),
         attack_speed_stat = safe_number(unit, "GetAttackSpeed", 100),
         strength = strength,
         agility = agility,

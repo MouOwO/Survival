@@ -26,10 +26,15 @@ local ready_callbacks = {}
 local failed_callbacks = {}
 local queue = {}
 local queued = {}
-local loading = false
+local background_loading_asset_id = nil
+local inflight = {}
+local gradual_sessions = {}
 local stream_cursor = 1
 local stream_rows = {}
 local generation = 0
+local gradual_snapshot
+local gradual_asset_finished
+local begin_async_request
 
 local function now()
     return GameRules and GameRules.GetGameTime and GameRules:GetGameTime() or 0
@@ -93,7 +98,9 @@ local function sort_queue()
 end
 
 local function finish(asset_id, ok, source)
-    loading = false
+    local was_background = background_loading_asset_id == asset_id
+    if was_background then background_loading_asset_id = nil end
+    inflight[asset_id] = nil
     queued[asset_id] = nil
     local started_at = (states[asset_id] or {}).started_at or now()
     set_state(asset_id, ok and STATE.READY or STATE.FAILED, {
@@ -128,12 +135,261 @@ local function finish(asset_id, ok, source)
             end
         end
     end
-    scheduler.after(INTER_ASSET_DELAY, function() M._pump() end,
-        "asset_preload_pump")
+    if gradual_asset_finished then
+        gradual_asset_finished(asset_id, ok, source)
+    end
+    if was_background then
+        scheduler.after(INTER_ASSET_DELAY, function() M._pump() end,
+            "asset_preload_pump")
+    end
+end
+
+local function protected_callback(label, callback, ...)
+    if type(callback) ~= "function" then return end
+    local ok, error_message = pcall(callback, ...)
+    if not ok then
+        logger.warn("AssetPreload", label .. " callback failed error="
+            .. tostring(error_message))
+    end
+end
+
+local function remove_queued_request(asset_id)
+    queued[asset_id] = nil
+    for index = #queue, 1, -1 do
+        if queue[index].asset_id == asset_id then
+            table.remove(queue, index)
+        end
+    end
+end
+
+gradual_snapshot = function(session)
+    local pending = 0
+    for _ in pairs(session.pending or {}) do pending = pending + 1 end
+    return {
+        session_id = session.session_id,
+        total = session.total,
+        ready = session.ready,
+        failed = session.failed,
+        pending = pending,
+        dispatched = session.dispatched,
+        dispatch_total = session.dispatch_total,
+        dispatch_complete = session.dispatch_complete == true,
+        window_complete = session.window_complete == true,
+        running = session.complete ~= true,
+        started_at = session.started_at,
+        duration_seconds = session.duration_seconds,
+    }
+end
+
+local function complete_gradual_session(session)
+    if session.complete then return end
+    for _ in pairs(session.pending) do return end
+    session.complete = true
+    session.completed_at = now()
+    logger.info("AssetPreload", "gradual complete id=" .. session.session_id
+        .. " ready=" .. tostring(session.ready)
+        .. " failed=" .. tostring(session.failed))
+    protected_callback(
+        "gradual complete",
+        session.on_complete,
+        gradual_snapshot(session)
+    )
+end
+
+gradual_asset_finished = function(asset_id, ok, source)
+    for _, session in pairs(gradual_sessions) do
+        if not session.complete and session.pending[asset_id] then
+            session.pending[asset_id] = nil
+            if ok then
+                session.ready = session.ready + 1
+            else
+                session.failed = session.failed + 1
+                session.last_error = source
+            end
+            complete_gradual_session(session)
+        end
+    end
+end
+
+local function dispatch_gradual_asset(session, asset_id)
+    if session.complete or not session.pending[asset_id] then return end
+
+    session.dispatched = session.dispatched + 1
+    if session.dispatched >= session.dispatch_total then
+        session.dispatch_complete = true
+        protected_callback(
+            "gradual dispatched",
+            session.on_dispatched,
+            gradual_snapshot(session)
+        )
+    end
+
+    local status = (states[asset_id] or {}).status
+    if status == STATE.READY then
+        gradual_asset_finished(asset_id, true, "already_ready")
+        return
+    end
+    if inflight[asset_id] then return end
+    if status == STATE.RETIRED then
+        gradual_asset_finished(asset_id, false, STATE.RETIRED)
+        return
+    end
+
+    remove_queued_request(asset_id)
+    if status == STATE.FAILED and not session.retry then
+        gradual_asset_finished(asset_id, false, STATE.FAILED)
+        return
+    end
+    if status == STATE.FAILED then
+        set_state(asset_id, STATE.NOT_REQUESTED, { retried_at = now() })
+    end
+    begin_async_request(asset_id, "gradual:" .. session.session_id)
+end
+
+function M.preload_gradually(asset_ids, options)
+    options = options or {}
+    local session_id = tostring(options.session_id or "default")
+    local existing = gradual_sessions[session_id]
+    if existing and not existing.complete then
+        return true, "already_running", gradual_snapshot(existing)
+    end
+
+    local unique_ids = {}
+    local seen = {}
+    for _, raw_asset_id in ipairs(asset_ids or {}) do
+        local asset_id = tostring(raw_asset_id or "")
+        if asset_id ~= "" and not seen[asset_id] then
+            if not catalog.resolve(asset_id) then
+                return false, "asset_not_found:" .. asset_id
+            end
+            seen[asset_id] = true
+            table.insert(unique_ids, asset_id)
+        end
+    end
+
+    local duration = math.max(0, tonumber(options.duration_seconds) or 10)
+    local dispatch_ratio = math.max(0, math.min(
+        1,
+        tonumber(options.dispatch_ratio) or 0.8
+    ))
+    local session = {
+        session_id = session_id,
+        total = #unique_ids,
+        ready = 0,
+        failed = 0,
+        dispatched = 0,
+        dispatch_total = 0,
+        dispatch_complete = false,
+        window_complete = false,
+        complete = false,
+        pending = {},
+        started_at = now(),
+        duration_seconds = duration,
+        retry = options.retry == true,
+        on_dispatched = options.on_dispatched,
+        on_complete = options.on_complete,
+        on_window_complete = options.on_window_complete,
+    }
+    gradual_sessions[session_id] = session
+
+    local dispatch_ids = {}
+    for _, asset_id in ipairs(unique_ids) do
+        local status = (states[asset_id] or {}).status
+        if status == STATE.READY then
+            session.ready = session.ready + 1
+        elseif status == STATE.RETIRED then
+            session.failed = session.failed + 1
+        else
+            session.pending[asset_id] = true
+            table.insert(dispatch_ids, asset_id)
+        end
+    end
+    session.dispatch_total = #dispatch_ids
+
+    if session.dispatch_total == 0 then
+        session.dispatch_complete = true
+        protected_callback(
+            "gradual dispatched",
+            session.on_dispatched,
+            gradual_snapshot(session)
+        )
+        complete_gradual_session(session)
+        return true, "complete", gradual_snapshot(session)
+    end
+
+    local dispatch_window = duration * dispatch_ratio
+    local divisor = math.max(1, session.dispatch_total - 1)
+    for index, asset_id in ipairs(dispatch_ids) do
+        local delay = (index - 1) * dispatch_window / divisor
+        if delay <= 0 then
+            dispatch_gradual_asset(session, asset_id)
+        else
+            scheduler.after(delay, function()
+                dispatch_gradual_asset(session, asset_id)
+            end, "asset_gradual:" .. session_id .. ":" .. tostring(index))
+        end
+    end
+    scheduler.after(duration, function()
+        if gradual_sessions[session_id] ~= session then return end
+        session.window_complete = true
+        protected_callback(
+            "gradual window",
+            session.on_window_complete,
+            gradual_snapshot(session)
+        )
+    end, "asset_gradual_window:" .. session_id)
+
+    logger.info("AssetPreload", "gradual started id=" .. session_id
+        .. " total=" .. tostring(session.total)
+        .. " dispatch=" .. tostring(session.dispatch_total)
+        .. " duration=" .. tostring(duration))
+    return true, "started", gradual_snapshot(session)
+end
+
+function M.gradual_status(session_id)
+    local session = gradual_sessions[tostring(session_id or "default")]
+    return session and gradual_snapshot(session) or nil
+end
+
+begin_async_request = function(asset_id, request_source)
+    local row = catalog.resolve(asset_id)
+    if not row then
+        finish(asset_id, false, "catalog_missing")
+        return false
+    end
+
+    inflight[asset_id] = request_source or "background"
+    set_state(asset_id, STATE.LOADING, { started_at = now() })
+    logger.info("AssetPreload", "started id=" .. asset_id
+        .. " source=" .. tostring(request_source or "background"))
+
+    local async_name = row.async_unit_name
+    local request_generation = generation
+    if type(PrecacheUnitByNameAsync) == "function"
+        and type(async_name) == "string" and async_name ~= "" then
+        local ok, error_message = pcall(
+            PrecacheUnitByNameAsync,
+            async_name,
+            function()
+                if request_generation == generation then
+                    finish(asset_id, true, "unit_async")
+                end
+            end,
+            -1
+        )
+        if ok then return true end
+        logger.warn("AssetPreload", "async request failed id="
+            .. asset_id .. " error=" .. tostring(error_message))
+    end
+
+    -- No safe runtime model-unload/precache-context API is available. Mark the
+    -- request failed so callers keep their current/fallback visual.
+    finish(asset_id, false, "async_unavailable")
+    return false
 end
 
 function M._pump()
-    if loading or #queue == 0 then return end
+    if background_loading_asset_id or #queue == 0 then return end
     sort_queue()
     local request = table.remove(queue, 1)
     local row = catalog.resolve(request.asset_id)
@@ -147,32 +403,8 @@ function M._pump()
         return
     end
 
-    loading = true
-    set_state(request.asset_id, STATE.LOADING, { started_at = now() })
-    logger.info("AssetPreload", "started id=" .. request.asset_id)
-
-    local async_name = row.async_unit_name
-    local request_generation = generation
-    if type(PrecacheUnitByNameAsync) == "function"
-        and type(async_name) == "string" and async_name ~= "" then
-        local ok, error_message = pcall(
-            PrecacheUnitByNameAsync,
-            async_name,
-            function()
-                if request_generation == generation then
-                    finish(request.asset_id, true, "unit_async")
-                end
-            end,
-            -1
-        )
-        if ok then return end
-        logger.warn("AssetPreload", "async request failed id="
-            .. request.asset_id .. " error=" .. tostring(error_message))
-    end
-
-    -- No safe runtime model-unload/precache-context API is available. Mark the
-    -- request failed so callers keep their current/fallback visual.
-    finish(request.asset_id, false, "async_unavailable")
+    background_loading_asset_id = request.asset_id
+    begin_async_request(request.asset_id, "background")
 end
 
 function M.queue(asset_id, options)
@@ -284,7 +516,9 @@ function M.init()
     queued = {}
     ready_callbacks = {}
     failed_callbacks = {}
-    loading = false
+    background_loading_asset_id = nil
+    inflight = {}
+    gradual_sessions = {}
     stream_cursor = 1
     stream_rows = catalog.group("zombie_stream")
     table.sort(stream_rows, function(a, b)
@@ -321,7 +555,12 @@ M._snapshot_for_test = function()
         callback_count = callback_count + #callbacks
     end
     return {
-        loading = loading,
+        loading = background_loading_asset_id ~= nil,
+        inflight_count = (function()
+            local count = 0
+            for _ in pairs(inflight) do count = count + 1 end
+            return count
+        end)(),
         queued_count = #queue,
         ready_callback_count = callback_count,
         stream_cursor = stream_cursor,

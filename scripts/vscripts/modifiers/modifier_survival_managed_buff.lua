@@ -2,6 +2,9 @@ modifier_survival_managed_buff = class({})
 modifier_survival_managed_aura = class({})
 
 local definitions = require("config/generated/buff_definitions")
+local event_bus = require("core/event_bus")
+local events = require("core/events")
+local scheduler = require("core/scheduler")
 
 local function now()
     return GameRules:GetGameTime()
@@ -9,6 +12,34 @@ end
 
 local function definition(buff_id)
     return (definitions.by_id or {})[buff_id]
+end
+
+local function affects_attack_speed(modifier)
+    local effect_type = modifier.definition and modifier.definition.effect_type
+    return effect_type == "attack_speed_bonus"
+        or effect_type == "attack_speed_pct"
+end
+
+local function publish_combat_stats_changed(modifier, reason, deferred)
+    if not affects_attack_speed(modifier) then return end
+    local parent = modifier:GetParent()
+    if not parent or parent:IsNull() then return end
+    local entindex = parent:entindex()
+    local buff_id = modifier.buff_id
+    local function publish()
+        if not parent or parent:IsNull() then return end
+        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+            entindex = entindex,
+            unit = parent,
+            reason = reason,
+            buff_id = buff_id,
+        })
+    end
+    if deferred then
+        scheduler.after(0, publish)
+    else
+        publish()
+    end
 end
 
 function modifier_survival_managed_buff:GetAttributes()
@@ -62,14 +93,19 @@ function modifier_survival_managed_buff:OnCreated(params)
             tonumber(params and params.managed_max_stacks)
                 or tonumber(self.definition.max_stacks) or 1
         )
+        -- 等引擎完成本 Modifier 的属性重算后再读取当前攻速。
+        publish_combat_stats_changed(self, "managed_buff_applied", true)
     end
 end
 
 function modifier_survival_managed_buff:OnDestroy()
-    if IsServer() and self.active_sound_name then
-        self:GetParent():StopSound(self.active_sound_name)
+    if not IsServer() then return end
+    local parent = self:GetParent()
+    if self.active_sound_name then
+        parent:StopSound(self.active_sound_name)
         self.active_sound_name = nil
     end
+    publish_combat_stats_changed(self, "managed_buff_removed", true)
 end
 
 function modifier_survival_managed_buff:OnRefresh(params)
@@ -118,6 +154,7 @@ function modifier_survival_managed_buff:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE,
         MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
+        MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE,
         MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
         MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE,
     }
@@ -128,6 +165,9 @@ function modifier_survival_managed_buff:GetModifierMoveSpeedBonus_Percentage()
 end
 function modifier_survival_managed_buff:GetModifierAttackSpeedBonus_Constant()
     return self.definition.effect_type == "attack_speed_bonus" and self.value or 0
+end
+function modifier_survival_managed_buff:GetModifierAttackSpeedPercentage()
+    return self.definition.effect_type == "attack_speed_pct" and self.value or 0
 end
 function modifier_survival_managed_buff:GetModifierPhysicalArmorBonus()
     if self.definition.effect_type ~= "physical_armor_base_pct" then return 0 end

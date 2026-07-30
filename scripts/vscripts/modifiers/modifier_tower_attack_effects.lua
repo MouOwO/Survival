@@ -2,8 +2,6 @@ LinkLuaModifier("modifier_tower_attack_effects", "modifiers/modifier_tower_attac
 LinkLuaModifier("modifier_tower_explosive_gatling_buff", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_frost_slow", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_blizzard_slow", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_tower_polar_obelisk_aura", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_tower_polar_obelisk_debuff", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 modifier_tower_attack_effects = class({})
 _G.modifier_tower_attack_effects = modifier_tower_attack_effects
 local M = modifier_tower_attack_effects
@@ -31,7 +29,6 @@ local DEFAULT_BLIZZARD_RADIUS = 250
 local DEFAULT_BLIZZARD_DURATION = 2
 local DEFAULT_BLIZZARD_INTERVAL = 1
 local BLIZZARD_SLOW_PCT = 30
-local POLAR_OBELISK_ATTACK_SLOW_PCT = 20
 local start_lightning_storm
 
 local function skill_matching(unit, prefix)
@@ -896,47 +893,6 @@ function modifier_tower_blizzard_slow:DeclareFunctions()
 end
 function modifier_tower_blizzard_slow:GetModifierMoveSpeedBonus_Percentage()
     return -(self.slow_pct or BLIZZARD_SLOW_PCT)
-end
-
-modifier_tower_polar_obelisk_aura = class({})
-_G.modifier_tower_polar_obelisk_aura = modifier_tower_polar_obelisk_aura
-
-function modifier_tower_polar_obelisk_aura:IsHidden() return true end
-function modifier_tower_polar_obelisk_aura:IsPurgable() return false end
-function modifier_tower_polar_obelisk_aura:IsAura() return true end
-function modifier_tower_polar_obelisk_aura:GetModifierAura()
-    return "modifier_tower_polar_obelisk_debuff"
-end
-function modifier_tower_polar_obelisk_aura:GetAuraSearchTeam()
-    return DOTA_UNIT_TARGET_TEAM_ENEMY
-end
-function modifier_tower_polar_obelisk_aura:GetAuraSearchType()
-    return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
-end
-function modifier_tower_polar_obelisk_aura:GetAuraSearchFlags()
-    return DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES
-end
-function modifier_tower_polar_obelisk_aura:OnCreated(params)
-    self.radius = math.max(1, tonumber(params and params.radius) or 400)
-end
-function modifier_tower_polar_obelisk_aura:GetAuraRadius()
-    return self.radius or 400
-end
-
-modifier_tower_polar_obelisk_debuff = class({})
-_G.modifier_tower_polar_obelisk_debuff = modifier_tower_polar_obelisk_debuff
-
-function modifier_tower_polar_obelisk_debuff:IsHidden() return false end
-function modifier_tower_polar_obelisk_debuff:IsDebuff() return true end
-function modifier_tower_polar_obelisk_debuff:IsPurgable() return false end
-function modifier_tower_polar_obelisk_debuff:GetTexture()
-    return "ancient_apparition_chilling_touch"
-end
-function modifier_tower_polar_obelisk_debuff:DeclareFunctions()
-    return { MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE }
-end
-function modifier_tower_polar_obelisk_debuff:GetModifierAttackSpeedPercentage()
-    return -POLAR_OBELISK_ATTACK_SLOW_PCT
 end
 
 modifier_tower_explosive_gatling_buff = class({})

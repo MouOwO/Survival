@@ -27,5 +27,6 @@
         "survival_weapon_effects",
         "survival_equipment_levels",
         "survival_weapon_ui_schema",
+        "survival_research",
     ]
 }
