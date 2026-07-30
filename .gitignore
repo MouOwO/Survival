@@ -1,6 +1,94 @@
-/.cline_tmp/
-/.idea/
+/.qclaw_backup/tower_dynamic_abilities_20260719_192312
+/.qclaw_backup/tower_dynamic_slots_20260719_194736
+/.qclaw_backup/tower_empty_slots_icon_20260719_232641
+/.qclaw_backup/tower_max_ui_20260719_203908
+/.qclaw_backup/tower_models_v2_20260720_085038
+/.qclaw_backup/tower_passive_level_fix_20260719_222917
+/.qclaw_backup/tower_skill_damage_schema_20260719_112817
+/.qclaw_backup/tower_skill_planner_schema_20260719_135013
+/.qclaw_backup/tree_level_cycle_20260719_091212
+/.qclaw_backup/ui_tree_tooltip_20260719_092949
+/.qclaw_backup/wall_levels_refactor_20260720_002816
+/.qclaw_backup/weapon_growth_counter_20260718_221530
+/.qclaw_backup/addspeed_attack_interval_20260718_235308
+/.qclaw_backup/addspeed_fixed_rate_20260718_232500
+/.qclaw_backup/addspeed_four_methods_20260719_085138
+/.qclaw_backup/addspeed_summoned_hero_20260718_233753
+/.qclaw_backup/all_tower_routes_runtime_20260719_155606
+/.qclaw_backup/arrow_base_skill_schema_20260719_132441
+/.qclaw_backup/attack_speed_config_20260721_003313
+/.qclaw_backup/blink_debug_multi_model_20260720_094858
+/.qclaw_backup/blink_multi_model_20260720_093603
+/.qclaw_backup/building_blink_direct_move_20260720_100152
+/.qclaw_backup/csv_chinese_headers_20260719_220630
+/.qclaw_backup/csv_config_tooltip_20260719_101818
+/.qclaw_backup/death_route_video_schema_20260719_140756
+/.qclaw_backup/decouple_building_modifiers_20260720_103603
+/.qclaw_backup/dev_tower_wave_20260720_083539
+/.qclaw_backup/feature_batch_20260718_224904
+/.qclaw_backup/force_load_modifiers_direct_position_20260720_102726
+/.qclaw_backup/force_modifier_link_blink_diag_20260720_102141
+/.qclaw_backup/generated_before_attack_speed_20260721_003638
+/.qclaw_backup/generated_before_csv_build_20260720_235954
+/.qclaw_backup/hero_lumber_overhead_20260719_094604
+/.qclaw_backup/hero_tower_rework_20260721_013454
+/.qclaw_backup/localization_tokens_20260720_092742
+/.qclaw_backup/modifier_globals_blink_call_20260720_101111
+/.qclaw_backup/n1_wave_runtime_20260720_074102
+/.qclaw_backup/panorama_building_move_20260720_112354
+/.qclaw_backup/runtime_fingerprint_20260720_104759
+/.qclaw_backup/team_alignment_20260720_085708
+/.qclaw_backup/team_assignment_final_20260720_085954
+/.qclaw_backup/tower_aggro_and_ui_20260719_201423
+/.qclaw_backup/tower_blink_aggro_20260720_091149
+/.qclaw_backup/tower_csv_chinese_headers_20260719_113610
+/.qclaw_backup/tower_csv_refactor_20260719_105512
+/.qclaw_backup/tower_dev_finish_20260720_083834
+/.qclaw_backup
+/TODO
+/survival_ui_backup
+/survival_update_backup
+/.cline_work
+/.clinerules
+/.research_sheets
+/.vscode
+/.cline_backups
+/.cline_tmp
+/
+/掉落物.csv
+/建筑内容数据.xlsx
+/每次命令前一定先执行.txt
+/武器合成.xlsx
+/,stat
+/.act_preexisting_diff.txt
+/.challenge_part1.txt
+/.challenge_part2.txt
+/.cline_current_relevant_diff.txt
+/.cline_grid_current_diff.txt
+/.cline_inventory_refs.txt
+/.cline_tooltip_refs.txt
+/.damage_module_last_backup
+/.hero_stats_section.txt
+/.research_diff_check.txt
+/.research_final_diff_check.txt
+/.research_git_status.txt
+/.research_xlsx_audit.json
+/.research_xlsx_tables.json
+/.survival_grid_magic_v1_2_state.json
+/.tooltip_item_section.txt
+/-ef  grep -E '\[g\]it.task_final_diff\[g\]it.diff --check'  head -20
+/er=' + str(importlib.util.find_spec('luaparser') is not None))
+/h -lc git log -5 --oneline
+/monitor=false -c core.untrackedCache=false --no-pager log -5 --oneline --decorate=no
+/NUL
+/survival.zip
+/t +e
+/tatus --short
+/tatus --short --untracked-files=no
+/tatus --short --untracked-files=no  grep -E 'ability_tooltipcontent_catalogchallenge_definitionsshop_entriestooltip_definitions'  head -40
+/total 148
+/scripts/vscripts/tests
 /tools_asset_info.bin
 /tools_thumbnail_cache.sqlite3
-/tools_thumbnail_cache.sqlite3-shm
-/tools_thumbnail_cache.sqlite3-wal
+/SurvivalTwo_QClaw_迁移提示词与知识库清单_V1.0.txt
+/SurvivalTwo_英雄属性与技能池配置说明手册_V1.0.docx

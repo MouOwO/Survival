@@ -38,6 +38,7 @@
 34. **本地化文件必须进入引擎标准加载路径。** Valve 游戏/世界 Tooltip 使用 `game/dota_addons/survival/resource/addon_<language>.txt`；Panorama 诊断和自定义 UI 使用 `panorama/localization/addon_<language>.txt`。不得只修改不会被这些消费者加载的 `resource/localization/` 镜像。
 35. **英雄商城饰品使用“本机资源取证 + 基础骨骼上的命名 wearable”方案。** 先通过 defindex 确认 Bundle 子物品和槽位，再从当前 `pak01_dir.vpk` 以英雄目录、发布时间开发代号、模型/材质/图标/粒子交叉验证真实路径；展示名不得直接当资源目录名。运行时保留英雄主体骨骼与动画，以项目创建的 `prop_dynamic`、`SetOwner` 和 `FollowEntity(hero, true)` 挂载 wearable。商城视觉像全身套装时也必须尊重实际槽位：`The Hallows Within` 已实机证明是单个大型 Head wearable，不得虚构多个身体组件或用 `SetModel` 替换英雄主体。
 36. **项目饰品生命周期必须幂等且严格限定身份。** wearable 和粒子按英雄 entindex 保存；重复应用先销毁/释放项目粒子并删除项目 wearable；粒子通过命名 owner 绑定对应 wearable。开局/重生接入必须校验目标英雄单位名、玩家身份和已初始化 entindex，禁止仅按 Undying 模型或单位名批量应用到修理工、波次怪、僵尸和 Boss。
+37. **需要逐单位穿透命中的移动路径技能使用引擎线性投射物。** `ParticleManager:CreateParticle()` 创建的 VPCF 只是视觉系统；粒子中的 `C_OP_MovementPlaceOnGround`、场景碰撞组或渲染包围范围不能当作 Lua 可监听的单位伤害碰撞体。类似维鲁斯 Q、火焰吐息或炙热巨箭的直线穿透技能，应使用 `ProjectileManager:CreateLinearProjectile()`，显式设置起止半径、距离、速度和目标过滤；穿透技能必须同时设置 `bDeleteOnHit=false`，并在每次 `OnProjectileHit[_ExtraData]` 单位回调中返回 `false`。每支投射物用唯一 ID 保存权威伤害和已命中 entindex，逐目标进入既有伤害服务；禁止用固定时间提前量或视觉粒子原点推算命中。
 
 ## 游戏行为决策
 
@@ -57,3 +58,4 @@
 - 建筑配置测试必须覆盖生成字段进入运行时配置、达到上限拒绝、队伍隔离、死亡释放名额和零值无限制。
 - Panorama 修改必须至少检查源码目标行、资源编译器汇总、编译产物时间戳/状态，以及限定路径的 `git diff --check`。
 - 专属地面材料测试必须覆盖 CSV 映射、映射缺失失败关闭、真实引擎物品名、地面标记、首次壳采用、重复合并、登记失败释放和成功后清除防复制标记。
+- 穿透线性投射物测试必须模拟同一 `ExtraData` 依次命中第一、第二、第三个单位，断言每次回调返回 `false`、每个单位各产生一次伤害、同一单位单波去重、终点/塔销毁后状态失效。只 mock `enemies_in_path()` 返回多个单位不能证明 Dota 引擎会产生后续单位命中回调。

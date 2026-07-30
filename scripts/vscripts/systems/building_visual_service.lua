@@ -40,38 +40,91 @@ local function clear_particles(unit)
     particles_by_unit[unit:entindex()] = nil
 end
 
+local function spawn_attachment(asset, model_path)
+    local entity_class = tostring(
+        asset and asset.attachment_entity_class or "prop_dynamic"
+    )
+    local data = {
+        model = model_path,
+        DefaultAnim = asset and asset.default_sequence or "idle",
+    }
+    local ok, attachment = pcall(
+        SpawnEntityFromTableSynchronous, entity_class, data
+    )
+    if (not ok or not valid_entity(attachment))
+        and entity_class ~= "prop_dynamic" then
+        logger.warn("BuildingVisual", "attachment class failed; fallback="
+            .. entity_class .. " model=" .. tostring(model_path))
+        ok, attachment = pcall(
+            SpawnEntityFromTableSynchronous, "prop_dynamic", data
+        )
+    end
+    return ok, attachment
+end
+
+local function normalize_attachment(asset, entry, index)
+    if type(entry) == "string" then
+        local component_id = asset and asset.attachment_ids
+            and asset.attachment_ids[index]
+        return component_id or "attachment_" .. tostring(index), entry
+    end
+    if type(entry) == "table" then
+        return entry.id or "attachment_" .. tostring(index), entry.model
+    end
+    return "attachment_" .. tostring(index), nil
+end
+
+local function normalize_particle(asset, entry, index)
+    if type(entry) == "string" then
+        local owner_id = asset and asset.environment_particle_owners
+            and asset.environment_particle_owners[index]
+        return entry, owner_id
+    end
+    if type(entry) == "table" then
+        return entry.path, entry.owner
+    end
+    return nil, nil
+end
+
 local function apply_attachments(unit, asset)
     clear_attachments(unit)
     local spawned = {}
-    for _, model_path in ipairs(asset and asset.attachment_models or {}) do
-        local ok, attachment = pcall(
-            SpawnEntityFromTableSynchronous,
-            "prop_dynamic",
-            { model = model_path, DefaultAnim = asset.default_sequence or "idle" }
-        )
+    local components = {}
+    for index, entry in ipairs(asset and asset.attachment_models or {}) do
+        local component_id, model_path = normalize_attachment(asset, entry, index)
+        local ok, attachment = spawn_attachment(asset, model_path)
         if ok and valid_entity(attachment) then
+            safe_call(attachment, "SetModel", model_path)
+            safe_call(attachment, "SetOriginalModel", model_path)
             safe_call(attachment, "SetOwner", unit)
             safe_call(attachment, "FollowEntity", unit, true)
+            if tonumber(asset.model_skin) then
+                safe_call(attachment, "SetSkin", tonumber(asset.model_skin))
+            end
             table.insert(spawned, attachment)
+            components[component_id] = attachment
         else
             logger.warn("BuildingVisual", "attachment failed: "
                 .. tostring(model_path))
         end
     end
     if #spawned > 0 then attachments_by_unit[unit:entindex()] = spawned end
+    return components
 end
 
-local function apply_particles(unit, asset)
+local function apply_particles(unit, asset, components)
     clear_particles(unit)
     local spawned = {}
     local attach_type = rawget(_G, "PATTACH_ABSORIGIN_FOLLOW") or 1
-    for _, particle_path in ipairs(asset and asset.particle_resources or {}) do
+    for index, entry in ipairs(asset and asset.environment_particles or {}) do
+        local particle_path, owner_id = normalize_particle(asset, entry, index)
+        local owner = components and components[owner_id] or unit
         local ok, particle = pcall(
             ParticleManager.CreateParticle,
             ParticleManager,
             particle_path,
             attach_type,
-            unit
+            owner
         )
         if ok and particle then
             table.insert(spawned, particle)
@@ -143,8 +196,13 @@ function M.apply(unit, data)
     if asset and tonumber(asset.model_scale) then
         unit:SetModelScale(tonumber(asset.model_scale))
     end
-    apply_attachments(unit, asset)
-    apply_particles(unit, asset)
+    if asset and tonumber(asset.model_skin) then
+        safe_call(unit, "SetSkin", tonumber(asset.model_skin))
+    else
+        safe_call(unit, "SetSkin", 0)
+    end
+    local components = apply_attachments(unit, asset)
+    apply_particles(unit, asset, components)
     unit.survival_model_asset_id = data and data.model_asset_id or nil
     unit.survival_pending_model_asset_id = nil
     unit.survival_pending_previous_model_asset_id = nil
