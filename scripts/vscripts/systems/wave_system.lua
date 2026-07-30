@@ -8,13 +8,17 @@ local spawn_points = require("config/generated/monster_spawn_points")
 local monster_spawn_marker_service = require("systems/monster_spawn_marker")
 local armor_balance = require("config/armor_balance")
 local asset_preload = require("systems/asset_preload_service")
+local difficulty_config = require("config/difficulty_config")
+local wave_difficulty_builder = require("systems/wave_difficulty_builder")
 
 local M = {}
 local state = {}
 local enemies = {}
 local wall_entindex = -1
 local generation_token = 0
-local difficulty_id = "N1"
+local difficulty_id = difficulty_config.default_id
+local difficulty_selected = false
+local game_started = false
 local waves = {}
 local dev_mode = false
 local monster_spawn_marker = nil
@@ -47,7 +51,9 @@ end
 local function reset()
     state = { current_wave = 0, total_waves = 0, status = "waiting", timer = 0,
         planned = 0, pending = 0, spawned = 0, alive = 0, killed = 0,
-        failed_spawn = 0, boss_alive = false, difficulty_id = difficulty_id }
+        failed_spawn = 0, boss_alive = false, difficulty_id = difficulty_id,
+        difficulty_selected = difficulty_selected,
+        difficulty_options = difficulty_config.client_options() }
 end
 
 local function publish(reason)
@@ -75,22 +81,23 @@ end
 
 local function rebuild_waves()
     waves = {}
-    for _, row in ipairs(wave_rows.rows or {}) do
-        if row.enabled ~= false and row.difficulty_id == difficulty_id then
-            local wave = waves[row.wave_number]
-            if not wave then
-                wave = { wave_number = row.wave_number, wait_seconds = row.wait_seconds or 30, batches = {} }
-                waves[row.wave_number] = wave
-            end
-            table.insert(wave.batches, row)
-        end
+    local built, build_error = wave_difficulty_builder.build(
+        wave_rows.rows,
+        difficulty_id
+    )
+    if not built then
+        state.total_waves = 0
+        return false, build_error
     end
-    for _, wave in pairs(waves) do
-        table.sort(wave.batches, function(a, b) return (a.spawn_order or 0) < (b.spawn_order or 0) end)
+    for wave_number, batches in pairs(built.waves) do
+        waves[wave_number] = {
+            wave_number = wave_number,
+            wait_seconds = batches[1] and batches[1].wait_seconds or 30,
+            batches = batches,
+        }
     end
-    local total = 0
-    for number in pairs(waves) do if number > total then total = number end end
-    state.total_waves = total
+    state.total_waves = built.total_waves
+    return true
 end
 
 local function apply_stats(unit, row, definition)
@@ -274,19 +281,39 @@ function M.debug_spawn_wave(number)
 end
 
 function M.set_difficulty(id)
-    if type(id) ~= "string" or id == "" then return false end
+    if type(id) ~= "string" or id == "" then
+        return false, "difficulty_not_found"
+    end
+    if difficulty_selected then
+        if id == difficulty_id then return true end
+        return false, "difficulty_locked"
+    end
+    if not difficulty_config.get(id) then
+        return false, "difficulty_not_found"
+    end
     difficulty_id = id
-    rebuild_waves()
+    local built, build_error = rebuild_waves()
+    if not built then
+        difficulty_id = difficulty_config.default_id
+        rebuild_waves()
+        return false, build_error or "difficulty_build_failed"
+    end
+    difficulty_selected = true
     state.difficulty_id = id
+    state.difficulty_selected = true
     state.current_wave = 0
     publish("difficulty_changed")
-    return state.total_waves > 0
+    if game_started then
+        start_countdown(difficulty_config.initial_wave_delay)
+    end
+    return true
 end
 
 local function set_difficulty_request(payload)
     local id = tostring(payload and payload.difficulty_id or "")
-    if not M.set_difficulty(id) then
-        return { ok = false, error = "difficulty_not_found" }
+    local ok, error_code = M.set_difficulty(id)
+    if not ok then
+        return { ok = false, error = error_code or "difficulty_not_found" }
     end
     return { ok = true, difficulty_id = difficulty_id, total_waves = state.total_waves }
 end
@@ -295,10 +322,22 @@ function M.get_difficulty() return difficulty_id end
 
 function M.init()
     monster_spawn_marker = nil
+    difficulty_id = difficulty_config.default_id
+    difficulty_selected = false
+    game_started = false
     reset(); enemies = {}; wall_entindex = -1; generation_token = 0; dev_mode = false
     rebuild_waves()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)
-    event_bus.subscribe(events.GAME_STARTED, function() start_countdown(30) end)
+    event_bus.subscribe(events.GAME_STARTED, function()
+        game_started = true
+        if difficulty_selected then
+            start_countdown(difficulty_config.initial_wave_delay)
+            return
+        end
+        state.status = "selecting_difficulty"
+        state.timer = 0
+        publish("difficulty_selection_started")
+    end)
     event_bus.subscribe(events.WAVE_START_NEXT, start_next_wave)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
     event_bus.subscribe(events.BUILDING_CREATED, function(payload) if payload.building_id == "wall" then wall_entindex = payload.entindex; update_targets() end end)

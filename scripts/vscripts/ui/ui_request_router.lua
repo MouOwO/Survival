@@ -264,6 +264,31 @@ local function register_snapshot_request()
     end)
 end
 
+local function register_difficulty_select_request()
+    CustomGameEventManager:RegisterListener(
+        "ui_difficulty_select_request",
+        function(_, payload)
+            local player_id = source_player_id(payload)
+            if not valid_player_id(player_id) then return end
+            local result, request_error = event_bus.request(
+                events.WAVE_DIFFICULTY_SET_REQUEST,
+                {
+                    difficulty_id = tostring(
+                        payload and payload.difficulty_id or ""
+                    ),
+                    player_id = player_id,
+                }
+            )
+            send_to_player("ui_difficulty_select_result", player_id, {
+                success = result and result.ok and 1 or 0,
+                difficulty_id = result and result.difficulty_id or "",
+                total_waves = result and result.total_waves or 0,
+                error = result and result.error or request_error or "",
+            })
+        end
+    )
+end
+
 local function register_shop_open_request()
     CustomGameEventManager:RegisterListener("ui_shop_open_request", function(_, payload)
         local player_id = source_player_id(payload)
@@ -792,6 +817,7 @@ function M.init()
     register_selected_unit_stats_request()
     register_building_snapshot_push()
     register_snapshot_request()
+    register_difficulty_select_request()
     register_shop_open_request()
     register_shop_close_request()
     register_shop_purchase_request()
