@@ -42,21 +42,7 @@ local function owned_passives(player_id)
     return owned
 end
 
-local function attribute_snapshot(player_id, hero)
-    if valid(hero) and hero.GetStrength and hero.GetAgility
-        and hero.GetIntellect then
-        local strength = tonumber(hero:GetStrength()) or 0
-        local agility = tonumber(hero:GetAgility()) or 0
-        -- Unlike GetStrength/GetAgility, Dota's GetIntellect API requires
-        -- bIncludeBonuses. Passive damage uses the hero's complete attributes.
-        local intelligence = tonumber(hero:GetIntellect(true)) or 0
-        return {
-            strength = strength,
-            agility = agility,
-            intelligence = intelligence,
-            all_attributes = strength + agility + intelligence,
-        }
-    end
+local function attribute_snapshot(player_id)
     local result = event_bus.request(events.HERO_COMBAT_STATS_GET_REQUEST, {
         player_id = player_id,
     })
@@ -562,7 +548,7 @@ local function on_main_attack(payload)
     scheduler.after(10, function() processed_attacks[attack_id] = nil end)
 
     local owned = owned_passives(tonumber(payload.player_id))
-    local attributes = attribute_snapshot(tonumber(payload.player_id), payload.attacker)
+    local attributes = attribute_snapshot(tonumber(payload.player_id))
     if not attributes then return end
     for _, definition in ipairs(definitions.rows) do
         local level = owned[definition.skill_id]

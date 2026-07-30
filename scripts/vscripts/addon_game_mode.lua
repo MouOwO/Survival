@@ -2,6 +2,9 @@
 
 local function configure_survival_launch_rules()
     local game_mode = GameRules:GetGameModeEntity()
+    if not game_mode then
+        return false, "game_mode_entity_unavailable"
+    end
     game_mode:SetCustomGameForceHero(SURVIVAL_FORCE_HERO)
     GameRules:SetCustomGameSetupTimeout(0)
     GameRules:SetHeroSelectionTime(0)
@@ -11,12 +14,18 @@ local function configure_survival_launch_rules()
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
     GameRules:EnableCustomGameSetupAutoLaunch(true)
     GameRules:SetCustomGameSetupAutoLaunchDelay(0)
+    return true, nil
 end
 
 -- Apply launch-critical rules before loading the gameplay modules. A failure
 -- in an unrelated module must never make the engine fall back to native team
 -- setup and hero selection.
-local launch_rules_ok, launch_rules_error = pcall(configure_survival_launch_rules)
+local launch_call_ok, launch_rules_applied, launch_rules_error =
+    pcall(configure_survival_launch_rules)
+local launch_rules_ok = launch_call_ok and launch_rules_applied == true
+if not launch_call_ok then
+    launch_rules_error = launch_rules_applied
+end
 local launch_map_name = GetMapName and GetMapName() or "unknown"
 print(
     "[SURVIVAL_LAUNCH_RULES] map=" .. tostring(launch_map_name)
@@ -25,14 +34,18 @@ print(
 )
 
 local modifier_registry = require("core/modifier_registry")
-modifier_registry.register()
+local modifiers_valid, modifier_count_or_error = modifier_registry.register()
+assert(modifiers_valid,
+    "modifier registry validation failed: " .. tostring(modifier_count_or_error))
 assert(modifier_single_health_bar ~= nil,
     "modifier_single_health_bar bootstrap failed")
 assert(modifier_debug_attack_cap ~= nil,
     "modifier_debug_attack_cap bootstrap failed")
 assert(modifier_enemy_wall_ai ~= nil,
     "modifier_enemy_wall_ai bootstrap failed")
-print("[SURVIVAL_MODIFIER_BOOTSTRAP] registry_refreshed=true health_bar=true attack_cap=true enemy_wall_ai=true")
+print("[SURVIVAL_MODIFIER_BOOTSTRAP] registry_refreshed=true count="
+    .. tostring(modifier_count_or_error)
+    .. " health_bar=true attack_cap=true enemy_wall_ai=true")
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
@@ -191,8 +204,12 @@ local function assign_player_to_survival_team(player_id)
 end
 
 local function configure_game_rules()
+    local launch_rules_applied, launch_error = configure_survival_launch_rules()
+    if not launch_rules_applied then
+        error("survival launch rules unavailable during Activate: "
+            .. tostring(launch_error))
+    end
     local game_mode = GameRules:GetGameModeEntity()
-    configure_survival_launch_rules()
     game_mode:SetBuybackEnabled(false)
     game_mode:SetCameraDistanceOverride(1500)
     game_mode:SetFixedRespawnTime(2)

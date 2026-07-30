@@ -115,9 +115,9 @@ local function ability_map(state)
     return result
 end
 
-local function synchronize_unit(state)
+local function synchronize_unit_impl(state)
     if not valid_entity(state.unit) then
-        return
+        error("combat hero is not valid")
     end
 
     ability_utils.remove_all_except(state.unit, ability_map(state))
@@ -125,7 +125,7 @@ local function synchronize_unit(state)
         state.unit:SetAbilityPoints(0)
     end
 
-    for _, skill_id in ipairs(state.order) do
+    for index, skill_id in ipairs(state.order) do
         local definition = skills.by_id[skill_id]
         if definition and definition.enabled ~= false
             and definition.ability_name
@@ -175,6 +175,44 @@ local function synchronize_unit(state)
             state.unit:CalculateStatBonus(true)
         end
     end)
+    return true
+end
+
+local function synchronize_unit(state)
+    local ok, result = pcall(synchronize_unit_impl, state)
+    if not ok then
+        print(string.format(
+            "[HERO_SKILL_SYNC_FAILED] player=%s hero=%s error=%s",
+            tostring(state and state.player_id),
+            tostring(state and state.hero_id),
+            tostring(result)
+        ))
+        return false, tostring(result)
+    end
+    return result == true, nil
+end
+
+local function copy_order(order)
+    local result = {}
+    for index, skill_id in ipairs(order or {}) do
+        result[index] = skill_id
+    end
+    return result
+end
+
+local function rollback_skill_state(state, skill_id, previous_level,
+        previous_order, previous_version)
+    state.levels[skill_id] = previous_level
+    state.order = previous_order
+    state.version = previous_version
+    local restored, restore_error = synchronize_unit(state)
+    if not restored then
+        print(string.format(
+            "[HERO_SKILL_ROLLBACK_SYNC_FAILED] player=%s skill=%s error=%s",
+            tostring(state.player_id), tostring(skill_id),
+            tostring(restore_error)
+        ))
+    end
 end
 
 local function grant_to_state(state, skill_id, levels)
@@ -186,6 +224,8 @@ local function grant_to_state(state, skill_id, levels)
     local current = state.levels[skill_id]
     local maximum = math.max(1, tonumber(definition.max_level) or 1)
     local amount = math.max(1, tonumber(levels) or 1)
+    local previous_order = copy_order(state.order)
+    local previous_version = state.version
 
     if current then
         if current >= maximum then
@@ -202,7 +242,21 @@ local function grant_to_state(state, skill_id, levels)
     end
 
     state.version = state.version + 1
-    synchronize_unit(state)
+    local synchronized, sync_error = synchronize_unit(state)
+    if not synchronized then
+        rollback_skill_state(
+            state,
+            skill_id,
+            current,
+            previous_order,
+            previous_version
+        )
+        return {
+            ok = false,
+            error = "skill_sync_failed",
+            diagnostic = sync_error,
+        }
+    end
     publish(state.player_id, "skill_granted")
     return {
         ok = true,
@@ -267,10 +321,30 @@ local function upgrade_with_skill_point_request(payload)
     if (state.skill_points or 0) < 1 then
         return { ok = false, error = "skill_points_insufficient" }
     end
+    local previous_points = state.skill_points
+    local previous_version = state.version
     state.skill_points = state.skill_points - 1
     state.levels[skill_id] = current + 1
     state.version = state.version + 1
-    synchronize_unit(state)
+    local synchronized, sync_error = synchronize_unit(state)
+    if not synchronized then
+        state.skill_points = previous_points
+        state.levels[skill_id] = current
+        state.version = previous_version
+        local restored, restore_error = synchronize_unit(state)
+        if not restored then
+            print(string.format(
+                "[HERO_SKILL_POINT_ROLLBACK_SYNC_FAILED] player=%s skill=%s error=%s",
+                tostring(player_id), tostring(skill_id),
+                tostring(restore_error)
+            ))
+        end
+        return {
+            ok = false,
+            error = "skill_sync_failed",
+            diagnostic = sync_error,
+        }
+    end
     publish(player_id, "skill_point_upgrade")
     return {
         ok = true,

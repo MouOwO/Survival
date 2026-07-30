@@ -94,18 +94,6 @@ local function get_all_equipment_stats(player_id)
     }
 end
 
-local function primary_logical_attribute(unit, definition, stats)
-    local name = tostring(definition.primary_attribute or "")
-    if name == "strength" then return stats.strength end
-    if name == "agility" then return stats.agility end
-    if name == "intellect" then return stats.intellect end
-    local attribute = safe_get(unit, "GetPrimaryAttribute", -1)
-    if attribute == 0 then return stats.strength end
-    if attribute == 1 then return stats.agility end
-    if attribute == 2 then return stats.intellect end
-    return 0
-end
-
 local function base_snapshot(unit, definition)
     local all_bonus = value(definition, "all_attributes_bonus", 0)
         + global_rules.number("hero_meta_all_attributes_bonus", 0)
@@ -113,17 +101,17 @@ local function base_snapshot(unit, definition)
         strength = value(
             definition,
             "base_strength",
-            safe_get(unit, "GetBaseStrength", safe_get(unit, "GetStrength", 0))
+            0
         ) + all_bonus,
         agility = value(
             definition,
             "base_agility",
-            safe_get(unit, "GetBaseAgility", safe_get(unit, "GetAgility", 0))
+            0
         ) + all_bonus,
         intellect = value(
             definition,
             "base_intellect",
-            safe_get(unit, "GetBaseIntellect", safe_get(unit, "GetIntellect", 0))
+            0
         ) + all_bonus,
     }
     local fallback_min = safe_get(unit, "GetBaseDamageMin", 0)
@@ -146,14 +134,6 @@ local function configured_damage_multiplier(definition)
         definition,
         global_rules.number("hero_meta_damage_multiplier", 1)
     )
-end
-
-local function primary_engine_attribute(unit, projected)
-    local attribute = safe_get(unit, "GetPrimaryAttribute", -1)
-    if attribute == 0 then return projected.strength end
-    if attribute == 1 then return projected.agility end
-    if attribute == 2 then return projected.intellect end
-    return 0
 end
 
 local function apply_base_projection(state)
@@ -443,9 +423,8 @@ local function on_changed(payload)
 end
 
 local function on_progression_changed(payload)
-    -- Per-attack attribute growth changes logical/native attributes, but it does
-    -- not change equipment health. Refreshing the health-bonus modifier here
-    -- made Dota recalculate maximum health on every landed attack.
+    -- Progression attributes are logical data only. They do not change native
+    -- attributes or equipment health, so only the combat snapshot is rebuilt.
     recalculate(tonumber(payload.player_id), payload.reason)
 end
 

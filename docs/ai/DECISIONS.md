@@ -39,6 +39,9 @@
 35. **英雄商城饰品使用“本机资源取证 + 基础骨骼上的命名 wearable”方案。** 先通过 defindex 确认 Bundle 子物品和槽位，再从当前 `pak01_dir.vpk` 以英雄目录、发布时间开发代号、模型/材质/图标/粒子交叉验证真实路径；展示名不得直接当资源目录名。运行时保留英雄主体骨骼与动画，以项目创建的 `prop_dynamic`、`SetOwner` 和 `FollowEntity(hero, true)` 挂载 wearable。商城视觉像全身套装时也必须尊重实际槽位：`The Hallows Within` 已实机证明是单个大型 Head wearable，不得虚构多个身体组件或用 `SetModel` 替换英雄主体。
 36. **项目饰品生命周期必须幂等且严格限定身份。** wearable 和粒子按英雄 entindex 保存；重复应用先销毁/释放项目粒子并删除项目 wearable；粒子通过命名 owner 绑定对应 wearable。开局/重生接入必须校验目标英雄单位名、玩家身份和已初始化 entindex，禁止仅按 Undying 模型或单位名批量应用到修理工、波次怪、僵尸和 Boss。
 37. **需要逐单位穿透命中的移动路径技能使用引擎线性投射物。** `ParticleManager:CreateParticle()` 创建的 VPCF 只是视觉系统；粒子中的 `C_OP_MovementPlaceOnGround`、场景碰撞组或渲染包围范围不能当作 Lua 可监听的单位伤害碰撞体。类似维鲁斯 Q、火焰吐息或炙热巨箭的直线穿透技能，应使用 `ProjectileManager:CreateLinearProjectile()`，显式设置起止半径、距离、速度和目标过滤；穿透技能必须同时设置 `bDeleteOnHit=false`，并在每次 `OnProjectileHit[_ExtraData]` 单位回调中返回 `false`。每支投射物用唯一 ID 保存权威伤害和已命中 entindex，逐目标进入既有伤害服务；禁止用固定时间提前量或视觉粒子原点推算命中。
+38. **英雄三维是项目逻辑数据，不是 Dota 原生属性。** 力量、敏捷、智力及全属性只保存在 progression、装备聚合和战斗属性快照中，用于 UI 与明确声明按三维结算的技能/装备效果。禁止调用 `ModifyStrength/ModifyAgility/ModifyIntellect`，也禁止通过 modifier 的原生三维 bonus 投影逻辑三维，否则会隐式改变攻速、护甲、生命、魔法和主属性攻击。技能必须通过 `HERO_COMBAT_STATS_GET_REQUEST` 读取逻辑三维，禁止优先读取 `GetStrength/GetAgility/GetIntellect`。
+39. **技能逻辑状态与引擎 ability 同步必须事务化。** 授予或升级技能时，`levels/order/skill_points/version` 与 `AddAbility/SetLevel/SetAbilityIndex` 属于同一个事务；引擎同步异常必须回滚逻辑状态并恢复旧 ability 集合。禁止先永久提交逻辑状态、再把可能抛错的引擎同步留在事务之外。Lua `ipairs` 循环需要索引时不得用 `_` 丢弃后再引用未定义的 `index`。
+40. **模块加载顶层不得假设 GameModeEntity 已存在。** `GameRules:GetGameModeEntity()` 在 `Activate()` 前可能返回 nil；依赖 GameModeEntity 的启动规则应在顶层安全标记 deferred，并在 `Activate()` 阶段强制成功，否则中止初始化，禁止带着半配置状态继续运行。
 
 ## 游戏行为决策
 

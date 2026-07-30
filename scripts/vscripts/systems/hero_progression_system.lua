@@ -1,11 +1,9 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
-local hero_health_guard = require("core/hero_health_guard")
 
 local M = {}
 
 local state_by_player = {}
-local hero_by_player = {}
 
 local function new_state(player_id)
     return {
@@ -44,20 +42,6 @@ local function snapshot(player_id)
     return result
 end
 
-local function apply_attributes(player_id, amount)
-    local hero = hero_by_player[player_id]
-    if not hero or hero:IsNull() or amount == 0 then
-        return
-    end
-
-    hero_health_guard.preserve_current(hero, function()
-        if hero.ModifyStrength then hero:ModifyStrength(amount) end
-        if hero.ModifyAgility then hero:ModifyAgility(amount) end
-        if hero.ModifyIntellect then hero:ModifyIntellect(amount) end
-        if hero.CalculateStatBonus then hero:CalculateStatBonus(true) end
-    end, "hero_progression_attributes")
-end
-
 local function append_skill_reward(state, effect)
     table.insert(state.pending_skill_rewards, {
         effect_type = effect.effect_type,
@@ -76,7 +60,6 @@ local function apply_effect(state, player_id, effect)
     end
     if effect_type == "add_all_attributes" then
         state.all_attributes = state.all_attributes + value
-        apply_attributes(player_id, value)
         return
     end
     if effect_type == "add_attack_flat" then
@@ -148,7 +131,6 @@ local function on_hero_ready(payload)
     if payload.player_id == nil or not payload.hero then
         return
     end
-    hero_by_player[payload.player_id] = payload.hero
     get_state(payload.player_id)
 end
 
@@ -156,7 +138,6 @@ local function on_hero_summoned(payload)
     if payload.player_id == nil or not payload.unit then
         return
     end
-    hero_by_player[payload.player_id] = payload.unit
     get_state(payload.player_id)
 end
 
@@ -174,7 +155,6 @@ local function on_attack_landed(payload)
     local amount = gain * multiplier
     state.all_attributes = state.all_attributes + amount
     state.version = state.version + 1
-    apply_attributes(player_id, amount)
     local data = snapshot(player_id)
     data.reason = "attack_all_attribute_growth"
     event_bus.emit(events.HERO_PROGRESSION_CHANGED, data)
@@ -182,7 +162,6 @@ end
 
 function M.init()
     state_by_player = {}
-    hero_by_player = {}
     event_bus.handle_request(
         events.HERO_PROGRESSION_GET_REQUEST,
         get_progression

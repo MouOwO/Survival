@@ -141,6 +141,20 @@ function M.register()
         "ModifierRegistry",
         "refreshed " .. tostring(#modifiers) .. " modifiers"
     )
+    return M.validate()
+end
+
+function M.validate()
+    local missing = {}
+    for _, definition in ipairs(modifiers) do
+        if _G[definition.name] == nil then
+            missing[#missing + 1] = definition.name
+        end
+    end
+    if #missing > 0 then
+        return false, table.concat(missing, ",")
+    end
+    return true, #modifiers
 end
 
 return M

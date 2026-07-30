@@ -2,6 +2,22 @@
 
 > 仅追加关键检查点。记录研究过程，而不只是任务完成后的总结。
 
+## 2026-07-30 — 二转技能授予失败与启动时序修复
+
+- 实机日志确认：`hero.skill.grant.request` 在 `hero_skill_system.lua:144` 执行 `index - 1` 时崩溃；循环使用 `for _, skill_id` 丢弃了索引，客户端因此只收到通用 `skill_grant_failed`。
+- 状态污染风险：旧实现先修改 `levels/order/version` 再同步 ability；异常后提示失败但服务端可能已拥有技能。技能点升级同样先扣点再同步，存在吞点风险。
+- 修复：技能同步改为受保护调用并返回 `skill_sync_failed`；授予失败回滚等级、顺序和版本，技能点升级失败恢复点数、等级和版本，并尝试重建旧 ability 集合。
+- 启动日志确认：模块顶层调用 `GetGameModeEntity()` 可能得到 nil。顶层现在只记录 `game_mode_entity_unavailable` deferred；`Activate()` 阶段必须成功应用启动规则，否则明确中止初始化。
+- Modifier 注册：统一注册表新增完整 class 验证并向启动日志输出验证数量；旧局出现 unknown modifier 且同时执行已删除代码，判定必须通过全新冷启动复验，不能用热加载混合局作为结论。
+
+## 2026-07-30 — 智慧之书逻辑三维与原生三维隔离
+
+- 用户实机发现：购买智慧之书后三维和攻击力数值正确，但攻速随敏捷增长，说明逻辑三维被写入了 Dota 原生属性。
+- 根因：`hero_progression_system.lua` 在累计 `all_attributes` 后又调用 `ModifyStrength/ModifyAgility/ModifyIntellect`；`modifier_weapon_stat_projection.lua` 也把七宗罪逻辑三维作为原生属性 bonus 投影。
+- 技能风险：`hero_passive_skill_service.lua` 原先优先读取 `GetStrength/GetAgility/GetIntellect`，会把引擎副作用当成技能权威数据；原生三维归零后还会导致技能按零三维结算。
+- 修复边界：逻辑三维只保存在 progression、装备聚合和 `hero_combat_stat_service` 快照中；被动技能与装备三维伤害统一通过 `HERO_COMBAT_STATS_GET_REQUEST` 读取；不增加抵消攻速的 modifier。
+- 预期结果：购书和其他全属性成长只改变三维 UI 及明确使用三维公式的技能/装备伤害，不再改变 Dota 原生攻速、护甲、生命、魔法或主属性攻击。
+
 ## 2026-07-28 — 检查点 001：确认上下文丢失风险
 
 - 用户最新要求：多次断开和界面关闭导致深度计划讨论丢失；希望解决即使重读四份上下文文档仍无法恢复断点的问题。

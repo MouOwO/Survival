@@ -148,7 +148,7 @@ local function grant_exclusive(player_id)
                 or row.exclusive_group_id == group_id)
             and row.guaranteed == true then
             if not owned[row.skill_id] then
-                local result = event_bus.request(
+                local result, request_error = event_bus.request(
                     events.HERO_SKILL_GRANT_REQUEST,
                     {
                         player_id = player_id,
@@ -158,6 +158,13 @@ local function grant_exclusive(player_id)
                     }
                 )
                 if not result or not result.ok then
+                    if request_error then
+                        print(string.format(
+                            "[HERO_EXCLUSIVE_SKILL_GRANT_HANDLER_FAILED] player=%s skill=%s error=%s",
+                            tostring(player_id), tostring(row.skill_id),
+                            tostring(request_error)
+                        ))
+                    end
                     return result or {
                         ok = false,
                         error = "exclusive_skill_grant_failed",
@@ -254,7 +261,7 @@ local function select_request(payload)
         return { ok = false, error = "skill_not_in_offer" }
     end
 
-    local result = event_bus.request(
+    local result, request_error = event_bus.request(
         events.HERO_SKILL_GRANT_REQUEST,
         {
             player_id = player_id,
@@ -264,6 +271,13 @@ local function select_request(payload)
         }
     )
     if not result or not result.ok then
+        if request_error then
+            print(string.format(
+                "[HERO_SKILL_CHOICE_GRANT_HANDLER_FAILED] player=%s skill=%s error=%s",
+                tostring(player_id), tostring(skill_id),
+                tostring(request_error)
+            ))
+        end
         return result or { ok = false, error = "skill_grant_failed" }
     end
 

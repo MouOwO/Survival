@@ -42,9 +42,6 @@ function modifier_weapon_stat_projection:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
         MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT,
-        MODIFIER_PROPERTY_STATS_STRENGTH_BONUS,
-        MODIFIER_PROPERTY_STATS_AGILITY_BONUS,
-        MODIFIER_PROPERTY_STATS_INTELLECT_BONUS,
         MODIFIER_EVENT_ON_TAKEDAMAGE,
     }
 end
@@ -57,12 +54,6 @@ end
 function modifier_weapon_stat_projection:AddCustomTransmitterData()
     local current = snapshot(self)
     return {
-        seven_sins_strength_bonus =
-            tonumber(current.seven_sins_strength_bonus) or 0,
-        seven_sins_agility_bonus =
-            tonumber(current.seven_sins_agility_bonus) or 0,
-        seven_sins_intellect_bonus =
-            tonumber(current.seven_sins_intellect_bonus) or 0,
         base_attack_time = tonumber(current.base_attack_time) or 0,
         engine_weapon_attack_bonus =
             tonumber(current.engine_weapon_attack_bonus) or 0,
@@ -73,18 +64,6 @@ end
 
 function modifier_weapon_stat_projection:HandleCustomTransmitterData(data)
     self.client_snapshot = data or {}
-end
-
-function modifier_weapon_stat_projection:GetModifierBonusStats_Strength()
-    return tonumber(snapshot(self).seven_sins_strength_bonus) or 0
-end
-
-function modifier_weapon_stat_projection:GetModifierBonusStats_Agility()
-    return tonumber(snapshot(self).seven_sins_agility_bonus) or 0
-end
-
-function modifier_weapon_stat_projection:GetModifierBonusStats_Intellect()
-    return tonumber(snapshot(self).seven_sins_intellect_bonus) or 0
 end
 
 function modifier_weapon_stat_projection:GetModifierBaseAttackTimeConstant()
