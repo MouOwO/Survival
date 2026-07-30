@@ -163,6 +163,7 @@ local M = {
     MONSTER_ENCOUNTER_START_REQUEST = "monster.encounter.start.request",
     MONSTER_ENCOUNTER_QUERY_REQUEST = "monster.encounter.query.request",
     MONSTER_ENCOUNTER_CHANGED = "monster.encounter.changed",
+    MONSTER_ENCOUNTER_COMPLETED = "monster.encounter.completed",
     MONSTER_SPAWNED = "monster.spawned",
     MONSTER_KILLED = "monster.killed",
     MONSTER_REWARD_GRANTED = "monster.reward.granted",

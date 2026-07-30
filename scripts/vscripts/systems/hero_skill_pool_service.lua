@@ -57,19 +57,17 @@ local function eligible(payload)
         local minimum = tonumber(member.min_rebirth_level) or 0
         local maximum = tonumber(member.max_rebirth_level) or 999
         local current = owned[member.skill_id] or 0
-        local max_level = definition
-            and (tonumber(definition.max_level) or 1) or 1
-        local can_add = current > 0
-            or state.skill_count < state.skill_capacity
+        local can_add = current == 0
+            and state.skill_count < state.skill_capacity
 
         if member.enabled ~= false
             and member.pool_id == payload.pool_id
             and definition
             and definition.enabled ~= false
+            and definition.is_public == true
             and rebirth >= minimum
             and rebirth <= maximum
             and (definition.vip_only ~= true or vip)
-            and current < max_level
             and can_add then
             table.insert(result, {
                 member = member,

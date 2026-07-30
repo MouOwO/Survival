@@ -5,4 +5,10 @@ exclusive_axe_01,exclusive_axe,hero_axe,skill_axe_exclusive,1,1,1,
 exclusive_slark_01,exclusive_slark,hero_slark,skill_slark_exclusive,1,1,1,
 exclusive_jugg_01,exclusive_juggernaut,hero_juggernaut,skill_juggernaut_exclusive,1,1,1,
 exclusive_monkey_01,exclusive_monkey_king,hero_monkey_king,skill_monkey_king_exclusive,1,1,1,
+exclusive_monkey_02,exclusive_monkey_king,hero_monkey_king,skill_monkey_king_fury,1,1,1,VIP一转解锁专属技能。
+exclusive_monkey_03,exclusive_monkey_king,hero_monkey_king,skill_monkey_king_swiftness,1,1,1,VIP一转解锁专属技能。
+exclusive_monkey_04,exclusive_monkey_king,hero_monkey_king,skill_monkey_king_agility,1,1,1,VIP一转解锁专属技能。
 exclusive_blademaster_01,exclusive_blademaster,hero_blademaster,skill_blademaster_exclusive,1,1,1,
+exclusive_blademaster_02,exclusive_blademaster,hero_blademaster,skill_blademaster_agility,1,1,1,VIP一转解锁专属技能。
+exclusive_blademaster_03,exclusive_blademaster,hero_blademaster,skill_blademaster_swiftness,1,1,1,VIP一转解锁专属技能。
+exclusive_blademaster_04,exclusive_blademaster,hero_blademaster,skill_blademaster_mobility,1,1,1,VIP一转解锁专属技能。

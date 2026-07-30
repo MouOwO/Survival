@@ -516,7 +516,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "axe_counter_helix"
-    "MaxLevel"           "5"
+    "MaxLevel"           "3"
     "AbilityManaCost"    "0"
 }
 
@@ -526,7 +526,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "slark_essence_shift"
-    "MaxLevel"           "5"
+    "MaxLevel"           "3"
     "AbilityManaCost"    "0"
 }
 
@@ -536,7 +536,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "juggernaut_blade_dance"
-    "MaxLevel"           "5"
+    "MaxLevel"           "3"
     "AbilityManaCost"    "0"
 }
 
@@ -546,7 +546,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "monkey_king_jingu_mastery"
-    "MaxLevel"           "5"
+    "MaxLevel"           "3"
     "AbilityManaCost"    "0"
 }
 
@@ -556,7 +556,187 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "sven_gods_strength"
-    "MaxLevel"           "5"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_monkey_king_fury"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "monkey_king_boundless_strike"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_monkey_king_swiftness"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "monkey_king_tree_dance"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_monkey_king_agility"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "monkey_king_mischief"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_blademaster_agility"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "juggernaut_blade_dance"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_blademaster_swiftness"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "juggernaut_omni_slash"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_blademaster_mobility"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "juggernaut_blade_fury"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_flame_burst"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "lina_dragon_slave"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_frost_nova"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "crystal_maiden_crystal_nova"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_chain_lightning"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "zuus_arc_lightning"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_poison_cloud"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "viper_nethertoxin"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_blade_nova"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "juggernaut_blade_fury"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_earth_line"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "earthshaker_fissure"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_meteor"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "invoker_chaos_meteor"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_arcane_barrage"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "skywrath_mage_arcane_bolt"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_shadow_blast"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "nevermore_shadowraze1"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_holy_pulse"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "omniknight_purification"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_ice_cone"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "drow_ranger_wave_of_silence"
+    "MaxLevel"           "3"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_void_pulse"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "faceless_void_time_dilation"
+    "MaxLevel"           "3"
     "AbilityManaCost"    "0"
 }
     "critical_strike_lv01"
@@ -1219,104 +1399,104 @@
         "AbilityManaCost"    "0"
     }
 
-    "magic_finger_lv01"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lion_finger_of_death"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_finger_lv02"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lion_finger_of_death"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_finger_lv03"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lion_finger_of_death"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_finger_lv04"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lion_finger_of_death"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_finger_lv05"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lion_finger_of_death"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_finger_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lion_finger_of_death"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_laguna_lv01"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lina_laguna_blade"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_laguna_lv02"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lina_laguna_blade"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv02"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_laguna_lv03"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lina_laguna_blade"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv03"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_laguna_lv04"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lina_laguna_blade"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv04"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "magic_laguna_lv05"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "lina_laguna_blade"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "magic_laguna_lv05"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "lina_laguna_blade"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
-    "arcane_supremacy_lv01"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "rubick_arcane_supremacy"
-        "MaxLevel"           "1"
-        "AbilityManaCost"    "0"
+    "arcane_supremacy_lv01"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "rubick_arcane_supremacy"
+        "MaxLevel"           "1"
+        "AbilityManaCost"    "0"
     }
     "ability_building_blink"
     {

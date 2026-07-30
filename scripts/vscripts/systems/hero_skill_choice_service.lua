@@ -70,6 +70,9 @@ local function publish(player_id)
 end
 
 local function create_offer(player_id, source, trigger_level)
+    if pending_by_player[player_id] then
+        return { ok = false, error = "skill_choice_already_pending" }
+    end
     local hero_state = state(player_id)
     if not hero_state or hero_state.hero_ready ~= 1 then
         return { ok = false, error = "combat_hero_not_ready" }
@@ -132,24 +135,49 @@ local function grant_exclusive(player_id)
     local group_id = definition
         and definition.exclusive_skill_group_id or ""
 
+    local owned = {}
+    for _, item in ipairs(hero_state.skills or {}) do
+        owned[item.skill_id] = true
+    end
+    local granted = {}
+    local added = {}
     for _, row in ipairs(exclusive.rows or {}) do
         if row.enabled ~= false
             and row.hero_id == hero_state.hero_id
             and (group_id == ""
                 or row.exclusive_group_id == group_id)
             and row.guaranteed == true then
-            return event_bus.request(
-                events.HERO_SKILL_GRANT_REQUEST,
-                {
-                    player_id = player_id,
-                    skill_id = row.skill_id,
-                    levels = 1,
-                    source = "rebirth_exclusive_reward",
-                }
-            )
+            if not owned[row.skill_id] then
+                local result = event_bus.request(
+                    events.HERO_SKILL_GRANT_REQUEST,
+                    {
+                        player_id = player_id,
+                        skill_id = row.skill_id,
+                        levels = tonumber(row.initial_level) or 1,
+                        source = "rebirth_exclusive_reward",
+                    }
+                )
+                if not result or not result.ok then
+                    return result or {
+                        ok = false,
+                        error = "exclusive_skill_grant_failed",
+                    }
+                end
+                added[#added + 1] = row.skill_id
+            end
+            granted[#granted + 1] = row.skill_id
         end
     end
-    return { ok = false, error = "exclusive_skill_missing" }
+    if #granted == 0 then
+        return { ok = false, error = "exclusive_skill_missing" }
+    end
+    return {
+        ok = true,
+        granted = granted,
+        count = #granted,
+        added = added,
+        added_count = #added,
+    }
 end
 
 local function on_skill_reward(payload)

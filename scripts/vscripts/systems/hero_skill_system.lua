@@ -3,11 +3,9 @@ local events = require("core/events")
 local hero_health_guard = require("core/hero_health_guard")
 local scheduler = require("core/scheduler")
 local ability_utils = require("core/ability_utils")
-local logger = require("core/logger")
 local heroes = require("config/generated/hero_definitions")
 local skills = require("config/generated/hero_skill_definitions")
 local passive_skills = require("config/hero_passive_skill_definitions")
-local initial_skills = require("config/generated/hero_initial_skills")
 local tooltip_view_model = require("ui/hero_skill_tooltip_view_model")
 
 local M = {}
@@ -18,20 +16,6 @@ local PICKUP_MATERIALS_ABILITY = "ability_survival_pickup_materials"
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
-end
-
-local function rows_for_hero(hero_id)
-    local rows = {}
-    for _, row in ipairs(initial_skills.rows or {}) do
-        if row.enabled ~= false and row.hero_id == hero_id then
-            table.insert(rows, row)
-        end
-    end
-    table.sort(rows, function(a, b)
-        return (tonumber(a.slot_order) or 0)
-            < (tonumber(b.slot_order) or 0)
-    end)
-    return rows
 end
 
 local function skill_projection(skill_id, level)
@@ -50,7 +34,7 @@ local function skill_projection(skill_id, level)
         level = level,
         max_level = maximum,
         passive = passive and 1 or 0,
-        hidden = passive and 1 or 0,
+        hidden = 0,
         trigger_type = passive and passive.trigger_type or "",
         trigger_chance = passive and passive.trigger_chance[level] or 0,
         damage_multiplier = passive and passive.damage_multiplier[level] or 0,
@@ -84,7 +68,7 @@ local function snapshot(player_id)
     end
 
     local projected = {}
-    for _, skill_id in ipairs(state.order) do
+    for index, skill_id in ipairs(state.order) do
         table.insert(
             projected,
             skill_projection(skill_id, state.levels[skill_id])
@@ -156,6 +140,9 @@ local function synchronize_unit(state)
                 ability:SetLevel(state.levels[skill_id])
                 ability:SetHidden(false)
                 ability:SetActivated(true)
+                if ability.SetAbilityIndex then
+                    ability:SetAbilityIndex(index - 1)
+                end
             end
         end
     end
@@ -168,7 +155,7 @@ local function synchronize_unit(state)
         return_ability:SetHidden(false)
         return_ability:SetActivated(true)
         if return_ability.SetAbilityIndex then
-            return_ability:SetAbilityIndex(4)
+            return_ability:SetAbilityIndex(#state.order)
         end
     end
     local pickup_ability = state.unit:FindAbilityByName(PICKUP_MATERIALS_ABILITY)
@@ -180,7 +167,7 @@ local function synchronize_unit(state)
         pickup_ability:SetHidden(false)
         pickup_ability:SetActivated(true)
         if pickup_ability.SetAbilityIndex then
-            pickup_ability:SetAbilityIndex(5)
+            pickup_ability:SetAbilityIndex(#state.order + 1)
         end
     end
     hero_health_guard.preserve_current(state.unit, function()
@@ -261,6 +248,11 @@ local function upgrade_with_skill_point_request(payload)
         return { ok = false, error = "combat_hero_not_ready" }
     end
     local skill_id = tostring(payload.skill_id or "")
+    local skill_definition = skills.by_id[skill_id]
+    if not skill_definition or skill_definition.enabled == false
+        or skill_definition.is_public ~= true then
+        return { ok = false, error = "public_pool_skill_invalid" }
+    end
     local definition = passive_skills.by_id[skill_id]
     if not definition then
         return { ok = false, error = "passive_skill_invalid" }
@@ -322,30 +314,8 @@ local function initialize_hero(payload)
     state_by_player[payload.player_id] = state
 
     ability_utils.remove_all(state.unit)
-    local rows = rows_for_hero(state.hero_id)
-    local expected = definition
-        and tonumber(definition.initial_skill_count) or #rows
-    expected = math.max(0, expected or 0)
-
-    for index, row in ipairs(rows) do
-        if index <= expected then
-            grant_to_state(
-                state,
-                row.skill_id,
-                tonumber(row.initial_level) or 1
-            )
-        end
-    end
-    if #rows ~= expected then
-        logger.warn(
-            "HeroSkill",
-            tostring(state.hero_id)
-            .. " initial rows=" .. tostring(#rows)
-            .. " expected=" .. tostring(expected)
-        )
-    end
     synchronize_unit(state)
-    publish(state.player_id, "initial_skills_applied")
+    publish(state.player_id, "exclusive_skills_locked")
 
     scheduler.after(0.25, function()
         if state_by_player[state.player_id] == state then

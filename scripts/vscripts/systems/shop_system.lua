@@ -340,6 +340,11 @@ local function purchase(payload)
         return { ok = false, error = "shop_entry_invalid" }
     end
     local gold_mine_ability = payload.source == "gold_mine_ability"
+    local mode = state.opened_players[player_id] or "shop"
+    if not gold_mine_ability and mode == "shop"
+        and not catalog.listed_in_shop(entry) then
+        return { ok = false, error = "shop_entry_not_listed" }
+    end
     if gold_mine_ability then
         local group = entry.definition and entry.definition.technology_group
         if group ~= "gold_mine_efficiency" and group ~= "gold_mine_crit" then

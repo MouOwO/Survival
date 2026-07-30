@@ -1,14 +1,3 @@
 ﻿initial_entry_id,hero_id,slot_order,skill_id,initial_level,source_type,enabled,notes
 #中文名:初始条目ID,英雄ID,槽位顺序,技能ID,初始等级,来源类型,是否启用,备注
 #types:string,string,number,string,number,enum,boolean,string
-initial_axe_01,hero_axe,1,skill_axe_exclusive,1,exclusive,1,普通英雄1个初始专属技能。
-initial_slark_01,hero_slark,1,skill_slark_exclusive,1,exclusive,1,普通英雄1个初始专属技能。
-initial_jugg_01,hero_juggernaut,1,skill_juggernaut_exclusive,1,exclusive,1,普通英雄1个初始专属技能。
-initial_monkey_01,hero_monkey_king,1,skill_monkey_king_exclusive,1,exclusive,1,VIP初始技能1。
-initial_monkey_02,hero_monkey_king,2,skill_power_training,1,public_configured,1,VIP初始技能2。
-initial_monkey_03,hero_monkey_king,3,skill_attack_speed_training,1,public_configured,1,VIP初始技能3。
-initial_monkey_04,hero_monkey_king,4,skill_attack_range_training,1,public_configured,1,VIP初始技能4。
-initial_blademaster_01,hero_blademaster,1,skill_blademaster_exclusive,1,exclusive,1,VIP初始技能1。
-initial_blademaster_02,hero_blademaster,2,skill_power_training,1,public_configured,1,VIP初始技能2。
-initial_blademaster_03,hero_blademaster,3,skill_agility_training,1,public_configured,1,VIP初始技能3。
-initial_blademaster_04,hero_blademaster,4,skill_attack_speed_training,1,public_configured,1,VIP初始技能4。

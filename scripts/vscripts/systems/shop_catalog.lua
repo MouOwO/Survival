@@ -1,6 +1,7 @@
 local content_catalog = require("config/generated/content_catalog")
 local categories = require("config/generated/shop_categories")
 local aggregation = require("config/generated/shop_aggregation_rules")
+local shop_listings = require("config/generated/shop_entries")
 local evaluator = require("systems/shop_condition_evaluator")
 local research_config = require("config/research_technology_config")
 local research_description = require("research/research_technology_description")
@@ -11,6 +12,7 @@ local M = {}
 local source_cache = {}
 local entries = {}
 local entries_by_id = {}
+local listings_by_content_id = {}
 
 local function number(value)
     return tonumber(value) or 0
@@ -118,15 +120,43 @@ local function fields_for(row, source_id)
     return result
 end
 
+local function rebuild_listings()
+    listings_by_content_id = {}
+    for _, listing in ipairs(shop_listings.rows or {}) do
+        if listing.enabled ~= false
+            and tostring(listing.content_id or "") ~= "" then
+            listings_by_content_id[tostring(listing.content_id)] = listing
+        end
+    end
+end
+
+local function apply_listing(entry)
+    local listing = entry and listings_by_content_id[entry.contentid] or nil
+    if not listing then return entry end
+    if entry.definition and entry.definition.enabled == false then return entry end
+    entry.listed_in_shop = true
+    entry.entryid = tostring(listing.shop_entry_id)
+    entry.shopid = tostring(listing.category_id or entry.shopid)
+    entry.name = tostring(listing.display_name or entry.name)
+    entry.woodcost = number(listing.wood_cost)
+    entry.goldcost = number(listing.gold_cost)
+    entry.purchase_limit = number(listing.purchase_limit)
+    entry.enabled = true
+    return entry
+end
+
 local function make_entry(rule, row)
     local content_id = tostring(field(row, rule.id_field, ""))
-    local wood = number(field(row, rule.wood_cost_field, 0))
-    local gold = number(field(row, rule.gold_cost_field, 0))
+    local listing = listings_by_content_id[content_id]
+    local wood = listing and number(listing.wood_cost)
+        or number(field(row, rule.wood_cost_field, 0))
+    local gold = listing and number(listing.gold_cost)
+        or number(field(row, rule.gold_cost_field, 0))
     local research = research_config.by_legacy_group[row.technology_group]
     local research_cost = research and research_config.cost_for_level(
         research, tonumber(row.level) or 0
     ) or nil
-    if research_cost then
+    if research_cost and not listing then
         wood = research_cost.wood
         gold = research_cost.gold
     end
@@ -145,7 +175,7 @@ local function make_entry(rule, row)
         rule.category_default
     )
     local icon_type = rule.icon_type_default or "item"
-    return {
+    return apply_listing({
         entryid = rule.source_id .. ":" .. content_id,
         tooltip_id = "shop_item:" .. rule.source_id .. ":" .. content_id,
         shopid = category_id,
@@ -191,10 +221,11 @@ local function make_entry(rule, row)
         unlock_technology_group = row.unlock_technology_group or "",
         technology_phase = tonumber(row.technology_phase) or 0,
         definition = row,
-    }
+    })
 end
 
 local function rebuild()
+    rebuild_listings()
     source_cache = {}
     entries = {}
     entries_by_id = {}
@@ -224,6 +255,10 @@ end
 
 function M.find_entry(entry_id)
     return entries_by_id[entry_id]
+end
+
+function M.listed_in_shop(entry)
+    return entry and entry.listed_in_shop == true
 end
 
 function M.find_technology_entry(group, level)
@@ -391,6 +426,8 @@ end
 function M.build_snapshot(player_id, context)
     local projected = {}
     for _, entry in ipairs(entries) do
+        local listed_for_mode = context.ui_mode ~= "shop"
+            or entry.listed_in_shop == true
         local item = project_entry(player_id, entry, context)
         -- Challenge entrances remain visible while locked. Players can see
         -- the abyss prerequisite/completion state instead of having its card
@@ -463,7 +500,7 @@ function M.build_snapshot(player_id, context)
                     or phase == 1 and current < 10
                     or phase == 2 and current >= 10)
         end
-        if item and include and scope_allowed then
+        if item and include and scope_allowed and listed_for_mode then
             table.insert(projected, item)
         end
     end

@@ -61,6 +61,42 @@ end
 
 local function grant_virtual_item(player_id, entry, state)
     local definition = entry.definition or {}
+    if definition.item_subtype == "consumable" then
+        local summoned = event_bus.request(
+            events.HERO_SUMMON_GET_REQUEST,
+            { player_id = player_id }
+        )
+        local hero = summoned and summoned.unit
+        if not hero or hero:IsNull() then
+            return { ok = false, error = "hero_not_ready" }
+        end
+        if definition.effect_type ~= "add_all_attributes" then
+            return { ok = false, error = "consumable_effect_unsupported" }
+        end
+        local attribute_value = tonumber(definition.effect_value)
+        local attack_value = tonumber(definition.effect_secondary_value)
+        if not attribute_value or attribute_value <= 0
+            or not attack_value or attack_value <= 0 then
+            return { ok = false, error = "consumable_effect_invalid" }
+        end
+        return event_bus.request(
+            events.HERO_PROGRESSION_APPLY_REQUEST,
+            {
+                player_id = player_id,
+                reason = "shop_consumable:" .. entry.entryid,
+                effects = {
+                    {
+                        effect_type = "add_all_attributes",
+                        value = attribute_value,
+                    },
+                    {
+                        effect_type = "add_attack_flat",
+                        value = attack_value,
+                    },
+                },
+            }
+        ) or { ok = false, error = "progression_handler_missing" }
+    end
     if definition.progression_type == "repeat_purchase"
         and tostring(definition.series_id or "") ~= "" then
         local series_id = tostring(definition.series_id)

@@ -518,6 +518,28 @@
 - 最终限定 `diff --check` 通过，仅有既有 LF/CRLF 提示。
 - 实机入口：完全停止并重新 Run 后，在控制台执行 `survival_ability_calibration`；满意后点击“输出当前参数”或执行 `survival_ability_calibration_dump`。
 - 尚未验证：助手无法直接观察 Workshop Tools；最终锚点和偏移必须由用户比较 1、2、7 技能状态后确认。
+
+## 2026-07-30 — 检查点 052：商店 UI 布局重构调查完成
+
+- 用户最新要求：商店物品单元只显示图片，不在单元中显示金币和木材；悬停仍显示 Tooltip；Tooltip 与物品单元垂直中心对齐，左边缘距单元右边缘 10px；商品区域宽度缩为原来的约三分之一。
+- 源码证据：`shop_ui.js` 当前为每个 `168×205px` 单元创建图片、名称、科技等级、金币、木材和购买状态；卡片 `onmouseover` 显示、`onmouseout` 隐藏 Tooltip。
+- 闪烁根因：`tooltip_position.js::PlaceRight()` 带有历史 `-78px/-88px` 偏移，可能把 Tooltip 放回卡片命中区域；`ShopEntryTooltip` 未显式关闭子节点命中。
+- 尺寸决定：当前 `980px` 窗口扣除内边距、`180px` 分类栏和 `12px` 间距后，商品区约 `760px`；商品区改为 `254px`（约三分之一），窗口配套改为 `474px`，保留分类栏可用性。
+- 实施边界：只改 content Panorama 的商店 JS/CSS/XML；保留右键购买、服务器快照、分类、Tooltip 中的价格/名称/条件/状态和不可购买视觉。
+- 尚未验证：截图未作为可访问文件提供；最终视觉、不同 UI scale 下的精确 10px 间距及鼠标悬停稳定性需要完全重启 Workshop Tools 后实机确认。
+- 下一步唯一动作：实施图片单元、独立右侧定位和商品区缩宽，强制编译相关 JS/CSS/XML，并执行源码契约与限定差异检查。
+
+## 2026-07-30 — 检查点 053：商店 UI 布局重构实施与自动验证完成
+
+- `shop_ui.js`：商品单元只创建 `ShopItemFrame + ShopItemIcon`；删除卡内名称、科技等级、金币、木材和购买状态节点及无用 `createCost()`。右键购买、悬停 Tooltip 和不可购买样式保留。
+- `shop.css`：窗口宽度 `980px → 474px`，商品区固定为 `254px`（原约 `760px` 的三分之一）；商品单元改为纯图片 `80×64px`，移除废弃文本/成本样式。
+- `shop_tooltip.js`：改用商店专用右侧定位，`x=物品右端+10px`，`y=物品中心-Tooltip半高`；显示后在当前帧、下一帧和 0.03 秒复测动态高度，并保留上下 12px 屏幕边界。
+- `survival_hud.xml`：`ShopEntryTooltip` 同时设置 `hittest=false` 与 `hittestchildren=false`，避免 Tooltip 覆盖卡片后触发 hover 抖动。
+- Tooltip 内容边界：名称、说明、金币、木材、购买条件、拥有数量、动态字段和购买状态全部保留，不改变服务端商店数据或购买逻辑。
+- 编译结果：`shop_ui.js`、`shop_tooltip.js`、`shop.css` 各 `1 compiled, 0 failed, 0 skipped`；`survival_hud.xml` 加载链 `7 compiled, 0 failed, 0 skipped`。
+- 编译产物时间均为 `2026-07-30 17:20:36`；源码契约 `SHOP_LAYOUT_CONTRACT_PASS`；content 限定 `git diff --check` 通过，仅有 LF/CRLF 提示。
+- 尚未验证：助手无法直接观察 Workshop Tools；需要完全停止并重新 Run，实机确认 Tooltip 不闪烁、垂直中心对齐、右侧 10px 间距及 `254px` 商品区宽度是否符合截图预期。
+- 下一步唯一动作：完全停止并重新 Run 地图，依次悬停商品区顶部/中部/底部物品，确认 Tooltip 稳定和边界位置；如视觉宽度仍需微调，返回新截图与目标宽度即可定向调整。
 - 下一步唯一动作：用户返回完整 `[SURVIVAL_ABILITY_CALIBRATION] build=grid52_calibrator_v4 ...` 日志；根据实机结果固化最终布局，并决定移除还是默认关闭校准 UI。
 
 ## 2026-07-29 — 检查点 052：收到三技能校准参数并定位切换延迟/原生图标闪现
@@ -817,3 +839,31 @@
 - 自动验证：配置生成器返回 `SUCCESS: generated 60 Lua config modules`；`BUILDING_VISUAL_SERVICE_PASS`、`TOWER_MULTI_VISUAL_CONFIG_PASS` 和目标 Lua 语法检查通过；目标 `git diff --check` 通过。
 - 全量回归：42 项中 39 项通过；3 项既有无关失败仍为英雄攻速投影、召唤英雄血条和树木等级配置，断言内容与检查点 075 记录一致。本任务直接相关测试全部通过。
 - 下一步唯一动作：完全停止当前 Workshop Tools Run 并重新启动，分别创建多重塔与穿透弩炮，实机确认 Medusa 五件和 Drow 七件均显示且随攻击、转向和死亡动画正确骨骼跟随。
+
+## 2026-07-30 — 检查点 076：英雄1～10转技能闭环第一阶段完成
+
+- 用户确认的新规则：普通英雄1个专属技能、VIP英雄4个真正专属技能；开局全部锁定，一转挑战成功后解锁当前英雄全部专属技能；二至五转每转公共技能三选一且只选未拥有技能，选中项从本局池中移除；六至十转每转给1点技能点，技能点只能升级公共技能池技能，不能升级专属技能；所有技能最高3级。
+- 初始锁定：`hero_initial_skills.csv` 数据行已清空，`hero_definitions.initial_skill_count` 统一为0；`hero_skill_system` 召唤时清除原技能后只同步回城/拾取工具技能，不再提前发放专属技能。
+- 一转解锁：`hero_skill_choice_service.grant_exclusive()` 改为按当前英雄专属组批量发放所有 guaranteed 行；普通英雄各1项，齐天大圣与VIP剑圣各4项；重试时跳过已拥有项，避免部分成功后重复升级。
+- VIP专属内容：齐天大圣新增斗战、神行、灵猴；VIP剑圣新增疾风剑意、迅影、踏风。当前复用已有属性 Modifier 和原版图标，不开发新特效；所有专属定义 `is_public=false`，技能点入口明确拒绝。
+- 二至五转：选择规则限制为等级2～5、3选1、拒绝 owned；技能池服务只返回 `is_public=true` 且 `current==0` 的技能。候选只在选择成功后通过 owned 状态永久排除，未选两项仍可后续出现；同一玩家不能覆盖未完成 offer。
+- 六至十转：奖励效果改为每转 `grant_skill_points=1`；升级服务必须同时满足技能定义启用、`is_public=true`、已拥有、未满3级和点数充足，校验成功后才扣点并同步 ability 等级。
+- 技能栏：12个公共池技能全部补齐非空 ability_name 和三级被动 KV 壳；`hero_skill_system` 会把项目战斗技能顺序放入槽0开始，回城/拾取动态跟随在技能末尾，避免VIP四专属后新增公共技能与固定槽4/5冲突。`modifier_survival_hero_skill` 已显式 Link/require。
+- 奖励时序：新增 `MONSTER_ENCOUNTER_COMPLETED`。`on_each_kill` 奖励仍消费击杀事件；转生 `on_encounter_complete` 奖励只消费完成事件，并按玩家+不可重复 reward profile 加幂等锁。
+- 首批伤害复核：炎爆震击、冰霜新星、雷霆连锁继续使用触发时力量+敏捷+智力快照乘三级配置倍率，提交 `DAMAGE_TYPE_PURE`；次级多重攻击不触发，同 attack_id 去重，雷霆连锁目标去重。未新增或修改粒子。
+- 配置生成：当前 Shell 无 `py/python`，使用 `.cline_tmp/build_target_configs.ps1` 定向生成本次8份 generated Lua，并保留 `hero_definitions.base_armor -> base_war3_armor` 正式别名语义；生成结果已逐项复核。
+- 自动验证：`.cline_tmp/test_rebirth_skill_contract.ps1` 输出 `REBIRTH_SKILL_CONTRACT_PASS`；覆盖初始锁定、普通/VIP专属数量、2～5转规则、6～10转点数、公共/专属边界、12个池技能KV、奖励完成时序/幂等及前三技能伤害契约。限定 `git diff --check` 无错误；当前环境无 Lua 解释器，仍需 Workshop Tools 实机走一至六转验证真实技能栏和伤害。
+
+
+## 2026-07-30 — 检查点 077：商店白名单与商店专用Tooltip切换完成
+
+- Valve物品Tooltip只支持引擎ItemCost金币，不提供项目木材货币字段；未采用依赖Valve私有动态节点的木材注入方案。
+- 商店动态图标关闭hittest/hittestchildren，外层卡片继续显示现有ShopEntryTooltip；该项目Tooltip已经同时显示木材、金币、购买条件和状态。背包与地面物品的官方Tooltip不受影响。
+- shop_catalog.lua现在读取generated/shop_entries；普通shop模式仅投影shop_entries中enabled=true、content_id有业务定义且业务definition.enabled未停用的条目。
+- shop_entries中的shop_entry_id、category_id、display_name、wood_cost、gold_cost、purchase_limit成为普通商店展示权威；实际物品效果、科技等级和挑战逻辑仍来自各业务定义表。
+- 普通商店购买请求增加listed_in_shop服务端校验；research模式和gold_mine_ability路径不受普通商店白名单限制。
+- 未列入shop_entries、shop_entries.enabled=0或业务定义停用的内容完全隐藏；仅资源不足的已陈列商品继续显示并置灰。
+- 当前shop_entries启用31项，无重复content_id；具体科技等级ID为0项，因此截图中的灰色普通/高级科技等级卡会从普通商店消失。technology分类当前只保留提前通关服务。
+- shop_ui.js相比本轮修改前只增加两行命中关闭；强制编译结果：OK: 1 compiled, 0 failed, 0 skipped。
+- 验证：SHOP_WHITELIST_CONTRACT_PASS、SHOP_SOURCE_ENCODING_AND_RULES_PASS、SHOP_FINAL_CONTRACT_PASS、SHOP_COMPLETION_CHECK_PASS；Lua限定git diff --check通过。
+- 后续维护：普通商店要显示具体科技等级时，在shop_entries.csv新增一行，content_id填写具体technology_id；修改后重新生成shop_entries.lua并重启地图。

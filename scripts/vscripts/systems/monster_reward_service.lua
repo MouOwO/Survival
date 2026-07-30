@@ -6,6 +6,7 @@ local reward_effects = require("config/generated/reward_effects")
 local return_home = require("systems/hero_return_home_service")
 
 local M = {}
+local granted_non_repeatable = {}
 
 local function return_rebirth_hero_home(result)
     if not string.match(
@@ -78,6 +79,16 @@ local function grant_reward(payload)
         }
     end
 
+    local player_id = tonumber(payload.player_id)
+    if player_id == nil or player_id < 0 then
+        return { ok = false, error = "reward_player_invalid" }
+    end
+    granted_non_repeatable[player_id] = granted_non_repeatable[player_id] or {}
+    if profile.repeatable ~= true
+        and granted_non_repeatable[player_id][profile_id] then
+        return { ok = true, idempotent = true, reward_profile_id = profile_id }
+    end
+
     local effects = effects_for(profile_id)
     local resources, progression = split_effects(effects)
 
@@ -120,6 +131,10 @@ local function grant_reward(payload)
         progression_result = progression_result,
     }
 
+    if result.ok and profile.repeatable ~= true then
+        granted_non_repeatable[player_id][profile_id] = true
+    end
+
     event_bus.emit(events.MONSTER_REWARD_GRANTED, result)
     return_rebirth_hero_home(result)
     if payload.player_id and payload.player_id >= 0 then
@@ -134,11 +149,22 @@ end
 
 local function on_monster_killed(payload)
     if tostring(payload.reward_profile_id or "") == "" then return end
+    local profile = reward_profiles.by_id[payload.reward_profile_id]
+    if profile and profile.trigger_type == "on_encounter_complete" then return end
+    grant_reward(payload)
+end
+
+local function on_encounter_completed(payload)
+    if tostring(payload.reward_profile_id or "") == "" then return end
+    local profile = reward_profiles.by_id[payload.reward_profile_id]
+    if not profile or profile.trigger_type ~= "on_encounter_complete" then return end
     grant_reward(payload)
 end
 
 function M.init()
+    granted_non_repeatable = {}
     event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
+    event_bus.subscribe(events.MONSTER_ENCOUNTER_COMPLETED, on_encounter_completed)
 end
 
 return M

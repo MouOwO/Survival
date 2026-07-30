@@ -1,22 +1,22 @@
-content_id,legacy_id,item_subtype,stackable,max_stack,effect_type,effect_value,replacement_content_id,description,enabled,review_status,source,notes,wood_cost,gold_cost,shop_enabled,shop_category_id,shop_sort_order,required_city_level,requires_vip,requires_hero_summoned,required_rebirth_level,requires_building_id,requires_content_id,purchase_limit,disabled_reason_text,grant_type,icon_name,encounter_id,engine_item_name
-#中文名:内容ID,旧版ID,物品子类型,是否可堆叠,最大堆叠数,效果类型,效果数值,替换内容ID,描述,是否启用,审核状态,来源,备注,木材消耗,金币消耗,是否进入商店,商店分类ID,商店排序,所需主城等级,是否需要VIP,是否需要已召唤英雄,所需转生等级,所需建筑ID,所需内容ID,购买上限,禁用原因,发放类型,图标名称,遭遇ID,引擎物品名
-#types:string,string,enum,boolean,number,string,string,string,string,boolean,enum,string,string,number,number,boolean,enum,number,number,boolean,boolean,number,string,string,number,string,enum,string,string,string
+﻿content_id,legacy_id,item_subtype,stackable,max_stack,effect_type,effect_value,effect_secondary_value,replacement_content_id,description,enabled,review_status,source,notes,wood_cost,gold_cost,shop_enabled,shop_category_id,shop_sort_order,required_city_level,requires_vip,requires_hero_summoned,required_rebirth_level,requires_building_id,requires_content_id,purchase_limit,disabled_reason_text,grant_type,icon_name,encounter_id,engine_item_name
+#中文名:内容ID,旧版ID,物品子类型,是否可堆叠,最大堆叠数,效果类型,效果数值,次要效果数值,替换内容ID,描述,是否启用,审核状态,来源,备注,木材消耗,金币消耗,是否进入商店,商店分类ID,商店排序,所需主城等级,是否需要VIP,是否需要已召唤英雄,所需转生等级,所需建筑ID,所需内容ID,购买上限,禁用原因,发放类型,图标名称,遭遇ID,引擎物品名
+#types:string,string,enum,boolean,number,string,string,number,string,string,boolean,enum,string,string,number,number,boolean,enum,number,number,boolean,boolean,number,string,string,number,string,enum,string,string,string
 item_death_mask,1011,enhancement_item,0,1,,,,能使英雄的攻击将50%对敌人造成的伤害转换成自己的生命值,1,ok,武器合成/行7,,10000,300,1,item,10,0,0,1,0,,,1,,virtual_item,item_lifesteal,
-material_molten_core_01,3021,synthesis_material,0,1,,,,熔火核心Lv1*3 合成熔火核心Lv2,1,ok,武器合成/行28,,0,0,0,item,20,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_molten_core_01_shell
-material_molten_core_02,3022,synthesis_material,0,1,,,,熔火核心Lv2*3 合成熔火核心Lv3,1,ok,武器合成/行29,,0,0,0,item,30,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_molten_core_02_shell
-material_molten_core_03,3023,synthesis_material,0,1,,,,可用熔火核心Lv3升级装备 狱火熔铠Lv1,1,ok,武器合成/行30,,0,0,0,item,40,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_molten_core_03_shell
-material_molten_core_04,3024,synthesis_material,0,1,,,,与狱火熔铠Lv4自动合成狱火熔铠Lvmax。拾取后保存在背包中，仅在合成成功时消耗。,1,ok,武器合成/行31,,0,0,0,item,50,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_molten_core_04_shell
+material_molten_core_01,3021,synthesis_material,0,1,,,,,熔火核心Lv1*3 合成熔火核心Lv2,1,ok,武器合成/行28,,0,0,0,item,20,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_molten_core_01_shell
+material_molten_core_02,3022,synthesis_material,0,1,,,,,熔火核心Lv2*3 合成熔火核心Lv3,1,ok,武器合成/行29,,0,0,0,item,30,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_molten_core_02_shell
+material_molten_core_03,3023,synthesis_material,0,1,,,,,可用熔火核心Lv3升级装备 狱火熔铠Lv1,1,ok,武器合成/行30,,0,0,0,item,40,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_molten_core_03_shell
+material_molten_core_04,3024,synthesis_material,0,1,,,,,与狱火熔铠Lv4自动合成狱火熔铠Lvmax。拾取后保存在背包中，仅在合成成功时消耗。,1,ok,武器合成/行31,,0,0,0,item,50,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_molten_core_04_shell
 item_molten_upgrade_gem_01_03,3111,synthesis_material,0,1,,,,可以升级狱火熔铠到最高Lv4级。,1,ok,武器合成/行32,,0,0,0,item,60,0,0,1,0,,,0,,virtual_item,item_recipe,
 item_molten_upgrade_gem_04,3112,synthesis_material,0,1,,,,可以升级狱火熔铠到最高Lvmax级。,1,ok,武器合成/行33,,0,0,0,item,70,0,0,1,0,,,0,,virtual_item,item_recipe,
-material_synthesis_gem,2041,synthesis_material,0,1,,,,加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1。拾取后保存在背包中，仅在合成成功时消耗。,1,ok,武器合成/行34,,0,0,0,item,80,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_synthesis_gem_shell
+material_synthesis_gem,2041,synthesis_material,0,1,,,,,加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1。拾取后保存在背包中，仅在合成成功时消耗。,1,ok,武器合成/行34,,0,0,0,item,80,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_synthesis_gem_shell
 challenge_synthesis_gem,2141,synthesis_material,0,1,,,,击败BOSS后掉落合成宝石,1,ok,武器合成/行35,,0,0,0,item,90,0,0,1,0,,,0,,virtual_item,item_recipe,
 item_forging_hammer,1111,enhancement_item,0,1,,,,英雄每次攻击 成长之剑额外+1次数 可叠加,1,ok,武器合成/行36,,5000,1000,1,item,100,0,0,1,0,,,5,,virtual_item,item_lifesteal,
 shop_proxy_iron_armor_01,2121,legacy_purchase_proxy,0,1,,,equipment_iron_armor_01,增加英雄10点护甲和5000点生命值，重复购买升级，最高5级。,0,needs_confirmation,武器合成/行37,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,110,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
-shop_proxy_attack_gloves_01,2101,legacy_purchase_proxy,0,1,,,equipment_attack_gloves_01,"增加英雄20%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1 ",0,needs_confirmation,武器合成/行38,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,120,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
+shop_proxy_attack_gloves_01,2101,legacy_purchase_proxy,0,1,,,,equipment_attack_gloves_01,"增加英雄20%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1 ",0,needs_confirmation,武器合成/行38,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,120,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
 shop_proxy_burning_blade_01,2111,legacy_purchase_proxy,0,1,,,equipment_burning_blade_01,能增加1000攻击力，可重复购买，最高5级,0,needs_confirmation,武器合成/行39,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,130,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
 item_small_polar_crystal,1021,enhancement_item,0,1,,,,全属性+1000    击杀200个冰之幽魂 升级,1,ok,武器合成/行45,,0,1000,1,item,140,0,0,1,0,,,1,,virtual_item,item_lifesteal,
 item_large_polar_crystal,1012,enhancement_item,0,1,,,,全属性+2000    大极地晶石+霜之剑刃max+合成宝石=极寒之刃,1,ok,武器合成/行46,,0,1000,0,item,150,0,0,1,0,,,1,,virtual_item,item_lifesteal,
-material_ice_soul_ember,3071,synthesis_material,0,1,,,,极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决,1,ok,武器合成/行52,,0,0,0,item,160,0,0,1,0,,,1,,virtual_item,item_recipe,,item_survival_ice_soul_ember_shell
-item_knowledge_book,10001,consumable,1,99,add_all_attributes,30000,,增加30000全属性，15000攻击力。,1,ok,英雄相关建筑/行16,,0,50000,1,item,170,0,0,1,0,,,99,,virtual_item,item_tome_of_knowledge,
-item_super_knowledge_book,10002,consumable,1,99,add_all_attributes,300000,,增加300000全属性，150000攻击力。,1,ok,英雄相关建筑/行17,,500000,500000,1,item,180,0,0,1,0,,,99,,virtual_item,item_tome_of_knowledge,
+material_ice_soul_ember,3071,synthesis_material,0,1,,,,,极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决,1,ok,武器合成/行52,,0,0,0,item,160,0,0,1,0,,,1,,virtual_item,item_recipe,,item_survival_ice_soul_ember_shell
+item_knowledge_book,10001,consumable,1,99,add_all_attributes,30000,15000,,增加30000全属性，15000攻击力。,1,ok,英雄相关建筑/行16,,0,50000,1,item,170,0,0,1,0,,,99,,virtual_item,item_tome_of_knowledge,
+item_super_knowledge_book,10002,consumable,1,99,add_all_attributes,300000,150000,,增加300000全属性，150000攻击力。,1,ok,英雄相关建筑/行17,,500000,500000,1,item,180,0,0,1,0,,,99,,virtual_item,item_tome_of_knowledge,
 service_early_final_boss,9999,service_action,0,1,summon_final_boss,1,,提前召唤最终BOSS进攻。,1,ok,英雄相关建筑/行18,开局不可用，15分钟CD。,0,50000,1,item,190,0,0,1,0,,,1,,virtual_item,item_smoke_of_deceit,

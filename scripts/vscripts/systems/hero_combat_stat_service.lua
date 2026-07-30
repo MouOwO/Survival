@@ -215,6 +215,7 @@ local function recalculate(player_id, reason)
     )
     local progression = progression_result and progression_result.snapshot or {}
     local progression_attributes = tonumber(progression.all_attributes) or 0
+    local progression_attack_flat = tonumber(progression.attack_flat) or 0
     local essence_attack_pct = tonumber(essence.attack_bonus_pct) or 0
     researcher_armor_reduction = researcher_armor_reduction
         + (tonumber(essence.armor_reduction_per_attack) or 0)
@@ -252,11 +253,13 @@ local function recalculate(player_id, reason)
         attack_min = debug_attack or ((state.base.attack_min + weapon_attack_min)
             * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
             + equipment_stats.attack_flat
-            + researcher_attack_flat),
+            + researcher_attack_flat
+            + progression_attack_flat),
         attack_max = debug_attack or ((state.base.attack_max + weapon_attack_max)
             * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
             + equipment_stats.attack_flat
-            + researcher_attack_flat),
+            + researcher_attack_flat
+            + progression_attack_flat),
         researcher_attack_pct = researcher_attack_pct,
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
@@ -273,6 +276,7 @@ local function recalculate(player_id, reason)
         seven_sins_armor_reduction_per_attack =
             tonumber(essence.armor_reduction_per_attack) or 0,
         progression_all_attributes = progression_attributes,
+        progression_attack_flat = progression_attack_flat,
         base_attack_time = base_attack_time,
         hero_damage_multiplier = hero_damage_multiplier,
         debug_attack_override = debug_attack or 0,
@@ -309,7 +313,8 @@ local function recalculate(player_id, reason)
             + state.engine_base_attack_max
             + weapon_attack_min + weapon_attack_max)
             * 0.5) * (researcher_attack_pct + essence_attack_pct) / 100
-            + researcher_attack_flat,
+            + researcher_attack_flat
+            + progression_attack_flat,
         engine_weapon_attack_bonus = debug_attack
             and (debug_attack
                 - ((state.engine_base_attack_min

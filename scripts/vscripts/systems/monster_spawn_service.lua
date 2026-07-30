@@ -295,6 +295,15 @@ local function on_entity_killed(payload)
         reward_profile_id = meta.reward_profile_id,
         encounter = meta.projection,
     })
+    event_bus.emit(events.MONSTER_ENCOUNTER_COMPLETED, {
+        victim = victim,
+        attacker = payload.attacker,
+        encounter_id = meta.encounter_id,
+        player_id = meta.player_id,
+        team = meta.team,
+        reward_profile_id = meta.reward_profile_id,
+        encounter = meta.projection,
+    })
     event_bus.emit(events.MONSTER_ENCOUNTER_CHANGED, {
         player_id = meta.player_id,
         status = "completed",
