@@ -99,13 +99,30 @@ function D:AddArmorReduction(value)
     if increment <= 0 then return end
     local parent = self:GetParent()
     local minimum = tonumber(parent.survival_minimum_armor)
+    local applied_reduction = math.max(
+        0,
+        (tonumber(self:GetStackCount()) or 0) / 100
+    )
+    local accumulated_reduction = math.max(
+        applied_reduction,
+        tonumber(self.armor_reduction) or 0
+    )
+    local target_reduction = accumulated_reduction + increment
     if minimum ~= nil then
         local current = tonumber(parent:GetPhysicalArmorValue(false)) or minimum
-        increment = math.min(increment, math.max(0, current - minimum))
+        local armor_without_this_modifier = current + applied_reduction
+        local maximum_reduction = math.max(
+            0,
+            armor_without_this_modifier - minimum
+        )
+        target_reduction = math.min(target_reduction, maximum_reduction)
     end
-    if increment <= 0 then return end
-    self.armor_reduction = (self.armor_reduction or 0) + increment
-    self:SetStackCount(math.floor(self.armor_reduction * 100 + 0.5))
+    -- The modifier stack stores hundredths of armor. Round down at the minimum
+    -- boundary so repeated fractional reductions can never cross below it.
+    local target_stack = math.floor(target_reduction * 100 + 0.000001)
+    self.armor_reduction = target_reduction
+    if target_stack <= (tonumber(self:GetStackCount()) or 0) then return end
+    self:SetStackCount(target_stack)
     event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
         entindex = parent:entindex(),
         unit = parent,

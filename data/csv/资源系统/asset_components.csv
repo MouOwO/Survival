@@ -1,0 +1,19 @@
+component_key,asset_id,component_id,model_path,entity_class,parent_component_id,attach_mode,attachment_point,default_sequence,model_scale,model_skin,material_group,sort_order,enabled,notes
+#中文名:组件记录键,资源ID,组件ID,模型路径,实体类型,父组件ID,挂载方式,挂点,默认动作,模型缩放,模型皮肤,材质组,排序,是否启用,备注
+#types:string,string,string,string,string,string,enum,string,string,number,number,string,number,boolean,string
+tower_multi_medusa_anamnessa:weapon,tower_multi_medusa_anamnessa,weapon,models/items/medusa/jewelled_splendor_weapon/jewelled_splendor_weapon.vmdl,prop_dynamic,,bone_merge,,idle,1,,,1,1,Jewels of Anamnessa 武器组件。
+tower_multi_medusa_anamnessa:tail,tower_multi_medusa_anamnessa,tail,models/items/medusa/jewelled_splendor_tail/jewelled_splendor_tail.vmdl,prop_dynamic,,bone_merge,,idle,1,,,2,1,Jewels of Anamnessa 尾部组件。
+tower_multi_medusa_anamnessa:head,tower_multi_medusa_anamnessa,head,models/items/medusa/jewelled_splendor_head/jewelled_splendor_head.vmdl,prop_dynamic,,bone_merge,,idle,1,,,3,1,Jewels of Anamnessa 头部组件。
+tower_multi_medusa_anamnessa:arms,tower_multi_medusa_anamnessa,arms,models/items/medusa/jewelled_splendor_arms/jewelled_splendor_arms.vmdl,prop_dynamic,,bone_merge,,idle,1,,,4,1,Jewels of Anamnessa 手臂组件。
+tower_multi_medusa_anamnessa:armor,tower_multi_medusa_anamnessa,armor,models/items/medusa/jewelled_splendor_armor/jewelled_splendor_armor.vmdl,prop_dynamic,,bone_merge,,idle,1,,,5,1,Jewels of Anamnessa 护甲组件。
+tower_multi_drow_dread_retribution:arms,tower_multi_drow_dread_retribution,arms,models/items/drow/drow_arcana/drow_arcana_arms.vmdl,prop_dynamic,,bone_merge,,idle,1,,,1,1,Dread Retribution 手臂组件。
+tower_multi_drow_dread_retribution:back,tower_multi_drow_dread_retribution,back,models/items/drow/drow_arcana/drow_arcana_back.vmdl,prop_dynamic,,bone_merge,,idle,1,,,2,1,Dread Retribution 背部组件。
+tower_multi_drow_dread_retribution:weapon,tower_multi_drow_dread_retribution,weapon,models/items/drow/drow_arcana/drow_arcana_weapon.vmdl,prop_dynamic,,bone_merge,,idle,1,,,3,1,Dread Retribution 武器组件。
+tower_multi_drow_dread_retribution:legs,tower_multi_drow_dread_retribution,legs,models/items/drow/drow_arcana/drow_arcana_legs.vmdl,prop_dynamic,,bone_merge,,idle,1,,,4,1,Dread Retribution 腿部组件。
+tower_multi_drow_dread_retribution:quiver,tower_multi_drow_dread_retribution,quiver,models/items/drow/drow_arcana/drow_arcana_quiver.vmdl,prop_dynamic,,bone_merge,,idle,1,,,5,1,Dread Retribution 箭袋组件。
+tower_multi_drow_dread_retribution:shoulder,tower_multi_drow_dread_retribution,shoulder,models/items/drow/drow_arcana/drow_arcana_shoulder.vmdl,prop_dynamic,,bone_merge,,idle,1,,,6,1,Dread Retribution 肩部组件。
+tower_multi_drow_dread_retribution:head,tower_multi_drow_dread_retribution,head,models/items/drow/drow_arcana/drow_arcana_head.vmdl,prop_dynamic,,bone_merge,,idle,1,,,7,1,Dread Retribution 头部组件。
+tower_multi_vengeful_shen_screeauk:shoulders,tower_multi_vengeful_shen_screeauk,shoulders,models/items/vengefulspirit/vengeful_spirit_arcana/vengeful_spirit_arcana_shoulders.vmdl,prop_dynamic,,bone_merge,,idle,1,1,,1,1,Servants of Scree'Auk 肩部组件。
+tower_multi_vengeful_shen_screeauk:weapon,tower_multi_vengeful_shen_screeauk,weapon,models/items/vengefulspirit/vengeful_spirit_arcana/vengeful_spirit_arcana_weapon.vmdl,prop_dynamic,,bone_merge,,idle,1,1,,2,1,Servants of Scree'Auk 武器组件。
+tower_multi_vengeful_shen_screeauk:head,tower_multi_vengeful_shen_screeauk,head,models/items/vengefulspirit/vengeful_spirit_arcana/vengeful_spirit_arcana_head_refit.vmdl,prop_dynamic,,bone_merge,,idle,1,1,,3,1,Servants of Scree'Auk 头部组件。
+tower_multi_vengeful_shen_screeauk:legs,tower_multi_vengeful_shen_screeauk,legs,models/items/vengefulspirit/vengeful_spirit_arcana/vengeful_spirit_arcana_legs_refit.vmdl,prop_dynamic,,bone_merge,,idle,1,1,,4,1,Servants of Scree'Auk 腿部组件。

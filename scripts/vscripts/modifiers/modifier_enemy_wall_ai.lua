@@ -1,4 +1,8 @@
+if LinkLuaModifier then
+    LinkLuaModifier("modifier_enemy_wall_ai", "modifiers/modifier_enemy_wall_ai", LUA_MODIFIER_MOTION_NONE)
+end
 modifier_enemy_wall_ai = class({})
+_G.modifier_enemy_wall_ai = modifier_enemy_wall_ai
 local M = modifier_enemy_wall_ai
 local team_alignment = require("core/team_alignment")
 

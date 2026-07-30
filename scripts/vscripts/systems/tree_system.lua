@@ -1,37 +1,56 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
-local scheduler = require("core/scheduler")
 local config = require("config/tree_config")
 local particle_manager = require("core/particle_manager")
 
 local M = {}
 local current_tree = nil
 local main_city = nil
-local tree_level = 0
+local tree_level = 1
+local reserved_grid = nil
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
 
-local function level_health(level)
-    local base = math.max(1, tonumber(config.health) or 1)
-    local fixed = math.max(0, tonumber(config.health_per_level) or 0)
-    local percent = math.max(0, tonumber(config.health_percent_per_level) or 0)
-    local fixed_health = base + fixed * level
-    return math.max(1, math.floor(fixed_health * math.pow(1 + percent, level)))
+local function level_row(level)
+    return config.levels[math.max(
+        1,
+        math.min(config.max_level, tonumber(level) or 1)
+    )]
+end
+
+local function tree_grid()
+    local point = config.spawn_point
+    local footprint = config.footprint
+    local size = tonumber(config.grid_cell_size) or 64
+    local anchor_x = math.floor(point.x / size + 0.5)
+    local anchor_y = math.floor(point.y / size + 0.5)
+    return {
+        grid_x = anchor_x - math.floor(footprint.x / 2),
+        grid_y = anchor_y - math.floor(footprint.y / 2),
+        footprint = footprint,
+    }
+end
+
+local function lumber_efficiency_buff()
+    return math.max(
+        0,
+        tonumber(config.lumber_efficiency_buff_per_level) or 0
+    ) * tree_level
 end
 
 local function tree_snapshot()
-    local health = level_health(tree_level)
+    local row = level_row(tree_level)
     return {
         level = tree_level,
-        health = health,
-        health_per_level = config.health_per_level or 0,
-        health_percent_per_level = config.health_percent_per_level or 0,
-        lumber_efficiency_buff = math.max(
-            0,
-            tonumber(config.lumber_efficiency_buff_per_level) or 0
-        ) * tree_level,
+        max_level = config.max_level,
+        health = row.health,
+        armor = row.armor,
+        war3_armor = row.war3_armor,
+        minimum_armor = row.minimum_armor,
+        war3_minimum_armor = row.war3_minimum_armor,
+        lumber_efficiency_buff = lumber_efficiency_buff(),
     }
 end
 
@@ -43,23 +62,64 @@ local function publish_changed(reason)
     event_bus.emit(events.TREE_CHANGED, snapshot)
 end
 
+local function clear_armor_reduction(tree)
+    if tree.HasModifier
+        and tree:HasModifier("modifier_research_armor_reduction") then
+        tree:RemoveModifierByName("modifier_research_armor_reduction")
+    end
+end
+
+local function apply_level(tree, level)
+    tree_level = math.max(
+        1,
+        math.min(config.max_level, tonumber(level) or 1)
+    )
+    local row = level_row(tree_level)
+    clear_armor_reduction(tree)
+    tree:SetBaseMaxHealth(row.health)
+    tree:SetMaxHealth(row.health)
+    tree:SetPhysicalArmorBaseValue(row.armor)
+    tree.survival_minimum_armor = row.minimum_armor
+    tree.survival_tree_level = tree_level
+    tree.survival_level = tree_level
+    tree:SetHealth(row.health)
+end
+
+local function reserve_tree_grid(entindex)
+    reserved_grid = reserved_grid or tree_grid()
+    event_bus.request(events.GRID_OCCUPY_REQUEST, {
+        grid_x = reserved_grid.grid_x,
+        grid_y = reserved_grid.grid_y,
+        footprint = reserved_grid.footprint,
+        entindex = entindex or "survival_tree_reserved",
+    })
+end
+
+local function upgrade_tree(tree)
+    if not valid_entity(tree) or tree ~= current_tree then return end
+    local previous_level = tree_level
+    local next_level = math.min(config.max_level, tree_level + 1)
+    apply_level(tree, next_level)
+    reserve_tree_grid(tree:entindex())
+    local reason = next_level > previous_level
+        and "tree_level_up" or "tree_max_level_reset"
+    publish_changed(reason)
+end
+
 local function spawn_tree(payload)
     local city = payload and payload.unit or main_city
     if not valid_entity(city) then
         print("[TreeSystem] main city entity is unavailable")
         return
     end
-    local offset = config.spawn_offset or { x = 520, y = 0, z = 0 }
-    local position = city:GetAbsOrigin() + Vector(
-        tonumber(offset.x) or 520,
-        tonumber(offset.y) or 0,
-        tonumber(offset.z) or 0
-    )
-    position.z = GetGroundHeight(position, city) + 32
+    if valid_entity(current_tree) then return end
+
+    local point = config.spawn_point
+    local position = Vector(point.x, point.y, point.z)
     local tree = CreateUnitByName(
         config.unit_name,
         position,
-        true,
+        false,
         nil,
         nil,
         DOTA_TEAM_BADGUYS
@@ -69,21 +129,22 @@ local function spawn_tree(payload)
         return
     end
 
-    local health = level_health(tree_level)
-    tree:SetBaseMaxHealth(health)
-    tree:SetMaxHealth(health)
-    tree:SetHealth(health)
-    tree:SetPhysicalArmorBaseValue(config.armor)
-    tree.survival_minimum_armor = tonumber(config.minimum_armor) or 100
+    tree:SetAbsOrigin(position)
+    tree:SetModel(config.model_name)
+    tree:SetOriginalModel(config.model_name)
+    tree:SetModelScale(config.model_scale)
     tree:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+    tree.survival_tree_depleted_callback = upgrade_tree
+    apply_level(tree, tree_level)
+    if not tree:HasModifier("modifier_tree_progression") then
+        tree:AddNewModifier(tree, nil, "modifier_tree_progression", {})
+    end
     current_tree = tree
+    reserve_tree_grid(tree:entindex())
 
-    event_bus.emit(events.TREE_SPAWNED, {
-        entindex = tree:entindex(),
-        level = tree_level,
-        health = health,
-        lumber_efficiency_buff = tree_snapshot().lumber_efficiency_buff,
-    })
+    local snapshot = tree_snapshot()
+    snapshot.entindex = tree:entindex()
+    event_bus.emit(events.TREE_SPAWNED, snapshot)
     publish_changed("tree_spawned")
 end
 
@@ -99,16 +160,13 @@ local function on_tree_hit(payload)
         and config.hero_base_lumber_efficiency
         or payload.base_lumber_efficiency
     local efficiency = math.max(0, math.floor(
-        (tonumber(base_efficiency) or 0)
-        + tree_snapshot().lumber_efficiency_buff
+        (tonumber(base_efficiency) or 0) + lumber_efficiency_buff()
     ))
     local critical = payload.critical == true
         or payload.source == "lumberjack"
         and RandomFloat(0, 100)
             < math.max(0, tonumber(payload.critical_chance_pct) or 0)
-    if critical then
-        efficiency = efficiency * 2
-    end
+    if critical then efficiency = efficiency * 2 end
     if efficiency <= 0 then return end
     local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
         team = payload.team,
@@ -122,38 +180,33 @@ local function on_tree_hit(payload)
     particle_manager.show_green_number(attacker, efficiency, player)
 end
 
-local function on_entity_killed(payload)
-    local victim = payload.victim
-    if not valid_entity(victim) or not valid_entity(current_tree) then return end
-    if victim:entindex() ~= current_tree:entindex() then return end
-
-    local old_entindex = current_tree:entindex()
-    tree_level = tree_level + 1
-    current_tree = nil
-    event_bus.emit(events.TREE_DESTROYED, {
-        entindex = old_entindex,
-        level = tree_level,
-        lumber_efficiency_buff = tree_snapshot().lumber_efficiency_buff,
-    })
-    publish_changed("tree_destroyed_level_up")
-    scheduler.after(config.respawn_time, spawn_tree, "tree_respawn")
-end
-
 local function on_building_created(payload)
     if not payload or payload.building_id ~= "main_city" then return end
     if not valid_entity(payload.unit) then return end
     main_city = payload.unit
-    if valid_entity(current_tree) then return end
     spawn_tree(payload)
 end
 
 function M.init()
     current_tree = nil
     main_city = nil
-    tree_level = 0
+    tree_level = 1
+    reserved_grid = nil
+    reserve_tree_grid("survival_tree_reserved")
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.TREE_HIT, on_tree_hit)
-    event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
+end
+
+M._level_row_for_test = level_row
+M._tree_grid_for_test = tree_grid
+M._apply_level_for_test = apply_level
+M._upgrade_tree_for_test = function(tree)
+    current_tree = tree
+    upgrade_tree(tree)
+end
+M._reset_for_test = function(level, tree)
+    tree_level = tonumber(level) or 1
+    current_tree = tree
 end
 
 return M

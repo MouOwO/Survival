@@ -1,4 +1,8 @@
+if LinkLuaModifier then
+    LinkLuaModifier("modifier_debug_attack_cap", "modifiers/modifier_debug_attack_cap", LUA_MODIFIER_MOTION_NONE)
+end
 modifier_debug_attack_cap = class({})
+_G.modifier_debug_attack_cap = modifier_debug_attack_cap
 
 local ATTACK_SPEED_MAX = 10000
 

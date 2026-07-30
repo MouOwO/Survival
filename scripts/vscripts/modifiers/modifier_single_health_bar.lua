@@ -1,4 +1,8 @@
+if LinkLuaModifier then
+    LinkLuaModifier("modifier_single_health_bar", "modifiers/modifier_single_health_bar", LUA_MODIFIER_MOTION_NONE)
+end
 modifier_single_health_bar = class({})
+_G.modifier_single_health_bar = modifier_single_health_bar
 
 function modifier_single_health_bar:IsHidden() return true end
 function modifier_single_health_bar:IsPurgable() return false end

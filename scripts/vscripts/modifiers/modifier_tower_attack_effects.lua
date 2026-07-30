@@ -13,10 +13,13 @@ local scheduler = require("core/scheduler")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local buff_manager = require("systems/buff_manager")
+local asset_catalog = require("config/asset_catalog")
 
 local MULTI_DAMAGE_MULTIPLIER = 1.00
 local LIGHTNING_BOUNCE_RADIUS = 200
 local LIGHTNING_BOUNCE_DELAY = 0.10
+local LIGHTNING_SOURCE_OFFSET_Z = 160
+local LIGHTNING_TARGET_OFFSET_Z = 70
 local SPLIT_ARROW_SPEED = 900
 local DEFAULT_STORM_RADIUS = 500
 local DEFAULT_STORM_DURATION = 5
@@ -30,6 +33,23 @@ local DEFAULT_BLIZZARD_DURATION = 2
 local DEFAULT_BLIZZARD_INTERVAL = 1
 local BLIZZARD_SLOW_PCT = 30
 local start_lightning_storm
+
+local LIGHTNING_ASSET_ID = "tower_zuus"
+local DEFAULT_CHAIN_PARTICLE =
+    "particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf"
+local DEFAULT_STORM_CLOUD_PARTICLE =
+    "particles/units/heroes/hero_zuus/zuus_cloud.vpcf"
+local DEFAULT_STORM_STRIKE_PARTICLE =
+    "particles/units/heroes/hero_zuus/zuus_lightning_bolt.vpcf"
+
+local function skill_effect_particle(skill, role, fallback)
+    local skill_id = type(skill) == "table" and skill.skill_id or nil
+    local bundle = asset_catalog.resolve_bundle(LIGHTNING_ASSET_ID)
+    local skill_bundle = bundle and skill_id and bundle.skills[skill_id] or nil
+    local effects = skill_bundle and skill_bundle.effects_by_role[role] or nil
+    local effect = effects and effects[1] or nil
+    return effect and effect.particle_path or fallback
+end
 
 local function skill_matching(unit, prefix)
     for _, row in pairs(tower_skills.get(unit)) do
@@ -213,12 +233,47 @@ end
 local function exists(u) return u and not u:IsNull() end
 local function valid(u) return exists(u) and u:IsAlive() end
 
-local function lightning_particle(caster, source_position, target_position)
+local function lightning_control_point(particle, control_point, unit,
+        attachment_name, fallback_position, offset_z)
+    local position = fallback_position
+    if not position and exists(unit) then position = unit:GetAbsOrigin() end
+    position = (position or Vector(0, 0, 0))
+        + Vector(0, 0, tonumber(offset_z) or 0)
+
+    local attachment_index = 0
+    if exists(unit) and type(unit.ScriptLookupAttachment) == "function" then
+        local ok, result = pcall(
+            unit.ScriptLookupAttachment, unit, attachment_name
+        )
+        if ok then attachment_index = tonumber(result) or 0 end
+    end
+    if attachment_index > 0
+        and type(ParticleManager.SetParticleControlEnt) == "function" then
+        ParticleManager:SetParticleControlEnt(
+            particle, control_point, unit, PATTACH_POINT_FOLLOW,
+            attachment_name, position, true
+        )
+        return
+    end
+    ParticleManager:SetParticleControl(particle, control_point, position)
+end
+
+local function lightning_particle(caster, source_unit, target_unit,
+        source_position, target_position, particle_name)
     local particle = ParticleManager:CreateParticle(
-        "particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
+        particle_name or DEFAULT_CHAIN_PARTICLE,
         PATTACH_CUSTOMORIGIN, caster)
-    ParticleManager:SetParticleControl(particle, 0, source_position)
-    ParticleManager:SetParticleControl(particle, 1, target_position)
+    lightning_control_point(
+        particle, 0, source_unit,
+        source_unit == caster and "attach_attack1" or "attach_hitloc",
+        source_position,
+        source_unit == caster and LIGHTNING_SOURCE_OFFSET_Z
+            or LIGHTNING_TARGET_OFFSET_Z
+    )
+    lightning_control_point(
+        particle, 1, target_unit, "attach_hitloc", target_position,
+        LIGHTNING_TARGET_OFFSET_Z
+    )
     ParticleManager:ReleaseParticleIndex(particle)
 end
 
@@ -381,18 +436,18 @@ local function storm_radius(skill)
     return math.max(1, tonumber(configured) or DEFAULT_STORM_RADIUS)
 end
 
-local function storm_cloud_particle(caster, position, radius)
+local function storm_cloud_particle(caster, position, radius, particle_name)
     local particle = ParticleManager:CreateParticle(
-        "particles/units/heroes/hero_zuus/zuus_cloud.vpcf",
+        particle_name or DEFAULT_STORM_CLOUD_PARTICLE,
         PATTACH_WORLDORIGIN, caster)
     ParticleManager:SetParticleControl(particle, 0, position)
     ParticleManager:SetParticleControl(particle, 1, Vector(radius, radius, radius))
     return particle
 end
 
-local function storm_strike_particle(caster, position)
+local function storm_strike_particle(caster, position, particle_name)
     local particle = ParticleManager:CreateParticle(
-        "particles/units/heroes/hero_zuus/zuus_lightning_bolt.vpcf",
+        particle_name or DEFAULT_STORM_STRIKE_PARTICLE,
         PATTACH_WORLDORIGIN, caster)
     ParticleManager:SetParticleControl(
         particle, 0, position + Vector(0, 0, 900)
@@ -402,9 +457,9 @@ local function storm_strike_particle(caster, position)
 end
 
 local function strike_lightning_storm(caster, position, radius, damage,
-        instance_id, tick)
+        instance_id, tick, strike_particle_name)
     if not valid(caster) then return false end
-    storm_strike_particle(caster, position)
+    storm_strike_particle(caster, position, strike_particle_name)
     local enemies = FindUnitsInRadius(
         caster:GetTeamNumber(), position, nil, radius,
         DOTA_UNIT_TARGET_TEAM_ENEMY,
@@ -456,7 +511,15 @@ start_lightning_storm = function(caster, position, skill)
         "storm_%d_%d_%d", caster:entindex(),
         math.floor(GameRules:GetGameTime() * 1000), RandomInt(1, 999999)
     )
-    local cloud = storm_cloud_particle(caster, position, radius)
+    local cloud_particle_name = skill_effect_particle(
+        skill, "skill_persistent", DEFAULT_STORM_CLOUD_PARTICLE
+    )
+    local strike_particle_name = skill_effect_particle(
+        skill, "skill_strike", DEFAULT_STORM_STRIKE_PARTICLE
+    )
+    local cloud = storm_cloud_particle(
+        caster, position, radius, cloud_particle_name
+    )
     print(string.format(
         "[TowerLightningStorm] START tower=%d instance=%s radius=%.0f duration=%.1f interval=%.1f multiplier=%.2f damage=%.1f",
         caster:entindex(), instance_id, radius, duration, interval,
@@ -467,7 +530,8 @@ start_lightning_storm = function(caster, position, skill)
     task_id = scheduler.every(interval, function()
         tick = tick + 1
         if not strike_lightning_storm(
-                caster, position, radius, damage, instance_id, tick
+                caster, position, radius, damage, instance_id, tick,
+                strike_particle_name
             ) or tick >= tick_limit then
             ParticleManager:DestroyParticle(cloud, false)
             ParticleManager:ReleaseParticleIndex(cloud)
@@ -527,9 +591,10 @@ local function nearest_unhit_enemy(caster, source_position, hit)
     return nil
 end
 
-local function continue_lightning_chain(caster, source_position, source_entindex,
+local function continue_lightning_chain(caster, source_unit, source_position,
+        source_entindex,
         base_damage, hit_count,
-        max_targets, hit)
+        max_targets, hit, particle_name)
     if hit_count >= max_targets or not valid(caster) then
         return
     end
@@ -548,7 +613,10 @@ local function continue_lightning_chain(caster, source_position, source_entindex
         local multiplier = math.max(0, 1 - (next_count - 1) * 0.10)
         local next_position = next_target:GetAbsOrigin()
         hit[next_target:entindex()] = true
-        lightning_particle(caster, source_position, next_position)
+        lightning_particle(
+            caster, source_unit, next_target,
+            source_position, next_position, particle_name
+        )
         print(string.format(
             "[TowerLightning] BOUNCE tower=%d from=%d target=%d hit=%d/%d multiplier=%.2f",
             caster:entindex(), source_entindex, next_target:entindex(),
@@ -558,8 +626,8 @@ local function continue_lightning_chain(caster, source_position, source_entindex
             "tower_chain_lightning", "bounce_" .. tostring(next_count),
         })
         continue_lightning_chain(
-            caster, next_position, next_target:entindex(), base_damage,
-            next_count, max_targets, hit
+            caster, next_target, next_position, next_target:entindex(), base_damage,
+            next_count, max_targets, hit, particle_name
         )
     end)
 end
@@ -819,14 +887,21 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         local max_targets = math.max(1, tonumber(lightning.max_targets) or 1)
         local hit = { [primary:entindex()] = true }
         local primary_position = primary:GetAbsOrigin()
-        lightning_particle(caster, caster:GetAbsOrigin(), primary_position)
+        local particle_name = skill_effect_particle(
+            lightning, "skill_chain", DEFAULT_CHAIN_PARTICLE
+        )
+        lightning_particle(
+            caster, caster, primary,
+            caster:GetAbsOrigin(), primary_position, particle_name
+        )
         print(string.format(
-            "[TowerLightning] START tower=%d target=%d hit=1/%d multiplier=1.00",
-            caster:entindex(), primary:entindex(), max_targets
+            "[TowerLightning] START tower=%d target=%d hit=1/%d multiplier=1.00 particle=%s",
+            caster:entindex(), primary:entindex(), max_targets,
+            tostring(particle_name)
         ))
         continue_lightning_chain(
-            caster, primary_position, primary:entindex(), damage,
-            1, max_targets, hit
+            caster, primary, primary_position, primary:entindex(), damage,
+            1, max_targets, hit, particle_name
         )
     end
 end

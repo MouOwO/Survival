@@ -3,8 +3,6 @@ local logger = require("core/logger")
 
 local M = {}
 
-local registered = false
-
 local modifiers = {
     {
         name = "modifier_building_blink_move",
@@ -29,6 +27,10 @@ local modifiers = {
     {
         name = "modifier_lumberjack_ai",
         path = "modifiers/modifier_lumberjack_ai",
+    },
+    {
+        name = "modifier_tree_progression",
+        path = "modifiers/modifier_tree_progression",
     },
     {
         name = "modifier_repair_worker_ai",
@@ -95,6 +97,10 @@ local modifiers = {
         path = "modifiers/modifier_practice_monster_ai",
     },
     {
+        name = "modifier_endless_training_target",
+        path = "modifiers/modifier_endless_training_target",
+    },
+    {
         name = "modifier_research_technology",
         path = "modifiers/modifier_research_technology",
     },
@@ -127,17 +133,13 @@ local function link(definition)
 end
 
 function M.register()
-    if registered then
-        return
-    end
     for _, definition in ipairs(modifiers) do
         link(definition)
     end
-    registered = true
-    print("[ModifierRegistry] LinkLuaModifier complete count=" .. tostring(#modifiers))
+    print("[ModifierRegistry] LinkLuaModifier refreshed count=" .. tostring(#modifiers))
     logger.info(
         "ModifierRegistry",
-        "registered " .. tostring(#modifiers) .. " modifiers"
+        "refreshed " .. tostring(#modifiers) .. " modifiers"
     )
 end
 

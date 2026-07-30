@@ -496,6 +496,7 @@ function M.init()
         end
     )
     event_bus.subscribe(events.TREE_SPAWNED, on_tree_spawned)
+    event_bus.subscribe(events.TREE_CHANGED, on_tree_spawned)
     event_bus.subscribe(events.TREE_DESTROYED, on_tree_destroyed)
     event_bus.subscribe(events.TREE_HIT, on_tree_hit)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
