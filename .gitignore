@@ -87,7 +87,10 @@
 /tatus --short --untracked-files=no
 /tatus --short --untracked-files=no  grep -E 'ability_tooltipcontent_catalogchallenge_definitionsshop_entriestooltip_definitions'  head -40
 /total 148
-/scripts/vscripts/tests
+/scripts/vscripts/tests/*
+!/scripts/vscripts/tests/test_wave_difficulty_builder.lua
+!/scripts/vscripts/tests/test_wave_difficulty_selection.lua
+!/scripts/vscripts/tests/test_difficulty_ui_contract.lua
 /tools_asset_info.bin
 /tools_thumbnail_cache.sqlite3
 /SurvivalTwo_QClaw_迁移提示词与知识库清单_V1.0.txt
