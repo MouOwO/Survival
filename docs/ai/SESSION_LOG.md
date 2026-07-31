@@ -893,3 +893,13 @@
 - shop_ui.js相比本轮修改前只增加两行命中关闭；强制编译结果：OK: 1 compiled, 0 failed, 0 skipped。
 - 验证：SHOP_WHITELIST_CONTRACT_PASS、SHOP_SOURCE_ENCODING_AND_RULES_PASS、SHOP_FINAL_CONTRACT_PASS、SHOP_COMPLETION_CHECK_PASS；Lua限定git diff --check通过。
 - 后续维护：普通商店要显示具体科技等级时，在shop_entries.csv新增一行，content_id填写具体technology_id；修改后重新生成shop_entries.lua并重启地图。
+
+## 2026-07-31 — 检查点 078：hero_definitions 中文乱码恢复与编码验证
+
+- 用户报告：`hero_definitions` 表中的中文出现乱码，影响英雄显示名称和备注。实际权威源为 `data/csv/英雄系统/hero_definitions.csv`；生成产物为 `scripts/vscripts/config/generated/hero_definitions.lua`。用户随后确认英雄 `attack_speed = 1.5` 是正确数据，不应因旧测试期望 `2.0` 而修改配置。
+- 根因：CSV 中的中文字段说明、五个英雄的 `display_name` 和 `notes` 已经被错误解码后保存为实际乱码，不是 VS Code 单纯显示编码问题。`hero_definitions.lua` 是自动生成文件，因此同步继承乱码。数值、ID、单位名、技能组和列结构未发现损坏。
+- 恢复内容：从 Git 权威版本恢复 UTF-8 BOM 的源 CSV；五个名称为 `斧王`、`斯拉克`、`主宰`、`齐天大圣`、`剑圣`；普通英雄备注为“普通英雄，专属技能第一转职成功后解锁”；VIP 英雄备注为“VIP英雄，4个专属技能第一转职成功后解锁”。未修改英雄数值或单位映射。
+- 生成链：PowerShell 7 安装后确认 `pwsh.exe` 为 `C:\Program Files\PowerShell\7\pwsh.exe`，版本 `7.6.4`；Python `3.13.14`、Lua `5.4.5`、Git `2.55.0` 可用。使用 `tools.build_configs.build()` 仅重建 `hero_definitions.lua`，输出 `HERO_DEFINITIONS_GENERATED`；禁止手工维护生成 Lua。
+- 测试契约：扩展 `scripts/vscripts/tests/test_hero_combat_stat_projection.lua`，覆盖五个英雄的名称、VIP 身份和备注，并将过时的 VIP 攻速期望从 `2.0` 对齐到权威 CSV 的 `1.5`，没有改游戏配置。定向结果：`HERO_COMBAT_STAT_PROJECTION_PASS`、`HERO_DEFINITIONS_ENCODING_CONTRACT_PASS`；目标 Lua 语法检查和 `git diff --check` 通过；目标文件乱码搜索为 0。
+- 全量回归：共运行 54 个 `scripts/vscripts/tests/test_*.lua`，51 个通过，3 个失败：`test_addhero_cheat.lua` 测试桩缺少 Dota 全局 `Vector`；`test_hero_passive_attribute_snapshot.lua` 仍按旧的原生三围读取契约；`test_hero_summon_owner.lua` 的统一血条断言与当前召唤实现/历史结果不一致。三项失败均未触及 `hero_definitions` 编码和本任务修改，不能标记为本任务回归通过。
+- 复用经验：乱码排查先检查原始字节、BOM、`�`/`��`/`锟斤拷`，再比较 Git 权威源和生成产物；不要对损坏文件直接“转 UTF-8”或用默认编码整文件读写。配置恢复后必须依次执行单文件生成、Lua 语法检查、中文名称/列数/BOM 契约和限定 `git diff --check`，最后重启 Workshop Tools 地图加载新的 Lua 配置。
