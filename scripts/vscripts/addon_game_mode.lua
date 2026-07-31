@@ -17,9 +17,9 @@ local function configure_survival_launch_rules()
     return true, nil
 end
 
--- Apply launch-critical rules before loading the gameplay modules. A failure
--- in an unrelated module must never make the engine fall back to native team
--- setup and hero selection.
+-- Apply launch-critical rules before loading gameplay modules when the engine
+-- entity already exists. Some Workshop startup paths create it only before
+-- Activate; that case is recorded as deferred and retried there.
 local launch_call_ok, launch_rules_applied, launch_rules_error =
     pcall(configure_survival_launch_rules)
 local launch_rules_ok = launch_call_ok and launch_rules_applied == true
@@ -28,8 +28,11 @@ if not launch_call_ok then
 end
 local launch_map_name = GetMapName and GetMapName() or "unknown"
 print(
-    "[SURVIVAL_LAUNCH_RULES] map=" .. tostring(launch_map_name)
+    "[SURVIVAL_LAUNCH_RULES] phase=module_load map=" .. tostring(launch_map_name)
         .. " ok=" .. tostring(launch_rules_ok)
+        .. " deferred=" .. tostring(
+            launch_rules_error == "game_mode_entity_unavailable"
+        )
         .. " error=" .. tostring(launch_rules_error)
 )
 
@@ -52,7 +55,7 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
 local combat_bootstrap = require("bootstrap/combat_bootstrap")
-print("[SURVIVAL_FINGERPRINT] addon_game_mode=20260730_zuus_cp_modifier_refresh")
+print("[SURVIVAL_FINGERPRINT] addon_game_mode=20260730_skill_grant_transaction")
 local ability_utils = require("core/ability_utils")
 local unit_display_names = require("config/generated/unit_display_names")
 local seven_sins_essences = require("config/seven_sins_essences")
@@ -209,6 +212,7 @@ local function configure_game_rules()
         error("survival launch rules unavailable during Activate: "
             .. tostring(launch_error))
     end
+    print("[SURVIVAL_LAUNCH_RULES] phase=activate ok=true deferred=false error=nil")
     local game_mode = GameRules:GetGameModeEntity()
     game_mode:SetBuybackEnabled(false)
     game_mode:SetCameraDistanceOverride(1500)

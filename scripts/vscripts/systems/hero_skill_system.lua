@@ -136,13 +136,15 @@ local function synchronize_unit_impl(state)
             if not ability then
                 ability = state.unit:AddAbility(definition.ability_name)
             end
-            if ability then
-                ability:SetLevel(state.levels[skill_id])
-                ability:SetHidden(false)
-                ability:SetActivated(true)
-                if ability.SetAbilityIndex then
-                    ability:SetAbilityIndex(index - 1)
-                end
+            if not ability then
+                error("failed to add skill ability: "
+                    .. tostring(definition.ability_name))
+            end
+            ability:SetLevel(state.levels[skill_id])
+            ability:SetHidden(false)
+            ability:SetActivated(true)
+            if ability.SetAbilityIndex then
+                ability:SetAbilityIndex(index - 1)
             end
         end
     end
@@ -150,25 +152,27 @@ local function synchronize_unit_impl(state)
     if not return_ability then
         return_ability = state.unit:AddAbility(RETURN_HOME_ABILITY)
     end
-    if return_ability then
-        return_ability:SetLevel(1)
-        return_ability:SetHidden(false)
-        return_ability:SetActivated(true)
-        if return_ability.SetAbilityIndex then
-            return_ability:SetAbilityIndex(#state.order)
-        end
+    if not return_ability then
+        error("failed to add utility ability: " .. RETURN_HOME_ABILITY)
+    end
+    return_ability:SetLevel(1)
+    return_ability:SetHidden(false)
+    return_ability:SetActivated(true)
+    if return_ability.SetAbilityIndex then
+        return_ability:SetAbilityIndex(#state.order)
     end
     local pickup_ability = state.unit:FindAbilityByName(PICKUP_MATERIALS_ABILITY)
     if not pickup_ability then
         pickup_ability = state.unit:AddAbility(PICKUP_MATERIALS_ABILITY)
     end
-    if pickup_ability then
-        pickup_ability:SetLevel(1)
-        pickup_ability:SetHidden(false)
-        pickup_ability:SetActivated(true)
-        if pickup_ability.SetAbilityIndex then
-            pickup_ability:SetAbilityIndex(#state.order + 1)
-        end
+    if not pickup_ability then
+        error("failed to add utility ability: " .. PICKUP_MATERIALS_ABILITY)
+    end
+    pickup_ability:SetLevel(1)
+    pickup_ability:SetHidden(false)
+    pickup_ability:SetActivated(true)
+    if pickup_ability.SetAbilityIndex then
+        pickup_ability:SetAbilityIndex(#state.order + 1)
     end
     hero_health_guard.preserve_current(state.unit, function()
         if state.unit.CalculateStatBonus then
@@ -254,7 +258,6 @@ local function grant_to_state(state, skill_id, levels)
         return {
             ok = false,
             error = "skill_sync_failed",
-            diagnostic = sync_error,
         }
     end
     publish(state.player_id, "skill_granted")
@@ -342,7 +345,6 @@ local function upgrade_with_skill_point_request(payload)
         return {
             ok = false,
             error = "skill_sync_failed",
-            diagnostic = sync_error,
         }
     end
     publish(player_id, "skill_point_upgrade")

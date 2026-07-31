@@ -42,6 +42,7 @@
 38. **英雄三维是项目逻辑数据，不是 Dota 原生属性。** 力量、敏捷、智力及全属性只保存在 progression、装备聚合和战斗属性快照中，用于 UI 与明确声明按三维结算的技能/装备效果。禁止调用 `ModifyStrength/ModifyAgility/ModifyIntellect`，也禁止通过 modifier 的原生三维 bonus 投影逻辑三维，否则会隐式改变攻速、护甲、生命、魔法和主属性攻击。技能必须通过 `HERO_COMBAT_STATS_GET_REQUEST` 读取逻辑三维，禁止优先读取 `GetStrength/GetAgility/GetIntellect`。
 39. **技能逻辑状态与引擎 ability 同步必须事务化。** 授予或升级技能时，`levels/order/skill_points/version` 与 `AddAbility/SetLevel/SetAbilityIndex` 属于同一个事务；引擎同步异常必须回滚逻辑状态并恢复旧 ability 集合。禁止先永久提交逻辑状态、再把可能抛错的引擎同步留在事务之外。Lua `ipairs` 循环需要索引时不得用 `_` 丢弃后再引用未定义的 `index`。
 40. **模块加载顶层不得假设 GameModeEntity 已存在。** `GameRules:GetGameModeEntity()` 在 `Activate()` 前可能返回 nil；依赖 GameModeEntity 的启动规则应在顶层安全标记 deferred，并在 `Activate()` 阶段强制成功，否则中止初始化，禁止带着半配置状态继续运行。
+41. **英雄战斗属性快照必须原子刷新并拒绝倒退。** 英雄攻击、护甲、攻速和逻辑三维来自同一份 `hero_combat_stat_service` 权威快照；选中单位即时响应不得用某一引擎帧的 `GetPhysicalArmorValue()` 或其他临时值覆盖其中单个字段。英雄快照携带单调 `refresh_version`，Panorama 同一选中单位只接受不旧于当前版本的快照；已有版本后到达的无版本快照也必须拒绝。非英雄单位仍可通过独立运行时快照反映临时 modifier。
 
 ## 游戏行为决策
 

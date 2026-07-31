@@ -56,6 +56,8 @@
 - 当前 `content/.../ability_tooltip.js` 仍包含三条高频时间驱动路径：每 `1.0s` 扫描官方技能/背包节点、每 `0.35s` 重绘可见 Tooltip、物品悬停时每 `0.03s` 强制关闭原生 Tooltip。
 - 当前人物属性数字已经由 `combat_stats.js` 使用服务端快照覆盖；护甲 UI 值为 War3 显示单位，`runtime_armor` 为 Dota 实际结算单位。
 - 英雄、建筑和普通选中单位都通过 `ui/combat_stat_projection.lua` 生成统一 UI 属性投影，因此人物逻辑属性 Tooltip 不得自行乘除护甲或重新读取引擎临时值。
+- 英雄攻击、护甲、攻速和三维必须作为带 `refresh_version` 的原子快照刷新；即时选中单位响应不得用引擎瞬时字段覆盖英雄权威快照，客户端必须拒绝同单位迟到的旧版本或无版本快照。
+- 英雄 HUD 护甲直接使用装备聚合的完整 War3 阶段值；装备护甲为 0 时才回退英雄配置基础护甲。`runtime_armor` 仅保留为 Dota 实际结算/诊断值，不得反向决定同帧 HUD 数字。
 - 重构采用分阶段可回滚方式：先建立共享快照/Tooltip ViewModel，再接管人物逻辑属性悬停，最后将技能/物品 Tooltip 改为原生优先与事件驱动扩展。
 - 角色属性详细 Tooltip 已按用户最新要求删除；`combat_stats.js` 继续直接显示服务端权威攻击、护甲、攻速与三围数值，不再发布 `SurvivalCombatStatsStore`。
 - 第二阶段已新增 `ui/tooltip_view_model.lua`，由 `weapon_synthesis_snapshot_service.lua` 把动态物品字段发布到 `survival_weapon_snapshot.tooltip_view_model`。

@@ -124,14 +124,10 @@ local function hero_ui_snapshot(player_id, entindex, unit)
     end
     local snapshot = {}
     for key, value in pairs(result.snapshot) do snapshot[key] = value end
-    if unit then
-        snapshot.runtime_armor = safe_number(
-            unit,
-            "GetPhysicalArmorValue",
-            snapshot.runtime_armor,
-            false
-        )
-    end
+    -- The hero combat snapshot is authoritative and internally consistent.
+    -- Never replace one field with a transient engine-frame value here: doing
+    -- so made request responses alternate between projected armor and zero
+    -- while the regular NetTable still contained the stable hero snapshot.
     return combat_stat_projection.for_ui(snapshot)
 end
 

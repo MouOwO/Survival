@@ -52,10 +52,12 @@ end
 local function snapshot_equal(left, right)
     if not left or not right then return false end
     for key, value in pairs(left) do
-        if key ~= "reason" and right[key] ~= value then return false end
+        if key ~= "reason" and key ~= "refresh_version"
+            and right[key] ~= value then return false end
     end
     for key, value in pairs(right) do
-        if key ~= "reason" and left[key] ~= value then return false end
+        if key ~= "reason" and key ~= "refresh_version"
+            and left[key] ~= value then return false end
     end
     return true
 end
@@ -163,6 +165,15 @@ local function recalculate(player_id, reason)
     local equipment, growth = weapon_snapshot(player_id)
     local equipment_stats = get_all_equipment_stats(player_id)
     local definition = weapons.by_id[equipment.main_hand_content_id] or {}
+    local configured_base_armor = value(
+        state.definition,
+        "base_war3_armor",
+        value(state.definition, "base_armor", 0)
+    )
+    -- Equipment levels are complete armor snapshots, not additive deltas. When
+    -- no equipped source supplies armor, retain the hero's configured base.
+    local authoritative_war3_armor = equipment_stats.armor_flat ~= 0
+        and equipment_stats.armor_flat or configured_base_armor
     local weapon_attack_min = value(definition, "base_attack_min", 0)
         + value(growth, "growth_attack", 0)
     local weapon_attack_max = value(definition, "base_attack_max", 0)
@@ -260,6 +271,14 @@ local function recalculate(player_id, reason)
         base_attack_time = base_attack_time,
         hero_damage_multiplier = hero_damage_multiplier,
         debug_attack_override = debug_attack or 0,
+        -- The equipment aggregation snapshot already owns the authoritative
+        -- War3/CSV armor value. Do not derive the HUD value from this frame's
+        -- engine armor: ForceRefresh/CalculateStatBonus may not have exposed the
+        -- new modifier value yet, which previously froze a real 850 bonus at 0.
+        armor = authoritative_war3_armor,
+        armor_unit = "war3_display",
+        stat_units_version = 2,
+        -- Keep the engine value separately for runtime mitigation diagnostics.
         runtime_armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
         -- 配置值使用“每秒攻击次数”。由配置 BAT、固定间隔变化和装备
         -- 攻速百分比直接投影，避免读取引擎当前帧临时攻击间隔。
@@ -307,8 +326,13 @@ local function recalculate(player_id, reason)
         equipment_all_attributes = equipment_stats.all_attributes_flat,
         equipment_lifesteal_pct = equipment_stats.lifesteal_pct,
         reason = reason or "changed",
+        refresh_version = tonumber(state.refresh_version) or 0,
     }
     local changed = not snapshot_equal(state.snapshot, next_snapshot)
+    if changed then
+        state.refresh_version = (tonumber(state.refresh_version) or 0) + 1
+    end
+    next_snapshot.refresh_version = tonumber(state.refresh_version) or 0
     state.snapshot = next_snapshot
     state.unit.survival_seven_sins_final_damage_pct =
         tonumber(essence.final_damage_pct) or 0
@@ -370,6 +394,7 @@ local function on_hero_summoned(payload)
             damage_multiplier
         ),
         engine_base_attack_time = safe_get(payload.unit, "GetBaseAttackTime", 2),
+        refresh_version = 0,
         snapshot = nil,
     }
     state_by_player[payload.player_id] = state

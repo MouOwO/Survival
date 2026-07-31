@@ -2,6 +2,16 @@
 
 > 仅追加关键检查点。记录研究过程，而不只是任务完成后的总结。
 
+## 2026-07-30 — 英雄护甲 0/850 跳变与攻速刷新审计
+
+- 用户实机截图确认：英雄护甲显示在 0 与 850 间反复跳变，要求先阅读刷新规则并同步审计攻速。
+- 既有规则：英雄面板护甲必须来自 `hero_combat_stat_service` 经 `combat_stat_projection` 生成的 War3 显示值；攻速必须来自配置 BAT、固定间隔变化和装备攻速百分比，禁止依赖引擎当前帧攻击间隔。完整属性为事件驱动，0.25 秒循环只刷新生命/魔法。
+- 根因：`ui_request_router.hero_ui_snapshot()` 取得英雄权威快照后，又用当前帧 `GetPhysicalArmorValue()` 覆盖其中 `runtime_armor`；这违反函数自身注释。英雄 NetTable 与即时响应又共用无版本 `update()`，后到的临时 0 与稳定 850 可互相覆盖。
+- 攻速审计：英雄即时响应没有单独改写权威攻速，但与护甲共用无版本 `update()`，因此旧的整份快照迟到时同样可能让攻速倒退。
+- 修复：英雄即时响应不再覆盖任何权威护甲字段；英雄战斗快照新增单调 `refresh_version`；Panorama 对同一选中单位拒绝旧版本，以及已有版本后到达的无版本快照。攻击、护甲、攻速与三维继续作为一份原子快照更新。
+- 验证：`COMBAT_STAT_REFRESH_CONTRACT_PASS`；`combat_stats.js` 强制编译为 `OK: 1 compiled, 0 failed, 0 skipped`；game 目录 `combat_stats.vjs_c` 已刷新；game/content 限定 `git diff --check` 均通过。当前环境仍无独立 `lua/luajit`，未虚报 Lua 运行测试。
+- 冷启动复测后护甲稳定为 0 的后续根因：5001 的生成武器字段 `base_war3_armor` 当前为 0，850 来自 `equipment_level_definitions.lua` 的完整阶段快照；英雄权威快照却仍从同帧 `GetPhysicalArmorValue()` 反推 HUD 值，Modifier 尚未完成刷新时会把 0 固化。现改为直接发布装备聚合的 War3 护甲（5001=850），装备护甲为 0 时回退英雄配置基础护甲；引擎 `runtime_armor` 只保留作结算诊断。刷新契约测试与两侧限定 `git diff --check` 再次通过。
+
 ## 2026-07-30 — 二转技能授予失败与启动时序修复
 
 - 实机日志确认：`hero.skill.grant.request` 在 `hero_skill_system.lua:144` 执行 `index - 1` 时崩溃；循环使用 `for _, skill_id` 丢弃了索引，客户端因此只收到通用 `skill_grant_failed`。
