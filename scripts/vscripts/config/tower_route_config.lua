@@ -1,4 +1,5 @@
 local arrow = require("config/generated/arrow_tower_base")
+local asset_catalog = require("config/asset_catalog")
 local modules = {
     class_1 = require("config/generated/tower_class_death"),
     class_2 = require("config/generated/tower_class_mystery"),
@@ -45,10 +46,15 @@ function M.row_at_level(state, absolute_level)
 end
 
 function M.model_for(row)
-    return row and row.model_name or nil
+    if not row then return nil end
+    local asset = asset_catalog.resolve(row.model_asset_id)
+    return asset and asset.primary_model or row.model_name
 end
 
 function M.is_supported_route_model(row)
+    if row and row.model_asset_id and asset_catalog.resolve(row.model_asset_id) then
+        return true
+    end
     local model = M.model_for(row)
     return model == "models/heroes/zuus/zuus.vmdl"
         or model == "models/heroes/drow_ranger/drow_ranger.vmdl"

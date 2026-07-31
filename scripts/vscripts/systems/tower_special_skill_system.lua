@@ -20,6 +20,11 @@ local DROW_FROST_HIT_PARTICLE =
 local DROW_TOWER_ASSET_ID = "tower_multi_drow_dread_retribution"
 local DEATH_GRENADE_PARTICLE =
     "particles/units/heroes/hero_death_prophet/death_prophet_silence.vpcf"
+local LIGHTNING_ASSET_ID = "tower_zuus"
+local DEFAULT_DIFFUSION_PARTICLE =
+    "particles/units/heroes/hero_razor/razor_plasmafield.vpcf"
+local DIFFUSION_PARTICLE_DURATION = 0.4
+local asset_catalog = require("config/asset_catalog")
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
@@ -50,7 +55,38 @@ local function configured_area(skill, fallback)
     return math.max(1, tonumber(value) or fallback)
 end
 
+local function diffusion_particle_path(skill)
+    local bundle = asset_catalog.by_id[LIGHTNING_ASSET_ID]
+    local skill_bundle = bundle and skill and bundle.skills[skill.skill_id]
+    local effects = skill_bundle
+        and skill_bundle.effects_by_role["skill_strike"]
+    local effect = effects and effects[1]
+    return effect and effect.particle_path or DEFAULT_DIFFUSION_PARTICLE
+end
+
+local function play_diffusion_particle(tower, position, radius, skill)
+    local particle = ParticleManager:CreateParticle(
+        diffusion_particle_path(skill), PATTACH_WORLDORIGIN, tower
+    )
+    ParticleManager:SetParticleControl(particle, 0, position)
+    -- Razor Plasma Field reads CP1 as outward speed, maximum radius, and force
+    -- scale. Keep z at 1: the VPCF uses that component to scale radial force.
+    ParticleManager:SetParticleControl(
+        particle, 1, Vector(
+            radius / DIFFUSION_PARTICLE_DURATION, radius, 1
+        )
+    )
+    ParticleManager:SetParticleControl(
+        particle, 2, Vector(DIFFUSION_PARTICLE_DURATION, 0, 0)
+    )
+    scheduler.after(DIFFUSION_PARTICLE_DURATION + 0.2, function()
+        ParticleManager:DestroyParticle(particle, false)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+end
+
 local function deal(attacker, victim, damage, tag, ability)
+    local secondary = tag == "lightning_diffusion"
     return event_bus.request(events.TOWER_SKILL_DAMAGE_REQUEST, {
         attacker = attacker,
         victim = victim,
@@ -59,6 +95,9 @@ local function deal(attacker, victim, damage, tag, ability)
         damage_type = DAMAGE_TYPE_PHYSICAL,
         damage_flags = DOTA_DAMAGE_FLAG_NO_DAMAGE_MULTIPLIERS,
         source_kind = "ability",
+        source = tag,
+        is_secondary = secondary,
+        can_trigger_diffusion = not secondary,
         tags = { "tower_special_skill", tag },
     })
 end
@@ -338,7 +377,12 @@ local function on_building_destroyed(payload)
 end
 
 local function on_lightning_hit(payload)
-    if not valid(payload.tower) or not valid(payload.target) then return end
+    if not valid(payload.tower) or not exists(payload.target) then return end
+    -- Only original lightning strikes may proc diffusion. Diffusion damage is
+    -- deliberately sent through the damage request only and never republishes
+    -- TOWER_LIGHTNING_HIT, preventing recursive Plasma Field chains.
+    if payload.can_trigger_diffusion ~= true
+        or payload.source == "lightning_diffusion" then return end
     local skill = skill_matching(payload.skills, "lightning_diffusion_")
     if not skill or not owns_ability(payload.tower, skill) then return end
     local chance = math.max(0, math.min(
@@ -348,8 +392,10 @@ local function on_lightning_hit(payload)
     local radius = configured_area(skill, 200)
     local damage = math.max(0, tonumber(payload.damage) or 0)
         * math.max(0, tonumber(skill.damage_multiplier) or 2)
+    local position = payload.target:GetAbsOrigin()
+    play_diffusion_particle(payload.tower, position, radius, skill)
     for _, enemy in ipairs(geometry.enemies_in_circle(
-        payload.tower, payload.target:GetAbsOrigin(), radius
+        payload.tower, position, radius
     )) do
         if enemy ~= payload.target then
             deal(payload.tower, enemy, damage, "lightning_diffusion")

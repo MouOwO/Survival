@@ -38,13 +38,13 @@ local LIGHTNING_ASSET_ID = "tower_zuus"
 local DEFAULT_CHAIN_PARTICLE =
     "particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf"
 local DEFAULT_STORM_CLOUD_PARTICLE =
-    "particles/units/heroes/hero_zuus/zuus_cloud.vpcf"
+    "particles/units/heroes/hero_disruptor/disruptor_static_storm.vpcf"
 local DEFAULT_STORM_STRIKE_PARTICLE =
-    "particles/units/heroes/hero_zuus/zuus_lightning_bolt.vpcf"
+    "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
 
 local function skill_effect_particle(skill, role, fallback)
     local skill_id = type(skill) == "table" and skill.skill_id or nil
-    local bundle = asset_catalog.resolve_bundle(LIGHTNING_ASSET_ID)
+    local bundle = asset_catalog.by_id[LIGHTNING_ASSET_ID]
     local skill_bundle = bundle and skill_id and bundle.skills[skill_id] or nil
     local effects = skill_bundle and skill_bundle.effects_by_role[role] or nil
     local effect = effects and effects[1] or nil
@@ -312,7 +312,7 @@ local function frost_impact_particle(caster, position, radius)
         PATTACH_WORLDORIGIN, caster
     )
     ParticleManager:SetParticleControl(particle, 0, position)
-    ParticleManager:SetParticleControl(particle, 1, Vector(radius, radius, radius))
+    ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
     ParticleManager:ReleaseParticleIndex(particle)
 end
 
@@ -436,12 +436,18 @@ local function storm_radius(skill)
     return math.max(1, tonumber(configured) or DEFAULT_STORM_RADIUS)
 end
 
-local function storm_cloud_particle(caster, position, radius, particle_name)
+local function storm_cloud_particle(caster, position, radius, duration,
+        particle_name)
     local particle = ParticleManager:CreateParticle(
         particle_name or DEFAULT_STORM_CLOUD_PARTICLE,
         PATTACH_WORLDORIGIN, caster)
     ParticleManager:SetParticleControl(particle, 0, position)
     ParticleManager:SetParticleControl(particle, 1, Vector(radius, radius, radius))
+    -- Disruptor Static Storm reads its visual lifetime from CP2.x. It is only
+    -- an area marker here: all damage remains in strike_lightning_storm.
+    ParticleManager:SetParticleControl(
+        particle, 2, Vector(duration, 0, 0)
+    )
     return particle
 end
 
@@ -474,11 +480,13 @@ local function strike_lightning_storm(caster, position, radius, damage,
                 "tower_lightning_storm", instance_id,
                 "tick_" .. tostring(tick),
             })
-                        event_bus.emit(events.TOWER_LIGHTNING_HIT, {
+            event_bus.emit(events.TOWER_LIGHTNING_HIT, {
                 tower = caster,
                 target = target,
                 damage = damage,
                 skills = tower_skills.get(caster),
+                source = "lightning_storm",
+                can_trigger_diffusion = true,
                 instance_id = instance_id,
                 tick = tick,
             })
@@ -518,7 +526,7 @@ start_lightning_storm = function(caster, position, skill)
         skill, "skill_strike", DEFAULT_STORM_STRIKE_PARTICLE
     )
     local cloud = storm_cloud_particle(
-        caster, position, radius, cloud_particle_name
+        caster, position, radius, duration, cloud_particle_name
     )
     print(string.format(
         "[TowerLightningStorm] START tower=%d instance=%s radius=%.0f duration=%.1f interval=%.1f multiplier=%.2f damage=%.1f",
@@ -624,6 +632,15 @@ local function continue_lightning_chain(caster, source_unit, source_position,
         ))
         deal(caster, next_target, base_damage * multiplier, "ability", {
             "tower_chain_lightning", "bounce_" .. tostring(next_count),
+        })
+        event_bus.emit(events.TOWER_LIGHTNING_HIT, {
+            tower = caster,
+            target = next_target,
+            damage = base_damage * multiplier,
+            skills = tower_skills.get(caster),
+            source = "chain_lightning",
+            can_trigger_diffusion = true,
+            hit_count = next_count,
         })
         continue_lightning_chain(
             caster, next_target, next_position, next_target:entindex(), base_damage,
@@ -894,6 +911,15 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
             caster, caster, primary,
             caster:GetAbsOrigin(), primary_position, particle_name
         )
+        event_bus.emit(events.TOWER_LIGHTNING_HIT, {
+            tower = caster,
+            target = primary,
+            damage = landed_damage,
+            skills = skills,
+            source = "chain_lightning",
+            can_trigger_diffusion = true,
+            hit_count = 1,
+        })
         print(string.format(
             "[TowerLightning] START tower=%d target=%d hit=1/%d multiplier=1.00 particle=%s",
             caster:entindex(), primary:entindex(), max_targets,

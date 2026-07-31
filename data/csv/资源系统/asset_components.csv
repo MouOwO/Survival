@@ -1,6 +1,7 @@
 component_key,asset_id,component_id,model_path,entity_class,parent_component_id,attach_mode,attachment_point,default_sequence,model_scale,model_skin,material_group,sort_order,enabled,notes
 #中文名:组件记录键,资源ID,组件ID,模型路径,实体类型,父组件ID,挂载方式,挂点,默认动作,模型缩放,模型皮肤,材质组,排序,是否启用,备注
 #types:string,string,string,string,string,string,enum,string,string,number,number,string,number,boolean,string
+tower_lightning_zeus_tempest:head,tower_lightning_zeus_tempest,head,models/heroes/zeus/zeus_hair_arcana.vmdl,prop_dynamic,,bone_merge,,idle,1,,,1,1,Tempest Helm of the Thundergod官方头部组件（物品6914）。
 tower_multi_medusa_anamnessa:weapon,tower_multi_medusa_anamnessa,weapon,models/items/medusa/jewelled_splendor_weapon/jewelled_splendor_weapon.vmdl,prop_dynamic,,bone_merge,,idle,1,,,1,1,Jewels of Anamnessa 武器组件。
 tower_multi_medusa_anamnessa:tail,tower_multi_medusa_anamnessa,tail,models/items/medusa/jewelled_splendor_tail/jewelled_splendor_tail.vmdl,prop_dynamic,,bone_merge,,idle,1,,,2,1,Jewels of Anamnessa 尾部组件。
 tower_multi_medusa_anamnessa:head,tower_multi_medusa_anamnessa,head,models/items/medusa/jewelled_splendor_head/jewelled_splendor_head.vmdl,prop_dynamic,,bone_merge,,idle,1,,,3,1,Jewels of Anamnessa 头部组件。

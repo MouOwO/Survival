@@ -360,6 +360,9 @@
     "asset_proxy_tower_keeper_of_the_light" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/keeper_of_the_light/keeper_of_the_light.vmdl" "ProjectileModel" "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_base_attack.vpcf" }
     "asset_proxy_tower_obsidian_destroyer" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/obsidian_destroyer/obsidian_destroyer.vmdl" "ProjectileModel" "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_base_attack.vpcf" }
     "asset_proxy_tower_zuus" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/zuus/zuus.vmdl" }
+    "asset_proxy_tower_lightning_zeus_tempest" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/zeus/zeus_arcana.vmdl" }
+    "asset_proxy_tower_lightning_disruptor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/disruptor/disruptor.vmdl" }
+    "asset_proxy_tower_lightning_razor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/razor/razor.vmdl" }
     "asset_proxy_tower_gyro" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/gyro/gyro.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
     "asset_proxy_tower_tinker" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tinker/tinker.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
     "asset_proxy_tower_crystal_maiden" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/crystal_maiden/crystal_maiden.vmdl" "ProjectileModel" "particles/units/heroes/hero_lich/lich_base_attack.vpcf" }
