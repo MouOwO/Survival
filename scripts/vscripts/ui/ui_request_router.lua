@@ -62,12 +62,16 @@ local function unit_combat_snapshot(unit)
         or internal_name
     local model_asset_id = unit.survival_model_asset_id or ""
     local visual_asset = asset_catalog.get(model_asset_id)
+    local absolute_level = tonumber(unit.survival_level)
+        or safe_number(unit, "GetLevel", 1)
     return {
         entindex = unit:entindex(),
         unit_name = internal_name,
         display_name = display_name,
-        level = tonumber(unit.survival_level)
-            or safe_number(unit, "GetLevel", 1),
+        level = absolute_level,
+        absolute_level = absolute_level,
+        route_level = tonumber(unit.survival_route_level) or absolute_level,
+        tower_class = unit.survival_tower_class or "",
         health = safe_number(unit, "GetHealth", 0),
         max_health = safe_number(unit, "GetMaxHealth", 0),
         mana = safe_number(unit, "GetMana", 0),
@@ -211,6 +215,11 @@ local function send_building_snapshot(payload, phase)
     snapshot.display_name = payload.display_name or snapshot.display_name
     snapshot.unit_name = snapshot.display_name
     snapshot.level = tonumber(payload.level) or snapshot.level
+    snapshot.absolute_level = tonumber(payload.absolute_level)
+        or snapshot.level
+    snapshot.route_level = tonumber(payload.route_level)
+        or snapshot.route_level
+    snapshot.tower_class = payload.tower_class or snapshot.tower_class
     snapshot.attack_min = tonumber(payload.attack_min) or snapshot.attack_min
     snapshot.attack_max = tonumber(payload.attack_max) or snapshot.attack_max
     snapshot.runtime_armor = tonumber(payload.runtime_armor)

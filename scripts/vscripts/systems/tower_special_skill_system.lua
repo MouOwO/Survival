@@ -19,7 +19,6 @@ local DROW_FROST_HIT_PARTICLE =
     "particles/econ/items/drow/drow_arcana/drow_arcana_frost_arrow_debuff.vpcf"
 local DROW_TOWER_ASSET_ID = "tower_multi_drow_dread_retribution"
 local DEATH_CRITICAL_ASSET_IDS = {
-    critical_strike = "tower_death_muerta_blackwing",
     bone_cannon = "tower_death_nevermore_sundered_souls",
 }
 local DEATH_GRENADE_ASSET_ID = "tower_death_warlock_seam_ripper"
@@ -191,9 +190,7 @@ local function trigger_death_critical_particle(payload)
     local source = tostring(payload.critical_source or "")
     local asset_id = DEATH_CRITICAL_ASSET_IDS[source]
     if not asset_id then return end
-    local skill_prefix = source == "bone_cannon"
-        and "bone_cannon_" or "critical_strike_"
-    local skill = skill_matching(payload.skills, skill_prefix)
+    local skill = skill_matching(payload.skills, "bone_cannon_")
     if not skill or not owns_ability(payload.tower, skill) then return end
     play_world_particle(
         payload.tower,

@@ -363,26 +363,69 @@
     "asset_proxy_tower_lightning_zeus_tempest" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/zeus/zeus_arcana.vmdl" }
     "asset_proxy_tower_lightning_disruptor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/disruptor/disruptor.vmdl" }
     "asset_proxy_tower_lightning_razor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/razor/razor.vmdl" }
-    "asset_proxy_tower_gyro" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/gyro/gyro.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
-    "asset_proxy_tower_tinker" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tinker/tinker.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
-    "asset_proxy_tower_death_muerta_blackwing"
+    "asset_proxy_tower_machine_gun_sniper_occultist"
     {
         "BaseClass" "npc_dota_creature"
-        "Model" "models/heroes/muerta/muerta.vmdl"
-        "ProjectileModel" "particles/units/heroes/hero_muerta/muerta_base_attack.vpcf"
+        "Model" "models/heroes/sniper/sniper.vmdl"
+        "ProjectileModel" "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack.vpcf"
         "precache"
         {
-            "model" "models/items/muerta/deathcaster_head/deathcaster_head.vmdl"
-            "model" "models/items/muerta/deathcaster_back/deathcaster_back.vmdl"
-            "model" "models/items/muerta/deathcaster_armor/deathcaster_armor.vmdl"
-            "model" "models/items/muerta/deathcaster_weapon/deathcaster_weapon.vmdl"
-            "particle" "particles/units/heroes/hero_muerta/muerta_deadshot_creep_impact.vpcf"
+            "model" "models/items/sniper/witch_hunter_set_back/witch_hunter_set_back.vmdl"
+            "model" "models/items/sniper/witch_hunter_set_head/witch_hunter_set_head.vmdl"
+            "model" "models/items/sniper/witch_hunter_set_arms/witch_hunter_set_arms.vmdl"
+            "model" "models/items/sniper/witch_hunter_set_shoulder/witch_hunter_set_shoulder.vmdl"
+            "model" "models/items/sniper/witch_hunter_set_weapon/witch_hunter_set_weapon.vmdl"
+            "particle" "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_head_ambient.vpcf"
+            "particle" "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_weapon_ambient.vpcf"
         }
+    }
+    "asset_proxy_tower_machine_gun_bounty_heartless"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/bounty_hunter/bounty_hunter.vmdl"
+        "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/items/bounty_hunter/maniac_off_hand/maniac_off_hand.vmdl"
+            "model" "models/items/bounty_hunter/maniac_weapon/maniac_weapon.vmdl"
+            "model" "models/items/bounty_hunter/maniac_shoulder/maniac_shoulder.vmdl"
+            "model" "models/items/bounty_hunter/maniac_back/maniac_back.vmdl"
+            "model" "models/items/bounty_hunter/maniac_armor/maniac_armor.vmdl"
+            "model" "models/items/bounty_hunter/maniac_head/maniac_head.vmdl"
+            "particle" "particles/econ/items/bounty_hunter/bounty_hunter_maniac_shoulders/bh_maniac_shoulders_ambient.vpcf"
+            "particle" "particles/econ/items/bounty_hunter/bounty_hunter_maniac_head/bh_maniac_head_ambient.vpcf"
+            "particle" "particles/units/heroes/hero_bounty_hunter/bounty_hunter_cutpurse.vpcf"
+        }
+    }
+    "asset_proxy_tower_machine_gun_windranger_rising_gale"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/windrunner/windrunner_arcana/wr_arcana_base.vmdl"
+        "ProjectileModel" "particles/econ/items/windrunner/windranger_arcana/windranger_arcana_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/items/windrunner/windrunner_arcana/wr_arcana_cape.vmdl"
+            "model" "models/items/windrunner/windrunner_arcana/wr_arcana_weapon.vmdl"
+            "model" "models/items/windrunner/windrunner_arcana/wr_arcana_shoulder.vmdl"
+            "model" "models/items/windrunner/windrunner_arcana/wr_arcana_quiver.vmdl"
+            "model" "models/items/windrunner/windrunner_arcana/wr_arcana_head.vmdl"
+            "particle" "particles/econ/items/windrunner/windranger_arcana/windranger_arcana_ambient.vpcf"
+            "particle" "particles/econ/items/windrunner/windranger_arcana/windranger_arcana_bowstring_ambient.vpcf"
+            "particle" "particles/econ/items/windrunner/windranger_arcana/windranger_arcana_bow_ambient.vpcf"
+            "particle" "particles/econ/items/windrunner/windranger_arcana/windranger_arcana_focusfire_start.vpcf"
+            "particle" "particles/econ/items/windrunner/windranger_arcana/windranger_arcana_focusfire.vpcf"
+        }
+    }
+    "asset_proxy_tower_death_templar_assassin"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/lanaya/lanaya.vmdl"
+        "ProjectileModel" "particles/units/heroes/hero_templar_assassin/templar_assassin_base_attack.vpcf"
     }
     "asset_proxy_tower_death_nevermore_sundered_souls"
     {
         "BaseClass" "npc_dota_creature"
-        "Model" "models/heroes/nevermore/nevermore.vmdl"
+        "Model" "models/heroes/shadow_fiend/shadow_fiend.vmdl"
         "ProjectileModel" "particles/units/heroes/hero_nevermore/nevermore_base_attack.vpcf"
         "precache"
         {

@@ -2,6 +2,7 @@
 local events = require("core/events")
 local config = require("config/buildings_config")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
+local tower_routes = require("config/tower_route_config")
 local global_rules = require("config/global_rules")
 local logger = require("core/logger")
 local modifier_registry = require("core/modifier_registry")
@@ -9,6 +10,7 @@ local team_alignment = require("core/team_alignment")
 local tower_skills = require("systems/tower_skill_runtime")
 local scheduler = require("core/scheduler")
 local grid_config = require("config/grid_config")
+local grid_placement_config = require("config/grid_placement_config")
 local building_population = require("systems/building_population_service")
 local building_visual = require("systems/building_visual_service")
 local M = {}
@@ -192,6 +194,8 @@ local function completion_level_data(definition, level)
     return levels[tonumber(level) or 1] or {}
 end
 local function public_state(state)
+    local route_row = state.building_id == "arrow_tower"
+        and tower_routes.current(state) or nil
     return {
         entindex = state.unit:entindex(),
         unit = state.unit,
@@ -200,9 +204,12 @@ local function public_state(state)
         player_id = state.player_id,
         building_id = state.building_id,
         level = state.level,
+        absolute_level = state.level,
+        route_level = route_row and route_row.level or state.level,
         tower_class = state.tower_class,
         tower_class_name = state.tower_class_name,
-        display_name = state.tower_class_name
+        display_name = state.unit.survival_display_name
+            or state.tower_class_name
             or (state.building_id == "arrow_tower"
                 and ((arrow_data(state.level) or {}).name)
                 or state.definition.display_name),
@@ -217,6 +224,110 @@ local function public_state(state)
             and tonumber((arrow_data(state.level) or {}).base_attack_damage)
             or nil,
     }
+end
+
+local function grid_position(position, definition)
+    local minimum = grid_placement_config.minimum_footprint or { x = 2, y = 2 }
+    local subdivision = math.max(
+        1,
+        math.floor(tonumber(grid_placement_config.footprint_subdivision) or 1)
+    )
+    local footprint = definition.footprint or minimum
+    local footprint_x = math.floor(math.max(
+        tonumber(footprint.x) or tonumber(minimum.x) or 2,
+        tonumber(minimum.x) or 2
+    )) * subdivision
+    local footprint_y = math.floor(math.max(
+        tonumber(footprint.y) or tonumber(minimum.y) or 2,
+        tonumber(minimum.y) or 2
+    )) * subdivision
+    local cell_size = tonumber(grid_placement_config.cell_size) or 64
+    return math.floor(position.x / cell_size + 0.5) - math.floor(footprint_x / 2),
+        math.floor(position.y / cell_size + 0.5) - math.floor(footprint_y / 2)
+end
+
+local function definition_for_unit(unit)
+    local building_id = tostring(unit.survival_building_id or "")
+    if building_id ~= "" and config[building_id] then
+        return config[building_id]
+    end
+    local unit_name = unit:GetUnitName()
+    for _, definition in pairs(config) do
+        if type(definition) == "table" and definition.unit_name == unit_name then
+            return definition
+        end
+    end
+    return nil
+end
+
+local function recover_building(unit)
+    if not valid_entity(unit) or unit.survival_is_building ~= true then return nil end
+    local entindex = unit:entindex()
+    if buildings[entindex] then return buildings[entindex] end
+    local definition = definition_for_unit(unit)
+    if not definition then return nil end
+    local origin = unit:GetAbsOrigin()
+    local grid_x = tonumber(unit.survival_grid_x)
+    local grid_y = tonumber(unit.survival_grid_y)
+    if grid_x == nil or grid_y == nil then
+        grid_x, grid_y = grid_position(origin, definition)
+    end
+    local state = {
+        unit = unit,
+        definition = definition,
+        team = unit:GetTeamNumber(),
+        player_id = tonumber(unit.survival_player_id)
+            or unit:GetPlayerOwnerID(),
+        building_id = definition.id,
+        level = tonumber(unit.survival_level) or 1,
+        grid_x = grid_x,
+        grid_y = grid_y,
+        tower_class = unit.survival_tower_class,
+        tower_class_name = unit.survival_tower_class
+            and unit.survival_display_name or nil,
+        tower_combat = nil,
+    }
+    local route_row = state.building_id == "arrow_tower"
+        and tower_routes.current(state) or nil
+    unit.survival_building_id = state.building_id
+    unit.survival_player_id = state.player_id
+    unit.survival_grid_x = grid_x
+    unit.survival_grid_y = grid_y
+    unit.survival_route_level = route_row and route_row.level or state.level
+    buildings[entindex] = state
+    change_count(state.team, state.building_id, 1)
+    if definition.build_once then wall_ever_built[state.team] = true end
+    event_bus.request(events.GRID_OCCUPY_REQUEST, {
+        grid_x = grid_x,
+        grid_y = grid_y,
+        footprint = definition.footprint,
+        entindex = entindex,
+    })
+    print(string.format(
+        "[BuildingSystem] recovered entindex=%s id=%s level=%s route_level=%s class=%s",
+        tostring(entindex), tostring(state.building_id), tostring(state.level),
+        tostring(unit.survival_route_level), tostring(state.tower_class)
+    ))
+    return state
+end
+
+local function recover_existing_buildings()
+    if not Entities or type(Entities.FindAllByClassname) ~= "function" then return 0 end
+    local recovered = 0
+    local seen = {}
+    for _, class_name in ipairs({ "npc_dota_creature", "npc_dota_building" }) do
+        local ok, units = pcall(Entities.FindAllByClassname, Entities, class_name)
+        if ok then
+            for _, unit in ipairs(units or {}) do
+                local entindex = valid_entity(unit) and unit:entindex() or nil
+                if entindex and not seen[entindex] then
+                    seen[entindex] = true
+                    if recover_building(unit) then recovered = recovered + 1 end
+                end
+            end
+        end
+    end
+    return recovered
 end
 require("systems/building_relocation").bind(
     function(entindex) return buildings[entindex] end,
@@ -304,6 +415,8 @@ local function start_building(payload)
     unit.survival_level = 1
     unit.survival_display_name = check.definition.display_name
     unit.survival_is_building = true
+    unit.survival_building_id = check.definition.id
+    unit.survival_player_id = check.player_id
     unit:SetOwner(payload.caster)
     apply_initial_stats(unit, check.definition)
     add_building_abilities(unit, check.definition, false)
@@ -320,6 +433,9 @@ local function start_building(payload)
         tower_class_name = nil,
         tower_combat = arrow_data(1),
     }
+    unit.survival_grid_x = state.grid_x
+    unit.survival_grid_y = state.grid_y
+    unit.survival_route_level = 1
     change_count(check.team, check.definition.id, 1)
     if check.definition.build_once then wall_ever_built[check.team] = true end
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
@@ -511,7 +627,12 @@ local function queue_building(payload)
     return { ok = true, moving = true, target = target }
 end
 local function query_building(payload)
-    local state = buildings[payload.entindex]
+    local entindex = tonumber(payload and payload.entindex)
+    local state = entindex and buildings[entindex] or nil
+    if not state and entindex and type(EntIndexToHScript) == "function" then
+        local ok, unit = pcall(EntIndexToHScript, entindex)
+        if ok then state = recover_building(unit) end
+    end
     if not state or not valid_entity(state.unit) then return nil end
     return public_state(state)
 end
@@ -521,6 +642,13 @@ local function on_building_changed(payload)
     state.level = payload.level or state.level
     state.tower_class = payload.tower_class
     state.tower_class_name = payload.tower_class_name
+    state.unit.survival_level = state.level
+    state.unit.survival_route_level = payload.route_level
+        or state.unit.survival_route_level
+    state.unit.survival_tower_class = state.tower_class
+    if payload.display_name then
+        state.unit.survival_display_name = payload.display_name
+    end
 end
 local function on_entity_killed(payload)
     local victim = payload.victim
@@ -603,10 +731,12 @@ function M.init()
     event_bus.subscribe(events.BUILD_REQUEST, queue_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
-    logger.info("BuildingSystem", "initialized")
+    local recovered = recover_existing_buildings()
+    logger.info("BuildingSystem", "initialized recovered=" .. tostring(recovered))
 end
 M._completion_level_data_for_test = completion_level_data
 M._public_state_for_test = public_state
+M._recover_existing_for_test = recover_existing_buildings
 M._building_limit_for_test = {
     reached = building_limit_reached,
     count_for = count_for,

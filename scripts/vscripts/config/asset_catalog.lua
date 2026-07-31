@@ -1,4 +1,5 @@
 local generated = require("config/generated/asset_catalog")
+local generated_bodygroups = require("config/generated/asset_bodygroups")
 local generated_components = require("config/generated/asset_components")
 local generated_effects = require("config/generated/asset_effects")
 local generated_sounds = require("config/generated/asset_sounds")
@@ -14,6 +15,7 @@ end
 local M = {
     rows = clone(generated.rows or {}),
     by_id = {},
+    bodygroups = generated_bodygroups.rows or {},
     components = generated_components.rows or {},
     effects = generated_effects.rows or {},
     sounds = generated_sounds.rows or {},
@@ -66,6 +68,7 @@ end
 
 local function initialize_bundle(asset)
     asset.components = {}
+    asset.bodygroups = {}
     asset.effects = {}
     asset.sounds = {}
     asset.effects_by_role = {}
@@ -97,6 +100,28 @@ for _, asset in ipairs(M.rows) do
     assert_unique(seen_asset_ids, asset_id, "asset_catalog duplicate asset_id")
     M.by_id[asset_id] = asset
     initialize_bundle(asset)
+end
+
+local seen_bodygroup_keys = {}
+local bodygroup_names_by_asset = {}
+for _, bodygroup in ipairs(sorted_rows(M.bodygroups, "bodygroup_key")) do
+    local asset = require_asset(bodygroup, "asset_bodygroups", "bodygroup_key")
+    local bodygroup_key = tostring(bodygroup.bodygroup_key or "")
+    local bodygroup_name = tostring(bodygroup.bodygroup_name or "")
+    assert(nonempty(bodygroup_key),
+        "asset_bodygroups contains an empty bodygroup_key")
+    assert(nonempty(bodygroup_name),
+        "asset_bodygroups contains an empty bodygroup_name: " .. bodygroup_key)
+    assert_unique(seen_bodygroup_keys, bodygroup_key,
+        "asset_bodygroups duplicate bodygroup_key")
+    bodygroup_names_by_asset[asset.asset_id]
+        = bodygroup_names_by_asset[asset.asset_id] or {}
+    assert_unique(
+        bodygroup_names_by_asset[asset.asset_id],
+        bodygroup_name,
+        "asset_bodygroups duplicate bodygroup_name for " .. asset.asset_id
+    )
+    asset.bodygroups[#asset.bodygroups + 1] = bodygroup
 end
 
 local components_by_asset = {}

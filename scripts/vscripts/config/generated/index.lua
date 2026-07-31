@@ -3,6 +3,7 @@ local M = {}
 
 M["altar_actions"] = require("config/generated/altar_actions")
 M["arrow_tower_base"] = require("config/generated/arrow_tower_base")
+M["asset_bodygroups"] = require("config/generated/asset_bodygroups")
 M["asset_catalog"] = require("config/generated/asset_catalog")
 M["asset_components"] = require("config/generated/asset_components")
 M["asset_effects"] = require("config/generated/asset_effects")

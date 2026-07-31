@@ -5,6 +5,7 @@ local logger = require("core/logger")
 local M = {}
 local attachments_by_unit = {}
 local particles_by_unit = {}
+local bodygroups_by_unit = {}
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -47,6 +48,16 @@ local function spawn_attachment(asset, model_path)
     local data = {
         model = model_path,
         DefaultAnim = asset and asset.default_sequence or "idle",
+        -- Cosmetic props must never intercept world selection or contribute
+        -- bone-follower collision. The owning tower remains the selectable,
+        -- authoritative entity.
+        solid = "0",
+        -- Source 2 prop_dynamic spawnflag 256 is "Start with collision
+        -- disabled". Keep it in addition to solid=0 and the runtime
+        -- SetSolid(SOLID_NONE) call because model initialization can otherwise
+        -- briefly restore collision after bone merge.
+        spawnflags = "256",
+        DisableBoneFollowers = "1",
     }
     local ok, attachment = pcall(
         SpawnEntityFromTableSynchronous, entity_class, data
@@ -60,6 +71,43 @@ local function spawn_attachment(asset, model_path)
         )
     end
     return ok, attachment
+end
+
+local function clear_bodygroups(unit)
+    local entindex = unit:entindex()
+    for bodygroup_name in pairs(bodygroups_by_unit[entindex] or {}) do
+        safe_call(unit, "SetBodygroupByName", bodygroup_name, 0)
+    end
+    bodygroups_by_unit[entindex] = nil
+end
+
+local function apply_bodygroups(unit, asset)
+    clear_bodygroups(unit)
+    local applied = {}
+    for _, bodygroup in ipairs(asset and asset.bodygroups or {}) do
+        local bodygroup_name = tostring(bodygroup.bodygroup_name or "")
+        local value = tonumber(bodygroup.value)
+        if bodygroup_name ~= "" and value then
+            local ok = safe_call(
+                unit,
+                "SetBodygroupByName",
+                bodygroup_name,
+                value
+            )
+            if ok then applied[bodygroup_name] = true end
+        end
+    end
+    if next(applied) then bodygroups_by_unit[unit:entindex()] = applied end
+end
+
+local function reset_main_animation(unit, asset)
+    -- SetModel can leave an existing building entity on the previous model's
+    -- sequence/animation graph. Refresh that state before selecting the new
+    -- bundle's default sequence so hero models resume their idle animation.
+    safe_call(unit, "ResetSequenceInfo")
+    local sequence = tostring(asset and asset.default_sequence or "idle")
+    if sequence ~= "" then safe_call(unit, "ResetSequence", sequence) end
+    safe_call(unit, "SetPlaybackRate", 1)
 end
 
 local function normalize_attachment(asset, entry, index)
@@ -98,6 +146,11 @@ local function apply_attachments(unit, asset)
             safe_call(attachment, "SetOriginalModel", model_path)
             safe_call(attachment, "SetOwner", unit)
             safe_call(attachment, "FollowEntity", unit, true)
+            safe_call(
+                attachment,
+                "SetSolid",
+                rawget(_G, "SOLID_NONE") or 0
+            )
             if tonumber(asset.model_skin) then
                 safe_call(attachment, "SetSkin", tonumber(asset.model_skin))
             end
@@ -199,6 +252,8 @@ function M.apply(unit, data)
 
     unit:SetModel(model_path)
     unit:SetOriginalModel(model_path)
+    reset_main_animation(unit, asset)
+    apply_bodygroups(unit, asset)
     if asset and tonumber(asset.model_scale) then
         unit:SetModelScale(tonumber(asset.model_scale))
     end
@@ -220,6 +275,7 @@ function M.clear(unit)
     if valid_entity(unit) then
         clear_attachments(unit)
         clear_particles(unit)
+        clear_bodygroups(unit)
     end
 end
 

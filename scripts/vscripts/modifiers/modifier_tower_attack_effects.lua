@@ -36,6 +36,15 @@ local BLIZZARD_SLOW_PCT = 25
 local start_lightning_storm
 
 local LIGHTNING_ASSET_ID = "tower_zuus"
+local MACHINE_GUN_ASSET_IDS = {
+    bounty = "tower_machine_gun_bounty_heartless",
+    gatling = "tower_machine_gun_windranger_rising_gale",
+}
+local DEATH_TOWER_ANIMATED_ASSETS = {
+    tower_death_templar_assassin = true,
+    tower_death_nevermore_sundered_souls = true,
+    tower_death_warlock_seam_ripper = true,
+}
 local DEFAULT_CHAIN_PARTICLE =
     "particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf"
 local DEFAULT_STORM_CLOUD_PARTICLE =
@@ -55,6 +64,19 @@ local function skill_effect_particle(unit, skill, role, fallback, fallback_asset
         return effect and effect.particle_path or nil
     end
     return lookup(asset_id) or lookup(fallback_asset_id) or fallback
+end
+
+local function play_follow_particle(owner, particle_name)
+    if not owner or owner:IsNull() or not particle_name or particle_name == "" then
+        return nil
+    end
+    local particle = ParticleManager:CreateParticle(
+        particle_name,
+        PATTACH_ABSORIGIN_FOLLOW,
+        owner
+    )
+    ParticleManager:ReleaseParticleIndex(particle)
+    return particle
 end
 
 local function skill_matching(unit, prefix)
@@ -149,10 +171,19 @@ local function trigger_gatling_buff(tower, skill, reason)
     if not tower or tower:IsNull() or not skill then return end
     local duration = math.max(0.1, tonumber(skill.duration) or 3)
     local bonus_pct = math.max(0, (tonumber(skill.damage_multiplier) or 0) * 100)
-    buff_manager.apply(tower, tower, skill.buff_id, {
+    local modifier = buff_manager.apply(tower, tower, skill.buff_id, {
         duration = duration,
         value = bonus_pct,
     })
+    if modifier then
+        play_follow_particle(tower, skill_effect_particle(
+            tower,
+            skill,
+            "skill_strike",
+            "particles/units/heroes/hero_windrunner/windrunner_focusfire_start.vpcf",
+            MACHINE_GUN_ASSET_IDS.gatling
+        ))
+    end
     print(string.format(
         "[TowerMachineGun] GATLING_BUFF tower=%d reason=%s bonus_pct=%.0f duration=%.1f",
         tower:entindex(), tostring(reason), bonus_pct, duration
@@ -804,15 +835,27 @@ end
 
 function modifier_tower_attack_effects:OnAttackStart(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
+    local caster = self:GetParent()
     local target = params.target
     self.current_attack_target = target
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
+    local attack_activity = rawget(_G, "ACT_DOTA_ATTACK")
+    if DEATH_TOWER_ANIMATED_ASSETS[caster.survival_model_asset_id]
+        and attack_activity ~= nil
+        and type(caster.StartGesture) == "function" then
+        pcall(
+            caster.StartGesture,
+            caster,
+            attack_activity
+        )
+    end
     event_bus.emit(events.TOWER_ATTACK_START, {
-        tower = self:GetParent(),
+        tower = caster,
         target = target,
-        skills = tower_skills.get(self:GetParent()),
-    })    local laser = skill_matching(self:GetParent(), "laser_")
+        skills = tower_skills.get(caster),
+    })
+    local laser = skill_matching(caster, "laser_")
     local effect = laser_config(laser)
     if laser and effect and valid(target)
         and target:GetTeamNumber() ~= self:GetParent():GetTeamNumber() then
@@ -874,7 +917,8 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         skills = skills,
     })
     self.pending_critical_multiplier = nil
-    self.pending_critical_source = nil    local frost = skill_matching(caster, "frost_attack_")
+    self.pending_critical_source = nil
+    local frost = skill_matching(caster, "frost_attack_")
     if frost then
         trigger_frost_attack(caster, primary, frost, damage)
     end
@@ -898,11 +942,20 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
     if bounty then
         local gold = math.max(0, tonumber(bounty.damage_multiplier) or 0)
         if gold > 0 then
-            event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
                 team = caster:GetTeamNumber(),
                 gold = gold,
                 reason = "tower_bounty_machine_gun_attack",
             })
+            if result and result.ok == true then
+                play_follow_particle(primary, skill_effect_particle(
+                    caster,
+                    bounty,
+                    "skill_strike",
+                    "particles/units/heroes/hero_bounty_hunter/bounty_hunter_cutpurse.vpcf",
+                    MACHINE_GUN_ASSET_IDS.bounty
+                ))
+            end
             print(string.format(
                 "[TowerMachineGun] BOUNTY tower=%d target=%d gold=%.0f",
                 caster:entindex(), primary:entindex(), gold

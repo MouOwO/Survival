@@ -195,9 +195,11 @@ local function base_health(state)
 end
 
 publish = function(state, reason)
+    local route_row = state.building_id == "arrow_tower"
+        and tower_routes.current(state) or nil
     local display_name = state.unit.survival_display_name
         or state.tower_class_name
-        or ((tower_routes.current(state) or {}).name)
+        or (route_row and route_row.name)
         or state.definition.display_name
     event_bus.emit(events.BUILDING_CHANGED, {
         entindex = state.unit:entindex(),
@@ -205,6 +207,8 @@ publish = function(state, reason)
         player_id = state.player_id,
         building_id = state.building_id,
         level = state.level,
+        absolute_level = state.level,
+        route_level = route_row and route_row.level or state.level,
         tower_class = state.tower_class,
         tower_class_name = state.tower_class_name,
         display_name = display_name,
@@ -281,7 +285,10 @@ local function recover_state(unit)
 
     if state.building_id == "arrow_tower" then
         local row = tower_routes.current(state) or arrow_data(state.level)
-        if row then sync_tower_abilities(state, row) end
+        if row then
+            unit.survival_route_level = tonumber(row.level) or state.level
+            sync_tower_abilities(state, row)
+        end
         apply_research_technology(state)
         if not unit:HasModifier("modifier_tower_attack_effects") then
             unit:AddNewModifier(unit, nil, "modifier_tower_attack_effects", {})
@@ -437,6 +444,7 @@ local function apply_tower_level(state, row, level, change_model)
     state.level = level
     state.tower_class_name = state.tower_class and tower_routes.display_name(row) or row.name
     state.unit.survival_level = level
+    state.unit.survival_route_level = tonumber(row.level) or level
     state.unit.survival_tower_class = state.tower_class
     state.unit.survival_display_name = state.tower_class_name
     sync_tower_abilities(state, row)
@@ -456,6 +464,13 @@ local function apply_tower_level(state, row, level, change_model)
     end
     if auto_attack and auto_attack.ResetTarget then
         auto_attack:ResetTarget()
+    end
+    if state.unit.SetControllableByPlayer
+        and tonumber(state.player_id) and tonumber(state.player_id) >= 0 then
+        -- Route upgrades keep the original tower entity. Reassert its owner-side
+        -- controllability after model and attachment changes so it remains
+        -- selectable when the player clicks it again.
+        state.unit:SetControllableByPlayer(state.player_id, true)
     end
 end
 

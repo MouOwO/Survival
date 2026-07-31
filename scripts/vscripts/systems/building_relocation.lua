@@ -47,6 +47,8 @@ function building_system.move(unit, position)
         - math.floor(footprint_x / 2)
     state.grid_y = math.floor(position.y / cell_size + 0.5)
         - math.floor(footprint_y / 2)
+    unit.survival_grid_x = state.grid_x
+    unit.survival_grid_y = state.grid_y
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
         grid_x = state.grid_x, grid_y = state.grid_y,
         footprint = state.definition.footprint,

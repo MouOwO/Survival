@@ -919,3 +919,24 @@
 - 测试契约：扩展 `scripts/vscripts/tests/test_hero_combat_stat_projection.lua`，覆盖五个英雄的名称、VIP 身份和备注，并将过时的 VIP 攻速期望从 `2.0` 对齐到权威 CSV 的 `1.5`，没有改游戏配置。定向结果：`HERO_COMBAT_STAT_PROJECTION_PASS`、`HERO_DEFINITIONS_ENCODING_CONTRACT_PASS`；目标 Lua 语法检查和 `git diff --check` 通过；目标文件乱码搜索为 0。
 - 全量回归：共运行 54 个 `scripts/vscripts/tests/test_*.lua`，51 个通过，3 个失败：`test_addhero_cheat.lua` 测试桩缺少 Dota 全局 `Vector`；`test_hero_passive_attribute_snapshot.lua` 仍按旧的原生三围读取契约；`test_hero_summon_owner.lua` 的统一血条断言与当前召唤实现/历史结果不一致。三项失败均未触及 `hero_definitions` 编码和本任务修改，不能标记为本任务回归通过。
 - 复用经验：乱码排查先检查原始字节、BOM、`�`/`��`/`锟斤拷`，再比较 Git 权威源和生成产物；不要对损坏文件直接“转 UTF-8”或用默认编码整文件读写。配置恢复后必须依次执行单文件生成、Lua 语法检查、中文名称/列数/BOM 契约和限定 `git diff --check`，最后重启 Workshop Tools 地图加载新的 Lua 配置。
+
+## 2026-07-31 — 检查点 079：机枪塔三阶段建模与技能视觉恢复并进入最终审计
+
+- 用户要求从上下文超限的上一会话继续箭塔机枪路线建模与特效任务；已直接读取 `C:\Users\li\.cline\data\sessions\1785506625979_s9010`，确认上一轮不是未开始，而是已完成实施并在最终审计时中断。
+- 当前实现：机枪塔 LV1～5 使用 Sniper Occultist's Pursuit 五件套；赏金机枪 LV1～5 使用 Bounty Hunter Heartless Hunt 六件套；爆矢加特林 LV1～10 使用 Windranger Compass of the Rising Gale Arcana 主体和五件套。
+- 技能视觉：资源增加请求成功后在受击目标播放 Jinada/Cutpurse；爆矢加特林第五次同目标攻击或击杀成功应用/刷新 20%、3 秒攻速 Buff 时，在塔上播放 Focus Fire 起手，持续粒子由 Buff 配置管理。
+- 生产引用审计：旧 `tower_gyro`、`tower_tinker`、`asset_proxy_tower_gyro`、`asset_proxy_tower_tinker` 在 `data`/`scripts` 生产范围内无匹配；新三套资产贯穿路线 CSV、生成 Lua、资产目录、代理单位与运行时。
+- 自动验证：机枪视觉、资产 bundle、资产预加载、受管攻速 Buff、建筑视觉、箭塔完工、升级 Runtime、选中头像、多重塔、雷电塔、冰霜路线共 11 项定向测试通过；目标 Lua 语法和限定 `git diff --check` 通过。
+- 全量回归：60 项中 57 项通过，既有失败仍为 `test_addhero_cheat.lua`、`test_hero_passive_attribute_snapshot.lua`、`test_hero_summon_owner.lua`，与本任务修改文件无交集。
+- 最终审计发现并修正：`modifier_tower_attack_effects.lua` 中清空暴击来源与读取冰霜技能被误拼在同一行；语义未改变，改为两行以恢复清晰控制流。
+- 尚未验证：Workshop Tools 中套装骨骼跟随、模型皮肤/主体显示、实际攻击弹道、Jinada 金币反馈和 Focus Fire 起手/持续视觉。
+- 下一步唯一动作：完成生成配置逐字节一致性和最终限定测试，然后完全停止并重新 Run 实机验收三阶段路线。
+
+## 2026-07-31 — 检查点 080：机枪塔建模与技能视觉自动审计完成
+
+- 生成一致性：使用 `tools.build_configs.build()` 将 `tower_class_machine_gun`、`buff_definitions`、`asset_catalog`、`asset_components`、`asset_effects` 定向生成到临时目录；五份结果与正式 `config/generated` Lua 逐字节一致，输出 `MACHINE_GUN_GENERATED_COMPARE_PASS`。
+- 最终回归：机枪视觉测试通过；共享攻击文件关联的死亡塔动画、选择、Templar 视觉和死亡榴弹四项测试全部通过；拼行修复后的目标 Lua 重新解析成功。
+- 最终静态检查：本任务源 CSV、生成 Lua、代理 KV、资产运行时、建筑视觉服务、测试和交接文档的限定 `git diff --check` 通过，仅有既有 LF/CRLF 提示，无空白错误。
+- 全量状态保持为 60 项中 57 项通过；3 个既有英雄测试失败名单未变化，没有把它们误报为本任务通过或回归。
+- 自动实施与审计已完成；尚未确认的唯一范围是 Workshop Tools 中的真实视觉和生命周期表现。
+- 下一步唯一动作：完全停止并重新 Run，分别创建机枪塔、赏金机枪和爆矢加特林，检查完整穿戴件、骨骼跟随、攻击弹道、金币到账 Jinada，以及第五次同目标攻击/击杀时 Focus Fire 起手和 3 秒持续视觉。
