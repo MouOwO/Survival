@@ -18,8 +18,11 @@ local WAVE_CLEANUP_GRACE = 0.25
 local DROW_FROST_HIT_PARTICLE =
     "particles/econ/items/drow/drow_arcana/drow_arcana_frost_arrow_debuff.vpcf"
 local DROW_TOWER_ASSET_ID = "tower_multi_drow_dread_retribution"
-local DEATH_GRENADE_PARTICLE =
-    "particles/units/heroes/hero_death_prophet/death_prophet_silence.vpcf"
+local DEATH_CRITICAL_ASSET_IDS = {
+    critical_strike = "tower_death_muerta_blackwing",
+    bone_cannon = "tower_death_nevermore_sundered_souls",
+}
+local DEATH_GRENADE_ASSET_ID = "tower_death_warlock_seam_ripper"
 local LIGHTNING_ASSET_ID = "tower_zuus"
 local DEFAULT_DIFFUSION_PARTICLE =
     "particles/units/heroes/hero_razor/razor_plasmafield.vpcf"
@@ -53,6 +56,23 @@ local function configured_area(skill, fallback)
     local value = skill and skill.area
     if type(value) == "table" then value = value[1] end
     return math.max(1, tonumber(value) or fallback)
+end
+
+local function skill_effect_particle(skill, role, asset_id)
+    local bundle = asset_catalog.by_id[asset_id]
+    local skill_bundle = bundle and skill and bundle.skills[skill.skill_id]
+    local effects = skill_bundle and skill_bundle.effects_by_role[role]
+    local effect = effects and effects[1]
+    return effect and effect.particle_path or nil
+end
+
+local function play_world_particle(tower, position, particle_path)
+    if not particle_path then return end
+    local particle = ParticleManager:CreateParticle(
+        particle_path, PATTACH_WORLDORIGIN, tower
+    )
+    ParticleManager:SetParticleControl(particle, 0, position)
+    ParticleManager:ReleaseParticleIndex(particle)
 end
 
 local function diffusion_particle_path(skill)
@@ -166,15 +186,20 @@ local function update_bone_counter(payload)
     end
 end
 
-local function death_grenade_particle(tower, position, radius)
-    local particle = ParticleManager:CreateParticle(
-        DEATH_GRENADE_PARTICLE,
-        PATTACH_WORLDORIGIN,
-        tower
+local function trigger_death_critical_particle(payload)
+    if not payload.critical then return end
+    local source = tostring(payload.critical_source or "")
+    local asset_id = DEATH_CRITICAL_ASSET_IDS[source]
+    if not asset_id then return end
+    local skill_prefix = source == "bone_cannon"
+        and "bone_cannon_" or "critical_strike_"
+    local skill = skill_matching(payload.skills, skill_prefix)
+    if not skill or not owns_ability(payload.tower, skill) then return end
+    play_world_particle(
+        payload.tower,
+        payload.target:GetAbsOrigin(),
+        skill_effect_particle(skill, "skill_strike", asset_id)
     )
-    ParticleManager:SetParticleControl(particle, 0, position)
-    ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
-    ParticleManager:ReleaseParticleIndex(particle)
 end
 
 local function trigger_death_grenade(payload)
@@ -185,7 +210,11 @@ local function trigger_death_grenade(payload)
     local damage = math.max(0, tonumber(payload.damage) or 0)
         * math.max(0, tonumber(skill.damage_multiplier) or 2)
     local position = payload.target:GetAbsOrigin()
-    death_grenade_particle(payload.tower, position, radius)
+    play_world_particle(
+        payload.tower,
+        position,
+        skill_effect_particle(skill, "skill_strike", DEATH_GRENADE_ASSET_ID)
+    )
     local hit = { [payload.target:entindex()] = true }
     for _, enemy in ipairs(geometry.enemies_in_circle(
         payload.tower, position, radius
@@ -363,6 +392,7 @@ local function on_attack_landed(payload)
     if not valid(payload.tower) or not exists(payload.target) then return end
     frost_arrow_hit_particle(payload.tower, payload.target)
     update_bone_counter(payload)
+    trigger_death_critical_particle(payload)
     trigger_death_grenade(payload)
     trigger_path_skill(payload, "arcane_eye_", 96, "arcane_eye")
     trigger_burning_great_arrow(payload)

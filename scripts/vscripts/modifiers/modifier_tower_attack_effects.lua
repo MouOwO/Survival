@@ -28,10 +28,11 @@ local DEFAULT_STORM_DAMAGE_MULTIPLIER = 1
 local GATLING_ATTACK_COUNT = 5
 local DEFAULT_FROST_SLOW_DURATION = 2
 local FROST_SLOW_PCT = 25
-local DEFAULT_BLIZZARD_RADIUS = 250
-local DEFAULT_BLIZZARD_DURATION = 2
+local DEFAULT_BLIZZARD_RADIUS = 300
+local DEFAULT_BLIZZARD_DURATION = 5
 local DEFAULT_BLIZZARD_INTERVAL = 1
-local BLIZZARD_SLOW_PCT = 30
+local DEFAULT_BLIZZARD_DAMAGE_MULTIPLIER = 0.5
+local BLIZZARD_SLOW_PCT = 25
 local start_lightning_storm
 
 local LIGHTNING_ASSET_ID = "tower_zuus"
@@ -42,13 +43,18 @@ local DEFAULT_STORM_CLOUD_PARTICLE =
 local DEFAULT_STORM_STRIKE_PARTICLE =
     "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
 
-local function skill_effect_particle(skill, role, fallback)
+local function skill_effect_particle(unit, skill, role, fallback, fallback_asset_id)
     local skill_id = type(skill) == "table" and skill.skill_id or nil
-    local bundle = asset_catalog.by_id[LIGHTNING_ASSET_ID]
-    local skill_bundle = bundle and skill_id and bundle.skills[skill_id] or nil
-    local effects = skill_bundle and skill_bundle.effects_by_role[role] or nil
-    local effect = effects and effects[1] or nil
-    return effect and effect.particle_path or fallback
+    local valid_unit = unit and not unit:IsNull()
+    local asset_id = valid_unit and unit.survival_model_asset_id or fallback_asset_id
+    local function lookup(candidate_id)
+        local bundle = asset_catalog.by_id[candidate_id]
+        local skill_bundle = bundle and skill_id and bundle.skills[skill_id] or nil
+        local effects = skill_bundle and skill_bundle.effects_by_role[role] or nil
+        local effect = effects and effects[1] or nil
+        return effect and effect.particle_path or nil
+    end
+    return lookup(asset_id) or lookup(fallback_asset_id) or fallback
 end
 
 local function skill_matching(unit, prefix)
@@ -306,9 +312,9 @@ local function enemies_in_radius(caster, position, radius)
     ) or {}
 end
 
-local function frost_impact_particle(caster, position, radius)
+local function frost_impact_particle(caster, position, radius, particle_name)
     local particle = ParticleManager:CreateParticle(
-        "particles/units/heroes/hero_lich/lich_frost_nova.vpcf",
+        particle_name or "particles/units/heroes/hero_lich/lich_frost_nova.vpcf",
         PATTACH_WORLDORIGIN, caster
     )
     ParticleManager:SetParticleControl(particle, 0, position)
@@ -330,7 +336,12 @@ local function trigger_frost_attack(caster, primary, skill, damage)
         0.1, tonumber(skill.duration) or DEFAULT_FROST_SLOW_DURATION
     )
     local position = primary:GetAbsOrigin()
-    frost_impact_particle(caster, position, radius)
+    local particle_name = skill_effect_particle(
+        caster, skill, "skill_impact",
+        "particles/units/heroes/hero_lich/lich_frost_nova.vpcf",
+        "tower_frost_lich_rime_lord"
+    )
+    frost_impact_particle(caster, position, radius, particle_name)
     local hit_count = 0
     for _, target in ipairs(enemies_in_radius(caster, position, radius)) do
         if valid(target) then
@@ -353,9 +364,10 @@ local function trigger_frost_attack(caster, primary, skill, damage)
     ))
 end
 
-local function blizzard_particle(caster, position, radius)
+local function blizzard_particle(caster, position, radius, particle_name)
     local particle = ParticleManager:CreateParticle(
-        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_snow.vpcf",
+        particle_name or
+            "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_snow.vpcf",
         PATTACH_WORLDORIGIN, caster
     )
     ParticleManager:SetParticleControl(particle, 0, position)
@@ -363,9 +375,10 @@ local function blizzard_particle(caster, position, radius)
     return particle
 end
 
-local function blizzard_explosion_particle(caster, position)
+local function blizzard_explosion_particle(caster, position, particle_name)
     local particle = ParticleManager:CreateParticle(
-        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
+        particle_name or
+            "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
         PATTACH_WORLDORIGIN, caster
     )
     ParticleManager:SetParticleControl(particle, 0, position)
@@ -381,15 +394,30 @@ local function start_blizzard(caster, position, skill)
     local interval = math.max(
         0.1, tonumber(skill.damage_interval) or DEFAULT_BLIZZARD_INTERVAL
     )
-    local multiplier = math.max(0, tonumber(skill.damage_multiplier) or 1)
+    local multiplier = math.max(
+        0, tonumber(skill.damage_multiplier)
+            or DEFAULT_BLIZZARD_DAMAGE_MULTIPLIER
+    )
     local damage = caster:GetAverageTrueAttackDamage(caster) * multiplier
     local tick_limit = math.max(1, math.floor(duration / interval + 0.001))
-    local slow_duration = math.max(interval + 0.1, duration)
+    local slow_duration = interval + 0.1
     local instance_id = string.format(
         "blizzard_%d_%d_%d", caster:entindex(),
         math.floor(GameRules:GetGameTime() * 1000), RandomInt(1, 999999)
     )
-    local snow = blizzard_particle(caster, position, radius)
+    local snow_particle_name = skill_effect_particle(
+        caster, skill, "skill_persistent",
+        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_snow.vpcf",
+        "tower_frost_crystal_maiden_winter_raven"
+    )
+    local explosion_particle_name = skill_effect_particle(
+        caster, skill, "skill_strike",
+        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
+        "tower_frost_crystal_maiden_winter_raven"
+    )
+    local snow = blizzard_particle(
+        caster, position, radius, snow_particle_name
+    )
     local tick = 0
     print(string.format(
         "[TowerBlizzard] START tower=%d instance=%s radius=%.0f duration=%.1f interval=%.1f damage=%.1f",
@@ -402,7 +430,7 @@ local function start_blizzard(caster, position, skill)
             ParticleManager:ReleaseParticleIndex(snow)
             return false
         end
-        blizzard_explosion_particle(caster, position)
+        blizzard_explosion_particle(caster, position, explosion_particle_name)
         local hit_count = 0
         for _, target in ipairs(enemies_in_radius(caster, position, radius)) do
             if valid(target) then
@@ -429,6 +457,9 @@ local function start_blizzard(caster, position, skill)
         return interval
     end, instance_id)
 end
+
+M._start_blizzard_for_test = start_blizzard
+M._sync_polar_obelisk_aura_for_test = sync_polar_obelisk_aura
 
 local function storm_radius(skill)
     local configured = skill.area
@@ -520,10 +551,12 @@ start_lightning_storm = function(caster, position, skill)
         math.floor(GameRules:GetGameTime() * 1000), RandomInt(1, 999999)
     )
     local cloud_particle_name = skill_effect_particle(
-        skill, "skill_persistent", DEFAULT_STORM_CLOUD_PARTICLE
+        caster, skill, "skill_persistent", DEFAULT_STORM_CLOUD_PARTICLE,
+        LIGHTNING_ASSET_ID
     )
     local strike_particle_name = skill_effect_particle(
-        skill, "skill_strike", DEFAULT_STORM_STRIKE_PARTICLE
+        caster, skill, "skill_strike", DEFAULT_STORM_STRIKE_PARTICLE,
+        LIGHTNING_ASSET_ID
     )
     local cloud = storm_cloud_particle(
         caster, position, radius, duration, cloud_particle_name
@@ -905,7 +938,8 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         local hit = { [primary:entindex()] = true }
         local primary_position = primary:GetAbsOrigin()
         local particle_name = skill_effect_particle(
-            lightning, "skill_chain", DEFAULT_CHAIN_PARTICLE
+            caster, lightning, "skill_chain", DEFAULT_CHAIN_PARTICLE,
+            LIGHTNING_ASSET_ID
         )
         lightning_particle(
             caster, caster, primary,
@@ -934,12 +968,17 @@ end
 
 
 function modifier_tower_attack_effects:OnDestroy()
-    if IsServer() then reset_laser(self) end
+    if not IsServer() then return end
+    local tower = self:GetParent()
+    reset_laser(self)
+    buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
 end
 
 function modifier_tower_attack_effects:ResetAfterRelocation()
     if not IsServer() then return end
+    local tower = self:GetParent()
     reset_laser(self)
+    buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     self.gatling_target_entindex = nil
     self.gatling_target_hits = 0
     self.current_attack_target = nil

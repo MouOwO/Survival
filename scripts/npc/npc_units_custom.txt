@@ -365,8 +365,101 @@
     "asset_proxy_tower_lightning_razor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/razor/razor.vmdl" }
     "asset_proxy_tower_gyro" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/gyro/gyro.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
     "asset_proxy_tower_tinker" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tinker/tinker.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
-    "asset_proxy_tower_crystal_maiden" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/crystal_maiden/crystal_maiden.vmdl" "ProjectileModel" "particles/units/heroes/hero_lich/lich_base_attack.vpcf" }
-    "asset_proxy_tower_ancient_apparition" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/ancient_apparition/ancient_apparition.vmdl" "ProjectileModel" "particles/units/heroes/hero_lich/lich_base_attack.vpcf" }
+    "asset_proxy_tower_death_muerta_blackwing"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/muerta/muerta.vmdl"
+        "ProjectileModel" "particles/units/heroes/hero_muerta/muerta_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/items/muerta/deathcaster_head/deathcaster_head.vmdl"
+            "model" "models/items/muerta/deathcaster_back/deathcaster_back.vmdl"
+            "model" "models/items/muerta/deathcaster_armor/deathcaster_armor.vmdl"
+            "model" "models/items/muerta/deathcaster_weapon/deathcaster_weapon.vmdl"
+            "particle" "particles/units/heroes/hero_muerta/muerta_deadshot_creep_impact.vpcf"
+        }
+    }
+    "asset_proxy_tower_death_nevermore_sundered_souls"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/nevermore/nevermore.vmdl"
+        "ProjectileModel" "particles/units/heroes/hero_nevermore/nevermore_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/items/nevermore/lord_of_the_elder_dunes_shoulders/lord_of_the_elder_dunes_shoulders.vmdl"
+            "model" "models/items/nevermore/lord_of_the_elder_dunes_arms/lord_of_the_elder_dunes_arms.vmdl"
+            "model" "models/items/nevermore/lord_of_the_elder_dunes_head/lord_of_the_elder_dunes_head.vmdl"
+            "particle" "particles/units/heroes/hero_nevermore/nevermore_shadowraze.vpcf"
+            "particle" "particles/econ/items/shadow_fiend/elder_dunes/default/elder_dunes_wings.vpcf"
+            "particle" "particles/econ/items/shadow_fiend/elder_dunes/default/elder_dunes_head_ambient.vpcf"
+        }
+    }
+    "asset_proxy_tower_death_warlock_seam_ripper"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/warlock/warlock.vmdl"
+        "ProjectileModel" "particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/items/warlock/warlock_tailor_of_burning_puppet_back/warlock_tailor_of_burning_puppet_back.vmdl"
+            "model" "models/items/warlock/warlock_tailor_of_burning_puppet_belt/warlock_tailor_of_burning_puppet_belt.vmdl"
+            "model" "models/items/warlock/warlock_tailor_of_burning_puppet_head/warlock_tailor_of_burning_puppet_head.vmdl"
+            "model" "models/items/warlock/warlock_tailor_of_burning_puppet_offhand_weapon/warlock_tailor_of_burning_puppet_offhand_weapon.vmdl"
+            "model" "models/items/warlock/warlock_tailor_of_burning_puppet_shoulder/warlock_tailor_of_burning_puppet_shoulder.vmdl"
+            "model" "models/items/warlock/warlock_tailor_of_burning_puppet_weapon/warlock_tailor_of_burning_puppet_weapon.vmdl"
+            "model" "models/items/warlock/warlock_tailor_of_burning_puppet_arms/warlock_tailor_of_burning_puppet_arms.vmdl"
+            "particle" "particles/units/heroes/hero_warlock/warlock_rain_of_chaos.vpcf"
+            "particle" "particles/econ/items/warlock/warlock_cc2024_burning_puppet/warlock_cc2024_head_ambient.vpcf"
+            "particle" "particles/econ/items/warlock/warlock_cc2024_burning_puppet/warlock_cc2024_offhand_ambient.vpcf"
+            "particle" "particles/econ/items/warlock/warlock_cc2024_burning_puppet/warlock_cc2024_burning_puppet_staff_ambient.vpcf"
+        }
+    }
+    "asset_proxy_tower_frost_lich_rime_lord"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/lich/lich.vmdl"
+        "ProjectileModel" "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/items/lich/lich_rime_lord_back/lich_rime_lord_back.vmdl"
+            "model" "models/items/lich/lich_rime_lord_belt/lich_rime_lord_belt.vmdl"
+            "model" "models/items/lich/lich_rime_lord_arms/lich_rime_lord_arms.vmdl"
+            "model" "models/items/lich/lich_rime_lord_neck/lich_rime_lord_neck.vmdl"
+            "model" "models/items/lich/lich_rime_lord_head/lich_rime_lord_head.vmdl"
+            "particle" "particles/units/heroes/hero_lich/lich_frost_nova.vpcf"
+        }
+    }
+    "asset_proxy_tower_frost_crystal_maiden_winter_raven"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/crystal_maiden/crystal_maiden_arcana.vmdl"
+        "ProjectileModel" "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_arms.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_back.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_head_refit.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_shoulder_refit.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_weapon.vmdl"
+            "model" "models/heroes/crystal_maiden/crystal_maiden_arcana_back_refit.vmdl"
+            "particle" "particles/units/heroes/hero_lich/lich_frost_nova.vpcf"
+            "particle" "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf"
+            "particle" "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf"
+        }
+    }
+    "asset_proxy_tower_frost_ancient_apparition"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/ancient_apparition/ancient_apparition.vmdl"
+        "ProjectileModel" "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
+        "precache"
+        {
+            "particle" "particles/units/heroes/hero_lich/lich_frost_nova.vpcf"
+            "particle" "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf"
+            "particle" "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf"
+            "particle" "particles/units/heroes/hero_ancient_apparition/ancient_ice_vortex.vpcf"
+        }
+    }
     "asset_proxy_tower_lion" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lion/lion.vmdl" "ProjectileModel" "particles/units/heroes/hero_lion/lion_base_attack.vpcf" }
     "asset_proxy_tower_lina" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lina/lina.vmdl" "ProjectileModel" "particles/units/heroes/hero_lina/lina_base_attack.vpcf" }
     "asset_proxy_tower_multi_medusa_anamnessa" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/medusa/medusa.vmdl" "ProjectileModel" "particles/units/heroes/hero_medusa/medusa_base_attack.vpcf" }
