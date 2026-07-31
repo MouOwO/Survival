@@ -1,4 +1,4 @@
-pool_member_id,pool_id,skill_id,weight,min_rebirth_level,max_rebirth_level,enabled,notes
+﻿pool_member_id,pool_id,skill_id,weight,min_rebirth_level,max_rebirth_level,enabled,notes
 #中文名:技能池成员ID,池ID,技能ID,权重,最低转生等级,最高转生等级,是否启用,备注
 #types:string,string,string,number,number,number,boolean,string
 public_01,public_pool,proto_flame_burst,100,2,10,1,二转及以后公共随机池。

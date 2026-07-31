@@ -2,6 +2,22 @@
 
 > 仅追加关键检查点。记录研究过程，而不只是任务完成后的总结。
 
+## 2026-07-31 — 英雄技能伤害测试、addskill 与公共技能上限
+
+- 伤害测试：沿用现有英雄伤害面板和最终 `OnTakeDamage` 事件，新增累计技能伤害、最近技能伤害和技能命中次数；普通攻击仍只进入总伤害。公共被动技能伤害请求补充真实 Ability handle，确保包括怒雷在内的技能伤害被归类为 `ability`。
+- 作弊码：新增聊天命令 `addskill`，通过独立 `HERO_SKILL_POINT_SET_REQUEST` 将当前英雄技能点直接设置为10，重复输入不累加；无英雄时返回 `combat_hero_not_ready`。
+- 技能池审计：原实现只有英雄总技能容量10，没有公共池独立上限；现增加公共技能上限3，并在候选生成、选择创建和最终授予三层检查。达到3个后转生随机技能奖励正常跳过，不影响同次技能点奖励或专属技能。
+- 验证：`REBIRTH_SKILL_CONTRACT_PASS`、`COMBAT_STAT_REFRESH_CONTRACT_PASS`、`SKILL_DAMAGE_AND_CHEAT_CONTRACT_PASS`、`git diff --check`；Panorama JS/CSS 分别 `1 compiled`，HUD XML加载链 `7 compiled`，均为0失败0跳过。当前环境无独立Lua解释器，仍需Workshop Tools完全冷启动实机确认。
+
+## 2026-07-31 — 公共技能“怒雷”五级实现与 Office CSV 编码兼容
+
+- 用户批准将现有 `proto_chain_lightning`/“雷霆连锁”原 ID 重做为“怒雷”，避免公共池数量与存档身份变化；等级4明确完整继承等级3，无任何数值或效果变化。
+- 最终规则：等级1触发率20%，主目标全属性×3纯粹伤害，400范围其他敌人承受50%；等级2命中施加/刷新3秒标记，旧标记目标额外全属性×1.5；等级3触发率45%，标记降低15%基础攻击力；等级5一次触发依次落3道，优先不同目标，不足时重复主目标且从第二次主雷起减半。每一道及其扩散均参与标记检查与刷新。
+- 实现：被动配置改为逐技能 `max_level`；怒雷引擎 Ability `MaxLevel=5`；运行服务取消三级硬截断，继续读取 `HERO_COMBAT_STATS_GET_REQUEST` 逻辑三维并通过既有纯粹伤害事务结算；复用宙斯 `zuus_lightning_bolt.vpcf`。
+- Buff：新增 `debuff_hero_fury_thunder_mark`，`none + refresh`，等级2数值0只作标记，等级3以上通过 `MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE` 施加-15%；每次怒雷命中先检查旧标记和额外伤害，再刷新完整3秒。
+- 编码：`data/csv/英雄系统/hero_skill_pool_members.csv` 从 UTF-8无BOM转换为UTF-8 BOM（`EF BB BF`），WPS与现有生成器继续兼容，Office/Excel双击可识别UTF-8中文。
+- 生成与验证：PowerShell定向生成 `hero_skill_definitions`、`buff_definitions`、`hero_skill_pool_members` 等配置；`REBIRTH_SKILL_CONTRACT_PASS` 与 `COMBAT_STAT_REFRESH_CONTRACT_PASS`。当前环境仍无独立 Python/Lua，Lua运行效果需 Workshop Tools 冷启动实机验收。
+
 ## 2026-07-30 — 英雄护甲 0/850 跳变与攻速刷新审计
 
 - 用户实机截图确认：英雄护甲显示在 0 与 850 间反复跳变，要求先阅读刷新规则并同步审计攻速。

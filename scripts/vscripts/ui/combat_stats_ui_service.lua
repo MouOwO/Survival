@@ -126,6 +126,10 @@ local function debug_snapshot(player_id)
         total_damage = tonumber(state.total_damage) or 0,
         last_damage = tonumber(state.last_damage) or 0,
         hit_count = tonumber(state.hit_count) or 0,
+        skill_total_damage = tonumber(state.skill_total_damage) or 0,
+        skill_last_damage = tonumber(state.skill_last_damage) or 0,
+        skill_hit_count = tonumber(state.skill_hit_count) or 0,
+        skill_last_ability_name = tostring(state.skill_last_ability_name or ""),
         technologies = technology_rows(state.levels or {}),
         technology_stats = technology_stat_manager.get(player_id),
     }
@@ -159,6 +163,10 @@ local function on_hero_summoned(payload)
         total_damage = 0,
         last_damage = 0,
         hit_count = 0,
+        skill_total_damage = 0,
+        skill_last_damage = 0,
+        skill_hit_count = 0,
+        skill_last_ability_name = "",
         levels = {},
     }
     local technology = event_bus.request(
@@ -186,6 +194,12 @@ local function on_damage(payload)
     state.total_damage = (state.total_damage or 0) + damage
     state.last_damage = damage
     state.hit_count = (state.hit_count or 0) + 1
+    if payload.damage_kind == "ability" then
+        state.skill_total_damage = (state.skill_total_damage or 0) + damage
+        state.skill_last_damage = damage
+        state.skill_hit_count = (state.skill_hit_count or 0) + 1
+        state.skill_last_ability_name = tostring(payload.ability_name or "")
+    end
     schedule_damage_publish(player_id)
 end
 
@@ -230,6 +244,10 @@ function M.init()
             total_damage = 0,
             last_damage = 0,
             hit_count = 0,
+            skill_total_damage = 0,
+            skill_last_damage = 0,
+            skill_hit_count = 0,
+            skill_last_ability_name = "",
             levels = {},
         }
         publish_debug(player_id)

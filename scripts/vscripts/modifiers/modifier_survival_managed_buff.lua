@@ -157,6 +157,7 @@ function modifier_survival_managed_buff:DeclareFunctions()
         MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE,
         MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
         MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE,
+        MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE,
     }
 end
 
@@ -177,6 +178,11 @@ end
 function modifier_survival_managed_buff:GetModifierTotalDamageOutgoing_Percentage()
     if self.definition.effect_type ~= "total_damage_outgoing_pct" then return 0 end
     return (self.value or 0) * math.max(1, self:GetStackCount())
+end
+
+function modifier_survival_managed_buff:GetModifierBaseDamageOutgoing_Percentage()
+    if self.definition.effect_type ~= "base_damage_outgoing_pct" then return 0 end
+    return self.value or 0
 end
 
 function modifier_survival_managed_aura:IsHidden() return true end

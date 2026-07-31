@@ -77,6 +77,10 @@ local function create_offer(player_id, source, trigger_level)
     if not hero_state or hero_state.hero_ready ~= 1 then
         return { ok = false, error = "combat_hero_not_ready" }
     end
+    if (tonumber(hero_state.public_skill_count) or 0)
+        >= (tonumber(hero_state.public_skill_capacity) or 3) then
+        return { ok = false, error = "public_skill_capacity_reached" }
+    end
 
     local level = tonumber(trigger_level)
         or tonumber(progression(player_id).rebirth_level) or 0
@@ -197,6 +201,14 @@ local function on_skill_reward(payload)
             or tonumber(progression(player_id).rebirth_level)
         local result = create_offer(player_id, "rebirth_reward", trigger_level)
         if result and result.ok then return end
+        if result and result.error == "public_skill_capacity_reached" then
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = player_id,
+                message = "公共技能已达到3个，本次不再生成技能选择。",
+                level = "info",
+            })
+            return
+        end
 
         reward_retry_by_player[player_id] = {
             trigger_level = trigger_level,

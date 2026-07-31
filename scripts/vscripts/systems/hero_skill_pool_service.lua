@@ -5,6 +5,7 @@ local passive_skills = require("config/hero_passive_skill_definitions")
 local pool_members = require("config/generated/hero_skill_pool_members")
 
 local M = {}
+local PUBLIC_SKILL_CAPACITY = 3
 
 local function owned_map(snapshot)
     local result = {}
@@ -12,6 +13,19 @@ local function owned_map(snapshot)
         result[item.skill_id] = tonumber(item.level) or 0
     end
     return result
+end
+
+local function public_skill_count(snapshot)
+    local count = tonumber(snapshot and snapshot.public_skill_count)
+    if count ~= nil then return math.max(0, math.floor(count)) end
+    for _, item in ipairs(snapshot and snapshot.skills or {}) do
+        local definition = skills.by_id[item.skill_id]
+        if definition and definition.is_public == true
+            and (tonumber(item.level) or 0) > 0 then
+            count = (count or 0) + 1
+        end
+    end
+    return count or 0
 end
 
 local function progression_level(player_id)
@@ -49,6 +63,9 @@ local function eligible(payload)
     local rebirth = tonumber(payload.rebirth_level)
         or progression_level(payload.player_id)
     local owned = owned_map(state)
+    local public_count = public_skill_count(state)
+    local public_capacity = tonumber(state.public_skill_capacity)
+        or PUBLIC_SKILL_CAPACITY
     local vip = vip_enabled(payload.player_id)
     local result = {}
 
@@ -59,6 +76,7 @@ local function eligible(payload)
         local current = owned[member.skill_id] or 0
         local can_add = current == 0
             and state.skill_count < state.skill_capacity
+            and public_count < public_capacity
 
         if member.enabled ~= false
             and member.pool_id == payload.pool_id

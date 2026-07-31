@@ -99,6 +99,7 @@ local M = {
     HERO_SKILL_STATE_GET_REQUEST = "hero.skill.state.get.request",
     HERO_SKILL_GRANT_REQUEST = "hero.skill.grant.request",
     HERO_SKILL_POINT_GRANT_REQUEST = "hero.skill_point.grant.request",
+    HERO_SKILL_POINT_SET_REQUEST = "hero.skill_point.set.request",
     HERO_SKILL_POINT_UPGRADE_REQUEST = "hero.skill_point.upgrade.request",
     HERO_SKILL_CHANGED = "hero.skill.changed",
     HERO_SKILL_POOL_DRAW_REQUEST = "hero.skill.pool.draw.request",

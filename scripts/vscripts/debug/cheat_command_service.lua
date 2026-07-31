@@ -528,6 +528,18 @@ local function list_skills(context)
     return true
 end
 
+local function set_test_skill_points(context)
+    local result = event_bus.request(
+        events.HERO_SKILL_POINT_SET_REQUEST,
+        { player_id = context.player_id, points = 10 }
+    )
+    if not result or not result.ok then
+        return false, result and result.error or "skill_points_set_failed"
+    end
+    notify(context, "技能点已设置为 10")
+    return true
+end
+
 local COMMANDS = {
     dev = enable_dev,
     shopshow = show_shop,
@@ -547,6 +559,7 @@ local COMMANDS = {
     skilloffer = skill_offer,
     skillchoose = skill_choose,
     skills = list_skills,
+    addskill = set_test_skill_points,
     additem = weapon_cheats.add_item,
     items = weapon_cheats.list_items,
     givegrowthsword = weapon_cheats.give_growth_sword,
@@ -604,7 +617,7 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: addhero, research_test, addtechnology, monster, items, hero, skill, weapon growth"
+        "ready: addhero, addskill, research_test, addtechnology, monster, items, hero, skill, weapon growth"
     )
 end
 

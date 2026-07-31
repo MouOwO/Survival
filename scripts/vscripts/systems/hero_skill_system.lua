@@ -13,6 +13,7 @@ local M = {}
 local state_by_player = {}
 local RETURN_HOME_ABILITY = "ability_survival_return_home"
 local PICKUP_MATERIALS_ABILITY = "ability_survival_pickup_materials"
+local PUBLIC_SKILL_CAPACITY = 3
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -54,6 +55,18 @@ local function skill_projection(skill_id, level)
     }
 end
 
+local function public_skill_count(state)
+    local count = 0
+    for skill_id, level in pairs(state and state.levels or {}) do
+        local definition = skills.by_id[skill_id]
+        if (tonumber(level) or 0) > 0
+            and definition and definition.is_public == true then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 local function snapshot(player_id)
     local state = state_by_player[player_id]
     if not state then
@@ -62,6 +75,8 @@ local function snapshot(player_id)
             hero_ready = 0,
             skill_count = 0,
             skill_capacity = 10,
+            public_skill_count = 0,
+            public_skill_capacity = PUBLIC_SKILL_CAPACITY,
             skill_points = 0,
             skills = {},
         }
@@ -83,6 +98,8 @@ local function snapshot(player_id)
             and state.unit:entindex() or -1,
         skill_count = #state.order,
         skill_capacity = state.capacity,
+        public_skill_count = public_skill_count(state),
+        public_skill_capacity = PUBLIC_SKILL_CAPACITY,
         skill_points = state.skill_points or 0,
         skills = projected,
         version = state.version,
@@ -241,6 +258,10 @@ local function grant_to_state(state, skill_id, levels)
         if #state.order >= state.capacity then
             return { ok = false, error = "skill_capacity_reached" }
         end
+        if definition.is_public == true
+            and public_skill_count(state) >= PUBLIC_SKILL_CAPACITY then
+            return { ok = false, error = "public_skill_capacity_reached" }
+        end
         state.levels[skill_id] = math.min(maximum, amount)
         table.insert(state.order, skill_id)
     end
@@ -295,6 +316,22 @@ local function grant_skill_points_request(payload)
     state.skill_points = (state.skill_points or 0) + amount
     state.version = state.version + 1
     publish(player_id, "skill_points_granted")
+    return { ok = true, skill_points = state.skill_points, snapshot = snapshot(player_id) }
+end
+
+local function set_skill_points_request(payload)
+    local player_id = tonumber(payload.player_id)
+    local state = state_by_player[player_id]
+    if not state then
+        return { ok = false, error = "combat_hero_not_ready" }
+    end
+    local points = math.floor(tonumber(payload.points) or tonumber(payload.value) or -1)
+    if points < 0 then
+        return { ok = false, error = "skill_points_invalid" }
+    end
+    state.skill_points = points
+    state.version = state.version + 1
+    publish(player_id, "skill_points_set")
     return { ok = true, skill_points = state.skill_points, snapshot = snapshot(player_id) }
 end
 
@@ -424,6 +461,10 @@ function M.init()
     event_bus.handle_request(
         events.HERO_SKILL_POINT_GRANT_REQUEST,
         grant_skill_points_request
+    )
+    event_bus.handle_request(
+        events.HERO_SKILL_POINT_SET_REQUEST,
+        set_skill_points_request
     )
     event_bus.handle_request(
         events.HERO_SKILL_POINT_UPGRADE_REQUEST,

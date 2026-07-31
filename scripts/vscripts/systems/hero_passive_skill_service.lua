@@ -3,6 +3,8 @@ local events = require("core/events")
 local combat_events = require("combat/combat_events")
 local scheduler = require("core/scheduler")
 local definitions = require("config/hero_passive_skill_definitions")
+local skill_definitions = require("config/generated/hero_skill_definitions")
+local buff_manager = require("systems/buff_manager")
 
 local M = {}
 local processed_attacks = {}
@@ -36,7 +38,8 @@ local function owned_passives(player_id)
     local owned = {}
     for _, item in ipairs(result and result.snapshot and result.snapshot.skills or {}) do
         if definitions.by_id[item.skill_id] then
-            owned[item.skill_id] = math.max(1, math.min(3, tonumber(item.level) or 1))
+            local maximum = definitions.by_id[item.skill_id].max_level or 1
+            owned[item.skill_id] = math.max(1, math.min(maximum, tonumber(item.level) or 1))
         end
     end
     return owned
@@ -185,6 +188,10 @@ local function deal(context, target, multiplier, secondary)
         or events.HERO_PASSIVE_SKILL_EFFECT_REQUESTED
     event_bus.emit(event_name, metadata)
     local base_damage = context.attributes.all_attributes * math.max(0, multiplier)
+    local skill_definition = skill_definitions.by_id[context.skill_id]
+    local ability = skill_definition and context.attacker:FindAbilityByName(
+        skill_definition.ability_name
+    ) or nil
     return event_bus.request(combat_events.DEAL_REQUEST, {
         transaction_id = string.format(
             "passive:%s:%s:%d",
@@ -192,6 +199,7 @@ local function deal(context, target, multiplier, secondary)
         ),
         attacker = context.attacker,
         victim = target,
+        ability = ability,
         source_kind = secondary and "dot" or "ability",
         base_damage = base_damage,
         damage_type = DAMAGE_TYPE_PURE,
@@ -283,26 +291,81 @@ local function run_frost(context, definition)
 end
 
 local function run_chain(context, definition)
-    local center = unit_position(context.target)
-    if not center then return end
-    local targets = enemies_in_radius(context.attacker, center,
-        level_value(definition, "chain_radius", context.level))
-    local maximum = level_value(definition, "max_targets", context.level)
-    local selected = {}
-    if alive(context.target) then selected[#selected + 1] = context.target end
-    for _, unit in ipairs(targets) do
-        if #selected >= maximum then break end
-        local duplicate = false
-        for _, prior in ipairs(selected) do if prior == unit then duplicate = true end end
-        if not duplicate then selected[#selected + 1] = unit end
-    end
-    deal_group(context, selected, definition.damage_multiplier[context.level], false)
-    if context.level >= 2 then
-        local effect = definition.level_effects[context.level]
-        for _, unit in ipairs(selected) do
-            apply_effect(context.attacker, unit, "attack_slow", effect.attack_slow_pct, effect.duration, context.skill_id)
+    local primary = context.target
+    if not alive(primary) then return end
+    local radius = level_value(definition, "radius", context.level)
+    local strike_count = math.max(1, math.floor(level_value(definition, "strike_count", context.level)))
+    local base_multiplier = level_value(definition, "damage_multiplier", context.level)
+    local splash_multiplier = level_value(definition, "splash_multiplier", context.level)
+    local mark_duration = level_value(definition, "mark_duration", context.level)
+    local mark_bonus = level_value(definition, "mark_bonus_multiplier", context.level)
+    local mark_reduction = level_value(definition, "mark_attack_reduction_pct", context.level)
+    local nearby = enemies_in_radius(context.attacker, primary:GetAbsOrigin(), radius)
+    local strike_targets = { primary }
+    for _, candidate in ipairs(nearby) do
+        if #strike_targets >= strike_count then break end
+        if candidate ~= primary and alive(candidate) then
+            strike_targets[#strike_targets + 1] = candidate
         end
-        if context.level == 3 and #selected > 0 then stun(context.attacker, selected[#selected], effect.stun_duration) end
+    end
+    while #strike_targets < strike_count do strike_targets[#strike_targets + 1] = primary end
+    local target_hit_counts = {}
+
+    local function execute_strike(target, strike_multiplier)
+        if not alive(target) or not valid(context.attacker) then return end
+        local position = unit_position(target)
+        if not position then return end
+        local particle = ParticleManager:CreateParticle(
+            "particles/units/heroes/hero_zuus/zuus_lightning_bolt.vpcf",
+            PATTACH_WORLDORIGIN, context.attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, position + Vector(0, 0, 900))
+        ParticleManager:SetParticleControl(particle, 1, position)
+        ParticleManager:ReleaseParticleIndex(particle)
+
+        local was_marked = context.level >= 2
+            and buff_manager.has(target, "debuff_hero_fury_thunder_mark")
+        deal(context, target, strike_multiplier, false)
+        if was_marked and mark_bonus > 0 then deal(context, target, mark_bonus, true) end
+        for _, splash_target in ipairs(enemies_in_radius(context.attacker, position, radius)) do
+            if splash_target ~= target and alive(splash_target) then
+                local splash_marked = context.level >= 2
+                    and buff_manager.has(splash_target, "debuff_hero_fury_thunder_mark")
+                deal(context, splash_target, strike_multiplier * splash_multiplier, true)
+                if splash_marked and mark_bonus > 0 then
+                    deal(context, splash_target, mark_bonus, true)
+                end
+                if context.level >= 2 then
+                    buff_manager.apply(
+                        context.attacker, splash_target,
+                        "debuff_hero_fury_thunder_mark",
+                        { duration = mark_duration, value = -math.abs(mark_reduction) }
+                    )
+                end
+            end
+        end
+        if context.level >= 2 then
+            buff_manager.apply(
+                context.attacker, target, "debuff_hero_fury_thunder_mark",
+                { duration = mark_duration, value = -math.abs(mark_reduction) }
+            )
+        end
+    end
+
+    for strike = 1, strike_count do
+        local target = strike_targets[strike]
+        local target_key = tostring(target:entindex())
+        local prior_hits = target_hit_counts[target_key] or 0
+        target_hit_counts[target_key] = prior_hits + 1
+        local repeated = prior_hits > 0
+        local strike_multiplier = base_multiplier * (repeated and 0.5 or 1)
+        if strike == 1 then
+            execute_strike(target, strike_multiplier)
+        else
+            scheduler.after(0.12 * (strike - 1), function()
+                execute_strike(target, strike_multiplier)
+            end)
+        end
     end
 end
 

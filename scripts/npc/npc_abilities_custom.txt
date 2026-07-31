@@ -645,8 +645,8 @@
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-    "AbilityTextureName" "zuus_arc_lightning"
-    "MaxLevel"           "3"
+    "AbilityTextureName" "zuus_lightning_bolt"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 

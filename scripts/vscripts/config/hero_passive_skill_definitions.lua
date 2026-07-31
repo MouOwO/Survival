@@ -1,7 +1,7 @@
 local M = {}
 
 local function skill(row)
-    row.max_level = 3
+    row.max_level = tonumber(row.max_level) or 3
     row.passive = true
     row.hidden = true
     row.trigger_type = row.trigger_type or "main_attack_landed"
@@ -40,18 +40,31 @@ M.rows = {
         },
     }),
     skill({
-        skill_id = "proto_chain_lightning", display_name = "雷霆连锁", icon_name = "zuus_arc_lightning",
-        trigger_chance = { 0.11, 0.17, 0.25 }, damage_multiplier = { 0.25, 0.40, 0.62 },
-        max_targets = { 4, 6, 8 }, chain_radius = { 500, 550, 600 },
+        skill_id = "proto_chain_lightning", display_name = "怒雷", icon_name = "zuus_lightning_bolt",
+        max_level = 5,
+        trigger_chance = { 0.20, 0.20, 0.45, 0.45, 0.45 },
+        damage_multiplier = { 3.00, 3.00, 3.00, 3.00, 3.00 },
+        radius = { 400, 400, 400, 400, 400 },
+        splash_multiplier = { 0.50, 0.50, 0.50, 0.50, 0.50 },
+        mark_duration = { 3.0, 3.0, 3.0, 3.0, 3.0 },
+        mark_bonus_multiplier = { 0, 1.50, 1.50, 1.50, 1.50 },
+        mark_attack_reduction_pct = { 0, 0, 15, 15, 15 },
+        strike_count = { 1, 1, 1, 1, 3 },
         level_effects = {
-            [2] = { effect_id = "attack_slow", attack_slow_pct = 20, duration = 2.0 },
-            [3] = { effect_id = "attack_slow_last_stun", attack_slow_pct = 40,
-                duration = 3.0, stun_duration = 0.8 },
+            [2] = { effect_id = "mark", duration = 3.0, bonus_multiplier = 1.50 },
+            [3] = { effect_id = "mark_attack_reduction", duration = 3.0,
+                bonus_multiplier = 1.50, attack_reduction_pct = 15 },
+            [4] = { effect_id = "mark_attack_reduction", duration = 3.0,
+                bonus_multiplier = 1.50, attack_reduction_pct = 15 },
+            [5] = { effect_id = "triple_strike", duration = 3.0,
+                bonus_multiplier = 1.50, attack_reduction_pct = 15, strike_count = 3 },
         },
         level_text = {
-            "普通攻击命中时，连锁最多4个不同目标，每个受到三围总和×0.25伤害。",
-            "目标提高至6个；降低20%攻击速度2秒。",
-            "目标提高至8个；降低40%攻击速度3秒，最后目标眩晕0.8秒。",
+            "普通攻击命中时，20%概率对目标落雷，造成全属性总和×3伤害，并对400范围内其他敌人造成50%伤害。",
+            "怒雷命中目标施加3秒标记；标记期间再次被怒雷命中，额外受到全属性总和×1.5伤害。每次命中都会刷新标记。",
+            "触发概率提高至45%；被标记的敌人攻击力降低15%，持续至标记结束。",
+            "完整继承等级3效果，无额外变化。",
+            "怒雷连续释放3道；同一目标重复被落雷命中时，该目标从第二道起每道伤害减半。每道雷都会触发标记效果。",
         },
     }),
     skill({
@@ -208,32 +221,37 @@ function M.validate()
         print("[HeroPassiveSkillConfig] ERROR " .. message)
     end
     for _, row in ipairs(M.rows) do
-        if row.max_level ~= 3 then fail(row.skill_id, "max_level", "must_equal_3") end
+        local maximum = math.max(1, tonumber(row.max_level) or 1)
         for _, field in ipairs({ "trigger_chance", "damage_multiplier" }) do
-            if array_size(row[field]) ~= 3 then fail(row.skill_id, field, "must_have_3_items") end
+            if array_size(row[field]) ~= maximum then
+                fail(row.skill_id, field, "must_have_" .. tostring(maximum) .. "_items")
+            end
         end
-        for level = 2, 3 do
-            if tonumber(row.trigger_chance[level]) <= tonumber(row.trigger_chance[level - 1]) then
-                fail(row.skill_id, "trigger_chance", "must_strictly_increase")
+        if array_size(row.level_text) ~= maximum then
+            fail(row.skill_id, "level_text", "must_have_" .. tostring(maximum) .. "_items")
+        end
+        for level = 2, maximum do
+            if tonumber(row.trigger_chance[level]) < tonumber(row.trigger_chance[level - 1]) then
+                fail(row.skill_id, "trigger_chance", "must_not_decrease")
             end
             if tonumber(row.damage_multiplier[level]) < tonumber(row.damage_multiplier[level - 1]) then
                 fail(row.skill_id, "damage_multiplier", "must_not_decrease")
             end
         end
         for level, _ in pairs(row.level_effects or {}) do
-            if type(level) ~= "number" or level < 1 or level > 3 then
+            if type(level) ~= "number" or level < 1 or level > maximum then
                 fail(row.skill_id, "level_effects", "level_out_of_range:" .. tostring(level))
             end
         end
         for field, values in pairs(row) do
             if type(values) == "table" and field ~= "level_effects" and field ~= "level_text"
-                and array_size(values) > 0 and array_size(values) ~= 3 then
-                fail(row.skill_id, field, "level_array_must_have_3_items")
+                and array_size(values) > 0 and array_size(values) ~= maximum then
+                fail(row.skill_id, field, "level_array_must_have_max_level_items")
             end
         end
     end
     if #errors > 0 then error("invalid hero passive skill config: " .. table.concat(errors, "; ")) end
-    print(string.format("[HeroPassiveSkillConfig] validated skills=%d max_level=3", #M.rows))
+    print(string.format("[HeroPassiveSkillConfig] validated skills=%d", #M.rows))
     return true
 end
 
