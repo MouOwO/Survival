@@ -1,6 +1,5 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
-local ability_utils = require("core/ability_utils")
 local heroes = require("config/generated/hero_definitions")
 local summon_rules = require("config/generated/hero_summon_rules")
 local stat_adapter = require("systems/hero_stat_adapter")
@@ -75,6 +74,20 @@ local function summon_position(anchor, definition)
         + anchor:GetForwardVector() * offset
 end
 
+local function preserve_and_hide_native_abilities(unit)
+    local count = math.max(0, tonumber(unit:GetAbilityCount()) or 0)
+    for index = 0, count - 1 do
+        local ability = unit:GetAbilityByIndex(index)
+        if ability and not ability:IsNull() then
+            ability:SetHidden(true)
+            ability:SetActivated(false)
+        end
+    end
+    print(string.format(
+        "[HERO_SUMMON_ABILITIES] policy=preserve_engine_abilities hidden=%s ability_count=%s",
+        tostring(count > 0), tostring(count)))
+    return count > 0
+end
 local function create_hero(player_id, team, altar, definition)
     local position = summon_position(altar, definition)
     local unit = CreateUnitByName(
@@ -103,7 +116,7 @@ local function create_hero(player_id, team, altar, definition)
         tostring(player_id), tostring(unit:GetPlayerOwnerID()),
         tostring(unit:entindex())))
 
-    ability_utils.remove_all(unit)
+    preserve_and_hide_native_abilities(unit)
     if unit.SetAbilityPoints then
         unit:SetAbilityPoints(0)
     end

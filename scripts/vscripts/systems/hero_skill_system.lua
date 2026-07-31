@@ -2,7 +2,6 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local hero_health_guard = require("core/hero_health_guard")
 local scheduler = require("core/scheduler")
-local ability_utils = require("core/ability_utils")
 local heroes = require("config/generated/hero_definitions")
 local skills = require("config/generated/hero_skill_definitions")
 local passive_skills = require("config/hero_passive_skill_definitions")
@@ -117,6 +116,21 @@ local function publish(player_id, reason)
     event_bus.emit(events.HERO_SKILL_CHANGED, data)
 end
 
+local function preserve_native_abilities(unit)
+    local count = math.max(0, tonumber(unit:GetAbilityCount()) or 0)
+    for index = 0, count - 1 do
+        local ability = unit:GetAbilityByIndex(index)
+        if ability and not ability:IsNull() then
+            local name = ability:GetAbilityName()
+            if name ~= RETURN_HOME_ABILITY
+                and name ~= PICKUP_MATERIALS_ABILITY
+                and not string.find(name or "", "^ability_survival_") then
+                ability:SetHidden(true)
+                ability:SetActivated(false)
+            end
+        end
+    end
+end
 local function ability_map(state)
     local result = {
         [RETURN_HOME_ABILITY] = true,
@@ -132,12 +146,25 @@ local function ability_map(state)
     return result
 end
 
+local function remove_unowned_custom_abilities(state)
+    local allowed = ability_map(state)
+    for _, definition in ipairs(skills.rows or {}) do
+        local name = definition.ability_name
+        if name and name ~= "" and not allowed[name] then
+            local ability = state.unit:FindAbilityByName(name)
+            if ability and not ability:IsNull() then
+                state.unit:RemoveAbility(name)
+            end
+        end
+    end
+end
 local function synchronize_unit_impl(state)
     if not valid_entity(state.unit) then
         error("combat hero is not valid")
     end
 
-    ability_utils.remove_all_except(state.unit, ability_map(state))
+    preserve_native_abilities(state.unit)
+    remove_unowned_custom_abilities(state)
     if state.unit.SetAbilityPoints then
         state.unit:SetAbilityPoints(0)
     end
@@ -426,7 +453,7 @@ local function initialize_hero(payload)
     }
     state_by_player[payload.player_id] = state
 
-    ability_utils.remove_all(state.unit)
+    preserve_native_abilities(state.unit)
     synchronize_unit(state)
     publish(state.player_id, "exclusive_skills_locked")
 

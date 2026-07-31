@@ -3,6 +3,8 @@ $root = Split-Path -Parent $PSScriptRoot
 $gameMode = Get-Content (Join-Path $root "scripts\vscripts\addon_game_mode.lua") -Raw
 $policy = Get-Content (Join-Path $root "scripts\vscripts\core\hero_ability_policy.lua") -Raw
 $builderProgression = Get-Content (Join-Path $root "scripts\vscripts\systems\builder_progression_system.lua") -Raw
+$heroSummon = Get-Content (Join-Path $root "scripts\vscripts\systems\hero_summon_system.lua") -Raw
+$heroSkills = Get-Content (Join-Path $root "scripts\vscripts\systems\hero_skill_system.lua") -Raw
 $builderStages = Get-Content (Join-Path $root "scripts\vscripts\config\generated\builder_ability_stages.lua") -Raw
 
 function Check($condition, $message) {
@@ -37,5 +39,20 @@ Check ($builderStages.Contains('ability_name = "ability_build_wall"')) "ALT_FIX_
 Check ($builderStages.Contains('ability_name = "ability_build_main_city"')) "ALT_FIX_MAIN_CITY_NOT_STAGE_MANAGED"
 Check ($builderStages.Contains('ability_name = "ability_build_arrow_tower"')) "ALT_FIX_ARROW_TOWER_NOT_STAGE_MANAGED"
 Check ($builderStages.Contains('ability_name = "ability_build_gold_mine"')) "ALT_FIX_GOLD_MINE_NOT_STAGE_MANAGED"
+Check (-not $heroSummon.Contains('require("core/ability_utils")')) "ALT_FIX_SUMMON_ABILITY_UTILS_DEPENDENCY_PRESENT"
+Check (-not $heroSummon.Contains("ability_utils.remove_all(unit)")) "ALT_FIX_SUMMON_REMOVE_ALL_PRESENT"
+Check ($heroSummon.Contains("local function preserve_and_hide_native_abilities(unit)")) "ALT_FIX_SUMMON_PRESERVE_POLICY_MISSING"
+Check ($heroSummon.Contains("ability:SetHidden(true)")) "ALT_FIX_SUMMON_NATIVE_HIDE_MISSING"
+Check ($heroSummon.Contains("ability:SetActivated(false)")) "ALT_FIX_SUMMON_NATIVE_DISABLE_MISSING"
+Check ($heroSummon.Contains("preserve_and_hide_native_abilities(unit)")) "ALT_FIX_SUMMON_POLICY_CALL_MISSING"
+Check (-not $heroSkills.Contains("ability_utils.remove_all(state.unit)")) "ALT_FIX_SKILL_SYNC_REMOVE_ALL_PRESENT"
+Check (-not $heroSkills.Contains("ability_utils.remove_all_except")) "ALT_FIX_SKILL_SYNC_REMOVE_ALL_EXCEPT_PRESENT"
+Check ($heroSkills.Contains("local function remove_unowned_custom_abilities(state)")) "ALT_FIX_SKILL_SYNC_MANAGED_CLEANUP_MISSING"
+Check ($heroSkills.Contains("for _, definition in ipairs(skills.rows or {}) do")) "ALT_FIX_SKILL_SYNC_MANAGED_WHITELIST_MISSING"
+Check (-not $heroSkills.Contains('require("core/ability_utils")')) "ALT_FIX_SKILL_SYNC_ABILITY_UTILS_DEPENDENCY_PRESENT"
+Check ($heroSkills.Contains("local function preserve_native_abilities(unit)")) "ALT_FIX_SKILL_SYNC_PRESERVE_POLICY_MISSING"
+Check ($heroSkills.Contains("ability:SetHidden(true)")) "ALT_FIX_SKILL_SYNC_NATIVE_HIDE_MISSING"
+Check ($heroSkills.Contains("ability:SetActivated(false)")) "ALT_FIX_SKILL_SYNC_NATIVE_DISABLE_MISSING"
+Check ($heroSkills.Contains("preserve_native_abilities(state.unit)")) "ALT_FIX_SKILL_SYNC_POLICY_CALL_MISSING"
 
 Write-Host "ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK"

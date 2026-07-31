@@ -528,7 +528,58 @@ local function list_skills(context)
     return true
 end
 
-local function set_test_skill_points(context)
+local function find_owned_skill(snapshot, skill_id)
+    for _, item in ipairs(snapshot and snapshot.skills or {}) do
+        if tostring(item.skill_id or "") == skill_id then
+            return item
+        end
+    end
+    return nil
+end
+
+local function add_test_skill(context)
+    local skill_id = tostring(context.args[1] or "")
+    if skill_id ~= "" then
+        local current = event_bus.request(
+            events.HERO_SKILL_STATE_GET_REQUEST,
+            { player_id = context.player_id }
+        )
+        if not current or not current.ok
+            or not current.snapshot
+            or current.snapshot.hero_ready ~= 1 then
+            return false, current and current.error or "combat_hero_not_ready"
+        end
+        local owned = find_owned_skill(current.snapshot, skill_id)
+        if owned then
+            notify(
+                context,
+                tostring(owned.display_name or skill_id)
+                    .. " 已拥有，当前 Lv." .. tostring(owned.level or 1)
+            )
+            return true
+        end
+        local result = event_bus.request(
+            events.HERO_SKILL_GRANT_REQUEST,
+            {
+                player_id = context.player_id,
+                skill_id = skill_id,
+                levels = 1,
+                source = "cheat_addskill",
+            }
+        )
+        if not result or not result.ok then
+            return false, result and result.error or "skill_grant_failed"
+        end
+        local granted = find_owned_skill(result.snapshot, skill_id)
+        notify(
+            context,
+            "已获得技能："
+                .. tostring(granted and granted.display_name or skill_id)
+                .. " Lv." .. tostring(result.level or 1)
+        )
+        return true
+    end
+
     local result = event_bus.request(
         events.HERO_SKILL_POINT_SET_REQUEST,
         { player_id = context.player_id, points = 10 }
@@ -559,7 +610,7 @@ local COMMANDS = {
     skilloffer = skill_offer,
     skillchoose = skill_choose,
     skills = list_skills,
-    addskill = set_test_skill_points,
+    addskill = add_test_skill,
     additem = weapon_cheats.add_item,
     items = weapon_cheats.list_items,
     givegrowthsword = weapon_cheats.give_growth_sword,
