@@ -1,4 +1,4 @@
-﻿local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
+local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
 
 local function configure_survival_launch_rules()
     local game_mode = GameRules:GetGameModeEntity()
@@ -56,7 +56,7 @@ local scheduler = require("core/scheduler")
 local logger = require("core/logger")
 local combat_bootstrap = require("bootstrap/combat_bootstrap")
 print("[SURVIVAL_FINGERPRINT] addon_game_mode=20260730_skill_grant_transaction")
-local ability_utils = require("core/ability_utils")
+local hero_ability_policy = require("core/hero_ability_policy")
 local unit_display_names = require("config/generated/unit_display_names")
 local seven_sins_essences = require("config/seven_sins_essences")
 
@@ -252,7 +252,7 @@ local function initialize_survival_hero(hero)
     ready_hero_entindex_by_player[player_id] = hero_entindex
     replacing_forced_hero[player_id] = nil
 
-    ability_utils.remove_all(hero)
+    hero_ability_policy.apply(hero)
     hero:SetGold(0, false)
     local display = (unit_display_names.by_id or {})[unit_name]
     if display and display.enabled ~= false then
@@ -496,17 +496,7 @@ function M.precache(context)
     hero_cosmetic_service.precache(context)
 end
 
-function M.activate()
-    if initialized then
-        return
-    end
-    initialized = true
-    replacing_forced_hero = {}
-    ready_hero_entindex_by_player = {}
-
-    event_bus.reset()
-    configure_game_rules()
-    scheduler.init()
+local function initialize_services()
     asset_preload_service.init()
     unit_health_bar_service.init()
     combat_bootstrap.init()
@@ -563,6 +553,20 @@ function M.activate()
     wave_system.init()
     shop_system.init()
     cheat_command_service.init()
+end
+
+function M.activate()
+    if initialized then
+        return
+    end
+    initialized = true
+    replacing_forced_hero = {}
+    ready_hero_entindex_by_player = {}
+
+    event_bus.reset()
+    configure_game_rules()
+    scheduler.init()
+    initialize_services()
 
     ListenToGameEvent(
         "game_rules_state_change",
