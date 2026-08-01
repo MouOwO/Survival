@@ -696,7 +696,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "skywrath_mage_arcane_bolt"
-    "MaxLevel"           "3"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 

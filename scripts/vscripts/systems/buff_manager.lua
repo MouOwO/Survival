@@ -69,7 +69,11 @@ function M.apply(caster, target, buff_id, options)
     )
     local modifier = find(target, buff_id)
     if modifier and not modifier:IsNull() then
-        modifier:ApplyManaged(value, duration, max_stacks)
+        if modifier.RefreshManaged then
+            modifier:RefreshManaged(value, duration, max_stacks)
+        else
+            modifier:ApplyManaged(value, duration, max_stacks)
+        end
         return modifier
     end
 

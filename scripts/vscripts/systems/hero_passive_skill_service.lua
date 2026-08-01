@@ -10,6 +10,12 @@ local M = {}
 local processed_attacks = {}
 local effect_sequence = 0
 local refresh_tokens = {}
+local active_arcane_barrages = {}
+local arcane_barrage_sequence = 0
+
+local ARCANE_EXPLOSION_PARTICLE =
+    "particles/basic_explosion/basic_explosion.vpcf"
+local ARCANE_MAX_HULL_RADIUS = 256
 
 local function valid(unit)
     return unit and not unit:IsNull()
@@ -21,6 +27,23 @@ end
 
 local function copy_position(position)
     return Vector(position.x, position.y, position.z)
+end
+
+local function unit_key(unit)
+    if not valid(unit) or not unit.entindex then return nil end
+    return tostring(unit:entindex())
+end
+
+local function arcane_barrage_locked(attacker_key)
+    local active = attacker_key and active_arcane_barrages[attacker_key] or nil
+    if not active then return false end
+    local current_time = GameRules and GameRules.GetGameTime
+        and GameRules:GetGameTime() or 0
+    if current_time >= (tonumber(active.unlock_at) or math.huge) then
+        active_arcane_barrages[attacker_key] = nil
+        return false
+    end
+    return true
 end
 
 local function level_value(definition, field, level, fallback)
@@ -71,6 +94,34 @@ local function enemies_in_radius(attacker, position, radius)
         DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
         FIND_CLOSEST, false
     ) or {}
+end
+
+local function enemies_touching_radius(attacker, position, radius)
+    local result = {}
+    if not valid(attacker) or not FindUnitsInRadius then return result end
+    radius = math.max(1, tonumber(radius) or 1)
+    local search_radius = radius + ARCANE_MAX_HULL_RADIUS
+    local candidates = FindUnitsInRadius(
+        attacker:GetTeamNumber(), position, nil, search_radius,
+        DOTA_UNIT_TARGET_TEAM_ENEMY,
+        DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+        DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+        FIND_ANY_ORDER, false
+    ) or {}
+    for _, enemy in ipairs(candidates) do
+        if alive(enemy) then
+            local enemy_position = enemy:GetAbsOrigin()
+            local dx = enemy_position.x - position.x
+            local dy = enemy_position.y - position.y
+            local hull_radius = enemy.GetHullRadius
+                and math.max(0, tonumber(enemy:GetHullRadius()) or 0) or 0
+            local hit_radius = radius + hull_radius
+            if dx * dx + dy * dy <= hit_radius * hit_radius then
+                result[#result + 1] = enemy
+            end
+        end
+    end
+    return result
 end
 
 local function unit_position(unit)
@@ -443,19 +494,132 @@ end
 
 local function run_arcane(context, definition)
     local position = unit_position(context.target)
-    if not position then return end
-    local targets = enemies_in_radius(context.attacker, position,
-        level_value(definition, "search_radius", context.level))
-    local maximum = level_value(definition, "max_targets", context.level)
-    while #targets > maximum do table.remove(targets) end
-    deal_group(context, targets, definition.damage_multiplier[context.level], false)
-    if context.level >= 2 then
-        local effect = definition.level_effects[context.level]
-        for _, unit in ipairs(targets) do
-            apply_effect(context.attacker, unit, "skill_vulnerability",
-                effect.vulnerability_pct, effect.duration, context.skill_id)
+    local attacker_key = unit_key(context.attacker)
+    if not position or not attacker_key or arcane_barrage_locked(attacker_key) then
+        return false
+    end
+    position = copy_position(position)
+
+    local landing_radius = level_value(definition, "landing_radius", context.level)
+    local missile_count = math.max(1, math.floor(
+        level_value(definition, "missile_count", context.level) + 0.001
+    ))
+    local explosion_radius = level_value(definition, "explosion_radius", context.level)
+    local barrage_count = math.max(1, math.floor(
+        level_value(definition, "barrage_count", context.level) + 0.001
+    ))
+    local barrage_interval = level_value(definition, "barrage_interval", context.level)
+    local missile_window = level_value(definition, "missile_window", context.level)
+    local damage_multiplier = level_value(definition, "damage_multiplier", context.level)
+    local total_missiles = missile_count * barrage_count
+    local cast_duration = (barrage_count - 1) * barrage_interval + missile_window
+    local current_time = GameRules and GameRules.GetGameTime
+        and GameRules:GetGameTime() or 0
+
+    arcane_barrage_sequence = arcane_barrage_sequence + 1
+    local token = arcane_barrage_sequence
+    active_arcane_barrages[attacker_key] = {
+        token = token,
+        remaining_missiles = total_missiles,
+        unlock_at = current_time + cast_duration + 0.25,
+    }
+
+    local function random_landing_position()
+        local angle = RandomFloat(0, math.pi * 2)
+        local distance = math.sqrt(RandomFloat(0, 1)) * landing_radius
+        local landing_position = position + Vector(
+            math.cos(angle) * distance,
+            math.sin(angle) * distance,
+            0
+        )
+        if GetGroundPosition then
+            landing_position = GetGroundPosition(landing_position, nil)
+        end
+        return landing_position
+    end
+
+    local function finish_missile()
+        local active = active_arcane_barrages[attacker_key]
+        if not active or active.token ~= token then return end
+        active.remaining_missiles = active.remaining_missiles - 1
+        if active.remaining_missiles <= 0 then
+            active_arcane_barrages[attacker_key] = nil
         end
     end
+
+    local function impact(landing_position)
+        if valid(context.attacker) then
+            local visual_ok, visual_error = pcall(function()
+                local explosion = ParticleManager:CreateParticle(
+                    ARCANE_EXPLOSION_PARTICLE,
+                    PATTACH_WORLDORIGIN,
+                    context.attacker
+                )
+                ParticleManager:SetParticleControl(explosion, 0, landing_position)
+                ParticleManager:SetParticleControl(
+                    explosion, 1, Vector(explosion_radius, 0, 0)
+                )
+                ParticleManager:ReleaseParticleIndex(explosion)
+            end)
+            if not visual_ok then
+                print("[HeroPassiveSkill] arcane barrage explosion failed: "
+                    .. tostring(visual_error))
+            end
+
+            local damage_ok, damage_error = pcall(function()
+                deal_group(
+                    context,
+                    enemies_touching_radius(
+                        context.attacker,
+                        landing_position,
+                        explosion_radius
+                    ),
+                    damage_multiplier,
+                    false
+                )
+            end)
+            if not damage_ok then
+                print("[HeroPassiveSkill] arcane barrage damage failed: "
+                    .. tostring(damage_error))
+            end
+        end
+        finish_missile()
+    end
+
+    local impacts = {}
+    for barrage = 1, barrage_count do
+        local barrage_delay = (barrage - 1) * barrage_interval
+        for missile = 1, missile_count do
+            local missile_delay = (missile / missile_count) * missile_window
+            local impact_delay = barrage_delay + missile_delay
+            impacts[#impacts + 1] = {
+                delay = impact_delay,
+                position = random_landing_position(),
+            }
+        end
+    end
+    table.sort(impacts, function(a, b) return a.delay < b.delay end)
+    local next_impact = 1
+    local function run_next_impact()
+        local current = impacts[next_impact]
+        if not current then return false end
+        impact(current.position)
+        next_impact = next_impact + 1
+        local following = impacts[next_impact]
+        if not following then return false end
+        local now = GameRules and GameRules.GetGameTime
+            and GameRules:GetGameTime() or current_time
+        return math.max(0, current_time + following.delay - now)
+    end
+    scheduler.after(impacts[1].delay, run_next_impact)
+    scheduler.after(cast_duration + 0.5, function()
+        local active = active_arcane_barrages[attacker_key]
+        if active and active.token == token then
+            active_arcane_barrages[attacker_key] = nil
+            print("[HeroPassiveSkill] arcane barrage lock released by failsafe")
+        end
+    end)
+    return true
 end
 
 local function run_shadow(context, definition)
@@ -561,7 +725,7 @@ local runners = {
 local function trigger(payload, skill_id, level, attributes, target_position)
     local definition = definitions.by_id[skill_id]
     local runner = runners[skill_id]
-    if not definition or not runner then return end
+    if not definition or not runner then return false end
     local context = {
         player_id = payload.player_id,
         attacker = payload.attacker,
@@ -583,12 +747,16 @@ local function trigger(payload, skill_id, level, attributes, target_position)
         attribute_snapshot = attributes,
         is_secondary_effect = false,
     })
-    runner(context, definition)
+    return runner(context, definition) ~= false
 end
 
 local function roll(payload, skill_id, level, attributes, target_position)
     local definition = definitions.by_id[skill_id]
     if not definition then return false end
+    if skill_id == "proto_arcane_barrage" then
+        local attacker_key = unit_key(payload.attacker)
+        if arcane_barrage_locked(attacker_key) then return false end
+    end
     local chance = definition.trigger_chance[level]
     event_bus.emit(events.HERO_PASSIVE_SKILL_ROLL_REQUESTED, {
         player_id = payload.player_id,
@@ -598,8 +766,7 @@ local function roll(payload, skill_id, level, attributes, target_position)
         trigger_chance = chance,
     })
     if RandomFloat(0, 1) >= chance then return false end
-    trigger(payload, skill_id, level, attributes, target_position)
-    return true
+    return trigger(payload, skill_id, level, attributes, target_position)
 end
 
 local function on_main_attack(payload)
@@ -631,6 +798,8 @@ function M.init()
     definitions.validate()
     processed_attacks = {}
     refresh_tokens = {}
+    active_arcane_barrages = {}
+    arcane_barrage_sequence = 0
     effect_sequence = 0
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_main_attack)
 end
@@ -638,6 +807,8 @@ end
 M._test = {
     attribute_snapshot = attribute_snapshot,
     vulnerability_pct = vulnerability_pct,
+    enemies_touching_radius = enemies_touching_radius,
+    active_arcane_barrages = function() return active_arcane_barrages end,
     runners = runners,
 }
 

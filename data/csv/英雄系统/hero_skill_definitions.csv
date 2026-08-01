@@ -8,7 +8,7 @@ proto_poison_cloud,ability_survival_poison_cloud,毒云·被动,主攻击命中�
 proto_blade_nova,ability_survival_blade_nova,剑刃震荡·被动,主攻击命中时概率对英雄周围造成伤害。,passive,3,100,1,,0,passive_proc,,juggernaut_blade_fury,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_earth_line,ability_survival_earth_line,地裂冲击·被动,主攻击命中时概率产生直线地裂。,passive,3,100,1,,0,passive_proc,,earthshaker_fissure,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_meteor,ability_survival_meteor,陨石坠落·被动,主攻击命中时概率延迟轰击记录位置。,passive,3,100,1,,0,passive_proc,,invoker_chaos_meteor,1,运行时效果见config/hero_passive_skill_definitions.lua。
-proto_arcane_barrage,ability_survival_arcane_barrage,奥术弹幕·被动,主攻击命中时概率攻击多个不同目标。,passive,3,100,1,,0,passive_proc,,skywrath_mage_arcane_bolt,1,运行时效果见config/hero_passive_skill_definitions.lua。
+proto_arcane_barrage,ability_survival_arcane_barrage,奥术弹幕·被动,主攻击命中时有10%概率对目标区域释放持续飞弹轰击，每颗飞弹造成全属性范围纯粹伤害。,passive,5,100,1,,0,passive_proc,,skywrath_mage_arcane_bolt,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_shadow_blast,ability_survival_shadow_blast,暗影爆裂·被动,主攻击直接击杀时概率触发。,passive,3,100,1,,0,passive_proc,,nevermore_shadowraze1,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_holy_pulse,ability_survival_holy_pulse,圣光震荡·被动,主攻击命中时概率对英雄周围造成伤害。,passive,3,100,1,,0,passive_proc,,omniknight_purification,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_ice_cone,ability_survival_ice_cone,寒冰锥·被动,主攻击命中时概率产生锥形三围伤害。,passive,3,100,1,,0,passive_proc,,drow_ranger_wave_of_silence,1,运行时效果见config/hero_passive_skill_definitions.lua。

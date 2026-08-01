@@ -14,14 +14,15 @@ local function definition(buff_id)
     return (definitions.by_id or {})[buff_id]
 end
 
-local function affects_attack_speed(modifier)
+local function affects_combat_stats_ui(modifier)
     local effect_type = modifier.definition and modifier.definition.effect_type
     return effect_type == "attack_speed_bonus"
         or effect_type == "attack_speed_pct"
+        or effect_type == "base_damage_outgoing_pct"
 end
 
 local function publish_combat_stats_changed(modifier, reason, deferred)
-    if not affects_attack_speed(modifier) then return end
+    if not affects_combat_stats_ui(modifier) then return end
     local parent = modifier:GetParent()
     if not parent or parent:IsNull() then return end
     local entindex = parent:entindex()
@@ -93,7 +94,7 @@ function modifier_survival_managed_buff:OnCreated(params)
             tonumber(params and params.managed_max_stacks)
                 or tonumber(self.definition.max_stacks) or 1
         )
-        -- 等引擎完成本 Modifier 的属性重算后再读取当前攻速。
+        -- 等引擎完成本 Modifier 的属性重算后再读取当前战斗属性。
         publish_combat_stats_changed(self, "managed_buff_applied", true)
     end
 end
@@ -110,12 +111,22 @@ end
 
 function modifier_survival_managed_buff:OnRefresh(params)
     if not IsServer() then return end
-    self:ApplyManaged(
+    self:RefreshManaged(
         tonumber(params and params.managed_value) or self.value,
         tonumber(params and params.managed_duration) or 0,
         tonumber(params and params.managed_max_stacks)
             or tonumber(self.definition.max_stacks) or 1
     )
+end
+
+function modifier_survival_managed_buff:RefreshManaged(value, duration, max_stacks)
+    if not IsServer() then return end
+    self:ApplyManaged(
+        value,
+        duration,
+        max_stacks
+    )
+    publish_combat_stats_changed(self, "managed_buff_refreshed", true)
 end
 
 function modifier_survival_managed_buff:ApplyManaged(value, duration, max_stacks)

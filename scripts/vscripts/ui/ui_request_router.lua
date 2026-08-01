@@ -44,6 +44,25 @@ local function effective_attack_speed(unit)
             safe_number(unit, "GetBaseAttackTime", 2)))
 end
 
+local function base_damage_outgoing_pct(unit)
+    if not unit or type(unit.FindAllModifiersByName) ~= "function" then return 0 end
+    local ok, modifiers = pcall(
+        unit.FindAllModifiersByName,
+        unit,
+        "modifier_survival_managed_buff"
+    )
+    if not ok or type(modifiers) ~= "table" then return 0 end
+    local total = 0
+    for _, modifier in ipairs(modifiers) do
+        if modifier and not modifier:IsNull()
+            and modifier.definition
+            and modifier.definition.effect_type == "base_damage_outgoing_pct" then
+            total = total + (tonumber(modifier.value) or 0)
+        end
+    end
+    return total
+end
+
 local function unit_combat_snapshot(unit)
     local strength = safe_number(unit, "GetStrength", 0)
     local agility = safe_number(unit, "GetAgility", 0)
@@ -54,6 +73,13 @@ local function unit_combat_snapshot(unit)
         or safe_number(unit, "GetDamageMax", nil)
     if attack_min == nil then attack_min = safe_number(unit, "GetBaseDamageMin", 0) end
     if attack_max == nil then attack_max = safe_number(unit, "GetBaseDamageMax", attack_min) end
+    -- BASEDAMAGEOUTGOING_PERCENTAGE changes attack resolution but is not
+    -- guaranteed to be included in GetDamageMin/Max or project-owned caches.
+    -- Apply it explicitly to the non-hero selected-unit display snapshot.
+    local outgoing_pct = base_damage_outgoing_pct(unit)
+    local outgoing_multiplier = math.max(0, 1 + outgoing_pct / 100)
+    attack_min = attack_min * outgoing_multiplier
+    attack_max = attack_max * outgoing_multiplier
     local internal_name = (unit.GetUnitName and unit:GetUnitName()) or ""
     local configured_name = (unit_display_names.by_id or {})[internal_name]
     local display_name = unit.survival_display_name
@@ -78,6 +104,7 @@ local function unit_combat_snapshot(unit)
         max_mana = safe_number(unit, "GetMaxMana", 0),
         attack_min = attack_min,
         attack_max = attack_max,
+        base_damage_outgoing_pct = outgoing_pct,
         -- 必须读取包含 Modifier 加减值的当前有效护甲；基础护甲和配置缓存
         -- 无法反映攻击减甲科技的实时叠层。
         runtime_armor = safe_number(unit, "GetPhysicalArmorValue", nil, false)
