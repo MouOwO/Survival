@@ -1,5 +1,5 @@
 local M = {
-    -- 与 grid_placement_config 保持一致：2x2 建筑总占地为 128x128。
+    -- 与 grid_placement_config 保持一致：每格为 64 码；具体占地由建筑配置决定。
     cell_size = 64,
     build_z = 128,
     build_bounds = {

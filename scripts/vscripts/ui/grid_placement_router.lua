@@ -240,7 +240,7 @@ local function register_profile_request()
                 profiles = profile_list(),
                 cell_size = tonumber(grid_config.cell_size) or 64,
                 preview_visual = grid_config.preview_visual or {},
-                version = "GridPlacement_V2.1_FootprintOnly2x2",
+                version = "GridPlacement_V2.2_PerBuildingFootprint",
             })
         end
     )

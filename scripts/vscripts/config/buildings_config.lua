@@ -74,6 +74,8 @@ local function level_rows(building_id)
                 prerequisite_text = row.prerequisite_text,
                 model_name = row.model_name,
                 model_asset_id = visual and visual.model_asset_id or nil,
+                model_scale = visual and visual.model_scale or nil,
+                model_yaw = visual and visual.model_yaw or nil,
                 add_population = row.population_add,
                 wood_cost = row.wood_cost or 0,
                 gold_cost = row.gold_cost or 0,
@@ -100,7 +102,7 @@ M.wall = {
     id = "wall", display_name = configured_name("wall", "城墙"),
     unit_name = configured_unit_name("wall", "building_wall"),
     build_cost = build_cost("building_wall", 100, 0),
-    footprint = { x = 2, y = 2 }, max_count = 1, build_once = true,
+    footprint = { x = 4, y = 4 }, max_count = 1, build_once = true,
     show_health_bar = true, selectable = true,
     abilities = { "ability_upgrade_wall" }, levels = wall_levels,
 }

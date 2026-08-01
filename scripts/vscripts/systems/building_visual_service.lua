@@ -254,8 +254,17 @@ function M.apply(unit, data)
     unit:SetOriginalModel(model_path)
     reset_main_animation(unit, asset)
     apply_bodygroups(unit, asset)
-    if asset and tonumber(asset.model_scale) then
-        unit:SetModelScale(tonumber(asset.model_scale))
+    local model_scale = tonumber(data and data.model_scale)
+        or (asset and tonumber(asset.model_scale))
+    if model_scale then
+        unit:SetModelScale(model_scale)
+    end
+    local model_yaw = tonumber(data and data.model_yaw)
+        or (asset and tonumber(asset.model_yaw))
+    if model_yaw then
+        -- Set an absolute yaw so upgrades and async visual refreshes are
+        -- idempotent instead of adding another 180 degrees on every apply.
+        safe_call(unit, "SetAngles", 0, model_yaw, 0)
     end
     if asset and tonumber(asset.model_skin) then
         safe_call(unit, "SetSkin", tonumber(asset.model_skin))
