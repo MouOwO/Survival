@@ -483,6 +483,56 @@ function M.precache(context)
         "particles/basic_explosion/basic_explosion.vpcf",
         context
     )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_huskar/huskar_burning_spear_debuff.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/basic_projectile/basic_projectile.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/basic_projectile/basic_projectile_explosion.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_tiny/tiny_avalanche.vpcf",
+        context
+    )
     local precached_buff_particles = {}
     for _, row in ipairs(buff_definitions.rows or {}) do
         local particle = row.enabled ~= false and row.particle_name or nil

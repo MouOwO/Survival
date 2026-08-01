@@ -186,8 +186,10 @@ local function start_encounter(payload)
     local minimum_war3_armor = tonumber(
         archetype.minimum_war3_armor or archetype.minimum_armor
     )
+    -- Missing minimum_armor means unrestricted armor reduction. Preserve a
+    -- floor only for archetypes that explicitly opt into one.
     unit.survival_minimum_armor = minimum_war3_armor ~= nil
-        and armor_balance.from_war3(minimum_war3_armor) or 1
+        and armor_balance.from_war3(minimum_war3_armor) or nil
     local attack_speed = tonumber(archetype.attack_speed)
         or tonumber(archetype.base_attack_speed) or 0.5
     attack_speed = math.max(0.01, attack_speed)

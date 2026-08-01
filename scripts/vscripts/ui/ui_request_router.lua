@@ -7,6 +7,7 @@ local unit_display_names = require("config/generated/unit_display_names")
 local research_events = require("research/research_event_names")
 local combat_stat_projection = require("ui/combat_stat_projection")
 local asset_catalog = require("config/asset_catalog")
+local armor_balance = require("config/armor_balance")
 
 local M = {}
 local synthesis_requests = {}
@@ -206,6 +207,21 @@ local function on_unit_combat_stats_changed(payload)
         if tonumber(selected_entindex) == entindex and valid_player_id(player_id) then
             local snapshot = hero_ui_snapshot(player_id, entindex, unit)
                 or combat_stat_projection.for_ui(unit_combat_snapshot(unit))
+            -- Hero snapshots intentionally own stable equipment armor, but
+            -- temporary armor debuffs must show the same effective engine armor
+            -- used by damage resolution without replacing other authoritative
+            -- hero fields.
+            local reason = tostring(payload.reason or "")
+            if reason:match("^poison_cloud_armor_")
+                or reason == "research_armor_reduction" then
+                local runtime_armor = safe_number(
+                    unit, "GetPhysicalArmorValue", 0, false
+                )
+                snapshot.runtime_armor = runtime_armor
+                snapshot.armor = armor_balance.to_war3(runtime_armor)
+                snapshot.armor_unit = "war3_display"
+                snapshot.stat_units_version = 2
+            end
             snapshot.success = 1
             snapshot.reason = payload.reason or "unit_combat_stats_changed"
             snapshot.push_phase = "immediate"

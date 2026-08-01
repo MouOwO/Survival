@@ -63,10 +63,17 @@
    - 技能接管不得再把稠密显示序号直接拼成 `AbilityN`；必须枚举有效官方按钮、按屏幕视觉位置排序，并在完整映射后原子提交。
    - 映射不完整时必须整批恢复官方 UI，禁止保留半项目、半官方状态。
 
-16. **当前 Shell 快照没有独立 Lua/LuaJIT 解释器，测试目录也与历史检查点不同。**
-    - `lua`、`luac`、`luajit` 当前均不在 PATH，常见安装路径也未找到；WSL 探测超时。
-    - 当前 `scripts/vscripts/tests` 只可见原 `test_hero_health_guard.lua` 与新建的 `test_hero_cosmetic_service.lua`，不能沿用旧文档中的 32 项数量声称全量通过。
-    - 本轮使用 VPK/源码 PowerShell 契约和 `git diff --check` 完成可执行验证；Lua 定向测试需在恢复解释器后补跑，或由 Workshop Tools 实际加载验证。
+16. **Lua 5.1 编译器存在，但不一定在 PATH。**
+    - 权威路径为 `C:\msys64\mingw64\bin\luac5.1.exe`，已验证为 Lua 5.1.5。
+    - `lua`、`luac`、`luajit` 在 PATH 中无结果不代表没有语法检查器；后续必须优先探测上述绝对路径。
+    - 使用 `luac5.1 -p <file.lua>` 做语法检查；成功通常没有输出，以退出代码0为准。
+    - Luac只能证明Lua 5.1语法可解析，不能替代Dota API、Scheduler、粒子、伤害和UI的Workshop Tools实机验证。
+
+17. **召唤英雄的攻击射程写入与读取接口不对称。**
+    - `hero_stat_adapter.lua`使用`Script_SetAttackRange(attack_range)`应用英雄CSV配置，但实机确认同一单位的`GetAttackRange()`可能返回0；英雄仍能正常普通攻击，因此0不是权威实际射程。
+    - 依赖攻击射程的功能不得只调用`GetAttackRange()`；魔法弹弓当前依次兼容`survival_attack_range`、`Script_GetAttackRange()`、`GetAttackRange()`和`hero_definitions.attack_range`，取最大有效值。
+    - 设置配置射程时必须同步保存`unit.survival_attack_range`。即使全部射程来源异常为0，本次已经合法命中的敌方主目标也不得被目标查询提前丢弃。
+    - 该问题曾表现为`MAGIC_SLINGSHOT_ROLL success=true`后紧跟`reason=no_targets range=0 primary=<entindex>`；修复后实机为`range=3000 selected=1 launched=1`。
 
 14. **项目技能 cell 曾继承 Valve 动态按钮尺寸，第一版固定尺寸仍偏大。**
    - 实机确认 1～2 个技能时图标较大、7 个技能时图标较小。

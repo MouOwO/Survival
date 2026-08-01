@@ -190,8 +190,10 @@ local function apply_combat_stats(unit, archetype)
     local minimum_war3_armor = tonumber(
         archetype.minimum_war3_armor or archetype.minimum_armor
     )
+    -- Only explicitly configured archetypes have an armor floor. A default
+    -- floor would silently block hero research armor reduction on normal mobs.
     unit.survival_minimum_armor = minimum_war3_armor ~= nil
-        and armor_balance.from_war3(minimum_war3_armor) or 1
+        and armor_balance.from_war3(minimum_war3_armor) or nil
     local attack_speed = math.max(0.01, tonumber(archetype.attack_speed) or 1)
     unit:SetBaseAttackTime(1 / attack_speed)
     unit.survival_attack_speed = attack_speed

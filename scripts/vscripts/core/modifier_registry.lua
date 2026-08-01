@@ -49,6 +49,10 @@ local modifiers = {
         path = "modifiers/modifier_hero_passive_skill_effects",
     },
     {
+        name = "modifier_hero_poison_cloud_armor",
+        path = "modifiers/modifier_hero_poison_cloud_armor",
+    },
+    {
         name = "modifier_weapon_attack_tracker",
         path = "modifiers/modifier_weapon_attack_tracker",
     },

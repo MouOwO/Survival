@@ -2,12 +2,22 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local builder = require("ui/ability_runtime_builder")
 local ability_utils = require("core/ability_utils")
+local hero_skill_definitions = require("config/generated/hero_skill_definitions")
+local hero_passive_definitions = require("config/hero_passive_skill_definitions")
+local hero_skill_tooltip = require("ui/hero_skill_tooltip_view_model")
 
 local M = {}
 
 local state_by_unit = {}
 local ability_keys_by_unit = {}
 local tower_trace_by_ability = {}
+local hero_skill_by_ability = {}
+
+for _, definition in ipairs(hero_skill_definitions.rows or {}) do
+    if definition.ability_name and definition.ability_name ~= "" then
+        hero_skill_by_ability[definition.ability_name] = definition
+    end
+end
 
 local function is_tower_upgrade(ability_name)
     return ability_name == "ability_upgrade_tower"
@@ -161,6 +171,31 @@ local function publish(state)
             state,
             resource_state
         )
+        local hero_skill = hero_skill_by_ability[ability_name]
+        local passive = hero_skill and (
+            hero_skill.skill_id == "proto_flame_burst"
+                or hero_skill.skill_id == "proto_ice_cone"
+                or hero_skill.skill_id == "proto_magic_slingshot"
+                or hero_skill.skill_id == "proto_frost_nova"
+                or hero_skill.skill_id == "proto_poison_cloud"
+        )
+            and hero_passive_definitions.by_id[hero_skill.skill_id] or nil
+        if passive then
+            local current_level = math.max(1, math.min(
+                tonumber(passive.max_level) or 1,
+                tonumber(ability:GetLevel()) or 1
+            ))
+            runtime.current_level = current_level
+            runtime.fields = runtime.fields or {}
+            for _, row in ipairs(hero_skill_tooltip.level_rows(
+                passive, tonumber(passive.max_level) or current_level
+            )) do
+                runtime.fields[#runtime.fields + 1] = {
+                    label = "LV" .. tostring(row.level),
+                    value = row.effect,
+                }
+            end
+        end
         runtime.ability_name = ability_name
         runtime.owner_entindex = unit_key
         runtime.ability_entindex = ability:entindex()

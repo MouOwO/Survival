@@ -112,8 +112,10 @@ local function apply_stats(unit, row, definition)
     local minimum_war3_armor = tonumber(
         definition.minimum_war3_armor or definition.minimum_armor
     )
+    -- Normal wave definitions generally omit minimum_armor and must remain
+    -- reducible. Explicit floors (for specially configured enemies) remain.
     unit.survival_minimum_armor = minimum_war3_armor ~= nil
-        and armor_balance.from_war3(minimum_war3_armor) or 1
+        and armor_balance.from_war3(minimum_war3_armor) or nil
     unit:SetBaseMoveSpeed(definition.move_speed or 250)
     -- attack_speed 表示每秒攻击次数；Dota 引擎需要基础攻击间隔。
     local attack_speed = tonumber(row.attack_speed) or 0.5

@@ -17,6 +17,11 @@ local function create_ability_class()
         return true
     end
 
+    function ability_class:OnProjectileHit_ExtraData(target, location, extra_data)
+        local service = require("systems/hero_passive_skill_service")
+        return service.on_tracking_projectile_hit(self, target, location, extra_data)
+    end
+
     return ability_class
 end
 

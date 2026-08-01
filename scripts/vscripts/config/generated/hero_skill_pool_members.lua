@@ -10,7 +10,7 @@ M.rows = {
     { pool_member_id = "public_06", pool_id = "public_pool", skill_id = "proto_earth_line", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
     { pool_member_id = "public_07", pool_id = "public_pool", skill_id = "proto_meteor", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
     { pool_member_id = "public_08", pool_id = "public_pool", skill_id = "proto_arcane_barrage", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
-    { pool_member_id = "public_09", pool_id = "public_pool", skill_id = "proto_shadow_blast", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
+    { pool_member_id = "public_09", pool_id = "public_pool", skill_id = "proto_magic_slingshot", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
     { pool_member_id = "public_10", pool_id = "public_pool", skill_id = "proto_holy_pulse", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
     { pool_member_id = "public_11", pool_id = "public_pool", skill_id = "proto_ice_cone", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
     { pool_member_id = "public_12", pool_id = "public_pool", skill_id = "proto_void_pulse", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },

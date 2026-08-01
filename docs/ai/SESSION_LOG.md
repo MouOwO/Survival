@@ -2,11 +2,102 @@
 
 > 仅追加关键检查点。记录研究过程，而不只是任务完成后的总结。
 
+## 2026-08-01 — 英雄科技19级攻击减甲结算与UI修复
+
+- 用户反馈`researcher_hero_armor_reduction_19`已完成但敌方实际护甲和自定义UI均未降低。完整链路确认配置无误：CSV/生成配置19级累计9.5 War3显示护甲，旧科技`ARS-09`通过`war3_hero_armor_shred_flat`累计，并由`armor_balance.from_war3`换算为每击约3.1667 Dota底层护甲后写入英雄`modifier_research_technology`；普攻命中及目标减甲Modifier注册也正常。
+- 实际结算根因：波次、遭遇和挑战生成入口在怪物未配置`minimum_armor`时默认写入`survival_minimum_armor=1`，等价于3点自定义显示护甲。减甲Modifier严格执行该下限，导致显示2/3护甲的前期怪完全不能降低，显示4护甲也最多降到3；`addmonster`同样硬编码该下限。现改为缺省`nil`，仅显式配置下限的特殊单位继续受限，树木规则未改。
+- UI根因：科技事件在`SetStackCount`同一调用栈同步派发，可能让`GetPhysicalArmorValue(false)`读取引擎旧值；同时项目英雄权威快照只对毒云覆盖实时护甲，`research_armor_reduction`会被稳定装备护甲隐藏。现将科技刷新延迟到下一Scheduler帧，并将该原因纳入实时有效护甲字段覆盖，其他英雄权威属性保持不变。
+- 验证：新增Lua状态测试覆盖19级换算后的累计减甲、无隐式下限、负护甲、显式下限与事件去重；契约测试锁定配置、换算、三个怪物入口、调试怪、Modifier注册和UI分流。`RESEARCH_ARMOR_REDUCTION_STATE_LUA51_PASS`、`RESEARCH_ARMOR_REDUCTION_CONTRACT_PASS`及毒云状态/契约回归通过；修改Lua 5.1语法、严格UTF-8和全局`git diff --check`通过。仍需Workshop Tools冷启动确认每击UI减少9.5且物理伤害同步提高。
+
+## 2026-08-01 — 毒云LV2减甲选中单位UI刷新修复
+
+- 后续冷启动实机反馈确认补发事件后护甲仍未等比例降低。重新追踪真正的自定义UI：`CombatArmorValue`直接消费`ui_selected_unit_stats_snapshot.armor`，事件名、服务端订阅、Panorama接收及普通敌人的版本规则均正确；根因不再是事件路由，而是`MODIFIER_PROPERTY_PHYSICAL_ARMOR_TOTAL_PERCENTAGE`未可靠反映到自定义UI权威读取的`GetPhysicalArmorValue(false)`。
+- 最终修复：毒云Modifier改用项目科技与装备链已验证的`MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS`。每次0.05秒同步读取包含毒云旧修正的当前护甲，加回毒云自身旧减甲得到实时外部护甲，再按层数重算20%/40%/60%的平坦负护甲；其他装备、科技、平A减甲和Buff变化会动态参与，不保存进入时快照。负护甲按绝对值继续向更低方向减少，例如-10的一层结果为-12。
+- 自定义UI边界：普通敌人继续由运行时快照读取有效护甲；若毒云事件目标命中项目英雄权威快照路径，仅覆盖该次快照的`runtime_armor/armor`为当前有效护甲，攻击、攻速和逻辑三维仍保持原子权威值。事件只在层数、比例或实际平坦减甲变化时派发，移除时派发恢复事件。
+- 用户实机反馈：毒云等级2未看到敌方单位护甲减少；用户同时指出若引擎减甲已经生效，则缺口可能是没有派发敌方单位护甲UI刷新事件。
+- 根因确认：敌方普通单位选中面板会在`UNIT_COMBAT_STATS_CHANGED`后通过`GetPhysicalArmorValue(false)`重新读取包含Modifier的实时护甲；科技平A减甲每次变化都会派发该事件，而`modifier_hero_poison_cloud_armor`此前只更新层数与总护甲百分比，创建、叠层和移除均未派发事件，因此面板会停留在旧护甲值。
+- 修复：毒云减甲Modifier在1/2/3层或每层百分比实际变化时延迟到下一Scheduler帧派发`UNIT_COMBAT_STATS_CHANGED`，原因标记为`poison_cloud_armor_changed`；移除时派发`poison_cloud_armor_removed`，使面板读取Modifier已完成变化或销毁后的护甲。0.05秒区域同步重复写入相同层数时不重复派发，避免UI事件洪泛。
+- 验证：Lua状态测试真实执行延迟回调，覆盖三次层数刷新、相同层数去重和移除恢复事件；毒云契约同时锁定UI路由订阅及`GetPhysicalArmorValue(false)`实时读取。`POISON_CLOUD_STATE_LUA51_PASS`、`POISON_CLOUD_CONTRACT_PASS`及爆炎弹、移动冰球、魔法弹弓、寒冰锥、奥术弹幕、addskill回归通过；Lua 5.1语法、严格UTF-8和全局`git diff --check`通过。仍需冷启动实机确认引擎实际护甲与面板同步下降。
+
+## 2026-08-01 — 公共技能“毒云”五级重做实现检查点
+
+- 身份与配置：保留`proto_poison_cloud`/`ability_survival_poison_cloud`及原公共池身份，最高等级由3改为5。LV1/2为12%触发、400固定范围、5秒内第1至第5秒各造成触发时全属性×1纯粹伤害；LV3起20%触发、持续7秒共7次；LV4完整继承。
+- 单云与状态：同一英雄同时只有一个毒云，再次触发立即销毁旧粒子、清理旧区域减甲并在新位置重置完整时序。所有毒云共用一个0.05秒Scheduler任务，整秒伤害按绝对开始时间校正；AOE与死亡判定均使用敌人Hull边缘二维范围。
+- 动态减甲：LV2起每次Tick命中增加1层，最多3层，分别通过专用`modifier_hero_poison_cloud_armor`返回实时总护甲-20%/-40%/-60%。不保存初始护甲快照，因此科技、平A减甲、装备和其他Buff变化会实时参与；离开、毒云替换或到期立即移除Modifier。不同英雄毒云重叠时取最高有效减甲而不相加超过60%。
+- LV5：订阅`ENGINE_ENTITY_KILLED`，死亡瞬间按实际位置重新检查有效毒云，以死亡位置为中心造成300范围、触发时全属性×3纯粹伤害；每个死亡单位去重一次，但爆炸击杀仍在毒云内的敌人可继续连锁。
+- 表现与验证：地面使用毒龙幽冥剧毒`viper_nethertoxin.vpcf`并显式预缓存；死亡反馈使用项目已验证的`basic_explosion.vpcf`。`POISON_CLOUD_STATE_LUA51_PASS`、`POISON_CLOUD_CONTRACT_PASS`及爆炎弹、移动冰球、魔法弹弓、寒冰锥、奥术弹幕、addskill回归通过；相关Lua 5.1语法、严格UTF-8和全局`git diff --check`通过。仍需Workshop Tools冷启动确认粒子控制点、动态总护甲属性、负护甲边界和连锁实机表现。
+
+## 2026-08-01 — 公共技能“爆炎弹”用户实机验收记录
+
+- 用户在实机体验后明确反馈“这个做的也很好”，并要求直接记录。该反馈作为爆炎弹整体效果的正向验收证据；不虚构用户未逐项报告的具体伤害数字或粒子测量结果。
+- 当前`proto_flame_burst`/`ability_survival_flame_burst`五级实现正式固化：15%触发、500范围×4主爆炸、3秒总计×2.2点燃、LV3五层独立生命周期、LV4继承、LV5三颗小火球在200落点范围内同步落地并各自造成250范围×3及点燃。
+- 后续默认不再主动调整爆炎弹数值、点燃替换规则、同步落地逻辑或粒子；只有用户提供新的明确需求或实机问题时才重新打开该技能任务。
+
+## 2026-08-01 — 公共技能“爆炎弹”五级重做实现检查点
+
+- 身份与配置：保留`proto_flame_burst`/`ability_survival_flame_burst`及原公共池身份，显示名改为“爆炎弹·被动”，最高5级。主攻击命中15%触发，主爆炸固定触发时目标位置，对500范围造成触发时全属性×4纯粹伤害。
+- 点燃：LV2起主爆炸命中施加点燃；每层在第1/2/3秒结算，三次总倍率通过末次余数校正确保精确为全属性×2.2。LV2重复点燃替换旧层并重置完整3秒；LV3起最多5层，每层独立保存属性快照、Tick进度和到期时间，第6层替换最早到期层；LV4完整继承。
+- LV5：主爆炸后一次性生成3个中心200半径内的均匀圆形随机落点，同时创建飞行粒子，仅用一个0.5秒Scheduler任务同步落地。每颗小火球分别对250范围造成全属性×3纯粹伤害并增加1层点燃；重叠敌人逐颗承受直接伤害并逐颗增加点燃。
+- 工程与表现：主爆炸和小火球AOE复用实际Hull边缘二维命中；点燃由单个0.05秒共享任务管理，敌人只创建一个持续燃烧视觉。暂用Lina光击阵/龙破斩及Huskar燃烧之矛粒子并显式预缓存，视觉仍需实机调整。
+- 自动验证：`FLAME_BURST_STATE_LUA51_PASS`与`FLAME_BURST_CONTRACT_PASS`通过，覆盖×2.2精确总倍率、LV2替换、五层上限、第6层替换最早层和200随机边界；移动冰球、魔法弹弓、寒冰锥、奥术弹幕、addskill、英雄Ability与原生血条契约全部回归通过，相关Lua 5.1语法、严格UTF-8和`git diff --check`通过。仍需Workshop Tools冷启动实机验收。
+
+## 2026-08-01 — 公共技能“移动冰球”五级重做实现检查点
+
+- 身份与配置：保留公共池`public_02`的`proto_frost_nova`/`ability_survival_frost_nova`，显示名改为“移动冰球·被动”，最高5级；没有覆盖独立的`proto_ice_cone`寒冰锥。源CSV、运行参数、Ability KV、生成技能与Tooltip配置已同步。
+- 运行规则：主攻击命中12%触发；LV1速度360、300范围、每0.5秒触发时全属性×2纯粹伤害；LV2速度540，每颗冰球按不同沿途敌人去重增长5%，最多10层；LV3起范围350并在所有飞行结束情形固定爆炸全属性×3；LV4继承LV3。
+- LV5：最大移动距离为触发时英雄至原攻击目标二维距离的150%，在该范围内随机选择敌人追踪，每实际移动100码使周期基础伤害+10%。目标死亡后锁定其死亡位置且不重新索敌，随后直线飞向该位置；到达死亡位置或耗尽最大距离时爆炸。碰撞和距离成长只影响周期×2，不影响固定×3爆炸。
+- 工程实现：每颗冰球保存触发时逻辑三维快照、当前位置、累计距离、碰撞去重集和追踪状态；所有活动冰球由单个0.05秒共享Scheduler任务更新。范围伤害复用实际Hull边缘二维命中，路径碰撞使用线段至单位原点距离再叠加单位Hull。
+- 表现与验证：移动/爆炸暂用项目内`basic_projectile`粒子并显式预缓存；Tooltip发布LV1至LV5完整说明。`MOVING_ICE_BALL_MATH_LUA51_PASS`、`MOVING_ICE_BALL_CONTRACT_PASS`及魔法弹弓、寒冰锥、奥术弹幕、addskill回归通过；相关Lua 5.1语法、严格UTF-8和`git diff --check`通过。仍需Workshop Tools冷启动验收粒子、Dota API、实际移动与伤害。
+
+## 2026-08-01 — 魔法弹弓10%触发与召唤英雄射程兼容实机修复
+
+- 用户实机连续攻击未见石弹。加入限量诊断后确认10%算法本身正常：日志多次出现`random < 0.1 success=true`，但随后为`MAGIC_SLINGSHOT_FAILED reason=no_targets range=0 primary=828`。因此根因不在随机数、攻击事件、技能拥有状态或“必须5人”，而在成功掷骰后的射程目标查询。
+- 规则澄清并固化：任意敌方主攻击命中都进行10%判定；`target_count=5`表示最多5名，绝不是至少5名。只有1名敌人时只发射1颗，少于5名时对所有有效目标各发1颗，超过5名时按LV2未眩晕优先及距离顺序截取5名。
+- 根因：项目通过`hero_stat_adapter::Script_SetAttackRange()`为`CreateUnitByName`召唤英雄应用CSV射程，但Dota实机中同一英雄`GetAttackRange()`返回0。旧魔法弹弓在`radius <= 0`时提前返回，甚至没有执行本次命中主目标的保底插入。
+- 修复：`hero_stat_adapter`同步保存`unit.survival_attack_range`；`current_attack_range()`受保护读取运行时缓存、`Script_GetAttackRange`、`GetAttackRange`和`hero_definitions[survival_hero_id].attack_range`并取最大有效值。宽查询使用`射程+256`，最终按`射程+敌人实际HullRadius`的XY平方距离过滤；本次合法命中的敌方主目标始终保底，即使所有射程来源仍为0也不会空触发。
+- 诊断：前30次打印`MAGIC_SLINGSHOT_ROLL`，之后仅成功掷骰继续打印；失败输出`MAGIC_SLINGSHOT_FAILED`及原因，创建投射物输出`MAGIC_SLINGSHOT_LAUNCHED`，命中回调输出`MAGIC_SLINGSHOT_HIT`。`HERO_PASSIVE_SKILL_TRIGGERED`已移动到runner成功之后，失败启动不再伪报触发。
+- 自动测试：新增`tools/test_magic_slingshot_targets.lua`并由`C:\msys64\mingw64\bin\lua5.1.exe`真实执行，覆盖单目标只发1颗、少于5名全部选择、6名截断最近5名、LV2未眩晕优先、Hull边界、引擎射程0时CSV回退及全部射程为0时主目标保底。`MAGIC_SLINGSHOT_TARGETS_LUA51_PASS`、魔法弹弓/奥术弹幕/寒冰锥/addskill契约、相关`luac5.1 -p`、严格UTF-8和`git diff --check`通过。
+- 最新实机证据：`[MAGIC_SLINGSHOT_ROLL] ... random=0.016141 chance=0.100000 success=true`后出现`[MAGIC_SLINGSHOT_LAUNCHED] ... range=3000 selected=1 launched=1`，证明概率、配置射程回退、单目标选择和投射物创建成功。该段日志尚无`MAGIC_SLINGSHOT_HIT`，所以命中回调、伤害、眩晕以及LV2/LV3/LV5效果仍必须继续实机验收，禁止提前标记完成。
+
+## 2026-08-01 — Lua 5.1工具路径纠正与寒冰锥语法补验
+
+- 用户纠正此前环境判断：可用编译器为 `C:\msys64\mingw64\bin\luac5.1.exe`。已实际探测文件存在并执行 `-v`，结果为Lua 5.1.5。
+- 根因：该可执行文件不在当前PATH，先前只探测`lua`/`luac`命令和Dota目录，因此错误地记录为没有Lua/Luac。后续会话不得仅依赖PATH探测，必须优先检查上述绝对路径。
+- 已将稳定路径和标准`-p`命令写入`PROJECT_CONTEXT.md`，并在`KNOWN_ISSUES.md`中把“没有解释器”修正为“存在但不一定在PATH”。旧检查点中的错误判断保留为历史，不静默改写。
+- 已使用该编译器补跑本次寒冰锥相关Lua文件语法检查；语法验证结果见本检查点后的当前任务状态。Luac通过不替代Workshop Tools中的Dota API与视觉行为验证。
+
+## 2026-08-01 — 公共技能“寒冰锥”五级重做完成检查点
+
+- 配置完成：保留 `proto_ice_cone` / `ability_survival_ice_cone` 身份；权威英雄技能 CSV、五级运行配置、Ability KV、生成技能配置和Tooltip配置已同步。技能最高5级，图标改为 `crystal_maiden_freezing_field`，等级4明确完整继承等级3。
+- 运行完成：旧前方扇形 `cone_targets()` 已删除；触发时固定目标地面位置并复用同一份逻辑三维快照，每次通过既有 Ability 伤害链造成全属性×1纯粹伤害。500范围使用 `enemies_touching_radius()` 的宽查询与实际Hull二维精确过滤。
+- 时序与锁：等级1至4同步执行t=0首击、单个绝对时间校正顺序任务执行t=1/2，共锁3秒；等级5执行t=0/1/2/3/4，共锁5秒。活动期在概率事件和随机数之前跳过；正常结束任务释放锁与雪场，理论过期检查可在回调异常时清理残留雪场并恢复资格。
+- 控制完成：新增 `debuff_hero_ice_cone_attack_slow`，`negative + none + refresh`；等级2至4每次命中刷新20%攻速降低3秒，等级5刷新40%。等级3起每次落冰循环内对每个存活命中敌人独立掷20%，成功添加1秒 `modifier_stunned`。
+- 表现完成：每场创建一次极寒领域雪场，每次落冰创建一次至宝爆发粒子，两项均在 `addon_game_mode.lua` 显式预缓存。每场只有一个落冰顺序任务与一个结束释放任务，没有恢复逐落冰独立调度。
+- Tooltip复核发现已有 `hero_skill_tooltip_view_model.lua` 未接入底栏技能Tooltip；现仅为 `proto_ice_cone` 在 `ability_runtime_service.lua` 发布当前等级与LV1至LV5完整效果字段，复用现有 `runtime.fields` 渲染，不修改Panorama源码也不影响其他11个公共技能。
+- 定向生成：当前WindowsApps `python.exe` 是不可用别名，使用PowerShell 7按正式生成器类型规则定向重建 `hero_skill_definitions.lua`、`buff_definitions.lua`，并同步寒冰锥Tooltip CSV/Lua行；差异审计确认未重建或污染其他生成模块。
+- 自动验证：`ICE_CONE_CONTRACT_PASS`、`ARCANE_BARRAGE_CONTRACT_PASS`、`ADDSKILL_CONTRACT_PASS`；三份目标CSV及六份相关Lua严格UTF-8解码成功、替换字符为0；旧 `cone_targets` 残留0、寒冰锥顺序调度入口1、释放调度入口1、Tooltip等级发布入口1；全局 `git diff --check` 通过。
+- 限制与下一步：当前环境没有Lua/Luac且仓库当前无Lua测试目录，不能声称Lua VM或Dota引擎加载已通过。必须完全停止并重新Run Workshop Tools，逐级验收Tooltip，确认1至4级3次、5级5次落冰，减速刷新不叠加，冻结按敌人分别发生，连续触发锁可恢复，雪场和爆发粒子无残留。
+
+## 2026-08-01 — 公共技能“寒冰锥”五级重做实施前检查点
+
+- 用户要求开始第三个五级公共技能“寒冰锥”，并批准推荐口径：攻击命中15%概率触发；立即落第1次、之后每秒1次；等级1至4共3次且整场锁3秒，等级5共5次且整场锁5秒；等级3起每次落冰对每个命中敌人独立判定20%冻结1秒。
+- 权威身份确认：`hero_definitions.csv` 只声明英雄使用 `public_pool`；实际技能池成员为 `hero_skill_pool_members.csv` 中的 `proto_ice_cone`，引擎壳为 `ability_survival_ice_cone`。必须保留二者以兼容已有技能状态；独立的 `proto_frost_nova` 不得覆盖。
+- 旧实现差异：当前寒冰锥最高3级，运行时是英雄前方扇形伤害、移动减速和中心冻结；本次整体替换为固定在攻击目标触发位置的500范围暴风雪。
+- 实施决定：整场使用触发时逻辑三维快照并结算纯粹伤害；等级2至4使用20%、等级5使用40%的3秒攻速降低，`none + refresh` 且不可叠加；等级4完整继承等级3；单个绝对时间校正顺序任务驱动3/5次落冰，活动锁同时提供理论过期和令牌化调度兜底。
+- 表现决定：使用项目已知可用的水晶室女至宝极寒领域持续雪场与爆发粒子；持续场每次触发只创建一次，每次落冰播放一次爆发。
+- 环境限制：当前PATH仅有`pwsh`，没有`py`、`lua`或`luac`，且当前工作树没有`scripts/vscripts/tests`目录；将使用PowerShell契约、定向配置生成、编码/结构检查和`git diff --check`，Lua VM与引擎表现需Workshop Tools冷启动验证。
+- 旧机枪塔视觉任务已归档；其未完成的Workshop Tools视觉验收不属于本次业务修改，不得回退相关文件。
+
 ## 2026-08-01 — 奥术弹幕性能自查与最小化优化
 
-- 性能自查确认等级5原实现会创建21个独立飞弹调度任务及1个锁兜底任务，每次爆炸还会执行排序后的宽范围单位查询、逐候选 `pcall` 和平方根距离计算，密集怪群中可能形成周期性尖峰。
-- 保持Hull边缘命中口径：候选宽查询仍使用 `explosion_radius + ARCANE_MAX_HULL_RADIUS`，但仅奥术弹幕改用 `FIND_ANY_ORDER`；最终过滤改成XY平方距离 `dx²+dy² <= (explosion_radius+enemy:GetHullRadius())²`，不计算平方根与Z轴，也不再为每个候选包装 `GetHullRadius()` 调用。
-- 21个独立飞弹任务合并为一个按时间排序、返回下次间隔的顺序回调；随机落点、飞弹时序、21次粒子与伤害、纯粹伤害、最终飞弹解锁和令牌化锁兜底均保持不变。
+- 用户反馈：完成奥术弹幕改写后，整体运行明显变慢并出现卡顿，要求确认此前是否属于最小范围修改并进行自查。审计结论是配置/KV/Tooltip修改较小，但 `scripts/vscripts/systems/hero_passive_skill_service.lua` 的运行时改写并非严格最小：等级5原实现会创建21个独立飞弹任务及1个锁兜底任务，每次爆炸还会执行排序后的宽范围单位查询、逐候选 `pcall` 和平方根距离计算，密集怪群中可能形成周期性尖峰。锁表检查是常数开销；每次攻击读取技能状态和属性快照是旧服务已有行为；工作区既有 Buff/UI 修改没有新增永久轮询，因此都不是本次卡顿的第一嫌疑。
+- 用户提出并批准的优化口径：以XY差值平方和判断命中。候选宽查询仍使用 `explosion_radius + ARCANE_MAX_HULL_RADIUS`，用于避免引擎按单位原点预查询时漏掉Hull边缘；最终精确过滤必须使用每只怪物实际Hull：`dx²+dy² <= (explosion_radius+enemy:GetHullRadius())²`。不采用纯 `150²`，因为会漏掉碰撞体边缘；不采用统一 `(150+最大Hull)²` 作为最终命中，因为会错误扩大对小怪的AOE。
+- 已实现：仅奥术弹幕候选查询改用 `FIND_ANY_ORDER`，不改变其他技能共用的 `FIND_CLOSEST`；精确过滤不再计算 `math.sqrt`、不计算Z轴，也不再为每个候选包装 `GetHullRadius()` 的 `pcall`。运行代码位置为 `hero_passive_skill_service.lua` 的 `enemies_touching_radius()`。
+- 已实现：21个独立飞弹任务合并为一个按理论落点时间排序、通过回调返回下一次间隔的顺序任务，另保留1个令牌化锁兜底任务；等级5一次施法的活动调度任务由最多22个降至2个。下一颗延迟按 `cast_start_time + following.delay - current_game_time` 计算，避免Scheduler 0.05秒粒度逐颗累积漂移。运行代码位置为 `run_arcane()` 的 `impacts` 队列与 `run_next_impact()`。
+- 行为保持：随机落点仍使用均匀圆分布，等级5仍为21个落点、21次粒子和最多21次伤害查询；飞弹理论时序、全属性×2纯粹伤害、150爆炸半径、实际Hull边缘命中、最后一颗正常解锁、按时过期和令牌化兜底均未改变。此次没有修改既有 Buff/UI 工作区内容。
+- 自动验证：`ARCANE_BARRAGE_CONTRACT_PASS`、`ADDSKILL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、`UI_RESTORE_NATIVE_HEALTH_BAR_CONTRACT_OK`；严格UTF-8、原始定界符504/504、限定及全局 `git diff --check` 通过；运行源码中逐飞弹 `scheduler.after(impact_delay...)` 残留0、旧平方根距离残留0、单队列入口1、绝对时间校正1。
+- 工具注意：当前 `pwsh` 可正常执行 `tools/test_arcane_barrage_contract.ps1`；旧 Windows PowerShell 5 独立进程会把无BOM脚本中的中文CSV路径错误解码并报路径不存在，这不是业务断言失败。当前环境仍无独立Lua/Luac，无法完成真实Lua VM和引擎性能测试。
+- 后续实机唯一验收清单：完全关闭并重启Workshop Tools；在密集怪群中触发等级5弹幕，确认3秒内21次爆炸完整且帧时间改善；确认怪物Hull边缘接触150范围时受伤、爆炸视觉与伤害中心一致；连续触发至少5次并确认每次结束后重新具备触发资格。若仍卡顿，下一优先嫌疑是21次粒子及21次 `FindUnitsInRadius` 的引擎成本，而不是平方距离或锁检查。
 
 ## 2026-08-01 — 公共技能“奥术弹幕”五级区域炮击实现
 

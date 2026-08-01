@@ -626,7 +626,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "lina_dragon_slave"
-    "MaxLevel"           "3"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 
@@ -636,7 +636,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "crystal_maiden_crystal_nova"
-    "MaxLevel"           "3"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 
@@ -656,7 +656,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "viper_nethertoxin"
-    "MaxLevel"           "3"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 
@@ -700,13 +700,13 @@
     "AbilityManaCost"    "0"
 }
 
-"ability_survival_shadow_blast"
+"ability_survival_magic_slingshot"
 {
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-    "AbilityTextureName" "nevermore_shadowraze1"
-    "MaxLevel"           "3"
+    "AbilityTextureName" "tiny_toss"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 
@@ -725,8 +725,8 @@
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-    "AbilityTextureName" "drow_ranger_wave_of_silence"
-    "MaxLevel"           "3"
+    "AbilityTextureName" "crystal_maiden_freezing_field"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 

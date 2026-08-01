@@ -314,7 +314,6 @@ local function add_monster(context)
     attack = math.floor(attack)
     unit:SetBaseDamageMin(attack)
     unit:SetBaseDamageMax(attack)
-    unit.survival_minimum_armor = 1
     if can_attack then
         unit:SetBaseMoveSpeed(250)
         unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)

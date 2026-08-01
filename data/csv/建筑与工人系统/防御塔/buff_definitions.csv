@@ -8,3 +8,5 @@ debuff_blizzard_move_slow,暴风雪减速,negative,none,refresh,1,1,1,move_speed
 debuff_polar_attack_slow,极地攻速降低,negative,none,aura,1,0,1,attack_speed_pct,-20,,,ancient_apparition_chilling_touch,,0,1,由受管光环施加；范围内攻击频率变为80%，离开范围或光环源销毁后自动移除；Ice Vortex仅常驻于塔底。,,,
 debuff_piercing_armor,穿透弩炮减甲,negative,none,refresh,1,1,1,physical_armor_base_pct,-15,particles/units/heroes/hero_slardar/slardar_amp_damage.vpcf,PATTACH_OVERHEAD_FOLLOW,slardar_amplify_damage,,0,1,减甲百分比由技能表attack_armor_reduction覆盖。
 debuff_hero_fury_thunder_mark,怒雷标记,negative,none,refresh,1,1,1,base_damage_outgoing_pct,0,particles/units/heroes/hero_zuus/zuus_static_field.vpcf,PATTACH_OVERHEAD_FOLLOW,zuus_lightning_bolt,,0,1,怒雷命中标记目标；每次命中刷新3秒，等级3及以上降低攻击力15%。
+debuff_hero_ice_cone_attack_slow,寒冰锥攻速降低,negative,none,refresh,1,1,1,attack_speed_pct,-20,particles/units/heroes/hero_crystalmaiden/maiden_frostbite_buff.vpcf,PATTACH_ABSORIGIN_FOLLOW,crystal_maiden_freezing_field,,0,1,寒冰锥等级2至4降低20%攻击速度，等级5降低40%；同技能不可叠加，每次落冰命中刷新3秒。,particles/status_fx/status_effect_frost.vpcf,20,
+debuff_hero_magic_slingshot_move_slow,魔法弹弓碎石区减速,negative,none,aura,1,0,1,move_speed_pct,-30,,,tiny_toss,,0,1,处于任意魔法弹弓碎石区内时降低30%移动速度；多个区域不叠加，离开全部区域立即移除。,,,

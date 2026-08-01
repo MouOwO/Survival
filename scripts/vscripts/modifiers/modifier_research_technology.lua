@@ -3,6 +3,7 @@ modifier_research_armor_reduction = class({})
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local M = modifier_research_technology
 
 function M:IsHidden() return true end
@@ -79,6 +80,26 @@ end
 
 local D = modifier_research_armor_reduction
 
+local function publish_armor_changed(modifier)
+    local parent = modifier:GetParent()
+    if not parent or parent:IsNull() then return end
+    local entindex = parent:entindex()
+    local reduction = math.max(0,
+        (tonumber(modifier:GetStackCount()) or 0) / 100)
+    -- SetStackCount updates the Lua state immediately, but engine armor can
+    -- still be stale in the same call stack. Publish on the next scheduler
+    -- frame so the selected-unit UI reads the resolved effective armor.
+    scheduler.after(0, function()
+        if not parent or parent:IsNull() then return end
+        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+            entindex = entindex,
+            unit = parent,
+            reason = "research_armor_reduction",
+            research_armor_reduction = reduction,
+        })
+    end)
+end
+
 function D:IsHidden() return false end
 function D:IsDebuff() return true end
 function D:IsPurgable() return false end
@@ -123,11 +144,7 @@ function D:AddArmorReduction(value)
     self.armor_reduction = target_reduction
     if target_stack <= (tonumber(self:GetStackCount()) or 0) then return end
     self:SetStackCount(target_stack)
-    event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
-        entindex = parent:entindex(),
-        unit = parent,
-        reason = "research_armor_reduction",
-    })
+    publish_armor_changed(self)
 end
 
 function D:DeclareFunctions()

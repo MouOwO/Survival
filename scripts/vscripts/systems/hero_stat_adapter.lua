@@ -97,6 +97,7 @@ local function apply_range(unit, definition)
     local attack_range = number(definition, "attack_range")
     if attack_range and attack_range > 0 then
         safe_call(unit, "Script_SetAttackRange", attack_range)
+        unit.survival_attack_range = attack_range
     end
 
     local acquisition = number(definition, "acquisition_range")

@@ -4,20 +4,17 @@
 
 ## 当前活跃任务
 
-- 替换箭塔机枪路线三阶段建模：Occultist's Pursuit、Heartless Hunt、Compass of the Rising Gale。
-- 赏金金币成功到账时播放 Jinada/Cutpurse 反馈。
-- 爆矢加特林攻速 Buff 触发时播放 Focus Fire 起手与持续视觉，不改变既有数值和触发规则。
+- 公共技能 `proto_magic_slingshot` 五级“魔法弹弓”已完成配置、运行时、Tooltip、碎石区和目标选择修复，当前等待投射物命中回调与后续等级效果实机验收。
+- 实机已确认主攻击命中后的10%判定正常，单目标可成功得到 `range=3000 selected=1 launched=1`；5是最多目标数，不是触发所需人数。
 
 ## 最后可靠检查点
 
-- 日期：2026-07-31
-- 三套模型 bundle、部件、弹道、常驻粒子和代理单位已经写入 CSV/KV 并生成 Lua。
-- 赏金金币成功后播放 Jinada；爆矢加特林第五次同目标攻击或击杀触发 Focus Fire，数值行为保持不变。
-- 机枪及相邻路线 11 项定向测试通过，Lua 语法检查和限定差异检查通过。
-- 全量 60 项测试中 57 项通过；3 项既有英雄测试失败，与本任务文件无交集。
-- 尚未验证：Workshop Tools 中三套穿戴件的实际骨骼跟随、攻击弹道及两类触发粒子的视觉表现。
-- 五个权威 CSV 的定向生成结果与正式 Lua 逐字节一致；共享攻击文件的死亡塔四项回归也全部通过。
-- 下一步唯一动作：完全停止并重新 Run，实机验收三阶段套装、骨骼跟随、弹道、Jinada 和 Focus Fire 表现。
+- 日期：2026-08-01
+- 魔法弹弓曾因召唤英雄 `GetAttackRange()` 返回0而在概率成功后得到 `reason=no_targets`；现已使用运行时缓存、`Script_GetAttackRange`、`GetAttackRange`和英雄CSV配置多级回退，并始终保留本次合法命中的敌方主目标。
+- 实机证据：`[MAGIC_SLINGSHOT_ROLL] ... success=true` 后已出现 `[MAGIC_SLINGSHOT_LAUNCHED] ... range=3000 selected=1 launched=1`，证明概率、射程回退、单目标选择及投射物创建成功。
+- 尚未在最新日志中看到 `[MAGIC_SLINGSHOT_HIT]`，因此不得声称投射物命中回调、伤害和眩晕已经实机验证。
+- `MAGIC_SLINGSHOT_TARGETS_LUA51_PASS`、魔法弹弓/奥术弹幕/寒冰锥/addskill契约、相关Lua 5.1语法、严格UTF-8和`git diff --check`均通过。
+- 下一步唯一动作：继续实机观察同一发射后的 `[MAGIC_SLINGSHOT_HIT]`；确认后再逐级验收LV2优先级、LV3旧眩晕增伤及LV5碎石区。
 
 ## 新会话恢复顺序
 
