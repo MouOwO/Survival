@@ -1,42 +1,37 @@
 # Current Task
 
-## 最新任务（2026-08-02）
+## 活跃任务（2026-08-02）
 
-修复召唤战斗英雄的初始最大生命，使其最终采用`hero_definitions.csv`的`base_health × max_health_multiplier × hero_meta_max_health_multiplier`；新增`blood +/-数值|+/-百分比%`聊天作弊码。百分比按当前最大生命计算，加血封顶，减血最低保留1点，只作用于当前玩家召唤英雄。
+将公共技能`proto_meteor`重做为五级“陨石坠落·被动”，保留Ability ID `ability_survival_meteor`、公共池身份、图标和存档兼容性。
 
-## 最新状态
+## 用户已确认边界
 
-**直接设置最大生命的第一版已被实机判定失败；隐藏永久生命Modifier第二版已通过自动验证，并由用户在 Workshop Tools 中确认英雄血量正常。** 原元气弹/毒云任务保持既有可靠基线，本轮未修改其行为。
-
-## 最新验证结果
-
-- `HERO_CONFIGURED_HEALTH_LUA51_PASS`
-- `HEALTH_CHEAT_LUA51_PASS`
-- `HERO_HEALTH_CONTRACT_PASS`
-- 6个本任务生产/测试Lua通过Lua 5.1语法检查；12个相关文件通过严格UTF-8；限定`git diff --check`通过。
-- `ADDSKILL_CONTRACT_PASS`、元气弹和毒云专项契约/Lua 5.1回归通过。
-- 第一版实机结果：直接调用`SetBaseMaxHealth/SetMaxHealth/SetHealth`后英雄仍为原生120生命，方案已废弃。
-- 第二版实现：`modifier_survival_hero_base_health`使用`MODIFIER_PROPERTY_HEALTH_BONUS`把原生生命动态补足到CSV目标；普通英雄原生120时补2880，VIP同理补足到11000；真实装备生命继续额外叠加。
-- 用户实机验收：隐藏永久生命Modifier生效，召唤英雄血量现在正常。
-- 未扩大验收范围：用户本次未分别确认普通英雄3000、VIP英雄11000、装备生命叠加、死亡重生和`blood`四种输入；这些仅保留为按需回归项，不影响生命修复完成结论。
-
-## 当前任务
-
-将公共技能 `proto_holy_pulse`（原“圣光震荡·被动”）重做为五级“元气弹·被动”，保留 Ability ID `ability_survival_holy_pulse` 和公共池成员 `public_10`；同时让同一英雄的毒云在活动期间禁止再次触发，直到毒云结束。
-将公共技能 `proto_flame_burst` Lv5 三颗随机溅射小火球的视觉从莉娜龙破斩替换为 Snapfire Mortimer Kisses，保留显示名“爆炎弹·被动”、Ability ID `ability_survival_flame_burst`、公共池身份及全部五级战斗规则。
+- LV1普通攻击命中12%概率触发，记录目标当时的地面位置；陨石坠落后原地爆炸，不进行卡尔原版陨石的滚动。500半径造成触发时逻辑全属性×3纯粹伤害。
+- LV2每颗陨石留下500半径、持续3秒的熔岩区域；落地后第1/2/3秒各造成一次触发时全属性×1纯粹伤害，落地瞬间不额外结算熔岩伤害。
+- LV3熔岩区域内敌人降低30%移动速度；离开所有区域立即移除，多个区域重叠不叠加。
+- LV4完整继承LV3，无新增效果。
+- LV5在同一记录位置连续落下两颗陨石，第二颗比第一颗晚0.5秒落地；第二颗爆炸和熔岩伤害均为80%，即×2.4和每秒×0.8。两片熔岩独立造成伤害。
+- 同一英雄从触发成功到最后一颗陨石的最后一次熔岩伤害完成前，不再进行该技能的12%概率判定；LV1在爆炸完成后解锁。锁不影响其他被动技能。
+- 所有伤害复用触发瞬间的同一份项目逻辑三维快照、既有伤害服务和Ability句柄。
 
 ## 当前状态
 
-**代码、配置、生成结果和自动测试已完成，等待 Workshop Tools 实机验证和用户验收。上一项龙卷风保持阶段性可靠基线，本轮未改变其行为。**
+**CSV、运行配置、被动服务、Ability KV、Tooltip、Buff、定向生成和自动测试均已完成，等待 Workshop Tools 实机验证和用户验收。**
+
+## 工作区保护
+
+- 调查阶段后出现最新提交`c36c56e`；已确认目标服务工作区哈希与HEAD一致，属于既有改动安全提交，不是回滚或外部未提交覆盖。
+- 当前仍有大量未跟踪测试文件；不得删除、覆盖或顺带整理。本任务仅新增陨石专项测试并修改直接相关文件。
+将公共技能 `proto_flame_burst` Lv5 三颗随机溅射小火球的视觉从莉娜龙破斩替换为 Snapfire Mortimer Kisses，保留显示名“爆炎弹·被动”、Ability ID `ability_survival_flame_burst`、公共池身份及全部五级战斗规则。
+
+## 自动验证结果
+
+- `METEOR_STATE_LUA51_PASS` / `METEOR_CONTRACT_PASS`。
+- `METEOR_LUAC_PASS`：运行配置、公共被动服务、Tooltip服务、三份生成Lua和专项状态测试通过Lua 5.1语法检查。
+- `METEOR_GENERATED_COMPARE_PASS`：英雄技能和Buff生成Lua与权威CSV定向重建结果逐字节一致；Tooltip专用生成器通过并仅改变陨石目标行。
+- 奥术弹幕、寒冰锥、魔法弹弓、爆炎弹、移动冰球、毒云、元气弹、脉冲激射和龙卷风专项回归全部通过。
+- 本任务12个核心源/生成/测试文件通过严格UTF-8和乱码检查；限定`git diff --check`通过。
 **生产粒子、控制点、预缓存、Lua状态测试、定向视觉契约及相邻视觉回归已完成并通过；仅待Workshop Tools实机视觉验收。**
-
-## 验证结果
-
-- `SPIRIT_BOMB_STATE_LUA51_PASS` / `SPIRIT_BOMB_CONTRACT_PASS`
-- `POISON_CLOUD_STATE_LUA51_PASS` / `POISON_CLOUD_CONTRACT_PASS`
-- 奥术弹幕、魔法弹弓、爆炎弹、移动冰球、寒冰锥、脉冲激射和龙卷风相关回归通过。
-- 8个相关Lua文件通过 `luac5.1 -p`；12个相关源/生成/测试文件通过严格UTF-8检查；CSV与生成Lua的元气弹字段一致；限定范围 `git diff --check` 通过。
-- 完整生成器在本任务无关的 `item_definitions.csv` 历史列错位处失败；已使用同一生成模块定向重建英雄技能，并使用Tooltip专用生成器重建Tooltip。生成内容差异仅包含本任务两份目标Lua。
 
 ## 剩余动作
 
@@ -104,3 +99,5 @@
 
 - 工作区已有大量用户未提交修改，目标服务和游戏模式文件在本任务前已处于修改状态。
 - 只在当前内容基础上替换目标粒子常量和对应预缓存，不回滚、覆盖或顺带清理其他修改。
+- 完全重启 Workshop Tools Run，实机验证基础投射物从空中坠落、落地基础爆炸、毒云地面粒子作为熔岩区域、双陨石0.5秒落地间隔、500范围、3次跳伤、30%减速进入/离开和活动期间不重触发。
+- 自动契约、Lua模拟和语法检查不能证明Dota粒子的实际尺寸、颜色、落地手感或引擎最终扣血；只有用户明确确认后才能记录为实机验收完成。

@@ -4,6 +4,7 @@
 
 ## 当前状态
 
+- 五级“陨石坠落·被动”的CSV、运行逻辑、Buff、KV、Tooltip、定向生成和自动测试已完成；用户已确认不滚动、同点双陨石间隔0.5秒、第二颗全部伤害80%、每片熔岩独立结算3次及全程同技能活动锁。当前等待Workshop Tools实机验证和用户验收。
 - 召唤英雄生命第一版直接Set方案实机仍为120，已废弃；第二版隐藏永久生命Modifier已由用户实机确认血量正常，作为可靠基线保留。
 - 已确认普通英雄初始最大生命3000，齐天大圣/剑圣11000；`blood`百分比按当前最大生命，减血最低1点。
 - `proto_holy_pulse` 已重做为五级“元气弹·被动”，毒云已改为活动期间禁止同一英雄再次触发。
@@ -28,6 +29,7 @@
 - 飞行视觉改为`hero_snapfire_ultimate.vpcf`，落地冲击改为`hero_snapfire_ultimate_impact.vpcf`；Dragon Slave生产依赖和预缓存已移除。
 - `FLAME_BURST_VISUAL_STATE_PASS`、`FLAME_BURST_VISUAL_CONTRACT_PASS`、五项相邻视觉契约、Lua 5.4语法、严格UTF-8和限定差异检查均通过；历史Lua 5.1工具当前不存在。
 - 下一步：Workshop Tools冷启动确认三颗弹体的实际飞行、同步落地、冲击位置和无残留。
+- 当前唯一下一步：完全重启Workshop Tools Run，实机验证陨石坠落/爆炸/熔岩视觉、双陨石间隔、伤害、减速和不重触发；此前技能和生命基线不得顺带修改。
 
 ## 新会话恢复顺序
 

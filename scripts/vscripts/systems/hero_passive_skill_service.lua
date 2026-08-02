@@ -18,6 +18,10 @@ local active_arcane_barrages = {}
 local arcane_barrage_sequence = 0
 local active_ice_cones = {}
 local ice_cone_sequence = 0
+local active_meteor_casts = {}
+local meteor_sequence = 0
+local meteor_slowed_units = {}
+local meteor_task = nil
 local active_moving_ice_balls = {}
 local moving_ice_ball_sequence = 0
 local moving_ice_ball_task = nil
@@ -62,6 +66,14 @@ local FURY_THUNDER_PARTICLE =
     "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
 local MOVING_ICE_BALL_PARTICLE =
     "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf"
+local METEOR_FALL_PARTICLE = "particles/basic_projectile/basic_projectile.vpcf"
+local METEOR_EXPLOSION_PARTICLE = "particles/basic_explosion/basic_explosion.vpcf"
+local METEOR_LAVA_PARTICLE =
+    "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf"
+local METEOR_LAVA_SLOW_BUFF = "debuff_hero_meteor_lava_move_slow"
+local METEOR_THINK_INTERVAL = 0.05
+local METEOR_FALL_HEIGHT = 1200
+local MOVING_ICE_BALL_PARTICLE = "particles/basic_projectile/basic_projectile.vpcf"
 local MOVING_ICE_BALL_EXPLOSION_PARTICLE = "particles/basic_projectile/basic_projectile_explosion.vpcf"
 local MOVING_ICE_BALL_THINK_INTERVAL = 0.05
 local MOVING_ICE_BALL_VISUAL_HEIGHT = 120
@@ -137,6 +149,18 @@ local function ice_cone_locked(attacker_key)
         return false
     end
     return true
+end
+
+local sync_meteors
+
+local function meteor_locked(attacker_key)
+    local active = attacker_key and active_meteor_casts[attacker_key] or nil
+    if not active then return false end
+    if game_time() + 0.0001 >= (tonumber(active.unlock_at) or math.huge)
+        and sync_meteors then
+        sync_meteors()
+    end
+    return active_meteor_casts[attacker_key] ~= nil
 end
 
 local function level_value(definition, field, level, fallback)
@@ -1696,25 +1720,284 @@ local function run_earth(context, definition)
     end
 end
 
+local function meteor_destroy_particle(particle, immediate)
+    if not particle then return end
+    ParticleManager:DestroyParticle(particle, immediate == true)
+    ParticleManager:ReleaseParticleIndex(particle)
+end
+
+local function meteor_sync_slow_units(desired)
+    for key, entry in pairs(desired) do
+        if not meteor_slowed_units[key] and alive(entry.target) then
+            buff_manager.apply(
+                entry.caster, entry.target, METEOR_LAVA_SLOW_BUFF,
+                { duration = 0, value = -math.abs(entry.move_slow_pct) }
+            )
+        end
+    end
+    for key, entry in pairs(meteor_slowed_units) do
+        if not desired[key] and valid(entry.target) then
+            buff_manager.remove(entry.target, METEOR_LAVA_SLOW_BUFF)
+        end
+    end
+    meteor_slowed_units = desired
+end
+
+local function meteor_release_cast(attacker_key)
+    local cast = active_meteor_casts[attacker_key]
+    if not cast then return end
+    for _, meteor in ipairs(cast.meteors) do
+        meteor_destroy_particle(meteor.fall_particle, true)
+        meteor_destroy_particle(meteor.lava_particle, false)
+        meteor.fall_particle = nil
+        meteor.lava_particle = nil
+    end
+    active_meteor_casts[attacker_key] = nil
+end
+
+local function clear_meteors()
+    local keys = {}
+    for attacker_key, _ in pairs(active_meteor_casts) do
+        keys[#keys + 1] = attacker_key
+    end
+    for _, attacker_key in ipairs(keys) do meteor_release_cast(attacker_key) end
+    meteor_sync_slow_units({})
+    if meteor_task then scheduler.cancel(meteor_task) end
+    meteor_task = nil
+end
+
+local function meteor_create_particle(name, position, attacker)
+    local particle = nil
+    local ok, failure = pcall(function()
+        particle = ParticleManager:CreateParticle(
+            name, PATTACH_WORLDORIGIN, attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, position)
+    end)
+    if not ok then
+        particle = nil
+        print("[HeroPassiveSkill] meteor particle failed: " .. tostring(failure))
+    end
+    return particle
+end
+
+local function meteor_start_fall(cast, meteor)
+    if meteor.fall_started then return end
+    meteor.fall_started = true
+    local start_position = copy_position(cast.position)
+    start_position.z = start_position.z + METEOR_FALL_HEIGHT
+    meteor.fall_particle = meteor_create_particle(
+        METEOR_FALL_PARTICLE, start_position, cast.context.attacker
+    )
+end
+
+local function meteor_impact(cast, meteor)
+    if meteor.landed then return end
+    meteor.landed = true
+    meteor_destroy_particle(meteor.fall_particle, true)
+    meteor.fall_particle = nil
+
+    local explosion = meteor_create_particle(
+        METEOR_EXPLOSION_PARTICLE, cast.position, cast.context.attacker
+    )
+    if explosion then
+        ParticleManager:SetParticleControl(
+            explosion, 1, Vector(cast.radius, 0, 0)
+        )
+        ParticleManager:ReleaseParticleIndex(explosion)
+    end
+    if valid(cast.context.attacker) then
+        deal_group(
+            cast.context,
+            enemies_touching_radius(
+                cast.context.attacker, cast.position, cast.radius
+            ),
+            cast.damage_multiplier * meteor.damage_scale,
+            false
+        )
+    end
+
+    if cast.lava_duration > 0 then
+        meteor.lava_particle = meteor_create_particle(
+            METEOR_LAVA_PARTICLE, cast.position, cast.context.attacker
+        )
+        if meteor.lava_particle then
+            ParticleManager:SetParticleControl(
+                meteor.lava_particle, 1, Vector(cast.radius, 0, 0)
+            )
+        end
+        meteor.lava_expires_at = meteor.land_at + cast.lava_duration
+        meteor.next_lava_tick_at = meteor.land_at + cast.lava_interval
+    end
+end
+
+local function meteor_lava_tick(cast, meteor)
+    if not valid(cast.context.attacker) then return end
+    deal_group(
+        cast.context,
+        enemies_touching_radius(
+            cast.context.attacker, cast.position, cast.radius
+        ),
+        cast.lava_damage_multiplier * meteor.damage_scale,
+        true
+    )
+end
+
+sync_meteors = function()
+    local now = game_time()
+    local desired_slow = {}
+    local finished = {}
+    local has_active = false
+
+    for attacker_key, cast in pairs(active_meteor_casts) do
+        if not valid(cast.context.attacker) then
+            finished[#finished + 1] = attacker_key
+        else
+            has_active = true
+            local complete = true
+            for _, meteor in ipairs(cast.meteors) do
+                if now + 0.0001 >= meteor.fall_start_at then
+                    meteor_start_fall(cast, meteor)
+                end
+                if meteor.fall_started and not meteor.landed then
+                    local progress = math.max(0, math.min(1,
+                        (now - meteor.fall_start_at) / cast.fall_duration
+                    ))
+                    local current = copy_position(cast.position)
+                    current.z = current.z + METEOR_FALL_HEIGHT * (1 - progress)
+                    if meteor.fall_particle then
+                        ParticleManager:SetParticleControl(
+                            meteor.fall_particle, 0, current
+                        )
+                    end
+                    if now + 0.0001 >= meteor.land_at then
+                        meteor_impact(cast, meteor)
+                    end
+                end
+
+                if meteor.landed and cast.lava_duration > 0 then
+                    while meteor.lava_ticks < cast.lava_tick_count
+                        and now + 0.0001 >= meteor.next_lava_tick_at do
+                        meteor_lava_tick(cast, meteor)
+                        meteor.lava_ticks = meteor.lava_ticks + 1
+                        meteor.next_lava_tick_at = meteor.next_lava_tick_at
+                            + cast.lava_interval
+                    end
+                    if now + 0.0001 >= meteor.lava_expires_at then
+                        meteor_destroy_particle(meteor.lava_particle, false)
+                        meteor.lava_particle = nil
+                    elseif cast.move_slow_pct > 0 then
+                        for _, target in ipairs(enemies_touching_radius(
+                            cast.context.attacker, cast.position, cast.radius
+                        )) do
+                            local key = unit_key(target)
+                            if key then
+                                desired_slow[key] = {
+                                    target = target,
+                                    caster = cast.context.attacker,
+                                    move_slow_pct = cast.move_slow_pct,
+                                }
+                            end
+                        end
+                    end
+                end
+
+                if not meteor.landed
+                    or (cast.lava_duration > 0
+                        and (meteor.lava_ticks < cast.lava_tick_count
+                            or now + 0.0001 < meteor.lava_expires_at)) then
+                    complete = false
+                end
+            end
+            if complete then finished[#finished + 1] = attacker_key end
+        end
+    end
+
+    for _, attacker_key in ipairs(finished) do meteor_release_cast(attacker_key) end
+    meteor_sync_slow_units(desired_slow)
+    if not has_active or next(active_meteor_casts) == nil then
+        meteor_task = nil
+        return false
+    end
+    return METEOR_THINK_INTERVAL
+end
+
+local function ensure_meteor_task()
+    if meteor_task then return end
+    meteor_task = scheduler.after(
+        0, sync_meteors, "hero_meteor_sync"
+    )
+end
+
 local function run_meteor(context, definition)
     local position = unit_position(context.target)
-    if not position then return end
+    local attacker_key = unit_key(context.attacker)
+    if not position or not attacker_key or meteor_locked(attacker_key) then
+        return false
+    end
     position = copy_position(position)
-    scheduler.after(level_value(definition, "delay", context.level), function()
-        local radius = level_value(definition, "radius", context.level)
-        local targets = enemies_in_radius(context.attacker, position, radius)
-        deal_group(context, targets, definition.damage_multiplier[context.level], true)
-        if context.level == 3 then
-            local effect = definition.level_effects[3]
-            for _, unit in ipairs(enemies_in_radius(context.attacker, position, radius * effect.center_radius_pct)) do
-                stun(context.attacker, unit, effect.stun_duration)
-            end
-        end
-        if context.level >= 2 then
-            local effect = definition.level_effects[context.level]
-            periodic_area(context, position, radius, effect.duration, effect.interval, effect.dot_multiplier)
-        end
-    end)
+    if GetGroundPosition then position = GetGroundPosition(position, nil) end
+
+    local fall_duration = math.max(0.01,
+        level_value(definition, "fall_duration", context.level, 0.8))
+    local lava_duration = level_value(
+        definition, "lava_duration", context.level
+    )
+    local lava_interval = level_value(
+        definition, "lava_interval", context.level, 1.0
+    )
+    local meteor_count = math.max(1, math.floor(
+        level_value(definition, "meteor_count", context.level, 1) + 0.001
+    ))
+    local second_delay = level_value(
+        definition, "second_meteor_delay", context.level
+    )
+    local second_scale = level_value(
+        definition, "second_meteor_damage_pct", context.level
+    ) / 100
+    local started_at = game_time()
+    local meteors = {}
+    local final_land_at = started_at + fall_duration
+    for index = 1, meteor_count do
+        local offset = index == 1 and 0 or second_delay
+        local land_at = started_at + fall_duration + offset
+        final_land_at = math.max(final_land_at, land_at)
+        meteors[#meteors + 1] = {
+            fall_start_at = started_at + offset,
+            land_at = land_at,
+            damage_scale = index == 1 and 1 or second_scale,
+            fall_started = false,
+            landed = false,
+            lava_ticks = 0,
+        }
+    end
+
+    meteor_sequence = meteor_sequence + 1
+    active_meteor_casts[attacker_key] = {
+        token = meteor_sequence,
+        context = context,
+        position = position,
+        radius = level_value(definition, "radius", context.level),
+        fall_duration = fall_duration,
+        damage_multiplier = level_value(
+            definition, "damage_multiplier", context.level
+        ),
+        lava_duration = lava_duration,
+        lava_interval = lava_interval,
+        lava_tick_count = lava_duration > 0 and math.floor(
+            lava_duration / math.max(0.01, lava_interval) + 0.001
+        ) or 0,
+        lava_damage_multiplier = level_value(
+            definition, "lava_damage_multiplier", context.level
+        ),
+        move_slow_pct = level_value(
+            definition, "lava_move_slow_pct", context.level
+        ),
+        unlock_at = final_land_at + lava_duration,
+        meteors = meteors,
+    }
+    ensure_meteor_task()
+    return true
 end
 
 local function run_arcane(context, definition)
@@ -2644,6 +2927,9 @@ local function roll(payload, skill_id, level, attributes, target_position)
     if skill_id == "proto_arcane_barrage" then
         local attacker_key = unit_key(payload.attacker)
         if arcane_barrage_locked(attacker_key) then return false end
+    elseif skill_id == "proto_meteor" then
+        local attacker_key = unit_key(payload.attacker)
+        if meteor_locked(attacker_key) then return false end
     elseif skill_id == "proto_ice_cone" then
         local attacker_key = unit_key(payload.attacker)
         if ice_cone_locked(attacker_key) then return false end
@@ -2722,6 +3008,7 @@ function M.init()
     clear_flame_burns()
     clear_moving_ice_balls()
     clear_poison_clouds()
+    clear_meteors()
     processed_attacks = {}
     refresh_tokens = {}
     flame_burns = {}
@@ -2731,6 +3018,10 @@ function M.init()
     arcane_barrage_sequence = 0
     active_ice_cones = {}
     ice_cone_sequence = 0
+    active_meteor_casts = {}
+    meteor_sequence = 0
+    meteor_slowed_units = {}
+    meteor_task = nil
     active_moving_ice_balls = {}
     moving_ice_ball_sequence = 0
     moving_ice_ball_task = nil
@@ -2767,6 +3058,11 @@ M._test = {
     enemies_touching_radius = enemies_touching_radius,
     active_arcane_barrages = function() return active_arcane_barrages end,
     active_ice_cones = function() return active_ice_cones end,
+    active_meteor_casts = function() return active_meteor_casts end,
+    meteor_slowed_units = function() return meteor_slowed_units end,
+    meteor_locked = meteor_locked,
+    sync_meteors = sync_meteors,
+    clear_meteors = clear_meteors,
     active_moving_ice_balls = function() return active_moving_ice_balls end,
     sync_moving_ice_balls = sync_moving_ice_balls,
     moving_ice_ball_periodic_multiplier = moving_ice_ball_periodic_multiplier,

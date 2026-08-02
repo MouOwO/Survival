@@ -686,7 +686,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "invoker_chaos_meteor"
-    "MaxLevel"           "3"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 
