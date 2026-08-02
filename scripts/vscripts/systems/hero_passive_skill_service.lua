@@ -35,6 +35,10 @@ local poison_cloud_deaths = {}
 local poison_cloud_task = nil
 local blade_pulse_projectiles = {}
 local blade_pulse_sequence = 0
+local active_tornadoes = {}
+local tornado_sequence = 0
+local tornado_task = nil
+local tornado_slow_units = {}
 
 local ARCANE_EXPLOSION_PARTICLE =
     "particles/basic_explosion/basic_explosion.vpcf"
@@ -70,6 +74,9 @@ local POISON_CLOUD_THINK_INTERVAL = 0.05
 local BLADE_PULSE_PARTICLE =
     "particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_wave_of_terror_v2.vpcf"
 local BLADE_PULSE_CLEANUP_GRACE = 0.25
+local TORNADO_PARTICLE =
+    "particles/survival_tornado/survival_tornado_follow.vpcf"
+local TORNADO_THINK_INTERVAL = 0.05
 
 local function valid(unit)
     return unit and not unit:IsNull()
@@ -2039,30 +2046,344 @@ local function run_ice_cone(context, definition)
     return true
 end
 
+local function tornado_refresh_attributes(state)
+    local attributes = attribute_snapshot(state.context.player_id)
+    if attributes then state.context.attributes = attributes end
+end
+
+local function tornado_damage_tick_due(next_damage_at, duration)
+    return next_damage_at < duration - 0.0001
+end
+
+local function tornado_log(state, event_name)
+    local position = state.position or Vector(0, 0, 0)
+    local target_index = valid(state.target) and state.target.entindex
+        and state.target:entindex() or -1
+    print("[HeroTornado] event=" .. tostring(event_name)
+        .. " id=" .. tostring(state.id)
+        .. " small=" .. tostring(state.is_small == true)
+        .. " target=" .. tostring(target_index)
+        .. " attached=" .. tostring(state.attached_to_target == true)
+        .. " position=" .. string.format(
+            "%.1f,%.1f,%.1f", position.x, position.y, position.z
+        ))
+end
+
+local function tornado_tracking_step(position, destination, speed, elapsed, fallback)
+    local dx = destination.x - position.x
+    local dy = destination.y - position.y
+    local distance = math.sqrt(dx * dx + dy * dy)
+    if distance <= 0.01 then
+        return copy_position(destination), fallback, true
+    end
+    local direction = Vector(dx / distance, dy / distance, 0)
+    local move_distance = math.min(distance, math.max(0, speed * elapsed))
+    return position + direction * move_distance, direction,
+        move_distance >= distance - 0.01
+end
+
+local function tornado_update_tracking(state, target_is_alive, target_position, elapsed)
+    if target_is_alive and target_position then
+        state.last_target_position = copy_position(target_position)
+    end
+    local destination = state.last_target_position
+    if state.attached_to_target and target_is_alive then
+        state.position = copy_position(destination)
+        return Vector(0, 0, 0)
+    end
+    if state.attached_to_target then
+        if destination then state.position = copy_position(destination) end
+        return Vector(0, 0, 0)
+    end
+    if not destination then return Vector(0, 0, 0) end
+    local reached = false
+    state.position, state.direction, reached = tornado_tracking_step(
+        state.position, destination, state.move_speed, elapsed, state.direction
+    )
+    if reached and target_is_alive then
+        state.attached_to_target = true
+        state.position = copy_position(destination)
+    end
+    return reached and Vector(0, 0, 0)
+        or state.direction * state.move_speed
+end
+
+local function tornado_damage(state)
+    if not alive(state.context.attacker) then return end
+    tornado_refresh_attributes(state)
+    local tick_hits = {}
+    local targets = enemies_in_radius(
+        state.context.attacker, state.position, state.hit_radius
+    )
+    for _, target in ipairs(targets) do
+        if alive(target) and (target:GetAbsOrigin() - state.position):Length2D()
+            <= state.hit_radius then
+            local key = unit_key(target)
+            if key and not tick_hits[key] then
+                tick_hits[key] = true
+                state.hit_units[key] = target
+                deal(state.context, target, state.damage_multiplier, state.is_small)
+            end
+        end
+    end
+end
+
+local function tornado_release(state)
+    if state.particle then
+        ParticleManager:DestroyParticle(state.particle, false)
+        ParticleManager:ReleaseParticleIndex(state.particle)
+        state.particle = nil
+    end
+    tornado_log(state, "finish")
+    active_tornadoes[state.id] = nil
+end
+
+local function tornado_spawn_small(parent, target)
+    local target_position = unit_position(target)
+    if not target_position then return end
+    local direction = normalized_direction(parent.position, target_position, parent.direction)
+    tornado_sequence = tornado_sequence + 1
+    local state = {
+        id = tornado_sequence,
+        context = parent.context,
+        definition = parent.definition,
+        level = parent.level,
+        position = copy_position(parent.position),
+        direction = direction,
+        started_at = game_time(),
+        last_update_at = game_time(),
+        origin = copy_position(parent.position),
+        next_damage_at = 1.0,
+        duration = level_value(parent.definition, "small_tornado_duration", parent.level),
+        move_speed = parent.move_speed,
+        hit_radius = parent.hit_radius,
+        effect_radius = parent.effect_radius,
+        damage_interval = parent.damage_interval,
+        damage_multiplier = parent.damage_multiplier
+            * level_value(parent.definition, "small_tornado_damage_pct", parent.level) / 100,
+        area_slow_pct = parent.area_slow_pct,
+        hit_slow_pct = 0,
+        is_small = true,
+        target = nil,
+        last_target_position = nil,
+        attached_to_target = false,
+        target_was_alive = false,
+        hit_units = {},
+        particle = nil,
+    }
+    active_tornadoes[state.id] = state
+    local visual_ok, visual_error = pcall(function()
+        state.particle = ParticleManager:CreateParticle(
+            TORNADO_PARTICLE, PATTACH_WORLDORIGIN, state.context.attacker
+        )
+        ParticleManager:SetParticleControl(state.particle, 0, state.position)
+    end)
+    if not visual_ok then
+        state.particle = nil
+        print("[HeroPassiveSkill] small tornado visual failed: " .. tostring(visual_error))
+    end
+    tornado_log(state, "spawn")
+    tornado_refresh_attributes(state)
+    tornado_damage(state)
+end
+
+local function tornado_finish(state)
+    if state.level >= 5 and not state.is_small then
+        local survivors = {}
+        for _, target in pairs(state.hit_units) do
+            if alive(target) then survivors[#survivors + 1] = target end
+        end
+        for _ = 1, #survivors do
+            if #survivors == 0 then break end
+            local index = RandomInt and RandomInt(1, #survivors)
+                or math.random(1, #survivors)
+            local target = table.remove(survivors, index)
+            tornado_spawn_small(state, target)
+        end
+    end
+    tornado_release(state)
+end
+
+local function tornado_sync_slow_units(desired_area, desired_hit)
+    for key, target in pairs(tornado_slow_units) do
+        if key ~= "values" then
+            if not desired_area[key] then
+                buff_manager.remove(target, "debuff_hero_tornado_area_slow")
+            end
+            if not desired_hit[key] then
+                buff_manager.remove(target, "debuff_hero_tornado_hit_slow")
+            end
+        end
+    end
+    tornado_slow_units = {}
+    for key, target in pairs(desired_area) do
+        if key ~= "values" then
+            tornado_slow_units[key] = target
+            buff_manager.apply(nil, target, "debuff_hero_tornado_area_slow", {
+                value = -math.abs(desired_area.values[key] or 0),
+            })
+        end
+    end
+    for key, target in pairs(desired_hit) do
+        if key ~= "values" then
+            tornado_slow_units[key] = target
+            buff_manager.apply(nil, target, "debuff_hero_tornado_hit_slow", {
+                value = -math.abs(desired_hit.values[key] or 0),
+            })
+        end
+    end
+end
+
+local function sync_tornadoes()
+    local now = game_time()
+    local desired_area = { values = {} }
+    local desired_hit = { values = {} }
+    local has_active = false
+    local finished = {}
+    for id, state in pairs(active_tornadoes) do
+        if not alive(state.context.attacker) then
+            tornado_release(state)
+        else
+            has_active = true
+            local end_at = state.started_at + state.duration
+            local elapsed = math.max(0,
+                math.min(now, end_at) - math.min(state.last_update_at, end_at)
+            )
+            state.last_update_at = now
+            local velocity = state.direction * state.move_speed
+            if state.is_small then
+                state.position = state.position + velocity * elapsed
+            else
+                local target_is_alive = alive(state.target)
+                local target_position = target_is_alive
+                    and state.target:GetAbsOrigin() or nil
+                local was_attached = state.attached_to_target
+                if state.target_was_alive and not target_is_alive then
+                    tornado_log(state, "target_dead")
+                end
+                velocity = tornado_update_tracking(
+                    state, target_is_alive, target_position, elapsed
+                )
+                if not was_attached and state.attached_to_target then
+                    tornado_log(state, "attached")
+                end
+                state.target_was_alive = target_is_alive
+            end
+            if GetGroundPosition then
+                state.position = GetGroundPosition(state.position, nil)
+            end
+            if state.particle then
+                ParticleManager:SetParticleControl(state.particle, 0, state.position)
+            end
+            if state.area_slow_pct > 0 then
+                for _, target in ipairs(enemies_touching_radius(
+                    state.context.attacker, state.position, state.effect_radius
+                )) do
+                    local key = unit_key(target)
+                    if key then
+                        desired_area[key] = target
+                        desired_area.values[key] = math.max(
+                            desired_area.values[key] or 0, state.area_slow_pct
+                        )
+                    end
+                end
+                if not state.is_small then
+                    for key, target in pairs(state.hit_units) do
+                        if alive(target) and (target:GetAbsOrigin() - state.position):Length2D()
+                            <= state.effect_radius then
+                            desired_hit[key] = target
+                            desired_hit.values[key] = math.max(
+                                desired_hit.values[key] or 0, state.hit_slow_pct
+                            )
+                        end
+                    end
+                end
+            end
+            while now + 0.0001 >= state.started_at + state.next_damage_at
+                and tornado_damage_tick_due(state.next_damage_at, state.duration) do
+                tornado_refresh_attributes(state)
+                tornado_damage(state)
+                state.next_damage_at = state.next_damage_at + state.damage_interval
+            end
+            if now + 0.0001 >= state.started_at + state.duration then
+                finished[#finished + 1] = state
+            end
+        end
+    end
+    for _, state in ipairs(finished) do
+        if active_tornadoes[state.id] then tornado_finish(state) end
+    end
+    tornado_sync_slow_units(desired_area, desired_hit)
+    if not has_active or next(active_tornadoes) == nil then
+        tornado_task = nil
+        return false
+    end
+    return TORNADO_THINK_INTERVAL
+end
+
+local function ensure_tornado_task()
+    if tornado_task then return end
+    tornado_task = scheduler.after(
+        TORNADO_THINK_INTERVAL, sync_tornadoes, "hero_tornado_sync"
+    )
+end
+
+local function clear_tornadoes()
+    for id, state in pairs(active_tornadoes) do tornado_release(state) end
+    tornado_sync_slow_units({ values = {} }, { values = {} })
+    if tornado_task then scheduler.cancel(tornado_task) end
+    tornado_task = nil
+end
+
 local function run_void(context, definition)
-    local position = unit_position(context.target)
-    if not position then return end
-    position = copy_position(position)
-    local radius = level_value(definition, "radius", context.level)
-    local center_radius = radius * level_value(definition, "center_radius_pct", context.level)
-    for _, unit in ipairs(enemies_in_radius(context.attacker, position, radius)) do
-        local multiplier = definition.damage_multiplier[context.level]
-        if (unit:GetAbsOrigin() - position):Length2D() <= center_radius then
-            multiplier = multiplier * (1 + level_value(definition, "center_bonus_pct", context.level))
-        end
-        deal(context, unit, multiplier, false)
-        if context.level >= 2 then
-            local effect = definition.level_effects[context.level]
-            apply_effect(context.attacker, unit, "attack_slow", effect.attack_slow_pct, effect.duration, context.skill_id)
-        end
+    local origin = unit_position(context.attacker)
+    local target_position = unit_position(context.target)
+    if not origin or not target_position then return false end
+    local direction = normalized_direction(origin, target_position, Vector(1, 0, 0))
+    tornado_sequence = tornado_sequence + 1
+    local id = tornado_sequence
+    local state = {
+        id = id,
+        context = context,
+        definition = definition,
+        level = context.level,
+        position = copy_position(origin),
+        direction = direction,
+        started_at = game_time(),
+        last_update_at = game_time(),
+        origin = copy_position(origin),
+        next_damage_at = 1.0,
+        duration = level_value(definition, "duration", context.level),
+        move_speed = level_value(definition, "move_speed", context.level),
+        hit_radius = level_value(definition, "hit_radius", context.level),
+        effect_radius = level_value(definition, "effect_radius", context.level),
+        damage_interval = level_value(definition, "damage_interval", context.level),
+        damage_multiplier = level_value(definition, "damage_multiplier", context.level),
+        area_slow_pct = level_value(definition, "area_slow_pct", context.level),
+        hit_slow_pct = level_value(definition, "hit_slow_pct", context.level),
+        is_small = false,
+        target = context.target,
+        last_target_position = copy_position(target_position),
+        attached_to_target = false,
+        target_was_alive = alive(context.target),
+        hit_units = {},
+        particle = nil,
+    }
+    active_tornadoes[id] = state
+    tornado_damage(state)
+    local visual_ok, visual_error = pcall(function()
+        state.particle = ParticleManager:CreateParticle(
+            TORNADO_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
+        )
+        ParticleManager:SetParticleControl(state.particle, 0, state.position)
+    end)
+    if not visual_ok then
+        state.particle = nil
+        print("[HeroPassiveSkill] tornado visual failed: " .. tostring(visual_error))
     end
-    if context.level == 3 then
-        local effect = definition.level_effects[3]
-        scheduler.after(effect.secondary_delay, function()
-            deal_group(context, enemies_in_radius(context.attacker, position, center_radius),
-                effect.secondary_multiplier, true)
-        end)
-    end
+    tornado_log(state, "spawn")
+    ensure_tornado_task()
+    return true
 end
 
 local runners = {
@@ -2213,6 +2534,11 @@ function M.init()
     poison_cloud_task = nil
     blade_pulse_projectiles = {}
     blade_pulse_sequence = 0
+    clear_tornadoes()
+    active_tornadoes = {}
+    tornado_sequence = 0
+    tornado_slow_units = {}
+    tornado_task = nil
     effect_sequence = 0
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_main_attack)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_poison_cloud_death)
@@ -2250,6 +2576,12 @@ M._test = {
     blade_pulse_damage_multiplier = blade_pulse_damage_multiplier,
     blade_pulse_projectiles = function() return blade_pulse_projectiles end,
     blade_pulse_projectile_hit = blade_pulse_projectile_hit,
+    active_tornadoes = function() return active_tornadoes end,
+    sync_tornadoes = sync_tornadoes,
+    clear_tornadoes = clear_tornadoes,
+    tornado_damage_tick_due = tornado_damage_tick_due,
+    tornado_tracking_step = tornado_tracking_step,
+    tornado_update_tracking = tornado_update_tracking,
 }
 
 return M

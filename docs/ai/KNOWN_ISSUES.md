@@ -2,6 +2,12 @@
 
 ## 当前已知问题
 
+0. **Valve完整Invoker Tornado粒子不能作为Lua逐帧追踪视觉。**
+   - `particles/units/heroes/hero_invoker/invoker_tornado.vpcf`会按创建时控制点在内部自行直线推进；后续更新CP0/CP1不能可靠重定位已经发射的内部粒子。
+   - 实机会表现为Lua伤害中心继续运行、状态测试通过，但画面龙卷仍沿初始直线飞走。
+   - `proto_void_pulse`现使用项目粒子`particles/survival_tornado/survival_tornado_follow.vpcf`，只承载`invoker_tornado_child.vpcf`且没有移动算子；位置完全由Lua更新CP0。
+   - 修改该粒子后必须用Resource Compiler强制编译到game目录，并完全重启Workshop Tools Run；热加载Lua不能替换已经预缓存的粒子资源。
+
 1. **`build_configs.bat` 当前可能因 Windows Python 别名挂起。**
    - 当前 PATH 首个 `python.exe` 是 `C:\Users\li\AppData\Local\Microsoft\WindowsApps\python.exe`，执行 `python --version` 无输出。
    - 可用解释器是 Python Launcher：`py -V` 返回 Python 3.13.14。

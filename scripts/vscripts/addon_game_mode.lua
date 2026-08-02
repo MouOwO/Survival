@@ -542,7 +542,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_invoker/invoker_tornado.vpcf",
+        "particles/survival_tornado/survival_tornado_follow.vpcf",
         context
     )
     local precached_buff_particles = {}

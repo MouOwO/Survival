@@ -76,6 +76,7 @@
 - 魔法弹弓的射程读取不得只依赖 `GetAttackRange()`：当前 `CreateUnitByName`召唤英雄由`hero_stat_adapter`通过`Script_SetAttackRange`写入配置，但实机曾读取到`GetAttackRange()==0`。权威回退顺序包含`unit.survival_attack_range`、`Script_GetAttackRange()`、`GetAttackRange()`和`config/generated/hero_definitions.lua`的`attack_range`，取最大有效正数；本次合法命中的敌方主目标始终作为保底候选。实机已确认`range=3000 selected=1 launched=1`，尚待确认`MAGIC_SLINGSHOT_HIT`。
 - `hero_skill_pool_members.csv` 使用 UTF-8 BOM，以兼容 Office/Excel 双击打开；配置生成器的 `utf-8-sig` 读取保持兼容。
 - 英雄伤害测试面板除原“累计/最近伤害”外，独立显示英雄技能的累计伤害、最近一次伤害和命中次数；统计使用 `OnTakeDamage` 的最终实际伤害，被动技能伤害请求必须携带对应 Ability handle 以区别普通攻击。
+- 公共技能`proto_void_pulse`的追踪龙卷视觉使用项目粒子`particles/survival_tornado/survival_tornado_follow.vpcf`，只引用Valve的`invoker_tornado_child.vpcf`子效果且不含内部移动算子；Lua权威状态每0.05秒写CP0。不得恢复为完整`invoker_tornado.vpcf`并尝试动态修改CP1追踪。
 - 测试聊天命令 `addskill` 将当前玩家技能点直接设置为10；未召唤英雄时拒绝执行，重复输入仍保持10点。
 - 英雄公共技能池独立上限为3，英雄总技能容量仍为配置中的10；候选生成和最终授予均由服务端检查，达到3个后转生随机技能奖励正常跳过，技能点奖励不受影响。
 - 重构采用分阶段可回滚方式：先建立共享快照/Tooltip ViewModel，再接管人物逻辑属性悬停，最后将技能/物品 Tooltip 改为原生优先与事件驱动扩展。
