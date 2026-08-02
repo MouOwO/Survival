@@ -123,6 +123,8 @@ local hero_combat_stat_service =
     require("systems/hero_combat_stat_service")
 local technology_stat_manager =
     require("systems/technology_stat_manager")
+local research_armor_reduction_service =
+    require("systems/research_armor_reduction_service")
 local research_technology_bootstrap =
     require("bootstrap/research_technology_bootstrap")
 local shop_system = require("systems/shop_system")
@@ -533,6 +535,16 @@ function M.precache(context)
         "particles/units/heroes/hero_tiny/tiny_avalanche.vpcf",
         context
     )
+    PrecacheResource(
+        "particle",
+        "particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_wave_of_terror_v2.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_invoker/invoker_tornado.vpcf",
+        context
+    )
     local precached_buff_particles = {}
     for _, row in ipairs(buff_definitions.rows or {}) do
         local particle = row.enabled ~= false and row.particle_name or nil
@@ -575,6 +587,7 @@ local function initialize_services()
     hero_progression_system.init()
     research_technology_bootstrap.init()
     technology_stat_manager.init()
+    research_armor_reduction_service.init()
     training_room_service.init()
     building_system.init()
     grid_placement_router.init()

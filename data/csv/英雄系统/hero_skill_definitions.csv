@@ -5,14 +5,14 @@ proto_flame_burst,ability_survival_flame_burst,爆炎弹·被动,主攻击命中
 proto_frost_nova,ability_survival_frost_nova,移动冰球·被动,主攻击命中时有12%概率向目标方向释放移动冰球，持续造成全属性范围纯粹伤害。,passive,5,100,1,,0,passive_proc,,crystal_maiden_crystal_nova,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_chain_lightning,ability_survival_chain_lightning,怒雷·被动,主攻击命中时概率释放宙斯落雷，对目标及周围敌人造成全属性伤害。,passive,5,100,1,,0,passive_proc,,zuus_lightning_bolt,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_poison_cloud,ability_survival_poison_cloud,毒云·被动,主攻击命中时概率在目标位置生成持续毒云，造成全属性范围纯粹伤害并逐秒降低敌人护甲。,passive,5,100,1,,0,passive_proc,,viper_nethertoxin,1,运行时效果见config/hero_passive_skill_definitions.lua。
-proto_blade_nova,ability_survival_blade_nova,剑刃震荡·被动,主攻击命中时概率对英雄周围造成伤害。,passive,3,100,1,,0,passive_proc,,juggernaut_blade_fury,1,运行时效果见config/hero_passive_skill_definitions.lua。
+proto_blade_nova,ability_survival_blade_nova,剑刃震荡·被动,主攻击命中时有15%概率沿英雄面向发射脉冲，对攻击射程内宽200的路径造成全属性纯粹伤害。,passive,5,100,1,,0,passive_proc,,juggernaut_blade_fury,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_earth_line,ability_survival_earth_line,地裂冲击·被动,主攻击命中时概率产生直线地裂。,passive,3,100,1,,0,passive_proc,,earthshaker_fissure,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_meteor,ability_survival_meteor,陨石坠落·被动,主攻击命中时概率延迟轰击记录位置。,passive,3,100,1,,0,passive_proc,,invoker_chaos_meteor,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_arcane_barrage,ability_survival_arcane_barrage,奥术弹幕·被动,主攻击命中时有10%概率对目标区域释放持续飞弹轰击，每颗飞弹造成全属性范围纯粹伤害。,passive,5,100,1,,0,passive_proc,,skywrath_mage_arcane_bolt,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_magic_slingshot,ability_survival_magic_slingshot,魔法弹弓·被动,主攻击命中时有10%概率向攻击射程内最近的5名敌人发射石弹，造成全属性伤害与眩晕，并在最高级生成减速碎石区。,passive,5,100,1,,0,passive_proc,,tiny_toss,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_holy_pulse,ability_survival_holy_pulse,圣光震荡·被动,主攻击命中时概率对英雄周围造成伤害。,passive,3,100,1,,0,passive_proc,,omniknight_purification,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_ice_cone,ability_survival_ice_cone,寒冰锥·被动,主攻击命中时有15%概率在目标区域释放暴风雪，逐秒造成全属性范围纯粹伤害并强化控制效果。,passive,5,100,1,,0,passive_proc,,crystal_maiden_freezing_field,1,运行时效果见config/hero_passive_skill_definitions.lua。
-proto_void_pulse,ability_survival_void_pulse,虚空震爆·被动,主攻击命中时概率产生中心强化的范围伤害。,passive,3,100,1,,0,passive_proc,,faceless_void_time_dilation,1,运行时效果见config/hero_passive_skill_definitions.lua。
+proto_void_pulse,ability_survival_void_pulse,虚空震爆·被动,主攻击命中时有15%概率释放移动龙卷风，持续造成实时全属性范围纯粹伤害并降低敌人移动速度。,passive,5,100,1,,0,passive_proc,,invoker_tornado,1,运行时效果见config/hero_passive_skill_definitions.lua。
 skill_axe_exclusive,ability_survival_axe_exclusive,斧王专属：战意,每级增加攻击伤害。,passive,3,0,0,hero_axe,0,pre_attack_damage,20,axe_counter_helix,1,英雄初始专属技能；统一最高3级。
 skill_slark_exclusive,ability_survival_slark_exclusive,斯拉克专属：猎杀,每级增加攻击速度。,passive,3,0,0,hero_slark,0,attack_speed_bonus,30,slark_essence_shift,1,英雄初始专属技能；统一最高3级。
 skill_juggernaut_exclusive,ability_survival_juggernaut_exclusive,主宰专属：剑意,每级增加敏捷。,passive,3,0,0,hero_juggernaut,0,agility_bonus,10,juggernaut_blade_dance,1,英雄初始专属技能；统一最高3级。

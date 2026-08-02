@@ -1,6 +1,40 @@
+## 2026-08-02 - 检查点：虚空震爆重做龙卷风需求确认与实现调查
+
+- 用户要求将现有 `proto_void_pulse` / “虚空震爆·被动”重做为龙卷风，并已明确批准编码。
+- 身份边界：保留 `ability_survival_void_pulse`、公共池成员 `public_12` 和原显示名；当前CSV、运行配置与Ability KV仍为旧三级虚空震爆，需要统一升至五级。
+- 最终规则：15%触发；主龙卷从攻击者位置朝目标触发位置固定方向移动，速度500、持续3秒；t=0/1/2实时读取逻辑全属性，对中心300范围造成×2纯粹伤害，同一目标每个周期最多一次。
+- 控制规则：影响范围600；LV3起范围内持续减速20%，主龙卷曾命中目标在仍处于范围时额外减速15%，总计35%，离开立即移除；LV2无新增效果，LV4继承LV3。
+- LV5规则：主龙卷结束时，仅统计仍存活的已命中不同目标；每个目标在结束位置产生一个无上限小龙卷，随机选择上述目标方向，持续2秒、速度500、t=0/1实时属性×1.2伤害，只保留20%范围减速，不施加额外15%且不继续分裂。
+- 调查证据：配置权威源为 `data/csv/英雄系统/hero_skill_definitions.csv`；运行定义为 `config/hero_passive_skill_definitions.lua`；执行服务为 `systems/hero_passive_skill_service.lua`；Tooltip动态等级字段由 `ui/ability_runtime_service.lua` 白名单发布；减速复用 `buff_manager` 的显式apply/remove受管Buff模式。
+- 工作区存在大量既有未提交修改，本任务相关文件也已修改；实现必须基于当前内容追加，不覆盖或回滚。
+- 尚未验证：生产实现、生成配置、Lua测试、契约测试、语法、UTF-8、限定diff检查以及Workshop Tools实机表现。
+- 下一步：实现CSV、运行配置、双减速Buff、共享龙卷状态机、Ability KV、Tooltip发布和测试。
 # Session Checkpoint Log
 
 > 仅追加关键检查点。记录研究过程，而不只是任务完成后的总结。
+
+## 2026-08-02 — 公共技能“脉冲激射”完成确认
+
+- 用户明确确认“技能已经制作完成”，本技能从“等待冷启动实机验收”转为已完成状态；当前没有脉冲激射待办，不再把它作为活跃开发任务恢复。
+- 最终基线保持不变：保留`proto_blade_nova`/`ability_survival_blade_nova`、显示名“剑刃震荡·被动”和`public_05`公共池身份；LV1至LV5规则、200总宽度、英雄面向、1秒全程、LV2逐道首目标、LV3距离倍率、LV4继承及LV5同路径三道完整独立伤害均按上一实现检查点固化。
+- `START_HERE.md`、`CURRENT_TASK.md`和`PROJECT_CONTEXT.md`已同步完成状态与稳定规则。后续只有用户提出明确调整或实机问题时才重新打开该技能。
+
+## 2026-08-02 — 公共技能“脉冲激射”五级实现
+
+- 用户确认保留`proto_blade_nova`/`ability_survival_blade_nova`和显示名“剑刃震荡·被动”，最高5级；LV4完整继承LV3，LV5才获得射程+50%和30%三道脉冲。三道完全重合，30%成功时本次总数为3道而非额外增加3道，每道完整独立伤害。
+- 运行实现改为原生穿透线性投射物：触发时快照英雄面向、逻辑全属性与多级回退攻击射程；总宽度200对应起止半径100，`bDeleteOnHit=false`，每道保存独立首目标状态和命中去重。复用已验证的Wave of Terror粒子，速度按射程动态计算，使所有射程均在1秒走完全段。
+- LV1为15%触发、全属性×4纯粹伤害；LV2每道首个目标翻倍；LV3按目标沿脉冲方向投影距离从×4线性增长到末端×8并钳制；LV4不变；LV5射程×1.5，30%概率发射同路径3道，同一敌人可分别承受3次且无衰减。
+- 源CSV、引擎Ability五级KV、运行配置、自定义Tooltip发布、生成技能/Tooltip配置和粒子预缓存已同步。当前环境无可用Python 3，使用仓库既有PowerShell CSV生成回退重建目标技能配置；生成结果与源CSV由契约测试核对。
+- `BLADE_PULSE_STATE_LUA51_PASS`、`BLADE_PULSE_CONTRACT_PASS`、addskill及爆炎弹/移动冰球/毒云/魔法弹弓/寒冰锥/奥术弹幕回归通过；相关Lua 5.1语法、严格UTF-8和限定`git diff --check`通过。仍需Workshop Tools冷启动验收粒子、引擎碰撞回调顺序和三道重合效果。
+
+## 2026-08-01 — 英雄科技攻击减甲实机诊断
+
+- 用户回传前5次权威命中均进入服务，但全部以 `reduction_not_positive` 拒绝，且科技/final/hero结构完整、减甲值为0；这排除了事件、攻击者、目标与Modifier应用链，根因收窄到科技运行值同步。
+- 根因确认：`addtechnology researcher_hero_armor_reduction_19` 走生成科技分支并在 `TECHNOLOGY_CHANGED` 中携带 `researcher_hero_armor_reduction=19`，但 `technology_stat_manager.on_technology_changed` 丢弃 `payload.levels`，转而查询独立旧研究仓库；旧仓库未写入 `ARS-09`，其0值遂覆盖生成科技。现生成科技事件优先按自身完整levels调用`rebuild`，仅无levels的旧调用方保留旧仓库兼容回退，并新增旧仓库返回0时仍必须得到`9.5/3`的Lua回归测试。
+- 用户冷启动实测同一怪物攻击500次后实际伤害仍不变，证明此前仅模拟`AddNewModifier`调用次数的测试不足以确认引擎创建、刷新和物理护甲属性结算。
+- 权威命中服务现对目标分别计数，在1至5及10/25/50/100/250/500次命中记录玩家、攻击者/目标、实时科技值、调用前护甲、Modifier返回值栈数和同调用栈有效护甲；`AddNewModifier`抛错或返回nil时输出`RESEARCH_ARMOR_APPLY_FAILED`，不再由EventBus静默吞掉关键信息。
+- 目标Modifier在相同里程碑记录`OnCreated`或`OnRefresh`、增量、计划/延迟帧栈数、延迟帧前后有效护甲、护甲差和显式下限。该诊断可直接区分服务未调用、Modifier未创建/未刷新、栈累计但引擎护甲不变三类故障。
+- 用户反馈`RESEARCH_ARMOR_APPLY/APPLY_FAILED/EFFECT`均完全未出现，因此故障已收窄到应用前：运行时可能仍加载旧Lua、服务未初始化、权威事件未到达、事件载荷被拒绝或科技管理器运行值为0。新增模块加载、服务订阅、回调入口和明确拒绝原因日志；回调入口/拒绝日志仅输出前5次，内存高水位警告本身不作为根因证据。
 
 ## 2026-08-01 — 英雄科技19级攻击减甲结算与UI修复
 

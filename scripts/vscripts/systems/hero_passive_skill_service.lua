@@ -33,6 +33,8 @@ local poison_cloud_sequence = 0
 local poison_cloud_units = {}
 local poison_cloud_deaths = {}
 local poison_cloud_task = nil
+local blade_pulse_projectiles = {}
+local blade_pulse_sequence = 0
 
 local ARCANE_EXPLOSION_PARTICLE =
     "particles/basic_explosion/basic_explosion.vpcf"
@@ -65,6 +67,9 @@ local POISON_CLOUD_EXPLOSION_PARTICLE =
     "particles/basic_explosion/basic_explosion.vpcf"
 local POISON_CLOUD_ARMOR_MODIFIER = "modifier_hero_poison_cloud_armor"
 local POISON_CLOUD_THINK_INTERVAL = 0.05
+local BLADE_PULSE_PARTICLE =
+    "particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_wave_of_terror_v2.vpcf"
+local BLADE_PULSE_CLEANUP_GRACE = 0.25
 
 local function valid(unit)
     return unit and not unit:IsNull()
@@ -1454,17 +1459,119 @@ local function run_poison(context, definition)
     return create_poison_cloud(context, position, definition)
 end
 
-local function run_blade(context, definition)
-    local targets = enemies_in_radius(context.attacker, context.attacker:GetAbsOrigin(),
-        level_value(definition, "radius", context.level))
-    deal_group(context, targets, definition.damage_multiplier[context.level], false)
-    if context.level >= 2 then
-        local effect = definition.level_effects[context.level]
-        for _, target in ipairs(targets) do
-            periodic_on_target(context, target, effect.duration, effect.interval,
-                effect.dot_multiplier, nil, context.level == 3)
-        end
+local function blade_pulse_damage_multiplier(state, target)
+    local multiplier = state.base_multiplier
+    if state.maximum_distance_multiplier > 1 then
+        local position = unit_position(target) or state.origin
+        local offset_x = position.x - state.origin.x
+        local offset_y = position.y - state.origin.y
+        local distance = math.max(0, math.min(
+            state.distance,
+            offset_x * state.direction.x + offset_y * state.direction.y
+        ))
+        local progress = state.distance > 0 and distance / state.distance or 0
+        multiplier = multiplier * (
+            1 + (state.maximum_distance_multiplier - 1) * progress
+        )
     end
+    if not state.first_target_hit then
+        multiplier = multiplier * state.first_target_multiplier
+    end
+    return multiplier
+end
+
+local function blade_pulse_projectile_hit(ability, target, projectile_id)
+    projectile_id = tonumber(projectile_id)
+    local state = projectile_id and blade_pulse_projectiles[projectile_id] or nil
+    if not state then return false end
+    if not target then
+        blade_pulse_projectiles[projectile_id] = nil
+        return false
+    end
+    if ability ~= state.ability or not valid(state.context.attacker)
+        or not is_enemy(state.context.attacker, target) then return false end
+    local target_key = unit_key(target)
+    if target_key and not state.hit[target_key] then
+        state.hit[target_key] = true
+        local multiplier = blade_pulse_damage_multiplier(state, target)
+        deal(state.context, target, multiplier, false)
+        state.first_target_hit = true
+    end
+    return false
+end
+
+local function run_blade(context, definition)
+    if not ProjectileManager or not ProjectileManager.CreateLinearProjectile then
+        return false
+    end
+    local skill_definition = skill_definitions.by_id[context.skill_id]
+    local ability = skill_definition and context.attacker:FindAbilityByName(
+        skill_definition.ability_name
+    ) or nil
+    if not valid(ability) then return false end
+    local origin = copy_position(context.attacker:GetAbsOrigin())
+    local forward = context.attacker:GetForwardVector()
+    local direction = Vector(forward.x, forward.y, 0)
+    if direction:Length2D() <= 0.001 then return false end
+    direction = direction:Normalized()
+    local distance = current_attack_range(context.attacker)
+        * level_value(definition, "range_multiplier", context.level)
+    local duration = level_value(definition, "pulse_duration", context.level)
+    local half_width = level_value(definition, "pulse_width", context.level) * 0.5
+    if distance <= 0 or duration <= 0 or half_width <= 0 then return false end
+    local speed = distance / duration
+
+    local pulse_count = 1
+    local triple_chance = level_value(
+        definition, "triple_pulse_chance", context.level
+    )
+    if triple_chance > 0 and RandomFloat(0, 1) <= triple_chance then
+        pulse_count = math.max(1, math.floor(level_value(
+            definition, "triple_pulse_count", context.level
+        ) + 0.001))
+    end
+    for _ = 1, pulse_count do
+        blade_pulse_sequence = blade_pulse_sequence + 1
+        local projectile_id = blade_pulse_sequence
+        blade_pulse_projectiles[projectile_id] = {
+            ability = ability,
+            context = context,
+            origin = copy_position(origin),
+            direction = direction,
+            distance = distance,
+            base_multiplier = level_value(
+                definition, "damage_multiplier", context.level
+            ),
+            first_target_multiplier = level_value(
+                definition, "first_target_multiplier", context.level
+            ),
+            maximum_distance_multiplier = level_value(
+                definition, "maximum_distance_multiplier", context.level
+            ),
+            first_target_hit = false,
+            hit = {},
+        }
+        ProjectileManager:CreateLinearProjectile({
+            Ability = ability,
+            EffectName = BLADE_PULSE_PARTICLE,
+            Source = context.attacker,
+            vSpawnOrigin = origin,
+            vVelocity = direction * speed,
+            fDistance = distance,
+            fStartRadius = half_width,
+            fEndRadius = half_width,
+            iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+            iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+            iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+            bDeleteOnHit = false,
+            bProvidesVision = false,
+            ExtraData = { blade_pulse_projectile_id = projectile_id },
+        })
+        scheduler.after(distance / speed + BLADE_PULSE_CLEANUP_GRACE, function()
+            blade_pulse_projectiles[projectile_id] = nil
+        end)
+    end
+    return true
 end
 
 local function run_earth(context, definition)
@@ -2061,6 +2168,11 @@ end
 
 function M.on_tracking_projectile_hit(ability, target, location, extra_data)
     extra_data = extra_data or {}
+    if extra_data.blade_pulse_projectile_id then
+        return blade_pulse_projectile_hit(
+            ability, target, extra_data.blade_pulse_projectile_id
+        )
+    end
     if extra_data.magic_slingshot_projectile_id then
         return magic_slingshot_projectile_hit(
             ability, target, location, extra_data.magic_slingshot_projectile_id
@@ -2099,6 +2211,8 @@ function M.init()
     poison_cloud_units = {}
     poison_cloud_deaths = {}
     poison_cloud_task = nil
+    blade_pulse_projectiles = {}
+    blade_pulse_sequence = 0
     effect_sequence = 0
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_main_attack)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_poison_cloud_death)
@@ -2133,6 +2247,9 @@ M._test = {
     poison_cloud_contains = poison_cloud_contains,
     poison_cloud_for_death = poison_cloud_for_death,
     on_poison_cloud_death = on_poison_cloud_death,
+    blade_pulse_damage_multiplier = blade_pulse_damage_multiplier,
+    blade_pulse_projectiles = function() return blade_pulse_projectiles end,
+    blade_pulse_projectile_hit = blade_pulse_projectile_hit,
 }
 
 return M

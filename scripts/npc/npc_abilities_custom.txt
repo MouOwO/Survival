@@ -666,7 +666,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "juggernaut_blade_fury"
-    "MaxLevel"           "3"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 
@@ -735,8 +735,8 @@
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-    "AbilityTextureName" "faceless_void_time_dilation"
-    "MaxLevel"           "3"
+    "AbilityTextureName" "invoker_tornado"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
     "critical_strike_lv01"

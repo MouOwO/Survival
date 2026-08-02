@@ -228,6 +228,16 @@ end
 local function on_technology_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
+    -- Generated technology purchases already carry the authoritative levels
+    -- from shop_system. Do not replace them with the separate legacy research
+    -- repository: cheat_addtechnology and non-legacy shop grants do not write
+    -- that repository, so querying it here would rebuild every generated
+    -- technology effect as zero.
+    if type(payload.levels) == "table" then
+        rebuild(player_id, payload.levels)
+        publish(player_id, payload.reason or "technology_changed")
+        return
+    end
     local response = event_bus.request(
         research_events.EFFECTS_GET_REQUESTED,
         { player_id = player_id }

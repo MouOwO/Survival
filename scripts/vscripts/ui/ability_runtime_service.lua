@@ -178,6 +178,8 @@ local function publish(state)
                 or hero_skill.skill_id == "proto_magic_slingshot"
                 or hero_skill.skill_id == "proto_frost_nova"
                 or hero_skill.skill_id == "proto_poison_cloud"
+                or hero_skill.skill_id == "proto_blade_nova"
+                or hero_skill.skill_id == "proto_void_pulse"
         )
             and hero_passive_definitions.by_id[hero_skill.skill_id] or nil
         if passive then
