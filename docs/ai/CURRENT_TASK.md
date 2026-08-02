@@ -1,5 +1,25 @@
 # Current Task
 
+## 最新状态（2026-08-02）
+
+用户已明确确认现有公共技能`proto_earth_line`五级“地裂冲击·被动”暂时完成。当前基线停止继续调整，不再把Workshop Tools逐项验证恢复为活跃任务；只有用户以后明确提出地裂冲击的新需求或报告实机问题时，才按下述维护方式重新开启。
+
+### 地裂冲击自动验证
+
+- `EARTH_LINE_STATE_LUA51_PASS` / `EARTH_LINE_CONTRACT_PASS`。
+- `EARTH_LINE_LUAC51_PASS`：运行配置、两份生成Lua、公共被动服务、Tooltip运行服务、游戏模式和专项状态测试通过Lua 5.1语法检查。
+- `EARTH_LINE_GENERATED_COMPARE_PASS`：英雄技能生成Lua与权威CSV逐字节一致；Tooltip生成行与权威CSV一致且生产生成文件仅改变地裂目标行。
+- 严格UTF-8、乱码标记检查和限定`git diff --check`通过。
+- 脉冲激射、魔法弹弓、寒冰锥、元气弹、陨石坠落和移动冰球相关回归通过。
+
+### 地裂冲击后续修改入口
+
+- 配置或文案修改必须先改`data/csv/英雄系统/hero_skill_definitions.csv`和`data/csv/公共规则/tooltip_definitions.csv`，再定向生成对应Lua；禁止直接维护生成Lua。
+- 数值和等级行为修改同步检查`scripts/vscripts/config/hero_passive_skill_definitions.lua`、`scripts/npc/npc_abilities_custom.txt`和`scripts/vscripts/ui/ability_runtime_service.lua`。
+- 移动、碰撞、伤害、眩晕、首次范围伤害或清理规则修改集中在`scripts/vscripts/systems/hero_passive_skill_service.lua`，继续复用线性投射物、逻辑属性快照和现有伤害事务，不恢复旧`line_targets()`瞬时扫描。
+- 修改后至少运行`tools/test_earth_line_contract.ps1`、`tools/test_earth_line_state.lua`、Lua 5.1语法检查、CSV生成一致性、严格UTF-8、限定`git diff --check`以及相关公共技能回归。
+- Tiny岩石视觉、150/250引擎碰撞和LV2视觉尺寸属于未来发生相关问题时再执行的Workshop Tools检查项；当前不作为阻止“暂时完成”的待办。
+
 ## 活跃任务（2026-08-02）
 
 将公共技能`proto_meteor`重做为五级“陨石坠落·被动”，保留Ability ID `ability_survival_meteor`、公共池身份、图标和存档兼容性。
@@ -16,7 +36,7 @@
 
 ## 当前状态
 
-**CSV、运行配置、被动服务、Ability KV、Tooltip、Buff、定向生成和自动测试均已完成，等待 Workshop Tools 实机验证和用户验收。**
+**CSV、运行配置、被动服务、Ability KV、Tooltip、Buff、定向生成和自动测试均已完成。用户已于2026-08-02实机确认`addmonster` 600移速测试基准下的熔岩30%减速正常；其余表现仍按用户后续验收结论记录。**
 
 ## 工作区保护
 
@@ -35,6 +55,7 @@
 
 ## 剩余动作
 
+- 陨石LV3-LV5减速专项已验收：实际数值为30%而非20%；可攻击`addmonster`使用600基础移速和600移速上限后，用户实机确认减速正常。正常波次怪物未改变，不可攻击调试怪仍为0移速。
 - 完全重启 Workshop Tools Run，实机验证追踪视觉、5/7/9目标数量、每颗命中伤害与治疗、LV5独立爆炸及毒云活动期间不重触发。
 - 自动测试、契约检查和Lua模拟不能替代实机验证；只有用户明确确认后才能记录为完成验收。
 

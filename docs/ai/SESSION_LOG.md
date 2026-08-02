@@ -1296,3 +1296,48 @@
 - 生成完成：通用生成模块定向重建`hero_skill_definitions.lua`和`buff_definitions.lua`，Tooltip专用生成器重建CSV/Lua；差异仅为陨石目标行和新增Buff行。`METEOR_GENERATED_COMPARE_PASS`证明两份通用生成Lua与临时定向重建逐字节一致。
 - 验证完成：`METEOR_STATE_LUA51_PASS`、`METEOR_CONTRACT_PASS`、`METEOR_LUAC_PASS`、`METEOR_STRICT_UTF8_PASS`；奥术弹幕、寒冰锥、魔法弹弓、爆炎弹、移动冰球、毒云、元气弹、脉冲激射和龙卷风专项回归全部通过。
 - 尚未验证：Workshop Tools中的实际坠落外观、粒子大小/颜色、双陨石落地手感、500范围视觉匹配、最终引擎扣血和减速表现。自动测试不得描述为实机验证。
+
+## 2026-08-02 - addmonster移速提高用于陨石减速实机辨识
+
+- 用户反馈“移速降低20%不明显”，要求若减速已实现则把`addmonster`单位移速设为600进行测试。
+- 复核确认陨石不是20%而是LV3-LV5固定30%：运行配置`lava_move_slow_pct`、权威Buff CSV、生成Buff和Lua状态测试均一致；区域进入应用`value=-30`，重叠不叠加，离开全部区域移除。
+- `addmonster`原本对可攻击调试怪硬编码`SetBaseMoveSpeed(250)`；现改为调试常量600，并挂载隐藏不可驱散的`modifier_debug_move_speed_cap`，通过`MODIFIER_PROPERTY_MOVESPEED_MAX/LIMIT`将该调试实例上限提高到600。Modifier不提供绝对移速，因此陨石百分比减速仍参与最终速度；生成通知和日志同步输出移速。显式不可攻击模式继续设置0移速且不挂载上限Modifier。
+- 修改仅作用于`addmonster`创建的实例；没有修改`monster_archetypes.csv`、生成怪物配置或`npc_units_custom.txt`，正常波次、挑战和遭遇怪移速保持原值。
+- 下一步：冷启动实机使用默认`addmonster`（默认可攻击）观察进入陨石熔岩前后的速度差异；600基础速度在30%减速下理论对比为约600到420，最终引擎显示和速度上限以实机为准。
+
+## 2026-08-02 - 用户确认陨石减速与addmonster测试基准正常
+
+- 用户实机反馈“现在没问题了”，确认可攻击`addmonster`使用600基础移速及600移速上限后，陨石LV3-LV5熔岩30%减速能够正常观察且行为符合预期。
+- 本次确认范围是`addmonster`高速测试基准和陨石熔岩减速专项；不得扩大描述为陨石视觉、伤害、双陨石时序及活动锁均已逐项验收。
+- 稳定经验：当百分比移速变化在约250的低速怪物上不明显时，可提高调试实例的基础移速并同步解除引擎移速上限，以放大前后差异；上限Modifier不能设置绝对速度，否则可能掩盖被测百分比减速。
+- 修改必须限定在调试生成实例，不得为了测试可见性改变`monster_archetypes.csv`、生成怪物配置或`npc_units_custom.txt`，避免污染正常怪物平衡。
+- 用户已确认该问题无须继续调整；后续不得因旧的“减速不明显”记录重复实现或擅自改回20%。
+
+## 2026-08-02 - 检查点：地裂冲击五级滚石重做获批实施
+
+- 用户要求制作现有公共技能“地裂冲击·被动”；调查确认应保留`proto_earth_line`、`ability_survival_earth_line`、公共池成员`public_06`、图标与存档身份，将当前三级空壳扩为五级。
+- 最终规则：LV1主攻击命中12%概率触发；触发瞬间固定英雄位置为起点、被攻击目标位置为终点，滚石以500码/秒直线移动且不追踪；总宽150，路径真实命中造成触发时逻辑全属性×3纯粹伤害，命中前已被任意来源眩晕则×6；终点爆炸仅为视觉。
+- LV2总宽提高到250；LV3起每个路径真实命中单位在伤害后独立30%概率眩晕1秒；LV4完整继承LV3。
+- LV5首次真实命中敌人时，以命中位置为中心对300范围额外造成全属性×3纯粹伤害；范围内每个单位按结算前旧眩晕独立翻倍，首敌同时承受路径与范围伤害。额外范围只触发一次，滚石继续穿透至终点；仅路径真实命中单位参与30%新眩晕，范围波及单位不参与。
+- 实现约束：权威配置先改CSV并生成Lua；真实路径碰撞使用`CreateLinearProjectile`、`bDeleteOnHit=false`、唯一滚石ID、逐单位去重、回调`return false`和终点/超时清理；伤害复用逻辑属性快照与既有纯粹伤害事务。
+- 工作区已有大量非本任务修改和未跟踪测试文件；只做最小增量，不回滚、删除或整理既有修改。
+- 下一步：修改权威技能/Tooltip CSV并定向生成，再实现运行配置、线性投射物、KV、Tooltip、预缓存与专项测试。
+
+## 2026-08-02 - 地裂冲击实现与自动验证完成
+
+- 配置与生成完成：权威`hero_skill_definitions.csv`将`proto_earth_line`从三级扩为五级并更新说明；Tooltip权威CSV同步；使用`tools.build_configs.build()`定向生成英雄技能Lua，Tooltip按项目既有定向单行生成方式更新，避免全量生成器规范化历史无关行。英雄技能生成结果逐字节一致，Tooltip生产文件相对基线仅改变目标行。
+- 运行完成：旧瞬时`line_targets()`扫描、固定眩晕和延迟二次伤害已移除；新实现使用Tiny岩石`CreateLinearProjectile`，触发时复制英雄起点和被攻击目标位置，速度500、固定距离、不追踪，LV1半径75、LV2起半径125，`bDeleteOnHit=false`且每道滚石逐单位去重。
+- 伤害与控制完成：每次路径命中先检查任意来源旧眩晕并按触发时逻辑全属性×3/×6提交既有纯粹伤害事务；LV5首次命中后、LV3新眩晕前，对300范围分别按旧眩晕结算×3/×6额外伤害，首敌重复承受；最后只对路径真实命中单位独立掷30%并眩晕1秒，范围波及单位不参与。
+- 生命周期与视觉完成：正常终点和飞行时间+0.25秒兜底共用幂等释放，只播放一次无伤害基础爆炸并清理状态；晚到回调不会重复结算。Tiny岩石与基础投射物爆炸均已显式预缓存，Ability KV和Tooltip Runtime同步五级。
+- 专项验证：`EARTH_LINE_STATE_LUA51_PASS`、`EARTH_LINE_CONTRACT_PASS`、`EARTH_LINE_LUAC51_PASS`、`EARTH_LINE_CONFIG_VALIDATE_PASS`、`EARTH_LINE_GENERATED_COMPARE_PASS`、`EARTH_LINE_STRICT_UTF8_PASS`和限定`EARTH_LINE_DIFF_CHECK_PASS`。
+- 相关回归：`BLADE_PULSE_STATE_LUA51_PASS`、`MAGIC_SLINGSHOT_TARGETS_LUA51_PASS`、`MAGIC_SLINGSHOT_CONTRACT_PASS`、`ICE_CONE_CONTRACT_PASS`、`SPIRIT_BOMB_STATE_LUA51_PASS`/`SPIRIT_BOMB_CONTRACT_PASS`、`METEOR_STATE_LUA51_PASS`/`METEOR_CONTRACT_PASS`、`MOVING_ICE_BALL_MATH_LUA51_PASS`/`MOVING_ICE_BALL_CONTRACT_PASS`。
+- 测试说明：旧脉冲契约仍断言已废弃的复仇之魂粒子，第一次回归在该过时视觉断言处失败，改以当前Lua状态测试验证共享线性投射物；魔法弹弓旧契约最初因Tiny粒子未预缓存失败，地裂采用Tiny岩石并显式预缓存后该完整契约恢复通过。没有为测试修改无关技能行为。
+- 尚未验证：Workshop Tools中的Tiny岩石实际滚动观感、固定路线、终点爆炸、150/250引擎碰撞、最终扣血及眩晕。尤其LV2视觉体积是否随线性投射物碰撞半径75→125自动变大没有静态证据；若实机不变，应制作独立可缩放滚石粒子，不能把碰撞测试描述为视觉验收。
+
+## 2026-08-02 - 用户确认地裂冲击暂时完成并沉淀维护经验
+
+- 用户明确要求“技能暂时完成”，并要求将该技能写入`docs`经验，作为后续修改方式。该口径表示接受当前实现作为阶段性稳定基线，不等同于补做或确认此前未逐项完成的Workshop Tools视觉、碰撞和伤害验收。
+- 状态调整：`proto_earth_line`不再作为活跃待验任务恢复；后续会话不得因为旧记录中的Tiny岩石观感、150/250碰撞或LV2视觉尺寸待验项而主动继续修改。只有用户明确提出新需求或实机问题时才重新开启。
+- 稳定实现经验已写入`PROJECT_CONTEXT.md`：保留`proto_earth_line`、`ability_survival_earth_line`和`public_06`身份；配置从英雄技能/Tooltip权威CSV修改并定向生成；五级数值、Ability KV、Tooltip Runtime和公共被动服务必须同步。
+- 运行维护边界：继续使用真实`CreateLinearProjectile`、唯一投射物ID、`bDeleteOnHit=false`、逐单位去重、回调`return false`、触发时逻辑属性与目标位置快照、旧眩晕判定、伤害后新眩晕、LV5首次范围伤害和终点/超时幂等清理；禁止恢复视觉粒子碰撞、固定延迟猜测命中或旧`line_targets()`瞬时扫描。
+- 后续修改验证基线：地裂PowerShell契约、Lua 5.1状态测试、`luac5.1 -p`、CSV/生成Lua一致性、严格UTF-8、限定`git diff --check`，并按改动范围运行脉冲激射、魔法弹弓、寒冰锥、元气弹等共享机制回归。Workshop Tools结果必须与自动测试分开记录。

@@ -12,6 +12,7 @@ local M = {}
 
 local ADD_MONSTER_POSITION = Vector(-1280, 1088, 64)
 local ADD_MONSTER_DEFAULT_ARGS = { "1000000000", "200", "1", "1" }
+local ADD_MONSTER_MOVE_SPEED = 600
 
 local HERO_ALIASES = {
     axe = "hero_axe",
@@ -336,9 +337,12 @@ local function add_monster(context)
     unit:SetBaseDamageMin(attack)
     unit:SetBaseDamageMax(attack)
     if can_attack then
-        unit:SetBaseMoveSpeed(250)
+        unit:SetBaseMoveSpeed(ADD_MONSTER_MOVE_SPEED)
         unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
         unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
+        unit:AddNewModifier(
+            unit, nil, "modifier_debug_move_speed_cap", {}
+        )
         if hero then
             if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
             local home = unit:GetAbsOrigin()
@@ -357,15 +361,16 @@ local function add_monster(context)
         unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
     end
     notify(context, string.format(
-        "测试怪已生成：生命 %d，护甲 %.1f，攻击力 %d，%s",
-        health, armor, attack,
+        "测试怪已生成：生命 %d，护甲 %.1f，攻击力 %d，移速 %d，%s",
+        health, armor, attack, can_attack and ADD_MONSTER_MOVE_SPEED or 0,
         can_attack and hero and "会攻击英雄"
             or can_attack and "有攻击能力（当前未召唤英雄）"
             or "不会攻击英雄"
     ))
     logger.info("CheatCommand", string.format(
-        "addmonster entindex=%d health=%d armor=%.1f can_attack=%s attack=%d position=(%.1f,%.1f,%.1f)",
+        "addmonster entindex=%d health=%d armor=%.1f can_attack=%s attack=%d move_speed=%d position=(%.1f,%.1f,%.1f)",
         unit:entindex(), health, armor, tostring(can_attack), attack,
+        can_attack and ADD_MONSTER_MOVE_SPEED or 0,
         unit:GetAbsOrigin().x, unit:GetAbsOrigin().y, unit:GetAbsOrigin().z
     ))
     return true

@@ -77,6 +77,10 @@ local modifiers = {
         path = "modifiers/modifier_debug_attack_cap",
     },
     {
+        name = "modifier_debug_move_speed_cap",
+        path = "modifiers/modifier_debug_move_speed_cap",
+    },
+    {
         name = "modifier_debug_attack_bonus",
         path = "modifiers/modifier_debug_combat_bonus",
     },

@@ -532,6 +532,16 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
+        "particles/basic_projectile/basic_projectile.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
         "particles/basic_projectile/basic_projectile_explosion.vpcf",
         context
     )

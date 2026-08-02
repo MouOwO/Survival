@@ -41,6 +41,7 @@ local poison_cloud_deaths = {}
 local poison_cloud_task = nil
 local blade_pulse_projectiles = {}
 local blade_pulse_sequence = 0
+local earth_rock = { projectiles = {}, sequence = 0 }
 local active_tornadoes = {}
 local tornado_sequence = 0
 local tornado_task = nil
@@ -98,6 +99,11 @@ local POISON_CLOUD_THINK_INTERVAL = 0.05
 local BLADE_PULSE_PARTICLE =
     "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
 local BLADE_PULSE_CLEANUP_GRACE = 0.25
+earth_rock.particle =
+    "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf"
+earth_rock.explosion_particle =
+    "particles/basic_projectile/basic_projectile_explosion.vpcf"
+earth_rock.cleanup_grace = 0.25
 local TORNADO_PARTICLE =
     "particles/survival_tornado/survival_tornado_follow.vpcf"
 local TORNADO_THINK_INTERVAL = 0.05
@@ -1698,26 +1704,137 @@ local function run_blade(context, definition)
     return true
 end
 
+function earth_rock.explosion_visual(context, position)
+    if not position or not ParticleManager then return end
+    local visual_ok, visual_error = pcall(function()
+        local particle = ParticleManager:CreateParticle(
+            earth_rock.explosion_particle,
+            PATTACH_WORLDORIGIN,
+            context.attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, position)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not visual_ok then
+        print("[HeroPassiveSkill] earth rock explosion visual failed: "
+            .. tostring(visual_error))
+    end
+end
+
+function earth_rock.release(projectile_id, show_visual)
+    local state = earth_rock.projectiles[projectile_id]
+    if not state then return end
+    earth_rock.projectiles[projectile_id] = nil
+    if show_visual then
+        earth_rock.explosion_visual(state.context, state.destination)
+    end
+end
+
+function earth_rock.damage_multiplier(state, target)
+    if is_stunned(target) then return state.stunned_damage_multiplier end
+    return state.damage_multiplier
+end
+
+function earth_rock.first_hit_explosion(state, position)
+    if state.first_hit_exploded or state.first_hit_explosion_radius <= 0 then return end
+    state.first_hit_exploded = true
+    for _, target in ipairs(enemies_touching_radius(
+        state.context.attacker, position, state.first_hit_explosion_radius
+    )) do
+        local multiplier = is_stunned(target)
+            and state.stunned_first_hit_explosion_multiplier
+            or state.first_hit_explosion_multiplier
+        deal(state.context, target, multiplier, true)
+    end
+end
+
+function earth_rock.projectile_hit(ability, target, location, projectile_id)
+    projectile_id = tonumber(projectile_id)
+    local state = projectile_id and earth_rock.projectiles[projectile_id] or nil
+    if not state then return false end
+    if not target then
+        earth_rock.release(projectile_id, true)
+        return false
+    end
+    if ability ~= state.ability or not valid(state.context.attacker)
+        or not is_enemy(state.context.attacker, target) then return false end
+    local target_key = unit_key(target)
+    if not target_key or state.hit[target_key] then return false end
+    state.hit[target_key] = true
+
+    deal(state.context, target, earth_rock.damage_multiplier(state, target), false)
+    local hit_position = location or unit_position(target) or state.destination
+    earth_rock.first_hit_explosion(state, copy_position(hit_position))
+    if state.stun_chance > 0 and RandomFloat(0, 1) < state.stun_chance then
+        stun(state.context.attacker, target, state.stun_duration)
+    end
+    return false
+end
+
 local function run_earth(context, definition)
+    if not ProjectileManager or not ProjectileManager.CreateLinearProjectile then
+        return false
+    end
+    local skill_definition = skill_definitions.by_id[context.skill_id]
+    local ability = skill_definition and context.attacker:FindAbilityByName(
+        skill_definition.ability_name
+    ) or nil
+    if not valid(ability) then return false end
+
     local origin = copy_position(context.attacker:GetAbsOrigin())
-    local target_position = unit_position(context.target) or origin + context.attacker:GetForwardVector() * 100
-    local direction = normalized_direction(origin, target_position, context.attacker:GetForwardVector())
-    local length = level_value(definition, "length", context.level)
-    local width = level_value(definition, "width", context.level)
-    local targets = line_targets(context.attacker, origin, direction, length, width)
-    deal_group(context, targets, definition.damage_multiplier[context.level], false)
-    if context.level >= 2 then
-        for _, unit in ipairs(targets) do
-            stun(context.attacker, unit, definition.level_effects[context.level].stun_duration)
-        end
-    end
-    if context.level == 3 then
-        local effect = definition.level_effects[3]
-        scheduler.after(effect.secondary_delay, function()
-            deal_group(context, line_targets(context.attacker, origin, direction, length, width),
-                effect.secondary_multiplier, true)
-        end)
-    end
+    local destination = context.target_position or unit_position(context.target)
+    if not destination then return false end
+    destination = copy_position(destination)
+    local offset = Vector(destination.x - origin.x, destination.y - origin.y, 0)
+    local distance = offset:Length2D()
+    local speed = level_value(definition, "move_speed", context.level)
+    local half_width = level_value(definition, "rock_width", context.level) * 0.5
+    if distance <= 0.001 or speed <= 0 or half_width <= 0 then return false end
+    local direction = offset:Normalized()
+
+    earth_rock.sequence = earth_rock.sequence + 1
+    local projectile_id = earth_rock.sequence
+    local explosion_multiplier = level_value(
+        definition, "first_hit_explosion_multiplier", context.level
+    )
+    earth_rock.projectiles[projectile_id] = {
+        ability = ability,
+        context = context,
+        destination = destination,
+        damage_multiplier = level_value(definition, "damage_multiplier", context.level),
+        stunned_damage_multiplier = level_value(
+            definition, "stunned_damage_multiplier", context.level
+        ),
+        stun_chance = level_value(definition, "stun_chance", context.level),
+        stun_duration = level_value(definition, "stun_duration", context.level),
+        first_hit_explosion_radius = level_value(
+            definition, "first_hit_explosion_radius", context.level
+        ),
+        first_hit_explosion_multiplier = explosion_multiplier,
+        stunned_first_hit_explosion_multiplier = explosion_multiplier * 2,
+        first_hit_exploded = false,
+        hit = {},
+    }
+    ProjectileManager:CreateLinearProjectile({
+        Ability = ability,
+        EffectName = earth_rock.particle,
+        Source = context.attacker,
+        vSpawnOrigin = origin,
+        vVelocity = direction * speed,
+        fDistance = distance,
+        fStartRadius = half_width,
+        fEndRadius = half_width,
+        iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+        iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+        iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+        bDeleteOnHit = false,
+        bProvidesVision = false,
+        ExtraData = { earth_rock_projectile_id = projectile_id },
+    })
+    scheduler.after(distance / speed + earth_rock.cleanup_grace, function()
+        earth_rock.release(projectile_id, true)
+    end)
+    return true
 end
 
 local function meteor_destroy_particle(particle, immediate)
@@ -2924,6 +3041,10 @@ end
 local function roll(payload, skill_id, level, attributes, target_position)
     local definition = definitions.by_id[skill_id]
     if not definition then return false end
+    if skill_id == "proto_earth_line" and not target_position then
+        local position = unit_position(payload.target)
+        target_position = position and copy_position(position) or nil
+    end
     if skill_id == "proto_arcane_barrage" then
         local attacker_key = unit_key(payload.attacker)
         if arcane_barrage_locked(attacker_key) then return false end
@@ -2985,6 +3106,11 @@ end
 
 function M.on_tracking_projectile_hit(ability, target, location, extra_data)
     extra_data = extra_data or {}
+    if extra_data.earth_rock_projectile_id then
+        return earth_rock.projectile_hit(
+            ability, target, location, extra_data.earth_rock_projectile_id
+        )
+    end
     if extra_data.blade_pulse_projectile_id then
         return blade_pulse_projectile_hit(
             ability, target, extra_data.blade_pulse_projectile_id
@@ -3042,6 +3168,8 @@ function M.init()
     poison_cloud_task = nil
     blade_pulse_projectiles = {}
     blade_pulse_sequence = 0
+    earth_rock.projectiles = {}
+    earth_rock.sequence = 0
     clear_tornadoes()
     active_tornadoes = {}
     tornado_sequence = 0
@@ -3098,6 +3226,8 @@ M._test = {
     blade_pulse_damage_multiplier = blade_pulse_damage_multiplier,
     blade_pulse_projectiles = function() return blade_pulse_projectiles end,
     blade_pulse_projectile_hit = blade_pulse_projectile_hit,
+    earth_rock_projectiles = function() return earth_rock.projectiles end,
+    earth_rock_projectile_hit = earth_rock.projectile_hit,
     active_tornadoes = function() return active_tornadoes end,
     sync_tornadoes = sync_tornadoes,
     clear_tornadoes = clear_tornadoes,
