@@ -8,6 +8,8 @@
 - 已确认普通英雄初始最大生命3000，齐天大圣/剑圣11000；`blood`百分比按当前最大生命，减血最低1点。
 - `proto_holy_pulse` 已重做为五级“元气弹·被动”，毒云已改为活动期间禁止同一英雄再次触发。
 - 配置、运行逻辑、定向生成、专项测试、共享回归、Lua 5.1语法、严格UTF-8和限定diff检查均已完成；等待Workshop Tools实机验证和用户验收。
+- 正在将公共技能 `proto_flame_burst` Lv5三颗随机溅射的龙破斩视觉替换为Snapfire Mortimer Kisses。
+- 生产修改、定向Lua状态测试、视觉契约和相邻视觉回归已通过；仅待Workshop Tools实机验收。
 
 ## 最后可靠检查点
 
@@ -22,6 +24,10 @@
 - 新粒子已由Resource Compiler强制编译，结果为`1 compiled, 0 failed, 0 skipped`；专项、共享回归及Lua 5.1语法均通过。
 - 用户确认口径：阶段性完成不等于最终优化或全部实机验收完成；不得擅自继续调整数值、视觉或行为。
 - 下一步：生命Modifier方案已获用户实机确认；仅在用户需要时继续逐项验收`blood`命令、VIP具体数值、装备叠加和重生保持，不主动改变当前生命基线。
+- 爆炎弹现有五级概率、伤害、点燃、随机落点、同步落地和逐颗重叠结算逻辑保持不变。
+- 飞行视觉改为`hero_snapfire_ultimate.vpcf`，落地冲击改为`hero_snapfire_ultimate_impact.vpcf`；Dragon Slave生产依赖和预缓存已移除。
+- `FLAME_BURST_VISUAL_STATE_PASS`、`FLAME_BURST_VISUAL_CONTRACT_PASS`、五项相邻视觉契约、Lua 5.4语法、严格UTF-8和限定差异检查均通过；历史Lua 5.1工具当前不存在。
+- 下一步：Workshop Tools冷启动确认三颗弹体的实际飞行、同步落地、冲击位置和无残留。
 
 ## 新会话恢复顺序
 

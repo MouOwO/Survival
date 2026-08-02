@@ -23,10 +23,12 @@
 ## 当前任务
 
 将公共技能 `proto_holy_pulse`（原“圣光震荡·被动”）重做为五级“元气弹·被动”，保留 Ability ID `ability_survival_holy_pulse` 和公共池成员 `public_10`；同时让同一英雄的毒云在活动期间禁止再次触发，直到毒云结束。
+将公共技能 `proto_flame_burst` Lv5 三颗随机溅射小火球的视觉从莉娜龙破斩替换为 Snapfire Mortimer Kisses，保留显示名“爆炎弹·被动”、Ability ID `ability_survival_flame_burst`、公共池身份及全部五级战斗规则。
 
 ## 当前状态
 
 **代码、配置、生成结果和自动测试已完成，等待 Workshop Tools 实机验证和用户验收。上一项龙卷风保持阶段性可靠基线，本轮未改变其行为。**
+**生产粒子、控制点、预缓存、Lua状态测试、定向视觉契约及相邻视觉回归已完成并通过；仅待Workshop Tools实机视觉验收。**
 
 ## 验证结果
 
@@ -65,6 +67,11 @@
 - 小龙卷持续2秒，速度500、影响范围600、命中范围300、t=0/1结算；每次实时属性伤害为主龙卷的60%，即全属性×1.2纯粹伤害。
 - 小龙卷只施加范围20%减速，不施加主龙卷命中额外15%减速，也不继续分裂。
 - “随机目标方向”使用主龙卷结束时仍存活的已命中目标作为方向候选。
+- 飞行主体使用 `particles/units/heroes/hero_snapfire/hero_snapfire_ultimate.vpcf`，CP0为主爆炸中心，CP1为按随机落点与0.5秒飞行时间计算的速度。
+- 落地瞬时冲击使用 `particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact.vpcf`，CP3为权威随机落点。
+- 不使用持续3.1秒的`hero_snapfire_ultimate_linger.vpcf`，也不使用原生半径约428的`hero_snapfire_ultimate_calldown.vpcf`，避免错误暗示持续伤害或错误范围。
+- 不改变15%触发、500主爆炸范围与×4伤害、点燃规则、LV5三颗、200随机落点、0.5秒同步落地、250溅射范围、×3伤害及逐颗点燃结算。
+- 粒子只负责表现；随机落点、同步时序、目标查询、伤害和点燃继续由Lua权威逻辑负责。
 
 ## 验证结果
 
@@ -77,6 +84,9 @@
 - `ICE_CONE_CONTRACT_PASS`
 - `BLADE_PULSE_STATE_LUA51_PASS` / `BLADE_PULSE_CONTRACT_PASS`
 - 相关生产、配置和测试 Lua 均通过 `luac5.1 -p`；严格 UTF-8 检查通过；限定范围 `git diff --check` 通过；CSV与生成Lua关键字段一致。
+- Workshop Tools冷启动确认三颗Mortimer Kisses弹体的朝向、速度、同步落地、CP3冲击位置、重叠表现及无粒子残留。
+- 当前历史Lua 5.1编译器路径已失效；目标Lua已通过当前可用Lua 5.4.5语法检查，不能宣称Lua 5.1验证通过。
+- 全量63个Lua测试中54个通过、9个既有无关测试失败；目标爆炎弹状态测试及全部相邻视觉状态/契约均通过，失败清单已记录在`SESSION_LOG.md`。
 
 ## 后续优化与剩余确认
 
@@ -92,5 +102,5 @@
 
 ## 工作区保护
 
-- 工作区已有大量用户未提交修改，且本任务涉及的CSV、生成配置、公共被动服务、Ability KV、Tooltip和文档均已处于修改状态。
-- 只在当前内容基础上追加本任务改动，不回滚、覆盖或顺带清理其他修改。
+- 工作区已有大量用户未提交修改，目标服务和游戏模式文件在本任务前已处于修改状态。
+- 只在当前内容基础上替换目标粒子常量和对应预缓存，不回滚、覆盖或顺带清理其他修改。

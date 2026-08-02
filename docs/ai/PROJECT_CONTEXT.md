@@ -10,7 +10,7 @@
 - 英雄力量、敏捷、智力是项目逻辑三维：由服务端战斗快照统一计算和发布，不写入 Dota 原生三维。逻辑三维本身不提供攻速、护甲、生命、魔法或主属性攻击，只供 UI 和明确按三维结算的技能/装备效果读取。
 - Panorama 源码不在当前 `game` 插件目录中，而在对应的内容目录：`D:\steam\steamapps\common\dota 2 beta\content\dota_addons\survival\panorama`。
 - 游戏实际加载的 Panorama 编译产物位于：`D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\panorama`。
-- Lua 5.1 语法检查器位于 `C:\msys64\mingw64\bin\luac5.1.exe`，已验证版本为 Lua 5.1.5。该目录当前不一定在 PATH；不得仅因 `Get-Command luac` 或 `where luac` 无结果就断言环境没有 Luac，必须优先探测并使用这个绝对路径。
+- 历史Lua 5.1检查器`C:\msys64\mingw64\bin\luac5.1.exe`在2026-08-02已确认不存在；当前WinGet目录提供Lua/Luac 5.4.5，只能作为当前版本语法检查，不能宣称Lua 5.1兼容。
 
 ## AI 会话恢复协议
 
@@ -22,11 +22,12 @@
 
 ## 常用命令与配置链
 
-- Lua 文件语法检查使用：
+- 当前可用的Lua 5.4语法检查使用：
   ```powershell
-  & "C:\msys64\mingw64\bin\luac5.1.exe" -p "D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\scripts\vscripts\path\to\file.lua"
+  $luac = Join-Path (Split-Path (Get-Command lua).Source -Parent) "luac.exe"
+  & $luac -p "D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\scripts\vscripts\path\to\file.lua"
   ```
-- 多文件检查应逐个调用并在任一文件失败时终止；`luac5.1 -p` 成功时通常没有标准输出，应结合退出代码0判断通过。
+- 多文件检查应逐个调用并在任一文件失败时终止；`luac -p`成功时通常没有标准输出，应结合退出代码0判断通过。需要Lua 5.1兼容结论时必须先恢复并实际运行5.1编译器。
 - 在 PowerShell 中不能从 `-NoProfile` 开始执行命令；该参数必须属于 PowerShell 可执行程序。正确形式：
   ```powershell
   powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\build_configs.ps1"

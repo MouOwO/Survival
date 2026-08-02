@@ -492,7 +492,12 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact.vpcf",
         context
     )
     PrecacheResource(
@@ -517,7 +522,12 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/basic_projectile/basic_projectile.vpcf",
+        "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf",
         context
     )
     PrecacheResource(
@@ -527,7 +537,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf",
+        "particles/units/heroes/hero_hoodwink/hoodwink_acorn_shot_tracking.vpcf",
         context
     )
     PrecacheResource(
@@ -537,7 +547,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_wave_of_terror_v2.vpcf",
+        "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf",
         context
     )
     PrecacheResource(

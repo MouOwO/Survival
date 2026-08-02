@@ -38,6 +38,50 @@
 - 完整配置生成在无关`item_definitions.csv`历史列错位（数字列读到`equipment_iron_armor_01`）处失败；使用相同`tools.build_configs.build()`定向重建英雄技能，并用Tooltip专用生成器重建Tooltip。实际生成内容差异只有两份目标文件。
 - 尚未完成：Workshop Tools实机验证与用户验收。
 
+## 2026-08-02 - 完成检查点：爆炎弹Lv5 Mortimer Kisses视觉
+
+- 最终生产状态：`FLAME_SMALL_FIREBALL_PARTICLE`使用`hero_snapfire_ultimate.vpcf`，`FLAME_SMALL_FIREBALL_IMPACT_PARTICLE`使用`hero_snapfire_ultimate_impact.vpcf`；服务和预缓存资源计数均为弹体1、冲击1、Dragon Slave 0。
+- 控制点与时序：三颗弹体分别以CP0主爆炸中心和CP1=`(随机落点-中心)/0.5`初始化；原有单个0.5秒Scheduler回调同步清理三颗弹体，以CP3生成三次落地冲击，再沿原路径逐颗执行250范围×3伤害和点燃。
+- 表现故障隔离：弹体创建、控制点、销毁、索引释放和落地冲击均不会把粒子API异常传播到战斗结算；销毁失败仍独立尝试释放索引。Lua状态测试覆盖弹体、冲击和清理三类模拟失败。
+- 定向结果：`FLAME_BURST_VISUAL_STATE_PASS`、`FLAME_BURST_VISUAL_CONTRACT_PASS`、`MOVING_ICE_BALL_VISUAL_STATE_PASS`、`MOVING_ICE_BALL_VISUAL_CONTRACT_PASS`、`MAGIC_SLINGSHOT_VISUAL_CONTRACT_PASS`、`FURY_THUNDER_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`及`POISON_CLOUD_VISUAL_CONTRACT_PASS`。
+- 静态结果：目标生产Lua与新测试通过当前Lua/Luac 5.4.5语法；8个目标文件严格UTF-8通过；限定`git diff --check`通过，仅有Git的LF/CRLF工作区提示。
+- 全量Lua结果：当前63项中54项通过、9项失败。失败位于未修改区域：`test_addhero_cheat`缺Vector Mock、旧原生智力快照预期、旧三级Tooltip预期、英雄召唤Mock、攻速Buff调度、Modifier注册数量、饰品肖像环境、树调度和血条Mock；其中智力快照失败已有多轮历史日志证据。本任务未修改这些模块，不顺带修复。
+- 尚未验证：Workshop Tools实机中的Mortimer Kisses弹体实际弧线/朝向/速度、三颗同步落地、CP3冲击与随机点一致、重叠视觉及连续触发无残留。
+- 下一步唯一动作：完全停止并重新Run Workshop Tools，使用爆炎弹Lv5进行冷启动实机视觉验收。
+
+## 2026-08-02 - 实施检查点：爆炎弹Lv5 Mortimer Kisses视觉
+
+- 用户新任务并批准实施：将`proto_flame_burst` Lv5三颗随机溅射的视觉从莉娜龙破斩替换为Snapfire Mortimer Kisses；现有概率、伤害、点燃、随机落点和同步落地规则不得改变。
+- 本机Dota Content资源确认：完整飞行弹体为`particles/units/heroes/hero_snapfire/hero_snapfire_ultimate.vpcf`，瞬时落地冲击为`hero_snapfire_ultimate_impact.vpcf`；前者使用CP0起点与CP1初速度，后者使用CP3落点。
+- 已排除`hero_snapfire_ultimate_linger.vpcf`，因其固定持续约3.1秒会暗示持续伤害；已排除`hero_snapfire_ultimate_calldown.vpcf`，因其预警半径约428与小球250伤害范围不符。
+- 生产实现：弹体CP0写入主爆炸中心，CP1按`(landing_position-center)/flight_time`计算；0.5秒原有单Scheduler回调继续同步销毁三颗弹体、创建三次CP3冲击并执行权威伤害/点燃。主爆炸光击阵未改。
+- 预缓存已由Dragon Slave替换为Mortimer Kisses完整弹体与落地冲击；移动冰球契约已移除对爆炎弹旧Dragon Slave资源的跨技能耦合。
+- 新增`test_flame_burst_visual.lua`和`test_flame_burst_visual_contract.ps1`。当前结果：`FLAME_BURST_VISUAL_STATE_PASS`、`FLAME_BURST_VISUAL_CONTRACT_PASS`、`MOVING_ICE_BALL_VISUAL_STATE_PASS`、`MOVING_ICE_BALL_VISUAL_CONTRACT_PASS`，目标Lua 5.4.5语法通过。
+- 会话中出现`Upstream HTTP/2 stream failed`，这是工具上游传输中断；已先检查磁盘和Git状态，确认上一补丁成功后继续，没有重复写入。
+- 尚未验证：其余相邻视觉回归、严格UTF-8、最终限定差异以及Workshop Tools中的弹体实际弧线、朝向、速度、同步落地和残留情况。
+- 下一步：执行相邻契约与更广Lua回归，完成静态验证后交付实机验收。
+
+## 2026-08-02 — 完成检查点：剑刃震荡马格纳斯震荡波视觉
+
+- 生产实现：`hero_passive_skill_service.lua`的`BLADE_PULSE_PARTICLE`已从复仇之魂恐怖波浪替换为`particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf`；`addon_game_mode.lua`同步替换显式预缓存。
+- 战斗边界保持：`CreateLinearProjectile`、动态攻击射程、1秒全程、宽度200、`bDeleteOnHit=false`、逐投射物命中去重、回调`return false`和LV5三道独立状态均未修改；未添加cast/hit粒子。
+- 新增`tools/test_blade_pulse_visual_contract.ps1`，锁定目标资源、旧资源移除、预缓存、线性投射物字段和穿透回调。结果`BLADE_PULSE_VISUAL_CONTRACT_PASS`。
+- 相邻视觉回归通过：`MOVING_ICE_BALL_VISUAL_CONTRACT_PASS`、`MAGIC_SLINGSHOT_VISUAL_CONTRACT_PASS`、`FURY_THUNDER_VISUAL_CONTRACT_PASS`。
+- 静态验证：目标生产Lua通过当前可用Luac 5.4.5语法检查；六个任务文件严格UTF-8、目标tracked diff check和新增测试尾随空白检查通过；目标粒子在服务/预缓存各出现一次，旧粒子均为零。
+- 环境限制：历史记录的`C:\msys64\mingw64\bin\luac5.1.exe`及MSYS2候选目录当前不存在，因此未宣称Lua 5.1语法通过；已修正`KNOWN_ISSUES.md`与`PROJECT_CONTEXT.md`的当前工具说明。
+- 已知无关失败：`test_hero_passive_attribute_snapshot.lua`仍要求旧原生`GetIntellect(true)`契约，与项目逻辑三维决策冲突；该失败已在历史全量测试中记录，本次仅替换粒子字符串，未修改其生产链或测试。
+- 尚未验证：Workshop Tools冷启动中的震荡波实际朝向、视觉速度/宽度、穿透多目标后是否持续及LV5三道重合效果。
+
+## 2026-08-02 — 检查点：剑刃震荡马格纳斯震荡波视觉实施
+
+- 用户新任务：为三选一公共技能`proto_blade_nova`/“剑刃震荡·被动”增加马格纳斯震荡波特效，并已明确批准实施。
+- 已确认现状：技能使用`CreateLinearProjectile`沿英雄面向移动，现有`EffectName`为复仇之魂恐怖波浪；伤害、碰撞、射程和LV5三脉冲逻辑已完成，本任务不得改变。
+- 资源证据：目标主体粒子为`particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf`；另有cast/hit配套粒子，但用户未要求额外前摇或逐目标命中视觉，本次不叠加。
+- 实施边界：仅替换`BLADE_PULSE_PARTICLE`、同步`M.precache`并新增定向视觉契约；继续由原生线性投射物承担权威碰撞，保留`bDeleteOnHit=false`和回调`return false`。
+- 工作区保护：`hero_passive_skill_service.lua`和`addon_game_mode.lua`在本任务前已有用户未提交修改，只做最小增量，不回滚其他被动与游戏模式变更。
+- 尚未验证：契约测试、Lua 5.1语法、严格UTF-8、限定差异及Workshop Tools实机视觉。
+- 下一步：完成最小代码修改并执行全部限定自动验证。
+
 ## 2026-08-02 - 检查点：虚空震爆重做龙卷风需求确认与实现调查
 
 - 用户要求将现有 `proto_void_pulse` / “虚空震爆·被动”重做为龙卷风，并已明确批准编码。

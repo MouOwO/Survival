@@ -47,7 +47,9 @@ local ARCANE_EXPLOSION_PARTICLE =
 local FLAME_MAIN_EXPLOSION_PARTICLE =
     "particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf"
 local FLAME_SMALL_FIREBALL_PARTICLE =
-    "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
+    "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate.vpcf"
+local FLAME_SMALL_FIREBALL_IMPACT_PARTICLE =
+    "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact.vpcf"
 local FLAME_BURN_PARTICLE =
     "particles/units/heroes/hero_huskar/huskar_burning_spear_debuff.vpcf"
 local FLAME_BURN_THINK_INTERVAL = 0.05
@@ -56,11 +58,15 @@ local ICE_CONE_SNOW_PARTICLE =
     "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf"
 local ICE_CONE_IMPACT_PARTICLE =
     "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf"
-local MOVING_ICE_BALL_PARTICLE = "particles/basic_projectile/basic_projectile.vpcf"
+local FURY_THUNDER_PARTICLE =
+    "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
+local MOVING_ICE_BALL_PARTICLE =
+    "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf"
 local MOVING_ICE_BALL_EXPLOSION_PARTICLE = "particles/basic_projectile/basic_projectile_explosion.vpcf"
 local MOVING_ICE_BALL_THINK_INTERVAL = 0.05
+local MOVING_ICE_BALL_VISUAL_HEIGHT = 120
 local MAGIC_SLINGSHOT_PROJECTILE_PARTICLE =
-    "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf"
+    "particles/units/heroes/hero_hoodwink/hoodwink_acorn_shot_tracking.vpcf"
 local MAGIC_SLINGSHOT_RUBBLE_PARTICLE =
     "particles/units/heroes/hero_tiny/tiny_avalanche.vpcf"
 local MAGIC_SLINGSHOT_SLOW_BUFF = "debuff_hero_magic_slingshot_move_slow"
@@ -78,7 +84,7 @@ local POISON_CLOUD_EXPLOSION_PARTICLE =
 local POISON_CLOUD_ARMOR_MODIFIER = "modifier_hero_poison_cloud_armor"
 local POISON_CLOUD_THINK_INTERVAL = 0.05
 local BLADE_PULSE_PARTICLE =
-    "particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_wave_of_terror_v2.vpcf"
+    "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
 local BLADE_PULSE_CLEANUP_GRACE = 0.25
 local TORNADO_PARTICLE =
     "particles/survival_tornado/survival_tornado_follow.vpcf"
@@ -995,6 +1001,68 @@ local function flame_explosion_visual(context, position)
     end
 end
 
+local function flame_small_fireball_velocity(center, landing_position, flight_time)
+    local duration = math.max(0.01, tonumber(flight_time) or 0.01)
+    return (landing_position - center) * (1 / duration)
+end
+
+local function release_flame_small_fireball_particle(particle, immediate)
+    if not particle then return end
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle, immediate == true)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not destroy_ok or not release_ok then
+        print("[HeroPassiveSkill] small fireball cleanup failed: "
+            .. tostring(destroy_error or release_error))
+    end
+end
+
+local function flame_small_fireball_visual(
+    context, center, landing_position, flight_time
+)
+    local particle = nil
+    local visual_ok, visual_error = pcall(function()
+        particle = ParticleManager:CreateParticle(
+            FLAME_SMALL_FIREBALL_PARTICLE,
+            PATTACH_WORLDORIGIN,
+            context.attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, center)
+        ParticleManager:SetParticleControl(
+            particle, 1,
+            flame_small_fireball_velocity(center, landing_position, flight_time)
+        )
+    end)
+    if not visual_ok then
+        release_flame_small_fireball_particle(particle, true)
+        print("[HeroPassiveSkill] small fireball visual failed: "
+            .. tostring(visual_error))
+        return nil
+    end
+    return particle
+end
+
+local function flame_small_fireball_impact_visual(context, position)
+    local particle = nil
+    local visual_ok, visual_error = pcall(function()
+        particle = ParticleManager:CreateParticle(
+            FLAME_SMALL_FIREBALL_IMPACT_PARTICLE,
+            PATTACH_WORLDORIGIN,
+            context.attacker
+        )
+        ParticleManager:SetParticleControl(particle, 3, position)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not visual_ok then
+        release_flame_small_fireball_particle(particle, true)
+        print("[HeroPassiveSkill] small fireball impact visual failed: "
+            .. tostring(visual_error))
+    end
+end
+
 local function run_flame(context, definition)
     local center = unit_position(context.target)
     if not center then return false end
@@ -1055,33 +1123,17 @@ local function run_flame(context, definition)
         local landing_position = flame_random_landing_position(
             center, landing_radius
         )
-        local particle = nil
-        local visual_ok, visual_error = pcall(function()
-            particle = ParticleManager:CreateParticle(
-                FLAME_SMALL_FIREBALL_PARTICLE,
-                PATTACH_WORLDORIGIN,
-                context.attacker
-            )
-            ParticleManager:SetParticleControl(particle, 0, center)
-            ParticleManager:SetParticleControl(particle, 1, landing_position)
-        end)
-        if not visual_ok then
-            particle = nil
-            print("[HeroPassiveSkill] small fireball visual failed: "
-                .. tostring(visual_error))
-        end
         fireballs[index] = {
             position = landing_position,
-            particle = particle,
+            particle = flame_small_fireball_visual(
+                context, center, landing_position, flight_time
+            ),
         }
     end
     scheduler.after(flight_time, function()
         for _, fireball in ipairs(fireballs) do
-            if fireball.particle then
-                ParticleManager:DestroyParticle(fireball.particle, false)
-                ParticleManager:ReleaseParticleIndex(fireball.particle)
-            end
-            flame_explosion_visual(context, fireball.position)
+            release_flame_small_fireball_particle(fireball.particle, false)
+            flame_small_fireball_impact_visual(context, fireball.position)
             if valid(context.attacker) then
                 local targets = enemies_touching_radius(
                     context.attacker, fireball.position, explosion_radius
@@ -1116,6 +1168,15 @@ local function moving_ice_ball_periodic_multiplier(state)
     local distance_stacks = math.floor(state.distance_travelled / 100 + 0.000000001)
     local distance_bonus = distance_stacks * state.distance_bonus_pct_per_100 / 100
     return state.damage_multiplier * (1 + collision_bonus + distance_bonus)
+end
+
+local function sync_moving_ice_ball_particle(state)
+    if not state or not state.particle then return end
+    ParticleManager:SetParticleControl(
+        state.particle,
+        3,
+        state.position + Vector(0, 0, MOVING_ICE_BALL_VISUAL_HEIGHT)
+    )
 end
 
 local function moving_ice_ball_random_target(attacker, origin, radius, primary_target)
@@ -1260,9 +1321,7 @@ local function sync_moving_ice_balls()
             if GetGroundPosition then
                 state.position = GetGroundPosition(state.position, nil)
             end
-            if state.particle then
-                ParticleManager:SetParticleControl(state.particle, 0, state.position)
-            end
+            sync_moving_ice_ball_particle(state)
 
             local reached_target = moving_ice_ball_collisions(
                 state, start_position, state.position
@@ -1333,28 +1392,21 @@ local function run_frost(context, definition)
         )
         if not target then return false end
     end
+    local target_position = copy_position(target:GetAbsOrigin())
+    local initial_direction = normalized_direction(
+        origin, target_position, initial_delta:Normalized()
+    )
 
     moving_ice_ball_sequence = moving_ice_ball_sequence + 1
     local ball_id = moving_ice_ball_sequence
     local now = game_time()
-    local particle = nil
-    local visual_ok, visual_error = pcall(function()
-        particle = ParticleManager:CreateParticle(
-            MOVING_ICE_BALL_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
-        )
-        ParticleManager:SetParticleControl(particle, 0, origin)
-    end)
-    if not visual_ok then
-        particle = nil
-        print("[HeroPassiveSkill] moving ice ball failed: " .. tostring(visual_error))
-    end
-    active_moving_ice_balls[ball_id] = {
+    local state = {
         context = context,
         position = origin,
         end_position = initial_target_position,
-        direction = initial_delta:Normalized(),
+        direction = initial_direction,
         target = target,
-        last_target_position = copy_position(target:GetAbsOrigin()),
+        last_target_position = target_position,
         target_death_position = nil,
         homing = homing,
         move_speed = level_value(definition, "move_speed", context.level),
@@ -1377,11 +1429,53 @@ local function run_frost(context, definition)
         explosion_multiplier = level_value(
             definition, "explosion_multiplier", context.level
         ),
-        particle = particle,
+        particle = nil,
         last_update_at = now,
     }
+    local visual_ok, visual_error = pcall(function()
+        state.particle = ParticleManager:CreateParticle(
+            MOVING_ICE_BALL_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
+        )
+        sync_moving_ice_ball_particle(state)
+    end)
+    if not visual_ok then
+        if state.particle then
+            pcall(function()
+                ParticleManager:DestroyParticle(state.particle, true)
+                ParticleManager:ReleaseParticleIndex(state.particle)
+            end)
+        end
+        state.particle = nil
+        print("[HeroPassiveSkill] moving ice ball failed: " .. tostring(visual_error))
+    end
+    active_moving_ice_balls[ball_id] = state
     ensure_moving_ice_ball_task()
     return true
+end
+
+local function fury_thunder_visual(context, position)
+    local particle = nil
+    local visual_ok, visual_error = pcall(function()
+        particle = ParticleManager:CreateParticle(
+            FURY_THUNDER_PARTICLE,
+            PATTACH_WORLDORIGIN, context.attacker
+        )
+        ParticleManager:SetParticleControl(
+            particle, 0, position + Vector(0, 0, 900)
+        )
+        ParticleManager:SetParticleControl(particle, 1, position)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not visual_ok then
+        if particle then
+            pcall(function()
+                ParticleManager:DestroyParticle(particle, true)
+                ParticleManager:ReleaseParticleIndex(particle)
+            end)
+        end
+        print("[HeroPassiveSkill] fury thunder visual failed: "
+            .. tostring(visual_error))
+    end
 end
 
 local function run_chain(context, definition)
@@ -1409,13 +1503,7 @@ local function run_chain(context, definition)
         if not alive(target) or not valid(context.attacker) then return end
         local position = unit_position(target)
         if not position then return end
-        local particle = ParticleManager:CreateParticle(
-            "particles/units/heroes/hero_zuus/zuus_lightning_bolt.vpcf",
-            PATTACH_WORLDORIGIN, context.attacker
-        )
-        ParticleManager:SetParticleControl(particle, 0, position + Vector(0, 0, 900))
-        ParticleManager:SetParticleControl(particle, 1, position)
-        ParticleManager:ReleaseParticleIndex(particle)
+        fury_thunder_visual(context, position)
 
         local was_marked = context.level >= 2
             and buff_manager.has(target, "debuff_hero_fury_thunder_mark")
@@ -2682,8 +2770,11 @@ M._test = {
     active_moving_ice_balls = function() return active_moving_ice_balls end,
     sync_moving_ice_balls = sync_moving_ice_balls,
     moving_ice_ball_periodic_multiplier = moving_ice_ball_periodic_multiplier,
+    sync_moving_ice_ball_particle = sync_moving_ice_ball_particle,
     moving_ice_ball_point_segment_distance_sq = moving_ice_ball_point_segment_distance_sq,
     moving_ice_ball_random_target = moving_ice_ball_random_target,
+    release_moving_ice_ball = release_moving_ice_ball,
+    fury_thunder_visual = fury_thunder_visual,
     magic_slingshot_targets = magic_slingshot_targets,
     magic_slingshot_projectiles = function() return magic_slingshot_projectiles end,
     spirit_bomb_projectiles = function() return spirit_bomb_projectiles end,
@@ -2696,6 +2787,10 @@ M._test = {
     sync_flame_burns = sync_flame_burns,
     flame_burn_tick_multiplier = flame_burn_tick_multiplier,
     flame_random_landing_position = flame_random_landing_position,
+    flame_small_fireball_velocity = flame_small_fireball_velocity,
+    release_flame_small_fireball_particle = release_flame_small_fireball_particle,
+    flame_small_fireball_visual = flame_small_fireball_visual,
+    flame_small_fireball_impact_visual = flame_small_fireball_impact_visual,
     active_poison_clouds = function() return active_poison_clouds end,
     poison_cloud_units = function() return poison_cloud_units end,
     create_poison_cloud = create_poison_cloud,

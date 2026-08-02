@@ -69,11 +69,11 @@
    - 技能接管不得再把稠密显示序号直接拼成 `AbilityN`；必须枚举有效官方按钮、按屏幕视觉位置排序，并在完整映射后原子提交。
    - 映射不完整时必须整批恢复官方 UI，禁止保留半项目、半官方状态。
 
-16. **Lua 5.1 编译器存在，但不一定在 PATH。**
-    - 权威路径为 `C:\msys64\mingw64\bin\luac5.1.exe`，已验证为 Lua 5.1.5。
-    - `lua`、`luac`、`luajit` 在 PATH 中无结果不代表没有语法检查器；后续必须优先探测上述绝对路径。
-    - 使用 `luac5.1 -p <file.lua>` 做语法检查；成功通常没有输出，以退出代码0为准。
-    - Luac只能证明Lua 5.1语法可解析，不能替代Dota API、Scheduler、粒子、伤害和UI的Workshop Tools实机验证。
+16. **历史 Lua 5.1 编译器路径当前已失效。**
+    - `C:\msys64\mingw64\bin\luac5.1.exe`曾验证为Lua 5.1.5，但2026-08-02再次探测时该文件及MSYS2候选目录均不存在。
+    - 当前可用解释器/编译器为WinGet目录中的Lua/Luac 5.4.5；可用于一般语法检查，但不得把结果标记为Lua 5.1兼容通过。
+    - 后续若恢复Lua 5.1工具，应重新探测并记录实际路径和`-v`输出，禁止继续把历史路径当作当前存在证据。
+    - Luac只能证明对应版本语法可解析，不能替代Dota API、Scheduler、粒子、伤害和UI的Workshop Tools实机验证。
 
 17. **召唤英雄的攻击射程写入与读取接口不对称。**
     - `hero_stat_adapter.lua`使用`Script_SetAttackRange(attack_range)`应用英雄CSV配置，但实机确认同一单位的`GetAttackRange()`可能返回0；英雄仍能正常普通攻击，因此0不是权威实际射程。
