@@ -64,3 +64,11 @@
 - Panorama 修改必须至少检查源码目标行、资源编译器汇总、编译产物时间戳/状态，以及限定路径的 `git diff --check`。
 - 专属地面材料测试必须覆盖 CSV 映射、映射缺失失败关闭、真实引擎物品名、地面标记、首次壳采用、重复合并、登记失败释放和成功后清除防复制标记。
 - 穿透线性投射物测试必须模拟同一 `ExtraData` 依次命中第一、第二、第三个单位，断言每次回调返回 `false`、每个单位各产生一次伤害、同一单位单波去重、终点/塔销毁后状态失效。只 mock `enemies_in_path()` 返回多个单位不能证明 Dota 引擎会产生后续单位命中回调。
+
+## 2026-08-02 英雄基础生命投影决策
+
+- CSV仍是英雄目标基础生命权威源，公式为`floor(base_health × max_health_multiplier × hero_meta_max_health_multiplier)`。
+- `CreateUnitByName`召唤的原生英雄不得依赖`SetBaseMaxHealth/SetMaxHealth/SetHealth`维持权威基础生命；实机已证明引擎会恢复原生120生命。
+- 使用隐藏、不可驱散、死亡不移除的`modifier_survival_hero_base_health`和`MODIFIER_PROPERTY_HEALTH_BONUS`，动态将原生最大生命补足到CSV目标。
+- 补足必须扣除同一Modifier的旧补充值以保证重复应用幂等；不得固定增加CSV值，也不得创建会进入背包、库存、合成、Tooltip或存档的真实隐藏装备。
+- 玩家真实装备生命在CSV目标基础生命之上继续独立叠加。

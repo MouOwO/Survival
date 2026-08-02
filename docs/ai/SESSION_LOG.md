@@ -1,3 +1,43 @@
+## 2026-08-02 - 检查点：召唤英雄CSV生命与blood作弊码实施前确认
+
+- 用户要求修复召唤战斗英雄的实际生命没有采用`hero_definitions`配置的问题，并新增聊天作弊码`blood`。
+- 权威数据确认：`data/csv/英雄系统/hero_definitions.csv`与生成Lua一致；普通英雄`base_health=3000`，齐天大圣/剑圣`base_health=10000`且`max_health_multiplier=1.1`，全局CSV倍率当前为1。用户批准最终初始最大生命分别为3000和11000。
+- 根因链确认：`hero_stat_adapter`写入生命后调用`CalculateStatBonus(true)`；随后`HERO_SUMMONED`订阅者`hero_combat_stat_service.apply_base_projection()`还会调用两次`CalculateStatBonus(true)`。原生英雄模板可能在这些阶段覆盖先前写入，因此最终必须在所有召唤期属性计算后重写同一个CSV权威生命值。
+- `blood`规则确认：`+/-数值`按固定生命变化，`+/-百分比%`按执行时当前最大生命计算；加血不超过最大生命，减血最低保留1点，不允许命令直接杀死英雄；只作用于当前玩家召唤的战斗英雄。
+- 实施边界：不改CSV数值，不改生成Lua，不定时覆盖生命，不破坏装备`MODIFIER_PROPERTY_HEALTH_BONUS`；合法加血调用`hero_health_guard.allow_healing()`。
+- 下一步：修改生命适配器、召唤期战斗投影和作弊命令，新增Lua 5.1行为/PowerShell契约测试并执行限定验证。
+
+## 2026-08-02 - 召唤英雄CSV生命与blood作弊码自动实现完成
+
+- `hero_stat_adapter`新增权威生命计算与应用API，不再从原生`GetMaxHealth()`临时值乘算；最终生命为`floor(base_health × max_health_multiplier × hero_meta_max_health_multiplier)`，并保存`survival_base_max_health`诊断值。
+- 生命写入移动到适配器内部`CalculateStatBonus`和等级应用之后；`hero_combat_stat_service`在召唤期两次基础投影计算后再次应用同一权威生命，输出`[HERO_CONFIGURED_HEALTH]`诊断。
+- 首次创建装备生命Modifier使用`hero_health_guard.preserve_missing()`并重算属性，使召唤时已损失生命为0的英雄在装备生命加成后仍保持满血；后续装备刷新继续沿用既有相同语义。
+- 新增`debug/health_cheat.lua`并接入聊天命令`blood`：只查找当前玩家召唤英雄；固定值和按当前最大生命百分比增减均支持；加血封顶、减血最低1点；合法加血先调用`allow_healing()`。
+- 新增`tools/test_hero_configured_health.lua`、`tools/test_health_cheat.lua`和`tools/test_hero_health_contract.ps1`。验证通过：`HERO_CONFIGURED_HEALTH_LUA51_PASS`、`HEALTH_CHEAT_LUA51_PASS`、`HERO_HEALTH_CONTRACT_PASS`。
+- 6个本任务生产/测试Lua通过`luac5.1 -p`；12个相关文件通过严格UTF-8；CSV/生成Lua生命字段契约和限定`git diff --check`通过。`ADDSKILL_CONTRACT_PASS`、元气弹及毒云专项契约/Lua 5.1回归通过。
+- 未修改`hero_definitions.csv`或生成配置，因为权威源与生成Lua原本已经一致；未触碰用户既有技能配置、Ability KV和大量生成文件修改。
+- 尚未验证：Workshop Tools中的普通英雄3000、VIP英雄11000、带初始装备生命时总生命/满血状态，以及`blood +100/-100/+10%/-10%`实际聊天输入。
+
+## 2026-08-02 - 元气弹与毒云触发锁实施检查点
+
+- 用户批准将已完整接入的 `proto_holy_pulse`/“圣光震荡·被动”原身份重做为“元气弹·被动”，保留 `ability_survival_holy_pulse` 和公共池成员 `public_10`。
+- 最终规则：LV1攻击命中12%概率向普攻范围内最近最多5个目标发射追踪投射物，每颗真实命中造成触发时逻辑全属性×4纯粹伤害；LV2每颗命中恢复英雄5%最大生命；LV3基础7目标且每次触发10%概率提高到9；LV4继承LV3；LV5每颗命中独立20%概率对目标250范围追加基础伤害60%，原目标重复承受爆炸伤害。
+- 用户新增毒云规则：同一英雄活动毒云未结束时禁止再次触发，结束后才恢复判定；不得继续使用新触发替换旧毒云。
+- 工作区最新提交为 `08317a6 技能提交`，本轮相关已跟踪文件在修改前干净；未跟踪的本地规则和既有测试文件不清理、不覆盖。
+- 实施方案：复用魔法弹弓的攻击射程回退、最近目标查询和共享 Ability 追踪投射物回调，但为元气弹建立独立状态、ID、命中清理与测试；伤害继续进入既有纯粹伤害事务，合法治疗调用 `hero_health_guard.allow_healing` 后使用 `Heal`。
+- 尚未验证：配置生成、专项Lua 5.1行为测试、PowerShell契约、公共技能回归、Lua语法、严格UTF-8、限定diff检查及Workshop Tools实机表现。
+
+## 2026-08-02 - 元气弹与毒云活动锁自动实现完成
+
+- 完成权威CSV、生成技能配置、生成Tooltip、五级运行定义、Ability KV和动态Tooltip白名单；保留`proto_holy_pulse`、`ability_survival_holy_pulse`与`public_10`身份。
+- 元气弹复用现有射程回退与最近目标排序，使用独立投射物ID和状态；真实命中后依次结算全属性×4纯粹伤害、5%最大生命治疗和LV5独立爆炸判定，状态在命中或10秒兜底时清理。
+- 合法治疗先调用`hero_health_guard.allow_healing`再使用Ability句柄执行`Heal`；LV5爆炸使用Hull边缘精确范围查询并包含原目标。
+- 毒云在通用概率判定前检查同英雄活动状态，创建函数同时提供第二层拒绝保护；原“新云替换旧云”行为测试已改为“活动拒绝、到期后允许”。
+- 验证：`SPIRIT_BOMB_STATE_LUA51_PASS`、`SPIRIT_BOMB_CONTRACT_PASS`、`POISON_CLOUD_STATE_LUA51_PASS`、`POISON_CLOUD_CONTRACT_PASS`，以及奥术弹幕、魔法弹弓、爆炎弹、移动冰球、寒冰锥、脉冲激射、龙卷风回归全部通过；8文件Lua 5.1语法、12文件严格UTF-8、CSV/生成字段一致性和限定diff检查通过。
+- 奥术弹幕旧契约曾因扫描整个共享服务而把已提交龙卷追踪的必要平方根误报为奥术AOE回归，已将断言收窄到禁止“平方根距离+hit_radius”的旧奥术模式，未修改生产逻辑。
+- 完整配置生成在无关`item_definitions.csv`历史列错位（数字列读到`equipment_iron_armor_01`）处失败；使用相同`tools.build_configs.build()`定向重建英雄技能，并用Tooltip专用生成器重建Tooltip。实际生成内容差异只有两份目标文件。
+- 尚未完成：Workshop Tools实机验证与用户验收。
+
 ## 2026-08-02 - 检查点：虚空震爆重做龙卷风需求确认与实现调查
 
 - 用户要求将现有 `proto_void_pulse` / “虚空震爆·被动”重做为龙卷风，并已明确批准编码。
@@ -1167,3 +1207,28 @@
 - 当前没有活跃编码动作，不得自动继续修改龙卷风数值、行为或视觉。
 - 稳定视觉架构：使用 particles/survival_tornado/survival_tornado_follow.vpcf，由Lua每0.05秒写CP0；不得恢复完整Invoker Tornado粒子的CP1直线推进方案。
 - 下一步唯一动作：等待用户指定具体优化项或新的开发任务。
+## 2026-08-02 - 检查点：原生英雄生命改用隐藏Modifier补足
+
+- 用户实机确认前一版直接调用`SetBaseMaxHealth/SetMaxHealth/SetHealth`后英雄仍显示120，证明召唤原生英雄的基础生命会在引擎阶段被覆盖；用户批准改用类似装备生命加成的隐藏永久Modifier，并要求把经验写入docs。
+- 实施决定：不创建真实隐藏物品，避免占用背包、进入逻辑库存/合成/Tooltip/存档；新增`modifier_survival_hero_base_health`，通过`MODIFIER_PROPERTY_HEALTH_BONUS`补足CSV目标生命。
+- 补足公式：先从当前最大生命扣除该Modifier已有旧补足值，得到原生基线，再计算`max(0, configured_target - native_baseline)`；禁止固定加3000，否则原生120会得到3120。
+- 生命周期：Modifier隐藏、不可驱散、死亡不移除、重复应用更新同一实例而不叠加；添加/刷新时使用`hero_health_guard.preserve_missing()`，首次召唤保持满血，未来刷新保持已损失生命。
+- 装备边界：基础生命Modifier先应用到CSV目标，之后真实`modifier_equipment_effects.health_flat`继续独立叠加。
+- 下一步：注册并实现Modifier，移除直接SetHealth最终方案，更新专项测试、契约和AI维护文档，执行完整限定验证。
+
+## 2026-08-02 - 隐藏基础生命Modifier实现与自动验证完成
+
+- 新增并注册`modifier_survival_hero_base_health`：隐藏、不可驱散、永久、死亡不移除，通过`MODIFIER_PROPERTY_HEALTH_BONUS`返回StackCount补充值。
+- `hero_stat_adapter.apply_configured_health()`不再调用基础/最大/当前生命Setter作为权威实现。它从当前最大生命扣除旧Modifier补充值得到原生基线，再计算`max(0, target-native)`；通过`hero_health_guard.preserve_missing()`创建或刷新同一Modifier并执行属性重算。
+- 普通英雄原生120时补充值为2880，最终目标3000；重复应用仍为2880而不叠加；从3000目标切换到VIP 11000目标时补10880，并保持原有已损失生命。
+- `hero_combat_stat_service`诊断扩展为`configured/native/bonus/engine_max/engine_current`；真实装备生命Modifier仍在基础生命Modifier后创建并独立叠加。
+- 验证通过：`HERO_CONFIGURED_HEALTH_LUA51_PASS`、`HERO_HEALTH_CONTRACT_PASS`、`HEALTH_CHEAT_LUA51_PASS`；元气弹、毒云、addskill、原生血条相关回归通过；新增/修改Lua通过Lua 5.1语法检查。`modifier_registry.lua`保留既有UTF-8 BOM，并通过临时去BOM副本完成Lua 5.1语法检查；严格UTF-8与BOM保持检查通过。
+- 尚未完成：Workshop Tools第二次实机验证。自动测试不能替代原生英雄生命Modifier的引擎表现。
+
+## 2026-08-02 - 隐藏基础生命Modifier用户实机验收成功
+
+- 用户明确反馈：“血量现在正常”，确认`modifier_survival_hero_base_health`第二版在Workshop Tools实际引擎中生效。
+- 本次实机结果证明：对于`CreateUnitByName`召唤的原生英雄，CSV目标生命应保留为配置权威，但引擎投影必须使用隐藏永久`MODIFIER_PROPERTY_HEALTH_BONUS`补足，不能依赖直接生命Setter。
+- 成功方案的关键边界：动态补足而非固定加3000；扣除旧补充值保证幂等；不创建真实隐藏装备；真实装备生命保持独立叠加；使用`preserve_missing()`保护当前已损失生命语义。
+- 验收范围准确限定为“英雄血量现在正常”。用户没有在本次反馈中分别确认普通英雄3000、VIP英雄11000、装备生命叠加、死亡重生或`blood`四种输入，因此这些不得写成已实机通过，只作为按需防回归项。
+- 维护结论：隐藏基础生命Modifier方案成为可靠生产基线；直接`SetBaseMaxHealth/SetMaxHealth/SetHealth`方案永久记为失败路径，不得恢复。

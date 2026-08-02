@@ -1,12 +1,57 @@
 # Current Task
 
+## 最新任务（2026-08-02）
+
+修复召唤战斗英雄的初始最大生命，使其最终采用`hero_definitions.csv`的`base_health × max_health_multiplier × hero_meta_max_health_multiplier`；新增`blood +/-数值|+/-百分比%`聊天作弊码。百分比按当前最大生命计算，加血封顶，减血最低保留1点，只作用于当前玩家召唤英雄。
+
+## 最新状态
+
+**直接设置最大生命的第一版已被实机判定失败；隐藏永久生命Modifier第二版已通过自动验证，并由用户在 Workshop Tools 中确认英雄血量正常。** 原元气弹/毒云任务保持既有可靠基线，本轮未修改其行为。
+
+## 最新验证结果
+
+- `HERO_CONFIGURED_HEALTH_LUA51_PASS`
+- `HEALTH_CHEAT_LUA51_PASS`
+- `HERO_HEALTH_CONTRACT_PASS`
+- 6个本任务生产/测试Lua通过Lua 5.1语法检查；12个相关文件通过严格UTF-8；限定`git diff --check`通过。
+- `ADDSKILL_CONTRACT_PASS`、元气弹和毒云专项契约/Lua 5.1回归通过。
+- 第一版实机结果：直接调用`SetBaseMaxHealth/SetMaxHealth/SetHealth`后英雄仍为原生120生命，方案已废弃。
+- 第二版实现：`modifier_survival_hero_base_health`使用`MODIFIER_PROPERTY_HEALTH_BONUS`把原生生命动态补足到CSV目标；普通英雄原生120时补2880，VIP同理补足到11000；真实装备生命继续额外叠加。
+- 用户实机验收：隐藏永久生命Modifier生效，召唤英雄血量现在正常。
+- 未扩大验收范围：用户本次未分别确认普通英雄3000、VIP英雄11000、装备生命叠加、死亡重生和`blood`四种输入；这些仅保留为按需回归项，不影响生命修复完成结论。
+
 ## 当前任务
 
-将公共技能 `proto_void_pulse` 重做为五级“龙卷风”，保留显示名“虚空震爆·被动”、Ability ID `ability_survival_void_pulse` 和公共池成员 `public_12`。
+将公共技能 `proto_holy_pulse`（原“圣光震荡·被动”）重做为五级“元气弹·被动”，保留 Ability ID `ability_survival_holy_pulse` 和公共池成员 `public_10`；同时让同一英雄的毒云在活动期间禁止再次触发，直到毒云结束。
 
 ## 当前状态
 
-**用户于2026-08-02确认本任务暂时完成。当前代码、配置、项目粒子和自动测试作为阶段性可靠基线保留；技能仍有后续优化空间，但本轮不再继续修改，等待用户给出具体优化要求。此确认不等同于“最终优化完成”或“全部实机验收通过”。**
+**代码、配置、生成结果和自动测试已完成，等待 Workshop Tools 实机验证和用户验收。上一项龙卷风保持阶段性可靠基线，本轮未改变其行为。**
+
+## 验证结果
+
+- `SPIRIT_BOMB_STATE_LUA51_PASS` / `SPIRIT_BOMB_CONTRACT_PASS`
+- `POISON_CLOUD_STATE_LUA51_PASS` / `POISON_CLOUD_CONTRACT_PASS`
+- 奥术弹幕、魔法弹弓、爆炎弹、移动冰球、寒冰锥、脉冲激射和龙卷风相关回归通过。
+- 8个相关Lua文件通过 `luac5.1 -p`；12个相关源/生成/测试文件通过严格UTF-8检查；CSV与生成Lua的元气弹字段一致；限定范围 `git diff --check` 通过。
+- 完整生成器在本任务无关的 `item_definitions.csv` 历史列错位处失败；已使用同一生成模块定向重建英雄技能，并使用Tooltip专用生成器重建Tooltip。生成内容差异仅包含本任务两份目标Lua。
+
+## 剩余动作
+
+- 完全重启 Workshop Tools Run，实机验证追踪视觉、5/7/9目标数量、每颗命中伤害与治疗、LV5独立爆炸及毒云活动期间不重触发。
+- 自动测试、契约检查和Lua模拟不能替代实机验证；只有用户明确确认后才能记录为完成验收。
+
+## 元气弹已确认边界
+
+- LV1主攻击命中12%概率触发，在英雄普攻范围内选择最近最多5个敌人并分别发射追踪投射物；每颗真实命中造成触发时逻辑全属性×4纯粹伤害。
+- LV2每颗真实命中恢复英雄5%最大生命值；按实际命中数累计并不超过最大生命值。
+- LV3基础目标上限提高到7，每次触发另有10%概率提高到9；LV4完整继承LV3，无新增效果。
+- LV5每颗命中独立20%概率在目标位置产生250范围爆炸，范围内所有敌人受到该颗基础伤害60%的额外纯粹伤害；原命中目标重复计算爆炸伤害。
+- 攻击射程复用现有运行缓存、Script API、引擎API和英雄生成配置回退；投射物使用 `CreateTrackingProjectile` 和真实命中回调。
+
+## 毒云新增边界
+
+- 同一英雄已有活动毒云时，不再进行该技能的再次触发判定，也不替换旧毒云；仅在旧毒云自然结束或清理后允许再次触发。
 
 ## 已确认边界
 

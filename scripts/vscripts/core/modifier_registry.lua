@@ -65,6 +65,10 @@ local modifiers = {
         path = "modifiers/modifier_equipment_effects",
     },
     {
+        name = "modifier_survival_hero_base_health",
+        path = "modifiers/modifier_survival_hero_base_health",
+    },
+    {
         name = "modifier_debug_fixed_attack_rate",
         path = "modifiers/modifier_debug_fixed_attack_rate",
     },

@@ -13,6 +13,7 @@ local equipment_stat_aggregation_service =
 local triggered_proc_service = require("systems/triggered_proc_service")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local hero_combat_stat_math = require("systems/hero_combat_stat_math")
+local hero_stat_adapter = require("systems/hero_stat_adapter")
 
 local M = {}
 local state_by_player = {}
@@ -399,6 +400,17 @@ local function on_hero_summoned(payload)
     }
     state_by_player[payload.player_id] = state
     apply_base_projection(state)
+    local configured_health, configured_bonus, native_health =
+        hero_stat_adapter.apply_configured_health(payload.unit, definition)
+    print(string.format(
+        "[HERO_CONFIGURED_HEALTH] hero=%s entindex=%s configured=%s "
+            .. "native=%s bonus=%s engine_max=%s engine_current=%s",
+        tostring(payload.hero_id), tostring(payload.unit:entindex()),
+        tostring(configured_health), tostring(native_health),
+        tostring(configured_bonus),
+        tostring(safe_get(payload.unit, "GetMaxHealth", 0)),
+        tostring(safe_get(payload.unit, "GetHealth", 0))
+    ))
     local function ensure_modifier(name)
         local existing = payload.unit:FindModifierByName(name)
         if existing then return existing end
@@ -412,7 +424,10 @@ local function on_hero_summoned(payload)
         return created
     end
     ensure_modifier("modifier_weapon_stat_projection")
-    ensure_modifier("modifier_equipment_effects")
+    hero_health_guard.preserve_missing(payload.unit, function()
+        ensure_modifier("modifier_equipment_effects")
+        safe_call(payload.unit, "CalculateStatBonus", true)
+    end, "hero_summoned_equipment_health")
     ensure_modifier("modifier_weapon_attack_tracker")
     local snapshot = recalculate(payload.player_id, "hero_summoned") or {}
     print(string.format(

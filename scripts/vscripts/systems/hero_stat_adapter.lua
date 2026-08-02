@@ -4,6 +4,7 @@ local projectile_config = require(
 )
 local global_rules = require("config/global_rules")
 local armor_balance = require("config/armor_balance")
+local hero_health_guard = require("core/hero_health_guard")
 
 local M = {}
 
@@ -110,12 +111,6 @@ local function apply_range(unit, definition)
 end
 
 local function apply_resource_stats(unit, definition)
-    local health = number(definition, "base_health")
-    if health and health > 0 then
-        safe_call(unit, "SetBaseMaxHealth", health)
-        safe_call(unit, "SetMaxHealth", health)
-        safe_call(unit, "SetHealth", health)
-    end
     set_if_present(
         unit,
         definition,
@@ -141,18 +136,6 @@ local function apply_misc(unit, definition)
 end
 
 local function apply_multipliers(unit, definition)
-    local health = (number(definition, "max_health_multiplier") or 1)
-        * global_rules.number("hero_meta_max_health_multiplier", 1)
-    if health ~= 1 then
-        local maximum = safe_get(unit, "GetMaxHealth")
-        if maximum then
-            maximum = math.max(1, math.floor(maximum * health))
-            safe_call(unit, "SetBaseMaxHealth", maximum)
-            safe_call(unit, "SetMaxHealth", maximum)
-            safe_call(unit, "SetHealth", maximum)
-        end
-    end
-
     local mana = (number(definition, "max_mana_multiplier") or 1)
         * global_rules.number("hero_meta_max_mana_multiplier", 1)
     if mana ~= 1 then
@@ -172,6 +155,47 @@ local function apply_multipliers(unit, definition)
             safe_call(unit, "SetBaseMoveSpeed", base + move_bonus)
         end
     end
+end
+
+function M.configured_max_health(definition)
+    local base = number(definition, "base_health")
+    if not base or base <= 0 then return nil end
+    local multiplier = number(definition, "max_health_multiplier") or 1
+    local global_multiplier = global_rules.number(
+        "hero_meta_max_health_multiplier", 1
+    )
+    return math.max(1, math.floor(base * multiplier * global_multiplier))
+end
+
+function M.apply_configured_health(unit, definition)
+    local target = M.configured_max_health(definition)
+    if not target or not unit or unit:IsNull() then return nil end
+    local modifier_name = "modifier_survival_hero_base_health"
+    local modifier = unit.FindModifierByName
+        and unit:FindModifierByName(modifier_name) or nil
+    local old_bonus = modifier and modifier.GetStackCount
+        and math.max(0, tonumber(modifier:GetStackCount()) or 0) or 0
+    local current_maximum = safe_get(unit, "GetMaxHealth") or 0
+    local native_maximum = math.max(1, current_maximum - old_bonus)
+    local health_bonus = math.max(0, math.floor(target - native_maximum))
+
+    hero_health_guard.preserve_missing(unit, function()
+        if not modifier then
+            modifier = unit:AddNewModifier(unit, nil, modifier_name, {
+                health_bonus = health_bonus,
+            })
+        elseif modifier.SetHealthBonus then
+            modifier:SetHealthBonus(health_bonus)
+        else
+            modifier:SetStackCount(health_bonus)
+        end
+        safe_call(unit, "CalculateStatBonus", true)
+    end, "configured_base_health")
+
+    unit.survival_base_max_health = target
+    unit.survival_native_max_health = native_maximum
+    unit.survival_base_health_bonus = health_bonus
+    return target, health_bonus, native_maximum
 end
 
 local function apply_level(unit, definition)
@@ -204,10 +228,12 @@ function M.apply(unit, definition)
     safe_call(unit, "CalculateStatBonus", true)
     apply_multipliers(unit, definition)
     apply_level(unit, definition)
+    local configured_health = M.apply_configured_health(unit, definition)
 
     logger.info(
         "HeroStat",
-        tostring(definition.hero_id) .. " data applied"
+        tostring(definition.hero_id) .. " data applied max_health="
+            .. tostring(configured_health)
     )
 end
 

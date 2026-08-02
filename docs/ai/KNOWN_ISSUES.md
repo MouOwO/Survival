@@ -126,3 +126,10 @@
 27. 挑战材料已改为专属真实地面物品，自动测试确认映射、Claim、合并和防复制边界；最新实机已确认 Valve 世界物品 Tooltip 的名称/说明仍为空，因此 Tooltip 视觉问题重新列为当前未解决项。鼠标命中、装备栏满时回落，以及“已有材料丢下再捡不复制”也仍需完全重启后实机确认。
 28. Git Bash 终端桥接可能在清空 `.cline_tmp` 日志时报告 `Device or resource busy`，但后续测试循环仍会执行；最终结论必须以新日志中的逐项记录和末尾 `ALL_LUA_TESTS total=... failed=0` 为准，不要仅看开头重定向警告。
 29. `The Hallows Within` 大型 Head wearable 已由用户实机确认上线成功；后续不得回退为主体 `SetModel` 替换，也不得把该物品误拆成不存在的多身体槽组件。环境粒子、死亡/重生和第二次 Run 尚未被用户分别确认，继续作为防回归验收项。
+
+## 2026-08-02 原生召唤英雄基础生命Setter会被引擎覆盖
+
+- 可复现表现：普通召唤英雄CSV目标生命为3000，即使Lua依次调用`SetBaseMaxHealth(3000)`、`SetMaxHealth(3000)`、`SetHealth(3000)`，Workshop Tools实机最终仍显示原生120生命。
+- 静态测试和Lua Mock只能证明调用顺序，不能证明Dota原生英雄初始化后会保留Setter结果；此前自动测试通过但实机失败，后续不得将Mock描述为引擎验证。
+- 已采用的规避方案：使用`MODIFIER_PROPERTY_HEALTH_BONUS`隐藏永久Modifier补足到CSV目标，因为现有真实装备生命加成已由实机证明有效。
+- 已解决：隐藏永久Modifier第二版已由用户在Workshop Tools中确认英雄血量正常。后续防回归时查看`[HERO_CONFIGURED_HEALTH]`中的`configured/native/bonus/engine_max/engine_current`，不得恢复直接Setter方案。

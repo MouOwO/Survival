@@ -28,6 +28,8 @@ local magic_slingshot_rubble_sequence = 0
 local magic_slingshot_slowed_units = {}
 local magic_slingshot_rubble_task = nil
 local magic_slingshot_diagnostics = {}
+local spirit_bomb_projectiles = {}
+local spirit_bomb_projectile_sequence = 0
 local active_poison_clouds = {}
 local poison_cloud_sequence = 0
 local poison_cloud_units = {}
@@ -65,6 +67,10 @@ local MAGIC_SLINGSHOT_SLOW_BUFF = "debuff_hero_magic_slingshot_move_slow"
 local MAGIC_SLINGSHOT_RUBBLE_THINK_INTERVAL = 0.1
 local MAGIC_SLINGSHOT_MAX_HULL_RADIUS = 256
 local MAGIC_SLINGSHOT_DIAGNOSTIC_ROLL_LIMIT = 30
+local SPIRIT_BOMB_PROJECTILE_PARTICLE =
+    "particles/basic_projectile/basic_projectile.vpcf"
+local SPIRIT_BOMB_EXPLOSION_PARTICLE =
+    "particles/basic_explosion/basic_explosion.vpcf"
 local POISON_CLOUD_PARTICLE =
     "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf"
 local POISON_CLOUD_EXPLOSION_PARTICLE =
@@ -700,8 +706,7 @@ end
 
 local function create_poison_cloud(context, position, definition)
     local attacker_key = unit_key(context.attacker)
-    if not attacker_key then return false end
-    release_poison_cloud(attacker_key)
+    if not attacker_key or active_poison_clouds[attacker_key] then return false end
     local radius = level_value(definition, "radius", context.level)
     local duration = level_value(definition, "duration", context.level)
     local interval = level_value(definition, "interval", context.level)
@@ -1913,23 +1918,137 @@ local function run_magic_slingshot(context, definition)
     return launched > 0
 end
 
+local function spirit_bomb_heal(state)
+    local attacker = state.context.attacker
+    if state.heal_max_health_pct <= 0 or not alive(attacker)
+        or not attacker.GetMaxHealth or not attacker.Heal then return end
+    local maximum = math.max(0, tonumber(attacker:GetMaxHealth()) or 0)
+    local amount = maximum * state.heal_max_health_pct / 100
+    if amount <= 0 then return end
+    require("core/hero_health_guard").allow_healing(attacker)
+    attacker:Heal(amount, state.ability)
+end
+
+local function spirit_bomb_explosion(state, target)
+    if state.explosion_radius <= 0 or state.explosion_damage_pct <= 0 then return end
+    local position = unit_position(target)
+    if not position then return end
+    position = copy_position(position)
+    if GetGroundPosition then position = GetGroundPosition(position, nil) end
+    local visual_ok, visual_error = pcall(function()
+        local particle = ParticleManager:CreateParticle(
+            SPIRIT_BOMB_EXPLOSION_PARTICLE,
+            PATTACH_WORLDORIGIN,
+            state.context.attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, position)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not visual_ok then
+        print("[HeroPassiveSkill] spirit bomb explosion visual failed: "
+            .. tostring(visual_error))
+    end
+    local targets = enemies_touching_radius(
+        state.context.attacker, position, state.explosion_radius
+    )
+    deal_group(
+        state.context, targets,
+        state.damage_multiplier * state.explosion_damage_pct / 100,
+        true
+    )
+end
+
+local function spirit_bomb_projectile_hit(ability, target, projectile_id)
+    projectile_id = tonumber(projectile_id)
+    local state = projectile_id and spirit_bomb_projectiles[projectile_id] or nil
+    if not state then return true end
+    spirit_bomb_projectiles[projectile_id] = nil
+    if not target or ability ~= state.ability
+        or not valid(state.context.attacker)
+        or not is_enemy(state.context.attacker, target) then return true end
+    deal(state.context, target, state.damage_multiplier, false)
+    spirit_bomb_heal(state)
+    if state.explosion_chance > 0
+        and RandomFloat(0, 1) < state.explosion_chance then
+        spirit_bomb_explosion(state, target)
+    end
+    return true
+end
+
 local function run_holy(context, definition)
-    local position = copy_position(context.attacker:GetAbsOrigin())
-    local radius = level_value(definition, "radius", context.level)
-    local targets = enemies_in_radius(context.attacker, position, radius)
-    deal_group(context, targets, definition.damage_multiplier[context.level], false)
-    if context.level >= 2 then
-        local effect = definition.level_effects[context.level]
-        for _, unit in ipairs(targets) do
-            apply_effect(context.attacker, unit, "attack_slow", effect.attack_slow_pct, effect.duration, context.skill_id)
-        end
-        if context.level == 3 then
-            scheduler.after(effect.secondary_delay, function()
-                deal_group(context, enemies_in_radius(context.attacker, position, radius),
-                    effect.secondary_multiplier, true)
+    local maximum = math.max(1, math.floor(
+        level_value(definition, "target_count", context.level) + 0.001
+    ))
+    local bonus_chance = level_value(
+        definition, "bonus_target_chance", context.level
+    )
+    if bonus_chance > 0 and RandomFloat(0, 1) < bonus_chance then
+        maximum = maximum + math.max(0, math.floor(
+            level_value(definition, "bonus_target_count", context.level) + 0.001
+        ))
+    end
+    local targets = magic_slingshot_targets(
+        context.attacker, maximum, false, context.target
+    )
+    local skill_definition = skill_definitions.by_id[context.skill_id]
+    local ability = skill_definition and context.attacker:FindAbilityByName(
+        skill_definition.ability_name
+    ) or nil
+    if not valid(ability) or not ProjectileManager
+        or not ProjectileManager.CreateTrackingProjectile or #targets == 0 then
+        return false
+    end
+    local launched = 0
+    for _, target in ipairs(targets) do
+        if alive(target) then
+            spirit_bomb_projectile_sequence = spirit_bomb_projectile_sequence + 1
+            local projectile_id = spirit_bomb_projectile_sequence
+            spirit_bomb_projectiles[projectile_id] = {
+                context = context,
+                ability = ability,
+                damage_multiplier = level_value(
+                    definition, "damage_multiplier", context.level
+                ),
+                heal_max_health_pct = level_value(
+                    definition, "heal_max_health_pct", context.level
+                ),
+                explosion_chance = level_value(
+                    definition, "explosion_chance", context.level
+                ),
+                explosion_radius = level_value(
+                    definition, "explosion_radius", context.level
+                ),
+                explosion_damage_pct = level_value(
+                    definition, "explosion_damage_pct", context.level
+                ),
+            }
+            local launch_ok, launch_error = pcall(function()
+                ProjectileManager:CreateTrackingProjectile({
+                    Target = target,
+                    Source = context.attacker,
+                    Ability = ability,
+                    EffectName = SPIRIT_BOMB_PROJECTILE_PARTICLE,
+                    iMoveSpeed = level_value(
+                        definition, "projectile_speed", context.level
+                    ),
+                    bDodgeable = false,
+                    bProvidesVision = false,
+                    ExtraData = { spirit_bomb_projectile_id = projectile_id },
+                })
             end)
+            if launch_ok then
+                scheduler.after(10, function()
+                    spirit_bomb_projectiles[projectile_id] = nil
+                end)
+                launched = launched + 1
+            else
+                spirit_bomb_projectiles[projectile_id] = nil
+                print("[HeroPassiveSkill] spirit bomb launch failed: "
+                    .. tostring(launch_error))
+            end
         end
     end
+    return launched > 0
 end
 
 local function run_ice_cone(context, definition)
@@ -2440,6 +2559,9 @@ local function roll(payload, skill_id, level, attributes, target_position)
     elseif skill_id == "proto_ice_cone" then
         local attacker_key = unit_key(payload.attacker)
         if ice_cone_locked(attacker_key) then return false end
+    elseif skill_id == "proto_poison_cloud" then
+        local attacker_key = unit_key(payload.attacker)
+        if attacker_key and active_poison_clouds[attacker_key] then return false end
     end
     local chance = definition.trigger_chance[level]
     event_bus.emit(events.HERO_PASSIVE_SKILL_ROLL_REQUESTED, {
@@ -2499,6 +2621,11 @@ function M.on_tracking_projectile_hit(ability, target, location, extra_data)
             ability, target, location, extra_data.magic_slingshot_projectile_id
         )
     end
+    if extra_data.spirit_bomb_projectile_id then
+        return spirit_bomb_projectile_hit(
+            ability, target, extra_data.spirit_bomb_projectile_id
+        )
+    end
     return true
 end
 
@@ -2521,6 +2648,8 @@ function M.init()
     moving_ice_ball_task = nil
     magic_slingshot_projectiles = {}
     magic_slingshot_projectile_sequence = 0
+    spirit_bomb_projectiles = {}
+    spirit_bomb_projectile_sequence = 0
     clear_magic_slingshot_rubble()
     magic_slingshot_rubble_fields = {}
     magic_slingshot_rubble_sequence = 0
@@ -2557,6 +2686,8 @@ M._test = {
     moving_ice_ball_random_target = moving_ice_ball_random_target,
     magic_slingshot_targets = magic_slingshot_targets,
     magic_slingshot_projectiles = function() return magic_slingshot_projectiles end,
+    spirit_bomb_projectiles = function() return spirit_bomb_projectiles end,
+    spirit_bomb_projectile_hit = spirit_bomb_projectile_hit,
     magic_slingshot_rubble_fields = function() return magic_slingshot_rubble_fields end,
     point_inside_rubble = point_inside_rubble,
     runners = runners,

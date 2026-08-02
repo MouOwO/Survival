@@ -6,6 +6,7 @@ local attack_speed_cheat = require("debug/attack_speed_cheat")
 local wave_system = require("systems/wave_system")
 local research_test = require("debug/research_technology_test")
 local dev_asset_preload = require("debug/dev_asset_preload")
+local health_cheat = require("debug/health_cheat")
 
 local M = {}
 
@@ -258,6 +259,26 @@ local function add_armor(context)
     return add_hero_combat_bonus(
         context, "addarmor", "modifier_debug_armor_bonus", "护甲"
     )
+end
+
+local function change_hero_health(context)
+    if #context.args ~= 1 then
+        return false, "usage: blood <+amount|-amount|+percent%|-percent%>"
+    end
+    local hero = summoned_hero(context.player_id)
+    if not hero then return false, "hero_not_summoned" end
+    local result, error_code = health_cheat.apply(hero, context.args[1])
+    if not result then return false, error_code end
+    notify(context, string.format(
+        "英雄生命 %.1f -> %.1f / %.1f（实际变化 %+.1f）",
+        result.before, result.after, result.maximum, result.delta
+    ))
+    logger.info("CheatCommand", string.format(
+        "blood player=%s entindex=%s before=%.1f after=%.1f max=%.1f delta=%+.1f",
+        tostring(context.player_id), tostring(hero:entindex()),
+        result.before, result.after, result.maximum, result.delta
+    ))
+    return true
 end
 
 local function finite_number(value)
@@ -598,6 +619,7 @@ local COMMANDS = {
     addhero = add_test_hero,
     addattack = add_attack,
     addarmor = add_armor,
+    blood = change_hero_health,
     addmonster = add_monster,
     addtechnology = add_technology,
     research_test = run_research_test,
@@ -667,7 +689,7 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: addhero, addskill, research_test, addtechnology, monster, items, hero, skill, weapon growth"
+        "ready: addhero, addskill, blood, research_test, addtechnology, monster, items, hero, skill, weapon growth"
     )
 end
 

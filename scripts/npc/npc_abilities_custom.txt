@@ -715,8 +715,8 @@
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-    "AbilityTextureName" "omniknight_purification"
-    "MaxLevel"           "3"
+    "AbilityTextureName" "keeper_of_the_light_illuminate"
+    "MaxLevel"           "5"
     "AbilityManaCost"    "0"
 }
 
