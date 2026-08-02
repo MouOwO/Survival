@@ -1,3 +1,14 @@
+## 2026-08-02 - 完成检查点：元气弹 Sven Storm Hammer 视觉
+
+- 用户批准为三选一公共技能`proto_holy_pulse`/“元气弹·被动”使用Sven Storm Hammer视觉：飞行弹体保留其原生普通命中EndCap爆裂，LV5每颗命中独立20%成功时再播放一次额外Storm Hammer爆炸。
+- 本机Dota Content资源确认：完整追踪弹体为`particles/units/heroes/hero_sven/sven_spell_storm_bolt.vpcf`；独立爆炸为`particles/units/heroes/hero_sven/sven_storm_bolt_projectile_explosion.vpcf`。后者及其子粒子使用CP3作为冲击中心，生产逻辑同步设置CP0与CP3。
+- `hero_passive_skill_service.lua`只替换元气弹两个视觉常量；`CreateTrackingProjectile`的目标、速度1000、不可躲避、无视野和独立ExtraData状态保持不变。`addon_game_mode.lua`显式预缓存完整弹体与独立爆炸。
+- LV5战斗规则未改：`explosion_chance={0,0,0,0,0.20}`、`explosion_radius={0,0,0,0,250}`、`explosion_damage_pct={0,0,0,0,60}`；伤害继续通过`enemies_touching_radius`按250码及敌人Hull边缘判定，包含原命中目标。
+- 新增`test_spirit_bomb_visual.lua`和`test_spirit_bomb_visual_contract.ps1`，覆盖多目标Storm Hammer追踪弹体、CP0/CP3、250码内外边界、原目标重复伤害、60%倍率及粒子API失败不阻断伤害/不跳过索引释放。结果：`SPIRIT_BOMB_VISUAL_STATE_PASS`、`SPIRIT_BOMB_VISUAL_CONTRACT_PASS`。
+- 相邻回归通过：爆炎弹、怒雷、移动冰球视觉状态，以及爆炎弹、魔法弹弓、怒雷、剑刃震荡视觉契约。当前Lua/Luac 5.4.5语法、四个任务文件严格UTF-8/无BOM/无尾随空白及限定`git diff --check`通过。
+- 两个未跟踪旧契约未计为本任务失败：移动冰球契约全文件禁止共享服务其他路径仍使用的CP0字符串；毒云视觉契约仍要求已废弃的“新云释放旧云”，与当前“活动期间拒绝重触发”规则冲突。本轮未为迁就旧断言修改无关生产逻辑。
+- 尚未验证：Workshop Tools冷启动中的多目标弹体尺寸/朝向/轨迹、普通EndCap爆裂、LV5额外爆炸位置与连续触发无残留。
+
 ## 2026-08-02 - 检查点：召唤英雄CSV生命与blood作弊码实施前确认
 
 - 用户要求修复召唤战斗英雄的实际生命没有采用`hero_definitions`配置的问题，并新增聊天作弊码`blood`。

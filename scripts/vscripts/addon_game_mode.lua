@@ -552,6 +552,16 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
+        "particles/units/heroes/hero_sven/sven_spell_storm_bolt.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_sven/sven_storm_bolt_projectile_explosion.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
         "particles/units/heroes/hero_tiny/tiny_avalanche.vpcf",
         context
     )

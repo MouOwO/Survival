@@ -87,9 +87,9 @@ local MAGIC_SLINGSHOT_RUBBLE_THINK_INTERVAL = 0.1
 local MAGIC_SLINGSHOT_MAX_HULL_RADIUS = 256
 local MAGIC_SLINGSHOT_DIAGNOSTIC_ROLL_LIMIT = 30
 local SPIRIT_BOMB_PROJECTILE_PARTICLE =
-    "particles/basic_projectile/basic_projectile.vpcf"
+    "particles/units/heroes/hero_sven/sven_spell_storm_bolt.vpcf"
 local SPIRIT_BOMB_EXPLOSION_PARTICLE =
-    "particles/basic_explosion/basic_explosion.vpcf"
+    "particles/units/heroes/hero_sven/sven_storm_bolt_projectile_explosion.vpcf"
 local POISON_CLOUD_PARTICLE =
     "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf"
 local POISON_CLOUD_EXPLOSION_PARTICLE =
@@ -2423,16 +2423,28 @@ local function spirit_bomb_explosion(state, target)
     if not position then return end
     position = copy_position(position)
     if GetGroundPosition then position = GetGroundPosition(position, nil) end
+    local particle = nil
     local visual_ok, visual_error = pcall(function()
-        local particle = ParticleManager:CreateParticle(
+        particle = ParticleManager:CreateParticle(
             SPIRIT_BOMB_EXPLOSION_PARTICLE,
             PATTACH_WORLDORIGIN,
             state.context.attacker
         )
         ParticleManager:SetParticleControl(particle, 0, position)
+        -- Storm Hammer's explosion and its child particles use CP3 as the
+        -- impact origin. Keep CP0 aligned for parent renderers as well.
+        ParticleManager:SetParticleControl(particle, 3, position)
         ParticleManager:ReleaseParticleIndex(particle)
     end)
     if not visual_ok then
+        if particle then
+            pcall(function()
+                ParticleManager:DestroyParticle(particle, true)
+            end)
+            pcall(function()
+                ParticleManager:ReleaseParticleIndex(particle)
+            end)
+        end
         print("[HeroPassiveSkill] spirit bomb explosion visual failed: "
             .. tostring(visual_error))
     end
@@ -3203,6 +3215,7 @@ M._test = {
     magic_slingshot_projectiles = function() return magic_slingshot_projectiles end,
     spirit_bomb_projectiles = function() return spirit_bomb_projectiles end,
     spirit_bomb_projectile_hit = spirit_bomb_projectile_hit,
+    spirit_bomb_explosion = spirit_bomb_explosion,
     magic_slingshot_rubble_fields = function() return magic_slingshot_rubble_fields end,
     point_inside_rubble = point_inside_rubble,
     runners = runners,

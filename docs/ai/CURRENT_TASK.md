@@ -37,12 +37,20 @@
 ## 当前状态
 
 **CSV、运行配置、被动服务、Ability KV、Tooltip、Buff、定向生成和自动测试均已完成。用户已于2026-08-02实机确认`addmonster` 600移速测试基准下的熔岩30%减速正常；其余表现仍按用户后续验收结论记录。**
+- 元气弹飞行视觉已替换为 Sven Storm Hammer 完整追踪弹体；LV5独立20%范围爆炸已替换为 Storm Hammer 原生爆炸，权威伤害范围继续读取技能定义的250码。
 
 ## 工作区保护
 
 - 调查阶段后出现最新提交`c36c56e`；已确认目标服务工作区哈希与HEAD一致，属于既有改动安全提交，不是回滚或外部未提交覆盖。
 - 当前仍有大量未跟踪测试文件；不得删除、覆盖或顺带整理。本任务仅新增陨石专项测试并修改直接相关文件。
 将公共技能 `proto_flame_burst` Lv5 三颗随机溅射小火球的视觉从莉娜龙破斩替换为 Snapfire Mortimer Kisses，保留显示名“爆炎弹·被动”、Ability ID `ability_survival_flame_burst`、公共池身份及全部五级战斗规则。
+- `SPIRIT_BOMB_VISUAL_STATE_PASS` / `SPIRIT_BOMB_VISUAL_CONTRACT_PASS`
+- 元气弹视觉生产Lua与新状态测试通过当前Lua/Luac 5.4.5语法；四个任务文件通过严格UTF-8、无BOM和尾随空白检查；限定`git diff --check`通过。
+- `SPIRIT_BOMB_STATE_LUA51_PASS` / `SPIRIT_BOMB_CONTRACT_PASS`
+- `POISON_CLOUD_STATE_LUA51_PASS` / `POISON_CLOUD_CONTRACT_PASS`
+- 奥术弹幕、魔法弹弓、爆炎弹、移动冰球、寒冰锥、脉冲激射和龙卷风相关回归通过。
+- 8个相关Lua文件通过 `luac5.1 -p`；12个相关源/生成/测试文件通过严格UTF-8检查；CSV与生成Lua的元气弹字段一致；限定范围 `git diff --check` 通过。
+- 完整生成器在本任务无关的 `item_definitions.csv` 历史列错位处失败；已使用同一生成模块定向重建英雄技能，并使用Tooltip专用生成器重建Tooltip。生成内容差异仅包含本任务两份目标Lua。
 
 ## 自动验证结果
 
@@ -56,6 +64,7 @@
 ## 剩余动作
 
 - 陨石LV3-LV5减速专项已验收：实际数值为30%而非20%；可攻击`addmonster`使用600基础移速和600移速上限后，用户实机确认减速正常。正常波次怪物未改变，不可攻击调试怪仍为0移速。
+- 冷重启Workshop Tools，确认多目标Storm Hammer弹体均正确追踪、普通命中自带EndCap爆裂、LV5额外爆炸位置正确且连续触发无粒子残留。
 - 完全重启 Workshop Tools Run，实机验证追踪视觉、5/7/9目标数量、每颗命中伤害与治疗、LV5独立爆炸及毒云活动期间不重触发。
 - 自动测试、契约检查和Lua模拟不能替代实机验证；只有用户明确确认后才能记录为完成验收。
 
