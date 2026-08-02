@@ -6,6 +6,7 @@ proto_frost_nova,ability_survival_frost_nova,移动冰球·被动,主攻击命�
 proto_chain_lightning,ability_survival_chain_lightning,怒雷·被动,主攻击命中时概率释放宙斯落雷，对目标及周围敌人造成全属性伤害。,passive,5,100,1,,0,passive_proc,,zuus_lightning_bolt,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_poison_cloud,ability_survival_poison_cloud,毒云·被动,主攻击命中时概率在目标位置生成持续毒云，造成全属性范围纯粹伤害并逐秒降低敌人护甲。,passive,5,100,1,,0,passive_proc,,viper_nethertoxin,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_blade_nova,ability_survival_blade_nova,剑刃震荡·被动,主攻击命中时有15%概率沿英雄面向发射脉冲，对攻击射程内宽200的路径造成全属性纯粹伤害。,passive,5,100,1,,0,passive_proc,,juggernaut_blade_fury,1,运行时效果见config/hero_passive_skill_definitions.lua。
+proto_echo_slash,ability_survival_echo_slash,回音重斩·被动,主攻击命中时概率朝目标触发位置方向连续发射弧形斩，对攻击射程内宽200的路径造成全属性纯粹伤害。,passive,5,100,1,,0,passive_proc,,magnataur_shockwave,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_earth_line,ability_survival_earth_line,地裂冲击·被动,主攻击命中时有12%概率向目标初始位置释放滚石，对路径敌人造成全属性纯粹伤害，并随等级扩大宽度、眩晕敌人与在首次命中时造成范围伤害。,passive,5,100,1,,0,passive_proc,,earthshaker_fissure,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_meteor,ability_survival_meteor,陨石坠落·被动,主攻击命中时有12%概率在目标记录位置坠落并爆炸，造成全属性范围纯粹伤害，并随等级留下熔岩区域、施加减速和连续落下第二颗陨石。,passive,5,100,1,,0,passive_proc,,invoker_chaos_meteor,1,运行时效果见config/hero_passive_skill_definitions.lua。
 proto_arcane_barrage,ability_survival_arcane_barrage,奥术弹幕·被动,主攻击命中时有10%概率对目标区域释放持续飞弹轰击，每颗飞弹造成全属性范围纯粹伤害。,passive,5,100,1,,0,passive_proc,,skywrath_mage_arcane_bolt,1,运行时效果见config/hero_passive_skill_definitions.lua。

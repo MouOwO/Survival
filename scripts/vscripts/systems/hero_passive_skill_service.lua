@@ -41,6 +41,7 @@ local poison_cloud_deaths = {}
 local poison_cloud_task = nil
 local blade_pulse_projectiles = {}
 local blade_pulse_sequence = 0
+local echo_slash = { projectiles = {}, sequence = 0 }
 local earth_rock = { projectiles = {}, sequence = 0 }
 local active_tornadoes = {}
 local tornado_sequence = 0
@@ -99,6 +100,9 @@ local POISON_CLOUD_THINK_INTERVAL = 0.05
 local BLADE_PULSE_PARTICLE =
     "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
 local BLADE_PULSE_CLEANUP_GRACE = 0.25
+echo_slash.particle =
+    "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
+echo_slash.cleanup_grace = 0.25
 earth_rock.particle =
     "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf"
 earth_rock.explosion_particle =
@@ -1704,6 +1708,119 @@ local function run_blade(context, definition)
     return true
 end
 
+function echo_slash.projectile_hit(ability, target, projectile_id)
+    projectile_id = tonumber(projectile_id)
+    local state = projectile_id and echo_slash.projectiles[projectile_id] or nil
+    if not state then return false end
+    if not target then
+        echo_slash.projectiles[projectile_id] = nil
+        return false
+    end
+    if ability ~= state.ability or not valid(state.context.attacker)
+        or not is_enemy(state.context.attacker, target) then return false end
+    local target_key = unit_key(target)
+    if target_key and not state.hit[target_key] then
+        state.hit[target_key] = true
+        deal(state.context, target, state.damage_multiplier, false)
+    end
+    return false
+end
+
+function echo_slash.run(context, definition)
+    if not ProjectileManager or not ProjectileManager.CreateLinearProjectile then
+        return false
+    end
+    local skill_definition = skill_definitions.by_id[context.skill_id]
+    local ability = skill_definition and context.attacker:FindAbilityByName(
+        skill_definition.ability_name
+    ) or nil
+    if not valid(ability) then return false end
+    local origin = copy_position(context.attacker:GetAbsOrigin())
+    local target_position = context.target_position
+        and copy_position(context.target_position) or nil
+    if not target_position then
+        local current_target_position = unit_position(context.target)
+        target_position = current_target_position
+            and copy_position(current_target_position) or nil
+    end
+    if not target_position then return false end
+    local direction = Vector(
+        target_position.x - origin.x,
+        target_position.y - origin.y,
+        0
+    )
+    if direction:Length2D() <= 0.001 then return false end
+    direction = direction:Normalized()
+    local distance = current_attack_range(context.attacker)
+    local duration = level_value(definition, "slash_duration", context.level)
+    local half_width = level_value(definition, "slash_width", context.level) * 0.5
+    local slash_count = math.max(1, math.floor(
+        level_value(definition, "slash_count", context.level) + 0.001
+    ))
+    local slash_interval = math.max(0, level_value(
+        definition, "slash_interval", context.level
+    ))
+    if distance <= 0 or duration <= 0 or half_width <= 0 then return false end
+    local speed = distance / duration
+    local cast_started_at = game_time()
+    local next_slash = 1
+
+    local function launch_next_slash()
+        if not valid(context.attacker) or not valid(ability) then return end
+        local damage_multiplier = level_value(
+            definition, "damage_multiplier", context.level
+        )
+        local minimum_bonus = level_value(
+            definition, "random_damage_min_pct", context.level
+        )
+        local maximum_bonus = level_value(
+            definition, "random_damage_max_pct", context.level
+        )
+        if maximum_bonus > 0 then
+            local bonus_pct = RandomFloat(minimum_bonus, maximum_bonus)
+            damage_multiplier = damage_multiplier * (1 + bonus_pct * 0.01)
+        end
+
+        echo_slash.sequence = echo_slash.sequence + 1
+        local projectile_id = echo_slash.sequence
+        echo_slash.projectiles[projectile_id] = {
+            ability = ability,
+            context = context,
+            damage_multiplier = damage_multiplier,
+            hit = {},
+        }
+        ProjectileManager:CreateLinearProjectile({
+            Ability = ability,
+            EffectName = echo_slash.particle,
+            Source = context.attacker,
+            vSpawnOrigin = origin,
+            vVelocity = direction * speed,
+            fDistance = distance,
+            fStartRadius = half_width,
+            fEndRadius = half_width,
+            iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
+            iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+            iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+            bDeleteOnHit = false,
+            bProvidesVision = false,
+            ExtraData = { echo_slash_projectile_id = projectile_id },
+        })
+        scheduler.after(duration + echo_slash.cleanup_grace, function()
+            echo_slash.projectiles[projectile_id] = nil
+        end)
+
+        next_slash = next_slash + 1
+        if next_slash <= slash_count then
+            local following_time = cast_started_at + (next_slash - 1) * slash_interval
+            local delay = math.max(0, following_time - game_time())
+            scheduler.after(delay, launch_next_slash)
+        end
+    end
+
+    launch_next_slash()
+    return true
+end
+
 function earth_rock.explosion_visual(context, position)
     if not position or not ParticleManager then return end
     local visual_ok, visual_error = pcall(function()
@@ -3011,6 +3128,7 @@ local runners = {
     proto_chain_lightning = run_chain,
     proto_poison_cloud = run_poison,
     proto_blade_nova = run_blade,
+    proto_echo_slash = echo_slash.run,
     proto_earth_line = run_earth,
     proto_meteor = run_meteor,
     proto_arcane_barrage = run_arcane,
@@ -3053,6 +3171,10 @@ end
 local function roll(payload, skill_id, level, attributes, target_position)
     local definition = definitions.by_id[skill_id]
     if not definition then return false end
+    if skill_id == "proto_echo_slash" and not target_position then
+        local position = unit_position(payload.target)
+        target_position = position and copy_position(position) or nil
+    end
     if skill_id == "proto_earth_line" and not target_position then
         local position = unit_position(payload.target)
         target_position = position and copy_position(position) or nil
@@ -3121,6 +3243,11 @@ function M.on_tracking_projectile_hit(ability, target, location, extra_data)
     if extra_data.earth_rock_projectile_id then
         return earth_rock.projectile_hit(
             ability, target, location, extra_data.earth_rock_projectile_id
+        )
+    end
+    if extra_data.echo_slash_projectile_id then
+        return echo_slash.projectile_hit(
+            ability, target, extra_data.echo_slash_projectile_id
         )
     end
     if extra_data.blade_pulse_projectile_id then
@@ -3239,6 +3366,8 @@ M._test = {
     blade_pulse_damage_multiplier = blade_pulse_damage_multiplier,
     blade_pulse_projectiles = function() return blade_pulse_projectiles end,
     blade_pulse_projectile_hit = blade_pulse_projectile_hit,
+    echo_slash_projectiles = function() return echo_slash.projectiles end,
+    echo_slash_projectile_hit = echo_slash.projectile_hit,
     earth_rock_projectiles = function() return earth_rock.projectiles end,
     earth_rock_projectile_hit = earth_rock.projectile_hit,
     active_tornadoes = function() return active_tornadoes end,

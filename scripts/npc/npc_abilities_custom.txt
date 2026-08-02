@@ -670,6 +670,16 @@
     "AbilityManaCost"    "0"
 }
 
+"ability_survival_echo_slash"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "magnataur_shockwave"
+    "MaxLevel"           "5"
+    "AbilityManaCost"    "0"
+}
+
 "ability_survival_earth_line"
 {
     "BaseClass"          "ability_lua"

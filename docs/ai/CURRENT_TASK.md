@@ -2,6 +2,27 @@
 
 ## 最新状态（2026-08-02）
 
+## 活跃任务（2026-08-02）
+
+新增公共技能 `proto_echo_slash` / “回音重斩·被动”。用户已确认：LV1攻击命中12%概率，发射1道总宽200的弧形斩，路径所有单位受到触发时全属性×1伤害；LV2波数+1、概率15%、波间隔0.1秒；LV3波数再+1；LV4完整继承LV3；LV5波数再+1，每波独立随机提高5%～20%伤害。斩击从触发英雄位置朝被攻击目标当时位置固定方向移动，距离等于攻击触发时英雄攻击射程，1秒走完全程；每道波真实穿透命中并独立去重，复用项目逻辑属性快照和既有纯粹伤害事务。计划新增 `public_13`，复用 `proto_blade_nova` 的线性投射物机制；用户已批准开始实施。
+
+### 本任务实施边界
+
+- 权威配置先修改 `data/csv/英雄系统/hero_skill_definitions.csv`、`data/csv/英雄系统/hero_skill_pool_members.csv` 和 `data/csv/公共规则/tooltip_definitions.csv`，再定向生成对应 Lua。
+- 运行配置位于 `scripts/vscripts/config/hero_passive_skill_definitions.lua`；真实碰撞和伤害位于 `scripts/vscripts/systems/hero_passive_skill_service.lua`；能力路由复用 `scripts/vscripts/abilities/survival_hero_skill.lua`。
+- LV5每道波分别随机抽取5%～20%增伤；同次触发固定起点、目标方向、距离和全属性快照。未额外设置活动锁，允许不同攻击触发并行。
+- 尚未验证：弧形斩粒子的实际视觉资源、Workshop Tools 中的宽度/连续波观感和真实引擎碰撞；自动测试不能替代实机验收。
+
+### 当前实施结果
+
+- 已新增 `proto_echo_slash`、`ability_survival_echo_slash`、公共池成员 `public_13` 和五级 Tooltip。
+- 三份权威CSV已更新并定向生成英雄技能、公共池和Tooltip Lua；生成比较逐字节一致。
+- 运行时使用马格纳斯震荡波粒子和独立线性投射物状态；每道波 `bDeleteOnHit=false`、独立去重、回调返回false，终点和超时均可清理。
+- 多波使用绝对时间校正的单链调度；LV5每波创建时独立抽取5%～20%增伤，触发时逻辑全属性快照在整次技能中保持不变。
+- 自动验证通过：`ECHO_SLASH_STATE_LUA51_PASS`、`ECHO_SLASH_CONTRACT_PASS`、`ECHO_SLASH_LUAC51_PASS`、配置Lua 5.1验证、CSV生成比较、严格UTF-8、限定`git diff --check`、脉冲激射/地裂/魔法弹弓共享回归。
+- 脉冲激射完整PowerShell契约存在既有陈旧预缓存断言，仍要求已废弃的Vengeful粒子；其Lua 5.1状态测试通过，本任务未修改该旧测试。
+- 剩余动作仅为Workshop Tools实机验证；尚不能记录为引擎验证或用户验收完成。
+
 用户已明确确认现有公共技能`proto_earth_line`五级“地裂冲击·被动”暂时完成。当前基线停止继续调整，不再把Workshop Tools逐项验证恢复为活跃任务；只有用户以后明确提出地裂冲击的新需求或报告实机问题时，才按下述维护方式重新开启。
 
 ### 地裂冲击自动验证

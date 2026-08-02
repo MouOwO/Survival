@@ -181,6 +181,7 @@ local function publish(state)
                 or hero_skill.skill_id == "proto_frost_nova"
                 or hero_skill.skill_id == "proto_poison_cloud"
                 or hero_skill.skill_id == "proto_blade_nova"
+                or hero_skill.skill_id == "proto_echo_slash"
                 or hero_skill.skill_id == "proto_earth_line"
                 or hero_skill.skill_id == "proto_void_pulse"
         )

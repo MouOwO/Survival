@@ -14,6 +14,7 @@ M.rows = {
     { pool_member_id = "public_10", pool_id = "public_pool", skill_id = "proto_holy_pulse", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
     { pool_member_id = "public_11", pool_id = "public_pool", skill_id = "proto_ice_cone", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
     { pool_member_id = "public_12", pool_id = "public_pool", skill_id = "proto_void_pulse", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
+    { pool_member_id = "public_13", pool_id = "public_pool", skill_id = "proto_echo_slash", weight = 100, min_rebirth_level = 2, max_rebirth_level = 10, enabled = true, notes = "二转及以后公共随机池。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do
