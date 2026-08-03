@@ -1435,3 +1435,14 @@
 - 调查确认：全局`damage_filter_service.lua`已有`damage_category_const`字段，可按引擎伤害类别区分基础攻击与技能/脚本伤害，不使用`inflictor == nil`猜测。
 - 调查确认：项目当前没有`SetExecuteOrderFilter`；仅修改塔自动选敌不能覆盖玩家手动右键树，因此计划新增最小OrderFilter服务，并由树承伤规则兜底已发射弹道或引擎竞态。
 - 用户已批准实施方案。下一步：实现共享树伤害规则、扩展树与塔modifier、注册OrderFilter并增加专项测试。
+
+## 2026-08-03 — 资源树承伤与防御塔目标限制自动实现完成
+
+- 新增`systems/tree_damage_rules.lua`作为共享身份与承伤规则：`enemy_tree`只放行`DOTA_DAMAGE_CATEGORY_ATTACK`；未知类别失败关闭；`survival_building_id == "arrow_tower"`即使是基础攻击也始终禁止伤树。
+- `damage_filter_service.lua`在消费项目pending事务后应用共享树规则，被拦截伤害发布`tree_requires_basic_attack`；因此技能、无Ability脚本伤害与平A触发附伤不会污染后续事务。
+- `modifier_tree_progression.lua`增加承伤属性但保留最低1血和耗尽升级调度。全局DamageFilter是类别权威；modifier参数缺少`damage_category`时交给全局过滤器，避免引擎版本差异误拦基础平A；箭塔攻击仍在modifier层直接拦截。
+- `modifier_tower_auto_attack.lua`自动搜索跳过树，当前目标为树时清除并重选，攻击开始事件额外停止竞态攻击；新增`tree_attack_order_filter.lua`只拒绝箭塔对树的手动`DOTA_UNIT_ORDER_ATTACK_TARGET`。
+- 自动验证通过：`TREE_DAMAGE_RULES_CONTRACT_PASS`、`TREE_DAMAGE_RULES_LUA51_PASS`、`TREE_DAMAGE_RULES_LUAC51_PASS`、`TREE_DAMAGE_RULES_STRICT_UTF8_PASS`、`TREE_DAMAGE_RULES_DIFF_CHECK_PASS`。Lua行为测试覆盖非塔基础平A、技能/未知/塔伤害、DamageFilter事务、手动命令、自动选敌、攻击开始、间隔重选及树升级调度。
+- 并发工作区事件：任务期间外部进程把生产与初版文档提交到新HEAD`00bfe05`，同时修改`.gitignore`并产生无关未跟踪`卡牌文本.txt`。按规则暂停后，用户明确选择接受新HEAD、保留外部`.gitignore`并继续验证；未回滚、覆盖或编辑这些外部内容。
+- 外部`.gitignore`第103至104行忽略本次`tools/test_tree_damage_rules.lua`与`tools/test_tree_damage_rules_contract.ps1`。两文件仍在磁盘且已执行通过，但未纳入Git状态；用户已明确接受该交付限制。
+- 尚未进行Workshop Tools实机验证，不能称为实机通过或用户验收。下一步只验证塔自动/手动忽略树、非塔基础平A扣血、所有额外伤害不扣血，以及树最低1血后的正常升级刷新。

@@ -1,5 +1,13 @@
 # Project Context
 
+## 资源树承伤与箭塔目标规则（2026-08-03）
+
+- 资源树单位身份是`GetUnitName() == "enemy_tree"`；箭塔及全部转职塔的稳定身份是`survival_building_id == "arrow_tower"`，不要只按引擎单位名识别转职塔。
+- 树可承受的伤害严格限定为引擎`DOTA_DAMAGE_CATEGORY_ATTACK`。不要用`inflictor == nil`或伤害类型猜测基础平A；技能、脚本、持续、范围和平A触发的技能/装备附伤均不得伤树，未知类别失败关闭。
+- 树伤害类别的权威入口是全局`combat/damage_filter_service.lua`，共享规则位于`systems/tree_damage_rules.lua`。`modifier_tree_progression`提供第二层保护并继续负责最低1血与耗尽升级，不能另建重复树modifier。
+- 箭塔禁止攻击树需要三层同时存在：`modifier_tower_auto_attack`自动目标排除与当前目标清理；`tree_attack_order_filter.lua`手动攻击命令拒绝；树承伤规则拦截已发射弹道和竞态伤害。
+- `MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE`的params在部分引擎版本可能缺少`damage_category`。modifier层缺失类别时应交由始终提供`damage_category_const`的DamageFilter判断，不能因此把所有基础平A误拦；可识别的箭塔攻击仍应直接拦截。
+
 ## 免费英雄与一转专属技能（2026-08-02）
 
 - 当前正式英雄池为四名免费英雄`hero_doom`、`hero_shadow_fiend`、`hero_axe`、`hero_drow_ranger`，以及两名VIP英雄`hero_monkey_king`、`hero_blademaster`。

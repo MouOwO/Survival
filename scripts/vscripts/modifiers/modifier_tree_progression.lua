@@ -18,10 +18,16 @@ function M:DeclareFunctions()
 end
 
 function M:GetModifierIncomingDamage_Percentage(params)
+    params = params or {}
+    if tree_damage_rules.is_arrow_tower(params.attacker) then return -100 end
+    -- DamageFilter always supplies damage_category_const and remains the
+    -- authority. Some engine builds omit damage_category from modifier
+    -- property params, so defer instead of accidentally blocking base attacks.
+    if params.damage_category == nil then return 0 end
     if tree_damage_rules.allows_damage(
-            params and params.attacker,
+            params.attacker,
             self:GetParent(),
-            params and params.damage_category) then
+            params.damage_category) then
         return 0
     end
     return -100

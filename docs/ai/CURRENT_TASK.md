@@ -10,6 +10,16 @@
 - 本任务无新增策划数值，不修改已有编码风险的建筑CSV，也不直接修改generated Lua。
 - 验证至少包含专项PowerShell契约、Lua 5.1行为测试、`luac5.1 -p`、树/塔/伤害回归、严格UTF-8和限定`git diff --check`；自动验证不能替代Workshop Tools中的塔选敌、右键命令与实际扣血验收。
 
+### 实施结果与当前状态
+
+- 已新增共享规则`systems/tree_damage_rules.lua`：只把`DOTA_DAMAGE_CATEGORY_ATTACK`视为树可承受的基础攻击类别；未知或缺失类别在全局DamageFilter中失败关闭；`survival_building_id == "arrow_tower"`始终禁止伤树。
+- `modifier_tree_progression.lua`保留最低1血与耗尽升级调度，并增加承伤属性作为第二层保护。全局DamageFilter是伤害类别权威；考虑部分引擎版本可能不向modifier属性参数提供`damage_category`，modifier在类别缺失时交由全局过滤器判断，但仍直接拦截可识别的箭塔攻击。
+- `modifier_tower_auto_attack.lua`已从自动搜索中排除树；当前目标或强制目标是树时会清除并重新选择合法敌人；攻击开始事件另行停止塔对树的竞态攻击。
+- 已新增`systems/tree_attack_order_filter.lua`并由`addon_game_mode.lua`启动注册，只拒绝箭塔单位对`enemy_tree`的`DOTA_UNIT_ORDER_ATTACK_TARGET`，其他单位、目标和命令不变。
+- 专项验证通过：`TREE_DAMAGE_RULES_CONTRACT_PASS`、`TREE_DAMAGE_RULES_LUA51_PASS`、`TREE_DAMAGE_RULES_LUAC51_PASS`、`TREE_DAMAGE_RULES_STRICT_UTF8_PASS`和`TREE_DAMAGE_RULES_DIFF_CHECK_PASS`。行为测试覆盖英雄/怪物/召唤物基础平A放行、技能/未知脚本/塔平A拦截、DamageFilter事务消费、手动命令过滤、自动选敌跳过树、攻击开始清理、间隔重新选敌以及最低1血后的升级调度。
+- 工作期间外部进程将生产改动提交为`00bfe05`并修改`.gitignore`；用户明确选择接受新HEAD、保留外部`.gitignore`并继续验证。两个专项测试文件仍在磁盘并已执行通过，但被外部`.gitignore`第103至104行忽略，未纳入Git状态。
+- 尚未完成Workshop Tools实机验证，不能记录为制作完成或用户验收。需验证：各转职塔自动忽略树；右键/攻击命令无法令塔攻击树；其他单位基础平A可扣树生命；技能、平A触发技能/装备附伤与无Ability脚本伤害不扣树生命；树到1血后仍正常升级刷新。
+
 ## 已完成任务（2026-08-02）：四名免费英雄替换
 
 - 用户已批准将原有非VIP英雄替换为末日使者、影魔、斧王、黑暗游侠；齐天大圣与剑圣两名VIP英雄保持不变。
