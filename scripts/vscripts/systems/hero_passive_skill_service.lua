@@ -20,9 +20,11 @@ local arcane_barrage_sequence = 0
 local active_ice_cones = {}
 local ice_cone_sequence = 0
 local active_meteor_casts = {}
-local meteor_sequence = 0
 local meteor_slowed_units = {}
 local meteor_task = nil
+local meteor_explosion_visuals = {
+    active = {}, cast_sequence = 0, sequence = 0, duration = 3.1,
+}
 local active_moving_ice_balls = {}
 local moving_ice_ball_sequence = 0
 local moving_ice_ball_task = nil
@@ -69,13 +71,16 @@ local FURY_THUNDER_PARTICLE =
     "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
 local MOVING_ICE_BALL_PARTICLE =
     "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf"
-local METEOR_FALL_PARTICLE = "particles/basic_projectile/basic_projectile.vpcf"
-local METEOR_EXPLOSION_PARTICLE = "particles/basic_explosion/basic_explosion.vpcf"
+local METEOR_FALL_PARTICLE =
+    "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf"
+local METEOR_EXPLOSION_PARTICLE =
+    "particles/units/heroes/hero_warlock/warlock_rain_of_chaos_explosion.vpcf"
 local METEOR_LAVA_PARTICLE =
     "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf"
 local METEOR_LAVA_SLOW_BUFF = "debuff_hero_meteor_lava_move_slow"
 local METEOR_THINK_INTERVAL = 0.05
 local METEOR_FALL_HEIGHT = 1200
+local METEOR_FLY_PARTICLE_TRAVEL_TIME = 1.3
 local MOVING_ICE_BALL_PARTICLE = "particles/basic_projectile/basic_projectile.vpcf"
 local MOVING_ICE_BALL_EXPLOSION_PARTICLE = "particles/basic_projectile/basic_projectile_explosion.vpcf"
 local MOVING_ICE_BALL_THINK_INTERVAL = 0.05
@@ -1963,8 +1968,26 @@ end
 
 local function meteor_destroy_particle(particle, immediate)
     if not particle then return end
-    ParticleManager:DestroyParticle(particle, immediate == true)
-    ParticleManager:ReleaseParticleIndex(particle)
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle, immediate == true)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not destroy_ok or not release_ok then
+        print("[HeroPassiveSkill] meteor particle cleanup failed: "
+            .. tostring(destroy_error or release_error))
+    end
+end
+
+meteor_explosion_visuals.release = function(visual_id, immediate)
+    local visual = meteor_explosion_visuals.active[visual_id]
+    if not visual then return end
+    meteor_explosion_visuals.active[visual_id] = nil
+    if visual.task then scheduler.cancel(visual.task) end
+    visual.task = nil
+    meteor_destroy_particle(visual.particle, immediate == true)
+    visual.particle = nil
 end
 
 local function meteor_sync_slow_units(desired)
@@ -2002,6 +2025,13 @@ local function clear_meteors()
         keys[#keys + 1] = attacker_key
     end
     for _, attacker_key in ipairs(keys) do meteor_release_cast(attacker_key) end
+    local visual_ids = {}
+    for visual_id, _ in pairs(meteor_explosion_visuals.active) do
+        visual_ids[#visual_ids + 1] = visual_id
+    end
+    for _, visual_id in ipairs(visual_ids) do
+        meteor_explosion_visuals.release(visual_id, true)
+    end
     meteor_sync_slow_units({})
     if meteor_task then scheduler.cancel(meteor_task) end
     meteor_task = nil
@@ -2016,20 +2046,65 @@ local function meteor_create_particle(name, position, attacker)
         ParticleManager:SetParticleControl(particle, 0, position)
     end)
     if not ok then
+        meteor_destroy_particle(particle, true)
         particle = nil
         print("[HeroPassiveSkill] meteor particle failed: " .. tostring(failure))
     end
     return particle
 end
 
+local function meteor_create_fall_particle(cast)
+    local start_position = copy_position(cast.position)
+    start_position.z = start_position.z + METEOR_FALL_HEIGHT
+
+    -- Valve's Chaos Meteor fly particle always traverses CP0 -> CP1 in 1.3s.
+    -- Extend CP1 below the ground so it crosses the authoritative impact point
+    -- at this skill's unchanged 0.8s fall duration.
+    local visual_end = copy_position(start_position)
+    visual_end.z = start_position.z - METEOR_FALL_HEIGHT
+        * METEOR_FLY_PARTICLE_TRAVEL_TIME / cast.fall_duration
+
+    local particle = meteor_create_particle(
+        METEOR_FALL_PARTICLE, start_position, cast.context.attacker
+    )
+    if not particle then return nil end
+
+    local ok, failure = pcall(function()
+        ParticleManager:SetParticleControl(particle, 1, visual_end)
+        ParticleManager:SetParticleControl(
+            particle, 2, Vector(cast.fall_duration, 0, 0)
+        )
+    end)
+    if not ok then
+        meteor_destroy_particle(particle, true)
+        print("[HeroPassiveSkill] meteor fall particle failed: "
+            .. tostring(failure))
+        return nil
+    end
+    return particle
+end
+
+local function meteor_explosion_visual(cast)
+    local particle = meteor_create_particle(
+        METEOR_EXPLOSION_PARTICLE, cast.position, cast.context.attacker
+    )
+    if not particle then return end
+
+    meteor_explosion_visuals.sequence = meteor_explosion_visuals.sequence + 1
+    local visual_id = meteor_explosion_visuals.sequence
+    local visual = { particle = particle, task = nil }
+    meteor_explosion_visuals.active[visual_id] = visual
+    visual.task = scheduler.after(
+        meteor_explosion_visuals.duration,
+        function() meteor_explosion_visuals.release(visual_id) end,
+        "hero_meteor_explosion_" .. tostring(visual_id)
+    )
+end
+
 local function meteor_start_fall(cast, meteor)
     if meteor.fall_started then return end
     meteor.fall_started = true
-    local start_position = copy_position(cast.position)
-    start_position.z = start_position.z + METEOR_FALL_HEIGHT
-    meteor.fall_particle = meteor_create_particle(
-        METEOR_FALL_PARTICLE, start_position, cast.context.attacker
-    )
+    meteor.fall_particle = meteor_create_fall_particle(cast)
 end
 
 local function meteor_impact(cast, meteor)
@@ -2038,15 +2113,7 @@ local function meteor_impact(cast, meteor)
     meteor_destroy_particle(meteor.fall_particle, true)
     meteor.fall_particle = nil
 
-    local explosion = meteor_create_particle(
-        METEOR_EXPLOSION_PARTICLE, cast.position, cast.context.attacker
-    )
-    if explosion then
-        ParticleManager:SetParticleControl(
-            explosion, 1, Vector(cast.radius, 0, 0)
-        )
-        ParticleManager:ReleaseParticleIndex(explosion)
-    end
+    meteor_explosion_visual(cast)
     if valid(cast.context.attacker) then
         deal_group(
             cast.context,
@@ -2101,16 +2168,6 @@ sync_meteors = function()
                     meteor_start_fall(cast, meteor)
                 end
                 if meteor.fall_started and not meteor.landed then
-                    local progress = math.max(0, math.min(1,
-                        (now - meteor.fall_start_at) / cast.fall_duration
-                    ))
-                    local current = copy_position(cast.position)
-                    current.z = current.z + METEOR_FALL_HEIGHT * (1 - progress)
-                    if meteor.fall_particle then
-                        ParticleManager:SetParticleControl(
-                            meteor.fall_particle, 0, current
-                        )
-                    end
                     if now + 0.0001 >= meteor.land_at then
                         meteor_impact(cast, meteor)
                     end
@@ -2213,9 +2270,10 @@ local function run_meteor(context, definition)
         }
     end
 
-    meteor_sequence = meteor_sequence + 1
+    meteor_explosion_visuals.cast_sequence =
+        meteor_explosion_visuals.cast_sequence + 1
     active_meteor_casts[attacker_key] = {
-        token = meteor_sequence,
+        token = meteor_explosion_visuals.cast_sequence,
         context = context,
         position = position,
         radius = level_value(definition, "radius", context.level),
@@ -3307,9 +3365,11 @@ function M.init()
     active_ice_cones = {}
     ice_cone_sequence = 0
     active_meteor_casts = {}
-    meteor_sequence = 0
     meteor_slowed_units = {}
     meteor_task = nil
+    meteor_explosion_visuals.active = {}
+    meteor_explosion_visuals.cast_sequence = 0
+    meteor_explosion_visuals.sequence = 0
     active_moving_ice_balls = {}
     moving_ice_ball_sequence = 0
     moving_ice_ball_task = nil
@@ -3350,6 +3410,7 @@ M._test = {
     active_ice_cones = function() return active_ice_cones end,
     active_meteor_casts = function() return active_meteor_casts end,
     meteor_slowed_units = function() return meteor_slowed_units end,
+    meteor_explosion_visuals = function() return meteor_explosion_visuals.active end,
     meteor_locked = meteor_locked,
     sync_meteors = sync_meteors,
     clear_meteors = clear_meteors,

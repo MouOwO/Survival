@@ -516,6 +516,16 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
+        "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_warlock/warlock_rain_of_chaos_explosion.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
         "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf",
         context
     )
