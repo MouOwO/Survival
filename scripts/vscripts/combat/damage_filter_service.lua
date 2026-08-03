@@ -6,6 +6,7 @@ local repository = nil
 local config = nil
 local registered = false
 local diagnostic_count_by_attacker = {}
+local tree_diagnostic_count = 0
 
 local function diagnostic_hero(attacker)
     local hero_id = tostring(attacker and attacker.survival_hero_id or "")
@@ -64,16 +65,64 @@ local function filter(_, keys)
         return false
     end
     local damage_category = keys.damage_category_const or keys.damage_category
+    local inflictor_index = tonumber(
+        keys.entindex_inflictor_const or keys.entindex_inflictor
+    )
+    local category_is_unknown = damage_category == nil
+        or tonumber(damage_category) == 0
+    local attack_evidence = false
+    if tree_damage_rules.is_tree(victim)
+        and not tree_damage_rules.is_arrow_tower(attacker)
+        and (tree_damage_rules.is_basic_attack_category(damage_category)
+            or category_is_unknown)
+        and (not inflictor_index or inflictor_index <= 0) then
+        attack_evidence = tree_damage_rules.consume_basic_attack(attacker, victim)
+    end
     if not tree_damage_rules.allows_damage(
-            attacker, victim, damage_category) then
+            attacker, victim, damage_category, attack_evidence) then
+        if tree_damage_rules.is_tree(victim) and tree_diagnostic_count < 20 then
+            tree_diagnostic_count = tree_diagnostic_count + 1
+            print(string.format(
+                "[TREE_DAMAGE_FILTER] allow=false attacker=%s name=%s category=%s "
+                    .. "inflictor=%s evidence=%s damage=%s",
+                tostring(attacker:entindex()),
+                tostring(attacker.GetUnitName and attacker:GetUnitName() or "unknown"),
+                tostring(damage_category),
+                tostring(inflictor_index),
+                tostring(attack_evidence),
+                tostring(keys.damage)
+            ))
+        end
         event_bus.emit(events.DAMAGE_BLOCKED, {
             transaction_id = transaction_id,
             reason = "tree_requires_basic_attack",
         })
         return false
     end
+    if tree_damage_rules.is_tree(victim) and tree_diagnostic_count < 20 then
+        tree_diagnostic_count = tree_diagnostic_count + 1
+        print(string.format(
+            "[TREE_DAMAGE_FILTER] allow=true attacker=%s name=%s category=%s "
+                .. "inflictor=%s evidence=%s damage=%s",
+            tostring(attacker:entindex()),
+            tostring(attacker.GetUnitName and attacker:GetUnitName() or "unknown"),
+            tostring(damage_category),
+            tostring(inflictor_index),
+            tostring(attack_evidence),
+            tostring(keys.damage)
+        ))
+    end
     if victim.survival_damage_blocked == true
         or (victim.IsInvulnerable and victim:IsInvulnerable()) then
+        if tree_damage_rules.is_tree(victim) and tree_diagnostic_count < 20 then
+            tree_diagnostic_count = tree_diagnostic_count + 1
+            print(string.format(
+                "[TREE_DAMAGE_FILTER] allow=false reason=damage_blocked "
+                    .. "survival_blocked=%s invulnerable=%s",
+                tostring(victim.survival_damage_blocked == true),
+                tostring(victim.IsInvulnerable and victim:IsInvulnerable() or false)
+            ))
+        end
         event_bus.emit(events.DAMAGE_BLOCKED, {
             transaction_id = transaction_id, reason = "damage_blocked",
         })
@@ -133,6 +182,8 @@ function M.init(deps)
     event_bus, events, repository, config = deps.event_bus, deps.events, deps.repository, deps.config
     registered = false
     diagnostic_count_by_attacker = {}
+    tree_diagnostic_count = 0
+    tree_damage_rules.reset_pending_attacks()
 end
 
 function M.register()

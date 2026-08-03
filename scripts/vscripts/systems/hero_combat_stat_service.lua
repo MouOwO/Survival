@@ -14,6 +14,7 @@ local triggered_proc_service = require("systems/triggered_proc_service")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local hero_combat_stat_math = require("systems/hero_combat_stat_math")
 local hero_stat_adapter = require("systems/hero_stat_adapter")
+local monkey_runtime = require("config/generated/monkey_king_exclusive_runtime")
 
 local M = {}
 local state_by_player = {}
@@ -139,6 +140,21 @@ local function configured_damage_multiplier(definition)
     )
 end
 
+local function has_skill(player_id, skill_id)
+    local result = event_bus.request(
+        events.HERO_SKILL_STATE_GET_REQUEST,
+        { player_id = player_id }
+    )
+    for _, skill in ipairs(result and result.snapshot
+            and result.snapshot.skills or {}) do
+        if skill.skill_id == skill_id and skill.locked ~= 1
+            and (tonumber(skill.level) or 0) > 0 then
+            return true
+        end
+    end
+    return false
+end
+
 local function apply_base_projection(state)
     local unit = state.unit
     hero_health_guard.preserve_current(unit, function()
@@ -148,8 +164,10 @@ local function apply_base_projection(state)
         safe_call(unit, "CalculateStatBonus", true)
         -- Keep the legacy damage multiplier on native basic attacks while the
         -- logical/UI attack remains the unmultiplied CSV value.
-        local minimum = math.max(0, state.engine_base_attack_min)
-        local maximum = math.max(minimum, state.engine_base_attack_max)
+        local multiplier = tonumber(state.exclusive_attack_multiplier) or 1
+        local minimum = math.max(0, state.engine_base_attack_min * multiplier)
+        local maximum = math.max(minimum,
+            state.engine_base_attack_max * multiplier)
         safe_call(unit, "SetBaseDamageMin", minimum)
         safe_call(unit, "SetBaseDamageMax", maximum)
         safe_call(unit, "CalculateStatBonus", true)
@@ -196,6 +214,18 @@ local function recalculate(player_id, reason)
         tonumber(hero_technology.armor_reduction_per_attack) or 0
     local researcher_critical_chance_pct =
         tonumber(hero_technology.critical_chance_pct) or 0
+    local monkey_w = state.hero_id == "hero_monkey_king"
+        and has_skill(player_id, "skill_monkey_king_fury")
+    local monkey_e = state.hero_id == "hero_monkey_king"
+        and has_skill(player_id, "skill_monkey_king_swiftness")
+    local monkey_config = monkey_runtime.by_id.monkey_king_exclusive or {}
+    local exclusive_attack_multiplier = monkey_e
+        and math.max(1, tonumber(monkey_config.e_attack_multiplier) or 1) or 1
+    local monkey_bonus_result = event_bus.request(
+        events.MONKEY_KING_BONUS_STATS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local monkey_bonus = monkey_bonus_result and monkey_bonus_result.snapshot or {}
     local essence_result = event_bus.request(
         events.SEVEN_SINS_ESSENCE_STATS_GET_REQUEST,
         { player_id = player_id }
@@ -212,15 +242,33 @@ local function recalculate(player_id, reason)
     researcher_armor_reduction = researcher_armor_reduction
         + (tonumber(essence.armor_reduction_per_attack) or 0)
     local essence_attributes_pct = tonumber(essence.all_attributes_pct) or 0
+    local engine_research_attack_bonus = (((state.engine_base_attack_min
+        + state.engine_base_attack_max
+        + weapon_attack_min + weapon_attack_max)
+        * 0.5) * (researcher_attack_pct + essence_attack_pct) / 100
+        + researcher_attack_flat
+        + progression_attack_flat) * exclusive_attack_multiplier
+    local engine_weapon_attack_bonus = (debug_attack
+        and (debug_attack
+            - ((state.engine_base_attack_min
+                + state.engine_base_attack_max) * 0.5)
+            - equipment_stats.attack_flat)
+        or ((weapon_attack_min + weapon_attack_max) * 0.5))
+            * exclusive_attack_multiplier
+    local engine_bonus_attack = engine_research_attack_bonus
+        + engine_weapon_attack_bonus
     local unscaled_strength = state.base.strength + weapon_strength
         + progression_attributes
         + equipment_stats.all_attributes_flat
+        + (tonumber(monkey_bonus.strength) or 0)
     local unscaled_agility = state.base.agility + weapon_agility
         + progression_attributes
         + equipment_stats.all_attributes_flat
+        + (tonumber(monkey_bonus.agility) or 0)
     local unscaled_intellect = state.base.intellect + weapon_intellect
         + progression_attributes
         + equipment_stats.all_attributes_flat
+        + (tonumber(monkey_bonus.intellect) or 0)
     local strength_bonus = unscaled_strength * essence_attributes_pct / 100
     local agility_bonus = unscaled_agility * essence_attributes_pct / 100
     local intellect_bonus = unscaled_intellect * essence_attributes_pct / 100
@@ -228,7 +276,10 @@ local function recalculate(player_id, reason)
         hero_combat_stat_math.configured_base_attack_time(
             state.definition,
             state.engine_base_attack_time
-        ) - (tonumber(essence.attack_interval_flat) or 0))
+        ) - (tonumber(essence.attack_interval_flat) or 0)
+            - (monkey_w
+                and (tonumber(monkey_config.w_attack_interval_reduction) or 0)
+                or 0))
     local hero_damage_multiplier = state.damage_multiplier
     local next_snapshot = {
         player_id = player_id,
@@ -242,21 +293,27 @@ local function recalculate(player_id, reason)
         weapon_content_id = equipment.main_hand_content_id or "",
         weapon_name = equipment.main_hand_name ~= ""
             and equipment.main_hand_name or "未装备武器",
-        attack_min = debug_attack or ((state.base.attack_min + weapon_attack_min)
+        attack_min = (debug_attack or ((state.base.attack_min + weapon_attack_min)
             * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
             + equipment_stats.attack_flat
             + researcher_attack_flat
-            + progression_attack_flat),
-        attack_max = debug_attack or ((state.base.attack_max + weapon_attack_max)
+            + progression_attack_flat)) * exclusive_attack_multiplier,
+        attack_max = (debug_attack or ((state.base.attack_max + weapon_attack_max)
             * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
             + equipment_stats.attack_flat
             + researcher_attack_flat
-            + progression_attack_flat),
+            + progression_attack_flat)) * exclusive_attack_multiplier,
         max_health = safe_get(state.unit, "GetMaxHealth", 1),
         researcher_attack_pct = researcher_attack_pct,
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
         researcher_critical_chance_pct = researcher_critical_chance_pct,
+        critical_chance_pct = researcher_critical_chance_pct,
+        critical_damage_pct = monkey_w
+            and (tonumber(monkey_config.w_critical_damage_pct) or 200) or 200,
+        exclusive_attack_multiplier = exclusive_attack_multiplier,
+        monkey_king_w_unlocked = monkey_w and 1 or 0,
+        monkey_king_e_unlocked = monkey_e and 1 or 0,
         seven_sins_attack_bonus_pct = essence_attack_pct,
         seven_sins_final_damage_pct = tonumber(essence.final_damage_pct) or 0,
         seven_sins_all_attributes_pct = essence_attributes_pct,
@@ -272,6 +329,10 @@ local function recalculate(player_id, reason)
         progression_attack_flat = progression_attack_flat,
         base_attack_time = base_attack_time,
         hero_damage_multiplier = hero_damage_multiplier,
+        engine_attack_min = state.engine_base_attack_min
+            * exclusive_attack_multiplier + engine_bonus_attack,
+        engine_attack_max = state.engine_base_attack_max
+            * exclusive_attack_multiplier + engine_bonus_attack,
         debug_attack_override = debug_attack or 0,
         -- The equipment aggregation snapshot already owns the authoritative
         -- War3/CSV armor value. Do not derive the HUD value from this frame's
@@ -310,18 +371,8 @@ local function recalculate(player_id, reason)
             0
         ),
         equipment_attack = equipment_stats.attack_flat,
-        engine_research_attack_bonus = ((state.engine_base_attack_min
-            + state.engine_base_attack_max
-            + weapon_attack_min + weapon_attack_max)
-            * 0.5) * (researcher_attack_pct + essence_attack_pct) / 100
-            + researcher_attack_flat
-            + progression_attack_flat,
-        engine_weapon_attack_bonus = debug_attack
-            and (debug_attack
-                - ((state.engine_base_attack_min
-                    + state.engine_base_attack_max) * 0.5)
-                - equipment_stats.attack_flat)
-            or ((weapon_attack_min + weapon_attack_max) * 0.5),
+        engine_research_attack_bonus = engine_research_attack_bonus,
+        engine_weapon_attack_bonus = engine_weapon_attack_bonus,
         equipment_attack_speed_pct = equipment_stats.attack_speed_pct,
         equipment_health = equipment_stats.health_flat,
         equipment_armor = equipment_stats.armor_flat,
@@ -336,6 +387,8 @@ local function recalculate(player_id, reason)
     end
     next_snapshot.refresh_version = tonumber(state.refresh_version) or 0
     state.snapshot = next_snapshot
+    state.exclusive_attack_multiplier = exclusive_attack_multiplier
+    apply_base_projection(state)
     state.unit.survival_seven_sins_final_damage_pct =
         tonumber(essence.final_damage_pct) or 0
     local research_modifier = state.unit:FindModifierByName(
@@ -529,6 +582,8 @@ function M.init()
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
     event_bus.subscribe(events.SEVEN_SINS_ESSENCE_CHANGED, on_progression_changed)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_progression_changed)
+    event_bus.subscribe(events.HERO_SKILL_CHANGED, on_progression_changed)
+    event_bus.subscribe(events.MONKEY_KING_BONUS_STATS_CHANGED, on_progression_changed)
 end
 
 M._test = {

@@ -250,6 +250,17 @@ function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
     })
     local multiplier = special and tonumber(special.multiplier_pct) or 0
     local source = special and special.source or nil
+    local inherited_chance = math.max(
+        0, tonumber(tower.survival_inherited_critical_chance_pct) or 0
+    )
+    if multiplier <= 100 and inherited_chance > 0
+        and RandomFloat(0, 100) < inherited_chance then
+        multiplier = math.max(
+            100,
+            tonumber(tower.survival_inherited_critical_damage_pct) or 200
+        )
+        source = "monkey_king_r"
+    end
     local research_chance = math.max(
         0, tonumber(tower.survival_super_tower_crit_chance) or 0
     )

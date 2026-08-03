@@ -17,6 +17,25 @@ local function create_ability_class()
         return true
     end
 
+    function ability_class:GetManaCost() return 0 end
+
+    function ability_class:GetCooldown()
+        if self:GetAbilityName() == "ability_survival_monkey_king_agility" then
+            return 0
+        end
+        return self.BaseClass.GetCooldown(self, self:GetLevel())
+    end
+
+    function ability_class:OnSpellStart()
+        if self:GetAbilityName() ~= "ability_survival_monkey_king_agility" then
+            return
+        end
+        local caster = self:GetCaster()
+        local result = require("systems/tower_fusion_service")
+            .teleport_for_player(caster:GetPlayerOwnerID(), caster)
+        if not result or not result.ok then self:EndCooldown() end
+    end
+
     function ability_class:OnProjectileHit_ExtraData(target, location, extra_data)
         local service = require("systems/hero_passive_skill_service")
         return service.on_tracking_projectile_hit(self, target, location, extra_data)

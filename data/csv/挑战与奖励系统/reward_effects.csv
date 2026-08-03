@@ -56,3 +56,6 @@ effect_0052,reward_rebirth_10,20,grant_skill_points,1,,公共技能点+1,player_
 effect_0053,reward_rebirth_10,30,add_all_attributes,200000,,,player_hero,add,hero_progression_system,all_attributes,1,
 effect_0054,reward_rebirth_10,40,add_attack_all_attribute_gain,12,,,player_hero,add,hero_progression_system,attack_all_attribute_gain,1,表示英雄每次攻击增加的全属性数值；实际攻击监听由英雄成长系统消费。
 effect_0055,reward_rebirth_10,50,add_multishot_count,0,,,player_hero,add,hero_progression_system,multishot_count,1,
+effect_0056,reward_rebirth_03,25,grant_exclusive_skill,1,,Monkey King W unlock,player_hero,unique,hero_skill_reward_adapter,skill_reward,1,
+effect_0057,reward_rebirth_06,25,grant_exclusive_skill,1,,Monkey King E unlock,player_hero,unique,hero_skill_reward_adapter,skill_reward,1,
+effect_0058,reward_rebirth_10,25,grant_exclusive_skill,1,,Monkey King R unlock,player_hero,unique,hero_skill_reward_adapter,skill_reward,1,

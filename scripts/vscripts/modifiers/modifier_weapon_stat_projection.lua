@@ -5,6 +5,8 @@ local events = require("core/events")
 
 modifier_weapon_stat_projection = class({})
 
+local critical_records = {}
+
 local function combat_snapshot(player_id)
     local result = event_bus.request(
         events.HERO_COMBAT_STATS_GET_REQUEST,
@@ -42,6 +44,7 @@ function modifier_weapon_stat_projection:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
         MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT,
+        MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE,
         MODIFIER_EVENT_ON_TAKEDAMAGE,
     }
 end
@@ -49,6 +52,38 @@ end
 local function snapshot(self)
     if IsServer() then return self.server_snapshot or {} end
     return self.client_snapshot or {}
+end
+
+function modifier_weapon_stat_projection:GetModifierPreAttack_CriticalStrike(params)
+    if not IsServer() then return 0 end
+    local stats = snapshot(self)
+    local chance = math.max(0, math.min(100,
+        tonumber(stats.critical_chance_pct) or 0))
+    local multiplier = math.max(100,
+        tonumber(stats.critical_damage_pct) or 200)
+    local record = params and params.record
+    local recorded = record ~= nil and critical_records[tostring(record)] or nil
+    if recorded ~= nil then
+        return recorded == false and 0 or tonumber(recorded) or 0
+    end
+    local critical = chance > 0 and RandomFloat(0, 100) < chance
+    if record ~= nil then
+        critical_records[tostring(record)] = critical and multiplier or false
+    end
+    return critical and multiplier or 0
+end
+
+function modifier_weapon_stat_projection.ClearCriticalAttackRecord(record)
+    if record ~= nil then critical_records[tostring(record)] = nil end
+end
+
+function modifier_weapon_stat_projection.ConsumeCriticalAttackRecord(record)
+    if record == nil then return false, 1 end
+    local key = tostring(record)
+    local value = critical_records[key]
+    critical_records[key] = nil
+    if value == nil or value == false then return false, 1 end
+    return true, (tonumber(value) or 100) / 100
 end
 
 function modifier_weapon_stat_projection:AddCustomTransmitterData()

@@ -636,6 +636,58 @@ local function query_building(payload)
     if not state or not valid_entity(state.unit) then return nil end
     return public_state(state)
 end
+local function list_buildings(payload)
+    local result = {}
+    local player_id = tonumber(payload and payload.player_id)
+    for _, state in pairs(buildings) do
+        if valid_entity(state.unit)
+            and (player_id == nil or state.player_id == player_id) then
+            result[#result + 1] = public_state(state)
+        end
+    end
+    table.sort(result, function(left, right)
+        return left.entindex < right.entindex
+    end)
+    return { ok = true, buildings = result }
+end
+
+local function consume_for_fusion(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local selected = {}
+    local routes = {}
+    for _, entindex in ipairs(payload and payload.entindexes or {}) do
+        local state = buildings[tonumber(entindex) or -1]
+        local row = state and tower_routes.current(state) or nil
+        if not state or not valid_entity(state.unit)
+            or state.player_id ~= player_id
+            or state.building_id ~= "arrow_tower"
+            or not state.tower_class
+            or not row or tonumber(row.level) ~= tonumber(row.max_level)
+            or routes[state.tower_class] then
+            return { ok = false, error = "fusion_towers_changed" }
+        end
+        routes[state.tower_class] = true
+        selected[#selected + 1] = state
+    end
+    if #selected ~= 7 then
+        return { ok = false, error = "fusion_requires_seven_routes" }
+    end
+    for _, state in ipairs(selected) do
+        building_visual.clear(state.unit)
+        buildings[state.unit:entindex()] = nil
+        change_count(state.team, state.building_id, -1)
+        event_bus.request(events.GRID_RELEASE_REQUEST, {
+            grid_x = state.grid_x,
+            grid_y = state.grid_y,
+            footprint = state.definition.footprint,
+        })
+        event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
+    end
+    for _, state in ipairs(selected) do
+        if valid_entity(state.unit) then UTIL_Remove(state.unit) end
+    end
+    return { ok = true, consumed = #selected }
+end
 local function on_building_changed(payload)
     local state = buildings[payload.entindex]
     if not state then return end
@@ -728,6 +780,10 @@ function M.init()
     wall_ever_built = {}
     event_bus.handle_request(events.BUILD_CAN_PLACE_REQUEST, can_place)
     event_bus.handle_request(events.BUILDING_QUERY_REQUEST, query_building)
+    event_bus.handle_request(events.BUILDING_LIST_REQUEST, list_buildings)
+    event_bus.handle_request(
+        events.BUILDING_FUSION_CONSUME_REQUEST, consume_for_fusion
+    )
     event_bus.subscribe(events.BUILD_REQUEST, queue_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)

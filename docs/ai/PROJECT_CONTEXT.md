@@ -1,5 +1,20 @@
 # Project Context
 
+## Lua模块加载故障排查（2026-08-03）
+
+- Dota日志中的`module not found`至少有两类根因，必须先分类，不能直接修改`package.path`或注释`require`：
+  - **模块真实缺失**：调用方新增了静态`require`，但目标`.lua`没有进入工作区或Git。`building_upgrade_process.lua`即属于此类；提交`85ce4eb`加入调用却漏提交文件。
+  - **目标模块编译失败**：文件存在，但Lua 5.1语法、200个活跃local上限、非法字节等问题使`require`失败，Dota同时显示`module not found`。`hero_passive_skill_service.lua`超过顶层local上限即属于此类。
+- 固定排查顺序：
+  1. 将模块名映射为`scripts/vscripts`下的实际文件路径，检查大小写和文件是否存在；
+  2. 执行`git ls-files`确认文件是否被跟踪，再用`git log --all --full-history`和`git rev-list --all --objects`确认是否曾存在；
+  3. 完整阅读`module not found`之后的诊断，查找目标文件编译错误；
+  4. 使用项目指定的`luac5.1 -p`检查目标模块、直接调用方和`addon_game_mode.lua`；
+  5. 扫描新增的静态`require("...")`目标是否全部存在，动态拼接的`require`必须单独按生成配置核对；
+  6. 补齐目标模块的接口契约和行为测试，不得通过注释`require`、返回空表或跳过初始化临时解除报错；
+  7. 完全停止并重新Run Workshop Tools。静态检查和Lua模拟通过不等于引擎启动验证通过。
+- 新增模块的提交必须同时包含：模块文件、调用方、相关测试和必要文档。提交前至少检查`git status --short`、静态require解析、Lua 5.1语法和限定`git diff --check`。
+
 ## Lua 5.1顶层local上限（2026-08-03）
 
 - Lua 5.1单个函数（包括模块主chunk）最多允许200个活跃local；`hero_passive_skill_service.lua`曾在第201个声明处编译失败，使Dota把真实编译错误包装成`module not found`并阻断`addon_game_mode.lua`加载。
@@ -26,7 +41,9 @@
 - 树可承受的伤害严格限定为引擎`DOTA_DAMAGE_CATEGORY_ATTACK`。不要用`inflictor == nil`或伤害类型猜测基础平A；技能、脚本、持续、范围和平A触发的技能/装备附伤均不得伤树，未知类别失败关闭。
 - 树伤害类别的权威入口是全局`combat/damage_filter_service.lua`，共享规则位于`systems/tree_damage_rules.lua`。`modifier_tree_progression`提供第二层保护并继续负责最低1血与耗尽升级，不能另建重复树modifier。
 - 箭塔禁止攻击树需要三层同时存在：`modifier_tower_auto_attack`自动目标排除与当前目标清理；`tree_attack_order_filter.lua`手动攻击命令拒绝；树承伤规则拦截已发射弹道和竞态伤害。
-- `MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE`的params在部分引擎版本可能缺少`damage_category`。modifier层缺失类别时应交由始终提供`damage_category_const`的DamageFilter判断，不能因此把所有基础平A误拦；可识别的箭塔攻击仍应直接拦截。
+- `MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE`的`params.damage_category`不是伤害类别权威；实机DamageFilter也不保证提供`damage_category_const`。此前Mock测试人为注入该字段，造成自动测试通过而真实平A被“未知类别失败关闭”。明确类别存在时仍按`DOTA_DAMAGE_CATEGORY_ATTACK`判断；类别缺失/0时必须使用项目登记的真实攻击凭证，不能只靠inflictor为空猜测。
+- 真实攻击凭证由树Modifier的`ON_ATTACK_START`按“攻击者+树”登记，短生命周期且一次性消费；失败/record销毁时清理。箭塔不得登记，DamageFilter中的箭塔身份拦截优先。缺类别伤害仅在无inflictor且成功消费凭证时放行，防止同次攻击后续无凭证脚本附伤重复利用。
+- 判断“远程平A是否真实落地”可观察`modifier_lumberjack_ai:OnAttackLanded`产生的木材绿字：若木材增加但树不扣生命，说明弹道和攻击落地正常，应排查后续承伤过滤，不能误改投射物或额外调用`ApplyDamage`补伤害。
 
 ## 免费英雄与一转专属技能（2026-08-02）
 

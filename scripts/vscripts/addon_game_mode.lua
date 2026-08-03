@@ -67,6 +67,7 @@ local building_upgrade_system = require("systems/building_upgrade_system")
 local tower_skill_effect_adapter = require("systems/tower_skill_effect_adapter")
 local tower_special_skill_system = require("systems/tower_special_skill_system")
 local tower_magic_supreme_system = require("systems/tower_magic_supreme_system")
+local tower_fusion_service = require("systems/tower_fusion_service")
 local tree_attack_order_filter = require("systems/tree_attack_order_filter")
 local tree_system = require("systems/tree_system")
 local worker_system = require("systems/worker_system")
@@ -81,6 +82,8 @@ local hero_skill_choice_service =
     require("systems/hero_skill_choice_service")
 local hero_passive_skill_service =
     require("systems/hero_passive_skill_service")
+local monkey_king_exclusive_service =
+    require("systems/monkey_king_exclusive_service")
 local hero_cosmetic_service =
     require("systems/hero_cosmetic_service")
 local hero_summon_system = require("systems/hero_summon_system")
@@ -623,6 +626,11 @@ function M.precache(context)
         "particles/units/heroes/hero_axe/axe_attack_blur_counterhelix.vpcf",
         context
     )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_monkey_king/monkey_king_strike.vpcf",
+        context
+    )
     local precached_buff_particles = {}
     for _, row in ipairs(buff_definitions.rows or {}) do
         local particle = row.enabled ~= false and row.particle_name or nil
@@ -649,6 +657,7 @@ local function initialize_services()
         "tree attack order filter registration failed")
 
     tower_magic_supreme_system.init()
+    tower_fusion_service.init()
     tower_special_skill_system.init()
     tower_skill_effect_adapter.init()
     ui_projection.init()
@@ -692,6 +701,7 @@ local function initialize_services()
     hero_combat_stat_service.init()
     game_info_service.init()
     hero_passive_skill_service.init()
+    monkey_king_exclusive_service.init()
     hero_summon_system.init()
     builder_progression_system.init()
     gold_mine_system.init()

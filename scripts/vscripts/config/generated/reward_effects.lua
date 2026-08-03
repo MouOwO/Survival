@@ -57,6 +57,9 @@ M.rows = {
     { effect_id = "effect_0053", reward_profile_id = "reward_rebirth_10", sort_order = 30, effect_type = "add_all_attributes", value = 200000, target = "player_hero", stack_mode = "add", server_handler = "hero_progression_system", client_field = "all_attributes", enabled = true },
     { effect_id = "effect_0054", reward_profile_id = "reward_rebirth_10", sort_order = 40, effect_type = "add_attack_all_attribute_gain", value = 12, target = "player_hero", stack_mode = "add", server_handler = "hero_progression_system", client_field = "attack_all_attribute_gain", enabled = true, notes = "表示英雄每次攻击增加的全属性数值；实际攻击监听由英雄成长系统消费。" },
     { effect_id = "effect_0055", reward_profile_id = "reward_rebirth_10", sort_order = 50, effect_type = "add_multishot_count", value = 0, target = "player_hero", stack_mode = "add", server_handler = "hero_progression_system", client_field = "multishot_count", enabled = true },
+    { effect_id = "effect_0056", reward_profile_id = "reward_rebirth_03", sort_order = 25, effect_type = "grant_exclusive_skill", value = 1, value_text = "Monkey King W unlock", target = "player_hero", stack_mode = "unique", server_handler = "hero_skill_reward_adapter", client_field = "skill_reward", enabled = true },
+    { effect_id = "effect_0057", reward_profile_id = "reward_rebirth_06", sort_order = 25, effect_type = "grant_exclusive_skill", value = 1, value_text = "Monkey King E unlock", target = "player_hero", stack_mode = "unique", server_handler = "hero_skill_reward_adapter", client_field = "skill_reward", enabled = true },
+    { effect_id = "effect_0058", reward_profile_id = "reward_rebirth_10", sort_order = 25, effect_type = "grant_exclusive_skill", value = 1, value_text = "Monkey King R unlock", target = "player_hero", stack_mode = "unique", server_handler = "hero_skill_reward_adapter", client_field = "skill_reward", enabled = true },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

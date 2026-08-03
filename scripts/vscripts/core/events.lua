@@ -21,6 +21,8 @@ local M = {
     BUILDING_UPGRADE_REQUEST = "building.upgrade.request",
     TOWER_CLASS_REQUEST = "tower.class.request",
     BUILDING_QUERY_REQUEST = "building.query.request",
+    BUILDING_LIST_REQUEST = "building.list.request",
+    BUILDING_FUSION_CONSUME_REQUEST = "building.fusion_consume.request",
     BUILDING_CREATED = "building.created",
     BUILDING_CHANGED = "building.changed",
     BUILDING_DESTROYED = "building.destroyed",
@@ -32,6 +34,7 @@ local M = {
     TOWER_LIGHTNING_HIT = "tower.lightning.hit",
     TOWER_SKILL_DAMAGE_REQUEST = "tower.skill.damage.request",
     TOWER_SKILL_BUFF_REQUEST = "tower.skill.buff.request",
+    TOWER_FUSION_REQUEST = "tower.fusion.request",
     WORKER_TRAIN_REQUEST = "worker.train.request",
     WORKER_TRAINING_GET_REQUEST = "worker.training.get.request",
     WORKER_CHANGED = "worker.changed",
@@ -158,6 +161,8 @@ local M = {
     HERO_COMBAT_STATS_GET_REQUEST = "hero.combat_stats.get.request",
     HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST = "hero.combat_stats.debug_attack.request",
     HERO_COMBAT_STATS_CHANGED = "hero.combat_stats.changed",
+    MONKEY_KING_BONUS_STATS_GET_REQUEST = "monkey_king.bonus_stats.get.request",
+    MONKEY_KING_BONUS_STATS_CHANGED = "monkey_king.bonus_stats.changed",
     COMBAT_DAMAGE_RESOLVED = "combat.damage.resolved",
     UNIT_COMBAT_STATS_CHANGED = "unit.combat_stats.changed",
 
@@ -167,6 +172,7 @@ local M = {
     MONSTER_ENCOUNTER_COMPLETED = "monster.encounter.completed",
     MONSTER_SPAWNED = "monster.spawned",
     MONSTER_KILLED = "monster.killed",
+    MONSTER_REWARD_GRANT_REQUEST = "monster.reward.grant.request",
     MONSTER_REWARD_GRANTED = "monster.reward.granted",
 }
 

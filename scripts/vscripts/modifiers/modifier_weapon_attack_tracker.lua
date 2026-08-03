@@ -23,7 +23,14 @@ function modifier_weapon_attack_tracker:DeclareFunctions()
     return {
         MODIFIER_EVENT_ON_ATTACK_START,
         MODIFIER_EVENT_ON_ATTACK_LANDED,
+        MODIFIER_EVENT_ON_ATTACK_RECORD_DESTROY,
     }
+end
+
+function modifier_weapon_attack_tracker:OnAttackRecordDestroy(params)
+    if not IsServer() or params.attacker ~= self:GetParent() then return end
+    modifier_weapon_attack_tracker.ClearSecondaryAttackRecord(params.record)
+    modifier_weapon_stat_projection.ClearCriticalAttackRecord(params.record)
 end
 
 local function diagnostic_hero(attacker)
@@ -107,6 +114,8 @@ function modifier_weapon_attack_tracker:OnAttackLanded(params)
         attack_sequence
     )
     local secondary = is_secondary_attack(params, self:GetParent())
+    local critical, critical_multiplier =
+        modifier_weapon_stat_projection.ConsumeCriticalAttackRecord(params.record)
     if self:GetParent().survival_drow_companion == true then
         if not secondary then
             require("systems/hero_passive_skill_service")
@@ -136,6 +145,9 @@ function modifier_weapon_attack_tracker:OnAttackLanded(params)
         attack_id = attack_id,
         is_main_attack = not secondary,
         is_multishot_secondary = secondary,
+        critical = critical,
+        critical_multiplier = critical_multiplier,
+        damage = tonumber(params.damage) or 0,
         target_was_killed = target.IsAlive and not target:IsAlive() or false,
     }
     event_bus.emit(events.WEAPON_ATTACK_LANDED, payload)

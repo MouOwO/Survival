@@ -616,6 +616,33 @@ local function add_test_skill(context)
     return true
 end
 
+local function pass_rebirth(context)
+    local requested = tonumber(context.command_suffix)
+    if not requested then return false, "rebirth_level_invalid" end
+    local progression = event_bus.request(
+        events.HERO_PROGRESSION_GET_REQUEST,
+        { player_id = context.player_id }
+    )
+    if not progression or not progression.ok then
+        return false, progression and progression.error or "progression_get_failed"
+    end
+    local current = tonumber(progression.snapshot.rebirth_level) or 0
+    if requested ~= current + 1 then
+        return false, "rebirth_must_be_next"
+    end
+    local result = event_bus.request(events.MONSTER_REWARD_GRANT_REQUEST, {
+        player_id = context.player_id,
+        team = context.team,
+        reward_profile_id = string.format("reward_rebirth_%02d", requested),
+        encounter_id = "cheat_pass_" .. tostring(requested),
+    })
+    if not result or not result.ok then
+        return false, result and result.error or "rebirth_reward_failed"
+    end
+    notify(context, "已通过第 " .. tostring(requested) .. " 转")
+    return true
+end
+
 local COMMANDS = {
     dev = enable_dev,
     shopshow = show_shop,
@@ -656,6 +683,11 @@ local function on_player_chat(keys)
     if monster_number then
         handler = spawn_wave
         command_suffix = monster_number
+    end
+    local pass_number = string.match(command, "^pass(%d+)$")
+    if pass_number then
+        handler = pass_rebirth
+        command_suffix = pass_number
     end
     if not handler then
         return

@@ -146,16 +146,36 @@ local function send_to_player(event_name, player_id, payload)
 end
 
 local function hero_ui_snapshot(player_id, entindex, unit)
+    local snapshot_player_id = player_id
+    local is_monkey_clone = unit and unit.survival_monkey_king_clone == true
+    if is_monkey_clone and unit.GetPlayerOwnerID then
+        snapshot_player_id = tonumber(unit:GetPlayerOwnerID())
+    end
     local result = event_bus.request(
         events.HERO_COMBAT_STATS_GET_REQUEST,
-        { player_id = player_id }
+        { player_id = snapshot_player_id }
     )
     if not result or not result.ok or not result.snapshot
-        or tonumber(result.snapshot.entindex) ~= tonumber(entindex) then
+        or (not is_monkey_clone
+            and tonumber(result.snapshot.entindex) ~= tonumber(entindex)) then
         return nil
     end
     local snapshot = {}
     for key, value in pairs(result.snapshot) do snapshot[key] = value end
+    if is_monkey_clone then
+        snapshot.entindex = entindex
+        snapshot.max_health = unit.GetMaxHealth
+            and unit:GetMaxHealth() or snapshot.max_health
+        snapshot.attack_speed = tonumber(unit.survival_attack_speed)
+            or snapshot.attack_speed
+        snapshot.armor = 10
+        snapshot.runtime_armor = unit.GetPhysicalArmorValue
+            and unit:GetPhysicalArmorValue(false) or snapshot.runtime_armor
+        snapshot.unit_name = unit.GetUnitName
+            and unit:GetUnitName() or snapshot.unit_name
+        snapshot.display_name = unit.survival_display_name
+            or snapshot.display_name
+    end
     -- The hero combat snapshot is authoritative and internally consistent.
     -- Never replace one field with a transient engine-frame value here: doing
     -- so made request responses alternate between projected armor and zero
