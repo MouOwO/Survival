@@ -3,8 +3,11 @@
 "#types:string,enum,string,string,number,number,string,string,string"
 ability:ability_enter_endless_training,ability,ability_enter_endless_training,无尽年轮圣殿,0,50000,传送至无尽年轮圣殿。英雄达到10转后解锁；每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。,faceless_void_time_walk,altar_endless_training
 ability:ability_enter_shadow_realm,ability,ability_enter_shadow_realm,暗影界前庭,0,50000,传送至暗影界前庭。当前版本仅开放传送，怪物与掉落逻辑暂不启用。,spectre_reality,altar_shadow_realm
+ability:ability_survival_doom_infernal,ability,ability_survival_doom_infernal,末日使者专属：地狱火,0,0,一转后激活。普通攻击命中时有10%概率召唤术士地狱火，继承触发时英雄100%攻击力、攻击速度、最大生命与防御，持续10秒。地狱火不继承英雄或装备攻击附带效果；存续期间跳过召唤概率判定。,warlock_rain_of_chaos,skill_doom_infernal
+ability:ability_survival_shadow_fiend_raze,ability,ability_survival_shadow_fiend_raze,影魔专属：影压,0,0,一转后激活。普通攻击命中时有10%概率在目标位置释放250范围影压。影压先增加1层再造成纯粹伤害，1至5层分别为全属性×27.5、×30、×32.5、×35、×37.5；最多5层，每层独立持续3秒。,nevermore_shadowraze1,skill_shadow_fiend_raze
+ability:ability_survival_axe_counter_helix,ability,ability_survival_axe_counter_helix,斧王专属：反击螺旋,0,0,一转后激活。普通攻击命中时有10%概率以被攻击目标为中心触发反击螺旋，对400范围内敌人造成触发时全属性×30纯粹伤害。,axe_counter_helix,skill_axe_counter_helix
+ability:ability_survival_drow_companion,ability,ability_survival_drow_companion,黑暗游侠专属：小游侠,0,0,一转后激活。普通攻击命中时有10%概率召唤无敌小游侠，继承触发时英雄150%攻击力和100%攻击速度，持续10秒。小游侠每次攻击主目标及射程内最近另外4个敌人；次级攻击不触发附带效果；存续期间跳过召唤概率判定。,drow_ranger_multishot,skill_drow_companion
 ability:ability_survival_arcane_barrage,ability,ability_survival_arcane_barrage,奥术弹幕·被动,0,0,主攻击命中时有10%概率对目标区域释放持续飞弹轰击，每颗飞弹造成全属性范围纯粹伤害。,skywrath_mage_arcane_bolt,proto_arcane_barrage
-ability:ability_survival_axe_exclusive,ability,ability_survival_axe_exclusive,斧王专属：战意,0,0,每级增加攻击伤害。,axe_counter_helix,skill_axe_exclusive
 ability:ability_survival_blade_nova,ability,ability_survival_blade_nova,剑刃震荡·被动,0,0,主攻击命中时有15%概率沿英雄面向发射脉冲，对攻击射程内宽200的路径造成全属性纯粹伤害。,juggernaut_blade_fury,proto_blade_nova
 ability:ability_survival_blademaster_agility,ability,ability_survival_blademaster_agility,剑圣专属：疾风剑意,0,0,增加敏捷。,juggernaut_blade_dance,skill_blademaster_agility
 ability:ability_survival_blademaster_exclusive,ability,ability_survival_blademaster_exclusive,剑圣专属：无双剑意,0,0,每级增加攻击伤害。,sven_gods_strength,skill_blademaster_exclusive
@@ -17,7 +20,6 @@ ability:ability_survival_flame_burst,ability,ability_survival_flame_burst,爆炎
 ability:ability_survival_frost_nova,ability,ability_survival_frost_nova,移动冰球·被动,0,0,主攻击命中时有12%概率向目标方向释放移动冰球，持续造成全属性范围纯粹伤害。,crystal_maiden_crystal_nova,proto_frost_nova
 ability:ability_survival_holy_pulse,ability,ability_survival_holy_pulse,元气弹·被动,0,0,主攻击命中时有12%概率向攻击射程内最近的敌人发射元气弹，造成全属性纯粹伤害并随等级获得治疗、额外目标和范围爆炸。,keeper_of_the_light_illuminate,proto_holy_pulse
 ability:ability_survival_ice_cone,ability,ability_survival_ice_cone,寒冰锥·被动,0,0,主攻击命中时有15%概率在目标区域释放暴风雪，逐秒造成全属性范围纯粹伤害并强化控制效果。,crystal_maiden_freezing_field,proto_ice_cone
-ability:ability_survival_juggernaut_exclusive,ability,ability_survival_juggernaut_exclusive,主宰专属：剑意,0,0,每级增加敏捷。,juggernaut_blade_dance,skill_juggernaut_exclusive
 ability:ability_survival_magic_slingshot,ability,ability_survival_magic_slingshot,魔法弹弓·被动,0,0,主攻击命中时有10%概率向攻击射程内最近的5名敌人发射石弹，造成全属性伤害与眩晕，并在最高级生成减速碎石区。,tiny_toss,proto_magic_slingshot
 ability:ability_survival_meteor,ability,ability_survival_meteor,陨石坠落·被动,0,0,主攻击命中时有12%概率在目标记录位置坠落并爆炸，造成全属性范围纯粹伤害，并随等级留下熔岩区域、施加减速和连续落下第二颗陨石。,invoker_chaos_meteor,proto_meteor
 ability:ability_survival_monkey_king_agility,ability,ability_survival_monkey_king_agility,齐天大圣专属：灵猴,0,0,增加敏捷。,monkey_king_mischief,skill_monkey_king_agility
@@ -25,7 +27,6 @@ ability:ability_survival_monkey_king_exclusive,ability,ability_survival_monkey_k
 ability:ability_survival_monkey_king_fury,ability,ability_survival_monkey_king_fury,齐天大圣专属：斗战,0,0,增加攻击伤害。,monkey_king_boundless_strike,skill_monkey_king_fury
 ability:ability_survival_monkey_king_swiftness,ability,ability_survival_monkey_king_swiftness,齐天大圣专属：神行,0,0,增加攻击速度。,monkey_king_tree_dance,skill_monkey_king_swiftness
 ability:ability_survival_poison_cloud,ability,ability_survival_poison_cloud,毒云·被动,0,0,主攻击命中时概率在目标位置生成持续毒云，造成全属性范围纯粹伤害并逐秒降低敌人护甲。,viper_nethertoxin,proto_poison_cloud
-ability:ability_survival_slark_exclusive,ability,ability_survival_slark_exclusive,斯拉克专属：猎杀,0,0,每级增加攻击速度。,slark_essence_shift,skill_slark_exclusive
 ability:ability_survival_void_pulse,ability,ability_survival_void_pulse,虚空震爆·被动,0,0,主攻击命中时有15%概率释放追踪目标的龙卷风，到达后附着跟随目标并持续造成实时全属性范围纯粹伤害。,invoker_tornado,proto_void_pulse
 ability:arcane_cannon_lv01,ability,arcane_cannon_lv01,魔能炮LV1,0,0,击杀后5秒内伤害+10%，最多4层,,arcane_cannon_lv01
 ability:arcane_cannon_lv02,ability,arcane_cannon_lv02,魔能炮LV2,0,0,击杀后5秒内伤害+10%，最多5层,,arcane_cannon_lv02
@@ -128,30 +129,22 @@ inventory_item:equipment_attack_gloves_01,inventory_item,equipment_attack_gloves
 inventory_item:equipment_attack_gloves_02,inventory_item,equipment_attack_gloves_02,加速手套Lv2,0,0,"增加英雄40%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_02
 inventory_item:equipment_attack_gloves_03,inventory_item,equipment_attack_gloves_03,加速手套Lv3,0,0,"增加英雄60%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_03
 inventory_item:equipment_attack_gloves_04,inventory_item,equipment_attack_gloves_04,加速手套Lv4,0,0,"增加英雄80%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_04
-inventory_item:equipment_attack_gloves_max,inventory_item,equipment_attack_gloves_max,加速手套Lvmax,0,0,"增加英雄100%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1
-| INGREDIENT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_max
+inventory_item:equipment_attack_gloves_max,inventory_item,equipment_attack_gloves_max,加速手套Lvmax,0,0,"增加英雄100%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1| INGREDIENT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_max
 inventory_item:equipment_burning_blade_01,inventory_item,equipment_burning_blade_01,灼热之刃Lv1,0,0,能增加1000攻击力，可重复购买，最高5级,item_blades_of_attack,equipment_burning_blade_01
 inventory_item:equipment_burning_blade_02,inventory_item,equipment_burning_blade_02,灼热之刃Lv2,0,0,能增加2000攻击力,item_blades_of_attack,equipment_burning_blade_02
 inventory_item:equipment_burning_blade_03,inventory_item,equipment_burning_blade_03,灼热之刃Lv3,0,0,能增加4000攻击力,item_blades_of_attack,equipment_burning_blade_03
 inventory_item:equipment_burning_blade_04,inventory_item,equipment_burning_blade_04,灼热之刃Lv4,0,0,能增加6000攻击力,item_blades_of_attack,equipment_burning_blade_04
-inventory_item:equipment_burning_blade_max,inventory_item,equipment_burning_blade_max,灼热之刃Lvmax,0,0,"能增加8000攻击力
-| INGREDIENT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1",item_blades_of_attack,equipment_burning_blade_max
-inventory_item:equipment_infernal_armor_01,inventory_item,equipment_infernal_armor_01,狱火熔铠Lv1,0,0,"增加属性  - 2W攻击力  - 150%攻速  - 10W生命值  - 150护甲 对周围200码敌人每秒造成全属性*1的伤害  可用熔火核心Lv1升级
-| RESULT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1 | INGREDIENT: 狱火熔铠Lv1 + 熔火核心Lv1 -> 狱火熔铠Lv2",item_platemail,equipment_infernal_armor_01
-inventory_item:equipment_infernal_armor_02,inventory_item,equipment_infernal_armor_02,狱火熔铠Lv2,0,0,"增加属性  - 3W攻击力  - 200%攻速  - 20W生命值  - 200护甲 对周围200码敌人每秒造成全属性*1的伤害  可用熔火核心Lv2升级
-| RESULT: 狱火熔铠Lv1 + 熔火核心Lv1 -> 狱火熔铠Lv2 | INGREDIENT: 狱火熔铠Lv2 + 熔火核心Lv2 -> 狱火熔铠Lv3",item_platemail,equipment_infernal_armor_02
-inventory_item:equipment_infernal_armor_03,inventory_item,equipment_infernal_armor_03,狱火熔铠Lv3,0,0,"增加属性  - 5W攻击力  - 250%攻速  - 30W生命值  - 250护甲 对周围200码敌人每秒造成全属性*1的伤害  可用熔火核心Lv3升级
-| RESULT: 狱火熔铠Lv2 + 熔火核心Lv2 -> 狱火熔铠Lv3 | INGREDIENT: 狱火熔铠Lv3 + 熔火核心Lv3 -> 狱火熔铠Lv4",item_platemail,equipment_infernal_armor_03
-inventory_item:equipment_infernal_armor_04,inventory_item,equipment_infernal_armor_04,狱火熔铠Lv4,0,0,"增加属性  - 7W攻击力  - 300%攻速  - 50W生命值  - 300护甲 对周围200码敌人每秒造成全属性*1的伤害  可用熔火核心Lv4升级
-| RESULT: 狱火熔铠Lv3 + 熔火核心Lv3 -> 狱火熔铠Lv4 | INGREDIENT: 狱火熔铠Lv4 + 熔火核心Lv4 -> 狱火熔铠Lvmax",item_platemail,equipment_infernal_armor_04
-inventory_item:equipment_infernal_armor_max,inventory_item,equipment_infernal_armor_max,狱火熔铠Lvmax,0,0,"增加属性  - 10W攻击力  - 400%攻速  - 80W生命值  - 400护甲 对周围200码敌人每秒造成全属性*1的伤害  极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决
-| RESULT: 狱火熔铠Lv4 + 熔火核心Lv4 -> 狱火熔铠Lvmax | INGREDIENT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决",item_platemail,equipment_infernal_armor_max
+inventory_item:equipment_burning_blade_max,inventory_item,equipment_burning_blade_max,灼热之刃Lvmax,0,0,能增加8000攻击力| INGREDIENT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1,item_blades_of_attack,equipment_burning_blade_max
+inventory_item:equipment_infernal_armor_01,inventory_item,equipment_infernal_armor_01,狱火熔铠Lv1,0,0,增加属性  - 2W攻击力  - 150%攻速  - 10W生命值  - 150护甲 对周围200码敌人每秒造成全属性*1的伤害  可用熔火核心Lv1升级| RESULT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1 | INGREDIENT: 狱火熔铠Lv1 + 熔火核心Lv1 -> 狱火熔铠Lv2,item_platemail,equipment_infernal_armor_01
+inventory_item:equipment_infernal_armor_02,inventory_item,equipment_infernal_armor_02,狱火熔铠Lv2,0,0,增加属性  - 3W攻击力  - 200%攻速  - 20W生命值  - 200护甲 对周围200码敌人每秒造成全属性*1的伤害  可用熔火核心Lv2升级| RESULT: 狱火熔铠Lv1 + 熔火核心Lv1 -> 狱火熔铠Lv2 | INGREDIENT: 狱火熔铠Lv2 + 熔火核心Lv2 -> 狱火熔铠Lv3,item_platemail,equipment_infernal_armor_02
+inventory_item:equipment_infernal_armor_03,inventory_item,equipment_infernal_armor_03,狱火熔铠Lv3,0,0,增加属性  - 5W攻击力  - 250%攻速  - 30W生命值  - 250护甲 对周围200码敌人每秒造成全属性*1的伤害  可用熔火核心Lv3升级| RESULT: 狱火熔铠Lv2 + 熔火核心Lv2 -> 狱火熔铠Lv3 | INGREDIENT: 狱火熔铠Lv3 + 熔火核心Lv3 -> 狱火熔铠Lv4,item_platemail,equipment_infernal_armor_03
+inventory_item:equipment_infernal_armor_04,inventory_item,equipment_infernal_armor_04,狱火熔铠Lv4,0,0,增加属性  - 7W攻击力  - 300%攻速  - 50W生命值  - 300护甲 对周围200码敌人每秒造成全属性*1的伤害  可用熔火核心Lv4升级| RESULT: 狱火熔铠Lv3 + 熔火核心Lv3 -> 狱火熔铠Lv4 | INGREDIENT: 狱火熔铠Lv4 + 熔火核心Lv4 -> 狱火熔铠Lvmax,item_platemail,equipment_infernal_armor_04
+inventory_item:equipment_infernal_armor_max,inventory_item,equipment_infernal_armor_max,狱火熔铠Lvmax,0,0,增加属性  - 10W攻击力  - 400%攻速  - 80W生命值  - 400护甲 对周围200码敌人每秒造成全属性*1的伤害  极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决| RESULT: 狱火熔铠Lv4 + 熔火核心Lv4 -> 狱火熔铠Lvmax | INGREDIENT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决,item_platemail,equipment_infernal_armor_max
 inventory_item:equipment_iron_armor_01,inventory_item,equipment_iron_armor_01,铁甲Lv1,0,0,增加英雄10点护甲和5000点生命值，重复购买升级，最高5级。,item_chainmail,equipment_iron_armor_01
 inventory_item:equipment_iron_armor_02,inventory_item,equipment_iron_armor_02,铁甲Lv2,0,0,增加英雄30点护甲和10000点生命值,item_chainmail,equipment_iron_armor_02
 inventory_item:equipment_iron_armor_03,inventory_item,equipment_iron_armor_03,铁甲Lv3,0,0,增加英雄50点护甲和20000点生命值,item_chainmail,equipment_iron_armor_03
 inventory_item:equipment_iron_armor_04,inventory_item,equipment_iron_armor_04,铁甲Lv4,0,0,增加英雄70点护甲和30000点生命值,item_chainmail,equipment_iron_armor_04
-inventory_item:equipment_iron_armor_max,inventory_item,equipment_iron_armor_max,铁甲Lvmax,0,0,"增加英雄100点护甲和50000点生命值
-| INGREDIENT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1",item_chainmail,equipment_iron_armor_max
+inventory_item:equipment_iron_armor_max,inventory_item,equipment_iron_armor_max,铁甲Lvmax,0,0,增加英雄100点护甲和50000点生命值| INGREDIENT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1,item_chainmail,equipment_iron_armor_max
 inventory_item:item_death_mask,inventory_item,item_death_mask,死亡面罩,0,0,1,,item_death_mask
 inventory_item:item_forging_hammer,inventory_item,item_forging_hammer,锻造之锤(W ),0,0,1,,item_forging_hammer
 inventory_item:item_knowledge_book,inventory_item,item_knowledge_book,知识之书,0,0,增加30000全属性，15000攻击力。,item_tome_of_knowledge,item_knowledge_book
@@ -186,34 +179,28 @@ inventory_item:rebirth_challenge_10,inventory_item,rebirth_challenge_10,挑战10
 inventory_item:service_early_final_boss,inventory_item,service_early_final_boss,提前通关,0,0,1,,service_early_final_boss
 inventory_item:shop_proxy_burning_blade_01,inventory_item,shop_proxy_burning_blade_01,灼热之刃LV1购买,0,0,0,,shop_proxy_burning_blade_01
 inventory_item:shop_proxy_iron_armor_01,inventory_item,shop_proxy_iron_armor_01,铁甲LV1购买,0,0,0,,shop_proxy_iron_armor_01
-inventory_item:weapon_epic_icefire_00,inventory_item,weapon_epic_icefire_00,史诗：冰火裁决,0,0,"增加属性  - 20W攻击力  - 400%攻速  - 100%吸血  - 80W生命值  - 500护甲  - 全属性+8000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害
-| RESULT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决",item_skadi,weapon_epic_icefire_00
+inventory_item:weapon_epic_icefire_00,inventory_item,weapon_epic_icefire_00,史诗：冰火裁决,0,0,增加属性  - 20W攻击力  - 400%攻速  - 100%吸血  - 80W生命值  - 500护甲  - 全属性+8000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害| RESULT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决,item_skadi,weapon_epic_icefire_00
 inventory_item:weapon_epic_icefire_01,inventory_item,weapon_epic_icefire_01,史诗：冰火裁决+1,0,0,增加属性  - 25W攻击力  - 400%攻速  - 100%吸血  - 85W生命值  - 550护甲  - 全属性+10000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_01
 inventory_item:weapon_epic_icefire_02,inventory_item,weapon_epic_icefire_02,史诗：冰火裁决+2,0,0,增加属性  - 30W攻击力  - 400%攻速  - 100%吸血  - 90W生命值  - 600护甲  - 全属性+12000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_02
 inventory_item:weapon_epic_icefire_03,inventory_item,weapon_epic_icefire_03,史诗：冰火裁决+3,0,0,增加属性  - 35W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 650护甲  - 全属性+15000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_03
 inventory_item:weapon_epic_icefire_04,inventory_item,weapon_epic_icefire_04,史诗：冰火裁决+4,0,0,增加属性  - 40W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 700护甲  - 全属性+18000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_04
 inventory_item:weapon_epic_icefire_05,inventory_item,weapon_epic_icefire_05,史诗：冰火裁决+5,0,0,增加属性  - 45W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 750护甲  - 全属性+20000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_05
 inventory_item:weapon_epic_icefire_06,inventory_item,weapon_epic_icefire_06,史诗：冰火裁决+6,0,0,增加属性  - 50W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 800护甲  - 全属性+25000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_06
-inventory_item:weapon_frost_blade_01,inventory_item,weapon_frost_blade_01,霜之剑刃Lv1,0,0,"英雄每次攻击增加6点攻击力 +50%吸血   攻击250次使该武器进化
-| RESULT: 成长之剑Lvmax + 死亡面罩 -> 霜之剑刃Lv1",item_crystalys,weapon_frost_blade_01
+inventory_item:weapon_frost_blade_01,inventory_item,weapon_frost_blade_01,霜之剑刃Lv1,0,0,英雄每次攻击增加6点攻击力 +50%吸血   攻击250次使该武器进化| RESULT: 成长之剑Lvmax + 死亡面罩 -> 霜之剑刃Lv1,item_crystalys,weapon_frost_blade_01
 inventory_item:weapon_frost_blade_02,inventory_item,weapon_frost_blade_02,霜之剑刃Lv2,0,0,英雄每次攻击增加7点攻击力 +50%吸血   攻击300次使该武器进化,item_crystalys,weapon_frost_blade_02
 inventory_item:weapon_frost_blade_03,inventory_item,weapon_frost_blade_03,霜之剑刃Lv3,0,0,英雄每次攻击增加8点攻击力 +50%吸血   攻击350次使该武器进化,item_crystalys,weapon_frost_blade_03
 inventory_item:weapon_frost_blade_04,inventory_item,weapon_frost_blade_04,霜之剑刃Lv4,0,0,英雄每次攻击增加9点攻击力 +50%吸血   攻击400次使该武器进化,item_crystalys,weapon_frost_blade_04
-inventory_item:weapon_frost_blade_max,inventory_item,weapon_frost_blade_max,霜之剑刃Lvmax,0,0,"英雄每次攻击增加10点攻击力 +50%吸血   +大极地晶石+霜之剑刃max+合成宝石=极寒之刃
-| INGREDIENT: 霜之剑刃Lvmax + 大极地晶石 + 合成宝石 -> 极寒之刃Lv1",item_crystalys,weapon_frost_blade_max
+inventory_item:weapon_frost_blade_max,inventory_item,weapon_frost_blade_max,霜之剑刃Lvmax,0,0,英雄每次攻击增加10点攻击力 +50%吸血   +大极地晶石+霜之剑刃max+合成宝石=极寒之刃| INGREDIENT: 霜之剑刃Lvmax + 大极地晶石 + 合成宝石 -> 极寒之刃Lv1,item_crystalys,weapon_frost_blade_max
 inventory_item:weapon_growth_sword_01,inventory_item,weapon_growth_sword_01,成长之剑Lv1,0,0,英雄每次攻击增加1点攻击力  攻击200次使该武器进化    成长之剑Lvmax＋吸血面罩 自动合成幻影之剑,item_broadsword,weapon_growth_sword_01
 inventory_item:weapon_growth_sword_02,inventory_item,weapon_growth_sword_02,成长之剑Lv2,0,0,英雄每次攻击增加2点攻击力  攻击200次使该武器进化,item_broadsword,weapon_growth_sword_02
 inventory_item:weapon_growth_sword_03,inventory_item,weapon_growth_sword_03,成长之剑Lv3,0,0,英雄每次攻击增加3点攻击力  攻击200次使该武器进化,item_broadsword,weapon_growth_sword_03
 inventory_item:weapon_growth_sword_04,inventory_item,weapon_growth_sword_04,成长之剑Lv4,0,0,英雄每次攻击增加4点攻击力  攻击200次使该武器进化,item_broadsword,weapon_growth_sword_04
-inventory_item:weapon_growth_sword_max,inventory_item,weapon_growth_sword_max,成长之剑Lvmax,0,0,"英雄每次攻击增加5点攻击力  ＋吸血面罩 自动合成霜之剑刃
-| INGREDIENT: 成长之剑Lvmax + 死亡面罩 -> 霜之剑刃Lv1",item_broadsword,weapon_growth_sword_max
-inventory_item:weapon_ice_blade_01,inventory_item,weapon_ice_blade_01,极寒之刃Lv1,0,0,"+50%吸血 +50%暴击2倍 每次造成伤害提高12点攻击力 全属性+2000  可通过击杀敌人升级武器
-| RESULT: 霜之剑刃Lvmax + 大极地晶石 + 合成宝石 -> 极寒之刃Lv1",item_daedalus,weapon_ice_blade_01
+inventory_item:weapon_growth_sword_max,inventory_item,weapon_growth_sword_max,成长之剑Lvmax,0,0,英雄每次攻击增加5点攻击力  ＋吸血面罩 自动合成霜之剑刃| INGREDIENT: 成长之剑Lvmax + 死亡面罩 -> 霜之剑刃Lv1,item_broadsword,weapon_growth_sword_max
+inventory_item:weapon_ice_blade_01,inventory_item,weapon_ice_blade_01,极寒之刃Lv1,0,0,+50%吸血 +50%暴击2倍 每次造成伤害提高12点攻击力 全属性+2000  可通过击杀敌人升级武器| RESULT: 霜之剑刃Lvmax + 大极地晶石 + 合成宝石 -> 极寒之刃Lv1,item_daedalus,weapon_ice_blade_01
 inventory_item:weapon_ice_blade_02,inventory_item,weapon_ice_blade_02,极寒之刃Lv2,0,0,+50%吸血 +50%暴击2倍 每次造成伤害提高13点攻击力 全属性+2500  可通过击杀敌人升级武器,item_daedalus,weapon_ice_blade_02
 inventory_item:weapon_ice_blade_03,inventory_item,weapon_ice_blade_03,极寒之刃Lv3,0,0,+50%吸血 +50%暴击2倍 全属性+3000 每次造成伤害提高14点攻击力  可通过击杀敌人升级武器,item_daedalus,weapon_ice_blade_03
 inventory_item:weapon_ice_blade_04,inventory_item,weapon_ice_blade_04,极寒之刃Lv4,0,0,+50%吸血 +50%暴击5倍 全属性+3500 每次造成伤害提高15点攻击力  可通过击杀敌人升级武器,item_daedalus,weapon_ice_blade_04
-inventory_item:weapon_ice_blade_max,inventory_item,weapon_ice_blade_max,极寒之刃Lvmax,0,0,"+50%吸血 +50%暴击5倍 全属性+5000 每次造成伤害提高16点攻击力  极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决
-| INGREDIENT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决",item_daedalus,weapon_ice_blade_max
+inventory_item:weapon_ice_blade_max,inventory_item,weapon_ice_blade_max,极寒之刃Lvmax,0,0,+50%吸血 +50%暴击5倍 全属性+5000 每次造成伤害提高16点攻击力  极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决| INGREDIENT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决,item_daedalus,weapon_ice_blade_max
 inventory_item:weapon_legend_abyss_00,inventory_item,weapon_legend_abyss_00,传说：深渊审判,0,0,增加属性  - 60W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 850护甲  - 全属性+30000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_00
 inventory_item:weapon_legend_abyss_01,inventory_item,weapon_legend_abyss_01,传说：深渊审判+1,0,0,增加属性  - 70W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 850护甲  - 全属性+50000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_01
 inventory_item:weapon_legend_abyss_02,inventory_item,weapon_legend_abyss_02,传说：深渊审判+2,0,0,增加属性  - 80W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 850护甲  - 全属性+100000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_02

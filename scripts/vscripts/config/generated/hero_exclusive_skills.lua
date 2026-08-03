@@ -2,9 +2,10 @@
 -- Source: hero_exclusive_skills.csv
 local M = {}
 M.rows = {
-    { exclusive_entry_id = "exclusive_axe_01", exclusive_group_id = "exclusive_axe", hero_id = "hero_axe", skill_id = "skill_axe_exclusive", initial_level = 1, guaranteed = true, enabled = true },
-    { exclusive_entry_id = "exclusive_slark_01", exclusive_group_id = "exclusive_slark", hero_id = "hero_slark", skill_id = "skill_slark_exclusive", initial_level = 1, guaranteed = true, enabled = true },
-    { exclusive_entry_id = "exclusive_jugg_01", exclusive_group_id = "exclusive_juggernaut", hero_id = "hero_juggernaut", skill_id = "skill_juggernaut_exclusive", initial_level = 1, guaranteed = true, enabled = true },
+    { exclusive_entry_id = "exclusive_doom_01", exclusive_group_id = "exclusive_doom", hero_id = "hero_doom", skill_id = "skill_doom_infernal", initial_level = 1, guaranteed = true, enabled = true, notes = "免费英雄一转激活固定Q槽专属技能。" },
+    { exclusive_entry_id = "exclusive_shadow_fiend_01", exclusive_group_id = "exclusive_shadow_fiend", hero_id = "hero_shadow_fiend", skill_id = "skill_shadow_fiend_raze", initial_level = 1, guaranteed = true, enabled = true, notes = "免费英雄一转激活固定Q槽专属技能。" },
+    { exclusive_entry_id = "exclusive_axe_01", exclusive_group_id = "exclusive_axe", hero_id = "hero_axe", skill_id = "skill_axe_counter_helix", initial_level = 1, guaranteed = true, enabled = true, notes = "免费英雄一转激活固定Q槽专属技能。" },
+    { exclusive_entry_id = "exclusive_drow_01", exclusive_group_id = "exclusive_drow_ranger", hero_id = "hero_drow_ranger", skill_id = "skill_drow_companion", initial_level = 1, guaranteed = true, enabled = true, notes = "免费英雄一转激活固定Q槽专属技能。" },
     { exclusive_entry_id = "exclusive_monkey_01", exclusive_group_id = "exclusive_monkey_king", hero_id = "hero_monkey_king", skill_id = "skill_monkey_king_exclusive", initial_level = 1, guaranteed = true, enabled = true },
     { exclusive_entry_id = "exclusive_monkey_02", exclusive_group_id = "exclusive_monkey_king", hero_id = "hero_monkey_king", skill_id = "skill_monkey_king_fury", initial_level = 1, guaranteed = true, enabled = true, notes = "VIP一转解锁专属技能。" },
     { exclusive_entry_id = "exclusive_monkey_03", exclusive_group_id = "exclusive_monkey_king", hero_id = "hero_monkey_king", skill_id = "skill_monkey_king_swiftness", initial_level = 1, guaranteed = true, enabled = true, notes = "VIP一转解锁专属技能。" },
@@ -20,4 +21,3 @@ for _, row in ipairs(M.rows) do
     if key ~= nil then M.by_id[key] = row end
 end
 return M
-

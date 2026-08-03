@@ -1,5 +1,28 @@
 # Current Task
 
+## 已完成任务（2026-08-02）：四名免费英雄替换
+
+- 用户已批准将原有非VIP英雄替换为末日使者、影魔、斧王、黑暗游侠；齐天大圣与剑圣两名VIP英雄保持不变。
+- 四名免费英雄沿用普通模板：逻辑三维及成长100、基础攻击20、攻速0.7、War3护甲1、移速2000、生命3000；末日/斧王射程500，影魔/黑暗游侠射程1200。
+- 四个专属技能均为1级、固定Q槽；召唤英雄时可见但置灰，一转成功后原位激活，不能用公共技能点升级。
+- 末日：主攻击命中10%概率召唤术士地狱火，持续10秒，继承触发时100%权威攻击力、攻击速度、最大生命和运行时护甲，不继承英雄/装备附加攻击效果。地狱火活动期间跳过概率判定，死亡或到期后解锁。
+- 影魔：主攻击命中10%概率在目标位置造成250范围影压；本次先加层再伤害，1至5层分别为全属性×27.5/30/32.5/35/37.5纯粹伤害；每层独立持续3秒，最多5层。
+- 斧王：主攻击命中10%概率以攻击目标为中心触发400范围反击螺旋，造成触发时全属性×30纯粹伤害。
+- 黑暗游侠：主攻击命中10%概率召唤无敌小游侠，持续10秒，继承触发时150%权威攻击力和100%攻击速度；每次攻击主目标并攻击射程内最近另外4个敌人，次级攻击不得触发英雄/装备/技能Proc。小游侠活动期间跳过概率判定，到期或实体失效后解锁。
+- CSV是权威源；先修改英雄定义、专属关系、技能定义、弹道和Tooltip CSV，再生成Lua。不得覆盖`hero_skill_definitions.csv`中已有的公共技能完整五级描述修改。
+- 用户已于2026-08-02明确确认任务成功并验收通过；该结论是用户验收，不应与自动测试或逐项引擎诊断混为一谈。
+
+### 实施结果
+
+- 已完成权威CSV、生成Lua、祭坛按钮、召唤脚本、Ability KV、专用召唤单位KV、中英文三套本地化镜像与预缓存替换；生产入口不再引用斯拉克或主宰。
+- 四名免费英雄召唤后会在Q槽预创建项目等级0的专属技能；引擎壳保持1级可见但`SetActivated(false)`，一转授予时同一技能原位切换到项目等级1并激活。VIP英雄不预创建，保留原一转四专属顺序。
+- 新增`hero_exclusive_passive_service.lua`管理四技能运行状态；伤害仍注入并复用`hero_passive_skill_service.lua`既有`deal_group -> combat_events.DEAL_REQUEST`事务。
+- 地狱火和小游侠使用唯一活动锁，概率调用前先检查召唤实体存活与到期；影压使用每目标独立到期时间数组；小游侠次级攻击通过攻击record标记与`PerformAttack(..., bProcessProcs=false, ...)`隔离。
+- 地狱火和小游侠均读取触发瞬间战斗快照中的权威`attack_speed`（每秒攻击次数），按100%继承并通过`SetBaseAttackTime(1 / attack_speed)`应用；同步记录`survival_attack_speed`供实机诊断。
+- 已通过：`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、`FREE_HERO_EXCLUSIVE_STATE_LUA51_PASS`、`FREE_HERO_ALL_CHANGED_LUAC51_PASS`、`FREE_HERO_GENERATION_CONSISTENCY_PASS`、`FREE_HERO_KV_UNIQUENESS_PASS`、`FREE_HERO_TASK_FILES_STRICT_UTF8_PASS`、`FREE_HERO_LOCALIZATION_STRUCTURE_PASS`、限定`git diff --check`，以及英雄生命/原生Ability保留/addskill和多项公共被动回归。
+- 已知测试边界：用户实施前已有的未跟踪`test_blade_pulse_contract.ps1`仍断言已批准删除的旧`ability_survival_axe_exclusive`；`test_flame_burst_contract.ps1`要求HEAD中原本就未预缓存的Dragon Slave粒子。未修改无关生产逻辑迎合这两条旧断言。
+- 完成结论：用户已确认整体任务成功；不再保留本任务待办，也不得依据旧验收清单自动恢复。只有用户以后报告具体回归或提出新需求时才重新开启。
+
 ## 最新状态（2026-08-02）
 
 ## 活跃任务（2026-08-02）

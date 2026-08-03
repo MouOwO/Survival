@@ -1,5 +1,19 @@
 # Project Context
 
+## 免费英雄与一转专属技能（2026-08-02）
+
+- 当前正式英雄池为四名免费英雄`hero_doom`、`hero_shadow_fiend`、`hero_axe`、`hero_drow_ranger`，以及两名VIP英雄`hero_monkey_king`、`hero_blademaster`。
+- 免费英雄专属技能在召唤时以项目等级0、`locked=true`进入技能状态和Q槽；引擎Ability使用等级1保证图标可见，但`SetActivated(false)`。一转授予必须解锁同一条目而不是删除重加。
+- VIP专属不使用开局预创建规则，继续在一转后按`hero_exclusive_skills.csv`顺序授予四个技能。
+- 四个免费专属的状态与召唤生命周期集中在`systems/hero_exclusive_passive_service.lua`，伤害通过主被动服务注入的既有`deal_group`提交，不得另建伤害事务。
+- 专属召唤单位为`npc_survival_doom_infernal`与`npc_survival_drow_companion`；它们不是项目战斗英雄，不应挂英雄装备、成长或公共被动服务。
+- 召唤物继承值必须取触发瞬间的`HERO_COMBAT_STATS_GET_REQUEST`权威快照，不从召唤物原生属性或英雄`GetStrength/GetAgility/GetIntellect`反推。当前地狱火继承100%攻击力、攻速、最大生命和运行时护甲；小游侠继承150%攻击力与100%攻速。
+- 项目`attack_speed`表示每秒攻击次数，不是Dota攻速加成百分比。召唤物继承时先按`attack_speed_inherit_pct`计算，再用`SetBaseAttackTime(1 / attack_speed)`写入引擎，并同步保存`unit.survival_attack_speed`供UI、日志和实机诊断；非正数不得参与除法或覆盖单位BAT。
+- 有持续时间且禁止重复召唤的技能，应以“英雄实体+技能ID”为唯一活动身份，同时检查召唤实体存活和到期时间；死亡、失效或到期必须清锁并清理实体。概率判定应在活动锁检查之后，避免存续期间无意义消耗随机数。
+- 多目标召唤攻击必须区分主攻击与次级攻击。小游侠次级攻击使用`PerformAttack`关闭Proc，并通过攻击record标记隔离项目装备、英雄技能和其他攻击附带效果；只关闭引擎Proc不足以证明项目事件链不会重复触发。
+- “开局可见但未解锁”的固定槽技能使用项目等级0与`locked=true`表达业务状态，引擎Ability保持等级1以显示图标，并用`SetActivated(false)`禁用；解锁时激活同一个Ability，禁止删除重加导致槽位、Tooltip或存档身份漂移。
+- 四英雄任务的可靠验证闭环包括：权威英雄/专属/技能/弹道/Tooltip CSV，定向生成Lua，Ability与单位KV、本地化镜像、Lua 5.1语法与行为测试、PowerShell契约、生成一致性、严格UTF-8和限定`git diff --check`。自动测试必须与用户验收分开记录；本任务已于2026-08-02获得用户明确成功确认。
+
 ## 项目与环境
 
 - 项目：Dota 2 自定义地图 `survival`。

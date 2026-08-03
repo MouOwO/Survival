@@ -1,3 +1,23 @@
+# 2026-08-02 — 检查点：四名免费英雄方案批准并开始实施
+
+- 用户要求用末日使者、影魔、斧王、黑暗游侠替换原有全部非VIP英雄，并要求所有基础配置从CSV获取；齐天大圣、剑圣VIP英雄不变。
+- 用户批准普通模板数值、四技能1级、Q槽开局置灰一转原位激活、末日10%召唤、影压先加层再伤害且每层独立3秒、斧王目标中心范围伤害、小游侠主目标加最近4目标。
+- 用户修正召唤策略：不得新召替换旧召唤；召唤物存续期间后续攻击直接跳过概率判定，直到召唤物死亡、持续时间结束或实体失效才解除活动锁。
+- 调查证据：`hero_definitions.csv`当前普通英雄为斧王/斯拉克/主宰；`hero_initial_skills.csv`为空；现有`hero_skill_system`开局不创建专属技能，一转后才AddAbility，因此必须新增正式locked状态而不能只改UI颜色。
+- 工作区保护：实施前仅`data/csv/英雄系统/hero_skill_definitions.csv`为已跟踪修改，内容是用户已有公共技能完整等级描述；另有大量未跟踪测试文件。本任务必须保留这些内容且不清理无关文件。
+- 下一步：修改权威CSV和祭坛召唤入口，定向生成配置，再实现锁定状态与四个运行技能。
+
+## 2026-08-02 — 四名免费英雄实现完成，等待实机验证
+
+- 权威数据：`hero_definitions.csv`改为末日/影魔/斧王/黑暗游侠免费，齐天大圣/剑圣VIP；普通模板、500/1200射程、专属关系、技能说明、弹道和Tooltip均从CSV生成或读取。
+- 技能栏：四免费专属开局项目等级0并置灰，占固定Q槽；一转授予将原条目升级为等级1并激活。修正`owned_passives()`，确保locked等级0不会被旧`math.max(1, level)`逻辑误判为已拥有。VIP不预创建。
+- 运行逻辑：独立`hero_exclusive_passive_service.lua`避免主被动服务超过Lua 5.1每函数200个局部变量限制；通过注入原`deal_group`继续使用既有纯粹伤害事务。影压先入层再按27.5/30/32.5/35/37.5结算，每层独立3秒；斧王目标中心400范围×30。
+- 召唤：地狱火继承项目战斗快照平均攻击、最大生命与运行时护甲；小游侠继承150%平均攻击并挂项目无敌Modifier。两者在概率前检查活动锁，死亡/到期/失效解除。小游侠攻击record标记次级攻击，次级`PerformAttack`关闭Proc并不发英雄攻击事件。
+- 资源：替换祭坛实际`buildings_config.lua`按钮列表和所有召唤脚本注册；加入两个专用单位KV、四个1级Ability壳、模型/粒子预缓存与六份中英文本地化镜像；删除旧斯拉克/主宰召唤脚本和三个旧普通专属KV壳。
+- 自动验证：新PowerShell合同、Lua 5.1层数/倍率行为、所有变更Lua语法、CSV生成一致性、KV名称唯一性、任务业务文件严格UTF-8、本地化结构、限定diff检查均通过。英雄生命、英雄原生Ability保留、addskill、Ice Cone、Meteor、Magic Slingshot、Poison Cloud、Tornado合同/行为通过；Flame Burst、Moving Ice Ball等行为测试也通过。
+- 未通过但非本轮生产回归：用户已有未跟踪Blade Pulse合同仍要求已批准删除的旧斧王专属壳；用户已有未跟踪Flame Burst合同要求HEAD原本未包含的Dragon Slave预缓存。保留失败事实，未修改无关生产文件。
+- 尚未完成：Workshop Tools实机验证与用户验收。
+
 ## 2026-08-02 - 完成检查点：元气弹 Sven Storm Hammer 视觉
 
 - 用户批准为三选一公共技能`proto_holy_pulse`/“元气弹·被动”使用Sven Storm Hammer视觉：飞行弹体保留其原生普通命中EndCap爆裂，LV5每颗命中独立20%成功时再播放一次额外Storm Hammer爆炸。
@@ -1365,3 +1385,26 @@
 - 稳定实现经验已写入`PROJECT_CONTEXT.md`：保留`proto_earth_line`、`ability_survival_earth_line`和`public_06`身份；配置从英雄技能/Tooltip权威CSV修改并定向生成；五级数值、Ability KV、Tooltip Runtime和公共被动服务必须同步。
 - 运行维护边界：继续使用真实`CreateLinearProjectile`、唯一投射物ID、`bDeleteOnHit=false`、逐单位去重、回调`return false`、触发时逻辑属性与目标位置快照、旧眩晕判定、伤害后新眩晕、LV5首次范围伤害和终点/超时幂等清理；禁止恢复视觉粒子碰撞、固定延迟猜测命中或旧`line_targets()`瞬时扫描。
 - 后续修改验证基线：地裂PowerShell契约、Lua 5.1状态测试、`luac5.1 -p`、CSV/生成Lua一致性、严格UTF-8、限定`git diff --check`，并按改动范围运行脉冲激射、魔法弹弓、寒冰锥、元气弹等共享机制回归。Workshop Tools结果必须与自动测试分开记录。
+
+
+## 2026-08-02 — 四英雄替换补充：地狱火与小游侠继承攻速
+
+- 用户新增要求：末日使者地狱火和黑暗游侠小游侠的攻击速度也继承原英雄。
+- 已确认项目战斗快照的 `attack_speed` 单位为每秒攻击次数；两种召唤均使用触发瞬间快照并按100%继承，通过 `SetBaseAttackTime(1 / attack_speed)` 应用，同时记录 `survival_attack_speed`。
+- 地狱火仍继承100%攻击力，小游侠仍继承150%攻击力；生命、护甲、无敌、活动锁、五目标攻击和Proc隔离规则未改变。
+- 已同步英雄技能与Tooltip权威CSV、定向生成Lua、运行配置、六份本地化镜像及专项测试。
+- 自动验证通过：`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、`FREE_HERO_EXCLUSIVE_STATE_LUA51_PASS`、`SUMMON_ATTACK_SPEED_LUAC51_PASS`、`SUMMON_ATTACK_SPEED_GENERATION_CONSISTENCY_PASS`、`SUMMON_ATTACK_SPEED_STRICT_UTF8_PASS`。这些不代表Workshop Tools实机验证。
+- 剩余动作：实机比较召唤瞬间英雄与地狱火/小游侠的每秒攻击次数，并检查高攻速下动画和五目标攻击节奏。
+
+## 2026-08-02 — 四英雄替换任务用户验收通过与经验沉淀
+
+- 用户最新确认：“任务做的很成功，需要把经验记录下来”。按用户当前消息最高优先级，将四名免费英雄替换、固定Q槽专属技能以及召唤物攻速继承整体记录为用户验收通过。
+- 证据边界：`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、`FREE_HERO_EXCLUSIVE_STATE_LUA51_PASS`、`SUMMON_ATTACK_SPEED_LUAC51_PASS`、生成一致性、严格UTF-8和限定diff检查仍只代表对应自动验证；“任务成功”来自用户明确验收，不虚构用户未提供的控制台日志或逐项测量结果。
+- 稳定配置经验：英雄、专属关系、技能、弹道和Tooltip必须先修改`data/csv/`权威源，再定向生成Lua，并同步检查Ability KV、单位KV和实际加载的中英文本地化入口。
+- 稳定技能状态经验：免费英雄固定Q槽技能以项目等级0和`locked=true`表示未解锁，引擎Ability保持等级1保证可见并使用`SetActivated(false)`禁用；一转时激活同一个Ability，避免删除重加造成槽位和身份变化。
+- 稳定召唤经验：攻击、攻速、生命和护甲继承取触发瞬间的项目战斗快照。`attack_speed`是每秒攻击次数，100%继承对应`SetBaseAttackTime(1 / attack_speed)`，并记录`survival_attack_speed`用于诊断；禁止把该值误当攻速百分比。
+- 稳定生命周期经验：持续召唤用“英雄实体+技能ID”建立唯一活动锁，概率判定前先检查锁；实体死亡、失效或到期都必须清锁和清理，避免重复召唤与永久锁死。
+- 稳定多目标攻击经验：小游侠次级攻击既要在`PerformAttack`关闭Proc，也要通过攻击record隔离项目自己的装备、技能和攻击事件链，不能只依赖单个引擎布尔参数。
+- 稳定模块边界经验：四个免费专属状态集中在`hero_exclusive_passive_service.lua`以规避Lua 5.1单函数局部变量上限，但伤害继续注入并复用主被动服务的既有伤害事务，不创建重复伤害系统。
+- 已排除方案：不使用原生三维反推项目属性；不把视觉粒子当碰撞体；不直接手改generated Lua；不为过时旧测试恢复已删除技能或无关预缓存；不把自动测试描述为用户实机验收。
+- 文档状态：稳定规则已写入`PROJECT_CONTEXT.md`，`START_HERE.md`和`CURRENT_TASK.md`已清除四英雄任务待办。该任务不再自动恢复，后续等待用户指定新任务或报告明确回归。

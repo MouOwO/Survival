@@ -49,6 +49,10 @@ local function should_diagnose_landed(modifier)
 end
 
 function modifier_weapon_attack_tracker:OnAttackStart(params)
+    if IsServer() and params.attacker == self:GetParent()
+        and self:GetParent().survival_next_drow_secondary == true then
+        modifier_weapon_attack_tracker.MarkSecondaryAttackRecord(params.record)
+    end
     if not IsServer() or params.attacker ~= self:GetParent()
         or not should_diagnose(self) then return end
     local target = params.target
@@ -102,6 +106,14 @@ function modifier_weapon_attack_tracker:OnAttackLanded(params)
         attack_sequence
     )
     local secondary = is_secondary_attack(params, self:GetParent())
+    if self:GetParent().survival_drow_companion == true then
+        if not secondary then
+            require("systems/hero_passive_skill_service")
+                .on_drow_companion_attack_landed(self:GetParent(), target)
+        end
+        modifier_weapon_attack_tracker.ClearSecondaryAttackRecord(params.record)
+        return
+    end
     if should_diagnose_landed(self) then
         print(string.format(
             "[HERO_ATTACK_LANDED] player=%s hero=%s attacker=%s target=%s "

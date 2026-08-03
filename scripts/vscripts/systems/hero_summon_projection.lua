@@ -6,9 +6,10 @@ local altar_actions = require("config/generated/altar_actions")
 local M = {}
 
 local SUMMON_ABILITIES = {
+    hero_doom = "ability_summon_doom",
+    hero_shadow_fiend = "ability_summon_shadow_fiend",
     hero_axe = "ability_summon_axe",
-    hero_slark = "ability_summon_slark",
-    hero_juggernaut = "ability_summon_juggernaut",
+    hero_drow_ranger = "ability_summon_drow_ranger",
     hero_monkey_king = "ability_summon_monkey_king",
     hero_blademaster = "ability_summon_blademaster",
 }

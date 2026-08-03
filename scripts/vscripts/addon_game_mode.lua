@@ -161,9 +161,10 @@ require("abilities/ability_build_farm")
 require("abilities/ability_building_blink")
 require("abilities/ability_build_gold_mine")
 require("abilities/ability_build_hero_altar")
+require("abilities/ability_summon_doom")
+require("abilities/ability_summon_shadow_fiend")
 require("abilities/ability_summon_axe")
-require("abilities/ability_summon_slark")
-require("abilities/ability_summon_juggernaut")
+require("abilities/ability_summon_drow_ranger")
 require("abilities/ability_summon_monkey_king")
 require("abilities/ability_summon_blademaster")
 require("abilities/ability_enter_endless_training")
@@ -455,11 +456,14 @@ function M.precache(context)
     tower_magic_supreme_system.precache(context)
     local units = {
         "npc_dota_hero_undying",
+        "npc_dota_hero_doom_bringer",
+        "npc_dota_hero_nevermore",
         "npc_dota_hero_axe",
-        "npc_dota_hero_slark",
-        "npc_dota_hero_juggernaut",
+        "npc_dota_hero_drow_ranger",
         "npc_dota_hero_monkey_king",
         "npc_dota_hero_sven",
+        "npc_survival_doom_infernal",
+        "npc_survival_drow_companion",
         "building_wall",
         "building_main_city",
         "building_arrow_tower",
@@ -573,6 +577,16 @@ function M.precache(context)
     PrecacheResource(
         "particle",
         "particles/survival_tornado/survival_tornado_follow.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_nevermore/nevermore_shadowraze.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_axe/axe_attack_blur_counterhelix.vpcf",
         context
     )
     local precached_buff_particles = {}

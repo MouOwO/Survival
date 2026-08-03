@@ -252,6 +252,7 @@ local function recalculate(player_id, reason)
             + equipment_stats.attack_flat
             + researcher_attack_flat
             + progression_attack_flat),
+        max_health = safe_get(state.unit, "GetMaxHealth", 1),
         researcher_attack_pct = researcher_attack_pct,
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,

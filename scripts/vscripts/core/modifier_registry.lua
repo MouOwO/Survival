@@ -69,6 +69,10 @@ local modifiers = {
         path = "modifiers/modifier_survival_hero_base_health",
     },
     {
+        name = "modifier_survival_drow_companion_invulnerable",
+        path = "modifiers/modifier_survival_drow_companion_invulnerable",
+    },
+    {
         name = "modifier_debug_fixed_attack_rate",
         path = "modifiers/modifier_debug_fixed_attack_rate",
     },

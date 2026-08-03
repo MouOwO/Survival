@@ -6,6 +6,7 @@ local definitions = require("config/hero_passive_skill_definitions")
 local skill_definitions = require("config/generated/hero_skill_definitions")
 local hero_definitions = require("config/generated/hero_definitions")
 local buff_manager = require("systems/buff_manager")
+local exclusive_passives = require("systems/hero_exclusive_passive_service")
 
 local M = {}
 local processed_attacks = {}
@@ -187,9 +188,10 @@ local function owned_passives(player_id)
     })
     local owned = {}
     for _, item in ipairs(result and result.snapshot and result.snapshot.skills or {}) do
-        if definitions.by_id[item.skill_id] then
+        local level = tonumber(item.level) or 0
+        if level > 0 and definitions.by_id[item.skill_id] then
             local maximum = definitions.by_id[item.skill_id].max_level or 1
-            owned[item.skill_id] = math.max(1, math.min(maximum, tonumber(item.level) or 1))
+            owned[item.skill_id] = math.min(maximum, level)
         end
     end
     return owned
@@ -209,6 +211,11 @@ local function attribute_snapshot(player_id)
         agility = agility,
         intelligence = intelligence,
         all_attributes = strength + agility + intelligence,
+        attack = ((tonumber(stats.attack_min) or 0)
+            + (tonumber(stats.attack_max) or 0)) * 0.5,
+        attack_speed = tonumber(stats.attack_speed) or 0,
+        max_health = tonumber(stats.max_health) or 1,
+        runtime_armor = tonumber(stats.runtime_armor) or 0,
     }
 end
 
@@ -3123,6 +3130,10 @@ local function run_void(context, definition)
 end
 
 local runners = {
+    skill_doom_infernal = exclusive_passives.runners.skill_doom_infernal,
+    skill_shadow_fiend_raze = exclusive_passives.runners.skill_shadow_fiend_raze,
+    skill_axe_counter_helix = exclusive_passives.runners.skill_axe_counter_helix,
+    skill_drow_companion = exclusive_passives.runners.skill_drow_companion,
     proto_flame_burst = run_flame,
     proto_frost_nova = run_frost,
     proto_chain_lightning = run_chain,
@@ -3191,6 +3202,11 @@ local function roll(payload, skill_id, level, attributes, target_position)
     elseif skill_id == "proto_poison_cloud" then
         local attacker_key = unit_key(payload.attacker)
         if attacker_key and active_poison_clouds[attacker_key] then return false end
+    elseif skill_id == "skill_doom_infernal"
+        or skill_id == "skill_drow_companion" then
+        if exclusive_passives.summon_locked(payload.attacker, skill_id) then
+            return false
+        end
     end
     local chance = definition.trigger_chance[level]
     event_bus.emit(events.HERO_PASSIVE_SKILL_ROLL_REQUESTED, {
@@ -3268,6 +3284,12 @@ function M.on_tracking_projectile_hit(ability, target, location, extra_data)
     return true
 end
 
+function M.on_drow_companion_attack_landed(attacker, primary_target)
+    return exclusive_passives.on_drow_companion_attack_landed(
+        attacker, primary_target
+    )
+end
+
 function M.init()
     definitions.validate()
     clear_flame_burns()
@@ -3275,6 +3297,7 @@ function M.init()
     clear_poison_clouds()
     clear_meteors()
     processed_attacks = {}
+    exclusive_passives.init({ deal_group = deal_group })
     refresh_tokens = {}
     flame_burns = {}
     flame_burn_sequence = 0

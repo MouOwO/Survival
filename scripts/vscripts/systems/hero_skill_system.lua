@@ -3,6 +3,7 @@ local events = require("core/events")
 local hero_health_guard = require("core/hero_health_guard")
 local scheduler = require("core/scheduler")
 local heroes = require("config/generated/hero_definitions")
+local exclusive_skills = require("config/generated/hero_exclusive_skills")
 local skills = require("config/generated/hero_skill_definitions")
 local passive_skills = require("config/hero_passive_skill_definitions")
 local tooltip_view_model = require("ui/hero_skill_tooltip_view_model")
@@ -18,7 +19,7 @@ local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
 
-local function skill_projection(skill_id, level)
+local function skill_projection(skill_id, level, locked)
     local definition = skills.by_id[skill_id]
     local passive = passive_skills.by_id[skill_id]
     local maximum = passive and passive.max_level
@@ -51,6 +52,8 @@ local function skill_projection(skill_id, level)
         effect_type = definition and definition.effect_type or "",
         effect_value_per_level = definition
             and (tonumber(definition.effect_value_per_level) or 0) or 0,
+        locked = locked == true and 1 or 0,
+        locked_reason = locked == true and "完成一转后激活" or "",
     }
 end
 
@@ -85,7 +88,11 @@ local function snapshot(player_id)
     for index, skill_id in ipairs(state.order) do
         table.insert(
             projected,
-            skill_projection(skill_id, state.levels[skill_id])
+            skill_projection(
+                skill_id,
+                state.levels[skill_id],
+                state.locked[skill_id]
+            )
         )
     end
 
@@ -184,9 +191,10 @@ local function synchronize_unit_impl(state)
                 error("failed to add skill ability: "
                     .. tostring(definition.ability_name))
             end
-            ability:SetLevel(state.levels[skill_id])
+            local locked = state.locked[skill_id] == true
+            ability:SetLevel(locked and 1 or state.levels[skill_id])
             ability:SetHidden(false)
-            ability:SetActivated(true)
+            ability:SetActivated(not locked)
             if ability.SetAbilityIndex then
                 ability:SetAbilityIndex(index - 1)
             end
@@ -249,8 +257,9 @@ local function copy_order(order)
 end
 
 local function rollback_skill_state(state, skill_id, previous_level,
-        previous_order, previous_version)
+        previous_locked, previous_order, previous_version)
     state.levels[skill_id] = previous_level
+    state.locked[skill_id] = previous_locked
     state.order = previous_order
     state.version = previous_version
     local restored, restore_error = synchronize_unit(state)
@@ -274,6 +283,7 @@ local function grant_to_state(state, skill_id, levels)
     local amount = math.max(1, tonumber(levels) or 1)
     local previous_order = copy_order(state.order)
     local previous_version = state.version
+    local previous_locked = state.locked[skill_id]
 
     if current then
         if current >= maximum then
@@ -281,6 +291,7 @@ local function grant_to_state(state, skill_id, levels)
         end
         state.levels[skill_id] =
             math.min(maximum, current + amount)
+        state.locked[skill_id] = nil
     else
         if #state.order >= state.capacity then
             return { ok = false, error = "skill_capacity_reached" }
@@ -300,6 +311,7 @@ local function grant_to_state(state, skill_id, levels)
             state,
             skill_id,
             current,
+            previous_locked,
             previous_order,
             previous_version
         )
@@ -447,11 +459,22 @@ local function initialize_hero(payload)
         unit = payload.unit,
         capacity = math.max(1, capacity or 10),
         levels = {},
+        locked = {},
         order = {},
         skill_points = 0,
         version = 0,
     }
     state_by_player[payload.player_id] = state
+
+    for _, row in ipairs(exclusive_skills.rows or {}) do
+        if definition and definition.vip_required ~= true
+            and row.enabled ~= false and row.guaranteed == true
+            and row.hero_id == payload.hero_id then
+            state.levels[row.skill_id] = 0
+            state.locked[row.skill_id] = true
+            state.order[#state.order + 1] = row.skill_id
+        end
+    end
 
     preserve_native_abilities(state.unit)
     synchronize_unit(state)

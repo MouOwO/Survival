@@ -326,6 +326,47 @@ M.rows = {
             "主龙卷结束时，按仍存活的已命中不同目标数量在结束位置生成小龙卷。小龙卷随机选择这些目标的方向，以相同速度移动2秒，每秒造成主龙卷60%的实时属性伤害，并仅施加20%范围减速。",
         },
     }),
+    skill({
+        skill_id = "skill_doom_infernal", display_name = "地狱火",
+        icon_name = "warlock_rain_of_chaos", max_level = 1,
+        trigger_chance = { 0.10 }, damage_multiplier = { 0 },
+        duration = { 10.0 }, attack_inherit_pct = { 100 },
+        attack_speed_inherit_pct = { 100 },
+        health_inherit_pct = { 100 }, armor_inherit_pct = { 100 },
+        level_text = {
+            "攻击命中10%概率召唤地狱火，继承100%攻击力、攻击速度、最大生命和防御，持续10秒；存续期间跳过概率判定。",
+        },
+    }),
+    skill({
+        skill_id = "skill_shadow_fiend_raze", display_name = "影压",
+        icon_name = "nevermore_shadowraze1", max_level = 1,
+        trigger_chance = { 0.10 }, damage_multiplier = { 25.0 },
+        radius = { 250 }, stack_duration = { 3.0 },
+        max_stacks = { 5 }, damage_per_stack_pct = { 10 },
+        level_text = {
+            "攻击命中10%概率释放250范围影压；先加层再造成全属性×27.5至×37.5纯粹伤害，最多5层，每层独立持续3秒。",
+        },
+    }),
+    skill({
+        skill_id = "skill_axe_counter_helix", display_name = "反击螺旋",
+        icon_name = "axe_counter_helix", max_level = 1,
+        trigger_chance = { 0.10 }, damage_multiplier = { 30.0 },
+        radius = { 400 },
+        level_text = {
+            "攻击命中10%概率以目标为中心触发400范围反击螺旋，造成全属性×30纯粹伤害。",
+        },
+    }),
+    skill({
+        skill_id = "skill_drow_companion", display_name = "小游侠",
+        icon_name = "drow_ranger_multishot", max_level = 1,
+        trigger_chance = { 0.10 }, damage_multiplier = { 0 },
+        duration = { 10.0 }, attack_inherit_pct = { 150 },
+        attack_speed_inherit_pct = { 100 },
+        attack_range = { 1200 }, max_targets = { 5 },
+        level_text = {
+            "攻击命中10%概率召唤无敌小游侠，继承150%攻击力和100%攻击速度，攻击主目标及最近另外4个敌人，持续10秒；存续期间跳过概率判定。",
+        },
+    }),
 }
 
 M.by_id = {}

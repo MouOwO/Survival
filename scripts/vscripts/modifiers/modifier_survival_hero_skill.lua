@@ -19,6 +19,9 @@ local function modifier_value(self, effect_type)
     if not ability or ability:IsNull() then
         return 0
     end
+    if ability.IsActivated and not ability:IsActivated() then
+        return 0
+    end
     local definition = by_ability[ability:GetAbilityName()]
     if not definition or definition.effect_type ~= effect_type then
         return 0

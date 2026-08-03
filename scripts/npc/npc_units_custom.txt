@@ -337,6 +337,54 @@
         "VisionNighttimeRange"   "800"
     }
 
+    "npc_survival_doom_infernal"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/warlock/warlock_demon.vmdl"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "StatusHealth"           "100"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_GROUND"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_MELEE_ATTACK"
+        "AttackDamageMin"        "1"
+        "AttackDamageMax"        "1"
+        "AttackRate"             "1.0"
+        "AttackRange"            "200"
+        "AttackAcquisitionRange" "800"
+        "ArmorPhysical"          "0"
+        "MagicalResistance"      "0"
+        "BoundsHullName"         "DOTA_HULL_SIZE_REGULAR"
+        "VisionDaytimeRange"     "800"
+        "VisionNighttimeRange"   "800"
+    }
+
+    "npc_survival_drow_companion"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/drow/drow.vmdl"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "StatusHealth"           "100"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_GROUND"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_RANGED_ATTACK"
+        "AttackDamageMin"        "1"
+        "AttackDamageMax"        "1"
+        "AttackRate"             "1.0"
+        "AttackRange"            "1200"
+        "AttackAcquisitionRange" "1200"
+        "ProjectileModel"        "particles/units/heroes/hero_drow/drow_base_attack.vpcf"
+        "ProjectileSpeed"        "1250"
+        "ArmorPhysical"          "0"
+        "MagicalResistance"      "0"
+        "BoundsHullName"         "DOTA_HULL_SIZE_REGULAR"
+        "VisionDaytimeRange"     "1200"
+        "VisionNighttimeRange"   "1200"
+    }
+
     // Resource-only units: never spawned in gameplay. They give
     // PrecacheUnitByNameAsync an exact KV dependency for each streamed model.
     "asset_proxy_monster_doom" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/doom/doom.vmdl" }

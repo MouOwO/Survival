@@ -361,24 +361,36 @@
     "AbilityManaCost"    "0"
 }
 
-"ability_summon_slark"
+"ability_summon_doom"
 {
     "BaseClass"          "ability_lua"
-    "ScriptFile"         "abilities/ability_summon_slark"
+    "ScriptFile"         "abilities/ability_summon_doom"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-    "AbilityTextureName" "slark_dark_pact"
+    "AbilityTextureName" "doom_bringer_devour"
     "MaxLevel"           "1"
     "AbilityCastPoint"   "0.0"
     "AbilityCooldown"    "0.2"
     "AbilityManaCost"    "0"
 }
 
-"ability_summon_juggernaut"
+"ability_summon_shadow_fiend"
 {
     "BaseClass"          "ability_lua"
-    "ScriptFile"         "abilities/ability_summon_juggernaut"
+    "ScriptFile"         "abilities/ability_summon_shadow_fiend"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-    "AbilityTextureName" "juggernaut_blade_fury"
+    "AbilityTextureName" "nevermore_shadowraze1"
+    "MaxLevel"           "1"
+    "AbilityCastPoint"   "0.0"
+    "AbilityCooldown"    "0.2"
+    "AbilityManaCost"    "0"
+}
+
+"ability_summon_drow_ranger"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/ability_summon_drow_ranger"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+    "AbilityTextureName" "drow_ranger_multishot"
     "MaxLevel"           "1"
     "AbilityCastPoint"   "0.0"
     "AbilityCooldown"    "0.2"
@@ -510,33 +522,43 @@
     "AbilityManaCost"    "0"
 }
 
-"ability_survival_axe_exclusive"
+"ability_survival_doom_infernal"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "warlock_rain_of_chaos"
+    "MaxLevel"           "1"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_shadow_fiend_raze"
+{
+    "BaseClass"          "ability_lua"
+    "ScriptFile"         "abilities/survival_hero_skill"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityTextureName" "nevermore_shadowraze1"
+    "MaxLevel"           "1"
+    "AbilityManaCost"    "0"
+}
+
+"ability_survival_axe_counter_helix"
 {
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "axe_counter_helix"
-    "MaxLevel"           "3"
+    "MaxLevel"           "1"
     "AbilityManaCost"    "0"
 }
 
-"ability_survival_slark_exclusive"
+"ability_survival_drow_companion"
 {
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-    "AbilityTextureName" "slark_essence_shift"
-    "MaxLevel"           "3"
-    "AbilityManaCost"    "0"
-}
-
-"ability_survival_juggernaut_exclusive"
-{
-    "BaseClass"          "ability_lua"
-    "ScriptFile"         "abilities/survival_hero_skill"
-    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-    "AbilityTextureName" "juggernaut_blade_dance"
-    "MaxLevel"           "3"
+    "AbilityTextureName" "drow_ranger_multishot"
+    "MaxLevel"           "1"
     "AbilityManaCost"    "0"
 }
 

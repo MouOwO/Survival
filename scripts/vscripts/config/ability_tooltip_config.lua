@@ -141,20 +141,26 @@ local M = {
 ability_summon_axe = {
     abilityid = "ability_summon_axe",
     abilityname = "召唤斧王",
-    abilitydesc = "召唤斧王作为战斗英雄。清除原版技能后，初始获得1个斧王专属项目技能。",
+    abilitydesc = "召唤斧王。专属技能固定显示在Q槽，完成一转后激活。",
     abilityicon = "axe_berserkers_call",
 },
-ability_summon_slark = {
-    abilityid = "ability_summon_slark",
-    abilityname = "召唤斯拉克",
-    abilitydesc = "召唤斯拉克作为战斗英雄。清除原版技能后，初始获得1个斯拉克专属项目技能。",
-    abilityicon = "slark_dark_pact",
+ability_summon_doom = {
+    abilityid = "ability_summon_doom",
+    abilityname = "召唤末日使者",
+    abilitydesc = "召唤末日使者。专属技能固定显示在Q槽，完成一转后激活。",
+    abilityicon = "doom_bringer_devour",
 },
-ability_summon_juggernaut = {
-    abilityid = "ability_summon_juggernaut",
-    abilityname = "召唤主宰",
-    abilitydesc = "召唤主宰作为战斗英雄。清除原版技能后，初始获得1个主宰专属项目技能。",
-    abilityicon = "juggernaut_blade_fury",
+ability_summon_shadow_fiend = {
+    abilityid = "ability_summon_shadow_fiend",
+    abilityname = "召唤影魔",
+    abilitydesc = "召唤影魔。专属技能固定显示在Q槽，完成一转后激活。",
+    abilityicon = "nevermore_shadowraze1",
+},
+ability_summon_drow_ranger = {
+    abilityid = "ability_summon_drow_ranger",
+    abilityname = "召唤黑暗游侠",
+    abilitydesc = "召唤黑暗游侠。专属技能固定显示在Q槽，完成一转后激活。",
+    abilityicon = "drow_ranger_multishot",
 },
 ability_summon_monkey_king = {
     abilityid = "ability_summon_monkey_king",

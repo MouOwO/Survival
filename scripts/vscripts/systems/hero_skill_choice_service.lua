@@ -141,7 +141,7 @@ local function grant_exclusive(player_id)
 
     local owned = {}
     for _, item in ipairs(hero_state.skills or {}) do
-        owned[item.skill_id] = true
+        owned[item.skill_id] = (tonumber(item.level) or 0) > 0
     end
     local granted = {}
     local added = {}
