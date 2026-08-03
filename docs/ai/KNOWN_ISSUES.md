@@ -2,6 +2,10 @@
 
 ## 当前已知问题
 
+0. **提交新增`require`时可能遗漏对应新模块文件。**
+   - 2026-08-03提交`85ce4eb`在`building_upgrade_system.lua`新增`require("systems/building_upgrade_process")`及四个接口调用，但Git历史和工作区均没有对应文件，导致地图在`addon_game_mode.lua`加载阶段立即终止。
+   - 排查真实`module not found`时应同时执行`git ls-files`、Git历史对象搜索和全项目require解析；不能只注释require绕过业务流程。当前缺失模块已补齐并有Lua 5.1行为测试。
+
 0. **Lua 5.1会把被require模块的编译失败同时显示为`module not found`。**
    - 2026-08-03实际表现为`module 'systems/hero_passive_skill_service' not found`，同一条搜索诊断后紧跟真实原因`main function has more than 200 local variables`。
    - 根因是主服务顶层chunk拥有202个local；已将三个末尾入口挂到模块表，使声明数降至199并通过`luac5.1 -p`。排查同类问题必须优先阅读`module not found`后附带的目标文件编译错误。

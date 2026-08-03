@@ -1,3 +1,35 @@
+## 2026-08-03 — 紧急修复建筑升级流程模块缺失
+
+- 用户实机报告`building_upgrade_system.lua:12`无法require `systems/building_upgrade_process`，阻断`addon_game_mode.lua`。
+- Git取证确认提交`85ce4eb`新增升级流程依赖与`begin/is_active/cancel_by_entindex/reset`调用，但该文件从未被提交，无法从历史恢复。
+- 新建完整流程模块，复用`core/scheduler`与`asset_preload_service`，提供单建筑去重、1秒完成、目标状态投影、可选粒子、异步视觉状态、销毁取消、reset清理和失效实体保护；既有`building_upgrade_system`无需改动。
+- 验证通过：`BUILDING_UPGRADE_LOAD_CHAIN_LUAC51_PASS`、`BUILDING_UPGRADE_PROCESS_LUA51_PASS`、`SYSTEM_REQUIRE_RESOLUTION_PASS`、严格UTF-8与限定`git diff --check`。全systems扫描仅在仓库已有BOM文件`building_relocation.lua`上被本地luac5.1拒绝；Dota此前已加载同样带BOM的`building_system.lua`并进入后续模块，因此未扩大范围改写既有编码。
+- 尚需用户完全停止并重新Run Workshop Tools，确认引擎实际进入地图和建筑升级/销毁时的1秒流程。
+
+
+## 2026-08-03 — 修理工修理有效间距统一为200
+
+- 用户确认修理工继续保持400的无攻击距离属性，并继续强制`NO_ATTACK`；LV1/LV2实际修理最大有效间距统一为200。
+- 权威`training_definitions.csv`中LV2 `repair_range`由240改为200并定向生成。运行时已有模型边缘间距判定：边缘间距大于200时靠近，小于等于200时持续修理，因此无需新增另一套距离逻辑。
+- 专项合同补充两级修理工400/200配置、`NO_ATTACK`和边缘距离判定断言。
+## 2026-08-03 — 树位置、工人/英雄远程与转生多目标普攻实施前检查点
+
+- 用户最终确认：`attack_rate=0.5`表示每秒0.5次；所有英雄含齐天大圣和剑圣统一远程；一至四转总目标数含主目标为3/4/5/6；各目标使用相同普通攻击基础过程并由引擎按各自护甲独立结算；次级攻击不应重复触发项目技能。
+- 工人边界：伐木工400射程、远程能力、无可见弹道；修理工保持纯修理和`NO_ATTACK`，只统一400距离属性。伐木工LV3模型无动作，替换为`creep_bad_flagbearer.vmdl`；LV6-LV8使用用户指定模型。
+- 已确认现有基础：`modifier_weapon_attack_tracker`已有次级record集合和项目事件隔离；`hero_progression_system`已有`split_multishot_unlocked/multishot_count`但未消费；奖励CSV当前一转解锁值1且二至十转持续+1，必须调整为一转总数3并在运行时封顶6。
+- 工作区保护：实施前只有用户已有未跟踪`tools/test_unit_model_config.lua`、`tools/test_unit_model_config_contract.ps1`和`卡的文本.txt`，不得覆盖或删除。
+- 下一步：修改权威CSV、最小运行时与KV回退，定向生成后补专项测试并执行Lua 5.1、编码、模型VPK、生成一致性和限定diff验证。
+
+## 2026-08-03 — 树位置、工人/英雄远程与转生多目标普攻实现完成
+
+- 权威CSV完成：树位置`448/64/128`；八级伐木工0.5次/秒与400射程；修理工400距离但不攻击；LV3、LV6-LV8模型；六英雄远程弹道配置；转生总目标3/4/5/6并从五转起不再增加。四份生成Lua均由生成器定向重建并逐字节比较通过。
+- 运行时完成：树坐标读取世界视觉生成表；伐木工远程、空弹道名和高速瞬发；修理工继续`NO_ATTACK`；所有英雄统一远程；`hero_progression_system`消费已有转生状态执行次级`PerformAttack`，现有tracker按record隔离项目事件链，并覆盖主目标被击杀后继续发射。
+- 最终复读发现科技刷新原本仍从旧`workers_config.attack_rate=1.0`重算伐木工攻速；已改为在工人状态保存训练行基础0.5并从该值叠加科技，缺失配置回退同步为0.5，专项合同新增对应防回归断言。
+- VPK v2正确按扩展名/目录/文件名三层解析，确认LV3、LV6、LV7、LV8四个新增模型存在，输出`WORKER_MODEL_VPK_PASS 4 INDEXED 383571`。首次把目录树误当连续完整路径字符串导致假缺失，已排除检查器错误，未据此修改模型。
+- 验证通过：专项PowerShell合同、Lua 5.1多目标行为、目标生产/生成Lua及`addon_game_mode.lua`语法、生成一致性、严格UTF-8/历史GB18030解码、树伤害、免费英雄次级攻击、魔法弹弓目标选择、研究减甲以及限定`git diff --check`。
+- 用户已有未跟踪`test_unit_model_config_contract.ps1`仍断言LV3旧坏模型，按预期失败；未修改。实施期间误删的三个已跟踪Python缓存已立即从HEAD逐字节恢复，最终状态无缓存差异。
+- 尚未实机验证：树实际位置与占地、四个新模型动画、伐木工400射程与无可见弹道、六英雄远程攻击表现、一至四转目标数量及不同护甲独立扣血。自动测试不得描述为Workshop Tools实机通过。
+
 # 2026-08-02 — 检查点：四名免费英雄方案批准并开始实施
 
 - 用户要求用末日使者、影魔、斧王、黑暗游侠替换原有全部非VIP英雄，并要求所有基础配置从CSV获取；齐天大圣、剑圣VIP英雄不变。

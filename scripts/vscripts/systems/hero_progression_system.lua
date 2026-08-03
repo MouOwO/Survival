@@ -4,6 +4,7 @@ local events = require("core/events")
 local M = {}
 
 local state_by_player = {}
+local MULTISHOT_MAX_TARGETS = 6
 
 local function new_state(player_id)
     return {
@@ -73,11 +74,17 @@ local function apply_effect(state, player_id, effect)
     end
     if effect_type == "unlock_split_multishot" then
         state.split_multishot_unlocked = true
-        state.multishot_count = math.max(state.multishot_count, 1)
+        state.multishot_count = math.min(
+            MULTISHOT_MAX_TARGETS,
+            math.max(state.multishot_count, value)
+        )
         return
     end
     if effect_type == "add_multishot_count" then
-        state.multishot_count = state.multishot_count + value
+        state.multishot_count = math.min(
+            MULTISHOT_MAX_TARGETS,
+            state.multishot_count + value
+        )
         return
     end
     if effect_type == "grant_exclusive_skill"
@@ -160,6 +167,64 @@ local function on_attack_landed(payload)
     event_bus.emit(events.HERO_PROGRESSION_CHANGED, data)
 end
 
+local function enemy_unit(attacker, unit)
+    return attacker and not attacker:IsNull()
+        and unit and not unit:IsNull()
+        and unit:GetTeamNumber() ~= attacker:GetTeamNumber()
+end
+
+local function valid_enemy(attacker, unit)
+    return enemy_unit(attacker, unit) and unit:IsAlive()
+end
+
+local function attack_range(attacker)
+    local maximum = math.max(0, tonumber(attacker.survival_attack_range) or 0)
+    for _, method_name in ipairs({ "Script_GetAttackRange", "GetAttackRange" }) do
+        local method = attacker[method_name]
+        if type(method) == "function" then
+            local ok, value = pcall(method, attacker)
+            if ok then maximum = math.max(maximum, tonumber(value) or 0) end
+        end
+    end
+    return maximum
+end
+
+local function trigger_multishot(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local attacker = payload and payload.attacker
+    local primary_target = payload and payload.target
+    if player_id == nil or not enemy_unit(attacker, primary_target) then return end
+    local state = get_state(player_id)
+    local maximum = math.min(
+        MULTISHOT_MAX_TARGETS,
+        math.max(1, tonumber(state.multishot_count) or 0)
+    )
+    if state.split_multishot_unlocked ~= true or maximum <= 1 then return end
+
+    local radius = attack_range(attacker)
+    if radius <= 0 then return end
+    local origin = attacker:GetAbsOrigin()
+    local candidates = FindUnitsInRadius(
+        attacker:GetTeamNumber(), origin, nil, radius,
+        DOTA_UNIT_TARGET_TEAM_ENEMY,
+        DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+        DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+        FIND_CLOSEST, false
+    ) or {}
+    local fired = 1
+    for _, target in ipairs(candidates) do
+        if fired >= maximum then break end
+        if target ~= primary_target and valid_enemy(attacker, target) then
+            attacker.survival_next_multishot_secondary = true
+            attacker:PerformAttack(
+                target, false, false, true, false, true, false, false
+            )
+            attacker.survival_next_multishot_secondary = nil
+            fired = fired + 1
+        end
+    end
+end
+
 function M.init()
     state_by_player = {}
     event_bus.handle_request(
@@ -173,6 +238,13 @@ function M.init()
     event_bus.subscribe(events.HERO_READY, on_hero_ready)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_attack_landed)
+    event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, trigger_multishot)
 end
+
+M._test = {
+    attack_range = attack_range,
+    trigger_multishot = trigger_multishot,
+    get_state = get_state,
+}
 
 return M

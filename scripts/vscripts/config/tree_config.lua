@@ -55,7 +55,11 @@ local M = {
     unit_name = "enemy_tree",
     model_name = tree_asset.model_name,
     model_scale = tree_asset.model_scale,
-    spawn_point = { x = 832, y = -64, z = 128 },
+    spawn_point = {
+        x = tree_asset.spawn_x,
+        y = tree_asset.spawn_y,
+        z = tree_asset.spawn_z,
+    },
     footprint = { x = 2, y = 2 },
     grid_cell_size = 64,
     max_level = #source_levels,

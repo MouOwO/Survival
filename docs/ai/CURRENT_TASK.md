@@ -1,5 +1,32 @@
 # Current Task
 
+## 紧急修复（2026-08-03）：缺失建筑升级流程模块阻断地图启动
+
+- Workshop Tools报错：`building_upgrade_system.lua:12`无法加载`systems/building_upgrade_process`，导致`addon_game_mode.lua`终止。
+- 根因确认：提交`85ce4eb`向`building_upgrade_system.lua`加入`begin/is_active/cancel_by_entindex/reset`调用，但对应模块从未进入Git历史或当前工作区。
+- 已补齐`building_upgrade_process.lua`：使用现有`scheduler`管理1秒升级事务，维护每建筑唯一活动状态、目标等级/模型状态、可选升级粒子、视觉预加载状态回调、完成/销毁取消/重置清理与旧回调失效保护。
+- Lua 5.1启动链语法与专项行为测试通过；仍需完全停止并重新Run Workshop Tools确认引擎实际启动。
+
+## 活跃任务（2026-08-03）：树位置、工人远程属性、全英雄远程与转生多目标普攻
+
+- 用户确认资源树初始位置改为`(448, 64, 128)`。
+- 伐木工LV1至LV8的权威攻速统一为每秒`0.5`次（基础攻击间隔2秒），攻击范围统一为400，改为远程攻击能力但不显示弹道；修理工保持纯修理、`NO_ATTACK`，只统一400距离属性。
+- 伐木工LV3坏模型替换为`models/creeps/lane_creeps/creep_bad_melee/creep_bad_flagbearer.vmdl`；LV6、LV7、LV8依次使用用户指定的Dire Bird Mega、Crystal Bad Melee和Mega Greevil模型。
+- 所有项目英雄（包括齐天大圣和剑圣）统一使用远程攻击能力；射程和弹道继续由英雄CSV独立配置。
+- 转生多目标普通攻击总目标数（包含主目标）为：一转3、二转4、三转5、四转及以后6。每个次级目标由引擎独立执行普通攻击并按各自护甲结算；次级攻击必须通过现有attack record隔离，不再触发项目技能、装备效果、成长或递归多目标。
+- CSV仍是配置权威；生成Lua不得手改。自动验证不能替代Workshop Tools中的模型动画、瞬发攻击表现、射程和多目标实际结算验收。
+
+### 实施结果与当前状态
+
+- `world_visual_definitions.csv`已增加树初始坐标并生成配置，运行时位置改为`(448, 64, 128)`。
+- `training_definitions.csv`已增加`attack_range`权威列；八级伐木工均为`attack_rate=0.5`和`attack_range=400`，LV3/LV6/LV7/LV8模型已替换。修理工两级均投影400距离，但运行时和KV继续保持`NO_ATTACK`；实际修理最大有效间距统一为模型边缘间距200码。
+- 伐木工运行时改为远程攻击能力、10000速度和空弹道名；KV首帧回退同步为远程、400射程、2秒AttackRate。四个新增模型已从当前Dota VPK v2目录索引确认存在。
+- 工人科技刷新已改为保存并复用每个训练行的基础攻速，攻速科技继续在0.5次/秒基线上计算，不会被旧全局1.0回退覆盖；全局工人缺失配置回退也同步为0.5。
+- 六名项目英雄均由`hero_attack_projectiles.csv`提供正弹道速度并统一切换远程能力；影魔/黑暗游侠保留现有可见弹道，末日/斧王/齐天大圣/剑圣使用空自定义弹道名。
+- 转生奖励CSV已规范为一转总目标3，二至四转各+1，五转以后+0；运行时额外封顶6。次级目标通过`PerformAttack`逐目标独立结算并由现有attack record标记为secondary，不发布`HERO_MAIN_ATTACK_LANDED`，因此不递归触发多目标、项目技能、成长或主攻击装备事件。
+- 自动验证通过：`WORKER_RANGED_MULTISHOT_CONTRACT_PASS`、`HERO_MULTISHOT_LUA51_PASS`、`WORKER_MODEL_VPK_PASS 4`、`WORKER_MULTISHOT_FINAL_LUAC51_PASS`、`WORKER_MULTISHOT_FINAL_GENERATION_ENCODING_PASS`、树伤害合同/行为、免费英雄合同/行为、魔法弹弓目标行为、研究减甲合同/行为以及限定`git diff --check`。
+- 用户已有未跟踪旧模型合同仍要求已批准替换的LV3坏模型，因此单独失败为过期断言；未修改该用户文件。尚需Workshop Tools冷启动验收模型动画、伐木工瞬发无弹道、六英雄远程表现、树位置及一至四转对不同护甲目标的实际独立伤害。
+
 ## 活跃任务（2026-08-03）：资源树、祭坛、主城、伐木工与修理工分级模型替换
 
 - 用户要求先替换以下模型，并将模型映射写入`data/csv/`权威配置，再通过项目生成链同步运行配置：

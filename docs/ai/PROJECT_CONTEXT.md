@@ -12,6 +12,13 @@
 - 主城与召唤祭坛视觉权威源是`building_visual_levels.csv`；`buildings_config.lua`按`building_id+level`合并到`building_levels.csv`的战斗等级数据，建造完成和升级均复用`building_visual_service.apply()`。
 - 普通建筑视觉表可直接使用`model_name/model_scale/model_yaw`，不强制进入复杂塔套装的`asset_catalog.csv`。当前`asset_catalog.csv`存在27列表头与大量22列历史行不一致，未修复前不得为普通模型任务强行生成或批量补列。
 - 新增分级模型必须同步：CSV、生成Lua、运行时消费者、模型预缓存和单位KV的LV1回退；模型路径需从当前`pak01_dir.vpk`索引确认，自动验证不能代替Workshop Tools中的尺寸、动画和朝向验收。
+- 工人攻击距离使用`training_definitions.csv.attack_range`。伐木工当前统一为每秒0.5次、400射程、远程能力和空自定义弹道；修理工虽然同样投影400距离，但稳定身份仍是纯修理单位，运行时和KV必须保持`NO_ATTACK`。修理距离由独立的`repair_range`控制，当前两级均为200，并按修理工与建筑碰撞体边缘间距判断，边缘间距小于等于200时可修理。
+
+## 英雄转生多目标普通攻击（2026-08-03）
+
+- `reward_effects.csv`是转生多目标数权威源：一转解锁并把总目标数设为3，二/三/四转依次增加到4/5/6，五转以后不再增加；`hero_progression_system`同时封顶6以防旧存档或异常奖励越界。
+- 总目标数包含主目标。次级目标使用引擎`PerformAttack`逐个独立结算，因此每个目标按自身护甲处理；次级攻击关闭Proc并在`modifier_weapon_attack_tracker`按attack record标记，不发布项目主攻击事件，避免递归多目标、公共技能、成长和主攻击装备效果。
+- 主目标可在原平A落地时死亡；只要攻击事件中的主目标实体和敌方身份仍有效，多目标仍应继续选择存活的其他敌人。目标查询范围读取`survival_attack_range`、`Script_GetAttackRange()`和`GetAttackRange()`最大有效值。
 
 ## 资源树承伤与箭塔目标规则（2026-08-03）
 

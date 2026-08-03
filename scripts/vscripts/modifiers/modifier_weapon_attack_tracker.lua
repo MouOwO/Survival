@@ -50,7 +50,8 @@ end
 
 function modifier_weapon_attack_tracker:OnAttackStart(params)
     if IsServer() and params.attacker == self:GetParent()
-        and self:GetParent().survival_next_drow_secondary == true then
+        and (self:GetParent().survival_next_drow_secondary == true
+            or self:GetParent().survival_next_multishot_secondary == true) then
         modifier_weapon_attack_tracker.MarkSecondaryAttackRecord(params.record)
     end
     if not IsServer() or params.attacker ~= self:GetParent()

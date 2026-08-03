@@ -4,6 +4,8 @@
 
 ## 当前状态
 
+- 紧急启动阻断已修复：提交`85ce4eb`引用但漏提交的`systems/building_upgrade_process.lua`已补齐；`building_upgrade_system.lua`与`addon_game_mode.lua` Lua 5.1语法、升级完成/重复拒绝/销毁取消/重置/失效建筑行为均通过。下一步必须完全停止并重新Run Workshop Tools确认不再出现`module not found`。
+- 当前新增实现待实机验收：资源树初始位置改为`(448,64,128)`；伐木工LV1-LV8统一0.5次/秒、400射程、远程空弹道，LV3与LV6-LV8模型已替换；修理工保持纯修理但距离属性为400；六英雄统一远程；一至四转普攻总目标数为3/4/5/6并按目标护甲独立结算。CSV、生成配置、运行时、KV、专项测试和相关回归已通过，下一步Workshop Tools冷启动验收。
 - 紧急阻断已修复：`hero_passive_skill_service.lua`曾因顶层chunk拥有202个local而超过Lua 5.1的200-local上限，导致`addon_game_mode.lua`无法加载。末尾`trigger/roll/on_main_attack`现改为模块表方法，顶层声明降至199；Lua 5.1语法、8项公共技能状态和四英雄专属回归已通过。仍需完全停止并重新Run Workshop Tools确认地图实际进入。
 - 当前活跃任务：资源树、召唤祭坛、主城、伐木工LV1至LV5及修理工LV1至LV2模型替换。CSV权威配置、定向生成、运行时应用、KV首帧回退与模型预缓存已完成；11个模型均在当前Dota VPK中确认存在，专项合同、Lua 5.1行为/语法、生成一致性、编码列数、限定diff及树伤害回归通过。下一步在Workshop Tools确认树尺寸、工人动画、主城五级缩放/切模及祭坛尺寸，未经实机验证和用户确认不得记录为制作完成。
 
@@ -24,6 +26,9 @@
 
 ## 最后可靠检查点
 
+- 日期：2026-08-03
+- 树位置、工人远程属性、四个伐木工模型、六英雄远程和转生多目标普攻已完成权威CSV、生成Lua、运行时和KV实现；专项合同、Lua 5.1行为/语法、VPK模型、生成编码、树/免费英雄/射程/减甲回归及限定diff检查通过。
+- 下一步：完全停止并重新Run Workshop Tools，确认树位于`(448,64,128)`、伐木工无可见弹道且400射程、修理工不攻击、六英雄均可按CSV射程远程攻击，以及一至四转实际攻击3/4/5/6个目标并按不同护甲独立扣血。
 - 日期：2026-08-03
 - 已消除阻断地图加载的Lua 5.1顶层local上限错误：`hero_passive_skill_service.lua`由202个顶层声明降至199，`luac5.1 -p`确认主服务、专属服务和`addon_game_mode.lua`通过。
 - 下一步：完全停止并重新Run Workshop Tools；先确认不再出现`main function has more than 200 local variables`，再继续模型实机验收。

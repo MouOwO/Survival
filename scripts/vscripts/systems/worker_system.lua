@@ -114,7 +114,10 @@ local function refresh_worker_technology(player_id)
     for entindex, state in pairs(workers) do
         if state.worker_type == "lumberjack"
             and state.player_id == player_id and valid_entity(state.unit) then
-            local speed = math.max(0.01, (tonumber(config.attack_rate) or 0.5) * (1 + speed_pct / 100))
+            local speed = math.max(0.01, (
+                tonumber(state.base_attack_speed)
+                    or tonumber(config.attack_rate) or 0.5
+            ) * (1 + speed_pct / 100))
             local base_interval = 1 / speed
             state.unit:SetBaseAttackTime(math.max(0.05, base_interval - interval_reduction))
             local base_min = tonumber(state.base_damage_min)
@@ -371,6 +374,14 @@ local function train_worker(payload)
         worker:AddNewModifier(worker, nil, "modifier_debug_attack_cap", {})
     end
     worker:SetBaseMoveSpeed(tonumber(training.move_speed) or config.move_speed)
+    local attack_range = math.max(0, tonumber(training.attack_range) or 400)
+    if worker.Script_SetAttackRange then
+        worker:Script_SetAttackRange(attack_range)
+    end
+    worker.survival_attack_range = attack_range
+    if worker.SetAcquisitionRange then
+        worker:SetAcquisitionRange(attack_range)
+    end
     if training.model_name and training.model_name ~= "" then
         worker:SetModel(training.model_name)
         worker:SetOriginalModel(training.model_name)
@@ -391,6 +402,15 @@ local function train_worker(payload)
         })
     else
         worker.survival_worker_type = "lumberjack"
+        if worker.SetRangedProjectileName then
+            worker:SetRangedProjectileName("")
+        end
+        if worker.SetProjectileSpeed then
+            worker:SetProjectileSpeed(10000)
+        end
+        if worker.SetAttackCapability then
+            worker:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
+        end
         local lumberjack = technology_stat_manager.get(city_state.player_id).final.lumberjack or {}
         technology_efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
         worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
@@ -415,6 +435,7 @@ local function train_worker(payload)
         worker_type = is_repairer and "repairer" or "lumberjack",
         base_damage_min = base_attack,
         base_damage_max = base_attack,
+        base_attack_speed = attack_speed,
         base_lumber_efficiency = tonumber(training.wood_per_hit) or 0,
         tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
         technology_efficiency = technology_efficiency,

@@ -89,8 +89,9 @@ local function apply_combat_stats(unit, definition)
         end
         safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_RANGED_ATTACK)
     else
+        safe_call(unit, "SetProjectileSpeed", 3000)
         safe_call(unit, "SetRangedProjectileName", "")
-        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_MELEE_ATTACK)
+        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_RANGED_ATTACK)
     end
 end
 
