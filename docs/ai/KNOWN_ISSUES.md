@@ -81,10 +81,11 @@
    - 技能接管不得再把稠密显示序号直接拼成 `AbilityN`；必须枚举有效官方按钮、按屏幕视觉位置排序，并在完整映射后原子提交。
    - 映射不完整时必须整批恢复官方 UI，禁止保留半项目、半官方状态。
 
-16. **历史 Lua 5.1 编译器路径当前已失效。**
-    - `C:\msys64\mingw64\bin\luac5.1.exe`曾验证为Lua 5.1.5，但2026-08-02再次探测时该文件及MSYS2候选目录均不存在。
-    - 当前可用解释器/编译器为WinGet目录中的Lua/Luac 5.4.5；可用于一般语法检查，但不得把结果标记为Lua 5.1兼容通过。
-    - 后续若恢复Lua 5.1工具，应重新探测并记录实际路径和`-v`输出，禁止继续把历史路径当作当前存在证据。
+16. **Lua 5.1 工具必须使用当前已验证的绝对路径。**
+    - 2026-08-03已确认`C:\Program Files\lua\bin\lua5.1.exe`与`C:\Program Files\lua\bin\luac5.1.exe`均为Lua 5.1.5；旧`C:\msys64\mingw64\bin`路径仍为失效历史路径。
+    - 当前终端PATH尚未包含Lua 5.1目录，自动验证必须使用上述绝对路径，不能因`Get-Command luac5.1`无结果而误判编译器不存在。
+    - PowerShell 7当前路径为`C:\Program Files\PowerShell\7\pwsh.exe`，版本7.6.4；Windows PowerShell 5.1仍位于系统默认路径。
+    - 当前有7个历史Lua源文件带UTF-8 BOM，PUC Lua 5.1会在第1字节拒绝；`tools/test_lua51_syntax.ps1`只对临时副本移除BOM再检查，不修改生产源文件，并在结果中报告`bom_normalized`数量。
     - Luac只能证明对应版本语法可解析，不能替代Dota API、Scheduler、粒子、伤害和UI的Workshop Tools实机验证。
 
 17. **召唤英雄的攻击射程写入与读取接口不对称。**

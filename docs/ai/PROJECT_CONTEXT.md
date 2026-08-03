@@ -52,7 +52,7 @@
 - 英雄力量、敏捷、智力是项目逻辑三维：由服务端战斗快照统一计算和发布，不写入 Dota 原生三维。逻辑三维本身不提供攻速、护甲、生命、魔法或主属性攻击，只供 UI 和明确按三维结算的技能/装备效果读取。
 - Panorama 源码不在当前 `game` 插件目录中，而在对应的内容目录：`D:\steam\steamapps\common\dota 2 beta\content\dota_addons\survival\panorama`。
 - 游戏实际加载的 Panorama 编译产物位于：`D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\panorama`。
-- 历史Lua 5.1检查器`C:\msys64\mingw64\bin\luac5.1.exe`在2026-08-02已确认不存在；当前WinGet目录提供Lua/Luac 5.4.5，只能作为当前版本语法检查，不能宣称Lua 5.1兼容。
+- 当前Lua 5.1解释器/检查器为`C:\Program Files\lua\bin\lua5.1.exe`与`C:\Program Files\lua\bin\luac5.1.exe`，均已在2026-08-03确认版本5.1.5；目录未加入PATH，必须使用绝对路径或`tools/test_lua51_syntax.ps1`。旧`C:\msys64\mingw64\bin`路径已失效。
 
 ## AI 会话恢复协议
 

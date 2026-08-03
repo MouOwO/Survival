@@ -235,7 +235,7 @@
 - `BLADE_PULSE_STATE_LUA51_PASS` / `BLADE_PULSE_CONTRACT_PASS`
 - 相关生产、配置和测试 Lua 均通过 `luac5.1 -p`；严格 UTF-8 检查通过；限定范围 `git diff --check` 通过；CSV与生成Lua关键字段一致。
 - Workshop Tools冷启动确认三颗Mortimer Kisses弹体的朝向、速度、同步落地、CP3冲击位置、重叠表现及无粒子残留。
-- 当前历史Lua 5.1编译器路径已失效；目标Lua已通过当前可用Lua 5.4.5语法检查，不能宣称Lua 5.1验证通过。
+- 该检查点执行时历史Lua 5.1路径不可用，只完成了Lua 5.4.5检查；2026-08-03已在`C:\Program Files\lua\bin`恢复Lua 5.1.5工具，并完成当前`scripts/vscripts`全部306个Lua文件的`luac5.1 -p`验证。
 - 全量63个Lua测试中54个通过、9个既有无关测试失败；目标爆炎弹状态测试及全部相邻视觉状态/契约均通过，失败清单已记录在`SESSION_LOG.md`。
 
 ## 后续优化与剩余确认

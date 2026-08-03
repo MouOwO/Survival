@@ -1513,3 +1513,22 @@
 - 审计确认服务顶层共有202个声明，且该文件在本轮模型任务前没有未提交差异。采用最小行为等价修复：把末尾`trigger`、`roll`、`on_main_attack`改为既有模块表`M`上的内部方法，并同步两处调用和事件订阅引用；顶层声明降至199，未修改CSV、技能数值、随机判定、伤害事务或生命周期。
 - 自动验证通过：`hero_passive_skill_service.lua`、`hero_exclusive_passive_service.lua`和`addon_game_mode.lua`的Lua 5.1语法；回音重斩、地裂冲击、陨石、元气弹、龙卷、脉冲激射、爆炎弹、毒云8项Lua 5.1状态测试；`FREE_HERO_EXCLUSIVE_STATE_LUA51_PASS`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、严格UTF-8及目标`git diff --check`。
 - 自动验证证明原编译阻断已消除，但不等同于Dota实机启动。下一步必须完全停止并重新Run Workshop Tools，先确认地图可进入且控制台不再出现200-local错误，再继续模型尺寸、动画和切模验收。用户原有`卡牌文本.txt`及模型任务全部既有修改均未触碰或回滚。
+
+## 2026-08-03 — 伐木工动态资源Tooltip与Lua 5.1全项目验证
+
+- 稳定性边界：继续保留Valve原生技能栏和既有Alt隔离，只把已经具有完整权威runtime投影的`ability_train_lumberjack`加入选择性Tooltip代理；未把修理工、人口训练或通用建造技能扩大接管，也没有新增扫描、永久计时器或Alt事件。
+- 费用表现：自定义技能Tooltip使用静态Panorama `Image + Label`分别显示金币和木材；改用项目现有`st2_icon_gold.png`与`st2_icon_wood.png`真实资源图标。金币/木材费用块按大于0独立显隐，两者都为0时隐藏整行，避免显示无意义的0。
+- 动态数据：真实`ability_runtime_builder.lua`在Lua 5.1测试桩下确认一级伐木工投影木材10、金币0、人口1；木材恰好10时`can_afford=1`，木材9时`can_afford=0`。服务端训练扣费与点击路由未修改。
+- 工具链记录：确认`C:\Program Files\lua\bin\lua5.1.exe`和`luac5.1.exe`均为Lua 5.1.5；PowerShell 7为`C:\Program Files\PowerShell\7\pwsh.exe` 7.6.4，Windows PowerShell为系统5.1.18362.2212。实际路径已写入`.cline/local-toolchain.json`和`KNOWN_ISSUES.md`。
+- Lua 5.1全项目验证：首次直接逐文件检查发现仅7个历史Lua文件因UTF-8 BOM在第1字节被PUC Lua 5.1拒绝；字节审计确认BOM后的内容均为严格UTF-8且文件没有既有工作区差异。为保持本次Tooltip改动最小，没有修改这7个生产源文件；最终仅在临时副本中删除三个BOM字节后完成`scripts/vscripts`下306/306个Lua文件的`luac5.1 -p`，结果明确报告`bom_normalized=7`。
+- 可重复验证：新增兼容Windows PowerShell 5.1与PowerShell 7的`tools/test_lua51_syntax.ps1`，优先读取本地工具链记录，对无BOM文件直接检查，对BOM文件使用自动清理的临时副本。当前工作树没有任何`test_*.lua`文件，历史文档中的Lua行为测试套件不在仓库内，不能冒充本轮全量行为回归。
+- Panorama编译：`ability_tooltip.js`和`ability_tooltip.css`各为`OK: 1 compiled, 0 failed, 0 skipped`；`survival_hud.xml`依赖链为`OK: 9 compiled, 0 failed, 0 skipped`，并实际生成金币/木材`*_png.vtex_c`。升级Tooltip契约和Alt安全契约均在PowerShell 7与Windows PowerShell 5.1通过。
+- 尚需实机：完全停止并重新Run Workshop Tools，悬停一级与高等级伐木工确认单木材/金币木材并排、费用实时变化、鼠标与快捷键训练正常；重复按住/松开Alt和快速切换主城/英雄，确认无双Tooltip、无输入残留且不崩溃。自动编译和契约不能替代该实机崩溃验收。
+
+## 2026-08-03 — 伐木工Tooltip主城选择映射修复第一版
+
+- 用户实机截图显示悬停目标仍出现Valve原生“升级主城”Tooltip，未显示伐木工金币/木材；确认原生Tooltip无法读取项目`survival_ability_runtime`中的双资源费用，因此继续使用窄范围选择性自定义Tooltip，不接管整行技能栏。
+- 修复`ability_tooltip.js`的官方按钮映射：不再把原始`AbilityN`编号直接当作稠密显示序号，而是收集当前稳定可见的官方按钮锚点、按窗口视觉位置排序，再与当前单位的真实可见ability entindex配对。悬停与点击统一读取代理上绑定的entindex，避免显示伐木工却施放升级主城或反向错位。
+- 原子安全回退：每次映射前关闭全部旧`AbilityN`代理；官方按钮数与真实可见技能数不一致时保持Valve原生交互，不启用部分映射。新增去重`[SURVIVAL_TOOLTIP_MAP]`日志，可直接观察`AbilityN->ability_name`或fallback数量。
+- 选择恢复：订阅本地`dota_player_update_selected_unit`和`dota_player_update_query_unit`；切换时先关闭旧Tooltip，再以`0/0.016/0.05/0.10/0.20s`有限重试绑定。初次HUD创建单独保留原有`0/0.10/0.35/1.0s`窗口；没有新增永久扫描、哨兵循环或Alt事件。
+- 自动验证：`ability_tooltip.js`经Dota资源编译器强制编译为`OK: 1 compiled, 0 failed, 0 skipped`；建筑升级/Tooltip契约与Alt安全契约在PowerShell 7及Windows PowerShell 5.1均通过；全项目Lua 5.1语法`306/306`通过，7个历史BOM仅在临时副本规范化；限定`git diff --check`通过。仍需彻底停止并重新Run后实机确认主城伐木工悬停、点击、快捷键、Alt和快速选中切换。
