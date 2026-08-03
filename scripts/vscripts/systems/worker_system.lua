@@ -371,6 +371,10 @@ local function train_worker(payload)
         worker:AddNewModifier(worker, nil, "modifier_debug_attack_cap", {})
     end
     worker:SetBaseMoveSpeed(tonumber(training.move_speed) or config.move_speed)
+    if training.model_name and training.model_name ~= "" then
+        worker:SetModel(training.model_name)
+        worker:SetOriginalModel(training.model_name)
+    end
     local is_repairer = training_id:match("^train_repairer_") ~= nil
     local technology_efficiency = 0
     if is_repairer then
@@ -380,10 +384,6 @@ local function train_worker(payload)
             worker:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
         end
         worker.survival_worker_type = "repairer"
-        if training.model_name and training.model_name ~= "" then
-            worker:SetModel(training.model_name)
-            worker:SetOriginalModel(training.model_name)
-        end
         worker:AddNewModifier(worker, nil, "modifier_repair_worker_ai", {
             repair_per_second = tonumber(training.repair_per_second) or 0,
             repair_range = tonumber(training.repair_range) or 200,

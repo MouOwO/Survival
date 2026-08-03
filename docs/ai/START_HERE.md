@@ -4,7 +4,10 @@
 
 ## 当前状态
 
-- 当前活跃任务：资源树`enemy_tree`只承受引擎基础普通攻击伤害；技能、脚本和攻击触发附伤全部无效。所有箭塔及转职塔不得自动或手动攻击树。生产实现与自动验证已完成，专项合同、Lua 5.1行为、Lua 5.1语法、严格UTF-8和限定diff检查均通过；下一步是在Workshop Tools验证自动选敌、手动攻击命令、实际扣血分类和树耗尽升级。未经实机验证及用户确认，不得记录为制作完成。
+- 紧急阻断已修复：`hero_passive_skill_service.lua`曾因顶层chunk拥有202个local而超过Lua 5.1的200-local上限，导致`addon_game_mode.lua`无法加载。末尾`trigger/roll/on_main_attack`现改为模块表方法，顶层声明降至199；Lua 5.1语法、8项公共技能状态和四英雄专属回归已通过。仍需完全停止并重新Run Workshop Tools确认地图实际进入。
+- 当前活跃任务：资源树、召唤祭坛、主城、伐木工LV1至LV5及修理工LV1至LV2模型替换。CSV权威配置、定向生成、运行时应用、KV首帧回退与模型预缓存已完成；11个模型均在当前Dota VPK中确认存在，专项合同、Lua 5.1行为/语法、生成一致性、编码列数、限定diff及树伤害回归通过。下一步在Workshop Tools确认树尺寸、工人动画、主城五级缩放/切模及祭坛尺寸，未经实机验证和用户确认不得记录为制作完成。
+
+- 已完成实现、待实机验收：资源树`enemy_tree`只承受引擎基础普通攻击伤害；技能、脚本和攻击触发附伤全部无效。所有箭塔及转职塔不得自动或手动攻击树。生产实现与自动验证已完成；下一步是在Workshop Tools验证自动选敌、手动攻击命令、实际扣血分类和树耗尽升级。未经实机验证及用户确认，不得记录为制作完成。
 
 - 四名免费英雄替换、固定Q槽专属技能、地狱火/小游侠活动锁及两种召唤物100%攻速继承已完成；用户于2026-08-02明确确认任务成功并验收通过。本任务不再作为活跃任务恢复，除非用户以后报告具体回归或提出新需求。
 
@@ -21,6 +24,13 @@
 
 ## 最后可靠检查点
 
+- 日期：2026-08-03
+- 已消除阻断地图加载的Lua 5.1顶层local上限错误：`hero_passive_skill_service.lua`由202个顶层声明降至199，`luac5.1 -p`确认主服务、专属服务和`addon_game_mode.lua`通过。
+- 下一步：完全停止并重新Run Workshop Tools；先确认不再出现`main function has more than 200 local variables`，再继续模型实机验收。
+- 日期：2026-08-03
+- 模型替换已完成：资源树使用Mango Tree；伐木工LV1至LV5和修理工LV1至LV2使用用户指定模型；祭坛使用tower_good4；主城LV1至LV3使用tower_good逐级放大，LV4至LV5使用tower_good3逐级放大。
+- 权威源为`training_definitions.csv`、`building_visual_levels.csv`和`world_visual_definitions.csv`；生成配置逐字节一致，11个模型通过VPK索引验证。
+- 下一步：完全停止并重新Run Workshop Tools，逐项确认实际模型、尺寸、动画、朝向、主城升级切模及无粉色/无模型残留。
 - 日期：2026-08-02
 - 四英雄替换任务已获用户明确成功确认；稳定实现与维护经验已写入`PROJECT_CONTEXT.md`，验收结论已追加到`SESSION_LOG.md`。
 - 地狱火和小游侠的攻速继承使用触发瞬间权威战斗快照：`attack_speed`表示每秒攻击次数，召唤物按100%继承并使用`SetBaseAttackTime(1 / attack_speed)`应用。

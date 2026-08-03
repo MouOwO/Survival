@@ -1,5 +1,6 @@
 local building_levels = require("config/generated/building_levels")
 local building_definitions = require("config/generated/building_definitions")
+local building_visual_levels = require("config/generated/building_visual_levels")
 local wall_visual_levels = require("config/generated/wall_visual_levels")
 local construction_rules = require(
     "config/generated/building_construction_rules"
@@ -59,12 +60,22 @@ for _, row in ipairs(wall_visual_levels.rows or {}) do
     if row.enabled ~= false then wall_visual_by_level[row.level] = row end
 end
 
+local building_visual_by_id = {}
+for _, row in ipairs(building_visual_levels.rows or {}) do
+    if row.enabled ~= false then
+        building_visual_by_id[row.building_id] =
+            building_visual_by_id[row.building_id] or {}
+        building_visual_by_id[row.building_id][row.level] = row
+    end
+end
+
 local function level_rows(building_id)
     local result = {}
     for _, row in ipairs(building_levels.rows or {}) do
         if row.enabled ~= false and row.building_id == building_id then
             local visual = building_id == "building_wall"
                 and wall_visual_by_level[row.level] or nil
+            visual = visual or ((building_visual_by_id[building_id] or {})[row.level])
             result[row.level] = {
                 level = row.level,
                 display_name = row.display_name,
@@ -72,7 +83,7 @@ local function level_rows(building_id)
                 armor = dota_armor(row.war3_armor or row.armor),
                 requires_city_level = row.requires_city_level,
                 prerequisite_text = row.prerequisite_text,
-                model_name = row.model_name,
+                model_name = visual and visual.model_name or row.model_name,
                 model_asset_id = visual and visual.model_asset_id or nil,
                 model_scale = visual and visual.model_scale or nil,
                 model_yaw = visual and visual.model_yaw or nil,
@@ -188,7 +199,11 @@ M.building_research_lab = {
 }
 
 M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
-M.hero_altar = { id = "hero_altar", display_name = configured_name("hero_altar", "英雄祭坛"), unit_name = configured_unit_name("hero_altar", "building_hero_altar"), build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_summon_doom", "ability_summon_shadow_fiend", "ability_summon_axe", "ability_summon_drow_ranger", "ability_summon_monkey_king", "ability_summon_blademaster", "ability_enter_endless_training", "ability_enter_shadow_realm" }, levels = { [1] = { health = 2500, armor = dota_armor(8) } } }
+local hero_altar_levels = level_rows("building_hero_altar")
+hero_altar_levels[1] = hero_altar_levels[1] or {}
+hero_altar_levels[1].health = hero_altar_levels[1].health or 2500
+hero_altar_levels[1].armor = hero_altar_levels[1].armor or dota_armor(8)
+M.hero_altar = { id = "hero_altar", display_name = configured_name("hero_altar", "英雄祭坛"), unit_name = configured_unit_name("hero_altar", "building_hero_altar"), build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_summon_doom", "ability_summon_shadow_fiend", "ability_summon_axe", "ability_summon_drow_ranger", "ability_summon_monkey_king", "ability_summon_blademaster", "ability_enter_endless_training", "ability_enter_shadow_realm" }, levels = hero_altar_levels }
 
 M.wall = apply_construction(M.wall, "wall")
 M.main_city = apply_construction(M.main_city, "main_city")

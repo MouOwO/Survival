@@ -3207,7 +3207,7 @@ local runners = {
     proto_void_pulse = run_void,
 }
 
-local function trigger(payload, skill_id, level, attributes, target_position)
+function M._trigger(payload, skill_id, level, attributes, target_position)
     local definition = definitions.by_id[skill_id]
     local runner = runners[skill_id]
     if not definition or not runner then return false end
@@ -3237,7 +3237,7 @@ local function trigger(payload, skill_id, level, attributes, target_position)
     return true
 end
 
-local function roll(payload, skill_id, level, attributes, target_position)
+function M._roll(payload, skill_id, level, attributes, target_position)
     local definition = definitions.by_id[skill_id]
     if not definition then return false end
     if skill_id == "proto_echo_slash" and not target_position then
@@ -3289,10 +3289,10 @@ local function roll(payload, skill_id, level, attributes, target_position)
         end
     end
     if random_value >= chance then return false end
-    return trigger(payload, skill_id, level, attributes, target_position)
+    return M._trigger(payload, skill_id, level, attributes, target_position)
 end
 
-local function on_main_attack(payload)
+function M._on_main_attack(payload)
     if payload.is_multishot_secondary == true or payload.is_main_attack == false then return end
     if not alive(payload.attacker) or not valid(payload.target) then return end
     local attack_id = tostring(payload.attack_id or "")
@@ -3306,7 +3306,7 @@ local function on_main_attack(payload)
     for _, definition in ipairs(definitions.rows) do
         local level = owned[definition.skill_id]
         if level and definition.trigger_type == "main_attack_landed" then
-            roll(payload, definition.skill_id, level, attributes)
+            M._roll(payload, definition.skill_id, level, attributes)
         end
     end
 
@@ -3398,7 +3398,7 @@ function M.init()
     tornado_slow_units = {}
     tornado_task = nil
     effect_sequence = 0
-    event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_main_attack)
+    event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, M._on_main_attack)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_poison_cloud_death)
 end
 

@@ -1,4 +1,10 @@
 local armor_balance = require("config/armor_balance")
+local world_visuals = require("config/generated/world_visual_definitions")
+
+local tree_asset = assert(
+    (world_visuals.by_id or {}).world_resource_tree,
+    "world_visual_definitions.csv must define world_resource_tree"
+)
 
 local source_levels = {
     { level = 1, health = 100000, war3_armor = -2, war3_minimum_armor = -2 },
@@ -47,8 +53,8 @@ end
 
 local M = {
     unit_name = "enemy_tree",
-    model_name = "models/heroes/furion/treant.vmdl",
-    model_scale = 3,
+    model_name = tree_asset.model_name,
+    model_scale = tree_asset.model_scale,
     spawn_point = { x = 832, y = -64, z = 128 },
     footprint = { x = 2, y = 2 },
     grid_cell_size = 64,

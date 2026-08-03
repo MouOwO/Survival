@@ -1446,3 +1446,38 @@
 - 并发工作区事件：任务期间外部进程把生产与初版文档提交到新HEAD`00bfe05`，同时修改`.gitignore`并产生无关未跟踪`卡牌文本.txt`。按规则暂停后，用户明确选择接受新HEAD、保留外部`.gitignore`并继续验证；未回滚、覆盖或编辑这些外部内容。
 - 外部`.gitignore`第103至104行忽略本次`tools/test_tree_damage_rules.lua`与`tools/test_tree_damage_rules_contract.ps1`。两文件仍在磁盘且已执行通过，但未纳入Git状态；用户已明确接受该交付限制。
 - 尚未进行Workshop Tools实机验证，不能称为实机通过或用户验收。下一步只验证塔自动/手动忽略树、非塔基础平A扣血、所有额外伤害不扣血，以及树最低1血后的正常升级刷新。
+
+## 2026-08-03 — 新任务检查点：资源树、祭坛、主城、伐木工与修理工分级模型替换
+
+- 用户开启新需求，要求先替换资源树、召唤祭坛、伐木工LV1至LV5及修理工LV1至LV2模型，并明确要求把对应关系写入CSV权威配置。
+- 资源树指定为`models/props_tree/mango_tree.vmdl`；召唤祭坛指定为`models/props_structures/tower_good4.vmdl`。伐木工与修理工逐级路径已完整记录在`CURRENT_TASK.md`。
+- 主城要求LV1至LV3使用同一模型逐级放大，LV4至LV5换成另一座类似高塔且更神圣的模型；用户授权先参考资源并自行选出一版。
+- 当前尚未调查模型配置链或修改生产文件。下一步唯一动作：检查Git状态，读取相关CSV与生成配置，搜索单位创建、升级、SetModel/SetModelScale、KV和预缓存消费链，并验证本机模型资源存在性。
+
+## 2026-08-03 — 模型配置链调查完成并固定第一版主城选型
+
+- 使用Python只读解析当前Dota`pak01_dir.vpk`的VPK v2目录树，共索引383571个文件；用户指定的Mango Tree、tower_good4、五个伐木工和两个修理工模型均确认存在。
+- Valve Good Tower模型族实际包含`tower_good.vmdl`、`tower_good2.vmdl`、`tower_good3.vmdl`、`tower_good4.vmdl`，不存在`tower_good1.vmdl`。主城第一版选择LV1至LV3为`tower_good.vmdl`、缩放0.55/0.65/0.75，LV4至LV5为`tower_good3.vmdl`、缩放0.80/0.95；祭坛使用指定`tower_good4.vmdl`并保留0.34缩放。
+- 工人权威链：`training_definitions.csv`已有`model_name`列，`worker_system.lua`按具体训练等级创建实体；当前只对修理工应用模型，需要提升为所有单位训练行共用。伐木工LV6至LV8未获模型要求，保持空值和既有KV回退。
+- 主城权威等级来自`building_levels.csv`，建造完成和升级均会调用`building_visual_service.apply()`；但该CSV为GB18030且已有编码/生成不一致风险。采用与`wall_visual_levels.csv`相同的独立视觉投影方式，新建UTF-8`building_visual_levels.csv`，由`buildings_config.lua`合并到主城及祭坛等级数据。
+- 资源树当前由`tree_config.lua`手写模型，运行时`tree_system.lua`应用；已有`asset_catalog.csv`的`world_resource_tree`身份，因此改为由该CSV生成资产行提供模型，保留既有缩放3。
+- 所有新增建筑模型登记到`asset_catalog.csv`并进入现有预加载服务；工人模型由`training_definitions.csv`生成后在游戏模式预缓存阶段遍历预加载。
+- 下一步：修改权威CSV和最小运行时适配，定向生成相关Lua，补充模型契约与Lua行为测试。
+
+## 2026-08-03 — 分级模型替换实现与自动验证完成
+
+- 权威CSV完成：`training_definitions.csv`写入伐木工LV1至LV5、修理工LV1至LV2模型；新增`building_visual_levels.csv`保存主城五级与祭坛模型/缩放；新增`world_visual_definitions.csv`保存资源树Mango Tree与缩放3。
+- 运行时完成：`worker_system.lua`统一应用任意工人训练行的`model_name`；`tree_config.lua`读取世界视觉生成表；`buildings_config.lua`按建筑和等级合并视觉行，祭坛改为复用`building_levels.csv`等级行并保留2500生命/8点War3护甲回退。
+- 引擎边界完成：`npc_units_custom.txt`同步资源树、主城LV1、祭坛、伐木工LV1和修理工LV1回退模型；`addon_game_mode.lua`补修理工单位预缓存，并遍历工人、建筑视觉和世界视觉生成配置去重预缓存模型。
+- 方案调整：曾考虑复用`asset_catalog.csv`，中间检查发现其表头已扩展为27列而大量历史行仍为22列，严格生成会失败。已精确撤回本轮对该文件的改动并确认`ASSET_CATALOG_UNTOUCHED_PASS`；没有批量改写历史资产表或有编码风险的`building_levels.csv`。
+- 模型取证：从当前Dota VPK v2目录索引确认11个实际引用模型全部存在，输出`UNIT_MODEL_VPK_INDEX_PASS 11`。其中`tower_good1.vmdl`不存在，因此主城低阶使用实际存在的`tower_good.vmdl`。
+- 自动验证通过：`UNIT_MODEL_CONFIG_CONTRACT_PASS`、`UNIT_MODEL_CONFIG_LUA51_PASS`、`UNIT_MODEL_ALL_LUAC51_PASS`、`UNIT_MODEL_GENERATED_COMPARE_PASS`、`UNIT_MODEL_ENCODING_AND_COLUMNS_PASS`、`UNIT_MODEL_DIFF_CHECK_PASS`；树规则回归`TREE_DAMAGE_RULES_CONTRACT_PASS`和`TREE_DAMAGE_RULES_LUA51_PASS`通过。
+- 编码边界：两个新CSV及生成Lua为严格UTF-8；既有`training_definitions.csv`保持GB18030原编码，只对ASCII模型字段做字节级替换，27列结构完整，未整表转码。
+- 尚未验证：Workshop Tools实际尺寸、动画、朝向、主城LV3到LV4切模、祭坛0.34缩放、Mango Tree缩放3及血条位置。下一步完全重启Run后逐项验收，不能把自动测试称为实机通过。
+
+## 2026-08-03 — 紧急修复公共被动服务Lua 5.1顶层local溢出
+
+- 用户在Workshop Tools启动时报告`addon_game_mode.lua:83`无法require`systems/hero_passive_skill_service`；本机`luac5.1 -p`精确复现真实编译错误：第3240行声明时主函数超过200个local。
+- 审计确认服务顶层共有202个声明，且该文件在本轮模型任务前没有未提交差异。采用最小行为等价修复：把末尾`trigger`、`roll`、`on_main_attack`改为既有模块表`M`上的内部方法，并同步两处调用和事件订阅引用；顶层声明降至199，未修改CSV、技能数值、随机判定、伤害事务或生命周期。
+- 自动验证通过：`hero_passive_skill_service.lua`、`hero_exclusive_passive_service.lua`和`addon_game_mode.lua`的Lua 5.1语法；回音重斩、地裂冲击、陨石、元气弹、龙卷、脉冲激射、爆炎弹、毒云8项Lua 5.1状态测试；`FREE_HERO_EXCLUSIVE_STATE_LUA51_PASS`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、严格UTF-8及目标`git diff --check`。
+- 自动验证证明原编译阻断已消除，但不等同于Dota实机启动。下一步必须完全停止并重新Run Workshop Tools，先确认地图可进入且控制台不再出现200-local错误，再继续模型尺寸、动画和切模验收。用户原有`卡牌文本.txt`及模型任务全部既有修改均未触碰或回滚。

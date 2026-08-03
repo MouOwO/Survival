@@ -474,11 +474,34 @@ function M.precache(context)
         "building_hero_altar",
         "npc_survival_upgrade_material",
         "npc_survival_lumberjack",
+        "npc_survival_repairer",
         "enemy_tree",
         "npc_survival_wave_monster",
     }
     for _, unit_name in ipairs(units) do
         PrecacheUnitByNameSync(unit_name, context)
+    end
+    local training_definitions = require("config/generated/training_definitions")
+    local precached_worker_models = {}
+    for _, row in ipairs(training_definitions.rows or {}) do
+        local model_name = tostring(row.model_name or "")
+        if model_name ~= "" and not precached_worker_models[model_name] then
+            PrecacheResource("model", model_name, context)
+            precached_worker_models[model_name] = true
+        end
+    end
+    for _, module_name in ipairs({
+        "config/generated/building_visual_levels",
+        "config/generated/world_visual_definitions",
+    }) do
+        local definitions = require(module_name)
+        for _, row in ipairs(definitions.rows or {}) do
+            local model_name = tostring(row.model_name or "")
+            if model_name ~= "" and not precached_worker_models[model_name] then
+                PrecacheResource("model", model_name, context)
+                precached_worker_models[model_name] = true
+            end
+        end
     end
     PrecacheResource(
         "particle",

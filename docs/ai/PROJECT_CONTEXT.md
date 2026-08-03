@@ -1,5 +1,18 @@
 # Project Context
 
+## Lua 5.1顶层local上限（2026-08-03）
+
+- Lua 5.1单个函数（包括模块主chunk）最多允许200个活跃local；`hero_passive_skill_service.lua`曾在第201个声明处编译失败，使Dota把真实编译错误包装成`module not found`并阻断`addon_game_mode.lua`加载。
+- 该服务末尾的内部入口使用既有模块表`M._trigger/M._roll/M._on_main_attack`保存，不再占用顶层local槽；当前源码顶层声明为199。后续增加公共技能函数前必须运行`luac5.1 -p`，不能只依赖较新Lua版本或把首行`module not found`误判为路径问题。
+
+## 世界、工人和普通建筑分级模型配置（2026-08-03）
+
+- 资源树视觉权威源是`data/csv/资源系统/world_visual_definitions.csv`，由`config/tree_config.lua`读取生成表并由`tree_system.lua`应用；单位KV只保留首帧/异常回退。
+- 伐木工和修理工分级模型直接使用`training_definitions.csv.model_name`，`worker_system.lua`在具体训练行创建实体后统一应用。不要为工人另建重复等级视觉表。
+- 主城与召唤祭坛视觉权威源是`building_visual_levels.csv`；`buildings_config.lua`按`building_id+level`合并到`building_levels.csv`的战斗等级数据，建造完成和升级均复用`building_visual_service.apply()`。
+- 普通建筑视觉表可直接使用`model_name/model_scale/model_yaw`，不强制进入复杂塔套装的`asset_catalog.csv`。当前`asset_catalog.csv`存在27列表头与大量22列历史行不一致，未修复前不得为普通模型任务强行生成或批量补列。
+- 新增分级模型必须同步：CSV、生成Lua、运行时消费者、模型预缓存和单位KV的LV1回退；模型路径需从当前`pak01_dir.vpk`索引确认，自动验证不能代替Workshop Tools中的尺寸、动画和朝向验收。
+
 ## 资源树承伤与箭塔目标规则（2026-08-03）
 
 - 资源树单位身份是`GetUnitName() == "enemy_tree"`；箭塔及全部转职塔的稳定身份是`survival_building_id == "arrow_tower"`，不要只按引擎单位名识别转职塔。

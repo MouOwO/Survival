@@ -1,6 +1,38 @@
 # Current Task
 
-## 活跃任务（2026-08-03）：资源树仅承受基础平A，防御塔禁止攻击树
+## 活跃任务（2026-08-03）：资源树、祭坛、主城、伐木工与修理工分级模型替换
+
+- 用户要求先替换以下模型，并将模型映射写入`data/csv/`权威配置，再通过项目生成链同步运行配置：
+  - 资源树：`models/props_tree/mango_tree.vmdl`；
+  - 召唤祭坛：`models/props_structures/tower_good4.vmdl`；
+  - 伐木工LV1：`models/creeps/lane_creeps/creep_radiant_melee/radiant_melee.vmdl`；
+  - 伐木工LV2：`models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_melee.vmdl`；
+  - 伐木工LV3：`models/creeps/lane_creeps/creep_bad_melee/creep_bad_melee_cavern_mega.vmdl`；
+  - 伐木工LV4：`models/creeps/lane_creeps/creep_2021_radiant/creep_2021_radiant_melee_mega.vmdl`；
+  - 伐木工LV5：`models/creeps/lane_creeps/creep_dire_hulk/creep_dire_diretide_ancient_hulk.vmdl`；
+  - 修理工LV1：`models/creeps/neutral_creeps/n_creep_eimermole/n_creep_eimermole.vmdl`；
+  - 修理工LV2：`models/creeps/neutral_creeps/n_creep_eimermole/n_creep_eimermole_lamp.vmdl`。
+- 主城第一版已完成资源取证并固定为：LV1至LV3使用`models/props_structures/tower_good.vmdl`，缩放依次为0.55/0.65/0.75；LV4至LV5切换为更修长的`models/props_structures/tower_good3.vmdl`，缩放依次为0.80/0.95。祭坛使用指定的`tower_good4.vmdl`并暂时沿用当前0.34缩放。`tower_good1.vmdl`在当前VPK中不存在，不能使用。
+- 当前Dota`pak01_dir.vpk`已确认用户指定的九个模型以及主城`tower_good.vmdl`、`tower_good3.vmdl`全部存在。资源树保留既有运行时缩放3；本轮未指定的伐木工LV6至LV8保持原状，不编造模型。
+- 配置落点已确定：工人使用既有`training_definitions.csv.model_name`；资源树使用新增UTF-8的`world_visual_definitions.csv`；主城与祭坛使用新增UTF-8的`building_visual_levels.csv`并由`building_visual_service`消费，避免重写当前GB18030且有已知风险的`building_levels.csv`和结构不一致的`asset_catalog.csv`。
+- 修改前必须调查相关CSV、生成Lua、单位KV、运行时模型/缩放消费位置、预缓存和现有测试；原则上不直接修改`config/generated/`。
+- 验证至少包含模型路径存在性、CSV与生成配置一致性、相关Lua语法、专项契约、严格UTF-8、限定`git diff --check`；模型实际尺寸、动画、骨骼、碰撞和高塔观感仍需Workshop Tools实机验收。
+
+### 实施结果与当前状态
+
+- 2026-08-03实机启动前发现紧急阻断：`addon_game_mode.lua`加载`hero_passive_skill_service.lua`时，Lua 5.1报告主chunk超过200个local。已将末尾`trigger`、`roll`和`on_main_attack`改为既有模块表`M`的方法并同步内部引用，顶层声明由202降至199，未改变随机、事件订阅或技能结算行为。
+- 紧急修复自动验证通过：主服务、专属服务和`addon_game_mode.lua`的`luac5.1 -p`；回音重斩、地裂冲击、陨石、元气弹、龙卷、脉冲、爆炎、毒云8项Lua 5.1状态回归；四英雄专属状态/契约；严格UTF-8和限定diff检查。仍需完全重启Workshop Tools确认实际地图可进入。
+- 已新增`building_visual_levels.csv`：主城LV1至LV3使用`tower_good.vmdl`并按0.55/0.65/0.75逐级放大；LV4至LV5切换`tower_good3.vmdl`并使用0.80/0.95；召唤祭坛使用`tower_good4.vmdl`和0.34缩放。
+- 已新增`world_visual_definitions.csv`：资源树由CSV提供`mango_tree.vmdl`和既有缩放3；`tree_config.lua`不再手写树模型。
+- `training_definitions.csv`已写入伐木工LV1至LV5和修理工LV1至LV2模型；`worker_system.lua`对所有工人统一应用训练行的`model_name`。未指定的伐木工LV6至LV8继续使用单位KV回退模型。
+- `npc_units_custom.txt`同步资源树、主城、祭坛、伐木工LV1和修理工LV1的引擎创建壳回退模型；分级切换仍由CSV与Lua权威控制。`addon_game_mode.lua`会从三份生成配置中去重预缓存全部模型，并补充修理工单位预缓存。
+- `asset_catalog.csv`因历史表头27列而多数既有行只有22列，不能在本任务安全生成；已排除该落点并确认该文件没有本轮差异。本任务改用两个结构完整的独立UTF-8视觉CSV，未重写有编码风险的`building_levels.csv`。
+- 自动验证通过：`UNIT_MODEL_CONFIG_CONTRACT_PASS`、`UNIT_MODEL_CONFIG_LUA51_PASS`、`UNIT_MODEL_ALL_LUAC51_PASS`、`UNIT_MODEL_GENERATED_COMPARE_PASS`、`UNIT_MODEL_VPK_INDEX_PASS 11`、`UNIT_MODEL_ENCODING_AND_COLUMNS_PASS`、`UNIT_MODEL_DIFF_CHECK_PASS`；资源树承伤回归`TREE_DAMAGE_RULES_CONTRACT_PASS`和`TREE_DAMAGE_RULES_LUA51_PASS`通过。
+- 尚未进行Workshop Tools实机验收。需确认Mango Tree在缩放3下的尺寸与血条位置；五级伐木工和两级修理工动画/朝向；主城LV1至LV5的尺寸、切模和神圣高塔观感；祭坛0.34缩放是否合适；模型碰撞仍由单位壳而非视觉模型决定。
+
+## 已完成实现、待实机验收（2026-08-03）：资源树仅承受基础平A，防御塔禁止攻击树
+
+## 已完成实现、待实机验收（2026-08-03）：资源树仅承受基础平A，防御塔禁止攻击树
 
 - 用户要求`enemy_tree`只承受引擎基础普通攻击伤害；任何技能、脚本、持续、范围及平A触发的技能/装备附伤都不得扣树生命。
 - 英雄、伐木工、波次怪、挑战怪和召唤物等非防御塔单位的基础平A仍可伤树。

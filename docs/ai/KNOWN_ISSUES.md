@@ -2,6 +2,10 @@
 
 ## 当前已知问题
 
+0. **Lua 5.1会把被require模块的编译失败同时显示为`module not found`。**
+   - 2026-08-03实际表现为`module 'systems/hero_passive_skill_service' not found`，同一条搜索诊断后紧跟真实原因`main function has more than 200 local variables`。
+   - 根因是主服务顶层chunk拥有202个local；已将三个末尾入口挂到模块表，使声明数降至199并通过`luac5.1 -p`。排查同类问题必须优先阅读`module not found`后附带的目标文件编译错误。
+
 0. **`SESSION_LOG.md`历史内容已有3个`U+FFFD`替换字符。**
    - 2026-08-02严格UTF-8检查确认整份文件可以正常解码，但本次四英雄验收记录之前的历史区域已有3个Unicode替换字符；本次新增经验段落不含乱码。
    - 不得通过另存编码或整文件转码掩盖损坏，也不得猜测原文。未来若要修复，必须从可信历史副本恢复对应文本，并单独验证差异。
