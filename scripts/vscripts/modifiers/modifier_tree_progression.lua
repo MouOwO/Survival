@@ -1,4 +1,5 @@
 local scheduler = require("core/scheduler")
+local tree_damage_rules = require("systems/tree_damage_rules")
 
 modifier_tree_progression = class({})
 local M = modifier_tree_progression
@@ -11,8 +12,19 @@ function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 function M:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_MIN_HEALTH,
+        MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE,
         MODIFIER_EVENT_ON_TAKEDAMAGE,
     }
+end
+
+function M:GetModifierIncomingDamage_Percentage(params)
+    if tree_damage_rules.allows_damage(
+            params and params.attacker,
+            self:GetParent(),
+            params and params.damage_category) then
+        return 0
+    end
+    return -100
 end
 
 function M:GetMinHealth()

@@ -1,11 +1,16 @@
 LinkLuaModifier("modifier_tower_auto_attack", "modifiers/modifier_tower_auto_attack", LUA_MODIFIER_MOTION_NONE)
 local global_rules = require("config/global_rules")
+local tree_damage_rules = require("systems/tree_damage_rules")
 modifier_tower_auto_attack = class({})
 _G.modifier_tower_auto_attack = modifier_tower_auto_attack
 
 function modifier_tower_auto_attack:IsHidden() return true end
 function modifier_tower_auto_attack:IsPurgable() return false end
 function modifier_tower_auto_attack:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
+
+function modifier_tower_auto_attack:DeclareFunctions()
+    return { MODIFIER_EVENT_ON_ATTACK_START }
+end
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
@@ -32,11 +37,23 @@ local function find_target(tower)
         local distance = valid(unit)
             and (unit:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
             or 99999
-        if valid(unit) and distance <= attack_range + 64 then
+        if valid(unit) and not tree_damage_rules.is_tree(unit)
+            and distance <= attack_range + 64 then
             return unit
         end
     end
     return nil
+end
+
+function modifier_tower_auto_attack:OnAttackStart(params)
+    if not IsServer() or params.attacker ~= self:GetParent()
+        or not tree_damage_rules.is_tree(params.target) then
+        return
+    end
+    local tower = self:GetParent()
+    tower:SetForceAttackTarget(nil)
+    self.forced_target = nil
+    if tower.Stop then tower:Stop() end
 end
 
 function modifier_tower_auto_attack:OnCreated()
@@ -71,7 +88,12 @@ function modifier_tower_auto_attack:OnIntervalThink()
         and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
         or 99999
     local attack_range = current_attack_range(tower)
-    if not valid(target) or target:GetTeamNumber() == tower:GetTeamNumber()
+    if tree_damage_rules.is_tree(target) then
+        tower:SetForceAttackTarget(nil)
+        self.forced_target = nil
+    end
+    if not valid(target) or tree_damage_rules.is_tree(target)
+        or target:GetTeamNumber() == tower:GetTeamNumber()
         or distance > attack_range + 96 then
         if self.forced_target ~= nil then
             tower:SetForceAttackTarget(nil)
@@ -103,5 +125,8 @@ function modifier_tower_auto_attack:OnDestroy()
         self.forced_target = nil
     end
 end
+
+modifier_tower_auto_attack._find_target_for_test = find_target
+modifier_tower_auto_attack._is_tree_for_test = tree_damage_rules.is_tree
 
 return modifier_tower_auto_attack

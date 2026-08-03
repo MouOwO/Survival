@@ -1426,3 +1426,12 @@
 - 资源与容错：游戏模式显式预缓存卡尔飞行与落地粒子；创建、控制点、销毁和索引释放均隔离视觉错误，视觉失败不阻断权威伤害、熔岩或解锁。
 - 验证完成：`METEOR_VISUAL_STATE_PASS`、`METEOR_VISUAL_CONTRACT_PASS`、目标Lua语法、严格UTF-8和限定`git diff --check`通过。状态测试覆盖LV1落地、LV5双陨石0.5秒间隔/第二颗80%伤害、减速清理及视觉失败隔离。爆炎弹、怒雷、元气弹视觉回归通过；移动冰球重复常量及魔法弹弓/毒云过时契约属于合并基线既有失败，未随本任务修改。
 - 尚未验证：Workshop Tools中卡尔陨石实际尺寸、空中轨迹、EndCap与落地主粒子叠加观感、落地后是否完全无滚动、LV5双陨石视觉间隔及连续触发后的粒子残留。
+
+## 2026-08-03 — 资源树承伤与防御塔目标限制任务启动
+
+- 用户要求：资源树只承受平A伤害，技能伤害不计入；防御塔不能攻击树，其他怪物可以攻击树。
+- 用户进一步确认：这里只保留引擎基础普通攻击伤害；平A触发的影压、反击螺旋、装备附伤、塔技能等额外伤害全部不能伤树。
+- 调查确认：树是`enemy_tree`，由`tree_system.lua`创建并永久挂载`modifier_tree_progression`；所有箭塔与转职塔统一保留`survival_building_id == "arrow_tower"`并挂载`modifier_tower_auto_attack`。
+- 调查确认：全局`damage_filter_service.lua`已有`damage_category_const`字段，可按引擎伤害类别区分基础攻击与技能/脚本伤害，不使用`inflictor == nil`猜测。
+- 调查确认：项目当前没有`SetExecuteOrderFilter`；仅修改塔自动选敌不能覆盖玩家手动右键树，因此计划新增最小OrderFilter服务，并由树承伤规则兜底已发射弹道或引擎竞态。
+- 用户已批准实施方案。下一步：实现共享树伤害规则、扩展树与塔modifier、注册OrderFilter并增加专项测试。

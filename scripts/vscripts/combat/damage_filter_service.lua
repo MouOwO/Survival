@@ -1,4 +1,5 @@
 local M = {}
+local tree_damage_rules = require("systems/tree_damage_rules")
 local event_bus = nil
 local events = nil
 local repository = nil
@@ -60,6 +61,15 @@ local function filter(_, keys)
     local transaction_id = record and record.transaction_id or nil
     if record and record.blocked then
         event_bus.emit(events.DAMAGE_BLOCKED, { transaction_id = transaction_id, reason = record.blocked })
+        return false
+    end
+    local damage_category = keys.damage_category_const or keys.damage_category
+    if not tree_damage_rules.allows_damage(
+            attacker, victim, damage_category) then
+        event_bus.emit(events.DAMAGE_BLOCKED, {
+            transaction_id = transaction_id,
+            reason = "tree_requires_basic_attack",
+        })
         return false
     end
     if victim.survival_damage_blocked == true
@@ -133,5 +143,7 @@ function M.register()
     registered = true
     return true
 end
+
+M._filter_for_test = filter
 
 return M

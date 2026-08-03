@@ -67,6 +67,7 @@ local building_upgrade_system = require("systems/building_upgrade_system")
 local tower_skill_effect_adapter = require("systems/tower_skill_effect_adapter")
 local tower_special_skill_system = require("systems/tower_special_skill_system")
 local tower_magic_supreme_system = require("systems/tower_magic_supreme_system")
+local tree_attack_order_filter = require("systems/tree_attack_order_filter")
 local tree_system = require("systems/tree_system")
 local worker_system = require("systems/worker_system")
 local player_entitlement_service =
@@ -621,6 +622,8 @@ local function initialize_services()
     asset_preload_service.init()
     unit_health_bar_service.init()
     combat_bootstrap.init()
+    assert(tree_attack_order_filter.register(),
+        "tree attack order filter registration failed")
 
     tower_magic_supreme_system.init()
     tower_special_skill_system.init()
