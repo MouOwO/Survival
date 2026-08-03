@@ -1513,3 +1513,12 @@
 - 审计确认服务顶层共有202个声明，且该文件在本轮模型任务前没有未提交差异。采用最小行为等价修复：把末尾`trigger`、`roll`、`on_main_attack`改为既有模块表`M`上的内部方法，并同步两处调用和事件订阅引用；顶层声明降至199，未修改CSV、技能数值、随机判定、伤害事务或生命周期。
 - 自动验证通过：`hero_passive_skill_service.lua`、`hero_exclusive_passive_service.lua`和`addon_game_mode.lua`的Lua 5.1语法；回音重斩、地裂冲击、陨石、元气弹、龙卷、脉冲激射、爆炎弹、毒云8项Lua 5.1状态测试；`FREE_HERO_EXCLUSIVE_STATE_LUA51_PASS`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、严格UTF-8及目标`git diff --check`。
 - 自动验证证明原编译阻断已消除，但不等同于Dota实机启动。下一步必须完全停止并重新Run Workshop Tools，先确认地图可进入且控制台不再出现200-local错误，再继续模型尺寸、动画和切模验收。用户原有`卡牌文本.txt`及模型任务全部既有修改均未触碰或回滚。
+
+## 2026-08-03 — 回音重斩替换为Kez Echo Slash纯刀光
+
+- 用户要求为三选一技能`proto_echo_slash`/“回音重斩·被动”增加Kez Echo Slash特效，并明确选择只显示纯斩击刀光：不要Kez英雄残影，也不要原技能的回音复击机制。
+- 本机Dota `pak01_dir.vpk`确认完整父粒子`kez_katana_echo_strike.vpcf`会引用Kez英雄残影；最终采用纯刀光子粒子`particles/units/heroes/hero_kez/kez_katana_echo_strike_slash.vpcf`，其运行依赖只有刀光材质和slash spikes子粒子，不依赖Kez英雄模型或残影。
+- 生产修改仅替换`echo_slash.particle`并增加显式预缓存。没有调用`kez_echo_slash`、没有添加Kez modifier、声音、延迟复击、额外攻击或额外伤害；1/2/3/3/4波、0.1秒间隔、1秒全程、攻击射程、总宽200、纯粹伤害、穿透和逐波去重全部保持。
+- 剑刃震荡的`BLADE_PULSE_PARTICLE`和马格纳斯震荡波预缓存均保留，未被回音重斩视觉替换影响。新增`tools/test_echo_slash_visual_contract.ps1`锁定纯刀光、排除完整回音父粒子/原生技能，并保护两项线性投射物契约。
+- 自动验证：`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua/Luac 5.4.5语法、六个任务文件严格UTF-8及限定`git diff --check`通过。历史记录的`C:\msys64\mingw64\bin\luac5.1.exe`本轮不存在，既有回音重斩状态测试脚本也未保存在当前工作区，因此未宣称本轮Lua 5.1或状态测试通过。
+- 尚未验证：Workshop Tools中的纯刀光实际朝向、尺寸、高度、移动速度、连续多波观感及是否完整走完攻击射程；自动契约不能替代引擎视觉验收。

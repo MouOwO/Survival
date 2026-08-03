@@ -113,17 +113,19 @@
 - 权威配置先修改 `data/csv/英雄系统/hero_skill_definitions.csv`、`data/csv/英雄系统/hero_skill_pool_members.csv` 和 `data/csv/公共规则/tooltip_definitions.csv`，再定向生成对应 Lua。
 - 运行配置位于 `scripts/vscripts/config/hero_passive_skill_definitions.lua`；真实碰撞和伤害位于 `scripts/vscripts/systems/hero_passive_skill_service.lua`；能力路由复用 `scripts/vscripts/abilities/survival_hero_skill.lua`。
 - LV5每道波分别随机抽取5%～20%增伤；同次触发固定起点、目标方向、距离和全属性快照。未额外设置活动锁，允许不同攻击触发并行。
-- 尚未验证：弧形斩粒子的实际视觉资源、Workshop Tools 中的宽度/连续波观感和真实引擎碰撞；自动测试不能替代实机验收。
+- 2026-08-03新增视觉要求：每道回音重斩改用Kez Echo Slash资源族中的纯刀光`particles/units/heroes/hero_kez/kez_katana_echo_strike_slash.vpcf`；明确排除完整父粒子、Kez英雄残影、原技能回音复击、额外攻击、额外伤害、modifier和声音。
+- 尚未验证：Workshop Tools 中纯刀光的朝向、尺寸、移动速度、宽度/连续波观感和真实引擎碰撞；自动测试不能替代实机验收。
 
 ### 当前实施结果
 
 - 已新增 `proto_echo_slash`、`ability_survival_echo_slash`、公共池成员 `public_13` 和五级 Tooltip。
 - 三份权威CSV已更新并定向生成英雄技能、公共池和Tooltip Lua；生成比较逐字节一致。
-- 运行时使用马格纳斯震荡波粒子和独立线性投射物状态；每道波 `bDeleteOnHit=false`、独立去重、回调返回false，终点和超时均可清理。
+- 运行时使用Kez Echo Slash纯刀光粒子和独立线性投射物状态；每道波 `bDeleteOnHit=false`、独立去重、回调返回false，终点和超时均可清理。马格纳斯震荡波继续仅供剑刃震荡使用。
 - 多波使用绝对时间校正的单链调度；LV5每波创建时独立抽取5%～20%增伤，触发时逻辑全属性快照在整次技能中保持不变。
 - 自动验证通过：`ECHO_SLASH_STATE_LUA51_PASS`、`ECHO_SLASH_CONTRACT_PASS`、`ECHO_SLASH_LUAC51_PASS`、配置Lua 5.1验证、CSV生成比较、严格UTF-8、限定`git diff --check`、脉冲激射/地裂/魔法弹弓共享回归。
+- 2026-08-03纯刀光变更验证：`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua 5.4.5语法、严格UTF-8和限定`git diff --check`通过。历史Lua 5.1工具绝对路径本轮不存在，因此没有把本轮编译写成Lua 5.1通过；既有状态测试脚本当前也未保存在工作区。
 - 脉冲激射完整PowerShell契约存在既有陈旧预缓存断言，仍要求已废弃的Vengeful粒子；其Lua 5.1状态测试通过，本任务未修改该旧测试。
-- 剩余动作仅为Workshop Tools实机验证；尚不能记录为引擎验证或用户验收完成。
+- 剩余动作仅为Workshop Tools实机验证纯刀光朝向、尺寸和移动观感；尚不能记录为引擎验证或用户验收完成。
 
 用户已明确确认现有公共技能`proto_earth_line`五级“地裂冲击·被动”暂时完成。当前基线停止继续调整，不再把Workshop Tools逐项验证恢复为活跃任务；只有用户以后明确提出地裂冲击的新需求或报告实机问题时，才按下述维护方式重新开启。
 

@@ -107,7 +107,7 @@ local BLADE_PULSE_PARTICLE =
     "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
 local BLADE_PULSE_CLEANUP_GRACE = 0.25
 echo_slash.particle =
-    "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
+    "particles/units/heroes/hero_kez/kez_katana_echo_strike_slash.vpcf"
 echo_slash.cleanup_grace = 0.25
 earth_rock.particle =
     "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf"
