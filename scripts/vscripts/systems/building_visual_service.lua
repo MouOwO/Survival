@@ -205,10 +205,23 @@ function M.resolve(data)
     return model_path, asset, requested_asset_id
 end
 
+function M.matches(unit, data)
+    if not valid_entity(unit) then return false end
+    local model_path = M.resolve(data)
+    return model_path ~= nil and model_path ~= ""
+        and unit.survival_applied_model_path == model_path
+        and unit.survival_pending_model_asset_id == nil
+end
+
 function M.apply(unit, data)
     if not valid_entity(unit) then return false, "invalid_entity" end
     local model_path, asset, requested_asset_id = M.resolve(data)
     if not model_path or model_path == "" then return false, "model_missing" end
+    if unit.survival_upgrade_skip_model_path == model_path then
+        unit.survival_upgrade_skip_model_path = nil
+        return false, "upgrade_preload_failed"
+    end
+    local same_model = M.matches(unit, data)
 
     if requested_asset_id and asset and asset.asset_id == requested_asset_id
         and not preload.is_ready(requested_asset_id) then
@@ -250,9 +263,11 @@ function M.apply(unit, data)
         return true, status
     end
 
-    unit:SetModel(model_path)
-    unit:SetOriginalModel(model_path)
-    reset_main_animation(unit, asset)
+    if not same_model then
+        unit:SetModel(model_path)
+        unit:SetOriginalModel(model_path)
+        reset_main_animation(unit, asset)
+    end
     apply_bodygroups(unit, asset)
     local model_scale = tonumber(data and data.model_scale)
         or (asset and tonumber(asset.model_scale))
@@ -274,6 +289,7 @@ function M.apply(unit, data)
     local components = apply_attachments(unit, asset)
     apply_particles(unit, asset, components)
     unit.survival_model_asset_id = requested_asset_id
+    unit.survival_applied_model_path = model_path
     unit.survival_pending_model_asset_id = nil
     unit.survival_pending_previous_model_asset_id = nil
 

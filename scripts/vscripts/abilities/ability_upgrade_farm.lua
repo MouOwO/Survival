@@ -7,6 +7,7 @@ function M:GetManaCost() return 0 end
 function M:OnSpellStart()
     event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
         building = self:GetCaster(),
+        source_ability = self,
     })
 end
 

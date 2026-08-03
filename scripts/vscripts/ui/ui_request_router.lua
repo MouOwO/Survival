@@ -651,6 +651,7 @@ local function register_ability_cast_request()
         local direct_result_required = false
         local direct_result = nil
         local direct_error = nil
+        local direct_cooldown_started = false
         if tower_ability_matches and owner_matches and not passive
             and not is_point_target and tower_upgrade_mode then
             -- Dynamic Lua abilities on npc_dota_creature buildings do not
@@ -658,43 +659,83 @@ local function register_ability_cast_request()
             -- tower UI actions straight to the authoritative building system;
             -- ownership/ability validation above and resource/level validation
             -- in building_upgrade_system remain unchanged.
-            event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
-                building = unit,
-                upgrade_mode = tower_upgrade_mode,
-            })
             handled_directly = true
-            print("[SURVIVAL_CAST][SERVER] TOWER_UPGRADE_DISPATCHED mode="
-                .. tostring(tower_upgrade_mode))
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden()
+                or not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "防御塔升级技能当前不可用" }
+            else
+                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+                direct_cooldown_started = true
+                local request = {
+                    building = unit,
+                    upgrade_mode = tower_upgrade_mode,
+                    source_ability = ability,
+                }
+                event_bus.emit(events.BUILDING_UPGRADE_REQUEST, request)
+                direct_result = request.result or { ok = false, error = "防御塔升级无响应" }
+                print("[SURVIVAL_CAST][SERVER] TOWER_UPGRADE_DISPATCHED mode="
+                    .. tostring(tower_upgrade_mode))
+            end
         elseif building_upgrade_ability_matches and owner_matches
             and not passive and not is_point_target then
-            event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
-                building = unit,
-            })
             handled_directly = true
-            print("[SURVIVAL_CAST][SERVER] BUILDING_UPGRADE_DISPATCHED name="
-                .. tostring(ability_name))
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden()
+                or not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "建筑升级技能当前不可用" }
+            else
+                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+                direct_cooldown_started = true
+                local request = {
+                    building = unit,
+                    source_ability = ability,
+                }
+                event_bus.emit(events.BUILDING_UPGRADE_REQUEST, request)
+                direct_result = request.result or { ok = false, error = "建筑升级无响应" }
+                print("[SURVIVAL_CAST][SERVER] BUILDING_UPGRADE_DISPATCHED name="
+                    .. tostring(ability_name))
+            end
         elseif tower_ability_matches and owner_matches and not passive
             and not is_point_target and tower_class_index and tower_class_index >= 1
             and tower_class_index <= 7 then
-            event_bus.emit(events.TOWER_CLASS_REQUEST, {
-                tower = unit,
-                class_index = tower_class_index,
-            })
             handled_directly = true
-            print("[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index="
-                .. tostring(tower_class_index))
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden()
+                or not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "防御塔转职技能当前不可用" }
+            else
+                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+                direct_cooldown_started = true
+                local request = {
+                    tower = unit,
+                    class_index = tower_class_index,
+                    source_ability = ability,
+                }
+                event_bus.emit(events.TOWER_CLASS_REQUEST, request)
+                direct_result = request.result or { ok = false, error = "防御塔转职无响应" }
+                print("[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index="
+                    .. tostring(tower_class_index))
+            end
         elseif gold_mine_ability_matches and owner_matches and not passive
             and not is_point_target then
             handled_directly = true
             direct_result_required = true
             if not ability:IsActivated() or ability:IsHidden() then
                 direct_result = { ok = false, error = "金矿技能当前不可用" }
+            elseif not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "金矿技能尚未冷却" }
+            elseif unit.survival_upgrade_in_progress
+                and gold_mine_action ~= "auto" then
+                direct_result = { ok = false, error = "金矿正在升级中" }
             else
+                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+                direct_cooldown_started = true
                 ability_request_sequence = ability_request_sequence + 1
                 if gold_mine_action == "level" then
                     direct_result, direct_error = event_bus.request(
                         events.GOLD_MINE_LEVEL_UPGRADE_REQUEST,
-                        { entindex = entindex }
+                        { entindex = entindex, source_ability = ability }
                     )
                 elseif gold_mine_action == "efficiency"
                     or gold_mine_action == "crit" then
@@ -732,6 +773,10 @@ local function register_ability_cast_request()
             print("[SURVIVAL_CAST][SERVER] GOLD_MINE_DISPATCHED action="
                 .. tostring(gold_mine_action) .. " ok=" .. tostring(succeeded)
                 .. " error=" .. tostring(message or ""))
+        end
+        if direct_result_required and direct_cooldown_started
+            and (not direct_result or direct_result.ok ~= true) then
+            ability:EndCooldown()
         end
         if is_point_target then
             print("[SURVIVAL_CAST][SERVER] REJECT point_target_requires_client_position name="

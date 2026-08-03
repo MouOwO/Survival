@@ -99,9 +99,31 @@ local function normalize(payload, unit)
         crit_level = payload.crit_level ~= nil
             and payload.crit_level
             or previous.crit_level or 0,
+        income_per_second = payload.income_per_second ~= nil
+            and payload.income_per_second
+            or previous.income_per_second or 0,
+        efficiency_percent = payload.efficiency_percent ~= nil
+            and payload.efficiency_percent
+            or previous.efficiency_percent or 0,
+        crit_chance = payload.crit_chance ~= nil
+            and payload.crit_chance
+            or previous.crit_chance or 0,
+        crit_multiplier = payload.crit_multiplier ~= nil
+            and payload.crit_multiplier
+            or previous.crit_multiplier or 0,
         auto_upgrading = payload.auto_upgrading ~= nil
             and payload.auto_upgrading
             or previous.auto_upgrading or 0,
+        upgrade_in_progress = payload.upgrade_in_progress ~= nil
+            and payload.upgrade_in_progress
+            or (unit.survival_upgrade_in_progress and 1 or 0),
+        upgrade_target_level = payload.upgrade_target_level ~= nil
+            and payload.upgrade_target_level
+            or unit.survival_upgrade_target_level,
+        upgrade_target_model_asset_id =
+            unit.survival_upgrade_target_model_asset_id,
+        upgrade_target_model_path = unit.survival_upgrade_target_model_path,
+        upgrade_model_status = unit.survival_upgrade_model_status,
         builder_stage = payload.builder_stage
             or previous.builder_stage or "",
         hero_summoned = payload.hero_summoned ~= nil

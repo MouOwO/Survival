@@ -10,6 +10,7 @@ function M.create(class_index)
         event_bus.emit(events.TOWER_CLASS_REQUEST, {
             tower = self:GetCaster(),
             class_index = class_index,
+            source_ability = self,
         })
     end
     return Ability

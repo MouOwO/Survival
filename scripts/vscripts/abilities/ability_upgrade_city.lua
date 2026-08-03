@@ -7,7 +7,10 @@ function M:GetManaCost() return 0 end
 function M:OnSpellStart()
     print("[MainCityAbility] upgrade cast entindex="
         .. tostring(self:GetCaster():entindex()))
-    event_bus.emit(events.BUILDING_UPGRADE_REQUEST, { building = self:GetCaster() })
+    event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
+        building = self:GetCaster(),
+        source_ability = self,
+    })
 end
 
 _G.ability_upgrade_city = M

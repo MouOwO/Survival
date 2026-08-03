@@ -9,6 +9,7 @@ local technology_stat_manager = require("systems/technology_stat_manager")
 local building_population = require("systems/building_population_service")
 local building_visual = require("systems/building_visual_service")
 local asset_preload = require("systems/asset_preload_service")
+local upgrade_process = require("systems/building_upgrade_process")
 
 local M = {}
 local buildings = {}
@@ -113,7 +114,8 @@ local function team_city_level(team)
 end
 
 local function refresh_farm_upgrade_ability(state)
-    if not state or state.building_id ~= "farm"
+    if not state or (state.building_id ~= "farm"
+        and state.building_id ~= "building_farm")
         or not valid_entity(state.unit) then return end
     local ability = state.unit:FindAbilityByName("ability_upgrade_farm")
     if ability then
@@ -220,6 +222,8 @@ publish = function(state, reason)
         base_attack_damage = state.building_id == "arrow_tower"
             and tonumber((arrow_data(state.level) or {}).base_attack_damage)
             or nil,
+        upgrade_in_progress = state.unit.survival_upgrade_in_progress and 1 or 0,
+        upgrade_target_level = state.unit.survival_upgrade_target_level,
         reason = reason,
     })
 end
@@ -232,6 +236,29 @@ local function spend(state, cost, reason)
         gold = cost.gold or 0,
         population = 0,
         reason = reason,
+    })
+end
+
+local function start_upgrade(state, target_data, target_level, on_complete, reason)
+    return upgrade_process.begin(state.unit, {
+        duration = 1.0,
+        particle = state.definition.build_particle,
+        target_level = target_level,
+        target_model_asset_id = target_data and target_data.model_asset_id,
+        target_model_name = target_data and target_data.model_name,
+        on_start = function()
+            publish(state, "upgrade_started_" .. tostring(reason))
+        end,
+        on_visual_status = function(status)
+            publish(state, "upgrade_visual_" .. tostring(status))
+        end,
+        on_complete = function()
+            on_complete()
+            notify(state, "升级完成")
+        end,
+        on_cancel = function(cancel_reason)
+            publish(state, "upgrade_cancelled_" .. tostring(cancel_reason))
+        end,
     })
 end
 
@@ -350,13 +377,14 @@ local function upgrade_wall(state)
     end
     local result = spend(state, data.upgrade_cost, "upgrade_wall")
     if not result or not result.ok then return result end
-    state.level = next_level
-    state.unit.survival_level = next_level
-    state.unit.survival_display_name = state.definition.display_name
-    apply_common(state.unit, data)
-    apply_research_technology(state)
-    publish(state, "wall_upgraded")
-    return { ok = true }
+    return start_upgrade(state, data, next_level, function()
+        state.level = next_level
+        state.unit.survival_level = next_level
+        state.unit.survival_display_name = state.definition.display_name
+        apply_common(state.unit, data)
+        apply_research_technology(state)
+        publish(state, "wall_upgraded")
+    end, "wall")
 end
 
 local function upgrade_city(state)
@@ -365,18 +393,19 @@ local function upgrade_city(state)
     if not data then return { ok = false, error = "主城已达最高等级" } end
     local result = spend(state, data.upgrade_cost, "upgrade_city")
     if not result or not result.ok then return result end
-    state.level = next_level
-    state.unit.survival_level = next_level
-    state.unit.survival_display_name = state.definition.display_name
-    apply_common(state.unit, data)
-    building_population.grant_level(
-        state,
-        next_level,
-        "city_level_population"
-    )
-    publish(state, "city_upgraded")
-    refresh_team_farms(state.team)
-    return { ok = true }
+    return start_upgrade(state, data, next_level, function()
+        state.level = next_level
+        state.unit.survival_level = next_level
+        state.unit.survival_display_name = state.definition.display_name
+        apply_common(state.unit, data)
+        building_population.grant_level(
+            state,
+            next_level,
+            "city_level_population"
+        )
+        publish(state, "city_upgraded")
+        refresh_team_farms(state.team)
+    end, "city")
 end
 
 local function upgrade_farm(state)
@@ -389,19 +418,20 @@ local function upgrade_farm(state)
     if not data then return { ok = false, error = "农场已达最高等级" } end
     local result = spend(state, data.upgrade_cost, "upgrade_farm")
     if not result or not result.ok then return result end
-    state.level = next_level
-    state.unit.survival_level = next_level
-    state.unit.survival_display_name = data.display_name
-        or state.definition.display_name
-    apply_common(state.unit, data)
-    building_population.grant_level(
-        state,
-        next_level,
-        "farm_level_population"
-    )
-    refresh_farm_upgrade_ability(state)
-    publish(state, "farm_upgraded")
-    return { ok = true }
+    return start_upgrade(state, data, next_level, function()
+        state.level = next_level
+        state.unit.survival_level = next_level
+        state.unit.survival_display_name = data.display_name
+            or state.definition.display_name
+        apply_common(state.unit, data)
+        building_population.grant_level(
+            state,
+            next_level,
+            "farm_level_population"
+        )
+        refresh_farm_upgrade_ability(state)
+        publish(state, "farm_upgraded")
+    end, "farm")
 end
 
 local function route_unit_data(state, row)
@@ -491,25 +521,27 @@ local function upgrade_tower(state, mode)
     local previous_row = tower_routes.current(state)
     local stage_changed = previous_row
         and previous_row.stage_id ~= final_row.stage_id
-    apply_tower_level(state, final_row, target, stage_changed)
-    if cost.population > 0 then
-        event_bus.request(events.RESOURCE_ADD_REQUEST, {
-            team = state.team, max_population = cost.population,
-            reason = "tower_route_population",
-        })
-    end
-    if not state.tower_class and state.level == 5 then
-        sync_tower_abilities(state, final_row)
-        set_class_buttons(state.unit, true)
-    end
-    publish(state, "tower_upgraded_" .. tostring(mode or "one"))
-    return { ok = true }
+    return start_upgrade(state, final_row, target, function()
+        apply_tower_level(state, final_row, target, stage_changed)
+        if cost.population > 0 then
+            event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                team = state.team, max_population = cost.population,
+                reason = "tower_route_population",
+            })
+        end
+        if not state.tower_class and state.level == 5 then
+            sync_tower_abilities(state, final_row)
+            set_class_buttons(state.unit, true)
+        end
+        publish(state, "tower_upgraded_" .. tostring(mode or "one"))
+    end, "tower_" .. tostring(mode or "one"))
 end
 
 local function on_upgrade_request(payload)
     local unit = payload.building
     if not valid_entity(unit) then
         print("[BuildingUpgrade] invalid building entity")
+        payload.result = { ok = false, error = "升级建筑不存在" }
         return
     end
     local state = recover_state(unit)
@@ -521,6 +553,14 @@ local function on_upgrade_request(payload)
             message = "建筑升级状态尚未初始化",
             level = "error",
         })
+        payload.result = { ok = false, error = "建筑升级状态尚未初始化" }
+        return
+    end
+
+    if upgrade_process.is_active(unit) then
+        if payload.source_ability then payload.source_ability:EndCooldown() end
+        notify(state, "建筑正在升级中", "error")
+        payload.result = { ok = false, error = "建筑正在升级中" }
         return
     end
 
@@ -533,46 +573,64 @@ local function on_upgrade_request(payload)
     else result = { ok = false, error = "该建筑不能升级" } end
 
     if not result or not result.ok then
-        local ability_name = payload.upgrade_mode == "max"
-            and "ability_upgrade_tower_max"
-            or "ability_upgrade_tower_lv01"
-        local ability = unit:FindAbilityByName(ability_name)
-        if ability then ability:EndCooldown() end
+        if payload.source_ability then payload.source_ability:EndCooldown() end
     end
-    notify(state, result and result.ok and "升级成功" or (result and result.error or "升级失败"),
+    notify(state, result and result.ok and "开始升级" or (result and result.error or "升级失败"),
         result and result.ok and "info" or "error")
+    payload.result = result or { ok = false, error = "升级失败" }
 end
 
 local function on_class_request(payload)
     local unit = payload.tower
-    if not valid_entity(unit) then return end
+    if not valid_entity(unit) then
+        payload.result = { ok = false, error = "防御塔不存在" }
+        return
+    end
     local state = recover_state(unit)
-    if not state or state.building_id ~= "arrow_tower" then return end
-    if state.level < 5 then notify(state, "防御塔未达到5级", "error"); return end
-    if state.tower_class then notify(state, "防御塔已经完成转职", "error"); return end
+    local function reject(message)
+        if payload.source_ability then payload.source_ability:EndCooldown() end
+        if state then notify(state, message, "error") end
+        payload.result = { ok = false, error = message }
+    end
+    if not state or state.building_id ~= "arrow_tower" then
+        reject("防御塔升级状态不存在")
+        return
+    end
+    if upgrade_process.is_active(unit) then reject("建筑正在升级中"); return end
+    if state.level < 5 then reject("防御塔未达到5级"); return end
+    if state.tower_class then reject("防御塔已经完成转职"); return end
 
     local class_data = state.definition.class_options[payload.class_index]
-    if not class_data then notify(state, "无效的转职方向", "error"); return end
+    if not class_data then reject("无效的转职方向"); return end
     local row = tower_routes.get(class_data.id, 1)
-    if not row then notify(state, "路线配置缺失", "error"); return end
+    if not row then reject("路线配置缺失"); return end
     local result = spend(
         state,
         tower_routes.class_change_cost(row),
         "tower_class_change"
     )
     if not result or not result.ok then
-        notify(state, result and result.error or "资源不足", "error")
+        reject(result and result.error or "资源不足")
         return
     end
-
-    state.tower_class = class_data.id
-    apply_tower_level(state, row, 6, true)
-    if row.population_delta and row.population_delta > 0 then
-        event_bus.request(events.RESOURCE_ADD_REQUEST, { team = state.team, max_population = row.population_delta, reason = "tower_route_population" })
+    local pending = start_upgrade(state, row, 6, function()
+        state.tower_class = class_data.id
+        apply_tower_level(state, row, 6, true)
+        if row.population_delta and row.population_delta > 0 then
+            event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                team = state.team,
+                max_population = row.population_delta,
+                reason = "tower_route_population",
+            })
+        end
+        set_class_buttons(state.unit, false)
+        publish(state, "tower_class_changed")
+    end, "tower_class")
+    if not pending or not pending.ok then reject(pending and pending.error or "转职失败")
+    else
+        payload.result = pending
+        notify(state, "开始转职")
     end
-    set_class_buttons(state.unit, false)
-    publish(state, "tower_class_changed")
-    notify(state, "防御塔已转职为" .. state.tower_class_name)
 end
 
 local function on_created(payload)
@@ -610,6 +668,7 @@ local function on_created(payload)
 end
 
 local function on_destroyed(payload)
+    upgrade_process.cancel_by_entindex(payload.entindex, "building_destroyed")
     buildings[payload.entindex] = nil
     if payload.building_id == "main_city" then refresh_team_farms(payload.team) end
 end
@@ -624,6 +683,7 @@ local function on_building_changed(payload)
 end
 
 function M.init()
+    upgrade_process.reset()
     buildings = {}
     event_bus.subscribe(events.BUILDING_CREATED, on_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)

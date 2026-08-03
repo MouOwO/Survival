@@ -6,6 +6,15 @@ ability_upgrade_gold_mine_efficiency = M
 
 function ability_upgrade_gold_mine_efficiency:OnSpellStart()
     local caster = self:GetCaster()
+    if caster.survival_upgrade_in_progress then
+        self:EndCooldown()
+        event_bus.emit(events.UI_NOTIFICATION, {
+            player_id = caster:GetPlayerOwnerID(),
+            message = "金矿正在升级中",
+            level = "error",
+        })
+        return
+    end
     local result, request_error = event_bus.request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, {
         player_id = caster:GetPlayerOwnerID(),
         technology_group = "gold_mine_efficiency",
@@ -14,6 +23,7 @@ function ability_upgrade_gold_mine_efficiency:OnSpellStart()
         request_id = "gold_mine_w_" .. tostring(caster:entindex()) .. "_" .. tostring(GameRules:GetGameTime()),
     })
     if not result or not result.ok then
+        self:EndCooldown()
         event_bus.emit(events.UI_NOTIFICATION, {
             player_id = caster:GetPlayerOwnerID(),
             message = result and result.error

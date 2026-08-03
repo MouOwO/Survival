@@ -2,6 +2,8 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local config = require("config/gold_mine_config")
+local building_visual = require("systems/building_visual_service")
+local upgrade_process = require("systems/building_upgrade_process")
 
 local M = {}
 local state_by_entindex = {}
@@ -102,6 +104,8 @@ local function publish(state)
         crit_multiplier = config.crit_multiplier(state.mine_level),
         auto_upgrading = auto_upgrade_by_entindex[state.unit:entindex()]
             and 1 or 0,
+        upgrade_in_progress = state.unit.survival_upgrade_in_progress and 1 or 0,
+        upgrade_target_level = state.unit.survival_upgrade_target_level,
         max_mine_level = config.max_mine_level,
         max_efficiency_level = config.max_efficiency_level,
         max_crit_level = config.max_crit_level,
@@ -159,7 +163,7 @@ local function auto_upgrade_step(entindex)
 
     if state.mine_level < config.max_mine_level then
         local result = upgrade_mine({ entindex = entindex })
-        if result and result.ok then return 1.0 end
+        if result and result.ok then return 1.1 end
         return 2.0
     end
 
@@ -222,12 +226,17 @@ local function apply_level_stats(state)
     state.unit:SetMaxHealth(data.health)
     state.unit:SetHealth(data.health)
     state.unit:SetPhysicalArmorBaseValue(data.armor)
+    state.unit.survival_armor = tonumber(data.armor) or 0
     state.unit.survival_level = state.mine_level
+    building_visual.apply(state.unit, data)
 end
 
 upgrade_mine = function(payload)
     local state = state_from_payload(payload)
     if not state then return { ok = false, error = "金矿不存在" } end
+    if upgrade_process.is_active(state.unit) then
+        return { ok = false, error = "金矿正在升级中" }
+    end
     if state.mine_level >= config.max_mine_level then
         return { ok = false, error = "金矿已达到最高等级" }
     end
@@ -237,16 +246,36 @@ upgrade_mine = function(payload)
     end
     local result = spend(state, cost, "gold_mine_level_upgrade")
     if not result or not result.ok then return result end
-    state.mine_level = state.mine_level + 1
-    state.unit.__building_level = state.mine_level
-    apply_level_stats(state)
-    publish(state)
-    event_bus.emit(events.BUILDING_CHANGED, {
-        unit = state.unit, entindex = state.unit:entindex(),
-        player_id = state.player_id, team = state.team,
-        building_id = "gold_mine", level = state.mine_level,
+    local target_level = state.mine_level + 1
+    local target_data = config.level_data(target_level)
+    local pending = upgrade_process.begin(state.unit, {
+        duration = 1.0,
+        particle = state.definition and state.definition.build_particle,
+        target_level = target_level,
+        target_model_asset_id = target_data and target_data.model_asset_id,
+        target_model_name = target_data and target_data.model_name,
+        on_start = function() publish(state) end,
+        on_visual_status = function() publish(state) end,
+        on_complete = function()
+            state.mine_level = target_level
+            state.unit.__building_level = target_level
+            apply_level_stats(state)
+            publish(state)
+            event_bus.emit(events.BUILDING_CHANGED, {
+                unit = state.unit, entindex = state.unit:entindex(),
+                player_id = state.player_id, team = state.team,
+                building_id = "gold_mine", level = target_level,
+            })
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = state.player_id,
+                message = "金矿升级完成",
+                level = "info",
+            })
+        end,
+        on_cancel = function() publish(state) end,
     })
-    return { ok = true, level = state.mine_level }
+    if not pending or not pending.ok then return pending end
+    return { ok = true, pending = true, level = target_level }
 end
 
 local function on_technology_changed(payload)
@@ -263,6 +292,7 @@ local function on_created(payload)
     local entindex = payload.unit:entindex()
     state_by_entindex[entindex] = {
         unit = payload.unit,
+        definition = payload.definition,
         player_id = payload.player_id,
         team = payload.team,
         mine_level = tonumber(payload.level) or 1,
@@ -272,6 +302,7 @@ end
 
 local function on_destroyed(payload)
     if payload.building_id == "gold_mine" then
+        upgrade_process.cancel_by_entindex(payload.entindex, "building_destroyed")
         local entindex = tonumber(payload.entindex)
         auto_upgrade_by_entindex[entindex] = nil
         scheduler.cancel("gold_mine_auto_upgrade_" .. tostring(entindex))

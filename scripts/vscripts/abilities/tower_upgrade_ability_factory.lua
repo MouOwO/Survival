@@ -9,6 +9,7 @@ local function create(mode)
         event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
             building = self:GetCaster(),
             upgrade_mode = mode,
+            source_ability = self,
         })
     end
     return Ability

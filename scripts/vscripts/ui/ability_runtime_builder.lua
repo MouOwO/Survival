@@ -41,6 +41,32 @@ local function with_affordability(data, cost, population_cost, resources)
     end
     return data
 end
+local function value_delta(current, target, suffix)
+    current = tonumber(current)
+    target = tonumber(target)
+    if not current or not target then return nil end
+    local delta = target - current
+    local sign = delta >= 0 and "+" or ""
+    return tostring(current) .. " → " .. tostring(target)
+        .. " (" .. sign .. tostring(delta) .. (suffix or "") .. ")"
+end
+local function mark_upgrade_state(data, state)
+    if state and state.upgrade_in_progress == 1 then
+        data.available = 0
+        data.can_afford = 0
+        data.upgrade_in_progress = 1
+        data.status_text = "升级中（1秒）"
+        data.target_model_asset_id = state.upgrade_target_model_asset_id
+        data.target_model_path = state.upgrade_target_model_path
+        data.upgrade_model_status = state.upgrade_model_status
+        data.fields = data.fields or {}
+        data.fields[#data.fields + 1] = {
+            label = "模型状态",
+            value = state.upgrade_model_status or "unchanged",
+        }
+    end
+    return data
+end
 local function count(state, building_id)
     return state.building_counts
         and state.building_counts[building_id] or 0
@@ -151,7 +177,7 @@ local function build_ability(ability_name, state, resources)
         resources
     )
 end
-local function upgrade_level(definition, current_level, resources)
+local function upgrade_level(definition, current_level, resources, state)
     local next_level = current_level + 1
     local data = definition.levels
         and definition.levels[next_level] or nil
@@ -163,18 +189,35 @@ local function upgrade_level(definition, current_level, resources)
             status_text = "已达最高等级",
         }
     end
+    local current_data = definition.levels and definition.levels[current_level] or {}
+    local fields = {
+        { label = "等级", value = tostring(current_level) .. " → " .. tostring(next_level) },
+    }
+    local health = value_delta(current_data.health, data.health)
+    local armor = value_delta(current_data.armor, data.armor)
+    local population = value_delta(
+        current_data.max_population or current_data.population,
+        data.max_population or data.population
+    )
+    if not population and (tonumber(data.add_population) or 0) ~= 0 then
+        population = "+" .. tostring(data.add_population)
+    end
+    if health then fields[#fields + 1] = { label = "生命", value = health } end
+    if armor then fields[#fields + 1] = { label = "护甲", value = armor } end
+    if population then fields[#fields + 1] = { label = "人口上限", value = population } end
     local result = merge({
         available = 1,
         current_level = current_level,
         next_level = next_level,
         status_text = "可以升级",
+        fields = fields,
     }, cost_data(data.upgrade_cost))
-    return with_affordability(
+    return mark_upgrade_state(with_affordability(
         result,
         data.upgrade_cost,
         0,
         resources
-    )
+    ), state)
 end
 local function tower_upgrade(ability_name, state, resources)
     local mode = ability_name == "ability_upgrade_tower_max" and "max" or "one"
@@ -212,6 +255,12 @@ local function tower_upgrade(ability_name, state, resources)
             { label = "目标等级", value = target },
             { label = "升级目标", value = tower_name },
             { label = "攻击提升", value = "+" .. tostring(attack_delta) },
+            { label = "攻击速度", value = value_delta(
+                current_row and current_row.base_attack_speed,
+                row.base_attack_speed
+            ) },
+            { label = "人口上限", value = (tonumber(cost.population) or 0) > 0
+                and ("+" .. tostring(cost.population)) or nil },
         },
     }, cost_data(cost))
     -- population_delta is granted as max population after an upgrade. The
@@ -222,7 +271,7 @@ local function tower_upgrade(ability_name, state, resources)
     if affordable == 0 then
         result.status_text = result.status_text .. "（当前资源不足）"
     end
-    return result
+    return mark_upgrade_state(result, state)
 end
 local function tower_class(ability_name, state, resources)
     local available = state.level >= 5 and not state.tower_class
@@ -241,7 +290,7 @@ local function tower_class(ability_name, state, resources)
     }, cost_data(cost))
     -- population_delta increases max population after the class change; it is
     -- not population consumed by the upgrade itself.
-    return with_affordability(result, cost, 0, resources)
+    return mark_upgrade_state(with_affordability(result, cost, 0, resources), state)
 end
 local function mine_level_upgrade(state, resources)
     local level = state.mine_level or state.level or 1
@@ -255,14 +304,25 @@ local function mine_level_upgrade(state, resources)
         }
     end
     local cost = gold_mine.mine_upgrade_cost(level)
+    local current_data = gold_mine.level_data(level) or {}
+    local target_data = gold_mine.level_data(level + 1) or {}
     local result = merge({
         available = 1,
         current_level = level,
         next_level = level + 1,
         status_text = "升级金矿本体至Lv." .. tostring(level + 1),
         upgrade_description = "提升金矿本体等级并提高基础金币产量。",
+        fields = {
+            { label = "等级", value = tostring(level) .. " → " .. tostring(level + 1) },
+            { label = "生命", value = value_delta(current_data.health, target_data.health) },
+            { label = "护甲", value = value_delta(current_data.armor, target_data.armor) },
+            { label = "每秒金币", value = value_delta(
+                state.income_per_second,
+                gold_mine.normal_income(level + 1, state.efficiency_level or 0)
+            ) },
+        },
     }, cost_data(cost))
-    return with_affordability(result, cost, 0, resources)
+    return mark_upgrade_state(with_affordability(result, cost, 0, resources), state)
 end
 local function mine_efficiency(state, resources)
     local level = state.efficiency_level or 0
@@ -283,8 +343,17 @@ local function mine_efficiency(state, resources)
         status_text = cost and "所有金矿收益增加5%（额外收益至少1金币）"
             or "收益升级配置缺失",
         upgrade_description = "共50级，每级使所有金矿收益提高5%；额外金币不足1时按1金币计算。",
+        fields = {
+            { label = "科技等级", value = tostring(level) .. " → " .. tostring(level + 1) },
+            { label = "效率", value = tostring(gold_mine.efficiency_percent(level))
+                .. "% → " .. tostring(gold_mine.efficiency_percent(level + 1)) .. "%" },
+            { label = "每秒金币", value = value_delta(
+                state.income_per_second,
+                gold_mine.normal_income(state.mine_level or 1, level + 1)
+            ) },
+        },
     }, cost_data(cost))
-    return with_affordability(result, cost, 0, resources)
+    return mark_upgrade_state(with_affordability(result, cost, 0, resources), state)
 end
 local function mine_crit(state, resources)
     local level = state.crit_level or 0
@@ -304,8 +373,16 @@ local function mine_crit(state, resources)
         next_level = level + 1,
         status_text = "每级增加3%采集暴击率",
         upgrade_description = "共10级，每级增加3%采集暴击率；采集暴击时获得正常采集金币的3倍。",
+        fields = {
+            { label = "科技等级", value = tostring(level) .. " → " .. tostring(level + 1) },
+            { label = "暴击率", value = tostring(gold_mine.crit_chance(level))
+                .. "% → " .. tostring(gold_mine.crit_chance(level + 1)) .. "%" },
+            { label = "暴击倍率", value = tostring(gold_mine.crit_multiplier(
+                state.mine_level or 1
+            )) .. "x" },
+        },
     }, cost_data(cost))
-    return with_affordability(result, cost, 0, resources)
+    return mark_upgrade_state(with_affordability(result, cost, 0, resources), state)
 end
 local function altar_open(state)
     local summoned = state and state.hero_summoned == 1
@@ -381,17 +458,21 @@ function M.build(ability_name, state, resources)
         }
     end
     if ability_name == "ability_upgrade_wall" then
-        return upgrade_level(buildings.wall, state.level, resources)
+        return upgrade_level(buildings.wall, state.level, resources, state)
     end
     if ability_name == "ability_upgrade_city" then
         return upgrade_level(
             buildings.main_city,
             state.level,
-            resources
+            resources,
+            state
         )
     end
     if ability_name == "ability_train_lumberjack" then
         return lumberjack_training(state, resources)
+    end
+    if ability_name == "ability_upgrade_farm" then
+        return upgrade_level(buildings.farm, state.level, resources, state)
     end
     if ability_name == "ability_upgrade_tower"
         or ability_name == "ability_upgrade_tower_lv01"

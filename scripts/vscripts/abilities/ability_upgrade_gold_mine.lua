@@ -8,12 +8,14 @@ function ability_upgrade_gold_mine:OnSpellStart()
     local caster = self:GetCaster()
     local result = event_bus.request(events.GOLD_MINE_LEVEL_UPGRADE_REQUEST, {
         entindex = caster:entindex(),
+        source_ability = self,
     })
-    if result and not result.ok then
+    if not result or not result.ok then
+        self:EndCooldown()
         local player_id = caster:GetPlayerOwnerID()
         event_bus.emit(events.UI_NOTIFICATION, {
             player_id = player_id,
-            message = result.error or "金矿升级失败",
+            message = result and result.error or "金矿升级失败",
             level = "error",
         })
     end

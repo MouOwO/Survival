@@ -5,7 +5,10 @@ local M = class({})
 function M:GetBehavior() return DOTA_ABILITY_BEHAVIOR_NO_TARGET end
 function M:GetManaCost() return 0 end
 function M:OnSpellStart()
-    event_bus.emit(events.BUILDING_UPGRADE_REQUEST, { building = self:GetCaster() })
+    event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
+        building = self:GetCaster(),
+        source_ability = self,
+    })
 end
 
 _G.ability_upgrade_wall = M

@@ -68,7 +68,7 @@
         "AbilityTextureName" "ogre_magi_bloodlust"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -80,7 +80,7 @@
         "AbilityTextureName" "alchemist_goblins_greed"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -92,7 +92,7 @@
         "AbilityTextureName" "furion_sprout"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -140,7 +140,7 @@
         "AbilityTextureName" "drow_ranger_multishot"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -152,7 +152,7 @@
         "AbilityTextureName" "drow_ranger_multishot"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -164,7 +164,7 @@
         "AbilityTextureName" "alchemist_goblins_greed"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -176,7 +176,7 @@
         "AbilityTextureName" "axe_battle_hunger"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -188,7 +188,7 @@
         "AbilityTextureName" "drow_ranger_frost_arrows"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -200,7 +200,7 @@
         "AbilityTextureName" "windrunner_focusfire"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -212,7 +212,7 @@
         "AbilityTextureName" "sniper_take_aim"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -224,7 +224,7 @@
         "AbilityTextureName" "zuus_arc_lightning"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -236,7 +236,7 @@
         "AbilityTextureName" "lich_frost_nova"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -248,7 +248,7 @@
         "AbilityTextureName" "rubick_arcane_supremacy"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -272,7 +272,7 @@
         "AbilityTextureName" "tinker_rearm"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.2"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -284,7 +284,7 @@
         "AbilityTextureName" "alchemist_goblins_greed"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.2"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
@@ -296,7 +296,7 @@
         "AbilityTextureName" "phantom_assassin_coup_de_grace"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.2"
+        "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
     }
 
