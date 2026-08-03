@@ -163,6 +163,7 @@ end
 
 function M.init()
     granted_non_repeatable = {}
+    event_bus.handle_request(events.MONSTER_REWARD_GRANT_REQUEST, grant_reward)
     event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
     event_bus.subscribe(events.MONSTER_ENCOUNTER_COMPLETED, on_encounter_completed)
 end

@@ -50,15 +50,7 @@ function M:OnDestroy()
 end
 
 function M:DeclareFunctions()
-    return {
-        MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE,
-    }
-end
-
-function M:GetModifierPreAttack_CriticalStrike()
-    if not IsServer() then return 0 end
-    return RandomFloat(0, 100) < (self.critical_chance_pct or 0)
-        and 200 or 0
+    return {}
 end
 
 local D = modifier_research_armor_reduction

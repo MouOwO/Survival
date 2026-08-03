@@ -144,6 +144,18 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_tower_fusion"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_fusion"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "arc_warden_tempest_double"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.0"
+        "AbilityManaCost"    "0"
+    }
+
     "ability_upgrade_tower_lv01"
     {
         "BaseClass"          "ability_lua"
@@ -568,7 +580,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "monkey_king_jingu_mastery"
-    "MaxLevel"           "3"
+    "MaxLevel"           "1"
     "AbilityManaCost"    "0"
 }
 
@@ -588,7 +600,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "monkey_king_boundless_strike"
-    "MaxLevel"           "3"
+    "MaxLevel"           "1"
     "AbilityManaCost"    "0"
 }
 
@@ -598,7 +610,7 @@
     "ScriptFile"         "abilities/survival_hero_skill"
     "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "monkey_king_tree_dance"
-    "MaxLevel"           "3"
+    "MaxLevel"           "1"
     "AbilityManaCost"    "0"
 }
 
@@ -606,9 +618,9 @@
 {
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
-    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
     "AbilityTextureName" "monkey_king_mischief"
-    "MaxLevel"           "3"
+    "MaxLevel"           "1"
     "AbilityManaCost"    "0"
 }
 

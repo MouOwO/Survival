@@ -13,24 +13,43 @@ function M:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_MIN_HEALTH,
         MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE,
+        MODIFIER_EVENT_ON_ATTACK_START,
+        MODIFIER_EVENT_ON_ATTACK_FAIL,
+        MODIFIER_EVENT_ON_ATTACK_RECORD_DESTROY,
         MODIFIER_EVENT_ON_TAKEDAMAGE,
     }
+end
+
+function M:OnAttackStart(params)
+    if not IsServer() or not params or params.target ~= self:GetParent() then return end
+    tree_damage_rules.mark_basic_attack(
+        params.attacker,
+        self:GetParent(),
+        params.record
+    )
+end
+
+function M:OnAttackFail(params)
+    if not IsServer() or not params or params.target ~= self:GetParent() then return end
+    tree_damage_rules.clear_basic_attack(
+        params.attacker,
+        self:GetParent(),
+        params.record
+    )
+end
+
+function M:OnAttackRecordDestroy(params)
+    if not IsServer() or not params then return end
+    tree_damage_rules.clear_basic_attack(params.attacker, nil, params.record)
 end
 
 function M:GetModifierIncomingDamage_Percentage(params)
     params = params or {}
     if tree_damage_rules.is_arrow_tower(params.attacker) then return -100 end
-    -- DamageFilter always supplies damage_category_const and remains the
-    -- authority. Some engine builds omit damage_category from modifier
-    -- property params, so defer instead of accidentally blocking base attacks.
-    if params.damage_category == nil then return 0 end
-    if tree_damage_rules.allows_damage(
-            params.attacker,
-            self:GetParent(),
-            params.damage_category) then
-        return 0
-    end
-    return -100
+    -- DamageFilter owns final classification and can consume the attack evidence
+    -- recorded by this modifier. Modifier damage params can omit the category or
+    -- report 0 for a real ranged attack, so keep only the tower-identity backstop.
+    return 0
 end
 
 function M:GetMinHealth()

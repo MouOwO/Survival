@@ -57,6 +57,10 @@ local modifiers = {
         path = "modifiers/modifier_weapon_attack_tracker",
     },
     {
+        name = "modifier_monkey_king_clone",
+        path = "modifiers/modifier_monkey_king_clone",
+    },
+    {
         name = "modifier_weapon_stat_projection",
         path = "modifiers/modifier_weapon_stat_projection",
     },

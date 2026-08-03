@@ -15,6 +15,15 @@ local RETURN_HOME_ABILITY = "ability_survival_return_home"
 local PICKUP_MATERIALS_ABILITY = "ability_survival_pickup_materials"
 local PUBLIC_SKILL_CAPACITY = 3
 
+local function exclusive_unlock_level(skill_id)
+    for _, row in ipairs(exclusive_skills.rows or {}) do
+        if row.skill_id == skill_id then
+            return math.max(1, tonumber(row.unlock_rebirth_level) or 1)
+        end
+    end
+    return 1
+end
+
 local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
@@ -53,7 +62,9 @@ local function skill_projection(skill_id, level, locked)
         effect_value_per_level = definition
             and (tonumber(definition.effect_value_per_level) or 0) or 0,
         locked = locked == true and 1 or 0,
-        locked_reason = locked == true and "完成一转后激活" or "",
+        locked_reason = locked == true
+            and ("完成" .. tostring(exclusive_unlock_level(skill_id))
+                .. "转后激活") or "",
     }
 end
 
@@ -467,7 +478,9 @@ local function initialize_hero(payload)
     state_by_player[payload.player_id] = state
 
     for _, row in ipairs(exclusive_skills.rows or {}) do
-        if definition and definition.vip_required ~= true
+        if definition
+            and (definition.vip_required ~= true
+                or payload.hero_id == "hero_monkey_king")
             and row.enabled ~= false and row.guaranteed == true
             and row.hero_id == payload.hero_id then
             state.levels[row.skill_id] = 0

@@ -129,7 +129,7 @@ local function create_offer(player_id, source, trigger_level)
     }
 end
 
-local function grant_exclusive(player_id)
+local function grant_exclusive(player_id, trigger_level)
     local hero_state = state(player_id)
     if not hero_state then
         return { ok = false, error = "combat_hero_not_ready" }
@@ -145,12 +145,15 @@ local function grant_exclusive(player_id)
     end
     local granted = {}
     local added = {}
+    local rebirth_level = tonumber(trigger_level)
+        or tonumber(progression(player_id).rebirth_level) or 0
     for _, row in ipairs(exclusive.rows or {}) do
         if row.enabled ~= false
             and row.hero_id == hero_state.hero_id
             and (group_id == ""
                 or row.exclusive_group_id == group_id)
-            and row.guaranteed == true then
+            and row.guaranteed == true
+            and rebirth_level >= (tonumber(row.unlock_rebirth_level) or 1) then
             if not owned[row.skill_id] then
                 local result, request_error = event_bus.request(
                     events.HERO_SKILL_GRANT_REQUEST,
@@ -194,7 +197,7 @@ end
 local function on_skill_reward(payload)
     local effect = payload.effect or {}
     if effect.effect_type == "grant_exclusive_skill" then
-        grant_exclusive(payload.player_id)
+        grant_exclusive(payload.player_id, payload.trigger_level)
     elseif effect.effect_type == "grant_random_skill_or_upgrade" then
         local player_id = tonumber(payload.player_id)
         local trigger_level = tonumber(payload.trigger_level)

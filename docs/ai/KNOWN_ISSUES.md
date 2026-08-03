@@ -2,13 +2,21 @@
 
 ## 当前已知问题
 
+0. **Modifier承伤参数中的`damage_category`可能误报真实远程平A。**
+   - 2026-08-03实机表现：伐木工远程攻击树会触发木材绿字并增加木材，证明`OnAttackLanded`正常，但树生命完全不减少。
+   - 根因是`modifier_tree_progression`曾用`MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE`的`params.damage_category`再次分类伤害；该字段可能为`0`或其他非权威值，导致真实平A被返回`-100%`清零。
+   - 第一轮误判：曾认为全局DamageFilter始终提供`damage_category_const`，但该保证只存在于项目Mock，不存在于实机接口；移除Modifier分类后实机仍不掉血，证明DamageFilter对缺失类别继续失败关闭。
+   - 修复原则：明确类别按`DOTA_DAMAGE_CATEGORY_ATTACK`判断；缺失/0类别使用树Modifier在`ON_ATTACK_START`登记的一次性真实攻击凭证。不能只靠inflictor为空，也不得用`ApplyDamage`补伤害掩盖根因。`TREE_DAMAGE_FILTER`限次日志用于输出实际类别、inflictor、凭证与无敌状态。
+
 0. **提交新增`require`时可能遗漏对应新模块文件。**
    - 2026-08-03提交`85ce4eb`在`building_upgrade_system.lua`新增`require("systems/building_upgrade_process")`及四个接口调用，但Git历史和工作区均没有对应文件，导致地图在`addon_game_mode.lua`加载阶段立即终止。
    - 排查真实`module not found`时应同时执行`git ls-files`、Git历史对象搜索和全项目require解析；不能只注释require绕过业务流程。当前缺失模块已补齐并有Lua 5.1行为测试。
+   - 防复发检查：新增静态`require`后，必须确认目标文件出现在`git status --short`或`git ls-files`中，并对“目标模块、直接调用方、`addon_game_mode.lua`”执行Lua 5.1语法检查。动态拼接模块名不能由简单正则完整验证，必须单独核对配置来源。
 
 0. **Lua 5.1会把被require模块的编译失败同时显示为`module not found`。**
    - 2026-08-03实际表现为`module 'systems/hero_passive_skill_service' not found`，同一条搜索诊断后紧跟真实原因`main function has more than 200 local variables`。
    - 根因是主服务顶层chunk拥有202个local；已将三个末尾入口挂到模块表，使声明数降至199并通过`luac5.1 -p`。排查同类问题必须优先阅读`module not found`后附带的目标文件编译错误。
+   - 结论：文件存在只能排除“真实缺失”，不能证明模块可加载；必须继续检查Lua 5.1语法、顶层local数量、BOM/非法字节和目标模块的传递依赖。
 
 0. **`SESSION_LOG.md`历史内容已有3个`U+FFFD`替换字符。**
    - 2026-08-02严格UTF-8检查确认整份文件可以正常解码，但本次四英雄验收记录之前的历史区域已有3个Unicode替换字符；本次新增经验段落不含乱码。
@@ -81,10 +89,11 @@
    - 技能接管不得再把稠密显示序号直接拼成 `AbilityN`；必须枚举有效官方按钮、按屏幕视觉位置排序，并在完整映射后原子提交。
    - 映射不完整时必须整批恢复官方 UI，禁止保留半项目、半官方状态。
 
-16. **历史 Lua 5.1 编译器路径当前已失效。**
-    - `C:\msys64\mingw64\bin\luac5.1.exe`曾验证为Lua 5.1.5，但2026-08-02再次探测时该文件及MSYS2候选目录均不存在。
-    - 当前可用解释器/编译器为WinGet目录中的Lua/Luac 5.4.5；可用于一般语法检查，但不得把结果标记为Lua 5.1兼容通过。
-    - 后续若恢复Lua 5.1工具，应重新探测并记录实际路径和`-v`输出，禁止继续把历史路径当作当前存在证据。
+16. **Lua 5.1 工具必须使用当前已验证的绝对路径。**
+    - 2026-08-03已确认`C:\Program Files\lua\bin\lua5.1.exe`与`C:\Program Files\lua\bin\luac5.1.exe`均为Lua 5.1.5；旧`C:\msys64\mingw64\bin`路径仍为失效历史路径。
+    - 当前终端PATH尚未包含Lua 5.1目录，自动验证必须使用上述绝对路径，不能因`Get-Command luac5.1`无结果而误判编译器不存在。
+    - PowerShell 7当前路径为`C:\Program Files\PowerShell\7\pwsh.exe`，版本7.6.4；Windows PowerShell 5.1仍位于系统默认路径。
+    - 当前有7个历史Lua源文件带UTF-8 BOM，PUC Lua 5.1会在第1字节拒绝；`tools/test_lua51_syntax.ps1`只对临时副本移除BOM再检查，不修改生产源文件，并在结果中报告`bom_normalized`数量。
     - Luac只能证明对应版本语法可解析，不能替代Dota API、Scheduler、粒子、伤害和UI的Workshop Tools实机验证。
 
 17. **召唤英雄的攻击射程写入与读取接口不对称。**

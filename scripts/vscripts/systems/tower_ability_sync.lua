@@ -30,6 +30,10 @@ function M.sync(state, row)
     for _, skill_id in ipairs(row and row.skill_ids or {}) do
         wanted[skill_id] = true
     end
+    if state.tower_class and row
+        and tonumber(row.level) == tonumber(row.max_level) then
+        wanted.ability_tower_fusion = true
+    end
 
     for _, ability_name in ipairs({
         "ability_upgrade_tower", "ability_upgrade_tower_lv01",
@@ -58,6 +62,11 @@ function M.sync(state, row)
     end
     for _, skill_id in ipairs(row and row.skill_ids or {}) do
         add_ability(state.unit, skill_id)
+    end
+    if wanted.ability_tower_fusion then
+        add_ability(state.unit, "ability_tower_fusion")
+    elseif state.unit:FindAbilityByName("ability_tower_fusion") then
+        state.unit:RemoveAbility("ability_tower_fusion")
     end
 end
 

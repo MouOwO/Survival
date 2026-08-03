@@ -1,3 +1,26 @@
+## 2026-08-03 — 资源树第二轮实机修复：DamageFilter缺少类别字段
+
+- 用户确认第一轮移除树Modifier类别二次过滤后，伐木工仍只加木材、不扣树生命。
+- 复查发现专项Mock一直主动传入`damage_category_const`，但实机DamageFilter不保证该字段存在；旧全局规则对`nil/0`失败关闭，导致测试与实机不一致。已撤销“DamageFilter始终提供类别字段”的错误经验。
+- 新实现由树Modifier在`ON_ATTACK_START`登记“攻击者+树+record”短生命周期凭证；DamageFilter类别缺失/0且无inflictor时，只有一次性消费凭证才能放行。明确基础攻击仍放行并消费凭证，箭塔不能登记且始终拒绝，后续无凭证脚本伤害无法复用。
+- 增加失败/record销毁清理及限20次`TREE_DAMAGE_FILTER`日志，输出allow、category、inflictor、evidence、damage和实体阻断状态。未添加`ApplyDamage`，未修改伐木工CSV/远程属性。
+- Lua 5.1行为测试已覆盖实机等价的“无category+无inflictor+真实攻击凭证”正向路径、凭证一次性、无凭证脚本伤害拒绝、塔不能登记、明确类别消费和攻击失败清理。
+
+## 2026-08-03 — 修复伐木工平A树只加木材但不扣生命
+
+- 用户明确规则：所有非塔单位的真实平A都应扣树生命，只有箭塔及转职塔不能攻击树；技能、脚本和攻击附伤仍不得伤树。
+- 用户实机确认伐木工攻击会出现木材绿字并增加木材，因此空远程弹道、攻击命令和`OnAttackLanded`均正常，问题发生在生命承伤过滤之后。
+- 根因：`modifier_tree_progression`曾使用非权威的`params.damage_category`重复分类伤害。真实远程平A在该入口可能报告`0`/其他值，旧逻辑返回`-100%`，覆盖了全局DamageFilter已放行的基础攻击。
+- 修复：树Modifier只保留稳定箭塔身份的`-100%`兜底，所有非塔伤害返回`0`并由拥有`damage_category_const`的全局DamageFilter权威分类。未修改CSV、伐木工远程/射程/攻速/弹道，也未新增`ApplyDamage`。
+- 自动验证通过：`TREE_DAMAGE_RULES_LUA51_PASS`、`TREE_DAMAGE_RULES_CONTRACT_PASS`、`TREE_LUMBERJACK_ALL_LUAC51_PASS`和限定`git diff --check`。行为测试新增显式伐木工攻击者、Modifier类别`0`放行和DamageFilter基础平A正向断言；仍需Workshop Tools实机确认树实际扣血。
+
+## 2026-08-03 — 固化Lua模块加载故障排查经验
+
+- 用户要求把本次`building_upgrade_process.lua`漏提交导致的启动阻断写入当前项目经验。
+- `PROJECT_CONTEXT.md`新增长期规则：将`module not found`分为真实文件缺失和目标模块Lua 5.1编译失败两类，并固定文件/Git历史/完整错误/Lua 5.1/静态require/行为测试/Workshop Tools冷启动的排查顺序。
+- `KNOWN_ISSUES.md`补充防复发检查：新增静态`require`必须同时确认目标文件被Git纳入，并检查目标模块、直接调用方和`addon_game_mode.lua`；动态require需单独核对配置，不能依赖简单正则。
+- 本次仅更新文档，不修改生产代码。
+
 ## 2026-08-03 — 紧急修复建筑升级流程模块缺失
 
 - 用户实机报告`building_upgrade_system.lua:12`无法require `systems/building_upgrade_process`，阻断`addon_game_mode.lua`。
@@ -1522,3 +1545,63 @@
 - 剑刃震荡的`BLADE_PULSE_PARTICLE`和马格纳斯震荡波预缓存均保留，未被回音重斩视觉替换影响。新增`tools/test_echo_slash_visual_contract.ps1`锁定纯刀光、排除完整回音父粒子/原生技能，并保护两项线性投射物契约。
 - 自动验证：`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua/Luac 5.4.5语法、六个任务文件严格UTF-8及限定`git diff --check`通过。历史记录的`C:\msys64\mingw64\bin\luac5.1.exe`本轮不存在，既有回音重斩状态测试脚本也未保存在当前工作区，因此未宣称本轮Lua 5.1或状态测试通过。
 - 尚未验证：Workshop Tools中的纯刀光实际朝向、尺寸、高度、移动速度、连续多波观感及是否完整走完攻击射程；自动契约不能替代引擎视觉验收。
+
+## 2026-08-03 — 伐木工动态资源Tooltip与Lua 5.1全项目验证
+
+- 稳定性边界：继续保留Valve原生技能栏和既有Alt隔离，只把已经具有完整权威runtime投影的`ability_train_lumberjack`加入选择性Tooltip代理；未把修理工、人口训练或通用建造技能扩大接管，也没有新增扫描、永久计时器或Alt事件。
+- 费用表现：自定义技能Tooltip使用静态Panorama `Image + Label`分别显示金币和木材；改用项目现有`st2_icon_gold.png`与`st2_icon_wood.png`真实资源图标。金币/木材费用块按大于0独立显隐，两者都为0时隐藏整行，避免显示无意义的0。
+- 动态数据：真实`ability_runtime_builder.lua`在Lua 5.1测试桩下确认一级伐木工投影木材10、金币0、人口1；木材恰好10时`can_afford=1`，木材9时`can_afford=0`。服务端训练扣费与点击路由未修改。
+- 工具链记录：确认`C:\Program Files\lua\bin\lua5.1.exe`和`luac5.1.exe`均为Lua 5.1.5；PowerShell 7为`C:\Program Files\PowerShell\7\pwsh.exe` 7.6.4，Windows PowerShell为系统5.1.18362.2212。实际路径已写入`.cline/local-toolchain.json`和`KNOWN_ISSUES.md`。
+- Lua 5.1全项目验证：首次直接逐文件检查发现仅7个历史Lua文件因UTF-8 BOM在第1字节被PUC Lua 5.1拒绝；字节审计确认BOM后的内容均为严格UTF-8且文件没有既有工作区差异。为保持本次Tooltip改动最小，没有修改这7个生产源文件；最终仅在临时副本中删除三个BOM字节后完成`scripts/vscripts`下306/306个Lua文件的`luac5.1 -p`，结果明确报告`bom_normalized=7`。
+- 可重复验证：新增兼容Windows PowerShell 5.1与PowerShell 7的`tools/test_lua51_syntax.ps1`，优先读取本地工具链记录，对无BOM文件直接检查，对BOM文件使用自动清理的临时副本。当前工作树没有任何`test_*.lua`文件，历史文档中的Lua行为测试套件不在仓库内，不能冒充本轮全量行为回归。
+- Panorama编译：`ability_tooltip.js`和`ability_tooltip.css`各为`OK: 1 compiled, 0 failed, 0 skipped`；`survival_hud.xml`依赖链为`OK: 9 compiled, 0 failed, 0 skipped`，并实际生成金币/木材`*_png.vtex_c`。升级Tooltip契约和Alt安全契约均在PowerShell 7与Windows PowerShell 5.1通过。
+- 尚需实机：完全停止并重新Run Workshop Tools，悬停一级与高等级伐木工确认单木材/金币木材并排、费用实时变化、鼠标与快捷键训练正常；重复按住/松开Alt和快速切换主城/英雄，确认无双Tooltip、无输入残留且不崩溃。自动编译和契约不能替代该实机崩溃验收。
+
+## 2026-08-03 — 伐木工Tooltip主城选择映射修复第一版
+
+- 用户实机截图显示悬停目标仍出现Valve原生“升级主城”Tooltip，未显示伐木工金币/木材；确认原生Tooltip无法读取项目`survival_ability_runtime`中的双资源费用，因此继续使用窄范围选择性自定义Tooltip，不接管整行技能栏。
+- 修复`ability_tooltip.js`的官方按钮映射：不再把原始`AbilityN`编号直接当作稠密显示序号，而是收集当前稳定可见的官方按钮锚点、按窗口视觉位置排序，再与当前单位的真实可见ability entindex配对。悬停与点击统一读取代理上绑定的entindex，避免显示伐木工却施放升级主城或反向错位。
+- 原子安全回退：每次映射前关闭全部旧`AbilityN`代理；官方按钮数与真实可见技能数不一致时保持Valve原生交互，不启用部分映射。新增去重`[SURVIVAL_TOOLTIP_MAP]`日志，可直接观察`AbilityN->ability_name`或fallback数量。
+- 选择恢复：订阅本地`dota_player_update_selected_unit`和`dota_player_update_query_unit`；切换时先关闭旧Tooltip，再以`0/0.016/0.05/0.10/0.20s`有限重试绑定。初次HUD创建单独保留原有`0/0.10/0.35/1.0s`窗口；没有新增永久扫描、哨兵循环或Alt事件。
+- 自动验证：`ability_tooltip.js`经Dota资源编译器强制编译为`OK: 1 compiled, 0 failed, 0 skipped`；建筑升级/Tooltip契约与Alt安全契约在PowerShell 7及Windows PowerShell 5.1均通过；全项目Lua 5.1语法`306/306`通过，7个历史BOM仅在临时副本规范化；限定`git diff --check`通过。仍需彻底停止并重新Run后实机确认主城伐木工悬停、点击、快捷键、Alt和快速选中切换。
+
+## 2026-08-03 — 齐天大圣专属技能与七塔合一计划获批
+
+- 用户批准实施齐天大圣固定Q/W/E/R专属技能，分别于1/3/6/10转解锁；召唤时四槽均显示但置灰，达到条件后原位激活。保留现有四个齐天大圣专属技能ID以维持技能槽和存档兼容。
+- Q最终确认：主攻击命中10%触发，从本体或唯一分身朝主目标快照方向释放；Lua矩形固定长1200、总宽200。范围内全属性×30纯粹伤害每次均结算；最大生命10%纯粹伤害由同玩家本体与分身共享，每个敌人最多3次，可击杀。原始“当前生命”描述已被用户明确更正为“最大生命”。
+- W最终确认：3转解锁，暴击伤害在默认200%上+2000个百分点，裸基础暴击率0%；攻击间隔-0.1秒且最低0.1秒。解锁后每60秒按排除W累计增量的当时逻辑全属性增加2%，永久复利。唯一永久分身优先在城墙附近生成，死亡1秒后重生；无城墙回退本体。实时镜像本体战斗属性并保持生命百分比，护甲固定10，只拥有Q。
+- E最终确认：6转解锁后本体最终攻击力独立×3；仅本体主普通攻击实际暴击时对主目标附加全属性×5纯粹伤害，分身、次级攻击、技能与塔均不触发。
+- 通用七塔合一最终确认：每条路线终阶塔获得主动合成技能；只使用施法塔建造玩家自己的塔。施法塔必选，其他路线取距离最近者，距离相同按实体ID。原子消耗7塔，在施法塔位置生成唯一无敌终极塔；生命上限、当前生命和护甲分别求和。
+- 终极塔保留7条独立攻击流，各自保留路线射程、攻击间隔、弹道和隔离被动状态；基础攻击力为7塔攻击力之和。齐天大圣10转R解锁后，每条攻击流均使用“7塔之和+英雄最终攻击力”，实时继承英雄暴击率和最终暴击伤害，不继承E附伤。
+- R主动无冷却，在英雄释放瞬间位置与该玩家城墙位置之间瞬移同一终极塔实体，并保留生命百分比、攻击计时与被动状态。七塔合一本身允许任何英雄使用，R仅负责齐天大圣增强与切换。
+- `passN`只允许严格下一转，直接复用正式CSV完整奖励事务，不打Boss；跳级、重复和倒退原子拒绝。
+- 调查证据：`hero_exclusive_skills.csv`当前齐天大圣4条均由一转一次发放；`reward_effects.csv`当前仅一转含专属授予；`hero_skill_system.lua`VIP英雄不预创建置灰技能；项目没有英雄普通攻击统一暴击结果事件；七条路线终阶均为第三阶段LV10，塔被动运行依赖独立攻击/计数状态。
+- 工作区保护：开始前`git status --short`已有树伤害、模型、多目标和恢复文档修改，以及多个用户未跟踪测试/文本文件。本任务不回滚、不覆盖这些既有修改；文档只做增量追加。
+- 下一步最小动作：读取专属奖励适配器、英雄战斗快照计算区和塔攻击事件关键区，先实现CSV分转解锁、`passN`与英雄暴击权威基础。
+
+## 2026-08-03 — 齐天大圣Q/W/E/R、passN与通用七塔合一实现
+
+- CSV权威配置已完成：`hero_exclusive_skills.csv`新增`unlock_rebirth_level`并将齐天大圣四技能设为1/3/6/10；`reward_effects.csv`在3/6/10转新增专属授予；新增`monkey_king_exclusive_runtime.csv`和`tower_fusion_runtime.csv`。生成Lua通过源/生成字节一致性验证。
+- 技能槽兼容：保留原四个skill/Ability ID，齐天大圣召唤后预创建固定Q/W/E/R，未解锁置灰；四技能CSV与KV统一最高1级，移除旧射程/攻击/攻速/敏捷占位效果。
+- 奖励测试：新增内部正式奖励请求，`passN`严格校验下一转后调用`reward_rebirth_NN`完整事务，不启动Boss。正式Boss完成和命令共享奖励配置及专属授予逻辑。
+- 战斗基础：统一研究暴击率、W最终暴击伤害和attack record实际暴击结果；同record幂等掷骰，命中发布实际结果，销毁时清理。E三倍使用独立乘区，不会在刷新时累乘。
+- Q/W/E由独立`monkey_king_exclusive_service.lua`管理，避免增加已有199-local公共被动服务压力。Q使用项目伤害事务与Lua矩形；W管理永久成长和唯一分身；E只消费本体实际主暴击。
+- 七塔合一由`building_system`批量消费入口和`tower_fusion_service.lua`协作。完整验证后创建主实体与7个隐藏路线代理；二次消费失败会删除新实体且不动原塔。人口视为替换而不释放。
+- 7代理各自保存原终阶技能Ability、`tower_skill_runtime`和`modifier_tower_attack_effects`，按独立计时执行真实`PerformAttack`，因此原七路线攻击事件和被动实现均复用且状态隔离。主实体无自然攻击，代理无自然索敌，避免额外第8路攻击。
+- R实时读取英雄战斗快照；每路攻击增加英雄最终攻击，路线自身未暴击时才尝试英雄继承暴击。主动移动同一主实体与代理，不重建状态。
+- 本地化：更新Panorama/resource/resource-localization中英文六份镜像，保留UTF-8 BOM与CRLF；修复插入时暴露的中间KV结束符缩进后，免费英雄本地化结构契约通过。
+- 自动验证通过：`MONKEY_TOWER_CONTRACT_PASS`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、`TREE_DAMAGE_RULES_CONTRACT_PASS`、`WORKER_RANGED_MULTISHOT_CONTRACT_PASS`、`MONKEY_KING_QWE_LUA51_PASS`、`TOWER_FUSION_LUA51_PASS`、`HERO_MULTISHOT_LUA51_PASS`、`MONKEY_TOWER_FINAL_LUAC_PASS`、严格UTF-8、CSV生成一致性及限定`git diff --check`。
+- 缺失测试：仓库不存在`test_tower_special_skill_contract.ps1`和`test_tower_magic_supreme_contract.ps1`，因此记录为`SKIP_MISSING`而非通过；相关路线必须重点实机回归。
+- 工作区保护：未触碰或回滚开始前已有的树伤害、模型、多目标、AI文档既有修改及用户未跟踪文件。本任务新增文件和增量修改均保留；只删除了本次Python导入产生的`tools/__pycache__`缓存。
+- 仍需Workshop Tools实机验收：粒子控制点、Q碰撞/计数、W分身、E暴击、七路线全部弹道和被动、R瞬移与状态保持。未记录为用户验收或制作完成。
+
+# 2026-08-03 - 齐天大圣W分身权威数据复刻修复
+
+- 用户实机反馈分身技能复刻正确，但分身数据与本体不一致，尤其攻速不同。
+- 根因一：旧分身Modifier自行读取`base_attack_time`和`equipment_attack_speed_pct`，会混入分身原生英雄攻速，不等于combat system已计算的最终`attack_speed`。
+- 根因二：旧分身最大生命使用`SetBaseMaxHealth/SetMaxHealth`，违反项目已实机确认的原生召唤英雄生命投影规则；旧攻击力还把整个逻辑攻击乘`hero_damage_multiplier`，错误放大装备/研究部分。
+- 修复后`hero_combat_stat_service`在同一快照发布最终引擎攻击上下界；分身每0.1秒只读取一次该权威快照，复制最终攻击、`SetBaseAttackTime(1 / attack_speed)`、生命Modifier补足、暴击和逻辑三维，并记录`refresh_version`。
+- 分身原生三维归零，避免敏捷暗中影响攻速/护甲；固定10 War3护甲、只拥有Q、不进入装备/公共技能/转生/E链保持不变。
+- `ui_request_router`增加严格分身身份适配，选中分身时消费owner的同一英雄快照并投影分身实体、生命、固定护甲和最终攻速，不再展示原生单位回退数据。
+- 验证通过：`MONKEY_KING_QWE_LUA51_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、`MONKEY_CLONE_LUAC51_PASS`、`HERO_HEALTH_CONTRACT_PASS`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、严格UTF-8和限定`git diff --check`。自动验证不等于Workshop Tools实机验证。
+- 下一步：冷启动后对照本体与分身的攻击上下界、每秒攻击次数/实际攻击间隔、最大生命、暴击和逻辑三维；同时确认固定10护甲、生命比例刷新、仅Q和死亡1秒重生无回归。
