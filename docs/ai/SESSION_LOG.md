@@ -1605,3 +1605,46 @@
 - `ui_request_router`增加严格分身身份适配，选中分身时消费owner的同一英雄快照并投影分身实体、生命、固定护甲和最终攻速，不再展示原生单位回退数据。
 - 验证通过：`MONKEY_KING_QWE_LUA51_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、`MONKEY_CLONE_LUAC51_PASS`、`HERO_HEALTH_CONTRACT_PASS`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、严格UTF-8和限定`git diff --check`。自动验证不等于Workshop Tools实机验证。
 - 下一步：冷启动后对照本体与分身的攻击上下界、每秒攻击次数/实际攻击间隔、最大生命、暴击和逻辑三维；同时确认固定10护甲、生命比例刷新、仅Q和死亡1秒重生无回归。
+
+## 2026-08-03 - 回音重斩纯刀光实机失败修正
+
+- 用户实机报告旧视觉“只闪一下或只显示残缺的一小段”。资源反编译确认`kez_katana_echo_strike_slash.vpcf`使用`C_INIT_CreateSequentialPathV2`，要求CP0/CP1两个世界端点，固定粒子寿命0.3秒且连续发射期0.5秒；`CreateLinearProjectile`的`EffectName`不会按该内部子粒子的契约提供控制点。
+- 修复后线性投射物不再设置Kez `EffectName`，继续唯一负责1秒路径、总宽200、穿透、逐单位去重和伤害。每道独立创建纯刀光，Lua每0.05秒按同一权威路径推进横向CP0/CP1，并补官方蓝色CP7和发射率CP8。
+- 为覆盖完整1秒路径，每道视觉在0.5秒销毁第一实例并从半程创建第二实例；两段仅是视觉生命周期，不增加战斗波、投射物、攻击、命中或伤害。正常终点、投射物回调、超时、服务重置和视觉异常均幂等销毁释放。
+- 曾尝试从Valve编译资源反解并重编译1秒项目粒子；Resource Compiler虽报告成功，但反编译产物的emit rate被规范化为0，判定不可用并已删除源与产物，未接入生产。
+- 新增`tools/test_echo_slash_visual.lua`和更新后的视觉契约，覆盖起点、半程换段、射程终点、CP7/CP8、幂等清理、视觉失败隔离及与剑刃震荡的资源隔离。自动验证通过：`ECHO_SLASH_VISUAL_STATE_PASS`、`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`和Lua 5.4.5语法；当前仍无Lua 5.1编译器。
+- 尚待完全停止并重新Run Workshop Tools，实机确认两段刀光衔接、朝向、宽度、高度、连续多波观感和完整攻击射程。
+
+## 2026-08-03 - 回音重斩第二次实机失败：修正刀光端点方向
+
+- 用户第二次实机截图显示刀光在英雄周围形成大圆弧，两端伴随强白光，仍没有成为沿攻击路径移动的弧形斩。
+- 结合截图和Valve资源定义确认新根因：`C_INIT_CreateSequentialPathV2`以CP0/CP1作为带`m_flBulge=100`的斩击路径两端；上一轮Lua却把两点放在移动中心的横向左右各100码，错误地把碰撞宽度当成视觉端点间距，连续发射后叠加成环。
+- 本轮最小修正只改变视觉几何：CP0/CP1沿固定投射方向放在移动中心后方/前方各100码；视觉总长200与碰撞总宽200在数值上相同但语义彻底分离，视觉同步函数禁止读取`state.half_width`。两个0.5秒视觉实例、0.05秒同步和所有清理策略保留。
+- 权威`CreateLinearProjectile`、1秒射程、总碰撞宽200、穿透、单波去重、多波0.1秒时序、伤害快照与视觉失败隔离均不修改。
+- 自动验证通过：`ECHO_SLASH_VISUAL_STATE_PASS`、`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua 5.4.5生产/测试语法、六个目标文件严格UTF-8、主服务顶层local仍为199及限定`git diff --check`。状态测试同时保护4波绝对时序、无碰撞投射物视觉、500射程、总宽200、穿透、单波去重、跨波命中、纯粹伤害、LV5随机倍率和视觉失败隔离。
+- 当前环境三个已知Lua 5.1编译器路径均不存在，不能宣称本轮Lua 5.1编译通过。额外运行的魔法弹弓视觉契约失败于既有`MAGIC_SLINGSHOT_TINY_ATTACK_PARTICLE_REMAINS`：该测试排斥Tiny attack资源，但当前地裂冲击既有视觉正在使用它；本轮未修改这两项，也未为无关陈旧断言改变生产行为。
+- 尚待冷启动Workshop Tools，确认大圆环和端点白爆消失，并检查弧线开口方向、总视觉长度、高度、两个0.5秒实例衔接和完整射程。
+
+## 2026-08-03 - 回音重斩改用完整Kez Echo Slash父粒子
+
+- 用户确认当前回音重斩没有正确使用Kez Echo Slash，并明确授权：若不能在去除Kez模型的前提下正确使用特效，可以保留Kez使用完整Echo Slash。此前内部`kez_katana_echo_strike_slash.vpcf`直接投射物和Lua端点驱动方案均正式废弃。
+- 生产视觉切换为`particles/units/heroes/hero_kez/kez_katana_echo_strike.vpcf`并同步替换预缓存。该父粒子会包含Kez英雄残影以及ground、movement、streaks、swoosh、wind warp和thickness indicator，符合本轮授权。
+- 每道战斗波仍对应两个连续0.5秒视觉实例：第一实例CP0/CP1为触发起点→射程中点，第二实例为中点→完整终点；CP2设置`(权威速度, 200, 1.5)`，CP6沿用Valve预览`(-9.61916,0,0)`，CP7/CP8保留原版蓝色和发射输入。父粒子自行从CP10传播运动位置和朝向给全部子效果。
+- 完整父粒子只作为独立视觉层。权威`CreateLinearProjectile`继续无`EffectName`并唯一负责1秒射程、总碰撞宽200、穿透、单波去重和伤害；1/2/3/3/4波、12%/15%触发、0.1秒间隔、全属性×1纯粹伤害和LV5每波独立5%～20%增伤均不修改。没有调用`kez_echo_slash`、Kez modifier、原生声音、攻击或回音复击。
+- 最终验证通过：`ECHO_SLASH_VISUAL_STATE_PASS`、`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua 5.4.5生产/测试语法、七个目标文件严格UTF-8、主服务顶层local仍为199及限定`git diff --check`。状态测试覆盖完整父资源、两阶段CP、CP2/6/7/8、清理、视觉异常隔离、四波时序、碰撞宽度、穿透、去重和纯粹伤害。下一步仅为冷启动Workshop Tools实测完整效果；当前环境无Lua 5.1编译器，未宣称本轮Lua 5.1编译通过。
+
+## 2026-08-03 - 回音重斩末端额外斩击根因与视觉清理修复
+
+- 继续反编译核对完整父粒子、slash和swoosh后确认：父资源只用`C_OP_InstantaneousEmitter`瞬发一个载体，没有延迟发射第二个父载体；该载体的寿命字段为0.5秒，并由`C_OP_BasicMovement`推进，再通过`C_OP_SetChildControlPoints`持续驱动完整子效果。CP1只参与方向/端点契约，不是载体到达后自动停止的硬边界。
+- 旧阶段切换与最终清理使用`DestroyParticle(..., false)`，只停止发射而不立即清除已生成载体。载体及其slash/swoosh子系统会在剩余寿命内继续移动，因此表现为斩击到达阶段终点后又向前播放；这比“父粒子延迟再发射一次”更符合资源定义。
+- 最小修复仅修改完整Kez视觉父粒子的统一销毁函数：无论阶段切换、正常终点、投射物终点、超时、异常或服务重置，均调用`DestroyParticle(particle, true)`并继续`ReleaseParticleIndex`。没有修改`CreateLinearProjectile`、射程、速度、总宽、穿透、单波去重、波数、0.1秒波间隔、伤害快照或纯粹伤害。
+- 状态测试现分别要求第一阶段换段和第二阶段正常收尾立即销毁；PowerShell契约禁止恢复调用方控制的淡出销毁。验证通过：`ECHO_SLASH_VISUAL_STATE_PASS`、`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua/Luac 5.4.5生产与测试语法、7个目标文件严格UTF-8、主服务顶层local仍为199及限定`git diff --check`。状态测试还保护四波绝对时序、无碰撞投射物视觉、500射程、总宽200、穿透、单波去重、跨波命中、纯粹伤害、LV5倍率和视觉失败隔离。当前无Lua 5.1命令，未宣称Lua 5.1验证；Workshop Tools冷启动实测仍待执行，重点确认末端额外斩击消失以及0.5秒换段是否出现明显断帧。
+
+## 2026-08-03 - 虚空震爆卡尔龙卷风视觉源与契约恢复
+
+- 用户批准为三选一公共技能`proto_void_pulse`/“虚空震爆·被动”使用卡尔原版龙卷主体外观，并保留现有Lua追踪、到达后附着、目标死亡后停在最后位置以及LV5小龙卷规则；本轮不得修改任何战斗数值。
+- 调查确认生产主/小龙卷已经统一使用`particles/survival_tornado/survival_tornado_follow.vpcf`，共享状态机每0.05秒写CP0；已有编译产物明确依赖Valve `particles/units/heroes/hero_invoker/invoker_tornado_child.vpcf`。完整`invoker_tornado.vpcf`因内部直线移动无法可靠重定位，继续禁止用于动态追踪视觉。
+- 恢复content源`particles/survival_tornado/survival_tornado_follow.vpcf`：仅包含一个卡尔龙卷主体子粒子，没有`C_OP_BasicMovement`、`m_Operators`或CP1速度驱动。新增`tools/test_tornado_visual_contract.ps1`，覆盖技能身份、源依赖、主/小创建、CP0同步、0.05秒间隔、释放、清局和预缓存。
+- Resource Compiler强制定向编译结果为`OK: 1 compiled, 0 failed, 0 skipped`；新产物未形成game仓库差异，证明恢复源可重现当前生产二进制。`TORNADO_VISUAL_CONTRACT_PASS`、生产Lua 5.4.5语法、严格UTF-8/尾随空白检查、编译产物卡尔子依赖及限定差异检查通过。
+- 10项相邻视觉契约中7项通过；3项既有无关失败为`MAGIC_SLINGSHOT_TINY_ATTACK_PARTICLE_REMAINS`、`MOVING_ICE_BALL_OLD_PROJECTILE_REMAINS`和`POISON_CLOUD_PERSISTENT_VISUAL_CREATION_MISSING`，均来自当前其他技能实现与陈旧测试不一致，本轮未修改。环境仅有Lua 5.4.5，不宣称Lua 5.1验证。
+- 尚未验证：完全重启Workshop Tools Run后的卡尔龙卷实际外观、主龙卷追踪与附着、目标死亡后的停留、多个活动龙卷重叠、LV5小龙卷和结束无残留。粒子已预缓存，Lua热加载不足以完成该验收。

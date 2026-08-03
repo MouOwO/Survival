@@ -8,6 +8,7 @@
 - 齐天大圣Q/W/E/R专属技能、严格顺序`passN`与通用七塔合一已完成代码和自动验证；当前状态为等待Workshop Tools实机验收，不得描述为制作完成。Q/W/E/R分别1/3/6/10转解锁，四槽固定置灰；终极塔使用7个隔离代理执行真实路线攻击并由R继承英雄攻击/暴击。详细实现、测试与实机清单见`CURRENT_TASK.md`顶部。
 - 资源树第二轮紧急修复待实机确认：第一轮移除Modifier重复分类后仍不掉血，现确认实机DamageFilter不保证`damage_category_const`，旧Mock错误掩盖缺字段拦截。已新增`ON_ATTACK_START`一次性真实攻击凭证，缺类别平A凭凭证放行，塔/技能/无凭证脚本伤害继续拒绝，并输出限次`TREE_DAMAGE_FILTER`诊断。
 - 第一轮树Modifier重复分类修复已被实机证实不充分，勿再恢复“DamageFilter类别字段始终存在”的假设；下一步冷启动验证第二轮真实攻击凭证方案。
+- 三选一公共技能`proto_void_pulse`/“虚空震爆·被动”的卡尔龙卷风视觉维护已完成：恢复content源`particles/survival_tornado/survival_tornado_follow.vpcf`，仅引用Valve `invoker_tornado_child.vpcf`且不含内部移动算子；生产主/小龙卷继续由Lua每0.05秒写CP0追踪。Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`，新视觉契约、Lua 5.4.5语法、严格UTF-8和限定检查通过；下一步完全重启Workshop Tools Run确认视觉追踪、附着、死亡停留和LV5分裂。
 - 紧急启动阻断已修复：提交`85ce4eb`引用但漏提交的`systems/building_upgrade_process.lua`已补齐；`building_upgrade_system.lua`与`addon_game_mode.lua` Lua 5.1语法、升级完成/重复拒绝/销毁取消/重置/失效建筑行为均通过。下一步必须完全停止并重新Run Workshop Tools确认不再出现`module not found`。
 - 当前新增实现待实机验收：资源树初始位置改为`(448,64,128)`；伐木工LV1-LV8统一0.5次/秒、400射程、远程空弹道，LV3与LV6-LV8模型已替换；修理工保持纯修理但距离属性为400；六英雄统一远程；一至四转普攻总目标数为3/4/5/6并按目标护甲独立结算。CSV、生成配置、运行时、KV、专项测试和相关回归已通过，下一步Workshop Tools冷启动验收。
 - 紧急阻断已修复：`hero_passive_skill_service.lua`曾因顶层chunk拥有202个local而超过Lua 5.1的200-local上限，导致`addon_game_mode.lua`无法加载。末尾`trigger/roll/on_main_attack`现改为模块表方法，顶层声明降至199；Lua 5.1语法、8项公共技能状态和四英雄专属回归已通过。仍需完全停止并重新Run Workshop Tools确认地图实际进入。
@@ -17,7 +18,7 @@
 
 - 四名免费英雄替换、固定Q槽专属技能、地狱火/小游侠活动锁及两种召唤物100%攻速继承已完成；用户于2026-08-02明确确认任务成功并验收通过。本任务不再作为活跃任务恢复，除非用户以后报告具体回归或提出新需求。
 
-- 新公共技能 `proto_echo_slash` / “回音重斩·被动”已完成CSV、生成配置、五级运行配置、真实线性投射物、Ability KV和Tooltip。2026-08-03按用户要求将视觉改为Kez Echo Slash纯刀光`kez_katana_echo_strike_slash.vpcf`，不包含Kez残影、原技能回音复击或额外伤害；等待Workshop Tools实机确认刀光朝向/尺寸、200总宽碰撞、0.1秒连续波和实际伤害。
+- 新公共技能 `proto_echo_slash` / “回音重斩·被动”已完成CSV、生成配置、五级运行配置、真实线性投射物、Ability KV和Tooltip。内部纯刀光方案经两次实机失败后已废弃；用户授权保留Kez模型，当前改用完整`kez_katana_echo_strike.vpcf`父粒子及其Kez/ground/movement/streaks/swoosh等子效果。每道用起点→中点、中点→终点两个0.5秒完整视觉实例覆盖1秒路径；完整父粒子的0.5秒移动载体曾因`DestroyParticle(..., false)`在收尾后继续外推，现所有视觉阶段边界统一立即销毁。碰撞投射物仍无视觉且唯一负责战斗，不调用原生能力、modifier、声音或额外结算。专项状态/契约、相邻视觉回归及Lua 5.4.5语法已通过，仍需Workshop Tools冷启动确认末端额外斩击消失且无明显断帧。
 - 用户已于2026-08-02确认现有公共技能`proto_earth_line`五级“地裂冲击·被动”暂时完成；CSV、生成配置、运行逻辑、KV、Tooltip、预缓存和自动测试均已完成。后续不得因旧的实机待验记录自动恢复该任务，只有用户明确提出新需求或实机问题时才继续修改。
 - 五级“陨石坠落·被动”的CSV、运行逻辑、Buff、KV、Tooltip、定向生成和自动测试已完成；用户已确认不滚动、同点双陨石间隔0.5秒、第二颗全部伤害80%、每片熔岩独立结算3次及全程同技能活动锁。`addmonster`测试怪提高至600移速后，用户已实机确认LV3-LV5熔岩30%减速正常；其余陨石视觉、伤害、时序和活动锁仍按实际验收状态处理。
 - 召唤英雄生命第一版直接Set方案实机仍为120，已废弃；第二版隐藏永久生命Modifier已由用户实机确认血量正常，作为可靠基线保留。
@@ -31,8 +32,14 @@
 ## 最后可靠检查点
 
 - 日期：2026-08-03
+- 回音重斩末端额外斩击已定位为完整Kez父粒子内部0.5秒移动载体在非立即销毁后继续存活；不是CP1终点错误，也没有第二个延迟父载体。阶段切换、正常终点、异常及重置现统一立即销毁视觉父粒子并释放索引，权威碰撞和伤害代码未变。
+- 下一步冷启动Workshop Tools，分别观察0.5秒换段和1秒终点，确认额外前冲消失并检查换段是否有明显断帧。
+- 日期：2026-08-03
 - 树位置、工人远程属性、四个伐木工模型、六英雄远程和转生多目标普攻已完成权威CSV、生成Lua、运行时和KV实现；专项合同、Lua 5.1行为/语法、VPK模型、生成编码、树/免费英雄/射程/减甲回归及限定diff检查通过。
 - 下一步：完全停止并重新Run Workshop Tools，确认树位于`(448,64,128)`、伐木工无可见弹道且400射程、修理工不攻击、六英雄均可按CSV射程远程攻击，以及一至四转实际攻击3/4/5/6个目标并按不同护甲独立扣血。
+- 日期：2026-08-03
+- 回音重斩内部纯刀光方案实机先后出现残缺、大圆环和端点白爆，现按用户授权改为完整Kez Echo Slash父粒子，允许显示Kez模型。完整资源作为独立视觉层按起点→中点和中点→终点两段驱动；权威碰撞、五级波数/概率/伤害和1秒路径不变。
+- `ECHO_SLASH_VISUAL_STATE_PASS`、完整父粒子视觉契约、剑刃震荡隔离、Lua 5.4.5语法、严格UTF-8、顶层local 199和限定diff均已通过。下一步完全停止并重新Run Workshop Tools，确认Kez、swoosh、地面痕迹、方向、两段衔接和完整射程。Lua 5.1工具仍不可用。
 - 日期：2026-08-03
 - 回音重斩已从马格纳斯震荡波替换为Kez Echo Slash纯刀光子粒子；完整Echo Strike父粒子、Kez英雄残影、原生技能、modifier、声音和额外结算均未接入。剑刃震荡仍保留马格纳斯震荡波。
 - `ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua 5.4.5语法、严格UTF-8和限定diff通过；本轮环境没有历史记录的Lua 5.1可执行文件。下一步在Workshop Tools确认刀光实际朝向、尺寸和移动观感。

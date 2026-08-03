@@ -613,7 +613,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_kez/kez_katana_echo_strike_slash.vpcf",
+        "particles/units/heroes/hero_kez/kez_katana_echo_strike.vpcf",
         context
     )
     PrecacheResource(

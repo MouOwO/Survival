@@ -189,19 +189,22 @@
 - 权威配置先修改 `data/csv/英雄系统/hero_skill_definitions.csv`、`data/csv/英雄系统/hero_skill_pool_members.csv` 和 `data/csv/公共规则/tooltip_definitions.csv`，再定向生成对应 Lua。
 - 运行配置位于 `scripts/vscripts/config/hero_passive_skill_definitions.lua`；真实碰撞和伤害位于 `scripts/vscripts/systems/hero_passive_skill_service.lua`；能力路由复用 `scripts/vscripts/abilities/survival_hero_skill.lua`。
 - LV5每道波分别随机抽取5%～20%增伤；同次触发固定起点、目标方向、距离和全属性快照。未额外设置活动锁，允许不同攻击触发并行。
-- 2026-08-03新增视觉要求：每道回音重斩改用Kez Echo Slash资源族中的纯刀光`particles/units/heroes/hero_kez/kez_katana_echo_strike_slash.vpcf`；明确排除完整父粒子、Kez英雄残影、原技能回音复击、额外攻击、额外伤害、modifier和声音。
-- 尚未验证：Workshop Tools 中纯刀光的朝向、尺寸、移动速度、宽度/连续波观感和真实引擎碰撞；自动测试不能替代实机验收。
+- 2026-08-03视觉方案最终调整：内部纯刀光`kez_katana_echo_strike_slash.vpcf`无论作为投射物`EffectName`还是Lua独立驱动都不能可靠还原原版，实机先后出现残缺小段、大圆环和端点白爆。用户明确授权：若不能移除Kez模型，可保留Kez并使用完整Echo Slash。因此内部子粒子路线废弃，改用完整父粒子`particles/units/heroes/hero_kez/kez_katana_echo_strike.vpcf`，允许其自带Kez英雄残影及ground/movement/streaks/swoosh等完整子效果。
+- 完整父粒子仍只作为独立视觉层；明确不调用`kez_echo_slash`、不添加Kez modifier、不播放原生声音，也不接入原技能攻击、回音复击或伤害。项目权威线性投射物继续唯一负责碰撞和结算。
+- 2026-08-03末端额外斩击根因已由资源数据收敛：完整父粒子创建时瞬发一个固定寿命0.5秒的移动载体，并通过子控制点驱动slash/swoosh；旧`DestroyParticle(..., false)`不会杀死已有载体，因此它会在换段或最终收尾后继续向前。父资源没有延迟发射第二个父载体，CP1也不是终止边界。视觉统一清理现强制`DestroyParticle(..., true)`并继续释放索引，战斗层不变。
+- 尚未验证：Workshop Tools中末端额外斩击是否消失，以及立即销毁后Kez模型、朝向、尺寸、高度、两个0.5秒实例衔接及连续多波观感；自动测试不能替代实机验收。
 
 ### 当前实施结果
 
 - 已新增 `proto_echo_slash`、`ability_survival_echo_slash`、公共池成员 `public_13` 和五级 Tooltip。
 - 三份权威CSV已更新并定向生成英雄技能、公共池和Tooltip Lua；生成比较逐字节一致。
-- 运行时使用Kez Echo Slash纯刀光粒子和独立线性投射物状态；每道波 `bDeleteOnHit=false`、独立去重、回调返回false，终点和超时均可清理。马格纳斯震荡波继续仅供剑刃震荡使用。
+- 运行时将碰撞投射物与视觉彻底分离：原生线性投射物不设置Kez `EffectName`，仍负责碰撞、穿透和伤害；Lua为每道波独立创建完整Echo Slash父粒子。第一实例CP0/CP1为触发起点→射程中点，第二实例为射程中点→完整终点；CP2按父粒子契约设置为`(权威速度, 200, 1.5)`，并补Valve预览CP6、蓝色CP7和CP8。两个0.5秒完整视觉实例合计覆盖1秒路径；这不是额外战斗波，不增加攻击、命中或伤害。
 - 多波使用绝对时间校正的单链调度；LV5每波创建时独立抽取5%～20%增伤，触发时逻辑全属性快照在整次技能中保持不变。
 - 自动验证通过：`ECHO_SLASH_STATE_LUA51_PASS`、`ECHO_SLASH_CONTRACT_PASS`、`ECHO_SLASH_LUAC51_PASS`、配置Lua 5.1验证、CSV生成比较、严格UTF-8、限定`git diff --check`、脉冲激射/地裂/魔法弹弓共享回归。
-- 2026-08-03纯刀光变更验证：`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua 5.4.5语法、严格UTF-8和限定`git diff --check`通过。历史Lua 5.1工具绝对路径本轮不存在，因此没有把本轮编译写成Lua 5.1通过；既有状态测试脚本当前也未保存在工作区。
+- 2026-08-03完整父粒子调整验证通过：`ECHO_SLASH_VISUAL_STATE_PASS`、`ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua 5.4.5生产/测试语法、严格UTF-8、主服务顶层local仍为199及限定`git diff --check`。状态测试覆盖完整父资源、两段CP0/CP1、CP2/6/7/8、正常/重置/异常清理及全部战斗保护。历史Lua 5.1工具绝对路径仍不存在，因此不会把本轮编译写成Lua 5.1通过。
+- 末端额外斩击修复后上述三项专项/相邻回归再次通过；Lua/Luac 5.4.5生产与测试语法、7个目标文件严格UTF-8、顶层local 199和限定`git diff --check`通过。状态测试新增锁定第一阶段换段及第二阶段正常收尾均立即销毁。当前仅发现Lua 5.4.5，无可用Lua 5.1命令，因此不宣称本轮Lua 5.1验证。
 - 脉冲激射完整PowerShell契约存在既有陈旧预缓存断言，仍要求已废弃的Vengeful粒子；其Lua 5.1状态测试通过，本任务未修改该旧测试。
-- 剩余动作仅为Workshop Tools实机验证纯刀光朝向、尺寸和移动观感；尚不能记录为引擎验证或用户验收完成。
+- 剩余动作仅为冷启动Workshop Tools，确认完整Kez Echo Slash在换段和终点不再额外向前播放，并验证立即销毁是否产生断帧、Kez模型、朝向、尺寸、高度、两段衔接和完整射程；尚不能记录为引擎验证或用户验收完成。
 
 用户已明确确认现有公共技能`proto_earth_line`五级“地裂冲击·被动”暂时完成。当前基线停止继续调整，不再把Workshop Tools逐项验证恢复为活跃任务；只有用户以后明确提出地裂冲击的新需求或报告实机问题时，才按下述维护方式重新开启。
 
@@ -318,6 +321,10 @@
 
 ## 后续优化与剩余确认
 
+- 2026-08-03用户批准为`proto_void_pulse`使用卡尔原版龙卷主体外观，同时保留可靠的Lua追踪与附着架构。已恢复可维护content源`particles/survival_tornado/survival_tornado_follow.vpcf`：父粒子只引用`particles/units/heroes/hero_invoker/invoker_tornado_child.vpcf`，没有`C_OP_BasicMovement`或其他内部位移算子。
+- 生产代码无需重写：主龙卷与LV5小龙卷已经统一创建项目粒子，共享调度器每0.05秒只写CP0，结束与清局均销毁释放；`addon_game_mode.lua`也已预缓存项目粒子。完整`invoker_tornado.vpcf`不会接入，因为其实机内部直线推进会脱离Lua权威伤害中心。
+- 新增`tools/test_tornado_visual_contract.ps1`，锁定三选一身份、卡尔子粒子依赖、禁止完整父粒子、主/小龙卷创建、CP0同步、释放与预缓存。Resource Compiler强制编译结果为`1 compiled, 0 failed, 0 skipped`，生成产物与game仓库已有跟踪产物无差异；契约、Lua 5.4.5语法、严格UTF-8、编译依赖和限定检查通过。
+- 相邻视觉契约共10项，7项通过；3项既有无关失败分别为魔法弹弓测试全局排斥地裂冲击正在使用的Tiny资源、移动冰球旧断言、毒云旧创建模式断言。本任务没有为这些陈旧断言修改其他技能。当前没有Lua 5.1命令，因此不宣称本轮Lua 5.1验证通过。
 - 后续继续本任务时，再按用户指定重点优化龙卷视觉、追踪手感或其他表现；不得在没有明确需求时主动改变当前行为和数值。
 - 尚未记录为最终用户验收的项目包括：完全重启Workshop Tools Run后的龙卷追踪、到达后附着、目标死亡后的最后位置、范围减速、实时属性伤害和LV5分裂方向。
 - 若仍异常，收集同一龙卷ID的`[HeroTornado] event=spawn/attached/target_dead/finish`日志；普通`[CombatDamage]`日志只能证明伤害事务，不能证明视觉位置。

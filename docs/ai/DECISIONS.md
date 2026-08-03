@@ -44,6 +44,7 @@
 40. **模块加载顶层不得假设 GameModeEntity 已存在。** `GameRules:GetGameModeEntity()` 在 `Activate()` 前可能返回 nil；依赖 GameModeEntity 的启动规则应在顶层安全标记 deferred，并在 `Activate()` 阶段强制成功，否则中止初始化，禁止带着半配置状态继续运行。
 41. **英雄战斗属性快照必须原子刷新并拒绝倒退。** 英雄攻击、护甲、攻速和逻辑三维来自同一份 `hero_combat_stat_service` 权威快照；选中单位即时响应不得用某一引擎帧的 `GetPhysicalArmorValue()` 或其他临时值覆盖其中单个字段。英雄快照携带单调 `refresh_version`，Panorama 同一选中单位只接受不旧于当前版本的快照；已有版本后到达的无版本快照也必须拒绝。非英雄单位仍可通过独立运行时快照反映临时 modifier。
 42. **含中文的配置 CSV 必须使用明确编码链并从权威源恢复。** `data/csv` 中的中文配置统一按 UTF-8/UTF-8 BOM 读取（构建器可兼容 `utf-8-sig`、UTF-8 和历史 GB18030/GBK 输入），生成 Lua 必须由 `tools/build_configs.py` 重新生成，禁止手改 `scripts/vscripts/config/generated`。发现 `�`、`��`、`锟斤拷` 或类似 CP936/GBK 误解码文本时，不能只“另存为 UTF-8”掩盖损坏，必须从 Git 或其他已确认权威源恢复中文，再做编码、列数、生成结果和 Lua 语法校验。PowerShell 读写中文源码时必须确认使用 PowerShell 7 或明确的 UTF-8 字节读写，禁止用 Windows PowerShell 5.1 默认编码整文件重写。
+43. **带移动父载体的分段视觉必须在阶段边界立即销毁。** `DestroyParticle(index, false)`只停止发射，不会清除已生成且仍有寿命的父载体或其子系统；若父粒子通过`C_OP_BasicMovement`和`C_OP_SetChildControlPoints`驱动完整子效果，已有载体会越过Lua定义的阶段终点继续外推。此类纯视觉实例在换段、正常终点、异常和重置时统一使用`DestroyParticle(index, true)`后再`ReleaseParticleIndex`；视觉清理不得改变权威投射物、命中、伤害、波数或时序。
 
 ## 游戏行为决策
 

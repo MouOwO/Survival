@@ -107,8 +107,14 @@ local BLADE_PULSE_PARTICLE =
     "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
 local BLADE_PULSE_CLEANUP_GRACE = 0.25
 echo_slash.particle =
-    "particles/units/heroes/hero_kez/kez_katana_echo_strike_slash.vpcf"
+    "particles/units/heroes/hero_kez/kez_katana_echo_strike.vpcf"
 echo_slash.cleanup_grace = 0.25
+echo_slash.visual_interval = 0.05
+echo_slash.visual_phase_duration = 0.5
+echo_slash.visual_width = 200
+echo_slash.visual_scale = 1.5
+echo_slash.color = Vector(0.231373, 0.407843, 0.607843)
+echo_slash.emit_rate = 200
 earth_rock.particle =
     "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf"
 earth_rock.explosion_particle =
@@ -1720,12 +1726,134 @@ local function run_blade(context, definition)
     return true
 end
 
+function echo_slash.destroy_visual_particle(state)
+    if not state or not state.particle then return end
+    local particle = state.particle
+    state.particle = nil
+    pcall(function()
+        -- The complete Kez parent owns a moving 0.5-second carrier. A graceful
+        -- stop lets that carrier and its slash children continue past this
+        -- visual phase's endpoint, so every parent instance must die now.
+        ParticleManager:DestroyParticle(particle, true)
+    end)
+    pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+end
+
+function echo_slash.release_visual(state, immediate)
+    if not state then return end
+    if state.visual_task then
+        scheduler.cancel(state.visual_task)
+        state.visual_task = nil
+    end
+    echo_slash.destroy_visual_particle(state)
+end
+
+function echo_slash.release(projectile_id, immediate)
+    local state = echo_slash.projectiles[projectile_id]
+    if not state then return end
+    echo_slash.projectiles[projectile_id] = nil
+    if immediate ~= true and state.particle then
+        pcall(function()
+            state.started_at = math.min(state.started_at, game_time() - state.duration)
+            echo_slash.sync_visual(state)
+        end)
+    end
+    echo_slash.release_visual(state, immediate)
+end
+
+function echo_slash.clear()
+    local projectile_ids = {}
+    for projectile_id, _ in pairs(echo_slash.projectiles) do
+        projectile_ids[#projectile_ids + 1] = projectile_id
+    end
+    for _, projectile_id in ipairs(projectile_ids) do
+        echo_slash.release(projectile_id, true)
+    end
+end
+
+function echo_slash.sync_visual(state)
+    if not state or not state.particle then return end
+    local phase = state.visual_phase or 1
+    local phase_start = phase == 2 and echo_slash.visual_phase_duration or 0
+    local phase_end = phase == 2 and state.duration
+        or echo_slash.visual_phase_duration
+    local start = state.origin + state.direction
+        * (state.speed * phase_start)
+    local finish = state.origin + state.direction * (state.speed * phase_end)
+    ParticleManager:SetParticleControl(state.particle, 0, start)
+    ParticleManager:SetParticleControl(state.particle, 1, finish)
+    ParticleManager:SetParticleControl(
+        state.particle, 2,
+        Vector(state.speed, echo_slash.visual_width, echo_slash.visual_scale)
+    )
+    ParticleManager:SetParticleControl(
+        state.particle, 6, Vector(-9.61916, 0, 0)
+    )
+    ParticleManager:SetParticleControl(state.particle, 7, echo_slash.color)
+    ParticleManager:SetParticleControl(
+        state.particle, 8, Vector(echo_slash.emit_rate, 0, 0)
+    )
+end
+
+function echo_slash.create_visual_particle(state)
+    if not state or not ParticleManager or not ParticleManager.CreateParticle then
+        return false
+    end
+    local visual_ok, visual_error = pcall(function()
+        state.particle = ParticleManager:CreateParticle(
+            echo_slash.particle, PATTACH_WORLDORIGIN, state.context.attacker
+        )
+        echo_slash.sync_visual(state)
+    end)
+    if not visual_ok then
+        echo_slash.release_visual(state, true)
+        print("[HeroPassiveSkill] echo slash visual failed: "
+            .. tostring(visual_error))
+        return false
+    end
+    return true
+end
+
+function echo_slash.create_visual(projectile_id)
+    local state = echo_slash.projectiles[projectile_id]
+    if not state then return end
+    state.visual_phase = state.visual_phase or 1
+    if not echo_slash.create_visual_particle(state) then return end
+    state.visual_task = scheduler.every(echo_slash.visual_interval, function()
+        local current = echo_slash.projectiles[projectile_id]
+        if not current or not current.particle then return false end
+        local elapsed = game_time() - current.started_at
+        if elapsed >= echo_slash.visual_phase_duration
+            and current.visual_phase == 1 then
+            echo_slash.destroy_visual_particle(current)
+            current.visual_phase = 2
+            if not echo_slash.create_visual_particle(current) then return false end
+        end
+        local sync_ok, sync_error = pcall(function()
+            echo_slash.sync_visual(current)
+        end)
+        if not sync_ok then
+            echo_slash.release_visual(current, true)
+            print("[HeroPassiveSkill] echo slash visual sync failed: "
+                .. tostring(sync_error))
+            return false
+        end
+        if elapsed >= current.duration then
+            echo_slash.release_visual(current, false)
+            return false
+        end
+        return true
+    end, "echo_slash_visual_" .. tostring(projectile_id))
+end
+
 function echo_slash.projectile_hit(ability, target, projectile_id)
     projectile_id = tonumber(projectile_id)
     local state = projectile_id and echo_slash.projectiles[projectile_id] or nil
     if not state then return false end
     if not target then
-        echo_slash.projectiles[projectile_id] = nil
+        echo_slash.release(projectile_id, false)
         return false
     end
     if ability ~= state.ability or not valid(state.context.attacker)
@@ -1799,11 +1927,17 @@ function echo_slash.run(context, definition)
             ability = ability,
             context = context,
             damage_multiplier = damage_multiplier,
+            origin = copy_position(origin),
+            direction = direction,
+            speed = speed,
+            duration = duration,
+            half_width = half_width,
+            started_at = game_time(),
             hit = {},
         }
+        echo_slash.create_visual(projectile_id)
         ProjectileManager:CreateLinearProjectile({
             Ability = ability,
-            EffectName = echo_slash.particle,
             Source = context.attacker,
             vSpawnOrigin = origin,
             vVelocity = direction * speed,
@@ -1818,7 +1952,7 @@ function echo_slash.run(context, definition)
             ExtraData = { echo_slash_projectile_id = projectile_id },
         })
         scheduler.after(duration + echo_slash.cleanup_grace, function()
-            echo_slash.projectiles[projectile_id] = nil
+            echo_slash.release(projectile_id, false)
         end)
 
         next_slash = next_slash + 1
@@ -3350,6 +3484,7 @@ end
 
 function M.init()
     definitions.validate()
+    echo_slash.clear()
     clear_flame_burns()
     clear_moving_ice_balls()
     clear_poison_clouds()
@@ -3390,6 +3525,8 @@ function M.init()
     poison_cloud_task = nil
     blade_pulse_projectiles = {}
     blade_pulse_sequence = 0
+    echo_slash.projectiles = {}
+    echo_slash.sequence = 0
     earth_rock.projectiles = {}
     earth_rock.sequence = 0
     clear_tornadoes()
@@ -3451,6 +3588,10 @@ M._test = {
     blade_pulse_projectiles = function() return blade_pulse_projectiles end,
     blade_pulse_projectile_hit = blade_pulse_projectile_hit,
     echo_slash_projectiles = function() return echo_slash.projectiles end,
+    echo_slash_create_visual = echo_slash.create_visual,
+    echo_slash_sync_visual = echo_slash.sync_visual,
+    echo_slash_release = echo_slash.release,
+    echo_slash_clear = echo_slash.clear,
     echo_slash_projectile_hit = echo_slash.projectile_hit,
     earth_rock_projectiles = function() return earth_rock.projectiles end,
     earth_rock_projectile_hit = earth_rock.projectile_hit,
