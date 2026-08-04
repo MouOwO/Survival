@@ -4,13 +4,16 @@
 
 ## 当前状态
 
+- 英雄普通平A最终伤害飘字第二轮修复与自动验证已完成：实机日志确认旧outgoing getter无record导致完全不掷暴击，并确认`addspeed`后record循环复用触发旧状态`dedup`。现改由`ON_ATTACK_RECORD`掷骰、getter消费倍率，新record重置上一代去重，状态键包含attacker+record。下一步冷启动后执行`addtechnology researcher_super_tower_crit_23`，确认日志`roll chance=11.5 → show → clear`、普通约21白字、暴击约42橙字（以当轮最终扣血为准）、旧2564不出现，且record循环后继续飘字；未经用户确认不得记为实机验收。
+- 当前活跃任务为“超级防御塔暴击”四项效果修复。代码与自动验证已完成：每级同时增加防御塔暴击/攻击和召唤英雄暴击/攻击各 `0.5%`，CSV 的23级均有四行说明，生成科技 Lua 复合投影接入现有塔与英雄刷新/攻击链。下一步完全停止并重新 Run Workshop Tools，实机确认 Tooltip、已有单位即时刷新、实际攻击值和暴击率；未经用户确认不得记录为验收完成。
+- 当前活跃任务为英雄实际射程与工具技能归属修正。用户最新批准齐天大圣由30000速度远程弹道改为近战式无飞行弹道结算，攻击/索敌仍为1000；CSV、生成Lua、运行时分流和自动验证已完成。Undying只保留D闪烁并修复D键；召唤英雄不拥有D，保留F范围拾取和F2回城。当前等待Workshop Tools实机验收，未经用户确认不得记录为制作完成。
 - 齐天大圣W分身数据复刻实机反馈已完成代码修复和自动验证：攻击、最终攻速、生命、暴击及逻辑三维统一消费本体同一份`HERO_COMBAT_STATS_GET_REQUEST`快照；生命复用隐藏生命Modifier，分身选中面板也适配同一快照。下一步Workshop Tools确认本体/分身攻击、攻速、生命、暴击、三维面板一致且固定10护甲、仅Q隔离未回归。
 - 齐天大圣Q/W/E/R专属技能、严格顺序`passN`与通用七塔合一已完成代码和自动验证；当前状态为等待Workshop Tools实机验收，不得描述为制作完成。Q/W/E/R分别1/3/6/10转解锁，四槽固定置灰；终极塔使用7个隔离代理执行真实路线攻击并由R继承英雄攻击/暴击。详细实现、测试与实机清单见`CURRENT_TASK.md`顶部。
 - 资源树第二轮紧急修复待实机确认：第一轮移除Modifier重复分类后仍不掉血，现确认实机DamageFilter不保证`damage_category_const`，旧Mock错误掩盖缺字段拦截。已新增`ON_ATTACK_START`一次性真实攻击凭证，缺类别平A凭凭证放行，塔/技能/无凭证脚本伤害继续拒绝，并输出限次`TREE_DAMAGE_FILTER`诊断。
 - 第一轮树Modifier重复分类修复已被实机证实不充分，勿再恢复“DamageFilter类别字段始终存在”的假设；下一步冷启动验证第二轮真实攻击凭证方案。
 - 三选一公共技能`proto_void_pulse`/“虚空震爆·被动”的卡尔龙卷风视觉维护已完成：恢复content源`particles/survival_tornado/survival_tornado_follow.vpcf`，仅引用Valve `invoker_tornado_child.vpcf`且不含内部移动算子；生产主/小龙卷继续由Lua每0.05秒写CP0追踪。Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`，新视觉契约、Lua 5.4.5语法、严格UTF-8和限定检查通过；下一步完全重启Workshop Tools Run确认视觉追踪、附着、死亡停留和LV5分裂。
 - 紧急启动阻断已修复：提交`85ce4eb`引用但漏提交的`systems/building_upgrade_process.lua`已补齐；`building_upgrade_system.lua`与`addon_game_mode.lua` Lua 5.1语法、升级完成/重复拒绝/销毁取消/重置/失效建筑行为均通过。下一步必须完全停止并重新Run Workshop Tools确认不再出现`module not found`。
-- 当前新增实现待实机验收：资源树初始位置改为`(448,64,128)`；伐木工LV1-LV8统一0.5次/秒、400射程、远程空弹道，LV3与LV6-LV8模型已替换；修理工保持纯修理但距离属性为400；六英雄统一远程；一至四转普攻总目标数为3/4/5/6并按目标护甲独立结算。CSV、生成配置、运行时、KV、专项测试和相关回归已通过，下一步Workshop Tools冷启动验收。
+- 当前新增实现待实机验收：资源树初始位置改为`(448,64,128)`；伐木工LV1-LV8统一0.5次/秒、400射程、远程空弹道，LV3与LV6-LV8模型已替换；修理工保持纯修理但距离属性为400；其他五英雄保持远程，齐天大圣改为1000码近战式即时结算；一至四转普攻总目标数为3/4/5/6并按目标护甲独立结算。CSV、生成配置、运行时、KV、专项测试和相关回归已通过，下一步Workshop Tools冷启动验收。
 - 紧急阻断已修复：`hero_passive_skill_service.lua`曾因顶层chunk拥有202个local而超过Lua 5.1的200-local上限，导致`addon_game_mode.lua`无法加载。末尾`trigger/roll/on_main_attack`现改为模块表方法，顶层声明降至199；Lua 5.1语法、8项公共技能状态和四英雄专属回归已通过。仍需完全停止并重新Run Workshop Tools确认地图实际进入。
 - 当前活跃任务：资源树、召唤祭坛、主城、伐木工LV1至LV5及修理工LV1至LV2模型替换。CSV权威配置、定向生成、运行时应用、KV首帧回退与模型预缓存已完成；11个模型均在当前Dota VPK中确认存在，专项合同、Lua 5.1行为/语法、生成一致性、编码列数、限定diff及树伤害回归通过。下一步在Workshop Tools确认树尺寸、工人动画、主城五级缩放/切模及祭坛尺寸，未经实机验证和用户确认不得记录为制作完成。
 
@@ -37,12 +40,20 @@
 - 日期：2026-08-03
 - 树位置、工人远程属性、四个伐木工模型、六英雄远程和转生多目标普攻已完成权威CSV、生成Lua、运行时和KV实现；专项合同、Lua 5.1行为/语法、VPK模型、生成编码、树/免费英雄/射程/减甲回归及限定diff检查通过。
 - 下一步：完全停止并重新Run Workshop Tools，确认树位于`(448,64,128)`、伐木工无可见弹道且400射程、修理工不攻击、六英雄均可按CSV射程远程攻击，以及一至四转实际攻击3/4/5/6个目标并按不同护甲独立扣血。
+- 当前任务最新数值与结算：齐天大圣攻击/索敌距离为1000，攻击能力为`melee`，不配置飞行弹道；攻击前摇结束时应像近战英雄一样直接命中。所有召唤英雄通过隐藏永久Modifier落实CSV射程。Undying只保留D闪烁、NO_ATTACK和原生主体/饰品，召唤英雄保留F拾取与F2回城且不拥有D。
+- 下一步：完全停止并重新Run Workshop Tools，重新召唤齐天大圣验证1000码近战式即时结算和攻击事件回归；同时验证Undying仅D且可正常选点、召唤英雄F/F2、真实物品所有权/满包、防复制以及Undying主体显示/重生/不可攻击树。
 - 日期：2026-08-03
 - 回音重斩内部纯刀光方案实机先后出现残缺、大圆环和端点白爆，现按用户授权改为完整Kez Echo Slash父粒子，允许显示Kez模型。完整资源作为独立视觉层按起点→中点和中点→终点两段驱动；权威碰撞、五级波数/概率/伤害和1秒路径不变。
 - `ECHO_SLASH_VISUAL_STATE_PASS`、完整父粒子视觉契约、剑刃震荡隔离、Lua 5.4.5语法、严格UTF-8、顶层local 199和限定diff均已通过。下一步完全停止并重新Run Workshop Tools，确认Kez、swoosh、地面痕迹、方向、两段衔接和完整射程。Lua 5.1工具仍不可用。
 - 日期：2026-08-03
 - 回音重斩已从马格纳斯震荡波替换为Kez Echo Slash纯刀光子粒子；完整Echo Strike父粒子、Kez英雄残影、原生技能、modifier、声音和额外结算均未接入。剑刃震荡仍保留马格纳斯震荡波。
 - `ECHO_SLASH_VISUAL_CONTRACT_PASS`、`BLADE_PULSE_VISUAL_CONTRACT_PASS`、Lua 5.4.5语法、严格UTF-8和限定diff通过；本轮环境没有历史记录的Lua 5.1可执行文件。下一步在Workshop Tools确认刀光实际朝向、尺寸和移动观感。
+- 日期：2026-08-03
+- 用户批准当前任务：齐天大圣攻击/索敌距离以CSV 500为准；Undying建造者D闪烁、F范围300拾取、T回城；删除F2；修复实际射程和头冠/可攻击异常。调查已确认旧`Script_SetAttackRange`不能保证原生近战英雄实际攻击距离，头冠`prop_dynamic`不是攻击者，真正攻击者是Undying主体。
+- 下一步：实施CSV与运行时投影、D/F/T能力、NO_ATTACK和Panorama输入，并执行Lua 5.1、契约、生成、编译、UTF-8及限定diff验证。
+- 日期：2026-08-03
+- 树位置、工人远程属性、四个伐木工模型、五英雄远程/齐天大圣近战式即时结算和转生多目标普攻已完成权威CSV、生成Lua、运行时和KV实现；专项合同、Lua 5.1行为/语法、VPK模型、生成编码、树/免费英雄/射程/减甲回归及限定diff检查通过。
+- 下一步：完全停止并重新Run Workshop Tools，确认树位于`(448,64,128)`、伐木工无可见弹道且400射程、修理工不攻击、其他五英雄保持CSV远程攻击、齐天大圣1000码攻击无飞行弹道，以及一至四转实际攻击3/4/5/6个目标并按不同护甲独立扣血。
 - 日期：2026-08-03
 - 已消除阻断地图加载的Lua 5.1顶层local上限错误：`hero_passive_skill_service.lua`由202个顶层声明降至199，`luac5.1 -p`确认主服务、专属服务和`addon_game_mode.lua`通过。
 - 下一步：完全停止并重新Run Workshop Tools；先确认不再出现`main function has more than 200 local variables`，再继续模型实机验收。

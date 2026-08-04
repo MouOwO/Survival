@@ -1,3 +1,74 @@
+# 2026-08-04 — 英雄最终攻击飘字第二轮实机根因与修复
+
+- 用户提供完整`[HERO_ATTACK_DAMAGE_NUMBER]`日志：首次0至64512的record持续`show/clear`，`addspeed`后record从0循环并连续`dedup/clear`；全程没有`roll`且所有`show`均为`critical=false multiplier=nil`。据此确认停止飘字是裸record循环复用后旧去重状态误杀，不是客户端overhead队列；暴击不出现是outgoing getter实机无record导致掷骰入口未执行。
+- 科技配置链确认有效：权威CSV的超级塔暴击Lv.1/19/23为0.5%/9.5%/11.5%，technology manager同步投影到英雄暴击率，英雄战斗快照消费该字段。`addtechnology`按传入的具体科技ID设置等级；Lv.1下30次不暴击概率约86%，高概率实机测试应使用`researcher_super_tower_crit_23`。
+- 用户批准后完成第二轮修复：本体和齐天大圣W分身使用`ON_ATTACK_RECORD`掷骰并准备本次outgoing倍率；每次新record先清除同攻击者同编号上一代显示状态；共享身份键由裸record改为`attacker entindex + record`，多目标继续按victim去重；销毁事件清理长期身份和未消费的临时倍率。
+- 自动验证通过：专项Lua 5.1行为/契约、超级塔暴击Lua/契约、科技CSV定向生成逐字节比较、英雄多重攻击、猴王QWE/近战/塔、研究减甲回归、目标生产与测试Lua 5.1语法、严格UTF-8。全量生成器因项目既有装备CSV类型错误`invalid number: equipment_iron_armor_01`中止，未出现新的工作区路径；本任务改用临时文件定向生成科技Lua并比较通过。
+- 尚未完成Workshop Tools实机验证。下一步冷启动并使用Lv.23，确认日志出现`roll chance=11.5 → show → clear`，暴击伤害倍率实际生效、橙字使用最终扣血、record循环后仍持续显示。
+
+# 2026-08-04 — 最终伤害飘字首轮实机失败反馈
+
+- 用户反馈：疑似首次暴击时没有显示暴击数字，并且从该次攻击后所有攻击伤害数字均停止显示。提供的日志没有Script Runtime Error或堆栈，只显示齐天大圣真实攻击DamageFilter的category=nil及其他常规日志。
+- 本机Dota目录未发现近期可读取的console日志，现阶段不能静默断言根因。优先取得暴击时刻前后完整红色Lua错误；若确认完全无错误，则为最终显示函数增加调用前后诊断，区分回调停止、record提前清理和Valve overhead队列/样式互斥。
+- 用户确认控制台完全无红色错误。已在modifier_weapon_stat_projection.lua增加最多80条[HERO_ATTACK_DAMAGE_NUMBER]诊断，覆盖record暴击roll、最终show、重复dedup和销毁clear；不改变伤害或显示调用。诊断版通过DAMAGE_NUMBER_DIAGNOSTIC_LUAC51_PASS、HERO_ATTACK_DAMAGE_NUMBERS_LUA51_PASS、两项契约、严格UTF-8和限定git diff --check。
+
+# 2026-08-04 — 英雄普通攻击最终伤害飘字实机问题与批准方案
+
+- 用户实机确认：英雄攻击约1115；目标项目UI护甲约3333、Dota内置面板约1000；普通平A最终扣血约17但没有白字，暴击原生橙字2564而最终扣血及`OnTakeDamage`测试面板均为38。
+- 调查确认权威训练目标配置仍来自`data/csv/商店系统/altar_actions.csv`，本轮不改变其护甲，也不改变其他单位各自独立护甲。高护甲下17/38最终伤害符合现有物理减伤数量级，代码问题限定为飘字语义与缺失。
+- 生产英雄暴击当前使用`MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE`，该引擎属性产生减甲前Valve橙字；项目普通攻击没有发送`OVERHEAD_ALERT_DAMAGE`，因此小额最终伤害没有稳定白字。
+- 用户批准方案：同一attack record继续唯一掷骰，改用普通攻击伤害倍率保留原生护甲/攻击事件结算；最终`OnTakeDamage`按record暴击身份发送实际扣血，普通白字、暴击橙字。技能和脚本伤害隔离，本体、W分身和多目标按真实命中分别显示。
+- 当前仅完成调查和方案批准，尚未完成代码与自动验证，更未进行Workshop Tools实机验收。
+- 后续实施完成：`modifier_weapon_stat_projection.lua`用record级`MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE`替代英雄原生暴击属性；attack tracker改为只读取暴击身份并等待record销毁统一清理；齐天大圣W分身接入同一倍率、最终飘字和清理路径。
+- 最终飘字严格读取`OnTakeDamage.params.damage`，要求攻击category、无inflictor且存在record；普通使用`OVERHEAD_ALERT_DAMAGE`，暴击使用`OVERHEAD_ALERT_CRITICAL`。显示按`record + victim entindex`去重，同一多目标record可对不同受击单位分别显示。
+- `altar_actions.csv`训练目标护甲100000未修改；专项契约锁定源CSV、生成Lua和训练服务消费者一致。项目UI继续显示引擎实际运行时护甲投影，实机约3333 War3 UI/约1111 Dota运行时与CSV请求100000不是同一层概念。
+- 新增专项Lua与PowerShell契约，覆盖230% record倍率、最终38橙字、最终16.6四舍五入17白字、同目标去重、多目标分别显示、技能排除、W分身契约和训练CSV链。
+- 自动结果：专项Lua/契约、英雄多重攻击、猴王QWE/近战/塔、超级塔暴击、研究减甲和多重攻击回归均通过；目标Lua 5.1语法、严格UTF-8和限定`git diff --check`通过。尚未进行Workshop Tools实机验证，不能称为制作完成或用户验收。
+
+## 2026-08-03 - 检查点：齐天大圣改为近战式无弹道结算
+
+- 用户批准将齐天大圣从30000速度的远程攻击改为近战英雄式无飞行弹道即时结算，同时保留攻击前摇、1000攻击距离和1000索敌距离。
+- 调查确认`hero_stat_adapter.lua`当前无论有无正弹道速度都强制`DOTA_UNIT_CAP_RANGED_ATTACK`，不存在可直接复用的近战回退；因此决定在权威`hero_attack_projectiles.csv`增加显式`attack_capability`字段，而不使用0速度或空值作为隐式开关。
+- 齐天大圣将配置为`melee`，其他五英雄保持`ranged`；1000射程继续由现有隐藏永久射程Modifier落实，不另写伤害，保留原生普通攻击事件链。自动验证完成前不记录为已实施，Workshop Tools验证前不称为实机通过。
+
+## 2026-08-03 - 齐天大圣无弹道即时结算实施与自动验证完成
+
+- 权威`hero_attack_projectiles.csv`新增`attack_capability`列并定向生成对应Lua：齐天大圣为`melee`且无弹速/弹道模型，其他五英雄为`ranged`并保留原配置。
+- `hero_stat_adapter.lua`对`melee`清空远程弹道名并设置`DOTA_UNIT_CAP_MELEE_ATTACK`；1000攻击距离仍由现有射程Modifier覆盖，1000索敌范围保持不变。未新增伤害逻辑，普通攻击、暴击、多目标与技能触发仍使用原生攻击链。
+- 自动验证通过：`BUILDER_UTILITY_CONTRACT_PASS`、`WORKER_RANGED_MULTISHOT_CONTRACT_PASS`、`MONKEY_MELEE_ATTACK_LUA51_PASS`、`MONKEY_MELEE_TEST_LUAC51_PASS`、`MONKEY_MELEE_LUAC51_PASS`、`HERO_ATTACK_PROJECTILES_GENERATED_COMPARE_PASS`、`HERO_MULTISHOT_LUA51_PASS`、`HERO_CONFIGURED_HEALTH_LUA51_PASS`、`MONKEY_MELEE_STRICT_UTF8_PASS`及限定`MONKEY_MELEE_DIFF_CHECK_PASS`。
+- 尚未完成引擎验证：必须完全停止并重新Run Workshop Tools、重新召唤齐天大圣，确认1000码攻击命令、攻击动画、无飞行弹道的命中时点及普通攻击事件链实际表现。未经用户确认不得记录为验收完成。
+
+## 2026-08-03 - 齐天大圣弹道速度提高到30000
+
+- 用户确认目标是视觉上基本瞬间命中；由于当前3000改为1000会更慢，最终明确选择30000。权威`hero_attack_projectiles.csv`及生成Lua同步改为30000，攻击/索敌距离继续保持1000。
+
+## 2026-08-03 - 齐天大圣攻击范围调整为1000
+
+- 用户要求将猴哥攻击范围改为1000后立即实机测试。权威`hero_definitions.csv`中的`attack_range`和`acquisition_range`同步改为1000，独立投射物CSV中的弹道速度3000保持不变。
+
+## 2026-08-03 - 实机反馈：修正Undying与召唤英雄工具技能归属
+
+- 用户实机确认旧方案不符合最终需求：Undying不应拥有回城和拾取，只保留D键1000码闪烁；当前D键实际不可用，需要修复。
+- 召唤战斗英雄不拥有D闪烁，默认工具输入恢复为F2回城和F范围拾取。F2必须继续通过服务端当前玩家召唤英雄查询，不能作用于Undying或客户端指定的任意单位。
+- 调查确认当前代码分别在`hero_ability_policy`给Undying授予D/F/T、在`hero_skill_system`给召唤英雄授予回城/拾取；D输入还依赖实机日志已证实不可用的`SetKeyPressedCallback`兜底。批准方案为Undying闪烁固定引擎D槽，召唤英雄按Ability名称保留F拾取，并恢复既有F2服务端旁路。
+- 实施完成：`hero_ability_policy`只给Undying保留闪烁，清除旧实体残留的拾取/回城并固定到四建造技能后的槽位；召唤英雄原有回城/拾取授予链保持不变且无闪烁。
+- D/F专用输入补齐裸命令及`+/-`命令，D按名称找到闪烁后使用`Abilities.ExecuteAbility`进入引擎点目标模式；F2恢复`ui_return_home_request`，服务端只通过`HERO_SUMMON_GET_REQUEST`定位当前玩家召唤英雄。技能栏显示分别固定为D、F、F2。
+- 验证通过：`BUILDER_UTILITY_CONTRACT_PASS`、`GROUND_ITEM_PICKUP_LUA51_PASS`、`BUILDER_UTILITY_LUAC51_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`；两个Panorama JS均强制编译为`1 compiled, 0 failed, 0 skipped`，限定`git diff --check`通过。
+- `.cline/local-toolchain.json`的Lua路径仍失效，本轮实际使用MSYS2 Lua/Luac 5.1.5。`SESSION_LOG.md`当前3个历史`U+FFFD`与已知问题记录一致，本轮新增段为0；未改写历史乱码。
+
+## 2026-08-03 - 英雄实际射程与Undying建造者D/F/T实现完成
+
+- 用户批准齐天大圣攻击/索敌距离500、弹道3000，以及仅开局Undying建造者拥有D闪烁、F范围拾取、T回城；同时删除F2旁路并修复漂浮头冠与可攻击树。
+- 权威数据：`hero_definitions.csv`和生成Lua把齐天大圣攻击/索敌改为500；弹道3000已由`hero_attack_projectiles.csv`及生成Lua提供，保持不变。
+- 射程实现：新增隐藏永久`modifier_survival_hero_attack_range`，通过基础射程覆盖属性落实引擎实际射程；`hero_stat_adapter`仍同步远程能力、弹道、`survival_attack_range`和索敌范围。
+- 建造者实现：`hero_ability_policy`按Undying身份授予D/F/T；初始化和重生均设`DOTA_UNIT_CAP_NO_ATTACK`。D校验1000距离、GridNav可通行/阻挡，使用`FindClearSpaceForUnit`、起终点Blink粒子和`ProjectileDodge`。
+- F实现：虚拟升阶材料与真实`dota_item_drop`进入统一二维距离、entindex平局排序；普通物品保留自定义owner、Purchaser、OwnerEntity和PlayerOwner校验；挑战奖励继续由官方背包拾取事件进入既有Claim/逻辑库存/防复制链；满包停止且不处理后续实体。
+- 输入实现：`combat_stats.js`和`hud_takeover.js`按Ability名称标记并绑定D/F/T；删除F2命令、图标和`ui_return_home_request`客户端旁路。两个JS强制编译均为`1 compiled, 0 failed, 0 skipped`。
+- 外观实现：删除Undying Hallows头冠prop及粒子配置，保留原生主体/饰品；`hero_cosmetic_service`在非隐藏配置时明确移除旧`EF_NODRAW`，支持热重载和重生幂等恢复。
+- 自动验证：`BUILDER_UTILITY_CONTRACT_PASS`、`GROUND_ITEM_PICKUP_LUA51_PASS`、`BUILDER_UTILITY_LUAC51_PASS`、`HERO_DEFINITIONS_GENERATED_COMPARE_PASS`、`BUILDER_UTILITY_STRICT_UTF8_PASS files=25`、`PANORAMA_DFT_IDENTITY_STATIC_PASS`及免费英雄、建造者Ability、英雄生命回归通过；限定`git diff --check`通过。
+- 环境记录：配置中的`C:\Program Files\lua\bin`失效，本次实际使用MSYS2的Lua/Luac 5.1.5。全量生成被既有无关`item_definitions.csv`数字列错误阻断，目标英雄配置改用同一生成器函数定向生成并逐字节比较通过。
+- 尚未实机验证：实际攻击距离、D/F/T最终按键、闪烁边界/视觉、真实物品拾取、满包、防复制、Undying外观和重生后NO_ATTACK。执行前已有未跟踪测试文件及`卡的文本.txt`均未修改。
+
 ## 2026-08-03 — 资源树第二轮实机修复：DamageFilter缺少类别字段
 
 - 用户确认第一轮移除树Modifier类别二次过滤后，伐木工仍只加木材、不扣树生命。
@@ -1648,3 +1719,21 @@
 - Resource Compiler强制定向编译结果为`OK: 1 compiled, 0 failed, 0 skipped`；新产物未形成game仓库差异，证明恢复源可重现当前生产二进制。`TORNADO_VISUAL_CONTRACT_PASS`、生产Lua 5.4.5语法、严格UTF-8/尾随空白检查、编译产物卡尔子依赖及限定差异检查通过。
 - 10项相邻视觉契约中7项通过；3项既有无关失败为`MAGIC_SLINGSHOT_TINY_ATTACK_PARTICLE_REMAINS`、`MOVING_ICE_BALL_OLD_PROJECTILE_REMAINS`和`POISON_CLOUD_PERSISTENT_VISUAL_CREATION_MISSING`，均来自当前其他技能实现与陈旧测试不一致，本轮未修改。环境仅有Lua 5.4.5，不宣称Lua 5.1验证。
 - 尚未验证：完全重启Workshop Tools Run后的卡尔龙卷实际外观、主龙卷追踪与附着、目标死亡后的停留、多个活动龙卷重叠、LV5小龙卷和结束无残留。粒子已预缓存，Lua热加载不足以完成该验收。
+
+## 2026-08-03 - W分身修复经验固化
+
+- 用户要求记录本次经验。已将可复用规则写入`PROJECT_CONTEXT.md`：完整镜像必须消费同一次combat system原子快照；最终攻速直接换算BAT；实际攻击复制最终引擎上下界；原生三维归零；生命复用隐藏Modifier；暴击不得拆分请求；选中UI必须按严格分身身份读取owner快照；数值镜像与装备/技能事件链继承必须隔离。
+- `DECISIONS.md`新增长期架构决策43，禁止未来在召唤物侧重新组合中间字段或通过挂本体全套Modifier实现数据复刻。
+- 本次仅修改AI经验文档，没有触碰当前工作区中英雄射程、工具技能、拾取、外观和Panorama等其他任务修改。
+
+
+## 2026-08-04 — 超级防御塔暴击四项科技修复
+
+- 用户最终批准：该科技每级同时增加防御塔暴击几率、防御塔攻击加成、召唤英雄暴击几率和召唤英雄攻击加成，四项均为 `+0.5%`；CSV 每一级介绍必须包含四项，复合功能放在 Lua。
+- 调查确认旧 `ARS-07` 已定义四项 `0.005`，但生成科技链只把 `super_tower_crit_pct` 投影为塔暴击；塔/英雄的消费和 `TECHNOLOGY_STATS_CHANGED` 刷新链原本已存在，根因是生成科技聚合迁移不完整。
+- `technology_definitions.csv` 的23级累计值改为 `level × 0.5%`，Lv.19 为 `9.5%`、Lv.23 为 `11.5%`；每级 `notes` 以四行列出全部效果。原文件经确认是可逆 GB18030、无替换字符，本轮使用明确解码后安全转换为 UTF-8 BOM。
+- `technology_stat_manager.lua` 现将单一科技值同时投影到 `tower.critical_chance_pct`、`tower.attack_bonus_pct`、`hero.critical_chance_pct` 和 `hero.attack_bonus_pct`；不新增自定义伤害或重复 Buff 服务。
+- `tools/build_configs.py` 改用 `splitlines(keepends=True)`，使 CSV 引号字段内换行生成成 Lua `\n`，商城现有 `notes` 描述链可按四行显示。
+- 新增专项 PowerShell 契约和 Lua 5.1 行为测试；生成逐字节一致、专项契约、Lv.1/Lv.19/Lv.23 四项行为、独立英雄攻击科技共存、Lua 5.1 语法、生成科技减甲回归、严格 UTF-8 与限定 `git diff --check` 全部通过。
+- 自动验证不等于 Workshop Tools 实机验证。下一步冷启动购买科技，确认 Tooltip、已有塔/英雄即时刷新、攻击数值与实际暴击率；未经用户确认不记录为验收完成。
+- 未回滚或清理工作区其他既有修改；仅删除本轮 Python 生成的 `tools/__pycache__` 副产物。

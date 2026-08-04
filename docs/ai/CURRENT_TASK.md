@@ -1,6 +1,162 @@
 # Current Task
 
-## 活跃任务（2026-08-03）：齐天大圣Q/W/E/R专属技能与七塔合一
+## 活跃任务（2026-08-04）：英雄普通攻击最终伤害飘字统一
+
+### 用户确认的实机事实与口径
+
+- 英雄面板攻击约`1115`；目标项目UI护甲约`3333`（对应约`1111` Dota运行时护甲，Dota内置面板约显示`1000`）。
+- 普通平A最终扣血约`17`但没有白色飘字；暴击原生橙字显示减甲前`2564`，最终扣血和`OnTakeDamage`测试面板均为`38`。
+- 现有伤害与护甲结算本身符合高护甲减伤预期；问题是Valve原生暴击字与项目最终伤害统计语义不一致，并且普通小额平A没有稳定飘字。
+- 用户批准：保持`altar_actions.csv`训练目标现有护甲和所有单位各自护甲不变；所有召唤英雄普通攻击按`OnTakeDamage`最终实际扣血显示，普通攻击白字、暴击橙字，小额伤害也显示。
+
+### 实施计划
+
+1. 保留attack record唯一暴击掷骰，但移除会产生减甲前橙字的`PREATTACK_CRITICALSTRIKE`，改用仅作用于对应普通攻击record的攻击伤害倍率。
+2. 在最终`OnTakeDamage`事件按同一record读取暴击身份，以最终实际伤害发送白色或橙色飘字，并在显示后清理record。
+3. 本体、齐天大圣W分身与多目标次级攻击均按各自真实命中显示；技能和脚本伤害不得进入普通攻击飘字。
+4. 增加Lua 5.1行为与PowerShell契约测试，并运行相关英雄攻击、分身、科技暴击回归、语法、严格UTF-8及限定差异检查。
+
+### 当前结果
+
+- 已完成生产代码：本体和齐天大圣W分身均按attack record掷骰并通过`DAMAGEOUTGOING_PERCENTAGE`应用暴击倍率，不再使用会产生减甲前Valve橙字的`PREATTACK_CRITICALSTRIKE`。
+- 已完成最终飘字：仅普通攻击record进入显示路径，使用`OnTakeDamage.params.damage`；普通白字、暴击橙字，按`record + victim`去重，多目标不同受击单位分别显示，技能伤害排除。
+- 已保留`data/csv/商店系统/altar_actions.csv`训练目标`target_armor=100000`；契约同时锁定源CSV、生成Lua和训练服务消费者。选中面板继续显示引擎实际运行时护甲的War3投影，不强行显示CSV请求值。
+- 自动验证通过：专项Lua/契约、英雄多重攻击、猴王QWE/近战/塔契约、超级塔暴击、研究减甲和多重攻击回归、Lua 5.1语法、严格UTF-8与限定`git diff --check`。
+- 未完成Workshop Tools实机验证。下一步冷启动地图，确认普通最终`17`显示白字、暴击最终`38`显示橙字、旧减甲前`2564`不再出现，并检查本体、W分身、多目标及技能伤害无重复/误标。
+- 首轮实机复测失败：用户观察到疑似首次暴击没有数字，且之后所有攻击数字停止显示；所提供日志无Lua错误段，包含真实攻击damage_category=nil。当前需取得暴击时刻附近的完整控制台错误或确认无错误，再区分暴击显示API异常与overhead队列互斥。
+- 用户确认控制台完全无红色错误。已加入最多80条[HERO_ATTACK_DAMAGE_NUMBER]限次诊断，记录roll/show/dedup/clear、record、暴击身份、最终伤害和style；诊断版通过Lua 5.1行为、语法、契约、严格UTF-8和限定diff检查。下一步只需冷启动复现并提供该前缀日志。
+- 最新实机日志已确认两个根因：`DAMAGEOUTGOING_PERCENTAGE`实机回调没有可用record，整轮没有任何`action=roll`，因此科技配置虽已进入英雄快照，但攻击消费层暴击实际等效0%；`addspeed`后Dota从0开始循环复用record，旧显示去重状态使新一代攻击连续进入`action=dedup`，解释暴击后所有飘字停止。
+- 已按用户批准完成修复：本体和齐天大圣W分身在`ON_ATTACK_RECORD`按权威战斗快照掷骰，再由无record参数的outgoing getter消费本次攻击倍率；新record建立时重置同攻击者同编号上一代显示状态。暴击和显示状态键改为`attacker entindex + record`，避免本体、分身或多英雄相同record互相覆盖；最终显示仍按victim去重。
+- 诊断`roll`现明确打印`chance`。权威CSV中`researcher_super_tower_crit_01/19/23`分别为`0.5%/9.5%/11.5%`；`addtechnology`设置传入科技ID的具体等级，不会自动加满。实机高概率验证必须使用`addtechnology researcher_super_tower_crit_23`，下一轮应看到`roll ... chance=11.5`。
+- 修复版自动验证通过：`HERO_ATTACK_DAMAGE_NUMBERS_LUA51_PASS`、`HERO_ATTACK_DAMAGE_NUMBERS_CONTRACT_PASS`、`SUPER_TOWER_CRIT_LUA51_PASS`、`SUPER_TOWER_CRIT_CONTRACT_PASS`、`SUPER_TOWER_CRIT_GENERATED_COMPARE_PASS`、英雄多重攻击、猴王QWE/近战/塔、研究减甲回归、相关Lua 5.1语法和严格UTF-8。仍需冷启动Workshop Tools验证`roll → show → clear`引擎时序、暴击最终伤害翻倍以及record循环后持续飘字；自动测试不等于实机验收。
+
+## 活跃任务（2026-08-04）：超级防御塔暴击四项科技效果修复
+
+### 用户已批准需求
+
+- `researcher_super_tower_crit` 每一级同时提升所有防御塔暴击几率、防御塔攻击加成、召唤英雄暴击几率、召唤英雄攻击加成，四项均为每级 `+0.5%`。
+- 权威科技 CSV 的每一级介绍必须明确包含上述四项；具体复合效果允许保留在 Lua 中，不要求为四项效果新增 CSV 数值字段。
+- “英雄”作用对象指祭坛召唤的项目战斗英雄；保留原生普通攻击、暴击及攻击事件链，不新增自定义攻击伤害。
+
+### 调查检查点
+
+- 旧 `research_technology_config.lua` 的 `ARS-07` 已定义四项 `0.005` 每级效果，证明原设计即为四项各 `0.5%`。
+- 当前生成科技权威链只把 CSV 的 `super_tower_crit_pct` 投影为防御塔暴击率；`technology_stat_manager.lua` 未派生防御塔攻击、英雄暴击和英雄攻击，并且英雄科技初始结构缺少 `critical_chance_pct`。
+- 防御塔消费与刷新链已存在：`building_upgrade_system.lua` 消费塔攻击百分比和暴击率，并在 `TECHNOLOGY_STATS_CHANGED` 后刷新玩家所有已登记箭塔；`modifier_tower_attack_effects.lua` 负责研究暴击。
+- 召唤英雄消费与刷新链已存在：`hero_combat_stat_service.lua` 消费英雄攻击百分比和暴击率，并在科技变化后重算；`modifier_weapon_stat_projection.lua` 按原生 attack record 结算暴击。
+- 当前 CSV 错误配置为每级累计 `1%` 且说明只包含防御塔暴击；应修正为每级累计 `0.5%`，Lv.23 为 `11.5%`，并为每一级写明四项说明。
+
+### 实施计划
+
+1. 修改 `technology_definitions.csv` 中该科技 Lv.1-Lv.23 的累计值和四项说明。
+2. 使用项目生成器定向重建 `generated/technology_definitions.lua`，不直接手改生成文件。
+3. 在 `technology_stat_manager.lua` 将 `super_tower_crit_pct` 同时投影到塔/英雄的暴击率与攻击百分比。
+4. 新增 PowerShell 契约与 Lua 5.1 行为测试，并执行生成一致性、语法、严格 UTF-8 和限定差异验证。
+
+### 实施结果与当前状态
+
+- 权威 CSV 的 Lv.1-Lv.23 已统一为每级 `0.5%`，累计值为 `level × 0.5%`；Lv.19 为 `9.5%`，Lv.23 为 `11.5%`。
+- 每一级 `notes` 均明确分四行写入防御塔暴击、防御塔攻击、召唤英雄暴击和召唤英雄攻击四项 `+0.5%`；商城现有描述链直接消费生成行 `notes`。
+- `technology_stat_manager.lua` 将单一 `super_tower_crit_pct` 同时投影为 `tower.critical_chance_pct`、`tower.attack_bonus_pct`、`hero.critical_chance_pct` 和 `hero.attack_bonus_pct`，并补齐英雄暴击零值结构。
+- 防御塔继续由现有建筑刷新与塔暴击 Modifier 消费；召唤英雄继续由权威战斗快照和 attack record 暴击 Modifier 消费。未新增自定义伤害、重复 Buff 服务或旁路攻击事件。
+- CSV 原文件为可逆 GB18030、无替换字符；本轮使用明确 GB18030 解码后转为 UTF-8 BOM。通用生成器改为保留 CSV 引号字段内换行，使生成 Lua 的 Tooltip 文本保留 `\n`。
+
+### 自动验证结果
+
+- `SUPER_TOWER_CRIT_GENERATED_COMPARE_PASS`：CSV 定向生成与生成 Lua 逐字节一致。
+- `SUPER_TOWER_CRIT_CONTRACT_PASS`：23级数值、四项说明、四项映射及塔/英雄消费刷新链静态契约通过。
+- `SUPER_TOWER_CRIT_LUA51_PASS`：Lv.1/Lv.19/Lv.23 四项行为与独立英雄攻击科技共存模拟通过。
+- `SUPER_TOWER_CRIT_LUAC51_PASS`：生产映射和专项测试 Lua 5.1 语法通过。
+- `RESEARCH_ARMOR_REDUCTION_CONTRACT_PASS` 与 `TECHNOLOGY_STAT_MANAGER_GENERATED_LEVELS_LUA51_PASS`：现有生成科技等级/减甲回归通过。
+- `SUPER_TOWER_CRIT_STRICT_UTF8_PASS` 与 `SUPER_TOWER_CRIT_DIFF_CHECK_PASS`。
+
+### 剩余实机验收
+
+- 完全停止并重新 Run Workshop Tools，购买若干等级后确认 Tooltip 四行文本和每级 `+0.5%`。
+- 对购买前后同一防御塔和召唤英雄记录攻击值，确认每级提高 `0.5%`；分别用足够攻击次数统计两类单位的暴击率变化。
+- 确认已有防御塔、已召唤英雄会在购买后立即刷新；科技前召唤与科技后召唤得到相同结果。
+- 自动测试不等于引擎实机验证，未经用户确认不得记录为验收完成。
+
+## 活跃任务（2026-08-03）：英雄实际射程与Undying/召唤英雄工具技能修正
+
+### 用户已批准需求
+
+- 用户于2026-08-03进一步确认：齐天大圣1000码攻击不能只追求高速远程弹道，而要改成近战英雄式的无飞行弹道即时结算；保留攻击前摇、1000攻击距离和1000索敌距离。
+- 用户此前要求齐天大圣攻击/索敌距离保持1000，并将弹道速度从3000提高到30000；该高速远程方案已被最新批准的近战式无弹道结算取代。
+- 修复原生近战英雄虽配置远程能力但实际攻击命令仍按近战距离处理的问题；所有英雄的实际射程必须来自`hero_definitions.csv`。
+- 用户实机反馈并修正需求：开局`npc_dota_hero_undying`建造者只拥有D键1000码点目标闪烁，不拥有拾取和回城技能；当前D键不可用必须修复。
+- 祭坛召唤战斗英雄不拥有D闪烁，保留F键300范围拾取和F2回城；F2继续复用现有召唤英雄查询及主城安全落点服务。
+- F拾取所有该玩家允许拾取的真实地面物品，按距召唤英雄由近到远处理；背包不足时停止，剩余物品保持在地面。
+- 修复只有头冠、没有身体但仍可攻击树的异常表现。已确认头冠是跟随Undying主体的`prop_dynamic`，真正攻击者是主体；建造者必须设为`DOTA_UNIT_CAP_NO_ATTACK`并恢复稳定主体显示。
+
+### 实施边界
+
+- CSV是英雄射程和技能说明的权威源；生成Lua不得手改。
+- 挑战地面奖励继续复用现有Claim、逻辑库存和`survival_ground_reward`防复制边界；普通物品使用官方背包拾取。
+- Undying只授予D闪烁；召唤英雄只保留F拾取和F2回城，不授予D闪烁。
+- 不增加空气弹道或手动补树伤害，不回滚当前`HEAD 187e732`及工作区既有未跟踪测试文件。
+- 自动测试不能代替Workshop Tools中的实际攻击距离、快捷键、闪烁落点、拾取和外观验收。
+
+### 当前状态
+
+- 旧D/F/T方案已被用户实机反馈取代；技能归属、D输入和F2输入已完成修正并通过自动验证，射程、拾取事务、外观与NO_ATTACK实现继续保留。齐天大圣无弹道即时结算已完成代码与自动验证，等待Workshop Tools实机验收。
+
+### 齐天大圣无弹道调查检查点（2026-08-03）
+
+- `hero_stat_adapter.lua`当前只要配置存在就把英雄设为`DOTA_UNIT_CAP_RANGED_ATTACK`；无速度分支也仍强制远程，因此不能把速度留空或设0来表达近战。
+- 已采用方案：在权威`hero_attack_projectiles.csv`新增显式`attack_capability`字段；齐天大圣配置`melee`，其他英雄配置`ranged`。运行时按字段投影攻击能力，近战分支清空可见弹道并在攻击前摇结束时由引擎直接结算。
+- 1000攻击距离继续由`modifier_survival_hero_attack_range`覆盖，1000索敌继续来自`hero_definitions.csv`；不另写伤害，不绕过普通攻击、暴击、多目标和技能事件链。
+- 已排除方案：继续提高30000速度仍会创建远程弹道，无法完全消除视觉差异；使用空值/0作为近战暗号会与旧回退语义冲突且数据不明确。
+- 尚未验证：原生近战能力配合1000基础射程覆盖后的实际攻击命令、动画与命中时点只能在Workshop Tools冷启动后确认。
+
+### 实施结果（2026-08-03）
+
+- `hero_definitions.csv`及生成Lua中的齐天大圣攻击距离、索敌距离均为1000；`hero_attack_projectiles.csv`新增显式`attack_capability`列，齐天大圣配置为`melee`且不再配置弹道速度，其他五英雄保持`ranged`及原弹道配置。
+- `hero_stat_adapter.lua`按CSV攻击能力分流：`melee`清空远程弹道名并设置`DOTA_UNIT_CAP_MELEE_ATTACK`，使攻击前摇结束时直接结算；远程英雄继续设置弹速、可选模型和`DOTA_UNIT_CAP_RANGED_ATTACK`。
+- 隐藏永久`modifier_survival_hero_attack_range`继续通过`MODIFIER_PROPERTY_ATTACK_RANGE_BASE_OVERRIDE`把CSV基础射程投影为引擎实际射程；保留`survival_attack_range`与1000索敌范围，不另写伤害或绕过原生攻击事件链。
+- 开局Undying只获得D键1000码点目标闪烁；策略会清除旧热重载实体残留的拾取/回城Ability，并把闪烁固定到四个建造技能后的D槽。D按Ability名称绑定，补齐`+/-`自定义命令，并明确通过`Abilities.ExecuteAbility`进入引擎原生点目标模式。
+- 召唤英雄继续由`hero_skill_system`获得回城和拾取Ability，不获得闪烁；F按Ability名称触发拾取，F2通过`ui_return_home_request`只查询并施放当前玩家的召唤英雄回城Ability。
+- F把虚拟升阶材料和真实`dota_item_drop`放入同一二维距离+entindex稳定排序序列。
+- 真实物品拾取保留自定义owner、Purchaser、OwnerEntity和PlayerOwner所有权校验；挑战地面奖励仍先进入官方背包，再由既有拾取事件执行Claim和防复制事务。装备栏0至8无空位时停止，后续物品不删除、不移动。
+- Panorama显示身份为Undying闪烁D、召唤英雄拾取F和回城F2；回城按钮与F2统一进入服务端召唤英雄查询路径。`combat_stats.js`与`hud_takeover.js`已强制编译。
+- Undying初始化和重生均设为`DOTA_UNIT_CAP_NO_ATTACK`；移除异常Hallows头冠prop/粒子配置，恢复原生主体和wearable可见性，并在热重载时明确清除旧`EF_NODRAW`。
+
+### 自动验证结果
+
+- `BUILDER_UTILITY_CONTRACT_PASS`
+- `WORKER_RANGED_MULTISHOT_CONTRACT_PASS`
+- `MONKEY_MELEE_ATTACK_LUA51_PASS`
+- `MONKEY_MELEE_TEST_LUAC51_PASS`
+- `MONKEY_MELEE_LUAC51_PASS`
+- `HERO_ATTACK_PROJECTILES_GENERATED_COMPARE_PASS`
+- `MONKEY_MELEE_STRICT_UTF8_PASS`
+- `MONKEY_MELEE_DIFF_CHECK_PASS`
+- `HERO_MULTISHOT_LUA51_PASS`
+- `GROUND_ITEM_PICKUP_LUA51_PASS`
+- `BUILDER_UTILITY_LUAC51_PASS`
+- `HERO_DEFINITIONS_GENERATED_COMPARE_PASS`
+- 本轮7个非历史文档目标文件严格UTF-8通过；`SESSION_LOG.md`当前3个`U+FFFD`与`KNOWN_ISSUES.md`记录的既有历史数量一致，本轮新增段为0。
+- `ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`
+- `FREE_HERO_REPLACEMENT_CONTRACT_PASS`
+- `HERO_HEALTH_CONTRACT_PASS`
+- `HERO_CONFIGURED_HEALTH_LUA51_PASS`
+- `FREE_HERO_EXCLUSIVE_STATE_LUA51_PASS`
+- Panorama两个JS均为`OK: 1 compiled, 0 failed, 0 skipped`；限定`git diff --check`通过。
+- 全量`tools/build_configs.py`被既有无关`item_definitions.csv`错误`invalid number: equipment_iron_armor_01`阻断；本任务使用同一生成器`build()`定向生成`hero_definitions.lua`并逐字节比较通过。失败命令触碰但内容未变化的Tooltip/Buff/Reward生成文件经`git diff --quiet`确认均为0。
+- `.cline/local-toolchain.json`记录的`C:\Program Files\lua\bin`路径已失效；本次实际使用`C:\msys64\mingw64\bin\lua5.1.exe`与`luac5.1.exe`，版本均为Lua 5.1.5。
+
+### 剩余实机验收
+
+- 完全停止并重新Run Workshop Tools，重新召唤齐天大圣，确认攻击/索敌距离均为1000，攻击前摇结束时直接命中且不再出现飞行弹道或高速远程攻击的视觉差异。
+- 回归确认齐天大圣的普通攻击伤害、暴击、攻击命中事件、专属/公共技能触发和转生多目标攻击仍正常；自动行为测试只证明Lua投影契约，不等于引擎实机验证。
+- 选中开局Undying，确认只显示D闪烁，没有拾取和回城技能；D可进入点目标模式。
+- 验证D在1000边界、阻挡地形、可通行落点、起终点闪光与投射物闪避的实际表现。
+- 选中召唤英雄，确认没有D闪烁，F拾取和F2回城均稳定；在300范围内混放挑战材料、普通物品和他人物品，确认距离顺序、所有权、防复制、最后一格和满包停止。
+- 确认Undying主体与默认外观稳定显示、无漂浮头冠，且无法自动或手动攻击资源树；死亡重生后保持一致。
+
+---
+
+## 已被当前任务取代的历史活跃段：齐天大圣Q/W/E/R专属技能与七塔合一
 
 - 用户已批准实施齐天大圣四个固定Q/W/E/R专属技能，以及所有英雄均可使用的通用七塔合一系统。
 - 四技能召唤时固定显示但置灰，分别在1/3/6/10转原位激活；复用现有四个齐天大圣专属技能ID，禁止公共技能点升级。

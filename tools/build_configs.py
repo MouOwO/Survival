@@ -76,7 +76,7 @@ def build(source: Path, output: Path) -> None:
             text = None
     if text is None:
         raise UnicodeDecodeError("unknown", raw, 0, 1, f"unsupported CSV encoding: {source}")
-    rows = list(csv.reader(text.splitlines()))
+    rows = list(csv.reader(text.splitlines(keepends=True)))
     if len(rows) < 2:
         raise ValueError(f"CSV requires header and #types row: {source}")
     headers = rows[0]

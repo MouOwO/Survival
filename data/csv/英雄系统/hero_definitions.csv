@@ -5,5 +5,5 @@ hero_doom,npc_dota_hero_doom_bringer,末日使者,strength,0,1,0,100,100,100,100
 hero_shadow_fiend,npc_dota_hero_nevermore,影魔,agility,0,1,0,100,100,100,100,100,100,20,20,0.7,1,,2000,1200,2000,900,3000,10,,,,0,1,1,1,0,0,10,public_pool,exclusive_shadow_fiend,260,20,1,免费英雄，专属技能第一转职成功后激活
 hero_axe,npc_dota_hero_axe,斧王,strength,0,1,0,100,100,100,100,100,100,20,20,0.7,1,,2000,500,2000,,3000,10,,,,0,1,1,1,0,0,10,public_pool,exclusive_axe,260,30,1,免费英雄，专属技能第一转职成功后激活
 hero_drow_ranger,npc_dota_hero_drow_ranger,黑暗游侠,agility,0,1,0,100,100,100,100,100,100,20,20,0.7,1,,2000,1200,2000,1250,3000,10,,,,0,1,1,1,0,0,10,public_pool,exclusive_drow_ranger,260,40,1,免费英雄，专属技能第一转职成功后激活
-hero_monkey_king,npc_dota_hero_monkey_king,齐天大圣,agility,1,1,0,500,500,500,500,500,500,1000,1000,1.5,10,,2000,3000,3000,,10000,10,,,,10,1.15,1.1,1.1,0,0,10,public_pool,exclusive_monkey_king,260,50,1,VIP英雄，4个专属技能第一转职成功后解锁
+hero_monkey_king,npc_dota_hero_monkey_king,齐天大圣,agility,1,1,0,500,500,500,500,500,500,1000,1000,1.5,10,,2000,1000,1000,,10000,10,,,,10,1.15,1.1,1.1,0,0,10,public_pool,exclusive_monkey_king,260,50,1,VIP英雄，4个专属技能第一转职成功后解锁
 hero_blademaster,npc_dota_hero_sven,剑圣,strength,1,1,0,500,500,500,500,500,500,1000,1000,1.5,10,,2000,3000,3000,,10000,10,,,,10,1.1,1.1,1.05,0,0,10,public_pool,exclusive_blademaster,260,60,1,VIP英雄，4个专属技能第一转职成功后解锁

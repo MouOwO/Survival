@@ -1,5 +1,22 @@
 # Project Context
 
+## 英雄普通攻击最终伤害飘字（2026-08-04）
+
+- 召唤英雄普通攻击伤害飘字以`OnTakeDamage.params.damage`为唯一数值口径，该值已经过引擎护甲与项目最终伤害层结算。普通攻击显示`OVERHEAD_ALERT_DAMAGE`，暴击显示`OVERHEAD_ALERT_CRITICAL`；暴击身份按`attacker + record`保存到record销毁，显示再按victim去重。不得恢复会额外显示减甲前数值的英雄`MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE`。
+- 无尽训练目标的`data/csv/商店系统/altar_actions.csv::target_armor=100000`是生成请求权威值；Dota引擎可能将最终有效护甲约束到约千点，普通选中单位UI应继续读取`GetPhysicalArmorValue(false)`并投影为War3显示值，不得用CSV请求值覆盖运行时有效护甲。
+
+## Attack record lifecycle
+
+- Dota attack record 数值会在长时间或高攻速攻击后循环复用，不能把裸record当作进程生命周期内永久唯一ID。record级状态至少要包含攻击者身份，并在每次`ON_ATTACK_RECORD`建立新一代时重置同键的上一代短期状态。
+- 实机不能假设`MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE`回调参数包含attack record；需要record级判定时应在`MODIFIER_EVENT_ON_ATTACK_RECORD`建立状态，getter只消费已经建立的本次攻击倍率。最终命中身份继续由`OnTakeDamage.params.record`关联，并在`ON_ATTACK_RECORD_DESTROY`清理。
+
+## 复合生成科技效果（2026-08-04）
+
+- `researcher_super_tower_crit` 的权威等级、成本、累计百分比和 Tooltip 文案来自 `data/csv/建筑与工人系统/technology_definitions.csv`；每级累计值是 `level × 0.5%`，说明必须同时列出防御塔暴击、防御塔攻击、召唤英雄暴击和召唤英雄攻击四项。
+- 该科技在 CSV 中保留单一 `effect_type=super_tower_crit_pct`，四项派生由 `technology_stat_manager.lua` 统一完成。不得为此另建塔 Buff、英雄 Buff 或自定义伤害链。
+- 塔属性由 `building_upgrade_system.lua` 在 `TECHNOLOGY_STATS_CHANGED` 后刷新，暴击由 `modifier_tower_attack_effects.lua` 结算；英雄属性由 `hero_combat_stat_service.lua` 同事件刷新，暴击由 `modifier_weapon_stat_projection.lua` 按 attack record 结算。
+- CSV 引号字段可包含 Tooltip 换行；`tools/build_configs.py` 必须使用 `splitlines(keepends=True)` 交给 `csv.reader`，否则字段内换行会被静默删除并导致生成 Tooltip 四段文字粘连。
+
 ## Lua模块加载故障排查（2026-08-03）
 
 - Dota日志中的`module not found`至少有两类根因，必须先分类，不能直接修改`package.path`或注释`require`：
@@ -35,6 +52,12 @@
 - 总目标数包含主目标。次级目标使用引擎`PerformAttack`逐个独立结算，因此每个目标按自身护甲处理；次级攻击关闭Proc并在`modifier_weapon_attack_tracker`按attack record标记，不发布项目主攻击事件，避免递归多目标、公共技能、成长和主攻击装备效果。
 - 主目标可在原平A落地时死亡；只要攻击事件中的主目标实体和敌方身份仍有效，多目标仍应继续选择存活的其他敌人。目标查询范围读取`survival_attack_range`、`Script_GetAttackRange()`和`GetAttackRange()`最大有效值。
 
+## 英雄攻击能力与弹道配置（2026-08-03）
+
+- `data/csv/英雄系统/hero_attack_projectiles.csv`同时是英雄弹道和攻击能力的权威源；`attack_capability`显式使用`melee`或`ranged`，禁止用0速度、空速度或极高速度隐式表达即时结算。
+- `hero_stat_adapter.lua`按该字段投影引擎能力。`melee`表示无飞行弹道、攻击前摇结束时由引擎直接结算；`ranged`继续消费`projectile_speed`和可选`projectile_model`。
+- 攻击能力与攻击距离是独立配置：近战能力仍可通过`modifier_survival_hero_attack_range`获得CSV指定的远距离。当前齐天大圣为`melee`且攻击/索敌1000；不应为了即时结算另写伤害或绕过原生普通攻击事件链。
+
 ## 资源树承伤与箭塔目标规则（2026-08-03）
 
 - 资源树单位身份是`GetUnitName() == "enemy_tree"`；箭塔及全部转职塔的稳定身份是`survival_building_id == "arrow_tower"`，不要只按引擎单位名识别转职塔。
@@ -58,6 +81,18 @@
 - 多目标召唤攻击必须区分主攻击与次级攻击。小游侠次级攻击使用`PerformAttack`关闭Proc，并通过攻击record标记隔离项目装备、英雄技能和其他攻击附带效果；只关闭引擎Proc不足以证明项目事件链不会重复触发。
 - “开局可见但未解锁”的固定槽技能使用项目等级0与`locked=true`表达业务状态，引擎Ability保持等级1以显示图标，并用`SetActivated(false)`禁用；解锁时激活同一个Ability，禁止删除重加导致槽位、Tooltip或存档身份漂移。
 - 四英雄任务的可靠验证闭环包括：权威英雄/专属/技能/弹道/Tooltip CSV，定向生成Lua，Ability与单位KV、本地化镜像、Lua 5.1语法与行为测试、PowerShell契约、生成一致性、严格UTF-8和限定`git diff --check`。自动测试必须与用户验收分开记录；本任务已于2026-08-02获得用户明确成功确认。
+
+## 召唤英雄与永久分身的完整战斗数据镜像（2026-08-03）
+
+- 当需求是“分身数据与本体完全一致”时，权威来源必须是本体同一次`HERO_COMBAT_STATS_GET_REQUEST`返回的原子快照。攻击、最终攻速、暴击、逻辑三维、最大生命和`refresh_version`必须一起读取、一起应用，禁止每个Modifier分别请求快照，否则一次刷新可能混用不同版本。
+- `attack_speed`是combat system已经计算完成的每秒攻击次数。完整镜像必须直接使用`SetBaseAttackTime(1 / attack_speed)`；禁止在分身侧重新组合`base_attack_time + equipment_attack_speed_pct`，因为分身原生英雄的基础100攻速、敏捷或其他原生状态仍可能参与引擎计算，造成二次投影和本体/分身漂移。
+- 需要复制本体实际普通攻击时，不能简单使用`attack_min/max * hero_damage_multiplier`。本体引擎攻击由基础攻击倍率层和装备/研究附加攻击层共同组成，粗略乘法会错误放大附加部分。应由`hero_combat_stat_service`在权威快照中发布最终引擎攻击上下界，分身只复制结果，不在召唤物服务中重复实现攻击公式，也不挂会触发装备业务链的本体Modifier。
+- 原生英雄分身必须把原生力量、敏捷、智力保持为0。项目逻辑三维只缓存和显示，不通过Dota原生三维投影；否则敏捷会额外改变攻速和护甲，力量会改变生命，主属性还可能改变攻击，导致数据看似已复制但实际结算继续偏移。
+- `CreateUnitByName`创建的原生英雄分身同样不能依赖`SetBaseMaxHealth/SetMaxHealth`维持目标生命。应复用`modifier_survival_hero_base_health`动态补足：从当前最大生命扣除旧补充值得到原生基线，再计算新补充值；刷新后按新最大生命恢复原生命百分比，保证重复同步幂等。
+- 暴击可由分身专用Modifier执行，但概率和倍率必须使用服务同步进去的同一份缓存快照，不得在暴击回调中再次请求combat system。这样一次攻击不会与攻击力、攻速或三维使用不同`refresh_version`。
+- 战斗实体正确不代表选中面板正确。`ui_request_router`默认只把本体英雄entindex识别为英雄权威快照；永久分身必须使用严格身份标记（当前为`survival_monkey_king_clone`），按owner读取同一英雄快照，再替换分身entindex、实际最大生命、最终攻速、固定护甲和显示名。禁止为显示逻辑三维而写入原生三维。
+- 完整镜像与业务链继承是两件事。分身可以复制最终数值，但仍应使用专用攻击Modifier和身份标记，明确隔离装备触发、公共技能、转生成长、英雄主攻击事件及未授权的专属技能；不能通过给分身挂本体全套Modifier来“省事复刻”。
+- 自动测试至少覆盖：最终攻速到BAT换算、生命补足幂等、最终引擎攻击字段存在、禁止攻速百分比二次投影、禁止Modifier拆分请求快照、分身UI严格身份/owner映射，以及Lua 5.1语法。上述检查不能替代Workshop Tools中对HUD、实际攻击间隔、平A伤害、暴击和生命比例的实机对照。
 
 ## 项目与环境
 

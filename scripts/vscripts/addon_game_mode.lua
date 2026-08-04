@@ -163,6 +163,7 @@ require("abilities/ability_build_arrow_tower")
 require("abilities/ability_build_research_lab")
 require("abilities/ability_build_farm")
 require("abilities/ability_building_blink")
+require("abilities/ability_survival_builder_blink")
 require("abilities/ability_build_gold_mine")
 require("abilities/ability_build_hero_altar")
 require("abilities/ability_summon_doom")
@@ -190,6 +191,7 @@ require("abilities/ability_upgrade_gold_mine_efficiency")
 require("abilities/ability_upgrade_gold_mine_crit")
 require("abilities/ability_gold_mine_auto_upgrade")
 require("abilities/ability_survival_pickup_materials")
+require("abilities/ability_survival_return_home")
 require("abilities/ability_tower_class_1")
 require("abilities/ability_tower_class_2")
 require("abilities/ability_tower_class_3")
@@ -260,6 +262,7 @@ local function initialize_survival_hero(hero)
     replacing_forced_hero[player_id] = nil
 
     hero_ability_policy.apply(hero)
+    hero:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
     hero:SetGold(0, false)
     local display = (unit_display_names.by_id or {})[unit_name]
     if display and display.enabled ~= false then
@@ -330,6 +333,7 @@ local function on_npc_spawned(keys)
     -- engine version. Reapplying is idempotent because the service first
     -- removes only the addon-owned wearable and particles.
     hero_cosmetic_service.apply(unit, "builder_undying")
+    unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
 end
 
 local function on_game_state_changed()
@@ -458,6 +462,16 @@ end
 function M.precache(context)
     -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
     tower_magic_supreme_system.precache(context)
+    PrecacheResource(
+        "particle",
+        "particles/items_fx/blink_dagger_start.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/items_fx/blink_dagger_end.vpcf",
+        context
+    )
     local units = {
         "npc_dota_hero_undying",
         "npc_dota_hero_doom_bringer",

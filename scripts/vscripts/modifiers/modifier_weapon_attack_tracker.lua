@@ -29,8 +29,17 @@ end
 
 function modifier_weapon_attack_tracker:OnAttackRecordDestroy(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
+    local projection = self:GetParent():FindModifierByName(
+        "modifier_weapon_stat_projection"
+    )
+    if projection and projection.active_attack_record == params.record then
+        projection.active_attack_multiplier = nil
+        projection.active_attack_record = nil
+    end
     modifier_weapon_attack_tracker.ClearSecondaryAttackRecord(params.record)
-    modifier_weapon_stat_projection.ClearCriticalAttackRecord(params.record)
+    modifier_weapon_stat_projection.ClearCriticalAttackRecord(
+        self:GetParent(), params.record
+    )
 end
 
 local function diagnostic_hero(attacker)
@@ -115,7 +124,9 @@ function modifier_weapon_attack_tracker:OnAttackLanded(params)
     )
     local secondary = is_secondary_attack(params, self:GetParent())
     local critical, critical_multiplier =
-        modifier_weapon_stat_projection.ConsumeCriticalAttackRecord(params.record)
+        modifier_weapon_stat_projection.PeekCriticalAttackRecord(
+            self:GetParent(), params.record
+        )
     if self:GetParent().survival_drow_companion == true then
         if not secondary then
             require("systems/hero_passive_skill_service")

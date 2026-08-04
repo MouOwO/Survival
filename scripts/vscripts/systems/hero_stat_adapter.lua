@@ -82,7 +82,11 @@ local function apply_combat_stats(unit, definition)
     projectile = projectile or definition
     local projectile_speed = number(projectile, "projectile_speed")
     local projectile_model = projectile.projectile_model
-    if projectile_speed and projectile_speed > 0 then
+    local attack_capability = projectile.attack_capability
+    if attack_capability == "melee" then
+        safe_call(unit, "SetRangedProjectileName", "")
+        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_MELEE_ATTACK)
+    elseif projectile_speed and projectile_speed > 0 then
         safe_call(unit, "SetProjectileSpeed", projectile_speed)
         if projectile_model and projectile_model ~= "" then
             safe_call(unit, "SetRangedProjectileName", projectile_model)
@@ -93,6 +97,7 @@ local function apply_combat_stats(unit, definition)
         safe_call(unit, "SetRangedProjectileName", "")
         safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_RANGED_ATTACK)
     end
+    unit.survival_attack_capability = attack_capability or "ranged"
 end
 
 local function apply_range(unit, definition)
@@ -100,6 +105,17 @@ local function apply_range(unit, definition)
     if attack_range and attack_range > 0 then
         safe_call(unit, "Script_SetAttackRange", attack_range)
         unit.survival_attack_range = attack_range
+        local modifier_name = "modifier_survival_hero_attack_range"
+        local modifier = unit.FindModifierByName
+            and unit:FindModifierByName(modifier_name) or nil
+        if not modifier then
+            modifier = unit:AddNewModifier(unit, nil, modifier_name, {
+                attack_range = attack_range,
+            })
+        elseif modifier.SetAttackRange then
+            modifier:SetAttackRange(attack_range)
+        end
+        safe_call(unit, "CalculateStatBonus", true)
     end
 
     local acquisition = number(definition, "acquisition_range")

@@ -1568,6 +1568,20 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_survival_builder_blink"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_builder_blink"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "queenofpain_blink"
+        "AbilityCastRange"   "1000"
+        "AbilityCastRangeBuffer" "0"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.0"
+        "AbilityManaCost"    "0"
+    }
+
     "ability_survival_pickup_materials"
     {
         "BaseClass"          "ability_lua"

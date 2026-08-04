@@ -1,6 +1,7 @@
 local events = require("core/events")
 local armor_balance = require("config/armor_balance")
 local runtime = require("config/generated/monkey_king_exclusive_runtime")
+require("modifiers/modifier_weapon_stat_projection")
 
 modifier_monkey_king_clone = class({})
 
@@ -16,8 +17,11 @@ end
 function modifier_monkey_king_clone:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
-        MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE,
+        MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE,
+        MODIFIER_EVENT_ON_ATTACK_RECORD,
         MODIFIER_EVENT_ON_ATTACK_LANDED,
+        MODIFIER_EVENT_ON_TAKEDAMAGE,
+        MODIFIER_EVENT_ON_ATTACK_RECORD_DESTROY,
     }
 end
 
@@ -32,13 +36,39 @@ function modifier_monkey_king_clone:GetModifierPhysicalArmorBonus()
     return desired - (tonumber(base) or 0)
 end
 
-function modifier_monkey_king_clone:GetModifierPreAttack_CriticalStrike()
-    if not IsServer() then return 0 end
-    local stats = self.combat_snapshot or {}
-    local chance = math.max(0, math.min(100,
-        tonumber(stats.critical_chance_pct) or 0))
-    return chance > 0 and RandomFloat(0, 100) < chance
-        and math.max(100, tonumber(stats.critical_damage_pct) or 200) or 0
+function modifier_monkey_king_clone:OnAttackRecord(params)
+    if not IsServer() or not params
+        or params.attacker ~= self:GetParent() then return end
+    self.active_attack_multiplier =
+        modifier_weapon_stat_projection.RollCriticalAttackRecord(
+            params.record, self.combat_snapshot or {}, self:GetParent()
+        )
+    self.active_attack_record = params.record
+end
+
+function modifier_monkey_king_clone:GetModifierDamageOutgoing_Percentage()
+    local multiplier = tonumber(self.active_attack_multiplier) or 0
+    self.active_attack_multiplier = nil
+    self.active_attack_record = nil
+    return multiplier > 0 and multiplier - 100 or 0
+end
+
+function modifier_monkey_king_clone:OnTakeDamage(params)
+    if not IsServer() or params.attacker ~= self:GetParent() then return end
+    modifier_weapon_stat_projection.ShowFinalAttackDamage(
+        self.player_id, self:GetParent(), params.unit, params
+    )
+end
+
+function modifier_monkey_king_clone:OnAttackRecordDestroy(params)
+    if not IsServer() or params.attacker ~= self:GetParent() then return end
+    if self.active_attack_record == params.record then
+        self.active_attack_multiplier = nil
+        self.active_attack_record = nil
+    end
+    modifier_weapon_stat_projection.ClearCriticalAttackRecord(
+        self:GetParent(), params.record
+    )
 end
 
 function modifier_monkey_king_clone:OnAttackLanded(params)

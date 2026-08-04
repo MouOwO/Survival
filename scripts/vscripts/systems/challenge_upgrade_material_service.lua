@@ -184,10 +184,10 @@ local function pickup_nearby(payload)
         end
     end
     table.sort(nearby, function(a, b)
-        local a_stage = tonumber(a.definition.required_stage) or 0
-        local b_stage = tonumber(b.definition.required_stage) or 0
-        if a_stage == b_stage then return a.drop_id < b.drop_id end
-        return a_stage < b_stage
+        local a_distance = (a.unit:GetAbsOrigin() - origin):Length2D()
+        local b_distance = (b.unit:GetAbsOrigin() - origin):Length2D()
+        if a_distance == b_distance then return a.drop_id < b.drop_id end
+        return a_distance < b_distance
     end)
 
     local synthesized = 0
@@ -216,6 +216,33 @@ local function pickup_nearby(payload)
         synthesized = synthesized,
         error = last_error,
     }
+end
+
+function M.nearby(caster, player_id)
+    player_id = tonumber(player_id)
+    if not valid(caster) or player_id == nil or player_id < 0 then return {} end
+    local origin = caster:GetAbsOrigin()
+    local result = {}
+    for _, drop in pairs(drops) do
+        if not drop.consumed and drop.player_id == player_id and valid(drop.unit) then
+            local distance = (drop.unit:GetAbsOrigin() - origin):Length2D()
+            if distance <= materials.pickup_radius then
+                result[#result + 1] = {
+                    drop = drop,
+                    distance = distance,
+                    entindex = drop.unit:entindex(),
+                }
+            end
+        end
+    end
+    return result
+end
+
+function M.pickup_candidate(candidate, player_id)
+    if not candidate or not candidate.drop then
+        return { ok = false, error = "upgrade_material_unavailable" }
+    end
+    return synthesize(candidate.drop, tonumber(player_id))
 end
 
 function M.pickup(caster, player_id)

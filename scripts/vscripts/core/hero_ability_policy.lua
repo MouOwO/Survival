@@ -7,6 +7,11 @@ local VISIBLE_REPLACEMENTS = {
     { native = "undying_tombstone", custom = "ability_build_arrow_tower" },
     { native = "undying_ceaseless_dirge", custom = "ability_build_gold_mine" },
 }
+local BUILDER_BLINK_ABILITY = "ability_survival_builder_blink"
+local BUILDER_REMOVED_UTILITY_ABILITIES = {
+    "ability_survival_pickup_materials",
+    "ability_survival_return_home",
+}
 
 local function add_ability(hero, ability_name)
     local ability = hero:FindAbilityByName(ability_name)
@@ -41,6 +46,27 @@ function M.apply(hero)
         end
     end
 
+    if hero:GetUnitName() == "npc_dota_hero_undying" then
+        for _, ability_name in ipairs(BUILDER_REMOVED_UTILITY_ABILITIES) do
+            local ability = hero:FindAbilityByName(ability_name)
+            if ability and not ability:IsNull() then
+                hero:RemoveAbility(ability_name)
+            end
+        end
+        local blink = add_ability(hero, BUILDER_BLINK_ABILITY)
+        if not blink or blink:IsNull() then
+            print("[SURVIVAL_HERO_ABILITIES] build=" .. BUILD
+                .. " success=false reason=utility_add_failed custom="
+                .. BUILDER_BLINK_ABILITY)
+            return false
+        end
+        blink:SetHidden(false)
+        blink:SetActivated(true)
+        if blink.SetAbilityIndex then
+            blink:SetAbilityIndex(#VISIBLE_REPLACEMENTS)
+        end
+    end
+
     local ultimate = hero:FindAbilityByName("undying_flesh_golem")
     if not ultimate or ultimate:IsNull() then
         print("[SURVIVAL_HERO_ABILITIES] build=" .. BUILD
@@ -53,6 +79,7 @@ function M.apply(hero)
     print("[SURVIVAL_HERO_ABILITIES] build=" .. BUILD
         .. " success=" .. tostring(ultimate_hidden)
         .. " visible_replacements=" .. tostring(#VISIBLE_REPLACEMENTS)
+        .. " utility_abilities=1"
         .. " native_ultimate_hidden=" .. tostring(ultimate_hidden)
         .. " engine_abilities_preserved=true"
         .. " ability_count=" .. tostring(hero:GetAbilityCount()))

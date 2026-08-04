@@ -68,6 +68,20 @@ local function hide_default_wearables(hero)
     end
 end
 
+local function show_default_wearables(hero)
+    local ok, child = safe_call(hero, "FirstMoveChild")
+    if not ok then return end
+    local no_draw = rawget(_G, "EF_NODRAW") or 32
+    while valid_entity(child) do
+        local next_ok, next_child = safe_call(child, "NextMovePeer")
+        local class_ok, class_name = safe_call(child, "GetClassname")
+        if class_ok and class_name == "dota_item_wearable" then
+            safe_call(child, "RemoveEffects", no_draw)
+        end
+        child = next_ok and next_child or nil
+    end
+end
+
 local function normalize_wearable(entry, index)
     if type(entry) == "string" then
         return "wearable_" .. tostring(index), entry
@@ -195,6 +209,8 @@ function M.apply(hero, hero_id)
 
     if definition.hide_default_wearables then
         hide_default_wearables(hero)
+    else
+        show_default_wearables(hero)
     end
 
     if definition.material_group then

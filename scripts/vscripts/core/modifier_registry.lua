@@ -1,4 +1,4 @@
-﻿require("modifiers/modifier_building_blink_move")
+require("modifiers/modifier_building_blink_move")
 local logger = require("core/logger")
 
 local M = {}
@@ -71,6 +71,10 @@ local modifiers = {
     {
         name = "modifier_survival_hero_base_health",
         path = "modifiers/modifier_survival_hero_base_health",
+    },
+    {
+        name = "modifier_survival_hero_attack_range",
+        path = "modifiers/modifier_survival_hero_attack_range",
     },
     {
         name = "modifier_survival_drow_companion_invulnerable",

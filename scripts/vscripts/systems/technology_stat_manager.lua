@@ -46,6 +46,7 @@ local function fresh_values()
             damage_multiplier_bonus = 0,
             final_damage_bonus_pct = 0,
             attack_bonus_pct = 0,
+            critical_chance_pct = 0,
             armor_reduction_per_attack = 0,
         },
     }
@@ -92,6 +93,12 @@ local function add_effect(values, effect_type, effect_value)
     elseif effect_type == "super_tower_crit_pct" then
         values.tower.critical_chance_pct =
             values.tower.critical_chance_pct + value
+        values.tower.attack_bonus_pct =
+            values.tower.attack_bonus_pct + value
+        values.hero.critical_chance_pct =
+            values.hero.critical_chance_pct + value
+        values.hero.attack_bonus_pct =
+            values.hero.attack_bonus_pct + value
     elseif effect_type == "tower_attack_flat"
         or effect_type == "tower_attack_flat_advanced"
         or effect_type == "super_tower_attack_flat" then
