@@ -1,5 +1,17 @@
 # Project Context
 
+## Panorama 输入生命周期与 Ability caster（2026-08-04）
+
+- Grid validate 的错误响应必须保留原请求身份和原请求坐标锚点。服务端即使在 caster、Ability、profile 或参数校验阶段提前失败，也必须回传 `session_id/request_id/ability_name/request_anchor_x/request_anchor_y/error`；客户端按这些请求字段拒绝过期响应，不能用仅在几何校验成功后才存在的结果 anchor 过滤错误，否则 UI 会永久停在“正在验证建筑占地……”。Grid 诊断按 Begin、请求、响应和拒绝原因输出，不在无请求时逐帧刷屏。
+- 开局引擎主英雄占位符不能只用 `AddNoDraw()` 隐藏；必须同时隐藏其 `dota_item_wearable` 子实体、取消玩家控制、禁攻并移出可见区域，而且隔离函数只能在明确的 `placeholder` 生命周期执行。英雄替换失败回滚到 `placeholder` 时必须重新隔离；提交 `combat_ready` 后禁止再对正式英雄执行。
+- Builder 快捷键的单位身份不得直接取 `GetLocalPlayerPortraitUnit()`。服务端应发布 CSV 定义的 Builder entindex；客户端统一解析实际 `Players.GetSelectedEntities()`、Portrait 和权威 Builder。当实际选中 Builder 而 Portrait 仍为占位 Undying 时必须选择 Builder；建筑、工人和正式英雄选择不得被永久覆盖。点击和快捷键必须调用同一选择解析器后再枚举 Ability。
+- `GameUI.CustomUIConfig()` 会跨 Workshop Tools Run 保留字段，但旧 Panorama context 的 JS callback 已失效。不得用持久化的 `SurvivalKeyDispatcherBound/SurvivalMouseDispatcherBound` boolean 跳过新 HUD 绑定，也不得让多个脚本分别调用全局 `SetKeyPressedCallback/SetMouseCallback/CreateCustomKeyBind`。唯一全局所有者是最早加载的 `ui_bootstrap.js`：每次 HUD generation 建立新 handler map、无条件替换 callback，并创建带 generation 的 fallback commands；业务模块只按稳定 ID 和优先级注册。
+- 托管 Ability 输入必须先确定 Ability entindex，再读取 `survival_ability_runtime[ability_entindex].owner_entindex`，并验证该单位槽位中确实存在同一 Ability。该 owner 是 Builder、建筑升级/训练/祭坛/金矿动作的 caster；Portrait Unit/玩家英雄只能用于普通英雄 Ability fallback，不能覆盖有效 runtime owner。
+- 鼠标与快捷键必须调用同一个 `SurvivalAbilityInput.ExecuteAbility()`。`ability_build_*` 与 runtime owner 为 `building_*` 的普通单位 Ability 需要官方 AbilityN 上的透明代理；建造技能不能回退原生点目标，否则会绕过项目 Grid validation/commit。
+- 点目标/Grid 会话必须在 Begin 时固定 caster entindex、Ability entindex/name 和 session id；活动期间不得逐帧从 `GetLocalPlayerPortraitUnit()` 重算 Builder。建筑移动 D 的高优先级 handler 只在当前选中建筑可移动或已进入移动状态时消费，否则 D 继续交给 Builder Blink。
+- `npc_survival_builder_proxy` 和项目建筑是普通 creature，`GetPlayerOwnerID()` 不能作为业务 ownership 权威。Builder 必须由 `builder_service` 注册表按玩家和实体双向校验，并把权威 ID 写入 `survival_player_id`；Grid、建造提交和建筑托管 Ability 路由读取该身份。引擎 `SetPlayerID/SetOwner/SetControllableByPlayer` 仍用于控制表现，但不能替代业务注册身份。
+- Builder 建造技能顺序来自 `data/csv/建筑与工人系统/builder_ability_stages.csv::slot_order`，运行时必须显式投影为 Ability index `slot_order - 1`。当前设计为五个建造技能 index `0..4`，项目输入 Q/W/E/R/T；Builder Blink 使用独立 index `5` 并按名称路由 D，不能再依赖 `AddAbility()` 自动排列。
+
 ## 英雄普通攻击最终伤害飘字（2026-08-04）
 
 - 召唤英雄伤害飘字以`OnTakeDamage.params.damage`为唯一数值口径，该值已经过引擎护甲与项目最终伤害层结算。普通攻击使用原生`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`，暴击使用原生`OVERHEAD_ALERT_CRITICAL`，带有效Ability inflictor的正式技能伤害使用红色`OVERHEAD_ALERT_DAMAGE`；无Ability的脚本或装备附伤不显示为技能伤害。暴击身份按`attacker + record`保存到record销毁，普通攻击显示再按victim去重。不得恢复会额外显示减甲前数值的英雄`MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE`。

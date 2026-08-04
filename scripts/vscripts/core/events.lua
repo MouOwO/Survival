@@ -1,6 +1,9 @@
 local M = {
     GAME_STARTED = "game.started",
     HERO_READY = "player.hero_ready",
+    BUILDER_READY = "player.builder_ready",
+    BUILDER_GET_REQUEST = "player.builder_get.request",
+    HERO_REPLACEMENT_SELECT = "hero.replacement.select",
     HERO_SUMMONED = "hero.summoned",
     HERO_SUMMON_GET_REQUEST = "hero.summon.get.request",
     ENGINE_ENTITY_KILLED = "engine.entity_killed",

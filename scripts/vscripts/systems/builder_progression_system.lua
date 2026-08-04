@@ -4,6 +4,8 @@ local stages = require("config/generated/builder_ability_stages")
 local training = require("config/generated/training_definitions")
 
 local M = {}
+local BUILDER_BLINK_ABILITY = "ability_survival_builder_blink"
+local BUILDER_BLINK_INDEX = 5
 
 local state_by_team = {}
 local managed_abilities = {}
@@ -14,7 +16,7 @@ end
 
 local function create_state()
     return {
-        hero = nil,
+        builder = nil,
         player_id = -1,
         team = -1,
         stage_id = "",
@@ -61,13 +63,13 @@ local function rows_for(stage_id)
     return rows
 end
 
-local function remove_managed(hero)
-    if not valid_entity(hero) then
+local function remove_managed(builder)
+    if not valid_entity(builder) then
         return
     end
     for ability_name, _ in pairs(managed_abilities) do
-        if hero:FindAbilityByName(ability_name) then
-            hero:RemoveAbility(ability_name)
+        if builder:FindAbilityByName(ability_name) then
+            builder:RemoveAbility(ability_name)
         end
     end
 end
@@ -88,21 +90,28 @@ local function can_activate(state, row)
 end
 
 local function add_stage_abilities(state, stage_rows)
-    local hero = state.hero
-    if not valid_entity(hero) then
+    local builder = state.builder
+    if not valid_entity(builder) then
         return
     end
 
     for _, row in ipairs(stage_rows) do
-        local ability = hero:FindAbilityByName(row.ability_name)
+        local ability = builder:FindAbilityByName(row.ability_name)
         if not ability then
-            ability = hero:AddAbility(row.ability_name)
+            ability = builder:AddAbility(row.ability_name)
         end
         if ability then
             ability:SetLevel(1)
             ability:SetHidden(false)
             ability:SetActivated(can_activate(state, row))
+            if ability.SetAbilityIndex then
+                ability:SetAbilityIndex(math.max(0, (tonumber(row.slot_order) or 1) - 1))
+            end
         end
+    end
+    local blink = builder:FindAbilityByName(BUILDER_BLINK_ABILITY)
+    if blink and blink.SetAbilityIndex then
+        blink:SetAbilityIndex(BUILDER_BLINK_INDEX)
     end
 end
 
@@ -115,12 +124,12 @@ local function public_counts(state)
 end
 
 local function publish(state)
-    if not valid_entity(state.hero) then
+    if not valid_entity(state.builder) then
         return
     end
     local payload = {
-        unit = state.hero,
-        entindex = state.hero:entindex(),
+        unit = state.builder,
+        entindex = state.builder:entindex(),
         player_id = state.player_id,
         team = state.team,
         building_id = "builder",
@@ -141,21 +150,21 @@ local function sync(state)
     local rows = rows_for(next_stage)
 
     if stage_changed then
-        remove_managed(state.hero)
+        remove_managed(state.builder)
     end
     add_stage_abilities(state, rows)
     publish(state)
 end
 
-local function on_hero_ready(payload)
+local function on_builder_ready(payload)
     local state = ensure(payload.team)
-    state.hero = payload.hero
+    state.builder = payload.builder
     state.player_id = payload.player_id
     local repair = (training.by_id or {}).train_repairer_01 or {}
-    if valid_entity(payload.hero)
-        and not payload.hero:HasModifier("modifier_repair_worker_ai") then
-        payload.hero:AddNewModifier(
-            payload.hero,
+    if valid_entity(payload.builder)
+        and not payload.builder:HasModifier("modifier_repair_worker_ai") then
+        payload.builder:AddNewModifier(
+            payload.builder,
             nil,
             "modifier_repair_worker_ai",
             {
@@ -212,7 +221,7 @@ end
 function M.init()
     state_by_team = {}
     managed_abilities = {}
-    event_bus.subscribe(events.HERO_READY, on_hero_ready)
+    event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)

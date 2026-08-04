@@ -339,6 +339,16 @@ local function can_place(payload)
     if not definition or not valid_entity(caster) then
         return { ok = false, error = "invalid_build_request" }
     end
+    local builder = event_bus.request(events.BUILDER_GET_REQUEST, {
+        player_id = tonumber(payload.player_id),
+        caster = caster,
+    })
+    if not builder or not builder.ok or builder.builder ~= caster then
+        return {
+            ok = false,
+            error = (builder and builder.error) or "builder_not_owned",
+        }
+    end
     local team = DOTA_TEAM_GOODGUYS
     team_alignment.enforce(caster, team, "builder_caster")
     if definition.build_once and wall_ever_built[team] then
@@ -365,7 +375,7 @@ local function can_place(payload)
         ok = true,
         definition = definition,
         team = team,
-        player_id = caster:GetPlayerOwnerID(),
+        player_id = builder.player_id,
         grid = grid,
     }
 end
@@ -373,7 +383,7 @@ local function start_building(payload)
     print("[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path")
     local check = can_place(payload)
     if not check.ok then
-        notify(payload.caster and payload.caster:GetPlayerOwnerID() or -1, check.error, "error")
+        notify(tonumber(payload.player_id) or -1, check.error, "error")
         return check
     end
     local cost = check.definition.build_cost
@@ -564,7 +574,7 @@ end
 local function queue_building(payload)
     local check = can_place(payload)
     if not check.ok then
-        notify(payload.caster and payload.caster:GetPlayerOwnerID() or -1, check.error, "error")
+        notify(tonumber(payload.player_id) or -1, check.error, "error")
         return check
     end
     local caster = payload.caster
@@ -596,6 +606,7 @@ local function queue_building(payload)
         if caster.survival_build_task ~= task then return false end
         local current = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
             caster = caster,
+            player_id = check.player_id,
             building_id = payload.building_id,
             position = target,
         })
@@ -603,7 +614,7 @@ local function queue_building(payload)
             if caster.survival_build_task == task then
                 caster.survival_build_task = nil
             end
-            notify(caster:GetPlayerOwnerID(), current and current.error or "建造位置失效", "error")
+            notify(check.player_id, current and current.error or "建造位置失效", "error")
             return false
         end
         if not builder_ready(
@@ -623,7 +634,7 @@ local function queue_building(payload)
         end
         return false
     end, "queue_building_" .. tostring(caster:entindex()))
-    notify(caster:GetPlayerOwnerID(), check.definition.display_name .. "正在前往建造位置")
+    notify(check.player_id, check.definition.display_name .. "正在前往建造位置")
     return { ok = true, moving = true, target = target }
 end
 local function query_building(payload)

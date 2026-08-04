@@ -11,7 +11,7 @@ function Check($condition, $message) {
     if (-not $condition) { throw $message }
 }
 
-Check ($gameMode.Contains('require("core/hero_ability_policy")')) "ALT_FIX_POLICY_DEPENDENCY_MISSING"
+Check (-not $gameMode.Contains('require("core/hero_ability_policy")')) "ALT_FIX_PLACEHOLDER_POLICY_DEPENDENCY_REMAINS"
 Check ($policy.Contains('local BUILD = "preserve_engine_abilities_origin_dev_v1_20260731"')) "ALT_FIX_BUILD_MISSING"
 Check ($policy.Contains("local VISIBLE_REPLACEMENTS = {")) "ALT_FIX_WHITELIST_MISSING"
 Check ($policy.Contains('{ native = "undying_decay", custom = "ability_build_wall" }')) "ALT_FIX_DECAY_PAIR_MISSING"
@@ -27,14 +27,14 @@ Check (-not $gameMode.Contains('require("core/ability_utils")')) "ALT_FIX_ABILIT
 Check (-not $gameMode.Contains("ability_utils.remove_all(hero)")) "ALT_FIX_REMOVE_ALL_PRESENT"
 Check (-not $policy.Contains('RemoveAbility("undying_flesh_golem")')) "ALT_FIX_ULTIMATE_REMOVED"
 
-$configureCall = $gameMode.IndexOf("hero_ability_policy.apply(hero)", $gameMode.IndexOf("local function initialize_survival_hero"))
+$configureCall = $gameMode.IndexOf("hero_anchor_service.register_placeholder", $gameMode.IndexOf("local function initialize_survival_hero"))
 $heroReady = $gameMode.IndexOf("event_bus.emit(events.HERO_READY", $configureCall)
-Check ($configureCall -ge 0) "ALT_FIX_NOT_APPLIED_DURING_HERO_INITIALIZATION"
-Check ($heroReady -gt $configureCall) "ALT_FIX_MUST_RUN_BEFORE_HERO_READY"
+Check ($configureCall -ge 0) "ALT_FIX_PLACEHOLDER_REGISTRATION_MISSING"
+Check ($heroReady -gt $configureCall) "ALT_FIX_PLACEHOLDER_MUST_REGISTER_BEFORE_HERO_READY"
 
 Check ($builderProgression.Contains("for ability_name, _ in pairs(managed_abilities) do")) "ALT_FIX_BUILDER_STAGE_MUST_REMOVE_ONLY_MANAGED_ABILITIES"
 Check (-not $builderProgression.Contains("ability_utils.remove_all")) "ALT_FIX_BUILDER_STAGE_REMOVE_ALL_PRESENT"
-Check ($builderProgression.Contains("event_bus.subscribe(events.HERO_READY, on_hero_ready)")) "ALT_FIX_BUILDER_STAGE_HERO_READY_SYNC_MISSING"
+Check ($builderProgression.Contains("event_bus.subscribe(events.BUILDER_READY, on_builder_ready)")) "ALT_FIX_BUILDER_STAGE_BUILDER_READY_SYNC_MISSING"
 Check ($builderStages.Contains('ability_name = "ability_build_wall"')) "ALT_FIX_WALL_NOT_STAGE_MANAGED"
 Check ($builderStages.Contains('ability_name = "ability_build_main_city"')) "ALT_FIX_MAIN_CITY_NOT_STAGE_MANAGED"
 Check ($builderStages.Contains('ability_name = "ability_build_arrow_tower"')) "ALT_FIX_ARROW_TOWER_NOT_STAGE_MANAGED"

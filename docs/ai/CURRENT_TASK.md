@@ -1,5 +1,36 @@
 # Current Task
 
+## 活跃任务（2026-08-04）：Undying 建造者代理与祭坛英雄替换首版
+
+- 最新实机反馈：用户确认“现在可以正常建造”，因此 Builder 注册 ownership、Grid validate/commit 和 Building 创建主链已通过 Workshop Tools 实机验证。仍需用户后续按需要确认选中城墙 Q 是否稳定执行 `ability_upgrade_wall`、最终 Q/W/E/R/T+D 布局及连续第二次 Run 输入生命周期；这些未确认项不得写成已验收。
+- 冲突收尾：`ability_tooltip.vjs_c`、`building_move.vjs_c`、`combat_stats.vjs_c`、`game_info_panel.vjs_c`、`survival_grid_placement.vjs_c`、`survival_ui.vjs_c` 曾为 Git `UU` 二进制冲突。6 个文件均以对应当前 content JS 源强制重编译，结果各 `1 compiled, 0 failed, 0 skipped`，再仅对这 6 个产物执行 `git add` 清除 unmerged stages；当前均为普通 stage 0 修改，没有 merge commit。
+- 最新 ownership/槽位/建筑选择修复已完成生产实现与自动验证：普通 creature Builder 不再依赖 `GetPlayerOwnerID()`，`builder_service` 按注册实体返回权威 `player_id/team`，Grid validate/commit 与 Building 创建链均校验同一注册 Builder 并传播玩家 ID；建筑和 Builder 将权威 ID 保存为 `survival_player_id`，建筑 no-target Ability 路由优先读取该字段。CSV `slot_order` 现显式投影建造技能 index `0..4`，Blink 保留 index `5`，项目输入语义为 Q/W/E/R/T + D。
+- Panorama Grid 和建筑移动不再读取 Portrait-only 选择，统一使用 `SurvivalSelectionResolver`；托管 Ability 要求 runtime owner 与当前解析选择一致，选中城墙后不得回退 Builder。fallback keybind 新增 command/apply/trigger 诊断。`builder_ability_rules.csv` 经审计当前无运行消费者且仍使用陈旧 `building_wall/building_main_city` 业务 ID，本轮未把它当作运行权威、也未扩大无消费者表迁移。
+- 验证通过：`BUILDER_OWNERSHIP_LUA51_PASS`、`BUILDER_ABILITY_SLOTS_LUA51_PASS`、`BUILDER_HERO_REPLACEMENT_LUA51_PASS/CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、Builder utility、Alt Ability 契约、相关 Lua 5.1 语法、严格 UTF-8 和限定 diff；`ui_bootstrap.js`、`combat_stats.js`、`survival_grid_placement.js`、`building_move.js` 均强制编译为 `1 compiled, 0 failed, 0 skipped`。尚未 Workshop Tools 实机验证，下一步冷启动后验证 Q 城墙 Grid、提交、城墙可控、选中城墙 Q 升级、最终 Q/W/E/R/T 与 D Blink。
+- 用户已批准继续修复占位实体碰撞/选择与 Grid 永久等待，并允许在不能唯一定位时增加完整请求级日志后提供实机日志复查。当前新增静态根因：占位隔离未设置不可选择、无单位碰撞和无移动能力；Grid caster/Ability 早期失败响应使用默认 anchor `(0,0)`，会被客户端当前 anchor 过滤并永久显示“正在验证建筑占地……”。实施边界为专用生命周期隔离 Modifier、Grid session/request 权威响应与状态变化日志，不改变 CSV Builder 身份、64码网格或英雄替换架构。
+- 本轮实施与自动验证已完成：新增 `modifier_survival_placeholder_anchor`，占位锚点现在不可选择、无单位碰撞、命令受限、不可移动、无血条且不上小地图；`hero_anchor_service` 仅在 placeholder 注册/重生/替换失败回滚时应用。Grid 服务端所有已接受 validate 请求均回显原请求 anchor 与 session/request/Ability 身份，客户端按请求 anchor 接收错误结果，不再把 caster/Ability 早期错误静默丢弃；客户端与服务端新增完整请求级诊断。
+- 验证通过：`BUILDER_HERO_REPLACEMENT_LUA51_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_UTILITY_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、相关生产 Lua `luac5.1 -p`、生产/测试目标文件严格 UTF-8且无替换字符、本轮文档新增行无替换字符、game/content 限定 `git diff --check`；`survival_grid_placement.js` 强制编译为 `1 compiled, 0 failed, 0 skipped`。`SESSION_LOG.md` 整文件仍保留已记录的3个历史 `U+FFFD`，本轮未猜测改写。尚未称为实机验证，下一步完全停止后 Run，测试移动碰撞、W与图标、网格与提交；若仍失败，提供同一次操作的 `[SURVIVAL_INPUT]`、`[SURVIVAL_CAST]` 和 `[GridPlacement][CLIENT/SERVER]` 日志。
+- 最新 Workshop Tools 实机失败：开局同时出现基础模型 Builder Proxy 与仍带原生技能/可残留 wearable 的占位 Undying；只有鼠标点击建造图标能进入 Grid，Q/W/E/R 快捷键不能建造。用户已批准按静态根因分析继续修复。
+- 已确认根因：`AddNoDraw()`与地下移动没有隔离占位英雄的 wearable、控制/选择和 Portrait 身份；快捷键又在解析 Ability entindex 前从 `GetLocalPlayerPortraitUnit()` 枚举可见技能，因此可能先取得占位 Undying 原生 Ability，后续 runtime owner 无法纠正错误 Ability 身份。当前实施边界是完整隔离占位英雄、发布权威 Builder entindex，并让点击/快捷键共用基于实际选择集合的单位解析；不使用永久 Selection Override。
+- 本轮生产修复已完成：`hero_anchor_service.isolate_placeholder()` 在注册、重生和替换失败回滚时统一隐藏占位主体及所有 `dota_item_wearable`、取消玩家控制、禁攻并移至地下；仅 `placeholder` 阶段允许执行，不会隐藏 `combat_ready` 正式英雄。`builder_service.lua` 向 `survival_builder_identity[player_<id>]` 发布 CSV Builder entindex。
+- `ui_bootstrap.js` 新增唯一 `SurvivalSelectionResolver`：读取 `Players.GetSelectedEntities()`、Portrait 和权威 Builder；实际选中 Builder 时拒绝占位 Undying Portrait，建筑/工人/正式英雄选择仍保持当前单位。`combat_stats.js` 与 `ability_tooltip.js` 共用该解析器；快捷键诊断现输出 dispatcher generation、selection、portrait、resolved unit/name、Builder、display slot、Ability name/entindex 和 runtime owner。
+- 自动验证通过：Builder 替换/输入生命周期/工具技能/Alt/免费英雄替换 PowerShell 契约，Builder Lua 5.1 隔离与生命周期行为，相关生产 Lua 的 `luac5.1` 语法，Builder CSV/生成 Lua 身份一致性，严格 UTF-8，以及 game/content 两仓限定 `git diff --check`。`ui_bootstrap.js`、`ability_tooltip.js`、`combat_stats.js` 强制编译均为 `1 compiled, 0 failed, 0 skipped`。首次 CSV 临时检查误把 `#中文表头/#types` 元数据算作业务行，修正过滤规则后通过，未修改数据。
+- 仍需完全停止 Workshop Tools 后连续 Run 两次实机验证：画面只能看到可控 Builder Proxy；占位 Undying/wearable 不可见、不可选、不可通过 HUD/Portrait 暴露；Q/W/E/R 与相同图标都解析为 Builder 的 `ability_build_*` 并进入 Grid；D/F、建筑操作、建筑移动 D、普通选择及祭坛 `ReplaceHeroWithNoTransfer()` 正常。控制台必须能看到对应 `[SURVIVAL_INPUT] KEY` 和完整 `[SURVIVAL_CAST][CLIENT] HOTKEY` 身份日志。
+- 用户已批准合并修复 Workshop Tools 输入回归：Builder 快捷键无效、建筑技能无法点击、Builder 建造绕过网格，以及第二次 Run 后 Q/W/E/R/T/Y/U 仅鼠标可用。生产修复和自动验证已完成：`ui_bootstrap.js` 每次 HUD generation 无条件重建唯一 Key/Mouse dispatcher 和 generation 专属 fallback keybind；业务模块按稳定 ID/优先级注册，不再依赖跨 Run 的 `*DispatcherBound` boolean 或匿名 handler 数组。
+- `combat_stats.js` 先解析 Ability runtime 并验证 `owner_entindex` 确实拥有该 Ability，再将该 owner 固定为 caster；Builder 不再被 Hero-only UI 过滤。`ability_tooltip.js` 的官方技能透明代理覆盖 `ability_build_*` 和所有 runtime owner 为 `building_*` 的建筑操作，鼠标点击与快捷键进入同一个 `SurvivalAbilityInput.ExecuteAbility()`。
+- 点目标状态固定 `unit/ability/name`；Grid session 从该状态读取 Builder 与 Ability，不再逐帧重新读取 Portrait Unit。`ability_build_*` 必须进入自定义 Grid，建筑升级/训练/祭坛/金矿操作保留建筑自身 caster。建筑移动 D 仅在当前选中可移动建筑时消费，否则继续分发给 Builder Blink。
+- 自动验证通过：`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS/LUA51_PASS`、`BUILDER_UTILITY_CONTRACT_PASS`、相关 Lua `LUAC_PASS`、严格 UTF-8 和限定 diff；6 个修改过的 Panorama JS 强制编译均为 `1 compiled, 0 failed, 0 skipped`。仍须在两次连续 Workshop Tools Run 中实机验证全部鼠标/键盘/网格/caster 流程，建筑 HUD anchor/count 假设也只能实机确认。
+- 用户批准先实现一版验证：开局 Undying 只作为引擎主英雄占位符；独立 Builder Proxy 承接建造技能、Blink、修理和施工；祭坛选择英雄时使用 `PlayerResource:ReplaceHeroWithNoTransfer()` 将占位 Undying 替换为正式战斗英雄。
+- 首版 Builder Proxy 使用普通自定义可控单位和 Undying 模型，不宣称 `IsCourier()==true`；待身份解耦和替换链实机稳定后，再单独验证真正 courier class，避免同时引入两个引擎变量。
+- 必须保持 `HERO_SUMMONED` 事件契约不变，使现有技能、属性、装备、成长、奖励和 UI 消费者继续绑定替换后的正式英雄。
+- 禁止使用永久全局 Selection Override；Builder 创建后仅一次性选中，不能阻止后续选择建筑、工人和战斗英雄。
+- 当前阶段：首版生产代码与自动验证已完成，尚未完成 Workshop Tools 实机验证。Builder 为 `npc_survival_builder_proxy` 普通可控单位，权威身份来自 `data/csv/建筑与工人系统/builder_definitions.csv`；开局 Undying 隐藏并移至地下，仅保留为引擎替换锚点。
+- `builder_service.lua` 提供 Builder 注册表和 `BUILDER_READY/BUILDER_GET_REQUEST`；阶段技能、修理 AI、Grid caster fallback 和 Ability Runtime 均已迁移。Builder 创建与正式英雄替换后各执行一次客户端 `GameUI.SelectUnit`，没有永久 Selection Override。
+- `hero_anchor_service.lua` 管理 `placeholder/replacing/combat_ready`；`hero_summon_system.lua` 使用 `ReplaceHeroWithNoTransfer()`、重复请求锁和提交顺序保护，继续发布原格式 `HERO_SUMMONED`。
+- 自动验证通过：`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_LUA51_PASS`、`BUILDER_UTILITY_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、相关 Lua 5.1 语法、Builder CSV/生成 Lua 一致性和限定 diff；两个 Panorama JS 均强制编译为 `1 compiled, 0 failed, 0 skipped`。
+- 下一步必须完全停止并连续重新 Run Workshop Tools 两次，验证 Builder 首次选中、建筑/工人可切换、Q/W/E/R/T/Y/U、Builder D/F、建筑移动 D、F2/TAB、建筑按钮 caster、所有建造强制 Grid、替换后的 HUD/所有权/死亡复活/技能物品不转移。未经实机确认不得称为完成或真实 courier。
+- 工作区已有未跟踪测试文件，本任务不得覆盖或清理。
+
 ## 已完成任务（2026-08-04）：齐天大圣E附伤确认与测试入口
 
 - 用户于2026-08-04完成修复版Workshop Tools复测并确认数据正常：齐天大圣本体主普通攻击暴击时，全属性×5额外伤害已正常触发。本任务已实机验收完成，不再作为活跃任务恢复。

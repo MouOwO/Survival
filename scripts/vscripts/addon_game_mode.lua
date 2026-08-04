@@ -56,7 +56,6 @@ local scheduler = require("core/scheduler")
 local logger = require("core/logger")
 local combat_bootstrap = require("bootstrap/combat_bootstrap")
 print("[SURVIVAL_FINGERPRINT] addon_game_mode=20260730_skill_grant_transaction")
-local hero_ability_policy = require("core/hero_ability_policy")
 local unit_display_names = require("config/generated/unit_display_names")
 local seven_sins_essences = require("config/seven_sins_essences")
 
@@ -86,6 +85,8 @@ local monkey_king_exclusive_service =
     require("systems/monkey_king_exclusive_service")
 local hero_cosmetic_service =
     require("systems/hero_cosmetic_service")
+local hero_anchor_service = require("systems/hero_anchor_service")
+local builder_service = require("systems/builder_service")
 local hero_summon_system = require("systems/hero_summon_system")
 local builder_progression_system =
     require("systems/builder_progression_system")
@@ -261,7 +262,6 @@ local function initialize_survival_hero(hero)
     ready_hero_entindex_by_player[player_id] = hero_entindex
     replacing_forced_hero[player_id] = nil
 
-    hero_ability_policy.apply(hero)
     hero:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
     hero:SetGold(0, false)
     local display = (unit_display_names.by_id or {})[unit_name]
@@ -269,12 +269,7 @@ local function initialize_survival_hero(hero)
         hero.survival_display_name = display.display_name
     end
     FindClearSpaceForUnit(hero, Vector(0, 0, 256), true)
-
-    -- Only the forced builder receives The Hallows Within. Custom Undying
-    -- creatures use the same native model but never enter this hero-ready path.
-    if unit_name == SURVIVAL_FORCE_HERO then
-        hero_cosmetic_service.apply(hero, "builder_undying")
-    end
+    hero_anchor_service.register_placeholder(player_id, hero)
 
     event_bus.emit(events.HERO_READY, {
         hero = hero,
@@ -294,7 +289,9 @@ local function on_hero_picked(keys)
     local player_id = hero:GetPlayerOwnerID()
     local unit_name = hero:GetUnitName()
     if unit_name ~= SURVIVAL_FORCE_HERO then
-        if player_id >= 0 and not replacing_forced_hero[player_id] then
+        if player_id >= 0
+            and hero_anchor_service.is_placeholder_phase(player_id)
+            and not replacing_forced_hero[player_id] then
             replacing_forced_hero[player_id] = true
             print(
                 "[SURVIVAL_FORCE_HERO] replacing player=" .. tostring(player_id)
@@ -328,12 +325,14 @@ local function on_npc_spawned(keys)
     if ready_hero_entindex_by_player[player_id] ~= unit:entindex() then
         return
     end
+    if not hero_anchor_service.is_placeholder_phase(player_id) then
+        return
+    end
 
     -- Hero respawn can rebuild or detach cosmetic children depending on the
     -- engine version. Reapplying is idempotent because the service first
     -- removes only the addon-owned wearable and particles.
-    hero_cosmetic_service.apply(unit, "builder_undying")
-    unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+    hero_anchor_service.isolate_placeholder(player_id, unit)
 end
 
 local function on_game_state_changed()
@@ -474,6 +473,7 @@ function M.precache(context)
     )
     local units = {
         "npc_dota_hero_undying",
+        "npc_survival_builder_proxy",
         "npc_dota_hero_doom_bringer",
         "npc_dota_hero_nevermore",
         "npc_dota_hero_axe",
@@ -679,6 +679,8 @@ function M.precache(context)
 end
 
 local function initialize_services()
+    hero_anchor_service.init()
+    builder_service.init()
     asset_preload_service.init()
     unit_health_bar_service.init()
     combat_bootstrap.init()

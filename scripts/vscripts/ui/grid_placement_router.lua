@@ -176,21 +176,45 @@ local function force_cells_invalid(cells, reason)
     return result
 end
 
+local function request_anchor(position)
+    local size = tonumber(grid_config.cell_size) or 64
+    return math.floor(position.x / size + 0.5),
+        math.floor(position.y / size + 0.5)
+end
+
+local function entity_diagnostic(entity)
+    if not valid_entity(entity) then return "invalid" end
+    local name = "unknown"
+    pcall(function()
+        name = entity.GetUnitName and entity:GetUnitName()
+            or entity.GetAbilityName and entity:GetAbilityName()
+            or name
+    end)
+    return tostring(entity:entindex()) .. ":" .. tostring(name)
+end
+
 local function resolve_profile_caster(player_id, payload, profile, allow_fallback)
     local entindex = tonumber(payload and payload.entindex)
     local ability_entindex = tonumber(payload and payload.ability_entindex)
     local caster = entindex and EntIndexToHScript(entindex) or nil
     local ability = ability_entindex and EntIndexToHScript(ability_entindex) or nil
+    local registered = event_bus.request(events.BUILDER_GET_REQUEST, {
+        player_id = player_id,
+        caster = valid_entity(caster) and caster or nil,
+    })
     if (not caster or caster:IsNull()) and allow_fallback then
-        caster = PlayerResource:GetSelectedHeroEntity(player_id)
+        caster = registered and registered.ok and registered.builder or nil
     end
     if caster and not caster:IsNull() and (not ability or ability:IsNull()) then
         ability = caster:FindAbilityByName(profile.ability_name)
     end
+    if not registered or not registered.ok then
+        return nil, nil, (registered and registered.error) or "builder_unavailable"
+    end
     if not caster or caster:IsNull() or not ability or ability:IsNull() then
         return nil, nil, "invalid_builder_or_ability"
     end
-    if caster:GetPlayerOwnerID() ~= player_id or ability:GetCaster() ~= caster then
+    if registered.builder ~= caster or ability:GetCaster() ~= caster then
         return nil, nil, "builder_not_owned"
     end
     if ability:GetAbilityName() ~= profile.ability_name then
@@ -222,6 +246,7 @@ local function validate_preview(player_id, payload, profile, position)
     }) or { ok = false, error = "grid_validation_failed", cells = {} }
     local business = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
         caster = caster,
+        player_id = player_id,
         building_id = profile.building_id,
         position = position,
     }) or { ok = false, error = "build_validation_failed" }
@@ -262,17 +287,37 @@ local function register_validation_request()
             local x = tonumber(payload.x)
             local y = tonumber(payload.y)
             local z = tonumber(payload.z)
+            local position = x and y and z and Vector(x, y, z) or nil
+            local request_anchor_x, request_anchor_y = 0, 0
+            if position then
+                request_anchor_x, request_anchor_y = request_anchor(position)
+            end
+            local requested_caster = tonumber(payload.entindex)
+                and EntIndexToHScript(tonumber(payload.entindex)) or nil
+            local requested_ability = tonumber(payload.ability_entindex)
+                and EntIndexToHScript(tonumber(payload.ability_entindex)) or nil
+            print(string.format(
+                "[GridPlacement][SERVER] VALIDATE player=%s session=%s request=%s ability_name=%s caster=%s ability=%s world=%.1f,%.1f,%.1f anchor=%s:%s",
+                tostring(player_id), tostring(session_id), tostring(payload.request_id),
+                tostring(payload.ability_name), entity_diagnostic(requested_caster),
+                entity_diagnostic(requested_ability), x or 0, y or 0, z or 0,
+                tostring(request_anchor_x), tostring(request_anchor_y)))
             if not profile or not x or not y or not z then
                 send(player_id, "ui_grid_placement_validation", {
                     session_id = session_id,
                     request_id = payload.request_id or "",
                     success = 0,
                     error = "invalid_preview_request",
+                    ability_name = tostring(payload.ability_name or ""),
+                    request_anchor_x = request_anchor_x,
+                    request_anchor_y = request_anchor_y,
                     cells = {},
                 })
+                print(string.format(
+                    "[GridPlacement][SERVER] VALIDATE_RESULT player=%s session=%s request=%s success=0 error=invalid_preview_request",
+                    tostring(player_id), tostring(session_id), tostring(payload.request_id)))
                 return
             end
-            local position = Vector(x, y, z)
             local caster, business, geometry = validate_preview(
                 player_id,
                 payload,
@@ -296,6 +341,8 @@ local function register_validation_request()
                         or "invalid_position"),
                 ability_name = profile.ability_name,
                 building_id = profile.building_id,
+                request_anchor_x = request_anchor_x,
+                request_anchor_y = request_anchor_y,
                 anchor_x = geometry.anchor_x or 0,
                 anchor_y = geometry.anchor_y or 0,
                 world_x = world.x,
@@ -303,6 +350,13 @@ local function register_validation_request()
                 world_z = world.z,
                 cells = geometry.cells or {},
             })
+            print(string.format(
+                "[GridPlacement][SERVER] VALIDATE_RESULT player=%s session=%s request=%s success=%s error=%s resolved_caster=%s geometry_anchor=%s:%s cells=%s",
+                tostring(player_id), tostring(session_id), tostring(payload.request_id),
+                tostring(success), tostring(success and "" or ((business and business.error)
+                    or geometry.error or "invalid_position")), entity_diagnostic(caster),
+                tostring(geometry.anchor_x), tostring(geometry.anchor_y),
+                tostring(#(geometry.cells or {}))))
         end
     )
 end
@@ -364,6 +418,7 @@ local function register_commit_request()
             local position = Vector(x, y, z)
             local check = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
                 caster = caster,
+                player_id = player_id,
                 building_id = profile.building_id,
                 position = position,
             }) or { ok = false, error = "build_validation_failed" }
@@ -377,6 +432,7 @@ local function register_commit_request()
             end
             event_bus.emit(events.BUILD_REQUEST, {
                 caster = caster,
+                player_id = player_id,
                 building_id = profile.building_id,
                 position = check.grid.world_position,
             })
