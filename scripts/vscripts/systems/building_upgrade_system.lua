@@ -280,7 +280,8 @@ local function recover_state(unit)
             unit = unit,
             definition = require("config/buildings_config").arrow_tower,
             team = unit:GetTeamNumber(),
-            player_id = unit:GetPlayerOwnerID(),
+            player_id = tonumber(unit.survival_player_id)
+                or unit:GetPlayerOwnerID(),
             building_id = "arrow_tower",
             level = tonumber(unit.survival_level) or 1,
             tower_class = unit.survival_tower_class,
@@ -329,7 +330,8 @@ local function recover_player_towers(player_id)
     local units = Entities:FindAllByClassname("npc_dota_creature") or {}
     local player_team = PlayerResource:GetTeam(player_id)
     for _, unit in ipairs(units) do
-        local owned = unit:GetPlayerOwnerID() == player_id
+        local owned = tonumber(unit.survival_player_id) == player_id
+            or unit:GetPlayerOwnerID() == player_id
             or unit:GetTeamNumber() == player_team
         if valid_entity(unit) and unit:GetUnitName() == "building_arrow_tower"
             and owned then
@@ -549,7 +551,8 @@ local function on_upgrade_request(payload)
         print("[BuildingUpgrade] missing state entindex="
             .. tostring(unit:entindex()))
         event_bus.emit(events.UI_NOTIFICATION, {
-            player_id = unit:GetPlayerOwnerID(),
+            player_id = tonumber(unit.survival_player_id)
+                or unit:GetPlayerOwnerID(),
             message = "建筑升级状态尚未初始化",
             level = "error",
         })

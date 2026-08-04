@@ -159,6 +159,27 @@
         "VisionNighttimeRange"   "400"
     }
 
+    "npc_survival_builder_proxy"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/undying/undying.vmdl"
+        "ModelScale"             "1.0"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "AbilityLayout"          "12"
+        "StatusHealth"           "1000"
+        "StatusMana"             "1000"
+        "StatusManaRegen"        "10"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_GROUND"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "MovementSpeed"          "300"
+        "ArmorPhysical"          "0"
+        "BoundsHullName"         "DOTA_HULL_SIZE_HERO"
+        "VisionDaytimeRange"     "800"
+        "VisionNighttimeRange"   "600"
+    }
+
     "npc_survival_repairer"
     {
         "BaseClass"              "npc_dota_creature"

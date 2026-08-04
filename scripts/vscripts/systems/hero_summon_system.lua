@@ -5,6 +5,7 @@ local summon_rules = require("config/generated/hero_summon_rules")
 local stat_adapter = require("systems/hero_stat_adapter")
 local cosmetic_service = require("systems/hero_cosmetic_service")
 local projection = require("systems/hero_summon_projection")
+local hero_anchor_service = require("systems/hero_anchor_service")
 
 local M = {}
 
@@ -12,6 +13,7 @@ local altar_by_team = {}
 local builder_by_player = {}
 local city_level_by_team = {}
 local summoned_by_player = {}
+local replacing_by_player = {}
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -88,31 +90,34 @@ local function preserve_and_hide_native_abilities(unit)
         tostring(count > 0), tostring(count)))
     return count > 0
 end
-local function create_hero(player_id, team, altar, definition)
+local function initialize_replacement(player_id, team, altar, definition)
     local position = summon_position(altar, definition)
-    local unit = CreateUnitByName(
-        definition.unit_name,
-        position,
-        true,
-        nil,
-        nil,
-        team
-    )
-    if not valid_entity(unit) then
-        return nil
+    local placeholder, begin_error = hero_anchor_service.begin_replacement(player_id)
+    if not placeholder then
+        return nil, begin_error
     end
 
-    -- CreateUnitByName gives control but does not reliably assign the player
-    -- identity used by GetPlayerOwnerID. Challenge pickup ownership and other
-    -- hero systems require the summoned hero to report the real player ID.
-    if unit.SetPlayerID then unit:SetPlayerID(player_id) end
-    local player = PlayerResource:GetPlayer(player_id)
-    if player and unit.SetOwner then unit:SetOwner(player) end
-    unit:SetControllableByPlayer(player_id, true)
+    local call_ok, unit = pcall(
+        PlayerResource.ReplaceHeroWithNoTransfer,
+        PlayerResource,
+        player_id,
+        definition.unit_name,
+        0,
+        0
+    )
+    if not call_ok or not valid_entity(unit) then
+        hero_anchor_service.abort_replacement(player_id)
+        print(string.format(
+            "[HERO_REPLACEMENT_FAILED] player=%s hero=%s error=%s",
+            tostring(player_id), tostring(definition.unit_name), tostring(unit)))
+        return nil, "hero_replacement_failed"
+    end
+
+    unit:RemoveNoDraw()
     FindClearSpaceForUnit(unit, position, true)
 
     print(string.format(
-        "[HERO_SUMMON_OWNER_ASSIGNED] player=%s reported_owner=%s entindex=%s",
+        "[HERO_REPLACEMENT_OWNER] player=%s reported_owner=%s entindex=%s",
         tostring(player_id), tostring(unit:GetPlayerOwnerID()),
         tostring(unit:entindex())))
 
@@ -135,7 +140,14 @@ local function create_hero(player_id, team, altar, definition)
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
     cosmetic_service.apply(unit, definition.hero_id)
-    return unit
+    local committed, commit_error = hero_anchor_service.commit_replacement(
+        player_id,
+        unit
+    )
+    if not committed then
+        return nil, commit_error
+    end
+    return unit, nil
 end
 
 local function validate(player_id, hero_id, debug_bypass)
@@ -145,13 +157,19 @@ local function validate(player_id, hero_id, debug_bypass)
     if current_summon(player_id) then
         return nil, nil, "已经召唤过英雄"
     end
+    if replacing_by_player[player_id] then
+        return nil, nil, "hero_replacement_in_progress"
+    end
 
     local team = PlayerResource:GetTeam(player_id)
     local altar = altar_by_team[team]
     if debug_bypass and not valid_entity(altar) then
         altar = builder_by_player[player_id]
         if not valid_entity(altar) then
-            altar = PlayerResource:GetSelectedHeroEntity(player_id)
+            local result = event_bus.request(events.BUILDER_GET_REQUEST, {
+                player_id = player_id,
+            })
+            altar = result and result.ok and result.builder or nil
         end
     end
     if not valid_entity(altar) then
@@ -186,14 +204,16 @@ local function summon(payload)
     end
 
     local team = PlayerResource:GetTeam(player_id)
-    local unit = create_hero(
+    replacing_by_player[player_id] = true
+    local unit, replacement_error = initialize_replacement(
         player_id,
         team,
         altar,
         definition
     )
     if not unit then
-        return { ok = false, error = "英雄创建失败" }
+        replacing_by_player[player_id] = nil
+        return { ok = false, error = replacement_error or "hero_replacement_failed" }
     end
 
     summoned_by_player[player_id] = {
@@ -202,6 +222,7 @@ local function summon(payload)
         unit_name = definition.unit_name,
         team = team,
     }
+    replacing_by_player[player_id] = nil
 
     event_bus.emit(events.HERO_SUMMONED, {
         player_id = player_id,
@@ -212,6 +233,13 @@ local function summon(payload)
         unit_name = definition.unit_name,
         display_name = definition.display_name,
     })
+    local player = PlayerResource:GetPlayer(player_id)
+    if player and CustomGameEventManager then
+        CustomGameEventManager:Send_ServerToPlayer(player, "survival_select_unit", {
+            entindex = unit:entindex(),
+            reason = "combat_hero_ready",
+        })
+    end
     publish(player_id, payload.debug_bypass == true
         and "cheat_hero_summoned" or "hero_summoned")
 
@@ -244,8 +272,8 @@ local function get_summoned(payload)
     }
 end
 
-local function on_hero_ready(payload)
-    builder_by_player[payload.player_id] = payload.hero
+local function on_builder_ready(payload)
+    builder_by_player[payload.player_id] = payload.builder
     city_level_by_team[payload.team] =
         city_level_by_team[payload.team] or 0
     publish(payload.player_id, "builder_ready")
@@ -302,6 +330,7 @@ function M.init()
     builder_by_player = {}
     city_level_by_team = {}
     summoned_by_player = {}
+    replacing_by_player = {}
 
     event_bus.handle_request(
         events.HERO_SUMMON_SNAPSHOT_REQUEST,
@@ -313,7 +342,7 @@ function M.init()
         get_summoned
     )
 
-    event_bus.subscribe(events.HERO_READY, on_hero_ready)
+    event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(

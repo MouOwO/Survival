@@ -25,6 +25,10 @@ local modifiers = {
         path = "modifiers/modifier_grid_building_preview",
     },
     {
+        name = "modifier_survival_placeholder_anchor",
+        path = "modifiers/modifier_survival_placeholder_anchor",
+    },
+    {
         name = "modifier_lumberjack_ai",
         path = "modifiers/modifier_lumberjack_ai",
     },

@@ -367,9 +367,9 @@ local function on_hero_skill_changed(payload)
     })
 end
 
-local function on_hero_ready(payload)
+local function on_builder_ready(payload)
     publish_unit({
-        unit = payload.hero,
+        unit = payload.builder,
         team = payload.team,
         level = 1,
         building_id = "builder",
@@ -380,7 +380,7 @@ function M.init()
     state_by_unit = {}
     ability_keys_by_unit = {}
     tower_trace_by_ability = {}
-    event_bus.subscribe(events.HERO_READY, on_hero_ready)
+    event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)
     event_bus.subscribe(events.BUILDING_DESTROYED, clear_unit)

@@ -557,7 +557,9 @@ local function register_ability_cast_position_request()
         local ability_valid = ability ~= nil and not ability:IsNull()
         local ability_name = ability_valid and ability:GetAbilityName() or ""
         local building_id = building_id_for_ability(ability_name)
-        local owner_id = unit_valid and unit:GetPlayerOwnerID() or -999
+        local owner_id = unit_valid
+            and (tonumber(unit.survival_player_id) or unit:GetPlayerOwnerID())
+            or -999
         local caster_matches = ability_valid and ability:GetCaster() == unit
         local behavior = ability_valid and ability:GetBehaviorInt() or -1
         local is_point_target = ability_valid
@@ -619,7 +621,9 @@ local function register_ability_cast_request()
         local ability_valid = ability ~= nil and not ability:IsNull()
         local ability_name = ability_valid and ability:GetAbilityName() or ""
         local caster_matches = ability_valid and ability:GetCaster() == unit
-        local owner_id = unit_valid and unit:GetPlayerOwnerID() or -999
+        local owner_id = unit_valid
+            and (tonumber(unit.survival_player_id) or unit:GetPlayerOwnerID())
+            or -999
         -- 当前 Dota API 没有对应的 PlayerResource 控制权查询方法。
         -- 这里使用实体所有权作为服务端校验，避免无效 API 中断 Lua。
         local owner_matches = owner_id == player_id
