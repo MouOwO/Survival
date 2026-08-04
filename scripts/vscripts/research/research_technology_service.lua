@@ -38,6 +38,8 @@ function M.new(deps)
             return { research_lab = true, advanced_research_lab = true }
         end,
         sync_client = deps.sync_client or function() end,
+        pending_transactions = {},
+        next_transaction_id = 0,
     }, M)
 end
 
@@ -52,14 +54,10 @@ function M:_finish(response)
     return response
 end
 
-function M:RequestUpgrade(payload)
+function M:BeginUpgrade(payload)
     payload = payload or {}
     local player_id = tonumber(payload.player_id)
     local tech_id = tostring(payload.tech_id or "")
-    self.event_bus.emit(event_names.UPGRADE_REQUESTED, {
-        player_id = player_id,
-        tech_id = tech_id,
-    })
     if not self.valid_player(player_id) then
         return self:_finish(build_result(
             false, tech_id, 0, 0, nil, "invalid_player"
@@ -135,19 +133,110 @@ function M:RequestUpgrade(payload)
         ))
     end
 
-    if not self.repository:SetLevel(player_id, tech_id, target_level) then
-        self.refund_resources(player_id, cost, tech_id)
-        return self:_finish(build_result(
-            false, tech_id, old_level, old_level, cost,
-            "resource_commit_failed"
-        ))
-    end
-
-    local effect_snapshot = self.effects:Recalculate(player_id)
+    self.next_transaction_id = self.next_transaction_id + 1
+    local transaction_id = table.concat({
+        tostring(player_id),
+        tech_id,
+        tostring(self.next_transaction_id),
+    }, ":")
+    self.pending_transactions[transaction_id] = {
+        transaction_id = transaction_id,
+        player_id = player_id,
+        tech_id = tech_id,
+        old_level = old_level,
+        target_level = target_level,
+        cost = { gold = cost.gold or 0, wood = cost.wood or 0 },
+        definition = definition,
+    }
     local response = build_result(
         true, tech_id, old_level, target_level, cost, nil
     )
     response.player_id = player_id
+    response.transaction_id = transaction_id
+    response.pending = true
+    return response
+end
+
+function M:RollbackUpgrade(payload)
+    payload = payload or {}
+    local transaction_id = tostring(payload.transaction_id or "")
+    local transaction = self.pending_transactions[transaction_id]
+    if not transaction then
+        return { success = false, error_code = "research_transaction_not_found" }
+    end
+    self.pending_transactions[transaction_id] = nil
+    self.refund_resources(
+        transaction.player_id,
+        transaction.cost,
+        transaction.tech_id
+    )
+    local response = build_result(
+        false,
+        transaction.tech_id,
+        transaction.old_level,
+        transaction.old_level,
+        transaction.cost,
+        tostring(payload.error_code or "research_cancelled")
+    )
+    response.player_id = transaction.player_id
+    response.transaction_id = transaction_id
+    response.rolled_back = true
+    return self:_finish(response)
+end
+
+function M:CommitUpgrade(payload)
+    payload = payload or {}
+    local transaction_id = tostring(payload.transaction_id or "")
+    local transaction = self.pending_transactions[transaction_id]
+    if not transaction then
+        return self:_finish(build_result(
+            false, "", 0, 0, nil, "research_transaction_not_found"
+        ))
+    end
+    self.pending_transactions[transaction_id] = nil
+
+    local player_id = transaction.player_id
+    local tech_id = transaction.tech_id
+    local old_level = transaction.old_level
+    local target_level = transaction.target_level
+    local cost = transaction.cost
+    local definition = transaction.definition
+    if self.repository:GetLevel(player_id, tech_id) ~= old_level then
+        self.refund_resources(player_id, cost, tech_id)
+        local response = build_result(
+            false, tech_id, old_level, old_level, cost,
+            "technology_level_changed_during_research"
+        )
+        response.player_id = player_id
+        response.transaction_id = transaction_id
+        return self:_finish(response)
+    end
+
+    local committed, effect_snapshot = pcall(function()
+        if not self.repository:SetLevel(player_id, tech_id, target_level) then
+            error("technology_level_commit_failed")
+        end
+        return self.effects:Recalculate(player_id)
+    end)
+    if not committed then
+        self.repository:SetLevel(player_id, tech_id, old_level)
+        pcall(function() self.effects:Recalculate(player_id) end)
+        self.refund_resources(player_id, cost, tech_id)
+        local response = build_result(
+            false, tech_id, old_level, old_level, cost,
+            "resource_commit_failed"
+        )
+        response.player_id = player_id
+        response.transaction_id = transaction_id
+        response.commit_error = tostring(effect_snapshot)
+        return self:_finish(response)
+    end
+
+    local response = build_result(
+        true, tech_id, old_level, target_level, cost, nil
+    )
+    response.player_id = player_id
+    response.transaction_id = transaction_id
     response.legacy_group = definition.legacy_group
     response.levels = self.repository:GetAllLevels(player_id)
     response.legacy_levels = self.repository:GetLegacyLevels(player_id)
@@ -160,6 +249,19 @@ function M:RequestUpgrade(payload)
     })
     self.sync_client(player_id, self:BuildClientSnapshot(player_id))
     return self:_finish(response)
+end
+
+function M:RequestUpgrade(payload)
+    payload = payload or {}
+    local player_id = tonumber(payload.player_id)
+    local tech_id = tostring(payload.tech_id or "")
+    self.event_bus.emit(event_names.UPGRADE_REQUESTED, {
+        player_id = player_id,
+        tech_id = tech_id,
+    })
+    local started = self:BeginUpgrade(payload)
+    if not started or started.success ~= true then return started end
+    return self:CommitUpgrade({ transaction_id = started.transaction_id })
 end
 
 function M:BuildClientSnapshot(player_id)

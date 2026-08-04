@@ -1805,3 +1805,17 @@
 - Resource Compiler两次强制定向编译均为`OK: 1 compiled, 0 failed, 0 skipped`；`resourceinfo`确认编译DATA包含0.14秒寿命、CP2速度、基础移动、模型渲染和Valve模型/材质，且无Children。
 - 更新`tools/test_monkey_king_boundless_visual.lua`和`tools/test_monkey_king_boundless_visual_contract.ps1`，覆盖延迟前无伤害、落地重扫、走入/走出、固定几何、属性快照、落地最大生命、共享3次计数、本体/分身、并行、视觉失败、攻击者失效、重置与迟到回调。`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、Lua/Luac 5.4.5语法、严格UTF-8/末尾换行/尾随空白及限定`git diff --check`通过；历史Lua 5.1路径不存在。
 - 尚待Workshop Tools冷启动实机验收800高度、0.14秒手感、模型比例/材质/俯仰、八方向、坡地、本体/分身、并行衔接、落地帧伤害与无残留。自动测试和资源编译不能替代引擎最终画面。
+
+## 2026-08-04 - 科技研究进度数字移除与完成时序事务化
+
+- 用户目标：移除科技研究径向进度条中央的`2 → 0`秒数，并修正旧流程“点击后立即升级/生效，却延迟显示完成”的时序；研究必须真正经过2秒，结束后才升级、生效并提示完成。
+- 根因与排除方案：旧商店把2秒状态当成购买后的团队冷却，科技服务仍同步完成扣费、升级和效果重算。只延迟通知或只修改Panorama数字不能修复提前生效，因此没有采用客户端延时提交、客户端权威倒计时或“立即升级后隐藏等级”的伪研究方案。
+- 科技服务改为两阶段事务：`BeginUpgrade()`校验玩家、研究所权限、最大等级、前置科技、转生和资源，通过服务端原子资源请求立即扣费，只保存旧等级、目标等级、费用和定义快照；`CommitUpgrade()`才写等级、重算效果、发布`LEVEL_CHANGED/EFFECTS_CHANGED`和同步客户端。bootstrap新增Begin/Commit/Rollback请求路由及退款依赖，原`RequestUpgrade()`保留同步兼容入口。
+- 失败与幂等边界：Commit在执行前消费pending事务；当前等级漂移时退款并拒绝提交，等级写入或效果重算抛错时恢复旧等级、重新计算旧效果并退款。显式Rollback只可消费一次并退款；提交成功、失败或迟到后再次Commit均不能二次升级。
+- 商店状态机按队伍保存唯一`transaction_id`、sequence、研究来源和2秒截止时间。Begin成功后立即向同队已打开页面的玩家推送研究状态并提示“正在研究”；期间所有队友研究请求返回`technology_research_in_progress`。计时回调验证sequence和transaction_id后请求Commit，清理团队状态；仅Commit成功后写购买计数并提示“已完成研究”，无响应时请求Rollback。
+- 协议兼容决定：继续发布`technology_cooldown_remaining/total/until/source_group/source_entry/sequence`，避免扩大商城全量/增量快照与Panorama改动，但这些字段现在统一表示“团队研究进度”，不得再解释为购买后冷却。
+- Panorama保留服务端驱动的顺时针径向遮罩，只作用于本次研究来源科技组；删除`ShopTechnologyCooldownLabel`、剩余秒数`Math.ceil(remaining)`和对应CSS。副标题、点击阻断和购买结果文字统一改为“研究耗时/正在研究/已开始研究”，客户端不决定完成。
+- 专项验证通过：`RESEARCH_TECHNOLOGY_TRANSACTION_PASS`、`RESEARCH_TECHNOLOGY_PREREQUISITE_PASS`、`SHOP_TEAM_TECHNOLOGY_COOLDOWN_PASS`、`SHOP_TECHNOLOGY_UI_CONTRACT_PASS`、`SHOP_RESEARCH_WITHOUT_HERO_PASS`。覆盖立即扣费但不升级、完成后单次提交、团队互斥、完成提示延后、Rollback退款、效果异常恢复与退款、重复回调幂等，以及径向动画存在且无数字。
+- 全量Lua 5.4.5测试实际执行74项，12项失败清单为`test_addhero_cheat.lua`、`test_hero_attack_mode.lua`、`test_hero_combat_stat_projection.lua`、`test_hero_cosmetic_service.lua`、`test_hero_passive_attribute_snapshot.lua`、`test_hero_skill_tooltip_view_model.lua`、`test_managed_attack_speed_buff.lua`、`test_modifier_registry_reload.lua`、`test_moving_ice_ball_visual.lua`、`test_selected_unit_cosmetic_portrait.lua`、`test_tree_progression.lua`、`test_unit_health_bar.lua`；本轮专项均通过，未为这些既有无关基线失败修改生产逻辑。当前PATH只有Lua/Luac 5.4.5，没有Lua 5.1工具，因此不宣称Lua 5.1验证。
+- 资源与仓库验证：`shop_ui.js`和`shop.css`分别强制定向编译为`1 compiled, 0 failed, 0 skipped`，HUD加载链为`7 compiled, 0 failed, 0 skipped`；编译附带改写的四个无关HUD产物已恢复，只保留任务相关`shop_ui.vjs_c`与`shop.vcss_c`。严格UTF-8、资源类型、限定`diff --check`均通过；game/content两仓库`ls-files -u`均为0，未自动暂存或提交。
+- 尚未确认：Workshop Tools冷启动后的真实资源扣除、2秒内等级/效果保持、同队多玩家互斥、进度无数字、结束帧升级/生效/完成提示，以及可构造的提交失败或中断退款。下一步唯一动作是完全停止并重新Run Workshop Tools逐项实测；自动测试与Resource Compiler不能替代引擎时序和视觉验收。

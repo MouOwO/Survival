@@ -1,5 +1,16 @@
 # Project Context
 
+## 科技研究两阶段事务与进度UI（2026-08-04）
+
+- 普通研究科技不是“购买成功后附带2秒冷却”，而是服务端权威的两阶段事务。`research_technology_service.lua::BeginUpgrade()`负责完整校验并通过`RESOURCE_TRY_SPEND_REQUEST`立即扣除金币/木材，然后创建一次性`pending_transactions[transaction_id]`；此阶段不得写入科技等级、重算效果、发布`LEVEL_CHANGED/EFFECTS_CHANGED`或提示研究完成。
+- `shop_system.lua`是2秒研究流程协调器，不是等级权威。它在Begin成功后按队伍保存唯一活动事务和进度来源，向同队已打开研究页的玩家推送进度，并拒绝所有队友开始另一项普通研究。计时结束只携带服务端生成的`transaction_id`请求Commit，不由客户端提交目标等级、费用或完成状态。
+- `CommitUpgrade()`在处理前先移除pending事务，使迟到或重复回调得到`research_transaction_not_found`而不能二次升级。提交前必须确认当前等级仍等于Begin快照；随后将等级提升和`effects:Recalculate()`视为同一提交单元。等级漂移、等级写入异常或效果重算异常时恢复旧等级、重新计算旧效果并退还Begin阶段已扣资源；只有成功提交后才发布等级/效果事件、同步客户端并提示“已完成研究”。
+- `RollbackUpgrade()`用于计时任务无法取得Commit响应或流程被显式取消时释放一次性事务并退款。商店完成回调无论成功失败都必须清除队伍活动事务、进度截止时间和来源字段；成功后才写`purchased_count`。不能通过只延迟成功提示来伪造研究耗时，否则等级和效果仍会提前生效。
+- 为降低现有快照、增量补丁和Panorama协议的改动风险，`technology_cooldown_remaining/total/until/source_group/source_entry/sequence`字段名暂时保留，但其业务语义统一为“团队科技研究进度”。新代码不得按购买后冷却理解这些字段，也不得在进度期间允许同队研究其他科技。
+- Panorama只表现服务端进度：购买响应显示“已开始研究”，径向遮罩只覆盖`technology_cooldown_source_group`对应卡片，其他科技因团队研究锁不可点击。中央秒数Label、`Math.ceil(remaining)`和对应CSS已删除；不要用客户端倒计时归零直接升级或显示完成，完成状态必须来自新的服务端快照/通知。
+- 兼容入口`RequestUpgrade()`仍保留Begin后立即Commit的同步语义，供未迁移的内部调用使用；研究商店必须明确调用`UPGRADE_BEGIN_REQUESTED`与`UPGRADE_COMMIT_REQUESTED`。以后扩展研究取消、建筑销毁中断或断线恢复时，应围绕服务端事务生命周期扩展，不能绕回客户端延时后发起一次普通购买。
+- 最小回归矩阵必须覆盖：Begin立即扣费但等级/效果不变；2秒后仅提交一次；同队第二玩家被拒；完成前无成功提示；Rollback退款；效果提交异常恢复等级并退款；重复完成回调幂等；径向动画存在且无数字；完整/增量快照都保留研究来源和sequence。专项Lua测试和静态Panorama契约不能替代Workshop Tools中的真实计时、团队同步和最终视觉验收。
+
 ## 英雄普通攻击最终伤害飘字（2026-08-04）
 
 - 召唤英雄伤害飘字以`OnTakeDamage.params.damage`为唯一数值口径，该值已经过引擎护甲与项目最终伤害层结算。普通攻击使用原生`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`，暴击使用原生`OVERHEAD_ALERT_CRITICAL`，带有效Ability inflictor的正式技能伤害使用红色`OVERHEAD_ALERT_DAMAGE`；无Ability的脚本或装备附伤不显示为技能伤害。暴击身份按`attacker + record`保存到record销毁，普通攻击显示再按victim去重。不得恢复会额外显示减甲前数值的英雄`MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE`。

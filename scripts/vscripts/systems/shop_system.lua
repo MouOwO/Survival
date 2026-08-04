@@ -8,7 +8,7 @@ local research_config = require("config/research_technology_config")
 local research_events = require("research/research_event_names")
 local M = {}
 local state = {}
-local TECHNOLOGY_PURCHASE_COOLDOWN = 2
+local TECHNOLOGY_RESEARCH_DURATION = 2
 
 local function game_time()
     return GameRules and GameRules.GetGameTime
@@ -33,6 +33,7 @@ local function reset_state()
         technology_cooldown_source_group_by_team = {},
         technology_cooldown_source_entry_by_team = {},
         technology_cooldown_sequence_by_team = {},
+        technology_research_transaction_by_team = {},
     }
 end
 local function valid_player_id(player_id)
@@ -166,7 +167,7 @@ local function snapshot_context(player_id, reason, mode)
         technology_cooldown_remaining = math.max(0,
             (state.technology_cooldown_until_by_team[team] or 0)
                 - game_time()),
-        technology_cooldown_total = TECHNOLOGY_PURCHASE_COOLDOWN,
+        technology_cooldown_total = TECHNOLOGY_RESEARCH_DURATION,
         technology_cooldown_until = state.technology_cooldown_until_by_team[team] or 0,
         technology_cooldown_source_group = state.technology_cooldown_source_group_by_team
             and state.technology_cooldown_source_group_by_team[team] or "",
@@ -411,6 +412,23 @@ local function purchase(payload)
             } or (resumed or { ok = false, error = "encounter_resume_failed" })
         end
     end
+    local technology_group = entry.definition
+        and entry.definition.technology_group or ""
+    local research_definition = research_config.by_legacy_group[technology_group]
+    if entry.contenttype == "technology" and research_definition then
+        local research_remaining = math.max(0,
+            (state.technology_cooldown_until_by_team[team] or 0)
+                - game_time())
+        if research_remaining > 0
+            or state.technology_research_transaction_by_team[team] then
+            return {
+                ok = false,
+                error = "已有科技正在研究中",
+                error_code = "technology_research_in_progress",
+                cooldown_remaining = research_remaining,
+            }
+        end
+    end
     local context = snapshot_context(
         player_id,
         "purchase_validation",
@@ -426,60 +444,84 @@ local function purchase(payload)
     if not purchasable then
         return { ok = false, error = reason or "not_purchasable" }
     end
-    local technology_group = entry.definition
-        and entry.definition.technology_group or ""
-    local research_definition = research_config.by_legacy_group[technology_group]
     if entry.contenttype == "technology" and research_definition then
-        local cooldown_remaining = math.max(0,
-            (state.technology_cooldown_until_by_team[team] or 0)
-                - game_time())
-        if cooldown_remaining > 0 then
-            return {
-                ok = false,
-                error = "科技购买冷却中",
-                error_code = "technology_purchase_cooldown",
-                cooldown_remaining = cooldown_remaining,
-            }
-        end
         local current_level = tonumber((state.technology_by_player[player_id]
             or {})[technology_group]) or 0
         local requested_level = tonumber(entry.definition.level) or 0
         if requested_level ~= current_level + 1 then
             return { ok = false, error = "technology_level_invalid" }
         end
-        local upgraded = event_bus.request(research_events.UPGRADE_REQUESTED, {
+        local started = event_bus.request(
+            research_events.UPGRADE_BEGIN_REQUESTED,
+            {
             player_id = player_id,
             tech_id = research_definition.tech_id,
-        })
-        if not upgraded or upgraded.success ~= true then
-            local failure = upgraded and upgraded.error_code
+            }
+        )
+        if not started or started.success ~= true then
+            local failure = started and started.error_code
                 or "resource_commit_failed"
             notify(player_id, failure, "error")
-            return { ok = false, error = failure, research_result = upgraded }
+            return { ok = false, error = failure, research_result = started }
         end
-        state.purchased_count[player_id] =
-            state.purchased_count[player_id] or {}
-        state.purchased_count[player_id][entry.entryid] = 1
         state.technology_cooldown_until_by_team[team] =
-            game_time() + TECHNOLOGY_PURCHASE_COOLDOWN
-        state.technology_cooldown_source_group_by_team =
-            state.technology_cooldown_source_group_by_team or {}
-        state.technology_cooldown_source_entry_by_team =
-            state.technology_cooldown_source_entry_by_team or {}
-        state.technology_cooldown_sequence_by_team =
-            state.technology_cooldown_sequence_by_team or {}
+            game_time() + TECHNOLOGY_RESEARCH_DURATION
         state.technology_cooldown_source_group_by_team[team] = technology_group
         state.technology_cooldown_source_entry_by_team[team] = entry.entryid
         state.technology_cooldown_sequence_by_team[team] =
             (state.technology_cooldown_sequence_by_team[team] or 0) + 1
-        notify(player_id, "研究成功：" .. research_definition.display_name
-            .. " Lv." .. tostring(upgraded.new_level))
-        push_team(team, "research_upgrade_completed")
-        scheduler.after(TECHNOLOGY_PURCHASE_COOLDOWN, function()
-            push_team(team, "technology_cooldown_completed")
+        local research_sequence = state.technology_cooldown_sequence_by_team[team]
+        state.technology_research_transaction_by_team[team] = {
+            transaction_id = started.transaction_id,
+            player_id = player_id,
+            entry_id = entry.entryid,
+            technology_group = technology_group,
+            display_name = research_definition.display_name,
+            target_level = started.new_level,
+            sequence = research_sequence,
+        }
+        notify(player_id, "正在研究：" .. research_definition.display_name
+            .. " Lv." .. tostring(started.new_level))
+        push_team(team, "technology_research_started")
+        scheduler.after(TECHNOLOGY_RESEARCH_DURATION, function()
+            local pending = state.technology_research_transaction_by_team[team]
+            if not pending or pending.sequence ~= research_sequence
+                or pending.transaction_id ~= started.transaction_id then
+                return
+            end
+            local completed = event_bus.request(
+                research_events.UPGRADE_COMMIT_REQUESTED,
+                { transaction_id = pending.transaction_id }
+            )
+            if not completed then
+                event_bus.request(
+                    research_events.UPGRADE_ROLLBACK_REQUESTED,
+                    {
+                        transaction_id = pending.transaction_id,
+                        error_code = "research_completion_failed",
+                    }
+                )
+            end
+            state.technology_research_transaction_by_team[team] = nil
+            state.technology_cooldown_until_by_team[team] = 0
+            state.technology_cooldown_source_group_by_team[team] = ""
+            state.technology_cooldown_source_entry_by_team[team] = ""
+            if completed and completed.success == true then
+                state.purchased_count[pending.player_id] =
+                    state.purchased_count[pending.player_id] or {}
+                state.purchased_count[pending.player_id][pending.entry_id] = 1
+                notify(pending.player_id, "已完成研究：" .. pending.display_name
+                    .. " Lv." .. tostring(completed.new_level))
+                push_team(team, "research_upgrade_completed")
+                return
+            end
+            local failure = completed and completed.error_code
+                or "research_completion_failed"
+            notify(pending.player_id, "研究失败：" .. failure, "error")
+            push_team(team, "research_upgrade_failed")
         end, "shop_technology_cooldown:" .. tostring(team))
         local result = { ok = true, entry_id = entry.entryid,
-            research_result = upgraded }
+            research_started = true, research_result = started }
         remember_result(player_id, request_id, result)
         return result
     end

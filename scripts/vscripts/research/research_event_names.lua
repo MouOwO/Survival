@@ -1,5 +1,8 @@
 local M = {
     UPGRADE_REQUESTED = "research:upgrade_requested",
+    UPGRADE_BEGIN_REQUESTED = "research:upgrade_begin_requested",
+    UPGRADE_COMMIT_REQUESTED = "research:upgrade_commit_requested",
+    UPGRADE_ROLLBACK_REQUESTED = "research:upgrade_rollback_requested",
     UPGRADE_SUCCEEDED = "research:upgrade_succeeded",
     UPGRADE_FAILED = "research:upgrade_failed",
     LEVEL_CHANGED = "research:level_changed",

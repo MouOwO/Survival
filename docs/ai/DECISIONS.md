@@ -48,6 +48,7 @@
 43. **完整复刻本体的召唤英雄或永久分身必须镜像combat system最终结果。** 同一次`HERO_COMBAT_STATS_GET_REQUEST`快照是攻击、最终攻速、暴击、逻辑三维和最大生命的唯一原子来源；召唤物侧不得重新组合BAT、装备攻速百分比、伤害倍率或原生三维。需要实际普通攻击值时由`hero_combat_stat_service`发布最终引擎攻击上下界；生命复用隐藏生命Modifier；选中UI按严格分身身份读取owner快照。数值镜像不得通过挂本体全套Modifier实现，装备、公共技能、转生和其他事件链必须继续显式隔离。
 44. **英雄即时普通攻击使用显式近战能力，不使用极高弹速模拟。** `hero_attack_projectiles.csv.attack_capability`是攻击能力权威字段；需要攻击前摇后立即结算时配置`melee`并保留原生攻击链，攻击距离由独立CSV射程和现有射程Modifier投影。禁止通过30000等极高速度、0速度暗号或手写伤害模拟近战即时命中。
 45. **英雄普通攻击飘字只显示最终实际伤害。** 暴击概率与倍率保持attack record身份并通过仅作用于普通攻击的`MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE`投影，避免Valve原生`PREATTACK_CRITICALSTRIKE`显示减甲前数值；护甲、吸血、攻击事件和项目DamageFilter仍走原链路。最终`OnTakeDamage.params.damage`决定白色普通字或橙色暴击字，技能与脚本伤害不得伪装为平A飘字。
+46. **科技研究必须在进度结束后原子提交等级和效果。** Begin阶段由服务端完成条件校验与原子扣费，只创建一次性事务，不改变等级、效果或发布完成事件；同一队伍在事务结束前只能存在一项研究。计时结束后以服务端`transaction_id`提交，提交异常必须恢复旧等级/效果并退款，重复或迟到回调不得二次升级。成功提示、等级事件和效果刷新只能发生在Commit成功后。Panorama只显示服务端研究进度，禁止用客户端倒计时决定升级；旧`technology_cooldown_*`字段仅作为兼容名称保留，其语义为研究进度而非购买后冷却。
 
 ## 游戏行为决策
 

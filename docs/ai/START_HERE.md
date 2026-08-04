@@ -4,6 +4,7 @@
 
 ## 当前状态
 
+- 科技研究进度与完成时序修复已完成代码、专项测试和资源编译，当前等待Workshop Tools冷启动实机验收：开始时服务端校验并立即扣费，但2秒研究期内保持旧等级/旧效果；同队同时只能研究一项；进度卡只显示径向遮罩、不显示`2 → 0`数字；结束后才提交等级、重算效果并提示“已完成研究”。提交异常会恢复旧等级并退款，迟到/重复回调不能二次升级。旧`technology_cooldown_*`协议字段暂时保留，但语义已改为研究进度。下一步完全停止并重新Run Workshop Tools，逐项确认扣费、团队互斥、无数字进度、延迟生效和完成提示；未经用户实机确认不得记录为验收完成。
 - 英雄最终伤害原生飘字分流已由用户确认完成，不再作为待验收任务恢复：普通攻击使用`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`白字，暴击使用`OVERHEAD_ALERT_CRITICAL`原生表现，带有效Ability的正式技能伤害使用`OVERHEAD_ALERT_DAMAGE`红字；三者均显示最终`OnTakeDamage.params.damage`，上一版Panorama暴击链已移除。稳定经验见`PROJECT_CONTEXT.md`。
 - 齐天大圣E全属性×5暴击附伤修复已由用户实机确认数据正常，本任务完成且不得恢复为活跃任务。稳定方案是在最终`OnTakeDamage`阶段消费已确认的主攻击暴击身份并发布`HERO_FINAL_CRITICAL_ATTACK_DAMAGE`，不在较晚`OnAttackLanded`读取可能已销毁的record；次级攻击与W分身排除，伤害事务失败输出`MONKEY_KING_E_DAMAGE_FAILED`。长期规则见`PROJECT_CONTEXT.md`。
 - 当前活跃任务为“超级防御塔暴击”四项效果修复。代码与自动验证已完成：每级同时增加防御塔暴击/攻击和召唤英雄暴击/攻击各 `0.5%`，CSV 的23级均有四行说明，生成科技 Lua 复合投影接入现有塔与英雄刷新/攻击链。下一步完全停止并重新 Run Workshop Tools，实机确认 Tooltip、已有单位即时刷新、实际攻击值和暴击率；未经用户确认不得记录为验收完成。
