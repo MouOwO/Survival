@@ -22,6 +22,9 @@ local game_started = false
 local waves = {}
 local dev_mode = false
 local monster_spawn_marker = nil
+local game_started_at = nil
+local EARLY_FINAL_UNLOCK_SECONDS = 15 * 60
+local FINAL_WAVE_NUMBER = 30
 
 local function queue_wave_assets(number)
     local wave = waves[number]
@@ -53,7 +56,10 @@ local function reset()
         planned = 0, pending = 0, spawned = 0, alive = 0, killed = 0,
         failed_spawn = 0, boss_alive = false, difficulty_id = difficulty_id,
         difficulty_selected = difficulty_selected,
-        difficulty_options = difficulty_config.client_options() }
+        difficulty_options = difficulty_config.client_options(),
+        final_wave_generation_completed = false,
+        early_final_used = false,
+        victory_settled = false }
 end
 
 local function publish(reason)
@@ -61,6 +67,43 @@ local function publish(reason)
     for key, value in pairs(state) do data[key] = value end
     data.reason = reason
     event_bus.emit(events.WAVE_CHANGED, data)
+end
+
+local function current_game_time()
+    return GameRules and GameRules.GetGameTime
+        and tonumber(GameRules:GetGameTime()) or 0
+end
+
+local function early_final_remaining()
+    if not game_started or game_started_at == nil then
+        return EARLY_FINAL_UNLOCK_SECONDS
+    end
+    return math.max(0,
+        EARLY_FINAL_UNLOCK_SECONDS - (current_game_time() - game_started_at))
+end
+
+local function settle_victory_once()
+    if state.victory_settled then return false end
+    state.victory_settled = true
+    state.status = "victory"
+    state.timer = 0
+    publish("final_wave_cleared")
+    if GameRules and GameRules.SetGameWinner then
+        GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
+    end
+    return true
+end
+
+local function check_final_victory()
+    local terminal_wave = state.current_wave == FINAL_WAVE_NUMBER
+        or (state.early_final_used ~= true
+            and state.current_wave == state.total_waves)
+    if terminal_wave
+        and state.final_wave_generation_completed == true
+        and state.failed_spawn <= 0
+        and state.pending <= 0 and state.alive <= 0 then
+        settle_victory_once()
+    end
 end
 
 local function set_wall(enemy)
@@ -95,6 +138,19 @@ local function rebuild_waves()
             wait_seconds = batches[1] and batches[1].wait_seconds or 30,
             batches = batches,
         }
+    end
+    if not waves[FINAL_WAVE_NUMBER] then
+        local final_source = wave_difficulty_builder.build(wave_rows.rows, "N2")
+        local final_batches = final_source
+            and final_source.waves[FINAL_WAVE_NUMBER] or nil
+        if final_batches then
+            waves[FINAL_WAVE_NUMBER] = {
+                wave_number = FINAL_WAVE_NUMBER,
+                wait_seconds = final_batches[1]
+                    and final_batches[1].wait_seconds or 30,
+                batches = final_batches,
+            }
+        end
     end
     state.total_waves = built.total_waves
     return true
@@ -159,18 +215,29 @@ local function spawn_one(row, token)
     if token ~= generation_token then return end
     state.pending = math.max(0, state.pending - 1)
     local definition = archetypes.by_id[row.archetype_id]
-    if not definition then state.failed_spawn = state.failed_spawn + 1; publish("archetype_missing"); return end
+    if not definition then
+        state.failed_spawn = state.failed_spawn + 1
+        publish("archetype_missing")
+        check_final_victory()
+        return
+    end
     local marker = monster_spawn_marker or find_monster_spawn_marker()
     if not marker then
         state.failed_spawn = state.failed_spawn + 1
         publish("monster_spawn_marker_missing")
+        check_final_victory()
         return
     end
     monster_spawn_marker = marker
     local position = marker:GetAbsOrigin() + RandomVector(100)
     position.z = GetGroundHeight(position, nil) + 32
     local unit = CreateUnitByName(definition.unit_name, position, true, nil, nil, DOTA_TEAM_BADGUYS)
-    if not valid(unit) then state.failed_spawn = state.failed_spawn + 1; publish("unit_create_failed"); return end
+    if not valid(unit) then
+        state.failed_spawn = state.failed_spawn + 1
+        publish("unit_create_failed")
+        check_final_victory()
+        return
+    end
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     apply_stats(unit, row, definition)
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", { wall_entindex = wall_entindex })
@@ -196,19 +263,19 @@ local function start_countdown(seconds)
     end, "wave_countdown")
 end
 
-local function start_next_wave()
-    if dev_mode then return end
-    if state.current_wave >= state.total_waves then state.status = "all_waves_spawned"; publish("all_waves_spawned"); return end
-    state.current_wave = state.current_wave + 1
-    local wave = waves[state.current_wave]
-    if not wave then return start_next_wave() end
+local function start_wave(number, reason)
+    local wave = waves[number]
+    if not wave then return false, "wave_not_found" end
+    scheduler.cancel("wave_countdown")
+    generation_token = generation_token + 1
+    state.current_wave = number
     state.status, state.timer = "spawning", 0
     state.planned, state.pending, state.spawned, state.killed, state.failed_spawn = 0, 0, 0, 0, 0
+    state.final_wave_generation_completed = false
     for _, row in ipairs(wave.batches) do state.planned = state.planned + (row.monster_count or 0) end
     state.pending = state.planned
-    generation_token = generation_token + 1
     local token = generation_token
-    publish("wave_started")
+    publish(reason or "wave_started")
     local sequence, last_delay = 0, 0
     for _, row in ipairs(wave.batches) do
         for _ = 1, (row.monster_count or 0) do
@@ -221,10 +288,37 @@ local function start_next_wave()
     scheduler.after(last_delay + 0.05, function()
         if token ~= generation_token then return end
         state.pending, state.status = 0, "active"
+        if state.current_wave == FINAL_WAVE_NUMBER
+            or (state.early_final_used ~= true
+                and state.current_wave == state.total_waves) then
+            state.final_wave_generation_completed = true
+        end
         publish("wave_generation_completed")
-        if state.current_wave < state.total_waves then start_countdown(wave.wait_seconds or 30)
-        else state.status = "all_waves_spawned"; publish("all_waves_spawned") end
+        if state.current_wave < state.total_waves then
+            start_countdown(wave.wait_seconds or 30)
+        else
+            state.status = "all_waves_spawned"
+            publish("all_waves_spawned")
+            check_final_victory()
+        end
     end, "wave_generation_complete")
+    return true
+end
+
+local function start_next_wave()
+    if dev_mode then return end
+    if state.current_wave >= state.total_waves then
+        state.status = "all_waves_spawned"
+        publish("all_waves_spawned")
+        check_final_victory()
+        return
+    end
+    local number = state.current_wave + 1
+    while number <= state.total_waves and not waves[number] do
+        number = number + 1
+    end
+    if number > state.total_waves then return end
+    start_wave(number, "wave_started")
 end
 
 local function on_killed(payload)
@@ -238,6 +332,79 @@ local function on_killed(payload)
     state.killed = state.killed + 1
     if meta.is_boss then state.boss_alive = false end
     publish("enemy_killed")
+    check_final_victory()
+end
+
+local function clear_normal_wave_enemies()
+    generation_token = generation_token + 1
+    scheduler.cancel("wave_countdown")
+    scheduler.cancel("wave_generation_complete")
+    local removed = 0
+    for entindex, meta in pairs(enemies) do
+        enemies[entindex] = nil
+        local unit = meta and meta.unit
+        if valid(unit) then
+            unit.survival_wave_cleanup = true
+            UTIL_Remove(unit)
+            removed = removed + 1
+        end
+    end
+    state.alive = 0
+    state.pending = 0
+    state.boss_alive = false
+    return removed
+end
+
+local function get_wave_state()
+    return {
+        ok = true,
+        current_wave = state.current_wave,
+        total_waves = state.total_waves,
+        status = state.status,
+        game_started = game_started == true,
+        early_final_used = state.early_final_used == true,
+        early_final_remaining = early_final_remaining(),
+        victory_settled = state.victory_settled == true,
+    }
+end
+
+local function request_early_final()
+    if not game_started then
+        return { ok = false, error = "游戏尚未开始" }
+    end
+    if state.early_final_used then
+        return { ok = false, error = "本局已购买提前通关" }
+    end
+    if state.victory_settled or state.current_wave >= FINAL_WAVE_NUMBER then
+        return { ok = false, error = "最终波已经开始" }
+    end
+    local remaining = early_final_remaining()
+    if remaining > 0 then
+        return {
+            ok = false,
+            error = "开局15分钟后可用",
+            remaining_seconds = remaining,
+        }
+    end
+    if not waves[FINAL_WAVE_NUMBER] then
+        return { ok = false, error = "最终波配置缺失" }
+    end
+    state.early_final_used = true
+    local removed = clear_normal_wave_enemies()
+    state.total_waves = math.max(state.total_waves, FINAL_WAVE_NUMBER)
+    local ok, error_code = start_wave(
+        FINAL_WAVE_NUMBER,
+        "early_final_wave_started"
+    )
+    if not ok then
+        state.early_final_used = false
+        return { ok = false, error = error_code or "最终波启动失败" }
+    end
+    return {
+        ok = true,
+        final_wave = FINAL_WAVE_NUMBER,
+        removed_normal_enemies = removed,
+    }
 end
 
 function M.set_dev_mode(enabled)
@@ -327,11 +494,15 @@ function M.init()
     difficulty_id = difficulty_config.default_id
     difficulty_selected = false
     game_started = false
+    game_started_at = nil
     reset(); enemies = {}; wall_entindex = -1; generation_token = 0; dev_mode = false
     rebuild_waves()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)
+    event_bus.handle_request(events.WAVE_STATE_GET_REQUEST, get_wave_state)
+    event_bus.handle_request(events.WAVE_EARLY_FINAL_REQUEST, request_early_final)
     event_bus.subscribe(events.GAME_STARTED, function()
         game_started = true
+        game_started_at = current_game_time()
         if difficulty_selected then
             start_countdown(difficulty_config.initial_wave_delay)
             return

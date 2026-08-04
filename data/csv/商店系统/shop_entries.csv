@@ -10,7 +10,7 @@ shop_item_death_mask,item,item_death_mask,死亡面罩,10000,300,1,altar_used==true,
 shop_item_small_polar_crystal,item,item_small_polar_crystal,小极地晶石,0,1000,1,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行15,全属性+1000/击杀200个冰之幽魂升级。
 shop_item_knowledge_book,item,item_knowledge_book,知识之书,0,50000,99,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行16,增加30000全属性，15000攻击力。
 shop_item_super_knowledge_book,item,item_super_knowledge_book,超级知识之书,500000,500000,99,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行17,增加300000全属性，150000攻击力。
-shop_service_early_final_boss,technology,service_early_final_boss,提前通关,0,50000,1,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行18,提前召唤最终BOSS进攻。（开局不可用，15分钟CD）
+shop_service_early_final_boss,item,service_early_final_boss,提前通关,0,50000,1,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行18,支付50000金币后终止并清理当前普通波，立即完整生成第30波；清空第30波后胜利。开局15分钟后可用，每局限购一次。
 shop_challenge_01,challenge,challenge_01,木材练功房,2000,0,0,altar_used==true,server_projection.purchasable==true,challenge_condition_not_met,start_challenge,1,ok,英雄相关建筑/行22,击杀每个怪物获得100木材。
 shop_challenge_02,challenge,challenge_02,金币练功房,10000,50,0,altar_used==true,server_projection.purchasable==true,challenge_condition_not_met,start_challenge,1,ok,英雄相关建筑/行23,击杀每个怪物获得100金币。
 shop_challenge_03,challenge,challenge_03,属性练功房,10000,500,0,altar_used==true,server_projection.purchasable==true,challenge_condition_not_met,start_challenge,1,ok,英雄相关建筑/行24,击杀每个怪物获得10点全属性。

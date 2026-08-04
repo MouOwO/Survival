@@ -138,6 +138,9 @@ local function apply_listing(entry)
     entry.entryid = tostring(listing.shop_entry_id)
     entry.shopid = tostring(listing.category_id or entry.shopid)
     entry.name = tostring(listing.display_name or entry.name)
+    if listing.notes and tostring(listing.notes) ~= "" then
+        entry.description = tostring(listing.notes)
+    end
     entry.woodcost = number(listing.wood_cost)
     entry.goldcost = number(listing.gold_cost)
     entry.purchase_limit = number(listing.purchase_limit)
@@ -331,6 +334,7 @@ local function project_entry(player_id, entry, context)
         visible = 1,
         purchasable = ok and 1 or 0,
         disabled_reason = reason,
+        disabled_reason_code = ok and "" or "condition_not_met",
         purchase_condition_text = entry.condition_text,
         owned_count = count,
         purchase_limit = entry.purchase_limit,
@@ -348,10 +352,34 @@ local function project_entry(player_id, entry, context)
         challenge_active = context.active_challenge_encounters
             and context.active_challenge_encounters[entry.encounter_id]
             and 1 or 0,
+        technology_cooldown_remaining = context.technology_cooldown_remaining or 0,
+        technology_cooldown_until = context.technology_cooldown_until or 0,
+        technology_cooldown_source_group = context.technology_cooldown_source_group or "",
+        technology_cooldown_source_entry = context.technology_cooldown_source_entry or "",
+        technology_cooldown_sequence = context.technology_cooldown_sequence or 0,
     }
     if item.challenge_active == 1 then
         item.wood_cost = 0
         item.gold_cost = 0
+    end
+    if not ok then
+        if reason == "金币不足" then
+            item.disabled_reason_code = "insufficient_gold"
+        elseif reason == "木材不足" then
+            item.disabled_reason_code = "insufficient_wood"
+        elseif reason == "已达到购买上限" then
+            item.disabled_reason_code = "purchase_limit_reached"
+        elseif reason == "已达到最高等级" then
+            item.disabled_reason_code = "max_level_reached"
+        elseif reason and string.find(reason, "前置", 1, true) then
+            item.disabled_reason_code = "prerequisite_not_met"
+        elseif reason and string.find(reason, "研究所", 1, true) then
+            item.disabled_reason_code = "research_access_not_met"
+        elseif reason and string.find(reason, "转", 1, true) then
+            item.disabled_reason_code = "rebirth_level_not_met"
+        elseif entry.contentid == "service_early_final_boss" then
+            item.disabled_reason_code = "early_final_not_available"
+        end
     end
     local research = research_config.by_legacy_group[
         entry.definition.technology_group
@@ -384,25 +412,102 @@ local function project_entry(player_id, entry, context)
                 or {}).legacy_group]) or 0) >= (required.required_level or 0)
         local reincarnation_met = (tonumber(context.rebirth_level) or 0)
             >= (required.reincarnation_level or 0)
+        local prerequisite_definition = required.tech_id
+            and research_config.by_id[required.tech_id] or nil
+        local prerequisite_group = prerequisite_definition
+            and prerequisite_definition.legacy_group or ""
+        local prerequisite_current_level = prerequisite_group ~= ""
+            and (tonumber(levels[prerequisite_group]) or 0) or 0
+        local prerequisite_required_level = tonumber(required.required_level) or 0
+        local prerequisite_text = prerequisite_definition
+            and (prerequisite_definition.display_name .. " Lv."
+                .. tostring(prerequisite_required_level)) or ""
+        if (tonumber(required.reincarnation_level) or 0) > 0 then
+            prerequisite_text = (prerequisite_text ~= "" and prerequisite_text .. " · " or "")
+                .. "完成" .. tostring(required.reincarnation_level) .. "转"
+        end
+        item.prerequisite_met = prerequisite_met and 1 or 0
+        item.prerequisite_technology_id = required.tech_id or ""
+        item.prerequisite_technology_group = prerequisite_group
+        item.prerequisite_current_level = prerequisite_current_level
+        item.prerequisite_required_level = prerequisite_required_level
+        item.prerequisite_rebirth_level = tonumber(required.reincarnation_level) or 0
+        item.prerequisite_text = prerequisite_text
         local locked_reason = nil
+        local locked_reason_code = nil
         if target_level ~= current_level + 1
             or current_level >= research.max_level then
             locked_reason = "已达到最高等级"
+            locked_reason_code = "max_level_reached"
         elseif not prerequisite_met and context.debug_all_unlocked ~= true then
-            locked_reason = "前置科技等级不足"
+            locked_reason = "需要【" .. (prerequisite_definition
+                and prerequisite_definition.display_name or required.tech_id or "前置科技")
+                .. "】达到Lv." .. tostring(prerequisite_required_level)
+                .. "（当前Lv." .. tostring(prerequisite_current_level) .. "）"
+            locked_reason_code = "prerequisite_not_met"
         elseif not reincarnation_met and context.debug_all_unlocked ~= true then
-            locked_reason = "转生等级不足"
+            locked_reason = "需要完成" .. tostring(required.reincarnation_level)
+                .. "转（当前" .. tostring(context.rebirth_level or 0) .. "转）"
+            locked_reason_code = "rebirth_level_not_met"
         elseif number((context.resources or {}).gold) < item.gold_cost then
             locked_reason = "金币不足"
+            locked_reason_code = "insufficient_gold"
         elseif number((context.resources or {}).wood) < item.wood_cost then
             locked_reason = "木材不足"
+            locked_reason_code = "insufficient_wood"
         end
         if item.purchasable == 1 and locked_reason then
             item.purchasable = 0
             item.disabled_reason = locked_reason
+            item.disabled_reason_code = locked_reason_code
+        end
+        if item.purchasable == 1
+            and (tonumber(context.technology_cooldown_remaining) or 0) > 0 then
+            item.purchasable = 0
+            item.disabled_reason = "科技购买冷却中（"
+                .. string.format("%.1f", context.technology_cooldown_remaining)
+                .. "秒）"
+            item.disabled_reason_code = "technology_purchase_cooldown"
         end
     end
     return item
+end
+
+local function is_gold_mine_technology(entry)
+    local group = entry and entry.definition
+        and entry.definition.technology_group or ""
+    return group == "gold_mine_efficiency" or group == "gold_mine_crit"
+end
+
+local function is_hero_technology(entry)
+    local group = entry and entry.definition
+        and entry.definition.technology_group or ""
+    return string.match(group, "^researcher_hero_") ~= nil
+end
+
+function M.allowed_in_mode(entry, mode)
+    mode = tostring(mode or "shop")
+    if mode == "challenge" then
+        if entry.contenttype == "challenge" or entry.contenttype == "rebirth" then
+            return true
+        end
+        return false, "该内容不属于挑战页"
+    end
+    if mode == "research" then
+        if entry.contenttype == "technology" and not is_gold_mine_technology(entry) then
+            return true
+        end
+        return false, "该内容不属于科技页"
+    end
+    if entry.contenttype == "challenge" or entry.contenttype == "rebirth"
+        or entry.contenttype == "technology"
+        or entry.contenttype == "technology_service" then
+        return false, "该内容不属于商店页"
+    end
+    if not entry.listed_in_shop then
+        return false, "shop_entry_not_listed"
+    end
+    return true
 end
 
 local function projected_categories()
@@ -425,10 +530,57 @@ end
 
 function M.build_snapshot(player_id, context)
     local projected = {}
+    local projected_technology_groups = {}
     for _, entry in ipairs(entries) do
-        local listed_for_mode = context.ui_mode ~= "shop"
-            or entry.listed_in_shop == true
-        local item = project_entry(player_id, entry, context)
+        local allowed_for_mode = M.allowed_in_mode(entry, context.ui_mode)
+        local group = entry.definition
+            and entry.definition.technology_group or ""
+        local item = nil
+        if allowed_for_mode and entry.contenttype == "technology"
+            and not is_gold_mine_technology(entry) then
+            local current = tonumber(context.technology_levels
+                and context.technology_levels[player_id]
+                and context.technology_levels[player_id][group]) or 0
+            local authoritative_research = research_config.by_legacy_group[group]
+            local max_level = authoritative_research
+                and tonumber(authoritative_research.max_level)
+                or M.max_technology_level(group)
+            if not projected_technology_groups[group]
+                and tonumber(entry.definition.level) == 1 then
+                local target_level = math.min(current + 1, max_level)
+                local target_entry = M.find_technology_entry(group, target_level)
+                    or entry
+                item = project_entry(player_id, target_entry, context)
+                item.entry_id = entry.entryid
+                item.purchase_entry_id = target_entry.entryid
+                item.technology_level = current
+                item.next_technology_level = target_level
+                item.technology_max_level = max_level
+                item.technology_group = group
+                item.level_text = "Lv." .. tostring(current)
+                    .. " / " .. tostring(max_level)
+                if current >= max_level then
+                    item.purchasable = 0
+                    item.disabled_reason = "已达到最高等级"
+                    item.wood_cost = 0
+                    item.gold_cost = 0
+                    item.name = (research_config.by_legacy_group[group]
+                        and research_config.by_legacy_group[group].display_name
+                        or item.name) .. "（已满级）"
+                    item.disabled_reason_code = "max_level_reached"
+                elseif item.purchasable == 1
+                    and (tonumber(context.technology_cooldown_remaining) or 0) > 0 then
+                    item.purchasable = 0
+                    item.disabled_reason = "科技购买冷却中（"
+                        .. string.format("%.1f", context.technology_cooldown_remaining)
+                        .. "秒）"
+                    item.disabled_reason_code = "technology_purchase_cooldown"
+                end
+                projected_technology_groups[group] = true
+            end
+        elseif allowed_for_mode then
+            item = project_entry(player_id, entry, context)
+        end
         -- Challenge entrances remain visible while locked. Players can see
         -- the abyss prerequisite/completion state instead of having its card
         -- disappear before the first run or after the tenth clear.
@@ -437,70 +589,7 @@ function M.build_snapshot(player_id, context)
         -- otherwise spending the last resources makes the incremental patch
         -- remove every unaffordable item and leaves the category visually empty.
         local include = item ~= nil
-        local group = entry.definition
-            and entry.definition.technology_group or ""
-        local hero_technology = string.match(
-            group,
-            "^researcher_hero_"
-        ) ~= nil
-        local scope_allowed = context.debug_all_unlocked == true
-            or context.ui_mode == "research"
-            and (entry.contenttype == "technology_service"
-                or entry.contenttype == "technology" and not hero_technology)
-            or context.ui_mode ~= "research"
-                and (entry.contenttype ~= "technology" or hero_technology)
-        if entry.contenttype == "technology_service" then
-            if context.debug_all_unlocked == true then
-                include = true
-            elseif entry.contentid == "advanced_researcher_unlock" then
-                include = not context.advanced_researcher_unlocked
-                    and (tonumber(context.city_level) or 0) >= 4
-            else
-                include = not context.research_unlocked
-                    and (tonumber(context.city_level) or 0) >= 1
-            end
-        elseif entry.contenttype == "rebirth" then
-            -- Always project exactly the next rebirth challenge. Resource or
-            -- building failures are shown as a disabled card instead of making
-            -- 4-10 rebirth silently disappear from the shop.
-            include = context.debug_all_unlocked == true
-                or (tonumber(entry.definition.rebirth_level) or 0)
-                    == (tonumber(context.rebirth_level) or 0) + 1
-        elseif entry.contenttype == "technology" then
-            local current = tonumber(item.technology_level) or 0
-            local level = tonumber(item.next_technology_level) or 0
-            local research = research_config.by_legacy_group[group]
-            local phase = tonumber(entry.technology_phase) or 1
-            local levels = context.technology_levels
-                and context.technology_levels[player_id] or {}
-            local prerequisite_level = tonumber(
-                levels[entry.unlock_technology_group] or 0
-            ) or 0
-            local prerequisite_required = tonumber(
-                entry.definition.unlock_required_level
-            ) or 0
-            local prerequisite_ready = research ~= nil
-                or entry.technology_track ~= "advanced"
-                or prerequisite_level >= prerequisite_required
-            local gold_mine_technology =
-                entry.definition.technology_group == "gold_mine_efficiency"
-                or entry.definition.technology_group == "gold_mine_crit"
-            local unlocked = entry.technology_track == "advanced_researcher"
-                and context.advanced_researcher_unlocked == true
-                or entry.technology_track ~= "advanced_researcher"
-                and context.research_unlocked == true
-            include = context.debug_all_unlocked == true
-                or not gold_mine_technology
-                and unlocked
-                and prerequisite_ready
-                and level == current + 1
-                and (research ~= nil
-                    or entry.technology_track == "advanced_researcher"
-                    or phase == 0
-                    or phase == 1 and current < 10
-                    or phase == 2 and current >= 10)
-        end
-        if item and include and scope_allowed and listed_for_mode then
+        if item and include and allowed_for_mode then
             table.insert(projected, item)
         end
     end
@@ -511,12 +600,31 @@ function M.build_snapshot(player_id, context)
         player_id = player_id,
         reason = context.reason or "open",
         resources = context.resources or {},
+        technology_cooldown_remaining = context.technology_cooldown_remaining or 0,
+        technology_cooldown_total = context.technology_cooldown_total or 2,
+        technology_cooldown_until = context.technology_cooldown_until or 0,
+        technology_cooldown_source_group = context.technology_cooldown_source_group or "",
+        technology_cooldown_source_entry = context.technology_cooldown_source_entry or "",
+        technology_cooldown_sequence = context.technology_cooldown_sequence or 0,
         categories = context.ui_mode == "research" and {
             {
                 shopid = "technology",
                 shopname = "建筑与工人科技",
                 order = 10,
                 description = "研究所科技",
+            },
+        } or context.ui_mode == "challenge" and {
+            {
+                shopid = "challenge",
+                shopname = "普通挑战",
+                order = 10,
+                description = "11个普通挑战",
+            },
+            {
+                shopid = "rebirth",
+                shopname = "转职挑战",
+                order = 20,
+                description = "1至10转挑战",
             },
         } or projected_categories(),
         entries = projected,

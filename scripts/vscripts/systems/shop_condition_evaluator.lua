@@ -35,12 +35,6 @@ local function exact_series_stage(context, prefix)
     return result
 end
 
-local function hero_technology(entry)
-    local group = entry.definition
-        and entry.definition.technology_group or ""
-    return string.match(group, "^researcher_hero_") ~= nil
-end
-
 function M.evaluate(player_id, entry, context)
     local count = context.purchased_count[player_id]
         and context.purchased_count[player_id][entry.entryid] or 0
@@ -51,20 +45,18 @@ function M.evaluate(player_id, entry, context)
 
     if context.debug_all_unlocked ~= true
         and not context.gold_mine_ability and context.ui_mode == "research" then
-        if entry.contenttype ~= "technology"
-            and entry.contenttype ~= "technology_service" then
+        if entry.contenttype ~= "technology" then
             return false, "该内容不属于研究所", count
         end
-        if entry.contenttype == "technology" and hero_technology(entry) then
-            return false, "英雄科技请在商店中研究", count
+    elseif context.debug_all_unlocked ~= true
+        and not context.gold_mine_ability and context.ui_mode == "challenge" then
+        if entry.contenttype ~= "challenge" and entry.contenttype ~= "rebirth" then
+            return false, "该内容不属于挑战页", count
         end
     elseif context.debug_all_unlocked ~= true
         and not context.gold_mine_ability then
-        if entry.contenttype == "technology_service" then
-            return false, "科技解锁服务请在研究所中使用", count
-        end
-        if entry.contenttype == "technology" and not hero_technology(entry) then
-            return false, "建筑与工人科技请在研究所中研究", count
+        if entry.contenttype == "technology" then
+            return false, "科技请在科技页中研究", count
         end
     end
 
@@ -83,16 +75,26 @@ function M.evaluate(player_id, entry, context)
     if limit > 0 and count >= limit then
         return false, "已达到购买上限", count
     end
-    local definition = entry.definition or {}
-    if entry.contenttype == "technology_service" then
-        if entry.contentid == "advanced_researcher_unlock" then
-            if context.advanced_researcher_unlocked == true then
-                return false, "高级研究员服务已解锁", count
-            end
-        elseif context.research_unlocked == true then
-            return false, "研究所科技服务已解锁", count
+    if entry.contentid == "service_early_final_boss"
+        and context.debug_all_unlocked ~= true then
+        local wave = context.wave_state or {}
+        if wave.game_started ~= true then
+            return false, "游戏开始15分钟后可用", count
+        end
+        if wave.early_final_used == true then
+            return false, "本局已购买提前通关", count
+        end
+        if wave.victory_settled == true
+            or (tonumber(wave.current_wave) or 0) >= (tonumber(wave.total_waves) or 30) then
+            return false, "最终波已经开始", count
+        end
+        local remaining = tonumber(wave.early_final_remaining) or 0
+        if remaining > 0 then
+            return false, "开局15分钟后可用（剩余"
+                .. tostring(math.ceil(remaining)) .. "秒）", count
         end
     end
+    local definition = entry.definition or {}
     if entry.contenttype == "technology" then
         -- Gold-mine technologies are intentionally purchased from the mine's
         -- W/E abilities. Ownership of the casting mine is validated by the
@@ -101,10 +103,10 @@ function M.evaluate(player_id, entry, context)
             and context.debug_all_unlocked ~= true then
             if entry.technology_track == "advanced_researcher" then
                 if context.advanced_researcher_unlocked ~= true then
-                    return false, "需要先解锁高级研究员服务", count
+                    return false, "需要建造高级研究所", count
                 end
             elseif context.research_unlocked ~= true then
-                return false, "需要先解锁研究所科技服务", count
+                return false, "需要建造研究所", count
             end
         end
         local levels = context.technology_levels and context.technology_levels[player_id] or {}
@@ -132,6 +134,18 @@ function M.evaluate(player_id, entry, context)
             end
         elseif entry.technology_track == "advanced_researcher" then
             -- 高级研究员服务已在科技入口处统一校验。
+        end
+    end
+    if entry.contenttype == "rebirth"
+        and context.debug_all_unlocked ~= true then
+        local target_rebirth = tonumber(definition.rebirth_level) or 0
+        local current_rebirth = tonumber(context.rebirth_level) or 0
+        if target_rebirth ~= current_rebirth + 1 then
+            return false,
+                target_rebirth <= current_rebirth
+                    and "该转职挑战已完成"
+                    or "请先完成上一转职挑战",
+                count
         end
     end
     if definition.progression_type == "repeat_purchase"

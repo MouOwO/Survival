@@ -92,6 +92,13 @@
 !/scripts/vscripts/tests/test_wave_difficulty_builder.lua
 !/scripts/vscripts/tests/test_wave_difficulty_selection.lua
 !/scripts/vscripts/tests/test_difficulty_ui_contract.lua
+!/scripts/vscripts/tests/test_shop_three_page_projection.lua
+!/scripts/vscripts/tests/test_shop_team_technology_cooldown.lua
+!/scripts/vscripts/tests/test_shop_technology_ui_contract.lua
+!/scripts/vscripts/tests/test_shop_research_without_hero.lua
+!/scripts/vscripts/tests/test_hero_altar_interaction_config.lua
+!/scripts/vscripts/tests/test_research_technology_prerequisite.lua
+!/scripts/vscripts/tests/test_wave_early_final.lua
 /tools_asset_info.bin
 /tools_thumbnail_cache.sqlite3
 /tools_thumbnail_cache.sqlite3-*

@@ -56,6 +56,8 @@ local M = {
     WAVE_CHANGED = "wave.changed",
     WAVE_START_NEXT = "wave.internal.start_next",
     WAVE_DIFFICULTY_SET_REQUEST = "wave.difficulty.set.request",
+    WAVE_STATE_GET_REQUEST = "wave.state.get.request",
+    WAVE_EARLY_FINAL_REQUEST = "wave.early_final.request",
 
     UI_NOTIFICATION = "ui.notification",
     UI_DIRTY = "ui.dirty",

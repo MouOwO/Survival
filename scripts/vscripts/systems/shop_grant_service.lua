@@ -61,6 +61,12 @@ end
 
 local function grant_virtual_item(player_id, entry, state)
     local definition = entry.definition or {}
+    if entry.contentid == "service_early_final_boss" then
+        return event_bus.request(events.WAVE_EARLY_FINAL_REQUEST, {
+            player_id = player_id,
+            reason = "shop_service_early_final_boss",
+        }) or { ok = false, error = "wave_handler_missing" }
+    end
     if definition.item_subtype == "consumable" then
         local summoned = event_bus.request(
             events.HERO_SUMMON_GET_REQUEST,

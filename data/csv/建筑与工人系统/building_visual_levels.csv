@@ -5,4 +5,4 @@ main_city_visual_lv02,building_main_city,2,models/props_structures/tower_good.vm
 main_city_visual_lv03,building_main_city,3,models/props_structures/tower_good.vmdl,0.75,0,1,主城低阶塔最终阶段
 main_city_visual_lv04,building_main_city,4,models/props_structures/tower_good3.vmdl,0.80,0,1,主城切换神圣高塔
 main_city_visual_lv05,building_main_city,5,models/props_structures/tower_good3.vmdl,0.95,0,1,主城神圣高塔最终阶段
-hero_altar_visual_lv01,building_hero_altar,1,models/props_structures/tower_good4.vmdl,0.34,0,1,召唤祭坛指定模型
+hero_altar_visual_lv01,building_hero_altar,1,models/props_structures/radiant_ancient001.vmdl,0.34,0,1,召唤祭坛可选中动态模型

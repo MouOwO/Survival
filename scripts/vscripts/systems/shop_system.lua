@@ -8,6 +8,13 @@ local research_config = require("config/research_technology_config")
 local research_events = require("research/research_event_names")
 local M = {}
 local state = {}
+local TECHNOLOGY_PURCHASE_COOLDOWN = 2
+
+local function game_time()
+    return GameRules and GameRules.GetGameTime
+        and tonumber(GameRules:GetGameTime()) or 0
+end
+
 local function reset_state()
     state = {
         technology_by_player = {},
@@ -22,6 +29,10 @@ local function reset_state()
         snapshot_cache_by_player = {},
         pending_push_reason = {},
         debug_all_unlocked = {},
+        technology_cooldown_until_by_team = {},
+        technology_cooldown_source_group_by_team = {},
+        technology_cooldown_source_entry_by_team = {},
+        technology_cooldown_sequence_by_team = {},
     }
 end
 local function valid_player_id(player_id)
@@ -132,6 +143,7 @@ local function snapshot_context(player_id, reason, mode)
     end
     state.sequence_by_player[player_id] =
         (state.sequence_by_player[player_id] or 0) + 1
+    local wave_state = event_bus.request(events.WAVE_STATE_GET_REQUEST, {}) or {}
     return {
         sequence = state.sequence_by_player[player_id],
         reason = reason,
@@ -151,6 +163,18 @@ local function snapshot_context(player_id, reason, mode)
         research_unlocked = state.research_unlocked[player_id] == true,
         advanced_researcher_unlocked = state.advanced_researcher_unlocked[player_id] == true,
         debug_all_unlocked = state.debug_all_unlocked[player_id] == true,
+        technology_cooldown_remaining = math.max(0,
+            (state.technology_cooldown_until_by_team[team] or 0)
+                - game_time()),
+        technology_cooldown_total = TECHNOLOGY_PURCHASE_COOLDOWN,
+        technology_cooldown_until = state.technology_cooldown_until_by_team[team] or 0,
+        technology_cooldown_source_group = state.technology_cooldown_source_group_by_team
+            and state.technology_cooldown_source_group_by_team[team] or "",
+        technology_cooldown_source_entry = state.technology_cooldown_source_entry_by_team
+            and state.technology_cooldown_source_entry_by_team[team] or "",
+        technology_cooldown_sequence = state.technology_cooldown_sequence_by_team
+            and state.technology_cooldown_sequence_by_team[team] or 0,
+        wave_state = wave_state,
         ui_mode = mode or state.opened_players[player_id] or "shop",
     }
 end
@@ -213,6 +237,12 @@ local function build_patch(previous, current)
         ui_mode = current.ui_mode,
         changed_entries = changed,
         removed_entry_ids = removed,
+        technology_cooldown_remaining = current.technology_cooldown_remaining,
+        technology_cooldown_total = current.technology_cooldown_total,
+        technology_cooldown_until = current.technology_cooldown_until,
+        technology_cooldown_source_group = current.technology_cooldown_source_group,
+        technology_cooldown_source_entry = current.technology_cooldown_source_entry,
+        technology_cooldown_sequence = current.technology_cooldown_sequence,
     }
     if not values_equal(previous.resources or {}, current.resources or {}) then
         patch.resources = current.resources
@@ -268,28 +298,21 @@ local function open_shop(payload)
     if not valid_player_id(player_id) then
         return { ok = false, error = "player_id_invalid" }
     end
-    local mode = payload.mode == "research" and "research" or "shop"
+    local requested_mode = tostring(payload.mode or "shop")
+    local mode = requested_mode == "research" and "research"
+        or requested_mode == "challenge" and "challenge" or "shop"
     if mode == "research" then
-        local team = player_team(player_id)
-        if (building_counts(team).building_research_lab or 0) < 1 then
-            return { ok = false, error = "请先建造研究所" }
-        end
         local source_entindex = tonumber(payload.source_entindex)
         if source_entindex and source_entindex > 0 then
             local building = event_bus.request(events.BUILDING_QUERY_REQUEST, {
                 entindex = source_entindex,
             })
             if not building
-                or building.building_id ~= "building_research_lab"
+                or (building.building_id ~= "building_research_lab"
+                    and building.building_id ~= "building_advanced_research_lab")
                 or tonumber(building.player_id) ~= player_id then
                 return { ok = false, error = "研究所归属验证失败" }
             end
-        end
-    else
-        local summon = summon_snapshot(player_id)
-        if summon.hero_summoned ~= 1
-            and state.debug_all_unlocked[player_id] ~= true then
-            return { ok = false, error = "请先在英雄祭坛召唤英雄" }
         end
     end
     state.opened_players[player_id] = mode
@@ -341,9 +364,11 @@ local function purchase(payload)
     end
     local gold_mine_ability = payload.source == "gold_mine_ability"
     local mode = state.opened_players[player_id] or "shop"
-    if not gold_mine_ability and mode == "shop"
-        and not catalog.listed_in_shop(entry) then
-        return { ok = false, error = "shop_entry_not_listed" }
+    if not gold_mine_ability then
+        local allowed, mode_error = catalog.allowed_in_mode(entry, mode)
+        if not allowed then
+            return { ok = false, error = mode_error or "shop_mode_invalid" }
+        end
     end
     if gold_mine_ability then
         local group = entry.definition and entry.definition.technology_group
@@ -405,6 +430,17 @@ local function purchase(payload)
         and entry.definition.technology_group or ""
     local research_definition = research_config.by_legacy_group[technology_group]
     if entry.contenttype == "technology" and research_definition then
+        local cooldown_remaining = math.max(0,
+            (state.technology_cooldown_until_by_team[team] or 0)
+                - game_time())
+        if cooldown_remaining > 0 then
+            return {
+                ok = false,
+                error = "科技购买冷却中",
+                error_code = "technology_purchase_cooldown",
+                cooldown_remaining = cooldown_remaining,
+            }
+        end
         local current_level = tonumber((state.technology_by_player[player_id]
             or {})[technology_group]) or 0
         local requested_level = tonumber(entry.definition.level) or 0
@@ -424,9 +460,24 @@ local function purchase(payload)
         state.purchased_count[player_id] =
             state.purchased_count[player_id] or {}
         state.purchased_count[player_id][entry.entryid] = 1
+        state.technology_cooldown_until_by_team[team] =
+            game_time() + TECHNOLOGY_PURCHASE_COOLDOWN
+        state.technology_cooldown_source_group_by_team =
+            state.technology_cooldown_source_group_by_team or {}
+        state.technology_cooldown_source_entry_by_team =
+            state.technology_cooldown_source_entry_by_team or {}
+        state.technology_cooldown_sequence_by_team =
+            state.technology_cooldown_sequence_by_team or {}
+        state.technology_cooldown_source_group_by_team[team] = technology_group
+        state.technology_cooldown_source_entry_by_team[team] = entry.entryid
+        state.technology_cooldown_sequence_by_team[team] =
+            (state.technology_cooldown_sequence_by_team[team] or 0) + 1
         notify(player_id, "研究成功：" .. research_definition.display_name
             .. " Lv." .. tostring(upgraded.new_level))
-        push_snapshot(player_id, "research_upgrade_completed")
+        push_team(team, "research_upgrade_completed")
+        scheduler.after(TECHNOLOGY_PURCHASE_COOLDOWN, function()
+            push_team(team, "technology_cooldown_completed")
+        end, "shop_technology_cooldown:" .. tostring(team))
         local result = { ok = true, entry_id = entry.entryid,
             research_result = upgraded }
         remember_result(player_id, request_id, result)
@@ -529,6 +580,12 @@ local function on_building_created(payload)
             state.research_unlocked[player_id] = true
         end
     end
+    if payload.building_id == "building_advanced_research_lab" then
+        local player_id = tonumber(payload.player_id)
+        if valid_player_id(player_id) then
+            state.advanced_researcher_unlocked[player_id] = true
+        end
+    end
     push_team(payload.team, "building_created")
 end
 local function on_building_changed(payload)
@@ -547,9 +604,12 @@ local function on_building_destroyed(payload)
         local player_id = tonumber(payload.player_id)
         if valid_player_id(player_id) then
             state.research_unlocked[player_id] = false
-            if state.opened_players[player_id] == "research" then
-                state.opened_players[player_id] = nil
-            end
+        end
+    end
+    if payload.building_id == "building_advanced_research_lab" then
+        local player_id = tonumber(payload.player_id)
+        if valid_player_id(player_id) then
+            state.advanced_researcher_unlocked[player_id] = false
         end
     end
     push_team(payload.team, "building_destroyed")
@@ -649,6 +709,12 @@ function M.init()
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_player_changed)
     event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
     event_bus.subscribe(research_events.LEVEL_CHANGED, on_research_level_changed)
+    event_bus.subscribe(events.GAME_STARTED, function()
+        scheduler.after(15 * 60, function()
+            for player_id, _ in pairs(state.opened_players) do
+                push_snapshot(player_id, "early_final_unlocked")
+            end
+        end, "shop_early_final_unlock")
+    end)
 end
 return M
---xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
