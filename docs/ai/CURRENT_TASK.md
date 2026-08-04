@@ -362,23 +362,35 @@
 - 脉冲激射完整PowerShell契约存在既有陈旧预缓存断言，仍要求已废弃的Vengeful粒子；其Lua 5.1状态测试通过，本任务未修改该旧测试。
 - 剩余动作仅为冷启动Workshop Tools，确认完整Kez Echo Slash在换段和终点不再额外向前播放，并验证立即销毁是否产生断帧、Kez模型、朝向、尺寸、高度、两段衔接和完整射程；尚不能记录为引擎验证或用户验收完成。
 
-用户已明确确认现有公共技能`proto_earth_line`五级“地裂冲击·被动”暂时完成。当前基线停止继续调整，不再把Workshop Tools逐项验证恢复为活跃任务；只有用户以后明确提出地裂冲击的新需求或报告实机问题时，才按下述维护方式重新开启。
+## 活跃任务（2026-08-03）：地裂冲击卡尔陨石滚动视觉
+
+用户明确重新开启公共技能`proto_earth_line`五级“地裂冲击·被动”，要求移动视觉使用卡尔混沌陨石落地后向前滚动的部分。已批准实施：使用项目滚动父粒子`particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf`替换现有Tiny移动外观；该资源复用Valve陨石模型与滚动火焰/拖尾/烟尘，排除落地瞬时冲击子效果，并将原版固定0.2秒主载体寿命改为由CP2.x接收地裂真实飞行时长。父粒子只作为独立视觉层，CP0使用触发起点、CP1使用地裂固定方向×权威速度500。原生无视觉线性投射物继续唯一负责碰撞、穿透和伤害。
+
+### 本轮不可改变边界
+
+- 不播放卡尔坠落段，不调用卡尔原生技能，不增加燃烧、声音、伤害或单位。
+- 保持12%触发、固定起终点、速度500、总宽150/250、逐单位去重、旧眩晕翻倍、LV3眩晕、LV5首次命中范围伤害及终点无伤害爆炸。
+- 正常终点、超时兜底和服务重置必须立即销毁并释放移动父粒子；视觉失败不得阻断权威投射物。
+- 主服务当前Lua 5.1顶层local为199；新增状态、常量和方法必须挂在既有`earth_rock`表，不增加模块级local。
+
+此前用户已确认现有公共技能`proto_earth_line`五级“地裂冲击·被动”暂时完成；本次只因上述明确新视觉需求重新开启，不恢复其他旧视觉/碰撞待办。
 
 ### 地裂冲击自动验证
 
-- `EARTH_LINE_STATE_LUA51_PASS` / `EARTH_LINE_CONTRACT_PASS`。
-- `EARTH_LINE_LUAC51_PASS`：运行配置、两份生成Lua、公共被动服务、Tooltip运行服务、游戏模式和专项状态测试通过Lua 5.1语法检查。
-- `EARTH_LINE_GENERATED_COMPARE_PASS`：英雄技能生成Lua与权威CSV逐字节一致；Tooltip生成行与权威CSV一致且生产生成文件仅改变地裂目标行。
-- 严格UTF-8、乱码标记检查和限定`git diff --check`通过。
-- 脉冲激射、魔法弹弓、寒冰锥、元气弹、陨石坠落和移动冰球相关回归通过。
+- `EARTH_LINE_VISUAL_STATE_PASS`：覆盖无视觉碰撞体、CP0起点、CP1权威速度、CP2完整飞行时长、穿透、逐单位去重、旧眩晕×6、LV5首次命中范围伤害、正常终点/超时/重置清理、迟到回调幂等、并行实例隔离及视觉异常不阻断碰撞投射物。
+- `EARTH_LINE_VISUAL_CONTRACT_PASS`：锁定项目粒子源、Valve陨石模型、CP1速度、CP2寿命、贴地、滚动旋转、滚动子效果、禁止land冲击与屏幕震动、预缓存、无Tiny生产引用和全部原战斗数值。
+- Resource Compiler强制定向编译结果为`OK: 1 compiled, 0 failed, 0 skipped`；game产物`particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf_c`存在。
+- 生产服务、Ability入口、游戏模式和专项状态测试通过当前Lua/Luac 5.4.5语法；主服务顶层local仍为199。当前环境没有Lua 5.1工具，因此不宣称本轮Lua 5.1验证。
+- 回音重斩、陨石坠落、元气弹三项状态测试及回音重斩、脉冲激射、魔法弹弓、陨石坠落、元气弹五项视觉契约通过。移动冰球视觉契约仍因本任务前已有的旧基础弹体常量失败，地裂差异未触碰该区域。
+- 7个任务文件严格UTF-8、限定`git diff --check`和粒子编译产物存在性检查通过。
 
 ### 地裂冲击后续修改入口
 
 - 配置或文案修改必须先改`data/csv/英雄系统/hero_skill_definitions.csv`和`data/csv/公共规则/tooltip_definitions.csv`，再定向生成对应Lua；禁止直接维护生成Lua。
 - 数值和等级行为修改同步检查`scripts/vscripts/config/hero_passive_skill_definitions.lua`、`scripts/npc/npc_abilities_custom.txt`和`scripts/vscripts/ui/ability_runtime_service.lua`。
 - 移动、碰撞、伤害、眩晕、首次范围伤害或清理规则修改集中在`scripts/vscripts/systems/hero_passive_skill_service.lua`，继续复用线性投射物、逻辑属性快照和现有伤害事务，不恢复旧`line_targets()`瞬时扫描。
-- 修改后至少运行`tools/test_earth_line_contract.ps1`、`tools/test_earth_line_state.lua`、Lua 5.1语法检查、CSV生成一致性、严格UTF-8、限定`git diff --check`以及相关公共技能回归。
-- Tiny岩石视觉、150/250引擎碰撞和LV2视觉尺寸属于未来发生相关问题时再执行的Workshop Tools检查项；当前不作为阻止“暂时完成”的待办。
+- 修改后至少运行`tools/test_earth_line_visual_contract.ps1`、`scripts/vscripts/tests/test_earth_line_visual.lua`、可用的Lua语法检查、Resource Compiler强制编译、严格UTF-8、限定`git diff --check`以及相关公共技能回归。
+- 当前唯一剩余动作是Workshop Tools冷启动实机验收：确认卡尔陨石尺寸/高度、贴地、固定方向、500速度与碰撞同步、完整路径连续、并行实例以及正常终点/超时后无残留；自动测试不能替代引擎验收。
 
 ## 活跃任务（2026-08-02）
 

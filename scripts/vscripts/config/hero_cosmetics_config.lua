@@ -41,10 +41,54 @@ local M = {
         },
     },
     hero_monkey_king = {
+        -- Cult of the Demon Trickster (21425): armor 13008, head 13544,
+        -- shoulder 13545 and weapon 13546. Use the base style assets only;
+        -- the Wukong's Command replacements belong to ability cosmetics.
         material_group = "1",
-        hide_default_wearables = false,
+        hide_default_wearables = true,
         wearables = {
-            "models/items/monkey_king/monkey_king_immortal_weapon/monkey_king_immortal_weapon.vmdl",
+            {
+                id = "demon_trickster_armor",
+                model = "models/items/monkey_king/mk_ti9_immortal_armor/mk_ti9_immortal_armor.vmdl",
+            },
+            {
+                id = "demon_trickster_mask",
+                model = "models/items/monkey_king/mk_ti9_immortal_head/mk_ti9_immortal_head.vmdl",
+            },
+            {
+                id = "demon_trickster_shoulders",
+                model = "models/items/monkey_king/mk_ti9_immortal_shoulder/mk_ti9_immortal_shoulder.vmdl",
+            },
+            {
+                id = "demon_trickster_staff",
+                model = "models/items/monkey_king/mk_ti9_immortal_weapon/mk_ti9_immortal_weapon.vmdl",
+            },
+        },
+        particles = {
+            {
+                id = "demon_trickster_armor_ambient",
+                path = "particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_armor_ambient.vpcf",
+                owner = "demon_trickster_armor",
+                attach_type = "PATTACH_ABSORIGIN_FOLLOW",
+            },
+            {
+                id = "demon_trickster_mask_ambient",
+                path = "particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_head_ambient.vpcf",
+                owner = "demon_trickster_mask",
+                attach_type = "PATTACH_ABSORIGIN_FOLLOW",
+            },
+            {
+                id = "demon_trickster_shoulders_ambient",
+                path = "particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_shoulders_ambient.vpcf",
+                owner = "demon_trickster_shoulders",
+                attach_type = "PATTACH_ABSORIGIN_FOLLOW",
+            },
+            {
+                id = "demon_trickster_staff_ambient",
+                path = "particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_weapon_ambient.vpcf",
+                owner = "demon_trickster_staff",
+                attach_type = "PATTACH_ABSORIGIN_FOLLOW",
+            },
         },
     },
     hero_blademaster = {

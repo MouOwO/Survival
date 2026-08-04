@@ -176,6 +176,7 @@
 - `hero_skill_pool_members.csv` 使用 UTF-8 BOM，以兼容 Office/Excel 双击打开；配置生成器的 `utf-8-sig` 读取保持兼容。
 - 英雄伤害测试面板除原“累计/最近伤害”外，独立显示英雄技能的累计伤害、最近一次伤害和命中次数；统计使用 `OnTakeDamage` 的最终实际伤害，被动技能伤害请求必须携带对应 Ability handle 以区别普通攻击。
 - 公共技能`proto_void_pulse`的追踪龙卷视觉使用项目粒子`particles/survival_tornado/survival_tornado_follow.vpcf`，只引用Valve的`invoker_tornado_child.vpcf`子效果且不含内部移动算子；Lua权威状态每0.05秒写CP0。不得恢复为完整`invoker_tornado.vpcf`并尝试动态修改CP1追踪。
+- 接入Valve移动父粒子前必须读取content源码确认主载体的发射方式、寿命、内部移动与EndCap，不能只根据粒子名称或预览判断。`invoker_chaos_meteor.vpcf`主载体固定寿命仅0.2秒，速度500时只覆盖约100码；`proto_earth_line`因此使用项目变体`particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf`，由CP2.x接收权威飞行时长并移除落地冲击子效果。修改项目粒子后必须Resource Compiler强制编译并冷重启Workshop Tools，Lua热加载不能完成验收。
 - 公共技能`proto_meteor`已重做为五级“陨石坠落”：攻击命中12%概率在目标快照位置坠落，0.8秒后500范围爆炸并造成触发时全属性×3纯粹伤害；LV2起留下3秒熔岩，在落地后第1/2/3秒各造成×1；LV3起区域内唯一减速30%，离开全部区域立即移除；LV4无新增；LV5同点晚0.5秒落下第二颗，其爆炸和熔岩均为80%。每英雄从触发到最后一次熔岩结算维持独立锁，概率判定前跳过；LV1落地即解锁。视觉使用卡尔`invoker_chaos_meteor_fly.vpcf`完成坠落，权威落地时立即清除卡尔粒子并在同点播放术士`warlock_rain_of_chaos_explosion.vpcf`纯爆炸；不创建地狱火单位，也不使用包含11秒烧焦地面的完整Rain of Chaos父粒子。爆炸由独立注册表保留3.1秒后强制销毁释放，清局立即回收；LV2起继续使用Viper Nethertoxin地面区域。粒子只负责表现，伤害碰撞仍由Lua状态与Hull精确AOE权威决定。
 - `addmonster`的可攻击调试怪使用600基础移速，并通过仅作用于该实例的`modifier_debug_move_speed_cap`把`MODIFIER_PROPERTY_MOVESPEED_MAX/LIMIT`提高到600；不可攻击模式仍为0。该Modifier不得提供绝对移速，以保证技能百分比减速继续参与最终速度。此方案已用于验证陨石熔岩30%减速，用户实机确认从高速基准观察时效果正常；不得为测试效果修改正常怪物CSV、生成怪物配置或`npc_units_custom.txt`。
 - 测试聊天命令 `addskill` 将当前玩家技能点直接设置为10；未召唤英雄时拒绝执行，重复输入仍保持10点。

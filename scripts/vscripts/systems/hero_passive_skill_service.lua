@@ -51,8 +51,8 @@ local tornado_sequence = 0
 local tornado_task = nil
 local tornado_slow_units = {}
 
-local ARCANE_EXPLOSION_PARTICLE =
-    "particles/basic_explosion/basic_explosion.vpcf"
+local ARCANE_MYSTIC_FLARE_PARTICLE =
+    "particles/units/heroes/hero_skywrath_mage/skywrath_mage_mystic_flare.vpcf"
 local FLAME_MAIN_EXPLOSION_PARTICLE =
     "particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf"
 local FLAME_SMALL_FIREBALL_PARTICLE =
@@ -107,16 +107,15 @@ local BLADE_PULSE_PARTICLE =
     "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
 local BLADE_PULSE_CLEANUP_GRACE = 0.25
 echo_slash.particle =
-    "particles/units/heroes/hero_kez/kez_katana_echo_strike.vpcf"
+    "particles/survival_echo_slash/survival_echo_slash_follow.vpcf"
 echo_slash.cleanup_grace = 0.25
 echo_slash.visual_interval = 0.05
-echo_slash.visual_phase_duration = 0.5
 echo_slash.visual_width = 200
 echo_slash.visual_scale = 1.5
 echo_slash.color = Vector(0.231373, 0.407843, 0.607843)
 echo_slash.emit_rate = 200
-earth_rock.particle =
-    "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf"
+earth_rock.visual_particle =
+    "particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf"
 earth_rock.explosion_particle =
     "particles/basic_projectile/basic_projectile_explosion.vpcf"
 earth_rock.cleanup_grace = 0.25
@@ -1731,9 +1730,8 @@ function echo_slash.destroy_visual_particle(state)
     local particle = state.particle
     state.particle = nil
     pcall(function()
-        -- The complete Kez parent owns a moving 0.5-second carrier. A graceful
-        -- stop lets that carrier and its slash children continue past this
-        -- visual phase's endpoint, so every parent instance must die now.
+        -- The project parent owns one moving carrier and all complete Kez children.
+        -- Immediate cleanup prevents any child from surviving the path endpoint.
         ParticleManager:DestroyParticle(particle, true)
     end)
     pcall(function()
@@ -1775,14 +1773,8 @@ end
 
 function echo_slash.sync_visual(state)
     if not state or not state.particle then return end
-    local phase = state.visual_phase or 1
-    local phase_start = phase == 2 and echo_slash.visual_phase_duration or 0
-    local phase_end = phase == 2 and state.duration
-        or echo_slash.visual_phase_duration
-    local start = state.origin + state.direction
-        * (state.speed * phase_start)
-    local finish = state.origin + state.direction * (state.speed * phase_end)
-    ParticleManager:SetParticleControl(state.particle, 0, start)
+    local finish = state.origin + state.direction * (state.speed * state.duration)
+    ParticleManager:SetParticleControl(state.particle, 0, state.origin)
     ParticleManager:SetParticleControl(state.particle, 1, finish)
     ParticleManager:SetParticleControl(
         state.particle, 2,
@@ -1794,6 +1786,9 @@ function echo_slash.sync_visual(state)
     ParticleManager:SetParticleControl(state.particle, 7, echo_slash.color)
     ParticleManager:SetParticleControl(
         state.particle, 8, Vector(echo_slash.emit_rate, 0, 0)
+    )
+    ParticleManager:SetParticleControl(
+        state.particle, 9, Vector(state.duration, 0, 0)
     )
 end
 
@@ -1819,18 +1814,11 @@ end
 function echo_slash.create_visual(projectile_id)
     local state = echo_slash.projectiles[projectile_id]
     if not state then return end
-    state.visual_phase = state.visual_phase or 1
     if not echo_slash.create_visual_particle(state) then return end
     state.visual_task = scheduler.every(echo_slash.visual_interval, function()
         local current = echo_slash.projectiles[projectile_id]
         if not current or not current.particle then return false end
         local elapsed = game_time() - current.started_at
-        if elapsed >= echo_slash.visual_phase_duration
-            and current.visual_phase == 1 then
-            echo_slash.destroy_visual_particle(current)
-            current.visual_phase = 2
-            if not echo_slash.create_visual_particle(current) then return false end
-        end
         local sync_ok, sync_error = pcall(function()
             echo_slash.sync_visual(current)
         end)
@@ -1984,12 +1972,60 @@ function earth_rock.explosion_visual(context, position)
     end
 end
 
+function earth_rock.destroy_visual(state)
+    if not state or not state.visual_particle then return end
+    local particle = state.visual_particle
+    state.visual_particle = nil
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle, true)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not destroy_ok or not release_ok then
+        print("[HeroPassiveSkill] earth rock rolling visual cleanup failed: "
+            .. tostring(destroy_error or release_error))
+    end
+end
+
+function earth_rock.create_visual(state)
+    if not state or not ParticleManager or not ParticleManager.CreateParticle then
+        return false
+    end
+    local visual_ok, visual_error = pcall(function()
+        state.visual_particle = ParticleManager:CreateParticle(
+            earth_rock.visual_particle,
+            PATTACH_WORLDORIGIN,
+            state.context.attacker
+        )
+        ParticleManager:SetParticleControl(state.visual_particle, 0, state.origin)
+        ParticleManager:SetParticleControl(state.visual_particle, 1, state.velocity)
+        ParticleManager:SetParticleControl(
+            state.visual_particle, 2, Vector(state.duration, 0, 0)
+        )
+    end)
+    if not visual_ok then
+        earth_rock.destroy_visual(state)
+        print("[HeroPassiveSkill] earth rock rolling visual failed: "
+            .. tostring(visual_error))
+        return false
+    end
+    return true
+end
+
 function earth_rock.release(projectile_id, show_visual)
     local state = earth_rock.projectiles[projectile_id]
     if not state then return end
     earth_rock.projectiles[projectile_id] = nil
+    earth_rock.destroy_visual(state)
     if show_visual then
         earth_rock.explosion_visual(state.context, state.destination)
+    end
+end
+
+function earth_rock.clear()
+    for projectile_id, _ in pairs(earth_rock.projectiles) do
+        earth_rock.release(projectile_id, false)
     end
 end
 
@@ -2063,7 +2099,10 @@ local function run_earth(context, definition)
     earth_rock.projectiles[projectile_id] = {
         ability = ability,
         context = context,
+        origin = origin,
         destination = destination,
+        velocity = direction * speed,
+        duration = distance / speed,
         damage_multiplier = level_value(definition, "damage_multiplier", context.level),
         stunned_damage_multiplier = level_value(
             definition, "stunned_damage_multiplier", context.level
@@ -2080,7 +2119,6 @@ local function run_earth(context, definition)
     }
     ProjectileManager:CreateLinearProjectile({
         Ability = ability,
-        EffectName = earth_rock.particle,
         Source = context.attacker,
         vSpawnOrigin = origin,
         vVelocity = direction * speed,
@@ -2094,6 +2132,7 @@ local function run_earth(context, definition)
         bProvidesVision = false,
         ExtraData = { earth_rock_projectile_id = projectile_id },
     })
+    earth_rock.create_visual(earth_rock.projectiles[projectile_id])
     scheduler.after(distance / speed + earth_rock.cleanup_grace, function()
         earth_rock.release(projectile_id, true)
     end)
@@ -2491,19 +2530,16 @@ local function run_arcane(context, definition)
     local function impact(landing_position)
         if valid(context.attacker) then
             local visual_ok, visual_error = pcall(function()
-                local explosion = ParticleManager:CreateParticle(
-                    ARCANE_EXPLOSION_PARTICLE,
+                local flare = ParticleManager:CreateParticle(
+                    ARCANE_MYSTIC_FLARE_PARTICLE,
                     PATTACH_WORLDORIGIN,
                     context.attacker
                 )
-                ParticleManager:SetParticleControl(explosion, 0, landing_position)
-                ParticleManager:SetParticleControl(
-                    explosion, 1, Vector(explosion_radius, 0, 0)
-                )
-                ParticleManager:ReleaseParticleIndex(explosion)
+                ParticleManager:SetParticleControl(flare, 0, landing_position)
+                ParticleManager:ReleaseParticleIndex(flare)
             end)
             if not visual_ok then
-                print("[HeroPassiveSkill] arcane barrage explosion failed: "
+                print("[HeroPassiveSkill] arcane barrage mystic flare visual failed: "
                     .. tostring(visual_error))
             end
 
@@ -3112,6 +3148,7 @@ local function tornado_spawn_small(parent, target)
             TORNADO_PARTICLE, PATTACH_WORLDORIGIN, state.context.attacker
         )
         ParticleManager:SetParticleControl(state.particle, 0, state.position)
+        ParticleManager:SetParticleControl(state.particle, 3, state.position)
     end)
     if not visual_ok then
         state.particle = nil
@@ -3209,6 +3246,7 @@ local function sync_tornadoes()
             end
             if state.particle then
                 ParticleManager:SetParticleControl(state.particle, 0, state.position)
+                ParticleManager:SetParticleControl(state.particle, 3, state.position)
             end
             if state.area_slow_pct > 0 then
                 for _, target in ipairs(enemies_touching_radius(
@@ -3311,6 +3349,7 @@ local function run_void(context, definition)
             TORNADO_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
         )
         ParticleManager:SetParticleControl(state.particle, 0, state.position)
+        ParticleManager:SetParticleControl(state.particle, 3, state.position)
     end)
     if not visual_ok then
         state.particle = nil
@@ -3485,6 +3524,7 @@ end
 function M.init()
     definitions.validate()
     echo_slash.clear()
+    earth_rock.clear()
     clear_flame_burns()
     clear_moving_ice_balls()
     clear_poison_clouds()
@@ -3594,6 +3634,9 @@ M._test = {
     echo_slash_clear = echo_slash.clear,
     echo_slash_projectile_hit = echo_slash.projectile_hit,
     earth_rock_projectiles = function() return earth_rock.projectiles end,
+    earth_rock_create_visual = earth_rock.create_visual,
+    earth_rock_release = earth_rock.release,
+    earth_rock_clear = earth_rock.clear,
     earth_rock_projectile_hit = earth_rock.projectile_hit,
     active_tornadoes = function() return active_tornadoes end,
     sync_tornadoes = sync_tornadoes,

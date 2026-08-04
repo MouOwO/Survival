@@ -69,6 +69,19 @@
 - 环境记录：配置中的`C:\Program Files\lua\bin`失效，本次实际使用MSYS2的Lua/Luac 5.1.5。全量生成被既有无关`item_definitions.csv`数字列错误阻断，目标英雄配置改用同一生成器函数定向生成并逐字节比较通过。
 - 尚未实机验证：实际攻击距离、D/F/T最终按键、闪烁边界/视觉、真实物品拾取、满包、防复制、Undying外观和重生后NO_ATTACK。执行前已有未跟踪测试文件及`卡的文本.txt`均未修改。
 
+## 2026-08-03 — 地裂冲击卡尔陨石滚动视觉获批实施
+
+- 用户明确重新开启三选一公共技能`proto_earth_line`，要求增加卡尔混沌陨石落地后向前滚动的视觉；批准用该视觉替换当前Tiny岩石移动外观，不叠加双模型。
+- 本机Valve content源码确认`invoker_chaos_meteor.vpcf`通过CP1初始化速度、`C_OP_BasicMovement`移动、CP3跟随主体并贴地；`invoker_chaos_meteor_fly.vpcf`是坠落段，不用于本任务。
+- 实施边界：独立卡尔父粒子只负责表现，无视觉线性投射物继续唯一负责碰撞和伤害；CP0为触发起点，CP1为固定方向×500；终点和兜底立即销毁父粒子并保留既有无伤害爆炸。全部数值、穿透、去重、眩晕和LV5范围伤害不变。
+- 当前生产服务顶层local为199，新增实现只能挂到既有`earth_rock`表。文档所列旧地裂专项测试文件当前不存在，本轮需补建真实可运行的视觉状态与契约测试。
+- 实施中进一步核对Valve源发现完整`invoker_chaos_meteor.vpcf`主载体寿命固定为0.2秒，速度500时只覆盖约100码，单次直接创建无法覆盖地裂路径。方案调整为项目滚动父粒子：保留Valve模型、CP1速度、贴地、旋转及滚动火焰/拖尾/烟尘，CP2.x提供整段真实飞行时长，并排除land ring/soil/debris/fireball等落地瞬时冲击，避免每100码重播落地爆炸。
+- 最终生产实现使用`particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf`；content源由当前Valve父资源最小化派生，移除屏幕震动、crumble、全部land冲击和坠落辉光，只保留陨石模型、fire/glow/ray/fire trail/smoke/burnt/light。Resource Compiler强制定向编译结果为`OK: 1 compiled, 0 failed, 0 skipped`，game产物存在。
+- 线性投射物移除`EffectName`后继续唯一负责碰撞、穿透、去重和伤害；独立视觉状态保存CP0起点、CP1固定方向×500、CP2.x=`distance/speed`。正常终点、1.25秒兜底、服务重置和局部创建失败均幂等销毁释放；正常/兜底保留既有终点无伤害爆炸，重置不播放爆炸。
+- 新建`scripts/vscripts/tests/test_earth_line_visual.lua`和`tools/test_earth_line_visual_contract.ps1`。结果：`EARTH_LINE_VISUAL_STATE_PASS`、`EARTH_LINE_VISUAL_CONTRACT_PASS`、当前Lua/Luac 5.4.5语法、严格UTF-8、主服务199个顶层local和限定`git diff --check`通过。状态测试包含两个并行实例及视觉API异常隔离。
+- 相邻回音重斩、陨石坠落、元气弹状态测试及回音重斩、脉冲激射、魔法弹弓、陨石坠落、元气弹视觉契约通过。移动冰球契约因本轮前已有的旧基础弹体常量报`MOVING_ICE_BALL_OLD_PROJECTILE_REMAINS`；地裂差异没有触碰该区域，未为迁就无关旧断言修改生产代码。
+- 当前环境只有Lua/Luac 5.4.5，文档中的历史Lua 5.1路径不存在，因此不宣称本轮Lua 5.1已执行。尚待完全重启Workshop Tools Run验收实际尺寸、贴地高度、方向、500速度同步、完整路径连续、终点残留和并行观感。
+
 ## 2026-08-03 — 资源树第二轮实机修复：DamageFilter缺少类别字段
 
 - 用户确认第一轮移除树Modifier类别二次过滤后，伐木工仍只加木材、不扣树生命。
@@ -1737,3 +1750,13 @@
 - 新增专项 PowerShell 契约和 Lua 5.1 行为测试；生成逐字节一致、专项契约、Lv.1/Lv.19/Lv.23 四项行为、独立英雄攻击科技共存、Lua 5.1 语法、生成科技减甲回归、严格 UTF-8 与限定 `git diff --check` 全部通过。
 - 自动验证不等于 Workshop Tools 实机验证。下一步冷启动购买科技，确认 Tooltip、已有塔/英雄即时刷新、攻击数值与实际暴击率；未经用户确认不记录为验收完成。
 - 未回滚或清理工作区其他既有修改；仅删除本轮 Python 生成的 `tools/__pycache__` 副产物。
+
+## 2026-08-04 - 奥术弹幕增加天怒法师秘奥耀光落击特效
+
+- 用户要求为三选一技能`proto_arcane_barrage`/“奥术弹幕·被动”增加天怒法师大招特效。调查本机Dota content确认`skywrath_mage_mystic_flare_ambient.vpcf`会在内部自行随机落击，无法与Lua既有权威随机伤害点逐颗对应，因此未接入该持续ambient父粒子。
+- 最终采用单次原版落击`particles/units/heroes/hero_skywrath_mage/skywrath_mage_mystic_flare.vpcf`替换奥术弹幕旧基础爆炸。每颗仍以`PATTACH_WORLDORIGIN`创建，CP0写入既有`landing_position`后释放索引；视觉异常继续由`pcall`隔离，不影响同颗伤害和后续飞弹。
+- 只等量重命名现有顶层粒子常量，没有新增顶层local，避免触碰公共被动服务历史199-local边界。启动预缓存新增秘奥耀光资源；`basic_explosion.vpcf`预缓存继续保留，因为毒云死亡爆炸仍独立使用该资源。
+- 战斗行为保持：随机落点、LV1/2的5颗、LV3/4的7颗、LV5三轮共21颗、单顺序Scheduler、150伤害范围、实际Hull边缘命中、全属性×2纯粹伤害、活动锁和兜底释放均未修改。
+- 新增`tools/test_arcane_barrage_visual_contract.ps1`，锁定秘奥耀光常量与预缓存、每颗CP0权威落点、索引释放、排除ambient随机父粒子、移除旧基础爆炸CP1，以及5/7/21颗、150范围和顺序调度契约。验证通过：`ARCANE_BARRAGE_VISUAL_CONTRACT_PASS`、`hero_passive_skill_service.lua`与`addon_game_mode.lua`的Lua 5.4.5语法、严格UTF-8和限定`git diff --check`。
+- 环境限制：当前PATH只有Lua/Luac 5.4.5；历史`.cline/local-toolchain.json`中的Lua 5.1路径及历史统一语法脚本均已不存在，因此未宣称本轮Lua 5.1执行。额外毒云视觉契约失败于既有`POISON_CLOUD_PERSISTENT_VISUAL_CREATION_MISSING`陈旧断言，本轮未修改毒云运行区段或为通过无关测试改变生产行为。
+- 尚待实机：完全停止并重新Run Workshop Tools，逐级触发奥术弹幕，确认天怒落击尺寸、亮度、落点与伤害中心一致，LV5连续21颗完整且无明显帧时间问题。

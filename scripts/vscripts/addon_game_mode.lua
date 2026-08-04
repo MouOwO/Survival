@@ -532,6 +532,11 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
+        "particles/units/heroes/hero_skywrath_mage/skywrath_mage_mystic_flare.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
         "particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf",
         context
     )
@@ -592,7 +597,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_tiny/tiny_base_attack.vpcf",
+        "particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf",
         context
     )
     PrecacheResource(
@@ -627,7 +632,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_kez/kez_katana_echo_strike.vpcf",
+        "particles/survival_echo_slash/survival_echo_slash_follow.vpcf",
         context
     )
     PrecacheResource(
