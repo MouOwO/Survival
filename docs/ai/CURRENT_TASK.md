@@ -600,3 +600,11 @@
 - 项目落棍粒子已加入`addon_game_mode.lua`预缓存。Resource Compiler强制定向编译为`OK: 1 compiled, 0 failed, 0 skipped`；编译DATA和依赖检查确认0.14秒寿命、CP2速度、基础移动、模型渲染、Valve模型/材质且无Children。
 - 更新专项状态与静态/资源契约。验证通过：`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、目标Lua/Luac 5.4.5语法、严格UTF-8/末尾换行/尾随空白及限定`git diff --check`。历史Lua 5.1路径不存在，不宣称Lua 5.1验证。
 - 尚待完全停止并重新Run Workshop Tools实机验收：确认800高度、0.14秒速度、棍体比例/材质/俯仰、八方向、坡地、本体/分身、连续并行、空中棍与地面棍衔接、落地帧伤害和结束无残留。自动测试不能证明粒子最终姿态与手感。
+
+### 落棍力量感优化（2026-08-04）
+
+- 用户实机反馈0.14秒匀速砸棍过快，希望增加下砸过程并强调力量感；用户批准采用更利落的0.28秒加速重砸方案，而不是单纯延长匀速慢放。
+- 落棍高度由800提高到1000，总时长由0.14秒提高到0.28秒，CP2初始向下速度改为350；项目VPCF的`C_OP_BasicMovement`增加Z轴`-23010`加速度。理论0.28秒位移为999.992、末速度约6793，形成前段可辨认、中后段持续加速、末段高速撞地的运动曲线。
+- 完整地面棒击、落地重扫和伤害继续与落棍结束同步，故用户已批准的伤害延迟由约0.14秒调整为约0.28秒。触发时固定1200×200几何、落地帧目标重扫、属性快照、当前最大生命、共享3次计数以及全部概率/范围/倍率均未改变。
+- 更新专项状态和资源契约，锁定1000高度、0.28秒、350初速、负Z加速度、运动方程与大于6700的末速度。Resource Compiler强制编译为`OK: 1 compiled, 0 failed, 0 skipped`；编译DATA确认新寿命、CP2、负Z加速度和Valve模型。
+- 验证通过：`MONKEY_KING_STAFF_DROP_ACCELERATED_DATA_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`及目标Lua/Luac 5.4.5语法。仍需Workshop Tools冷启动确认加速曲线、力量感、调度帧衔接、八方向、坡地、本体/分身、并行与无残留。

@@ -1852,6 +1852,14 @@
 - 更新`tools/test_monkey_king_boundless_visual.lua`和`tools/test_monkey_king_boundless_visual_contract.ps1`，覆盖延迟前无伤害、落地重扫、走入/走出、固定几何、属性快照、落地最大生命、共享3次计数、本体/分身、并行、视觉失败、攻击者失效、重置与迟到回调。`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、Lua/Luac 5.4.5语法、严格UTF-8/末尾换行/尾随空白及限定`git diff --check`通过；历史Lua 5.1路径不存在。
 - 尚待Workshop Tools冷启动实机验收800高度、0.14秒手感、模型比例/材质/俯仰、八方向、坡地、本体/分身、并行衔接、落地帧伤害与无残留。自动测试和资源编译不能替代引擎最终画面。
 
+## 2026-08-04 - 齐天大圣落棍力量感优化
+
+- 用户反馈0.14秒匀速落棍过快，要求增加下砸动画过程并强调力量；批准选择0.28秒的利落加速方案。没有采用单纯降低匀速的慢动作方案。
+- 生产常量改为1000高度、0.28秒总时长和350初始向下速度；VPCF寿命同步改为0.28秒，`C_OP_BasicMovement`增加`m_Gravity = [ 0.0, 0.0, -23010.0 ]`。运动方程在0.28秒下降999.992单位，理论末速度约6793，前段较慢而末段快于旧匀速方案。
+- 地面棒击与权威伤害继续在落棍结束时同步，因此延迟由约0.14秒改为约0.28秒。原固定1200×200几何、落地目标重扫、全属性触发快照、目标落地当前最大生命、10%概率、全属性×30、最大生命10%、共享3次计数和纯粹伤害均未修改。
+- 专项状态测试改为断言1000高度、350初速和0.28秒任务；静态/资源契约新增负Z加速度、精确位移和末速度下限。Resource Compiler强制定向编译为`OK: 1 compiled, 0 failed, 0 skipped`，编译DATA检查输出`MONKEY_KING_STAFF_DROP_ACCELERATED_DATA_PASS`。
+- 当前验证通过：`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`和目标Lua/Luac 5.4.5语法。仍待Workshop Tools冷启动实机判断0.28秒曲线是否有足够力量感，以及粒子寿命与0.05秒调度检查周期之间的落地衔接是否可见空档。
+
 ## 2026-08-04 - 科技研究进度数字移除与完成时序事务化
 
 - 用户目标：移除科技研究径向进度条中央的`2 → 0`秒数，并修正旧流程“点击后立即升级/生效，却延迟显示完成”的时序；研究必须真正经过2秒，结束后才升级、生效并提示完成。

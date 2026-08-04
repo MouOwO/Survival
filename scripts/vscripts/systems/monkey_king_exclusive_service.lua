@@ -15,8 +15,9 @@ local BOUNDLESS_PARTICLE =
     "particles/units/heroes/hero_monkey_king/monkey_king_strike.vpcf"
 local STAFF_DROP_PARTICLE =
     "particles/survival_monkey_king/survival_monkey_king_staff_drop.vpcf"
-local STAFF_DROP_HEIGHT = 800
-local STAFF_DROP_DURATION = 0.14
+local STAFF_DROP_HEIGHT = 1000
+local STAFF_DROP_DURATION = 0.28
+local STAFF_DROP_INITIAL_SPEED = 350
 
 local q_health_hits_by_player = {}
 local q_impacts = {}
@@ -219,7 +220,7 @@ local function play_staff_drop(attacker, origin, direction, length)
         )
         ParticleManager:SetParticleControl(
             particle, 2,
-            Vector(0, 0, -STAFF_DROP_HEIGHT / STAFF_DROP_DURATION)
+            Vector(0, 0, -STAFF_DROP_INITIAL_SPEED)
         )
     end)
     if visual_ok then return particle end
