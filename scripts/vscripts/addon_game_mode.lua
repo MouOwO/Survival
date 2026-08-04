@@ -655,6 +655,11 @@ function M.precache(context)
         "particles/units/heroes/hero_monkey_king/monkey_king_strike.vpcf",
         context
     )
+    PrecacheResource(
+        "particle",
+        "particles/survival_monkey_king/survival_monkey_king_staff_drop.vpcf",
+        context
+    )
     local precached_buff_particles = {}
     for _, row in ipairs(buff_definitions.rows or {}) do
         local particle = row.enabled ~= false and row.particle_name or nil

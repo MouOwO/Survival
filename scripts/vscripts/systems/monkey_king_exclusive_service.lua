@@ -13,8 +13,14 @@ local Q_ABILITY = "ability_survival_monkey_king_exclusive"
 local E_ABILITY = "ability_survival_monkey_king_swiftness"
 local BOUNDLESS_PARTICLE =
     "particles/units/heroes/hero_monkey_king/monkey_king_strike.vpcf"
+local STAFF_DROP_PARTICLE =
+    "particles/survival_monkey_king/survival_monkey_king_staff_drop.vpcf"
+local STAFF_DROP_HEIGHT = 800
+local STAFF_DROP_DURATION = 0.14
 
 local q_health_hits_by_player = {}
+local q_impacts = {}
+local q_impact_sequence = 0
 local state_by_player = {}
 local wall_by_player = {}
 local damage_sequence = 0
@@ -148,20 +154,131 @@ local function deal(player_id, attacker, victim, ability_name, amount, source)
     })
 end
 
-local function play_boundless_visual(attacker, origin, endpoint)
-    if not ParticleManager or not ParticleManager.CreateParticle then return end
-    local particle = ParticleManager:CreateParticle(
-        BOUNDLESS_PARTICLE, PATTACH_WORLDORIGIN, attacker
-    )
-    ParticleManager:SetParticleControl(particle, 0, origin)
-    ParticleManager:SetParticleControl(particle, 1, endpoint)
-    ParticleManager:SetParticleControl(particle, 2, endpoint)
-    ParticleManager:ReleaseParticleIndex(particle)
+local function play_boundless_visual(attacker, origin, endpoint, direction)
+    if not ParticleManager or not ParticleManager.CreateParticle then return false end
+    local particle = nil
+    local visual_ok = pcall(function()
+        local visual_origin = GetGroundPosition
+            and GetGroundPosition(origin, attacker) or origin
+        local visual_endpoint = GetGroundPosition
+            and GetGroundPosition(endpoint, attacker) or endpoint
+        particle = ParticleManager:CreateParticle(
+            BOUNDLESS_PARTICLE, PATTACH_WORLDORIGIN, attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, visual_origin)
+        ParticleManager:SetParticleControlForward(particle, 0, direction)
+        ParticleManager:SetParticleControl(particle, 1, visual_endpoint)
+        ParticleManager:SetParticleControl(particle, 2, visual_endpoint)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if visual_ok then return true end
+    if particle ~= nil then
+        if ParticleManager.DestroyParticle then
+            pcall(function()
+                ParticleManager:DestroyParticle(particle, true)
+            end)
+        end
+        if ParticleManager.ReleaseParticleIndex then
+            pcall(function()
+                ParticleManager:ReleaseParticleIndex(particle)
+            end)
+        end
+    end
+    return false
+end
+
+local function destroy_particle(particle)
+    if particle == nil or not ParticleManager then return end
+    if ParticleManager.DestroyParticle then
+        pcall(function()
+            ParticleManager:DestroyParticle(particle, true)
+        end)
+    end
+    if ParticleManager.ReleaseParticleIndex then
+        pcall(function()
+            ParticleManager:ReleaseParticleIndex(particle)
+        end)
+    end
+end
+
+local function play_staff_drop(attacker, origin, direction, length)
+    if not ParticleManager or not ParticleManager.CreateParticle then return nil end
+    local particle = nil
+    local visual_ok = pcall(function()
+        local center = origin + direction * (length * 0.5)
+        local ground_center = GetGroundPosition
+            and GetGroundPosition(center, attacker) or center
+        local start_position = ground_center + Vector(0, 0, STAFF_DROP_HEIGHT)
+        particle = ParticleManager:CreateParticle(
+            STAFF_DROP_PARTICLE, PATTACH_WORLDORIGIN, attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, start_position)
+        ParticleManager:SetParticleControlForward(particle, 0, direction)
+        ParticleManager:SetParticleControl(
+            particle, 1, start_position + direction * length
+        )
+        ParticleManager:SetParticleControl(
+            particle, 2,
+            Vector(0, 0, -STAFF_DROP_HEIGHT / STAFF_DROP_DURATION)
+        )
+    end)
+    if visual_ok then return particle end
+    destroy_particle(particle)
+    return nil
 end
 
 local function health_hit_count(player_id, target)
     q_health_hits_by_player[player_id] = q_health_hits_by_player[player_id] or {}
     return q_health_hits_by_player[player_id], tostring(target:entindex())
+end
+
+local function resolve_q_impact(impact_id)
+    local impact = q_impacts[impact_id]
+    if not impact then return false end
+    q_impacts[impact_id] = nil
+    impact.task = nil
+    destroy_particle(impact.drop_particle)
+    impact.drop_particle = nil
+
+    if not valid(impact.attacker) then return false end
+    play_boundless_visual(
+        impact.attacker, impact.origin, impact.endpoint, impact.direction
+    )
+    for _, enemy in ipairs(line_targets(
+            impact.attacker, impact.origin, impact.direction,
+            impact.length, impact.total_width)) do
+        local counts, key = health_hit_count(impact.player_id, enemy)
+        local count = tonumber(counts[key]) or 0
+        local health_damage = 0
+        if count < impact.health_hit_limit then
+            health_damage = math.max(0, tonumber(enemy:GetMaxHealth()) or 0)
+                * impact.max_health_pct / 100
+            counts[key] = count + 1
+        end
+        local result = deal(
+            impact.player_id, impact.attacker, enemy, Q_ABILITY,
+            impact.attribute_damage + health_damage, "q"
+        )
+        if health_damage > 0 and (not result or result.success ~= true) then
+            counts[key] = count
+        end
+    end
+    return false
+end
+
+local function clear_q_impacts()
+    local impact_ids = {}
+    for impact_id, _ in pairs(q_impacts) do
+        impact_ids[#impact_ids + 1] = impact_id
+    end
+    for _, impact_id in ipairs(impact_ids) do
+        local impact = q_impacts[impact_id]
+        q_impacts[impact_id] = nil
+        if impact then
+            if impact.task then scheduler.cancel(impact.task) end
+            destroy_particle(impact.drop_particle)
+        end
+    end
 end
 
 local function trigger_q(player_id, attacker, target)
@@ -177,30 +294,31 @@ local function trigger_q(player_id, attacker, target)
     )
     local length = math.max(0, tonumber(row.q_length) or 0)
     local total_width = math.max(0, tonumber(row.q_total_width) or 0)
-    play_boundless_visual(attacker, origin, origin + direction * length)
-
     local attribute_damage = all_attributes(player_id)
         * math.max(0, tonumber(row.q_attribute_multiplier) or 0)
     local limit = math.max(0,
         math.floor(tonumber(row.q_max_health_hit_limit) or 0))
-    for _, enemy in ipairs(line_targets(
-            attacker, origin, direction, length, total_width)) do
-        local counts, key = health_hit_count(player_id, enemy)
-        local count = tonumber(counts[key]) or 0
-        local health_damage = 0
-        if count < limit then
-            health_damage = math.max(0, tonumber(enemy:GetMaxHealth()) or 0)
-                * math.max(0, tonumber(row.q_max_health_pct) or 0) / 100
-            counts[key] = count + 1
-        end
-        local result = deal(
-            player_id, attacker, enemy, Q_ABILITY,
-            attribute_damage + health_damage, "q"
-        )
-        if health_damage > 0 and (not result or result.success ~= true) then
-            counts[key] = count
-        end
-    end
+    q_impact_sequence = q_impact_sequence + 1
+    local impact_id = q_impact_sequence
+    local impact = {
+        player_id = player_id,
+        attacker = attacker,
+        origin = origin,
+        direction = direction,
+        endpoint = origin + direction * length,
+        length = length,
+        total_width = total_width,
+        attribute_damage = attribute_damage,
+        max_health_pct = math.max(0,
+            tonumber(row.q_max_health_pct) or 0),
+        health_hit_limit = limit,
+        drop_particle = play_staff_drop(attacker, origin, direction, length),
+        task = nil,
+    }
+    q_impacts[impact_id] = impact
+    impact.task = scheduler.after(STAFF_DROP_DURATION, function()
+        return resolve_q_impact(impact_id)
+    end, "monkey_q_impact_" .. tostring(impact_id))
     return true
 end
 
@@ -442,7 +560,10 @@ local function sync_all_clones()
 end
 
 function M.init()
+    clear_q_impacts()
     q_health_hits_by_player = {}
+    q_impacts = {}
+    q_impact_sequence = 0
     state_by_player = {}
     wall_by_player = {}
     damage_sequence = 0
@@ -467,9 +588,14 @@ function M.trigger_clone_q(player_id, attacker, target)
 end
 M._test = {
     line_targets = line_targets,
+    play_boundless_visual = play_boundless_visual,
+    play_staff_drop = play_staff_drop,
+    resolve_q_impact = resolve_q_impact,
+    trigger_q = trigger_q,
     health_hits = function() return q_health_hits_by_player end,
     trigger_e = trigger_e,
     on_final_critical_attack_damage = on_final_critical_attack_damage,
+    impacts = function() return q_impacts end,
 }
 
 return M
