@@ -4,6 +4,7 @@
 
 ## 当前状态
 
+- 当前最高优先级任务：祭坛召唤按钮修复已完成代码和自动验证，等待Workshop Tools冷启动实机确认。根因是creature祭坛动态Lua Ability经`CastAbilityNoTarget()`不可靠进入`OnSpellStart`，而服务端直接权威分发遗漏`ability_summon_*`；现复用既有Ability→hero_id映射直达`HERO_SUMMON_REQUEST`，客户端也显式托管召唤/旅行按钮。下一步选中祭坛点击免费英雄，确认`SEND_NO_TARGET`、`ALTAR_SUMMON_DISPATCHED ... ok=true`及正式英雄替换。当前`custom_net_tables.txt`缺Builder身份表造成既有输入契约独立失败，不属于祭坛链。
 - 科技研究进度与完成时序修复已完成代码、专项测试和资源编译，当前等待Workshop Tools冷启动实机验收：开始时服务端校验并立即扣费，但2秒研究期内保持旧等级/旧效果；同队同时只能研究一项；进度卡只显示径向遮罩、不显示`2 → 0`数字；结束后才提交等级、重算效果并提示“已完成研究”。提交异常会恢复旧等级并退款，迟到/重复回调不能二次升级。旧`technology_cooldown_*`协议字段暂时保留，但语义已改为研究进度。下一步完全停止并重新Run Workshop Tools，逐项确认扣费、团队互斥、无数字进度、延迟生效和完成提示；未经用户实机确认不得记录为验收完成。
 - 用户已在 Workshop Tools 确认 Builder 当前可以正常建造，`builder_not_owned`、Grid 校验与建造提交主链视为实机通过；尚未据此推定城墙 Q 升级、完整 Q/W/E/R/T+D 或连续两次 Run 均已验收。6 个 Panorama 二进制生成物曾残留 Git `UU` stages，现已全部从当前 content JS 权威源强制重编译并精确暂存为 stage 0，未选择整仓 ours/theirs、未提交、未触碰其他既有修改。
 - Builder ownership/槽位/建筑选择最新补丁已完成自动验证：普通 creature 的业务身份改由 `builder_service` 注册实体和 `survival_player_id` 权威解析，Grid/Building/建筑 Ability 路由不再假设 `GetPlayerOwnerID()` 有效；CSV `slot_order` 显式映射五个建造槽 index `0..4`，Blink 独立 index `5`。Grid、建筑移动与托管 Ability 输入统一当前选择解析并拒绝跨选择 runtime owner。专项 Lua 5.1/契约/语法/UTF-8/限定 diff 通过，四个 Panorama JS 均强制编译成功。下一步冷启动 Workshop Tools 验证 Q Grid、建造提交、城墙控制与 Q 升级、最终 Q/W/E/R/T + D。

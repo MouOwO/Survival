@@ -1,5 +1,16 @@
 # Current Task
 
+## 活跃任务（2026-08-04）：祭坛召唤英雄按钮无法点击
+
+- 用户最新实机反馈：祭坛当前无法召唤英雄，表现为祭坛技能按钮无法点击；要求优先修复。
+- 当前仅确认 UI 输入症状，尚未确认断点位于祭坛 CSV/生成配置、Ability runtime 发布、Panorama 按钮接管、服务端祭坛动作路由或 `ReplaceHeroWithNoTransfer()`。调查必须从 `data/csv/商店系统/altar_actions.csv` 权威源开始，并沿生成配置、祭坛 Ability、runtime owner、统一 `SurvivalAbilityInput` 和英雄替换链逐段核对。
+- 修改边界：只修复祭坛召唤直接相关逻辑并补专项回归；保留当前 Builder、建筑 Grid、普通英雄 Ability 与科技研究行为，不清理两仓既有修改。
+- 已确认权威链：`altar_actions.csv::altar_select_hero`只描述选择语义，实际召唤规则来自`hero_summon_rules.csv`，六个英雄Ability来自`buildings_config.lua`和`hero_summon_projection.lua`映射。CSV/生成Lua、Ability KV、祭坛Ability列表均存在，不能通过给`altar_actions.csv`伪造Ability修复。
+- 静态根因：项目已经明确记录`npc_dota_creature`建筑的动态Lua Ability通过`CastAbilityNoTarget()`不可靠进入`OnSpellStart`，服务端路由已为塔、普通升级和金矿提供直接权威分发，但遗漏`ability_summon_*`，因此祭坛点击即使到达统一输入也可能只产生无效原生施法命令。
+- 当前修复：`hero_summon_projection`暴露现有Ability到hero_id反向查询；`ui_request_router`验证祭坛身份、Ability归属、玩家ownership和可施放状态后直接请求`HERO_SUMMON_REQUEST`，失败回滚冷却并通知；客户端显式将召唤和祭坛旅行Ability列为托管建筑动作，避免runtime短暂缺失时回退原生路径。专项契约与严格UTF-8通过，`combat_stats.js`单文件编译为`1 compiled, 0 failed, 0 skipped`，完整HUD链为`9 compiled, 0 failed, 0 skipped`。
+- 最终自动验证：`ALTAR_SUMMON_INPUT_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS/LUA51_PASS`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`、目标生产Lua的`ALTAR_LUAC51_PASS`、严格UTF-8和两仓限定`git diff --check`均通过。尚未称为实机验证；下一步完全Stop后Run，选中祭坛点击任一免费英雄，确认客户端`SEND_NO_TARGET`、服务端`ALTAR_SUMMON_DISPATCHED hero=<id> ok=true`、占位英雄替换和正式英雄选中。
+- 独立遗留：当前磁盘`scripts/custom_net_tables.txt`缺少`survival_builder_identity`，导致既有`test_ability_input_lifecycle_contract.ps1`在`BUILDER_IDENTITY_NETTABLE_UNDECLARED`失败；该表不参与祭坛召唤路由，本轮未把Builder NetTable修复混入当前任务。
+
 ## 活跃任务（2026-08-04）：Undying 建造者代理与祭坛英雄替换首版
 
 - 最新实机反馈：用户确认“现在可以正常建造”，因此 Builder 注册 ownership、Grid validate/commit 和 Building 创建主链已通过 Workshop Tools 实机验证。仍需用户后续按需要确认选中城墙 Q 是否稳定执行 `ability_upgrade_wall`、最终 Q/W/E/R/T+D 布局及连续第二次 Run 输入生命周期；这些未确认项不得写成已验收。

@@ -1,3 +1,11 @@
+# 2026-08-04 — 祭坛召唤英雄输入修复
+
+- 用户实机报告祭坛无法召唤英雄，表现为祭坛按钮无法点击。先核对CSV权威链：`altar_actions.csv`的`altar_select_hero`没有Ability字段且只描述选择语义；实际规则来自`hero_summon_rules.csv`，英雄按钮来自`buildings_config.lua`与`hero_summon_projection.lua`既有六英雄映射，CSV/生成Lua/KV均存在。
+- 根因定位到托管建筑无目标施法链：`ui_request_router.lua`已注明creature建筑动态Lua Ability经`CastAbilityNoTarget()`不可靠触发`OnSpellStart`，但直接权威分发只覆盖塔、普通升级和金矿，遗漏祭坛`ability_summon_*`。修复复用`hero_summon_projection.hero_id_for_summon_ability()`映射，验证祭坛身份、Ability归属、ownership及可施放状态后直接请求`HERO_SUMMON_REQUEST`；失败结束冷却并通知，成功继续现有`ReplaceHeroWithNoTransfer()`事务。
+- Panorama `managedBuildingAction()`显式纳入`ability_summon_*`和两个祭坛旅行Ability，防止runtime状态短暂缺失时回退不可靠的`Abilities.ExecuteAbility`。新增祭坛输入契约；首轮结果为`ALTAR_SUMMON_INPUT_CONTRACT_PASS`、严格UTF-8通过、`combat_stats.js`强制编译`1 compiled, 0 failed, 0 skipped`、完整HUD链`9 compiled, 0 failed, 0 skipped`。
+- 既有输入生命周期回归在`BUILDER_IDENTITY_NETTABLE_UNDECLARED`处失败，属于当前磁盘`custom_net_tables.txt`状态与此前摘要冲突，尚未为祭坛任务静默修改；其后的回归与Lua 5.1语法需拆开补跑。
+- 补跑结果：`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS/LUA51_PASS`、`FREE_HERO_REPLACEMENT_CONTRACT_PASS`和目标生产Lua的`ALTAR_LUAC51_PASS`通过；两仓限定`git diff --check`通过且无unmerged文件。祭坛补丁仍需Workshop Tools冷启动点击验证，自动检查不冒充实机。
+
 # 2026-08-04 — Panorama 输入生命周期与 Ability caster 统一修复
 
 - 用户实机确认 Builder 现在可以正常建造。该反馈确认了注册 Builder ownership、Grid 校验/提交和建筑创建主链；没有同时确认的城墙 Q 升级、完整快捷键布局与连续第二次 Run 仍保留为待验收项。

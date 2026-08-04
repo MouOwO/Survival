@@ -8,6 +8,7 @@ local research_events = require("research/research_event_names")
 local combat_stat_projection = require("ui/combat_stat_projection")
 local asset_catalog = require("config/asset_catalog")
 local armor_balance = require("config/armor_balance")
+local hero_summon_projection = require("systems/hero_summon_projection")
 
 local M = {}
 local synthesis_requests = {}
@@ -671,6 +672,11 @@ local function register_ability_cast_request()
         local gold_mine_action = gold_mine_actions[ability_name]
         local gold_mine_ability_matches = gold_mine_action and unit_valid
             and ability_valid and unit:FindAbilityByName(ability_name) == ability
+        local summon_hero_id = hero_summon_projection
+            .hero_id_for_summon_ability(ability_name)
+        local altar_summon_matches = summon_hero_id ~= nil and unit_valid
+            and ability_valid and unit.survival_building_id == "hero_altar"
+            and unit:FindAbilityByName(ability_name) == ability
         local handled_directly = false
         local direct_result_required = false
         local direct_result = nil
@@ -796,6 +802,42 @@ local function register_ability_cast_request()
             end
             print("[SURVIVAL_CAST][SERVER] GOLD_MINE_DISPATCHED action="
                 .. tostring(gold_mine_action) .. " ok=" .. tostring(succeeded)
+                .. " error=" .. tostring(message or ""))
+        elseif altar_summon_matches and owner_matches and not passive
+            and not is_point_target then
+            -- Creature-based altar abilities can accept an order without
+            -- reliably entering OnSpellStart. Dispatch the same authoritative
+            -- request used by hero_summon_ability_factory.
+            handled_directly = true
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden()
+                or not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "英雄召唤技能当前不可用" }
+            else
+                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+                direct_cooldown_started = true
+                direct_result, direct_error = event_bus.request(
+                    events.HERO_SUMMON_REQUEST,
+                    {
+                        player_id = player_id,
+                        hero_id = summon_hero_id,
+                        source = "altar_ui_ability",
+                    }
+                )
+            end
+            local succeeded = direct_result and direct_result.ok == true
+            local message = direct_result
+                and (direct_result.error or direct_result.message)
+                or direct_error
+            if message and message ~= "" then
+                event_bus.emit(events.UI_NOTIFICATION, {
+                    player_id = player_id,
+                    message = message,
+                    level = succeeded and "info" or "error",
+                })
+            end
+            print("[SURVIVAL_CAST][SERVER] ALTAR_SUMMON_DISPATCHED hero="
+                .. tostring(summon_hero_id) .. " ok=" .. tostring(succeeded)
                 .. " error=" .. tostring(message or ""))
         end
         if direct_result_required and direct_cooldown_started

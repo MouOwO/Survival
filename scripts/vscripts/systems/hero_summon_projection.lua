@@ -13,6 +13,11 @@ local SUMMON_ABILITIES = {
     hero_monkey_king = "ability_summon_monkey_king",
     hero_blademaster = "ability_summon_blademaster",
 }
+
+local HERO_BY_SUMMON_ABILITY = {}
+for hero_id, ability_name in pairs(SUMMON_ABILITIES) do
+    HERO_BY_SUMMON_ABILITY[ability_name] = hero_id
+end
 local TRAVEL_ABILITIES = {
     "ability_enter_endless_training",
     "ability_enter_shadow_realm",
@@ -48,6 +53,10 @@ function M.entitlements(player_id)
         vip = 0,
         values = {},
     }
+end
+
+function M.hero_id_for_summon_ability(ability_name)
+    return HERO_BY_SUMMON_ABILITY[tostring(ability_name or "")]
 end
 
 local function option(definition, entitlement)
