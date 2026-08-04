@@ -1787,3 +1787,21 @@
 - 新增`tools/test_arcane_barrage_visual_contract.ps1`，锁定秘奥耀光常量与预缓存、每颗CP0权威落点、索引释放、排除ambient随机父粒子、移除旧基础爆炸CP1，以及5/7/21颗、150范围和顺序调度契约。验证通过：`ARCANE_BARRAGE_VISUAL_CONTRACT_PASS`、`hero_passive_skill_service.lua`与`addon_game_mode.lua`的Lua 5.4.5语法、严格UTF-8和限定`git diff --check`。
 - 环境限制：当前PATH只有Lua/Luac 5.4.5；历史`.cline/local-toolchain.json`中的Lua 5.1路径及历史统一语法脚本均已不存在，因此未宣称本轮Lua 5.1执行。额外毒云视觉契约失败于既有`POISON_CLOUD_PERSISTENT_VISUAL_CREATION_MISSING`陈旧断言，本轮未修改毒云运行区段或为通过无关测试改变生产行为。
 - 尚待实机：完全停止并重新Run Workshop Tools，逐级触发奥术弹幕，确认天怒落击尺寸、亮度、落点与伤害中心一致，LV5连续21颗完整且无明显帧时间问题。
+
+## 2026-08-04 - 齐天大圣棍式棒击大地视觉对齐修复
+
+- 用户实机反馈专属Q“棍式”的砸棍主体偏离地面特效。根因收敛到`monkey_king_exclusive_service.lua`的原版`monkey_king_strike.vpcf`控制点：旧实现只写CP0起点、CP1/CP2终点，未向世界原点附着粒子的CP0写入权威攻击方向，导致依赖朝向的砸棍子效果可能与依赖端点的地面线效分离。
+- 修复后Q触发时的同一`origin/direction/length`同时传给视觉和既有Lua矩形。视觉CP0与CP1/CP2分别贴合起终点地面Z，X/Y不加固定偏移；CP0 Forward明确设置为归一化水平攻击方向。目标与英雄同位置时继续使用英雄Forward兜底；本体与分身仍统一进入`trigger_q()`。
+- 战斗逻辑未改：10%概率、1200×200矩形、全属性×30、最大生命10%、每目标最多3次共享计数、纯粹伤害事务及原版粒子预缓存保持原值。粒子创建/控制点异常现在被隔离，失败粒子立即销毁并释放，不阻止权威伤害继续结算。
+- 新增可追踪的`tools/test_monkey_king_boundless_visual.lua`状态测试及PowerShell契约。验证通过：`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、目标Lua/Luac 5.4.5语法、任务代码与测试严格UTF-8及限定`git diff --check`；本新增段无`U+FFFD`，未改写`SESSION_LOG.md`已知的3个历史替换字符。`scripts/vscripts/tests/*`受`.gitignore`排除，因此状态测试已迁移到`tools`而未修改忽略规则。
+- 当前环境只有Lua/Luac 5.4.5，四个历史Lua 5.1绝对路径均不存在，未宣称Lua 5.1验证。尚待Workshop Tools冷启动实机检查八方向、坡地、本体/分身、连续触发和粒子残留；若CP0 Forward后仍有固定模型内部偏移，下一阶段应检查并包装VPCF，而不是加入方向相关的经验偏移。
+
+## 2026-08-04 - 齐天大圣棍式新增快速空中落棍
+
+- 用户确认原棒击主体与地面效果偏离已修复，并批准完整同步时序：Q触发后先播放0.14秒空中落棍，落地帧再播放现有完整棒击大地粒子并结算；命中名单在落地帧按触发时固定的1200×200矩形重新扫描，允许走出躲避和走入受击。
+- 本机Valve content源码确认`monkey_king_strike_cast_modelonly.vpcf`使用专用`models/props_items/monkey_king_bar01.vmdl`与`monkey_king_weapon_fx.vmat`。新增项目粒子`particles/survival_monkey_king/survival_monkey_king_staff_drop.vpcf`直接复用其模型、材质、局部偏移和姿态参数，新增单载体CP2垂直速度、`C_OP_BasicMovement`和固定0.14秒寿命；没有Children、地面冲击、震屏、碰撞或战斗逻辑。
+- 生产Q在触发时快照固定几何和全属性伤害，落棍从路径地面中点上方800高度下落。落地回调清理落棍并播放已对齐的原版地面效果，再扫描固定区域；最大生命部分使用落地目标当前最大生命。原10%概率、1200×200、全属性×30、最大生命10%、每目标最多3次共享计数和纯粹伤害数值保持，唯一明确战斗时序变化是用户批准的约0.14秒延迟。
+- 每次本体/分身触发使用独立impact ID和调度任务；视觉API异常不阻断权威落地结算，攻击者实体删除后取消，初始化会取消未落地任务并销毁释放活动粒子，迟到回调幂等。`addon_game_mode.lua`已预缓存项目粒子。
+- Resource Compiler两次强制定向编译均为`OK: 1 compiled, 0 failed, 0 skipped`；`resourceinfo`确认编译DATA包含0.14秒寿命、CP2速度、基础移动、模型渲染和Valve模型/材质，且无Children。
+- 更新`tools/test_monkey_king_boundless_visual.lua`和`tools/test_monkey_king_boundless_visual_contract.ps1`，覆盖延迟前无伤害、落地重扫、走入/走出、固定几何、属性快照、落地最大生命、共享3次计数、本体/分身、并行、视觉失败、攻击者失效、重置与迟到回调。`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、Lua/Luac 5.4.5语法、严格UTF-8/末尾换行/尾随空白及限定`git diff --check`通过；历史Lua 5.1路径不存在。
+- 尚待Workshop Tools冷启动实机验收800高度、0.14秒手感、模型比例/材质/俯仰、八方向、坡地、本体/分身、并行衔接、落地帧伤害与无残留。自动测试和资源编译不能替代引擎最终画面。

@@ -538,3 +538,23 @@
 - 只在当前内容基础上替换目标粒子常量和对应预缓存，不回滚、覆盖或顺带清理其他修改。
 - 完全重启 Workshop Tools Run，实机验证卡尔Chaos Meteor从空中坠落并在落地时消失、同点衔接术士Rain of Chaos纯爆炸且不出现地狱火单位、爆炸约3.1秒后无残留、Viper Nethertoxin熔岩继续存在、双陨石0.5秒落地间隔、500范围、3次跳伤、30%减速进入/离开和活动期间不重触发。
 - 自动契约、Lua模拟和语法检查不能证明Dota粒子的实际尺寸、颜色、落地手感或引擎最终扣血；只有用户明确确认后才能记录为实机验收完成。
+
+## 活跃任务（2026-08-04）：齐天大圣棍式棒击大地视觉对齐
+
+- 用户实机报告齐天大圣专属Q“棍式”的砸棍主体与地面特效没有重合。调查定位到`scripts/vscripts/systems/monkey_king_exclusive_service.lua`：原版`monkey_king_strike.vpcf`只收到CP0起点及CP1/CP2终点，没有收到本次Q权威方向对应的CP0 Forward；视觉和Lua矩形虽共用端点，但砸棍子效果缺少可靠朝向。
+- 已实施最小视觉修复：同一次Q触发计算的`origin/direction/length`同时驱动视觉和Lua矩形；视觉CP0、CP1、CP2只对Z使用`GetGroundPosition`贴地，X/Y保持权威起终点；CP0通过`SetParticleControlForward`写入归一化水平攻击方向。本体与分身继续共用同一个`trigger_q()`路径。
+- 战斗边界不变：10%触发、1200长度、200总宽、全属性×30纯粹伤害、10%最大生命纯粹伤害、每目标最多3次共享计数和Lua矩形判定均未修改；没有把粒子改为碰撞或伤害权威。
+- 视觉创建及控制点写入使用受保护调用。失败时立即销毁已创建粒子并尝试释放索引，视觉异常不会中断后续Q伤害事务。
+- 新增`tools/test_monkey_king_boundless_visual.lua`和`tools/test_monkey_king_boundless_visual_contract.ps1`。状态测试覆盖斜向CP0 Forward、起终点地面Z、1200路径、同位置时英雄Forward兜底、分身复用、粒子异常清理及伤害继续；静态契约锁定原版粒子与预缓存、同源视觉/伤害几何、原Q数值和Lua矩形。
+- 自动验证通过：`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、生产/测试/游戏模式Lua与Luac 5.4.5语法、任务代码与测试严格UTF-8及限定`git diff --check`。`SESSION_LOG.md`可严格UTF-8解码且本轮新增段无`U+FFFD`，未改写该文件已记录的3个历史替换字符。当前Lua 5.1历史路径均不存在，不宣称Lua 5.1验证。
+- 尚待完全停止并重新Run Workshop Tools实机验收：本体与分身在八个水平朝向、平地/坡面及连续触发时，确认砸棍主体、地面线效和1200×200实际命中方向重合，结束后无粒子残留。自动测试不能证明原版VPCF内部模型最终画面；若仍有固定内部偏移，再进入项目包装粒子阶段，不添加经验性世界坐标偏移。
+
+### 新增快速落棍动画（2026-08-04）
+
+- 用户确认原偏离问题已修复，并批准新增“极快棍体从半空砸向地面”的完整同步方案：先播放落棍，约0.14秒落地时再同时播放原版地面棒击并结算伤害；落地帧按触发时固定的1200×200矩形重新扫描，因此敌人可以走出躲避或走入受击。
+- 新增content源`particles/survival_monkey_king/survival_monkey_king_staff_drop.vpcf`及game编译产物。项目粒子派生自Valve `monkey_king_strike_cast_modelonly.vpcf`的模型表现参数，直接复用`models/props_items/monkey_king_bar01.vmdl`和金箍棒特效材质；单载体从路径地面中点上方800高度以CP2速度在0.14秒内下落，不含Children、地面冲击、震屏、碰撞或战斗逻辑。
+- `trigger_q()`现在在触发时快照固定`origin/direction/length/total_width`和全属性伤害，创建独立落棍实例；落地回调先清理落棍、播放当前已对齐的完整`monkey_king_strike.vpcf`，再按固定几何扫描。最大生命部分读取落地目标当前最大生命；10%触发、1200×200、全属性×30、最大生命10%、每目标最多3次共享计数和纯粹伤害数值均未改变，但结算时机按用户批准延后约0.14秒。
+- 本体与分身继续共用同一个`trigger_q()`；并行实例使用独立ID和任务。落棍或地面视觉失败均不阻断落地伤害；攻击者实体已删除时取消；服务重置会取消全部未落地任务、销毁释放活动落棍，迟到回调幂等。
+- 项目落棍粒子已加入`addon_game_mode.lua`预缓存。Resource Compiler强制定向编译为`OK: 1 compiled, 0 failed, 0 skipped`；编译DATA和依赖检查确认0.14秒寿命、CP2速度、基础移动、模型渲染、Valve模型/材质且无Children。
+- 更新专项状态与静态/资源契约。验证通过：`MONKEY_KING_BOUNDLESS_VISUAL_STATE_PASS`、`MONKEY_KING_BOUNDLESS_VISUAL_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、目标Lua/Luac 5.4.5语法、严格UTF-8/末尾换行/尾随空白及限定`git diff --check`。历史Lua 5.1路径不存在，不宣称Lua 5.1验证。
+- 尚待完全停止并重新Run Workshop Tools实机验收：确认800高度、0.14秒速度、棍体比例/材质/俯仰、八方向、坡地、本体/分身、连续并行、空中棍与地面棍衔接、落地帧伤害和结束无残留。自动测试不能证明粒子最终姿态与手感。
