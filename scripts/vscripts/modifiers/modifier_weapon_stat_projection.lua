@@ -178,7 +178,9 @@ function modifier_weapon_stat_projection.ShowFinalAttackDamage(
     local critical = state ~= nil and state ~= false
     local player = player_id ~= nil and player_id >= 0
         and PlayerResource:GetPlayer(player_id) or nil
-    local style = critical and OVERHEAD_ALERT_CRITICAL or OVERHEAD_ALERT_DAMAGE
+    local rounded_damage = math.max(1, math.floor(damage + 0.5))
+    local style = critical and OVERHEAD_ALERT_CRITICAL
+        or OVERHEAD_ALERT_BONUS_SPELL_DAMAGE
     diagnose_damage_number("show", {
         record = record,
         attacker = attacker:entindex(),
@@ -190,9 +192,36 @@ function modifier_weapon_stat_projection.ShowFinalAttackDamage(
         inflictor = params.inflictor,
         style = style,
     })
+    local secondary = modifier_weapon_attack_tracker
+        and modifier_weapon_attack_tracker.IsSecondaryAttackRecord
+        and modifier_weapon_attack_tracker.IsSecondaryAttackRecord(record)
+    if critical and not secondary then
+        event_bus.emit(events.HERO_FINAL_CRITICAL_ATTACK_DAMAGE, {
+            player_id = player_id,
+            attacker = attacker,
+            target = victim,
+            record = record,
+            final_damage = damage,
+            critical = true,
+            is_main_attack = true,
+        })
+    end
+    SendOverheadEventMessage(player, style, victim, rounded_damage, nil)
+    return true
+end
+
+function modifier_weapon_stat_projection.ShowFinalAbilityDamage(
+        player_id, attacker, victim, params)
+    if not IsServer() or not attacker or attacker:IsNull()
+        or not victim or victim:IsNull() or not params then return false end
+    local ability = params.inflictor
+    local damage = math.max(0, tonumber(params.damage) or 0)
+    if damage <= 0 or not ability or ability:IsNull() then return false end
+    local player = player_id ~= nil and player_id >= 0
+        and PlayerResource:GetPlayer(player_id) or nil
     SendOverheadEventMessage(
         player,
-        style,
+        OVERHEAD_ALERT_DAMAGE,
         victim,
         math.max(1, math.floor(damage + 0.5)),
         nil
@@ -237,6 +266,9 @@ function modifier_weapon_stat_projection:OnTakeDamage(params)
         or (tonumber(params.damage) or 0) <= 0 then return end
     if attacker == self:GetParent() then
         modifier_weapon_stat_projection.ShowFinalAttackDamage(
+            self.player_id, attacker, victim, params
+        )
+        modifier_weapon_stat_projection.ShowFinalAbilityDamage(
             self.player_id, attacker, victim, params
         )
     end

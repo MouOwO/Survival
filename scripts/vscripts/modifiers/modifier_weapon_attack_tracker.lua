@@ -97,13 +97,17 @@ function modifier_weapon_attack_tracker.ClearSecondaryAttackRecord(record)
     if record ~= nil then secondary_records[tostring(record)] = nil end
 end
 
+function modifier_weapon_attack_tracker.IsSecondaryAttackRecord(record)
+    return record ~= nil and secondary_records[tostring(record)] == true
+end
+
 local function is_secondary_attack(params, attacker)
     if params.is_multishot_secondary == true
         or params.is_multishot_secondary == 1 then
         return true
     end
     if attacker.survival_is_multishot_secondary == true then return true end
-    return params.record ~= nil and secondary_records[tostring(params.record)] == true
+    return modifier_weapon_attack_tracker.IsSecondaryAttackRecord(params.record)
 end
 
 function modifier_weapon_attack_tracker:OnAttackLanded(params)

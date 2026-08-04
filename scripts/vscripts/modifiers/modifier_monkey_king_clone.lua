@@ -58,6 +58,9 @@ function modifier_monkey_king_clone:OnTakeDamage(params)
     modifier_weapon_stat_projection.ShowFinalAttackDamage(
         self.player_id, self:GetParent(), params.unit, params
     )
+    modifier_weapon_stat_projection.ShowFinalAbilityDamage(
+        self.player_id, self:GetParent(), params.unit, params
+    )
 end
 
 function modifier_monkey_king_clone:OnAttackRecordDestroy(params)

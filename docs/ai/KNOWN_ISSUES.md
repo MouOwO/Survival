@@ -2,6 +2,16 @@
 
 ## 当前已知问题
 
+0. **Attack record身份不能跨最终伤害与落地事件阶段延迟消费。**
+   - 2026-08-04实机确认：齐天大圣E已解锁且原生暴击飘字正常，但等待`OnAttackLanded`再次读取同一record时无法触发全属性×5附伤；这证明`OnTakeDamage`时存在的暴击身份不能假设在后续落地回调仍可用。
+   - 需要与最终伤害一致的攻击触发效果，应在`OnTakeDamage`已确认`attacker+record`身份时发布项目内部事件，并在发布前完成主/次级攻击分类和record+victim去重。不得用彼此独立的Mock测试替代真实事件顺序测试。
+   - 伤害事务调用方必须检查`result.success`并记录`blocked_reason`；不能在请求返回nil或被阻断后仍无条件报告触发成功。
+
+0. **公开API文档不保证原生Overhead Alert的具体颜色。**
+   - `SendOverheadEventMessage`与`DOTA_OVERHEAD_ALERT`公开资料只列接口、枚举名称和值，没有正式记录不同客户端版本中的字体颜色和动画。
+   - 当前项目已由用户实机确认：`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`可用于普通攻击白字，`OVERHEAD_ALERT_CRITICAL`为原生暴击表现，`OVERHEAD_ALERT_DAMAGE`可用于技能红字强调。该结论只对当前客户端版本和项目HUD成立。
+   - 修改原生飘字类型或Dota客户端升级后仍必须重新冷启动Workshop Tools视觉确认；自动契约只能证明调用类型，不得替代视觉验收。
+
 0. **Modifier承伤参数中的`damage_category`可能误报真实远程平A。**
    - 2026-08-03实机表现：伐木工远程攻击树会触发木材绿字并增加木材，证明`OnAttackLanded`正常，但树生命完全不减少。
    - 根因是`modifier_tree_progression`曾用`MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE`的`params.damage_category`再次分类伤害；该字段可能为`0`或其他非权威值，导致真实平A被返回`-100%`清零。
@@ -90,8 +100,8 @@
    - 映射不完整时必须整批恢复官方 UI，禁止保留半项目、半官方状态。
 
 16. **Lua 5.1 工具必须使用当前已验证的绝对路径。**
-    - 2026-08-03已确认`C:\Program Files\lua\bin\lua5.1.exe`与`C:\Program Files\lua\bin\luac5.1.exe`均为Lua 5.1.5；旧`C:\msys64\mingw64\bin`路径仍为失效历史路径。
-    - 当前终端PATH尚未包含Lua 5.1目录，自动验证必须使用上述绝对路径，不能因`Get-Command luac5.1`无结果而误判编译器不存在。
+    - 2026-08-04复查发现`C:\Program Files\lua\bin`已不存在；当前实际可用的是`C:\msys64\mingw64\bin\lua5.1.exe`与`luac5.1.exe`，均已执行确认版本5.1.5。
+    - 当前终端PATH尚未包含Lua 5.1目录，自动验证必须优先读取`.cline/local-toolchain.json`并检查路径存在；记录失效时做限定搜索和版本验证，不能因`Get-Command luac5.1`无结果而误判编译器不存在。
     - PowerShell 7当前路径为`C:\Program Files\PowerShell\7\pwsh.exe`，版本7.6.4；Windows PowerShell 5.1仍位于系统默认路径。
     - 当前有7个历史Lua源文件带UTF-8 BOM，PUC Lua 5.1会在第1字节拒绝；`tools/test_lua51_syntax.ps1`只对临时副本移除BOM再检查，不修改生产源文件，并在结果中报告`bom_normalized`数量。
     - Luac只能证明对应版本语法可解析，不能替代Dota API、Scheduler、粒子、伤害和UI的Workshop Tools实机验证。

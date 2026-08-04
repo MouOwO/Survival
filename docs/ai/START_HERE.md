@@ -4,7 +4,8 @@
 
 ## 当前状态
 
-- 英雄普通平A最终伤害飘字第二轮修复与自动验证已完成：实机日志确认旧outgoing getter无record导致完全不掷暴击，并确认`addspeed`后record循环复用触发旧状态`dedup`。现改由`ON_ATTACK_RECORD`掷骰、getter消费倍率，新record重置上一代去重，状态键包含attacker+record。下一步冷启动后执行`addtechnology researcher_super_tower_crit_23`，确认日志`roll chance=11.5 → show → clear`、普通约21白字、暴击约42橙字（以当轮最终扣血为准）、旧2564不出现，且record循环后继续飘字；未经用户确认不得记为实机验收。
+- 英雄最终伤害原生飘字分流已由用户确认完成，不再作为待验收任务恢复：普通攻击使用`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`白字，暴击使用`OVERHEAD_ALERT_CRITICAL`原生表现，带有效Ability的正式技能伤害使用`OVERHEAD_ALERT_DAMAGE`红字；三者均显示最终`OnTakeDamage.params.damage`，上一版Panorama暴击链已移除。稳定经验见`PROJECT_CONTEXT.md`。
+- 齐天大圣E全属性×5暴击附伤修复已由用户实机确认数据正常，本任务完成且不得恢复为活跃任务。稳定方案是在最终`OnTakeDamage`阶段消费已确认的主攻击暴击身份并发布`HERO_FINAL_CRITICAL_ATTACK_DAMAGE`，不在较晚`OnAttackLanded`读取可能已销毁的record；次级攻击与W分身排除，伤害事务失败输出`MONKEY_KING_E_DAMAGE_FAILED`。长期规则见`PROJECT_CONTEXT.md`。
 - 当前活跃任务为“超级防御塔暴击”四项效果修复。代码与自动验证已完成：每级同时增加防御塔暴击/攻击和召唤英雄暴击/攻击各 `0.5%`，CSV 的23级均有四行说明，生成科技 Lua 复合投影接入现有塔与英雄刷新/攻击链。下一步完全停止并重新 Run Workshop Tools，实机确认 Tooltip、已有单位即时刷新、实际攻击值和暴击率；未经用户确认不得记录为验收完成。
 - 当前活跃任务为英雄实际射程与工具技能归属修正。用户最新批准齐天大圣由30000速度远程弹道改为近战式无飞行弹道结算，攻击/索敌仍为1000；CSV、生成Lua、运行时分流和自动验证已完成。Undying只保留D闪烁并修复D键；召唤英雄不拥有D，保留F范围拾取和F2回城。当前等待Workshop Tools实机验收，未经用户确认不得记录为制作完成。
 - 三选一公共技能`proto_arcane_barrage`/“奥术弹幕·被动”已将每颗随机落击从基础爆炸替换为天怒法师秘奥耀光单次落击`skywrath_mage_mystic_flare.vpcf`；每颗CP0仍绑定Lua权威伤害落点，未接入会自行随机落点的持续ambient父粒子。5/7/21颗、调度、150伤害范围、全属性伤害和活动锁均未修改；专项契约、Lua 5.4.5语法、严格UTF-8和限定检查通过，下一步冷启动Workshop Tools实测连续落击外观、落点一致性和21颗性能。

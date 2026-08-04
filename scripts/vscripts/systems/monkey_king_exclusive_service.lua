@@ -209,8 +209,19 @@ local function trigger_e(payload)
     local row = runtime()
     local damage = all_attributes(payload.player_id)
         * math.max(0, tonumber(row.e_attribute_multiplier) or 0)
-    deal(payload.player_id, payload.attacker, payload.target,
+    local result, request_error = deal(
+        payload.player_id, payload.attacker, payload.target,
         E_ABILITY, damage, "e")
+    if not result or result.success ~= true then
+        print(string.format(
+            "[MONKEY_KING_E_DAMAGE_FAILED] player=%s record=%s damage=%s error=%s",
+            tostring(payload.player_id), tostring(payload.record),
+            tostring(damage), tostring(
+                result and result.blocked_reason or request_error or "no_result"
+            )
+        ))
+        return false
+    end
     return true
 end
 
@@ -224,9 +235,17 @@ local function on_main_attack_landed(payload)
     if skill_active(player_id, Q_SKILL) then
         trigger_q(player_id, attacker, payload.target)
     end
-    if skill_active(player_id, E_SKILL) then
-        trigger_e(payload)
-    end
+end
+
+local function on_final_critical_attack_damage(payload)
+    local attacker = payload and payload.attacker
+    if not alive(attacker)
+        or attacker.survival_hero_id ~= "hero_monkey_king"
+        or attacker.survival_monkey_king_clone == true
+        or payload.is_main_attack ~= true then return end
+    local player_id = tonumber(payload.player_id)
+    if player_id == nil or not skill_active(player_id, E_SKILL) then return end
+    trigger_e(payload)
 end
 
 local function clone_position(player_id, hero)
@@ -432,6 +451,8 @@ function M.init()
             return { ok = true, snapshot = bonus_snapshot(tonumber(payload.player_id)) }
         end)
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_main_attack_landed)
+    event_bus.subscribe(events.HERO_FINAL_CRITICAL_ATTACK_DAMAGE,
+        on_final_critical_attack_damage)
     event_bus.subscribe(events.HERO_SKILL_CHANGED, on_skill_changed)
     event_bus.subscribe(events.BUILDING_CREATED, on_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building)
@@ -447,6 +468,8 @@ end
 M._test = {
     line_targets = line_targets,
     health_hits = function() return q_health_hits_by_player end,
+    trigger_e = trigger_e,
+    on_final_critical_attack_damage = on_final_critical_attack_damage,
 }
 
 return M

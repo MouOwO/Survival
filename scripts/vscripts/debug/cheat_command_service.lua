@@ -13,6 +13,7 @@ local M = {}
 local ADD_MONSTER_POSITION = Vector(-1280, 1088, 64)
 local ADD_MONSTER_DEFAULT_ARGS = { "1000000000", "200", "1", "1" }
 local ADD_MONSTER_MOVE_SPEED = 600
+local MONKEY_KING_E_SKILL = "skill_monkey_king_swiftness"
 
 local HERO_ALIASES = {
     axe = "hero_axe",
@@ -616,6 +617,39 @@ local function add_test_skill(context)
     return true
 end
 
+local function unlock_skill(context)
+    local slot = string.lower(tostring(context.args[1] or ""))
+    if slot ~= "e" then return false, "usage: unlock e" end
+    local current = event_bus.request(
+        events.HERO_SKILL_STATE_GET_REQUEST,
+        { player_id = context.player_id }
+    )
+    local snapshot = current and current.snapshot
+    if not current or not current.ok or not snapshot
+        or snapshot.hero_ready ~= 1 then
+        return false, current and current.error or "combat_hero_not_ready"
+    end
+    if snapshot.hero_id ~= "hero_monkey_king" then
+        return false, "unlock_e_requires_monkey_king"
+    end
+    local owned = find_owned_skill(snapshot, MONKEY_KING_E_SKILL)
+    if owned and owned.locked ~= 1 and (tonumber(owned.level) or 0) > 0 then
+        notify(context, "齐天大圣 E 已解锁")
+        return true
+    end
+    local result = event_bus.request(events.HERO_SKILL_GRANT_REQUEST, {
+        player_id = context.player_id,
+        skill_id = MONKEY_KING_E_SKILL,
+        levels = 1,
+        source = "cheat_unlock_e",
+    })
+    if not result or not result.ok then
+        return false, result and result.error or "unlock_e_failed"
+    end
+    notify(context, "已解锁齐天大圣 E：齐天")
+    return true
+end
+
 local function pass_rebirth(context)
     local requested = tonumber(context.command_suffix)
     if not requested then return false, "rebirth_level_invalid" end
@@ -664,6 +698,7 @@ local COMMANDS = {
     skillchoose = skill_choose,
     skills = list_skills,
     addskill = add_test_skill,
+    unlock = unlock_skill,
     additem = weapon_cheats.add_item,
     items = weapon_cheats.list_items,
     givegrowthsword = weapon_cheats.give_growth_sword,
@@ -726,8 +761,12 @@ function M.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     logger.info(
         "CheatCommand",
-        "ready: addhero, addskill, blood, research_test, addtechnology, monster, items, hero, skill, weapon growth"
+        "ready: addhero, addskill, unlock e, blood, research_test, addtechnology, monster, items, hero, skill, weapon growth"
     )
 end
+
+M._test = {
+    unlock_skill = unlock_skill,
+}
 
 return M

@@ -2,13 +2,17 @@
 
 ## 英雄普通攻击最终伤害飘字（2026-08-04）
 
-- 召唤英雄普通攻击伤害飘字以`OnTakeDamage.params.damage`为唯一数值口径，该值已经过引擎护甲与项目最终伤害层结算。普通攻击显示`OVERHEAD_ALERT_DAMAGE`，暴击显示`OVERHEAD_ALERT_CRITICAL`；暴击身份按`attacker + record`保存到record销毁，显示再按victim去重。不得恢复会额外显示减甲前数值的英雄`MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE`。
+- 召唤英雄伤害飘字以`OnTakeDamage.params.damage`为唯一数值口径，该值已经过引擎护甲与项目最终伤害层结算。普通攻击使用原生`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`，暴击使用原生`OVERHEAD_ALERT_CRITICAL`，带有效Ability inflictor的正式技能伤害使用红色`OVERHEAD_ALERT_DAMAGE`；无Ability的脚本或装备附伤不显示为技能伤害。暴击身份按`attacker + record`保存到record销毁，普通攻击显示再按victim去重。不得恢复会额外显示减甲前数值的英雄`MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE`。
+- 用户已在Workshop Tools确认上述原生伤害显示方案完成。当前客户端中`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`可作为普通攻击白字，`OVERHEAD_ALERT_CRITICAL`保留原生暴击表现，`OVERHEAD_ALERT_DAMAGE`用于技能红字强调。以后调整飘字必须继续使用最终伤害、避免同一命中重复显示，并区分静态枚举契约与客户端实际视觉。
+- 攻击触发的额外技能伤害若要进入技能红字路径，统一伤害请求必须携带对应Ability，使`OnTakeDamage.params.inflictor`有效；不能把所有`ability=nil`脚本伤害都标为技能，否则装备光环等兼容伤害会被误报。
 - 无尽训练目标的`data/csv/商店系统/altar_actions.csv::target_armor=100000`是生成请求权威值；Dota引擎可能将最终有效护甲约束到约千点，普通选中单位UI应继续读取`GetPhysicalArmorValue(false)`并投影为War3显示值，不得用CSV请求值覆盖运行时有效护甲。
 
 ## Attack record lifecycle
 
 - Dota attack record 数值会在长时间或高攻速攻击后循环复用，不能把裸record当作进程生命周期内永久唯一ID。record级状态至少要包含攻击者身份，并在每次`ON_ATTACK_RECORD`建立新一代时重置同键的上一代短期状态。
 - 实机不能假设`MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE`回调参数包含attack record；需要record级判定时应在`MODIFIER_EVENT_ON_ATTACK_RECORD`建立状态，getter只消费已经建立的本次攻击倍率。最终命中身份继续由`OnTakeDamage.params.record`关联，并在`ON_ATTACK_RECORD_DESTROY`清理。
+- 需要与最终伤害使用同一暴击身份的攻击触发效果，必须在`OnTakeDamage`仍持有有效`attacker + record`状态时完成判断和发布，不得延迟到`OnAttackLanded`再次读取该record。齐天大圣E已采用`HERO_FINAL_CRITICAL_ATTACK_DAMAGE`：在最终攻击伤害按`record + victim`去重并排除次级攻击后发布，本体E再读取触发瞬间逻辑三维并提交全属性×5纯粹伤害。
+- 用户于2026-08-04在Workshop Tools确认修复后的齐天大圣E数据正常：本体主普通攻击暴击能够触发独立的全属性×5额外伤害。伤害请求必须携带`ability_survival_monkey_king_swiftness`并检查统一伤害事务`result.success`；不得恢复旧的`HERO_MAIN_ATTACK_LANDED.critical`延迟消费路径。
 
 ## 复合生成科技效果（2026-08-04）
 
@@ -104,7 +108,7 @@
 - 英雄力量、敏捷、智力是项目逻辑三维：由服务端战斗快照统一计算和发布，不写入 Dota 原生三维。逻辑三维本身不提供攻速、护甲、生命、魔法或主属性攻击，只供 UI 和明确按三维结算的技能/装备效果读取。
 - Panorama 源码不在当前 `game` 插件目录中，而在对应的内容目录：`D:\steam\steamapps\common\dota 2 beta\content\dota_addons\survival\panorama`。
 - 游戏实际加载的 Panorama 编译产物位于：`D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\panorama`。
-- 当前Lua 5.1解释器/检查器为`C:\Program Files\lua\bin\lua5.1.exe`与`C:\Program Files\lua\bin\luac5.1.exe`，均已在2026-08-03确认版本5.1.5；目录未加入PATH，必须使用绝对路径或`tools/test_lua51_syntax.ps1`。旧`C:\msys64\mingw64\bin`路径已失效。
+- 当前Lua 5.1解释器/检查器为`C:\msys64\mingw64\bin\lua5.1.exe`与`C:\msys64\mingw64\bin\luac5.1.exe`，均已在2026-08-04实际执行确认版本5.1.5；目录未加入PATH，必须使用绝对路径。旧`C:\Program Files\lua\bin`记录当前已失效。
 
 ## AI 会话恢复协议
 

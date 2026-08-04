@@ -1,3 +1,30 @@
+# 2026-08-04 — 齐天大圣E附伤检查与unlock e
+
+- 用户完成修复版Workshop Tools复测并明确确认“数据正常”：齐天大圣本体主普通攻击暴击时，全属性×5额外伤害已经正常触发。本任务获得用户实机验收并完成，不再恢复为活跃任务。
+- 稳定经验已沉淀到`PROJECT_CONTEXT.md`：最终伤害相关的攻击触发效果必须在`OnTakeDamage`仍持有有效`attacker + record`时消费暴击身份；不得延迟到`OnAttackLanded`重新读取。齐天大圣E保留最终暴击事件、主/次级隔离、逻辑三维快照、Ability inflictor和伤害事务结果检查。
+- 用户完成实机复测并确认Bug：`unlock e`有效、原生暴击数字出现，但没有E全属性×5额外伤害。由此推翻“静态调用链完整即可认为E可触发”的结论。
+- 根因定位为跨引擎事件阶段消费attack record不可靠：暴击飘字已证明`OnTakeDamage`阶段身份正确，旧E却等到`OnAttackLanded`再次Peek；record可能在两者之间销毁。修复新增最终主攻击暴击伤害事件，在`OnTakeDamage`完成去重时发布，E直接消费；次级record发布前排除。E伤害事务新增失败结果检查与`MONKEY_KING_E_DAMAGE_FAILED`诊断。
+- 新增`test_monkey_king_e_trigger.lua`服务级行为测试：最终主攻击暴击事件在E解锁时提交一次`(10+20+30)×5=300`纯粹伤害，携带`ability_survival_monkey_king_swiftness`且`can_crit=false`；分身和锁定E不提交，事务阻断返回失败并输出诊断。`MONKEY_KING_E_TRIGGER_LUA51_PASS`及伤害飘字、猴王塔、QWE、unlock E、超级塔暴击、多目标、近战回归全部通过；Lua 5.1语法、CSV/生成一致性、严格UTF-8和限定diff通过。
+- 用户确认英雄伤害显示已经做好。原生飘字经验已写入`PROJECT_CONTEXT.md`：普通攻击白字使用`BONUS_SPELL_DAMAGE`、暴击使用`CRITICAL`、正式技能红字使用`DAMAGE`，均读取最终`OnTakeDamage.params.damage`。
+- 调查权威CSV、生成Lua和生产调用链确认E已实现：6转解锁、最终攻击×3；只在齐天大圣本体主普通攻击实际暴击时，对主目标追加触发瞬间逻辑全属性×5纯粹伤害。统一伤害请求携带`ability_survival_monkey_king_swiftness`且为纯粹伤害，可进入技能红字路径。
+- 新增聊天作弊码`unlock e`，只接受当前玩家已召唤的齐天大圣，通过`HERO_SKILL_GRANT_REQUEST`解除固定槽E的锁定并设为Lv.1；重复执行幂等，不改变转生等级，不调用`MONSTER_REWARD_GRANT_REQUEST`，不补发其他奖励。
+- 自动验证通过：`UNLOCK_E_LUA51_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、`ADDSKILL_CONTRACT_PASS`、`MONKEY_KING_QWE_LUA51_PASS`、`HERO_ATTACK_DAMAGE_NUMBERS_LUA51_PASS/CONTRACT_PASS`、`SUPER_TOWER_CRIT_LUA51_PASS/CONTRACT_PASS`、`HERO_MULTISHOT_LUA51_PASS`；相关生产和测试Lua 5.1语法、E的CSV/生成Lua一致性、严格UTF-8与限定`git diff --check`通过。尚需Workshop Tools确认命令提示、E实际触发和额外技能红字。
+
+# 2026-08-04 — 英雄伤害原生飘字分流
+
+- 用户要求放弃2倍Panorama暴击字，恢复Dota原生字体；并批准普通攻击用`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`白字候选、暴击用`OVERHEAD_ALERT_CRITICAL`、正式技能伤害用红色`OVERHEAD_ALERT_DAMAGE`的分流。
+- `modifier_weapon_stat_projection`和齐天大圣W分身继续以最终`OnTakeDamage.params.damage`为数值；普通/暴击攻击保持`attacker + record + victim`去重。技能路径仅接受有效`params.inflictor`，因此`ability=nil`的装备光环和脚本附伤不会误标为技能伤害。没有恢复减甲前原生暴击属性。
+- 已删除上一版未跟踪的`critical_damage_numbers.js/css`及对应编译产物，移除HUD加载项和容器，并停止发送`survival_critical_damage_number`。`survival_hud.xml`强制编译结果为`OK: 7 compiled, 0 failed, 0 skipped`，加载链不再包含自定义暴击资源。
+- 自动验证通过：`HERO_ATTACK_DAMAGE_NUMBERS_LUA51_PASS`、`HERO_ATTACK_DAMAGE_NUMBERS_CONTRACT_PASS`、`SUPER_TOWER_CRIT_LUA51_PASS`、`SUPER_TOWER_CRIT_CONTRACT_PASS`、`HERO_MULTISHOT_LUA51_PASS`、`MONKEY_KING_QWE_LUA51_PASS`、`MONKEY_MELEE_ATTACK_LUA51_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、相关Lua 5.1语法和严格UTF-8。公开API文档未承诺`BONUS_SPELL_DAMAGE`颜色，仍需Workshop Tools冷启动视觉验收。
+
+# 2026-08-04 — 英雄暴击2倍橙色Panorama飘字
+
+- 用户确认最终表现：普通攻击伤害为普通字号红字，暴击伤害为约普通数字2倍大小的橙色粗体字；伤害数值、暴击率、倍率、护甲和record生命周期保持不变。
+- `modifier_weapon_stat_projection.ShowFinalAttackDamage`继续以`OnTakeDamage.params.damage`为唯一数值并按`attacker + record + victim`去重。普通路径保留`OVERHEAD_ALERT_DAMAGE`；暴击路径移除`OVERHEAD_ALERT_CRITICAL`调用，只向攻击者所属玩家发送`survival_critical_damage_number { target_entindex, damage }`，避免引擎字与自定义字重复。
+- content侧新增`critical_damage_numbers.js/css`并接入`survival_hud.xml`。客户端以`Entities.GetAbsOrigin`和`Game.WorldToScreenX/Y`逐帧跟随目标头顶，48px橙色粗体数字在1秒内上漂72px并淡出；目标失效或生命周期结束时删除面板。
+- 自动验证通过：`HERO_ATTACK_DAMAGE_NUMBERS_LUA51_PASS`、`HERO_ATTACK_DAMAGE_NUMBERS_CONTRACT_PASS`、`SUPER_TOWER_CRIT_LUA51_PASS`、`SUPER_TOWER_CRIT_CONTRACT_PASS`、英雄多目标、猴王QWE/近战及相关契约；生产Lua经Lua 5.1语法检查，任务源严格UTF-8和限定`diff --check`通过。Resource Compiler结果为JS/CSS各`1 compiled, 0 failed, 0 skipped`，HUD XML加载链`7 compiled, 0 failed, 0 skipped`。
+- 本地工具链记录已修正：`C:\Program Files\lua\bin`当前不存在，实际使用`C:\msys64\mingw64\bin`的Lua/Luac 5.1.5。仍需Workshop Tools冷启动实机确认实际2倍观感、红/橙区分、位置跟随、击杀数字、无重复、连续暴击及record循环后持续显示。
+
 # 2026-08-04 — 英雄最终攻击飘字第二轮实机根因与修复
 
 - 用户提供完整`[HERO_ATTACK_DAMAGE_NUMBER]`日志：首次0至64512的record持续`show/clear`，`addspeed`后record从0循环并连续`dedup/clear`；全程没有`roll`且所有`show`均为`critical=false multiplier=nil`。据此确认停止飘字是裸record循环复用后旧去重状态误杀，不是客户端overhead队列；暴击不出现是outgoing getter实机无record导致掷骰入口未执行。

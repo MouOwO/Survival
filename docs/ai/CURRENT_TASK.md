@@ -1,6 +1,29 @@
 # Current Task
 
+## 已完成任务（2026-08-04）：齐天大圣E附伤确认与测试入口
+
+- 用户于2026-08-04完成修复版Workshop Tools复测并确认数据正常：齐天大圣本体主普通攻击暴击时，全属性×5额外伤害已正常触发。本任务已实机验收完成，不再作为活跃任务恢复。
+- 用户实机确认Bug：执行`unlock e`后原生暴击数字正常出现，但没有E的全属性×5额外伤害。此前自动测试只分别验证record暴击和E公式，没有覆盖实机`OnTakeDamage`、record生命周期、`OnAttackLanded`的先后顺序，不能再描述为E实机有效。
+- 根因修复：E不再等到较晚的`HERO_MAIN_ATTACK_LANDED`重新读取可能已销毁的attack record；改为在最终`OnTakeDamage`已确认暴击身份并完成record+victim去重的同一时点发布`HERO_FINAL_CRITICAL_ATTACK_DAMAGE`。次级attack record在发布前排除，E继续只接受齐天大圣本体主攻击。
+- E现在检查统一伤害事务`result.success`；失败输出`MONKEY_KING_E_DAMAGE_FAILED`及record、计算伤害和阻断原因，不再静默返回成功。
+- 修复版自动验证通过：`MONKEY_KING_E_TRIGGER_LUA51_PASS`直接覆盖最终暴击事件→技能状态→逻辑三维快照→全属性×5→携带E Ability的纯粹伤害事务，并覆盖分身/锁定/事务失败；伤害飘字Lua/契约、猴王塔契约、QWE数学、unlock E、超级塔暴击、多目标和近战回归均通过。相关生产/测试Lua 5.1语法、CSV/生成Lua倍率5一致性、严格UTF-8和限定`diff --check`通过。
+- 修复版Workshop Tools实机复测已通过；`unlock e`保留为后续回归测试入口。若未来回归，收集`MONKEY_KING_E_DAMAGE_FAILED`和`HERO_ATTACK_DAMAGE_NUMBER`日志。
+- 用户已确认英雄原生伤害飘字做好；该任务已沉淀到`PROJECT_CONTEXT.md`，不再恢复为待视觉验收。
+- 权威CSV与生成Lua确认E为6转技能，最终攻击独立×3；仅齐天大圣本体主普通攻击实际暴击时，对主目标追加触发瞬间逻辑全属性×5纯粹伤害。
+- 已被实机推翻的旧实现：`monkey_king_exclusive_service.lua`曾消费`HERO_MAIN_ATTACK_LANDED.critical`；静态调用链虽携带`ability_survival_monkey_king_swiftness`，但跨事件读取record导致E未触发。该路径已由顶部最终伤害事件方案取代。
+- 用户批准新增`unlock e`：仅对当前玩家已召唤的齐天大圣生效，只用正式技能授予请求把固定槽E从锁定Lv.0激活为Lv.1；不修改转生等级、不补发转生奖励，重复输入幂等成功。
+- 已完成实现和自动验证：`UNLOCK_E_LUA51_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、`ADDSKILL_CONTRACT_PASS`、`MONKEY_KING_QWE_LUA51_PASS`、英雄伤害飘字Lua/契约、超级塔暴击Lua/契约和英雄多目标回归均通过；相关生产与测试Lua 5.1语法、CSV/生成Lua E数值一致性、严格UTF-8及限定`diff --check`通过。
+- 首轮Workshop Tools确认旧E路径失败；修复版随后由用户确认数据正常。两次结果均保留，用于区分旧路径失败与最终方案验收通过。
+
 ## 活跃任务（2026-08-04）：英雄普通攻击最终伤害飘字统一
+
+### 最新批准的显示调整（2026-08-04）
+
+- 用户确认普通攻击最终伤害显示为引擎普通字号红字；暴击最终伤害显示为约普通数字2倍大小的橙色粗体字，以颜色和尺寸同时区分。
+- `SendOverheadEventMessage`没有字号参数，因此普通攻击继续使用`OVERHEAD_ALERT_DAMAGE`，暴击在最终伤害去重成功后改为仅向攻击者所属玩家发送Panorama自定义事件；暴击不得再发送引擎`OVERHEAD_ALERT_CRITICAL`，避免重复显示。
+- Panorama按目标entindex读取世界位置并投影到屏幕，数字向上漂浮淡出；目标失效、离屏或生命周期结束时必须清理。
+- 数值仍唯一来自`OnTakeDamage.params.damage`，不得修改暴击率、暴击倍率、伤害、护甲、技能隔离、attack record状态或多目标逐受击单位去重。
+- 用户已批准实施；当前进入生产代码、Panorama源、定向资源编译、专项测试和回归验证阶段，尚未完成Workshop Tools实机验收。
 
 ### 用户确认的实机事实与口径
 
@@ -19,7 +42,7 @@
 ### 当前结果
 
 - 已完成生产代码：本体和齐天大圣W分身均按attack record掷骰并通过`DAMAGEOUTGOING_PERCENTAGE`应用暴击倍率，不再使用会产生减甲前Valve橙字的`PREATTACK_CRITICALSTRIKE`。
-- 已完成最终飘字：仅普通攻击record进入显示路径，使用`OnTakeDamage.params.damage`；普通白字、暴击橙字，按`record + victim`去重，多目标不同受击单位分别显示，技能伤害排除。
+- 已完成最终飘字基础链：仅普通攻击record进入显示路径，使用`OnTakeDamage.params.damage`，按`record + victim`去重，多目标不同受击单位分别显示，技能伤害排除。最新显示层为普通引擎红字、暴击Panorama橙色2倍粗体字。
 - 已保留`data/csv/商店系统/altar_actions.csv`训练目标`target_armor=100000`；契约同时锁定源CSV、生成Lua和训练服务消费者。选中面板继续显示引擎实际运行时护甲的War3投影，不强行显示CSV请求值。
 - 自动验证通过：专项Lua/契约、英雄多重攻击、猴王QWE/近战/塔契约、超级塔暴击、研究减甲和多重攻击回归、Lua 5.1语法、严格UTF-8与限定`git diff --check`。
 - 未完成Workshop Tools实机验证。下一步冷启动地图，确认普通最终`17`显示白字、暴击最终`38`显示橙字、旧减甲前`2564`不再出现，并检查本体、W分身、多目标及技能伤害无重复/误标。
@@ -29,6 +52,12 @@
 - 已按用户批准完成修复：本体和齐天大圣W分身在`ON_ATTACK_RECORD`按权威战斗快照掷骰，再由无record参数的outgoing getter消费本次攻击倍率；新record建立时重置同攻击者同编号上一代显示状态。暴击和显示状态键改为`attacker entindex + record`，避免本体、分身或多英雄相同record互相覆盖；最终显示仍按victim去重。
 - 诊断`roll`现明确打印`chance`。权威CSV中`researcher_super_tower_crit_01/19/23`分别为`0.5%/9.5%/11.5%`；`addtechnology`设置传入科技ID的具体等级，不会自动加满。实机高概率验证必须使用`addtechnology researcher_super_tower_crit_23`，下一轮应看到`roll ... chance=11.5`。
 - 修复版自动验证通过：`HERO_ATTACK_DAMAGE_NUMBERS_LUA51_PASS`、`HERO_ATTACK_DAMAGE_NUMBERS_CONTRACT_PASS`、`SUPER_TOWER_CRIT_LUA51_PASS`、`SUPER_TOWER_CRIT_CONTRACT_PASS`、`SUPER_TOWER_CRIT_GENERATED_COMPARE_PASS`、英雄多重攻击、猴王QWE/近战/塔、研究减甲回归、相关Lua 5.1语法和严格UTF-8。仍需冷启动Workshop Tools验证`roll → show → clear`引擎时序、暴击最终伤害翻倍以及record循环后持续飘字；自动测试不等于实机验收。
+- 已完成最新显示层实现：普通攻击继续调用`OVERHEAD_ALERT_DAMAGE`显示普通字号红字；暴击不再调用`OVERHEAD_ALERT_CRITICAL`，只向攻击者所属玩家发送`survival_critical_damage_number`，负载为目标entindex和四舍五入后的最终伤害。Panorama使用48px橙色粗体字，逐帧跟随目标头顶、向上漂浮72px并在1秒内淡出清理。
+- 新增Panorama源`critical_damage_numbers.js/css`并接入`survival_hud.xml`；Resource Compiler强制编译JS/CSS均为`1 compiled, 0 failed, 0 skipped`，HUD XML加载链为`7 compiled, 0 failed, 0 skipped`。
+- 最新验证通过：`HERO_ATTACK_DAMAGE_NUMBERS_LUA51_PASS`、`HERO_ATTACK_DAMAGE_NUMBERS_CONTRACT_PASS`、`SUPER_TOWER_CRIT_LUA51_PASS`、`SUPER_TOWER_CRIT_CONTRACT_PASS`、`HERO_MULTISHOT_LUA51_PASS`、`MONKEY_KING_QWE_LUA51_PASS`、`MONKEY_MELEE_ATTACK_LUA51_PASS`、猴王塔/工人多目标契约、相关生产Lua 5.1语法、严格UTF-8和限定`git diff --check`。仍需Workshop Tools冷启动确认实际字号约2倍、橙色位置、杀怪时显示、无重复、连续暴击和record循环后持续显示。
+- 用户随后改为要求全部使用原生字体，并批准最终分流：普通攻击使用`OVERHEAD_ALERT_BONUS_SPELL_DAMAGE`作为白字候选，暴击使用`OVERHEAD_ALERT_CRITICAL`恢复原生暴击字体/动画，带有效`params.inflictor`的正式技能伤害使用已确认醒目的红色`OVERHEAD_ALERT_DAMAGE`；无Ability的脚本或装备附伤不进入技能飘字。
+- 原生显示仍只消费最终`OnTakeDamage.params.damage`；没有恢复会显示减甲前伤害的`MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE`。普通攻击继续按`attacker + record + victim`去重，本体和齐天大圣W分身共用同一规则；上一版`survival_critical_damage_number`事件、Panorama源、HUD引用和编译产物已移除。
+- 最新原生分流验证通过：专项Lua 5.1行为/契约、超级塔暴击、英雄多目标、猴王QWE/近战/塔、相关Lua 5.1语法和严格UTF-8均通过；`survival_hud.xml`强制资源编译为`OK: 7 compiled, 0 failed, 0 skipped`。Valve公开文档未记录`BONUS_SPELL_DAMAGE`的视觉颜色，必须在Workshop Tools冷启动确认普通攻击确为白字、暴击为原生效果、技能红字足够凸显且三者均无重复。
 
 ## 活跃任务（2026-08-04）：超级防御塔暴击四项科技效果修复
 
