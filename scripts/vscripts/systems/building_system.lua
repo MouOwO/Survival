@@ -88,6 +88,25 @@ local function building_limit_reached(definition, existing_count)
     local maximum = tonumber(definition and definition.max_count) or 0
     return maximum > 0 and (tonumber(existing_count) or 0) >= maximum
 end
+local function apply_hull_radius(unit, definition)
+    local radius = tonumber(definition and definition.hull_radius)
+    if not radius or radius <= 0 then return false end
+    if not valid_entity(unit) or type(unit.SetHullRadius) ~= "function" then
+        logger.warn("BuildingSystem", "unable to apply hull radius id="
+            .. tostring(definition and definition.id)
+            .. " radius=" .. tostring(radius))
+        return false
+    end
+    local ok, error_message = pcall(unit.SetHullRadius, unit, radius)
+    if not ok then
+        logger.warn("BuildingSystem", "hull radius failed id="
+            .. tostring(definition.id) .. " radius=" .. tostring(radius)
+            .. " error=" .. tostring(error_message))
+        return false
+    end
+    unit.survival_hull_radius = radius
+    return true
+end
 local function main_city_level(team)
     for _, state in pairs(buildings) do
         if state.team == team
@@ -160,6 +179,7 @@ local function apply_initial_stats(unit, definition)
         apply_projectile(unit, combat.projectile_model)
         set_attack_range(unit, data.attack_range)
     end
+    apply_hull_radius(unit, definition)
 end
 local function add_ability(unit, ability_name, active)
     print("[BuildingAbility] add begin unit=" .. tostring(unit:entindex()) .. " ability=" .. tostring(ability_name))
@@ -294,6 +314,7 @@ local function recover_building(unit)
     unit.survival_grid_x = grid_x
     unit.survival_grid_y = grid_y
     unit.survival_route_level = route_row and route_row.level or state.level
+    apply_hull_radius(unit, definition)
     buildings[entindex] = state
     change_count(state.team, state.building_id, 1)
     if definition.build_once then wall_ever_built[state.team] = true end
@@ -712,6 +733,7 @@ local function on_building_changed(payload)
     if payload.display_name then
         state.unit.survival_display_name = payload.display_name
     end
+    apply_hull_radius(state.unit, state.definition)
 end
 local function on_entity_killed(payload)
     local victim = payload.victim
@@ -802,6 +824,8 @@ function M.init()
     logger.info("BuildingSystem", "initialized recovered=" .. tostring(recovered))
 end
 M._completion_level_data_for_test = completion_level_data
+M._apply_hull_radius_for_test = apply_hull_radius
+M._apply_initial_stats_for_test = apply_initial_stats
 M._public_state_for_test = public_state
 M._recover_existing_for_test = recover_existing_buildings
 M._building_limit_for_test = {

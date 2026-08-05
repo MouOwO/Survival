@@ -15,6 +15,7 @@ local weapons = require("config/generated/weapon_definitions")
 local seven_sins_essences = require("config/seven_sins_essences")
 local molten_core_rules = require("config/molten_core_challenge_rules")
 local hero_return_home = require("systems/hero_return_home_service")
+local monster_visual = require("systems/challenge_monster_visual_service")
 
 local M = {}
 local sessions = {}
@@ -165,6 +166,7 @@ end
 local function destroy_session_monsters(session)
     for entindex, unit in pairs(session.monsters or {}) do
         monster_meta[entindex] = nil
+        if valid(unit) then monster_visual.clear(unit) end
         if alive(unit) then UTIL_Remove(unit) end
     end
     session.monsters = {}
@@ -292,6 +294,7 @@ local function spawn_member(session, member)
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
     apply_combat_stats(unit, combat_archetype)
+    monster_visual.apply(unit, archetype)
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
 
     local home = nil
@@ -844,6 +847,7 @@ local function on_killed(payload)
     local meta = monster_meta[entindex]
     if not meta then return end
     monster_meta[entindex] = nil
+    monster_visual.clear(victim)
     local session = get_session(meta.player_id, meta.encounter_id)
     if not session then return end
     session.monsters[entindex] = nil

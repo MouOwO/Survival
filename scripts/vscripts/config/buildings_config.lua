@@ -113,7 +113,8 @@ M.wall = {
     id = "wall", display_name = configured_name("wall", "城墙"),
     unit_name = configured_unit_name("wall", "building_wall"),
     build_cost = build_cost("building_wall", 100, 0),
-    footprint = { x = 4, y = 4 }, max_count = 1, build_once = true,
+    footprint = { x = 4, y = 4 }, hull_radius = 128,
+    max_count = 1, build_once = true,
     show_health_bar = true, selectable = true,
     abilities = { "ability_upgrade_wall" }, levels = wall_levels,
 }

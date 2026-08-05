@@ -1,4 +1,5 @@
 local generated = require("config/generated/asset_catalog")
+local generated_activity_modifiers = require("config/generated/asset_activity_modifiers")
 local generated_bodygroups = require("config/generated/asset_bodygroups")
 local generated_components = require("config/generated/asset_components")
 local generated_effects = require("config/generated/asset_effects")
@@ -15,6 +16,7 @@ end
 local M = {
     rows = clone(generated.rows or {}),
     by_id = {},
+    activity_modifiers = generated_activity_modifiers.rows or {},
     bodygroups = generated_bodygroups.rows or {},
     components = generated_components.rows or {},
     effects = generated_effects.rows or {},
@@ -67,6 +69,7 @@ local function assert_unique(seen, key, message)
 end
 
 local function initialize_bundle(asset)
+    asset.activity_modifiers = {}
     asset.components = {}
     asset.bodygroups = {}
     asset.effects = {}
@@ -100,6 +103,34 @@ for _, asset in ipairs(M.rows) do
     assert_unique(seen_asset_ids, asset_id, "asset_catalog duplicate asset_id")
     M.by_id[asset_id] = asset
     initialize_bundle(asset)
+end
+
+local seen_activity_modifier_keys = {}
+local activity_modifier_names_by_asset = {}
+for _, entry in ipairs(sorted_rows(M.activity_modifiers, "modifier_key")) do
+    local asset = require_asset(
+        entry,
+        "asset_activity_modifiers",
+        "modifier_key"
+    )
+    local modifier_key = tostring(entry.modifier_key or "")
+    local modifier_name = tostring(entry.modifier_name or "")
+    assert(nonempty(modifier_key),
+        "asset_activity_modifiers contains an empty modifier_key")
+    assert(nonempty(modifier_name),
+        "asset_activity_modifiers contains an empty modifier_name: "
+            .. modifier_key)
+    assert_unique(seen_activity_modifier_keys, modifier_key,
+        "asset_activity_modifiers duplicate modifier_key")
+    activity_modifier_names_by_asset[asset.asset_id]
+        = activity_modifier_names_by_asset[asset.asset_id] or {}
+    assert_unique(
+        activity_modifier_names_by_asset[asset.asset_id],
+        modifier_name,
+        "asset_activity_modifiers duplicate modifier_name for "
+            .. asset.asset_id
+    )
+    asset.activity_modifiers[#asset.activity_modifiers + 1] = entry
 end
 
 local seen_bodygroup_keys = {}

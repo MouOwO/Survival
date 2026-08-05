@@ -3,6 +3,7 @@ local preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
 
 local M = {}
+local activity_modifiers_by_unit = {}
 local attachments_by_unit = {}
 local particles_by_unit = {}
 local bodygroups_by_unit = {}
@@ -15,6 +16,49 @@ local function safe_call(target, method_name, ...)
     local method = target and target[method_name]
     if type(method) ~= "function" then return false, nil end
     return pcall(method, target, ...)
+end
+
+local function clear_activity_modifiers(unit)
+    local entindex = unit:entindex()
+    if activity_modifiers_by_unit[entindex] then
+        safe_call(unit, "ClearActivityModifiers")
+    end
+    activity_modifiers_by_unit[entindex] = nil
+end
+
+local function apply_activity_modifiers(unit, asset)
+    if type(unit.AddActivityModifier) ~= "function"
+        or type(unit.ClearActivityModifiers) ~= "function" then
+        activity_modifiers_by_unit[unit:entindex()] = nil
+        return
+    end
+
+    local desired = {}
+    for _, entry in ipairs(asset and asset.activity_modifiers or {}) do
+        local modifier_name = tostring(entry.modifier_name or "")
+        if modifier_name ~= "" then desired[#desired + 1] = modifier_name end
+    end
+
+    local entindex = unit:entindex()
+    local applied = activity_modifiers_by_unit[entindex]
+    local unchanged = applied ~= nil and #applied == #desired
+    if unchanged then
+        for index, modifier_name in ipairs(desired) do
+            if applied[index] ~= modifier_name then
+                unchanged = false
+                break
+            end
+        end
+    end
+    if unchanged then return end
+
+    clear_activity_modifiers(unit)
+    applied = {}
+    for _, modifier_name in ipairs(desired) do
+        local ok = safe_call(unit, "AddActivityModifier", modifier_name)
+        if ok then applied[#applied + 1] = modifier_name end
+    end
+    if #applied > 0 then activity_modifiers_by_unit[entindex] = applied end
 end
 
 local function clear_attachments(unit)
@@ -266,6 +310,9 @@ function M.apply(unit, data)
     if not same_model then
         unit:SetModel(model_path)
         unit:SetOriginalModel(model_path)
+    end
+    apply_activity_modifiers(unit, asset)
+    if not same_model then
         reset_main_animation(unit, asset)
     end
     apply_bodygroups(unit, asset)
@@ -298,6 +345,7 @@ end
 
 function M.clear(unit)
     if valid_entity(unit) then
+        clear_activity_modifiers(unit)
         clear_attachments(unit)
         clear_particles(unit)
         clear_bodygroups(unit)
