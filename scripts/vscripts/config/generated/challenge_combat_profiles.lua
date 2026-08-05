@@ -1,0 +1,61 @@
+-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.
+-- Source: challenge_combat_profiles.csv
+local M = {}
+M.rows = {
+    { profile_id = "N1_practice_wood", difficulty_id = "N1", member_id = "practice_wood", health = 60000, attack = 10000, war3_armor = 50, evidence_status = "用户截图", source = "N1四个练功房属性", notes = "木头怪；独立练功房目标", enabled = true },
+    { profile_id = "N1_practice_gold", difficulty_id = "N1", member_id = "practice_gold", health = 1000000, attack = 500000, war3_armor = 50, evidence_status = "用户截图", source = "N1四个练功房属性", notes = "金币怪；独立练功房目标", enabled = true },
+    { profile_id = "N1_practice_attribute", difficulty_id = "N1", member_id = "practice_attribute", health = 1777780, attack = 1000000, war3_armor = 200, evidence_status = "用户截图", source = "N1四个练功房属性", notes = "属性怪；独立练功房目标", enabled = true },
+    { profile_id = "N1_practice_greater_attribute", difficulty_id = "N1", member_id = "practice_greater_attribute", health = 5777780, attack = 3777776, war3_armor = 888, evidence_status = "用户截图", source = "N1四个练功房属性", notes = "大属性怪；独立练功房目标", enabled = true },
+    { profile_id = "N2_practice_wood", difficulty_id = "N2", member_id = "practice_wood", health = 75000, attack = 11000, war3_armor = 100, evidence_status = "用户截图", source = "N2四个练功房属性", notes = "木头怪；独立练功房目标", enabled = true },
+    { profile_id = "N2_practice_gold", difficulty_id = "N2", member_id = "practice_gold", health = 1250000, attack = 550000, war3_armor = 100, evidence_status = "用户截图", source = "N2四个练功房属性", notes = "金币怪；独立练功房目标", enabled = true },
+    { profile_id = "N2_practice_attribute", difficulty_id = "N2", member_id = "practice_attribute", health = 2222225, attack = 1100000, war3_armor = 400, evidence_status = "用户截图", source = "N2四个练功房属性", notes = "属性怪；独立练功房目标", enabled = true },
+    { profile_id = "N2_practice_greater_attribute", difficulty_id = "N2", member_id = "practice_greater_attribute", health = 7222225, attack = 4155554, war3_armor = 1776, evidence_status = "用户截图", source = "N2四个练功房属性", notes = "大属性怪；独立练功房目标", enabled = true },
+    { profile_id = "N3_practice_wood", difficulty_id = "N3", member_id = "practice_wood", health = 90000, attack = 12000, war3_armor = 100, evidence_status = "用户截图", source = "N3四个练功房属性", notes = "木头怪；独立练功房目标", enabled = true },
+    { profile_id = "N3_practice_gold", difficulty_id = "N3", member_id = "practice_gold", health = 1500000, attack = 600000, war3_armor = 100, evidence_status = "用户截图", source = "N3四个练功房属性", notes = "金币怪；独立练功房目标", enabled = true },
+    { profile_id = "N3_practice_attribute", difficulty_id = "N3", member_id = "practice_attribute", health = 2666670, attack = 1200000, war3_armor = 400, evidence_status = "用户截图", source = "N3四个练功房属性", notes = "属性怪；独立练功房目标", enabled = true },
+    { profile_id = "N3_practice_greater_attribute", difficulty_id = "N3", member_id = "practice_greater_attribute", health = 8666670, attack = 4533331, war3_armor = 1776, evidence_status = "用户截图", source = "N3四个练功房属性", notes = "大属性怪；独立练功房目标", enabled = true },
+    { profile_id = "N4_practice_wood", difficulty_id = "N4", member_id = "practice_wood", health = 105000, attack = 13000, war3_armor = 100, evidence_status = "用户截图", source = "N4四个练功房属性", notes = "木头怪；第30波后独立选中", enabled = true },
+    { profile_id = "N4_practice_gold", difficulty_id = "N4", member_id = "practice_gold", health = 1750000, attack = 650000, war3_armor = 100, evidence_status = "用户截图", source = "N4四个练功房属性", notes = "金币怪；第30波后独立选中", enabled = true },
+    { profile_id = "N4_practice_attribute", difficulty_id = "N4", member_id = "practice_attribute", health = 3111115, attack = 1300000, war3_armor = 400, evidence_status = "用户截图", source = "N4四个练功房属性", notes = "属性怪；面板以万为单位显示", enabled = true },
+    { profile_id = "N4_practice_greater_attribute", difficulty_id = "N4", member_id = "practice_greater_attribute", health = 10111115, attack = 4911109, war3_armor = 1776, evidence_status = "用户截图", source = "N4四个练功房属性", notes = "大属性怪；面板以万为单位显示", enabled = true },
+    { profile_id = "N5_practice_wood", difficulty_id = "N5", member_id = "practice_wood", health = 15000, attack = 14000, war3_armor = 125, evidence_status = "用户截图", source = "N5四个练功房属性", notes = "木头怪；截图明确显示生命1.500万", enabled = true },
+    { profile_id = "N5_practice_gold", difficulty_id = "N5", member_id = "practice_gold", health = 2500000, attack = 700000, war3_armor = 125, evidence_status = "用户截图", source = "N5四个练功房属性", notes = "金币怪；截图明确显示生命250.000万", enabled = true },
+    { profile_id = "N5_practice_attribute", difficulty_id = "N5", member_id = "practice_attribute", health = 4444440, attack = 4000000, war3_armor = 500, evidence_status = "用户截图", source = "N5四个练功房属性", notes = "属性怪；截图注明未受单位显示精度限制", enabled = true },
+    { profile_id = "N5_practice_greater_attribute", difficulty_id = "N5", member_id = "practice_greater_attribute", health = 4444440, attack = 5288887, war3_armor = 2220, evidence_status = "用户截图", source = "N5四个练功房属性", notes = "大属性怪；截图注明当前生命已受伤", enabled = true },
+    { profile_id = "N1_challenge_05_boss", difficulty_id = "N1", member_id = "challenge_05_boss", health = 100000, attack = 4000, war3_armor = 300, evidence_status = "面板确认", source = "特殊目标对照", notes = "合成宝石（宝石Boss）", enabled = true },
+    { profile_id = "N2_challenge_05_boss", difficulty_id = "N2", member_id = "challenge_05_boss", health = 12500, attack = 4400, war3_armor = 600, evidence_status = "待确认", source = "特殊目标对照", notes = "合成宝石（宝石Boss）", enabled = true },
+    { profile_id = "N3_challenge_05_boss", difficulty_id = "N3", member_id = "challenge_05_boss", health = 15000, attack = 4800, war3_armor = 600, evidence_status = "待确认", source = "特殊目标对照", notes = "合成宝石（宝石Boss）", enabled = true },
+    { profile_id = "N4_challenge_05_boss", difficulty_id = "N4", member_id = "challenge_05_boss", health = 175000, attack = 5200, war3_armor = 600, evidence_status = "面板确认", source = "特殊目标对照", notes = "合成宝石（宝石Boss）", enabled = true },
+    { profile_id = "N5_challenge_05_boss", difficulty_id = "N5", member_id = "challenge_05_boss", health = 250000, attack = 5600, war3_armor = 750, evidence_status = "面板确认", source = "特殊目标对照", notes = "合成宝石（宝石Boss）", enabled = true },
+    { profile_id = "N1_challenge_06_ice_wraith", difficulty_id = "N1", member_id = "challenge_06_ice_wraith", health = 40000, attack = 6000, war3_armor = 300, evidence_status = "面板确认", source = "特殊目标对照", notes = "冰之幽魂（小极地晶石小怪）", enabled = true },
+    { profile_id = "N2_challenge_06_ice_wraith", difficulty_id = "N2", member_id = "challenge_06_ice_wraith", health = 50000, attack = 6600, war3_armor = 600, evidence_status = "面板确认", source = "特殊目标对照", notes = "冰之幽魂（小极地晶石小怪）", enabled = true },
+    { profile_id = "N3_challenge_06_ice_wraith", difficulty_id = "N3", member_id = "challenge_06_ice_wraith", health = 60000, attack = 7200, war3_armor = 600, evidence_status = "规律推定", source = "特殊目标对照", notes = "冰之幽魂（小极地晶石小怪）", enabled = true },
+    { profile_id = "N4_challenge_06_ice_wraith", difficulty_id = "N4", member_id = "challenge_06_ice_wraith", health = 70000, attack = 7800, war3_armor = 600, evidence_status = "面板确认", source = "特殊目标对照", notes = "冰之幽魂（小极地晶石小怪）", enabled = true },
+    { profile_id = "N5_challenge_06_ice_wraith", difficulty_id = "N5", member_id = "challenge_06_ice_wraith", health = 100000, attack = 8400, war3_armor = 750, evidence_status = "面板确认", source = "特殊目标对照", notes = "冰之幽魂（小极地晶石小怪）", enabled = true },
+    { profile_id = "N1_challenge_07_molten_minion", difficulty_id = "N1", member_id = "challenge_07_molten_minion", health = 240000, attack = 16000, war3_armor = 300, evidence_status = "面板确认", source = "特殊目标对照", notes = "概率掉落熔火核心", enabled = true },
+    { profile_id = "N2_challenge_07_molten_minion", difficulty_id = "N2", member_id = "challenge_07_molten_minion", health = 300000, attack = 17600, war3_armor = 600, evidence_status = "面板确认", source = "特殊目标对照", notes = "概率掉落熔火核心", enabled = true },
+    { profile_id = "N3_challenge_07_molten_minion", difficulty_id = "N3", member_id = "challenge_07_molten_minion", health = 360000, attack = 19200, war3_armor = 600, evidence_status = "规律推定", source = "特殊目标对照", notes = "概率掉落熔火核心", enabled = true },
+    { profile_id = "N4_challenge_07_molten_minion", difficulty_id = "N4", member_id = "challenge_07_molten_minion", health = 420000, attack = 20800, war3_armor = 600, evidence_status = "面板确认", source = "特殊目标对照", notes = "概率掉落熔火核心", enabled = true },
+    { profile_id = "N5_challenge_07_molten_minion", difficulty_id = "N5", member_id = "challenge_07_molten_minion", health = 600000, attack = 22400, war3_armor = 750, evidence_status = "面板确认", source = "特殊目标对照", notes = "概率掉落熔火核心", enabled = true },
+    { profile_id = "N1_challenge_08_boss", difficulty_id = "N1", member_id = "challenge_08_boss", health = 10209920, attack = 200000, war3_armor = 300, evidence_status = "面板确认", source = "特殊目标对照", notes = "火焰巨魔", enabled = true },
+    { profile_id = "N2_challenge_08_boss", difficulty_id = "N2", member_id = "challenge_08_boss", health = 12762400, attack = 220000, war3_armor = 600, evidence_status = "规律推定", source = "特殊目标对照", notes = "火焰巨魔", enabled = true },
+    { profile_id = "N3_challenge_08_boss", difficulty_id = "N3", member_id = "challenge_08_boss", health = 15314880, attack = 240000, war3_armor = 600, evidence_status = "规律推定", source = "特殊目标对照", notes = "火焰巨魔", enabled = true },
+    { profile_id = "N4_challenge_08_boss", difficulty_id = "N4", member_id = "challenge_08_boss", health = 7867360, attack = 260000, war3_armor = 600, evidence_status = "面板确认", source = "特殊目标对照", notes = "火焰巨魔", enabled = true },
+    { profile_id = "N5_challenge_08_boss", difficulty_id = "N5", member_id = "challenge_08_boss", health = 25624800, attack = 280000, war3_armor = 750, evidence_status = "面板确认", source = "特殊目标对照", notes = "火焰巨魔", enabled = true },
+    { profile_id = "N1_challenge_09_boss", difficulty_id = "N1", member_id = "challenge_09_boss", health = 8209920, attack = 600000, war3_armor = 400, evidence_status = "面板确认", source = "特殊目标对照", notes = "冰烬挽歌", enabled = true },
+    { profile_id = "N2_challenge_09_boss", difficulty_id = "N2", member_id = "challenge_09_boss", health = 22762400, attack = 660000, war3_armor = 800, evidence_status = "面板确认", source = "特殊目标对照", notes = "冰烬挽歌", enabled = true },
+    { profile_id = "N3_challenge_09_boss", difficulty_id = "N3", member_id = "challenge_09_boss", health = 27314880, attack = 720000, war3_armor = 800, evidence_status = "规律推定", source = "特殊目标对照", notes = "冰烬挽歌", enabled = true },
+    { profile_id = "N4_challenge_09_boss", difficulty_id = "N4", member_id = "challenge_09_boss", health = 31867360, attack = 780000, war3_armor = 800, evidence_status = "面板确认", source = "特殊目标对照", notes = "冰烬挽歌", enabled = true },
+    { profile_id = "N5_challenge_09_boss", difficulty_id = "N5", member_id = "challenge_09_boss", health = 45524800, attack = 840000, war3_armor = 1000, evidence_status = "面板确认", source = "特殊目标对照", notes = "冰烬挽歌", enabled = true },
+    { profile_id = "N1_seven_sins_minion", difficulty_id = "N1", member_id = "seven_sins_minion", health = 18209920, attack = 1200000, war3_armor = 400, evidence_status = "用户批准沿用现值", source = "monster_archetypes.csv", notes = "工作簿N1未记录；用户明确沿用当前七宗罪小怪属性", enabled = true },
+    { profile_id = "N2_seven_sins_minion", difficulty_id = "N2", member_id = "seven_sins_minion", health = 22762400, attack = 1100000, war3_armor = 800, evidence_status = "面板确认", source = "特殊目标对照", notes = "概率掉落精华", enabled = true },
+    { profile_id = "N3_seven_sins_minion", difficulty_id = "N3", member_id = "seven_sins_minion", health = 27314880, attack = 1200000, war3_armor = 800, evidence_status = "面板确认", source = "特殊目标对照", notes = "概率掉落精华", enabled = true },
+    { profile_id = "N4_seven_sins_minion", difficulty_id = "N4", member_id = "seven_sins_minion", health = 31867360, attack = 1300000, war3_armor = 800, evidence_status = "规律推定", source = "特殊目标对照", notes = "概率掉落精华", enabled = true },
+    { profile_id = "N5_seven_sins_minion", difficulty_id = "N5", member_id = "seven_sins_minion", health = 45524800, attack = 1400000, war3_armor = 1000, evidence_status = "面板确认", source = "特殊目标对照", notes = "概率掉落精华", enabled = true },
+}
+M.by_id = {}
+for _, row in ipairs(M.rows) do
+    local key = row["profile_id"]
+    if key ~= nil then M.by_id[key] = row end
+end
+return M

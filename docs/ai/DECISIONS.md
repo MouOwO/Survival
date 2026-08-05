@@ -45,13 +45,14 @@
 41. **英雄战斗属性快照必须原子刷新并拒绝倒退。** 英雄攻击、护甲、攻速和逻辑三维来自同一份 `hero_combat_stat_service` 权威快照；选中单位即时响应不得用某一引擎帧的 `GetPhysicalArmorValue()` 或其他临时值覆盖其中单个字段。英雄快照携带单调 `refresh_version`，Panorama 同一选中单位只接受不旧于当前版本的快照；已有版本后到达的无版本快照也必须拒绝。非英雄单位仍可通过独立运行时快照反映临时 modifier。
 42. **含中文的配置 CSV 必须使用明确编码链并从权威源恢复。** `data/csv` 中的中文配置统一按 UTF-8/UTF-8 BOM 读取（构建器可兼容 `utf-8-sig`、UTF-8 和历史 GB18030/GBK 输入），生成 Lua 必须由 `tools/build_configs.py` 重新生成，禁止手改 `scripts/vscripts/config/generated`。发现 `�`、`��`、`锟斤拷` 或类似 CP936/GBK 误解码文本时，不能只“另存为 UTF-8”掩盖损坏，必须从 Git 或其他已确认权威源恢复中文，再做编码、列数、生成结果和 Lua 语法校验。PowerShell 读写中文源码时必须确认使用 PowerShell 7 或明确的 UTF-8 字节读写，禁止用 Windows PowerShell 5.1 默认编码整文件重写。
 43. **带移动父载体的分段视觉必须在阶段边界立即销毁。** `DestroyParticle(index, false)`只停止发射，不会清除已生成且仍有寿命的父载体或其子系统；若父粒子通过`C_OP_BasicMovement`和`C_OP_SetChildControlPoints`驱动完整子效果，已有载体会越过Lua定义的阶段终点继续外推。此类纯视觉实例在换段、正常终点、异常和重置时统一使用`DestroyParticle(index, true)`后再`ReleaseParticleIndex`；视觉清理不得改变权威投射物、命中、伤害、波数或时序。
-43. **完整复刻本体的召唤英雄或永久分身必须镜像combat system最终结果。** 同一次`HERO_COMBAT_STATS_GET_REQUEST`快照是攻击、最终攻速、暴击、逻辑三维和最大生命的唯一原子来源；召唤物侧不得重新组合BAT、装备攻速百分比、伤害倍率或原生三维。需要实际普通攻击值时由`hero_combat_stat_service`发布最终引擎攻击上下界；生命复用隐藏生命Modifier；选中UI按严格分身身份读取owner快照。数值镜像不得通过挂本体全套Modifier实现，装备、公共技能、转生和其他事件链必须继续显式隔离。
+
 44. **英雄即时普通攻击使用显式近战能力，不使用极高弹速模拟。** `hero_attack_projectiles.csv.attack_capability`是攻击能力权威字段；需要攻击前摇后立即结算时配置`melee`并保留原生攻击链，攻击距离由独立CSV射程和现有射程Modifier投影。禁止通过30000等极高速度、0速度暗号或手写伤害模拟近战即时命中。
 45. **英雄普通攻击飘字只显示最终实际伤害。** 暴击概率与倍率保持attack record身份并通过仅作用于普通攻击的`MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE`投影，避免Valve原生`PREATTACK_CRITICALSTRIKE`显示减甲前数值；护甲、吸血、攻击事件和项目DamageFilter仍走原链路。最终`OnTakeDamage.params.damage`决定白色普通字或橙色暴击字，技能与脚本伤害不得伪装为平A飘字。
 46. **科技研究必须在进度结束后原子提交等级和效果。** Begin阶段由服务端完成条件校验与原子扣费，只创建一次性事务，不改变等级、效果或发布完成事件；同一队伍在事务结束前只能存在一项研究。计时结束后以服务端`transaction_id`提交，提交异常必须恢复旧等级/效果并退款，重复或迟到回调不得二次升级。成功提示、等级事件和效果刷新只能发生在Commit成功后。Panorama只显示服务端研究进度，禁止用客户端倒计时决定升级；旧`technology_cooldown_*`字段仅作为兼容名称保留，其语义为研究进度而非购买后冷却。
 47. **Panorama HUD展示选择与Ability输入选择使用不同身份边界。** HUD属性链使用有效非占位portrait，即使敌方单位或树木不在`Players.GetSelectedEntities()`；技能、Builder、Grid和建筑移动只使用可控选择解析器。两条链可以共享底层工具，但不得共用一个会拒绝敌方query单位或允许敌方成为caster的最终解析结果。
 48. **攻击触发的装备范围效果以主攻击业务事件和战斗快照为权威。** 只响应`HERO_MAIN_ATTACK_LANDED`并防御性排除次级攻击；每次业务攻击按`attack_id`有界去重，不能永久保存可复用的裸record。按三维结算时必须在触发点读取`HERO_COMBAT_STATS_GET_REQUEST`，AoE中心由效果语义明确指定，逐目标进入统一伤害事务并检查结果。粒子和声音只提供一次性反馈，必须与权威范围查询和伤害隔离。
-
+49. **挑战难度战斗值按遭遇成员和session快照解析。** 练功房及特殊目标的生命、攻击、War3护甲来自`challenge_combat_profiles.csv`的`difficulty_id + member_id`行；遭遇开始时固定`wave_system`难度，后续刷新沿用同一session值。已纳入Profile的成员缺少当前难度行时必须在生成单位前失败关闭，禁止回退原型或其他难度；未纳入Profile的旧遭遇继续使用原型。War3护甲只在单位生成边界转换一次。
+50. **完整复刻本体的召唤英雄或永久分身必须镜像combat system最终结果。** 同一次`HERO_COMBAT_STATS_GET_REQUEST`快照是攻击、最终攻速、暴击、逻辑三维和最大生命的唯一原子来源；召唤物侧不得重新组合BAT、装备攻速百分比、伤害倍率或原生三维。需要实际普通攻击值时由`hero_combat_stat_service`发布最终引擎攻击上下界；生命复用隐藏生命Modifier；选中UI按严格分身身份读取owner快照。数值镜像不得通过挂本体全套Modifier实现，装备、公共技能、转生和其他事件链必须继续显式隔离。
 ## 游戏行为决策
 
 1. 合成宝石、熔火核心和其他非武器材料允许丢弃；武器不可丢弃。

@@ -1,5 +1,21 @@
 # Project Context
 
+## 范围拾取与Builder建造技能的跨层边界（2026-08-05）
+
+- 召唤英雄工具技能`ability_survival_pickup_materials`固定由F触发；物品拾取必须保留现有玩家所有权过滤、二维距离排序、同距离entindex稳定排序、装备栏`0..8`容量检查和满栏立即停止。真实地面物品继续通过`AddItem`进入既有Claim/逻辑库存/防复制链，虚拟升阶材料继续走自身服务，不能为了范围拾取直接删除实体或手写库存发放。
+- “范围拾取”存在两个不同几何概念，必须分别建模和测试：英雄到鼠标目标点的最大施法距离，以及鼠标点周围的拾取AOE半径。Ability KV/运行Ability必须是点目标并提供AOE预览，服务端搜索函数必须显式接收目标位置；如果仍使用`caster:GetAbsOrigin()`，即使UI显示AOE也只是错误视觉。当前用户目标口径为施法距离1000、目标点AOE半径300。
+- Builder技能槽位以`data/csv/建筑与工人系统/builder_ability_stages.csv`为权威：`slot_order=1`映射Ability index 0/Q；城墙完成后主城替换同一Q链，主城完成后再展开五个建造槽，D闪烁固定index 5。不得把旧`builder_ability_rules.csv`或Ability自然添加顺序当成槽位权威。
+- 施工时间以`building_construction_rules.csv::build_time`为业务来源。若技能CD用于表现施工期，CD必须绑定“本次施法的具体Ability实例”和该建筑施工事务，失败/取消时恢复，完成时自然结束或校正；不能用Builder全局锁阻止其他建筑，也不能只修改KV固定CD而与CSV施工时间漂移。专项测试至少要覆盖当前技能施工中不可再次使用、其他建造技能仍可使用、失败不残留CD、多个建筑并行施工互不覆盖。
+- 用户对本任务的当前反馈是“基本完成”，不是逐项实机验收声明。当前仓库可确认F归属、旧英雄圆心300拾取、满栏停止及城墙/主城Q槽位；点目标1000/300 AOE和施工期独立CD仍需在继续工作前核对实际运行分支与产物。
+
+## 挑战战斗Profile与难度快照（2026-08-05）
+
+- `data/csv/挑战与奖励系统/challenge_combat_profiles.csv`是练功房及特殊目标的难度战斗数值权威源，键为`difficulty_id + member_id`；当前覆盖四个练功房成员和六类特殊目标，共10个成员×N1-N5=50条。模型、移动速度、射程、攻速和奖励仍由现有成员/怪物原型控制，Profile只覆盖生命、攻击和War3护甲。
+- 挑战遭遇创建时通过`WAVE_STATE_GET_REQUEST`读取`wave_system`当前`difficulty_id`并写入session；维持数量和死亡刷新都继续调用`spawn_member(session, member)`，因此必须沿用session快照，不能在刷新时重新读取可能变化的全局状态。纯Lua启动阶段尚未注册波次handler时只回退`difficulty_config.default_id`；handler存在但状态异常仍失败关闭。
+- Profile表中不存在的成员继续使用怪物原型战斗值；成员一旦进入Profile表，该难度缺行必须返回`challenge_combat_profile_missing:<member>:<difficulty>`并在session生成任何单位前失败，禁止静默回退N1或生成部分遭遇。
+- CSV存储War3护甲，`challenge_session_service.apply_combat_stats()`仅在单位生成边界调用一次`armor_balance.from_war3()`。不得把Profile生成Lua预先除3，也不得让UI或刷新链重复换算。
+- 已确认特殊目标成员映射：合成宝石=`challenge_05_boss`、冰之幽魂=`challenge_06_ice_wraith`、熔火核心小怪=`challenge_07_molten_minion`、火焰巨魔=`challenge_08_boss`、冰烬挽歌=`challenge_09_boss`、精华小怪=`seven_sins_minion`。N1七宗罪按用户批准沿用生命18209920、攻击1200000、War3护甲400；N5木头怪生命按截图原值15000保留。
+
 ## N3-N5独立波次导入与难度选择（2026-08-05）
 
 - `data/csv/怪物与波次系统/wave_definitions.csv`是N3-N5波次成员的运行权威源。N3-N5各自拥有30波直接数据，每个难度均为普通怪1270、`wave_leader`27、`assault_boss`6，总计划1303；完整直接CSV存在时`wave_difficulty_builder`不得回退到N1倍率派生。

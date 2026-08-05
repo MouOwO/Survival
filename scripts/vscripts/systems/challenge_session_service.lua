@@ -11,6 +11,8 @@ local encounters = require("config/generated/monster_encounters")
 local locations = require("config/generated/challenge_locations")
 local members = require("config/generated/encounter_members")
 local archetypes = require("config/generated/monster_archetypes")
+local combat_profiles = require("config/challenge_combat_profile_config")
+local difficulty_config = require("config/difficulty_config")
 local weapons = require("config/generated/weapon_definitions")
 local seven_sins_essences = require("config/seven_sins_essences")
 local molten_core_rules = require("config/molten_core_challenge_rules")
@@ -195,19 +197,23 @@ local function destroy_session_monsters(session)
     session.monster_count = 0
 end
 
-local function apply_combat_stats(unit, archetype)
-    local health = tonumber(archetype.health)
+local function apply_combat_stats(unit, archetype, profile)
+    profile = profile or archetype
+    local health = tonumber(profile.health or archetype.health)
     if health and health > 0 then
         unit:SetBaseMaxHealth(health)
         unit:SetMaxHealth(health)
         unit:SetHealth(health)
     end
-    local attack = tonumber(archetype.attack)
+    local attack = tonumber(profile.attack or archetype.attack)
     if attack then
         unit:SetBaseDamageMin(attack)
         unit:SetBaseDamageMax(attack)
     end
-    local war3_armor = tonumber(archetype.war3_armor or archetype.armor)
+    local war3_armor = tonumber(
+        profile.war3_armor or profile.armor
+            or archetype.war3_armor or archetype.armor
+    )
     if war3_armor then
         unit:SetPhysicalArmorBaseValue(armor_balance.from_war3(war3_armor))
     end
@@ -249,6 +255,11 @@ local function spawn_member(session, member)
     if not archetype or archetype.enabled == false then
         return nil, "challenge_archetype_not_found:" .. tostring(member.archetype_id)
     end
+    local combat_profile, profile_error = combat_profiles.resolve(
+        member.member_id,
+        session.difficulty_id
+    )
+    if profile_error then return nil, profile_error end
 
     local point, expected = spawn_point_for(session, member, location)
     local position = point and point:GetAbsOrigin() or nil
@@ -315,7 +326,7 @@ local function spawn_member(session, member)
     if unit.Script_SetAttackRange and combat_archetype.attack_range then
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
-    apply_combat_stats(unit, combat_archetype)
+    apply_combat_stats(unit, combat_archetype, combat_profile)
     monster_visual.apply(unit, archetype)
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
 
@@ -409,6 +420,17 @@ local function validate_session_markers(session)
         if not ok then return false, error_message end
     end
     return true
+end
+
+local function validate_session_combat_profiles(session)
+    for _, member in ipairs(session.members) do
+        local _, profile_error = combat_profiles.resolve(
+            member.member_id,
+            session.difficulty_id
+        )
+        if profile_error then return false, profile_error end
+    end
+    return true, nil
 end
 
 local function teleport_to_current(session)
@@ -636,6 +658,20 @@ function M.start(payload)
     end
     local hero = hero_for(player_id)
     if not alive(hero) then return { ok = false, error = "hero_not_ready" } end
+    local wave_state, wave_state_error = event_bus.request(
+        events.WAVE_STATE_GET_REQUEST,
+        {}
+    )
+    local difficulty_id = wave_state and wave_state.ok
+        and tostring(wave_state.difficulty_id or "") or ""
+    if difficulty_id == ""
+        and wave_state_error == "no_request_handler:"
+            .. tostring(events.WAVE_STATE_GET_REQUEST) then
+        difficulty_id = difficulty_config.default_id
+    end
+    if difficulty_id == "" then
+        return { ok = false, error = "challenge_difficulty_unavailable" }
+    end
 
     if challenge.challenge_id == "challenge_10" then
         local abyss_stage, inventory_error = owned_series_stage(player_id, "legend_abyss")
@@ -713,6 +749,7 @@ function M.start(payload)
         challenge = challenge,
         encounter = encounter,
         encounter_id = encounter_id,
+        difficulty_id = difficulty_id,
         members = list,
         stage = 1,
         display_stage = display_stage,
@@ -730,6 +767,8 @@ function M.start(payload)
         spawn_serial = 0,
         molten_core_kill_serial = 0,
     }
+    local profiles_ok, profile_error = validate_session_combat_profiles(session)
+    if not profiles_ok then return { ok = false, error = profile_error } end
     local markers_ok, marker_error = validate_session_markers(session)
     if not markers_ok then return { ok = false, error = marker_error } end
 

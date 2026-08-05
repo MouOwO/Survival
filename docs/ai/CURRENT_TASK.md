@@ -1,5 +1,26 @@
 # Current Task
 
+## 2026-08-05 范围拾取与Builder建造槽位任务经验记录
+
+- 用户反馈该任务“基本完成”并要求记录经验；本条作为收束检查点，不将其升级为全部需求已实机验收。
+- 当前仓库已确认：召唤英雄F拥有范围拾取；物品按所有权过滤、二维距离/entindex稳定排序和装备栏空位逐件拾取，满栏停止；`builder_ability_stages.csv`让城墙与随后主城都使用`slot_order=1`，即同一Q槽位，主城完成后展开Q/W/E/R/T。
+- 当前仓库仍与用户最新目标存在静态差异：拾取KV仍为无目标立即施法且搜索中心仍是英雄位置300码，没有点目标1000施法距离/鼠标点300 AOE预览；建造KV仍为0.5秒固定CD，尚无施工3秒与具体建造Ability CD绑定且不阻塞其他建筑的专项证据。
+- 本次未修改生产代码。后续若用户继续该任务，第一步必须确认“基本完成”的实测运行产物是否来自当前分支；若是当前分支，则按最新需求补齐上述两项并新增点目标几何、空栏容量、施工独立CD、失败清理和并行建造测试。
+- 经验已沉淀到`PROJECT_CONTEXT.md`，关键过程已追加到`SESSION_LOG.md`；`DECISIONS.md`和`KNOWN_ISSUES.md`没有新增长期决策或已证实引擎陷阱，因此不为本次记录扩写。
+
+## 2026-08-05 新增批准范围：练功房与特殊目标难度属性
+
+- 用户要求把权威工作簿“特殊目标对照”Sheet中的不同房间怪物属性同步到CSV，并把用户提供的五张截图中N1-N5四个练功房小怪属性全部同步到CSV和运行时。
+- 用户已批准实施。四个练功房按`practice_wood/practice_gold/practice_attribute/practice_greater_attribute`映射；截图中的N5木头怪生命明确按`15000`原值录入，不擅自改为`150000`。
+- 特殊目标映射确认为：合成宝石→`challenge_05_boss`、冰之幽魂→`challenge_06_ice_wraith`、概率掉落熔火核心→`challenge_07_molten_minion`、火焰巨魔→`challenge_08_boss`、冰烬挽歌→`challenge_09_boss`、概率掉落精华→`seven_sins_minion`。
+- 工作簿未记录“概率掉落精华”的N1属性；用户明确选择N1继续沿用当前`seven_sins_minion`生命`18209920`、攻击`1200000`、War3护甲`400`，N2-N5使用工作簿值。
+- 实施边界：新增按`difficulty_id + member_id`区分的CSV战斗Profile；挑战遭遇创建时从现有`WAVE_STATE_GET_REQUEST`读取`wave_system`权威难度并固定快照，后续刷新沿用session快照；外观继续由怪物原型控制，生命/攻击/护甲由Profile控制，护甲只执行一次War3→Dota换算。
+- 验证要求：CSV/生成Lua一致性、50条数据契约、Lua 5.1难度快照与属性应用行为、相关挑战回归、Lua 5.1语法、严格UTF-8、限定`git diff --check`和最终Git状态。自动验证不能替代Workshop Tools实机验收。
+- 实施完成：新增50条Profile及生成Lua；挑战session固定`WAVE_STATE_GET_REQUEST`返回的难度，刷新沿用快照；Profile预校验在生成单位前失败关闭；生命/攻击/War3护甲覆盖已接入，其他原型属性保持不变。
+- 自动验证通过：`CHALLENGE_COMBAT_PROFILES_CONTRACT_PASS`、`CHALLENGE_COMBAT_PROFILES_LUA51_PASS`、`CHALLENGE_COMBAT_PROFILES_LUAC51_PASS`、`CHALLENGE_COMBAT_PROFILES_GENERATED_COMPARE_PASS`、`CHALLENGE_COMBAT_PROFILES_STRICT_UTF8_PASS`、`CHALLENGE_COMBAT_PROFILES_DIFF_CHECK_PASS`，以及挑战foreground、N3、N4/N5现有专项回归。
+- 构建边界：全量`tools/build_configs.py`被既有无关`item_definitions.csv`的`invalid number: equipment_iron_armor_01`阻断；目标CSV已用同一生成函数定向生成并逐字节比较通过，未修改无关物品配置。
+- 剩余动作：Workshop Tools完全冷启动后，分别以N1-N5进入四个练功房和六类特殊目标，核对生命、攻击、UI War3护甲、维持数量刷新/死亡刷新继承当前session难度，并确认切换或后续状态变化不影响已创建遭遇。未经用户确认不得记录实机验收或任务完成。
+
 ## 活跃任务（2026-08-05）：N1–N5怪物难度与CSV架构重构
 
 - 用户要求整理N1–N5难度并大规模重构怪物CSV：不同难度的每波属性和组成均可不同；同波可包含普通怪、模型略大的首只领头怪（工作簿称“首怪Boss”）和明显更强、更大的进攻Boss；特殊目标、野外/副本Boss、转生Boss及十戒Boss也必须按N1–N5变化。

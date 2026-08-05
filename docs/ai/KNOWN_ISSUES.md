@@ -2,6 +2,10 @@
 
 ## 当前已知问题
 
+0. **全量`tools/build_configs.py`当前被既有`item_definitions.csv`列类型错误阻断。**
+   - 2026-08-05生成挑战战斗Profile时，全量构建在物品表读取到`invalid number: equipment_iron_armor_01`后退出；失败发生在新增Profile成功生成之后，但不能描述为全量构建通过。
+   - 本任务使用同一个`tools.build_configs.build()`对`challenge_combat_profiles.csv`定向重建，并与仓库生成Lua做SHA-256逐字节比较通过。不得修改无关物品CSV来迎合本任务；后续应单独修复物品表表头/类型/行错位后再恢复全量构建验证。
+
 0. **Dota实体entindex会在单位移除后复用，不能作为跨生命周期的永久死亡去重键。**
    - 2026-08-05极寒之刃实机问题表现为批量击杀很多普通敌人时进度通常只减少1～2，甚至不减少。根因是成长服务同时订阅引擎死亡和派生怪物死亡，再把`victim_entindex`永久保存在玩家去重集合；后续新单位复用旧entindex时被误判为同一次死亡。
    - 同一底层事实存在引擎事件与派生业务事件时，应明确唯一权威入口；极寒之刃只消费`ENGINE_ENTITY_KILLED`。不要通过跨整局保存entindex来弥补双订阅，按数量裁剪无序Lua table也不能保证淘汰最旧身份。

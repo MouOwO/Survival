@@ -366,6 +366,7 @@ end
 local function get_wave_state()
     return {
         ok = true,
+        difficulty_id = difficulty_id,
         current_wave = state.current_wave,
         total_waves = state.total_waves,
         status = state.status,
