@@ -1,5 +1,17 @@
 # Current Task
 
+## 已完成任务（2026-08-05）：初始资源与基础伐木效率修正
+
+- 用户要求开局金币改为`0`、木材改为`10`；农民LV1基础伐木效率为`1`，即无科技且资源树LV1时每次普通攻击只获得1木材，其他农民等级依照`training_definitions.csv.wood_per_hit`类推。
+- 只读调查确认：初始资源当前由`config/resources_config.lua`手写为木材1000、金币500，没有CSV权威来源；农民LV1至LV8的CSV及生成Lua基础效率`1/2/3/5/10/20/40/80`一致且正确。
+- “整体多1”根因确认：`tree_config.lua`配置`lumber_efficiency_buff_per_level=1`，`tree_system.lua`按`tree_level * per_level`计算；资源树初始为LV1，因此开局无条件额外+1。科技加成链只并入一次，不是本次根因。
+- 用户已批准实施：在`global_rules.csv`增加初始资源、人口及树收益规则并生成Lua；`resources_config.lua`和`tree_config.lua`消费CSV包装器；树升级收益改为`max(0, tree_level - 1) * per_level`，即树LV1为+0、LV2为+1、LV3为+2。
+- 工作区保护：实施前`git status --short`只有既有未跟踪测试和日志文件，本任务不得覆盖、删除或纳入这些文件。
+- 验证要求：专项PowerShell契约、Lua 5.1行为测试、相关树木回归、Lua 5.1语法、CSV与生成Lua一致性、严格UTF-8、限定`git diff --check`和最终Git状态。自动测试不能替代Workshop Tools实机确认。
+- 实施完成：`global_rules.csv`新增开局金币0、木材10、人口0/0、树每级收益1和英雄基础伐木13，并已定向生成；`resources_config.lua`与`tree_config.lua`改为消费CSV包装器。树收益公式现为`max(0, tree_level - 1) * per_level`，农民基础CSV保持不变。
+- 自动验证通过：`INITIAL_RESOURCES_AND_LUMBER_CONTRACT_PASS`、`INITIAL_RESOURCES_AND_LUMBER_LUA51_PASS`（包含实际`resource_system`账户快照）、`INITIAL_RESOURCES_AND_LUMBER_ALL_LUAC51_PASS`、`GLOBAL_RULES_GENERATED_COMPARE_PASS`、`TREE_DAMAGE_RULES_CONTRACT_PASS`、`TREE_DAMAGE_RULES_LUA51_PASS`、本任务生产/测试文件严格UTF-8和限定`git diff --check`。`SESSION_LOG.md`历史已有3个替换字符与1处乱码标记，HEAD/工作树计数相同且本轮新增段严格UTF-8，不在本任务清理。
+- 用户验收：用户于2026-08-05明确回复“验收通过”。本任务的开局金币0、木材10及基础伐木效率修正已通过Workshop Tools实机验收，任务完成；后续不得再把它恢复为活跃或待验收任务，除非用户报告具体回归。
+
 ## 2026-08-05 范围拾取与Builder建造槽位任务经验记录
 
 - 用户反馈该任务“基本完成”并要求记录经验；本条作为收束检查点，不将其升级为全部需求已实机验收。

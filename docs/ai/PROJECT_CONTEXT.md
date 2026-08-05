@@ -1,5 +1,11 @@
 # Project Context
 
+## 初始资源与资源树伐木收益边界（2026-08-05）
+
+- 队伍开局金币、木材、已用人口和人口上限的权威源是`data/csv/公共规则/global_rules.csv`，由生成的`global_rules.lua`经`config/global_rules.lua`投影到`config/resources_config.lua`。当前值为金币0、木材10、人口0/0；不得恢复为`resources_config.lua`手写业务初值。
+- 农民各等级基础伐木效率权威源仍是`training_definitions.csv.wood_per_hit`，当前LV1至LV8为`1/2/3/5/10/20/40/80`。科技收益在`modifier_lumberjack_ai`中并入基础命中载荷，资源树等级收益在`tree_system.lua`统一追加，不能把两者再写回训练基础值。
+- 资源树等级收益语义是“从LV2起每级+1”，公式为`max(0, tree_level - 1) * tree_lumber_efficiency_buff_per_level`。资源树LV1必须为额外+0，否则所有农民和英雄采集会从开局整体多1；LV2为+1、LV3为+2。每级值与英雄基础伐木收益也来自`global_rules.csv`。
+
 ## 范围拾取与Builder建造技能的跨层边界（2026-08-05）
 
 - 召唤英雄工具技能`ability_survival_pickup_materials`固定由F触发；物品拾取必须保留现有玩家所有权过滤、二维距离排序、同距离entindex稳定排序、装备栏`0..8`容量检查和满栏立即停止。真实地面物品继续通过`AddItem`进入既有Claim/逻辑库存/防复制链，虚拟升阶材料继续走自身服务，不能为了范围拾取直接删除实体或手写库存发放。

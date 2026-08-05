@@ -1,4 +1,5 @@
 local armor_balance = require("config/armor_balance")
+local global_rules = require("config/global_rules")
 local world_visuals = require("config/generated/world_visual_definitions")
 
 local tree_asset = assert(
@@ -64,8 +65,14 @@ local M = {
     grid_cell_size = 64,
     max_level = #source_levels,
     levels = levels,
-    lumber_efficiency_buff_per_level = 1,
-    hero_base_lumber_efficiency = 13,
+    lumber_efficiency_buff_per_level = global_rules.number(
+        "tree_lumber_efficiency_buff_per_level",
+        1
+    ),
+    hero_base_lumber_efficiency = global_rules.number(
+        "hero_base_lumber_efficiency",
+        13
+    ),
 }
 
 return M

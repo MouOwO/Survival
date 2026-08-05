@@ -33,11 +33,11 @@ local function tree_grid()
     }
 end
 
-local function lumber_efficiency_buff()
+local function lumber_efficiency_buff(level)
     return math.max(
         0,
         tonumber(config.lumber_efficiency_buff_per_level) or 0
-    ) * tree_level
+    ) * math.max(0, (tonumber(level) or tree_level) - 1)
 end
 
 local function tree_snapshot()
@@ -50,7 +50,7 @@ local function tree_snapshot()
         war3_armor = row.war3_armor,
         minimum_armor = row.minimum_armor,
         war3_minimum_armor = row.war3_minimum_armor,
-        lumber_efficiency_buff = lumber_efficiency_buff(),
+        lumber_efficiency_buff = lumber_efficiency_buff(tree_level),
     }
 end
 
@@ -160,7 +160,7 @@ local function on_tree_hit(payload)
         and config.hero_base_lumber_efficiency
         or payload.base_lumber_efficiency
     local efficiency = math.max(0, math.floor(
-        (tonumber(base_efficiency) or 0) + lumber_efficiency_buff()
+        (tonumber(base_efficiency) or 0) + lumber_efficiency_buff(tree_level)
     ))
     local critical = payload.critical == true
         or payload.source == "lumberjack"
@@ -208,5 +208,7 @@ M._reset_for_test = function(level, tree)
     tree_level = tonumber(level) or 1
     current_tree = tree
 end
+
+M._lumber_efficiency_buff_for_test = lumber_efficiency_buff
 
 return M

@@ -1,4 +1,29 @@
 -
+## 2026-08-05 - 初始资源与基础伐木效率修正获批
+
+- 用户要求开局金币0、木材10，并指出农民LV1应每次平A只获得1木材、当前基础伐木效率疑似整体多1。用户已批准按调查方案实施。
+- CSV调查确认`training_definitions.csv.wood_per_hit`及生成Lua均为LV1至LV8 `1/2/3/5/10/20/40/80`，农民基础表没有配置错。收益链为`modifier_lumberjack_ai`发布基础值和科技值，`tree_system.lua`再加资源树等级Buff；科技没有重复叠加。
+- 根因是资源树从LV1开始按`tree_level * lumber_efficiency_buff_per_level`计算，且每级值为1，因此所有采集从开局无条件+1。批准行为改为`max(0, tree_level - 1) * per_level`，保留树升级收益但让LV1为0。
+- 初始资源当前只在`resources_config.lua`手写木材1000、金币500。为遵守CSV权威，批准把初始金币、木材、人口和树收益基础规则写入`global_rules.csv`并定向生成，现有配置包装器负责运行时读取。
+- 实施前工作区只有已记录的用户未跟踪测试/日志文件；本任务不触碰这些文件。工具链确认Python 3.14.3、Lua/Luac 5.1.5和PowerShell 7.6.4有效。
+- 下一步：修改CSV、定向生成、接入配置消费者、修正树公式并添加专项测试；随后执行生成一致性、Lua 5.1、契约、语法、UTF-8和限定diff验证。
+
+### 实施与自动验证完成
+
+- `global_rules.csv`已新增开局金币0、木材10、已用人口0、人口上限0、资源树每级伐木收益1和英雄基础伐木收益13；使用`tools.build_configs.build()`定向生成`global_rules.lua`并与临时重建文件逐字节一致。没有运行会被既有物品表问题阻断的全量生成，也没有手改生成文件。
+- `resources_config.lua`和`tree_config.lua`复用现有`config/global_rules.lua`读取CSV值。`tree_system.lua`统一使用`max(0, tree_level - 1) * per_level`，因此LV1树额外收益0、LV2为1、LV3为2；农民训练CSV基础值和科技单次叠加链未改。
+- 新增专项PowerShell契约和Lua 5.1行为测试。行为测试实际初始化`resource_system`并请求队伍快照，确认金币0、木材10、人口0/0；同时确认八级农民基础值、树LV1/LV2/LV3偏移及LV1科技+1只叠加一次。
+- 验证通过：`INITIAL_RESOURCES_AND_LUMBER_CONTRACT_PASS`、`INITIAL_RESOURCES_AND_LUMBER_LUA51_PASS`、`INITIAL_RESOURCES_AND_LUMBER_ALL_LUAC51_PASS`、`GLOBAL_RULES_GENERATED_COMPARE_PASS`、`TREE_DAMAGE_RULES_CONTRACT_PASS`、`TREE_DAMAGE_RULES_LUA51_PASS`、9个本任务生产/测试文件严格UTF-8和限定`git diff --check`。
+- 编码边界：`SESSION_LOG.md`历史基线已有3个替换字符和1处历史乱码标记，Python直接读取HEAD与工作树字节后计数完全相同；本轮新增段严格UTF-8通过。未擅自清理无关历史日志。
+- 工作区保护：本轮生成的Python 3.14缓存已删除；`tools/__pycache__`中既有3.11/3.13忽略缓存未触碰。用户原有未跟踪测试和日志仍保留，未覆盖、删除或纳入本任务。
+- 剩余动作：Workshop Tools完全冷启动确认开局资源面板为0金币/10木材；农民LV1攻击LV1树每次获得1木材，树升至LV2后每次获得2木材。自动测试不等于引擎实机验收。
+
+### 用户实机验收通过
+
+- 用户于2026-08-05明确回复“验收通过”。据此记录：开局金币0、木材10，以及农民基础伐木效率不再整体额外+1的修正已通过Workshop Tools实机验收。
+- 本任务正式完成，不再保留待验收动作，也不得在后续会话中自动恢复为活跃任务。稳定配置和公式边界已写入`PROJECT_CONTEXT.md`；除非用户报告具体回归，否则等待下一项任务。
+- 验收后Git状态出现`hero_definitions.csv`、Panorama编译产物和粒子编译产物变化，视为Workshop Tools或用户产生的工作区内容；本次记录未触碰、回滚或纳入这些无关修改。
+
 ## 2026-08-05 - 范围拾取与Builder建造槽位任务经验收束
 
 - 用户反馈本任务“基本完成”，要求记录任务经验。本次只整理经验和恢复状态，不继续修改生产代码，也不把“基本完成”扩大解释为全部细项均已Workshop Tools验收。
