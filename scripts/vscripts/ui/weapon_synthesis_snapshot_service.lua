@@ -3,10 +3,40 @@ local events = require("core/events")
 local recipe_config = require("config/recipe_definitions")
 local effect_config = require("config/item_level_effects")
 local levels = require("config/equipment_level_definitions")
+local weapons = require("config/generated/weapon_definitions")
 local effects = require("config/effect_dictionary")
 local tooltip_view_model = require("ui/tooltip_view_model")
 
 local M = {}
+
+local function copy(values)
+    local result = {}
+    for key, value in pairs(values or {}) do result[key] = value end
+    return result
+end
+
+local function authoritative_growth(equipped, weapon_growth, equipment_progress)
+    local result = copy(weapon_growth)
+    local content_id = tostring(equipped.main_hand_content_id or "")
+    local definition = levels.by_id[content_id]
+    if not definition or not definition.progression
+        or definition.progression.type ~= "valid_enemy_kill_count" then
+        return result
+    end
+    local configured_target = tonumber(
+        weapons.by_id[content_id] and weapons.by_id[content_id].progression_value
+    )
+    local target = configured_target and configured_target > 0
+        and configured_target or 200
+    local current = math.max(
+        0,
+        tonumber(equipment_progress and equipment_progress[content_id]) or 0
+    )
+    result.stage_attack_count = current
+    result.stage_attack_target = target
+    result.stage_attack_remaining = math.max(0, target - current)
+    return result
+end
 
 local function valid_player(id)
     return id ~= nil and id >= 0 and PlayerResource:IsValidPlayerID(id)
@@ -31,7 +61,13 @@ local function publish(id, reason)
     local equipment_growth = event_bus.request(
         events.EQUIPMENT_GROWTH_GET_REQUEST, { player_id = id })
     local equipped = equipment and equipment.snapshot or { player_id = id }
-    local weapon_growth = growth and growth.snapshot or { player_id = id }
+    local raw_weapon_growth = growth and growth.snapshot or { player_id = id }
+    local equipment_progress = equipment_growth and equipment_growth.progress or {}
+    local weapon_growth = authoritative_growth(
+        equipped,
+        raw_weapon_growth,
+        equipment_progress
+    )
     CustomNetTables:SetTableValue(
         "survival_weapon_equipment", tostring(id), equipped)
     CustomNetTables:SetTableValue(
@@ -46,12 +82,12 @@ local function publish(id, reason)
         equipment = equipped,
         growth = weapon_growth,
         instances = instances and instances.instances or {},
-        equipment_growth = equipment_growth and equipment_growth.progress or {},
+        equipment_growth = equipment_progress,
         tooltip_view_model = tooltip_view_model.weapon_snapshot(
             equipped,
             weapon_growth,
             instances and instances.instances or {},
-            equipment_growth and equipment_growth.progress or {}
+            equipment_progress
         ),
     })
     send(id, "ui_weapon_synthesis_snapshot", {

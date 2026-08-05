@@ -46,6 +46,19 @@
 - 首轮验证：`WAVE_TIMING_LUA51_PASS`、`WAVE_TIMING_CONTRACT_PASS`、`WAVE_TIMING_LUAC51_PASS`、`WAVE_TIMING_GENERATED_COMPARE_PASS`、严格UTF-8及限定`git diff --check`通过。这些分别是数学/契约/语法/生成一致性检查，不是Workshop Tools实机计时验证。
 - 仍阻塞：飞行高护甲怪具体难度、波次和组成表尚待用户上传；N2–N5完整组成也尚无权威明细，不能猜测写入。
 - 最终补充验证：生成注册表`config/generated/index.lua`已加入`wave_timing_rules`并通过Lua 5.1语法；本轮Python 3.14产生的缓存已清理。清理时曾误删3个仓库原有跟踪`.pyc`，已立即从`HEAD`按原字节恢复并确认`git status`无差异。两次间隔工作区状态检查稳定，未触碰用户已有Panorama/粒子产物和未跟踪测试/日志。
+## 2026-08-05 — 极寒之刃批量击杀进度修复获批实施
+
+- 用户反馈：极寒之刃设计为杀死任意敌人使自己的剩余进度减1，但实机一次杀很多怪时通常只减1～2，甚至不减；要求同时调查服务端逻辑和UI实时刷新，并参考历史docs。
+- 静态根因一：`equipment_growth_service.lua`同时消费`ENGINE_ENTITY_KILLED`与派生`MONSTER_KILLED`，为去重而跨整局保存`kill_seen[player][victim_entindex]`；Dota新单位可能复用已移除单位entindex，后续合法死亡因此被误判为旧事件。超过256条后的`pairs()`无序裁剪也不能保证移除最旧记录。
+- 静态根因二：极寒实际击杀值保存在`EQUIPMENT_GROWTH_GET_REQUEST.progress`，但`survival_weapon_snapshot.growth`与Tooltip ViewModel优先消费未接收极寒击杀的`WEAPON_GROWTH_GET_REQUEST`。物品charges直接消费`EQUIPMENT_GROWTH_CHANGED.snapshot`，导致不同UI可能显示不同进度。
+- 已排除纯客户端刷新慢：历史Tooltip重构和当前源码均证明`inventory_tooltip.js`、`weapon_growth_hud.js`订阅`survival_weapon_snapshot`并立即重绘；同帧多次服务端写入允许客户端只呈现最终累计值，不应丢失权威计数。
+- 用户已批准实施：极寒只消费唯一权威`ENGINE_ENTITY_KILLED`，删除永久死亡entindex去重，有限向上解析攻击者owner玩家；服务端武器快照对`valid_enemy_kill_count`使用实际equipment progress覆盖通用零值。补测派生事件不重复、entindex复用、多层召唤归属、批量升级和UI快照一致性。
+- 实施完成：`equipment_growth_service.lua`删除`kill_seen`及`MONSTER_KILLED`订阅，只保留`ENGINE_ENTITY_KILLED`；owner解析最多向上8层，支持实体显式`survival_player_id`及引擎owner ID、循环保护，并优先按`PlayerResource`归属队伍过滤友军。英雄、建筑、无玩家owner和循环owner死亡保持不计数。
+- UI权威值统一：`weapon_synthesis_snapshot_service.lua`仅对`valid_enemy_kill_count`装备把实际`EQUIPMENT_GROWTH_GET_REQUEST.progress[content_id]`投影为标准`growth.stage_attack_count`，target直接读取生成武器CSV的`progression_value`且缺失统一回退200，remaining由两者现场计算。`survival_weapon_growth`、`survival_weapon_snapshot.growth`及Tooltip ViewModel使用同一投影；现有事件驱动Panorama无需轮询或重编译。
+- 自动验证：`ICE_BLADE_KILL_PROGRESS_PASS`、`TOOLTIP_VIEW_MODEL_PASS`、`WEAPON_SYNTHESIS_PASS`、`WEAPON_SYNTHESIS_ERROR_RECOVERY_PASS`通过；专项覆盖同一派生死亡不重复、不同敌人复用entindex仍计数、多层召唤/伤害代理归属、无效目标、200次批量死亡精确升级、下一级250目标、CSV缺失回退、物品charges及Tooltip/HUD标准快照`10/200/190`一致，并拒绝通用stale target 999。相关Lua/Luac 5.4.5语法、5个目标文件严格UTF-8及限定`diff --check`通过。
+- 全量回归实际执行77项，63项通过、14项失败；极寒专项在全量日志中明确通过。失败中的12项与既有文档清单一致；额外`test_hero_summon_owner.lua`失败于独立召唤mock，`test_shop_technology_ui_contract.lua`失败于当前商城Panorama结构契约，两者均不加载或经过本轮两个生产文件，本轮未扩大范围修复。未触碰现有`ability_tooltip/combat_stats/shop_ui/ui_bootstrap.vjs_c`及猴王粒子产物，也未暂存文件。
+- 尚需实机：完全停止并重新Run Workshop Tools，装备极寒之刃后记录初始剩余值，一次击杀已知数量的普通敌人；确认物品右下角charges、Tooltip“当前/剩余进度”和成长HUD都在同次事件刷新后精确减少相同击杀数，并确认召唤物击杀归属、友军/建筑/英雄不计数及达到阈值后升级和新目标正确。自动测试不能替代引擎entindex复用、击杀事件和Panorama最终视觉验收。
+
 # 2026-08-04 — 挑战镜头移除临时目标锁定
 
 - 2026-08-05用户最终确认“相机问题已经解决”。空格镜头运动与挑战传送后的镜头停留均记录为Workshop Tools实机通过，本任务完成，不再恢复为活跃或待验收任务。
