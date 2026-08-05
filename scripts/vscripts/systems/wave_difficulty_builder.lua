@@ -2,6 +2,7 @@ local difficulty_config = require("config/difficulty_config")
 
 local M = {}
 local SCALED_STATS = { "health", "attack", "war3_armor" }
+local ROLE_ORDER = { wave_leader = 1, normal = 2, assault_boss = 3 }
 
 local function clone(value)
     if type(value) ~= "table" then return value end
@@ -20,6 +21,11 @@ local function source_waves(rows, difficulty_id)
     end
     for _, batches in pairs(waves) do
         table.sort(batches, function(a, b)
+            local a_role = ROLE_ORDER[a.member_role]
+            local b_role = ROLE_ORDER[b.member_role]
+            if a_role and b_role and a_role ~= b_role then
+                return a_role < b_role
+            end
             return (a.spawn_order or 0) < (b.spawn_order or 0)
         end)
     end
@@ -55,6 +61,29 @@ end
 function M.build(rows, difficulty_id)
     local definition = difficulty_config.get(difficulty_id)
     if not definition then return nil, "difficulty_not_found" end
+
+    local direct = source_waves(rows, difficulty_id)
+    local has_complete_direct = true
+    for wave_number = 1, definition.total_waves do
+        if not direct[wave_number] or #direct[wave_number] == 0 then
+            has_complete_direct = false
+            break
+        end
+    end
+    if has_complete_direct then
+        local flattened = {}
+        for wave_number = 1, definition.total_waves do
+            for _, row in ipairs(direct[wave_number]) do
+                flattened[#flattened + 1] = clone(row)
+            end
+        end
+        return {
+            difficulty = definition,
+            total_waves = definition.total_waves,
+            rows = flattened,
+            waves = direct,
+        }
+    end
 
     local base = source_waves(rows, definition.source_difficulty_id)
     local waves = {}

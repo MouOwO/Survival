@@ -10,6 +10,7 @@ local armor_balance = require("config/armor_balance")
 local asset_preload = require("systems/asset_preload_service")
 local difficulty_config = require("config/difficulty_config")
 local wave_difficulty_builder = require("systems/wave_difficulty_builder")
+local wave_timing_config = require("config/wave_timing_config")
 
 local M = {}
 local state = {}
@@ -162,9 +163,11 @@ local function apply_stats(unit, row, definition)
     unit:SetHealth(row.health)
     unit:SetBaseDamageMin(row.attack)
     unit:SetBaseDamageMax(row.attack)
-    unit:SetPhysicalArmorBaseValue(
-        armor_balance.from_war3(row.war3_armor or row.armor)
-    )
+    local war3_armor = tonumber(row.war3_armor or row.armor) or 0
+    local runtime_armor = armor_balance.from_war3(war3_armor)
+    unit.survival_war3_armor = war3_armor
+    unit.survival_armor = runtime_armor
+    unit:SetPhysicalArmorBaseValue(runtime_armor)
     local minimum_war3_armor = tonumber(
         definition.minimum_war3_armor or definition.minimum_armor
     )
@@ -188,12 +191,14 @@ local function apply_stats(unit, row, definition)
     else
         unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
     end
-    if definition.movement_type == "flying" then
+    local movement_type = row.movement_type_override or definition.movement_type
+    if movement_type == "flying" then
         unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_FLY)
     else
         unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
     end
-    unit:SetModelScale(definition.model_scale or 1.0)
+    unit:SetModelScale((definition.model_scale or 1.0)
+        * (tonumber(row.model_scale_multiplier) or 1.0))
     if unit.SetModel and definition.model_path then unit:SetModel(definition.model_path) end
     if unit.SetOriginalModel and definition.model_path then unit:SetOriginalModel(definition.model_path) end
     if unit.SetAttackCapability then
@@ -201,7 +206,7 @@ local function apply_stats(unit, row, definition)
             and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK)
     end
     if unit.SetMoveCapability then
-        unit:SetMoveCapability(definition.movement_type == "flying"
+        unit:SetMoveCapability(movement_type == "flying"
             and DOTA_UNIT_CAP_MOVE_FLY or DOTA_UNIT_CAP_MOVE_GROUND)
     end
     for _, ability_name in ipairs(definition.passive_skill_ids or {}) do
@@ -241,10 +246,12 @@ local function spawn_one(row, token)
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     apply_stats(unit, row, definition)
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", { wall_entindex = wall_entindex })
-    enemies[unit:entindex()] = { unit = unit, is_boss = row.is_boss == true }
+    local is_assault_boss = row.member_role == "assault_boss"
+        or (row.member_role == nil and row.is_boss == true)
+    enemies[unit:entindex()] = { unit = unit, is_boss = is_assault_boss }
     state.spawned = state.spawned + 1
     state.alive = state.alive + 1
-    if row.is_boss == true then state.boss_alive = true end
+    if is_assault_boss then state.boss_alive = true end
     publish("enemy_spawned")
 end
 
@@ -276,27 +283,28 @@ local function start_wave(number, reason)
     state.pending = state.planned
     local token = generation_token
     publish(reason or "wave_started")
-    local sequence, last_delay = 0, 0
+    if number < state.total_waves then
+        start_countdown(wave_timing_config.interval_after_wave(number))
+    end
+    local next_delay, last_delay = 0, 0
     for _, row in ipairs(wave.batches) do
         for _ = 1, (row.monster_count or 0) do
-            local delay = sequence * 1.0
-            sequence = sequence + 1
+            local delay = next_delay
             last_delay = delay
             scheduler.after(delay, function() spawn_one(row, token) end)
+            next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
         end
     end
     scheduler.after(last_delay + 0.05, function()
         if token ~= generation_token then return end
-        state.pending, state.status = 0, "active"
+        state.pending = 0
         if state.current_wave == FINAL_WAVE_NUMBER
             or (state.early_final_used ~= true
                 and state.current_wave == state.total_waves) then
             state.final_wave_generation_completed = true
         end
         publish("wave_generation_completed")
-        if state.current_wave < state.total_waves then
-            start_countdown(wave.wait_seconds or 30)
-        else
+        if state.current_wave >= state.total_waves then
             state.status = "all_waves_spawned"
             publish("all_waves_spawned")
             check_final_victory()
@@ -473,7 +481,7 @@ function M.set_difficulty(id)
     state.current_wave = 0
     publish("difficulty_changed")
     if game_started then
-        start_countdown(difficulty_config.initial_wave_delay)
+        start_countdown(wave_timing_config.initial_delay_seconds)
     end
     return true
 end
@@ -504,7 +512,7 @@ function M.init()
         game_started = true
         game_started_at = current_game_time()
         if difficulty_selected then
-            start_countdown(difficulty_config.initial_wave_delay)
+            start_countdown(wave_timing_config.initial_delay_seconds)
             return
         end
         state.status = "selecting_difficulty"

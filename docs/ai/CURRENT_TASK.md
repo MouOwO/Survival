@@ -1,5 +1,38 @@
 # Current Task
 
+## 活跃任务（2026-08-05）：N1–N5怪物难度与CSV架构重构
+
+- 用户要求整理N1–N5难度并大规模重构怪物CSV：不同难度的每波属性和组成均可不同；同波可包含普通怪、模型略大的首只领头怪（工作簿称“首怪Boss”）和明显更强、更大的进攻Boss；特殊目标、野外/副本Boss、转生Boss及十戒Boss也必须按N1–N5变化。
+- 用户提供权威研究工作簿：`C:\Users\a\Documents\xwechat_files\wxid_4b1ytiieiibm21_17c7\msg\file\2026-08\N1-N5最终逻辑属性对照_倍率同步版(1).xlsx`。工作簿只读，不作为运行时依赖；最终业务权威必须落入`data/csv/`并通过生成工具生成Lua。
+- 已确认行为：全部特殊目标和Boss跟随本局开局选择的全局难度；每次遭遇开始时固定`difficulty_id`快照，刷新、阶段切换和完成前不得改变。
+- 已确认架构问题：当前`wave_definitions.csv`只有N1；N2由统一倍率派生；N3/N4禁用且无N5；当前Schema不能表达不同难度组成、领头怪与进攻Boss双身份；正式波次忽略CSV的`spawn_interval`；挑战/转生/十戒当前不读取全局难度。
+- 已批准方案：CSV化难度定义；拆分波级元数据和波内成员；角色使用`normal/wave_leader/assault_boss`；建立统一难度化遭遇战斗Profile；原型主要保存外观和通用行为；移除统一倍率作为实际数值来源；按N1迁移、N2–N5接入、遭遇难度快照、时序/模型覆盖和完整验证分阶段实施。
+- 数据状态边界：工作簿中的“面板确认/顺序确认/规律推定/待复核”等证据状态必须保留，不能把推定值描述为用户确认值。N1仅25个正常波次，N2–N5为30波；提前终局不得伪装成N1正常第30波。
+- 当前阶段：用户已批准进入Act模式。先建立标准库OOXML导入审计、CSV Schema和N1迁移基线，再进入生产运行时修改。
+- 工作区保护：当前已有19个Panorama编译产物、4个粒子编译产物和一批未跟踪测试/日志文件；这些均不是本任务修改，连续两次状态检查已稳定，禁止触碰或回滚。
+- 尚未验证：工作簿各表到规范化CSV的完整映射、全部难度波次组成来源、N1第15波进攻Boss差异、运行时行为、Lua测试及Workshop Tools实机表现。
+- 下一步：实现无第三方依赖的OOXML审计工具，输出工作表Schema、状态与异常；据结果定义并生成首批规范化CSV，同时建立生成与迁移契约测试。
+- 最新检查点：`tools/audit_n1_n5_workbook.py`已使用Python标准库完成严格OOXML只读审计，输出`N1_N5_WORKBOOK_AUDIT_PASS`，Python语法和严格UTF-8通过。实际第8张表为“本次修正记录”，不是“各难度波次记录”。工作簿只有逐波最低小怪、首怪Boss、进攻Boss属性及特殊目标/转生/十戒属性，没有每波模型、怪种、数量、生成组和生成顺序明细；总览的N1小怪合计202、N2–N5各1270不能反推出组成。
+- 当前阻塞：用户明确要求不同难度波次组成不同，但现有工作簿缺少组成权威数据。确认组成来源前不得擅自复制N1、按总数分配或从属性推断模型/数量。
+- 用户新增计时规则：选择难度后才开始计时，第一波首只怪在150秒后出现；当前波1–9到下一波首只怪间隔90秒；当前波10起到下一波首只怪间隔150秒，用户已明确10→11也是150秒。波内全部怪生成所花时间不作为波间计时依据。当前`wave_system.lua`在上一波全部生成后才倒计时，必须改为绝对的首只到首只调度。
+- 用户新增怪物规则：某个待定位波次包含飞行怪，其护甲为该波“当前护甲”的3倍，CSV备注写“飞行高护甲怪”。现有N1第11/13/16/24波均含混合飞行怪，另有纯飞龙波，当前消息未附新表且未给难度/波次，禁止猜测目标行和“当前护甲”的具体基准。
+- 计时阶段实施完成：新增`wave_timing_rules.csv`作为唯一权威，配置为选难度后150秒首波、当前波1–9到下一波90秒、当前波10起到下一波150秒；`wave_system.lua`改为每波开始时立即安排下一波，生成完成不再重新倒计时，因此波内数量不影响相邻首怪时刻。旧`difficulty_config.initial_wave_delay=30`已移除。
+- 计时验证完成：`WAVE_TIMING_LUA51_PASS`、`WAVE_TIMING_CONTRACT_PASS`、`WAVE_TIMING_FINAL_LUAC51_PASS`、`WAVE_TIMING_FINAL_GENERATED_COMPARE_PASS`、严格UTF-8和限定`git diff --check`通过；生成注册表已加入`wave_timing_rules`并通过Lua 5.1语法。尚未进行Workshop Tools实机计时验证。
+- （已由后续用户提供N3工作簿并批准实施的记录取代）下一步唯一输入：用户重新上传飞行高护甲怪所在波次的表格/截图并注明难度和波次。收到前不修改具体怪物属性或N2–N5组成。
+- 用户随后提供`N3按最新波次总表同步(1).xlsx`并批准接入N3：第1–25波沿用N1同波模型，第26–30波依次沿用N1第21–25波模型；同波地面/飞行成员按来源数量比例使用最大余数法确定性分配。工作簿要求飞行但来源波没有飞行原型时，用户确认统一回退`flying_red_gargoyle`。
+- N3数量与角色子阶段已实施：`wave_definitions.csv`新增89条N3成员行，普通小怪1270、`wave_leader`27、`assault_boss`6，游戏计划总数1303；角色生成顺序为领头怪→普通怪→进攻Boss。N3第1–10波普通怪各14、第11–29波各59、第30波9；5/10/15/20/25/30波各有1只进攻Boss。
+- N3飞行规则已实施：工作簿`AD/AE/AF`分别作为飞行普通怪、飞行领头怪和飞行进攻Boss审计口径；普通飞行成员使用该波War3基准护甲3倍，并在CSV备注“飞行高护甲怪”。领头怪/Boss使用工作簿各自独立护甲，不重复套三倍。
+- 护甲显示边界已强化：波次怪保存`survival_war3_armor`和Dota运行时`survival_armor`，写入引擎仅执行一次`War3/3`；普通选中单位UI继续读取当前有效Dota护甲并由统一投影乘回3，因此初始值等于CSV，受到加减甲后动态变化。
+- N3已作为30波独立难度启用，`wave_difficulty_builder`在目标难度拥有完整直接CSV时不再从N1倍率派生；正式出怪开始消费成员`spawn_interval`，同时保留已完成的首怪到首怪绝对计时。
+- 自动验证通过：`N3_WAVE_CSV_IMPORT_PASS`、独立CSV检查、`N3_WAVE_CONFIG_LUA51_PASS`、`N3_WAVE_CONTRACT_PASS`、`N3_LUAC51_PASS`、`N3_GENERATED_COMPARE_PASS`、波次计时回归、科技减甲状态/触发/契约回归、严格UTF-8和限定`git diff --check`。尚未进行Workshop Tools实机数量、模型、护甲UI和重叠波次验证。
+- 当前插入修复（用户已批准实施）：点击敌方单位或树木后，人物属性UI仍显示上一个单位。静态根因是共享`SurvivalSelectionResolver.Resolve()`要求portrait也存在于玩家可控`GetSelectedEntities()`，敌方query单位因此被拒绝并回退旧可控单位，服务端没有收到新entindex请求。
+- 已批准边界：新增只供HUD/query使用的`ResolveDisplayUnit()`，允许有效非占位portrait不属于可控选择集合；`combat_stats.js`的属性、名称、生命和快照链使用该入口，技能输入、Builder、Grid和建筑移动继续使用原`Resolve()`，不得让敌方query单位进入施法链。
+- 插入修复已完成：`ui_bootstrap.js`发布独立`ResolveDisplayUnit()`，属性HUD可接受不属于玩家可控选择集合的有效敌方/树木portrait；`combat_stats.js`的属性覆盖、名称、等级、生命、请求、NetTable和事件响应过滤统一改用display身份。技能枚举、runtime owner、快捷键和施法校验继续使用原`Resolve()`可控身份。
+- 自动验证通过：`SELECTED_UNIT_STATS_REFRESH_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS`、相关服务端Lua 5.1语法、严格UTF-8以及game/content限定`diff --check`。`ui_bootstrap.js`和`combat_stats.js`强制定向编译各为`1 compiled, 0 failed, 0 skipped`。
+- 尚未实机验证：Workshop Tools冷启动后在英雄/不同敌人/树木间快速切换，确认名称、生命、攻击、攻速和护甲立即对应当前portrait；同时点击敌人后按Q/W/E，确认技能输入仍属于原可控单位，不会进入敌方query单位。
+
+---
+
 ## 当前状态
 
 - 当前没有相机相关活跃任务。用户已在Workshop Tools明确确认相机问题解决，后续不得将本任务恢复为待验收或活跃任务；等待用户指定下一项任务。

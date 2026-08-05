@@ -1,3 +1,51 @@
+-
+## 2026-08-05 - N3逐波数量、角色、飞行高护甲与UI护甲边界接入
+
+- 用户提供`N3按最新波次总表同步(1).xlsx`，要求按工作簿修改每波数量并保证游戏实际生成一致；同时确认小怪初始UI显示CSV中的War3护甲，加减甲后按当前有效护甲动态变化。
+- 标准库OOXML只读审计确认工作簿含13张表，`N3波次总表`完整记录30波：普通小怪1270、首怪Boss27、进攻Boss6、总数1303。飞行统计列分别是普通飞行、飞行首怪和飞行进攻Boss，不能混算；例如第8波为9普通飞行+1飞行领头怪。
+- 用户批准模型映射：N3第1–25波沿用N1同波，第26–30波依次映射N1第21–25波；来源波没有飞行原型但工作簿要求飞行时统一使用`flying_red_gargoyle`。同类别多个模型按N1原数量比例使用最大余数法确定性分配。
+- 新增`tools/import_n3_wave_workbook.py`，只从工作簿与权威N1 CSV重建N3成员行，硬校验30波和`1270/27/6/1303`。`wave_definitions.csv`新增`member_role/movement_type_override/model_scale_multiplier`，生成89条N3成员；普通飞行怪护甲为本波War3基准3倍并明确备注“飞行高护甲怪”。
+- `wave_difficulty_builder.lua`优先使用完整独立难度数据，并按`wave_leader→normal→assault_boss`排序；`difficulty_config.lua`启用N3独立30波；`wave_system.lua`应用成员移动/缩放覆盖、只把进攻Boss纳入Boss状态、正式生成消费CSV`spawn_interval`，并保存War3初始护甲与Dota运行时护甲双字段。
+- UI没有固定显示CSV初值：选中普通怪仍读取`GetPhysicalArmorValue(false)`当前有效Dota护甲，经`combat_stat_projection`统一乘3。新增Lua测试覆盖6/24/555/1665初值往返及±2 Dota护甲后的动态显示。
+- 验证：`N3_WAVE_CSV_IMPORT_PASS`、独立CSV检查、`N3_WAVE_CONFIG_LUA51_PASS`、`N3_WAVE_CONTRACT_PASS`、`N3_LUAC51_PASS`、`N3_GENERATED_COMPARE_PASS`、波次计时契约、科技减甲状态/触发/契约、严格UTF-8和限定`git diff --check`通过。上述均不是Workshop Tools实机验证；仍需冷启动确认每波实体数、模型、领头怪首发、飞行移动、护甲UI和跨波并存。
+
+## 2026-08-05 - N1–N5怪物难度与CSV重构获批实施
+
+- 用户提供`N1-N5最终逻辑属性对照_倍率同步版(1).xlsx`，要求不同难度的波次属性、组成、领头怪、进攻Boss、特殊目标、野外/副本Boss、转生Boss和十戒Boss均可独立变化；领头怪模型仅略大，进攻Boss模型明显更大。
+- 只读调查确认工作簿含总览、小怪、首怪Boss、进攻Boss、特殊目标、转生Boss、十戒Boss、各难度波次记录及两张倍率明细。工作簿包含明确值、公式审计和“面板确认/规律推定/待复核”等状态，不是统一倍率模板。
+- 当前项目事实：`wave_definitions.csv`仅49行N1组成；`difficulty_config.lua`只启用N1/N2，N2由倍率派生，N3/N4禁用且无N5；波次Schema只有`is_boss`，无法区分领头怪和进攻Boss；正式生成固定每秒一只并忽略`spawn_interval`；挑战、转生和十戒直接读取固定原型属性且不消费全局难度。
+- 用户确认全部特殊目标和Boss跟随本局开局选择的全局难度，并在每次遭遇开始时固定难度快照。客户端不得单独覆盖遭遇难度。
+- 用户批准完整实施方案：CSV化难度、拆分波次成员、明确`normal/wave_leader/assault_boss`、建立难度化遭遇战斗Profile、统一全局难度快照、修正生成时序和模型缩放覆盖，并完成生成、Lua 5.1、契约、UTF-8与Workshop Tools边界验证。
+- 工作区保护：首次检查存在4个粒子产物和未跟踪测试；随后出现19个非本任务Panorama编译产物。按规则暂停后，用户停止Workshop Tools，连续两次`git status --short`完全一致。以上文件作为用户已有基线，后续不触碰、不回滚、不纳入交付。
+- 工具链确认：Python 3.14.3、Lua/Luac 5.1.5和PowerShell 7.6.4绝对路径有效；没有`openpyxl`，Excel审计将使用Python标准库直接解析OOXML，不引入新依赖。
+- 未确认项：工作簿“各难度波次记录”能否提供完整模型/组成映射，N1第15波进攻Boss与旧CSV差异，所有推定值是否最终接受，以及实际模型尺寸。
+- 下一步：实现OOXML审计工具并建立规范化CSV Schema和N1迁移基线；任何生成或大范围编辑前再次记录检查点。
+
+## 2026-08-05 - N1–N5工作簿审计完成并发现组成数据缺口
+
+- 新增`tools/audit_n1_n5_workbook.py`，仅使用Python标准库读取OOXML，不安装`openpyxl`或其他依赖；支持严格工作表顺序、公式缓存、内联文本、UTF-8 JSON输出和指定工作表筛选。
+- 首次契约按先前误读预期“各难度波次记录”而失败；读取实际名称后确认第8张表是“本次修正记录”，修正为严格真实名称后输出`N1_N5_WORKBOOK_AUDIT_PASS`。该失败是契约发现，不是工作簿损坏或解析失败。
+- 工作簿事实：10张表依次为总览、小怪属性、首怪Boss、进攻Boss、特殊目标、转生Boss、十戒Boss、本次修正记录、首怪倍率明细、进攻Boss倍率明细。它提供N1–N5逐波属性和证据状态，但不提供每波模型、怪种、数量、生成组或生成顺序。
+- 总览只给出N1小怪合计202、首怪21、进攻Boss5，以及N2–N5各小怪1270、首怪27、进攻Boss6。汇总值不能唯一还原波次组成；不得用复制N1、平均分配或从最低属性猜怪种来填充权威CSV。
+- 下一步阻塞：需要用户提供N1–N5逐波组成表/来源文件，或明确允许采用一套具体组成规则。该确认前可保留审计工具，但暂停生产Schema数据导入和运行时重构，避免把假设写成权威配置。
+
+## 2026-08-05 - 用户补充波次计时与飞行高护甲怪规则
+
+- 已确认时间口径：只有难度选择成功后才开始波次计时；第一波首只怪在150秒后出现；前10波按相邻波首只怪时刻计算90秒间隔；第11波之后按相邻波首只怪时刻计算150秒间隔。波内逐只生成耗时不需要作为主要平衡项。
+- 代码核对确认当前实现不符合该口径：`wave_system.lua`在一波全部单位生成完毕后才调用`start_countdown(wave.wait_seconds)`，且正式生成固定`sequence * 1.0`。怪物数量会额外推迟下一波，必须改为以难度选择时刻和波号计划为权威的绝对首只时间。
+- 尚有一个时间边界歧义：用户明确1→2至9→10属于前10波，也明确11→12为150秒，但未明确10→11。建议按阶段切换将10→11设为150秒，需用户确认后落CSV。
+- 用户说明某个具体波次中的飞行怪护甲为“当前护甲”的3倍，备注固定为“飞行高护甲怪”。现有N1混合飞行怪至少分布在第11、13、16、24波，另有纯飞龙波；当前消息没有附新表、难度、波号或基础行，因此不能唯一定位，也不能判断“当前护甲”指同波最低小怪、对应地面怪还是飞行怪旧值。
+- 下一步：请用户补充该波次的难度、波号和具体组成/数值，并确认10→11间隔；确认后先写权威CSV及契约，再修改绝对波次调度。
+
+## 2026-08-05 - 波次首怪到首怪计时规则实施
+
+- 用户确认10→11同样使用150秒。新增权威`data/csv/怪物与波次系统/wave_timing_rules.csv`：选难度后首波延迟150秒；当前波1–9到下一波首怪间隔90秒；当前波10起到下一波首怪间隔150秒。
+- 新增生成配置`wave_timing_rules.lua`和薄解析器`wave_timing_config.lua`；旧`difficulty_config.initial_wave_delay=30`移除，避免同一规则存在CSV与手写Lua两个冲突来源。
+- `wave_system.lua`现在在每波开始并发布`wave_started`后立即按当前波号启动下一波倒计时；本波全部单位生成完成只更新pending和完成事件，不再重新开始倒计时。这样波内单位数量与逐只生成耗时不会改变相邻波首只怪的目标时间。
+- 提前终局和开发模式继续取消`wave_countdown`；最终波不安排下一波。当前波内正式生成仍为每只间隔1秒，本阶段按用户“波内耗时不用太在意”保持不改，等待完整组成重构时再统一成员时序Schema。
+- 首轮验证：`WAVE_TIMING_LUA51_PASS`、`WAVE_TIMING_CONTRACT_PASS`、`WAVE_TIMING_LUAC51_PASS`、`WAVE_TIMING_GENERATED_COMPARE_PASS`、严格UTF-8及限定`git diff --check`通过。这些分别是数学/契约/语法/生成一致性检查，不是Workshop Tools实机计时验证。
+- 仍阻塞：飞行高护甲怪具体难度、波次和组成表尚待用户上传；N2–N5完整组成也尚无权威明细，不能猜测写入。
+- 最终补充验证：生成注册表`config/generated/index.lua`已加入`wave_timing_rules`并通过Lua 5.1语法；本轮Python 3.14产生的缓存已清理。清理时曾误删3个仓库原有跟踪`.pyc`，已立即从`HEAD`按原字节恢复并确认`git status`无差异。两次间隔工作区状态检查稳定，未触碰用户已有Panorama/粒子产物和未跟踪测试/日志。
 # 2026-08-04 — 挑战镜头移除临时目标锁定
 
 - 2026-08-05用户最终确认“相机问题已经解决”。空格镜头运动与挑战传送后的镜头停留均记录为Workshop Tools实机通过，本任务完成，不再恢复为活跃或待验收任务。
@@ -1928,3 +1976,13 @@
 - 全量Lua 5.4.5测试实际执行74项，12项失败清单为`test_addhero_cheat.lua`、`test_hero_attack_mode.lua`、`test_hero_combat_stat_projection.lua`、`test_hero_cosmetic_service.lua`、`test_hero_passive_attribute_snapshot.lua`、`test_hero_skill_tooltip_view_model.lua`、`test_managed_attack_speed_buff.lua`、`test_modifier_registry_reload.lua`、`test_moving_ice_ball_visual.lua`、`test_selected_unit_cosmetic_portrait.lua`、`test_tree_progression.lua`、`test_unit_health_bar.lua`；本轮专项均通过，未为这些既有无关基线失败修改生产逻辑。当前PATH只有Lua/Luac 5.4.5，没有Lua 5.1工具，因此不宣称Lua 5.1验证。
 - 资源与仓库验证：`shop_ui.js`和`shop.css`分别强制定向编译为`1 compiled, 0 failed, 0 skipped`，HUD加载链为`7 compiled, 0 failed, 0 skipped`；编译附带改写的四个无关HUD产物已恢复，只保留任务相关`shop_ui.vjs_c`与`shop.vcss_c`。严格UTF-8、资源类型、限定`diff --check`均通过；game/content两仓库`ls-files -u`均为0，未自动暂存或提交。
 - 尚未确认：Workshop Tools冷启动后的真实资源扣除、2秒内等级/效果保持、同队多玩家互斥、进度无数字、结束帧升级/生效/完成提示，以及可构造的提交失败或中断退款。下一步唯一动作是完全停止并重新Run Workshop Tools逐项实测；自动测试与Resource Compiler不能替代引擎时序和视觉验收。
+
+## 2026-08-05 - 敌方单位与树木属性UI选择身份修复
+
+- 用户实机反馈：点击敌方单位时攻击等属性继续显示上一个单位，树木也存在同样问题。服务端`unit_combat_snapshot()`已统一支持普通敌人与树木，根因位于请求前的Panorama选择解析。
+- 根因：共享`SurvivalSelectionResolver.Resolve()`优先把portrait限定为同时存在于`Players.GetSelectedEntities()`；敌方单位和树木可成为Valve query/portrait单位，但不属于玩家可控选择集合，因此被拒绝并回退旧可控单位。`combat_stats.js`继续请求旧entindex，`lastRequestedUnit`还会去重重复旧请求。
+- 修复：`ui_bootstrap.js`新增`ResolveDisplayUnit()`，有效且非占位Undying的portrait直接作为HUD展示单位，缺失时回退原可控解析器。`combat_stats.js`的攻击/攻速/护甲覆盖、逻辑三维、名称、等级、生命、选择事件、请求和迟到快照过滤统一使用display身份。
+- 输入隔离：原`Resolve()`未改变；Ability枚举、runtime owner、快捷键、施法校验、Builder、Grid和建筑移动继续使用可控身份，点击敌人不会使敌方query单位成为caster。
+- 自动验证：`SELECTED_UNIT_STATS_REFRESH_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS`、`SELECTED_UNIT_STATS_LUAC51_PASS`、严格UTF-8以及game/content限定`diff --check`通过。`ui_bootstrap.js`与`combat_stats.js`经Resource Compiler强制定向编译，各为`1 compiled, 0 failed, 0 skipped`。
+- 工作区保护：本轮只新增/修改HUD选择修复源码、两个对应`.vjs_c`、专项契约和AI文档；既有N3 CSV/Lua、其他Panorama编译产物、粒子产物和测试/日志修改均未触碰或回滚。
+- 尚未实机验证：完全停止并重新Run Workshop Tools，在英雄、两个属性明显不同的敌人和树木间快速切换，确认名称、生命、攻击、攻速、护甲实时对应当前portrait；选中敌人后按Q/W/E确认技能仍属于原可控单位。

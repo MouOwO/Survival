@@ -4,6 +4,10 @@
 
 ## 当前状态
 
+- 当前活跃任务（2026-08-05）：按用户提供的`N1-N5最终逻辑属性对照_倍率同步版(1).xlsx`重构N1–N5怪物难度数据。用户已批准完整分阶段实施，并确认特殊目标、野外/副本Boss、转生Boss和十戒Boss全部跟随本局开局选择的全局难度，遭遇开始时固定难度快照。当前处于第一阶段：建立CSV Schema、标准库OOXML导入审计和N1迁移基线；不得恢复下方历史任务为当前任务。
+- 最新可靠检查点：用户补充的`N3按最新波次总表同步(1).xlsx`已作为N3数量与属性来源接入；N3模型映射、飞行回退和26–30波来源均由用户明确批准。权威CSV现包含N3普通小怪1270、领头怪27、进攻Boss6，总计划1303；N3独立30波难度已启用，飞行普通怪使用本波War3基准护甲3倍。Lua 5.1、契约、生成一致性、计时/减甲回归、UTF-8和限定diff均通过；下一步Workshop Tools冷启动验证每波实际数量、模型、领头怪首发、护甲UI及波次重叠。
+- 插入修复检查点：敌方单位和树木属性UI复用上一个单位的问题已完成生产修复和自动验证。根因是可控输入解析器拒绝不在`GetSelectedEntities()`中的敌方portrait；现新增HUD专用`ResolveDisplayUnit()`，属性/名称/生命/快照链使用display身份，技能与Builder输入继续使用可控`Resolve()`。专项/输入回归、Lua 5.1语法、严格UTF-8、限定diff和两个JS强制定向编译通过；下一步冷启动快速切换英雄、敌人和树木，并确认点击敌人后Q/W/E仍由可控单位处理。
+- 本任务工作区保护基线：已有19个Panorama编译产物、4个粒子编译产物和一批未跟踪测试/日志文件，不属于本任务；用户停止Workshop Tools后连续两次`git status --short`一致。后续不得触碰、回滚或纳入本任务交付。
 - 相机任务已由用户于2026-08-05在Workshop Tools明确确认解决，不再作为活跃任务恢复：空格定位使用`MoveCameraToEntity(target)`；挑战镜头已删除`SetCameraTarget(hero)`→`SetCameraTarget(-1)`锁定/释放链，改为一次性非锁定聚焦，镜头不再返回英雄传送前位置。稳定规则见`PROJECT_CONTEXT.md`，引擎陷阱见`KNOWN_ISSUES.md`；等待用户指定下一项任务。
 - 已否定检查点：第一版曾使用`SetCameraLookAtPosition`并只有Panorama本地日志；虽然静态契约与编译通过，用户实机确认空格不定位、挑战仍回弹。该方案已被上方第二版替代，不得恢复。
 - 关联前置修复：未召唤正式英雄时按空格选中隐藏 Undying 占位锚点的问题已完成生产修复和自动验证。Panorama 唯一输入所有者现在接管 `SPACE`：占位阶段选择 CSV Builder，正式英雄替换后选择正式英雄，并覆盖 fallback keybind；Builder身份NetTable声明已补齐。专项契约、Lua 5.1行为/语法和Resource Compiler强制编译通过。下一步完全停止后 Run，召唤前后各按空格并核对`[SURVIVAL_SELECTION] SPACE_SELECT`日志；尚未实机验收。

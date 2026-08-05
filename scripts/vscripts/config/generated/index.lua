@@ -66,6 +66,7 @@ M["ui_unlock_rules"] = require("config/generated/ui_unlock_rules")
 M["unit_display_names"] = require("config/generated/unit_display_names")
 M["wall_visual_levels"] = require("config/generated/wall_visual_levels")
 M["wave_definitions"] = require("config/generated/wave_definitions")
+M["wave_timing_rules"] = require("config/generated/wave_timing_rules")
 M["weapon_definitions"] = require("config/generated/weapon_definitions")
 
 return M

@@ -1,0 +1,4 @@
+﻿timing_rule_id,initial_delay_seconds,early_wave_last_number,early_interval_seconds,late_interval_seconds,enabled,notes
+#中文名:计时规则ID,选择难度后首波延迟秒数,短间隔适用的当前波末值,短波间隔秒数,长波间隔秒数,是否启用,备注
+#types:string,number,number,number,number,boolean,string
+default,150,9,90,150,1,选择难度后150秒出第一波；第1至9波首怪到下一波首怪间隔90秒；第10波起首怪到下一波首怪间隔150秒

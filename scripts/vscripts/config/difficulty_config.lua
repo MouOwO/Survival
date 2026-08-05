@@ -1,6 +1,5 @@
 local M = {
     default_id = "N1",
-    initial_wave_delay = 30,
     rows = {
         {
             difficulty_id = "N1",
@@ -35,13 +34,13 @@ local M = {
         -- finalized. Enabling them requires no wave-system or Panorama change.
         {
             difficulty_id = "N3",
-            display_name = "N3",
-            subtitle = "开发中",
-            description = "预留难度。",
-            source_difficulty_id = "N1",
+            display_name = "N3 高难度",
+            subtitle = "30 波",
+            description = "使用N3独立波次属性、数量与Boss配置。",
+            source_difficulty_id = "N3",
             total_waves = 30,
             stat_multiplier = 1.0,
-            enabled = false,
+            enabled = true,
             wave_overrides = {},
         },
         {
