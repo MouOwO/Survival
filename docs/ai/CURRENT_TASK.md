@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-- 当前没有相机相关活跃任务。用户已在Workshop Tools明确确认相机问题解决，后续不得将本任务恢复为待验收或活跃任务；等待用户指定下一项任务。
+- 极寒之刃批量击杀进度修复已完成生产实现与自动验证，等待Workshop Tools冷启动实机验收。成长服务现在只消费唯一权威`ENGINE_ENTITY_KILLED`，不再跨整局按可复用victim entindex去重；攻击者可沿最多8层owner链解析`survival_player_id/GetPlayerOwnerID()`，并按归属玩家队伍过滤友军。服务端武器快照对`valid_enemy_kill_count`统一使用实际equipment progress与生成武器CSV目标，物品数字、Tooltip和成长HUD因此读取同一count/target/remaining。专项测试覆盖派生事件不重复、entindex复用、多层召唤归属、无效目标、批量升级、charges及Tooltip/HUD快照一致性并通过；全量77项中极寒专项通过，14项失败均不经过本轮生产文件，其中12项与已有文档基线一致，另2项为当前英雄召唤mock和商城UI契约的无关失败。未修改或重编译任何Panorama/粒子产物。
 
 ## 已完成任务（2026-08-05）：恢复空格镜头定位并修复挑战镜头回弹
 

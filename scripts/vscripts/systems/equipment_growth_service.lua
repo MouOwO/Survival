@@ -4,7 +4,7 @@ local levels = require("config/equipment_level_definitions")
 local weapons = require("config/generated/weapon_definitions")
 
 local M = {}
-local progress, attack_seen, kill_seen = {}, {}, {}
+local progress, attack_seen = {}, {}
 local MAX_RECORDS = 256
 local function trim(t, n) local c=0; for k in pairs(t) do c=c+1; if c>n then t[k]=nil end end end
 local function bucket(p) progress[p]=progress[p] or {}; return progress[p] end
@@ -51,11 +51,40 @@ local function on_attack(x)
  local id=equipped(p); local d=levels.by_id[id]
  if d and d.progression and d.progression.type=="normal_attack_count" then advance(p,"normal_attack_count",1+instance_count(p,"item_forging_hammer"),"normal_attack") end
 end
-local function on_kill(x)
- local p=tonumber(x.player_id); local v=x.victim; local k=tonumber(x.victim_entindex) or (v and v.entindex and v:entindex())
- if not p or not k or k<0 then return end
- kill_seen[p]=kill_seen[p] or {}; if kill_seen[p][k] then return end; kill_seen[p][k]=true; trim(kill_seen[p],MAX_RECORDS)
- advance(p,"valid_enemy_kill_count",1,"legal_enemy_kill")
+local function valid_entity(entity)
+ return entity and (not entity.IsNull or not entity:IsNull())
+end
+local function entity_player_id(entity)
+ if not valid_entity(entity) then return nil end
+ local explicit=tonumber(entity.survival_player_id)
+ if explicit and explicit>=0 then return explicit end
+ if entity.GetPlayerOwnerID then
+  local player_id=tonumber(entity:GetPlayerOwnerID())
+  if player_id and player_id>=0 then return player_id end
+ end
+ return nil
+end
+local function owner_player_id(attacker)
+ local current=attacker; local seen={}
+ for _=1,8 do
+  if not valid_entity(current) or seen[current] then return nil end
+  seen[current]=true
+  local player_id=entity_player_id(current)
+  if player_id then return player_id,current end
+  if not current.GetOwnerEntity then return nil end
+  current=current:GetOwnerEntity()
+ end
+ return nil
+end
+local function attributed_team(player_id, owner, attacker)
+ if PlayerResource and PlayerResource.GetTeam then
+  local team=tonumber(PlayerResource:GetTeam(player_id))
+  if team then return team end
+ end
+ if valid_entity(owner) and owner.GetTeamNumber then
+  return tonumber(owner:GetTeamNumber())
+ end
+ return attacker.GetTeamNumber and tonumber(attacker:GetTeamNumber()) or nil
 end
 local function on_equipped(x)
  if x.slot~="main_hand" then return end
@@ -68,24 +97,17 @@ local function on_equipped(x)
 end
 local function on_entity_killed(x)
  local victim,attacker=x.victim,x.attacker
- if not victim or not attacker then return end
+ if not valid_entity(victim) or not valid_entity(attacker) then return end
  if victim.IsRealHero and victim:IsRealHero() then return end
  if victim.IsBuilding and victim:IsBuilding() then return end
- if victim.GetTeamNumber and attacker.GetTeamNumber
-  and victim:GetTeamNumber()==attacker:GetTeamNumber() then return end
- local owner=attacker
- if attacker.GetOwnerEntity then
-  local candidate=attacker:GetOwnerEntity()
-  if candidate and (not candidate.IsNull or not candidate:IsNull()) then owner=candidate end
- end
- local p=owner.GetPlayerOwnerID and tonumber(owner:GetPlayerOwnerID()) or -1
- if p<0 and attacker.GetPlayerOwnerID then
-  p=tonumber(attacker:GetPlayerOwnerID()) or -1
- end
- on_kill({player_id=p,victim=victim})
+ local player_id,owner=owner_player_id(attacker)
+ if not player_id then return end
+ if victim.GetTeamNumber
+   and tonumber(victim:GetTeamNumber())==attributed_team(player_id,owner,attacker) then return end
+ advance(player_id,"valid_enemy_kill_count",1,"legal_enemy_kill")
 end
 function M.init()
- progress,attack_seen,kill_seen={},{},{}; event_bus.handle_request(events.EQUIPMENT_GROWTH_GET_REQUEST,function(x) return {ok=true,progress=bucket(tonumber(x.player_id))} end)
- event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED,on_equipped); event_bus.subscribe(events.ENGINE_ENTITY_KILLED,on_entity_killed); event_bus.subscribe(events.MONSTER_KILLED,on_kill); print("[EQUIPMENT_GROWTH_INIT] config=equipment_level_definitions kill_source=ENGINE_ENTITY_KILLED csv_progress=true")
+ progress,attack_seen={},{}; event_bus.handle_request(events.EQUIPMENT_GROWTH_GET_REQUEST,function(x) return {ok=true,progress=bucket(tonumber(x.player_id))} end)
+ event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED,on_equipped); event_bus.subscribe(events.ENGINE_ENTITY_KILLED,on_entity_killed); print("[EQUIPMENT_GROWTH_INIT] config=equipment_level_definitions kill_source=ENGINE_ENTITY_KILLED csv_progress=true")
 end
 return M
