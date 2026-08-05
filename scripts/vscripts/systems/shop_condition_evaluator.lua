@@ -67,6 +67,11 @@ function M.evaluate(player_id, entry, context)
                 or "该内容暂不可购买",
             count
     end
+    if entry.contenttype == "rebirth"
+        and context.active_challenge_encounters
+        and context.active_challenge_encounters[entry.encounter_id] then
+        return false, "该转生挑战正在进行中", count
+    end
     if entry.requires_hero_summoned
         and context.hero_summoned ~= true
         and context.debug_all_unlocked ~= true then

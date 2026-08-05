@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local catalog = require("systems/shop_catalog")
 local grant_service = require("systems/shop_grant_service")
 local challenge_definitions = require("config/generated/challenge_definitions")
+local rebirth_challenges = require("config/generated/rebirth_challenges")
 local research_config = require("config/research_technology_config")
 local research_events = require("research/research_event_names")
 local M = {}
@@ -110,18 +111,20 @@ local function merge_technology_levels(player_id, incoming)
 end
 local function active_challenge_encounters(player_id)
     local result = {}
-    for _, challenge in ipairs(challenge_definitions.rows or {}) do
-        local encounter_id = tostring(challenge.encounter_id or "")
-        if challenge.enabled ~= false and encounter_id ~= "" then
-            local current = event_bus.request(
-                events.MONSTER_ENCOUNTER_QUERY_REQUEST,
-                {
-                    player_id = player_id,
-                    encounter_id = encounter_id,
-                }
-            )
-            if current and current.ok and current.active then
-                result[encounter_id] = true
+    for _, definitions in ipairs({ challenge_definitions, rebirth_challenges }) do
+        for _, challenge in ipairs(definitions.rows or {}) do
+            local encounter_id = tostring(challenge.encounter_id or "")
+            if challenge.enabled ~= false and encounter_id ~= "" then
+                local current = event_bus.request(
+                    events.MONSTER_ENCOUNTER_QUERY_REQUEST,
+                    {
+                        player_id = player_id,
+                        encounter_id = encounter_id,
+                    }
+                )
+                if current and current.ok and current.active then
+                    result[encounter_id] = true
+                end
             end
         end
     end
@@ -389,6 +392,19 @@ local function purchase(payload)
         return { ok = false, error = "金矿科技只能通过金矿技能升级" }
     end
     local team = player_team(player_id)
+    if entry.contenttype == "rebirth"
+        and entry.grant_type == "start_encounter" then
+        local current = event_bus.request(
+            events.MONSTER_ENCOUNTER_QUERY_REQUEST,
+            {
+                player_id = player_id,
+                encounter_id = entry.encounter_id,
+            }
+        )
+        if current and current.ok and current.active then
+            return { ok = false, error = "该转生挑战正在进行中" }
+        end
+    end
     -- Re-entering an unfinished normal challenge only teleports the hero back
     -- to its existing session. It must not charge the entrance fee again and
     -- therefore runs before resource validation. Rebirth encounters retain

@@ -19,6 +19,7 @@ local monster_visual = require("systems/challenge_monster_visual_service")
 
 local M = {}
 local sessions = {}
+local foreground_encounter_by_player = {}
 local monster_meta = {}
 local auto_test_started = {}
 local abyss_cleared_stage_by_player = {}
@@ -126,6 +127,27 @@ end
 
 local function set_session(session)
     player_sessions(session.player_id)[session.encounter_id] = session
+end
+
+local function set_foreground(session)
+    foreground_encounter_by_player[session.player_id] = session.encounter_id
+end
+
+local function should_teleport_after_completion(session)
+    return session.challenge.completion_teleport_policy == "reset_to_stage_entry"
+        and foreground_encounter_by_player[session.player_id] == session.encounter_id
+end
+
+local function on_foreground_encounter_changed(payload)
+    if payload and payload.status == "active"
+        and payload.foreground_entry == true
+        and payload.encounter then
+        local player_id = tonumber(payload.player_id)
+        local encounter_id = tostring(payload.encounter.encounter_id or "")
+        if player_id and player_id >= 0 and encounter_id ~= "" then
+            foreground_encounter_by_player[player_id] = encounter_id
+        end
+    end
 end
 
 local function spawn_marker(location, allow_occupied)
@@ -551,6 +573,7 @@ local function complete_session(session)
 
     session.status = "waiting_respawn"
     session.generation = DoUniqueString("challenge_completion")
+    local scheduled_generation = session.generation
     session.completion_drop_position = nil
     publish(session, "waiting_respawn", {
         reward_result = reward_result or {},
@@ -558,7 +581,8 @@ local function complete_session(session)
     })
     scheduler.after(delay, function()
         if get_session(session.player_id, session.encounter_id) ~= session
-            or session.status ~= "waiting_respawn" then
+            or session.status ~= "waiting_respawn"
+            or session.generation ~= scheduled_generation then
             return
         end
         session.killed_members = 0
@@ -567,11 +591,13 @@ local function complete_session(session)
             block_session(session, error_message)
             return
         end
-        ok, error_message = teleport_to_current(session)
-        if not ok then
-            destroy_session_monsters(session)
-            block_session(session, error_message)
-            return
+        if should_teleport_after_completion(session) then
+            ok, error_message = teleport_to_current(session)
+            if not ok then
+                destroy_session_monsters(session)
+                block_session(session, error_message)
+                return
+            end
         end
         session.status = "active"
         publish(session, "active")
@@ -627,6 +653,7 @@ function M.start(payload)
         if payload.teleport_hero ~= false then
             local ok, error_message = teleport_to_current(existing)
             if not ok then return { ok = false, error = error_message } end
+            set_foreground(existing)
         end
         return {
             ok = true,
@@ -715,6 +742,7 @@ function M.start(payload)
         return { ok = false, error = error_message }
     end
     set_session(session)
+    if session.teleport_hero then set_foreground(session) end
     publish(session, "active")
     return {
         ok = true,
@@ -1070,10 +1098,15 @@ end
 
 function M.init()
     sessions = {}
+    foreground_encounter_by_player = {}
     monster_meta = {}
     auto_test_started = {}
     abyss_cleared_stage_by_player = {}
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
+    event_bus.subscribe(
+        events.MONSTER_ENCOUNTER_CHANGED,
+        on_foreground_encounter_changed
+    )
     event_bus.subscribe(events.SEVEN_SINS_COMPLETED, on_seven_sins_completed)
     event_bus.subscribe(events.HERO_READY, start_auto_tests)
 end

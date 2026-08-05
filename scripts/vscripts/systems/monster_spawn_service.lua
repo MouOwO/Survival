@@ -240,6 +240,7 @@ local function start_encounter(payload)
     event_bus.emit(events.MONSTER_ENCOUNTER_CHANGED, {
         player_id = meta.player_id,
         status = "active",
+        foreground_entry = hero_entry ~= nil,
         entindex = unit:entindex(),
         encounter = meta.projection,
     })

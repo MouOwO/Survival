@@ -30,6 +30,11 @@
 - 插入修复已完成：`ui_bootstrap.js`发布独立`ResolveDisplayUnit()`，属性HUD可接受不属于玩家可控选择集合的有效敌方/树木portrait；`combat_stats.js`的属性覆盖、名称、等级、生命、请求、NetTable和事件响应过滤统一改用display身份。技能枚举、runtime owner、快捷键和施法校验继续使用原`Resolve()`可控身份。
 - 自动验证通过：`SELECTED_UNIT_STATS_REFRESH_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS`、相关服务端Lua 5.1语法、严格UTF-8以及game/content限定`diff --check`。`ui_bootstrap.js`和`combat_stats.js`强制定向编译各为`1 compiled, 0 failed, 0 skipped`。
 - 尚未实机验证：Workshop Tools冷启动后在英雄/不同敌人/树木间快速切换，确认名称、生命、攻击、攻速和护甲立即对应当前portrait；同时点击敌人后按Q/W/E，确认技能输入仍属于原可控单位，不会进入敌方query单位。
+- 当前插入修复（用户已批准实施）：转生挑战Boss未击杀时，对应转生商店条目必须记录为进行中并禁止再次购买；英雄从副本A进入副本B后，副本A的延迟刷新不得把英雄拉回；普通材料Boss死亡刷新时保留英雄当前位置，只有`challenge_11`十宗罪/罪渊在仍为当前前台副本时允许按阶段入口重置位置。
+- 已确认根因：商店活动遭遇投影只遍历普通`challenge_definitions`，遗漏`rebirth_challenges`；挑战session按玩家+encounter并存但没有唯一前台身份；可重复挑战完成后的2秒刷新回调无条件调用`teleport_to_current()`。
+- 已批准边界：转生进行中门禁在服务端购买校验和商店快照同时生效且不得重复扣费；普通副本自动刷新怪物但不移动英雄，主动从商店重进仍传送；`challenge_11`仅在仍为前台session时保留自动阶段传送，离开后旧回调不得拉回。
+- 插入修复已完成：`challenge_definitions.csv`新增完成刷新传送策略，普通挑战统一`preserve_position`，仅`challenge_11`为`reset_to_stage_entry`；每玩家前台遭遇身份同时消费普通挑战主动进入和转生Boss成功进入事件，延迟回调校验session、generation及前台身份。商店活动投影纳入`rebirth_challenges`，转生进行中在快照与购买扣费前双重拒绝。
+- 自动验证通过：`CHALLENGE_SESSION_FOREGROUND_CONTRACT_PASS`、`CHALLENGE_SESSION_FOREGROUND_LUA51_PASS`、`CHALLENGE_SESSION_CROSS_SERVICE_LUAC51_PASS`、`ADDMONSTER_MOVE_SPEED_CONTRACT_PASS`和定向生成逐字节一致性通过。行为测试覆盖普通Boss保持位置、十宗罪前台阶段重置、进入转生后旧十宗罪回调不拉回及转生活动商店禁用。尚未进行Workshop Tools冷启动实机验证，不得记录为用户验收完成。
 
 ---
 
