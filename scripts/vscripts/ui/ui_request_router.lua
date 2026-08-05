@@ -146,6 +146,43 @@ local function send_to_player(event_name, player_id, payload)
     end
 end
 
+local CLIENT_DIAGNOSTIC_STAGES = {
+    hud_ready = true,
+    space_select = true,
+    camera_follow_start = true,
+    camera_follow_settled = true,
+    camera_fallback = true,
+}
+
+local function diagnostic_value(value)
+    local text = tostring(value == nil and "" or value)
+    text = string.gsub(text, "[%c]", " ")
+    return string.sub(text, 1, 160)
+end
+
+local function register_client_diagnostic()
+    CustomGameEventManager:RegisterListener("ui_client_diagnostic", function(_, payload)
+        local player_id = source_player_id(payload)
+        local stage = diagnostic_value(payload and payload.stage)
+        if not valid_player_id(player_id) or not CLIENT_DIAGNOSTIC_STAGES[stage] then
+            return
+        end
+        print("[SURVIVAL_CLIENT_DIAGNOSTIC] player=" .. tostring(player_id)
+            .. " stage=" .. stage
+            .. " hero=" .. diagnostic_value(payload.hero)
+            .. " hero_name=" .. diagnostic_value(payload.hero_name)
+            .. " builder=" .. diagnostic_value(payload.builder)
+            .. " entindex=" .. diagnostic_value(payload.entindex)
+            .. " target=" .. diagnostic_value(payload.target)
+            .. " reason=" .. diagnostic_value(payload.reason)
+            .. " result=" .. diagnostic_value(payload.result)
+            .. " move_camera_api=" .. diagnostic_value(payload.move_camera_api)
+            .. " camera_api=" .. diagnostic_value(payload.camera_api)
+            .. " camera_follow_api=" .. diagnostic_value(payload.camera_follow_api)
+            .. " camera_result=" .. diagnostic_value(payload.camera_result))
+    end)
+end
+
 local function hero_ui_snapshot(player_id, entindex, unit)
     local snapshot_player_id = player_id
     local is_monkey_clone = unit and unit.survival_monkey_king_clone == true
@@ -973,6 +1010,7 @@ function M.init()
     building_snapshot_sequence = 0
     ability_request_sequence = 0
     selected_unit_by_player = {}
+    register_client_diagnostic()
     register_selected_unit_stats_request()
     register_building_snapshot_push()
     register_snapshot_request()

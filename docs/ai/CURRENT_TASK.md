@@ -1,5 +1,50 @@
 # Current Task
 
+## 当前状态
+
+- 当前没有相机相关活跃任务。用户已在Workshop Tools明确确认相机问题解决，后续不得将本任务恢复为待验收或活跃任务；等待用户指定下一项任务。
+
+## 已完成任务（2026-08-05）：恢复空格镜头定位并修复挑战镜头回弹
+
+- 用户最新实机确认：空格镜头运动已经正常，但进入挑战后镜头仍会回到英雄传送前消失的位置；此前“挑战不再回弹”的判断被最新反馈推翻。
+- 最新根因：项目没有保存或恢复传送前英雄坐标的业务变量。`survival_ui.js`和`shop_ui.js`挑战链先调用`GameUI.SetCameraTarget(hero)`临时锁定英雄，再调用`GameUI.SetCameraTarget(-1)`解除；Dota解除目标后恢复锁定前的自由镜头锚点，表现为回到英雄消失处。
+- 用户批准删除整段挑战锁定/释放链。当前实现改为一次性`MoveCameraToEntity(hero)`非锁定聚焦，API缺失或异常才按服务端从CSV入口投影的坐标调用`SetCameraTargetPosition`；挑战CSV、服务端传送和怪物生成保持不变。
+- 自动验证完成：`CAMERA_FOCUS_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`ui_request_router.lua` Lua 5.1语法和目标文件严格UTF-8通过；`survival_ui.js`与`shop_ui.js`均强制编译为`1 compiled, 0 failed, 0 skipped`。仍需Workshop Tools冷启动实机确认挑战日志为`camera_follow_settled reason=non_locking_focus move_camera_api=function camera_result=move_to_entity`且镜头不再返回英雄传送前位置。
+- 用户最终验收：2026-08-05用户明确确认“相机问题已经解决”。空格镜头运动和挑战传送后的镜头停留均视为Workshop Tools实机通过；上条“仍需冷启动确认”由本条验收结果关闭。
+- 历史第二轮反馈（已被上方最新实机反馈推翻）：挑战进入日志曾完整出现`camera_follow_start`与`camera_follow_settled reason=arrived camera_result=target_position`，当次未观察到回弹；空格日志持续为`space_select ... camera_result=target_position`，但镜头只缓慢移向英雄。
+- 当前Panorama声明确认`SetCameraTargetPosition(vec3, flLerp)`第二参数为插值值，但未定义单位或`0`的特殊语义；当前客户端实机已证明`0.0`不是瞬移。声明同时提供`MoveCameraToEntity(entindex)`，语义为移动到实体但不锁定；Valve本机`npx_2019`示例也使用实体target完成即时聚焦。
+- 空格第三版已实施并通过自动验证：选择合法Builder/正式英雄后优先调用`MoveCameraToEntity(target)`，仅在API缺失或抛错时回退`SetCameraTargetPosition(origin, 0.0)`；服务端诊断包含`move_camera_api`，主路径结果为`camera_result=move_to_entity`。用户已确认空格镜头运动正常。
+- 用户对第一版修复的最新实机反馈：空格仍不定位、挑战仍回弹，并且普通Workshop Tools服务端控制台没有`[SURVIVAL_SELECTION]`或`[SURVIVAL_CAMERA]`。两组旧日志均为Panorama `$.Msg()`，没有服务端镜像；第一版使用的`GameUI.SetCameraLookAtPosition`也不是当前项目可确认的Dota Panorama接口，并被存在性判断静默跳过。Resource Compiler只证明JS可编译，不能证明运行时API存在。
+- 第二版实施完成：三条生产镜头链统一改用`GameUI.SetCameraTargetPosition(position, 0.0)`。空格选择合法Builder/正式英雄后直接定位；挑战共享控制器解除临时`SetCameraTarget`后下一帧落定服务端入口坐标；`shop_ui.js`共享控制器缺失的fallback也不再等待5秒后直接释放回旧位置。旧`SetCameraLookAtPosition`已从三条生产链移除。
+- 新增服务端可见`ui_client_diagnostic`：只接受`hud_ready/space_select/camera_follow_start/camera_follow_settled/camera_fallback`白名单阶段，按事件注入的`PlayerID`确定玩家，控制字符替换且单字段限制160字符。实机统一查看`[SURVIVAL_CLIENT_DIAGNOSTIC]`；`camera_api=function camera_result=target_position`才是当前客户端调用成功的证据。
+- 第二版自动验证：`CAMERA_FOCUS_CONTRACT_PASS`、输入/Builder契约和`ui_request_router.lua` Lua 5.1语法通过；`ui_bootstrap.js`、`survival_ui.js`、`shop_ui.js`均强制编译为`1 compiled, 0 failed, 0 skipped`。仍需冷启动实机确认API能力、空格定位与首次/重复挑战停留。
+- 用户实机反馈：上一轮占位英雄空格保护完成后，按空格只能选中合法单位，缺少Valve默认的镜头定位；购买挑战并传送英雄时，镜头先到英雄处，约0.2秒后又回到传送前位置。
+- 静态根因已确认：`ui_bootstrap.js`将`SPACE`覆盖为generation fallback command后只调用`GameUI.SelectUnit()`，没有复刻镜头行为；`survival_ui.js`挑战聚焦使用`SetCameraTarget(hero)`临时跟随，到达后直接`SetCameraTarget(-1)`，解除跟随后自由镜头恢复旧锚点。服务端先生成挑战、再按`challenge_locations.csv`入口传送并回传坐标，传送与CSV链无异常。
+- 第一版实施记录（已被第二版替代）：曾使用`SetCameraLookAtPosition()`尝试落定自由镜头；自动契约与编译通过，但用户实机确认两个行为均未生效。该结果不得恢复为有效方案。
+
+## 活跃任务（2026-08-04）：未召唤英雄时屏蔽空格选中占位英雄
+
+- 用户最新实机反馈：尚未通过祭坛召唤正式战斗英雄时按空格，会重新选中隐藏的开局 Undying 占位英雄，HUD 显示“建造者”、原生属性和技能；该内部替换锚点不能被玩家选中或通过空格暴露。
+- 修复必须从 Builder CSV 身份、占位英雄生命周期、现有选择恢复和 Panorama 全局按键入口核对；仅在 `placeholder/replacing` 阶段屏蔽占位英雄选择，正式英雄召唤后空格选择英雄必须恢复正常，且不得使用会阻止建筑、工人、Builder 或正式英雄正常选择的永久全局 Selection Override。
+- 当前仅有 Workshop Tools 截图证据；现有占位 Modifier 已声明 `MODIFIER_STATE_UNSELECTABLE`，但实机证明 Valve 默认主英雄选择仍可直接选中引擎占位英雄。当前确认需由 Panorama 唯一输入所有者接管 `SPACE`：占位阶段选择 CSV Builder，正式替换后选择引擎正式英雄；同时兼容 `SetKeyPressedCallback` 不可用时的 fallback keybind。
+- 实施完成：`ui_bootstrap.js` 注册最高优先级 `placeholder_space_guard` 并把 `SPACE` 纳入 generation fallback keybind。按空格时读取引擎主英雄：仍为 Undying 占位锚点则只选择 `survival_builder_identity` 发布的 Builder，身份尚未到达时也消费输入并阻止穿透；替换完成后选择正式英雄。未使用轮询或 `SetOverrideSelectionEntity`。`custom_net_tables.txt`同步补齐既有 Builder 身份表声明。
+- 自动验证通过：`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS/LUA51_PASS`、占位服务 Lua 5.1 语法和 `ui_bootstrap.js` Resource Compiler 强制编译（`1 compiled, 0 failed, 0 skipped`）。尚需 Workshop Tools 完全停止后 Run，分别在召唤前后按空格确认选择目标；自动契约与编译不能替代引擎输入验收。
+
+## 活跃任务（2026-08-04）：小游侠同步新版多目标出手逻辑
+
+- 用户要求黑暗游侠召唤的小游侠从旧版“主箭命中后补射”同步为新版“正式出手时主箭与另外4箭并列发射”。权威`hero_skill_definitions.csv`保持固定总计5目标，不改继承攻击/攻速、持续时间、无敌或Tooltip。
+- 根因是tracker的`OnAttackLanded`仍调用`on_drow_companion_attack_landed()`。修复还必须阻止小游侠发布英雄`HERO_MAIN_ATTACK_FIRED`，否则会错误消费owner的转生3～6目标逻辑并与自身固定5目标叠加。
+- 最小实现：tracker在`OnAttack`优先按`survival_drow_companion`分流，只有非次级主攻击调用召唤物出手函数，随后返回；落地阶段仅清理次级record。补专项行为/递归测试及契约，保留所有真实普通攻击独立结算。
+- 实施与自动验证完成：小游侠现在在`MODIFIER_EVENT_ON_ATTACK`调用固定五目标逻辑，落地阶段不再补射，也不发布英雄转生出手事件。专项嵌套行为、相关攻击回归、免费英雄与多目标契约、Lua 5.1语法、CSV/运行配置/生成Lua一致性及严格UTF-8通过。下一步Workshop Tools冷启动确认视觉同步和真实独立结算。
+
+## 活跃任务（2026-08-04）：转生多目标普通攻击改为并列发射
+
+- 用户批准将一转后多目标普通攻击从“主目标命中后补射”改为“主攻击正式出手时同时向主目标和其他目标发射”。一至四转总目标3/4/5/6、包含主目标、各目标独立普通攻击结算以及次级攻击不触发项目主攻击业务的既有规则不变。
+- 静态根因：`hero_progression_system.lua::trigger_multishot()`当前订阅`HERO_MAIN_ATTACK_LANDED`，在主箭真实命中后才调用次级`PerformAttack()`。批准方案是在攻击追踪Modifier的`MODIFIER_EVENT_ON_ATTACK`阶段发布新的主攻击出手事件，次级record不得发布该事件，成长、技能、装备和研究等命中消费者继续留在`HERO_MAIN_ATTACK_LANDED`。
+- 黑暗游侠Buff图标与多目标逻辑分开处理。项目已检查的基础Modifier均隐藏；原生Ability被保留但隐藏停用，可能仍有intrinsic modifier。本轮只输出黑暗游侠可见Modifier及来源Ability诊断，未唯一确认前不删除任何Modifier。
+- 实施完成：`HERO_MAIN_ATTACK_FIRED`由攻击追踪Modifier在`MODIFIER_EVENT_ON_ATTACK`发布，多目标处理只订阅该事件；同步次级标志与secondary record共同防递归。真实命中事件及其成长、公共技能、装备和研究消费者未迁移。
+- 自动验证通过：多目标Lua 5.1行为/递归模拟、PowerShell契约、相关攻击与猴王回归、目标Lua 5.1语法、CSV与生成Lua一致性及严格UTF-8。尚需Workshop Tools冷启动确认视觉时点，并提供`[DROW_VISIBLE_MODIFIER]`日志归因Buff图标。
+
 ## 活跃任务（2026-08-04）：祭坛召唤英雄按钮无法点击
 
 - 用户最新实机反馈：祭坛当前无法召唤英雄，表现为祭坛技能按钮无法点击；要求优先修复。

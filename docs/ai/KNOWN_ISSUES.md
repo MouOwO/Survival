@@ -2,6 +2,12 @@
 
 ## 当前已知问题
 
+0. **Panorama解除`SetCameraTarget`会恢复锁定前的自由镜头锚点。**
+   - 2026-08-05用户实机确认：挑战传送时先调用`GameUI.SetCameraTarget(hero)`、到达后再调用`GameUI.SetCameraTarget(-1)`，会让镜头返回英雄传送前消失的位置。表现类似项目保存并恢复旧坐标，但全链搜索确认没有对应业务变量；这是目标锁定解除后的引擎镜头行为。
+   - 只需要把镜头移动到单位、但不需要持续跟随时，应使用`GameUI.MoveCameraToEntity(entindex)`，不得建立随后需要`SetCameraTarget(-1)`解除的临时锁定。
+   - `MoveCameraToEntity`缺失或异常时，可以用权威目标坐标调用`SetCameraTargetPosition(position, flLerp)`回退；当前客户端实机证明`flLerp=0.0`仍可能发生慢速插值，不能将其描述为瞬移。
+   - `GameUI.SelectUnit()`只改变选择，不会复刻Valve默认空格的镜头定位；自定义接管空格时必须显式调用非锁定镜头移动API。
+
 0. **Attack record身份不能跨最终伤害与落地事件阶段延迟消费。**
    - 2026-08-04实机确认：齐天大圣E已解锁且原生暴击飘字正常，但等待`OnAttackLanded`再次读取同一record时无法触发全属性×5附伤；这证明`OnTakeDamage`时存在的暴击身份不能假设在后续落地回调仍可用。
    - 需要与最终伤害一致的攻击触发效果，应在`OnTakeDamage`已确认`attacker+record`身份时发布项目内部事件，并在发布前完成主/次级攻击分类和record+victim去重。不得用彼此独立的Mock测试替代真实事件顺序测试。

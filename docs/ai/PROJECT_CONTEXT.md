@@ -22,6 +22,10 @@
 - 点目标/Grid 会话必须在 Begin 时固定 caster entindex、Ability entindex/name 和 session id；活动期间不得逐帧从 `GetLocalPlayerPortraitUnit()` 重算 Builder。建筑移动 D 的高优先级 handler 只在当前选中建筑可移动或已进入移动状态时消费，否则 D 继续交给 Builder Blink。
 - `npc_survival_builder_proxy` 和项目建筑是普通 creature，`GetPlayerOwnerID()` 不能作为业务 ownership 权威。Builder 必须由 `builder_service` 注册表按玩家和实体双向校验，并把权威 ID 写入 `survival_player_id`；Grid、建造提交和建筑托管 Ability 路由读取该身份。引擎 `SetPlayerID/SetOwner/SetControllableByPlayer` 仍用于控制表现，但不能替代业务注册身份。
 - Builder 建造技能顺序来自 `data/csv/建筑与工人系统/builder_ability_stages.csv::slot_order`，运行时必须显式投影为 Ability index `slot_order - 1`。当前设计为五个建造技能 index `0..4`，项目输入 Q/W/E/R/T；Builder Blink 使用独立 index `5` 并按名称路由 D，不能再依赖 `AddAbility()` 自动排列。
+- `MODIFIER_STATE_UNSELECTABLE`不能保证 Valve 默认“选择主英雄”命令不选中引擎占位英雄。项目的空格输入由`ui_bootstrap.js`唯一输入所有者接管：`Players.GetPlayerHeroEntityIndex()`仍为`npc_dota_hero_undying`时选择`survival_builder_identity`发布的CSV Builder；正式替换后选择实际英雄。Builder身份尚未发布时也必须消费空格，不能让默认命令穿透到占位锚点；禁止用永久`SetOverrideSelectionEntity`或轮询纠正选择。
+- 自定义`SPACE`覆盖Valve默认主英雄命令时，`GameUI.SelectUnit()`只复刻选择，不会自动定位镜头。空格定位优先使用Dota Panorama的`MoveCameraToEntity(target)`，该API按声明移动到实体但不锁定；API缺失或异常时才用`Entities.GetAbsOrigin(target)`和`SetCameraTargetPosition(position, 0.0)`兼容回退。当前客户端实机证明后者即使`flLerp=0.0`仍会慢速插值，不能再描述为瞬移。`SetCameraLookAtPosition`也已被实机否定，禁止恢复。
+- 挑战传送禁止使用`SetCameraTarget(hero)`再`SetCameraTarget(-1)`的临时锁定链；当前客户端实机证明解除目标会恢复锁定前自由镜头锚点，即英雄传送前消失位置。挑战购买成功后应一次性调用`MoveCameraToEntity(hero)`非锁定聚焦，API缺失或异常时才使用服务端从`challenge_locations.csv`入口投影的坐标调用`SetCameraTargetPosition(position, 0.0)`。共享控制器缺失的`shop_ui.js` fallback必须保持相同非锁定语义。
+- Panorama `$.Msg()`不等于Workshop Tools服务端日志。需要用户从普通服务端控制台核对的客户端输入/镜头诊断，应通过白名单CustomGameEvent镜像到Lua，并使用事件注入的`PlayerID`、控制字符清理和字段长度限制；当前统一前缀为`[SURVIVAL_CLIENT_DIAGNOSTIC]`。
 
 ## 英雄普通攻击最终伤害飘字（2026-08-04）
 
@@ -77,6 +81,7 @@
 
 - `reward_effects.csv`是转生多目标数权威源：一转解锁并把总目标数设为3，二/三/四转依次增加到4/5/6，五转以后不再增加；`hero_progression_system`同时封顶6以防旧存档或异常奖励越界。
 - 总目标数包含主目标。次级目标使用引擎`PerformAttack`逐个独立结算，因此每个目标按自身护甲处理；次级攻击关闭Proc并在`modifier_weapon_attack_tracker`按attack record标记，不发布项目主攻击事件，避免递归多目标、公共技能、成长和主攻击装备效果。
+- 多目标选择与次级`PerformAttack`必须由`MODIFIER_EVENT_ON_ATTACK`发布的`HERO_MAIN_ATTACK_FIRED`触发，使主箭和次级箭在正式出手点并列发射；不得恢复为订阅`HERO_MAIN_ATTACK_LANDED`，否则视觉会退化为主目标命中后补射。属性成长、技能、装备和研究等真实命中业务继续消费`HERO_MAIN_ATTACK_LANDED`。
 - 主目标可在原平A落地时死亡；只要攻击事件中的主目标实体和敌方身份仍有效，多目标仍应继续选择存活的其他敌人。目标查询范围读取`survival_attack_range`、`Script_GetAttackRange()`和`GetAttackRange()`最大有效值。
 
 ## 英雄攻击能力与弹道配置（2026-08-03）
@@ -106,6 +111,7 @@
 - 项目`attack_speed`表示每秒攻击次数，不是Dota攻速加成百分比。召唤物继承时先按`attack_speed_inherit_pct`计算，再用`SetBaseAttackTime(1 / attack_speed)`写入引擎，并同步保存`unit.survival_attack_speed`供UI、日志和实机诊断；非正数不得参与除法或覆盖单位BAT。
 - 有持续时间且禁止重复召唤的技能，应以“英雄实体+技能ID”为唯一活动身份，同时检查召唤实体存活和到期时间；死亡、失效或到期必须清锁并清理实体。概率判定应在活动锁检查之后，避免存续期间无意义消耗随机数。
 - 多目标召唤攻击必须区分主攻击与次级攻击。小游侠次级攻击使用`PerformAttack`关闭Proc，并通过攻击record标记隔离项目装备、英雄技能和其他攻击附带效果；只关闭引擎Proc不足以证明项目事件链不会重复触发。
+- 小游侠固定五目标普通攻击与英雄转生多目标使用相同的“正式出手时并列发射”时点，但身份和目标数必须隔离：tracker在`MODIFIER_EVENT_ON_ATTACK`先按`survival_drow_companion`分流，主攻击调用小游侠固定五目标逻辑后直接返回，不能发布`HERO_MAIN_ATTACK_FIRED`；`OnAttackLanded`只清理record，禁止恢复命中后补射。
 - “开局可见但未解锁”的固定槽技能使用项目等级0与`locked=true`表达业务状态，引擎Ability保持等级1以显示图标，并用`SetActivated(false)`禁用；解锁时激活同一个Ability，禁止删除重加导致槽位、Tooltip或存档身份漂移。
 - 四英雄任务的可靠验证闭环包括：权威英雄/专属/技能/弹道/Tooltip CSV，定向生成Lua，Ability与单位KV、本地化镜像、Lua 5.1语法与行为测试、PowerShell契约、生成一致性、严格UTF-8和限定`git diff --check`。自动测试必须与用户验收分开记录；本任务已于2026-08-02获得用户明确成功确认。
 

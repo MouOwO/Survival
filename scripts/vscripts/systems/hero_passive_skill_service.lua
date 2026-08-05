@@ -3515,8 +3515,8 @@ function M.on_tracking_projectile_hit(ability, target, location, extra_data)
     return true
 end
 
-function M.on_drow_companion_attack_landed(attacker, primary_target)
-    return exclusive_passives.on_drow_companion_attack_landed(
+function M.on_drow_companion_attack_fired(attacker, primary_target)
+    return exclusive_passives.on_drow_companion_attack_fired(
         attacker, primary_target
     )
 end

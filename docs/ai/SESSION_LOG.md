@@ -1,3 +1,58 @@
+# 2026-08-04 — 挑战镜头移除临时目标锁定
+
+- 2026-08-05用户最终确认“相机问题已经解决”。空格镜头运动与挑战传送后的镜头停留均记录为Workshop Tools实机通过，本任务完成，不再恢复为活跃或待验收任务。
+- 用户最新实机确认空格镜头运动正常，但挑战镜头仍返回英雄传送前消失位置，推翻此前“挑战不再回弹”的判断。
+- 全链搜索没有发现保存或恢复传送前英雄坐标的业务变量。根因是`survival_ui.js`与`shop_ui.js`挑战路径先`SetCameraTarget(hero)`再`SetCameraTarget(-1)`；解除目标时Dota恢复锁定前自由镜头锚点。
+- 用户批准删除整段锁定/释放/到达轮询链。当前挑战改为`MoveCameraToEntity(hero)`一次性非锁定聚焦，API缺失或异常才按服务端CSV入口坐标回退；CSV、服务端传送和怪物生成未修改。
+- 自动验证：`CAMERA_FOCUS_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`ui_request_router.lua` Lua 5.1语法和目标文件严格UTF-8通过；`survival_ui.js`、`shop_ui.js`分别强制编译为`1 compiled, 0 failed, 0 skipped`。尚需Workshop Tools冷启动实机确认非锁定日志和不再返回旧镜头位置。
+
+# 2026-08-04 — 空格镜头改用非锁定实体移动API
+
+- 用户提供第二版服务端诊断并实机确认：挑战依次出现`camera_follow_start`和`camera_follow_settled reason=arrived camera_result=target_position`，镜头不再回弹；空格每次成功选择正式英雄并调用位置API，但镜头只缓慢移动。
+- 当前`@moddota/panorama-types 1.39.2`声明确认`SetCameraTargetPosition(vec3, flLerp)`为插值接口，并提供`MoveCameraToEntity(entindex)`，说明为移动到实体但不锁定。`flLerp=0.0`的具体单位/特殊值没有公开说明，当前客户端实机行为是权威证据，不能继续假定为0秒瞬移。
+- 购买前没有镜头调用；购买挑战成功后项目`shop_ui.js`按服务端`close_shop_and_focus_hero=1`主动进入共享镜头控制器。最开始精准聚焦来自项目`SetCameraTarget(hero)`，不是Valve购买默认行为。用户批准只修改空格主路径，挑战、购买、CSV和传送链不动。
+- 实施：空格合法目标选择后优先`MoveCameraToEntity(target)`，缺失或异常时回退既有位置插值；诊断增加`move_camera_api`，主路径结果为`move_to_entity`。自动验证与冷启动实机结果待补。
+
+# 2026-08-04 — 镜头修复第二版：正确API与服务端诊断
+
+- 用户实机确认第一版两个行为均未生效：空格不定位，挑战仍回弹；服务端控制台也没有旧`[SURVIVAL_SELECTION]/[SURVIVAL_CAMERA]`。后两者原本仅由Panorama `$.Msg()`输出，没有服务端镜像。
+- 复盘确认第一版错误：`SetCameraLookAtPosition`只通过源码契约和Resource Compiler，不能证明当前Dota Panorama运行时支持；存在性判断会在API缺失时静默跳过。空格因此只执行选择，挑战则临时跟随后释放并回到旧镜头。
+- 第二版实现：空格、挑战共享控制器和`shop_ui` fallback统一使用`SetCameraTargetPosition(position, 0.0)`；fallback不再5秒后直接释放。新增`ui_client_diagnostic`，服务端只打印5种白名单阶段并清理/限制客户端字段，统一输出`[SURVIVAL_CLIENT_DIAGNOSTIC]`。
+- 自动验证：镜头、输入、Builder契约通过；旧错误API在三条生产链中不存在；`ui_request_router.lua`通过Lua 5.1语法；三个Panorama JS各强制编译为`1 compiled, 0 failed, 0 skipped`。尚需冷启动实机确认`hud_ready camera_api=function`以及空格/挑战`camera_result=target_position`，自动编译不等于运行时API验收。
+
+# 2026-08-04 — 空格镜头定位与挑战镜头回弹
+
+- 用户确认上一轮空格占位保护已完成，但自定义空格失去Valve默认镜头定位；进入挑战时镜头先到英雄处，随后回到传送前位置。
+- 权威链复核：挑战入口来自`challenge_locations.csv`；`challenge_session_service`先生成挑战，再传送英雄并返回入口坐标；`ui_request_router`把英雄entindex和坐标发送给Panorama。服务端传送与CSV配置无异常。
+- 根因与修复：自定义`SPACE`原先只调用`SelectUnit`，现对合法Builder/正式英雄同时调用`SetCameraLookAtPosition`；挑战临时`SetCameraTarget`到达后直接释放会恢复旧自由镜头，现改为先释放并在下一帧落到服务端入口坐标，缺失时回退英雄位置。保留Builder未同步时消费空格和Undying隔离，不改挑战数据或传送业务。
+- 自动验证：`CAMERA_FOCUS_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS`通过；`challenge_session_service.lua`和`ui_request_router.lua`通过Lua 5.1语法检查；`ui_bootstrap.js`与`survival_ui.js`各强制编译为`1 compiled, 0 failed, 0 skipped`。尚需冷启动Workshop Tools确认两阶段空格定位、首次进入挑战和重新进入未完成挑战，自动检查不等于引擎镜头验收。
+
+# 2026-08-04 — 占位英雄空格选择屏蔽
+
+- 用户新增实机反馈：未召唤正式英雄时按空格会选中隐藏的开局 Undying 占位锚点，HUD 暴露“建造者”及原生属性/技能。新任务要求该内部单位不能被空格选中；不得影响 Builder、建筑、工人和召唤后正式英雄的正常选择，也不得恢复永久全局 Selection Override。
+- CSV `builder_definitions.csv`确认玩家可控建造者为独立`npc_survival_builder_proxy`；占位英雄已有隐藏、取消控制、地下隔离和`MODIFIER_STATE_UNSELECTABLE`，但截图证明 Valve 默认主英雄选择可绕过常规不可选状态。当前方案是在 Panorama 唯一输入所有者中接管`SPACE`：引擎主英雄仍为 Undying 时选择权威 Builder，替换后选择正式英雄；同时覆盖当前客户端`SetKeyPressedCallback`不可用时的generation fallback keybind。
+- 实施完成：`ui_bootstrap.js`新增优先级120的`placeholder_space_guard`并将`SPACE`加入generation fallback；占位阶段选择Builder，正式英雄阶段选择主英雄，Builder身份暂不可用时消费输入并记录`block_placeholder`。补齐`custom_net_tables.txt`中的`survival_builder_identity`声明，未修改CSV业务值、占位Lua生命周期或其他选择行为。
+- 自动验证：`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS/LUA51_PASS`和`PLACEHOLDER_LUAC51_PASS`通过；`ui_bootstrap.js`强制编译为`1 compiled, 0 failed, 0 skipped`。尚需Workshop Tools冷启动，召唤前后分别按空格并核对`[SURVIVAL_SELECTION] SPACE_SELECT`，自动测试不等于实机输入验收。
+- 严格UTF-8复查确认本轮新增段落及生产/测试目标文件无替换字符或乱码；`SESSION_LOG.md`整文件仍精确保留`KNOWN_ISSUES.md`已登记的3个历史`U+FFFD`，本轮未猜测改写。限定`git diff --check`通过。
+
+# 2026-08-04 — 小游侠多目标攻击同步新版出手逻辑
+
+- 用户要求黑暗游侠专属召唤物小游侠同步新版英雄攻击逻辑。权威`hero_skill_definitions.csv`确认其规则仍为每次攻击主目标及射程内最近另外4个敌人，次级攻击不触发附带效果；本轮不修改目标数、继承数值、持续时间或Tooltip。
+- 静态根因：`modifier_weapon_attack_tracker:OnAttackLanded()`对`survival_drow_companion`调用`on_drow_companion_attack_landed()`，因此小游侠仍在主箭命中后补射。新增英雄出手事件后，小游侠还可能因共享tracker错误发布`HERO_MAIN_ATTACK_FIRED`并消费玩家英雄转生目标数，必须在tracker中按召唤物身份提前分流。
+- 实施边界：小游侠非次级主攻击在`MODIFIER_EVENT_ON_ATTACK`直接调用自己的固定五目标发射逻辑并返回，不发布英雄出手事件；小游侠次级攻击继续用临时标志和record双重隔离；`OnAttackLanded`只清理record，不再生成箭矢。英雄和其他召唤物行为不变。
+- 实施完成：专属服务入口重命名为`on_drow_companion_attack_fired()`；tracker的`OnAttack`先识别小游侠，主攻击立即创建最近4个次级普通攻击并返回，次级攻击直接返回且不递归；`OnAttackLanded`的小游侠分支只清理secondary record。小游侠不会发布或消费英雄转生`HERO_MAIN_ATTACK_FIRED`。
+- 自动验证通过：`DROW_COMPANION_MULTISHOT_LUA51_PASS`真实模拟主攻击OnAttack、4个嵌套次级OnAttackStart/OnAttack和后续主箭落地，确认固定总计5目标、距离排序、无递归、无英雄事件、落地不补射；免费英雄、英雄多目标、伤害数字、猴王E/QWE/近战/塔回归通过，相关Lua 5.1语法、CSV/运行配置/生成技能一致性和严格UTF-8通过。
+- 尚需Workshop Tools冷启动实机确认小游侠主箭和另外4箭在同一正式出手点并列发射、每个目标独立结算且不触发英雄/装备附带效果；自动测试不等于实机视觉验收。
+
+# 2026-08-04 — 转生多目标普通攻击并列发射获批
+
+- 用户补充并批准修复：一转后的多目标攻击应在一次普通攻击正式出手时，从英雄当前位置同时向主目标和射程内其他目标发射箭矢；不能等主目标先命中后再补射。目标总数仍由`reward_effects.csv`权威配置为一至四转3/4/5/6且包含主目标。
+- 静态根因已确认：`hero_progression_system.lua::trigger_multishot()`订阅`HERO_MAIN_ATTACK_LANDED`，所以次级`PerformAttack()`只能在主弹道命中后创建。修复边界是新增主攻击正式出手事件并只前移目标查询/次级发射；成长、公共技能、装备、研究和其他真实命中业务继续使用原命中事件。
+- 次级攻击继续使用attack record身份隔离并关闭Proc，禁止递归多目标或重复项目技能。黑暗游侠Buff图标尚未唯一归因；项目基础生命、射程、技能属性和攻击追踪Modifier均隐藏，本轮只增加黑暗游侠召唤完成时的可见Modifier及来源Ability限次诊断，不无差别删除Modifier。
+- 实施完成：新增`HERO_MAIN_ATTACK_FIRED`，攻击追踪Modifier在`MODIFIER_EVENT_ON_ATTACK`只为非次级主攻击发布；成长系统仅把`trigger_multishot`迁移到该事件，`HERO_MAIN_ATTACK_LANDED`上的属性成长和其他消费者保持不变。同步临时标志与secondary record双重阻止嵌套`PerformAttack()`递归。
+- 自动验证通过：`HERO_MULTISHOT_LUA51_PASS`（包含嵌套OnAttack递归模拟）、`WORKER_RANGED_MULTISHOT_CONTRACT_PASS`、英雄伤害数字、猴王E/QWE/近战、超级塔暴击和unlock E Lua 5.1行为，以及Alt/免费英雄/Builder替换契约；目标Lua通过`luac5.1 -p`，转生CSV与生成Lua一致，目标文件严格UTF-8通过。超级塔独立契约仍在既有生成说明字符串断言失败，本轮未修改其CSV或生成文件。
+- 尚未完成Workshop Tools实机验证：需冷启动后确认主箭与次级箭在同一正式出手点并列发射、各目标独立伤害和次级技能隔离；同时收集`[DROW_VISIBLE_MODIFIER] modifier=... ability=...`以唯一识别Buff图标，未取得日志前不做删除。
+
 # 2026-08-04 — 祭坛召唤英雄输入修复
 
 - 用户实机报告祭坛无法召唤英雄，表现为祭坛按钮无法点击。先核对CSV权威链：`altar_actions.csv`的`altar_select_hero`没有Ability字段且只描述选择语义；实际规则来自`hero_summon_rules.csv`，英雄按钮来自`buildings_config.lua`与`hero_summon_projection.lua`既有六英雄映射，CSV/生成Lua/KV均存在。

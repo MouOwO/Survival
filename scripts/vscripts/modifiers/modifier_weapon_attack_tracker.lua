@@ -22,6 +22,7 @@ end
 function modifier_weapon_attack_tracker:DeclareFunctions()
     return {
         MODIFIER_EVENT_ON_ATTACK_START,
+        MODIFIER_EVENT_ON_ATTACK,
         MODIFIER_EVENT_ON_ATTACK_LANDED,
         MODIFIER_EVENT_ON_ATTACK_RECORD_DESTROY,
     }
@@ -106,8 +107,38 @@ local function is_secondary_attack(params, attacker)
         or params.is_multishot_secondary == 1 then
         return true
     end
-    if attacker.survival_is_multishot_secondary == true then return true end
+    if attacker.survival_is_multishot_secondary == true
+        or attacker.survival_next_drow_secondary == true
+        or attacker.survival_next_multishot_secondary == true then
+        return true
+    end
     return modifier_weapon_attack_tracker.IsSecondaryAttackRecord(params.record)
+end
+
+function modifier_weapon_attack_tracker:OnAttack(params)
+    if not IsServer() or params.attacker ~= self:GetParent() then return end
+    local target = params.target
+    if not target or target:IsNull()
+        or target:GetTeamNumber() == self:GetParent():GetTeamNumber() then
+        return
+    end
+    local secondary = is_secondary_attack(params, self:GetParent())
+    if self:GetParent().survival_drow_companion == true then
+        if not secondary then
+            require("systems/hero_passive_skill_service")
+                .on_drow_companion_attack_fired(self:GetParent(), target)
+        end
+        return
+    end
+    if secondary then return end
+    event_bus.emit(events.HERO_MAIN_ATTACK_FIRED, {
+        player_id = self.player_id,
+        attacker = self:GetParent(),
+        target = target,
+        record = params.record,
+        is_main_attack = true,
+        is_multishot_secondary = false,
+    })
 end
 
 function modifier_weapon_attack_tracker:OnAttackLanded(params)
@@ -132,10 +163,6 @@ function modifier_weapon_attack_tracker:OnAttackLanded(params)
             self:GetParent(), params.record
         )
     if self:GetParent().survival_drow_companion == true then
-        if not secondary then
-            require("systems/hero_passive_skill_service")
-                .on_drow_companion_attack_landed(self:GetParent(), target)
-        end
         modifier_weapon_attack_tracker.ClearSecondaryAttackRecord(params.record)
         return
     end

@@ -90,6 +90,24 @@ local function preserve_and_hide_native_abilities(unit)
         tostring(count > 0), tostring(count)))
     return count > 0
 end
+
+local function diagnose_drow_visible_modifiers(unit)
+    if unit:GetUnitName() ~= "npc_dota_hero_drow_ranger"
+        or type(unit.FindAllModifiers) ~= "function" then return end
+    for _, modifier in ipairs(unit:FindAllModifiers() or {}) do
+        local hidden = modifier.IsHidden and modifier:IsHidden() or false
+        if not hidden then
+            local ability = modifier.GetAbility and modifier:GetAbility() or nil
+            print(string.format(
+                "[DROW_VISIBLE_MODIFIER] modifier=%s ability=%s",
+                tostring(modifier:GetName()),
+                tostring(ability and not ability:IsNull()
+                    and ability:GetAbilityName() or "none")
+            ))
+        end
+    end
+end
+
 local function initialize_replacement(player_id, team, altar, definition)
     local position = summon_position(altar, definition)
     local placeholder, begin_error = hero_anchor_service.begin_replacement(player_id)
@@ -140,6 +158,7 @@ local function initialize_replacement(player_id, team, altar, definition)
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
     cosmetic_service.apply(unit, definition.hero_id)
+    diagnose_drow_visible_modifiers(unit)
     local committed, commit_error = hero_anchor_service.commit_replacement(
         player_id,
         unit

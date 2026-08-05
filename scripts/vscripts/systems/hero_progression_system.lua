@@ -238,7 +238,7 @@ function M.init()
     event_bus.subscribe(events.HERO_READY, on_hero_ready)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_attack_landed)
-    event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, trigger_multishot)
+    event_bus.subscribe(events.HERO_MAIN_ATTACK_FIRED, trigger_multishot)
 end
 
 M._test = {

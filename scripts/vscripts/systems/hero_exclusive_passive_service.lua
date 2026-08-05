@@ -213,7 +213,7 @@ function M.runners.skill_axe_counter_helix(context, definition)
     return true
 end
 
-function M.on_drow_companion_attack_landed(attacker, primary_target)
+function M.on_drow_companion_attack_fired(attacker, primary_target)
     if not alive(attacker) or not alive(primary_target)
         or attacker.survival_drow_companion ~= true then return false end
     local origin = attacker:GetAbsOrigin()

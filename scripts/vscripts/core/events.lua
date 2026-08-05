@@ -152,6 +152,7 @@ local M = {
     WEAPON_EQUIPMENT_GET_REQUEST = "weapon.equipment.get.request",
     WEAPON_EQUIPPED_CHANGED = "weapon.equipped.changed",
     WEAPON_ATTACK_LANDED = "weapon.attack.landed",
+    HERO_MAIN_ATTACK_FIRED = "hero.main_attack_fired",
     HERO_MAIN_ATTACK_LANDED = "hero.main_attack_landed",
     HERO_FINAL_CRITICAL_ATTACK_DAMAGE = "hero.final_critical_attack_damage",
     HERO_PASSIVE_SKILL_ROLL_REQUESTED = "hero.passive_skill.roll_requested",
