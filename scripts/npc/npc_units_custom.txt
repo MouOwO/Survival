@@ -60,9 +60,10 @@
         "AttackCapabilities"     "DOTA_UNIT_CAP_RANGED_ATTACK"
         "AttackDamageMin"        "20"
         "AttackDamageMax"        "20"
-        "AttackRange"            "600"
+        "AttackRange"            "1000"
         "AttackRate"             "1.0"
         "AttackAnimationPoint"   "0.3"
+        "ProjectileSpeed"        "5000"
         // Attack acquisition must cover the real attack radius; the default 10
         // prevents autonomous tower target search.
         "AttackAcquisitionRange" "1000"

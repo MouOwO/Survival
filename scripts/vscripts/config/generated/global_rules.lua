@@ -2,8 +2,11 @@
 -- Source: global_rules.csv
 local M = {}
 M.rows = {
-    { rule_id = "tower_attack_range", value = 2500, description = "所有防御塔统一攻击距离", enabled = true },
-    { rule_id = "tower_acquisition_range", value = 2500, description = "所有防御塔统一索敌距离", enabled = true },
+    { rule_id = "tower_attack_range", value = 1000, description = "所有防御塔统一基础攻击距离", enabled = true },
+    { rule_id = "tower_acquisition_range", value = 1000, description = "所有防御塔统一基础索敌距离", enabled = true },
+    { rule_id = "tower_base_projectile_speed", value = 5000, description = "基础箭塔原始弹道速度", enabled = true },
+    { rule_id = "tower_route_default_projectile_speed", value = 1250, description = "无独立配置转职塔的原始弹道速度", enabled = true },
+    { rule_id = "tower_projectile_speed_multiplier", value = 1, description = "所有防御塔弹道速度倍率", enabled = true },
     { rule_id = "repair_detection_range", value = 99999, description = "修理师自动感知受损建筑的范围", enabled = true },
     { rule_id = "initial_gold", value = 0, description = "队伍开局金币", enabled = true },
     { rule_id = "initial_wood", value = 10, description = "队伍开局木材", enabled = true },

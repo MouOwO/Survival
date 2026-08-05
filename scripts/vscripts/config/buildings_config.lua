@@ -1,6 +1,7 @@
 local building_levels = require("config/generated/building_levels")
 local building_definitions = require("config/generated/building_definitions")
 local building_visual_levels = require("config/generated/building_visual_levels")
+local arrow_tower_base = require("config/generated/arrow_tower_base")
 local wall_visual_levels = require("config/generated/wall_visual_levels")
 local construction_rules = require(
     "config/generated/building_construction_rules"
@@ -108,6 +109,14 @@ local function build_cost(building_id, fallback_wood, fallback_gold)
     }
 end
 
+local function arrow_tower_build_cost()
+    local level_one = (arrow_tower_base.rows or {})[1] or {}
+    return {
+        wood = tonumber(level_one.upgrade_wood) or 0,
+        gold = tonumber(level_one.upgrade_gold) or 0,
+    }
+end
+
 local wall_levels = level_rows("building_wall")
 M.wall = {
     id = "wall", display_name = configured_name("wall", "城墙"),
@@ -153,7 +162,7 @@ M.building_farm = {
 M.arrow_tower = {
     id = "arrow_tower", display_name = configured_name("arrow_tower", "防御塔"),
     unit_name = configured_unit_name("arrow_tower", "building_arrow_tower"),
-    build_cost = build_cost("building_arrow_tower", 80, 20),
+    build_cost = arrow_tower_build_cost(),
     footprint = { x = 2, y = 2 }, max_count = 0,
     show_health_bar = false, selectable = true, abilities = {
         "ability_upgrade_tower_lv01",

@@ -110,8 +110,16 @@ local function add_stage_abilities(state, stage_rows)
         end
     end
     local blink = builder:FindAbilityByName(BUILDER_BLINK_ABILITY)
-    if blink and blink.SetAbilityIndex then
-        blink:SetAbilityIndex(BUILDER_BLINK_INDEX)
+    if not blink then
+        blink = builder:AddAbility(BUILDER_BLINK_ABILITY)
+    end
+    if blink then
+        blink:SetLevel(1)
+        blink:SetHidden(false)
+        blink:SetActivated(true)
+        if blink.SetAbilityIndex then
+            blink:SetAbilityIndex(BUILDER_BLINK_INDEX)
+        end
     end
 end
 

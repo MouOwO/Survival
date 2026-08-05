@@ -5,6 +5,7 @@ local routes = require("config/tower_route_config")
 local runtime = require("config/generated/tower_fusion_runtime")
 local tower_skills = require("systems/tower_skill_runtime")
 local tree_damage_rules = require("systems/tree_damage_rules")
+local tower_combat_rules = require("config/tower_combat_rules")
 
 local M = {}
 
@@ -118,8 +119,14 @@ local function create_proxy(state, source, row, class_id)
         proxy:SetRangedProjectileName(row.projectile_model)
         proxy.survival_projectile_model = row.projectile_model
     end
-    if tonumber(row.projectile_speed) and proxy.SetProjectileSpeed then
-        proxy:SetProjectileSpeed(tonumber(row.projectile_speed))
+    local projectile_speed = tonumber(source.unit.survival_projectile_speed)
+        or (source.unit.GetProjectileSpeed
+            and tonumber(source.unit:GetProjectileSpeed()))
+        or tower_combat_rules.projectile_speed(row.projectile_speed)
+        or tower_combat_rules.projectile_speed(1000)
+    if proxy.SetProjectileSpeed then
+        proxy:SetProjectileSpeed(projectile_speed)
+        proxy.survival_projectile_speed = projectile_speed
     end
     if proxy.SetAcquisitionRange then proxy:SetAcquisitionRange(0) end
     add_proxy_skills(proxy, row)
@@ -141,8 +148,7 @@ local function create_proxy(state, source, row, class_id)
             tonumber(source.unit:GetSecondsPerAttack())
                 or tonumber(row.base_attack_speed) or 1),
         projectile = row.projectile_model,
-        projectile_speed = math.max(1,
-            tonumber(row.projectile_speed) or 1000),
+        projectile_speed = math.max(1, projectile_speed),
         next_attack_at = GameRules:GetGameTime(),
     }
 end

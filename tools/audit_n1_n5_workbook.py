@@ -31,6 +31,36 @@ EXPECTED_SHEETS = (
     "首怪Boss倍率明细",
     "进攻Boss倍率明细",
 )
+MODERN_SHEET_SUFFIXES = (
+    "说明与总览",
+    "{difficulty}波次总表",
+    "小怪属性明细",
+    "进攻Boss波",
+    "出怪期挑战Boss",
+    "每波Boss倍率对比",
+    "四个练功房",
+    "转生Boss",
+    "十戒Boss",
+    "特殊Boss与材料怪",
+    "存档挑战独立表",
+    "属性关联分析",
+    "待确认索引",
+)
+
+
+def valid_sheet_order(actual_names: tuple[str, ...]) -> bool:
+    if actual_names == EXPECTED_SHEETS:
+        return True
+    if len(actual_names) != len(MODERN_SHEET_SUFFIXES):
+        return False
+    match = re.fullmatch(r"(N[1-5])波次总表", actual_names[1])
+    if not match:
+        return False
+    difficulty_id = match.group(1)
+    expected = tuple(
+        name.format(difficulty=difficulty_id) for name in MODERN_SHEET_SUFFIXES
+    )
+    return actual_names == expected
 
 
 @dataclass(frozen=True)
@@ -131,7 +161,7 @@ def audit(path: Path) -> tuple[dict[str, object], list[str]]:
         shared_strings = load_shared_strings(archive)
         definitions = workbook_sheets(archive)
         actual_names = tuple(name for name, _ in definitions)
-        if actual_names != EXPECTED_SHEETS:
+        if not valid_sheet_order(actual_names):
             errors.append("unexpected_sheet_order")
         sheets = []
         for name, target in definitions:

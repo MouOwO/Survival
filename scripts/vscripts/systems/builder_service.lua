@@ -81,13 +81,6 @@ local function create_builder(payload)
     builder.survival_player_id = player_id
     FindClearSpaceForUnit(builder, position, true)
 
-    local blink = builder:AddAbility("ability_survival_builder_blink")
-    if blink then
-        blink:SetLevel(1)
-        blink:SetHidden(false)
-        blink:SetActivated(true)
-        if blink.SetAbilityIndex then blink:SetAbilityIndex(5) end
-    end
     cosmetic_service.apply(builder, "builder_undying")
     builder_by_player[player_id] = builder
     publish_identity(player_id, builder)

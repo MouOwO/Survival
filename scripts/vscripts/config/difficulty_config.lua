@@ -16,19 +16,12 @@ local M = {
             difficulty_id = "N2",
             display_name = "N2 挑战难度",
             subtitle = "30 波",
-            description = "生命、攻击和护甲提升至 1.5 倍；第25至30波进一步强化。",
-            source_difficulty_id = "N1",
+            description = "使用N2独立波次属性、数量与Boss配置。",
+            source_difficulty_id = "N2",
             total_waves = 30,
-            stat_multiplier = 1.5,
+            stat_multiplier = 1.0,
             enabled = true,
-            wave_overrides = {
-                {
-                    target_start = 25,
-                    target_end = 30,
-                    source_start = 20,
-                    stat_multiplier = 2.0,
-                },
-            },
+            wave_overrides = {},
         },
         {
             difficulty_id = "N3",

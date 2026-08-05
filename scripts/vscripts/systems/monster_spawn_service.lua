@@ -8,6 +8,8 @@ local spawn_points = require("config/generated/monster_spawn_points")
 local encounters = require("config/generated/monster_encounters")
 local reward_profiles = require("config/generated/reward_profiles")
 local reward_effects = require("config/generated/reward_effects")
+local combat_profiles = require("config/challenge_combat_profile_config")
+local difficulty_config = require("config/difficulty_config")
 local challenge_sessions = require("systems/challenge_session_service")
 
 local M = {}
@@ -129,6 +131,22 @@ local function rebirth_entry(encounter_id)
     return valid_entity(entry) and entry or nil, entry_name
 end
 
+local function current_difficulty_id()
+    local wave_state, wave_state_error = event_bus.request(
+        events.WAVE_STATE_GET_REQUEST,
+        {}
+    )
+    local difficulty_id = wave_state and wave_state.ok
+        and tostring(wave_state.difficulty_id or "") or ""
+    if difficulty_id == ""
+        and wave_state_error == "no_request_handler:"
+            .. tostring(events.WAVE_STATE_GET_REQUEST) then
+        difficulty_id = difficulty_config.default_id
+    end
+    if difficulty_id == "" then return nil, "monster_difficulty_unavailable" end
+    return difficulty_id, nil
+end
+
 local function start_encounter(payload)
     local encounter_id = tostring(payload.encounter_id or "")
     if challenge_sessions.handles(encounter_id) then
@@ -150,6 +168,13 @@ local function start_encounter(payload)
     if not archetype or archetype.enabled == false then
         return { ok = false, error = "archetype_not_found" }
     end
+    local difficulty_id, difficulty_error = current_difficulty_id()
+    if not difficulty_id then return { ok = false, error = difficulty_error } end
+    local combat_profile, profile_error = combat_profiles.resolve(
+        encounter.encounter_id,
+        difficulty_id
+    )
+    if profile_error then return { ok = false, error = profile_error } end
 
     local marker = find_marker(spawn_point)
     if not marker then
@@ -190,18 +215,22 @@ local function start_encounter(payload)
         unit:SetForwardVector(marker:GetForwardVector())
     end
     FindClearSpaceForUnit(unit, origin, true)
-    local health = tonumber(archetype.health)
+    local profile = combat_profile or archetype
+    local health = tonumber(profile.health or archetype.health)
     if health and health > 0 then
         unit:SetBaseMaxHealth(health)
         unit:SetMaxHealth(health)
         unit:SetHealth(health)
     end
-    local attack = tonumber(archetype.attack)
+    local attack = tonumber(profile.attack or archetype.attack)
     if attack then
         unit:SetBaseDamageMin(attack)
         unit:SetBaseDamageMax(attack)
     end
-    local war3_armor = tonumber(archetype.war3_armor or archetype.armor)
+    local war3_armor = tonumber(
+        profile.war3_armor or profile.armor
+            or archetype.war3_armor or archetype.armor
+    )
     if war3_armor then
         unit:SetPhysicalArmorBaseValue(armor_balance.from_war3(war3_armor))
     end
@@ -240,6 +269,7 @@ local function start_encounter(payload)
         team = tonumber(payload.team) or DOTA_TEAM_GOODGUYS,
         reward_profile_id = encounter.reward_profile_id,
         spawn_point_id = encounter.spawn_point_id,
+        difficulty_id = difficulty_id,
         projection = project_encounter(encounter),
     }
 

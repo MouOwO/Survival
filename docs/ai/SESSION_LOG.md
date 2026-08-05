@@ -1,4 +1,53 @@
--
+# 2026-08-05 - 箭塔建造成本调查检查点
+
+- 用户要求以`全部箭塔成长路线_分路线录像提取V1.0(1)(1).xlsx`为准核对箭塔建造与升级金币/木材成本，并判断问题后修复；用户随后批准实施计划。
+- 使用项目标准库XLSX解析链只读提取工作簿。7条路线各25个成本节点，共175个节点，与`arrow_tower_base.csv`和七份`tower_class_*.csv`逐项比较，`COST_MISMATCH_COUNT=0`。基础箭塔1-1至1-5分别为金/木`0/50`、`0/100`、`0/200`、`0/250`、`0/300`。
+- 已确认事实：升级与转职运行链直接读取塔CSV的`upgrade_gold/upgrade_wood`，没有额外金币叠加；升级数据正确。
+- 根因：`building_levels.csv`没有`building_arrow_tower`一级行，`buildings_config.lua::build_cost("building_arrow_tower", 80, 20)`查询失败后使用手写回退，导致建造实际消耗80木材和20金币。
+- 已排除：不修改七份路线CSV，不向`building_levels.csv`复制一份箭塔成本，不直接手改生成Lua。批准方案是让运行适配层从生成的`arrow_tower_base.lua`首级行读取建造成本，使现有塔CSV继续作为唯一业务源。
+- 实施完成：`buildings_config.lua`读取生成的`arrow_tower_base.lua`，由首级`upgrade_gold/upgrade_wood`投影建造费0金币、50木材；旧80木材+20金币手写回退已移除。服务端`building_system.lua`和UI`ability_runtime_builder.lua`继续共享`definition.build_cost`。
+- 自动验证通过：`ARROW_TOWER_COST_CONTRACT_PASS`、`ARROW_TOWER_COST_LUA51_PASS`、`ARROW_TOWER_WORKBOOK_COST_AUDIT_PASS 175`、`ARROW_TOWER_GENERATED_COMPARE_PASS`、相关Lua 5.1语法、Builder槽位、升级流程、塔融合、射程和塔契约回归、严格UTF-8及限定diff。`test_builder_ownership.lua`仍失败于既有Builder移速600断言，未修改相关生产/测试文件，不计为本任务回归通过。
+- 尚未验证：Workshop Tools冷启动后的按钮费用显示、实际建造只扣50木材且金币不变，以及基础升级费用实机回归。
+
+# 2026-08-05 - 防御塔基础射程1000与弹速翻倍
+
+- 用户要求所有防御塔射程设为1000、弹道速度改为原来的2倍，并明确选择基础射程1000后仍保留现有射程科技加成；基础索敌距离同步为1000。
+- 权威`global_rules.csv`新增弹速倍率2并定向生成。运行时为基础箭塔、七条转职路线140级及终极融合七路代理统一投影；原始弹速与最终弹速分离保存，覆盖创建、升级、转职、科技刷新和热重载恢复，避免重复刷新变成4倍。基础塔KV攻击/索敌首帧回退同步1000。
+- 自动验证通过：专项PowerShell契约、Lua 5.1数学行为、七路线审计、融合数学、猴王塔契约、超级塔科技Lua 5.1行为、树攻击回归、相关Luac 5.1、全局规则定向生成逐字节一致、严格UTF-8和限定diff。既有超级塔契约仍失败于此前科技说明生成文本断言，本轮未修改对应文件；Workshop Tools射程和弹道视觉仍待冷启动实测。
+- 用户随后要求基础箭塔最终弹速固定为10000；检查发现用户已自行把全局倍率从2调整为4。本轮保留该用户修改，在权威CSV增加基础原始弹速2500，因此基础箭塔及无独立弹速路线最终为10000；基础塔KV首帧回退同步10000，显式100000路线当前最终为400000。专项契约、Lua 5.1、生成一致性和语法检查通过。
+- 用户实测10000过快，最终将基础箭塔改为5000，并要求其他转职塔恢复原速度。全局倍率恢复1；基础箭塔原始/最终5000，神秘/机枪/多重/对空转职后显式恢复1250，死亡/冰霜/闪电保持路线CSV 100000；融合塔继续继承来源塔。专项契约、Lua 5.1、融合/猴王塔回归、生成一致性、语法和UTF-8通过。
+
+# 2026-08-05 - N1最新波次总表同步
+
+- 用户提供`N1按最新波次总表同步(1).xlsx`，要求继N2之后同步N1当前已接入游戏的波次、练功房、特殊目标、转生Boss和十戒Boss；存档挑战继续按既定边界忽略。
+- 新版工作簿是13 Sheet结构，扩展审计器兼容N1-N5新版顺序。新增N1专用波次导入器：权威CSV由49条旧行/总209重建为70条直接成员，25波普通202、首怪21、进攻Boss5、总228；保留既有模型，飞行缺口和W15 Boss只用已批准回退。
+- Profile导入器扩展为可按N1或N2替换单一难度。N1四练功房、五个工作簿特殊目标、转生1-10、十戒1-10已更新，未列出的`seven_sins_minion`保持既有值；存档挑战未创建。N1十转为`840400000/37040396/340`，十戒10为`140200000/10000000/1400`。
+- 验证通过：`N1_WAVE_CONTRACT_PASS`、`N1_WAVE_CONFIG_LUA51_PASS`、`N1_REBIRTH_COMBAT_PROFILE_LUA51_PASS`、Profile契约/Lua 5.1、N2/N3/N4/N5波次、波次计时、相关Luac 5.1、严格UTF-8、目标CSV定向生成逐字节一致、限定diff检查。全量生成器仍在已知无关物品CSV错误`invalid number: equipment_iron_armor_01`处中止，未修改物品数据；不能称为全量构建通过。
+- 待Workshop Tools完全冷启动选择N1，逐波及逐目标实机核对。未经用户确认不得记录为实机验收完成。
+
+## 2026-08-05 - Builder与英雄工具技能尾部排序修复
+
+- 用户在Builder Q槽修复后反馈自定义技能图标左上角仍显示W/E，并要求Builder的D Blink放在最后；正式英雄的回城与拾取也放在最后两位。用户确认英雄尾部顺序为回城F2在前、拾取F最后。
+- 根因位于Panorama而非CSV：`hud_takeover.js`虽按名称把工具技能标签覆盖为D/F/F2，但仍让工具技能消耗稠密`displayIndex`，导致后续普通技能标签从W/E开始；`combat_stats.js`的Q/W/E输入枚举也使用同类未过滤列表，因此不能只改显示文字。
+- 实施：两份JS均新增稳定工具技能尾部优先级Blink=10、回城=20、拾取=30。可见Ability先按实体槽位收集，再拆分为普通与工具；普通技能保持原顺序并独占Q/W/E/R/T/Y/U索引，工具技能排序后追加。HUD接管代理、官方技能运行时槽定位和快捷键输入统一消费该顺序。`hero_skill_system.lua`原本已先追加回城再追加拾取，服务端无需修改；Builder阶段CSV与生成Lua也无需修改。
+- 新增独立`test_ability_utility_order_contract.ps1`，避免本次验证被旧Utility综合测试中的无关猴王数据断言截断。验证通过：`ABILITY_UTILITY_ORDER_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS/LUA51_PASS`、`BUILDER_ABILITY_SLOTS_LUA51_PASS`、相关生产Lua的Luac 5.1语法、`BUILDER_STAGE_CSV_GENERATED_PASS rows=7`、严格UTF-8；`hud_takeover.js`与`combat_stats.js`经Resource Compiler强制定向编译，各为`1 compiled, 0 failed, 0 skipped`。
+- 既有`test_builder_utility_contract.ps1`仍在执行本次新增断言前被`MONKEY_CSV_RANGE_1000_MISSING`阻断，与本任务无关，本轮未修改猴王CSV或放宽旧测试。剩余动作是Workshop Tools完全停止并冷启动，验证Builder Q/W/E/R/T后接D，以及正式英雄普通技能后接F2回城、最后F拾取；自动检查不等于实机视觉或用户验收。
+
+## 2026-08-05 - Undying Builder 建造技能Q槽修复获批
+
+- 用户反馈当前Undying Builder的建造功能实际位于W，Q为空，并要求核对过往未验收任务后修复。历史记录确认此前目标即城墙Q→主城Q→最终Q/W/E/R/T+D，但用户只验收了建造主链，没有验收完整槽位。
+- CSV权威`builder_ability_stages.csv`及生成Lua均正确：城墙与主城`slot_order=1`，最终五项为1至5。问题不在基础数据，不修改CSV。
+- 静态根因：`builder_service`先添加Blink，令其自然占据index 0；阶段系统随后添加建造技能，建造自然落到index 1，再依赖`SetAbilityIndex()`换位。现有槽位测试的Mock自行实现了理想换位，因此无法证明Dota对动态`npc_dota_creature` Ability可靠重排；实机Q空/W建造与“Blink移到D后原index 0留下空洞”一致。
+- 用户已批准实施：阶段系统先按CSV添加建造技能，再在其后创建Blink并投影到index 5；补强测试以Ability实际添加顺序为断言，不依赖Mock模拟换位。下一步修改生产代码与专项测试，再执行Lua 5.1、契约、语法、生成一致性、UTF-8和限定diff验证。
+
+### 实施与自动验证完成
+
+- `builder_service.lua`已移除Builder创建阶段的Blink预添加；`builder_progression_system.lua`先添加当前CSV阶段的建造技能，再创建或查找Blink并设为Lv1、可见、可用和index 5。阶段切换时旧建造技能被移除，下一阶段技能可自然填入从index 0开始的空槽。
+- `test_builder_ability_slots.lua`不再模拟已占槽间自动换位，并新增建造城墙必须先于Blink添加的断言；`test_builder_hero_replacement_contract.ps1`新增禁止Builder服务预占Q、Blink由阶段系统创建及语句顺序契约。
+- 自动验证通过：`BUILDER_ABILITY_SLOTS_LUA51_PASS`、`BUILDER_HERO_REPLACEMENT_LUA51_PASS/CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_Q_SLOT_LUAC51_PASS`、`BUILDER_STAGE_CSV_GENERATED_PASS rows=7`、目标文件严格UTF-8和限定diff检查。
+- 无关旧测试边界：未跟踪`test_builder_ownership.lua`要求Builder速度600，而当前CSV为300；`test_builder_utility_contract.ps1`在到达Builder断言前因既有齐天大圣CSV射程模式失败。两项均非本轮槽位修改导致，本轮未修改无关CSV或测试来强行通过。
+- 下一步唯一动作：Workshop Tools完全停止后重新Run，依次确认开局城墙Q/W空、城墙完成后主城Q、主城完成后Q/W/E/R/T以及D Blink和Grid建造。自动验证不能称为引擎实机验收。
+
 ## 2026-08-05 - 初始资源与基础伐木效率修正获批
 
 - 用户要求开局金币0、木材10，并指出农民LV1应每次平A只获得1木材、当前基础伐木效率疑似整体多1。用户已批准按调查方案实施。
@@ -2045,3 +2094,14 @@
 - 新增最多40条`[EQUIPMENT_FLAME_BURST]`诊断以及`test_weapon_legend_abyss_proc.lua`。专项覆盖11阶配置、佩戴/未佩戴、概率9通过与10失败、同次攻击去重、record复用、旧事件和次级攻击隔离、逻辑三维×50、英雄中心500范围、两目标魔法事务、部分事务失败及单次粒子/声音；`.gitignore`显式放行该测试。
 - 验证通过：`WEAPON_LEGEND_ABYSS_PROC_PASS`、全部7个`test_weapon_*.lua`、Lua 5.4语法、严格UTF-8、粒子预缓存及限定`git diff --check`。本机没有Lua 5.1，因此未宣称Lua 5.1验证；永久武器成长和11阶配置未修改。
 - 用户随后确认“没有问题”，本次引擎行为与表现视为实机验收完成，不再作为待验收任务恢复。长期维护规则已写入`PROJECT_CONTEXT.md`、`DECISIONS.md`和`START_HERE.md`。
+
+## 2026-08-05 — N2最新工作簿同步当前已接入怪物内容
+
+- 用户确认N2没有独立波次数据，并指定`N2按最新波次总表同步(1).xlsx`为权威；同步范围为当前游戏已有的30波、四个练功房、六类特殊Boss/材料怪、十个转生Boss和十个十戒Boss。用户明确暂时忽略未接入游戏的“存档挑战独立表”。
+- `wave_definitions.csv`新增89条N2直接成员行：普通怪1270、`wave_leader`27、`assault_boss`6，总计划1303。`difficulty_config.lua`的N2改为完整直接CSV，不再从N1按1.5/2.0倍率派生。
+- `wave_id`审计确认旧N1与N3-N5格式虽不统一，但现有ID全部唯一且运行时不按完整字符串分组。为避免无收益兼容迁移，本次保留旧ID；新增N2沿用角色格式，并新增唯一性及难度/波次/角色后缀契约。
+- `challenge_combat_profiles.csv`从50条扩展为150条。N2练功房与特殊目标数值/证据状态按工作簿复核；转生与十戒各补齐N1-N5矩阵，N2使用工作簿值，其他难度显式沿用当前原型值以保持既有行为。
+- `monster_spawn_service.lua`在独立转生Boss创建前读取`WAVE_STATE_GET_REQUEST`难度并解析Profile；十戒继续走挑战session难度快照。N2十转Boss行为测试确认生命1050500000、攻击40744436、War3护甲680只转换一次；N2十戒10为175250000/11000000/2800。
+- 验证通过：`N2_WAVE_CONTRACT_PASS`、`N2_WAVE_CONFIG_LUA51_PASS`、`CHALLENGE_COMBAT_PROFILES_CONTRACT_PASS`、`CHALLENGE_COMBAT_PROFILES_LUA51_PASS`、`N2_REBIRTH_COMBAT_PROFILE_LUA51_PASS`、N3/N4/N5波次回归、波次计时回归、相关Luac 5.1、目标生成逐字节一致性、严格UTF-8及限定`git diff --check`。
+- 无关回归未通过：未修改的`shop_condition_evaluator.lua`当前没有对`active_rebirth`立即返回“正在进行中”；旧前台Lua测试还缺`min_city_level` Mock字段。本轮未越界修改，不能把N2专项通过描述为挑战前台全回归通过。
+- 尚未完成Workshop Tools实机验证；下一步冷启动核对N2每波实体、模型、领头/Boss/飞行/护甲，以及练功房、特殊目标、转生和十戒的实际属性。

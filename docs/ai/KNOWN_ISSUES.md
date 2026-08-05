@@ -2,6 +2,10 @@
 
 ## 当前已知问题
 
+0. **转生商店前台旧回归当前未通过，且不属于N2数据同步修改。**
+   - 2026-08-05复跑`test_challenge_session_foreground_contract.ps1`发现`shop_condition_evaluator.lua`虽计算`active_rebirth`，但当前只用于绕过购买上限，没有立即返回“该转生挑战正在进行中”；对应生产文件Git无差异，本轮未修改。
+   - 旧Lua行为测试还因测试context缺少`min_city_level`，在`context.city_level < entry.min_city_level`处出现number与nil比较。后续修复该独立任务时，应同时恢复服务端/商店快照双门禁并更新Mock必需字段；不得把本次N2专项通过误述为该回归通过。
+
 0. **全量`tools/build_configs.py`当前被既有`item_definitions.csv`列类型错误阻断。**
    - 2026-08-05生成挑战战斗Profile时，全量构建在物品表读取到`invalid number: equipment_iron_armor_01`后退出；失败发生在新增Profile成功生成之后，但不能描述为全量构建通过。
    - 本任务使用同一个`tools.build_configs.build()`对`challenge_combat_profiles.csv`定向重建，并与仓库生成Lua做SHA-256逐字节比较通过。不得修改无关物品CSV来迎合本任务；后续应单独修复物品表表头/类型/行错位后再恢复全量构建验证。

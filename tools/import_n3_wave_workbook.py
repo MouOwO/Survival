@@ -214,7 +214,9 @@ def build_n3(
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("workbook", type=Path)
-    parser.add_argument("--difficulty", choices=("N3", "N4", "N5"), default="N3")
+    parser.add_argument(
+        "--difficulty", choices=("N2", "N3", "N4", "N5"), default="N3"
+    )
     args = parser.parse_args()
     rows, old_headers = read_csv(CSV_PATH)
     headers = list(old_headers)

@@ -5,6 +5,7 @@ local tower_routes = require("config/tower_route_config")
 local tower_skills = require("systems/tower_skill_runtime")
 local tower_ability_sync = require("systems/tower_ability_sync")
 local global_rules = require("config/global_rules")
+local tower_combat_rules = require("config/tower_combat_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local building_population = require("systems/building_population_service")
 local building_visual = require("systems/building_visual_service")
@@ -44,6 +45,23 @@ local function set_attack_range(unit, attack_range)
     end
 end
 
+local function set_tower_projectile_speed(unit, configured_speed)
+    local base_speed = tonumber(configured_speed)
+    if not base_speed and unit.survival_base_projectile_speed == nil then
+        base_speed = tonumber(global_rules.tower_base_projectile_speed)
+        if not base_speed and unit.GetProjectileSpeed then
+            base_speed = tonumber(unit:GetProjectileSpeed())
+        end
+    end
+    if base_speed then unit.survival_base_projectile_speed = base_speed end
+    base_speed = tonumber(unit.survival_base_projectile_speed)
+    if base_speed and unit.SetProjectileSpeed then
+        local projectile_speed = tower_combat_rules.projectile_speed(base_speed)
+        unit:SetProjectileSpeed(projectile_speed)
+        unit.survival_projectile_speed = projectile_speed
+    end
+end
+
 local function apply_common(unit, data)
     unit:SetBaseMaxHealth(data.health)
     unit:SetMaxHealth(data.health)
@@ -58,6 +76,12 @@ local function arrow_data(level)
         if row.level == level then return row end
     end
     return nil
+end
+
+local function configured_projectile_speed(state, row)
+    if not state.tower_class then return row and row.projectile_speed end
+    return tonumber(row and row.projectile_speed)
+        or global_rules.tower_route_default_projectile_speed
 end
 
 local function apply_research_technology(state)
@@ -78,8 +102,9 @@ local function apply_research_technology(state)
         unit.survival_attack_max = damage
         unit.survival_super_tower_crit_chance =
             tonumber(tower.critical_chance_pct) or 0
-        local attack_range = global_rules.tower_attack_range
-            + (tonumber(tower.attack_range_bonus) or 0)
+        local attack_range = tower_combat_rules.attack_range(
+            tower.attack_range_bonus
+        )
         set_attack_range(unit, attack_range)
     elseif state.building_id == "wall" then
         local data = state.definition.levels[state.level or 1] or {}
@@ -170,10 +195,8 @@ local function apply_tower(unit, data, level)
         unit:SetRangedProjectileName("")
         unit.survival_projectile_model = ""
     end
-    if tonumber(data.projectile_speed) and unit.SetProjectileSpeed then
-        unit:SetProjectileSpeed(tonumber(data.projectile_speed))
-    end
-    set_attack_range(unit, data.attack_range)
+    set_tower_projectile_speed(unit, data.projectile_speed)
+    set_attack_range(unit, global_rules.tower_attack_range)
 end
 
 local function set_class_buttons(unit, active)
@@ -316,6 +339,10 @@ local function recover_state(unit)
         if row then
             unit.survival_route_level = tonumber(row.level) or state.level
             sync_tower_abilities(state, row)
+            set_tower_projectile_speed(
+                unit,
+                configured_projectile_speed(state, row)
+            )
         end
         apply_research_technology(state)
         if not unit:HasModifier("modifier_tower_attack_effects") then
@@ -447,7 +474,8 @@ local function route_unit_data(state, row)
         model_asset_id = row.model_asset_id,
         model_name = row.model_name,
         projectile_model = row.projectile_model,
-        projectile_speed = row.projectile_speed,
+        projectile_speed = tonumber(row.projectile_speed)
+            or global_rules.tower_route_default_projectile_speed,
     }
 end
 
@@ -657,6 +685,7 @@ local function on_created(payload)
             -- upgrade abilities must be active before ability runtime metadata
             -- is published, otherwise Panorama keeps the initial grey state.
             sync_tower_abilities(state, row)
+            set_tower_projectile_speed(state.unit, row.projectile_speed)
         end
     end
     apply_research_technology(state)

@@ -1,5 +1,25 @@
 # Project Context
 
+## 箭塔建造与升级成本权威边界（2026-08-05）
+
+- 箭塔建造、基础升级、转职和七条路线升级的金币/木材权威源是`data/csv/建筑与工人系统/防御塔/`下的`arrow_tower_base.csv`和七份`tower_class_*.csv`。`upgrade_gold/upgrade_wood`表示升到该行等级实际支付的资源；基础箭塔首级行同时表示建造成本，当前为0金币、50木材。
+- `building_levels.csv`不包含箭塔等级，不能用`build_cost("building_arrow_tower", ...)`读取箭塔建造费，也不能保留另一份手写业务回退。`buildings_config.lua`必须从生成的`arrow_tower_base.lua`首级行投影`arrow_tower.build_cost`；`building_system.lua`服务端扣费和`ability_runtime_builder.lua`UI费用都消费该对象。
+- 2026-08-05提供的工作簿7条路线各25个成本节点，共175个节点，已与现有塔CSV逐项核对且完全一致；只有旧建造适配层的80木材+20金币回退错误，升级CSV不应随该修复改动。
+
+## 防御塔基础射程与弹速倍率（2026-08-05）
+
+- 所有防御塔的基础攻击距离、基础索敌距离、基础箭塔原始弹速、无独立字段转职塔默认弹速和全局弹速倍率权威源是`data/csv/公共规则/global_rules.csv`。当前值分别为1000、1000、5000、1250和1；基础箭塔最终弹速为5000。`config/global_rules.lua`只负责投影生成配置，基础箭塔单位KV只保留创建首帧回退。
+- 防御塔射程科技继续在基础1000上加算，实际攻击距离为`1000 + attack_range_bonus`；索敌距离必须至少覆盖实际攻击距离。不得把“基础射程1000”误解为封顶1000。
+- 弹速投影必须保存原始弹速身份并保持幂等：路线显式弹速使用CSV值，缺失时只在首次应用读取引擎基础弹速；最终弹速为原始弹速乘全局倍率。升级、科技刷新和热重载不得读取已经翻倍的运行值再次乘倍率。
+- 基础箭塔与转职塔弹速必须分开解析：基础LV1-LV5使用`tower_base_projectile_speed=5000`；无独立字段的神秘/机枪/多重/对空路线转职后使用`tower_route_default_projectile_speed=1250`；死亡/冰霜/闪电使用路线CSV的100000。终极融合塔七路代理继承来源塔最终弹速，不得在融合边界再次乘倍率；神秘激光路线最终切换近战式结算。
+
+## N1最新工作簿同步规则（2026-08-05）
+
+- N1与N2-N5数量结构不同：N1权威工作簿是25波，普通怪202、首怪Boss21、进攻Boss5，总计划228；不得套用N2-N5的30波/1303模板。
+- N1波次在`wave_definitions.csv`中使用直接难度成员及`normal`、`wave_leader`、`assault_boss`身份。W5起首怪独立于普通怪，W5/10/15/20/25的进攻Boss也独立计数；运行排序保持首怪、普通、进攻Boss。
+- N1工作簿小怪主表是同波三项最低权威值，三项不要求来自同一模型。若明细没有完整的模型与数量映射，不得猜测拆成运行变体；CSV按主表最低值驱动，明细仅作证据。
+- 当前N1 Profile关键值：十转Boss为生命840400000、攻击37040396、War3护甲340；十戒10为生命140200000、攻击10000000、War3护甲1400。工作簿未列`seven_sins_minion`，继续保持此前批准值18209920/1200000/400。
+
 ## 初始资源与资源树伐木收益边界（2026-08-05）
 
 - 队伍开局金币、木材、已用人口和人口上限的权威源是`data/csv/公共规则/global_rules.csv`，由生成的`global_rules.lua`经`config/global_rules.lua`投影到`config/resources_config.lua`。当前值为金币0、木材10、人口0/0；不得恢复为`resources_config.lua`手写业务初值。
@@ -14,9 +34,15 @@
 - 施工时间以`building_construction_rules.csv::build_time`为业务来源。若技能CD用于表现施工期，CD必须绑定“本次施法的具体Ability实例”和该建筑施工事务，失败/取消时恢复，完成时自然结束或校正；不能用Builder全局锁阻止其他建筑，也不能只修改KV固定CD而与CSV施工时间漂移。专项测试至少要覆盖当前技能施工中不可再次使用、其他建造技能仍可使用、失败不残留CD、多个建筑并行施工互不覆盖。
 - 用户对本任务的当前反馈是“基本完成”，不是逐项实机验收声明。当前仓库可确认F归属、旧英雄圆心300拾取、满栏停止及城墙/主城Q槽位；点目标1000/300 AOE和施工期独立CD仍需在继续工作前核对实际运行分支与产物。
 
+## N2工作簿同步边界（2026-08-05）
+
+- `N2按最新波次总表同步(1).xlsx`覆盖波次、练功房、特殊Boss/材料怪、转生Boss、十戒Boss及尚未接入的存档挑战。当前实施只同步游戏已经存在的内容；“存档挑战独立表”在缺少现有遭遇、模型、地点、入口和奖励链时明确忽略，不能据名称自行创建玩法。
+- N2必须使用`wave_definitions.csv`中的完整30波直接数据，不再从N1倍率派生。目标总数与N3-N5一致：普通怪1270、`wave_leader`27、`assault_boss`6、总计划1303。
+- `wave_id`是唯一行身份但不是运行时波次分组或角色判断的业务键。已有N1旧格式与N3-N5角色格式不为可读性批量迁移；新增N2使用现行角色格式，并通过契约保证唯一性及难度、波次、角色一致。
+
 ## 挑战战斗Profile与难度快照（2026-08-05）
 
-- `data/csv/挑战与奖励系统/challenge_combat_profiles.csv`是练功房及特殊目标的难度战斗数值权威源，键为`difficulty_id + member_id`；当前覆盖四个练功房成员和六类特殊目标，共10个成员×N1-N5=50条。模型、移动速度、射程、攻速和奖励仍由现有成员/怪物原型控制，Profile只覆盖生命、攻击和War3护甲。
+- `data/csv/挑战与奖励系统/challenge_combat_profiles.csv`是练功房、特殊目标、转生Boss及十戒Boss的难度战斗数值权威源，键为`difficulty_id + member_id`；当前覆盖30个目标×N1-N5=150条。模型、移动速度、射程、攻速和奖励仍由现有成员/怪物原型控制，Profile只覆盖生命、攻击和War3护甲。
 - 挑战遭遇创建时通过`WAVE_STATE_GET_REQUEST`读取`wave_system`当前`difficulty_id`并写入session；维持数量和死亡刷新都继续调用`spawn_member(session, member)`，因此必须沿用session快照，不能在刷新时重新读取可能变化的全局状态。纯Lua启动阶段尚未注册波次handler时只回退`difficulty_config.default_id`；handler存在但状态异常仍失败关闭。
 - Profile表中不存在的成员继续使用怪物原型战斗值；成员一旦进入Profile表，该难度缺行必须返回`challenge_combat_profile_missing:<member>:<difficulty>`并在session生成任何单位前失败，禁止静默回退N1或生成部分遭遇。
 - CSV存储War3护甲，`challenge_session_service.apply_combat_stats()`仅在单位生成边界调用一次`armor_balance.from_war3()`。不得把Profile生成Lua预先除3，也不得让UI或刷新链重复换算。
@@ -24,9 +50,9 @@
 
 ## N3-N5独立波次导入与难度选择（2026-08-05）
 
-- `data/csv/怪物与波次系统/wave_definitions.csv`是N3-N5波次成员的运行权威源。N3-N5各自拥有30波直接数据，每个难度均为普通怪1270、`wave_leader`27、`assault_boss`6，总计划1303；完整直接CSV存在时`wave_difficulty_builder`不得回退到N1倍率派生。
-- N3-N5使用同一已批准模型规则：1-25波沿用N1同波模型，26-30波依次沿用N1第21-25波模型；同波混合模型按N1来源数量比例使用最大余数法确定性分配。工作簿要求飞行但来源波没有飞行原型时使用`flying_red_gargoyle`；普通飞行怪使用该波普通War3基准护甲3倍，领头怪和进攻Boss使用各自工作簿护甲。
-- `tools/import_n3_wave_workbook.py`保留旧N3默认入口，并通过`--difficulty N3|N4|N5`定向重写单一难度。导入必须从对应`N*波次总表`读取30波，保留属性、飞行和对齐证据到CSV备注，不直接修改生成Lua。
+- `data/csv/怪物与波次系统/wave_definitions.csv`是N2-N5波次成员的运行权威源。N2-N5各自拥有30波直接数据，每个难度均为普通怪1270、`wave_leader`27、`assault_boss`6，总计划1303；完整直接CSV存在时`wave_difficulty_builder`不得回退到N1倍率派生。
+- N2-N5使用同一已批准模型规则：1-25波沿用N1同波模型，26-30波依次沿用N1第21-25波模型；同波混合模型按N1来源数量比例使用最大余数法确定性分配。工作簿要求飞行但来源波没有飞行原型时使用`flying_red_gargoyle`；普通飞行怪使用该波普通War3基准护甲3倍，领头怪和进攻Boss使用各自工作簿护甲。
+- `tools/import_n3_wave_workbook.py`保留旧N3默认入口，并通过`--difficulty N2|N3|N4|N5`定向重写单一难度。导入必须从对应`N*波次总表`读取30波，保留属性、飞行和对齐证据到CSV备注，不直接修改生成Lua。
 - 难度选项由`config/difficulty_config.lua::client_options()`按N1-N5顺序发布。Panorama难度卡只显示`display_name`和`subtitle/total_waves`，不创建描述Label；当前固定为五格横向一排，每格228x72、间距12px、弹窗宽1280px。修改后必须强制定向编译`survival_ui.js`和`survival_hud.css`。
 
 ## 深渊审判主攻击焰爆装备触发（2026-08-05）
@@ -70,6 +96,7 @@
 - 点目标/Grid 会话必须在 Begin 时固定 caster entindex、Ability entindex/name 和 session id；活动期间不得逐帧从 `GetLocalPlayerPortraitUnit()` 重算 Builder。建筑移动 D 的高优先级 handler 只在当前选中建筑可移动或已进入移动状态时消费，否则 D 继续交给 Builder Blink。
 - `npc_survival_builder_proxy` 和项目建筑是普通 creature，`GetPlayerOwnerID()` 不能作为业务 ownership 权威。Builder 必须由 `builder_service` 注册表按玩家和实体双向校验，并把权威 ID 写入 `survival_player_id`；Grid、建造提交和建筑托管 Ability 路由读取该身份。引擎 `SetPlayerID/SetOwner/SetControllableByPlayer` 仍用于控制表现，但不能替代业务注册身份。
 - Builder 建造技能顺序来自 `data/csv/建筑与工人系统/builder_ability_stages.csv::slot_order`，运行时必须显式投影为 Ability index `slot_order - 1`。当前设计为五个建造技能 index `0..4`，项目输入 Q/W/E/R/T；Builder Blink 使用独立 index `5` 并按名称路由 D，不能再依赖 `AddAbility()` 自动排列。
+- Panorama技能栏不得用包含工具技能的稠密可见序号直接分配Q/W/E/R/T/Y/U。应先按实体槽位收集可见Ability，再分为普通技能和按名称路由的工具技能；普通技能保持原顺序并独占普通快捷键索引，工具技能稳定追加到尾部。当前固定尾部优先级为Builder Blink D、正式英雄回城F2、正式英雄拾取F；Builder只拥有Blink，因此D是最后一位，正式英雄最后两位固定为回城F2、拾取F。HUD代理顺序、左上角标签、官方槽运行时定位和键盘输入必须共用该分类规则。
 - `MODIFIER_STATE_UNSELECTABLE`不能保证 Valve 默认“选择主英雄”命令不选中引擎占位英雄。项目的空格输入由`ui_bootstrap.js`唯一输入所有者接管：`Players.GetPlayerHeroEntityIndex()`仍为`npc_dota_hero_undying`时选择`survival_builder_identity`发布的CSV Builder；正式替换后选择实际英雄。Builder身份尚未发布时也必须消费空格，不能让默认命令穿透到占位锚点；禁止用永久`SetOverrideSelectionEntity`或轮询纠正选择。
 - 自定义`SPACE`覆盖Valve默认主英雄命令时，`GameUI.SelectUnit()`只复刻选择，不会自动定位镜头。空格定位优先使用Dota Panorama的`MoveCameraToEntity(target)`，该API按声明移动到实体但不锁定；API缺失或异常时才用`Entities.GetAbsOrigin(target)`和`SetCameraTargetPosition(position, 0.0)`兼容回退。当前客户端实机证明后者即使`flLerp=0.0`仍会慢速插值，不能再描述为瞬移。`SetCameraLookAtPosition`也已被实机否定，禁止恢复。
 - 挑战传送禁止使用`SetCameraTarget(hero)`再`SetCameraTarget(-1)`的临时锁定链；当前客户端实机证明解除目标会恢复锁定前自由镜头锚点，即英雄传送前消失位置。挑战购买成功后应一次性调用`MoveCameraToEntity(hero)`非锁定聚焦，API缺失或异常时才使用服务端从`challenge_locations.csv`入口投影的坐标调用`SetCameraTargetPosition(position, 0.0)`。共享控制器缺失的`shop_ui.js` fallback必须保持相同非锁定语义。
