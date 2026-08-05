@@ -11,6 +11,7 @@ local M = {}
 local state_by_unit = {}
 local ability_keys_by_unit = {}
 local tower_trace_by_ability = {}
+local hero_runtime_trace_by_unit = {}
 local hero_skill_by_ability = {}
 
 for _, definition in ipairs(hero_skill_definitions.rows or {}) do
@@ -172,6 +173,63 @@ local function reconcile_authoritative_unit_state(state)
     end
 end
 
+local function bool_flag(value)
+    return value and 1 or 0
+end
+
+local function ability_behavior(ability)
+    local ok, behavior = pcall(function()
+        return ability:GetBehaviorInt()
+    end)
+    return ok and behavior or "unavailable"
+end
+
+local function trace_combat_hero_runtime(state)
+    if state.building_id ~= "combat_hero" then return end
+    local unit = state.unit
+    if not valid_entity(unit) then return end
+
+    local unit_key = unit:entindex()
+    local rows = {}
+    local count = math.max(0, tonumber(unit:GetAbilityCount()) or 0)
+    for slot = 0, count - 1 do
+        local ability = unit:GetAbilityByIndex(slot)
+        if ability and not ability:IsNull() then
+            local ability_name = ability:GetAbilityName()
+            local project_visible = not ability:IsHidden() and (
+                hero_skill_by_ability[ability_name] ~= nil
+                    or ability_name == "ability_survival_return_home"
+                    or ability_name == "ability_survival_pickup_materials"
+            )
+            if project_visible then
+                rows[#rows + 1] = table.concat({
+                    "engine_slot=" .. tostring(slot),
+                    "name=" .. tostring(ability_name),
+                    "entindex=" .. tostring(ability:entindex()),
+                    "level=" .. tostring(ability:GetLevel()),
+                    "hidden=" .. tostring(bool_flag(ability:IsHidden())),
+                    "activated=" .. tostring(bool_flag(ability:IsActivated())),
+                    "behavior=" .. tostring(ability_behavior(ability)),
+                    "definition=" .. tostring(bool_flag(
+                        hero_skill_by_ability[ability_name] ~= nil
+                    )),
+                }, ",")
+            end
+        end
+    end
+    local signature = table.concat(rows, "|")
+    if hero_runtime_trace_by_unit[unit_key] == signature then return end
+    hero_runtime_trace_by_unit[unit_key] = signature
+    print(string.format(
+        "[SURVIVAL_TOOLTIP_RUNTIME] unit=%s player=%s hero=%s engine_count=%s abilities=%s",
+        tostring(unit_key),
+        tostring(state.player_id),
+        tostring(unit:GetUnitName()),
+        tostring(count),
+        signature
+    ))
+end
+
 local function publish(state)
     local unit = state.unit
     if not valid_entity(unit) then
@@ -272,6 +330,7 @@ local function publish(state)
 
     clear_removed(unit_key, current)
     ability_keys_by_unit[unit_key] = current
+    trace_combat_hero_runtime(state)
     return tower_transitions
 end
 
@@ -295,6 +354,7 @@ local function clear_unit(payload)
     end
     ability_keys_by_unit[entindex] = nil
     state_by_unit[entindex] = nil
+    hero_runtime_trace_by_unit[entindex] = nil
     for ability_entindex, _ in pairs(keys or {}) do
         tower_trace_by_ability[ability_entindex] = nil
     end
@@ -380,6 +440,7 @@ function M.init()
     state_by_unit = {}
     ability_keys_by_unit = {}
     tower_trace_by_ability = {}
+    hero_runtime_trace_by_unit = {}
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)

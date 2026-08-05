@@ -21,7 +21,7 @@ skill_drow_companion,ability_survival_drow_companion,黑暗游侠专属：小游
 skill_monkey_king_exclusive,ability_survival_monkey_king_exclusive,齐天大圣专属：棍式,一转激活。主攻击命中时有10%概率朝目标方向挥出1200×200棍击，对范围敌人造成全属性×30与最大生命10%的纯粹伤害；生命伤害每个敌人最多3次。,passive,1,0,0,hero_monkey_king,1,monkey_king_q,0,monkey_king_boundless_strike,1,固定Q槽；分身共享每敌人生命伤害次数。
 skill_monkey_king_fury,ability_survival_monkey_king_fury,齐天大圣专属：混沌神猿,三转激活。暴击伤害提高至2200%，攻击间隔减少0.1秒；每60秒永久复利增加2%全属性，并召唤唯一永久分身。,passive,1,0,0,hero_monkey_king,1,monkey_king_w,0,monkey_king_jingu_mastery,1,固定W槽；专属技能不能使用转生技能点升级。
 skill_monkey_king_swiftness,ability_survival_monkey_king_swiftness,齐天大圣专属：齐天,六转激活。最终攻击力使用独立三倍乘区；仅本体主普通攻击实际暴击时对主目标追加全属性×5纯粹伤害。,passive,1,0,0,hero_monkey_king,1,monkey_king_e,0,monkey_king_tree_dance,1,固定E槽；次级攻击、分身、技能和塔不触发。
-skill_monkey_king_agility,ability_survival_monkey_king_agility,齐天大圣专属：身外化身,十转激活。终极塔继承英雄暴击与最终攻击，并可在英雄当前位置和城墙之间无冷却切换。,passive,1,0,0,hero_monkey_king,1,monkey_king_r,0,monkey_king_mischief,1,固定R槽；终极塔系统接管主动效果。
+skill_monkey_king_agility,ability_survival_monkey_king_agility,齐天大圣专属：身外化身,十转激活。终极塔继承英雄暴击与最终攻击，并可在英雄当前位置和城墙之间无冷却切换。,active,1,0,0,hero_monkey_king,1,monkey_king_r,0,monkey_king_mischief,1,固定R槽；终极塔系统接管主动效果。
 skill_blademaster_exclusive,ability_survival_blademaster_exclusive,剑圣专属：无双剑意,每级增加攻击伤害。,passive,3,0,0,hero_blademaster,1,pre_attack_damage,28,sven_gods_strength,1,VIP英雄初始专属技能；统一最高3级。
 skill_blademaster_agility,ability_survival_blademaster_agility,剑圣专属：疾风剑意,增加敏捷。,passive,3,0,0,hero_blademaster,1,agility_bonus,20,juggernaut_blade_dance,1,VIP英雄一转解锁；专属技能不能使用转生技能点升级。
 skill_blademaster_swiftness,ability_survival_blademaster_swiftness,剑圣专属：迅影,增加攻击速度。,passive,3,0,0,hero_blademaster,1,attack_speed_bonus,40,juggernaut_omni_slash,1,VIP英雄一转解锁；专属技能不能使用转生技能点升级。
