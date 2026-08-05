@@ -1,0 +1,28 @@
+cue_id,skill_id,phase,sound_event,sound_resource,playback_mode,attach_scope,cooldown_group,cooldown_seconds,max_plays_per_window,window_seconds,enabled,notes,max_concurrent,concurrency_seconds
+#中文名:音效Cue ID,技能ID,阶段,原生音效事件,音效资源文件,播放模式,挂载范围,冷却组,冷却秒数,窗口最大播放次数,窗口秒数,是否启用,备注,最大并发数,并发占位秒数
+#types:string,string,enum,string,string,enum,enum,string,number,number,number,boolean,string,number,number
+hero_flame_main_impact,proto_flame_burst,impact,Ability.LightStrikeArray,soundevents/game_sounds_heroes/game_sounds_lina.vsndevts,oneshot,position,hero_flame_main,0.1,1,0.2,1,爆炎弹主爆炸；事件已从本机Lina原生Sound Event核实。
+hero_flame_fireball_launch,proto_flame_burst,launch,Hero_Snapfire.MortimerBlob.Launch,soundevents/game_sounds_heroes/game_sounds_snapfire.vsndevts,oneshot,position,hero_flame_fireball_launch,0.2,1,0.5,1,三级小火球整批共享一次发射声。
+hero_flame_fireball_impact,proto_flame_burst,impact,Hero_Snapfire.MortimerBlob.Impact,soundevents/game_sounds_heroes/game_sounds_snapfire.vsndevts,oneshot,position,hero_flame_fireball_impact,0.08,3,0.6,1,小火球落地声；三颗落地受窗口限流。,2,0.35
+hero_frost_launch,proto_frost_nova,launch,hero_Crystal.CrystalNovaCast,soundevents/game_sounds_heroes/game_sounds_crystalmaiden.vsndevts,oneshot,position,hero_frost_launch,0.2,1,0.5,1,移动冰球生成。
+hero_frost_explode,proto_frost_nova,impact,Hero_Crystal.CrystalNova,soundevents/game_sounds_heroes/game_sounds_crystalmaiden.vsndevts,oneshot,position,hero_frost_explode,0.15,1,0.5,1,移动冰球结束爆炸。
+hero_fury_thunder_strike,proto_chain_lightning,impact,Hero_Zuus.LightningBolt,soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts,oneshot,position,hero_fury_thunder,0.08,3,0.5,1,怒雷每次实际雷击；三级连续雷击受窗口限流。,2,0.3
+hero_poison_cloud_cast,proto_poison_cloud,cast,Hero_Viper.Nethertoxin.Cast,soundevents/game_sounds_heroes/game_sounds_viper.vsndevts,oneshot,position,hero_poison_cloud,0.25,1,0.5,1,毒云建立；不在每个伤害Tick重复播放。
+hero_blade_launch,proto_blade_nova,launch,Hero_Magnataur.ShockWave.Cast,soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts,oneshot,unit,hero_blade_launch,0.15,1,0.4,1,剑刃震荡整批脉冲共享起手声。
+hero_blade_hit,proto_blade_nova,hit,Hero_Magnataur.ShockWave.Target,soundevents/game_sounds_heroes/game_sounds_magnataur.vsndevts,oneshot,unit,hero_blade_hit,0.08,4,0.5,1,震荡波首次命中各目标；受窗口限流。,2,0.25
+hero_echo_slash_launch,proto_echo_slash,launch,Hero_Kez.EchoSlash.Katana.Start,soundevents/game_sounds_heroes/game_sounds_kez.vsndevts,oneshot,position,hero_echo_slash,0.08,4,0.6,1,每波纯刀光使用Kez原生回音斩起手声，不添加回音复击。
+hero_earth_launch,proto_earth_line,launch,Hero_EarthShaker.Fissure.Cast,soundevents/game_sounds_heroes/game_sounds_earthshaker.vsndevts,oneshot,unit,hero_earth_launch,0.2,1,0.5,1,地裂冲击发射。
+hero_earth_impact,proto_earth_line,impact,Hero_EarthShaker.FissureDestroy,soundevents/game_sounds_heroes/game_sounds_earthshaker.vsndevts,oneshot,position,hero_earth_impact,0.1,2,0.5,1,地裂首击爆炸或路径终点反馈。
+hero_spirit_bomb_launch,proto_holy_pulse,launch,Hero_Sven.StormBolt,soundevents/game_sounds_heroes/game_sounds_sven.vsndevts,oneshot,unit,hero_spirit_bomb_launch,0.2,1,0.5,1,元气弹多目标整批共享一次发射声。
+hero_spirit_bomb_impact,proto_holy_pulse,impact,Hero_Sven.StormBoltImpact,soundevents/game_sounds_heroes/game_sounds_sven.vsndevts,oneshot,unit,hero_spirit_bomb_impact,0.07,5,0.6,1,元气弹命中及额外爆炸共用原生雷锤命中声并限流。,3,0.3
+hero_meteor_cast,proto_meteor,cast,Hero_Invoker.ChaosMeteor.Cast,soundevents/game_sounds_heroes/game_sounds_invoker.vsndevts,oneshot,position,hero_meteor_cast,0.2,2,0.8,1,每颗陨石开始下落。
+hero_meteor_impact,proto_meteor,impact,Hero_Invoker.ChaosMeteor.Impact,soundevents/game_sounds_heroes/game_sounds_invoker.vsndevts,oneshot,position,hero_meteor_impact,0.15,2,1,1,每颗陨石实际落地。
+hero_arcane_cast,proto_arcane_barrage,cast,Hero_SkywrathMage.MysticFlare.Cast,soundevents/game_sounds_heroes/game_sounds_skywrath_mage.vsndevts,oneshot,position,hero_arcane_cast,0.3,1,0.8,1,奥术弹幕整次启动。
+hero_arcane_impact,proto_arcane_barrage,impact,Hero_SkywrathMage.MysticFlare.Target,soundevents/game_sounds_heroes/game_sounds_skywrath_mage.vsndevts,oneshot,position,hero_arcane_impact,0.12,4,1,1,最高21颗落弹使用冷却、窗口与并发限流保留节奏。,2,0.3
+hero_slingshot_launch,proto_magic_slingshot,launch,Ability.TossThrow,soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts,oneshot,unit,hero_slingshot_launch,0.2,1,0.5,1,魔法弹弓多目标整批共享发射声。
+hero_slingshot_impact,proto_magic_slingshot,impact,Ability.TossImpact,soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts,oneshot,unit,hero_slingshot_impact,0.07,5,0.6,1,石弹实际命中并限流。,3,0.3
+hero_slingshot_rubble,proto_magic_slingshot,persistent_start,Ability.Avalanche,soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts,oneshot,position,hero_slingshot_rubble,0.15,3,0.8,1,最高级碎石区建立；不在伤害Tick重复播放。
+hero_ice_cone_cast,proto_ice_cone,cast,hero_Crystal.CrystalNovaCast,soundevents/game_sounds_heroes/game_sounds_crystalmaiden.vsndevts,oneshot,position,hero_ice_cone_cast,0.3,1,0.8,1,寒冰锥暴风雪区域启动。
+hero_ice_cone_impact,proto_ice_cone,impact,hero_Crystal.freezingField.explosion,soundevents/game_sounds_heroes/game_sounds_crystalmaiden.vsndevts,oneshot,position,hero_ice_cone_impact,0.14,4,1,1,多次落冰爆炸受限流；不再对每个受影响单位启动风声。,2,0.35
+hero_tornado_cast,proto_void_pulse,cast,Hero_Invoker.Tornado.Cast,soundevents/game_sounds_heroes/game_sounds_invoker.vsndevts,oneshot,position,hero_tornado_cast,0.2,1,0.5,1,主龙卷生成。
+hero_tornado_small,proto_void_pulse,spawn_secondary,Hero_Invoker.Tornado.Target,soundevents/game_sounds_heroes/game_sounds_invoker.vsndevts,oneshot,position,hero_tornado_small,0.1,4,0.8,1,最高级小龙卷生成并限制同屏堆叠。,2,0.4

@@ -66,6 +66,72 @@ def value(raw: str, kind: str) -> str:
     return f'"{lua_escape(raw)}"'
 
 
+def validate_hero_skill_sounds(
+    source: Path, headers: list[str], data_rows: list[tuple[int, list[str]]]
+) -> None:
+    """Validate lifecycle and limiter fields that generic CSV types cannot."""
+    if source.name != "hero_skill_sound_definitions.csv":
+        return
+    required = {
+        "cue_id", "skill_id", "phase", "sound_event", "sound_resource",
+        "playback_mode", "attach_scope", "cooldown_seconds",
+        "max_plays_per_window", "window_seconds", "max_concurrent",
+        "concurrency_seconds",
+    }
+    missing = sorted(required.difference(headers))
+    if missing:
+        raise ValueError(f"sound config missing columns {missing}: {source}")
+    phases = {
+        "cast", "launch", "hit", "impact", "persistent_start",
+        "persistent_end", "spawn_secondary",
+    }
+    playback_modes = {"oneshot", "loop"}
+    attach_scopes = {"unit", "position"}
+    seen: set[str] = set()
+    for row_number, fields in data_rows:
+        row = dict(zip(headers, fields))
+        cue_id = row["cue_id"].strip()
+        if not cue_id or cue_id in seen:
+            raise ValueError(
+                f"missing or duplicate sound cue_id {cue_id!r}:"
+                f" {source} line {row_number}"
+            )
+        seen.add(cue_id)
+        for key in ("skill_id", "sound_event", "sound_resource"):
+            if not row[key].strip():
+                raise ValueError(
+                    f"sound cue {cue_id} requires {key}:"
+                    f" {source} line {row_number}"
+                )
+        for key, allowed in (
+            ("phase", phases),
+            ("playback_mode", playback_modes),
+            ("attach_scope", attach_scopes),
+        ):
+            if row[key].strip() not in allowed:
+                raise ValueError(
+                    f"invalid {key} for sound cue {cue_id}: {row[key]!r}"
+                )
+        if row["playback_mode"].strip() == "loop" \
+                and row["attach_scope"].strip() != "unit":
+            raise ValueError(
+                f"loop sound cue {cue_id} must attach to a unit lifecycle"
+            )
+        for key in (
+            "cooldown_seconds", "max_plays_per_window", "window_seconds",
+            "max_concurrent", "concurrency_seconds",
+        ):
+            raw = row[key].strip()
+            if raw and float(raw) < 0:
+                raise ValueError(f"sound cue {cue_id} has negative {key}")
+        maximum = float(row["max_concurrent"].strip() or 0)
+        lifetime = float(row["concurrency_seconds"].strip() or 0)
+        if (maximum > 0) != (lifetime > 0):
+            raise ValueError(
+                f"sound cue {cue_id} concurrency fields must both be positive"
+            )
+
+
 def build(source: Path, output: Path) -> None:
     raw = source.read_bytes()
     for encoding in ("utf-8-sig", "utf-8", "gb18030", "gbk"):
@@ -104,6 +170,7 @@ def build(source: Path, output: Path) -> None:
             f"header: {headers}\n"
             f"types: {types}"
         )
+    data_rows = []
     for row_number, fields in enumerate(rows[type_index + 1:], type_index + 2):
         if not fields or (len(fields) == 1 and not fields[0].strip()):
             continue
@@ -121,6 +188,8 @@ def build(source: Path, output: Path) -> None:
                 f" expected {len(headers)})\n"
                 f"row: {fields}"
             )
+        data_rows.append((row_number, fields))
+    validate_hero_skill_sounds(source, headers, data_rows)
     lines = [
         "-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.",
         f"-- Source: {source.name}",

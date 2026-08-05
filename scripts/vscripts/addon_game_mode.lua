@@ -54,6 +54,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
+local sound_service = require("core/sound_service")
 local combat_bootstrap = require("bootstrap/combat_bootstrap")
 print("[SURVIVAL_FINGERPRINT] addon_game_mode=20260730_skill_grant_transaction")
 local unit_display_names = require("config/generated/unit_display_names")
@@ -461,6 +462,7 @@ end
 function M.precache(context)
     -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
     tower_magic_supreme_system.precache(context)
+    sound_service.precache(context)
     PrecacheResource(
         "particle",
         "particles/items_fx/blink_dagger_start.vpcf",
@@ -755,6 +757,7 @@ function M.activate()
     event_bus.reset()
     configure_game_rules()
     scheduler.init()
+    sound_service.init()
     initialize_services()
 
     ListenToGameEvent(

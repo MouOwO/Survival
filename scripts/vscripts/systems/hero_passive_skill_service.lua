@@ -9,6 +9,7 @@ local buff_manager = require("systems/buff_manager")
 local exclusive_passives = require("systems/hero_exclusive_passive_service")
 
 local M = {}
+M.sound_service = require("core/sound_service")
 local processed_attacks = {}
 local effect_sequence = 0
 local refresh_tokens = {}
@@ -81,7 +82,6 @@ local METEOR_LAVA_SLOW_BUFF = "debuff_hero_meteor_lava_move_slow"
 local METEOR_THINK_INTERVAL = 0.05
 local METEOR_FALL_HEIGHT = 1200
 local METEOR_FLY_PARTICLE_TRAVEL_TIME = 1.3
-local MOVING_ICE_BALL_PARTICLE = "particles/basic_projectile/basic_projectile.vpcf"
 local MOVING_ICE_BALL_EXPLOSION_PARTICLE = "particles/basic_projectile/basic_projectile_explosion.vpcf"
 local MOVING_ICE_BALL_THINK_INTERVAL = 0.05
 local MOVING_ICE_BALL_VISUAL_HEIGHT = 120
@@ -808,6 +808,9 @@ local function create_poison_cloud(context, position, definition)
         members = {},
         particle = particle,
     }
+    M.sound_service.play("hero_poison_cloud_cast", {
+        source = context.attacker, position = position,
+    })
     ensure_poison_cloud_task()
     return true
 end
@@ -1143,6 +1146,9 @@ local function run_flame(context, definition)
     end
 
     flame_explosion_visual(context, center)
+    M.sound_service.play("hero_flame_main_impact", {
+        source = context.attacker, position = center,
+    })
     local main_targets = enemies_touching_radius(
         context.attacker, center, radius
     )
@@ -1157,6 +1163,9 @@ local function run_flame(context, definition)
         definition, "small_fireball_count", context.level
     ) + 0.001)
     if fireball_count <= 0 then return true end
+    M.sound_service.play("hero_flame_fireball_launch", {
+        source = context.attacker, position = center,
+    })
     local landing_radius = level_value(
         definition, "small_fireball_landing_radius", context.level
     )
@@ -1185,6 +1194,9 @@ local function run_flame(context, definition)
         for _, fireball in ipairs(fireballs) do
             release_flame_small_fireball_particle(fireball.particle, false)
             flame_small_fireball_impact_visual(context, fireball.position)
+            M.sound_service.play("hero_flame_fireball_impact", {
+                source = context.attacker, position = fireball.position,
+            })
             if valid(context.attacker) then
                 local targets = enemies_touching_radius(
                     context.attacker, fireball.position, explosion_radius
@@ -1257,6 +1269,9 @@ local function release_moving_ice_ball(ball_id, explode)
         ParticleManager:ReleaseParticleIndex(state.particle)
     end
     if explode and valid(state.context.attacker) then
+        M.sound_service.play("hero_frost_explode", {
+            source = state.context.attacker, position = state.position,
+        })
         local visual_ok, visual_error = pcall(function()
             local particle = ParticleManager:CreateParticle(
                 MOVING_ICE_BALL_EXPLOSION_PARTICLE,
@@ -1500,11 +1515,17 @@ local function run_frost(context, definition)
         print("[HeroPassiveSkill] moving ice ball failed: " .. tostring(visual_error))
     end
     active_moving_ice_balls[ball_id] = state
+    M.sound_service.play("hero_frost_launch", {
+        source = context.attacker, position = origin,
+    })
     ensure_moving_ice_ball_task()
     return true
 end
 
 local function fury_thunder_visual(context, position)
+    M.sound_service.play("hero_fury_thunder_strike", {
+        source = context.attacker, position = position,
+    })
     local particle = nil
     local visual_ok, visual_error = pcall(function()
         particle = ParticleManager:CreateParticle(
@@ -1644,6 +1665,9 @@ local function blade_pulse_projectile_hit(ability, target, projectile_id)
     local target_key = unit_key(target)
     if target_key and not state.hit[target_key] then
         state.hit[target_key] = true
+        M.sound_service.play("hero_blade_hit", {
+            source = state.context.attacker, unit = target,
+        })
         local multiplier = blade_pulse_damage_multiplier(state, target)
         deal(state.context, target, multiplier, false)
         state.first_target_hit = true
@@ -1671,6 +1695,9 @@ local function run_blade(context, definition)
     local half_width = level_value(definition, "pulse_width", context.level) * 0.5
     if distance <= 0 or duration <= 0 or half_width <= 0 then return false end
     local speed = distance / duration
+    M.sound_service.play("hero_blade_launch", {
+        source = context.attacker, unit = context.attacker,
+    })
 
     local pulse_count = 1
     local triple_chance = level_value(
@@ -1895,6 +1922,9 @@ function echo_slash.run(context, definition)
 
     local function launch_next_slash()
         if not valid(context.attacker) or not valid(ability) then return end
+        M.sound_service.play("hero_echo_slash_launch", {
+            source = context.attacker, position = origin,
+        })
         local damage_multiplier = level_value(
             definition, "damage_multiplier", context.level
         )
@@ -2052,6 +2082,10 @@ function earth_rock.projectile_hit(ability, target, location, projectile_id)
     local state = projectile_id and earth_rock.projectiles[projectile_id] or nil
     if not state then return false end
     if not target then
+        M.sound_service.play("hero_earth_impact", {
+            source = state.context.attacker,
+            position = location or state.destination,
+        })
         earth_rock.release(projectile_id, true)
         return false
     end
@@ -2131,6 +2165,9 @@ local function run_earth(context, definition)
         bDeleteOnHit = false,
         bProvidesVision = false,
         ExtraData = { earth_rock_projectile_id = projectile_id },
+    })
+    M.sound_service.play("hero_earth_launch", {
+        source = context.attacker, unit = context.attacker,
     })
     earth_rock.create_visual(earth_rock.projectiles[projectile_id])
     scheduler.after(distance / speed + earth_rock.cleanup_grace, function()
@@ -2278,6 +2315,9 @@ local function meteor_start_fall(cast, meteor)
     if meteor.fall_started then return end
     meteor.fall_started = true
     meteor.fall_particle = meteor_create_fall_particle(cast)
+    M.sound_service.play("hero_meteor_cast", {
+        source = cast.context.attacker, position = cast.position,
+    })
 end
 
 local function meteor_impact(cast, meteor)
@@ -2287,6 +2327,9 @@ local function meteor_impact(cast, meteor)
     meteor.fall_particle = nil
 
     meteor_explosion_visual(cast)
+    M.sound_service.play("hero_meteor_impact", {
+        source = cast.context.attacker, position = cast.position,
+    })
     if valid(cast.context.attacker) then
         deal_group(
             cast.context,
@@ -2503,6 +2546,9 @@ local function run_arcane(context, definition)
         remaining_missiles = total_missiles,
         unlock_at = current_time + cast_duration + 0.25,
     }
+    M.sound_service.play("hero_arcane_cast", {
+        source = context.attacker, position = position,
+    })
 
     local function random_landing_position()
         local angle = RandomFloat(0, math.pi * 2)
@@ -2529,6 +2575,9 @@ local function run_arcane(context, definition)
 
     local function impact(landing_position)
         if valid(context.attacker) then
+            M.sound_service.play("hero_arcane_impact", {
+                source = context.attacker, position = landing_position,
+            })
             local visual_ok, visual_error = pcall(function()
                 local flare = ParticleManager:CreateParticle(
                     ARCANE_MYSTIC_FLARE_PARTICLE,
@@ -2633,6 +2682,9 @@ local function create_magic_slingshot_rubble(context, position, definition)
         expires_at = game_time() + duration + 0.05,
         particle = particle,
     }
+    M.sound_service.play("hero_slingshot_rubble", {
+        source = context.attacker, position = position,
+    })
     ensure_magic_slingshot_rubble_task()
 
     local tick_count = math.max(1, math.floor(duration / interval + 0.001))
@@ -2669,6 +2721,9 @@ local function magic_slingshot_projectile_hit(ability, target, location, project
         tostring(target:entindex())
     ))
     local was_stunned = is_stunned(target)
+    M.sound_service.play("hero_slingshot_impact", {
+        source = state.context.attacker, unit = target,
+    })
     local multiplier = was_stunned
         and level_value(definition, "stunned_damage_multiplier", state.context.level)
         or level_value(definition, "damage_multiplier", state.context.level)
@@ -2755,6 +2810,11 @@ local function run_magic_slingshot(context, definition)
         tostring(context.attack_id),
         tostring(current_attack_range(context.attacker)), #targets, launched
     ))
+    if launched > 0 then
+        M.sound_service.play("hero_slingshot_launch", {
+            source = context.attacker, unit = context.attacker,
+        })
+    end
     return launched > 0
 end
 
@@ -2818,6 +2878,9 @@ local function spirit_bomb_projectile_hit(ability, target, projectile_id)
     if not target or ability ~= state.ability
         or not valid(state.context.attacker)
         or not is_enemy(state.context.attacker, target) then return true end
+    M.sound_service.play("hero_spirit_bomb_impact", {
+        source = state.context.attacker, unit = target,
+    })
     deal(state.context, target, state.damage_multiplier, false)
     spirit_bomb_heal(state)
     if state.explosion_chance > 0
@@ -2900,6 +2963,11 @@ local function run_holy(context, definition)
             end
         end
     end
+    if launched > 0 then
+        M.sound_service.play("hero_spirit_bomb_launch", {
+            source = context.attacker, unit = context.attacker,
+        })
+    end
     return launched > 0
 end
 
@@ -2948,6 +3016,9 @@ local function run_ice_cone(context, definition)
         unlock_at = current_time + cast_duration,
         snow_particle = snow_particle,
     }
+    M.sound_service.play("hero_ice_cone_cast", {
+        source = context.attacker, position = position,
+    })
 
     local function release_active()
         local active = active_ice_cones[attacker_key]
@@ -2961,6 +3032,9 @@ local function run_ice_cone(context, definition)
 
     local function impact()
         if not valid(context.attacker) then return end
+        M.sound_service.play("hero_ice_cone_impact", {
+            source = context.attacker, position = position,
+        })
         local impact_visual_ok, impact_visual_error = pcall(function()
             local particle = ParticleManager:CreateParticle(
                 ICE_CONE_IMPACT_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
@@ -3143,6 +3217,9 @@ local function tornado_spawn_small(parent, target)
         particle = nil,
     }
     active_tornadoes[state.id] = state
+    M.sound_service.play("hero_tornado_small", {
+        source = state.context.attacker, position = state.position,
+    })
     local visual_ok, visual_error = pcall(function()
         state.particle = ParticleManager:CreateParticle(
             TORNADO_PARTICLE, PATTACH_WORLDORIGIN, state.context.attacker
@@ -3343,6 +3420,9 @@ local function run_void(context, definition)
         particle = nil,
     }
     active_tornadoes[id] = state
+    M.sound_service.play("hero_tornado_cast", {
+        source = context.attacker, position = state.position,
+    })
     tornado_damage(state)
     local visual_ok, visual_error = pcall(function()
         state.particle = ParticleManager:CreateParticle(
@@ -3523,6 +3603,7 @@ end
 
 function M.init()
     definitions.validate()
+    M.sound_service.reset()
     echo_slash.clear()
     earth_rock.clear()
     clear_flame_burns()
