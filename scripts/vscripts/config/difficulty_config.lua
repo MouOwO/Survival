@@ -30,8 +30,6 @@ local M = {
                 },
             },
         },
-        -- Reserved definitions stay disabled until their balance rules are
-        -- finalized. Enabling them requires no wave-system or Panorama change.
         {
             difficulty_id = "N3",
             display_name = "N3 高难度",
@@ -46,12 +44,23 @@ local M = {
         {
             difficulty_id = "N4",
             display_name = "N4",
-            subtitle = "开发中",
-            description = "预留难度。",
-            source_difficulty_id = "N1",
+            subtitle = "30 波",
+            description = "使用N4独立波次属性、数量与Boss配置。",
+            source_difficulty_id = "N4",
             total_waves = 30,
             stat_multiplier = 1.0,
-            enabled = false,
+            enabled = true,
+            wave_overrides = {},
+        },
+        {
+            difficulty_id = "N5",
+            display_name = "N5",
+            subtitle = "30 波",
+            description = "使用N5独立波次属性、数量与Boss配置。",
+            source_difficulty_id = "N5",
+            total_waves = 30,
+            stat_multiplier = 1.0,
+            enabled = true,
             wave_overrides = {},
         },
     },

@@ -1,5 +1,12 @@
 # Project Context
 
+## N3-N5独立波次导入与难度选择（2026-08-05）
+
+- `data/csv/怪物与波次系统/wave_definitions.csv`是N3-N5波次成员的运行权威源。N3-N5各自拥有30波直接数据，每个难度均为普通怪1270、`wave_leader`27、`assault_boss`6，总计划1303；完整直接CSV存在时`wave_difficulty_builder`不得回退到N1倍率派生。
+- N3-N5使用同一已批准模型规则：1-25波沿用N1同波模型，26-30波依次沿用N1第21-25波模型；同波混合模型按N1来源数量比例使用最大余数法确定性分配。工作簿要求飞行但来源波没有飞行原型时使用`flying_red_gargoyle`；普通飞行怪使用该波普通War3基准护甲3倍，领头怪和进攻Boss使用各自工作簿护甲。
+- `tools/import_n3_wave_workbook.py`保留旧N3默认入口，并通过`--difficulty N3|N4|N5`定向重写单一难度。导入必须从对应`N*波次总表`读取30波，保留属性、飞行和对齐证据到CSV备注，不直接修改生成Lua。
+- 难度选项由`config/difficulty_config.lua::client_options()`按N1-N5顺序发布。Panorama难度卡只显示`display_name`和`subtitle/total_waves`，不创建描述Label；当前固定为五格横向一排，每格228x72、间距12px、弹窗宽1280px。修改后必须强制定向编译`survival_ui.js`和`survival_hud.css`。
+
 ## 击杀成长事件与UI权威进度（2026-08-05）
 
 - 极寒之刃`valid_enemy_kill_count`的唯一权威输入是`ENGINE_ENTITY_KILLED`。不得同时订阅派生`MONSTER_KILLED`后再用victim entindex做跨整局去重；Dota会在旧单位移除后复用entindex，新敌人的合法死亡会因此被永久忽略。用户已在Workshop Tools确认修复成功。

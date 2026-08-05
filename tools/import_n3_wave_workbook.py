@@ -1,8 +1,8 @@
-"""Import approved N3 wave members from the authoritative OOXML workbook.
+"""Import approved N3-N5 wave members from an authoritative OOXML workbook.
 
-The workbook supplies N3 totals and stats. Models come from the approved N1
-mapping; N3 waves 26-30 map to N1 waves 21-25. This tool only rewrites N3 rows
-in the authoritative wave CSV and never edits generated Lua directly.
+The workbook supplies totals and stats. Models come from the approved N1
+mapping; waves 26-30 map to N1 waves 21-25. This tool only rewrites the target
+difficulty rows in the authoritative wave CSV and never edits generated Lua.
 """
 from __future__ import annotations
 
@@ -33,16 +33,17 @@ def read_csv(path: Path) -> tuple[list[list[str]], list[str]]:
     return rows, rows[0]
 
 
-def workbook_rows(path: Path) -> dict[int, dict[str, str]]:
+def workbook_rows(path: Path, difficulty_id: str = "N3") -> dict[int, dict[str, str]]:
     report, _ = audit(path)
-    sheet = next(item for item in report["sheets"] if item["name"] == "N3波次总表")
+    sheet_name = f"{difficulty_id}波次总表"
+    sheet = next(item for item in report["sheets"] if item["name"] == sheet_name)
     result = {}
     for row in sheet["rows"]:
         values = row["values"]
         if values.get("A", "").isdigit():
             result[int(values["A"])] = values
     if sorted(result) != list(range(1, 31)):
-        raise ValueError("N3 workbook must contain waves 1-30")
+        raise ValueError(f"{difficulty_id} workbook must contain waves 1-30")
     return result
 
 
@@ -73,11 +74,12 @@ def make_row(
     headers: list[str], template: dict[str, str], wave: int, batch: str,
     order: int, count: int, role: str, stats: tuple[str, str, str], notes: str,
     movement_type_override: str = "", model_scale_multiplier: str = "1",
+    difficulty_id: str = "N3",
 ) -> list[str]:
     row = dict(template)
     row.update({
-        "wave_id": f"n3_wave_{wave:02d}_{batch.lower()}",
-        "difficulty_id": "N3",
+        "wave_id": f"{difficulty_id.lower()}_wave_{wave:02d}_{batch.lower()}",
+        "difficulty_id": difficulty_id,
         "wave_number": str(wave),
         "batch_id": batch,
         "spawn_order": str(order),
@@ -98,7 +100,19 @@ def make_row(
     return [row.get(header, "") for header in headers]
 
 
-def build_n3(existing: list[list[str]], headers: list[str], book: dict[int, dict[str, str]]) -> list[list[str]]:
+def evidence_note(values: dict[str, str], *columns: str) -> str:
+    parts = []
+    for column in columns:
+        value = values.get(column, "").strip()
+        if value and value not in parts:
+            parts.append(value)
+    return "；".join(parts)
+
+
+def build_difficulty(
+    existing: list[list[str]], headers: list[str],
+    book: dict[int, dict[str, str]], difficulty_id: str,
+) -> list[list[str]]:
     data = [dict(zip(headers, row)) for row in existing if row and not row[0].startswith("#")]
     n1 = {}
     for row in data:
@@ -138,13 +152,17 @@ def build_n3(existing: list[list[str]], headers: list[str], book: dict[int, dict
                     continue
                 member_index += 1
                 armor = str(float(values["L"]) * 3).rstrip("0").rstrip(".") if is_flying else values["L"]
-                note = "N3工作簿数量；沿用N1模型映射"
+                note = f"{difficulty_id}工作簿数量；沿用N1模型映射"
                 if is_flying:
                     note += "；飞行高护甲怪；护甲为本波基准War3护甲3倍"
+                evidence = evidence_note(values, "M", "AI", "AJ")
+                if evidence:
+                    note += "；证据：" + evidence
                 output.append(make_row(
                     headers, template, wave, f"{wave}N{member_index}", order,
                     allocated, "normal", (values["J"], values["K"], armor), note,
                     "ground" if ground_uses_flying_models and not is_flying else "",
+                    difficulty_id=difficulty_id,
                 ))
                 order += 1
                 totals["normal"] += allocated
@@ -156,8 +174,10 @@ def build_n3(existing: list[list[str]], headers: list[str], book: dict[int, dict
             output.append(make_row(
                 headers, leader_template, wave, f"{wave}L", order, leader_count,
                 "wave_leader", (values["O"], values["P"], values["Q"]),
-                "N3工作簿首怪Boss；独立wave_leader身份；模型略大",
-                "flying" if leader_is_flying else "", "1.15",
+                f"{difficulty_id}工作簿首怪Boss；独立wave_leader身份；模型略大"
+                + ("；证据：" + evidence_note(values, "R", "AI", "AJ")
+                   if evidence_note(values, "R", "AI", "AJ") else ""),
+                "flying" if leader_is_flying else "", "1.15", difficulty_id,
             ))
             order += 1
             totals["wave_leader"] += leader_count
@@ -170,21 +190,31 @@ def build_n3(existing: list[list[str]], headers: list[str], book: dict[int, dict
             output.append(make_row(
                 headers, boss_template, wave, f"{wave}B", order, assault_count,
                 "assault_boss", (values["T"], values["U"], values["V"]),
-                "N3工作簿进攻Boss；独立assault_boss身份",
+                f"{difficulty_id}工作簿进攻Boss；独立assault_boss身份"
+                + ("；证据：" + evidence_note(values, "W", "AI", "AJ")
+                   if evidence_note(values, "W", "AI", "AJ") else ""),
                 "flying" if int(values.get("AF", "0") or 0) > 0 else "", "1",
+                difficulty_id,
             ))
             order += 1
             totals["assault_boss"] += assault_count
 
     expected = {"normal": 1270, "wave_leader": 27, "assault_boss": 6}
     if totals != expected or sum(totals.values()) != 1303:
-        raise ValueError(f"N3 totals mismatch: {totals}")
+        raise ValueError(f"{difficulty_id} totals mismatch: {totals}")
     return output
+
+
+def build_n3(
+    existing: list[list[str]], headers: list[str], book: dict[int, dict[str, str]],
+) -> list[list[str]]:
+    return build_difficulty(existing, headers, book, "N3")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("workbook", type=Path)
+    parser.add_argument("--difficulty", choices=("N3", "N4", "N5"), default="N3")
     args = parser.parse_args()
     rows, old_headers = read_csv(CSV_PATH)
     headers = list(old_headers)
@@ -211,9 +241,11 @@ def main() -> int:
             metadata.append([mapped.get(header, "") for header in headers])
             continue
         mapped = dict(zip(old_headers, row))
-        if mapped.get("difficulty_id") != "N3":
+        if mapped.get("difficulty_id") != args.difficulty:
             existing.append([mapped.get(header, "") for header in headers])
-    generated = build_n3(existing, headers, workbook_rows(args.workbook))
+    generated = build_difficulty(
+        existing, headers, workbook_rows(args.workbook, args.difficulty), args.difficulty,
+    )
     buffer = io.StringIO(newline="")
     writer = csv.writer(buffer, lineterminator="\n")
     writer.writerow(headers)
@@ -221,7 +253,10 @@ def main() -> int:
     writer.writerows(existing)
     writer.writerows(generated)
     CSV_PATH.write_bytes(b"\xef\xbb\xbf" + buffer.getvalue().encode("utf-8"))
-    print("N3_WAVE_CSV_IMPORT_PASS normal=1270 wave_leader=27 assault_boss=6 total=1303")
+    print(
+        f"{args.difficulty}_WAVE_CSV_IMPORT_PASS "
+        "normal=1270 wave_leader=27 assault_boss=6 total=1303"
+    )
     return 0
 
 

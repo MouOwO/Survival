@@ -35,6 +35,9 @@
 - 已批准边界：转生进行中门禁在服务端购买校验和商店快照同时生效且不得重复扣费；普通副本自动刷新怪物但不移动英雄，主动从商店重进仍传送；`challenge_11`仅在仍为前台session时保留自动阶段传送，离开后旧回调不得拉回。
 - 插入修复已完成：`challenge_definitions.csv`新增完成刷新传送策略，普通挑战统一`preserve_position`，仅`challenge_11`为`reset_to_stage_entry`；每玩家前台遭遇身份同时消费普通挑战主动进入和转生Boss成功进入事件，延迟回调校验session、generation及前台身份。商店活动投影纳入`rebirth_challenges`，转生进行中在快照与购买扣费前双重拒绝。
 - 自动验证通过：`CHALLENGE_SESSION_FOREGROUND_CONTRACT_PASS`、`CHALLENGE_SESSION_FOREGROUND_LUA51_PASS`、`CHALLENGE_SESSION_CROSS_SERVICE_LUAC51_PASS`、`ADDMONSTER_MOVE_SPEED_CONTRACT_PASS`和定向生成逐字节一致性通过。行为测试覆盖普通Boss保持位置、十宗罪前台阶段重置、进入转生后旧十宗罪回调不拉回及转生活动商店禁用。尚未进行Workshop Tools冷启动实机验证，不得记录为用户验收完成。
+- 当前N1-N5主任务继续实施：用户于2026-08-05批准将本机`N4完全正确_倍率同步(1).xlsx`和`N5完全正确_倍率同步(1).xlsx`按已批准N3逻辑接入。N4/N5均使用独立30波CSV；1-25波沿用N1同波模型，26-30波沿用N1第21-25波模型；混合模型按来源数量比例确定性分配；缺少飞行原型时回退`flying_red_gargoyle`；普通飞行怪使用当波普通War3基准护甲3倍；领头怪、普通怪、进攻Boss依次生成，并保留工作簿证据状态。
+- N4/N5接入与难度选择UI已完成生产实现：权威CSV和生成Lua各新增N4/N5独立89条成员行；`difficulty_config.lua`启用N4并新增N5直接配置；导入器支持N3-N5并保留工作簿证据状态。开局选择为N1-N5五格横向一排，单格228x72、间距12px，弹窗宽1280px；卡片不再创建或显示描述小字，只保留难度名称和波次数。
+- N4/N5自动验证通过：`N4_WAVE_CSV_IMPORT_PASS`、`N5_WAVE_CSV_IMPORT_PASS`、`N4_N5_WAVE_CONFIG_LUA51_PASS`、`N4_N5_WAVE_CONTRACT_PASS`、N3与计时回归、`N4_N5_FINAL_LUAC51_PASS`、生成逐字节一致性、严格UTF-8和game/content限定`diff --check`。`survival_ui.js`与`survival_hud.css`均经Resource Compiler强制定向编译为`1 compiled, 0 failed, 0 skipped`。尚未进行Workshop Tools冷启动实机验证，不得记录为用户验收完成。
 
 ---
 
