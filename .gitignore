@@ -100,6 +100,7 @@
 !/scripts/vscripts/tests/test_research_technology_prerequisite.lua
 !/scripts/vscripts/tests/test_research_technology_transaction.lua
 !/scripts/vscripts/tests/test_wave_early_final.lua
+!/scripts/vscripts/tests/test_weapon_legend_abyss_proc.lua
 /tools_asset_info.bin
 /tools_thumbnail_cache.sqlite3
 /tools_thumbnail_cache.sqlite3-*

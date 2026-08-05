@@ -57,7 +57,8 @@
 - UI权威值统一：`weapon_synthesis_snapshot_service.lua`仅对`valid_enemy_kill_count`装备把实际`EQUIPMENT_GROWTH_GET_REQUEST.progress[content_id]`投影为标准`growth.stage_attack_count`，target直接读取生成武器CSV的`progression_value`且缺失统一回退200，remaining由两者现场计算。`survival_weapon_growth`、`survival_weapon_snapshot.growth`及Tooltip ViewModel使用同一投影；现有事件驱动Panorama无需轮询或重编译。
 - 自动验证：`ICE_BLADE_KILL_PROGRESS_PASS`、`TOOLTIP_VIEW_MODEL_PASS`、`WEAPON_SYNTHESIS_PASS`、`WEAPON_SYNTHESIS_ERROR_RECOVERY_PASS`通过；专项覆盖同一派生死亡不重复、不同敌人复用entindex仍计数、多层召唤/伤害代理归属、无效目标、200次批量死亡精确升级、下一级250目标、CSV缺失回退、物品charges及Tooltip/HUD标准快照`10/200/190`一致，并拒绝通用stale target 999。相关Lua/Luac 5.4.5语法、5个目标文件严格UTF-8及限定`diff --check`通过。
 - 全量回归实际执行77项，63项通过、14项失败；极寒专项在全量日志中明确通过。失败中的12项与既有文档清单一致；额外`test_hero_summon_owner.lua`失败于独立召唤mock，`test_shop_technology_ui_contract.lua`失败于当前商城Panorama结构契约，两者均不加载或经过本轮两个生产文件，本轮未扩大范围修复。未触碰现有`ability_tooltip/combat_stats/shop_ui/ui_bootstrap.vjs_c`及猴王粒子产物，也未暂存文件。
-- 尚需实机：完全停止并重新Run Workshop Tools，装备极寒之刃后记录初始剩余值，一次击杀已知数量的普通敌人；确认物品右下角charges、Tooltip“当前/剩余进度”和成长HUD都在同次事件刷新后精确减少相同击杀数，并确认召唤物击杀归属、友军/建筑/英雄不计数及达到阈值后升级和新目标正确。自动测试不能替代引擎entindex复用、击杀事件和Panorama最终视觉验收。
+- 最终实机验收：用户在Workshop Tools确认“修改成功”。该反馈关闭此前的冷启动待验收项，证明本轮服务端击杀计数与实际UI显示修复在真实游戏链生效；极寒之刃任务完成，不得在后续会话恢复为待验收状态。用户未逐项提供召唤物、无效目标或跨级场景的独立口述，因此这些细分边界仍以已通过的自动测试为证，不扩大表述为逐项实机确认。
+- 可复用经验：Dota实体entindex只适合当前实体查找，不能作为跨单位生命周期的永久死亡身份；若同一底层死亡同时产生引擎事件和派生业务事件，应选择一个权威来源，而不是靠永久entindex集合补偿双订阅。UI即时刷新也不等于数据一致：物品charges、Tooltip和HUD必须在服务端快照边界消费同一progress/target并现场计算remaining，不能让客户端分别拼接通用成长与装备成长两个状态源。
 
 # 2026-08-04 — 挑战镜头移除临时目标锁定
 

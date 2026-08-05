@@ -1,5 +1,13 @@
 # Project Context
 
+## 击杀成长事件与UI权威进度（2026-08-05）
+
+- 极寒之刃`valid_enemy_kill_count`的唯一权威输入是`ENGINE_ENTITY_KILLED`。不得同时订阅派生`MONSTER_KILLED`后再用victim entindex做跨整局去重；Dota会在旧单位移除后复用entindex，新敌人的合法死亡会因此被永久忽略。用户已在Workshop Tools确认修复成功。
+- 攻击归属从attacker开始沿最多8层`GetOwnerEntity()`解析，优先读取业务显式`survival_player_id`，再读取有效`GetPlayerOwnerID()`，并用实体集合阻止owner循环。友军判断优先使用`PlayerResource:GetTeam(player_id)`，避免中立team的thinker或damage proxy绕过过滤；真实英雄、建筑和无法归属玩家的死亡不计数。
+- 极寒实际进度保存在`EQUIPMENT_GROWTH_GET_REQUEST.progress[content_id]`；通用`WEAPON_GROWTH_GET_REQUEST`不负责该击杀计数。`weapon_synthesis_snapshot_service.lua`必须在发布边界把实际值投影为标准`growth.stage_attack_count`，从生成武器CSV读取target（无有效值统一回退200），并现场计算remaining。`survival_weapon_growth`、`survival_weapon_snapshot.growth`和Tooltip ViewModel必须消费同一投影。
+- Panorama现有NetTable订阅已经是事件驱动；批量击杀同帧内多次服务端写入时，客户端只呈现最终累计快照是正确行为。不要增加高频轮询来解决服务端计数丢失或状态源分裂。
+- 最小回归矩阵必须覆盖：派生怪物事件不二次计数；新敌人复用entindex仍计数；多层召唤/伤害代理归属；友军、英雄、建筑、无owner和循环owner不计数；批量达到阈值后正确结转升级；CSV目标与200回退；物品charges、Tooltip与HUD的count/target/remaining一致。
+
 ## 科技研究两阶段事务与进度UI（2026-08-04）
 
 - 普通研究科技不是“购买成功后附带2秒冷却”，而是服务端权威的两阶段事务。`research_technology_service.lua::BeginUpgrade()`负责完整校验并通过`RESOURCE_TRY_SPEND_REQUEST`立即扣除金币/木材，然后创建一次性`pending_transactions[transaction_id]`；此阶段不得写入科技等级、重算效果、发布`LEVEL_CHANGED/EFFECTS_CHANGED`或提示研究完成。

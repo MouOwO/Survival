@@ -10,6 +10,7 @@ local FORGING_HAMMER_LIMIT = 4
 
 local function state(player_id)
     state_by_player[player_id] = state_by_player[player_id] or {
+        hero = nil,
         content_id = "",
         series_id = "",
         stage_attack_count = 0,
@@ -40,6 +41,9 @@ local function snapshot(player_id)
         0,
         math.floor(tonumber(counts[FORGING_HAMMER_ID]) or 0)
     ))
+    local damage_growth = current.series_id == "ice_blade"
+        or current.series_id == "epic_icefire"
+        or current.series_id == "legend_abyss"
     return {
         player_id = player_id,
         content_id = current.content_id,
@@ -57,10 +61,10 @@ local function snapshot(player_id)
         growth_intellect = current.growth_intellect,
         attack_gain_per_attack =
             tonumber(definition.attack_gain_per_attack) or 0,
-        damage_gain_attack = (current.series_id == "epic_icefire"
-            or current.series_id == "legend_abyss") and 20 or 0,
-        damage_gain_all_attributes = (current.series_id == "epic_icefire"
-            or current.series_id == "legend_abyss") and 5 or 0,
+        damage_gain_attack = damage_growth
+            and (tonumber(definition.attack_gain_per_attack) or 0) or 0,
+        damage_gain_all_attributes = damage_growth
+            and (tonumber(definition.strength_gain_per_attack) or 0) or 0,
     }
 end
 
@@ -167,9 +171,9 @@ end
 
 local function on_attack_landed(payload)
     local player_id = tonumber(payload.player_id)
+    if player_id == nil or payload.is_main_attack == false then return end
     local data = snapshot(player_id)
-    if data.series_id == "ice_blade" or data.series_id == "epic_icefire"
-        or data.series_id == "legend_abyss" then
+    if data.series_id ~= "growth_sword" and data.series_id ~= "frost_blade" then
         return
     end
     local multiplier = technology_stat_manager.training_room_multiplier(
@@ -179,11 +183,65 @@ local function on_attack_landed(payload)
     add_attacks(player_id, data.progress_per_attack, "attack_landed", multiplier)
 end
 
+local function valid_entity(entity)
+    return entity and (not entity.IsNull or not entity:IsNull())
+end
+
+local function is_building(entity)
+    return valid_entity(entity) and entity.IsBuilding and entity:IsBuilding()
+end
+
+local function entity_player_id(entity)
+    if not valid_entity(entity) then return nil end
+    local explicit = tonumber(entity.survival_player_id)
+    if explicit and explicit >= 0 then return explicit end
+    if not entity.GetPlayerOwnerID then return nil end
+    local player_id = tonumber(entity:GetPlayerOwnerID())
+    return player_id and player_id >= 0 and player_id or nil
+end
+
+local function damage_source_belongs_to_hero(player_id, attacker, owner_hero)
+    local hero = state(player_id).hero
+    if not valid_entity(hero) or owner_hero ~= hero or not valid_entity(attacker) then
+        return false
+    end
+    local current = attacker
+    local seen = {}
+    for _ = 1, 8 do
+        if not valid_entity(current) or seen[current] or is_building(current) then
+            return false
+        end
+        seen[current] = true
+        if current == hero
+            or current.survival_owner_hero == hero
+            or current.survival_hero_owner == hero then
+            return true
+        end
+        -- The permanent Monkey King clone deliberately owns a Player entity
+        -- rather than the hero and is isolated from the hero modifier stack.
+        -- Its strict business identity plus matching player id is the only
+        -- same-player exception; builders, workers and towers remain excluded.
+        local explicit_clone = current.IsClone and current:IsClone()
+        if (explicit_clone or current.survival_monkey_king_clone == true)
+            and entity_player_id(current) == player_id then
+            return true
+        end
+        if not current.GetOwnerEntity then return false end
+        current = current:GetOwnerEntity()
+    end
+    return false
+end
+
 local function on_damage_dealt(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil or (tonumber(payload.final_damage) or 0) <= 0 then return end
     local data = snapshot(player_id)
-    if data.series_id ~= "epic_icefire" and data.series_id ~= "legend_abyss" then
+    if data.series_id ~= "ice_blade" and data.series_id ~= "epic_icefire"
+        and data.series_id ~= "legend_abyss" then
+        return
+    end
+    if not damage_source_belongs_to_hero(
+            player_id, payload.attacker, payload.owner_hero) then
         return
     end
     local multiplier = technology_stat_manager.training_room_multiplier(
@@ -193,24 +251,24 @@ local function on_damage_dealt(payload)
     local current = state(player_id)
     local definition = weapons.by_id[current.content_id]
     if not definition then return end
-    -- Icefire/Abyss explicitly grow from every successful allied damage event,
-    -- not only basic attacks. Keep these canonical values independent from the
-    -- legacy CSV columns, where Abyss stages previously contained zeroes.
-    local attack_gain = 20
-    local attribute_gain = 5
+    local attack_gain = tonumber(definition.attack_gain_per_attack) or 0
+    local strength_gain = tonumber(definition.strength_gain_per_attack) or 0
+    local agility_gain = tonumber(definition.agility_gain_per_attack) or 0
+    local intellect_gain = tonumber(definition.intellect_gain_per_attack) or 0
     current.growth_attack = current.growth_attack
         + attack_gain * multiplier
     current.growth_strength = current.growth_strength
-        + attribute_gain * multiplier
+        + strength_gain * multiplier
     current.growth_agility = current.growth_agility
-        + attribute_gain * multiplier
+        + agility_gain * multiplier
     current.growth_intellect = current.growth_intellect
-        + attribute_gain * multiplier
+        + intellect_gain * multiplier
     publish(player_id, "damage_dealt")
 end
 
 local function on_hero_summoned(payload)
     if payload.unit and not payload.unit:IsNull() then
+        state(tonumber(payload.player_id)).hero = payload.unit
         payload.unit:AddNewModifier(
             payload.unit,
             nil,
@@ -243,7 +301,7 @@ function M.init()
     event_bus.handle_request(events.WEAPON_GROWTH_GET_REQUEST, get_growth)
     event_bus.handle_request(events.WEAPON_GROWTH_DEBUG_REQUEST, debug_add)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_equipped)
-    event_bus.subscribe(events.WEAPON_ATTACK_LANDED, on_attack_landed)
+    event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_attack_landed)
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage_dealt)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_inventory_changed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)

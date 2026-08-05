@@ -2,6 +2,15 @@
 
 ## 当前已知问题
 
+0. **Dota实体entindex会在单位移除后复用，不能作为跨生命周期的永久死亡去重键。**
+   - 2026-08-05极寒之刃实机问题表现为批量击杀很多普通敌人时进度通常只减少1～2，甚至不减少。根因是成长服务同时订阅引擎死亡和派生怪物死亡，再把`victim_entindex`永久保存在玩家去重集合；后续新单位复用旧entindex时被误判为同一次死亡。
+   - 同一底层事实存在引擎事件与派生业务事件时，应明确唯一权威入口；极寒之刃只消费`ENGINE_ENTITY_KILLED`。不要通过跨整局保存entindex来弥补双订阅，按数量裁剪无序Lua table也不能保证淘汰最旧身份。
+   - 需要归属召唤物、thinker或伤害代理时，应沿有界owner链解析`survival_player_id/GetPlayerOwnerID()`并防循环，再按归属玩家队伍过滤友军。用户已确认本轮整体修改成功；entindex复用、多层owner和无效目标细分边界由专项自动测试覆盖。
+
+0. **事件驱动UI仍可能因服务端混用两个状态源而显示彼此矛盾的实时值。**
+   - 极寒之刃实际击杀数位于equipment growth，而通用weapon growth不接收该击杀；此前物品charges直接使用前者，Tooltip/HUD标准`growth`字段却可能使用后者的零值或旧值。客户端即使每次NetTable变化都立即重绘，也只会更快显示不一致数据。
+   - 同一业务进度必须在服务端快照边界统一：极寒之刃将实际equipment progress投影为标准count，target读取生成武器CSV且缺失回退200，remaining现场计算。物品charges、Tooltip和HUD不得分别选择状态源，也不得靠增加Panorama轮询掩盖权威值分裂。
+
 0. **Panorama解除`SetCameraTarget`会恢复锁定前的自由镜头锚点。**
    - 2026-08-05用户实机确认：挑战传送时先调用`GameUI.SetCameraTarget(hero)`、到达后再调用`GameUI.SetCameraTarget(-1)`，会让镜头返回英雄传送前消失的位置。表现类似项目保存并恢复旧坐标，但全链搜索确认没有对应业务变量；这是目标锁定解除后的引擎镜头行为。
    - 只需要把镜头移动到单位、但不需要持续跟随时，应使用`GameUI.MoveCameraToEntity(entindex)`，不得建立随后需要`SetCameraTarget(-1)`解除的临时锁定。

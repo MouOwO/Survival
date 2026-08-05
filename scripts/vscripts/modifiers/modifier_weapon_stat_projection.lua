@@ -275,6 +275,8 @@ function modifier_weapon_stat_projection:OnTakeDamage(params)
     local ability = params.inflictor
     event_bus.emit(events.COMBAT_DAMAGE_RESOLVED, {
         player_id = self.player_id,
+        attacker = attacker,
+        owner_hero = self:GetParent(),
         attacker_entindex = attacker:entindex(),
         victim_entindex = victim:entindex(),
         damage_kind = ability and not ability:IsNull() and "ability" or "attack",
