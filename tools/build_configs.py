@@ -10,6 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 CSV_ROOT = ROOT / "data" / "csv"
 OUT_ROOT = ROOT / "scripts" / "vscripts" / "config" / "generated"
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+SOUND_OWNER_FIELDS = {
+    "hero_skill_sound_definitions.csv": "skill_id",
+    "worker_sound_definitions.csv": "worker_id",
+}
 
 # These CSVs preserve values extracted from the original War3 map. Generated
 # Lua names the unit explicitly so runtime code cannot confuse source armor
@@ -66,14 +70,15 @@ def value(raw: str, kind: str) -> str:
     return f'"{lua_escape(raw)}"'
 
 
-def validate_hero_skill_sounds(
+def validate_sound_definitions(
     source: Path, headers: list[str], data_rows: list[tuple[int, list[str]]]
 ) -> None:
     """Validate lifecycle and limiter fields that generic CSV types cannot."""
-    if source.name != "hero_skill_sound_definitions.csv":
+    owner_field = SOUND_OWNER_FIELDS.get(source.name)
+    if owner_field is None:
         return
     required = {
-        "cue_id", "skill_id", "phase", "sound_event", "sound_resource",
+        "cue_id", owner_field, "phase", "sound_event", "sound_resource",
         "playback_mode", "attach_scope", "cooldown_seconds",
         "max_plays_per_window", "window_seconds", "max_concurrent",
         "concurrency_seconds",
@@ -97,7 +102,7 @@ def validate_hero_skill_sounds(
                 f" {source} line {row_number}"
             )
         seen.add(cue_id)
-        for key in ("skill_id", "sound_event", "sound_resource"):
+        for key in (owner_field, "sound_event", "sound_resource"):
             if not row[key].strip():
                 raise ValueError(
                     f"sound cue {cue_id} requires {key}:"
@@ -130,6 +135,34 @@ def validate_hero_skill_sounds(
             raise ValueError(
                 f"sound cue {cue_id} concurrency fields must both be positive"
             )
+
+
+def validate_sound_cue_uniqueness(sources: list[Path]) -> None:
+    """Reject cue IDs shared by independently owned sound definition tables."""
+    seen: dict[str, tuple[Path, int]] = {}
+    for source in sources:
+        if source.name not in SOUND_OWNER_FIELDS:
+            continue
+        with source.open("r", encoding="utf-8-sig", newline="") as handle:
+            rows = list(csv.reader(handle))
+        if not rows or "cue_id" not in rows[0]:
+            continue
+        cue_index = rows[0].index("cue_id")
+        for row_number, fields in enumerate(rows[1:], start=2):
+            if cue_index >= len(fields):
+                continue
+            cue_id = fields[cue_index].strip()
+            if not cue_id or cue_id.startswith("#"):
+                continue
+            previous = seen.get(cue_id)
+            if previous is not None:
+                previous_source, previous_line = previous
+                raise ValueError(
+                    f"duplicate sound cue_id {cue_id!r} across definitions:"
+                    f" {previous_source} line {previous_line};"
+                    f" {source} line {row_number}"
+                )
+            seen[cue_id] = (source, row_number)
 
 
 def build(source: Path, output: Path) -> None:
@@ -189,7 +222,7 @@ def build(source: Path, output: Path) -> None:
                 f"row: {fields}"
             )
         data_rows.append((row_number, fields))
-    validate_hero_skill_sounds(source, headers, data_rows)
+    validate_sound_definitions(source, headers, data_rows)
     lines = [
         "-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.",
         f"-- Source: {source.name}",
@@ -233,6 +266,12 @@ def build(source: Path, output: Path) -> None:
 
 
 def main() -> int:
+    files = sorted(CSV_ROOT.rglob("*.csv"))
+    if not files:
+        print(f"ERROR: no CSV files under {CSV_ROOT}", file=sys.stderr)
+        return 11
+    validate_sound_cue_uniqueness(files)
+
     tooltip_builder = ROOT / "tools" / "build_tooltip_definitions.py"
     tooltip_built_separately = False
     if tooltip_builder.exists():
@@ -240,10 +279,6 @@ def main() -> int:
         if result.returncode != 0:
             return result.returncode
         tooltip_built_separately = True
-    files = sorted(CSV_ROOT.rglob("*.csv"))
-    if not files:
-        print(f"ERROR: no CSV files under {CSV_ROOT}", file=sys.stderr)
-        return 11
     OUT_ROOT.mkdir(parents=True, exist_ok=True)
     for source in files:
         if tooltip_built_separately and source.name == "tooltip_definitions.csv":

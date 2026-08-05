@@ -70,5 +70,6 @@ M["wall_visual_levels"] = require("config/generated/wall_visual_levels")
 M["wave_definitions"] = require("config/generated/wave_definitions")
 M["wave_timing_rules"] = require("config/generated/wave_timing_rules")
 M["weapon_definitions"] = require("config/generated/weapon_definitions")
+M["worker_sound_definitions"] = require("config/generated/worker_sound_definitions")
 
 return M

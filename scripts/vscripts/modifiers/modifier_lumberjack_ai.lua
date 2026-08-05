@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local sound_service = require("core/sound_service")
 
 modifier_lumberjack_ai = class({})
 local M = modifier_lumberjack_ai
@@ -102,6 +103,10 @@ function M:OnAttackLanded(keys)
     local target = keys.target
     if not target or target:IsNull() then return end
     if target:entindex() ~= self.tree_entindex then return end
+    sound_service.play("worker_lumberjack_tree_impact", {
+        unit = target,
+        source = target,
+    })
     if self.technology_armor_reduction > 0
         and target:GetTeamNumber() ~= parent:GetTeamNumber() then
         local modifier = target:AddNewModifier(

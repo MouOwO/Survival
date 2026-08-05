@@ -1,4 +1,19 @@
-local definitions = require("config/generated/hero_skill_sound_definitions")
+local definition_sources = {
+    require("config/generated/hero_skill_sound_definitions"),
+    require("config/generated/worker_sound_definitions"),
+}
+
+local definitions = { rows = {}, by_id = {} }
+for _, source in ipairs(definition_sources) do
+    for _, row in ipairs(source.rows or {}) do
+        definitions.rows[#definitions.rows + 1] = row
+    end
+    for cue_id, row in pairs(source.by_id or {}) do
+        assert(definitions.by_id[cue_id] == nil,
+            "duplicate sound cue across definitions: " .. tostring(cue_id))
+        definitions.by_id[cue_id] = row
+    end
+end
 
 local M = {}
 local last_played = {}

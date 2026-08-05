@@ -5,6 +5,7 @@ local scheduler = require("core/scheduler")
 local config = require("config/generated/monkey_king_exclusive_runtime")
 
 local M = {}
+M.sound_service = require("core/sound_service")
 
 local Q_SKILL = "skill_monkey_king_exclusive"
 local W_SKILL = "skill_monkey_king_fury"
@@ -245,6 +246,15 @@ local function resolve_q_impact(impact_id)
     play_boundless_visual(
         impact.attacker, impact.origin, impact.endpoint, impact.direction
     )
+    local impact_position = impact.origin
+        + impact.direction * (impact.length * 0.5)
+    if GetGroundPosition then
+        impact_position = GetGroundPosition(impact_position, impact.attacker)
+    end
+    M.sound_service.play("hero_monkey_boundless_impact", {
+        source = impact.attacker,
+        position = impact_position,
+    })
     for _, enemy in ipairs(line_targets(
             impact.attacker, impact.origin, impact.direction,
             impact.length, impact.total_width)) do
@@ -320,6 +330,10 @@ local function trigger_q(player_id, attacker, target)
     impact.task = scheduler.after(STAFF_DROP_DURATION, function()
         return resolve_q_impact(impact_id)
     end, "monkey_q_impact_" .. tostring(impact_id))
+    M.sound_service.play("hero_monkey_boundless_cast", {
+        unit = attacker,
+        source = attacker,
+    })
     return true
 end
 

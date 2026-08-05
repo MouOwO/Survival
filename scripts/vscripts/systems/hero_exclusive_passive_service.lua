@@ -1,6 +1,7 @@
 local scheduler = require("core/scheduler")
 
 local M = { runners = {} }
+M.sound_service = require("core/sound_service")
 local deal_group = nil
 local exclusive_summons = {}
 local shadow_raze_stacks = {}
@@ -136,19 +137,27 @@ local function create_summon(context, definition, unit_name, invulnerable)
         exclusive_summons[key] = nil
         if alive(unit) then unit:ForceKill(false) end
     end, "hero_exclusive_summon:" .. key)
-    return true
+    return true, unit
 end
 
 function M.runners.skill_doom_infernal(context, definition)
-    return create_summon(
+    local created, unit = create_summon(
         context, definition, "npc_survival_doom_infernal", false
     )
+    if created then
+        M.sound_service.play("hero_doom_infernal_spawn", {
+            unit = unit,
+            source = context.attacker,
+        })
+    end
+    return created
 end
 
 function M.runners.skill_drow_companion(context, definition)
-    return create_summon(
+    local created = create_summon(
         context, definition, "npc_survival_drow_companion", true
     )
+    return created
 end
 
 local function live_raze_layers(target, duration, maximum)
@@ -191,6 +200,10 @@ function M.runners.skill_shadow_fiend_raze(context, definition)
     )
     local position = context.target:GetAbsOrigin()
     particle_at(SHADOW_RAZE_PARTICLE, context.attacker, position)
+    M.sound_service.play("hero_shadow_raze_impact", {
+        source = context.attacker,
+        position = position,
+    })
     deal_group(
         context,
         enemies_in_radius(context.attacker, position, radius),
@@ -202,6 +215,10 @@ end
 function M.runners.skill_axe_counter_helix(context, definition)
     local position = context.target:GetAbsOrigin()
     particle_at(COUNTER_HELIX_PARTICLE, context.attacker, position)
+    M.sound_service.play("hero_axe_counter_helix_impact", {
+        source = context.attacker,
+        position = position,
+    })
     deal_group(
         context,
         enemies_in_radius(
@@ -216,6 +233,10 @@ end
 function M.on_drow_companion_attack_fired(attacker, primary_target)
     if not alive(attacker) or not alive(primary_target)
         or attacker.survival_drow_companion ~= true then return false end
+    M.sound_service.play("hero_drow_companion_volley", {
+        unit = attacker,
+        source = attacker,
+    })
     local origin = attacker:GetAbsOrigin()
     local candidates = enemies_in_radius(
         attacker, origin, tonumber(attacker.survival_drow_attack_range) or 1200
