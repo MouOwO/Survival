@@ -20,22 +20,7 @@ local function return_rebirth_hero_home(result)
     })
     local hero = summoned and summoned.unit
         or PlayerResource:GetSelectedHeroEntity(result.player_id)
-    local returned = return_home.return_unit(hero, result.player_id)
-    if not returned or not returned.ok then return end
-    local player = PlayerResource:GetPlayer(result.player_id)
-    local position = returned.position
-    if player and position then
-        CustomGameEventManager:Send_ServerToPlayer(
-            player,
-            "ui_camera_follow_hero",
-            {
-                entindex = hero:entindex(),
-                target_x = position.x,
-                target_y = position.y,
-                target_z = position.z,
-            }
-        )
-    end
+    return_home.return_unit(hero, result.player_id)
 end
 
 local function effects_for(profile_id)

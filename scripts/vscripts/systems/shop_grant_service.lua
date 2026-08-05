@@ -248,7 +248,7 @@ function M.grant(player_id, team, entry, state)
 end
 
 function M.refund(team, entry)
-    event_bus.request(events.RESOURCE_ADD_REQUEST, {
+    return event_bus.request(events.RESOURCE_ADD_REQUEST, {
         team = team,
         wood = entry.woodcost or 0,
         gold = entry.goldcost or 0,

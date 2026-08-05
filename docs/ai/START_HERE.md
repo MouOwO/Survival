@@ -10,6 +10,7 @@
 - 插入修复检查点：敌方单位和树木属性UI复用上一个单位的问题已完成生产修复和自动验证。根因是可控输入解析器拒绝不在`GetSelectedEntities()`中的敌方portrait；现新增HUD专用`ResolveDisplayUnit()`，属性/名称/生命/快照链使用display身份，技能与Builder输入继续使用可控`Resolve()`。专项/输入回归、Lua 5.1语法、严格UTF-8、限定diff和两个JS强制定向编译通过；下一步冷启动快速切换英雄、敌人和树木，并确认点击敌人后Q/W/E仍由可控单位处理。
 - 插入修复检查点：转生挑战进行中重复购买、副本切换后旧回调拉回英雄及普通Boss刷新错误传送已完成生产修复和自动验证。商店快照与扣费前均拒绝活动中的转生挑战；每玩家唯一前台遭遇覆盖普通挑战与转生进入，延迟刷新校验session/generation/前台身份；普通挑战刷新保留位置，仅仍在前台的`challenge_11`重置到阶段入口。专项契约、Lua 5.1行为、相关回归、生成一致性、语法和UTF-8通过；下一步Workshop Tools冷启动实测重复点击转生购买、普通Boss刷新、十宗罪阶段刷新及十宗罪→转生切换，尚未用户验收。
 - 本任务工作区保护基线：已有19个Panorama编译产物、4个粒子编译产物和一批未跟踪测试/日志文件，不属于本任务；用户停止Workshop Tools后连续两次`git status --short`一致。后续不得触碰、回滚或纳入本任务交付。
+- 传说：深渊审判焰爆被动已由用户确认没有问题，不再作为活跃或待验收任务恢复。稳定实现只消费`HERO_MAIN_ATTACK_LANDED`并排除次级攻击，以`attack_id`有界去重；触发时读取`HERO_COMBAT_STATS_GET_REQUEST`逻辑三维，以佩戴英雄为500范围中心，逐目标提交全属性×50魔法伤害，并在英雄处播放一次焰爆粒子和声音。完整维护边界见`PROJECT_CONTEXT.md`和`DECISIONS.md`。
 - 极寒之刃批量击杀进度修复已由用户在Workshop Tools确认成功，不再作为活跃或待验收任务恢复。稳定规则：成长只消费`ENGINE_ENTITY_KILLED`，不得按victim entindex跨实体生命周期永久去重；召唤/代理攻击沿有界owner链归属玩家；物品charges、Tooltip与成长HUD统一消费服务端投影的实际equipment progress、CSV target和现场remaining。完整根因、测试和验收记录见`PROJECT_CONTEXT.md`、`KNOWN_ISSUES.md`及`SESSION_LOG.md`顶部。
 - 相机任务已由用户于2026-08-05在Workshop Tools明确确认解决，不再作为活跃任务恢复：空格定位使用`MoveCameraToEntity(target)`；挑战镜头已删除`SetCameraTarget(hero)`→`SetCameraTarget(-1)`锁定/释放链，改为一次性非锁定聚焦，镜头不再返回英雄传送前位置。稳定规则见`PROJECT_CONTEXT.md`，引擎陷阱见`KNOWN_ISSUES.md`；等待用户指定下一项任务。
 - 已否定检查点：第一版曾使用`SetCameraLookAtPosition`并只有Panorama本地日志；虽然静态契约与编译通过，用户实机确认空格不定位、挑战仍回弹。该方案已被上方第二版替代，不得恢复。

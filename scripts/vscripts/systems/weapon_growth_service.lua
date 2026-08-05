@@ -133,14 +133,27 @@ local function upgrade_if_ready(player_id, current, definition)
     return true
 end
 
-local function add_attacks(player_id, amount, reason, income_multiplier)
+local function add_attacks(
+    player_id,
+    progress_amount,
+    reason,
+    income_multiplier,
+    growth_amount
+)
     local current = state(player_id)
     local definition = weapons.by_id[current.content_id]
     if not definition or definition.enabled == false then
         return { ok = false, error = "weapon_not_equipped" }
     end
-    local count = math.max(0, math.floor(tonumber(amount) or 0))
-    if count <= 0 then
+    local progress_count = math.max(
+        0,
+        math.floor(tonumber(progress_amount) or 0)
+    )
+    local growth_count = math.max(
+        0,
+        math.floor(tonumber(growth_amount) or progress_count)
+    )
+    if progress_count <= 0 or growth_count <= 0 then
         return { ok = false, error = "attack_count_invalid" }
     end
     local attack_gain = tonumber(definition.attack_gain_per_attack) or 0
@@ -148,12 +161,16 @@ local function add_attacks(player_id, amount, reason, income_multiplier)
     local agility_gain = tonumber(definition.agility_gain_per_attack) or 0
     local intellect_gain = tonumber(definition.intellect_gain_per_attack) or 0
     local multiplier = math.max(1, tonumber(income_multiplier) or 1)
-    current.stage_attack_count = current.stage_attack_count + count
-    current.lifetime_attack_count = current.lifetime_attack_count + count
-    current.growth_attack = current.growth_attack + attack_gain * count * multiplier
-    current.growth_strength = current.growth_strength + strength_gain * count * multiplier
-    current.growth_agility = current.growth_agility + agility_gain * count * multiplier
-    current.growth_intellect = current.growth_intellect + intellect_gain * count * multiplier
+    current.stage_attack_count = current.stage_attack_count + progress_count
+    current.lifetime_attack_count = current.lifetime_attack_count + growth_count
+    current.growth_attack = current.growth_attack
+        + attack_gain * growth_count * multiplier
+    current.growth_strength = current.growth_strength
+        + strength_gain * growth_count * multiplier
+    current.growth_agility = current.growth_agility
+        + agility_gain * growth_count * multiplier
+    current.growth_intellect = current.growth_intellect
+        + intellect_gain * growth_count * multiplier
     publish(player_id, reason or "attack_landed")
     local guard = 0
     while upgrade_if_ready(player_id, current, definition) do
@@ -180,7 +197,13 @@ local function on_attack_landed(payload)
         player_id,
         payload.target
     )
-    add_attacks(player_id, data.progress_per_attack, "attack_landed", multiplier)
+    add_attacks(
+        player_id,
+        data.progress_per_attack,
+        "attack_landed",
+        multiplier,
+        1
+    )
 end
 
 local function valid_entity(entity)

@@ -106,6 +106,29 @@ local function is_active(encounter_id)
     return true
 end
 
+local function active_meta(encounter_id)
+    if not is_active(encounter_id) then return nil end
+    return active_by_entindex[active_by_encounter[encounter_id]]
+end
+
+local function hero_for(player_id)
+    local summon = event_bus.request(
+        events.HERO_SUMMON_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local hero = summon and summon.unit
+        or PlayerResource:GetSelectedHeroEntity(player_id)
+    if not valid_entity(hero) or not hero:IsAlive() then return nil end
+    return hero
+end
+
+local function rebirth_entry(encounter_id)
+    local suffix = string.match(encounter_id, "encounter_rebirth_(%d+)$")
+    local entry_name = suffix and ("rebirth_" .. suffix .. "_entry") or nil
+    local entry = entry_name and Entities:FindByName(nil, entry_name) or nil
+    return valid_entity(entry) and entry or nil, entry_name
+end
+
 local function start_encounter(payload)
     local encounter_id = tostring(payload.encounter_id or "")
     if challenge_sessions.handles(encounter_id) then
@@ -139,10 +162,9 @@ local function start_encounter(payload)
 
     local hero_entry = nil
     if encounter.encounter_type == "rebirth_boss" then
-        local suffix = string.match(encounter_id, "encounter_rebirth_(%d+)$")
-        local entry_name = suffix and ("rebirth_" .. suffix .. "_entry") or nil
-        hero_entry = entry_name and Entities:FindByName(nil, entry_name) or nil
-        if not valid_entity(hero_entry) then
+        local entry_name
+        hero_entry, entry_name = rebirth_entry(encounter_id)
+        if not hero_entry then
             return {
                 ok = false,
                 error = "hammer_marker_not_found:" .. tostring(entry_name),
@@ -201,13 +223,8 @@ local function start_encounter(payload)
 
     if hero_entry then
         local player_id = tonumber(payload.player_id)
-        local summon = event_bus.request(
-            events.HERO_SUMMON_GET_REQUEST,
-            { player_id = player_id }
-        )
-        local hero = summon and summon.unit
-            or PlayerResource:GetSelectedHeroEntity(player_id)
-        if valid_entity(hero) and hero:IsAlive() then
+        local hero = hero_for(player_id)
+        if hero then
             local hero_origin = hero_entry:GetAbsOrigin()
             hero:SetAbsOrigin(hero_origin)
             FindClearSpaceForUnit(hero, hero_origin, true)
@@ -267,10 +284,52 @@ local function query_encounter(payload)
     if not encounter then
         return { ok = false, error = "encounter_not_found" }
     end
+    local meta = active_meta(encounter_id)
+    local player_id = tonumber(payload.player_id)
     return {
         ok = true,
-        active = is_active(encounter_id),
+        active = meta ~= nil and tonumber(meta.player_id) == player_id,
         encounter = project_encounter(encounter),
+    }
+end
+
+local function reenter_encounter(payload)
+    local encounter_id = tostring(payload.encounter_id or "")
+    local encounter = encounters.by_id[encounter_id]
+    if not encounter or encounter.encounter_type ~= "rebirth_boss" then
+        return { ok = false, error = "rebirth_encounter_not_found" }
+    end
+    local player_id = tonumber(payload.player_id)
+    if not valid_player_id(player_id) then
+        return { ok = false, error = "player_id_invalid" }
+    end
+    local meta = active_meta(encounter_id)
+    if not meta then
+        return { ok = false, error = "encounter_not_active" }
+    end
+    if tonumber(meta.player_id) ~= player_id then
+        return { ok = false, error = "encounter_not_owned" }
+    end
+    local entry, entry_name = rebirth_entry(encounter_id)
+    if not entry then
+        return {
+            ok = false,
+            error = "hammer_marker_not_found:" .. tostring(entry_name),
+        }
+    end
+    local hero = hero_for(player_id)
+    if not hero then return { ok = false, error = "hero_not_ready" } end
+    local origin = entry:GetAbsOrigin()
+    hero:SetAbsOrigin(origin)
+    FindClearSpaceForUnit(hero, origin, true)
+    hero:Stop()
+    return {
+        ok = true,
+        resumed = true,
+        encounter_id = encounter_id,
+        entindex = meta.unit:entindex(),
+        boss_health = meta.unit:GetHealth(),
+        camera_target = { x = origin.x, y = origin.y, z = origin.z },
     }
 end
 
@@ -336,6 +395,10 @@ function M.init()
     event_bus.handle_request(
         events.MONSTER_ENCOUNTER_QUERY_REQUEST,
         query_encounter
+    )
+    event_bus.handle_request(
+        events.MONSTER_ENCOUNTER_REENTER_REQUEST,
+        reenter_encounter
     )
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     event_bus.subscribe(events.GAME_STARTED, validate_all_markers)

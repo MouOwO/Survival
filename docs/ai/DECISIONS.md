@@ -50,6 +50,7 @@
 45. **英雄普通攻击飘字只显示最终实际伤害。** 暴击概率与倍率保持attack record身份并通过仅作用于普通攻击的`MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE`投影，避免Valve原生`PREATTACK_CRITICALSTRIKE`显示减甲前数值；护甲、吸血、攻击事件和项目DamageFilter仍走原链路。最终`OnTakeDamage.params.damage`决定白色普通字或橙色暴击字，技能与脚本伤害不得伪装为平A飘字。
 46. **科技研究必须在进度结束后原子提交等级和效果。** Begin阶段由服务端完成条件校验与原子扣费，只创建一次性事务，不改变等级、效果或发布完成事件；同一队伍在事务结束前只能存在一项研究。计时结束后以服务端`transaction_id`提交，提交异常必须恢复旧等级/效果并退款，重复或迟到回调不得二次升级。成功提示、等级事件和效果刷新只能发生在Commit成功后。Panorama只显示服务端研究进度，禁止用客户端倒计时决定升级；旧`technology_cooldown_*`字段仅作为兼容名称保留，其语义为研究进度而非购买后冷却。
 47. **Panorama HUD展示选择与Ability输入选择使用不同身份边界。** HUD属性链使用有效非占位portrait，即使敌方单位或树木不在`Players.GetSelectedEntities()`；技能、Builder、Grid和建筑移动只使用可控选择解析器。两条链可以共享底层工具，但不得共用一个会拒绝敌方query单位或允许敌方成为caster的最终解析结果。
+48. **攻击触发的装备范围效果以主攻击业务事件和战斗快照为权威。** 只响应`HERO_MAIN_ATTACK_LANDED`并防御性排除次级攻击；每次业务攻击按`attack_id`有界去重，不能永久保存可复用的裸record。按三维结算时必须在触发点读取`HERO_COMBAT_STATS_GET_REQUEST`，AoE中心由效果语义明确指定，逐目标进入统一伤害事务并检查结果。粒子和声音只提供一次性反馈，必须与权威范围查询和伤害隔离。
 
 ## 游戏行为决策
 

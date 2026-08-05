@@ -358,7 +358,7 @@ local function project_entry(player_id, entry, context)
         technology_cooldown_source_entry = context.technology_cooldown_source_entry or "",
         technology_cooldown_sequence = context.technology_cooldown_sequence or 0,
     }
-    if item.challenge_active == 1 then
+    if item.challenge_active == 1 and entry.contenttype == "challenge" then
         item.wood_cost = 0
         item.gold_cost = 0
     end
@@ -589,6 +589,10 @@ function M.build_snapshot(player_id, context)
         -- otherwise spending the last resources makes the incremental patch
         -- remove every unaffordable item and leaves the category visually empty.
         local include = item ~= nil
+        if item and entry.contenttype == "rebirth" then
+            include = (tonumber(entry.definition.rebirth_level) or 0)
+                == (tonumber(context.rebirth_level) or 0) + 1
+        end
         if item and include and allowed_for_mode then
             table.insert(projected, item)
         end

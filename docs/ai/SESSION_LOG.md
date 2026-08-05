@@ -2000,3 +2000,14 @@
 - 自动验证：`SELECTED_UNIT_STATS_REFRESH_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDER_HERO_REPLACEMENT_CONTRACT_PASS`、`SELECTED_UNIT_STATS_LUAC51_PASS`、严格UTF-8以及game/content限定`diff --check`通过。`ui_bootstrap.js`与`combat_stats.js`经Resource Compiler强制定向编译，各为`1 compiled, 0 failed, 0 skipped`。
 - 工作区保护：本轮只新增/修改HUD选择修复源码、两个对应`.vjs_c`、专项契约和AI文档；既有N3 CSV/Lua、其他Panorama编译产物、粒子产物和测试/日志修改均未触碰或回滚。
 - 尚未实机验证：完全停止并重新Run Workshop Tools，在英雄、两个属性明显不同的敌人和树木间快速切换，确认名称、生命、攻击、攻速、护甲实时对应当前portrait；选中敌人后按Q/W/E确认技能仍属于原可控单位。
+
+## 2026-08-05 - 传说：深渊审判焰爆被动修复与实机确认
+
+- 用户目标：深渊审判全部11阶在装备为主手武器时，每次有效主攻击有10%概率，以佩戴英雄为中心对500范围敌人造成逻辑力量、敏捷、智力总和×50魔法伤害，并有明确火焰爆炸反馈。
+- 调查确认配置、装备效果快照和服务初始化均正常，原实现缺陷集中在消费层：读取Dota原生三维、订阅同时包含次级攻击的`WEAPON_ATTACK_LANDED`、以受击目标为AoE中心且没有粒子/声音反馈。
+- `triggered_proc_service.lua`改为只订阅`HERO_MAIN_ATTACK_LANDED`，并防御性拒绝`is_main_attack=false`和`is_multishot_secondary=true`。每次业务攻击优先按攻击追踪器生成的`attack_id`去重；缓存限制为每玩家最近512次，兼顾同次事件去重、Dota record循环复用和长局内存边界。
+- 触发时通过`HERO_COMBAT_STATS_GET_REQUEST`读取同一权威逻辑三维快照，以英雄`GetAbsOrigin()`执行500范围查询。每个敌人分别提交`combat_events.DEAL_REQUEST`，保留魔法伤害、不可暴击和`equipment_proc`标签，并汇总成功数、失败数与`blocked_reason`。
+- 表现层在英雄位置播放已预缓存的术士`warlock_rain_of_chaos_explosion.vpcf`和`Hero_Warlock.RainOfChaos`，每次成功触发只创建一次。粒子和声音使用`pcall`隔离，不参与Lua权威命中与伤害判定。
+- 新增最多40条`[EQUIPMENT_FLAME_BURST]`诊断以及`test_weapon_legend_abyss_proc.lua`。专项覆盖11阶配置、佩戴/未佩戴、概率9通过与10失败、同次攻击去重、record复用、旧事件和次级攻击隔离、逻辑三维×50、英雄中心500范围、两目标魔法事务、部分事务失败及单次粒子/声音；`.gitignore`显式放行该测试。
+- 验证通过：`WEAPON_LEGEND_ABYSS_PROC_PASS`、全部7个`test_weapon_*.lua`、Lua 5.4语法、严格UTF-8、粒子预缓存及限定`git diff --check`。本机没有Lua 5.1，因此未宣称Lua 5.1验证；永久武器成长和11阶配置未修改。
+- 用户随后确认“没有问题”，本次引擎行为与表现视为实机验收完成，不再作为待验收任务恢复。长期维护规则已写入`PROJECT_CONTEXT.md`、`DECISIONS.md`和`START_HERE.md`。

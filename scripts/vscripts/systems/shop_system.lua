@@ -392,6 +392,7 @@ local function purchase(payload)
         return { ok = false, error = "金矿科技只能通过金矿技能升级" }
     end
     local team = player_team(player_id)
+    local active_rebirth = false
     if entry.contenttype == "rebirth"
         and entry.grant_type == "start_encounter" then
         local current = event_bus.request(
@@ -401,14 +402,10 @@ local function purchase(payload)
                 encounter_id = entry.encounter_id,
             }
         )
-        if current and current.ok and current.active then
-            return { ok = false, error = "该转生挑战正在进行中" }
-        end
+        active_rebirth = current and current.ok and current.active == true
     end
-    -- Re-entering an unfinished normal challenge only teleports the hero back
-    -- to its existing session. It must not charge the entrance fee again and
-    -- therefore runs before resource validation. Rebirth encounters retain
-    -- their one-completion flow.
+    -- Normal challenge sessions retain their existing free re-entry behavior.
+    -- Rebirth sessions use the paid, ownership-checked branch below.
     if entry.contenttype == "challenge"
         and entry.grant_type == "start_encounter" then
         local current = event_bus.request(
@@ -459,6 +456,50 @@ local function purchase(payload)
     )
     if not purchasable then
         return { ok = false, error = reason or "not_purchasable" }
+    end
+    if active_rebirth then
+        local spend = event_bus.request(
+            events.RESOURCE_TRY_SPEND_REQUEST,
+            {
+                team = team,
+                wood = entry.woodcost,
+                gold = entry.goldcost,
+                population = 0,
+                reason = "shop_rebirth_reentry:" .. entry.entryid,
+            }
+        )
+        if not spend or not spend.ok then
+            local result = spend or { ok = false, error = "resource_error" }
+            remember_result(player_id, request_id, result)
+            return result
+        end
+        local resumed = event_bus.request(
+            events.MONSTER_ENCOUNTER_REENTER_REQUEST,
+            {
+                player_id = player_id,
+                encounter_id = entry.encounter_id,
+            }
+        ) or { ok = false, error = "encounter_reentry_handler_missing" }
+        if not resumed.ok then
+            local refund = grant_service.refund(team, entry)
+            local result = {
+                ok = false,
+                error = resumed.error or "encounter_reentry_failed",
+                refunded = refund and refund.ok == true,
+            }
+            remember_result(player_id, request_id, result)
+            return result
+        end
+        notify(player_id, "已返回转职挑战：" .. catalog.content_name(entry))
+        push_snapshot(player_id, "rebirth_challenge_reentered")
+        local result = {
+            ok = true,
+            entry_id = entry.entryid,
+            grant_result = resumed,
+            rebirth_reentered = true,
+        }
+        remember_result(player_id, request_id, result)
+        return result
     end
     if entry.contenttype == "technology" and research_definition then
         local current_level = tonumber((state.technology_by_player[player_id]

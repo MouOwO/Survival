@@ -20,6 +20,21 @@ local function notify(player_id, message, level)
     })
 end
 
+local function follow_hero_camera(hero, player_id, position)
+    local player = PlayerResource:GetPlayer(player_id)
+    if not player then return end
+    CustomGameEventManager:Send_ServerToPlayer(
+        player,
+        "ui_camera_follow_hero",
+        {
+            entindex = hero:entindex(),
+            target_x = position.x,
+            target_y = position.y,
+            target_z = position.z,
+        }
+    )
+end
+
 local function position_is_clear(position, hero)
     if GridNav:IsBlocked(position) or not GridNav:IsTraversable(position) then
         return false
@@ -89,6 +104,8 @@ function M.return_unit(hero, player_id)
     ProjectileManager:ProjectileDodge(hero)
     hero:SetAbsOrigin(position)
     FindClearSpaceForUnit(hero, position, true)
+    position = hero:GetAbsOrigin()
+    follow_hero_camera(hero, player_id, position)
     notify(player_id, "已返回主城")
     return { ok = true, position = position }
 end

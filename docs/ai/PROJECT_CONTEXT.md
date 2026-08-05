@@ -7,6 +7,16 @@
 - `tools/import_n3_wave_workbook.py`保留旧N3默认入口，并通过`--difficulty N3|N4|N5`定向重写单一难度。导入必须从对应`N*波次总表`读取30波，保留属性、飞行和对齐证据到CSV备注，不直接修改生成Lua。
 - 难度选项由`config/difficulty_config.lua::client_options()`按N1-N5顺序发布。Panorama难度卡只显示`display_name`和`subtitle/total_waves`，不创建描述Label；当前固定为五格横向一排，每格228x72、间距12px、弹窗宽1280px。修改后必须强制定向编译`survival_ui.js`和`survival_hud.css`。
 
+## 深渊审判主攻击焰爆装备触发（2026-08-05）
+
+- 传说：深渊审判`weapon_legend_abyss_00`至`weapon_legend_abyss_10`的焰爆配置统一为主攻击命中时10%概率、佩戴英雄周围500范围、逻辑全属性总和×50魔法伤害。用户已确认当前实机行为没有问题，本任务完成；不得恢复为以受击目标为中心，也不得改回Dota原生`GetStrength/GetAgility/GetIntellect`。
+- 攻击触发边界使用`HERO_MAIN_ATTACK_LANDED`，而不是同时包含主攻击和次级攻击的兼容事件`WEAPON_ATTACK_LANDED`。上游攻击追踪器只为非次级攻击发布主攻击事件，消费服务仍必须防御性拒绝`is_main_attack=false`或`is_multishot_secondary=true`，保证多重攻击、分身次级箭和其他派生攻击不额外掷骰。
+- 每次有效主攻击只进行一次概率判定。去重优先使用攻击追踪器生成的`attack_id`，不能把裸Dota record当作整局唯一身份；record会循环复用。最近攻击去重集合必须有界，避免长局随攻击次数无限增长。
+- 按全属性结算的装备效果在触发时请求`HERO_COMBAT_STATS_GET_REQUEST`，从同一权威快照读取`strength/agility/intellect`并现场求和。该口径自然包含装备和永久成长；不得从引擎原生三维拼装，也不得提前缓存一份会落后于成长事件的属性值。
+- AoE中心是佩戴英雄触发瞬间的`GetAbsOrigin()`，范围查询只负责返回500内敌方英雄和普通单位；每个目标分别进入`combat_events.DEAL_REQUEST`，保持`DAMAGE_TYPE_MAGICAL`、`can_crit=false`和`equipment_proc`标签。调用方必须逐目标检查`result.success`并汇总`blocked_reason`，不能因部分事务失败而伪报全部成功。
+- 焰爆表现使用已预缓存的`warlock_rain_of_chaos_explosion.vpcf`和`Hero_Warlock.RainOfChaos`，在佩戴英雄位置每次成功触发只播放一次。粒子和声音通过`pcall`与权威伤害隔离；视觉失败不能阻断范围伤害，视觉粒子也不能承担命中判定。
+- 诊断使用有界`[EQUIPMENT_FLAME_BURST]`日志，包含玩家、record、装备阶段、三维、总属性、倍率、计算伤害、半径、目标数、成功数和失败原因。最小回归矩阵覆盖全部11阶配置、佩戴/未佩戴、概率通过/失败、同次攻击去重、record复用、旧事件与次级攻击隔离、权威属性公式、佩戴者中心500范围、逐目标魔法事务及单次粒子/声音。
+
 ## 击杀成长事件与UI权威进度（2026-08-05）
 
 - 极寒之刃`valid_enemy_kill_count`的唯一权威输入是`ENGINE_ENTITY_KILLED`。不得同时订阅派生`MONSTER_KILLED`后再用victim entindex做跨整局去重；Dota会在旧单位移除后复用entindex，新敌人的合法死亡会因此被永久忽略。用户已在Workshop Tools确认修复成功。
