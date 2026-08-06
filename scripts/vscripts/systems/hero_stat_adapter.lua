@@ -135,17 +135,12 @@ local function apply_resource_stats(unit, definition)
         "SetBaseHealthRegen"
     )
 
-    local mana = number(definition, "base_mana")
-    if mana and mana >= 0 then
-        safe_call(unit, "SetMaxMana", mana)
-        safe_call(unit, "SetMana", mana)
+    -- The configured mana standard is projected by a permanent modifier after
+    -- every native stat calculation. Keep native regeneration neutral so the
+    -- modifier can provide an exact, attribute-independent value.
+    if number(definition, "base_mana") ~= nil then
+        safe_call(unit, "SetBaseManaRegen", 0)
     end
-    set_if_present(
-        unit,
-        definition,
-        "base_mana_regen",
-        "SetBaseManaRegen"
-    )
 end
 
 local function apply_misc(unit, definition)
@@ -153,17 +148,6 @@ local function apply_misc(unit, definition)
 end
 
 local function apply_multipliers(unit, definition)
-    local mana = (number(definition, "max_mana_multiplier") or 1)
-        * global_rules.number("hero_meta_max_mana_multiplier", 1)
-    if mana ~= 1 then
-        local maximum = safe_get(unit, "GetMaxMana")
-        if maximum then
-            maximum = math.max(0, maximum * mana)
-            safe_call(unit, "SetMaxMana", maximum)
-            safe_call(unit, "SetMana", maximum)
-        end
-    end
-
     local move_bonus = (number(definition, "move_speed_bonus") or 0)
         + global_rules.number("hero_meta_move_speed_bonus", 0)
     if move_bonus ~= 0 then
@@ -172,6 +156,51 @@ local function apply_multipliers(unit, definition)
             safe_call(unit, "SetBaseMoveSpeed", base + move_bonus)
         end
     end
+end
+
+function M.configured_max_mana(definition)
+    local base = number(definition, "base_mana")
+    if not base or base < 0 then return nil end
+    local multiplier = number(definition, "max_mana_multiplier") or 1
+    return math.max(0, math.floor(base * multiplier))
+end
+
+function M.apply_configured_mana(unit, definition, fill_to_maximum)
+    local target = M.configured_max_mana(definition)
+    if target == nil or not unit or unit:IsNull() then return nil end
+
+    local modifier_name = "modifier_survival_hero_mana_standard"
+    local modifier = unit.FindModifierByName
+        and unit:FindModifierByName(modifier_name) or nil
+    local first_application = modifier == nil
+    local old_adjustment = modifier and modifier.GetManaAdjustment
+        and (tonumber(modifier:GetManaAdjustment()) or 0) or 0
+    local current_maximum = safe_get(unit, "GetMaxMana") or 0
+    local native_maximum = current_maximum - old_adjustment
+    local adjustment = target - native_maximum
+    local regeneration = math.max(
+        0,
+        number(definition, "base_mana_regen") or 0
+    )
+    local current_mana = math.max(0, safe_get(unit, "GetMana") or 0)
+
+    if not modifier then
+        modifier = unit:AddNewModifier(unit, nil, modifier_name, {
+            mana_adjustment = adjustment,
+            mana_regen = regeneration,
+        })
+    elseif modifier.SetManaStandard then
+        modifier:SetManaStandard(adjustment, regeneration)
+    end
+    safe_call(unit, "CalculateStatBonus", true)
+    safe_call(unit, "SetMana", fill_to_maximum == true and first_application
+        and target or math.min(current_mana, target))
+
+    unit.survival_base_max_mana = target
+    unit.survival_native_max_mana = native_maximum
+    unit.survival_mana_adjustment = adjustment
+    unit.survival_base_mana_regen = regeneration
+    return target, adjustment, native_maximum, regeneration
 end
 
 function M.configured_max_health(definition)
@@ -246,11 +275,13 @@ function M.apply(unit, definition)
     apply_multipliers(unit, definition)
     apply_level(unit, definition)
     local configured_health = M.apply_configured_health(unit, definition)
+    local configured_mana = M.apply_configured_mana(unit, definition, true)
 
     logger.info(
         "HeroStat",
         tostring(definition.hero_id) .. " data applied max_health="
             .. tostring(configured_health)
+            .. " max_mana=" .. tostring(configured_mana)
     )
 end
 

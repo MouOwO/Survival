@@ -11,6 +11,7 @@ local building_population = require("systems/building_population_service")
 local building_visual = require("systems/building_visual_service")
 local asset_preload = require("systems/asset_preload_service")
 local upgrade_process = require("systems/building_upgrade_process")
+local building_sound = require("systems/building_sound_service")
 
 local M = {}
 local buildings = {}
@@ -285,6 +286,15 @@ local function start_upgrade(state, target_data, target_level, on_complete, reas
     })
 end
 
+local function play_upgrade_sound(state, options)
+    options = options or {}
+    options.unit = state.unit
+    options.team = state.team
+    options.building_id = state.building_id
+    options.tower_class = state.tower_class
+    building_sound.upgrade_completed(options)
+end
+
 -- The upgrade system owns a runtime cache, while building_system owns the
 -- authoritative building state. A script reload or an early ability click can
 -- leave the cache empty even though the building is still valid.
@@ -413,6 +423,7 @@ local function upgrade_wall(state)
         apply_common(state.unit, data)
         apply_research_technology(state)
         publish(state, "wall_upgraded")
+        play_upgrade_sound(state)
     end, "wall")
 end
 
@@ -434,6 +445,7 @@ local function upgrade_city(state)
         )
         publish(state, "city_upgraded")
         refresh_team_farms(state.team)
+        play_upgrade_sound(state)
     end, "city")
 end
 
@@ -460,6 +472,7 @@ local function upgrade_farm(state)
         )
         refresh_farm_upgrade_ability(state)
         publish(state, "farm_upgraded")
+        play_upgrade_sound(state)
     end, "farm")
 end
 
@@ -564,6 +577,7 @@ local function upgrade_tower(state, mode)
             set_class_buttons(state.unit, true)
         end
         publish(state, "tower_upgraded_" .. tostring(mode or "one"))
+        play_upgrade_sound(state, { stage_changed = stage_changed })
     end, "tower_" .. tostring(mode or "one"))
 end
 
@@ -656,6 +670,7 @@ local function on_class_request(payload)
         end
         set_class_buttons(state.unit, false)
         publish(state, "tower_class_changed")
+        play_upgrade_sound(state, { class_changed = true })
     end, "tower_class")
     if not pending or not pending.ok then reject(pending and pending.error or "转职失败")
     else

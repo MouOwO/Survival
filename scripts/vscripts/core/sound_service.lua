@@ -1,5 +1,7 @@
 local definition_sources = {
+    require("config/generated/building_sound_definitions"),
     require("config/generated/hero_skill_sound_definitions"),
+    require("config/generated/tower_skill_sound_definitions"),
     require("config/generated/worker_sound_definitions"),
 }
 
@@ -47,17 +49,34 @@ end
 
 local function cue(cue_id)
     local row = (definitions.by_id or {})[tostring(cue_id or "")]
-    if not row or row.enabled == false or not row.sound_event
-        or row.sound_event == "" then return nil end
+    local has_events = row and ((row.sound_event and row.sound_event ~= "")
+        or (type(row.sound_events) == "table" and #row.sound_events > 0))
+    if not row or row.enabled == false or not has_events then return nil end
     return row
 end
 
-local function limiter_key(row, source)
-    return tostring(row.cooldown_group or row.cue_id) .. ":" .. entity_key(source)
+local function sound_events(row)
+    if type(row.sound_events) == "table" and #row.sound_events > 0 then
+        return row.sound_events
+    end
+    return { row.sound_event }
 end
 
-local function allowed(row, source, now)
-    local key = limiter_key(row, source)
+local function sound_resources(row)
+    if type(row.sound_resources) == "table" and #row.sound_resources > 0 then
+        return row.sound_resources
+    end
+    return { row.sound_resource }
+end
+
+local function limiter_key(row, source, limiter_scope)
+    local scope_key = limiter_scope ~= nil and tostring(limiter_scope)
+        or entity_key(source)
+    return tostring(row.cooldown_group or row.cue_id) .. ":" .. scope_key
+end
+
+local function allowed(row, source, now, limiter_scope)
+    local key = limiter_key(row, source, limiter_scope)
     local previous_window = play_windows[key]
     local previous_active = active_plays[key]
     local reservation = {
@@ -163,14 +182,20 @@ function M.play(cue_id, options)
     options = options or {}
     local source = options.source or options.unit
     local now = game_time()
-    local accepted, reservation = allowed(row, source, now)
+    local accepted, reservation = allowed(row, source, now, options.limiter_scope)
     if not accepted then return false, "limited" end
 
     local ok, played = pcall(function()
-        if row.attach_scope == "position" and options.position then
-            return emit_at_position(row.sound_event, options.position, source)
+        for _, sound_event in ipairs(sound_events(row)) do
+            local played
+            if row.attach_scope == "position" and options.position then
+                played = emit_at_position(sound_event, options.position, source)
+            else
+                played = emit_on_unit(sound_event, options.unit or source)
+            end
+            if not played then return false end
         end
-        return emit_on_unit(row.sound_event, options.unit or source)
+        return true
     end)
     if not ok or not played then
         -- Failed engine calls must not consume a cooldown in tests or during
@@ -233,11 +258,14 @@ function M.precache(context)
     local seen = {}
     local count = 0
     for _, row in ipairs(definitions.rows or {}) do
-        local resource = row.enabled ~= false and row.sound_resource or nil
-        if resource and resource ~= "" and not seen[resource] then
-            PrecacheResource("soundfile", resource, context)
-            seen[resource] = true
-            count = count + 1
+        if row.enabled ~= false then
+            for _, resource in ipairs(sound_resources(row)) do
+                if resource and resource ~= "" and not seen[resource] then
+                    PrecacheResource("soundfile", resource, context)
+                    seen[resource] = true
+                    count = count + 1
+                end
+            end
         end
     end
     return count

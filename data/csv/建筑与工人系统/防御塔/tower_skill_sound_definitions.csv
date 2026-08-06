@@ -1,0 +1,24 @@
+cue_id,skill_family,phase,sound_event,sound_resource,playback_mode,attach_scope,cooldown_group,cooldown_seconds,max_plays_per_window,window_seconds,enabled,notes,max_concurrent,concurrency_seconds
+#中文名:音效Cue ID,塔技能族,阶段,原生音效事件,音效资源文件,播放模式,挂载范围,冷却组,冷却秒数,窗口最大播放次数,窗口秒数,是否启用,备注,最大并发数,并发占位秒数
+#types:string,string,enum,string,string,enum,enum,string,number,number,number,boolean,string,number,number
+tower_critical_strike,critical_strike,impact,Hero_TemplarAssassin.Meld.Attack,soundevents/game_sounds_heroes/game_sounds_templar_assassin.vsndevts,oneshot,position,tower_death_critical,0.08,2,0.35,1,致命一击权威落地帧；本机原生事件已核验。,2,0.3
+tower_bone_cannon,bone_cannon,impact,Hero_Nevermore.Shadowraze,soundevents/game_sounds_heroes/game_sounds_nevermore.vsndevts,oneshot,position,tower_death_critical,0.08,2,0.35,1,骨炮十倍暴击落地帧；与普通致命一击共享密度组。,2,0.3
+tower_death_grenade,death_grenade,impact,Hero_Warlock.RainOfChaos,soundevents/game_sounds_heroes/game_sounds_warlock.vsndevts,oneshot,position,tower_death_grenade,0.15,1,0.5,1,整次死亡榴弹范围结算只播放一次。
+tower_laser,laser,persistent_start,Hero_Tinker.Laser,soundevents/game_sounds_heroes/game_sounds_tinker.vsndevts,oneshot,position,tower_mystery_laser,0.25,1,0.6,1,激光锁定新目标并建立持续伤害时播放。
+tower_arcane_cannon,arcane_cannon,impact,Hero_ObsidianDestroyer.ArcaneOrb.Impact,soundevents/game_sounds_heroes/game_sounds_obsidian_destroyer.vsndevts,oneshot,unit,tower_arcane_cannon,0.12,3,0.8,1,击杀增伤Buff成功提交后播放。,2,0.35
+tower_arcane_eye,arcane_eye,launch,Hero_KeeperOfTheLight.Illuminate.Discharge,soundevents/game_sounds_heroes/game_sounds_keeper_of_the_light.vsndevts,oneshot,unit,tower_arcane_eye,0.12,2,0.5,1,整条路径结算共享一次释放声。
+tower_lightning_strike,lightning_strike,launch,Hero_Zuus.ArcLightning.Cast,soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts,oneshot,position,tower_lightning_strike,0.1,2,0.4,1,整条连锁闪电只在首段建立时播放。,2,0.3
+tower_lightning_storm,lightning_storm,persistent_start,Hero_Disruptor.StaticStorm,soundevents/game_sounds_heroes/game_sounds_disruptor.vsndevts,oneshot,position,tower_lightning_storm,0.35,1,1,1,雷暴区域建立时播放；不按目标重复。
+tower_lightning_diffusion,lightning_diffusion,impact,Ability.PlasmaField,soundevents/game_sounds_heroes/game_sounds_razor.vsndevts,oneshot,position,tower_lightning_diffusion,0.12,2,0.5,1,扩散判定成功后整次范围结算播放一次。,2,0.4
+tower_machine_gun,machine_gun,persistent_start,,,,,tower_machine_gun,0,0,0,0,纯数值常驻被动；首版明确不添加额外技能声。
+tower_bounty_machine_gun,bounty_machine_gun,impact,Hero_BountyHunter.Jinada,soundevents/game_sounds_heroes/game_sounds_bounty_hunter.vsndevts,oneshot,unit,tower_bounty_machine_gun,0.1,3,0.6,1,金币资源请求成功后在目标处播放。,2,0.35
+tower_explosive_gatling,explosive_gatling,impact,Ability.Focusfire.Arcana,soundevents/game_sounds_heroes/game_sounds_windrunner.vsndevts,oneshot,unit,tower_explosive_gatling,0.2,2,0.8,1,五连击或击杀Buff成功提交后播放。
+tower_multi_attack,multi_attack,launch,Hero_Medusa.AttackSplit,soundevents/game_sounds_heroes/game_sounds_medusa.vsndevts,oneshot,unit,tower_multi_attack,0.1,3,0.6,1,一次分裂箭批次共享一次发射声。,2,0.3
+tower_piercing_ballista,piercing_ballista,hit,Hero_DrowRanger.FrostArrows,soundevents/game_sounds_heroes/game_sounds_drowranger.vsndevts,oneshot,unit,tower_piercing_ballista,0.1,3,0.6,1,攻击开始时减甲请求提交后播放。,2,0.3
+tower_burning_great_arrow,burning_great_arrow,launch,Hero_VengefulSpirit.WaveOfTerror,soundevents/game_sounds_heroes/game_sounds_vengefulspirit.vsndevts,oneshot,unit,tower_burning_great_arrow,0.15,2,0.6,1,穿透直线投射物创建后播放。
+tower_frost_attack,frost_attack,impact,Ability.FrostNova,soundevents/game_sounds_heroes/game_sounds_lich.vsndevts,oneshot,position,tower_frost_attack,0.1,3,0.6,1,整次冰霜范围伤害和减速结算播放一次。,2,0.35
+tower_ice_blizzard,ice_blizzard,persistent_start,Hero_Crystal.FreezingField.Arcana,soundevents/game_sounds_heroes/game_sounds_crystalmaiden.vsndevts,oneshot,position,tower_ice_blizzard,0.4,1,1,1,暴风雪区域建立时播放；不逐目标发声。
+tower_polar_obelisk,polar_obelisk,persistent_start,Hero_Ancient_Apparition.IceVortexCast,soundevents/game_sounds_heroes/game_sounds_ancient_apparition.vsndevts,oneshot,unit,tower_polar_obelisk,0.5,1,1,1,光环从未激活切换为激活时播放；高频同步不重复。
+tower_magic_finger,magic_finger,impact,Hero_Lion.FingerOfDeath,soundevents/game_sounds_heroes/game_sounds_lion.vsndevts,oneshot,position,tower_magic_finger,0.1,2,0.5,1,死亡一指触发并提交魔法伤害时播放。,2,0.35
+tower_magic_laguna,magic_laguna,impact,Ability.LagunaBlade,soundevents/game_sounds_heroes/game_sounds_lina.vsndevts,oneshot,position,tower_magic_laguna,0.1,2,0.5,1,神灭斩触发并提交魔法伤害时播放。,2,0.35
+tower_arcane_supremacy,arcane_supremacy,impact,Hero_Rubick.FadeBolt.Cast,soundevents/game_sounds_heroes/game_sounds_rubick.vsndevts,oneshot,position,tower_arcane_supremacy,0.1,3,0.6,1,奥术至尊每次权威追加伤害播放；受窗口和并发限流。,2,0.3

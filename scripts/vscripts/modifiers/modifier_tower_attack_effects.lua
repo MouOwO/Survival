@@ -14,6 +14,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local buff_manager = require("systems/buff_manager")
 local asset_catalog = require("config/asset_catalog")
+local sound_service = require("core/sound_service")
 
 local MULTI_DAMAGE_MULTIPLIER = 1.00
 local LIGHTNING_BOUNCE_RADIUS = 200
@@ -77,6 +78,14 @@ local function play_follow_particle(owner, particle_name)
     )
     ParticleManager:ReleaseParticleIndex(particle)
     return particle
+end
+
+local function play_tower_sound(cue_id, tower, unit, position)
+    sound_service.play(cue_id, {
+        source = tower,
+        unit = unit or tower,
+        position = position,
+    })
 end
 
 local function skill_matching(unit, prefix)
@@ -150,10 +159,12 @@ function modifier_tower_attack_effects:OnCreated()
     self.current_attack_target = nil
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
+    self.polar_obelisk_sound_active = false
     self:StartIntervalThink(0.03)
 end
 
-local function sync_polar_obelisk_aura(tower)
+local function sync_polar_obelisk_aura(tower, state)
+    state = state or tower
     local skill = skill_matching(tower, "polar_obelisk_")
     if skill then
         local configured = skill.area
@@ -162,8 +173,13 @@ local function sync_polar_obelisk_aura(tower)
             tower, skill.buff_id,
             math.max(1, tonumber(configured) or 400)
         )
+        if not state.polar_obelisk_sound_active then
+            play_tower_sound("tower_polar_obelisk", tower, tower)
+            state.polar_obelisk_sound_active = true
+        end
     else
         buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
+        state.polar_obelisk_sound_active = false
     end
 end
 
@@ -183,6 +199,7 @@ local function trigger_gatling_buff(tower, skill, reason)
             "particles/units/heroes/hero_windrunner/windrunner_focusfire_start.vpcf",
             MACHINE_GUN_ASSET_IDS.gatling
         ))
+        play_tower_sound("tower_explosive_gatling", tower, tower)
     end
     print(string.format(
         "[TowerMachineGun] GATLING_BUFF tower=%d reason=%s bonus_pct=%.0f duration=%.1f",
@@ -231,6 +248,9 @@ function modifier_tower_attack_effects:OnDeath(params)
         value = (tonumber(skill.damage_multiplier) or 0) * 100,
         max_stacks = max_stacks,
     })
+    if modifier then
+        play_tower_sound("tower_arcane_cannon", tower, tower)
+    end
     print(string.format(
         "[TowerMystery] KILL_BUFF tower=%d stacks=%d duration=%.1f",
         tower:entindex(), modifier and modifier:GetStackCount() or 0, duration
@@ -384,6 +404,7 @@ local function trigger_frost_attack(caster, primary, skill, damage)
         "tower_frost_lich_rime_lord"
     )
     frost_impact_particle(caster, position, radius, particle_name)
+    play_tower_sound("tower_frost_attack", caster, primary, position)
     local hit_count = 0
     for _, target in ipairs(enemies_in_radius(caster, position, radius)) do
         if valid(target) then
@@ -460,6 +481,7 @@ local function start_blizzard(caster, position, skill)
     local snow = blizzard_particle(
         caster, position, radius, snow_particle_name
     )
+    play_tower_sound("tower_ice_blizzard", caster, caster, position)
     local tick = 0
     print(string.format(
         "[TowerBlizzard] START tower=%d instance=%s radius=%.0f duration=%.1f interval=%.1f damage=%.1f",
@@ -603,6 +625,7 @@ start_lightning_storm = function(caster, position, skill)
     local cloud = storm_cloud_particle(
         caster, position, radius, duration, cloud_particle_name
     )
+    play_tower_sound("tower_lightning_storm", caster, caster, position)
     print(string.format(
         "[TowerLightningStorm] START tower=%d instance=%s radius=%.0f duration=%.1f interval=%.1f multiplier=%.2f damage=%.1f",
         caster:entindex(), instance_id, radius, duration, interval,
@@ -776,12 +799,15 @@ local function start_laser(self, target, effect)
     self.laser_target = target
     self.laser_ticks = 0
     create_laser_segment(self, effect, GameRules:GetGameTime())
+    play_tower_sound(
+        "tower_laser", self:GetParent(), target, target:GetAbsOrigin()
+    )
 end
 
 function modifier_tower_attack_effects:OnIntervalThink()
     if not IsServer() then return end
     local caster = self:GetParent()
-    sync_polar_obelisk_aura(caster)
+    sync_polar_obelisk_aura(caster, self)
     local now = GameRules:GetGameTime()
     local elapsed = math.max(0, now - (self.last_interval_time or now))
     self.last_interval_time = now
@@ -902,6 +928,9 @@ function modifier_tower_attack_effects:OnAttack(params)
             count = count + 1
         end
     end
+    if count > 1 then
+        play_tower_sound("tower_multi_attack", caster, caster)
+    end
     print(string.format(
         "[TowerMulti] FIRE tower=%d primary=%d targets=%d max_targets=%d",
         caster:entindex(), primary:entindex(), count, max_targets
@@ -966,6 +995,9 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
                     "particles/units/heroes/hero_bounty_hunter/bounty_hunter_cutpurse.vpcf",
                     MACHINE_GUN_ASSET_IDS.bounty
                 ))
+                play_tower_sound(
+                    "tower_bounty_machine_gun", caster, primary
+                )
             end
             print(string.format(
                 "[TowerMachineGun] BOUNTY tower=%d target=%d gold=%.0f",
@@ -1009,6 +1041,9 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
             caster, caster, primary,
             caster:GetAbsOrigin(), primary_position, particle_name
         )
+        play_tower_sound(
+            "tower_lightning_strike", caster, primary, primary_position
+        )
         event_bus.emit(events.TOWER_LIGHTNING_HIT, {
             tower = caster,
             target = primary,
@@ -1036,6 +1071,7 @@ function modifier_tower_attack_effects:OnDestroy()
     local tower = self:GetParent()
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
+    self.polar_obelisk_sound_active = false
 end
 
 function modifier_tower_attack_effects:ResetAfterRelocation()
@@ -1043,6 +1079,7 @@ function modifier_tower_attack_effects:ResetAfterRelocation()
     local tower = self:GetParent()
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
+    self.polar_obelisk_sound_active = false
     self.gatling_target_entindex = nil
     self.gatling_target_hits = 0
     self.current_attack_target = nil

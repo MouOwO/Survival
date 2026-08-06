@@ -11,6 +11,8 @@ local asset_preload = require("systems/asset_preload_service")
 local difficulty_config = require("config/difficulty_config")
 local wave_difficulty_builder = require("systems/wave_difficulty_builder")
 local wave_timing_config = require("config/wave_timing_config")
+local monster_visual_config = require("config/monster_visual_config")
+local monster_visual_service = require("systems/monster_visual_service")
 
 local M = {}
 local state = {}
@@ -42,6 +44,10 @@ local function queue_wave_assets(number)
             seen[model_path] = true
         end
     end
+    monster_visual_service.queue_wave(number, {
+        urgent = true,
+        priority = 3000 - (tonumber(number) or 0),
+    })
 end
 
 local function valid(entity)
@@ -216,7 +222,7 @@ local function apply_stats(unit, row, definition)
     end
 end
 
-local function spawn_one(row, token)
+local function spawn_one(row, token, wave_number, normal_instance_index)
     if token ~= generation_token then return end
     state.pending = math.max(0, state.pending - 1)
     local definition = archetypes.by_id[row.archetype_id]
@@ -245,6 +251,14 @@ local function spawn_one(row, token)
     end
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     apply_stats(unit, row, definition)
+    local resolved_visual = monster_visual_config.resolve(
+        wave_number,
+        row.member_role or "normal",
+        normal_instance_index
+    )
+    if resolved_visual then
+        pcall(monster_visual_service.apply, unit, resolved_visual)
+    end
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", { wall_entindex = wall_entindex })
     local is_assault_boss = row.member_role == "assault_boss"
         or (row.member_role == nil and row.is_boss == true)
@@ -253,6 +267,12 @@ local function spawn_one(row, token)
     state.alive = state.alive + 1
     if is_assault_boss then state.boss_alive = true end
     publish("enemy_spawned")
+end
+
+local function spawn_callback(row, token, wave_number, normal_instance_index)
+    return function()
+        spawn_one(row, token, wave_number, normal_instance_index)
+    end
 end
 
 local function start_countdown(seconds)
@@ -285,13 +305,25 @@ local function start_wave(number, reason)
     publish(reason or "wave_started")
     if number < state.total_waves then
         start_countdown(wave_timing_config.interval_after_wave(number))
+        queue_wave_assets(number + 1)
     end
     local next_delay, last_delay = 0, 0
+    local normal_instance_index = 0
     for _, row in ipairs(wave.batches) do
         for _ = 1, (row.monster_count or 0) do
+            local visual_instance_index = nil
+            if row.member_role == nil or row.member_role == "normal" then
+                normal_instance_index = normal_instance_index + 1
+                visual_instance_index = normal_instance_index
+            end
             local delay = next_delay
             last_delay = delay
-            scheduler.after(delay, function() spawn_one(row, token) end)
+            scheduler.after(delay, spawn_callback(
+                row,
+                token,
+                number,
+                visual_instance_index
+            ))
             next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
         end
     end
@@ -335,6 +367,7 @@ local function on_killed(payload)
     local entindex = victim:entindex()
     local meta = enemies[entindex]
     if not meta then return end
+    monster_visual_service.cleanup(victim)
     enemies[entindex] = nil
     state.alive = math.max(0, state.alive - 1)
     state.killed = state.killed + 1
@@ -353,6 +386,7 @@ local function clear_normal_wave_enemies()
         local unit = meta and meta.unit
         if valid(unit) then
             unit.survival_wave_cleanup = true
+            monster_visual_service.cleanup(unit)
             UTIL_Remove(unit)
             removed = removed + 1
         end
@@ -444,11 +478,22 @@ function M.debug_spawn_wave(number)
     for _, row in ipairs(wave.batches) do state.planned = state.planned + (row.monster_count or 0) end
     state.pending = state.planned
     local sequence = 0
+    local normal_instance_index = 0
     for _, row in ipairs(wave.batches) do
         for _ = 1, (row.monster_count or 0) do
+            local visual_instance_index = nil
+            if row.member_role == nil or row.member_role == "normal" then
+                normal_instance_index = normal_instance_index + 1
+                visual_instance_index = normal_instance_index
+            end
             local delay = sequence * (row.spawn_interval or 1.0)
             sequence = sequence + 1
-            scheduler.after(delay, function() spawn_one(row, token) end)
+            scheduler.after(delay, spawn_callback(
+                row,
+                token,
+                number,
+                visual_instance_index
+            ))
         end
     end
     scheduler.after(math.max(0, (sequence - 1) * 1.0) + 0.05, function()

@@ -13,6 +13,10 @@ local grid_config = require("config/grid_config")
 local grid_placement_config = require("config/grid_placement_config")
 local building_population = require("systems/building_population_service")
 local building_visual = require("systems/building_visual_service")
+local building_sound = require("systems/building_sound_service")
+local construction_visual = require(
+    "systems/building_construction_visual_service"
+)
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
@@ -485,15 +489,10 @@ local function start_building(payload)
     local build_time = math.max(0.1, tonumber(check.definition.build_time) or 3)
     local started_at = GameRules:GetGameTime()
     unit:SetHealth(1)
-    local particle = nil
-    if check.definition.build_particle
-        and check.definition.build_particle ~= "" then
-        particle = ParticleManager:CreateParticle(
-            check.definition.build_particle,
-            PATTACH_ABSORIGIN_FOLLOW,
-            unit
-        )
-    end
+    local construction_visual_state = construction_visual.start(
+        unit,
+        check.definition
+    )
     if valid_entity(payload.caster) then
         payload.caster:StartGesture(ACT_DOTA_ATTACK)
         if payload.caster.survival_build_task == payload.build_task then
@@ -502,10 +501,7 @@ local function start_building(payload)
     end
     scheduler.every(0.1, function()
         if not valid_entity(unit) then
-            if particle then
-                ParticleManager:DestroyParticle(particle, false)
-                ParticleManager:ReleaseParticleIndex(particle)
-            end
+            construction_visual.cancel(construction_visual_state)
             change_count(check.team, check.definition.id, -1)
             event_bus.request(events.GRID_RELEASE_REQUEST, {
                 grid_x = state.grid_x,
@@ -521,10 +517,11 @@ local function start_building(payload)
         unit:SetHealth(math.max(1, math.floor(maximum_health * progress)))
         if progress < 1 then return true end
 
-        if particle then
-            ParticleManager:DestroyParticle(particle, false)
-            ParticleManager:ReleaseParticleIndex(particle)
-        end
+        construction_visual.complete(
+            construction_visual_state,
+            unit,
+            check.definition
+        )
         unit:RemoveModifierByName("modifier_building_under_construction")
         -- Restore construction-disabled abilities before applying optional
         -- completion visuals. Arrow towers use pre_class_levels rather than
@@ -581,9 +578,11 @@ local function start_building(payload)
         )
         data.reason = "created"
         event_bus.emit(events.BUILDING_CHANGED, data)
+        building_sound.construction_completed(unit, state.team)
         notify(state.player_id, state.definition.display_name .. "已建造")
         return false
     end, "construct_building_" .. tostring(unit:entindex()))
+    building_sound.construction_started(unit, check.team)
     notify(check.player_id, check.definition.display_name .. "开始建造")
     return {
         ok = true,
@@ -738,6 +737,7 @@ end
 local function on_entity_killed(payload)
     local victim = payload.victim
     if not valid_entity(victim) then return end
+    construction_visual.cancel(victim)
     local state = buildings[victim:entindex()]
     if not state then return end
     building_visual.clear(victim)
@@ -808,6 +808,7 @@ end
 
 function M.init()
     modifier_registry.register()
+    construction_visual.reset()
     buildings = {}
     counts = {}
     wall_ever_built = {}

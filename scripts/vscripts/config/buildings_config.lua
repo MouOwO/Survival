@@ -46,6 +46,10 @@ local function apply_construction(definition, source_id)
     definition.build_time = tonumber(row.build_time) or 3
     definition.build_particle = row.build_particle
         or "particles/items_fx/repair_kit.vpcf"
+    definition.build_start_particle = row.build_start_particle
+    definition.build_loop_particle = row.build_loop_particle
+        or definition.build_particle
+    definition.build_visual_scale = tonumber(row.build_visual_scale) or 1
     definition.build_cast_range = tonumber(row.build_cast_range) or 200
     return definition
 end

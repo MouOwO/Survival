@@ -11,8 +11,16 @@ CSV_ROOT = ROOT / "data" / "csv"
 OUT_ROOT = ROOT / "scripts" / "vscripts" / "config" / "generated"
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 SOUND_OWNER_FIELDS = {
+    "building_sound_definitions.csv": "building_scope",
     "hero_skill_sound_definitions.csv": "skill_id",
+    "tower_skill_sound_definitions.csv": "skill_family",
     "worker_sound_definitions.csv": "worker_id",
+}
+MONSTER_VISUAL_FILES = {
+    "monster_visual_assets.csv",
+    "monster_visual_components.csv",
+    "monster_visual_effects.csv",
+    "wave_visual_definitions.csv",
 }
 
 # These CSVs preserve values extracted from the original War3 map. Generated
@@ -78,7 +86,7 @@ def validate_sound_definitions(
     if owner_field is None:
         return
     required = {
-        "cue_id", owner_field, "phase", "sound_event", "sound_resource",
+        "cue_id", owner_field, "phase",
         "playback_mode", "attach_scope", "cooldown_seconds",
         "max_plays_per_window", "window_seconds", "max_concurrent",
         "concurrency_seconds",
@@ -86,9 +94,16 @@ def validate_sound_definitions(
     missing = sorted(required.difference(headers))
     if missing:
         raise ValueError(f"sound config missing columns {missing}: {source}")
+    event_fields = {"sound_event", "sound_events"}.intersection(headers)
+    resource_fields = {"sound_resource", "sound_resources"}.intersection(headers)
+    if not event_fields or not resource_fields:
+        raise ValueError(
+            f"sound config requires event and resource columns: {source}"
+        )
     phases = {
         "cast", "launch", "hit", "impact", "persistent_start",
-        "persistent_end", "spawn_secondary",
+        "persistent_end", "spawn_secondary", "construction_start",
+        "construction_complete", "upgrade_complete",
     }
     playback_modes = {"oneshot", "loop"}
     attach_scopes = {"unit", "position"}
@@ -102,12 +117,41 @@ def validate_sound_definitions(
                 f" {source} line {row_number}"
             )
         seen.add(cue_id)
-        for key in (owner_field, "sound_event", "sound_resource"):
+        for key in (owner_field,):
             if not row[key].strip():
                 raise ValueError(
                     f"sound cue {cue_id} requires {key}:"
                     f" {source} line {row_number}"
                 )
+        # Runtime rows default to enabled when the optional boolean cell is
+        # blank; only explicit false-like values disable a cue.
+        enabled = row.get("enabled", "").strip().lower() \
+            not in {"0", "false", "no", "n", "off"}
+        configured_events = [row[key].strip() for key in event_fields if row[key].strip()]
+        configured_resources = [
+            row[key].strip() for key in resource_fields if row[key].strip()
+        ]
+        if enabled:
+            if not configured_events or not configured_resources:
+                raise ValueError(
+                    f"enabled sound cue {cue_id} requires events and resources:"
+                    f" {source} line {row_number}"
+                )
+            if "sound_events" in row and "sound_resources" in row:
+                events = [part.strip() for part in re.split(r"[|,]", row["sound_events"])
+                          if part.strip()]
+                resources = [part.strip() for part in re.split(r"[|,]", row["sound_resources"])
+                             if part.strip()]
+                if events and len(events) != len(resources):
+                    raise ValueError(
+                        f"sound cue {cue_id} layer event/resource counts differ:"
+                        f" {source} line {row_number}"
+                    )
+        elif not configured_events and not configured_resources:
+            # Disabled policy rows may intentionally document that a family
+            # has no sound. Lifecycle fields are irrelevant when no event can
+            # be resolved by the runtime service.
+            continue
         for key, allowed in (
             ("phase", phases),
             ("playback_mode", playback_modes),
@@ -163,6 +207,85 @@ def validate_sound_cue_uniqueness(sources: list[Path]) -> None:
                     f" {source} line {row_number}"
                 )
             seen[cue_id] = (source, row_number)
+
+
+def read_data_rows(source: Path) -> list[dict[str, str]]:
+    with source.open("r", encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.reader(handle))
+    if not rows:
+        return []
+    headers = rows[0]
+    return [
+        dict(zip(headers, fields))
+        for fields in rows[1:]
+        if fields and fields[0].strip()
+        and not fields[0].strip().startswith("#")
+    ]
+
+
+def validate_monster_visual_definitions(sources: list[Path]) -> None:
+    by_name = {source.name: source for source in sources}
+    if not MONSTER_VISUAL_FILES.issubset(by_name):
+        missing = sorted(MONSTER_VISUAL_FILES.difference(by_name))
+        raise ValueError(f"monster visual config missing files: {missing}")
+
+    assets = read_data_rows(by_name["monster_visual_assets.csv"])
+    asset_ids: set[str] = set()
+    for row in assets:
+        asset_id = row.get("visual_asset_id", "").strip()
+        if not asset_id or asset_id in asset_ids:
+            raise ValueError(f"invalid or duplicate monster visual asset: {asset_id!r}")
+        asset_ids.add(asset_id)
+        if not row.get("model_path", "").strip():
+            raise ValueError(f"monster visual asset requires model_path: {asset_id}")
+        if not row.get("async_unit_name", "").strip():
+            raise ValueError(f"monster visual asset requires async_unit_name: {asset_id}")
+    for row in assets:
+        fallback_id = row.get("fallback_visual_asset_id", "").strip()
+        if fallback_id and fallback_id not in asset_ids:
+            raise ValueError(f"monster visual fallback not found: {fallback_id}")
+
+    for filename, id_field, resource_field in (
+        ("monster_visual_components.csv", "component_id", "model_path"),
+        ("monster_visual_effects.csv", "effect_id", "particle_path"),
+    ):
+        seen: set[str] = set()
+        for row in read_data_rows(by_name[filename]):
+            row_id = row.get(id_field, "").strip()
+            asset_id = row.get("visual_asset_id", "").strip()
+            if not row_id or row_id in seen:
+                raise ValueError(f"invalid or duplicate {id_field}: {row_id!r}")
+            seen.add(row_id)
+            if asset_id not in asset_ids:
+                raise ValueError(f"{id_field} references missing visual asset: {asset_id}")
+            if not row.get(resource_field, "").strip():
+                raise ValueError(f"{id_field} requires {resource_field}: {row_id}")
+            if filename == "monster_visual_effects.csv":
+                limit = float(row.get("max_per_unit", "0") or 0)
+                if limit < 0:
+                    raise ValueError(f"effect has negative max_per_unit: {row_id}")
+
+    seen_waves: set[int] = set()
+    role_fields = (
+        "main_visual_asset_id", "support_visual_asset_id",
+        "mini_boss_visual_asset_id", "stage_boss_visual_asset_id",
+    )
+    for row in read_data_rows(by_name["wave_visual_definitions.csv"]):
+        wave_number = int(row.get("wave_number", "0") or 0)
+        if wave_number < 1 or wave_number > 30 or wave_number in seen_waves:
+            raise ValueError(f"invalid or duplicate monster visual wave: {wave_number}")
+        seen_waves.add(wave_number)
+        if not row.get("main_visual_asset_id", "").strip():
+            raise ValueError(f"wave visual requires main asset: {wave_number}")
+        for field in role_fields:
+            asset_id = row.get(field, "").strip()
+            if asset_id and asset_id not in asset_ids:
+                raise ValueError(
+                    f"wave {wave_number} {field} references missing asset: {asset_id}"
+                )
+        support_every = float(row.get("support_every_nth", "0") or 0)
+        if support_every < 0 or not support_every.is_integer():
+            raise ValueError(f"wave has invalid support_every_nth: {wave_number}")
 
 
 def build(source: Path, output: Path) -> None:
@@ -271,6 +394,7 @@ def main() -> int:
         print(f"ERROR: no CSV files under {CSV_ROOT}", file=sys.stderr)
         return 11
     validate_sound_cue_uniqueness(files)
+    validate_monster_visual_definitions(files)
 
     tooltip_builder = ROOT / "tools" / "build_tooltip_definitions.py"
     tooltip_built_separately = False

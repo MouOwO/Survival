@@ -63,6 +63,9 @@ local seven_sins_essences = require("config/seven_sins_essences")
 local grid_system = require("systems/grid_placement_system")
 local resource_system = require("systems/resource_system")
 local building_system = require("systems/building_system")
+local building_construction_visual = require(
+    "systems/building_construction_visual_service"
+)
 local building_upgrade_system = require("systems/building_upgrade_system")
 local tower_skill_effect_adapter = require("systems/tower_skill_effect_adapter")
 local tower_special_skill_system = require("systems/tower_special_skill_system")
@@ -97,6 +100,7 @@ local monster_reward_service =
 local monster_spawn_service =
     require("systems/monster_spawn_service")
 local asset_preload_service = require("systems/asset_preload_service")
+local monster_visual_service = require("systems/monster_visual_service")
 local unit_health_bar_service = require("systems/unit_health_bar_service")
 local challenge_session_service =
     require("systems/challenge_session_service")
@@ -166,6 +170,7 @@ require("abilities/ability_build_research_lab")
 require("abilities/ability_build_farm")
 require("abilities/ability_building_blink")
 require("abilities/ability_survival_builder_blink")
+require("abilities/ability_survival_hero_ball_lightning")
 require("abilities/ability_build_gold_mine")
 require("abilities/ability_build_hero_altar")
 require("abilities/ability_summon_doom")
@@ -463,6 +468,8 @@ function M.precache(context)
     -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
     tower_magic_supreme_system.precache(context)
     sound_service.precache(context)
+    building_construction_visual.precache(context)
+    monster_visual_service.precache_range(context, 1, 5)
     PrecacheResource(
         "particle",
         "particles/items_fx/blink_dagger_start.vpcf",
@@ -525,6 +532,16 @@ function M.precache(context)
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning.vpcf",
+        context
+    )
+    PrecacheResource(
+        "soundfile",
+        "soundevents/game_sounds_heroes/game_sounds_stormspirit.vsndevts",
         context
     )
     PrecacheResource(

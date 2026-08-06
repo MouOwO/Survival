@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local config = require("config/gold_mine_config")
 local building_visual = require("systems/building_visual_service")
 local upgrade_process = require("systems/building_upgrade_process")
+local building_sound = require("systems/building_sound_service")
 
 local M = {}
 local state_by_entindex = {}
@@ -270,6 +271,11 @@ upgrade_mine = function(payload)
                 player_id = state.player_id,
                 message = "金矿升级完成",
                 level = "info",
+            })
+            building_sound.upgrade_completed({
+                unit = state.unit,
+                team = state.team,
+                building_id = "gold_mine",
             })
         end,
         on_cancel = function() publish(state) end,

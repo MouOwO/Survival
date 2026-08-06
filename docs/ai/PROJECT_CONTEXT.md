@@ -1,5 +1,13 @@
 # Project Context
 
+## 第1-5波怪物视觉系统边界（2026-08-06）
+
+- 波次怪物视觉权威源是`monster_visual_assets.csv`、`monster_visual_components.csv`、`monster_visual_effects.csv`和`wave_visual_definitions.csv`；历史`asset_catalog.csv`不承担这套新视觉业务。当前只覆盖W1-W5，11个自包含模型均由本机`pak01_dir.vpk`验证。
+- 视觉按实际生成实例的`wave_number + member_role + normal_index`解析。`normal`按可配置确定性周期选择主力/辅助；`wave_leader`只映射实际领头成员的小Boss视觉；`assault_boss`映射阶段Boss并回退小Boss。视觉表不得创建成员、Boss或改变角色、数量、战斗、移动、攻击、计时字段。
+- W4/W5辅助候选已配置，但普通怪主辅分布尚未获批，因此`support_every_nth=0`是当前生产边界；不得擅自恢复曾讨论的4:1。Hellbear与Smasher当前共享同一完整模型，只通过0.95/1.35缩放区分；W5阶段Boss使用1.75的Spirit Bear。
+- 启动阶段通过`PrecacheResource`预载W1-W5全部视觉资源；每个独立模型在`npc_units_custom.txt`有resource-only代理，运行期下一波可通过`PrecacheUnitByNameAsync`幂等排队。附件和持续粒子必须按单位生命周期记录，重新应用、死亡和提前终局清理时立即销毁/释放；单单位粒子硬上限当前为2。
+- 视觉解析或应用失败不得阻断怪物生成。运行边界保留原型模型作为最终回退，`wave_definitions.csv`与`monster_archetypes.csv`继续作为数量和战斗权威，不得为了视觉修改。
+
 ## 箭塔建造与升级成本权威边界（2026-08-05）
 
 - 箭塔建造、基础升级、转职和七条路线升级的金币/木材权威源是`data/csv/建筑与工人系统/防御塔/`下的`arrow_tower_base.csv`和七份`tower_class_*.csv`。`upgrade_gold/upgrade_wood`表示升到该行等级实际支付的资源；基础箭塔首级行同时表示建造成本，当前为0金币、50木材。

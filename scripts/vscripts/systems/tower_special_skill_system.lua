@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local geometry = require("systems/tower_skill_geometry")
+local sound_service = require("core/sound_service")
 
 local M = {}
 local death_state = {}
@@ -72,6 +73,14 @@ local function play_world_particle(tower, position, particle_path)
     )
     ParticleManager:SetParticleControl(particle, 0, position)
     ParticleManager:ReleaseParticleIndex(particle)
+end
+
+local function play_tower_sound(cue_id, tower, unit, position)
+    sound_service.play(cue_id, {
+        source = tower,
+        unit = unit or tower,
+        position = position,
+    })
 end
 
 local function diffusion_particle_path(skill)
@@ -159,7 +168,7 @@ local function on_attack_start(payload)
     if not valid(tower) or not valid(target) then return end
     local piercing = skill_matching(payload.skills, "piercing_ballista_")
     if piercing and owns_ability(tower, piercing) and piercing.buff_id then
-        event_bus.request(events.TOWER_SKILL_BUFF_REQUEST, {
+        local modifier = event_bus.request(events.TOWER_SKILL_BUFF_REQUEST, {
             caster = tower,
             target = target,
             buff_id = piercing.buff_id,
@@ -170,6 +179,9 @@ local function on_attack_start(payload)
                 ),
             },
         })
+        if modifier then
+            play_tower_sound("tower_piercing_ballista", tower, target)
+        end
     end
 end
 
@@ -188,6 +200,15 @@ end
 local function trigger_death_critical_particle(payload)
     if not payload.critical then return end
     local source = tostring(payload.critical_source or "")
+    local sound_cue = source == "bone_cannon" and "tower_bone_cannon"
+        or source == "critical_strike" and "tower_critical_strike"
+        or nil
+    if sound_cue then
+        play_tower_sound(
+            sound_cue, payload.tower, payload.target,
+            payload.target:GetAbsOrigin()
+        )
+    end
     local asset_id = DEATH_CRITICAL_ASSET_IDS[source]
     if not asset_id then return end
     local skill = skill_matching(payload.skills, "bone_cannon_")
@@ -196,6 +217,9 @@ local function trigger_death_critical_particle(payload)
         payload.tower,
         payload.target:GetAbsOrigin(),
         skill_effect_particle(skill, "skill_strike", asset_id)
+    )
+    play_tower_sound(
+        "tower_death_grenade", payload.tower, payload.target, position
     )
 end
 
@@ -291,6 +315,7 @@ local function launch_burning_wave(payload, skill, fallback_width)
             burning_wave_id = wave_id,
         },
     })
+    play_tower_sound("tower_burning_great_arrow", tower, tower)
 
     local task_id = "burning_great_arrow_cleanup_"
         .. tostring(tower_entindex) .. "_" .. tostring(wave_id)
@@ -369,6 +394,9 @@ local function trigger_path_skill(payload, prefix, fallback_width, tag,
     if particle_callback then
         particle_callback(payload.tower, start_pos, end_pos, width)
     end
+    if tag == "arcane_eye" then
+        play_tower_sound("tower_arcane_eye", payload.tower, payload.tower)
+    end
     for _, enemy in ipairs(geometry.enemies_in_path(
         payload.tower, start_pos, end_pos, width, payload.target
     )) do
@@ -421,6 +449,9 @@ local function on_lightning_hit(payload)
         * math.max(0, tonumber(skill.damage_multiplier) or 2)
     local position = payload.target:GetAbsOrigin()
     play_diffusion_particle(payload.tower, position, radius, skill)
+    play_tower_sound(
+        "tower_lightning_diffusion", payload.tower, payload.target, position
+    )
     for _, enemy in ipairs(geometry.enemies_in_circle(
         payload.tower, position, radius
     )) do

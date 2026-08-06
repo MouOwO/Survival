@@ -1582,6 +1582,20 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_survival_hero_ball_lightning"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_hero_ball_lightning"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "storm_spirit_ball_lightning"
+        "AbilityCastRange"   "800"
+        "AbilityCastRangeBuffer" "0"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.0"
+        "AbilityManaCost"    "20"
+    }
+
     "ability_survival_pickup_materials"
     {
         "BaseClass"          "ability_lua"

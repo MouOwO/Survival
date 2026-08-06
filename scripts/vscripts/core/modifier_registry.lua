@@ -77,6 +77,15 @@ local modifiers = {
         path = "modifiers/modifier_survival_hero_base_health",
     },
     {
+        name = "modifier_survival_hero_mana_standard",
+        path = "modifiers/modifier_survival_hero_mana_standard",
+    },
+    {
+        name = "modifier_survival_hero_ball_lightning",
+        path = "modifiers/modifier_survival_hero_ball_lightning",
+        motion_type = LUA_MODIFIER_MOTION_HORIZONTAL,
+    },
+    {
         name = "modifier_survival_hero_attack_range",
         path = "modifiers/modifier_survival_hero_attack_range",
     },
@@ -146,7 +155,7 @@ local function link(definition)
     LinkLuaModifier(
         definition.name,
         definition.path,
-        LUA_MODIFIER_MOTION_NONE
+        definition.motion_type or LUA_MODIFIER_MOTION_NONE
     )
     require(definition.path)
 

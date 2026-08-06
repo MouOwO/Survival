@@ -72,6 +72,8 @@
         "DOTA_Tooltip_ability_item_survival_lust_essence_Description" "点击使用强化冰火裁决+1，并且每次攻击减甲+3。"
         "DOTA_Tooltip_ability_ability_survival_return_home" "回城"
         "DOTA_Tooltip_ability_ability_survival_return_home_Description" "立即返回己方主城周围的安全位置。"
+		"DOTA_Tooltip_ability_ability_survival_hero_ball_lightning" "球状传送"
+		"DOTA_Tooltip_ability_ability_survival_hero_ball_lightning_Description" "化为闪电飞向800范围内的目标位置，消耗20点魔法。飞行期间无敌且无法攻击，不会对沿途敌人造成伤害。"
 		"DOTA_Tooltip_ability_ability_survival_builder_blink" "建造者闪烁"
 		"DOTA_Tooltip_ability_ability_survival_builder_blink_Description" "闪烁到1000范围内可通行且未被阻挡的目标位置，并躲避飞行中的投射物。"
 		"DOTA_Tooltip_ability_ability_survival_pickup_materials" "范围拾取"

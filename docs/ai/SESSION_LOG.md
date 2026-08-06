@@ -1,3 +1,12 @@
+# 2026-08-06 - 第1-5波数据驱动怪物视觉系统
+
+- 从用户提供的`SurvivalTwo_Dota2怪物视觉模型规划_V1.0.xlsx`、`wave_visual_model_plan_dota2_V1.0.csv`和`monster_visual_asset_catalog_dota2_V1.0.csv`恢复并交叉提取W1-W5精确视觉ID、角色候选和缩放。新增独立视觉资产、组件、效果和波次映射CSV，不扩展历史不一致的资产目录。
+- 当前实现覆盖11项自包含模型：Kobold A/C、Worg Small/Large、Centaur Medium/Large、Ogre Large/Medium、Hellbear共享主体和Lone Druid Spirit Bear。全部模型通过本机VPK索引；10个resource-only代理写入单位KV，支持运行期下一波异步预载。
+- 运行解析使用实际`wave_number/member_role/normal_index`。普通怪支持确定性周期混编，但W4/W5的比例未获批准，生产配置保持`support_every_nth=0`；领头与阶段Boss只映射实际成员，不凭视觉计划增加单位。W5 Hellbear/Smasher共享模型并分别使用0.95/1.35缩放，阶段BossSpirit Bear为1.75。
+- `monster_visual_service.lua`负责模型、附件、粒子上限、重新应用和死亡/提前终局清理；视觉返回失败或抛异常均不阻断生成。`wave_definitions.csv`和`monster_archetypes.csv`无diff，战斗指纹为`06079adac3429a88c12188fe63b26793c5755ab2837a465f5d4d73f7745610e4`。
+- 自动验证通过：`MONSTER_VISUAL_CONFIG_PASS`、`MONSTER_VISUAL_RESOLVER_PASS`、`MONSTER_VISUAL_SERVICE_PASS`、`WAVE_MONSTER_VISUAL_INTEGRATION_PASS`、`MONSTER_VISUAL_PROXY_KV_PASS`、`MONSTER_COMBAT_CONFIG_UNCHANGED_PASS`、`WAVE_EARLY_FINAL_PASS`、既有预载服务与渐进预载回归、相关Lua语法、定向生成逐字节一致、严格UTF-8及限定diff。既有旧波次测试仍有两项过时断言：N1最终波批次数和N3禁用状态，与当前权威数据不一致，本轮未改测试迎合。
+- 尚未完成：Workshop Tools冷启动实机确认W1-W5模型动画、朝向、缩放、碰撞/选择表现和同屏性能，重点检查W5普通Hellbear、领头Smasher和Spirit Bear阶段Boss。自动测试不能视为视觉实机验收。
+
 # 2026-08-05 - 箭塔建造成本调查检查点
 
 - 用户要求以`全部箭塔成长路线_分路线录像提取V1.0(1)(1).xlsx`为准核对箭塔建造与升级金币/木材成本，并判断问题后修复；用户随后批准实施计划。

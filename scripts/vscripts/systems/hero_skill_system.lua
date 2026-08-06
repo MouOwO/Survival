@@ -13,6 +13,7 @@ local M = {}
 local state_by_player = {}
 local RETURN_HOME_ABILITY = "ability_survival_return_home"
 local PICKUP_MATERIALS_ABILITY = "ability_survival_pickup_materials"
+local BALL_LIGHTNING_ABILITY = "ability_survival_hero_ball_lightning"
 local PUBLIC_SKILL_CAPACITY = 3
 
 local function exclusive_unlock_level(skill_id)
@@ -151,6 +152,7 @@ local function preserve_native_abilities(unit)
 end
 local function ability_map(state)
     local result = {
+        [BALL_LIGHTNING_ABILITY] = true,
         [RETURN_HOME_ABILITY] = true,
         [PICKUP_MATERIALS_ABILITY] = true,
     }
@@ -211,6 +213,19 @@ local function synchronize_unit_impl(state)
             end
         end
     end
+    local ball_lightning = state.unit:FindAbilityByName(BALL_LIGHTNING_ABILITY)
+    if not ball_lightning then
+        ball_lightning = state.unit:AddAbility(BALL_LIGHTNING_ABILITY)
+    end
+    if not ball_lightning then
+        error("failed to add utility ability: " .. BALL_LIGHTNING_ABILITY)
+    end
+    ball_lightning:SetLevel(1)
+    ball_lightning:SetHidden(false)
+    ball_lightning:SetActivated(true)
+    if ball_lightning.SetAbilityIndex then
+        ball_lightning:SetAbilityIndex(#state.order)
+    end
     local return_ability = state.unit:FindAbilityByName(RETURN_HOME_ABILITY)
     if not return_ability then
         return_ability = state.unit:AddAbility(RETURN_HOME_ABILITY)
@@ -222,7 +237,7 @@ local function synchronize_unit_impl(state)
     return_ability:SetHidden(false)
     return_ability:SetActivated(true)
     if return_ability.SetAbilityIndex then
-        return_ability:SetAbilityIndex(#state.order)
+        return_ability:SetAbilityIndex(#state.order + 1)
     end
     local pickup_ability = state.unit:FindAbilityByName(PICKUP_MATERIALS_ABILITY)
     if not pickup_ability then
@@ -235,7 +250,7 @@ local function synchronize_unit_impl(state)
     pickup_ability:SetHidden(false)
     pickup_ability:SetActivated(true)
     if pickup_ability.SetAbilityIndex then
-        pickup_ability:SetAbilityIndex(#state.order + 1)
+        pickup_ability:SetAbilityIndex(#state.order + 2)
     end
     hero_health_guard.preserve_current(state.unit, function()
         if state.unit.CalculateStatBonus then

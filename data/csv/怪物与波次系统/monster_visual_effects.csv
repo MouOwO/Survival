@@ -1,0 +1,3 @@
+﻿effect_id,visual_asset_id,particle_path,attach_mode,max_per_unit,enabled,notes
+#中文名:效果ID,视觉资产ID,粒子路径,挂载模式,单单位上限,是否启用,备注
+#types:string,string,string,enum,number,boolean,string

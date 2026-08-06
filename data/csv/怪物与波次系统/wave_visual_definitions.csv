@@ -1,0 +1,8 @@
+﻿wave_number,main_visual_asset_id,support_visual_asset_id,mini_boss_visual_asset_id,stage_boss_visual_asset_id,main_scale,support_scale,mini_boss_scale,stage_boss_scale,support_every_nth,enabled,notes
+#中文名:波次编号,主力视觉资产ID,辅助视觉资产ID,小Boss视觉资产ID,阶段Boss视觉资产ID,主力缩放,辅助缩放,小Boss缩放,阶段Boss缩放,每N个普通怪使用辅助视觉,是否启用,备注
+#types:number,string,string,string,string,number,number,number,number,number,boolean,string
+1,vis_kobold_pack,,vis_kobold_foreman,,0.9,,1.25,,0,1,荒原兽潮第1波；无运行时领头怪时不会凭视觉计划新增单位
+2,vis_giant_wolf,,vis_alpha_wolf,,0.95,,1.28,,0,1,荒原兽潮第2波；无运行时领头怪时不会凭视觉计划新增单位
+3,vis_centaur_courser,,vis_centaur_conqueror,,0.95,,1.3,,0,1,荒原兽潮第3波；无运行时领头怪时不会凭视觉计划新增单位
+4,vis_ogre_bruiser,vis_ogre_frostmage,vis_ogre_bruiser,,0.92,0.88,1.32,,0,1,辅助候选已配置；混编比例批准前support_every_nth保持0
+5,vis_hellbear,vis_hellbear_smasher,vis_hellbear_smasher,vis_spirit_bear_boss,0.95,0.9,1.35,1.75,0,1,阶段Boss仅映射实际assault_boss；辅助比例批准前保持0

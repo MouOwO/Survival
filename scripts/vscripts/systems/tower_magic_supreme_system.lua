@@ -1,21 +1,20 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local sound_service = require("core/sound_service")
 
 local M = {}
 
 local EFFECTS = {
     finger = {
         particle = "particles/units/heroes/hero_lion/lion_spell_finger_of_death.vpcf",
-        sound = "Hero_Lion.FingerOfDeath",
-        sound_file = "soundevents/game_sounds_heroes/game_sounds_lion.vsndevts",
+        sound_cue = "tower_magic_finger",
         -- 死亡一指的粒子控制点与常规光束相反：0为目标，1为施法者。
         source_control = 1,
         target_control = 0,
     },
     laguna = {
         particle = "particles/units/heroes/hero_lina/lina_spell_laguna_blade.vpcf",
-        sound = "Ability.LagunaBlade",
-        sound_file = "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts",
+        sound_cue = "tower_magic_laguna",
         source_control = 0,
         target_control = 1,
     },
@@ -23,8 +22,7 @@ local EFFECTS = {
         -- 奥术至尊本身是被动技能，没有单独的攻击弹道。
         -- 使用拉比克绿色奥术伤害弹道表现最终阶段的4倍魔法攻击。
         particle = "particles/units/heroes/hero_rubick/rubick_fade_bolt.vpcf",
-        sound = "Hero_Rubick.FadeBolt.Cast",
-        sound_file = "soundevents/game_sounds_heroes/game_sounds_rubick.vsndevts",
+        sound_cue = "tower_arcane_supremacy",
         source_control = 0,
         target_control = 1,
     },
@@ -99,8 +97,12 @@ local function play_effect(caster, target, effect)
             end)
         end
     end
-    if effect.sound then
-        pcall(function() EmitSoundOn(effect.sound, target) end)
+    if effect.sound_cue then
+        sound_service.play(effect.sound_cue, {
+            source = caster,
+            unit = target,
+            position = target:GetAbsOrigin(),
+        })
     end
 end
 
@@ -113,6 +115,11 @@ local function deal_magic(tower, target, damage, tag)
         source_kind = "ability",
         tags = { "tower_magic_supreme", tag },
     })
+end
+
+local function damage_submitted(result)
+    return result == true
+        or (type(result) == "table" and result.success == true)
 end
 
 local function chance(skill, fallback)
@@ -132,8 +139,10 @@ end
 local function trigger_chance_skill(tower, target, skill, effect, tag, base)
     if not skill or not owns_ability(tower, skill) then return false end
     if not RollPercentage(chance(skill, 20)) then return false end
-    play_effect(tower, target, effect)
-    deal_magic(tower, target, base * multiplier(skill, 1), tag)
+    local accepted = deal_magic(
+        tower, target, base * multiplier(skill, 1), tag
+    )
+    if damage_submitted(accepted) then play_effect(tower, target, effect) end
     return true
 end
 
@@ -170,13 +179,15 @@ local function on_attack_landed(payload)
 
     local supreme = skill_matching(skills, "arcane_supremacy_")
     if supreme and owns_ability(tower, supreme) then
-        play_effect(tower, target, EFFECTS.arcane)
-        deal_magic(
+        local accepted = deal_magic(
             tower,
             target,
             base * multiplier(supreme, 4),
             "arcane_supremacy"
         )
+        if damage_submitted(accepted) then
+            play_effect(tower, target, EFFECTS.arcane)
+        end
     end
 end
 
@@ -186,15 +197,10 @@ end
 
 function M.precache(context)
     local particles = {}
-    local sound_files = {}
     for _, effect in pairs(EFFECTS) do
         if effect.particle and not particles[effect.particle] then
             PrecacheResource("particle", effect.particle, context)
             particles[effect.particle] = true
-        end
-        if effect.sound_file and not sound_files[effect.sound_file] then
-            PrecacheResource("soundfile", effect.sound_file, context)
-            sound_files[effect.sound_file] = true
         end
     end
 end
