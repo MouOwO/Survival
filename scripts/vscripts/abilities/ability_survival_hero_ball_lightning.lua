@@ -1,7 +1,7 @@
 ability_survival_hero_ball_lightning = class({})
 
 local MAX_DISTANCE = 800
-local TRAVEL_SPEED = 1400
+local TRAVEL_SPEED = 7000
 
 local function valid_destination(position)
     return GridNav:IsTraversable(position) and not GridNav:IsBlocked(position)

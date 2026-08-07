@@ -551,6 +551,10 @@ function M.build_snapshot(player_id, context)
                 local target_entry = M.find_technology_entry(group, target_level)
                     or entry
                 item = project_entry(player_id, target_entry, context)
+                -- A technology group keeps one fixed shelf position while its
+                -- target entry advances through level-specific configuration.
+                -- Using target_entry.order here makes upgrades reorder the card.
+                item.sort_order = entry.order
                 item.entry_id = entry.entryid
                 item.purchase_entry_id = target_entry.entryid
                 item.technology_level = current

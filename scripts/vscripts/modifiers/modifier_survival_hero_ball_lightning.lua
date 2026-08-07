@@ -33,7 +33,7 @@ function modifier_survival_hero_ball_lightning:OnCreated(kv)
         tonumber(kv.y) or parent:GetAbsOrigin().y,
         tonumber(kv.z) or parent:GetAbsOrigin().z
     )
-    self.speed = math.max(1, tonumber(kv.speed) or 1400)
+    self.speed = math.max(1, tonumber(kv.speed) or 7000)
     self.particle = ParticleManager:CreateParticle(
         PARTICLE,
         PATTACH_ABSORIGIN_FOLLOW,

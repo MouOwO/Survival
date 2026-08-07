@@ -906,6 +906,7 @@ function modifier_tower_attack_effects:OnAttack(params)
     if not valid(primary) or primary:GetTeamNumber() == caster:GetTeamNumber() then
         return
     end
+    play_tower_sound("tower_basic_attack", caster, caster)
     local multi = skill_matching(caster, "multi_attack_")
     if not multi then return end
     local max_targets = multi_max_targets(multi)

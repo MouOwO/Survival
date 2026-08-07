@@ -35,6 +35,27 @@ local function origin_for(unit)
     return nil
 end
 
+local function hide_model(unit)
+    if not valid_entity(unit) or type(unit.AddNoDraw) ~= "function" then
+        return false
+    end
+    return pcall(unit.AddNoDraw, unit)
+end
+
+local function show_model(unit)
+    if not valid_entity(unit) then return false end
+    local restored = false
+    if type(unit.RemoveNoDraw) == "function" then
+        restored = pcall(unit.RemoveNoDraw, unit)
+    end
+    -- Clear render alpha left by an older Workshop Tools session that loaded
+    -- the superseded construction-opacity implementation.
+    if type(unit.SetRenderAlpha) == "function" then
+        pcall(unit.SetRenderAlpha, unit, 255)
+    end
+    return restored
+end
+
 local function visual_origins(unit, definition)
     local origin = origin_for(unit)
     if not origin then return {} end
@@ -111,7 +132,7 @@ local function state_for(value)
     return entindex and active_by_entindex[entindex] or nil
 end
 
-local function retire(state, immediate)
+local function retire(state, immediate, reveal_model)
     if not state or state.retired then return false end
     state.retired = true
     if active_by_entindex[state.entindex] == state then
@@ -121,6 +142,7 @@ local function retire(state, immediate)
         destroy_particle(particle, immediate)
     end
     state.loop_particles = {}
+    if reveal_model then show_model(state.unit) end
     return true
 end
 
@@ -129,6 +151,9 @@ function M.start(unit, definition)
     local entindex = entindex_for(unit)
     if not entindex then return nil end
     M.cancel(entindex)
+    -- Hide the real model before creating any construction particles so only
+    -- the Tinker teleport channel is rendered during the build timer.
+    hide_model(unit)
 
     local origins = visual_origins(unit, definition)
     local start_path = definition and definition.build_start_particle
@@ -161,12 +186,14 @@ function M.complete(value, unit, definition)
     local state = state_for(value)
     -- A graceful stop preserves teleport_start's short falling-ring End Cap.
     -- The full teleport_end burst is intentionally omitted.
-    return state ~= nil and retire(state, false)
+    return state ~= nil and retire(state, false, true)
 end
 
 function M.cancel(value)
     local state = state_for(value)
-    return retire(state, true)
+    -- Cancellation is used by the death path, so do not reveal a model that is
+    -- already dead or about to be removed.
+    return retire(state, true, false)
 end
 
 function M.precache(context)
@@ -193,7 +220,9 @@ end
 function M.reset()
     local states = {}
     for _, state in pairs(active_by_entindex) do states[#states + 1] = state end
-    for _, state in ipairs(states) do retire(state, true) end
+    -- Workshop Tools can preserve Lua entities across Run sessions. Restore
+    -- surviving units while retiring stale construction particle state.
+    for _, state in ipairs(states) do retire(state, true, true) end
 end
 
 M._active_count_for_test = function()
