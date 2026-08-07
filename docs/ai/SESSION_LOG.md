@@ -2114,3 +2114,23 @@
 - 验证通过：`N2_WAVE_CONTRACT_PASS`、`N2_WAVE_CONFIG_LUA51_PASS`、`CHALLENGE_COMBAT_PROFILES_CONTRACT_PASS`、`CHALLENGE_COMBAT_PROFILES_LUA51_PASS`、`N2_REBIRTH_COMBAT_PROFILE_LUA51_PASS`、N3/N4/N5波次回归、波次计时回归、相关Luac 5.1、目标生成逐字节一致性、严格UTF-8及限定`git diff --check`。
 - 无关回归未通过：未修改的`shop_condition_evaluator.lua`当前没有对`active_rebirth`立即返回“正在进行中”；旧前台Lua测试还缺`min_city_level` Mock字段。本轮未越界修改，不能把N2专项通过描述为挑战前台全回归通过。
 - 尚未完成Workshop Tools实机验证；下一步冷启动核对N2每波实体、模型、领头/Boss/飞行/护甲，以及练功房、特殊目标、转生和十戒的实际属性。
+## 2026-08-06 - 多人联机工程立项与阶段1启动
+
+- 用户确认玩法：每名玩家对应独立波次怪、经济、建筑、英雄和Builder；初始位置按东南西北等固定槽位，但战场空间共享。玩家可把城墙建到其他玩家区域集中防守，英雄可跨区域支援；这些行为不改变业务owner。
+- 怪物目标规则：每批怪绑定所属`player_id`并攻击该玩家自己的城墙实体，不得按最近城墙、固定区域或最后创建城墙选择目标。
+- 控制权规则：玩家不能控制他人的英雄、Builder、工人、建筑、塔或召唤物。客户端只提交意图，服务端校验身份和业务状态后执行，实体结果由Dota引擎同步。
+- 审计事实：启动人数仍为1；资源、Builder阶段、建筑上限按team保存；波次为单例且只有一个`wall_entindex`和单个`monsterborn`出生marker。Builder注册表、`survival_player_id`和多数服务端UI请求校验可复用。
+- 计划决定：按8阶段纵向推进，先做最多4人配置和身份基础，再做2人可运行切片；完整清单见`CURRENT_TASK.md`。
+- 文档治理：旧`CURRENT_TASK.md`和`START_HERE.md`内容混杂多个历史任务，已完整归档为`docs/ai/archive/2026-08-06-pre-multiplayer-*.md`；新文件只恢复多人任务。旧任务暂停且不得自动恢复。
+- 编辑器联机：不要求先发布Workshop；目标使用两台电脑、两个Steam账号和一致addon文件，由Workshop Tools主机启动开发地图，第二客户端经好友/开发大厅或`connect <LAN IP>:27015`加入，具体入口待阶段2实测确认。
+- 当前唯一动作：完成阶段1CSV、生成Lua、玩家上下文服务、4人启动规则和Builder槽位出生接入，并保持玩家0旧地图单人兼容。
+## 2026-08-06 - 多人阶段1生产实现与自动验证完成
+
+- 新增CSV权威配置`多人系统/multiplayer_rules.csv`和`player_slots.csv`，定义最多4人、首轮2人切片、共享时钟/跨区支援规则以及东南西北4个玩家槽位。
+- 新增生成配置`multiplayer_rules.lua`和`player_slots.lua`；临时目录定向重生成与工作树生成文件SHA256一致。
+- 新增`player_context_service.lua`，提供槽位、Hammer marker优先解析、玩家0旧坐标回退、非0缺marker失败关闭、实体owner登记和ownership校验。
+- `addon_game_mode.lua`与`addoninfo.txt`开放4名好人方玩家；`player_connect_full`现有路径负责后续玩家队伍分配。身份服务在Builder服务前初始化，使用直接`require().init()`避免Lua 5.1函数60 upvalue上限。
+- Builder出生改为按玩家槽位解析，成功后登记owner并发布`slot_id/spawn_marker/spawn_source`；玩家0保持旧地图兼容，玩家1至3缺marker时明确拒绝且不在原点重叠。
+- 专项契约、Lua 5.1行为、Builder集成、Lua 5.1语法、CSV生成一致性、严格UTF-8和限定diff检查通过。
+- 两个用户既有未跟踪回归脚本未通过：Builder ownership测试硬编码600移速但当前权威CSV为300；Builder utility契约缺Monkey射程1000。均与本轮diff无关，未修改这些文件或业务配置。
+- 下一步唯一动作：Workshop Tools冷启动`template_map`做玩家0单人兼容验收。尚未完成实机或网络验收。

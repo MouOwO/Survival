@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local definitions = require("config/generated/builder_definitions")
 local cosmetic_service = require("systems/hero_cosmetic_service")
+local player_context = require("systems/player_context_service")
 
 local M = {}
 
@@ -50,11 +51,15 @@ local function create_builder(payload)
     end
     initialized_player[player_id] = true
 
-    local position = Vector(
-        tonumber(config.spawn_x) or 0,
-        tonumber(config.spawn_y) or 0,
-        tonumber(config.spawn_z) or 256
-    )
+    local spawn, spawn_error = player_context.resolve_builder_spawn(player_id)
+    if not spawn then
+        initialized_player[player_id] = nil
+        print(string.format(
+            "[BUILDER_READY] rejected player=%s error=%s",
+            tostring(player_id), tostring(spawn_error)))
+        return
+    end
+    local position = spawn.position
     local builder = CreateUnitByName(
         config.unit_name,
         position,
@@ -78,7 +83,16 @@ local function create_builder(payload)
     builder:SetModelScale(tonumber(config.model_scale) or 1)
     builder.survival_display_name = config.display_name
     builder.survival_builder_id = config.builder_id
-    builder.survival_player_id = player_id
+    local registered, register_error = player_context.register_unit(
+        player_id,
+        builder,
+        "builder"
+    )
+    if not registered then
+        initialized_player[player_id] = nil
+        if UTIL_Remove then UTIL_Remove(builder) end
+        error("failed to register builder owner: " .. tostring(register_error))
+    end
     FindClearSpaceForUnit(builder, position, true)
 
     cosmetic_service.apply(builder, "builder_undying")
@@ -91,12 +105,17 @@ local function create_builder(payload)
         entindex = builder:entindex(),
         player_id = player_id,
         team = payload.team,
+        slot_id = spawn.slot_id,
+        spawn_marker = spawn.marker,
+        spawn_source = spawn.source,
     }
     event_bus.emit(events.BUILDER_READY, ready)
     publish_selection(player_id, builder)
     print(string.format(
-        "[BUILDER_READY] player=%s entindex=%s unit=%s proxy=true courier=false",
-        tostring(player_id), tostring(builder:entindex()), tostring(config.unit_name)))
+        "[BUILDER_READY] player=%s slot=%s spawn=%s source=%s entindex=%s unit=%s proxy=true courier=false",
+        tostring(player_id), tostring(spawn.slot_id), tostring(spawn.marker),
+        tostring(spawn.source), tostring(builder:entindex()),
+        tostring(config.unit_name)))
 end
 
 local function get_builder(payload)

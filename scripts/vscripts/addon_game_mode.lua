@@ -1,4 +1,10 @@
 local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
+local multiplayer_rules = require("config/generated/multiplayer_rules")
+
+local function configured_max_players()
+    local rule = (multiplayer_rules.by_id or {}).default_multiplayer
+    return math.max(1, math.floor(tonumber(rule and rule.max_players) or 1))
+end
 
 local function configure_survival_launch_rules()
     local game_mode = GameRules:GetGameModeEntity()
@@ -10,7 +16,10 @@ local function configure_survival_launch_rules()
     GameRules:SetHeroSelectionTime(0)
     GameRules:SetShowcaseTime(0)
     GameRules:SetStrategyTime(0)
-    GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 1)
+    GameRules:SetCustomGameTeamMaxPlayers(
+        DOTA_TEAM_GOODGUYS,
+        configured_max_players()
+    )
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
     GameRules:EnableCustomGameSetupAutoLaunch(true)
     GameRules:SetCustomGameSetupAutoLaunchDelay(0)
@@ -235,7 +244,10 @@ local function configure_game_rules()
     game_mode:SetFixedRespawnTime(2)
     -- Human players must never occupy the enemy team. Allowing Badguys
     -- player slots made early Workshop runs assign the local player there.
-    GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 1)
+    GameRules:SetCustomGameTeamMaxPlayers(
+        DOTA_TEAM_GOODGUYS,
+        configured_max_players()
+    )
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
     assign_player_to_survival_team(0)
     GameRules:SetHeroRespawnEnabled(true)
@@ -699,6 +711,7 @@ end
 
 local function initialize_services()
     hero_anchor_service.init()
+    require("systems/player_context_service").init()
     builder_service.init()
     asset_preload_service.init()
     unit_health_bar_service.init()
