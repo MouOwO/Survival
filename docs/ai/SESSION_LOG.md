@@ -1,12 +1,28 @@
+# 2026-08-08 - 金矿替换为可选中动态建筑模型
+
+- 用户实测`tower_good4.vmdl`金矿无法鼠标选择。静态审计确认`building_gold_mine`运行配置已有`selectable=true`，没有金矿专属不可选Modifier，且`BoundsHullName`只影响碰撞/寻路，不能替静态模型补出选择hitbox。
+- 用户批准使用项目已确认可选中的`models/props_structures/radiant_ancient001.vmdl`并采用`model_scale=0.34`。权威`building_visual_levels.csv`和`building_construction_rules.csv`已同步完工/施工视觉，项目生成器定向重建两份生成Lua，单位KV同步首帧/异常回退。
+- 保留金矿建筑ID、单位ID、五个技能、等级、收益、成本、人口占用、数量上限、`selectable=true`和存档身份；未引入选择代理，未修改Hull冒充选择修复。
+- 自动验证通过：`SIX_GAMEPLAY_FIXES_CONTRACT_PASS`、`SIX_GAMEPLAY_FIXES_LUA51_PASS`、`UNIT_MODEL_CONFIG_LUA51_PASS`、`GOLD_MINE_GENERATED_BYTE_MATCH_PASS`、`GOLD_MINE_LUAC51_PASS`、严格UTF-8及限定diff检查。`building_system.lua`以临时去BOM副本完成Lua 5.1语法检查，没有重写生产文件编码。
+- 全局单位模型旧契约在移除过时`tower_good4`要求后，仍只被既有无关伐木工CSV缺项`creep_bad_melee_cavern_mega.vmdl`阻断；未修改无关数据迎合。尚未Workshop Tools实机验证金矿模型鼠标命中、五个技能与尺寸，不能称为实机验收。
+
+# 2026-08-08 - 城墙升级生命比例修复
+
+- 用户确认城墙升级不应回满，应按升级提交前一瞬间的`当前生命/最大生命`比例投影到CSV新最大生命；升级施工期间受到的伤害必须计入最终比例。
+- 根因定位为`building_upgrade_system.lua::apply_common()`无条件将当前生命设置为新最大生命。实施边界仅限`upgrade_wall()`完成回调，主城、农场与防御塔保持既有行为。
+- 新增`building_health_projection.lua`，在应用新最大生命前捕获比例，应用后按最近整数恢复并夹紧到`1..新最大生命`；新增Lua 5.1行为测试与PowerShell契约测试。
+- 自动验证通过：`WALL_UPGRADE_HEALTH_LUA51_PASS`、`WALL_UPGRADE_HEALTH_CONTRACT_PASS`、`BUILDING_UPGRADE_PROCESS_LUA51_PASS`、`POPULATION_TRAINING_LUA51_PASS`、`WALL_POSITION_ANCHOR_LUA51_PASS`、`POPULATION_WALL_CONTRACT_PASS`、目标Lua 5.1语法、7个首轮目标文件严格UTF-8及限定diff检查。尚未进行Workshop Tools实机验证。
+
 # 2026-08-08 - 城墙固定锚点与人口训练阶段加载（已纠正）
 
+- 用户于2026-08-08明确反馈“问题已经解决了，可以记录下来了”。人口训练修复据此记为用户实机验收通过：训练1能够正确加载，阶段按CSV次数完成后顺序推进；该问题不再恢复为活跃任务。用户确认范围仅限人口训练，不扩展为城墙锚点验收。
 - 用户后续确认原始人口训练CSV数据正确，上一轮将阶段1至5改为各一次并禁用阶段6属于错误修改，已撤销；权威数据保持阶段1至5各`max_count=5`、阶段6为`max_count=100`且启用。
 - 原始代码根因是`train_population_auto`使用`math.max(2, farm_level + 1)`直接选训练ID，导致训练1永远不加载。运行时现按启用行等级排序，以team共享、`training_id`独立次数选择第一个未满阶段，当前阶段满额后才顺序加载下一阶段；农场等级只校验前置条件。
 - 服务端与Tooltip共用`base_cost + stage_count * increment`费用；仅扣费成功后推进当前阶段并增加人口，`WORKER_CHANGED`继续刷新农场Runtime。Tooltip显示当前阶段、阶段内进度、当前费用、人口收益和下一阶段条件；阶段6达到100次后才完成并禁用。
 - 城墙施工完成和已有实体恢复时建立`survival_fixed_position`，既有固定Modifier每0.1秒纠正碰撞/物理偏移；主动迁移先更新锚点，再沿用现有临时移动Modifier与网格迁移流程，因此迁移后固定在新位置。
 - 新增人口训练与城墙锚点Lua 5.1行为测试及跨CSV/生成Lua/服务端/Runtime/Panorama契约。验证通过：`POPULATION_TRAINING_LUA51_PASS`、`WALL_POSITION_ANCHOR_LUA51_PASS`、`POPULATION_WALL_CONTRACT_PASS`、相关玩法/修理工/Builder回归、目标Lua语法、严格UTF-8、生成逐字节一致与限定diff检查。
 - `ability_tooltip.js`已加入人口训练托管白名单，并由Resource Compiler强制定向编译为`1 compiled, 0 failed, 0 skipped`。Node不在PATH，未运行`node --check`；Resource Compiler结果不等同于Workshop Tools实机验收。
-- 未触碰或回滚工作区内其他用户已有修改。仍需冷启动实测城墙碰撞压力、主动迁移重锚、人口训练1连续5次及递增费用、满额后切换训练2、后续农场门槛和训练6的100次上限；无关伐木工缺失模型契约问题保持不变。
+- 未触碰或回滚工作区内其他用户已有修改。人口训练已获用户验收；仍需冷启动实测的本组合任务范围只保留城墙碰撞压力和主动迁移重锚。无关伐木工缺失模型契约问题保持不变。
 
 # 2026-08-07：建筑祭坛同尺寸与怪物角色Hull修复
 

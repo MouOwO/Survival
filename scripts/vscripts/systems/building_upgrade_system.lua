@@ -12,6 +12,7 @@ local building_visual = require("systems/building_visual_service")
 local asset_preload = require("systems/asset_preload_service")
 local upgrade_process = require("systems/building_upgrade_process")
 local building_sound = require("systems/building_sound_service")
+local building_health_projection = require("systems/building_health_projection")
 
 local M = {}
 local buildings = {}
@@ -420,7 +421,9 @@ local function upgrade_wall(state)
         state.level = next_level
         state.unit.survival_level = next_level
         state.unit.survival_display_name = state.definition.display_name
-        apply_common(state.unit, data)
+        building_health_projection.apply_preserved_ratio(state.unit, function()
+            apply_common(state.unit, data)
+        end)
         apply_research_technology(state)
         publish(state, "wall_upgraded")
         play_upgrade_sound(state)

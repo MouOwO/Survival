@@ -8,4 +8,4 @@ main_city_visual_lv05,building_main_city,5,models/props_structures/tower_good3.v
 hero_altar_visual_lv01,building_hero_altar,1,models/props_structures/radiant_ancient001.vmdl,0.34,0,1,召唤祭坛可选中动态模型
 research_lab_visual_lv01,building_research_lab,1,models/props_structures/radiant_ancient001.vmdl,0.34,0,1,研究所与英雄祭坛保持相同模型缩放
 farm_visual_lv01,building_farm,1,models/props_structures/radiant_ancient001.vmdl,0.34,0,1,人口农场与英雄祭坛保持相同模型缩放
-gold_mine_visual_lv01,building_gold_mine,1,models/props_structures/tower_good4.vmdl,1,0,1,金矿使用模型原生缩放
+gold_mine_visual_lv01,building_gold_mine,1,models/props_structures/radiant_ancient001.vmdl,0.34,0,1,金矿使用可选中动态建筑模型并与祭坛保持相同缩放
