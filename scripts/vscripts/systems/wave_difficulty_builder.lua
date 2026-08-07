@@ -2,7 +2,6 @@ local difficulty_config = require("config/difficulty_config")
 
 local M = {}
 local SCALED_STATS = { "health", "attack", "war3_armor" }
-local ROLE_ORDER = { wave_leader = 1, normal = 2, assault_boss = 3 }
 
 local function clone(value)
     if type(value) ~= "table" then return value end
@@ -21,11 +20,6 @@ local function source_waves(rows, difficulty_id)
     end
     for _, batches in pairs(waves) do
         table.sort(batches, function(a, b)
-            local a_role = ROLE_ORDER[a.member_role]
-            local b_role = ROLE_ORDER[b.member_role]
-            if a_role and b_role and a_role ~= b_role then
-                return a_role < b_role
-            end
             return (a.spawn_order or 0) < (b.spawn_order or 0)
         end)
     end

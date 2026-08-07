@@ -385,7 +385,10 @@ end
 
 local function on_worker_changed(payload)
     for _, state in pairs(state_by_unit) do
-        if state.team == payload.team and state.building_id == "main_city" then
+        if state.team == payload.team and (
+            state.building_id == "main_city"
+                or state.building_id == "building_farm"
+        ) then
             publish(state)
         end
     end

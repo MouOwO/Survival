@@ -13,6 +13,15 @@ local current_tree_entindex = -1
 local tree_lumber_efficiency_buff = 0
 local population_training_counts = {}
 local lumberjack_training = worker_training_progress.create(training_definitions)
+local population_training_rows = {}
+for _, row in ipairs(training_definitions.rows or {}) do
+    if row.enabled ~= false and row.training_type == "population_upgrade" then
+        population_training_rows[#population_training_rows + 1] = row
+    end
+end
+table.sort(population_training_rows, function(left, right)
+    return (tonumber(left.level) or 0) < (tonumber(right.level) or 0)
+end)
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -100,6 +109,66 @@ end
 
 local function lumberjack_training_state(team)
     return lumberjack_training:get(team)
+end
+
+local function population_training_state(team)
+    local key = tonumber(team) or team
+    local counts = population_training_counts[key] or {}
+    local current = nil
+    local current_index = nil
+    local count = 0
+    local maximum = 0
+    local total_count = 0
+    local total_max_count = 0
+    for index, row in ipairs(population_training_rows) do
+        local row_count = counts[row.training_id] or 0
+        local row_maximum = tonumber(row.max_count) or 0
+        total_count = total_count + row_count
+        if row_maximum > 0 then
+            total_max_count = total_max_count + row_maximum
+        end
+        if not current and (row_maximum <= 0 or row_count < row_maximum) then
+            current = row
+            current_index = index
+            count = row_count
+            maximum = row_maximum
+        end
+    end
+    local next_row = current_index and population_training_rows[current_index + 1] or nil
+    local completed = current == nil
+    local wood_cost = current and ((tonumber(current.wood_cost) or 0)
+        + count * (tonumber(current.wood_cost_increment) or 0)) or 0
+    local gold_cost = current and ((tonumber(current.gold_cost) or 0)
+        + count * (tonumber(current.gold_cost_increment) or 0)) or 0
+    return {
+        training_id = current and current.training_id or nil,
+        name = current and current.name or "人口训练",
+        level = current and (tonumber(current.level) or current_index) or #population_training_rows,
+        count = count,
+        max_count = maximum,
+        total_count = total_count,
+        total_max_count = total_max_count,
+        completed = completed and 1 or 0,
+        wood_cost = wood_cost,
+        gold_cost = gold_cost,
+        population_add = current and (tonumber(current.population_add) or 0) or 0,
+        prerequisite_text = current and current.prerequisite_text or "",
+        requires_farm_level = required_city_level(current),
+        next_prerequisite_text = next_row and next_row.prerequisite_text or "已完成",
+        next_requires_farm_level = next_row and required_city_level(next_row) or nil,
+    }
+end
+
+local function record_population_training_success(team, training_id)
+    local key = tonumber(team) or team
+    local state = population_training_state(key)
+    if state.completed == 1 then return state end
+    if training_id and state.training_id ~= training_id then
+        return nil, "population_training_not_current"
+    end
+    population_training_counts[key] = population_training_counts[key] or {}
+    population_training_counts[key][state.training_id] = state.count + 1
+    return population_training_state(key)
 end
 
 local function refresh_worker_technology(player_id)
@@ -241,10 +310,11 @@ local function train_worker(payload)
             and city_state.building_id ~= "farm" then
             return { ok = false, error = "not_population_farm" }
         end
-        training_id = string.format(
-            "train_population_%02d",
-            math.max(2, math.min(6, (tonumber(city_state.level) or 1) + 1))
-        )
+        local population_state = population_training_state(city_state.team)
+        if population_state.completed == 1 or not population_state.training_id then
+            return { ok = false, error = "人口训练已完成" }
+        end
+        training_id = population_state.training_id
     elseif city_state.building_id ~= "main_city" then
         return { ok = false, error = "not_main_city" }
     end
@@ -263,30 +333,41 @@ local function train_worker(payload)
     end
     if training.training_type == "population_upgrade" then
         local team = city_state.team
-        population_training_counts[team] = population_training_counts[team] or {}
-        local count = population_training_counts[team][training_id] or 0
-        local maximum = tonumber(training.max_count) or 0
-        if maximum > 0 and count >= maximum then
-            return { ok = false, error = "该等级人口训练已达上限" }
+        local state = population_training_state(team)
+        if state.completed == 1 or state.training_id ~= training_id then
+            return { ok = false, error = "人口训练阶段无效" }
+        end
+        local farm_level = tonumber(city_state.level) or 1
+        if farm_level < state.requires_farm_level then
+            local error_message = "农场达到LV" .. tostring(state.requires_farm_level)
+                .. "后才能进行下一次人口训练"
+            notify(city_state.player_id, error_message, "error")
+            return { ok = false, error = error_message }
         end
         local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
             team = team,
-            wood = (tonumber(training.wood_cost) or 0)
-                + count * (tonumber(training.wood_cost_increment) or 0),
-            gold = (tonumber(training.gold_cost) or 0)
-                + count * (tonumber(training.gold_cost_increment) or 0),
+            wood = state.wood_cost,
+            gold = state.gold_cost,
             population = 0,
             reason = "train:" .. training_id,
         })
         if not spend or not spend.ok then return spend end
-        population_training_counts[team][training_id] = count + 1
+        local completed_state = record_population_training_success(team, training_id)
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
             team = team,
             max_population = tonumber(training.population_add) or 0,
             reason = "population_training:" .. training_id,
         })
         notify(city_state.player_id, tostring(training.name) .. "完成")
-        return { ok = true, population_add = training.population_add }
+        event_bus.emit(events.WORKER_CHANGED, {
+            team = team,
+            population_training = completed_state,
+        })
+        return {
+            ok = true,
+            population_add = training.population_add,
+            training = completed_state,
+        }
     end
     if training.training_type ~= "unit" then
         return { ok = false, error = "training_type_invalid" }
@@ -515,6 +596,9 @@ function M.init()
     event_bus.handle_request(
         events.WORKER_TRAINING_GET_REQUEST,
         function(payload)
+            if payload and payload.training_type == "population_upgrade" then
+                return population_training_state(payload.team)
+            end
             return lumberjack_training_state(payload.team)
         end
     )
@@ -524,6 +608,13 @@ function M.init()
     event_bus.subscribe(events.TREE_HIT, on_tree_hit)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
+end
+
+M._population_training_state_for_test = population_training_state
+M._record_population_training_success_for_test = record_population_training_success
+M._train_worker_for_test = train_worker
+M._reset_population_training_for_test = function()
+    population_training_counts = {}
 end
 
 return M

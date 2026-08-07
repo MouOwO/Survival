@@ -341,20 +341,15 @@ local function tick()
             })
             if result and result.ok then
                 local player = PlayerResource:GetPlayer(state.player_id)
-                SendOverheadEventMessage(
-                    player,
-                    OVERHEAD_ALERT_GOLD,
-                    state.unit,
-                    amount,
-                    nil
-                )
-                if crit then
-                    SendOverheadEventMessage(
+                if player then
+                    CustomGameEventManager:Send_ServerToPlayer(
                         player,
-                        OVERHEAD_ALERT_CRITICAL,
-                        state.unit,
-                        amount,
-                        nil
+                        "survival_gold_mine_income_number",
+                        {
+                            target_entindex = state.unit:entindex(),
+                            amount = math.floor(amount + 0.5),
+                            critical = crit and 1 or 0,
+                        }
                     )
                 end
             end

@@ -175,6 +175,18 @@ def main() -> int:
     if totals != expected or sum(totals.values()) != 228:
         raise ValueError(f"N1 totals mismatch: {totals}")
 
+    role_order = {"assault_boss": 1, "wave_leader": 2, "normal": 3}
+    role_index = headers.index("member_role")
+    spawn_index = headers.index("spawn_order")
+    wave_index = headers.index("wave_number")
+    generated.sort(key=lambda row: (
+        int(row[wave_index]),
+        role_order.get(row[role_index], 99),
+        int(row[spawn_index]),
+    ))
+    for spawn_order, row in enumerate(generated, 1):
+        row[spawn_index] = str(spawn_order)
+
     buffer = io.StringIO(newline="")
     writer = csv.writer(buffer, lineterminator="\n")
     writer.writerow(headers)

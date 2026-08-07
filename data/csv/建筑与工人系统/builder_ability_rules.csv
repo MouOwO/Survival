@@ -4,5 +4,5 @@
 ability_build_wall,building_wall,main_city_level>=0,building_count(building_wall)<1,1,1,城墙已建造,客户端置灰且不发送；服务器再次验证。
 ability_build_main_city,building_main_city,main_city_level>=0,building_count(building_main_city)<1,1,1,主城已建造,客户端置灰且不发送；服务器再次验证。
 ability_build_arrow_tower,building_arrow_tower,main_city_built==true,true,0,1,,
-ability_build_gold_mine,building_gold_mine,main_city_level>=3,building_count(building_gold_mine)<1,1,1,主城未到3级或金矿已建造,
+ability_build_gold_mine,building_gold_mine,main_city_level>=3,building_count(building_gold_mine)<5,1,1,主城未到3级或金矿已达5座上限,
 ability_build_hero_altar,building_hero_altar,main_city_level>=3,building_count(building_hero_altar)<1,1,1,主城未到3级或祭坛已建造,

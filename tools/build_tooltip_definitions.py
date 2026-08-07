@@ -46,6 +46,11 @@ def lua_string(value):
 
 def main():
     out = {}
+    existing_tooltips = {
+        clean(row.get("tooltip_id")): row
+        for row in read_csv(OUT_CSV)
+        if clean(row.get("tooltip_id")).startswith("ability:ability_build_")
+    }
     hero = read_csv(CSV_ROOT / "英雄系统" / "hero_skill_definitions.csv")
     for row in hero:
         if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:
@@ -71,6 +76,33 @@ def main():
             row.get("name"), row.get("wood_cost"), row.get("gold_cost"),
             row.get("description"), row.get("ability_texture"),
             row.get("action_id"))
+
+    building_definitions = read_csv(
+        CSV_ROOT / "建筑与工人系统" / "building_definitions.csv"
+    )
+    building_levels = read_csv(
+        CSV_ROOT / "建筑与工人系统" / "building_levels.csv"
+    )
+    level_one_by_unit = {
+        clean(row.get("building_id")): row
+        for row in building_levels
+        if clean(row.get("level")) == "1"
+    }
+    for row in building_definitions:
+        ability = clean(row.get("builder_ability"))
+        unit_name = clean(row.get("unit_name"))
+        if not ability or not unit_name:
+            continue
+        level_one = level_one_by_unit.get(unit_name, {})
+        existing = existing_tooltips.get("ability:" + ability)
+        if not existing:
+            continue
+        add(
+            out, "ability:" + ability, "ability", ability,
+            existing.get("name"),
+            level_one.get("wood_cost"), level_one.get("gold_cost"),
+            existing.get("desc"), existing.get("icon"), row.get("building_id"),
+        )
 
     catalog = read_csv(CSV_ROOT / "物品系统" / "content_catalog.csv")
     catalog_by_id = {clean(row.get("content_id")): row for row in catalog}

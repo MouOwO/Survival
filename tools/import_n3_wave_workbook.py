@@ -202,6 +202,17 @@ def build_difficulty(
     expected = {"normal": 1270, "wave_leader": 27, "assault_boss": 6}
     if totals != expected or sum(totals.values()) != 1303:
         raise ValueError(f"{difficulty_id} totals mismatch: {totals}")
+    role_order = {"assault_boss": 1, "wave_leader": 2, "normal": 3}
+    role_index = headers.index("member_role")
+    spawn_index = headers.index("spawn_order")
+    wave_index = headers.index("wave_number")
+    output.sort(key=lambda row: (
+        int(row[wave_index]),
+        role_order.get(row[role_index], 99),
+        int(row[spawn_index]),
+    ))
+    for spawn_order, row in enumerate(output, 1000):
+        row[spawn_index] = str(spawn_order)
     return output
 
 

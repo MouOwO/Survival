@@ -89,6 +89,11 @@ local function can_activate(state, row)
     return true
 end
 
+local function count_limit_reached(state, row)
+    local maximum = tonumber(row.max_building_count) or 0
+    return maximum > 0 and count(state, row.building_id) >= maximum
+end
+
 local function add_stage_abilities(state, stage_rows)
     local builder = state.builder
     if not valid_entity(builder) then
@@ -96,14 +101,18 @@ local function add_stage_abilities(state, stage_rows)
     end
 
     for _, row in ipairs(stage_rows) do
+        local active = can_activate(state, row)
         local ability = builder:FindAbilityByName(row.ability_name)
-        if not ability then
+        if count_limit_reached(state, row) and ability then
+            builder:RemoveAbility(row.ability_name)
+            ability = nil
+        elseif not count_limit_reached(state, row) and not ability then
             ability = builder:AddAbility(row.ability_name)
         end
         if ability then
             ability:SetLevel(1)
             ability:SetHidden(false)
-            ability:SetActivated(can_activate(state, row))
+            ability:SetActivated(active)
             if ability.SetAbilityIndex then
                 ability:SetAbilityIndex(math.max(0, (tonumber(row.slot_order) or 1) - 1))
             end

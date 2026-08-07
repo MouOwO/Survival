@@ -12,6 +12,7 @@ local scheduler = require("core/scheduler")
 local grid_config = require("config/grid_config")
 local grid_placement_config = require("config/grid_placement_config")
 local building_population = require("systems/building_population_service")
+local building_hull_scale = require("systems/building_hull_scale")
 local building_visual = require("systems/building_visual_service")
 local building_sound = require("systems/building_sound_service")
 local construction_visual = require(
@@ -319,6 +320,13 @@ local function recover_building(unit)
     unit.survival_grid_y = grid_y
     unit.survival_route_level = route_row and route_row.level or state.level
     apply_hull_radius(unit, definition)
+    if state.building_id == "wall" then
+        unit.survival_fixed_position = unit.survival_fixed_position
+            or Vector(origin.x, origin.y, origin.z)
+        if not unit:HasModifier("modifier_building_stationary") then
+            unit:AddNewModifier(unit, nil, "modifier_building_stationary", {})
+        end
+    end
     buildings[entindex] = state
     change_count(state.team, state.building_id, 1)
     if definition.build_once then wall_ever_built[state.team] = true end
@@ -536,6 +544,12 @@ local function start_building(payload)
         unit:SetHealth(maximum_health)
         unit:SetControllableByPlayer(check.player_id, true)
         buildings[unit:entindex()] = state
+        if state.building_id == "wall" then
+            local anchor = check.grid.world_position or unit:GetAbsOrigin()
+            unit.survival_fixed_position = Vector(anchor.x, anchor.y, anchor.z)
+            unit:SetAbsOrigin(unit.survival_fixed_position)
+            unit:AddNewModifier(unit, nil, "modifier_building_stationary", {})
+        end
         -- Keep ability entity indexes stable for runtime tooltip data. Activate
         -- once now and once after the construction modifier state has replicated.
         scheduler.after(0.1, function()
@@ -762,6 +776,14 @@ local function on_entity_killed(payload)
 end
 function M.relocate_building(unit, position)
     return require("systems/building_relocation").move(unit, position)
+end
+
+function M.set_wall_hull_scale(player_id, entindex, multiplier)
+    return building_hull_scale.apply(
+        buildings[tonumber(entindex) or -1],
+        player_id,
+        multiplier
+    )
 end
 
 function M.main_city_for_team(team)

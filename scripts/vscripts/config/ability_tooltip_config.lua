@@ -38,7 +38,7 @@ local M = {
     ability_train_population = {
         abilityid = "ability_train_population",
         abilityname = "训练人口",
-        abilitydesc = "按当前人口农场等级消耗木材和金币，永久增加人口上限。每个训练等级的费用、增加人口和训练次数上限均读取人口训练配置表。",
+        abilitydesc = "最多训练5次。每次消耗、增加人口和所需农场等级均读取人口训练配置；完成5次后技能不可再用。",
         abilityicon = "chen_holy_persuasion",
     },
     ability_open_research_lab = {

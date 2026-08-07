@@ -127,11 +127,67 @@ local function lumberjack_training(state, resources)
     }, cost_data(cost))
     return with_affordability(result, cost, population, resources)
 end
+local function population_training(state, resources)
+    local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
+        team = state.team,
+        training_type = "population_upgrade",
+    }) or {}
+    local trained = tonumber(training.count) or 0
+    local maximum = tonumber(training.max_count) or 0
+    local completed = training.completed == 1
+        or (maximum > 0 and trained >= maximum)
+    local required = tonumber(training.requires_farm_level) or 1
+    local farm_level = tonumber(state.level) or 1
+    local unlocked = not completed and farm_level >= required
+    local progress_text = tostring(trained) .. "/" .. tostring(maximum)
+    local cost = {
+        wood = completed and 0 or (tonumber(training.wood_cost) or 0),
+        gold = completed and 0 or (tonumber(training.gold_cost) or 0),
+    }
+    local training_name = tostring(training.name or "人口训练")
+    local status = "人口训练已全部完成"
+    if not completed then
+        status = unlocked and (training_name .. "可训练（第"
+            .. tostring(trained + 1) .. "次）")
+            or ("农场达到LV" .. tostring(required) .. "后解锁")
+    end
+    local fields = {
+        { label = "当前阶段", value = training_name },
+        { label = "阶段进度", value = progress_text },
+    }
+    if not completed then
+        fields[#fields + 1] = {
+            label = "本次增加人口",
+            value = "+" .. tostring(training.population_add or 0),
+        }
+        fields[#fields + 1] = {
+            label = "本次条件",
+            value = tostring(training.prerequisite_text or ("农场LV" .. tostring(required))),
+        }
+        fields[#fields + 1] = {
+            label = "下一级条件",
+            value = tostring(training.next_prerequisite_text or "已完成"),
+        }
+    end
+    local result = merge({
+        available = unlocked and 1 or 0,
+        current_level = tonumber(training.level) or 0,
+        next_level = completed and nil or (tonumber(training.level) or 0),
+        status_text = status,
+        upgrade_description = completed
+            and "所有人口训练阶段均已达到CSV配置的次数上限。"
+            or "当前阶段达到次数上限后自动加载下一人口训练阶段；费用与人口收益由CSV配置决定。",
+        fields = fields,
+    }, cost_data(cost))
+    if completed then result.can_afford = 0 end
+    return completed and result or with_affordability(result, cost, 0, resources)
+end
 local function build_ability(ability_name, state, resources)
     local definitions = {
         ability_build_wall = buildings.wall,
         ability_build_main_city = buildings.main_city,
         ability_build_arrow_tower = buildings.arrow_tower,
+        ability_build_farm = buildings.building_farm,
         ability_build_gold_mine = buildings.gold_mine,
         ability_build_hero_altar = buildings.hero_altar,
     }
@@ -470,6 +526,9 @@ function M.build(ability_name, state, resources)
     end
     if ability_name == "ability_train_lumberjack" then
         return lumberjack_training(state, resources)
+    end
+    if ability_name == "ability_train_population" then
+        return population_training(state, resources)
     end
     if ability_name == "ability_upgrade_farm" then
         return upgrade_level(buildings.farm, state.level, resources, state)

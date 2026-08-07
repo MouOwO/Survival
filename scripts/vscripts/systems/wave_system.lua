@@ -13,6 +13,7 @@ local wave_difficulty_builder = require("systems/wave_difficulty_builder")
 local wave_timing_config = require("config/wave_timing_config")
 local monster_visual_config = require("config/monster_visual_config")
 local monster_visual_service = require("systems/monster_visual_service")
+local monster_hull_scale = require("systems/monster_hull_scale")
 
 local M = {}
 local state = {}
@@ -25,6 +26,7 @@ local game_started = false
 local waves = {}
 local dev_mode = false
 local monster_spawn_marker = nil
+local monster_hull_multiplier = 1
 local game_started_at = nil
 local EARLY_FINAL_UNLOCK_SECONDS = 15 * 60
 local FINAL_WAVE_NUMBER = 30
@@ -181,7 +183,7 @@ local function apply_stats(unit, row, definition)
     -- reducible. Explicit floors (for specially configured enemies) remain.
     unit.survival_minimum_armor = minimum_war3_armor ~= nil
         and armor_balance.from_war3(minimum_war3_armor) or nil
-    unit:SetBaseMoveSpeed(definition.move_speed or 250)
+    unit:SetBaseMoveSpeed(definition.move_speed or 500)
     -- attack_speed 表示每秒攻击次数；Dota 引擎需要基础攻击间隔。
     local attack_speed = tonumber(row.attack_speed) or 0.5
     attack_speed = math.max(0.01, attack_speed)
@@ -259,10 +261,29 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
     if resolved_visual then
         pcall(monster_visual_service.apply, unit, resolved_visual)
     end
+    local base_hull_radius = 29
+    if row.member_role == "assault_boss" or definition.rank == "boss"
+        or row.is_boss == true then
+        base_hull_radius = 0
+    elseif definition.rank == "elite" or row.member_role == "wave_leader" then
+        base_hull_radius = 58
+    end
+    local hull_ok, hull_error = monster_hull_scale.apply(
+        unit,
+        monster_hull_multiplier,
+        base_hull_radius
+    )
+    if not hull_ok then
+        print("[WaveSystem] monster hull apply failed: " .. tostring(hull_error))
+    end
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", { wall_entindex = wall_entindex })
     local is_assault_boss = row.member_role == "assault_boss"
         or (row.member_role == nil and row.is_boss == true)
-    enemies[unit:entindex()] = { unit = unit, is_boss = is_assault_boss }
+    enemies[unit:entindex()] = {
+        unit = unit,
+        is_boss = is_assault_boss,
+        base_hull_radius = base_hull_radius,
+    }
     state.spawned = state.spawned + 1
     state.alive = state.alive + 1
     if is_assault_boss then state.boss_alive = true end
@@ -543,12 +564,23 @@ end
 
 function M.get_difficulty() return difficulty_id end
 
+function M.set_monster_hull_scale(multiplier)
+    local ok, result_or_error = monster_hull_scale.apply_all(
+        enemies,
+        multiplier
+    )
+    if not ok then return false, result_or_error end
+    monster_hull_multiplier = result_or_error.multiplier
+    return true, result_or_error
+end
+
 function M.init()
     monster_spawn_marker = nil
     difficulty_id = difficulty_config.default_id
     difficulty_selected = false
     game_started = false
     game_started_at = nil
+    monster_hull_multiplier = 1
     reset(); enemies = {}; wall_entindex = -1; generation_token = 0; dev_mode = false
     rebuild_waves()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)

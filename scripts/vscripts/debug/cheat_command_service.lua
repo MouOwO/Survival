@@ -7,6 +7,7 @@ local wave_system = require("systems/wave_system")
 local research_test = require("debug/research_technology_test")
 local dev_asset_preload = require("debug/dev_asset_preload")
 local health_cheat = require("debug/health_cheat")
+local building_system = require("systems/building_system")
 
 local M = {}
 
@@ -14,6 +15,7 @@ local ADD_MONSTER_POSITION = Vector(-1280, 1088, 64)
 local ADD_MONSTER_DEFAULT_ARGS = { "1000000000", "200", "1", "1" }
 local ADD_MONSTER_MOVE_SPEED = 600
 local MONKEY_KING_E_SKILL = "skill_monkey_king_swiftness"
+local selected_entindex_by_player = {}
 
 local HERO_ALIASES = {
     axe = "hero_axe",
@@ -677,6 +679,68 @@ local function pass_rebirth(context)
     return true
 end
 
+local function scale_selected_wall(context)
+    local multiplier = tonumber(context.args[1])
+    if not multiplier then
+        return false, "scale_number_required"
+    end
+    local entindex = selected_entindex_by_player[context.player_id]
+    local ok, radius_or_error, base_radius = building_system.set_wall_hull_scale(
+        context.player_id,
+        entindex,
+        multiplier
+    )
+    if not ok then return false, radius_or_error end
+    notify(context, string.format(
+        "城墙碰撞倍率 %.2f：基础 %.0f，当前 %.0f",
+        multiplier,
+        base_radius,
+        radius_or_error
+    ))
+    return true
+end
+
+local function scale_monsters(context)
+    local multiplier = finite_number(context.args[1])
+    if not multiplier or multiplier <= 0 then
+        return false, "usage: scalemonster <positive_number>"
+    end
+    local ok, result_or_error = wave_system.set_monster_hull_scale(multiplier)
+    if not ok then return false, result_or_error end
+    local result = result_or_error
+    local base_text = result.applied > 0 and string.format(
+        "原生Hull %.1f~%.1f，当前Hull %.1f~%.1f",
+        result.base_min,
+        result.base_max,
+        result.radius_min,
+        result.radius_max
+    ) or "当前没有存活波次怪，倍率将应用于之后生成的怪物"
+    notify(context, string.format(
+        "怪物碰撞倍率 %.3f：已应用 %d，失败 %d；%s",
+        result.multiplier,
+        result.applied,
+        result.failed,
+        base_text
+    ))
+    logger.info("CheatCommand", string.format(
+        "scalemonster multiplier=%.6f applied=%d failed=%d base=%s~%s radius=%s~%s",
+        result.multiplier,
+        result.applied,
+        result.failed,
+        tostring(result.base_min),
+        tostring(result.base_max),
+        tostring(result.radius_min),
+        tostring(result.radius_max)
+    ))
+    return true
+end
+
+local function on_scale_selection_changed(_, payload)
+    local player_id = tonumber(payload and payload.PlayerID)
+    if not valid_player_id(player_id) then return end
+    selected_entindex_by_player[player_id] = tonumber(payload.entindex) or -1
+end
+
 local COMMANDS = {
     dev = enable_dev,
     shopshow = show_shop,
@@ -707,6 +771,8 @@ local COMMANDS = {
     weaponstats = weapon_cheats.weapon_stats,
     attack40b = weapon_cheats.set_attack_40b,
     attackreset = weapon_cheats.reset_attack,
+    scale = scale_selected_wall,
+    scalemonster = scale_monsters,
 }
 
 local function on_player_chat(keys)
@@ -757,8 +823,13 @@ local function on_player_chat(keys)
 end
 
 function M.init()
+    selected_entindex_by_player = {}
     attack_speed_cheat.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
+    CustomGameEventManager:RegisterListener(
+        "survival_scale_selection_changed",
+        on_scale_selection_changed
+    )
     logger.info(
         "CheatCommand",
         "ready: addhero, addskill, unlock e, blood, research_test, addtechnology, monster, items, hero, skill, weapon growth"

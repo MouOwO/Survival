@@ -88,7 +88,7 @@
         "DOTA_Tooltip_ability_ability_train_repairer" "训练修理工"
         "DOTA_Tooltip_ability_ability_train_repairer_Description" "训练一个自动修复受损城墙的修理工。"
         "DOTA_Tooltip_ability_ability_build_farm" "建造人口农场"
-        "DOTA_Tooltip_ability_ability_build_farm_Description" "主城建成后解锁，可重复建造。"
+        "DOTA_Tooltip_ability_ability_build_farm_Description" "主城建成后解锁，最多建造1座。消耗100木材、0金币。"
         "DOTA_Tooltip_ability_ability_upgrade_farm" "升级农场"
         "DOTA_Tooltip_ability_ability_upgrade_farm_Description" "农场等级低于主城等级时可以升级，最高5级。"
         "DOTA_Tooltip_ability_ability_train_population" "训练人口"

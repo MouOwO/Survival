@@ -87,7 +87,7 @@
         "DOTA_Tooltip_ability_ability_train_repairer" "Train Repairer"
         "DOTA_Tooltip_ability_ability_train_repairer_Description" "Trains a worker that automatically repairs damaged walls."
         "DOTA_Tooltip_ability_ability_build_farm" "Build Population Farm"
-        "DOTA_Tooltip_ability_ability_build_farm_Description" "Unlocked after the main city is completed."
+        "DOTA_Tooltip_ability_ability_build_farm_Description" "Unlocked after the main city is completed. Maximum 1 farm. Costs 100 wood and 0 gold."
         "DOTA_Tooltip_ability_ability_upgrade_farm" "Upgrade Farm"
         "DOTA_Tooltip_ability_ability_upgrade_farm_Description" "Available while the farm level is below the main city level. Maximum level 5."
         "DOTA_Tooltip_ability_ability_train_population" "Train Population"

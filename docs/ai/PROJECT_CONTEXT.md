@@ -1,5 +1,12 @@
 # Project Context
 
+## 城墙固定锚点与人口训练阶段权威（2026-08-08）
+
+- 人口训练的阶段、每阶段次数、基础费用、递增费用、人口增加和农场等级要求以`training_definitions.csv`中`enabled=true`且`training_type=population_upgrade`的行作为唯一业务权威，并按`level`排序。当前阶段1至5各`max_count=5`，阶段6为`max_count=100`且启用；不得为修复阶段加载而改写这些业务数据。
+- 人口训练运行计数按team共享、按`training_id`独立保存。自动训练必须从阶段1开始，选择第一个未达到自身`max_count`的启用阶段；只有当前阶段满额后才顺序加载下一阶段。农场等级只校验当前阶段前置条件，禁止用`farm_level + 1`直接推导训练ID或跳过未完成阶段。
+- 人口训练事务必须先校验当前阶段和农场等级，再按`base_cost + stage_count * increment`由资源服务扣费，之后才推进次数和增加人口。Tooltip和按钮状态消费同一个`WORKER_TRAINING_GET_REQUEST`投影，并由`WORKER_CHANGED`刷新农场Runtime。
+- 城墙位置身份保存在实体`survival_fixed_position`。施工完成建立初始锚点，已有城墙恢复时补建锚点；碰撞/物理位移只恢复到当前锚点。成功主动迁移是唯一会替换锚点的常规路径，必须继续同步网格释放、重算和占用；不能用永久禁止迁移来解决自动位移。
+
 ## 第1-5波怪物视觉系统边界（2026-08-06）
 
 - 波次怪物视觉权威源是`monster_visual_assets.csv`、`monster_visual_components.csv`、`monster_visual_effects.csv`和`wave_visual_definitions.csv`；历史`asset_catalog.csv`不承担这套新视觉业务。当前只覆盖W1-W5，11个自包含模型均由本机`pak01_dir.vpk`验证。
@@ -155,9 +162,13 @@
 
 - 资源树视觉权威源是`data/csv/资源系统/world_visual_definitions.csv`，由`config/tree_config.lua`读取生成表并由`tree_system.lua`应用；单位KV只保留首帧/异常回退。
 - 伐木工和修理工分级模型直接使用`training_definitions.csv.model_name`，`worker_system.lua`在具体训练行创建实体后统一应用。不要为工人另建重复等级视觉表。
-- 主城与召唤祭坛视觉权威源是`building_visual_levels.csv`；`buildings_config.lua`按`building_id+level`合并到`building_levels.csv`的战斗等级数据，建造完成和升级均复用`building_visual_service.apply()`。
+- 主城、召唤祭坛、研究所、农场与金矿的普通建筑视觉权威源是`building_visual_levels.csv`；`buildings_config.lua`按`building_id+level`合并到`building_levels.csv`的战斗等级数据，建造完成和升级均复用`building_visual_service.apply()`。
 - 普通建筑视觉表可直接使用`model_name/model_scale/model_yaw`，不强制进入复杂塔套装的`asset_catalog.csv`。当前`asset_catalog.csv`存在27列表头与大量22列历史行不一致，未修复前不得为普通模型任务强行生成或批量补列。
 - 新增分级模型必须同步：CSV、生成Lua、运行时消费者、模型预缓存和单位KV的LV1回退；模型路径需从当前`pak01_dir.vpk`索引确认，自动验证不能代替Workshop Tools中的尺寸、动画和朝向验收。
+- - 研究所与人口农场的视觉权威值与英雄祭坛一致，均使用`radiant_ancient001.vmdl`、`model_scale=0.34`；施工规则和单位KV首帧回退也必须保持0.34。金矿LV1仍使用`tower_good4.vmdl`和原生缩放1。升级等级没有另一个缩放值时，视觉服务不得恢复旧KV缩放。
+- Builder数量上限以`builder_ability_stages.csv.max_building_count`控制Ability存在性：达到上限应移除技能，建筑销毁释放容量后恢复；等级不足或其他非数量条件仍保持置灰。底层`buildings_config`的`max_count`必须与CSV一致，不能只修UI层。
+- 城墙Hull调试命令只允许当前玩家注册拥有的选中城墙；`scale 1`使用建筑定义中的基础Hull（当前256），倍率不得基于上次结果累乘，也不得调用模型缩放。
+- 波次怪共用单位KV保留原生`DOTA_HULL_SIZE_SMALL`；`scalemonster <倍数>`只用于调试Hull，以每只怪首次`GetHullRadius()`结果为不累乘基准，同时更新当前存活怪与之后生成怪，倍率1恢复原生Hull。该命令不得改变怪物模型、战斗CSV或波次数值，地图重新初始化后倍率恢复1。
 - 工人攻击距离使用`training_definitions.csv.attack_range`。伐木工当前统一为每秒0.5次、400射程、远程能力和空自定义弹道；修理工虽然同样投影400距离，但稳定身份仍是纯修理单位，运行时和KV必须保持`NO_ATTACK`。修理距离由独立的`repair_range`控制，当前两级均为200，并按修理工与建筑碰撞体边缘间距判断，边缘间距小于等于200时可修理。
 
 ## 英雄转生多目标普通攻击（2026-08-03）

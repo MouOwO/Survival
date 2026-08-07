@@ -1,3 +1,38 @@
+# 2026-08-08 - 城墙固定锚点与人口训练阶段加载（已纠正）
+
+- 用户后续确认原始人口训练CSV数据正确，上一轮将阶段1至5改为各一次并禁用阶段6属于错误修改，已撤销；权威数据保持阶段1至5各`max_count=5`、阶段6为`max_count=100`且启用。
+- 原始代码根因是`train_population_auto`使用`math.max(2, farm_level + 1)`直接选训练ID，导致训练1永远不加载。运行时现按启用行等级排序，以team共享、`training_id`独立次数选择第一个未满阶段，当前阶段满额后才顺序加载下一阶段；农场等级只校验前置条件。
+- 服务端与Tooltip共用`base_cost + stage_count * increment`费用；仅扣费成功后推进当前阶段并增加人口，`WORKER_CHANGED`继续刷新农场Runtime。Tooltip显示当前阶段、阶段内进度、当前费用、人口收益和下一阶段条件；阶段6达到100次后才完成并禁用。
+- 城墙施工完成和已有实体恢复时建立`survival_fixed_position`，既有固定Modifier每0.1秒纠正碰撞/物理偏移；主动迁移先更新锚点，再沿用现有临时移动Modifier与网格迁移流程，因此迁移后固定在新位置。
+- 新增人口训练与城墙锚点Lua 5.1行为测试及跨CSV/生成Lua/服务端/Runtime/Panorama契约。验证通过：`POPULATION_TRAINING_LUA51_PASS`、`WALL_POSITION_ANCHOR_LUA51_PASS`、`POPULATION_WALL_CONTRACT_PASS`、相关玩法/修理工/Builder回归、目标Lua语法、严格UTF-8、生成逐字节一致与限定diff检查。
+- `ability_tooltip.js`已加入人口训练托管白名单，并由Resource Compiler强制定向编译为`1 compiled, 0 failed, 0 skipped`。Node不在PATH，未运行`node --check`；Resource Compiler结果不等同于Workshop Tools实机验收。
+- 未触碰或回滚工作区内其他用户已有修改。仍需冷启动实测城墙碰撞压力、主动迁移重锚、人口训练1连续5次及递增费用、满额后切换训练2、后续农场门槛和训练6的100次上限；无关伐木工缺失模型契约问题保持不变。
+
+# 2026-08-07：建筑祭坛同尺寸与怪物角色Hull修复
+
+- 用户实测确认：研究所和人口农场的预建造/实际模型应与英雄祭坛一致；普通小怪Hull为32，精英怪为64，Boss无碰撞体。
+- 权威CSV已将研究所/农场实际视觉和施工视觉统一为`radiant_ancient001.vmdl`、0.34，生成Lua与单位KV回退同步；金矿继续保持原生缩放1。
+- 波次生成按`normal=32`、`elite/wave_leader=64`、`boss/assault_boss=0`设置基准Hull；`scalemonster`从角色基准乘正倍率，保存基准避免累计，Boss始终为0。
+- `SIX_GAMEPLAY_FIXES_CONTRACT_PASS`、`SIX_GAMEPLAY_FIXES_LUA51_PASS`、目标Lua `luac5.1`、严格UTF-8与`git diff --check`通过。既有单位模型契约仍被无关伐木工模型CSV缺项阻断；尚未进行Workshop Tools实机验收。
+
+# 2026-08-07 - 城墙/怪物Hull调试与三种建筑原生尺寸
+
+- 核对确认城墙运行基础Hull原为128而非256；波次怪共用`npc_survival_wave_monster`已有原生`DOTA_HULL_SIZE_SMALL`，CSV没有Hull字段，生成链也没有覆盖原生Hull。按用户最新要求将城墙基础Hull改为256。
+- 新增`monster_hull_scale.lua`与`scalemonster <正数倍数>`：首次通过`GetHullRadius()`捕获每只波次怪原生Hull，后续始终从该基准计算而不累计；命令立即更新当前存活怪，`wave_system`保存本局倍率并应用于之后生成怪，倍率1恢复原生Hull，地图初始化恢复1。命令只改Hull，不改模型、战斗CSV或波次数值，并通知/日志输出应用数与原生/结果Hull范围。
+- `building_visual_levels.csv`新增研究所/农场一级视觉并将研究所、农场、金矿统一为模型原生缩放1；定向生成`building_visual_levels.lua`，单位KV同步1.0首帧回退。模型路径、占地和建筑Hull未顺带修改。上一轮金矿0.0875视觉目标被用户最新要求明确取代，但无声收入飘字等其他实现保持不变。
+- 自动验证通过：`SIX_GAMEPLAY_FIXES_LUA51_PASS`、`SIX_GAMEPLAY_FIXES_CONTRACT_PASS`、`BUILDER_ABILITY_SLOTS_LUA51_PASS`、`UNIT_MODEL_CONFIG_LUA51_PASS`、`WAVE_TIMING_LUA51_PASS/WAVE_TIMING_CONTRACT_PASS`、6个相关Lua 5.1语法、建筑视觉定向生成逐字节一致、12个任务文件严格UTF-8和限定diff检查。
+- 未计为通过：既有单位模型契约仍失败于无关伐木工模型CSV缺项`creep_bad_melee_cavern_mega.vmdl`，本轮未修改。仍需Workshop Tools确认城墙256实际堵路、`scalemonster`不同倍率的真实拥挤/穿行，以及研究所/农场/金矿原生模型尺寸；自动测试不等于引擎实机验证。
+
+# 2026-08-07 - 六项玩法修复自动验证完成（部分尺寸值后被用户最新要求取代）
+
+- 金矿视觉权威CSV新增`building_gold_mine`一级`tower_good4.vmdl / 0.0875`，生成Lua与单位KV首帧回退同步；`buildings_config.lua`将视觉行合并进金矿一级数据，升级无新scale时保持当前缩放。
+- 金矿产出移除`OVERHEAD_ALERT_GOLD/CRITICAL`，服务端仅向矿主发送`survival_gold_mine_income_number`；content新增JS/CSS并接入HUD，普通黄色、暴击橙色数字跟随金矿上浮1秒，全链不调用声音API。
+- 农场底层/Builder上限统一为1，金矿为5；Builder仅在数量达到上限时移除技能，销毁释放容量后按CSV槽位恢复，等级条件仍使用原置灰行为。Tooltip生成器从建筑定义与一级成本CSV投影建造费用，农场显示100木材、0金币。
+- 新增城墙Hull模块和`scale <number>`聊天命令；客户端只在选择事件变化时同步候选，服务端验证注册state、玩家与wall身份，允许0.25至4倍，以128为不累乘基准且不改模型。
+- 波次CSV保持426个wave_id和所有非顺序字段不变，仅335个`spawn_order`调整；145组均按`assault_boss -> wave_leader -> normal`。运行构建器删除旧角色优先级覆盖，N1/N3导入器以后生成同一规则。
+- 自动验证通过：专项Lua 5.1行为与契约、Builder槽位回归、8个相关Lua 5.1语法、波次字段/角色顺序、4份生成逐字节一致、Tooltip幂等、30个任务文件严格UTF-8、Python工具语法、波次计时和双仓diff。新JS/CSS各强制编译`1/0/0`，HUD链`9/0/0`；编译器改写的无关依赖产物按用户授权恢复。
+- 未计为通过：用户已有未跟踪旧波次测试仍断言leader首发/assault boss末发，与新需求冲突，未覆盖；既有模型契约失败于无关伐木工模型CSV缺失。仍需Workshop Tools冷启动实测六项行为，自动测试和资源编译不等于实机验收。
+
 # 2026-08-06 - 第1-5波数据驱动怪物视觉系统
 
 - 从用户提供的`SurvivalTwo_Dota2怪物视觉模型规划_V1.0.xlsx`、`wave_visual_model_plan_dota2_V1.0.csv`和`monster_visual_asset_catalog_dota2_V1.0.csv`恢复并交叉提取W1-W5精确视觉ID、角色候选和缩放。新增独立视觉资产、组件、效果和波次映射CSV，不扩展历史不一致的资产目录。

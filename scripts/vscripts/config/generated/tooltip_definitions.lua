@@ -1,6 +1,7 @@
 -- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.
 local M = {}
 M.rows = {
+    { tooltip_id = "ability:ability_build_farm", tooltip_type = "ability", id = "ability_build_farm", name = "建造人口农场", needwood = "100", needgold = "0", desc = "主城建成后解锁，最多建造1座。消耗100木材、0金币。", icon = "chen_holy_persuasion", source_id = "building_farm" },
     { tooltip_id = "ability:ability_enter_endless_training", tooltip_type = "ability", id = "ability_enter_endless_training", name = "无尽年轮圣殿", needwood = "0", needgold = "50000", desc = "传送至无尽年轮圣殿。英雄达到10转后解锁；每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。", icon = "faceless_void_time_walk", source_id = "altar_endless_training" },
     { tooltip_id = "ability:ability_enter_shadow_realm", tooltip_type = "ability", id = "ability_enter_shadow_realm", name = "暗影界前庭", needwood = "0", needgold = "50000", desc = "传送至暗影界前庭。当前版本仅开放传送，怪物与掉落逻辑暂不启用。", icon = "spectre_reality", source_id = "altar_shadow_realm" },
     { tooltip_id = "ability:ability_survival_arcane_barrage", tooltip_type = "ability", id = "ability_survival_arcane_barrage", name = "奥术弹幕·被动", needwood = "0", needgold = "0", desc = "等级1：普通攻击命中时有10%概率触发：以目标位置为中心，在500范围内于1秒内随机落下5颗飞弹。每颗飞弹对落点150范围造成全属性总和×2纯粹伤害。施法结束前不能再次触发。 等级2：飞弹落点区域半径缩小至200，其他效果不变。 等级3：每轮飞弹数量增加至7颗，其他效果不变。 等级4：完整继承等级3效果，无额外变化。 等级5：炮击区域持续3秒，每秒释放一轮7颗飞弹，共3轮、总计21颗飞弹。施法结束前不能再次触发。", icon = "skywrath_mage_arcane_bolt", source_id = "proto_arcane_barrage" },
