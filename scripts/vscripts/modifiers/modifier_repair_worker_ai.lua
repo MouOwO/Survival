@@ -1,5 +1,6 @@
 modifier_repair_worker_ai = class({})
 local M = modifier_repair_worker_ai
+local repair_math = require("core/repair_math")
 
 local THINK_INTERVAL = 0.25
 
@@ -9,15 +10,17 @@ function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
 function M:OnCreated(params)
     if not IsServer() then return end
-    self.repair_per_second = math.max(
+    self.repair_max_health_pct_per_second = math.max(
         0,
-        tonumber(params.repair_per_second) or 0
+        tonumber(params.repair_max_health_pct_per_second) or 0
     )
     self.repair_range = math.max(64, tonumber(params.repair_range) or 200)
     self.detection_range = math.max(
         self.repair_range,
         tonumber(params.detection_range) or FIND_UNITS_EVERYWHERE
     )
+    self.repair_target_entindex = nil
+    self.repair_fractional_remainder = 0
     self:StartIntervalThink(THINK_INTERVAL)
 end
 
@@ -62,7 +65,16 @@ function M:OnIntervalThink()
     if not unit_is_idle(parent) then return end
 
     local building = damaged_building(parent, self.detection_range)
-    if not building then return end
+    if not building then
+        self.repair_target_entindex = nil
+        self.repair_fractional_remainder = 0
+        return
+    end
+    local building_index = building:entindex()
+    if self.repair_target_entindex ~= building_index then
+        self.repair_target_entindex = building_index
+        self.repair_fractional_remainder = 0
+    end
     local center_distance = (
         building:GetAbsOrigin() - parent:GetAbsOrigin()
     ):Length2D()
@@ -86,11 +98,21 @@ function M:OnIntervalThink()
 
     parent:FaceTowards(building:GetAbsOrigin())
     parent:StartGesture(ACT_DOTA_ATTACK)
-    local amount = self.repair_per_second * THINK_INTERVAL
-    building:SetHealth(math.min(
+    local amount, remainder = repair_math.whole_amount_for_interval(
         building:GetMaxHealth(),
-        building:GetHealth() + amount
-    ))
+        self.repair_max_health_pct_per_second,
+        THINK_INTERVAL,
+        self.repair_fractional_remainder
+    )
+    local max_health = building:GetMaxHealth()
+    local next_health = math.min(max_health, building:GetHealth() + amount)
+    building:SetHealth(next_health)
+    if next_health >= max_health then
+        self.repair_target_entindex = nil
+        self.repair_fractional_remainder = 0
+    else
+        self.repair_fractional_remainder = remainder
+    end
 end
 
 return M

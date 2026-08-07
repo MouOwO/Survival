@@ -11,9 +11,9 @@ item_molten_upgrade_gem_04,3112,synthesis_material,0,1,,,,可以升级狱火熔�
 material_synthesis_gem,2041,synthesis_material,0,1,,,,,加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1。拾取后保存在背包中，仅在合成成功时消耗。,1,ok,武器合成/行34,,0,0,0,item,80,0,0,1,0,,,0,,virtual_item,item_recipe,,item_survival_synthesis_gem_shell
 challenge_synthesis_gem,2141,synthesis_material,0,1,,,,击败BOSS后掉落合成宝石,1,ok,武器合成/行35,,0,0,0,item,90,0,0,1,0,,,0,,virtual_item,item_recipe,
 item_forging_hammer,1111,enhancement_item,0,1,,,,英雄每次攻击 成长之剑额外+1次数 可叠加,1,ok,武器合成/行36,,5000,1000,1,item,100,0,0,1,0,,,5,,virtual_item,item_lifesteal,
-shop_proxy_iron_armor_01,2121,legacy_purchase_proxy,0,1,,,equipment_iron_armor_01,增加英雄10点护甲和5000点生命值，重复购买升级，最高5级。,0,needs_confirmation,武器合成/行37,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,110,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
+shop_proxy_iron_armor_01,2121,legacy_purchase_proxy,0,1,,,,equipment_iron_armor_01,增加英雄10点护甲和5000点生命值，重复购买升级，最高5级。,0,needs_confirmation,武器合成/行37,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,110,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
 shop_proxy_attack_gloves_01,2101,legacy_purchase_proxy,0,1,,,,equipment_attack_gloves_01,"增加英雄20%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1 ",0,needs_confirmation,武器合成/行38,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,120,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
-shop_proxy_burning_blade_01,2111,legacy_purchase_proxy,0,1,,,equipment_burning_blade_01,能增加1000攻击力，可重复购买，最高5级,0,needs_confirmation,武器合成/行39,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,130,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
+shop_proxy_burning_blade_01,2111,legacy_purchase_proxy,0,1,,,,equipment_burning_blade_01,能增加1000攻击力，可重复购买，最高5级,0,needs_confirmation,武器合成/行39,原表购买代理行，建议停用并指向真实内容ID。,0,0,0,item,130,0,0,1,0,,,0,数据仍需确认，暂不可购买,virtual_item,item_branches,
 item_small_polar_crystal,1021,enhancement_item,0,1,,,,全属性+1000    击杀200个冰之幽魂 升级,1,ok,武器合成/行45,,0,1000,1,item,140,0,0,1,0,,,1,,virtual_item,item_lifesteal,
 item_large_polar_crystal,1012,enhancement_item,0,1,,,,全属性+2000    大极地晶石+霜之剑刃max+合成宝石=极寒之刃,1,ok,武器合成/行46,,0,1000,0,item,150,0,0,1,0,,,1,,virtual_item,item_lifesteal,
 material_ice_soul_ember,3071,synthesis_material,0,1,,,,,极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决,1,ok,武器合成/行52,,0,0,0,item,160,0,0,1,0,,,1,,virtual_item,item_recipe,,item_survival_ice_soul_ember_shell

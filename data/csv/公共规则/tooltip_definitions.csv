@@ -185,8 +185,6 @@ inventory_item:rebirth_challenge_08,inventory_item,rebirth_challenge_08,挑战8�
 inventory_item:rebirth_challenge_09,inventory_item,rebirth_challenge_09,挑战9转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄100000全属性/增加攻击全属性+10/多重攻击+1,,rebirth_challenge_09
 inventory_item:rebirth_challenge_10,inventory_item,rebirth_challenge_10,挑战10转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄200000全属性/增加攻击全属性+12/多重攻击+1,,rebirth_challenge_10
 inventory_item:service_early_final_boss,inventory_item,service_early_final_boss,提前通关,0,0,1,,service_early_final_boss
-inventory_item:shop_proxy_burning_blade_01,inventory_item,shop_proxy_burning_blade_01,灼热之刃LV1购买,0,0,0,,shop_proxy_burning_blade_01
-inventory_item:shop_proxy_iron_armor_01,inventory_item,shop_proxy_iron_armor_01,铁甲LV1购买,0,0,0,,shop_proxy_iron_armor_01
 inventory_item:weapon_epic_icefire_00,inventory_item,weapon_epic_icefire_00,史诗：冰火裁决,0,0,"增加属性  - 20W攻击力  - 400%攻速  - 100%吸血  - 80W生命值  - 500护甲  - 全属性+8000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害
 | RESULT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决",item_skadi,weapon_epic_icefire_00
 inventory_item:weapon_epic_icefire_01,inventory_item,weapon_epic_icefire_01,史诗：冰火裁决+1,0,0,增加属性  - 25W攻击力  - 400%攻速  - 100%吸血  - 85W生命值  - 550护甲  - 全属性+10000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_01

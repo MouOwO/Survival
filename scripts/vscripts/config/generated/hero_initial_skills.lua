@@ -9,4 +9,3 @@ for _, row in ipairs(M.rows) do
     if key ~= nil then M.by_id[key] = row end
 end
 return M
-

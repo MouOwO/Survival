@@ -396,7 +396,9 @@ local function train_worker(payload)
         end
         worker.survival_worker_type = "repairer"
         worker:AddNewModifier(worker, nil, "modifier_repair_worker_ai", {
-            repair_per_second = tonumber(training.repair_per_second) or 0,
+            repair_max_health_pct_per_second = tonumber(
+                training.repair_max_health_pct_per_second
+            ) or 0,
             repair_range = tonumber(training.repair_range) or 200,
             detection_range = global_rules.repair_detection_range,
         })

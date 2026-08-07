@@ -176,8 +176,9 @@ local function on_builder_ready(payload)
             nil,
             "modifier_repair_worker_ai",
             {
-                repair_per_second = tonumber(repair.repair_per_second)
-                    or 10000,
+                repair_max_health_pct_per_second = tonumber(
+                    repair.repair_max_health_pct_per_second
+                ) or 2,
                 repair_range = tonumber(repair.repair_range) or 200,
             }
         )
