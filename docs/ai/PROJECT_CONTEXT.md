@@ -1,6 +1,23 @@
 # Project Context
 
 ## 城墙升级生命增量语义（2026-08-08）
+## 运行时内存诊断与Panorama生命周期（2026-08-08）
+
+- Dota自定义游戏中的Lua VM高水位、Panorama/V8堆和模型/显存资源池必须分开判断。`LUA Memory usage warning`跨过16 MiB不等于客户端因Lua OOM退出；文件名明确为`V8_hiting_max_memory_limit__512_MB.mdmp`的转储应优先按Panorama JS、Panel和V8闭包生命周期排查。
+- 长期Panorama递归调度必须绑定当前HUD context身份。`survival_hud.xml`先加载`ui_bootstrap.js`建立`SurvivalInputLifecycleGeneration`，后续模块捕获该generation和自己的context Panel；每次调度与高频事件入口都必须同时验证generation仍为当前值且Panel有效。旧context可以暂时仍被引擎订阅持有，但不得继续安排递归任务、创建Panel或改写UI。
+- 运行诊断只能保存固定大小的当前标量：pending/peak调度、累计事件、活动通知和代理Panel数量等；禁止为了诊断保留逐事件或逐波历史。Lua波次采样只读取`collectgarbage("count")`及服务当前计数，不应每波执行`collectgarbage("collect")`掩盖真实保留状态。
+- Panorama短时崩溃诊断不能只依赖60秒周期采样；HUD应在启动约1秒和5秒输出固定大小早期样本，之后再按60秒低频聚合。技能、背包Tooltip等所有拥有延迟回调或NetTable/GameEvent订阅的HUD模块都必须使用同一generation/context门禁，不能只保护主HUD脚本。
+- Tooltip逐次SHOW、游标祖先链、代理几何、绑定映射与恢复签名属于详细诊断，不应默认常驻构造和输出。当前统一由`SurvivalTooltipDetailedDiagnostics === true`显式开启；真正异常、施法诊断和`[SURVIVAL_MEMORY][PANORAMA]`低频聚合保持输出。
+- 内存问题的自动契约和Resource Compiler只能证明门禁、计数和语法/构建成立，不能证明V8堆实际稳定。最终必须冷启动Workshop Tools运行足够长时间，比较相同阶段基线并检查是否生成新V8 heap-limit dump。
+
+## 多选同类型建筑批量升级语义（2026-08-08）
+
+- 建筑等级升级支持War3式多选命令：HUD仍以主选中建筑技能为入口，普通建筑按相同`survival_building_id`匹配；防御塔还必须具有相同`survival_tower_class`，未转职基础塔以空路线作为同一类型。不同当前等级分别升级自身下一等级、读取自身CSV费用，不要求与主建筑同级。
+- Panorama的`Players.GetSelectedEntities()`只作为最多64个候选实体提交。服务端必须以主建筑为类型基准，逐栋重新验证有效存活、`survival_player_id/GetPlayerOwnerID()`、类型/路线、当前单级升级Ability和可施放状态；禁止信任客户端列表直接扣费或升级。
+- 批量协调器必须复用既有`BUILDING_UPGRADE_REQUEST`、升级过程和`RESOURCE_TRY_SPEND_REQUEST`原子扣费。资源按选择顺序逐栋消费，资源不足、满级、升级中、前置不足或状态无效者跳过，已成功开始升级的建筑不回滚；用户提示聚合为一次成功/跳过结果。
+- 批量只适用于普通建筑等级升级和防御塔单级升级。`ability_upgrade_tower_max`保留主塔累计费用直升语义；防御塔转职、金矿科技/自动升级、训练及其他特殊操作不得隐式批量。
+
+## 城墙升级生命比例语义（2026-08-08）
 
 - 城墙等级生命值权威源仍是`building_levels.csv`。城墙升级完成提交时，必须读取提交前一瞬间的当前生命与实际最大生命，应用新等级及当前科技后的最终实际最大生命，再计算`最大生命增量=新最大生命-旧最大生命`，最终`新当前生命=旧当前生命+最大生命增量`；不得保持旧生命百分比或无条件回满。
 - 该公式等价于保持已损失的固定生命值不变。例如`100/200`升级到最大生命`400`时，增量为`200`，最终为`300/400`。仍存活城墙的结果夹紧到`1..新最大生命`；升级施工期间受到的伤害必须进入提交时快照，不得在点击升级时提前锁定生命。

@@ -201,4 +201,10 @@ function M._state_for_test(entindex)
     return state_by_unit[tonumber(entindex)]
 end
 
+function M.active_state_count()
+    local count = 0
+    for _ in pairs(state_by_unit) do count = count + 1 end
+    return count
+end
+
 return M

@@ -700,19 +700,23 @@ local function on_upgrade_request(payload)
     if not state then
         print("[BuildingUpgrade] missing state entindex="
             .. tostring(unit:entindex()))
-        event_bus.emit(events.UI_NOTIFICATION, {
-            player_id = tonumber(unit.survival_player_id)
-                or unit:GetPlayerOwnerID(),
-            message = "建筑升级状态尚未初始化",
-            level = "error",
-        })
+        if not payload.silent_notification then
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = tonumber(unit.survival_player_id)
+                    or unit:GetPlayerOwnerID(),
+                message = "建筑升级状态尚未初始化",
+                level = "error",
+            })
+        end
         payload.result = { ok = false, error = "建筑升级状态尚未初始化" }
         return
     end
 
     if upgrade_process.is_active(unit) then
         if payload.source_ability then payload.source_ability:EndCooldown() end
-        notify(state, "建筑正在升级中", "error")
+        if not payload.silent_notification then
+            notify(state, "建筑正在升级中", "error")
+        end
         payload.result = { ok = false, error = "建筑正在升级中" }
         return
     end
@@ -728,8 +732,10 @@ local function on_upgrade_request(payload)
     if not result or not result.ok then
         if payload.source_ability then payload.source_ability:EndCooldown() end
     end
-    notify(state, result and result.ok and "开始升级" or (result and result.error or "升级失败"),
-        result and result.ok and "info" or "error")
+    if not payload.silent_notification then
+        notify(state, result and result.ok and "开始升级" or (result and result.error or "升级失败"),
+            result and result.ok and "info" or "error")
+    end
     payload.result = result or { ok = false, error = "升级失败" }
 end
 

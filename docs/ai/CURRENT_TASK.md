@@ -1,5 +1,32 @@
 # Current Task
 
+## 当前插入任务（2026-08-08）：Lua高水位与W13-W18客户端闪退调查
+
+- 用户提供`出英雄5秒后闪退.txt`并于2026-08-08批准第二轮最小修复。完整日志约4.62 MB/41789行，共120次JS Exception：119次为`ability_tooltip.js`几何诊断错误引用未定义`active.engineSlot`，1次为`combat_stats.js`无效单位分支调用不存在的`refreshOfficialReturnHomeHotkey`。日志生成于17:05，早于17:20-17:30第一轮生命周期源码和产物，因此不能否定第一轮门禁；但两个错误仍存在于当前源码/编译产物，必须修复。
+- 第二轮批准边界：修复两个确定性ReferenceError；把`inventory_tooltip.js`纳入同一generation/context门禁和有界计数；Panorama聚合在启动约1秒、5秒及之后每60秒输出，覆盖短时崩溃；默认关闭Tooltip逐次SHOW/CURSOR/HITBOX等高频长诊断和200次游标探针，只保留错误、必要状态及低频聚合。扩展契约并强制编译四份JS。不修改CSV、波次数量/模型、Lua GC策略或用户既有其他改动。
+- 第二轮生产实现完成：几何诊断改用作用域内`binding.engineSlot`；无效单位分支改为已有`refreshOfficialUtilityHotkeys([])`并继续受保护递归。`inventory_tooltip.js`的全部延迟、hover、NetTable和GameEvent入口现验证HUD generation/context，并发布pending/peak/recovery固定计数。聚合新增`startup_1s/startup_5s/periodic_60s`及inventory/游标探针字段；Tooltip详细SHOW/CURSOR/HITBOX/GEOMETRY/MAP/BIND/RECOVERY和背包恢复日志默认关闭，且默认不启动200次游标探针。
+- 第二轮自动验证通过：`MEMORY_LIFECYCLE_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`ABILITY_UTILITY_ORDER_CONTRACT_PASS`、`SCHEDULER_DIAGNOSTICS_LUA51_PASS`、目标Lua `luac5.1 -p`、严格UTF-8、编译产物静态契约及两仓限定`diff --check`。`ability_tooltip.js`、`combat_stats.js`、`survival_ui.js`、`inventory_tooltip.js`分别由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。这些只证明静态契约、Lua模拟/语法和构建通过，不是Workshop Tools实机验证。
+- 最终状态检查期间新出现`monster_archetypes.csv`及对应生成Lua的怪物速度修改，用户已明确确认是其有意修改；本轮完整保留且未触碰。`SESSION_LOG.md`历史未提交段落存在既有`U+FFFD`替换字符，不在本轮新增记录中；本轮目标源码与新增文档段落严格UTF-8通过，未越界重写历史日志。
+- 用户报告N1第13至18波附近客户端闪退，并观察到`LUA Memory usage warning`首次跨过16 MiB。当前没有普通文本log，但已在`game/bin/win64`找到同时间的`dota2_2026_0808_033038_0_V8_hiting_max_memory_limit__512_MB.mdmp`及4秒后的breakpoint转储。
+- 初步结论：直接闪退证据指向Panorama JavaScript所在V8 VM达到512 MiB，不得把Lua 16 MiB高水位、V8 512 MiB上限和模型/显存资源池混为一谈。权威`wave_definitions.csv`与`monster_archetypes.csv`确认N1 W13-W18每波仅8至10只、1至2种模型；新增组装视觉仅覆盖W1-W5，因此模型数量不是当前第一嫌疑。
+- 用户已批准实施低开销诊断和生命周期门禁：Lua只在波次开始、生成完成和活怪归零时输出当前Lua KiB、活怪、scheduler任务和视觉状态计数，不强制Full GC、不保存历史；Panorama复用`ui_bootstrap.js`的HUD generation，使旧context的长期调度和事件入口失败关闭，并发布固定大小的当前计数。
+- 修改边界：不降低CSV怪物数量、不替换W13-W18模型、不修改生成配置、不通过每波`collectgarbage("collect")`掩盖泄漏；保留批量升级及其他既有未提交修改。完成后需冷启动Workshop Tools连续运行至少到W20，比较每波后Lua基线与Panorama诊断，并确认不再生成V8 512 MiB转储。
+- 生产实现完成：`scheduler.task_count()`和`monster_visual_service.active_state_count()`提供只读计数；`wave_system`在波次开始、生成完成和活怪归零时输出`[SURVIVAL_MEMORY][LUA]`，包含波次、游戏时间、Lua KiB、alive/pending、敌人表、scheduler和视觉状态。没有调用Full GC，也没有保存样本历史。
+- Panorama的`survival_ui.js`、`combat_stats.js`和`ability_tooltip.js`统一以`SurvivalInputLifecycleGeneration + context Panel`校验当前HUD身份。所有原始`$.Schedule`集中到`scheduleActive()`；旧context回调到期后只退出，不再递归。高频NetTable/GameEvent入口同样失败关闭。固定计数包含pending/peak调度、通知Panel、选择事件、Tooltip恢复/Runtime事件和代理Panel；`survival_ui`每60秒输出一条聚合`[SURVIVAL_MEMORY][PANORAMA]`，不保留历史。
+- 自动验证通过：`MEMORY_LIFECYCLE_CONTRACT_PASS`、`SCHEDULER_DIAGNOSTICS_LUA51_PASS`、`WAVE_TIMING_LUA51_PASS/CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`、目标Lua 5.1语法、严格UTF-8及game/content限定`diff --check`。三份Panorama JS均由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。
+- 无关失败：`test_n1_wave_config.lua`当前失败于既有“W5起领头怪必须排首位”断言，目标CSV/生成波次数据不在本轮diff中，未为内存任务改数据或测试。尚未完成Workshop Tools实机内存验证，也尚未证明V8泄漏根因完全消除。
+- 下一步实机清单：完全停止并重新Run，先召唤英雄并观察至少10秒，确认不再出现`active is not defined`、`refreshOfficialReturnHomeHotkey is not defined`或立即退出，并保存`startup_1s/startup_5s`样本；再冷启动N1连续运行到至少W20，低选择活动跑一轮，高频切换英雄/建筑/怪物并反复悬停技能再跑一轮。逐波保存两类`SURVIVAL_MEMORY`日志，重点比较`wave_cleared`的Lua KiB基线、scheduler/visuals是否回落、Panorama pending/peak/proxies/inventory是否有界，并检查`game/bin/win64`是否新增`V8_hiting_max_memory_limit__512_MB`转储。
+
+## 当前插入任务（2026-08-08）：多选同类型建筑批量升级
+
+- 用户已批准War3式批量升级：多选建筑后仍点击主选中建筑的等级升级按钮，当前选择中属于同一玩家且同类型的建筑分别尝试升级自己的下一等级。
+- 已确认语义A：普通建筑按同一`building_id`匹配；防御塔按同一`survival_tower_class`路线匹配，未转职基础塔归为同一类型。不同当前等级允许批量，各自读取既有CSV下一等级与费用；满级、升级中、前置不足或资源不足者跳过，已成功开始升级者不回滚。
+- 实施边界：只批量普通建筑等级升级和防御塔等级升级；金矿科技、自动升级开关、转职方向、训练及其他特殊按钮不批量。客户端只提交有界选择候选，服务端逐栋校验实体、玩家所有权、类型和合法升级入口，并复用现有单栋升级与原子扣费逻辑。
+- 生产实现完成：`ability_tooltip.js`与`combat_stats.js`统一向既有`ui_ability_cast_request`附带最多64个当前选择实体；服务端新增`building_batch_upgrade_service.lua`，以主建筑为类型基准逐栋重新校验实体、业务owner、路线与当前可用单级升级Ability，再复用`BUILDING_UPGRADE_REQUEST`和原子扣费。每栋读取自身当前等级对应的既有CSV生成配置，资源耗尽后其余建筑跳过，成功项目不回滚，并只显示一次成功/跳过汇总。
+- 兼容边界已保留：`ability_upgrade_tower_max`继续只作用于主塔并保持原累计费用/直升语义；七个转职按钮、金矿科技/自动升级、训练及其他特殊按钮不批量。单选仍走同一批量协调器但行为等同原单体升级。
+- 自动验证通过：`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`、`BUILDING_BATCH_UPGRADE_LUA51_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、建筑升级过程/城墙生命/箭塔成本相关回归、目标Lua 5.1语法、严格UTF-8及game/content限定`diff --check`。`ability_tooltip.js`与`combat_stats.js`均由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。
+- 两项任务前既有Builder回归仍失败且未越界修改：`test_builder_ownership.lua`硬编码移速600而CSV权威为300；`test_builder_hero_replacement_contract.ps1`检查已过时源码字符串。尚未Workshop Tools实机验收多选、鼠标/快捷键、不同等级、部分资源和多人owner隔离。
+
 ## 当前插入任务（2026-08-08）：金矿升级后固定模型尺寸
 
 - 用户实测金矿升级后模型尺寸恢复原状，要求直接固定模型大小。

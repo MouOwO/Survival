@@ -2200,3 +2200,32 @@
 - 专项契约、Lua 5.1行为、Builder集成、Lua 5.1语法、CSV生成一致性、严格UTF-8和限定diff检查通过。
 - 两个用户既有未跟踪回归脚本未通过：Builder ownership测试硬编码600移速但当前权威CSV为300；Builder utility契约缺Monkey射程1000。均与本轮diff无关，未修改这些文件或业务配置。
 - 下一步唯一动作：Workshop Tools冷启动`template_map`做玩家0单人兼容验收。尚未完成实机或网络验收。
+
+## 2026-08-08 - 多选同类型建筑批量升级
+
+- 用户批准War3式语义A：多选建筑后点击主建筑等级升级按钮，普通建筑按相同`building_id`、防御塔按相同路线批量；不同等级各自升级下一等级并支付自身CSV费用，资源不足、满级、升级中或不合法者跳过，已成功项目不回滚。
+- Panorama实际输入双发布者`ability_tooltip.js`和`combat_stats.js`都附带最多64个当前选择entindex。服务端新增`building_batch_upgrade_service.lua`，客户端列表仅作候选，逐栋重新验证存活、业务owner、类型/路线和当前单级升级Ability，再复用既有`BUILDING_UPGRADE_REQUEST`、升级过程与原子扣费。
+- 兼容边界：`ability_upgrade_tower_max`继续只作用于主塔并保留累计费用直升语义；七条转职、金矿科技/自动升级、训练和其他特殊按钮不批量。批量期间单栋错误提示静默，只发送一次成功/跳过汇总。
+- 验证通过：`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`、`BUILDING_BATCH_UPGRADE_LUA51_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、建筑升级过程/城墙生命/箭塔成本回归、目标Lua 5.1语法、严格UTF-8和两仓限定`diff --check`。两个Panorama JS均强制编译为`1 compiled, 0 failed, 0 skipped`。
+- 两项既有Builder测试仍失败：一个硬编码移速600而CSV为300，另一个检查过时源码字符串；本轮未修改Builder迎合无关测试。下一步Workshop Tools冷启动实测多选、鼠标/快捷键、不同等级、部分资源、路线隔离和多人owner隔离，未经用户确认不得记录为实机验收完成。
+
+## 2026-08-08 - N1 W13-W18 V8内存闪退诊断与生命周期门禁
+
+- 用户报告N1第13至18波附近客户端闪退，并观察到Lua首次跨过16 MiB高水位。`game/bin/win64`中同时间存在`dota2_2026_0808_033038_0_V8_hiting_max_memory_limit__512_MB.mdmp`及4秒后的breakpoint转储，因此当前优先调查Panorama/V8，不把Lua高水位或模型资源池混为同一原因。
+- 权威CSV复核确认N1 W13-W18每波8至10只、1至2种模型；数据驱动怪物组装视觉只覆盖W1-W5。波次敌人表、怪物视觉清理和scheduler未发现明显永久波次实体保留，因此没有降低怪物数量、替换模型或加入每波Full GC。
+- 服务端新增只读`scheduler.task_count()`和`monster_visual_service.active_state_count()`。`wave_system`在开始、生成完成和清场时输出固定大小`[SURVIVAL_MEMORY][LUA]`，记录wave、game_time、Lua KiB、alive/pending、敌人表、scheduler和视觉状态；每波清场只采样一次，不保存历史。
+- `survival_ui.js`、`combat_stats.js`和`ability_tooltip.js`统一复用`ui_bootstrap.js`先建立的`SurvivalInputLifecycleGeneration`。所有调度集中到`scheduleActive()`并校验generation/context Panel；旧context的递归与高频NetTable/GameEvent入口失败关闭。固定计数覆盖pending/peak、通知Panel、选择事件、Tooltip恢复/Runtime事件和代理Panel，由HUD每60秒聚合输出，不保存逐事件历史。
+- 自动验证通过：`MEMORY_LIFECYCLE_CONTRACT_PASS`、`SCHEDULER_DIAGNOSTICS_LUA51_PASS`、`WAVE_TIMING_LUA51_PASS/CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`、目标Lua 5.1语法、严格UTF-8及game/content限定`diff --check`。`survival_ui.js`、`combat_stats.js`、`ability_tooltip.js`强制编译均为`1 compiled, 0 failed, 0 skipped`。
+- 无关回归：`test_n1_wave_config.lua`失败于既有“W5起领头怪必须排首位”断言，本轮没有修改任何波次CSV或生成配置，未越界处理。工作期间新出现的`buff_definitions.csv`经用户确认是用户本人修改，已保留且未触碰。
+- 尚未完成引擎实机验证。下一步完全停止并重新Run Workshop Tools，N1分别以低选择与高频选择/Tooltip活动运行至至少W20，保存两类`SURVIVAL_MEMORY`日志并检查是否新增V8 512 MiB转储；未经该步骤不能宣称闪退已解决。
+
+## 2026-08-08 - 英雄召唤后闪退日志复核与Panorama第二轮补强
+
+- 用户提供`出英雄5秒后闪退.txt`。严格UTF-8容错读取后统计约4.62 MB、41789行、120次JS Exception：119次为`ability_tooltip.js`几何诊断越作用域读取`active.engineSlot`，1次为`combat_stats.js`无效单位过渡分支调用不存在的`refreshOfficialReturnHomeHotkey`。异常贯穿日志且最后一次距VConsole断开仅约21行，但`game/bin/win64`没有当次同时间新mdmp，因此不能把该次退出再次宣称为已证明的V8 512 MiB。
+- 时间线确认日志写于17:05，早于17:20-17:30第一轮生命周期源码和编译产物，不能用它否定第一轮门禁；但两个错误仍存在于当时当前源码/产物。现已将几何诊断修正为`binding.engineSlot`，并将无效单位分支修正为已有`refreshOfficialUtilityHotkeys([])`，后续1秒受保护刷新保持不变。
+- `inventory_tooltip.js`补齐与主HUD一致的`SurvivalInputLifecycleGeneration + context Panel`门禁。全部延迟回调、hover事件、NetTable和GameEvent入口在旧context下失败关闭；发布固定大小scheduled total/pending/peak和recovery count，不保存Panel或事件历史。
+- `survival_ui.js`内存聚合新增`startup_1s`、`startup_5s`与`periodic_60s`样本，包含inventory pending/peak/recovery和Tooltip游标探针状态，覆盖英雄召唤后数秒内退出的观测盲区。
+- `ability_tooltip.js`的逐次SHOW、OWNER、SCOPE、LAYER、HITBOX、CURSOR、OUT、SESSION、HOVER、GEOMETRY、MAP、PROXY、BIND、RECOVERY及背包恢复日志统一由`SurvivalTooltipDetailedDiagnostics === true`显式开启；默认不构造主要长映射字符串，也不启动200次/50ms游标探针。真正`SURVIVAL_TOOLTIP_ERROR`、施法日志、Fade控制反馈和低频内存聚合保持输出。
+- 自动验证通过：`MEMORY_LIFECYCLE_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、`ABILITY_UTILITY_ORDER_CONTRACT_PASS`、`SCHEDULER_DIAGNOSTICS_LUA51_PASS`、三份内存相关Lua的`luac5.1 -p`、严格UTF-8、四份编译产物标记/废弃符号契约及两仓限定`diff --check`。四份Panorama JS分别由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。
+- Resource Compiler每次结束均输出工具自身`Leaked KeyValues blocks: 162`，不能当作游戏V8实机堆结果。当前仍未完成Workshop Tools验证；下一步完全停止再Run，先召唤英雄观察10秒和1秒/5秒样本，再按低/高选择活动跑N1至W20并检查新dump。
+- 最终工作区检查发现并发出现`monster_archetypes.csv`及对应生成Lua的速度配置修改；用户明确确认是其有意修改并要求保留，本轮未触碰或回滚。历史未提交`SESSION_LOG.md`约1756行存在既有`U+FFFD`替换字符，本轮新增段落不含该字符，未为内存任务越界重写历史内容。

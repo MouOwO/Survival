@@ -42,6 +42,12 @@ function M.clear()
     tasks = {}
 end
 
+function M.task_count()
+    local count = 0
+    for _ in pairs(tasks) do count = count + 1 end
+    return count
+end
+
 function M.think()
     local current = now()
     local due = {}

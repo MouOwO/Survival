@@ -2,6 +2,12 @@
 
 ## 当前已知问题
 
+0. **N1 W13-W18附近曾发生Panorama/V8 512 MiB堆上限闪退，修复仍待实机确认。**
+   - 同时间转储为`game/bin/win64/dota2_2026_0808_033038_0_V8_hiting_max_memory_limit__512_MB.mdmp`，4秒后另有breakpoint转储。当前尚未做符号化dump分析；“闪退对应V8堆上限”来自时间相关性与明确文件名，不能扩展为已证明某个具体JS函数泄漏。
+   - N1 W13-W18权威CSV每波只有8至10只怪和1至2种模型，新增数据驱动组装视觉只覆盖W1-W5；因此暂不以删模型或减怪作为第一修复。Lua 16 MiB高水位是独立观测，不得称为这次V8 512 MiB闪退的直接原因。
+   - 已加入Lua低频波次采样和Panorama generation/context门禁、有界计数，自动验证与资源编译通过。尚需Workshop Tools冷启动跑到至少W20并检查新dump；在实机数据前不能声明泄漏根因或闪退已解决。
+   - 2026-08-08用户提供的17:05完整日志约4.62 MB/41789行，含120次JS Exception：119次是`ability_tooltip.js`几何诊断越作用域引用`active.engineSlot`，1次是`combat_stats.js`调用不存在的`refreshOfficialReturnHomeHotkey`。日志早于17:20-17:30第一轮生命周期修复，不能用于否定第一轮门禁；两个确定性错误现已修复，`inventory_tooltip.js`也补入生命周期门禁。该日志没有同时间新mdmp，因此不能把当次退出再次宣称为已证明的V8 512 MiB。
+
 0. **转生商店前台旧回归当前未通过，且不属于N2数据同步修改。**
    - 2026-08-05复跑`test_challenge_session_foreground_contract.ps1`发现`shop_condition_evaluator.lua`虽计算`active_rebirth`，但当前只用于绕过购买上限，没有立即返回“该转生挑战正在进行中”；对应生产文件Git无差异，本轮未修改。
    - 旧Lua行为测试还因测试context缺少`min_city_level`，在`context.city_level < entry.min_city_level`处出现number与nil比较。后续修复该独立任务时，应同时恢复服务端/商店快照双门禁并更新Mock必需字段；不得把本次N2专项通过误述为该回归通过。

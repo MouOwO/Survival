@@ -9,6 +9,7 @@ local combat_stat_projection = require("ui/combat_stat_projection")
 local asset_catalog = require("config/asset_catalog")
 local armor_balance = require("config/armor_balance")
 local hero_summon_projection = require("systems/hero_summon_projection")
+local building_batch_upgrade = require("systems/building_batch_upgrade_service")
 
 local M = {}
 local synthesis_requests = {}
@@ -770,17 +771,31 @@ local function register_ability_cast_request()
                 or not ability:IsFullyCastable() then
                 direct_result = { ok = false, error = "防御塔升级技能当前不可用" }
             else
-                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
-                direct_cooldown_started = true
-                local request = {
-                    building = unit,
-                    upgrade_mode = tower_upgrade_mode,
-                    source_ability = ability,
-                }
-                event_bus.emit(events.BUILDING_UPGRADE_REQUEST, request)
-                direct_result = request.result or { ok = false, error = "防御塔升级无响应" }
-                print("[SURVIVAL_CAST][SERVER] TOWER_UPGRADE_DISPATCHED mode="
-                    .. tostring(tower_upgrade_mode))
+                if tower_upgrade_mode == "one" then
+                    direct_result = building_batch_upgrade.execute({
+                        player_id = player_id,
+                        primary = unit,
+                        primary_ability = ability,
+                        ability_name = ability_name,
+                        selected_entindexes = payload.selected_entindexes,
+                    })
+                    print("[SURVIVAL_CAST][SERVER] TOWER_BATCH_UPGRADE_DISPATCHED success="
+                        .. tostring(direct_result and direct_result.success_count or 0)
+                        .. " skipped=" .. tostring(direct_result and direct_result.skipped_count or 0))
+                else
+                    ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+                    direct_cooldown_started = true
+                    local request = {
+                        building = unit,
+                        upgrade_mode = tower_upgrade_mode,
+                        source_ability = ability,
+                    }
+                    event_bus.emit(events.BUILDING_UPGRADE_REQUEST, request)
+                    direct_result = request.result
+                        or { ok = false, error = "防御塔升级无响应" }
+                    print("[SURVIVAL_CAST][SERVER] TOWER_UPGRADE_DISPATCHED mode="
+                        .. tostring(tower_upgrade_mode))
+                end
             end
         elseif building_upgrade_ability_matches and owner_matches
             and not passive and not is_point_target then
@@ -790,16 +805,17 @@ local function register_ability_cast_request()
                 or not ability:IsFullyCastable() then
                 direct_result = { ok = false, error = "建筑升级技能当前不可用" }
             else
-                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
-                direct_cooldown_started = true
-                local request = {
-                    building = unit,
-                    source_ability = ability,
-                }
-                event_bus.emit(events.BUILDING_UPGRADE_REQUEST, request)
-                direct_result = request.result or { ok = false, error = "建筑升级无响应" }
-                print("[SURVIVAL_CAST][SERVER] BUILDING_UPGRADE_DISPATCHED name="
-                    .. tostring(ability_name))
+                direct_result = building_batch_upgrade.execute({
+                    player_id = player_id,
+                    primary = unit,
+                    primary_ability = ability,
+                    ability_name = ability_name,
+                    selected_entindexes = payload.selected_entindexes,
+                })
+                print("[SURVIVAL_CAST][SERVER] BUILDING_BATCH_UPGRADE_DISPATCHED name="
+                    .. tostring(ability_name) .. " success="
+                    .. tostring(direct_result and direct_result.success_count or 0)
+                    .. " skipped=" .. tostring(direct_result and direct_result.skipped_count or 0))
             end
         elseif tower_ability_matches and owner_matches and not passive
             and not is_point_target and tower_class_index and tower_class_index >= 1

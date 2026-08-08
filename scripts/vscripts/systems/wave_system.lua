@@ -28,6 +28,7 @@ local dev_mode = false
 local monster_spawn_marker = nil
 local monster_hull_multiplier = 1
 local game_started_at = nil
+local memory_cleared_wave = -1
 local EARLY_FINAL_UNLOCK_SECONDS = 15 * 60
 local FINAL_WAVE_NUMBER = 30
 
@@ -54,6 +55,35 @@ end
 
 local function valid(entity)
     return entity and not entity:IsNull()
+end
+
+local function count_entries(values)
+    local count = 0
+    for _ in pairs(values or {}) do count = count + 1 end
+    return count
+end
+
+local function report_memory(phase)
+    local lua_kib = type(collectgarbage) == "function"
+        and tonumber(collectgarbage("count")) or -1
+    local scheduler_count = type(scheduler.task_count) == "function"
+        and scheduler.task_count() or -1
+    local visual_count = type(monster_visual_service.active_state_count) == "function"
+        and monster_visual_service.active_state_count() or -1
+    local game_time = GameRules and GameRules.GetGameTime
+        and tonumber(GameRules:GetGameTime()) or -1
+    print(string.format(
+        "[SURVIVAL_MEMORY][LUA] phase=%s wave=%d game_time=%.1f lua_kib=%.1f alive=%d pending=%d enemies=%d scheduler=%d visuals=%d",
+        tostring(phase),
+        tonumber(state.current_wave) or 0,
+        game_time,
+        lua_kib or -1,
+        tonumber(state.alive) or 0,
+        tonumber(state.pending) or 0,
+        count_entries(enemies),
+        scheduler_count,
+        visual_count
+    ))
 end
 
 local function find_monster_spawn_marker()
@@ -317,6 +347,7 @@ local function start_wave(number, reason)
     scheduler.cancel("wave_countdown")
     generation_token = generation_token + 1
     state.current_wave = number
+    memory_cleared_wave = -1
     state.status, state.timer = "spawning", 0
     state.planned, state.pending, state.spawned, state.killed, state.failed_spawn = 0, 0, 0, 0, 0
     state.final_wave_generation_completed = false
@@ -357,12 +388,14 @@ local function start_wave(number, reason)
             state.final_wave_generation_completed = true
         end
         publish("wave_generation_completed")
+        report_memory("generation_completed")
         if state.current_wave >= state.total_waves then
             state.status = "all_waves_spawned"
             publish("all_waves_spawned")
             check_final_victory()
         end
     end, "wave_generation_complete")
+    report_memory("wave_started")
     return true
 end
 
@@ -394,6 +427,11 @@ local function on_killed(payload)
     state.killed = state.killed + 1
     if meta.is_boss then state.boss_alive = false end
     publish("enemy_killed")
+    if state.alive == 0 and state.pending == 0
+        and memory_cleared_wave ~= state.current_wave then
+        memory_cleared_wave = state.current_wave
+        report_memory("wave_cleared")
+    end
     check_final_victory()
 end
 
@@ -581,6 +619,7 @@ function M.init()
     game_started = false
     game_started_at = nil
     monster_hull_multiplier = 1
+    memory_cleared_wave = -1
     reset(); enemies = {}; wall_entindex = -1; generation_token = 0; dev_mode = false
     rebuild_waves()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)
