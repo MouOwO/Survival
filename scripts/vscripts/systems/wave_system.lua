@@ -242,7 +242,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
         return
     end
     monster_spawn_marker = marker
-    local position = marker:GetAbsOrigin() + RandomVector(100)
+    local position = marker:GetAbsOrigin()
     position.z = GetGroundHeight(position, nil) + 32
     local unit = CreateUnitByName(definition.unit_name, position, true, nil, nil, DOTA_TEAM_BADGUYS)
     if not valid(unit) then

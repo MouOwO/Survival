@@ -602,9 +602,47 @@ local function register_ability_cast_position_request()
         local behavior = ability_valid and ability:GetBehaviorInt() or -1
         local is_point_target = ability_valid
             and bit.band(behavior, DOTA_ABILITY_BEHAVIOR_POINT) ~= 0
+        local hero_quickcast = ability_name
+            == "ability_survival_hero_ball_lightning"
         print(string.format("[SURVIVAL_CAST][SERVER] POINT_CHECK name=%s building=%s unit_valid=%s ability_valid=%s caster_matches=%s owner=%s point=%s",
             tostring(ability_name), tostring(building_id), tostring(unit_valid), tostring(ability_valid),
             tostring(caster_matches), tostring(owner_id), tostring(is_point_target)))
+        if hero_quickcast then
+            local hero_ability_matches = unit_valid and ability_valid
+                and unit:FindAbilityByName(ability_name) == ability
+            local can_cast = hero_ability_matches and caster_matches
+                and owner_id == player_id and is_point_target
+                and unit:IsAlive() and ability:IsActivated()
+                and not ability:IsHidden() and ability:IsFullyCastable()
+            if not can_cast then
+                print("[SURVIVAL_CAST][SERVER] POINT_REJECT hero_quickcast_validation")
+                send_to_player("ui_ability_cast_result", player_id, {
+                    success = 0, entindex = entindex or -1,
+                    ability_entindex = ability_entindex or -1,
+                    ability_name = ability_name, behavior = behavior,
+                    error = "hero_quickcast_rejected",
+                })
+                return
+            end
+            local origin = unit:GetAbsOrigin()
+            local delta = Vector(x, y, z) - origin
+            delta.z = 0
+            local distance = delta:Length2D()
+            local target = Vector(x, y, z)
+            if distance > 800 then
+                target = origin + delta:Normalized() * 800
+            end
+            target.z = GetGroundHeight(target, unit)
+            unit:CastAbilityOnPosition(target, ability, player_id)
+            print("[SURVIVAL_CAST][SERVER] POINT_HERO_CAST_ISSUED name="
+                .. tostring(ability_name))
+            send_to_player("ui_ability_cast_result", player_id, {
+                success = 1, entindex = entindex,
+                ability_entindex = ability_entindex,
+                ability_name = ability_name, behavior = behavior, error = "",
+            })
+            return
+        end
         if not unit_valid or not ability_valid or not building_id
             or not caster_matches or owner_id ~= player_id or not is_point_target then
             print("[SURVIVAL_CAST][SERVER] POINT_REJECT validation")

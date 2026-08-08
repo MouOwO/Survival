@@ -21,6 +21,10 @@ local modifiers = {
         path = "modifiers/modifier_building_under_construction",
     },
     {
+        name = "modifier_building_damage_sound",
+        path = "modifiers/modifier_building_damage_sound",
+    },
+    {
         name = "modifier_grid_building_preview",
         path = "modifiers/modifier_grid_building_preview",
     },

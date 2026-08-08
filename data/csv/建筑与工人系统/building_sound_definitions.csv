@@ -3,6 +3,7 @@ cue_id,building_scope,phase,transition_type,tower_class,sound_events,sound_resou
 #types:string,string,enum,string,string,list,list,enum,enum,string,number,number,number,boolean,string,number,number
 building_construction_start,all,construction_start,construction_start,,General.SelectAction,soundevents/game_sounds_ui_imported.vsndevts,oneshot,unit,building_construction_start,0.12,3,0.4,1,资源扣除和施工实体创建成功后播放一次轻量提示；不在工人移动阶段提前播放。,3,0.35
 building_construction_complete,all,construction_complete,construction_complete,,DOTA_Item.Buckler.Activate,soundevents/game_sounds_items.vsndevts,oneshot,unit,building_construction_complete,0.15,2,0.6,1,施工达到100%且建筑状态完成提交后播放一次柔和完成提示。,2,0.55
+building_wall_damage,wall,hit,damage,,Building_Generic.PartialDestruction,soundevents/game_sounds.vsndevts,oneshot,unit,building_wall_damage,0.12,3,0.6,1,城墙实际受到正伤害后播放石质建筑受击声；按城墙实体限流。,2,0.4
 building_structure_upgrade_complete,wall|main_city|hero_altar,upgrade_complete,structure_upgrade,,General.LevelUp.Bonus,soundevents/game_sounds.vsndevts,oneshot,unit,building_structure_upgrade,0.2,2,0.8,1,城墙、主城与祭坛升级完成使用单层轻量升级提示。,2,0.7
 building_standard_upgrade_complete,building_farm|gold_mine,upgrade_complete,standard_upgrade,,General.LevelUp.Bonus,soundevents/game_sounds.vsndevts,oneshot,unit,building_standard_upgrade,0.15,3,0.8,1,农场与金矿本体等级完成提交后的单层轻量升级提示。,3,0.45
 tower_base_upgrade_complete,arrow_tower,upgrade_complete,base_upgrade,,General.LevelUp.Bonus,soundevents/game_sounds.vsndevts,oneshot,unit,tower_upgrade,0.15,3,0.8,1,基础箭塔LV1至LV5普通升级；LV5解锁转职仍使用单层轻量提示。,3,0.45

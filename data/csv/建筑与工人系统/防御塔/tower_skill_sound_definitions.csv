@@ -1,6 +1,7 @@
 cue_id,skill_family,phase,sound_event,sound_resource,playback_mode,attach_scope,cooldown_group,cooldown_seconds,max_plays_per_window,window_seconds,enabled,notes,max_concurrent,concurrency_seconds
 #中文名:音效Cue ID,塔技能族,阶段,原生音效事件,音效资源文件,播放模式,挂载范围,冷却组,冷却秒数,窗口最大播放次数,窗口秒数,是否启用,备注,最大并发数,并发占位秒数
 #types:string,string,enum,string,string,enum,enum,string,number,number,number,boolean,string,number,number
+tower_basic_attack,basic_attack,launch,Creep_Good_Range.Attack,soundevents/game_sounds_creeps.vsndevts,oneshot,unit,tower_basic_attack,0.08,3,0.35,1,箭塔实际发射普通攻击时播放；覆盖基础、转职及融合塔攻击代理。,3,0.25
 tower_critical_strike,critical_strike,impact,Hero_TemplarAssassin.Meld.Attack,soundevents/game_sounds_heroes/game_sounds_templar_assassin.vsndevts,oneshot,position,tower_death_critical,0.08,2,0.35,1,致命一击权威落地帧；本机原生事件已核验。,2,0.3
 tower_bone_cannon,bone_cannon,impact,Hero_Nevermore.Shadowraze,soundevents/game_sounds_heroes/game_sounds_nevermore.vsndevts,oneshot,position,tower_death_critical,0.08,2,0.35,1,骨炮十倍暴击落地帧；与普通致命一击共享密度组。,2,0.3
 tower_death_grenade,death_grenade,impact,Hero_Warlock.RainOfChaos,soundevents/game_sounds_heroes/game_sounds_warlock.vsndevts,oneshot,position,tower_death_grenade,0.15,1,0.5,1,整次死亡榴弹范围结算只播放一次。

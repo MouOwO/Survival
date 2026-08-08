@@ -90,6 +90,7 @@
 /scripts/vscripts/tests/*
 !/scripts/vscripts/tests/test_building_sound_integration.lua
 !/scripts/vscripts/tests/test_building_construction_visual_service.lua
+!/scripts/vscripts/tests/test_building_upgrade_process.lua
 !/scripts/vscripts/tests/test_earth_line_visual.lua
 !/scripts/vscripts/tests/test_wave_difficulty_builder.lua
 !/scripts/vscripts/tests/test_wave_difficulty_selection.lua

@@ -4,6 +4,7 @@ local asset_preload = require("systems/asset_preload_service")
 local M = {}
 local active_by_entindex = {}
 local next_generation = 0
+local KEEN_TELEPORT_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
 
 local function valid_entity(unit)
     return unit and not unit:IsNull()
@@ -69,17 +70,45 @@ local function complete_state(state)
     safe_callback(state.options.on_complete)
 end
 
+local function particle_origin(unit)
+    if not valid_entity(unit) or type(unit.GetAbsOrigin) ~= "function" then
+        return nil
+    end
+    local ok, origin = pcall(unit.GetAbsOrigin, unit)
+    if ok then return origin end
+    return nil
+end
+
 local function start_particle(state)
     local path = state.options.particle
     if type(path) ~= "string" or path == "" or not ParticleManager then return end
-    local ok, particle_id = pcall(function()
-        return ParticleManager:CreateParticle(
+    local origin = particle_origin(state.unit)
+    if not origin then return end
+
+    local particle_id = nil
+    local ok = pcall(function()
+        particle_id = ParticleManager:CreateParticle(
             path,
-            PATTACH_ABSORIGIN_FOLLOW,
+            PATTACH_WORLDORIGIN,
             state.unit
         )
+        ParticleManager:SetParticleControl(particle_id, 0, origin)
+        if path == KEEN_TELEPORT_PARTICLE then
+            ParticleManager:SetParticleControl(
+                particle_id,
+                7,
+                Vector(math.max(0.1, state.duration), 0, 0)
+            )
+        end
     end)
-    if ok then state.particle_id = particle_id end
+    if ok and particle_id ~= nil then
+        state.particle_id = particle_id
+    elseif particle_id ~= nil then
+        pcall(function()
+            ParticleManager:DestroyParticle(particle_id, true)
+            ParticleManager:ReleaseParticleIndex(particle_id)
+        end)
+    end
 end
 
 local function queue_target_visual(state)
@@ -123,6 +152,7 @@ function M.begin(unit, options)
         unit = unit,
         entindex = entindex,
         options = options,
+        duration = math.max(0, tonumber(options.duration) or 0),
         finished = false,
     }
     active_by_entindex[entindex] = state
@@ -135,8 +165,7 @@ function M.begin(unit, options)
     safe_callback(options.on_start)
     queue_target_visual(state)
 
-    local duration = math.max(0, tonumber(options.duration) or 0)
-    state.task_id = scheduler.after(duration, function()
+    state.task_id = scheduler.after(state.duration, function()
         complete_state(state)
     end, "building_upgrade_" .. tostring(entindex)
         .. "_" .. tostring(next_generation))
@@ -145,7 +174,7 @@ function M.begin(unit, options)
         pending = true,
         entindex = entindex,
         target_level = unit.survival_upgrade_target_level,
-        duration = duration,
+        duration = state.duration,
     }
 end
 

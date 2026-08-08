@@ -326,6 +326,9 @@ local function recover_building(unit)
         if not unit:HasModifier("modifier_building_stationary") then
             unit:AddNewModifier(unit, nil, "modifier_building_stationary", {})
         end
+        if not unit:HasModifier("modifier_building_damage_sound") then
+            unit:AddNewModifier(unit, nil, "modifier_building_damage_sound", {})
+        end
     end
     buildings[entindex] = state
     change_count(state.team, state.building_id, 1)
@@ -577,6 +580,10 @@ local function start_building(payload)
         if check.definition.id == "arrow_tower" then
             unit:AddNewModifier(unit, nil, "modifier_tower_auto_attack", {})
             unit:AddNewModifier(unit, nil, "modifier_tower_attack_effects", {})
+        end
+        if check.definition.id == "wall"
+            and not unit:HasModifier("modifier_building_damage_sound") then
+            unit:AddNewModifier(unit, nil, "modifier_building_damage_sound", {})
         end
         if check.definition.id == "arrow_tower" then
             local initial_row = arrow_data(1)

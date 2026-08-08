@@ -36,12 +36,24 @@ local function play(cue_id, unit, team)
     })
 end
 
+local function play_for_unit(cue_id, unit)
+    if not valid_entity(unit) then return false, "invalid_building" end
+    return sounds.play(cue_id, {
+        unit = unit,
+        source = unit,
+    })
+end
+
 function M.construction_started(unit, team)
     return play("building_construction_start", unit, team)
 end
 
 function M.construction_completed(unit, team)
     return play("building_construction_complete", unit, team)
+end
+
+function M.wall_damaged(unit)
+    return play_for_unit("building_wall_damage", unit)
 end
 
 function M.upgrade_completed(options)
