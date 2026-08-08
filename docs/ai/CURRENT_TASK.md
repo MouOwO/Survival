@@ -1,5 +1,17 @@
 # Current Task
 
+## 当前插入任务（2026-08-08）：`monster<N>`开发跳波预载窗口
+
+- 用户实机复测确认`monster19`会输出`ready_after_buffer elapsed=3.00`并按时生成，但单位仍显示红色`ERROR`；这证明3秒门禁正常执行，剩余问题不是等待不足。
+- 最终根因已由本机当前Dota `pak01_dir.vpk`目录索引确认：旧路径`models/heroes/tiny/tiny.vmdl_c`不存在，而`models/heroes/tiny/tiny_01/tiny_01.vmdl_c`存在。`PrecacheUnitByNameAsync()`对引用无效模型的代理仍可能回调READY，因此`ready_after_buffer`不能证明模型路径有效。
+- 已批准边界：仅影响`monster<N>`/`monster <N>`开发跳波；复用现有`asset_preload_service`、`monster_visual_service`与`scheduler`。无论资源是否已就绪都固定等待满3秒渲染缓冲，3秒结束时未就绪或加载失败则失败开放；连续命令只允许最后一次生效，迟到状态不得二次出怪。正常波次倒计时、数量、属性、模型映射和正式出怪时序保持不变。
+- 工作区保护：用户确认当前`building_levels.csv`修改与`wall_upgrade.xlsx`删除均为其有意改动，本任务完整保留且不触碰；大量既有未跟踪测试文件同样不清理、不覆盖。
+- 生产实现完成：`wave_timing_rules.csv`新增`dev_wave_preload_timeout_seconds=3`并定向生成；`debug_spawn_wave()`现进入`dev_preloading`，按目标波CSV archetype模型去重并通过`asset_preload_service`紧急排队，同时排队波次视觉。原型资源状态只用于3秒结束时诊断；即使全部READY也等待完整3秒，FAILED/RETIRED/模型未注册或超时在缓冲结束后失败开放。独立settled锁、generation token及命名scheduler任务共同防止迟到轮询二次出怪和旧命令覆盖新命令。
+- Tiny路径修复从权威CSV落地：`monster_tiny`、`golem_gray_small`、`golem_gray_large`及同样引用旧路径的`rebirth_boss_09`统一改为`models/heroes/tiny/tiny_01/tiny_01.vmdl`，定向重建两个生成Lua并同步`asset_proxy_monster_tiny`。专项契约同时禁止恢复不存在的旧路径；最终自动验证结果见本节后续记录。
+- 既有回归未通过且未越界修复：未跟踪`test_wave_timing_contract.ps1`硬编码要求基线`late_interval_seconds=150`，但任务前权威CSV/生成Lua均为90；未跟踪`test_n1_wave_config.lua`仍失败于既有“W5起领头怪必须排首位”断言。本任务未修改这两个业务数据或用户测试。
+- 编码修复：本次必须修改的`wave_timing_rules.csv`在Git基线已含真实`U+FFFD`替换字符；已依据可正常读取的生成Lua字段语义恢复该文件4行中文并统一为严格UTF-8，没有改动既有波次计时数值。
+- 当前状态：3秒门禁已有用户实机日志证明按时执行；无效Tiny路径修复的专项Lua 5.1行为、PowerShell契约、Lua 5.1语法、VPK索引、定向生成逐字节一致、严格UTF-8和限定`diff --check`均通过。下一步必须完全冷启动Workshop Tools后输入`monster19`，确认Tiny LV1主体正常显示而非红色`ERROR`；再快速连续输入`monster19`、`monster20`确认只出最后一波。
+
 ## 当前插入任务（2026-08-08）：Lua高水位与W13-W18客户端闪退调查
 
 - 用户提供`出英雄5秒后闪退.txt`并于2026-08-08批准第二轮最小修复。完整日志约4.62 MB/41789行，共120次JS Exception：119次为`ability_tooltip.js`几何诊断错误引用未定义`active.engineSlot`，1次为`combat_stats.js`无效单位分支调用不存在的`refreshOfficialReturnHomeHotkey`。日志生成于17:05，早于17:20-17:30第一轮生命周期源码和产物，因此不能否定第一轮门禁；但两个错误仍存在于当前源码/编译产物，必须修复。

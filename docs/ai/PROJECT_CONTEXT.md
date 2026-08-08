@@ -1,5 +1,11 @@
 # Project Context
 
+## 开发跳波资源加载边界（2026-08-08）
+
+- 正常波次依靠倒计时和上一波开始时的`queue_wave_assets()`获得下一波预载提前量；`monster<N>`/`monster <N>`属于随机跳波开发路径，不能假设此前波次已经加载目标模型。
+- 开发跳波必须从当前难度生成后的波次成员读取archetype，再从生成的`monster_archetypes.lua`取得模型路径并通过CSV生成的`asset_catalog`映射到异步代理；同一模型必须去重。Lua资源READY回调不等于客户端模型已可渲染；开发跳波固定等待`wave_timing_rules.csv.dev_wave_preload_timeout_seconds`定义的完整渲染缓冲（当前3秒）后再出怪。READY只影响结束日志；FAILED、RETIRED、映射缺失或超时在缓冲结束后仅于dev路径失败开放，不得永久卡住测试。
+- 开发预载门禁必须同时拥有请求generation、一次性settled身份和可取消的命名scheduler任务。快速连续输入不同波次时旧轮询不得出旧波；超时后的迟到READY状态不得二次生成。额外波次视觉继续排队，但遵循既有“视觉失败不阻断原型怪生成”边界。
+
 ## 城墙升级生命增量语义（2026-08-08）
 ## 运行时内存诊断与Panorama生命周期（2026-08-08）
 
@@ -188,6 +194,7 @@
 - 主城、召唤祭坛、研究所、农场与金矿的普通建筑视觉权威源是`building_visual_levels.csv`。普通建筑由`buildings_config.lua`按`building_id+level`合并到战斗等级数据；金矿使用独立`gold_mine_system`升级链，因此`gold_mine_config.level_data()`必须把金矿固定视觉行投影到全部等级。两条提交链最终均复用`building_visual_service.apply()`。
 - 普通建筑视觉表可直接使用`model_name/model_scale/model_yaw`，不强制进入复杂塔套装的`asset_catalog.csv`。当前`asset_catalog.csv`存在27列表头与大量22列历史行不一致，未修复前不得为普通模型任务强行生成或批量补列。
 - 新增分级模型必须同步：CSV、生成Lua、运行时消费者、模型预缓存和单位KV的LV1回退；模型路径需从当前`pak01_dir.vpk`索引确认，自动验证不能代替Workshop Tools中的尺寸、动画和朝向验收。
+- 当前Dota不包含`models/heroes/tiny/tiny.vmdl_c`；基础Tiny有效主体是`models/heroes/tiny/tiny_01/tiny_01.vmdl_c`。W18/W19灰色傀儡、九转Boss、`monster_tiny`资产和`asset_proxy_monster_tiny`必须保持该路径一致。异步预载READY回调不能作为路径存在或客户端可渲染的证据。
 - 研究所、人口农场与金矿的视觉权威值现与英雄祭坛一致，均使用`radiant_ancient001.vmdl`、`model_scale=0.34`；施工规则和单位KV首帧回退也必须保持0.34。金矿使用该模型是为了提供可靠的单位选择命中边界；`selectable=true`和建筑Hull不能为缺少选择hitbox的静态模型补出可靠鼠标命中。金矿LV1视觉是全部金矿等级的固定视觉，手动和自动升级提交必须重新投影模型、缩放和朝向，禁止因等级行缺少`model_scale`恢复原始尺寸。
 - Builder数量上限以`builder_ability_stages.csv.max_building_count`控制Ability存在性：达到上限应移除技能，建筑销毁释放容量后恢复；等级不足或其他非数量条件仍保持置灰。底层`buildings_config`的`max_count`必须与CSV一致，不能只修UI层。
 - 城墙Hull调试命令只允许当前玩家注册拥有的选中城墙；`scale 1`使用建筑定义中的基础Hull（当前256），倍率不得基于上次结果累乘，也不得调用模型缩放。

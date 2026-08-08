@@ -11,6 +11,7 @@ local asset_preload = require("systems/asset_preload_service")
 local difficulty_config = require("config/difficulty_config")
 local wave_difficulty_builder = require("systems/wave_difficulty_builder")
 local wave_timing_config = require("config/wave_timing_config")
+local asset_catalog = require("config/asset_catalog")
 local monster_visual_config = require("config/monster_visual_config")
 local monster_visual_service = require("systems/monster_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
@@ -31,6 +32,9 @@ local game_started_at = nil
 local memory_cleared_wave = -1
 local EARLY_FINAL_UNLOCK_SECONDS = 15 * 60
 local FINAL_WAVE_NUMBER = 30
+local DEV_PRELOAD_POLL_INTERVAL = 0.05
+local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
+local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
 
 local function queue_wave_assets(number)
     local wave = waves[number]
@@ -513,6 +517,8 @@ function M.set_dev_mode(enabled)
     dev_mode = enabled == true
     generation_token = generation_token + 1
     scheduler.cancel("wave_countdown")
+    scheduler.cancel(DEV_PRELOAD_TASK_ID)
+    scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
     if dev_mode then
         state.status = "dev_mode"
         state.pending = 0
@@ -523,13 +529,8 @@ end
 
 function M.is_dev_mode() return dev_mode end
 
-function M.debug_spawn_wave(number)
-    number = tonumber(number)
-    local wave = number and waves[number] or nil
-    if not wave then return false, "wave_not_found" end
-    dev_mode = true
-    generation_token = generation_token + 1
-    local token = generation_token
+local function begin_debug_wave_spawn(number, wave, token, preload_reason)
+    if token ~= generation_token then return false end
     state.current_wave = number
     state.status = "dev_spawn"
     state.planned, state.pending, state.spawned, state.killed, state.failed_spawn = 0, 0, 0, 0, 0
@@ -557,8 +558,101 @@ function M.debug_spawn_wave(number)
     end
     scheduler.after(math.max(0, (sequence - 1) * 1.0) + 0.05, function()
         if token == generation_token then state.status = "dev_mode"; publish("dev_wave_completed") end
-    end, "dev_wave_complete")
+    end, DEV_WAVE_COMPLETE_TASK_ID)
+    print("[WaveSystem] dev wave spawn started wave=" .. tostring(number)
+        .. " preload=" .. tostring(preload_reason))
     publish("dev_wave_started")
+    return true
+end
+
+local function debug_wave_model_asset_ids(wave)
+    local asset_ids = {}
+    local seen = {}
+    local failed = 0
+    for _, row in ipairs(wave.batches or {}) do
+        local definition = archetypes.by_id[row.archetype_id]
+        local model_path = definition and definition.model_path or nil
+        local asset = model_path and asset_catalog.for_model(model_path)
+            or nil
+        local asset_id = asset and asset.asset_id or nil
+        if asset_id and not seen[asset_id] then
+            seen[asset_id] = true
+            asset_ids[#asset_ids + 1] = asset_id
+        elseif model_path and not asset_id and not seen[model_path] then
+            seen[model_path] = true
+            failed = failed + 1
+        end
+    end
+    return asset_ids, failed
+end
+
+function M.debug_spawn_wave(number)
+    number = tonumber(number)
+    local wave = number and waves[number] or nil
+    if not wave then return false, "wave_not_found" end
+    dev_mode = true
+    generation_token = generation_token + 1
+    local token = generation_token
+    scheduler.cancel("wave_countdown")
+    scheduler.cancel(DEV_PRELOAD_TASK_ID)
+    scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
+    state.current_wave = number
+    state.status = "dev_preloading"
+    state.timer = wave_timing_config.dev_wave_preload_timeout_seconds
+    state.pending = 0
+    publish("dev_wave_preload_started")
+
+    local asset_ids, missing_count = debug_wave_model_asset_ids(wave)
+    local preload_failed = missing_count > 0
+    for _, asset_id in ipairs(asset_ids) do
+        local ok = asset_preload.queue(asset_id, {
+            urgent = true,
+            priority = 4000 - number,
+            retry = true,
+        })
+        if not ok then preload_failed = true end
+    end
+    monster_visual_service.queue_wave(number, {
+        urgent = true,
+        priority = 5000 - number,
+    })
+
+    local started_at = current_game_time()
+    local timeout = wave_timing_config.dev_wave_preload_timeout_seconds
+    local preload_settled = false
+    local function check_preload()
+        if token ~= generation_token or preload_settled then return false end
+        local pending = 0
+        for _, asset_id in ipairs(asset_ids) do
+            local status = asset_preload.status(asset_id).status
+            if status == asset_preload.STATE.FAILED
+                or status == asset_preload.STATE.RETIRED then
+                preload_failed = true
+            elseif status ~= asset_preload.STATE.READY then
+                pending = pending + 1
+            end
+        end
+        local elapsed = math.max(0, current_game_time() - started_at)
+        state.timer = math.max(0, timeout - elapsed)
+        if elapsed >= timeout then
+            preload_settled = true
+            local reason = pending <= 0 and not preload_failed
+                and "ready_after_buffer"
+                or (preload_failed and "failed_open_after_buffer"
+                    or "timeout_after_buffer")
+            print("[WaveSystem] dev wave preload finished wave=" .. tostring(number)
+                .. " reason=" .. reason .. " pending=" .. tostring(pending)
+                .. " failed=" .. tostring(preload_failed)
+                .. " elapsed=" .. string.format("%.2f", elapsed))
+            begin_debug_wave_spawn(number, wave, token, reason)
+            return false
+        end
+        return DEV_PRELOAD_POLL_INTERVAL
+    end
+
+    if check_preload() ~= false then
+        scheduler.after(DEV_PRELOAD_POLL_INTERVAL, check_preload, DEV_PRELOAD_TASK_ID)
+    end
     return true
 end
 
@@ -620,6 +714,8 @@ function M.init()
     game_started_at = nil
     monster_hull_multiplier = 1
     memory_cleared_wave = -1
+    scheduler.cancel(DEV_PRELOAD_TASK_ID)
+    scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
     reset(); enemies = {}; wall_entindex = -1; generation_token = 0; dev_mode = false
     rebuild_waves()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)

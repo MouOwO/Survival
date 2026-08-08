@@ -2,7 +2,7 @@
 -- Source: wave_timing_rules.csv
 local M = {}
 M.rows = {
-    { timing_rule_id = "default", initial_delay_seconds = 150, early_wave_last_number = 9, early_interval_seconds = 90, late_interval_seconds = 90, enabled = true, notes = "选择难度后150秒出第一波；第1至9波首怪到下一波首怪间隔90秒；第10波起首怪到下一波首怪间隔150秒" },
+    { timing_rule_id = "default", initial_delay_seconds = 150, early_wave_last_number = 9, early_interval_seconds = 90, late_interval_seconds = 90, enabled = true, dev_wave_preload_timeout_seconds = 3, notes = "选择难度后150秒出第一波；第1至9波使用短间隔；第10波起使用长间隔；开发跳波最多等待3秒资源加载" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

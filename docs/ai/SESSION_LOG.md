@@ -1,3 +1,12 @@
+## 2026-08-08 `monster<N>`开发跳波预载门禁
+
+- 用户批准修复直接输入`monster19`等作弊码时资源尚未加载导致怪物未正常出现的问题。只读追踪确认`cheat_command_service`直接调用`wave_system.debug_spawn_wave()`，旧实现首怪延迟0且绕过正常倒计时预载；N1 W19权威CSV共9只，两个archetype共享Tiny模型，资产CSV已有`monster_tiny/asset_proxy_monster_tiny`。
+- `wave_timing_rules.csv`新增3秒开发预载窗口并定向生成；`wave_system`按目标波原型模型去重紧急排队、轮询状态。首次实机复测证明Lua READY回调后立即生成仍可能没有模型，因此第二轮改为无论READY/FAILED/LOADING都固定等待满3秒，结束时再出怪并按状态记录诊断；FAILED/RETIRED/缺映射/超时仅在dev路径失败开放。generation、settled锁和命名任务阻止旧命令与迟到轮询二次生成，正式波次时序不变。
+- 自动验证通过：`DEV_WAVE_PRELOAD_LUA51_PASS`、`DEV_WAVE_PRELOAD_CONTRACT_PASS`和目标Lua 5.1语法已按固定3秒语义复跑通过；定向生成逐字节一致、严格UTF-8和限定`diff --check`在最终检查中再次确认。旧波次计时测试因基线90与硬编码150不一致失败；旧N1测试仍失败于已知W5领头顺序断言，均未越界修改。
+- 用户确认并行的`building_levels.csv`修改和`wall_upgrade.xlsx`删除均为其有意改动，本任务完整保留。尚需Workshop Tools冷启动实测`monster19`及快速连续`monster19/monster20`。
+- 后续实机反馈：日志为`ready_after_buffer pending=0 failed=false elapsed=3.00`且已开始W19生成，但模型仍是红色`ERROR`，从而排除“没有等满3秒”。本机VPK v2目录索引确认`models/heroes/tiny/tiny.vmdl_c`不存在，`models/heroes/tiny/tiny_01/tiny_01.vmdl_c`存在；说明异步代理即使引用无效模型也可能回调READY。
+- 修复权威`asset_catalog.csv`和`monster_archetypes.csv`，将W18/W19灰色傀儡及同路径九转Boss统一到Tiny LV1有效主体；定向重建资产/怪物生成Lua，同步`asset_proxy_monster_tiny`与专项测试。重建还把权威CSV中既有`rebirth_boss_01.move_speed=200`投影到此前陈旧为260的生成Lua，未改动该CSV业务值。新路径仍需Workshop Tools完全冷启动验收。
+
 # 2026-08-08 - 金矿升级后固定模型尺寸
 
 - 用户实测金矿升级后模型尺寸恢复原状。根因是金矿走独立`gold_mine_system`升级链：升级完成把`gold_mine_config.level_data()`交给`building_visual.apply()`，而各级等级行只有`model_name`、没有视觉CSV中的`model_scale=0.34`。

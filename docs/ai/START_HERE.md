@@ -4,6 +4,7 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-08）：`monster19`实机已证明3秒门禁按预期输出`ready_after_buffer elapsed=3.00`，但仍显示红色`ERROR`。本机VPK索引确认最终根因是旧`models/heroes/tiny/tiny.vmdl`不存在；现已从权威CSV改为实际存在的`models/heroes/tiny/tiny_01/tiny_01.vmdl`，重建资产/怪物生成Lua并同步异步代理KV。3秒固定缓冲与连续命令generation门禁继续保留。下一步完全冷启动Workshop Tools复测W19模型和快速`monster19`/`monster20`；新路径尚未实机验收。
 - 当前插入任务（2026-08-08）：N1 W13-W18客户端闪退的直接证据是`dota2_2026_0808_033038_0_V8_hiting_max_memory_limit__512_MB.mdmp`，Lua 16 MiB高水位不是同一内存池。用户新日志确认119次Tooltip几何诊断`active`越作用域异常和1次Combat不存在函数调用；两项已修复，`inventory_tooltip.js`也纳入generation/context门禁。Panorama现于启动1秒/5秒及之后60秒输出聚合，默认关闭高频Tooltip长诊断和200次游标探针。下一步必须完全冷启动，先验证出英雄5秒不再异常/退出，再跑N1到W20并核对`[SURVIVAL_MEMORY]`与新dump；尚未实机证明闪退解决。
 - 当前插入任务（2026-08-08）：War3式多选同类型建筑批量升级已完成生产实现和自动验证。普通建筑按同一`building_id`、防御塔按同一路线匹配，不同等级各升自身下一等级并支付各自CSV费用；资源不足、满级、升级中或不合法者跳过，成功者不回滚。客户端只提交最多64个选择候选，服务端逐栋校验owner/类型/Ability；塔直升最高、转职、金矿特殊操作等保持单体。专项Lua 5.1/契约、相关回归、语法、UTF-8和Panorama强制编译通过，下一步Workshop Tools冷启动实测，尚未用户验收。
 - 当前插入任务（2026-08-08）：金矿升级后尺寸恢复原状的问题已完成生产修复和自动验证。`gold_mine_config`现把`building_visual_levels.csv`金矿LV1固定视觉投影到全部等级，手动/自动升级提交后均重新应用`radiant_ancient001.vmdl / 0.34`；专项Lua 5.1/契约、语法、生成一致性、UTF-8与限定diff通过。下一步Workshop Tools冷启动连续升级实测，尚未用户验收。

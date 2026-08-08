@@ -19,7 +19,7 @@ monster_tusk,巨牙海民怪模型,model_bundle,models/heroes/tusk/tusk.vmdl,,,,
 monster_visage,维萨吉怪模型,model_bundle,models/heroes/visage/visage.vmdl,,,,,,idle,1,,,zombie_stream,7,770,14,streamed,asset_proxy_monster_visage,monster_undying,1,按首次波次进入后台加载队列。
 monster_sniper,火枪怪模型,model_bundle,models/heroes/sniper/sniper.vmdl,,particles/units/heroes/hero_sniper/sniper_base_attack.vpcf,,,,idle,1,,,zombie_stream,8,765,15,streamed,asset_proxy_monster_sniper,monster_undying,1,按首次波次进入后台加载队列；机枪塔第一阶段复用弹道。
 monster_ogre_magi,食人魔怪模型,model_bundle,models/heroes/ogre_magi/ogre_magi.vmdl,,,,,,idle,1,,,zombie_stream,9,760,16,streamed,asset_proxy_monster_ogre_magi,monster_undying,1,按首次波次进入后台加载队列。
-monster_tiny,小小怪模型,model_bundle,models/heroes/tiny/tiny.vmdl,,,,,,idle,1,,,zombie_stream,12,745,19,streamed,asset_proxy_monster_tiny,monster_undying,1,基础Tiny模型；饰品最大形态路径核验后另建资源包。
+monster_tiny,小小怪模型,model_bundle,models/heroes/tiny/tiny_01/tiny_01.vmdl,,,,,,idle,1,,,zombie_stream,12,745,19,streamed,asset_proxy_monster_tiny,monster_undying,1,基础Tiny模型；饰品最大形态路径核验后另建资源包。
 monster_ursa,熊战士怪模型,model_bundle,models/heroes/ursa/ursa.vmdl,,,,,,idle,1,,,zombie_stream,13,740,20,streamed,asset_proxy_monster_ursa,monster_undying,1,按首次波次进入后台加载队列。
 monster_terrorblade,恐怖利刃怪模型,model_bundle,models/heroes/terrorblade/terrorblade.vmdl,,,,,,idle,1,,,zombie_stream,14,735,20,streamed,asset_proxy_monster_terrorblade,monster_undying,1,按首次波次进入后台加载队列。
 monster_tidehunter,潮汐怪模型,model_bundle,models/heroes/tidehunter/tidehunter.vmdl,,,,,,idle,1,,,zombie_stream,15,730,21,streamed,asset_proxy_monster_tidehunter,monster_undying,1,按首次波次进入后台加载队列。

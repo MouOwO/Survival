@@ -430,7 +430,7 @@
     "asset_proxy_monster_visage" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/visage/visage.vmdl" }
     "asset_proxy_monster_sniper" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/sniper/sniper.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
     "asset_proxy_monster_ogre_magi" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/ogre_magi/ogre_magi.vmdl" }
-    "asset_proxy_monster_tiny" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tiny/tiny.vmdl" }
+    "asset_proxy_monster_tiny" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tiny/tiny_01/tiny_01.vmdl" }
     "asset_proxy_monster_ursa" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/ursa/ursa.vmdl" }
     "asset_proxy_monster_terrorblade" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/terrorblade/terrorblade.vmdl" }
     "asset_proxy_monster_tidehunter" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tidehunter/tidehunter.vmdl" }
