@@ -474,10 +474,10 @@ local function upgrade_wall(state)
         state.level = next_level
         state.unit.survival_level = next_level
         state.unit.survival_display_name = state.definition.display_name
-        building_health_projection.apply_preserved_ratio(state.unit, function()
+        building_health_projection.apply_maximum_health_increase(state.unit, function()
             apply_common(state.unit, data)
+            apply_research_technology(state)
         end)
-        apply_research_technology(state)
         publish(state, "wall_upgraded")
         play_upgrade_sound(state)
     end, "wall")

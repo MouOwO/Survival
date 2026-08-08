@@ -20,13 +20,13 @@
 - 全局单位模型旧契约在更新过时的`tower_good4`要求后，仍只失败于任务前已知的无关伐木工CSV缺项`creep_bad_melee_cavern_mega.vmdl`；本任务未修改无关伐木工数据迎合测试。
 - 尚未Workshop Tools实机验收。必须完全停止并重新Run后，确认完工金矿可通过鼠标点击模型主体选中、五个技能正常显示，且施工/完工尺寸、收益、升级、血条、上限和人口占用无回归。
 
-## 当前插入任务（2026-08-08）：城墙升级保持提交前生命比例
+## 当前插入任务（2026-08-08）：城墙升级增加最大生命差值
 
-- 用户确认：城墙升级不得回满血；升级计时完成、提交新等级前一瞬间读取`当前生命/最大生命`，应用CSV新最大生命后恢复相同比例。
-- 修改范围仅限城墙；主城、农场和防御塔继续保持既有升级行为。存活城墙换算后生命按最近整数取整并夹紧到`1..新最大生命`，升级过程中的受伤必须计入提交时比例。
-- 根因是`building_upgrade_system.lua::apply_common()`无条件`SetHealth(data.health)`；实施采用城墙提交路径专用生命比例投影，不修改`building_levels.csv`权威数值。
-- 生产实现完成：新增`building_health_projection.lua`，城墙提交路径在应用新最大生命前捕获即时比例，应用后按最近整数恢复并夹紧到`1..新最大生命`；其他建筑未接入该投影。
-- 自动验证通过：`WALL_UPGRADE_HEALTH_LUA51_PASS`、`WALL_UPGRADE_HEALTH_CONTRACT_PASS`、`BUILDING_UPGRADE_PROCESS_LUA51_PASS`、人口训练/城墙锚点相关回归、目标Lua 5.1语法、严格UTF-8与限定`git diff --check`。仍需Workshop Tools实机验收残血升级后的实际血条比例。
+- 用户确认新语义：升级完成时计算`最大生命增量=新最大生命-旧最大生命`，并令`新当前生命=旧当前生命+最大生命增量`。例如`100/200`升级到最大生命`400`，最终为`300/400`，不再保持旧生命百分比。
+- 修改范围仅限城墙；主城、农场和防御塔继续保持既有升级行为。存活城墙结果夹紧到`1..新最大生命`，升级过程中的受伤必须计入提交瞬间的旧当前生命。
+- 根因是上一版`building_health_projection.lua`按生命百分比投影。城墙提交路径现捕获即时当前/最大生命，并把等级数据与当前科技重算后的最终实际最大生命一并纳入增量计算；不修改`building_levels.csv`权威数值。
+- 生产实现完成：`apply_maximum_health_increase()`以最终实际最大生命差值增加当前生命；其他建筑未接入该投影。专项行为测试和契约测试覆盖`100/200 -> 300/400`、满血、1血、无增量、合法夹紧、科技后最终上限及城墙专用边界。
+- 自动验证通过：`WALL_UPGRADE_HEALTH_LUA51_PASS`、`WALL_UPGRADE_HEALTH_CONTRACT_PASS`、`WALL_UPGRADE_HEALTH_LUAC51_PASS`、全项目351个生产Lua的Lua 5.1语法检查、修理工百分比行为/契约回归、严格UTF-8及限定`git diff --check`。任务前未跟踪的旧`test_building_upgrade_contract.ps1`仍失败于其过时断言要求`local duration`，而当前HEAD一直使用等价的`state.duration`；升级流程生产文件与HEAD一致，本轮未修改该无关测试迎合。仍需Workshop Tools实机验收残血城墙升级后的实际血条数值。
 
 ## 已完成并经用户确认（2026-08-08）：人口训练按CSV阶段内次数顺序推进
 
