@@ -83,6 +83,7 @@ local function create_builder(payload)
     builder:SetModelScale(tonumber(config.model_scale) or 1)
     builder.survival_display_name = config.display_name
     builder.survival_builder_id = config.builder_id
+    builder.survival_player_id = player_id
     local registered, register_error = player_context.register_unit(
         player_id,
         builder,

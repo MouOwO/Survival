@@ -20,8 +20,86 @@ function M:OnCreated(params)
         tonumber(params.detection_range) or FIND_UNITS_EVERYWHERE
     )
     self.repair_target_entindex = nil
+    self.manual_repair_target_entindex = nil
+    self.approaching_manual_target = false
     self.repair_fractional_remainder = 0
     self:StartIntervalThink(THINK_INTERVAL)
+end
+
+local function valid_entity(entity)
+    return entity and not entity:IsNull()
+end
+
+local function entity(entindex)
+    entindex = tonumber(entindex)
+    if not entindex or type(EntIndexToHScript) ~= "function" then return nil end
+    local ok, result = pcall(EntIndexToHScript, entindex)
+    if not ok or not valid_entity(result) then return nil end
+    return result
+end
+
+local function same_owner(parent, building)
+    local parent_player_id = tonumber(parent.survival_player_id)
+    local building_player_id = tonumber(building.survival_player_id)
+    return parent_player_id == nil or building_player_id == nil
+        or parent_player_id == building_player_id
+end
+
+local function repairable_building(parent, building)
+    return valid_entity(building)
+        and building.survival_is_building == true
+        and building:IsAlive()
+        and building:GetTeamNumber() == parent:GetTeamNumber()
+        and same_owner(parent, building)
+        and not building:HasModifier("modifier_building_under_construction")
+        and building:GetHealth() < building:GetMaxHealth()
+end
+
+local function issue_internal_order(parent, order)
+    parent.survival_repair_internal_order = true
+    local ok, result = pcall(ExecuteOrderFromTable, order)
+    parent.survival_repair_internal_order = nil
+    return ok, result
+end
+
+function M:SetManualRepairTarget(building)
+    if not IsServer() then return false end
+    local parent = self:GetParent()
+    if not repairable_building(parent, building) then return false end
+    local build_task = parent.survival_build_task
+    if build_task and build_task.constructing then return false end
+    if build_task then parent.survival_build_task = nil end
+    local entindex = building:entindex()
+    if self.manual_repair_target_entindex ~= entindex then
+        self.manual_repair_target_entindex = entindex
+        self.repair_target_entindex = entindex
+        self.repair_fractional_remainder = 0
+        self.approaching_manual_target = false
+    end
+    issue_internal_order(parent, {
+        UnitIndex = parent:entindex(),
+        OrderType = DOTA_UNIT_ORDER_STOP,
+        Queue = false,
+    })
+    return true
+end
+
+function M:ClearManualRepairTarget(reason)
+    if not IsServer() then return end
+    local parent = self:GetParent()
+    local should_stop = self.approaching_manual_target == true
+        and reason ~= "player_order"
+    self.manual_repair_target_entindex = nil
+    self.approaching_manual_target = false
+    self.repair_target_entindex = nil
+    self.repair_fractional_remainder = 0
+    if should_stop and valid_entity(parent) then
+        issue_internal_order(parent, {
+            UnitIndex = parent:entindex(),
+            OrderType = DOTA_UNIT_ORDER_STOP,
+            Queue = false,
+        })
+    end
 end
 
 local function damaged_building(parent, detection_range)
@@ -37,10 +115,7 @@ local function damaged_building(parent, detection_range)
         false
     )
     for _, unit in ipairs(units) do
-        if unit.survival_is_building == true
-            and unit:IsAlive()
-            and not unit:HasModifier("modifier_building_under_construction")
-            and unit:GetHealth() < unit:GetMaxHealth() then
+        if repairable_building(parent, unit) then
             return unit
         end
     end
@@ -62,9 +137,17 @@ function M:OnIntervalThink()
         or (parent.GetCurrentActiveAbility and parent:GetCurrentActiveAbility()) then
         return
     end
-    if not unit_is_idle(parent) then return end
-
-    local building = damaged_building(parent, self.detection_range)
+    local manual_target = self.manual_repair_target_entindex ~= nil
+    local building = manual_target
+        and entity(self.manual_repair_target_entindex) or nil
+    if manual_target and not repairable_building(parent, building) then
+        self:ClearManualRepairTarget("target_invalid")
+        return
+    end
+    if not manual_target then
+        if not unit_is_idle(parent) then return end
+        building = damaged_building(parent, self.detection_range)
+    end
     if not building then
         self.repair_target_entindex = nil
         self.repair_fractional_remainder = 0
@@ -87,13 +170,23 @@ function M:OnIntervalThink()
         center_distance - parent_hull - building_hull
     )
     if edge_distance > self.repair_range then
-        ExecuteOrderFromTable({
+        if manual_target then self.approaching_manual_target = true end
+        issue_internal_order(parent, {
             UnitIndex = parent:entindex(),
             OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
             Position = building:GetAbsOrigin(),
             Queue = false,
         })
         return
+    end
+
+    if manual_target and self.approaching_manual_target then
+        issue_internal_order(parent, {
+            UnitIndex = parent:entindex(),
+            OrderType = DOTA_UNIT_ORDER_STOP,
+            Queue = false,
+        })
+        self.approaching_manual_target = false
     end
 
     parent:FaceTowards(building:GetAbsOrigin())
@@ -108,8 +201,12 @@ function M:OnIntervalThink()
     local next_health = math.min(max_health, building:GetHealth() + amount)
     building:SetHealth(next_health)
     if next_health >= max_health then
-        self.repair_target_entindex = nil
-        self.repair_fractional_remainder = 0
+        if manual_target then
+            self:ClearManualRepairTarget("target_full")
+        else
+            self.repair_target_entindex = nil
+            self.repair_fractional_remainder = 0
+        end
     else
         self.repair_fractional_remainder = remainder
     end

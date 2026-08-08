@@ -432,6 +432,7 @@ local function train_worker(payload)
 
     FindClearSpaceForUnit(worker, spawn_position, true)
     worker:SetControllableByPlayer(city_state.player_id, true)
+    worker.survival_player_id = city_state.player_id
     local health = tonumber(training.health) or config.health
     worker:SetBaseMaxHealth(health)
     worker:SetMaxHealth(health)

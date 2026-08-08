@@ -1,4 +1,5 @@
 local tree_damage_rules = require("systems/tree_damage_rules")
+local repair_order_service = require("systems/repair_order_service")
 
 local M = {}
 local registered = false
@@ -19,6 +20,7 @@ local function ordered_units(keys)
 end
 
 local function filter(_, keys)
+    if repair_order_service.process(keys) then return false end
     if tonumber(keys.order_type) ~= tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET) then
         return true
     end
