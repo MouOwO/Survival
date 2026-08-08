@@ -1,4 +1,4 @@
-buff_id,buff_name,polarity,stacking_rule,refresh_rule,max_stacks,purgable,remove_on_death,effect_type,default_value,particle_name,particle_attach,texture,exclusive_group,priority,enabled,notes,status_effect_name,status_effect_priority,sound_name
+﻿buff_id,buff_name,polarity,stacking_rule,refresh_rule,max_stacks,purgable,remove_on_death,effect_type,default_value,particle_name,particle_attach,texture,exclusive_group,priority,enabled,notes,status_effect_name,status_effect_priority,sound_name
 #中文名:Buff ID,Buff名称,正负面类型,叠加规则,刷新规则,默认最大层数,可驱散,死亡移除,效果类型,默认数值,持续特效,特效挂点,图标,互斥组,优先级,是否启用,备注,状态材质特效,状态特效优先级,音效
 #types:string,string,string,string,string,number,boolean,boolean,string,number,string,string,string,string,number,boolean,string,string,number,string
 buff_arcane_cannon_damage,魔能炮增伤,positive,stack,independent,4,0,1,total_damage_outgoing_pct,10,particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_matter_buff.vpcf,PATTACH_ABSORIGIN_FOLLOW,obsidian_destroyer_arcane_orb,,0,1,每层独立计时；持续时间、单层数值和最大层数由技能表覆盖。
