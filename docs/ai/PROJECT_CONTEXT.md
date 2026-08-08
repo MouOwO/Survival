@@ -168,10 +168,10 @@
 
 - 资源树视觉权威源是`data/csv/资源系统/world_visual_definitions.csv`，由`config/tree_config.lua`读取生成表并由`tree_system.lua`应用；单位KV只保留首帧/异常回退。
 - 伐木工和修理工分级模型直接使用`training_definitions.csv.model_name`，`worker_system.lua`在具体训练行创建实体后统一应用。不要为工人另建重复等级视觉表。
-- 主城、召唤祭坛、研究所、农场与金矿的普通建筑视觉权威源是`building_visual_levels.csv`；`buildings_config.lua`按`building_id+level`合并到`building_levels.csv`的战斗等级数据，建造完成和升级均复用`building_visual_service.apply()`。
+- 主城、召唤祭坛、研究所、农场与金矿的普通建筑视觉权威源是`building_visual_levels.csv`。普通建筑由`buildings_config.lua`按`building_id+level`合并到战斗等级数据；金矿使用独立`gold_mine_system`升级链，因此`gold_mine_config.level_data()`必须把金矿固定视觉行投影到全部等级。两条提交链最终均复用`building_visual_service.apply()`。
 - 普通建筑视觉表可直接使用`model_name/model_scale/model_yaw`，不强制进入复杂塔套装的`asset_catalog.csv`。当前`asset_catalog.csv`存在27列表头与大量22列历史行不一致，未修复前不得为普通模型任务强行生成或批量补列。
 - 新增分级模型必须同步：CSV、生成Lua、运行时消费者、模型预缓存和单位KV的LV1回退；模型路径需从当前`pak01_dir.vpk`索引确认，自动验证不能代替Workshop Tools中的尺寸、动画和朝向验收。
-- 研究所、人口农场与金矿的视觉权威值现与英雄祭坛一致，均使用`radiant_ancient001.vmdl`、`model_scale=0.34`；施工规则和单位KV首帧回退也必须保持0.34。金矿使用该模型是为了提供可靠的单位选择命中边界；`selectable=true`和建筑Hull不能为缺少选择hitbox的静态模型补出可靠鼠标命中。升级等级没有另一个缩放值时，视觉服务不得恢复旧KV缩放。
+- 研究所、人口农场与金矿的视觉权威值现与英雄祭坛一致，均使用`radiant_ancient001.vmdl`、`model_scale=0.34`；施工规则和单位KV首帧回退也必须保持0.34。金矿使用该模型是为了提供可靠的单位选择命中边界；`selectable=true`和建筑Hull不能为缺少选择hitbox的静态模型补出可靠鼠标命中。金矿LV1视觉是全部金矿等级的固定视觉，手动和自动升级提交必须重新投影模型、缩放和朝向，禁止因等级行缺少`model_scale`恢复原始尺寸。
 - Builder数量上限以`builder_ability_stages.csv.max_building_count`控制Ability存在性：达到上限应移除技能，建筑销毁释放容量后恢复；等级不足或其他非数量条件仍保持置灰。底层`buildings_config`的`max_count`必须与CSV一致，不能只修UI层。
 - 城墙Hull调试命令只允许当前玩家注册拥有的选中城墙；`scale 1`使用建筑定义中的基础Hull（当前256），倍率不得基于上次结果累乘，也不得调用模型缩放。
 - 波次怪共用单位KV保留原生`DOTA_HULL_SIZE_SMALL`；`scalemonster <倍数>`只用于调试Hull，以每只怪首次`GetHullRadius()`结果为不累乘基准，同时更新当前存活怪与之后生成怪，倍率1恢复原生Hull。该命令不得改变怪物模型、战斗CSV或波次数值，地图重新初始化后倍率恢复1。

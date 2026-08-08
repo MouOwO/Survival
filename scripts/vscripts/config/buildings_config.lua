@@ -136,7 +136,7 @@ M.main_city = {
     id = "main_city", display_name = configured_name("main_city", "主城"),
     unit_name = configured_unit_name("main_city", "building_main_city"),
     build_cost = build_cost("building_main_city", 100, 50),
-    footprint = { x = 2, y = 2 },
+    footprint = { x = 2, y = 2 }, hull_radius = 80,
     max_count = 1, show_health_bar = false, selectable = true,
     abilities = {
         "ability_upgrade_city",
@@ -154,7 +154,7 @@ M.building_farm = {
     id = "building_farm", display_name = configured_name("building_farm", "人口农场"),
     unit_name = configured_unit_name("building_farm", "building_farm"),
     build_cost = build_cost("building_farm", 100, 0),
-    footprint = { x = 2, y = 2 }, max_count = 1,
+    footprint = { x = 2, y = 2 }, max_count = 1, hull_radius = 80,
     unlock_city_level = 1, show_health_bar = true, selectable = true,
     abilities = {
         "ability_upgrade_farm",
@@ -167,7 +167,7 @@ M.arrow_tower = {
     id = "arrow_tower", display_name = configured_name("arrow_tower", "防御塔"),
     unit_name = configured_unit_name("arrow_tower", "building_arrow_tower"),
     build_cost = arrow_tower_build_cost(),
-    footprint = { x = 2, y = 2 }, max_count = 0,
+    footprint = { x = 2, y = 2 }, max_count = 0, hull_radius = 80,
     show_health_bar = false, selectable = true, abilities = {
         "ability_upgrade_tower_lv01",
         "ability_upgrade_tower_max",
@@ -203,7 +203,7 @@ M.building_research_lab = {
         "building_research_lab"
     ),
     build_cost = build_cost("building_research_lab", 0, 0),
-    footprint = { x = 2, y = 2 },
+    footprint = { x = 2, y = 2 }, hull_radius = 80,
     max_count = 1,
     unlock_city_level = 1,
     show_health_bar = false,
@@ -212,7 +212,7 @@ M.building_research_lab = {
     levels = research_lab_levels,
 }
 
-M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
+M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, hull_radius = 80,max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
 local gold_mine_visual = (building_visual_by_id.building_gold_mine or {})[1]
 if gold_mine_visual then
     M.gold_mine.levels[1] = M.gold_mine.levels[1] or {}

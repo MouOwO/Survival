@@ -1,4 +1,5 @@
 local levels = require("config/generated/building_levels")
+local building_visuals = require("config/generated/building_visual_levels")
 local rules = require("config/generated/gold_mine_rules")
 local technologies = require("config/generated/technology_definitions")
 local armor_balance = require("config/armor_balance")
@@ -12,6 +13,17 @@ for _, row in ipairs(levels.rows or {}) do
         max_mine_level = math.max(max_mine_level, row.level)
     end
 end
+
+local fixed_visual = nil
+for _, row in ipairs(building_visuals.rows or {}) do
+    if row.enabled ~= false
+        and row.building_id == "building_gold_mine"
+        and (fixed_visual == nil or tonumber(row.level) == 1) then
+        fixed_visual = row
+        if tonumber(row.level) == 1 then break end
+    end
+end
+assert(fixed_visual ~= nil, "building_visual_levels.csv must define gold mine visual")
 assert(max_mine_level > 0, "building_levels.csv must define enabled gold mine levels")
 for level = 1, max_mine_level do
     assert(
@@ -121,6 +133,11 @@ function M.level_data(level)
     if not source then return nil end
     local result = {}
     for key, value in pairs(source) do result[key] = value end
+    for _, key in ipairs({
+        "model_asset_id", "model_name", "model_scale", "model_yaw",
+    }) do
+        if fixed_visual[key] ~= nil then result[key] = fixed_visual[key] end
+    end
     result.armor = armor_balance.from_war3(
         source.war3_armor or source.armor
     )

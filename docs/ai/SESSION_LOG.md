@@ -1,3 +1,10 @@
+# 2026-08-08 - 金矿升级后固定模型尺寸
+
+- 用户实测金矿升级后模型尺寸恢复原状。根因是金矿走独立`gold_mine_system`升级链：升级完成把`gold_mine_config.level_data()`交给`building_visual.apply()`，而各级等级行只有`model_name`、没有视觉CSV中的`model_scale=0.34`。
+- 修复保持`building_visual_levels.csv`为视觉权威，不向30行等级数据重复写缩放。`gold_mine_config`读取生成视觉表，选择启用的金矿LV1视觉，并把`model_asset_id/model_name/model_scale/model_yaw`覆盖投影到全部等级；手动与自动升级共用原提交链，每次完成均重新应用固定模型和尺寸。
+- 未修改金矿生命、护甲、收益、费用、技能、升级时长、升级事务或其他建筑。新增Lua 5.1测试证明等级行即使携带旧模型，LV1/LV2升级数据仍固定为`radiant_ancient001.vmdl / 0.34`。
+- 自动验证通过：`GOLD_MINE_FIXED_VISUAL_LUA51_PASS`、`SIX_GAMEPLAY_FIXES_LUA51_PASS`、`SIX_GAMEPLAY_FIXES_CONTRACT_PASS`、`GOLD_MINE_FIXED_VISUAL_LUAC51_PASS`、`GOLD_MINE_VISUAL_GENERATED_BYTE_MATCH_PASS`、严格UTF-8和限定diff检查。尚未Workshop Tools实机连续升级验收。
+
 # 2026-08-08 - 金矿替换为可选中动态建筑模型
 
 - 用户实测`tower_good4.vmdl`金矿无法鼠标选择。静态审计确认`building_gold_mine`运行配置已有`selectable=true`，没有金矿专属不可选Modifier，且`BoundsHullName`只影响碰撞/寻路，不能替静态模型补出选择hitbox。
