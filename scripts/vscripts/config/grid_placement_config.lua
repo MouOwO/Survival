@@ -6,6 +6,8 @@ local M = {
     minimum_footprint = { x = 2, y = 2 },
     max_height_delta = 48,
     unit_block_radius_scale = 1.25,
+    -- 单位查询先使用此上限扩大候选范围，再按每个单位的实际 Hull 精确过滤。
+    max_unit_hull_radius = 512,
     tree_block_radius_scale = 0.72,
     -- 以下参数仅用于客户端预览，不参与服务端吸附、校验或最终建造坐标。
     preview_visual = {

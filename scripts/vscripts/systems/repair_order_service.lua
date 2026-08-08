@@ -33,6 +33,16 @@ local function repair_modifier(unit)
     return nil
 end
 
+local function cancel_pending_build(unit)
+    if valid_entity(unit)
+        and unit.survival_build_task
+        and unit.survival_build_internal_order ~= true then
+        unit.survival_build_task = nil
+        return true
+    end
+    return false
+end
+
 local function same_owner(unit, target)
     local unit_player_id = tonumber(unit.survival_player_id)
     local target_player_id = tonumber(target.survival_player_id)
@@ -68,6 +78,7 @@ function M.process(keys)
     local consumed = false
 
     for _, unit in ipairs(units) do
+        cancel_pending_build(unit)
         local modifier = repair_modifier(unit)
         if modifier and unit.survival_repair_internal_order ~= true then
             if target and is_repairable_target(unit, target) then
@@ -85,5 +96,6 @@ end
 
 M._ordered_units_for_test = ordered_units
 M._is_repairable_target_for_test = is_repairable_target
+M._cancel_pending_build_for_test = cancel_pending_build
 
 return M

@@ -112,10 +112,38 @@ local function apply_hull_radius(unit, definition)
     unit.survival_hull_radius = radius
     return true
 end
+local function fixed_position(position)
+    if type(Vector) == "function" then
+        return Vector(position.x, position.y, position.z)
+    end
+    return { x = position.x, y = position.y, z = position.z }
+end
+local function anchor_building(unit, position)
+    if not valid_entity(unit) or not position then return false end
+    unit.survival_fixed_position = fixed_position(position)
+    if type(unit.SetAbsOrigin) == "function" then
+        unit:SetAbsOrigin(unit.survival_fixed_position)
+    end
+    if type(unit.HasModifier) == "function"
+        and type(unit.AddNewModifier) == "function"
+        and not unit:HasModifier("modifier_building_stationary") then
+        unit:AddNewModifier(unit, nil, "modifier_building_stationary", {})
+    end
+    return true
+end
+local function clear_build_task(caster, task)
+    if valid_entity(caster)
+        and (task == nil or caster.survival_build_task == task) then
+        caster.survival_build_task = nil
+        return true
+    end
+    return false
+end
 local function main_city_level(team)
     for _, state in pairs(buildings) do
         if state.team == team
             and state.building_id == "main_city"
+            and not state.constructing
             and valid_entity(state.unit) then
             return state.level or 0
         end
@@ -350,12 +378,8 @@ local function recover_building(unit)
     unit.survival_grid_y = grid_y
     unit.survival_route_level = route_row and route_row.level or state.level
     apply_hull_radius(unit, definition)
+    anchor_building(unit, unit.survival_fixed_position or origin)
     if state.building_id == "wall" then
-        unit.survival_fixed_position = unit.survival_fixed_position
-            or Vector(origin.x, origin.y, origin.z)
-        if not unit:HasModifier("modifier_building_stationary") then
-            unit:AddNewModifier(unit, nil, "modifier_building_stationary", {})
-        end
         if not unit:HasModifier("modifier_building_damage_sound") then
             unit:AddNewModifier(unit, nil, "modifier_building_damage_sound", {})
         end
@@ -404,6 +428,9 @@ local function can_place(payload)
     local caster = payload.caster
     if not definition or not valid_entity(caster) then
         return { ok = false, error = "invalid_build_request" }
+    end
+    if caster.IsAlive and not caster:IsAlive() then
+        return { ok = false, error = "builder_unavailable" }
     end
     local builder = event_bus.request(events.BUILDER_GET_REQUEST, {
         player_id = tonumber(payload.player_id),
@@ -494,9 +521,17 @@ local function start_building(payload)
     unit.survival_building_id = check.definition.id
     unit.survival_player_id = check.player_id
     unit:SetOwner(payload.caster)
+    anchor_building(unit, check.grid.world_position)
+    unit:AddNewModifier(
+        unit,
+        nil,
+        "modifier_building_under_construction",
+        {}
+    )
     apply_initial_stats(unit, check.definition)
     add_building_abilities(unit, check.definition, false)
     local state = {
+        entindex = unit:entindex(),
         unit = unit,
         definition = check.definition,
         team = check.team,
@@ -509,6 +544,8 @@ local function start_building(payload)
         tower_class_name = nil,
         tower_combat = arrow_data(1),
         population_occupied = 0,
+        constructing = true,
+        cleaned = false,
     }
     unit.survival_grid_x = state.grid_x
     unit.survival_grid_y = state.grid_y
@@ -522,12 +559,7 @@ local function start_building(payload)
         footprint = state.definition.footprint,
         entindex = unit:entindex(),
     })
-    unit:AddNewModifier(
-        unit,
-        nil,
-        "modifier_building_under_construction",
-        {}
-    )
+    buildings[state.entindex] = state
     local maximum_health = unit:GetMaxHealth()
     local build_time = math.max(0.1, tonumber(check.definition.build_time) or 3)
     local started_at = GameRules:GetGameTime()
@@ -538,19 +570,27 @@ local function start_building(payload)
     )
     if valid_entity(payload.caster) then
         payload.caster:StartGesture(ACT_DOTA_ATTACK)
-        if payload.caster.survival_build_task == payload.build_task then
-            payload.caster.survival_build_task = nil
-        end
+        clear_build_task(payload.caster, payload.build_task)
     end
     scheduler.every(0.1, function()
-        if not valid_entity(unit) then
+        if state.cleaned then
             construction_visual.cancel(construction_visual_state)
-            change_count(check.team, check.definition.id, -1)
-            event_bus.request(events.GRID_RELEASE_REQUEST, {
-                grid_x = state.grid_x,
-                grid_y = state.grid_y,
-                footprint = state.definition.footprint,
-            })
+            return false
+        end
+        if not valid_entity(unit) or (unit.IsAlive and not unit:IsAlive()) then
+            construction_visual.cancel(construction_visual_state)
+            if not state.cleaned then
+                state.cleaned = true
+                buildings[state.entindex] = nil
+                change_count(check.team, check.definition.id, -1)
+                event_bus.request(events.GRID_RELEASE_REQUEST, {
+                    grid_x = state.grid_x,
+                    grid_y = state.grid_y,
+                    footprint = state.definition.footprint,
+                    entindex = state.entindex,
+                })
+                release_population(state, "building_construction_failed")
+            end
             return false
         end
         local progress = math.min(
@@ -565,7 +605,10 @@ local function start_building(payload)
             unit,
             check.definition
         )
+        anchor_building(unit, check.grid.world_position)
         unit:RemoveModifierByName("modifier_building_under_construction")
+        apply_hull_radius(unit, check.definition)
+        unit:SetAbsOrigin(unit.survival_fixed_position)
         -- Restore construction-disabled abilities before applying optional
         -- completion visuals. Arrow towers use pre_class_levels rather than
         -- levels, and a malformed visual row must never leave their abilities
@@ -578,13 +621,7 @@ local function start_building(payload)
         building_visual.apply(unit, completed_level)
         unit:SetHealth(maximum_health)
         unit:SetControllableByPlayer(check.player_id, true)
-        buildings[unit:entindex()] = state
-        if state.building_id == "wall" then
-            local anchor = check.grid.world_position or unit:GetAbsOrigin()
-            unit.survival_fixed_position = Vector(anchor.x, anchor.y, anchor.z)
-            unit:SetAbsOrigin(unit.survival_fixed_position)
-            unit:AddNewModifier(unit, nil, "modifier_building_stationary", {})
-        end
+        state.constructing = false
         -- Keep ability entity indexes stable for runtime tooltip data. Activate
         -- once now and once after the construction modifier state has replicated.
         scheduler.after(0.1, function()
@@ -655,7 +692,7 @@ local function queue_building(payload)
         if caster.survival_build_task.constructing then
             return { ok = false, error = "建筑正在施工中" }
         end
-        caster.survival_build_task = nil
+        clear_build_task(caster, caster.survival_build_task)
     end
     local target = check.grid.world_position
     local work_position = builder_work_position(caster, check.definition, target)
@@ -668,15 +705,26 @@ local function queue_building(payload)
         work_position = work_position,
     }
     caster.survival_build_task = task
-    ExecuteOrderFromTable({
+    caster.survival_build_internal_order = true
+    local order_ok, order_error = pcall(ExecuteOrderFromTable, {
         UnitIndex = caster:entindex(),
         OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
         Position = work_position,
         Queue = false,
     })
+    caster.survival_build_internal_order = nil
+    if not order_ok then
+        clear_build_task(caster, task)
+        logger.warn("BuildingSystem", "builder move order failed: " .. tostring(order_error))
+        return { ok = false, error = "builder_move_order_failed" }
+    end
     scheduler.every(0.1, function()
         if not valid_entity(caster) then return false end
         if caster.survival_build_task ~= task then return false end
+        if caster.IsAlive and not caster:IsAlive() then
+            clear_build_task(caster, task)
+            return false
+        end
         local current = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
             caster = caster,
             player_id = check.player_id,
@@ -684,9 +732,7 @@ local function queue_building(payload)
             position = target,
         })
         if not current or not current.ok then
-            if caster.survival_build_task == task then
-                caster.survival_build_task = nil
-            end
+            clear_build_task(caster, task)
             notify(check.player_id, current and current.error or "建造位置失效", "error")
             return false
         end
@@ -699,12 +745,9 @@ local function queue_building(payload)
             return true
         end
         payload.build_task = task
+        task.constructing = true
         local result = start_building(payload)
-        if not result or not result.ok then
-            if caster.survival_build_task == task then
-                caster.survival_build_task = nil
-            end
-        end
+        clear_build_task(caster, task)
         return false
     end, "queue_building_" .. tostring(caster:entindex()))
     notify(check.player_id, check.definition.display_name .. "正在前往建造位置")
@@ -717,7 +760,7 @@ local function query_building(payload)
         local ok, unit = pcall(EntIndexToHScript, entindex)
         if ok then state = recover_building(unit) end
     end
-    if not state or not valid_entity(state.unit) then return nil end
+    if not state or state.constructing or not valid_entity(state.unit) then return nil end
     return public_state(state)
 end
 local function list_buildings(payload)
@@ -725,6 +768,7 @@ local function list_buildings(payload)
     local player_id = tonumber(payload and payload.player_id)
     for _, state in pairs(buildings) do
         if valid_entity(state.unit)
+            and not state.constructing
             and (player_id == nil or state.player_id == player_id) then
             result[#result + 1] = public_state(state)
         end
@@ -764,6 +808,7 @@ local function consume_for_fusion(payload)
             grid_x = state.grid_x,
             grid_y = state.grid_y,
             footprint = state.definition.footprint,
+            entindex = state.unit:entindex(),
         })
         event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
         release_population(state, "tower_fusion_consumed")
@@ -794,9 +839,12 @@ end
 local function on_entity_killed(payload)
     local victim = payload.victim
     if not valid_entity(victim) then return end
+    clear_build_task(victim, victim.survival_build_task)
     construction_visual.cancel(victim)
     local state = buildings[victim:entindex()]
     if not state then return end
+    if state.cleaned then return end
+    state.cleaned = true
     building_visual.clear(victim)
     buildings[victim:entindex()] = nil
     change_count(state.team, state.building_id, -1)
@@ -804,10 +852,13 @@ local function on_entity_killed(payload)
         grid_x = state.grid_x,
         grid_y = state.grid_y,
         footprint = state.definition.footprint,
+        entindex = victim:entindex(),
     })
-    event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
+    if not state.constructing then
+        event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
+    end
     release_population(state, "building_destroyed:" .. state.building_id)
-    if state.building_id == "main_city" then
+    if state.building_id == "main_city" and not state.constructing then
         GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
     end
 end
@@ -827,6 +878,7 @@ function M.main_city_for_team(team)
     for _, state in pairs(buildings) do
         if state.team == team
             and state.building_id == "main_city"
+            and not state.constructing
             and valid_entity(state.unit)
             and state.unit:IsAlive() then
             return state.unit
@@ -837,7 +889,7 @@ end
 
 function M.relocate_for_player(player_id, entindex, position)
     local state = buildings[tonumber(entindex) or -1]
-    if not state or not valid_entity(state.unit) then
+    if not state or state.constructing or not valid_entity(state.unit) then
         return false, "building_not_found"
     end
     if state.player_id ~= player_id then
@@ -889,6 +941,8 @@ M._apply_initial_stats_for_test = apply_initial_stats
 M._public_state_for_test = public_state
 M._population_to_release_for_test = population_to_release
 M._recover_existing_for_test = recover_existing_buildings
+M._anchor_building_for_test = anchor_building
+M._clear_build_task_for_test = clear_build_task
 M._building_limit_for_test = {
     reached = building_limit_reached,
     count_for = count_for,

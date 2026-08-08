@@ -15,6 +15,7 @@ function building_system.move(unit, position)
     event_bus.request(events.GRID_RELEASE_REQUEST, {
         grid_x = state.grid_x, grid_y = state.grid_y,
         footprint = state.definition.footprint,
+        entindex = unit:entindex(),
     })
     print(string.format("[BuildingBlink] SetAbsOrigin begin ent=%d target=(%.1f,%.1f,%.1f)", unit:entindex(), position.x, position.y, position.z))
     unit:Stop()
@@ -30,7 +31,7 @@ function building_system.move(unit, position)
     end
     unit:RemoveModifierByName("modifier_building_stationary")
     unit.survival_fixed_position = Vector(position.x, position.y, position.z)
-    unit:SetAbsOrigin(position)
+    unit:SetAbsOrigin(unit.survival_fixed_position)
     unit:AddNewModifier(unit, nil, "modifier_building_blink_move", {
         x = position.x, y = position.y, z = position.z,
     })
@@ -60,7 +61,7 @@ function building_system.move(unit, position)
         "building_relocation_refresh_" .. tostring(unit:entindex()),
         function()
             if not unit or unit:IsNull() then return nil end
-            unit:SetAbsOrigin(position)
+            unit:SetAbsOrigin(unit.survival_fixed_position)
             unit:Stop()
             if unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
             if unit.survival_projectile_model

@@ -146,9 +146,42 @@ local function has_tree(center)
     return found
 end
 
+local function unit_hull_radius(unit)
+    local hull = number(unit and unit.survival_hull_radius, nil)
+    if hull == nil and unit and unit.GetHullRadius then
+        local ok, value = pcall(unit.GetHullRadius, unit)
+        if ok then hull = number(value, 0) end
+    end
+    return math.max(0, hull or 0)
+end
+
+local function unit_overlaps_cell(unit, center, half)
+    local origin = unit:GetAbsOrigin()
+    local nearest_x = clamp(origin.x, center.x - half, center.x + half)
+    local nearest_y = clamp(origin.y, center.y - half, center.y + half)
+    local dx = origin.x - nearest_x
+    local dy = origin.y - nearest_y
+    local hull = unit_hull_radius(unit)
+    return dx * dx + dy * dy <= hull * hull
+end
+
+local function construction_building_is_logical_only(unit, payload)
+    if unit.survival_is_building ~= true or not unit.HasModifier then return false end
+    local ok, constructing = pcall(
+        unit.HasModifier,
+        unit,
+        "modifier_building_under_construction"
+    )
+    if not ok or not constructing then return false end
+    return not unit.GetTeamNumber
+        or unit:GetTeamNumber() == number(payload.team, DOTA_TEAM_GOODGUYS)
+end
+
 local function has_unit(center, payload)
     local size = number(config.cell_size, 128)
-    local radius = size * number(config.unit_block_radius_scale, 1.25)
+    local half = size * 0.5
+    local radius = half * math.sqrt(2)
+        + number(config.max_unit_hull_radius, size * 4)
     local units = payload.nearby_units
     if not units then
         units = FindUnitsInRadius(
@@ -165,21 +198,37 @@ local function has_unit(center, payload)
         ) or {}
     end
     local ignored = number(payload.ignore_entindex, -1)
-    local half = size * 0.5
     for _, unit in ipairs(units) do
         if unit and not unit:IsNull()
             and unit:entindex() ~= ignored
-            and not unit.survival_is_grid_preview then
-            local origin = unit:GetAbsOrigin()
-            local hull = 0
-            if unit.GetHullRadius then hull = number(unit:GetHullRadius(), 0) end
-            if math.abs(origin.x - center.x) <= half + hull
-                and math.abs(origin.y - center.y) <= half + hull then
-                return true
-            end
+            and not unit.survival_is_grid_preview
+            and not construction_building_is_logical_only(unit, payload)
+            and unit_overlaps_cell(unit, center, half) then
+            return true
         end
     end
     return false
+end
+
+local function nearby_units_for_footprint(payload, footprint, world_position)
+    if payload.nearby_units then return payload.nearby_units end
+    local size = number(config.cell_size, 128)
+    local half_width = footprint.x * size * 0.5
+    local half_height = footprint.y * size * 0.5
+    local radius = math.sqrt(half_width * half_width + half_height * half_height)
+        + number(config.max_unit_hull_radius, size * 4)
+    return FindUnitsInRadius(
+        number(payload.team, DOTA_TEAM_GOODGUYS),
+        world_position,
+        nil,
+        radius,
+        DOTA_UNIT_TARGET_TEAM_BOTH,
+        DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
+            + DOTA_UNIT_TARGET_BUILDING,
+        DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+        FIND_ANY_ORDER,
+        false
+    ) or {}
 end
 
 local function occupied_by_other(grid_x, grid_y, ignored)
@@ -255,10 +304,18 @@ local function can_place(payload)
     local anchor_x, anchor_y = snap_anchor(position)
     local grid_x = start_cell(anchor_x, footprint.x)
     local grid_y = start_cell(anchor_y, footprint.y)
+    local world_position = anchor_world(anchor_x, anchor_y)
+    local validation_payload = {}
+    for key, value in pairs(payload) do validation_payload[key] = value end
+    validation_payload.nearby_units = nearby_units_for_footprint(
+        payload,
+        footprint,
+        world_position
+    )
     local cells, all_valid, first_error = {}, true, nil
     for x = grid_x, grid_x + footprint.x - 1 do
         for y = grid_y, grid_y + footprint.y - 1 do
-            local cell = validate_cell(x, y, payload)
+            local cell = validate_cell(x, y, validation_payload)
             table.insert(cells, cell)
             if not cell.ok then
                 all_valid = false
@@ -274,7 +331,7 @@ local function can_place(payload)
         grid_x = grid_x,
         grid_y = grid_y,
         footprint = footprint,
-        world_position = anchor_world(anchor_x, anchor_y),
+        world_position = world_position,
         cells = cells,
     }
 end
@@ -292,10 +349,13 @@ end
 
 local function release(payload)
     local footprint = normalized_footprint(payload.footprint)
+    local entindex = number(payload.entindex, nil)
     for x = payload.grid_x, payload.grid_x + footprint.x - 1 do
         if occupied[x] then
             for y = payload.grid_y, payload.grid_y + footprint.y - 1 do
-                occupied[x][y] = nil
+                if entindex == nil or occupied[x][y] == entindex then
+                    occupied[x][y] = nil
+                end
             end
         end
     end
@@ -329,5 +389,10 @@ function M.init()
     event_bus.handle_request(events.GRID_RELEASE_REQUEST, release)
     print("[GridPlacement] server grid validation initialized")
 end
+
+M._unit_overlaps_cell_for_test = unit_overlaps_cell
+M._has_unit_for_test = has_unit
+M._nearby_units_for_footprint_for_test = nearby_units_for_footprint
+M._occupied_for_test = function() return occupied end
 
 return M
