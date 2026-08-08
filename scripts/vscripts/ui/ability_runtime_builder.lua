@@ -307,6 +307,7 @@ local function tower_upgrade(ability_name, state, resources)
         upgrade_description = description,
         target_level = target,
         upgrade_attack_delta = attack_delta,
+        population = cost.population or 0,
         fields = {
             { label = "目标等级", value = target },
             { label = "升级目标", value = tower_name },
@@ -315,14 +316,14 @@ local function tower_upgrade(ability_name, state, resources)
                 current_row and current_row.base_attack_speed,
                 row.base_attack_speed
             ) },
-            { label = "人口上限", value = (tonumber(cost.population) or 0) > 0
-                and ("+" .. tostring(cost.population)) or nil },
+            { label = "人口消耗", value = (tonumber(cost.population) or 0) > 0
+                and tostring(cost.population)
+                or ((tonumber(row.population_occupied) or 0) > 0
+                    and ("0（当前占有" .. tostring(row.population_occupied) .. "）")
+                    or "0") },
         },
     }, cost_data(cost))
-    -- population_delta is granted as max population after an upgrade. The
-    -- authoritative spend path always uses population=0, so it must not make
-    -- an otherwise affordable tower upgrade appear disabled.
-    local affordable = can_afford(cost, 0, resources)
+    local affordable = can_afford(cost, cost.population or 0, resources)
     result.can_afford = affordable
     if affordable == 0 then
         result.status_text = result.status_text .. "（当前资源不足）"
@@ -334,7 +335,7 @@ local function tower_class(ability_name, state, resources)
     local class_index = tonumber(string.match(ability_name, "(%d+)$"))
     local class_id = class_index and "class_" .. tostring(class_index) or nil
     local row = class_id and tower_routes.get(class_id, 1) or nil
-    local cost = tower_routes.class_change_cost(row)
+    local cost = tower_routes.class_change_cost(row, state)
     local result = merge({
         available = available and row and 1 or 0,
         current_level = state.level,
@@ -343,10 +344,24 @@ local function tower_class(ability_name, state, resources)
                 or "防御塔未达到5级"),
         tower_name = row and tower_routes.display_name(row) or "",
         skill_ids = row and row.skill_ids or nil,
+        population = cost and cost.population or 0,
+        fields = row and {
+            {
+                label = "人口消耗",
+                value = tostring(cost and cost.population or 0),
+            },
+            {
+                label = "转职后人口占有",
+                value = tostring(row.population_occupied or 0),
+            },
+        } or nil,
     }, cost_data(cost))
-    -- population_delta increases max population after the class change; it is
-    -- not population consumed by the upgrade itself.
-    return mark_upgrade_state(with_affordability(result, cost, 0, resources), state)
+    return mark_upgrade_state(with_affordability(
+        result,
+        cost,
+        cost and cost.population or 0,
+        resources
+    ), state)
 end
 local function mine_level_upgrade(state, resources)
     local level = state.mine_level or state.level or 1

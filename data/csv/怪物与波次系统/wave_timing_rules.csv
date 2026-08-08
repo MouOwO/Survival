@@ -1,4 +1,4 @@
-ï»¿timing_rule_id,initial_delay_seconds,early_wave_last_number,early_interval_seconds,late_interval_seconds,enabled,notes
-#ä¸­æ–‡å:è®¡æ—¶è§„åˆ™ID,é€‰æ‹©éš¾åº¦åé¦–æ³¢å»¶è¿Ÿç§’æ•°,çŸ­é—´éš”é€‚ç”¨çš„å½“å‰æ³¢æœ«å€¼,çŸ­æ³¢é—´éš”ç§’æ•°,é•¿æ³¢é—´éš”ç§’æ•°,æ˜¯å¦å¯ç”¨,å¤‡æ³¨
+timing_rule_id,initial_delay_seconds,early_wave_last_number,early_interval_seconds,late_interval_seconds,enabled,notes
+#ÖĞÎÄÃû:¼ÆÊ±¹æÔòID,Ñ¡ÔñÄÑ¶ÈºóÊ×²¨ÑÓ³ÙÃëÊı,¶Ì¼ä¸ôÊÊÓÃµÄµ±Ç°²¨Ä©Öµ,¶Ì²¨¼ä¸ôÃëÊı,³¤²¨¼ä¸ôÃëÊı,ÊÇ·ñÆôÓÃ,±¸×¢
 #types:string,number,number,number,number,boolean,string
-default,150,9,90,150,1,é€‰æ‹©éš¾åº¦å150ç§’å‡ºç¬¬ä¸€æ³¢ï¼›ç¬¬1è‡³9æ³¢é¦–æ€ªåˆ°ä¸‹ä¸€æ³¢é¦–æ€ªé—´éš”90ç§’ï¼›ç¬¬10æ³¢èµ·é¦–æ€ªåˆ°ä¸‹ä¸€æ³¢é¦–æ€ªé—´éš”150ç§’
+default,150,9,90,90,1,Ñ¡ÔñÄÑ¶Èºó150Ãë³öµÚÒ»²¨£»µÚ1ÖÁ9²¨Ê×¹Öµ½ÏÂÒ»²¨Ê×¹Ö¼ä¸ô90Ãë£»µÚ10²¨ÆğÊ×¹Öµ½ÏÂÒ»²¨Ê×¹Ö¼ä¸ô150Ãë

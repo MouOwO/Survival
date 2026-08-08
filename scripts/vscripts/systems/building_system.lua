@@ -218,6 +218,32 @@ local function completion_level_data(definition, level)
     local levels = definition.levels or definition.pre_class_levels or {}
     return levels[tonumber(level) or 1] or {}
 end
+local function tower_population_occupied(state)
+    if not state or state.building_id ~= "arrow_tower" then return 0 end
+    return math.max(
+        0,
+        tonumber(state.population_occupied)
+            or tonumber(state.unit and state.unit.survival_population_occupied)
+            or tower_routes.population_occupied(tower_routes.current(state))
+    )
+end
+local function population_to_release(state)
+    return math.max(
+        0,
+        tonumber(state and state.definition and state.definition.population_cost)
+            or 0
+    ) + tower_population_occupied(state)
+end
+local function release_population(state, reason)
+    local population = population_to_release(state)
+    if population <= 0 then return 0 end
+    event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+        team = state.team,
+        population = population,
+        reason = reason,
+    })
+    return population
+end
 local function public_state(state)
     local route_row = state.building_id == "arrow_tower"
         and tower_routes.current(state) or nil
@@ -233,6 +259,7 @@ local function public_state(state)
         route_level = route_row and route_row.level or state.level,
         tower_class = state.tower_class,
         tower_class_name = state.tower_class_name,
+        population_occupied = tower_population_occupied(state),
         display_name = state.unit.survival_display_name
             or state.tower_class_name
             or (state.building_id == "arrow_tower"
@@ -314,6 +341,9 @@ local function recover_building(unit)
     }
     local route_row = state.building_id == "arrow_tower"
         and tower_routes.current(state) or nil
+    state.population_occupied = tonumber(unit.survival_population_occupied)
+        or tower_routes.population_occupied(route_row)
+    unit.survival_population_occupied = state.population_occupied
     unit.survival_building_id = state.building_id
     unit.survival_player_id = state.player_id
     unit.survival_grid_x = grid_x
@@ -478,10 +508,12 @@ local function start_building(payload)
         tower_class = nil,
         tower_class_name = nil,
         tower_combat = arrow_data(1),
+        population_occupied = 0,
     }
     unit.survival_grid_x = state.grid_x
     unit.survival_grid_y = state.grid_y
     unit.survival_route_level = 1
+    unit.survival_population_occupied = state.population_occupied
     change_count(check.team, check.definition.id, 1)
     if check.definition.build_once then wall_ever_built[check.team] = true end
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
@@ -734,6 +766,7 @@ local function consume_for_fusion(payload)
             footprint = state.definition.footprint,
         })
         event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
+        release_population(state, "tower_fusion_consumed")
     end
     for _, state in ipairs(selected) do
         if valid_entity(state.unit) then UTIL_Remove(state.unit) end
@@ -746,10 +779,13 @@ local function on_building_changed(payload)
     state.level = payload.level or state.level
     state.tower_class = payload.tower_class
     state.tower_class_name = payload.tower_class_name
+    state.population_occupied = tonumber(payload.population_occupied)
+        or state.population_occupied
     state.unit.survival_level = state.level
     state.unit.survival_route_level = payload.route_level
         or state.unit.survival_route_level
     state.unit.survival_tower_class = state.tower_class
+    state.unit.survival_population_occupied = state.population_occupied
     if payload.display_name then
         state.unit.survival_display_name = payload.display_name
     end
@@ -770,13 +806,7 @@ local function on_entity_killed(payload)
         footprint = state.definition.footprint,
     })
     event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
-    if (state.definition.population_cost or 0) > 0 then
-        event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
-            team = state.team,
-            population = state.definition.population_cost,
-            reason = "building_destroyed:" .. state.building_id,
-        })
-    end
+    release_population(state, "building_destroyed:" .. state.building_id)
     if state.building_id == "main_city" then
         GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
     end
@@ -857,6 +887,7 @@ M._completion_level_data_for_test = completion_level_data
 M._apply_hull_radius_for_test = apply_hull_radius
 M._apply_initial_stats_for_test = apply_initial_stats
 M._public_state_for_test = public_state
+M._population_to_release_for_test = population_to_release
 M._recover_existing_for_test = recover_existing_buildings
 M._building_limit_for_test = {
     reached = building_limit_reached,

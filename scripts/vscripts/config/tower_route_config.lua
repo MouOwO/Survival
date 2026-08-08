@@ -31,6 +31,23 @@ function M.current(state)
     return M.arrow(state.level)
 end
 
+function M.population_occupied(row)
+    return math.max(0, tonumber(row and row.population_occupied) or 0)
+end
+
+function M.population_transition(state, target_row)
+    local current = tonumber(state and state.population_occupied)
+    if current == nil then current = M.population_occupied(M.current(state)) end
+    current = math.max(0, current)
+    local target = M.population_occupied(target_row)
+    return {
+        current = current,
+        target = target,
+        spend = math.max(0, target - current),
+        release = math.max(0, current - target),
+    }
+end
+
 function M.stage_end_level(state)
     if not state.tower_class then return 5 end
     local row = M.current(state)
@@ -62,24 +79,34 @@ end
 
 function M.cost_to(state, target_level)
     local cost = { wood = 0, gold = 0, population = 0 }
+    local target_row = nil
     for level = state.level + 1, target_level do
         local row = M.row_at_level(state, level)
         if not row then return nil end
+        target_row = row
         cost.wood = cost.wood + (tonumber(row.upgrade_wood) or 0)
         cost.gold = cost.gold + (tonumber(row.upgrade_gold) or 0)
-        -- population_delta is a max-population reward granted after the
-        -- upgrade. It is deliberately kept separate from spend population.
-        cost.population = cost.population
-            + (tonumber(row.population_delta) or 0)
     end
+    local transition = M.population_transition(state, target_row)
+    cost.population = transition.spend
+    cost.population_release = transition.release
+    cost.population_occupied = transition.target
     return cost
 end
 
-function M.class_change_cost(row)
+function M.class_change_cost(row, state)
     if not row then return nil end
+    local transition = state and M.population_transition(state, row) or {
+        spend = M.population_occupied(row),
+        release = 0,
+        target = M.population_occupied(row),
+    }
     return {
         wood = tonumber(row.upgrade_wood) or 0,
         gold = tonumber(row.upgrade_gold) or 0,
+        population = transition.spend,
+        population_release = transition.release,
+        population_occupied = transition.target,
     }
 end
 

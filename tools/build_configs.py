@@ -51,6 +51,24 @@ WAR3_FIELD_ALIASES = {
         "base_armor": "base_war3_armor",
     },
 }
+
+# Tower CSVs describe the population required by a design row, while runtime
+# code stores the population currently occupied by the resulting tower. Keep
+# that distinction explicit at the generated-config boundary.
+TOWER_POPULATION_FILES = {
+    "arrow_tower_base.csv",
+    "tower_class_anti_air.csv",
+    "tower_class_death.csv",
+    "tower_class_frost.csv",
+    "tower_class_lightning.csv",
+    "tower_class_machine_gun.csv",
+    "tower_class_multi.csv",
+    "tower_class_mystery.csv",
+}
+LUA_FIELD_ALIASES = {
+    name: {"population_cost": "population_occupied"}
+    for name in TOWER_POPULATION_FILES
+}
 WAR3_ARMOR_EFFECT_TYPES = {
     "super_wall_armor_flat",
     "lumberjack_attack_armor_reduction",
@@ -302,10 +320,9 @@ def build(source: Path, output: Path) -> None:
     if len(rows) < 2:
         raise ValueError(f"CSV requires header and #types row: {source}")
     headers = rows[0]
-    output_headers = [
-        WAR3_FIELD_ALIASES.get(source.name, {}).get(header, header)
-        for header in headers
-    ]
+    aliases = dict(WAR3_FIELD_ALIASES.get(source.name, {}))
+    aliases.update(LUA_FIELD_ALIASES.get(source.name, {}))
+    output_headers = [aliases.get(header, header) for header in headers]
     type_index = next(
         (i for i, row in enumerate(rows[1:], 1)
          if row and row[0].startswith("#types:")),

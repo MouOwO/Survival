@@ -5,6 +5,14 @@
 - 未修改金矿生命、护甲、收益、费用、技能、升级时长、升级事务或其他建筑。新增Lua 5.1测试证明等级行即使携带旧模型，LV1/LV2升级数据仍固定为`radiant_ancient001.vmdl / 0.34`。
 - 自动验证通过：`GOLD_MINE_FIXED_VISUAL_LUA51_PASS`、`SIX_GAMEPLAY_FIXES_LUA51_PASS`、`SIX_GAMEPLAY_FIXES_CONTRACT_PASS`、`GOLD_MINE_FIXED_VISUAL_LUAC51_PASS`、`GOLD_MINE_VISUAL_GENERATED_BYTE_MATCH_PASS`、严格UTF-8和限定diff检查。尚未Workshop Tools实机连续升级验收。
 
+# 2026-08-08 - 城墙升级生命改为增加最大生命差值
+
+- 用户明确替换同日早先“保持生命百分比”的需求：升级完成时计算`最大生命增量=新最大生命-旧最大生命`，并令`新当前生命=旧当前生命+最大生命增量`。确认示例为`100/200`升级到上限`400`后得到`300/400`；本节语义覆盖下方较早的生命比例记录。
+- 实现继续仅接入`upgrade_wall()`提交路径，并在完成瞬间捕获生命。等级数据与当前科技重算被包入同一次投影，以最终实际最大生命计算差值；主城、农场、防御塔和CSV权威值不变。
+- `building_health_projection.lua`移除比例算法，新增`apply_maximum_health_increase()`；专项Lua行为测试覆盖残血、满血、1血、无增量、下降夹紧和科技后最终上限，PowerShell契约约束公式、调用范围与科技调用顺序。
+- 自动验证通过：`WALL_UPGRADE_HEALTH_LUA51_PASS`、`WALL_UPGRADE_HEALTH_CONTRACT_PASS`、`WALL_UPGRADE_HEALTH_LUAC51_PASS`、全项目351个生产Lua的Lua 5.1语法检查、`REPAIR_WORKER_PERCENTAGE_MATH_OK/CONTRACT_OK`、8个任务文件严格UTF-8及限定`git diff --check`。生产新投影调用点计数为1且旧`apply_preserved_ratio`无残留。
+- 任务前未跟踪的旧`test_building_upgrade_contract.ps1`失败于`UPGRADE_DURATION_OPTION_MISSING`：它硬编码要求`local duration = ...`，当前HEAD和工作树均一直使用等价的`state.duration = ...`；`building_upgrade_process.lua`与HEAD逐字无差异，本轮未修改该无关旧测试或升级流程迎合。尚未进行Workshop Tools实机验证。
+
 # 2026-08-08 - 金矿替换为可选中动态建筑模型
 
 - 用户实测`tower_good4.vmdl`金矿无法鼠标选择。静态审计确认`building_gold_mine`运行配置已有`selectable=true`，没有金矿专属不可选Modifier，且`BoundsHullName`只影响碰撞/寻路，不能替静态模型补出选择hitbox。

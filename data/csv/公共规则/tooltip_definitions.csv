@@ -125,7 +125,7 @@ inventory_item:challenge_08,inventory_item,challenge_08,挑战熔火核心lv4宝
 inventory_item:challenge_09,inventory_item,challenge_09,挑战冰烬挽歌,0,0,击败BOSS后掉落冰魂焰魄。当满足装备升级进化条件时，拾取掉落精华即可升级进化。,,challenge_09
 inventory_item:challenge_10,inventory_item,challenge_10,进入七宗罪,0,0,场内维持10只相同小怪；每只怪物死亡有40%概率按权重掉落七种精华，掉落数量不限。,,challenge_10
 inventory_item:challenge_11,inventory_item,challenge_11,进入罪渊（十宗罪）,0,0,持有深渊审判才能进入；武器+N进入第N+1层，击杀对应Boss后自动合成升阶。,,challenge_11
-inventory_item:challenge_synthesis_gem,inventory_item,challenge_synthesis_gem,挑战合成宝石,0,0,1,,challenge_synthesis_gem
+inventory_item:challenge_synthesis_gem,inventory_item,challenge_synthesis_gem,挑战合成宝石,0,0,击败BOSS后掉落合成宝石,item_recipe,challenge_synthesis_gem
 inventory_item:equipment_attack_gloves_01,inventory_item,equipment_attack_gloves_01,加速手套Lv1,0,0,"增加英雄20%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_01
 inventory_item:equipment_attack_gloves_02,inventory_item,equipment_attack_gloves_02,加速手套Lv2,0,0,"增加英雄40%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_02
 inventory_item:equipment_attack_gloves_03,inventory_item,equipment_attack_gloves_03,加速手套Lv3,0,0,"增加英雄60%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_03
@@ -154,12 +154,12 @@ inventory_item:equipment_iron_armor_03,inventory_item,equipment_iron_armor_03,�
 inventory_item:equipment_iron_armor_04,inventory_item,equipment_iron_armor_04,铁甲Lv4,0,0,增加英雄70点护甲和30000点生命值,item_chainmail,equipment_iron_armor_04
 inventory_item:equipment_iron_armor_max,inventory_item,equipment_iron_armor_max,铁甲Lvmax,0,0,"增加英雄100点护甲和50000点生命值
 | INGREDIENT: 加速手套Lvmax + 灼热之刃Lvmax + 铁甲Lvmax + 合成宝石 -> 狱火熔铠Lv1",item_chainmail,equipment_iron_armor_max
-inventory_item:item_death_mask,inventory_item,item_death_mask,死亡面罩,0,0,1,,item_death_mask
-inventory_item:item_forging_hammer,inventory_item,item_forging_hammer,锻造之锤(W ),0,0,1,,item_forging_hammer
+inventory_item:item_death_mask,inventory_item,item_death_mask,死亡面罩,0,0,能使英雄的攻击将50%对敌人造成的伤害转换成自己的生命值,item_lifesteal,item_death_mask
+inventory_item:item_forging_hammer,inventory_item,item_forging_hammer,锻造之锤(W ),0,0,英雄每次攻击 成长之剑额外+1次数 可叠加,item_lifesteal,item_forging_hammer
 inventory_item:item_knowledge_book,inventory_item,item_knowledge_book,知识之书,0,0,增加30000全属性，15000攻击力。,item_tome_of_knowledge,item_knowledge_book
-inventory_item:item_large_polar_crystal,inventory_item,item_large_polar_crystal,大极地晶石,0,0,1,,item_large_polar_crystal
-inventory_item:item_molten_upgrade_gem_01_03,inventory_item,item_molten_upgrade_gem_01_03,挑战熔火核心Lv1-3升级宝石,0,0,1,,item_molten_upgrade_gem_01_03
-inventory_item:item_molten_upgrade_gem_04,inventory_item,item_molten_upgrade_gem_04,挑战熔火核心Lv4升级宝石,0,0,1,,item_molten_upgrade_gem_04
+inventory_item:item_large_polar_crystal,inventory_item,item_large_polar_crystal,大极地晶石,0,0,全属性+2000    大极地晶石+霜之剑刃max+合成宝石=极寒之刃,item_lifesteal,item_large_polar_crystal
+inventory_item:item_molten_upgrade_gem_01_03,inventory_item,item_molten_upgrade_gem_01_03,挑战熔火核心Lv1-3升级宝石,0,0,可以升级狱火熔铠到最高Lv4级。,item_recipe,item_molten_upgrade_gem_01_03
+inventory_item:item_molten_upgrade_gem_04,inventory_item,item_molten_upgrade_gem_04,挑战熔火核心Lv4升级宝石,0,0,可以升级狱火熔铠到最高Lvmax级。,item_recipe,item_molten_upgrade_gem_04
 inventory_item:item_seven_sins_envy_essence,inventory_item,item_seven_sins_envy_essence,妒忌精华,0,0,点击使用强化冰火裁决+1并且全属性加成+5%,item_skadi,item_seven_sins_envy_essence
 inventory_item:item_seven_sins_gluttony_essence,inventory_item,item_seven_sins_gluttony_essence,暴食精华,0,0,点击使用强化冰火裁决+1并且攻击间隔-0.05,item_gloves,item_seven_sins_gluttony_essence
 inventory_item:item_seven_sins_greed_essence,inventory_item,item_seven_sins_greed_essence,贪婪精华,0,0,点击使用强化冰火裁决+1并且每次攻击全属性+3,item_eagle,item_seven_sins_greed_essence
@@ -167,7 +167,7 @@ inventory_item:item_seven_sins_lust_essence,inventory_item,item_seven_sins_lust_
 inventory_item:item_seven_sins_pride_essence,inventory_item,item_seven_sins_pride_essence,傲慢精华,0,0,点击使用强化冰火裁决+1并且攻击加成+20%,item_reaver,item_seven_sins_pride_essence
 inventory_item:item_seven_sins_sloth_essence,inventory_item,item_seven_sins_sloth_essence,懒惰精华,0,0,点击使用强化冰火裁决+1并且杀敌全属性+5,item_ultimate_orb,item_seven_sins_sloth_essence
 inventory_item:item_seven_sins_wrath_essence,inventory_item,item_seven_sins_wrath_essence,暴怒精华,0,0,点击使用强化冰火裁决+1并且最终伤害+5%,item_demon_edge,item_seven_sins_wrath_essence
-inventory_item:item_small_polar_crystal,inventory_item,item_small_polar_crystal,小极地晶石,0,0,1,,item_small_polar_crystal
+inventory_item:item_small_polar_crystal,inventory_item,item_small_polar_crystal,小极地晶石,0,0,全属性+1000    击杀200个冰之幽魂 升级,item_lifesteal,item_small_polar_crystal
 inventory_item:item_super_knowledge_book,inventory_item,item_super_knowledge_book,超级知识之书,0,0,增加300000全属性，150000攻击力。,item_tome_of_knowledge,item_super_knowledge_book
 inventory_item:material_ice_soul_ember,inventory_item,material_ice_soul_ember,冰魂焰魄,0,0,极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决,item_recipe,material_ice_soul_ember
 inventory_item:material_molten_core_01,inventory_item,material_molten_core_01,熔火核心Lv1,0,0,熔火核心Lv1*3 合成熔火核心Lv2,item_recipe,material_molten_core_01
@@ -185,7 +185,7 @@ inventory_item:rebirth_challenge_07,inventory_item,rebirth_challenge_07,挑战7�
 inventory_item:rebirth_challenge_08,inventory_item,rebirth_challenge_08,挑战8转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄70000全属性/增加攻击全属性+9/多重攻击+1,,rebirth_challenge_08
 inventory_item:rebirth_challenge_09,inventory_item,rebirth_challenge_09,挑战9转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄100000全属性/增加攻击全属性+10/多重攻击+1,,rebirth_challenge_09
 inventory_item:rebirth_challenge_10,inventory_item,rebirth_challenge_10,挑战10转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄200000全属性/增加攻击全属性+12/多重攻击+1,,rebirth_challenge_10
-inventory_item:service_early_final_boss,inventory_item,service_early_final_boss,提前通关,0,0,1,,service_early_final_boss
+inventory_item:service_early_final_boss,inventory_item,service_early_final_boss,提前通关,0,0,提前召唤最终BOSS进攻。,item_smoke_of_deceit,service_early_final_boss
 inventory_item:weapon_epic_icefire_00,inventory_item,weapon_epic_icefire_00,史诗：冰火裁决,0,0,"增加属性  - 20W攻击力  - 400%攻速  - 100%吸血  - 80W生命值  - 500护甲  - 全属性+8000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害
 | RESULT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决",item_skadi,weapon_epic_icefire_00
 inventory_item:weapon_epic_icefire_01,inventory_item,weapon_epic_icefire_01,史诗：冰火裁决+1,0,0,增加属性  - 25W攻击力  - 400%攻速  - 100%吸血  - 85W生命值  - 550护甲  - 全属性+10000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_01
