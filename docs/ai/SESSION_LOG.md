@@ -1,3 +1,17 @@
+## 2026-08-08 - 多选金矿Q/W/E与自动升级批量协调
+
+- 新增独立`gold_mine_batch_upgrade_service.lua`并由`ui_request_router`接管五个金矿无目标技能。沿用Panorama现有最多64个去重候选，不修改客户端协议；服务端逐矿重验存活、owner、金矿身份、Ability、升级状态和可施放性。
+- Q通过新增只读报价request取得每矿下一等级木材/金币，按木材、金币、entindex升序调用原金矿升级事务；中间失败继续后续候选，成功受理才冷却。W/E一次只调用一次共享科技购买，成功同步本次有效候选冷却，失败不冷却；商店新增显式静默通知参数，避免原购买提示与批量汇总重复。
+- 自动升级底层新增状态查询和可选`enabled=true/false`接口，未传参数时继续兼容旧单矿toggle。批量开启/停止对已在目标状态的矿幂等保持；变更后不操作已被槽位刷新隐藏的旧Ability句柄。同玩家所有自动矿中entindex最小者协调共享科技购买，其他矿只独立升级本体；移除购买成功后手工递增科技缓存，统一以`TECHNOLOGY_CHANGED`为权威。
+- 新增Lua 5.1行为测试覆盖Q三键排序、部分资源、失败继续、owner/建筑/Ability隔离、W/E单次一级与同步冷却、失败无冷却、自动混合状态幂等，以及多自动矿共享科技协调。`GOLD_MINE_BATCH_UPGRADE_LUA51_PASS`、`GOLD_MINE_AUTO_COORDINATOR_LUA51_PASS`、`GOLD_MINE_BATCH_UPGRADE_CONTRACT_PASS`、箭塔批量、商店/研究科技回归和目标`luac5.1 -p`通过。Panorama无源码变化，未重新编译；尚需Workshop Tools冷启动实机验收。
+
+## 2026-08-08 - 多选箭塔跨路线Q/W费用排序批量升级
+
+- 本节替换同日旧“箭塔仅同路线、W仅主塔、按选择顺序”的批量升级记录。用户最终要求基础箭塔与不同转职塔混选；Q按各塔下一等级费用，W按各塔直升当前阶段最高级的累计费用，排序固定为木材升序、金币升序、entindex升序。
+- 两个Panorama施法发布者现提交最多64个去重`selected_entindexes`。服务端新增权威只读报价request，箭塔只按共同`survival_building_id == "arrow_tower"`匹配；逐塔重验owner/存活/对应Ability，正式请求继续复用升级系统和原子资源扣费。失败跳过后续继续，成功受理后才启动冷却。
+- 专项Lua 5.1覆盖跨路线Q/W、累计费用排序、木/金/entindex三键、部分资源、非法owner/建筑/Ability、失败无冷却、单选普通建筑；PowerShell契约、目标Lua 5.1语法、升级流程/塔Runtime/人口配置、配置CheckOnly、严格UTF-8和两仓diff通过。`ability_tooltip.js`与`combat_stats.js`均强制编译为`1 compiled, 0 failed, 0 skipped`。
+- 既有`test_building_state_recovery.lua`只因未修改的`building_system.lua`首字节BOM被裸Lua 5.1拒绝而未运行到业务断言，本轮不改无关生产文件迎合。尚未Workshop Tools实机验收跨路线Q/W和多人隔离。
+
 ## 2026-08-08 `monster<N>`开发跳波预载门禁
 
 - 用户批准修复直接输入`monster19`等作弊码时资源尚未加载导致怪物未正常出现的问题。只读追踪确认`cheat_command_service`直接调用`wave_system.debug_spawn_wave()`，旧实现首怪延迟0且绕过正常倒计时预载；N1 W19权威CSV共9只，两个archetype共享Tiny模型，资产CSV已有`monster_tiny/asset_proxy_monster_tiny`。
@@ -2210,11 +2224,11 @@
 - 两个用户既有未跟踪回归脚本未通过：Builder ownership测试硬编码600移速但当前权威CSV为300；Builder utility契约缺Monkey射程1000。均与本轮diff无关，未修改这些文件或业务配置。
 - 下一步唯一动作：Workshop Tools冷启动`template_map`做玩家0单人兼容验收。尚未完成实机或网络验收。
 
-## 2026-08-08 - 多选同类型建筑批量升级
+## 2026-08-08 - 多选同类型建筑批量升级（已被本文顶部跨路线Q/W语义替换）
 
-- 用户批准War3式语义A：多选建筑后点击主建筑等级升级按钮，普通建筑按相同`building_id`、防御塔按相同路线批量；不同等级各自升级下一等级并支付自身CSV费用，资源不足、满级、升级中或不合法者跳过，已成功项目不回滚。
+- 本节是较早实现记录；其中“防御塔同路线、仅单级升级”已失效，以本文顶部最新跨路线Q/W记录为准。
 - Panorama实际输入双发布者`ability_tooltip.js`和`combat_stats.js`都附带最多64个当前选择entindex。服务端新增`building_batch_upgrade_service.lua`，客户端列表仅作候选，逐栋重新验证存活、业务owner、类型/路线和当前单级升级Ability，再复用既有`BUILDING_UPGRADE_REQUEST`、升级过程与原子扣费。
-- 兼容边界：`ability_upgrade_tower_max`继续只作用于主塔并保留累计费用直升语义；七条转职、金矿科技/自动升级、训练和其他特殊按钮不批量。批量期间单栋错误提示静默，只发送一次成功/跳过汇总。
+- 后续实现已将`ability_upgrade_tower_max`纳入跨路线批量，并改为权威累计费用排序；七条转职、金矿科技/自动升级、训练和其他特殊按钮仍不批量。批量期间单栋错误提示静默，只发送一次成功/跳过汇总。
 - 验证通过：`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`、`BUILDING_BATCH_UPGRADE_LUA51_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、建筑升级过程/城墙生命/箭塔成本回归、目标Lua 5.1语法、严格UTF-8和两仓限定`diff --check`。两个Panorama JS均强制编译为`1 compiled, 0 failed, 0 skipped`。
 - 两项既有Builder测试仍失败：一个硬编码移速600而CSV为300，另一个检查过时源码字符串；本轮未修改Builder迎合无关测试。下一步Workshop Tools冷启动实测多选、鼠标/快捷键、不同等级、部分资源、路线隔离和多人owner隔离，未经用户确认不得记录为实机验收完成。
 

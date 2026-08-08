@@ -10,11 +10,11 @@ local asset_catalog = require("config/asset_catalog")
 local armor_balance = require("config/armor_balance")
 local hero_summon_projection = require("systems/hero_summon_projection")
 local building_batch_upgrade = require("systems/building_batch_upgrade_service")
+local gold_mine_batch_upgrade = require("systems/gold_mine_batch_upgrade_service")
 
 local M = {}
 local synthesis_requests = {}
 local building_snapshot_sequence = 0
-local ability_request_sequence = 0
 local selected_unit_by_player = {}
 
 local function safe_number(entity, method_name, fallback, ...)
@@ -742,8 +742,8 @@ local function register_ability_cast_request()
             ability_upgrade_gold_mine = "level",
             ability_upgrade_gold_mine_efficiency = "efficiency",
             ability_upgrade_gold_mine_crit = "crit",
-            ability_gold_mine_auto_upgrade = "auto",
-            ability_gold_mine_stop_auto_upgrade = "auto",
+            ability_gold_mine_auto_upgrade = "auto_start",
+            ability_gold_mine_stop_auto_upgrade = "auto_stop",
         }
         local gold_mine_action = gold_mine_actions[ability_name]
         local gold_mine_ability_matches = gold_mine_action and unit_valid
@@ -771,31 +771,17 @@ local function register_ability_cast_request()
                 or not ability:IsFullyCastable() then
                 direct_result = { ok = false, error = "防御塔升级技能当前不可用" }
             else
-                if tower_upgrade_mode == "one" then
-                    direct_result = building_batch_upgrade.execute({
-                        player_id = player_id,
-                        primary = unit,
-                        primary_ability = ability,
-                        ability_name = ability_name,
-                        selected_entindexes = payload.selected_entindexes,
-                    })
-                    print("[SURVIVAL_CAST][SERVER] TOWER_BATCH_UPGRADE_DISPATCHED success="
-                        .. tostring(direct_result and direct_result.success_count or 0)
-                        .. " skipped=" .. tostring(direct_result and direct_result.skipped_count or 0))
-                else
-                    ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
-                    direct_cooldown_started = true
-                    local request = {
-                        building = unit,
-                        upgrade_mode = tower_upgrade_mode,
-                        source_ability = ability,
-                    }
-                    event_bus.emit(events.BUILDING_UPGRADE_REQUEST, request)
-                    direct_result = request.result
-                        or { ok = false, error = "防御塔升级无响应" }
-                    print("[SURVIVAL_CAST][SERVER] TOWER_UPGRADE_DISPATCHED mode="
-                        .. tostring(tower_upgrade_mode))
-                end
+                direct_result = building_batch_upgrade.execute({
+                    player_id = player_id,
+                    primary = unit,
+                    primary_ability = ability,
+                    ability_name = ability_name,
+                    selected_entindexes = payload.selected_entindexes,
+                })
+                print("[SURVIVAL_CAST][SERVER] TOWER_BATCH_UPGRADE_DISPATCHED mode="
+                    .. tostring(tower_upgrade_mode) .. " success="
+                    .. tostring(direct_result and direct_result.success_count or 0)
+                    .. " skipped=" .. tostring(direct_result and direct_result.skipped_count or 0))
             end
         elseif building_upgrade_ability_matches and owner_matches
             and not passive and not is_point_target then
@@ -842,58 +828,22 @@ local function register_ability_cast_request()
             and not is_point_target then
             handled_directly = true
             direct_result_required = true
-            if not ability:IsActivated() or ability:IsHidden() then
-                direct_result = { ok = false, error = "金矿技能当前不可用" }
-            elseif not ability:IsFullyCastable() then
-                direct_result = { ok = false, error = "金矿技能尚未冷却" }
-            elseif unit.survival_upgrade_in_progress
-                and gold_mine_action ~= "auto" then
-                direct_result = { ok = false, error = "金矿正在升级中" }
-            else
-                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
-                direct_cooldown_started = true
-                ability_request_sequence = ability_request_sequence + 1
-                if gold_mine_action == "level" then
-                    direct_result, direct_error = event_bus.request(
-                        events.GOLD_MINE_LEVEL_UPGRADE_REQUEST,
-                        { entindex = entindex, source_ability = ability }
-                    )
-                elseif gold_mine_action == "efficiency"
-                    or gold_mine_action == "crit" then
-                    local group = gold_mine_action == "efficiency"
-                        and "gold_mine_efficiency" or "gold_mine_crit"
-                    direct_result, direct_error = event_bus.request(
-                        events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,
-                        {
-                            player_id = player_id,
-                            technology_group = group,
-                            source = "gold_mine_ability",
-                            entindex = entindex,
-                            request_id = "gold_mine_ui_" .. tostring(entindex)
-                                .. "_" .. tostring(ability_request_sequence),
-                        }
-                    )
-                else
-                    direct_result, direct_error = event_bus.request(
-                        events.GOLD_MINE_AUTO_UPGRADE_REQUEST,
-                        { entindex = entindex }
-                    )
-                end
-            end
-            local succeeded = direct_result and direct_result.ok == true
-            local message = direct_result
-                and (direct_result.error or direct_result.message)
-                or direct_error
-            if message and message ~= "" then
-                event_bus.emit(events.UI_NOTIFICATION, {
-                    player_id = player_id,
-                    message = message,
-                    level = succeeded and "info" or "error",
-                })
-            end
-            print("[SURVIVAL_CAST][SERVER] GOLD_MINE_DISPATCHED action="
-                .. tostring(gold_mine_action) .. " ok=" .. tostring(succeeded)
-                .. " error=" .. tostring(message or ""))
+            direct_result = gold_mine_batch_upgrade.execute({
+                player_id = player_id,
+                primary = unit,
+                primary_ability = ability,
+                ability_name = ability_name,
+                selected_entindexes = payload.selected_entindexes,
+            })
+            print("[SURVIVAL_CAST][SERVER] GOLD_MINE_BATCH_DISPATCHED action="
+                .. tostring(gold_mine_action) .. " ok="
+                .. tostring(direct_result and direct_result.ok == true)
+                .. " success="
+                .. tostring(direct_result and direct_result.success_count or 0)
+                .. " unchanged="
+                .. tostring(direct_result and direct_result.unchanged_count or 0)
+                .. " skipped="
+                .. tostring(direct_result and direct_result.skipped_count or 0))
         elseif altar_summon_matches and owner_matches and not passive
             and not is_point_target then
             -- Creature-based altar abilities can accept an order without
@@ -1062,7 +1012,6 @@ end
 function M.init()
     synthesis_requests = {}
     building_snapshot_sequence = 0
-    ability_request_sequence = 0
     selected_unit_by_player = {}
     register_client_diagnostic()
     register_selected_unit_stats_request()

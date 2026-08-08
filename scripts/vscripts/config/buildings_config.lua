@@ -150,6 +150,19 @@ local farm_levels = level_rows("building_farm")
 farm_levels[1] = farm_levels[1] or {}
 farm_levels[1].health = farm_levels[1].health or 2500
 farm_levels[1].armor = farm_levels[1].armor or dota_armor(5)
+local farm_visual = (building_visual_by_id.building_farm or {})[1]
+if farm_visual then
+    for _, level_data in pairs(farm_levels) do
+        for key, value in pairs(farm_visual) do
+            if key == "model_asset_id"
+                or key == "model_name"
+                or key == "model_scale"
+                or key == "model_yaw" then
+                level_data[key] = value
+            end
+        end
+    end
+end
 M.building_farm = {
     id = "building_farm", display_name = configured_name("building_farm", "人口农场"),
     unit_name = configured_unit_name("building_farm", "building_farm"),

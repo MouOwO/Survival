@@ -689,6 +689,62 @@ local function upgrade_tower(state, mode)
     return pending
 end
 
+local function upgrade_quote(payload)
+    payload = payload or {}
+    local unit = payload.building
+    if not valid_entity(unit) or not unit:IsAlive() then
+        return { ok = false, error = "升级建筑不存在" }
+    end
+    local state = recover_state(unit)
+    if not state then
+        return { ok = false, error = "建筑升级状态尚未初始化" }
+    end
+    if upgrade_process.is_active(unit) then
+        return { ok = false, error = "建筑正在升级中" }
+    end
+
+    local mode = payload.upgrade_mode == "max" and "max" or "one"
+    local target_level = state.level + 1
+    local cost = nil
+    if state.building_id == "arrow_tower" then
+        if not state.tower_class and state.level >= 5 then
+            return { ok = false, error = "请先选择防御塔转职" }
+        end
+        if mode == "max" then
+            target_level = tower_routes.stage_end_level(state)
+        end
+        local target_row = tower_routes.row_at_level(state, target_level)
+        cost = tower_routes.cost_to(state, target_level)
+        if target_level <= state.level or not target_row or not cost then
+            return { ok = false, error = "防御塔已达当前阶段最高等级" }
+        end
+    else
+        if mode ~= "one" then
+            return { ok = false, error = "该建筑不支持直升最高级" }
+        end
+        local data = state.definition.levels
+            and state.definition.levels[target_level] or nil
+        if not data then
+            return { ok = false, error = "该建筑已达最高等级" }
+        end
+        cost = data.upgrade_cost
+        if not cost then
+            return { ok = false, error = "升级费用未配置" }
+        end
+    end
+
+    return {
+        ok = true,
+        building_id = state.building_id,
+        current_level = state.level,
+        target_level = target_level,
+        upgrade_mode = mode,
+        wood = math.max(0, tonumber(cost.wood) or 0),
+        gold = math.max(0, tonumber(cost.gold) or 0),
+        population = math.max(0, tonumber(cost.population) or 0),
+    }
+end
+
 local function on_upgrade_request(payload)
     local unit = payload.building
     if not valid_entity(unit) then
@@ -873,6 +929,7 @@ end
 function M.init()
     upgrade_process.reset()
     buildings = {}
+    event_bus.handle_request(events.BUILDING_UPGRADE_QUOTE_REQUEST, upgrade_quote)
     event_bus.subscribe(events.BUILDING_CREATED, on_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)

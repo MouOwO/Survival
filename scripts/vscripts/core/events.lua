@@ -21,6 +21,7 @@ local M = {
 
     BUILD_CAN_PLACE_REQUEST = "building.can_place.request",
     BUILD_REQUEST = "building.build.request",
+    BUILDING_UPGRADE_QUOTE_REQUEST = "building.upgrade_quote.request",
     BUILDING_UPGRADE_REQUEST = "building.upgrade.request",
     TOWER_CLASS_REQUEST = "tower.class.request",
     BUILDING_QUERY_REQUEST = "building.query.request",
@@ -45,7 +46,9 @@ local M = {
     BUILDER_UNLOCK_CHANGED = "builder.unlock.changed",
     BUILDER_STAGE_CHANGED = "builder.stage.changed",
 
+    GOLD_MINE_LEVEL_UPGRADE_QUOTE_REQUEST = "gold_mine.level_upgrade_quote.request",
     GOLD_MINE_LEVEL_UPGRADE_REQUEST = "gold_mine.level_upgrade.request",
+    GOLD_MINE_AUTO_STATE_REQUEST = "gold_mine.auto_state.request",
     GOLD_MINE_AUTO_UPGRADE_REQUEST = "gold_mine.auto_upgrade.request",
     GOLD_MINE_UPGRADE_REQUEST = "gold_mine.upgrade.request",
     GOLD_MINE_CRIT_UPGRADE_REQUEST = "gold_mine.crit_upgrade.request",

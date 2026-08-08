@@ -145,6 +145,19 @@ local function purchase_technology(state, group)
     })
 end
 
+local function auto_technology_leader(player_id)
+    local leader = nil
+    for entindex, enabled in pairs(auto_upgrade_by_entindex) do
+        local state = enabled and state_by_entindex[entindex] or nil
+        if state and player_id_for(state) == player_id
+            and valid(state.unit) and state.unit:IsAlive()
+            and (leader == nil or entindex < leader) then
+            leader = entindex
+        end
+    end
+    return leader
+end
+
 local function auto_upgrade_step(entindex)
     local state = state_by_entindex[entindex]
     if not auto_upgrade_by_entindex[entindex]
@@ -168,11 +181,14 @@ local function auto_upgrade_step(entindex)
         return 2.0
     end
 
+    if auto_technology_leader(player_id_for(state)) ~= entindex then
+        return 2.0
+    end
+
     local efficiency_level = tonumber(technology.gold_mine_efficiency) or 0
     if efficiency_level < config.max_efficiency_level then
         local result = purchase_technology(state, "gold_mine_efficiency")
         if result and result.ok then
-            technology.gold_mine_efficiency = efficiency_level + 1
             publish(state)
             return 1.0
         end
@@ -183,7 +199,6 @@ local function auto_upgrade_step(entindex)
     if crit_level < config.max_crit_level then
         local result = purchase_technology(state, "gold_mine_crit")
         if result and result.ok then
-            technology.gold_mine_crit = crit_level + 1
             publish(state)
             return 1.0
         end
@@ -200,15 +215,56 @@ local function auto_upgrade_step(entindex)
     return false
 end
 
+local function auto_state(payload)
+    local state = state_from_payload(payload)
+    if not state or not valid(state.unit) or not state.unit:IsAlive() then
+        return { ok = false, error = "金矿不存在" }
+    end
+    local entindex = state.unit:entindex()
+    return {
+        ok = true,
+        enabled = auto_upgrade_by_entindex[entindex] == true,
+    }
+end
+
 local function toggle_auto_upgrade(payload)
     local state = state_from_payload(payload)
-    if not state then return { ok = false, message = "金矿不存在" } end
+    if not state or not valid(state.unit) or not state.unit:IsAlive() then
+        return { ok = false, message = "金矿不存在" }
+    end
     local entindex = state.unit:entindex()
-    if auto_upgrade_by_entindex[entindex] then
+    local current = auto_upgrade_by_entindex[entindex] == true
+    local requested = payload.enabled
+    local enabled = requested == nil and not current or requested == true
+    if enabled == current then
+        return {
+            ok = true,
+            changed = false,
+            enabled = current,
+            message = current and "金矿自动升级已经开启"
+                or "金矿自动升级已经停止",
+        }
+    end
+    if not enabled then
         auto_upgrade_by_entindex[entindex] = nil
         scheduler.cancel("gold_mine_auto_upgrade_" .. tostring(entindex))
         publish(state)
-        return { ok = true, message = "已停止金矿自动升级" }
+        return {
+            ok = true,
+            changed = true,
+            enabled = false,
+            message = "已停止金矿自动升级",
+        }
+    end
+    local efficiency_level = technology_level(
+        state.player_id,
+        "gold_mine_efficiency"
+    )
+    local crit_level = technology_level(state.player_id, "gold_mine_crit")
+    if state.mine_level >= config.max_mine_level
+        and efficiency_level >= config.max_efficiency_level
+        and crit_level >= config.max_crit_level then
+        return { ok = false, message = "金矿本体、收益和暴击科技均已满级" }
     end
     auto_upgrade_by_entindex[entindex] = true
     publish(state)
@@ -217,7 +273,12 @@ local function toggle_auto_upgrade(payload)
         function() return auto_upgrade_step(entindex) end,
         "gold_mine_auto_upgrade_" .. tostring(entindex)
     )
-    return { ok = true, message = "已开始金矿自动升级" }
+    return {
+        ok = true,
+        changed = true,
+        enabled = true,
+        message = "已开始金矿自动升级",
+    }
 end
 
 local function apply_level_stats(state)
@@ -267,11 +328,13 @@ upgrade_mine = function(payload)
                 player_id = state.player_id, team = state.team,
                 building_id = "gold_mine", level = target_level,
             })
-            event_bus.emit(events.UI_NOTIFICATION, {
-                player_id = state.player_id,
-                message = "金矿升级完成",
-                level = "info",
-            })
+            if payload.silent_notification ~= true then
+                event_bus.emit(events.UI_NOTIFICATION, {
+                    player_id = state.player_id,
+                    message = "金矿升级完成",
+                    level = "info",
+                })
+            end
             building_sound.upgrade_completed({
                 unit = state.unit,
                 team = state.team,
@@ -282,6 +345,30 @@ upgrade_mine = function(payload)
     })
     if not pending or not pending.ok then return pending end
     return { ok = true, pending = true, level = target_level }
+end
+
+local function level_upgrade_quote(payload)
+    local state = state_from_payload(payload)
+    if not state or not valid(state.unit) or not state.unit:IsAlive() then
+        return { ok = false, error = "金矿不存在" }
+    end
+    if upgrade_process.is_active(state.unit) then
+        return { ok = false, error = "金矿正在升级中" }
+    end
+    if state.mine_level >= config.max_mine_level then
+        return { ok = false, error = "金矿已达到最高等级" }
+    end
+    local cost = config.mine_upgrade_cost(state.mine_level)
+    if not cost then
+        return { ok = false, error = "金矿下一等级升级费用未配置" }
+    end
+    return {
+        ok = true,
+        current_level = state.mine_level,
+        target_level = state.mine_level + 1,
+        wood = tonumber(cost.wood) or 0,
+        gold = tonumber(cost.gold) or 0,
+    }
 end
 
 local function on_technology_changed(payload)
@@ -363,6 +450,11 @@ function M.init()
     technology_by_player = {}
     auto_upgrade_by_entindex = {}
     auto_sequence = 0
+    event_bus.handle_request(
+        events.GOLD_MINE_LEVEL_UPGRADE_QUOTE_REQUEST,
+        level_upgrade_quote
+    )
+    event_bus.handle_request(events.GOLD_MINE_AUTO_STATE_REQUEST, auto_state)
     event_bus.handle_request(events.GOLD_MINE_AUTO_UPGRADE_REQUEST, toggle_auto_upgrade)
     event_bus.handle_request(events.GOLD_MINE_LEVEL_UPGRADE_REQUEST, upgrade_mine)
     event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)

@@ -29,15 +29,23 @@
 - 无关失败：`test_n1_wave_config.lua`当前失败于既有“W5起领头怪必须排首位”断言，目标CSV/生成波次数据不在本轮diff中，未为内存任务改数据或测试。尚未完成Workshop Tools实机内存验证，也尚未证明V8泄漏根因完全消除。
 - 下一步实机清单：完全停止并重新Run，先召唤英雄并观察至少10秒，确认不再出现`active is not defined`、`refreshOfficialReturnHomeHotkey is not defined`或立即退出，并保存`startup_1s/startup_5s`样本；再冷启动N1连续运行到至少W20，低选择活动跑一轮，高频切换英雄/建筑/怪物并反复悬停技能再跑一轮。逐波保存两类`SURVIVAL_MEMORY`日志，重点比较`wave_cleared`的Lua KiB基线、scheduler/visuals是否回落、Panorama pending/peak/proxies/inventory是否有界，并检查`game/bin/win64`是否新增`V8_hiting_max_memory_limit__512_MB`转储。
 
-## 当前插入任务（2026-08-08）：多选同类型建筑批量升级
+## 当前插入任务（2026-08-08）：多选箭塔跨路线批量升级
 
-- 用户已批准War3式批量升级：多选建筑后仍点击主选中建筑的等级升级按钮，当前选择中属于同一玩家且同类型的建筑分别尝试升级自己的下一等级。
-- 已确认语义A：普通建筑按同一`building_id`匹配；防御塔按同一`survival_tower_class`路线匹配，未转职基础塔归为同一类型。不同当前等级允许批量，各自读取既有CSV下一等级与费用；满级、升级中、前置不足或资源不足者跳过，已成功开始升级者不回滚。
-- 实施边界：只批量普通建筑等级升级和防御塔等级升级；金矿科技、自动升级开关、转职方向、训练及其他特殊按钮不批量。客户端只提交有界选择候选，服务端逐栋校验实体、玩家所有权、类型和合法升级入口，并复用现有单栋升级与原子扣费逻辑。
-- 生产实现完成：`ability_tooltip.js`与`combat_stats.js`统一向既有`ui_ability_cast_request`附带最多64个当前选择实体；服务端新增`building_batch_upgrade_service.lua`，以主建筑为类型基准逐栋重新校验实体、业务owner、路线与当前可用单级升级Ability，再复用`BUILDING_UPGRADE_REQUEST`和原子扣费。每栋读取自身当前等级对应的既有CSV生成配置，资源耗尽后其余建筑跳过，成功项目不回滚，并只显示一次成功/跳过汇总。
-- 兼容边界已保留：`ability_upgrade_tower_max`继续只作用于主塔并保持原累计费用/直升语义；七个转职按钮、金矿科技/自动升级、训练及其他特殊按钮不批量。单选仍走同一批量协调器但行为等同原单体升级。
-- 自动验证通过：`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`、`BUILDING_BATCH_UPGRADE_LUA51_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、建筑升级过程/城墙生命/箭塔成本相关回归、目标Lua 5.1语法、严格UTF-8及game/content限定`diff --check`。`ability_tooltip.js`与`combat_stats.js`均由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。
-- 两项任务前既有Builder回归仍失败且未越界修改：`test_builder_ownership.lua`硬编码移速600而CSV权威为300；`test_builder_hero_replacement_contract.ps1`检查已过时源码字符串。尚未Workshop Tools实机验收多选、鼠标/快捷键、不同等级、部分资源和多人owner隔离。
+- 用户最终确认Q/W都需要批量：Q=`ability_upgrade_tower_lv01`按各塔下一等级费用；W=`ability_upgrade_tower_max`按各塔直升当前阶段最高级的累计费用。基础箭塔与不同转职路线可以混选，各塔沿自身路线升级。
+- 箭塔候选只要求共同`survival_building_id == "arrow_tower"`，不得再按`survival_tower_class`排除跨路线候选。普通建筑仍按同一`building_id`匹配；转职、融合、金矿科技/自动升级、训练等非Q/W入口不参与。
+- `ability_tooltip.js`与`combat_stats.js`现向`ui_ability_cast_request`附带最多64个去重选择候选。客户端列表不具权威性；服务端逐塔校验存活、owner、建筑ID、对应Q/W Ability及可施放状态。
+- `building_upgrade_system`新增只读权威报价request：Q返回下一等级目标与费用，W返回当前阶段末目标与累计费用；报价不扣费、不启动升级、不修改冷却。协调器按木材升序、金币升序、entindex升序排列候选。
+- 轮到每塔时重新校验并提交既有`BUILDING_UPGRADE_REQUEST`，由现有`RESOURCE_TRY_SPEND_REQUEST`原子扣费。失败只跳过并继续，已成功项目不回滚；仅正式升级成功受理后启动该塔对应Ability冷却。
+- 自动验证通过：`BUILDING_BATCH_UPGRADE_LUA51_PASS`、`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`、目标`luac5.1 -p`、升级流程/塔Runtime/人口配置回归、配置CheckOnly、严格UTF-8和两仓`diff --check`。两个Panorama JS均由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。
+- 既有`test_building_state_recovery.lua`在加载未修改的BOM版`building_system.lua`首字节时被裸Lua 5.1拒绝，未进入本任务代码；没有为迎合该无关编码问题改写生产文件。尚需Workshop Tools冷启动实测跨路线Q/W、部分资源、鼠标/快捷键与多人owner隔离。
+
+## 当前插入任务（2026-08-08）：多选金矿Q/W/E与自动升级批量协调
+
+- 用户最终要求：全选多座金矿时，Q按每矿权威下一等级费用逐矿升级；W/E是玩家共享科技，一次批量请求只购买1级；自动升级按钮按明确目标状态批量开启或停止，混合状态下已处于目标状态的金矿幂等跳过。
+- 生产实现完成：新增`gold_mine_batch_upgrade_service.lua`。客户端沿用现有最多64个去重`selected_entindexes`载荷；服务端重新验证存活、owner、`gold_mine`身份、对应Ability、升级中和可施放状态。Q先读取`gold_mine_system`只读报价，按木材、金币、entindex升序逐矿调用原升级事务；失败继续，成功受理后才冷却。
+- W/E只从请求发生前的有效候选中选择entindex最小金矿作为购买来源，调用一次现有`TECHNOLOGY_PURCHASE_NEXT_REQUEST`原子扣费/发放；成功后对全部有效候选同步对应Ability冷却，失败不冷却。批量服务只发一次汇总通知，商店请求使用显式静默标志避免重复提示。
+- 自动升级底层兼容旧单矿toggle，同时接受`enabled=true/false`明确状态。批量开启/停止不会对已处于目标状态的矿反向切换；同一玩家全部自动矿中entindex最小者协调共享科技购买，其他自动矿继续独立升级本体并等待协调者，科技缓存只由权威`TECHNOLOGY_CHANGED`更新。
+- 自动验证通过：`GOLD_MINE_BATCH_UPGRADE_LUA51_PASS`、`GOLD_MINE_AUTO_COORDINATOR_LUA51_PASS`、`GOLD_MINE_BATCH_UPGRADE_CONTRACT_PASS`、箭塔批量回归、四项商店/研究科技回归及目标Lua 5.1语法。Panorama协议未修改，因此未重新编译JS。尚需Workshop Tools冷启动实测鼠标按钮、Q/W/E快捷键、部分资源、混合自动状态和多人owner隔离。
 
 ## 当前插入任务（2026-08-08）：金矿升级后固定模型尺寸
 
@@ -280,6 +288,7 @@
 - `MULTIPLAYER_BUILDER_INTEGRATION_LUA51_PASS`：玩家0 Builder旧地图生成、CSV移速保持、owner登记和玩家1缺marker拒绝通过。
 - `MULTIPLAYER_LUAC51_PASS`：本轮Lua生产文件、生成文件和专项测试语法通过。
 - `MULTIPLAYER_GENERATED_CONFIG_MATCH_PASS`：两份CSV临时重生成结果与提交生成Lua逐字节一致。
+
 - `MULTIPLAYER_STRICT_UTF8_PASS`和限定`git diff --check`通过。
 - 未跟踪既有`test_builder_ownership.lua`失败于硬编码期望Builder移速600，而当前权威CSV和生成Lua均为300；本轮未修改移动速度逻辑。
 - 未跟踪既有`test_builder_utility_contract.ps1`失败于`MONKEY_CSV_RANGE_1000_MISSING`；与本轮多人身份改造无关，未修改该测试或Monkey配置。

@@ -356,6 +356,7 @@ local function purchase(payload)
         return { ok = false, error = "player_id_invalid" }
     end
     local request_id = tostring(payload.request_id or "")
+    local silent_notification = payload.silent_notification == true
     local cached = cached_result(player_id, request_id)
     if cached then
         return cached
@@ -593,11 +594,13 @@ local function purchase(payload)
         }
     )
     if not spend or not spend.ok then
-        notify(
-            player_id,
-            spend and spend.error or "购买失败",
-            "error"
-        )
+        if not silent_notification then
+            notify(
+                player_id,
+                spend and spend.error or "购买失败",
+                "error"
+            )
+        end
         return spend or { ok = false, error = "resource_error" }
     end
     local granted = grant_service.grant(
@@ -608,18 +611,22 @@ local function purchase(payload)
     )
     if not granted or not granted.ok then
         grant_service.refund(team, entry)
-        notify(
-            player_id,
-            granted and granted.error or "发放失败",
-            "error"
-        )
+        if not silent_notification then
+            notify(
+                player_id,
+                granted and granted.error or "发放失败",
+                "error"
+            )
+        end
         return granted or { ok = false, error = "grant_failed" }
     end
     state.purchased_count[player_id] =
         state.purchased_count[player_id] or {}
     local counts = state.purchased_count[player_id]
     counts[entry.entryid] = (counts[entry.entryid] or 0) + 1
-    notify(player_id, "购买成功：" .. catalog.content_name(entry))
+    if not silent_notification then
+        notify(player_id, "购买成功：" .. catalog.content_name(entry))
+    end
     push_snapshot(player_id, "purchase_completed")
     local result = {
         ok = true,
@@ -656,6 +663,7 @@ local function purchase_next_technology(payload)
         request_id = tostring(payload.request_id or ""),
         source = payload.source,
         entindex = payload.entindex,
+        silent_notification = payload.silent_notification,
     })
 end
 

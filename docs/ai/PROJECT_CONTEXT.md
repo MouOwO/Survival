@@ -16,12 +16,20 @@
 - Tooltip逐次SHOW、游标祖先链、代理几何、绑定映射与恢复签名属于详细诊断，不应默认常驻构造和输出。当前统一由`SurvivalTooltipDetailedDiagnostics === true`显式开启；真正异常、施法诊断和`[SURVIVAL_MEMORY][PANORAMA]`低频聚合保持输出。
 - 内存问题的自动契约和Resource Compiler只能证明门禁、计数和语法/构建成立，不能证明V8堆实际稳定。最终必须冷启动Workshop Tools运行足够长时间，比较相同阶段基线并检查是否生成新V8 heap-limit dump。
 
-## 多选同类型建筑批量升级语义（2026-08-08）
+## 多选建筑批量升级语义（2026-08-08）
 
-- 建筑等级升级支持War3式多选命令：HUD仍以主选中建筑技能为入口，普通建筑按相同`survival_building_id`匹配；防御塔还必须具有相同`survival_tower_class`，未转职基础塔以空路线作为同一类型。不同当前等级分别升级自身下一等级、读取自身CSV费用，不要求与主建筑同级。
-- Panorama的`Players.GetSelectedEntities()`只作为最多64个候选实体提交。服务端必须以主建筑为类型基准，逐栋重新验证有效存活、`survival_player_id/GetPlayerOwnerID()`、类型/路线、当前单级升级Ability和可施放状态；禁止信任客户端列表直接扣费或升级。
-- 批量协调器必须复用既有`BUILDING_UPGRADE_REQUEST`、升级过程和`RESOURCE_TRY_SPEND_REQUEST`原子扣费。资源按选择顺序逐栋消费，资源不足、满级、升级中、前置不足或状态无效者跳过，已成功开始升级的建筑不回滚；用户提示聚合为一次成功/跳过结果。
-- 批量只适用于普通建筑等级升级和防御塔单级升级。`ability_upgrade_tower_max`保留主塔累计费用直升语义；防御塔转职、金矿科技/自动升级、训练及其他特殊操作不得隐式批量。
+- HUD仍以主选中建筑技能为入口。普通建筑按相同`survival_building_id`匹配；所有箭塔以共同`survival_building_id == "arrow_tower"`匹配，不要求`survival_tower_class`相同，基础塔和各转职塔可混选并沿自身路线升级。
+- 箭塔Q与W都批量：Q按下一等级费用报价，W按直升各塔当前阶段最高级的累计费用报价。协调器固定按木材、金币、entindex升序逐塔尝试，不按客户端选择顺序消费资源。
+- Panorama的`Players.GetSelectedEntities()`只作为最多64个去重候选提交。服务端必须逐栋重新验证有效存活、`survival_player_id/GetPlayerOwnerID()`、建筑ID、对应Q/W Ability和可施放状态；禁止信任客户端列表直接扣费或升级。
+- 只读报价必须与正式升级共享`tower_routes.stage_end_level/row_at_level/cost_to`目标和费用语义，不得扣费、启动升级或改冷却。正式提交继续复用`BUILDING_UPGRADE_REQUEST`、升级过程和`RESOURCE_TRY_SPEND_REQUEST`原子扣费。
+- 每栋失败只跳过并继续后续候选，已成功开始升级的建筑不回滚；只有正式请求成功受理后才启动对应Ability冷却。防御塔转职、融合、金矿科技/自动升级、训练及其他特殊操作不得隐式批量。
+
+## 多选金矿批量升级语义（2026-08-08）
+
+- 金矿Q与箭塔批量升级共享“客户端候选不权威、服务端逐栋重验、权威报价排序、失败继续、成功后冷却”原则，但不能复用箭塔路线语义。金矿本体等级是每矿独立状态，Q只读取`gold_mine_config.mine_upgrade_cost(current_level)`的下一等级费用，并按木材、金币、entindex升序提交现有原子扣费与升级过程。
+- 金矿W/E不是每矿独立升级，而是玩家共享的`gold_mine_efficiency/gold_mine_crit`科技。一次批量意图无论选中多少矿都只能调用一次`TECHNOLOGY_PURCHASE_NEXT_REQUEST`、购买最多1级；成功后仅对请求前通过owner/建筑/Ability/施放状态校验的候选同步冷却，失败不得冷却。禁止按矿循环购买共享科技。
+- 自动升级批量操作必须传明确`enabled=true/false`目标，不得逐矿toggle导致混合状态反转。已处于目标状态的有效金矿计为幂等保持；待变更矿仍须校验对应开启/停止Ability。自动按钮刷新会立即隐藏旧Ability，因此变更成功后禁止继续操作旧Ability句柄启动冷却。
+- 多座自动矿各自负责本体升级。共享科技由同一玩家所有已开启自动矿中entindex最小者协调；非协调矿不得购买共享科技，即使自身本体已满级。科技购买成功后的本地状态只消费同步`TECHNOLOGY_CHANGED`，不能再手工递增缓存造成状态漂移。
 
 ## 城墙升级生命比例语义（2026-08-08）
 
