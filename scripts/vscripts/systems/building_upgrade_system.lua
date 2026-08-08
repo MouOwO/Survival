@@ -249,6 +249,7 @@ publish = function(state, reason)
             or nil,
         upgrade_in_progress = state.unit.survival_upgrade_in_progress and 1 or 0,
         upgrade_target_level = state.unit.survival_upgrade_target_level,
+        population_occupied = tonumber(state.population_occupied) or 0,
         reason = reason,
     })
 end
@@ -259,12 +260,41 @@ local function spend(state, cost, reason)
         team = state.team,
         wood = cost.wood or 0,
         gold = cost.gold or 0,
-        population = 0,
+        population = cost.population or 0,
         reason = reason,
     })
 end
 
-local function start_upgrade(state, target_data, target_level, on_complete, reason)
+local function refund_spend(state, cost, reason)
+    if not cost then return end
+    local wood = math.max(0, tonumber(cost.wood) or 0)
+    local gold = math.max(0, tonumber(cost.gold) or 0)
+    local population = math.max(0, tonumber(cost.population) or 0)
+    if wood > 0 or gold > 0 then
+        event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            team = state.team,
+            wood = wood,
+            gold = gold,
+            reason = reason or "tower_upgrade_refund",
+        })
+    end
+    if population > 0 then
+        event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+            team = state.team,
+            population = population,
+            reason = (reason or "tower_upgrade_refund") .. "_population",
+        })
+    end
+end
+
+local function start_upgrade(
+    state,
+    target_data,
+    target_level,
+    on_complete,
+    reason,
+    on_cancel
+)
     return upgrade_process.begin(state.unit, {
         duration = 1.0,
         particle = state.definition.build_particle,
@@ -278,10 +308,23 @@ local function start_upgrade(state, target_data, target_level, on_complete, reas
             publish(state, "upgrade_visual_" .. tostring(status))
         end,
         on_complete = function()
-            on_complete()
-            notify(state, "升级完成")
+            local ok, error_message = pcall(on_complete)
+            if ok then
+                notify(state, "升级完成")
+            else
+                print("[BuildingUpgrade] completion failed: "
+                    .. tostring(error_message))
+                if on_cancel then on_cancel("completion_failed") end
+                publish(state, "upgrade_cancelled_completion_failed")
+                notify(
+                    state,
+                    on_cancel and "升级失败，资源已返还" or "升级失败",
+                    "error"
+                )
+            end
         end,
         on_cancel = function(cancel_reason)
+            if on_cancel then on_cancel(cancel_reason) end
             publish(state, "upgrade_cancelled_" .. tostring(cancel_reason))
         end,
     })
@@ -340,10 +383,20 @@ local function recover_state(unit)
         level = tonumber(snapshot.level) or tonumber(unit.survival_level) or 1,
         tower_class = snapshot.tower_class,
         tower_class_name = snapshot.tower_class_name,
+        population_occupied = tonumber(snapshot.population_occupied)
+            or tonumber(unit.survival_population_occupied),
         tower_combat = nil,
         research_base_attack_damage = snapshot.base_attack_damage,
     }
     buildings[entindex] = state
+    if state.population_occupied == nil and state.building_id == "arrow_tower" then
+        state.population_occupied = tower_routes.population_occupied(
+            tower_routes.current(state)
+        )
+    end
+    if state.population_occupied ~= nil then
+        unit.survival_population_occupied = state.population_occupied
+    end
 
     if state.building_id == "arrow_tower" then
         local row = tower_routes.current(state) or arrow_data(state.level)
@@ -548,6 +601,36 @@ local function apply_tower_level(state, row, level, change_model)
         -- selectable when the player clicks it again.
         state.unit:SetControllableByPlayer(state.player_id, true)
     end
+    state.population_occupied = tower_routes.population_occupied(row)
+    state.unit.survival_population_occupied = state.population_occupied
+end
+
+local function restore_tower_level(state, row, level, tower_class, population)
+    state.tower_class = tower_class
+    state.level = level
+    state.population_occupied = population
+    if not valid_entity(state.unit) or not row then return false end
+    local ok, error_message = pcall(
+        apply_tower_level,
+        state,
+        row,
+        level,
+        true
+    )
+    if not ok then
+        state.level = level
+        state.tower_class = tower_class
+        state.population_occupied = population
+        state.unit.survival_level = level
+        state.unit.survival_tower_class = tower_class
+        state.unit.survival_population_occupied = population
+        print("[BuildingUpgrade] tower rollback failed: "
+            .. tostring(error_message))
+        return false
+    end
+    state.population_occupied = population
+    state.unit.survival_population_occupied = population
+    return true
 end
 
 local function upgrade_tower(state, mode)
@@ -565,23 +648,45 @@ local function upgrade_tower(state, mode)
     local result = spend(state, cost, "upgrade_tower_" .. tostring(mode or "one"))
     if not result or not result.ok then return result end
     local previous_row = tower_routes.current(state)
+    local previous_level = state.level
+    local previous_class = state.tower_class
+    local previous_population = tonumber(state.population_occupied)
+        or tower_routes.population_occupied(previous_row)
     local stage_changed = previous_row
         and previous_row.stage_id ~= final_row.stage_id
-    return start_upgrade(state, final_row, target, function()
+    local pending = start_upgrade(state, final_row, target, function()
         apply_tower_level(state, final_row, target, stage_changed)
-        if cost.population > 0 then
-            event_bus.request(events.RESOURCE_ADD_REQUEST, {
-                team = state.team, max_population = cost.population,
-                reason = "tower_route_population",
-            })
-        end
         if not state.tower_class and state.level == 5 then
             sync_tower_abilities(state, final_row)
             set_class_buttons(state.unit, true)
         end
         publish(state, "tower_upgraded_" .. tostring(mode or "one"))
         play_upgrade_sound(state, { stage_changed = stage_changed })
-    end, "tower_" .. tostring(mode or "one"))
+    end, "tower_" .. tostring(mode or "one"), function(cancel_reason)
+        if cancel_reason == "completion_failed" then
+            restore_tower_level(
+                state,
+                previous_row,
+                previous_level,
+                previous_class,
+                previous_population
+            )
+        else
+            state.population_occupied = previous_population
+            if valid_entity(state.unit) then
+                state.unit.survival_population_occupied = previous_population
+            end
+        end
+        refund_spend(
+            state,
+            cost,
+            "tower_upgrade_cancelled:" .. tostring(cancel_reason)
+        )
+    end)
+    if not pending or not pending.ok then
+        refund_spend(state, cost, "tower_upgrade_start_failed")
+    end
+    return pending
 end
 
 local function on_upgrade_request(payload)
@@ -652,30 +757,51 @@ local function on_class_request(payload)
     if not class_data then reject("无效的转职方向"); return end
     local row = tower_routes.get(class_data.id, 1)
     if not row then reject("路线配置缺失"); return end
+    local cost = tower_routes.class_change_cost(row, state)
     local result = spend(
         state,
-        tower_routes.class_change_cost(row),
+        cost,
         "tower_class_change"
     )
     if not result or not result.ok then
         reject(result and result.error or "资源不足")
         return
     end
+    local previous_population = tonumber(state.population_occupied)
+        or tower_routes.population_occupied(tower_routes.current(state))
+    local previous_row = tower_routes.current(state)
+    local previous_level = state.level
+    local previous_class = state.tower_class
     local pending = start_upgrade(state, row, 6, function()
         state.tower_class = class_data.id
         apply_tower_level(state, row, 6, true)
-        if row.population_delta and row.population_delta > 0 then
-            event_bus.request(events.RESOURCE_ADD_REQUEST, {
-                team = state.team,
-                max_population = row.population_delta,
-                reason = "tower_route_population",
-            })
-        end
         set_class_buttons(state.unit, false)
         publish(state, "tower_class_changed")
         play_upgrade_sound(state, { class_changed = true })
-    end, "tower_class")
-    if not pending or not pending.ok then reject(pending and pending.error or "转职失败")
+    end, "tower_class", function(cancel_reason)
+        if cancel_reason == "completion_failed" then
+            restore_tower_level(
+                state,
+                previous_row,
+                previous_level,
+                previous_class,
+                previous_population
+            )
+        else
+            state.population_occupied = previous_population
+            if valid_entity(state.unit) then
+                state.unit.survival_population_occupied = previous_population
+            end
+        end
+        refund_spend(
+            state,
+            cost,
+            "tower_class_cancelled:" .. tostring(cancel_reason)
+        )
+    end)
+    if not pending or not pending.ok then
+        refund_spend(state, cost, "tower_class_start_failed")
+        reject(pending and pending.error or "转职失败")
     else
         payload.result = pending
         notify(state, "开始转职")
@@ -692,10 +818,14 @@ local function on_created(payload)
         level = tonumber(payload.level) or 1,
         tower_class = nil,
         tower_class_name = nil,
+        population_occupied = 0,
         tower_combat = nil,
         research_base_attack_damage = payload.base_attack_damage,
     }
     buildings[payload.entindex] = state
+    if valid_entity(state.unit) then
+        state.unit.survival_population_occupied = state.population_occupied
+    end
     if state.building_id == "arrow_tower" and valid_entity(state.unit) then
         local row = arrow_data(state.level)
         if row then
@@ -727,6 +857,8 @@ local function on_building_changed(payload)
     local state = buildings[payload.entindex]
     if state then
         state.level = tonumber(payload.level) or state.level
+        state.population_occupied = tonumber(payload.population_occupied)
+            or state.population_occupied
         refresh_farm_upgrade_ability(state)
     end
     if payload.building_id == "main_city" then refresh_team_farms(payload.team) end

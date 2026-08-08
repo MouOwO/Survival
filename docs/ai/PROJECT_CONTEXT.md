@@ -334,7 +334,7 @@
 7. 挑战 07 已改为场内维持 10 只熔火怪物，死亡后 0.5 秒补充，每只授权击杀独立 20% 概率掉落熔火核心 Lv1。
 8. 挑战 07 的 Lv1 核心复用现有地面奖励、拾取、背包壳和自动合成链；`3×Lv1→Lv2`、`3×Lv2→Lv3` 配方有效。
 9. 挑战 08 Boss 现在会在死亡位置掉落 `material_molten_core_04`；拾取后进入背包，并可与狱火熔铠 Lv4 自动合成 Lvmax。
-10. 防御塔升级按钮会随 `RESOURCE_CHANGED` 实时刷新；`population_delta` 只表示升级后的最大人口奖励，不参与升级成本判断。
+10. 防御塔升级按钮会随 `RESOURCE_CHANGED` 实时刷新；塔 CSV 的 `population_cost` 生成到 Lua 后命名为 `population_occupied`。基础箭塔占有 0，所有转职塔占有 1；首次转职原子占用 1 人口，后续升级不重复占用，死亡或融合时释放。
 11. Panorama 快捷键绑定必须按 HUD 上下文重建，不能用跨 Workshop Tools Run 保留的 `CustomUIConfig` 标志跳过注册。
 12. 受运行时管理的建筑技能，原生按钮鼠标点击与 Q/W/E 快捷键统一发送 `ui_ability_cast_request`；客户端 `can_afford` 只用于费用/资源提示，不能阻止请求，最终资源判断由服务端原子扣费负责。
 13. 英雄和建筑战斗属性 UI 已统一单位投影：运行时护甲使用 Dota 单位，面板护甲使用 War3 显示单位；英雄面板攻击保持 CSV 值，原生普通攻击仍保留英雄倍率投影。

@@ -41,10 +41,12 @@ CSV 只填写策划可读的玩法数据：
 
 ## 塔等级与技能继承
 
-每一级塔在所属路线表中填写：`base_attack_damage`、`upgrade_gold`、`upgrade_wood`、`population_delta` 和 `skill_ids`。
+每一级塔在所属路线表中填写：`base_attack_damage`、`upgrade_gold`、`upgrade_wood`、`population_cost` 和 `skill_ids`。
 
 - `base_attack_damage` 是升级完成后显示的基础攻击力。
 - `upgrade_gold` / `upgrade_wood` 是升到本级实际支付的资源，不是从本级升到下一级的资源。
+- `population_cost` 是成为该级塔后持续占用的人口，不是人口上限奖励。基础箭塔填写 `0`，所有转职塔等级填写 `1`；升级时 Lua 按新旧人口占有的差额结算，因此首次转职占用 1 人口，后续升级不重复占用，塔被移除时释放人口。
+- 生成 Lua 将 `population_cost` 明确映射为 `population_occupied`，运行时禁止继续使用旧的 `population_delta` 增量语义。
 - `skill_ids` 是本级最终生效的全部技能ID列表，以 `|` 分隔。
 - 技能升级时，用新等级技能ID替换旧等级技能ID；技能继承时保留已有技能ID并追加新技能ID。
 - 技能封顶后，后续塔等级继续引用同一个技能ID，不复制技能数据。
