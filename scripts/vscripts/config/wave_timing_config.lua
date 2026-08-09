@@ -14,6 +14,10 @@ M.dev_wave_preload_timeout_seconds = math.max(
     0,
     tonumber(definition.dev_wave_preload_timeout_seconds) or 0
 )
+M.formal_wave_preload_lead_seconds = math.max(
+    0,
+    tonumber(definition.formal_wave_preload_lead_seconds) or 0
+)
 
 function M.interval_after_wave(wave_number)
     local number = tonumber(wave_number) or 0

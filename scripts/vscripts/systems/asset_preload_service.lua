@@ -22,6 +22,8 @@ local INTER_ASSET_DELAY = 1
 
 local states = {}
 local initial_states = {}
+local resource_states = {}
+local initial_resource_states = {}
 local ready_callbacks = {}
 local failed_callbacks = {}
 local queue = {}
@@ -46,6 +48,13 @@ local function set_state(asset_id, status, extra)
     for key, value in pairs(extra or {}) do entry[key] = value end
     states[asset_id] = entry
     return entry
+end
+
+local function set_resource_state(resource_type, path, status)
+    if type(path) ~= "string" or path == "" then return end
+    local key = tostring(resource_type) .. ":" .. path
+    resource_states[key] = status
+    return key
 end
 
 local function precache_initial_resource(resource_type, path, context)
@@ -80,6 +89,68 @@ local function precache_initial_row(row, context)
         source = "initial",
     })
     initial_states[row.asset_id] = state
+    local status = ok and STATE.READY or STATE.FAILED
+    local function remember(resource_type, path)
+        local key = set_resource_state(resource_type, path, status)
+        if key then initial_resource_states[key] = status end
+    end
+    remember("model", row.primary_model)
+    for _, path in ipairs(row.attachment_models or {}) do
+        remember("model", path)
+    end
+    for _, path in ipairs(row.particle_resources or {}) do
+        remember("particle", path)
+    end
+    for _, path in ipairs(row.sound_resources or {}) do
+        remember("soundfile", path)
+    end
+end
+
+local function append_resource(result, seen, resource_type, path, asset_id,
+        async_unit_name)
+    path = tostring(path or "")
+    local key = resource_type .. ":" .. path
+    if path == "" or seen[key] then return end
+    seen[key] = true
+    result[#result + 1] = {
+        resource_type = resource_type,
+        path = path,
+        asset_id = asset_id,
+        async_unit_name = async_unit_name,
+    }
+end
+
+local function append_asset_resources(result, seen, asset)
+    if not asset then return end
+    append_resource(result, seen, "model", asset.primary_model,
+        asset.asset_id, asset.async_unit_name)
+    for _, path in ipairs(asset.attachment_models or {}) do
+        append_resource(result, seen, "model", path)
+    end
+    for _, path in ipairs(asset.particle_resources or {}) do
+        append_resource(result, seen, "particle", path)
+    end
+    for _, path in ipairs(asset.sound_resources or {}) do
+        append_resource(result, seen, "soundfile", path)
+    end
+end
+
+function M.resources_for_models(model_paths, extra_resources)
+    local result = {}
+    local seen = {}
+    for _, model_path in ipairs(model_paths or {}) do
+        local asset = catalog.for_model(model_path)
+        if asset then
+            append_asset_resources(result, seen, asset)
+        else
+            append_resource(result, seen, "model", model_path)
+        end
+    end
+    for _, resource in ipairs(extra_resources or {}) do
+        append_resource(result, seen, resource.resource_type, resource.path,
+            resource.asset_id, resource.async_unit_name)
+    end
+    return result
 end
 
 function M.precache_initial(context)
@@ -469,6 +540,106 @@ function M.queue_particle(particle_path, options)
     return M.queue(row.asset_id, options)
 end
 
+function M.queue_resources(resources, options)
+    options = options or {}
+    local queued_count = 0
+    local failed_count = 0
+    local seen_resources = {}
+    local resources_by_asset = {}
+    local direct_resources = {}
+    for _, resource in ipairs(resources or {}) do
+        local resource_type = tostring(resource.resource_type or "")
+        local path = tostring(resource.path or "")
+        local resource_key = resource_type .. ":" .. path
+        local status = resource_states[resource_key]
+        if path ~= "" and not seen_resources[resource_key]
+            and status ~= STATE.READY and status ~= STATE.LOADING then
+            seen_resources[resource_key] = true
+            local asset = resource.asset_id and catalog.resolve(resource.asset_id)
+                or (resource_type == "model" and catalog.for_model(path))
+                or nil
+            local asset_id = asset and asset.asset_id or nil
+            if asset_id then
+                resources_by_asset[asset_id] = resources_by_asset[asset_id] or {}
+                resources_by_asset[asset_id][#resources_by_asset[asset_id] + 1]
+                    = resource_key
+            else
+                direct_resources[#direct_resources + 1] = {
+                    key = resource_key,
+                    resource_type = resource_type,
+                    async_unit_name = resource.async_unit_name,
+                }
+            end
+        end
+    end
+    for asset_id, resource_keys in pairs(resources_by_asset) do
+        for _, key in ipairs(resource_keys) do
+            resource_states[key] = STATE.LOADING
+        end
+        local request_options = {}
+        for key, value in pairs(options) do request_options[key] = value end
+        request_options.on_ready = function()
+            for _, key in ipairs(resource_keys) do
+                resource_states[key] = STATE.READY
+            end
+            protected_callback("resource ready", options.on_ready, asset_id)
+        end
+        request_options.on_failed = function(reason)
+            for _, key in ipairs(resource_keys) do
+                resource_states[key] = STATE.FAILED
+            end
+            protected_callback("resource failed", options.on_failed,
+                asset_id, reason)
+        end
+        local ok = M.queue(asset_id, request_options)
+        if ok then
+            queued_count = queued_count + 1
+        else
+            for _, key in ipairs(resource_keys) do
+                resource_states[key] = STATE.FAILED
+            end
+            failed_count = failed_count + 1
+        end
+    end
+    for _, resource in ipairs(direct_resources) do
+        local async_name = tostring(resource.async_unit_name or "")
+        if resource.resource_type == "model" and async_name ~= ""
+            and type(PrecacheUnitByNameAsync) == "function" then
+            resource_states[resource.key] = STATE.LOADING
+            local request_generation = generation
+            local ok = pcall(PrecacheUnitByNameAsync, async_name, function()
+                if request_generation == generation then
+                    resource_states[resource.key] = STATE.READY
+                end
+            end, -1)
+            if ok then
+                queued_count = queued_count + 1
+            else
+                resource_states[resource.key] = STATE.FAILED
+                failed_count = failed_count + 1
+            end
+        elseif (resource.resource_type == "model"
+                or resource.resource_type == "particle"
+                or resource.resource_type == "soundfile")
+            and type(PrecacheResource) == "function" then
+            local resource_type, path = string.match(
+                resource.key, "^([^:]+):(.+)$"
+            )
+            local ok = pcall(PrecacheResource, resource_type, path, nil)
+            resource_states[resource.key] = ok and STATE.READY or STATE.FAILED
+            if ok then queued_count = queued_count + 1
+            else failed_count = failed_count + 1 end
+        else
+            resource_states[resource.key] = STATE.FAILED
+            failed_count = failed_count + 1
+        end
+    end
+    if failed_count > 0 then
+        return false, "resource_queue_failed", queued_count, failed_count
+    end
+    return true, queued_count > 0 and "queued" or "ready", queued_count, 0
+end
+
 function M.is_ready(asset_id)
     return (states[asset_id] or {}).status == STATE.READY
 end
@@ -512,6 +683,10 @@ function M.init()
     for asset_id, state in pairs(initial_states) do
         states[asset_id] = state
     end
+    resource_states = {}
+    for key, status in pairs(initial_resource_states) do
+        resource_states[key] = status
+    end
     queue = {}
     queued = {}
     ready_callbacks = {}
@@ -520,15 +695,7 @@ function M.init()
     inflight = {}
     gradual_sessions = {}
     stream_cursor = 1
-    stream_rows = catalog.group("zombie_stream")
-    table.sort(stream_rows, function(a, b)
-        local a_wave = tonumber(a.first_use_wave) or math.huge
-        local b_wave = tonumber(b.first_use_wave) or math.huge
-        if a_wave ~= b_wave then return a_wave < b_wave end
-        local a_order = tonumber(a.load_order) or math.huge
-        local b_order = tonumber(b.load_order) or math.huge
-        return a_order < b_order
-    end)
+    stream_rows = {}
     for _, row in ipairs(catalog.group("tower_stream")) do
         table.insert(stream_rows, row)
     end
@@ -565,6 +732,11 @@ M._snapshot_for_test = function()
         ready_callback_count = callback_count,
         stream_cursor = stream_cursor,
         stream_total = #stream_rows,
+        resource_state_count = (function()
+            local count = 0
+            for _ in pairs(resource_states) do count = count + 1 end
+            return count
+        end)(),
     }
 end
 

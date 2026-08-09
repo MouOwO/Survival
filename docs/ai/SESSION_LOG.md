@@ -13,6 +13,29 @@
 - 排队建造保存`source_ability`，新增`action_cooldown_rollback.once()`按task幂等处理移动/位置/创建/施工失败，避免竞争路径重复`EndCooldown()`。实体创建后的施工失败退木材、金币和人口，成功完成后清理事务上下文。
 - 自动验证通过：四项Lua 5.1行为/数学测试、两项PowerShell契约、目标Lua 5.1语法、训练CSV/生成字段比对、严格UTF-8、配置CheckOnly及限定diff。修正本机工具链JSON中的工作区、Python、Lua/Luac绝对路径。未修改权威CSV或生成Lua；尚需Workshop Tools冷启动实测失败冷却、退款与修理工5+2进度，不能称为实机验收。
 
+## 2026-08-09 - N2–N5 W30普通怪同步为59只
+
+- 用户补充并确认统一节奏：W1–W10保持原始普通怪数量；从W11开始到各难度最后一波，普通怪每波统一为59只。N1截止W25，N2–N5截止W30。
+- CSV审计确认N2–N5 W11–W29已经是59，只有四个W30的`flying_red_gargoyle`普通怪各为9只。按用户确认统一改为59；每个W30的`wave_leader`和`assault_boss`仍各1只。
+- 权威CSV和生成Lua已同步。范围审计确认相对Git基线总共35条数量/备注变化，其中N1 W11–W25为31条，N2–N5 W30为4条；没有修改W1–W10、怪种、属性、顺序或特殊角色数量。
+- `ALL_TARGET_WAVES_NORMAL_59_CONTRACT_PASS`、五难度W1–W10未变、特殊角色未变、`ALL_WAVE_TARGET_LUA51_PASS`、`WAVE_DEFINITIONS_LUAC51_PASS`、生成逐字节一致、严格UTF-8/BOM及限定`git diff --check`均通过。尚需Workshop Tools冷启动实机验证。
+
+## 2026-08-09 - N1 W11–W25普通怪同步为59只
+
+- 用户明确结束预载验收上下文并切换到波次数量任务：N1 W11–W25每波普通怪需要59只；多怪种等比增加，Boss只能1只，精英数量不变。
+- 当前权威CSV审计确认只有N1目标波不足59；N2–N5 W11–W25已经全部为59。N1目标波31条普通怪行按原比例用最大余数法分配到每波59，精英保持每波1只，进攻Boss仅W15/W20/W25各1只。N1 W1–W10、N2–N5和所有非数量业务字段未修改。
+- 定向生成`wave_definitions.lua`。专项目标范围、每波角色数量、Lua 5.1行为、`luac5.1`语法、CSV生成逐字节一致及严格UTF-8/BOM通过。旧N2/N3扩展测试继续失败于既有角色排序旧断言，本任务未修改无关逻辑或未跟踪测试。
+- 尚未Workshop Tools实机验证；冷启动后重点确认多怪种波实际总数和精英/Boss边界。
+
+## 2026-08-09 - 正式波次资源提前4秒异步预载
+
+- 用户批准将正式后续波次资源改为首只敌人出现前4秒按目标波异步预载，同时保留首波和练功房启动预载；本轮未改变出怪时间、数量或顺序，也未引入`monster<N>`调试跳波门禁。
+- 权威CSV `wave_timing_rules.csv`新增`formal_wave_preload_lead_seconds=4`并生成`wave_timing_rules.lua`。`wave_system.lua`删除上一波开始时的目标波调用，倒计时跨入4秒窗口时只触发一次目标波资源队列，并输出目标波、剩余秒数、资源数、排队数和失败数诊断。
+- `asset_preload_service.lua`统一展开目标波原型Bundle和视觉资源，主体模型使用异步代理，组件模型/粒子/音效按自身路径处理；以`resource_type:path`跨请求去重。敌方`zombie_stream`后台流关闭，塔和城墙后台流保留。`monster_visual_service.lua`复用统一队列，启动视觉范围从W1-W5收紧为W1，W2-W4练功房模型仍由`asset_catalog.csv` `initial_required`保留。
+- 新增正式波预载和资源队列行为/契约测试；通过`FORMAL_WAVE_PRELOAD_CONTRACT_PASS`、`FORMAL_WAVE_PRELOAD_LUA51_PASS`、`WAVE_ASSET_RESOURCE_QUEUE_LUA51_PASS`、`DEV_WAVE_PRELOAD_CONTRACT_PASS`、`WAVE_TIMING_CONTRACT_PASS`、生成逐字节一致、目标严格UTF-8、目标Lua 5.1语法和限定`git diff --check`。
+- 扩展N1-N5契约仍因已有领头怪排序旧断言失败；全项目Lua扫描的6个失败文件均为已有BOM文件，临时去BOM语法复核通过，未改写这些文件。用户已有未提交修改和未跟踪测试文件完整保留。
+- 尚未完成Workshop Tools实机验证；下一步冷启动确认4秒日志、目标波资源实际显示、正式首只敌人时刻不变以及敌方后台流关闭后的性能表现。
+
 ## 2026-08-08 - 多选金矿Q/W/E与自动升级批量协调
 
 - 新增独立`gold_mine_batch_upgrade_service.lua`并由`ui_request_router`接管五个金矿无目标技能。沿用Panorama现有最多64个去重候选，不修改客户端协议；服务端逐矿重验存活、owner、金矿身份、Ability、升级状态和可施放性。

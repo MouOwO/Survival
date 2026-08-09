@@ -39,25 +39,43 @@ local DEV_PRELOAD_POLL_INTERVAL = 0.05
 local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
 local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
 
+local function next_wave_number_after(number)
+    local next_number = (tonumber(number) or 0) + 1
+    while next_number <= (tonumber(state.total_waves) or 0)
+        and not waves[next_number] do
+        next_number = next_number + 1
+    end
+    if next_number > (tonumber(state.total_waves) or 0) then return nil end
+    return next_number
+end
+
 local function queue_wave_assets(number)
     local wave = waves[number]
-    if not wave then return end
-    local seen = {}
+    if not wave then return false, "wave_not_found", 0, 0 end
+    local model_paths = {}
+    local seen_models = {}
     for _, row in ipairs(wave.batches or {}) do
         local definition = archetypes.by_id[row.archetype_id]
         local model_path = definition and definition.model_path or nil
-        if model_path and not seen[model_path] then
-            asset_preload.queue_model(model_path, {
-                urgent = true,
-                priority = 2000 - (tonumber(number) or 0),
-            })
-            seen[model_path] = true
+        if model_path and not seen_models[model_path] then
+            seen_models[model_path] = true
+            model_paths[#model_paths + 1] = model_path
         end
     end
-    monster_visual_service.queue_wave(number, {
-        urgent = true,
-        priority = 3000 - (tonumber(number) or 0),
-    })
+    local visual_resources = monster_visual_config.resources_for_wave(number)
+    local resources = asset_preload.resources_for_models(
+        model_paths,
+        visual_resources
+    )
+    local ok, status, queued_count, failed_count = asset_preload.queue_resources(
+        resources,
+        {
+            urgent = true,
+            priority = 3000 - (tonumber(number) or 0),
+            retry = true,
+        }
+    )
+    return ok, status, queued_count or 0, failed_count or 0, #resources
 end
 
 local function valid(entity)
@@ -338,11 +356,31 @@ local function start_countdown(seconds)
     if dev_mode then return end
     state.status = "countdown"
     state.timer = seconds
-    queue_wave_assets((state.current_wave or 0) + 1)
+    local target_wave = next_wave_number_after(state.current_wave)
+    local preload_lead = wave_timing_config.formal_wave_preload_lead_seconds
+    local preload_queued = target_wave == nil or target_wave <= 1
+    local function queue_target_wave_once()
+        if preload_queued then return end
+        preload_queued = true
+        local ok, status, queued_count, failed_count, resource_count =
+            queue_wave_assets(target_wave)
+        print(string.format(
+            "[WaveSystem] formal wave assets queued target_wave=%d remaining=%.1f resources=%d queued=%d failed=%d status=%s ok=%s",
+            tonumber(target_wave) or 0,
+            tonumber(state.timer) or 0,
+            tonumber(resource_count) or 0,
+            tonumber(queued_count) or 0,
+            tonumber(failed_count) or 0,
+            tostring(status),
+            tostring(ok)
+        ))
+    end
+    if state.timer <= preload_lead then queue_target_wave_once() end
     publish("countdown_started")
     scheduler.cancel("wave_countdown")
     scheduler.every(1.0, function()
         state.timer = math.max(0, state.timer - 1)
+        if state.timer <= preload_lead then queue_target_wave_once() end
         publish("countdown_tick")
         if state.timer <= 0 then event_bus.emit(events.WAVE_START_NEXT, {}); return false end
         return true
@@ -365,7 +403,6 @@ local function start_wave(number, reason)
     publish(reason or "wave_started")
     if number < state.total_waves then
         start_countdown(wave_timing_config.interval_after_wave(number))
-        queue_wave_assets(number + 1)
     end
     local next_delay, last_delay = 0, 0
     local normal_instance_index = 0
@@ -415,11 +452,8 @@ local function start_next_wave()
         check_final_victory()
         return
     end
-    local number = state.current_wave + 1
-    while number <= state.total_waves and not waves[number] do
-        number = number + 1
-    end
-    if number > state.total_waves then return end
+    local number = next_wave_number_after(state.current_wave)
+    if not number then return end
     start_wave(number, "wave_started")
 end
 

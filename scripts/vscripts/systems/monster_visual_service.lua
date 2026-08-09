@@ -1,13 +1,10 @@
 local visual_config = require("config/monster_visual_config")
+local asset_preload = require("systems/asset_preload_service")
 
 local M = {}
 local state_by_unit = {}
 local MAX_PARTICLES_PER_UNIT = 2
 local resource_states = {}
-
-local function mark_resource_ready(key)
-    return function() resource_states[key] = "ready" end
-end
 
 local function valid(entity)
     return entity and (type(entity.IsNull) ~= "function" or not entity:IsNull())
@@ -153,40 +150,16 @@ function M.precache_wave(context, wave_number)
     return count
 end
 
-function M.queue_wave(wave_number)
-    local loading = 0
-    local failed = 0
+function M.queue_wave(wave_number, options)
+    local pending = {}
     for _, resource in ipairs(visual_config.resources_for_wave(wave_number)) do
         local key = resource.resource_type .. ":" .. resource.path
-        local status = resource_states[key]
-        if status == "loading" then
-            loading = loading + 1
-        elseif status ~= "ready" then
-            local async_unit_name = tostring(resource.async_unit_name or "")
-            if resource.resource_type ~= "model" or async_unit_name == ""
-                or type(PrecacheUnitByNameAsync) ~= "function" then
-                resource_states[key] = "failed"
-                failed = failed + 1
-            else
-                resource_states[key] = "loading"
-                local ok = pcall(
-                    PrecacheUnitByNameAsync,
-                    async_unit_name,
-                    mark_resource_ready(key),
-                    -1
-                )
-                if ok then
-                    loading = loading + 1
-                else
-                    resource_states[key] = "failed"
-                    failed = failed + 1
-                end
-            end
+        if resource_states[key] ~= "ready" then
+            pending[#pending + 1] = resource
         end
     end
-    if failed > 0 then return false, "runtime_preload_failed" end
-    if loading > 0 then return true, "loading" end
-    return true, "ready"
+    local resources = asset_preload.resources_for_models({}, pending)
+    return asset_preload.queue_resources(resources, options)
 end
 
 function M.precache_range(context, first_wave, last_wave)

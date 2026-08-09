@@ -18,6 +18,34 @@
 - 自动验证通过：`ACTION_COOLDOWN_ROLLBACK_LUA51_PASS`、`WORKER_TRAINING_PROGRESS_LUA51_PASS`、`SYNCHRONOUS_ABILITY_RESULTS_LUA51_PASS`、`REPAIR_WORKER_PERCENTAGE_MATH_OK/CONTRACT_OK`、`SYNCHRONOUS_ACTION_CONTRACT_PASS`、目标`LUAC51_PASS`、`TRAINING_CSV_GENERATED_FIELDS_PASS`、严格UTF-8、配置`CheckOnly`和限定`DIFF_CHECK_PASS`。`building_system.lua`保留项目既有UTF-8 BOM，语法检查使用仅验证用临时无BOM副本，没有改写生产编码。
 - 尚需Workshop Tools冷启动实测：修理工连续训练5+2次的模型/数值/最终拒绝；资源不足和实体创建失败不消耗冷却且退款；Builder移动途中死亡、位置失效、施工中建筑死亡只回滚一次冷却并完整退款；普通升级、批量升级和箭塔转职失败不保留冷却。未经实机结果不能记录为用户验收。
 
+## 已完成当前任务（2026-08-09）：统一N2–N5 W30普通怪为59只
+
+- 用户明确稳定节奏：所有难度W1–W10保留原始普通怪数量；从W11起，每个已存在波次固定59只普通怪。N1截止W25，N2–N5截止W30；59只不包含`wave_leader`精英和`assault_boss`。
+- 权威CSV与生成Lua审计确认：N2–N5 W11–W29均已是59只，只有四个难度的W30仍各为9只普通怪。四个W30都只有一个普通怪种`flying_red_gargoyle`，因此只需把对应普通怪行从9改为59，无比例取整歧义。
+- 批准修改边界：只修改`n2_wave_30_30n1`、`n3_wave_30_30n1`、`n4_wave_30_30n1`、`n5_wave_30_30n1`的数量和备注，再从CSV定向生成`wave_definitions.lua`。精英、Boss、怪种、属性、顺序和其他难度数据保持不变。
+- 验证通过：N1 W11–W25和N2–N5 W11–W30普通怪逐波59；W1–W10相对修改前不变；角色数量不变；Lua 5.1行为/语法、生成逐字节一致、严格UTF-8、CSV列数及限定`git diff --check`通过。旧N1–N5扩展契约仍硬编码修改前普通怪总数202/1270和总计划228/1303，分别失败于`N1_NORMAL_TOTAL_INVALID`、`N2/N3/N4/N5_NORMAL_TOTAL_INVALID`，未修改这些用户已有未跟踪测试文件。
+- 尚未执行Workshop Tools实机验证；需要冷启动后确认N2–N5 W30实际生成59只普通飞行怪，以及W30的领头怪和进攻Boss仍各1只。
+
+## 前阶段完成记录（2026-08-09）：N1 W11–W25普通怪同步为59只
+
+- 前一阶段CSV核算确认只有N1 W11–W25普通怪不足59；随后按用户明确的统一节奏补齐N2–N5 W30。N1没有W26–W30；N2–N5 W11–W29原本已经是59，W30由9只普通怪统一调整为59只。
+- 同波多种普通怪按修改前`monster_count`比例使用最大余数法确定性分配到总计59只，余数相同按CSV原顺序补齐。只修改31条`member_role=normal`行的数量和备注；怪种、属性、顺序、移动、缩放及其他字段不变。
+- `wave_leader`作为精英怪保持N1 W11–W25每波1只；`assault_boss`只在W15/W20/W25各保留1只，其余目标波为0。故普通波计划总数为60，含进攻Boss波计划总数为61。
+- 已从权威`data/csv/怪物与波次系统/wave_definitions.csv`定向生成`scripts/vscripts/config/generated/wave_definitions.lua`，没有直接手改生成文件。
+- 验证通过：`TARGET_ONLY_DIFF_PASS changed_rows=31`、`N1_W11_W25_COUNT_CONTRACT_PASS`、`N1_W11_W25_LUA51_PASS`、`WAVE_DEFINITIONS_LUAC51_PASS`、`WAVE_DEFINITIONS_GENERATED_MATCH_PASS`、`WAVE_DEFINITIONS_STRICT_UTF8_BOM_PASS`。旧N2/N3扩展测试仍分别失败于任务前已有的领头怪排序断言和`ROLE_ORDER`文本断言，本次未修改无关排序逻辑或旧未跟踪测试。
+- 尚未执行Workshop Tools实机验证；需要完全停止并重新Run地图，重点用N1 W11、W13、W16、W18、W24确认多怪种比例和实际生成总数，并确认精英/Boss数量不变。
+
+## 当前插入任务（2026-08-09）：正式波次资源提前4秒异步预载
+
+- 已完成生产实现：首波和练功房启动预载保留；正式后续波次不再在上一波开始时提前排队，而是在目标波次倒计时剩余`wave_timing_rules.csv.formal_wave_preload_lead_seconds=4`时只排队该目标波资源。
+- 目标资源从当前难度生成后的波次成员读取`monster_archetypes.csv`模型，再合并目标波视觉CSV解析出的模型、组件模型、粒子和`asset_sounds.csv`实际音效资源；按`resource_type:path`统一去重。当前`asset_sounds.csv`无实际记录，因此未添加虚构音效路径。
+- `asset_preload_service`保留主体模型的`PrecacheUnitByNameAsync`异步代理；附件模型、粒子和音效按各自资源路径处理，并在服务内跨正式波次/视觉服务统一去重。敌方`zombie_stream`后台批量流已关闭，塔和城墙`tower_stream/wall_stream`保留。
+- `addon_game_mode.precache()`的怪物视觉启动范围收紧到W1；W2-W4练功房模型仍由`asset_catalog.csv`的`initial_required`启动包保留。正式倒计时不读取开发跳波的READY/3秒门禁，出怪数量、顺序和时间不变。
+- 新增`test_formal_wave_preload.lua`、`test_formal_wave_preload_contract.ps1`和`test_wave_asset_resource_queue.lua`，覆盖首波保留、4秒触发、目标波隔离、Bundle资源展开、跨调用去重、后台流边界和正式流程不继承调试门禁。
+- 自动验证：`FORMAL_WAVE_PRELOAD_CONTRACT_PASS`、`FORMAL_WAVE_PRELOAD_LUA51_PASS`、`WAVE_ASSET_RESOURCE_QUEUE_LUA51_PASS`、`DEV_WAVE_PRELOAD_CONTRACT_PASS`、`WAVE_TIMING_CONTRACT_PASS`、目标生成逐字节一致、目标严格UTF-8、目标Lua 5.1语法和限定`git diff --check`通过。
+- 扩展验证中N1-N5旧波次契约仍分别失败于任务前已有的“领头怪必须排第一”断言；本任务未修改`wave_definitions.csv`、`monster_archetypes.csv`或其生成Lua。全项目354个Lua文件中348个直接通过`luac5.1`，6个既有BOM文件去除BOM后临时语法通过，未改写这些无关文件。
+- 当前剩余动作：完全停止并重新Run Workshop Tools，确认正式倒计时日志`[WaveSystem] formal wave assets queued target_wave=... remaining=4.0`，确认目标波模型/组件/粒子实际显示、首只敌人时刻不变，并观察无敌方后台批量预载。
+
 ## 当前插入任务（2026-08-08）：`monster<N>`开发跳波预载窗口
 
 - 用户实机复测确认`monster19`会输出`ready_after_buffer elapsed=3.00`并按时生成，但单位仍显示红色`ERROR`；这证明3秒门禁正常执行，剩余问题不是等待不足。

@@ -14,6 +14,27 @@
 - 排队建造的同步成功只代表移动任务已受理，不代表建筑已创建。异步阶段必须把`source_ability`绑定到具有唯一生命周期的build task，并用幂等settled标记保证Builder死亡、位置失效、实体创建失败或施工失败等竞争路径至多回滚一次冷却。已扣费后的失败必须同时一次性退还木材、金币和人口；成功完成后清除退款与冷却上下文。
 - 有限工人训练阶段按成功创建历史推进，不按当前活体数量判断。不同训练prefix和team必须拥有独立tracker；只有单位实体成功创建后记录进度。最终有限阶段达到CSV上限后保留当前tier完成快照并拒绝继续训练；`max_count=-1`表示无限阶段，永远不进入完成态。
 
+## N1 W11–W25波次数量规则（2026-08-09）
+
+- `wave_definitions.csv`中N1第11–25波每波`normal`普通怪总数固定为59；`wave_leader`精英每波保持1只，`assault_boss`只在W15/W20/W25各1只。59只只统计普通怪，不包含精英和进攻Boss。
+- 同波存在多种普通怪时，以修改前CSV数量为比例，使用最大余数法确定性放大到59；余数相同按CSV原顺序补齐。不得改变怪种、属性、角色、生成顺序、移动类型或模型缩放来完成数量同步。
+- N1仍只有25波，本N1阶段记录当时不意味着新增N1 W26–W30；其“暂不改变N2–N5波次数量”边界已由下方全难度波次数量规则覆盖。配置修改必须先改CSV，再通过`tools.build_configs.build()`生成`wave_definitions.lua`。
+
+## 全难度波次数量规则（2026-08-09）
+
+- 所有难度W1–W10保留各自原始普通怪数量；从W11起，每个难度中实际存在的波次普通怪总数固定为59。N1实际存在W1–W25，N2–N5实际存在W1–W30。
+- 因此N2–N5 W11–W30均应为59只普通怪；当前四个W30已从原始9只统一调整为59只。`wave_leader`和`assault_boss`是独立成员，不计入59只普通怪，并保持原有数量。
+- 多怪种波次以修改前普通怪数量为比例，使用最大余数法确定性分配到59；单一普通怪种直接设为59。不得借此改变怪种、属性、角色、出怪顺序、移动类型或模型缩放。
+- 业务配置必须先修改`data/csv/怪物与波次系统/wave_definitions.csv`，再通过`tools.build_configs.build()`定向生成`scripts/vscripts/config/generated/wave_definitions.lua`并进行一致性校验。
+
+## 正式波次目标资源预载边界（2026-08-09）
+
+- 正式波次首波继续依赖启动预载；后续目标波只在其首只敌人计划出现前`wave_timing_rules.csv.formal_wave_preload_lead_seconds`秒进入异步资源队列，当前配置为4秒。预载不得改变倒计时、首只敌人时刻、成员数量、顺序或生成间隔。
+- 目标波资源必须从当前难度构建后的`wave_definitions`成员、`monster_archetypes.csv`模型和视觉CSV解析；主体模型、组件模型、粒子及已在`asset_sounds.csv`配置的音效按`resource_type:path`统一去重。空音效CSV不得填入猜测路径。
+- `asset_preload_service`是正式波、开发跳波和视觉队列共享的资源去重边界。主体模型可使用`PrecacheUnitByNameAsync`代理；组件模型、粒子和音效不得因主体代理回调而被错误标记READY，必须按各自路径处理。
+- 正常敌方`zombie_stream`不再后台批量加载；`tower_stream`和`wall_stream`继续保留。启动视觉预载只保留W1，练功房模型通过`asset_catalog.csv`的`initial_required`继续启动预载。
+- 正式倒计时不得继承开发跳波的`dev_preloading`、READY检查、3秒缓冲或失败开放门禁。开发跳波仍保持原有3秒固定渲染缓冲和generation/settled清理策略。
+
 ## 开发跳波资源加载边界（2026-08-08）
 
 - 正常波次依靠倒计时和上一波开始时的`queue_wave_assets()`获得下一波预载提前量；`monster<N>`/`monster <N>`属于随机跳波开发路径，不能假设此前波次已经加载目标模型。

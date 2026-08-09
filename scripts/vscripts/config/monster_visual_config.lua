@@ -8,6 +8,18 @@ local M = {}
 local components_by_asset = {}
 local effects_by_asset = {}
 
+local function add_resource(result, seen, resource_type, path, async_unit_name)
+    path = tostring(path or "")
+    local key = resource_type .. ":" .. path
+    if path == "" or seen[key] then return end
+    seen[key] = true
+    result[#result + 1] = {
+        resource_type = resource_type,
+        path = path,
+        async_unit_name = async_unit_name,
+    }
+end
+
 local function append_enabled(grouped, row)
     if row.enabled == false then return end
     local asset_id = tostring(row.visual_asset_id or "")
@@ -92,23 +104,11 @@ function M.resolve(wave_number, member_role, normal_index)
     }
 end
 
-function M.resources_for_wave(wave_number)
+function M.append_resources_for_wave(wave_number, result, seen)
     local wave = enabled_wave(wave_number)
-    if not wave then return {} end
-    local result = {}
-    local seen = {}
-    local function add(resource_type, path, async_unit_name)
-        path = tostring(path or "")
-        local key = resource_type .. ":" .. path
-        if path ~= "" and not seen[key] then
-            seen[key] = true
-            result[#result + 1] = {
-                resource_type = resource_type,
-                path = path,
-                async_unit_name = async_unit_name,
-            }
-        end
-    end
+    result = result or {}
+    seen = seen or {}
+    if not wave then return result, seen end
     for _, asset_id in ipairs({
         wave.main_visual_asset_id,
         wave.support_visual_asset_id,
@@ -117,16 +117,21 @@ function M.resources_for_wave(wave_number)
     }) do
         local asset = M.asset(asset_id)
         if asset then
-            add("model", asset.model_path, asset.async_unit_name)
+            add_resource(result, seen, "model", asset.model_path,
+                asset.async_unit_name)
             for _, component in ipairs(components_by_asset[asset.visual_asset_id] or {}) do
-                add("model", component.model_path)
+                add_resource(result, seen, "model", component.model_path)
             end
             for _, effect in ipairs(effects_by_asset[asset.visual_asset_id] or {}) do
-                add("particle", effect.particle_path)
+                add_resource(result, seen, "particle", effect.particle_path)
             end
         end
     end
-    return result
+    return result, seen
+end
+
+function M.resources_for_wave(wave_number)
+    return M.append_resources_for_wave(wave_number, {}, {})
 end
 
 function M._select_role_for_test(wave, member_role, normal_index)

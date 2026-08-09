@@ -481,7 +481,7 @@ function M.precache(context)
     tower_magic_supreme_system.precache(context)
     sound_service.precache(context)
     building_construction_visual.precache(context)
-    monster_visual_service.precache_range(context, 1, 5)
+    monster_visual_service.precache_range(context, 1, 1)
     PrecacheResource(
         "particle",
         "particles/items_fx/blink_dagger_start.vpcf",
