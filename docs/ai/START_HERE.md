@@ -4,6 +4,7 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-09）：工人训练、建筑提交、普通升级、箭塔升级/转职已改为同步`event_bus.request/handle_request`结果。修理工按team独立消费CSV两级进度（LV1成功5次后进入LV2，LV2成功2次后保留最终完成态并拒绝继续训练），伐木工最终`max_count=-1`无限行为不变；只有单位创建成功才推进进度，创建失败继续退款。建造移动/施工异步失败保存`source_ability`并以独立幂等事务恰好回滚一次冷却，扣费后的创建/施工失败同时退木材、金币和人口。专项Lua 5.1行为、PowerShell契约、目标语法、CSV/生成字段、严格UTF-8、配置CheckOnly和限定diff通过；下一步Workshop Tools冷启动实测失败冷却、资源退款和两级修理工，尚未实机验收。
 - 当前插入任务（2026-08-08）：`monster19`实机已证明3秒门禁按预期输出`ready_after_buffer elapsed=3.00`，但仍显示红色`ERROR`。本机VPK索引确认最终根因是旧`models/heroes/tiny/tiny.vmdl`不存在；现已从权威CSV改为实际存在的`models/heroes/tiny/tiny_01/tiny_01.vmdl`，重建资产/怪物生成Lua并同步异步代理KV。3秒固定缓冲与连续命令generation门禁继续保留。下一步完全冷启动Workshop Tools复测W19模型和快速`monster19`/`monster20`；新路径尚未实机验收。
 - 当前插入任务（2026-08-08）：N1 W13-W18客户端闪退的直接证据是`dota2_2026_0808_033038_0_V8_hiting_max_memory_limit__512_MB.mdmp`，Lua 16 MiB高水位不是同一内存池。用户新日志确认119次Tooltip几何诊断`active`越作用域异常和1次Combat不存在函数调用；两项已修复，`inventory_tooltip.js`也纳入generation/context门禁。Panorama现于启动1秒/5秒及之后60秒输出聚合，默认关闭高频Tooltip长诊断和200次游标探针。下一步必须完全冷启动，先验证出英雄5秒不再异常/退出，再跑N1到W20并核对`[SURVIVAL_MEMORY]`与新dump；尚未实机证明闪退解决。
 - 当前插入任务（2026-08-08）：多选箭塔跨路线批量升级已按最新要求完成生产实现和自动验证。基础塔及不同转职塔以共同`arrow_tower`身份混选，各沿自身路线；Q按下一等级费用、W按直升当前阶段最高级累计费用报价，并按木材→金币→entindex升序尝试。客户端只提交最多64个去重候选，服务端逐塔重验owner/建筑/Ability并原子扣费；资源不足等失败跳过，成功受理后才启动冷却。专项Lua 5.1/契约、相关回归、语法、UTF-8和Panorama强制编译通过，下一步Workshop Tools冷启动实测，尚未用户验收。

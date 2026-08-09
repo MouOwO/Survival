@@ -6,11 +6,12 @@ local function create(mode)
     function Ability:GetBehavior() return DOTA_ABILITY_BEHAVIOR_NO_TARGET end
     function Ability:GetManaCost() return 0 end
     function Ability:OnSpellStart()
-        event_bus.emit(events.BUILDING_UPGRADE_REQUEST, {
+        local result = event_bus.request(events.BUILDING_UPGRADE_REQUEST, {
             building = self:GetCaster(),
             upgrade_mode = mode,
             source_ability = self,
         })
+        if not result or not result.ok then self:EndCooldown() end
     end
     return Ability
 end

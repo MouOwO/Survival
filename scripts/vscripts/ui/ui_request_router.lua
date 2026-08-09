@@ -665,15 +665,22 @@ local function register_ability_cast_position_request()
             })
             return
         end
-        event_bus.emit(events.BUILD_REQUEST, {
+        local result = event_bus.request(events.BUILD_REQUEST, {
             caster = unit,
             building_id = building_id,
             position = position,
+            source_ability = ability,
         })
-        print("[SURVIVAL_CAST][SERVER] POINT_BUILD_EMITTED building=" .. tostring(building_id))
+        if result and result.ok then
+            ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+        end
+        print("[SURVIVAL_CAST][SERVER] POINT_BUILD_REQUESTED building=" .. tostring(building_id))
         send_to_player("ui_ability_cast_result", player_id, {
-            success = 1, entindex = entindex, ability_entindex = ability_entindex,
-            ability_name = ability_name, behavior = behavior, error = "",
+            success = result and result.ok and 1 or 0,
+            entindex = entindex, ability_entindex = ability_entindex,
+            ability_name = ability_name, behavior = behavior,
+            error = result and result.ok and ""
+                or (result and result.error or "build_request_failed"),
         })
     end)
 end
@@ -819,8 +826,9 @@ local function register_ability_cast_request()
                     class_index = tower_class_index,
                     source_ability = ability,
                 }
-                event_bus.emit(events.TOWER_CLASS_REQUEST, request)
-                direct_result = request.result or { ok = false, error = "防御塔转职无响应" }
+                direct_result = event_bus.request(events.TOWER_CLASS_REQUEST, request)
+                    or request.result
+                    or { ok = false, error = "防御塔转职无响应" }
                 print("[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index="
                     .. tostring(tower_class_index))
             end

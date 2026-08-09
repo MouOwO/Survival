@@ -197,14 +197,18 @@ function M.execute(payload)
                 source_ability = ability,
                 silent_notification = true,
             }
-            event_bus.emit(events.BUILDING_UPGRADE_REQUEST, request)
-            if request.result and request.result.ok == true then
+            local returned = event_bus.request(
+                events.BUILDING_UPGRADE_REQUEST,
+                request
+            )
+            local result = returned or request.result
+            if result and result.ok == true then
                 ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
                 success_count = success_count + 1
             else
                 skipped_count = skipped_count + 1
                 first_error = first_error
-                    or (request.result and request.result.error)
+                    or (result and result.error)
                     or "升级失败"
             end
         end

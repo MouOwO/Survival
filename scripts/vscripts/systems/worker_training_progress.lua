@@ -4,12 +4,12 @@ local function maximum_for(row)
     return tonumber(row and row.max_count) or 0
 end
 
-local function lumberjack_rows(definitions)
+local function training_rows(definitions, prefix)
     local rows = {}
     for _, row in ipairs(definitions.rows or {}) do
         if row.enabled ~= false
             and row.training_type == "unit"
-            and string.match(row.training_id or "", "^train_lumberjack_") then
+            and string.match(row.training_id or "", "^" .. prefix) then
             rows[#rows + 1] = row
         end
     end
@@ -30,6 +30,7 @@ local function snapshot(state, row)
             "LV(%d+)"
         )) or 1
     end
+    local completed = maximum >= 0 and count >= maximum
     return {
         training_id = training_id,
         level = row and (tonumber(row.level) or 1) or 1,
@@ -37,6 +38,7 @@ local function snapshot(state, row)
         count = count,
         max_count = maximum,
         unlimited = maximum < 0 and 1 or 0,
+        completed = completed and 1 or 0,
         requires_city_level = requires_city_level,
         wood_cost = row and (tonumber(row.wood_cost) or 0) or 0,
         gold_cost = row and (tonumber(row.gold_cost) or 0) or 0,
@@ -46,9 +48,11 @@ local function snapshot(state, row)
     }
 end
 
-function M.create(definitions)
-    local rows = lumberjack_rows(definitions or {})
-    assert(#rows > 0, "lumberjack training definitions are required")
+function M.create(definitions, prefix, error_prefix)
+    prefix = tostring(prefix or "train_lumberjack_")
+    error_prefix = tostring(error_prefix or "lumberjack")
+    local rows = training_rows(definitions or {}, prefix)
+    assert(#rows > 0, error_prefix .. " training definitions are required")
 
     local tracker = { rows = rows, states = {} }
 
@@ -79,7 +83,7 @@ function M.create(definitions)
         local state = state_for(team)
         local row = self.rows[state.current_index]
         if not row or row.training_id ~= training_id then
-            return nil, "lumberjack_training_not_current"
+            return nil, error_prefix .. "_training_not_current"
         end
 
         local count = (state.counts[training_id] or 0) + 1

@@ -27,8 +27,9 @@ $rows = Import-Csv -LiteralPath $csvPath | Where-Object {
 }
 Check ($rows.Count -gt 0) "REPAIR_PERCENTAGE_ROWS_MISSING"
 foreach ($row in $rows) {
-    Check ([double]$row.repair_max_health_pct_per_second -eq 2) `
-        "REPAIR_PERCENTAGE_NOT_TWO_FOR_$($row.training_id)"
+    $expected = if ($row.training_id -eq "train_repairer_01") { 1.4 } else { 2.0 }
+    Check ([double]$row.repair_max_health_pct_per_second -eq $expected) `
+        "REPAIR_PERCENTAGE_TIER_MISMATCH_$($row.training_id)"
 }
 
 $generated = Get-Content -LiteralPath $generatedPath -Raw
@@ -50,5 +51,19 @@ Check ($modifier.Contains("repair_math.whole_amount_for_interval")) `
     "REPAIR_PERCENTAGE_MATH_CALL_MISSING"
 Check ($modifier.Contains("repair_fractional_remainder")) `
     "REPAIR_FRACTIONAL_REMAINDER_MISSING"
+Check ($worker.Contains('worker_training_progress.create(')) `
+    "REPAIR_TRAINING_TRACKER_MISSING"
+Check ($worker.Contains('"train_repairer_"')) `
+    "REPAIR_TRAINING_PREFIX_MISSING"
+Check ($worker.Contains('training_id == "train_repairer_auto"')) `
+    "REPAIR_AUTO_TRAINING_REQUEST_MISSING"
+Check ($worker.Contains('repairer_training:record_success(')) `
+    "REPAIR_SUCCESS_PROGRESSION_MISSING"
+Check ($worker.Contains('if progress.completed == 1 then')) `
+    "REPAIR_FINAL_TIER_REJECTION_MISSING"
+Check ($worker.Contains('repairer_training:reset()')) `
+    "REPAIR_TRAINING_RESET_MISSING"
+Check ($worker.Contains('event_bus.handle_request(events.WORKER_TRAIN_REQUEST')) `
+    "WORKER_TRAINING_NOT_SYNCHRONOUS"
 
 Write-Host "REPAIR_WORKER_PERCENTAGE_CONTRACT_OK"

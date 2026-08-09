@@ -2,6 +2,10 @@
 
 ## 当前已知问题
 
+0. **`.cline/local-toolchain.json`中的绝对路径会随工作区迁移或MSYS目录布局漂移。**
+   - 2026-08-09文件仍指向不存在的`D:\SteamLibrary`、WorkBuddy Python及`C:\msys64\mingw64\bin`，实际工作区位于`E:\steam`，有效Lua/Luac 5.1.5位于`C:\msys64\msys64\bin`，Python 3.10.11位于当前用户LocalAppData。配置已按本机实测修正。
+   - 后续会话仍必须先逐项`Test-Path`并输出版本，不能仅凭JSON存在就认定工具可用；也不能因PATH或失效配置找不到命令就声称Lua/Python不存在。
+
 0. **N1 W13-W18附近曾发生Panorama/V8 512 MiB堆上限闪退，修复仍待实机确认。**
    - 同时间转储为`game/bin/win64/dota2_2026_0808_033038_0_V8_hiting_max_memory_limit__512_MB.mdmp`，4秒后另有breakpoint转储。当前尚未做符号化dump分析；“闪退对应V8堆上限”来自时间相关性与明确文件名，不能扩展为已证明某个具体JS函数泄漏。
    - N1 W13-W18权威CSV每波只有8至10只怪和1至2种模型，新增数据驱动组装视觉只覆盖W1-W5；因此暂不以删模型或减怪作为第一修复。Lua 16 MiB高水位是独立观测，不得称为这次V8 512 MiB闪退的直接原因。

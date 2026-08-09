@@ -44,11 +44,13 @@ function M.create(building_id)
     end
 
     function Ability:OnSpellStart()
-        event_bus.emit(events.BUILD_REQUEST, {
+        local result = event_bus.request(events.BUILD_REQUEST, {
             caster = self:GetCaster(),
             building_id = building_id,
             position = self:GetCursorPosition(),
+            source_ability = self,
         })
+        if not result or not result.ok then self:EndCooldown() end
     end
 
     return Ability

@@ -18,6 +18,7 @@ local building_sound = require("systems/building_sound_service")
 local construction_visual = require(
     "systems/building_construction_visual_service"
 )
+local action_cooldown_rollback = require("core/action_cooldown_rollback")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
@@ -139,6 +140,7 @@ local function clear_build_task(caster, task)
     end
     return false
 end
+local rollback_build_cooldown = action_cooldown_rollback.once
 local function main_city_level(team)
     for _, state in pairs(buildings) do
         if state.team == team
@@ -546,6 +548,8 @@ local function start_building(payload)
         population_occupied = 0,
         constructing = true,
         cleaned = false,
+        build_task = payload.build_task,
+        build_cost = cost,
     }
     unit.survival_grid_x = state.grid_x
     unit.survival_grid_y = state.grid_y
@@ -590,6 +594,16 @@ local function start_building(payload)
                     entindex = state.entindex,
                 })
                 release_population(state, "building_construction_failed")
+                if state.build_cost then
+                    event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                        team = state.team,
+                        wood = state.build_cost.wood,
+                        gold = state.build_cost.gold,
+                        reason = "building_construction_failed",
+                    })
+                    state.build_cost = nil
+                end
+                rollback_build_cooldown(state.build_task)
             end
             return false
         end
@@ -622,6 +636,8 @@ local function start_building(payload)
         unit:SetHealth(maximum_health)
         unit:SetControllableByPlayer(check.player_id, true)
         state.constructing = false
+        state.build_cost = nil
+        state.build_task = nil
         -- Keep ability entity indexes stable for runtime tooltip data. Activate
         -- once now and once after the construction modifier state has replicated.
         scheduler.after(0.1, function()
@@ -678,6 +694,7 @@ local function start_building(payload)
         ok = true,
         entindex = unit:entindex(),
         constructing = true,
+        pending = true,
         build_time = build_time,
     }
 end
@@ -692,6 +709,7 @@ local function queue_building(payload)
         if caster.survival_build_task.constructing then
             return { ok = false, error = "建筑正在施工中" }
         end
+        rollback_build_cooldown(caster.survival_build_task)
         clear_build_task(caster, caster.survival_build_task)
     end
     local target = check.grid.world_position
@@ -703,6 +721,7 @@ local function queue_building(payload)
         building_id = payload.building_id,
         target = target,
         work_position = work_position,
+        source_ability = payload.source_ability,
     }
     caster.survival_build_task = task
     caster.survival_build_internal_order = true
@@ -719,10 +738,14 @@ local function queue_building(payload)
         return { ok = false, error = "builder_move_order_failed" }
     end
     scheduler.every(0.1, function()
-        if not valid_entity(caster) then return false end
+        if not valid_entity(caster) then
+            rollback_build_cooldown(task)
+            return false
+        end
         if caster.survival_build_task ~= task then return false end
         if caster.IsAlive and not caster:IsAlive() then
             clear_build_task(caster, task)
+            rollback_build_cooldown(task)
             return false
         end
         local current = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
@@ -734,6 +757,7 @@ local function queue_building(payload)
         if not current or not current.ok then
             clear_build_task(caster, task)
             notify(check.player_id, current and current.error or "建造位置失效", "error")
+            rollback_build_cooldown(task)
             return false
         end
         if not builder_ready(
@@ -748,10 +772,11 @@ local function queue_building(payload)
         task.constructing = true
         local result = start_building(payload)
         clear_build_task(caster, task)
+        if not result or not result.ok then rollback_build_cooldown(task) end
         return false
     end, "queue_building_" .. tostring(caster:entindex()))
     notify(check.player_id, check.definition.display_name .. "正在前往建造位置")
-    return { ok = true, moving = true, target = target }
+    return { ok = true, pending = true, moving = true, target = target }
 end
 local function query_building(payload)
     local entindex = tonumber(payload and payload.entindex)
@@ -839,6 +864,7 @@ end
 local function on_entity_killed(payload)
     local victim = payload.victim
     if not valid_entity(victim) then return end
+    rollback_build_cooldown(victim.survival_build_task)
     clear_build_task(victim, victim.survival_build_task)
     construction_visual.cancel(victim)
     local state = buildings[victim:entindex()]
@@ -858,6 +884,18 @@ local function on_entity_killed(payload)
         event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
     end
     release_population(state, "building_destroyed:" .. state.building_id)
+    if state.constructing then
+        if state.build_cost then
+            event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                team = state.team,
+                wood = state.build_cost.wood,
+                gold = state.build_cost.gold,
+                reason = "building_construction_destroyed",
+            })
+            state.build_cost = nil
+        end
+        rollback_build_cooldown(state.build_task)
+    end
     if state.building_id == "main_city" and not state.constructing then
         GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
     end
@@ -929,7 +967,7 @@ function M.init()
     event_bus.handle_request(
         events.BUILDING_FUSION_CONSUME_REQUEST, consume_for_fusion
     )
-    event_bus.subscribe(events.BUILD_REQUEST, queue_building)
+    event_bus.handle_request(events.BUILD_REQUEST, queue_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     local recovered = recover_existing_buildings()

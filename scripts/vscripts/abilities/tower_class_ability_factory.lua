@@ -7,11 +7,12 @@ function M.create(class_index)
     function Ability:GetBehavior() return DOTA_ABILITY_BEHAVIOR_NO_TARGET end
     function Ability:GetManaCost() return 0 end
     function Ability:OnSpellStart()
-        event_bus.emit(events.TOWER_CLASS_REQUEST, {
+        local result = event_bus.request(events.TOWER_CLASS_REQUEST, {
             tower = self:GetCaster(),
             class_index = class_index,
             source_ability = self,
         })
+        if not result or not result.ok then self:EndCooldown() end
     end
     return Ability
 end

@@ -1,5 +1,14 @@
 # Current Task
 
+## 当前插入任务（2026-08-09）：训练、建造与升级同步结果事务
+
+- 需求：工人训练、建筑提交、普通/批量升级必须同步返回结构化结果；请求缺失或失败时不得保留Ability冷却。排队建造后发生的异步失败必须恰好回滚一次冷却，并在已扣费时完整退还资源/人口。修理工不能继续按同`training_id`活体数量永久卡在第一阶段，必须按权威CSV顺序推进；最终阶段完成后保留完成态并拒绝继续训练，伐木工最终无限阶段保持不变。
+- 生产实现：`WORKER_TRAIN_REQUEST`、`BUILD_REQUEST`、`BUILDING_UPGRADE_REQUEST`和`TOWER_CLASS_REQUEST`全部改为`handle_request`，调用者改用`request`。升级handler继续写`payload.result`并同时返回结果，批量升级以返回值优先、`payload.result`兼容。原生训练/建造/升级Ability在无结果或`ok~=true`时`EndCooldown()`；Panorama直接提交仅在同步受理后启动冷却。
+- 修理工进度：`worker_training_progress.create()`按prefix泛化，修理工与伐木工拥有独立按team状态和reset生命周期。修理工自动请求从CSV当前tier解析；LV1成功创建5次后进入LV2，LV2成功2次后最终快照保持`completed=1`并在扣费前拒绝。活体死亡不倒退训练历史；单位创建失败在资源/人口退款后不记录成功。伐木工CSV最终`train_lumberjack_08.max_count=-1`仍不完成且可无限累计。
+- 建造事务：同步提交只表示移动任务已受理。任务保存`source_ability`；Builder死亡、二次位置失效、移动命令/实体创建失败、施工中建筑死亡等失败路径由`core/action_cooldown_rollback.once()`按task身份幂等回滚。实体已创建后的施工失败退木材、金币和人口；成功完成后清除退款与冷却上下文。
+- 自动验证通过：`ACTION_COOLDOWN_ROLLBACK_LUA51_PASS`、`WORKER_TRAINING_PROGRESS_LUA51_PASS`、`SYNCHRONOUS_ABILITY_RESULTS_LUA51_PASS`、`REPAIR_WORKER_PERCENTAGE_MATH_OK/CONTRACT_OK`、`SYNCHRONOUS_ACTION_CONTRACT_PASS`、目标`LUAC51_PASS`、`TRAINING_CSV_GENERATED_FIELDS_PASS`、严格UTF-8、配置`CheckOnly`和限定`DIFF_CHECK_PASS`。`building_system.lua`保留项目既有UTF-8 BOM，语法检查使用仅验证用临时无BOM副本，没有改写生产编码。
+- 尚需Workshop Tools冷启动实测：修理工连续训练5+2次的模型/数值/最终拒绝；资源不足和实体创建失败不消耗冷却且退款；Builder移动途中死亡、位置失效、施工中建筑死亡只回滚一次冷却并完整退款；普通升级、批量升级和箭塔转职失败不保留冷却。未经实机结果不能记录为用户验收。
+
 ## 当前插入任务（2026-08-08）：`monster<N>`开发跳波预载窗口
 
 - 用户实机复测确认`monster19`会输出`ready_after_buffer elapsed=3.00`并按时生成，但单位仍显示红色`ERROR`；这证明3秒门禁正常执行，剩余问题不是等待不足。

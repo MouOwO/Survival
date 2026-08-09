@@ -13,6 +13,11 @@ local current_tree_entindex = -1
 local tree_lumber_efficiency_buff = 0
 local population_training_counts = {}
 local lumberjack_training = worker_training_progress.create(training_definitions)
+local repairer_training = worker_training_progress.create(
+    training_definitions,
+    "train_repairer_",
+    "repairer"
+)
 local population_training_rows = {}
 for _, row in ipairs(training_definitions.rows or {}) do
     if row.enabled ~= false and row.training_type == "population_upgrade" then
@@ -320,10 +325,22 @@ local function train_worker(payload)
     end
     local is_lumberjack_request = training_id == "train_lumberjack_auto"
         or string.match(training_id, "^train_lumberjack_") ~= nil
+    local is_repairer_request = training_id == "train_repairer_auto"
+        or string.match(training_id, "^train_repairer_") ~= nil
     if is_lumberjack_request then
         local current = lumberjack_training:current(city_state.team)
         if not current then
             return { ok = false, error = "lumberjack_training_missing" }
+        end
+        training_id = current.training_id
+    elseif is_repairer_request then
+        local progress = repairer_training:get(city_state.team)
+        if progress.completed == 1 then
+            return { ok = false, error = "修理工训练已完成" }
+        end
+        local current = repairer_training:current(city_state.team)
+        if not current then
+            return { ok = false, error = "repairer_training_missing" }
         end
         training_id = current.training_id
     end
@@ -373,7 +390,7 @@ local function train_worker(payload)
         return { ok = false, error = "training_type_invalid" }
     end
     local is_lumberjack = string.match(training_id, "^train_lumberjack_") ~= nil
-    if is_lumberjack then
+    if is_lumberjack or is_repairer_request then
         local required_level = required_city_level(training)
         if (tonumber(city_state.level) or 1) < required_level then
             local error_message = "主城达到LV" .. tostring(required_level)
@@ -381,7 +398,7 @@ local function train_worker(payload)
             notify(city_state.player_id, error_message, "error")
             return { ok = false, error = error_message }
         end
-    else
+    elseif not is_repairer_request then
         local existing_count = 0
         for _, state in pairs(workers) do
             if state.training_id == training_id and valid_entity(state.unit) then
@@ -536,6 +553,11 @@ local function train_worker(payload)
             city_state.team,
             training_id
         )
+    elseif is_repairer then
+        training_progress = repairer_training:record_success(
+            city_state.team,
+            training_id
+        )
     end
     notify(city_state.player_id, tostring(training.name) .. "训练完成")
     local changed = {
@@ -593,12 +615,16 @@ function M.init()
     tree_lumber_efficiency_buff = 0
     population_training_counts = {}
     lumberjack_training:reset()
-    event_bus.subscribe(events.WORKER_TRAIN_REQUEST, train_worker)
+    repairer_training:reset()
+    event_bus.handle_request(events.WORKER_TRAIN_REQUEST, train_worker)
     event_bus.handle_request(
         events.WORKER_TRAINING_GET_REQUEST,
         function(payload)
             if payload and payload.training_type == "population_upgrade" then
                 return population_training_state(payload.team)
+            end
+            if payload and payload.training_type == "repairer" then
+                return repairer_training:get(payload.team)
             end
             return lumberjack_training_state(payload.team)
         end

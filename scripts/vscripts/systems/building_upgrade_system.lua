@@ -750,7 +750,7 @@ local function on_upgrade_request(payload)
     if not valid_entity(unit) then
         print("[BuildingUpgrade] invalid building entity")
         payload.result = { ok = false, error = "升级建筑不存在" }
-        return
+        return payload.result
     end
     local state = recover_state(unit)
     if not state then
@@ -765,16 +765,15 @@ local function on_upgrade_request(payload)
             })
         end
         payload.result = { ok = false, error = "建筑升级状态尚未初始化" }
-        return
+        return payload.result
     end
 
     if upgrade_process.is_active(unit) then
-        if payload.source_ability then payload.source_ability:EndCooldown() end
         if not payload.silent_notification then
             notify(state, "建筑正在升级中", "error")
         end
         payload.result = { ok = false, error = "建筑正在升级中" }
-        return
+        return payload.result
     end
 
     local result
@@ -785,40 +784,37 @@ local function on_upgrade_request(payload)
     elseif state.building_id == "arrow_tower" then result = upgrade_tower(state, payload.upgrade_mode or "one")
     else result = { ok = false, error = "该建筑不能升级" } end
 
-    if not result or not result.ok then
-        if payload.source_ability then payload.source_ability:EndCooldown() end
-    end
     if not payload.silent_notification then
         notify(state, result and result.ok and "开始升级" or (result and result.error or "升级失败"),
             result and result.ok and "info" or "error")
     end
     payload.result = result or { ok = false, error = "升级失败" }
+    return payload.result
 end
 
 local function on_class_request(payload)
     local unit = payload.tower
     if not valid_entity(unit) then
         payload.result = { ok = false, error = "防御塔不存在" }
-        return
+        return payload.result
     end
     local state = recover_state(unit)
     local function reject(message)
-        if payload.source_ability then payload.source_ability:EndCooldown() end
         if state then notify(state, message, "error") end
         payload.result = { ok = false, error = message }
+        return payload.result
     end
     if not state or state.building_id ~= "arrow_tower" then
-        reject("防御塔升级状态不存在")
-        return
+        return reject("防御塔升级状态不存在")
     end
-    if upgrade_process.is_active(unit) then reject("建筑正在升级中"); return end
-    if state.level < 5 then reject("防御塔未达到5级"); return end
-    if state.tower_class then reject("防御塔已经完成转职"); return end
+    if upgrade_process.is_active(unit) then return reject("建筑正在升级中") end
+    if state.level < 5 then return reject("防御塔未达到5级") end
+    if state.tower_class then return reject("防御塔已经完成转职") end
 
     local class_data = state.definition.class_options[payload.class_index]
-    if not class_data then reject("无效的转职方向"); return end
+    if not class_data then return reject("无效的转职方向") end
     local row = tower_routes.get(class_data.id, 1)
-    if not row then reject("路线配置缺失"); return end
+    if not row then return reject("路线配置缺失") end
     local cost = tower_routes.class_change_cost(row, state)
     local result = spend(
         state,
@@ -826,8 +822,7 @@ local function on_class_request(payload)
         "tower_class_change"
     )
     if not result or not result.ok then
-        reject(result and result.error or "资源不足")
-        return
+        return reject(result and result.error or "资源不足")
     end
     local previous_population = tonumber(state.population_occupied)
         or tower_routes.population_occupied(tower_routes.current(state))
@@ -868,6 +863,7 @@ local function on_class_request(payload)
         payload.result = pending
         notify(state, "开始转职")
     end
+    return payload.result
 end
 
 local function on_created(payload)
@@ -933,8 +929,8 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CREATED, on_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
-    event_bus.subscribe(events.BUILDING_UPGRADE_REQUEST, on_upgrade_request)
-    event_bus.subscribe(events.TOWER_CLASS_REQUEST, on_class_request)
+    event_bus.handle_request(events.BUILDING_UPGRADE_REQUEST, on_upgrade_request)
+    event_bus.handle_request(events.TOWER_CLASS_REQUEST, on_class_request)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
 end
 

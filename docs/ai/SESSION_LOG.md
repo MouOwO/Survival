@@ -1,3 +1,10 @@
+## 2026-08-09 - 训练、建造与升级同步结果事务
+
+- 将工人训练、建筑提交、普通/箭塔升级和箭塔转职由`emit/subscribe`改为`request/handle_request`。handler统一返回结构化结果；升级链继续写`payload.result`兼容旧载荷，批量升级优先消费request返回值。原生Ability同步失败回滚冷却，Panorama直接请求仅成功受理后启动冷却。
+- 泛化`worker_training_progress`为prefix tracker，修理工与伐木工按team独立。修理工按权威CSV的5次LV1、2次LV2推进，最终完成态保留并在扣费前拒绝；单位创建失败退款且不推进。伐木工最终`max_count=-1`无限语义保持。
+- 排队建造保存`source_ability`，新增`action_cooldown_rollback.once()`按task幂等处理移动/位置/创建/施工失败，避免竞争路径重复`EndCooldown()`。实体创建后的施工失败退木材、金币和人口，成功完成后清理事务上下文。
+- 自动验证通过：四项Lua 5.1行为/数学测试、两项PowerShell契约、目标Lua 5.1语法、训练CSV/生成字段比对、严格UTF-8、配置CheckOnly及限定diff。修正本机工具链JSON中的工作区、Python、Lua/Luac绝对路径。未修改权威CSV或生成Lua；尚需Workshop Tools冷启动实测失败冷却、退款与修理工5+2进度，不能称为实机验收。
+
 ## 2026-08-08 - 多选金矿Q/W/E与自动升级批量协调
 
 - 新增独立`gold_mine_batch_upgrade_service.lua`并由`ui_request_router`接管五个金矿无目标技能。沿用Panorama现有最多64个去重候选，不修改客户端协议；服务端逐矿重验存活、owner、金矿身份、Ability、升级状态和可施放性。

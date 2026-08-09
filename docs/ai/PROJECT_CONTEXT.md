@@ -1,5 +1,12 @@
 # Project Context
 
+## 同步动作结果与异步冷却事务（2026-08-09）
+
+- 会直接决定Ability冷却是否保留的训练、建造受理、建筑升级和箭塔转职必须使用`event_bus.request/handle_request`返回结构化`{ ok = ... }`，不能依赖同栈`emit/subscribe`后观察载荷副作用。迁移期handler可继续写`payload.result`兼容旧调用者，但新调用者优先使用request返回值。
+- 原生Dota Ability进入`OnSpellStart()`时引擎已处理冷却，因此同步拒绝、handler缺失或handler异常无结果时由Ability调用`EndCooldown()`；Panorama直接权威提交没有引擎施法流程，只能在同步受理成功后显式`StartCooldown()`。批量升级逐栋正式受理成功后才启动对应Ability冷却。
+- 排队建造的同步成功只代表移动任务已受理，不代表建筑已创建。异步阶段必须把`source_ability`绑定到具有唯一生命周期的build task，并用幂等settled标记保证Builder死亡、位置失效、实体创建失败或施工失败等竞争路径至多回滚一次冷却。已扣费后的失败必须同时一次性退还木材、金币和人口；成功完成后清除退款与冷却上下文。
+- 有限工人训练阶段按成功创建历史推进，不按当前活体数量判断。不同训练prefix和team必须拥有独立tracker；只有单位实体成功创建后记录进度。最终有限阶段达到CSV上限后保留当前tier完成快照并拒绝继续训练；`max_count=-1`表示无限阶段，永远不进入完成态。
+
 ## 开发跳波资源加载边界（2026-08-08）
 
 - 正常波次依靠倒计时和上一波开始时的`queue_wave_assets()`获得下一波预载提前量；`monster<N>`/`monster <N>`属于随机跳波开发路径，不能假设此前波次已经加载目标模型。

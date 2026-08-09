@@ -401,7 +401,7 @@ local function register_commit_request()
                 })
                 return
             end
-            local caster, _, ability_error = resolve_profile_caster(
+            local caster, ability, ability_error = resolve_profile_caster(
                 player_id,
                 payload,
                 profile,
@@ -430,16 +430,21 @@ local function register_commit_request()
                 })
                 return
             end
-            event_bus.emit(events.BUILD_REQUEST, {
+            local result = event_bus.request(events.BUILD_REQUEST, {
                 caster = caster,
                 player_id = player_id,
                 building_id = profile.building_id,
                 position = check.grid.world_position,
+                source_ability = ability,
             })
+            if result and result.ok then
+                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+            end
             close_preview_session(player_id, session_id)
             send(player_id, "ui_grid_placement_commit_result", {
-                success = 1,
-                error = "",
+                success = result and result.ok and 1 or 0,
+                error = result and result.ok and ""
+                    or (result and result.error or "build_request_failed"),
                 building_id = profile.building_id,
             })
         end

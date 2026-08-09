@@ -7,10 +7,12 @@ function M:GetManaCost() return 0 end
 function M:OnSpellStart()
     print("[MainCityAbility] repairer cast entindex="
         .. tostring(self:GetCaster():entindex()))
-    event_bus.emit(events.WORKER_TRAIN_REQUEST, {
+    local result = event_bus.request(events.WORKER_TRAIN_REQUEST, {
         city = self:GetCaster(),
-        training_id = "train_repairer_01",
+        training_id = "train_repairer_auto",
+        source_ability = self,
     })
+    if not result or not result.ok then self:EndCooldown() end
 end
 
 _G.ability_train_repairer = M
