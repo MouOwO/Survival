@@ -9,7 +9,7 @@ train_lumberjack_05,unit,building_main_city,unit_lumberjack_05,农民LV5,5,5000,10
 train_lumberjack_06,unit,building_main_city,unit_lumberjack_06,农民LV6,6,12000,1000,3,0,20,2002,3,0,0,基地LV3,1,建筑/行17,,,models/creeps/lane_creeps/creep_bird_dire/creep_bird_dire_melee_mega.vmdl,,,0.67,,,,400
 train_lumberjack_07,unit,building_main_city,unit_lumberjack_07,农民LV7,7,30000,3000,3,0,40,4002,3,0,0,基地LV4,1,建筑/行18,,,models/creeps/lane_creeps/nemestice_crystal_creeps/creep_bad_melee/creep_crystal_bad_melee.vmdl,,,0.67,,,,400
 train_lumberjack_08,unit,building_main_city,unit_lumberjack_08,农民LV8,8,50000,5000,3,0,80,8002,-1,0,0,基地LV4,1,建筑/行19,,,models/creeps/mega_greevil/mega_greevil.vmdl,,,0.67,,,,400
-train_repairer_01,unit,building_main_city,unit_repairer_01,修理工1,1,100,0,1,0,0,0,5,0,0,基地LV1,1,建筑/行20,,npc_survival_repairer,models/creeps/neutral_creeps/n_creep_eimermole/n_creep_eimermole.vmdl,1000,2,1,300,2,600,400
+train_repairer_01,unit,building_main_city,unit_repairer_01,修理工1,1,100,0,1,0,0,0,5,0,0,基地LV1,1,建筑/行20,,npc_survival_repairer,models/creeps/neutral_creeps/n_creep_eimermole/n_creep_eimermole.vmdl,1000,2,1,300,1.4,600,400
 train_repairer_02,unit,building_main_city,unit_repairer_02,修理工2,2,0,1000,1,0,0,0,2,0,0,基地LV1,1,建筑/行21,,npc_survival_repairer,models/creeps/neutral_creeps/n_creep_eimermole/n_creep_eimermole_lamp.vmdl,2000,5,1,320,2,600,400
 train_population_01,population_upgrade,building_farm,,人口训练1,1,200,0,0,1,0,0,5,50,0,农场LV1,1,建筑/行34,,,,,,,,,,
 train_population_02,population_upgrade,building_farm,,人口训练2,2,1000,0,0,2,0,0,5,250,0,农场LV1,1,建筑/行35,,,,,,,,,,
