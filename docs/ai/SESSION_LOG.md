@@ -1,3 +1,11 @@
+## 2026-08-09 - 怪物尸体、日志与本地化性能优化
+
+- 只读审计确认波次、挑战、奖励、掉落、成长和死亡连锁均同步消费`ENGINE_ENTITY_KILLED`；波次与练功怪AI为0.5秒Think且无持续日志。新增统一尸体服务，明确标记波次、挑战/转生和`addmonster`怪，事件结算后按CSV执行0.6秒保留、0.8秒/160码共享下沉、隐藏与实体删除；强制波次清场保持立即删除，其他单位类型不按队伍猜测。
+- `global_rules.csv`新增5项尸体时序和`runtime_detailed_diagnostics=0`。防御塔15个成功效果日志改为开关关闭时不格式化，英雄攻击START/LANDED限次诊断默认关闭；错误、施法、DamageFilter限次诊断及低频内存聚合保留。
+- Panorama四个本地化入口新增每context最多256项的token缓存，缺失结果也缓存；`ability_tooltip.js`的SHOW/OWNER/SCOPE/LAYER/HITBOX/CURSOR/OUT/SESSION/HOVER/GEOMETRY/MAP/PROXY/BIND/RECOVERY及背包恢复日志重新受`SurvivalTooltipDetailedDiagnostics === true`保护。4份JS强制编译均为`1 compiled, 0 failed, 0 skipped`。
+- 自动验证通过：尸体Lua 5.1行为、尸体/性能PowerShell契约、CSV与生成`global_rules.lua`逐字节一致、全项目356个Lua文件Lua 5.1语法、18个目标文件严格UTF-8；`SESSION_LOG.md`历史3个替换字符数量保持不变且本轮新增段为0、配置CheckOnly和game/content限定diff。历史文档中的塔技能Lua测试文件当前不存在，枚举为0，未报告为回归通过。尚需Workshop Tools批量死亡、奖励链、实体数量、localization控制台和前后帧时间实测。
+- 工作区保护：任务开始前game仓库已有4个未跟踪同步事务测试，完整保留；content仓库已有`template_map.tga`修改和`AssetBrowserSavedSearches.kv3`，未触碰。探测生成器时因其不支持`--help`而执行了一次全量生成，但最终无额外tracked配置差异；生成的Python缓存曾被清理，发现其中4个为tracked后已从`HEAD`原始blob逐字节恢复，最终无缓存差异。
+
 ## 2026-08-09 - 训练、建造与升级同步结果事务
 
 - 将工人训练、建筑提交、普通/箭塔升级和箭塔转职由`emit/subscribe`改为`request/handle_request`。handler统一返回结构化结果；升级链继续写`payload.result`兼容旧载荷，批量升级优先消费request返回值。原生Ability同步失败回滚冷却，Panorama直接请求仅成功受理后启动冷却。

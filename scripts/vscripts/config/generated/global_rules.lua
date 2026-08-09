@@ -19,6 +19,12 @@ M.rows = {
     { rule_id = "hero_meta_max_health_multiplier", value = 1, description = "全体英雄局外最大生命倍率", enabled = true },
     { rule_id = "hero_meta_max_mana_multiplier", value = 1, description = "全体英雄局外最大魔法倍率", enabled = true },
     { rule_id = "hero_meta_move_speed_bonus", value = 0, description = "全体英雄局外移动速度加成", enabled = true },
+    { rule_id = "monster_corpse_hold_seconds", value = 0.6, description = "怪物死亡后在原地保留死亡表现的秒数", enabled = true },
+    { rule_id = "monster_corpse_sink_seconds", value = 0.8, description = "怪物尸体平滑下沉所需秒数", enabled = true },
+    { rule_id = "monster_corpse_sink_depth", value = 160, description = "怪物尸体下沉的垂直距离", enabled = true },
+    { rule_id = "monster_corpse_update_interval", value = 0.05, description = "全部怪物尸体共享更新任务的间隔秒数", enabled = true },
+    { rule_id = "monster_corpse_remove_delay_seconds", value = 0.05, description = "尸体隐藏后安全移除实体的延迟秒数", enabled = true },
+    { rule_id = "runtime_detailed_diagnostics", value = 0, description = "运行时攻击与技能成功路径详细日志开关（0关闭1开启）", enabled = true },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

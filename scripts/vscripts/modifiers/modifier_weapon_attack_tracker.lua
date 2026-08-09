@@ -1,5 +1,10 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local global_rules = require("config/generated/global_rules")
+
+local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
+    and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
+    and tonumber(global_rules.by_id.runtime_detailed_diagnostics.value) == 1
 
 local attack_sequence = 0
 local secondary_records = {}
@@ -49,7 +54,7 @@ local function diagnostic_hero(attacker)
 end
 
 local function should_diagnose(modifier)
-    if not diagnostic_hero(modifier:GetParent()) then return false end
+    if not detailed_diagnostics or not diagnostic_hero(modifier:GetParent()) then return false end
     modifier.diagnostic_count = tonumber(modifier.diagnostic_count) or 0
     if modifier.diagnostic_count >= 20 then return false end
     modifier.diagnostic_count = modifier.diagnostic_count + 1
@@ -57,7 +62,7 @@ local function should_diagnose(modifier)
 end
 
 local function should_diagnose_landed(modifier)
-    if not diagnostic_hero(modifier:GetParent()) then return false end
+    if not detailed_diagnostics or not diagnostic_hero(modifier:GetParent()) then return false end
     modifier.diagnostic_landed_count =
         tonumber(modifier.diagnostic_landed_count) or 0
     if modifier.diagnostic_landed_count >= 20 then return false end

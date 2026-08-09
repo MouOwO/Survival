@@ -1,4 +1,7 @@
 local event_bus = require("core/event_bus")
+local monster_corpse_lifecycle_service = require(
+    "systems/monster_corpse_lifecycle_service"
+)
 local events = require("core/events")
 local logger = require("core/logger")
 local weapon_cheats = require("debug/weapon_cheat_handlers")
@@ -332,6 +335,7 @@ local function add_monster(context)
     )
     if not unit or unit:IsNull() then return false, "unit_create_failed" end
     FindClearSpaceForUnit(unit, ADD_MONSTER_POSITION, true)
+    monster_corpse_lifecycle_service.track(unit, "debug")
     unit:SetBaseMaxHealth(health)
     unit:SetMaxHealth(health)
     unit:SetHealth(health)

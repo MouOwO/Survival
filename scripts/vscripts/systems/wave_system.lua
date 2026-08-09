@@ -15,6 +15,9 @@ local asset_catalog = require("config/asset_catalog")
 local monster_visual_config = require("config/monster_visual_config")
 local monster_visual_service = require("systems/monster_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
+local monster_corpse_lifecycle_service = require(
+    "systems/monster_corpse_lifecycle_service"
+)
 
 local M = {}
 local state = {}
@@ -286,6 +289,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
         return
     end
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
+    monster_corpse_lifecycle_service.track(unit, "wave")
     apply_stats(unit, row, definition)
     local resolved_visual = monster_visual_config.resolve(
         wave_number,

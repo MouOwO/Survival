@@ -774,6 +774,7 @@ local function initialize_services()
     wave_system.init()
     shop_system.init()
     cheat_command_service.init()
+    require("systems/monster_corpse_lifecycle_service").init()
 end
 
 function M.activate()

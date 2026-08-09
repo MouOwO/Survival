@@ -1,5 +1,12 @@
 # Project Context
 
+## 怪物尸体、详细日志与本地化性能边界（2026-08-09）
+
+- 可安全删除的怪物必须由明确生成入口标记，不能按敌方队伍或通用单位名猜测。死亡业务继续以同步`ENGINE_ENTITY_KILLED`完成波次计数、奖励、掉落、成长和连锁技能；尸体视觉与实体删除只能在该事件栈退出后的scheduler阶段开始。强制清场可显式设置`survival_wave_cleanup`并立即删除，不进入死亡动画。
+- 尸体时序来自`global_rules.csv`：当前原地保留0.6秒、0.8秒内下沉160码、共享0.05秒更新，隐藏后0.05秒安全移除。所有活动尸体共享一个scheduler任务，不为每只尸体创建永久Think；状态以单位对象为生命周期身份并在移除后释放，禁止跨生命周期永久保存entindex。
+- 高频攻击、伤害和短间隔技能路径不得默认格式化并输出成功明细。`runtime_detailed_diagnostics=0`时详细日志包装器必须在`string.format()`之前返回；错误、有限次诊断、用户操作结果和低频聚合仍保留。排障时从CSV显式开启并冷启动，不在生产路径临时散落无界`print`。
+- Panorama动态本地化必须在当前HUD context内使用固定上限缓存；当前四个helper最多保存256个token字符串结果，缺失token缓存为空，避免高频刷新持续请求同一无效token。Tooltip逐次SHOW、定位、映射、游标、恢复等详细日志默认关闭，仅在`SurvivalTooltipDetailedDiagnostics === true`时输出；错误、施法诊断和低频内存聚合不受影响。
+
 ## 同步动作结果与异步冷却事务（2026-08-09）
 
 - 会直接决定Ability冷却是否保留的训练、建造受理、建筑升级和箭塔转职必须使用`event_bus.request/handle_request`返回结构化`{ ok = ... }`，不能依赖同栈`emit/subscribe`后观察载荷副作用。迁移期handler可继续写`payload.result`兼容旧调用者，但新调用者优先使用request返回值。

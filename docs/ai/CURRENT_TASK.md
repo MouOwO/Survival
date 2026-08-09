@@ -1,5 +1,14 @@
 # Current Task
 
+## 当前插入任务（2026-08-09）：怪物尸体生命周期优化
+
+- 用户需求：怪物死亡完成业务结算后，不再让大量尸体长期留在地表；采用短暂保留、平滑下沉、`AddNoDraw()`隐藏并安全移除实体的方式，降低高密度波次中的模型、阴影和实体管理开销。
+- 实现边界：先审计CSV权威配置、引擎死亡事件、波次/挑战奖励与计数调用链；仅清理明确属于项目怪物的死亡实体，不影响英雄、工人、建筑、召唤物、掉落物或死亡结算。下沉/清理时序必须数据驱动，任务可取消且按单位生命周期去重。
+- 生产实现：新增`monster_corpse_lifecycle_service`。波次怪、挑战/转生怪和`addmonster`调试怪以显式单位身份加入清理链；`ENGINE_ENTITY_KILLED`同步业务结算完成后，尸体按CSV保留0.6秒、由单个共享0.05秒任务在0.8秒内下沉160码，随后`AddNoDraw()`并延迟0.05秒`UTIL_Remove()`。强制波次清场继续立即删除，英雄、工人、建筑、召唤物、训练目标和掉落物不受影响；状态以单位对象为生命周期身份，不永久保存可复用entindex。
+- 日志与本地化：`global_rules.csv.runtime_detailed_diagnostics=0`默认关闭防御塔成功效果明细及两类英雄攻击追踪日志，塔日志在开关关闭时连`string.format()`也不执行；错误、施法请求、DamageFilter限次诊断和低频内存聚合保留。四个Panorama本地化helper按HUD context缓存最多256个token，缺失token同样缓存为空，避免持续重复请求；Tooltip SHOW/RECOVERY等详细日志及背包恢复日志仅在`SurvivalTooltipDetailedDiagnostics === true`时输出。
+- 自动验证：`MONSTER_CORPSE_LIFECYCLE_LUA51_PASS`、`MONSTER_CORPSE_LIFECYCLE_CONTRACT_PASS`、`PERFORMANCE_LOG_LOCALIZATION_CONTRACT_PASS`、`GLOBAL_RULES_GENERATED_MATCH_PASS`、全项目356个Lua文件的Lua 5.1语法检查、18个目标文件严格UTF-8；`SESSION_LOG.md`历史3个替换字符数量保持不变且本轮新增段为0、配置`CheckOnly`及game/content限定`diff --check`通过。4份Panorama JS分别强制编译为`1 compiled, 0 failed, 0 skipped`。当前工作区没有文档历史提到的塔技能Lua测试文件，相关测试枚举为0，未将其误报为回归通过。
+- 尚需Workshop Tools冷启动实测：批量击杀波次怪、挑战怪和`addmonster`，确认约0.6秒后开始下沉、约1.45秒后实体消失且奖励/掉落/击杀成长/波次计数不回归；确认英雄、工人、建筑和掉落物不会被清理；反复悬停技能并观察控制台不再持续输出Tooltip详细日志或localization错误；对比相同刷怪场景的尸体数量、控制台行数、服务器帧时间与客户端帧率。未经实机结果不能称为性能改善已验收。
+
 ## 当前插入任务（2026-08-09）：训练、建造与升级同步结果事务
 
 - 需求：工人训练、建筑提交、普通/批量升级必须同步返回结构化结果；请求缺失或失败时不得保留Ability冷却。排队建造后发生的异步失败必须恰好回滚一次冷却，并在已扣费时完整退还资源/人口。修理工不能继续按同`training_id`活体数量永久卡在第一阶段，必须按权威CSV顺序推进；最终阶段完成后保留完成态并拒绝继续训练，伐木工最终无限阶段保持不变。

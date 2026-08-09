@@ -15,6 +15,17 @@ local events = require("core/events")
 local buff_manager = require("systems/buff_manager")
 local asset_catalog = require("config/asset_catalog")
 local sound_service = require("core/sound_service")
+local global_rules = require("config/generated/global_rules")
+
+local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
+    and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
+    and tonumber(global_rules.by_id.runtime_detailed_diagnostics.value) == 1
+
+local function detailed_log(format_string, ...)
+    if detailed_diagnostics then
+        print(string.format(format_string, ...))
+    end
+end
 
 local MULTI_DAMAGE_MULTIPLIER = 1.00
 local LIGHTNING_BOUNCE_RADIUS = 200
@@ -201,10 +212,10 @@ local function trigger_gatling_buff(tower, skill, reason)
         ))
         play_tower_sound("tower_explosive_gatling", tower, tower)
     end
-    print(string.format(
+    detailed_log(
         "[TowerMachineGun] GATLING_BUFF tower=%d reason=%s bonus_pct=%.0f duration=%.1f",
         tower:entindex(), tostring(reason), bonus_pct, duration
-    ))
+    )
 end
 
 function modifier_tower_attack_effects:GetModifierAttackPointConstant()
@@ -251,10 +262,10 @@ function modifier_tower_attack_effects:OnDeath(params)
     if modifier then
         play_tower_sound("tower_arcane_cannon", tower, tower)
     end
-    print(string.format(
+    detailed_log(
         "[TowerMystery] KILL_BUFF tower=%d stacks=%d duration=%.1f",
         tower:entindex(), modifier and modifier:GetStackCount() or 0, duration
-    ))
+    )
 end
 
 function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
@@ -420,11 +431,11 @@ local function trigger_frost_attack(caster, primary, skill, damage)
             hit_count = hit_count + 1
         end
     end
-    print(string.format(
+    detailed_log(
         "[TowerFrost] HIT tower=%d target=%d radius=%.0f damage=%.1f targets=%d slow=%d duration=%.1f",
         caster:entindex(), primary:entindex(), radius, damage, hit_count,
         FROST_SLOW_PCT, duration
-    ))
+    )
 end
 
 local function blizzard_particle(caster, position, radius, particle_name)
@@ -483,10 +494,10 @@ local function start_blizzard(caster, position, skill)
     )
     play_tower_sound("tower_ice_blizzard", caster, caster, position)
     local tick = 0
-    print(string.format(
+    detailed_log(
         "[TowerBlizzard] START tower=%d instance=%s radius=%.0f duration=%.1f interval=%.1f damage=%.1f",
         caster:entindex(), instance_id, radius, duration, interval, damage
-    ))
+    )
     scheduler.every(interval, function()
         tick = tick + 1
         if not valid(caster) then
@@ -509,10 +520,10 @@ local function start_blizzard(caster, position, skill)
                 hit_count = hit_count + 1
             end
         end
-        print(string.format(
+        detailed_log(
             "[TowerBlizzard] TICK tower=%d instance=%s tick=%d targets=%d",
             caster:entindex(), instance_id, tick, hit_count
-        ))
+        )
         if tick >= tick_limit then
             ParticleManager:DestroyParticle(snow, false)
             ParticleManager:ReleaseParticleIndex(snow)
@@ -588,10 +599,10 @@ local function strike_lightning_storm(caster, position, radius, damage,
             hit_count = hit_count + 1
         end
     end
-    print(string.format(
+    detailed_log(
         "[TowerLightningStorm] STRIKE tower=%d instance=%s tick=%d radius=%.0f damage=%.1f targets=%d",
         caster:entindex(), instance_id, tick, radius, damage, hit_count
-    ))
+    )
     return true
 end
 
@@ -626,11 +637,11 @@ start_lightning_storm = function(caster, position, skill)
         caster, position, radius, duration, cloud_particle_name
     )
     play_tower_sound("tower_lightning_storm", caster, caster, position)
-    print(string.format(
+    detailed_log(
         "[TowerLightningStorm] START tower=%d instance=%s radius=%.0f duration=%.1f interval=%.1f multiplier=%.2f damage=%.1f",
         caster:entindex(), instance_id, radius, duration, interval,
         multiplier, damage
-    ))
+    )
     local tick = 0
     local task_id
     task_id = scheduler.every(interval, function()
@@ -641,11 +652,11 @@ start_lightning_storm = function(caster, position, skill)
             ) or tick >= tick_limit then
             ParticleManager:DestroyParticle(cloud, false)
             ParticleManager:ReleaseParticleIndex(cloud)
-            print(string.format(
+            detailed_log(
                 "[TowerLightningStorm] END tower=%s instance=%s ticks=%d",
                 valid(caster) and tostring(caster:entindex()) or "invalid",
                 instance_id, tick
-            ))
+            )
             return false
         end
         return interval
@@ -668,11 +679,11 @@ local function split_arrow(caster, target, damage, projectile_name)
     })
     scheduler.after(distance / SPLIT_ARROW_SPEED, function()
         if valid(caster) and valid(target) then
-            print(string.format(
+            detailed_log(
                 "[TowerMulti] HIT tower=%d target=%d raw_attack=%.1f multiplier=%.2f",
                 caster:entindex(), target:entindex(), damage,
                 MULTI_DAMAGE_MULTIPLIER
-            ))
+            )
             deal(caster, target, damage, "splash", { "tower_multi_arrow" })
         end
     end)
@@ -708,11 +719,11 @@ local function continue_lightning_chain(caster, source_unit, source_position,
         if not valid(caster) then return end
         local next_target = nearest_unhit_enemy(caster, source_position, hit)
         if not next_target then
-            print(string.format(
+            detailed_log(
                 "[TowerLightning] END tower=%d from=%s hit=%d/%d reason=no_target_in_%d",
                 caster:entindex(), tostring(source_entindex), hit_count,
                 max_targets, LIGHTNING_BOUNCE_RADIUS
-            ))
+            )
             return
         end
         local next_count = hit_count + 1
@@ -723,11 +734,11 @@ local function continue_lightning_chain(caster, source_unit, source_position,
             caster, source_unit, next_target,
             source_position, next_position, particle_name
         )
-        print(string.format(
+        detailed_log(
             "[TowerLightning] BOUNCE tower=%d from=%d target=%d hit=%d/%d multiplier=%.2f",
             caster:entindex(), source_entindex, next_target:entindex(),
             next_count, max_targets, multiplier
-        ))
+        )
         deal(caster, next_target, base_damage * multiplier, "ability", {
             "tower_chain_lightning", "bounce_" .. tostring(next_count),
         })
@@ -861,11 +872,11 @@ function modifier_tower_attack_effects:OnIntervalThink()
     )
     local base_damage = caster:GetAverageTrueAttackDamage(caster)
     local amount = base_damage * multiplier
-    print(string.format(
+    detailed_log(
         "[TowerMystery] LASER tower=%d target=%d tick=%d multiplier=%.2f raw_damage=%.1f buff_stacks=%d",
         caster:entindex(), target:entindex(), (self.laser_ticks or 0) + 1,
         multiplier, amount, 0
-    ))
+    )
     deal(caster, target, amount)
     self.laser_ticks = (self.laser_ticks or 0) + 1
 end
@@ -932,10 +943,10 @@ function modifier_tower_attack_effects:OnAttack(params)
     if count > 1 then
         play_tower_sound("tower_multi_attack", caster, caster)
     end
-    print(string.format(
+    detailed_log(
         "[TowerMulti] FIRE tower=%d primary=%d targets=%d max_targets=%d",
         caster:entindex(), primary:entindex(), count, max_targets
-    ))
+    )
 end
 
 function modifier_tower_attack_effects:OnAttackLanded(params)
@@ -1000,10 +1011,10 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
                     "tower_bounty_machine_gun", caster, primary
                 )
             end
-            print(string.format(
+            detailed_log(
                 "[TowerMachineGun] BOUNTY tower=%d target=%d gold=%.0f",
                 caster:entindex(), primary:entindex(), gold
-            ))
+            )
         end
     end
 
@@ -1054,11 +1065,11 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
             can_trigger_diffusion = true,
             hit_count = 1,
         })
-        print(string.format(
+        detailed_log(
             "[TowerLightning] START tower=%d target=%d hit=1/%d multiplier=1.00 particle=%s",
             caster:entindex(), primary:entindex(), max_targets,
             tostring(particle_name)
-        ))
+        )
         continue_lightning_chain(
             caster, primary, primary_position, primary:entindex(), damage,
             1, max_targets, hit, particle_name
