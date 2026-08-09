@@ -10,6 +10,7 @@ local wave_system = require("systems/wave_system")
 local research_test = require("debug/research_technology_test")
 local dev_asset_preload = require("debug/dev_asset_preload")
 local health_cheat = require("debug/health_cheat")
+local armor_engine_diagnostic = require("debug/armor_engine_diagnostic")
 local building_system = require("systems/building_system")
 
 local M = {}
@@ -379,6 +380,23 @@ local function add_monster(context)
         unit:entindex(), health, armor, tostring(can_attack), attack,
         can_attack and ADD_MONSTER_MOVE_SPEED or 0,
         unit:GetAbsOrigin().x, unit:GetAbsOrigin().y, unit:GetAbsOrigin().z
+    ))
+    return true
+end
+
+local function run_armor_engine_diagnostic(context)
+    if not wave_system.is_dev_mode() then
+        return false, "dev_mode_required: run dev first"
+    end
+    local ok, result_or_error = armor_engine_diagnostic.run({
+        player_id = context.player_id,
+        origin = ADD_MONSTER_POSITION,
+    })
+    if not ok then return false, result_or_error end
+    notify(context, string.format(
+        "护甲引擎诊断已启动：%d 个护甲档位，%d 个伤害样本；请查看控制台 ARMOR_ENGINE_DIAGNOSTIC",
+        result_or_error.armor_count,
+        result_or_error.case_count
     ))
     return true
 end
@@ -755,6 +773,7 @@ local COMMANDS = {
     addarmor = add_armor,
     blood = change_hero_health,
     addmonster = add_monster,
+    armortest = run_armor_engine_diagnostic,
     addtechnology = add_technology,
     research_test = run_research_test,
     monster = spawn_wave,
@@ -836,7 +855,7 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: addhero, addskill, unlock e, blood, research_test, addtechnology, monster, items, hero, skill, weapon growth"
+        "ready: addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, items, hero, skill, weapon growth"
     )
 end
 

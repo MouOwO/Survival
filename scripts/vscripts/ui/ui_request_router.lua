@@ -113,6 +113,8 @@ local function unit_combat_snapshot(unit)
         runtime_armor = safe_number(unit, "GetPhysicalArmorValue", nil, false)
             or tonumber(unit.survival_armor)
             or safe_number(unit, "GetPhysicalArmorBaseValue", 0),
+        armor_mapping_version = tonumber(unit.survival_armor_mapping_version)
+            or 1,
         -- attack_speed 表示当前每秒攻击次数，不是 BAT，也不是 Dota
         -- 百分比攻速；非英雄单位必须包含光环等临时 Modifier。
         attack_speed = effective_attack_speed(unit),
@@ -277,7 +279,16 @@ local function on_unit_combat_stats_changed(payload)
                     unit, "GetPhysicalArmorValue", 0, false
                 )
                 snapshot.runtime_armor = runtime_armor
-                snapshot.armor = armor_balance.to_war3(runtime_armor)
+                local mapping_version = tonumber(
+                    unit.survival_armor_mapping_version
+                ) or tonumber(snapshot.armor_mapping_version) or 1
+                local display_armor = armor_balance.to_war3_for_mapping(
+                    runtime_armor,
+                    mapping_version
+                )
+                snapshot.armor = display_armor ~= nil
+                    and display_armor or runtime_armor
+                snapshot.armor_mapping_version = mapping_version
                 snapshot.armor_unit = "war3_display"
                 snapshot.stat_units_version = 2
             end

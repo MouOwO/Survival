@@ -25,6 +25,10 @@ print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
 local buildings = {}
 local counts = {}
 local wall_ever_built = {}
+local COLLIDING_BUILDINGS = {
+    wall = true,
+    main_city = true,
+}
 local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
@@ -95,22 +99,32 @@ local function building_limit_reached(definition, existing_count)
     return maximum > 0 and (tonumber(existing_count) or 0) >= maximum
 end
 local function apply_hull_radius(unit, definition)
-    local radius = tonumber(definition and definition.hull_radius)
-    if not radius or radius <= 0 then return false end
     if not valid_entity(unit) or type(unit.SetHullRadius) ~= "function" then
         logger.warn("BuildingSystem", "unable to apply hull radius id="
             .. tostring(definition and definition.id)
-            .. " radius=" .. tostring(radius))
+            .. " collision=" .. tostring(COLLIDING_BUILDINGS[definition and definition.id] == true))
+        return false
+    end
+    local collides = COLLIDING_BUILDINGS[definition and definition.id] == true
+    local radius = collides and tonumber(definition and definition.hull_radius) or 0
+    if collides and (not radius or radius <= 0) then
+        logger.warn("BuildingSystem", "colliding building is missing hull radius id="
+            .. tostring(definition and definition.id))
         return false
     end
     local ok, error_message = pcall(unit.SetHullRadius, unit, radius)
     if not ok then
         logger.warn("BuildingSystem", "hull radius failed id="
-            .. tostring(definition.id) .. " radius=" .. tostring(radius)
+            .. tostring(definition and definition.id)
+            .. " radius=" .. tostring(radius)
             .. " error=" .. tostring(error_message))
         return false
     end
     unit.survival_hull_radius = radius
+    if not collides then
+        unit.survival_base_hull_radius = nil
+        unit.survival_hull_scale = nil
+    end
     return true
 end
 local function fixed_position(position)
@@ -976,6 +990,7 @@ end
 M._completion_level_data_for_test = completion_level_data
 M._apply_hull_radius_for_test = apply_hull_radius
 M._apply_initial_stats_for_test = apply_initial_stats
+M._colliding_buildings_for_test = COLLIDING_BUILDINGS
 M._public_state_for_test = public_state
 M._population_to_release_for_test = population_to_release
 M._recover_existing_for_test = recover_existing_buildings

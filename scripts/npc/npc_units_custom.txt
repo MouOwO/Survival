@@ -423,10 +423,10 @@
     "asset_proxy_wave_vis_spirit_bear_boss" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lone_druid/spirit_bear.vmdl" }
     "asset_proxy_monster_doom" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/doom/doom.vmdl" }
     "asset_proxy_monster_undying_golem" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/undying/undying_flesh_golem.vmdl" }
-    "asset_proxy_monster_underlord" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/abyssal_underlord/abyssal_underlord.vmdl" }
-    "asset_proxy_monster_vengefulspirit" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/vengefulspirit/vengefulspirit.vmdl" }
+    "asset_proxy_monster_underlord" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl" }
+    "asset_proxy_monster_vengefulspirit" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/vengeful/vengeful.vmdl" }
     "asset_proxy_monster_dragon_knight" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/dragon_knight/dragon_knight.vmdl" }
-    "asset_proxy_monster_tusk" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tusk/tusk.vmdl" }
+    "asset_proxy_monster_tusk" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tuskarr/tuskarr.vmdl" }
     "asset_proxy_monster_visage" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/visage/visage.vmdl" }
     "asset_proxy_monster_sniper" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/sniper/sniper.vmdl" "ProjectileModel" "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf" }
     "asset_proxy_monster_ogre_magi" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/ogre_magi/ogre_magi.vmdl" }

@@ -4,6 +4,7 @@ modifier_research_armor_reduction = class({})
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
+local armor_balance = require("config/armor_balance")
 local M = modifier_research_technology
 
 function M:IsHidden() return true end
@@ -118,6 +119,7 @@ function D:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
 function D:OnCreated(params)
     self.armor_reduction = 0
+    self.war3_armor_reduction = 0
     self:AddArmorReduction(
         params and params.armor_reduction_per_attack or 0,
         params and params.diagnostic_hit,
@@ -139,6 +141,50 @@ function D:AddArmorReduction(value, diagnostic_hit, phase)
     if increment <= 0 then return end
     local parent = self:GetParent()
     local armor_before = tonumber(parent:GetPhysicalArmorValue(false))
+    local modern_mapping = tonumber(parent.survival_armor_mapping_version)
+        == armor_balance.MODERN_MAPPING_VERSION
+    if modern_mapping and tonumber(parent.survival_war3_armor) ~= nil then
+        local minimum_war3 = tonumber(parent.survival_minimum_war3_armor)
+        local war3_increment = armor_balance.to_war3_linear(increment)
+        local current_reduction = math.max(0,
+            tonumber(self.war3_armor_reduction) or 0)
+        local target_reduction = current_reduction + war3_increment
+        if minimum_war3 ~= nil then
+            local maximum_reduction = math.max(0,
+                tonumber(parent.survival_war3_armor) - minimum_war3)
+            target_reduction = math.min(target_reduction, maximum_reduction)
+        end
+        self.war3_armor_reduction = target_reduction
+        parent.survival_war3_armor_reduction = target_reduction
+        parent.survival_effective_war3_armor =
+            armor_balance.effective_war3_armor(
+                parent.survival_war3_armor,
+                target_reduction,
+                minimum_war3
+            )
+        local base_runtime = armor_balance.from_war3_modern(
+            parent.survival_war3_armor
+        )
+        local effective_runtime = armor_balance.from_war3_modern(
+            parent.survival_effective_war3_armor
+        )
+        local runtime_reduction = math.max(0, base_runtime - effective_runtime)
+        -- StackCount remains hundredths of actual Dota armor so the replicated
+        -- modifier property has identical server/client semantics. The War3
+        -- accumulator is server-owned and only drives the nonlinear remap.
+        local target_stack = math.floor(runtime_reduction * 100 + 0.000001)
+        self.armor_reduction = runtime_reduction
+        if target_stack <= (tonumber(self:GetStackCount()) or 0) then return end
+        self:SetStackCount(target_stack)
+        publish_armor_changed(self, {
+            hit = tonumber(diagnostic_hit),
+            phase = phase or "unknown",
+            increment = war3_increment,
+            armor_before = armor_before,
+            stack = target_stack,
+        })
+        return
+    end
     local minimum = tonumber(parent.survival_minimum_armor)
     local applied_reduction = math.max(
         0,

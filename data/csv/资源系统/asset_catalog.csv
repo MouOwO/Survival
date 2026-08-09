@@ -12,10 +12,10 @@ monster_wraith_king,骷髅王怪模型,model_bundle,models/heroes/wraith_king/wr
 monster_sven,斯温怪模型,model_bundle,models/heroes/sven/sven.vmdl,,,,,,idle,1,,,initial_required,13,920,4,early_phase,npc_dota_hero_sven,monster_undying,1,第四波和大属性练功房使用。
 monster_doom,末日怪模型,model_bundle,models/heroes/doom/doom.vmdl,,,,,,idle,1,,,zombie_stream,1,800,5,streamed,asset_proxy_monster_doom,monster_undying,1,按首次波次进入后台加载队列。
 monster_undying_golem,血肉傀儡/二级修理工模型,model_bundle,models/heroes/undying/undying_flesh_golem.vmdl,,,,,,idle,1.5,,,initial_required,14,795,5,early_phase,asset_proxy_monster_undying_golem,monster_undying,1,二级修理工可在主城一级训练，因此属于启动工人包；第五波Boss复用。
-monster_underlord,孽主怪模型,model_bundle,models/heroes/abyssal_underlord/abyssal_underlord.vmdl,,,,,,idle,1,,,zombie_stream,3,790,11,streamed,asset_proxy_monster_underlord,monster_undying,1,按首次波次进入后台加载队列。
-monster_vengefulspirit,复仇之魂怪模型,model_bundle,models/heroes/vengefulspirit/vengefulspirit.vmdl,,,,,,idle,1,,,zombie_stream,4,785,11,streamed,asset_proxy_monster_vengefulspirit,monster_undying,1,按首次波次进入后台加载队列。
+monster_underlord,孽主怪模型,model_bundle,models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl,,,,,,idle,1,,,zombie_stream,3,790,11,streamed,asset_proxy_monster_underlord,monster_undying,1,按首次波次进入后台加载队列。
+monster_vengefulspirit,复仇之魂怪模型,model_bundle,models/heroes/vengeful/vengeful.vmdl,,,,,,idle,1,,,zombie_stream,4,785,11,streamed,asset_proxy_monster_vengefulspirit,monster_undying,1,按首次波次进入后台加载队列。
 monster_dragon_knight,龙骑士怪模型,model_bundle,models/heroes/dragon_knight/dragon_knight.vmdl,,,,,,idle,1,,,zombie_stream,5,780,12,streamed,asset_proxy_monster_dragon_knight,monster_undying,1,按首次波次进入后台加载队列。
-monster_tusk,巨牙海民怪模型,model_bundle,models/heroes/tusk/tusk.vmdl,,,,,,idle,1,,,zombie_stream,6,775,13,streamed,asset_proxy_monster_tusk,monster_undying,1,按首次波次进入后台加载队列。
+monster_tusk,巨牙海民怪模型,model_bundle,models/heroes/tuskarr/tuskarr.vmdl,,,,,,idle,1,,,zombie_stream,6,775,13,streamed,asset_proxy_monster_tusk,monster_undying,1,按首次波次进入后台加载队列。
 monster_visage,维萨吉怪模型,model_bundle,models/heroes/visage/visage.vmdl,,,,,,idle,1,,,zombie_stream,7,770,14,streamed,asset_proxy_monster_visage,monster_undying,1,按首次波次进入后台加载队列。
 monster_sniper,火枪怪模型,model_bundle,models/heroes/sniper/sniper.vmdl,,particles/units/heroes/hero_sniper/sniper_base_attack.vpcf,,,,idle,1,,,zombie_stream,8,765,15,streamed,asset_proxy_monster_sniper,monster_undying,1,按首次波次进入后台加载队列；机枪塔第一阶段复用弹道。
 monster_ogre_magi,食人魔怪模型,model_bundle,models/heroes/ogre_magi/ogre_magi.vmdl,,,,,,idle,1,,,zombie_stream,9,760,16,streamed,asset_proxy_monster_ogre_magi,monster_undying,1,按首次波次进入后台加载队列。

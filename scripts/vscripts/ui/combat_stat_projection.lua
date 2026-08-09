@@ -9,8 +9,7 @@ local function copy(snapshot)
 end
 
 local function physical_reduction_pct(runtime_armor)
-    local armor = tonumber(runtime_armor) or 0
-    return 100 * (0.06 * armor) / (1 + 0.06 * math.abs(armor))
+    return armor_balance.modern_physical_reduction_pct(runtime_armor)
 end
 
 local function stat_tooltips(projected)
@@ -27,6 +26,7 @@ local function stat_tooltips(projected)
             display_value = tonumber(projected.armor) or 0,
             runtime_value = tonumber(projected.runtime_armor) or 0,
             unit = "war3_display",
+            mapping_version = tonumber(projected.armor_mapping_version) or 1,
             physical_reduction_pct = physical_reduction_pct(
                 projected.runtime_armor
             ),
@@ -52,7 +52,16 @@ function M.for_ui(snapshot)
             or tonumber(projected.armor)
             or 0
         projected.runtime_armor = runtime_armor
-        projected.armor = armor_balance.to_war3(runtime_armor)
+        local mapping_version = tonumber(projected.armor_mapping_version) or 1
+        local display_armor = armor_balance.to_war3_for_mapping(
+            runtime_armor,
+            mapping_version
+        )
+        -- Modern equivalent armor has no finite War3 inverse at or above the
+        -- asymptote. Keep the runtime value visible rather than fabricating a
+        -- misleading finite display value.
+        projected.armor = display_armor ~= nil and display_armor or runtime_armor
+        projected.armor_mapping_version = mapping_version
         projected.armor_unit = "war3_display"
         projected.stat_units_version = 2
     end
