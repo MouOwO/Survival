@@ -24,6 +24,7 @@ local function create_state()
         city_level = 0,
         hero_summoned = false,
         counts = {},
+        tower_class_by_entindex = {},
     }
 end
 
@@ -92,6 +93,68 @@ end
 local function count_limit_reached(state, row)
     local maximum = tonumber(row.max_building_count) or 0
     return maximum > 0 and count(state, row.building_id) >= maximum
+end
+
+local function valid_tower_class(value)
+    return type(value) == "string"
+        and string.match(value, "^class_[1-7]$") ~= nil
+end
+
+local function count_key_for_tower(tower_class)
+    return valid_tower_class(tower_class) and tower_class or "arrow_tower"
+end
+
+local function change_count(state, building_id, delta)
+    state.counts[building_id] = math.max(
+        0,
+        (state.counts[building_id] or 0) + delta
+    )
+end
+
+local function apply_tower_identity(state, payload, delta)
+    if payload.building_id ~= "arrow_tower" then return end
+    local entindex = tonumber(payload.entindex)
+    if not entindex then return end
+    local previous = state.tower_class_by_entindex[entindex]
+    local next_class = valid_tower_class(payload.tower_class)
+        and payload.tower_class or nil
+    local previous_key = count_key_for_tower(previous)
+    local next_key = count_key_for_tower(next_class)
+    if delta > 0 then
+        state.tower_class_by_entindex[entindex] = next_class
+        change_count(state, next_key, 1)
+    elseif delta < 0 then
+        change_count(state, previous_key, -1)
+        state.tower_class_by_entindex[entindex] = nil
+    elseif previous_key ~= next_key then
+        change_count(state, previous_key, -1)
+        change_count(state, next_key, 1)
+        state.tower_class_by_entindex[entindex] = next_class
+    end
+end
+
+local function rebuild_building_counts(state)
+    state.counts = {}
+    state.tower_class_by_entindex = {}
+    state.city_level = 0
+    local result = event_bus.request(events.BUILDING_LIST_REQUEST, {
+        player_id = state.player_id,
+    }) or {}
+    for _, building in ipairs(result.buildings or {}) do
+        local building_id = tostring(building.building_id or "")
+        if building_id == "arrow_tower" then
+            apply_tower_identity(state, building, 1)
+        elseif building_id ~= "" then
+            change_count(state, building_id, 1)
+        end
+        if building_id == "wall" then state.wall_built_once = true end
+        if building_id == "main_city" then
+            state.city_level = math.max(
+                state.city_level,
+                tonumber(building.level) or 1
+            )
+        end
+    end
 end
 
 local function add_stage_abilities(state, stage_rows)
@@ -177,6 +240,7 @@ local function on_builder_ready(payload)
     local state = ensure(payload.team)
     state.builder = payload.builder
     state.player_id = payload.player_id
+    rebuild_building_counts(state)
     local repair = (training.by_id or {}).train_repairer_01 or {}
     if valid_entity(payload.builder)
         and not payload.builder:HasModifier("modifier_repair_worker_ai") then
@@ -202,6 +266,11 @@ end
 local function on_building_created(payload)
     local state = ensure(payload.team)
     local building_id = tostring(payload.building_id or "")
+    if building_id == "arrow_tower" then
+        apply_tower_identity(state, payload, 1)
+        sync(state)
+        return
+    end
     state.counts[building_id] = count(state, building_id) + 1
     if building_id == "wall" then
         state.wall_built_once = true
@@ -214,6 +283,11 @@ end
 
 local function on_building_changed(payload)
     local state = ensure(payload.team)
+    if payload.building_id == "arrow_tower" then
+        apply_tower_identity(state, payload, 0)
+        sync(state)
+        return
+    end
     if payload.building_id == "main_city" then
         state.city_level = tonumber(payload.level) or state.city_level
         sync(state)
@@ -223,6 +297,11 @@ end
 local function on_building_destroyed(payload)
     local state = ensure(payload.team)
     local building_id = tostring(payload.building_id or "")
+    if building_id == "arrow_tower" then
+        apply_tower_identity(state, payload, -1)
+        sync(state)
+        return
+    end
     state.counts[building_id] = math.max(0, count(state, building_id) - 1)
     if building_id == "main_city" then
         state.city_level = 0

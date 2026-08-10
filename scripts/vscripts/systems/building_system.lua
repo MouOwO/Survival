@@ -24,6 +24,7 @@ local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
 local buildings = {}
 local counts = {}
+local class_slot_reservations = {}
 local wall_ever_built = {}
 local COLLIDING_BUILDINGS = {
     wall = true,
@@ -93,6 +94,101 @@ end
 local function change_count(team, building_id, delta)
     counts[team] = counts[team] or {}
     counts[team][building_id] = math.max(0, (counts[team][building_id] or 0) + delta)
+end
+local function class_id_for_state(state)
+    if not state or state.building_id ~= "arrow_tower" then return nil end
+    local class_id = state.tower_class
+    if type(class_id) ~= "string"
+        or not string.match(class_id, "^class_[1-7]$") then
+        return nil
+    end
+    return class_id
+end
+local function class_slot_count(team, class_id)
+    return count_for(team, class_id)
+end
+local function class_slot_reservation_count(team, class_id)
+    local reservations = class_slot_reservations[team]
+        and class_slot_reservations[team][class_id] or {}
+    local total = 0
+    for _, reserved in pairs(reservations) do
+        if reserved then total = total + 1 end
+    end
+    return total
+end
+local function class_slot_snapshot(team, class_id)
+    return {
+        count = class_slot_count(team, class_id),
+        pending = class_slot_reservation_count(team, class_id),
+        maximum = tonumber(global_rules.tower_class_max_count) or 5,
+    }
+end
+local function tower_class_counts(team)
+    local result = {}
+    for class_index = 1, 7 do
+        local class_id = "class_" .. tostring(class_index)
+        result[class_id] = class_slot_snapshot(team, class_id)
+    end
+    return result
+end
+local function publish_tower_class_counts(team, reason)
+    event_bus.emit(events.TOWER_CLASS_COUNTS_CHANGED, {
+        team = team,
+        tower_class_counts = tower_class_counts(team),
+        reason = reason,
+    })
+end
+local function tower_class_slot_request(payload)
+    payload = payload or {}
+    local team = tonumber(payload.team)
+    local class_id = tostring(payload.class_id or "")
+    local entindex = tonumber(payload.entindex)
+    local operation = tostring(payload.operation or "")
+    if team == nil or not string.match(class_id, "^class_[1-7]$") then
+        return { ok = false, error = "invalid_tower_class_slot" }
+    end
+    local snapshot = class_slot_snapshot(team, class_id)
+    if operation == "snapshot" then
+        snapshot.ok = true
+        return snapshot
+    end
+    if operation == "release" then
+        local changed = false
+        if entindex ~= nil and class_slot_reservations[team]
+            and class_slot_reservations[team][class_id] then
+            changed = class_slot_reservations[team][class_id][entindex] == true
+            class_slot_reservations[team][class_id][entindex] = nil
+        end
+        if changed then publish_tower_class_counts(team, "reservation_released") end
+        snapshot = class_slot_snapshot(team, class_id)
+        snapshot.ok = true
+        snapshot.released = true
+        return snapshot
+    end
+    if operation ~= "reserve" or entindex == nil then
+        return { ok = false, error = "invalid_tower_class_slot_operation" }
+    end
+    class_slot_reservations[team] = class_slot_reservations[team] or {}
+    local by_class = class_slot_reservations[team]
+    by_class[class_id] = by_class[class_id] or {}
+    if by_class[class_id][entindex] then
+        snapshot.ok = true
+        snapshot.reserved = true
+        snapshot.idempotent = true
+        return snapshot
+    end
+    if snapshot.maximum > 0
+        and snapshot.count + snapshot.pending >= snapshot.maximum then
+        snapshot.ok = false
+        snapshot.error = "tower_class_limit_reached"
+        return snapshot
+    end
+    by_class[class_id][entindex] = true
+    publish_tower_class_counts(team, "reservation_created")
+    snapshot = class_slot_snapshot(team, class_id)
+    snapshot.ok = true
+    snapshot.reserved = true
+    return snapshot
 end
 local function building_limit_reached(definition, existing_count)
     local maximum = tonumber(definition and definition.max_count) or 0
@@ -319,6 +415,7 @@ local function public_state(state)
         base_attack_damage = state.building_id == "arrow_tower"
             and tonumber((arrow_data(state.level) or {}).base_attack_damage)
             or nil,
+        tower_class_counts = tower_class_counts(state.team),
     }
 end
 
@@ -401,7 +498,7 @@ local function recover_building(unit)
         end
     end
     buildings[entindex] = state
-    change_count(state.team, state.building_id, 1)
+    change_count(state.team, class_id_for_state(state) or state.building_id, 1)
     if definition.build_once then wall_ever_built[state.team] = true end
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
         grid_x = grid_x,
@@ -842,7 +939,11 @@ local function consume_for_fusion(payload)
     for _, state in ipairs(selected) do
         building_visual.clear(state.unit)
         buildings[state.unit:entindex()] = nil
-        change_count(state.team, state.building_id, -1)
+        local class_id = class_id_for_state(state)
+        change_count(state.team, class_id or state.building_id, -1)
+        if class_id then
+            publish_tower_class_counts(state.team, "tower_fusion_consumed")
+        end
         event_bus.request(events.GRID_RELEASE_REQUEST, {
             grid_x = state.grid_x,
             grid_y = state.grid_y,
@@ -860,8 +961,18 @@ end
 local function on_building_changed(payload)
     local state = buildings[payload.entindex]
     if not state then return end
+    local previous_class = class_id_for_state(state)
+    local next_class = payload.tower_class
+    if type(next_class) ~= "string"
+        or not string.match(next_class, "^class_[1-7]$") then
+        next_class = nil
+    end
+    if previous_class ~= next_class then
+        change_count(state.team, previous_class or state.building_id, -1)
+        change_count(state.team, next_class or state.building_id, 1)
+    end
     state.level = payload.level or state.level
-    state.tower_class = payload.tower_class
+    state.tower_class = next_class
     state.tower_class_name = payload.tower_class_name
     state.population_occupied = tonumber(payload.population_occupied)
         or state.population_occupied
@@ -870,6 +981,13 @@ local function on_building_changed(payload)
         or state.unit.survival_route_level
     state.unit.survival_tower_class = state.tower_class
     state.unit.survival_population_occupied = state.population_occupied
+    if next_class and class_slot_reservations[state.team]
+        and class_slot_reservations[state.team][next_class] then
+        class_slot_reservations[state.team][next_class][payload.entindex] = nil
+    end
+    if previous_class ~= next_class then
+        publish_tower_class_counts(state.team, "tower_class_changed")
+    end
     if payload.display_name then
         state.unit.survival_display_name = payload.display_name
     end
@@ -885,9 +1003,28 @@ local function on_entity_killed(payload)
     if not state then return end
     if state.cleaned then return end
     state.cleaned = true
+    local reservation_cleared = false
+    for class_index = 1, 7 do
+        local class_id = "class_" .. tostring(class_index)
+        if class_slot_reservations[state.team]
+            and class_slot_reservations[state.team][class_id] then
+            reservation_cleared = reservation_cleared
+                or class_slot_reservations[state.team][class_id][victim:entindex()] == true
+            class_slot_reservations[state.team][class_id][victim:entindex()] = nil
+        end
+    end
+    if reservation_cleared then
+        publish_tower_class_counts(state.team, "tower_destroyed_during_class_change")
+    end
     building_visual.clear(victim)
     buildings[victim:entindex()] = nil
-    change_count(state.team, state.building_id, -1)
+    local class_id = class_id_for_state(state)
+    change_count(state.team, class_id or state.building_id, -1)
+    if class_id and class_slot_reservations[state.team]
+        and class_slot_reservations[state.team][class_id] then
+        class_slot_reservations[state.team][class_id][victim:entindex()] = nil
+    end
+    if class_id then publish_tower_class_counts(state.team, "tower_destroyed") end
     event_bus.request(events.GRID_RELEASE_REQUEST, {
         grid_x = state.grid_x,
         grid_y = state.grid_y,
@@ -977,6 +1114,7 @@ function M.init()
     construction_visual.reset()
     buildings = {}
     counts = {}
+    class_slot_reservations = {}
     wall_ever_built = {}
     event_bus.handle_request(events.BUILD_CAN_PLACE_REQUEST, can_place)
     event_bus.handle_request(events.BUILDING_QUERY_REQUEST, query_building)
@@ -985,6 +1123,7 @@ function M.init()
         events.BUILDING_FUSION_CONSUME_REQUEST, consume_for_fusion
     )
     event_bus.handle_request(events.BUILD_REQUEST, queue_building)
+    event_bus.handle_request(events.TOWER_CLASS_SLOT_REQUEST, tower_class_slot_request)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     local recovered = recover_existing_buildings()
@@ -1004,5 +1143,15 @@ M._building_limit_for_test = {
     count_for = count_for,
     change_count = change_count,
     reset = function() counts = {} end,
+}
+M._tower_class_slot_for_test = {
+    request = tower_class_slot_request,
+    count = class_slot_count,
+    reservations = class_slot_reservation_count,
+    snapshot = class_slot_snapshot,
+    reset = function()
+        counts = {}
+        class_slot_reservations = {}
+    end,
 }
 return M

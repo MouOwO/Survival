@@ -14,6 +14,7 @@ from import_n3_wave_workbook import FLYING_ARCHETYPES, FLYING_FALLBACK_ARCHETYPE
 ROOT = Path(__file__).resolve().parents[1]
 CSV_PATH = ROOT / "data" / "csv" / "怪物与波次系统" / "wave_definitions.csv"
 ASSAULT_WAVES = {5, 10, 15, 20, 25}
+SPECIAL_MIXED_WAVES = {11, 13, 24}
 
 
 def read_csv() -> tuple[list[str], list[list[str]]]:
@@ -115,11 +116,15 @@ def main() -> int:
     for wave in range(1, 26):
         values = book[wave]
         templates = sorted(by_wave[wave], key=lambda row: int(row["spawn_order"]))
-        normals = [row for row in templates if row["is_boss"] != "1"]
+        normals = [
+            row for row in templates
+            if row["member_role"] == "normal"
+            or (wave not in SPECIAL_MIXED_WAVES and row["is_boss"] != "1")
+        ]
         flying = [row for row in normals if row["archetype_id"] in FLYING_ARCHETYPES]
         ground = [row for row in normals if row["archetype_id"] not in FLYING_ARCHETYPES]
-        flying_count = int(values.get("AD", "0") or 0)
-        normal_count = int(values["D"])
+        flying_count = 19 if wave in SPECIAL_MIXED_WAVES else int(values.get("AD", "0") or 0)
+        normal_count = 59 if wave in SPECIAL_MIXED_WAVES else int(values["D"])
         if flying_count > normal_count:
             raise ValueError(f"wave {wave}: flying count exceeds normal count")
         if flying_count and not flying:
@@ -142,18 +147,23 @@ def main() -> int:
 
         member_index = 0
         stats = (values["J"], values["K"], values["L"])
-        for group, count in ((ground, ground_count), (flying, flying_count)):
+        flying_stats = (str(int(values["O"]) // 10), str(int(values["K"]) // 2), values["L"])
+        for group, count, is_flying in ((ground, ground_count, False), (flying, flying_count, True)):
             for template, allocated in zip(group, allocate(count, group)):
                 if allocated <= 0:
                     continue
                 member_index += 1
                 generated.append(updated_row(
                     headers, template, wave, f"{wave}N{member_index}", order,
-                    allocated, "normal", stats,
+                    allocated, "normal", flying_stats if is_flying and wave in SPECIAL_MIXED_WAVES else stats,
+                    ("N1 W" + str(wave) + "混合波；普通怪每2只走地后1只飞行；"
+                     "飞行怪生命为首怪1/10、攻击为普通怪1/2")
+                    if wave in SPECIAL_MIXED_WAVES else
                     "N1工作簿数量与同波最低属性；保留现有模型映射；证据："
                     + values["M"] + "；" + values["AJ"],
                     template["wave_id"] if template in normals
                     else f"n1_wave_{wave:02d}_{wave}n{member_index}",
+                    "flying" if is_flying and wave in SPECIAL_MIXED_WAVES else "",
                 ))
                 order += 1
                 totals["normal"] += allocated
@@ -171,8 +181,15 @@ def main() -> int:
             order += 1
             totals["assault_boss"] += 1
 
-    expected = {"normal": 202, "wave_leader": 21, "assault_boss": 5}
-    if totals != expected or sum(totals.values()) != 228:
+    expected = {
+        "normal": sum(
+            59 if wave in SPECIAL_MIXED_WAVES else int(book[wave]["D"])
+            for wave in range(1, 26)
+        ),
+        "wave_leader": sum(int(book[wave]["E"]) for wave in range(1, 26)),
+        "assault_boss": len(ASSAULT_WAVES),
+    }
+    if totals != expected:
         raise ValueError(f"N1 totals mismatch: {totals}")
 
     role_order = {"assault_boss": 1, "wave_leader": 2, "normal": 3}
@@ -194,7 +211,11 @@ def main() -> int:
     writer.writerows(generated)
     writer.writerows([[row.get(header, "") for header in headers] for row in other])
     CSV_PATH.write_bytes(b"\xef\xbb\xbf" + buffer.getvalue().encode("utf-8"))
-    print("N1_WAVE_CSV_IMPORT_PASS normal=202 wave_leader=21 assault_boss=5 total=228")
+    print(
+        "N1_WAVE_CSV_IMPORT_PASS "
+        f"normal={totals['normal']} wave_leader={totals['wave_leader']} "
+        f"assault_boss={totals['assault_boss']} total={sum(totals.values())}"
+    )
     return 0
 
 

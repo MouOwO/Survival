@@ -118,9 +118,9 @@ local M = {
     ability_upgrade_tower_max = { abilityid = "ability_upgrade_tower_max", abilityname = "升满级", abilitydesc = "一次升至当前阶段最高等级；自动累计计算金币和木材消耗。", abilityicon = "drow_ranger_multishot" },
     ability_tower_class_1 = { abilityid = "ability_tower_class_1", abilityname = "【N】死亡之塔", abilitydesc = "转职为【N】死亡之塔；转职后技能全部为被动技能。", abilityicon = "axe_battle_hunger" },
     ability_tower_class_2 = { abilityid = "ability_tower_class_2", abilityname = "【N】神秘之塔", abilitydesc = "转职为【N】神秘之塔；转职后技能全部为被动技能。", abilityicon = "drow_ranger_frost_arrows" },
-    ability_tower_class_3 = { abilityid = "ability_tower_class_3", abilityname = "【N】闪电塔", abilitydesc = "转职为【N】闪电塔；转职后技能全部为被动技能。", abilityicon = "windrunner_focusfire" },
+    ability_tower_class_3 = { abilityid = "ability_tower_class_3", abilityname = "【N】闪电塔", abilitydesc = "转职为【N】闪电塔；转职后技能全部为被动技能。", abilityicon = "zuus_arc_lightning" },
     ability_tower_class_4 = { abilityid = "ability_tower_class_4", abilityname = "【N】机枪塔", abilitydesc = "转职为【N】机枪塔；转职后技能全部为被动技能。", abilityicon = "sniper_take_aim" },
-    ability_tower_class_5 = { abilityid = "ability_tower_class_5", abilityname = "【N】多重塔", abilitydesc = "转职为【N】多重塔；转职后技能全部为被动技能。", abilityicon = "zuus_arc_lightning" },
+    ability_tower_class_5 = { abilityid = "ability_tower_class_5", abilityname = "【N】多重塔", abilitydesc = "转职为【N】多重塔；转职后技能全部为被动技能。", abilityicon = "windrunner_focusfire" },
     ability_tower_class_6 = { abilityid = "ability_tower_class_6", abilityname = "【N】冰霜之塔", abilitydesc = "转职为【N】冰霜之塔；转职后技能全部为被动技能。", abilityicon = "lich_frost_nova" },
     ability_tower_class_7 = { abilityid = "ability_tower_class_7", abilityname = "【N】魔法塔", abilitydesc = "转职为【N】魔法塔；成长为大魔法塔与魔法至尊，使用魔法伤害克制高护甲敌人。", abilityicon = "rubick_arcane_supremacy" },
     ability_build_hero_altar = {

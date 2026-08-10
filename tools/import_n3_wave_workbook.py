@@ -26,7 +26,9 @@ FLYING_ARCHETYPES = {
 FLYING_FALLBACK_ARCHETYPE = "flying_red_gargoyle"
 ASSAULT_SOURCE_WAVES = {5, 10, 15, 20, 25, 30}
 APPROVED_NORMAL_FLYING_COUNT_OVERRIDES = {
-    11: 0,
+    11: 19,
+    13: 19,
+    24: 19,
 }
 
 
@@ -166,17 +168,30 @@ def build_difficulty(
             ground = flying
 
         normal_stats = (values["J"], values["K"], values["L"])
+        flying_stats = (
+            str(int(values["O"]) // 10),
+            str(int(values["K"]) // 2),
+            str(float(values["L"]) * 3).rstrip("0").rstrip("."),
+        )
+        standard_flying_stats = (
+            values["J"],
+            values["K"],
+            str(float(values["L"]) * 3).rstrip("0").rstrip("."),
+        )
         member_index = 0
         for group, count, is_flying in ((ground, ground_count, False), (flying, flying_count, True)):
             for template, allocated in zip(group, allocate(count, group)):
                 if allocated <= 0:
                     continue
                 member_index += 1
-                armor = str(float(values["L"]) * 3).rstrip("0").rstrip(".") if is_flying else values["L"]
+                if is_flying:
+                    stats = flying_stats if wave in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES else standard_flying_stats
+                else:
+                    stats = normal_stats
                 if wave in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES:
                     note = (
-                        f"{difficulty_id} W11修正为当前N1同波地面模型映射；"
-                        "普通怪共59只；移除错误飞行变体"
+                        f"{difficulty_id} W{wave}按批准混合顺序修正；"
+                        "普通怪每2只走地后1只飞行；飞行怪生命为首怪1/10、攻击为普通怪1/2"
                     )
                 else:
                     note = f"{difficulty_id}工作簿数量；沿用N1模型映射"
@@ -187,8 +202,9 @@ def build_difficulty(
                     note += "；证据：" + evidence
                 output.append(make_row(
                     headers, template, wave, f"{wave}N{member_index}", order,
-                    allocated, "normal", (values["J"], values["K"], armor), note,
-                    "ground" if ground_uses_flying_models and not is_flying else "",
+                    allocated, "normal", stats, note,
+                    "flying" if is_flying and wave in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES
+                    else ("ground" if ground_uses_flying_models and not is_flying else ""),
                     difficulty_id=difficulty_id,
                 ))
                 order += 1
@@ -201,9 +217,7 @@ def build_difficulty(
             leader_note = (
                 f"{difficulty_id}工作簿首怪Boss；独立wave_leader身份；模型略大"
             )
-            if wave in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES:
-                leader_note += "；W11普通怪已按批准修正为纯地面构成"
-            elif evidence_note(values, "R", "AI", "AJ"):
+            if wave not in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES and evidence_note(values, "R", "AI", "AJ"):
                 leader_note += "；证据：" + evidence_note(values, "R", "AI", "AJ")
             output.append(make_row(
                 headers, leader_template, wave, f"{wave}L", order, leader_count,

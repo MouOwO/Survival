@@ -22,8 +22,13 @@ M.tower_route_default_projectile_speed = M.number(
     "tower_route_default_projectile_speed",
     1250
 )
+M.tower_class_max_count = M.number("tower_class_max_count", 5)
 M.tower_projectile_speed_multiplier = M.number(
     "tower_projectile_speed_multiplier",
+    1
+)
+M.wave_monster_round_robin_enabled = M.number(
+    "wave_monster_round_robin_enabled",
     1
 )
 M.repair_detection_range = M.number(

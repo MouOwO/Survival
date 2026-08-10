@@ -11,9 +11,17 @@ function M:IsPurgable() return false end
 function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
 function M:OnCreated(params)
+    self.no_unit_collision = tonumber(params.no_unit_collision) == 1
     if not IsServer() then return end
     self.wall_entindex = tonumber(params.wall_entindex) or -1
     self:StartIntervalThink(0.5)
+end
+
+function M:CheckState()
+    if not self.no_unit_collision then return {} end
+    return {
+        [MODIFIER_STATE_NO_UNIT_COLLISION] = true,
+    }
 end
 
 function M:SetWallEntIndex(entindex)

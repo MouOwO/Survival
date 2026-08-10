@@ -136,6 +136,8 @@ local function normalize(payload, unit)
             or unit:GetPlayerOwnerID(),
         building_counts = payload.building_counts
             or previous.building_counts or {},
+        tower_class_counts = payload.tower_class_counts
+            or previous.tower_class_counts or {},
     }
 end
 
@@ -394,6 +396,15 @@ local function on_worker_changed(payload)
     end
 end
 
+local function on_tower_class_counts_changed(payload)
+    for _, state in pairs(state_by_unit) do
+        if state.team == payload.team and state.building_id == "arrow_tower" then
+            state.tower_class_counts = payload.tower_class_counts or {}
+            publish(state)
+        end
+    end
+end
+
 local function on_hero_summon_state(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil or player_id < 0 then
@@ -461,6 +472,10 @@ function M.init()
     )
     event_bus.subscribe(events.RESOURCE_CHANGED, on_resources)
     event_bus.subscribe(events.WORKER_CHANGED, on_worker_changed)
+    event_bus.subscribe(
+        events.TOWER_CLASS_COUNTS_CHANGED,
+        on_tower_class_counts_changed
+    )
     event_bus.subscribe(
         events.HERO_PROGRESSION_CHANGED,
         on_hero_progression_changed

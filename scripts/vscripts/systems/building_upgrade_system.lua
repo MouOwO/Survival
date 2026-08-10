@@ -287,6 +287,25 @@ local function refund_spend(state, cost, reason)
     end
 end
 
+local function reserve_tower_class_slot(state, class_id)
+    return event_bus.request(events.TOWER_CLASS_SLOT_REQUEST, {
+        operation = "reserve",
+        team = state.team,
+        class_id = class_id,
+        entindex = state.unit:entindex(),
+    })
+end
+
+local function release_tower_class_slot(state, class_id)
+    if not state or not class_id then return end
+    event_bus.request(events.TOWER_CLASS_SLOT_REQUEST, {
+        operation = "release",
+        team = state.team,
+        class_id = class_id,
+        entindex = state.unit:entindex(),
+    })
+end
+
 local function start_upgrade(
     state,
     target_data,
@@ -815,6 +834,12 @@ local function on_class_request(payload)
     if not class_data then return reject("无效的转职方向") end
     local row = tower_routes.get(class_data.id, 1)
     if not row then return reject("路线配置缺失") end
+    local slot = reserve_tower_class_slot(state, class_data.id)
+    if not slot or not slot.ok then
+        return reject("该转职路线数量已达上限（"
+            .. tostring(slot and slot.maximum or global_rules.tower_class_max_count)
+            .. "）")
+    end
     local cost = tower_routes.class_change_cost(row, state)
     local result = spend(
         state,
@@ -822,6 +847,7 @@ local function on_class_request(payload)
         "tower_class_change"
     )
     if not result or not result.ok then
+        release_tower_class_slot(state, class_data.id)
         return reject(result and result.error or "资源不足")
     end
     local previous_population = tonumber(state.population_occupied)
@@ -834,8 +860,10 @@ local function on_class_request(payload)
         apply_tower_level(state, row, 6, true)
         set_class_buttons(state.unit, false)
         publish(state, "tower_class_changed")
+        release_tower_class_slot(state, class_data.id)
         play_upgrade_sound(state, { class_changed = true })
     end, "tower_class", function(cancel_reason)
+        release_tower_class_slot(state, class_data.id)
         if cancel_reason == "completion_failed" then
             restore_tower_level(
                 state,
@@ -857,6 +885,7 @@ local function on_class_request(payload)
         )
     end)
     if not pending or not pending.ok then
+        release_tower_class_slot(state, class_data.id)
         refund_spend(state, cost, "tower_class_start_failed")
         reject(pending and pending.error or "转职失败")
     else

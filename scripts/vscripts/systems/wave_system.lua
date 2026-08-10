@@ -18,6 +18,9 @@ local monster_hull_scale = require("systems/monster_hull_scale")
 local monster_corpse_lifecycle_service = require(
     "systems/monster_corpse_lifecycle_service"
 )
+local wave_spawn_sequence = require("systems/wave_spawn_sequence")
+local wave_monster_collision = require("systems/wave_monster_collision")
+local global_rules = require("config/global_rules")
 
 local M = {}
 local state = {}
@@ -38,6 +41,18 @@ local FINAL_WAVE_NUMBER = 30
 local DEV_PRELOAD_POLL_INTERVAL = 0.05
 local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
 local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
+
+local function movement_type_for(row)
+    local definition = archetypes.by_id[row.archetype_id] or {}
+    return row.movement_type_override or definition.movement_type or "ground"
+end
+
+local function spawn_sequence(batches)
+    return wave_spawn_sequence.build(batches, {
+        enabled = global_rules.wave_monster_round_robin_enabled ~= 0,
+        movement_type = movement_type_for,
+    })
+end
 
 local function next_wave_number_after(number)
     local next_number = (tonumber(number) or 0) + 1
@@ -220,7 +235,7 @@ local function rebuild_waves()
     return true
 end
 
-local function apply_stats(unit, row, definition)
+local function apply_stats(unit, row, definition, movement_type)
     unit:SetBaseMaxHealth(row.health)
     unit:SetMaxHealth(row.health)
     unit:SetHealth(row.health)
@@ -254,7 +269,6 @@ local function apply_stats(unit, row, definition)
     else
         unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
     end
-    local movement_type = row.movement_type_override or definition.movement_type
     if movement_type == "flying" then
         unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_FLY)
     else
@@ -308,7 +322,8 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
     end
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     monster_corpse_lifecycle_service.track(unit, "wave")
-    apply_stats(unit, row, definition)
+    local collision_profile = wave_monster_collision.profile(row, definition)
+    apply_stats(unit, row, definition, collision_profile.movement_type)
     local resolved_visual = monster_visual_config.resolve(
         wave_number,
         row.member_role or "normal",
@@ -317,13 +332,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
     if resolved_visual then
         pcall(monster_visual_service.apply, unit, resolved_visual)
     end
-    local base_hull_radius = 29
-    if row.member_role == "assault_boss" or definition.rank == "boss"
-        or row.is_boss == true then
-        base_hull_radius = 0
-    elseif definition.rank == "elite" or row.member_role == "wave_leader" then
-        base_hull_radius = 58
-    end
+    local base_hull_radius = collision_profile.base_hull_radius
     local hull_ok, hull_error = monster_hull_scale.apply(
         unit,
         monster_hull_multiplier,
@@ -332,7 +341,12 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
     if not hull_ok then
         print("[WaveSystem] monster hull apply failed: " .. tostring(hull_error))
     end
-    unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", { wall_entindex = wall_entindex })
+    unit.survival_wave_movement_type = collision_profile.movement_type
+    unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
+    unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
+        wall_entindex = wall_entindex,
+        no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
+    })
     local is_assault_boss = row.member_role == "assault_boss"
         or (row.member_role == nil and row.is_boss == true)
     enemies[unit:entindex()] = {
@@ -406,23 +420,21 @@ local function start_wave(number, reason)
     end
     local next_delay, last_delay = 0, 0
     local normal_instance_index = 0
-    for _, row in ipairs(wave.batches) do
-        for _ = 1, (row.monster_count or 0) do
-            local visual_instance_index = nil
-            if row.member_role == nil or row.member_role == "normal" then
-                normal_instance_index = normal_instance_index + 1
-                visual_instance_index = normal_instance_index
-            end
-            local delay = next_delay
-            last_delay = delay
-            scheduler.after(delay, spawn_callback(
-                row,
-                token,
-                number,
-                visual_instance_index
-            ))
-            next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
+    for _, row in ipairs(spawn_sequence(wave.batches)) do
+        local visual_instance_index = nil
+        if wave_spawn_sequence.is_normal(row) then
+            normal_instance_index = normal_instance_index + 1
+            visual_instance_index = normal_instance_index
         end
+        local delay = next_delay
+        last_delay = delay
+        scheduler.after(delay, spawn_callback(
+            row,
+            token,
+            number,
+            visual_instance_index
+        ))
+        next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
     end
     scheduler.after(last_delay + 0.05, function()
         if token ~= generation_token then return end
@@ -575,26 +587,25 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason)
     state.boss_alive = false
     for _, row in ipairs(wave.batches) do state.planned = state.planned + (row.monster_count or 0) end
     state.pending = state.planned
-    local sequence = 0
+    local next_delay, last_delay = 0, 0
     local normal_instance_index = 0
-    for _, row in ipairs(wave.batches) do
-        for _ = 1, (row.monster_count or 0) do
-            local visual_instance_index = nil
-            if row.member_role == nil or row.member_role == "normal" then
-                normal_instance_index = normal_instance_index + 1
-                visual_instance_index = normal_instance_index
-            end
-            local delay = sequence * (row.spawn_interval or 1.0)
-            sequence = sequence + 1
-            scheduler.after(delay, spawn_callback(
-                row,
-                token,
-                number,
-                visual_instance_index
-            ))
+    for _, row in ipairs(spawn_sequence(wave.batches)) do
+        local visual_instance_index = nil
+        if wave_spawn_sequence.is_normal(row) then
+            normal_instance_index = normal_instance_index + 1
+            visual_instance_index = normal_instance_index
         end
+        local delay = next_delay
+        last_delay = delay
+        scheduler.after(delay, spawn_callback(
+            row,
+            token,
+            number,
+            visual_instance_index
+        ))
+        next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
     end
-    scheduler.after(math.max(0, (sequence - 1) * 1.0) + 0.05, function()
+    scheduler.after(last_delay + 0.05, function()
         if token == generation_token then state.status = "dev_mode"; publish("dev_wave_completed") end
     end, DEV_WAVE_COMPLETE_TASK_ID)
     print("[WaveSystem] dev wave spawn started wave=" .. tostring(number)

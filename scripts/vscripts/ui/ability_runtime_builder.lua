@@ -388,12 +388,21 @@ local function tower_class(ability_name, state, resources)
     local class_id = class_index and "class_" .. tostring(class_index) or nil
     local row = class_id and tower_routes.get(class_id, 1) or nil
     local cost = tower_routes.class_change_cost(row, state)
+    local class_count = state.tower_class_counts
+        and state.tower_class_counts[class_id] or {}
+    local completed = tonumber(class_count.count) or 0
+    local pending = tonumber(class_count.pending) or 0
+    local maximum = tonumber(class_count.maximum) or 5
+    local class_full = maximum > 0 and completed + pending >= maximum
+    available = available and not class_full
     local result = merge({
         available = available and row and 1 or 0,
         current_level = state.level,
-        status_text = available and row and "转职为" .. tower_routes.display_name(row)
-            or (state.tower_class and "已经完成转职"
-                or "防御塔未达到5级"),
+        status_text = class_full and ("该路线数量已达上限（"
+                .. tostring(completed + pending) .. "/" .. tostring(maximum) .. "）")
+            or (available and row and "转职为" .. tower_routes.display_name(row)
+                or (state.tower_class and "已经完成转职"
+                    or "防御塔未达到5级")),
         tower_name = row and tower_routes.display_name(row) or "",
         skill_ids = row and row.skill_ids or nil,
         population = cost and cost.population or 0,
@@ -405,6 +414,10 @@ local function tower_class(ability_name, state, resources)
             {
                 label = "转职后人口占有",
                 value = tostring(row.population_occupied or 0),
+            },
+            {
+                label = "路线数量",
+                value = tostring(completed + pending) .. "/" .. tostring(maximum),
             },
         } or nil,
     }, cost_data(cost))
