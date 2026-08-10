@@ -1,5 +1,12 @@
 # Decisions
 
+## 2026-08-10：英雄移动使用白名单，建筑额外使用禁建黑名单
+
+- 决定：`build_forbidden_regions.csv`统一保存`hero_movable`和`building_forbidden`两类区域；英雄目的地只消费前者，建筑footprint同时消费前者联集覆盖和后者相交拒绝。
+- 决定：正式战斗英雄以`survival_hero_id`为身份；Builder、工人、怪物、建筑和占位英雄不受移动白名单约束。非法普通移动/攻击移动提前拒绝，其他运行时越界停止并拉回最后合法位置。
+- 决定：没有有效`hero_movable`业务行表示白名单未启用，英雄和建筑沿用旧地图导航与Grid规则；存在至少一个有效区域后才启用严格白名单。`building_forbidden`始终独立生效。区域策略拒绝建筑时仍返回完整红色footprint cells。
+- 原因：CSV schema的存在不等于地图已选择启用白名单；空配置失败关闭会让地图不可移动、不可建造并使Grid消失。显式按有效行启用既保持旧地图可玩，又不需要猜测Hammer边界，且保留后续严格约束能力。
+
 ## 2026-08-09：怪物护甲保持线性投影与Damage Filter曲线补偿
 
 - 决定：波次、挑战和调试怪的War3护甲继续通过`armor_balance.from_war3()`线性`/3`写入运行时护甲；Damage Filter只补偿War3目标承伤曲线与当前Dota曲线的倍率差。

@@ -4,6 +4,8 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-10）：本地化缺失/重复token已按最小范围修复。`npc_survival_builder_proxy`和`npc_survival_repairer`已从`unit_display_names.csv`补齐并生成；game六份本地化镜像和content两份Panorama源中的精确单位token、挑战奖励大小写别名、金矿/英雄祭坛显示值已同步。专项契约、冲突扫描、结构、生成一致性、Lua 5.1语法及UTF-8/BOM通过；仍需Workshop Tools完全冷启动确认`FindSafe`与重复token引擎告警消失，尚未实机验收。
+- 当前插入任务（2026-08-10）：空区域配置兼容修复已实施。没有有效`hero_movable`时白名单不启用，英雄和建筑沿用旧导航/Grid规则；配置有效行后才启用严格白名单，`building_forbidden`始终独立生效。区域拒绝现在返回完整红色footprint cells，不再让Grid消失。CSV生成、专项契约/Lua 5.1行为和目标语法已通过，仍需Workshop Tools冷启动确认Grid显示、合法建造与拒绝红格；Hammer真实边界只阻断新白名单启用，不阻断当前地图可玩性。
 - 已完成插入任务（2026-08-09）：怪物物理伤害按当前Dota护甲曲线补偿到War3目标曲线，且并发stash冲突已解决。117 War3护甲继续线性投影为39运行时护甲；现代非线性映射辅助API保留但不用于波次、挑战或调试怪。`monster_war3_armor_damage_enabled=1`只对明确项目怪物的正护甲物理伤害乘目标曲线/引擎曲线差值，随后仍由引擎结算。固定基准最终倍率约0.299401、理论23.79秒；专项Lua 5.1/契约/语法及科技减甲、毒云回归通过。用户明确确认固定样本测试验收通过，但未提供精确击杀秒数或日志；极高护甲怪仍需独立抽样。
 - 当前插入任务（2026-08-09）：怪物尸体、运行时日志和Panorama本地化性能优化已完成生产实现及自动验证。明确标记的波次/挑战/调试怪死亡结算后按CSV保留0.6秒、共享任务下沉0.8秒/160码、隐藏并安全移除；强制清场仍立即删除。运行时成功路径详细日志默认关闭且惰性格式化，Tooltip详细日志默认关闭，四个动态本地化入口使用256项有界缓存。专项Lua 5.1行为/契约、全项目356个Lua语法、生成一致性、UTF-8、配置检查和两仓diff通过；4份Panorama产物均强制编译成功。下一步Workshop Tools冷启动批量击杀并对比实体/日志/帧时间，尚未实机验收。
 - 当前插入任务（2026-08-09）：工人训练、建筑提交、普通升级、箭塔升级/转职已改为同步`event_bus.request/handle_request`结果。修理工按team独立消费CSV两级进度（LV1成功5次后进入LV2，LV2成功2次后保留最终完成态并拒绝继续训练），伐木工最终`max_count=-1`无限行为不变；只有单位创建成功才推进进度，创建失败继续退款。建造移动/施工异步失败保存`source_ability`并以独立幂等事务恰好回滚一次冷却，扣费后的创建/施工失败同时退木材、金币和人口。专项Lua 5.1行为、PowerShell契约、目标语法、CSV/生成字段、严格UTF-8、配置CheckOnly和限定diff通过；下一步Workshop Tools冷启动实测失败冷却、资源退款和两级修理工，尚未实机验收。
@@ -67,6 +69,7 @@
 
 ## 最后可靠检查点
 
+- 2026-08-10空区域配置兼容策略已落地：CSV无启用`hero_movable`业务行时保持旧地图导航与Grid建造，区域拒绝仍返回可渲染红格；等待Workshop Tools实机验证。
 - 2026-08-06已完成代码库只读审计并建立完整任务清单。
 - `addon_game_mode.lua`和`addoninfo.txt`已开放4名好人方玩家。
 - Builder已经按player注册并保存`survival_player_id`，是多人身份改造的可复用基础。
@@ -83,7 +86,7 @@
 
 ## 下一步唯一动作
 
-在Workshop Tools冷启动`template_map`，确认玩家0 Builder正常生成、可选择并可建造，且日志包含`[MULTIPLAYER_CONTEXT]`和`[BUILDER_READY] player=0 slot=east ... source=legacy_coordinates`。验收后进入Hammer添加玩家1出生marker。
+从Hammer提供并确认`hero_movable`白名单与`building_forbidden`黑名单的真实边界坐标，写入`data/csv/建筑与工人系统/build_forbidden_regions.csv`并通过生成工具重建配置；随后冷启动Workshop Tools验证英雄移动/攻击移动、越界回退、传送技能、挑战/练功房/回城以及建筑完整footprint。多人阶段1验收保持暂停，待本插入任务解除数据阻断后再恢复。
 
 ## 恢复顺序
 

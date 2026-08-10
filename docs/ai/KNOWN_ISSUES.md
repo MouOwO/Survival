@@ -1,5 +1,12 @@
 # Known Issues
 
+## 2026-08-10：区域边界数据尚未提供（不阻断旧地图可玩性）
+
+- `template_map.vmap`和`survival_dev.vmap`已通过`dmxconvert.exe`转换为KeyValues文本审计；地图存在`challenge_*`、`rebirth_*`和`monsterborn`等业务中心Marker，但没有可证明为移动白名单/禁建黑名单边界的成组corner、boundary或region Marker。
+- `challenge_locations.csv.room_radius`只描述挑战房间业务半径，不能推断英雄可移动区域，也不能推断建筑禁建区域。当前`build_forbidden_regions.csv`只有schema注释和示例注释，没有启用业务行。
+- 空`hero_movable`现在表示白名单未启用，运行时沿用旧地图导航和Grid规则；`building_forbidden`仍独立生效。这恢复当前可玩性，但不等于已经定义或验证了全图移动边界。
+- 需要在Hammer中补充可靠边界点或直接把确认后的坐标写入CSV，再通过`tools.build_configs.py`生成配置，才能启用严格白名单。当前兼容修复仍需Workshop Tools冷启动验证Grid显示、合法建造和区域拒绝红格反馈。
+
 ## 当前已知问题
 
 0. **`.cline/local-toolchain.json`中的绝对路径会随工作区迁移或MSYS目录布局漂移。**

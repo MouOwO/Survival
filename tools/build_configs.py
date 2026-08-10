@@ -96,6 +96,77 @@ def value(raw: str, kind: str) -> str:
     return f'"{lua_escape(raw)}"'
 
 
+def validate_build_regions(
+    source: Path, headers: list[str], data_rows: list[tuple[int, list[str]]]
+) -> None:
+    if source.name != "build_forbidden_regions.csv":
+        return
+    required = {
+        "region_id", "region_type", "shape", "p1_x", "p1_y", "p2_x",
+        "p2_y", "p3_x", "p3_y", "p4_x", "p4_y", "center_x",
+        "center_y", "radius", "enabled",
+    }
+    missing = required.difference(headers)
+    if missing:
+        raise ValueError(f"build region columns missing: {sorted(missing)}")
+    index = {name: position for position, name in enumerate(headers)}
+    seen: set[str] = set()
+
+    def text(fields: list[str], name: str) -> str:
+        return fields[index[name]].strip()
+
+    def coordinate(fields: list[str], name: str, line: int) -> float:
+        raw = text(fields, name)
+        if not raw:
+            raise ValueError(f"missing {name}: {source} line {line}")
+        try:
+            return float(raw)
+        except ValueError as error:
+            raise ValueError(
+                f"invalid {name}: {source} line {line}: {raw}"
+            ) from error
+
+    for line, fields in data_rows:
+        region_id = text(fields, "region_id")
+        if not region_id or region_id in seen:
+            raise ValueError(f"duplicate or empty region_id: {source} line {line}")
+        seen.add(region_id)
+        region_type = text(fields, "region_type")
+        if region_type not in {"hero_movable", "building_forbidden"}:
+            raise ValueError(
+                f"invalid region_type: {source} line {line}: {region_type}"
+            )
+        shape = text(fields, "shape")
+        if shape == "circle":
+            coordinate(fields, "center_x", line)
+            coordinate(fields, "center_y", line)
+            if coordinate(fields, "radius", line) <= 0:
+                raise ValueError(f"circle radius must be positive: {source} line {line}")
+            continue
+        if shape != "quadrilateral":
+            raise ValueError(f"invalid region shape: {source} line {line}: {shape}")
+        points = [
+            (coordinate(fields, f"p{i}_x", line),
+             coordinate(fields, f"p{i}_y", line))
+            for i in range(1, 5)
+        ]
+        direction = 0
+        for i in range(4):
+            a, b, c = points[i], points[(i + 1) % 4], points[(i + 2) % 4]
+            cross = (b[0] - a[0]) * (c[1] - a[1]) \
+                - (b[1] - a[1]) * (c[0] - a[0])
+            if abs(cross) <= 0.000001:
+                raise ValueError(
+                    f"degenerate quadrilateral: {source} line {line}"
+                )
+            sign = 1 if cross > 0 else -1
+            if direction and direction != sign:
+                raise ValueError(
+                    f"non-convex quadrilateral: {source} line {line}"
+                )
+            direction = sign
+
+
 def validate_sound_definitions(
     source: Path, headers: list[str], data_rows: list[tuple[int, list[str]]]
 ) -> None:
@@ -362,6 +433,7 @@ def build(source: Path, output: Path) -> None:
                 f"row: {fields}"
             )
         data_rows.append((row_number, fields))
+    validate_build_regions(source, headers, data_rows)
     validate_sound_definitions(source, headers, data_rows)
     lines = [
         "-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.",
@@ -405,6 +477,17 @@ def build(source: Path, output: Path) -> None:
     output.write_text("\n".join(lines), encoding="utf-8", newline="\n")
 
 
+def build_index(files: list[Path], output: Path) -> None:
+    names = sorted(source.stem for source in files)
+    index = ["-- AUTO-GENERATED CONFIG REGISTRY.", "local M = {}", ""]
+    index += [
+        f'M["{name}"] = require("config/generated/{name}")'
+        for name in names
+    ]
+    index += ["", "return M", ""]
+    output.write_text("\n".join(index), encoding="utf-8", newline="\n")
+
+
 def main() -> int:
     files = sorted(CSV_ROOT.rglob("*.csv"))
     if not files:
@@ -436,10 +519,7 @@ def main() -> int:
     for old in OUT_ROOT.glob("*.lua"):
         if old.name not in expected_outputs:
             old.unlink()
-    index = ["-- AUTO-GENERATED CONFIG REGISTRY.", "local M = {}", ""]
-    index += [f'M["{name}"] = require("config/generated/{name}")' for name in names]
-    index += ["", "return M", ""]
-    (OUT_ROOT / "index.lua").write_text("\n".join(index), encoding="utf-8", newline="\n")
+    build_index(files, OUT_ROOT / "index.lua")
     print(f"SUCCESS: generated {len(names)} Lua config modules")
     return 0
 

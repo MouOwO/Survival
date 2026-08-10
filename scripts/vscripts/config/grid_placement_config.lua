@@ -23,11 +23,7 @@ local M = {
         max_y = 1200,
     },
 
-    -- 可直接填写矩形或圆形禁建区；默认不改变现有地图。
-    -- { id = "spawn", shape = "rect", min_x = -256, max_x = 256,
-    --   min_y = -256, max_y = 256 }
-    -- { id = "boss", shape = "circle", x = 1024, y = 0, radius = 320 }
-    forbidden_regions = {},
+    -- 业务禁区统一来自build_forbidden_regions.csv。
 
     -- 可选 Hammer info_target 标记。标记不存在时只记录日志，不阻断启动。
     -- { id = "lane", marker_name = "grid_no_build_lane", radius = 256 }

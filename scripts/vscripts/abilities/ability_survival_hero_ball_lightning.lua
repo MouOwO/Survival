@@ -2,9 +2,10 @@ ability_survival_hero_ball_lightning = class({})
 
 local MAX_DISTANCE = 800
 local TRAVEL_SPEED = 7000
+local destination_validation = require("systems/destination_validation_service")
 
-local function valid_destination(position)
-    return GridNav:IsTraversable(position) and not GridNav:IsBlocked(position)
+local function valid_destination(position, caster)
+    return destination_validation.validate(position, caster)
 end
 
 function ability_survival_hero_ball_lightning:CastFilterResultLocation(location)
@@ -24,7 +25,7 @@ function ability_survival_hero_ball_lightning:CastFilterResultLocation(location)
         location.y,
         GetGroundHeight(location, caster)
     )
-    if not valid_destination(destination) then
+    if not valid_destination(destination, caster) then
         self.cast_error = "目标位置无法到达"
         return UF_FAIL_CUSTOM
     end
@@ -60,7 +61,7 @@ function ability_survival_hero_ball_lightning:OnSpellStart()
     distance = math.min(distance, MAX_DISTANCE)
     local target = origin + delta:Normalized() * distance
     target.z = GetGroundHeight(target, caster)
-    if not valid_destination(target) then
+    if not valid_destination(target, caster) then
         self:RefundTravelMana()
         return
     end

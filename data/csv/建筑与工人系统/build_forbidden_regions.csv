@@ -1,0 +1,10 @@
+﻿region_id,region_type,shape,p1_x,p1_y,p2_x,p2_y,p3_x,p3_y,p4_x,p4_y,center_x,center_y,radius,enabled,notes
+#中文名:区域ID,区域类型,形状,四边形点1X,四边形点1Y,四边形点2X,四边形点2Y,四边形点3X,四边形点3Y,四边形点4X,四边形点4Y,圆心X,圆心Y,圆半径,是否启用,备注
+#types:string,string,string,number,number,number,number,number,number,number,number,number,number,number,boolean,string
+# region_type仅允许hero_movable或building_forbidden。
+# 凸四边形使用shape=quadrilateral，四点必须按顺时针或逆时针沿边界填写。
+# 圆形使用shape=circle，只填写center_x、center_y和radius。
+# 没有启用的hero_movable业务行时，白名单暂不启用，沿用旧地图的Grid和导航校验；building_forbidden仍独立生效。
+# template_map.vmap和survival_dev.vmap当前只有业务中心Marker，没有可靠边界点；获得Hammer边界坐标前不得填入猜测数据。
+# 示例：main_lane,hero_movable,quadrilateral,-512,-256,512,-256,512,256,-512,256,,,,1,主战区移动白名单
+# 示例：altar_no_build,building_forbidden,circle,,,,,,,,,1024,0,320,1,祭坛禁建区

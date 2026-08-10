@@ -17,6 +17,7 @@ local weapons = require("config/generated/weapon_definitions")
 local seven_sins_essences = require("config/seven_sins_essences")
 local molten_core_rules = require("config/molten_core_challenge_rules")
 local hero_return_home = require("systems/hero_return_home_service")
+local destination_validation = require("systems/destination_validation_service")
 local monster_visual = require("systems/challenge_monster_visual_service")
 
 local M = {}
@@ -109,12 +110,16 @@ local function marker(name)
 end
 
 local function teleport(unit, target)
-    if not alive(unit) or not valid(target) then return false end
+    if not alive(unit) or not valid(target) then
+        return false, "challenge_destination_invalid"
+    end
     local position = target:GetAbsOrigin()
-    unit:SetAbsOrigin(position)
-    FindClearSpaceForUnit(unit, position, true)
+    local moved, move_error = destination_validation.teleport(
+        unit, position, false
+    )
+    if not moved then return false, move_error end
     unit:Stop()
-    return true
+    return true, nil
 end
 
 local function player_sessions(player_id)
@@ -447,7 +452,7 @@ local function teleport_to_current(session)
     if not entry then
         return false, "hammer_marker_not_found:" .. tostring(entry_target_name)
     end
-    return teleport(hero, entry), nil
+    return teleport(hero, entry)
 end
 
 local function camera_target_for_session(session)
@@ -465,8 +470,8 @@ local function teleport_to_active_monster(session)
     for _, unit in pairs(session.monsters) do
         if alive(unit) then
             local position = unit:GetAbsOrigin() - unit:GetForwardVector() * 160
-            hero:SetAbsOrigin(position)
-            FindClearSpaceForUnit(hero, position, true)
+            local moved = destination_validation.teleport(hero, position, true)
+            if not moved then return false, "challenge_destination_invalid" end
             hero:Stop()
             return true
         end
@@ -774,6 +779,17 @@ function M.start(payload)
     if not profiles_ok then return { ok = false, error = profile_error } end
     local markers_ok, marker_error = validate_session_markers(session)
     if not markers_ok then return { ok = false, error = marker_error } end
+    if session.teleport_hero then
+        local entry = marker(current_entry_marker_name(session))
+        if not entry then
+            return { ok = false, error = "challenge_entry_marker_missing" }
+        end
+        local destination_ok, destination_error =
+            destination_validation.validate(entry:GetAbsOrigin(), hero)
+        if not destination_ok then
+            return { ok = false, error = destination_error }
+        end
+    end
 
     -- Create the whole encounter before moving the player. A failed spawn
     -- therefore never leaves the player in an empty challenge room.

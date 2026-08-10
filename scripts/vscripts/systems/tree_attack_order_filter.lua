@@ -1,6 +1,7 @@
 local tree_damage_rules = require("systems/tree_damage_rules")
 local repair_order_service = require("systems/repair_order_service")
 local lumberjack_order_service = require("systems/lumberjack_order_service")
+local destination_validation = require("systems/destination_validation_service")
 
 local M = {}
 local registered = false
@@ -23,9 +24,23 @@ end
 local function filter(_, keys)
     lumberjack_order_service.process(keys)
     if repair_order_service.process(keys) then return false end
-    if tonumber(keys.order_type) ~= tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET) then
+    local order_type = tonumber(keys.order_type)
+    if order_type == tonumber(DOTA_UNIT_ORDER_MOVE_TO_POSITION)
+        or order_type == tonumber(DOTA_UNIT_ORDER_ATTACK_MOVE) then
+        local position = Vector(
+            tonumber(keys.position_x) or 0,
+            tonumber(keys.position_y) or 0,
+            tonumber(keys.position_z) or 0
+        )
+        for _, unit in ipairs(ordered_units(keys)) do
+            if destination_validation.is_constrained_hero(unit) then
+                local allowed = destination_validation.validate(position, unit)
+                if not allowed then return false end
+            end
+        end
         return true
     end
+    if order_type ~= tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET) then return true end
     local target = entity(keys.entindex_target)
     if not tree_damage_rules.is_tree(target) then return true end
     for _, unit in ipairs(ordered_units(keys)) do

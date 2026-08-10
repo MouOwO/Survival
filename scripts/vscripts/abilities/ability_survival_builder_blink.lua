@@ -1,11 +1,12 @@
 ability_survival_builder_blink = class({})
 
 local BLINK_RANGE = 1000
+local destination_validation = require("systems/destination_validation_service")
 local START_PARTICLE = "particles/items_fx/blink_dagger_start.vpcf"
 local END_PARTICLE = "particles/items_fx/blink_dagger_end.vpcf"
 
 local function valid_destination(position)
-    return GridNav:IsTraversable(position) and not GridNav:IsBlocked(position)
+    return destination_validation.validate(position)
 end
 
 function ability_survival_builder_blink:CastFilterResultLocation(location)
@@ -55,7 +56,8 @@ function ability_survival_builder_blink:OnSpellStart()
     caster:Stop()
     flash(START_PARTICLE, origin, caster)
     ProjectileManager:ProjectileDodge(caster)
-    FindClearSpaceForUnit(caster, destination, true)
+    local moved = destination_validation.teleport(caster, destination, true)
+    if not moved then self:EndCooldown(); return end
     flash(END_PARTICLE, caster:GetAbsOrigin(), caster)
 end
 

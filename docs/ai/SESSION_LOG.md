@@ -1,3 +1,18 @@
+## 2026-08-10 - Source 2本地化缺失与重复token告警清理
+
+- 冷启动日志定位到两个精确单位token缺失，以及挑战奖励说明、金矿和英雄祭坛的大小写不敏感同名异值。按批准范围只修改CSV显示名、本地化源/镜像和专项测试，未触碰启动规则、modifier bootstrap、fingerprint日志或其他玩法系统。
+- `unit_display_names.csv`新增`npc_survival_builder_proxy=建造者`和`npc_survival_repairer=修理工`，通过现有生成器定向重建`unit_display_names.lua`。game侧六份本地化文件和content侧两份Panorama源同步补齐`Builder/建造者`、`Repairer/修理工`；历史挑战奖励大小写别名保留但说明完全一致；建筑占位改为`Gold Mine/金矿`和`Hero Altar/英雄祭坛`。
+- 新增`test_localization_token_integrity.ps1`，覆盖精确token、大小写不敏感同名异值、建筑占位、CSV/生成Lua、严格UTF-8和本地化BOM。专项契约、八文件冲突扫描与结构检查、定向生成逐字节一致、生成Lua 5.1语法、UTF-8/BOM及Builder替换回归通过。既有免费英雄替换契约在无关的Shadow Fiend力量断言失败，未为其改动英雄数据。
+- 本任务不能称为实机验证或性能提升证明。下一步需完全退出并冷启动Workshop Tools，确认原日志中的`FindSafe`和`Ignoring duplicate token`告警消失。
+
+## 2026-08-10 - 英雄移动白名单与建筑禁建黑名单重构
+
+- 用户批准从Plan切换到Act并实施禁建区域重构。先按CSV权威源审计，确认原草稿把同一`forbidden_region_service`同时用于英雄目的地和建筑校验，且区域CSV只有表头/示例。
+- 使用`game/bin/win64/dmxconvert.exe`成功提取`template_map.vmap`和`survival_dev.vmap`。两份地图均只有挑战、转生、波次等业务中心Marker，没有可靠的区域边界点；未把Marker或挑战`room_radius`伪造为白名单/黑名单坐标。
+- 生产实现拆分为`hero_movable`白名单和`building_forbidden`黑名单，支持圆形与凸四边形。用户后续确认空配置必须保持游戏可玩，因此无有效`hero_movable`时白名单不启用，沿用旧导航/Grid规则；有效行存在后才严格约束。`building_forbidden`始终独立生效。
+- 统一目的地服务已接入祭坛召唤、挑战传送、练功房、回城、球状闪电、Builder Blink和终极塔锚点；唯一Order Filter增加正式英雄移动/攻击移动位置拒绝；英雄守卫按单位对象保存最后合法位置并在脚本位移/击退/追击越界后停止并精确拉回。
+- 本次兼容修复自动验证通过：`BUILD_FORBIDDEN_REGIONS_CONTRACT_PASS`、`BUILD_FORBIDDEN_REGIONS_LUA51_PASS`、`HERO_REGION_RUNTIME_LUA51_PASS`、目标Lua 5.1语法、区域生成逐字节一致、配置CheckOnly、生产/测试严格UTF-8、本轮文档新增行无替换字符、限定`git diff --check`，以及Builder替换/槽位/多人、输入生命周期、祭坛输入、树规则、相机和终极塔回归。既有Builder移速行为/契约因CSV当前500与测试期望600失败，既有Builder utility契约因Monkey CSV射程非1000失败；未为无关测试修改权威数据。
+- 兼容修复新增空配置、仅黑名单、启用白名单以及区域拒绝仍返回完整红色Grid cells回归。当前不能称为Workshop Tools实机验收：需冷启动确认Grid显示、合法建造和拒绝红格；真实边界仅影响后续严格白名单启用。
 ## 2026-08-09 - 怪物护甲并发冲突解决与用户验收记录
 
 - stash恢复在`armor_balance.lua`产生冲突：当前分支新增现代非线性映射辅助API，恢复内容则是已验收的怪物线性`/3`投影加Damage Filter曲线差值补偿。三方比较和调用审计确认两者可兼容保留，但当前分支同时把波次、挑战和调试怪切到现代映射，117会从39变为约34.32，不能作为纯文本合并保留。

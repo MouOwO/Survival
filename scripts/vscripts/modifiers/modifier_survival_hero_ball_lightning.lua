@@ -5,6 +5,7 @@ LinkLuaModifier(
 )
 
 modifier_survival_hero_ball_lightning = class({})
+local destination_validation = require("systems/destination_validation_service")
 
 local PARTICLE = "particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning.vpcf"
 local SOUND = "Hero_StormSpirit.BallLightning"
@@ -54,6 +55,12 @@ function modifier_survival_hero_ball_lightning:UpdateHorizontalMotion(parent, dt
     local remaining = delta:Length2D()
     local step = self.speed * math.max(0, tonumber(dt) or 0)
     if remaining <= math.max(1, step) then
+        local valid = destination_validation.validate(self.target, parent)
+        if not valid then
+            self:RefundMana()
+            self:Destroy()
+            return
+        end
         parent:SetAbsOrigin(self.target)
         self.completed = true
         self:Destroy()
@@ -92,6 +99,10 @@ function modifier_survival_hero_ball_lightning:OnDestroy()
         self.particle = nil
     end
     if parent:IsAlive() then
+        local valid = destination_validation.validate(parent:GetAbsOrigin(), parent)
+        if not valid and parent.survival_hero_last_legal_position then
+            parent:SetAbsOrigin(parent.survival_hero_last_legal_position)
+        end
         FindClearSpaceForUnit(parent, parent:GetAbsOrigin(), true)
         parent:Stop()
     end

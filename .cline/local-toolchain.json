@@ -1,7 +1,7 @@
 {
-  "workspace": "E:\\steam\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\Survival",
-  "python3": "C:\\Users\\UserComputer\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
-  "lua51": "C:\\msys64\\msys64\\bin\\lua5.1.exe",
-  "luac51": "C:\\msys64\\msys64\\bin\\luac5.1.exe",
+  "workspace": "D:\\steam\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival",
+  "python3": "C:\\Users\\a\\.workbuddy\\binaries\\python\\versions\\3.11.9\\python.exe",
+  "lua51": "C:\\msys64\\mingw64\\bin\\lua5.1.exe",
+  "luac51": "C:\\msys64\\mingw64\\bin\\luac5.1.exe",
   "powershell": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
 }

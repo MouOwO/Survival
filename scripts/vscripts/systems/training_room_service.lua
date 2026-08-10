@@ -5,6 +5,7 @@ local actions = require("config/generated/altar_actions")
 local locations = require("config/generated/challenge_locations")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local return_home = require("systems/hero_return_home_service")
+local destination_validation = require("systems/destination_validation_service")
 
 local M = {}
 local state_by_player = {}
@@ -166,6 +167,11 @@ function M.enter(player_id, action_id)
     if not valid(marker) then
         return { ok = false, error = "传送地点不存在：" .. tostring(marker_name) }
     end
+    local destination_ok, destination_error =
+        destination_validation.validate(marker:GetAbsOrigin(), hero)
+    if not destination_ok then
+        return { ok = false, error = destination_error }
+    end
     local team = hero:GetTeamNumber()
     local entry_cost = math.max(0, tonumber(action.gold_cost) or 0)
     local periodic_cost = math.max(
@@ -207,8 +213,8 @@ function M.enter(player_id, action_id)
     hero:Stop()
     ProjectileManager:ProjectileDodge(hero)
     local position = marker:GetAbsOrigin()
-    hero:SetAbsOrigin(position)
-    FindClearSpaceForUnit(hero, position, true)
+    local moved, move_error = destination_validation.teleport(hero, position, false)
+    if not moved then return { ok = false, error = move_error } end
 
     local multiplier = math.max(
         1,

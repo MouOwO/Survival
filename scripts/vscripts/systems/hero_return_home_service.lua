@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local destination_validation = require("systems/destination_validation_service")
 local building_system = require("systems/building_system")
 
 local M = {}
@@ -36,6 +37,8 @@ local function follow_hero_camera(hero, player_id, position)
 end
 
 local function position_is_clear(position, hero)
+    local valid_destination = destination_validation.validate(position, hero)
+    if not valid_destination then return false end
     if GridNav:IsBlocked(position) or not GridNav:IsTraversable(position) then
         return false
     end
@@ -102,8 +105,8 @@ function M.return_unit(hero, player_id)
 
     hero:Stop()
     ProjectileManager:ProjectileDodge(hero)
-    hero:SetAbsOrigin(position)
-    FindClearSpaceForUnit(hero, position, true)
+    local moved, move_error = destination_validation.teleport(hero, position, false)
+    if not moved then return { ok = false, error = move_error } end
     position = hero:GetAbsOrigin()
     follow_hero_camera(hero, player_id, position)
     notify(player_id, "已返回主城")

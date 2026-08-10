@@ -1,5 +1,26 @@
 # Current Task
 
+## 当前插入任务（2026-08-10）：本地化缺失与重复 token 告警清理
+
+- 用户提供冷启动日志：`npc_survival_repairer`、`npc_survival_builder_proxy` 缺失精确本地化 token；挑战通用奖励说明、`building_gold_mine`和`building_hero_altar`存在大小写不敏感同名但文本不同的重复定义。
+- 已完成最小范围修复：单位显示名先补入`unit_display_names.csv`并定向生成；六份game本地化镜像和两份content Panorama源已同步；历史大小写别名继续保留但值已统一；中英文建筑占位值分别改为可显示名称。未修改Lua运行逻辑、启动规则、modifier bootstrap或fingerprint日志。
+- 性能边界：这些告警主要发生在本地化加载/热重载阶段，不是逐帧热路径；本任务目标是消除重复日志、避免覆盖顺序导致错误显示，并防止缺失token被重复请求，不能把静态清理夸大为已证明的帧率提升。
+- 自动验证结果：`LOCALIZATION_TOKEN_INTEGRITY_CONTRACT_PASS`、八文件大小写不敏感冲突扫描、结构检查、定向生成逐字节一致、生成Lua 5.1语法、严格UTF-8/BOM和Builder替换回归通过。既有免费英雄替换契约在无关的`FREE_HERO_STRENGTH_INVALID_hero_shadow_fiend`断言失败；未修改英雄CSV或其生成配置。
+- 剩余验证：必须完全退出并冷启动Workshop Tools，确认日志中的`FindSafe`缺失token与`Ignoring duplicate token`告警不再出现；自动检查不能替代引擎本地化装载验证。
+
+## 当前插入任务（2026-08-10）：英雄移动白名单与建筑禁建黑名单
+
+- 用户当前消息已明确批准从Plan切换到Act并实施本任务；该指令优先于本文后部仍记录的“多人阶段1等待验收”。多人任务保持原状态暂停，本轮只修改区域、目的地、Grid、传送、命令过滤和英雄边界守卫直接相关内容。
+- 已批准模型：`build_forbidden_regions.csv`使用`region_type=hero_movable|building_forbidden`，支持`circle`和按边界顺序定义的凸`quadrilateral`。召唤祭坛产生的正式战斗英雄受移动白名单约束；Builder、伐木工、修理工、建筑、怪物和隐藏占位英雄不受英雄白名单约束。
+- 英雄普通移动/攻击移动的非法目标在Order Filter提前拒绝；追击、击退和脚本位移等运行时越界由生命周期守卫停止动作并拉回最后合法位置。普通寻路不承诺整条路径都位于白名单内。
+- 空区域配置必须保持游戏可玩：没有启用的`hero_movable`时白名单视为未启用，英雄沿用既有导航，建筑沿用既有Grid边界、地形、坡度、树木、单位、占用和所有权校验；不得猜测坐标或伪造超大区域。
+- 一旦存在有效`hero_movable`，建筑footprint必须完整位于其区域联集内；`building_forbidden`始终独立生效，与白名单是否启用无关。区域策略拒绝时仍必须返回完整footprint cells并全部标红，不能用空`cells`隐藏Grid。
+- 工作区已有本任务前置草稿：目的地/Grid/传送相关tracked文件有未提交修改，CSV、生成Lua、区域服务和目的地服务为未跟踪文件。本轮在其基础上审计和完成，不回滚其他既有修改。
+- 本机有效工具链已重新探测：Python 3.11.9位于`C:\Users\a\.workbuddy\binaries\python\versions\3.11.9\python.exe`，Lua/Luac 5.1位于`C:\msys64\mingw64\bin`，PowerShell 7.6.4位于`C:\Program Files\PowerShell\7\pwsh.exe`；`.cline/local-toolchain.json`现有路径失效，需同步修正。
+- 本轮实现结果：已完成CSV schema、生成、区域几何服务、英雄/建筑策略分离、统一目的地校验、Grid footprint白名单/黑名单、移动/攻击移动Order Filter、英雄生命周期回退、祭坛/挑战/练功房/回城/球状闪电/终极塔锚点接入。`build_forbidden_regions.csv`当前无启用业务行，因此运行时保持旧地图导航与Grid建造规则；后续写入真实`hero_movable`后自动启用严格白名单。
+- 本次兼容修复自动验证：区域PowerShell契约、区域Lua 5.1几何/Grid行为、英雄身份/回退/移动过滤、Builder替换与Ability槽位、多人Builder、输入生命周期、祭坛输入、树规则、终极塔数学、相机契约、目标Lua 5.1语法、配置CheckOnly、区域CSV定向生成逐字节一致、生产/测试严格UTF-8、本轮文档新增行无替换字符及限定`git diff --check`通过。既有Builder移速测试仍要求600但当前CSV为500，既有Builder utility契约仍要求Monkey射程1000；两项失败均未修改本任务区域代码或权威数据。
+- 剩余验证：需Workshop Tools冷启动确认当前空配置下Grid正常显示、合法地点可建造，区域拒绝时Grid保持显示并标红。Hammer真实边界仍是启用新白名单能力所需的数据，但不再阻断当前地图可玩性。
+
 ## 已完成插入任务（2026-08-09）：怪物护甲并发冲突解决
 
 - 用户确认此前“117 War3护甲保持线性投影为39运行时护甲，并在Damage Filter中只补偿War3目标曲线/当前Dota曲线差值”的方案已通过测试验收。本次处理`armor_balance.lua`与当前分支现代非线性映射的stash恢复冲突，以该已验收行为为准，并同步核对波次、挑战、调试怪、科技减甲和UI映射身份，不能只删除冲突标记。
@@ -336,6 +357,7 @@
 
 ## 当前检查点
 
+- 当前插入任务：区域生产实现与自动验证完成，真实Hammer边界坐标缺失导致CSV保持空业务行；运行时按批准策略失败关闭，尚不能Workshop Tools实机验收。
 - 当前阶段：阶段1生产实现与自动验证完成，等待Workshop Tools单人冷启动验收。
 - 当前地图源存在`template_map.vmap`和`survival_dev.vmap`，运行产物为`maps/template_map.vpk`。
 - 已确认旧地图只有单个历史波次marker `monsterborn`；尚未确认4套玩家marker。
@@ -345,7 +367,7 @@
 
 ## 下一步唯一动作
 
-用户在Workshop Tools冷启动`template_map`做阶段1单人兼容验收：确认玩家0 Builder正常生成、可选择并可建造，日志包含`[MULTIPLAYER_CONTEXT]`与`[BUILDER_READY] player=0 slot=east ... source=legacy_coordinates`。通过后进入Hammer双槽位和两客户端联机测试。
+先进行Workshop Tools冷启动区域实机验证，确认空配置下Grid显示和合法建造恢复、非法区域仍显示红格。Hammer真实边界取得后再更新权威CSV并定向生成，以启用严格白名单；多人阶段1保持暂停，等待当前插入任务实机结果。
 ## 阶段1自动验证记录（2026-08-06）
 
 - `MULTIPLAYER_CONTEXT_CONTRACT_PASS`：CSV、生成Lua、服务接入和4人启动契约通过。

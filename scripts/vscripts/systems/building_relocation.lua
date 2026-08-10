@@ -8,10 +8,31 @@ function building_system.bind(get_state, public_state)
     building_system.public_state = public_state
 end
 
+function building_system.validate(unit, position)
+    if not unit or unit:IsNull() or not position then
+        return nil, "invalid_unit_or_position"
+    end
+    local state = building_system.get_state(unit:entindex())
+    if not state then return nil, "building_state_not_found" end
+    local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
+        position = position,
+        footprint = state.definition.footprint,
+        ignore_entindex = unit:entindex(),
+        team = state.team,
+    })
+    if not grid or grid.ok ~= true then
+        return nil, grid and grid.error or "relocation_position_invalid"
+    end
+    return grid, nil
+end
+
 function building_system.move(unit, position)
     if not unit or unit:IsNull() or not position then return false, "invalid_unit_or_position" end
     local state = building_system.get_state(unit:entindex())
     if not state then return false, "building_state_not_found" end
+    local grid, reason = building_system.validate(unit, position)
+    if not grid then return false, reason end
+    position = grid.world_position
     event_bus.request(events.GRID_RELEASE_REQUEST, {
         grid_x = state.grid_x, grid_y = state.grid_y,
         footprint = state.definition.footprint,

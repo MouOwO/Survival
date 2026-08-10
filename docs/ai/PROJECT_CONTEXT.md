@@ -1,11 +1,21 @@
 # Project Context
 
+## 英雄移动白名单与建筑禁建黑名单边界（2026-08-10）
+
+- 区域权威源为`data/csv/建筑与工人系统/build_forbidden_regions.csv`。`region_type=hero_movable`定义战斗英雄可移动区域联集，`region_type=building_forbidden`定义建筑禁建黑名单；形状只允许`circle`和按边界顺序定义的凸`quadrilateral`。生成器和运行时均校验类型、坐标、正半径和凸性，禁止直接手改生成Lua。
+- 只有祭坛替换产生且已写`survival_hero_id`的正式战斗英雄受移动白名单约束。Builder、伐木工、修理工、建筑、怪物和隐藏占位英雄不按`IsHero()`或队伍猜测身份，也不受英雄白名单约束。
+- 英雄目的地只校验导航与`hero_movable`，不得把`building_forbidden`用于拒绝英雄移动。存在有效`hero_movable`时，建筑footprint必须完整位于区域联集内；无有效行时白名单未启用，英雄和建筑沿用既有导航与Grid规则。`building_forbidden`始终独立拒绝相交footprint，之后继续Grid边界、地形、坡度、树木、单位、占用和所有权校验。
+- 英雄普通移动/攻击移动目标由项目唯一组合Order Filter提前拒绝；追击、击退和脚本位移由0.05秒生命周期守卫处理。守卫以单位对象为生命周期身份保存最后合法位置，越界时停止并精确拉回；不得永久保存可复用entindex，也不得宣称普通寻路路径全程受白名单约束。
+- 祭坛、挑战、练功房等有副作用流程必须在英雄替换、怪物/目标生成和扣费前预验证目标；传送后还要验证`FindClearSpaceForUnit`产生的最终位置，失败时精确恢复原点。终极塔等建筑锚点必须校验自身footprint，不能用单位点校验替代。
+- 区域策略拒绝建筑时必须返回完整footprint cells并统一标记区域错误，使Panorama仍能渲染红色Grid；不得通过提前返回空`cells`隐藏反馈。Hammer中心Marker和`challenge_locations.csv.room_radius`不能推断区域边界，获得可靠边界前不得填猜测坐标。
+
 ## 怪物尸体、详细日志与本地化性能边界（2026-08-09）
 
 - 可安全删除的怪物必须由明确生成入口标记，不能按敌方队伍或通用单位名猜测。死亡业务继续以同步`ENGINE_ENTITY_KILLED`完成波次计数、奖励、掉落、成长和连锁技能；尸体视觉与实体删除只能在该事件栈退出后的scheduler阶段开始。强制清场可显式设置`survival_wave_cleanup`并立即删除，不进入死亡动画。
 - 尸体时序来自`global_rules.csv`：当前原地保留0.6秒、0.8秒内下沉160码、共享0.05秒更新，隐藏后0.05秒安全移除。所有活动尸体共享一个scheduler任务，不为每只尸体创建永久Think；状态以单位对象为生命周期身份并在移除后释放，禁止跨生命周期永久保存entindex。
 - 高频攻击、伤害和短间隔技能路径不得默认格式化并输出成功明细。`runtime_detailed_diagnostics=0`时详细日志包装器必须在`string.format()`之前返回；错误、有限次诊断、用户操作结果和低频聚合仍保留。排障时从CSV显式开启并冷启动，不在生产路径临时散落无界`print`。
 - Panorama动态本地化必须在当前HUD context内使用固定上限缓存；当前四个helper最多保存256个token字符串结果，缺失token缓存为空，避免高频刷新持续请求同一无效token。Tooltip逐次SHOW、定位、映射、游标、恢复等详细日志默认关闭，仅在`SurvivalTooltipDetailedDiagnostics === true`时输出；错误、施法诊断和低频内存聚合不受影响。
+- Source 2本地化token按大小写不敏感方式冲突检查。为兼容历史调用保留大小写变体时，各变体必须使用完全相同的文本；精确单位token必须同步到game侧`resource`/`resource/localization`/`panorama/localization`和content侧Panorama源。单位项目显示名仍先维护`data/csv/公共规则/unit_display_names.csv`，再定向生成对应Lua，禁止只手改生成文件。
 
 ## 同步动作结果与异步冷却事务（2026-08-09）
 

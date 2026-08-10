@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/grid_placement_config")
+local region_service = require("systems/forbidden_region_service")
 
 local M = {}
 local occupied = {}
@@ -93,12 +94,7 @@ local function in_region(center, region)
         and center.y - half <= number(region.max_y, 0)
 end
 
-local function forbidden(center)
-    for _, region in ipairs(config.forbidden_regions or {}) do
-        if in_region(center, region) then
-            return true, "forbidden_region:" .. tostring(region.id or "unnamed")
-        end
-    end
+local function forbidden_marker(center)
     for _, region in ipairs(marker_regions) do
         if in_region(center, {
             shape = "circle",
@@ -124,10 +120,14 @@ local function terrain_clear(center)
     }
     local lowest, highest = nil, nil
     for _, sample in ipairs(samples) do
-        local traversable, blocked = true, false
-        pcall(function() traversable = GridNav:IsTraversable(sample) end)
-        pcall(function() blocked = GridNav:IsBlocked(sample) end)
-        if not traversable or blocked then return false, "terrain_blocked" end
+        local traversable_ok, traversable = pcall(function()
+            return GridNav:IsTraversable(sample)
+        end)
+        local blocked_ok, blocked = pcall(function()
+            return GridNav:IsBlocked(sample)
+        end)
+        if not traversable_ok or traversable ~= true
+            or not blocked_ok or blocked ~= false then return false, "terrain_blocked" end
         local height = ground_height(sample)
         lowest = lowest and math.min(lowest, height) or height
         highest = highest and math.max(highest, height) or height
@@ -272,7 +272,11 @@ local function validate_cell(grid_x, grid_y, payload)
         result.ok, result.reason = false, "build_out_of_bounds"
         return result
     end
-    local is_forbidden, forbidden_reason = forbidden(center)
+    if payload.region_policy_error then
+        result.ok, result.reason = false, payload.region_policy_error
+        return result
+    end
+    local is_forbidden, forbidden_reason = forbidden_marker(center)
     if is_forbidden then
         result.ok, result.reason = false, forbidden_reason
         return result
@@ -305,13 +309,36 @@ local function can_place(payload)
     local grid_x = start_cell(anchor_x, footprint.x)
     local grid_y = start_cell(anchor_y, footprint.y)
     local world_position = anchor_world(anchor_x, anchor_y)
+    local size = number(config.cell_size, 128)
+    local policy_ok, policy_error = region_service.validate_building_footprint(
+        grid_x * size,
+        grid_y * size,
+        (grid_x + footprint.x) * size,
+        (grid_y + footprint.y) * size
+    )
+    if payload.policy_only == true then
+        return {
+            ok = policy_ok,
+            error = policy_error,
+            anchor_x = anchor_x,
+            anchor_y = anchor_y,
+            grid_x = grid_x,
+            grid_y = grid_y,
+            footprint = footprint,
+            world_position = world_position,
+            cells = {},
+        }
+    end
     local validation_payload = {}
     for key, value in pairs(payload) do validation_payload[key] = value end
-    validation_payload.nearby_units = nearby_units_for_footprint(
-        payload,
-        footprint,
-        world_position
-    )
+    if not policy_ok then validation_payload.region_policy_error = policy_error end
+    if policy_ok then
+        validation_payload.nearby_units = nearby_units_for_footprint(
+            payload,
+            footprint,
+            world_position
+        )
+    end
     local cells, all_valid, first_error = {}, true, nil
     for x = grid_x, grid_x + footprint.x - 1 do
         for y = grid_y, grid_y + footprint.y - 1 do
@@ -394,5 +421,6 @@ M._unit_overlaps_cell_for_test = unit_overlaps_cell
 M._has_unit_for_test = has_unit
 M._nearby_units_for_footprint_for_test = nearby_units_for_footprint
 M._occupied_for_test = function() return occupied end
+M._can_place_for_test = can_place
 
 return M

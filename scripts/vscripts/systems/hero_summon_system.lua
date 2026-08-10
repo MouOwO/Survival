@@ -6,6 +6,7 @@ local stat_adapter = require("systems/hero_stat_adapter")
 local cosmetic_service = require("systems/hero_cosmetic_service")
 local projection = require("systems/hero_summon_projection")
 local hero_anchor_service = require("systems/hero_anchor_service")
+local destination_validation = require("systems/destination_validation_service")
 
 local M = {}
 
@@ -132,7 +133,6 @@ local function initialize_replacement(player_id, team, altar, definition)
     end
 
     unit:RemoveNoDraw()
-    FindClearSpaceForUnit(unit, position, true)
 
     print(string.format(
         "[HERO_REPLACEMENT_OWNER] player=%s reported_owner=%s entindex=%s",
@@ -149,6 +149,10 @@ local function initialize_replacement(player_id, team, altar, definition)
     -- native carrier identity (for example Sven or Undying).
     unit.survival_display_name = definition.display_name
     unit.survival_hero_id = definition.hero_id
+    local moved, move_error = destination_validation.teleport(unit, position, false)
+    if not moved then
+        return nil, move_error
+    end
     if not unit:HasModifier("modifier_single_health_bar") then
         unit:AddNewModifier(unit, nil, "modifier_single_health_bar", {
             player_id = player_id,
@@ -202,6 +206,13 @@ local function validate(player_id, hero_id, debug_bypass)
     local definition = heroes.by_id[hero_id]
     if not definition or definition.enabled == false then
         return nil, nil, "英雄配置不存在"
+    end
+    local spawn = summon_position(altar, definition)
+    spawn.z = GetGroundHeight(spawn, altar)
+    local destination_ok, destination_error =
+        destination_validation.validate_hero_position(spawn)
+    if not destination_ok then
+        return nil, nil, destination_error
     end
 
     local entitlement = projection.entitlements(player_id)

@@ -197,6 +197,8 @@ local function create_ultimate(player_id, caster, selected)
         base_attack = attack,
         streams = {},
         at_wall = false,
+        footprint = selected[1].definition
+            and selected[1].definition.footprint or { x = 2, y = 2 },
     }
     for _, source in ipairs(selected) do
         local row = final_row(source.tower_class)
@@ -371,9 +373,21 @@ function M.teleport_for_player(player_id, hero)
         target = valid(wall) and wall:GetAbsOrigin() or nil
     end
     if not target then return { ok = false, error = "teleport_anchor_missing" } end
+    local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
+        position = target,
+        footprint = state.footprint,
+        ignore_entindex = state.unit:entindex(),
+        team = state.unit:GetTeamNumber(),
+        policy_only = true,
+    })
+    if not grid or grid.ok ~= true then
+        return { ok = false, error = grid and grid.error or "teleport_anchor_invalid" }
+    end
+    target = grid.world_position
     state.unit:SetAbsOrigin(target)
-    FindClearSpaceForUnit(state.unit, target, true)
-    for _, stream in ipairs(state.streams) do stream.proxy:SetAbsOrigin(target) end
+    for _, stream in ipairs(state.streams) do
+        stream.proxy:SetAbsOrigin(target)
+    end
     state.at_wall = not state.at_wall
     return { ok = true }
 end

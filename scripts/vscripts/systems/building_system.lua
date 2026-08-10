@@ -917,6 +917,9 @@ end
 function M.relocate_building(unit, position)
     return require("systems/building_relocation").move(unit, position)
 end
+function M.validate_relocation(unit, position)
+    return require("systems/building_relocation").validate(unit, position)
+end
 
 function M.set_wall_hull_scale(player_id, entindex, multiplier)
     return building_hull_scale.apply(
