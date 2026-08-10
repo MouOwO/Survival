@@ -1,5 +1,7 @@
 local M = {}
 local tree_damage_rules = require("systems/tree_damage_rules")
+local global_rules = require("config/generated/global_rules")
+local armor_balance = require("config/armor_balance")
 local event_bus = nil
 local events = nil
 local repository = nil
@@ -7,6 +9,15 @@ local config = nil
 local registered = false
 local diagnostic_count_by_attacker = {}
 local tree_diagnostic_count = 0
+local monster_physical_diagnostic_count = 0
+
+local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
+    and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
+    and tonumber(global_rules.by_id.runtime_detailed_diagnostics.value) == 1
+local monster_war3_armor_damage_enabled =
+    global_rules.by_id.monster_war3_armor_damage_enabled
+    and global_rules.by_id.monster_war3_armor_damage_enabled.enabled ~= false
+    and tonumber(global_rules.by_id.monster_war3_armor_damage_enabled.value) == 1
 
 local function diagnostic_hero(attacker)
     local hero_id = tostring(attacker and attacker.survival_hero_id or "")
@@ -148,6 +159,33 @@ local function filter(_, keys)
             - target_reduction)
         * boss_multiplier
     keys.damage = math.max(0, keys.damage * multiplier)
+    local damage_type = tonumber(keys.damagetype_const or keys.damagetype)
+    local armor_compensation = 1
+    local runtime_armor = nil
+    if monster_war3_armor_damage_enabled
+        and victim.survival_monster_corpse == true
+        and damage_type == DAMAGE_TYPE_PHYSICAL then
+        runtime_armor = tonumber(victim:GetPhysicalArmorValue(false)) or 0
+        armor_compensation =
+            armor_balance.monster_physical_damage_compensation(runtime_armor)
+        keys.damage = math.max(0, keys.damage * armor_compensation)
+    end
+    if detailed_diagnostics and monster_physical_diagnostic_count < 40
+        and victim.survival_monster_corpse == true
+        and damage_type == DAMAGE_TYPE_PHYSICAL then
+        monster_physical_diagnostic_count = monster_physical_diagnostic_count + 1
+        print(string.format(
+            "[MONSTER_PHYSICAL_DAMAGE_FILTER] sample=%s attacker=%s victim=%s "
+                .. "filtered_damage=%s flags=%s runtime_armor=%s health=%s/%s "
+                .. "post_multiplier=%s armor_compensation=%s",
+            tostring(monster_physical_diagnostic_count),
+            tostring(attacker:entindex()), tostring(victim:entindex()),
+            tostring(keys.damage), tostring(keys.damage_flags or 0),
+            tostring(runtime_armor or victim:GetPhysicalArmorValue(false)),
+            tostring(victim:GetHealth()), tostring(victim:GetMaxHealth()),
+            tostring(multiplier), tostring(armor_compensation)
+        ))
+    end
     if diagnostic then
         print(string.format(
             "[HERO_DAMAGE_FILTER_RESULT] hero=%s attacker=%s victim=%s "
@@ -183,6 +221,7 @@ function M.init(deps)
     registered = false
     diagnostic_count_by_attacker = {}
     tree_diagnostic_count = 0
+    monster_physical_diagnostic_count = 0
     tree_damage_rules.reset_pending_attacks()
 end
 

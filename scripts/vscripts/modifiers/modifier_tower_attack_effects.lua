@@ -16,6 +16,7 @@ local buff_manager = require("systems/buff_manager")
 local asset_catalog = require("config/asset_catalog")
 local sound_service = require("core/sound_service")
 local global_rules = require("config/generated/global_rules")
+local tower_combat_rules = require("config/tower_combat_rules")
 
 local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
     and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
@@ -136,14 +137,20 @@ function modifier_tower_attack_effects:DeclareFunctions()
     return {
         MODIFIER_EVENT_ON_ATTACK_START,
         MODIFIER_EVENT_ON_ATTACK,
+        MODIFIER_EVENT_ON_ATTACK_FAIL,
         MODIFIER_EVENT_ON_ATTACK_LANDED,
         MODIFIER_EVENT_ON_DEATH,
         MODIFIER_PROPERTY_ATTACK_POINT_CONSTANT,
+        MODIFIER_PROPERTY_CANNOT_MISS,
         MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE,
         MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE,
         MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE,
         MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE,
     }
+end
+
+function modifier_tower_attack_effects:GetModifierCannotMiss()
+    return tower_combat_rules.cannot_miss(self:GetParent()) and 1 or 0
 end
 
 function modifier_tower_attack_effects:GetModifierAttackSpeedPercentage()
@@ -170,6 +177,8 @@ function modifier_tower_attack_effects:OnCreated()
     self.current_attack_target = nil
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
+    self.attack_landed_diagnostic_count = 0
+    self.attack_failed_diagnostic_count = 0
     self.polar_obelisk_sound_active = false
     self:StartIntervalThink(0.03)
 end
@@ -949,11 +958,38 @@ function modifier_tower_attack_effects:OnAttack(params)
     )
 end
 
+function modifier_tower_attack_effects:OnAttackFail(params)
+    if not IsServer() or params.attacker ~= self:GetParent() then return end
+    self.attack_failed_diagnostic_count =
+        (tonumber(self.attack_failed_diagnostic_count) or 0) + 1
+    if self.attack_failed_diagnostic_count <= 20 then
+        detailed_log(
+            "[TOWER_ATTACK_RESULT] result=failed tower=%d target=%s "
+                .. "failed=%d landed=%d",
+            self:GetParent():entindex(),
+            tostring(exists(params.target) and params.target:entindex() or -1),
+            self.attack_failed_diagnostic_count,
+            tonumber(self.attack_landed_diagnostic_count) or 0
+        )
+    end
+end
+
 function modifier_tower_attack_effects:OnAttackLanded(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
     local caster, primary = self:GetParent(), params.target
     if not exists(primary) or primary:GetTeamNumber() == caster:GetTeamNumber() then
         return
+    end
+    self.attack_landed_diagnostic_count =
+        (tonumber(self.attack_landed_diagnostic_count) or 0) + 1
+    if self.attack_landed_diagnostic_count <= 20 then
+        detailed_log(
+            "[TOWER_ATTACK_RESULT] result=landed tower=%d target=%d "
+                .. "failed=%d landed=%d damage=%s",
+            caster:entindex(), primary:entindex(),
+            tonumber(self.attack_failed_diagnostic_count) or 0,
+            self.attack_landed_diagnostic_count, tostring(params.damage)
+        )
     end
     local skills = tower_skills.get(caster)
     local damage = caster:GetAverageTrueAttackDamage(caster)

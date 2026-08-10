@@ -215,23 +215,18 @@ local function apply_combat_stats(unit, archetype, profile)
             or archetype.war3_armor or archetype.armor
     )
     if war3_armor then
-        local runtime_armor = armor_balance.from_war3_modern(war3_armor)
+        local runtime_armor = armor_balance.from_war3(war3_armor)
         unit:SetPhysicalArmorBaseValue(runtime_armor)
         unit.survival_war3_armor = war3_armor
-        unit.survival_base_war3_armor = war3_armor
-        unit.survival_effective_war3_armor = war3_armor
-        unit.survival_war3_armor_reduction = 0
         unit.survival_armor = runtime_armor
-        unit.survival_armor_mapping_version = armor_balance.MODERN_MAPPING_VERSION
     end
     local minimum_war3_armor = tonumber(
         archetype.minimum_war3_armor or archetype.minimum_armor
     )
     -- Only explicitly configured archetypes have an armor floor. A default
     -- floor would silently block hero research armor reduction on normal mobs.
-    unit.survival_minimum_war3_armor = minimum_war3_armor
     unit.survival_minimum_armor = minimum_war3_armor ~= nil
-        and armor_balance.from_war3_modern(minimum_war3_armor) or nil
+        and armor_balance.from_war3(minimum_war3_armor) or nil
     local attack_speed = math.max(0.01, tonumber(archetype.attack_speed) or 1)
     unit:SetBaseAttackTime(1 / attack_speed)
     unit.survival_attack_speed = attack_speed

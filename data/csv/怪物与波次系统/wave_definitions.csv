@@ -8,7 +8,7 @@ n1_wave_04_4a,N1,4,4N1,4,orc_large_melee,1,90,1,1.2,1000,62,9,0,0,1,normal,,1,N1
 n1_wave_04_4b,N1,4,4N2,5,orc_small_axe,9,90,1,1,1000,62,9,0,0,1,normal,,1,N1工作簿数量与同波最低属性；保留现有模型映射；证据：面板确认；按真实LV/出怪顺序归位；各属性分别取同波最低值
 n1_wave_05_5l,N1,5,5L,7,demon_purple_melee,1,90,1,1.1,2000,202,9,0,0,1,wave_leader,,1.15,N1工作簿首怪Boss；独立wave_leader身份；模型略大；证据：出怪顺序确认；同LV面板
 n1_wave_05_5a,N1,5,5N1,8,demon_purple_melee,8,90,1,1.1,2000,202,9,0,0,1,normal,,1,N1工作簿数量与同波最低属性；保留现有模型映射；证据：面板确认；按真实LV/出怪顺序归位；各属性分别取同波最低值
-n1_wave_05_5b,N1,5,5B,6,boss_dreadlord,1,90,1,1.5,20000,1302,17,1,1,1,assault_boss,flying,1,N1工作簿进攻Boss；独立assault_boss身份；证据：面板确认
+n1_wave_05_5b,N1,5,5B,6,boss_dreadlord,1,90,1,1.5,20000,1302,117,1,1,1,assault_boss,flying,1,N1工作簿进攻Boss；独立assault_boss身份；证据：面板确认
 n1_wave_06_6l,N1,6,6L,9,humanoid_white_melee,1,90,1,1,40000,1762,23,0,0,1,wave_leader,,1.15,N1工作簿首怪Boss；独立wave_leader身份；模型略大；证据：面板确认
 n1_wave_06_6a,N1,6,6N1,10,humanoid_white_melee,8,90,1,1,4000,442,11,0,0,1,normal,,1,N1工作簿数量与同波最低属性；保留现有模型映射；证据：面板确认；同波低护甲组合；按真实LV/出怪顺序归位；各属性分别取同波最低值
 n1_wave_07_7l,N1,7,7L,11,humanoid_red_axe,1,90,1,1,60000,3202,47,0,0,1,wave_leader,,1.15,N1工作簿首怪Boss；独立wave_leader身份；模型略大；证据：面板确认

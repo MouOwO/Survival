@@ -4,6 +4,10 @@ M.WAR3_TO_DOTA_RATIO = 1 / 3
 M.MODERN_MAPPING_VERSION = 2
 M.MODERN_DOTA_ARMOR_A = 225
 M.MODERN_DOTA_ARMOR_B = 650
+M.WAR3_POSITIVE_ARMOR_FACTOR = 0.02
+M.DOTA_POSITIVE_ARMOR_NUMERATOR = 0.052
+M.DOTA_POSITIVE_ARMOR_BASE = 0.9
+M.DOTA_POSITIVE_ARMOR_DENOMINATOR = 0.048
 
 local function number(value)
     return tonumber(value) or 0
@@ -79,6 +83,32 @@ function M.effective_war3_armor(base_war3_armor, reduction, minimum_war3_armor)
     local minimum = tonumber(minimum_war3_armor)
     if minimum ~= nil then reduced = math.max(minimum, reduced) end
     return reduced
+end
+
+function M.war3_positive_damage_multiplier(war3_armor)
+    local armor = math.max(0, tonumber(war3_armor) or 0)
+    return 1 / (1 + M.WAR3_POSITIVE_ARMOR_FACTOR * armor)
+end
+
+function M.dota_positive_damage_multiplier(dota_armor)
+    local armor = math.max(0, tonumber(dota_armor) or 0)
+    local reduction = M.DOTA_POSITIVE_ARMOR_NUMERATOR * armor
+        / (M.DOTA_POSITIVE_ARMOR_BASE
+            + M.DOTA_POSITIVE_ARMOR_DENOMINATOR * armor)
+    return 1 - reduction
+end
+
+function M.monster_physical_damage_compensation(runtime_armor)
+    local armor = tonumber(runtime_armor) or 0
+    if armor <= 0 then return 1 end
+    -- DamageFilter runs before native physical armor. Apply only the ratio
+    -- between the requested War3 curve and the current Dota armor curve.
+    local engine_multiplier = M.dota_positive_damage_multiplier(armor)
+    if engine_multiplier <= 0 then return 1 end
+    local target_multiplier = M.war3_positive_damage_multiplier(
+        M.to_war3(armor)
+    )
+    return target_multiplier / engine_multiplier
 end
 
 return M

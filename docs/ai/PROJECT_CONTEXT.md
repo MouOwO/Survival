@@ -27,6 +27,12 @@
 - 多怪种波次以修改前普通怪数量为比例，使用最大余数法确定性分配到59；单一普通怪种直接设为59。不得借此改变怪种、属性、角色、出怪顺序、移动类型或模型缩放。
 - 业务配置必须先修改`data/csv/怪物与波次系统/wave_definitions.csv`，再通过`tools.build_configs.build()`定向生成`scripts/vscripts/config/generated/wave_definitions.lua`并进行一致性校验。
 
+## 怪物物理伤害曲线边界（2026-08-09）
+
+- 怪物CSV保存War3显示护甲，生成/出生边界继续通过`armor_balance.from_war3()`除以3写入Dota运行时护甲，UI继续通过`to_war3()`反向显示。该双向属性投影不代表当前Dota伤害曲线天然等于目标War3曲线；旧式`1/(1+0.06*A)`假设不得恢复。`from_war3_modern()`和版本化反投影可作为兼容辅助API保留，但不得给波次、挑战或调试怪写现代映射身份并替换已验收的线性边界。
+- `global_rules.csv.monster_war3_armor_damage_enabled=1`时，全局Damage Filter只对带`survival_monster_corpse=true`明确身份的怪物物理伤害应用曲线补偿。补偿值为`War3目标正护甲承伤倍率 / 当前Dota正护甲承伤倍率`，随后仍由引擎正常结算当前有效护甲；不得再直接乘完整War3减伤倍率，否则会二次减伤。不得动态写`DOTA_DAMAGE_FLAG_IGNORES_PHYSICAL_ARMOR`或递归`ApplyDamage`。科技减甲和毒云改变`GetPhysicalArmorValue(false)`后会自然进入下一次补偿计算；零/负护甲沿用原生曲线。
+- 固定回归基准为N1 W5进攻Boss的20000生命/117 War3护甲和7座五级基础箭塔的401攻击/1次每秒：运行时护甲39，Filter补偿约1.11551，当前Dota原生护甲后最终倍率约0.299401，理论击杀时间约23.79秒。该基准要求每座基础塔每秒实际命中1次，因此`global_rules.csv.base_arrow_tower_cannot_miss`只为未转职基础箭塔提供必中；身份边界是`survival_building_id == "arrow_tower"`且`tower_class`为空，不得扩展到转职塔或其他单位。用户已确认该固定样本测试验收通过，但未提供精确秒数或日志；极高护甲上限行为仍必须由Workshop Tools独立抽样。
+
 ## 正式波次目标资源预载边界（2026-08-09）
 
 - 正式波次首波继续依赖启动预载；后续目标波只在其首只敌人计划出现前`wave_timing_rules.csv.formal_wave_preload_lead_seconds`秒进入异步资源队列，当前配置为4秒。预载不得改变倒计时、首只敌人时刻、成员数量、顺序或生成间隔。

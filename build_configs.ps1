@@ -19,7 +19,7 @@ function Resolve-PythonExecutable {
     # Prefer the Python 3 installation registered on this workstation. Keep
     # this as a candidate rather than a hard requirement so -PythonPath and
     # QCLAW_PYTHON_BINARY can still override it on other machines.
-    $candidates += 'C:\Users\li\AppData\Local\Programs\Python\Python313\python.exe'
+    $candidates += 'C:\Users\a\.workbuddy\binaries\python\versions\3.14.3\python.exe'
 
     $pythonCommand = Get-Command python.exe -ErrorAction SilentlyContinue
     if ($pythonCommand -and $pythonCommand.Source -notlike '*\Microsoft\WindowsApps\*') {
@@ -61,7 +61,7 @@ function Resolve-PythonExecutable {
         }
     }
 
-    throw "Python 3 executable not found. Pass it explicitly with -PythonPath 'C:\path\to\python.exe'. The Microsoft Store WindowsApps alias is not a real Python runtime."
+    throw "Python 3 executable not found. Pass it explicitly with -PythonPath 'D:\VisionScore\python310_embed\python.exe'. The Microsoft Store WindowsApps alias is not a real Python runtime."
 }
 
 $Python = Resolve-PythonExecutable

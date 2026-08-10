@@ -7,6 +7,8 @@ M.rows = {
     { rule_id = "tower_base_projectile_speed", value = 5000, description = "基础箭塔原始弹道速度", enabled = true },
     { rule_id = "tower_route_default_projectile_speed", value = 1250, description = "无独立配置转职塔的原始弹道速度", enabled = true },
     { rule_id = "tower_projectile_speed_multiplier", value = 1, description = "所有防御塔弹道速度倍率", enabled = true },
+    { rule_id = "base_arrow_tower_cannot_miss", value = 1, description = "未转职基础箭塔普通攻击必中（0关闭1开启）", enabled = true },
+    { rule_id = "monster_war3_armor_damage_enabled", value = 1, description = "怪物物理伤害按War3目标护甲曲线补偿（0关闭1开启）", enabled = true },
     { rule_id = "repair_detection_range", value = 99999, description = "修理师自动感知受损建筑的范围", enabled = true },
     { rule_id = "initial_gold", value = 0, description = "队伍开局金币", enabled = true },
     { rule_id = "initial_wood", value = 10, description = "队伍开局木材", enabled = true },

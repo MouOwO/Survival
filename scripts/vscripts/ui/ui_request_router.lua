@@ -276,19 +276,10 @@ local function on_unit_combat_stats_changed(payload)
             if reason:match("^poison_cloud_armor_")
                 or reason == "research_armor_reduction" then
                 local runtime_armor = safe_number(
-                    unit, "GetPhysicalArmorValue", 0, false
+                    unit, "GetPhysicalArmorValue", nil, false
                 )
                 snapshot.runtime_armor = runtime_armor
-                local mapping_version = tonumber(
-                    unit.survival_armor_mapping_version
-                ) or tonumber(snapshot.armor_mapping_version) or 1
-                local display_armor = armor_balance.to_war3_for_mapping(
-                    runtime_armor,
-                    mapping_version
-                )
-                snapshot.armor = display_armor ~= nil
-                    and display_armor or runtime_armor
-                snapshot.armor_mapping_version = mapping_version
+                snapshot.armor = armor_balance.to_war3(runtime_armor)
                 snapshot.armor_unit = "war3_display"
                 snapshot.stat_units_version = 2
             end
