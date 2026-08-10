@@ -12,6 +12,13 @@
 - 为保证固定基准中的“7塔每秒各命中1次”成立，`global_rules.csv.base_arrow_tower_cannot_miss=1`通过现有塔公共Modifier赋予未转职基础箭塔必中；严格以`survival_building_id=arrow_tower`且`tower_class`为空限制范围，七条转职路线、终极塔代理、英雄、工人和其他单位不受影响。伤害、攻速、护甲和弹道数值未改。
 - 复用`global_rules.csv.runtime_detailed_diagnostics`增加默认关闭的限量诊断：`MONSTER_PHYSICAL_DAMAGE_FILTER`记录进入原生护甲阶段前的伤害、flags、运行时护甲、生命和Filter倍率；`TOWER_ATTACK_RESULT`分别累计每座塔前20次landed/failed。诊断不参与伤害或命中计算。
 - 自动验证通过：`MONSTER_WAR3_ARMOR_DAMAGE_LUA51_PASS/CONTRACT_PASS`、117护甲固定数学基准、开关关闭/非怪物/非物理/非正护甲边界、基础塔必中范围、科技减甲、毒云、树伤害、塔射程/弹速、箭塔成本与融合回归，以及目标Lua 5.1语法。用户已明确确认固定样本测试验收通过；未提供精确击杀秒数或日志。项目CSV最高存在4990 War3护甲，极高护甲下的引擎上限行为仍需后续独立抽样，固定样本验收不能替代该边界验证。
+## 当前紧急修复（2026-08-10）：N2-N5 W11错误飞行怪恢复为地面怪
+
+- 用户实机反馈第十一关模型错误，怪物表现为飞行单位：可穿地形并相互叠加。审计确认运行时按成员逐只设置移动能力，W1-W5视觉覆盖不处理W11；根因是N2-N5 W11残留19只`flying_red_gargoyle`旧成员，而当前N1 W11权威模型只有`beast_green_large`和`skeleton_bone`两种地面怪。
+- 权威CSV已将N2-N5 W11普通怪统一为`beast_green_large=15`、`skeleton_bone=44`，删除四条飞行成员及三倍飞行护甲，普通怪总数仍为59；领头怪保持1只且所有运行字段不变。生成Lua已定向同步。
+- `import_n3_wave_workbook.py`仅对W11应用批准校正：普通飞行数量强制为0并只使用N1同波`member_role=normal`模板，防止旧工作簿重新生成飞行怪或把领头怪混入普通模板。W12及其他合法飞行波不受影响。
+- 自动验证通过：`WAVE_11_GROUND_MONSTERS_PASS`、模型资源检查、生成逐字节一致、配置CheckOnly、生成Lua语法、严格UTF-8/BOM、限定范围与`diff --check`。既有未跟踪`test_wave_monster_visual_integration.lua`在业务断言前失败于旧预载桩缺少`dev_wave_preload_timeout_seconds`，本任务未修改该测试或无关预载逻辑。尚需Workshop Tools完全冷启动后跳到W11，确认模型、地形阻挡、单位碰撞和59只数量。
+
 ## 当前插入任务（2026-08-09）：怪物尸体生命周期优化
 
 - 用户需求：怪物死亡完成业务结算后，不再让大量尸体长期留在地表；采用短暂保留、平滑下沉、`AddNoDraw()`隐藏并安全移除实体的方式，降低高密度波次中的模型、阴影和实体管理开销。

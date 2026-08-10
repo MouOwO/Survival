@@ -57,7 +57,7 @@ Check ($worker.Contains('"train_repairer_"')) `
     "REPAIR_TRAINING_PREFIX_MISSING"
 Check ($worker.Contains('training_id == "train_repairer_auto"')) `
     "REPAIR_AUTO_TRAINING_REQUEST_MISSING"
-Check ($worker.Contains('repairer_training:record_success(')) `
+Check ($worker.Contains('repairer_training:record_explicit(')) `
     "REPAIR_SUCCESS_PROGRESSION_MISSING"
 Check ($worker.Contains('if progress.completed == 1 then')) `
     "REPAIR_FINAL_TIER_REJECTION_MISSING"

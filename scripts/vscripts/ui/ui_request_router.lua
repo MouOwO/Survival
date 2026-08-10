@@ -11,6 +11,7 @@ local armor_balance = require("config/armor_balance")
 local hero_summon_projection = require("systems/hero_summon_projection")
 local building_batch_upgrade = require("systems/building_batch_upgrade_service")
 local gold_mine_batch_upgrade = require("systems/gold_mine_batch_upgrade_service")
+local tree_config = require("config/tree_config")
 
 local M = {}
 local synthesis_requests = {}
@@ -100,6 +101,9 @@ local function unit_combat_snapshot(unit)
         level = absolute_level,
         absolute_level = absolute_level,
         route_level = tonumber(unit.survival_route_level) or absolute_level,
+        is_resource_tree = internal_name == tree_config.unit_name and 1 or 0,
+        max_level = internal_name == tree_config.unit_name
+            and tonumber(tree_config.max_level) or nil,
         tower_class = unit.survival_tower_class or "",
         health = safe_number(unit, "GetHealth", 0),
         max_health = safe_number(unit, "GetMaxHealth", 0),
@@ -253,6 +257,26 @@ local function register_selected_unit_stats_request()
         snapshot.success = 1
         send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
     end)
+end
+
+local function publish_selected_tree_snapshot(payload)
+    local entindex = tonumber(payload and payload.entindex)
+    if not entindex then return end
+    local ok, unit = pcall(EntIndexToHScript, entindex)
+    if not ok or not unit or unit:IsNull() then return end
+    for player_id, selected_entindex in pairs(selected_unit_by_player) do
+        if tonumber(selected_entindex) == entindex and valid_player_id(player_id) then
+            local snapshot = combat_stat_projection.for_ui(unit_combat_snapshot(unit))
+            snapshot.success = 1
+            snapshot.reason = payload.reason or "tree_changed"
+            snapshot.push_phase = "immediate"
+            send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
+        end
+    end
+end
+
+local function register_selected_tree_snapshot_push()
+    event_bus.subscribe(events.TREE_CHANGED, publish_selected_tree_snapshot)
 end
 
 local function on_unit_combat_stats_changed(payload)
@@ -1025,6 +1049,7 @@ function M.init()
     selected_unit_by_player = {}
     register_client_diagnostic()
     register_selected_unit_stats_request()
+    register_selected_tree_snapshot_push()
     register_building_snapshot_push()
     register_snapshot_request()
     register_difficulty_select_request()

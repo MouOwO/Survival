@@ -4,6 +4,13 @@ local sound_service = require("core/sound_service")
 
 modifier_lumberjack_ai = class({})
 local M = modifier_lumberjack_ai
+local IDLE_RESUME_DELAY = 3
+local THINK_INTERVAL = 0.25
+
+local function game_time()
+    if GameRules and GameRules.GetGameTime then return GameRules:GetGameTime() end
+    return 0
+end
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end
@@ -32,7 +39,22 @@ function M:OnCreated(params)
     self.lumber_efficiency = self.base_lumber_efficiency
         + self.tree_lumber_efficiency_buff
         + self.technology_lumber_efficiency
-    self:StartIntervalThink(0.5)
+    self.manual_control = false
+    self.manual_idle_since = nil
+    self:StartIntervalThink(THINK_INTERVAL)
+end
+
+function M:OnPlayerOrder(order_type, target)
+    if not IsServer() then return end
+    if tonumber(order_type) == tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET)
+        and target and not target:IsNull()
+        and target:entindex() == self.tree_entindex then
+        self.manual_control = false
+        self.manual_idle_since = nil
+        return
+    end
+    self.manual_control = true
+    self.manual_idle_since = nil
 end
 
 function M:SetTreeEntIndex(entindex)
@@ -68,6 +90,23 @@ function M:GetLumberEfficiency()
     return self.lumber_efficiency or self.base_lumber_efficiency or 1
 end
 
+local function is_idle(unit)
+    if not unit.IsIdle then return false end
+    local ok, idle = pcall(unit.IsIdle, unit)
+    return ok and idle == true
+end
+
+local function issue_tree_attack(unit, tree)
+    unit.survival_lumberjack_internal_order = true
+    ExecuteOrderFromTable({
+        UnitIndex = unit:entindex(),
+        OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+        TargetIndex = tree:entindex(),
+        Queue = false,
+    })
+    unit.survival_lumberjack_internal_order = nil
+end
+
 function M:OnIntervalThink()
     if not IsServer() then return end
     local parent = self:GetParent()
@@ -80,14 +119,23 @@ function M:OnIntervalThink()
         and not parent:CanEntityBeSeenByMyTeam(tree) then
         return
     end
-    if parent:GetAttackTarget() == tree then return end
-
-    ExecuteOrderFromTable({
-        UnitIndex = parent:entindex(),
-        OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
-        TargetIndex = tree:entindex(),
-        Queue = false,
-    })
+    if parent:GetAttackTarget() == tree then
+        self.manual_control = false
+        self.manual_idle_since = nil
+        return
+    end
+    if self.manual_control then
+        if not is_idle(parent) then
+            self.manual_idle_since = nil
+            return
+        end
+        local now = game_time()
+        self.manual_idle_since = self.manual_idle_since or now
+        if now - self.manual_idle_since < IDLE_RESUME_DELAY then return end
+        self.manual_control = false
+        self.manual_idle_since = nil
+    end
+    issue_tree_attack(parent, tree)
 end
 
 function M:DeclareFunctions()
@@ -103,6 +151,8 @@ function M:OnAttackLanded(keys)
     local target = keys.target
     if not target or target:IsNull() then return end
     if target:entindex() ~= self.tree_entindex then return end
+    self.manual_control = false
+    self.manual_idle_since = nil
     sound_service.play("worker_lumberjack_tree_impact", {
         unit = target,
         source = target,
@@ -127,5 +177,7 @@ function M:OnAttackLanded(keys)
         source = "lumberjack",
     })
 end
+
+M.IDLE_RESUME_DELAY = IDLE_RESUME_DELAY
 
 return M

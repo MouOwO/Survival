@@ -127,6 +127,58 @@ local function lumberjack_training(state, resources)
     }, cost_data(cost))
     return with_affordability(result, cost, population, resources)
 end
+local function repairer_training(state, resources, training_id)
+    local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
+        team = state.team,
+        training_type = "repairer",
+        training_id = training_id,
+    }) or {}
+    local required = tonumber(training.requires_city_level) or 1
+    local city_level = tonumber(state.level) or tonumber(state.city_level) or 1
+    local maximum = tonumber(training.max_count) or 0
+    local trained = tonumber(training.count) or 0
+    local completed = training.completed == 1
+        or (maximum > 0 and trained >= maximum)
+    local unlocked = not completed and city_level >= required
+    local progress_text = maximum < 0 and "无限训练"
+        or (tostring(trained) .. "/" .. tostring(maximum))
+    local cost = {
+        wood = tonumber(training.wood_cost) or 0,
+        gold = tonumber(training.gold_cost) or 0,
+    }
+    local population = tonumber(training.population_cost) or 0
+    local status = "修理工训练已完成"
+    if not completed then
+        status = unlocked
+            and ("当前训练进度 " .. progress_text)
+            or ("主城达到LV" .. tostring(required) .. "后解锁")
+    end
+    local repair_rate = tonumber(training.repair_max_health_pct_per_second) or 0
+    local result = merge({
+        available = unlocked and 1 or 0,
+        display_name = "训练" .. tostring(training.name or "修理工"),
+        current_level = tonumber(training.level) or 1,
+        status_text = status,
+        upgrade_description = "训练一名" .. tostring(training.name or "修理工")
+            .. "，自动修复受损城墙。每秒修复最大生命值的"
+            .. tostring(repair_rate) .. "%。",
+        population = population,
+        fields = {
+            { label = "训练进度", value = progress_text },
+            { label = "人口消耗", value = population },
+            { label = "木材消耗", value = cost.wood },
+            { label = "金币消耗", value = cost.gold },
+            { label = "修复效率", value = tostring(repair_rate) .. "%最大生命/秒" },
+            { label = "修理范围", value = training.repair_range or 0 },
+            { label = "训练上限", value = maximum < 0 and "无限" or maximum },
+        },
+    }, cost_data(cost))
+    if completed then
+        result.can_afford = 0
+        return result
+    end
+    return with_affordability(result, cost, population, resources)
+end
 local function population_training(state, resources)
     local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
         team = state.team,
@@ -541,6 +593,12 @@ function M.build(ability_name, state, resources)
     end
     if ability_name == "ability_train_lumberjack" then
         return lumberjack_training(state, resources)
+    end
+    if ability_name == "ability_train_repairer" then
+        return repairer_training(state, resources, "train_repairer_01")
+    end
+    if ability_name == "ability_train_advanced_repairer" then
+        return repairer_training(state, resources, "train_repairer_02")
     end
     if ability_name == "ability_train_population" then
         return population_training(state, resources)

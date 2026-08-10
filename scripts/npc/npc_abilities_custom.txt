@@ -132,6 +132,18 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_train_advanced_repairer"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_train_advanced_repairer"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "wisp_overcharge"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "1.0"
+        "AbilityManaCost"    "0"
+    }
+
     "ability_upgrade_tower"
     {
         "BaseClass"          "ability_lua"

@@ -334,15 +334,16 @@ local function train_worker(payload)
         end
         training_id = current.training_id
     elseif is_repairer_request then
-        local progress = repairer_training:get(city_state.team)
-        if progress.completed == 1 then
-            return { ok = false, error = "修理工训练已完成" }
+        if training_id == "train_repairer_auto" then
+            training_id = "train_repairer_01"
         end
-        local current = repairer_training:current(city_state.team)
-        if not current then
+        local progress = repairer_training:get_for(city_state.team, training_id)
+        if not progress then
             return { ok = false, error = "repairer_training_missing" }
         end
-        training_id = current.training_id
+        if progress.completed == 1 then
+            return { ok = false, error = tostring(progress.name) .. "训练已完成" }
+        end
     end
     local training = (training_definitions.by_id or {})[training_id]
     if not training or training.enabled == false then
@@ -398,7 +399,14 @@ local function train_worker(payload)
             notify(city_state.player_id, error_message, "error")
             return { ok = false, error = error_message }
         end
-    elseif not is_repairer_request then
+    end
+    if is_repairer_request then
+        local progress = repairer_training:get_for(city_state.team, training_id)
+        local max_count = tonumber(training.max_count) or 0
+        if not progress or (max_count > 0 and progress.count >= max_count) then
+            return { ok = false, error = "training_max_count_reached" }
+        end
+    elseif not is_lumberjack then
         local existing_count = 0
         for _, state in pairs(workers) do
             if state.training_id == training_id and valid_entity(state.unit) then
@@ -554,7 +562,7 @@ local function train_worker(payload)
             training_id
         )
     elseif is_repairer then
-        training_progress = repairer_training:record_success(
+        training_progress = repairer_training:record_explicit(
             city_state.team,
             training_id
         )
@@ -624,6 +632,12 @@ function M.init()
                 return population_training_state(payload.team)
             end
             if payload and payload.training_type == "repairer" then
+                if payload.training_id then
+                    return repairer_training:get_for(
+                        payload.team,
+                        payload.training_id
+                    )
+                end
                 return repairer_training:get(payload.team)
             end
             return lumberjack_training_state(payload.team)

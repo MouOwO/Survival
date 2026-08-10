@@ -101,6 +101,18 @@ local M = {
         abilitydesc = "训练一名伐木工。伐木工会在主城外侧出生，并自动攻击资源树。当前每次有效攻击获得1点木材。",
         abilityicon = "furion_force_of_nature",
     },
+    ability_train_repairer = {
+        abilityid = "ability_train_repairer",
+        abilityname = "训练修理工",
+        abilitydesc = "训练普通修理工。每名修理工消耗1人口，最多训练5名；费用和修理效率读取训练配置。",
+        abilityicon = "wisp_tether",
+    },
+    ability_train_advanced_repairer = {
+        abilityid = "ability_train_advanced_repairer",
+        abilityname = "训练高级修理工",
+        abilitydesc = "直接训练高级修理工。每名消耗1人口，最多训练2名；无需先训练普通修理工。",
+        abilityicon = "wisp_overcharge",
+    },
     ability_upgrade_tower = { abilityid = "ability_upgrade_tower", abilityname = "升级防御塔", abilitydesc = "按当前等级升1级。金币和木材不足时不会消耗，也不会进入冷却。", abilityicon = "drow_ranger_multishot" },
     ability_upgrade_tower_lv01 = { abilityid = "ability_upgrade_tower_lv01", abilityname = "升级1级", abilitydesc = "按当前路线升1级；消耗由路线表自动计算。", abilityicon = "drow_ranger_multishot" },
     ability_upgrade_tower_max = { abilityid = "ability_upgrade_tower_max", abilityname = "升满级", abilitydesc = "一次升至当前阶段最高等级；自动累计计算金币和木材消耗。", abilityicon = "drow_ranger_multishot" },

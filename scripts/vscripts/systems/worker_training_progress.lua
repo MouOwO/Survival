@@ -45,6 +45,9 @@ local function snapshot(state, row)
         population_cost = row and (tonumber(row.population_cost) or 0) or 0,
         wood_per_hit = row and (tonumber(row.wood_per_hit) or 0) or 0,
         base_attack = row and (tonumber(row.base_attack) or 0) or 0,
+        repair_max_health_pct_per_second = row
+            and (tonumber(row.repair_max_health_pct_per_second) or 0) or 0,
+        repair_range = row and (tonumber(row.repair_range) or 0) or 0,
     }
 end
 
@@ -79,6 +82,16 @@ function M.create(definitions, prefix, error_prefix)
         return snapshot(state, self.rows[state.current_index])
     end
 
+    function tracker:get_for(team, training_id)
+        local state = state_for(team)
+        for _, row in ipairs(self.rows) do
+            if row.training_id == training_id then
+                return snapshot(state, row)
+            end
+        end
+        return nil
+    end
+
     function tracker:record_success(team, training_id)
         local state = state_for(team)
         local row = self.rows[state.current_index]
@@ -101,6 +114,22 @@ function M.create(definitions, prefix, error_prefix)
         result.completed_count = count
         result.advanced = advanced and 1 or 0
         return result
+    end
+
+    function tracker:record_explicit(team, training_id)
+        local state = state_for(team)
+        for _, row in ipairs(self.rows) do
+            if row.training_id == training_id then
+                local count = (state.counts[training_id] or 0) + 1
+                state.counts[training_id] = count
+                local result = snapshot(state, row)
+                result.completed_training_id = training_id
+                result.completed_count = count
+                result.advanced = 0
+                return result
+            end
+        end
+        return nil, error_prefix .. "_training_not_found"
     end
 
     return tracker

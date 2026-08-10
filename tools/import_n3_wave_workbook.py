@@ -25,6 +25,22 @@ FLYING_ARCHETYPES = {
 }
 FLYING_FALLBACK_ARCHETYPE = "flying_red_gargoyle"
 ASSAULT_SOURCE_WAVES = {5, 10, 15, 20, 25, 30}
+APPROVED_NORMAL_FLYING_COUNT_OVERRIDES = {
+    11: 0,
+}
+
+
+def approved_normal_flying_count(wave: int, workbook_count: int) -> int:
+    return APPROVED_NORMAL_FLYING_COUNT_OVERRIDES.get(wave, workbook_count)
+
+
+def approved_normal_member_templates(
+    wave: int,
+    templates: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    if wave in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES:
+        return [row for row in templates if row.get("member_role") == "normal"]
+    return [row for row in templates if row["is_boss"] != "1"]
 
 
 def read_csv(path: Path) -> tuple[list[list[str]], list[str]]:
@@ -130,10 +146,15 @@ def build_difficulty(
     for wave in range(1, 31):
         values = book[wave]
         templates = n1[source_wave(wave)]
-        normal_templates = [row for row in templates if row["is_boss"] != "1"]
+        normal_templates = approved_normal_member_templates(wave, templates)
+        if not normal_templates:
+            raise ValueError(f"wave {wave}: normal member templates missing")
         flying = [row for row in normal_templates if row["archetype_id"] in FLYING_ARCHETYPES]
         ground = [row for row in normal_templates if row["archetype_id"] not in FLYING_ARCHETYPES]
-        flying_count = int(values.get("AD", "0") or 0)
+        flying_count = approved_normal_flying_count(
+            wave,
+            int(values.get("AD", "0") or 0),
+        )
         normal_count = int(values["D"])
         if flying_count > normal_count:
             raise ValueError(f"wave {wave}: flying count exceeds normal count")
@@ -152,11 +173,17 @@ def build_difficulty(
                     continue
                 member_index += 1
                 armor = str(float(values["L"]) * 3).rstrip("0").rstrip(".") if is_flying else values["L"]
-                note = f"{difficulty_id}工作簿数量；沿用N1模型映射"
+                if wave in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES:
+                    note = (
+                        f"{difficulty_id} W11修正为当前N1同波地面模型映射；"
+                        "普通怪共59只；移除错误飞行变体"
+                    )
+                else:
+                    note = f"{difficulty_id}工作簿数量；沿用N1模型映射"
                 if is_flying:
                     note += "；飞行高护甲怪；护甲为本波基准War3护甲3倍"
                 evidence = evidence_note(values, "M", "AI", "AJ")
-                if evidence:
+                if evidence and wave not in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES:
                     note += "；证据：" + evidence
                 output.append(make_row(
                     headers, template, wave, f"{wave}N{member_index}", order,
@@ -171,12 +198,17 @@ def build_difficulty(
         if leader_count:
             leader_is_flying = int(values.get("AE", "0") or 0) > 0
             leader_template = fallback_flying if leader_is_flying else normal_templates[0]
+            leader_note = (
+                f"{difficulty_id}工作簿首怪Boss；独立wave_leader身份；模型略大"
+            )
+            if wave in APPROVED_NORMAL_FLYING_COUNT_OVERRIDES:
+                leader_note += "；W11普通怪已按批准修正为纯地面构成"
+            elif evidence_note(values, "R", "AI", "AJ"):
+                leader_note += "；证据：" + evidence_note(values, "R", "AI", "AJ")
             output.append(make_row(
                 headers, leader_template, wave, f"{wave}L", order, leader_count,
                 "wave_leader", (values["O"], values["P"], values["Q"]),
-                f"{difficulty_id}工作簿首怪Boss；独立wave_leader身份；模型略大"
-                + ("；证据：" + evidence_note(values, "R", "AI", "AJ")
-                   if evidence_note(values, "R", "AI", "AJ") else ""),
+                leader_note,
                 "flying" if leader_is_flying else "", "1.15", difficulty_id,
             ))
             order += 1

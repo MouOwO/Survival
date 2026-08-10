@@ -26,6 +26,7 @@
 - 因此N2–N5 W11–W30均应为59只普通怪；当前四个W30已从原始9只统一调整为59只。`wave_leader`和`assault_boss`是独立成员，不计入59只普通怪，并保持原有数量。
 - 多怪种波次以修改前普通怪数量为比例，使用最大余数法确定性分配到59；单一普通怪种直接设为59。不得借此改变怪种、属性、角色、出怪顺序、移动类型或模型缩放。
 - 业务配置必须先修改`data/csv/怪物与波次系统/wave_definitions.csv`，再通过`tools.build_configs.build()`定向生成`scripts/vscripts/config/generated/wave_definitions.lua`并进行一致性校验。
+- 后续W11实机BUG修正覆盖旧任务的“怪种不变”边界：N2-N5 W11不再使用旧工作簿中的19只飞行变体，必须与当前N1同波普通模型一致，为15只`beast_green_large`加44只`skeleton_bone`，两者及领头怪均为地面移动。此例外只覆盖W11；W12及其他有明确证据的飞行波保持原配置。
 
 ## 怪物物理伤害曲线边界（2026-08-09）
 

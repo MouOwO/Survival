@@ -142,6 +142,7 @@ M.main_city = {
         "ability_upgrade_city",
         "ability_train_lumberjack",
         "ability_train_repairer",
+        "ability_train_advanced_repairer",
     },
     levels = level_rows("building_main_city"),
 }
