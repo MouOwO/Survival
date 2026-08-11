@@ -65,6 +65,26 @@ def main():
         skill_id = clean(row.get("skill_id"))
         add(out, "ability:" + skill_id, "ability", skill_id, row.get("skill_name"), "0", "0", row.get("description"), "", skill_id)
 
+    worker_skills = read_csv(
+        CSV_ROOT / "建筑与工人系统" / "worker_skill_definitions.csv"
+    )
+    for row in worker_skills:
+        if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:
+            continue
+        skill_id = clean(row.get("skill_id"))
+        add(
+            out,
+            "ability:" + skill_id,
+            "ability",
+            skill_id,
+            row.get("name"),
+            "0",
+            "0",
+            row.get("description"),
+            row.get("icon"),
+            row.get("source") or skill_id,
+        )
+
     altar_actions = read_csv(CSV_ROOT / "商店系统" / "altar_actions.csv")
     for row in altar_actions:
         if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:

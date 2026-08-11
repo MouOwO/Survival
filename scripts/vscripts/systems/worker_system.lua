@@ -32,6 +32,38 @@ local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
 
+local function add_training_abilities(worker, training)
+    for _, ability_name in ipairs(training.active_skill_ids or {}) do
+        if ability_name ~= "" then
+            local ability = worker:FindAbilityByName(ability_name)
+            if not ability then ability = worker:AddAbility(ability_name) end
+            if ability and ability:GetLevel() < 1 then ability:SetLevel(1) end
+        end
+    end
+end
+
+local function active_worker_count(team, training_id)
+    local count = 0
+    for _, state in pairs(workers) do
+        if state.team == team and state.training_id == training_id
+            and valid_entity(state.unit) then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+local function repairer_training_state(team, training_id)
+    local progress = repairer_training:get_for(team, training_id)
+    if not progress then return nil end
+
+    progress.total_trained = progress.count
+    progress.count = active_worker_count(team, training_id)
+    local maximum = tonumber(progress.max_count) or 0
+    progress.completed = maximum > 0 and progress.count >= maximum and 1 or 0
+    return progress
+end
+
 local function candidate_is_traversable(position)
     local ok_traversable, traversable = pcall(function()
         return GridNav:IsTraversable(position)
@@ -337,7 +369,7 @@ local function train_worker(payload)
         if training_id == "train_repairer_auto" then
             training_id = "train_repairer_01"
         end
-        local progress = repairer_training:get_for(city_state.team, training_id)
+        local progress = repairer_training_state(city_state.team, training_id)
         if not progress then
             return { ok = false, error = "repairer_training_missing" }
         end
@@ -401,7 +433,7 @@ local function train_worker(payload)
         end
     end
     if is_repairer_request then
-        local progress = repairer_training:get_for(city_state.team, training_id)
+        local progress = repairer_training_state(city_state.team, training_id)
         local max_count = tonumber(training.max_count) or 0
         if not progress or (max_count > 0 and progress.count >= max_count) then
             return { ok = false, error = "training_max_count_reached" }
@@ -493,6 +525,7 @@ local function train_worker(payload)
         worker:SetModel(training.model_name)
         worker:SetOriginalModel(training.model_name)
     end
+    add_training_abilities(worker, training)
     local is_repairer = training_id:match("^train_repairer_") ~= nil
     local technology_efficiency = 0
     if is_repairer then
@@ -562,10 +595,11 @@ local function train_worker(payload)
             training_id
         )
     elseif is_repairer then
-        training_progress = repairer_training:record_explicit(
+        repairer_training:record_explicit(
             city_state.team,
             training_id
         )
+        training_progress = repairer_training_state(city_state.team, training_id)
     end
     notify(city_state.player_id, tostring(training.name) .. "训练完成")
     local changed = {
@@ -599,22 +633,50 @@ local function on_tree_destroyed(payload)
     update_worker_efficiency()
 end
 
-local function on_entity_killed(payload)
-    local victim = payload.victim
-    if not valid_entity(victim) then return end
-    local state = workers[victim:entindex()]
+local function remove_worker(worker, entindex, reason)
+    entindex = tonumber(entindex)
+        or (worker and worker.entindex and worker:entindex())
+    if not entindex then return nil end
+
+    local state = workers[entindex]
     if not state then return end
 
-    workers[victim:entindex()] = nil
+    workers[entindex] = nil
     event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
         team = state.team,
         population = state.population,
-        reason = "lumberjack_died",
+        reason = reason or (state.worker_type .. "_died"),
     })
     event_bus.emit(events.WORKER_CHANGED, {
         team = state.team,
         count_delta = -1,
     })
+    return state
+end
+
+local function dismiss_worker(payload)
+    local worker = payload and payload.worker
+    if not valid_entity(worker) then
+        return { ok = false, error = "worker_invalid" }
+    end
+    local state = workers[worker:entindex()]
+    if not state or state.worker_type ~= "repairer" then
+        return { ok = false, error = "repairer_not_registered" }
+    end
+
+    local entindex = worker:entindex()
+    worker:ForceKill(false)
+    remove_worker(worker, entindex, payload.reason or "repairer_suicide")
+    return { ok = true }
+end
+
+local function on_entity_killed(payload)
+    remove_worker(
+        payload.victim,
+        payload.victim_entindex
+            or (payload.keys and payload.keys.entindex_killed),
+        nil
+    )
 end
 
 function M.init()
@@ -625,6 +687,7 @@ function M.init()
     lumberjack_training:reset()
     repairer_training:reset()
     event_bus.handle_request(events.WORKER_TRAIN_REQUEST, train_worker)
+    event_bus.handle_request(events.WORKER_DISMISS_REQUEST, dismiss_worker)
     event_bus.handle_request(
         events.WORKER_TRAINING_GET_REQUEST,
         function(payload)
@@ -633,7 +696,7 @@ function M.init()
             end
             if payload and payload.training_type == "repairer" then
                 if payload.training_id then
-                    return repairer_training:get_for(
+                    return repairer_training_state(
                         payload.team,
                         payload.training_id
                     )

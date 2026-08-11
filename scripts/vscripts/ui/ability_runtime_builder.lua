@@ -147,10 +147,10 @@ local function repairer_training(state, resources, training_id)
         gold = tonumber(training.gold_cost) or 0,
     }
     local population = tonumber(training.population_cost) or 0
-    local status = "修理工训练已完成"
+    local status = "修理工数量已达上限"
     if not completed then
         status = unlocked
-            and ("当前训练进度 " .. progress_text)
+            and ("当前修理工数量 " .. progress_text)
             or ("主城达到LV" .. tostring(required) .. "后解锁")
     end
     local repair_rate = tonumber(training.repair_max_health_pct_per_second) or 0
@@ -164,7 +164,7 @@ local function repairer_training(state, resources, training_id)
             .. tostring(repair_rate) .. "%。",
         population = population,
         fields = {
-            { label = "训练进度", value = progress_text },
+            { label = "当前数量", value = progress_text },
             { label = "人口消耗", value = population },
             { label = "木材消耗", value = cost.wood },
             { label = "金币消耗", value = cost.gold },

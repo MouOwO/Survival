@@ -86,6 +86,8 @@
         "DOTA_Tooltip_ability_ability_train_lumberjack" "Train Lumberjack"
         "DOTA_Tooltip_ability_ability_train_repairer" "Train Repairer"
         "DOTA_Tooltip_ability_ability_train_repairer_Description" "Trains a worker that automatically repairs damaged walls."
+        "DOTA_Tooltip_ability_ability_repairer_suicide" "Self-Destruct"
+        "DOTA_Tooltip_ability_ability_repairer_suicide_Description" "Immediately destroys this repairer and releases its 1 population. Training wood and gold are not refunded."
         "DOTA_Tooltip_ability_ability_train_advanced_repairer" "Train Advanced Repairer"
         "DOTA_Tooltip_ability_ability_train_advanced_repairer_Description" "Directly trains an advanced repairer. Each unit costs 1 population, with a maximum of 2."
         "DOTA_Tooltip_ability_ability_build_farm" "Build Population Farm"

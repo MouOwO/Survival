@@ -365,11 +365,12 @@ local function on_entity_killed(keys)
         and EntIndexToHScript(keys.entindex_killed) or nil
     local attacker = keys.entindex_attacker
         and EntIndexToHScript(keys.entindex_attacker) or nil
-    if not victim then
+    if not victim and not keys.entindex_killed then
         return
     end
     event_bus.emit(events.ENGINE_ENTITY_KILLED, {
         victim = victim,
+        victim_entindex = tonumber(keys.entindex_killed),
         attacker = attacker,
         keys = keys,
     })

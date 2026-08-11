@@ -82,6 +82,7 @@ M["wave_definitions"] = require("config/generated/wave_definitions")
 M["wave_timing_rules"] = require("config/generated/wave_timing_rules")
 M["wave_visual_definitions"] = require("config/generated/wave_visual_definitions")
 M["weapon_definitions"] = require("config/generated/weapon_definitions")
+M["worker_skill_definitions"] = require("config/generated/worker_skill_definitions")
 M["worker_sound_definitions"] = require("config/generated/worker_sound_definitions")
 M["world_visual_definitions"] = require("config/generated/world_visual_definitions")
 

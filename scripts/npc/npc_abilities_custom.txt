@@ -144,6 +144,18 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_repairer_suicide"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_repairer_suicide"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+        "AbilityTextureName" "techies_suicide"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.0"
+        "AbilityManaCost"    "0"
+    }
+
     "ability_upgrade_tower"
     {
         "BaseClass"          "ability_lua"

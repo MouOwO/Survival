@@ -4,6 +4,7 @@
 ability:ability_build_farm,ability,ability_build_farm,建造人口农场,100,0,主城建成后解锁，最多建造1座。消耗100木材、0金币。,chen_holy_persuasion,building_farm
 ability:ability_enter_endless_training,ability,ability_enter_endless_training,无尽年轮圣殿,0,50000,传送至无尽年轮圣殿。英雄达到10转后解锁；每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。,faceless_void_time_walk,altar_endless_training
 ability:ability_enter_shadow_realm,ability,ability_enter_shadow_realm,暗影界前庭,0,50000,传送至暗影界前庭。当前版本仅开放传送，怪物与掉落逻辑暂不启用。,spectre_reality,altar_shadow_realm
+ability:ability_repairer_suicide,ability,ability_repairer_suicide,自我销毁,0,0,立即销毁当前修理工并返还其占用的1人口。训练消耗的木材和金币不返还。,techies_suicide,修理工系统
 ability:ability_survival_arcane_barrage,ability,ability_survival_arcane_barrage,奥术弹幕·被动,0,0,等级1：普通攻击命中时有10%概率触发：以目标位置为中心，在500范围内于1秒内随机落下5颗飞弹。每颗飞弹对落点150范围造成全属性总和×2纯粹伤害。施法结束前不能再次触发。 等级2：飞弹落点区域半径缩小至200，其他效果不变。 等级3：每轮飞弹数量增加至7颗，其他效果不变。 等级4：完整继承等级3效果，无额外变化。 等级5：炮击区域持续3秒，每秒释放一轮7颗飞弹，共3轮、总计21颗飞弹。施法结束前不能再次触发。,skywrath_mage_arcane_bolt,proto_arcane_barrage
 ability:ability_survival_axe_counter_helix,ability,ability_survival_axe_counter_helix,斧王专属：反击螺旋,0,0,一转后激活。普通攻击命中时有10%概率以被攻击目标为中心触发反击螺旋，对400范围内敌人造成触发时全属性×30纯粹伤害。,axe_counter_helix,skill_axe_counter_helix
 ability:ability_survival_blade_nova,ability,ability_survival_blade_nova,剑刃震荡·被动,0,0,等级1：普通攻击命中时有15%概率沿英雄面向发射脉冲。脉冲总宽度200，长度等于英雄攻击射程，对路径内所有敌人造成触发时全属性总和×4纯粹伤害。 等级2：每道脉冲最先命中的目标受到双倍伤害。 等级3：伤害随目标沿脉冲方向的距离线性提高：英雄近端为全属性×4，射程末端最高为全属性×8；首个目标仍会受到双倍伤害。 等级4：完整继承等级3效果，无额外变化。 等级5：脉冲射程提高50%；每次触发有30%概率沿同一路径同时发射3道脉冲。三道分别造成完整伤害，同一敌人可被三道分别命中。,juggernaut_blade_fury,proto_blade_nova

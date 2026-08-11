@@ -42,6 +42,7 @@ local M = {
     TOWER_SKILL_BUFF_REQUEST = "tower.skill.buff.request",
     TOWER_FUSION_REQUEST = "tower.fusion.request",
     WORKER_TRAIN_REQUEST = "worker.train.request",
+    WORKER_DISMISS_REQUEST = "worker.dismiss.request",
     WORKER_TRAINING_GET_REQUEST = "worker.training.get.request",
     WORKER_CHANGED = "worker.changed",
 
