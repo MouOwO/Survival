@@ -142,8 +142,8 @@ local function release_wave_model_resources(session, reason, force)
             wave_model_leases[model_path] = lease
         elseif lease and lease.session_count <= 0 and not lease.dev_resident then
             -- TODO(SOURCE2_MODEL_UNLOAD): Workshop Lua exposes no confirmed safe
-            -- model-unload API. This releases only project Lua leases; never call
-            -- asset_preload.retire(), which would block a later reload.
+            -- model-unload API. This releases only project Lua leases; the
+            -- preload service RETIRED state would block a later reload.
             wave_model_leases[model_path] = nil
         end
     end
@@ -551,6 +551,7 @@ local function start_wave(number, reason)
     local wave = waves[number]
     if not wave then return false, "wave_not_found" end
     scheduler.cancel("wave_countdown")
+    cancel_pending_wave_resource_sessions("next_wave_started", false)
     generation_token = generation_token + 1
     state.current_wave = number
     memory_cleared_wave = -1
@@ -962,6 +963,10 @@ function M._resource_snapshot_for_test()
         lease_count = count_entries(wave_model_leases),
     }
 end
+
+M._wave_model_paths_for_test = wave_model_paths
+M._acquire_wave_model_resources_for_test = acquire_wave_model_resources
+M._release_wave_model_resources_for_test = release_wave_model_resources
 
 function M.init()
     monster_spawn_marker = nil

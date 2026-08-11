@@ -16,7 +16,7 @@ monster_underlord,孽主怪模型,model_bundle,models/heroes/abyssal_underlord/a
 monster_vengefulspirit,复仇之魂怪模型,model_bundle,models/heroes/vengeful/vengeful.vmdl,,,,,,idle,1,,,zombie_stream,4,785,11,streamed,asset_proxy_monster_vengefulspirit,monster_undying,1,按首次波次进入后台加载队列。
 monster_dragon_knight,龙骑士怪模型,model_bundle,models/heroes/dragon_knight/dragon_knight.vmdl,,,,,,idle,1,,,zombie_stream,5,780,12,streamed,asset_proxy_monster_dragon_knight,monster_undying,1,按首次波次进入后台加载队列。
 monster_tusk,巨牙海民怪模型,model_bundle,models/heroes/tuskarr/tuskarr.vmdl,,,,,,idle,1,,,zombie_stream,6,775,13,streamed,asset_proxy_monster_tusk,monster_undying,1,按首次波次进入后台加载队列。
-monster_visage,维萨吉怪模型,model_bundle,models/heroes/visage/visage.vmdl,,,,,,idle,1,,,zombie_stream,7,770,14,streamed,asset_proxy_monster_visage,monster_undying,1,按首次波次进入后台加载队列。
+monster_visage,维萨吉怪模型,model_bundle,models/heroes/visage/visage.vmdl,,,,,,idle,1,,,zombie_stream,7,770,8,streamed,asset_proxy_monster_visage,monster_undying,1,普通飞行兼容模型最早在正式第8波使用；最终逐波模型定稿后移除共享兼容。
 monster_sniper,火枪怪模型,model_bundle,models/heroes/sniper/sniper.vmdl,,particles/units/heroes/hero_sniper/sniper_base_attack.vpcf,,,,idle,1,,,zombie_stream,8,765,15,streamed,asset_proxy_monster_sniper,monster_undying,1,按首次波次进入后台加载队列；机枪塔第一阶段复用弹道。
 monster_ogre_magi,食人魔怪模型,model_bundle,models/heroes/ogre_magi/ogre_magi.vmdl,,,,,,idle,1,,,zombie_stream,9,760,16,streamed,asset_proxy_monster_ogre_magi,monster_undying,1,按首次波次进入后台加载队列。
 monster_tiny,小小怪模型,model_bundle,models/heroes/tiny/tiny_01/tiny_01.vmdl,,,,,,idle,1,,,zombie_stream,12,745,19,streamed,asset_proxy_monster_tiny,monster_undying,1,基础Tiny模型；饰品最大形态路径核验后另建资源包。

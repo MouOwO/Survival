@@ -63,7 +63,7 @@
 
 ## 正式波次目标资源预载边界（2026-08-09）
 
-- 正式波次首波继续依赖启动预载；后续目标波只在其首只敌人计划出现前`wave_timing_rules.csv.formal_wave_preload_lead_seconds`秒进入异步资源队列，当前配置为4秒。预载不得改变倒计时、首只敌人时刻、成员数量、顺序或生成间隔。
+- 正式波次首波继续依赖启动预载；后续目标波在目标倒计时开始立即进入异步资源队列，并在首只敌人计划出现前`wave_timing_rules.csv.formal_wave_preload_lead_seconds`秒（当前4秒）幂等复核。预载不得改变倒计时、首只敌人时刻、成员数量、顺序或生成间隔。
 - 目标波资源必须从当前难度构建后的`wave_definitions`成员、`monster_archetypes.csv`模型和视觉CSV解析；主体模型、组件模型、粒子及已在`asset_sounds.csv`配置的音效按`resource_type:path`统一去重。空音效CSV不得填入猜测路径。
 - `asset_preload_service`是正式波、开发跳波和视觉队列共享的资源去重边界。主体模型可使用`PrecacheUnitByNameAsync`代理；组件模型、粒子和音效不得因主体代理回调而被错误标记READY，必须按各自路径处理。
 - 正常敌方`zombie_stream`不再后台批量加载；`tower_stream`和`wall_stream`继续保留。启动视觉预载只保留W1，练功房模型通过`asset_catalog.csv`的`initial_required`继续启动预载。

@@ -4,6 +4,10 @@
 - 本机VPK索引、Dota英雄KV、项目`monster_visage`资产和`asset_proxy_monster_visage`均证明Visage路径仍有效。尸体`UTIL_Remove()`只删除单位实体；项目没有生产调用`asset_preload.retire()`，且该函数只封锁Lua资源状态，不是Source 2模型卸载，所以错误不能解释为模型文件已被删除。
 - 确定代码缺陷位于开发跳波：正式预载/出生已按`normal + flying`解析到Visage，`debug_wave_model_asset_ids()`却仍读取原`definition.model_path`，导致`monster12`预载红龙基础模型后出生切换Visage。正式流程另有倒计时仅剩4秒才请求且urgent受后台串行流阻塞的冷资源竞态。
 - 批准实施：统一实际模型解析；增加逐波session和Lua模型租约；正式倒计时开始即请求、4秒窗口幂等复核；urgent不受后台流阻塞；波次结束释放项目可控引用。dev只清实体/视觉/任务和会话对象，模型保持驻留。代码标记`TODO(FINAL_WAVE_MODELS)`和`TODO(SOURCE2_MODEL_UNLOAD)`，禁止把当前release或`retire()`表述为真正卸载`.vmdl`。
+- 生产实现确认：正式预载、开发预载和出生统一消费实际波次模型集合；`monster12`会请求`monster_visage`。每波session独立统计planned/pending/alive并按模型路径共享租约；旧波仍活着时新波不会提前释放其租约，异常残留pending在新波开始时结算，强制清场/初始化显式结束会话。dev释放session身份但把模型租约保留为resident；生产波次系统无`asset_preload.retire()`调用。
+- 资源时点补强：正式倒计时开始立即请求下一波资源，配置的4秒窗口只做幂等复核；`asset_preload_service`的urgent请求直接启动独立异步代理，可与一个后台塔/墙请求并行。Visage资产`first_use_wave`从陈旧14更正为实际最早正式使用波8，生成Lua与CSV逐字节一致。
+- 自动验证通过专项生命周期、W12模型解析、重叠共享租约、pending/alive release门禁、dev resident、urgent并行、视觉集成、渐进预载、开发预载、提前最终波、混合顺序、飞行碰撞、本地VPK/代理资源、PowerShell契约、配置CheckOnly、Python编译、目标Lua/Luac 5.4.5语法和限定diff检查。本机无Lua 5.1。三个旧测试仍分别硬编码旧N1最终波批次、把已启用N3视为非法、要求旧后台流总数26；未修改这些无关旧基线。
+- 尚需完全退出并冷启动Workshop Tools，执行`monster12`和正式W12，确认Visage模型首只即正常显示、控制台不再出现`requested is not loaded and may have been deleted`，并核对正式双阶段预载日志。Source 2实际资源驻留/释放只能由引擎实测观察，当前Lua release不能宣称强卸载模型。
 
 ## 2026-08-10 - Source 2本地化缺失与重复token告警清理
 
@@ -67,7 +71,7 @@
 ## 2026-08-09 - 正式波次资源提前4秒异步预载
 
 - 用户批准将正式后续波次资源改为首只敌人出现前4秒按目标波异步预载，同时保留首波和练功房启动预载；本轮未改变出怪时间、数量或顺序，也未引入`monster<N>`调试跳波门禁。
-- 权威CSV `wave_timing_rules.csv`新增`formal_wave_preload_lead_seconds=4`并生成`wave_timing_rules.lua`。`wave_system.lua`删除上一波开始时的目标波调用，倒计时跨入4秒窗口时只触发一次目标波资源队列，并输出目标波、剩余秒数、资源数、排队数和失败数诊断。
+- 历史实现：权威CSV `wave_timing_rules.csv`新增`formal_wave_preload_lead_seconds=4`并生成`wave_timing_rules.lua`，当时只在倒计时跨入4秒窗口时触发目标波资源队列。该首次请求时点现由2026-08-11 W12修复取代：倒计时开始立即请求，4秒窗口幂等复核，并分别输出phase诊断。
 - `asset_preload_service.lua`统一展开目标波原型Bundle和视觉资源，主体模型使用异步代理，组件模型/粒子/音效按自身路径处理；以`resource_type:path`跨请求去重。敌方`zombie_stream`后台流关闭，塔和城墙后台流保留。`monster_visual_service.lua`复用统一队列，启动视觉范围从W1-W5收紧为W1，W2-W4练功房模型仍由`asset_catalog.csv` `initial_required`保留。
 - 新增正式波预载和资源队列行为/契约测试；通过`FORMAL_WAVE_PRELOAD_CONTRACT_PASS`、`FORMAL_WAVE_PRELOAD_LUA51_PASS`、`WAVE_ASSET_RESOURCE_QUEUE_LUA51_PASS`、`DEV_WAVE_PRELOAD_CONTRACT_PASS`、`WAVE_TIMING_CONTRACT_PASS`、生成逐字节一致、目标严格UTF-8、目标Lua 5.1语法和限定`git diff --check`。
 - 扩展N1-N5契约仍因已有领头怪排序旧断言失败；全项目Lua扫描的6个失败文件均为已有BOM文件，临时去BOM语法复核通过，未改写这些文件。用户已有未提交修改和未跟踪测试文件完整保留。

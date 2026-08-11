@@ -7,6 +7,9 @@
 - 资源生命周期采用波次会话和Lua租约：每波独立登记planned/pending/alive及实际模型集合；生成完成且该会话怪物全部死亡后调用统一release边界，清除本波Lua引用、回调身份、附件/粒子/实体生命周期状态。波次重叠时按会话身份结算，禁止只看全局`current_wave`提前释放其他波。
 - `release`不等于Source 2强卸载。Workshop Lua当前没有公开、安全的`UnloadModel/UnloadResource`；现有`asset_preload.retire()`只会把Lua状态永久置为`RETIRED`并阻止以后重载，不能作为波次delete。实现必须标记`TODO(SOURCE2_MODEL_UNLOAD)`，未来只有在Valve提供安全卸载API或项目迁移到可卸载独立资源包后才能接入真正模型卸载。
 - dev模式继续清理怪物实体、附件、粒子、任务和会话对象，但不释放模型租约、不调用`retire()`；反复`monster<N>`可复用已加载资源。正式波次在倒计时开始即独立请求下一波资源，并在配置的4秒窗口幂等复核；urgent波次请求不得被塔/城墙后台串行流阻塞，且不得改变倒计时、数量、顺序或生成间隔。
+- 实现与自动验证完成：`monster12`开发预载现使用与出生一致的Visage解析；正式波次拥有独立session/共享路径租约，pending或alive非零时拒绝release，重叠波只释放已完成session，dev释放session身份但保留resident模型租约。urgent请求可与后台流并行；Visage资产权威`first_use_wave`由14更正为8并定向生成Lua。
+- 通过：`WAVE_MODEL_RESOURCE_LIFECYCLE_PASS`、`ASSET_PRELOAD_URGENT_PARALLEL_PASS`、`WAVE_MODEL_RESOURCE_LIFECYCLE_CONTRACT_PASS`、`WAVE_MONSTER_VISUAL_INTEGRATION_PASS`、`ASSET_PRELOAD_GRADUAL_PASS`、`DEV_ASSET_PRELOAD_PASS`、`WAVE_EARLY_FINAL_PASS`、`WAVE_SPECIAL_MIXED_WAVES_PASS`、`WAVE_SPAWN_SEQUENCE_PASS`、`WAVE_FLYING_COLLISION_PASS`、`WAVE_MONSTER_MODEL_RESOURCES_PASS`、资产生成逐字节一致、配置CheckOnly、目标Lua/Luac 5.4.5语法、Python编译和限定`git diff --check`。本机无Lua 5.1，不宣称Lua 5.1验证。
+- 既有非本轮失败：`test_wave_difficulty_builder.lua`仍要求旧N1最终波批次数；`test_wave_difficulty_selection.lua`仍把当前已启用N3当作非法难度；`test_asset_preload_service.lua`仍硬编码旧后台流总数26而当前生产为9。本轮未修改这些过时业务基线。尚需Workshop Tools完全冷启动执行`monster12`及正式W12，确认控制台不再出现Visage未加载告警，并观察`phase=countdown_start`/`phase=lead_review`日志；自动测试不能替代引擎资源池验收。
 
 ## 已完成插入任务（2026-08-11）：正式波次数量、混合顺序、飞行模型与Hull修正
 
@@ -93,16 +96,16 @@
 - 验证通过：`TARGET_ONLY_DIFF_PASS changed_rows=31`、`N1_W11_W25_COUNT_CONTRACT_PASS`、`N1_W11_W25_LUA51_PASS`、`WAVE_DEFINITIONS_LUAC51_PASS`、`WAVE_DEFINITIONS_GENERATED_MATCH_PASS`、`WAVE_DEFINITIONS_STRICT_UTF8_BOM_PASS`。旧N2/N3扩展测试仍分别失败于任务前已有的领头怪排序断言和`ROLE_ORDER`文本断言，本次未修改无关排序逻辑或旧未跟踪测试。
 - 尚未执行Workshop Tools实机验证；需要完全停止并重新Run地图，重点用N1 W11、W13、W16、W18、W24确认多怪种比例和实际生成总数，并确认精英/Boss数量不变。
 
-## 当前插入任务（2026-08-09）：正式波次资源提前4秒异步预载
+## 历史任务（2026-08-09）：正式波次资源提前4秒异步预载（首次请求时点已被2026-08-11方案取代）
 
-- 已完成生产实现：首波和练功房启动预载保留；正式后续波次不再在上一波开始时提前排队，而是在目标波次倒计时剩余`wave_timing_rules.csv.formal_wave_preload_lead_seconds=4`时只排队该目标波资源。
+- 历史实现曾只在目标波倒计时剩余`wave_timing_rules.csv.formal_wave_preload_lead_seconds=4`时首次排队。2026-08-11 W12修复后，目标波在倒计时开始立即首次请求，4秒窗口仅作幂等复核；首波和练功房启动预载继续保留。
 - 目标资源从当前难度生成后的波次成员读取`monster_archetypes.csv`模型，再合并目标波视觉CSV解析出的模型、组件模型、粒子和`asset_sounds.csv`实际音效资源；按`resource_type:path`统一去重。当前`asset_sounds.csv`无实际记录，因此未添加虚构音效路径。
 - `asset_preload_service`保留主体模型的`PrecacheUnitByNameAsync`异步代理；附件模型、粒子和音效按各自资源路径处理，并在服务内跨正式波次/视觉服务统一去重。敌方`zombie_stream`后台批量流已关闭，塔和城墙`tower_stream/wall_stream`保留。
 - `addon_game_mode.precache()`的怪物视觉启动范围收紧到W1；W2-W4练功房模型仍由`asset_catalog.csv`的`initial_required`启动包保留。正式倒计时不读取开发跳波的READY/3秒门禁，出怪数量、顺序和时间不变。
 - 新增`test_formal_wave_preload.lua`、`test_formal_wave_preload_contract.ps1`和`test_wave_asset_resource_queue.lua`，覆盖首波保留、4秒触发、目标波隔离、Bundle资源展开、跨调用去重、后台流边界和正式流程不继承调试门禁。
 - 自动验证：`FORMAL_WAVE_PRELOAD_CONTRACT_PASS`、`FORMAL_WAVE_PRELOAD_LUA51_PASS`、`WAVE_ASSET_RESOURCE_QUEUE_LUA51_PASS`、`DEV_WAVE_PRELOAD_CONTRACT_PASS`、`WAVE_TIMING_CONTRACT_PASS`、目标生成逐字节一致、目标严格UTF-8、目标Lua 5.1语法和限定`git diff --check`通过。
 - 扩展验证中N1-N5旧波次契约仍分别失败于任务前已有的“领头怪必须排第一”断言；本任务未修改`wave_definitions.csv`、`monster_archetypes.csv`或其生成Lua。全项目354个Lua文件中348个直接通过`luac5.1`，6个既有BOM文件去除BOM后临时语法通过，未改写这些无关文件。
-- 当前剩余动作：完全停止并重新Run Workshop Tools，确认正式倒计时日志`[WaveSystem] formal wave assets queued target_wave=... remaining=4.0`，确认目标波模型/组件/粒子实际显示、首只敌人时刻不变，并观察无敌方后台批量预载。
+- 历史验收日志已由新双阶段日志取代：冷启动应同时观察`phase=countdown_start`和`phase=lead_review`（后者约剩4秒），确认目标波模型/组件/粒子实际显示、首只敌人时刻不变，并观察无敌方后台批量预载。
 
 ## 当前插入任务（2026-08-08）：`monster<N>`开发跳波预载窗口
 
