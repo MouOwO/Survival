@@ -1,5 +1,15 @@
 # Project Context
 
+## 雷电塔连锁与击杀风暴边界（2026-08-11）
+
+- `MODIFIER_EVENT_ON_DEATH`是全局事件。防御塔的击杀触发效果必须以`params.attacker == 当前塔对象`作为权威身份，不能按同队、同玩家或任意敌方死亡推断；其他塔、英雄和其他单位击杀不得触发当前塔效果。
+- 闪电魔塔`lightning_storm_lv01`至`lv05`的权威触发类型为`on_kill`，含义是任意归因于该塔的伤害造成击杀。业务配置先改`tower_skill_definitions.csv`，再生成技能Lua和统一Tooltip，不得直接手改生成文件。
+- 雷电风暴伤害继续把生成风暴的塔作为`damage_service`攻击者，因此风暴击杀属于该塔击杀并可继续生成风暴。修改死亡事件、伤害归因或塔代理时必须回归本塔击杀、其他单位击杀和风暴连锁三条边界。
+- 闪电打击每跳范围来自技能行`area`，当前为400；从上一目标位置以`FIND_CLOSEST`查找并跳过已命中单位。不得恢复为硬编码200或以塔位置重新选目标。
+- 闪电魔塔伤害倍率直接来自技能CSV的`damage_multiplier`，LV1至LV5为1.1/1.2/1.3/1.4/1.5；击杀触发栈内只查询一次死亡点500范围，并按触发瞬间塔攻击快照立即对每个目标结算一次物理伤害。每目标只发布一次`TOWER_LIGHTNING_HIT`，因此最多进行一次雷电扩散判定。
+- `strike_count`只表示一秒内5/6/7/8/9道视觉雷柱。视觉点可在死亡点500半径圆内按面积均匀随机，但视觉调度不得查询敌人、造成伤害或发布命中事件；旧`damage_increment_per_strike`、`damage_multiplier_cap`和逐雷柱伤害规则已删除，不得恢复。
+- 独立`lightning_diffusion_lv01`保持每个原始雷电命中独立30%判定，对目标周围200范围其他敌人造成该次伤害200%。扩散伤害必须标记为secondary且不发布`TOWER_LIGHTNING_HIT`，禁止递归扩散。
+
 ## 逐波模型资源会话与临时兼容删除边界（2026-08-11）
 
 - 最终资源架构是`difficulty_id + wave_number + wave session`拥有独立实际模型集合。正式预载、开发跳波预载和出生`SetModel/SetOriginalModel`必须调用同一解析；任何新增模型覆盖都必须同时进入这三条路径及资源代理/VPK校验。

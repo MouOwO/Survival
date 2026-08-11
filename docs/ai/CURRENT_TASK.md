@@ -10,6 +10,23 @@
 - 自动验证完成：真实技能行为桩覆盖普通/高级两级技能挂载、即时死亡、`12/13 -> 11/13`、重复死亡不重复释放、木材金币不变和训练进度不倒退；专项契约、修理工百分比/右键回归、工人训练回归、目标Lua 5.1语法、配置生成与CheckOnly、严格编码、Python编译和限定`git diff --check`通过。尚未进行Workshop Tools实机验收；需完全停止当前测试会话并重新Run后分别训练两级修理工点击技能确认。
 - 2026-08-11实机反馈修复：自毁现在经`WORKER_DISMISS_REQUEST`同步执行死亡与幂等登记清理，人口不再依赖死亡实体句柄仍有效；引擎死亡桥同时传递`victim_entindex`作为自然死亡兜底。修理工`max_count`改为限制当前存活数量，历史训练总数继续保留但不再永久禁用按钮；高级修理工从`2/2`死亡一名后恢复为`1/2`并可重新支付1000金币、1人口训练。
 
+## 当前插入任务（2026-08-11）：闪电魔塔击杀风暴即时伤害与纯视觉雷柱
+
+- 用户最终确认：任意归因于当前闪电塔的伤害造成击杀时，以死亡位置为圆心立即查询一次500范围敌人，按LV1至LV5分别造成触发时塔攻击快照110%/120%/130%/140%/150%的物理伤害。每个范围目标只受伤一次并只发布一次`TOWER_LIGHTNING_HIT`；风暴伤害保持原塔归因，可继续触发连锁风暴。
+- 已完成生产实现：权威`tower_skill_definitions.csv`把五级`damage_timing`改为`instant`、倍率改为1.1至1.5，只保留`strike_count=5/6/7/8/9`作为视觉次数，删除`damage_increment_per_strike`和`damage_multiplier_cap`。`modifier_tower_attack_effects.lua`在触发栈内完成单次范围查询、伤害和命中事件；后续调度回调只在一秒内创建随机雷柱粒子，不查询敌人、不调用伤害服务、不发布命中事件。
+- 独立“雷电扩散LV1”生产逻辑未修改：每个原始雷电命中事件独立30%判定，对目标周围200范围其他敌人造成该次伤害200%，扩散伤害标记为secondary且不重新发布`TOWER_LIGHTNING_HIT`，因此不递归。
+- 已同步：定向生成`tower_skill_definitions.lua`，统一生成Tooltip CSV/Lua，六份中英本地化镜像同步五级即时倍率和纯视觉雷柱说明；塔配置README明确`strike_count`只表示视觉次数。技能ID和最高等级未变化，Ability KV无需修改。
+- 自动验证通过：`LIGHTNING_TOWER_KILL_TRIGGER_LUA51_PASS/CONTRACT_PASS`，覆盖五级倍率、触发栈内即时伤害、单次范围查询、双目标各一次伤害/事件、5至9道视觉、视觉零查询/零伤害/零事件、原塔归因、连锁风暴，以及扩散30%/200%/排除原目标/非递归；怪物War3护甲、终极塔和本地化回归通过。5个目标Lua语法、塔技能和Tooltip生成逐字节一致、CSV 19列结构、配置CheckOnly、15个目标文件严格UTF-8/BOM及限定diff通过。
+- 尚需Workshop Tools完全冷启动：确认LV1至LV5击杀瞬间立即跳血一次，实际倍率和物理护甲链正确；一秒内仅显示5至9道随机雷柱且不再追加伤害/扩散判定；多个目标各结算一次；风暴击杀继续连锁；独立雷电扩散保持每目标一次30%判定。自动测试不能替代引擎实机验收。
+
+## 当前插入任务（2026-08-11）：Ability Tooltip 几何诊断作用域异常
+
+- Workshop Tools 实机日志确认 `ability_tooltip.js:997` 在 `scheduleExternalGeometryDiagnostic(binding)` 的异步回调中读取未定义的 `active.engineSlot`，触发 `Uncaught ReferenceError: active is not defined` 并中断当次 Panorama 脚本回调。
+- 权威 Tooltip CSV `data/csv/公共规则/tooltip_definitions.csv` 内容正常；问题属于 Panorama 客户端代码作用域错误，不修改 CSV、生成 Lua 或 Tooltip 业务数据。
+- 已确认当前 content 源码与 game 编译产物均包含错误引用。最小修复为改用当前函数参数 `binding.engineSlot`，随后强制重编译 `ability_tooltip.js` 并执行源码、产物、UTF-8 和限定差异检查。
+- 现有 `test_memory_lifecycle_contract.ps1` 当前先失败于无关的 `SURVIVAL_UI_CONTEXT_GUARD_MISSING`，本轮必须单独报告该既有阻断，不能把专项字符串检查冒充完整生命周期契约通过。
+- 已完成：`content/.../ability_tooltip.js:997` 已改为 `binding.engineSlot`，Resource Compiler 强制编译结果为 `OK: 1 compiled, 0 failed, 0 skipped`；源码和编译产物目标函数体作用域契约、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、严格 UTF-8 和限定 `git diff --check` 通过。仍需完全停止并重新 Run Workshop Tools，确认冷启动日志不再出现 `active is not defined`。
+
 ## 当前插入任务（2026-08-11）：逐波模型资源会话、W12预载修复与临时兼容TODO
 
 - 用户确认最终目标是每个正式波次拥有独立的最终模型配置，不依赖前一波已经加载的模型。当前`normal_flying_model_path`把多波普通飞行怪统一映射到Visage，只是模型尚未逐波定稿期间的临时兼容层，必须标记`TODO(FINAL_WAVE_MODELS)`；待逐波模型表完整后删除该字段、共享模型租约兼容和相关分支。

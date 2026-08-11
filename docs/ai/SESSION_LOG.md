@@ -1,3 +1,11 @@
+## 2026-08-11 - 闪电魔塔击杀风暴即时结算与视觉解耦
+
+- 用户最终修正规则：任意归因于闪电塔的伤害击杀时，以死亡点为中心立即对500范围敌人造成一次物理伤害；LV1至LV5倍率为触发时塔攻击快照110%至150%。每目标只伤害一次、发布一次`TOWER_LIGHTNING_HIT`，后续5至9道雷柱仅作视觉。该规则取代本文件后部“一秒递增雷柱每道伤害”的历史结论。
+- 权威`tower_skill_definitions.csv`保留`strike_count`为视觉次数，删除`damage_increment_per_strike`和`damage_multiplier_cap`，五级改为`damage_timing=instant`及倍率1.1/1.2/1.3/1.4/1.5。定向生成塔技能Lua，统一生成Tooltip CSV/Lua，并同步中英文三组game本地化镜像；Ability ID和最高等级未改变。
+- `modifier_tower_attack_effects.lua`将风暴拆为触发栈内单次范围伤害和后续纯视觉scheduler。范围查询、`damage_service`物理伤害及`TOWER_LIGHTNING_HIT`每目标各执行一次；视觉回调只创建随机雷柱粒子。攻击者仍为原塔，风暴击杀可继续触发风暴，War3怪物护甲补偿链不变。
+- `tower_special_skill_system.lua`生产文件未修改。专项行为测试新增雷电扩散回归：每个原始命中独立30%判定、200范围其他敌人受到该次伤害200%，secondary扩散伤害不重新发布命中事件，因此不递归。
+- 自动验证通过：`LIGHTNING_TOWER_KILL_TRIGGER_LUA51_PASS/CONTRACT_PASS`、`MONSTER_WAR3_ARMOR_DAMAGE_LUA51_PASS/CONTRACT_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、`LOCALIZATION_TOKEN_INTEGRITY_CONTRACT_PASS`；5个目标Lua `luac5.1`、CSV 19列/BOM、塔技能和Tooltip生成逐字节一致、配置CheckOnly、15个目标文件严格UTF-8/BOM及限定`git diff --check`通过。尚未Workshop Tools实机验证即时跳血、护甲结果、纯视觉雷柱、扩散和连锁风暴。
+
 ## 2026-08-11 - W12模型未加载根因与逐波资源生命周期方案
 
 - 后续状态：用户当前运行中暂未再观察到加载问题，但不能确认未来新增模型或更长运行一定不复发。已新增`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`，向其他Cline会话同步CSV优先、三路径统一解析、session/租约、urgent并行、release非引擎卸载、复发诊断顺序及逐波换模验收清单。
@@ -2361,3 +2369,29 @@
 - 已从CSV重新生成`monster_archetypes.lua`和`wave_definitions.lua`，定向重建与工作树产物逐字节一致。自动验证通过：`WAVE_SPECIAL_MIXED_WAVES_PASS`、`WAVE_SPAWN_SEQUENCE_PASS mixed_waves=25 special_mixed_waves=15`、`WAVE_FLYING_COLLISION_PASS`、`WAVE_MONSTER_MODEL_RESOURCES_PASS`（含本地VPK、资源目录和代理单位）、`WAVE_GENERATED_BYTE_MATCH_PASS count=2`、严格UTF-8、Python编译、Lua/Luac 5.4.5语法及限定`git diff --check`。
 - 环境边界：当前PATH可用Lua/Luac为5.4.5，历史Lua 5.1路径在本机不存在，因此未把本轮记录为Lua 5.1通过。仍需Workshop Tools完全冷启动跳到W11，实测59只构成、2地+1飞视觉顺序、Visage普通飞行模型、Hull 10拥挤/阻挡以及`scalemonster`倍率；未经该步骤不能记录为实机验收完成。
 - 经验已同步到`PROJECT_CONTEXT.md`，并明确覆盖此前N2-N5 W11“纯地面15+44”的临时结论；历史原因保留，但后续实现和排障必须以2026-08-11最终规则为准。
+
+## 2026-08-11 - Ability Tooltip 几何诊断作用域异常修复
+
+- 用户提供Workshop Tools日志：`ability_tooltip.js:997`在`scheduleExternalGeometryDiagnostic(binding)`异步回调中读取未定义的`active.engineSlot`，触发`Uncaught ReferenceError: active is not defined`。
+- 根因确认：`active`只在另一个`startBoundedCursorProbe()`函数内作为局部绑定存在，几何诊断函数应使用其参数`binding`。权威`data/csv/公共规则/tooltip_definitions.csv`正常，本轮未修改CSV、生成Lua或Tooltip业务数据。
+- 最小修复：content源码将该行改为`String(binding.engineSlot)`；使用Resource Compiler强制重建game产物，结果为`OK: 1 compiled, 0 failed, 0 skipped`。
+- 验证通过：源码与编译产物目标函数体`TOOLTIP_ENGINE_SLOT_SCOPE_CONTRACT_PASS`/`COMPILED_TOOLTIP_ENGINE_SLOT_SCOPE_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、严格UTF-8和限定`git diff --check`。完整`test_memory_lifecycle_contract.ps1`仍先失败于既有无关`SURVIVAL_UI_CONTEXT_GUARD_MISSING`，未将其报告为通过。
+- 仍需完全停止并重新Run Workshop Tools，重新召唤英雄或触发技能Tooltip，确认冷启动控制台不再出现`active is not defined`；自动编译和契约检查不能替代引擎实机验证。
+
+## 2026-08-11 - 闪电魔塔仅由本塔击杀触发
+
+- 用户确认规则：只有拥有闪电魔塔技能的雷电塔自身击杀怪物时才生成雷电风暴；其他塔、英雄或其他单位击杀不得触发。
+- 生产审计确认`modifier_tower_attack_effects:OnDeath()`原本已有严格对象守卫`params.attacker ~= tower`，无需重写运行时逻辑；风暴伤害请求的`attacker = caster`仍归因到原塔，因此风暴击杀可继续触发风暴。
+- 权威`tower_skill_definitions.csv`的5级闪电魔塔从`on_enemy_death`统一改为`on_kill`，中文说明改为“该塔击杀敌方单位时”；CSV由既有GB18030安全转换为UTF-8 BOM。定向生成`tower_skill_definitions.lua`，统一生成Tooltip CSV/Lua，并同步game侧中英文三份本地化镜像。
+- 新增专项Lua 5.1行为和PowerShell契约，覆盖本塔击杀触发、其他塔/英雄击杀不触发、友军死亡不触发、风暴伤害归因及连锁触发。通过`LIGHTNING_TOWER_KILL_TRIGGER_LUA51_PASS/CONTRACT_PASS`、目标Lua 5.1语法、技能与Tooltip生成逐字节一致、配置CheckOnly、怪物护甲塔Modifier回归、终极塔契约、本地化token完整性、12个目标文件严格UTF-8/BOM及限定`git diff --check`。
+- 未修改生产Modifier逻辑，也未触碰工作区中既有的编译产物和其他未跟踪测试。尚需Workshop Tools完全冷启动，用雷电塔、其他塔和英雄分别击杀怪物，确认只有雷电塔击杀出现风暴；自动测试不能替代引擎实机验收。
+
+## 2026-08-11 - 闪电打击400连锁与闪电魔塔一秒递增雷柱
+
+- 用户批准后续行为：闪电打击从上一目标400范围选择最近未命中敌人；闪电魔塔在原死亡点生成一秒序列，LV1至LV5分别5/6/7/8/9道随机视觉雷柱。每道始终伤害原死亡点500范围全部敌人，倍率从触发时塔攻击快照100%起每道+10%，最高150%。
+- 权威CSV在尾部新增`strike_count`、`damage_increment_per_strike`、`damage_multiplier_cap`，避免中间插列破坏旧技能行兼容；闪电打击5行`area=400`，风暴5行`duration=1`、次数5至9、增量0.1、上限1.5。塔配置README已补充字段语义。
+- 生产`modifier_tower_attack_effects.lua`现把连锁范围传入每跳查找；风暴在触发时保存攻击快照，按`duration/strike_count`调度。视觉点使用`sqrt(RandomFloat)`在圆面积上均匀采样；伤害查询独立固定在原死亡点。伤害继续以原塔为攻击者并发布`TOWER_LIGHTNING_HIT`，保留扩散和风暴击杀连锁。
+- 定向重建塔技能生成Lua，统一重建Tooltip CSV/Lua；中英文三份game镜像各精确更新10个雷电说明token，保持UTF-8 BOM与LF。未修改Ability KV，因为技能ID和最高等级未变化。
+- 自动验证通过：`LIGHTNING_TOWER_KILL_TRIGGER_LUA51_PASS/CONTRACT_PASS`，覆盖400范围、最近/未命中选择、5至9次数、每级一秒均匀间隔、100/110/120/130/140/150%封顶、视觉与伤害中心分离、攻击快照、原塔归因、扩散事件和风暴连锁击杀；`MONSTER_WAR3_ARMOR_DAMAGE_LUA51_PASS/CONTRACT_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、`LOCALIZATION_TOKEN_INTEGRITY_CONTRACT_PASS`通过。4个目标Lua `luac5.1`语法、塔技能与Tooltip三项生成逐字节一致、20个目标本地化token镜像、14个目标文件严格UTF-8/BOM及限定`git diff --check`通过。
+- 无关既有失败：`test_super_tower_crit_contract.ps1`失败于`SUPER_TOWER_CRIT_GENERATED_NOTES_INVALID`；本轮未修改科技CSV、生成科技配置或科技逻辑，也未越界修正该旧断言。
+- 尚未Workshop Tools实机验证。下一步完全停止并重新Run，分别确认400连锁真实选敌、LV1至LV5雷柱数量/一秒节奏/随机视觉、原死亡点500伤害区、递增倍率、雷电扩散和风暴击杀继续生成风暴。

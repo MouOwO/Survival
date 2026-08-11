@@ -29,14 +29,13 @@ local function detailed_log(format_string, ...)
 end
 
 local MULTI_DAMAGE_MULTIPLIER = 1.00
-local LIGHTNING_BOUNCE_RADIUS = 200
+local DEFAULT_LIGHTNING_BOUNCE_RADIUS = 200
 local LIGHTNING_BOUNCE_DELAY = 0.10
 local LIGHTNING_SOURCE_OFFSET_Z = 160
 local LIGHTNING_TARGET_OFFSET_Z = 70
 local SPLIT_ARROW_SPEED = 900
 local DEFAULT_STORM_RADIUS = 500
 local DEFAULT_STORM_DURATION = 5
-local DEFAULT_STORM_INTERVAL = 1
 local DEFAULT_STORM_DAMAGE_MULTIPLIER = 1
 local GATLING_ATTACK_COUNT = 5
 local DEFAULT_FROST_SLOW_DURATION = 2
@@ -559,7 +558,7 @@ local function storm_cloud_particle(caster, position, radius, duration,
     ParticleManager:SetParticleControl(particle, 0, position)
     ParticleManager:SetParticleControl(particle, 1, Vector(radius, radius, radius))
     -- Disruptor Static Storm reads its visual lifetime from CP2.x. It is only
-    -- an area marker here: all damage remains in strike_lightning_storm.
+    -- an area marker here; storm damage is settled once before visual timing.
     ParticleManager:SetParticleControl(
         particle, 2, Vector(duration, 0, 0)
     )
@@ -577,23 +576,25 @@ local function storm_strike_particle(caster, position, particle_name)
     ParticleManager:ReleaseParticleIndex(particle)
 end
 
-local function strike_lightning_storm(caster, position, radius, damage,
-        instance_id, tick, strike_particle_name)
-    if not valid(caster) then return false end
-    storm_strike_particle(caster, position, strike_particle_name)
-    local enemies = FindUnitsInRadius(
-        caster:GetTeamNumber(), position, nil, radius,
-        DOTA_UNIT_TARGET_TEAM_ENEMY,
-        DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-        DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
-        FIND_ANY_ORDER, false
+local function random_point_in_circle(position, radius)
+    local angle = RandomFloat(0, math.pi * 2)
+    local distance = radius * math.sqrt(RandomFloat(0, 1))
+    return position + Vector(
+        math.cos(angle) * distance,
+        math.sin(angle) * distance,
+        0
     )
+end
+
+local function apply_lightning_storm_damage(caster, position, radius, damage,
+        instance_id)
+    if not valid(caster) then return false end
+    local enemies = enemies_in_radius(caster, position, radius)
     local hit_count = 0
     for _, target in ipairs(enemies or {}) do
         if valid(target) then
             deal(caster, target, damage, "ability", {
                 "tower_lightning_storm", instance_id,
-                "tick_" .. tostring(tick),
             })
             event_bus.emit(events.TOWER_LIGHTNING_HIT, {
                 tower = caster,
@@ -603,14 +604,13 @@ local function strike_lightning_storm(caster, position, radius, damage,
                 source = "lightning_storm",
                 can_trigger_diffusion = true,
                 instance_id = instance_id,
-                tick = tick,
             })
             hit_count = hit_count + 1
         end
     end
     detailed_log(
-        "[TowerLightningStorm] STRIKE tower=%d instance=%s tick=%d radius=%.0f damage=%.1f targets=%d",
-        caster:entindex(), instance_id, tick, radius, damage, hit_count
+        "[TowerLightningStorm] DAMAGE tower=%d instance=%s radius=%.0f damage=%.1f targets=%d",
+        caster:entindex(), instance_id, radius, damage, hit_count
     )
     return true
 end
@@ -621,15 +621,16 @@ start_lightning_storm = function(caster, position, skill)
     local duration = math.max(
         0.1, tonumber(skill.duration) or DEFAULT_STORM_DURATION
     )
-    local interval = math.max(
-        0.1, tonumber(skill.damage_interval) or DEFAULT_STORM_INTERVAL
+    local strike_count = math.max(
+        1, math.floor(tonumber(skill.strike_count) or 1)
     )
-    local multiplier = math.max(
+    local interval = duration / strike_count
+    local damage_multiplier = math.max(
         0, tonumber(skill.damage_multiplier)
             or DEFAULT_STORM_DAMAGE_MULTIPLIER
     )
-    local damage = caster:GetAverageTrueAttackDamage(caster) * multiplier
-    local tick_limit = math.max(1, math.floor(duration / interval + 0.001))
+    local attack_damage_snapshot = caster:GetAverageTrueAttackDamage(caster)
+    local damage = attack_damage_snapshot * damage_multiplier
     local instance_id = string.format(
         "storm_%d_%d_%d", caster:entindex(),
         math.floor(GameRules:GetGameTime() * 1000), RandomInt(1, 999999)
@@ -646,19 +647,28 @@ start_lightning_storm = function(caster, position, skill)
         caster, position, radius, duration, cloud_particle_name
     )
     play_tower_sound("tower_lightning_storm", caster, caster, position)
+    apply_lightning_storm_damage(
+        caster, position, radius, damage, instance_id
+    )
     detailed_log(
-        "[TowerLightningStorm] START tower=%d instance=%s radius=%.0f duration=%.1f interval=%.1f multiplier=%.2f damage=%.1f",
-        caster:entindex(), instance_id, radius, duration, interval,
-        multiplier, damage
+        "[TowerLightningStorm] START tower=%d instance=%s radius=%.0f duration=%.2f visual_strikes=%d interval=%.3f multiplier=%.2f attack_snapshot=%.1f damage=%.1f",
+        caster:entindex(), instance_id, radius, duration, strike_count,
+        interval, damage_multiplier, attack_damage_snapshot, damage
     )
     local tick = 0
     local task_id
     task_id = scheduler.every(interval, function()
         tick = tick + 1
-        if not strike_lightning_storm(
-                caster, position, radius, damage, instance_id, tick,
-                strike_particle_name
-            ) or tick >= tick_limit then
+        if not valid(caster) then
+            ParticleManager:DestroyParticle(cloud, false)
+            ParticleManager:ReleaseParticleIndex(cloud)
+            return false
+        end
+        storm_strike_particle(
+            caster, random_point_in_circle(position, radius),
+            strike_particle_name
+        )
+        if tick >= strike_count then
             ParticleManager:DestroyParticle(cloud, false)
             ParticleManager:ReleaseParticleIndex(cloud)
             detailed_log(
@@ -703,10 +713,10 @@ local function multi_max_targets(skill)
     return math.max(1, tonumber(skill.max_targets) or 1, math.min(7, level + 3))
 end
 
-local function nearest_unhit_enemy(caster, source_position, hit)
+local function nearest_unhit_enemy(caster, source_position, hit, radius)
     local units = FindUnitsInRadius(
         caster:GetTeamNumber(), source_position, nil,
-        LIGHTNING_BOUNCE_RADIUS, DOTA_UNIT_TARGET_TEAM_ENEMY,
+        radius, DOTA_UNIT_TARGET_TEAM_ENEMY,
         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
         DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
         FIND_CLOSEST, false
@@ -720,18 +730,20 @@ end
 local function continue_lightning_chain(caster, source_unit, source_position,
         source_entindex,
         base_damage, hit_count,
-        max_targets, hit, particle_name)
+        max_targets, hit, radius, particle_name)
     if hit_count >= max_targets or not valid(caster) then
         return
     end
     scheduler.after(LIGHTNING_BOUNCE_DELAY, function()
         if not valid(caster) then return end
-        local next_target = nearest_unhit_enemy(caster, source_position, hit)
+        local next_target = nearest_unhit_enemy(
+            caster, source_position, hit, radius
+        )
         if not next_target then
             detailed_log(
                 "[TowerLightning] END tower=%d from=%s hit=%d/%d reason=no_target_in_%d",
                 caster:entindex(), tostring(source_entindex), hit_count,
-                max_targets, LIGHTNING_BOUNCE_RADIUS
+                max_targets, radius
             )
             return
         end
@@ -762,7 +774,7 @@ local function continue_lightning_chain(caster, source_unit, source_position,
         })
         continue_lightning_chain(
             caster, next_target, next_position, next_target:entindex(), base_damage,
-            next_count, max_targets, hit, particle_name
+            next_count, max_targets, hit, radius, particle_name
         )
     end)
 end
@@ -1079,6 +1091,9 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
     end
     if lightning then
         local max_targets = math.max(1, tonumber(lightning.max_targets) or 1)
+        local bounce_radius = area_radius(
+            lightning, DEFAULT_LIGHTNING_BOUNCE_RADIUS
+        )
         local hit = { [primary:entindex()] = true }
         local primary_position = primary:GetAbsOrigin()
         local particle_name = skill_effect_particle(
@@ -1108,7 +1123,7 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         )
         continue_lightning_chain(
             caster, primary, primary_position, primary:entindex(), damage,
-            1, max_targets, hit, particle_name
+            1, max_targets, hit, bounce_radius, particle_name
         )
     end
 end

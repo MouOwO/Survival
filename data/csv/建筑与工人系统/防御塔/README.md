@@ -31,6 +31,7 @@ CSV 只填写策划可读的玩法数据：
 - `duration`：持续伤害总时长。
 - `damage_interval`：持续伤害跳伤间隔。
 - `damage_multiplier`：伤害倍率。统一以普通攻击伤害作为基础伤害。
+- `strike_count`：仅用于表现序列在 `duration` 内生成的视觉次数；为空时由具体技能实现采用兼容默认值。视觉序列不得据此重复结算伤害。
 - `max_targets`：最多目标数。
 - `attack_armor_reduction`：攻击减甲数值。
 - `buff_id`：技能施加的状态 ID，具体叠加、驱散和特效规则由 Buff 表管理。
