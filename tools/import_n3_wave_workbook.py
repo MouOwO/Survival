@@ -32,6 +32,15 @@ APPROVED_NORMAL_FLYING_COUNT_OVERRIDES = {
 }
 
 
+def dedupe_by_wave_id(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Keep the final definition for an ID after interrupted/manual merges."""
+    last_index = {row["wave_id"]: index for index, row in enumerate(rows)}
+    return [
+        row for index, row in enumerate(rows)
+        if last_index[row["wave_id"]] == index
+    ]
+
+
 def approved_normal_flying_count(wave: int, workbook_count: int) -> int:
     return APPROVED_NORMAL_FLYING_COUNT_OVERRIDES.get(wave, workbook_count)
 
@@ -136,8 +145,9 @@ def build_difficulty(
     for row in data:
         if row.get("difficulty_id") == "N1":
             n1.setdefault(int(row["wave_number"]), []).append(row)
-    for rows in n1.values():
-        rows.sort(key=lambda row: int(row["spawn_order"]))
+    for wave, rows in list(n1.items()):
+        n1[wave] = dedupe_by_wave_id(rows)
+        n1[wave].sort(key=lambda row: int(row["spawn_order"]))
     fallback_flying = next(
         row for row in data if row.get("archetype_id") == FLYING_FALLBACK_ARCHETYPE
     )

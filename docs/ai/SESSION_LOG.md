@@ -1,3 +1,10 @@
+## 2026-08-11 - W12模型未加载根因与逐波资源生命周期方案
+
+- 用户反馈W12出现`models/heroes/visage/visage.vmdl requested is not loaded and may have been deleted`，并确认最终目标为每波使用不同模型；当前共享模型和相关代码属于临时阶段，需要留下最终弃用TODO后立即修复。
+- 本机VPK索引、Dota英雄KV、项目`monster_visage`资产和`asset_proxy_monster_visage`均证明Visage路径仍有效。尸体`UTIL_Remove()`只删除单位实体；项目没有生产调用`asset_preload.retire()`，且该函数只封锁Lua资源状态，不是Source 2模型卸载，所以错误不能解释为模型文件已被删除。
+- 确定代码缺陷位于开发跳波：正式预载/出生已按`normal + flying`解析到Visage，`debug_wave_model_asset_ids()`却仍读取原`definition.model_path`，导致`monster12`预载红龙基础模型后出生切换Visage。正式流程另有倒计时仅剩4秒才请求且urgent受后台串行流阻塞的冷资源竞态。
+- 批准实施：统一实际模型解析；增加逐波session和Lua模型租约；正式倒计时开始即请求、4秒窗口幂等复核；urgent不受后台流阻塞；波次结束释放项目可控引用。dev只清实体/视觉/任务和会话对象，模型保持驻留。代码标记`TODO(FINAL_WAVE_MODELS)`和`TODO(SOURCE2_MODEL_UNLOAD)`，禁止把当前release或`retire()`表述为真正卸载`.vmdl`。
+
 ## 2026-08-10 - Source 2本地化缺失与重复token告警清理
 
 - 冷启动日志定位到两个精确单位token缺失，以及挑战奖励说明、金矿和英雄祭坛的大小写不敏感同名异值。按批准范围只修改CSV显示名、本地化源/镜像和专项测试，未触碰启动规则、modifier bootstrap、fingerprint日志或其他玩法系统。
@@ -2337,3 +2344,15 @@
 - 权威`global_rules.csv`恢复并启用`monster_war3_armor_damage_enabled=1`。Damage Filter现在只对明确标记的项目怪物正护甲物理伤害乘`War3目标倍率/当前Dota倍率`，随后仍由引擎正常结算护甲；117样本补偿约1.11551，401在Filter后约447.32、原生护甲后约120.06。不开忽略护甲flag、不递归伤害、不直接再乘完整护甲倍率；魔法、纯粹、非怪物和零/负护甲不补偿。
 - 117→39的既有属性投影和UI反向显示保持不变；科技减甲与毒云改变当前有效护甲后会由下一次Damage Filter动态读取。CSV审计发现项目怪物最高4990 War3护甲，自动数学不能证明当前Dota引擎极高护甲内部上限，需后续Workshop Tools抽样。
 - 自动验证通过：专项Lua 5.1行为/契约、开关关闭及范围边界、科技减甲状态与触发、毒云状态、树伤害行为/契约、塔射程/弹速、箭塔成本、塔融合和目标Lua 5.1语法。超级塔暴击回归仍失败于既有`SUPER_TOWER_CRIT_GENERATED_NOTES_INVALID`；N3旧契约失败于既有数量断言；均未修改无关配置迎合。尚需完全冷启动实测N1 W5固定样本22–24秒。
+
+## 2026-08-11 - 正式波次数量、混合出怪、飞行模型与Hull经验固化
+
+- 用户批准实施后，审计确认N1-N5 W11均同时存在旧普通成员59只与新混合成员59只，因此运行时按`rows`消费后每个难度实际生成118只。重复的`wave_id`虽然会在生成模块`by_id`索引中被后行覆盖，但不会从`rows`删除，不能依赖索引覆盖解决重复生成。
+- 权威`wave_definitions.csv`已删除五个难度W11的旧成员和重复领头怪；最终普通怪统一为`beast_green_large ×10 + skeleton_bone ×30 + flying_red_gargoyle ×19 = 59`。全表428个成员行的`wave_id`唯一，所有实际存在的N1-N5 W11-W30波次普通怪均为59；N1仍只定义到W25。
+- `tools/build_configs.py`新增永久校验：重复`wave_id`立即失败；N1-N5实际存在的W11-W30任一普通怪总数不等于59立即失败。`import_n1_wave_workbook.py`和`import_n3_wave_workbook.py`在抽取现有模板时按ID保留最终行，避免中断导入或人工合并再次叠加旧模板。
+- `wave_spawn_sequence`的正式契约按移动类别轮转：地面原型内部round-robin、飞行原型内部round-robin，每轮最多取2地面再取1飞行。两地面种为`地A → 地B → 飞`，单地面种为`地 → 地 → 飞`；W24三地面种也不变成3地+1飞。任一类别耗尽后继续确定性输出另一类别剩余单位，数量不丢失。
+- 为避免共享原型越界影响精英、Boss、十罪和挑战怪，未直接把所有飞行原型的`model_path`改为Visage，而是在`monster_archetypes.csv`新增`normal_flying_model_path`。正式波次`member_role=normal`且最终移动类型为`flying`的12个原型统一解析到`models/heroes/visage/visage.vmdl`；资源预载和出生模型设置复用同一解析。共享原`model_path`继续供非普通角色使用。
+- 碰撞规则改为正式普通飞行怪基础Hull 10且不启用`NO_UNIT_COLLISION`；飞行领头怪、精英和Boss保持旧Hull 0与无单位碰撞。Hull缩放继续保存基础身份并非累计应用，行为测试确认先4倍为40、后0.5倍为5。
+- 已从CSV重新生成`monster_archetypes.lua`和`wave_definitions.lua`，定向重建与工作树产物逐字节一致。自动验证通过：`WAVE_SPECIAL_MIXED_WAVES_PASS`、`WAVE_SPAWN_SEQUENCE_PASS mixed_waves=25 special_mixed_waves=15`、`WAVE_FLYING_COLLISION_PASS`、`WAVE_MONSTER_MODEL_RESOURCES_PASS`（含本地VPK、资源目录和代理单位）、`WAVE_GENERATED_BYTE_MATCH_PASS count=2`、严格UTF-8、Python编译、Lua/Luac 5.4.5语法及限定`git diff --check`。
+- 环境边界：当前PATH可用Lua/Luac为5.4.5，历史Lua 5.1路径在本机不存在，因此未把本轮记录为Lua 5.1通过。仍需Workshop Tools完全冷启动跳到W11，实测59只构成、2地+1飞视觉顺序、Visage普通飞行模型、Hull 10拥挤/阻挡以及`scalemonster`倍率；未经该步骤不能记录为实机验收完成。
+- 经验已同步到`PROJECT_CONTEXT.md`，并明确覆盖此前N2-N5 W11“纯地面15+44”的临时结论；历史原因保留，但后续实现和排障必须以2026-08-11最终规则为准。

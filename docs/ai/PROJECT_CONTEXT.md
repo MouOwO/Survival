@@ -1,5 +1,13 @@
 # Project Context
 
+## 逐波模型资源会话与临时兼容删除边界（2026-08-11）
+
+- 最终资源架构是`difficulty_id + wave_number + wave session`拥有独立实际模型集合。正式预载、开发跳波预载和出生`SetModel/SetOriginalModel`必须调用同一解析；任何新增模型覆盖都必须同时进入这三条路径及资源代理/VPK校验。
+- 当前`monster_archetypes.normal_flying_model_path=Visage`及跨波英雄模型复用是模型尚未逐波定稿时的临时兼容。生产代码以`TODO(FINAL_WAVE_MODELS)`标记；删除条件是权威配置已为每个正式波成员提供最终模型、代理和本地资源验证，届时删除共享飞行覆盖字段、模型租约兼容及对应测试例外。
+- 每波运行会话以唯一session身份保存planned/pending/alive和模型租约。出生成功单位必须回写session身份，死亡只结算所属session；生成完成且pending/alive均为0后释放会话。提前最终波、强制清场和重新初始化必须显式结束相关会话，禁止永久保存可复用entindex。
+- 波次release只释放Lua层会话、租约、回调身份和项目可控的实体/附件/粒子引用。Dota Workshop Lua没有已确认安全的模型强卸载API；`asset_preload.retire()`不会卸载`.vmdl`且会阻止后续加载，因此波次系统不得调用它。`TODO(SOURCE2_MODEL_UNLOAD)`只有在Valve提供安全接口或项目采用可卸载独立资源包后才能替换。
+- dev模式必须继续删除旧怪实体、附件、粒子和调度任务，避免测试堆积；但不释放模型租约、不把资源置为RETIRED。正式下一波在倒计时开始请求资源，4秒窗口只做幂等复核；urgent模型请求不等待后台塔/墙流，资源准备不得改变出怪业务时序。
+
 ## 英雄移动白名单与建筑禁建黑名单边界（2026-08-10）
 
 - 区域权威源为`data/csv/建筑与工人系统/build_forbidden_regions.csv`。`region_type=hero_movable`定义战斗英雄可移动区域联集，`region_type=building_forbidden`定义建筑禁建黑名单；形状只允许`circle`和按边界顺序定义的凸`quadrilateral`。生成器和运行时均校验类型、坐标、正半径和凸性，禁止直接手改生成Lua。
@@ -36,7 +44,16 @@
 - 因此N2–N5 W11–W30均应为59只普通怪；当前四个W30已从原始9只统一调整为59只。`wave_leader`和`assault_boss`是独立成员，不计入59只普通怪，并保持原有数量。
 - 多怪种波次以修改前普通怪数量为比例，使用最大余数法确定性分配到59；单一普通怪种直接设为59。不得借此改变怪种、属性、角色、出怪顺序、移动类型或模型缩放。
 - 业务配置必须先修改`data/csv/怪物与波次系统/wave_definitions.csv`，再通过`tools.build_configs.build()`定向生成`scripts/vscripts/config/generated/wave_definitions.lua`并进行一致性校验。
-- 后续W11实机BUG修正覆盖旧任务的“怪种不变”边界：N2-N5 W11不再使用旧工作簿中的19只飞行变体，必须与当前N1同波普通模型一致，为15只`beast_green_large`加44只`skeleton_bone`，两者及领头怪均为地面移动。此例外只覆盖W11；W12及其他有明确证据的飞行波保持原配置。
+- 2026-08-11批准的最终W11规则覆盖此前“纯地面15+44”临时修正：N1-N5 W11普通怪统一为`beast_green_large ×10 + skeleton_bone ×30 + flying_red_gargoyle ×19 = 59`。59只仍不包含`wave_leader`和`assault_boss`；W12及其他有明确证据的飞行波保持各自配置。
+
+## 正式波次混合出怪、飞行模型与Hull边界（2026-08-11）
+
+- `wave_definitions.csv.wave_id`必须全局唯一。旧成员和新成员使用同一ID同时残留时，运行时会把两行都计入波次，即使生成Lua的`by_id`只保留后者也无法消除`rows`中的重复生成。`tools/build_configs.py`必须在生成边界拒绝重复ID，并校验N1-N5中所有实际存在的W11-W30波次普通怪总数严格为59。
+- N1/N3-N5工作簿导入器从现有波次抽取模板前必须按`wave_id`保留最终定义，防止中断导入或人工合并再次把旧模板与新模板叠加。业务修改仍以CSV为权威，生成Lua不得手改；数量契约必须同时检查逐波总数、W11精确组成和全表ID唯一性。
+- 正式普通怪的混合出怪按移动类别调度，而不是简单遍历全部原型：地面成员先进入一个内部轮转队列，飞行成员进入另一个队列；每轮取2只地面再取1只飞行。两种地面原型时表现为`地A → 地B → 飞`；一种地面原型时表现为`地 → 地 → 飞`；即使W24有三种地面原型也仍是每2只地面后1只飞行。任一类别耗尽后必须确定性输出另一类别剩余成员，不丢怪、不重复怪。
+- 飞行视觉覆盖只适用于正式波次中`member_role=normal`且最终移动类型为`flying`的成员。`monster_archetypes.csv.normal_flying_model_path`是该范围的专用模型字段，当前12个正式普通飞行原型统一使用可靠的Visage飞行模型；预载与实际`SetModel/SetOriginalModel`必须消费同一个解析结果。原`model_path`继续服务共享原型的`wave_leader`、精英、Boss、十罪和挑战怪，禁止为修普通飞行模型直接覆盖共享基础模型。
+- 正式普通飞行怪基础Hull为10且保留单位碰撞；飞行领头怪、精英和Boss继续沿用Hull 0与无单位碰撞。Hull角色判断必须同时看最终移动类型和成员角色，不能只按`movement_type=flying`一刀切。`scalemonster`继续保存基础Hull身份并以该基准非累计缩放，例如先4倍得到40，再改0.5倍必须得到5而不是20。
+- 自动验证必须覆盖五个难度的真实W11/W13/W24逐位置周期、类别耗尽、Hull非累计缩放、普通飞行与飞行领头怪边界、Visage模型的本地VPK/资源目录/代理预载契约、CSV与生成Lua逐字节一致性。自动测试不能替代Workshop Tools冷启动；实机仍需观察59只数量、2地+1飞视觉顺序、飞行模型及Hull 10的拥挤和阻挡表现。
 
 ## 怪物物理伤害曲线边界（2026-08-09）
 

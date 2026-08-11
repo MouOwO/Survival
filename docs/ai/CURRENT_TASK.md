@@ -1,5 +1,23 @@
 # Current Task
 
+## 当前插入任务（2026-08-11）：逐波模型资源会话、W12预载修复与临时兼容TODO
+
+- 用户确认最终目标是每个正式波次拥有独立的最终模型配置，不依赖前一波已经加载的模型。当前`normal_flying_model_path`把多波普通飞行怪统一映射到Visage，只是模型尚未逐波定稿期间的临时兼容层，必须标记`TODO(FINAL_WAVE_MODELS)`；待逐波模型表完整后删除该字段、共享模型租约兼容和相关分支。
+- 已定位W12错误的确定根因：正式预载和出生使用`model_path_for()`，但`monster<N>`开发跳波仍直接读取`definition.model_path`。因此`monster12`预载Dragon Knight/旧飞行基础模型，出生却`SetModel()`为Visage，触发`requested is not loaded and may have been deleted`。修复必须让正式预载、开发预载和出生设置消费同一实际模型解析。
+- 资源生命周期采用波次会话和Lua租约：每波独立登记planned/pending/alive及实际模型集合；生成完成且该会话怪物全部死亡后调用统一release边界，清除本波Lua引用、回调身份、附件/粒子/实体生命周期状态。波次重叠时按会话身份结算，禁止只看全局`current_wave`提前释放其他波。
+- `release`不等于Source 2强卸载。Workshop Lua当前没有公开、安全的`UnloadModel/UnloadResource`；现有`asset_preload.retire()`只会把Lua状态永久置为`RETIRED`并阻止以后重载，不能作为波次delete。实现必须标记`TODO(SOURCE2_MODEL_UNLOAD)`，未来只有在Valve提供安全卸载API或项目迁移到可卸载独立资源包后才能接入真正模型卸载。
+- dev模式继续清理怪物实体、附件、粒子、任务和会话对象，但不释放模型租约、不调用`retire()`；反复`monster<N>`可复用已加载资源。正式波次在倒计时开始即独立请求下一波资源，并在配置的4秒窗口幂等复核；urgent波次请求不得被塔/城墙后台串行流阻塞，且不得改变倒计时、数量、顺序或生成间隔。
+
+## 已完成插入任务（2026-08-11）：正式波次数量、混合顺序、飞行模型与Hull修正
+
+- 根因确认并修复：N1-N5 W11均同时保留旧59只成员和新59只混合成员，导致运行时普通怪实际为118只。权威CSV现删除旧重复行，全表`wave_id`唯一；五个难度W11均严格为`beast_green_large ×10 + skeleton_bone ×30 + flying_red_gargoyle ×19 = 59`，不含领头怪和进攻Boss。
+- `tools/build_configs.py`新增生成边界失败关闭：拒绝重复`wave_id`，并要求N1-N5中所有实际存在的W11-W30波次普通怪严格为59。N1与N3-N5导入器在复用现有模板前按`wave_id`保留最终定义，防止再次叠加旧数据。
+- 混合出怪以移动类别建立独立轮转队列，正式规则为每2只地面后1只飞行；两种地面原型表现为`地A → 地B → 飞`，一种地面原型表现为`地 → 地 → 飞`，任一类别耗尽后确定性输出剩余成员。五个难度W11/W13/W24共15个真实混合波已逐位置验证。
+- `monster_archetypes.csv`新增`normal_flying_model_path`。只有正式波次`normal + flying`成员使用该专用字段，当前统一为Visage飞行模型；预载与出生模型使用同一解析。飞行领头怪、精英、Boss、十罪和挑战怪仍使用共享原`model_path`，未扩大修改范围。
+- 正式普通飞行怪基础Hull改为10并保留单位碰撞；飞行领头怪、精英和Boss继续Hull 0与无单位碰撞。`scalemonster`以基础Hull非累计缩放，专项覆盖`10×4=40`后改为`10×0.5=5`。
+- 自动验证通过：`WAVE_SPECIAL_MIXED_WAVES_PASS`、`WAVE_SPAWN_SEQUENCE_PASS mixed_waves=25 special_mixed_waves=15`、`WAVE_FLYING_COLLISION_PASS`、`WAVE_MONSTER_MODEL_RESOURCES_PASS`、`WAVE_GENERATED_BYTE_MATCH_PASS count=2`、严格UTF-8、Python编译、Lua/Luac 5.4.5语法及限定`git diff --check`。当前机器没有可执行Lua 5.1，因此不宣称本轮Lua 5.1验证。
+- 尚待Workshop Tools完全冷启动实测：跳到W11核对实际59只构成和`2地+1飞`顺序，确认普通飞行怪显示Visage模型、不会相互完全叠加，并观察Hull 10及`scalemonster`倍率下的真实拥挤/阻挡。自动验证不能记录为引擎实机验收。
+
 ## 当前插入任务（2026-08-10）：本地化缺失与重复 token 告警清理
 
 - 用户提供冷启动日志：`npc_survival_repairer`、`npc_survival_builder_proxy` 缺失精确本地化 token；挑战通用奖励说明、`building_gold_mine`和`building_hero_altar`存在大小写不敏感同名但文本不同的重复定义。

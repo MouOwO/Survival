@@ -505,7 +505,15 @@ function M.queue(asset_id, options)
         return true, state.status
     end
     if queued[asset_id] then
-        if options.urgent then queued[asset_id].urgent = true end
+        if options.urgent then
+            -- A formal wave can be only a few seconds away. Do not leave its
+            -- exact-model proxy behind the minute-based tower/wall stream.
+            remove_queued_request(asset_id)
+            local started = begin_async_request(asset_id, "urgent")
+            local current_status = (states[asset_id] or {}).status
+                or STATE.LOADING
+            return started, current_status
+        end
         return true, STATE.QUEUED
     end
     local request = {
@@ -515,10 +523,17 @@ function M.queue(asset_id, options)
         queued_at = now(),
     }
     queued[asset_id] = request
-    table.insert(queue, request)
     set_state(asset_id, STATE.QUEUED, { queued_at = request.queued_at })
     logger.info("AssetPreload", "queued id=" .. asset_id
         .. " urgent=" .. tostring(request.urgent))
+    if request.urgent then
+        local started = begin_async_request(asset_id, "urgent")
+        local current_status = (states[asset_id] or {}).status
+            or STATE.LOADING
+        if not started then return false, current_status end
+        return true, current_status
+    end
+    table.insert(queue, request)
     M._pump()
     local current_status = (states[asset_id] or {}).status or STATE.QUEUED
     if current_status == STATE.FAILED then return false, current_status end

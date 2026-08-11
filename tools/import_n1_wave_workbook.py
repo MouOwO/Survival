@@ -17,6 +17,15 @@ ASSAULT_WAVES = {5, 10, 15, 20, 25}
 SPECIAL_MIXED_WAVES = {11, 13, 24}
 
 
+def dedupe_by_wave_id(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Keep the final definition for an ID after interrupted/manual merges."""
+    last_index = {row["wave_id"]: index for index, row in enumerate(rows)}
+    return [
+        row for index, row in enumerate(rows)
+        if last_index[row["wave_id"]] == index
+    ]
+
+
 def read_csv() -> tuple[list[str], list[list[str]]]:
     rows = list(csv.reader(io.StringIO(CSV_PATH.read_bytes().decode("utf-8-sig"))))
     return rows[0], rows[1:]
@@ -106,6 +115,10 @@ def main() -> int:
     by_wave = {}
     for row in current:
         by_wave.setdefault(int(row["wave_number"]), []).append(row)
+    by_wave = {
+        wave: dedupe_by_wave_id(rows)
+        for wave, rows in by_wave.items()
+    }
     fallback_flying = next(row for row in current if row["archetype_id"] == FLYING_FALLBACK_ARCHETYPE)
     fallback_boss = next(row for row in by_wave[25] if row["is_boss"] == "1")
     book = workbook_rows(args.workbook)

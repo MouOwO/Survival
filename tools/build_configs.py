@@ -298,6 +298,45 @@ def validate_sound_cue_uniqueness(sources: list[Path]) -> None:
             seen[cue_id] = (source, row_number)
 
 
+def validate_wave_definitions(
+    source: Path, headers: list[str], data_rows: list[tuple[int, list[str]]]
+) -> None:
+    if source.name != "wave_definitions.csv":
+        return
+    seen_ids: dict[str, int] = {}
+    normal_totals: dict[tuple[str, int], int] = {}
+    present_groups: set[tuple[str, int]] = set()
+    for row_number, fields in data_rows:
+        row = dict(zip(headers, fields))
+        wave_id = row.get("wave_id", "").strip()
+        if not wave_id:
+            raise ValueError(f"wave definition has empty wave_id: {source} line {row_number}")
+        if wave_id in seen_ids:
+            raise ValueError(
+                f"duplicate wave_id {wave_id}: {source} lines"
+                f" {seen_ids[wave_id]} and {row_number}"
+            )
+        seen_ids[wave_id] = row_number
+        if row.get("enabled", "").strip().lower() in {"0", "false", "no", "n", "off"}:
+            continue
+        difficulty_id = row.get("difficulty_id", "").strip()
+        wave_number = int(row.get("wave_number", "0") or 0)
+        group = (difficulty_id, wave_number)
+        present_groups.add(group)
+        if row.get("member_role", "").strip() in {"", "normal"}:
+            normal_totals[group] = normal_totals.get(group, 0) + int(
+                row.get("monster_count", "0") or 0
+            )
+    for difficulty_id in ("N1", "N2", "N3", "N4", "N5"):
+        for wave_number in range(11, 31):
+            group = (difficulty_id, wave_number)
+            if group in present_groups and normal_totals.get(group, 0) != 59:
+                raise ValueError(
+                    f"{difficulty_id} W{wave_number} requires exactly 59 normal monsters:"
+                    f" found {normal_totals.get(group, 0)}"
+                )
+
+
 def read_data_rows(source: Path) -> list[dict[str, str]]:
     with source.open("r", encoding="utf-8-sig", newline="") as handle:
         rows = list(csv.reader(handle))
@@ -434,6 +473,7 @@ def build(source: Path, output: Path) -> None:
             )
         data_rows.append((row_number, fields))
     validate_build_regions(source, headers, data_rows)
+    validate_wave_definitions(source, headers, data_rows)
     validate_sound_definitions(source, headers, data_rows)
     lines = [
         "-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.",

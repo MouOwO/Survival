@@ -41,10 +41,147 @@ local FINAL_WAVE_NUMBER = 30
 local DEV_PRELOAD_POLL_INTERVAL = 0.05
 local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
 local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
+local wave_resource_sessions = {}
+local wave_model_leases = {}
+local dev_resident_models = {}
+local next_wave_resource_session_id = 0
 
 local function movement_type_for(row)
     local definition = archetypes.by_id[row.archetype_id] or {}
     return row.movement_type_override or definition.movement_type or "ground"
+end
+
+local function model_path_for(row, definition)
+    definition = definition or {}
+    -- TODO(FINAL_WAVE_MODELS): Remove this shared flying compatibility override
+    -- after every formal wave member has an approved unique final model.
+    if wave_spawn_sequence.is_normal(row)
+        and movement_type_for(row) == "flying"
+        and type(definition.normal_flying_model_path) == "string"
+        and definition.normal_flying_model_path ~= "" then
+        return definition.normal_flying_model_path
+    end
+    return definition.model_path
+end
+
+local function wave_model_paths(wave)
+    local model_paths = {}
+    local seen_models = {}
+    for _, row in ipairs((wave and wave.batches) or {}) do
+        local definition = archetypes.by_id[row.archetype_id]
+        local model_path = definition and model_path_for(row, definition) or nil
+        if model_path and model_path ~= "" and not seen_models[model_path] then
+            seen_models[model_path] = true
+            model_paths[#model_paths + 1] = model_path
+        end
+    end
+    table.sort(model_paths)
+    return model_paths
+end
+
+local function acquire_wave_model_resources(number, wave, token, is_dev)
+    next_wave_resource_session_id = next_wave_resource_session_id + 1
+    local session_id = string.format(
+        "%s:%d:%d",
+        is_dev and "dev" or "formal",
+        tonumber(number) or 0,
+        next_wave_resource_session_id
+    )
+    local planned = 0
+    for _, row in ipairs((wave and wave.batches) or {}) do
+        planned = planned + (tonumber(row.monster_count) or 0)
+    end
+    local session = {
+        session_id = session_id,
+        wave_number = number,
+        generation_token = token,
+        dev_mode = is_dev == true,
+        model_paths = wave_model_paths(wave),
+        planned = planned,
+        pending = planned,
+        alive = 0,
+        generation_completed = false,
+        released = false,
+    }
+    wave_resource_sessions[session_id] = session
+    for _, model_path in ipairs(session.model_paths) do
+        local lease = wave_model_leases[model_path] or {
+            session_count = 0,
+            sessions = {},
+            dev_resident = dev_resident_models[model_path] == true,
+        }
+        if not lease.sessions[session_id] then
+            lease.sessions[session_id] = true
+            lease.session_count = lease.session_count + 1
+        end
+        wave_model_leases[model_path] = lease
+    end
+    return session
+end
+
+local function release_wave_model_resources(session, reason, force)
+    if not session or session.released then return false end
+    if not force and (session.pending > 0 or session.alive > 0
+            or not session.generation_completed) then
+        return false
+    end
+    session.released = true
+    session.release_reason = reason or "wave_complete"
+    for _, model_path in ipairs(session.model_paths or {}) do
+        local lease = wave_model_leases[model_path]
+        if lease and lease.sessions[session.session_id] then
+            lease.sessions[session.session_id] = nil
+            lease.session_count = math.max(0, lease.session_count - 1)
+        end
+        if session.dev_mode then
+            -- Dev jumps intentionally keep exact models resident for repeated
+            -- inspection while still releasing the per-session Lua identity.
+            dev_resident_models[model_path] = true
+            lease = lease or { session_count = 0, sessions = {} }
+            lease.dev_resident = true
+            wave_model_leases[model_path] = lease
+        elseif lease and lease.session_count <= 0 and not lease.dev_resident then
+            -- TODO(SOURCE2_MODEL_UNLOAD): Workshop Lua exposes no confirmed safe
+            -- model-unload API. This releases only project Lua leases; never call
+            -- asset_preload.retire(), which would block a later reload.
+            wave_model_leases[model_path] = nil
+        end
+    end
+    wave_resource_sessions[session.session_id] = nil
+    return true
+end
+
+local function settle_wave_resource_session(session, reason, force)
+    if not session or session.released then return false end
+    if force then
+        session.pending = 0
+        session.alive = 0
+        session.generation_completed = true
+    end
+    return release_wave_model_resources(session, reason, force)
+end
+
+local function cancel_pending_wave_resource_sessions(reason, keep_models_resident)
+    local sessions = {}
+    for _, session in pairs(wave_resource_sessions) do
+        sessions[#sessions + 1] = session
+    end
+    for _, session in ipairs(sessions) do
+        session.pending = 0
+        session.generation_completed = true
+        if keep_models_resident then session.dev_mode = true end
+        release_wave_model_resources(session, reason or "generation_cancelled")
+    end
+end
+
+local function force_release_all_wave_resource_sessions(reason)
+    local sessions = {}
+    for _, session in pairs(wave_resource_sessions) do
+        sessions[#sessions + 1] = session
+    end
+    for _, session in ipairs(sessions) do
+        settle_wave_resource_session(session, reason, true)
+    end
 end
 
 local function spawn_sequence(batches)
@@ -67,16 +204,7 @@ end
 local function queue_wave_assets(number)
     local wave = waves[number]
     if not wave then return false, "wave_not_found", 0, 0 end
-    local model_paths = {}
-    local seen_models = {}
-    for _, row in ipairs(wave.batches or {}) do
-        local definition = archetypes.by_id[row.archetype_id]
-        local model_path = definition and definition.model_path or nil
-        if model_path and not seen_models[model_path] then
-            seen_models[model_path] = true
-            model_paths[#model_paths + 1] = model_path
-        end
-    end
+    local model_paths = wave_model_paths(wave)
     local visual_resources = monster_visual_config.resources_for_wave(number)
     local resources = asset_preload.resources_for_models(
         model_paths,
@@ -276,8 +404,9 @@ local function apply_stats(unit, row, definition, movement_type)
     end
     unit:SetModelScale((definition.model_scale or 1.0)
         * (tonumber(row.model_scale_multiplier) or 1.0))
-    if unit.SetModel and definition.model_path then unit:SetModel(definition.model_path) end
-    if unit.SetOriginalModel and definition.model_path then unit:SetOriginalModel(definition.model_path) end
+    local model_path = model_path_for(row, definition)
+    if unit.SetModel and model_path then unit:SetModel(model_path) end
+    if unit.SetOriginalModel and model_path then unit:SetOriginalModel(model_path) end
     if unit.SetAttackCapability then
         unit:SetAttackCapability(definition.attack_type == "ranged"
             and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK)
@@ -293,13 +422,17 @@ local function apply_stats(unit, row, definition, movement_type)
     end
 end
 
-local function spawn_one(row, token, wave_number, normal_instance_index)
+local function spawn_one(row, token, wave_number, normal_instance_index, session)
     if token ~= generation_token then return end
     state.pending = math.max(0, state.pending - 1)
+    if session and not session.released then
+        session.pending = math.max(0, session.pending - 1)
+    end
     local definition = archetypes.by_id[row.archetype_id]
     if not definition then
         state.failed_spawn = state.failed_spawn + 1
         publish("archetype_missing")
+        release_wave_model_resources(session, "spawn_failed")
         check_final_victory()
         return
     end
@@ -307,6 +440,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
     if not marker then
         state.failed_spawn = state.failed_spawn + 1
         publish("monster_spawn_marker_missing")
+        release_wave_model_resources(session, "spawn_marker_missing")
         check_final_victory()
         return
     end
@@ -317,6 +451,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
     if not valid(unit) then
         state.failed_spawn = state.failed_spawn + 1
         publish("unit_create_failed")
+        release_wave_model_resources(session, "unit_create_failed")
         check_final_victory()
         return
     end
@@ -353,16 +488,20 @@ local function spawn_one(row, token, wave_number, normal_instance_index)
         unit = unit,
         is_boss = is_assault_boss,
         base_hull_radius = base_hull_radius,
+        wave_resource_session_id = session and session.session_id or nil,
     }
     state.spawned = state.spawned + 1
     state.alive = state.alive + 1
+    if session and not session.released then
+        session.alive = session.alive + 1
+    end
     if is_assault_boss then state.boss_alive = true end
     publish("enemy_spawned")
 end
 
-local function spawn_callback(row, token, wave_number, normal_instance_index)
+local function spawn_callback(row, token, wave_number, normal_instance_index, session)
     return function()
-        spawn_one(row, token, wave_number, normal_instance_index)
+        spawn_one(row, token, wave_number, normal_instance_index, session)
     end
 end
 
@@ -372,15 +511,15 @@ local function start_countdown(seconds)
     state.timer = seconds
     local target_wave = next_wave_number_after(state.current_wave)
     local preload_lead = wave_timing_config.formal_wave_preload_lead_seconds
-    local preload_queued = target_wave == nil or target_wave <= 1
-    local function queue_target_wave_once()
-        if preload_queued then return end
-        preload_queued = true
+    local preload_reviewed = target_wave == nil or target_wave <= 1
+    local function queue_target_wave(phase)
+        if target_wave == nil or target_wave <= 1 then return end
         local ok, status, queued_count, failed_count, resource_count =
             queue_wave_assets(target_wave)
         print(string.format(
-            "[WaveSystem] formal wave assets queued target_wave=%d remaining=%.1f resources=%d queued=%d failed=%d status=%s ok=%s",
+            "[WaveSystem] formal wave assets queued target_wave=%d phase=%s remaining=%.1f resources=%d queued=%d failed=%d status=%s ok=%s",
             tonumber(target_wave) or 0,
+            tostring(phase),
             tonumber(state.timer) or 0,
             tonumber(resource_count) or 0,
             tonumber(queued_count) or 0,
@@ -389,12 +528,19 @@ local function start_countdown(seconds)
             tostring(ok)
         ))
     end
-    if state.timer <= preload_lead then queue_target_wave_once() end
+    queue_target_wave("countdown_start")
+    if state.timer <= preload_lead and not preload_reviewed then
+        preload_reviewed = true
+        queue_target_wave("lead_review")
+    end
     publish("countdown_started")
     scheduler.cancel("wave_countdown")
     scheduler.every(1.0, function()
         state.timer = math.max(0, state.timer - 1)
-        if state.timer <= preload_lead then queue_target_wave_once() end
+        if state.timer <= preload_lead and not preload_reviewed then
+            preload_reviewed = true
+            queue_target_wave("lead_review")
+        end
         publish("countdown_tick")
         if state.timer <= 0 then event_bus.emit(events.WAVE_START_NEXT, {}); return false end
         return true
@@ -414,6 +560,12 @@ local function start_wave(number, reason)
     for _, row in ipairs(wave.batches) do state.planned = state.planned + (row.monster_count or 0) end
     state.pending = state.planned
     local token = generation_token
+    local resource_session = acquire_wave_model_resources(
+        number,
+        wave,
+        token,
+        false
+    )
     publish(reason or "wave_started")
     if number < state.total_waves then
         start_countdown(wave_timing_config.interval_after_wave(number))
@@ -432,13 +584,17 @@ local function start_wave(number, reason)
             row,
             token,
             number,
-            visual_instance_index
+            visual_instance_index,
+            resource_session
         ))
         next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
     end
     scheduler.after(last_delay + 0.05, function()
         if token ~= generation_token then return end
         state.pending = 0
+        resource_session.pending = 0
+        resource_session.generation_completed = true
+        release_wave_model_resources(resource_session, "generation_completed")
         if state.current_wave == FINAL_WAVE_NUMBER
             or (state.early_final_used ~= true
                 and state.current_wave == state.total_waves) then
@@ -478,6 +634,12 @@ local function on_killed(payload)
     monster_visual_service.cleanup(victim)
     enemies[entindex] = nil
     state.alive = math.max(0, state.alive - 1)
+    local resource_session = meta.wave_resource_session_id
+        and wave_resource_sessions[meta.wave_resource_session_id] or nil
+    if resource_session then
+        resource_session.alive = math.max(0, resource_session.alive - 1)
+        release_wave_model_resources(resource_session, "all_monsters_finished")
+    end
     state.killed = state.killed + 1
     if meta.is_boss then state.boss_alive = false end
     publish("enemy_killed")
@@ -507,6 +669,7 @@ local function clear_normal_wave_enemies()
     state.alive = 0
     state.pending = 0
     state.boss_alive = false
+    force_release_all_wave_resource_sessions("forced_wave_cleanup")
     return removed
 end
 
@@ -572,6 +735,7 @@ function M.set_dev_mode(enabled)
     if dev_mode then
         state.status = "dev_mode"
         state.pending = 0
+        cancel_pending_wave_resource_sessions("dev_mode_enabled", true)
         publish("dev_mode_enabled")
     end
     return dev_mode
@@ -587,6 +751,12 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason)
     state.boss_alive = false
     for _, row in ipairs(wave.batches) do state.planned = state.planned + (row.monster_count or 0) end
     state.pending = state.planned
+    local resource_session = acquire_wave_model_resources(
+        number,
+        wave,
+        token,
+        true
+    )
     local next_delay, last_delay = 0, 0
     local normal_instance_index = 0
     for _, row in ipairs(spawn_sequence(wave.batches)) do
@@ -601,12 +771,19 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason)
             row,
             token,
             number,
-            visual_instance_index
+            visual_instance_index,
+            resource_session
         ))
         next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
     end
     scheduler.after(last_delay + 0.05, function()
-        if token == generation_token then state.status = "dev_mode"; publish("dev_wave_completed") end
+        if token == generation_token then
+            resource_session.pending = 0
+            resource_session.generation_completed = true
+            release_wave_model_resources(resource_session, "dev_generation_completed")
+            state.status = "dev_mode"
+            publish("dev_wave_completed")
+        end
     end, DEV_WAVE_COMPLETE_TASK_ID)
     print("[WaveSystem] dev wave spawn started wave=" .. tostring(number)
         .. " preload=" .. tostring(preload_reason))
@@ -620,7 +797,7 @@ local function debug_wave_model_asset_ids(wave)
     local failed = 0
     for _, row in ipairs(wave.batches or {}) do
         local definition = archetypes.by_id[row.archetype_id]
-        local model_path = definition and definition.model_path or nil
+        local model_path = definition and model_path_for(row, definition) or nil
         local asset = model_path and asset_catalog.for_model(model_path)
             or nil
         local asset_id = asset and asset.asset_id or nil
@@ -645,6 +822,7 @@ function M.debug_spawn_wave(number)
     scheduler.cancel("wave_countdown")
     scheduler.cancel(DEV_PRELOAD_TASK_ID)
     scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
+    cancel_pending_wave_resource_sessions("dev_wave_replaced", true)
     state.current_wave = number
     state.status = "dev_preloading"
     state.timer = wave_timing_config.dev_wave_preload_timeout_seconds
@@ -755,6 +933,36 @@ function M.set_monster_hull_scale(multiplier)
     return true, result_or_error
 end
 
+function M._resource_snapshot_for_test()
+    local sessions = {}
+    for session_id, session in pairs(wave_resource_sessions) do
+        sessions[session_id] = {
+            wave_number = session.wave_number,
+            dev_mode = session.dev_mode,
+            planned = session.planned,
+            pending = session.pending,
+            alive = session.alive,
+            generation_completed = session.generation_completed,
+        }
+    end
+    local leases = {}
+    for model_path, lease in pairs(wave_model_leases) do
+        leases[model_path] = {
+            session_count = lease.session_count,
+            dev_resident = lease.dev_resident == true,
+        }
+    end
+    local residents = {}
+    for model_path in pairs(dev_resident_models) do residents[model_path] = true end
+    return {
+        sessions = sessions,
+        leases = leases,
+        dev_resident_models = residents,
+        session_count = count_entries(wave_resource_sessions),
+        lease_count = count_entries(wave_model_leases),
+    }
+end
+
 function M.init()
     monster_spawn_marker = nil
     difficulty_id = difficulty_config.default_id
@@ -763,6 +971,11 @@ function M.init()
     game_started_at = nil
     monster_hull_multiplier = 1
     memory_cleared_wave = -1
+    force_release_all_wave_resource_sessions("wave_system_init")
+    wave_resource_sessions = {}
+    wave_model_leases = {}
+    dev_resident_models = {}
+    next_wave_resource_session_id = 0
     scheduler.cancel(DEV_PRELOAD_TASK_ID)
     scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
     reset(); enemies = {}; wall_entindex = -1; generation_token = 0; dev_mode = false
