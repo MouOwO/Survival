@@ -520,6 +520,23 @@ function M.precache(context)
     for _, unit_name in ipairs(units) do
         PrecacheUnitByNameSync(unit_name, context)
     end
+    for _, model_name in ipairs({
+        "models/heroes/sniper/sniper.vmdl",
+        "models/heroes/skywrath_mage/skywrath_mage.vmdl",
+        "models/heroes/vengeful/vengeful.vmdl",
+    }) do
+        PrecacheResource("model", model_name, context)
+    end
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf",
+        context
+    )
+    PrecacheResource(
+        "model",
+        "models/heroes/skywrath_mage/skywrath_mage.vmdl",
+        context
+    )
     local training_definitions = require("config/generated/training_definitions")
     local precached_worker_models = {}
     for _, row in ipairs(training_definitions.rows or {}) do

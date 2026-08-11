@@ -364,6 +364,8 @@ local function rebuild_waves()
 end
 
 local function apply_stats(unit, row, definition, movement_type)
+    unit.survival_movement_type = definition.movement_type or "ground"
+    unit.survival_movement_type_override = row.movement_type_override
     unit:SetBaseMaxHealth(row.health)
     unit:SetMaxHealth(row.health)
     unit:SetHealth(row.health)

@@ -1,6 +1,7 @@
 LinkLuaModifier("modifier_tower_auto_attack", "modifiers/modifier_tower_auto_attack", LUA_MODIFIER_MOTION_NONE)
 local global_rules = require("config/global_rules")
 local tree_damage_rules = require("systems/tree_damage_rules")
+local anti_air_rules = require("systems/anti_air_rules")
 modifier_tower_auto_attack = class({})
 _G.modifier_tower_auto_attack = modifier_tower_auto_attack
 
@@ -38,6 +39,7 @@ local function find_target(tower)
             and (unit:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
             or 99999
         if valid(unit) and not tree_damage_rules.is_tree(unit)
+            and anti_air_rules.can_attack(tower, unit)
             and distance <= attack_range + 64 then
             return unit
         end
@@ -47,7 +49,8 @@ end
 
 function modifier_tower_auto_attack:OnAttackStart(params)
     if not IsServer() or params.attacker ~= self:GetParent()
-        or not tree_damage_rules.is_tree(params.target) then
+        or (not tree_damage_rules.is_tree(params.target)
+            and anti_air_rules.can_attack(self:GetParent(), params.target)) then
         return
     end
     local tower = self:GetParent()
@@ -88,11 +91,13 @@ function modifier_tower_auto_attack:OnIntervalThink()
         and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
         or 99999
     local attack_range = current_attack_range(tower)
-    if tree_damage_rules.is_tree(target) then
+    if tree_damage_rules.is_tree(target)
+        or not anti_air_rules.can_attack(tower, target) then
         tower:SetForceAttackTarget(nil)
         self.forced_target = nil
     end
     if not valid(target) or tree_damage_rules.is_tree(target)
+        or not anti_air_rules.can_attack(tower, target)
         or target:GetTeamNumber() == tower:GetTeamNumber()
         or distance > attack_range + 96 then
         if self.forced_target ~= nil then

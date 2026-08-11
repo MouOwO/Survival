@@ -1,5 +1,18 @@
 # Current Task
 
+## 当前实施任务（2026-08-11）：第7塔路线由魔法塔重构为防空塔
+
+- 用户已批准实施：将当前第7路线“魔法塔→大魔法塔→魔法至尊”重构为“防空塔→防空火炮→空域霸主”，基础数值、升级费用、人口占用与阶段等级沿用当前CSV。
+- 飞行身份严格读取怪物权威CSV投影：`movement_type == "flying"`或`movement_type_override == "flying"`任一成立。第7路线自动索敌、手动攻击、竞态伤害兜底及七塔合一第7路都只能攻击飞行单位。
+- 防空炮等级1至5每轮对同一目标发射`4/5/6/7/7`枚飞弹，每枚为独立普通攻击并享受对空伤害+90%；塔面板攻速保持1。目标死亡后本轮剩余飞弹停止且不转射，随后重新索敌开启下一轮；额外普通攻击必须隔离递归。
+- 防空火炮等级1至5的每枚真实命中独立以`10%/12%/14%/16%/16%`概率眩晕飞行单位3秒。
+- 空域霸主半径500：范围内敌方单位最终承伤提高20%，其中飞行单位攻击速度额外降低20%；同名效果不叠加，离开范围恢复，攻速变化通过现有`UNIT_COMBAT_STATS_CHANGED`链同步到敌方选中单位UI。
+- 策划数值只写入`data/csv/`权威源；生成Lua不得直接编辑。实现后新增专项Lua/契约测试，并执行配置生成一致性、Lua 5.1语法、严格编码及限定`git diff --check`。自动测试不等于Workshop Tools实机验收。
+- 实现与自动验证完成：防空路线、技能、Tooltip、本地化、飞行索敌/手动命令/伤害竞态兜底、七塔合一第7路、额外普通攻击序列、每弹眩晕和空域光环均已接入。正式波次、普通遭遇及挑战会话三条生成边界都会保存CSV飞行身份；挑战会话同时按该身份设置引擎移动能力。
+- `ANTI_AIR_TOWER_LUA51_PASS`覆盖`0.1s`飞弹调度、`4`枚总数、递归隔离、目标死亡停止、每弹独立眩晕及双光环；`ANTI_AIR_DAMAGE_FILTER_LUA51_PASS`证明最终加法伤害项交换顺序结果不变，并锁定空域`1.2`在Boss与其他最终倍率之后相乘。
+- 通过：`ANTI_AIR_TOWER_CONTRACT_PASS`、配置生成84模块成功、目标Lua 5.1语法、`BUFF_MANAGER_NONSTACKING_PASS`、`WAVE_FLYING_COLLISION_PASS`、`WAVE_SPECIAL_MIXED_WAVES_PASS`、严格UTF-8及限定`git diff --check`。既有`test_tower_class_fusion_counts.lua`在加载带BOM的`building_system.lua`时被Lua 5.1解析器阻断，未进入业务断言；本轮未改该既有文件。尚未进行Workshop Tools实机验收。
+- 2026-08-11紧急启动修复：防空改动曾删除`tower_magic_supreme_system`的`require`与`init()`，但`M.precache()`仍首先调用其`precache(context)`，导致预载入口在同步加载主城和`npc_dota_hero_monkey_king`前中断；表现为主城预建筑error模型，以及猴王本体、武器、头发、护甲和肩部资源未加载。现已恢复模块绑定和初始化，并新增`ADDON_PRECACHE_CONTRACT_PASS`锁定模块生命周期及主城/猴王同步预载项；`addon_game_mode.lua`通过Lua 5.1语法检查。仍需完全停止旧会话后冷启动Workshop Tools确认引擎资源恢复，热重载不能证明启动预载已重跑。
+
 ## 已完成实现（2026-08-11）：修理工自杀返还占用人口
 
 - 用户批准为普通和高级修理工增加同一个即时无目标自杀技能；点击后立即死亡，不弹确认、不吟唱。

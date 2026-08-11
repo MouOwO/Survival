@@ -2,6 +2,7 @@ local tree_damage_rules = require("systems/tree_damage_rules")
 local repair_order_service = require("systems/repair_order_service")
 local lumberjack_order_service = require("systems/lumberjack_order_service")
 local destination_validation = require("systems/destination_validation_service")
+local anti_air_rules = require("systems/anti_air_rules")
 
 local M = {}
 local registered = false
@@ -42,9 +43,15 @@ local function filter(_, keys)
     end
     if order_type ~= tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET) then return true end
     local target = entity(keys.entindex_target)
-    if not tree_damage_rules.is_tree(target) then return true end
     for _, unit in ipairs(ordered_units(keys)) do
-        if tree_damage_rules.is_arrow_tower(unit) then return false end
+        if tree_damage_rules.is_tree(target)
+            and tree_damage_rules.is_arrow_tower(unit) then
+            return false
+        end
+        if anti_air_rules.is_anti_air_tower(unit)
+            and not anti_air_rules.is_flying(target) then
+            return false
+        end
     end
     return true
 end

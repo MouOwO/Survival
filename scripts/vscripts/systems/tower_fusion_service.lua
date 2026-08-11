@@ -5,6 +5,7 @@ local routes = require("config/tower_route_config")
 local runtime = require("config/generated/tower_fusion_runtime")
 local tower_skills = require("systems/tower_skill_runtime")
 local tree_damage_rules = require("systems/tree_damage_rules")
+local anti_air_rules = require("systems/anti_air_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
 
 local M = {}
@@ -224,7 +225,10 @@ local function find_target(state, stream)
         FIND_CLOSEST, false
     )
     for _, unit in ipairs(units or {}) do
-        if alive(unit) and not tree_damage_rules.is_tree(unit) then return unit end
+        if alive(unit) and not tree_damage_rules.is_tree(unit)
+            and anti_air_rules.can_attack(stream.proxy, unit) then
+            return unit
+        end
     end
     return nil
 end

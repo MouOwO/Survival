@@ -17,6 +17,7 @@ local asset_catalog = require("config/asset_catalog")
 local sound_service = require("core/sound_service")
 local global_rules = require("config/generated/global_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
+local anti_air_rules = require("systems/anti_air_rules")
 
 local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
     and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
@@ -45,7 +46,14 @@ local DEFAULT_BLIZZARD_DURATION = 5
 local DEFAULT_BLIZZARD_INTERVAL = 1
 local DEFAULT_BLIZZARD_DAMAGE_MULTIPLIER = 0.5
 local BLIZZARD_SLOW_PCT = 25
+local ANTI_AIR_MISSILE_INTERVAL = 0.10
+local AIRSPACE_AURA_REFRESH_INTERVAL = 0.20
+local AIRSPACE_AURA_BUFF_DURATION = 0.35
 local start_lightning_storm
+local exists
+local valid
+local area_radius
+local enemies_in_radius
 
 local LIGHTNING_ASSET_ID = "tower_zuus"
 local MACHINE_GUN_ASSET_IDS = {
@@ -161,6 +169,9 @@ function modifier_tower_attack_effects:GetModifierDamageOutgoing_Percentage()
     if skill_matching(self:GetParent(), "multi_attack_") then
         return (MULTI_DAMAGE_MULTIPLIER - 1) * 100
     end
+    if skill_matching(self:GetParent(), "anti_air_missile_") then
+        return 90
+    end
     return 0
 end
 
@@ -179,7 +190,89 @@ function modifier_tower_attack_effects:OnCreated()
     self.attack_landed_diagnostic_count = 0
     self.attack_failed_diagnostic_count = 0
     self.polar_obelisk_sound_active = false
+    self.anti_air_sequence = 0
+    self.anti_air_sequence_active = false
+    self.anti_air_secondary_attack = false
+    self.airspace_aura_elapsed = AIRSPACE_AURA_REFRESH_INTERVAL
     self:StartIntervalThink(0.03)
+end
+
+local function sync_airspace_aura(modifier, tower, elapsed)
+    modifier.airspace_aura_elapsed =
+        (tonumber(modifier.airspace_aura_elapsed) or 0) + elapsed
+    if modifier.airspace_aura_elapsed < AIRSPACE_AURA_REFRESH_INTERVAL then
+        return
+    end
+    modifier.airspace_aura_elapsed = 0
+    local skill = skill_matching(tower, "airspace_overlord_")
+    if not skill or not valid(tower) then return end
+    local radius = area_radius(skill, 500)
+    for _, target in ipairs(enemies_in_radius(
+            tower, tower:GetAbsOrigin(), radius)) do
+        if valid(target) then
+            buff_manager.apply(
+                tower, target, "debuff_airspace_damage_taken",
+                { duration = AIRSPACE_AURA_BUFF_DURATION }
+            )
+            if anti_air_rules.is_flying(target) then
+                buff_manager.apply(
+                    tower, target, "debuff_airspace_attack_slow",
+                    { duration = AIRSPACE_AURA_BUFF_DURATION }
+                )
+            end
+        end
+    end
+end
+
+local function stop_anti_air_sequence(modifier)
+    modifier.anti_air_sequence = (tonumber(modifier.anti_air_sequence) or 0) + 1
+    modifier.anti_air_sequence_active = false
+    modifier.anti_air_secondary_attack = false
+end
+
+function modifier_tower_attack_effects:ResetAntiAirSequence()
+    if not IsServer() then return end
+    local tower = self:GetParent()
+    scheduler.cancel("tower_anti_air_sequence_" .. tostring(tower:entindex()))
+    stop_anti_air_sequence(self)
+end
+
+local function start_anti_air_sequence(modifier, tower, target, skill)
+    if modifier.anti_air_sequence_active or not valid(target)
+        or not anti_air_rules.is_flying(target) then
+        return
+    end
+    local missile_count = math.max(1, math.floor(tonumber(skill.max_targets) or 1))
+    if missile_count <= 1 then return end
+    modifier.anti_air_sequence = (tonumber(modifier.anti_air_sequence) or 0) + 1
+    local sequence = modifier.anti_air_sequence
+    modifier.anti_air_sequence_active = true
+    local fired = 1
+    local function fire_next()
+        if modifier.anti_air_sequence ~= sequence or not valid(tower)
+            or not valid(target) or not anti_air_rules.is_flying(target) then
+            if modifier.anti_air_sequence == sequence then
+                modifier.anti_air_sequence_active = false
+            end
+            return false
+        end
+        modifier.anti_air_secondary_attack = true
+        tower:PerformAttack(
+            target, false, false, true, false, true, false, false
+        )
+        modifier.anti_air_secondary_attack = false
+        fired = fired + 1
+        if fired >= missile_count then
+            modifier.anti_air_sequence_active = false
+            return false
+        end
+        return ANTI_AIR_MISSILE_INTERVAL
+    end
+    scheduler.after(
+        ANTI_AIR_MISSILE_INTERVAL,
+        fire_next,
+        "tower_anti_air_sequence_" .. tostring(tower:entindex())
+    )
 end
 
 local function sync_polar_obelisk_aura(tower, state)
@@ -317,8 +410,8 @@ function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
     return 0
 end
 
-local function exists(u) return u and not u:IsNull() end
-local function valid(u) return exists(u) and u:IsAlive() end
+exists = function(u) return u and not u:IsNull() end
+valid = function(u) return exists(u) and u:IsAlive() end
 
 local function lightning_control_point(particle, control_point, unit,
         attachment_name, fallback_position, offset_z)
@@ -377,13 +470,13 @@ local function deal(caster, target, amount, source_kind, tags)
     })
 end
 
-local function area_radius(skill, fallback)
+area_radius = function(skill, fallback)
     local configured = skill and skill.area
     if type(configured) == "table" then configured = configured[1] end
     return math.max(1, tonumber(configured) or fallback)
 end
 
-local function enemies_in_radius(caster, position, radius)
+enemies_in_radius = function(caster, position, radius)
     return FindUnitsInRadius(
         caster:GetTeamNumber(), position, nil, radius,
         DOTA_UNIT_TARGET_TEAM_ENEMY,
@@ -843,6 +936,7 @@ function modifier_tower_attack_effects:OnIntervalThink()
     local now = GameRules:GetGameTime()
     local elapsed = math.max(0, now - (self.last_interval_time or now))
     self.last_interval_time = now
+    sync_airspace_aura(self, caster, elapsed)
     local laser = skill_matching(caster, "laser_")
     local effect = laser_config(laser)
     local target = self.laser_target
@@ -939,6 +1033,10 @@ function modifier_tower_attack_effects:OnAttack(params)
         return
     end
     play_tower_sound("tower_basic_attack", caster, caster)
+    local anti_air = skill_matching(caster, "anti_air_missile_")
+    if anti_air and not self.anti_air_secondary_attack then
+        start_anti_air_sequence(self, caster, primary, anti_air)
+    end
     local multi = skill_matching(caster, "multi_attack_")
     if not multi then return end
     local max_targets = multi_max_targets(multi)
@@ -1018,6 +1116,17 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
     })
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
+    local drag_net = skill_matching(caster, "drag_net_")
+    if drag_net and anti_air_rules.is_flying(primary) then
+        local chance = math.max(
+            0, math.min(100, tonumber(drag_net.trigger_chance_pct) or 0)
+        )
+        if RollPercentage(chance) then
+            primary:AddNewModifier(caster, nil, "modifier_stunned", {
+                duration = math.max(0.1, tonumber(drag_net.duration) or 3),
+            })
+        end
+    end
     local frost = skill_matching(caster, "frost_attack_")
     if frost then
         trigger_frost_attack(caster, primary, frost, damage)
@@ -1132,14 +1241,21 @@ end
 function modifier_tower_attack_effects:OnDestroy()
     if not IsServer() then return end
     local tower = self:GetParent()
+    scheduler.cancel("tower_anti_air_sequence_" .. tostring(tower:entindex()))
+    stop_anti_air_sequence(self)
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     self.polar_obelisk_sound_active = false
 end
 
+M._start_anti_air_sequence_for_test = start_anti_air_sequence
+M._sync_airspace_aura_for_test = sync_airspace_aura
+
 function modifier_tower_attack_effects:ResetAfterRelocation()
     if not IsServer() then return end
     local tower = self:GetParent()
+    scheduler.cancel("tower_anti_air_sequence_" .. tostring(tower:entindex()))
+    stop_anti_air_sequence(self)
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     self.polar_obelisk_sound_active = false

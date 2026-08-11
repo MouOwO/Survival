@@ -216,6 +216,8 @@ local function start_encounter(payload)
     end
     FindClearSpaceForUnit(unit, origin, true)
     local profile = combat_profile or archetype
+    unit.survival_movement_type = archetype.movement_type or "ground"
+    unit.survival_movement_type_override = encounter.movement_type_override
     local health = tonumber(profile.health or archetype.health)
     if health and health > 0 then
         unit:SetBaseMaxHealth(health)

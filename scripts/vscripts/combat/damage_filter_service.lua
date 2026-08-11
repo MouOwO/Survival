@@ -1,5 +1,6 @@
 local M = {}
 local tree_damage_rules = require("systems/tree_damage_rules")
+local anti_air_rules = require("systems/anti_air_rules")
 local global_rules = require("config/generated/global_rules")
 local armor_balance = require("config/armor_balance")
 local event_bus = nil
@@ -110,6 +111,13 @@ local function filter(_, keys)
         })
         return false
     end
+    if not anti_air_rules.can_attack(attacker, victim) then
+        event_bus.emit(events.DAMAGE_BLOCKED, {
+            transaction_id = transaction_id,
+            reason = "anti_air_requires_flying_target",
+        })
+        return false
+    end
     if tree_damage_rules.is_tree(victim) and tree_diagnostic_count < 20 then
         tree_diagnostic_count = tree_diagnostic_count + 1
         print(string.format(
@@ -158,6 +166,9 @@ local function filter(_, keys)
         1 + source_bonus + global_bonus + research_bonus + seven_sins_bonus
             - target_reduction)
         * boss_multiplier
+    if anti_air_rules.has_damage_taken_aura(victim) then
+        multiplier = multiplier * 1.2
+    end
     keys.damage = math.max(0, keys.damage * multiplier)
     local damage_type = tonumber(keys.damagetype_const or keys.damagetype)
     local armor_compensation = 1

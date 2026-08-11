@@ -597,6 +597,12 @@ local function apply_tower_level(state, row, level, change_model)
     state.unit.survival_display_name = state.tower_class_name
     sync_tower_abilities(state, row)
     tower_skills.apply(state.unit, row.skill_ids)
+    local attack_effects = state.unit:FindModifierByName(
+        "modifier_tower_attack_effects"
+    )
+    if attack_effects and attack_effects.ResetAntiAirSequence then
+        attack_effects:ResetAntiAirSequence()
+    end
     for _, skill_id in ipairs(row.skill_ids or {}) do
         if string.match(skill_id, "^laser_") then
             -- Laser routes use instant attack contact; the persistent beam is

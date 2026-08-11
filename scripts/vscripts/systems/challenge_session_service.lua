@@ -328,6 +328,15 @@ local function spawn_member(session, member)
     local combat_archetype = archetypes.by_id[
         tostring(member.combat_archetype_id or "")
     ] or archetype
+    unit.survival_movement_type = archetype.movement_type or "ground"
+    unit.survival_movement_type_override = member.movement_type_override
+    if unit.SetMoveCapability then
+        unit:SetMoveCapability(
+            (unit.survival_movement_type == "flying"
+                or unit.survival_movement_type_override == "flying")
+                and DOTA_UNIT_CAP_MOVE_FLY or DOTA_UNIT_CAP_MOVE_GROUND
+        )
+    end
     if unit.SetBaseMoveSpeed and combat_archetype.move_speed then
         unit:SetBaseMoveSpeed(tonumber(combat_archetype.move_speed) or 270)
     end

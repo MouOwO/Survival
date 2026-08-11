@@ -1,0 +1,4 @@
+skill_id,name,description,icon,enabled,source
+#中文名:技能ID,名称,描述,图标,是否启用,来源
+#types:string,string,string,string,boolean,string
+ability_repairer_suicide,自我销毁,立即销毁当前修理工并返还其占用的1人口。训练消耗的木材和金币不返还。,techies_suicide,1,修理工系统
