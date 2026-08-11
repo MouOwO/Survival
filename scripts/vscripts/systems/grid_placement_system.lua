@@ -198,9 +198,11 @@ local function has_unit(center, payload)
         ) or {}
     end
     local ignored = number(payload.ignore_entindex, -1)
+    local ignored_set = payload.ignore_entindexes or {}
     for _, unit in ipairs(units) do
         if unit and not unit:IsNull()
             and unit:entindex() ~= ignored
+            and ignored_set[unit:entindex()] ~= true
             and not unit.survival_is_grid_preview
             and not construction_building_is_logical_only(unit, payload)
             and unit_overlaps_cell(unit, center, half) then

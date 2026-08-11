@@ -19,13 +19,17 @@ local construction_visual = require(
     "systems/building_construction_visual_service"
 )
 local action_cooldown_rollback = require("core/action_cooldown_rollback")
+local player_tower_limits = require("systems/player_tower_limit_service")
+local building_defeat_rules = require("systems/building_defeat_rules")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
 local buildings = {}
-local counts = {}
-local class_slot_reservations = {}
+local tower_limits = player_tower_limits.new(function()
+    return global_rules.tower_class_max_count
+end)
 local wall_ever_built = {}
+local defeat_triggered = false
 local COLLIDING_BUILDINGS = {
     wall = true,
     main_city = true,
@@ -87,13 +91,11 @@ local function notify(player_id, message, level)
         level = level or "info",
     })
 end
-local function count_for(team, building_id)
-    counts[team] = counts[team] or {}
-    return counts[team][building_id] or 0
+local function count_for(player_id, building_id)
+    return tower_limits:count(player_id, building_id)
 end
-local function change_count(team, building_id, delta)
-    counts[team] = counts[team] or {}
-    counts[team][building_id] = math.max(0, (counts[team][building_id] or 0) + delta)
+local function change_count(player_id, building_id, delta)
+    tower_limits:change(player_id, building_id, delta)
 end
 local function class_id_for_state(state)
     if not state or state.building_id ~= "arrow_tower" then return nil end
@@ -104,63 +106,53 @@ local function class_id_for_state(state)
     end
     return class_id
 end
-local function class_slot_count(team, class_id)
-    return count_for(team, class_id)
+local function class_slot_count(player_id, class_id)
+    return count_for(player_id, class_id)
 end
-local function class_slot_reservation_count(team, class_id)
-    local reservations = class_slot_reservations[team]
-        and class_slot_reservations[team][class_id] or {}
-    local total = 0
-    for _, reserved in pairs(reservations) do
-        if reserved then total = total + 1 end
-    end
-    return total
+local function class_slot_reservation_count(player_id, class_id)
+    return tower_limits:reservation_count(player_id, class_id)
 end
-local function class_slot_snapshot(team, class_id)
+local function class_slot_snapshot(player_id, class_id)
     return {
-        count = class_slot_count(team, class_id),
-        pending = class_slot_reservation_count(team, class_id),
+        count = class_slot_count(player_id, class_id),
+        pending = class_slot_reservation_count(player_id, class_id),
         maximum = tonumber(global_rules.tower_class_max_count) or 5,
     }
 end
-local function tower_class_counts(team)
+local function tower_class_counts(player_id)
     local result = {}
     for class_index = 1, 7 do
         local class_id = "class_" .. tostring(class_index)
-        result[class_id] = class_slot_snapshot(team, class_id)
+        result[class_id] = class_slot_snapshot(player_id, class_id)
     end
     return result
 end
-local function publish_tower_class_counts(team, reason)
+local function publish_tower_class_counts(player_id, reason)
     event_bus.emit(events.TOWER_CLASS_COUNTS_CHANGED, {
-        team = team,
-        tower_class_counts = tower_class_counts(team),
+        player_id = player_id,
+        tower_class_counts = tower_class_counts(player_id),
         reason = reason,
     })
 end
 local function tower_class_slot_request(payload)
     payload = payload or {}
-    local team = tonumber(payload.team)
+    local player_id = tonumber(payload.player_id)
     local class_id = tostring(payload.class_id or "")
     local entindex = tonumber(payload.entindex)
     local operation = tostring(payload.operation or "")
-    if team == nil or not string.match(class_id, "^class_[1-7]$") then
+    if player_id == nil or not string.match(class_id, "^class_[1-7]$") then
         return { ok = false, error = "invalid_tower_class_slot" }
     end
-    local snapshot = class_slot_snapshot(team, class_id)
+    local snapshot = class_slot_snapshot(player_id, class_id)
     if operation == "snapshot" then
         snapshot.ok = true
         return snapshot
     end
     if operation == "release" then
-        local changed = false
-        if entindex ~= nil and class_slot_reservations[team]
-            and class_slot_reservations[team][class_id] then
-            changed = class_slot_reservations[team][class_id][entindex] == true
-            class_slot_reservations[team][class_id][entindex] = nil
-        end
-        if changed then publish_tower_class_counts(team, "reservation_released") end
-        snapshot = class_slot_snapshot(team, class_id)
+        local changed = entindex ~= nil
+            and tower_limits:release(player_id, class_id, entindex) or false
+        if changed then publish_tower_class_counts(player_id, "reservation_released") end
+        snapshot = class_slot_snapshot(player_id, class_id)
         snapshot.ok = true
         snapshot.released = true
         return snapshot
@@ -168,31 +160,16 @@ local function tower_class_slot_request(payload)
     if operation ~= "reserve" or entindex == nil then
         return { ok = false, error = "invalid_tower_class_slot_operation" }
     end
-    class_slot_reservations[team] = class_slot_reservations[team] or {}
-    local by_class = class_slot_reservations[team]
-    by_class[class_id] = by_class[class_id] or {}
-    if by_class[class_id][entindex] then
-        snapshot.ok = true
-        snapshot.reserved = true
-        snapshot.idempotent = true
-        return snapshot
-    end
-    if snapshot.maximum > 0
-        and snapshot.count + snapshot.pending >= snapshot.maximum then
-        snapshot.ok = false
-        snapshot.error = "tower_class_limit_reached"
-        return snapshot
-    end
-    by_class[class_id][entindex] = true
-    publish_tower_class_counts(team, "reservation_created")
-    snapshot = class_slot_snapshot(team, class_id)
-    snapshot.ok = true
-    snapshot.reserved = true
+    snapshot = tower_limits:reserve(player_id, class_id, entindex)
+    if not snapshot.ok or snapshot.idempotent then return snapshot end
+    publish_tower_class_counts(player_id, "reservation_created")
     return snapshot
 end
 local function building_limit_reached(definition, existing_count)
-    local maximum = tonumber(definition and definition.max_count) or 0
-    return maximum > 0 and (tonumber(existing_count) or 0) >= maximum
+    return player_tower_limits.limit_reached(
+        definition and definition.max_count,
+        existing_count
+    )
 end
 local function apply_hull_radius(unit, definition)
     if not valid_entity(unit) or type(unit.SetHullRadius) ~= "function" then
@@ -415,7 +392,8 @@ local function public_state(state)
         base_attack_damage = state.building_id == "arrow_tower"
             and tonumber((arrow_data(state.level) or {}).base_attack_damage)
             or nil,
-        tower_class_counts = tower_class_counts(state.team),
+        tower_class_counts = tower_class_counts(state.player_id),
+        fusion_participated = state.fusion_participated == true and 1 or 0,
     }
 end
 
@@ -478,6 +456,7 @@ local function recover_building(unit)
         tower_class = unit.survival_tower_class,
         tower_class_name = unit.survival_tower_class
             and unit.survival_display_name or nil,
+        fusion_participated = unit.survival_fusion_participated == true,
         tower_combat = nil,
     }
     local route_row = state.building_id == "arrow_tower"
@@ -498,8 +477,8 @@ local function recover_building(unit)
         end
     end
     buildings[entindex] = state
-    change_count(state.team, class_id_for_state(state) or state.building_id, 1)
-    if definition.build_once then wall_ever_built[state.team] = true end
+    change_count(state.player_id, class_id_for_state(state) or state.building_id, 1)
+    if definition.build_once then wall_ever_built[state.player_id] = true end
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
         grid_x = grid_x,
         grid_y = grid_y,
@@ -557,10 +536,10 @@ local function can_place(payload)
     end
     local team = DOTA_TEAM_GOODGUYS
     team_alignment.enforce(caster, team, "builder_caster")
-    if definition.build_once and wall_ever_built[team] then
+    if definition.build_once and wall_ever_built[builder.player_id] then
         return { ok = false, error = "城墙整局只能建造一次" }
     end
-    if building_limit_reached(definition, count_for(team, definition.id)) then
+    if building_limit_reached(definition, count_for(builder.player_id, definition.id)) then
         return { ok = false, error = "建筑数量已达上限" }
     end
     if definition.unlock_city_level
@@ -655,6 +634,7 @@ local function start_building(payload)
         grid_y = check.grid.grid_y,
         tower_class = nil,
         tower_class_name = nil,
+        fusion_participated = false,
         tower_combat = arrow_data(1),
         population_occupied = 0,
         constructing = true,
@@ -666,8 +646,7 @@ local function start_building(payload)
     unit.survival_grid_y = state.grid_y
     unit.survival_route_level = 1
     unit.survival_population_occupied = state.population_occupied
-    change_count(check.team, check.definition.id, 1)
-    if check.definition.build_once then wall_ever_built[check.team] = true end
+    change_count(check.player_id, check.definition.id, 1)
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
         grid_x = state.grid_x,
         grid_y = state.grid_y,
@@ -697,7 +676,7 @@ local function start_building(payload)
             if not state.cleaned then
                 state.cleaned = true
                 buildings[state.entindex] = nil
-                change_count(check.team, check.definition.id, -1)
+                change_count(check.player_id, check.definition.id, -1)
                 event_bus.request(events.GRID_RELEASE_REQUEST, {
                     grid_x = state.grid_x,
                     grid_y = state.grid_y,
@@ -747,6 +726,9 @@ local function start_building(payload)
         unit:SetHealth(maximum_health)
         unit:SetControllableByPlayer(check.player_id, true)
         state.constructing = false
+        if check.definition.build_once then
+            wall_ever_built[check.player_id] = true
+        end
         state.build_cost = nil
         state.build_task = nil
         -- Keep ability entity indexes stable for runtime tooltip data. Activate
@@ -915,7 +897,7 @@ local function list_buildings(payload)
     return { ok = true, buildings = result }
 end
 
-local function consume_for_fusion(payload)
+local function mark_for_fusion(payload)
     local player_id = tonumber(payload and payload.player_id)
     local selected = {}
     local routes = {}
@@ -927,6 +909,7 @@ local function consume_for_fusion(payload)
             or state.building_id ~= "arrow_tower"
             or not state.tower_class
             or not row or tonumber(row.level) ~= tonumber(row.max_level)
+            or state.fusion_participated == true
             or routes[state.tower_class] then
             return { ok = false, error = "fusion_towers_changed" }
         end
@@ -937,26 +920,15 @@ local function consume_for_fusion(payload)
         return { ok = false, error = "fusion_requires_seven_routes" }
     end
     for _, state in ipairs(selected) do
-        building_visual.clear(state.unit)
-        buildings[state.unit:entindex()] = nil
-        local class_id = class_id_for_state(state)
-        change_count(state.team, class_id or state.building_id, -1)
-        if class_id then
-            publish_tower_class_counts(state.team, "tower_fusion_consumed")
-        end
-        event_bus.request(events.GRID_RELEASE_REQUEST, {
-            grid_x = state.grid_x,
-            grid_y = state.grid_y,
-            footprint = state.definition.footprint,
-            entindex = state.unit:entindex(),
-        })
-        event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
-        release_population(state, "tower_fusion_consumed")
+        state.fusion_participated = true
+        state.unit.survival_fusion_participated = true
     end
     for _, state in ipairs(selected) do
-        if valid_entity(state.unit) then UTIL_Remove(state.unit) end
+        local changed = public_state(state)
+        changed.reason = "tower_fusion_participated"
+        event_bus.emit(events.BUILDING_CHANGED, changed)
     end
-    return { ok = true, consumed = #selected }
+    return { ok = true, marked = #selected }
 end
 local function on_building_changed(payload)
     local state = buildings[payload.entindex]
@@ -968,12 +940,14 @@ local function on_building_changed(payload)
         next_class = nil
     end
     if previous_class ~= next_class then
-        change_count(state.team, previous_class or state.building_id, -1)
-        change_count(state.team, next_class or state.building_id, 1)
+        change_count(state.player_id, previous_class or state.building_id, -1)
+        change_count(state.player_id, next_class or state.building_id, 1)
     end
     state.level = payload.level or state.level
     state.tower_class = next_class
     state.tower_class_name = payload.tower_class_name
+        state.fusion_participated = payload.fusion_participated == 1
+            or state.fusion_participated == true
     state.population_occupied = tonumber(payload.population_occupied)
         or state.population_occupied
     state.unit.survival_level = state.level
@@ -981,12 +955,18 @@ local function on_building_changed(payload)
         or state.unit.survival_route_level
     state.unit.survival_tower_class = state.tower_class
     state.unit.survival_population_occupied = state.population_occupied
-    if next_class and class_slot_reservations[state.team]
-        and class_slot_reservations[state.team][next_class] then
-        class_slot_reservations[state.team][next_class][payload.entindex] = nil
+    if next_class then
+        tower_limits:release(state.player_id, next_class, payload.entindex)
     end
     if previous_class ~= next_class then
-        publish_tower_class_counts(state.team, "tower_class_changed")
+        publish_tower_class_counts(state.player_id, "tower_class_changed")
+    end
+    if state.building_id == "arrow_tower"
+        and payload.reason ~= "tower_fusion_eligibility_changed" then
+        event_bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
+            player_id = state.player_id,
+            reason = payload.reason or "tower_changed",
+        })
     end
     if payload.display_name then
         state.unit.survival_display_name = payload.display_name
@@ -1006,25 +986,27 @@ local function on_entity_killed(payload)
     local reservation_cleared = false
     for class_index = 1, 7 do
         local class_id = "class_" .. tostring(class_index)
-        if class_slot_reservations[state.team]
-            and class_slot_reservations[state.team][class_id] then
-            reservation_cleared = reservation_cleared
-                or class_slot_reservations[state.team][class_id][victim:entindex()] == true
-            class_slot_reservations[state.team][class_id][victim:entindex()] = nil
-        end
+        reservation_cleared = reservation_cleared or tower_limits:release(
+            state.player_id, class_id, victim:entindex()
+        )
     end
     if reservation_cleared then
-        publish_tower_class_counts(state.team, "tower_destroyed_during_class_change")
+        publish_tower_class_counts(state.player_id, "tower_destroyed_during_class_change")
     end
     building_visual.clear(victim)
     buildings[victim:entindex()] = nil
     local class_id = class_id_for_state(state)
-    change_count(state.team, class_id or state.building_id, -1)
-    if class_id and class_slot_reservations[state.team]
-        and class_slot_reservations[state.team][class_id] then
-        class_slot_reservations[state.team][class_id][victim:entindex()] = nil
+    change_count(state.player_id, class_id or state.building_id, -1)
+    if class_id then
+        tower_limits:release(state.player_id, class_id, victim:entindex())
     end
-    if class_id then publish_tower_class_counts(state.team, "tower_destroyed") end
+    if class_id then publish_tower_class_counts(state.player_id, "tower_destroyed") end
+    if state.building_id == "arrow_tower" then
+        event_bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
+            player_id = state.player_id,
+            reason = "tower_destroyed",
+        })
+    end
     event_bus.request(events.GRID_RELEASE_REQUEST, {
         grid_x = state.grid_x,
         grid_y = state.grid_y,
@@ -1047,7 +1029,8 @@ local function on_entity_killed(payload)
         end
         rollback_build_cooldown(state.build_task)
     end
-    if state.building_id == "main_city" and not state.constructing then
+    if building_defeat_rules.should_trigger(defeat_triggered, state) then
+        defeat_triggered = true
         GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
     end
 end
@@ -1113,15 +1096,13 @@ function M.init()
     modifier_registry.register()
     construction_visual.reset()
     buildings = {}
-    counts = {}
-    class_slot_reservations = {}
+    tower_limits:reset()
     wall_ever_built = {}
+    defeat_triggered = false
     event_bus.handle_request(events.BUILD_CAN_PLACE_REQUEST, can_place)
     event_bus.handle_request(events.BUILDING_QUERY_REQUEST, query_building)
     event_bus.handle_request(events.BUILDING_LIST_REQUEST, list_buildings)
-    event_bus.handle_request(
-        events.BUILDING_FUSION_CONSUME_REQUEST, consume_for_fusion
-    )
+    event_bus.handle_request(events.BUILDING_FUSION_MARK_REQUEST, mark_for_fusion)
     event_bus.handle_request(events.BUILD_REQUEST, queue_building)
     event_bus.handle_request(events.TOWER_CLASS_SLOT_REQUEST, tower_class_slot_request)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
@@ -1142,7 +1123,7 @@ M._building_limit_for_test = {
     reached = building_limit_reached,
     count_for = count_for,
     change_count = change_count,
-    reset = function() counts = {} end,
+    reset = function() tower_limits:reset() end,
 }
 M._tower_class_slot_for_test = {
     request = tower_class_slot_request,
@@ -1150,8 +1131,7 @@ M._tower_class_slot_for_test = {
     reservations = class_slot_reservation_count,
     snapshot = class_slot_snapshot,
     reset = function()
-        counts = {}
-        class_slot_reservations = {}
+        tower_limits:reset()
     end,
 }
 return M

@@ -4,6 +4,7 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-11，生产实现与自动验证完成）：基础箭塔/路线计数及并发预占已改为玩家作用域；七塔合一支持每玩家最多5座终极塔，材料不消耗且每座永久仅参与一次；齐天大圣R整组原子迁移全部终极塔并保留相对位置；任意已完工城墙死亡一次性触发全队失败，施工墙和主城不直接失败。专项Lua 5.1/契约、语法、生成一致、UTF-8/BOM和限定diff通过；下一步Workshop Tools完全冷启动实机验收，详见`CURRENT_TASK.md`顶部。
 - 逐波模型加载经验已沉淀到`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`，包括W12 Visage告警的确定根因、CSV优先原则、正式/dev/出生统一解析、session租约、urgent并行、禁止误用`asset_preload.retire()`、复发排查顺序和未来逐波换模清单。用户2026-08-11后续观察中暂未再发现加载问题；只能记为阶段性有效，新增模型后仍需冷启动分别验证`monster<N>`与正式波次。
 - 当前插入任务（2026-08-11）：闪电魔塔击杀风暴已改为死亡点500范围即时单次物理伤害，LV1至LV5使用触发时塔攻击快照110%/120%/130%/140%/150%；每目标只受伤和发布一次`TOWER_LIGHTNING_HIT`。随后一秒内5/6/7/8/9道雷柱仅作视觉，不查询敌人、不伤害、不触发扩散。原塔归因、风暴连锁击杀及独立雷电扩散30%/200%/非递归规则保留。CSV、生成Lua、Tooltip和六份本地化已同步；专项Lua 5.1行为/契约、相关回归、5个Lua语法、生成逐字节一致、配置CheckOnly、UTF-8/BOM和限定diff通过。下一步Workshop Tools冷启动实测即时伤害时点、物理护甲结果、纯视觉雷柱数量、扩散和连锁风暴，尚未实机验收。
 - 当前插入任务（2026-08-11）：`ability_tooltip.js:997` 的几何诊断越作用域 `active.engineSlot` 已修正为函数参数 `binding.engineSlot`，并强制重编译 `ability_tooltip.vjs_c`。源码/产物作用域契约、输入生命周期契约、严格UTF-8和限定diff通过；完整内存生命周期契约仍被既有无关`SURVIVAL_UI_CONTEXT_GUARD_MISSING`阻断。下一步完全冷启动Workshop Tools确认不再出现`active is not defined`，尚未实机验收。

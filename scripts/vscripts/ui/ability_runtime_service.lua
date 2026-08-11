@@ -398,7 +398,8 @@ end
 
 local function on_tower_class_counts_changed(payload)
     for _, state in pairs(state_by_unit) do
-        if state.team == payload.team and state.building_id == "arrow_tower" then
+        if tonumber(state.player_id) == tonumber(payload.player_id)
+            and state.building_id == "arrow_tower" then
             state.tower_class_counts = payload.tower_class_counts or {}
             publish(state)
         end

@@ -1,5 +1,7 @@
 local logger = require("core/logger")
 local tower_skills = require("systems/tower_skill_runtime")
+local event_bus = require("core/event_bus")
+local events = require("core/events")
 
 local M = {}
 
@@ -30,8 +32,13 @@ function M.sync(state, row)
     for _, skill_id in ipairs(row and row.skill_ids or {}) do
         wanted[skill_id] = true
     end
-    if state.tower_class and row
-        and tonumber(row.level) == tonumber(row.max_level) then
+    local fusion = state.tower_class and row
+        and tonumber(row.level) == tonumber(row.max_level)
+        and state.fusion_participated ~= true
+        and event_bus.request(events.TOWER_FUSION_ELIGIBILITY_REQUEST, {
+            player_id = state.player_id,
+        })
+    if fusion and fusion.eligible == true then
         wanted.ability_tower_fusion = true
     end
 

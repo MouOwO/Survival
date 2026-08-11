@@ -1,4 +1,4 @@
-﻿config_id,route_ids,unit_name,display_name,target_scan_interval,projectile_expire_time,enabled
-#中文名:配置ID,路线ID,单位名,显示名,目标扫描间隔,弹道过期时间,是否启用
-#types:string,list,string,string,number,number,boolean
-ultimate_tower,class_1|class_2|class_3|class_4|class_5|class_6|class_7,building_arrow_tower,终极塔,0.05,10,1
+﻿config_id,route_ids,unit_name,display_name,target_scan_interval,projectile_expire_time,max_count_per_player,enabled
+#中文名:配置ID,路线ID,单位名,显示名,目标扫描间隔,弹道过期时间,每玩家最大数量,是否启用
+#types:string,list,string,string,number,number,number,boolean
+ultimate_tower,class_1|class_2|class_3|class_4|class_5|class_6|class_7,building_arrow_tower,终极塔,0.05,10,5,1

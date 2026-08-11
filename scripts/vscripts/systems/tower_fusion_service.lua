@@ -13,6 +13,7 @@ local M = {}
 local ultimate_by_player = {}
 local state_by_id = {}
 local wall_by_player = {}
+local group_at_wall_by_player = {}
 local next_id = 0
 
 local function config()
@@ -40,6 +41,22 @@ local function final_row(class_id)
     return route[#route]
 end
 
+local function player_ultimates(player_id)
+    local result = {}
+    local saved = ultimate_by_player[player_id] or {}
+    for _, state in ipairs(saved) do
+        if alive(state.unit) then result[#result + 1] = state end
+    end
+    ultimate_by_player[player_id] = result
+    return result
+end
+
+local function ultimate_limit()
+    return math.max(1, math.floor(
+        tonumber(config().max_count_per_player) or 5
+    ))
+end
+
 local function distance_sq(left, right)
     local delta = left:GetAbsOrigin() - right:GetAbsOrigin()
     return delta.x * delta.x + delta.y * delta.y
@@ -52,12 +69,14 @@ local function select_towers(caster, player_id, buildings)
         if item.unit == caster then caster_state = item end
         local row = item.tower_class and final_row(item.tower_class) or nil
         if item.player_id == player_id and item.building_id == "arrow_tower"
-            and row and tonumber(item.route_level) == tonumber(row.level) then
+            and row and tonumber(item.route_level) == tonumber(row.level)
+            and tonumber(item.fusion_participated) ~= 1 then
             candidates[item.tower_class] = candidates[item.tower_class] or {}
             candidates[item.tower_class][#candidates[item.tower_class] + 1] = item
         end
     end
-    if not caster_state or not caster_state.tower_class then
+    if not caster_state or not caster_state.tower_class
+        or tonumber(caster_state.fusion_participated) == 1 then
         return nil, "fusion_caster_invalid"
     end
     local caster_row = final_row(caster_state.tower_class)
@@ -84,6 +103,30 @@ local function select_towers(caster, player_id, buildings)
     end
     if #selected ~= 7 then return nil, "fusion_requires_seven_routes" end
     return selected
+end
+
+local function eligibility(player_id, buildings)
+    local selected = {}
+    local routes_ready = {}
+    for _, item in ipairs(buildings or {}) do
+        local row = item.tower_class and final_row(item.tower_class) or nil
+        if item.player_id == player_id and item.building_id == "arrow_tower"
+            and row and tonumber(item.route_level) == tonumber(row.level)
+            and tonumber(item.fusion_participated) ~= 1
+            and not routes_ready[item.tower_class] then
+            routes_ready[item.tower_class] = true
+            selected[#selected + 1] = item
+        end
+    end
+    local current = #player_ultimates(player_id)
+    local maximum = ultimate_limit()
+    return {
+        ok = true,
+        eligible = #selected == #(config().route_ids or {}) and current < maximum,
+        route_count = #selected,
+        ultimate_count = current,
+        maximum = maximum,
+    }
 end
 
 local function add_proxy_skills(proxy, row)
@@ -154,9 +197,9 @@ local function create_proxy(state, source, row, class_id)
     }
 end
 
-local function create_ultimate(player_id, caster, selected)
+local function create_ultimate(player_id, caster, selected, position)
     local unit = CreateUnitByName(
-        config().unit_name, caster:GetAbsOrigin(), true,
+        config().unit_name, position, true,
         caster, caster, caster:GetTeamNumber()
     )
     if not valid(unit) then return nil, "fusion_create_failed" end
@@ -212,8 +255,64 @@ local function create_ultimate(player_id, caster, selected)
         state.streams[#state.streams + 1] = stream
     end
     state_by_id[state.id] = state
-    ultimate_by_player[player_id] = state
+    ultimate_by_player[player_id] = ultimate_by_player[player_id] or {}
+    ultimate_by_player[player_id][#ultimate_by_player[player_id] + 1] = state
     return state
+end
+
+local function remove_ultimate_state(state)
+    if not state then return end
+    state_by_id[state.id] = nil
+    local saved = ultimate_by_player[state.player_id] or {}
+    for index = #saved, 1, -1 do
+        if saved[index] == state then table.remove(saved, index) end
+    end
+end
+
+local function plan_group_move(states, target, validate)
+    if #states == 0 or not target then
+        return nil, "teleport_anchor_missing"
+    end
+    local origin = states[1].unit:GetAbsOrigin()
+    local destinations = {}
+    for _, state in ipairs(states) do
+        local destination = target + (state.unit:GetAbsOrigin() - origin)
+        local ok, error_code = validate(state, destination)
+        if not ok then return nil, error_code or "teleport_anchor_invalid" end
+        destinations[#destinations + 1] = destination
+    end
+    return destinations
+end
+
+local function fusion_spawn_position(caster, selected)
+    local footprint = selected[1].definition
+        and selected[1].definition.footprint or { x = 2, y = 2 }
+    local ignored_entindexes = {}
+    for _, source in ipairs(selected) do
+        ignored_entindexes[source.entindex] = true
+    end
+    local origin = caster:GetAbsOrigin()
+    local candidates = { origin }
+    for index = 0, 11 do
+        local angle = math.rad(index * 30)
+        candidates[#candidates + 1] = origin + Vector(
+            math.cos(angle) * 256,
+            math.sin(angle) * 256,
+            0
+        )
+    end
+    for _, position in ipairs(candidates) do
+        local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
+            position = position,
+            footprint = footprint,
+            ignore_entindexes = ignored_entindexes,
+            team = caster:GetTeamNumber(),
+        })
+        if grid and grid.ok == true then
+            return grid.world_position
+        end
+    end
+    return nil, "fusion_spawn_position_invalid"
 end
 
 local function find_target(state, stream)
@@ -272,7 +371,16 @@ local function think()
     local now = GameRules:GetGameTime()
     for id, state in pairs(state_by_id) do
         if not alive(state.unit) then
-            state_by_id[id] = nil
+            for _, stream in ipairs(state.streams or {}) do
+                if valid(stream.proxy) then UTIL_Remove(stream.proxy) end
+            end
+            remove_ultimate_state(state)
+            event_bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
+                player_id = state.player_id,
+                ultimate_count = #player_ultimates(state.player_id),
+                maximum = ultimate_limit(),
+                reason = "ultimate_tower_removed",
+            })
         else
             for index, stream in ipairs(state.streams) do
                 stream.index = index
@@ -298,12 +406,13 @@ local function fuse(payload)
     if not alive(caster) then return { ok = false, error = "fusion_caster_invalid" } end
     local player_id = tonumber(caster.survival_player_id)
         or caster:GetPlayerOwnerID()
-    if ultimate_by_player[player_id] and alive(ultimate_by_player[player_id].unit) then
-        return { ok = false, error = "ultimate_tower_already_exists" }
-    end
     local listed = event_bus.request(events.BUILDING_LIST_REQUEST, {
         player_id = player_id,
     })
+    local eligible = eligibility(player_id, listed and listed.buildings)
+    if eligible.ultimate_count >= eligible.maximum then
+        return { ok = false, error = "ultimate_tower_limit_reached" }
+    end
     local selected, error_code = select_towers(
         caster, player_id, listed and listed.buildings
     )
@@ -311,20 +420,25 @@ local function fuse(payload)
         notify(player_id, error_code, "error")
         return { ok = false, error = error_code }
     end
-    local state, create_error = create_ultimate(player_id, caster, selected)
+    local spawn_position, spawn_error = fusion_spawn_position(caster, selected)
+    if not spawn_position then
+        return { ok = false, error = spawn_error }
+    end
+    local state, create_error = create_ultimate(
+        player_id, caster, selected, spawn_position
+    )
     if not state then return { ok = false, error = create_error } end
     local entindexes = {}
     for _, source in ipairs(selected) do entindexes[#entindexes + 1] = source.entindex end
-    local consumed = event_bus.request(events.BUILDING_FUSION_CONSUME_REQUEST, {
+    local marked = event_bus.request(events.BUILDING_FUSION_MARK_REQUEST, {
         player_id = player_id,
         entindexes = entindexes,
     })
-    if not consumed or not consumed.ok then
+    if not marked or not marked.ok then
         for _, stream in ipairs(state.streams) do UTIL_Remove(stream.proxy) end
         UTIL_Remove(state.unit)
-        state_by_id[state.id] = nil
-        ultimate_by_player[player_id] = nil
-        return consumed or { ok = false, error = "fusion_consume_failed" }
+        remove_ultimate_state(state)
+        return marked or { ok = false, error = "fusion_mark_failed" }
     end
     local ability = state.unit:AddAbility("ability_tower_fusion")
     if ability then
@@ -332,6 +446,12 @@ local function fuse(payload)
         ability:SetHidden(true)
         ability:SetActivated(false)
     end
+    event_bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
+        player_id = player_id,
+        ultimate_count = #player_ultimates(player_id),
+        maximum = ultimate_limit(),
+        reason = "fusion_completed",
+    })
     notify(player_id, "七塔合一完成")
     return { ok = true, unit = state.unit }
 end
@@ -365,35 +485,72 @@ function M.on_projectile_hit(_, target, _, data)
 end
 
 function M.teleport_for_player(player_id, hero)
-    local state = ultimate_by_player[tonumber(player_id)]
-    local wall = wall_by_player[tonumber(player_id)]
-    if not state or not alive(state.unit) then
+    player_id = tonumber(player_id)
+    local states = player_ultimates(player_id)
+    local wall = wall_by_player[player_id]
+    if #states == 0 then
         return { ok = false, error = "ultimate_tower_missing" }
     end
     local target
-    if state.at_wall then
+    if group_at_wall_by_player[player_id] == true then
         target = alive(hero) and hero:GetAbsOrigin() or nil
     else
         target = valid(wall) and wall:GetAbsOrigin() or nil
     end
     if not target then return { ok = false, error = "teleport_anchor_missing" } end
-    local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
-        position = target,
-        footprint = state.footprint,
-        ignore_entindex = state.unit:entindex(),
-        team = state.unit:GetTeamNumber(),
-        policy_only = true,
-    })
-    if not grid or grid.ok ~= true then
-        return { ok = false, error = grid and grid.error or "teleport_anchor_invalid" }
+    local anchor = group_at_wall_by_player[player_id] == true and hero or wall
+    local ignored_entindexes = {}
+    if valid(anchor) then ignored_entindexes[anchor:entindex()] = true end
+    for _, state in ipairs(states) do
+        ignored_entindexes[state.unit:entindex()] = true
+        for _, stream in ipairs(state.streams or {}) do
+            if valid(stream.proxy) then
+                ignored_entindexes[stream.proxy:entindex()] = true
+            end
+        end
     end
-    target = grid.world_position
-    state.unit:SetAbsOrigin(target)
-    for _, stream in ipairs(state.streams) do
-        stream.proxy:SetAbsOrigin(target)
+    local planned_cells = {}
+    local destinations, move_error = plan_group_move(states, target,
+        function(state, destination)
+        local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
+            position = destination,
+            footprint = state.footprint,
+            ignore_entindex = valid(anchor) and anchor:entindex()
+                or state.unit:entindex(),
+            ignore_entindexes = ignored_entindexes,
+            team = state.unit:GetTeamNumber(),
+        })
+        if not grid or grid.ok ~= true then
+            return false, grid and grid.error or "teleport_anchor_invalid"
+        end
+        local footprint = grid.footprint or state.footprint or { x = 1, y = 1 }
+        for x = grid.grid_x, grid.grid_x + footprint.x - 1 do
+            for y = grid.grid_y, grid.grid_y + footprint.y - 1 do
+                local key = tostring(x) .. ":" .. tostring(y)
+                if planned_cells[key] then
+                    return false, "teleport_group_overlap"
+                end
+            end
+        end
+        for x = grid.grid_x, grid.grid_x + footprint.x - 1 do
+            for y = grid.grid_y, grid.grid_y + footprint.y - 1 do
+                planned_cells[tostring(x) .. ":" .. tostring(y)] = true
+            end
+        end
+        return true
+    end)
+    if not destinations then
+        return { ok = false, error = move_error }
     end
-    state.at_wall = not state.at_wall
-    return { ok = true }
+    for index, state in ipairs(states) do
+        state.unit:SetAbsOrigin(destinations[index])
+        for _, stream in ipairs(state.streams) do
+            stream.proxy:SetAbsOrigin(destinations[index])
+        end
+    end
+    group_at_wall_by_player[player_id] =
+        group_at_wall_by_player[player_id] ~= true
+    return { ok = true, moved = #states }
 end
 
 local function on_building(payload)
@@ -407,8 +564,20 @@ function M.init()
     ultimate_by_player = {}
     state_by_id = {}
     wall_by_player = {}
+    group_at_wall_by_player = {}
     next_id = 0
     event_bus.handle_request(events.TOWER_FUSION_REQUEST, fuse)
+    event_bus.handle_request(events.TOWER_FUSION_ELIGIBILITY_REQUEST,
+        function(payload)
+            local player_id = tonumber(payload and payload.player_id)
+            if player_id == nil then
+                return { ok = false, eligible = false, error = "invalid_player" }
+            end
+            local listed = event_bus.request(events.BUILDING_LIST_REQUEST, {
+                player_id = player_id,
+            })
+            return eligibility(player_id, listed and listed.buildings)
+        end)
     event_bus.subscribe(events.BUILDING_CREATED, on_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building)
     scheduler.every(math.max(0.01,
@@ -416,5 +585,14 @@ function M.init()
         "ultimate_tower_streams")
 end
 
-M._test = { select_towers = select_towers }
+M._test = {
+    select_towers = select_towers,
+    eligibility = eligibility,
+    ultimate_limit = ultimate_limit,
+    player_ultimates = player_ultimates,
+    plan_group_move = plan_group_move,
+    set_player_ultimates = function(player_id, states)
+        ultimate_by_player[player_id] = states or {}
+    end,
+}
 return M

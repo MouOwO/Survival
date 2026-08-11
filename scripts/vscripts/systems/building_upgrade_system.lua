@@ -205,12 +205,53 @@ local function set_class_buttons(unit, active)
     local state = buildings[unit:entindex()]
     if not state then return end
     for _, class_data in ipairs(state.definition.class_options or {}) do
+        local available = active
+        if available then
+            local snapshot = event_bus.request(events.TOWER_CLASS_SLOT_REQUEST, {
+                operation = "snapshot",
+                player_id = state.player_id,
+                class_id = class_data.id,
+            }) or {}
+            local count = tonumber(snapshot.count) or 0
+            local pending = tonumber(snapshot.pending) or 0
+            local maximum = tonumber(snapshot.maximum)
+                or tonumber(global_rules.tower_class_max_count) or 5
+            available = maximum <= 0 or count + pending < maximum
+        end
         local ability = unit:FindAbilityByName(class_data.ability)
-        if active and not ability then
+        if available and not ability then
             ability = unit:AddAbility(class_data.ability)
             if ability then ability:SetLevel(1) end
         end
-        if ability then ability:SetActivated(active) end
+        if not available and ability then
+            unit:RemoveAbility(class_data.ability)
+            ability = nil
+        end
+        if ability then ability:SetActivated(true) end
+    end
+end
+
+local function refresh_class_buttons(state, tower_class_counts)
+    if not state or state.tower_class or state.level < 5
+        or not valid_entity(state.unit) then
+        return
+    end
+    for _, class_data in ipairs(state.definition.class_options or {}) do
+        local snapshot = tower_class_counts and tower_class_counts[class_data.id] or {}
+        local count = tonumber(snapshot.count) or 0
+        local pending = tonumber(snapshot.pending) or 0
+        local maximum = tonumber(snapshot.maximum)
+            or tonumber(global_rules.tower_class_max_count) or 5
+        local available = maximum <= 0 or count + pending < maximum
+        local ability = state.unit:FindAbilityByName(class_data.ability)
+        if available and not ability then
+            ability = state.unit:AddAbility(class_data.ability)
+            if ability then ability:SetLevel(1) end
+        elseif not available and ability then
+            state.unit:RemoveAbility(class_data.ability)
+            ability = nil
+        end
+        if ability then ability:SetActivated(true) end
     end
 end
 
@@ -238,6 +279,7 @@ publish = function(state, reason)
         route_level = route_row and route_row.level or state.level,
         tower_class = state.tower_class,
         tower_class_name = state.tower_class_name,
+        fusion_participated = state.fusion_participated == true and 1 or 0,
         display_name = display_name,
         attack_min = state.unit.survival_attack_min,
         attack_max = state.unit.survival_attack_max,
@@ -290,7 +332,7 @@ end
 local function reserve_tower_class_slot(state, class_id)
     return event_bus.request(events.TOWER_CLASS_SLOT_REQUEST, {
         operation = "reserve",
-        team = state.team,
+        player_id = state.player_id,
         class_id = class_id,
         entindex = state.unit:entindex(),
     })
@@ -300,7 +342,7 @@ local function release_tower_class_slot(state, class_id)
     if not state or not class_id then return end
     event_bus.request(events.TOWER_CLASS_SLOT_REQUEST, {
         operation = "release",
-        team = state.team,
+        player_id = state.player_id,
         class_id = class_id,
         entindex = state.unit:entindex(),
     })
@@ -402,6 +444,8 @@ local function recover_state(unit)
         level = tonumber(snapshot.level) or tonumber(unit.survival_level) or 1,
         tower_class = snapshot.tower_class,
         tower_class_name = snapshot.tower_class_name,
+        fusion_participated = snapshot.fusion_participated == 1
+            or unit.survival_fusion_participated == true,
         population_occupied = tonumber(snapshot.population_occupied)
             or tonumber(unit.survival_population_occupied),
         tower_combat = nil,
@@ -911,6 +955,8 @@ local function on_created(payload)
         level = tonumber(payload.level) or 1,
         tower_class = nil,
         tower_class_name = nil,
+        fusion_participated = payload.fusion_participated == 1
+            or payload.unit.survival_fusion_participated == true,
         population_occupied = 0,
         tower_combat = nil,
         research_base_attack_damage = payload.base_attack_damage,
@@ -950,11 +996,37 @@ local function on_building_changed(payload)
     local state = buildings[payload.entindex]
     if state then
         state.level = tonumber(payload.level) or state.level
+        state.fusion_participated = payload.fusion_participated == 1
+            or state.fusion_participated == true
         state.population_occupied = tonumber(payload.population_occupied)
             or state.population_occupied
         refresh_farm_upgrade_ability(state)
     end
     if payload.building_id == "main_city" then refresh_team_farms(payload.team) end
+end
+
+local function on_tower_class_counts_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    for _, state in pairs(buildings) do
+        if tonumber(state.player_id) == player_id then
+            refresh_class_buttons(state, payload.tower_class_counts or {})
+            publish(state, "tower_class_availability_changed")
+        end
+    end
+end
+
+local function on_tower_fusion_state_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    for _, state in pairs(buildings) do
+        if tonumber(state.player_id) == player_id
+            and state.building_id == "arrow_tower" then
+            local row = tower_routes.current(state) or arrow_data(state.level)
+            if row then sync_tower_abilities(state, row) end
+            publish(state, "tower_fusion_eligibility_changed")
+        end
+    end
 end
 
 function M.init()
@@ -964,6 +1036,10 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CREATED, on_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
+    event_bus.subscribe(events.TOWER_CLASS_COUNTS_CHANGED,
+        on_tower_class_counts_changed)
+    event_bus.subscribe(events.TOWER_FUSION_STATE_CHANGED,
+        on_tower_fusion_state_changed)
     event_bus.handle_request(events.BUILDING_UPGRADE_REQUEST, on_upgrade_request)
     event_bus.handle_request(events.TOWER_CLASS_REQUEST, on_class_request)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)

@@ -659,6 +659,29 @@ function M.build(ability_name, state, resources)
     ) then
         return tower_class(ability_name, state, resources)
     end
+    if ability_name == "ability_tower_fusion" then
+        local fusion = event_bus.request(events.TOWER_FUSION_ELIGIBILITY_REQUEST, {
+            player_id = state.player_id,
+        }) or {}
+        local ready = tonumber(fusion.route_count) or 0
+        local count = tonumber(fusion.ultimate_count) or 0
+        local maximum = tonumber(fusion.maximum) or 5
+        return {
+            available = fusion.eligible == true and 1 or 0,
+            can_afford = 1,
+            status_text = count >= maximum
+                and ("终极塔数量已达上限（" .. tostring(count) .. "/"
+                    .. tostring(maximum) .. "）")
+                or ("可用路线材料：" .. tostring(ready) .. "/7；终极塔："
+                    .. tostring(count) .. "/" .. tostring(maximum)),
+            fields = {
+                { label = "未参与满级路线", value = tostring(ready) .. "/7" },
+                { label = "终极塔数量", value = tostring(count) .. "/"
+                    .. tostring(maximum) },
+                { label = "材料消耗", value = "不消耗；每座塔永久限参与一次" },
+            },
+        }
+    end
     return {
         available = 1,
         can_afford = 1,

@@ -535,5 +535,5 @@
         "Survival_UpgradeModel_Unchanged" "Current model retained"
         "Survival_UpgradeModel_Loading" "Loading"
         "DOTA_Tooltip_ability_ability_tower_fusion" "Seven-Tower Fusion"
-        "DOTA_Tooltip_ability_ability_tower_fusion_Description" "Consumes one owned final tower from every route and creates an invulnerable ultimate tower with seven isolated attack streams."
+        "DOTA_Tooltip_ability_ability_tower_fusion_Description" "Uses one owned final tower from every route without consuming them. Each material tower can participate only once. Creates an invulnerable ultimate tower; each player can own up to 5."
 }
