@@ -9,7 +9,7 @@
 - dev模式继续清理怪物实体、附件、粒子、任务和会话对象，但不释放模型租约、不调用`retire()`；反复`monster<N>`可复用已加载资源。正式波次在倒计时开始即独立请求下一波资源，并在配置的4秒窗口幂等复核；urgent波次请求不得被塔/城墙后台串行流阻塞，且不得改变倒计时、数量、顺序或生成间隔。
 - 实现与自动验证完成：`monster12`开发预载现使用与出生一致的Visage解析；正式波次拥有独立session/共享路径租约，pending或alive非零时拒绝release，重叠波只释放已完成session，dev释放session身份但保留resident模型租约。urgent请求可与后台流并行；Visage资产权威`first_use_wave`由14更正为8并定向生成Lua。
 - 通过：`WAVE_MODEL_RESOURCE_LIFECYCLE_PASS`、`ASSET_PRELOAD_URGENT_PARALLEL_PASS`、`WAVE_MODEL_RESOURCE_LIFECYCLE_CONTRACT_PASS`、`WAVE_MONSTER_VISUAL_INTEGRATION_PASS`、`ASSET_PRELOAD_GRADUAL_PASS`、`DEV_ASSET_PRELOAD_PASS`、`WAVE_EARLY_FINAL_PASS`、`WAVE_SPECIAL_MIXED_WAVES_PASS`、`WAVE_SPAWN_SEQUENCE_PASS`、`WAVE_FLYING_COLLISION_PASS`、`WAVE_MONSTER_MODEL_RESOURCES_PASS`、资产生成逐字节一致、配置CheckOnly、目标Lua/Luac 5.4.5语法、Python编译和限定`git diff --check`。本机无Lua 5.1，不宣称Lua 5.1验证。
-- 既有非本轮失败：`test_wave_difficulty_builder.lua`仍要求旧N1最终波批次数；`test_wave_difficulty_selection.lua`仍把当前已启用N3当作非法难度；`test_asset_preload_service.lua`仍硬编码旧后台流总数26而当前生产为9。本轮未修改这些过时业务基线。尚需Workshop Tools完全冷启动执行`monster12`及正式W12，确认控制台不再出现Visage未加载告警，并观察`phase=countdown_start`/`phase=lead_review`日志；自动测试不能替代引擎资源池验收。
+- 既有非本轮失败：`test_wave_difficulty_builder.lua`仍要求旧N1最终波批次数；`test_wave_difficulty_selection.lua`仍把当前已启用N3当作非法难度；`test_asset_preload_service.lua`仍硬编码旧后台流总数26而当前生产为9。本轮未修改这些过时业务基线。用户2026-08-11后续观察中暂未再发现加载问题，记为阶段性有效而非永久保证；未来新增逐波模型后仍需冷启动分别执行`monster<N>`和正式目标波，核对首只怪及`phase=countdown_start`/`phase=lead_review`日志。完整复发排查经验见`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`。
 
 ## 已完成插入任务（2026-08-11）：正式波次数量、混合顺序、飞行模型与Hull修正
 

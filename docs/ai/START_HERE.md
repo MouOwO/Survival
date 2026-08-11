@@ -4,6 +4,7 @@
 
 ## 当前任务
 
+- 逐波模型加载经验已沉淀到`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`，包括W12 Visage告警的确定根因、CSV优先原则、正式/dev/出生统一解析、session租约、urgent并行、禁止误用`asset_preload.retire()`、复发排查顺序和未来逐波换模清单。用户2026-08-11后续观察中暂未再发现加载问题；只能记为阶段性有效，新增模型后仍需冷启动分别验证`monster<N>`与正式波次。
 - 当前插入任务（2026-08-10）：本地化缺失/重复token已按最小范围修复。`npc_survival_builder_proxy`和`npc_survival_repairer`已从`unit_display_names.csv`补齐并生成；game六份本地化镜像和content两份Panorama源中的精确单位token、挑战奖励大小写别名、金矿/英雄祭坛显示值已同步。专项契约、冲突扫描、结构、生成一致性、Lua 5.1语法及UTF-8/BOM通过；仍需Workshop Tools完全冷启动确认`FindSafe`与重复token引擎告警消失，尚未实机验收。
 - 当前插入任务（2026-08-10）：空区域配置兼容修复已实施。没有有效`hero_movable`时白名单不启用，英雄和建筑沿用旧导航/Grid规则；配置有效行后才启用严格白名单，`building_forbidden`始终独立生效。区域拒绝现在返回完整红色footprint cells，不再让Grid消失。CSV生成、专项契约/Lua 5.1行为和目标语法已通过，仍需Workshop Tools冷启动确认Grid显示、合法建造与拒绝红格；Hammer真实边界只阻断新白名单启用，不阻断当前地图可玩性。
 - 已完成插入任务（2026-08-09）：怪物物理伤害按当前Dota护甲曲线补偿到War3目标曲线，且并发stash冲突已解决。117 War3护甲继续线性投影为39运行时护甲；现代非线性映射辅助API保留但不用于波次、挑战或调试怪。`monster_war3_armor_damage_enabled=1`只对明确项目怪物的正护甲物理伤害乘目标曲线/引擎曲线差值，随后仍由引擎结算。固定基准最终倍率约0.299401、理论23.79秒；专项Lua 5.1/契约/语法及科技减甲、毒云回归通过。用户明确确认固定样本测试验收通过，但未提供精确击杀秒数或日志；极高护甲怪仍需独立抽样。
@@ -96,6 +97,7 @@
 3. `docs/ai/PROJECT_CONTEXT.md`
 4. `docs/ai/DECISIONS.md`
 5. `docs/ai/KNOWN_ISSUES.md`
-6. 仅需历史证据时读取`docs/ai/SESSION_LOG.md`和`docs/ai/archive/`
+6. 涉及波次模型加载、预载或换模时读取`docs/ai/WAVE_MODEL_LOADING_TROUBLESHOOTING.md`和`docs/ai/WAVE_MODEL_RESOURCE_LIFECYCLE.md`
+7. 仅需历史证据时读取`docs/ai/SESSION_LOG.md`和`docs/ai/archive/`
 
 恢复后先向用户复述当前阶段、最后检查点、未知项和下一步，再修改代码。

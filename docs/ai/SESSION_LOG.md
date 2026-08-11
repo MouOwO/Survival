@@ -1,5 +1,6 @@
 ## 2026-08-11 - W12模型未加载根因与逐波资源生命周期方案
 
+- 后续状态：用户当前运行中暂未再观察到加载问题，但不能确认未来新增模型或更长运行一定不复发。已新增`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`，向其他Cline会话同步CSV优先、三路径统一解析、session/租约、urgent并行、release非引擎卸载、复发诊断顺序及逐波换模验收清单。
 - 用户反馈W12出现`models/heroes/visage/visage.vmdl requested is not loaded and may have been deleted`，并确认最终目标为每波使用不同模型；当前共享模型和相关代码属于临时阶段，需要留下最终弃用TODO后立即修复。
 - 本机VPK索引、Dota英雄KV、项目`monster_visage`资产和`asset_proxy_monster_visage`均证明Visage路径仍有效。尸体`UTIL_Remove()`只删除单位实体；项目没有生产调用`asset_preload.retire()`，且该函数只封锁Lua资源状态，不是Source 2模型卸载，所以错误不能解释为模型文件已被删除。
 - 确定代码缺陷位于开发跳波：正式预载/出生已按`normal + flying`解析到Visage，`debug_wave_model_asset_ids()`却仍读取原`definition.model_path`，导致`monster12`预载红龙基础模型后出生切换Visage。正式流程另有倒计时仅剩4秒才请求且urgent受后台串行流阻塞的冷资源竞态。

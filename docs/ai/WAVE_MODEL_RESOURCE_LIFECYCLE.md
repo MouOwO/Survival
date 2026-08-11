@@ -1,5 +1,7 @@
 # Wave Model Resource Lifecycle
 
+中文排障、复发处理和逐波换模清单见`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`。2026-08-11用户后续观察中暂未再出现模型加载问题；该反馈记为阶段性有效，不替代未来新增模型后的冷启动验证。
+
 ## Final target
 
 Each formal wave must eventually declare its own approved final model resources. Formal preload, developer jump-wave preload, `SetModel`/`SetOriginalModel`, and lifecycle accounting must all consume the same resolved wave-model list. A wave must never depend on an earlier wave having loaded a shared model.
