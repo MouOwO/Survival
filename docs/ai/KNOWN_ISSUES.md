@@ -157,6 +157,17 @@
     - 设置配置射程时必须同步保存`unit.survival_attack_range`。即使全部射程来源异常为0，本次已经合法命中的敌方主目标也不得被目标查询提前丢弃。
     - 该问题曾表现为`MAGIC_SLINGSHOT_ROLL success=true`后紧跟`reason=no_targets range=0 primary=<entindex>`；修复后实机为`range=3000 selected=1 launched=1`。
 
+18. **Source 2热重载可能清除Modifier全局类但保留Lua模块缓存。**
+    - 可复现风险：`_G.modifier_*`丢失而`package.loaded["modifiers/..."]`仍为已加载，普通`require`不会重新执行类定义；英雄替换时可能出现unknown modifier。
+    - 禁止在每次`addhero`前全量执行`LinkLuaModifier`，也禁止用进程级永久布尔标志跳过热重载后的启动注册。当前规避为每个脚本启动generation完整注册一次、同代去重；替换前只对缺类模块定向清缓存、重载并重新链接该模块全部声明，仍缺失则失败关闭。
+    - Lua 5.1模拟只能证明同代去重、新代全量重链、普通替换零链接、单模块恢复和失败关闭契约；冷启动与热重载后的真实引擎注册状态仍需Workshop Tools分别验证。
+    - Mango Tree缺少`attach_hitloc`时，原生攻击命中特效可能继续输出无功能影响告警；项目不更换`models/props_tree/mango_tree.vmdl`或绕过原生攻击链来消除该资产告警。
+
+19. **VMAT直接引用TGA可能生成运行时无法稳定识别的哈希VTEX子资源。**
+    - 已确认旧`template_map.vmat_c`运行时依赖`template_map_tga_d9088edf.vtex`；源TGA和编译产物均存在，但运行时资源管理器未稳定识别该自动哈希名，表现为小地图花屏。
+    - 当前规避为显式Content源`template_map.vtex`并让VMAT直接引用该稳定资源名。Resource Compiler成功生成`template_map.vtex_c/template_map.vmat_c`，`resourceinfo.exe`确认VMAT运行时依赖已变为`materials/overviews/template_map.vtex`。
+    - 自动编译和依赖检查不能证明Workshop Tools当前进程已丢弃旧资源缓存；必须完全冷启动确认小地图，再单独验证热重载路径。
+
 14. **项目技能 cell 曾继承 Valve 动态按钮尺寸，第一版固定尺寸仍偏大。**
    - 实机确认 1～2 个技能时图标较大、7 个技能时图标较小。
    - 根因是 `applyOfficialGeometry()` 把官方锚点的动态 `geometry.width/height` 直接赋给项目按钮。

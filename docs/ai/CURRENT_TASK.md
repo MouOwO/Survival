@@ -1,5 +1,19 @@
 # Current Task
 
+## 当前插入任务（2026-08-12）：热重载 Modifier 注册与小地图显式纹理
+
+- 用户实机日志显示 Mango Tree 模型缺少 `attach_hitloc`，以及召唤猴王后多个英雄核心 Modifier 被引擎判定为 unknown；同时存在 `modifier_single_health_bar` 重复告警。
+- 权威资源树模型继续来自 `data/csv/资源系统/world_visual_definitions.csv`，本任务不擅自更换模型或修改树木数值。
+- 审计确认 `modifier_single_health_bar` 只剩兼容标记，已不负责自定义血条，可停用自动附加链；其余攻击上限、CSV射程/生命、装备、暴击和科技 Modifier 仍在生产使用，不得注释。
+- 最小修复：完整 Modifier 注册只保留在地图启动边界；英雄替换前仅验证Lua类并对缺类模块定向恢复，失败关闭；停用旧血条标记服务；项目粒子仅在模型确有 attachment 时绑定，否则回退世界坐标；增加专项契约并执行 Lua 5.1、编码和限定差异验证。
+- 实施完成：`addon_game_mode.lua`不再初始化废弃`unit_health_bar_service`，英雄替换不再附加`modifier_single_health_bar`。启动入口现在为每次脚本加载分配递增generation，`modifier_registry.register(generation)`在每代完整执行一次`LinkLuaModifier()`、同代重复调用去重；普通`addhero`继续只调用`ensure_available()`，正常路径零次链接。缺类时按模块路径清除`package.loaded`并重载一次，随后由注册器重新链接该模块声明的全部Modifier；恢复失败在`hero_anchor_service.begin_replacement()`前返回`modifier_registry_unavailable`。
+- 英雄替换的CSV基础属性应用现在受`pcall`保护；提交前按英雄CSV检查攻击上限、攻击射程、基础生命及条件性法力Modifier是否实际存在。添加异常或实体缺失返回`hero_modifier_apply_failed`，不写召唤成功状态、不发布`HERO_SUMMONED`。装备效果、攻击投影和攻击追踪仍由既有`hero_combat_stat_service`在同步`HERO_SUMMONED`链创建，科技Modifier继续按条件性效果运行，未复制第二套服务。
+- 猴王四件Cult of the Demon Trickster饰品继续使用原模型、`material_group="1"`、四个环境粒子、Owner和`FollowEntity`骨骼跟随；`hero_cosmetic_service`只移除了`prop_dynamic`创建参数中的`DefaultAnim="idle"`，避免模型不存在该序列时产生四次告警。
+- Mango Tree权威CSV及生成Lua继续保持`models/props_tree/mango_tree.vmdl`、缩放3。自定义魔法塔粒子会先用`ScriptLookupAttachment`确认`attach_attack1/attach_hitloc`存在，缺失时改用实体世界坐标，不再强绑不存在的attachment。
+- 小地图已新增Content源`materials/overviews/template_map.vtex`，继续读取现有`template_map.tga`并输出`RGBA8888`；`template_map.vmat`改为引用显式VTEX。Resource Compiler强制编译结果为`2 compiled, 0 failed, 0 skipped`，`resourceinfo.exe`确认新`template_map.vmat_c`运行时依赖精确为`materials/overviews/template_map.vtex`。稳定`template_map.vtex_c`已生成，失去引用的旧`template_map_tga_d9088edf.vtex_c`已删除；无Content源且未被overview引用的历史`survival_minimap.*`未越界清理。
+- 自动验证通过：`TREE_ATTACK_WARNING_CONTRACT_PASS`、`MODIFIER_REGISTRY_RELOAD_LUA51_PASS`、`HERO_REPLACEMENT_MODIFIER_GUARD_LUA51_PASS`、`MINIMAP_TEXTURE_RESOURCE_CONTRACT_PASS`及当前磁盘其余测试。当前`tools/test_*.lua`共9项全部通过，`tools/test_*.ps1`共8项通过7项；唯一失败仍为既有无关`test_performance_log_localization_contract.ps1`的`LOCALIZATION_CACHE_MISSING_ability_tooltip.js`。相关生产/测试共14个Lua通过`luac5.1`语法；严格UTF-8、资源依赖和限定`git diff --check`通过。历史文档提到但当前不存在的专项未伪报运行。
+- Mango Tree继续保持`models/props_tree/mango_tree.vmdl`、缩放3、现有数值和原生攻击链。用户已决定接受原生攻击特效对该资产缺少`attach_hitloc`的无功能影响引擎告警；项目自定义魔法塔粒子的attachment回退仍保留。16 MiB Lua内存信息仅记为高水位提示，当前没有泄漏证据。
+- 尚需Workshop Tools实机验证：完全停止旧Run后冷启动，确认小地图无花屏，并分别召唤猴王和其他英雄确认核心Modifier生效且猴王饰品不再输出`idle`序列告警；随后热重载并连续执行`addhero`，确认新generation完整重链、普通替换不重复全量链接且不再出现unknown modifier。Source 2注册与资源管理器时序只能由引擎验证，自动测试不能称为实机验收。
 ## 当前实施任务（2026-08-11）：玩家级塔上限、零消耗七塔合一、多终极塔迁移与城墙失败
 
 - 用户已在 Plan 阶段确认并切换 Act：每玩家最多7座未转职基础箭塔；每玩家每条转职路线最多5座，并使用玩家级预占阻止并发第6座；转职完成释放基础塔名额，死亡/取消释放计数或预占。

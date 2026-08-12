@@ -56,6 +56,31 @@ local function attack_damage(tower)
     return math.max(0, tonumber(tower:GetAverageTrueAttackDamage(tower)) or 0)
 end
 
+local function set_control_point_for_unit(particle, control_point, unit,
+        attachment_name)
+    local position = unit:GetAbsOrigin()
+    local attachment_index = 0
+    if type(unit.ScriptLookupAttachment) == "function" then
+        local ok, result = pcall(
+            unit.ScriptLookupAttachment, unit, attachment_name
+        )
+        if ok then attachment_index = tonumber(result) or 0 end
+    end
+    if attachment_index > 0 then
+        ParticleManager:SetParticleControlEnt(
+            particle,
+            control_point,
+            unit,
+            PATTACH_POINT_FOLLOW,
+            attachment_name,
+            position,
+            true
+        )
+        return
+    end
+    ParticleManager:SetParticleControl(particle, control_point, position)
+end
+
 local function play_effect(caster, target, effect)
     if not valid(caster) or not exists(target) or not effect then return end
     local particle = nil
@@ -65,23 +90,11 @@ local function play_effect(caster, target, effect)
             PATTACH_CUSTOMORIGIN,
             caster
         )
-        ParticleManager:SetParticleControlEnt(
-            particle,
-            effect.source_control or 0,
-            caster,
-            PATTACH_POINT_FOLLOW,
-            "attach_attack1",
-            caster:GetAbsOrigin(),
-            true
+        set_control_point_for_unit(
+            particle, effect.source_control or 0, caster, "attach_attack1"
         )
-        ParticleManager:SetParticleControlEnt(
-            particle,
-            effect.target_control or 1,
-            target,
-            PATTACH_POINT_FOLLOW,
-            "attach_hitloc",
-            target:GetAbsOrigin(),
-            true
+        set_control_point_for_unit(
+            particle, effect.target_control or 1, target, "attach_hitloc"
         )
         ParticleManager:ReleaseParticleIndex(particle)
     end)

@@ -1,5 +1,18 @@
 # Project Context
 
+## Modifier注册与热重载恢复边界（2026-08-12）
+
+- `LinkLuaModifier()`只刷新引擎路径绑定，不能保证被清除的Lua全局类重新创建；普通`require(path)`命中`package.loaded`时也不会重跑模块顶层类定义。`addon_game_mode.lua`每次脚本加载分配递增generation，集中注册器在每个generation完整链接一次、同代调用去重，确保热重载后的引擎类型注册不被进程级永久布尔标志错误跳过。
+- 当且仅当目标`_G[modifier_name]`缺失时，注册器可按模块路径清除`package.loaded[path]`并重载一次，随后必须重新链接该模块声明的全部Modifier；正常类存在时必须保留缓存且零次链接，不能在每次英雄替换时无条件重载或全量链接。重载后仍缺失必须报错并在替换事务开始前失败关闭。
+- 新增或修改modifier模块时，应避免在模块顶层注册不可去重的事件监听或永久调度；若确有顶层副作用，必须设计幂等/注销策略后才能依赖上述单模块恢复。目前`scripts/vscripts/modifiers/`未发现模块顶层事件订阅。
+- 模型attachment不是所有单位共有能力。自定义粒子调用`SetParticleControlEnt(..., PATTACH_POINT_FOLLOW, attachment_name, ...)`前必须用`ScriptLookupAttachment`确认索引大于0；缺失时使用单位当前世界坐标控制点。资源树模型继续由CSV权威配置决定，不能为了消除attachment告警擅自换模。
+
+## 小地图显式纹理资源边界（2026-08-12）
+
+- overview VMAT不得直接引用TGA并依赖Resource Compiler生成的哈希子资源名；本项目使用Content源`materials/overviews/template_map.vtex`显式读取`template_map.tga`，VMAT运行时只引用稳定的`materials/overviews/template_map.vtex`。
+- 修改小地图源后必须同时强制编译VTEX和VMAT，并用`resourceinfo.exe -dep runtime`确认`template_map.vmat_c`依赖显式VTEX而非`template_map_tga_<hash>.vtex`。旧哈希`.vtex_c`只有在新依赖确认后才能删除。
+- `survival_minimap.vmat_c`和`survival_minimap_tga_81334029.vtex_c`没有对应Content源且未被`resource/overviews/template_map.txt`引用，属于历史编译产物；不得仅因名称看似匹配而切换或顺带删除。
+
 ## 雷电塔连锁与击杀风暴边界（2026-08-11）
 
 - `MODIFIER_EVENT_ON_DEATH`是全局事件。防御塔的击杀触发效果必须以`params.attacker == 当前塔对象`作为权威身份，不能按同队、同玩家或任意敌方死亡推断；其他塔、英雄和其他单位击杀不得触发当前塔效果。
@@ -436,6 +449,8 @@
 
 - 召唤战斗英雄的权威目标基础生命由`hero_definitions.csv`的`base_health × max_health_multiplier × hero_meta_max_health_multiplier`计算；普通英雄当前为3000，齐天大圣/剑圣为11000。原生英雄实机证明直接`SetBaseMaxHealth/SetMaxHealth/SetHealth`会被引擎恢复为120，因此目标生命由隐藏永久`modifier_survival_hero_base_health`通过`MODIFIER_PROPERTY_HEALTH_BONUS`补足：补充值=`目标生命-(当前最大生命-旧补充值)`。真实装备`health_flat`随后独立叠加；禁止改成固定加3000或真实隐藏物品。该隐藏Modifier方案已由用户在Workshop Tools中确认英雄血量正常。
 - 测试聊天命令`blood`只作用于当前玩家召唤的战斗英雄：`+/-数值`固定增减，`+/-百分比%`按执行时当前最大生命计算；加血不超过最大生命，减血最低保留1点，合法加血会使延迟生命保护失效。
+- Modifier注册边界：完整`LinkLuaModifier`只允许由`addon_game_mode.lua`在脚本启动generation边界通过`core/modifier_registry.register(generation)`每代执行一次，同代重复调用去重；普通英雄替换不得再次全量链接。`addhero`前只调用`ensure_available()`检查Lua全局类，缺失时按模块路径去重后清除对应`package.loaded`、定向重载并重新链接该模块全部声明；恢复失败必须在`hero_anchor_service.begin_replacement()`前中止。CSV基础属性Modifier添加后必须校验英雄实体实际持有状态，不能仅凭Lua类存在就报告替换成功。
+- 英雄外观`prop_dynamic`默认只传模型并使用Owner/`FollowEntity`骨骼跟随；不得统一强制`DefaultAnim="idle"`，因为部分Valve wearable模型没有该序列。猴王Cult of the Demon Trickster四件模型、材质组和环境粒子均保持配置不变。
 
 1. 合成宝石和挑战材料可以作为可见物品直接拾取并保留在英雄背包中；只有原子合成成功后才消耗。
 2. 修复自动合成检查在首次成功后可能遗留 pending 状态、导致后续配方不再执行的问题，并加入错误恢复测试。

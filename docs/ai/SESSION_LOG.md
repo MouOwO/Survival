@@ -2406,3 +2406,24 @@
 - 自动验证通过：`LIGHTNING_TOWER_KILL_TRIGGER_LUA51_PASS/CONTRACT_PASS`，覆盖400范围、最近/未命中选择、5至9次数、每级一秒均匀间隔、100/110/120/130/140/150%封顶、视觉与伤害中心分离、攻击快照、原塔归因、扩散事件和风暴连锁击杀；`MONSTER_WAR3_ARMOR_DAMAGE_LUA51_PASS/CONTRACT_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、`LOCALIZATION_TOKEN_INTEGRITY_CONTRACT_PASS`通过。4个目标Lua `luac5.1`语法、塔技能与Tooltip三项生成逐字节一致、20个目标本地化token镜像、14个目标文件严格UTF-8/BOM及限定`git diff --check`通过。
 - 无关既有失败：`test_super_tower_crit_contract.ps1`失败于`SUPER_TOWER_CRIT_GENERATED_NOTES_INVALID`；本轮未修改科技CSV、生成科技配置或科技逻辑，也未越界修正该旧断言。
 - 尚未Workshop Tools实机验证。下一步完全停止并重新Run，分别确认400连锁真实选敌、LV1至LV5雷柱数量/一秒节奏/随机视觉、原死亡点500伤害区、递增倍率、雷电扩散和风暴击杀继续生成风暴。
+
+## 2026-08-12 - Mango Tree attachment、英雄Modifier注册与废弃血条链修复
+
+- 用户日志显示英雄攻击Mango Tree时出现`attach_hitloc`告警，英雄替换后多个核心Modifier被判定unknown，并伴随`modifier_single_health_bar`重复告警。权威`world_visual_definitions.csv`确认资源树继续使用`models/props_tree/mango_tree.vmdl`、缩放3；本轮未更换模型或修改树木数值。
+- 已停用`unit_health_bar_service.init()`及英雄替换时的`modifier_single_health_bar`附加；该链当前只剩废弃兼容标记，原生头顶血条继续使用。攻击上限、CSV射程/生命、装备、攻击追踪和科技等生产Modifier保持启用。
+- 当时的中间修复边界：英雄替换不得调用`modifier_registry.register()`全量重链接；普通`addhero`调用`ensure_available()`，正常预检零次链接，缺类时仅清除对应模块缓存并定向重载一次，仍缺失则在替换事务开始前返回`modifier_registry_unavailable`。其中“进程级全局标志只注册一次”已被下方generation方案取代，不得作为当前生产规则恢复。
+- `tower_magic_supreme_system.lua`新增attachment存在性检查：`attach_attack1`或`attach_hitloc`索引有效时继续实体绑定，否则使用实体世界坐标控制点。该修复只覆盖项目自定义魔法塔粒子；若冷启动后英雄基础攻击树木仍告警，需要完整控制台上下文确认是否来自Dota原生攻击命中特效。
+- 英雄CSV基础属性应用加入异常保护和提交前实体Modifier检查；攻击上限、CSV射程、基础生命及条件性法力Modifier添加失败时返回`hero_modifier_apply_failed`，不写成功状态或发布`HERO_SUMMONED`。装备、攻击投影/追踪及科技继续复用既有服务链。
+- 猴王四件饰品保留原模型、材质、粒子、Owner和`FollowEntity`，仅移除`prop_dynamic`的`DefaultAnim="idle"`。行为测试实际捕获4次创建参数，确认模型顺序不变且均无强制序列。Mango Tree保持原模型、缩放、数值和原生攻击链；其原生`attach_hitloc`告警按用户决定接受。
+- 自动验证通过：`TREE_ATTACK_WARNING_CONTRACT_PASS`、`MODIFIER_REGISTRY_RELOAD_LUA51_PASS`、`HERO_REPLACEMENT_MODIFIER_GUARD_LUA51_PASS`、`MONKEY_KING_WEARABLE_SPAWN_LUA51_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、`PLAYER_TOWER_FUSION_CONTRACT_PASS`、`PLAYER_TOWER_FUSION_RULES_LUA51_PASS`；目标Lua 5.1语法、Mango Tree与猴王攻击CSV/生成一致性、英雄装备/攻击/科技静态链、严格UTF-8和限定`git diff --check`通过。当前磁盘16项测试中15项通过；唯一失败为既有无关`LOCALIZATION_CACHE_MISSING_ability_tooltip.js`。
+- 本地`.cline/local-toolchain.json`路径已过期，实际使用`C:\msys64\msys64\bin\lua5.1.exe/luac5.1.exe`和`C:\Program Files\PowerShell\7\pwsh.exe`。reload测试预置既有带UTF-8 BOM的`modifier_building_blink_move`模块缓存，以隔离原生Lua 5.1不能直接解析该BOM文件的历史工具限制；生产文件编码未改。
+- 历史文档提到的precache、英雄生命、装备、科技、树伤害、单位模型和旧血条专项测试文件当前不在工作区，因此明确记为缺失而非通过。仍需Workshop Tools完全冷启动验证unknown modifier与猴王饰品序列告警，并单独复测热重载后英雄替换；Source 2注册时序不能由Mock证明。16 MiB Lua信息继续仅视为高水位提示，暂无泄漏证据。用户已有`materials/particle/basic_glow.vtex_c`及其他未跟踪测试未触碰。
+
+## 2026-08-12 - Modifier generation重链与小地图显式VTEX
+
+- 用户批准继续修复热重载后`addhero`的unknown modifier以及小地图花屏。上一版进程级`__survival_modifier_registry_linked`永久布尔标志会在新脚本generation错误跳过完整`LinkLuaModifier()`，而`ensure_available()`只证明Lua类存在，不能证明Source 2引擎类型仍已注册。
+- `addon_game_mode.lua`现在每次脚本加载递增`__survival_modifier_registry_generation`并传给`modifier_registry.register(generation)`。注册器保存最后完整链接generation：同代调用只校验，新代完整链接全部Modifier一次。普通`addhero`类完整时仍为零链接；缺类时按模块路径清缓存并重载，随后重新链接该模块声明的全部Modifier，覆盖一个模块定义多个Modifier的情况。
+- Lua 5.1行为测试覆盖同代去重、新代全量重链、普通替换零链接、单缺类模块恢复、同模块全部声明重链及恢复失败关闭。当前`tools/test_*.lua`9项全部通过；`tools/test_*.ps1`8项通过7项，唯一失败仍为本任务前已知的`LOCALIZATION_CACHE_MISSING_ability_tooltip.js`。相关生产/测试14个Lua通过`luac5.1`语法。
+- Content新增`materials/overviews/template_map.vtex`，显式读取现有512×512、24位`template_map.tga`并输出`RGBA8888`；`template_map.vmat`改为引用稳定VTEX。Resource Compiler强制编译结果`2 compiled, 0 failed, 0 skipped`。`resourceinfo.exe`确认新VMAT runtime dependency精确为`materials/overviews/template_map.vtex`，新`template_map.vtex_c`资源名正确；旧`template_map_tga_d9088edf.vtex_c`在确认失去引用后删除。
+- 新增`test_minimap_texture_resource_contract.ps1`锁定Content源、稳定编译产物、旧哈希产物删除和VMAT runtime dependency。历史`survival_minimap.*`无Content源且未被overview引用，本轮未删除；`tools_asset_info.bin`仍含旧资产索引字符串，但不是当前VMAT运行时依赖，本轮未直接手改二进制缓存。
+- 仍需Workshop Tools完全冷启动确认小地图无花屏、三个生产Modifier和四个技能intrinsic Modifier均正常；随后热重载并连续执行`addhero`，确认启动日志generation递增且不再出现unknown modifier。自动行为测试、Resource Compiler和`resourceinfo`均不等于引擎实机验收。

@@ -46,18 +46,23 @@ print(
 )
 
 local modifier_registry = require("core/modifier_registry")
-local modifiers_valid, modifier_count_or_error = modifier_registry.register()
+local MODIFIER_GENERATION_KEY = "__survival_modifier_registry_generation"
+local modifier_registry_generation =
+    (tonumber(rawget(_G, MODIFIER_GENERATION_KEY)) or 0) + 1
+rawset(_G, MODIFIER_GENERATION_KEY, modifier_registry_generation)
+local modifiers_valid, modifier_count_or_error = modifier_registry.register(
+    modifier_registry_generation
+)
 assert(modifiers_valid,
     "modifier registry validation failed: " .. tostring(modifier_count_or_error))
-assert(modifier_single_health_bar ~= nil,
-    "modifier_single_health_bar bootstrap failed")
 assert(modifier_debug_attack_cap ~= nil,
     "modifier_debug_attack_cap bootstrap failed")
 assert(modifier_enemy_wall_ai ~= nil,
     "modifier_enemy_wall_ai bootstrap failed")
-print("[SURVIVAL_MODIFIER_BOOTSTRAP] registry_refreshed=true count="
-    .. tostring(modifier_count_or_error)
-    .. " health_bar=true attack_cap=true enemy_wall_ai=true")
+print("[SURVIVAL_MODIFIER_BOOTSTRAP] registry_ready=true generation="
+    .. tostring(modifier_registry_generation)
+    .. " count=" .. tostring(modifier_count_or_error)
+    .. " native_health_bar=true attack_cap=true enemy_wall_ai=true")
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
@@ -110,7 +115,7 @@ local monster_spawn_service =
     require("systems/monster_spawn_service")
 local asset_preload_service = require("systems/asset_preload_service")
 local monster_visual_service = require("systems/monster_visual_service")
-local unit_health_bar_service = require("systems/unit_health_bar_service")
+-- Legacy custom world health bars were retired; the engine native bar is used.
 local challenge_session_service =
     require("systems/challenge_session_service")
 local training_room_service = require("systems/training_room_service")
@@ -733,7 +738,8 @@ local function initialize_services()
     require("systems/player_context_service").init()
     builder_service.init()
     asset_preload_service.init()
-    unit_health_bar_service.init()
+    -- Do not re-enable unit_health_bar_service: it only adds the retired
+    -- modifier_single_health_bar compatibility marker to every spawned unit.
     combat_bootstrap.init()
     assert(tree_attack_order_filter.register(),
         "tree attack order filter registration failed")

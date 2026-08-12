@@ -7,6 +7,7 @@ local cosmetic_service = require("systems/hero_cosmetic_service")
 local projection = require("systems/hero_summon_projection")
 local hero_anchor_service = require("systems/hero_anchor_service")
 local destination_validation = require("systems/destination_validation_service")
+local modifier_registry = require("core/modifier_registry")
 
 local M = {}
 
@@ -109,7 +110,59 @@ local function diagnose_drow_visible_modifiers(unit)
     end
 end
 
+local function configured_number(definition, key)
+    local value = definition and definition[key]
+    if value == nil or value == "" then return nil end
+    return tonumber(value)
+end
+
+local function validate_replacement_modifiers(unit, definition)
+    local required = {}
+    if (configured_number(definition, "attack_speed") or 0) > 0 then
+        required[#required + 1] = "modifier_debug_attack_cap"
+    end
+    if (configured_number(definition, "attack_range") or 0) > 0 then
+        required[#required + 1] = "modifier_survival_hero_attack_range"
+    end
+    if (configured_number(definition, "base_health") or 0) > 0 then
+        required[#required + 1] = "modifier_survival_hero_base_health"
+    end
+    if configured_number(definition, "base_mana") ~= nil then
+        required[#required + 1] = "modifier_survival_hero_mana_standard"
+    end
+
+    local missing = {}
+    for _, modifier_name in ipairs(required) do
+        if not unit:HasModifier(modifier_name) then
+            missing[#missing + 1] = modifier_name
+        end
+    end
+    if #missing > 0 then
+        return false, table.concat(missing, ",")
+    end
+    return true, #required
+end
+
 local function initialize_replacement(player_id, team, altar, definition)
+    local registry_call_ok, modifiers_valid, modifier_detail = pcall(
+        modifier_registry.ensure_available
+    )
+    if not registry_call_ok or modifiers_valid ~= true then
+        local error_detail = registry_call_ok and modifier_detail or modifiers_valid
+        print(string.format(
+            "[HERO_REPLACEMENT_FAILED] player=%s hero=%s modifier_registry=%s",
+            tostring(player_id), tostring(definition.unit_name),
+            tostring(error_detail)
+        ))
+        return nil, "modifier_registry_unavailable"
+    end
+    print(string.format(
+        "[HERO_REPLACEMENT_MODIFIER_PREFLIGHT] player=%s hero=%s checked=%s recovered=%s",
+        tostring(player_id), tostring(definition.unit_name),
+        tostring(modifier_detail and modifier_detail.checked or "unknown"),
+        tostring(modifier_detail and modifier_detail.recovered or 0)
+    ))
+
     local position = summon_position(altar, definition)
     local placeholder, begin_error = hero_anchor_service.begin_replacement(player_id)
     if not placeholder then
@@ -144,22 +197,37 @@ local function initialize_replacement(player_id, team, altar, definition)
         unit:SetAbilityPoints(0)
     end
 
-    stat_adapter.apply(unit, definition)
+    local stat_ok, stat_error = pcall(stat_adapter.apply, unit, definition)
+    if not stat_ok then
+        hero_anchor_service.abort_replacement(player_id)
+        print(string.format(
+            "[HERO_REPLACEMENT_FAILED] player=%s hero=%s stat_apply=%s",
+            tostring(player_id), tostring(definition.unit_name),
+            tostring(stat_error)
+        ))
+        return nil, "hero_modifier_apply_failed"
+    end
     -- Selected-unit UI must use the addon hero identity rather than the
     -- native carrier identity (for example Sven or Undying).
     unit.survival_display_name = definition.display_name
     unit.survival_hero_id = definition.hero_id
     local moved, move_error = destination_validation.teleport(unit, position, false)
     if not moved then
+        hero_anchor_service.abort_replacement(player_id)
         return nil, move_error
     end
-    if not unit:HasModifier("modifier_single_health_bar") then
-        unit:AddNewModifier(unit, nil, "modifier_single_health_bar", {
-            player_id = player_id,
-        })
-    end
-    if not unit:HasModifier("modifier_debug_attack_cap") then
-        unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+    -- The retired custom world-health-bar overlay no longer consumes a marker
+    -- modifier. Native overhead health bars remain enabled for this hero.
+    local unit_modifiers_valid, missing_modifiers =
+        validate_replacement_modifiers(unit, definition)
+    if not unit_modifiers_valid then
+        hero_anchor_service.abort_replacement(player_id)
+        print(string.format(
+            "[HERO_REPLACEMENT_FAILED] player=%s hero=%s missing_unit_modifiers=%s",
+            tostring(player_id), tostring(definition.unit_name),
+            tostring(missing_modifiers)
+        ))
+        return nil, "hero_modifier_apply_failed"
     end
     cosmetic_service.apply(unit, definition.hero_id)
     diagnose_drow_visible_modifiers(unit)
@@ -168,6 +236,7 @@ local function initialize_replacement(player_id, team, altar, definition)
         unit
     )
     if not committed then
+        hero_anchor_service.abort_replacement(player_id)
         return nil, commit_error
     end
     return unit, nil
@@ -388,5 +457,9 @@ function M.init()
         on_hero_progression_changed
     )
 end
+
+M._test = {
+    validate_replacement_modifiers = validate_replacement_modifiers,
+}
 
 return M

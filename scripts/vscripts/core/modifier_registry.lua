@@ -1,4 +1,3 @@
-require("modifiers/modifier_building_blink_move")
 local logger = require("core/logger")
 
 local M = {}
@@ -155,6 +154,9 @@ local modifiers = {
     },
 }
 
+local REGISTERED_GENERATION_KEY =
+    "__survival_modifier_registry_linked_generation"
+
 local function link(definition)
     LinkLuaModifier(
         definition.name,
@@ -162,27 +164,113 @@ local function link(definition)
         definition.motion_type or LUA_MODIFIER_MOTION_NONE
     )
     require(definition.path)
+end
 
-    if _G[definition.name] == nil then
-        error(
-            "modifier class was not created: "
-            .. definition.name
-            .. " from "
-            .. definition.path
-        )
+local function relink_path(path)
+    for _, definition in ipairs(modifiers) do
+        if definition.path == path then
+            LinkLuaModifier(
+                definition.name,
+                definition.path,
+                definition.motion_type or LUA_MODIFIER_MOTION_NONE
+            )
+        end
     end
 end
 
-function M.register()
-    for _, definition in ipairs(modifiers) do
-        link(definition)
+function M.register(generation)
+    generation = tonumber(generation)
+    if not generation then
+        return false, "modifier registry generation is required"
     end
-    print("[ModifierRegistry] LinkLuaModifier refreshed count=" .. tostring(#modifiers))
-    logger.info(
+
+    local linked_generation = rawget(_G, REGISTERED_GENERATION_KEY)
+    if linked_generation ~= generation then
+        for _, definition in ipairs(modifiers) do
+            link(definition)
+        end
+        rawset(_G, REGISTERED_GENERATION_KEY, generation)
+        print("[ModifierRegistry] startup linked generation="
+            .. tostring(generation) .. " count=" .. tostring(#modifiers))
+        logger.info(
+            "ModifierRegistry",
+            "startup linked generation=" .. tostring(generation)
+                .. " modifiers=" .. tostring(#modifiers)
+        )
+    end
+    local valid, detail = M.ensure_available()
+    if not valid then return false, detail end
+    return true, detail.checked
+end
+
+function M.ensure_available()
+    local missing_path_set = {}
+    local missing_paths = {}
+    local missing_before = {}
+    for _, definition in ipairs(modifiers) do
+        if _G[definition.name] == nil then
+            missing_before[#missing_before + 1] = definition.name
+            if not missing_path_set[definition.path] then
+                missing_path_set[definition.path] = true
+                missing_paths[#missing_paths + 1] = definition.path
+            end
+        end
+    end
+
+    if #missing_before == 0 then
+        return true, {
+            checked = #modifiers,
+            recovered = 0,
+        }
+    end
+
+    local reload_errors = {}
+    local reloaded = 0
+    local relinked = 0
+    for _, path in ipairs(missing_paths) do
+        package.loaded[path] = nil
+        local ok, error_message = pcall(require, path)
+        reloaded = reloaded + 1
+        if not ok then
+            reload_errors[#reload_errors + 1] = path .. ": "
+                .. tostring(error_message)
+        end
+        local links_before = relinked
+        for _, definition in ipairs(modifiers) do
+            if definition.path == path then
+                relinked = relinked + 1
+            end
+        end
+        if relinked > links_before then
+            relink_path(path)
+        end
+    end
+
+    local valid, detail = M.validate()
+    if not valid then
+        local message = "missing=" .. tostring(detail)
+        if #reload_errors > 0 then
+            message = message .. " reload_errors="
+                .. table.concat(reload_errors, " | ")
+        end
+        logger.error("ModifierRegistry", "targeted recovery failed " .. message)
+        return false, message
+    end
+
+    logger.warn(
         "ModifierRegistry",
-        "refreshed " .. tostring(#modifiers) .. " modifiers"
+        "targeted recovery restored=" .. tostring(#missing_before)
+            .. " modules=" .. tostring(reloaded)
+            .. " relinked=" .. tostring(relinked)
+            .. " names=" .. table.concat(missing_before, ",")
     )
-    return M.validate()
+    return true, {
+        checked = #modifiers,
+        recovered = #missing_before,
+        reloaded = reloaded,
+        relinked = relinked,
+        names = missing_before,
+    }
 end
 
 function M.validate()

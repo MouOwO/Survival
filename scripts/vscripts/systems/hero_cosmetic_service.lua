@@ -102,7 +102,6 @@ local function spawn_wearable(hero, component_id, model_path)
         "prop_dynamic",
         {
             model = model_path,
-            DefaultAnim = "idle",
         }
     )
     if not ok or not valid_entity(wearable) then
