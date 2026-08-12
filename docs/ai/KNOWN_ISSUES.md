@@ -9,13 +9,17 @@
 
 ## 当前已知问题
 
+0. **Windows上的addon根目录大小写迁移会被当前VS Code工作区句柄阻止。**
+   - 2026-08-12两次从`Survival`经中间名迁移到`survival`均在首个`Rename-Item`处返回“文件正在被另一进程使用”；Dota、Workshop Tools和Resource Compiler进程已全部停止，失败未留下中间目录，说明当前VS Code/Cline工作区根目录句柄是剩余阻断。
+   - 不得通过并存目录、复制目录或junction创建第二个addon身份，这会继续污染Source 2 file mod索引。应关闭当前VS Code窗口，在插件目录外运行`tools/finalize_addon_file_mod_case.ps1`完成Game/Content两阶段改名、定向小地图编译和契约；脚本包含半迁移回滚保护。
+
 0. **W12 Visage模型加载告警当前未再观察到，但未来新增逐波模型仍有复发风险。**
    - 已确认原缺陷不是模型文件被尸体清理删除，而是开发跳波预载与出生模型解析不一致，叠加正式后续波预载过晚和urgent受后台流阻塞的风险。当前三条解析、倒计时起始请求、4秒幂等复核、urgent并行及逐波session租约均已补齐。
    - 用户2026-08-11后续观察中暂未再发现加载问题。这只能证明当前已运行路径未见复发，不能证明未来每个新模型、冷资源路径或长时间重叠波次都不会触发。
    - 新增或替换模型必须先改CSV权威数据，并按`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`同时验证正式预载、`monster<N>`预载、出生设置、精确代理/VPK和冷启动第一只怪。不得用`asset_preload.retire()`尝试“卸载修复”。
 
 0. **`.cline/local-toolchain.json`中的绝对路径会随工作区迁移或MSYS目录布局漂移。**
-   - 2026-08-09文件仍指向不存在的`D:\SteamLibrary`、WorkBuddy Python及`C:\msys64\mingw64\bin`，实际工作区位于`E:\steam`，有效Lua/Luac 5.1.5位于`C:\msys64\msys64\bin`，Python 3.10.11位于当前用户LocalAppData。配置已按本机实测修正。
+   - 2026-08-12旧配置仍指向不存在的`D:\steam`、旧用户WorkBuddy Python及`C:\msys64\mingw64\bin`；实际规范工作区位于`E:\steam`，有效Lua/Luac 5.1.5位于`C:\msys64\msys64\bin`，Python 3.14.3位于当前用户WorkBuddy目录。配置已按本机实测修正。
    - 后续会话仍必须先逐项`Test-Path`并输出版本，不能仅凭JSON存在就认定工具可用；也不能因PATH或失效配置找不到命令就声称Lua/Python不存在。
 
 0. **N1 W13-W18附近曾发生Panorama/V8 512 MiB堆上限闪退，修复仍待实机确认。**
