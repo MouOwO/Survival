@@ -2428,3 +2428,17 @@
 - 仍待用户冷启动Workshop Tools确认玩家0日志及NetTable，并以两台电脑/两个Steam账号验收玩家0/1隔离。玩家1地图Builder Marker仍缺失，只影响完整玩法出生，不影响档案加载隔离检查。
 
 - 联机代码复核发现旧记录“`player_connect_full`负责分队”缺少当前生产实现证据；实际代码只配置好人方4人/坏人方0人，未找到显式`SetCustomTeamAssignment()`。双机验收新增检查：第二端必须取得活动`PlayerID=1`，只增加服务器连接数或进入观战不算通过。
+- 用户批准继续修复热重载后`addhero`的unknown modifier以及小地图花屏。上一版进程级`__survival_modifier_registry_linked`永久布尔标志会在新脚本generation错误跳过完整`LinkLuaModifier()`，而`ensure_available()`只证明Lua类存在，不能证明Source 2引擎类型仍已注册。
+- `addon_game_mode.lua`现在每次脚本加载递增`__survival_modifier_registry_generation`并传给`modifier_registry.register(generation)`。注册器保存最后完整链接generation：同代调用只校验，新代完整链接全部Modifier一次。普通`addhero`类完整时仍为零链接；缺类时按模块路径清缓存并重载，随后重新链接该模块声明的全部Modifier，覆盖一个模块定义多个Modifier的情况。
+- Lua 5.1行为测试覆盖同代去重、新代全量重链、普通替换零链接、单缺类模块恢复、同模块全部声明重链及恢复失败关闭。当前`tools/test_*.lua`9项全部通过；`tools/test_*.ps1`8项通过7项，唯一失败仍为本任务前已知的`LOCALIZATION_CACHE_MISSING_ability_tooltip.js`。相关生产/测试14个Lua通过`luac5.1`语法。
+- Content新增`materials/overviews/template_map.vtex`，显式读取现有512×512、24位`template_map.tga`并输出`RGBA8888`；`template_map.vmat`改为引用稳定VTEX。Resource Compiler强制编译结果`2 compiled, 0 failed, 0 skipped`。`resourceinfo.exe`确认新VMAT runtime dependency精确为`materials/overviews/template_map.vtex`，新`template_map.vtex_c`资源名正确；旧`template_map_tga_d9088edf.vtex_c`在确认失去引用后删除。
+- 新增`test_minimap_texture_resource_contract.ps1`锁定Content源、稳定编译产物、旧哈希产物删除和VMAT runtime dependency。历史`survival_minimap.*`无Content源且未被overview引用，本轮未删除；`tools_asset_info.bin`仍含旧资产索引字符串，但不是当前VMAT运行时依赖，本轮未直接手改二进制缓存。
+- 仍需Workshop Tools完全冷启动确认小地图无花屏、三个生产Modifier和四个技能intrinsic Modifier均正常；随后热重载并连续执行`addhero`，确认启动日志generation递增且不再出现unknown modifier。自动行为测试、Resource Compiler和`resourceinfo`均不等于引擎实机验收。
+
+## 2026-08-12 - Workshop Tools file-mod大小写根因与迁移准备
+
+- 用户冷启动实机反馈显示`file mod 'dota_addons/survival' is invalid`持续刷屏，小地图仍花屏，长期存在的`survival_hud.vxml`和金币图标也被同一按需重编译失败阻断；因此撤回“显式VTEX已修复小地图”的结论。Game/Content物理目录均为`Survival`，编译资源内部为`dota_addons/survival`，旧`tools_asset_info.bin`同时含两种身份，根因定位为addon挂载/资产索引大小写冲突。
+- 完全停止孤立`resourcecompiler.exe`后，确认旧`tools_asset_info.bin`不受Git管理且由`.gitignore`忽略；已将84917字节缓存移到`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`，插件目录内当前无缓存。两次两阶段改名均被当前VS Code工作区目录句柄在首步拒绝，Game/Content仍为原名，未留下中间目录或半迁移。
+- 按用户选择保留当前所有既有Panorama/粒子编译产物修改，本轮不重编译HUD依赖链。Content VTEX改为Valve overview同类schema：`./template_map.tga`相对输入、DXT1声明及官方clear color/dimension/clamp/LOD字段；仅定向强制编译VTEX和VMAT，结果分别为`1 compiled, 0 failed, 0 skipped`。二进制字符串只含小写file mod，但`resourceinfo`仍报告`ManifestResource dota_addons/Survival`，物理改名不可省略。
+- `test_minimap_texture_resource_contract.ps1`新增Game/Content精确小写、VTEX schema、编译产物file-mod、runtime ManifestResource和资产索引大小写检查；当前准确失败于`GAME_ADDON_DIRECTORY_NOT_CANONICAL_LOWERCASE`。新增`finalize_addon_file_mod_case.ps1`，供关闭VS Code后从插件目录外完成两阶段改名、仅编译小地图资源和运行最终契约，含半迁移回滚保护。
+- `.cline/local-toolchain.json`已改为实际E盘规范工作区及本机有效工具：Python 3.14.3、Lua/Luac 5.1.5、PowerShell 7.6.4，均逐项实测。CSV审计确认唯一`template_map`命中是区域边界说明注释，本任务没有addon/overview权威CSV字段。仍需最终化脚本输出`ADDON_FILE_MOD_CASE_FINALIZE_PASS`，再冷启动Workshop Tools确认不再刷`file mod ... is invalid`且小地图正常；自动编译不等于实机验收。

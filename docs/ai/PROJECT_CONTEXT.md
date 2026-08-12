@@ -350,14 +350,14 @@
 ## 项目与环境
 
 - 项目：Dota 2 自定义地图 `survival`。
-- 工作目录：`d:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival`。
+- 规范工作目录：`E:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival`。Source 2编译资源会规范化为小写file mod；Game/Content物理插件目录也必须保持精确全小写，禁止再次创建`Survival`大小写变体。
 - 服务端主要使用 Lua，配置权威来源位于 `data/csv`，生成配置位于 `scripts/vscripts/config/generated`。
 - 配置修改规范：优先修改 CSV，再运行 `build_configs.bat`；运行时服务通过 `core/event_bus.lua` 解耦。
 - 内容库存以 `content_id` 为权威身份，Dota 物品实体只是可见背包壳。
 - 英雄力量、敏捷、智力是项目逻辑三维：由服务端战斗快照统一计算和发布，不写入 Dota 原生三维。逻辑三维本身不提供攻速、护甲、生命、魔法或主属性攻击，只供 UI 和明确按三维结算的技能/装备效果读取。
-- Panorama 源码不在当前 `game` 插件目录中，而在对应的内容目录：`D:\steam\steamapps\common\dota 2 beta\content\dota_addons\survival\panorama`。
-- 游戏实际加载的 Panorama 编译产物位于：`D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\panorama`。
-- 当前Lua 5.1解释器/检查器为`C:\msys64\mingw64\bin\lua5.1.exe`与`C:\msys64\mingw64\bin\luac5.1.exe`，均已在2026-08-04实际执行确认版本5.1.5；目录未加入PATH，必须使用绝对路径。旧`C:\Program Files\lua\bin`记录当前已失效。
+- Panorama 源码不在当前 `game` 插件目录中，而在对应的内容目录：`E:\steam\steamapps\common\dota 2 beta\content\dota_addons\survival\panorama`。
+- 游戏实际加载的 Panorama 编译产物位于：`E:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\panorama`。
+- 当前Lua 5.1解释器/检查器为`C:\msys64\msys64\bin\lua5.1.exe`与`C:\msys64\msys64\bin\luac5.1.exe`，均已在2026-08-12实际执行确认版本5.1.5；目录未加入PATH，必须使用绝对路径。当前Python为`C:\Users\UserComputer\.workbuddy\binaries\python\versions\3.14.3\python.exe`，PowerShell 7为`C:\Program Files\PowerShell\7\pwsh.exe`。
 
 ## AI 会话恢复协议
 

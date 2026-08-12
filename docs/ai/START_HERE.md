@@ -4,6 +4,8 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-12，file-mod大小写迁移待关闭VS Code后收尾）：Workshop Tools实机证明Game/Content物理目录`Survival`与编译资源`dota_addons/survival`冲突，导致`file mod ... is invalid`刷屏并阻断小地图/Panorama按需编译。旧`tools_asset_info.bin`已移出并备份；VTEX已对齐Valve overview schema，VTEX/VMAT定向编译各`1 compiled, 0 failed, 0 skipped`，但`resourceinfo`仍报告大写ManifestResource。当前VS Code工作区句柄阻止根目录大小写改名，下一步唯一动作是关闭VS Code和Workshop Tools后执行`tools/finalize_addon_file_mod_case.ps1`，取得`ADDON_FILE_MOD_CASE_FINALIZE_PASS`后再冷启动实机确认告警停止和小地图正常。按用户要求未重编译HUD、Panorama或粒子既有修改。
+
 - 当前插入任务（2026-08-11，生产实现与自动验证完成）：基础箭塔/路线计数及并发预占已改为玩家作用域；七塔合一支持每玩家最多5座终极塔，材料不消耗且每座永久仅参与一次；齐天大圣R整组原子迁移全部终极塔并保留相对位置；任意已完工城墙死亡一次性触发全队失败，施工墙和主城不直接失败。专项Lua 5.1/契约、语法、生成一致、UTF-8/BOM和限定diff通过；下一步Workshop Tools完全冷启动实机验收，详见`CURRENT_TASK.md`顶部。
 - 当前实施任务（2026-08-12）：外围玩家档案本地Fixture纵向切片已完成生产实现，包含CSV schema/公开白名单/开发账号映射、JSON Fixture生成、统一Provider、完整快照与增量revision/update_id、异步generation、VIP失败关闭、服务端私有档案和公开NetTable。专项Lua 5.1与契约已通过；真实HTTP、数据库、支付、Steam身份和写回尚未实现。下一步冷启动Workshop Tools验证玩家0 VIP、玩家1非VIP和公开表字段；详细协议见`PLAYER_PROFILE_INTEGRATION.md`。
 - 逐波模型加载经验已沉淀到`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`，包括W12 Visage告警的确定根因、CSV优先原则、正式/dev/出生统一解析、session租约、urgent并行、禁止误用`asset_preload.retire()`、复发排查顺序和未来逐波换模清单。用户2026-08-11后续观察中暂未再发现加载问题；只能记为阶段性有效，新增模型后仍需冷启动分别验证`monster<N>`与正式波次。
@@ -75,6 +77,7 @@
 ## 最后可靠检查点
 
 - 2026-08-12玩家档案Fixture纵向切片代码与自动测试完成；已增加公开投影成功日志，可直接核对玩家0/1的Fixture账号、revision及公开白名单字段。VIP权威CSV默认关闭，Mock账号验证后再投影。尚未Workshop Tools实机验证，也未接HTTP/数据库。
+- 2026-08-12旧混合大小写资产索引已安全移出插件目录，备份位于`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`；Game/Content仍保持大写`Survival`，没有中间目录或半迁移。最终化脚本已完成语法检查和回滚保护，但尚未实际运行成功。
 - 2026-08-10空区域配置兼容策略已落地：CSV无启用`hero_movable`业务行时保持旧地图导航与Grid建造，区域拒绝仍返回可渲染红格；等待Workshop Tools实机验证。
 - 2026-08-06已完成代码库只读审计并建立完整任务清单。
 - `addon_game_mode.lua`和`addoninfo.txt`已开放4名好人方玩家。

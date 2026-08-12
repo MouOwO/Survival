@@ -1,5 +1,22 @@
 # Current Task
 
+## 当前插入任务（2026-08-12）：热重载 Modifier 注册与小地图显式纹理
+
+- 最新Workshop Tools实机失败：冷启动后持续输出`file mod 'dota_addons/survival' is invalid`，按需重编译`template_map.vtex`和`survival_hud.vxml`均被同指纹抑制，小地图仍然花屏；因此此前“显式VTEX已修复小地图”的结论撤回，当前状态改为资产挂载身份修复进行中。
+- 只读取证确认Game/Content物理目录均为`dota_addons/Survival`，但`template_map.vmat_c`、`template_map.vtex_c`及本次重编译的`survival_hud.vxml_c`内部均记录`dota_addons/survival`，`tools_asset_info.bin`同时含大小写两种file mod身份。相同错误还阻断长期存在的Panorama金币图标依赖，说明首要根因是插件目录大小写与资产数据库身份冲突，不是单独VTEX扩展名或TGA文件头损坏。
+- 当前实施状态：已停止孤立`resourcecompiler.exe`，旧`tools_asset_info.bin`已移出插件目录并备份到`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`；按用户要求不重编译HUD/Panorama/粒子既有修改，只定向处理小地图VTEX/VMAT。Game/Content两次两阶段改名均被当前VS Code工作区目录句柄拒绝，未留下中间目录或半迁移状态；必须关闭当前VS Code工作区后执行`tools/finalize_addon_file_mod_case.ps1`完成物理改名、定向重编译和最终契约。
+- 用户实机日志显示 Mango Tree 模型缺少 `attach_hitloc`，以及召唤猴王后多个英雄核心 Modifier 被引擎判定为 unknown；同时存在 `modifier_single_health_bar` 重复告警。
+- 权威资源树模型继续来自 `data/csv/资源系统/world_visual_definitions.csv`，本任务不擅自更换模型或修改树木数值。
+- 审计确认 `modifier_single_health_bar` 只剩兼容标记，已不负责自定义血条，可停用自动附加链；其余攻击上限、CSV射程/生命、装备、暴击和科技 Modifier 仍在生产使用，不得注释。
+- 最小修复：完整 Modifier 注册只保留在地图启动边界；英雄替换前仅验证Lua类并对缺类模块定向恢复，失败关闭；停用旧血条标记服务；项目粒子仅在模型确有 attachment 时绑定，否则回退世界坐标；增加专项契约并执行 Lua 5.1、编码和限定差异验证。
+- 实施完成：`addon_game_mode.lua`不再初始化废弃`unit_health_bar_service`，英雄替换不再附加`modifier_single_health_bar`。启动入口现在为每次脚本加载分配递增generation，`modifier_registry.register(generation)`在每代完整执行一次`LinkLuaModifier()`、同代重复调用去重；普通`addhero`继续只调用`ensure_available()`，正常路径零次链接。缺类时按模块路径清除`package.loaded`并重载一次，随后由注册器重新链接该模块声明的全部Modifier；恢复失败在`hero_anchor_service.begin_replacement()`前返回`modifier_registry_unavailable`。
+- 英雄替换的CSV基础属性应用现在受`pcall`保护；提交前按英雄CSV检查攻击上限、攻击射程、基础生命及条件性法力Modifier是否实际存在。添加异常或实体缺失返回`hero_modifier_apply_failed`，不写召唤成功状态、不发布`HERO_SUMMONED`。装备效果、攻击投影和攻击追踪仍由既有`hero_combat_stat_service`在同步`HERO_SUMMONED`链创建，科技Modifier继续按条件性效果运行，未复制第二套服务。
+- 猴王四件Cult of the Demon Trickster饰品继续使用原模型、`material_group="1"`、四个环境粒子、Owner和`FollowEntity`骨骼跟随；`hero_cosmetic_service`只移除了`prop_dynamic`创建参数中的`DefaultAnim="idle"`，避免模型不存在该序列时产生四次告警。
+- Mango Tree权威CSV及生成Lua继续保持`models/props_tree/mango_tree.vmdl`、缩放3。自定义魔法塔粒子会先用`ScriptLookupAttachment`确认`attach_attack1/attach_hitloc`存在，缺失时改用实体世界坐标，不再强绑不存在的attachment。
+- 小地图Content源`materials/overviews/template_map.vtex`现已对齐Valve overview schema：同目录相对输入`./template_map.tga`、声明`DXT1`及官方clear color/dimension/clamp/LOD字段；`template_map.vmat`继续引用显式VTEX。当前大写物理目录下定向强制编译VTEX、VMAT均为`1 compiled, 0 failed, 0 skipped`，且二进制字符串只含`dota_addons/survival`；但`resourceinfo.exe`仍把VMAT ManifestResource报告为`dota_addons/Survival`，证明物理改名尚未完成，不能把离线编译记为最终修复。
+- 小地图契约已增加Game/Content目录精确小写、源VTEX相对路径和DXT1声明、编译产物file-mod大小写、`resourceinfo` ManifestResource以及重建后资产索引不得含大写身份的检查。当前契约按预期失败于`GAME_ADDON_DIRECTORY_NOT_CANONICAL_LOWERCASE`；只有最终化脚本输出`ADDON_FILE_MOD_CASE_FINALIZE_PASS`后才能记录自动修复完成。`.cline/local-toolchain.json`已修正为实际E盘工作区、Python 3.14.3、Lua/Luac 5.1.5和PowerShell 7.6.4路径并逐项实测。
+- Mango Tree继续保持`models/props_tree/mango_tree.vmdl`、缩放3、现有数值和原生攻击链。用户已决定接受原生攻击特效对该资产缺少`attach_hitloc`的无功能影响引擎告警；项目自定义魔法塔粒子的attachment回退仍保留。16 MiB Lua内存信息仅记为高水位提示，当前没有泄漏证据。
+- 下一步唯一动作：关闭当前VS Code窗口及Workshop Tools，在插件目录外用PowerShell 7执行`E:\steam\steamapps\common\dota 2 beta\game\dota_addons\Survival\tools\finalize_addon_file_mod_case.ps1`。脚本会通过中间名把Game/Content统一为全小写`survival`、仅重编译小地图VTEX/VMAT并运行最终契约，失败时回滚半迁移。随后冷启动Workshop Tools确认不再出现`file mod ... is invalid`、小地图无花屏；Modifier与猴王饰品仍按原实机清单单独验证。Source 2注册与资源管理器时序只能由引擎验证，自动测试不能称为实机验收。
 ## 当前实施任务（2026-08-11）：玩家级塔上限、零消耗七塔合一、多终极塔迁移与城墙失败
 
 - 用户已在 Plan 阶段确认并切换 Act：每玩家最多7座未转职基础箭塔；每玩家每条转职路线最多5座，并使用玩家级预占阻止并发第6座；转职完成释放基础塔名额，死亡/取消释放计数或预占。
