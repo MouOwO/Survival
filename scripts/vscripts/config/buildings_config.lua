@@ -85,6 +85,7 @@ local function level_rows(building_id)
                 level = row.level,
                 display_name = row.display_name,
                 health = row.health,
+                war3_armor = row.war3_armor or row.armor,
                 armor = dota_armor(row.war3_armor or row.armor),
                 requires_city_level = row.requires_city_level,
                 prerequisite_text = row.prerequisite_text,

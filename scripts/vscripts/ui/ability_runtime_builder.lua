@@ -302,7 +302,9 @@ local function upgrade_level(definition, current_level, resources, state)
         { label = "等级", value = tostring(current_level) .. " → " .. tostring(next_level) },
     }
     local health = value_delta(current_data.health, data.health)
-    local armor = value_delta(current_data.armor, data.armor)
+    local armor = definition.id == "wall"
+        and value_delta(current_data.war3_armor, data.war3_armor)
+        or value_delta(current_data.armor, data.armor)
     local population = value_delta(
         current_data.max_population or current_data.population,
         data.max_population or data.population

@@ -335,6 +335,26 @@ local function completion_level_data(definition, level)
     local levels = definition.levels or definition.pre_class_levels or {}
     return levels[tonumber(level) or 1] or {}
 end
+local function level_display_name(definition, level)
+    if definition.id ~= "wall" and definition.id ~= "main_city" then return nil end
+    return completion_level_data(definition, level).display_name
+end
+local function state_display_name(state)
+    if state.building_id == "arrow_tower" then
+        return state.unit.survival_display_name
+            or state.tower_class_name
+            or ((arrow_data(state.level) or {}).name)
+            or state.definition.display_name
+    end
+    return level_display_name(state.definition, state.level)
+        or state.unit.survival_display_name
+        or state.definition.display_name
+end
+local function sync_display_name(state)
+    local display_name = state_display_name(state)
+    state.unit.survival_display_name = display_name
+    return display_name
+end
 local function tower_population_occupied(state)
     if not state or state.building_id ~= "arrow_tower" then return 0 end
     return math.max(
@@ -377,11 +397,7 @@ local function public_state(state)
         tower_class = state.tower_class,
         tower_class_name = state.tower_class_name,
         population_occupied = tower_population_occupied(state),
-        display_name = state.unit.survival_display_name
-            or state.tower_class_name
-            or (state.building_id == "arrow_tower"
-                and ((arrow_data(state.level) or {}).name)
-                or state.definition.display_name),
+        display_name = state_display_name(state),
         configured_attack_damage = state.building_id == "arrow_tower"
             and (arrow_data(state.level) or {}).base_attack_damage or nil,
         configured_attack_speed = state.building_id == "arrow_tower"
@@ -468,6 +484,7 @@ local function recover_building(unit)
     unit.survival_player_id = state.player_id
     unit.survival_grid_x = grid_x
     unit.survival_grid_y = grid_y
+    sync_display_name(state)
     unit.survival_route_level = route_row and route_row.level or state.level
     apply_hull_radius(unit, definition)
     anchor_building(unit, unit.survival_fixed_position or origin)
@@ -608,7 +625,8 @@ local function start_building(payload)
     end
     team_alignment.enforce(unit, check.team, "building")
     unit.survival_level = 1
-    unit.survival_display_name = check.definition.display_name
+    unit.survival_display_name = level_display_name(check.definition, 1)
+        or check.definition.display_name
     unit.survival_is_building = true
     unit.survival_building_id = check.definition.id
     unit.survival_player_id = check.player_id
@@ -968,7 +986,9 @@ local function on_building_changed(payload)
             reason = payload.reason or "tower_changed",
         })
     end
-    if payload.display_name then
+    if state.building_id == "wall" or state.building_id == "main_city" then
+        sync_display_name(state)
+    elseif payload.display_name then
         state.unit.survival_display_name = payload.display_name
     end
     apply_hull_radius(state.unit, state.definition)

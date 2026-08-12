@@ -1,5 +1,13 @@
 # Project Context
 
+## 建筑等级名称与护甲展示边界（2026-08-12）
+
+- `building_levels.csv.display_name`是主城与城墙各等级名称的权威源。创建、热恢复、升级提交和公开状态发布必须按当前等级解析；箭塔路线/转职名称及其他建筑的动态`payload.display_name`行为不得被该规则覆盖。
+- `building_levels.csv.war3_armor`是原始业务护甲；`buildings_config.lua`中的`armor`仍是经项目War3到Dota规则换算后的引擎运行护甲。不得为了Tooltip改回原始值驱动引擎护甲。
+- 城墙升级Tooltip展示相邻等级`war3_armor`的原始差值；其他建筑继续展示运行时`armor`差值。修改相关字段时必须从CSV生成链验证，禁止直接手改`config/generated/building_levels.lua`。
+- 当前`building_levels.csv`使用CP936/GBK编码。读取和定向生成必须沿用生成器编码回退并检查乱码；不得以系统默认编码整文件重写。
+
+
 ## 玩家档案Provider、版本协议与隐私边界（2026-08-12）
 
 - 永久档案使用稳定字符串`account_id`；Dota `player_id`只作为本局槽位，禁止成为数据库主键。正式身份可直用Steam Account ID或映射自有账号ID，但Lua协议不依赖具体方案。

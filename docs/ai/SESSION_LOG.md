@@ -2428,3 +2428,12 @@
 - 仍待用户冷启动Workshop Tools确认玩家0日志及NetTable，并以两台电脑/两个Steam账号验收玩家0/1隔离。玩家1地图Builder Marker仍缺失，只影响完整玩法出生，不影响档案加载隔离检查。
 
 - 联机代码复核发现旧记录“`player_connect_full`负责分队”缺少当前生产实现证据；实际代码只配置好人方4人/坏人方0人，未找到显式`SetCustomTeamAssignment()`。双机验收新增检查：第二端必须取得活动`PlayerID=1`，只增加服务器连接数或进入观战不算通过。
+
+## 2026-08-12 - 主城/城墙等级名称与城墙原始护甲Tooltip
+
+- 主城和城墙名称改为按当前等级读取`building_levels.csv.display_name`，覆盖创建、热恢复、升级提交、升级发布和公共状态；范围严格限定`wall/main_city`，箭塔转职名称与其他建筑`payload.display_name`行为保持不变。
+- `buildings_config.lua`新增透传原始`war3_armor`，现有换算后`armor`继续驱动引擎。城墙升级Tooltip使用相邻等级原始护甲差，例如`10 -> 15 (+5)`；其他建筑仍显示运行时护甲差。
+- 权威`building_levels.csv`为CP936/GBK且本轮未修改；生成Lua也未修改。定向调用生成器所得结果与现有`building_levels.lua`逐字节一致，配置`CheckOnly`通过。
+- 自动验证通过：`BUILDING_LEVEL_IDENTITY_LUA51_PASS/CONTRACT_PASS`、`BUILDING_UPGRADE_PROCESS_LUA51_PASS`、`SIX_GAMEPLAY_FIXES_LUA51_PASS/CONTRACT_PASS`、5个目标Lua语法、源CSV CP936解码/乱码检查、6个任务文件严格UTF-8及限定`git diff --check`。
+- 既有无关漂移未修改：批量升级Lua Mock缺`event_bus.request`，批量升级PowerShell契约要求已删除selection snapshot，旧城墙健康测试调用已删除`apply_preserved_ratio`，单位模型契约缺伐木工CSV模型项。
+- 用户于2026-08-12明确确认问题圆满完成，本任务已验收并关闭；稳定行为边界已沉淀至`PROJECT_CONTEXT.md`，后续会话不得再将其恢复为活跃任务。

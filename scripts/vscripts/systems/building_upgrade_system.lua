@@ -262,13 +262,25 @@ local function base_health(state)
     return tonumber(data.health) or state.unit:GetMaxHealth()
 end
 
+local function configured_display_name(state, route_row)
+    if state.building_id == "arrow_tower" then
+        return state.unit.survival_display_name
+            or state.tower_class_name
+            or (route_row and route_row.name)
+            or state.definition.display_name
+    end
+    if state.building_id == "wall" or state.building_id == "main_city" then
+        local level_data = (state.definition.levels or {})[state.level] or {}
+        return level_data.display_name or state.definition.display_name
+    end
+    return state.unit.survival_display_name or state.definition.display_name
+end
+
 publish = function(state, reason)
     local route_row = state.building_id == "arrow_tower"
         and tower_routes.current(state) or nil
-    local display_name = state.unit.survival_display_name
-        or state.tower_class_name
-        or (route_row and route_row.name)
-        or state.definition.display_name
+    local display_name = configured_display_name(state, route_row)
+    state.unit.survival_display_name = display_name
     event_bus.emit(events.BUILDING_CHANGED, {
         entindex = state.unit:entindex(),
         team = state.team,
@@ -536,7 +548,8 @@ local function upgrade_wall(state)
     return start_upgrade(state, data, next_level, function()
         state.level = next_level
         state.unit.survival_level = next_level
-        state.unit.survival_display_name = state.definition.display_name
+        state.unit.survival_display_name = data.display_name
+            or state.definition.display_name
         building_health_projection.apply_maximum_health_increase(state.unit, function()
             apply_common(state.unit, data)
             apply_research_technology(state)
@@ -555,7 +568,8 @@ local function upgrade_city(state)
     return start_upgrade(state, data, next_level, function()
         state.level = next_level
         state.unit.survival_level = next_level
-        state.unit.survival_display_name = state.definition.display_name
+        state.unit.survival_display_name = data.display_name
+            or state.definition.display_name
         apply_common(state.unit, data)
         building_population.grant_level(
             state,

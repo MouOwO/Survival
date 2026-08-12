@@ -1,5 +1,16 @@
 # Current Task
 
+## 已完成插入任务（2026-08-12）：主城/城墙等级名称与城墙原始护甲Tooltip
+
+- 目标：主城和城墙的单位名称随当前等级使用权威`building_levels.csv.display_name`；城墙升级Tooltip使用相邻等级CSV原始`war3_armor`差值，例如`10 -> 15 (+5)`。
+- 实现完成：`buildings_config.lua`在保留Dota换算后`armor`作为引擎运行值的同时透传`war3_armor`；`building_system.lua`在创建、热恢复、状态发布和变更同步时解析等级名称；`building_upgrade_system.lua`在城墙/主城升级提交与发布时同步等级名称。
+- 名称重算严格限定`wall/main_city`。箭塔继续保留路线/转职名称，其他建筑继续接受原有`payload.display_name`，没有扩大名称行为范围。
+- `ability_runtime_builder.lua`仅对城墙使用`war3_armor`计算Tooltip差值；主城和其他建筑仍沿用运行时Dota护甲差值。权威CSV为CP936/GBK，本轮未修改CSV或`config/generated`。
+- 自动验证通过：`BUILDING_LEVEL_IDENTITY_LUA51_PASS`、`BUILDING_LEVEL_IDENTITY_CONTRACT_PASS`、`BUILDING_UPGRADE_PROCESS_LUA51_PASS`、`SIX_GAMEPLAY_FIXES_LUA51_PASS/CONTRACT_PASS`、5个目标Lua的Lua 5.1语法、配置`CheckOnly`、`building_levels.lua`定向生成逐字节一致、源CSV CP936解码与乱码标记检查、6个任务文件严格UTF-8及限定`git diff --check`。
+- 无关既有失败保持不变：两份批量升级旧测试分别缺少当前`event_bus.request` Mock并要求已删除的客户端selection snapshot；旧城墙健康测试仍调用已删除的`apply_preserved_ratio`；单位模型旧契约仍缺伐木工模型CSV项。未修改这些无关测试或数据迎合。
+- 用户于2026-08-12明确确认问题圆满完成，本任务已验收并关闭；后续会话不得再将其恢复为活跃任务。
+
+
 ## 当前实施任务（2026-08-11）：玩家级塔上限、零消耗七塔合一、多终极塔迁移与城墙失败
 
 - 用户已在 Plan 阶段确认并切换 Act：每玩家最多7座未转职基础箭塔；每玩家每条转职路线最多5座，并使用玩家级预占阻止并发第6座；转职完成释放基础塔名额，死亡/取消释放计数或预占。
