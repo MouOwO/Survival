@@ -103,6 +103,8 @@ local M = {
     HERO_SUMMON_GET_REQUEST = "hero.summon.get.request",
     HERO_SUMMON_STATE_CHANGED = "hero.summon.state.changed",
 
+    PLAYER_PROFILE_GET_REQUEST = "player.profile.get.request",
+    PLAYER_PROFILE_CHANGED = "player.profile.changed",
     PLAYER_ENTITLEMENT_GET_REQUEST = "player.entitlement.get.request",
     PLAYER_ENTITLEMENT_SET_REQUEST = "player.entitlement.set.request",
     PLAYER_ENTITLEMENT_CHANGED = "player.entitlement.changed",

@@ -5,6 +5,7 @@
 ## 当前任务
 
 - 当前插入任务（2026-08-11，生产实现与自动验证完成）：基础箭塔/路线计数及并发预占已改为玩家作用域；七塔合一支持每玩家最多5座终极塔，材料不消耗且每座永久仅参与一次；齐天大圣R整组原子迁移全部终极塔并保留相对位置；任意已完工城墙死亡一次性触发全队失败，施工墙和主城不直接失败。专项Lua 5.1/契约、语法、生成一致、UTF-8/BOM和限定diff通过；下一步Workshop Tools完全冷启动实机验收，详见`CURRENT_TASK.md`顶部。
+- 当前实施任务（2026-08-12）：外围玩家档案本地Fixture纵向切片已完成生产实现，包含CSV schema/公开白名单/开发账号映射、JSON Fixture生成、统一Provider、完整快照与增量revision/update_id、异步generation、VIP失败关闭、服务端私有档案和公开NetTable。专项Lua 5.1与契约已通过；真实HTTP、数据库、支付、Steam身份和写回尚未实现。下一步冷启动Workshop Tools验证玩家0 VIP、玩家1非VIP和公开表字段；详细协议见`PLAYER_PROFILE_INTEGRATION.md`。
 - 逐波模型加载经验已沉淀到`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`，包括W12 Visage告警的确定根因、CSV优先原则、正式/dev/出生统一解析、session租约、urgent并行、禁止误用`asset_preload.retire()`、复发排查顺序和未来逐波换模清单。用户2026-08-11后续观察中暂未再发现加载问题；只能记为阶段性有效，新增模型后仍需冷启动分别验证`monster<N>`与正式波次。
 - 当前插入任务（2026-08-11）：闪电魔塔击杀风暴已改为死亡点500范围即时单次物理伤害，LV1至LV5使用触发时塔攻击快照110%/120%/130%/140%/150%；每目标只受伤和发布一次`TOWER_LIGHTNING_HIT`。随后一秒内5/6/7/8/9道雷柱仅作视觉，不查询敌人、不伤害、不触发扩散。原塔归因、风暴连锁击杀及独立雷电扩散30%/200%/非递归规则保留。CSV、生成Lua、Tooltip和六份本地化已同步；专项Lua 5.1行为/契约、相关回归、5个Lua语法、生成逐字节一致、配置CheckOnly、UTF-8/BOM和限定diff通过。下一步Workshop Tools冷启动实测即时伤害时点、物理护甲结果、纯视觉雷柱数量、扩散和连锁风暴，尚未实机验收。
 - 当前插入任务（2026-08-11）：`ability_tooltip.js:997` 的几何诊断越作用域 `active.engineSlot` 已修正为函数参数 `binding.engineSlot`，并强制重编译 `ability_tooltip.vjs_c`。源码/产物作用域契约、输入生命周期契约、严格UTF-8和限定diff通过；完整内存生命周期契约仍被既有无关`SURVIVAL_UI_CONTEXT_GUARD_MISSING`阻断。下一步完全冷启动Workshop Tools确认不再出现`active is not defined`，尚未实机验收。
@@ -73,6 +74,7 @@
 
 ## 最后可靠检查点
 
+- 2026-08-12玩家档案Fixture纵向切片代码与自动测试完成；已增加公开投影成功日志，可直接核对玩家0/1的Fixture账号、revision及公开白名单字段。VIP权威CSV默认关闭，Mock账号验证后再投影。尚未Workshop Tools实机验证，也未接HTTP/数据库。
 - 2026-08-10空区域配置兼容策略已落地：CSV无启用`hero_movable`业务行时保持旧地图导航与Grid建造，区域拒绝仍返回可渲染红格；等待Workshop Tools实机验证。
 - 2026-08-06已完成代码库只读审计并建立完整任务清单。
 - `addon_game_mode.lua`和`addoninfo.txt`已开放4名好人方玩家。
@@ -87,10 +89,11 @@
 - 当前Dota版本下未发布addon的最佳两客户端加入入口，需要在阶段2用两台机器实测。
 - 支援击杀的成长和额外奖励归属，阶段6前必须由用户确认或写入CSV规则。
 - 同一挑战是否允许多名玩家并发进入同一个挑战实例，阶段7前确认。
+- 正式档案键直接使用Steam Account ID，还是由后端映射为自有账号ID。
 
 ## 下一步唯一动作
 
-从Hammer提供并确认`hero_movable`白名单与`building_forbidden`黑名单的真实边界坐标，写入`data/csv/建筑与工人系统/build_forbidden_regions.csv`并通过生成工具重建配置；随后冷启动Workshop Tools验证英雄移动/攻击移动、越界回退、传送技能、挑战/练功房/回城以及建筑完整footprint。多人阶段1验收保持暂停，待本插入任务解除数据阻断后再恢复。
+完全停止并冷启动Workshop Tools，确认玩家0加载`mock_account_10001`后VIP链可用、玩家1加载`mock_account_10002`后VIP链锁定、`survival_player_public_profiles`只含CSV白名单字段且无Lua异常；随后恢复多人阶段1单人/双客户端验收。Hammer区域边界与玩家1出生Marker仍是后续地图数据阻断。
 
 ## 恢复顺序
 

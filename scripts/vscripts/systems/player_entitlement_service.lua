@@ -69,6 +69,33 @@ local function on_hero_ready(payload)
     end
 end
 
+function M.replace_all(player_id, entitlement_values, reason)
+    player_id = tonumber(player_id)
+    if player_id == nil or player_id < 0 or type(entitlement_values) ~= "table" then
+        return { ok = false, error = "entitlement_replace_invalid" }
+    end
+    local next_state = {}
+    for _, definition in ipairs(definitions.rows or {}) do
+        if definition.enabled ~= false then
+            next_state[definition.entitlement_id] = false
+        end
+    end
+    for entitlement_id, unlocked in pairs(entitlement_values) do
+        if not definitions.by_id[entitlement_id] then
+            return { ok = false, error = "entitlement_invalid:" .. entitlement_id }
+        end
+        if type(unlocked) ~= "boolean" then
+            return { ok = false, error = "entitlement_value_invalid:" .. entitlement_id }
+        end
+        next_state[entitlement_id] = unlocked
+    end
+    state_by_player[player_id] = next_state
+    local data = snapshot(player_id)
+    data.reason = tostring(reason or "replace_all")
+    event_bus.emit(events.PLAYER_ENTITLEMENT_CHANGED, data)
+    return { ok = true, snapshot = data }
+end
+
 function M.init()
     state_by_player = {}
     event_bus.handle_request(

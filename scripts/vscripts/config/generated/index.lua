@@ -1,6 +1,7 @@
 -- AUTO-GENERATED CONFIG REGISTRY.
 local M = {}
 
+M["achievement_definitions"] = require("config/generated/achievement_definitions")
 M["altar_actions"] = require("config/generated/altar_actions")
 M["arrow_tower_base"] = require("config/generated/arrow_tower_base")
 M["asset_activity_modifiers"] = require("config/generated/asset_activity_modifiers")
@@ -42,6 +43,7 @@ M["hero_skill_pool_members"] = require("config/generated/hero_skill_pool_members
 M["hero_skill_sound_definitions"] = require("config/generated/hero_skill_sound_definitions")
 M["hero_summon_rules"] = require("config/generated/hero_summon_rules")
 M["item_definitions"] = require("config/generated/item_definitions")
+M["mock_player_account_bindings"] = require("config/generated/mock_player_account_bindings")
 M["monkey_king_exclusive_runtime"] = require("config/generated/monkey_king_exclusive_runtime")
 M["monster_archetypes"] = require("config/generated/monster_archetypes")
 M["monster_encounters"] = require("config/generated/monster_encounters")
@@ -50,6 +52,8 @@ M["monster_visual_assets"] = require("config/generated/monster_visual_assets")
 M["monster_visual_components"] = require("config/generated/monster_visual_components")
 M["monster_visual_effects"] = require("config/generated/monster_visual_effects")
 M["multiplayer_rules"] = require("config/generated/multiplayer_rules")
+M["player_profile_public_fields"] = require("config/generated/player_profile_public_fields")
+M["player_profile_rules"] = require("config/generated/player_profile_rules")
 M["player_slots"] = require("config/generated/player_slots")
 M["progression_rules"] = require("config/generated/progression_rules")
 M["rebirth_challenges"] = require("config/generated/rebirth_challenges")

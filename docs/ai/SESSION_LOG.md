@@ -2406,3 +2406,25 @@
 - 自动验证通过：`LIGHTNING_TOWER_KILL_TRIGGER_LUA51_PASS/CONTRACT_PASS`，覆盖400范围、最近/未命中选择、5至9次数、每级一秒均匀间隔、100/110/120/130/140/150%封顶、视觉与伤害中心分离、攻击快照、原塔归因、扩散事件和风暴连锁击杀；`MONSTER_WAR3_ARMOR_DAMAGE_LUA51_PASS/CONTRACT_PASS`、`MONKEY_TOWER_CONTRACT_PASS`、`LOCALIZATION_TOKEN_INTEGRITY_CONTRACT_PASS`通过。4个目标Lua `luac5.1`语法、塔技能与Tooltip三项生成逐字节一致、20个目标本地化token镜像、14个目标文件严格UTF-8/BOM及限定`git diff --check`通过。
 - 无关既有失败：`test_super_tower_crit_contract.ps1`失败于`SUPER_TOWER_CRIT_GENERATED_NOTES_INVALID`；本轮未修改科技CSV、生成科技配置或科技逻辑，也未越界修正该旧断言。
 - 尚未Workshop Tools实机验证。下一步完全停止并重新Run，分别确认400连锁真实选敌、LV1至LV5雷柱数量/一秒节奏/随机视觉、原死亡点500伤害区、递增倍率、雷电扩散和风暴击杀继续生成风暴。
+
+## 2026-08-12 - 外围玩家档案本地Fixture纵向切片
+
+- 用户批准按“协议先行→本地假数据→Mock HTTP→正式数据库”实施，并要求预留接口及完整docs记录。本轮只完成本地Fixture层，不宣称已有HTTP、数据库、支付或写回。
+- 新增CSV权威定义`玩家档案系统/player_profile_rules.csv`、`mock_player_account_bindings.csv`、`player_profile_public_fields.csv`和`achievement_definitions.csv`；本地样本位于`data/mock/player_profiles.json`，4个开发账号分别映射本局玩家0至3。
+- 新增Lua 5.1 JSON解码器，支持对象、数组、number、boolean、null、UTF-8和UTF-16代理对。JSON经独立生成器包装为`config/fixtures/player_profiles.lua`；Fixture不放`config/generated/`，避免CSV全量生成清理非CSV模块。
+- 新增可替换`local_fixture_provider`和统一`player_profile_service`。实现完整快照、`schema_version/revision`校验、永久账号唯一绑定、低revision快照拒绝、异步generation与迟到回调隔离；增量实现`update_id`有界幂等、`base_revision`连续性、缺口重拉标记、未知分区拒绝、JSON null字段删除和原子失败。
+- 完整档案只保存在Lua服务端并通过`PLAYER_PROFILE_GET_REQUEST`返回副本；`PLAYER_PROFILE_CHANGED`只发布身份/revision元数据。`survival_player_public_profiles`只发布CSV白名单`title_id/achievement_score/vip_badge/highest_difficulty`，不含账号、完整权益、成就、存档、库存或支付信息。
+- `player_entitlement_service`新增原子`replace_all()`；VIP权威CSV默认从true改为false。档案加载开始、Provider失败、非法快照或账号错配时权益保持关闭，只有验证后的快照或增量可授予；玩家0 Fixture为VIP，玩家1为非VIP。
+- 自动专项当前通过：`PLAYER_PROFILE_SERVICE_LUA51_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、目标Lua 5.1语法。覆盖真实Fixture加载、服务端私有副本、公开白名单、VIP投影、未知权益/成就原子拒绝、重复/乱序/缺口、低revision快照、账号错配、Provider失败、重复刷新迟到回调和Unicode代理对。
+- 长期协议、Provider签名、JSON示例、错误矩阵、隐私/支付边界及Mock HTTP/正式后端迁移顺序已写入`docs/ai/PLAYER_PROFILE_INTEGRATION.md`，稳定规则同步到`PROJECT_CONTEXT.md`和`DECISIONS.md`。
+- 最终自动验证通过：`PLAYER_PROFILE_SERVICE_LUA51_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、`MULTIPLAYER_CONTEXT_CONTRACT_PASS/LUA51_PASS`、`MULTIPLAYER_BUILDER_INTEGRATION_LUA51_PASS`；5份CSV及生成Lua逐字节一致、生成索引一致、Fixture JSON/Lua一致、14个目标Lua的`luac5.1`语法、24个本轮文件严格UTF-8、新增docs行编码、5份CSV结构、Python语法及限定`git diff --check`通过。全量生成误触的12个无关既有文件已从`HEAD`精确恢复，未触碰用户原有大量未跟踪测试。
+- 尚待：Workshop Tools冷启动、两客户端实测、正式身份方案确认、Mock HTTP、数据库、支付回调和写回。多人资源/建筑/波次隔离与玩家1地图Marker仍未完成。
+
+## 2026-08-12 - 玩家档案实机成功诊断日志
+
+- 用户指出服务器状态日志没有输出玩家0的`revision/title_id/achievement_score/vip_badge/highest_difficulty`，无法直接确认Fixture档案是否在引擎内成功加载。
+- 在公开NetTable成功写入后新增`PlayerProfile` INFO日志，直接输出最终公开投影值；本地Fixture同时输出`mock_account_*`以验证PlayerID绑定，未来非Fixture Provider统一输出`account_id=<redacted>`，不记录私有存档、完整权益、订单或认证数据。
+- 专项测试新增玩家0/1完整日志断言。`PLAYER_PROFILE_SERVICE_LUA51_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、生产与测试Lua 5.1语法、严格UTF-8和限定差异检查通过。
+- 仍待用户冷启动Workshop Tools确认玩家0日志及NetTable，并以两台电脑/两个Steam账号验收玩家0/1隔离。玩家1地图Builder Marker仍缺失，只影响完整玩法出生，不影响档案加载隔离检查。
+
+- 联机代码复核发现旧记录“`player_connect_full`负责分队”缺少当前生产实现证据；实际代码只配置好人方4人/坏人方0人，未找到显式`SetCustomTeamAssignment()`。双机验收新增检查：第二端必须取得活动`PlayerID=1`，只增加服务器连接数或进入观战不算通过。

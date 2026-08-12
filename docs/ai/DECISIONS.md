@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-08-12：玩家档案协议先行并通过可替换Provider接入
+
+- 决定：外围档案固定采用“稳定`account_id` + versioned snapshot/incremental”协议；当前本地Fixture、后续Mock HTTP和正式数据库都必须经过同一`player_profile_service`校验与提交边界。
+- 决定：`schema_version/revision/base_revision/update_id`是协议必需字段。增量严格连续且幂等，缺口或乱序重拉快照；快照不能用较低revision覆盖当前状态，异步请求用generation拒绝迟到回调。
+- 决定：付费权益默认关闭并由验证后的档案原子投影。客户端和Lua请求不得声明支付成功；正式支付只能由后端验签、订单幂等和数据库事务生成权益revision。
+- 决定：完整档案不进入Custom Net Tables。客户端只看到CSV白名单公开投影；新增公开字段必须先经过隐私审计并修改权威CSV。
+- 原因：这样可以先用假数据验证多人按账号隔离和现有商城权益链，又不会把本局`player_id`、客户端声明或临时Mock结构固化为正式数据库接口。
+
 ## 2026-08-11：逐波模型最终唯一，当前共享模型只作为可删除兼容层
 
 - 决定：最终版每个正式波次必须拥有自己的实际模型资源清单；预载、`SetModel/SetOriginalModel`和生命周期释放全部消费同一解析结果，不得依赖前一波曾经加载同路径。当前Visage普通飞行覆盖及其他跨波英雄模型复用属于资源未定稿阶段的临时兼容，代码必须使用`TODO(FINAL_WAVE_MODELS)`说明删除条件。

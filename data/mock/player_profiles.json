@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "profiles": {
+    "mock_account_10001": {
+      "revision": 3,
+      "entitlements": {
+        "vip": { "active": true }
+      },
+      "achievements": {
+        "first_wave_clear": { "progress": 1, "unlocked": true },
+        "clear_n2": { "progress": 1, "unlocked": true }
+      },
+      "save": {
+        "highest_difficulty": "N2",
+        "total_wins": 5
+      },
+      "public": {
+        "title_id": "veteran",
+        "achievement_score": 120,
+        "highest_difficulty": "N2"
+      }
+    },
+    "mock_account_10002": {
+      "revision": 1,
+      "entitlements": {
+        "vip": { "active": false }
+      },
+      "achievements": {
+        "first_wave_clear": { "progress": 0, "unlocked": false },
+        "clear_n2": { "progress": 0, "unlocked": false }
+      },
+      "save": {
+        "highest_difficulty": "N1",
+        "total_wins": 0
+      },
+      "public": {
+        "title_id": "rookie",
+        "achievement_score": 0,
+        "highest_difficulty": "N1"
+      }
+    },
+    "mock_account_10003": {
+      "revision": 1,
+      "entitlements": { "vip": { "active": false } },
+      "achievements": {},
+      "save": { "highest_difficulty": "N1", "total_wins": 0 },
+      "public": { "title_id": "", "achievement_score": 0, "highest_difficulty": "N1" }
+    },
+    "mock_account_10004": {
+      "revision": 1,
+      "entitlements": { "vip": { "active": false } },
+      "achievements": {},
+      "save": { "highest_difficulty": "N1", "total_wins": 0 },
+      "public": { "title_id": "", "achievement_score": 0, "highest_difficulty": "N1" }
+    }
+  }
+}

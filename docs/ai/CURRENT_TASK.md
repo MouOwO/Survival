@@ -50,6 +50,18 @@
 - 权威塔技能 CSV、生成技能 Lua、Tooltip CSV/Lua及六份中英本地化镜像已同步为物理伤害文案；专项生产契约同步改为验证物理伤害。
 - 尚未进行 Workshop Tools 实机验收。需用不同物理护甲敌人确认主目标及技能伤害随护甲变化、闪电主目标没有双伤、闪电跳跃击杀触发一次落雷、普通攻击/落雷/电圈击杀不触发落雷，以及仅落雷命中能触发电圈。
 
+## 当前实施任务（2026-08-12）：外围玩家档案Mock纵向切片
+
+- 用户批准先按稳定远端协议实现本地假数据版，覆盖付费权益、成就、长期存档和同局公开投影；正式数据库、支付回调、HTTP读取和游戏结果写回暂不实施。
+- 权威业务定义继续来自`data/csv/`：档案运行规则、开发账号映射、成就定义和公开字段白名单均使用CSV；玩家样本值来自`data/mock/player_profiles.json`。
+- 运行时必须通过统一Provider接口加载JSON，完整档案只保存在Lua服务端；Custom Net Tables只发布白名单公开字段，不得发布订单、金额、鉴权信息、完整库存或私有存档。
+- 首版实现完整快照、`revision/update_id`增量、幂等、迟到更新拒绝、版本缺口要求重新拉取，以及现有`player_entitlement_service`原子投影。未来HTTP Provider必须复用同一JSON解析、schema校验和提交入口。
+- 自动验证至少包含Lua 5.1 JSON/快照/增量行为、PowerShell契约、CSV生成与JSON生成一致性、现有商城权益回归、Lua 5.1语法、严格UTF-8和限定`git diff --check`。Workshop Tools验证只确认引擎初始化与NetTable发布，不等同远端数据库验证。
+- 首版生产实现已完成：统一JSON解码、Fixture Provider、完整快照、增量事务、账号绑定、代际去重、旧快照/迟到回调拒绝、VIP失败关闭、服务端完整档案查询、公开白名单NetTable及变更元事件均已接入。VIP CSV默认值已从测试期true改为false；只有验证通过的档案可授予。
+- 当前样本账号：玩家0=`mock_account_10001`（VIP、N2、120成就分），玩家1=`mock_account_10002`（非VIP、N1、0分），玩家2/3为预留非VIP空样本。详细协议和后续HTTP/数据库迁移见`docs/ai/PLAYER_PROFILE_INTEGRATION.md`。
+- 尚未实施：真实Steam身份解析、Mock HTTP、正式数据库、支付回调、存档写回和长期库存投影。仍需Workshop Tools冷启动确认主入口加载、VIP商城链及公开NetTable；自动测试不得描述为引擎或远端验证。
+- 最终自动验证通过：`PLAYER_PROFILE_SERVICE_LUA51_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、多人阶段1三项回归、5份CSV及生成Lua逐字节一致、生成索引一致、Fixture JSON/Lua一致、14个目标Lua的`luac5.1`语法、24个本轮文件严格UTF-8、新增docs行编码、5份CSV结构、Python语法及限定`git diff --check`。这些结果不等于Workshop Tools、双客户端或后端实机验证。
+
 ## 当前实施任务（2026-08-11）：第7塔路线由魔法塔重构为防空塔
 
 - 用户已批准实施：将当前第7路线“魔法塔→大魔法塔→魔法至尊”重构为“防空塔→防空火炮→空域霸主”，基础数值、升级费用、人口占用与阶段等级沿用当前CSV。
@@ -503,3 +515,12 @@
 - 未跟踪既有`test_builder_ownership.lua`失败于硬编码期望Builder移速600，而当前权威CSV和生成Lua均为300；本轮未修改移动速度逻辑。
 - 未跟踪既有`test_builder_utility_contract.ps1`失败于`MONKEY_CSV_RANGE_1000_MISSING`；与本轮多人身份改造无关，未修改该测试或Monkey配置。
 - 尚未执行Workshop Tools实机验证，不能称为联机或单人实机验收通过。
+
+## 玩家档案实机诊断补充（2026-08-12）
+
+- 玩家档案公开投影成功后打印`[Survival][INFO][PlayerProfile] public_profile_published ...`，字段包含Fixture `provider_id/player_id/account_id`、`revision`及公开白名单`title_id/achievement_score/vip_badge/highest_difficulty`；非Fixture Provider账号日志自动显示`<redacted>`。
+- 玩家0预期`mock_account_10001/revision=3/veteran/120/true/N2`；玩家1预期`mock_account_10002/revision=1/rookie/0/false/N1`。
+- 专项行为、契约、Lua 5.1语法、严格UTF-8和限定差异检查通过；仍需Workshop Tools冷启动及两客户端实机验收，不能称为实机通过。
+- 双机档案隔离可先验收；玩家1 Builder仍因地图缺少`player_1_builder_spawn`按配置失败关闭，不属于档案Provider失败。
+
+- 双机入口审计补充：生产代码当前只设置好人方容量4、坏人方0，未找到显式`SetCustomTeamAssignment()`或自定义`player_connect_full`分队实现；直连验收必须确认第二客户端取得活动`PlayerID=1`。若只进入观战，应使用Hidden/Friends Only大厅选择好人方槽位，或后续单独补充分队逻辑。

@@ -1,5 +1,13 @@
 # Project Context
 
+## 玩家档案Provider、版本协议与隐私边界（2026-08-12）
+
+- 永久档案使用稳定字符串`account_id`；Dota `player_id`只作为本局槽位，禁止成为数据库主键。正式身份可直用Steam Account ID或映射自有账号ID，但Lua协议不依赖具体方案。
+- Provider只负责`resolve_account_id`和`fetch_snapshot`传输；快照/增量JSON解析、schema校验、账号绑定、revision、update_id、原子提交、权益投影和公开投影统一归`player_profile_service`。未来HTTP Provider不得复制业务校验。
+- 付费权益默认失败关闭。加载开始、网络失败、非法JSON、账号错配或schema不支持时均不能继承测试默认权限；只有服务端验证通过的档案快照/增量可以原子替换`player_entitlement_service`状态。支付成功只能由后端验签后转成新权益revision。
+- 完整档案只保存在Lua服务端。`survival_player_public_profiles`只能发布`player_profile_public_fields.csv`白名单，禁止发布账号、完整权益、成就、存档、库存、订单、金额、签名或token。
+- 增量要求`base_revision == current_revision`且`revision == base_revision + 1`；`update_id`有界幂等。缺口/乱序返回`reload_required`，未知分区失败，JSON null只删除字段。旧完整快照、旧请求迟到回调和同局重复账号绑定都失败关闭。完整约定见`PLAYER_PROFILE_INTEGRATION.md`。
+
 ## 雷电塔连锁与击杀风暴边界（2026-08-11）
 
 - `MODIFIER_EVENT_ON_DEATH`是全局事件。防御塔的击杀触发效果必须以`params.attacker == 当前塔对象`作为权威身份，不能按同队、同玩家或任意敌方死亡推断；其他塔、英雄和其他单位击杀不得触发当前塔效果。

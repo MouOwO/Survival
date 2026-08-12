@@ -29,5 +29,6 @@
         "survival_weapon_ui_schema",
         "survival_research",
         "survival_builder_identity",
+        "survival_player_public_profiles",
     ]
 }

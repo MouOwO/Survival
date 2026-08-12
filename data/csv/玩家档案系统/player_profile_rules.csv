@@ -1,0 +1,4 @@
+profile_rule_id,provider_id,schema_version,max_processed_update_ids,publish_public_profiles,load_on_hero_ready,enabled,notes
+#中文表头:档案规则ID,数据提供器ID,协议版本,最大已处理更新ID数,发布公开档案,英雄就绪时加载,是否启用,备注
+#types:string,string,number,number,boolean,boolean,boolean,string
+default_profile,local_fixture,1,128,1,1,1,首版使用本地JSON假数据；正式HTTP Provider必须保持同一快照与增量契约。

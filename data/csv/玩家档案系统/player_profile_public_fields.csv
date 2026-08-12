@@ -1,0 +1,7 @@
+field_id,source_section,source_key,value_type,default_value,enabled,notes
+#中文表头:公开字段ID,来源分区,来源键,值类型,默认值,是否启用,备注
+#types:string,string,string,string,string,boolean,string
+title_id,public,title_id,string,,1,公开称号ID。
+achievement_score,public,achievement_score,number,0,1,公开成就总分。
+vip_badge,entitlements,vip,boolean,0,1,只公开VIP展示标记，不公开订单或支付信息。
+highest_difficulty,public,highest_difficulty,string,N1,1,公开最高通关难度。

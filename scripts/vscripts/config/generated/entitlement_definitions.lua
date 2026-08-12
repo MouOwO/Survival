@@ -2,7 +2,7 @@
 -- Source: entitlement_definitions.csv
 local M = {}
 M.rows = {
-    { entitlement_id = "vip", display_name = "VIP英雄召唤权限", default_unlocked = true, test_cheat_name = "setvip", enabled = true, notes = "测试阶段默认VIP=true；正式发布时接入存档/平台权益并改回false。" },
+    { entitlement_id = "vip", display_name = "VIP英雄召唤权限", default_unlocked = false, test_cheat_name = "setvip", enabled = true, notes = "默认关闭；只有服务端验证通过的玩家档案或测试作弊指令可以授予VIP。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

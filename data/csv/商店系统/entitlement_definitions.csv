@@ -1,4 +1,4 @@
 ﻿entitlement_id,display_name,default_unlocked,test_cheat_name,enabled,notes
 #中文名:权益ID,显示名称,默认解锁,测试作弊指令,是否启用,备注
 #types:string,string,boolean,string,boolean,string
-vip,VIP英雄召唤权限,1,setvip,1,测试阶段默认VIP=true；正式发布时接入存档/平台权益并改回false。
+vip,VIP英雄召唤权限,0,setvip,1,默认关闭；只有服务端验证通过的玩家档案或测试作弊指令可以授予VIP。

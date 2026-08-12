@@ -1,0 +1,7 @@
+binding_id,player_id,account_id,enabled,notes
+#中文表头:绑定ID,本局玩家ID,开发账号ID,是否启用,备注
+#types:string,number,string,boolean,string
+mock_player_0,0,mock_account_10001,1,仅用于本地假数据Provider；正式环境不得把player_id作为永久账号主键。
+mock_player_1,1,mock_account_10002,1,仅用于双人联机假数据验证。
+mock_player_2,2,mock_account_10003,1,预留第三名玩家假账号。
+mock_player_3,3,mock_account_10004,1,预留第四名玩家假账号。
