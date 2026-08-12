@@ -279,6 +279,7 @@
 - 资源树视觉权威源是`data/csv/资源系统/world_visual_definitions.csv`，由`config/tree_config.lua`读取生成表并由`tree_system.lua`应用；单位KV只保留首帧/异常回退。
 - 伐木工和修理工分级模型直接使用`training_definitions.csv.model_name`，`worker_system.lua`在具体训练行创建实体后统一应用。不要为工人另建重复等级视觉表。
 - 主城、召唤祭坛、研究所、农场与金矿的普通建筑视觉权威源是`building_visual_levels.csv`。普通建筑由`buildings_config.lua`按`building_id+level`合并到战斗等级数据；金矿使用独立`gold_mine_system`升级链，因此`gold_mine_config.level_data()`必须把金矿固定视觉行投影到全部等级。两条提交链最终均复用`building_visual_service.apply()`。
+- 项目创建的模型组件统一由`visual/model_appearance_service.lua`管理实体句柄；`Apply/Refresh`先清理旧组件，任一声明组件创建或绑定失败时清理本轮部分结果并返回失败，`Clear`负责死亡和删除生命周期。组件路径继续以`asset_components.csv`为权威，预载继续复用`asset_preload_service`；成功明细仅在`survival_model_appearance_debug=1`时输出。
 - 普通建筑视觉表可直接使用`model_name/model_scale/model_yaw`，不强制进入复杂塔套装的`asset_catalog.csv`。当前`asset_catalog.csv`存在27列表头与大量22列历史行不一致，未修复前不得为普通模型任务强行生成或批量补列。
 - 新增分级模型必须同步：CSV、生成Lua、运行时消费者、模型预缓存和单位KV的LV1回退；模型路径需从当前`pak01_dir.vpk`索引确认，自动验证不能代替Workshop Tools中的尺寸、动画和朝向验收。
 - 当前Dota不包含`models/heroes/tiny/tiny.vmdl_c`；基础Tiny有效主体是`models/heroes/tiny/tiny_01/tiny_01.vmdl_c`。W18/W19灰色傀儡、九转Boss、`monster_tiny`资产和`asset_proxy_monster_tiny`必须保持该路径一致。异步预载READY回调不能作为路径存在或客户端可渲染的证据。

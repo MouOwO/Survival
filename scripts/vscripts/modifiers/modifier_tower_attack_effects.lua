@@ -42,10 +42,13 @@ local GATLING_ATTACK_COUNT = 5
 local DEFAULT_FROST_SLOW_DURATION = 2
 local FROST_SLOW_PCT = 25
 local DEFAULT_BLIZZARD_RADIUS = 300
-local DEFAULT_BLIZZARD_DURATION = 5
+local DEFAULT_BLIZZARD_DURATION = 4
 local DEFAULT_BLIZZARD_INTERVAL = 1
 local DEFAULT_BLIZZARD_DAMAGE_MULTIPLIER = 0.5
 local BLIZZARD_SLOW_PCT = 25
+local BLIZZARD_ICE_FALL_HEIGHT = 700
+local BLIZZARD_ICE_FALL_DURATION = 0.35
+local BLIZZARD_ICE_FALL_STEP = 0.03
 local ANTI_AIR_MISSILE_INTERVAL = 0.10
 local AIRSPACE_AURA_REFRESH_INTERVAL = 0.20
 local AIRSPACE_AURA_BUFF_DURATION = 0.35
@@ -71,6 +74,7 @@ local DEFAULT_STORM_CLOUD_PARTICLE =
     "particles/units/heroes/hero_disruptor/disruptor_static_storm.vpcf"
 local DEFAULT_STORM_STRIKE_PARTICLE =
     "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
+local LIGHTNING_ATTACK_PLAYBACK_RATE = 2
 
 local function skill_effect_particle(unit, skill, role, fallback, fallback_asset_id)
     local skill_id = type(skill) == "table" and skill.skill_id or nil
@@ -129,9 +133,12 @@ local function is_arrow_tower(unit)
         and unit:GetUnitName() == "building_arrow_tower"
 end
 
-local function laser_config(skill)
+local function laser_config(unit, skill)
     if not skill then return nil end
-    local row = (laser_effects.by_id or {})[skill.skill_id]
+    local by_id = laser_effects.by_id or {}
+    local asset_id = unit and unit.survival_model_asset_id or nil
+    local row = asset_id and by_id[skill.skill_id .. ":" .. asset_id] or nil
+    row = row or by_id[skill.skill_id .. ":default"] or by_id[skill.skill_id]
     return row and row.enabled ~= false and row or nil
 end
 
@@ -320,7 +327,8 @@ local function trigger_gatling_buff(tower, skill, reason)
 end
 
 function modifier_tower_attack_effects:GetModifierAttackPointConstant()
-    local effect = laser_config(skill_matching(self:GetParent(), "laser_"))
+    local parent = self:GetParent()
+    local effect = laser_config(parent, skill_matching(parent, "laser_"))
     return effect and math.max(0, tonumber(effect.attack_point) or 0) or nil
 end
 
@@ -338,13 +346,6 @@ function modifier_tower_attack_effects:OnDeath(params)
     -- this modifier's own tower is the actual killer; team/player ownership
     -- is deliberately insufficient because heroes and towers are isolated
     -- combat domains.
-    local storm = skill_matching(tower, "lightning_storm_")
-    if is_arrow_tower(tower) and owns_skill_ability(tower, storm)
-        and victim and not victim:IsNull()
-        and victim:GetTeamNumber() ~= tower:GetTeamNumber() then
-        start_lightning_storm(tower, victim:GetAbsOrigin(), storm)
-    end
-
     local gatling = skill_matching(tower, "explosive_gatling_")
     if gatling and victim and not victim:IsNull()
         and victim:GetTeamNumber() ~= tower:GetTeamNumber() then
@@ -457,17 +458,27 @@ local function lightning_particle(caster, source_unit, target_unit,
     ParticleManager:ReleaseParticleIndex(particle)
 end
 
-local function deal(caster, target, amount, source_kind, tags)
-    if not valid(target) then return end
-    damage_service:Deal({
+local function deal(caster, target, amount, source_kind, tags, damage_type)
+    if not valid(target) then return nil end
+    return damage_service:Deal({
         attacker = caster,
         victim = target,
         base_damage = math.max(0, amount),
-        damage_type = DAMAGE_TYPE_PHYSICAL,
+        damage_type = damage_type or DAMAGE_TYPE_PHYSICAL,
         source_kind = source_kind or "script",
         can_crit = false,
         tags = tags or {},
     })
+end
+
+local function trigger_chain_kill_storm(caster, target)
+    if not exists(target) or target:IsAlive() or not is_arrow_tower(caster) then
+        return
+    end
+    local storm = skill_matching(caster, "lightning_storm_")
+    if storm and owns_skill_ability(caster, storm) then
+        start_lightning_storm(caster, target:GetAbsOrigin(), storm)
+    end
 end
 
 area_radius = function(skill, fallback)
@@ -506,6 +517,10 @@ end
 
 local function trigger_frost_attack(caster, primary, skill, damage)
     local radius = area_radius(skill, 100)
+    local splash_multiplier = math.max(
+        0, tonumber(skill.damage_multiplier) or 0.5
+    )
+    local splash_damage = damage * splash_multiplier
     local duration = math.max(
         0.1, tonumber(skill.duration) or DEFAULT_FROST_SLOW_DURATION
     )
@@ -520,10 +535,10 @@ local function trigger_frost_attack(caster, primary, skill, damage)
     local hit_count = 0
     for _, target in ipairs(enemies_in_radius(caster, position, radius)) do
         if valid(target) then
-            -- 主目标已由普通攻击造成伤害，只给其施加减速；其余目标承受
-            -- 与本次普通攻击相同的物理范围伤害。
             if target ~= primary then
-                deal(caster, target, damage, "splash", { "tower_frost_attack" })
+                deal(caster, target, splash_damage, "splash", {
+                    "tower_frost_attack",
+                })
             end
             apply_slow(
                 caster, target, skill.buff_id,
@@ -533,21 +548,10 @@ local function trigger_frost_attack(caster, primary, skill, damage)
         end
     end
     detailed_log(
-        "[TowerFrost] HIT tower=%d target=%d radius=%.0f damage=%.1f targets=%d slow=%d duration=%.1f",
-        caster:entindex(), primary:entindex(), radius, damage, hit_count,
-        FROST_SLOW_PCT, duration
+        "[TowerFrost] HIT tower=%d target=%d radius=%.0f primary_damage=%.1f splash_damage=%.1f targets=%d slow=%d duration=%.1f",
+        caster:entindex(), primary:entindex(), radius, damage, splash_damage,
+        hit_count, FROST_SLOW_PCT, duration
     )
-end
-
-local function blizzard_particle(caster, position, radius, particle_name)
-    local particle = ParticleManager:CreateParticle(
-        particle_name or
-            "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_snow.vpcf",
-        PATTACH_WORLDORIGIN, caster
-    )
-    ParticleManager:SetParticleControl(particle, 0, position)
-    ParticleManager:SetParticleControl(particle, 1, Vector(radius, radius, radius))
-    return particle
 end
 
 local function blizzard_explosion_particle(caster, position, particle_name)
@@ -558,6 +562,40 @@ local function blizzard_explosion_particle(caster, position, particle_name)
     )
     ParticleManager:SetParticleControl(particle, 0, position)
     ParticleManager:ReleaseParticleIndex(particle)
+end
+
+local function falling_ice_particle(caster, position, particle_name, on_impact)
+    local particle = ParticleManager:CreateParticle(
+        particle_name or
+            "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
+        PATTACH_WORLDORIGIN, caster
+    )
+    local elapsed = 0
+    ParticleManager:SetParticleControl(
+        particle, 0, position + Vector(0, 0, BLIZZARD_ICE_FALL_HEIGHT)
+    )
+    scheduler.every(BLIZZARD_ICE_FALL_STEP, function()
+        if not valid(caster) then
+            ParticleManager:DestroyParticle(particle, false)
+            ParticleManager:ReleaseParticleIndex(particle)
+            return false
+        end
+        elapsed = math.min(
+            BLIZZARD_ICE_FALL_DURATION, elapsed + BLIZZARD_ICE_FALL_STEP
+        )
+        local progress = elapsed / BLIZZARD_ICE_FALL_DURATION
+        ParticleManager:SetParticleControl(
+            particle, 0,
+            position + Vector(
+                0, 0, BLIZZARD_ICE_FALL_HEIGHT * (1 - progress)
+            )
+        )
+        if progress < 1 then return BLIZZARD_ICE_FALL_STEP end
+        ParticleManager:DestroyParticle(particle, false)
+        ParticleManager:ReleaseParticleIndex(particle)
+        on_impact()
+        return false
+    end)
 end
 
 local function start_blizzard(caster, position, skill)
@@ -580,18 +618,15 @@ local function start_blizzard(caster, position, skill)
         "blizzard_%d_%d_%d", caster:entindex(),
         math.floor(GameRules:GetGameTime() * 1000), RandomInt(1, 999999)
     )
-    local snow_particle_name = skill_effect_particle(
-        caster, skill, "skill_persistent",
-        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_snow.vpcf",
-        "tower_frost_crystal_maiden_winter_raven"
-    )
     local explosion_particle_name = skill_effect_particle(
         caster, skill, "skill_strike",
         "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
         "tower_frost_crystal_maiden_winter_raven"
     )
-    local snow = blizzard_particle(
-        caster, position, radius, snow_particle_name
+    local falling_particle_name = skill_effect_particle(
+        caster, skill, "skill_chain",
+        "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1_shard.vpcf",
+        "tower_frost_crystal_maiden_winter_raven"
     )
     play_tower_sound("tower_ice_blizzard", caster, caster, position)
     local tick = 0
@@ -602,32 +637,44 @@ local function start_blizzard(caster, position, skill)
     scheduler.every(interval, function()
         tick = tick + 1
         if not valid(caster) then
-            ParticleManager:DestroyParticle(snow, false)
-            ParticleManager:ReleaseParticleIndex(snow)
             return false
         end
-        blizzard_explosion_particle(caster, position, explosion_particle_name)
-        local hit_count = 0
-        for _, target in ipairs(enemies_in_radius(caster, position, radius)) do
-            if valid(target) then
-                deal(caster, target, damage, "ability", {
-                    "tower_ice_blizzard", instance_id,
-                    "tick_" .. tostring(tick),
-                })
-                apply_slow(
-                    caster, target, skill.buff_id,
-                    slow_duration, BLIZZARD_SLOW_PCT
+        local angle = RandomFloat(0, math.pi * 2)
+        local distance = radius * math.sqrt(RandomFloat(0, 1))
+        local impact_position = position + Vector(
+            math.cos(angle) * distance,
+            math.sin(angle) * distance,
+            0
+        )
+        local wave = tick
+        falling_ice_particle(caster, impact_position, falling_particle_name,
+            function()
+                if not valid(caster) then return end
+                blizzard_explosion_particle(
+                    caster, impact_position, explosion_particle_name
                 )
-                hit_count = hit_count + 1
+                local hit_count = 0
+                for _, target in ipairs(
+                        enemies_in_radius(caster, position, radius)) do
+                    if valid(target) then
+                        deal(caster, target, damage, "ability", {
+                            "tower_ice_blizzard", instance_id,
+                            "tick_" .. tostring(wave),
+                        })
+                        apply_slow(
+                            caster, target, skill.buff_id,
+                            slow_duration, BLIZZARD_SLOW_PCT
+                        )
+                        hit_count = hit_count + 1
+                    end
+                end
+                detailed_log(
+                    "[TowerBlizzard] TICK tower=%d instance=%s tick=%d targets=%d",
+                    caster:entindex(), instance_id, wave, hit_count
+                )
             end
-        end
-        detailed_log(
-            "[TowerBlizzard] TICK tower=%d instance=%s tick=%d targets=%d",
-            caster:entindex(), instance_id, tick, hit_count
         )
         if tick >= tick_limit then
-            ParticleManager:DestroyParticle(snow, false)
-            ParticleManager:ReleaseParticleIndex(snow)
             return false
         end
         return interval
@@ -635,6 +682,7 @@ local function start_blizzard(caster, position, skill)
 end
 
 M._start_blizzard_for_test = start_blizzard
+M._trigger_frost_attack_for_test = trigger_frost_attack
 M._sync_polar_obelisk_aura_for_test = sync_polar_obelisk_aura
 
 local function storm_radius(skill)
@@ -776,6 +824,8 @@ start_lightning_storm = function(caster, position, skill)
     return task_id
 end
 
+M._start_lightning_storm_for_test = start_lightning_storm
+
 local function split_arrow(caster, target, damage, projectile_name)
     if not valid(caster) or not valid(target) then return end
     local distance = (target:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
@@ -853,18 +903,12 @@ local function continue_lightning_chain(caster, source_unit, source_position,
             caster:entindex(), source_entindex, next_target:entindex(),
             next_count, max_targets, multiplier
         )
-        deal(caster, next_target, base_damage * multiplier, "ability", {
+        local result = deal(caster, next_target, base_damage * multiplier, "ability", {
             "tower_chain_lightning", "bounce_" .. tostring(next_count),
         })
-        event_bus.emit(events.TOWER_LIGHTNING_HIT, {
-            tower = caster,
-            target = next_target,
-            damage = base_damage * multiplier,
-            skills = tower_skills.get(caster),
-            source = "chain_lightning",
-            can_trigger_diffusion = true,
-            hit_count = next_count,
-        })
+        if result and result.success then
+            trigger_chain_kill_storm(caster, next_target)
+        end
         continue_lightning_chain(
             caster, next_target, next_position, next_target:entindex(), base_damage,
             next_count, max_targets, hit, radius, particle_name
@@ -911,9 +955,10 @@ local function create_laser_segment(self, effect, now)
     )
     table.insert(self.laser_particles, {
         index = index,
-        expires_at = now + math.max(
-            0.03, tonumber(effect.visual_segment_duration) or 0.18
-        ),
+        expires_at = effect.beam_mode == "continuous" and math.huge
+            or now + math.max(
+                0.03, tonumber(effect.visual_segment_duration) or 0.18
+            ),
     })
     update_laser_position(self, effect)
 end
@@ -938,9 +983,12 @@ function modifier_tower_attack_effects:OnIntervalThink()
     self.last_interval_time = now
     sync_airspace_aura(self, caster, elapsed)
     local laser = skill_matching(caster, "laser_")
-    local effect = laser_config(laser)
+    local effect = laser_config(caster, laser)
     local target = self.laser_target
+    local active_attack_target = type(caster.GetAttackTarget) == "function"
+        and caster:GetAttackTarget() or self.current_attack_target
     if not laser or not effect or not valid(caster) or not valid(target)
+        or active_attack_target ~= target
         or target:GetTeamNumber() == caster:GetTeamNumber()
         or (target:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
             > caster:GetAcquisitionRange() + 96 then
@@ -954,23 +1002,25 @@ function modifier_tower_attack_effects:OnIntervalThink()
         self.current_update_interval = update_interval
         self:StartIntervalThink(update_interval)
     end
-    local visible = {}
-    for _, segment in ipairs(self.laser_particles or {}) do
-        if segment.expires_at > now then
-            table.insert(visible, segment)
-        else
-            ParticleManager:DestroyParticle(segment.index, false)
-            ParticleManager:ReleaseParticleIndex(segment.index)
+    if effect.beam_mode ~= "continuous" then
+        local visible = {}
+        for _, segment in ipairs(self.laser_particles or {}) do
+            if segment.expires_at > now then
+                table.insert(visible, segment)
+            else
+                ParticleManager:DestroyParticle(segment.index, false)
+                ParticleManager:ReleaseParticleIndex(segment.index)
+            end
         end
-    end
-    self.laser_particles = visible
-    self.laser_visual_elapsed = self.laser_visual_elapsed + elapsed
-    local visual_interval = math.max(
-        update_interval, tonumber(effect.visual_refresh_interval) or 0.12
-    )
-    if self.laser_visual_elapsed + 0.001 >= visual_interval then
-        self.laser_visual_elapsed = self.laser_visual_elapsed % visual_interval
-        create_laser_segment(self, effect, now)
+        self.laser_particles = visible
+        self.laser_visual_elapsed = self.laser_visual_elapsed + elapsed
+        local visual_interval = math.max(
+            update_interval, tonumber(effect.visual_refresh_interval) or 0.12
+        )
+        if self.laser_visual_elapsed + 0.001 >= visual_interval then
+            self.laser_visual_elapsed = self.laser_visual_elapsed % visual_interval
+            create_laser_segment(self, effect, now)
+        end
     end
     update_laser_position(self, effect)
     self.laser_elapsed = self.laser_elapsed + elapsed
@@ -1004,14 +1054,22 @@ function modifier_tower_attack_effects:OnAttackStart(params)
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
     local attack_activity = rawget(_G, "ACT_DOTA_ATTACK")
-    if DEATH_TOWER_ANIMATED_ASSETS[caster.survival_model_asset_id]
+    local lightning = skill_matching(caster, "lightning_strike_")
+    if lightning and attack_activity ~= nil then
+        if type(caster.StartGestureWithPlaybackRate) == "function" then
+            pcall(
+                caster.StartGestureWithPlaybackRate,
+                caster,
+                attack_activity,
+                LIGHTNING_ATTACK_PLAYBACK_RATE
+            )
+        elseif type(caster.StartGesture) == "function" then
+            pcall(caster.StartGesture, caster, attack_activity)
+        end
+    elseif DEATH_TOWER_ANIMATED_ASSETS[caster.survival_model_asset_id]
         and attack_activity ~= nil
         and type(caster.StartGesture) == "function" then
-        pcall(
-            caster.StartGesture,
-            caster,
-            attack_activity
-        )
+        pcall(caster.StartGesture, caster, attack_activity)
     end
     event_bus.emit(events.TOWER_ATTACK_START, {
         tower = caster,
@@ -1019,7 +1077,7 @@ function modifier_tower_attack_effects:OnAttackStart(params)
         skills = tower_skills.get(caster),
     })
     local laser = skill_matching(caster, "laser_")
-    local effect = laser_config(laser)
+    local effect = laser_config(caster, laser)
     if laser and effect and valid(target)
         and target:GetTeamNumber() ~= self:GetParent():GetTeamNumber() then
         start_laser(self, target, effect)
@@ -1104,7 +1162,12 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
     local skills = tower_skills.get(caster)
     local damage = caster:GetAverageTrueAttackDamage(caster)
     local critical_multiplier = tonumber(self.pending_critical_multiplier) or 1
-    local landed_damage = tonumber(params.damage) or damage * critical_multiplier
+    local lightning = skill_matching(caster, "lightning_strike_")
+    local frost = skill_matching(caster, "frost_attack_")
+    local landed_damage = damage * critical_multiplier
+    if lightning then
+        trigger_chain_kill_storm(caster, primary)
+    end
     event_bus.emit(events.TOWER_ATTACK_LANDED, {
         tower = caster,
         target = primary,
@@ -1127,9 +1190,8 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
             })
         end
     end
-    local frost = skill_matching(caster, "frost_attack_")
     if frost then
-        trigger_frost_attack(caster, primary, frost, damage)
+        trigger_frost_attack(caster, primary, frost, landed_damage)
     end
     local blizzard = skill_matching(caster, "ice_blizzard_")
     if blizzard then
@@ -1194,7 +1256,7 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         if row.skill_id and string.match(row.skill_id, "^lightning_strike_") then lightning = row end
     end
     local laser = skill_matching(caster, "laser_")
-    local effect = laser_config(laser)
+    local effect = laser_config(caster, laser)
     if laser and effect then
         start_laser(self, primary, effect)
     end
@@ -1216,15 +1278,6 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         play_tower_sound(
             "tower_lightning_strike", caster, primary, primary_position
         )
-        event_bus.emit(events.TOWER_LIGHTNING_HIT, {
-            tower = caster,
-            target = primary,
-            damage = landed_damage,
-            skills = skills,
-            source = "chain_lightning",
-            can_trigger_diffusion = true,
-            hit_count = 1,
-        })
         detailed_log(
             "[TowerLightning] START tower=%d target=%d hit=1/%d multiplier=1.00 particle=%s",
             caster:entindex(), primary:entindex(), max_targets,

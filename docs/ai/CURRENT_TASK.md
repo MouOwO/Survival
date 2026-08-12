@@ -16,6 +16,40 @@
 - 尚未Workshop Tools实机验收：需完全冷启动，双玩家分别验证数量隔离/Ability动态恢复，连续五轮合成的实体与攻击流，齐天大圣R多塔往返/非法落点，以及施工中城墙、主城和已完工城墙三类死亡结果。自动测试不能称为实机验证。
 - 恢复冲突：此前文件顶部仍记录第7塔路线任务；本轮以用户当前批准的插入任务为最高优先级，旧记录保留为历史上下文但不作为当前实施目标。
 
+## 当前实施任务（2026-08-12）：凤凰终级激光视觉修复与冰塔技能调整
+
+- 2026-08-12第二次实机反馈：Phoenix Sun Ray方案仍有问题，用户要求彻底停用凤凰激光资源，Phoenix直接沿用已成功的普通激光塔Tinker Laser；寒冰尖塔现有冰锥只有落地爆炸，需要补充清晰的空中下落过程。
+- 用户实机确认防空塔LV1-LV10天怒至宝第二分支及其余阶段内容全部通过；当前仅剩终级Phoenix红色缺材质和Solar Forge Sun Ray表现错误。
+- Phoenix保留现有塔模型组件，但彻底停用Solar Forge Sun Ray；专用配置与普通五级激光一致，使用Tinker Laser和segmented短段重播，Gameplay数值不变。
+- 冰霜攻击LV1-LV5保留主目标原生普通攻击全额伤害，半径内其他目标只承受该次攻击50%的物理范围伤害；范围内所有目标继续减速25%持续2秒。
+- 寒冰尖塔LV1-LV5保留10/12/14/16/16%触发率、每波触发时攻击力50%的物理伤害和25%减速，统一为300码、每1秒一波、共4波；每波先从落点上方700单位生成Frost Avalanche冰片并在0.35秒内下落，落地后播放爆炸并结算伤害。
+- 权威数值与资源配置继续来自`data/csv/`；自动验证不等于Workshop Tools实机验收，最终需冷启动确认Phoenix使用Tinker Laser表现正常，以及寒冰尖塔落冰观感。
+- 实现完成：Phoenix专用激光回退为`particles/units/heroes/hero_tinker/tinker_laser.vpcf`和`segmented`模式，起止高度、刷新和保留时长均与`laser_lv05:default`一致；不再进入Sun Ray continuous分支。
+- 冰霜攻击五级均从CSV读取`damage_multiplier=0.5`，只对非主目标提交范围物理伤害，主目标不重复结算；寒冰尖塔五级统一300码、4秒、1秒间隔、每波50%攻击力，去除持续雪场。下落段从CSV读取`maiden_freezing_field_snow_arcana1_shard.vpcf`，落地段继续读取Frost Avalanche explosion。
+- 自动验证通过：本轮两个CSV定向生成、`FROST_TOWER_ROUTE_PASS`（含4个高空冰片、逐步下落、落地后4波伤害与爆炸）、`PHOENIX_LASER_CONTRACT_PASS`、`ASSET_BUNDLE_CONFIG_PASS`、下落冰片VPK路径、相关Lua 5.1语法及限定`git diff --check`。尚需Workshop Tools冷启动确认下落冰片尺寸、朝向和可见度。
+
+## 当前实施任务（2026-08-12）：闪电塔双倍攻速伤害实验与攻击动画同步
+
+- 用户要求为伤害猜想进行临时实验：闪电路线全部20级的基础攻速由每秒1次提高为每秒2次。
+- 每次持有 `lightning_strike_` 的塔开始普通攻击时，主动播放2倍速 `ACT_DOTA_ATTACK`，使闪电链释放节奏与攻击频率同步；不改变0.1秒连锁跳跃间隔、伤害倍率和触发链。
+- 权威数值必须来自 `data/csv/建筑与工人系统/防御塔/tower_class_lightning.csv` 并重新生成 Lua。该CSV当前存在本轮之前的乱码修改，用户已明确选择恢复正常文本后实施全部20级改动。
+- 自动验收应覆盖20行CSV/生成Lua攻速均为2、闪电攻击动画倍率为2、非闪电塔不进入该动画分支、现有闪电伤害与触发链专项测试、Lua 5.1语法和限定差异检查；Workshop Tools负责最终视觉节奏验收。
+- 实现完成：闪电路线CSV已从错误的GB18030工作树编码无损转换回UTF-8 BOM，20行中文与资源字段完整保留；全部等级基础攻速设为2并已重新生成配置。持有`lightning_strike_`的塔在攻击开始时调用`StartGestureWithPlaybackRate(ACT_DOTA_ATTACK, 2)`，API不可用时回退普通`StartGesture`；非闪电死亡塔仍走原动画分支。
+- 自动验证通过：84模块配置生成、`TOWER_LIGHTNING_VISUAL_PASS`、`LIGHTNING_FROST_PHYSICAL_CONTRACT_PASS`、CSV与生成Lua各20行攻速精确为2、CSV UTF-8 BOM与中文名称检查、两个目标Lua 5.1语法及限定`git diff --check`。尚未进行Workshop Tools实机动画节奏验收。
+
+## 当前实施任务（2026-08-11）：闪电/寒冰塔技能恢复物理伤害并保留收窄后的闪电触发链
+
+- 用户要求回滚魔法伤害版本：闪电打击和冰霜攻击恢复原生物理主攻击，后续跳跃、冰霜范围伤害、暴风雪、落雷和电圈均恢复物理伤害并进入护甲结算。
+- 闪电塔落雷只由闪电打击造成击杀时触发；普通攻击、落雷和电圈击杀不得触发新的落雷。
+- 电圈只由落雷命中事件触发；闪电打击直接命中、电圈自身伤害和其他来源不得触发电圈，电圈不得递归。
+- 伤害来源必须显式保留在本次技能伤害事务边界内，不能继续按“当前塔是 attacker”推断落雷触发来源。
+- 权威技能说明继续来自 `data/csv/建筑与工人系统/防御塔/tower_skill_definitions.csv`，生成 Lua、Tooltip 和本地化镜像必须由现有生成链同步产出。
+- 自动验收覆盖原生主攻击未被抑制、相关脚本伤害使用 `DAMAGE_TYPE_PHYSICAL`、闪电击杀/落雷/电圈触发边界、配置生成一致性、Lua 5.1 语法、严格编码和限定 `git diff --check`；Workshop Tools 冷启动仍是最终护甲实机验收。
+- 实现完成：Modifier 不再抑制闪电打击/冰霜攻击的引擎原生攻击，闪电首目标不再提交额外脚本伤害；连锁跳跃、冰霜范围、暴风雪、落雷和电圈均通过物理伤害结算。闪电打击主目标或跳跃致死后仍直接启动一次落雷，旧的全局 `OnDeath` 落雷入口保持移除。
+- 电圈入口继续硬校验 `source == "lightning_storm"`；闪电打击不发布 `TOWER_LIGHTNING_HIT`，生产 Modifier 仅剩落雷发布点，电圈伤害不发布命中事件，因此不递归。
+- 权威塔技能 CSV、生成技能 Lua、Tooltip CSV/Lua及六份中英本地化镜像已同步为物理伤害文案；专项生产契约同步改为验证物理伤害。
+- 尚未进行 Workshop Tools 实机验收。需用不同物理护甲敌人确认主目标及技能伤害随护甲变化、闪电主目标没有双伤、闪电跳跃击杀触发一次落雷、普通攻击/落雷/电圈击杀不触发落雷，以及仅落雷命中能触发电圈。
+
 ## 当前实施任务（2026-08-11）：第7塔路线由魔法塔重构为防空塔
 
 - 用户已批准实施：将当前第7路线“魔法塔→大魔法塔→魔法至尊”重构为“防空塔→防空火炮→空域霸主”，基础数值、升级费用、人口占用与阶段等级沿用当前CSV。
@@ -229,6 +263,18 @@
 - 自动验证通过：`SIX_GAMEPLAY_FIXES_CONTRACT_PASS`、`SIX_GAMEPLAY_FIXES_LUA51_PASS`、`UNIT_MODEL_CONFIG_LUA51_PASS`、两份生成Lua逐字节一致、相关Lua 5.1语法、严格UTF-8和限定`git diff --check`。`building_system.lua`保留既有UTF-8 BOM，使用临时去BOM副本完成语法检查，未重写生产编码。
 - 全局单位模型旧契约在更新过时的`tower_good4`要求后，仍只失败于任务前已知的无关伐木工CSV缺项`creep_bad_melee_cavern_mega.vmdl`；本任务未修改无关伐木工数据迎合测试。
 - 尚未Workshop Tools实机验收。必须完全停止并重新Run后，确认完工金矿可通过鼠标点击模型主体选中、五个技能正常显示，且施工/完工尺寸、收益、升级、血条、上限和人口占用无回归。
+
+## 已完成待实机验收（2026-08-12）：死亡/闪电/激光/防空塔阶段饰品与凤凰激光
+
+- CSV权威源已更新：死亡塔一阶段使用Templar Assassin `Darkblade Adept`四件套；闪电二阶段使用基础Leshrac，三阶段使用Razor `Voidstorm Asylum` Arcana主体与五件套；激光三阶段依次使用Keeper of the Light `Forgotten Renegade`、Outworld Destroyer `Blackgate Sentinel`、Phoenix基础主体加`Solar Forge`头和`Solar Gyre`翅膀；防空三阶段依次使用Gyrocopter `Swooping Elder`、Batrider `Empiric Incendiary`、Skywrath Mage至宝`The Devotions of Dragonus`第二分支“天怒一族尊主”。
+- `items_schinese.txt`与`items_game.txt`交叉确认：劫烧狂客为`Empiric Incendiary` Bundle 21239；天怒目标为Bundle 22277“倾天之战：扎贡纳斯的献身”，核心翅膀物品18539负责替换`skywrath_arcana.vmdl`主体，Style Unlock 27601解锁style 1 / skin 1。空域霸主现使用至宝主体、18539-18544六件组件、第二分支常驻粒子与`skywrath_arcana_base_attack_v2.vpcf`弹道；旧版将其误判为单件`Empyrean`（物品6892）的结论已作废。
+- 闪电链`lightning_strike_lv01-lv05.area`统一为500；雷暴`lightning_storm_lv01-lv05.area`统一为300，并同步描述。保留任务前已有的闪电塔全阶段`base_attack_speed=2`及其余物理伤害/技能链修改。
+- `tower_laser_effects.csv`改用`effect_key`索引，保留五条技能默认Tinker Laser行，并增加`laser_lv05:tower_laser_phoenix_solar`；运行时按`skill_id + survival_model_asset_id`优先选择，找不到时回退技能默认，因此只有Phoenix阶段使用Solar Forge Sun Ray。
+- Phoenix激光继续同步CP9/CP0源点与CP1目标点；本机资源定义没有要求额外控制点，因此未扩展未经验证的控制点逻辑。新增八个精确主体预载代理，组件和粒子继续由资源子表预载链负责。
+- `tools/build_configs.py`成功生成84个Lua配置模块。自动验证通过：`ASSET_BUNDLE_CONFIG_PASS`、`TOWER_LIGHTNING_VISUAL_PASS`、`DEATH_TOWER_TEMPLAR_VISUAL_PASS`、`ANTI_AIR_TOWER_LUA51_PASS`、`TOWER_STAGE_VISUAL_ROUTES_PASS`、`TOWER_SKILL_GEOMETRY_PASS`、`ANTI_AIR_TOWER_CONTRACT_PASS`、`RESOURCE_PATH_CHECK_PASS`、`LIGHTNING_RANGE_CONTRACT_PASS`、`PHOENIX_LASER_CONTRACT_PASS`、相关Lua 5.1语法与`git diff --check`。
+- 路线Gameplay列对比：死亡、激光、防空除模型字段外0差异；闪电仅保留任务开始前已有的20条攻速`1 -> 2`差异。本轮未修改其他塔数值、伤害、眩晕、光环、费用、人口或升级逻辑。
+- 天怒至宝纠正专项验证通过：`ASSET_BUNDLE_CONFIG_PASS`、`TOWER_STAGE_VISUAL_ROUTES_PASS`、`ANTI_AIR_TOWER_LUA51_PASS`、`ANTI_AIR_SKYWRATH_CSV_CONTRACT_PASS`、`ANTI_AIR_GAMEPLAY_COLUMNS_UNCHANGED_PASS`、`SKYWRATH_ARCANA_STYLE1_RESOURCE_PATH_PASS`（主体、六件组件、四个粒子共11条VPK资源）、相关Lua 5.1语法及`git diff --check`。未跟踪的旧`tools/test_anti_air_tower_contract.ps1`在Windows PowerShell 5.1中因无BOM UTF-8中文路径被误解码，于`Import-Csv`前失败；其数值契约由Lua测试和独立CSV列对比覆盖，本次未修改该无关脚本。
+- 尚未Workshop Tools冷启动实机验收。需要完全停止并重新Run，逐阶段确认组件骨骼合并、模型尺寸、动作、头像、升级换模，以及Phoenix Solar Forge Sun Ray的源点、目标点、持续重播和停止攻击/目标死亡时清理。
 
 ## 当前插入任务（2026-08-08）：城墙升级增加最大生命差值
 

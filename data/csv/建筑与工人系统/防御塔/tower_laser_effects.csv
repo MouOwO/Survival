@@ -1,8 +1,9 @@
-skill_id,particle_name,attack_point,beam_update_interval,visual_refresh_interval,visual_segment_duration,source_offset_z,target_offset_z,damage_increment_pct,max_damage_multiplier,enabled,notes
-#ÖĞÎÄÃû:¼¼ÄÜID,ÌØĞ§×ÊÔ´,¹¥»÷Ç°Ò¡,¹âÊø×ø±êË¢ĞÂ¼ä¸ô,ÊÓ¾õ¶ÎÖØ²¥¼ä¸ô,ÊÓ¾õ¶Î±£ÁôÊ±¼ä,Æğµã¸ß¶ÈÆ«ÒÆ,ÖÕµã¸ß¶ÈÆ«ÒÆ,Ã¿ÃëµİÔöÉËº¦(%),×î¸ßÉËº¦±¶ÂÊ,ÊÇ·ñÆôÓÃ,±¸×¢
-#types:string,string,number,number,number,number,number,number,number,number,boolean,string
-laser_lv01,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
-laser_lv02,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
-laser_lv03,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
-laser_lv04,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
-laser_lv05,particles/units/heroes/hero_tinker/tinker_laser.vpcf,0,0.03,0.12,0.18,160,70,5,5,1,³ÖĞøÖØ²¥Ïà»¥ÖØµşµÄ¼¤¹â¶Î£»ÊÓ¾õË¢ĞÂ²»Ó°ÏìÃ¿ÃëÉËº¦¼ÆÊ±¡£
+ï»¿effect_key,skill_id,model_asset_id,particle_name,beam_mode,attack_point,beam_update_interval,visual_refresh_interval,visual_segment_duration,source_offset_z,target_offset_z,damage_increment_pct,max_damage_multiplier,enabled,notes
+#ä¸­æ–‡å:ç‰¹æ•ˆè®°å½•é”®,#ä¸­æ–‡å:æŠ€èƒ½ID,æ¨¡å‹èµ„æºID,ç‰¹æ•ˆèµ„æº,å…‰æŸæ¨¡å¼,æ”»å‡»å‰æ‘‡,å…‰æŸåæ ‡åˆ·æ–°é—´éš”,è§†è§‰æ®µé‡æ’­é—´éš”,è§†è§‰æ®µä¿ç•™æ—¶é—´,èµ·ç‚¹é«˜åº¦åç§»,ç»ˆç‚¹é«˜åº¦åç§»,æ¯ç§’é€’å¢ä¼¤å®³(%),æœ€é«˜ä¼¤å®³å€ç‡,æ˜¯å¦å¯ç”¨,å¤‡æ³¨
+#types:string,#types:string,string,string,string,number,number,number,number,number,number,number,number,boolean,string
+laser_lv01:default,laser_lv01,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
+laser_lv02:default,laser_lv02,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
+laser_lv03:default,laser_lv03,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
+laser_lv04:default,laser_lv04,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
+laser_lv05:default,laser_lv05,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,æŒç»­é‡æ’­ç›¸äº’é‡å çš„æ¿€å…‰æ®µï¼›è§†è§‰åˆ·æ–°ä¸å½±å“æ¯ç§’ä¼¤å®³è®¡æ—¶ã€‚
+laser_lv05:tower_laser_phoenix_solar,laser_lv05,tower_laser_phoenix_solar,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,Phoenixé˜¶æ®µåœç”¨Sun Rayï¼Œå®Œæ•´æ²¿ç”¨å·²éªŒè¯çš„æ™®é€šæ¿€å…‰å¡”Tinker Laserè§†è§‰ä¸åˆ†æ®µç”Ÿå‘½å‘¨æœŸã€‚

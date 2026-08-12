@@ -113,14 +113,14 @@ local function play_diffusion_particle(tower, position, radius, skill)
     end)
 end
 
-local function deal(attacker, victim, damage, tag, ability)
+local function deal(attacker, victim, damage, tag, ability, damage_type)
     local secondary = tag == "lightning_diffusion"
     return event_bus.request(events.TOWER_SKILL_DAMAGE_REQUEST, {
         attacker = attacker,
         victim = victim,
         damage = damage,
         ability = ability,
-        damage_type = DAMAGE_TYPE_PHYSICAL,
+        damage_type = damage_type or DAMAGE_TYPE_PHYSICAL,
         damage_flags = DOTA_DAMAGE_FLAG_NO_DAMAGE_MULTIPLIERS,
         source_kind = "ability",
         source = tag,
@@ -433,11 +433,10 @@ end
 
 local function on_lightning_hit(payload)
     if not valid(payload.tower) or not exists(payload.target) then return end
-    -- Only original lightning strikes may proc diffusion. Diffusion damage is
-    -- deliberately sent through the damage request only and never republishes
-    -- TOWER_LIGHTNING_HIT, preventing recursive Plasma Field chains.
-    if payload.can_trigger_diffusion ~= true
-        or payload.source == "lightning_diffusion" then return end
+    -- Only Lightning Storm impacts may proc diffusion. Diffusion damage is sent
+    -- through the damage request only and never republishes TOWER_LIGHTNING_HIT.
+    if payload.source ~= "lightning_storm"
+        or payload.can_trigger_diffusion ~= true then return end
     local skill = skill_matching(payload.skills, "lightning_diffusion_")
     if not skill or not owns_ability(payload.tower, skill) then return end
     local chance = math.max(0, math.min(

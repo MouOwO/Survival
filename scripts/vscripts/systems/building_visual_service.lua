@@ -1,15 +1,21 @@
 local catalog = require("config/asset_catalog")
 local preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
+local appearance = require("visual/model_appearance_service")
 
 local M = {}
 local activity_modifiers_by_unit = {}
-local attachments_by_unit = {}
 local particles_by_unit = {}
 local bodygroups_by_unit = {}
 
 local function valid_entity(entity)
-    return entity and not entity:IsNull()
+    if not entity then return false end
+    if type(entity.IsNull) == "function" and entity:IsNull() then return false end
+    if type(IsValidEntity) == "function" then
+        local ok, is_valid = pcall(IsValidEntity, entity)
+        if ok and not is_valid then return false end
+    end
+    return true
 end
 
 local function safe_call(target, method_name, ...)
@@ -61,20 +67,6 @@ local function apply_activity_modifiers(unit, asset)
     if #applied > 0 then activity_modifiers_by_unit[entindex] = applied end
 end
 
-local function clear_attachments(unit)
-    local entindex = unit:entindex()
-    for _, attachment in ipairs(attachments_by_unit[entindex] or {}) do
-        if valid_entity(attachment) then
-            if type(UTIL_Remove) == "function" then
-                pcall(UTIL_Remove, attachment)
-            else
-                safe_call(attachment, "RemoveSelf")
-            end
-        end
-    end
-    attachments_by_unit[entindex] = nil
-end
-
 local function clear_particles(unit)
     for _, particle in ipairs(particles_by_unit[unit:entindex()] or {}) do
         pcall(function()
@@ -83,38 +75,6 @@ local function clear_particles(unit)
         end)
     end
     particles_by_unit[unit:entindex()] = nil
-end
-
-local function spawn_attachment(asset, model_path)
-    local entity_class = tostring(
-        asset and asset.attachment_entity_class or "prop_dynamic"
-    )
-    local data = {
-        model = model_path,
-        DefaultAnim = asset and asset.default_sequence or "idle",
-        -- Cosmetic props must never intercept world selection or contribute
-        -- bone-follower collision. The owning tower remains the selectable,
-        -- authoritative entity.
-        solid = "0",
-        -- Source 2 prop_dynamic spawnflag 256 is "Start with collision
-        -- disabled". Keep it in addition to solid=0 and the runtime
-        -- SetSolid(SOLID_NONE) call because model initialization can otherwise
-        -- briefly restore collision after bone merge.
-        spawnflags = "256",
-        DisableBoneFollowers = "1",
-    }
-    local ok, attachment = pcall(
-        SpawnEntityFromTableSynchronous, entity_class, data
-    )
-    if (not ok or not valid_entity(attachment))
-        and entity_class ~= "prop_dynamic" then
-        logger.warn("BuildingVisual", "attachment class failed; fallback="
-            .. entity_class .. " model=" .. tostring(model_path))
-        ok, attachment = pcall(
-            SpawnEntityFromTableSynchronous, "prop_dynamic", data
-        )
-    end
-    return ok, attachment
 end
 
 local function clear_bodygroups(unit)
@@ -154,18 +114,6 @@ local function reset_main_animation(unit, asset)
     safe_call(unit, "SetPlaybackRate", 1)
 end
 
-local function normalize_attachment(asset, entry, index)
-    if type(entry) == "string" then
-        local component_id = asset and asset.attachment_ids
-            and asset.attachment_ids[index]
-        return component_id or "attachment_" .. tostring(index), entry
-    end
-    if type(entry) == "table" then
-        return entry.id or "attachment_" .. tostring(index), entry.model
-    end
-    return "attachment_" .. tostring(index), nil
-end
-
 local function normalize_particle(asset, entry, index)
     if type(entry) == "string" then
         local owner_id = asset and asset.environment_particle_owners
@@ -176,37 +124,6 @@ local function normalize_particle(asset, entry, index)
         return entry.path, entry.owner
     end
     return nil, nil
-end
-
-local function apply_attachments(unit, asset)
-    clear_attachments(unit)
-    local spawned = {}
-    local components = {}
-    for index, entry in ipairs(asset and asset.attachment_models or {}) do
-        local component_id, model_path = normalize_attachment(asset, entry, index)
-        local ok, attachment = spawn_attachment(asset, model_path)
-        if ok and valid_entity(attachment) then
-            safe_call(attachment, "SetModel", model_path)
-            safe_call(attachment, "SetOriginalModel", model_path)
-            safe_call(attachment, "SetOwner", unit)
-            safe_call(attachment, "FollowEntity", unit, true)
-            safe_call(
-                attachment,
-                "SetSolid",
-                rawget(_G, "SOLID_NONE") or 0
-            )
-            if tonumber(asset.model_skin) then
-                safe_call(attachment, "SetSkin", tonumber(asset.model_skin))
-            end
-            table.insert(spawned, attachment)
-            components[component_id] = attachment
-        else
-            logger.warn("BuildingVisual", "attachment failed: "
-                .. tostring(model_path))
-        end
-    end
-    if #spawned > 0 then attachments_by_unit[unit:entindex()] = spawned end
-    return components
 end
 
 local function apply_particles(unit, asset, components)
@@ -333,7 +250,18 @@ function M.apply(unit, data)
     else
         safe_call(unit, "SetSkin", 0)
     end
-    local components = apply_attachments(unit, asset)
+    local appearance_ok, appearance_status, components =
+        appearance.Refresh(unit, asset)
+    if not appearance_ok then
+        clear_activity_modifiers(unit)
+        clear_particles(unit)
+        clear_bodygroups(unit)
+        unit.survival_model_asset_id = nil
+        unit.survival_applied_model_path = nil
+        unit.survival_pending_model_asset_id = nil
+        unit.survival_pending_previous_model_asset_id = nil
+        return false, appearance_status
+    end
     apply_particles(unit, asset, components)
     unit.survival_model_asset_id = requested_asset_id
     unit.survival_applied_model_path = model_path
@@ -346,7 +274,7 @@ end
 function M.clear(unit)
     if valid_entity(unit) then
         clear_activity_modifiers(unit)
-        clear_attachments(unit)
+        appearance.Clear(unit)
         clear_particles(unit)
         clear_bodygroups(unit)
     end
