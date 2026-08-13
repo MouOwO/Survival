@@ -20,6 +20,7 @@ local function deal_damage(payload)
         base_damage = math.max(0, tonumber(payload.damage) or 0),
         damage_type = payload.damage_type or DAMAGE_TYPE_PHYSICAL,
         damage_flags = payload.damage_flags,
+        physical_armor_ignore_pct = payload.physical_armor_ignore_pct,
         source_kind = payload.source_kind or "ability",
         can_crit = false,
         tags = payload.tags or { "tower_special_skill" },

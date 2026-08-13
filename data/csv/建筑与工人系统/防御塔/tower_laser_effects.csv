@@ -6,4 +6,4 @@ laser_lv02:default,laser_lv02,,particles/units/heroes/hero_tinker/tinker_laser.v
 laser_lv03:default,laser_lv03,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
 laser_lv04:default,laser_lv04,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
 laser_lv05:default,laser_lv05,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
-laser_lv05:tower_laser_phoenix_solar,laser_lv05,tower_laser_phoenix_solar,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,Phoenix阶段停用Sun Ray，完整沿用已验证的普通激光塔Tinker Laser视觉与分段生命周期。
+laser_lv05:tower_laser_death_prophet_brightshroud,laser_lv05,tower_laser_death_prophet_brightshroud,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,光明尸衣之魂阶段完整沿用已验证的普通激光塔Tinker Laser视觉与分段生命周期。

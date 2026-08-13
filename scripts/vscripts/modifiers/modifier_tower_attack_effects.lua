@@ -18,6 +18,8 @@ local sound_service = require("core/sound_service")
 local global_rules = require("config/generated/global_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
 local anti_air_rules = require("systems/anti_air_rules")
+local tower_multi_damage = require("systems/tower_multi_damage")
+local tower_laser_damage = require("systems/tower_laser_damage")
 
 local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
     and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
@@ -29,7 +31,6 @@ local function detailed_log(format_string, ...)
     end
 end
 
-local MULTI_DAMAGE_MULTIPLIER = 1.00
 local DEFAULT_LIGHTNING_BOUNCE_RADIUS = 200
 local LIGHTNING_BOUNCE_DELAY = 0.10
 local LIGHTNING_SOURCE_OFFSET_Z = 160
@@ -49,7 +50,6 @@ local BLIZZARD_SLOW_PCT = 25
 local BLIZZARD_ICE_FALL_HEIGHT = 700
 local BLIZZARD_ICE_FALL_DURATION = 0.35
 local BLIZZARD_ICE_FALL_STEP = 0.03
-local ANTI_AIR_MISSILE_INTERVAL = 0.10
 local AIRSPACE_AURA_REFRESH_INTERVAL = 0.20
 local AIRSPACE_AURA_BUFF_DURATION = 0.35
 local start_lightning_storm
@@ -173,8 +173,12 @@ function modifier_tower_attack_effects:GetModifierAttackSpeedPercentage()
 end
 
 function modifier_tower_attack_effects:GetModifierDamageOutgoing_Percentage()
-    if skill_matching(self:GetParent(), "multi_attack_") then
-        return (MULTI_DAMAGE_MULTIPLIER - 1) * 100
+    local skill = skill_matching(self:GetParent(), "multi_attack_")
+    if skill then
+        local multiplier = tower_multi_damage.multiplier(
+            skill, self.current_attack_target
+        )
+        return (multiplier - 1) * 100
     end
     if skill_matching(self:GetParent(), "anti_air_missile_") then
         return 90
@@ -198,7 +202,7 @@ function modifier_tower_attack_effects:OnCreated()
     self.attack_failed_diagnostic_count = 0
     self.polar_obelisk_sound_active = false
     self.anti_air_sequence = 0
-    self.anti_air_sequence_active = false
+    self.anti_air_task_ids = {}
     self.anti_air_secondary_attack = false
     self.airspace_aura_elapsed = AIRSPACE_AURA_REFRESH_INTERVAL
     self:StartIntervalThink(0.03)
@@ -233,53 +237,60 @@ end
 
 local function stop_anti_air_sequence(modifier)
     modifier.anti_air_sequence = (tonumber(modifier.anti_air_sequence) or 0) + 1
-    modifier.anti_air_sequence_active = false
+    for task_id in pairs(modifier.anti_air_task_ids or {}) do
+        scheduler.cancel(task_id)
+    end
+    modifier.anti_air_task_ids = {}
     modifier.anti_air_secondary_attack = false
 end
 
 function modifier_tower_attack_effects:ResetAntiAirSequence()
     if not IsServer() then return end
-    local tower = self:GetParent()
-    scheduler.cancel("tower_anti_air_sequence_" .. tostring(tower:entindex()))
     stop_anti_air_sequence(self)
 end
 
 local function start_anti_air_sequence(modifier, tower, target, skill)
-    if modifier.anti_air_sequence_active or not valid(target)
-        or not anti_air_rules.is_flying(target) then
+    if not valid(target) or not anti_air_rules.is_flying(target) then
         return
     end
     local missile_count = math.max(1, math.floor(tonumber(skill.max_targets) or 1))
     if missile_count <= 1 then return end
     modifier.anti_air_sequence = (tonumber(modifier.anti_air_sequence) or 0) + 1
     local sequence = modifier.anti_air_sequence
-    modifier.anti_air_sequence_active = true
-    local fired = 1
-    local function fire_next()
-        if modifier.anti_air_sequence ~= sequence or not valid(tower)
-            or not valid(target) or not anti_air_rules.is_flying(target) then
-            if modifier.anti_air_sequence == sequence then
-                modifier.anti_air_sequence_active = false
-            end
-            return false
-        end
-        modifier.anti_air_secondary_attack = true
-        tower:PerformAttack(
-            target, false, false, true, false, true, false, false
+    local interval = math.max(0.01, tonumber(skill.barrage_interval) or 0.1)
+    modifier.anti_air_task_ids = modifier.anti_air_task_ids or {}
+    for missile_index = 2, missile_count do
+        local task_id = string.format(
+            "tower_anti_air_sequence_%d_%d_%d",
+            tower:entindex(), sequence, missile_index
         )
-        modifier.anti_air_secondary_attack = false
-        fired = fired + 1
-        if fired >= missile_count then
-            modifier.anti_air_sequence_active = false
+        modifier.anti_air_task_ids[task_id] = true
+        scheduler.after(interval * (missile_index - 1), function()
+            modifier.anti_air_task_ids[task_id] = nil
+            if not valid(tower) or not valid(target)
+                or not anti_air_rules.is_flying(target) then
+                return false
+            end
+            modifier.anti_air_secondary_attack = true
+            tower:PerformAttack(
+                target, false, false, true, false, true, false, false
+            )
+            modifier.anti_air_secondary_attack = false
             return false
-        end
-        return ANTI_AIR_MISSILE_INTERVAL
+        end, task_id)
     end
-    scheduler.after(
-        ANTI_AIR_MISSILE_INTERVAL,
-        fire_next,
-        "tower_anti_air_sequence_" .. tostring(tower:entindex())
+end
+
+local function trigger_drag_net(caster, target, skill)
+    if not skill or not anti_air_rules.is_flying(target) then return false end
+    local chance = math.max(
+        0, math.min(100, tonumber(skill.trigger_chance_pct) or 0)
     )
+    if not RollPercentage(chance) then return false end
+    target:AddNewModifier(caster, nil, "modifier_stunned", {
+        duration = math.max(0.1, tonumber(skill.duration) or 3),
+    })
+    return true
 end
 
 local function sync_polar_obelisk_aura(tower, state)
@@ -332,7 +343,11 @@ function modifier_tower_attack_effects:GetModifierAttackPointConstant()
     return effect and math.max(0, tonumber(effect.attack_point) or 0) or nil
 end
 
-function modifier_tower_attack_effects:GetModifierTotalDamageOutgoing_Percentage()
+function modifier_tower_attack_effects:GetModifierTotalDamageOutgoing_Percentage(params)
+    if params and params.damage_category == DOTA_DAMAGE_CATEGORY_ATTACK
+        and skill_matching(self:GetParent(), "burning_great_arrow_") then
+        return -100
+    end
     return 0
 end
 
@@ -372,6 +387,7 @@ end
 
 function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
     if not IsServer() then return 0 end
+    if skill_matching(self:GetParent(), "burning_great_arrow_") then return 0 end
     if self.pending_critical_multiplier then
         return self.pending_critical_multiplier * 100
     end
@@ -826,7 +842,11 @@ end
 
 M._start_lightning_storm_for_test = start_lightning_storm
 
-local function split_arrow(caster, target, damage, projectile_name)
+local function multi_attack_multiplier(skill, target)
+    return tower_multi_damage.multiplier(skill, target)
+end
+
+local function split_arrow(caster, target, damage, projectile_name, multiplier)
     if not valid(caster) or not valid(target) then return end
     local distance = (target:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
     ProjectileManager:CreateTrackingProjectile({
@@ -844,9 +864,9 @@ local function split_arrow(caster, target, damage, projectile_name)
             detailed_log(
                 "[TowerMulti] HIT tower=%d target=%d raw_attack=%.1f multiplier=%.2f",
                 caster:entindex(), target:entindex(), damage,
-                MULTI_DAMAGE_MULTIPLIER
+                multiplier
             )
-            deal(caster, target, damage, "splash", { "tower_multi_arrow" })
+            deal(caster, target, damage * multiplier, "splash", { "tower_multi_arrow" })
         end
     end)
 end
@@ -964,7 +984,7 @@ local function create_laser_segment(self, effect, now)
 end
 
 local function start_laser(self, target, effect)
-    if self.laser_target == target then return end
+    if self.laser_target == target then return false end
     reset_laser(self)
     self.laser_target = target
     self.laser_ticks = 0
@@ -972,6 +992,34 @@ local function start_laser(self, target, effect)
     play_tower_sound(
         "tower_laser", self:GetParent(), target, target:GetAbsOrigin()
     )
+    return true
+end
+
+local function deal_laser_tick(self, caster, target, laser, effect)
+    local interval = math.max(0.1, tonumber(laser.damage_interval) or 1)
+    local base_multiplier = tonumber(laser.damage_multiplier) or 1
+    local increment = (tonumber(effect.damage_increment_pct) or 5) / 100
+    local maximum = math.max(
+        base_multiplier, tonumber(effect.max_damage_multiplier) or 5
+    )
+    local multiplier = tower_laser_damage.multiplier(
+        base_multiplier, increment, maximum,
+        self.laser_ticks or 0, interval
+    )
+    local amount = caster:GetAverageTrueAttackDamage(caster) * multiplier
+    detailed_log(
+        "[TowerMystery] LASER tower=%d target=%d tick=%d multiplier=%.2f raw_damage=%.1f buff_stacks=%d",
+        caster:entindex(), target:entindex(), (self.laser_ticks or 0) + 1,
+        multiplier, amount, 0
+    )
+    deal(caster, target, amount)
+    event_bus.emit(events.TOWER_LASER_HIT, {
+        tower = caster,
+        target = target,
+        damage = amount,
+        skills = tower_skills.get(caster),
+    })
+    self.laser_ticks = (self.laser_ticks or 0) + 1
 end
 
 function modifier_tower_attack_effects:OnIntervalThink()
@@ -1027,23 +1075,7 @@ function modifier_tower_attack_effects:OnIntervalThink()
     local interval = math.max(0.1, tonumber(laser.damage_interval) or 1)
     if self.laser_elapsed + 0.001 < interval then return end
     self.laser_elapsed = self.laser_elapsed - interval
-    local base_multiplier = tonumber(laser.damage_multiplier) or 1
-    local increment = (tonumber(effect.damage_increment_pct) or 5) / 100
-    local maximum = math.max(
-        base_multiplier, tonumber(effect.max_damage_multiplier) or 5
-    )
-    local multiplier = math.min(
-        maximum, base_multiplier + (self.laser_ticks or 0) * increment
-    )
-    local base_damage = caster:GetAverageTrueAttackDamage(caster)
-    local amount = base_damage * multiplier
-    detailed_log(
-        "[TowerMystery] LASER tower=%d target=%d tick=%d multiplier=%.2f raw_damage=%.1f buff_stacks=%d",
-        caster:entindex(), target:entindex(), (self.laser_ticks or 0) + 1,
-        multiplier, amount, 0
-    )
-    deal(caster, target, amount)
-    self.laser_ticks = (self.laser_ticks or 0) + 1
+    deal_laser_tick(self, caster, target, laser, effect)
 end
 
 function modifier_tower_attack_effects:OnAttackStart(params)
@@ -1080,7 +1112,9 @@ function modifier_tower_attack_effects:OnAttackStart(params)
     local effect = laser_config(caster, laser)
     if laser and effect and valid(target)
         and target:GetTeamNumber() ~= self:GetParent():GetTeamNumber() then
-        start_laser(self, target, effect)
+        if start_laser(self, target, effect) then
+            deal_laser_tick(self, caster, target, laser, effect)
+        end
     end
 end
 
@@ -1090,7 +1124,9 @@ function modifier_tower_attack_effects:OnAttack(params)
     if not valid(primary) or primary:GetTeamNumber() == caster:GetTeamNumber() then
         return
     end
-    play_tower_sound("tower_basic_attack", caster, caster)
+    if not skill_matching(caster, "burning_great_arrow_") then
+        play_tower_sound("tower_basic_attack", caster, caster)
+    end
     local anti_air = skill_matching(caster, "anti_air_missile_")
     if anti_air and not self.anti_air_secondary_attack then
         start_anti_air_sequence(self, caster, primary, anti_air)
@@ -1112,8 +1148,14 @@ function modifier_tower_attack_effects:OnAttack(params)
     local count = 1
     for _, target in ipairs(units or {}) do
         if target ~= primary and count < max_targets then
-            -- 主箭与每支分裂箭均按100%当前攻击力结算。
-            split_arrow(caster, target, damage, caster.survival_projectile_model)
+            -- Each target resolves its configured ground or flying multiplier.
+            split_arrow(
+                caster,
+                target,
+                damage,
+                caster.survival_projectile_model,
+                multi_attack_multiplier(multi, target)
+            )
             count = count + 1
         end
     end
@@ -1159,6 +1201,11 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
             self.attack_landed_diagnostic_count, tostring(params.damage)
         )
     end
+    if skill_matching(caster, "burning_great_arrow_") then
+        self.pending_critical_multiplier = nil
+        self.pending_critical_source = nil
+        return
+    end
     local skills = tower_skills.get(caster)
     local damage = caster:GetAverageTrueAttackDamage(caster)
     local critical_multiplier = tonumber(self.pending_critical_multiplier) or 1
@@ -1180,16 +1227,7 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
     local drag_net = skill_matching(caster, "drag_net_")
-    if drag_net and anti_air_rules.is_flying(primary) then
-        local chance = math.max(
-            0, math.min(100, tonumber(drag_net.trigger_chance_pct) or 0)
-        )
-        if RollPercentage(chance) then
-            primary:AddNewModifier(caster, nil, "modifier_stunned", {
-                duration = math.max(0.1, tonumber(drag_net.duration) or 3),
-            })
-        end
-    end
+    trigger_drag_net(caster, primary, drag_net)
     if frost then
         trigger_frost_attack(caster, primary, frost, landed_damage)
     end
@@ -1203,7 +1241,8 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         end
     end
     local piercing = skill_matching(caster, "piercing_ballista_")
-    if piercing and piercing.buff_id then
+    if piercing and piercing.buff_id
+        and not skill_matching(caster, "burning_great_arrow_") then
         buff_manager.apply(caster, primary, piercing.buff_id, {
             duration = math.max(0.1, tonumber(piercing.duration) or 3),
             value = -math.abs(tonumber(piercing.attack_armor_reduction) or 0),
@@ -1294,7 +1333,6 @@ end
 function modifier_tower_attack_effects:OnDestroy()
     if not IsServer() then return end
     local tower = self:GetParent()
-    scheduler.cancel("tower_anti_air_sequence_" .. tostring(tower:entindex()))
     stop_anti_air_sequence(self)
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
@@ -1302,12 +1340,14 @@ function modifier_tower_attack_effects:OnDestroy()
 end
 
 M._start_anti_air_sequence_for_test = start_anti_air_sequence
+M._trigger_drag_net_for_test = trigger_drag_net
 M._sync_airspace_aura_for_test = sync_airspace_aura
+M._start_laser_for_test = start_laser
+M._deal_laser_tick_for_test = deal_laser_tick
 
 function modifier_tower_attack_effects:ResetAfterRelocation()
     if not IsServer() then return end
     local tower = self:GetParent()
-    scheduler.cancel("tower_anti_air_sequence_" .. tostring(tower:entindex()))
     stop_anti_air_sequence(self)
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")

@@ -1,0 +1,9 @@
+skill_id,ground_damage_multiplier,penetration_decay,enabled,notes
+#中文名:技能ID,对地伤害倍率,每穿透一个目标保留倍率,是否启用,备注
+#types:string,number,number,boolean,string
+multi_attack_lv01,1.8,,1,基础伤害倍率读取tower_skill_definitions.csv；地面目标在基础倍率上再乘1.8。
+multi_attack_lv02,1.8,,1,基础伤害倍率读取tower_skill_definitions.csv；地面目标在基础倍率上再乘1.8。
+multi_attack_lv03,1.8,,1,基础伤害倍率读取tower_skill_definitions.csv；地面目标在基础倍率上再乘1.8。
+multi_attack_lv04,1.8,,1,基础伤害倍率读取tower_skill_definitions.csv；地面目标在基础倍率上再乘1.8。
+multi_attack_lv05,1.8,,1,基础伤害倍率读取tower_skill_definitions.csv；地面目标在基础倍率上再乘1.8。
+burning_great_arrow_lv01,1,0.8,1,第n个有效新目标从n=0开始，伤害倍率为技能基础倍率×0.8^n；地面与飞行目标一致。

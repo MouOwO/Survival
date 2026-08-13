@@ -111,4 +111,23 @@ function M.monster_physical_damage_compensation(runtime_armor)
     return target_multiplier / engine_multiplier
 end
 
+function M.physical_armor_ignore_compensation(runtime_armor, ignore_pct,
+        use_war3_curve)
+    local armor = tonumber(runtime_armor) or 0
+    if armor <= 0 then return 1 end
+    local ignored = math.max(0, math.min(100, tonumber(ignore_pct) or 0))
+    local effective_armor = armor * (1 - ignored / 100)
+    local engine_multiplier = M.dota_positive_damage_multiplier(armor)
+    if engine_multiplier <= 0 then return 1 end
+    local target_multiplier
+    if use_war3_curve then
+        target_multiplier = M.war3_positive_damage_multiplier(
+            M.to_war3(effective_armor)
+        )
+    else
+        target_multiplier = M.dota_positive_damage_multiplier(effective_armor)
+    end
+    return target_multiplier / engine_multiplier
+end
+
 return M

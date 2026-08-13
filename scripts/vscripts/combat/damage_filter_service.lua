@@ -173,12 +173,25 @@ local function filter(_, keys)
     local damage_type = tonumber(keys.damagetype_const or keys.damagetype)
     local armor_compensation = 1
     local runtime_armor = nil
-    if monster_war3_armor_damage_enabled
+    local armor_ignore_pct = math.max(
+        0, math.min(100, tonumber(record and record.physical_armor_ignore_pct) or 0)
+    )
+    if damage_type == DAMAGE_TYPE_PHYSICAL and armor_ignore_pct > 0 then
+        runtime_armor = tonumber(victim:GetPhysicalArmorValue(false)) or 0
+        armor_compensation = armor_balance.physical_armor_ignore_compensation(
+            runtime_armor,
+            armor_ignore_pct,
+            monster_war3_armor_damage_enabled
+                and victim.survival_monster_corpse == true
+        )
+        keys.damage = math.max(0, keys.damage * armor_compensation)
+    elseif monster_war3_armor_damage_enabled
         and victim.survival_monster_corpse == true
         and damage_type == DAMAGE_TYPE_PHYSICAL then
         runtime_armor = tonumber(victim:GetPhysicalArmorValue(false)) or 0
-        armor_compensation =
-            armor_balance.monster_physical_damage_compensation(runtime_armor)
+        armor_compensation = armor_balance.monster_physical_damage_compensation(
+            runtime_armor
+        )
         keys.damage = math.max(0, keys.damage * armor_compensation)
     end
     if detailed_diagnostics and monster_physical_diagnostic_count < 40

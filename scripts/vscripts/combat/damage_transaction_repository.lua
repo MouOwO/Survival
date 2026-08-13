@@ -39,6 +39,7 @@ function M.create(request)
         created_time = GameRules:GetGameTime(),
         attacker = request.attacker,
         victim = request.victim,
+        physical_armor_ignore_pct = request.physical_armor_ignore_pct,
     }
     if depth > (config.maximum_recursion_depth or 6) then
         record.blocked = "maximum_recursion_depth"

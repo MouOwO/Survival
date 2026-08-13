@@ -269,11 +269,9 @@ local function apply_attack_speed(unit, attacks_per_second)
     end
 end
 local function apply_projectile(unit, projectile_model)
-    if projectile_model and projectile_model ~= ""
-        and unit.SetRangedProjectileName then
-        unit:SetRangedProjectileName(projectile_model)
-        unit.survival_projectile_model = projectile_model
-    end
+    if projectile_model == nil or not unit.SetRangedProjectileName then return end
+    unit:SetRangedProjectileName(projectile_model)
+    unit.survival_projectile_model = projectile_model
 end
 local function apply_initial_stats(unit, definition)
     local data = definition.id == "arrow_tower"

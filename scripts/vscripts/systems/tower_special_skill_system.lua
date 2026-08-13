@@ -3,6 +3,8 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local geometry = require("systems/tower_skill_geometry")
 local sound_service = require("core/sound_service")
+local anti_air_rules = require("systems/anti_air_rules")
+local tower_skill_damage_rules = require("config/generated/tower_skill_damage_rules")
 
 local M = {}
 local death_state = {}
@@ -113,7 +115,8 @@ local function play_diffusion_particle(tower, position, radius, skill)
     end)
 end
 
-local function deal(attacker, victim, damage, tag, ability, damage_type)
+local function deal(attacker, victim, damage, tag, ability, damage_type,
+        physical_armor_ignore_pct)
     local secondary = tag == "lightning_diffusion"
     return event_bus.request(events.TOWER_SKILL_DAMAGE_REQUEST, {
         attacker = attacker,
@@ -122,6 +125,7 @@ local function deal(attacker, victim, damage, tag, ability, damage_type)
         ability = ability,
         damage_type = damage_type or DAMAGE_TYPE_PHYSICAL,
         damage_flags = DOTA_DAMAGE_FLAG_NO_DAMAGE_MULTIPLIERS,
+        physical_armor_ignore_pct = physical_armor_ignore_pct,
         source_kind = "ability",
         source = tag,
         is_secondary = secondary,
@@ -129,6 +133,8 @@ local function deal(attacker, victim, damage, tag, ability, damage_type)
         tags = { "tower_special_skill", tag },
     })
 end
+
+local trigger_burning_great_arrow
 
 local function death_data(tower)
     local key = tower:entindex()
@@ -166,6 +172,11 @@ end
 local function on_attack_start(payload)
     local tower, target = payload.tower, payload.target
     if not valid(tower) or not valid(target) then return end
+    local burning = skill_matching(payload.skills, "burning_great_arrow_")
+    if burning then
+        trigger_burning_great_arrow(payload)
+        return
+    end
     local piercing = skill_matching(payload.skills, "piercing_ballista_")
     if piercing and owns_ability(tower, piercing) and piercing.buff_id then
         local modifier = event_bus.request(events.TOWER_SKILL_BUFF_REQUEST, {
@@ -218,34 +229,28 @@ local function trigger_death_critical_particle(payload)
         payload.target:GetAbsOrigin(),
         skill_effect_particle(skill, "skill_strike", asset_id)
     )
-    play_tower_sound(
-        "tower_death_grenade", payload.tower, payload.target, position
-    )
 end
 
 local function trigger_death_grenade(payload)
     if not payload.critical then return end
     local skill = skill_matching(payload.skills, "death_grenade_")
     if not skill or not owns_ability(payload.tower, skill) then return end
-    local radius = configured_area(skill, 300)
+    local chance = math.max(0, math.min(
+        100, tonumber(skill.trigger_chance_pct) or 10
+    ))
+    if not RollPercentage(chance) then return end
     local damage = math.max(0, tonumber(payload.damage) or 0)
-        * math.max(0, tonumber(skill.damage_multiplier) or 2)
+        * math.max(0, tonumber(skill.damage_multiplier) or 1)
     local position = payload.target:GetAbsOrigin()
     play_world_particle(
         payload.tower,
         position,
         skill_effect_particle(skill, "skill_strike", DEATH_GRENADE_ASSET_ID)
     )
-    local hit = { [payload.target:entindex()] = true }
-    for _, enemy in ipairs(geometry.enemies_in_circle(
-        payload.tower, position, radius
-    )) do
-        local enemy_index = enemy:entindex()
-        if not hit[enemy_index] then
-            hit[enemy_index] = true
-            deal(payload.tower, enemy, damage, "death_grenade")
-        end
-    end
+    play_tower_sound(
+        "tower_death_grenade", payload.tower, payload.target, position
+    )
+    deal(payload.tower, payload.target, damage, "death_grenade")
 end
 
 local function clear_wave(wave_id, destroy_projectile)
@@ -281,8 +286,12 @@ local function launch_burning_wave(payload, skill, fallback_width)
     direction = direction:Normalized()
 
     local width = configured_area(skill, fallback_width)
-    local damage = math.max(0, tonumber(payload.damage) or 0)
-        * math.max(0, tonumber(skill.damage_multiplier) or 1)
+    local damage = math.max(
+        0,
+        tonumber(payload.damage) or tower:GetAverageTrueAttackDamage(tower)
+    )
+    local rule = tower_skill_damage_rules.by_id[skill.skill_id]
+    local piercing = skill_matching(payload.skills, "piercing_ballista_")
 
     next_wave_id = next_wave_id + 1
     local wave_id = next_wave_id
@@ -292,6 +301,14 @@ local function launch_burning_wave(payload, skill, fallback_width)
         tower_entindex = tower_entindex,
         ability = ability,
         damage = damage,
+        base_multiplier = math.max(0, tonumber(skill.damage_multiplier) or 1),
+        penetration_decay = math.max(
+            0, tonumber(rule and rule.penetration_decay) or 1
+        ),
+        armor_ignore_pct = math.max(
+            0, tonumber(piercing and piercing.attack_armor_reduction) or 0
+        ),
+        hit_count = 0,
         hit = {},
     }
     active_waves[wave_id] = wave
@@ -347,12 +364,17 @@ function M.on_burning_wave_projectile_hit(ability, target, _, extra_data)
     local enemy_index = target:entindex()
     if not wave.hit[enemy_index] then
         wave.hit[enemy_index] = true
+        local multiplier = wave.base_multiplier
+            * math.pow(wave.penetration_decay, wave.hit_count)
+        wave.hit_count = wave.hit_count + 1
         deal(
             wave.tower,
             target,
-            wave.damage,
+            wave.damage * multiplier,
             "burning_great_arrow",
-            wave.ability
+            wave.ability,
+            nil,
+            wave.armor_ignore_pct
         )
     end
     -- A linear projectile only pierces subsequent units when every unit-hit
@@ -382,32 +404,31 @@ local function frost_arrow_hit_particle(tower, target)
     end
 end
 
-local function trigger_path_skill(payload, prefix, fallback_width, tag,
-        particle_callback)
-    local skill = skill_matching(payload.skills, prefix)
-    if not skill or not owns_ability(payload.tower, skill) then return end
-    local damage = math.max(0, tonumber(payload.damage) or 0)
-        * math.max(0, tonumber(skill.damage_multiplier) or 1)
-    local start_pos = payload.tower:GetAbsOrigin()
-    local end_pos = payload.target:GetAbsOrigin()
-    local width = configured_area(skill, fallback_width)
-    if particle_callback then
-        particle_callback(payload.tower, start_pos, end_pos, width)
-    end
-    if tag == "arcane_eye" then
-        play_tower_sound("tower_arcane_eye", payload.tower, payload.tower)
-    end
-    for _, enemy in ipairs(geometry.enemies_in_path(
-        payload.tower, start_pos, end_pos, width, payload.target
-    )) do
-        deal(payload.tower, enemy, damage, tag)
-    end
-end
-
-local function trigger_burning_great_arrow(payload)
+trigger_burning_great_arrow = function(payload)
     local skill = skill_matching(payload.skills, "burning_great_arrow_")
     if not skill or not owns_ability(payload.tower, skill) then return end
     launch_burning_wave(payload, skill, WAVE_OF_TERROR_HALF_WIDTH)
+end
+
+local function on_laser_hit(payload)
+    if not valid(payload.tower) or not exists(payload.target) then return end
+    local skill = skill_matching(payload.skills, "arcane_eye_")
+    if not skill or not owns_ability(payload.tower, skill) then return end
+    local radius = configured_area(skill, 150)
+    local damage = math.max(0, tonumber(payload.damage) or 0)
+        * math.max(0, tonumber(skill.damage_multiplier) or 0.3)
+    local position = payload.target:GetAbsOrigin()
+    play_tower_sound(
+        "tower_arcane_eye", payload.tower, payload.target, position
+    )
+    for _, enemy in ipairs(geometry.enemies_in_circle(
+        payload.tower, position, radius
+    )) do
+        if enemy ~= payload.target then
+            deal(payload.tower, enemy, damage, "arcane_eye", nil,
+                DAMAGE_TYPE_PHYSICAL)
+        end
+    end
 end
 
 local function on_attack_landed(payload)
@@ -419,8 +440,6 @@ local function on_attack_landed(payload)
     update_bone_counter(payload)
     trigger_death_critical_particle(payload)
     trigger_death_grenade(payload)
-    trigger_path_skill(payload, "arcane_eye_", 96, "arcane_eye")
-    trigger_burning_great_arrow(payload)
 end
 
 local function on_building_destroyed(payload)
@@ -470,6 +489,7 @@ function M.init()
     event_bus.handle_request(events.TOWER_CRITICAL_QUERY, critical_query)
     event_bus.subscribe(events.TOWER_ATTACK_START, on_attack_start)
     event_bus.subscribe(events.TOWER_ATTACK_LANDED, on_attack_landed)
+    event_bus.subscribe(events.TOWER_LASER_HIT, on_laser_hit)
     event_bus.subscribe(events.TOWER_LIGHTNING_HIT, on_lightning_hit)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
 end

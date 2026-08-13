@@ -41,7 +41,7 @@ function building_system.move(unit, position)
     print(string.format("[BuildingBlink] SetAbsOrigin begin ent=%d target=(%.1f,%.1f,%.1f)", unit:entindex(), position.x, position.y, position.z))
     unit:Stop()
     if unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
-    if unit.survival_projectile_model and unit.SetRangedProjectileName then
+    if unit.survival_projectile_model ~= nil and unit.SetRangedProjectileName then
         unit:SetRangedProjectileName(unit.survival_projectile_model)
     end
     local auto_attack = unit:FindModifierByName("modifier_tower_auto_attack")
@@ -85,7 +85,7 @@ function building_system.move(unit, position)
             unit:SetAbsOrigin(unit.survival_fixed_position)
             unit:Stop()
             if unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
-            if unit.survival_projectile_model
+            if unit.survival_projectile_model ~= nil
                 and unit.SetRangedProjectileName then
                 unit:SetRangedProjectileName(unit.survival_projectile_model)
             end

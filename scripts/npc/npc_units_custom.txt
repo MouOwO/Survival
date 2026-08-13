@@ -449,7 +449,7 @@
     "asset_proxy_tower_lightning_razor_voidstorm" { "BaseClass" "npc_dota_creature" "Model" "models/items/razor/razor_arcana/razor_arcana.vmdl" }
     "asset_proxy_tower_laser_keeper_forgotten" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/keeper_of_the_light/keeper_of_the_light.vmdl" }
     "asset_proxy_tower_laser_od_blackgate" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/obsidian_destroyer/obsidian_destroyer.vmdl" }
-    "asset_proxy_tower_laser_phoenix_solar" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/phoenix/phoenix.vmdl" }
+    "asset_proxy_tower_laser_death_prophet_brightshroud" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/death_prophet/death_prophet.vmdl" }
     "asset_proxy_tower_anti_air_gyro_swooping" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/gyro/gyro.vmdl" }
     "asset_proxy_tower_anti_air_batrider_empiric" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/batrider/batrider.vmdl" }
     "asset_proxy_tower_anti_air_skywrath_empyrean" { "BaseClass" "npc_dota_creature" "Model" "models/items/skywrath_mage/skywrath_arcana/skywrath_arcana.vmdl" }
