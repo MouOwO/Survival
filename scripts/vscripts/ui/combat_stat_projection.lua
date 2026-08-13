@@ -8,8 +8,11 @@ local function copy(snapshot)
     return projected
 end
 
-local function physical_reduction_pct(runtime_armor)
-    return armor_balance.modern_physical_reduction_pct(runtime_armor)
+local function physical_reduction_pct(armor, mapping_version)
+    if tonumber(mapping_version) == armor_balance.CUSTOM_WAR3_MAPPING_VERSION then
+        return armor_balance.war3_physical_reduction_pct(armor)
+    end
+    return armor_balance.modern_physical_reduction_pct(armor)
 end
 
 local function stat_tooltips(projected)
@@ -28,7 +31,11 @@ local function stat_tooltips(projected)
             unit = "war3_display",
             mapping_version = tonumber(projected.armor_mapping_version) or 1,
             physical_reduction_pct = physical_reduction_pct(
-                projected.runtime_armor
+                tonumber(projected.armor_mapping_version)
+                        == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+                    and (tonumber(projected.armor) or 0)
+                    or (tonumber(projected.runtime_armor) or 0),
+                projected.armor_mapping_version
             ),
         },
         attack_speed = {
@@ -47,6 +54,15 @@ end
 
 function M.for_ui(snapshot)
     local projected = copy(snapshot)
+    if tonumber(projected.armor_mapping_version)
+        == armor_balance.CUSTOM_WAR3_MAPPING_VERSION then
+        projected.armor = tonumber(projected.armor)
+            or tonumber(projected.effective_war3_armor)
+            or tonumber(projected.war3_armor) or 0
+        projected.runtime_armor = 0
+        projected.armor_unit = "war3_display"
+        projected.stat_units_version = 2
+    end
     if tonumber(projected.stat_units_version) ~= 2 then
         local runtime_armor = tonumber(projected.runtime_armor)
             or tonumber(projected.armor)

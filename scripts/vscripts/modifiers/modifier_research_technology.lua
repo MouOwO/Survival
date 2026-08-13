@@ -74,15 +74,20 @@ local function publish_armor_changed(modifier, diagnostic)
     local parent = modifier:GetParent()
     if not parent or parent:IsNull() then return end
     local entindex = parent:entindex()
-    local reduction = math.max(0,
-        (tonumber(modifier:GetStackCount()) or 0) / 100)
+    local custom_war3 = tonumber(parent.survival_armor_mapping_version)
+        == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+    local reduction = custom_war3
+        and math.max(0, tonumber(parent.survival_war3_armor_reduction) or 0)
+        or math.max(0, (tonumber(modifier:GetStackCount()) or 0) / 100)
     -- SetStackCount updates the Lua state immediately, but engine armor can
     -- still be stale in the same call stack. Publish on the next scheduler
     -- frame so the selected-unit UI reads the resolved effective armor.
     scheduler.after(0, function()
         if not parent or parent:IsNull() then return end
         if diagnostic and ARMOR_DIAGNOSTIC_MILESTONES[diagnostic.hit] then
-            local armor_after = tonumber(parent:GetPhysicalArmorValue(false))
+            local armor_after = custom_war3
+                and tonumber(parent.survival_effective_war3_armor)
+                or tonumber(parent:GetPhysicalArmorValue(false))
             local armor_before = tonumber(diagnostic.armor_before)
             print(string.format(
                 "[RESEARCH_ARMOR_EFFECT] hit=%s target=%s phase=%s "
@@ -100,7 +105,8 @@ local function publish_armor_changed(modifier, diagnostic)
                 tostring(armor_after),
                 tostring(armor_before and armor_after
                     and armor_after - armor_before or "unavailable"),
-                tostring(parent.survival_minimum_armor)
+                tostring(custom_war3 and parent.survival_minimum_war3_armor
+                    or parent.survival_minimum_armor)
             ))
         end
         event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
@@ -141,9 +147,10 @@ function D:AddArmorReduction(value, diagnostic_hit, phase)
     if increment <= 0 then return end
     local parent = self:GetParent()
     local armor_before = tonumber(parent:GetPhysicalArmorValue(false))
-    local modern_mapping = tonumber(parent.survival_armor_mapping_version)
-        == armor_balance.MODERN_MAPPING_VERSION
-    if modern_mapping and tonumber(parent.survival_war3_armor) ~= nil then
+    local mapping_version = tonumber(parent.survival_armor_mapping_version)
+    local war3_mapping = mapping_version == armor_balance.MODERN_MAPPING_VERSION
+        or mapping_version == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+    if war3_mapping and tonumber(parent.survival_war3_armor) ~= nil then
         local minimum_war3 = tonumber(parent.survival_minimum_war3_armor)
         local war3_increment = armor_balance.to_war3_linear(increment)
         local current_reduction = math.max(0,
@@ -160,8 +167,24 @@ function D:AddArmorReduction(value, diagnostic_hit, phase)
             armor_balance.effective_war3_armor(
                 parent.survival_war3_armor,
                 target_reduction,
-                minimum_war3
+                minimum_war3,
+                parent.survival_poison_cloud_armor_reduction_pct
             )
+        if mapping_version == armor_balance.CUSTOM_WAR3_MAPPING_VERSION then
+            local target_stack = math.floor(target_reduction * 100 + 0.000001)
+            self.armor_reduction = 0
+            if target_stack <= (tonumber(self:GetStackCount()) or 0) then return end
+            self:SetStackCount(target_stack)
+            publish_armor_changed(self, {
+                hit = tonumber(diagnostic_hit),
+                phase = phase or "unknown",
+                increment = war3_increment,
+                armor_before = tonumber(parent.survival_effective_war3_armor)
+                    + war3_increment,
+                stack = target_stack,
+            })
+            return
+        end
         local base_runtime = armor_balance.from_war3_modern(
             parent.survival_war3_armor
         )
@@ -224,6 +247,10 @@ function D:DeclareFunctions()
 end
 
 function D:GetModifierPhysicalArmorBonus()
+    if tonumber(self:GetParent().survival_armor_mapping_version)
+        == armor_balance.CUSTOM_WAR3_MAPPING_VERSION then
+        return 0
+    end
     return -(self:GetStackCount() or 0) / 100
 end
 

@@ -372,8 +372,11 @@ local function apply_stats(unit, row, definition, movement_type)
     unit:SetBaseDamageMin(row.attack)
     unit:SetBaseDamageMax(row.attack)
     local war3_armor = tonumber(row.war3_armor or row.armor) or 0
-    local runtime_armor = armor_balance.from_war3(war3_armor)
+    local runtime_armor = 0
     unit.survival_war3_armor = war3_armor
+    unit.survival_base_war3_armor = war3_armor
+    unit.survival_armor_mapping_version = armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+    unit.survival_effective_war3_armor = war3_armor
     unit.survival_armor = runtime_armor
     unit:SetPhysicalArmorBaseValue(runtime_armor)
     local minimum_war3_armor = tonumber(
@@ -381,8 +384,8 @@ local function apply_stats(unit, row, definition, movement_type)
     )
     -- Normal wave definitions generally omit minimum_armor and must remain
     -- reducible. Explicit floors (for specially configured enemies) remain.
-    unit.survival_minimum_armor = minimum_war3_armor ~= nil
-        and armor_balance.from_war3(minimum_war3_armor) or nil
+    unit.survival_minimum_armor = nil
+    unit.survival_minimum_war3_armor = minimum_war3_armor
     unit:SetBaseMoveSpeed(definition.move_speed or 500)
     -- attack_speed 表示每秒攻击次数；Dota 引擎需要基础攻击间隔。
     local attack_speed = tonumber(row.attack_speed) or 0.5

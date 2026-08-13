@@ -15,11 +15,6 @@ local monster_physical_diagnostic_count = 0
 local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
     and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
     and tonumber(global_rules.by_id.runtime_detailed_diagnostics.value) == 1
-local monster_war3_armor_damage_enabled =
-    global_rules.by_id.monster_war3_armor_damage_enabled
-    and global_rules.by_id.monster_war3_armor_damage_enabled.enabled ~= false
-    and tonumber(global_rules.by_id.monster_war3_armor_damage_enabled.value) == 1
-
 local function diagnostic_hero(attacker)
     local hero_id = tostring(attacker and attacker.survival_hero_id or "")
     return hero_id == "hero_slark" or hero_id == "hero_blademaster"
@@ -47,6 +42,13 @@ local function resolve_combatants(keys)
     )
     if not attacker_index or not victim_index then return nil, nil end
     return EntIndexToHScript(attacker_index), EntIndexToHScript(victim_index)
+end
+
+local function add_damage_flag(flags, flag)
+    local current = math.max(0, math.floor(tonumber(flags) or 0))
+    local value = math.max(0, math.floor(tonumber(flag) or 0))
+    if value == 0 or math.floor(current / value) % 2 == 1 then return current end
+    return current + value
 end
 
 local function filter(_, keys)
@@ -148,6 +150,7 @@ local function filter(_, keys)
         return false
     end
     local source_bonus = record and tonumber(record.post_damage_bonus_pct) or 0
+    local filter_input_damage = tonumber(keys.damage) or 0
     local global_bonus = tonumber(config.global_post_bonus_pct) or 0
     local research_bonus = math.max(
         0,
@@ -170,29 +173,32 @@ local function filter(_, keys)
         multiplier = multiplier * 1.2
     end
     keys.damage = math.max(0, keys.damage * multiplier)
+    local post_multiplier_damage = keys.damage
     local damage_type = tonumber(keys.damagetype_const or keys.damagetype)
-    local armor_compensation = 1
-    local runtime_armor = nil
+    local armor_multiplier = 1
+    local effective_war3_armor = nil
+    local pierced_war3_armor = nil
     local armor_ignore_pct = math.max(
         0, math.min(100, tonumber(record and record.physical_armor_ignore_pct) or 0)
     )
-    if damage_type == DAMAGE_TYPE_PHYSICAL and armor_ignore_pct > 0 then
-        runtime_armor = tonumber(victim:GetPhysicalArmorValue(false)) or 0
-        armor_compensation = armor_balance.physical_armor_ignore_compensation(
-            runtime_armor,
-            armor_ignore_pct,
-            monster_war3_armor_damage_enabled
-                and victim.survival_monster_corpse == true
-        )
-        keys.damage = math.max(0, keys.damage * armor_compensation)
-    elseif monster_war3_armor_damage_enabled
+    local custom_monster_armor = damage_type == DAMAGE_TYPE_PHYSICAL
         and victim.survival_monster_corpse == true
-        and damage_type == DAMAGE_TYPE_PHYSICAL then
-        runtime_armor = tonumber(victim:GetPhysicalArmorValue(false)) or 0
-        armor_compensation = armor_balance.monster_physical_damage_compensation(
-            runtime_armor
+        and tonumber(victim.survival_armor_mapping_version)
+            == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+    if custom_monster_armor then
+        effective_war3_armor = tonumber(victim.survival_effective_war3_armor)
+            or tonumber(victim.survival_war3_armor) or 0
+        pierced_war3_armor = math.max(0, effective_war3_armor)
+            * (1 - armor_ignore_pct / 100)
+        armor_multiplier = armor_balance.war3_physical_damage_multiplier(
+            effective_war3_armor,
+            armor_ignore_pct
         )
-        keys.damage = math.max(0, keys.damage * armor_compensation)
+        keys.damage = math.max(0, keys.damage * armor_multiplier)
+        keys.damage_flags = add_damage_flag(
+            keys.damage_flags_const or keys.damage_flags,
+            DOTA_DAMAGE_FLAG_IGNORES_PHYSICAL_ARMOR
+        )
     end
     if detailed_diagnostics and monster_physical_diagnostic_count < 40
         and victim.survival_monster_corpse == true
@@ -200,14 +206,17 @@ local function filter(_, keys)
         monster_physical_diagnostic_count = monster_physical_diagnostic_count + 1
         print(string.format(
             "[MONSTER_PHYSICAL_DAMAGE_FILTER] sample=%s attacker=%s victim=%s "
-                .. "filtered_damage=%s flags=%s runtime_armor=%s health=%s/%s "
-                .. "post_multiplier=%s armor_compensation=%s",
+                .. "input_damage=%s post_multiplier_damage=%s war3_armor=%s "
+                .. "pierced_armor=%s armor_multiplier=%s filtered_damage=%s "
+                .. "flags=%s health=%s/%s post_multiplier=%s",
             tostring(monster_physical_diagnostic_count),
             tostring(attacker:entindex()), tostring(victim:entindex()),
-            tostring(keys.damage), tostring(keys.damage_flags or 0),
-            tostring(runtime_armor or victim:GetPhysicalArmorValue(false)),
+            tostring(filter_input_damage), tostring(post_multiplier_damage),
+            tostring(effective_war3_armor), tostring(pierced_war3_armor),
+            tostring(armor_multiplier), tostring(keys.damage),
+            tostring(keys.damage_flags or 0),
             tostring(victim:GetHealth()), tostring(victim:GetMaxHealth()),
-            tostring(multiplier), tostring(armor_compensation)
+            tostring(multiplier)
         ))
     end
     if diagnostic then
@@ -259,5 +268,6 @@ function M.register()
 end
 
 M._filter_for_test = filter
+M._add_damage_flag_for_test = add_damage_flag
 
 return M

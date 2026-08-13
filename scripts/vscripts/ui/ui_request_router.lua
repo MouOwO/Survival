@@ -94,6 +94,13 @@ local function unit_combat_snapshot(unit)
     local visual_asset = asset_catalog.get(model_asset_id)
     local absolute_level = tonumber(unit.survival_level)
         or safe_number(unit, "GetLevel", 1)
+    local armor_mapping_version = tonumber(unit.survival_armor_mapping_version) or 1
+    local custom_war3_armor = armor_mapping_version
+        == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+    local runtime_armor = custom_war3_armor and 0
+        or safe_number(unit, "GetPhysicalArmorValue", nil, false)
+        or tonumber(unit.survival_armor)
+        or safe_number(unit, "GetPhysicalArmorBaseValue", 0)
     return {
         entindex = unit:entindex(),
         unit_name = internal_name,
@@ -114,11 +121,12 @@ local function unit_combat_snapshot(unit)
         base_damage_outgoing_pct = outgoing_pct,
         -- 必须读取包含 Modifier 加减值的当前有效护甲；基础护甲和配置缓存
         -- 无法反映攻击减甲科技的实时叠层。
-        runtime_armor = safe_number(unit, "GetPhysicalArmorValue", nil, false)
-            or tonumber(unit.survival_armor)
-            or safe_number(unit, "GetPhysicalArmorBaseValue", 0),
-        armor_mapping_version = tonumber(unit.survival_armor_mapping_version)
-            or 1,
+        runtime_armor = runtime_armor,
+        armor = custom_war3_armor
+            and (tonumber(unit.survival_effective_war3_armor) or 0) or nil,
+        effective_war3_armor = custom_war3_armor
+            and (tonumber(unit.survival_effective_war3_armor) or 0) or nil,
+        armor_mapping_version = armor_mapping_version,
         -- attack_speed 表示当前每秒攻击次数，不是 BAT，也不是 Dota
         -- 百分比攻速；非英雄单位必须包含光环等临时 Modifier。
         attack_speed = effective_attack_speed(unit),

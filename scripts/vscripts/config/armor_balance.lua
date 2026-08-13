@@ -2,6 +2,7 @@ local M = {}
 
 M.WAR3_TO_DOTA_RATIO = 1 / 3
 M.MODERN_MAPPING_VERSION = 2
+M.CUSTOM_WAR3_MAPPING_VERSION = 3
 M.MODERN_DOTA_ARMOR_A = 225
 M.MODERN_DOTA_ARMOR_B = 650
 M.WAR3_POSITIVE_ARMOR_FACTOR = 0.02
@@ -77,17 +78,34 @@ function M.modern_physical_reduction_pct(dota_armor)
         / (0.9 + 0.048 * math.abs(value))
 end
 
-function M.effective_war3_armor(base_war3_armor, reduction, minimum_war3_armor)
+function M.effective_war3_armor(base_war3_armor, reduction, minimum_war3_armor,
+        percentage_reduction)
     local base = number(base_war3_armor)
     local reduced = base - math.max(0, number(reduction))
     local minimum = tonumber(minimum_war3_armor)
     if minimum ~= nil then reduced = math.max(minimum, reduced) end
+    local pct = math.max(0, math.min(100, number(percentage_reduction))) / 100
+    if reduced >= 0 then reduced = reduced * (1 - pct)
+    else reduced = reduced * (1 + pct) end
     return reduced
 end
 
 function M.war3_positive_damage_multiplier(war3_armor)
     local armor = math.max(0, tonumber(war3_armor) or 0)
     return 1 / (1 + M.WAR3_POSITIVE_ARMOR_FACTOR * armor)
+end
+
+function M.war3_physical_damage_multiplier(war3_armor, ignore_pct)
+    local armor = math.max(0, tonumber(war3_armor) or 0)
+    local ignored = math.max(0, math.min(100, tonumber(ignore_pct) or 0))
+    return M.war3_positive_damage_multiplier(armor * (1 - ignored / 100))
+end
+
+function M.war3_physical_reduction_pct(war3_armor, ignore_pct)
+    return 100 * (1 - M.war3_physical_damage_multiplier(
+        war3_armor,
+        ignore_pct
+    ))
 end
 
 function M.dota_positive_damage_multiplier(dota_armor)
@@ -116,15 +134,18 @@ function M.physical_armor_ignore_compensation(runtime_armor, ignore_pct,
     local armor = tonumber(runtime_armor) or 0
     if armor <= 0 then return 1 end
     local ignored = math.max(0, math.min(100, tonumber(ignore_pct) or 0))
-    local effective_armor = armor * (1 - ignored / 100)
     local engine_multiplier = M.dota_positive_damage_multiplier(armor)
     if engine_multiplier <= 0 then return 1 end
     local target_multiplier
     if use_war3_curve then
+        local war3_armor = M.to_war3_modern(armor)
+        if war3_armor == nil then return 1 end
+        local effective_war3_armor = war3_armor * (1 - ignored / 100)
         target_multiplier = M.war3_positive_damage_multiplier(
-            M.to_war3(effective_armor)
+            effective_war3_armor
         )
     else
+        local effective_armor = armor * (1 - ignored / 100)
         target_multiplier = M.dota_positive_damage_multiplier(effective_armor)
     end
     return target_multiplier / engine_multiplier

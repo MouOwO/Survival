@@ -234,9 +234,12 @@ local function start_encounter(payload)
             or archetype.war3_armor or archetype.armor
     )
     if war3_armor then
-        local runtime_armor = armor_balance.from_war3(war3_armor)
+        local runtime_armor = 0
         unit:SetPhysicalArmorBaseValue(runtime_armor)
         unit.survival_war3_armor = war3_armor
+        unit.survival_base_war3_armor = war3_armor
+        unit.survival_armor_mapping_version = armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+        unit.survival_effective_war3_armor = war3_armor
         unit.survival_armor = runtime_armor
     end
     local minimum_war3_armor = tonumber(
@@ -244,8 +247,8 @@ local function start_encounter(payload)
     )
     -- Missing minimum_armor means unrestricted armor reduction. Preserve a
     -- floor only for archetypes that explicitly opt into one.
-    unit.survival_minimum_armor = minimum_war3_armor ~= nil
-        and armor_balance.from_war3(minimum_war3_armor) or nil
+    unit.survival_minimum_armor = nil
+    unit.survival_minimum_war3_armor = minimum_war3_armor
     local attack_speed = tonumber(archetype.attack_speed)
         or tonumber(archetype.base_attack_speed) or 0.5
     attack_speed = math.max(0.01, attack_speed)

@@ -55,6 +55,15 @@
 - 既有未跟踪回归脚本的两个启动问题保持不变：怪物护甲PowerShell契约用单行字符串匹配生产中的等价多行调用，研究减甲PowerShell契约未设置项目`LUA_PATH`。前者对应Lua行为测试通过；后者按项目历史约定补充进程级`LUA_PATH`后，state/trigger/generated-levels三个Lua 5.1测试全部通过。本任务未修改这些既有测试迎合文本或环境问题。
 - 当前状态：代码与自动验证完成，等待用户直接双击`tools/war3_damage_calculator/index.html`确认字段和使用体验；自动浏览器测试不等于Workshop Tools实机验证或用户验收。
 
+## 当前任务（2026-08-14）：怪物物理伤害改用项目 War3 护甲公式
+
+- 用户实机确认无任何科技时，`801`攻击命中`117` War3护甲怪物扣血`262`；该结果与`34.322`运行时护甲按引擎`0.06`曲线结算一致，证明此前现代非线性映射并未得到目标`240`。
+- 用户批准怪物物理伤害不再依赖Dota原生护甲曲线或护甲映射。所有命中明确项目怪物的物理伤害统一按`X / (1 + 0.02 * max(0, A))`结算，`A`为CSV派生的当前有效War3护甲；负护甲保留状态/UI值，但伤害按0护甲处理，不提供额外增伤。
+- 实施边界：保持`DAMAGE_TYPE_PHYSICAL`，在唯一Damage Filter内结算并追加忽略原生物理护甲flag；不递归`ApplyDamage`、不创建第二个Filter。普通攻击和项目物理技能使用同一规则，魔法/纯粹及非怪物目标不变。百分比穿甲先在War3域缩放有效正护甲。
+- 当前状态：生产实现与自动验证完成。怪物生成边界引擎护甲归零；Damage Filter统一处理物理攻击/技能、穿甲和忽略原生护甲flag；固定减甲与毒云百分比减甲维护有效War3护甲；选中单位UI和诊断使用同一权威值。
+- 自动验证通过：`CUSTOM_MONSTER_ARMOR_PASS`、`CUSTOM_MONSTER_POISON_ARMOR_PASS`、`ARMOR_REDUCTION_MAPPING_PASS`、`ARMOR_MAPPING_CONTRACT_PASS`、`COMBAT_STAT_PROJECTION_PASS`、`DAMAGE_TRANSACTION_ARMOR_IGNORE_PASS`、目标Lua 5.1语法、配置全量生成与`CheckOnly`、目标严格UTF-8及限定`git diff --check`。数学基准为`117`护甲下`801 -> 239.82`、`1401 -> 419.46`。
+- 尚需Workshop Tools完全停止当前会话后冷启动实测：确认`801`最终扣血约`240`，`MONSTER_PHYSICAL_DAMAGE_FILTER.filtered_damage`等于最终扣血；再抽样30%穿甲、物理技能、科技/毒云减甲、负护甲及非怪物隔离。自动测试不等于引擎实机验证。
+
 ## 已完成插入任务（2026-08-12）：主城/城墙等级名称与城墙原始护甲Tooltip
 
 - 目标：主城和城墙的单位名称随当前等级使用权威`building_levels.csv.display_name`；城墙升级Tooltip使用相邻等级CSV原始`war3_armor`差值，例如`10 -> 15 (+5)`。

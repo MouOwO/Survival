@@ -3,8 +3,26 @@ modifier_hero_poison_cloud_armor = class({})
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
+local armor_balance = require("config/armor_balance")
 
 local ARMOR_EPSILON = 0.0001
+
+local function uses_custom_war3_armor(parent)
+    return parent and not parent:IsNull()
+        and tonumber(parent.survival_armor_mapping_version)
+            == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+end
+
+local function refresh_custom_war3_armor(parent, reduction_pct)
+    parent.survival_poison_cloud_armor_reduction_pct = reduction_pct > 0
+        and reduction_pct or nil
+    parent.survival_effective_war3_armor = armor_balance.effective_war3_armor(
+        parent.survival_war3_armor,
+        parent.survival_war3_armor_reduction,
+        parent.survival_minimum_war3_armor,
+        reduction_pct
+    )
+end
 
 local function publish_armor_changed(modifier, reason, stacks, reduction)
     if not IsServer() then return end
@@ -51,14 +69,23 @@ function modifier_hero_poison_cloud_armor:SetPoisonValues(params)
     self:SetPoisonStacks(params.poison_stacks or self:GetStackCount())
     local next_stacks = tonumber(self:GetStackCount()) or 0
     local parent = self:GetParent()
+    local custom_war3 = uses_custom_war3_armor(parent)
+    local reduction_pct = math.min(100, next_pct * next_stacks)
+    if custom_war3 then
+        refresh_custom_war3_armor(parent, reduction_pct)
+        self.armor_reduction = 0
+        if previous_pct ~= next_pct or previous_stacks ~= next_stacks then
+            publish_armor_changed(self, "poison_cloud_armor_changed", next_stacks)
+        end
+        return
+    end
     local current_armor = parent and not parent:IsNull()
         and tonumber(parent:GetPhysicalArmorValue(false)) or 0
     -- GetPhysicalArmorValue already contains this modifier's previous flat
     -- reduction. Add it back before calculating the new percentage so every
     -- sync follows current equipment, technology and all other modifiers.
     local armor_without_poison = current_armor + previous_reduction
-    local reduction_pct = math.min(100, next_pct * next_stacks) / 100
-    local next_reduction = math.abs(armor_without_poison) * reduction_pct
+    local next_reduction = math.abs(armor_without_poison) * reduction_pct / 100
     self.armor_reduction = next_reduction
     if previous_pct ~= next_pct or previous_stacks ~= next_stacks
         or math.abs(previous_reduction - next_reduction) > ARMOR_EPSILON then
@@ -78,10 +105,13 @@ function modifier_hero_poison_cloud_armor:DeclareFunctions()
 end
 
 function modifier_hero_poison_cloud_armor:GetModifierPhysicalArmorBonus()
+    if uses_custom_war3_armor(self:GetParent()) then return 0 end
     return -math.max(0, tonumber(self.armor_reduction) or 0)
 end
 
 function modifier_hero_poison_cloud_armor:OnDestroy()
+    local parent = self:GetParent()
+    if uses_custom_war3_armor(parent) then refresh_custom_war3_armor(parent, 0) end
     publish_armor_changed(self, "poison_cloud_armor_removed", 0, 0)
 end
 

@@ -9,7 +9,7 @@ M.rows = {
     { rule_id = "tower_class_max_count", value = 5, description = "每条箭塔转职路线允许同时存在的最大数量", enabled = true },
     { rule_id = "tower_projectile_speed_multiplier", value = 1, description = "所有防御塔弹道速度倍率", enabled = true },
     { rule_id = "base_arrow_tower_cannot_miss", value = 1, description = "未转职基础箭塔普通攻击必中（0关闭1开启）", enabled = true },
-    { rule_id = "monster_war3_armor_damage_enabled", value = 1, description = "怪物物理伤害按War3目标护甲曲线补偿（0关闭1开启）", enabled = true },
+    { rule_id = "monster_war3_armor_damage_enabled", value = 0, description = "废弃兼容字段；怪物物理伤害固定使用项目War3护甲公式", enabled = false },
     { rule_id = "wave_monster_round_robin_enabled", value = 1, description = "每波普通怪按类型循环；地面飞行混合时按两地面一飞行（0关闭1开启）", enabled = true },
     { rule_id = "repair_detection_range", value = 99999, description = "修理师自动感知受损建筑的范围", enabled = true },
     { rule_id = "initial_gold", value = 0, description = "队伍开局金币", enabled = true },
