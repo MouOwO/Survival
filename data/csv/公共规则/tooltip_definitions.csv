@@ -75,11 +75,11 @@ ability:ice_blizzard_lv02,ability,ice_blizzard_lv02,寒冰尖塔LV2,0,0,攻击�
 ability:ice_blizzard_lv03,ability,ice_blizzard_lv03,寒冰尖塔LV3,0,0,攻击时14%概率触发落冰，每秒对300码范围造成触发时攻击力50%的物理伤害并减速25%，共4波,,ice_blizzard_lv03
 ability:ice_blizzard_lv04,ability,ice_blizzard_lv04,寒冰尖塔LV4,0,0,攻击时16%概率触发落冰，每秒对300码范围造成触发时攻击力50%的物理伤害并减速25%，共4波,,ice_blizzard_lv04
 ability:ice_blizzard_lv05,ability,ice_blizzard_lv05,寒冰尖塔LV5,0,0,攻击时16%概率触发落冰，每秒对300码范围造成触发时攻击力50%的物理伤害并减速25%，共4波,,ice_blizzard_lv05
-ability:laser_lv01,ability,laser_lv01,激光LV1,0,0,每0.5秒造成攻击力120%伤害，同目标每秒递增5%，最高500%,,laser_lv01
-ability:laser_lv02,ability,laser_lv02,激光LV2,0,0,每0.5秒造成攻击力140%伤害，同目标每秒递增5%，最高500%,,laser_lv02
-ability:laser_lv03,ability,laser_lv03,激光LV3,0,0,每0.5秒造成攻击力160%伤害，同目标每秒递增5%，最高500%,,laser_lv03
-ability:laser_lv04,ability,laser_lv04,激光LV4,0,0,每0.5秒造成攻击力180%伤害，同目标每秒递增5%，最高500%,,laser_lv04
-ability:laser_lv05,ability,laser_lv05,激光LV5,0,0,每0.5秒造成攻击力180%伤害，同目标每秒递增5%，最高500%,,laser_lv05
+ability:laser_lv01,ability,laser_lv01,激光LV1,0,0,每1秒造成攻击力100%伤害，同目标每秒递增5%，最高500%,,laser_lv01
+ability:laser_lv02,ability,laser_lv02,激光LV2,0,0,每1秒造成攻击力120%伤害，同目标每秒递增5%，最高500%,,laser_lv02
+ability:laser_lv03,ability,laser_lv03,激光LV3,0,0,每1秒造成攻击力140%伤害，同目标每秒递增5%，最高500%,,laser_lv03
+ability:laser_lv04,ability,laser_lv04,激光LV4,0,0,每1秒造成攻击力160%伤害，同目标每秒递增5%，最高500%,,laser_lv04
+ability:laser_lv05,ability,laser_lv05,激光LV5,0,0,每1秒造成攻击力180%伤害，同目标每秒递增5%，最高500%,,laser_lv05
 ability:lightning_diffusion_lv01,ability,lightning_diffusion_lv01,雷电扩散LV1,0,0,落雷命中时30%几率触发电圈，对半径200码造成该次物理伤害200%；电圈伤害为物理伤害且不会递归,,lightning_diffusion_lv01
 ability:lightning_storm_lv01,ability,lightning_storm_lv01,闪电魔塔LV1,0,0,闪电打击击杀敌方单位时，以死亡位置为中心立即对300范围内全部敌人造成触发时攻击力110%的物理伤害；随后1秒内随机落下5道仅视觉雷柱,,lightning_storm_lv01
 ability:lightning_storm_lv02,ability,lightning_storm_lv02,闪电魔塔LV2,0,0,闪电打击击杀敌方单位时，以死亡位置为中心立即对300范围内全部敌人造成触发时攻击力120%的物理伤害；随后1秒内随机落下6道仅视觉雷柱,,lightning_storm_lv02

@@ -1,0 +1,1671 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survival 击杀时间计算器</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d1218;
+      --panel: #161e27;
+      --panel-strong: #1d2834;
+      --line: #314052;
+      --text: #edf4fb;
+      --muted: #9eb0c2;
+      --accent: #f0b84b;
+      --accent-strong: #ffd477;
+      --danger: #ff7979;
+      --good: #74d99f;
+      --shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 0;
+      background: var(--bg);
+    }
+
+    body {
+      min-width: 0;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(240, 184, 75, 0.11), transparent 30rem),
+        linear-gradient(180deg, #111923 0%, var(--bg) 32rem);
+      font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .hero {
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--accent-strong);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      max-width: 820px;
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(22, 30, 39, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-section {
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-section:last-child {
+      border-bottom: 0;
+    }
+
+    .section-heading {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .section-note,
+    .field-help,
+    .result-note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #dfe9f2;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #405166;
+      border-radius: 10px;
+      outline: none;
+      background: #0e151d;
+      color: var(--text);
+      padding: 10px 12px;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(240, 184, 75, 0.16);
+    }
+
+    .field-help {
+      display: block;
+      margin-top: 5px;
+    }
+
+    .attacker-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .attacker-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+      padding: 13px;
+      border: 1px solid #35465a;
+      border-radius: 12px;
+      background: var(--panel-strong);
+    }
+
+    .attacker-index {
+      align-self: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(240, 184, 75, 0.16);
+      color: var(--accent-strong);
+      font-weight: 800;
+      line-height: 32px;
+      text-align: center;
+    }
+
+    .button {
+      border: 1px solid #52657a;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #253342;
+      color: var(--text);
+      padding: 9px 13px;
+      font-weight: 700;
+    }
+
+    .button:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .button-danger {
+      border-color: rgba(255, 121, 121, 0.45);
+      background: rgba(255, 121, 121, 0.08);
+      color: #ffaaaa;
+    }
+
+    .result-panel {
+      position: sticky;
+      top: 18px;
+    }
+
+    .result-hero {
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(240, 184, 75, 0.16), rgba(22, 30, 39, 0.2));
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .kill-time {
+      margin: 5px 0 2px;
+      color: var(--accent-strong);
+      font-size: clamp(36px, 8vw, 58px);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .kill-summary {
+      margin: 12px 0 0;
+      color: #e8eef4;
+      font-weight: 700;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .result-item {
+      min-width: 0;
+      padding: 16px;
+      background: var(--panel);
+    }
+
+    .result-value {
+      display: block;
+      overflow-wrap: anywhere;
+      margin-top: 4px;
+      color: #fff;
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .result-note {
+      margin: 0;
+      padding: 17px 20px 20px;
+    }
+
+    .error-box {
+      display: none;
+      margin: 16px 20px 20px;
+      border: 1px solid rgba(255, 121, 121, 0.55);
+      border-radius: 10px;
+      background: rgba(255, 121, 121, 0.1);
+      color: #ffb6b6;
+      padding: 12px 14px;
+    }
+
+    .error-box.visible {
+      display: block;
+    }
+
+    .test-results {
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 22px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(22, 30, 39, 0.82);
+    }
+
+    .mode-button.active {
+      border-color: var(--accent);
+      background: rgba(240, 184, 75, 0.16);
+      color: var(--accent-strong);
+    }
+
+    .mode-panel[hidden] {
+      display: none;
+    }
+
+    .experiment-layout {
+      display: grid;
+      gap: 22px;
+    }
+
+    .experiment-summary {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .checkbox-field {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 11px 12px;
+      border: 1px solid #405166;
+      border-radius: 10px;
+      background: #0e151d;
+    }
+
+    .checkbox-field input {
+      width: auto;
+      margin-top: 4px;
+    }
+
+    .checkbox-field label {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 112px;
+      resize: vertical;
+      border: 1px solid #405166;
+      border-radius: 10px;
+      outline: none;
+      background: #0e151d;
+      color: var(--text);
+      padding: 10px 12px;
+      font: inherit;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(240, 184, 75, 0.16);
+    }
+
+    .event-table-wrap {
+      overflow-x: auto;
+    }
+
+    .event-table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .event-table th,
+    .event-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .event-table th {
+      position: sticky;
+      top: 0;
+      background: #202c39;
+      color: var(--accent-strong);
+    }
+
+    .event-table td {
+      color: #dfe9f2;
+    }
+
+    .event-note {
+      max-width: 360px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 840px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .result-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        width: min(100% - 20px, 1180px);
+        padding-top: 20px;
+      }
+
+      .panel-section,
+      .result-hero {
+        padding: 17px;
+      }
+
+      .field-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      .attacker-row {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+
+      .attacker-row .button-danger {
+        grid-column: 1 / -1;
+      }
+
+      .result-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .mode-switch,
+      .experiment-summary {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">Survival · Offline Tool</p>
+      <h1>Survival 击杀时间计算器</h1>
+      <p class="subtitle">按当前地图的普通攻击、随机暴击、怪物护甲补偿和离散攻击时间轴计算期望伤害达标时间。</p>
+    </header>
+
+    <nav class="mode-switch" aria-label="计算器模式">
+      <button id="standardModeButton" class="button mode-button active" type="button" data-mode="standard">通用普通攻击</button>
+      <button id="mysteryModeButton" class="button mode-button" type="button" data-mode="mystery">神秘路线录像实验</button>
+    </nav>
+
+    <section id="standardMode" class="mode-panel">
+    <div class="layout">
+      <form id="calculatorForm" class="panel" novalidate>
+        <section class="panel-section">
+          <div class="section-heading">
+            <h2>全局攻击</h2>
+            <span class="section-note">所有攻击单位共用</span>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="attackDamage">当前面板物理攻击力</label>
+              <input id="attackDamage" type="number" min="0.000001" step="any" value="100" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="growthMode">每次命中后的永久成长</label>
+              <select id="growthMode">
+                <option value="percent_base">按基础攻击力百分比</option>
+                <option value="fixed" selected>按固定数值</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="growthValue">成长数值</label>
+              <input id="growthValue" type="number" min="0" step="any" value="0" inputmode="decimal">
+              <span id="growthHelp" class="field-help">每次命中后，当前攻击力固定增加该数值。</span>
+            </div>
+            <div class="field">
+              <label for="criticalChance">暴击率（%）</label>
+              <input id="criticalChance" type="number" min="0" max="100" step="any" value="0" inputmode="decimal">
+              <span class="field-help">每个普通攻击记录独立随机判定；计算结果使用期望伤害。</span>
+            </div>
+            <div class="field">
+              <label for="criticalDamagePct">暴击伤害（%）</label>
+              <input id="criticalDamagePct" type="number" min="100" step="any" value="200" inputmode="decimal">
+              <span class="field-help">项目快照使用百分数；例如200表示暴击造成普通伤害的200%。</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-heading">
+            <h2>攻击单位</h2>
+            <button id="addAttacker" class="button" type="button">+ 添加攻击单位</button>
+          </div>
+          <div id="attackerList" class="attacker-list">
+            <div class="attacker-row" data-attacker-id="1">
+              <span class="attacker-index">1</span>
+              <div class="field">
+                <label for="attacksPerSecond">每秒攻击次数</label>
+                <input id="attacksPerSecond" class="attacker-speed" type="number" min="0.000001" step="any" value="1" inputmode="decimal">
+              </div>
+              <button class="button button-danger remove-attacker" type="button" disabled>删除</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-heading">
+            <h2>穿甲与目标</h2>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="percentPenetration">物理护甲无视（%）</label>
+              <input id="percentPenetration" type="number" min="0" max="100" step="any" value="0" inputmode="decimal">
+              <span class="field-help">只缩放正护甲。</span>
+            </div>
+            <div class="field">
+              <label for="flatPenetration">固定减甲</label>
+              <input id="flatPenetration" type="number" min="0" step="any" value="0" inputmode="decimal">
+              <span class="field-help">视为已施加到目标的War3显示护甲，先于百分比无视计算。</span>
+            </div>
+            <div class="field">
+              <label for="targetArmor">怪物War3显示护甲</label>
+              <input id="targetArmor" type="number" step="any" value="0" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="targetHealth">敌方生命值</label>
+              <input id="targetHealth" type="number" min="0.000001" step="any" value="1000" inputmode="decimal">
+            </div>
+          </div>
+        </section>
+      </form>
+
+      <aside class="panel result-panel" aria-live="polite">
+        <div class="result-hero">
+          <span class="result-label">期望伤害达标时间</span>
+          <div id="killTime" class="kill-time">--</div>
+          <p id="killSummary" class="kill-summary">请输入有效数据</p>
+        </div>
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">期望口径平A次数</span>
+            <strong id="requiredHits" class="result-value">--</strong>
+          </div>
+          <div class="result-item">
+            <span class="result-label">期望暴击次数</span>
+            <strong id="criticalHitsUsed" class="result-value">--</strong>
+          </div>
+          <div class="result-item">
+            <span class="result-label">期望非暴击次数</span>
+            <strong id="normalHits" class="result-value">--</strong>
+          </div>
+          <div class="result-item">
+            <span class="result-label">有效护甲</span>
+            <strong id="effectiveArmor" class="result-value">--</strong>
+          </div>
+          <div class="result-item">
+            <span class="result-label">护甲伤害倍率</span>
+            <strong id="armorMultiplier" class="result-value">--</strong>
+          </div>
+          <div class="result-item">
+            <span class="result-label">致死时全局攻击力</span>
+            <strong id="lethalAttackDamage" class="result-value">--</strong>
+          </div>
+          <div class="result-item">
+            <span class="result-label">致死事件结算伤害</span>
+            <strong id="lethalEventDamage" class="result-value">--</strong>
+          </div>
+          <div class="result-item">
+            <span class="result-label">累计结算伤害</span>
+            <strong id="totalDamage" class="result-value">--</strong>
+          </div>
+        </div>
+        <p class="result-note">所有单位在0秒首次命中。同刻攻击共享成长前攻击力，结算后再成长。随机暴击以每次命中的期望伤害估算，单次实战结果会波动。</p>
+        <div id="errorBox" class="error-box"></div>
+      </aside>
+    </div>
+    </section>
+
+    <section id="mysteryMode" class="mode-panel" hidden>
+      <div class="experiment-layout">
+        <form id="mysteryForm" class="panel" novalidate>
+          <section class="panel-section">
+            <div class="section-heading">
+              <h2>神秘路线实验预设</h2>
+              <span class="section-note">仅离线录像反推，不接入生产配置</span>
+            </div>
+            <div class="field-grid">
+              <div class="field full">
+                <label for="mysteryPreset">塔等级预设</label>
+                <select id="mysteryPreset"></select>
+                <span id="mysteryPresetNote" class="field-help"></span>
+              </div>
+              <div class="field">
+                <label for="mysteryAttackDamage">录像面板攻击力</label>
+                <input id="mysteryAttackDamage" type="number" min="0.000001" step="any" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryAttackInterval">普通攻击间隔（秒）</label>
+                <input id="mysteryAttackInterval" type="number" min="0.000001" step="any" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryLaserFirstTick">激光首跳</label>
+                <select id="mysteryLaserFirstTick">
+                  <option value="delayed">锁定后延迟预设秒数（原版默认）</option>
+                  <option value="immediate">立即首跳（后续改造实验）</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="mysteryEventOrder">同刻事件顺序</label>
+                <select id="mysteryEventOrder">
+                  <option value="attack_first">普通攻击 → 激光</option>
+                  <option value="laser_first">激光 → 普通攻击</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="mysteryLaserInterval">激光间隔（秒）</label>
+                <input id="mysteryLaserInterval" type="number" min="0.000001" step="any" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryLaserBase">激光基础倍率</label>
+                <input id="mysteryLaserBase" type="number" min="0" step="any" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryLaserGrowth">每Tick倍率成长</label>
+                <input id="mysteryLaserGrowth" type="number" min="0" step="any" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryLaserCap">激光倍率上限</label>
+                <input id="mysteryLaserCap" type="number" min="0.000001" step="any" inputmode="decimal">
+              </div>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <div class="section-heading"><h2>主目标与时间线</h2></div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="mysteryTargetHealth">每个主目标生命值</label>
+                <input id="mysteryTargetHealth" type="number" min="0.000001" step="any" value="6000" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryTargetArmor">主目标War3护甲</label>
+                <input id="mysteryTargetArmor" type="number" step="any" value="23" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryTargetCount">连续主目标数量</label>
+                <input id="mysteryTargetCount" type="number" min="1" max="1000" step="1" value="1" inputmode="numeric">
+              </div>
+              <div class="field">
+                <label for="mysteryMaxTime">最长模拟时间（秒）</label>
+                <input id="mysteryMaxTime" type="number" min="0" step="any" value="30" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryTargetDistance">主目标距离（路径长度）</label>
+                <input id="mysteryTargetDistance" type="number" min="0.000001" step="any" value="600" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryPathHalfWidth">魔能之眼路径半宽</label>
+                <input id="mysteryPathHalfWidth" type="number" min="0" step="any" inputmode="decimal">
+                <span class="field-help">默认96仅为旧实现近似实验值，不是原版权威值。</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <div class="section-heading"><h2>魔能炮与魔能之眼</h2></div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="mysteryStackCap">击杀增伤层上限</label>
+                <input id="mysteryStackCap" type="number" min="0" step="1" inputmode="numeric">
+              </div>
+              <div class="field">
+                <label for="mysteryStackDuration">每层持续时间（秒）</label>
+                <input id="mysteryStackDuration" type="number" min="0.000001" step="any" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryStackBonus">每层增伤（%）</label>
+                <input id="mysteryStackBonus" type="number" min="0" step="any" inputmode="decimal">
+              </div>
+              <div class="field">
+                <label for="mysteryEyeMultiplier">魔能之眼路径倍率（%）</label>
+                <input id="mysteryEyeMultiplier" type="number" min="0" step="any" inputmode="decimal">
+              </div>
+              <div class="field full checkbox-field">
+                <input id="mysteryEyeUsesStacks" type="checkbox">
+                <label for="mysteryEyeUsesStacks">实验开关：魔能炮当前增伤层传递给魔能之眼路径伤害（录像尚无法唯一确认，默认关闭）</label>
+              </div>
+              <div class="field full">
+                <label for="mysteryPathTargets">路径内其他单位（每行：名称,x,y,生命,War3护甲）</label>
+                <textarea id="mysteryPathTargets" spellcheck="false" placeholder="路径怪A,250,40,1000,0&#10;路径怪B,400,120,2000,23"></textarea>
+                <span class="field-help">塔固定在(0,0)，主目标在(目标距离,0)。主目标不属于此列表；超出线段投影或路径半宽的单位不会受伤。</span>
+              </div>
+            </div>
+          </section>
+        </form>
+
+        <section class="panel" aria-live="polite">
+          <div class="result-hero">
+            <span class="result-label">实验时间线结果</span>
+            <div id="mysteryKillTime" class="kill-time">--</div>
+            <p id="mysterySummary" class="kill-summary">请选择预设</p>
+          </div>
+          <div class="experiment-summary">
+            <div class="result-item"><span class="result-label">主目标击杀</span><strong id="mysteryKills" class="result-value">--</strong></div>
+            <div class="result-item"><span class="result-label">路径目标击杀</span><strong id="mysteryPathKills" class="result-value">--</strong></div>
+            <div class="result-item"><span class="result-label">最终有效层数</span><strong id="mysteryFinalStacks" class="result-value">--</strong></div>
+            <div class="result-item"><span class="result-label">普通攻击伤害</span><strong id="mysteryAttackTotal" class="result-value">--</strong></div>
+            <div class="result-item"><span class="result-label">激光伤害</span><strong id="mysteryLaserTotal" class="result-value">--</strong></div>
+          </div>
+          <p class="result-note">默认模型：t=0普通攻击，t=1激光首跳，之后各每秒一次；激光切换目标重置成长。击杀层在致死事件结束后新增，各层独立到期。</p>
+          <div id="mysteryErrorBox" class="error-box"></div>
+          <div class="event-table-wrap">
+            <table class="event-table">
+              <thead><tr><th>时间</th><th>事件</th><th>目标</th><th>倍率</th><th>层数 前→后</th><th>结算伤害</th><th>目标剩余</th><th>说明</th></tr></thead>
+              <tbody id="mysteryEventRows"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <pre id="testResults" class="test-results"></pre>
+  </main>
+
+  <script>
+    "use strict";
+
+    const RULES = Object.freeze({ war3PositiveArmorFactor: 0.02, war3ToDotaRatio: 0.333333333333333, dotaArmorNumerator: 0.052, dotaArmorBase: 0.9, dotaArmorDenominator: 0.048 }); // CSV_RULES_END
+    const MYSTERY_PRESETS = Object.freeze([{"presetId":"mystery_lv01","routeId":"mystery","displayName":"神秘之塔LV1","level":1.0,"panelAttackDamage":901.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.0,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":0.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"录像工作簿面板值；原版默认延迟首跳"},{"presetId":"mystery_lv02","routeId":"mystery","displayName":"神秘之塔LV2","level":2.0,"panelAttackDamage":1501.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.2,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":0.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"录像工作簿面板值；第7波验证样本"},{"presetId":"mystery_lv03","routeId":"mystery","displayName":"神秘之塔LV3","level":3.0,"panelAttackDamage":2101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.4,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":0.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"录像工作簿面板值"},{"presetId":"mystery_lv04","routeId":"mystery","displayName":"神秘之塔LV4","level":4.0,"panelAttackDamage":3901.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.6,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":0.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"录像工作簿面板值"},{"presetId":"mystery_lv05","routeId":"mystery","displayName":"神秘之塔LV5","level":5.0,"panelAttackDamage":6101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":0.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"录像工作簿面板值"},{"presetId":"arcane_cannon_lv01","routeId":"arcane_cannon","displayName":"魔能炮LV1","level":1.0,"panelAttackDamage":12201.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":4.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"击杀层独立持续5秒"},{"presetId":"arcane_cannon_lv02","routeId":"arcane_cannon","displayName":"魔能炮LV2","level":2.0,"panelAttackDamage":35101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":5.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"击杀层独立持续5秒"},{"presetId":"arcane_cannon_lv03","routeId":"arcane_cannon","displayName":"魔能炮LV3","level":3.0,"panelAttackDamage":50101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":6.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"击杀层独立持续5秒"},{"presetId":"arcane_cannon_lv04","routeId":"arcane_cannon","displayName":"魔能炮LV4","level":4.0,"panelAttackDamage":75101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"击杀层独立持续5秒"},{"presetId":"arcane_cannon_lv05","routeId":"arcane_cannon","displayName":"魔能炮LV5","level":5.0,"panelAttackDamage":108101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":false,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"击杀层独立持续5秒"},{"presetId":"arcane_eye_lv01","routeId":"arcane_eye","displayName":"魔能之眼LV1","level":1.0,"panelAttackDamage":308101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv02","routeId":"arcane_eye","displayName":"魔能之眼LV2","level":2.0,"panelAttackDamage":508101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv03","routeId":"arcane_eye","displayName":"魔能之眼LV3","level":3.0,"panelAttackDamage":808101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv04","routeId":"arcane_eye","displayName":"魔能之眼LV4","level":4.0,"panelAttackDamage":1008101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv05","routeId":"arcane_eye","displayName":"魔能之眼LV5","level":5.0,"panelAttackDamage":1508101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv06","routeId":"arcane_eye","displayName":"魔能之眼LV6","level":6.0,"panelAttackDamage":2008101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv07","routeId":"arcane_eye","displayName":"魔能之眼LV7","level":7.0,"panelAttackDamage":3008101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv08","routeId":"arcane_eye","displayName":"魔能之眼LV8","level":8.0,"panelAttackDamage":4008101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv09","routeId":"arcane_eye","displayName":"魔能之眼LV9","level":9.0,"panelAttackDamage":5008101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"},{"presetId":"arcane_eye_lv10","routeId":"arcane_eye","displayName":"魔能之眼LV10","level":10.0,"panelAttackDamage":6008101.0,"attackInterval":1.0,"laserInitialDelay":1.0,"laserInterval":1.0,"laserBaseMultiplier":1.8,"laserGrowthPerTick":0.05,"laserMaxMultiplier":5.0,"arcaneStackBonus":0.1,"arcaneStackDuration":5.0,"arcaneStackCap":7.0,"eyeEnabled":true,"eyeDamageMultiplier":0.3,"eyePathHalfWidth":96.0,"notes":"路径半宽96为可调实验默认值"}]); // CSV_MYSTERY_PRESETS_END
+    const TIME_EPSILON = 1e-9;
+    const MAX_EVENTS = 1000000;
+    const MAX_ATTACKERS = 20;
+
+    function finiteNumber(value, fieldName) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) {
+        throw new Error(fieldName + "必须是有效数字");
+      }
+      return number;
+    }
+
+    function validateInput(raw) {
+      const input = {
+        attackDamage: finiteNumber(raw.attackDamage, "基础物理攻击力"),
+        growthMode: raw.growthMode,
+        growthValue: finiteNumber(raw.growthValue, "成长数值"),
+        criticalChance: finiteNumber(raw.criticalChance, "暴击率"),
+        criticalDamagePct: finiteNumber(raw.criticalDamagePct, "暴击伤害"),
+        percentPenetration: finiteNumber(raw.percentPenetration, "物理护甲无视"),
+        flatPenetration: finiteNumber(raw.flatPenetration, "固定减甲"),
+        targetArmor: finiteNumber(raw.targetArmor, "敌方护甲"),
+        targetHealth: finiteNumber(raw.targetHealth, "敌方生命值"),
+        attackers: raw.attackers.map(function (attacker, index) {
+          return {
+            attacksPerSecond: finiteNumber(attacker.attacksPerSecond, "攻击单位" + (index + 1) + "的每秒攻击次数")
+          };
+        })
+      };
+
+      if (input.attackDamage <= 0) throw new Error("基础物理攻击力必须大于0");
+      if (input.growthMode !== "fixed" && input.growthMode !== "percent_base") throw new Error("成长模式无效");
+      if (input.growthValue < 0) throw new Error("成长数值不能小于0");
+      if (input.criticalChance < 0 || input.criticalChance > 100) throw new Error("暴击率必须在0到100之间");
+      if (input.criticalDamagePct < 100) throw new Error("暴击伤害不能小于100%");
+      if (input.percentPenetration < 0 || input.percentPenetration > 100) throw new Error("物理护甲无视必须在0到100之间");
+      if (input.flatPenetration < 0) throw new Error("固定减甲不能小于0");
+      if (input.targetHealth <= 0) throw new Error("敌方生命值必须大于0");
+      if (input.attackers.length < 1) throw new Error("至少需要一个攻击单位");
+      if (input.attackers.length > MAX_ATTACKERS) throw new Error("攻击单位最多为" + MAX_ATTACKERS + "个");
+      input.attackers.forEach(function (attacker, index) {
+        if (attacker.attacksPerSecond <= 0) throw new Error("攻击单位" + (index + 1) + "的每秒攻击次数必须大于0");
+      });
+      return input;
+    }
+
+    function calculateEffectiveArmor(armor, percentPenetration, flatPenetration) {
+      const afterFlat = armor - flatPenetration;
+      return afterFlat > 0 ? afterFlat * (1 - percentPenetration / 100) : afterFlat;
+    }
+
+    function calculateArmorMultiplier(armor) {
+      if (armor > 0) {
+        return 1 / (1 + RULES.war3PositiveArmorFactor * armor);
+      }
+      const runtimeArmor = armor * RULES.war3ToDotaRatio;
+      const reduction = RULES.dotaArmorNumerator * runtimeArmor /
+        (RULES.dotaArmorBase + RULES.dotaArmorDenominator * Math.abs(runtimeArmor));
+      return 1 - reduction;
+    }
+
+    function sameTime(left, right) {
+      return Math.abs(left - right) <= TIME_EPSILON * Math.max(1, Math.abs(left), Math.abs(right));
+    }
+
+    function calculateKill(rawInput) {
+      const input = validateInput(rawInput);
+      const effectiveArmor = calculateEffectiveArmor(input.targetArmor, input.percentPenetration, input.flatPenetration);
+      const armorMultiplier = calculateArmorMultiplier(effectiveArmor);
+      const growthPerHit = input.growthMode === "percent_base"
+        ? input.attackDamage * input.growthValue / 100
+        : input.growthValue;
+      const expectedCriticalMultiplier = 1 + input.criticalChance / 100 *
+        (input.criticalDamagePct / 100 - 1);
+      const nextTimes = input.attackers.map(function () { return 0; });
+      const intervals = input.attackers.map(function (attacker) { return 1 / attacker.attacksPerSecond; });
+      let currentAttackDamage = input.attackDamage;
+      let totalHits = 0;
+      let totalDamage = 0;
+
+      for (let eventCount = 0; eventCount < MAX_EVENTS; eventCount += 1) {
+        const eventTime = Math.min.apply(null, nextTimes);
+        const attackingIndexes = [];
+        for (let index = 0; index < nextTimes.length; index += 1) {
+          if (sameTime(nextTimes[index], eventTime)) attackingIndexes.push(index);
+        }
+
+        const eventHitCount = attackingIndexes.length;
+        const normalDamagePerHit = currentAttackDamage * armorMultiplier;
+        const eventDamage = normalDamagePerHit * eventHitCount * expectedCriticalMultiplier;
+
+        totalHits += eventHitCount;
+        totalDamage += eventDamage;
+
+        if (totalDamage + 1e-10 >= input.targetHealth) {
+          return {
+            killTime: eventTime,
+            totalHits: totalHits,
+            criticalHitsUsed: totalHits * input.criticalChance / 100,
+            normalHits: totalHits * (1 - input.criticalChance / 100),
+            effectiveArmor: effectiveArmor,
+            armorMultiplier: armorMultiplier,
+            lethalAttackDamage: currentAttackDamage,
+            lethalEventDamage: eventDamage,
+            totalDamage: totalDamage
+          };
+        }
+
+        currentAttackDamage += growthPerHit * eventHitCount;
+        attackingIndexes.forEach(function (index) {
+          nextTimes[index] += intervals[index];
+        });
+      }
+
+      throw new Error("计算事件过多，请降低生命值或提高攻击力/攻速");
+    }
+
+    function inputValue(id) {
+      return document.getElementById(id).value;
+    }
+
+    function readForm() {
+      return {
+        attackDamage: inputValue("attackDamage"),
+        growthMode: inputValue("growthMode"),
+        growthValue: inputValue("growthValue"),
+        criticalChance: inputValue("criticalChance"),
+        criticalDamagePct: inputValue("criticalDamagePct"),
+        percentPenetration: inputValue("percentPenetration"),
+        flatPenetration: inputValue("flatPenetration"),
+        targetArmor: inputValue("targetArmor"),
+        targetHealth: inputValue("targetHealth"),
+        attackers: Array.from(document.querySelectorAll(".attacker-speed")).map(function (input) {
+          return { attacksPerSecond: input.value };
+        })
+      };
+    }
+
+    function formatNumber(value, maximumFractionDigits) {
+      if (!Number.isFinite(value)) return "--";
+      const digits = maximumFractionDigits === undefined ? 6 : maximumFractionDigits;
+      return new Intl.NumberFormat("zh-CN", {
+        maximumFractionDigits: digits,
+        useGrouping: true
+      }).format(value);
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function renderError(error) {
+      ["killTime", "requiredHits", "criticalHitsUsed", "normalHits", "effectiveArmor",
+        "armorMultiplier", "lethalAttackDamage", "lethalEventDamage", "totalDamage"].forEach(function (id) {
+        setText(id, "--");
+      });
+      setText("killSummary", "无法计算");
+      const errorBox = document.getElementById("errorBox");
+      errorBox.textContent = error.message;
+      errorBox.classList.add("visible");
+    }
+
+    function renderResult(result) {
+      document.getElementById("errorBox").classList.remove("visible");
+      setText("killTime", formatNumber(result.killTime, 6) + " 秒");
+      setText("killSummary", "期望伤害在第 " + formatNumber(result.totalHits, 0) + " 次平A命中时达到生命值");
+      setText("requiredHits", formatNumber(result.totalHits, 0));
+      setText("criticalHitsUsed", formatNumber(result.criticalHitsUsed, 6));
+      setText("normalHits", formatNumber(result.normalHits, 6));
+      setText("effectiveArmor", formatNumber(result.effectiveArmor, 6));
+      setText("armorMultiplier", formatNumber(result.armorMultiplier, 6) + "×");
+      setText("lethalAttackDamage", formatNumber(result.lethalAttackDamage, 6));
+      setText("lethalEventDamage", formatNumber(result.lethalEventDamage, 6));
+      setText("totalDamage", formatNumber(result.totalDamage, 6));
+    }
+
+    function updateCalculation() {
+      try {
+        renderResult(calculateKill(readForm()));
+      } catch (error) {
+        renderError(error);
+      }
+    }
+
+    function updateGrowthHelp() {
+      const percentMode = inputValue("growthMode") === "percent_base";
+      document.getElementById("growthHelp").textContent = percentMode
+        ? "每次命中后，按基础攻击力的该百分比永久增加。"
+        : "每次命中后，当前攻击力固定增加该数值。";
+    }
+
+    function refreshAttackerRows() {
+      const rows = Array.from(document.querySelectorAll(".attacker-row"));
+      rows.forEach(function (row, index) {
+        row.querySelector(".attacker-index").textContent = String(index + 1);
+        const input = row.querySelector(".attacker-speed");
+        const label = row.querySelector("label");
+        const inputId = index === 0 ? "attacksPerSecond" : "attacksPerSecond" + (index + 1);
+        input.id = inputId;
+        label.htmlFor = inputId;
+        row.querySelector(".remove-attacker").disabled = rows.length === 1;
+      });
+      document.getElementById("addAttacker").disabled = rows.length >= MAX_ATTACKERS;
+    }
+
+    function addAttackUnit(attacksPerSecond) {
+      const list = document.getElementById("attackerList");
+      const row = document.createElement("div");
+      row.className = "attacker-row";
+      row.innerHTML =
+        '<span class="attacker-index"></span>' +
+        '<div class="field"><label>每秒攻击次数</label>' +
+        '<input class="attacker-speed" type="number" min="0.000001" step="any" value="' +
+        String(attacksPerSecond === undefined ? 1 : attacksPerSecond) + '" inputmode="decimal"></div>' +
+        '<button class="button button-danger remove-attacker" type="button">删除</button>';
+      list.appendChild(row);
+      refreshAttackerRows();
+      updateCalculation();
+      return row;
+    }
+
+    function mysteryPresetById(presetId) {
+      const preset = MYSTERY_PRESETS.find(function (item) { return item.presetId === presetId; });
+      if (!preset) throw new Error("神秘路线预设不存在：" + presetId);
+      return preset;
+    }
+
+    function laserMultiplierForTick(input, tickIndex) {
+      return Math.min(input.laserBaseMultiplier + input.laserGrowthPerTick * tickIndex, input.laserMaxMultiplier);
+    }
+
+    function parseMysteryPathTargets(text) {
+      if (!String(text || "").trim()) return [];
+      return String(text).split(/\r?\n/).filter(function (line) { return line.trim(); }).map(function (line, index) {
+        const parts = line.split(",").map(function (part) { return part.trim(); });
+        if (parts.length !== 5) throw new Error("路径目标第" + (index + 1) + "行必须包含5列");
+        const target = {
+          name: parts[0] || ("路径目标" + (index + 1)),
+          x: finiteNumber(parts[1], "路径目标" + (index + 1) + "的x"),
+          y: finiteNumber(parts[2], "路径目标" + (index + 1) + "的y"),
+          health: finiteNumber(parts[3], "路径目标" + (index + 1) + "的生命"),
+          armor: finiteNumber(parts[4], "路径目标" + (index + 1) + "的护甲")
+        };
+        if (target.health <= 0) throw new Error("路径目标" + (index + 1) + "的生命必须大于0");
+        return target;
+      });
+    }
+
+    function validateMysteryInput(raw) {
+      const input = {
+        presetId: String(raw.presetId || ""),
+        attackDamage: finiteNumber(raw.attackDamage, "录像面板攻击力"),
+        attackInterval: finiteNumber(raw.attackInterval, "普通攻击间隔"),
+        laserFirstTick: raw.laserFirstTick,
+        laserInitialDelay: finiteNumber(raw.laserInitialDelay, "激光首跳延迟"),
+        laserInterval: finiteNumber(raw.laserInterval, "激光间隔"),
+        laserBaseMultiplier: finiteNumber(raw.laserBaseMultiplier, "激光基础倍率"),
+        laserGrowthPerTick: finiteNumber(raw.laserGrowthPerTick, "激光每Tick成长"),
+        laserMaxMultiplier: finiteNumber(raw.laserMaxMultiplier, "激光倍率上限"),
+        eventOrder: raw.eventOrder,
+        targetHealth: finiteNumber(raw.targetHealth, "主目标生命"),
+        targetArmor: finiteNumber(raw.targetArmor, "主目标护甲"),
+        targetCount: finiteNumber(raw.targetCount, "主目标数量"),
+        maxTime: finiteNumber(raw.maxTime, "最长模拟时间"),
+        targetDistance: finiteNumber(raw.targetDistance, "主目标距离"),
+        pathHalfWidth: finiteNumber(raw.pathHalfWidth, "路径半宽"),
+        stackCap: finiteNumber(raw.stackCap, "击杀层上限"),
+        stackDuration: finiteNumber(raw.stackDuration, "每层持续时间"),
+        stackBonus: finiteNumber(raw.stackBonus, "每层增伤"),
+        eyeDamageMultiplier: finiteNumber(raw.eyeDamageMultiplier, "魔能之眼倍率"),
+        eyeUsesStacks: Boolean(raw.eyeUsesStacks),
+        pathTargets: (raw.pathTargets || []).map(function (target) {
+          return {
+            name: String(target.name), x: finiteNumber(target.x, "路径目标x"), y: finiteNumber(target.y, "路径目标y"),
+            health: finiteNumber(target.health, "路径目标生命"), armor: finiteNumber(target.armor, "路径目标护甲")
+          };
+        }),
+        initialStackExpiries: (raw.initialStackExpiries || []).map(function (expiry) {
+          return finiteNumber(expiry, "初始层过期时间");
+        })
+      };
+      if (input.attackDamage <= 0) throw new Error("录像面板攻击力必须大于0");
+      if (input.attackInterval <= 0 || input.laserInterval <= 0) throw new Error("攻击与激光间隔必须大于0");
+      if (input.laserInitialDelay < 0) throw new Error("激光首跳延迟不能小于0");
+      if (input.laserFirstTick !== "delayed" && input.laserFirstTick !== "immediate") throw new Error("激光首跳模式无效");
+      if (input.eventOrder !== "attack_first" && input.eventOrder !== "laser_first") throw new Error("同刻事件顺序无效");
+      if (input.laserBaseMultiplier < 0 || input.laserGrowthPerTick < 0 || input.laserMaxMultiplier <= 0) throw new Error("激光倍率参数无效");
+      if (input.laserMaxMultiplier < input.laserBaseMultiplier) throw new Error("激光倍率上限不能小于基础倍率");
+      if (input.targetHealth <= 0 || input.targetDistance <= 0) throw new Error("主目标生命与距离必须大于0");
+      if (!Number.isInteger(input.targetCount) || input.targetCount < 1 || input.targetCount > 1000) throw new Error("主目标数量必须是1到1000的整数");
+      if (input.maxTime < 0) throw new Error("最长模拟时间不能小于0");
+      if (!Number.isInteger(input.stackCap) || input.stackCap < 0) throw new Error("击杀层上限必须是非负整数");
+      if (input.stackDuration <= 0 || input.stackBonus < 0 || input.eyeDamageMultiplier < 0 || input.pathHalfWidth < 0) throw new Error("增伤与路径参数无效");
+      input.pathTargets.forEach(function (target, index) {
+        if (target.health <= 0) throw new Error("路径目标" + (index + 1) + "生命必须大于0");
+      });
+      return input;
+    }
+
+    function isMysteryPathHit(target, distance, halfWidth) {
+      return target.x >= -TIME_EPSILON && target.x <= distance + TIME_EPSILON && Math.abs(target.y) <= halfWidth + TIME_EPSILON;
+    }
+
+    function simulateMystery(rawInput) {
+      const input = validateMysteryInput(rawInput);
+      const mainArmorMultiplier = calculateArmorMultiplier(input.targetArmor);
+      const pathTargets = input.pathTargets.map(function (target, index) {
+        return {
+          id: index + 1,
+          name: target.name,
+          x: target.x,
+          y: target.y,
+          health: target.health,
+          maxHealth: target.health,
+          armor: target.armor,
+          armorMultiplier: calculateArmorMultiplier(target.armor),
+          inPath: isMysteryPathHit(target, input.targetDistance, input.pathHalfWidth),
+          dead: false
+        };
+      });
+      const firstLaserDelay = input.laserFirstTick === "immediate" ? 0 : input.laserInitialDelay;
+      let activeTarget = { index: 1, health: input.targetHealth };
+      let mainKills = 0;
+      let pathKills = 0;
+      let nextAttack = 0;
+      let nextLaser = firstLaserDelay;
+      let laserTickIndex = 0;
+      let stackExpiries = input.initialStackExpiries.slice().sort(function (a, b) { return a - b; });
+      let attackDamageTotal = 0;
+      let laserDamageTotal = 0;
+      let pathDamageTotal = 0;
+      let processedEvents = 0;
+      let lastTime = 0;
+      const events = [];
+
+      function pushEvent(event) {
+        events.push(event);
+        processedEvents += 1;
+        if (processedEvents > MAX_EVENTS) throw new Error("神秘路线模拟事件过多，请缩短时间或增大间隔");
+      }
+
+      function expireStacks(time) {
+        let expired = 0;
+        while (stackExpiries.length && stackExpiries[0] <= time + TIME_EPSILON) {
+          stackExpiries.shift();
+          expired += 1;
+        }
+        if (expired > 0) {
+          pushEvent({
+            time: time, type: "expire", target: "魔能炮层", multiplier: 0,
+            stacksBefore: stackExpiries.length + expired, stacksAfter: stackExpiries.length,
+            damage: 0, remaining: null, note: expired + "层独立到期"
+          });
+        }
+      }
+
+      function awardKillStacks(time, killCount) {
+        if (killCount <= 0 || input.stackCap <= 0) return 0;
+        const added = Math.min(killCount, Math.max(0, input.stackCap - stackExpiries.length));
+        for (let index = 0; index < added; index += 1) stackExpiries.push(time + input.stackDuration);
+        stackExpiries.sort(function (a, b) { return a - b; });
+        return added;
+      }
+
+      function switchMainTarget(time) {
+        if (mainKills >= input.targetCount) {
+          activeTarget = null;
+          nextLaser = Infinity;
+          return;
+        }
+        activeTarget = { index: mainKills + 1, health: input.targetHealth };
+        laserTickIndex = 0;
+        nextLaser = time + firstLaserDelay;
+      }
+
+      function resolveAttack(time) {
+        if (!activeTarget) return;
+        const stacksBefore = stackExpiries.length;
+        const amp = 1 + stacksBefore * input.stackBonus;
+        const mainDamage = input.attackDamage * amp * mainArmorMultiplier;
+        activeTarget.health -= mainDamage;
+        attackDamageTotal += mainDamage;
+        let killCount = 0;
+        let mainKilled = false;
+        if (activeTarget.health <= TIME_EPSILON) {
+          activeTarget.health = 0;
+          mainKills += 1;
+          killCount += 1;
+          mainKilled = true;
+        }
+
+        const pathNotes = [];
+        pathTargets.forEach(function (target) {
+          if (!target.inPath || target.dead) return;
+          const eyeAmp = input.eyeUsesStacks ? amp : 1;
+          const damage = input.attackDamage * input.eyeDamageMultiplier * eyeAmp * target.armorMultiplier;
+          target.health -= damage;
+          pathDamageTotal += damage;
+          let killed = false;
+          if (target.health <= TIME_EPSILON) {
+            target.health = 0;
+            target.dead = true;
+            pathKills += 1;
+            killCount += 1;
+            killed = true;
+          }
+          pathNotes.push(target.name + "=" + formatNumber(damage, 3) + (killed ? "(击杀)" : ""));
+        });
+
+        const added = awardKillStacks(time, killCount);
+        const targetLabel = "主目标" + activeTarget.index;
+        const remaining = activeTarget.health;
+        pushEvent({
+          time: time, type: "attack", target: targetLabel, multiplier: amp,
+          stacksBefore: stacksBefore, stacksAfter: stackExpiries.length,
+          damage: mainDamage, remaining: remaining,
+          note: (pathNotes.length ? "路径：" + pathNotes.join("；") + "。" : "") +
+            (added ? "事件结束后新增" + added + "层；本次伤害未反向增强。" : "")
+        });
+        if (mainKilled) switchMainTarget(time);
+      }
+
+      function resolveLaser(time) {
+        if (!activeTarget) return;
+        const stacksBefore = stackExpiries.length;
+        const amp = 1 + stacksBefore * input.stackBonus;
+        const laserMultiplier = laserMultiplierForTick(input, laserTickIndex);
+        const damage = input.attackDamage * laserMultiplier * amp * mainArmorMultiplier;
+        activeTarget.health -= damage;
+        laserDamageTotal += damage;
+        const targetLabel = "主目标" + activeTarget.index;
+        let killCount = 0;
+        let mainKilled = false;
+        if (activeTarget.health <= TIME_EPSILON) {
+          activeTarget.health = 0;
+          mainKills += 1;
+          killCount = 1;
+          mainKilled = true;
+        }
+        const added = awardKillStacks(time, killCount);
+        pushEvent({
+          time: time, type: "laser", target: targetLabel, multiplier: laserMultiplier * amp,
+          laserMultiplier: laserMultiplier, stacksBefore: stacksBefore, stacksAfter: stackExpiries.length,
+          damage: damage, remaining: activeTarget.health,
+          note: (added ? "事件结束后新增1层；本次伤害未反向增强。" : "") +
+            (mainKilled ? "切换目标后激光成长重置。" : "")
+        });
+        if (mainKilled) {
+          switchMainTarget(time);
+        } else {
+          laserTickIndex += 1;
+        }
+      }
+
+      while (lastTime <= input.maxTime + TIME_EPSILON) {
+        const nextExpiry = stackExpiries.length ? stackExpiries[0] : Infinity;
+        const nextTime = Math.min(activeTarget ? nextAttack : Infinity, activeTarget ? nextLaser : Infinity, nextExpiry);
+        if (!Number.isFinite(nextTime) || nextTime > input.maxTime + TIME_EPSILON) break;
+        lastTime = nextTime;
+        expireStacks(nextTime);
+        const order = input.eventOrder === "attack_first" ? ["attack", "laser"] : ["laser", "attack"];
+        order.forEach(function (eventType) {
+          if (!activeTarget) return;
+          if (eventType === "attack" && sameTime(nextAttack, nextTime)) {
+            nextAttack += input.attackInterval;
+            resolveAttack(nextTime);
+          } else if (eventType === "laser" && sameTime(nextLaser, nextTime)) {
+            nextLaser += input.laserInterval;
+            resolveLaser(nextTime);
+          }
+        });
+        if (!activeTarget && (!stackExpiries.length || mainKills >= input.targetCount)) break;
+      }
+
+      return {
+        presetId: input.presetId,
+        completed: mainKills >= input.targetCount,
+        killTime: mainKills >= input.targetCount ? lastTime : null,
+        simulatedUntil: lastTime,
+        mainKills: mainKills,
+        pathKills: pathKills,
+        finalStacks: stackExpiries.length,
+        attackDamageTotal: attackDamageTotal,
+        laserDamageTotal: laserDamageTotal,
+        pathDamageTotal: pathDamageTotal,
+        events: events,
+        pathTargets: pathTargets
+      };
+    }
+
+    function readMysteryForm() {
+      const preset = mysteryPresetById(inputValue("mysteryPreset"));
+      return {
+        presetId: preset.presetId,
+        attackDamage: inputValue("mysteryAttackDamage"),
+        attackInterval: inputValue("mysteryAttackInterval"),
+        laserFirstTick: inputValue("mysteryLaserFirstTick"),
+        laserInitialDelay: preset.laserInitialDelay,
+        laserInterval: inputValue("mysteryLaserInterval"),
+        laserBaseMultiplier: inputValue("mysteryLaserBase"),
+        laserGrowthPerTick: inputValue("mysteryLaserGrowth"),
+        laserMaxMultiplier: inputValue("mysteryLaserCap"),
+        eventOrder: inputValue("mysteryEventOrder"),
+        targetHealth: inputValue("mysteryTargetHealth"),
+        targetArmor: inputValue("mysteryTargetArmor"),
+        targetCount: inputValue("mysteryTargetCount"),
+        maxTime: inputValue("mysteryMaxTime"),
+        targetDistance: inputValue("mysteryTargetDistance"),
+        pathHalfWidth: inputValue("mysteryPathHalfWidth"),
+        stackCap: inputValue("mysteryStackCap"),
+        stackDuration: inputValue("mysteryStackDuration"),
+        stackBonus: finiteNumber(inputValue("mysteryStackBonus"), "每层增伤") / 100,
+        eyeDamageMultiplier: finiteNumber(inputValue("mysteryEyeMultiplier"), "魔能之眼倍率") / 100,
+        eyeUsesStacks: document.getElementById("mysteryEyeUsesStacks").checked,
+        pathTargets: parseMysteryPathTargets(inputValue("mysteryPathTargets"))
+      };
+    }
+
+    function applyMysteryPreset(presetId) {
+      const preset = mysteryPresetById(presetId);
+      document.getElementById("mysteryAttackDamage").value = String(preset.panelAttackDamage);
+      document.getElementById("mysteryAttackInterval").value = String(preset.attackInterval);
+      document.getElementById("mysteryLaserInterval").value = String(preset.laserInterval);
+      document.getElementById("mysteryLaserBase").value = String(preset.laserBaseMultiplier);
+      document.getElementById("mysteryLaserGrowth").value = String(preset.laserGrowthPerTick);
+      document.getElementById("mysteryLaserCap").value = String(preset.laserMaxMultiplier);
+      document.getElementById("mysteryStackCap").value = String(preset.arcaneStackCap);
+      document.getElementById("mysteryStackDuration").value = String(preset.arcaneStackDuration);
+      document.getElementById("mysteryStackBonus").value = String(preset.arcaneStackBonus * 100);
+      document.getElementById("mysteryEyeMultiplier").value = String(preset.eyeDamageMultiplier * 100);
+      document.getElementById("mysteryPathHalfWidth").value = String(preset.eyePathHalfWidth);
+      document.getElementById("mysteryPresetNote").textContent = preset.notes +
+        (preset.eyeEnabled ? "；包含魔能之眼路径实验。" : "；该阶段默认不启用路径伤害。") +
+        " 正式塔CSV未被本实验修改。";
+      document.getElementById("mysteryPathTargets").disabled = !preset.eyeEnabled;
+      document.getElementById("mysteryEyeMultiplier").disabled = !preset.eyeEnabled;
+      document.getElementById("mysteryPathHalfWidth").disabled = !preset.eyeEnabled;
+      document.getElementById("mysteryEyeUsesStacks").disabled = !preset.eyeEnabled;
+      updateMysteryCalculation();
+    }
+
+    function eventTypeName(type) {
+      if (type === "attack") return "普通攻击";
+      if (type === "laser") return "激光Tick";
+      return "层过期";
+    }
+
+    function renderMysteryResult(result) {
+      document.getElementById("mysteryErrorBox").classList.remove("visible");
+      setText("mysteryKillTime", result.completed ? formatNumber(result.killTime, 6) + " 秒" : "未完成");
+      setText("mysterySummary", result.completed
+        ? "连续" + result.mainKills + "个主目标在离散事件时间线上全部击杀"
+        : "最长时间内击杀" + result.mainKills + "个主目标");
+      setText("mysteryKills", result.mainKills);
+      setText("mysteryPathKills", result.pathKills);
+      setText("mysteryFinalStacks", result.finalStacks);
+      setText("mysteryAttackTotal", formatNumber(result.attackDamageTotal, 3));
+      setText("mysteryLaserTotal", formatNumber(result.laserDamageTotal, 3));
+      const rows = document.getElementById("mysteryEventRows");
+      rows.textContent = "";
+      result.events.forEach(function (event) {
+        const row = document.createElement("tr");
+        [
+          formatNumber(event.time, 6), eventTypeName(event.type), event.target,
+          event.type === "expire" ? "--" : formatNumber(event.multiplier, 4) + "×",
+          event.stacksBefore + " → " + event.stacksAfter,
+          event.type === "expire" ? "--" : formatNumber(event.damage, 3),
+          event.remaining === null ? "--" : formatNumber(event.remaining, 3), event.note || ""
+        ].forEach(function (value, index) {
+          const cell = document.createElement("td");
+          cell.textContent = String(value);
+          if (index === 7) cell.className = "event-note";
+          row.appendChild(cell);
+        });
+        rows.appendChild(row);
+      });
+    }
+
+    function renderMysteryError(error) {
+      ["mysteryKillTime", "mysteryKills", "mysteryPathKills", "mysteryFinalStacks", "mysteryAttackTotal", "mysteryLaserTotal"].forEach(function (id) {
+        setText(id, "--");
+      });
+      setText("mysterySummary", "输入无效");
+      document.getElementById("mysteryEventRows").textContent = "";
+      const box = document.getElementById("mysteryErrorBox");
+      box.textContent = error.message;
+      box.classList.add("visible");
+    }
+
+    function updateMysteryCalculation() {
+      try {
+        const preset = mysteryPresetById(inputValue("mysteryPreset"));
+        const raw = readMysteryForm();
+        if (!preset.eyeEnabled) raw.pathTargets = [];
+        renderMysteryResult(simulateMystery(raw));
+      } catch (error) {
+        renderMysteryError(error);
+      }
+    }
+
+    function initializeMysteryMode() {
+      const select = document.getElementById("mysteryPreset");
+      MYSTERY_PRESETS.forEach(function (preset) {
+        const option = document.createElement("option");
+        option.value = preset.presetId;
+        option.textContent = preset.displayName + " · 面板攻击 " + formatNumber(preset.panelAttackDamage, 0);
+        select.appendChild(option);
+      });
+      select.value = "mystery_lv02";
+      applyMysteryPreset(select.value);
+    }
+
+    function switchMode(mode) {
+      const mystery = mode === "mystery";
+      document.getElementById("standardMode").hidden = mystery;
+      document.getElementById("mysteryMode").hidden = !mystery;
+      document.getElementById("standardModeButton").classList.toggle("active", !mystery);
+      document.getElementById("mysteryModeButton").classList.toggle("active", mystery);
+    }
+
+    function baseTestInput(overrides) {
+      const input = {
+        attackDamage: 100,
+        growthMode: "fixed",
+        growthValue: 0,
+        criticalChance: 0,
+        criticalDamagePct: 200,
+        percentPenetration: 0,
+        flatPenetration: 0,
+        targetArmor: 0,
+        targetHealth: 100,
+        attackers: [{ attacksPerSecond: 1 }]
+      };
+      Object.keys(overrides || {}).forEach(function (key) { input[key] = overrides[key]; });
+      return input;
+    }
+
+    function baseMysteryTestInput(overrides) {
+      const preset = mysteryPresetById("arcane_eye_lv01");
+      const input = {
+        presetId: preset.presetId,
+        attackDamage: 100,
+        attackInterval: 1,
+        laserFirstTick: "delayed",
+        laserInitialDelay: 1,
+        laserInterval: 1,
+        laserBaseMultiplier: 1,
+        laserGrowthPerTick: 0.05,
+        laserMaxMultiplier: 5,
+        eventOrder: "attack_first",
+        targetHealth: 1000,
+        targetArmor: 0,
+        targetCount: 1,
+        maxTime: 10,
+        targetDistance: 600,
+        pathHalfWidth: 96,
+        stackCap: 7,
+        stackDuration: 5,
+        stackBonus: 0.1,
+        eyeDamageMultiplier: 0.3,
+        eyeUsesStacks: false,
+        pathTargets: [],
+        initialStackExpiries: []
+      };
+      Object.keys(overrides || {}).forEach(function (key) { input[key] = overrides[key]; });
+      return input;
+    }
+
+    function runBrowserTests() {
+      let assertions = 0;
+      function assert(condition, message) {
+        assertions += 1;
+        if (!condition) throw new Error("断言失败：" + message);
+      }
+      function near(actual, expected, message) {
+        assert(Math.abs(actual - expected) <= 1e-8 * Math.max(1, Math.abs(expected)), message + " actual=" + actual);
+      }
+
+      try {
+        near(calculateArmorMultiplier(10), 1 / 1.2, "项目怪物正护甲公式");
+        near(calculateArmorMultiplier(0), 1, "零护甲公式");
+        near(calculateArmorMultiplier(-10), 1 - (0.052 * (-10 / 3)) / (0.9 + 0.048 * (10 / 3)), "负护甲沿用Dota运行曲线");
+        near(calculateEffectiveArmor(20, 25, 3), 12.75, "正护甲先固定减甲后百分比无视");
+        near(calculateEffectiveArmor(-5, 80, 3), -8, "非正护甲不受百分比无视影响");
+
+        const defaultResult = calculateKill(baseTestInput({
+          criticalChance: 50,
+          criticalDamagePct: 200,
+          targetHealth: 1000
+        }));
+        assert(defaultResult.totalHits === 7, "期望伤害使用完整平A次数");
+        near(defaultResult.criticalHitsUsed, 3.5, "按概率显示期望暴击次数");
+        near(defaultResult.normalHits, 3.5, "按概率显示期望非暴击次数");
+        near(defaultResult.killTime, 6, "单单位首击0秒");
+        near(defaultResult.totalDamage, 1050, "每击使用随机暴击期望倍率");
+
+        const noCritical = calculateKill(baseTestInput({ targetHealth: 250, attackers: [{ attacksPerSecond: 2 }] }));
+        assert(noCritical.totalHits === 3, "无暴击离散攻击次数");
+        near(noCritical.killTime, 1, "每秒两次攻击的离散时间");
+
+        const guaranteedCritical = calculateKill(baseTestInput({ criticalChance: 100, targetHealth: 150 }));
+        assert(guaranteedCritical.totalHits === 1 && guaranteedCritical.criticalHitsUsed === 1 && guaranteedCritical.normalHits === 0, "100%暴击按必暴结算");
+        near(guaranteedCritical.killTime, 0, "首次必暴0秒击杀");
+
+        const fixedGrowth = calculateKill(baseTestInput({ growthValue: 50, targetHealth: 450 }));
+        assert(fixedGrowth.totalHits === 3, "固定成长攻击次数");
+        near(fixedGrowth.lethalAttackDamage, 200, "固定成长命中后生效");
+
+        const percentGrowth = calculateKill(baseTestInput({ growthMode: "percent_base", growthValue: 10, targetHealth: 330 }));
+        assert(percentGrowth.totalHits === 3, "基础攻击百分比成长攻击次数");
+        near(percentGrowth.lethalAttackDamage, 120, "百分比成长始终基于基础攻击力");
+
+        const simultaneous = calculateKill(baseTestInput({
+          growthValue: 100,
+          targetHealth: 700,
+          attackers: [{ attacksPerSecond: 1 }, { attacksPerSecond: 1 }]
+        }));
+        assert(simultaneous.totalHits === 4, "同刻攻击全部计入总平A");
+        near(simultaneous.killTime, 1, "同刻事件时间");
+        near(simultaneous.lethalAttackDamage, 300, "同刻结算后才累计成长");
+
+        const independent = calculateKill(baseTestInput({
+          targetHealth: 400,
+          attackers: [{ attacksPerSecond: 1 }, { attacksPerSecond: 2 }]
+        }));
+        assert(independent.totalHits === 5, "独立攻击时间轴事件数");
+        near(independent.killTime, 1, "独立攻击时间轴最早击杀时间");
+
+        const expectedBatchCritical = calculateKill(baseTestInput({
+          criticalChance: 50,
+          criticalDamagePct: 300,
+          targetHealth: 400,
+          attackers: [{ attacksPerSecond: 1 }, { attacksPerSecond: 1 }]
+        }));
+        assert(expectedBatchCritical.criticalHitsUsed === 1 && expectedBatchCritical.normalHits === 1, "同刻批次按概率统计期望暴击和非暴击");
+        near(expectedBatchCritical.killTime, 0, "同刻期望暴击伤害0秒结算");
+
+        let invalidSpeedRejected = false;
+        try { calculateKill(baseTestInput({ attackers: [{ attacksPerSecond: 0 }] })); } catch (error) { invalidSpeedRejected = true; }
+        assert(invalidSpeedRejected, "拒绝零攻速");
+        let invalidCriticalChanceRejected = false;
+        try { calculateKill(baseTestInput({ criticalChance: 100.1 })); } catch (error) { invalidCriticalChanceRejected = true; }
+        assert(invalidCriticalChanceRejected, "拒绝超范围暴击率");
+        let weakCriticalRejected = false;
+        try { calculateKill(baseTestInput({ criticalDamagePct: 99 })); } catch (error) { weakCriticalRejected = true; }
+        assert(weakCriticalRejected, "拒绝小于100%的暴击伤害");
+
+        const beforeRows = document.querySelectorAll(".attacker-row").length;
+        const addedRow = addAttackUnit(1.5);
+        assert(document.querySelectorAll(".attacker-row").length === beforeRows + 1, "动态添加攻击单位");
+        addedRow.remove();
+        refreshAttackerRows();
+        updateCalculation();
+        assert(document.querySelectorAll(".attacker-row").length === beforeRows, "动态删除攻击单位");
+
+        assert(MYSTERY_PRESETS.length === 20, "神秘路线CSV预设数量");
+        const mysteryLv2 = mysteryPresetById("mystery_lv02");
+        const mysteryLaserSequence = MYSTERY_PRESETS.filter(function (preset) {
+          return preset.routeId === "mystery";
+        }).map(function (preset) { return preset.laserBaseMultiplier; }).join(",");
+        const inheritedLaserIsMax = MYSTERY_PRESETS.filter(function (preset) {
+          return preset.routeId !== "mystery";
+        }).every(function (preset) { return preset.laserBaseMultiplier === 1.8; });
+        assert(mysteryLv2.panelAttackDamage === 1501 && mysteryLaserSequence === "1,1.2,1.4,1.6,1.8" && inheritedLaserIsMax, "五级激光倍率及后续路线继承预设");
+        const lv2Wave7 = simulateMystery(baseMysteryTestInput({
+          presetId: mysteryLv2.presetId,
+          attackDamage: mysteryLv2.panelAttackDamage,
+          laserBaseMultiplier: mysteryLv2.laserBaseMultiplier,
+          stackCap: 0,
+          targetHealth: 6000,
+          targetArmor: 23,
+          maxTime: 5
+        }));
+        near(lv2Wave7.killTime, 3, "LV2第7波延迟首跳约3秒击杀");
+        near(laserMultiplierForTick(baseMysteryTestInput({}), 0), 1, "激光首Tick基础倍率");
+        near(laserMultiplierForTick(baseMysteryTestInput({}), 3), 1.15, "激光逐Tick增加0.05");
+        near(laserMultiplierForTick(baseMysteryTestInput({ laserBaseMultiplier: 4.95 }), 3), 5, "激光倍率封顶500%");
+
+        const resetGrowth = simulateMystery(baseMysteryTestInput({
+          attackInterval: 100,
+          targetHealth: 190,
+          targetCount: 2,
+          stackCap: 0,
+          maxTime: 2
+        }));
+        const resetLasers = resetGrowth.events.filter(function (event) { return event.type === "laser"; });
+        assert(resetLasers.length === 2, "切换目标样本产生两次目标激光事件");
+        near(resetLasers[0].laserMultiplier, 1, "第一目标激光基础倍率");
+        near(resetLasers[1].laserMultiplier, 1, "切换目标后激光成长重置");
+
+        const independentExpiry = simulateMystery(baseMysteryTestInput({
+          attackInterval: 1,
+          laserInterval: 100,
+          targetHealth: 1000000000,
+          maxTime: 6.1,
+          pathTargets: [
+            { name: "首层目标", x: 200, y: 0, health: 30, armor: 0 },
+            { name: "次层目标", x: 300, y: 0, health: 60, armor: 0 }
+          ]
+        }));
+        assert(independentExpiry.finalStacks === 0, "5秒层可独立过期至0层");
+        const expiryEvents = independentExpiry.events.filter(function (event) { return event.type === "expire"; });
+        assert(expiryEvents.length === 2, "不同时刻击杀产生两个独立过期事件");
+        near(expiryEvents[0].time, 5, "t=0新增层在t=5到期");
+        near(expiryEvents[1].time, 6, "t=1新增层在t=6到期");
+
+        const capTargets = [];
+        for (let capIndex = 0; capIndex < 9; capIndex += 1) {
+          capTargets.push({ name: "层目标" + capIndex, x: 100 + capIndex, y: 0, health: 1, armor: 0 });
+        }
+        const stackCap = simulateMystery(baseMysteryTestInput({
+          targetHealth: 1000000,
+          maxTime: 0,
+          pathTargets: capTargets
+        }));
+        assert(stackCap.pathKills === 9, "路径击杀逐单位结算");
+        assert(stackCap.finalStacks === 7, "魔能炮7层上限");
+
+        const lethalOrder = simulateMystery(baseMysteryTestInput({
+          targetHealth: 100,
+          maxTime: 0,
+          pathTargets: []
+        }));
+        const lethalAttack = lethalOrder.events[0];
+        near(lethalAttack.damage, 100, "致死普通攻击不受新增层反向增强");
+        assert(lethalAttack.stacksBefore === 0 && lethalAttack.stacksAfter === 1, "致死事件结束后新增层");
+
+        const pathArmor = simulateMystery(baseMysteryTestInput({
+          targetHealth: 1000000,
+          maxTime: 0,
+          pathTargets: [
+            { name: "零甲路径", x: 250, y: 40, health: 1000, armor: 0 },
+            { name: "23甲路径", x: 400, y: 80, health: 1000, armor: 23 },
+            { name: "越界目标", x: 400, y: 120, health: 1000, armor: 0 },
+            { name: "线段外目标", x: 700, y: 0, health: 1000, armor: 0 }
+          ]
+        }));
+        near(pathArmor.events[0].damage, 100, "主目标只承受普通攻击且不重复计入路径伤害");
+        near(pathArmor.pathTargets[0].health, 970, "零甲路径目标30%伤害");
+        near(pathArmor.pathTargets[1].health, 1000 - 30 / 1.46, "路径目标按23护甲独立结算");
+        near(pathArmor.pathTargets[2].health, 1000, "超出96半宽不受伤");
+        near(pathArmor.pathTargets[3].health, 1000, "超出塔到主目标线段不受伤");
+
+        const eyeWithoutStacks = simulateMystery(baseMysteryTestInput({
+          targetHealth: 1000000,
+          maxTime: 0,
+          initialStackExpiries: [5],
+          pathTargets: [{ name: "开关目标", x: 200, y: 0, health: 1000, armor: 0 }]
+        }));
+        const eyeWithStacks = simulateMystery(baseMysteryTestInput({
+          targetHealth: 1000000,
+          maxTime: 0,
+          initialStackExpiries: [5],
+          eyeUsesStacks: true,
+          pathTargets: [{ name: "开关目标", x: 200, y: 0, health: 1000, armor: 0 }]
+        }));
+        near(eyeWithoutStacks.pathTargets[0].health, 970, "默认不向魔能之眼传递魔能炮层");
+        near(eyeWithStacks.pathTargets[0].health, 967, "实验开关可向魔能之眼传递魔能炮层");
+
+        const attackFirst = simulateMystery(baseMysteryTestInput({
+          laserFirstTick: "immediate", laserInitialDelay: 0, laserBaseMultiplier: 1,
+          targetHealth: 150, maxTime: 0, eventOrder: "attack_first"
+        }));
+        const laserFirst = simulateMystery(baseMysteryTestInput({
+          laserFirstTick: "immediate", laserInitialDelay: 0, laserBaseMultiplier: 1,
+          targetHealth: 150, maxTime: 0, eventOrder: "laser_first"
+        }));
+        assert(attackFirst.events[0].type === "attack" && attackFirst.events[1].type === "laser", "同刻普通攻击优先顺序可配置");
+        assert(laserFirst.events[0].type === "laser" && laserFirst.events[1].type === "attack", "同刻激光优先顺序可配置");
+
+        switchMode("mystery");
+        assert(!document.getElementById("mysteryMode").hidden && document.getElementById("standardMode").hidden, "神秘路线模式切换");
+        assert(document.querySelectorAll("#mysteryPreset option").length === 20, "神秘路线预设渲染");
+        switchMode("standard");
+        assert(document.documentElement.scrollWidth <= window.innerWidth + 1, "页面无横向溢出");
+
+        document.documentElement.dataset.testStatus = "pass";
+        document.getElementById("testResults").textContent = "WAR3_DAMAGE_CALCULATOR_BROWSER_PASS assertions=" + assertions;
+      } catch (error) {
+        document.documentElement.dataset.testStatus = "fail";
+        document.getElementById("testResults").textContent = "WAR3_DAMAGE_CALCULATOR_BROWSER_FAIL assertions=" + assertions + " " + error.message;
+      }
+    }
+
+    document.getElementById("calculatorForm").addEventListener("input", updateCalculation);
+    document.getElementById("calculatorForm").addEventListener("change", function () {
+      updateGrowthHelp();
+      updateCalculation();
+    });
+    document.getElementById("addAttacker").addEventListener("click", function () { addAttackUnit(1); });
+    document.getElementById("attackerList").addEventListener("click", function (event) {
+      const button = event.target.closest(".remove-attacker");
+      if (!button || button.disabled) return;
+      button.closest(".attacker-row").remove();
+      refreshAttackerRows();
+      updateCalculation();
+    });
+    document.querySelectorAll(".mode-button").forEach(function (button) {
+      button.addEventListener("click", function () { switchMode(button.dataset.mode); });
+    });
+    document.getElementById("mysteryPreset").addEventListener("change", function (event) {
+      applyMysteryPreset(event.target.value);
+    });
+    document.getElementById("mysteryForm").addEventListener("input", updateMysteryCalculation);
+    document.getElementById("mysteryForm").addEventListener("change", function (event) {
+      if (event.target.id !== "mysteryPreset") updateMysteryCalculation();
+    });
+
+    refreshAttackerRows();
+    updateGrowthHelp();
+    updateCalculation();
+    initializeMysteryMode();
+    if (new URLSearchParams(window.location.search).get("test") === "1") runBrowserTests();
+  </script>
+</body>
+</html>

@@ -1,3 +1,58 @@
+## 2026-08-14 - 用户确认神秘塔激光问题已解决并沉淀计算器方法
+
+- 用户确认此前神秘塔激光Tick问题已经没有了。本条将本次计算器复算方法记录为后续数值问题的复用经验，不再把Workshop Tools冷启动列为该问题的待办验收。
+- 复用入口为`tools/war3_damage_calculator/index.html`，基础规则来自`data/csv/公共规则/war3_damage_calculator_rules.csv`，神秘塔/魔能炮/魔能之眼实验预设来自`data/csv/公共规则/war3_damage_calculator_mystery_experiment.csv`。生成脚本`tools/build_war3_damage_calculator.ps1`只负责校验并嵌入HTML，不把实验CSV注册到生产Lua。
+- 计算方法：先对War3显示护甲执行固定减甲，再对剩余正护甲执行百分比无视；正甲使用`1/(1+0.02W)`，零/负甲按`W/3`投影后使用当前Dota曲线。多个攻击单位各自从`t=0`维护下一命中时间，同刻合并；暴击按`1+p×(m-1)`每击期望倍率，成长在同刻批次伤害结算后累计。
+- 神秘路线按离散事件推进：默认`t=0`普攻、`t=1`激光首跳，激光Tick逐目标增长且换目标重置；击杀层在致死事件结束后以独立过期时间加入；路径附伤按线段和半宽逐单位筛选、主目标排除、各自护甲结算。所有未经证实的路径宽度或增伤传递保持为实验参数。
+- 后续验证顺序：先检查输入属于生产数据还是实验数据，再修改CSV；运行生成脚本和`-CheckOnly`，运行`tools/test_war3_damage_calculator_contract.ps1`，确认Edge桌面/移动视口断言、生成一致性、Lua 5.1语法、严格UTF-8和`git diff --check`，最后才用Workshop Tools核对引擎表现。自动测试与计算器结果不能代替实机验证。
+
+## 2026-08-13 - 神秘塔激光Tick恢复为1秒
+
+- 用户确认以离线录像实验的1秒模型修正生产激光间隔。根因不是普通攻击速度，而是`laser_lv01-lv05`生产`damage_interval=0.5`；该值由提交`f92e6c9`从1秒改为0.5秒。
+- 本次从权威`tower_skill_definitions.csv`把五级激光恢复为1秒，保留基础倍率、首次锁定立即Tick、每秒5%成长、500%封顶、切换目标重置和魔能之眼规则；Tooltip、六份本地化、生成Lua和专项测试同步更新。
+- LV2生产攻击`1401`与离线实验`1501`继续作为独立输入差异记录。按23护甲、6000生命和默认延迟首跳复算，两者均在`t=3`激光事件达到阈值，累计伤害分别约6477.226与6939.555。
+- 自动验证通过：生产激光契约/Lua 5.1数学测试、计算器Edge双视口59项断言、生成哈希稳定、目标Lua 5.1语法、Python/PowerShell语法、严格UTF-8解码、CSV BOM及限定diff检查。仍需Workshop Tools冷启动实测；自动测试不等于引擎验证或用户验收。
+
+## 2026-08-13 - 激光基础倍率同步到生产与离线模型
+
+- 用户将目标倍率明确为`laser_lv01-lv05=1.0/1.2/1.4/1.6/1.8`。权威生产技能CSV和离线神秘实验CSV已更新；魔能炮、魔能之眼预设继续保持`1.8`，神秘塔路线映射未改。
+- 通过现有生成链同步生成技能Lua、Tooltip CSV/Lua和六份本地化；计算器生成器重新嵌入20个预设。运行时`tower_laser_damage.lua`未修改，连续增长、500%封顶和目标切换重置规则保持不变。
+- 新增生产倍率契约与Lua 5.1数学测试；生产契约、计算器契约（Edge桌面/移动各59项）、Build/CheckOnly、Lua/Python/PowerShell语法、严格UTF-8和限定`git diff --check`通过。仍需Workshop Tools冷启动和用户验收，自动测试不等于实机验证。
+
+## 2026-08-13 - 神秘之塔原版录像反推离线实验模型
+
+- 用户批准Act实施，但范围严格限定离线HTML计算器，不修改生产Lua、正式`tower_class_mystery.csv`或正式技能配置。先核对当前生产代码，确认其0.5秒激光、立即首跳和150范围激光AOE属于后续改造，不能作为录像原版权威。
+- 新增`war3_damage_calculator_mystery_experiment.csv`，20个预设直接使用录像/工作簿面板攻击值：神秘塔901/1501/2101/3901/6101，魔能炮12201至108101，魔能之眼308101至6008101。构建器只把预设JSON嵌入单文件HTML，明确排除生产配置索引且不生成实验Lua。
+- 页面新增独立“神秘路线录像实验”模式：默认`t=0`普攻、`t=1`激光首跳，支持立即首跳比较和同刻事件顺序；激光基础倍率120%/140%/160%/180%/180%，每Tick+0.05、封顶500%、切换目标重置。
+- 魔能炮每次击杀在致死事件结束后新增独立5秒的10%层，五级上限4/5/6/7/7；事件表显示层数前后和过期。魔能之眼由普通攻击触发，按塔到主目标线段、可调半宽和路径单位各自护甲结算30%，主目标排除；增伤是否传递保留默认关闭的实验开关。
+- 专项契约和Edge实际页面测试通过。LV2第7波`1501攻击/6000生命/23护甲`默认模型2秒击杀；真实`t=0/t=1`路径击杀产生`t=5/t=6`独立过期；覆盖500%封顶、换目标重置、7层上限、致死后加层、路径边界/逐甲、增伤开关和同刻顺序。Edge在1440px/390px均执行59项断言通过。
+- 生成Build/CheckOnly、两份PowerShell语法、通用规则生成Lua的Lua 5.1语法、任务文件严格UTF-8和限定diff通过。自动结果仅证明实验模型按当前假设一致运行，不证明720p录像已恢复逐次生命值，也不唯一确认魔能炮对魔能之眼的传递关系；等待用户打开页面继续录像对照。
+
+## 2026-08-13 - 计算器切换为Survival当前战斗算法
+
+- 用户明确放弃继续寻找“苟发育”外部公式，要求直接采用本项目当前算法更新HTML计算器。调用链审计以CSV为基础并核对`hero_combat_stat_service`、`modifier_weapon_stat_projection`、`damage_filter_service`和`armor_balance`生产逻辑。
+- 删除经典TFT `0.06/0.94`计算口径。权威`war3_damage_calculator_rules.csv`现保存项目怪物正甲系数0.02、War3到Dota投影1/3及当前Dota护甲曲线0.052/0.9/0.048，生成脚本同步HTML和生成Lua。
+- 暴击输入由“前N次固定暴击”改为暴击率和百分比暴伤，每击使用`1 + p × (m - 1)`期望倍率；输出显示期望暴击/非暴击次数。页面明确把结果称为“期望伤害达标时间”，不将其描述成某次随机实战或随机停止时间的严格数学期望。
+- 穿甲顺序改为固定War3减甲先结算，再对剩余正护甲应用伤害事务的百分比护甲无视。正护甲使用明确项目怪物目标曲线；零/负护甲以`W/3`投影到运行时Dota曲线。当前面板攻击输入已包含项目攻击加成与专属乘区，不重复乘算。
+- 自动验证：`WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`，Edge在1440px与390px实际执行31项公式/行为断言；生成Build/CheckOnly、PowerShell语法、生成Lua语法、`MONSTER_WAR3_ARMOR_DAMAGE_LUA51_PASS`、研究减甲state/trigger/generated-levels Lua 5.1行为、10文件严格UTF-8和限定diff检查通过。`.cline/local-toolchain.json`中的旧Lua路径失效，实际使用自动搜索到的`C:\msys64\mingw64\bin\lua5.1.exe`/`luac5.1.exe` 5.1.5。
+- 两个既有未跟踪PowerShell回归入口仍有非生产失败：怪物护甲契约要求补偿调用保持单行文本，但生产当前是等价多行；研究减甲契约未设置项目`LUA_PATH`。对应Lua行为测试在正确环境下均通过，本次未修改这些旧测试迎合字符串或启动环境。
+
+## 2026-08-13 - 多攻击单位计算器最终暴击口径与缺失页面恢复
+
+- 用户最终明确：暴击次数包含在总平A次数中。例如暴击3次，则全局前3次平A按暴击倍率结算，后续均为非暴击；`非暴击次数 = 总平A次数 - 实际暴击次数`。不需要输入或推导具体“第几次暴击”。该口径取代`CURRENT_TASK.md`中“每次平A额外附带多段暴击”的中断版本。
+- 恢复时发现文档与磁盘冲突：`START_HERE.md`曾称旧单文件页面完成，但当前`D:`工作区实际缺失`tools/war3_damage_calculator/index.html`，`CURRENT_TASK.md`仍写“正在实施”。按用户当前消息和磁盘状态为准，重新创建完整单文件页面，没有依赖不存在的历史产物。
+- 页面支持动态增删多个攻击单位；每个单位只有独立每秒攻击次数，所有单位共享基础/当前攻击力。成长支持“基础攻击力百分比”与“固定数值”，每次平A先伤害后成长；同刻命中共享成长前攻击力，合并结算后才累计成长。
+- 输出新增总平A次数（含暴击）、实际暴击次数、非暴击次数、有效护甲、护甲倍率、致死时攻击力、致死事件伤害和累计伤害。权威护甲常量仍来自`war3_damage_calculator_rules.csv`，生成链未增加业务常量。
+- 自动验证通过：`WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`，Edge在1440px与390px下实际执行31项断言，覆盖前三次暴击/后续非暴击、暴击包含在总平A、同刻混合暴击、动态增删、多时间轴、两类成长、正负护甲和穿甲顺序；CSV生成Build/CheckOnly、PowerShell语法、生成Lua的Lua 5.1语法、10个任务文本严格UTF-8解码和限定diff检查通过。本次新增diff无乱码标记；`SESSION_LOG.md`旧行中用于排障说明的乱码示例字符在HEAD已存在且不是文件解码失败。尚待用户双击页面进行使用体验验收。
+
+## 2026-08-13 - 单文件离线War3击杀时间计算器
+
+- 用户最终确认采用每秒攻击次数，支持固定与百分比穿甲；百分比先作用于正护甲，再扣固定穿甲。输入范围收敛为物理攻击力、攻速、两类穿甲、敌方护甲和生命值。
+- `tools/war3_damage_calculator/index.html`已收敛为真正单文件，内嵌样式、逻辑和测试，无服务器、npm、CDN、外部脚本或图片依赖。首次攻击按0秒命中，TTK按完整攻击次数离散计算，并显示有效护甲、护甲倍率、单次伤害、实际DPS、攻击次数和致死总伤害。
+- 公式常量权威源收敛为`war3_damage_calculator_rules.csv`，仅保留正甲系数与负甲底数；生成器同步单文件HTML标记常量、Lua和配置索引。旧攻防矩阵及拆分的CSS/JS/测试文件已移除。
+- 自动验证通过：`WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`含Edge实际执行18项公式/行为断言，1440px与390px均无横向溢出；生成`Build/CheckOnly`、Lua 5.1语法、严格UTF-8、PowerShell语法和限定`git diff --check`通过。尚待用户双击`index.html`确认使用体验。
+- 工作区保护：未修改或清理任务开始前已有的大量未跟踪测试文件及`联机.txt`，只新增本任务专项测试与工具文件。
+
 ## 2026-08-11 - 玩家级塔上限、零消耗五轮七塔合一、多塔迁移与城墙失败
 
 - 用户在Plan阶段确认：每玩家最多7座未转职基础箭塔、每路线5座、每座满级材料塔永久只参与一次且不消耗、每玩家最多5座终极塔；齐天大圣R整组迁移全部终极塔并保持相对位置；任意已完工城墙死亡全队失败，施工墙不失败，主城死亡不再直接失败。
@@ -2451,3 +2506,12 @@
 - 按用户选择保留当前所有既有Panorama/粒子编译产物修改，本轮不重编译HUD依赖链。Content VTEX改为Valve overview同类schema：`./template_map.tga`相对输入、DXT1声明及官方clear color/dimension/clamp/LOD字段；仅定向强制编译VTEX和VMAT，结果分别为`1 compiled, 0 failed, 0 skipped`。二进制字符串只含小写file mod，但`resourceinfo`仍报告`ManifestResource dota_addons/Survival`，物理改名不可省略。
 - `test_minimap_texture_resource_contract.ps1`新增Game/Content精确小写、VTEX schema、编译产物file-mod、runtime ManifestResource和资产索引大小写检查；当前准确失败于`GAME_ADDON_DIRECTORY_NOT_CANONICAL_LOWERCASE`。新增`finalize_addon_file_mod_case.ps1`，供关闭VS Code后从插件目录外完成两阶段改名、仅编译小地图资源和运行最终契约，含半迁移回滚保护。
 - `.cline/local-toolchain.json`已改为实际E盘规范工作区及本机有效工具：Python 3.14.3、Lua/Luac 5.1.5、PowerShell 7.6.4，均逐项实测。CSV审计确认唯一`template_map`命中是区域边界说明注释，本任务没有addon/overview权威CSV字段。仍需最终化脚本输出`ADDON_FILE_MOD_CASE_FINALIZE_PASS`，再冷启动Workshop Tools确认不再刷`file mod ... is invalid`且小地图正常；自动编译不等于实机验收。
+
+## 2026-08-13 - 神秘塔升级particles.dll崩溃最小修复
+
+- 延续只读排障结论：两份当前minidump均为`particles.dll+0x19F6FF/+0x19F70F`附近空读，崩溃稳定对应约1秒升级完成边界；战斗值、激光倍率和CSV数据不是首要嫌疑，native符号栈仍不可用。
+- 检查升级流程全部路径后确认正常完成、建筑销毁取消、reset和实体失效均汇聚到统一粒子清理。旧实现调用`DestroyParticle(id, false)`后立即`ReleaseParticleIndex(id)`；现改为先清空保存ID，再立即销毁，并独立保护单次释放。粒子控制点创建失败也使用同一立即销毁/释放语义。
+- 临时启用最多64条`BuildingUpgradeParticle`日志，记录create/destroy/release、建筑entindex、粒子ID、完成或取消状态及清理细节，供下一次Workshop Tools冷启动比对。权威施工CSV和生成Lua未修改。
+- 新增专项PowerShell契约和扩展Lua 5.1行为测试，覆盖完成、建筑销毁取消、reset、实体失效、控制点失败以及Destroy调用抛错后仍释放；每个粒子断言立即销毁一次、释放一次。
+- 自动验证通过：`BUILDING_UPGRADE_PARTICLE_CONTRACT_PASS`、`BUILDING_UPGRADE_PROCESS_LUA51_PASS`、`BUILDING_UPGRADE_PARTICLE_LUAC51_PASS`、PowerShell语法、严格UTF-8、CSV三个粒子字段与生成Lua一致及限定diff；建筑等级身份、六项公共行为和箭塔成本的Lua/契约回归通过。批量升级两项旧测试继续失败于已记录的Mock/旧Panorama断言，本轮未改。
+- 尚未Workshop Tools实机验证，不能记录为native崩溃已解决。下一步先无Alt冷启动转职神秘塔，再测试Alt与其他路线；若仍崩溃，保留新dump后依次禁用升级传送粒子、隔离神秘塔四个外观组件和Tooltip代理。

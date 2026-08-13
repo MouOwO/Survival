@@ -1,0 +1,7 @@
+rule_id,value,display_name,description
+#types:string,number,string,string
+war3_positive_armor_factor,0.02,项目怪物正护甲系数,明确项目怪物物理伤害的War3目标承伤曲线系数
+war3_to_dota_ratio,0.3333333333333333,War3护甲运行时换算率,War3显示护甲投影为Dota运行时护甲的线性倍率
+dota_positive_armor_numerator,0.052,Dota护甲分子系数,当前项目采用的Dota运行时护甲曲线分子系数
+dota_positive_armor_base,0.9,Dota护甲基础常数,当前项目采用的Dota运行时护甲曲线基础常数
+dota_positive_armor_denominator,0.048,Dota护甲分母系数,当前项目采用的Dota运行时护甲曲线分母系数

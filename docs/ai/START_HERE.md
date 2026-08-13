@@ -4,6 +4,11 @@
 
 ## 当前任务
 
+- 已完成任务（2026-08-14，神秘塔激光1秒Tick及计算器方法）：用户确认问题已解决。此前权威`tower_skill_definitions.csv`的`laser_lv01-lv05`已统一恢复1秒，生成配置、Tooltip、本地化和专项测试已同步；计算器的CSV数据边界、护甲公式、离散事件时间轴、暴击期望、成长、激光重置、击杀层和路径附伤方法已沉淀到`PROJECT_CONTEXT.md`/`DECISIONS.md`，后续数值复算直接复用。不要再把该问题列为待Workshop Tools验收。
+- 当前插入任务（2026-08-13，神秘塔升级崩溃最小修复待实机确认）：两份当前minidump均为`particles.dll`近同偏移空读，升级完成边界的施工传送粒子原使用`DestroyParticle(id, false)`后立即释放。`building_upgrade_process.lua`现对完成、取消、reset、实体失效和创建失败统一先清空状态，再`DestroyParticle(id, true)`并独立尝试一次`ReleaseParticleIndex`；临时启用最多64条`BuildingUpgradeParticle`生命周期日志。专项契约/Lua 5.1、相关建筑回归、语法、CSV字段生成一致、UTF-8和限定diff已通过；下一步必须冷启动Workshop Tools测试神秘塔转职，自动测试不能证明native崩溃已消失。
+- 当前插入任务（2026-08-13，激光基础倍率同步与自动验证完成）：生产激光基础倍率已按`laser_lv01-lv05=1.0/1.2/1.4/1.6/1.8`同步到权威技能CSV、生成技能配置、Tooltip、六份本地化和离线War3计算器；魔能炮与魔能之眼继续继承`laser_lv05=1.8`。生产运行时算法、路线映射和连续命中增长/500%封顶/切换重置规则未改。专项契约、Lua 5.1、计算器Edge双视口59项断言、生成CheckOnly、UTF-8、PowerShell/Python语法及限定diff已通过；尚需Workshop Tools冷启动确认实际扣血和Tooltip表现，不能记录为实机验收。
+- 当前插入任务（2026-08-13，离线实验实现与自动验证完成）：`tools/war3_damage_calculator/index.html`新增独立“神秘路线录像实验”，20个录像/工作簿面板预设来自`war3_damage_calculator_mystery_experiment.csv`且不生成/注册生产Lua。默认`t=0`普攻、`t=1`激光，支持同刻顺序、激光成长/重置、魔能炮独立5秒层和魔能之眼路径逐甲；增伤是否传递保留开关。Edge桌面/移动59项断言及生成、Lua 5.1语法、UTF-8、diff通过，下一步用户双击页面继续录像对照，不能记录为原版算法已唯一证明或用户验收。
+- 当前插入任务（2026-08-13，生产实现与自动验证完成）：单文件离线计算器位于`tools/war3_damage_calculator/index.html`，已按用户最新要求放弃外部“苟发育”算法并切换到Survival当前生产口径。暴击按attack record独立概率和百分比暴伤计算每击期望值；固定减甲后做正护甲百分比无视；项目怪物正护甲使用`1/(1+0.02W)`，零/负护甲按`W/3`进入当前Dota曲线。动态多攻击单位、共享成长、0秒首击和离散时间轴保留；Edge 31项断言及桌面/移动视口、CSV生成、Lua 5.1和PowerShell语法通过，当前只待用户双击页面确认使用体验。
 - 当前插入任务（2026-08-12，file-mod大小写迁移待关闭VS Code后收尾）：Workshop Tools实机证明Game/Content物理目录`Survival`与编译资源`dota_addons/survival`冲突，导致`file mod ... is invalid`刷屏并阻断小地图/Panorama按需编译。旧`tools_asset_info.bin`已移出并备份；VTEX已对齐Valve overview schema，VTEX/VMAT定向编译各`1 compiled, 0 failed, 0 skipped`，但`resourceinfo`仍报告大写ManifestResource。当前VS Code工作区句柄阻止根目录大小写改名，下一步唯一动作是关闭VS Code和Workshop Tools后执行`tools/finalize_addon_file_mod_case.ps1`，取得`ADDON_FILE_MOD_CASE_FINALIZE_PASS`后再冷启动实机确认告警停止和小地图正常。按用户要求未重编译HUD、Panorama或粒子既有修改。
 
 - 当前插入任务（2026-08-11，生产实现与自动验证完成）：基础箭塔/路线计数及并发预占已改为玩家作用域；七塔合一支持每玩家最多5座终极塔，材料不消耗且每座永久仅参与一次；齐天大圣R整组原子迁移全部终极塔并保留相对位置；任意已完工城墙死亡一次性触发全队失败，施工墙和主城不直接失败。专项Lua 5.1/契约、语法、生成一致、UTF-8/BOM和限定diff通过；下一步Workshop Tools完全冷启动实机验收，详见`CURRENT_TASK.md`顶部。

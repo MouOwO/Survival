@@ -1,9 +1,13 @@
 local scheduler = require("core/scheduler")
 local asset_preload = require("systems/asset_preload_service")
+local logger = require("core/logger")
 
 local M = {}
 local active_by_entindex = {}
 local next_generation = 0
+local particle_diagnostic_count = 0
+local PARTICLE_DIAGNOSTICS_ENABLED = true
+local PARTICLE_DIAGNOSTIC_LIMIT = 64
 local KEEN_TELEPORT_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
 
 local function valid_entity(unit)
@@ -20,15 +24,66 @@ local function safe_callback(callback, ...)
     return ok
 end
 
+local function log_particle(event, state, particle_id, lifecycle_state, detail)
+    if not PARTICLE_DIAGNOSTICS_ENABLED
+        or particle_diagnostic_count >= PARTICLE_DIAGNOSTIC_LIMIT then
+        return
+    end
+    particle_diagnostic_count = particle_diagnostic_count + 1
+    pcall(logger.info, "BuildingUpgradeParticle", string.format(
+        "event=%s entindex=%s particle_id=%s state=%s detail=%s",
+        tostring(event),
+        tostring(state and state.entindex or "unknown"),
+        tostring(particle_id),
+        tostring(lifecycle_state or "unknown"),
+        tostring(detail or "")
+    ))
+end
+
 local function destroy_particle(state)
     if state.particle_id == nil then return end
-    if ParticleManager then
-        pcall(function()
-            ParticleManager:DestroyParticle(state.particle_id, false)
-            ParticleManager:ReleaseParticleIndex(state.particle_id)
-        end)
-    end
+    local particle_id = state.particle_id
     state.particle_id = nil
+    if not ParticleManager then return end
+
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle_id, true)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle_id)
+    end)
+    log_particle("destroy", state, particle_id, state.cleanup_reason,
+        "immediate=1 ok=" .. tostring(destroy_ok)
+        .. " error=" .. tostring(destroy_error or ""))
+    log_particle("release", state, particle_id, state.cleanup_reason,
+        "count=1 ok=" .. tostring(release_ok)
+        .. " error=" .. tostring(release_error or ""))
+end
+
+local function release_failed_particle(state, particle_id)
+    if not ParticleManager or particle_id == nil then return end
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle_id, true)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle_id)
+    end)
+    log_particle("destroy_failed_create", state, particle_id, "create_failed",
+        "immediate=1 ok=" .. tostring(destroy_ok)
+        .. " error=" .. tostring(destroy_error or ""))
+    log_particle("release_failed_create", state, particle_id, "create_failed",
+        "count=1 ok=" .. tostring(release_ok)
+        .. " error=" .. tostring(release_error or ""))
+end
+
+local function set_particle_control(state, particle_id, control_point, value)
+    local ok = pcall(function()
+        ParticleManager:SetParticleControl(particle_id, control_point, value)
+    end)
+    if not ok then
+        release_failed_particle(state, particle_id)
+    end
+    return ok
 end
 
 local function clear_unit_state(state)
@@ -40,7 +95,8 @@ local function clear_unit_state(state)
     unit.survival_upgrade_target_model_name = nil
 end
 
-local function remove_state(state)
+local function remove_state(state, cleanup_reason)
+    state.cleanup_reason = cleanup_reason or "removed"
     if active_by_entindex[state.entindex] == state then
         active_by_entindex[state.entindex] = nil
     end
@@ -53,7 +109,7 @@ end
 local function cancel_state(state, reason)
     if not state or state.finished then return false end
     state.finished = true
-    remove_state(state)
+    remove_state(state, reason or "cancelled")
     safe_callback(state.options.on_cancel, reason or "cancelled")
     return true
 end
@@ -66,7 +122,7 @@ local function complete_state(state)
         return
     end
     state.finished = true
-    remove_state(state)
+    remove_state(state, "complete")
     safe_callback(state.options.on_complete)
 end
 
@@ -92,22 +148,27 @@ local function start_particle(state)
             PATTACH_WORLDORIGIN,
             state.unit
         )
-        ParticleManager:SetParticleControl(particle_id, 0, origin)
+        if not set_particle_control(state, particle_id, 0, origin) then
+            particle_id = nil
+            error("particle_control_failed")
+        end
         if path == KEEN_TELEPORT_PARTICLE then
-            ParticleManager:SetParticleControl(
+            if not set_particle_control(
+                state,
                 particle_id,
                 7,
                 Vector(math.max(0.1, state.duration), 0, 0)
-            )
+            ) then
+                particle_id = nil
+                error("particle_control_failed")
+            end
         end
     end)
     if ok and particle_id ~= nil then
         state.particle_id = particle_id
+        log_particle("create", state, particle_id, "active", "path=" .. tostring(path))
     elseif particle_id ~= nil then
-        pcall(function()
-            ParticleManager:DestroyParticle(particle_id, true)
-            ParticleManager:ReleaseParticleIndex(particle_id)
-        end)
+        release_failed_particle(state, particle_id)
     end
 end
 

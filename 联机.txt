@@ -1,0 +1,765 @@
+Dota 2 Survival 玩家档案与双机联机验收操作手册
+================================================
+
+项目：survival
+地图：template_map
+适用日期：2026-08-12
+适用范围：本地Fixture玩家档案、公开NetTable、两台电脑局域网联机验收
+
+
+一、当前测试目标
+----------------
+
+本次测试需要确认：
+
+1. 玩家0能够加载本地Fixture账号mock_account_10001。
+2. 玩家1能够加载本地Fixture账号mock_account_10002。
+3. 玩家0和玩家1的档案、revision及VIP状态互相隔离。
+4. 公开NetTable只包含允许公开的白名单字段。
+5. 两台电脑进入同一局后，主机取得PlayerID 0，第二台电脑取得PlayerID 1。
+
+本次测试暂时不代表以下功能已经完成：
+
+1. Steam账号与永久档案绑定。
+2. HTTP、数据库、支付回调或存档写回。
+3. 玩家1完整Builder、建筑和独立波次玩法。
+4. 商城实际VIP商品UI门禁。
+
+
+二、服务器状态信息说明
+----------------------
+
+运行地图后可能看到：
+
+Game: "Dota 2"
+Map: "template_map"
+Players: 1 (0 bots) / 64 humans
+Build: 10835 (revision 10903182)
+Server Number: 2
+
+以上信息只能证明：
+
+1. 当前运行的是Dota 2。
+2. 当前地图是template_map。
+3. 当前服务器有1名真人玩家、0个机器人。
+4. 当前引擎Build和服务器编号正常。
+
+“/64 humans”是Source 2服务器通用连接容量显示，不代表Survival玩法开放64个玩家位。
+
+Survival项目的实际配置为：
+
+1. addoninfo.txt中的MaxPlayers为4。
+2. Lua启动规则设置好人方最多4人。
+3. 坏人方人数为0。
+4. 当前开发阶段优先验收2人切片。
+
+服务器状态信息不能证明玩家档案已经成功加载，必须继续检查PlayerProfile日志和公开NetTable。
+
+
+三、玩家档案预期数据
+--------------------
+
+玩家0预期数据：
+
+player_id=0
+account_id=mock_account_10001
+revision=3
+title_id=veteran
+achievement_score=120
+vip_badge=true
+highest_difficulty=N2
+
+玩家1预期数据：
+
+player_id=1
+account_id=mock_account_10002
+revision=1
+title_id=rookie
+achievement_score=0
+vip_badge=false
+highest_difficulty=N1
+
+当前Fixture根据本局PlayerID绑定档案，不根据Steam账号永久绑定：
+
+本局PlayerID 0 -> mock_account_10001
+本局PlayerID 1 -> mock_account_10002
+
+如果两个Steam账号交换主机或交换本局玩家槽位，Fixture档案将跟随本局PlayerID。这是当前开发阶段的预期行为。
+
+
+四、单机冷启动步骤
+------------------
+
+修改Lua或Fixture后必须完全冷启动，不能只依赖热重载。
+
+操作步骤：
+
+[ ] 1. 退出当前地图。
+[ ] 2. 完全关闭Dota 2。
+[ ] 3. 完全关闭Dota 2 Workshop Tools。
+[ ] 4. 打开任务管理器，确认没有残留dota2.exe。
+[ ] 5. 重新启动Dota 2 Workshop Tools。
+[ ] 6. 选择Addon：survival。
+[ ] 7. 使用Hammer运行template_map，或者在控制台执行：
+
+dota_launch_custom_game survival template_map
+
+[ ] 8. 等待英雄和Builder完成初始化。
+[ ] 9. 打开控制台，搜索PlayerProfile或public_profile_published。
+
+
+五、玩家0服务端日志验收
+----------------------
+
+玩家0成功加载后，服务端控制台应出现完整日志：
+
+[Survival][INFO][PlayerProfile] public_profile_published provider_id=local_fixture player_id=0 account_id=mock_account_10001 revision=3 title_id=veteran achievement_score=120 vip_badge=true highest_difficulty=N2 reason=hero_ready
+
+逐项检查：
+
+[ ] provider_id=local_fixture
+[ ] player_id=0
+[ ] account_id=mock_account_10001
+[ ] revision=3
+[ ] title_id=veteran
+[ ] achievement_score=120
+[ ] vip_badge=true
+[ ] highest_difficulty=N2
+[ ] reason=hero_ready
+
+出现这一整行可以证明：
+
+1. HERO_READY已经触发。
+2. 玩家0映射到了mock_account_10001。
+3. Fixture Provider成功返回档案。
+4. 档案schema和revision校验通过。
+5. VIP权益投影已经执行。
+6. 公开档案投影已经执行。
+7. survival_player_public_profiles已经写入。
+
+同时检查控制台中没有以下内容：
+
+[ ] 没有[Survival][WARN][PlayerProfile]
+[ ] 没有[Survival][ERROR][PlayerProfile]
+[ ] 没有JSON解析错误
+[ ] 没有Provider错误
+[ ] 没有Lua调用栈
+
+
+六、Panorama Debugger检查玩家0
+-----------------------------
+
+打开Panorama Debugger：
+
+1. 在游戏控制台输入：
+
+panorama_debugger
+
+2. 如果当前Dota版本没有响应，从Workshop Tools调试菜单打开Panorama Debugger。
+3. 在Panorama JavaScript控制台执行：
+
+var id = Game.GetLocalPlayerID();
+var profile = CustomNetTables.GetTableValue(
+    "survival_player_public_profiles",
+    String(id)
+);
+$.Msg("LOCAL_PLAYER_ID=", id);
+$.Msg("PUBLIC_PROFILE=", JSON.stringify(profile));
+
+玩家0应看到：
+
+LOCAL_PLAYER_ID=0
+
+公开档案应相当于：
+
+{
+  "schema_version": 1,
+  "revision": 3,
+  "player_id": 0,
+  "reason": "hero_ready",
+  "title_id": "veteran",
+  "achievement_score": 120,
+  "vip_badge": true,
+  "highest_difficulty": "N2"
+}
+
+对象字段排列顺序不同是正常的。
+
+
+七、公开字段白名单检查
+----------------------
+
+在Panorama JavaScript控制台执行：
+
+$.Msg(Object.keys(profile).sort().join(","));
+
+允许出现的字段：
+
+achievement_score
+highest_difficulty
+player_id
+reason
+revision
+schema_version
+title_id
+vip_badge
+
+不允许出现的字段：
+
+account_id
+entitlements
+achievements
+save
+inventory
+orders
+payment
+auth
+token
+
+说明：
+
+mock_account_10001和mock_account_10002只允许出现在本地Fixture服务端诊断日志中，不允许进入公开NetTable。
+
+
+八、单机玩家0验收清单
+----------------------
+
+[ ] 地图确实为template_map。
+[ ] 控制台没有PlayerProfile WARN或ERROR。
+[ ] 控制台出现玩家0完整public_profile_published日志。
+[ ] Game.GetLocalPlayerID()返回0。
+[ ] NetTable key "0"返回对象。
+[ ] revision等于3。
+[ ] title_id等于veteran。
+[ ] achievement_score等于120。
+[ ] vip_badge等于true。
+[ ] highest_difficulty等于N2。
+[ ] NetTable没有账号、私有存档、完整权益、库存、订单或认证字段。
+[ ] 退出地图并重新Run后，结果仍然一致。
+
+
+九、双机联机环境要求
+--------------------
+
+两台电脑可以进行未发布Addon的局域网开发联机测试，但必须满足：
+
+[ ] 两台电脑使用两个不同Steam账号。
+[ ] 两台电脑位于同一局域网。
+[ ] 两台电脑的Dota 2版本完全一致。
+[ ] 两台电脑都安装Dota 2 Workshop Tools。
+[ ] 两台电脑都具有相同的survival Addon运行文件。
+[ ] 主机Windows防火墙允许dota2.exe通过专用网络。
+
+推荐同步以下两个目录：
+
+D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival
+D:\steam\steamapps\common\dota 2 beta\content\dota_addons\survival
+
+真正运行时最关键的是game\dota_addons\survival中的Lua、配置和编译产物。content目录主要用于Workshop Tools编辑和重新编译，但也建议两端保持一致。
+
+
+十、双机关键文件一致性检查
+--------------------------
+
+两台电脑至少保证以下文件一致：
+
+scripts\vscripts\systems\player_profile_service.lua
+scripts\vscripts\config\fixtures\player_profiles.lua
+scripts\vscripts\config\generated\mock_player_account_bindings.lua
+scripts\vscripts\config\generated\player_profile_public_fields.lua
+scripts\custom_net_tables.txt
+maps\template_map.vpk
+
+在两台电脑的PowerShell中分别执行：
+
+$root = "D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival"
+
+$files = @(
+    "$root\scripts\vscripts\systems\player_profile_service.lua",
+    "$root\scripts\vscripts\config\fixtures\player_profiles.lua",
+    "$root\scripts\vscripts\config\generated\mock_player_account_bindings.lua",
+    "$root\scripts\custom_net_tables.txt",
+    "$root\maps\template_map.vpk"
+)
+
+$files | ForEach-Object {
+    Get-FileHash -Algorithm SHA256 -LiteralPath $_
+}
+
+两台电脑对应文件的SHA256必须完全相同。
+
+
+十一、主机网络准备
+------------------
+
+在主机电脑上：
+
+1. 按Win + R。
+2. 输入cmd并回车。
+3. 执行：
+
+ipconfig
+
+4. 找到当前正在使用的Wi-Fi或有线网卡IPv4地址，例如：
+
+192.168.1.100
+
+不能使用：
+
+127.0.0.1
+
+不要使用VPN网卡、虚拟机网卡或已经断开的网卡地址。
+
+
+十二、主机防火墙准备
+--------------------
+
+在Windows Defender防火墙中允许Dota 2通过专用网络。
+
+dota2.exe通常位于：
+
+D:\steam\steamapps\common\dota 2 beta\game\bin\win64\dota2.exe
+
+如果仍然无法连接，可以检查或临时开放：
+
+UDP 27015
+TCP 27015
+
+局域网直连主要关注UDP 27015。
+
+
+十三、主机启动步骤
+------------------
+
+主机电脑使用Steam账号A：
+
+[ ] 1. 启动Dota 2 Workshop Tools。
+[ ] 2. 选择Addon：survival。
+[ ] 3. 打开游戏控制台。
+[ ] 4. 执行：
+
+dota_launch_custom_game survival template_map
+
+[ ] 5. 等待进入地图。
+[ ] 6. 在控制台执行：
+
+status
+
+[ ] 7. 确认Map为template_map。
+[ ] 8. 确认初始Players为1。
+[ ] 9. 保持地图运行，不要暂停或退出。
+[ ] 10. 记下主机局域网IPv4地址。
+
+
+十四、第二台电脑连接步骤
+------------------------
+
+第二台电脑使用不同的Steam账号B：
+
+[ ] 1. 确认Dota 2和Workshop Tools版本与主机一致。
+[ ] 2. 确认本机survival Addon文件与主机一致。
+[ ] 3. 打开Dota 2 Workshop Tools。
+[ ] 4. 选择Addon：survival。
+[ ] 5. 打开游戏控制台。
+[ ] 6. 执行：
+
+connect <主机局域网IPv4地址>:27015
+
+例如主机IPv4地址是192.168.31.25，则执行：
+
+connect 192.168.31.25:27015
+
+[ ] 7. 等待客户端进入地图。
+[ ] 8. 主机再次执行status。
+[ ] 9. 确认主机服务器人数变成2。
+
+
+十五、确认第二台电脑不是观战者
+------------------------------
+
+当前生产代码已经设置：
+
+1. 好人方容量4。
+2. 坏人方容量0。
+
+但当前代码没有显式SetCustomTeamAssignment()，也没有找到自定义player_connect_full分队实现。
+
+因此，服务器人数变成2并不代表第二台电脑已经取得活动玩家身份。
+
+在第二台电脑的Panorama JavaScript控制台执行：
+
+$.Msg("LOCAL_PLAYER_ID=", Game.GetLocalPlayerID());
+
+目标结果：
+
+LOCAL_PLAYER_ID=1
+
+如果返回-1，通常表示第二台电脑没有取得活动玩家身份，可能处于观战状态。
+
+只有满足以下条件才能继续档案隔离验收：
+
+[ ] 主机本地PlayerID为0。
+[ ] 第二台电脑本地PlayerID为1。
+[ ] 第二台电脑不是观战者。
+
+
+十六、双机服务端日志验收
+------------------------
+
+第二台电脑成为活动玩家并完成英雄初始化后，主机服务端控制台应该同时出现两条日志。
+
+玩家0：
+
+[Survival][INFO][PlayerProfile] public_profile_published provider_id=local_fixture player_id=0 account_id=mock_account_10001 revision=3 title_id=veteran achievement_score=120 vip_badge=true highest_difficulty=N2 reason=hero_ready
+
+玩家1：
+
+[Survival][INFO][PlayerProfile] public_profile_published provider_id=local_fixture player_id=1 account_id=mock_account_10002 revision=1 title_id=rookie achievement_score=0 vip_badge=false highest_difficulty=N1 reason=hero_ready
+
+服务端Lua日志主要查看主机控制台。第二台电脑的客户端控制台不一定显示服务端Lua的全部print输出。
+
+逐项检查：
+
+[ ] 出现player_id=0和account_id=mock_account_10001。
+[ ] 出现player_id=1和account_id=mock_account_10002。
+[ ] 玩家0 revision为3。
+[ ] 玩家1 revision为1。
+[ ] 玩家0 vip_badge为true。
+[ ] 玩家1 vip_badge为false。
+[ ] 没有两个PlayerID绑定到同一Fixture账号。
+[ ] 没有PlayerProfile WARN或ERROR。
+
+
+十七、主机客户端档案检查
+------------------------
+
+在主机Panorama JavaScript控制台执行：
+
+var id = Game.GetLocalPlayerID();
+var profile = CustomNetTables.GetTableValue(
+    "survival_player_public_profiles",
+    String(id)
+);
+$.Msg("ID=", id, " PROFILE=", JSON.stringify(profile));
+
+主机预期：
+
+ID=0
+revision=3
+title_id=veteran
+achievement_score=120
+vip_badge=true
+highest_difficulty=N2
+
+
+十八、第二客户端档案检查
+------------------------
+
+在第二台电脑的Panorama JavaScript控制台执行相同代码：
+
+var id = Game.GetLocalPlayerID();
+var profile = CustomNetTables.GetTableValue(
+    "survival_player_public_profiles",
+    String(id)
+);
+$.Msg("ID=", id, " PROFILE=", JSON.stringify(profile));
+
+第二台电脑预期：
+
+ID=1
+revision=1
+title_id=rookie
+achievement_score=0
+vip_badge=false
+highest_difficulty=N1
+
+
+十九、两端公开档案一致性检查
+----------------------------
+
+因为survival_player_public_profiles是公开NetTable，所以两个客户端都可以读取玩家0和玩家1的公开字段。
+
+在两台电脑的Panorama JavaScript控制台分别执行：
+
+$.Msg(
+    "P0=",
+    JSON.stringify(
+        CustomNetTables.GetTableValue(
+            "survival_player_public_profiles",
+            "0"
+        )
+    )
+);
+
+$.Msg(
+    "P1=",
+    JSON.stringify(
+        CustomNetTables.GetTableValue(
+            "survival_player_public_profiles",
+            "1"
+        )
+    )
+);
+
+两端都应该看到：
+
+1. key "0"始终为veteran、120、true、N2、revision 3。
+2. key "1"始终为rookie、0、false、N1、revision 1。
+3. key "0"和key "1"没有互相覆盖。
+4. 两个公开对象都没有account_id。
+5. 两个公开对象都没有entitlements、achievements、save、inventory或认证数据。
+
+公开NetTable能被所有客户端读取是正常设计，不代表私有档案泄漏。
+
+
+二十、玩家1当前已知地图限制
+--------------------------
+
+权威CSV为玩家1配置：
+
+builder_spawn_marker=player_1_builder_spawn
+wave_spawn_marker=player_1_wave_spawn
+
+但是当前template_map还没有这些Hammer Marker。
+
+因此可能出现：
+
+1. 玩家1档案正常加载。
+2. 玩家1公开NetTable正常。
+3. 玩家1 VIP为false且权益投影正常。
+4. 玩家1 Builder无法出生。
+5. 控制台出现player_1_builder_spawn缺失相关错误。
+
+如果主机日志已经出现：
+
+player_id=1
+account_id=mock_account_10002
+revision=1
+
+则玩家1档案加载已经成功。
+
+随后出现player_1_builder_spawn错误属于已知地图Marker缺失，不属于档案Provider失败。
+
+当前双机可以先验收：
+
+[ ] 玩家连接。
+[ ] 活动PlayerID。
+[ ] Fixture账号绑定。
+[ ] revision隔离。
+[ ] VIP公开投影。
+[ ] 公开字段白名单。
+
+当前不能宣称通过：
+
+[ ] 玩家1 Builder正常出生。
+[ ] 玩家1完整建筑流程。
+[ ] 玩家1独立波次流程。
+
+
+二十一、局域网连接故障排查
+--------------------------
+
+情况A：主机仍显示Players: 1
+
+说明第二台电脑没有真正连接。
+
+检查：
+
+[ ] 主机局域网IP是否正确。
+[ ] 是否错误使用127.0.0.1。
+[ ] 两台电脑是否位于同一局域网和同一网段。
+[ ] 主机Windows防火墙是否允许dota2.exe。
+[ ] UDP 27015是否被拦截。
+[ ] 两台电脑Dota 2版本是否一致。
+[ ] 两端Addon运行文件是否一致。
+[ ] 第二台电脑是否使用Workshop Tools并挂载survival Addon。
+
+
+情况B：主机显示Players: 2，但第二端PlayerID为-1
+
+说明网络连接成功，但第二端可能进入观战位。
+
+本轮不能算玩家档案隔离验收通过。
+
+处理方法：
+
+1. 退出当前测试。
+2. 尝试重新连接并确认活动玩家槽位。
+3. 如果直连始终进入观战，使用Hidden或Friends Only测试大厅。
+4. 在大厅中明确让两名玩家进入好人方槽位。
+
+
+情况C：客户端提示地图或资源不一致
+
+重点比较两端：
+
+maps\template_map.vpk
+scripts\vscripts\systems\player_profile_service.lua
+scripts\vscripts\config\fixtures\player_profiles.lua
+scripts\vscripts\config\generated\mock_player_account_bindings.lua
+scripts\custom_net_tables.txt
+panorama目录
+particles目录
+resource目录
+
+未发布Addon不会可靠地自动把主机本地项目文件传给第二台电脑，因此第二台电脑必须提前具有匹配的运行文件。
+
+
+情况D：出现玩家1档案日志，但Builder报Marker缺失
+
+如果已经看到：
+
+player_id=1
+account_id=mock_account_10002
+revision=1
+
+说明玩家1档案加载成功。
+
+player_1_builder_spawn缺失是已知地图问题，不是档案联网失败。
+
+
+情况E：没有public_profile_published日志
+
+检查：
+
+[ ] 是否完全关闭并重新启动Dota 2和Workshop Tools。
+[ ] 是否运行正确Addon survival。
+[ ] 是否运行template_map。
+[ ] 是否出现HERO_READY相关流程。
+[ ] 是否有PlayerProfile WARN或ERROR。
+[ ] 是否有JSON、Provider或Lua调用栈错误。
+[ ] game目录中的player_profile_service.lua是否包含public_profile_published。
+[ ] 两端是否使用了旧文件或旧编译产物。
+
+
+二十二、隐藏测试大厅备用方案
+----------------------------
+
+如果局域网connect不稳定、第二端始终进入观战位，或者当前Dota版本无法正确分配玩家槽位，可以发布非公开测试版本。
+
+建议发布类型：
+
+1. Hidden。
+2. Friends Only。
+3. Workshop Manager当前支持的其他非公开测试模式。
+
+操作顺序：
+
+[ ] 1. 主机发布非公开测试版本。
+[ ] 2. 第二Steam账号订阅或通过好友访问。
+[ ] 3. 主机在Dota 2游廊创建自定义大厅。
+[ ] 4. 设置大厅密码。
+[ ] 5. 两名玩家明确进入好人方槽位。
+[ ] 6. 启动游戏。
+[ ] 7. 确认主机Game.GetLocalPlayerID()为0。
+[ ] 8. 确认第二端Game.GetLocalPlayerID()为1。
+[ ] 9. 重复服务端日志和公开NetTable验收。
+
+发布隐藏版本不是单机玩家0验收的前提，只是双机槽位分配不稳定时的备用方案。
+
+
+二十三、双机最终验收清单
+------------------------
+
+网络与身份：
+
+[ ] 两台电脑使用不同Steam账号。
+[ ] 两台电脑Dota 2 Build一致。
+[ ] 两端Addon运行文件及关键文件SHA256一致。
+[ ] 主机运行template_map。
+[ ] 第二台电脑成功连接。
+[ ] 主机status显示2名玩家。
+[ ] 主机本地PlayerID为0。
+[ ] 第二台电脑本地PlayerID为1。
+[ ] 第二台电脑不是观战者。
+
+档案与权益：
+
+[ ] 主机日志出现mock_account_10001。
+[ ] 主机日志出现mock_account_10002。
+[ ] 玩家0 revision为3。
+[ ] 玩家1 revision为1。
+[ ] 玩家0 vip_badge为true。
+[ ] 玩家1 vip_badge为false。
+[ ] 玩家0公开档案为veteran、120、N2。
+[ ] 玩家1公开档案为rookie、0、N1。
+[ ] key "0"和key "1"互不覆盖。
+[ ] 两端读取到的公开档案内容一致。
+[ ] 公开NetTable没有account_id。
+[ ] 公开NetTable没有私有存档、完整权益、库存、订单或认证字段。
+[ ] 控制台没有PlayerProfile WARN或ERROR。
+
+稳定性：
+
+[ ] 两台电脑退出地图后重新运行一次。
+[ ] 第二次运行仍分配PlayerID 0和PlayerID 1。
+[ ] 第二次运行档案数据仍保持一致。
+[ ] 没有旧玩家档案覆盖新玩家档案。
+[ ] 没有玩家0 VIP状态错误投影给玩家1。
+
+
+二十四、本轮不能记录为已通过的项目
+--------------------------------
+
+在后续功能真正实现或用户明确验收前，以下项目不能记录为通过：
+
+1. 玩家1 Builder正常出生。
+2. 玩家1完整建筑、资源和波次隔离。
+3. Steam账号永久身份绑定。
+4. HTTP Provider。
+5. 正式数据库读写。
+6. 支付回调。
+7. 存档写回。
+8. 商城实际VIP商品UI门禁。
+9. 四人完整联机。
+10. 掉线重连和状态恢复。
+
+
+二十五、测试结果记录模板
+------------------------
+
+测试日期：____________________
+主机Steam账号：____________________
+客户端Steam账号：____________________
+主机局域网IPv4：____________________
+Dota 2 Build：____________________
+地图：template_map
+
+主机PlayerID：____________________
+客户端PlayerID：____________________
+服务器Players：____________________
+
+玩家0日志：
+________________________________________________________________
+________________________________________________________________
+
+玩家1日志：
+________________________________________________________________
+________________________________________________________________
+
+玩家0公开NetTable：
+________________________________________________________________
+________________________________________________________________
+
+玩家1公开NetTable：
+________________________________________________________________
+________________________________________________________________
+
+是否存在PlayerProfile WARN或ERROR：是 / 否
+是否存在JSON或Provider错误：是 / 否
+第二客户端是否为活动PlayerID 1：是 / 否
+玩家1是否出现Builder Marker缺失：是 / 否
+
+本轮单机玩家0档案验收：通过 / 不通过 / 未执行
+本轮双机连接验收：通过 / 不通过 / 未执行
+本轮双机档案隔离验收：通过 / 不通过 / 未执行
+本轮公开字段白名单验收：通过 / 不通过 / 未执行
+
+问题与备注：
+________________________________________________________________
+________________________________________________________________
+________________________________________________________________
+
+
+文档结束
+========

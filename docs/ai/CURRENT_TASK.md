@@ -1,5 +1,60 @@
 # Current Task
 
+## 已完成任务（2026-08-14）：神秘塔激光Tick恢复为1秒及计算器方法沉淀
+
+- 用户确认神秘塔普通攻击的`base_attack_speed=1`本来就是1秒间隔；LV2第7波差异来自生产激光`damage_interval=0.5`，而离线录像实验按1秒激光间隔计算。提交`f92e6c9`曾把`laser_lv01-lv05`从1秒改成0.5秒。
+- 本次决定以离线录像实验的1秒模型为准：五级激光统一恢复`damage_interval=1`；基础倍率`1.0/1.2/1.4/1.6/1.8`、同目标每秒递增5%、500%封顶、目标切换重置、首次锁定立即Tick和魔能之眼150码附伤规则均不改变。
+- 权威源只修改`tower_skill_definitions.csv`，再通过现有生成链同步技能Lua、Tooltip和六份中英文本地化；专项契约与Lua 5.1数学测试同步要求1秒Tick。下方此前“0.5秒激光”条目由本条取代，不得恢复为当前行为。
+- LV2生产基础攻击为`1401`，离线实验面板输入为`1501`；间隔统一后仍须在比较结果时保留这100点独立输入差异，不能把它误判为Tick修复未生效。
+- 实施完成：权威技能CSV、生成技能Lua、Tooltip CSV/Lua、六份中英本地化及专项测试均已同步为1秒Tick；运行时继续在伤害计算和调度两处消费`laser.damage_interval`，未新增硬编码间隔。
+- 自动验证通过：`TOWER_LASER_BASE_MULTIPLIER_CONTRACT_PASS`、`TOWER_LASER_BASE_MULTIPLIER_LUA51_PASS`、`WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`（Edge 1440/390各59项）、生成哈希稳定、目标Lua 5.1语法、Python/PowerShell语法、严格UTF-8解码、CSV BOM及限定`git diff --check`。`DECISIONS.md`和`SESSION_LOG.md`中各有3个用于说明乱码检查的既有字面`U+FFFD`，Git基线数量相同，本轮未重写历史内容。
+- 离线复算：按23护甲、6000生命、默认`t=0`普攻及`t=1`激光首跳，生产攻击1401与实验攻击1501都在`t=3`激光事件达到阈值，累计伤害分别约6477.226与6939.555。用户已确认问题没有了；这些数值仍作为后续复算的生产输入与实验输入对照，不把自动计算结果描述为独立的引擎实机验证。
+- 用户已确认问题没有了。本任务关闭，不再等待该激光问题的Workshop Tools验收；后续类似数值复算统一参考`PROJECT_CONTEXT.md`中的“离线伤害计算器复用方法”和`DECISIONS.md`中的计算器决策。
+
+## 当前插入任务（2026-08-13）：神秘塔升级触发particles.dll崩溃
+
+- 用户提供的两份当前minidump均为读取空指针访问冲突，落在`particles.dll+0x19F6FF/+0x19F70F`附近；崩溃稳定发生在箭塔约1秒升级完成为神秘塔的边界。战斗数值、激光倍率和权威CSV未显示为根因，native符号栈仍不可用。
+- 最小生产修复已实施：`building_upgrade_process.lua`的统一清理从`DestroyParticle(id, false)`改为`DestroyParticle(id, true)`；完成、建筑销毁取消、reset、升级回调发现实体失效及粒子控制点创建失败均清空保存ID，并将销毁和`ReleaseParticleIndex`放在独立保护调用中，确保每个已创建索引最多释放一次且销毁异常不阻断释放。
+- 临时诊断默认开启且全局最多64条，日志scope为`BuildingUpgradeParticle`，记录`event/entindex/particle_id/state/detail`；正常完成的状态为`complete`，取消记录实际reason，创建失败记录`create_failed`。该日志用于下一轮A/B，确认后应移除或恢复默认关闭。
+- 权威`building_construction_rules.csv`及生成`building_construction_rules.lua`未修改；专项契约从CSV解析`arrow_tower`并逐项核对`build_particle/build_start_particle/build_loop_particle`生成结果，当前升级仍使用CSV定义的`particles/items2_fx/teleport_start.vpcf`。
+- 自动验证通过：`BUILDING_UPGRADE_PARTICLE_CONTRACT_PASS`、`BUILDING_UPGRADE_PROCESS_LUA51_PASS`、`BUILDING_UPGRADE_PARTICLE_LUAC51_PASS`、PowerShell语法、严格UTF-8和限定`git diff --check`；`BUILDING_LEVEL_IDENTITY_LUA51/CONTRACT_PASS`、`SIX_GAMEPLAY_FIXES_LUA51/CONTRACT_PASS`、`ARROW_TOWER_COST_LUA51/CONTRACT_PASS`回归通过。
+- 两项既有批量升级测试保持失败且与本轮无关：Lua Mock缺`event_bus.request`；PowerShell契约仍要求已删除的客户端selection snapshot。本轮未修改批量服务、Panorama或旧测试迎合。
+- 下一步：完全停止并冷启动Workshop Tools，不按Alt、不悬停Tooltip完成一次基础箭塔到神秘塔转职，保存`BuildingUpgradeParticle`日志并确认客户端不退出；再分别按住Alt、测试其他路线。若仍崩溃，保存新dump并对比`particles.dll+0x19F6FF`，随后按既定A/B先禁用升级传送粒子，再隔离神秘塔四个bone-merged组件和`abilityTooltips=false`。未经实机结果不能称为崩溃已修复或用户验收。
+
+## 当前插入任务（2026-08-13）：激光基础倍率同步到生产与离线模型
+
+- 用户要求将激光基础倍率统一为`laser_lv01-lv05=1.0/1.2/1.4/1.6/1.8`，并同步生产技能配置、Tooltip/本地化及离线War3伤害实验模型。
+- 权威源为`data/csv/建筑与工人系统/防御塔/tower_skill_definitions.csv`和`data/csv/公共规则/war3_damage_calculator_mystery_experiment.csv`；生成技能Lua、Tooltip、六份本地化和单文件HTML均由现有生成链更新。魔能炮和魔能之眼继续使用`laser_lv05=1.8`，神秘路线`mystery_tower_lv01-lv05`映射及运行时激光算法不变。
+- 连续命中增长、每完整秒增加`0.05`、`5.00`封顶、切换主目标重置和魔能炮层规则均保持不变；离线计算器验证样本因LV2基础倍率降低而同步为默认延迟模型约3秒击杀。
+- 实现完成：新增生产激光倍率PowerShell契约和Lua 5.1数学测试；更新离线计算器契约覆盖完整五级序列及后续路线继承。`TOWER_LASER_BASE_MULTIPLIER_CONTRACT_PASS`、`TOWER_LASER_BASE_MULTIPLIER_LUA51_PASS`、`WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`（Edge 1440/390各59项）、生成Build/CheckOnly、目标Lua 5.1语法、严格UTF-8、Python/PowerShell语法及限定`git diff --check`已通过。
+- 尚未Workshop Tools冷启动确认实际激光扣血、Tooltip显示和路线实机表现；自动契约、模拟测试和Lua语法检查不能替代引擎实机验证或用户验收。
+
+## 当前插入任务（2026-08-13）：神秘之塔原版录像反推离线实验模型
+
+- 用户已批准进入Act模式。目标是在现有单文件离线计算器中加入与生产配置完全隔离的神秘之塔、魔能炮、魔能之眼离散事件实验模型；本任务原先不得修改生产Lua、`tower_class_mystery.csv`或正式技能配置，后续用户任务已明确要求同步生产激光基础倍率，当前任务条目以顶部最新条目为准。
+- 实验面板攻击力直接采用录像/工作簿最终面板值。正式路线CSV对应行均少100的内部原因尚未唯一证明，实验工具不得通过修改正式数据或运行时补偿来掩盖该差异。
+- 已确认原版时间线：普通攻击与激光并行且均约每秒结算；默认`t=0`普攻、锁定后`t=1`激光首跳。当前离线实验同步使用生产要求的激光基础倍率`100%/120%/140%/160%/180%`，每次有效Tick增加`0.05`，最高`500%`；切换目标后成长重置。
+- 魔能炮每次符合条件的击杀新增独立持续5秒的10%增伤层，各级上限`4/5/6/7/7`。致死事件使用新增层之前的快照，不允许新层反向增强本次伤害；同刻普通攻击与激光的先后顺序必须可配置并在事件明细中可见。
+- 魔能之眼由普通攻击触发，只伤害塔与主目标线段路径内的其他单位，主目标明确排除；倍率30%，路径目标按各自护甲独立结算。路径半宽默认96仅来自旧实现近似值，属于可调实验参数，不记录为原版权威值。
+- 魔能炮增伤是否传递给魔能之眼仍无唯一录像证据，必须保留显式实验开关。0.5秒激光、立即首跳和目标周围150范围AOE均属于后续改造，不得作为原版默认值。
+- 已新增`data/csv/公共规则/war3_damage_calculator_mystery_experiment.csv`作为离线实验权威源，20个预设由`tools/build_war3_damage_calculator.ps1`嵌入HTML；生成器和专项契约确认该CSV不进入生产生成Lua或`config/generated/index.lua`。
+- 页面保留通用计算器并新增独立神秘路线模式、录像面板预设、可配置首跳/同刻顺序、连续主目标、逐事件明细、独立层过期、路径目标CSV式输入和魔能之眼增伤传递开关。README已同步实验边界和使用口径。
+- 自动验证通过：神秘LV2第7波`1501攻击/6000生命/23护甲`在默认延迟首跳模型中于3秒达到击杀阈值；激光成长/500%封顶/切换重置、真实`t=0/t=1`击杀层在`t=5/t=6`独立过期、7层上限、致死事件后加层、路径主目标排除/线段半宽/逐甲、增伤传递开关及同刻顺序均有浏览器断言。
+- `WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`已通过，Edge在1440px与390px实际执行59项断言；生成Build/CheckOnly、PowerShell语法、通用规则生成Lua的Lua 5.1语法、严格UTF-8和限定`git diff --check`通过。该实验CSV仍不生成生产Lua；生产激光倍率同步见顶部最新任务条目。
+- 当前状态：离线实验工具实现和自动验证完成，等待用户双击`tools/war3_damage_calculator/index.html`选择“神秘路线录像实验”确认交互与模型是否便于继续对照录像。自动测试不等于原版算法已被唯一证明，也不等于用户验收。
+
+## 当前插入任务（2026-08-13）：计算器改用 Survival 当前战斗算法
+
+- 用户放弃查找“苟发育”外部算法，明确要求计算器以本项目当前生产公式为准。旧版经典TFT `0.06/0.94`护甲和“前N次固定暴击”口径已被本条覆盖，不得恢复。
+- 当前面板物理攻击力作为普通攻击输入；项目现有英雄CSV `damage_multiplier=1`，装备、研究、成长和英雄专属攻击乘区已体现在面板快照，计算器不得重复乘算。
+- 暴击与生产`modifier_weapon_stat_projection`一致：每个attack record按`critical_chance_pct`独立随机判定，暴击伤害使用`critical_damage_pct`。离线工具按`1 + 暴击率 × (暴击倍率 - 1)`累计每击期望伤害，并显示期望暴击/非暴击次数；结果是期望伤害达标时间，不冒充某局实战或随机停止时间的严格数学期望。
+- 固定减甲先改变怪物War3显示护甲，百分比物理护甲无视再缩放剩余正护甲；零/负护甲不受百分比无视。正护甲按项目怪物目标曲线`1/(1+0.02×War3护甲)`，零/负护甲先按`1/3`投影到运行时护甲，再沿当前Dota曲线结算。
+- 保留工具既有用途：动态多个攻击单位、各自每秒攻击次数、0秒首击、共享当前攻击力、命中后固定/基础百分比成长和同刻批量结算。最终伤害科技、Boss减伤、光环、技能、闪避、格挡、回血、前摇和弹道不在普通攻击基础估算范围。
+- 权威常量位于`data/csv/公共规则/war3_damage_calculator_rules.csv`，生成脚本同步单文件HTML、生成Lua和配置索引；禁止直接手改生成常量。
+- 实施完成：页面字段、核心公式、README、生成器和专项契约均已切换到当前项目算法。Edge在1440px与390px视口实际执行31项页面断言通过；生成Build/CheckOnly、PowerShell语法、生成Lua语法、生产怪物护甲及研究减甲Lua 5.1行为回归、10个任务文件严格UTF-8和限定diff检查通过。
+- 既有未跟踪回归脚本的两个启动问题保持不变：怪物护甲PowerShell契约用单行字符串匹配生产中的等价多行调用，研究减甲PowerShell契约未设置项目`LUA_PATH`。前者对应Lua行为测试通过；后者按项目历史约定补充进程级`LUA_PATH`后，state/trigger/generated-levels三个Lua 5.1测试全部通过。本任务未修改这些既有测试迎合文本或环境问题。
+- 当前状态：代码与自动验证完成，等待用户直接双击`tools/war3_damage_calculator/index.html`确认字段和使用体验；自动浏览器测试不等于Workshop Tools实机验证或用户验收。
+
 ## 已完成插入任务（2026-08-12）：主城/城墙等级名称与城墙原始护甲Tooltip
 
 - 目标：主城和城墙的单位名称随当前等级使用权威`building_levels.csv.display_name`；城墙升级Tooltip使用相邻等级CSV原始`war3_armor`差值，例如`10 -> 15 (+5)`。
@@ -42,7 +97,7 @@
 ## 当前实施任务（2026-08-13）：炙热巨箭单发与激光首击判定、魔能之眼建模
 
 - 用户已批准实施：多重路线升级为炙热巨箭塔后不再执行多重射击；多重塔与穿透弩炮阶段保持现有多重攻击，炙热巨箭阶段继续保留满级穿透弩炮护甲忽略与炙热巨箭路径穿透。
-- 激光在锁定新目标的攻击开始事件中立即执行首个伤害Tick，使激光判定和魔能之眼150码AOE先于基础攻击命中；同一目标后续普通攻击不得重复首Tick，切换目标后重置并立即结算。后续仍每0.5秒Tick，同目标每完整1秒增长5%，最高500%。
+- 激光在锁定新目标的攻击开始事件中立即执行首个伤害Tick，使激光判定和魔能之眼150码AOE先于基础攻击命中；同一目标后续普通攻击不得重复首Tick，切换目标后重置并立即结算。该历史实现的后续0.5秒Tick已被本文件顶部最新任务恢复为1秒，同目标每完整1秒增长5%，最高500%。
 - 魔能之眼LV1-LV10由Phoenix建模改为死亡先知主体与“光明尸衣之魂”（Soul of the Brightshroud，Bundle 21346）五件可穿戴组件；套装恶灵属于ability_ultimate替换模型，不作为塔身静态组件。激光视觉继续使用已验证的Tinker Laser。
 - 实现与自动验证完成：权威CSV及生成Lua已同步；`BURNING_GREAT_ARROW_SKILL_CHAIN_PASS`、`TOWER_LASER_ATTACK_START_PASS`、`TOWER_LASER_DAMAGE_PASS`、`TOWER_ARCANE_EYE_PASS`、`ASSET_BUNDLE_CONFIG_PASS`、`MYSTERY_TOWER_CONTRACT_PASS`、Lua 5.1语法、配置生成/`CheckOnly`、目标UTF-8、五件光明尸衣VPK路径、有效生产文件无Phoenix残留及限定`git diff --check`通过。既有综合视觉测试仍被任务前死亡路线Bundle缺失阻断，本轮独立专项已覆盖多重技能链；最终仍需Workshop Tools完全冷启动确认实际判定顺序、150码AOE、模型五组件与Tinker Laser挂点。
 
@@ -56,15 +111,15 @@
 - 防空火炮五级概率已改为2%/3%/4%/5%/5%，每枚真实命中继续独立判定并仅对飞行单位施加3秒眩晕；第三阶段继承满级配置。Tooltip CSV/Lua及六份中英本地化已同步。
 - 自动验证通过：`ANTI_AIR_TOWER_CONTRACT_PASS`、`TOWER_ANTI_AIR_BARRAGE_PASS`、目标Lua 5.1语法、85项CSV生成、86个生成Lua UTF-8检查、目标生成文件二次哈希稳定、配置`CheckOnly`、防空本地化目标token三镜像一致、严格UTF-8/BOM及限定`git diff --check`。尚未Workshop Tools实机验收。
 
-## 当前实施任务（2026-08-13）：神秘之塔激光结算与魔能之眼范围伤害
+## 已被后续修正取代（2026-08-13）：神秘路线攻击间隔与魔能之眼范围触发
 
-- 用户已批准实施：神秘路线普通攻击保持1秒间隔；`laser_lv01-lv05`改为每0.5秒结算一次，现有攻击力倍率、同一目标每秒递增5%及最高500%保持不变。
+- 历史实现曾让神秘路线普通攻击保持1秒间隔，并把`laser_lv01-lv05`改为每0.5秒结算一次；该激光间隔已被本文件顶部最新任务恢复为1秒。
 - 魔能之眼移除普通攻击命中时对塔与目标之间路径单位造成伤害的旧行为；改为每次激光伤害结算时，以激光主目标为圆心，使150码内其他敌方单位承受本次激光主目标伤害的30%。主目标不得重复承受魔能之眼伤害。
-- 权威数值必须先写入`data/csv/`再生成Lua；同步Tooltip与中英文本地化。自动验证需覆盖全路线1秒普攻、五级激光0.5秒Tick、每秒递增速度不翻倍、150码圆形查询、排除主目标、30%伤害以及未学习技能不触发。
+- 权威数值必须先写入`data/csv/`再生成Lua；同步Tooltip与中英文本地化。当前自动验证须覆盖全路线1秒普攻、五级激光1秒Tick、每Tick递增5%、150码圆形查询、排除主目标、30%伤害以及未学习技能不触发。
 - 自动测试不能称为Workshop Tools实机验证；最终仍需冷启动确认普通攻击与激光并行节奏、连续锁定递增、切换目标重置及魔能之眼实际范围扣血。
-- 实现完成：神秘路线20级继续保持`base_attack_speed=1`；五级激光统一每0.5秒结算，倍率按已完成的完整秒数递增，因此每两个Tick增加5%且仍封顶500%。激光每次结算发布权威伤害快照；魔能之眼仅响应该事件，以主目标为圆心查询150码，排除主目标后对其他敌人提交30%物理技能伤害，致死Tick仍会在目标最终位置触发。
+- 当前行为：神秘路线20级继续保持`base_attack_speed=1`；五级激光由顶部最新任务统一恢复为每1秒结算，倍率每Tick增加5%且仍封顶500%。激光每次结算发布权威伤害快照；魔能之眼仅响应该事件，以主目标为圆心查询150码，排除主目标后对其他敌人提交30%物理技能伤害，致死Tick仍会在目标最终位置触发。
 - CSV、生成Lua、Tooltip及六份中英文本地化已同步。自动验证通过：`MYSTERY_TOWER_CONTRACT_PASS`、`TOWER_LASER_DAMAGE_PASS`、`TOWER_ARCANE_EYE_PASS`、死亡塔与路径几何相关回归、目标Lua 5.1语法、85项CSV生成日志、86个生成Lua二次哈希稳定、严格UTF-8、本地化一致性及限定`git diff --check`。仓库当前不存在历史文档提及的Phoenix专项脚本，因此该项未能重跑；本轮未修改激光视觉CSV。
-- 尚未Workshop Tools实机验收：需完全冷启动确认普通攻击1秒一次、激光0.5秒一次、锁定同目标每秒只增长5%，并用不同护甲的密集目标确认150码内其他单位独立承受本次激光30%的物理伤害。
+- 尚未Workshop Tools实机验收：需完全冷启动确认普通攻击与激光后续Tick均为1秒一次、锁定同目标每Tick增长5%，并用不同护甲的密集目标确认150码内其他单位独立承受本次激光30%的物理伤害。
 
 ## 当前实施任务（2026-08-13）：死亡路线攻击间隔与死神榴弹炮单体追加暴击
 

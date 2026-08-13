@@ -1,1 +1,7 @@
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\build_configs.ps1"
+
+
+目前神秘之塔的伤害你先计算一下，我在苟发育当中遇到了这样一个问题，
+就是苟发育当中第五波的boss，我用神秘之塔lv1去攻击，发现需要的时间
+是27s，但是我们的防御塔攻击所用的时间是19s，很明显我们的攻击伤害高
+一些，先确认一下，但是我知道的是

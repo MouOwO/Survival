@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import re
+import sys
 from pathlib import Path
 
 
@@ -36,6 +37,13 @@ ENGLISH = {
             ((110, 5), (120, 6), (130, 7), (140, 8), (150, 9)), 1
         )
     },
+    **{
+        f"laser_lv{level:02d}": (
+            f"Deals {multiplier}% attack damage every 1 second. Damage to the same "
+            "target rises by 5% each second, up to 500%."
+        )
+        for level, multiplier in enumerate((100, 120, 140, 160, 180), 1)
+    },
     "lightning_diffusion_lv01": (
         "Lightning Storm hits have a 30% chance to release an electric ring, dealing "
         "200% of that hit as physical damage in a 200 radius. The ring cannot recurse."
@@ -60,18 +68,27 @@ ENGLISH = {
 }
 
 
-def descriptions() -> dict[str, str]:
+def selected_skill_ids() -> set[str]:
+    prefixes = tuple(arg.split("=", 1)[1] for arg in sys.argv[1:] if arg.startswith("--only-prefix="))
+    if not prefixes:
+        return set(ENGLISH)
+    return {skill_id for skill_id in ENGLISH if skill_id.startswith(prefixes)}
+
+
+def descriptions(skill_ids: set[str]) -> dict[str, str]:
     with SKILLS.open("r", encoding="utf-8-sig", newline="") as handle:
         rows = {row["skill_id"].strip(): row for row in csv.DictReader(handle)}
-    return {skill_id: rows[skill_id]["description"] for skill_id in ENGLISH}
+    return {skill_id: rows[skill_id]["description"] for skill_id in skill_ids}
 
 
-def update(path: Path, language: str, chinese: dict[str, str]) -> None:
+def update(path: Path, language: str, chinese: dict[str, str], skill_ids: set[str]) -> None:
     raw = path.read_bytes()
     has_bom = raw.startswith(b"\xef\xbb\xbf")
     text = raw.decode("utf-8-sig")
     newline = "\r\n" if "\r\n" in text else "\n"
-    values = chinese if language == "schinese" else ENGLISH
+    values = chinese if language == "schinese" else {
+        skill_id: ENGLISH[skill_id] for skill_id in skill_ids
+    }
     for skill_id, value in values.items():
         token = f"DOTA_Tooltip_ability_{skill_id}_Description"
         pattern = re.compile(rf'(^\s*"{re.escape(token)}"\s+")[^"]*("\s*$)', re.MULTILINE)
@@ -83,10 +100,11 @@ def update(path: Path, language: str, chinese: dict[str, str]) -> None:
 
 
 def main() -> int:
-    chinese = descriptions()
+    skill_ids = selected_skill_ids()
+    chinese = descriptions(skill_ids)
     for path, language in TARGETS:
-        update(path, language, chinese)
-    print(f"LIGHTNING_FROST_LOCALIZATION_SYNC_PASS files={len(TARGETS)} skills={len(ENGLISH)}")
+        update(path, language, chinese, skill_ids)
+    print(f"LIGHTNING_FROST_LOCALIZATION_SYNC_PASS files={len(TARGETS)} skills={len(skill_ids)}")
     return 0
 
 

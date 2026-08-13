@@ -1,5 +1,11 @@
 # Known Issues
 
+## 2026-08-13：神秘塔升级边界的particles.dll空读崩溃待实机复验
+
+- 两份当前minidump均为`particles.dll`近同偏移的空指针读取访问冲突，且发生在基础箭塔约1秒转职为神秘塔的完成边界；没有native符号栈，因此不能仅凭偏移唯一证明具体引擎对象。
+- 第一嫌疑路径已做最小修复：升级传送粒子由延迟销毁改为立即销毁，所有结束路径单次释放并有界记录生命周期。自动Lua测试只能证明项目侧调用语义，不能证明Source 2粒子线程不再崩溃。
+- 下一轮必须冷启动测试无Alt神秘塔转职，再测试Alt和其他路线；若仍崩溃，先禁用升级传送粒子做单变量A/B。禁用仍崩溃时，再隔离神秘塔四个bone-merged外观组件和Tooltip代理重建，不能同时修改多项后猜测根因。
+
 ## 2026-08-10：区域边界数据尚未提供（不阻断旧地图可玩性）
 
 - `template_map.vmap`和`survival_dev.vmap`已通过`dmxconvert.exe`转换为KeyValues文本审计；地图存在`challenge_*`、`rebirth_*`和`monsterborn`等业务中心Marker，但没有可证明为移动白名单/禁建黑名单边界的成组corner、boundary或region Marker。

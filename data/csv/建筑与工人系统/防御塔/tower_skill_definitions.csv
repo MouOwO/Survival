@@ -12,11 +12,11 @@ bone_cannon_lv03,碎骨重炮LV3,每攻击7次下一击必定造成10倍暴击,a
 bone_cannon_lv04,碎骨重炮LV4,每攻击6次下一击必定造成10倍暴击,attack_counter,,6,single,none,,instant,,,10,1,,1,,
 bone_cannon_lv05,碎骨重炮LV5,每攻击6次下一击必定造成10倍暴击,attack_counter,,6,single,none,,instant,,,10,1,,1,Lv5沿用录像最高档数值；本次仅修正技能等级编号，不外推新数值。,
 death_grenade_lv01,死神榴弹炮Lv1,暴击时有10%概率对原目标追加一次等同于该次暴击的物理伤害,on_critical_hit,10,,single,none,,instant,,,1,,,1,仅在普通攻击暴击命中后判定；追加伤害不重新暴击且不递归触发。,
-laser_lv01,激光LV1,每0.5秒造成攻击力120%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,0.5,1.2,,,1,同目标递增上限500%；每两个0.5秒伤害Tick递增一次。,
-laser_lv02,激光LV2,每0.5秒造成攻击力140%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,0.5,1.4,,,1,同目标递增上限500%；每两个0.5秒伤害Tick递增一次。,
-laser_lv03,激光LV3,每0.5秒造成攻击力160%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,0.5,1.6,,,1,同目标递增上限500%；每两个0.5秒伤害Tick递增一次。,
-laser_lv04,激光LV4,每0.5秒造成攻击力180%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,0.5,1.8,,,1,同目标递增上限500%；每两个0.5秒伤害Tick递增一次。,
-laser_lv05,激光LV5,每0.5秒造成攻击力180%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,0.5,1.8,,,1,同目标递增上限500%；每两个0.5秒伤害Tick递增一次；Lv5沿用录像最高档数值。,
+laser_lv01,激光LV1,每1秒造成攻击力100%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,1,1,,,1,同目标递增上限500%；每次伤害Tick递增5%。,
+laser_lv02,激光LV2,每1秒造成攻击力120%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,1,1.2,,,1,同目标递增上限500%；每次伤害Tick递增5%。,
+laser_lv03,激光LV3,每1秒造成攻击力140%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,1,1.4,,,1,同目标递增上限500%；每次伤害Tick递增5%。,
+laser_lv04,激光LV4,每1秒造成攻击力160%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,1,1.6,,,1,同目标递增上限500%；每次伤害Tick递增5%。,
+laser_lv05,激光LV5,每1秒造成攻击力180%伤害，同目标每秒递增5%，最高500%,on_attack,,,single,none,,periodic,,1,1.8,,,1,同目标递增上限500%；每次伤害Tick递增5%；Lv5沿用录像最高档数值。,
 arcane_cannon_lv01,魔能炮LV1,击杀后5秒内伤害+10%，最多4层,on_kill,,,self,none,,buff,5,,0.1,4,,1,,buff_arcane_cannon_damage
 arcane_cannon_lv02,魔能炮LV2,击杀后5秒内伤害+10%，最多5层,on_kill,,,self,none,,buff,5,,0.1,5,,1,,buff_arcane_cannon_damage
 arcane_cannon_lv03,魔能炮LV3,击杀后5秒内伤害+10%，最多6层,on_kill,,,self,none,,buff,5,,0.1,6,,1,,buff_arcane_cannon_damage
