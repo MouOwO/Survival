@@ -4,6 +4,7 @@
 
 ## 当前任务
 
+- 已完成任务（2026-08-14，挑战怪零碰撞、挑战建筑统一视觉与自动Toggle）：五种挑战怪在专属生成边界固定0 Hull并启用无单位碰撞；挑战建筑保持2x2占地，完工与施工统一为`radiant_ancient001.vmdl / 0.34`且复用公共施工服务；自动Toggle已补齐Panorama托管、行为位放行、服务端直达分发和`OnToggle`重入保护。挑战专项、正式波次碰撞/顺序回归、Lua 5.1、CSV生成、JS编译、UTF-8和限定diff均通过。用户已明确表示任务完成，不再恢复为待验收项；复发排查顺序见`PROJECT_CONTEXT.md`顶部。
 - 当前插入任务（2026-08-14，神秘塔LV4攻击W10 Boss高甲公式修复完成自动验证）：当前Dota护甲曲线已确认为`1 - 0.06A/(1+0.06|A|)`；War3护甲按`A=W/3`投影后，正甲原生结算天然等于`1/(1+0.02W)`，怪物普通物理补偿应为1。权威计算器规则CSV已改为`0.06/1/0.06`，`armor_balance.lua`改为消费生成规则，生成Lua和单文件HTML已重建；117/477/4990护甲、W10 60000生命与神秘塔LV4 3801攻击/1秒普攻/1.6起始激光回归通过，离散模拟`t=44`达到60044.259962。专项契约/Lua 5.1、计算器Edge双视口62项、激光、研究减甲、毒云、塔射程、超级塔科技、语法、生成一致、UTF-8及限定diff检查通过；下一步完全冷启动Workshop Tools，以单座LV4神秘之塔实测W10 Boss约45～46秒，自动模拟不能替代引擎实机验证。
 - 已完成任务（2026-08-14，神秘塔激光1秒Tick及计算器方法）：用户确认问题已解决。此前权威`tower_skill_definitions.csv`的`laser_lv01-lv05`已统一恢复1秒，生成配置、Tooltip、本地化和专项测试已同步；计算器的CSV数据边界、护甲公式、离散事件时间轴、暴击期望、成长、激光重置、击杀层和路径附伤方法已沉淀到`PROJECT_CONTEXT.md`/`DECISIONS.md`，后续数值复算直接复用。不要再把该问题列为待Workshop Tools验收。
 - 当前插入任务（2026-08-13，神秘塔升级崩溃最小修复待实机确认）：两份当前minidump均为`particles.dll`近同偏移空读，升级完成边界的施工传送粒子原使用`DestroyParticle(id, false)`后立即释放。`building_upgrade_process.lua`现对完成、取消、reset、实体失效和创建失败统一先清空状态，再`DestroyParticle(id, true)`并独立尝试一次`ReleaseParticleIndex`；临时启用最多64条`BuildingUpgradeParticle`生命周期日志。专项契约/Lua 5.1、相关建筑回归、语法、CSV字段生成一致、UTF-8和限定diff已通过；下一步必须冷启动Workshop Tools测试神秘塔转职，自动测试不能证明native崩溃已消失。

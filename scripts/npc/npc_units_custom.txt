@@ -95,6 +95,27 @@
         "VisionNighttimeRange"   "800"
     }
 
+    "building_challenge"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/props_structures/radiant_ancient001.vmdl"
+        "ModelScale"             "0.34"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "AbilityLayout"          "6"
+        "HealthBarOffset"        "-1"
+        "StatusHealth"           "2500"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "ArmorPhysical"          "2.666667"
+        "MagicalResistance"      "25"
+        "BoundsHullName"         "DOTA_HULL_SIZE_BARRACKS"
+        "VisionDaytimeRange"     "1000"
+        "VisionNighttimeRange"   "800"
+    }
+
     "building_farm"
     {
         "BaseClass"              "npc_dota_creature"

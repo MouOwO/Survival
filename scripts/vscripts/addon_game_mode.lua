@@ -68,6 +68,9 @@ local combat_bootstrap = require("bootstrap/combat_bootstrap")
 print("[SURVIVAL_FINGERPRINT] addon_game_mode=20260730_skill_grant_transaction")
 local unit_display_names = require("config/generated/unit_display_names")
 local seven_sins_essences = require("config/seven_sins_essences")
+local building_challenge_definitions = require(
+    "config/generated/building_challenge_definitions"
+)
 
 local grid_system = require("systems/grid_placement_system")
 local resource_system = require("systems/resource_system")
@@ -176,6 +179,12 @@ require("abilities/ability_build_wall")
 require("abilities/ability_build_main_city")
 require("abilities/ability_build_arrow_tower")
 require("abilities/ability_build_research_lab")
+require("abilities/ability_build_challenge")
+require("abilities/ability_challenge_monster_01")
+require("abilities/ability_challenge_monster_02")
+require("abilities/ability_challenge_monster_03")
+require("abilities/ability_challenge_monster_04")
+require("abilities/ability_challenge_auto_summon")
 require("abilities/ability_build_farm")
 require("abilities/ability_building_blink")
 require("abilities/ability_survival_builder_blink")
@@ -483,6 +492,14 @@ function M.precache(context)
     sound_service.precache(context)
     building_construction_visual.precache(context)
     monster_visual_service.precache_range(context, 1, 1)
+    local challenge_models = {}
+    for _, challenge in ipairs(building_challenge_definitions.rows or {}) do
+        local model_path = challenge.model_path
+        if challenge.enabled ~= false and model_path and not challenge_models[model_path] then
+            PrecacheResource("model", model_path, context)
+            challenge_models[model_path] = true
+        end
+    end
     PrecacheResource(
         "particle",
         "particles/items_fx/blink_dagger_start.vpcf",
@@ -793,6 +810,7 @@ local function initialize_services()
     challenge_session_service.init()
     monster_spawn_service.init()
     wave_system.init()
+    require("systems/building_challenge_service").init()
     shop_system.init()
     cheat_command_service.init()
     require("systems/monster_corpse_lifecycle_service").init()

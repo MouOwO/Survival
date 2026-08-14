@@ -76,6 +76,14 @@ local function remove_managed(builder)
 end
 
 local function can_activate(state, row)
+    if row.building_id == "building_research_lab"
+        and count(state, "building_research_lab") >= 1 then
+        return false
+    end
+    if row.building_id == "building_challenge"
+        and count(state, "building_research_lab") < 1 then
+        return false
+    end
     if state.city_level < (tonumber(row.required_city_level) or 0) then
         return false
     end
@@ -166,10 +174,16 @@ local function add_stage_abilities(state, stage_rows)
     for _, row in ipairs(stage_rows) do
         local active = can_activate(state, row)
         local ability = builder:FindAbilityByName(row.ability_name)
-        if count_limit_reached(state, row) and ability then
+        local replaced_research = row.building_id == "building_research_lab"
+            and count(state, "building_research_lab") >= 1
+        local challenge_locked = row.building_id == "building_challenge"
+            and count(state, "building_research_lab") < 1
+        if (count_limit_reached(state, row) or replaced_research or challenge_locked)
+            and ability then
             builder:RemoveAbility(row.ability_name)
             ability = nil
-        elseif not count_limit_reached(state, row) and not ability then
+        elseif not count_limit_reached(state, row) and not replaced_research
+            and not challenge_locked and not ability then
             ability = builder:AddAbility(row.ability_name)
         end
         if ability then

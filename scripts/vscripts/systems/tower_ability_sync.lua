@@ -2,6 +2,7 @@ local logger = require("core/logger")
 local tower_skills = require("systems/tower_skill_runtime")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local tower_utility_abilities = require("systems/tower_utility_ability_sync")
 
 local M = {}
 
@@ -65,7 +66,11 @@ function M.sync(state, row)
     end
 
     for _, ability_name in ipairs(row and row.active_skill_ids or {}) do
-        if wanted[ability_name] then add_ability(state.unit, ability_name) end
+        if wanted[ability_name]
+            and ability_name ~= tower_utility_abilities.MOVE_ABILITY
+            and ability_name ~= tower_utility_abilities.DESTROY_ABILITY then
+            add_ability(state.unit, ability_name)
+        end
     end
     for _, skill_id in ipairs(row and row.skill_ids or {}) do
         add_ability(state.unit, skill_id)
@@ -75,6 +80,7 @@ function M.sync(state, row)
     elseif state.unit:FindAbilityByName("ability_tower_fusion") then
         state.unit:RemoveAbility("ability_tower_fusion")
     end
+    tower_utility_abilities.sync(state, row)
 end
 
 return M

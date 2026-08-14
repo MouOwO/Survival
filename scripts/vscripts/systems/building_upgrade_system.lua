@@ -13,6 +13,7 @@ local asset_preload = require("systems/asset_preload_service")
 local upgrade_process = require("systems/building_upgrade_process")
 local building_sound = require("systems/building_sound_service")
 local building_health_projection = require("systems/building_health_projection")
+local tower_utility_abilities = require("systems/tower_utility_ability_sync")
 local dev_wall_stats = require("debug/dev_wall_stats")
 
 local M = {}
@@ -239,6 +240,7 @@ local function set_class_buttons(unit, active)
         end
         if ability then ability:SetActivated(true) end
     end
+    tower_utility_abilities.sync(state, tower_routes.current(state))
 end
 
 local function refresh_class_buttons(state, tower_class_counts)
@@ -263,6 +265,7 @@ local function refresh_class_buttons(state, tower_class_counts)
         end
         if ability then ability:SetActivated(true) end
     end
+    tower_utility_abilities.sync(state, tower_routes.current(state))
 end
 
 local function base_health(state)

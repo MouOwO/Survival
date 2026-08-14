@@ -227,6 +227,31 @@ M.building_research_lab = {
     levels = research_lab_levels,
 }
 
+local challenge_levels = level_rows("building_challenge")
+challenge_levels[1] = challenge_levels[1] or {}
+challenge_levels[1].health = challenge_levels[1].health or 2500
+challenge_levels[1].armor = challenge_levels[1].armor or dota_armor(8)
+M.building_challenge = {
+    id = "building_challenge",
+    display_name = configured_name("building_challenge", "挑战建筑"),
+    unit_name = configured_unit_name("building_challenge", "building_challenge"),
+    build_cost = build_cost("building_challenge", 100, 0),
+    footprint = { x = 2, y = 2 },
+    max_count = 1,
+    unlock_city_level = 1,
+    show_health_bar = false,
+    selectable = true,
+    abilities = {
+        "ability_challenge_monster_01",
+        "ability_challenge_monster_02",
+        "ability_challenge_monster_03",
+        "ability_challenge_monster_04",
+        "ability_challenge_monster_05",
+        "ability_challenge_auto_summon",
+    },
+    levels = challenge_levels,
+}
+
 M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
 local gold_mine_visual = (building_visual_by_id.building_gold_mine or {})[1]
 if gold_mine_visual then
@@ -250,6 +275,10 @@ M.arrow_tower = apply_construction(M.arrow_tower, "arrow_tower")
 M.building_research_lab = apply_construction(
     M.building_research_lab,
     "building_research_lab"
+)
+M.building_challenge = apply_construction(
+    M.building_challenge,
+    "building_challenge"
 )
 M.gold_mine = apply_construction(M.gold_mine, "gold_mine")
 M.hero_altar = apply_construction(M.hero_altar, "hero_altar")

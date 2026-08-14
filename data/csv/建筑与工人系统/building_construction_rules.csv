@@ -6,5 +6,6 @@ main_city,200,3,particles/items2_fx/teleport_start.vpcf,particles/items2_fx/tele
 arrow_tower,200,3,particles/items2_fx/teleport_start.vpcf,particles/items2_fx/teleport_start_l_flash.vpcf,particles/items2_fx/teleport_start.vpcf,1,1,Undying走到200范围内施法；完成前不可选择。
 building_farm,200,3,particles/items2_fx/teleport_start.vpcf,particles/items2_fx/teleport_start_l_flash.vpcf,particles/items2_fx/teleport_start.vpcf,0.34,1,人口农场施工视觉与英雄祭坛保持相同模型缩放；完成前不可选择，完成后恢复模型与选择。
 building_research_lab,200,3,particles/items2_fx/teleport_start.vpcf,particles/items2_fx/teleport_start_l_flash.vpcf,particles/items2_fx/teleport_start.vpcf,0.34,1,研究所施工视觉与英雄祭坛保持相同模型缩放；主城建成后Undying通过W建造；费用读取building_levels.csv；完成前不可选择。
+building_challenge,200,3,particles/items2_fx/teleport_start.vpcf,particles/items2_fx/teleport_start_l_flash.vpcf,particles/items2_fx/teleport_start.vpcf,0.34,1,挑战建筑统一使用普通动态建筑施工接口与传送施工特效；完成前不可选择。
 gold_mine,200,3,particles/items2_fx/teleport_start.vpcf,particles/items2_fx/teleport_start_l_flash.vpcf,particles/items2_fx/teleport_start.vpcf,0.34,1,金矿施工视觉与可选中动态建筑模型保持相同缩放；完成前不可选择。
 hero_altar,200,3,particles/items2_fx/teleport_start.vpcf,particles/items2_fx/teleport_start_l_flash.vpcf,particles/items2_fx/teleport_start.vpcf,1,1,Undying走到200范围内施法；完成前不可选择。

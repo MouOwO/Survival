@@ -37,9 +37,24 @@ local function effects_for(profile_id)
     return result
 end
 
+local function scaled_effects(effects, challenge_wave_number)
+    local result = {}
+    local multiplier = math.max(1, tonumber(challenge_wave_number) or 1)
+    for _, source in ipairs(effects) do
+        local effect = {}
+        for key, value in pairs(source) do effect[key] = value end
+        if effect.stack_mode == "multiply_by_challenge_wave" then
+            effect.value = (tonumber(effect.value) or 0) * multiplier
+        end
+        result[#result + 1] = effect
+    end
+    return result
+end
+
 local function split_effects(effects)
     local resource = { wood = 0, gold = 0 }
     local progression = {}
+    local challenge = {}
 
     for _, effect in ipairs(effects) do
         local value = tonumber(effect.value) or 0
@@ -47,11 +62,13 @@ local function split_effects(effects)
             resource.wood = resource.wood + value
         elseif effect.effect_type == "add_gold" then
             resource.gold = resource.gold + value
+        elseif string.match(tostring(effect.effect_type), "^challenge_") then
+            table.insert(challenge, effect)
         else
             table.insert(progression, effect)
         end
     end
-    return resource, progression
+    return resource, progression, challenge
 end
 
 local function grant_reward(payload)
@@ -74,8 +91,11 @@ local function grant_reward(payload)
         return { ok = true, idempotent = true, reward_profile_id = profile_id }
     end
 
-    local effects = effects_for(profile_id)
-    local resources, progression = split_effects(effects)
+    local effects = scaled_effects(
+        effects_for(profile_id),
+        payload.challenge_wave_number
+    )
+    local resources, progression, challenge = split_effects(effects)
 
     local resource_result = { ok = true }
     if resources.wood ~= 0 or resources.gold ~= 0 then
@@ -102,9 +122,22 @@ local function grant_reward(payload)
         }
     end
 
+    local challenge_result = { ok = true }
+    if #challenge > 0 then
+        challenge_result = event_bus.request(
+            events.TECHNOLOGY_STATS_CHALLENGE_ADD_REQUEST,
+            {
+                player_id = payload.player_id,
+                effects = challenge,
+                reason = "monster_reward:" .. profile_id,
+            }
+        ) or { ok = false, error = "challenge_stats_handler_missing" }
+    end
+
     local result = {
         ok = resource_result.ok == true
-            and progression_result.ok == true,
+            and progression_result.ok == true
+            and challenge_result.ok == true,
         player_id = payload.player_id,
         team = payload.team,
         encounter_id = payload.encounter_id,
@@ -114,6 +147,7 @@ local function grant_reward(payload)
         resources = resources,
         resource_result = resource_result,
         progression_result = progression_result,
+        challenge_result = challenge_result,
     }
 
     if result.ok and profile.repeatable ~= true then

@@ -5,6 +5,7 @@ local config = require("config/gold_mine_config")
 local building_visual = require("systems/building_visual_service")
 local upgrade_process = require("systems/building_upgrade_process")
 local building_sound = require("systems/building_sound_service")
+local technology_stat_manager = require("systems/technology_stat_manager")
 
 local M = {}
 local state_by_entindex = {}
@@ -422,6 +423,12 @@ local function tick()
                 efficiency_level,
                 crit
             )
+            local gold_mine = technology_stat_manager.get(
+                state.player_id
+            ).final.gold_mine or {}
+            amount = math.floor(amount * (
+                1 + (tonumber(gold_mine.income_bonus_pct) or 0) / 100
+            ))
             local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
                 team = state.team, gold = amount,
                 reason = crit and "gold_mine_critical_income" or "gold_mine_income",
@@ -458,6 +465,13 @@ function M.init()
     event_bus.handle_request(events.GOLD_MINE_AUTO_UPGRADE_REQUEST, toggle_auto_upgrade)
     event_bus.handle_request(events.GOLD_MINE_LEVEL_UPGRADE_REQUEST, upgrade_mine)
     event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
+    event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
+        for _, state in pairs(state_by_entindex) do
+            if state.player_id == tonumber(payload and payload.player_id) then
+                publish(state)
+            end
+        end
+    end)
     event_bus.subscribe(events.BUILDING_CREATED, on_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)
     scheduler.every(config.production_interval, tick, "gold_mine_production")

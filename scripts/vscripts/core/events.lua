@@ -32,6 +32,8 @@ local M = {
     BUILDING_CREATED = "building.created",
     BUILDING_CHANGED = "building.changed",
     BUILDING_DESTROYED = "building.destroyed",
+    BUILDING_CHALLENGE_SUMMON_REQUEST = "building.challenge.summon.request",
+    BUILDING_CHALLENGE_AUTO_REQUEST = "building.challenge.auto.request",
 
 
     TOWER_CRITICAL_QUERY = "tower.critical.query",
@@ -83,6 +85,7 @@ local M = {
     SHOP_DEBUG_UNLOCK_REQUEST = "shop.debug_unlock.request",
     TECHNOLOGY_STATE_GET_REQUEST = "technology.state.get.request",
     TECHNOLOGY_PURCHASE_NEXT_REQUEST = "technology.purchase_next.request",
+    TECHNOLOGY_STATS_CHALLENGE_ADD_REQUEST = "technology.stats.challenge_add.request",
     TECHNOLOGY_CHEAT_SET_REQUEST = "technology.cheat_set.request",
     TECHNOLOGY_CHANGED = "technology.changed",
     TECHNOLOGY_STATS_GET_REQUEST = "technology.stats.get.request",

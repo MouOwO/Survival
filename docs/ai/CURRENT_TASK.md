@@ -1,5 +1,35 @@
 # Current Task
 
+## 当前任务（2026-08-14）：箭塔移动与确认销毁工具技能
+
+- 用户已批准实施：仅基础箭塔及全部转职/升级形态增加移动D和无偿销毁G；城墙与其他建筑不包含。
+- 槽位规则：现有升级、转职和战斗技能优先；6格栏至少空2格时显示移动与销毁，仅空1格时只显示销毁，无空格时两者隐藏且快捷键不得绕过；销毁始终排在最后。
+- 移动继续使用现有1000范围、网格占用与平坦地形校验，移除城墙适用范围及独立备用按钮。销毁必须弹出确认框，只允许鼠标点击按钮确认，Esc取消；不得注册、处理或占用Enter。服务端验证所有权、箭塔身份、存活、非施工状态及可见技能后调用`ForceKill(false)`，不返还资源，沿既有死亡链释放网格、人口和数量名额。
+- 自动实现完成：8份箭塔CSV共139个设计行均在既有主动技能末尾追加移动与销毁；统一同步器按6格可见技能数重排工具技能，保证升级/转职/战斗技能优先、销毁最后，并对隐藏技能同时停用。移动仅允许箭塔，继续复用1000范围、网格占用和地形校验；旧城墙范围与独立右下角按钮已移除。
+- 销毁实现完成：G或技能点击只打开确认框，只能鼠标点击按钮确认，Esc/按钮取消；Enter未注册且不会被该功能处理。选择变化、单位失效或技能隐藏会自动取消。服务端重新验证玩家所有权、箭塔身份、存活、非施工状态及销毁技能可见可用后`ForceKill(false)`，不调用退款入口，沿既有死亡链释放网格、人口和数量名额。
+- 自动验证通过：`ARROW_TOWER_UTILITY_CONTRACT_PASS`、93模块CSV生成与`--check-only`、目标及生成Lua 5.1语法（原带BOM的`building_system.lua`使用无BOM临时副本）、KV括号/技能定义、限定`git diff --check`。4个Panorama JS各`1 compiled, 0 failed`，HUD XML加载链`9 compiled, 0 failed`，CSS单独`1 compiled, 0 failed`；6个对应game编译产物已更新。
+- 待Workshop Tools冷启动实机验收：基础塔1-5、7条路线不同等级/技能数量下的2空槽/1空槽/0空槽显示；D移动成功与越界/占用拒绝；G打开、鼠标确认、Esc取消、Enter完全不受影响、切换选择；销毁后资源不返还且网格、人口、基础塔/路线数量名额恢复。自动测试和编译不得称为引擎实机验证或用户验收。
+- 实机检查发现基础箭塔名称显示为`����1-5`。根因是批量追加工具技能时，基础塔、冰霜和机枪三份权威CSV已有中文字段被写成U+FFFD，生成Lua原样传播；现从最后正确UTF-8历史版本按`record_id`和字段位置仅恢复受污染文本，保留当前数值、模型与工具技能，并新增8份塔CSV及生成Lua禁止U+FFFD、基础塔逐级名称精确匹配的契约。
+
+## 已完成任务（2026-08-14）：挑战怪碰撞、建筑施工一致性与自动召唤输入
+
+- 用户实测提出三项问题：五种挑战怪必须始终使用0碰撞体以避免卡怪；挑战建筑的占地、模型大小和施工特效需要与普通建筑一致，并统一消费现有建筑施工接口；自动召唤Toggle点击后没有执行自动判断。
+- 根因确认并修复：挑战怪出生曾复用Boss profile和全局Hull缩放，现于挑战专属生成边界固定`SetHullRadius(0)`、保存0基础Hull并向城墙AI传递无单位碰撞；不修改正式波次碰撞规则或`scalemonster`集合。
+- 挑战建筑继续使用普通2x2占地、`radiant_ancient001.vmdl`和KV回退缩放0.34；权威视觉CSV新增完工缩放0.34，施工CSV新增同一缩放及统一传送开始/持续特效，继续由`building_construction_visual_service`消费，不创建专属施工实现。正式生成器已重建93个Lua模块，目标生成行已复核。
+- 自动召唤根因是两层遗漏：主HUD未把挑战Toggle列为托管建筑动作，且无目标分发只接受`NO_TARGET`行为位，会在客户端以`unsupported behavior`拒绝Toggle；服务端也未提供creature建筑的直达分发。现两套HUD入口均托管该Ability，主HUD允许Toggle行为位；路由完成ownership/建筑/Ability校验后切换权威自动状态并同步引擎Toggle，重入标记阻止`OnToggle()`二次反向请求。
+- 自动验证通过：`BUILDING_CHALLENGE_CONTRACT/SERVICE/REWARDS_LUA51_PASS`、`WAVE_FLYING_COLLISION_PASS`、`WAVE_SPAWN_SEQUENCE_PASS`、目标Lua 5.1语法、正式CSV生成93模块、两个Panorama JS各`1 compiled, 0 failed, 0 skipped`及双仓限定`git diff --check`。挑战独立次数、冷却、成长、剑圣前置、奖励和正式波次隔离语义保持不变。
+- 完成状态：用户于2026-08-14明确表示任务完成，本任务关闭且不得在后续会话中自动恢复为活跃或待验收任务，除非用户报告具体回归。此前自动验证证明静态跨层契约、Lua Mock行为、语法、生成配置及JS编译通过；用户未提供逐项Workshop Tools日志，因此记录为用户确认完成，不追加虚构的逐项引擎测试数据。
+
+## 已完成自动实现（2026-08-14）：五种挑战怪独立进度与正式奖励纠正
+
+- 用户纠正挑战进度与正式wave完全无关：山岭巨人、树人、红龙、剑圣、炼金各自按队伍维护本局挑战次数，最多20次；成功召唤第N只读取该怪第N条挑战CSV，生命为`N*1000`、War3护甲为`N*10`。
+- 五种召唤技能独立冷却依次为100/110/120/130/140秒，仍共享手动/自动入口且同队同类最多存活1只。剑圣额外要求主城LV5，所有校验由服务端执行。
+- 奖励按截图纠正为CSV权威：山岭巨人每次城墙护甲+3、生命+1%；树人箭塔攻击`+100*挑战次数`、攻击+1%；红龙伐木效率+1；剑圣英雄全属性`+1000*挑战次数`、攻击`+2000*挑战次数`；炼金金矿收益+2%。
+- 生产实现完成：挑战定义自包含五种模型与战斗外观，不修改历史本地代码页怪物原型CSV；正式波次 getter 已从挑战服务依赖中移除。成功生成第N只时立即冻结独立挑战次数，建筑重建不重置次数或同类存活限制；达到20次后拒绝继续召唤。自动模式会跳过已满20次或主城前置不足的种类，继续检查后续种类，每Tick仍最多成功召唤一种。
+- 奖励实现完成：通用奖励解释器按召唤时冻结的挑战次数缩放CSV效果；建筑/经济奖励进入`technology_stat_manager`独立challenge层，与研究科技和运行时成长合并且不被科技重算覆盖。山岭巨人War3护甲+3投影为Dota护甲+1；箭塔、城墙、英雄、伐木工沿既有`TECHNOLOGY_STATS_CHANGED`刷新，金矿产量额外消费挑战收益百分比。
+- 自动验证通过：`BUILDING_CHALLENGE_CONTRACT/SERVICE/REWARDS_LUA51_PASS`、100行生成矩阵、正式波次飞行碰撞与生成顺序、怪物奖励回城、目标Lua 5.1语法、KV括号、六套本地化12个挑战token镜像、严格UTF-8及限定`git diff --check`。历史怪物原型CSV和生成Lua已确认相对任务前逐字节无变化。
+- 验证边界：旧`test_gold_mine_income_numbers_contract.ps1`仍失败于content HUD任务前缺少`SurvivalInputLifecycleGeneration`，与本次服务端金矿收益公式无关，未越界修改。尚未Workshop Tools冷启动实测六个按钮、五种独立CD/20次进度、五模型、剑圣主城LV5、自动跳过、城墙AI、正式波次隔离和五种奖励实际到账。
+
 ## 当前插入任务（2026-08-14）：神秘塔LV4攻击W10 Boss高护甲补偿修复
 
 - 根因来自提交`462eb84`加入的怪物物理伤害曲线补偿，不是激光间隔、重复Modifier、光环或缓存。当前Dota护甲承伤曲线为`1 - 0.06A/(1+0.06|A|)`；项目继续按`A=W/3`投影War3护甲，因此正甲原生承伤已经严格等于目标`1/(1+0.02W)`，无需额外普通物理补偿。
@@ -8,6 +38,16 @@
 - W10回归直接读取生成配置：`n1_wave_10_10b`为60000生命/477护甲，`mystery_tower_lv04`为3801攻击/每秒1次，`laser_lv04`为1.6起始倍率/每秒增长0.05。按生产首次锁定立即激光Tick的离散模型，`t=44`累计60044.259962伤害，覆盖预期约45～46秒实机计时。
 - 自动验证通过：`MONSTER_WAR3_ARMOR_DAMAGE_LUA51/CONTRACT_PASS`、`WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`（Edge 1440/390各62项）、`TOWER_LASER_BASE_MULTIPLIER_LUA51/CONTRACT_PASS`、研究减甲、毒云、塔射程、超级塔科技和六项玩法回归；目标Lua 5.1语法、生成Build/CheckOnly、严格UTF-8及限定`git diff --check`通过。研究减甲与毒云旧包装器需要按既有约定设置项目`LUA_PATH`后运行，业务断言通过。
 - 下一步：完全停止并冷启动Workshop Tools，只放置单座LV4神秘之塔攻击N1 W10进攻Boss，记录从首次伤害到死亡的时间与`MONSTER_PHYSICAL_DAMAGE_FILTER`样本；目标约45～46秒，`armor_compensation`应为1。自动测试和离散模拟不能称为引擎实机验证或用户验收。
+
+## 已完成任务（2026-08-14）：研究所前置的挑战建筑
+
+- 生产实现完成：新增最多1座、消耗100木材且不可升级的挑战建筑；研究所完成后Builder的W槽由研究所替换为挑战建筑。Builder投影与`building_system`服务端均校验前置，客户端直接提交不能绕过。
+- 建筑提供4个手动召唤技能和1个自动Toggle。完工时四技能均进入150秒CD；手动与自动共享技能CD。自动模式每秒检查一次，每Tick最多按CSV固定顺序召唤一种。
+- `building_challenge_waves.csv`显式配置1-30波×4种共120条记录，首版统一为生命200、攻击2、War3护甲2、每秒攻击1次和Boss身份；四种外观来自已确认怪物原型并在Addon Precache阶段显式预载。
+- `building_challenge_service.lua`按team维护同种最多1只的存活身份，建筑摧毁重建也不能绕过。`wave_system.spawn_challenge_monster()`复用正式出生Marker、战斗属性投影、Boss碰撞、尸体生命周期及攻击城墙AI，但不登记正式`enemies`，不修改波次planned/pending/spawned/alive/killed/boss_alive，不进入胜利或正式怪物奖励链。
+- 奖励复用通用CSV效果解释器：`reward_building_challenge_wood_1000`当前仅启用`add_wood=1000`，归建筑所属玩家team；既有英雄成长效果类型可供后续扩展，本轮未擅自发放研究Buff。
+- 自动验证通过：正式全量CSV生成93个Lua模块；`BUILDING_CHALLENGE_CONTRACT_PASS`、`BUILDING_CHALLENGE_SERVICE_LUA51_PASS`、120行生成矩阵、奖励配置、目标Lua 5.1语法、严格UTF-8、KV括号、限定`git diff --check`、怪物奖励、波次碰撞和生成顺序回归通过。`building_system.lua`因历史UTF-8 BOM使用去BOM临时副本通过Lua 5.1语法。
+- 验证边界：全量`build_configs.ps1 -CheckOnly`仍因历史`building_definitions.lua`和`building_levels.lua`含字面U+FFFD报告`bad_utf8=2`；本轮新增挑战行及核心文件严格UTF-8通过，未越界重写历史损坏数据。尚未Workshop Tools实机验证W槽替换、五个按钮、独立CD、四秒自动顺序、模型、城墙AI、波次隔离和木材到账。
 
 ## 当前实施任务（2026-08-14）：机枪每秒轮次与逐跳独立暴击
 

@@ -1,123 +1,103 @@
-﻿challenge_wave_id,challenge_id,wave_number,health,attack,armor,attack_speed,is_boss,enabled,notes
-#中文名:挑战波次ID,挑战ID,正式波次,生命值,攻击力,War3护甲,每秒攻击次数,是否Boss,是否启用,备注
+challenge_wave_id,challenge_id,wave_number,health,attack,armor,attack_speed,is_boss,enabled,notes
+#中文名:挑战波次ID,挑战ID,独立挑战次数,生命值,攻击力,War3护甲,每秒攻击次数,是否Boss,是否启用,备注
 #types:string,string,number,number,number,number,number,boolean,boolean,string
-challenge_monster_01_wave_01,challenge_monster_01,1,200,2,2,1,1,1,首版统一复制N1第1波强度。
-challenge_monster_02_wave_01,challenge_monster_02,1,200,2,2,1,1,1,首版统一复制N1第1波强度。
-challenge_monster_03_wave_01,challenge_monster_03,1,200,2,2,1,1,1,首版统一复制N1第1波强度。
-challenge_monster_04_wave_01,challenge_monster_04,1,200,2,2,1,1,1,首版统一复制N1第1波强度。
-challenge_monster_01_wave_02,challenge_monster_01,2,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_02,challenge_monster_02,2,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_02,challenge_monster_03,2,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_02,challenge_monster_04,2,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_03,challenge_monster_01,3,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_03,challenge_monster_02,3,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_03,challenge_monster_03,3,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_03,challenge_monster_04,3,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_04,challenge_monster_01,4,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_04,challenge_monster_02,4,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_04,challenge_monster_03,4,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_04,challenge_monster_04,4,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_05,challenge_monster_01,5,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_05,challenge_monster_02,5,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_05,challenge_monster_03,5,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_05,challenge_monster_04,5,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_06,challenge_monster_01,6,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_06,challenge_monster_02,6,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_06,challenge_monster_03,6,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_06,challenge_monster_04,6,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_07,challenge_monster_01,7,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_07,challenge_monster_02,7,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_07,challenge_monster_03,7,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_07,challenge_monster_04,7,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_08,challenge_monster_01,8,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_08,challenge_monster_02,8,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_08,challenge_monster_03,8,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_08,challenge_monster_04,8,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_09,challenge_monster_01,9,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_09,challenge_monster_02,9,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_09,challenge_monster_03,9,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_09,challenge_monster_04,9,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_10,challenge_monster_01,10,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_10,challenge_monster_02,10,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_10,challenge_monster_03,10,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_10,challenge_monster_04,10,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_11,challenge_monster_01,11,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_11,challenge_monster_02,11,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_11,challenge_monster_03,11,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_11,challenge_monster_04,11,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_12,challenge_monster_01,12,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_12,challenge_monster_02,12,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_12,challenge_monster_03,12,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_12,challenge_monster_04,12,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_13,challenge_monster_01,13,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_13,challenge_monster_02,13,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_13,challenge_monster_03,13,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_13,challenge_monster_04,13,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_14,challenge_monster_01,14,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_14,challenge_monster_02,14,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_14,challenge_monster_03,14,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_14,challenge_monster_04,14,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_15,challenge_monster_01,15,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_15,challenge_monster_02,15,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_15,challenge_monster_03,15,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_15,challenge_monster_04,15,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_16,challenge_monster_01,16,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_16,challenge_monster_02,16,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_16,challenge_monster_03,16,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_16,challenge_monster_04,16,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_17,challenge_monster_01,17,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_17,challenge_monster_02,17,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_17,challenge_monster_03,17,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_17,challenge_monster_04,17,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_18,challenge_monster_01,18,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_18,challenge_monster_02,18,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_18,challenge_monster_03,18,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_18,challenge_monster_04,18,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_19,challenge_monster_01,19,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_19,challenge_monster_02,19,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_19,challenge_monster_03,19,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_19,challenge_monster_04,19,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_20,challenge_monster_01,20,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_20,challenge_monster_02,20,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_20,challenge_monster_03,20,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_20,challenge_monster_04,20,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_21,challenge_monster_01,21,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_21,challenge_monster_02,21,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_21,challenge_monster_03,21,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_21,challenge_monster_04,21,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_22,challenge_monster_01,22,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_22,challenge_monster_02,22,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_22,challenge_monster_03,22,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_22,challenge_monster_04,22,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_23,challenge_monster_01,23,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_23,challenge_monster_02,23,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_23,challenge_monster_03,23,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_23,challenge_monster_04,23,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_24,challenge_monster_01,24,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_24,challenge_monster_02,24,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_24,challenge_monster_03,24,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_24,challenge_monster_04,24,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_25,challenge_monster_01,25,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_25,challenge_monster_02,25,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_25,challenge_monster_03,25,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_25,challenge_monster_04,25,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_26,challenge_monster_01,26,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_26,challenge_monster_02,26,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_26,challenge_monster_03,26,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_26,challenge_monster_04,26,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_27,challenge_monster_01,27,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_27,challenge_monster_02,27,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_27,challenge_monster_03,27,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_27,challenge_monster_04,27,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_28,challenge_monster_01,28,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_28,challenge_monster_02,28,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_28,challenge_monster_03,28,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_28,challenge_monster_04,28,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_29,challenge_monster_01,29,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_29,challenge_monster_02,29,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_29,challenge_monster_03,29,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_29,challenge_monster_04,29,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_01_wave_30,challenge_monster_01,30,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_02_wave_30,challenge_monster_02,30,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_03_wave_30,challenge_monster_03,30,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
-challenge_monster_04_wave_30,challenge_monster_04,30,200,2,2,1,1,1,Initial release copies N1 wave 1 stats.
+challenge_monster_01_wave_01,challenge_monster_01,1,1000,2,10,1,1,1,独立挑战第1次。
+challenge_monster_02_wave_01,challenge_monster_02,1,1000,2,10,1,1,1,独立挑战第1次。
+challenge_monster_03_wave_01,challenge_monster_03,1,1000,2,10,1,1,1,独立挑战第1次。
+challenge_monster_04_wave_01,challenge_monster_04,1,1000,2,10,1,1,1,独立挑战第1次。
+challenge_monster_05_wave_01,challenge_monster_05,1,1000,2,10,1,1,1,独立挑战第1次。
+challenge_monster_01_wave_02,challenge_monster_01,2,2000,2,20,1,1,1,独立挑战第2次。
+challenge_monster_02_wave_02,challenge_monster_02,2,2000,2,20,1,1,1,独立挑战第2次。
+challenge_monster_03_wave_02,challenge_monster_03,2,2000,2,20,1,1,1,独立挑战第2次。
+challenge_monster_04_wave_02,challenge_monster_04,2,2000,2,20,1,1,1,独立挑战第2次。
+challenge_monster_05_wave_02,challenge_monster_05,2,2000,2,20,1,1,1,独立挑战第2次。
+challenge_monster_01_wave_03,challenge_monster_01,3,3000,2,30,1,1,1,独立挑战第3次。
+challenge_monster_02_wave_03,challenge_monster_02,3,3000,2,30,1,1,1,独立挑战第3次。
+challenge_monster_03_wave_03,challenge_monster_03,3,3000,2,30,1,1,1,独立挑战第3次。
+challenge_monster_04_wave_03,challenge_monster_04,3,3000,2,30,1,1,1,独立挑战第3次。
+challenge_monster_05_wave_03,challenge_monster_05,3,3000,2,30,1,1,1,独立挑战第3次。
+challenge_monster_01_wave_04,challenge_monster_01,4,4000,2,40,1,1,1,独立挑战第4次。
+challenge_monster_02_wave_04,challenge_monster_02,4,4000,2,40,1,1,1,独立挑战第4次。
+challenge_monster_03_wave_04,challenge_monster_03,4,4000,2,40,1,1,1,独立挑战第4次。
+challenge_monster_04_wave_04,challenge_monster_04,4,4000,2,40,1,1,1,独立挑战第4次。
+challenge_monster_05_wave_04,challenge_monster_05,4,4000,2,40,1,1,1,独立挑战第4次。
+challenge_monster_01_wave_05,challenge_monster_01,5,5000,2,50,1,1,1,独立挑战第5次。
+challenge_monster_02_wave_05,challenge_monster_02,5,5000,2,50,1,1,1,独立挑战第5次。
+challenge_monster_03_wave_05,challenge_monster_03,5,5000,2,50,1,1,1,独立挑战第5次。
+challenge_monster_04_wave_05,challenge_monster_04,5,5000,2,50,1,1,1,独立挑战第5次。
+challenge_monster_05_wave_05,challenge_monster_05,5,5000,2,50,1,1,1,独立挑战第5次。
+challenge_monster_01_wave_06,challenge_monster_01,6,6000,2,60,1,1,1,独立挑战第6次。
+challenge_monster_02_wave_06,challenge_monster_02,6,6000,2,60,1,1,1,独立挑战第6次。
+challenge_monster_03_wave_06,challenge_monster_03,6,6000,2,60,1,1,1,独立挑战第6次。
+challenge_monster_04_wave_06,challenge_monster_04,6,6000,2,60,1,1,1,独立挑战第6次。
+challenge_monster_05_wave_06,challenge_monster_05,6,6000,2,60,1,1,1,独立挑战第6次。
+challenge_monster_01_wave_07,challenge_monster_01,7,7000,2,70,1,1,1,独立挑战第7次。
+challenge_monster_02_wave_07,challenge_monster_02,7,7000,2,70,1,1,1,独立挑战第7次。
+challenge_monster_03_wave_07,challenge_monster_03,7,7000,2,70,1,1,1,独立挑战第7次。
+challenge_monster_04_wave_07,challenge_monster_04,7,7000,2,70,1,1,1,独立挑战第7次。
+challenge_monster_05_wave_07,challenge_monster_05,7,7000,2,70,1,1,1,独立挑战第7次。
+challenge_monster_01_wave_08,challenge_monster_01,8,8000,2,80,1,1,1,独立挑战第8次。
+challenge_monster_02_wave_08,challenge_monster_02,8,8000,2,80,1,1,1,独立挑战第8次。
+challenge_monster_03_wave_08,challenge_monster_03,8,8000,2,80,1,1,1,独立挑战第8次。
+challenge_monster_04_wave_08,challenge_monster_04,8,8000,2,80,1,1,1,独立挑战第8次。
+challenge_monster_05_wave_08,challenge_monster_05,8,8000,2,80,1,1,1,独立挑战第8次。
+challenge_monster_01_wave_09,challenge_monster_01,9,9000,2,90,1,1,1,独立挑战第9次。
+challenge_monster_02_wave_09,challenge_monster_02,9,9000,2,90,1,1,1,独立挑战第9次。
+challenge_monster_03_wave_09,challenge_monster_03,9,9000,2,90,1,1,1,独立挑战第9次。
+challenge_monster_04_wave_09,challenge_monster_04,9,9000,2,90,1,1,1,独立挑战第9次。
+challenge_monster_05_wave_09,challenge_monster_05,9,9000,2,90,1,1,1,独立挑战第9次。
+challenge_monster_01_wave_10,challenge_monster_01,10,10000,2,100,1,1,1,独立挑战第10次。
+challenge_monster_02_wave_10,challenge_monster_02,10,10000,2,100,1,1,1,独立挑战第10次。
+challenge_monster_03_wave_10,challenge_monster_03,10,10000,2,100,1,1,1,独立挑战第10次。
+challenge_monster_04_wave_10,challenge_monster_04,10,10000,2,100,1,1,1,独立挑战第10次。
+challenge_monster_05_wave_10,challenge_monster_05,10,10000,2,100,1,1,1,独立挑战第10次。
+challenge_monster_01_wave_11,challenge_monster_01,11,11000,2,110,1,1,1,独立挑战第11次。
+challenge_monster_02_wave_11,challenge_monster_02,11,11000,2,110,1,1,1,独立挑战第11次。
+challenge_monster_03_wave_11,challenge_monster_03,11,11000,2,110,1,1,1,独立挑战第11次。
+challenge_monster_04_wave_11,challenge_monster_04,11,11000,2,110,1,1,1,独立挑战第11次。
+challenge_monster_05_wave_11,challenge_monster_05,11,11000,2,110,1,1,1,独立挑战第11次。
+challenge_monster_01_wave_12,challenge_monster_01,12,12000,2,120,1,1,1,独立挑战第12次。
+challenge_monster_02_wave_12,challenge_monster_02,12,12000,2,120,1,1,1,独立挑战第12次。
+challenge_monster_03_wave_12,challenge_monster_03,12,12000,2,120,1,1,1,独立挑战第12次。
+challenge_monster_04_wave_12,challenge_monster_04,12,12000,2,120,1,1,1,独立挑战第12次。
+challenge_monster_05_wave_12,challenge_monster_05,12,12000,2,120,1,1,1,独立挑战第12次。
+challenge_monster_01_wave_13,challenge_monster_01,13,13000,2,130,1,1,1,独立挑战第13次。
+challenge_monster_02_wave_13,challenge_monster_02,13,13000,2,130,1,1,1,独立挑战第13次。
+challenge_monster_03_wave_13,challenge_monster_03,13,13000,2,130,1,1,1,独立挑战第13次。
+challenge_monster_04_wave_13,challenge_monster_04,13,13000,2,130,1,1,1,独立挑战第13次。
+challenge_monster_05_wave_13,challenge_monster_05,13,13000,2,130,1,1,1,独立挑战第13次。
+challenge_monster_01_wave_14,challenge_monster_01,14,14000,2,140,1,1,1,独立挑战第14次。
+challenge_monster_02_wave_14,challenge_monster_02,14,14000,2,140,1,1,1,独立挑战第14次。
+challenge_monster_03_wave_14,challenge_monster_03,14,14000,2,140,1,1,1,独立挑战第14次。
+challenge_monster_04_wave_14,challenge_monster_04,14,14000,2,140,1,1,1,独立挑战第14次。
+challenge_monster_05_wave_14,challenge_monster_05,14,14000,2,140,1,1,1,独立挑战第14次。
+challenge_monster_01_wave_15,challenge_monster_01,15,15000,2,150,1,1,1,独立挑战第15次。
+challenge_monster_02_wave_15,challenge_monster_02,15,15000,2,150,1,1,1,独立挑战第15次。
+challenge_monster_03_wave_15,challenge_monster_03,15,15000,2,150,1,1,1,独立挑战第15次。
+challenge_monster_04_wave_15,challenge_monster_04,15,15000,2,150,1,1,1,独立挑战第15次。
+challenge_monster_05_wave_15,challenge_monster_05,15,15000,2,150,1,1,1,独立挑战第15次。
+challenge_monster_01_wave_16,challenge_monster_01,16,16000,2,160,1,1,1,独立挑战第16次。
+challenge_monster_02_wave_16,challenge_monster_02,16,16000,2,160,1,1,1,独立挑战第16次。
+challenge_monster_03_wave_16,challenge_monster_03,16,16000,2,160,1,1,1,独立挑战第16次。
+challenge_monster_04_wave_16,challenge_monster_04,16,16000,2,160,1,1,1,独立挑战第16次。
+challenge_monster_05_wave_16,challenge_monster_05,16,16000,2,160,1,1,1,独立挑战第16次。
+challenge_monster_01_wave_17,challenge_monster_01,17,17000,2,170,1,1,1,独立挑战第17次。
+challenge_monster_02_wave_17,challenge_monster_02,17,17000,2,170,1,1,1,独立挑战第17次。
+challenge_monster_03_wave_17,challenge_monster_03,17,17000,2,170,1,1,1,独立挑战第17次。
+challenge_monster_04_wave_17,challenge_monster_04,17,17000,2,170,1,1,1,独立挑战第17次。
+challenge_monster_05_wave_17,challenge_monster_05,17,17000,2,170,1,1,1,独立挑战第17次。
+challenge_monster_01_wave_18,challenge_monster_01,18,18000,2,180,1,1,1,独立挑战第18次。
+challenge_monster_02_wave_18,challenge_monster_02,18,18000,2,180,1,1,1,独立挑战第18次。
+challenge_monster_03_wave_18,challenge_monster_03,18,18000,2,180,1,1,1,独立挑战第18次。
+challenge_monster_04_wave_18,challenge_monster_04,18,18000,2,180,1,1,1,独立挑战第18次。
+challenge_monster_05_wave_18,challenge_monster_05,18,18000,2,180,1,1,1,独立挑战第18次。
+challenge_monster_01_wave_19,challenge_monster_01,19,19000,2,190,1,1,1,独立挑战第19次。
+challenge_monster_02_wave_19,challenge_monster_02,19,19000,2,190,1,1,1,独立挑战第19次。
+challenge_monster_03_wave_19,challenge_monster_03,19,19000,2,190,1,1,1,独立挑战第19次。
+challenge_monster_04_wave_19,challenge_monster_04,19,19000,2,190,1,1,1,独立挑战第19次。
+challenge_monster_05_wave_19,challenge_monster_05,19,19000,2,190,1,1,1,独立挑战第19次。
+challenge_monster_01_wave_20,challenge_monster_01,20,20000,2,200,1,1,1,独立挑战第20次。
+challenge_monster_02_wave_20,challenge_monster_02,20,20000,2,200,1,1,1,独立挑战第20次。
+challenge_monster_03_wave_20,challenge_monster_03,20,20000,2,200,1,1,1,独立挑战第20次。
+challenge_monster_04_wave_20,challenge_monster_04,20,20000,2,200,1,1,1,独立挑战第20次。
+challenge_monster_05_wave_20,challenge_monster_05,20,20000,2,200,1,1,1,独立挑战第20次。

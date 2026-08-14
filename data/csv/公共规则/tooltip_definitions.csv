@@ -42,11 +42,11 @@ ability:arcane_cannon_lv03,ability,arcane_cannon_lv03,魔能炮LV3,0,0,击杀后
 ability:arcane_cannon_lv04,ability,arcane_cannon_lv04,魔能炮LV4,0,0,击杀后5秒内伤害+10%，最多7层,,arcane_cannon_lv04
 ability:arcane_cannon_lv05,ability,arcane_cannon_lv05,魔能炮LV5,0,0,击杀后5秒内伤害+10%，最多7层,,arcane_cannon_lv05
 ability:arcane_eye_lv01,ability,arcane_eye_lv01,魔能之眼LV1,0,0,每次激光结算时，主目标周围150码内其他敌人受到本次激光伤害的30%,,arcane_eye_lv01
-ability:bone_cannon_lv01,ability,bone_cannon_lv01,碎骨重炮LV1,0,0,每攻击9次下一击必定造成5倍暴击,,bone_cannon_lv01
-ability:bone_cannon_lv02,ability,bone_cannon_lv02,碎骨重炮LV2,0,0,每攻击8次下一击必定造成5倍暴击,,bone_cannon_lv02
-ability:bone_cannon_lv03,ability,bone_cannon_lv03,碎骨重炮LV3,0,0,每攻击7次下一击必定造成5倍暴击,,bone_cannon_lv03
-ability:bone_cannon_lv04,ability,bone_cannon_lv04,碎骨重炮LV4,0,0,每攻击6次下一击必定造成5倍暴击,,bone_cannon_lv04
-ability:bone_cannon_lv05,ability,bone_cannon_lv05,碎骨重炮LV5,0,0,每攻击6次下一击必定造成5倍暴击,,bone_cannon_lv05
+ability:bone_cannon_lv01,ability,bone_cannon_lv01,碎骨重炮LV1,0,0,每攻击9次下一击必定造成10倍暴击,,bone_cannon_lv01
+ability:bone_cannon_lv02,ability,bone_cannon_lv02,碎骨重炮LV2,0,0,每攻击8次下一击必定造成10倍暴击,,bone_cannon_lv02
+ability:bone_cannon_lv03,ability,bone_cannon_lv03,碎骨重炮LV3,0,0,每攻击7次下一击必定造成10倍暴击,,bone_cannon_lv03
+ability:bone_cannon_lv04,ability,bone_cannon_lv04,碎骨重炮LV4,0,0,每攻击6次下一击必定造成10倍暴击,,bone_cannon_lv04
+ability:bone_cannon_lv05,ability,bone_cannon_lv05,碎骨重炮LV5,0,0,每攻击6次下一击必定造成10倍暴击,,bone_cannon_lv05
 ability:bounty_machine_gun_lv01,ability,bounty_machine_gun_lv01,赏金机枪LV1,0,0,每次攻击金币+5,,bounty_machine_gun_lv01
 ability:bounty_machine_gun_lv02,ability,bounty_machine_gun_lv02,赏金机枪LV2,0,0,每次攻击金币+7,,bounty_machine_gun_lv02
 ability:bounty_machine_gun_lv03,ability,bounty_machine_gun_lv03,赏金机枪LV3,0,0,每次攻击金币+9,,bounty_machine_gun_lv03

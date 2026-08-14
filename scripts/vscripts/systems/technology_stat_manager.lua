@@ -75,6 +75,7 @@ local function fresh_state()
             training_room_action_id = "",
             training_room_income_multiplier = 1,
         },
+        challenge = fresh_values(),
         snapshot = nil,
     }
 end
@@ -181,6 +182,7 @@ local function snapshot(state)
         levels = {},
         technology = copy_values(state.technology),
         growth = copy_values(state.growth),
+        challenge = copy_values(state.challenge or fresh_values()),
         final = copy_values(state.technology),
         runtime = {
             training_room_active = state.runtime.training_room_active == true,
@@ -189,6 +191,14 @@ local function snapshot(state)
                 number(state.runtime.training_room_income_multiplier, 1),
         },
     }
+    for section, fields in pairs(state.challenge or fresh_values()) do
+        result.challenge[section] = result.challenge[section] or {}
+        result.final[section] = result.final[section] or {}
+        for field, value in pairs(fields) do
+            result.final[section][field] = number(result.final[section][field])
+                + number(value)
+        end
+    end
     for group, level in pairs(state.levels or {}) do
         result.levels[group] = level
     end
@@ -295,6 +305,47 @@ local function add_growth(payload)
     return { ok = true, snapshot = snapshot(state) }
 end
 
+local CHALLENGE_EFFECT_FIELDS = {
+    challenge_wall_armor_flat = { "wall", "technology_armor_bonus", 1 / 3 },
+    challenge_wall_health_pct = { "wall", "health_bonus_pct", 1 },
+    challenge_tower_attack_flat = { "tower", "attack_flat", 1 },
+    challenge_tower_attack_pct = { "tower", "attack_bonus_pct", 1 },
+    challenge_lumber_efficiency_flat = { "lumberjack", "wood_per_hit_bonus", 1 },
+    challenge_gold_mine_income_pct = { "gold_mine", "income_bonus_pct", 1 },
+}
+
+local function add_challenge_effects(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil or player_id < 0 then
+        return { ok = false, error = "player_id_invalid" }
+    end
+    local state = ensure_state(player_id)
+    state.challenge = state.challenge or fresh_values()
+    state.challenge.gold_mine = state.challenge.gold_mine or { income_bonus_pct = 0 }
+    local additions = {}
+    for _, effect in ipairs(payload.effects or {}) do
+        local field = CHALLENGE_EFFECT_FIELDS[effect.effect_type]
+        if not field then
+            return { ok = false, error = "challenge_effect_invalid" }
+        end
+        additions[#additions + 1] = {
+            section = field[1],
+            field = field[2],
+            amount = number(effect.value) * field[3],
+        }
+    end
+    for _, addition in ipairs(additions) do
+        local section = addition.section
+        local field = addition.field
+        state.challenge[section] = state.challenge[section] or {}
+        state.challenge[section][field] = number(state.challenge[section][field])
+            + addition.amount
+    end
+    state.snapshot = nil
+    publish(player_id, payload.reason or "building_challenge_reward")
+    return { ok = true, snapshot = snapshot(state) }
+end
+
 function M.get(player_id)
     return snapshot(ensure_state(player_id))
 end
@@ -335,6 +386,10 @@ function M.init()
     state_by_player = {}
     event_bus.handle_request(events.TECHNOLOGY_STATS_GET_REQUEST, get_stats)
     event_bus.handle_request(events.TECHNOLOGY_STATS_GROWTH_ADD_REQUEST, add_growth)
+    event_bus.handle_request(
+        events.TECHNOLOGY_STATS_CHALLENGE_ADD_REQUEST,
+        add_challenge_effects
+    )
     event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
     event_bus.subscribe(research_events.EFFECTS_CHANGED, on_research_effects_changed)
 end

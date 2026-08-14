@@ -558,6 +558,10 @@ local function can_place(payload)
     if building_limit_reached(definition, count_for(builder.player_id, definition.id)) then
         return { ok = false, error = "建筑数量已达上限" }
     end
+    if definition.id == "building_challenge"
+        and count_for(builder.player_id, "building_research_lab") < 1 then
+        return { ok = false, error = "请先建造研究所" }
+    end
     if definition.unlock_city_level
         and main_city_level(team) < definition.unlock_city_level then
         return {
@@ -1091,8 +1095,13 @@ function M.relocate_for_player(player_id, entindex, position)
     if state.player_id ~= player_id then
         return false, "building_not_owned"
     end
-    if state.building_id ~= "wall" and state.building_id ~= "arrow_tower" then
+    if state.building_id ~= "arrow_tower" then
         return false, "building_not_movable"
+    end
+    local ability = state.unit:FindAbilityByName("ability_building_blink")
+    if not ability or ability:IsNull() or ability:IsHidden()
+        or not ability:IsActivated() then
+        return false, "move_ability_unavailable"
     end
     local origin = state.unit:GetAbsOrigin()
     local dx = position.x - origin.x
@@ -1111,6 +1120,31 @@ function M.relocate_for_player(player_id, entindex, position)
         return false, grid and grid.error or "relocation_position_invalid"
     end
     return M.relocate_building(state.unit, grid.world_position)
+end
+
+function M.destroy_arrow_tower_for_player(player_id, entindex)
+    local state = buildings[tonumber(entindex) or -1]
+    if not state or not valid_entity(state.unit) or not state.unit:IsAlive() then
+        return false, "tower_not_found"
+    end
+    if state.player_id ~= player_id then
+        return false, "tower_not_owned"
+    end
+    if state.building_id ~= "arrow_tower"
+        or state.unit:GetUnitName() ~= "building_arrow_tower" then
+        return false, "unit_not_arrow_tower"
+    end
+    if state.constructing
+        or state.unit:HasModifier("modifier_building_under_construction") then
+        return false, "tower_under_construction"
+    end
+    local ability = state.unit:FindAbilityByName("ability_destroy_arrow_tower")
+    if not ability or ability:IsNull() or ability:IsHidden()
+        or not ability:IsActivated() then
+        return false, "destroy_ability_unavailable"
+    end
+    state.unit:ForceKill(false)
+    return true, nil
 end
 
 function M.enable_dev_wall_stats()

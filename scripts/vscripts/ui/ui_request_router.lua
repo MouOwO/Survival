@@ -794,6 +794,10 @@ local function register_ability_cast_request()
         local altar_summon_matches = summon_hero_id ~= nil and unit_valid
             and ability_valid and unit.survival_building_id == "hero_altar"
             and unit:FindAbilityByName(ability_name) == ability
+        local challenge_auto_matches = ability_name == "ability_challenge_auto_summon"
+            and unit_valid and ability_valid
+            and unit.survival_building_id == "building_challenge"
+            and unit:FindAbilityByName(ability_name) == ability
         local handled_directly = false
         local direct_result_required = false
         local direct_result = nil
@@ -886,6 +890,31 @@ local function register_ability_cast_request()
                 .. tostring(direct_result and direct_result.unchanged_count or 0)
                 .. " skipped="
                 .. tostring(direct_result and direct_result.skipped_count or 0))
+        elseif challenge_auto_matches and owner_matches and not passive
+            and not is_point_target then
+            handled_directly = true
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden() then
+                direct_result = { ok = false, error = "自动召唤技能当前不可用" }
+            else
+                local enabled = ability:GetToggleState() ~= true
+                direct_result, direct_error = event_bus.request(
+                    events.BUILDING_CHALLENGE_AUTO_REQUEST,
+                    {
+                        building = unit,
+                        building_entindex = entindex,
+                        enabled = enabled,
+                    }
+                )
+                if direct_result and direct_result.ok == true
+                    and ability:GetToggleState() ~= enabled then
+                    ability.survival_reverting_toggle = true
+                    ability:ToggleAbility()
+                end
+            end
+            print("[SURVIVAL_CAST][SERVER] CHALLENGE_AUTO_DISPATCHED enabled="
+                .. tostring(direct_result and direct_result.enabled) .. " ok="
+                .. tostring(direct_result and direct_result.ok == true))
         elseif altar_summon_matches and owner_matches and not passive
             and not is_point_target then
             -- Creature-based altar abilities can accept an order without
@@ -999,6 +1028,25 @@ local function register_building_move_request()
     end)
 end
 
+local function register_arrow_tower_destroy_request()
+    CustomGameEventManager:RegisterListener(
+        "ui_arrow_tower_destroy_request",
+        function(_, payload)
+            local player_id = source_player_id(payload)
+            if not valid_player_id(player_id) then return end
+            local ok, error_code = building_system.destroy_arrow_tower_for_player(
+                player_id,
+                tonumber(payload.entindex)
+            )
+            send_to_player("ui_arrow_tower_destroy_result", player_id, {
+                success = ok and 1 or 0,
+                error = error_code or "",
+                entindex = tonumber(payload.entindex) or -1,
+            })
+        end
+    )
+end
+
 local function register_return_home_request()
     CustomGameEventManager:RegisterListener("ui_return_home_request", function(_, payload)
         local player_id = source_player_id(payload)
@@ -1070,6 +1118,7 @@ function M.init()
     register_ability_cast_request()
     register_ability_cast_position_request()
     register_building_move_request()
+    register_arrow_tower_destroy_request()
     register_return_home_request()
     event_bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, on_hero_combat_stats_changed)

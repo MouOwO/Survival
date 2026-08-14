@@ -928,6 +928,55 @@ local function set_difficulty_request(payload)
 end
 
 function M.get_difficulty() return difficulty_id end
+function M.current_wave_number() return tonumber(state.current_wave) or 0 end
+
+function M.spawn_challenge_monster(row, challenge_definition)
+    row = row or {}
+    local definition = challenge_definition or {}
+    if definition.enabled == false or not definition.unit_name
+        or not definition.model_path then
+        return nil, "challenge_archetype_missing"
+    end
+    local marker = monster_spawn_marker or find_monster_spawn_marker()
+    if not marker then return nil, "monster_spawn_marker_missing" end
+    monster_spawn_marker = marker
+    local position = marker:GetAbsOrigin()
+    position.z = GetGroundHeight(position, nil) + 32
+    local unit = CreateUnitByName(
+        definition.unit_name,
+        position,
+        true,
+        nil,
+        nil,
+        DOTA_TEAM_BADGUYS
+    )
+    if not valid(unit) then return nil, "unit_create_failed" end
+
+    team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "building_challenge_enemy")
+    monster_corpse_lifecycle_service.track(unit, "building_challenge")
+    local combat_row = {
+        health = tonumber(row.health) or 200,
+        attack = tonumber(row.attack) or 2,
+        armor = tonumber(row.war3_armor or row.armor) or 2,
+        attack_speed = tonumber(row.attack_speed) or 1,
+        is_boss = true,
+        member_role = "assault_boss",
+    }
+    local collision_profile = wave_monster_collision.profile(combat_row, definition)
+    apply_stats(unit, combat_row, definition, collision_profile.movement_type)
+    unit:SetHullRadius(0)
+    unit.survival_base_monster_hull_radius = 0
+    unit.survival_monster_hull_radius = 0
+    unit.survival_is_boss = true
+    unit.survival_is_challenge_monster = true
+    unit.survival_wave_movement_type = collision_profile.movement_type
+    unit.survival_wave_no_unit_collision = true
+    unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
+        wall_entindex = wall_entindex,
+        no_unit_collision = 1,
+    })
+    return unit
+end
 
 function M.set_monster_hull_scale(multiplier)
     local ok, result_or_error = monster_hull_scale.apply_all(

@@ -1,3 +1,11 @@
+## 2026-08-14 - 挑战怪零碰撞、挑战建筑视觉与自动Toggle修复完成
+
+- 五种研究所挑战怪在`wave_system.spawn_challenge_monster()`专属边界固定`SetHullRadius(0)`，基础Hull记录为0，并向城墙AI传递`no_unit_collision=1`；正式波次碰撞profile、正式`enemies`集合和`scalemonster`行为未被扩展到挑战怪。
+- 挑战建筑保持普通2x2占地，`building_visual_levels.csv`与`building_construction_rules.csv`成对配置`radiant_ancient001.vmdl / 0.34`，施工继续消费统一`building_construction_visual_service`和传送开始/持续粒子。正式生成器重建93个Lua模块，目标生成配置已复核。
+- 自动召唤失效由两层输入遗漏造成：主HUD只放行`NO_TARGET`而拒绝Toggle行为位，服务端又缺少creature建筑直达分发。两套Panorama入口现均托管`ability_challenge_auto_summon`，服务端在ownership、建筑身份和Ability归属校验后切换权威状态、同步按钮外观，并用重入标记阻止`OnToggle()`反向重复提交。
+- 自动验证通过：挑战契约、服务和奖励Lua 5.1测试、正式波次飞行碰撞与生成顺序回归、目标Lua 5.1语法、严格UTF-8、两个Panorama JS各`1 compiled, 0 failed, 0 skipped`及双仓限定diff检查。
+- 用户于2026-08-14明确表示任务完成。本任务关闭，后续不得自动恢复为活跃或待验收任务；只有出现具体回归时才按`PROJECT_CONTEXT.md`记录的碰撞、CSV视觉和Toggle输入链排查。用户未提供逐项Workshop Tools日志，因此不补写未发生的具体实机观测值。
+
 ## 2026-08-14 - 神秘塔LV4攻击W10 Boss高护甲补偿修复
 
 - 用户报告单座LV4神秘之塔攻击N1 W10进攻Boss只需20多秒，预期约45～46秒。调用链、提交历史和权威CSV复核确认根因是提交`462eb84`引入的怪物物理伤害预补偿，不是激光间隔、重复Modifier、光环或缓存。

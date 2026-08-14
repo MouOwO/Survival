@@ -1,5 +1,12 @@
 # Project Context
 
+## 挑战怪碰撞、挑战建筑视觉与Toggle输入边界（2026-08-14）
+
+- 五种研究所挑战怪必须在`wave_system.spawn_challenge_monster()`专属生成边界显式执行`SetHullRadius(0)`，并向城墙AI传递`no_unit_collision=1`。不能只依赖Boss碰撞profile，也不能让`scalemonster`全局倍率重新放大挑战怪；挑战怪不进入正式波次`enemies`集合。
+- 动态`npc_dota_creature`建筑的Toggle不能只实现Lua `OnToggle()`。Panorama托管动作必须识别该Ability，允许`DOTA_ABILITY_BEHAVIOR_TOGGLE`行为位通过无选点分发；`ui_request_router`验证实体归属、建筑身份和Ability归属后直达权威服务，并同步引擎Toggle外观。服务端调用`ToggleAbility()`前必须设置重入标记，避免`OnToggle()`再次反向提交。
+- 同一动态建筑的完工尺寸和施工覆盖必须成对配置：`building_visual_levels.csv`定义模型/完工`model_scale`，`building_construction_rules.csv`定义施工粒子、时间和`build_visual_scale`，再由正式生成器生成Lua。缺少施工行会回退到缩放1，造成施工与完工尺寸不一致；不得为单一建筑绕开`building_construction_visual_service`另写施工特效。
+- 本轮任务已由用户于2026-08-14明确确认完成。后续若挑战怪再次卡位，优先检查挑战生成边界是否仍固定0 Hull及墙AI无单位碰撞；若自动Toggle失效，按“Panorama托管识别 -> Toggle行为位放行 -> `ui_request_router`直达分发 -> `OnToggle`重入保护”的顺序排查；若建筑施工尺寸跳变，先比较两张CSV的缩放值，不新增旁路实现。
+
 ## 神秘塔激光Tick权威边界（2026-08-13）
 
 - `tower_skill_definitions.csv`是生产激光Tick间隔的唯一权威源；`laser_lv01-lv05`统一使用`damage_interval=1`，与神秘路线录像实验的1秒模型一致。不得在运行时、Tooltip或测试中另写0.5秒等级常量。
