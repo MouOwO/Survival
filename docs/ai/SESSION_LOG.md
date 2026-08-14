@@ -6,6 +6,48 @@
 - 自动验证通过：怪物护甲Lua 5.1/契约、计算器Edge 1440/390双视口各62项、生成Build/CheckOnly、激光倍率、研究减甲、毒云、塔射程、超级塔科技、六项玩法回归、目标Lua 5.1语法、严格UTF-8和限定diff检查。研究减甲和毒云旧包装器需设置项目`LUA_PATH`后运行；断言通过。`DECISIONS.md`和`SESSION_LOG.md`各有3个历史乱码排障说明中的字面`U+FFFD`，数量与`HEAD`一致，本轮未新增。
 - 尚未进行Workshop Tools引擎实机验证。下一步完全冷启动，以单座LV4神秘之塔攻击N1 W10进攻Boss，记录首次伤害到死亡约45～46秒，并确认诊断中的`armor_compensation=1`；未经实机结果不得称为用户验收。
 
+# 2026-08-14 机枪每秒轮次与逐跳独立暴击
+
+- 用户批准将三条机枪路线从原生高攻速攻击改为每秒一次原生触发、每轮脚本多跳。权威CSV已配置LV1-LV5为`6/7/8/8/8`跳，间隔`0.178571/0.15625/0.138889/0.125/0.125`秒；路线20行`base_attack_speed`统一为1并生成对应Lua。
+- `modifier_tower_attack_effects.lua`新增绝对递进式机枪任务序列：首跳在`OnAttack`立即执行，后续跳逐次调度，目标死亡/伤害事务失败即停止且不转射。每跳独立调用从原生暴击路径抽取的通用暴击函数，独立发布`TOWER_ATTACK_LANDED`；原生机枪攻击不掷暴击且由总伤害钩子归零。
+- 赏金金币与Jinada反馈、爆矢同目标五跳计数迁移到成功脚本跳；击杀Buff保留实际死亡事件。爆矢托管Buff改为`machine_gun_interval_pct`，不改变每秒轮次，仅令后续轮内间隔除以1.2。
+- 原生基础攻击声音被跳过；Modifier创建/迁移及升级数据应用后均清空机枪弹道。销毁和迁移会取消全部待执行任务并重置计数，避免升级或移除后残留跳伤。
+- 自动验证通过：机枪Lua行为、CSV/运行时契约、塔升级刷新、防空弹幕回归、配置Build与CheckOnly、7个目标Lua 5.1语法、CP936路线读取和限定diff检查。防空PowerShell契约的既有UTF-8/CP936错误、箭塔完成测试的既有Lua 5.1 BOM加载错误均在进入行为断言前失败，本轮未修改无关测试。
+- 待验证：Workshop Tools必须完全冷启动后验证三路线五等级、暴击、赏金、爆矢、目标提前死亡、升级/销毁和非机枪塔；当前结论仅为静态契约、Lua模拟、语法及生成检查通过。
+
+## 2026-08-14 - 暴击塔二技能倍率调整开始
+
+- 用户批准将死亡塔路线第二技能“碎骨重炮”`bone_cannon_lv01-lv05`的必定暴击倍率从10倍统一调整为5倍。
+- 本次只调整技能倍率与对应描述；各等级触发攻击次数`9/8/7/6/6`、第一技能“致命一击”、第三技能“死神榴弹炮”触发规则及路线继承关系保持不变。
+- 实施以`tower_skill_definitions.csv`为权威数据源，并通过现有配置生成链同步Lua和Tooltip；自动验证结果完成后补充记录。
+- 实施完成：五级`damage_multiplier`及中英文正式Tooltip均已同步为5倍；CSV生成Lua、统一Tooltip CSV/Lua以及`resource`、`resource/localization`、`panorama/localization`六份本地化保持一致。
+- 自动验证通过：`DEATH_TOWER_BALANCE_CONTRACT_PASS`、`CONFIG_BUILD_PASS`（92个生成Lua、`bad_utf8=0`）、正式路径`BONE_CANNON_NO_10X_RESIDUE_PASS`、目标生成Lua 5.1语法及限定`git diff --check`。这些是配置、契约和语法检查，不等于Workshop Tools实机验证。
+
+## 2026-08-14 - 第三阶段散射平A与炙热巨箭1.3倍速
+
+- 第三阶段额外目标散射箭改为从`tower_multi_vengeful_shen_screeauk`资产包读取Vengeful Arcana普通攻击弹道；没有恢复路线CSV的原生`projectile_model`，因此主目标仍不会显示或结算普通平A。
+- 炙热巨箭线性投射物速度由`1200`提升为`1560`，视觉与权威碰撞同步按1.3倍速移动；射程1200、半宽112、穿透、单波去重、穿甲和`0.8^n`伤害衰减均保持不变，清理延迟按新速度动态计算。
+- 自动验证通过：`CONFIG_BUILD_PASS`、`VENGEFUL_SCATTER_CONFIG_PASS`、`TOWER_MULTI_ATTACK_RUNTIME_PASS`、`TOWER_WAVE_OF_TERROR_VISUAL_PASS`、`TOWER_MULTI_DAMAGE_RUNTIME_PASS`、目标Lua 5.1语法及限定`git diff --check`。完整多重视觉配置测试仍仅失败于既有无关的`tower_death_templar_assassin`资源完整性断言。
+- 待实机：完全停止当前Workshop Tools Run后重新启动，确认第三阶段额外目标显示Vengeful平A散射箭、主目标只有炙热巨箭，以及巨箭视觉和命中同步提速。
+
+## 2026-08-14 - 第三阶段炙热巨箭保留多重攻击但排除主目标
+
+- 权威配置：`data/csv/建筑与工人系统/防御塔/tower_class_multi.csv` 的炙热巨箭塔 `LV1-LV10` 唯一记录全部加入 `multi_attack_lv05`；说明明确炙热巨箭弩箭负责主目标，多重攻击只攻击额外目标。
+- 运行时：`modifier_tower_attack_effects.lua` 在炙热巨箭路线将多重攻击计数从额外目标开始，排除主目标；主目标仍仅由炙热巨箭线性投射物结算，保持 `1200` 速度、穿透和衰减规则。前两阶段和终极融合塔逻辑保持不变。
+- 测试：新增第三阶段主目标排除、额外目标发箭断言；配置生成、Lua 语法、`TOWER_MULTI_ATTACK_RUNTIME_PASS`、`TOWER_WAVE_OF_TERROR_VISUAL_PASS` 和 `git diff --check` 通过。完整多重视觉配置测试在既有无关的 `tower_death_templar_assassin` 资源断言处失败。
+- 待实机：完全停止当前 Workshop Tools Run 后重新启动地图，确认第三阶段主目标只有炙热巨箭伤害、额外目标有分裂箭、无重复伤害，并回归前两阶段和融合塔。
+
+## 2026-08-14 - 多重塔前两阶段分裂箭替代普通攻击完成
+
+- 用户批准：`multi_tower` 与 `piercing_ballista` 按第三阶段的攻击边界隐藏原生普通攻击弹道并将原生攻击伤害归零，主目标与额外目标全部由分裂箭结算。
+- 用户确认：替代分裂箭速度使用 `1250`，匹配多重路线默认原生弹速；保持既有目标数、105%基础倍率、对地1.8倍及穿透弩炮各等级穿甲数值。
+- 权威配置：`tower_class_multi.csv` 清空前两阶段原生弹道并更新说明，`tower_skill_definitions.csv` 明确每支分裂箭结算；已通过 `build_configs.ps1` 生成路线、技能和 tooltip Lua。
+- 运行时：仅 Medusa 多重塔与 Drow 穿透弩炮压制原生攻击伤害和普通攻击反馈；每次攻击先向主目标、再向额外目标发射速度 `1250` 的资产分裂箭。每个目标最多一支，目标上限、105%倍率和对地1.8倍保持不变。
+- 穿甲：穿透弩炮不再依赖零伤害原生落地事件施加旧减甲 Debuff，改为每支分裂箭的物理伤害事务携带 `physical_armor_ignore_pct`；第三阶段炙热巨箭及终极融合塔行为不变。
+- 自动验证：新增 `TOWER_MULTI_ATTACK_RUNTIME_PASS`；`TOWER_MULTI_DAMAGE_RUNTIME_PASS`、`TOWER_MULTI_DAMAGE_CONFIG_PASS`、`DAMAGE_TRANSACTION_ARMOR_IGNORE_PASS`、`CUSTOM_MONSTER_ARMOR_PASS`、`TOWER_WAVE_OF_TERROR_VISUAL_PASS`、`TOWER_UPGRADE_RUNTIME_REFRESH_PASS` 均通过；目标 Lua 语法、配置检查和 `git diff --check` 通过。
+- 已知无关测试：`test_tower_multi_visual_config.lua` 的本任务多重路线断言通过后，在既有死亡塔 `tower_death_templar_assassin` 资产完整性断言处失败，不属于本次改动。
+- 待实机：必须完全停止当前 Workshop Tools Run 后重新启动，确认前两阶段只显示同速分裂箭、主目标和额外目标均正确掉血、没有隐藏原生箭造成的重复伤害。
+
 ## 2026-08-14 - 用户确认神秘塔激光问题已解决并沉淀计算器方法
 
 - 用户确认此前神秘塔激光Tick问题已经没有了。本条将本次计算器复算方法记录为后续数值问题的复用经验，不再把Workshop Tools冷启动列为该问题的待办验收。
@@ -2523,3 +2565,11 @@
 - 新增专项PowerShell契约和扩展Lua 5.1行为测试，覆盖完成、建筑销毁取消、reset、实体失效、控制点失败以及Destroy调用抛错后仍释放；每个粒子断言立即销毁一次、释放一次。
 - 自动验证通过：`BUILDING_UPGRADE_PARTICLE_CONTRACT_PASS`、`BUILDING_UPGRADE_PROCESS_LUA51_PASS`、`BUILDING_UPGRADE_PARTICLE_LUAC51_PASS`、PowerShell语法、严格UTF-8、CSV三个粒子字段与生成Lua一致及限定diff；建筑等级身份、六项公共行为和箭塔成本的Lua/契约回归通过。批量升级两项旧测试继续失败于已记录的Mock/旧Panorama断言，本轮未改。
 - 尚未Workshop Tools实机验证，不能记录为native崩溃已解决。下一步先无Alt冷启动转职神秘塔，再测试Alt与其他路线；若仍崩溃，保留新dump后依次禁用升级传送粒子、隔离神秘塔四个外观组件和Tooltip代理。
+
+## 2026-08-14 - 机枪塔0.25秒基础间隔与等级攻速修订
+
+- 用户实机发现机枪塔LV1约0.284秒攻击一次，而不是预期的高速间隔。根因是路线CSV的0.22秒通过`SetBaseAttackTime`写入后被引擎最低BAT截为约0.4秒；现有`modifier_debug_attack_cap`只解除总攻速上限，不能解除BAT下限。随后LV1攻速加成参与计算，形成约0.4/1.4的实测结果。
+- 用户最终确认机枪三阶段统一以0.25秒为基础攻击间隔；机枪技能LV1至LV5依次为+40%/+60%/+80%/+100%/+100%。精确攻击间隔依次为0.178571/0.15625/0.138889/0.125/0.125秒。
+- 权威`tower_class_machine_gun.csv`全部20行`base_attack_speed`改为4，`tower_skill_definitions.csv`同步修订五级技能并定向重建两份生成Lua。`modifier_tower_attack_effects`新增机枪专用`MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT`，从CSV已投影的`survival_attack_speed`返回0.25；非机枪技能集返回nil，不覆盖其他塔。
+- 机枪即时伤害、原生弹道视觉、原生攻击伤害抑制、赏金金币、爆矢第五次攻击与击杀Buff均保持不变。专项契约与Lua 5.1行为测试覆盖0.25基础BAT、LV1 40%、高级路线继承及非机枪隔离。
+- 自动测试不能替代Workshop Tools实机验收。下一步完全停止并重新Run地图，逐级确认机枪塔实际间隔，重点核对LV1约0.178秒；同时回归赏金与爆矢阶段、爆矢Buff期间攻速及其他塔攻击间隔。

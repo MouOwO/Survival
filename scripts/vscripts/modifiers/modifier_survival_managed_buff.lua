@@ -18,6 +18,7 @@ local function affects_combat_stats_ui(modifier)
     local effect_type = modifier.definition and modifier.definition.effect_type
     return effect_type == "attack_speed_bonus"
         or effect_type == "attack_speed_pct"
+        or effect_type == "machine_gun_interval_pct"
         or effect_type == "base_damage_outgoing_pct"
 end
 

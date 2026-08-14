@@ -199,6 +199,14 @@ local function apply_tower(unit, data, level)
         unit:SetRangedProjectileName("")
         unit.survival_projectile_model = ""
     end
+    for _, skill_id in ipairs(data.skill_ids or {}) do
+        if string.match(skill_id, "^machine_gun_")
+            and unit.SetRangedProjectileName then
+            unit:SetRangedProjectileName("")
+            unit.survival_projectile_model = ""
+            break
+        end
+    end
     set_tower_projectile_speed(unit, data.projectile_speed)
     set_attack_range(unit, global_rules.tower_attack_range)
 end

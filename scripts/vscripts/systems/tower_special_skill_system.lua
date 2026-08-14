@@ -12,9 +12,9 @@ local active_waves = {}
 local next_wave_id = 0
 local WAVE_OF_TERROR_PARTICLE =
     "particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_wave_of_terror_v2.vpcf"
-local WAVE_OF_TERROR_SPEED = 1200
--- The root particle lives for one second and its visible core has a constant
--- radius of 112. Keep the engine projectile aligned with those source values.
+local WAVE_OF_TERROR_SPEED = 1560
+-- Keep the source particle's 1200 length and 112 core radius while playing
+-- its travel at the approved 1.3x speed.
 local WAVE_OF_TERROR_DISTANCE = 1200
 local WAVE_OF_TERROR_HALF_WIDTH = 112
 local WAVE_CLEANUP_GRACE = 0.25

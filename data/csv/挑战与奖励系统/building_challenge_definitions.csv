@@ -1,0 +1,7 @@
+challenge_id,display_name,ability_name,archetype_id,cooldown_seconds,max_alive,reward_profile_id,sort_order,enabled,notes
+#中文名:挑战ID,显示名称,召唤技能ID,怪物原型ID,冷却秒数,同类最大存活数,奖励方案ID,排序,是否启用,备注
+#types:string,string,string,string,number,number,string,number,boolean,string
+challenge_monster_01,挑战怪物一,ability_challenge_monster_01,humanoid_white_melee,150,1,reward_building_challenge_wood_1000,1,1,首版使用第一种普通怪外观。
+challenge_monster_02,挑战怪物二,ability_challenge_monster_02,humanoid_red_axe,150,1,reward_building_challenge_wood_1000,2,1,首版使用第二种普通怪外观。
+challenge_monster_03,挑战怪物三,ability_challenge_monster_03,skeleton_melee,150,1,reward_building_challenge_wood_1000,3,1,首版使用第三种普通怪外观。
+challenge_monster_04,挑战怪物四,ability_challenge_monster_04,orc_large_melee,150,1,reward_building_challenge_wood_1000,4,1,首版使用第四种普通怪外观。

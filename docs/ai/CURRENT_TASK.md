@@ -9,6 +9,17 @@
 - 自动验证通过：`MONSTER_WAR3_ARMOR_DAMAGE_LUA51/CONTRACT_PASS`、`WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`（Edge 1440/390各62项）、`TOWER_LASER_BASE_MULTIPLIER_LUA51/CONTRACT_PASS`、研究减甲、毒云、塔射程、超级塔科技和六项玩法回归；目标Lua 5.1语法、生成Build/CheckOnly、严格UTF-8及限定`git diff --check`通过。研究减甲与毒云旧包装器需要按既有约定设置项目`LUA_PATH`后运行，业务断言通过。
 - 下一步：完全停止并冷启动Workshop Tools，只放置单座LV4神秘之塔攻击N1 W10进攻Boss，记录从首次伤害到死亡的时间与`MONSTER_PHYSICAL_DAMAGE_FILTER`样本；目标约45～46秒，`armor_compensation`应为1。自动测试和离散模拟不能称为引擎实机验证或用户验收。
 
+## 当前实施任务（2026-08-14）：机枪每秒轮次与逐跳独立暴击
+
+- 用户已批准将三条机枪路线改为防空弹幕式脚本轮次：原生攻击每秒只启动一轮，隐藏原生弹道、声音、命中特效与伤害；每轮首跳立即结算，目标死亡后取消该轮剩余跳且不转射。
+- LV1-LV5每轮固定为`6/7/8/8/8`跳，相邻跳伤间隔为`0.178571/0.15625/0.138889/0.125/0.125`秒。权威数值先写入`tower_skill_definitions.csv`，三条路线原生`base_attack_speed`恢复为每秒一轮，再定向生成Lua。
+- 每一跳独立调用现有通用塔暴击查询及科技/继承暴击链；只有触发暴击的当前跳按通用倍率结算，不得将暴击扩散到整轮或后续跳。赏金金币和爆矢同目标五次计数按有效伤害跳触发，击杀Buff仍按实际击杀触发。
+- 爆矢加特林攻速Buff不突破引擎BAT，改为使轮内间隔除以`1 + bonus_pct/100`。销毁、升级迁移和显式重置必须取消所有待执行机枪跳伤；自动验证与Workshop Tools冷启动实机验证严格区分。
+- 实施完成：三条路线20行原生攻击频率统一为每秒1轮；机枪五级技能由CSV配置`6/7/8/8/8`跳及`0.178571/0.15625/0.138889/0.125/0.125`秒间隔。原生弹道、声音、命中特效、伤害和原生暴击均被抑制，逐跳脚本伤害独立调用通用暴击链；赏金、爆矢计数和击杀Buff已迁移到有效跳/实际击杀边界。
+- 爆矢Buff效果类型改为`machine_gun_interval_pct`，托管Buff仍保留20点值、3秒刷新、图标和特效，但不再投影原生攻击速度；轮内下一跳实时读取该值并按`interval / 1.2`调度。升级应用路线弹道后会再次按最终`skill_ids`清空机枪弹道，避免已有Modifier升级时被写回。
+- 自动验证通过：`TOWER_MACHINE_GUN_VISUAL_PASS`、`MACHINE_GUN_ATTACK_INTERVAL_CONTRACT_PASS`、`TOWER_UPGRADE_RUNTIME_REFRESH_PASS`、`TOWER_ANTI_AIR_BARRAGE_PASS`、配置Build/CheckOnly、7个目标Lua 5.1语法、机枪路线CP936解析及限定`git diff --check`。两项无关旧测试未计为通过：防空PowerShell契约错误地按UTF-8读取CP936 CSV；箭塔完成测试的Lua 5.1加载器不接受既有`building_system.lua` UTF-8 BOM。
+- 尚需完全停止并冷启动Workshop Tools，实测三条路线、LV1-LV5跳数/时点、逐跳暴击、赏金逐跳金币、爆矢第五跳加速与击杀刷新、目标提前死亡、升级/销毁清理，以及非机枪塔回归；自动测试不等于引擎实机验证或用户验收。
+
 ## 已完成任务（2026-08-14）：神秘塔激光Tick恢复为1秒及计算器方法沉淀
 
 - 用户确认神秘塔普通攻击的`base_attack_speed=1`本来就是1秒间隔；LV2第7波差异来自生产激光`damage_interval=0.5`，而离线录像实验按1秒激光间隔计算。提交`f92e6c9`曾把`laser_lv01-lv05`从1秒改成0.5秒。

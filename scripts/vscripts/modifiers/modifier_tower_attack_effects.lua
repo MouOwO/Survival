@@ -35,7 +35,7 @@ local DEFAULT_LIGHTNING_BOUNCE_RADIUS = 200
 local LIGHTNING_BOUNCE_DELAY = 0.10
 local LIGHTNING_SOURCE_OFFSET_Z = 160
 local LIGHTNING_TARGET_OFFSET_Z = 70
-local SPLIT_ARROW_SPEED = 900
+local SPLIT_ARROW_SPEED = 1250
 local DEFAULT_STORM_RADIUS = 500
 local DEFAULT_STORM_DURATION = 5
 local DEFAULT_STORM_DAMAGE_MULTIPLIER = 1
@@ -62,6 +62,10 @@ local LIGHTNING_ASSET_ID = "tower_zuus"
 local MACHINE_GUN_ASSET_IDS = {
     bounty = "tower_machine_gun_bounty_heartless",
     gatling = "tower_machine_gun_windranger_rising_gale",
+}
+local MULTI_REPLACEMENT_ASSET_IDS = {
+    tower_multi_medusa_anamnessa = true,
+    tower_multi_drow_dread_retribution = true,
 }
 local DEATH_TOWER_ANIMATED_ASSETS = {
     tower_death_templar_assassin = true,
@@ -133,6 +137,17 @@ local function is_arrow_tower(unit)
         and unit:GetUnitName() == "building_arrow_tower"
 end
 
+local function uses_multi_replacement_arrows(unit)
+    return unit and MULTI_REPLACEMENT_ASSET_IDS[unit.survival_model_asset_id]
+        and skill_matching(unit, "multi_attack_") ~= nil
+end
+
+local function uses_machine_gun_attack(unit)
+    return skill_matching(unit, "machine_gun_") ~= nil
+        or skill_matching(unit, "bounty_machine_gun_") ~= nil
+        or skill_matching(unit, "explosive_gatling_") ~= nil
+end
+
 local function laser_config(unit, skill)
     if not skill then return nil end
     local by_id = laser_effects.by_id or {}
@@ -159,6 +174,7 @@ function modifier_tower_attack_effects:DeclareFunctions()
         MODIFIER_PROPERTY_PREATTACK_CRITICALSTRIKE,
         MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE,
         MODIFIER_PROPERTY_TOTALDAMAGEOUTGOING_PERCENTAGE,
+        MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT,
         MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE,
     }
 end
@@ -168,19 +184,23 @@ function modifier_tower_attack_effects:GetModifierCannotMiss()
 end
 
 function modifier_tower_attack_effects:GetModifierAttackSpeedPercentage()
-    local skill = skill_matching(self:GetParent(), "machine_gun_")
-    return skill and (tonumber(skill.damage_multiplier) or 0) * 100 or 0
+    return 0
+end
+
+function modifier_tower_attack_effects:GetModifierBaseAttackTimeConstant()
+    return nil
 end
 
 function modifier_tower_attack_effects:GetModifierDamageOutgoing_Percentage()
-    local skill = skill_matching(self:GetParent(), "multi_attack_")
-    if skill then
+    local parent = self:GetParent()
+    local skill = skill_matching(parent, "multi_attack_")
+    if skill and not uses_multi_replacement_arrows(parent) then
         local multiplier = tower_multi_damage.multiplier(
             skill, self.current_attack_target
         )
         return (multiplier - 1) * 100
     end
-    if skill_matching(self:GetParent(), "anti_air_missile_") then
+    if skill_matching(parent, "anti_air_missile_") then
         return 90
     end
     return 0
@@ -204,6 +224,13 @@ function modifier_tower_attack_effects:OnCreated()
     self.anti_air_sequence = 0
     self.anti_air_task_ids = {}
     self.anti_air_secondary_attack = false
+    self.machine_gun_sequence = 0
+    self.machine_gun_task_ids = {}
+    if uses_machine_gun_attack(self:GetParent())
+        and type(self:GetParent().SetRangedProjectileName) == "function" then
+        self:GetParent():SetRangedProjectileName("")
+        self:GetParent().survival_projectile_model = ""
+    end
     self.airspace_aura_elapsed = AIRSPACE_AURA_REFRESH_INTERVAL
     self:StartIntervalThink(0.03)
 end
@@ -344,8 +371,13 @@ function modifier_tower_attack_effects:GetModifierAttackPointConstant()
 end
 
 function modifier_tower_attack_effects:GetModifierTotalDamageOutgoing_Percentage(params)
+    if self.machine_gun_instant_damage then
+        return 0
+    end
     if params and params.damage_category == DOTA_DAMAGE_CATEGORY_ATTACK
-        and skill_matching(self:GetParent(), "burning_great_arrow_") then
+        and (uses_multi_replacement_arrows(self:GetParent())
+            or skill_matching(self:GetParent(), "burning_great_arrow_")
+            or uses_machine_gun_attack(self:GetParent())) then
         return -100
     end
     return 0
@@ -385,16 +417,10 @@ function modifier_tower_attack_effects:OnDeath(params)
     )
 end
 
-function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
-    if not IsServer() then return 0 end
-    if skill_matching(self:GetParent(), "burning_great_arrow_") then return 0 end
-    if self.pending_critical_multiplier then
-        return self.pending_critical_multiplier * 100
-    end
-    local tower = self:GetParent()
+local function roll_tower_critical(tower, target)
     local special = event_bus.request(events.TOWER_CRITICAL_QUERY, {
         tower = tower,
-        target = self.current_attack_target,
+        target = target,
         skills = tower_skills.get(tower),
     })
     local multiplier = special and tonumber(special.multiplier_pct) or 0
@@ -417,10 +443,26 @@ function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
         multiplier = 200
         source = "research_critical"
     end
-    if multiplier > 100 then
-        self.pending_critical_multiplier = multiplier / 100
+    return multiplier > 100 and multiplier / 100 or 1, source
+end
+
+function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
+    if not IsServer() then return 0 end
+    local tower = self:GetParent()
+    if skill_matching(tower, "burning_great_arrow_")
+        or uses_machine_gun_attack(tower) then
+        return 0
+    end
+    if self.pending_critical_multiplier then
+        return self.pending_critical_multiplier * 100
+    end
+    local multiplier, source = roll_tower_critical(
+        tower, self.current_attack_target
+    )
+    if multiplier > 1 then
+        self.pending_critical_multiplier = multiplier
         self.pending_critical_source = source
-        return multiplier
+        return multiplier * 100
     end
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
@@ -474,7 +516,8 @@ local function lightning_particle(caster, source_unit, target_unit,
     ParticleManager:ReleaseParticleIndex(particle)
 end
 
-local function deal(caster, target, amount, source_kind, tags, damage_type)
+local function deal(caster, target, amount, source_kind, tags, damage_type,
+        physical_armor_ignore_pct)
     if not valid(target) then return nil end
     return damage_service:Deal({
         attacker = caster,
@@ -484,7 +527,120 @@ local function deal(caster, target, amount, source_kind, tags, damage_type)
         source_kind = source_kind or "script",
         can_crit = false,
         tags = tags or {},
+        physical_armor_ignore_pct = physical_armor_ignore_pct,
     })
+end
+
+local function apply_machine_gun_hit_effects(modifier, tower, target)
+    local bounty = skill_matching(tower, "bounty_machine_gun_")
+    if bounty then
+        local gold = math.max(0, tonumber(bounty.damage_multiplier) or 0)
+        if gold > 0 then
+            local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                team = tower:GetTeamNumber(),
+                gold = gold,
+                reason = "tower_bounty_machine_gun_attack",
+            })
+            if result and result.ok == true then
+                play_follow_particle(target, skill_effect_particle(
+                    tower, bounty, "skill_strike",
+                    "particles/units/heroes/hero_bounty_hunter/bounty_hunter_cutpurse.vpcf",
+                    MACHINE_GUN_ASSET_IDS.bounty
+                ))
+                play_tower_sound("tower_bounty_machine_gun", tower, target)
+            end
+        end
+    end
+
+    local gatling = skill_matching(tower, "explosive_gatling_")
+    if not gatling then return end
+    local target_entindex = target:entindex()
+    if modifier.gatling_target_entindex ~= target_entindex then
+        modifier.gatling_target_entindex = target_entindex
+        modifier.gatling_target_hits = 0
+    end
+    modifier.gatling_target_hits = (modifier.gatling_target_hits or 0) + 1
+    if modifier.gatling_target_hits >= GATLING_ATTACK_COUNT then
+        modifier.gatling_target_hits = 0
+        trigger_gatling_buff(tower, gatling, "same_target_5_hits")
+    end
+end
+
+local function machine_gun_interval(tower, skill)
+    local interval = math.max(0.01, tonumber(skill.barrage_interval) or 0.125)
+    local bonus_pct = math.max(
+        0, tonumber(buff_manager.value(
+            tower, "buff_explosive_gatling_attack_speed"
+        )) or 0
+    )
+    return interval / (1 + bonus_pct / 100)
+end
+
+local function fire_machine_gun_hit(modifier, tower, target, hit_index)
+    if not valid(tower) or not valid(target)
+        or target:GetTeamNumber() == tower:GetTeamNumber() then
+        return false
+    end
+    local multiplier, source = roll_tower_critical(tower, target)
+    modifier.machine_gun_instant_damage = true
+    local ok, result = pcall(function()
+        return deal(
+            tower, target,
+            tower:GetAverageTrueAttackDamage(tower) * multiplier,
+            "script",
+            { "tower_machine_gun_attack", "hit_" .. tostring(hit_index) }
+        )
+    end)
+    modifier.machine_gun_instant_damage = false
+    if not ok or not result or result.success ~= true then return false end
+    event_bus.emit(events.TOWER_ATTACK_LANDED, {
+        tower = tower,
+        target = target,
+        damage = tonumber(result.final_damage)
+            or tower:GetAverageTrueAttackDamage(tower) * multiplier,
+        critical = multiplier > 1,
+        critical_multiplier = multiplier,
+        critical_source = source,
+        skills = tower_skills.get(tower),
+    })
+    apply_machine_gun_hit_effects(modifier, tower, target)
+    return true
+end
+
+local function stop_machine_gun_sequences(modifier)
+    modifier.machine_gun_sequence =
+        (tonumber(modifier.machine_gun_sequence) or 0) + 1
+    for task_id in pairs(modifier.machine_gun_task_ids or {}) do
+        scheduler.cancel(task_id)
+    end
+    modifier.machine_gun_task_ids = {}
+end
+
+local function start_machine_gun_sequence(modifier, tower, target, skill)
+    if not valid(tower) or not valid(target) then return end
+    local hit_count = math.max(1, math.floor(tonumber(skill.max_targets) or 1))
+    modifier.machine_gun_sequence =
+        (tonumber(modifier.machine_gun_sequence) or 0) + 1
+    local sequence = modifier.machine_gun_sequence
+    modifier.machine_gun_task_ids = modifier.machine_gun_task_ids or {}
+    local function fire(hit_index)
+        if not fire_machine_gun_hit(modifier, tower, target, hit_index)
+            or hit_index >= hit_count then
+            return
+        end
+        local next_index = hit_index + 1
+        local task_id = string.format(
+            "tower_machine_gun_sequence_%d_%d_%d",
+            tower:entindex(), sequence, next_index
+        )
+        modifier.machine_gun_task_ids[task_id] = true
+        scheduler.after(machine_gun_interval(tower, skill), function()
+            modifier.machine_gun_task_ids[task_id] = nil
+            fire(next_index)
+            return false
+        end, task_id)
+    end
+    fire(1)
 end
 
 local function trigger_chain_kill_storm(caster, target)
@@ -846,7 +1002,8 @@ local function multi_attack_multiplier(skill, target)
     return tower_multi_damage.multiplier(skill, target)
 end
 
-local function split_arrow(caster, target, damage, projectile_name, multiplier)
+local function split_arrow(caster, target, damage, projectile_name, multiplier,
+        armor_ignore_pct)
     if not valid(caster) or not valid(target) then return end
     local distance = (target:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
     ProjectileManager:CreateTrackingProjectile({
@@ -866,7 +1023,9 @@ local function split_arrow(caster, target, damage, projectile_name, multiplier)
                 caster:entindex(), target:entindex(), damage,
                 multiplier
             )
-            deal(caster, target, damage * multiplier, "splash", { "tower_multi_arrow" })
+            deal(caster, target, damage * multiplier, "splash", {
+                "tower_multi_arrow",
+            }, nil, armor_ignore_pct)
         end
     end)
 end
@@ -1124,8 +1283,15 @@ function modifier_tower_attack_effects:OnAttack(params)
     if not valid(primary) or primary:GetTeamNumber() == caster:GetTeamNumber() then
         return
     end
-    if not skill_matching(caster, "burning_great_arrow_") then
+    local replacement_multi = uses_multi_replacement_arrows(caster)
+    if not replacement_multi
+        and not skill_matching(caster, "burning_great_arrow_")
+        and not uses_machine_gun_attack(caster) then
         play_tower_sound("tower_basic_attack", caster, caster)
+    end
+    local machine_gun = skill_matching(caster, "machine_gun_")
+    if machine_gun then
+        start_machine_gun_sequence(self, caster, primary, machine_gun)
     end
     local anti_air = skill_matching(caster, "anti_air_missile_")
     if anti_air and not self.anti_air_secondary_attack then
@@ -1145,21 +1311,52 @@ function modifier_tower_attack_effects:OnAttack(params)
         FIND_CLOSEST, false
     )
     local damage = caster:GetAverageTrueAttackDamage(caster)
+    if not replacement_multi then
+        local burning = skill_matching(caster, "burning_great_arrow_") ~= nil
+        local count = burning and 0 or 1
+        local asset = asset_catalog.by_id[caster.survival_model_asset_id]
+        local projectile_name = asset and asset.attack
+            and asset.attack.projectile or caster.survival_projectile_model
+        for _, target in ipairs(units or {}) do
+            if target ~= primary and count < max_targets and valid(target) then
+                split_arrow(
+                    caster, target, damage, projectile_name,
+                    multi_attack_multiplier(multi, target), 0
+                )
+                count = count + 1
+            end
+        end
+        if count > 0 then
+            play_tower_sound("tower_multi_attack", caster, caster)
+        end
+        return
+    end
+    local piercing = skill_matching(caster, "piercing_ballista_")
+    local armor_ignore_pct = math.max(
+        0, tonumber(piercing and piercing.attack_armor_reduction) or 0
+    )
+    local asset = asset_catalog.by_id[caster.survival_model_asset_id]
+    local projectile_name = asset and asset.attack
+        and asset.attack.projectile or caster.survival_projectile_model
+    split_arrow(
+        caster, primary, damage, projectile_name,
+        multi_attack_multiplier(multi, primary), armor_ignore_pct
+    )
     local count = 1
     for _, target in ipairs(units or {}) do
-        if target ~= primary and count < max_targets then
-            -- Each target resolves its configured ground or flying multiplier.
+        if target ~= primary and count < max_targets and valid(target) then
             split_arrow(
                 caster,
                 target,
                 damage,
-                caster.survival_projectile_model,
-                multi_attack_multiplier(multi, target)
+                projectile_name,
+                multi_attack_multiplier(multi, target),
+                armor_ignore_pct
             )
             count = count + 1
         end
     end
-    if count > 1 then
+    if count > 0 then
         play_tower_sound("tower_multi_attack", caster, caster)
     end
     detailed_log(
@@ -1206,6 +1403,11 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         self.pending_critical_source = nil
         return
     end
+    if uses_machine_gun_attack(caster) then
+        self.pending_critical_multiplier = nil
+        self.pending_critical_source = nil
+        return
+    end
     local skills = tower_skills.get(caster)
     local damage = caster:GetAverageTrueAttackDamage(caster)
     local critical_multiplier = tonumber(self.pending_critical_multiplier) or 1
@@ -1242,54 +1444,13 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
     end
     local piercing = skill_matching(caster, "piercing_ballista_")
     if piercing and piercing.buff_id
+        and not uses_multi_replacement_arrows(caster)
         and not skill_matching(caster, "burning_great_arrow_") then
         buff_manager.apply(caster, primary, piercing.buff_id, {
             duration = math.max(0.1, tonumber(piercing.duration) or 3),
             value = -math.abs(tonumber(piercing.attack_armor_reduction) or 0),
         })
     end
-    local bounty = skill_matching(caster, "bounty_machine_gun_")
-    if bounty then
-        local gold = math.max(0, tonumber(bounty.damage_multiplier) or 0)
-        if gold > 0 then
-            local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
-                team = caster:GetTeamNumber(),
-                gold = gold,
-                reason = "tower_bounty_machine_gun_attack",
-            })
-            if result and result.ok == true then
-                play_follow_particle(primary, skill_effect_particle(
-                    caster,
-                    bounty,
-                    "skill_strike",
-                    "particles/units/heroes/hero_bounty_hunter/bounty_hunter_cutpurse.vpcf",
-                    MACHINE_GUN_ASSET_IDS.bounty
-                ))
-                play_tower_sound(
-                    "tower_bounty_machine_gun", caster, primary
-                )
-            end
-            detailed_log(
-                "[TowerMachineGun] BOUNTY tower=%d target=%d gold=%.0f",
-                caster:entindex(), primary:entindex(), gold
-            )
-        end
-    end
-
-    local gatling = skill_matching(caster, "explosive_gatling_")
-    if gatling then
-        local target_entindex = primary:entindex()
-        if self.gatling_target_entindex ~= target_entindex then
-            self.gatling_target_entindex = target_entindex
-            self.gatling_target_hits = 0
-        end
-        self.gatling_target_hits = (self.gatling_target_hits or 0) + 1
-        if self.gatling_target_hits >= GATLING_ATTACK_COUNT then
-            self.gatling_target_hits = 0
-            trigger_gatling_buff(caster, gatling, "same_target_5_hits")
-        end
-    end
-
     local lightning = nil
     for _, row in pairs(skills) do
         if row.skill_id and string.match(row.skill_id, "^lightning_strike_") then lightning = row end
@@ -1334,21 +1495,27 @@ function modifier_tower_attack_effects:OnDestroy()
     if not IsServer() then return end
     local tower = self:GetParent()
     stop_anti_air_sequence(self)
+    stop_machine_gun_sequences(self)
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     self.polar_obelisk_sound_active = false
 end
 
 M._start_anti_air_sequence_for_test = start_anti_air_sequence
+M._start_machine_gun_sequence_for_test = start_machine_gun_sequence
+M._fire_machine_gun_hit_for_test = fire_machine_gun_hit
+M._machine_gun_interval_for_test = machine_gun_interval
 M._trigger_drag_net_for_test = trigger_drag_net
 M._sync_airspace_aura_for_test = sync_airspace_aura
 M._start_laser_for_test = start_laser
 M._deal_laser_tick_for_test = deal_laser_tick
+M._split_arrow_speed_for_test = SPLIT_ARROW_SPEED
 
 function modifier_tower_attack_effects:ResetAfterRelocation()
     if not IsServer() then return end
     local tower = self:GetParent()
     stop_anti_air_sequence(self)
+    stop_machine_gun_sequences(self)
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     self.polar_obelisk_sound_active = false
@@ -1357,6 +1524,11 @@ function modifier_tower_attack_effects:ResetAfterRelocation()
     self.current_attack_target = nil
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
+    if uses_machine_gun_attack(tower)
+        and type(tower.SetRangedProjectileName) == "function" then
+        tower:SetRangedProjectileName("")
+        tower.survival_projectile_model = ""
+    end
     self.last_interval_time = GameRules:GetGameTime()
     self.current_update_interval = nil
     self:StartIntervalThink(0.03)

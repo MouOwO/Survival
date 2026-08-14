@@ -99,6 +99,11 @@ function M.has(target, buff_id)
     return find(target, buff_id) ~= nil
 end
 
+function M.value(target, buff_id)
+    local modifier = find(target, buff_id)
+    return modifier and not modifier:IsNull() and tonumber(modifier.value) or nil
+end
+
 function M.apply_aura(caster, buff_id, radius)
     if not IsServer() or not valid(caster) or not definition(buff_id) then
         return nil
