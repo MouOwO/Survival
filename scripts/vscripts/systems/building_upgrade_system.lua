@@ -15,6 +15,7 @@ local building_sound = require("systems/building_sound_service")
 local building_health_projection = require("systems/building_health_projection")
 local tower_utility_abilities = require("systems/tower_utility_ability_sync")
 local dev_wall_stats = require("debug/dev_wall_stats")
+local war3_armor_target = require("systems/war3_armor_target")
 
 local M = {}
 local buildings = {}
@@ -116,7 +117,9 @@ local function apply_research_technology(state)
         local wall = technology.wall or {}
         local bonus_pct = (tonumber(wall.health_bonus_pct) or 0)
             + (tonumber(wall.technology_health_bonus_pct) or 0)
-        local armor_bonus = tonumber(wall.technology_armor_bonus) or 0
+        -- Technology/challenge aggregation retains the legacy Dota-armor unit.
+        -- Convert it back to the CSV-authored War3 value for custom mitigation.
+        local armor_bonus = (tonumber(wall.technology_armor_bonus) or 0) * 3
         local old_max = math.max(1, unit:GetMaxHealth())
         local old_health = math.max(0, unit:GetHealth())
         local health_ratio = old_health / old_max
@@ -125,9 +128,11 @@ local function apply_research_technology(state)
         unit:SetMaxHealth(max_health)
         unit:SetHealth(old_health > 0
             and math.max(1, math.floor(max_health * health_ratio)) or 0)
-        local base_armor = tonumber(data.armor) or 0
-        unit:SetPhysicalArmorBaseValue(base_armor + armor_bonus)
-        unit.survival_armor = base_armor + armor_bonus
+        war3_armor_target.apply(
+            unit,
+            data.war3_armor or data.armor,
+            armor_bonus
+        )
         dev_wall_stats.apply(state)
     end
 end

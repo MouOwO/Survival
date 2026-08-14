@@ -13,11 +13,8 @@ function M.profile(row, definition)
 
     if normal_flying then
         base_hull_radius = 10
-    elseif flying or row.member_role == "assault_boss"
-        or definition.rank == "boss" or row.is_boss == true then
+    elseif flying then
         base_hull_radius = 0
-    elseif definition.rank == "elite" or row.member_role == "wave_leader" then
-        base_hull_radius = 58
     end
 
     return {

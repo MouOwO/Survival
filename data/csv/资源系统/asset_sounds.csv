@@ -1,4 +1,4 @@
-sound_key,asset_id,sound_group_id,sound_id,sound_role,skill_id,phase,sound_resource,sound_event,delay_seconds,sort_order,enabled,notes
+﻿sound_key,asset_id,sound_group_id,sound_id,sound_role,skill_id,phase,sound_resource,sound_event,delay_seconds,sort_order,enabled,notes
 #中文名:音效记录键,资源ID,音效组合ID,音效ID,音效角色,技能ID,阶段,音效资源文件,音效事件,延迟秒数,排序,是否启用,备注
 #types:string,string,string,string,enum,string,enum,string,string,number,number,boolean,string
 # 已建立结构；多重塔音效需经本机资源验证后再录入，禁止填入猜测路径或事件名。

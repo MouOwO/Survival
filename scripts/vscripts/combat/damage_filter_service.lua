@@ -181,11 +181,12 @@ local function filter(_, keys)
     local armor_ignore_pct = math.max(
         0, math.min(100, tonumber(record and record.physical_armor_ignore_pct) or 0)
     )
-    local custom_monster_armor = damage_type == DAMAGE_TYPE_PHYSICAL
-        and victim.survival_monster_corpse == true
+    local custom_war3_armor = damage_type == DAMAGE_TYPE_PHYSICAL
+        and (victim.survival_monster_corpse == true
+            or victim.survival_war3_armor_target == true)
         and tonumber(victim.survival_armor_mapping_version)
             == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
-    if custom_monster_armor then
+    if custom_war3_armor then
         effective_war3_armor = tonumber(victim.survival_effective_war3_armor)
             or tonumber(victim.survival_war3_armor) or 0
         pierced_war3_armor = math.max(0, effective_war3_armor)

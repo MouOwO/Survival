@@ -2,6 +2,7 @@ ability_survival_builder_blink = class({})
 
 local BLINK_RANGE = 1000
 local destination_validation = require("systems/destination_validation_service")
+local blink_destination = require("systems/blink_destination")
 local START_PARTICLE = "particles/items_fx/blink_dagger_start.vpcf"
 local END_PARTICLE = "particles/items_fx/blink_dagger_end.vpcf"
 
@@ -13,14 +14,13 @@ function ability_survival_builder_blink:CastFilterResultLocation(location)
     if not IsServer() then return UF_SUCCESS end
     local caster = self:GetCaster()
     if not caster or caster:IsNull() then return UF_FAIL_CUSTOM end
-    if (location - caster:GetAbsOrigin()):Length2D() > BLINK_RANGE then
-        self.cast_error = "目标位置超出闪烁范围"
-        return UF_FAIL_CUSTOM
-    end
+    local target = blink_destination.clamp(
+        caster:GetAbsOrigin(), location, BLINK_RANGE
+    )
     local destination = Vector(
-        location.x,
-        location.y,
-        GetGroundHeight(location, caster)
+        target.x,
+        target.y,
+        GetGroundHeight(target, caster)
     )
     if not valid_destination(destination) then
         self.cast_error = "目标位置无法移动到达"
@@ -48,8 +48,9 @@ function ability_survival_builder_blink:OnSpellStart()
     local caster = self:GetCaster()
     if not caster or caster:IsNull() then return end
     local origin = caster:GetAbsOrigin()
-    local cursor = self:GetCursorPosition()
-    if (cursor - origin):Length2D() > BLINK_RANGE then return end
+    local cursor = blink_destination.clamp(
+        origin, self:GetCursorPosition(), BLINK_RANGE
+    )
     local destination = Vector(cursor.x, cursor.y, GetGroundHeight(cursor, caster))
     if not valid_destination(destination) then return end
 

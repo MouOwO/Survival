@@ -1,4 +1,4 @@
-location_id,location_set_id,sequence_index,entry_target_name,home_target_name,spawn_target_names,room_radius,next_location_id,enabled,notes
+﻿location_id,location_set_id,sequence_index,entry_target_name,home_target_name,spawn_target_names,room_radius,next_location_id,enabled,notes
 #中文名:地点ID,地点集合ID,顺序,进入点名称,回归点名称,生成点名称列表,房间半径,下一地点ID,是否启用,备注
 #types:string,string,number,string,string,list,number,string,boolean,string
 challenge_01_room,wood_room,1,challenge_01_entry,challenge_01_home,challenge_01_spawn_01|challenge_01_spawn_02|challenge_01_spawn_03|challenge_01_spawn_04|challenge_01_spawn_05|challenge_01_spawn_06|challenge_01_spawn_07|challenge_01_spawn_08,1000,,1,木材练功房

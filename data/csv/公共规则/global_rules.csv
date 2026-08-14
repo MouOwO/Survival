@@ -1,4 +1,4 @@
-rule_id,value,description,enabled
+﻿rule_id,value,description,enabled
 #中文名:规则ID,数值,说明,是否启用
 #types:string,number,string,boolean
 tower_attack_range,1000,所有防御塔统一基础攻击距离,1

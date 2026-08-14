@@ -14,6 +14,8 @@ local grid_config = require("config/grid_config")
 local grid_placement_config = require("config/grid_placement_config")
 local building_population = require("systems/building_population_service")
 local building_hull_scale = require("systems/building_hull_scale")
+local war3_armor_target = require("systems/war3_armor_target")
+local blink_destination = require("systems/blink_destination")
 local building_visual = require("systems/building_visual_service")
 local building_sound = require("systems/building_sound_service")
 local construction_visual = require(
@@ -281,8 +283,12 @@ local function apply_initial_stats(unit, definition)
     unit:SetBaseMaxHealth(data.health)
     unit:SetMaxHealth(data.health)
     unit:SetHealth(data.health)
-    unit:SetPhysicalArmorBaseValue(data.armor)
-    unit.survival_armor = tonumber(data.armor) or 0
+    if definition.id == "wall" then
+        war3_armor_target.apply(unit, data.war3_armor or data.armor, 0)
+    else
+        unit:SetPhysicalArmorBaseValue(data.armor)
+        unit.survival_armor = tonumber(data.armor) or 0
+    end
     if definition.id == "arrow_tower" and unit.SetAttackCapability then
         unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
     end
@@ -488,6 +494,12 @@ local function recover_building(unit)
     apply_hull_radius(unit, definition)
     anchor_building(unit, unit.survival_fixed_position or origin)
     if state.building_id == "wall" then
+        local level_data = definition.levels[state.level] or definition.levels[1] or {}
+        war3_armor_target.apply(
+            unit,
+            level_data.war3_armor or level_data.armor,
+            0
+        )
         if not unit:HasModifier("modifier_building_damage_sound") then
             unit:AddNewModifier(unit, nil, "modifier_building_damage_sound", {})
         end
@@ -1103,13 +1115,9 @@ function M.relocate_for_player(player_id, entindex, position)
         or not ability:IsActivated() then
         return false, "move_ability_unavailable"
     end
-    local origin = state.unit:GetAbsOrigin()
-    local dx = position.x - origin.x
-    local dy = position.y - origin.y
-    if (dx * dx + dy * dy) > (RELOCATION_RANGE * RELOCATION_RANGE) then
-        notify(player_id, "超出范围", "error")
-        return false, "relocation_out_of_range"
-    end
+    position = blink_destination.clamp(
+        state.unit:GetAbsOrigin(), position, RELOCATION_RANGE
+    )
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = position,
         footprint = state.definition.footprint,

@@ -1,4 +1,4 @@
-cue_id,building_scope,phase,transition_type,tower_class,sound_events,sound_resources,playback_mode,attach_scope,cooldown_group,cooldown_seconds,max_plays_per_window,window_seconds,enabled,notes,max_concurrent,concurrency_seconds
+﻿cue_id,building_scope,phase,transition_type,tower_class,sound_events,sound_resources,playback_mode,attach_scope,cooldown_group,cooldown_seconds,max_plays_per_window,window_seconds,enabled,notes,max_concurrent,concurrency_seconds
 #中文名:音效Cue ID,建筑范围,阶段,转换类型,防御塔路线,原生音效事件列表,音效资源文件列表,播放模式,挂载范围,冷却组,冷却秒数,窗口最大播放次数,窗口秒数,是否启用,备注,最大并发数,并发占位秒数
 #types:string,string,enum,string,string,list,list,enum,enum,string,number,number,number,boolean,string,number,number
 building_construction_start,all,construction_start,construction_start,,General.SelectAction,soundevents/game_sounds_ui_imported.vsndevts,oneshot,unit,building_construction_start,0.12,3,0.4,1,资源扣除和施工实体创建成功后播放一次轻量提示；不在工人移动阶段提前播放。,3,0.35

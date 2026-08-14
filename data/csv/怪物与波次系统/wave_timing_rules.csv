@@ -1,4 +1,4 @@
-timing_rule_id,initial_delay_seconds,early_wave_last_number,early_interval_seconds,late_interval_seconds,enabled,dev_wave_preload_timeout_seconds,formal_wave_preload_lead_seconds,notes
+﻿timing_rule_id,initial_delay_seconds,early_wave_last_number,early_interval_seconds,late_interval_seconds,enabled,dev_wave_preload_timeout_seconds,formal_wave_preload_lead_seconds,notes
 #字段说明:计时规则ID,选择难度后首波延迟秒数,短间隔适用的当前波末值,短波次间隔秒数,长波次间隔秒数,是否启用,开发跳波资源加载等待秒数,正式波次资源提前加载秒数,备注
 #types:string,number,number,number,number,boolean,number,number,string
 default,150,9,90,90,1,3,4,选择难度后150秒出第一波；第1至9波使用短间隔；第10波起使用长间隔；开发跳波最多等待3秒资源加载；后续正式波次在首只敌人出现前4秒异步加载目标波资源

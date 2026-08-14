@@ -1,4 +1,4 @@
-cue_id,worker_id,phase,sound_event,sound_resource,playback_mode,attach_scope,cooldown_group,cooldown_seconds,max_plays_per_window,window_seconds,enabled,notes,max_concurrent,concurrency_seconds
+﻿cue_id,worker_id,phase,sound_event,sound_resource,playback_mode,attach_scope,cooldown_group,cooldown_seconds,max_plays_per_window,window_seconds,enabled,notes,max_concurrent,concurrency_seconds
 #中文名:音效Cue ID,工人ID,阶段,原生音效事件,音效资源文件,播放模式,挂载范围,冷却组,冷却秒数,窗口最大播放次数,窗口秒数,是否启用,备注,最大并发数,并发占位秒数
 #types:string,string,enum,string,string,enum,enum,string,number,number,number,boolean,string,number,number
 worker_lumberjack_tree_impact,npc_survival_lumberjack,hit,Hero_Tiny_Tree.Impact,soundevents/game_sounds_heroes/game_sounds_tiny.vsndevts,oneshot,unit,worker_lumberjack_tree_impact,0.12,4,1,1,伐木工真实命中资源树；Tiny原生木质命中事件已用本机resourceinfo核实。,2,0.62

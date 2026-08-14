@@ -1,4 +1,4 @@
-level_id,level,model_asset_id,model_scale,model_yaw,enabled,notes
+﻿level_id,level,model_asset_id,model_scale,model_yaw,enabled,notes
 #中文名:等级ID,城墙等级,模型资源ID,模型缩放,模型偏航角,是否启用,备注
 #types:string,number,string,number,number,boolean,string
 wall_visual_lv01,1,wall_tiny_large_form,1.6,180,1,1-1

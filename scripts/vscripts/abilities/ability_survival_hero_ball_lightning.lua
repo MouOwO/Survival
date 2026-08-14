@@ -3,6 +3,7 @@ ability_survival_hero_ball_lightning = class({})
 local MAX_DISTANCE = 800
 local TRAVEL_SPEED = 7000
 local destination_validation = require("systems/destination_validation_service")
+local blink_destination = require("systems/blink_destination")
 
 local function valid_destination(position, caster)
     return destination_validation.validate(position, caster)
@@ -16,14 +17,13 @@ function ability_survival_hero_ball_lightning:CastFilterResultLocation(location)
         self.cast_error = "正在传送中"
         return UF_FAIL_CUSTOM
     end
-    if (location - caster:GetAbsOrigin()):Length2D() > MAX_DISTANCE then
-        self.cast_error = "目标位置超出传送范围"
-        return UF_FAIL_CUSTOM
-    end
+    local target = blink_destination.clamp(
+        caster:GetAbsOrigin(), location, MAX_DISTANCE
+    )
     local destination = Vector(
-        location.x,
-        location.y,
-        GetGroundHeight(location, caster)
+        target.x,
+        target.y,
+        GetGroundHeight(target, caster)
     )
     if not valid_destination(destination, caster) then
         self.cast_error = "目标位置无法到达"
@@ -49,17 +49,14 @@ function ability_survival_hero_ball_lightning:OnSpellStart()
     if not caster or caster:IsNull() then return end
 
     local origin = caster:GetAbsOrigin()
-    local cursor = self:GetCursorPosition()
-    local delta = cursor - origin
-    delta.z = 0
-    local distance = delta:Length2D()
+    local target, distance = blink_destination.clamp(
+        origin, self:GetCursorPosition(), MAX_DISTANCE
+    )
     if distance < 1 then
         self:RefundTravelMana()
         return
     end
 
-    distance = math.min(distance, MAX_DISTANCE)
-    local target = origin + delta:Normalized() * distance
     target.z = GetGroundHeight(target, caster)
     if not valid_destination(target, caster) then
         self:RefundTravelMana()

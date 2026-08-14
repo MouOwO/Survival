@@ -1,4 +1,4 @@
-challenge_wave_id,challenge_id,wave_number,health,attack,armor,attack_speed,is_boss,enabled,notes
+﻿challenge_wave_id,challenge_id,wave_number,health,attack,armor,attack_speed,is_boss,enabled,notes
 #中文名:挑战波次ID,挑战ID,独立挑战次数,生命值,攻击力,War3护甲,每秒攻击次数,是否Boss,是否启用,备注
 #types:string,string,number,number,number,number,number,boolean,boolean,string
 challenge_monster_01_wave_01,challenge_monster_01,1,1000,2,10,1,1,1,独立挑战第1次。

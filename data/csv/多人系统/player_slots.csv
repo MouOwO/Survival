@@ -1,4 +1,4 @@
-slot_id,player_id,display_name,builder_spawn_marker,wave_spawn_marker,legacy_builder_x,legacy_builder_y,legacy_builder_z,allow_legacy_builder_fallback,enabled,notes
+﻿slot_id,player_id,display_name,builder_spawn_marker,wave_spawn_marker,legacy_builder_x,legacy_builder_y,legacy_builder_z,allow_legacy_builder_fallback,enabled,notes
 #中文表头:槽位ID,玩家ID,显示名称,Builder出生Marker,波次出生Marker,旧Builder出生X,旧Builder出生Y,旧Builder出生Z,允许旧Builder坐标回退,是否启用,备注
 #types:string,number,string,string,string,number,number,number,boolean,boolean,string
 east,0,东区,player_0_builder_spawn,monsterborn,0,0,256,1,1,玩家0兼容当前单人地图；Hammer补齐marker后自动优先使用marker。

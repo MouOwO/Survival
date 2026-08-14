@@ -1,4 +1,4 @@
-preset_id,route_id,display_name,level,panel_attack_damage,attack_interval,laser_initial_delay,laser_interval,laser_base_multiplier,laser_growth_per_tick,laser_max_multiplier,arcane_stack_bonus,arcane_stack_duration,arcane_stack_cap,eye_enabled,eye_damage_multiplier,eye_path_half_width,notes
+﻿preset_id,route_id,display_name,level,panel_attack_damage,attack_interval,laser_initial_delay,laser_interval,laser_base_multiplier,laser_growth_per_tick,laser_max_multiplier,arcane_stack_bonus,arcane_stack_duration,arcane_stack_cap,eye_enabled,eye_damage_multiplier,eye_path_half_width,notes
 #types:string,string,string,number,number,number,number,number,number,number,number,number,number,number,boolean,number,number,string
 mystery_lv01,mystery,神秘之塔LV1,1,901,1,1,1,1,0.05,5,0.1,5,0,0,0.3,96,录像工作簿面板值；原版默认延迟首跳
 mystery_lv02,mystery,神秘之塔LV2,2,1501,1,1,1,1.2,0.05,5,0.1,5,0,0,0.3,96,录像工作簿面板值；第7波验证样本

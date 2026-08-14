@@ -1,4 +1,4 @@
-builder_id,unit_name,display_name,model_name,model_scale,move_speed,spawn_x,spawn_y,spawn_z,enabled,notes
+﻿builder_id,unit_name,display_name,model_name,model_scale,move_speed,spawn_x,spawn_y,spawn_z,enabled,notes
 #中文表头:建造者ID,单位名称,显示名称,模型路径,模型缩放,移动速度,出生X,出生Y,出生Z,是否启用,备注
 #types:string,string,string,string,number,number,number,number,number,boolean,string
 default_builder,npc_survival_builder_proxy,建造者,models/heroes/undying/undying.vmdl,1,500,0,0,256,1,独立建造代理；首版使用普通可控单位验证身份解耦，不声明为真实信使类型。

@@ -1,4 +1,4 @@
-skill_id,ground_damage_multiplier,penetration_decay,enabled,notes
+﻿skill_id,ground_damage_multiplier,penetration_decay,enabled,notes
 #中文名:技能ID,对地伤害倍率,每穿透一个目标保留倍率,是否启用,备注
 #types:string,number,number,boolean,string
 multi_attack_lv01,1.8,,1,基础伤害倍率读取tower_skill_definitions.csv；地面目标在基础倍率上再乘1.8。

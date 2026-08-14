@@ -1,4 +1,4 @@
-rule_id,max_players,initial_slice_players,shared_wave_clock,allow_cross_lane_hero_support,player_zero_legacy_fallback,enabled,notes
+﻿rule_id,max_players,initial_slice_players,shared_wave_clock,allow_cross_lane_hero_support,player_zero_legacy_fallback,enabled,notes
 #中文表头:规则ID,最大玩家数,首轮切片人数,共享波次时钟,允许英雄跨区支援,玩家0旧地图回退,是否启用,备注
 #types:string,number,number,boolean,boolean,boolean,boolean,string
 default_multiplayer,4,2,1,1,1,1,最多4名玩家；先完成2人纵向切片。服务端权威结算，客户端只提交操作意图。

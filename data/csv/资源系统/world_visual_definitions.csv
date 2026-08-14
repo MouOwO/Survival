@@ -1,3 +1,3 @@
-visual_id,model_name,model_scale,spawn_x,spawn_y,spawn_z,enabled,notes
+﻿visual_id,model_name,model_scale,spawn_x,spawn_y,spawn_z,enabled,notes
 #types:string,string,number,number,number,number,boolean,string
 world_resource_tree,models/props_tree/mango_tree.vmdl,3,448,64,128,1,资源树模型、运行缩放与初始位置

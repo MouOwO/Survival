@@ -6,6 +6,7 @@ _G.ability_building_blink = M
 print("[BuildingBlink] ability class loaded name=ability_building_blink")
 
 local BLINK_RANGE = 1000
+local blink_destination = require("systems/blink_destination")
 local MAX_HEIGHT_DELTA = 32
 local SAMPLE_RADIUS = 96
 
@@ -26,14 +27,10 @@ function M:CastFilterResultLocation(location)
     if IsServer() then print("[BuildingBlink] CastFilterResultLocation ability=" .. tostring(self:GetAbilityName())) end
     if not IsServer() then return UF_SUCCESS end
     local caster = self:GetCaster()
-    local origin = caster:GetAbsOrigin()
-    local delta = location - origin
-    delta.z = 0
-    if delta:Length2D() > BLINK_RANGE then
-        self.cast_error = "目标位置超出闪现范围"
-        return UF_FAIL_CUSTOM
-    end
-    local center = Vector(location.x, location.y, GetGroundHeight(location, caster))
+    local target = blink_destination.clamp(
+        caster:GetAbsOrigin(), location, BLINK_RANGE
+    )
+    local center = Vector(target.x, target.y, GetGroundHeight(target, caster))
     if not self:IsFlat(center, caster) then
         self.cast_error = "目标地形不平坦"
         return UF_FAIL_CUSTOM
@@ -50,19 +47,13 @@ function M:OnSpellStart()
     local caster = self:GetCaster()
     print("[BuildingBlink] OnSpellStart entered ability=" .. tostring(self:GetAbilityName()) .. " caster=" .. tostring(caster and caster:entindex() or -1))
     local origin = caster:GetAbsOrigin()
-    local cursor = self:GetCursorPosition()
-    local delta = cursor - origin
-    delta.z = 0
-    local distance = delta:Length2D()
+    local cursor, distance = blink_destination.clamp(
+        origin, self:GetCursorPosition(), BLINK_RANGE
+    )
     if distance < 1 then
         self:EndCooldown()
         return
     end
-    if distance > BLINK_RANGE then
-        self:EndCooldown()
-        return
-    end
-
     print(string.format("[BuildingBlink] cast ent=%d cursor=(%.1f,%.1f,%.1f) distance=%.1f", caster:entindex(), cursor.x, cursor.y, cursor.z, distance))
     local ground = GetGroundHeight(cursor, caster)
     local center = Vector(cursor.x, cursor.y, ground)

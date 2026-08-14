@@ -1,4 +1,4 @@
-member_id,encounter_id,sequence_index,location_id,archetype_id,spawn_count,max_alive,respawn_policy,respawn_seconds,reward_profile_id,spawn_mode,spawn_target_name,spawn_delay_seconds,completion_scope,enabled,notes,combat_archetype_id
+﻿member_id,encounter_id,sequence_index,location_id,archetype_id,spawn_count,max_alive,respawn_policy,respawn_seconds,reward_profile_id,spawn_mode,spawn_target_name,spawn_delay_seconds,completion_scope,enabled,notes,combat_archetype_id
 #中文名:成员ID,遭遇ID,顺序,地点ID,怪物原型ID,初始生成数,最大存活数,刷新策略,刷新秒数,奖励方案ID,生成方式,固定生成点,下一成员延迟秒数,完成范围,是否启用,备注,战斗数值模板ID
 #types:string,string,number,string,string,number,number,enum,number,string,enum,string,number,enum,boolean,string,string
 practice_wood,encounter_challenge_01,1,challenge_01_room,humanoid_white_melee,8,8,maintain_count,0.5,reward_practice_wood_100,maintain_count,,0,member_kill,1,木材练功房；采用N1第1波战斗数值。

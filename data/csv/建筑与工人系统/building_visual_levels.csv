@@ -1,4 +1,4 @@
-visual_id,building_id,level,model_name,model_scale,model_yaw,enabled,notes
+﻿visual_id,building_id,level,model_name,model_scale,model_yaw,enabled,notes
 #types:string,string,number,string,number,number,boolean,string
 main_city_visual_lv01,building_main_city,1,models/props_structures/tower_good.vmdl,0.55,0,1,主城低阶塔第一阶段
 main_city_visual_lv02,building_main_city,2,models/props_structures/tower_good.vmdl,0.65,0,1,主城低阶塔逐级放大
