@@ -1,5 +1,14 @@
 # Current Task
 
+## 当前插入任务（2026-08-14）：神秘塔LV4攻击W10 Boss高护甲补偿修复
+
+- 根因来自提交`462eb84`加入的怪物物理伤害曲线补偿，不是激光间隔、重复Modifier、光环或缓存。当前Dota护甲承伤曲线为`1 - 0.06A/(1+0.06|A|)`；项目继续按`A=W/3`投影War3护甲，因此正甲原生承伤已经严格等于目标`1/(1+0.02W)`，无需额外普通物理补偿。
+- 原规则`0.052/0.9/0.048`使W10 Boss的477 War3护甲投影为159后产生约3.06624倍错误预补偿，解释单座LV4神秘塔从预期45～46秒缩短到20多秒。权威`war3_damage_calculator_rules.csv`现改为`numerator=0.06/base=1/denominator=0.06`，`armor_balance.lua`统一消费生成规则，不再重复硬编码引擎曲线。
+- 现有Damage Filter、怪物身份开关和物理护甲无视入口保留。普通项目怪物物理伤害在117/477/4990 War3护甲下补偿均为1；有物理护甲无视时仍按有效护甲倍率与原生护甲倍率之比预补偿。`from_war3_modern()`兼容API也按同一生成规则求解，当前参数下自然退化为线性`W/3`。
+- W10回归直接读取生成配置：`n1_wave_10_10b`为60000生命/477护甲，`mystery_tower_lv04`为3801攻击/每秒1次，`laser_lv04`为1.6起始倍率/每秒增长0.05。按生产首次锁定立即激光Tick的离散模型，`t=44`累计60044.259962伤害，覆盖预期约45～46秒实机计时。
+- 自动验证通过：`MONSTER_WAR3_ARMOR_DAMAGE_LUA51/CONTRACT_PASS`、`WAR3_DAMAGE_CALCULATOR_CONTRACT_PASS`（Edge 1440/390各62项）、`TOWER_LASER_BASE_MULTIPLIER_LUA51/CONTRACT_PASS`、研究减甲、毒云、塔射程、超级塔科技和六项玩法回归；目标Lua 5.1语法、生成Build/CheckOnly、严格UTF-8及限定`git diff --check`通过。研究减甲与毒云旧包装器需要按既有约定设置项目`LUA_PATH`后运行，业务断言通过。
+- 下一步：完全停止并冷启动Workshop Tools，只放置单座LV4神秘之塔攻击N1 W10进攻Boss，记录从首次伤害到死亡的时间与`MONSTER_PHYSICAL_DAMAGE_FILTER`样本；目标约45～46秒，`armor_compensation`应为1。自动测试和离散模拟不能称为引擎实机验证或用户验收。
+
 ## 已完成任务（2026-08-14）：神秘塔激光Tick恢复为1秒及计算器方法沉淀
 
 - 用户确认神秘塔普通攻击的`base_attack_speed=1`本来就是1秒间隔；LV2第7波差异来自生产激光`damage_interval=0.5`，而离线录像实验按1秒激光间隔计算。提交`f92e6c9`曾把`laser_lv01-lv05`从1秒改成0.5秒。

@@ -29,6 +29,8 @@ M.rows = {
     { rule_id = "monster_corpse_update_interval", value = 0.05, description = "全部怪物尸体共享更新任务的间隔秒数", enabled = true },
     { rule_id = "monster_corpse_remove_delay_seconds", value = 0.05, description = "尸体隐藏后安全移除实体的延迟秒数", enabled = true },
     { rule_id = "runtime_detailed_diagnostics", value = 0, description = "运行时攻击与技能成功路径详细日志开关（0关闭1开启）", enabled = true },
+    { rule_id = "dev_wall_health", value = 10000000, description = "输入dev后城墙的开发模式最大生命和当前生命", enabled = true },
+    { rule_id = "dev_wall_war3_armor", value = 1000, description = "输入dev后城墙的开发模式War3护甲", enabled = true },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

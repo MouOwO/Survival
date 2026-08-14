@@ -1,6 +1,8 @@
 local M = {}
+local calculator_rules = require(
+    "config/generated/war3_damage_calculator_rules"
+)
 
-M.WAR3_TO_DOTA_RATIO = 1 / 3
 M.MODERN_MAPPING_VERSION = 2
 M.CUSTOM_WAR3_MAPPING_VERSION = 3
 M.MODERN_DOTA_ARMOR_A = 225
@@ -9,6 +11,22 @@ M.WAR3_POSITIVE_ARMOR_FACTOR = 0.02
 M.DOTA_POSITIVE_ARMOR_NUMERATOR = 0.052
 M.DOTA_POSITIVE_ARMOR_BASE = 0.9
 M.DOTA_POSITIVE_ARMOR_DENOMINATOR = 0.048
+
+local function rule_value(rule_id)
+    local row = calculator_rules.by_id[rule_id]
+    return assert(row and tonumber(row.value),
+        "invalid armor calculator rule: " .. tostring(rule_id))
+end
+
+M.WAR3_TO_DOTA_RATIO = rule_value("war3_to_dota_ratio")
+M.WAR3_POSITIVE_ARMOR_FACTOR = rule_value("war3_positive_armor_factor")
+M.DOTA_POSITIVE_ARMOR_NUMERATOR = rule_value(
+    "dota_positive_armor_numerator"
+)
+M.DOTA_POSITIVE_ARMOR_BASE = rule_value("dota_positive_armor_base")
+M.DOTA_POSITIVE_ARMOR_DENOMINATOR = rule_value(
+    "dota_positive_armor_denominator"
+)
 
 local function number(value)
     return tonumber(value) or 0
@@ -32,30 +50,28 @@ function M.to_war3(dota_armor)
     return M.to_war3_linear(dota_armor)
 end
 
--- The modern Dota armor curve is assumed to be:
---     reduction = 0.052 * A / (0.9 + 0.048 * abs(A))
--- The positive War3 curve represented by the old W / 3 conversion is:
---     reduction = 0.02 * W / (1 + 0.02 * W)
--- Solving the two curves for equal reduction gives:
---     A = 225 * W / (650 + W)
---
--- Negative armor is intentionally kept on the legacy linear path until the
--- original War3 attack/armor matrix and the engine's negative-armor behavior
--- have been verified in Workshop Tools.
 function M.from_war3_modern(war3_armor)
     local value = number(war3_armor)
     if value <= 0 then return M.from_war3_linear(value) end
-    return M.MODERN_DOTA_ARMOR_A * value
-        / (M.MODERN_DOTA_ARMOR_B + value)
+    local numerator = M.DOTA_POSITIVE_ARMOR_BASE
+        * M.WAR3_POSITIVE_ARMOR_FACTOR * value
+    local denominator = M.DOTA_POSITIVE_ARMOR_NUMERATOR
+        + M.WAR3_POSITIVE_ARMOR_FACTOR * value
+            * (M.DOTA_POSITIVE_ARMOR_NUMERATOR
+                - M.DOTA_POSITIVE_ARMOR_DENOMINATOR)
+    if denominator <= 0 then return nil end
+    return numerator / denominator
 end
 
 function M.to_war3_modern(dota_armor)
     local value = number(dota_armor)
     if value <= 0 then return M.to_war3_linear(value) end
-    -- A >= 225 has no finite inverse in the modern equivalent mapping.
-    if value >= M.MODERN_DOTA_ARMOR_A then return nil end
-    return M.MODERN_DOTA_ARMOR_B * value
-        / (M.MODERN_DOTA_ARMOR_A - value)
+    local denominator = M.WAR3_POSITIVE_ARMOR_FACTOR
+        * (M.DOTA_POSITIVE_ARMOR_BASE
+            - value * (M.DOTA_POSITIVE_ARMOR_NUMERATOR
+                - M.DOTA_POSITIVE_ARMOR_DENOMINATOR))
+    if denominator <= 0 then return nil end
+    return value * M.DOTA_POSITIVE_ARMOR_NUMERATOR / denominator
 end
 
 function M.from_war3_for_mapping(war3_armor, mapping_version)
@@ -74,8 +90,9 @@ end
 
 function M.modern_physical_reduction_pct(dota_armor)
     local value = number(dota_armor)
-    return 100 * (0.052 * value)
-        / (0.9 + 0.048 * math.abs(value))
+    return 100 * (M.DOTA_POSITIVE_ARMOR_NUMERATOR * value)
+        / (M.DOTA_POSITIVE_ARMOR_BASE
+            + M.DOTA_POSITIVE_ARMOR_DENOMINATOR * math.abs(value))
 end
 
 function M.effective_war3_armor(base_war3_armor, reduction, minimum_war3_armor,

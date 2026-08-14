@@ -13,6 +13,7 @@ local asset_preload = require("systems/asset_preload_service")
 local upgrade_process = require("systems/building_upgrade_process")
 local building_sound = require("systems/building_sound_service")
 local building_health_projection = require("systems/building_health_projection")
+local dev_wall_stats = require("debug/dev_wall_stats")
 
 local M = {}
 local buildings = {}
@@ -126,6 +127,7 @@ local function apply_research_technology(state)
         local base_armor = tonumber(data.armor) or 0
         unit:SetPhysicalArmorBaseValue(base_armor + armor_bonus)
         unit.survival_armor = base_armor + armor_bonus
+        dev_wall_stats.apply(state)
     end
 end
 

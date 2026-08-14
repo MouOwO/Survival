@@ -4,6 +4,7 @@ local config = require("config/buildings_config")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
 local tower_routes = require("config/tower_route_config")
 local global_rules = require("config/global_rules")
+local dev_wall_stats = require("debug/dev_wall_stats")
 local logger = require("core/logger")
 local modifier_registry = require("core/modifier_registry")
 local team_alignment = require("core/team_alignment")
@@ -670,6 +671,7 @@ local function start_building(payload)
         entindex = unit:entindex(),
     })
     buildings[state.entindex] = state
+    dev_wall_stats.apply(state)
     local maximum_health = unit:GetMaxHealth()
     local build_time = math.max(0.1, tonumber(check.definition.build_time) or 3)
     local started_at = GameRules:GetGameTime()
@@ -989,6 +991,7 @@ local function on_building_changed(payload)
     elseif payload.display_name then
         state.unit.survival_display_name = payload.display_name
     end
+    dev_wall_stats.apply(state)
     apply_hull_radius(state.unit, state.definition)
 end
 local function on_entity_killed(payload)
@@ -1110,6 +1113,10 @@ function M.relocate_for_player(player_id, entindex, position)
     return M.relocate_building(state.unit, grid.world_position)
 end
 
+function M.enable_dev_wall_stats()
+    return dev_wall_stats.enable(buildings)
+end
+
 function M.init()
     modifier_registry.register()
     construction_visual.reset()
@@ -1117,6 +1124,7 @@ function M.init()
     tower_limits:reset()
     wall_ever_built = {}
     defeat_triggered = false
+    dev_wall_stats.reset()
     event_bus.handle_request(events.BUILD_CAN_PLACE_REQUEST, can_place)
     event_bus.handle_request(events.BUILDING_QUERY_REQUEST, query_building)
     event_bus.handle_request(events.BUILDING_LIST_REQUEST, list_buildings)

@@ -12,6 +12,7 @@ local dev_asset_preload = require("debug/dev_asset_preload")
 local health_cheat = require("debug/health_cheat")
 local armor_engine_diagnostic = require("debug/armor_engine_diagnostic")
 local building_system = require("systems/building_system")
+local global_rules = require("config/global_rules")
 
 local M = {}
 
@@ -95,6 +96,12 @@ end
 
 local function enable_dev(context)
     wave_system.set_dev_mode(true)
+    local wall_ok, wall_count = building_system.enable_dev_wall_stats()
+    if not wall_ok then return false, "dev_wall_stats_failed" end
+    notify(context, "开发城墙强化已开启：生命"
+        .. tostring(global_rules.dev_wall_health) .. "，护甲"
+        .. tostring(global_rules.dev_wall_war3_armor)
+        .. "（已应用 " .. tostring(wall_count) .. " 座）")
     local ok, status, snapshot = dev_asset_preload.start({
         on_dispatched = function(progress)
             notify(context, "开发模型加载请求已全部发出："
