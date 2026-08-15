@@ -60,6 +60,19 @@
 - 当前`building_levels.csv`使用CP936/GBK编码。读取和定向生成必须沿用生成器编码回退并检查乱码；不得以系统默认编码整文件重写。
 
 
+## 原生技能栏快捷键标签所有权（2026-08-12）
+
+- Valve原生技能栏和输入链必须保持启用；`ui_bootstrap.js`的HUD隐藏配置继续使用`abilities: false`，不得为了自定义标签隐藏或重建整条技能栏。
+- 项目快捷键标签由`combat_stats.js`创建在当前原生`AbilityN`按钮内。普通技能按项目可见顺序映射`Q/W/E/R/T/Y/U`；工具技能按Ability身份映射`D/F/F2`，工具视觉顺序继续为`D -> F2 -> F`。快捷键分配顺序与原生面板定位是两个边界：前者消费分类后的业务可见顺序；后者必须收集当前可见且尺寸有效的原生按钮锚点，按窗口几何从左到右排序后逐一配对。引擎槽、压缩数组下标和`AbilityN`节点编号均不得互相直接推导。标签必须不参与父布局、不可命中且保持不透明；原生`HotkeyContainer`只允许透明压制并关闭命中，禁止折叠布局或隐藏整个Ability面板。
+- 原生快捷键压制必须可逆：第一次压制前保存Valve容器原有`opacity/hittest/hittestchildren`，当前映射设为`opacity=0`且不可命中；标签清理、无有效选中单位或面板复用时恢复保存值。刷新签名必须同时包含当前单位、引擎槽、ability entindex、Ability名称和解析到的原生面板顺序；即使签名不变，也必须检查目标标签及原生压制状态，以恢复同ID面板重建或Valve样式回写。选择事件和Ability runtime事件用于即时触发，既有0.25秒HUD生命周期执行变化/完整性检查，原1秒技能刷新作为原生子面板晚创建兜底。
+- 纯Panorama标签任务不修改业务CSV或生成Lua。自动契约和Resource Compiler只能证明静态边界与构建，最终仍需Workshop Tools冷启动验证只剩项目标签后的实际字母、面板复用及鼠标/键盘输入。
+
+## Source 2 addon目录大小写与file-mod身份（2026-08-12）
+
+- Game与Content下的addon物理目录必须统一使用全小写`dota_addons/survival`，并与编译资源内部file-mod身份保持一致。Windows文件访问虽然通常不区分大小写，但Source 2资产索引、ManifestResource和按需编译会区分这两个身份。
+- 已复现的错误边界是物理目录`Survival`配合编译身份`dota_addons/survival`：引擎持续输出`file mod 'dota_addons/survival' is invalid`，小地图花屏，并可能阻断Panorama资源按需编译。用户在Game/Content统一改为小写`survival`后实机确认小地图恢复正常。
+- 后续迁移、脚本和文档不得恢复大写`Survival`，不得通过复制、junction或并存目录创建第二个大小写身份。资源异常排查应先核对两个物理目录、编译资源ManifestResource及`tools_asset_info.bin`，再判断VTEX、VMAT或Panorama源本身。
+
 ## 玩家档案Provider、版本协议与隐私边界（2026-08-12）
 
 - 永久档案使用稳定字符串`account_id`；Dota `player_id`只作为本局槽位，禁止成为数据库主键。正式身份可直用Steam Account ID或映射自有账号ID，但Lua协议不依赖具体方案。

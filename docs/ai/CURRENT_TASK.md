@@ -166,6 +166,25 @@
 - 自动验证通过：`CUSTOM_MONSTER_ARMOR_PASS`、`CUSTOM_MONSTER_POISON_ARMOR_PASS`、`ARMOR_REDUCTION_MAPPING_PASS`、`ARMOR_MAPPING_CONTRACT_PASS`、`COMBAT_STAT_PROJECTION_PASS`、`DAMAGE_TRANSACTION_ARMOR_IGNORE_PASS`、目标Lua 5.1语法、配置全量生成与`CheckOnly`、目标严格UTF-8及限定`git diff --check`。数学基准为`117`护甲下`801 -> 239.82`、`1401 -> 419.46`。
 - 尚需Workshop Tools完全停止当前会话后冷启动实测：确认`801`最终扣血约`240`，`MONSTER_PHYSICAL_DAMAGE_FILTER.filtered_damage`等于最终扣血；再抽样30%穿甲、物理技能、科技/毒云减甲、负护甲及非怪物隔离。自动测试不等于引擎实机验证。
 
+## 当前任务（2026-08-14）：怪物物理伤害改用项目 War3 护甲公式
+
+- 用户实机确认无任何科技时，`801`攻击命中`117` War3护甲怪物扣血`262`；该结果与`34.322`运行时护甲按引擎`0.06`曲线结算一致，证明此前现代非线性映射并未得到目标`240`。
+- 用户批准怪物物理伤害不再依赖Dota原生护甲曲线或护甲映射。所有命中明确项目怪物的物理伤害统一按`X / (1 + 0.02 * max(0, A))`结算，`A`为CSV派生的当前有效War3护甲；负护甲保留状态/UI值，但伤害按0护甲处理，不提供额外增伤。
+- 实施边界：保持`DAMAGE_TYPE_PHYSICAL`，在唯一Damage Filter内结算并追加忽略原生物理护甲flag；不递归`ApplyDamage`、不创建第二个Filter。普通攻击和项目物理技能使用同一规则，魔法/纯粹及非怪物目标不变。百分比穿甲先在War3域缩放有效正护甲。
+- 当前状态：生产实现与自动验证完成。怪物生成边界引擎护甲归零；Damage Filter统一处理物理攻击/技能、穿甲和忽略原生护甲flag；固定减甲与毒云百分比减甲维护有效War3护甲；选中单位UI和诊断使用同一权威值。
+- 自动验证通过：`CUSTOM_MONSTER_ARMOR_PASS`、`CUSTOM_MONSTER_POISON_ARMOR_PASS`、`ARMOR_REDUCTION_MAPPING_PASS`、`ARMOR_MAPPING_CONTRACT_PASS`、`COMBAT_STAT_PROJECTION_PASS`、`DAMAGE_TRANSACTION_ARMOR_IGNORE_PASS`、目标Lua 5.1语法、配置全量生成与`CheckOnly`、目标严格UTF-8及限定`git diff --check`。数学基准为`117`护甲下`801 -> 239.82`、`1401 -> 419.46`。
+- 尚需Workshop Tools完全停止当前会话后冷启动实测：确认`801`最终扣血约`240`，`MONSTER_PHYSICAL_DAMAGE_FILTER.filtered_damage`等于最终扣血；再抽样30%穿甲、物理技能、科技/毒云减甲、负护甲及非怪物隔离。自动测试不等于引擎实机验证。
+
+## 当前插入任务（2026-08-12）：原生技能栏项目快捷键标签
+
+- 目标：保留Valve原生技能栏与输入链，由项目在每个当前可见Ability面板上显示权威快捷键标签。普通技能按项目可见顺序使用`Q/W/E/R/T/Y/U`；工具技能按Ability身份使用`D/F/F2`，现有工具图标顺序`D -> F2 -> F`不变。
+- 最新Workshop Tools截图推翻了“引擎槽`N`必然对应原生面板`AbilityN`”的旧结论：Builder使用`AbilityLayout "12"`，技能栏左侧存在额外原生组件；初始业务技能仍位于引擎槽`0`，Blink仍位于槽`5`，但实际两个可见按钮可对应`Ability1/Ability2`，旧实现因此留下Valve原生`W/E`。本轮只修正显示目标解析，不修改CSV、生成Lua、Ability KV、引擎槽、输入处理或HUD架构。
+- 生产实现完成：原工具技能覆盖层已泛化为`SurvivalAbilityHotkey`。每次重贴先清空当前标签与旧`SurvivalUtilityHotkey`；当前映射面板的原生`HotkeyContainer`仅设`opacity=0`并关闭自身及子级命中，不使用`collapse`，不影响按钮布局、图标、冷却、等级、充能或升级按钮。压制前保存Valve原有`opacity/hittest/hittestchildren`，清理、无有效选中单位或面板复用时恢复原值。
+- 显示目标已与引擎槽解耦：只收集当前可见、尺寸有效且不属于旧HUD的原生`AbilityN`按钮锚点，按窗口几何从左到右排序，再与项目业务可见技能顺序逐一配对；数量不一致时原子失败并重试。标签与`DOTADisabled`共用同一配对结果，不再使用`entry.slot -> AbilityN`或压缩下标定位。
+- 刷新签名同时包含`selected unit + engine slot + ability entindex + ability name`和本轮原生面板顺序；选择事件会强制重贴，Ability runtime事件与既有0.25秒HUD生命周期同时检查技能替换、面板顺序变化、标签完整性和原生`HotkeyContainer`压制状态，原1秒刷新保留为晚创建兜底。`ui_bootstrap.js`继续保持`abilities: false`。
+- 自动验证完成：Resource Compiler输出`OK: 1 compiled, 0 failed, 0 skipped`，产物84450字节并包含几何映射、原生快捷键压制/恢复和完整性检查符号；`COMBAT_STATS_UTILITY_HOTKEY_CONTRACT_PASS`覆盖Builder CSV/生成Lua、初始`Ability1/Ability2`错位场景、槽洞、英雄`D/F2/F`映射及压制/恢复行为，`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、PowerShell解析、相关2个Lua的Luac 5.1语法、严格UTF-8、编译产物符号及Game/Content限定`git diff --check`通过。未修改CSV或生成Lua。
+- 剩余：Workshop Tools完全冷启动，确认疑似Valve原生`W/E/D/F/R`消失后，逐个记录仅剩`SurvivalAbilityHotkey`显示的字母；同时验证Builder/正式英雄/建筑切换、技能替换和重排、Ability面板复用，以及鼠标和`Q/W/E/R/T/Y/U/D/F/F2`输入仍正常。自动契约与资源编译不是实机视觉验收。
+
 ## 已完成插入任务（2026-08-12）：主城/城墙等级名称与城墙原始护甲Tooltip
 
 - 目标：主城和城墙的单位名称随当前等级使用权威`building_levels.csv.display_name`；城墙升级Tooltip使用相邻等级CSV原始`war3_armor`差值，例如`10 -> 15 (+5)`。
@@ -176,12 +195,18 @@
 - 无关既有失败保持不变：两份批量升级旧测试分别缺少当前`event_bus.request` Mock并要求已删除的客户端selection snapshot；旧城墙健康测试仍调用已删除的`apply_preserved_ratio`；单位模型旧契约仍缺伐木工模型CSV项。未修改这些无关测试或数据迎合。
 - 用户于2026-08-12明确确认问题圆满完成，本任务已验收并关闭；后续会话不得再将其恢复为活跃任务。
 
+## 已完成插入任务（2026-08-12）：combat_stats无效快捷键刷新调用
 
-## 当前插入任务（2026-08-12）：热重载 Modifier 注册与小地图显式纹理
+- 用户实机日志确认`combat_stats.js:1057`在无有效选中单位分支调用不存在的`refreshOfficialReturnHomeHotkey([])`，随后抛出ReferenceError并跳过该轮脚本。当前Content源码和Game编译产物均包含旧符号，不能按历史文档中的“已修复”结论忽略。
+- 最小修复只把该分支改为项目现有且正常分支已使用的`refreshOfficialUtilityHotkeys([])`，保留后续1秒调度、技能运行状态和快捷键映射逻辑。定向重编译`combat_stats.vjs_c`，不修改CSV、小地图、粒子或其他Panorama文件。
+- 生产修改与自动验证完成：源码和编译产物均不再包含`refreshOfficialReturnHomeHotkey`且保留`refreshOfficialUtilityHotkeys`；专项契约输出`COMBAT_STATS_UTILITY_HOTKEY_CONTRACT_PASS`，Resource Compiler输出`OK: 1 compiled, 0 failed, 0 skipped`。目标源码、测试及本轮文档严格UTF-8通过，Game/Content限定`git diff --check`通过。
+- 用户已在Workshop Tools实机确认修复后不再出现`refreshOfficialReturnHomeHotkey is not defined`。该ReferenceError任务已通过用户验收并关闭；专项契约继续作为旧符号回归门禁。
 
-- 最新Workshop Tools实机失败：冷启动后持续输出`file mod 'dota_addons/survival' is invalid`，按需重编译`template_map.vtex`和`survival_hud.vxml`均被同指纹抑制，小地图仍然花屏；因此此前“显式VTEX已修复小地图”的结论撤回，当前状态改为资产挂载身份修复进行中。
-- 只读取证确认Game/Content物理目录均为`dota_addons/Survival`，但`template_map.vmat_c`、`template_map.vtex_c`及本次重编译的`survival_hud.vxml_c`内部均记录`dota_addons/survival`，`tools_asset_info.bin`同时含大小写两种file mod身份。相同错误还阻断长期存在的Panorama金币图标依赖，说明首要根因是插件目录大小写与资产数据库身份冲突，不是单独VTEX扩展名或TGA文件头损坏。
-- 当前实施状态：已停止孤立`resourcecompiler.exe`，旧`tools_asset_info.bin`已移出插件目录并备份到`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`；按用户要求不重编译HUD/Panorama/粒子既有修改，只定向处理小地图VTEX/VMAT。Game/Content两次两阶段改名均被当前VS Code工作区目录句柄拒绝，未留下中间目录或半迁移状态；必须关闭当前VS Code工作区后执行`tools/finalize_addon_file_mod_case.ps1`完成物理改名、定向重编译和最终契约。
+## 已完成插入任务（2026-08-12）：热重载 Modifier 注册与小地图显式纹理
+
+- 历史失败表现为冷启动持续输出`file mod 'dota_addons/survival' is invalid`，小地图花屏且Panorama按需编译受阻。根因已确定为Game/Content物理目录`Survival`与编译资源`dota_addons/survival`的file-mod大小写身份冲突，不是TGA文件头或单独VTEX扩展名损坏。
+- Game/Content物理目录现已统一为全小写`dota_addons/survival`。用户Workshop Tools实机确认小地图恢复正常，该问题已验收关闭；后续不得把目录改回大写`Survival`，也不得创建大小写并存的第二个addon身份。
+- 旧`tools_asset_info.bin`备份仍位于`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`。本次JS修复不修改或重编译现有小地图VTEX/VMAT、HUD依赖链及粒子资源。
 - 用户实机日志显示 Mango Tree 模型缺少 `attach_hitloc`，以及召唤猴王后多个英雄核心 Modifier 被引擎判定为 unknown；同时存在 `modifier_single_health_bar` 重复告警。
 - 权威资源树模型继续来自 `data/csv/资源系统/world_visual_definitions.csv`，本任务不擅自更换模型或修改树木数值。
 - 审计确认 `modifier_single_health_bar` 只剩兼容标记，已不负责自定义血条，可停用自动附加链；其余攻击上限、CSV射程/生命、装备、暴击和科技 Modifier 仍在生产使用，不得注释。
@@ -190,10 +215,10 @@
 - 英雄替换的CSV基础属性应用现在受`pcall`保护；提交前按英雄CSV检查攻击上限、攻击射程、基础生命及条件性法力Modifier是否实际存在。添加异常或实体缺失返回`hero_modifier_apply_failed`，不写召唤成功状态、不发布`HERO_SUMMONED`。装备效果、攻击投影和攻击追踪仍由既有`hero_combat_stat_service`在同步`HERO_SUMMONED`链创建，科技Modifier继续按条件性效果运行，未复制第二套服务。
 - 猴王四件Cult of the Demon Trickster饰品继续使用原模型、`material_group="1"`、四个环境粒子、Owner和`FollowEntity`骨骼跟随；`hero_cosmetic_service`只移除了`prop_dynamic`创建参数中的`DefaultAnim="idle"`，避免模型不存在该序列时产生四次告警。
 - Mango Tree权威CSV及生成Lua继续保持`models/props_tree/mango_tree.vmdl`、缩放3。自定义魔法塔粒子会先用`ScriptLookupAttachment`确认`attach_attack1/attach_hitloc`存在，缺失时改用实体世界坐标，不再强绑不存在的attachment。
-- 小地图Content源`materials/overviews/template_map.vtex`现已对齐Valve overview schema：同目录相对输入`./template_map.tga`、声明`DXT1`及官方clear color/dimension/clamp/LOD字段；`template_map.vmat`继续引用显式VTEX。当前大写物理目录下定向强制编译VTEX、VMAT均为`1 compiled, 0 failed, 0 skipped`，且二进制字符串只含`dota_addons/survival`；但`resourceinfo.exe`仍把VMAT ManifestResource报告为`dota_addons/Survival`，证明物理改名尚未完成，不能把离线编译记为最终修复。
-- 小地图契约已增加Game/Content目录精确小写、源VTEX相对路径和DXT1声明、编译产物file-mod大小写、`resourceinfo` ManifestResource以及重建后资产索引不得含大写身份的检查。当前契约按预期失败于`GAME_ADDON_DIRECTORY_NOT_CANONICAL_LOWERCASE`；只有最终化脚本输出`ADDON_FILE_MOD_CASE_FINALIZE_PASS`后才能记录自动修复完成。`.cline/local-toolchain.json`已修正为实际E盘工作区、Python 3.14.3、Lua/Luac 5.1.5和PowerShell 7.6.4路径并逐项实测。
+- 小地图Content源`materials/overviews/template_map.vtex`保持Valve overview schema：同目录相对输入`./template_map.tga`、声明`DXT1`及官方clear color/dimension/clamp/LOD字段；`template_map.vmat`继续引用显式VTEX。Game/Content全小写后，用户已实机确认该资源链正常显示。
+- 小地图契约继续锁定Game/Content目录精确小写、源VTEX相对路径和DXT1声明、编译产物file-mod大小写、`resourceinfo` ManifestResource以及资产索引不得含大写身份。当前额外复跑仍失败于既有`template_map_tga_d9088edf.vtex_c`残留，未为本次JS任务删除或修改该资源；这项静态残留不否定用户已确认的小地图实机显示正常。`.cline/local-toolchain.json`使用实际E盘工作区、Python 3.14.3、Lua/Luac 5.1.5和PowerShell 7.6.4路径。
 - Mango Tree继续保持`models/props_tree/mango_tree.vmdl`、缩放3、现有数值和原生攻击链。用户已决定接受原生攻击特效对该资产缺少`attach_hitloc`的无功能影响引擎告警；项目自定义魔法塔粒子的attachment回退仍保留。16 MiB Lua内存信息仅记为高水位提示，当前没有泄漏证据。
-- 下一步唯一动作：关闭当前VS Code窗口及Workshop Tools，在插件目录外用PowerShell 7执行`E:\steam\steamapps\common\dota 2 beta\game\dota_addons\Survival\tools\finalize_addon_file_mod_case.ps1`。脚本会通过中间名把Game/Content统一为全小写`survival`、仅重编译小地图VTEX/VMAT并运行最终契约，失败时回滚半迁移。随后冷启动Workshop Tools确认不再出现`file mod ... is invalid`、小地图无花屏；Modifier与猴王饰品仍按原实机清单单独验证。Source 2注册与资源管理器时序只能由引擎验证，自动测试不能称为实机验收。
+- 小地图大小写任务已关闭。Modifier与猴王饰品仍按原实机清单单独验证；Source 2注册与资源管理器时序只能由引擎验证，自动测试不能称为实机验收。
 ## 当前实施任务（2026-08-13）：炙热巨箭公式与普通攻击完全抑制
 
 - 用户已批准实施并确认穿透编号从`n=0`开始：第n个路径命中目标的技能伤害基数为`Attack × 3.24 × 0.8^n`，再按目标30%穿甲后的War3物理护甲曲线`1 / (1 + 0.02 × A × 0.7)`结算。

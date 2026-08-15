@@ -39,7 +39,7 @@ M.repair_detection_range = M.number(
     "repair_detection_range",
     FIND_UNITS_EVERYWHERE or 99999
 )
-M.dev_wall_health = M.number("dev_wall_health", 10000000)
-M.dev_wall_war3_armor = M.number("dev_wall_war3_armor", 1000)
+--M.dev_wall_health = M.number("dev_wall_health", 10000000)
+--M.dev_wall_war3_armor = M.number("dev_wall_war3_armor", 1000)
 
 return M
