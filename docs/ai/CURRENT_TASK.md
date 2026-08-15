@@ -1,5 +1,21 @@
 # Current Task
 
+## 当前插入任务（2026-08-15）：主城升级Tooltip隐藏生命与护甲变化
+
+- 用户要求“升级主城”技能Tooltip不再显示生命、护甲的升级前后变化，等级、人口上限、资源费用、状态等其他内容保持现状。
+- 数据边界：主城实际生命、护甲、人口和升级费用继续读取`building_levels.csv`并照常结算；仅调整`ability_upgrade_city`运行时Tooltip字段，不影响城墙、农场、金矿或防御塔升级Tooltip。
+- 验证要求：增加专项Lua测试，锁定主城字段过滤和其他建筑回归；执行Lua 5.1语法、严格UTF-8及限定`diff --check`。自动验证不等于Workshop Tools实机Tooltip验收。
+- 实施完成：`ability_upgrade_city`调用通用建筑升级视图模型时显式关闭生命、护甲字段；主城实际升级数值与结算未改，通用逻辑的其他调用继续默认显示原字段。
+- 自动验证通过：`CITY_UPGRADE_TOOLTIP_FIELDS_PASS`、生产与测试Lua 5.1语法、目标文件严格UTF-8及限定`diff --check`。尚需Workshop Tools冷启动或脚本热重载后悬停“升级主城”确认最终视觉；自动测试不等于引擎实机验收。
+
+## 当前插入任务（2026-08-15）：城墙同时攻击地面怪数量由五只收紧为四只
+
+- 用户实机确认当前城墙可同时被五只地面怪攻击，批准通过小幅增大正式地面波次怪碰撞体，将同时攻击数量收紧为四只。
+- 实施边界：城墙Hull继续保持256；正式地面普通怪、领头怪、精英和Boss的基础Hull由29调整为32，并改由`global_rules.csv`权威配置；不修改攻击距离、模型或模型缩放。普通飞行怪Hull 10、特殊飞行怪Hull 0及五种挑战怪固定Hull 0保持不变。
+- 验证要求：更新地面/飞行碰撞专项测试，执行CSV生成一致性、Lua 5.1行为与语法、严格UTF-8和限定`diff --check`。自动验证不等于Workshop Tools实机确认四只同时攻击。
+- 实施完成：`global_rules.csv`新增`wave_ground_monster_hull_radius=32`并定向生成；`wave_monster_collision`改为读取该权威配置，正式地面普通、领头、精英和Boss统一从29增至32。城墙、飞行怪、挑战怪、攻击距离和模型配置均未修改。
+- 自动验证通过：`WALL_COLLISION_BLINK_LUA51_PASS`、`WAVE_FLYING_COLLISION_PASS`、目标Lua 5.1语法、`GLOBAL_RULES_BYTE_MATCH_PASS`、严格UTF-8及限定`diff --check`。尚需Workshop Tools完全冷启动观察城墙周围实际站位，确认同时攻击者由五只变为四只。
+
 ## 当前插入任务（2026-08-15）：按录像提取工作簿校正城墙全等级血量
 
 - 用户要求按`C:\Users\li\Downloads\城墙全等级血量护甲数据_2026-08-15.xlsx`修正当前城墙血量；工作簿含1-30级、对应`1-1`至`10-3`的权威血量与护甲。

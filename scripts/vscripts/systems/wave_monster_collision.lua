@@ -1,4 +1,5 @@
 local M = {}
+local global_rules = require("config/global_rules")
 
 function M.profile(row, definition)
     row = row or {}
@@ -9,7 +10,7 @@ function M.profile(row, definition)
     local flying = movement_type == "flying"
     local role = tostring(row.member_role or "")
     local normal_flying = flying and (role == "" or role == "normal")
-    local base_hull_radius = 29
+    local base_hull_radius = global_rules.wave_ground_monster_hull_radius
 
     if normal_flying then
         base_hull_radius = 10

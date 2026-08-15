@@ -1,3 +1,9 @@
+## 2026-08-15 - 城墙同时攻击地面怪数量收紧
+
+- 用户实机确认地面Hull 29时城墙可同时被五只地面怪攻击，批准小幅增大怪物碰撞体，将目标收紧为四只。城墙Hull继续保持256，怪物攻击距离、模型和模型缩放不变。
+- `global_rules.csv`新增权威规则`wave_ground_monster_hull_radius=32`并定向生成；`wave_monster_collision`不再硬编码29，正式地面普通、领头、精英和Boss统一读取32。普通飞行怪Hull 10、特殊飞行怪Hull 0与五种挑战怪专属Hull 0边界保持不变。
+- 自动验证通过：`WALL_COLLISION_BLINK_LUA51_PASS`、`WAVE_FLYING_COLLISION_PASS`、目标Lua 5.1语法、生成Lua逐字节一致、严格UTF-8及限定`diff --check`。这些检查证明配置与分类调用链正确，不等于Workshop Tools实机站位验收；仍需完全冷启动确认实际同时攻击者为四只。
+
 ## 2026-08-14 - 挑战怪零碰撞、挑战建筑视觉与自动Toggle修复完成
 
 - 五种研究所挑战怪在`wave_system.spawn_challenge_monster()`专属边界固定`SetHullRadius(0)`，基础Hull记录为0，并向城墙AI传递`no_unit_collision=1`；正式波次碰撞profile、正式`enemies`集合和`scalemonster`行为未被扩展到挑战怪。

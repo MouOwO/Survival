@@ -3,7 +3,7 @@
 ## 城墙War3护甲、正式波次碰撞与D位移截断（2026-08-15）
 
 - 城墙基础护甲来自`building_levels.csv.war3_armor`；科技`super_wall_armor_flat`和山岭巨人`challenge_wall_armor_flat`虽然在既有聚合层按Dota单位`/3`保存，但投影到城墙自定义护甲状态时必须乘回3。城墙原生Dota护甲固定为0，全部物理伤害由唯一Damage Filter按`1/(1+0.02*max(0,有效War3护甲))`结算并忽略原生护甲；百分比穿甲先作用于War3护甲。
-- 正式波次所有地面怪不区分普通、精英、领头怪或Boss，基础HullRadius统一为29。普通飞行怪保持10，飞行精英/领头/Boss保持0和无单位碰撞；五种研究所挑战怪继续走专属Hull 0边界。`scalemonster`只按缓存的基础Hull非累计缩放，不能修改模型缩放。
+- 正式波次所有地面怪不区分普通、精英、领头怪或Boss，基础HullRadius统一从`global_rules.csv.wave_ground_monster_hull_radius`读取，当前为32，用于将城墙周围同时攻击者由五只收紧为四只。普通飞行怪保持10，飞行精英/领头/Boss保持0和无单位碰撞；五种研究所挑战怪继续走专属Hull 0边界。`scalemonster`只按缓存的基础Hull非累计缩放，不能修改模型缩放。
 - 建造者和防御塔D实际最大位移1000，英雄D实际最大位移800。鼠标目标超范围时，过滤与执行都必须用公共helper沿光标方向截断到最大距离，再执行原有地形、占用、旅行状态等校验；不得返回距离超限。防御塔的Ability与Panorama请求入口都执行该规则，最终移动继续通过`building_system.relocate_building()`。
 
 ## 挑战怪碰撞、挑战建筑视觉与Toggle输入边界（2026-08-14）

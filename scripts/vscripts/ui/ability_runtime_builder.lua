@@ -285,7 +285,8 @@ local function build_ability(ability_name, state, resources)
         resources
     )
 end
-local function upgrade_level(definition, current_level, resources, state)
+local function upgrade_level(definition, current_level, resources, state, display)
+    display = display or {}
     local next_level = current_level + 1
     local data = definition.levels
         and definition.levels[next_level] or nil
@@ -312,8 +313,12 @@ local function upgrade_level(definition, current_level, resources, state)
     if not population and (tonumber(data.add_population) or 0) ~= 0 then
         population = "+" .. tostring(data.add_population)
     end
-    if health then fields[#fields + 1] = { label = "生命", value = health } end
-    if armor then fields[#fields + 1] = { label = "护甲", value = armor } end
+    if health and display.health ~= false then
+        fields[#fields + 1] = { label = "生命", value = health }
+    end
+    if armor and display.armor ~= false then
+        fields[#fields + 1] = { label = "护甲", value = armor }
+    end
     if population then fields[#fields + 1] = { label = "人口上限", value = population } end
     local result = merge({
         available = 1,
@@ -603,7 +608,8 @@ function M.build(ability_name, state, resources)
             buildings.main_city,
             state.level,
             resources,
-            state
+            state,
+            { health = false, armor = false }
         )
     end
     if ability_name == "ability_train_lumberjack" then
