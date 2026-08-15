@@ -513,12 +513,6 @@ function M.precache(context)
     local units = {
         "npc_dota_hero_undying",
         "npc_survival_builder_proxy",
-        "npc_dota_hero_doom_bringer",
-        "npc_dota_hero_nevermore",
-        "npc_dota_hero_axe",
-        "npc_dota_hero_drow_ranger",
-        "npc_dota_hero_monkey_king",
-        "npc_dota_hero_sven",
         "npc_survival_doom_infernal",
         "npc_survival_drow_companion",
         "building_wall",
@@ -750,6 +744,7 @@ local function initialize_services()
     require("systems/player_context_service").init()
     builder_service.init()
     asset_preload_service.init()
+    require("systems/hero_asset_preload_service").init()
     unit_health_bar_service.init()
     combat_bootstrap.init()
     assert(tree_attack_order_filter.register(),

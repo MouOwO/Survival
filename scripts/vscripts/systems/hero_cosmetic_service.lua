@@ -1,9 +1,43 @@
 local config = require("config/hero_cosmetics_config")
+local asset_catalog = require("config/asset_catalog")
 local logger = require("core/logger")
 
 local M = {}
 
 local cosmetics_by_hero = {}
+
+local function definition_for(hero_id)
+    local asset = asset_catalog.resolve_bundle(
+        "hero_permanent_" .. tostring(hero_id or "")
+    )
+    if not asset then return config[hero_id] end
+    local wearables = {}
+    for _, component in ipairs(asset.components or {}) do
+        wearables[#wearables + 1] = {
+            id = component.component_id,
+            model = component.model_path,
+        }
+    end
+    local particles = {}
+    for _, effect in ipairs(asset.effects or {}) do
+        if effect.effect_role == "ambient" then
+            particles[#particles + 1] = {
+                id = effect.effect_id,
+                path = effect.particle_path,
+                owner = effect.owner_component_id,
+                attach_type = effect.attach_type,
+            }
+        end
+    end
+    local local_definition = config[hero_id] or {}
+    return {
+        material_group = asset.material_group,
+        hide_default_wearables = local_definition.hide_default_wearables
+            ~= false and #wearables > 0,
+        wearables = wearables,
+        particles = particles,
+    }
+end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -157,7 +191,8 @@ local function spawn_particle(hero, particle, components)
 end
 
 function M.precache(context)
-    for _, definition in pairs(config) do
+    local definitions = { config.builder_undying }
+    for _, definition in ipairs(definitions) do
         for index, entry in ipairs(definition.wearables or {}) do
             local _, model_path = normalize_wearable(entry, index)
             local ok, error_message = pcall(
@@ -199,7 +234,7 @@ function M.apply(hero, hero_id)
         return false
     end
 
-    local definition = config[hero_id]
+    local definition = definition_for(hero_id)
     if not definition then
         return false
     end

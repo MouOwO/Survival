@@ -1,3 +1,15 @@
+## 当前实施任务（2026-08-15）：英雄永久异步预载与召唤READY门禁
+
+- 用户报告部分电脑执行`addhero`时客户端闪退，怀疑英雄主体、饰品组件和常驻粒子在`ReplaceHeroWithNoTransfer()`后同帧集中实例化造成冷资源峰值。调查确认六个英雄主体已在地图`Precache`阶段同步预载，英雄饰品也由`hero_cosmetic_service.precache()`同步预载，但尚未纳入游戏开始后的异步完整bundle队列。
+- 代码库没有`collectgarbage("collect")`或`ForceGarbageCollection`；现有`collectgarbage("count")`只读取Lua内存。Workshop Lua没有已确认安全的运行时模型卸载API，`asset_preload.retire()`仅改变项目Lua状态且阻止后续请求，不能描述为Source 2资源卸载。
+- 用户批准方案：六个英雄及其饰品/粒子以CSV资源bundle为权威，在`GAME_STARTED`后宽松分帧异步加载，`resident_policy=permanent`，整局不调用项目退休/释放路径。目标英雄未READY时，`addhero`和祭坛召唤返回已受理等待态，提示“英雄资源准备中”；READY后重新执行完整权威校验并自动召唤，失败则清理等待态、明确提示并允许重试。
+- 并发语义：同一bundle全局去重；同一玩家重复选择同一英雄幂等；改选另一英雄时最新请求覆盖旧请求；不同玩家互不覆盖。不得修改英雄平衡、资格、ownership、`HERO_SUMMONED`载荷和正式英雄cosmetics生命周期。
+- 验证范围：CSV/生成Lua一致性、完整代理KV依赖、开局渐进调度、多人/覆盖/失败重试门禁、`addhero`完成时序、祭坛回归、Lua 5.1语法、配置CheckOnly、严格UTF-8和限定`git diff --check`。自动验证不能替代Workshop Tools冷启动下的帧时间、显存和闪退验证。
+- 实施完成：六个战斗英雄已从`addon_game_mode.precache()`同步单位列表移除；CSV新增`hero_permanent`永久bundle，精确保留现有Axe Searing Annihilator五件套、Monkey King Demon Trickster四件套/四条ambient、Blademaster Cyclopean Marauder五件套，Doom/Shadow Fiend/Drow仅使用原生主体。六个`asset_proxy_hero_*`的KV依赖与CSV一致，运行时cosmetics改为从CSV bundle读取，Builder继续保持原生外观。
+- `hero_asset_preload_service`在`GAME_STARTED`启动30秒渐进窗口（80%窗口内发出六项请求），召唤时目标bundle升级为urgent并允许FAILED重试。`hero_summon_system`按玩家保存generation等待项：同英雄重复幂等且合并完成回调，改选覆盖旧项，多玩家隔离；READY后重新执行祭坛、主城、VIP、位置和重复召唤校验，再进入`ReplaceHeroWithNoTransfer()`，并显式恢复owner/control兜底。
+- `addhero`在资源等待时不再提前加钱、解锁商城或显示测试环境完成；异步召唤成功后才执行这些动作。正常祭坛Ability对pending保持已受理语义，资源失败会提示并清理等待项，后续请求可重试。
+- 自动验证通过：`HERO_ASSET_PRELOAD_SERVICE_PASS`、`HERO_SUMMON_PRELOAD_GATE_PASS`、`HERO_SUMMON_OWNER_PASS`、`ADDHERO_CHEAT_PASS`、`HERO_COSMETIC_SERVICE_PASS`、`ASSET_PRELOAD_GRADUAL_PASS`、`HERO_ASSET_PRELOAD_CONTRACT_PASS`、`ADDON_PRECACHE_CONTRACT_PASS`、目标Lua 5.1语法和限定`git diff --check`。仍需Workshop Tools完全Stop后冷启动，记录六bundle READY时序/帧尖峰，分别测试两名玩家改选和同时召唤，并检查客户端闪退与新`.mdmp`；未执行前不得称为引擎实机通过。
+
 # Current Task
 
 ## 当前插入任务（2026-08-15）：主城升级Tooltip隐藏生命与护甲变化

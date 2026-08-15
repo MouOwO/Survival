@@ -443,6 +443,34 @@ local function summon_hero(context)
 end
 
 local function add_test_hero(context)
+    local function finish_test_environment(result)
+        if not result or result.ok ~= true then
+            notify(context, "英雄自动召唤失败："
+                .. tostring(result and result.error or "unknown"), "error")
+            return false
+        end
+        local resources = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            team = context.team,
+            wood = 100000000,
+            gold = 100000000,
+            reason = "cheat_addhero_test_resources",
+        })
+        if not resources or not resources.ok then return false end
+        local unlocked = event_bus.request(events.SHOP_DEBUG_UNLOCK_REQUEST, {
+            player_id = context.player_id,
+            unlocked = true,
+        })
+        if not unlocked or not unlocked.ok then return false end
+        show_shop(context)
+        notify(context, "测试环境已就绪：齐天大圣、金币1亿、木材1亿、商城全解锁")
+        print(string.format(
+            "[CHEAT_ADDHERO_READY] player=%s team=%s hero=hero_monkey_king gold=%s wood=%s shop_unlocked=true",
+            tostring(context.player_id), tostring(context.team),
+            tostring(resources.snapshot and resources.snapshot.gold or ""),
+            tostring(resources.snapshot and resources.snapshot.wood or "")))
+        return true
+    end
+
     local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
         player_id = context.player_id,
     })
@@ -452,6 +480,7 @@ local function add_test_hero(context)
             hero_id = "hero_monkey_king",
             reason = "cheat_addhero",
             debug_bypass = true,
+            on_completed = finish_test_environment,
         })
         if not summoned or not summoned.ok then
             return false, summoned and summoned.error or "hero_summon_failed"
@@ -460,31 +489,13 @@ local function add_test_hero(context)
         return false, "another_hero_already_summoned"
     end
 
-    local resources = event_bus.request(events.RESOURCE_ADD_REQUEST, {
-        team = context.team,
-        wood = 100000000,
-        gold = 100000000,
-        reason = "cheat_addhero_test_resources",
-    })
-    if not resources or not resources.ok then
-        return false, resources and resources.error or "resource_request_failed"
+    if summoned.pending == true then
+        notify(context, "齐天大圣资源正在准备，完成后自动开启测试环境")
+        return true
     end
-
-    local unlocked = event_bus.request(events.SHOP_DEBUG_UNLOCK_REQUEST, {
-        player_id = context.player_id,
-        unlocked = true,
-    })
-    if not unlocked or not unlocked.ok then
-        return false, unlocked and unlocked.error or "shop_debug_unlock_failed"
+    if not finish_test_environment(summoned) then
+        return false, "test_environment_setup_failed"
     end
-
-    show_shop(context)
-    notify(context, "测试环境已就绪：齐天大圣、金币1亿、木材1亿、商城全解锁")
-    print(string.format(
-        "[CHEAT_ADDHERO_READY] player=%s team=%s hero=hero_monkey_king gold=%s wood=%s shop_unlocked=true",
-        tostring(context.player_id), tostring(context.team),
-        tostring(resources.snapshot and resources.snapshot.gold or ""),
-        tostring(resources.snapshot and resources.snapshot.wood or "")))
     return true
 end
 

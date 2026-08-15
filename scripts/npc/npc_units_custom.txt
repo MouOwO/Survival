@@ -625,4 +625,61 @@
     "asset_proxy_wall_tiny_frostmoot_large" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/frozen_stonehenge/frozen_stonehenge_lvl_04.vmdl" "ProjectileModel" "particles/econ/items/tiny/tiny_frozen_stonehenge/tiny_stonehenge_ambient_lvl4.vpcf" }
     "asset_proxy_wall_tiny_astral_origins_back" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/tiny_astral_order_back/tiny_astral_order_back.vmdl" "ProjectileModel" "particles/econ/items/tiny/tiny_astral_order/tiny_astral_order_back_ambient.vpcf" }
     "asset_proxy_wall_tiny_colossus_monolith" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/tiny_prestige/tiny_prestige_lvl_04.vmdl" "ProjectileModel" "particles/econ/items/tiny/tiny_prestige/tiny_prestige_lvl4_ambient.vpcf" }
+    "asset_proxy_hero_doom"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/doom/doom.vmdl"
+    }
+    "asset_proxy_hero_shadow_fiend"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/shadow_fiend/shadow_fiend.vmdl"
+    }
+    "asset_proxy_hero_axe"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/axe/axe.vmdl"
+        "precache"
+        {
+            "model" "models/items/axe/searing_annihilator_head/searing_annihilator_head.vmdl"
+            "model" "models/items/axe/searing_annihilator_armor/searing_annihilator_armor.vmdl"
+            "model" "models/items/axe/searing_annihilator_weapon/searing_annihilator_weapon.vmdl"
+            "model" "models/items/axe/searing_annihilator_belt/searing_annihilator_belt.vmdl"
+            "model" "models/items/axe/searing_annihilator_arms/searing_annihilator_arms.vmdl"
+        }
+    }
+    "asset_proxy_hero_drow_ranger"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/drow/drow_base.vmdl"
+    }
+    "asset_proxy_hero_monkey_king"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/monkey_king/monkey_king.vmdl"
+        "precache"
+        {
+            "model" "models/items/monkey_king/mk_ti9_immortal_armor/mk_ti9_immortal_armor.vmdl"
+            "model" "models/items/monkey_king/mk_ti9_immortal_head/mk_ti9_immortal_head.vmdl"
+            "model" "models/items/monkey_king/mk_ti9_immortal_shoulder/mk_ti9_immortal_shoulder.vmdl"
+            "model" "models/items/monkey_king/mk_ti9_immortal_weapon/mk_ti9_immortal_weapon.vmdl"
+            "particle" "particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_armor_ambient.vpcf"
+            "particle" "particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_weapon_ambient.vpcf"
+            "particle" "particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_head_ambient.vpcf"
+            "particle" "particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_shoulders_ambient.vpcf"
+        }
+    }
+    "asset_proxy_hero_blademaster"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/sven/sven.vmdl"
+        "precache"
+        {
+            "model" "models/items/sven/gaze_cyclopean_marauder/gaze_cyclopean_marauder.vmdl"
+            "model" "models/items/sven/pauldron_cyclopean_marauder/pauldron_cyclopean_marauder.vmdl"
+            "model" "models/items/sven/gauntlet_cyclopean_marauder/gauntlet_cyclopean_marauder.vmdl"
+            "model" "models/items/sven/fauld_cyclopean_marauder/fauld_cyclopean_marauder.vmdl"
+            "model" "models/items/sven/greatsword_cyclopean_marauder/greatsword_cyclopean_marauder.vmdl"
+        }
+    }
 }

@@ -934,6 +934,22 @@ local function register_ability_cast_request()
                         player_id = player_id,
                         hero_id = summon_hero_id,
                         source = "altar_ui_ability",
+                        on_completed = function(final_result)
+                            if final_result and final_result.ok then return end
+                            if ability and not ability:IsNull() then
+                                ability:EndCooldown()
+                            end
+                            local final_message = final_result
+                                and final_result.error or nil
+                            if final_message and not string.find(final_message,
+                                    "^hero_resource_load_failed:") then
+                                event_bus.emit(events.UI_NOTIFICATION, {
+                                    player_id = player_id,
+                                    message = final_message,
+                                    level = "error",
+                                })
+                            end
+                        end,
                     }
                 )
             end

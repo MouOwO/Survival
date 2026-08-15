@@ -7,6 +7,7 @@ local cosmetic_service = require("systems/hero_cosmetic_service")
 local projection = require("systems/hero_summon_projection")
 local hero_anchor_service = require("systems/hero_anchor_service")
 local destination_validation = require("systems/destination_validation_service")
+local hero_asset_preload = require("systems/hero_asset_preload_service")
 
 local M = {}
 
@@ -15,6 +16,9 @@ local builder_by_player = {}
 local city_level_by_team = {}
 local summoned_by_player = {}
 local replacing_by_player = {}
+local pending_by_player = {}
+local pending_generation = 0
+local summon
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -133,6 +137,12 @@ local function initialize_replacement(player_id, team, altar, definition)
     end
 
     unit:RemoveNoDraw()
+    if unit.SetPlayerID then unit:SetPlayerID(player_id) end
+    local player = PlayerResource:GetPlayer(player_id)
+    if player and unit.SetOwner then unit:SetOwner(player) end
+    if unit.SetControllableByPlayer then
+        unit:SetControllableByPlayer(player_id, true)
+    end
 
     print(string.format(
         "[HERO_REPLACEMENT_OWNER] player=%s reported_owner=%s entindex=%s",
@@ -224,13 +234,94 @@ local function validate(player_id, hero_id, debug_bypass)
     return altar, definition, nil
 end
 
-local function summon(payload)
+local function complete_pending(player_id, generation, result)
+    local pending = pending_by_player[player_id]
+    if not pending or pending.generation ~= generation then return end
+    pending_by_player[player_id] = nil
+    for _, callback in ipairs(pending.completion_callbacks or {}) do
+        pcall(callback, result)
+    end
+end
+
+local function notify_preload(player_id, message, level)
+    event_bus.emit(events.UI_NOTIFICATION, {
+        player_id = player_id,
+        message = message,
+        level = level or "info",
+    })
+end
+
+local function queue_pending_summon(payload, definition)
+    local player_id = tonumber(payload.player_id)
+    local existing = pending_by_player[player_id]
+    if existing and existing.hero_id == definition.hero_id then
+        if type(payload.on_completed) == "function" then
+            existing.completion_callbacks[#existing.completion_callbacks + 1] =
+                payload.on_completed
+        end
+        return {
+            ok = true,
+            pending = true,
+            hero_id = definition.hero_id,
+            status = "hero_resource_loading",
+        }
+    end
+
+    pending_generation = pending_generation + 1
+    local generation = pending_generation
+    pending_by_player[player_id] = {
+        generation = generation,
+        hero_id = definition.hero_id,
+        payload = payload,
+        completion_callbacks = type(payload.on_completed) == "function"
+            and { payload.on_completed } or {},
+    }
+    notify_preload(player_id, "英雄资源准备中，完成后将自动召唤")
+
+    local queued, status = hero_asset_preload.request(definition.hero_id, {
+        on_ready = function()
+            local pending = pending_by_player[player_id]
+            if not pending or pending.generation ~= generation then return end
+            local retry_payload = {}
+            for key, value in pairs(pending.payload) do
+                retry_payload[key] = value
+            end
+            retry_payload.on_completed = nil
+            local result = summon(retry_payload)
+            complete_pending(player_id, generation, result)
+        end,
+        on_failed = function(reason)
+            local result = {
+                ok = false,
+                error = "hero_resource_load_failed:" .. tostring(reason),
+            }
+            notify_preload(player_id, "英雄资源加载失败，请稍后重试", "error")
+            complete_pending(player_id, generation, result)
+        end,
+    })
+    if not queued then
+        pending_by_player[player_id] = nil
+        return { ok = false, error = status or "hero_resource_queue_failed" }
+    end
+    return {
+        ok = true,
+        pending = true,
+        hero_id = definition.hero_id,
+        status = status,
+    }
+end
+
+summon = function(payload)
     local player_id = tonumber(payload.player_id)
     local hero_id = tostring(payload.hero_id or "")
     local altar, definition, error_code =
         validate(player_id, hero_id, payload.debug_bypass == true)
     if error_code then
         return { ok = false, error = error_code }
+    end
+
+    if not hero_asset_preload.is_ready(hero_id) then
+        return queue_pending_summon(payload, definition)
     end
 
     local team = PlayerResource:GetTeam(player_id)
@@ -273,12 +364,13 @@ local function summon(payload)
     publish(player_id, payload.debug_bypass == true
         and "cheat_hero_summoned" or "hero_summoned")
 
-    return {
+    local result = {
         ok = true,
         hero_id = hero_id,
         entindex = unit:entindex(),
         snapshot = snapshot(player_id),
     }
+    return result
 end
 
 local function snapshot_request(payload)
@@ -361,6 +453,8 @@ function M.init()
     city_level_by_team = {}
     summoned_by_player = {}
     replacing_by_player = {}
+    pending_by_player = {}
+    pending_generation = 0
 
     event_bus.handle_request(
         events.HERO_SUMMON_SNAPSHOT_REQUEST,

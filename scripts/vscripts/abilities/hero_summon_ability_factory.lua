@@ -19,6 +19,7 @@ function M.create(hero_id)
         end
 
         local player_id = player_id_from_caster(self:GetCaster())
+        local ability = self
         local result = event_bus.request(
             events.HERO_SUMMON_SNAPSHOT_REQUEST,
             { player_id = player_id }
@@ -65,6 +66,21 @@ function M.create(hero_id)
                 player_id = player_id,
                 hero_id = hero_id,
                 source = "altar_ability",
+                on_completed = function(final_result)
+                    if final_result and final_result.ok then return end
+                    if ability and not ability:IsNull() then
+                        ability:EndCooldown()
+                    end
+                    local message = final_result and final_result.error or nil
+                    if message and not string.find(message,
+                            "^hero_resource_load_failed:") then
+                        event_bus.emit(events.UI_NOTIFICATION, {
+                            player_id = player_id,
+                            message = message,
+                            level = "error",
+                        })
+                    end
+                end,
             }
         )
 
