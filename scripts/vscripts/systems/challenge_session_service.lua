@@ -19,6 +19,8 @@ local molten_core_rules = require("config/molten_core_challenge_rules")
 local hero_return_home = require("systems/hero_return_home_service")
 local destination_validation = require("systems/destination_validation_service")
 local monster_visual = require("systems/challenge_monster_visual_service")
+local monster_hull_scale = require("systems/monster_hull_scale")
+local wave_monster_collision = require("systems/wave_monster_collision")
 
 local M = {}
 local sessions = {}
@@ -346,6 +348,8 @@ local function spawn_member(session, member)
     if unit.Script_SetAttackRange and combat_archetype.attack_range then
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
+    local collision_profile = wave_monster_collision.profile(member, archetype)
+    monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
     apply_combat_stats(unit, combat_archetype, combat_profile)
     monster_visual.apply(unit, archetype)
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end

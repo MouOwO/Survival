@@ -964,16 +964,18 @@ function M.spawn_challenge_monster(row, challenge_definition)
     }
     local collision_profile = wave_monster_collision.profile(combat_row, definition)
     apply_stats(unit, combat_row, definition, collision_profile.movement_type)
-    unit:SetHullRadius(0)
-    unit.survival_base_monster_hull_radius = 0
-    unit.survival_monster_hull_radius = 0
+    monster_hull_scale.apply(
+        unit,
+        1,
+        collision_profile.base_hull_radius
+    )
     unit.survival_is_boss = true
     unit.survival_is_challenge_monster = true
     unit.survival_wave_movement_type = collision_profile.movement_type
-    unit.survival_wave_no_unit_collision = true
+    unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
         wall_entindex = wall_entindex,
-        no_unit_collision = 1,
+        no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
     return unit
 end

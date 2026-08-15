@@ -135,7 +135,7 @@
 ## 已完成任务（2026-08-14）：挑战怪碰撞、建筑施工一致性与自动召唤输入
 
 - 用户实测提出三项问题：五种挑战怪必须始终使用0碰撞体以避免卡怪；挑战建筑的占地、模型大小和施工特效需要与普通建筑一致，并统一消费现有建筑施工接口；自动召唤Toggle点击后没有执行自动判断。
-- 根因确认并修复：挑战怪出生曾复用Boss profile和全局Hull缩放，现于挑战专属生成边界固定`SetHullRadius(0)`、保存0基础Hull并向城墙AI传递无单位碰撞；不修改正式波次碰撞规则或`scalemonster`集合。
+- 当时将挑战怪固定为0 Hull；该碰撞规则已被2026-08-15“全部怪物与小怪碰撞体相同”的新需求替代，建筑施工与自动召唤部分仍有效。
 - 挑战建筑继续使用普通2x2占地、`radiant_ancient001.vmdl`和KV回退缩放0.34；权威视觉CSV新增完工缩放0.34，施工CSV新增同一缩放及统一传送开始/持续特效，继续由`building_construction_visual_service`消费，不创建专属施工实现。正式生成器已重建93个Lua模块，目标生成行已复核。
 - 自动召唤根因是两层遗漏：主HUD未把挑战Toggle列为托管建筑动作，且无目标分发只接受`NO_TARGET`行为位，会在客户端以`unsupported behavior`拒绝Toggle；服务端也未提供creature建筑的直达分发。现两套HUD入口均托管该Ability，主HUD允许Toggle行为位；路由完成ownership/建筑/Ability校验后切换权威自动状态并同步引擎Toggle，重入标记阻止`OnToggle()`二次反向请求。
 - 自动验证通过：`BUILDING_CHALLENGE_CONTRACT/SERVICE/REWARDS_LUA51_PASS`、`WAVE_FLYING_COLLISION_PASS`、`WAVE_SPAWN_SEQUENCE_PASS`、目标Lua 5.1语法、正式CSV生成93模块、两个Panorama JS各`1 compiled, 0 failed, 0 skipped`及双仓限定`git diff --check`。挑战独立次数、冷却、成长、剑圣前置、奖励和正式波次隔离语义保持不变。

@@ -1,7 +1,12 @@
+## 2026-08-15 - 全部怪物碰撞与精英/Boss攻击范围统一
+
+- 用户要求所有Boss、精英怪与小怪使用相同碰撞体，并将Boss和精英怪攻击范围增加36且同步CSV。地面怪统一基础HullRadius 32，飞行怪统一10；研究所挑战怪、飞行精英/领头/Boss不再使用0 Hull或无单位碰撞。
+- `monster_archetypes.csv`的30个精英/Boss原型和`building_challenge_definitions.csv`的5个Boss均在原攻击范围上增加36并定向生成。正式波次、挑战副本、野外/转生遭遇和研究所挑战生成边界统一应用碰撞解析及CSV射程。
+
 ## 2026-08-15 - 城墙同时攻击地面怪数量收紧
 
 - 用户实机确认地面Hull 29时城墙可同时被五只地面怪攻击，批准小幅增大怪物碰撞体，将目标收紧为四只。城墙Hull继续保持256，怪物攻击距离、模型和模型缩放不变。
-- `global_rules.csv`新增权威规则`wave_ground_monster_hull_radius=32`并定向生成；`wave_monster_collision`不再硬编码29，正式地面普通、领头、精英和Boss统一读取32。普通飞行怪Hull 10、特殊飞行怪Hull 0与五种挑战怪专属Hull 0边界保持不变。
+- `global_rules.csv`新增权威规则`wave_ground_monster_hull_radius=32`并定向生成；`wave_monster_collision`不再硬编码29，正式地面普通、领头、精英和Boss统一读取32。当时保留的飞行特殊怪及挑战怪0 Hull规则已被上方统一规则替代。
 - 自动验证通过：`WALL_COLLISION_BLINK_LUA51_PASS`、`WAVE_FLYING_COLLISION_PASS`、目标Lua 5.1语法、生成Lua逐字节一致、严格UTF-8及限定`diff --check`。这些检查证明配置与分类调用链正确，不等于Workshop Tools实机站位验收；仍需完全冷启动确认实际同时攻击者为四只。
 
 ## 2026-08-15 - 研究所十槽Tooltip代理几何、点击路由与ARS-01图标修复

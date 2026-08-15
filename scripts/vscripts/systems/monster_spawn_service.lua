@@ -11,6 +11,8 @@ local reward_effects = require("config/generated/reward_effects")
 local combat_profiles = require("config/challenge_combat_profile_config")
 local difficulty_config = require("config/difficulty_config")
 local challenge_sessions = require("systems/challenge_session_service")
+local monster_hull_scale = require("systems/monster_hull_scale")
+local wave_monster_collision = require("systems/wave_monster_collision")
 
 local M = {}
 
@@ -216,6 +218,8 @@ local function start_encounter(payload)
     end
     FindClearSpaceForUnit(unit, origin, true)
     local profile = combat_profile or archetype
+    local collision_profile = wave_monster_collision.profile(encounter, archetype)
+    monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
     unit.survival_movement_type = archetype.movement_type or "ground"
     unit.survival_movement_type_override = encounter.movement_type_override
     local health = tonumber(profile.health or archetype.health)
@@ -254,6 +258,11 @@ local function start_encounter(payload)
     attack_speed = math.max(0.01, attack_speed)
     unit.survival_attack_speed = attack_speed
     unit:SetBaseAttackTime(1 / attack_speed)
+    if unit.Script_SetAttackRange and archetype.attack_range then
+        unit:Script_SetAttackRange(tonumber(archetype.attack_range) or 128)
+    elseif unit.SetAttackRange and archetype.attack_range then
+        unit:SetAttackRange(tonumber(archetype.attack_range) or 128)
+    end
     if not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end

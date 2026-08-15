@@ -13,18 +13,23 @@
 - Panorama识别`npc_survival_builder_proxy`后按runtime `builder_slot_order=1..6`映射`Q/W/E/R/T/A`，Blink按名称固定映射`D`；视觉标签和键盘分发必须消费同一映射，禁止读取绝对engine index推导业务键。所有客户端实体Ability枚举必须受`survival_ability_runtime["unit:<entindex>"].ability_count`限制；固定24/64扫描只允许用于枚举Valve `AbilityN` HUD节点。
 - 恢复stash或解决二进制Panorama冲突时，`.vjs_c/.vcss_c/.vxml_c`必须从最终合并后的content源强制重编译，禁止直接采用ours/theirs。HUD XML递归编译产生的无关依赖副产物应恢复到任务前index，只保留目标产物。
 
+## 全部怪物碰撞与精英/Boss攻击范围统一（2026-08-15）
+
+- 所有怪物按移动类型使用与小怪相同的基础HullRadius：地面怪统一读取`global_rules.csv.wave_ground_monster_hull_radius=32`，飞行怪统一为10；不再为精英、领头怪、Boss或研究所挑战怪保留0 Hull和无单位碰撞。正式波次、挑战副本、野外/转生遭遇及研究所挑战生成边界均消费同一碰撞解析器。
+- `monster_archetypes.csv`中全部`rank=elite/boss`原型，以及`building_challenge_definitions.csv`中全部Boss，攻击范围均在原值上增加36并生成到Lua。新增或修改怪物时必须先维护CSV，运行时不得再次叠加36。
+
 ## 城墙War3护甲、正式波次碰撞与D位移截断（2026-08-15）
 
 - 城墙基础护甲来自`building_levels.csv.war3_armor`；科技`super_wall_armor_flat`和山岭巨人`challenge_wall_armor_flat`虽然在既有聚合层按Dota单位`/3`保存，但投影到城墙自定义护甲状态时必须乘回3。城墙原生Dota护甲固定为0，全部物理伤害由唯一Damage Filter按`1/(1+0.02*max(0,有效War3护甲))`结算并忽略原生护甲；百分比穿甲先作用于War3护甲。
-- 正式波次所有地面怪不区分普通、精英、领头怪或Boss，基础HullRadius统一从`global_rules.csv.wave_ground_monster_hull_radius`读取，当前为32，用于将城墙周围同时攻击者由五只收紧为四只。普通飞行怪保持10，飞行精英/领头/Boss保持0和无单位碰撞；五种研究所挑战怪继续走专属Hull 0边界。`scalemonster`只按缓存的基础Hull非累计缩放，不能修改模型缩放。
+- 正式波次所有地面怪不区分普通、精英、领头怪或Boss，基础HullRadius统一从`global_rules.csv.wave_ground_monster_hull_radius`读取，当前为32。飞行怪及研究所挑战怪的旧特殊碰撞规则已被上方2026-08-15统一规则替代。`scalemonster`只按缓存的基础Hull非累计缩放，不能修改模型缩放。
 - 建造者和防御塔D实际最大位移1000，英雄D实际最大位移800。鼠标目标超范围时，过滤与执行都必须用公共helper沿光标方向截断到最大距离，再执行原有地形、占用、旅行状态等校验；不得返回距离超限。防御塔的Ability与Panorama请求入口都执行该规则，最终移动继续通过`building_system.relocate_building()`。
 
 ## 挑战怪碰撞、挑战建筑视觉与Toggle输入边界（2026-08-14）
 
-- 五种研究所挑战怪必须在`wave_system.spawn_challenge_monster()`专属生成边界显式执行`SetHullRadius(0)`，并向城墙AI传递`no_unit_collision=1`。不能只依赖Boss碰撞profile，也不能让`scalemonster`全局倍率重新放大挑战怪；挑战怪不进入正式波次`enemies`集合。
+- 本节的研究所挑战怪0 Hull规则已被上方2026-08-15统一碰撞规则替代；挑战怪仍不进入正式波次`enemies`集合。
 - 动态`npc_dota_creature`建筑的Toggle不能只实现Lua `OnToggle()`。Panorama托管动作必须识别该Ability，允许`DOTA_ABILITY_BEHAVIOR_TOGGLE`行为位通过无选点分发；`ui_request_router`验证实体归属、建筑身份和Ability归属后直达权威服务，并同步引擎Toggle外观。服务端调用`ToggleAbility()`前必须设置重入标记，避免`OnToggle()`再次反向提交。
 - 同一动态建筑的完工尺寸和施工覆盖必须成对配置：`building_visual_levels.csv`定义模型/完工`model_scale`，`building_construction_rules.csv`定义施工粒子、时间和`build_visual_scale`，再由正式生成器生成Lua。缺少施工行会回退到缩放1，造成施工与完工尺寸不一致；不得为单一建筑绕开`building_construction_visual_service`另写施工特效。
-- 本轮任务已由用户于2026-08-14明确确认完成。后续若挑战怪再次卡位，优先检查挑战生成边界是否仍固定0 Hull及墙AI无单位碰撞；若自动Toggle失效，按“Panorama托管识别 -> Toggle行为位放行 -> `ui_request_router`直达分发 -> `OnToggle`重入保护”的顺序排查；若建筑施工尺寸跳变，先比较两张CSV的缩放值，不新增旁路实现。
+- 本轮任务已由用户于2026-08-14明确确认完成，其中挑战怪0 Hull规则已在2026-08-15被新需求替代。若自动Toggle失效，按“Panorama托管识别 -> Toggle行为位放行 -> `ui_request_router`直达分发 -> `OnToggle`重入保护”的顺序排查；若建筑施工尺寸跳变，先比较两张CSV的缩放值，不新增旁路实现。
 
 ## 研究所建筑技能与Builder W替换边界（2026-08-15）
 
