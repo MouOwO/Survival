@@ -1,3 +1,9 @@
+## 当前实施任务（2026-08-16）：高级伐木效率金币与木材费用交换
+
+- 用户确认研究所科技“高级伐木效率”的金币消耗与木材消耗填反，并批准交换全部30级费用。
+- 权威数据仅修改`data/csv/建筑与工人系统/technology_definitions.csv`中`advanced_lumberjack_efficiency_01`至`advanced_lumberjack_efficiency_30`的`gold_cost`与`wood_cost`；随后通过现有CSV生成链同步Lua。
+- 验证范围：30级费用逐行交换、相邻科技不变、CSV与生成Lua一致、相关研究所契约、Lua 5.1语法、配置检查及限定`git diff --check`。自动验证不能称为Workshop Tools实机验收。`CSV_ADVANCED_LUMBERJACK_PASS`、`GENERATED_ADVANCED_LUMBERJACK_PASS`、`ADVANCED_RESEARCH_LAB_CONTRACT_PASS`、Lua 5.1语法、配置生成和`git diff --check`均已通过。
+
 ## 当前实施任务（2026-08-15）：英雄永久异步预载与召唤READY门禁
 
 - 用户报告部分电脑执行`addhero`时客户端闪退，怀疑英雄主体、饰品组件和常驻粒子在`ReplaceHeroWithNoTransfer()`后同帧集中实例化造成冷资源峰值。调查确认六个英雄主体已在地图`Precache`阶段同步预载，英雄饰品也由`hero_cosmetic_service.precache()`同步预载，但尚未纳入游戏开始后的异步完整bundle队列。
