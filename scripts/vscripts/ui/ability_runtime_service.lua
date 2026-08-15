@@ -5,6 +5,7 @@ local ability_utils = require("core/ability_utils")
 local hero_skill_definitions = require("config/generated/hero_skill_definitions")
 local hero_passive_definitions = require("config/hero_passive_skill_definitions")
 local hero_skill_tooltip = require("ui/hero_skill_tooltip_view_model")
+local research_events = require("research/research_event_names")
 
 local M = {}
 
@@ -13,6 +14,7 @@ local ability_keys_by_unit = {}
 local tower_trace_by_ability = {}
 local hero_runtime_trace_by_unit = {}
 local hero_skill_by_ability = {}
+local research_transaction_by_team = {}
 
 for _, definition in ipairs(hero_skill_definitions.rows or {}) do
     if definition.ability_name and definition.ability_name ~= "" then
@@ -36,6 +38,15 @@ local function ensure_tower_upgrade_active(ability, runtime)
     if not ability:IsActivated() then
         ability:SetActivated(true)
     end
+    runtime.engine_level = ability:GetLevel()
+    runtime.engine_activated = ability:IsActivated() and 1 or 0
+end
+
+local function sync_research_ability_active(ability, runtime)
+    if runtime.research_upgrade ~= 1 then return end
+    if ability:GetLevel() < 1 then ability:SetLevel(1) end
+    local active = runtime.available == 1
+    if ability:IsActivated() ~= active then ability:SetActivated(active) end
     runtime.engine_level = ability:GetLevel()
     runtime.engine_activated = ability:IsActivated() and 1 or 0
 end
@@ -239,9 +250,32 @@ local function publish(state)
     end
 
     reconcile_authoritative_unit_state(state)
+    if state.building_id == "building_research_lab"
+        or state.building_id == "building_advanced_research_lab" then
+        local research_state = event_bus.request(research_events.STATE_GET_REQUESTED, {
+            player_id = state.player_id,
+        })
+        state.research_levels = research_state and research_state.ok == true
+            and research_state.legacy_levels or {}
+        state.research_transaction = research_transaction_by_team[state.team]
+            or { researching = 0 }
+        local progression = event_bus.request(events.HERO_PROGRESSION_GET_REQUEST, {
+            player_id = state.player_id,
+        })
+        state.reincarnation_level = tonumber(progression and progression.snapshot
+            and progression.snapshot.rebirth_level) or 0
+    end
 
     local unit_key = unit:entindex()
     state_by_unit[unit_key] = state
+    CustomNetTables:SetTableValue(
+        "survival_ability_runtime",
+        "unit:" .. tostring(unit_key),
+        {
+            owner_entindex = unit_key,
+            ability_count = math.max(0, tonumber(unit:GetAbilityCount()) or 0),
+        }
+    )
     local resource_state = resources(state.team)
     local current = {}
     local tower_transitions = 0
@@ -289,6 +323,7 @@ local function publish(state)
         runtime.ability_entindex = ability:entindex()
         runtime.resource_version =
             resource_state and resource_state.version or 0
+        sync_research_ability_active(ability, runtime)
         if is_tower_upgrade(ability_name) then
             ensure_tower_upgrade_active(ability, runtime)
             local trace_key = ability:entindex()
@@ -352,6 +387,13 @@ local function clear_unit(payload)
             "survival_ability_runtime",
             tostring(ability_entindex),
             { removed = 1 }
+        )
+    end
+    if entindex then
+        CustomNetTables:SetTableValue(
+            "survival_ability_runtime",
+            "unit:" .. tostring(entindex),
+            { owner_entindex = entindex, ability_count = 0, removed = 1 }
         )
     end
     ability_keys_by_unit[entindex] = nil
@@ -429,6 +471,27 @@ local function on_hero_progression_changed(payload)
     end
 end
 
+local function refresh_research_team(team)
+    for _, state in pairs(state_by_unit) do
+        if state.team == team and (state.building_id == "building_research_lab"
+            or state.building_id == "building_advanced_research_lab") then
+            publish(state)
+        end
+    end
+end
+
+local function on_research_state_changed(payload)
+    research_transaction_by_team[payload.team] = payload.researching == 1
+        and payload or nil
+    refresh_research_team(payload.team)
+end
+
+local function on_research_level_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local team = player_id ~= nil and PlayerResource:GetTeam(player_id) or nil
+    if team ~= nil then refresh_research_team(team) end
+end
+
 
 local function on_hero_skill_changed(payload)
     local entindex = tonumber(payload.unit_entindex)
@@ -456,6 +519,7 @@ function M.init()
     ability_keys_by_unit = {}
     tower_trace_by_ability = {}
     hero_runtime_trace_by_unit = {}
+    research_transaction_by_team = {}
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)
@@ -481,6 +545,11 @@ function M.init()
         events.HERO_PROGRESSION_CHANGED,
         on_hero_progression_changed
     )
+    event_bus.subscribe(
+        events.TECHNOLOGY_RESEARCH_STATE_CHANGED,
+        on_research_state_changed
+    )
+    event_bus.subscribe(research_events.LEVEL_CHANGED, on_research_level_changed)
 end
 
 return M

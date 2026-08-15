@@ -42,7 +42,7 @@ building_farm_lv03,building_farm,3,人口农场LV3,4100,7,2000,0,2,3,主城LV3,,
 building_farm_lv04,building_farm,4,人口农场LV4,5200,8,10000,1000,1,4,主城LV4,,models/props_structures/radiant_ancient001.vmdl,1,建筑等级统一表,农场等级不得高于主城等级。,
 building_farm_lv05,building_farm,5,人口农场LV5,6500,10,50000,5000,1,5,主城LV5,,models/props_structures/radiant_ancient001.vmdl,1,建筑等级统一表,最高等级与主城一致。,
 building_research_lab_lv01,building_research_lab,1,研究所LV1,2500,8,100,0,0,1,主城LV1,,models/props_structures/radiant_ancient001.vmdl,1,building_definitions.csv cost migration,LV1成本作为建造费用。,
-building_advanced_research_lab_lv01,building_advanced_research_lab,1,高级研究所LV1,2500,8,0,0,0,4,主城LV4,,models/props_structures/radiant_ancient001.vmdl,1,building_definitions.csv cost migration,LV1成本作为建造费用。,
+building_advanced_research_lab_lv01,building_advanced_research_lab,1,高级研究所LV1,2500,8,100,0,0,4,主城LV4,,models/props_structures/radiant_ancient001.vmdl,1,building_definitions.csv cost migration,LV1成本作为建造费用。,
 building_gold_mine_lv01,building_gold_mine,1,金矿LV1,3000,8,2000,0,0,3,主城LV3,,models/props_structures/radiant_ancient001.vmdl,1,建筑等级统一表,LV1费用为建造费用；占用2人口。,2
 building_gold_mine_lv02,building_gold_mine,2,金矿LV2,3000,9,3000,0,0,3,金矿LV1,,models/props_structures/radiant_ancient001.vmdl,1,建筑等级统一表,,4
 building_gold_mine_lv03,building_gold_mine,3,金矿LV3,3000,10,4000,0,0,3,金矿LV2,,models/props_structures/radiant_ancient001.vmdl,1,建筑等级统一表,,7

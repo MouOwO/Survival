@@ -156,6 +156,12 @@ local function make_entry(rule, row)
     local gold = listing and number(listing.gold_cost)
         or number(field(row, rule.gold_cost_field, 0))
     local research = research_config.by_legacy_group[row.technology_group]
+    if research and row.building_id == nil then
+        local projected = {}
+        for key, value in pairs(row) do projected[key] = value end
+        projected.building_id = research.building_id
+        row = projected
+    end
     local research_cost = research and research_config.cost_for_level(
         research, tonumber(row.level) or 0
     ) or nil
@@ -510,6 +516,15 @@ function M.allowed_in_mode(entry, mode)
     return true
 end
 
+function M.allowed_in_research_scope(entry, scope)
+    if not entry or entry.contenttype ~= "technology" then return false end
+    local definition = entry.definition or {}
+    if scope == "advanced" then
+        return definition.building_id == "advanced_research_lab"
+    end
+    return definition.building_id == "research_lab"
+end
+
 local function projected_categories()
     local result = {}
     for _, category in ipairs(categories.rows or {}) do
@@ -533,6 +548,12 @@ function M.build_snapshot(player_id, context)
     local projected_technology_groups = {}
     for _, entry in ipairs(entries) do
         local allowed_for_mode = M.allowed_in_mode(entry, context.ui_mode)
+        if allowed_for_mode and context.ui_mode == "research" then
+            allowed_for_mode = M.allowed_in_research_scope(
+                entry,
+                context.research_scope
+            )
+        end
         local group = entry.definition
             and entry.definition.technology_group or ""
         local item = nil
@@ -561,6 +582,12 @@ function M.build_snapshot(player_id, context)
                 item.next_technology_level = target_level
                 item.technology_max_level = max_level
                 item.technology_group = group
+                item.technology_id = authoritative_research
+                    and authoritative_research.tech_id or ""
+                item.auto_research_available = context.research_scope == "advanced"
+                    and 1 or 0
+                item.auto_research_enabled = context.auto_research
+                    and context.auto_research[group] and 1 or 0
                 item.level_text = "Lv." .. tostring(current)
                     .. " / " .. tostring(max_level)
                 if current >= max_level then
@@ -637,6 +664,8 @@ function M.build_snapshot(player_id, context)
         } or projected_categories(),
         entries = projected,
         ui_mode = context.ui_mode or "shop",
+        research_scope = context.research_scope or "",
+        research_source_entindex = context.research_source_entindex or -1,
     }
 end
 

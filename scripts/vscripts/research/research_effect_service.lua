@@ -34,8 +34,8 @@ local function legacy_projection(values)
         + value("lumberjack_wood_per_gather_advanced_flat")
         + value("lumberjack_wood_per_gather_growth_flat")
     result.lumberjack.attack_gain_per_attack = value("lumberjack_attack_growth_per_hit")
-    result.lumberjack.armor_reduction_per_attack =
-        armor_balance.from_war3(-value("war3_tree_armor_shred_per_hit"))
+    result.lumberjack.armor_reduction_per_attack = value("tree_armor_shred_per_hit")
+        + armor_balance.from_war3(-value("war3_tree_armor_shred_per_hit"))
     result.tower.attack_flat = value("tower_attack_flat")
         + value("tower_attack_advanced_flat") + value("tower_attack_super_flat")
     result.tower.attack_range_bonus = value("tower_attack_range_flat")
@@ -45,13 +45,14 @@ local function legacy_projection(values)
         + value("wall_health_advanced_pct")) * 100
     result.wall.technology_health_bonus_pct = (value("wall_health_super_pct")
         + value("wall_health_bonus_pct")) * 100
-    result.wall.technology_armor_bonus =
-        armor_balance.from_war3(value("war3_wall_armor_flat"))
+    result.wall.technology_armor_bonus = value("wall_armor_flat")
+        + armor_balance.from_war3(value("war3_wall_armor_flat"))
     result.hero.final_damage_bonus_pct = value("hero_final_damage_pct") * 100
     result.hero.attack_bonus_pct = value("hero_attack_bonus_pct") * 100
+    result.hero.attack_flat = value("hero_attack_flat")
     result.hero.critical_chance_pct = value("hero_crit_chance_pct") * 100
-    result.hero.armor_reduction_per_attack =
-        armor_balance.from_war3(value("war3_hero_armor_shred_flat"))
+    result.hero.armor_reduction_per_attack = value("hero_armor_shred_flat")
+        + armor_balance.from_war3(value("war3_hero_armor_shred_flat"))
     return result
 end
 
@@ -69,9 +70,7 @@ function M:Recalculate(player_id)
     for _, definition in ipairs(config.technologies) do
         local level = tonumber(levels[definition.tech_id]) or 0
         for _, effect in ipairs(definition.effects) do
-            local contribution = effect.mode == "constant"
-                and (level > 0 and effect.value_per_level or 0)
-                or level * effect.value_per_level
+            local contribution = config.effect_value(effect, level)
             values[effect.key] = (values[effect.key] or 0) + contribution
         end
     end

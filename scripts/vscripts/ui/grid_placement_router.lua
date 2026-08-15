@@ -11,9 +11,18 @@ local preview_units = {}
 local preview_sessions = {}
 local closed_preview_sessions = {}
 local preview_request_ids = {}
+local PREVIEW_UNIT_NAME = "npc_survival_grid_preview_proxy"
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
+end
+
+local function prepare_preview_unit(unit, profile)
+    unit.survival_is_grid_preview = true
+    if unit.SetHullRadius then unit:SetHullRadius(0) end
+    if unit.SetModelScale and profile and profile.preview_model_scale then
+        unit:SetModelScale(profile.preview_model_scale)
+    end
 end
 
 local function destroy_preview(player_id)
@@ -67,13 +76,13 @@ end
 
 local function ensure_preview(player_id, caster, profile, position, valid)
     local unit = preview_units[player_id]
-    if valid_entity(unit) and unit:GetUnitName() ~= profile.unit_name then
+    if valid_entity(unit) and unit:GetUnitName() ~= PREVIEW_UNIT_NAME then
         destroy_preview(player_id)
         unit = nil
     end
     if not valid_entity(unit) then
         unit = CreateUnitByName(
-            profile.unit_name,
+            PREVIEW_UNIT_NAME,
             position,
             false,
             caster,
@@ -82,12 +91,12 @@ local function ensure_preview(player_id, caster, profile, position, valid)
         )
         if not valid_entity(unit) then return end
         preview_units[player_id] = unit
-        unit.survival_is_grid_preview = true
         unit:SetOwner(caster)
         if profile.preview_model_name and profile.preview_model_name ~= "" then
             unit:SetModel(profile.preview_model_name)
             unit:SetOriginalModel(profile.preview_model_name)
         end
+        prepare_preview_unit(unit, profile)
         unit:AddNewModifier(unit, nil, "modifier_grid_building_preview", {})
         if unit.SetDayTimeVisionRange then unit:SetDayTimeVisionRange(0) end
         if unit.SetNightTimeVisionRange then unit:SetNightTimeVisionRange(0) end
@@ -132,6 +141,9 @@ local function build_profiles()
                 preview_model_name = definition.id == "arrow_tower"
                     and (((arrow_tower_base.rows or {})[1] or {}).model_name)
                     or (((definition.levels or {})[1] or {}).model_name),
+                preview_model_scale = definition.id == "arrow_tower"
+                    and tonumber(((arrow_tower_base.rows or {})[1] or {}).model_scale)
+                    or tonumber(((definition.levels or {})[1] or {}).model_scale),
                 footprint_x = math.max(
                     2,
                     tonumber((definition.footprint or {}).x) or 2
@@ -464,5 +476,10 @@ function M.init()
     register_commit_request()
     print("[GridPlacement] UI router initialized")
 end
+
+M._prepare_preview_unit_for_test = prepare_preview_unit
+M._preview_unit_name_for_test = PREVIEW_UNIT_NAME
+M._build_profiles_for_test = build_profiles
+M._profiles_for_test = function() return profiles_by_ability end
 
 return M

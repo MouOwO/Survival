@@ -32,7 +32,7 @@ $heroReady = $gameMode.IndexOf("event_bus.emit(events.HERO_READY", $configureCal
 Check ($configureCall -ge 0) "ALT_FIX_PLACEHOLDER_REGISTRATION_MISSING"
 Check ($heroReady -gt $configureCall) "ALT_FIX_PLACEHOLDER_MUST_REGISTER_BEFORE_HERO_READY"
 
-Check ($builderProgression.Contains("for ability_name, _ in pairs(managed_abilities) do")) "ALT_FIX_BUILDER_STAGE_MUST_REMOVE_ONLY_MANAGED_ABILITIES"
+Check ($builderProgression.Contains("if managed_abilities[entry.name] or entry.name == BUILDER_BLINK_ABILITY then") -and $builderProgression.Contains("builder:RemoveAbility(name)")) "ALT_FIX_BUILDER_STAGE_MUST_REMOVE_ONLY_MANAGED_ABILITIES"
 Check (-not $builderProgression.Contains("ability_utils.remove_all")) "ALT_FIX_BUILDER_STAGE_REMOVE_ALL_PRESENT"
 Check ($builderProgression.Contains("event_bus.subscribe(events.BUILDER_READY, on_builder_ready)")) "ALT_FIX_BUILDER_STAGE_BUILDER_READY_SYNC_MISSING"
 Check ($builderStages.Contains('ability_name = "ability_build_wall"')) "ALT_FIX_WALL_NOT_STAGE_MANAGED"

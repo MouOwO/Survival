@@ -1,150 +1,217 @@
+local generated = require("config/generated/technology_definitions")
+
 local M = { technologies = {}, by_id = {}, by_legacy_group = {} }
 
-local function prerequisite(tech_id, required_level, reincarnation_level)
-    return {
-        tech_id = tech_id,
-        required_level = required_level or 0,
-        reincarnation_level = reincarnation_level or 0,
-    }
-end
-
-local function effect(key, value_per_level, mode)
-    return { key = key, value_per_level = value_per_level, mode = mode }
-end
-
-local function technology(id, name, building, max_level, legacy_group,
-        gold_base, gold_step, wood_base, wood_step, required, effects)
-    return {
-        tech_id = id,
-        display_name = name,
-        building_id = building,
-        max_level = max_level,
-        legacy_group = legacy_group,
-        cost = {
-            gold_base = gold_base,
-            gold_step = gold_step,
-            wood_base = wood_base,
-            wood_step = wood_step,
-        },
-        prerequisite = required or prerequisite(),
-        effects = effects,
-    }
-end
-
-M.technologies = {
-    technology("RS-01", "伐木工攻速", "research_lab", 10,
-        "lumberjack_speed", 0, 0, 200, 400, prerequisite(), {
-            effect("lumberjack_attack_speed_pct", 0.05),
-        }),
-    technology("RS-02", "高级伐木工攻速", "research_lab", 30,
-        "advanced_lumberjack_speed", 1000, 1000, 5000, 1000,
-        prerequisite("RS-01", 5), {
-            effect("lumberjack_attack_interval_reduction", -0.01),
-        }),
-    technology("RS-03", "伐木工暴击", "research_lab", 10,
-        "lumberjack_crit", 0, 2000, 500, 5000, prerequisite(), {
-            effect("lumberjack_wood_crit_chance_pct", 0.03),
-        }),
-    technology("RS-04", "伐木效率", "research_lab", 20,
-        "lumberjack_efficiency", 0, 0, 200, 300, prerequisite(), {
-            effect("lumberjack_wood_per_gather_flat", 1),
-        }),
-    technology("RS-05", "高级伐木效率", "research_lab", 30,
-        "advanced_lumberjack_efficiency", 1000, 500, 5000, 1000,
-        prerequisite("RS-04", 10), {
-            effect("lumberjack_wood_per_gather_advanced_flat", 3),
-        }),
-    technology("RS-06", "防御塔强化", "research_lab", 10,
-        "tower_attack", 0, 0, 300, 200, prerequisite(), {
-            effect("tower_attack_flat", 200),
-        }),
-    technology("RS-07", "高级防御塔强化", "research_lab", 20,
-        "advanced_tower_attack", 1000, 500, 0, 0,
-        prerequisite("RS-06", 10), {
-            effect("tower_attack_advanced_flat", 1000),
-        }),
-    technology("RS-08", "墙强化", "research_lab", 10,
-        "wall_health", 0, 0, 200, 300, prerequisite(), {
-            effect("wall_health_pct", 0.15),
-        }),
-    technology("RS-09", "高级墙强化", "research_lab", 20,
-        "advanced_wall_health", 1000, 500, 0, 0,
-        prerequisite("RS-08", 10), {
-            effect("wall_health_advanced_pct", 0.30),
-        }),
-    technology("ARS-01", "伐木工攻击成长", "advanced_research_lab", 30,
-        "researcher_lumberjack_attack_growth", 30000, 10000, 0, 0,
-        prerequisite(), {
-            effect("lumberjack_attack_growth_per_hit", 2),
-            effect("lumberjack_wood_per_gather_growth_flat", 5),
-        }),
-    technology("ARS-02", "伐木工攻击减甲", "advanced_research_lab", 30,
-        "researcher_lumberjack_armor_reduction", 20000, 5000, 0, 0,
-        prerequisite(), {
-            effect("war3_tree_armor_shred_per_hit", -0.1),
-            effect("minimum_war3_tree_armor", 100, "constant"),
-        }),
-    technology("ARS-03", "超级墙强化", "advanced_research_lab", 30,
-        "researcher_super_wall_health", 30000, 20000, 100000, 30000,
-        prerequisite("RS-09", 10), {
-            effect("wall_health_super_pct", 0.60),
-            effect("wall_health_bonus_pct", 0.05),
-        }),
-    technology("ARS-04", "超级墙护甲强化", "advanced_research_lab", 30,
-        "researcher_super_wall_armor", 30000, 20000, 100000, 30000,
-        prerequisite("RS-09", 10), {
-            effect("war3_wall_armor_flat", 10),
-            effect("wall_health_bonus_pct", 0.05),
-        }),
-    technology("ARS-05", "超级防御塔强化", "advanced_research_lab", 30,
-        "researcher_super_tower_attack", 30000, 20000, 100000, 30000,
-        prerequisite("RS-07", 10), {
-            effect("tower_attack_super_flat", 30000),
-        }),
-    technology("ARS-06", "超级防御塔攻击范围", "advanced_research_lab", 30,
-        "researcher_super_tower_range", 30000, 20000, 100000, 30000,
-        prerequisite("RS-07", 10), {
-            effect("tower_attack_range_flat", 30),
-        }),
-    technology("ARS-07", "超级防御塔暴击", "advanced_research_lab", 23,
-        "researcher_super_tower_crit", 1000, 20000, 300000, 30000,
-        prerequisite("RS-07", 10), {
-            effect("tower_crit_chance_pct", 0.005),
-            effect("tower_attack_bonus_pct", 0.005),
-            effect("hero_crit_chance_pct", 0.005),
-            effect("hero_attack_bonus_pct", 0.005),
-        }),
-    technology("ARS-08", "英雄最终伤害", "advanced_research_lab", 19,
-        "researcher_hero_final_damage", 10000, 10000, 50000, 50000,
-        prerequisite(nil, 0, 3), {
-            effect("hero_final_damage_pct", 0.01),
-        }),
-    technology("ARS-09", "英雄攻击减甲", "advanced_research_lab", 19,
-        "researcher_hero_armor_reduction", 10000, 10000, 50000, 50000,
-        prerequisite(nil, 0, 3), {
-            effect("war3_hero_armor_shred_flat", 0.5),
-        }),
-    technology("ARS-10", "英雄攻击", "advanced_research_lab", 19,
-        "researcher_hero_attack", 10000, 10000, 50000, 50000,
-        prerequisite(nil, 0, 3), {
-            effect("hero_attack_bonus_pct", 0.02),
-        }),
+local IDENTITIES = {
+    { id = "RS-01", group = "lumberjack_speed", building = "research_lab" },
+    { id = "RS-02", group = "advanced_lumberjack_speed", building = "research_lab" },
+    { id = "RS-03", group = "lumberjack_crit", building = "research_lab" },
+    { id = "RS-04", group = "lumberjack_efficiency", building = "research_lab" },
+    { id = "RS-05", group = "advanced_lumberjack_efficiency", building = "research_lab" },
+    { id = "RS-06", group = "tower_attack", building = "research_lab" },
+    { id = "RS-07", group = "advanced_tower_attack", building = "research_lab" },
+    { id = "RS-08", group = "wall_health", building = "research_lab" },
+    { id = "RS-09", group = "advanced_wall_health", building = "research_lab" },
+    { id = "ARS-01", group = "researcher_lumberjack_attack_growth", building = "advanced_research_lab" },
+    { id = "ARS-02", group = "researcher_lumberjack_armor_reduction", building = "advanced_research_lab" },
+    { id = "ARS-03", group = "researcher_super_wall_health", building = "advanced_research_lab" },
+    { id = "ARS-04", group = "researcher_super_wall_armor", building = "advanced_research_lab" },
+    { id = "ARS-05", group = "researcher_super_tower_attack", building = "advanced_research_lab" },
+    { id = "ARS-06", group = "researcher_super_tower_range", building = "advanced_research_lab" },
+    { id = "ARS-07", group = "researcher_super_tower_crit", building = "advanced_research_lab" },
+    { id = "ARS-08", group = "researcher_hero_final_damage", building = "advanced_research_lab" },
+    { id = "ARS-09", group = "researcher_hero_armor_reduction", building = "advanced_research_lab" },
+    { id = "ARS-10", group = "researcher_hero_attack", building = "advanced_research_lab" },
 }
 
-for _, definition in ipairs(M.technologies) do
+local EFFECT_RULES = {
+    lumberjack_attack_speed_pct = {
+        { key = "lumberjack_attack_speed_pct", scale = 0.01 },
+    },
+    lumberjack_attack_interval_flat = {
+        { key = "lumberjack_attack_interval_reduction" },
+    },
+    lumberjack_wood_per_hit = {
+        { key = "lumberjack_wood_per_gather_flat" },
+    },
+    lumberjack_wood_per_hit_advanced = {
+        { key = "lumberjack_wood_per_gather_advanced_flat" },
+    },
+    lumberjack_critical_chance_pct = {
+        { key = "lumberjack_wood_crit_chance_pct", scale = 0.01 },
+    },
+    tower_attack_flat = {
+        { key = "tower_attack_flat" },
+    },
+    tower_attack_flat_advanced = {
+        { key = "tower_attack_advanced_flat" },
+    },
+    wall_health_pct = {
+        { key = "wall_health_pct", scale = 0.01 },
+    },
+    wall_health_pct_advanced = {
+        { key = "wall_health_advanced_pct", scale = 0.01 },
+    },
+    lumberjack_attack_growth = {
+        { key = "lumberjack_attack_growth_per_hit" },
+    },
+    lumberjack_attack_armor_reduction = {
+        { key = "tree_armor_shred_per_hit" },
+    },
+    super_wall_health_pct = {
+        { key = "wall_health_super_pct", scale = 0.01 },
+    },
+    super_wall_armor_flat = {
+        { key = "wall_armor_flat" },
+    },
+    super_tower_attack_flat = {
+        { key = "tower_attack_super_flat" },
+    },
+    super_tower_attack_range = {
+        { key = "tower_attack_range_flat" },
+    },
+    super_tower_crit_pct = {
+        { key = "tower_crit_chance_pct", scale = 0.01 },
+        { key = "tower_attack_bonus_pct", scale = 0.01 },
+        { key = "hero_crit_chance_pct", scale = 0.01 },
+        { key = "hero_attack_bonus_pct", scale = 0.01 },
+    },
+    hero_final_damage_pct = {
+        { key = "hero_final_damage_pct", scale = 0.01 },
+    },
+    hero_attack_armor_reduction = {
+        { key = "hero_armor_shred_flat" },
+    },
+    hero_attack_flat = {
+        { key = "hero_attack_flat" },
+    },
+}
+
+local ACCUMULATED_GROUPS = { advanced_lumberjack_speed = true }
+local rows_by_group = {}
+local generated_by_id = {}
+
+for _, row in ipairs(generated.rows or {}) do
+    generated_by_id[row.technology_id] = row
+    if row.enabled ~= false then
+        local group = tostring(row.technology_group or "")
+        local level = tonumber(row.level)
+        if group ~= "" and level and level > 0 then
+            rows_by_group[group] = rows_by_group[group] or {}
+            rows_by_group[group][level] = row
+        end
+    end
+end
+
+local function scaled(value, rule)
+    return (tonumber(value) or 0) * (tonumber(rule.scale) or 1)
+end
+
+local function effect_values(rows, maximum, rule)
+    local values = {}
+    local display_values = {}
+    local running = 0
+    local display_running = 0
+    for level = 1, maximum do
+        local row = rows[level]
+        local value = scaled(row and row.effect_value, rule)
+        local display_value = scaled(
+            row and (row.war3_effect_value or row.effect_value),
+            rule
+        )
+        if ACCUMULATED_GROUPS[row and row.technology_group] then
+            running = running + value
+            display_running = display_running + display_value
+            values[level] = running
+            display_values[level] = display_running
+        else
+            values[level] = value
+            display_values[level] = display_value
+        end
+    end
+    return values, display_values
+end
+
+for _, identity in ipairs(IDENTITIES) do
+    local rows = rows_by_group[identity.group] or {}
+    local first = rows[1]
+    assert(first, "missing generated research technology group: " .. identity.group)
+    local maximum = 0
+    for level, _ in pairs(rows) do
+        if level > maximum then maximum = level end
+    end
+    local definition = {
+        tech_id = identity.id,
+        display_name = tostring(first.display_name or identity.group)
+            :gsub("%s+Lv%.%d+$", ""),
+        building_id = identity.building,
+        max_level = maximum,
+        legacy_group = identity.group,
+        generated_rows = rows,
+        prerequisite = {
+            tech_id = nil,
+            required_level = 0,
+            reincarnation_level = tonumber(first.required_rebirth_level) or 0,
+        },
+        effects = {},
+    }
+    local rules = EFFECT_RULES[first.effect_type] or {}
+    for _, rule in ipairs(rules) do
+        local values, display_values = effect_values(rows, maximum, rule)
+        definition.effects[#definition.effects + 1] = {
+            key = rule.key,
+            value_per_level = scaled(first.value_per_level, rule),
+            display_value_per_level = scaled(
+                first.war3_value_per_level or first.value_per_level,
+                rule
+            ),
+            values_by_level = values,
+            display_values_by_level = display_values,
+        }
+    end
+    M.technologies[#M.technologies + 1] = definition
     M.by_id[definition.tech_id] = definition
     M.by_legacy_group[definition.legacy_group] = definition
 end
 
+for _, definition in ipairs(M.technologies) do
+    local first = definition.generated_rows[1]
+    local prerequisite_row = generated_by_id[first.prerequisite_id]
+    local prerequisite = prerequisite_row
+        and M.by_legacy_group[prerequisite_row.technology_group] or nil
+    local required_level = tonumber(prerequisite_row and prerequisite_row.level) or 0
+    if not prerequisite then
+        prerequisite = M.by_legacy_group[first.unlock_technology_group]
+        required_level = tonumber(first.unlock_required_level) or 0
+    end
+    if prerequisite and required_level > 0 then
+        definition.prerequisite.tech_id = prerequisite.tech_id
+        definition.prerequisite.required_level = required_level
+    end
+end
+
 function M.cost_for_level(definition, target_level)
-    if not definition or target_level < 1
-        or target_level > definition.max_level then return nil end
+    local row = definition and definition.generated_rows
+        and definition.generated_rows[target_level] or nil
+    if not row then return nil end
     return {
-        gold = definition.cost.gold_base
-            + (target_level - 1) * definition.cost.gold_step,
-        wood = definition.cost.wood_base
-            + (target_level - 1) * definition.cost.wood_step,
+        gold = tonumber(row.gold_cost) or 0,
+        wood = tonumber(row.wood_cost) or 0,
     }
+end
+
+function M.effect_value(effect, level, display)
+    level = math.max(0, math.floor(tonumber(level) or 0))
+    if level == 0 or not effect then return 0 end
+    local values = display and effect.display_values_by_level
+        or effect.values_by_level
+    return tonumber(values and values[level]) or 0
+end
+
+function M.effect_per_level(effect, display)
+    if not effect then return 0 end
+    return tonumber(display and effect.display_value_per_level
+        or effect.value_per_level) or 0
 end
 
 return M

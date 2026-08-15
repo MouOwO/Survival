@@ -125,7 +125,7 @@ local function run_transaction_tests()
 
     local locked = service:RequestUpgrade({ player_id = 0, tech_id = "RS-02" })
     assert_equal(locked.error_code, "prerequisite_not_met", "RS-02 prerequisite")
-    repository:SetLevel(0, "RS-01", 5)
+    repository:SetLevel(0, "RS-01", 10)
     local unlocked = service:RequestUpgrade({ player_id = 0, tech_id = "RS-02" })
     assert_equal(unlocked.success, true, "RS-02 unlocked")
 
@@ -165,7 +165,7 @@ local function run_transaction_tests()
         two.legacy.wall.health_bonus_pct, "reinitialize wall idempotent")
     assert_equal(one.legacy.hero.final_damage_bonus_pct, 4,
         "hero final damage once")
-    assert_equal(one.legacy.hero.attack_bonus_pct, 10,
+    assert_equal(one.legacy.hero.attack_flat, 10,
         "hero attack once")
 end
 
@@ -176,15 +176,15 @@ local function run_config_tests()
         total_levels = total_levels + definition.max_level
         local first = config.cost_for_level(definition, 1)
         local last = config.cost_for_level(definition, definition.max_level)
-        assert_equal(first.gold, definition.cost.gold_base,
+        assert_equal(first.gold, definition.generated_rows[1].gold_cost,
             definition.tech_id .. " first gold")
-        assert_equal(first.wood, definition.cost.wood_base,
+        assert_equal(first.wood, definition.generated_rows[1].wood_cost,
             definition.tech_id .. " first wood")
-        assert_equal(last.gold, definition.cost.gold_base
-            + (definition.max_level - 1) * definition.cost.gold_step,
+        assert_equal(last.gold,
+            definition.generated_rows[definition.max_level].gold_cost,
             definition.tech_id .. " last gold")
-        assert_equal(last.wood, definition.cost.wood_base
-            + (definition.max_level - 1) * definition.cost.wood_step,
+        assert_equal(last.wood,
+            definition.generated_rows[definition.max_level].wood_cost,
             definition.tech_id .. " last wood")
         assert_equal(config.cost_for_level(definition,
             definition.max_level + 1), nil,
@@ -212,7 +212,7 @@ local function run_description_tests()
     assert_equal(string.find(ars07, "英雄攻击力", 1, true) ~= nil, true,
         "hero attack description")
     assert_equal(Description.condition_text(config.by_id["RS-02"]),
-        "伐木工攻速 Lv.5", "prerequisite display name")
+        "伐木工速度 Lv.10", "prerequisite display name")
     assert_equal(Description.condition_text(config.by_id["ARS-08"]),
         "完成3转", "reincarnation description")
 end

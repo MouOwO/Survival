@@ -180,10 +180,12 @@ require("abilities/ability_build_main_city")
 require("abilities/ability_build_arrow_tower")
 require("abilities/ability_build_research_lab")
 require("abilities/ability_build_challenge")
+require("abilities/ability_build_advanced_research_lab")
 require("abilities/ability_challenge_monster_01")
 require("abilities/ability_challenge_monster_02")
 require("abilities/ability_challenge_monster_03")
 require("abilities/ability_challenge_monster_04")
+require("abilities/ability_challenge_monster_05")
 require("abilities/ability_challenge_auto_summon")
 require("abilities/ability_build_farm")
 require("abilities/ability_building_blink")
@@ -224,6 +226,7 @@ require("abilities/ability_tower_class_4")
 require("abilities/ability_tower_class_5")
 require("abilities/ability_tower_class_6")
 require("abilities/ability_tower_class_7")
+require("abilities/ability_research_lab_upgrade")
 
 local M = {}
 local initialized = false
@@ -519,6 +522,7 @@ function M.precache(context)
         "building_main_city",
         "building_arrow_tower",
         "building_research_lab",
+        "building_advanced_research_lab",
         "building_farm",
         "building_gold_mine",
         "building_hero_altar",
@@ -770,6 +774,7 @@ local function initialize_services()
     require("systems/player_profile_service").init()
     hero_progression_system.init()
     research_technology_bootstrap.init()
+    require("systems/research_lab_ability_sync").init()
     technology_stat_manager.init()
     research_armor_reduction_service.init()
     training_room_service.init()

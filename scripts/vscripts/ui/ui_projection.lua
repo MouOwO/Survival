@@ -7,6 +7,7 @@ local city_level_by_team = {}
 local worker_count_by_team = {}
 local wave = {}
 local research_unlocked_by_team = {}
+local advanced_research_unlocked_by_team = {}
 local shop_unlocked_by_player = {}
 
 local function mark_dirty(team)
@@ -28,6 +29,8 @@ end
 local function on_building_created(payload)
     if payload.building_id == "building_research_lab" then
         research_unlocked_by_team[payload.team] = true
+    elseif payload.building_id == "building_advanced_research_lab" then
+        advanced_research_unlocked_by_team[payload.team] = true
     end
     on_building_changed(payload)
 end
@@ -37,6 +40,8 @@ local function on_building_destroyed(payload)
         city_level_by_team[payload.team] = 0
     elseif payload.building_id == "building_research_lab" then
         research_unlocked_by_team[payload.team] = false
+    elseif payload.building_id == "building_advanced_research_lab" then
+        advanced_research_unlocked_by_team[payload.team] = false
     end
     mark_dirty(payload.team)
 end
@@ -74,6 +79,18 @@ local function build_snapshot(payload)
         }
         resource_by_team[team] = resource
     end
+    if advanced_research_unlocked_by_team[team] == nil then
+        local result = event_bus.request(events.BUILDING_LIST_REQUEST, {
+            player_id = payload.player_id,
+        })
+        advanced_research_unlocked_by_team[team] = false
+        for _, building in ipairs(result and result.buildings or {}) do
+            if building.building_id == "building_advanced_research_lab" then
+                advanced_research_unlocked_by_team[team] = true
+                break
+            end
+        end
+    end
     return {
         schema_version = 2,
         player_id = payload.player_id,
@@ -84,6 +101,8 @@ local function build_snapshot(payload)
         worker_count = worker_count_by_team[team] or 0,
         shop_unlocked = shop_unlocked_by_player[payload.player_id] and 1 or 0,
         research_unlocked = research_unlocked_by_team[team] and 1 or 0,
+        advanced_researcher_unlocked =
+            advanced_research_unlocked_by_team[team] and 1 or 0,
         wave = wave,
     }
 end
@@ -94,6 +113,7 @@ function M.init()
     worker_count_by_team = {}
     wave = {}
     research_unlocked_by_team = {}
+    advanced_research_unlocked_by_team = {}
     shop_unlocked_by_player = {}
     event_bus.subscribe(events.RESOURCE_CHANGED, on_resource_changed)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)

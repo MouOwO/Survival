@@ -312,9 +312,7 @@ end
 function M:_effect_text(definition, level)
     local parts = {}
     for _, effect in ipairs(definition.effects) do
-        local value = effect.mode == "constant"
-            and (level > 0 and effect.value_per_level or 0)
-            or effect.value_per_level * level
+        local value = config.effect_value(effect, level)
         parts[#parts + 1] = effect.key .. "=" .. tostring(value)
     end
     return table.concat(parts, "; ")

@@ -3,9 +3,20 @@ local gold_mine = require("config/gold_mine_config")
 local tower_routes = require("config/tower_route_config")
 local altar_actions = require("config/generated/altar_actions")
 local training_definitions = require("config/generated/training_definitions")
+local research_lab_abilities = require("config/generated/research_lab_abilities")
+local builder_ability_stages = require("config/generated/builder_ability_stages")
+local research_config = require("config/research_technology_config")
+local research_description = require("research/research_technology_description")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local M = {}
+local builder_slot_order_by_ability = {}
+for _, row in ipairs(builder_ability_stages.rows or {}) do
+    if row.enabled ~= false and row.ability_name then
+        builder_slot_order_by_ability[row.ability_name] =
+            tonumber(row.slot_order) or 0
+    end
+end
 local function cost_data(cost)
     return {
         cost_wood = cost and cost.wood or 0,
@@ -239,7 +250,10 @@ local function build_ability(ability_name, state, resources)
         ability_build_wall = buildings.wall,
         ability_build_main_city = buildings.main_city,
         ability_build_arrow_tower = buildings.arrow_tower,
+        ability_build_research_lab = buildings.building_research_lab,
         ability_build_farm = buildings.building_farm,
+        ability_build_advanced_research_lab = buildings.building_advanced_research_lab,
+        ability_build_challenge = buildings.building_challenge,
         ability_build_gold_mine = buildings.gold_mine,
         ability_build_hero_altar = buildings.hero_altar,
     }
@@ -268,6 +282,7 @@ local function build_ability(ability_name, state, resources)
     end
     local data = merge({
         available = available and 1 or 0,
+        builder_slot_order = builder_slot_order_by_ability[ability_name] or 0,
         current_level = city_level,
         status_text = status,
         fields = required > 0 and {
@@ -284,6 +299,96 @@ local function build_ability(ability_name, state, resources)
         definition.population_cost or 0,
         resources
     )
+end
+
+local function research_effect_value(definition, level)
+    local effect = definition and definition.effects and definition.effects[1]
+    return research_config.effect_value(effect, level, true)
+end
+
+local function research_upgrade(ability_name, state, resources)
+    local mapping = research_lab_abilities.by_id[ability_name]
+    if not mapping then return nil end
+    local definition = research_config.by_legacy_group[mapping.technology_group]
+    if not definition or (state.building_id ~= nil
+        and state.building_id ~= mapping.building_id) then
+        return { available = 0, can_afford = 0, status_text = "研究来源无效" }
+    end
+    local levels = state.research_levels or {}
+    local current = tonumber(levels[mapping.technology_group]) or 0
+    local maximum = tonumber(definition.max_level) or 0
+    local target = current + 1
+    local transaction = state.research_transaction or {}
+    local researching = transaction.researching == 1
+    local required = definition.prerequisite or {}
+    local prerequisite_met = true
+    if required.tech_id then
+        local prerequisite = research_config.by_id[required.tech_id]
+        prerequisite_met = prerequisite ~= nil
+            and (tonumber(levels[prerequisite.legacy_group]) or 0)
+                >= (tonumber(required.required_level) or 0)
+    end
+    prerequisite_met = prerequisite_met
+        and (tonumber(state.reincarnation_level) or 0)
+            >= (tonumber(required.reincarnation_level) or 0)
+    if current >= maximum then
+        return {
+            research_upgrade = 1,
+            display_name = mapping.display_name,
+            available = 0,
+            can_afford = 0,
+            current_level = current,
+            next_level = current,
+            max_level = maximum,
+            research_status_code = "max_level",
+            status_text = "科技已满级",
+            upgrade_description = research_description.build(definition, current, current),
+            cost_wood = 0,
+            cost_gold = 0,
+            research_effect_current = research_effect_value(definition, current),
+            research_effect_next = research_effect_value(definition, current),
+            research_slot_order = tonumber(mapping.slot_order) or 0,
+            research_building_id = mapping.building_id,
+            technology_group = mapping.technology_group,
+            fields = research_description.fields(definition, current, current),
+        }
+    end
+    local cost = research_config.cost_for_level(definition, target) or {}
+    local status_code = "available"
+    local status = "可以研究"
+    local available = true
+    if researching then
+        available = false
+        status_code = transaction.research_group == mapping.technology_group
+            and "researching_current" or "researching_other"
+        status = status_code == "researching_current"
+            and "正在研究此科技" or "团队已有科技正在研究"
+    elseif not prerequisite_met then
+        available = false
+        status_code = "prerequisite_not_met"
+        status = "前置条件未满足"
+    end
+    local data = {
+        research_upgrade = 1,
+        display_name = mapping.display_name,
+        available = available and 1 or 0,
+        current_level = current,
+        next_level = target,
+        max_level = maximum,
+        research_status_code = status_code,
+        status_text = status,
+        upgrade_description = research_description.build(definition, current, target),
+        fields = research_description.fields(definition, current, target),
+        research_effect_current = research_effect_value(definition, current),
+        research_effect_next = research_effect_value(definition, target),
+        cost_wood = tonumber(cost.wood) or 0,
+        cost_gold = tonumber(cost.gold) or 0,
+        research_slot_order = tonumber(mapping.slot_order) or 0,
+        research_building_id = mapping.building_id,
+        technology_group = mapping.technology_group,
+    }
+    if not available then data.can_afford = 0 return data end
+    return with_affordability(data, cost, 0, resources)
 end
 local function upgrade_level(definition, current_level, resources, state, display)
     display = display or {}
@@ -588,6 +693,8 @@ function M.build(ability_name, state, resources)
     if build then
         return build
     end
+    local research = state and research_upgrade(ability_name, state, resources)
+    if research then return research end
     if ability_name == "ability_open_hero_altar" then
         return altar_open(state)
     end

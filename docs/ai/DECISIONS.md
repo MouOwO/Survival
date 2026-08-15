@@ -1,5 +1,32 @@
 # Decisions
 
+## 2026-08-15：Builder采用动态连续管理域并统一Ability数量边界
+
+- 决定：CSV `slot_order=1..6`只定义Builder业务技能在管理域内的相对顺序；Blink紧随第六业务槽，不再规定业务技能必须占绝对engine index `0..5`或Blink必须占index 6。已有管理实例时以首个管理Ability为域起点；无管理实例时在真实`GetAbilityCount()`之后自然追加。未知非管理Ability必须保留，异常同步只删除项目管理实例。
+- 决定：服务端只能枚举`0..GetAbilityCount()-1`。Panorama只能按`survival_ability_runtime["unit:<entindex>"].ability_count`调用`Entities.GetAbility()`；固定24/64上限仅用于遍历Valve `AbilityN`面板节点。快捷键继续消费CSV生成的`builder_slot_order`，不依赖动态域绝对起点。
+- 原因：Workshop Tools实机证明Builder index 0可被非管理Ability占用，管理技能自然位于`1..7`；旧绝对布局会把有效状态判错并反复重建。旧固定63最低扫描上限还会在真实Ability数量为8时访问`8..63`并输出多组`invalid index`。本决定覆盖下方同日“engine index固定`0..6`”部分，不改变`Q/W/E/R/T/A/D`业务键或CSV槽位身份。
+
+## 2026-08-15：Builder六业务槽连续排列并让挑战建筑独立占用A
+
+- 决定：Builder固定业务槽为`Q/W/E/R/T/A`，CSV `slot_order=1..6`直接映射到engine index `0..5`；Blink固定`D`并占用engine index 6。Panorama对Builder按实体槽映射业务快捷键、按Ability名称映射Blink，不使用可见技能稠密序号。
+- 决定：普通研究所完工后，W由普通研究所替换为高级研究所；挑战建筑同时作为独立A技能出现。挑战建筑和高级研究所各自保留建筑ID、Ability ID、最大数量、前置、存档身份和运行服务。
+- 决定：生成Lua只从合并后的权威CSV重建；Panorama编译产物只从合并后的content源重编译。stash冲突中的生成文件和二进制产物不能直接选择某一侧。
+- 原因：隐藏或移除技能会改变可见技能稠密顺序，若客户端按稠密序号解释第六业务技能会显示/响应Y而不是A；独立槽与稳定ID也避免高级研究和挑战功能互相覆盖。
+
+## 2026-08-15：研究所配置统一消费生成科技定义并保留固定槽位
+
+- 决定：`technology_definitions.csv`及生成Lua是研究等级、逐级费用、累计效果、科技前置和转生要求唯一权威源；`research_technology_config.lua`只保留稳定`RS-*`/`ARS-*`身份和效果单位转换，禁止恢复手写线性费用、等级或前置常量。
+- 决定：普通研究所固定六槽`Q/W/E/R/T/A`，只有速度/防御塔/城墙三链在普通科技满10级后同槽切换；高级研究所固定十槽`Q/W/E/R/T/A/S/D/F/G`。所有未解锁、研究中和满级Ability都保留原槽并通过激活状态置灰。
+- 决定（已由同日后续决定部分覆盖）：不再维护高级研究所专属5x2 Panorama布局。原“普通/高级研究所统一使用52px项目技能行”仅为中间实现，研究所最终视觉以后续“Valve原生按钮”决定为准。金矿两组科技不进入研究所，继续由金矿能力链消费。
+- 原因：固定Ability身份和槽位避免解锁/满级造成快捷键漂移；生成数据单源消除手写配置与CSV在等级、费用、前置和Tooltip上的长期漂移。
+
+## 2026-08-15：研究所固定使用Valve原生按钮并由独立代理接管Tooltip
+
+- 决定：普通和高级研究所无条件绕过项目52px技能接管，保留Valve原生Ability按钮、禁用遮罩和布局；固定槽位、快捷键及服务端Ability状态继续由现有运行时链决定。
+- 决定：研究科技悬停和点击使用位于Valve `AbilityN`祖先树之外的透明代理。代理屏蔽Valve原生Tooltip，显示项目科技Tooltip，并承接左键研究和高级研究所右键窗口；不得直接在Valve节点内绑定项目悬停事件。
+- 决定：研究Tooltip标题使用`research_lab_abilities.csv.display_name`，等级独立显示；描述和字段消费服务端从`technology_definitions.csv`生成的运行时数据。研究Tooltip不显示“施法类型”或“科技编号”，Panorama不维护第二份效果名称映射。
+- 原因：原生按钮可以保持Dota一致的视觉、等级和禁用反馈；独立代理同时避免Valve祖先节点创建原生Tooltip，且不牺牲项目权威输入和研究事务。
+
 ## 2026-08-14：Dota护甲曲线以0.06公式为准并取消普通怪物额外补偿
 
 - 决定：当前Dota护甲承伤曲线统一采用`1 - 0.06A/(1+0.06|A|)`；War3护甲继续线性投影`A=W/3`。正甲下原生结算已经严格等于目标`1/(1+0.02W)`，因此普通项目怪物物理伤害补偿必须为1。

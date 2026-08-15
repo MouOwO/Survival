@@ -29,5 +29,5 @@ monster_corpse_sink_depth,160,怪物尸体下沉的垂直距离,1
 monster_corpse_update_interval,0.05,全部怪物尸体共享更新任务的间隔秒数,1
 monster_corpse_remove_delay_seconds,0.05,尸体隐藏后安全移除实体的延迟秒数,1
 runtime_detailed_diagnostics,0,运行时攻击与技能成功路径详细日志开关（0关闭1开启）,1
-dev_wall_health,9999999999,输入dev后城墙的开发模式最大生命和当前生命,1
+dev_wall_health,100000000,输入dev后城墙的开发模式最大生命和当前生命,1
 dev_wall_war3_armor,100000,输入dev后城墙的开发模式War3护甲,1

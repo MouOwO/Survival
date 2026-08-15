@@ -174,6 +174,15 @@ local function building_limit_reached(definition, existing_count)
         existing_count
     )
 end
+local function has_completed_building(player_id, building_id)
+    for _, state in pairs(buildings) do
+        if state.player_id == player_id and state.building_id == building_id
+            and not state.constructing and valid_entity(state.unit) then
+            return true
+        end
+    end
+    return false
+end
 local function apply_hull_radius(unit, definition)
     if not valid_entity(unit) or type(unit.SetHullRadius) ~= "function" then
         logger.warn("BuildingSystem", "unable to apply hull radius id="
@@ -580,6 +589,13 @@ local function can_place(payload)
             ok = false,
             error = "主城达到Lv." .. tostring(definition.unlock_city_level) .. "后解锁",
         }
+    end
+    if definition.requires_building_id
+        and not has_completed_building(
+            builder.player_id,
+            definition.requires_building_id
+        ) then
+        return { ok = false, error = "需要先完成普通研究所" }
     end
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = payload.position,

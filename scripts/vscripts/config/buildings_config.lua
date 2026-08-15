@@ -6,6 +6,10 @@ local wall_visual_levels = require("config/generated/wall_visual_levels")
 local construction_rules = require(
     "config/generated/building_construction_rules"
 )
+local builder_ability_stages = require(
+    "config/generated/builder_ability_stages"
+)
+local research_lab_ability_sync = require("systems/research_lab_ability_sync")
 
 local M = {}
 
@@ -27,8 +31,16 @@ local function configured_unit_name(building_id, fallback)
     return fallback
 end
 
+local builder_stage_by_building_id = {}
+for _, row in ipairs(builder_ability_stages.rows or {}) do
+    if row.enabled ~= false and row.building_id then
+        builder_stage_by_building_id[row.building_id] = row
+    end
+end
+
 local function apply_construction(definition, source_id)
     local configured = definition_row(source_id)
+    local builder_stage = builder_stage_by_building_id[source_id] or {}
     local row = (construction_rules.by_id or {})[source_id] or configured
     -- building_definitions.csv is authoritative for generic building rules.
     -- Keep the hand-written values only as compatibility fallbacks so changing
@@ -43,6 +55,7 @@ local function apply_construction(definition, source_id)
     definition.population_cost = tonumber(configured.population_cost)
         or tonumber(definition.population_cost)
         or 0
+    definition.requires_building_id = builder_stage.requires_building_id
     definition.build_time = tonumber(row.build_time) or 3
     definition.build_particle = row.build_particle
         or "particles/items_fx/repair_kit.vpcf"
@@ -210,6 +223,9 @@ local research_lab_levels = level_rows("building_research_lab")
 research_lab_levels[1] = research_lab_levels[1] or {}
 research_lab_levels[1].health = research_lab_levels[1].health or 2500
 research_lab_levels[1].armor = research_lab_levels[1].armor or dota_armor(8)
+local research_lab_skill_names = research_lab_ability_sync.initial_abilities(
+    "building_research_lab"
+)
 M.building_research_lab = {
     id = "building_research_lab",
     display_name = configured_name("building_research_lab", "研究所"),
@@ -223,7 +239,7 @@ M.building_research_lab = {
     unlock_city_level = 1,
     show_health_bar = false,
     selectable = true,
-    abilities = {},
+    abilities = research_lab_skill_names,
     levels = research_lab_levels,
 }
 
@@ -251,6 +267,29 @@ M.building_challenge = {
     },
     levels = challenge_levels,
 }
+local advanced_research_lab_levels = level_rows("building_advanced_research_lab")
+advanced_research_lab_levels[1] = advanced_research_lab_levels[1] or {}
+advanced_research_lab_levels[1].health = advanced_research_lab_levels[1].health or 2500
+advanced_research_lab_levels[1].armor = advanced_research_lab_levels[1].armor or dota_armor(8)
+M.building_advanced_research_lab = {
+    id = "building_advanced_research_lab",
+    display_name = configured_name("building_advanced_research_lab", "高级研究所"),
+    unit_name = configured_unit_name(
+        "building_advanced_research_lab",
+        "building_advanced_research_lab"
+    ),
+    build_cost = build_cost("building_advanced_research_lab", 100, 0),
+    footprint = { x = 2, y = 2 },
+    max_count = 1,
+    unlock_city_level = 4,
+    show_health_bar = false,
+    selectable = true,
+    abilities = research_lab_ability_sync.initial_abilities(
+        "building_advanced_research_lab"
+    ),
+    levels = advanced_research_lab_levels,
+}
+
 
 M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
 local gold_mine_visual = (building_visual_by_id.building_gold_mine or {})[1]
@@ -279,6 +318,10 @@ M.building_research_lab = apply_construction(
 M.building_challenge = apply_construction(
     M.building_challenge,
     "building_challenge"
+)
+M.building_advanced_research_lab = apply_construction(
+    M.building_advanced_research_lab,
+    "building_advanced_research_lab"
 )
 M.gold_mine = apply_construction(M.gold_mine, "gold_mine")
 M.hero_altar = apply_construction(M.hero_altar, "hero_altar")

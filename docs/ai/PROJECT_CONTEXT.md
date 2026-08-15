@@ -1,5 +1,18 @@
 # Project Context
 
+## Builder第六业务槽与研究/挑战建筑并存边界（2026-08-15）
+
+- 建筑前置身份必须从`builder_ability_stages.csv`生成配置投影到`buildings_config.lua`，不得在具体建筑定义中重复手写。普通研究所的`requires_building_id`为空；高级研究所和挑战建筑均为`building_research_lab`。误把普通研究所前置写成自身会让`building_system.can_place()`在Grid地形校验前固定拒绝，随后全部footprint格被统一标红，表现与碰撞或地形阻挡相同；排查全红时必须先比较同位置其他建筑并检查业务错误。
+- `builder_ability_stages.csv`是Builder槽位与建筑前置的唯一权威源。普通和高级研究所共用`slot_order=2`并按普通研究所完工替换；独立挑战建筑使用`slot_order=6`且要求普通研究所完工，不替换任一研究所。
+- Builder六个业务槽按CSV `slot_order=1..6`保持相对连续，`ability_survival_builder_blink`紧随第六业务槽；它们不再绑定绝对engine index。实机Builder可能由未知非管理Ability占用index 0，此时管理域自然位于`1..7`。同步必须保留所有非管理Ability，以首个现有管理Ability为管理域起点；完全无管理实例时从真实`GetAbilityCount()`之后自然追加。正确布局保持实体以保留冷却，异常布局才清理管理实例并按相对顺序重建，不能依赖`FindAbilityByName()`掩盖同名重复。
+- 动态`npc_dota_creature`的`SetAbilityIndex()`不保证在同一同步调用内立即反映到严格槽位枚举。Builder重建时必须先对`AddAbility()`实际返回的实例写入等级、隐藏和激活状态，再验证布局；布局瞬时失败可记录并由后续同步自愈，但不得提前返回而留下0级/未激活的整排灰按钮。行为测试必须模拟拒绝即时换位，不能只使用理想化槽位Mock。
+- 最新实机进一步证明“失败后反复重建并等待自愈”仍不可靠，可能留下重复箭塔或错误槽枚举。当前稳定策略是在动态管理域内让六个业务相对槽始终各有一个自然添加的业务Ability或隐藏占位Ability，Blink最后自然添加；Builder生产同步禁止调用`SetAbilityIndex()`。隐藏占位固定Lv.1、隐藏、未激活，并纳入管理域清理和完整布局校验。
+- Builder Panorama快捷键不得再读取瞬时engine slot。`ability_runtime_builder.lua`必须从生成`builder_ability_stages.lua`按Ability名称发布`builder_slot_order`，标签与键盘输入共同消费该字段映射`1..6 -> Q/W/E/R/T/A`；Blink仍按名称映射D。这样CSV仍是唯一业务槽权威源。
+- 实机已证明使用`DOTA_UNIT_CAP_MOVE_NONE`真实静态建筑作为Grid预览时，仅加`MODIFIER_STATE_NO_UNIT_COLLISION`和`SetHullRadius(0)`仍可能让预览后的网格持续全红。项目Grid预览统一创建专用地面移动型`npc_survival_grid_preview_proxy`，再由预览Modifier固定、禁交互并写0 Hull；模型和缩放从生成建筑配置投影。真实完工建筑继续使用KV Hull、逻辑footprint和Grid占用，禁止用修改真实建筑Hull掩盖预览问题。
+- 普通研究所自前置修复已由用户于2026-08-15明确确认解决并通过实机验收。后续若再次出现普通研究所四格固定全红，先检查生成Builder阶段和`buildings_config.lua`运行投影是否仍使普通研究所`requires_building_id=nil`，再检查专用预览代理与地形；不得直接恢复普通研究所自身前置，也不得把本任务重新列为待验收。
+- Panorama识别`npc_survival_builder_proxy`后按runtime `builder_slot_order=1..6`映射`Q/W/E/R/T/A`，Blink按名称固定映射`D`；视觉标签和键盘分发必须消费同一映射，禁止读取绝对engine index推导业务键。所有客户端实体Ability枚举必须受`survival_ability_runtime["unit:<entindex>"].ability_count`限制；固定24/64扫描只允许用于枚举Valve `AbilityN` HUD节点。
+- 恢复stash或解决二进制Panorama冲突时，`.vjs_c/.vcss_c/.vxml_c`必须从最终合并后的content源强制重编译，禁止直接采用ours/theirs。HUD XML递归编译产生的无关依赖副产物应恢复到任务前index，只保留目标产物。
+
 ## 城墙War3护甲、正式波次碰撞与D位移截断（2026-08-15）
 
 - 城墙基础护甲来自`building_levels.csv.war3_armor`；科技`super_wall_armor_flat`和山岭巨人`challenge_wall_armor_flat`虽然在既有聚合层按Dota单位`/3`保存，但投影到城墙自定义护甲状态时必须乘回3。城墙原生Dota护甲固定为0，全部物理伤害由唯一Damage Filter按`1/(1+0.02*max(0,有效War3护甲))`结算并忽略原生护甲；百分比穿甲先作用于War3护甲。
@@ -12,6 +25,20 @@
 - 动态`npc_dota_creature`建筑的Toggle不能只实现Lua `OnToggle()`。Panorama托管动作必须识别该Ability，允许`DOTA_ABILITY_BEHAVIOR_TOGGLE`行为位通过无选点分发；`ui_request_router`验证实体归属、建筑身份和Ability归属后直达权威服务，并同步引擎Toggle外观。服务端调用`ToggleAbility()`前必须设置重入标记，避免`OnToggle()`再次反向提交。
 - 同一动态建筑的完工尺寸和施工覆盖必须成对配置：`building_visual_levels.csv`定义模型/完工`model_scale`，`building_construction_rules.csv`定义施工粒子、时间和`build_visual_scale`，再由正式生成器生成Lua。缺少施工行会回退到缩放1，造成施工与完工尺寸不一致；不得为单一建筑绕开`building_construction_visual_service`另写施工特效。
 - 本轮任务已由用户于2026-08-14明确确认完成。后续若挑战怪再次卡位，优先检查挑战生成边界是否仍固定0 Hull及墙AI无单位碰撞；若自动Toggle失效，按“Panorama托管识别 -> Toggle行为位放行 -> `ui_request_router`直达分发 -> `OnToggle`重入保护”的顺序排查；若建筑施工尺寸跳变，先比较两张CSV的缩放值，不新增旁路实现。
+
+## 研究所建筑技能与Builder W替换边界（2026-08-15）
+
+- 研究技能身份、所属建筑、链顺序和槽位唯一权威源为`research_lab_abilities.csv`。普通研究所固定六槽：`Q`速度低/高级链、`W`普通伐木效率、`E`防御塔低/高级链、`R`城墙低/高级链、`T`高级伐木效率、`A`伐木暴击；只有速度/防御塔/城墙在普通科技满10级后同槽替换。高级研究所固定`Q/W/E/R/T/A/S/D/F/G`十槽。
+- 未解锁、研究中和满级科技都保留Ability与固定槽位，通过`SetActivated(false)`置灰；前置或转生满足后激活同一个Ability。不得再以删除满级Ability表达完成状态，也不得恢复高级研究所Panorama 5x2特殊布局。
+- 两类研究所固定使用Valve原生Ability按钮视觉，项目52px技能接管必须对研究所无条件关闭。固定槽位/快捷键属于运行时输入规则，不依赖自定义按钮绘制；原生按钮角标按`research_slot_order`和`research_building_id`投影固定键位。
+- 研究科技使用独立于Valve `AbilityN`祖先树的透明代理：保留原生按钮视觉和禁用遮罩，代理屏蔽Valve原生Tooltip并显示项目Tooltip，同时承接左键研究和高级研究所右键窗口。代理映射失败必须整批失败关闭，避免部分按钮出现双Tooltip或点击分流。
+- 高级研究所即使运行时权威配置有十槽，Valve HUD也可能只创建部分真实`AbilityN`按钮。代理枚举上限必须来自研究运行时签名：已有按钮使用真实窗口矩形，尾部缺失槽位按最后两个真实按钮的水平步距外推，步距无效时回退按钮宽度；外推槽只使用显式窗口矩形做定位和光标命中，禁止访问空Valve锚点。代理Tooltip与左键项目输入必须共同消费同一槽位投影。
+- 研究科技Tooltip标题读取`research_lab_abilities.csv.display_name`，当前科技等级单独显示；描述、累计效果、升级后效果、等级上限和前置由服务端消费`technology_definitions.csv`后发布。Panorama不得维护第二套高级科技效果字典，研究Tooltip不得显示Ability内部名、施法类型或稳定`RS-*`/`ARS-*`编号。
+- `technology_definitions.csv`及其生成Lua是研究等级、逐级费用、累计效果、科技前置和转生要求唯一权威源。`research_technology_config.lua`只允许作为稳定`RS-*`/`ARS-*`身份和效果单位转换适配层，不得重新维护线性费用或等级常量。
+- 普通研究范围是九个非金矿组，高级研究范围是十个`researcher_*`组；`gold_mine_efficiency`和`gold_mine_crit`只能由金矿能力链消费，不进入任一研究所。
+- Builder W阶段唯一权威源为`builder_ability_stages.csv`：主城完成后先显示普通研究所建造；只有普通研究所发布完工`BUILDING_CREATED`后才替换为高级研究所建造。主城Lv.4控制激活状态，不控制提前显示；建造系统还必须验证前置研究所已完工，不能接受施工中计数。
+- 研究点击必须从当前Ability映射反查可信科技组，并验证Ability属于来源建筑、建筑已完工、building ID匹配、owner/team匹配且Ability可用，再进入现有团队共享2秒研究事务。客户端运行时和技能增删只投影服务端状态，不自行提交等级。
+- 高级研究所视觉与尺寸保持`models/props_structures/radiant_ancient001.vmdl`、`model_scale=0.34`、`2x2` footprint和`AbilityLayout 12`。左键研究技能直接研究；右键高级研究技能打开高级研究窗口，窗口右键卡片切换自动研究。
 
 ## 神秘塔激光Tick权威边界（2026-08-13）
 

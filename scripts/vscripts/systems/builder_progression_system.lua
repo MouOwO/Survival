@@ -5,10 +5,24 @@ local training = require("config/generated/training_definitions")
 
 local M = {}
 local BUILDER_BLINK_ABILITY = "ability_survival_builder_blink"
-local BUILDER_BLINK_INDEX = 5
+local BUILDER_SLOT_COUNT = 6
 
 local state_by_team = {}
 local managed_abilities = {}
+
+local function placeholder_name(slot_order)
+    return "ability_survival_builder_slot_" .. tostring(slot_order)
+        .. "_placeholder"
+end
+
+local function is_managed_ability(name)
+    return managed_abilities[name] == true
+        or name == BUILDER_BLINK_ABILITY
+        or string.match(
+            name,
+            "^ability_survival_builder_slot_[1-6]_placeholder$"
+        ) ~= nil
+end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -64,17 +78,6 @@ local function rows_for(stage_id)
     return rows
 end
 
-local function remove_managed(builder)
-    if not valid_entity(builder) then
-        return
-    end
-    for ability_name, _ in pairs(managed_abilities) do
-        if builder:FindAbilityByName(ability_name) then
-            builder:RemoveAbility(ability_name)
-        end
-    end
-end
-
 local function can_activate(state, row)
     if row.building_id == "building_research_lab"
         and count(state, "building_research_lab") >= 1 then
@@ -91,6 +94,10 @@ local function can_activate(state, row)
     if maximum > 0 and count(state, row.building_id) >= maximum then
         return false
     end
+    local prerequisite = tostring(row.requires_building_id or "")
+    if prerequisite ~= "" and count(state, prerequisite) < 1 then
+        return false
+    end
     if row.disable_after_hero_summoned == true
         and state.hero_summoned then
         return false
@@ -101,6 +108,12 @@ end
 local function count_limit_reached(state, row)
     local maximum = tonumber(row.max_building_count) or 0
     return maximum > 0 and count(state, row.building_id) >= maximum
+end
+
+local function should_show(state, row)
+    if count_limit_reached(state, row) then return false end
+    local prerequisite = tostring(row.requires_building_id or "")
+    return prerequisite == "" or count(state, prerequisite) > 0
 end
 
 local function valid_tower_class(value)
@@ -165,46 +178,216 @@ local function rebuild_building_counts(state)
     end
 end
 
-local function add_stage_abilities(state, stage_rows)
-    local builder = state.builder
-    if not valid_entity(builder) then
-        return
+local function ability_name(ability)
+    if not ability or not ability.GetAbilityName then return "" end
+    return tostring(ability:GetAbilityName() or "")
+end
+
+local function enumerate_abilities(builder)
+    local result = {}
+    local reported_count = builder.GetAbilityCount
+        and (tonumber(builder:GetAbilityCount()) or 0) or 0
+    reported_count = math.max(0, math.floor(reported_count))
+    for index = 0, reported_count - 1 do
+        local ability = builder:GetAbilityByIndex(index)
+        if ability then
+            table.insert(result, {
+                ability = ability,
+                name = ability_name(ability),
+                index = index,
+            })
+        end
+    end
+    return result, reported_count
+end
+
+local function management_domain_start(entries, reported_count)
+    local first_managed = nil
+    for _, entry in ipairs(entries or {}) do
+        if is_managed_ability(entry.name)
+            and (first_managed == nil or entry.index < first_managed) then
+            first_managed = entry.index
+        end
+    end
+    if first_managed ~= nil then return first_managed end
+    return math.max(0, tonumber(reported_count) or 0)
+end
+
+local function desired_layout(state, stage_rows, domain_start)
+    local result = {}
+    local target_by_index = {}
+    domain_start = math.max(0, tonumber(domain_start) or 0)
+    for _, row in ipairs(stage_rows) do
+        if should_show(state, row) then
+            local relative_index = math.max(
+                0,
+                (tonumber(row.slot_order) or 1) - 1
+            )
+            local target = {
+                name = row.ability_name,
+                index = domain_start + relative_index,
+                row = row,
+            }
+            target_by_index[relative_index] = target
+        end
+    end
+    for relative_index = 0, BUILDER_SLOT_COUNT - 1 do
+        table.insert(result, target_by_index[relative_index] or {
+            name = placeholder_name(relative_index + 1),
+            index = domain_start + relative_index,
+            row = nil,
+            placeholder = true,
+        })
+    end
+    table.sort(result, function(a, b) return a.index < b.index end)
+    table.insert(result, {
+        name = BUILDER_BLINK_ABILITY,
+        index = domain_start + BUILDER_SLOT_COUNT,
+        row = nil,
+    })
+    return result
+end
+
+local function layout_is_valid(builder, desired, entries)
+    entries = entries or enumerate_abilities(builder)
+    local expected_by_index = {}
+    local actual_by_index = {}
+    local expected_count = 0
+    for _, target in ipairs(desired) do
+        if expected_by_index[target.index] then return false end
+        expected_by_index[target.index] = target.name
+        expected_count = expected_count + 1
     end
 
-    for _, row in ipairs(stage_rows) do
-        local active = can_activate(state, row)
-        local ability = builder:FindAbilityByName(row.ability_name)
-        local replaced_research = row.building_id == "building_research_lab"
-            and count(state, "building_research_lab") >= 1
-        local challenge_locked = row.building_id == "building_challenge"
-            and count(state, "building_research_lab") < 1
-        if (count_limit_reached(state, row) or replaced_research or challenge_locked)
-            and ability then
-            builder:RemoveAbility(row.ability_name)
-            ability = nil
-        elseif not count_limit_reached(state, row) and not replaced_research
-            and not challenge_locked and not ability then
-            ability = builder:AddAbility(row.ability_name)
+    local managed_count = 0
+    for _, entry in ipairs(entries) do
+        actual_by_index[entry.index] = entry.name
+        if is_managed_ability(entry.name) then
+            managed_count = managed_count + 1
+            if expected_by_index[entry.index] ~= entry.name then return false end
         end
-        if ability then
-            ability:SetLevel(1)
-            ability:SetHidden(false)
-            ability:SetActivated(active)
-            if ability.SetAbilityIndex then
-                ability:SetAbilityIndex(math.max(0, (tonumber(row.slot_order) or 1) - 1))
+    end
+    if managed_count ~= expected_count then return false end
+
+    for _, target in ipairs(desired) do
+        if actual_by_index[target.index] ~= target.name then
+            return false
+        end
+    end
+    return true
+end
+
+local function capture_cooldowns(builder, entries)
+    local result = {}
+    entries = entries or enumerate_abilities(builder)
+    for _, entry in ipairs(entries) do
+        if is_managed_ability(entry.name) then
+            local remaining = 0
+            if entry.ability.GetCooldownTimeRemaining then
+                remaining = math.max(
+                    0,
+                    tonumber(entry.ability:GetCooldownTimeRemaining()) or 0
+                )
             end
+            result[entry.name] = math.max(result[entry.name] or 0, remaining)
         end
     end
-    local blink = builder:FindAbilityByName(BUILDER_BLINK_ABILITY)
-    if not blink then
-        blink = builder:AddAbility(BUILDER_BLINK_ABILITY)
+    return result
+end
+
+local function remove_managed_instances(builder, entries)
+    local counts = {}
+    entries = entries or enumerate_abilities(builder)
+    for _, entry in ipairs(entries) do
+        if is_managed_ability(entry.name) then
+            counts[entry.name] = (counts[entry.name] or 0) + 1
+        end
     end
-    if blink then
-        blink:SetLevel(1)
-        blink:SetHidden(false)
-        blink:SetActivated(true)
-        if blink.SetAbilityIndex then
-            blink:SetAbilityIndex(BUILDER_BLINK_INDEX)
+    for name, ability_count in pairs(counts) do
+        for _ = 1, ability_count do builder:RemoveAbility(name) end
+    end
+end
+
+local function restore_cooldown(ability, remaining)
+    remaining = math.max(0, tonumber(remaining) or 0)
+    if remaining <= 0 or not ability.StartCooldown then return end
+    if ability.EndCooldown then ability:EndCooldown() end
+    ability:StartCooldown(remaining)
+end
+
+local function configure_ability(state, target, ability)
+    if not ability then return end
+    ability:SetLevel(1)
+    ability:SetHidden(target.placeholder == true)
+    ability:SetActivated(target.placeholder ~= true
+        and (target.row == nil or can_activate(state, target.row)))
+end
+
+local function rebuild_layout(state, builder, desired, entries)
+    local cooldowns = capture_cooldowns(builder, entries)
+    remove_managed_instances(builder, entries)
+    local rebuilt = {}
+    for _, target in ipairs(desired) do
+        local ability = builder:AddAbility(target.name)
+        rebuilt[target.name] = ability
+        if ability then
+            restore_cooldown(ability, cooldowns[target.name])
+            configure_ability(state, target, ability)
+        end
+    end
+    local rebuilt_entries, reported_count = enumerate_abilities(builder)
+    return layout_is_valid(builder, desired, rebuilt_entries), rebuilt,
+        rebuilt_entries, reported_count
+end
+
+local function layout_description(entries)
+    local parts = {}
+    for _, entry in ipairs(entries or {}) do
+        table.insert(parts, tostring(entry.index) .. ":" .. entry.name)
+    end
+    return table.concat(parts, ",")
+end
+
+local function expected_description(desired)
+    local parts = {}
+    for _, target in ipairs(desired or {}) do
+        table.insert(parts, tostring(target.index) .. ":" .. target.name)
+    end
+    return table.concat(parts, ",")
+end
+
+local function configure_layout(state, stage_rows)
+    local builder = state.builder
+    if not valid_entity(builder) then return end
+    local entries, reported_count = enumerate_abilities(builder)
+    local domain_start = management_domain_start(entries, reported_count)
+    local desired = desired_layout(state, stage_rows, domain_start)
+    local layout_valid = layout_is_valid(builder, desired, entries)
+    local rebuilt = {}
+    if not layout_valid then
+        layout_valid, rebuilt, entries, reported_count = rebuild_layout(
+            state,
+            builder,
+            desired,
+            entries
+        )
+    end
+    if not layout_valid then
+        print("[BuilderProgression] failed to rebuild authoritative ability layout"
+            .. " ability_count=" .. tostring(reported_count)
+            .. " domain_start=" .. tostring(domain_start)
+            .. " valid_slots=[" .. layout_description(entries) .. "]"
+            .. " expected=[" .. expected_description(desired) .. "]")
+    end
+    local ability_by_index = {}
+    for _, entry in ipairs(entries) do
+        ability_by_index[entry.index] = entry.ability
+    end
+    for _, target in ipairs(desired) do
+        local ability = rebuilt[target.name]
+            or ability_by_index[target.index]
+        if ability_name(ability) == target.name then
+            configure_ability(state, target, ability)
         end
     end
 end
@@ -239,14 +422,9 @@ end
 
 local function sync(state)
     local next_stage = stage_for(state)
-    local stage_changed = next_stage ~= state.stage_id
     state.stage_id = next_stage
     local rows = rows_for(next_stage)
-
-    if stage_changed then
-        remove_managed(state.builder)
-    end
-    add_stage_abilities(state, rows)
+    configure_layout(state, rows)
     publish(state)
 end
 

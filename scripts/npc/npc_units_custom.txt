@@ -116,6 +116,27 @@
         "VisionNighttimeRange"   "800"
     }
 
+    "building_advanced_research_lab"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/props_structures/radiant_ancient001.vmdl"
+        "ModelScale"             "0.34"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "AbilityLayout"          "12"
+        "HealthBarOffset"        "-1"
+        "StatusHealth"           "2500"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "ArmorPhysical"          "2.666667"
+        "MagicalResistance"      "25"
+        "BoundsHullName"         "DOTA_HULL_SIZE_BARRACKS"
+        "VisionDaytimeRange"     "1000"
+        "VisionNighttimeRange"   "800"
+    }
+
     "building_farm"
     {
         "BaseClass"              "npc_dota_creature"
@@ -200,6 +221,26 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_HERO"
         "VisionDaytimeRange"     "800"
         "VisionNighttimeRange"   "600"
+    }
+
+    "npc_survival_grid_preview_proxy"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/undying/undying.vmdl"
+        "ModelScale"             "1.0"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "StatusHealth"           "1"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_GROUND"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "MovementSpeed"          "1"
+        "ArmorPhysical"          "0"
+        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
+        "HealthBarOffset"        "-1"
+        "VisionDaytimeRange"     "0"
+        "VisionNighttimeRange"   "0"
     }
 
     "npc_survival_repairer"

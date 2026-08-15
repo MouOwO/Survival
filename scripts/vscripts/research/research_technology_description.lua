@@ -43,6 +43,7 @@ local EFFECTS = {
     tower_attack_bonus_pct = { label = "防御塔攻击力", kind = "percent" },
     hero_crit_chance_pct = { label = "英雄暴击率", kind = "percent" },
     hero_attack_bonus_pct = { label = "英雄攻击力", kind = "percent" },
+    hero_attack_flat = { label = "英雄攻击力", kind = "flat" },
     wall_health_pct = { label = "最大生命", kind = "percent" },
     wall_health_advanced_pct = { label = "最大生命", kind = "percent" },
     wall_health_super_pct = { label = "最大生命", kind = "percent" },
@@ -72,10 +73,7 @@ local function format_value(value, kind)
 end
 
 local function contribution(effect, level)
-    if effect.mode == "constant" then
-        return level > 0 and effect.value_per_level or 0
-    end
-    return (tonumber(effect.value_per_level) or 0) * level
+    return config.effect_value(effect, level, true)
 end
 
 local function effect_parts(definition, level, per_level)
@@ -83,7 +81,7 @@ local function effect_parts(definition, level, per_level)
     for _, effect in ipairs(definition.effects or {}) do
         local metadata = EFFECTS[effect.key]
         if metadata then
-            local value = per_level and effect.value_per_level
+            local value = per_level and config.effect_per_level(effect, true)
                 or contribution(effect, level)
             if metadata.absolute then value = math.abs(value) end
             parts[#parts + 1] = metadata.label .. "+"
@@ -129,10 +127,10 @@ end
 
 function M.fields(definition, current_level, target_level)
     return {
-        { label = "科技编号", value = definition.tech_id },
         { label = "等级上限", value = definition.max_level },
         { label = "当前累计", value = M.effect_summary(definition, current_level) },
         { label = "升级后累计", value = M.effect_summary(definition, target_level) },
+        { label = "前置条件", value = M.condition_text(definition) },
     }
 end
 

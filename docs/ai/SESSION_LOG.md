@@ -4,6 +4,63 @@
 - `global_rules.csv`新增权威规则`wave_ground_monster_hull_radius=32`并定向生成；`wave_monster_collision`不再硬编码29，正式地面普通、领头、精英和Boss统一读取32。普通飞行怪Hull 10、特殊飞行怪Hull 0与五种挑战怪专属Hull 0边界保持不变。
 - 自动验证通过：`WALL_COLLISION_BLINK_LUA51_PASS`、`WAVE_FLYING_COLLISION_PASS`、目标Lua 5.1语法、生成Lua逐字节一致、严格UTF-8及限定`diff --check`。这些检查证明配置与分类调用链正确，不等于Workshop Tools实机站位验收；仍需完全冷启动确认实际同时攻击者为四只。
 
+## 2026-08-15 - 研究所十槽Tooltip代理几何、点击路由与ARS-01图标修复
+
+- 研究所透明代理原先受Valve已创建按钮数量限制，高级研究所后四个运行时槽位可能没有可用锚点，导致十槽自定义Tooltip、命中和点击路由不完整。`ability_tooltip.js`现按研究运行时权威签名枚举普通六槽/高级十槽；真实槽使用Valve按钮矩形，尾部缺失槽位按最后两个真实按钮的水平步距外推，步距无效时回退按钮宽度，并以显式窗口矩形定位透明代理和判断光标命中。
+- 真实槽与外推槽统一显示项目自定义Tooltip并把左键送入项目研究输入；高级研究所右键窗口、自动研究及链式替换协议未改。ARS-01/Q图标已从权威`research_lab_abilities.csv`改为`furion_force_of_nature`，定向生成Lua和Ability KV同步，KV的UTF-8 BOM保持。
+- 自动验证通过：高级研究所专项PowerShell契约、三项研究所Lua 5.1行为测试、Ability输入生命周期契约、目标Lua 5.1语法、PowerShell语法解析、CSV/生成Lua逐字节一致、ARS-01三层图标一致、目标严格UTF-8及BOM约定、双仓限定`diff --check`。Resource Compiler定向输出`1 compiled, 0 failed, 0 skipped`，编译产物非空且晚于源码。自动检查不能替代Workshop Tools实机验证，仍需冷启动检查十槽几何、Tooltip、左右键和链式替换。
+
+## 2026-08-15 - 研究所Grid自前置修复完成并通过用户实机验收
+
+- 用户冷启动实机确认专用Grid预览代理上线后，普通研究所在空旷合法地形仍四格全红；同位置人口农场可以显示合法网格。该对照排除了全局输入、鼠标坐标和基础导航整体失效，并把问题收窄到研究所业务profile。
+- Git历史和运行调用链确认：高级研究所接入时误把`requires_building_id = "building_research_lab"`写入普通研究所。`building_system.can_place()`在Grid地形校验前因此固定返回“需要先完成普通研究所”，`grid_placement_router`再把业务错误写入全部四格，所以此前修改预览Hull无法解决。
+- `buildings_config.lua`现从CSV生成的`builder_ability_stages.lua`按`building_id`统一投影建筑前置，不再在普通/高级研究所定义中重复手写。真实加载结果为普通研究所无前置，高级研究所和挑战建筑均要求已完工普通研究所；专用预览代理、W/A/D快捷键、费用、2x2占地和真实建筑碰撞未改。
+- 新增`test_building_prerequisite_projection.lua`，并扩展研究所Grid与挑战合并契约覆盖CSV、生成Lua、运行投影及禁止普通研究所自前置。11项相关Lua 5.1回归、7项直接契约、Builder前置CSV/生成一致、生产/测试目标严格UTF-8、本轮新增文档行无替换字符和限定`diff --check`通过；`SESSION_LOG.md`整文件仍保留此前已记录的历史替换字符。`building_system.lua`既有UTF-8 BOM通过去BOM内存语法检查；融合区域旧契约的`policy_only`失败与本轮无关。
+- 用户随后明确确认普通研究所全红且无法建造的问题已经解决，本任务记为用户实机验收通过并关闭。该确认仅覆盖本次报告的问题；高级研究所和挑战建筑前置仍由CSV、运行投影和自动契约保证，不在此追加未明确给出的实机验收结论。
+
+## 2026-08-15 - 研究所Grid第二轮实机反馈与专用预览代理
+
+- 用户实机确认Builder所有快捷键均正确，研究所为W、挑战建筑为A、Blink为D，因此旧挑战建筑占W冲突不是本次红格原因。CSV与生成Lua复核也保持研究所/高级研究所`slot_order=2`、挑战建筑`slot_order=6`，Grid profile按各自Ability名称绑定不同建筑ID。
+- 同次实机确认研究所2x2预览在空旷位置仍持续全红，说明上一轮复用真实`DOTA_UNIT_CAP_MOVE_NONE`研究所单位并仅写0 Hull不足。当前Grid预览统一改用专用`npc_survival_grid_preview_proxy`：KV为地面移动单位，运行时由既有预览Modifier固定、禁交互并设0 Hull，显示模型和缩放继续读取CSV生成建筑配置。真实研究所单位、Barracks Hull、2x2 footprint、费用和前置未改。
+- 自动验证通过：研究所预览专项Lua 5.1/PowerShell契约、Builder槽位与挑战合并、研究所runtime/Ability同步、禁建区域等相关Lua 5.1回归、5项相关契约、目标Lua 5.1语法、Builder CSV/生成Lua 9行槽位一致、NPC KV结构、生产/测试目标严格UTF-8、本轮新增文档行无替换字符和限定`diff --check`。`CURRENT_TASK.md`整文件仍保留此前已记录的1处历史U+FFFD。额外全量回归仍暴露既有无关失败：Builder ownership移速断言、融合`policy_only`契约、旧Builder CSV农场行匹配，以及带BOM的`building_system.lua`直接交给luac；本轮未越界修改。该轮当时仍待冷启动验证且未解决固定全红，最终已由上方自前置修复及用户实机验收覆盖。
+
+## 2026-08-15 - 研究所Grid常红与Builder快捷键错位修复
+
+- 用户实机反馈普通研究所Grid始终红色无法建造，且主城完成后的Builder出现Q/W均为箭塔、后续快捷键错位，只有Blink/D正确。先核对四份建筑CSV和生成Lua：箭塔/研究所等业务槽仍为1/2/...，研究所为100木材、主城Lv.1、2x2占地且施工启用，因此未改正确的CSV业务数值。
+- Grid问题定位到预览实体生命周期：研究所预览复用Barracks Hull静态creature，`NO_UNIT_COLLISION`不保证不影响`GridNav:IsBlocked()`。预览创建后现在固定`SetHullRadius(0)`并保留`survival_is_grid_preview`身份；真实研究所KV Hull、逻辑footprint和完工碰撞均未改。
+- Builder不再依赖动态`SetAbilityIndex()`：六个CSV槽用隐藏占位Ability保持自然index 0..5，当前阶段业务Ability按顺序自然添加，Blink最后自然进入index 6。异常布局重建不再调用引擎换槽接口，避免反复同步留下重复箭塔。占位Ability统一隐藏且未激活。
+- `ability_runtime_builder.lua`从生成Builder阶段配置发布`builder_slot_order`，两份Panorama源码按该CSV投影显示和分发`Q/W/E/R/T/A`，Blink继续名称映射D。两个目标JS由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。
+- 自动通过：Builder槽位、研究所预览、研究所/高级研究所/挑战/英雄替换/六项玩法/禁建区域Lua 5.1行为，Builder同步/挑战/英雄替换/输入/utility/高级研究所/研究所预览契约，目标Lua 5.1语法，Builder CSV生成9行一致和严格UTF-8。一次误用`build_configs.py --check-only`实际执行了全量生成；已精确恢复本次新产生且无关的War3实验生成Lua，未覆盖任务开始时已有生成修改。自动测试不能替代Workshop Tools实机确认。
+
+## 2026-08-15 - Builder整排技能置灰修复
+
+- 用户在上一轮建造点击代理修复后提供实机截图：Builder城墙与Blink按钮同时置灰，仍不能建造。核对`builder_ability_stages.csv`确认开局城墙要求主城等级0；独立执行`ability_runtime_builder.build()`确认城墙runtime为`available=1/can_afford=1`，排除CSV、资源、前置和Panorama runtime置灰判定。
+- 根因是最近新增的Builder完整布局重建把状态写入放在严格槽位验证之后。真实`npc_dota_creature`动态`SetAbilityIndex()`可能不即时生效；重建后`layout_is_valid()`一旦失败，`configure_layout()`直接返回，刚由`AddAbility()`创建的城墙与Blink便保留默认0级/未激活状态。现改为对每个实际返回的Ability立即设置Lv.1、可见和阶段激活，再进行独立槽位验证；验证失败保留诊断且允许后续同步自愈，不再以灰按钮作为失败状态。
+- `test_builder_ability_slots.lua`新增拒绝即时换位场景，确认失败日志出现时城墙与Blink仍为Lv.1、可见、激活，恢复换位后布局回到index 0/6。自动通过：`BUILDER_ABILITY_SLOTS_LUA51_PASS`、`BUILDER_ABILITY_SYNC_CONTRACT_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、Builder挑战/英雄替换契约及Lua 5.1行为、目标Lua语法、`BUILDER_STAGE_CSV_GENERATED_PASS rows=9`、严格UTF-8和限定`diff --check`。未修改Builder CSV、费用、前置、建造规则、Grid或Panorama源码；尚需Workshop Tools完全冷启动确认实际按钮与建造。
+
+## 2026-08-15 - Builder建造与Grid紧急回归修复
+
+- 用户实机反馈城墙及所有后续建筑均无法建造，且网格完全不出现。审计权威`builder_ability_stages.csv`和`building_construction_rules.csv`确认当前阶段、施工规则均启用；`builder_progression_system.lua`仍会设置Ability等级、可见性和激活状态，因此未修改CSV或服务端建筑数值。
+- 根因位于`ability_tooltip.js`透明代理左键分流：`ability_build_*`只有在`managedUpgrade()`读到有效runtime时才进入`SurvivalAbilityInput`，Ability重建/runtime发布窗口中会误回退`Abilities.ExecuteAbility()`，从而绕过项目`SurvivalPointTargetState`及Grid validation/commit。修复后建造技能按名称无条件走统一项目输入，非托管技能继续保留Valve原生执行。
+- 新增契约防止建造代理再次原生回退。输入生命周期、Builder同步、挑战合并、英雄替换契约通过；Builder槽位、英雄替换、挑战建筑Lua 5.1行为和Builder/Grid目标Lua 5.1语法通过；目标生产源码/测试严格UTF-8且无替换字符、文档新增段落无新增替换字符及两仓限定`diff --check`通过。`CURRENT_TASK.md`与`SESSION_LOG.md`整文件各保留1处既有历史U+FFFD，本次未猜测恢复。`ability_tooltip.js`由Resource Compiler强制编译为`OK: 1 compiled, 0 failed, 0 skipped`，产物包含`projectManagedInput`、`ability_build_`与诊断符号。
+- 自动验证不能替代实机。下一步完全Stop并重新Run Workshop Tools，先点击Q城墙确认立即进入项目网格并完成一次建造，再验证主城及后续Q/W/E/R/T/A建筑；若仍失败，提供同次点击的`EXTERNAL_PROXY`、`POINT_TARGET_BEGIN/MODE`和`GridPlacement`日志。
+
+## 2026-08-15 - Builder六业务槽、Blink与Tooltip同步纠正
+
+- 权威`builder_ability_stages.csv`保持`slot_order=1..6`，生成Lua逐项一致；运行时改为业务槽直接映射engine index`0..5`，`ability_survival_builder_blink`固定index 6。服务端枚举完整Ability实例清单，正确布局不重建；重复、过期或错槽时只清理Builder管理域，按目标顺序重建并按Ability名称恢复最长剩余冷却，完成后再次验证布局。
+- `combat_stats.js`和`hud_takeover.js`统一Builder实体槽`0..5 -> Q/W/E/R/T/A`，Blink继续按名称映射`D`。Valve原生Ability按钮按窗口几何与可见Ability原子配对，项目统一显示`SurvivalAbilityHotkey`，保存并压制原生`HotkeyContainer`，清理或旧HUD context退出时恢复。
+- `ability_tooltip.js`只为`customTooltipAbility()`判定的托管技能提交透明代理；托管渲染失败不再回退Valve原生Tooltip。mouseout、选择/Ability变化、代理禁用、旧context替换和Shutdown统一释放高亮、Hover身份、代理命中和自定义Tooltip面板；非托管技能继续由Valve处理。
+- 自动验证通过：`BUILDER_ABILITY_SLOTS_LUA51_PASS`、`BUILDING_CHALLENGE_MERGE_LUA51_PASS`、`BUILDER_HERO_REPLACEMENT_LUA51_PASS`、研究所三项Lua 5.1、Builder同步/挑战合并/英雄替换/Ability输入/utility顺序/高级研究所/Alt契约、目标Lua 5.1语法、CSV与生成Lua一致、严格UTF-8和限定`diff --check`。`combat_stats.js`、`ability_tooltip.js`、`hud_takeover.js`各由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`并通过产物符号检查。
+- 无关验证边界：`test_builder_utility_contract.ps1`在进入本次UI断言前失败于既有齐天大圣CSV射程断言；`test_memory_lifecycle_contract.ps1`失败于既有`survival_ui.js`缺少context门禁。两项目标文件均不在本轮修改范围。尚未Workshop Tools实机确认七个槽位、`Q/W/E/R/T/A/D`输入、重建冷却与单一自定义Tooltip。
+
+## 2026-08-15 - stash冲突恢复与Builder QWERTA+D固定槽位
+
+- 恢复`stash@{0}`后共19个`UU`。三份建筑CSV以上游最新中文和城墙数据为主体，追加高级研究所行；Builder阶段CSV保留W普通/高级研究所替换，并新增A独立挑战建筑。生成Lua由正式94模块生成链统一重建。
+- KV/Lua合并保留挑战建筑、挑战01-05、自动Toggle、普通/高级研究所、研究Ability和Tooltip代理；`addon_game_mode.lua`补齐`ability_challenge_monster_05`加载。`ui_request_router`同时保留挑战Toggle和研究Ability权威直达分发。
+- Builder engine index 5固定Blink/D，`slot_order=6`跳到index 6。content的`hud_takeover.js`与`combat_stats.js`按Builder实体槽固定`Q/W/E/R/T/A`，挑战Toggle行为位512继续走无选点权威请求；`ability_runtime_builder.lua`补齐挑战建筑运行时定义。
+- 7个冲突Panorama产物全部从最终content源强制重编译；HUD XML递归产生的无关二进制副产物恢复到任务前index。4个JS、2个CSS和HUD加载链全部0失败。
+- 自动验证通过：Builder槽位、高级研究所、研究同步/运行时、挑战合并行为/契约、Ability输入/utility、Lua 5.1语法、正式生成、冲突标记和限定diff。19个`UU`与index unmerged entries均清零；未提交，未触碰用户其他既有修改。仍需Workshop Tools冷启动验收D/A、双建筑显示、挑战01-05/Toggle和单位切换清理。
+
 ## 2026-08-14 - 挑战怪零碰撞、挑战建筑视觉与自动Toggle修复完成
 
 - 五种研究所挑战怪在`wave_system.spawn_challenge_monster()`专属边界固定`SetHullRadius(0)`，基础Hull记录为0，并向城墙AI传递`no_unit_collision=1`；正式波次碰撞profile、正式`enemies`集合和`scalemonster`行为未被扩展到挑战怪。
@@ -11,6 +68,24 @@
 - 自动召唤失效由两层输入遗漏造成：主HUD只放行`NO_TARGET`而拒绝Toggle行为位，服务端又缺少creature建筑直达分发。两套Panorama入口现均托管`ability_challenge_auto_summon`，服务端在ownership、建筑身份和Ability归属校验后切换权威状态、同步按钮外观，并用重入标记阻止`OnToggle()`反向重复提交。
 - 自动验证通过：挑战契约、服务和奖励Lua 5.1测试、正式波次飞行碰撞与生成顺序回归、目标Lua 5.1语法、严格UTF-8、两个Panorama JS各`1 compiled, 0 failed, 0 skipped`及双仓限定diff检查。
 - 用户于2026-08-14明确表示任务完成。本任务关闭，后续不得自动恢复为活跃或待验收任务；只有出现具体回归时才按`PROJECT_CONTEXT.md`记录的碰撞、CSV视觉和Toggle输入链排查。用户未提供逐项Workshop Tools日志，因此不补写未发生的具体实机观测值。
+
+## 2026-08-15 - 研究科技原生按钮与CSV驱动Tooltip
+
+- 用户确认上一轮研究所分组和固定槽位完成，并要求科技Tooltip标题改用`research_lab_abilities.csv.display_name`、等级单独显示，删除“施法类型/科技编号”；研究所技能按钮恢复Valve原生视觉，同时屏蔽Valve原生Tooltip。
+- 生产实现：`ability_runtime_builder.lua`向运行时发布CSV名称和服务端生成描述/字段；`research_technology_description.lua`删除科技编号并保留等级上限、当前/升级后累计和前置。`ability_tooltip.js`消费这些字段，未研究科技也显示等级0，满级保留完整说明。
+- HUD边界：`hud_takeover.js`对普通/高级研究所无条件关闭52px项目接管；独立透明代理覆盖Valve按钮，压制原生Tooltip、显示项目Tooltip、左键提交研究，并在高级研究所右键调用既有`SurvivalShop.OpenResearch`。`combat_stats.js`继续按运行时槽位处理固定输入，并在Valve按钮上投影`Q/W/E/R/T/A/S/D/F/G`角标。
+- CSV审计：`technology_definitions.csv`与`HEAD` schema和UTF-8 BOM一致；删除的20个ID仅为低阶塔攻击/墙生命旧Lv.11-Lv.20。其余240行变化只涉及183行显式前置、40行高级衔接等级和57行英雄3转，没有费用、效果、名称或图标变化；两份目标CSV定向生成与仓库Lua逐字节一致。
+- 自动验证通过：研究运行时/同步/高级研究Lua 5.1、`ADVANCED_RESEARCH_LAB_CONTRACT_PASS`、Ability输入/utility顺序、研究减甲、超级塔暴击、目标Lua 5.1语法、PowerShell语法、严格UTF-8和限定diff检查。四份Panorama JS强制编译均为`1 compiled, 0 failed, 0 skipped`。`test_memory_lifecycle_contract.ps1`仍因本轮无关的既有`survival_ui.js`上下文契约失败，本轮未修改该文件迎合宽泛测试。
+- 尚未Workshop Tools实机验证：需冷启动确认原生按钮外观、固定角标和输入、置灰状态、自定义Tooltip内容、无Valve双Tooltip、左键研究、右键高级窗口、自动研究及完成后即时刷新。自动测试和资源编译不能称为引擎验收。
+
+## 2026-08-15 - 研究所科技分组、固定槽位与生成配置统一
+
+- 用户批准普通研究所六槽`Q/W/E/R/T/A`与高级研究所十槽`Q/W/E/R/T/A/S/D/F/G`最终映射；未解锁和满级按钮都必须保留置灰，速度/防御塔/城墙在普通科技满10级后同槽切换高级科技，金矿科技不进入研究所。
+- 权威CSV修正：高级防御塔和高级城墙全部等级的`unlock_required_level=10`；英雄最终伤害、英雄减甲、英雄攻击全部等级的`required_rebirth_level=3`。`research_lab_abilities.csv`重排为六槽/十槽并定向生成两份Lua。
+- `research_technology_config.lua`重构为生成科技定义适配层，稳定保留`RS-*`/`ARS-*`外部ID；逐级费用、最大等级、前置、转生和效果均来自生成行。百分比、War3护甲与Dota运行值在适配边界明确转换，Repository、Service、Ability运行时、Tooltip和商店共享该定义。
+- `research_lab_ability_sync.lua`现在保留满级Ability并禁用；三条链只在低阶满级后替换同槽条目。`ability_runtime_service.lua`同步引擎激活状态，满级分支继续发布固定槽位身份。高级研究所5x2特殊布局和CSS已删除，统一为52px单行。
+- 自动验证通过：`RESEARCH_LAB_ABILITY_SYNC_LUA51_PASS`、`RESEARCH_LAB_RUNTIME_LUA51_PASS`、`ADVANCED_RESEARCH_LAB_LUA51/CONTRACT_PASS`、19科技420级调试事务、`RESEARCH_GROUP_PARTITION_LUA51_PASS normal=9 advanced=10 gold_excluded=2`、`RESEARCH_ARMOR_REDUCTION_CONTRACT_PASS`、`SUPER_TOWER_CRIT_CONTRACT_PASS`、Builder槽位与Ability输入契约、目标Lua 5.1语法、生成逐字节一致、严格UTF-8和高级单行静态检查。三个Panorama资源均定向编译为`1 compiled, 0 failed, 0 skipped`。
+- 尚未进行Workshop Tools实机验证。必须完全冷启动验证普通六槽、三条同槽切换、锁定/满级置灰与恢复、高级十槽单行、固定快捷键、右键高级窗口及自动研究；自动验证不能记录为用户验收。
 
 ## 2026-08-14 - 神秘塔LV4攻击W10 Boss高护甲补偿修复
 
@@ -2632,3 +2707,27 @@
 - `officialAbilityHotkeysMatch()`现同时验证`SurvivalAbilityHotkey`文本/父锚点和原生容器压制状态，因此Valve重建子节点或回写样式后，既有0.25秒完整性检查会触发重新压制；没有新增永久调度链。
 - `test_combat_stats_utility_hotkey_contract.ps1`新增源码、编译产物及压制/恢复行为契约。首次执行暴露测试自身PowerShell多行表达式解析错误，已改为预计算布尔变量后通过；生产JS和Resource Compiler未受该测试错误影响。
 - 最终自动结果：Resource Compiler为`OK: 1 compiled, 0 failed, 0 skipped`，`combat_stats.vjs_c`为84450字节；`COMBAT_STATS_UTILITY_HOTKEY_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、PowerShell解析、Builder相关2个Lua的Luac 5.1语法、严格UTF-8、编译产物符号及Game/Content限定`git diff --check`通过。未修改CSV或生成Lua；下一步必须完全冷启动Workshop Tools，记录仅剩项目标签后的实际字母并复测鼠标及全部快捷键输入。
+
+## 2026-08-15 - 研究所技能与高级研究所建造阻断修复
+
+- 冷启动实机报错确认`combat_stats.js:1057`调用不存在的`refreshOfficialReturnHomeHotkey([])`，使`refreshAbilities()`初始化直接终止；已改为现有`refreshOfficialUtilityHotkeys([])`并强制重编译。该异常会连带阻断研究技能栏刷新，不是单独的研究所Lua问题。
+- 同时确认高级研究所实现存在跨层漂移：Builder阶段CSV仍指向无运行实现的挑战建筑，生成阶段无前置建筑字段，研究Ability同步、建筑配置、KV、启动注册、服务端路由和高级自动研究未完整接线。现已按CSV恢复普通研究所完工后W替换、Lv.4激活、高级研究所建造及19项研究技能。
+- 服务端研究请求验证Ability实体、来源建筑完工状态、building ID、owner/team、Ability激活/隐藏/可施放状态及CSV映射，再复用既有团队共享2秒事务。研究开始/结束事件同步两类研究所Ability，升级链同槽替换、满级移除和团队研究锁均由服务端驱动。高级研究右键打开窗口，窗口右键卡片切换自动研究。
+- 自动验证通过：研究同步/运行时/高级研究完整行为、Builder槽位、PowerShell高级研究契约、Ability输入生命周期/utility顺序、19项KV覆盖、CSV/生成结构、高级研究所100木材/旧模型0.34/2x2、目标Lua 5.1语法、严格UTF-8和限定diff。3份Panorama脚本均为`1 compiled, 0 failed, 0 skipped`。额外宽泛回归中的Builder移速与猴王1000射程断言为无关既有失败，未修改其生产数据。
+- 尚需Workshop Tools完全停止并冷启动：确认ReferenceError消失；普通研究所首次选中即显示Q/W/E/R/T并验证置灰、资源不足、升级替换和满级隐藏；确认研究所施工期间Builder W不替换、完工后立即替换；确认高级研究所可建造、QWERT/ASDFG两行布局和右键自动研究窗口正常，切换建筑无UI残留。自动测试不能替代引擎实机验收。
+
+## 2026-08-15 - Ability runtime重建与Panorama安全枚举修复
+
+- 合并冲突导致`upgrade_level()`仍访问`display.health/armor`却丢失形参；恢复`display`参数及默认空表后，主城隐藏字段和其他建筑默认字段均由Lua 5.1回归覆盖。
+- 服务端在既有`survival_ability_runtime`中新增`unit:<entindex>`元数据，数量严格取自`GetAbilityCount()`；单位销毁时发布`ability_count=0, removed=1`。新增Mock行为测试通过实际事件总线验证0、8和销毁三个状态。
+- `ability_tooltip.js`及`combat_stats.js`的实体Ability枚举统一受单位元数据限制；元数据未到时返回0并等待NetTable更新，不回退固定探测。固定64上限仅保留在`AbilityN` HUD面板树枚举，因此高级研究所第七至第十槽的几何外推未被破坏。
+- 自动结果：`ABILITY_RUNTIME_PUBLISH_LUA51_PASS`、`ABILITY_RUNTIME_CONTRACT_PASS`、`RESEARCH_LAB_RUNTIME_LUA51_PASS`、`ADVANCED_RESEARCH_LAB_CONTRACT_PASS`、`ADVANCED_RESEARCH_LAB_LUA51_PASS`、`RESEARCH_LAB_ABILITY_SYNC_LUA51_PASS`、`ABILITY_INPUT_LIFECYCLE_CONTRACT_PASS`、目标`LUAC_PASS`、严格UTF-8和双仓限定`git diff --check`通过。
+- 第一次Resource Compiler调用因误把addon子目录作为`-game`而失败，按项目文档改为`game/dota`后，`ability_tooltip.js`与`combat_stats.js`均强制编译为`OK: 1 compiled, 0 failed, 0 skipped`。尚需Workshop Tools冷启动确认控制台无无效Ability索引`8..17`访问，并验证主城Tooltip及普通/高级研究所槽位。
+
+## 2026-08-15 - Builder动态管理域与全链路Ability安全枚举
+
+- 实机日志确认服务端`0..63`告警来自Builder同步固定扫描下限63，而非`GetAbilityCount()`返回64；同一失败同步的四次枚举造成四组重复告警。服务端现严格枚举`0..GetAbilityCount()-1`，校验、冷却捕获与清理复用初始快照，重建后仅再枚举一次。
+- 实机Builder index 0由非管理Ability占用，管理技能自然位于`1..7`。布局现以首个管理实例为动态域起点；完全无管理实例时从实际Ability数量之后追加。六个CSV业务槽与Blink只要求域内相对连续，非管理Ability原位保留，异常重建仍清理重复/过期管理实例并按名称恢复最长剩余冷却。失败诊断补充实际数量、域起点、有效槽和期望布局。
+- `hud_takeover.js`与`survival_grid_placement.js`移除固定`0..23`实体扫描；连同`ability_tooltip.js`和`combat_stats.js`统一消费`unit:<entindex>.ability_count`。固定24/64只用于Valve `AbilityN`节点扫描，Builder视觉和输入继续消费CSV生成的`builder_slot_order`。
+- 自动通过：Builder动态域Lua 5.1行为与同步/挑战契约、Ability runtime发布行为/契约、研究所runtime/同步/高级研究/Grid回归、输入生命周期、utility顺序、目标Lua 5.1语法、Builder CSV生成9行一致和双仓限定`diff --check`。四份JS强制编译均为`1 compiled, 0 failed, 0 skipped`。
+- `test_builder_hero_replacement_contract.ps1`已通过本轮相对域检查，但随后被前序异步预载召唤实现的显式`SetOwner()`触发旧ownership禁令；对应Builder英雄替换Lua行为通过，本轮未改召唤逻辑。尚需Workshop Tools冷启动短测高级研究所与农场并确认无`invalid index`和布局重建失败，自动验证不等于实机验收。

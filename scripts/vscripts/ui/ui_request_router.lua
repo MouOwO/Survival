@@ -12,6 +12,7 @@ local hero_summon_projection = require("systems/hero_summon_projection")
 local building_batch_upgrade = require("systems/building_batch_upgrade_service")
 local gold_mine_batch_upgrade = require("systems/gold_mine_batch_upgrade_service")
 local tree_config = require("config/tree_config")
+local research_lab_abilities = require("config/generated/research_lab_abilities")
 
 local M = {}
 local synthesis_requests = {}
@@ -473,6 +474,7 @@ local function register_shop_purchase_request()
             player_id = player_id,
             entry_id = tostring(payload.entry_id or ""),
             request_id = payload.request_id,
+            source_entindex = tonumber(payload.source_entindex),
         })
         local encounter_started = result and result.ok
             and result.grant_result
@@ -503,6 +505,31 @@ local function register_shop_purchase_request()
             focus_target_z = tonumber(camera_target.z),
         })
     end)
+end
+
+local function register_shop_auto_research_toggle_request()
+    CustomGameEventManager:RegisterListener(
+        "ui_shop_auto_research_toggle_request",
+        function(_, payload)
+            local player_id = source_player_id(payload)
+            if not valid_player_id(player_id) then return end
+            local result = event_bus.request(
+                events.SHOP_AUTO_RESEARCH_TOGGLE_REQUEST,
+                {
+                    player_id = player_id,
+                    technology_group = tostring(payload.technology_group or ""),
+                    source_entindex = tonumber(payload.source_entindex),
+                }
+            )
+            send_to_player("ui_operation_result", player_id, {
+                request_id = payload.request_id or "",
+                success = result and result.ok and 1 or 0,
+                operation = "shop_auto_research_toggle",
+                enabled = result and result.enabled and 1 or 0,
+                error = result and result.error or "auto_research_toggle_failed",
+            })
+        end
+    )
 end
 
 local function register_research_requests()
@@ -596,6 +623,7 @@ local function building_id_for_ability(ability_name)
         ability_build_main_city = "main_city",
         ability_build_arrow_tower = "arrow_tower",
         ability_build_research_lab = "building_research_lab",
+        ability_build_advanced_research_lab = "building_advanced_research_lab",
         ability_build_gold_mine = "gold_mine",
         ability_build_hero_altar = "hero_altar",
     }
@@ -798,6 +826,9 @@ local function register_ability_cast_request()
             and unit_valid and ability_valid
             and unit.survival_building_id == "building_challenge"
             and unit:FindAbilityByName(ability_name) == ability
+        local research_upgrade = research_lab_abilities.by_id[ability_name]
+        local research_ability_matches = research_upgrade ~= nil and unit_valid
+            and ability_valid and unit:FindAbilityByName(ability_name) == ability
         local handled_directly = false
         local direct_result_required = false
         local direct_result = nil
@@ -914,6 +945,33 @@ local function register_ability_cast_request()
             end
             print("[SURVIVAL_CAST][SERVER] CHALLENGE_AUTO_DISPATCHED enabled="
                 .. tostring(direct_result and direct_result.enabled) .. " ok="
+                .. tostring(direct_result and direct_result.ok == true))
+        elseif research_ability_matches and owner_matches and not passive
+            and not is_point_target then
+            handled_directly = true
+            direct_result_required = true
+            local building = event_bus.request(events.BUILDING_QUERY_REQUEST, {
+                entindex = unit:entindex(),
+            })
+            if not building
+                or building.building_id ~= research_upgrade.building_id
+                or tonumber(building.player_id) ~= player_id
+                or not ability:IsActivated() or ability:IsHidden()
+                or not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "research_source_invalid" }
+            else
+                direct_result = event_bus.request(
+                    events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,
+                    {
+                        player_id = player_id,
+                        technology_group = research_upgrade.technology_group,
+                        source_entindex = unit:entindex(),
+                        source = "research_lab_ability",
+                    }
+                ) or { ok = false, error = "research_request_unhandled" }
+            end
+            print("[SURVIVAL_CAST][SERVER] RESEARCH_DISPATCHED group="
+                .. tostring(research_upgrade.technology_group) .. " ok="
                 .. tostring(direct_result and direct_result.ok == true))
         elseif altar_summon_matches and owner_matches and not passive
             and not is_point_target then
@@ -1128,6 +1186,7 @@ function M.init()
     register_shop_open_request()
     register_shop_close_request()
     register_shop_purchase_request()
+    register_shop_auto_research_toggle_request()
     register_research_requests()
     register_weapon_synthesis_request()
     register_weapon_snapshot_request()

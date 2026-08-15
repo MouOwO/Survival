@@ -24,6 +24,54 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_survival_builder_slot_1_placeholder"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_builder_slot_placeholder"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "MaxLevel"           "1"
+    }
+
+    "ability_survival_builder_slot_2_placeholder"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_builder_slot_placeholder"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "MaxLevel"           "1"
+    }
+
+    "ability_survival_builder_slot_3_placeholder"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_builder_slot_placeholder"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "MaxLevel"           "1"
+    }
+
+    "ability_survival_builder_slot_4_placeholder"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_builder_slot_placeholder"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "MaxLevel"           "1"
+    }
+
+    "ability_survival_builder_slot_5_placeholder"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_builder_slot_placeholder"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "MaxLevel"           "1"
+    }
+
+    "ability_survival_builder_slot_6_placeholder"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_builder_slot_placeholder"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "MaxLevel"           "1"
+    }
+
     "ability_build_arrow_tower"
     {
         "BaseClass"          "ability_lua"
@@ -54,6 +102,18 @@
         "ScriptFile"         "abilities/ability_build_challenge"
         "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
         "AbilityTextureName" "doom_bringer_devour"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.5"
+        "AbilityManaCost"    "0"
+    }
+
+    "ability_build_advanced_research_lab"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_build_advanced_research_lab"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "tinker_rearm"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
         "AbilityCooldown"    "0.5"
@@ -1662,5 +1722,196 @@
         "AbilityCastPoint"   "0.0"
         "AbilityCooldown"    "1.0"
         "AbilityManaCost"    "0"
+    }
+
+    "ability_research_lumberjack_speed"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ability_train_lumberjack"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_advanced_lumberjack_speed"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ability_train_lumberjack"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_lumberjack_crit"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "phantom_assassin_coup_de_grace"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_lumberjack_efficiency"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_advanced_lumberjack_efficiency"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_tower_attack"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ability_upgrade_attack"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_advanced_tower_attack"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ability_upgrade_attack"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_wall_health"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ability_upgrade_wall"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_advanced_wall_health"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ability_upgrade_wall"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_01"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_02"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "slardar_amplify_damage"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_03"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ability_upgrade_wall"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_04"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "dragon_knight_dragon_blood"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_05"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ability_upgrade_attack"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_06"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "sniper_take_aim"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_07"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "phantom_assassin_coup_de_grace"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_08"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "bloodseeker_bloodrage"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_09"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "slardar_amplify_damage"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
+    }
+    "ability_research_ars_10"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_research_lab_upgrade"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "sven_gods_strength"
+        "MaxLevel" "1"
+        "AbilityCooldown" "0"
+        "AbilityManaCost" "0"
     }
 }

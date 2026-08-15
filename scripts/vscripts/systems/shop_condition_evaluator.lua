@@ -44,17 +44,22 @@ function M.evaluate(player_id, entry, context)
         and entry.contenttype == "technology"
 
     if context.debug_all_unlocked ~= true
-        and not context.gold_mine_ability and context.ui_mode == "research" then
+        and not context.gold_mine_ability
+        and context.validated_research_source ~= true
+        and context.ui_mode == "research" then
         if entry.contenttype ~= "technology" then
             return false, "该内容不属于研究所", count
         end
     elseif context.debug_all_unlocked ~= true
-        and not context.gold_mine_ability and context.ui_mode == "challenge" then
+        and not context.gold_mine_ability
+        and context.validated_research_source ~= true
+        and context.ui_mode == "challenge" then
         if entry.contenttype ~= "challenge" and entry.contenttype ~= "rebirth" then
             return false, "该内容不属于挑战页", count
         end
     elseif context.debug_all_unlocked ~= true
-        and not context.gold_mine_ability then
+        and not context.gold_mine_ability
+        and context.validated_research_source ~= true then
         if entry.contenttype == "technology" then
             return false, "科技请在科技页中研究", count
         end
@@ -103,6 +108,7 @@ function M.evaluate(player_id, entry, context)
         -- W/E abilities. Ownership of the casting mine is validated by the
         -- shop system, so they must not depend on the research service.
         if not context.gold_mine_ability
+            and context.validated_research_source ~= true
             and context.debug_all_unlocked ~= true then
             if entry.technology_track == "advanced_researcher" then
                 if context.advanced_researcher_unlocked ~= true then
@@ -159,6 +165,7 @@ function M.evaluate(player_id, entry, context)
         end
     end
     if context.debug_all_unlocked ~= true
+        and context.validated_research_source ~= true
         and context.city_level < entry.min_city_level then
         return false,
             "需要主城达到Lv." .. tostring(entry.min_city_level),
