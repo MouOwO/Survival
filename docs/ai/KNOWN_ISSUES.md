@@ -15,9 +15,9 @@
 
 ## 当前已知问题
 
-0. **Windows上的addon根目录大小写迁移会被当前VS Code工作区句柄阻止。**
-   - 2026-08-12两次从`Survival`经中间名迁移到`survival`均在首个`Rename-Item`处返回“文件正在被另一进程使用”；Dota、Workshop Tools和Resource Compiler进程已全部停止，失败未留下中间目录，说明当前VS Code/Cline工作区根目录句柄是剩余阻断。
-   - 不得通过并存目录、复制目录或junction创建第二个addon身份，这会继续污染Source 2 file mod索引。应关闭当前VS Code窗口，在插件目录外运行`tools/finalize_addon_file_mod_case.ps1`完成Game/Content两阶段改名、定向小地图编译和契约；脚本包含半迁移回滚保护。
+0. **addon根目录大小写迁移已完成，小地图实机恢复；自动契约仍有旧哈希产物残留。**
+   - 2026-08-12 Game/Content物理目录已统一为全小写`survival`，用户Workshop Tools实机确认小地图正常显示。根因是物理目录`Survival`与编译资源`dota_addons/survival`的file-mod身份冲突；后续不得恢复大写目录，也不得通过并存目录、复制或junction创建第二个身份。
+   - `test_minimap_texture_resource_contract.ps1`当前仍失败于既有`template_map_tga_d9088edf.vtex_c`。该静态残留不影响本次用户已确认的实机结果，本次JS修复未删除或修改它；后续若清理，必须先确认没有运行时依赖并单独验证小地图资源链。
 
 0. **W12 Visage模型加载告警当前未再观察到，但未来新增逐波模型仍有复发风险。**
    - 已确认原缺陷不是模型文件被尸体清理删除，而是开发跳波预载与出生模型解析不一致，叠加正式后续波预载过晚和urgent受后台流阻塞的风险。当前三条解析、倒计时起始请求、4秒幂等复核、urgent并行及逐波session租约均已补齐。

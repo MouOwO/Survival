@@ -12,6 +12,9 @@
 - 当前插入任务（2026-08-13，离线实验实现与自动验证完成）：`tools/war3_damage_calculator/index.html`新增独立“神秘路线录像实验”，20个录像/工作簿面板预设来自`war3_damage_calculator_mystery_experiment.csv`且不生成/注册生产Lua。默认`t=0`普攻、`t=1`激光，支持同刻顺序、激光成长/重置、魔能炮独立5秒层和魔能之眼路径逐甲；增伤是否传递保留开关。Edge桌面/移动59项断言及生成、Lua 5.1语法、UTF-8、diff通过，下一步用户双击页面继续录像对照，不能记录为原版算法已唯一证明或用户验收。
 - 当前插入任务（2026-08-13，生产实现与自动验证完成）：单文件离线计算器位于`tools/war3_damage_calculator/index.html`，已按用户最新要求放弃外部“苟发育”算法并切换到Survival当前生产口径。暴击按attack record独立概率和百分比暴伤计算每击期望值；固定减甲后做正护甲百分比无视；项目怪物正护甲使用`1/(1+0.02W)`，零/负护甲按`W/3`进入当前Dota曲线。动态多攻击单位、共享成长、0秒首击和离散时间轴保留；Edge 31项断言及桌面/移动视口、CSV生成、Lua 5.1和PowerShell语法通过，当前只待用户双击页面确认使用体验。
 - 当前插入任务（2026-08-12，file-mod大小写迁移待关闭VS Code后收尾）：Workshop Tools实机证明Game/Content物理目录`Survival`与编译资源`dota_addons/survival`冲突，导致`file mod ... is invalid`刷屏并阻断小地图/Panorama按需编译。旧`tools_asset_info.bin`已移出并备份；VTEX已对齐Valve overview schema，VTEX/VMAT定向编译各`1 compiled, 0 failed, 0 skipped`，但`resourceinfo`仍报告大写ManifestResource。当前VS Code工作区句柄阻止根目录大小写改名，下一步唯一动作是关闭VS Code和Workshop Tools后执行`tools/finalize_addon_file_mod_case.ps1`，取得`ADDON_FILE_MOD_CASE_FINALIZE_PASS`后再冷启动实机确认告警停止和小地图正常。按用户要求未重编译HUD、Panorama或粒子既有修改。
+- 当前插入任务（2026-08-13，生产实现与自动验证完成）：Valve原生技能栏和输入保持启用，项目标签按可见按钮几何顺序与业务技能原子配对。为隔离疑似`W/E/D/F/R`的Valve文字层，每个已映射Ability面板的原生`HotkeyContainer`现在只设`opacity=0`并关闭命中，不折叠布局；清理、无有效选择或面板复用时恢复Valve原值。标签与原生压制状态均纳入0.25秒完整性检查。专项契约、替代英雄回归、PowerShell解析、相关Lua 5.1语法、严格UTF-8、限定diff、编译产物符号和`combat_stats.vjs_c`定向编译通过；下一步Workshop Tools完全冷启动，直接观察仅剩的`SurvivalAbilityHotkey`实际字母并复测输入，尚未实机验收。
+- 已完成插入任务（2026-08-12）：Game/Content物理目录已统一为全小写`survival`。用户Workshop Tools实机确认小地图恢复正常，根因确定为物理目录`Survival`与编译资源`dota_addons/survival`的file-mod大小写身份冲突；后续不得恢复大写addon目录名。现有小地图源和编译产物保持不变。
+- 已完成插入任务（2026-08-12，用户实机验收通过）：`combat_stats.js`无有效选中单位分支已从不存在的`refreshOfficialReturnHomeHotkey()`改用现有`refreshOfficialUtilityHotkeys([])`，保留后续1秒刷新。专项契约、严格UTF-8、限定diff通过，`combat_stats.vjs_c`定向编译为`1 compiled, 0 failed, 0 skipped`；用户确认Workshop Tools中不再出现该ReferenceError，任务关闭。
 
 - 当前插入任务（2026-08-11，生产实现与自动验证完成）：基础箭塔/路线计数及并发预占已改为玩家作用域；七塔合一支持每玩家最多5座终极塔，材料不消耗且每座永久仅参与一次；齐天大圣R整组原子迁移全部终极塔并保留相对位置；任意已完工城墙死亡一次性触发全队失败，施工墙和主城不直接失败。专项Lua 5.1/契约、语法、生成一致、UTF-8/BOM和限定diff通过；下一步Workshop Tools完全冷启动实机验收，详见`CURRENT_TASK.md`顶部。
 - 当前实施任务（2026-08-12）：外围玩家档案本地Fixture纵向切片已完成生产实现，包含CSV schema/公开白名单/开发账号映射、JSON Fixture生成、统一Provider、完整快照与增量revision/update_id、异步generation、VIP失败关闭、服务端私有档案和公开NetTable。专项Lua 5.1与契约已通过；真实HTTP、数据库、支付、Steam身份和写回尚未实现。下一步冷启动Workshop Tools验证玩家0 VIP、玩家1非VIP和公开表字段；详细协议见`PLAYER_PROFILE_INTEGRATION.md`。
@@ -84,7 +87,7 @@
 ## 最后可靠检查点
 
 - 2026-08-12玩家档案Fixture纵向切片代码与自动测试完成；已增加公开投影成功日志，可直接核对玩家0/1的Fixture账号、revision及公开白名单字段。VIP权威CSV默认关闭，Mock账号验证后再投影。尚未Workshop Tools实机验证，也未接HTTP/数据库。
-- 2026-08-12旧混合大小写资产索引已安全移出插件目录，备份位于`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`；Game/Content仍保持大写`Survival`，没有中间目录或半迁移。最终化脚本已完成语法检查和回滚保护，但尚未实际运行成功。
+- 2026-08-12 Game/Content物理目录已统一为全小写`survival`，用户Workshop Tools实机确认小地图正常显示。旧混合大小写资产索引备份仍位于`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`；该问题已关闭，不再恢复为活跃迁移任务。
 - 2026-08-10空区域配置兼容策略已落地：CSV无启用`hero_movable`业务行时保持旧地图导航与Grid建造，区域拒绝仍返回可渲染红格；等待Workshop Tools实机验证。
 - 2026-08-06已完成代码库只读审计并建立完整任务清单。
 - `addon_game_mode.lua`和`addoninfo.txt`已开放4名好人方玩家。

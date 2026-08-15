@@ -2581,3 +2581,48 @@
 - 权威`tower_class_machine_gun.csv`全部20行`base_attack_speed`改为4，`tower_skill_definitions.csv`同步修订五级技能并定向重建两份生成Lua。`modifier_tower_attack_effects`新增机枪专用`MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT`，从CSV已投影的`survival_attack_speed`返回0.25；非机枪技能集返回nil，不覆盖其他塔。
 - 机枪即时伤害、原生弹道视觉、原生攻击伤害抑制、赏金金币、爆矢第五次攻击与击杀Buff均保持不变。专项契约与Lua 5.1行为测试覆盖0.25基础BAT、LV1 40%、高级路线继承及非机枪隔离。
 - 自动测试不能替代Workshop Tools实机验收。下一步完全停止并重新Run地图，逐级确认机枪塔实际间隔，重点核对LV1约0.178秒；同时回归赏金与爆矢阶段、爆矢Buff期间攻速及其他塔攻击间隔。
+
+## 2026-08-12 - 小地图大小写验收与combat_stats快捷键异常修复
+
+- 用户已将Game/Content物理目录从`Survival`统一为全小写`survival`，并在Workshop Tools实机确认小地图恢复正常。根因闭环为物理目录与编译资源file-mod身份大小写不一致；该问题已验收关闭，后续不得恢复大写目录或创建大小写并存身份。
+- 新实机日志证明当前`combat_stats.js:1057`仍调用不存在的`refreshOfficialReturnHomeHotkey([])`，与历史“已修复”记录冲突。复核Content源码和Game编译产物均含旧符号，因此以当前实机与文件证据为准重新修复。
+- 无有效选中单位分支现调用已有`refreshOfficialUtilityHotkeys([])`，保留1秒递归刷新和正常单位分支逻辑。新增`test_combat_stats_utility_hotkey_contract.ps1`锁定源码及编译产物不得含旧符号、必须保留现有通用快捷键函数。
+- Resource Compiler定向强制编译`combat_stats.js`输出`OK: 1 compiled, 0 failed, 0 skipped`；专项契约输出`COMBAT_STATS_UTILITY_HOTKEY_CONTRACT_PASS`，源码/产物符号检查、严格UTF-8和Game/Content限定`git diff --check`通过。编译器末尾既有`Leaked KeyValues blocks: 162`仅为工具输出，不是Workshop Tools V8实机结论。
+- 额外复跑小地图契约仍失败于既有`LEGACY_HASHED_MINIMAP_VTEX_STILL_PRESENT`（`template_map_tga_d9088edf.vtex_c`）。本轮没有删除或修改该既有资源；这项静态契约残留与用户已确认的小地图实机正常分别记录，不把失败误报为通过，也不重新打开已验收的显示问题。
+- 本轮未修改CSV、小地图VTEX/VMAT、粒子及其他现有未提交Panorama产物。
+- 用户随后确认Workshop Tools中不再出现`refreshOfficialReturnHomeHotkey is not defined`。该JS ReferenceError修复已通过用户实机验收并关闭；后续保留专项契约防止旧符号回归。
+
+## 2026-08-12 - 原生技能栏项目快捷键标签泛化
+
+- 现有`refreshOfficialUtilityHotkeys()`已从工具技能专用覆盖泛化为所有当前可见技能。普通技能独占`Q/W/E/R/T/Y/U`顺序；球状闪电/Builder Blink按身份为D，拾取为F，回城为F2；现有`utilityDisplayOrder`保持`D -> F2 -> F`不变。
+- 覆盖节点统一为`SurvivalAbilityHotkey`，创建前会清空当前节点及旧`SurvivalUtilityHotkey`的文本和可见性。节点设置`hittest=false`、`hittestchildren=false`、`ignoreParentFlow=true`、不透明背景、显式opacity和高zIndex，不改变官方按钮点击或Valve技能栏生命周期。
+- 新签名由`selected unit + engine slot + ability entindex + ability name`组成。选择事件有限重试强制重贴，Ability runtime事件和既有`refreshHeroVitalsTick()`的0.25秒周期只在签名变化时重贴；原1秒`refreshAbilities()`继续用于原生Ability子面板晚创建或复用后的恢复，没有新增永久调度链。
+- `test_combat_stats_utility_hotkey_contract.ps1`扩展覆盖标准键序、工具身份映射、旧/新节点清理、不可交互与布局隔离、不透明样式、完整签名、选择/周期刷新、`abilities: false`及编译产物符号。`test_alt_hero_ability_contract.ps1`继续验证替代英雄原Ability保留边界。
+- 旧记录中的独立`test_ability_utility_order_contract.ps1`当前在Game/Content仓库均不存在，无法按该文件名复跑；本轮专项契约已实际锁定Blink/Ball Lightning=10、回城=20、拾取=30的等价`D -> F2 -> F`排序边界，不把缺失脚本记为通过。
+- Resource Compiler定向强制编译`combat_stats.js`输出`OK: 1 compiled, 0 failed, 0 skipped`，最终产物79662字节并包含新覆盖与签名符号、不含废弃`refreshOfficialReturnHomeHotkey`。编译器既有`Leaked KeyValues blocks: 162`不代表游戏V8实机泄漏。
+- 自动结果：`COMBAT_STATS_UTILITY_HOTKEY_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、目标严格UTF-8、Game/Content限定`git diff --check`通过。纯Panorama任务未修改CSV或生成Lua；尚需Workshop Tools冷启动验证实际文字遮盖、切换/替换/重排/面板复用及全部鼠标和快捷键输入。
+
+## 2026-08-12 - Builder快捷键标签真实槽位补丁
+
+- 复核确认Builder权威源`data/csv/建筑与工人系统/builder_ability_stages.csv`及生成Lua保持五个建造技能`slot_order=1..5`，运行时对应引擎槽`0..4`；`builder_progression_system.lua`固定Blink为index 5。基础数据正确，本轮未修改CSV或生成Lua。
+- 根因位于`combat_stats.js`：`visibleAbilityEntries()`保留`entry.slot`，但标签刷新使用压缩数组`index`查`AbilityN`，Ability runtime状态刷新也使用独立`displaySlot`。Builder动态移除技能后Valve可保留原生槽洞，因此标签和置灰状态会落到错误按钮。
+- 新增`officialAbilityPanelForEntry()`统一按`entry.slot`查找原生面板；标签和运行状态两条消费者均改用该辅助函数。普通键仍按可见标准技能顺序分配，工具键仍按Ability身份分配，完整Builder为`Ability0..4=Q/W/E/R/T`、`Ability5=D`；槽洞只改变面板ID，不让标签压缩到不存在的前序面板。
+- `hud_takeover.js`未修改：`ui_bootstrap.js`当前为`abilities: false`，旧完整接管路径不参与生产技能栏；其映射实现也已枚举实际存在的`AbilityN`并按窗口几何排序，不存在本次相同的直接稠密ID查找。
+- `test_combat_stats_utility_hotkey_contract.ps1`现读取Builder CSV与生成Lua，验证完整槽、槽洞、Builder Blink D及英雄`D/F2/F`映射，并禁止源码恢复`displaySlot/index -> AbilityN`。旧历史`test_builder_ability_slots.lua`当前不在工作区，未虚报为通过。
+- Resource Compiler定向编译`combat_stats.js`为`OK: 1 compiled, 0 failed, 0 skipped`，产物78276字节且包含`officialAbilityPanelForEntry`。`COMBAT_STATS_UTILITY_HOTKEY_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、Builder相关2个Lua的Luac 5.1语法、4个目标严格UTF-8、编译符号和Game/Content限定`git diff --check`通过。
+- 一次误用不支持的`build_configs.py --help`触发了全量生成；命令产生的CSV/`config/generated`工作树改动已按执行前干净范围精确恢复，没有覆盖用户原有未提交修改。仍需Workshop Tools完全冷启动验证Builder各阶段、槽洞、切换、原生文字遮盖及鼠标/键盘输入。
+
+## 2026-08-13 - 快捷键标签改用可见按钮几何配对
+
+- 用户实机反馈证明上一轮`entry.slot -> AbilityN`补丁仍然失败：快捷键输入本身正确，但Builder左上角标签继续错位。截图与当前HUD结构表明引擎槽0/5的两个业务技能可显示在原生`Ability1/Ability2`，因此`AbilityN`节点编号不是引擎槽身份；以上一节“真实槽位补丁”为历史失败尝试，不再作为生产规则。
+- `combat_stats.js`现独立收集可见、尺寸有效且不属于旧HUD的原生按钮锚点，按窗口X/Y几何排序，再与`visibleAbilityEntries()`的项目业务顺序逐一配对；数量不一致时不提交部分映射。标签刷新、Ability runtime的`DOTADisabled`全量刷新和单项runtime事件均复用同一配对结果。
+- 刷新签名新增原生面板顺序，并增加标签完整性检查；技能替换、面板重排、Ability entindex变化和同ID面板重建后标签丢失均会由选择/runtime事件或既有0.25秒生命周期检查重贴，原1秒链只保留晚创建兜底。未改变输入映射、技能槽、CSV、生成Lua、KV或`ui_bootstrap.js abilities:false`。
+- 专项测试改为模拟Builder引擎槽0/5但可见`Ability1/Ability2`，并覆盖任意面板ID顺序、槽洞、标准键和英雄`D/F2/F`。自动结果：PowerShell解析、`COMBAT_STATS_UTILITY_HOTKEY_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、源码静态映射检查、严格UTF-8及限定`git diff --check`通过；Resource Compiler输出`OK: 1 compiled, 0 failed, 0 skipped`，产物82600字节。仍需Workshop Tools冷启动完成视觉与输入实机验收。
+
+## 2026-08-13 - 暂时隐藏Valve原生技能快捷键文字
+
+- 为隔离当前疑似`W/E/D/F/R`是否来自Valve原生层，`combat_stats.js`新增对每个已映射Ability面板内`HotkeyContainer`的最小视觉压制：只设`opacity=0`并关闭`hittest/hittestchildren`，不设`collapse`，不修改技能图标、冷却、等级、充能、升级按钮、输入、技能顺序或服务端槽配置。
+- 压制是可逆的：首次处理保存Valve原有`opacity/hittest/hittestchildren`；每次重贴先恢复全部旧Ability面板，再只压制本轮映射面板。无有效选中单位、技能替换、面板复用和清理路径都会恢复旧值，避免永久污染Valve面板状态。
+- `officialAbilityHotkeysMatch()`现同时验证`SurvivalAbilityHotkey`文本/父锚点和原生容器压制状态，因此Valve重建子节点或回写样式后，既有0.25秒完整性检查会触发重新压制；没有新增永久调度链。
+- `test_combat_stats_utility_hotkey_contract.ps1`新增源码、编译产物及压制/恢复行为契约。首次执行暴露测试自身PowerShell多行表达式解析错误，已改为预计算布尔变量后通过；生产JS和Resource Compiler未受该测试错误影响。
+- 最终自动结果：Resource Compiler为`OK: 1 compiled, 0 failed, 0 skipped`，`combat_stats.vjs_c`为84450字节；`COMBAT_STATS_UTILITY_HOTKEY_CONTRACT_PASS`、`ALT_HERO_ABILITY_ORIGIN_DEV_CONTRACT_OK`、PowerShell解析、Builder相关2个Lua的Luac 5.1语法、严格UTF-8、编译产物符号及Game/Content限定`git diff --check`通过。未修改CSV或生成Lua；下一步必须完全冷启动Workshop Tools，记录仅剩项目标签后的实际字母并复测鼠标及全部快捷键输入。
