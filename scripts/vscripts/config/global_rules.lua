@@ -35,6 +35,12 @@ M.wave_ground_monster_hull_radius = M.number(
     "wave_ground_monster_hull_radius",
     32
 )
+M.wall_engagement_slot_count = M.number("wall_engagement_slot_count", 4)
+M.wall_engagement_slot_spacing = M.number("wall_engagement_slot_spacing", 80)
+M.wall_engagement_normal_offset = M.number("wall_engagement_normal_offset", 384)
+M.wall_engagement_arrival_distance = M.number("wall_engagement_arrival_distance", 24)
+M.wall_engagement_departure_distance = M.number("wall_engagement_departure_distance", 48)
+M.wall_engagement_queue_spacing = M.number("wall_engagement_queue_spacing", 160)
 M.repair_detection_range = M.number(
     "repair_detection_range",
     FIND_UNITS_EVERYWHERE or 99999

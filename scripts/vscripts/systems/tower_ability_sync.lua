@@ -43,6 +43,11 @@ function M.sync(state, row)
         wanted.ability_tower_fusion = true
     end
 
+    -- Free the utility slots before route abilities are added. Source 2 fills
+    -- lower vacant ability indexes first, so clearing them only at the end
+    -- leaves move and destroy ahead of newly inherited route skills.
+    tower_utility_abilities.clear(state.unit)
+
     for _, ability_name in ipairs({
         "ability_upgrade_tower", "ability_upgrade_tower_lv01",
         "ability_upgrade_tower_max",

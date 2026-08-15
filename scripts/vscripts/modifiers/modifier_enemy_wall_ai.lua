@@ -5,6 +5,8 @@ modifier_enemy_wall_ai = class({})
 _G.modifier_enemy_wall_ai = modifier_enemy_wall_ai
 local M = modifier_enemy_wall_ai
 local team_alignment = require("core/team_alignment")
+local global_rules = require("config/global_rules")
+local wall_engagement_slots = require("systems/wall_engagement_slots")
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end
@@ -25,12 +27,101 @@ function M:CheckState()
 end
 
 function M:SetWallEntIndex(entindex)
-    self.wall_entindex = tonumber(entindex) or -1
     local parent = self:GetParent()
+    local previous_wall_entindex = self.wall_entindex
+    self.wall_entindex = tonumber(entindex) or -1
+    if previous_wall_entindex ~= self.wall_entindex and parent and not parent:IsNull() then
+        wall_engagement_slots.release(previous_wall_entindex, parent:entindex())
+        self.engagement_slot = nil
+        self.engagement_arrived = nil
+        self.navigation_key = nil
+        self.navigation_position = nil
+    end
     if parent and not parent:IsNull() and self.wall_entindex < 0 then
         parent:SetForceAttackTarget(nil)
         parent:Stop()
     end
+end
+
+local function is_ground(unit)
+    return (unit.survival_wave_movement_type
+        or unit.survival_movement_type_override
+        or unit.survival_movement_type
+        or "ground") == "ground"
+end
+
+local function distance_2d(a, b)
+    local x, y = a.x - b.x, a.y - b.y
+    return math.sqrt(x * x + y * y)
+end
+
+local function move_to(parent, position)
+    parent:SetForceAttackTarget(nil)
+    ExecuteOrderFromTable({
+        UnitIndex = parent:entindex(),
+        OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+        Position = position,
+        Queue = false,
+    })
+end
+
+local function same_position(a, b)
+    return a ~= nil and b ~= nil and distance_2d(a, b) <= 1
+end
+
+function M:MoveToOnce(parent, position, navigation_key)
+    if self.navigation_key == navigation_key
+        and same_position(self.navigation_position, position)
+    then
+        return
+    end
+    self.navigation_key = navigation_key
+    self.navigation_position = Vector(position.x, position.y, position.z or 0)
+    move_to(parent, position)
+end
+
+function M:UpdateGroundEngagement(parent, wall)
+    local previous_slot = self.engagement_slot
+    self.engagement_slot = wall_engagement_slots.claim(wall, parent)
+    if previous_slot ~= self.engagement_slot then
+        self.engagement_arrived = nil
+        self.navigation_key = nil
+        self.navigation_position = nil
+    end
+    local position, navigation_key
+    if self.engagement_slot then
+        position = wall_engagement_slots.position(wall, self.engagement_slot, 0)
+        navigation_key = "slot:" .. tostring(self.engagement_slot)
+    else
+        local queue_slot, queue_row
+        position, queue_slot, queue_row = wall_engagement_slots.queue_position(wall, parent)
+        navigation_key = "queue:" .. tostring(queue_slot) .. ":" .. tostring(queue_row)
+    end
+    if not position then return false end
+
+    local distance = distance_2d(parent:GetAbsOrigin(), position)
+    if self.engagement_slot then
+        if self.engagement_arrived
+            and distance <= global_rules.wall_engagement_departure_distance
+        then
+            self.navigation_key = nil
+            self.navigation_position = nil
+            return false
+        end
+        if distance <= global_rules.wall_engagement_arrival_distance then
+            self.engagement_arrived = true
+            self.navigation_key = nil
+            self.navigation_position = nil
+            return false
+        end
+    end
+
+    self.engagement_arrived = nil
+    self:MoveToOnce(parent, position, navigation_key)
+    if not self.engagement_slot or distance > global_rules.wall_engagement_arrival_distance then
+        return true
+    end
+    return false
 end
 
 function M:OnIntervalThink()
@@ -55,6 +146,8 @@ function M:OnIntervalThink()
     end
     if not team_alignment.are_enemies(parent, wall) then return end
 
+    if is_ground(parent) and self:UpdateGroundEngagement(parent, wall) then return end
+
     parent:SetForceAttackTarget(wall)
     if parent:GetAttackTarget() ~= wall then
         ExecuteOrderFromTable({
@@ -70,6 +163,7 @@ function M:OnDestroy()
     if not IsServer() then return end
     local parent = self:GetParent()
     if parent and not parent:IsNull() then
+        wall_engagement_slots.release(self.wall_entindex, parent:entindex())
         parent:SetForceAttackTarget(nil)
     end
 end

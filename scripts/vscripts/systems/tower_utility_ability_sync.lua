@@ -23,6 +23,10 @@ local function remove_utility(unit)
     end
 end
 
+function M.clear(unit)
+    if valid_entity(unit) then remove_utility(unit) end
+end
+
 local function visible_non_utility_count(unit)
     local count = 0
     for index = 0, 23 do
@@ -51,7 +55,7 @@ function M.sync(state, row)
     local unit = state and state.unit
     if not valid_entity(unit) or state.building_id ~= "arrow_tower" then return end
 
-    remove_utility(unit)
+    M.clear(unit)
     local free_slots = math.max(0, MAX_VISIBLE_ABILITIES - visible_non_utility_count(unit))
     local show_destroy = configured(row, DESTROY_ABILITY) and free_slots >= 1
     local show_move = configured(row, MOVE_ABILITY) and free_slots >= 2

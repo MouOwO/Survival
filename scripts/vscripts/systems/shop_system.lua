@@ -438,6 +438,9 @@ local function purchase(payload)
         validated_research_source = true
     end
     local gold_mine_ability = payload.source == "gold_mine_ability"
+    local gold_mine_source_entindex = tonumber(
+        payload.source_entindex or payload.entindex
+    )
     local mode = state.opened_players[player_id] or "shop"
     if not gold_mine_ability and not research_source then
         local allowed, mode_error = catalog.allowed_in_mode(entry, mode)
@@ -451,7 +454,7 @@ local function purchase(payload)
             return { ok = false, error = "gold_mine_technology_invalid" }
         end
         local building = event_bus.request(events.BUILDING_QUERY_REQUEST, {
-            entindex = tonumber(payload.entindex),
+            entindex = gold_mine_source_entindex,
         })
         if not building or building.building_id ~= "gold_mine"
             or tonumber(building.player_id) ~= player_id then
