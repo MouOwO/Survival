@@ -961,6 +961,7 @@ function M.spawn_challenge_monster(row, challenge_definition)
         attack_speed = tonumber(row.attack_speed) or 1,
         is_boss = true,
         member_role = "assault_boss",
+        is_challenge_monster = true,
     }
     local collision_profile = wave_monster_collision.profile(combat_row, definition)
     apply_stats(unit, combat_row, definition, collision_profile.movement_type)

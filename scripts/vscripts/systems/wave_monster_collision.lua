@@ -14,10 +14,15 @@ function M.profile(row, definition)
         base_hull_radius = 10
     end
 
+    local challenge_monster = row.is_challenge_monster == true
+    if challenge_monster then
+        base_hull_radius = global_rules.building_challenge_hull_radius
+    end
+
     return {
         movement_type = movement_type,
         base_hull_radius = base_hull_radius,
-        no_unit_collision = false,
+        no_unit_collision = challenge_monster,
     }
 end
 

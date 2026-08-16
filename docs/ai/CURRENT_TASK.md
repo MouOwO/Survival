@@ -1,3 +1,25 @@
+# 当前任务（2026-08-16）：挑战怪失败判定与零碰撞体
+
+- 用户确认挑战怪召唤后存活达到60秒，或城墙当前生命严格低于最大生命50%时挑战失败；恰好50%不失败。失败保留本次技能冷却，不发奖励，也不消耗本局该类挑战次数。
+- 用户追加确认所有挑战怪Hull碰撞体为0。四项基础数据已写入`global_rules.csv`并定向生成：挑战怪Hull 0、挑战存活时限60秒、城墙失败阈值50%、城墙生命检查间隔0.1秒；运行时不硬编码判定数值。每个挑战实例使用独立生命周期ID和具名检查/超时任务，统一结算入口先标记状态、取消任务并移除奖励映射，再删除失败单位，死亡回调按单位身份幂等处理。
+- 挑战次数递增已从生成路径移动到正常击杀奖励路径。即时低血失败返回`ok=false, cast_consumed=true`，手动能力据此保留引擎冷却；自动召唤显式启动冷却后停止本轮扫描。死亡事件再次检查`>=60秒`与城墙低血，覆盖定时任务和死亡同帧边界。
+- 自动验证通过：`WAVE_FLYING_COLLISION_PASS`、`BUILDING_CHALLENGE_SERVICE_LUA51_PASS`、`BUILDING_CHALLENGE_ABILITY_FACTORY_LUA51_PASS`、`BUILDING_CHALLENGE_CONTRACT_PASS`、配置`CheckOnly`、目标生成一致性、Lua 5.1语法及限定`diff --check`。碰撞测试覆盖地面/飞行挑战怪profile及实际`SetHullRadius(0)`调用；失败行为测试覆盖即时/延迟低血、50%边界、定时和死亡同帧60秒边界、正常击杀、重复死亡、奖励、挑战次数、手动/自动冷却。尚未执行Workshop Tools实机验证，自动测试不等于引擎实机验收。
+
+# 前序任务（2026-08-16）：挑战建筑怪物补齐 N1-N5 数据与实例显示名
+
+- 用户确认`building_challenge_waves.csv`需要覆盖N1-N5，并采用临时方案：N2-N5完整复制N1战斗数值，只区分`difficulty_id`和唯一ID，不引入未经确认的难度倍率。
+- 实施范围：权威CSV扩展为5难度x5种挑战怪x20次挑战共500行；`challenge_wave_id`改为`n*_challenge_monster_**_wave_**`，新增`difficulty_id`和`display_name`。显示名必须与`building_challenge_definitions.csv`对应，召唤按`wave_system.get_difficulty()`消费，并投影为实例`survival_display_name`供现有选中单位UI读取。
+- 保留工作区已有的N1山岭巨人第1次`health=6000`，修复该CSV现有中文乱码；不覆盖或回退正在进行的挑战怪碰撞修改。验证覆盖500行矩阵、ID唯一、难度索引、跨表显示名一致、N2-N5临时复制N1、实例显示名、生成一致性、Lua 5.1语法、UTF-8及限定diff。
+- 实施完成：CSV现为500行严格矩阵，ID从`n1_challenge_monster_01_wave_01`到`n5_challenge_monster_05_wave_20`；五种显示名分别从定义表同步为山岭巨人、树人、红龙、剑圣、炼金。挑战服务按当前全局难度、怪物ID和独立挑战次数三维查行，并为实例保存难度与显示名；原`health=6000`保留，CSV中文编码恢复为UTF-8 BOM。
+- 自动验证通过：`BUILDING_CHALLENGE_CONTRACT_PASS definitions=5 rows=500 difficulties=5 waves=20 rewards=8`、`BUILDING_CHALLENGE_SERVICE_LUA51_PASS`、矩阵/唯一ID/UTF-8审计、两个目标Lua的Lua 5.1语法、94模块正式生成、95生成Lua无U+FFFD、配置`CheckOnly`及限定`diff --check`通过。尚未Workshop Tools冷启动实测N1-N5分别召唤属性与选中面板名称，自动验证不等于引擎实机验收。
+
+# 当前任务（2026-08-16）：挑战怪与正式波次同时生成时卡住
+
+- 用户确认采用推荐方案：仅关闭挑战怪的单位碰撞，保留挑战怪基础Hull、移动、攻击、奖励和正式波次怪之间的原有碰撞行为。
+- 已确认根因：`wave_system.spawn_challenge_monster()`虽设置了挑战身份字段，但`wave_monster_collision.profile()`当前始终返回`no_unit_collision=false`，导致挑战怪仍会占用正式波次怪的实体碰撞空间和城墙接敌通道。
+- 实施边界：挑战身份由运行时生成边界显式传给共享碰撞profile；基础生命、攻击、护甲、模型、数量和生成时序继续来自现有CSV及其生成Lua，不新增硬编码战斗数值。
+- 自动验证完成：挑战profile行为、`modifier_enemy_wall_ai`的`NO_UNIT_COLLISION`状态、Lua 5.1语法、挑战契约、生成配置完整性和限定`git diff --check`均通过；未修改CSV或生成Lua。Workshop Tools仍需实测同时生成时的移动与攻击表现。
+
 ## 当前实施任务（2026-08-16）：恢复多重塔中间六级数据
 
 - 用户确认恢复`multi_tower_lv05`及`piercing_ballista_lv01`至`piercing_ballista_lv05`共6条缺失记录，并沿用当前炙热巨箭/多重攻击规则整理技能继承。

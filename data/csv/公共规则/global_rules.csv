@@ -18,6 +18,10 @@ wall_engagement_arrival_distance,24,走地怪视为到达城墙接敌槽位的�
 wall_engagement_departure_distance,48,已接敌走地怪重新离开槽位并恢复移动的距离,1
 wall_engagement_queue_spacing,160,超出接敌槽位的走地怪向外排队间距,1
 repair_detection_range,99999,修理师自动感知受损建筑的范围,1
+building_challenge_hull_radius,0,所有挑战怪的基础碰撞半径,1
+building_challenge_lifetime_seconds,60,挑战怪存活达到该秒数时挑战失败,1
+building_challenge_wall_failure_health_pct,50,挑战期间城墙生命低于该百分比时挑战失败,1
+building_challenge_failure_check_interval_seconds,0.1,挑战期间检查城墙生命的间隔秒数,1
 initial_gold,0,队伍开局金币,1
 initial_wood,10,队伍开局木材,1
 initial_population,0,队伍开局已用人口,1

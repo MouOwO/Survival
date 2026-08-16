@@ -45,6 +45,22 @@ M.repair_detection_range = M.number(
     "repair_detection_range",
     FIND_UNITS_EVERYWHERE or 99999
 )
+M.building_challenge_hull_radius = M.number(
+    "building_challenge_hull_radius",
+    0
+)
+M.building_challenge_lifetime_seconds = M.number(
+    "building_challenge_lifetime_seconds",
+    60
+)
+M.building_challenge_wall_failure_health_pct = M.number(
+    "building_challenge_wall_failure_health_pct",
+    50
+)
+M.building_challenge_failure_check_interval_seconds = M.number(
+    "building_challenge_failure_check_interval_seconds",
+    0.1
+)
 --M.dev_wall_health = M.number("dev_wall_health", 10000000)
 --M.dev_wall_war3_armor = M.number("dev_wall_war3_armor", 1000)
 

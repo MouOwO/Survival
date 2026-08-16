@@ -14,7 +14,7 @@ function M.create(challenge_id)
             challenge_id = challenge_id,
             source_ability = self,
         })
-        if not result or result.ok ~= true then
+        if not result or (result.ok ~= true and result.cast_consumed ~= true) then
             self:EndCooldown()
         end
     end
