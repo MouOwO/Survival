@@ -1,3 +1,41 @@
+## 当前插入任务（2026-08-17）：修复建造密令无法领取
+
+- 实机发现点击`construction_order`后奖励界面不关闭。根因是`rogue_effect_registry.lua`中`grant_building_upgrade_action`被重复注册，后置旧handler覆盖了已实现的额度handler，并尝试创建已经删除的`item_survival_rogue_construction_order`，导致效果事务失败。
+- 删除后置旧handler，保留由`rogue_effect_state_service`登记下一次建筑升级额度的唯一实现；验证需覆盖重复注册/旧道具引用、专项Lua 5.1测试、语法检查和建筑批量升级契约。Workshop Tools领取与升级效果仍需实机复验。
+
+## 当前任务（2026-08-17）：新增肉鸽奖励卡牌 8-18
+
+- `nuclear_bomb`实机使用闪退修复：确认实现中没有粒子、声音或屏幕效果；风险点为`OnSpellStart`遍历实体时同步批量`ForceKill`，并在同一施法栈移除正在执行的Item，导致死亡奖励、波次/挑战结算和尸体链集中重入。现改为施放时只快照并停用Item，按CSV的每批4只、间隔0.05秒从后续scheduler帧分批正常击杀，完成后再移除Item；每批重新校验实体、怪物标记与Boss身份。
+- `nuclear_bomb`漏杀保护修复：第五波首个怪的CSV身份是`wave_leader`，此前仅存在于`MONSTER_SPAWNED`事件载荷，未写入单位实体，核弹无法识别。正式波次出生现在同步保存`survival_monster_role`和`survival_is_boss`；核弹统一排除`wave_leader`、`assault_boss`、通用Boss标记和`modifier_boss`。
+- 实现并启用`nuclear_bomb`至`training_dummy`范围内用户明确指定的11张卡；全部基础数值、阶段时长、次数和目标范围继续以肉鸽CSV为权威。
+- `bounty_order`只作用于挑战建筑召唤的五类挑战怪物，不影响英雄、转生或其他挑战；后续5次挑战建筑怪物成功结算时先正常发奖，再额外发放同一份奖励，失败不消费次数。
+- `command_change`为下一次肉鸽卡牌选择额外增加1次刷新；`internship_certificate`为初级修理工训练上限永久增加2，不即时赠送修理工。
+- 主动道具、攻击投影、吸血阶段、护甲无视、金币事务和30秒训练靶均复用现有Builder、建筑报价、英雄/塔战斗、资源和生命周期入口。自动测试必须与Workshop Tools实机验收明确区分。
+
+## 当前任务（2026-08-17）：新增五张肉鸽卡牌
+
+- 实现并启用`infrastructure_maniac`、`gunpowder_splash`、`kick_when_down`、`tower_network`、`corrosive_shield`，基础数值和目标定义继续以独立肉鸽CSV为权威。
+- `infrastructure_maniac`免费串行完成3次随机单级建筑升级；每次完成后重新计算候选，允许同一建筑重复入选。候选必须通过`BUILDING_UPGRADE_QUOTE_REQUEST`，因此包含可继续升级的城墙、基础箭塔和已转职箭塔，自动排除施工中、升级中、已满级、前置不满足及等待转职的基础箭塔；候选耗尽时按已成功次数正常完成，不等待未来建筑。
+- `gunpowder_splash`使CSV定义的穿透弩炮路线永久提高30%伤害，覆盖已有、后续转职和升级重算，不影响其他防御塔。
+- `kick_when_down`使持卡玩家造成的所有合法伤害在目标怪物当前受到移动速度降低时提高50%；多个减速只触发一次，攻击速度降低等非移速效果不算。
+- `tower_network`在领取瞬间统计该玩家最终路线满阶防御塔，每座固定增加全塔5%攻击，最多50%；领取后的建造、升级和销毁不改变快照。
+- `corrosive_shield`按玩家隔离开启：怪物每次对持卡玩家拥有的单位正式发动普通攻击时，自身永久降低1点War3护甲。城墙只是该玩家单位之一；攻击未持卡玩家单位不触发。同一次攻击最多触发一次，技能/持续伤害不触发，减甲持续至怪物死亡并与其他减甲来源合并。
+- 验证必须覆盖候选不足/升级中/等待转职、弩炮路线投影、减速识别、满阶快照、多人目标归属与腐蚀减甲去重；自动测试不等于Workshop Tools实机验收。
+
+## 当前任务（2026-08-17）：Boss 肉鸽奖励三选一
+
+- 用户批准实现独立肉鸽奖励系统：正式波次 Boss 死亡后触发三选一；建造者拥有一次性“开局三选一”技能，点击后打开界面并永久移除。
+- 卡牌定义、效果、显示名、说明、图标、启用状态和抽取规则必须以独立 CSV 为权威。外部工作簿“肉鸽卡牌效果库”的31张卡全部录入；无法准确映射当前项目概念或原文不完整的卡先保留并禁用，不擅自改写。
+- 每次 offer 展示3张互不重复的卡并提供1次免费重抽。只有实际领取过的卡永久排除；仅展示或被重抽替换的卡未来仍可出现。服务端维护玩家会话、token、队列和幂等校验。
+- `冰封城墙`按清晰录像值采用攻速-15%；`炮塔串联`按每座满阶防御塔全塔攻击+5%、最多+50%。Panorama 仅借鉴 Balatro 的窄高卡、悬停抬升放大和翻牌节奏，不复制第三方GPL代码或素材。
+- 验证必须区分Lua模拟测试、静态契约、Lua 5.1语法、Panorama编译和Workshop Tools实机验收；自动测试不得描述为引擎实测。
+- 生产实现完成：31张原始卡全部进入独立卡牌CSV，效果和抽取规则分别由独立CSV管理；首版启用可准确接入当前系统的`防御工事`、`璀璨树苗`、`财政补贴`3张，其余28张保留原描述并注明停用原因。当前首轮可稳定展示3张，领取后卡池按“已领取永久排除”缩小；在更多卡启用前不通过重复已领取卡强行补足3张。
+- 服务端会话按玩家维护当前offer、已领取集合、一次免费重抽、递增token和Boss奖励队列。重抽只替换当前展示并使旧token失效；未领取或被重抽的卡不进入永久排除。正式波次Boss只消费`wave_system`登记的`meta.is_boss`，击杀者无法解析时向有效Radiant玩家分别排队。
+- 建造者开局第2业务槽新增一次性技能。服务端成功创建或排队奖励后记录已消费，立即触发Builder权威布局同步并永久替换为隐藏占位；动态creature技能通过UI路由直达同一服务端请求，Lua`OnSpellStart`保留为原生施放入口。
+- 效果首版完成：金币和当前木材百分比走既有资源事务；防御塔攻速进入`technology_stat_manager`独立rogue永久层并沿既有`TECHNOLOGY_STATS_CHANGED`刷新所有塔。Panorama为独立overlay，整卡点击领取，使用Dota Ability图标、窄高牌面、悬停抬升缩放、翻牌和错峰入场，不含第三方代码或素材。
+- 自动验证通过：`ROGUE_REWARD_SERVICE_LUA51_PASS`覆盖三卡去重、一次重抽、旧token、防重复领取、未领取可再出现、队列提升和3种效果；目标Lua 5.1语法、97模块配置`--check-only`、31卡/3启用契约、严格UTF-8和限定`git diff --check`通过。新JS、CSS、XML及manifest加载链均为`1 compiled, 0 failed, 0 skipped`。
+- 验证边界：尚未Workshop Tools冷启动实测开局技能槽、Boss击杀触发、连续奖励排队、三卡点击、重抽动画、资源到账与塔攻速实际刷新；自动测试和Resource Compiler结果不等于引擎实机验收。
+
 # 当前任务（2026-08-16）：挑战怪失败判定与零碰撞体
 
 - 用户确认挑战怪召唤后存活达到60秒，或城墙当前生命严格低于最大生命50%时挑战失败；恰好50%不失败。失败保留本次技能冷却，不发奖励，也不消耗本局该类挑战次数。
@@ -971,3 +1009,68 @@
 - 双机档案隔离可先验收；玩家1 Builder仍因地图缺少`player_1_builder_spawn`按配置失败关闭，不属于档案Provider失败。
 
 - 双机入口审计补充：生产代码当前只设置好人方容量4、坏人方0，未找到显式`SetCustomTeamAssignment()`或自定义`player_connect_full`分队实现；直连验收必须确认第二客户端取得活动`PlayerID=1`。若只进入观战，应使用Hidden/Friends Only大厅选择好人方槽位，或后续单独补充分队逻辑。
+
+## 肉鸽奖励四表运行时检查点（2026-08-17）
+
+- 四表已落地：31张卡、31个效果、38个强类型参数、21条生命周期规则；数值只从CSV生成配置读取。
+- enum已覆盖effect type、execution mode、owner scope、target selector、stack policy、event type、predicate、rule role和transition。
+- 生成器已增加四表唯一键、外键、enum、参数类型、必需参数、启用卡/效果和生命周期完整性校验，错误失败关闭。
+- 通用运行时已实现`grant_id/effect_instance_id/phase_instance_id/target_binding_id`、玩家隔离、幂等、限时到期、事件计数、下一匹配事件、动态binding和多阶段转换。
+- effect/event/predicate均通过Lua注册表白名单执行；CSV不接受自由Lua表达式。当前只启用并迁移`防御工事`、`璀璨树苗`、`财政补贴`三个已有准确handler，其余卡保持`enabled=0`。
+- Boss奖励不再按最后一击者发放；每次权威Boss死亡遍历`player_context_service.active_player_ids()`，向所有有效好人方在局玩家分别排队。
+- 自动验证通过：四表契约和行数、100个生成配置模块加载、Lua 5.1奖励回归、运行时六类机制、有效玩家筛选、相关Lua语法、Python静态编译、UTF-8和`git diff --check`。
+- 尚未执行Workshop Tools实机验证，不能称为引擎或多客户端验收通过。下一步应冷启动验证三个启用效果，再以两客户端确认同一次Boss死亡为双方分别创建或排队一次奖励会话。
+
+## 肉鸽指定三卡作弊命令（2026-08-17）
+
+- 聊天输入`rogue <card_id1> <card_id2> <card_id3>`可为发言玩家直接创建指定三卡调试会话；示例：`rogue fiscal_subsidy radiant_sapling fortifications`。
+- 三个参数必须是`rogue_reward_cards.csv`中存在且互不重复的`card_id`。指定顺序即UI显示顺序，调试会话不可重抽。
+- 调试命令替换当前屏幕offer并使旧token失效，但不清空正式Boss/Builder奖励队列，不消费Builder一次性奖励。
+- 调试会话允许重复选择已领取卡，点击仍走正式选择校验、`grant_id`和通用效果运行时，便于重复验证资源或属性效果。
+- 31张卡均可强制显示；当前只有`fiscal_subsidy`、`radiant_sapling`、`fortifications`具有启用业务handler。点击其他卡会按运行时契约失败关闭并保留界面，不会伪造效果。
+
+## 肉鸽第二批四卡实现（2026-08-17）
+
+- 已确认实现`frozen_wall`、`recruit_training`、`ion_shield`、`internship_certificate`四张卡，继续以肉鸽四张CSV为业务数值和目标参数权威源。
+- `frozen_wall`永久令正式波次怪和建筑挑战怪攻速降低15%（保留85%），覆盖领取时存量与后续生成单位。
+- `recruit_training`永久令基础箭塔记录ID`arrow_tower_lv01`至`arrow_tower_lv04`攻击力提高100%；LV5和转职塔无效，升级离开目标集合后移除。
+- `ion_shield`令所属城墙经过既有伤害规则后的单次最终伤害不超过最大生命值20%。
+- `internship_certificate`通过普通修理工训练事务额外赠送2个`train_repairer_01`，不消耗木材或金币，只消耗每个1人口，并要求原子成功或回滚。
+- 四张卡与效果已从CSV启用并生成Lua配置；新增统一怪物生成事件、两个可移除Modifier、城墙最终伤害上限状态查询，以及复用普通训练链路的双修理工原子事务。
+- 正式选择的过期token、非法卡和效果执行失败均输出`player_id/source/card_id/token/effect_id/error`结构化服务端日志，失败不消费当前offer。
+- 自动验证通过：CSV全量生成99个Lua配置模块、四卡handler专项测试、批量训练事务测试、肉鸽运行时/奖励服务回归、城墙最终伤害过滤测试、Lua 5.1语法、Python编译和`git diff --check`。
+- 既有建筑挑战数值测试仍因工作区当前CSV与旧硬编码断言不一致而失败（`manual challenge health invalid`/`CHALLENGE_STATS_INVALID`），失败发生于本轮新增怪物事件之前，本任务未修改该无关数值。
+- 尚未执行Workshop Tools实机冷启动，不能称为引擎或多人客户端验收通过。
+
+## 肉鸽第三批五卡实现（2026-08-17）
+
+- 已批准实现`weakening_orb`、`divine_wish`、`tower_growth`、`feast`、`boss_promise`，继续以肉鸽CSV为数值、目标优先级和持续时间权威源。
+- `weakening_orb`领取时锁定下一次尚未开始的正式波次；该波优先作用第一个`assault_boss`，若无进攻Boss则作用第一个`wave_leader`，目标基础攻击永久降低50%，命中后消费且无时间到期。
+- `divine_wish`立即从玩家当前可用启用卡池按权重无放回抽取3张（排除自身和已领取卡），分别直接授予各自独立效果；子授予使用确定性grant ID支持失败后幂等重试。
+- `tower_growth`作用于所有箭塔路线，只在领取后成功完成升级时为对应塔永久累计10%攻击加成，建造、升级开始和科技刷新不计层数。
+- `feast`首版只将玩家当前城墙最大生命和当前生命同时翻倍，不实现后续10%阶段。
+- `boss_promise`令领取时在场及原始120秒窗口内新生成的所属伐木工获得100%攻速，全部在同一截止点清理；修理工、Builder及其他玩家单位不受影响。
+- 已完成五卡CSV启用、生成Lua、运行时handler、怪物波次身份payload、工人增量payload、Modifier注册和奖励服务随机三卡事务。
+- `divine_wish`首次执行固定三张抽取结果，子卡使用`parent_grant_id:child:index:card_id`确定性ID；中途失败保留已成功领取状态并在重试时继续原抽取，不会重抽或重复结算成功子卡。
+- 新增`tools/test_rogue_five_card_handlers.lua`与`tools/test_rogue_divine_wish_transaction.lua`，覆盖目标波/角色过滤、精英回退、无放回与失败重试、塔升级原因过滤、城墙血量比例和伐木工存量/增量/清理。
+- 自动验证通过：CSV生成99个Lua模块、五卡专项、神许愿事务、既有肉鸽运行时/奖励服务/四卡回归、工人批量事务、波次生成顺序、建筑与金矿批量升级契约、本批目标Lua 5.1语法、Python编译和`git diff --check`。
+- 全`vscripts` Lua 5.1扫描被6个既有UTF-8 BOM文件阻断（`ability_building_blink.lua`、4个既有建筑Modifier/系统文件及`building_system.lua`）；均在首字节报`unexpected symbol near '�'`，本批未改其编码且未将该全量扫描记为通过。
+- 尚未执行Workshop Tools冷启动、正式波次实机、多人客户端或UI验收；自动测试不能替代这些人工验证。
+
+## `weakening_orb`纯普通波领取失败修复（2026-08-17）
+
+- 实机反馈确认开局通过`rogue`调试选择`weakening_orb`时界面不关闭；根因为旧实现只检查紧邻下一波，而第1至第4波CSV均无`assault_boss`或`wave_leader`，handler返回`next_wave_special_target_missing`导致奖励事务失败关闭。
+- 已批准改为从下一正式波向后跳过纯普通波，锁定首个含特殊角色的波次；同波仍优先`assault_boss`，否则选择`wave_leader`。开局应锁定第5波进攻Boss。
+- 若已经没有后续特殊正式波，卡牌仍领取成功，效果实例立即完成为空效果，不留下永久等待状态。
+- 已新增无状态`wave_special_target`查询并由`wave_system`返回独立的`next_special_wave_number/next_special_role`；保留原`next_wave_number`紧邻下一波语义，避免影响既有调用方。
+- 新增真实生成波次配置测试：N1开局跳过第1至第4波并锁定第5波`assault_boss`；第5波后锁定第6波`wave_leader`；最终波后返回无目标。运行时测试确认无目标实例以指定原因立即完成且不再接收事件。
+- 自动验证通过：真实波次特殊目标测试、五卡handler专项、肉鸽运行时、奖励服务、特殊混合波身份契约、目标Lua 5.1语法及`git diff --check`。
+
+## `feast`城墙升级固定生命增量保留（2026-08-17）
+
+- 实机反馈确认`feast`领取时翻倍正常，但城墙升级会由等级CSV和科技公式重写最大生命，覆盖领取时直接写入的增量。
+- 用户明确语义不是后续等级继续翻倍：领取时按当前实际最大生命计算一次固定增加量；后续城墙升级和科技重算结果均为“等级与科技正常生命 + 该固定增加量”。
+- 领取瞬间仍同时增加最大生命与当前生命并保持原生命百分比；固定增加量按玩家存入肉鸽状态，不修改城墙CSV基础生命。
+- 已完成：`feast`领取时记录实际固定增加量；城墙等级/科技重算在正常生命结果上加回该固定值，不按后续等级重复乘2，也不会在重复重算时叠加。
+- 新增`tools/test_feast_wall_health_projection.lua`，直接验证正常等级生命1500加固定1000得到2500、20%科技只乘等级基础生命得到2800、后续等级与重复重算均只携带原固定值一次，并验证玩家隔离。
+- 自动验证通过：`FEAST_WALL_HEALTH_PROJECTION_LUA51_PASS`、五卡handler固定增量断言、肉鸽运行时/奖励服务回归、建筑批量升级契约、本批目标Lua 5.1语法和`git diff --check`；尚未执行Workshop Tools实机残血升级验收。

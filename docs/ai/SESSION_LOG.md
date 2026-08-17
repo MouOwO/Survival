@@ -1,3 +1,15 @@
+- 2026-08-17：修复`construction_order`实机无法领取。根因是效果注册表存在两个同名handler，后置旧实现覆盖额度实现并尝试创建已删除道具，导致领取事务失败。现删除旧handler，并为专项测试增加“handler只能注册一次”的回归断言；专项Lua 5.1测试、目标语法与建筑批量升级契约通过，Workshop Tools仍需复验领取和下一次升级消费。
+- 2026-08-17：修复`feast`升级覆盖问题。`feast`现在在领取时按当时实际城墙最大生命记录一次固定生命增量；后续等级和科技重算使用“正常生命+固定增量”，不再按每级倍率翻倍，也不会重复叠加。新增`FEAST_WALL_HEALTH_PROJECTION_LUA51_PASS`覆盖等级、科技、重复重算和玩家隔离；五卡专项、肉鸽回归、建筑升级契约、Lua 5.1语法和`git diff --check`通过，Workshop Tools残血升级仍待实机验收。
+- 2026-08-17：修复`weakening_orb`开局无法领取。根因是旧handler只检查紧邻下一波，而N1第1至第4波均为纯普通波，导致`next_wave_special_target_missing`并触发奖励失败保护。现改为从下一波向后搜索首个特殊正式波，同波优先`assault_boss`否则`wave_leader`；无后续特殊波时领取成功并立即完成为空效果。新增真实生成波次查询测试和运行时空完成契约测试，相关回归通过。
+- 2026-08-17：完成肉鸽第三批`weakening_orb`、`divine_wish`、`tower_growth`、`feast`、`boss_promise`。五卡数据均由肉鸽CSV启用并生成Lua；下一波特殊目标、随机三卡幂等子授予、塔升级永久层数、城墙生命同比翻倍和120秒伐木工统一投影均接入现有事件/运行时架构。新增两项Lua 5.1专项测试并通过相关肉鸽、波次、工人及建筑回归；本批目标Lua语法通过，全目录语法扫描另被6个既有UTF-8 BOM文件阻断；Workshop Tools与多人客户端仍待人工验证。
+## 2026-08-17 - 肉鸽奖励 UI、通用效果运行时与指定三卡调试入口
+
+- 肉鸽奖励已形成四表数据链：31 张卡、31 个效果、38 个强类型参数和 21 条生命周期规则由独立 CSV 驱动，生成器执行唯一键、外键、enum、参数类型、启用状态与生命周期完整性校验。Lua 运行时通过白名单 handler 执行，不解释 CSV 中的自由代码。
+- 服务端按玩家维护 offer、递增 token、已领取集合、一次免费重抽和 Boss/Builder 奖励队列；通用效果运行时以 `grant_id/effect_instance_id/phase_instance_id/target_binding_id`处理幂等、限时、事件计数、动态 binding 和阶段转换。Boss 死亡向全部有效 Radiant 在局玩家分别发放，不再依赖最后一击者。
+- Panorama 以独立 HUD overlay 接入 manifest，按本地玩家订阅 `survival_rogue_reward`，使用服务端顺序和文案渲染三张窄高卡；整卡选择和重抽只发送 token 化意图。当前启用效果为 `fiscal_subsidy`、`radiant_sapling`、`fortifications`，分别复用资源事务和 `technology_stat_manager` rogue 层。
+- 新增聊天命令 `rogue <card_id1> <card_id2> <card_id3>`。它严格拒绝参数不足、重复或未知 ID，按输入顺序显示且禁用重抽；合法请求替换当前显示会话并使旧 token 失效，但不清空正式队列、不消费 Builder 一次性奖励。已领取卡可重复调试，点击仍走正式选择与效果运行时。
+- 自动验证已覆盖四表契约、100 个生成模块加载、Lua 5.1 奖励/运行时/聊天命令回归、目标语法、Python 静态编译、严格 UTF-8、Panorama 编译与限定 `git diff --check`。尚未执行 Workshop Tools 冷启动或双客户端实测，不能称为 UI、引擎效果或多人验收通过。后续接入规范和测试清单见 `docs/ai/ROGUE_REWARD_INTEGRATION.md`。
+
 ## 2026-08-15 - 全部怪物碰撞与精英/Boss攻击范围统一
 
 - 用户要求所有Boss、精英怪与小怪使用相同碰撞体，并将Boss和精英怪攻击范围增加36且同步CSV。地面怪统一基础HullRadius 32，飞行怪统一10；研究所挑战怪、飞行精英/领头/Boss不再使用0 Hull或无单位碰撞。

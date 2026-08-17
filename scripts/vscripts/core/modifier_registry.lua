@@ -142,6 +142,10 @@ local modifiers = {
         path = "modifiers/modifier_endless_training_target",
     },
     {
+        name = "modifier_rogue_training_dummy",
+        path = "modifiers/modifier_rogue_training_dummy",
+    },
+    {
         name = "modifier_research_technology",
         path = "modifiers/modifier_research_technology",
     },
@@ -152,6 +156,46 @@ local modifiers = {
     {
         name = "modifier_single_health_bar",
         path = "modifiers/modifier_single_health_bar",
+    },
+    {
+        name = "modifier_rogue_enemy_attack_speed",
+        path = "modifiers/modifier_rogue_reward_effects",
+    },
+    {
+        name = "modifier_rogue_base_tower_attack",
+        path = "modifiers/modifier_rogue_reward_effects",
+    },
+    {
+        name = "modifier_rogue_tower_attack_projection",
+        path = "modifiers/modifier_rogue_reward_effects",
+    },
+    {
+        name = "modifier_rogue_weakening_attack",
+        path = "modifiers/modifier_rogue_reward_effects",
+    },
+    {
+        name = "modifier_rogue_tower_growth",
+        path = "modifiers/modifier_rogue_reward_effects",
+    },
+    {
+        name = "modifier_rogue_lumberjack_attack_speed",
+        path = "modifiers/modifier_rogue_reward_effects",
+    },
+    {
+        name = "modifier_rogue_combat_bonus",
+        path = "modifiers/modifier_rogue_combat_effects",
+    },
+    {
+        name = "modifier_rogue_training_dummy",
+        path = "modifiers/modifier_rogue_combat_effects",
+    },
+    {
+        name = "modifier_rogue_training_attack",
+        path = "modifiers/modifier_rogue_combat_effects",
+    },
+    {
+        name = "modifier_rogue_corrosive_shield_attack",
+        path = "modifiers/modifier_rogue_reward_effects",
     },
 }
 

@@ -1,0 +1,35 @@
+1.weakening_orb 这个卡牌的效果作用的对象是下一波次怪boss或者精英怪的攻击力降低50%，一次性的效果，没有时效性的制约
+2.divine_wish 这个卡牌的效果是从卡牌池当中随机选取3个卡牌给到玩家，也是一次性的效果，选取的这三个卡牌的效果就是各自的效果，没有什么相关性了。
+3.tower_growth 这个作用对象是所有类型的防御塔，只要升级攻击力加成+10%，永久类效果
+4.feast 针对对象是城墙，效果是当前的城墙的生命值直接翻倍，后续的功能先不加上，先做生命值翻倍的效果
+5.boss_promise 这个针对的是在场所有的伐木工，持续时间是120s，具有时效性，在这个时间内生成的伐木工也能享受这个buff，但是120s之后所有的伐木工都会失去这个buff
+1.weakening_orb divine_wish tower_growth feast boss_promise
+
+
+
+
+1.infrastructure_maniac 这个卡牌的效果的作用对象是随机的可升级的建筑物，效果是使作用对象提升一级的等级，一次性效果，重复三次
+2.gunpowder_splash 这个卡牌的效果是使所有弩炮全局提高30%的伤害
+3.kick_when_down 这个卡牌的效果作用于移动速度受到减弱的敌方怪物，效果为受到50%的额外伤害
+4.tower_network 这个卡牌的效果作用于所有防御塔，使攻击力＋5%，最高50%，条件是场上每有一座满阶防御塔，则触发一次此效果，一次性效果
+5.corrosive_shield 此卡牌的效果作用于怪物，效果为每当城墙被攻击时，攻击者的护甲减少1点，全局持续
+
+
+infrastructure_maniac gunpowder_splash kick_when_down
+
+infrastructure_maniac gunpowder_splash tower_network corrosive_shield
+
+
+
+8.nuclear_bomb 给予建造者一个可使用的道具，效果是杀死场上目前存活的所有非boss敌方怪物
+9.bounty_order 该效果作用于接下来五次的挑战怪物，效果是如果挑战成功，则给予双倍奖励
+10.high_morale 该效果作用于我方英雄和防御塔的攻击加成，效果是攻击加成提高30%
+11.in_step 该效果作用于防御塔，效果是使防御塔增加相当于英雄攻击力的10%
+12.construction_order 给予建造者一个可使用的道具，可使玩家自主选择一个可升级的建筑免费升一级
+13.internship_certificate 该效果可将初级修理工的训练上限增加2
+14.bloodthirst_potion 该效果作用于英雄，效果是使英雄立刻获得100%的吸血效果，持续60秒。60秒后获得永久的20%的吸血效果。
+15.infrastructure_outsourcing 效果是给予玩家 建筑数×当前难度×100的金币
+16.command_change 该效果是使下一次选择卡牌时拥有有一次刷新的机会
+17.iron_fist_policy 该效果是使英雄和防御塔无视目标40%的护甲
+18.training_dummy 该效果是放置一个持续时间为30秒的靶子，我方单位每次攻击这个靶子增加100的攻击力
+nuclear_bomb bounty_order high_morale in_step construction_order internship_certificate internship_certificate bloodthirst_potion infrastructure_outsourcing command_change iron_fist_policy training_dummy

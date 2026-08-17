@@ -1674,6 +1674,18 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_survival_rogue_reward"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_survival_rogue_reward"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+        "AbilityTextureName" "item_tome_of_knowledge"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "0.0"
+        "AbilityManaCost"    "0"
+    }
+
     "ability_survival_hero_ball_lightning"
     {
         "BaseClass"          "ability_lua"

@@ -75,6 +75,47 @@ WAR3_ARMOR_EFFECT_TYPES = {
     "hero_attack_armor_reduction",
 }
 
+ROGUE_ENUM_FIELDS = {
+    "effect_type": "rogue_effect_type",
+    "execution_mode": "rogue_execution_mode",
+    "owner_scope": "rogue_owner_scope",
+    "target_selector": "rogue_target_selector",
+    "stack_policy": "rogue_stack_policy",
+}
+ROGUE_LIFECYCLE_ENUM_FIELDS = {
+    "rule_role": "rogue_rule_role",
+    "event_type": "rogue_event_type",
+    "predicate": "rogue_predicate",
+    "transition": "rogue_transition",
+}
+ROGUE_REQUIRED_PARAMS = {
+    "grant_gold_flat": {"value"},
+    "grant_current_wood_pct": {"value"},
+    "tower_attack_speed_bonus_pct": {"value"},
+    "base_tower_attack_bonus_pct": {
+        "value", "level_exclusive_max", "target_record_ids",
+    },
+    "wall_attacker_attack_speed_pct": {"value", "target_group"},
+    "wall_hit_damage_cap_pct": {"value"},
+    "training_capacity_flat": {
+        "value", "training_id", "wood_cost_override", "gold_cost_override",
+    },
+    "next_boss_attack_pct": {"value", "boss_role", "elite_role"},
+    "grant_random_cards": {"count"},
+    "tower_upgrade_attack_bonus_pct": {"value"},
+    "random_building_upgrade_count": {"count"},
+    "ballista_damage_bonus_pct": {"value", "target_stage_ids"},
+    "slowed_target_damage_taken_pct": {"value"},
+    "max_tower_count_attack_bonus_pct": {"value_per_target", "max_value"},
+    "owned_target_attacker_armor_reduction": {"value"},
+    "grant_nuclear_bomb_action": {"batch_size", "batch_interval_seconds"},
+    "wall_health_multiplier": {"multiplier"},
+    "lumberjack_attack_speed_bonus_pct": {"value", "duration_seconds"},
+    "hero_lifesteal_pct": {"burst.duration_seconds"},
+    "timed_state": {"duration_seconds"},
+    "event_counter": {"count"},
+}
+
 
 def lua_escape(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"', '\\"').replace("\r", "\\r").replace("\n", "\\n")
@@ -94,6 +135,128 @@ def value(raw: str, kind: str) -> str:
         separator = "," if "," in raw and "|" not in raw else "|"
         return "{" + ", ".join(f'"{lua_escape(x.strip())}"' for x in raw.split(separator) if x.strip()) + "}"
     return f'"{lua_escape(raw)}"'
+
+
+def csv_dict_rows(source: Path) -> list[tuple[int, dict[str, str]]]:
+    with source.open("r", encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.reader(handle))
+    if not rows:
+        return []
+    headers = rows[0]
+    result = []
+    for line, fields in enumerate(rows[1:], start=2):
+        if not fields or not fields[0].strip() or fields[0].strip().startswith("#"):
+            continue
+        fields = fields + [""] * (len(headers) - len(fields))
+        result.append((line, dict(zip(headers, fields))))
+    return result
+
+
+def validate_rogue_reward_definitions(files: list[Path]) -> None:
+    by_name = {source.name: source for source in files}
+    required_files = {
+        "enums.csv", "rogue_reward_cards.csv", "rogue_reward_effects.csv",
+        "rogue_reward_effect_params.csv", "rogue_reward_effect_lifecycle.csv",
+    }
+    missing_files = required_files.difference(by_name)
+    if missing_files:
+        raise ValueError(f"rogue reward CSV files missing: {sorted(missing_files)}")
+
+    enum_values: dict[str, set[str]] = {}
+    for _, row in csv_dict_rows(by_name["enums.csv"]):
+        if row.get("enabled", "").strip().lower() not in {"0", "false", "no", "off"}:
+            enum_values.setdefault(row["enum_name"].strip(), set()).add(
+                row["enum_value"].strip()
+            )
+
+    def unique_rows(name: str, key: str) -> dict[str, tuple[int, dict[str, str]]]:
+        result = {}
+        for line, row in csv_dict_rows(by_name[name]):
+            identity = row.get(key, "").strip()
+            if not identity:
+                raise ValueError(f"empty {key}: {by_name[name]} line {line}")
+            if identity in result:
+                raise ValueError(f"duplicate {key} {identity!r}: {by_name[name]} line {line}")
+            result[identity] = (line, row)
+        return result
+
+    cards = unique_rows("rogue_reward_cards.csv", "card_id")
+    effects = unique_rows("rogue_reward_effects.csv", "effect_id")
+    params = unique_rows("rogue_reward_effect_params.csv", "param_id")
+    lifecycles = unique_rows("rogue_reward_effect_lifecycle.csv", "lifecycle_id")
+    params_by_effect: dict[str, dict[str, str]] = {}
+    lifecycle_by_effect: dict[str, list[dict[str, str]]] = {}
+    enabled_effects_by_card: dict[str, int] = {}
+
+    for effect_id, (line, row) in effects.items():
+        card_id = row.get("card_id", "").strip()
+        if card_id not in cards:
+            raise ValueError(f"rogue effect {effect_id!r} has unknown card_id {card_id!r}")
+        for field, enum_name in ROGUE_ENUM_FIELDS.items():
+            raw = row.get(field, "").strip()
+            if raw not in enum_values.get(enum_name, set()):
+                raise ValueError(
+                    f"rogue effect {effect_id!r} has invalid {field} {raw!r} at line {line}"
+                )
+        if row.get("enabled", "").strip().lower() not in {"0", "false", "no", "off"}:
+            enabled_effects_by_card[card_id] = enabled_effects_by_card.get(card_id, 0) + 1
+
+    for param_id, (line, row) in params.items():
+        effect_id = row.get("effect_id", "").strip()
+        if effect_id not in effects:
+            raise ValueError(f"rogue param {param_id!r} has unknown effect_id {effect_id!r}")
+        name = row.get("param_name", "").strip()
+        effect_params = params_by_effect.setdefault(effect_id, {})
+        if name in effect_params:
+            raise ValueError(f"duplicate rogue param name {name!r} for {effect_id!r}")
+        kind = row.get("value_type", "").strip()
+        if kind not in {"number", "string", "boolean"}:
+            raise ValueError(f"rogue param {param_id!r} has invalid value_type {kind!r}")
+        value_fields = {
+            "number": row.get("number_value", "").strip(),
+            "string": row.get("string_value", "").strip(),
+            "boolean": row.get("boolean_value", "").strip(),
+        }
+        if not value_fields[kind] or any(value_fields[other] for other in value_fields if other != kind):
+            raise ValueError(f"rogue param {param_id!r} does not match value_type at line {line}")
+        if kind == "number" and not re.fullmatch(r"[-+]?\d+(?:\.\d+)?", value_fields[kind]):
+            raise ValueError(f"rogue param {param_id!r} has invalid number")
+        if kind == "boolean" and value_fields[kind].lower() not in {
+            "0", "1", "true", "false", "yes", "no", "on", "off",
+        }:
+            raise ValueError(f"rogue param {param_id!r} has invalid boolean")
+        effect_params[name] = value_fields[kind]
+
+    for lifecycle_id, (line, row) in lifecycles.items():
+        effect_id = row.get("effect_id", "").strip()
+        if effect_id not in effects:
+            raise ValueError(
+                f"rogue lifecycle {lifecycle_id!r} has unknown effect_id {effect_id!r}"
+            )
+        for field, enum_name in ROGUE_LIFECYCLE_ENUM_FIELDS.items():
+            raw = row.get(field, "").strip()
+            if raw not in enum_values.get(enum_name, set()):
+                raise ValueError(
+                    f"rogue lifecycle {lifecycle_id!r} has invalid {field} {raw!r} at line {line}"
+                )
+        lifecycle_by_effect.setdefault(effect_id, []).append(row)
+
+    for effect_id, (_, effect) in effects.items():
+        required = set(ROGUE_REQUIRED_PARAMS.get(effect["effect_type"].strip(), set()))
+        required.update(ROGUE_REQUIRED_PARAMS.get(effect["execution_mode"].strip(), set()))
+        available_params = params_by_effect.get(effect_id, {})
+        missing = required.difference(available_params)
+        if missing:
+            raise ValueError(f"rogue effect {effect_id!r} missing params: {sorted(missing)}")
+        if effect.get("enabled", "").strip().lower() not in {"0", "false", "no", "off"}:
+            rules = lifecycle_by_effect.get(effect_id, [])
+            if not any(rule.get("rule_role", "").strip() == "activate" for rule in rules):
+                raise ValueError(f"enabled rogue effect {effect_id!r} has no activate lifecycle")
+
+    for card_id, (_, card) in cards.items():
+        if card.get("enabled", "").strip().lower() not in {"0", "false", "no", "off"} \
+                and enabled_effects_by_card.get(card_id, 0) == 0:
+            raise ValueError(f"enabled rogue card {card_id!r} has no enabled effect")
 
 
 def validate_build_regions(
@@ -535,6 +698,7 @@ def main() -> int:
         return 11
     validate_sound_cue_uniqueness(files)
     validate_monster_visual_definitions(files)
+    validate_rogue_reward_definitions(files)
 
     tooltip_builder = ROOT / "tools" / "build_tooltip_definitions.py"
     tooltip_built_separately = False

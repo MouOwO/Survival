@@ -1,0 +1,42 @@
+-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.
+-- Source: rogue_reward_cards.csv
+local M = {}
+M.rows = {
+    { card_id = "frozen_wall", display_name = "冰封城墙", description = "所有波次怪和挑战怪的攻击速度永久降低15%。", icon_name = "winter_wyvern_cold_embrace", weight = 5, enabled = true, source_status = "确认", notes = "保留原攻速的85%；覆盖当前与后续生成目标。" },
+    { card_id = "recruit_training", display_name = "新兵作训", description = "基础箭塔LV1至LV4的攻击力永久翻倍。", icon_name = "drow_ranger_marksmanship", weight = 3, enabled = true, source_status = "确认", notes = "仅匹配arrow_tower_lv01至arrow_tower_lv04记录ID。" },
+    { card_id = "ion_shield", display_name = "离子护盾", description = "城墙单次受到的伤害不会超过其最大生命值的20%。", icon_name = "razor_static_link", weight = 4, enabled = true, source_status = "确认", notes = "在共享伤害过滤器最终伤害阶段截断。" },
+    { card_id = "weakening_orb", display_name = "虚弱宝珠", description = "下一波优先令Boss攻击力降低50%；若无Boss则作用于第一个精英怪。", icon_name = "item_orb_of_corrosion", weight = 3, enabled = true, source_status = "确认", notes = "领取时锁定下一正式波次；命中一次后消费且无时间到期。" },
+    { card_id = "divine_wish", display_name = "神许愿", description = "立即从卡牌池随机获得3张卡牌的全部效果。", icon_name = "oracle_false_promise", weight = 8, enabled = true, source_status = "确认", notes = "按权重无放回抽取；排除自身和已领取卡。" },
+    { card_id = "tower_growth", display_name = "炮塔成长", description = "所有防御塔每次升级后永久提高10%攻击力。", icon_name = "tiny_grow", weight = 5, enabled = true, source_status = "确认", notes = "只计算领取后成功完成的升级。" },
+    { card_id = "fortifications", display_name = "防御工事", description = "所有防御塔攻击速度提高6%。", icon_name = "beastmaster_inner_beast", weight = 7, enabled = true, source_status = "确认", notes = "永久团队效果；重复获得已被抽取规则排除。" },
+    { card_id = "feast", display_name = "盛宴", description = "当前城墙的最大生命值和当前生命值立即翻倍。", icon_name = "life_stealer_feast", weight = 4, enabled = true, source_status = "确认", notes = "首版只实现当前城墙生命翻倍。" },
+    { card_id = "boss_promise", display_name = "老板的大饼", description = "所有伐木工攻击速度翻倍，持续120秒。", icon_name = "ogre_magi_bloodlust", weight = 6, enabled = true, source_status = "确认", notes = "覆盖领取时在场及原始时间窗内新生成的伐木工；统一到期。" },
+    { card_id = "far_sighted", display_name = "深谋远虑", description = "下一次选择时获得页面全部3个效果。", icon_name = "dark_seer_wall_of_replica", weight = 7, enabled = false, disabled_reason = "需要定义与已领取排除及效果失败的原子事务", source_status = "确认" },
+    { card_id = "command_change", display_name = "命令更换", description = "下一次肉鸽卡牌选择额外获得1次刷新机会。", icon_name = "chen_holy_persuasion", weight = 5, enabled = true, source_status = "确认", notes = "在下一次创建肉鸽选卡页面时一次性消费。" },
+    { card_id = "infrastructure_maniac", display_name = "基建狂魔", description = "立即免费随机升级可升级建筑3次。", icon_name = "tinker_rearm", weight = 3, enabled = true, source_status = "确认", notes = "每次完成后重新随机；候选耗尽时提前结束；等待转职的基础箭塔不参与。" },
+    { card_id = "gunpowder_splash", display_name = "火药溅射", description = "所有穿透弩炮伤害永久提高30%。", icon_name = "snapfire_scatterblast", weight = 7, enabled = true, source_status = "确认", notes = "按防御塔CSV的piercing_ballista阶段识别，覆盖已有与后续进入该阶段的塔。" },
+    { card_id = "radiant_sapling", display_name = "璀璨树苗", description = "立即获得当前木材数量20%的额外木材。", icon_name = "furion_force_of_nature", weight = 3, enabled = true, source_status = "确认", notes = "结算时向下取整。" },
+    { card_id = "kick_when_down", display_name = "落井下石", description = "你对处于移动减速状态的怪物造成的伤害提高50%。", icon_name = "slardar_amplify_damage", weight = 4, enabled = true, source_status = "确认", notes = "按伤害来源玩家隔离；多个移动减速只触发一次。" },
+    { card_id = "tower_network", display_name = "炮塔串联", description = "领取时每有1座最终满阶防御塔，所有防御塔永久提高5%攻击，最多提高50%。", icon_name = "disruptor_kinetic_field", weight = 7, enabled = true, source_status = "存在差异", notes = "领取时一次性快照；后续建造、升级和销毁不改变加成。" },
+    { card_id = "fiscal_subsidy", display_name = "财政补贴", description = "立即获得10000金币。", icon_name = "alchemist_goblins_greed", weight = 5, enabled = true, source_status = "确认" },
+    { card_id = "corrosive_shield", display_name = "腐蚀护盾", description = "怪物每次对你的单位发动普通攻击时，自身永久降低1点护甲，可叠加。", icon_name = "bristleback_viscous_nasal_goo", weight = 2, enabled = true, source_status = "确认", notes = "按目标单位所属持卡玩家判定；技能伤害不触发；持续至怪物死亡。" },
+    { card_id = "goblin_duplicator", display_name = "地精复制器", description = "获得一次复制防御塔的机会：49%成功，失败则目标防御塔消失。", icon_name = "meepo_divided_we_stand", weight = 6, enabled = false, disabled_reason = "项目没有地精复制器道具与目标选择流程", source_status = "确认" },
+    { card_id = "lucky_watch", display_name = "幸运怀表", description = "接下来3次相关技能触发后立即结束其冷却。", icon_name = "faceless_void_time_walk", weight = 4, enabled = false, disabled_reason = "原文未明确哪些技能属于相关技能", source_status = "部分确认" },
+    { card_id = "nuclear_bomb", display_name = "核弹", description = "建造者获得核弹道具；使用后杀死场上当前存活的所有非Boss敌方怪物。", icon_name = "techies_suicide", weight = 5, enabled = true, source_status = "确认", notes = "一次性无目标道具；Boss按正式Boss身份排除。" },
+    { card_id = "bounty_order", display_name = "赏金密令", description = "接下来5次挑战建筑怪物挑战成功时，额外获得一份相同奖励。", icon_name = "bounty_hunter_track", weight = 9, enabled = true, source_status = "确认", notes = "只作用于挑战建筑五类挑战怪物；失败及英雄相关挑战不消费次数。" },
+    { card_id = "high_morale", display_name = "斗志昂扬", description = "我方英雄和防御塔的攻击加成提高30%。", icon_name = "legion_commander_press_the_attack", weight = 5, enabled = true, source_status = "确认" },
+    { card_id = "in_step", display_name = "步调一致", description = "所有防御塔增加相当于关联英雄当前攻击力10%的攻击力。", icon_name = "chen_penitence", weight = 4, enabled = true, source_status = "确认", notes = "英雄未召唤时投影为0；攻击变化时动态读取。" },
+    { card_id = "construction_order", display_name = "建造密令", description = "建造者获得一个可令任意可升级建筑免费提升1级的道具。", icon_name = "item_recipe", weight = 3, enabled = true, source_status = "确认", notes = "一次性单位目标道具；复用权威升级报价与免费升级请求。" },
+    { card_id = "internship_certificate", display_name = "实习证明", description = "初级修理工的训练上限永久增加2。", icon_name = "invoker_forge_spirit", weight = 3, enabled = true, source_status = "确认", notes = "不即时生成修理工；训练仍正常消耗资源和人口。" },
+    { card_id = "bloodthirst_potion", display_name = "渴血药剂", description = "英雄立即获得100%吸血持续60秒，随后永久获得20%吸血。", icon_name = "bloodseeker_bloodrage", weight = 2, enabled = true, source_status = "确认" },
+    { card_id = "infrastructure_outsourcing", display_name = "基建外包", description = "立即获得建筑数×当前难度×100金币。", icon_name = "alchemist_unstable_concoction", weight = 1, enabled = true, source_status = "确认", notes = "难度N1-N5分别取数值1-5。" },
+    { card_id = "burst_potion", display_name = "爆发药剂", description = "给予英雄一个兴奋剂。", icon_name = "item_moon_shard", weight = 2, enabled = false, disabled_reason = "兴奋剂效果未在来源中定义", source_status = "确认" },
+    { card_id = "iron_fist_policy", display_name = "铁腕政策", description = "防御塔和英雄攻击无视目标40%护甲。", icon_name = "templar_assassin_meld", weight = 3, enabled = true, source_status = "确认", notes = "只作用于物理攻击伤害。" },
+    { card_id = "training_dummy", display_name = "训练靶子", description = "放置持续30秒的靶子；我方单位每次攻击它永久获得100攻击力。", icon_name = "axe_berserkers_call", weight = 2, enabled = true, source_status = "确认", notes = "每次成功命中均成长，不按攻击者去重。" },
+}
+M.by_id = {}
+for _, row in ipairs(M.rows) do
+    local key = row["card_id"]
+    if key ~= nil then M.by_id[key] = row end
+end
+return M

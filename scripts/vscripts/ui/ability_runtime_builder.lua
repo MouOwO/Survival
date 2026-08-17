@@ -141,6 +141,7 @@ end
 local function repairer_training(state, resources, training_id)
     local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
         team = state.team,
+        player_id = state.player_id,
         training_type = "repairer",
         training_id = training_id,
     }) or {}

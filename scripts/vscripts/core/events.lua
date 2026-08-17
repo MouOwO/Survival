@@ -23,6 +23,7 @@ local M = {
     BUILD_REQUEST = "building.build.request",
     BUILDING_UPGRADE_QUOTE_REQUEST = "building.upgrade_quote.request",
     BUILDING_UPGRADE_REQUEST = "building.upgrade.request",
+    BUILDING_UPGRADE_FREE_REQUEST = "building.upgrade.free.request",
     TOWER_CLASS_REQUEST = "tower.class.request",
     TOWER_CLASS_SLOT_REQUEST = "tower.class_slot.request",
     TOWER_CLASS_COUNTS_CHANGED = "tower.class_counts.changed",
@@ -47,10 +48,13 @@ local M = {
     TOWER_FUSION_ELIGIBILITY_REQUEST = "tower.fusion_eligibility.request",
     TOWER_FUSION_STATE_CHANGED = "tower.fusion_state.changed",
     WORKER_TRAIN_REQUEST = "worker.train.request",
+    WORKER_LIST_REQUEST = "worker.list.request",
     WORKER_DISMISS_REQUEST = "worker.dismiss.request",
     WORKER_TRAINING_GET_REQUEST = "worker.training.get.request",
     WORKER_CHANGED = "worker.changed",
 
+    BUILDER_READY = "builder.ready",
+    BUILDER_GET_REQUEST = "builder.get.request",
     BUILDER_UNLOCK_CHANGED = "builder.unlock.changed",
     BUILDER_STAGE_CHANGED = "builder.stage.changed",
 
@@ -68,6 +72,7 @@ local M = {
     TREE_CHANGED = "tree.changed",
 
     WAVE_CHANGED = "wave.changed",
+    MONSTER_SPAWNED = "monster.spawned",
     WAVE_START_NEXT = "wave.internal.start_next",
     WAVE_DIFFICULTY_SET_REQUEST = "wave.difficulty.set.request",
     WAVE_STATE_GET_REQUEST = "wave.state.get.request",
@@ -86,6 +91,7 @@ local M = {
     TECHNOLOGY_STATE_GET_REQUEST = "technology.state.get.request",
     TECHNOLOGY_PURCHASE_NEXT_REQUEST = "technology.purchase_next.request",
     TECHNOLOGY_STATS_CHALLENGE_ADD_REQUEST = "technology.stats.challenge_add.request",
+    TECHNOLOGY_STATS_ROGUE_ADD_REQUEST = "technology.stats.rogue_add.request",
     TECHNOLOGY_RESEARCH_STATE_CHANGED = "technology.research_state.changed",
     SHOP_AUTO_RESEARCH_TOGGLE_REQUEST = "shop.auto_research_toggle.request",
     TECHNOLOGY_CHEAT_SET_REQUEST = "technology.cheat_set.request",
@@ -131,6 +137,13 @@ local M = {
     HERO_SKILL_CHOICE_GET_REQUEST = "hero.skill.choice.get.request",
     HERO_SKILL_CHOICE_SELECT_REQUEST = "hero.skill.choice.select.request",
     HERO_SKILL_CHOICE_CHANGED = "hero.skill.choice.changed",
+
+    ROGUE_REWARD_OPEN_REQUEST = "rogue_reward.open.request",
+    ROGUE_REWARD_SELECT_REQUEST = "rogue_reward.select.request",
+    ROGUE_REWARD_REROLL_REQUEST = "rogue_reward.reroll.request",
+    ROGUE_REWARD_CONSUMED_GET_REQUEST = "rogue_reward.consumed.get.request",
+    ROGUE_REWARD_GRANT_RANDOM_REQUEST = "rogue_reward.grant_random.request",
+    ROGUE_REWARD_CHANGED = "rogue_reward.changed",
 
     CONTENT_INVENTORY_GRANT_REQUEST = "content.inventory.grant.request",
     CONTENT_INVENTORY_TRANSACTION_REQUEST = "content.inventory.transaction.request",

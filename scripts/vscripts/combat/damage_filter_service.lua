@@ -3,6 +3,7 @@ local tree_damage_rules = require("systems/tree_damage_rules")
 local anti_air_rules = require("systems/anti_air_rules")
 local global_rules = require("config/generated/global_rules")
 local armor_balance = require("config/armor_balance")
+local rogue_effect_state = require("systems/rogue_effect_state_service")
 local event_bus = nil
 local events = nil
 local repository = nil
@@ -169,6 +170,18 @@ local function filter(_, keys)
         1 + source_bonus + global_bonus + research_bonus + seven_sins_bonus
             - target_reduction)
         * boss_multiplier
+    if rogue_effect_state.has_effect(attacker.survival_player_id,
+        "slowed_target_damage_taken_pct")
+        and (victim.survival_is_wave_monster == true
+            or victim.survival_is_challenge_monster == true)
+        and victim:FindModifierByName("modifier_survival_managed_buff") then
+        local slowed = false
+        for _, modifier in ipairs(victim:FindAllModifiersByName("modifier_survival_managed_buff") or {}) do
+            if modifier.definition and modifier.definition.effect_type == "move_speed_pct"
+                and (tonumber(modifier.value) or 0) < 0 then slowed = true break end
+        end
+        if slowed then multiplier = multiplier * 1.5 end
+    end
     if anti_air_rules.has_damage_taken_aura(victim) then
         multiplier = multiplier * 1.2
     end
@@ -178,9 +191,17 @@ local function filter(_, keys)
     local armor_multiplier = 1
     local effective_war3_armor = nil
     local pierced_war3_armor = nil
-    local armor_ignore_pct = math.max(
-        0, math.min(100, tonumber(record and record.physical_armor_ignore_pct) or 0)
-    )
+    local armor_ignore_pct = tonumber(record and record.physical_armor_ignore_pct) or 0
+    local is_basic_attack = tree_damage_rules.is_basic_attack_category(damage_category)
+        or (category_is_unknown and (not inflictor_index or inflictor_index <= 0))
+    if damage_type == DAMAGE_TYPE_PHYSICAL and is_basic_attack
+        and (attacker.survival_building_id == "arrow_tower"
+            or (attacker.IsRealHero and attacker:IsRealHero())) then
+        armor_ignore_pct = armor_ignore_pct + rogue_effect_state.numeric(
+            attacker.survival_player_id, "physical_armor_ignore_pct"
+        )
+    end
+    armor_ignore_pct = math.max(0, math.min(100, armor_ignore_pct))
     local custom_war3_armor = damage_type == DAMAGE_TYPE_PHYSICAL
         and (victim.survival_monster_corpse == true
             or victim.survival_war3_armor_target == true)
@@ -200,6 +221,21 @@ local function filter(_, keys)
             keys.damage_flags_const or keys.damage_flags,
             DOTA_DAMAGE_FLAG_IGNORES_PHYSICAL_ARMOR
         )
+    elseif damage_type == DAMAGE_TYPE_PHYSICAL and armor_ignore_pct > 0
+        and victim.GetPhysicalArmorValue then
+        armor_multiplier = armor_balance.physical_armor_ignore_compensation(
+            victim:GetPhysicalArmorValue(false), armor_ignore_pct, false
+        )
+        keys.damage = math.max(0, keys.damage * armor_multiplier)
+    end
+    if victim.survival_building_id == "wall" then
+        local cap_pct = rogue_effect_state.wall_damage_cap(victim)
+        if cap_pct and cap_pct > 0 then
+            keys.damage = math.min(
+                keys.damage,
+                math.max(0, tonumber(victim:GetMaxHealth()) or 0) * cap_pct / 100
+            )
+        end
     end
     if detailed_diagnostics and monster_physical_diagnostic_count < 40
         and victim.survival_monster_corpse == true

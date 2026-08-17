@@ -60,6 +60,23 @@ function M.initial_slice_players()
     return math.max(1, math.floor(tonumber(rule and rule.initial_slice_players) or 1))
 end
 
+function M.active_player_ids()
+    local result = {}
+    if not PlayerResource then return result end
+    for player_id = 0, M.max_players() - 1 do
+        local valid = not PlayerResource.IsValidPlayerID
+            or PlayerResource:IsValidPlayerID(player_id)
+        local player = PlayerResource.GetPlayer
+            and PlayerResource:GetPlayer(player_id) or nil
+        local team = PlayerResource.GetTeam
+            and PlayerResource:GetTeam(player_id) or nil
+        if valid and player and team == DOTA_TEAM_GOODGUYS then
+            result[#result + 1] = player_id
+        end
+    end
+    return result
+end
+
 function M.slot(player_id)
     player_id = normalized_player_id(player_id)
     return player_id and slot_by_player[player_id] or nil

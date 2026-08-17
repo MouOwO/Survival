@@ -1,6 +1,18 @@
 "DOTAAbilities"
 {
     "Version" "1"
+    "item_survival_rogue_nuclear_bomb"
+    {
+        "BaseClass" "item_lua"
+        "ScriptFile" "items/item_survival_rogue_actions"
+        "AbilityTextureName" "techies_suicide"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+        "ItemCost" "0"
+        "ItemPurchasable" "0"
+        "ItemSellable" "0"
+        "ItemDroppable" "0"
+        "ItemPermanent" "0"
+    }
     "item_survival_challenge_reward"
     {
         "BaseClass" "item_lua"

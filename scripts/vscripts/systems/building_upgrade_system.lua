@@ -16,6 +16,7 @@ local building_health_projection = require("systems/building_health_projection")
 local tower_utility_abilities = require("systems/tower_utility_ability_sync")
 local dev_wall_stats = require("debug/dev_wall_stats")
 local war3_armor_target = require("systems/war3_armor_target")
+local rogue_effect_state = require("systems/rogue_effect_state_service")
 
 local M = {}
 local buildings = {}
@@ -107,6 +108,11 @@ local function apply_research_technology(state)
         unit.survival_attack_max = damage
         unit.survival_super_tower_crit_chance =
             tonumber(tower.critical_chance_pct) or 0
+        local attack_speed_bonus = tonumber(tower.attack_speed_bonus_pct) or 0
+        local base_attack_time = tonumber(unit.survival_research_base_attack_time)
+            or tonumber(unit:GetBaseAttackTime()) or 1
+        unit.survival_research_base_attack_time = base_attack_time
+        unit:SetBaseAttackTime(base_attack_time / math.max(0.01, 1 + attack_speed_bonus / 100))
         local attack_range = tower_combat_rules.attack_range(
             tower.attack_range_bonus
         )
@@ -123,7 +129,11 @@ local function apply_research_technology(state)
         local old_max = math.max(1, unit:GetMaxHealth())
         local old_health = math.max(0, unit:GetHealth())
         local health_ratio = old_health / old_max
-        local max_health = math.max(1, math.floor(base_health * (1 + bonus_pct / 100)))
+        local max_health = building_health_projection.maximum_with_flat_bonus(
+            base_health,
+            bonus_pct,
+            rogue_effect_state.wall_health_flat(player_id)
+        )
         unit:SetBaseMaxHealth(max_health)
         unit:SetMaxHealth(max_health)
         unit:SetHealth(old_health > 0
@@ -186,7 +196,8 @@ local function apply_tower(unit, data, level)
         or tonumber(combat.base_attack_speed) or 1
     attacks_per_second = math.max(0.01, attacks_per_second)
     unit.survival_attack_speed = attacks_per_second
-    unit:SetBaseAttackTime(1 / attacks_per_second)
+    unit.survival_research_base_attack_time = 1 / attacks_per_second
+    unit:SetBaseAttackTime(unit.survival_research_base_attack_time)
     if not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
@@ -307,6 +318,7 @@ publish = function(state, reason)
         level = state.level,
         absolute_level = state.level,
         route_level = route_row and route_row.level or state.level,
+        record_id = route_row and route_row.record_id or nil,
         tower_class = state.tower_class,
         tower_class_name = state.tower_class_name,
         fusion_participated = state.fusion_participated == true and 1 or 0,
@@ -328,6 +340,15 @@ end
 
 local function spend(state, cost, reason)
     if not cost then return { ok = false, error = "升级费用未配置" } end
+    if state.free_upgrade_request == true then
+        return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+            team = state.team,
+            wood = 0,
+            gold = 0,
+            population = cost.population or 0,
+            reason = reason,
+        })
+    end
     return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         team = state.team,
         wood = cost.wood or 0,
@@ -335,6 +356,15 @@ local function spend(state, cost, reason)
         population = cost.population or 0,
         reason = reason,
     })
+end
+
+local function charged_cost(state, cost)
+    if state.free_upgrade_request ~= true then return cost end
+    return {
+        wood = 0,
+        gold = 0,
+        population = cost and cost.population or 0,
+    }
 end
 
 local function refund_spend(state, cost, reason)
@@ -495,6 +525,7 @@ local function recover_state(unit)
         local row = tower_routes.current(state) or arrow_data(state.level)
         if row then
             unit.survival_route_level = tonumber(row.level) or state.level
+            unit.survival_tower_record_id = row.record_id
             sync_tower_abilities(state, row)
             set_tower_projectile_speed(
                 unit,
@@ -561,9 +592,10 @@ local function upgrade_wall(state)
             }
         end
     end
-    local result = spend(state, data.upgrade_cost, "upgrade_wall")
+    local cost = charged_cost(state, data.upgrade_cost)
+    local result = spend(state, cost, "upgrade_wall")
     if not result or not result.ok then return result end
-    return start_upgrade(state, data, next_level, function()
+    local pending = start_upgrade(state, data, next_level, function()
         state.level = next_level
         state.unit.survival_level = next_level
         state.unit.survival_display_name = data.display_name
@@ -574,16 +606,23 @@ local function upgrade_wall(state)
         end)
         publish(state, "wall_upgraded")
         play_upgrade_sound(state)
-    end, "wall")
+    end, "wall", function(cancel_reason)
+        refund_spend(state, cost, "wall_upgrade_cancelled:" .. tostring(cancel_reason))
+    end)
+    if not pending or not pending.ok then
+        refund_spend(state, cost, "wall_upgrade_start_failed")
+    end
+    return pending
 end
 
 local function upgrade_city(state)
     local next_level = state.level + 1
     local data = state.definition.levels[next_level]
     if not data then return { ok = false, error = "主城已达最高等级" } end
-    local result = spend(state, data.upgrade_cost, "upgrade_city")
+    local cost = charged_cost(state, data.upgrade_cost)
+    local result = spend(state, cost, "upgrade_city")
     if not result or not result.ok then return result end
-    return start_upgrade(state, data, next_level, function()
+    local pending = start_upgrade(state, data, next_level, function()
         state.level = next_level
         state.unit.survival_level = next_level
         state.unit.survival_display_name = data.display_name
@@ -597,7 +636,13 @@ local function upgrade_city(state)
         publish(state, "city_upgraded")
         refresh_team_farms(state.team)
         play_upgrade_sound(state)
-    end, "city")
+    end, "city", function(cancel_reason)
+        refund_spend(state, cost, "city_upgrade_cancelled:" .. tostring(cancel_reason))
+    end)
+    if not pending or not pending.ok then
+        refund_spend(state, cost, "city_upgrade_start_failed")
+    end
+    return pending
 end
 
 local function upgrade_farm(state)
@@ -608,9 +653,10 @@ local function upgrade_farm(state)
     local next_level = state.level + 1
     local data = state.definition.levels[next_level]
     if not data then return { ok = false, error = "农场已达最高等级" } end
-    local result = spend(state, data.upgrade_cost, "upgrade_farm")
+    local cost = charged_cost(state, data.upgrade_cost)
+    local result = spend(state, cost, "upgrade_farm")
     if not result or not result.ok then return result end
-    return start_upgrade(state, data, next_level, function()
+    local pending = start_upgrade(state, data, next_level, function()
         state.level = next_level
         state.unit.survival_level = next_level
         state.unit.survival_display_name = data.display_name
@@ -624,7 +670,13 @@ local function upgrade_farm(state)
         refresh_farm_upgrade_ability(state)
         publish(state, "farm_upgraded")
         play_upgrade_sound(state)
-    end, "farm")
+    end, "farm", function(cancel_reason)
+        refund_spend(state, cost, "farm_upgrade_cancelled:" .. tostring(cancel_reason))
+    end)
+    if not pending or not pending.ok then
+        refund_spend(state, cost, "farm_upgrade_start_failed")
+    end
+    return pending
 end
 
 local function route_unit_data(state, row)
@@ -669,6 +721,7 @@ local function apply_tower_level(state, row, level, change_model)
     state.tower_class_name = state.tower_class and tower_routes.display_name(row) or row.name
     state.unit.survival_level = level
     state.unit.survival_route_level = tonumber(row.level) or level
+    state.unit.survival_tower_stage_id = row.stage_id
     state.unit.survival_tower_class = state.tower_class
     state.unit.survival_display_name = state.tower_class_name
     sync_tower_abilities(state, row)
@@ -742,7 +795,7 @@ local function upgrade_tower(state, mode)
     local target = mode == "max" and tower_routes.stage_end_level(state)
         or state.level + 1
     local final_row = tower_routes.row_at_level(state, target)
-    local cost = tower_routes.cost_to(state, target)
+    local cost = charged_cost(state, tower_routes.cost_to(state, target))
     if target <= state.level or not final_row or not cost then
         return { ok = false, error = "防御塔已达当前阶段最高等级" }
     end
@@ -800,6 +853,10 @@ local function upgrade_quote(payload)
     if not state then
         return { ok = false, error = "建筑升级状态尚未初始化" }
     end
+    local player_id = tonumber(payload.player_id)
+    if player_id ~= nil and player_id ~= tonumber(state.player_id) then
+        return { ok = false, error = "只能升级自己的建筑" }
+    end
     if upgrade_process.is_active(unit) then
         return { ok = false, error = "建筑正在升级中" }
     end
@@ -823,10 +880,27 @@ local function upgrade_quote(payload)
         if mode ~= "one" then
             return { ok = false, error = "该建筑不支持直升最高级" }
         end
+        if state.building_id ~= "wall" and state.building_id ~= "main_city"
+            and state.building_id ~= "building_farm"
+            and state.building_id ~= "farm" then
+            return { ok = false, error = "该建筑不能升级" }
+        end
         local data = state.definition.levels
             and state.definition.levels[target_level] or nil
         if not data then
             return { ok = false, error = "该建筑已达最高等级" }
+        end
+        if state.building_id == "wall" and data.requires_city_level
+            and data.requires_city_level > team_city_level(state.team) then
+            return {
+                ok = false,
+                error = "基地达到Lv." .. tostring(data.requires_city_level)
+                    .. "后才能升级城墙",
+            }
+        end
+        if (state.building_id == "building_farm" or state.building_id == "farm")
+            and state.level >= team_city_level(state.team) then
+            return { ok = false, error = "农场等级不能高于主城等级" }
         end
         cost = data.upgrade_cost
         if not cost then
@@ -847,6 +921,7 @@ local function upgrade_quote(payload)
 end
 
 local function on_upgrade_request(payload)
+    payload = payload or {}
     local unit = payload.building
     if not valid_entity(unit) then
         print("[BuildingUpgrade] invalid building entity")
@@ -877,13 +952,34 @@ local function on_upgrade_request(payload)
         return payload.result
     end
 
-    local result
-    if state.building_id == "wall" then result = upgrade_wall(state)
-    elseif state.building_id == "main_city" then result = upgrade_city(state)
-    elseif state.building_id == "building_farm"
-        or state.building_id == "farm" then result = upgrade_farm(state)
-    elseif state.building_id == "arrow_tower" then result = upgrade_tower(state, payload.upgrade_mode or "one")
-    else result = { ok = false, error = "该建筑不能升级" } end
+    local free_effect_type = "grant_building_upgrade_action"
+    local has_free_upgrade = payload.system_free_upgrade ~= true
+        and rogue_effect_state.numeric(state.player_id, free_effect_type) > 0
+    local requested_mode = payload.upgrade_mode or "one"
+    if has_free_upgrade then
+        state.free_upgrade_request = true
+        requested_mode = "one"
+    end
+
+    local ok, result = pcall(function()
+        if state.building_id == "wall" then return upgrade_wall(state) end
+        if state.building_id == "main_city" then return upgrade_city(state) end
+        if state.building_id == "building_farm" or state.building_id == "farm" then
+            return upgrade_farm(state)
+        end
+        if state.building_id == "arrow_tower" then
+            return upgrade_tower(state, requested_mode)
+        end
+        return { ok = false, error = "该建筑不能升级" }
+    end)
+    state.free_upgrade_request = nil
+    if not ok then
+        print("[BuildingUpgrade] upgrade failed: " .. tostring(result))
+        result = { ok = false, error = "升级失败" }
+    end
+    if has_free_upgrade and result.ok == true then
+        rogue_effect_state.consume_numeric(state.player_id, free_effect_type, 1)
+    end
 
     if not payload.silent_notification then
         notify(state, result and result.ok and "开始升级" or (result and result.error or "升级失败"),
@@ -891,6 +987,23 @@ local function on_upgrade_request(payload)
     end
     payload.result = result or { ok = false, error = "升级失败" }
     return payload.result
+end
+
+local function on_free_upgrade_request(payload)
+    payload = payload or {}
+    payload.silent_notification = true
+    payload.system_free_upgrade = true
+    local quote = upgrade_quote(payload)
+    if not quote.ok then return quote end
+    local state = recover_state(payload.building)
+    state.free_upgrade_request = true
+    local ok, result = pcall(on_upgrade_request, payload)
+    state.free_upgrade_request = nil
+    if not ok then
+        print("[BuildingUpgrade] free upgrade failed: " .. tostring(result))
+        return { ok = false, error = "升级失败" }
+    end
+    return result
 end
 
 local function on_class_request(payload)
@@ -1073,6 +1186,7 @@ function M.init()
     event_bus.subscribe(events.TOWER_FUSION_STATE_CHANGED,
         on_tower_fusion_state_changed)
     event_bus.handle_request(events.BUILDING_UPGRADE_REQUEST, on_upgrade_request)
+    event_bus.handle_request(events.BUILDING_UPGRADE_FREE_REQUEST, on_free_upgrade_request)
     event_bus.handle_request(events.TOWER_CLASS_REQUEST, on_class_request)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
 end

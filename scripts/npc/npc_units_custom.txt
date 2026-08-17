@@ -209,7 +209,7 @@
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
-        "HasInventory"           "0"
+        "HasInventory"           "1"
         "AbilityLayout"          "12"
         "StatusHealth"           "1000"
         "StatusMana"             "1000"
@@ -421,6 +421,23 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_BUILDING"
         "VisionDaytimeRange"     "800"
         "VisionNighttimeRange"   "800"
+    }
+
+    "npc_survival_rogue_training_dummy"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/props_structures/radiant_tower001.vmdl"
+        "ModelScale"             "0.45"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "StatusHealth"           "1000000000"
+        "StatusHealthRegen"      "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "ArmorPhysical"          "0"
+        "MagicalResistance"      "100"
+        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
     }
 
     "npc_survival_doom_infernal"

@@ -4,6 +4,7 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-17，肉鸽奖励 UI、通用效果运行时与指定三卡调试入口完成自动验证）：四张权威 CSV 已覆盖 31 张卡、31 个效果、38 个强类型参数和 21 条生命周期规则；服务端 offer/token/队列、Panorama 独立 overlay、Boss 全有效玩家发放及 `rogue <card_id1> <card_id2> <card_id3>`正式运行时调试链已接入。当前只启用 `fiscal_subsidy`、`radiant_sapling`、`fortifications`，尚未 Workshop Tools 冷启动或双客户端验收。后续开发先读 `ROGUE_REWARD_INTEGRATION.md`，实机基线命令为 `rogue fiscal_subsidy radiant_sapling fortifications`。
 - 当前插入任务（2026-08-15，Builder动态管理域与全链路安全枚举完成自动验证）：Builder服务端仅枚举`0..GetAbilityCount()-1`，保留index 0等非管理Ability，并以动态起点连续维护六个CSV业务槽与尾随Blink；快捷键仍由`builder_slot_order`投影`Q/W/E/R/T/A`和名称映射`D`。四份Panorama实体Ability访问统一消费runtime `ability_count`，固定24/64仅保留为HUD节点枚举。专项行为/契约、研究与Grid回归、Lua 5.1语法、CSV生成一致、双仓限定检查和四份JS强制编译通过；下一步冷启动短测高级研究所和农场并确认无`invalid index`或布局重建失败。
 - 当前插入任务（2026-08-15，Ability runtime重建与安全枚举完成自动验证）：已恢复`upgrade_level(..., display)`及默认空表；服务端通过`survival_ability_runtime`的`unit:<entindex>`发布真实`GetAbilityCount()`并在销毁时清理，两份Panorama仅按该元数据访问实体Ability，不再固定探测无效索引。高级研究所十槽HUD几何外推保持不变。专项Lua 5.1、契约、研究回归、语法、UTF-8、限定diff和两份JS强制编译均通过；下一步冷启动Workshop Tools确认runtime重建、主城Tooltip及控制台无`8..17`索引告警。
 - 当前插入任务（2026-08-15，研究所十槽Tooltip代理几何与图标修复完成自动验证）：普通/高级研究所代理按运行时权威签名枚举六/十槽；Valve仅提供部分按钮锚点时，第七至第十槽由最后两个真实按钮的水平步距外推为窗口矩形，透明代理继续负责自定义Tooltip及项目左键输入。ARS-01/Q图标已在权威CSV、生成Lua和Ability KV统一为`furion_force_of_nature`。专项契约、三项Lua 5.1行为、输入生命周期、目标Lua语法、CSV生成逐字节一致、严格UTF-8、限定diff及`ability_tooltip.js`强制编译通过；下一步冷启动Workshop Tools验收十槽实际几何、Tooltip、左右键和链式替换。
@@ -126,7 +127,8 @@
 3. `docs/ai/PROJECT_CONTEXT.md`
 4. `docs/ai/DECISIONS.md`
 5. `docs/ai/KNOWN_ISSUES.md`
-6. 涉及波次模型加载、预载或换模时读取`docs/ai/WAVE_MODEL_LOADING_TROUBLESHOOTING.md`和`docs/ai/WAVE_MODEL_RESOURCE_LIFECYCLE.md`
-7. 仅需历史证据时读取`docs/ai/SESSION_LOG.md`和`docs/ai/archive/`
+6. 涉及肉鸽卡牌、效果运行时、奖励 UI 或调试命令时读取`docs/ai/ROGUE_REWARD_INTEGRATION.md`
+7. 涉及波次模型加载、预载或换模时读取`docs/ai/WAVE_MODEL_LOADING_TROUBLESHOOTING.md`和`docs/ai/WAVE_MODEL_RESOURCE_LIFECYCLE.md`
+8. 仅需历史证据时读取`docs/ai/SESSION_LOG.md`和`docs/ai/archive/`
 
 恢复后先向用户复述当前阶段、最后检查点、未知项和下一步，再修改代码。

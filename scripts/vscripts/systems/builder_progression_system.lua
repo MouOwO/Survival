@@ -111,6 +111,12 @@ local function count_limit_reached(state, row)
 end
 
 local function should_show(state, row)
+    if row.ability_name == "ability_survival_rogue_reward"
+        and event_bus.request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, {
+            player_id = state.player_id,
+        }) == true then
+        return false
+    end
     if count_limit_reached(state, row) then return false end
     local prerequisite = tostring(row.requires_building_id or "")
     return prerequisite == "" or count(state, prerequisite) > 0
@@ -515,6 +521,12 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    event_bus.subscribe(events.ROGUE_REWARD_CHANGED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        for _, state in pairs(state_by_team) do
+            if state.player_id == player_id then sync(state) end
+        end
+    end)
 end
 
 return M

@@ -7,6 +7,7 @@ local return_home = require("systems/hero_return_home_service")
 
 local M = {}
 local granted_non_repeatable = {}
+local granted_transactions = {}
 
 local function return_rebirth_hero_home(result)
     if not string.match(
@@ -86,7 +87,12 @@ local function grant_reward(payload)
         return { ok = false, error = "reward_player_invalid" }
     end
     granted_non_repeatable[player_id] = granted_non_repeatable[player_id] or {}
+    local transaction_id = tostring(payload.reward_transaction_id or "")
+    if transaction_id ~= "" and granted_transactions[transaction_id] then
+        return { ok = true, idempotent = true, reward_profile_id = profile_id }
+    end
     if profile.repeatable ~= true
+        and transaction_id == ""
         and granted_non_repeatable[player_id][profile_id] then
         return { ok = true, idempotent = true, reward_profile_id = profile_id }
     end
@@ -150,8 +156,12 @@ local function grant_reward(payload)
         challenge_result = challenge_result,
     }
 
-    if result.ok and profile.repeatable ~= true then
-        granted_non_repeatable[player_id][profile_id] = true
+    if result.ok then
+        if transaction_id ~= "" then
+            granted_transactions[transaction_id] = true
+        elseif profile.repeatable ~= true then
+            granted_non_repeatable[player_id][profile_id] = true
+        end
     end
 
     event_bus.emit(events.MONSTER_REWARD_GRANTED, result)
@@ -182,6 +192,7 @@ end
 
 function M.init()
     granted_non_repeatable = {}
+    granted_transactions = {}
     event_bus.handle_request(events.MONSTER_REWARD_GRANT_REQUEST, grant_reward)
     event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
     event_bus.subscribe(events.MONSTER_ENCOUNTER_COMPLETED, on_encounter_completed)

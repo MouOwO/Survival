@@ -20,7 +20,9 @@ local monster_corpse_lifecycle_service = require(
 )
 local wave_spawn_sequence = require("systems/wave_spawn_sequence")
 local wave_monster_collision = require("systems/wave_monster_collision")
+local wave_special_target = require("systems/wave_special_target")
 local global_rules = require("config/global_rules")
+local player_context = require("systems/player_context_service")
 
 local M = {}
 local state = {}
@@ -199,6 +201,10 @@ local function next_wave_number_after(number)
     end
     if next_number > (tonumber(state.total_waves) or 0) then return nil end
     return next_number
+end
+
+local function next_special_target_after(number)
+    return wave_special_target.find(waves, number, state.total_waves)
 end
 
 local function queue_wave_assets(number)
@@ -483,12 +489,15 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     end
     unit.survival_wave_movement_type = collision_profile.movement_type
     unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
+    unit.survival_is_wave_monster = true
+    unit.survival_monster_role = row.member_role or "normal"
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
         wall_entindex = wall_entindex,
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
     local is_assault_boss = row.member_role == "assault_boss"
         or (row.member_role == nil and row.is_boss == true)
+    unit.survival_is_boss = is_assault_boss
     enemies[unit:entindex()] = {
         unit = unit,
         is_boss = is_assault_boss,
@@ -501,6 +510,14 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         session.alive = session.alive + 1
     end
     if is_assault_boss then state.boss_alive = true end
+    event_bus.emit(events.MONSTER_SPAWNED, {
+        unit = unit,
+        entindex = unit:entindex(),
+        monster_source = "wave",
+        wave_number = wave_number,
+        member_role = row.member_role or (is_assault_boss and "assault_boss" or "normal"),
+        is_boss = is_assault_boss,
+    })
     publish("enemy_spawned")
 end
 
@@ -647,7 +664,14 @@ local function on_killed(payload)
         release_wave_model_resources(resource_session, "all_monsters_finished")
     end
     state.killed = state.killed + 1
-    if meta.is_boss then state.boss_alive = false end
+    if meta.is_boss then
+        state.boss_alive = false
+        for _, player_id in ipairs(player_context.active_player_ids()) do
+            event_bus.request(events.ROGUE_REWARD_OPEN_REQUEST, {
+                player_id = player_id, source = "boss",
+            })
+        end
+    end
     publish("enemy_killed")
     if state.alive == 0 and state.pending == 0
         and memory_cleared_wave ~= state.current_wave then
@@ -680,6 +704,10 @@ local function clear_normal_wave_enemies()
 end
 
 local function get_wave_state()
+    local next_wave_number = next_wave_number_after(state.current_wave)
+    local next_special_wave_number, next_special_role = next_special_target_after(
+        state.current_wave
+    )
     return {
         ok = true,
         difficulty_id = difficulty_id,
@@ -690,6 +718,9 @@ local function get_wave_state()
         early_final_used = state.early_final_used == true,
         early_final_remaining = early_final_remaining(),
         victory_settled = state.victory_settled == true,
+        next_wave_number = next_wave_number,
+        next_special_wave_number = next_special_wave_number,
+        next_special_role = next_special_role,
     }
 end
 
@@ -977,6 +1008,12 @@ function M.spawn_challenge_monster(row, challenge_definition)
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
         wall_entindex = wall_entindex,
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
+    })
+    event_bus.emit(events.MONSTER_SPAWNED, {
+        unit = unit,
+        entindex = unit:entindex(),
+        monster_source = "building_challenge",
+        is_boss = true,
     })
     return unit
 end

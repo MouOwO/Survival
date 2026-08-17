@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-08-17：肉鸽奖励采用四表声明、服务端会话与白名单效果运行时
+
+- 决定：肉鸽卡牌、效果、强类型参数和生命周期规则分别以四张 CSV 为唯一权威源，并由 `tools/build_configs.py`执行唯一键、外键、enum、必需参数和生命周期完整性校验。生成 Lua 禁止手改；CSV 不接受自由 Lua 表达式，只能引用 Lua 注册表中的 effect、event 和 predicate handler。
+- 决定：抽卡、重抽、领取、已领取排除和奖励排队全部按玩家保存在服务端。每次 offer 变化生成新 token，所有客户端请求校验玩家、当前 token 和 card ID；效果以稳定 `grant_id`进入通用运行时，并用实例、阶段和目标 binding 身份保证幂等与清理。
+- 决定：Panorama 只按本地玩家订阅 `survival_rogue_reward`并渲染服务端快照，只发送选择/重抽意图。Boss 奖励向全部有效 Radiant 在局玩家分别发放，不依赖最后一击者；Builder 一次性入口、正式奖励队列和调试 offer 保持独立消费边界。
+- 决定：`rogue <card_id1> <card_id2> <card_id3>`只创建固定顺序、不可重抽的调试 offer，但选择仍进入正式 token 校验、`grant_id`和效果运行时。调试入口不得直接发资源、写属性、清空正式队列或消费 Builder 奖励。
+- 原因：这组边界让数值与生命周期可由 CSV 审计，同时防止客户端伪造选择、旧请求重复生效、多人奖励串线和作弊测试形成第二套效果实现。完整接入说明见 `docs/ai/ROGUE_REWARD_INTEGRATION.md`。
+
 ## 2026-08-15：Builder采用动态连续管理域并统一Ability数量边界
 
 - 决定：CSV `slot_order=1..6`只定义Builder业务技能在管理域内的相对顺序；Blink紧随第六业务槽，不再规定业务技能必须占绝对engine index `0..5`或Blink必须占index 6。已有管理实例时以首个管理Ability为域起点；无管理实例时在真实`GetAbilityCount()`之后自然追加。未知非管理Ability必须保留，异常同步只删除项目管理实例。

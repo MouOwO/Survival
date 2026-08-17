@@ -6,6 +6,7 @@ local global_rules = require("config/global_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local worker_training_progress = require("systems/worker_training_progress")
 local armor_balance = require("config/armor_balance")
+local rogue_effect_state = require("systems/rogue_effect_state_service")
 
 local M = {}
 local workers = {}
@@ -53,12 +54,17 @@ local function active_worker_count(team, training_id)
     return count
 end
 
-local function repairer_training_state(team, training_id)
+local function repairer_training_state(team, training_id, player_id)
     local progress = repairer_training:get_for(team, training_id)
     if not progress then return nil end
 
     progress.total_trained = progress.count
     progress.count = active_worker_count(team, training_id)
+    progress.max_count = (tonumber(progress.max_count) or 0)
+        + rogue_effect_state.numeric(
+            player_id,
+            "repairer_training_capacity_flat:" .. tostring(training_id)
+        )
     local maximum = tonumber(progress.max_count) or 0
     progress.completed = maximum > 0 and progress.count >= maximum and 1 or 0
     return progress
@@ -322,7 +328,7 @@ local function update_worker_targets()
     end
 end
 
-local function train_worker(payload)
+local function train_worker_one(payload)
     local city = payload.city
     if not valid_entity(city) then
         print("[WorkerTrain] invalid city entity")
@@ -369,11 +375,13 @@ local function train_worker(payload)
         if training_id == "train_repairer_auto" then
             training_id = "train_repairer_01"
         end
-        local progress = repairer_training_state(city_state.team, training_id)
+        local progress = repairer_training_state(
+            city_state.team, training_id, city_state.player_id
+        )
         if not progress then
             return { ok = false, error = "repairer_training_missing" }
         end
-        if progress.completed == 1 then
+        if progress.completed == 1 and payload.allow_extra_slot ~= true then
             return { ok = false, error = tostring(progress.name) .. "训练已完成" }
         end
     end
@@ -432,9 +440,15 @@ local function train_worker(payload)
             return { ok = false, error = error_message }
         end
     end
-    if is_repairer_request then
-        local progress = repairer_training_state(city_state.team, training_id)
-        local max_count = tonumber(training.max_count) or 0
+    if is_repairer_request and payload.allow_extra_slot ~= true then
+        local progress = repairer_training_state(
+            city_state.team, training_id, city_state.player_id
+        )
+        local max_count = (tonumber(training.max_count) or 0)
+            + rogue_effect_state.numeric(
+                city_state.player_id,
+                "repairer_training_capacity_flat:" .. tostring(training_id)
+            )
         if not progress or (max_count > 0 and progress.count >= max_count) then
             return { ok = false, error = "training_max_count_reached" }
         end
@@ -451,10 +465,16 @@ local function train_worker(payload)
         end
     end
 
+    local wood_cost = payload.wood_cost_override ~= nil
+        and math.max(0, tonumber(payload.wood_cost_override) or 0)
+        or tonumber(training.wood_cost) or 0
+    local gold_cost = payload.gold_cost_override ~= nil
+        and math.max(0, tonumber(payload.gold_cost_override) or 0)
+        or tonumber(training.gold_cost) or 0
     local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         team = city_state.team,
-        wood = tonumber(training.wood_cost) or 0,
-        gold = tonumber(training.gold_cost) or 0,
+        wood = wood_cost,
+        gold = gold_cost,
         population = tonumber(training.population_cost) or 0,
         reason = "train:" .. training_id,
     })
@@ -475,8 +495,8 @@ local function train_worker(payload)
     if not worker then
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
             team = city_state.team,
-            wood = tonumber(training.wood_cost) or 0,
-            gold = tonumber(training.gold_cost) or 0,
+            wood = wood_cost,
+            gold = gold_cost,
             reason = "train_refund:" .. training_id,
         })
         event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
@@ -594,17 +614,23 @@ local function train_worker(payload)
             city_state.team,
             training_id
         )
-    elseif is_repairer then
+    elseif is_repairer and payload.skip_training_progress ~= true then
         repairer_training:record_explicit(
             city_state.team,
             training_id
         )
-        training_progress = repairer_training_state(city_state.team, training_id)
+        training_progress = repairer_training_state(
+            city_state.team, training_id, city_state.player_id
+        )
     end
     notify(city_state.player_id, tostring(training.name) .. "训练完成")
     local changed = {
         team = city_state.team,
+        player_id = city_state.player_id,
         count_delta = 1,
+        unit = worker,
+        entindex = worker:entindex(),
+        worker_type = is_repairer and "repairer" or "lumberjack",
         training = training_progress,
     }
     event_bus.emit(events.WORKER_CHANGED, changed)
@@ -670,6 +696,60 @@ local function dismiss_worker(payload)
     return { ok = true }
 end
 
+local function run_batch_training(count, create_one, rollback_one)
+    local created = {}
+    for _ = 1, count do
+        local one = create_one()
+        if not one or not one.ok then
+            for index = #created, 1, -1 do rollback_one(created[index]) end
+            return one or { ok = false, error = "worker_create_failed" }
+        end
+        created[#created + 1] = one.entindex
+    end
+    return { ok = true, entindices = created, count = #created }
+end
+
+local function train_worker(payload)
+    payload = payload or {}
+    local count = payload.source == "rogue_reward"
+        and math.max(1, math.floor(tonumber(payload.count) or 1)) or 1
+    if count == 1 then return train_worker_one(payload) end
+
+    local training = (training_definitions.by_id or {})[payload.training_id]
+    if not training or training.enabled == false then
+        return { ok = false, error = "training_definition_invalid" }
+    end
+    local city = payload.city
+    if not valid_entity(city) then return { ok = false, error = "invalid_city" } end
+    local city_state = event_bus.request(events.BUILDING_QUERY_REQUEST, {
+        entindex = city:entindex(),
+    })
+    if not city_state then return { ok = false, error = "training_building_missing" } end
+    local resources = event_bus.request(events.RESOURCE_GET_REQUEST, {
+        team = city_state.team,
+    })
+    local population_cost = math.max(0, tonumber(training.population_cost) or 0) * count
+    if not resources or resources.population + population_cost > resources.max_population then
+        return { ok = false, error = "population_not_enough" }
+    end
+
+    return run_batch_training(count, function()
+        return train_worker_one({
+            city = city,
+            training_id = payload.training_id,
+            wood_cost_override = payload.wood_cost_override,
+            gold_cost_override = payload.gold_cost_override,
+            allow_extra_slot = true,
+            skip_training_progress = true,
+        })
+    end, function(entindex)
+        local worker = EntIndexToHScript(entindex)
+        if valid_entity(worker) then
+            dismiss_worker({ worker = worker, reason = "rogue_training_rollback" })
+        end
+    end)
+end
+
 local function on_entity_killed(payload)
     remove_worker(
         payload.victim,
@@ -688,6 +768,17 @@ function M.init()
     repairer_training:reset()
     event_bus.handle_request(events.WORKER_TRAIN_REQUEST, train_worker)
     event_bus.handle_request(events.WORKER_DISMISS_REQUEST, dismiss_worker)
+    event_bus.handle_request(events.WORKER_LIST_REQUEST, function(payload)
+        local result = {}
+        local player_id = tonumber(payload and payload.player_id)
+        for _, worker in pairs(workers) do
+            if (player_id == nil or worker.player_id == player_id)
+                and valid_entity(worker.unit) then
+                result[#result + 1] = worker
+            end
+        end
+        return result
+    end)
     event_bus.handle_request(
         events.WORKER_TRAINING_GET_REQUEST,
         function(payload)
@@ -698,10 +789,20 @@ function M.init()
                 if payload.training_id then
                     return repairer_training_state(
                         payload.team,
-                        payload.training_id
+                        payload.training_id,
+                        payload.player_id
                     )
                 end
-                return repairer_training:get(payload.team)
+                local progress = repairer_training:get(payload.team)
+                progress.max_count = (tonumber(progress.max_count) or 0)
+                    + rogue_effect_state.numeric(
+                        payload.player_id,
+                        "repairer_training_capacity_flat:"
+                            .. tostring(progress.training_id)
+                    )
+                progress.completed = progress.max_count > 0
+                    and progress.count >= progress.max_count and 1 or 0
+                return progress
             end
             return lumberjack_training_state(payload.team)
         end
@@ -717,6 +818,7 @@ end
 M._population_training_state_for_test = population_training_state
 M._record_population_training_success_for_test = record_population_training_success
 M._train_worker_for_test = train_worker
+M._run_batch_training_for_test = run_batch_training
 M._reset_population_training_for_test = function()
     population_training_counts = {}
 end

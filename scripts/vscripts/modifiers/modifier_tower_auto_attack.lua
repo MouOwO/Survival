@@ -25,6 +25,10 @@ local function current_attack_range(tower)
     return global_rules.tower_attack_range
 end
 
+local function is_training_dummy(unit)
+    return unit and unit.survival_is_training_dummy == true
+end
+
 local function find_target(tower)
     local attack_range = current_attack_range(tower)
     local radius = math.max(attack_range + 64, 700)
@@ -34,26 +38,35 @@ local function find_target(tower)
         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
         DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
         FIND_CLOSEST, false)
+    local training_dummy = nil
     for _, unit in ipairs(units or {}) do
         local distance = valid(unit)
             and (unit:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
             or 99999
-        if valid(unit) and not tree_damage_rules.is_tree(unit)
+        if valid(unit) and is_training_dummy(unit)
+            and anti_air_rules.can_attack(tower, unit)
+            and distance <= attack_range + 64 and not training_dummy then
+            training_dummy = unit
+        elseif valid(unit) and not tree_damage_rules.is_tree(unit)
             and anti_air_rules.can_attack(tower, unit)
             and distance <= attack_range + 64 then
             return unit
         end
     end
-    return nil
+    return training_dummy
 end
 
 function modifier_tower_auto_attack:OnAttackStart(params)
-    if not IsServer() or params.attacker ~= self:GetParent()
-        or (not tree_damage_rules.is_tree(params.target)
-            and anti_air_rules.can_attack(self:GetParent(), params.target)) then
+    if not IsServer() or params.attacker ~= self:GetParent() then
         return
     end
     local tower = self:GetParent()
+    local target = params.target
+    if not tree_damage_rules.is_tree(target)
+        and anti_air_rules.can_attack(tower, target)
+        and (not is_training_dummy(target) or find_target(tower) == target) then
+        return
+    end
     tower:SetForceAttackTarget(nil)
     self.forced_target = nil
     if tower.Stop then tower:Stop() end
@@ -92,11 +105,13 @@ function modifier_tower_auto_attack:OnIntervalThink()
         or 99999
     local attack_range = current_attack_range(tower)
     if tree_damage_rules.is_tree(target)
+        or is_training_dummy(target) and find_target(tower) ~= target
         or not anti_air_rules.can_attack(tower, target) then
         tower:SetForceAttackTarget(nil)
         self.forced_target = nil
     end
     if not valid(target) or tree_damage_rules.is_tree(target)
+        or is_training_dummy(target) and find_target(tower) ~= target
         or not anti_air_rules.can_attack(tower, target)
         or target:GetTeamNumber() == tower:GetTeamNumber()
         or distance > attack_range + 96 then

@@ -2,6 +2,7 @@
 #中文名:阶段ID,阶段顺序,触发状态,技能名称ID,槽位顺序,所需主城等级,建筑ID,最大建筑数量,前置建筑ID,召唤英雄后禁用,是否启用,备注
 #types:string,number,enum,string,number,number,string,number,string,boolean,boolean,string
 wall_pending,10,wall_not_built,ability_build_wall,1,0,wall,1,,0,1,游戏开始只显示建造城墙。
+wall_pending,10,wall_not_built,ability_survival_rogue_reward,2,0,,0,,0,1,开局一次性肉鸽奖励；成功打开后永久移除。
 city_pending,20,wall_built_city_not_built,ability_build_main_city,1,0,main_city,1,,0,1,城墙完成后，同一建造链技能替换为建造主城。
 city_built,30,main_city_built,ability_build_arrow_tower,1,1,arrow_tower,7,,0,1,主城完成后可建造；最多同时存在7座未转职箭塔，转职后释放名额。
 city_built,30,main_city_built,ability_build_research_lab,2,1,building_research_lab,1,,0,1,主城完成后W技能解锁建造研究所；研究所最多建造1座。

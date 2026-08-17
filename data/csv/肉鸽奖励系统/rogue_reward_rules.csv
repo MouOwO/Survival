@@ -1,0 +1,4 @@
+rule_id,choice_count,free_reroll_count,exclude_claimed,unique_within_offer,enabled,notes
+#中文名:规则ID,候选数量,免费重抽次数,排除已领取卡,同次选项不重复,是否启用,备注
+#types:string,number,number,boolean,boolean,boolean,string
+default_rogue_reward,3,1,1,1,1,正式Boss与开局技能共用；未选择和被重抽的卡不会永久排除。

@@ -408,6 +408,7 @@ local function public_state(state)
         level = state.level,
         absolute_level = state.level,
         route_level = route_row and route_row.level or state.level,
+        record_id = route_row and route_row.record_id or nil,
         tower_class = state.tower_class,
         tower_class_name = state.tower_class_name,
         population_occupied = tower_population_occupied(state),
@@ -815,6 +816,7 @@ local function start_building(payload)
         end
         if check.definition.id == "arrow_tower" then
             local initial_row = arrow_data(1)
+            unit.survival_tower_record_id = initial_row and initial_row.record_id or nil
             tower_skills.apply(
                 unit,
                 initial_row and initial_row.skill_ids or {}
@@ -1003,6 +1005,8 @@ local function on_building_changed(payload)
     state.unit.survival_level = state.level
     state.unit.survival_route_level = payload.route_level
         or state.unit.survival_route_level
+    state.unit.survival_tower_record_id = payload.record_id
+        or state.unit.survival_tower_record_id
     state.unit.survival_tower_class = state.tower_class
     state.unit.survival_population_occupied = state.population_occupied
     if next_class then
@@ -1106,6 +1110,20 @@ function M.main_city_for_team(team)
     for _, state in pairs(buildings) do
         if state.team == team
             and state.building_id == "main_city"
+            and not state.constructing
+            and valid_entity(state.unit)
+            and state.unit:IsAlive() then
+            return state.unit
+        end
+    end
+    return nil
+end
+
+function M.wall_for_player(player_id)
+    player_id = tonumber(player_id)
+    for _, state in pairs(buildings) do
+        if state.player_id == player_id
+            and state.building_id == "wall"
             and not state.constructing
             and valid_entity(state.unit)
             and state.unit:IsAlive() then

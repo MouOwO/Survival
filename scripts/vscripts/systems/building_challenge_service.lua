@@ -317,13 +317,30 @@ local function on_entity_killed(payload)
     challenge_count_by_team[meta.team] = challenge_count_by_team[meta.team] or {}
     challenge_count_by_team[meta.team][meta.challenge_id]
         = meta.challenge_wave_number
-    event_bus.request(events.MONSTER_REWARD_GRANT_REQUEST, {
+    local reward = event_bus.request(events.MONSTER_REWARD_GRANT_REQUEST, {
         player_id = meta.player_id,
         team = meta.team,
         reward_profile_id = meta.reward_profile_id,
         encounter_id = "building_challenge:" .. meta.challenge_id,
         challenge_wave_number = meta.challenge_wave_number,
     })
+    local effect_state = require("systems/rogue_effect_state_service")
+    if reward and reward.ok and reward.idempotent ~= true
+        and effect_state.numeric(meta.player_id,
+            "building_challenge_reward_doubles") > 0 then
+        local copy_result = event_bus.request(events.MONSTER_REWARD_GRANT_REQUEST, {
+            player_id = meta.player_id,
+            team = meta.team,
+            reward_profile_id = meta.reward_profile_id,
+            encounter_id = "building_challenge:" .. meta.challenge_id .. ":reward_copy",
+            reward_transaction_id = "bounty_order:" .. tostring(meta.lifecycle_id),
+            challenge_wave_number = meta.challenge_wave_number,
+        })
+        if copy_result and copy_result.ok and copy_result.idempotent ~= true then
+            effect_state.consume_numeric(meta.player_id,
+                "building_challenge_reward_doubles", 1)
+        end
+    end
 end
 
 function M.init()

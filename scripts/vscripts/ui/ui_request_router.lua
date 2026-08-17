@@ -826,6 +826,10 @@ local function register_ability_cast_request()
             and unit_valid and ability_valid
             and unit.survival_building_id == "building_challenge"
             and unit:FindAbilityByName(ability_name) == ability
+        local rogue_builder_matches = ability_name == "ability_survival_rogue_reward"
+            and unit_valid and ability_valid
+            and unit.survival_building_id == "builder"
+            and unit:FindAbilityByName(ability_name) == ability
         local research_upgrade = research_lab_abilities.by_id[ability_name]
         local research_ability_matches = research_upgrade ~= nil and unit_valid
             and ability_valid and unit:FindAbilityByName(ability_name) == ability
@@ -921,6 +925,17 @@ local function register_ability_cast_request()
                 .. tostring(direct_result and direct_result.unchanged_count or 0)
                 .. " skipped="
                 .. tostring(direct_result and direct_result.skipped_count or 0))
+        elseif rogue_builder_matches and owner_matches and not passive
+            and not is_point_target then
+            handled_directly = true
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden() then
+                direct_result = { ok = false, error = "rogue_reward_unavailable" }
+            else
+                direct_result = event_bus.request(events.ROGUE_REWARD_OPEN_REQUEST, {
+                    player_id = player_id, source = "builder",
+                }) or { ok = false, error = "rogue_reward_unhandled" }
+            end
         elseif challenge_auto_matches and owner_matches and not passive
             and not is_point_target then
             handled_directly = true
@@ -1168,6 +1183,26 @@ local function on_notification(payload)
     })
 end
 
+local function register_rogue_reward_requests()
+    CustomGameEventManager:RegisterListener("ui_rogue_reward_select", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        event_bus.request(events.ROGUE_REWARD_SELECT_REQUEST, {
+            player_id = player_id,
+            token = tostring(payload and payload.token or ""),
+            card_id = tostring(payload and payload.card_id or ""),
+        })
+    end)
+    CustomGameEventManager:RegisterListener("ui_rogue_reward_reroll", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        event_bus.request(events.ROGUE_REWARD_REROLL_REQUEST, {
+            player_id = player_id,
+            token = tostring(payload and payload.token or ""),
+        })
+    end)
+end
+
 local function on_shop_state_changed(payload)
     if not payload or not payload.snapshot then return end
     send_to_player("ui_shop_snapshot", payload.player_id, payload.snapshot)
@@ -1195,6 +1230,7 @@ function M.init()
     register_building_move_request()
     register_arrow_tower_destroy_request()
     register_return_home_request()
+    register_rogue_reward_requests()
     event_bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, on_hero_combat_stats_changed)
     event_bus.subscribe(events.UI_NOTIFICATION, on_notification)
