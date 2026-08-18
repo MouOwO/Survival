@@ -478,6 +478,63 @@
         "AbilityManaCost"    "0"
     }
 
+    "ultimate_tower_passive_1"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "razor_static_link"
+        "MaxLevel"           "1"
+    }
+    "ultimate_tower_passive_2"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "warlock_fatal_bonds"
+        "MaxLevel"           "1"
+    }
+    "ultimate_tower_passive_3"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "windrunner_focusfire"
+        "MaxLevel"           "1"
+    }
+    "ultimate_tower_passive_4"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "vengefulspirit_nether_swap"
+        "MaxLevel"           "1"
+    }
+    "ultimate_tower_passive_5"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "crystal_maiden_brilliance_aura"
+        "MaxLevel"           "1"
+    }
+    "ultimate_tower_passive_6"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "death_prophet_spirit_siphon"
+        "MaxLevel"           "1"
+    }
+    "ultimate_tower_passive_7"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_tower_passive"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "skywrath_mage_ancient_seal"
+        "MaxLevel"           "1"
+    }
+
     "ability_upgrade_tower_lv01"
     {
         "BaseClass"          "ability_lua"

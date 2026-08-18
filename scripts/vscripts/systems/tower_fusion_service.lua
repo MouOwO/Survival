@@ -14,6 +14,7 @@ local ultimate_by_player = {}
 local state_by_id = {}
 local wall_by_player = {}
 local group_at_wall_by_player = {}
+local fusion_in_progress = {}
 local next_id = 0
 
 local function config()
@@ -52,9 +53,7 @@ local function player_ultimates(player_id)
 end
 
 local function ultimate_limit()
-    return math.max(1, math.floor(
-        tonumber(config().max_count_per_player) or 5
-    ))
+    return 1
 end
 
 local function distance_sq(left, right)
@@ -206,25 +205,29 @@ local function create_ultimate(player_id, caster, selected, position)
     if unit.SetPlayerID then unit:SetPlayerID(player_id) end
     unit:SetOwner(PlayerResource:GetPlayer(player_id))
     unit:SetControllableByPlayer(player_id, true)
-    unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
-    if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
+    unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
+    if unit.SetAcquisitionRange then unit:SetAcquisitionRange(1000) end
     unit:SetInvulnerable(true)
     unit.survival_ultimate_tower = true
     unit.survival_player_id = player_id
     unit.survival_display_name = config().display_name or "终极塔"
-    local model = caster:GetModelName()
+    local model = config().model_name
     if model and model ~= "" then
         unit:SetModel(model)
         unit:SetOriginalModel(model)
     end
 
     local maximum, current, armor, attack = 0, 0, 0, 0
+    local multiplier = tonumber(config().base_attack_multiplier) or 3
     for _, source in ipairs(selected) do
         maximum = maximum + math.max(0, source.unit:GetMaxHealth())
         current = current + math.max(0, source.unit:GetHealth())
         armor = armor + (tonumber(source.runtime_armor)
             or source.unit:GetPhysicalArmorBaseValue())
-        attack = attack + source.unit:GetAverageTrueAttackDamage(source.unit)
+        local row = final_row(source.tower_class) or {}
+        local base = tonumber(row.base_attack_damage) or 0
+        local actual = source.unit:GetAverageTrueAttackDamage(source.unit)
+        attack = attack + base * multiplier + math.max(0, actual - base)
     end
     unit:SetBaseMaxHealth(math.max(1, maximum))
     unit:SetMaxHealth(math.max(1, maximum))
@@ -244,15 +247,14 @@ local function create_ultimate(player_id, caster, selected, position)
         footprint = selected[1].definition
             and selected[1].definition.footprint or { x = 2, y = 2 },
     }
-    for _, source in ipairs(selected) do
-        local row = final_row(source.tower_class)
-        local stream = create_proxy(state, source, row, source.tower_class)
-        if not stream then
-            for _, old in ipairs(state.streams) do UTIL_Remove(old.proxy) end
-            UTIL_Remove(unit)
-            return nil, "fusion_proxy_create_failed"
+    for index, ability_name in ipairs(config().passive_slot_ability_ids or {}) do
+        local ability = unit:AddAbility(ability_name)
+        if ability then
+            ability:SetLevel(1)
+            ability:SetHidden(false)
+            ability:SetActivated(false)
+            ability.survival_passive_slot = index
         end
-        state.streams[#state.streams + 1] = stream
     end
     state_by_id[state.id] = state
     ultimate_by_player[player_id] = ultimate_by_player[player_id] or {}
@@ -406,53 +408,52 @@ local function fuse(payload)
     if not alive(caster) then return { ok = false, error = "fusion_caster_invalid" } end
     local player_id = tonumber(caster.survival_player_id)
         or caster:GetPlayerOwnerID()
+    if player_id == nil or fusion_in_progress[player_id] then
+        return { ok = false, error = "fusion_in_progress" }
+    end
+    fusion_in_progress[player_id] = true
+    local function fail(result)
+        fusion_in_progress[player_id] = nil
+        return result
+    end
     local listed = event_bus.request(events.BUILDING_LIST_REQUEST, {
         player_id = player_id,
     })
     local eligible = eligibility(player_id, listed and listed.buildings)
-    if eligible.ultimate_count >= eligible.maximum then
-        return { ok = false, error = "ultimate_tower_limit_reached" }
+    if eligible.ultimate_count >= 1 then
+        return fail({ ok = false, error = "ultimate_tower_already_exists" })
     end
     local selected, error_code = select_towers(
         caster, player_id, listed and listed.buildings
     )
     if not selected then
         notify(player_id, error_code, "error")
-        return { ok = false, error = error_code }
+        return fail({ ok = false, error = error_code })
     end
     local spawn_position, spawn_error = fusion_spawn_position(caster, selected)
     if not spawn_position then
-        return { ok = false, error = spawn_error }
+        return fail({ ok = false, error = spawn_error })
     end
     local state, create_error = create_ultimate(
         player_id, caster, selected, spawn_position
     )
-    if not state then return { ok = false, error = create_error } end
-    local entindexes = {}
-    for _, source in ipairs(selected) do entindexes[#entindexes + 1] = source.entindex end
-    local marked = event_bus.request(events.BUILDING_FUSION_MARK_REQUEST, {
+    if not state then return fail({ ok = false, error = create_error }) end
+    local consumed = event_bus.request(events.BUILDING_FUSION_CONSUME_REQUEST, {
         player_id = player_id,
-        entindexes = entindexes,
     })
-    if not marked or not marked.ok then
-        for _, stream in ipairs(state.streams) do UTIL_Remove(stream.proxy) end
+    if not consumed or not consumed.ok then
         UTIL_Remove(state.unit)
         remove_ultimate_state(state)
-        return marked or { ok = false, error = "fusion_mark_failed" }
-    end
-    local ability = state.unit:AddAbility("ability_tower_fusion")
-    if ability then
-        ability:SetLevel(1)
-        ability:SetHidden(true)
-        ability:SetActivated(false)
+        return fail(consumed or { ok = false, error = "fusion_consume_failed" })
     end
     event_bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
         player_id = player_id,
         ultimate_count = #player_ultimates(player_id),
-        maximum = ultimate_limit(),
+        maximum = 1,
         reason = "fusion_completed",
     })
     notify(player_id, "七塔合一完成")
+    fusion_in_progress[player_id] = nil
     return { ok = true, unit = state.unit }
 end
 
@@ -565,6 +566,7 @@ function M.init()
     state_by_id = {}
     wall_by_player = {}
     group_at_wall_by_player = {}
+    fusion_in_progress = {}
     next_id = 0
     event_bus.handle_request(events.TOWER_FUSION_REQUEST, fuse)
     event_bus.handle_request(events.TOWER_FUSION_ELIGIBILITY_REQUEST,

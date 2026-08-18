@@ -30,6 +30,7 @@ local M = {
     BUILDING_QUERY_REQUEST = "building.query.request",
     BUILDING_LIST_REQUEST = "building.list.request",
     BUILDING_FUSION_MARK_REQUEST = "building.fusion_mark.request",
+    BUILDING_FUSION_CONSUME_REQUEST = "building.fusion_consume.request",
     BUILDING_CREATED = "building.created",
     BUILDING_CHANGED = "building.changed",
     BUILDING_DESTROYED = "building.destroyed",

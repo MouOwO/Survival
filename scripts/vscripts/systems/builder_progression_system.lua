@@ -111,6 +111,9 @@ local function count_limit_reached(state, row)
 end
 
 local function should_show(state, row)
+    if state.fusion_completed and row.building_id == "arrow_tower" then
+        return false
+    end
     if row.ability_name == "ability_survival_rogue_reward"
         and event_bus.request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, {
             player_id = state.player_id,
@@ -513,6 +516,17 @@ local function on_hero_summoned(payload)
     sync(state)
 end
 
+local function on_fusion_completed(payload)
+    if not payload or payload.reason ~= "fusion_completed" then return end
+    local player_id = tonumber(payload and payload.player_id)
+    for _, state in pairs(state_by_team) do
+        if state.player_id == player_id then
+            state.fusion_completed = true
+            sync(state)
+        end
+    end
+end
+
 function M.init()
     state_by_team = {}
     managed_abilities = {}
@@ -521,6 +535,7 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    event_bus.subscribe(events.TOWER_FUSION_STATE_CHANGED, on_fusion_completed)
     event_bus.subscribe(events.ROGUE_REWARD_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
         for _, state in pairs(state_by_team) do

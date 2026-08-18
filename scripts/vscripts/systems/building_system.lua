@@ -990,6 +990,24 @@ local function mark_for_fusion(payload)
     end
     return { ok = true, marked = #selected }
 end
+
+local function consume_for_fusion(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return { ok = false, error = "invalid_player" } end
+    local states = {}
+    for _, state in pairs(buildings) do
+        if state.player_id == player_id
+            and state.building_id == "arrow_tower"
+            and valid_entity(state.unit)
+            and state.unit:IsAlive() then
+            states[#states + 1] = state
+        end
+    end
+    for _, state in ipairs(states) do
+        state.unit:ForceKill(false)
+    end
+    return { ok = true, consumed = #states }
+end
 local function on_building_changed(payload)
     local state = buildings[payload.entindex]
     if not state then return end
@@ -1215,6 +1233,9 @@ function M.init()
     event_bus.handle_request(events.BUILD_CAN_PLACE_REQUEST, can_place)
     event_bus.handle_request(events.BUILDING_QUERY_REQUEST, query_building)
     event_bus.handle_request(events.BUILDING_LIST_REQUEST, list_buildings)
+    event_bus.handle_request(
+        events.BUILDING_FUSION_CONSUME_REQUEST, consume_for_fusion
+    )
     event_bus.handle_request(events.BUILDING_FUSION_MARK_REQUEST, mark_for_fusion)
     event_bus.handle_request(events.BUILD_REQUEST, queue_building)
     event_bus.handle_request(events.TOWER_CLASS_SLOT_REQUEST, tower_class_slot_request)

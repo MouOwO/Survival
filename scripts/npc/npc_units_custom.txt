@@ -74,6 +74,34 @@
         "VisionNighttimeRange"   "800"
     }
 
+    "npc_dota_unit_ultimate_tower"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/creeps/roshan/roshan.vmdl"
+        "ModelScale"             "0.8"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "AbilityLayout"          "7"
+        "HealthBarOffset"        "220"
+        "StatusHealth"           "1000000"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_RANGED_ATTACK"
+        "AttackDamageMin"        "1"
+        "AttackDamageMax"        "1"
+        "AttackRange"            "1000"
+        "AttackRate"             "1.0"
+        "AttackAnimationPoint"   "0.3"
+        "ProjectileSpeed"        "5000"
+        "AttackAcquisitionRange" "1000"
+        "ArmorPhysical"          "10"
+        "MagicalResistance"      "25"
+        "BoundsHullName"         "DOTA_HULL_SIZE_BARRACKS"
+        "VisionDaytimeRange"     "1200"
+        "VisionNighttimeRange"   "800"
+    }
+
     "building_research_lab"
     {
         "BaseClass"              "npc_dota_creature"

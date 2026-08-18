@@ -24,6 +24,9 @@ end
 function M.sync(state, row)
     local wanted = {}
     local base_tower_is_full = not state.tower_class and state.level >= 5
+    if wanted.ability_tower_fusion then
+        add_ability(state.unit, "ability_tower_fusion")
+    end
     for _, ability_name in ipairs(row and row.active_skill_ids or {}) do
         local allowed = not base_tower_is_full
             and (ability_name ~= "ability_upgrade_tower_max"
@@ -41,6 +44,9 @@ function M.sync(state, row)
         })
     if fusion and fusion.eligible == true then
         wanted.ability_tower_fusion = true
+        wanted.ability_upgrade_tower = nil
+        wanted.ability_upgrade_tower_lv01 = nil
+        wanted.ability_upgrade_tower_max = nil
     end
 
     -- Free the utility slots before route abilities are added. Source 2 fills
@@ -80,9 +86,8 @@ function M.sync(state, row)
     for _, skill_id in ipairs(row and row.skill_ids or {}) do
         add_ability(state.unit, skill_id)
     end
-    if wanted.ability_tower_fusion then
-        add_ability(state.unit, "ability_tower_fusion")
-    elseif state.unit:FindAbilityByName("ability_tower_fusion") then
+    if not wanted.ability_tower_fusion
+        and state.unit:FindAbilityByName("ability_tower_fusion") then
         state.unit:RemoveAbility("ability_tower_fusion")
     end
     tower_utility_abilities.sync(state, row)

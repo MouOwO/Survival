@@ -601,5 +601,5 @@
         "Survival_UpgradeModel_Unchanged" "保持当前模型"
         "Survival_UpgradeModel_Loading" "加载中"
         "DOTA_Tooltip_ability_ability_tower_fusion" "七塔合一"
-        "DOTA_Tooltip_ability_ability_tower_fusion_Description" "使用自己每条路线各一座未参与过合成的终阶塔，材料塔不消耗且每座永久只能参与一次；生成拥有七条独立攻击流的无敌终极塔，每位玩家最多拥有5座。"
+        "DOTA_Tooltip_ability_ability_tower_fusion_Description" "使用自己每条路线当前最高等级的防御塔各一座，消耗所有防御塔并生成一座无敌终极塔；终极塔拥有七个按路线顺序排列的被动技能槽。"
 }
