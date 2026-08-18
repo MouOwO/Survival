@@ -3,8 +3,9 @@
 - `builder_ability_stages.csv` 将 `ability_survival_rogue_reward` 从 W 业务槽改为独立 `slot_order=7`；Builder 的六个建筑槽和 Blink 仍由原有布局管理，肉鸽 Ability 在布局完成后单独追加，因此建墙阶段刷新不会删除或复制未消费奖励。
 - 奖励消费状态仍由 `rogue_reward_service` 权威维护；`builder_progression_system` 是唯一 Ability 移除者。成功打开后发布 `ROGUE_REWARD_CHANGED`，同步立即移除肉鸽 Ability，后续阶段刷新不会恢复。
 - `rogue_reward_rules.csv` 新增 Tooltip 名称、描述和图标字段；`build_tooltip_definitions.py` 从该 CSV 生成统一 Tooltip CSV/Lua，runtime 显示名称、描述和 G 快捷键字段均来自生成配置。
-- `combat_stats.js`、`hud_takeover.js`、`ability_tooltip.js` 将 Builder `slot_order=7` 统一投影为 G；点击和键盘均进入 `ui_ability_cast_request`/肉鸽奖励请求链，不再走原生 Ability 执行回退。三份 content 源已强制编译到 game 产物。
-- 自动验证通过：Builder Ability 槽位 Lua 5.1 行为、肉鸽奖励服务行为、肉鸽集成契约、Ability utility 顺序契约、目标 Lua 5.1 语法、Tooltip/Builder 定向生成、三份 Panorama Resource Compiler（各 `1 compiled, 0 failed, 0 skipped`）及 `git diff --check`。`test_ability_input_lifecycle_contract.ps1` 仍受既有 `building_move.js` 的无关 `BUILDER_D_CONFLICT_GUARD_MISSING` 阻断，未修改无关文件。
+- `combat_stats.js`、`hud_takeover.js`、`ability_tooltip.js` 将 Builder `slot_order=7` 统一投影为 G；Builder D/G 键盘路由先按 Ability 名称解析，不再依赖压缩后的显示序号；肉鸽奖励加入 G utility 映射。`ability_tooltip.js` 禁止项目技能回退到原生 Ability Tooltip，`hud_takeover.js` 增加仅针对当前自定义技能的有界异步原生 Tooltip 抑制。三份 content 源已强制编译到 game 产物。
+- 自动验证：Ability utility 顺序契约通过；三份 Panorama Resource Compiler 各 `1 compiled, 0 failed, 0 skipped`，目标源码严格 UTF-8 与 `git diff --check` 通过。肉鸽集成契约在既有事件名断言 `ROGUE_EVENT_MISSING_ROGUE_REWARD_OPEN_REQUEST` 处提前失败，未将其误报为通过；`test_ability_input_lifecycle_contract.ps1` 仍受既有 `building_move.js` 的无关 `BUILDER_D_CONFLICT_GUARD_MISSING` 阻断，未修改无关文件。
+- 本轮 Tooltip 修复：`ability_tooltip.js`将普通伐木工融合技能`ability_fuse_lumberjack_01..08`和超级伐木工性格被动`ability_lumberjack_personality_*`纳入自定义范围；`ability_tooltip.js`、`hud_takeover.js`、`combat_stats.js`在单位runtime计数尚未到达时使用24槽有界引擎回退，修复Builder及动态伐木工首次选中/首次悬停仍走原生Tooltip的问题。伐木工完整接管scope已纳入代理绑定。三份JS强制编译均为`OK: 1 compiled, 0 failed, 0 skipped`；高级研究所契约、严格UTF-8和`git diff --check`通过。`test_ability_input_lifecycle_contract.ps1`仍仅因既有`BUILDER_D_CONFLICT_GUARD_MISSING`失败；尚未Workshop Tools冷启动确认首帧Tooltip、伐木工被动Tooltip和施法后刷新。
 - 尚未 Workshop Tools 冷启动实机验收；需确认开局 G 标签、建墙后 G Ability 保留、鼠标点击和 G 键均弹出三选一，以及消费后 Ability 只移除一次。
 
 ## 当前任务补充（2026-08-18）：融合运行时错误与七塔批量升级卡顿定位
