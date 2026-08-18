@@ -28,6 +28,21 @@
 - 用户要求所有Boss、精英怪与小怪使用相同碰撞体，并将Boss和精英怪攻击范围增加36且同步CSV。地面怪统一基础HullRadius 32，飞行怪统一10；研究所挑战怪、飞行精英/领头/Boss不再使用0 Hull或无单位碰撞。
 - `monster_archetypes.csv`的30个精英/Boss原型和`building_challenge_definitions.csv`的5个Boss均在原攻击范围上增加36并定向生成。正式波次、挑战副本、野外/转生遭遇和研究所挑战生成边界统一应用碰撞解析及CSV射程。
 
+## 2026-08-17 - 持久化在线计时钓鱼奖励纵向切片
+
+- 用户批准Act模式后先恢复AI文档、检查Git状态、CSV权威源、档案Provider协议和本机工具链。基线已有`.cline/content_survival`、挑战波CSV/生成Lua修改及大量未跟踪旧测试；本轮未覆盖或清理。
+- 新增钓鱼规则/奖励CSV与生成Lua。恢复摘要中的三条歧义定义全部以weight 0、enabled false保留；未虚构缺失生产清单。Python启动会拒绝空启用池。
+- 新增Supabase migration：Steam账号、不可变定义版本、单账号session租约、冻结计时器、append-only grants、永久聚合、幂等响应、RLS/权限收口和单事务heartbeat/grant RPC。并发session租约内拒绝，过期接管不扣离线时间。
+- 新增Python 3.14标准库loopback API、严格Bearer认证、结构化错误、超时、CSV规范哈希和Supabase REST/RPC；新增Lua JSON编码、HTTP Provider、服务端Steam Account ID解析、Provider ConVar override、连接状态心跳停止及request/grant幂等重试。
+- 永久投影通过既有档案revision链恢复，并接入英雄全属性/攻击、伐木工攻速百分比和金矿收入百分比。即时资源只具备同局grant ID去重，跨进程outbox/ack和玩家私有资源账户仍是生产阻断。
+- 验证通过：Python 5项单元/loopback HTTP、Lua 5.1行为、PowerShell契约、原玩家档案行为/契约回归、目标Lua 5.1语法、Python compileall、CSV生成逐字节一致、严格UTF-8及限定diff检查。本机无`psql`/Supabase CLI，未执行真实migration、Supabase或Workshop Tools验证。
+- 同日后续完成grant成功事件与安全公告：即时/永久奖励统一在本地应用成功后按grant ID仅发布一次`FISHING_REWARD_GRANTED`；永久路径验证中奖玩家档案及永久投影，即时资源因共享team账户无法保证owner-only而在实际写入前失败关闭。成功事件不携带raw grant、账号、档案或definition hash。
+- 公告订阅者只使用服务端玩家名、CSV `display_name`和本地校验amount，发出显式`UI_NOTIFICATION audience=all`；UI路由仅转发`message/level`并只对显式全员值广播，既有个人通知行为不变。现有Panorama容器无需修改。
+- 新增9001高位版本、固定10秒、永久`hero_attack_flat +5`的独立reward/rule CSV fixture及同生成器Lua输出；即时资源失败关闭只在Lua行为测试覆盖，避免已提交的测试grant阻塞实机链。Lua只有Tools Mode加`survival_fishing_reward_fixture=automation_9001`才加载，生产CSV继续全禁用。新增/复跑Lua行为、广播路由、PowerShell契约、Python 5项、档案/资源回归、Lua语法、Python编译、CSV生成一致、UTF-8和限定diff均通过；仍未进行Supabase或Workshop Tools实机验证。
+- 用户批准部署迁移后，将`backend/`、`supabase/`和`.env.example`迁至独立`D:\survival_database`，排除Python缓存并初始化独立Git仓库；addon保留CSV、生成Lua和游戏运行代码。跨仓测试通过`SURVIVAL_ADDON_ROOT`关联两侧。
+- 新后端边界对原始Steam Account ID执行带独立pepper的HMAC-SHA256，Supabase schema/RPC只接受64位假名，返回Lua前恢复原始ID；新增Secret Key/legacy service-role兼容、loopback启动脚本、`.env`占位检查与NTFS ACL收紧。真实Supabase和Workshop Tools验证仍受项目/凭据缺失阻断。
+- 初始化脚本已在本机生成不输出明文的64字符随机API Token和pepper；`.env`只允许当前用户与`SYSTEM`、无继承且被独立Git仓库忽略，Supabase URL/Key保持空白。迁移后Python 9项、跨仓契约、Lua相关回归/语法、CSV逐字节生成一致、PowerShell语法、严格UTF-8和空白检查通过；启动脚本确认准确因缺少Supabase URL失败关闭。AI文档整文件仍含此前记录的历史替换字符，本轮新增diff未引入。
+
 ## 2026-08-15 - 城墙同时攻击地面怪数量收紧
 
 - 用户实机确认地面Hull 29时城墙可同时被五只地面怪攻击，批准小幅增大怪物碰撞体，将目标收紧为四只。城墙Hull继续保持256，怪物攻击距离、模型和模型缩放不变。

@@ -16,6 +16,14 @@ local active_rule = nil
 local load_generation_by_player = {}
 local revision_high_water_by_account = {}
 
+local function register_server_convar(name, default_value)
+    if Convars and type(Convars.RegisterConvar) == "function" then
+        pcall(function()
+            Convars:RegisterConvar(name, default_value, "Survival server config", 0)
+        end)
+    end
+end
+
 local function copy(value, seen)
     if type(value) ~= "table" then
         return value
@@ -493,6 +501,8 @@ function M.init(options)
     player_by_account = {}
     load_generation_by_player = {}
     revision_high_water_by_account = {}
+    register_server_convar("survival_player_profile_provider", "")
+    register_server_convar("survival_fishing_api_token", "")
     active_rule = nil
     for _, row in ipairs(rules.rows or {}) do
         if row.enabled ~= false then
@@ -507,6 +517,12 @@ function M.init(options)
         provider = options.provider
     else
         local provider_id = tostring(active_rule.provider_id or "")
+        if Convars and type(Convars.GetStr) == "function" then
+            local override = tostring(
+                Convars:GetStr("survival_player_profile_provider") or ""
+            )
+            if override ~= "" then provider_id = override end
+        end
         if not string.match(provider_id, "^[a-z][a-z0-9_]*$") then
             error("player profile provider_id invalid: " .. provider_id)
         end

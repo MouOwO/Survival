@@ -277,7 +277,15 @@ local function configure_game_rules()
 end
 
 local function on_player_connected(keys)
-    assign_player_to_survival_team(tonumber(keys.PlayerID))
+    local player_id = tonumber(keys.PlayerID)
+    assign_player_to_survival_team(player_id)
+    require("systems/fishing_reward_service").connect(player_id)
+end
+
+local function on_player_disconnected(keys)
+    require("systems/fishing_reward_service").disconnect(
+        tonumber(keys.PlayerID or keys.playerid)
+    )
 end
 
 local function initialize_survival_hero(hero)
@@ -782,6 +790,8 @@ local function initialize_services()
     resource_system.init()
     player_entitlement_service.init()
     require("systems/player_profile_service").init()
+    require("systems/permanent_reward_effect_service").init()
+    require("systems/fishing_reward_service").init()
     hero_progression_system.init()
     research_technology_bootstrap.init()
     require("systems/research_lab_ability_sync").init()
@@ -852,6 +862,7 @@ function M.activate()
         on_player_connected,
         nil
     )
+    ListenToGameEvent("player_disconnect", on_player_disconnected, nil)
     ListenToGameEvent(
         "dota_player_pick_hero",
         on_hero_picked,

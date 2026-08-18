@@ -88,6 +88,9 @@
 /tatus --short --untracked-files=no  grep -E 'ability_tooltipcontent_catalogchallenge_definitionsshop_entriestooltip_definitions'  head -40
 /total 148
 /scripts/vscripts/tests/*
+!/scripts/vscripts/tests/generated_fishing_reward_definitions.lua
+!/scripts/vscripts/tests/test_fishing_reward_service.lua
+!/scripts/vscripts/tests/test_ui_notification_audience.lua
 !/scripts/vscripts/tests/test_worker_system_training.lua
 !/scripts/vscripts/tests/test_worker_ability_runtime.lua
 !/scripts/vscripts/tests/test_armor_balance.lua
@@ -125,6 +128,9 @@
 /tools_asset_info.bin
 /tools_thumbnail_cache.sqlite3
 /tools_thumbnail_cache.sqlite3-*
+/.env
+__pycache__/
+*.pyc
 /panorama/layout/custom_game/crash_isolation_v5_hud.vxml_c
 /panorama/scripts/custom_game/crash_isolation_v5.vjs_c
 /SurvivalTwo_QClaw_迁移提示词与知识库清单_V1.0.txt

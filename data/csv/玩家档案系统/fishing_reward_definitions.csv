@@ -1,0 +1,6 @@
+reward_id,definition_version,display_name,weight,effect_key,effect_scope,value_min,value_max,stacking_rule,cap_value,enabled,notes
+#中文表头:奖励ID,定义版本,显示名称,权重,效果键,效果范围,最小值,最大值,叠加规则,上限,是否启用,备注
+#types:string,number,string,number,string,string,number,number,string,number,boolean,string
+pending_reward_body,1,奖励正文待复核,0,pending_reward_body,permanent,0,0,add,0,0,原始奖励正文未恢复；禁止进入随机池。
+pending_lumberjack_speed_x4,1,增加伐木工攻速4倍（待复核）,0,lumberjack_attack_speed_multiplier,permanent,0,0,add,0,0,倍数是乘4还是增加400%尚未确认；禁止进入随机池。
+pending_lumberjack_speed_5pct,1,伐木工攻速5%（待复核）,0,lumberjack_attack_speed_pct,permanent,0,0,add,0,0,增加或减少以及数值单位尚未确认；禁止进入随机池。

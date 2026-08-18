@@ -8,6 +8,17 @@
 - 11项性格定义以`lumberjack_personality_definitions.csv`为权威。超级LV1-LV7每次从完整池等概率随机挂载1项，允许重复；LV8无性格。超级攻击与基础采集量汇总材料基础值，科技和树等级增益按材料数量投影，每击成长的全局累计只提交一次，避免`n²`放大。
 
 
+## 持久化在线计时钓鱼奖励边界（2026-08-17）
+
+- 信任链固定为Dota服务端Lua -> 仅loopback监听且Bearer认证的Python API -> Supabase PostgreSQL。Steam Account ID由服务端`PlayerResource:GetSteamAccountID()`解析；Lua和客户端不得持有Supabase URL、service-role key或数据库凭据。
+- `fishing_system_rules.csv`是心跳、租约、60至600秒区间和定义版本权威源；`fishing_reward_definitions.csv`是奖励ID、权重、效果键、范围、叠加、上限和启用状态权威源。定义版本与SHA-256绑定且数据库不可更新/删除；更改定义必须升版本。
+- 在线时间只由同一session租约内相邻心跳差值累计。首次、新session、超租约和离线时间均扣0秒；单账号只允许一个活动租约，异常断线最多等待15秒接管且等待期间冻结。
+- grant历史、永久聚合、档案revision、下个区间和幂等响应必须在`heartbeat_fishing_session()`一个数据库事务中提交。`reward_grants`不可变，`player_effect_totals`是当前投影；Lua使用同一request ID重试并按grant ID做同局应用去重。
+- 永久效果通过`permanent_reward_effect_service`从既有已校验档案`save.permanent_effects`恢复，不能混入单局科技或挑战状态。当前适配键为英雄全属性/攻击、伐木工攻速百分比和金矿收益百分比。团队资源未玩家隔离前，禁止把玩家永久开局资源直接加入共享team账户。
+- 即时资源尚无数据库提交后Lua崩溃的持久投递ack，生产不得启用immediate奖励。当前三条歧义奖励全部禁用；生产池为空导致API启动失败是有意失败关闭。
+- 钓鱼grant必须由Lua按本地CSV生成定义复核版本、ID、效果、scope、enabled和整数数值范围。永久效果仅在中奖玩家档案快照及其独立永久投影成功后发布一次`FISHING_REWARD_GRANTED`；即时资源因当前账户仍是team-scoped而在共享账户写入前失败关闭。成功事件只含白名单业务字段，不能携带raw grant、账号、Token、档案或definition hash。
+- 钓鱼成功公告由`FISHING_REWARD_GRANTED`订阅者构造，只使用服务端玩家名、CSV `display_name`和已校验amount，并通过显式`UI_NOTIFICATION.audience="all"`广播。UI路由只有该显式值才调用`Send_ServerToAllClients`，其他通知继续定向；客户端只接收`message/level`。自动化fixture固定definition version 9001/10秒，Lua端仅在Tools Mode且`survival_fishing_reward_fixture=automation_9001`时加载。
+
 ## Builder第六业务槽与研究/挑战建筑并存边界（2026-08-15）
 
 - 建筑前置身份必须从`builder_ability_stages.csv`生成配置投影到`buildings_config.lua`，不得在具体建筑定义中重复手写。普通研究所的`requires_building_id`为空；高级研究所和挑战建筑均为`building_research_lab`。误把普通研究所前置写成自身会让`building_system.can_place()`在Grid地形校验前固定拒绝，随后全部footprint格被统一标红，表现与碰撞或地形阻挡相同；排查全红时必须先比较同位置其他建筑并检查业务错误。
@@ -119,6 +130,8 @@
 - Provider只负责`resolve_account_id`和`fetch_snapshot`传输；快照/增量JSON解析、schema校验、账号绑定、revision、update_id、原子提交、权益投影和公开投影统一归`player_profile_service`。未来HTTP Provider不得复制业务校验。
 - 付费权益默认失败关闭。加载开始、网络失败、非法JSON、账号错配或schema不支持时均不能继承测试默认权限；只有服务端验证通过的档案快照/增量可以原子替换`player_entitlement_service`状态。支付成功只能由后端验签后转成新权益revision。
 - 完整档案只保存在Lua服务端。`survival_player_public_profiles`只能发布`player_profile_public_fields.csv`白名单，禁止发布账号、完整权益、成就、存档、库存、订单、金额、签名或token。
+- 正式Supabase账号键由独立Python后端计算`HMAC-SHA256(FISHING_ACCOUNT_ID_PEPPER, Steam Account ID)`，数据库只保存64位小写十六进制假名。Python向Lua恢复当前请求的原始账号ID以维持Provider绑定协议。pepper必须长期稳定、单独备份且仅存在服务端密钥环境；普通无密钥SHA-256不足以抵抗可枚举Steam ID反查。
+- 钓鱼Python API和Supabase migration位于独立`D:\survival_database`仓库；addon的`data/csv/`仍是生产配置唯一权威源，后端通过`SURVIVAL_ADDON_ROOT`读取，禁止复制第二份生产奖励CSV。
 - 增量要求`base_revision == current_revision`且`revision == base_revision + 1`；`update_id`有界幂等。缺口/乱序返回`reload_required`，未知分区失败，JSON null只删除字段。旧完整快照、旧请求迟到回调和同局重复账号绑定都失败关闭。完整约定见`PLAYER_PROFILE_INTEGRATION.md`。
 
 ## 雷电塔连锁与击杀风暴边界（2026-08-11）

@@ -8,6 +8,13 @@
 - 决定：`rogue <card_id1> <card_id2> <card_id3>`只创建固定顺序、不可重抽的调试 offer，但选择仍进入正式 token 校验、`grant_id`和效果运行时。调试入口不得直接发资源、写属性、清空正式队列或消费 Builder 奖励。
 - 原因：这组边界让数值与生命周期可由 CSV 审计，同时防止客户端伪造选择、旧请求重复生效、多人奖励串线和作弊测试形成第二套效果实现。完整接入说明见 `docs/ai/ROGUE_REWARD_INTEGRATION.md`。
 
+## 2026-08-17：钓鱼奖励使用在线租约、不可变账本和独立永久投影
+
+- 决定：外围信任链固定为Dota服务端Lua -> loopback鉴权Python API -> Supabase；Steam Account ID为永久身份。数据库凭据只存在Python环境，客户端和Lua均不持有。
+- 决定：在线时间按同session且租约内的相邻心跳差值累计，离线与新session扣0；单账号只允许一个活动session。grant、永久聚合、档案revision、下一60至600秒区间与幂等响应在单个RPC事务提交。
+- 决定：奖励定义由CSV生成并以`definition_version + SHA-256`不可变发布；grant历史不可变，永久效果由独立聚合层投影，不能写入单局科技/挑战状态。歧义定义和缺少持久投递ack的即时奖励失败关闭。
+- 原因：可审计账本与原子事务能处理重复请求、并发到期和服务重启；租约避免把墙钟离线时间误算在线；独立永久投影避免长期奖励污染现有match-scoped数值来源。
+
 ## 2026-08-15：Builder采用动态连续管理域并统一Ability数量边界
 
 - 决定：CSV `slot_order=1..6`只定义Builder业务技能在管理域内的相对顺序；Blink紧随第六业务槽，不再规定业务技能必须占绝对engine index `0..5`或Blink必须占index 6。已有管理实例时以首个管理Ability为域起点；无管理实例时在真实`GetAbilityCount()`之后自然追加。未知非管理Ability必须保留，异常同步只删除项目管理实例。

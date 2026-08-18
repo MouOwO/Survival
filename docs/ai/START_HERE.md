@@ -7,6 +7,7 @@
 - 当前插入任务（2026-08-18，伐木工点击融合完成自动验证）：普通LV1五合一、LV2-LV8三合一生成对应超级伐木工；独立CSV管理8级配方和11项性格，LV1-LV7每次从11项性格池等概率随机抽取1项且允许重复，LV8无技能。服务端同玩家/同队/同级预校验、施法者等级匹配、pending锁、目标先建后原子提交、净人口释放及失败无副作用已接入；规则/事务/生产注册投影Lua 5.1、契约、语法、CSV生成一致、UTF-8和限定diff通过。下一步Workshop Tools冷启动逐级验收，未经实机确认不得记录完成。
 
 - 当前插入任务（2026-08-17，肉鸽奖励 UI、通用效果运行时与指定三卡调试入口完成自动验证）：四张权威 CSV 已覆盖 31 张卡、31 个效果、38 个强类型参数和 21 条生命周期规则；服务端 offer/token/队列、Panorama 独立 overlay、Boss 全有效玩家发放及 `rogue <card_id1> <card_id2> <card_id3>`正式运行时调试链已接入。当前只启用 `fiscal_subsidy`、`radiant_sapling`、`fortifications`，尚未 Workshop Tools 冷启动或双客户端验收。后续开发先读 `ROGUE_REWARD_INTEGRATION.md`，实机基线命令为 `rogue fiscal_subsidy radiant_sapling fortifications`。
+- 当前插入任务（2026-08-17，持久化在线计时钓鱼奖励纵向切片自动验证完成）：已实现CSV权威定义、Supabase单事务grant/永久聚合/冻结计时/幂等migration、Python 3.14 loopback鉴权API、Steam Account ID Lua HTTP Provider、在线session租约和永久效果独立投影。生产奖励因完整清单缺失及三条定义待复核而全部禁用并失败关闭；本机无PostgreSQL/Supabase CLI且未提供项目凭据，尚未执行远端migration或Workshop Tools实机。详细阻断、测试与启动步骤见`CURRENT_TASK.md`顶部和`FISHING_REWARD_INTEGRATION.md`。
 - 当前插入任务（2026-08-15，Builder动态管理域与全链路安全枚举完成自动验证）：Builder服务端仅枚举`0..GetAbilityCount()-1`，保留index 0等非管理Ability，并以动态起点连续维护六个CSV业务槽与尾随Blink；快捷键仍由`builder_slot_order`投影`Q/W/E/R/T/A`和名称映射`D`。四份Panorama实体Ability访问统一消费runtime `ability_count`，固定24/64仅保留为HUD节点枚举。专项行为/契约、研究与Grid回归、Lua 5.1语法、CSV生成一致、双仓限定检查和四份JS强制编译通过；下一步冷启动短测高级研究所和农场并确认无`invalid index`或布局重建失败。
 - 当前插入任务（2026-08-15，Ability runtime重建与安全枚举完成自动验证）：已恢复`upgrade_level(..., display)`及默认空表；服务端通过`survival_ability_runtime`的`unit:<entindex>`发布真实`GetAbilityCount()`并在销毁时清理，两份Panorama仅按该元数据访问实体Ability，不再固定探测无效索引。高级研究所十槽HUD几何外推保持不变。专项Lua 5.1、契约、研究回归、语法、UTF-8、限定diff和两份JS强制编译均通过；下一步冷启动Workshop Tools确认runtime重建、主城Tooltip及控制台无`8..17`索引告警。
 - 当前插入任务（2026-08-15，研究所十槽Tooltip代理几何与图标修复完成自动验证）：普通/高级研究所代理按运行时权威签名枚举六/十槽；Valve仅提供部分按钮锚点时，第七至第十槽由最后两个真实按钮的水平步距外推为窗口矩形，透明代理继续负责自定义Tooltip及项目左键输入。ARS-01/Q图标已在权威CSV、生成Lua和Ability KV统一为`furion_force_of_nature`。专项契约、三项Lua 5.1行为、输入生命周期、目标Lua语法、CSV生成逐字节一致、严格UTF-8、限定diff及`ability_tooltip.js`强制编译通过；下一步冷启动Workshop Tools验收十槽实际几何、Tooltip、左右键和链式替换。
@@ -99,6 +100,8 @@
 
 ## 最后可靠检查点
 
+- 2026-08-17钓鱼奖励基础设施、安全全员公告与自动验证完成。grant仅在中奖玩家本地投影成功后按ID发布一次；公告只含服务端玩家名、CSV奖励名和数值，UI路由保留个人通知。默认`local_fixture`档案路径不变；生产奖励池为空仍阻止Python API启动。10秒/9001测试fixture仅可在Tools Mode加显式ConVar下加载。仍未执行Supabase migration或Workshop Tools双客户端实机，不得宣称上线。
+- 同日后端与Supabase文件已迁到独立`D:\survival_database`仓库，生产CSV仍只在addon。Python经`SURVIVAL_ADDON_ROOT`读取CSV，并以独立pepper对Steam Account ID做HMAC后入库；目标仓库提供loopback安全启动脚本和9001 fixture开关。本机`.env`已安全生成Token/pepper但Supabase URL/Key为空，尚无真实项目，不能启动或称为远端验证。
 - 2026-08-12玩家档案Fixture纵向切片代码与自动测试完成；已增加公开投影成功日志，可直接核对玩家0/1的Fixture账号、revision及公开白名单字段。VIP权威CSV默认关闭，Mock账号验证后再投影。尚未Workshop Tools实机验证，也未接HTTP/数据库。
 - 2026-08-12 Game/Content物理目录已统一为全小写`survival`，用户Workshop Tools实机确认小地图正常显示。旧混合大小写资产索引备份仍位于`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`；该问题已关闭，不再恢复为活跃迁移任务。
 - 2026-08-10空区域配置兼容策略已落地：CSV无启用`hero_movable`业务行时保持旧地图导航与Grid建造，区域拒绝仍返回可渲染红格；等待Workshop Tools实机验证。
@@ -119,7 +122,7 @@
 
 ## 下一步唯一动作
 
-完全停止并冷启动Workshop Tools，确认玩家0加载`mock_account_10001`后VIP链可用、玩家1加载`mock_account_10002`后VIP链锁定、`survival_player_public_profiles`只含CSV白名单字段且无Lua异常；随后恢复多人阶段1单人/双客户端验收。Hammer区域边界与玩家1出生Marker仍是后续地图数据阻断。
+创建Supabase项目，在SQL Editor执行`D:\survival_database\supabase\migrations\202608170001_fishing_rewards.sql`，再仅在本机`D:\survival_database\.env`填写`SUPABASE_URL`和`SUPABASE_SECRET_KEY`。随后先用`start_fishing_api.ps1 -Automation9001`验证远端RPC，再完全冷启动Workshop Tools进行双客户端、重试、断线、API重启和Supabase故障联调；生产奖励CSV仍全禁用，不得作为正式奖励验收。
 
 ## 恢复顺序
 

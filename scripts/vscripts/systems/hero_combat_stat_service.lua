@@ -236,8 +236,15 @@ local function recalculate(player_id, reason)
         { player_id = player_id }
     )
     local progression = progression_result and progression_result.snapshot or {}
-    local progression_attributes = tonumber(progression.all_attributes) or 0
-    local progression_attack_flat = tonumber(progression.attack_flat) or 0
+    local permanent_result = event_bus.request(
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local permanent = permanent_result and permanent_result.totals or {}
+    local progression_attributes = (tonumber(progression.all_attributes) or 0)
+        + (tonumber(permanent.hero_all_attributes_flat) or 0)
+    local progression_attack_flat = (tonumber(progression.attack_flat) or 0)
+        + (tonumber(permanent.hero_attack_flat) or 0)
     local essence_attack_pct = tonumber(essence.attack_bonus_pct) or 0
     researcher_armor_reduction = researcher_armor_reduction
         + (tonumber(essence.armor_reduction_per_attack) or 0)
@@ -582,6 +589,7 @@ function M.init()
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
     event_bus.subscribe(events.SEVEN_SINS_ESSENCE_CHANGED, on_progression_changed)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_progression_changed)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, on_progression_changed)
     event_bus.subscribe(events.HERO_SKILL_CHANGED, on_progression_changed)
     event_bus.subscribe(events.MONKEY_KING_BONUS_STATS_CHANGED, on_progression_changed)
 end

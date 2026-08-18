@@ -110,6 +110,26 @@
 - 权威数据仅修改`data/csv/建筑与工人系统/technology_definitions.csv`中`advanced_lumberjack_efficiency_01`至`advanced_lumberjack_efficiency_30`的`gold_cost`与`wood_cost`；随后通过现有CSV生成链同步Lua。
 - 验证范围：30级费用逐行交换、相邻科技不变、CSV与生成Lua一致、相关研究所契约、Lua 5.1语法、配置检查及限定`git diff --check`。自动验证不能称为Workshop Tools实机验收。`CSV_ADVANCED_LUMBERJACK_PASS`、`GENERATED_ADVANCED_LUMBERJACK_PASS`、`ADVANCED_RESEARCH_LAB_CONTRACT_PASS`、Lua 5.1语法、配置生成和`git diff --check`均已通过。
 
+## 当前实施任务（2026-08-17）：持久化在线计时钓鱼奖励纵向切片
+
+- 用户已批准进入Act模式。目标链路固定为Dota服务端Lua -> 本机带共享令牌认证的Python JSON API -> Supabase PostgreSQL；客户端和Lua均不得持有Supabase URL或数据库密钥。
+- 计时语义固定为只累计在线租约时间、离线冻结、重连恢复剩余秒数；成功发放后重新抽取60至600秒。发放历史使用append-only grant，永久效果使用独立聚合投影，二者与下一计时器必须由单个数据库RPC原子提交。
+- 本轮工作区保护基线：已有`.cline/content_survival`、`building_challenge_waves.csv`及其生成Lua修改，并有大量未跟踪旧测试文件；均不属于本任务，不得覆盖、回滚或清理。
+- 当前恢复摘要只保留三条待复核定义：`奖励正文待复核`、`增加伐木工攻速4倍（待复核）`、`伐木工攻速5%`的符号/含义；仓库和会话文档中没有完整生产奖励清单。实现不得猜测缺失数值，待复核行必须保持禁用，自动测试使用独立fixture定义验证纵向链路。
+- 实施范围：CSV schema与生成Lua、Supabase migration/原子RPC、Python 3.14标准库API、Lua 5.1 HTTP Provider/在线租约服务、档案revision复用、永久效果独立投影、幂等/重连/失败恢复测试、严格UTF-8与限定差异检查。没有Supabase项目和服务端密钥时只能完成静态、模拟和本机HTTP验证，不能称为远端数据库或Workshop Tools实机验证。
+- 实施完成：新增两张CSV及生成Lua；migration包含Steam Account ID账号、不可变定义版本、单账号session租约、冻结计时器、append-only grant、永久聚合、幂等响应和单事务发放RPC；Python 3.14标准库API实现loopback绑定、Bearer认证、严格环境配置、CSV SHA-256同步和Supabase REST/RPC；Lua HTTP Provider复用既有快照/revision校验，心跳只在`http_fishing` override下启用，断线/连接状态停止租约，同一request/grant按ID重试去重。
+- 永久效果独立投影已接入`hero_all_attributes_flat`、`hero_attack_flat`、`lumberjack_attack_speed_pct`和`gold_mine_income_pct`。即时金币/木材/人口上限仅保证同局Lua session按grant ID幂等，跨进程提交后崩溃仍需持久outbox/ack；团队资源尚未完成玩家隔离，因此永久开局资源不得投影到共享团队账户。
+- 自动验证通过：Python 5项单元/真实loopback HTTP测试、`FISHING_REWARD_LUA51_PASS`、`FISHING_REWARD_CONTRACT_PASS`、原档案Lua 5.1与PowerShell回归、14个目标Lua的`luac5.1 -p`、Python compileall、两张CSV定向生成逐字节一致、严格UTF-8及限定`git diff --check`。本机无`psql`和Supabase CLI，migration仅完成静态契约检查；未执行远端Supabase或Workshop Tools实机验证。
+- 下一步阻断：用户提供完整确认后的奖励表并解决三条待复核定义，创建Supabase项目并提供仅Python进程可见的`SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`及本机API token。之后才能启用生产定义、实际执行migration、启动API并进行断线重连/并发/重启/数据库故障与Dota HTTP实机验收。
+- 2026-08-17后续实施完成：即时/永久grant统一为“本地应用成功后按grant ID仅发布一次`FISHING_REWARD_GRANTED`”。Lua从本地CSV生成定义复核版本、reward/effect/scope/enabled和amount范围；永久路径要求中奖玩家的档案快照及永久投影已成功，即时路径因现有team-scoped资源账户不能保证owner-only而在共享写入前明确失败关闭。
+- 安全公告已接入：grant订阅者仅使用服务端玩家名、CSV `display_name`和已校验数值构造`UI_NOTIFICATION audience=all`；UI路由仅对显式全员通知广播且只转发`message/level`，既有个人通知保持定向。Panorama现有`NotificationContainer`可直接渲染，无需修改Content资源。
+- 新增独立测试CSV fixture：definition version 9001、固定10秒及永久`hero_attack_flat +5`；即时金币失败关闭由Lua行为测试覆盖，不进入数据库fixture池。对应Lua配置由同一CSV生成器生成，只有Tools Mode且ConVar精确为`automation_9001`时可加载，生产CSV继续全部禁用。
+- 本轮新增验证通过：`FISHING_REWARD_LUA51_PASS`、`UI_NOTIFICATION_AUDIENCE_LUA51_PASS`、`FISHING_REWARD_CONTRACT_PASS`、Python 5项unittest/loopback HTTP、玩家档案Lua/契约回归、初始资源和人口训练回归、目标Lua 5.1语法、Python compileall、生产/fixture CSV生成逐字节一致、严格UTF-8及限定`git diff --check`。这些不是Supabase或Workshop Tools实机验证。
+- 2026-08-17部署迁移：`backend/`、`supabase/`和后端环境模板已迁至独立`D:\survival_database`仓库，addon继续唯一持有生产CSV及生成Lua。Python通过`SURVIVAL_ADDON_ROOT`读取权威CSV；独立启动脚本保持loopback、加载本机`.env`并收紧NTFS ACL，支持`-Automation9001`测试fixture。
+- 正式数据库账号改为Python边界的`HMAC-SHA256`假名，Supabase不保存原始Steam Account ID，Lua响应仍恢复原始ID以保留既有绑定校验。`FISHING_ACCOUNT_ID_PEPPER`是稳定账号映射密钥，必须独立生成、备份且不得上线后直接更换。新`SUPABASE_SECRET_KEY`和legacy service-role均兼容。
+- 当前仍缺真实Supabase项目、URL和Secret Key，生产奖励CSV仍全部禁用；远端migration、API实际启动、Dota双客户端与故障场景仍未验证。
+- 迁移后本机`.env`已由初始化脚本生成64字符随机API Token和独立pepper，ACL仅允许当前Windows用户与`SYSTEM`，并确认被目标仓库Git忽略；`SUPABASE_URL`和Secret Key仍为空，因此启动脚本按预期失败关闭。最终自动验证通过：Python 9项、跨仓钓鱼契约、钓鱼/公告/档案/初始资源/人口Lua回归、目标Lua 5.1语法、Python编译、PowerShell解析、CSV生成逐字节一致、数据库仓严格UTF-8/空白检查及限定diff检查。未执行远端Supabase或Workshop Tools实机验证。
+
 ## 当前实施任务（2026-08-15）：英雄永久异步预载与召唤READY门禁
 
 - 用户报告部分电脑执行`addhero`时客户端闪退，怀疑英雄主体、饰品组件和常驻粒子在`ReplaceHeroWithNoTransfer()`后同帧集中实例化造成冷资源峰值。调查确认六个英雄主体已在地图`Precache`阶段同步预载，英雄饰品也由`hero_cosmetic_service.precache()`同步预载，但尚未纳入游戏开始后的异步完整bundle队列。

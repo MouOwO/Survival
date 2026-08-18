@@ -214,6 +214,9 @@ local M = {
     MONSTER_KILLED = "monster.killed",
     MONSTER_REWARD_GRANT_REQUEST = "monster.reward.grant.request",
     MONSTER_REWARD_GRANTED = "monster.reward.granted",
+    PERMANENT_REWARD_EFFECTS_GET_REQUEST = "permanent_reward.effects.get.request",
+    PERMANENT_REWARD_EFFECTS_CHANGED = "permanent_reward.effects.changed",
+    FISHING_REWARD_GRANTED = "fishing.reward.granted",
 }
 
 return M

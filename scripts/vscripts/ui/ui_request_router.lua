@@ -1177,10 +1177,17 @@ local function register_return_home_request()
 end
 
 local function on_notification(payload)
-    send_to_player("ui_notification", payload.player_id, {
+    local notification = {
         message = payload.message or "",
         level = payload.level or "info",
-    })
+    }
+    if payload.audience == "all" then
+        CustomGameEventManager:Send_ServerToAllClients(
+            "ui_notification", notification
+        )
+        return
+    end
+    send_to_player("ui_notification", payload.player_id, notification)
 end
 
 local function register_rogue_reward_requests()
@@ -1236,5 +1243,9 @@ function M.init()
     event_bus.subscribe(events.UI_NOTIFICATION, on_notification)
     event_bus.subscribe(events.SHOP_STATE_CHANGED, on_shop_state_changed)
 end
+
+M._test = {
+    on_notification = on_notification,
+}
 
 return M
