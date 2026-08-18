@@ -19,6 +19,7 @@ local war3_armor_target = require("systems/war3_armor_target")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 
 local M = {}
+print("[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter")
 local buildings = {}
 local publish
 local sync_tower_abilities
@@ -90,6 +91,15 @@ local function configured_projectile_speed(state, row)
         or global_rules.tower_route_default_projectile_speed
 end
 
+local function configured_base_attack_time(state)
+    local row = tower_routes.current(state)
+    local attacks_per_second = tonumber(row and row.base_attack_speed)
+    if attacks_per_second and attacks_per_second > 0 then
+        return 1 / attacks_per_second
+    end
+    return nil
+end
+
 local function apply_research_technology(state)
     local unit = state.unit
     if not valid_entity(unit) then return end
@@ -109,8 +119,11 @@ local function apply_research_technology(state)
         unit.survival_super_tower_crit_chance =
             tonumber(tower.critical_chance_pct) or 0
         local attack_speed_bonus = tonumber(tower.attack_speed_bonus_pct) or 0
+        -- GetBaseAttackTime has different native signatures between the Dev
+        -- harness and the live engine. The CSV route data is authoritative for
+        -- tower attack speed, so do not call the engine getter here.
         local base_attack_time = tonumber(unit.survival_research_base_attack_time)
-            or tonumber(unit:GetBaseAttackTime()) or 1
+            or configured_base_attack_time(state) or 1
         unit.survival_research_base_attack_time = base_attack_time
         unit:SetBaseAttackTime(base_attack_time / math.max(0.01, 1 + attack_speed_bonus / 100))
         local attack_range = tower_combat_rules.attack_range(

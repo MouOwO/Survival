@@ -1,3 +1,15 @@
+## 当前任务补充（2026-08-18）：融合运行时错误与七塔批量升级卡顿定位
+
+- 已获用户批准进入执行模式。本轮先实施低风险诊断与幂等同步：`building_upgrade_system.lua`增加源码指纹，确认Workshop Tools实际加载版本；`tower_ability_sync.lua`以CSV生成路线行的`record_id/active_skill_ids/skill_ids/融合状态`生成签名，同一实体配置未变化时跳过Remove/AddAbility重建，并记录同步开始、跳过、结束及耗时。
+- 当前源码全局搜索未发现`GetBaseAttackTime()`调用；用户日志中的旧签名错误说明实机仍可能加载旧脚本或未冷启动。本轮不在Lua中重新调用该Native getter，攻速继续只取CSV路线数据。
+
+- 用户实机日志确认：七类转职塔均已成功施法，材料塔的`BuildingUpgradeParticle`销毁/释放链全部执行；终极融合请求最后仍被`scripts/vscripts/systems/tower_fusion_service.lua:211`阻断。
+- 已确认阻断根因：`CreateUnitByName()`返回的是普通单位实体，当前项目/Dota单位API没有`SetInvulnerable`方法。删除该无效调用；终极塔创建继续使用CSV生成配置`tower_fusion_runtime.csv`中的`unit_name/model_name/route_ids`，不新增Lua硬编码基础数据。
+- 已确认普通升级卡顿的代码路径：`building_batch_upgrade_service.lua`逐塔同步提交七个升级请求；每个请求在升级完成时进入`building_upgrade_system.lua:apply_tower_level()`，即使CSV目标行的模型与上一等级相同，也会调用`tower_ability_sync.sync()`。该同步会清理并重建管理技能，随后`tower_utility_ability_sync.sync()`遍历24个Ability槽并重新处理辅助技能。七座塔在相近完成时间集中执行这些实体操作，会造成同帧脚本/网络同步峰值，因此“模型不变化也卡”与模型加载并不矛盾。
+- `building_visual_service.matches()`会跳过相同模型路径的`SetModel`，模型变化不是普通升级必经步骤；模型异步预载只在资源未Ready时排队。因此当前日志中的Monkey King附件资源错误不是七塔普通升级卡顿的充分根因，而是独立的英雄附件资源加载问题。
+- 本轮已保留技能槽顺序语义，并将无变化的同步改为基于CSV签名的幂等短路；Workshop Tools仍需记录七塔升级完成时间、`tower_ability_sync.sync()`耗时和最终技能显示状态，以确认同帧峰值是否下降且动作没有回归。
+- 静态验证已通过：`tower_fusion_service.lua` Lua 5.1语法、现有`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`和限定文件`git diff --check`。当前未发现独立的箭塔融合契约脚本；融合成功、终极塔位置/属性/能力及七塔实际卡顿仍需冷启动Workshop Tools实机确认。
+
 ## 当前插入任务（2026-08-18）：普通伐木工点击合成超级伐木工
 
 - 普通伐木工LV1使用5合1，LV2-LV8使用3合1；每级普通伐木工挂载对应无目标融合Ability，只有同玩家、同队、同等级、存活且未参与其他融合的普通伐木工可作为材料。LV1/LV2要求主城LV4并消耗10000/20000木材；LV3-LV8要求主城LV5并消耗30000/40000/50000/60000/70000/80000木材及5000/8000/15000/30000/40000/50000金币。失败不改变材料、资源或人口，服务端按caster加pending锁防重复请求。
@@ -87,6 +99,9 @@
 - 实施边界：只修复转职及升级时的运行时Ability排列与必要契约，不修改塔数值、技能效果、升级费用、移动/拆除权限或HUD视觉样式。验证包括基础箭塔与全部转职路线、转职后顺序、CSV与生成Lua一致、Lua 5.1语法、相关契约及限定`diff --check`；自动验证不能称为Workshop Tools实机验收。
 - 实现完成：`tower_ability_sync.lua`在挂载转职路线技能前先清除移动/拆除，主体技能占用低位空槽后再按CSV顺序重加移动、拆除，消除Source 2复用低位Ability索引导致工具技能滞留在左侧的问题；基础箭塔和全部转职塔仍只从CSV读取技能集合与顺序。
 - 自动验证完成：真实生产同步模块的Lua 5.1行为桩验证转职后顺序为升级、路线技能、移动、拆除；八份塔CSV及对应生成Lua专项契约、三个目标Lua语法和限定`git diff --check`通过。既有`test_arrow_tower_completion.lua`因工作区已有`building_system.lua`首字节被MSYS Lua识别为非法字符而在加载阶段失败，未执行到本次逻辑；尚未进行Workshop Tools冷启动实机HUD验收。
+- 本轮修复：融合资格判断现先于Ability挂载，满足七条路线均为CSV最大等级且未参与融合时，按`ability_tower_fusion`、CSV主动技能、CSV路线技能、移动、拆除的顺序重建受管理Ability；不调用动态建筑上不可靠的`SetAbilityIndex()`，保留Panorama的`D`移动输入路径。融合服务既有的并发锁、创建后消费与创建失败回滚继续保留。
+- 本轮自动验证：目标技能同步、工具同步、融合服务和融合Ability的Lua 5.1语法通过；`ARROW_TOWER_UTILITY_CONTRACT_PASS`通过；未运行Workshop Tools，因此能力栏原生索引、Q/D显示、Roshan模型、七路攻击和实机融合点击仍待冷启动验收。
+- 本轮回归修复：融合消费现在接收并校验玩家当前全部箭塔，按拆除生命周期逐一`ForceKill(false)`并在消费前确认拆除Ability可用；融合技能刷新覆盖玩家所有符合条件的终阶路线塔；终极塔直接创建在施法塔原点，不再改投附近网格。Panorama按Ability身份固定移动为`D`、拆除为`G`，避免显示引擎默认`T/Y`。
 
 ## 当前实施任务（2026-08-16）：城墙四点均匀接敌寻路
 

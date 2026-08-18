@@ -55,6 +55,9 @@ function M.sync(state, row)
     local unit = state and state.unit
     if not valid_entity(unit) or state.building_id ~= "arrow_tower" then return end
 
+    -- tower_ability_sync has already removed utility abilities before adding
+    -- route abilities. Keep this second clear for direct callers and make the
+    -- final append order explicit: movement first (D), destruction last.
     M.clear(unit)
     local free_slots = math.max(0, MAX_VISIBLE_ABILITIES - visible_non_utility_count(unit))
     local show_destroy = configured(row, DESTROY_ABILITY) and free_slots >= 1

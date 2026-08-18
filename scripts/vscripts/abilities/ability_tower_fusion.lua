@@ -15,7 +15,15 @@ function ability_tower_fusion:OnSpellStart()
         caster = self:GetCaster(),
         ability = self,
     })
-    if not result or not result.ok then self:EndCooldown() end
+    if not result or not result.ok then
+        -- The request can fail after the engine has invalidated/replaced the
+        -- dynamic ability handle. Do not let cooldown rollback hide the real
+        -- fusion error with "Invalid object passed to EndCooldown".
+        local ok, is_null = pcall(function() return self:IsNull() end)
+        if ok and not is_null then
+            pcall(function() self:EndCooldown() end)
+        end
+    end
 end
 
 function ability_tower_fusion:OnProjectileHit_ExtraData(target, location, data)

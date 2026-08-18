@@ -1,3 +1,4 @@
+- 2026-08-18：用户实机确认七座转职塔一起升级时卡顿现象明显减少。确认有效的改动是`tower_ability_sync.lua`按CSV路线行的`record_id/active_skill_ids/skill_ids/融合状态`生成签名，同一实体配置未变化时输出`[TowerAbilitySync] skip`并跳过Ability清理/重建；配置变化时仍执行完整同步，未改变技能槽顺序语义。`building_upgrade_system.lua`增加`20260818_csv_attack_time_no_native_getter`版本指纹，用于排除Workshop Tools继续加载旧版`GetBaseAttackTime`调用。Lua 5.1语法、`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`、`ARROW_TOWER_UTILITY_CONTRACT_PASS`和限定`git diff --check`通过。该结果是用户实机对卡顿改善的确认，仍需后续观察升级后动作/技能完整性及其他路线的冷启动表现。
 - 2026-08-18：完成已验收城墙碰撞/接敌实现的收敛清理。删除地面怪Hull、接敌槽、排队点和边界的全部`DebugDrawCircle`/`DebugDrawLine`绘制；移除CSV、生成Lua和运行时配置中的全部`wall_engagement_*`/`wall_collision_*`规则，将四槽接敌、80间距、288法向、160排队、24/48阈值，以及3x10空气墙、188基础法向、38/10间距、Hull 8和既有方位修正固化为对应模块私有常量。怪物Hull等通用规则继续保留。专项测试增加禁止加载`global_rules`及固定几何断言；Lua 5.1行为与语法、残留引用搜索和`git diff --check`通过，仍需Workshop Tools冷启动确认彩色图形消失且隐藏空气墙、排队和补位行为不变。
 ## 2026-08-18 - 普通伐木工点击融合超级伐木工
 

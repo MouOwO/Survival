@@ -7,6 +7,7 @@ local tower_skills = require("systems/tower_skill_runtime")
 local tree_damage_rules = require("systems/tree_damage_rules")
 local anti_air_rules = require("systems/anti_air_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
+local tower_ability_sync = require("systems/tower_ability_sync")
 
 local M = {}
 
@@ -196,10 +197,10 @@ local function create_proxy(state, source, row, class_id)
     }
 end
 
-local function create_ultimate(player_id, caster, selected, position)
+local function create_ultimate(player_id, team_number, selected, position)
     local unit = CreateUnitByName(
         config().unit_name, position, true,
-        caster, caster, caster:GetTeamNumber()
+        nil, nil, team_number
     )
     if not valid(unit) then return nil, "fusion_create_failed" end
     if unit.SetPlayerID then unit:SetPlayerID(player_id) end
@@ -207,7 +208,6 @@ local function create_ultimate(player_id, caster, selected, position)
     unit:SetControllableByPlayer(player_id, true)
     unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(1000) end
-    unit:SetInvulnerable(true)
     unit.survival_ultimate_tower = true
     unit.survival_player_id = player_id
     unit.survival_display_name = config().display_name or "终极塔"
@@ -220,13 +220,11 @@ local function create_ultimate(player_id, caster, selected, position)
     local maximum, current, armor, attack = 0, 0, 0, 0
     local multiplier = tonumber(config().base_attack_multiplier) or 3
     for _, source in ipairs(selected) do
-        maximum = maximum + math.max(0, source.unit:GetMaxHealth())
-        current = current + math.max(0, source.unit:GetHealth())
-        armor = armor + (tonumber(source.runtime_armor)
-            or source.unit:GetPhysicalArmorBaseValue())
-        local row = final_row(source.tower_class) or {}
-        local base = tonumber(row.base_attack_damage) or 0
-        local actual = source.unit:GetAverageTrueAttackDamage(source.unit)
+        maximum = maximum + math.max(0, source.max_health)
+        current = current + math.max(0, source.health)
+        armor = armor + source.armor
+        local base = source.base_attack_damage
+        local actual = source.attack_damage
         attack = attack + base * multiplier + math.max(0, actual - base)
     end
     unit:SetBaseMaxHealth(math.max(1, maximum))
@@ -287,34 +285,34 @@ local function plan_group_move(states, target, validate)
 end
 
 local function fusion_spawn_position(caster, selected)
-    local footprint = selected[1].definition
-        and selected[1].definition.footprint or { x = 2, y = 2 }
-    local ignored_entindexes = {}
-    for _, source in ipairs(selected) do
-        ignored_entindexes[source.entindex] = true
-    end
-    local origin = caster:GetAbsOrigin()
-    local candidates = { origin }
-    for index = 0, 11 do
-        local angle = math.rad(index * 30)
-        candidates[#candidates + 1] = origin + Vector(
-            math.cos(angle) * 256,
-            math.sin(angle) * 256,
-            0
-        )
-    end
-    for _, position in ipairs(candidates) do
-        local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
-            position = position,
-            footprint = footprint,
-            ignore_entindexes = ignored_entindexes,
-            team = caster:GetTeamNumber(),
-        })
-        if grid and grid.ok == true then
-            return grid.world_position
+    if not alive(caster) then return nil, "fusion_caster_invalid" end
+    -- Fusion replaces the selected towers at the casting tower's exact origin.
+    -- Do not project the result to a nearby free grid cell.
+    return caster:GetAbsOrigin()
+end
+
+local function sync_fusion_abilities(player_id, buildings)
+    local synced = 0
+    for _, item in ipairs(buildings or {}) do
+        if item.player_id == player_id and item.building_id == "arrow_tower"
+            and alive(item.unit) and item.tower_class then
+            local row = final_row(item.tower_class)
+            if row and tonumber(item.route_level) == tonumber(row.level)
+                and tonumber(item.fusion_participated) ~= 1 then
+                tower_ability_sync.sync({
+                    unit = item.unit,
+                    building_id = item.building_id,
+                    tower_class = item.tower_class,
+                    level = item.level,
+                    player_id = player_id,
+                    fusion_participated = item.fusion_participated,
+                    definition = item.definition,
+                }, row)
+                synced = synced + 1
+            end
         end
     end
-    return nil, "fusion_spawn_position_invalid"
+    return synced
 end
 
 local function find_target(state, stream)
@@ -430,22 +428,45 @@ local function fuse(payload)
         notify(player_id, error_code, "error")
         return fail({ ok = false, error = error_code })
     end
+    sync_fusion_abilities(player_id, listed and listed.buildings)
     local spawn_position, spawn_error = fusion_spawn_position(caster, selected)
     if not spawn_position then
         return fail({ ok = false, error = spawn_error })
     end
-    local state, create_error = create_ultimate(
-        player_id, caster, selected, spawn_position
-    )
-    if not state then return fail({ ok = false, error = create_error }) end
+    local team_number = caster:GetTeamNumber()
+    -- Snapshot material stats before the G-style destruction invalidates their
+    -- entity handles. The actual towers must be removed before spawning the
+    -- ultimate tower so their attack loops cannot survive the fusion frame.
+    for _, item in ipairs(selected) do
+        local row = final_row(item.tower_class) or {}
+        item.max_health = math.max(0, item.unit:GetMaxHealth())
+        item.health = math.max(0, item.unit:GetHealth())
+        item.armor = tonumber(item.runtime_armor)
+            or item.unit:GetPhysicalArmorBaseValue()
+        item.base_attack_damage = tonumber(row.base_attack_damage) or 0
+        item.attack_damage = item.unit:GetAverageTrueAttackDamage(item.unit)
+    end
     local consumed = event_bus.request(events.BUILDING_FUSION_CONSUME_REQUEST, {
         player_id = player_id,
+        entindexes = (function()
+            local result = {}
+            for _, item in ipairs(listed and listed.buildings or {}) do
+                if item.player_id == player_id
+                    and item.building_id == "arrow_tower"
+                    and alive(item.unit) then
+                    result[#result + 1] = item.entindex
+                end
+            end
+            return result
+        end)(),
     })
     if not consumed or not consumed.ok then
-        UTIL_Remove(state.unit)
-        remove_ultimate_state(state)
         return fail(consumed or { ok = false, error = "fusion_consume_failed" })
     end
+    local state, create_error = create_ultimate(
+        player_id, team_number, selected, spawn_position
+    )
+    if not state then return fail({ ok = false, error = create_error }) end
     event_bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
         player_id = player_id,
         ultimate_count = #player_ultimates(player_id),

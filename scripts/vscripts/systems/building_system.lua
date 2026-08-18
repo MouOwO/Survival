@@ -991,20 +991,51 @@ local function mark_for_fusion(payload)
     return { ok = true, marked = #selected }
 end
 
+local function destroy_arrow_tower_state(state)
+    if not state or not valid_entity(state.unit) or not state.unit:IsAlive() then
+        return false, "tower_not_found"
+    end
+    if state.building_id ~= "arrow_tower"
+        or state.unit:GetUnitName() ~= "building_arrow_tower" then
+        return false, "unit_not_arrow_tower"
+    end
+    if state.constructing
+        or state.unit:HasModifier("modifier_building_under_construction") then
+        return false, "tower_under_construction"
+    end
+    local ability = state.unit:FindAbilityByName("ability_destroy_arrow_tower")
+    if not ability or ability:IsNull() or ability:IsHidden()
+        or not ability:IsActivated() then
+        return false, "destroy_ability_unavailable"
+    end
+    -- This is the same destruction lifecycle used by the confirmed G action.
+    state.unit:ForceKill(false)
+    return true, nil
+end
+
 local function consume_for_fusion(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return { ok = false, error = "invalid_player" } end
     local states = {}
-    for _, state in pairs(buildings) do
+    local requested = {}
+    for _, entindex in ipairs(payload and payload.entindexes or {}) do
+        requested[tonumber(entindex) or -1] = true
+    end
+    for entindex, state in pairs(buildings) do
         if state.player_id == player_id
             and state.building_id == "arrow_tower"
             and valid_entity(state.unit)
-            and state.unit:IsAlive() then
+            and state.unit:IsAlive()
+            and (next(requested) == nil or requested[entindex]) then
             states[#states + 1] = state
         end
     end
+    if #states == 0 then return { ok = false, error = "fusion_towers_missing" } end
     for _, state in ipairs(states) do
-        state.unit:ForceKill(false)
+        local destroyed, error_code = destroy_arrow_tower_state(state)
+        if not destroyed then
+            return { ok = false, error = error_code }
+        end
     end
     return { ok = true, consumed = #states }
 end
@@ -1195,27 +1226,10 @@ end
 
 function M.destroy_arrow_tower_for_player(player_id, entindex)
     local state = buildings[tonumber(entindex) or -1]
-    if not state or not valid_entity(state.unit) or not state.unit:IsAlive() then
-        return false, "tower_not_found"
-    end
-    if state.player_id ~= player_id then
+    if not state or state.player_id ~= player_id then
         return false, "tower_not_owned"
     end
-    if state.building_id ~= "arrow_tower"
-        or state.unit:GetUnitName() ~= "building_arrow_tower" then
-        return false, "unit_not_arrow_tower"
-    end
-    if state.constructing
-        or state.unit:HasModifier("modifier_building_under_construction") then
-        return false, "tower_under_construction"
-    end
-    local ability = state.unit:FindAbilityByName("ability_destroy_arrow_tower")
-    if not ability or ability:IsNull() or ability:IsHidden()
-        or not ability:IsActivated() then
-        return false, "destroy_ability_unavailable"
-    end
-    state.unit:ForceKill(false)
-    return true, nil
+    return destroy_arrow_tower_state(state)
 end
 
 function M.enable_dev_wall_stats()
