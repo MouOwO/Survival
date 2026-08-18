@@ -512,7 +512,7 @@ local function recover_state(unit)
         unit = snapshot.unit,
         definition = snapshot.definition,
         team = snapshot.team,
-        player_id = snapshot.player_id,
+        player_id = tonumber(snapshot.player_id),
         building_id = snapshot.building_id,
         level = tonumber(snapshot.level) or tonumber(unit.survival_level) or 1,
         tower_class = snapshot.tower_class,
@@ -576,7 +576,7 @@ local function on_technology_stats_changed(payload)
     if player_id == nil then return end
     recover_player_towers(player_id)
     for _, state in pairs(buildings) do
-        if state.player_id == player_id then
+        if tonumber(state.player_id) == player_id then
             apply_research_technology(state)
             publish(state, "technology_stats_changed")
         end
