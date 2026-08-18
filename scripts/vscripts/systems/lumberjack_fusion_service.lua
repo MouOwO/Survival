@@ -44,10 +44,12 @@ local function collect_materials(caster, row)
     local listed = event_bus.request(events.WORKER_LIST_REQUEST, {
         player_id = player_id,
     }) or {}
-    local result = {}
+    local result = { caster }
+    local caster_entindex = caster:entindex()
     for _, state in ipairs(listed) do
         local unit = state.unit
-        if valid(unit) and state.team == caster:GetTeamNumber()
+        if valid(unit) and unit:entindex() ~= caster_entindex
+            and state.team == caster:GetTeamNumber()
             and tonumber(state.player_id) == player_id
             and state.worker_type == "lumberjack"
             and unit.survival_super_lumberjack ~= true
@@ -89,7 +91,7 @@ local function refund_cost(team, cost)
     })
 end
 
-local function configure_target(target, row, materials)
+local function target_data(row, materials, fusion_ability_name)
     local source = source_training(row)
     if not source then return { ok = false, error = "source_training_missing" } end
     local attack = 0
@@ -105,15 +107,11 @@ local function configure_target(target, row, materials)
         wood_per_hit = wood_per_hit
             + (tonumber(material.survival_base_wood_per_hit) or 0)
     end
-    if source.model_name and source.model_name ~= "" then
-        target:SetModel(source.model_name)
-        target:SetOriginalModel(source.model_name)
-    end
-    return worker_system.register_fused_lumberjack(target, {
+    return {
+        ok = true,
         level = row.level,
         team = materials[1]:GetTeamNumber(),
         player_id = materials[1].survival_player_id,
-        population = 0,
         fusion_count = #materials,
         base_attack = attack,
         wood_per_hit = wood_per_hit,
@@ -126,7 +124,10 @@ local function configure_target(target, row, materials)
             tonumber(source.war3_armor or source.armor) or 0
         ),
         ability_names = ability_names(row),
-    })
+        fusion_ability_name = fusion_ability_name,
+        model_name = source.model_name,
+        model_scale = 1.5,
+    }
 end
 
 local function fuse(payload)
@@ -135,6 +136,7 @@ local function fuse(payload)
     if not valid(caster) or not ability
         or caster.survival_worker_type ~= "lumberjack"
         or caster.survival_super_lumberjack
+        or caster.survival_lumberjack_fusion_pending
         or tonumber(caster.survival_player_id) == nil then
         return { ok = false, error = "invalid_caster" }
     end
@@ -176,33 +178,18 @@ local function fuse(payload)
         pending_by_caster[caster_key] = nil
         return spent or { ok = false, error = "fusion_resource_not_enough" }
     end
-    local target = CreateUnitByName(row.super_unit_name,
-        materials[1]:GetAbsOrigin(), true, caster, caster,
-        caster:GetTeamNumber())
-    if not target then
+    local target = caster
+    local data = target_data(row, materials, ability:GetAbilityName())
+    if not data or not data.ok then
         for _, material in ipairs(materials) do
             material.survival_lumberjack_fusion_pending = nil
         end
         refund_cost(caster:GetTeamNumber(), cost)
         pending_by_caster[caster_key] = nil
-        return { ok = false, error = "fusion_target_create_failed" }
+        return data or { ok = false, error = "fusion_target_config_failed" }
     end
-    local configured = configure_target(target, row, materials)
-    if not configured or not configured.ok then
-        target:ForceKill(false)
-        for _, material in ipairs(materials) do
-            material.survival_lumberjack_fusion_pending = nil
-        end
-        refund_cost(caster:GetTeamNumber(), cost)
-        pending_by_caster[caster_key] = nil
-        return configured or { ok = false, error = "fusion_target_config_failed" }
-    end
-    local committed = worker_system.commit_lumberjack_fusion(
-        materials, target, tonumber(source_training(row).population_cost) or 1
-    )
+    local committed = worker_system.commit_lumberjack_fusion(materials, target, data)
     if not committed or not committed.ok then
-        worker_system.rollback_fused_lumberjack(target)
-        target:ForceKill(false)
         refund_cost(caster:GetTeamNumber(), cost)
         for _, material in ipairs(materials) do
             material.survival_lumberjack_fusion_pending = nil

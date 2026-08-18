@@ -1,5 +1,12 @@
 # Decisions
 
+## 2026-08-18：所有新技能统一走 CSV 到自定义 Tooltip 的完整接入流程
+
+- 决定：新技能 Tooltip 的基础数据必须来自对应业务 CSV，禁止在 Panorama 或 Lua 中另行硬编码名称、描述、图标和基础数值。CSV 修改后必须重新生成统一 Tooltip CSV/Lua，并由 `client_data_service.lua` 投影到客户端 Tooltip NetTable。
+- 决定：每个新 Ability 必须同时审计 `ability_tooltip.js` 的自定义判定、`hud_takeover.js` 的技能行/代理绑定/首次悬停初始化/原生 Tooltip 抑制，以及需要时的 `combat_stats.js` 枚举和快捷键投影；动态挂载和被动技能不能因为缺少首次 runtime 事件而回退到 Valve Tooltip。
+- 决定：交付前必须强制编译对应 Content Panorama 源码到 Game 侧 `.vjs_c`，运行生成器、相关契约、严格 UTF-8 和 `git diff --check`；Workshop Tools 冷启动必须覆盖首次 hover、施法后刷新、动态/被动技能和快捷键映射。用户已确认本流程的 Tooltip 显示正常，后续 Tooltip 任务默认复用此流程。
+- 原因：本次 Builder 首次 hover 与伐木工融合/性格 Tooltip 问题均不是文案缺失，而是初始化时序、动态 Ability 枚举和自定义接管范围遗漏。完整链路能同时保证数据权威、首次显示、刷新稳定性和编译产物同步。
+
 ## 2026-08-18：建筑技能同步必须基于CSV状态幂等，避免批量升级重建实体
 
 - 决定：建筑升级或状态刷新时，先使用CSV生成路线行和运行时融合状态生成稳定签名；签名未变化时禁止执行`RemoveAbility()`/`AddAbility()`全量重建，只保留状态发布和必要的外观/数值更新。签名变化、首次创建和路线切换才允许执行完整技能同步。

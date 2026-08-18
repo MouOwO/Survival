@@ -5,8 +5,9 @@
 - `rogue_reward_rules.csv` 新增 Tooltip 名称、描述和图标字段；`build_tooltip_definitions.py` 从该 CSV 生成统一 Tooltip CSV/Lua，runtime 显示名称、描述和 G 快捷键字段均来自生成配置。
 - `combat_stats.js`、`hud_takeover.js`、`ability_tooltip.js` 将 Builder `slot_order=7` 统一投影为 G；Builder D/G 键盘路由先按 Ability 名称解析，不再依赖压缩后的显示序号；肉鸽奖励加入 G utility 映射。`ability_tooltip.js` 禁止项目技能回退到原生 Ability Tooltip，`hud_takeover.js` 增加仅针对当前自定义技能的有界异步原生 Tooltip 抑制。三份 content 源已强制编译到 game 产物。
 - 自动验证：Ability utility 顺序契约通过；三份 Panorama Resource Compiler 各 `1 compiled, 0 failed, 0 skipped`，目标源码严格 UTF-8 与 `git diff --check` 通过。肉鸽集成契约在既有事件名断言 `ROGUE_EVENT_MISSING_ROGUE_REWARD_OPEN_REQUEST` 处提前失败，未将其误报为通过；`test_ability_input_lifecycle_contract.ps1` 仍受既有 `building_move.js` 的无关 `BUILDER_D_CONFLICT_GUARD_MISSING` 阻断，未修改无关文件。
-- 本轮 Tooltip 修复：`ability_tooltip.js`将普通伐木工融合技能`ability_fuse_lumberjack_01..08`和超级伐木工性格被动`ability_lumberjack_personality_*`纳入自定义范围；`ability_tooltip.js`、`hud_takeover.js`、`combat_stats.js`在单位runtime计数尚未到达时使用24槽有界引擎回退，修复Builder及动态伐木工首次选中/首次悬停仍走原生Tooltip的问题。伐木工完整接管scope已纳入代理绑定。三份JS强制编译均为`OK: 1 compiled, 0 failed, 0 skipped`；高级研究所契约、严格UTF-8和`git diff --check`通过。`test_ability_input_lifecycle_contract.ps1`仍仅因既有`BUILDER_D_CONFLICT_GUARD_MISSING`失败；尚未Workshop Tools冷启动确认首帧Tooltip、伐木工被动Tooltip和施法后刷新。
-- 尚未 Workshop Tools 冷启动实机验收；需确认开局 G 标签、建墙后 G Ability 保留、鼠标点击和 G 键均弹出三选一，以及消费后 Ability 只移除一次。
+- 本轮 Tooltip 修复已由用户实机确认显示正常：`ability_tooltip.js`将普通伐木工融合技能`ability_fuse_lumberjack_01..08`和超级伐木工性格被动`ability_lumberjack_personality_*`纳入自定义范围；`ability_tooltip.js`、`hud_takeover.js`、`combat_stats.js`在单位runtime计数尚未到达时使用24槽有界引擎回退，修复Builder及动态伐木工首次选中/首次悬停仍走原生Tooltip的问题。伐木工完整接管scope已纳入代理绑定。三份JS强制编译均为`OK: 1 compiled, 0 failed, 0 skipped`；高级研究所契约、严格UTF-8和`git diff --check`通过。`test_ability_input_lifecycle_contract.ps1`仍仅因既有`BUILDER_D_CONFLICT_GUARD_MISSING`失败。
+- 后续所有新技能 Tooltip 必须复用 `PROJECT_CONTEXT.md` 与 `DECISIONS.md` 记录的 CSV→生成配置→runtime NetTable→Panorama 接管→强制编译→Workshop Tools 冷启动验收流程。
+- Builder 的 G 标签、建墙后 G Ability 保留、鼠标点击/G 键触发和消费后只移除一次仍属于独立的后续实机验收项。
 
 ## 当前任务补充（2026-08-18）：融合运行时错误与七塔批量升级卡顿定位
 
@@ -24,7 +25,9 @@
 
 - 普通伐木工LV1使用5合1，LV2-LV8使用3合1；每级普通伐木工挂载对应无目标融合Ability，只有同玩家、同队、同等级、存活且未参与其他融合的普通伐木工可作为材料。LV1/LV2要求主城LV4并消耗10000/20000木材；LV3-LV8要求主城LV5并消耗30000/40000/50000/60000/70000/80000木材及5000/8000/15000/30000/40000/50000金币。失败不改变材料、资源或人口，服务端按caster加pending锁防重复请求。
 - 配方和11项性格技能分别以`lumberjack_fusion_definitions.csv`、`lumberjack_personality_definitions.csv`为权威源。超级LV1-LV7每次从完整11项性格池等概率随机抽取1项，允许不同超级伐木工重复；超级LV8无性格技能。
-- 超级伐木工攻击力汇总每个材料当前科技后攻击力，合成注册时剥离已包含的单个科技攻击增量，之后按材料数`n`重新投影，避免科技重复计算；基础采集量同样汇总，攻击间隔按对应普通单位间隔减少0.5秒。每击成长、减甲、效率和树等级收益按材料数`n`投影；人口以材料总占用减目标占用一次性净释放。
+- 超级伐木工攻击力汇总每个材料当前科技后攻击力，合成注册时剥离已包含的单个科技攻击增量，之后按材料数`n`重新投影，避免科技重复计算；基础采集量同样汇总，攻击间隔按对应普通单位间隔减少0.5秒。每击成长、减甲、效率和树等级收益按材料数`n`投影。
+- 用户后续明确要求原地融合：点击施法的普通伐木工固定作为超级伐木工目标，保留实体、位置、朝向和`entindex`，不再创建新单位；其他材料消失，目标模型缩放为1.5倍。融合人口不返还，目标继承全部材料实际人口总和，因此LV1五合一仍占5人口、LV2-LV8三合一仍占3人口，最终死亡时再由既有工人死亡链一次性返还。
+- 原地融合自动验证通过：`LUMBERJACK_IN_PLACE_FUSION_CONTRACT_PASS`、`WORKER_SYSTEM_TRAINING_PASS`、`LUMBERJACK_MANUAL_CONTROL_PASS`、两个目标Lua的Lua 5.1语法、严格UTF-8和限定`git diff --check`。`test_lumberjack_sound.lua`仍因既有测试fixture缺少`modifier_lumberjack_ai.lua:174`所需字段而失败，本轮未修改无关音效/AI生产逻辑。仍需Workshop Tools冷启动确认点击目标原地变为1.5倍、其他材料消失、无碰撞卡位、人口融合前后不变且目标死亡后一次性返还。
 - 自动验证通过：`LUMBERJACK_FUSION_CONTRACT_PASS`、`LUMBERJACK_FUSION_RULES_LUA51_PASS`、`LUMBERJACK_FUSION_TRANSACTION_LUA51_PASS`、`LUMBERJACK_FUSION_WORKER_PROJECTION_LUA51_PASS`、目标Lua 5.1语法、严格UTF-8、定向CSV生成与限定`git diff --check`；规则/事务/生产注册投影测试覆盖主城等级、施法者等级错配、资源不足、提交失败退款、不同材料攻击快照、科技不重复计算、LV1五合一、LV2-LV8三合一和BAT减少。既有`test_repair_worker_percentage_contract.ps1`仍因修理工独立数值契约失败，本任务未修改该无关回归。尚未Workshop Tools冷启动实测融合按钮、模型/技能栏、性格实际触发、光环叠加、人口和死亡释放。
 - Tooltip已补齐：融合LV1-LV8以及11项性格技能均在`resource`、`resource/localization`、`panorama/localization`的中英文入口拥有标题和说明；性格中文名称/说明由`lumberjack_personality_definitions.csv`逐字校验。`LUMBERJACK_FUSION_CONTRACT_PASS`、目标Lua 5.1语法、严格UTF-8和限定`git diff --check`通过；未修改数值继承逻辑，仍需Workshop Tools确认实际悬停显示。
 - Tooltip中央数据链已补齐：`build_tooltip_definitions.py`现在从两份伐木工CSV生成8条融合和11条性格Ability行，`client_data_service.lua`将统一Ability Tooltip投影到`survival_ability_data`，保留既有技能配置覆盖优先级；契约增加8+11行、LV8无性格、生成CSV/Lua和重复key校验。自动验证完成后仍需Workshop Tools确认动态挂载技能的实际悬停显示。

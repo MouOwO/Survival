@@ -219,7 +219,7 @@ local function start_encounter(payload)
     FindClearSpaceForUnit(unit, origin, true)
     local profile = combat_profile or archetype
     local collision_profile = wave_monster_collision.profile(encounter, archetype)
-    monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
+    monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius*0.1)
     unit.survival_movement_type = archetype.movement_type or "ground"
     unit.survival_movement_type_override = encounter.movement_type_override
     local health = tonumber(profile.health or archetype.health)

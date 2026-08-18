@@ -788,6 +788,9 @@ function M.register_fused_lumberjack(worker, data)
     local wood_per_hit = tonumber(data.wood_per_hit) or 0
     local attack_speed = math.max(0.01, tonumber(data.attack_speed) or 0.5)
     local fusion_count = tonumber(data.fusion_count) or 1
+    if data.fusion_ability_name and worker.RemoveAbility then
+        worker:RemoveAbility(data.fusion_ability_name)
+    end
     add_ability_names(worker, data.ability_names)
     worker.survival_worker_type = "lumberjack"
     worker.survival_super_lumberjack = true
@@ -891,36 +894,42 @@ function M.register_fused_lumberjack(worker, data)
     return { ok = true, entindex = worker:entindex() }
 end
 
-function M.commit_lumberjack_fusion(materials, target, target_population)
+function M.commit_lumberjack_fusion(materials, target, data)
     if not valid_entity(target) then
         return { ok = false, error = "fusion_target_invalid" }
     end
-    local target_state = workers[target:entindex()]
-    if not target_state or not target_state.unit.survival_super_lumberjack then
-        return { ok = false, error = "fusion_target_not_registered" }
-    end
+    local target_entindex = target:entindex()
     local states = {}
-    local released_population = 0
+    local preserved_population = 0
     for _, material in ipairs(materials or {}) do
         local state = valid_entity(material) and workers[material:entindex()] or nil
+        local material_entindex = material and material.entindex and material:entindex()
         if not state or state.worker_type ~= "lumberjack"
             or material.survival_super_lumberjack then
             return { ok = false, error = "fusion_material_changed" }
         end
         states[#states + 1] = state
-        released_population = released_population + (tonumber(state.population) or 0)
+        preserved_population = preserved_population + (tonumber(state.population) or 0)
     end
-    target_state.population = math.max(0, tonumber(target_population) or 0)
-    for _, state in ipairs(states) do workers[state.unit:entindex()] = nil end
-    local net_release = math.max(0, released_population - target_state.population)
-    if net_release > 0 then
-        event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
-            team = target_state.team,
-            population = net_release,
-            reason = "lumberjack_fusion",
-        })
+    if not data then return { ok = false, error = "fusion_target_data_missing" } end
+    data.population = preserved_population
+    local registered = M.register_fused_lumberjack(target, data)
+    if not registered or not registered.ok then
+        return registered or { ok = false, error = "fusion_target_register_failed" }
     end
-    for _, state in ipairs(states) do state.unit:ForceKill(false) end
+    if data.model_name and data.model_name ~= "" then
+        target:SetModel(data.model_name)
+        target:SetOriginalModel(data.model_name)
+    end
+    if target.SetModelScale then target:SetModelScale(tonumber(data.model_scale) or 1) end
+    local target_state = workers[target_entindex]
+    for _, state in ipairs(states) do
+        if state.unit:entindex() ~= target_entindex then
+            workers[state.unit:entindex()] = nil
+            state.unit:ForceKill(false)
+        end
+    end
+    target.survival_lumberjack_fusion_pending = nil
     refresh_worker_technology(target_state.player_id)
     refresh_cheer_buffs(target_state.player_id)
     event_bus.emit(events.WORKER_CHANGED, {
@@ -932,7 +941,7 @@ function M.commit_lumberjack_fusion(materials, target, target_population)
         unit = target,
         entindex = target:entindex(),
     })
-    return { ok = true, population_released = net_release }
+    return { ok = true, population_released = 0, population_preserved = preserved_population }
 end
 
 function M.rollback_fused_lumberjack(target)

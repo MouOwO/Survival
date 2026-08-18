@@ -2,6 +2,12 @@
 
 ## 伐木工融合与性格技能边界（2026-08-18）
 
+## Tooltip 技能接入标准流程（2026-08-18）
+
+- 用户已实机确认本流程的 Tooltip 显示正常。以后任何新技能、动态挂载技能或被动技能接入 Tooltip，必须沿用以下完整链路：先在对应业务 CSV 中登记 Ability ID、名称、描述和图标等基础数据；再运行 `build_tooltip_definitions.py` 生成统一 Tooltip CSV/Lua；由 `client_data_service.lua` 投影到 `survival_ability_data`/`survival_tooltips`；在 `ability_tooltip.js` 中加入正确的自定义接管范围和单位/Ability 判定；在 `hud_takeover.js` 中确保技能面板、代理绑定、首次悬停初始化和原生 Tooltip 抑制路径覆盖该技能；必要时同步 `combat_stats.js` 的技能枚举/快捷键投影。
+- Content Panorama 源码修改后，必须使用 Resource Compiler 强制编译对应 Game 侧 `.vjs_c` 产物，确认每个目标为 `OK: 1 compiled, 0 failed, 0 skipped`；同时执行 Tooltip CSV/Lua 生成校验、严格 UTF-8、相关契约和 `git diff --check`。
+- 新技能不得只补 Valve localization 或只补 CSV 文案；必须验证“未使用任何技能前首次选中/首次悬停”“技能使用后刷新”“动态 Ability/被动 Ability”三种状态均由自定义 Tooltip 接管。最终必须进行 Workshop Tools 冷启动实机验收，确认没有原生 Tooltip 回退、显示内容正确且技能映射未改变。
+
 - 普通伐木工融合配方权威源是`lumberjack_fusion_definitions.csv`，训练阶段`max_count`与融合所需数量保持独立。LV1为5合1，LV2-LV8为3合1；LV1/LV2要求主城LV4，LV3-LV8要求主城LV5；材料必须同玩家、同队、同训练等级、存活且不是超级伐木工。
 - 融合资源费用也只来自该CSV：LV1/LV2为10000/20000木材，LV3-LV8为30000/40000/50000/60000/70000/80000木材及5000/8000/15000/30000/40000/50000金币。服务端先锁材料并通过`RESOURCE_TRY_SPEND_REQUEST`原子扣费，目标创建/注册/提交任一步失败都用`RESOURCE_ADD_REQUEST`按原额退款。
 - 超级伐木工进入`worker_system`同一注册、树攻击、科技刷新和死亡人口释放链。目标攻击力取材料各自当前`survival_attack_min`之和；注册时剥离已包含的单个科技攻击增量，再按融合数量投影未来科技，避免重复叠加。目标BAT在注册时直接应用基础间隔减0.5秒。合成先预校验并锁定材料，再扣资源、创建并配置目标，最后由工人注册表一次提交材料替换和净人口释放；失败目标必须静默回滚注册，禁止依赖异步死亡事件补事务。
