@@ -5,8 +5,9 @@ modifier_enemy_wall_ai = class({})
 _G.modifier_enemy_wall_ai = modifier_enemy_wall_ai
 local M = modifier_enemy_wall_ai
 local team_alignment = require("core/team_alignment")
-local global_rules = require("config/global_rules")
 local wall_engagement_slots = require("systems/wall_engagement_slots")
+local ARRIVAL_DISTANCE = 24
+local DEPARTURE_DISTANCE = 48
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end
@@ -68,29 +69,6 @@ local function same_position(a, b)
     return a ~= nil and b ~= nil and distance_2d(a, b) <= 1
 end
 
-local function debug_draw_hull(parent)
-    if global_rules.wall_engagement_debug_enabled <= 0
-        or type(DebugDrawCircle) ~= "function"
-    then
-        return
-    end
-    local origin = parent:GetAbsOrigin()
-    local raised = Vector(origin.x, origin.y,
-        origin.z + global_rules.wall_engagement_debug_z_offset)
-    local radius = global_rules.wave_ground_monster_hull_radius
-    if parent.GetHullRadius then
-        local ok, actual = pcall(parent.GetHullRadius, parent)
-        if ok and tonumber(actual) and tonumber(actual) > 0 then
-            radius = tonumber(actual)
-        end
-    end
-    DebugDrawCircle(raised, Vector(0, 160, 255), 220, radius, false,
-        global_rules.wall_engagement_debug_duration)
-    if type(DebugDrawLine) == "function" then
-        DebugDrawLine(origin, raised, 0, 160, 255, false,
-            global_rules.wall_engagement_debug_duration)
-    end
-end
 function M:MoveToOnce(parent, position, navigation_key)
     if self.navigation_key == navigation_key
         and same_position(self.navigation_position, position)
@@ -103,8 +81,6 @@ function M:MoveToOnce(parent, position, navigation_key)
 end
 
 function M:UpdateGroundEngagement(parent, wall)
-    debug_draw_hull(parent)
-    wall_engagement_slots.debug_draw_engagement(wall, parent)
     local previous_slot = self.engagement_slot
     self.engagement_slot = wall_engagement_slots.claim(wall, parent)
     if previous_slot ~= self.engagement_slot then
@@ -119,7 +95,6 @@ function M:UpdateGroundEngagement(parent, wall)
     else
         local queue_slot, queue_row
         position, queue_slot, queue_row = wall_engagement_slots.queue_position(wall, parent)
-        wall_engagement_slots.debug_draw_queue(wall, parent, position)
         navigation_key = "queue:" .. tostring(queue_slot) .. ":" .. tostring(queue_row)
     end
     if not position then return false end
@@ -127,13 +102,13 @@ function M:UpdateGroundEngagement(parent, wall)
     local distance = distance_2d(parent:GetAbsOrigin(), position)
     if self.engagement_slot then
         if self.engagement_arrived
-            and distance <= global_rules.wall_engagement_departure_distance
+            and distance <= DEPARTURE_DISTANCE
         then
             self.navigation_key = nil
             self.navigation_position = nil
             return false
         end
-        if distance <= global_rules.wall_engagement_arrival_distance then
+        if distance <= ARRIVAL_DISTANCE then
             self.engagement_arrived = true
             self.navigation_key = nil
             self.navigation_position = nil
@@ -143,7 +118,7 @@ function M:UpdateGroundEngagement(parent, wall)
 
     self.engagement_arrived = nil
     self:MoveToOnce(parent, position, navigation_key)
-    if not self.engagement_slot or distance > global_rules.wall_engagement_arrival_distance then
+    if not self.engagement_slot or distance > ARRIVAL_DISTANCE then
         return true
     end
     return false

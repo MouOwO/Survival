@@ -33,31 +33,8 @@ M.wave_monster_round_robin_enabled = M.number(
 )
 M.wave_ground_monster_hull_radius = M.number(
     "wave_ground_monster_hull_radius",
-    32
+    12
 )
-M.wall_engagement_slot_count = M.number("wall_engagement_slot_count", 4)
-M.wall_engagement_slot_spacing = M.number("wall_engagement_slot_spacing", 40)
-M.wall_engagement_normal_offset = M.number("wall_engagement_normal_offset", 144)
-M.wall_engagement_arrival_distance = M.number("wall_engagement_arrival_distance", 24)
-M.wall_engagement_departure_distance = M.number("wall_engagement_departure_distance", 48)
-M.wall_engagement_queue_spacing = M.number("wall_engagement_queue_spacing", 120)
-M.wall_engagement_debug_enabled = M.number("wall_engagement_debug_enabled", 0)
-M.wall_engagement_debug_z_offset = M.number("wall_engagement_debug_z_offset", 96)
-M.wall_engagement_debug_duration = M.number("wall_engagement_debug_duration", 0.6)
-M.wall_collision_barrier_count = M.number("wall_collision_barrier_count", 3)
-M.wall_collision_barrier_spacing = M.number("wall_collision_barrier_spacing", 80)
-M.wall_collision_barrier_hull_radius = M.number("wall_collision_barrier_hull_radius", 32)
-M.wall_collision_normal_offset = M.number("wall_collision_normal_offset", 288)
-M.wall_collision_offset_x = M.number("wall_collision_offset_x", 0)
-M.wall_collision_offset_y = M.number("wall_collision_offset_y", 0)
-M.wall_collision_up_offset_x = M.number("wall_collision_up_offset_x", 0)
-M.wall_collision_up_offset_y = M.number("wall_collision_up_offset_y", 0)
-M.wall_collision_down_offset_x = M.number("wall_collision_down_offset_x", 0)
-M.wall_collision_down_offset_y = M.number("wall_collision_down_offset_y", 0)
-M.wall_collision_left_offset_x = M.number("wall_collision_left_offset_x", 0)
-M.wall_collision_left_offset_y = M.number("wall_collision_left_offset_y", 0)
-M.wall_collision_right_offset_x = M.number("wall_collision_right_offset_x", 0)
-M.wall_collision_right_offset_y = M.number("wall_collision_right_offset_y", 0)
 M.repair_detection_range = M.number(
     "repair_detection_range",
     FIND_UNITS_EVERYWHERE or 99999

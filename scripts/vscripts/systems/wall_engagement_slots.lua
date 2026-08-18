@@ -1,7 +1,9 @@
-local global_rules = require("config/global_rules")
-
 local M = {}
 local states = {}
+local SLOT_COUNT = 4
+local SLOT_SPACING = 80
+local NORMAL_OFFSET = 288
+local QUEUE_SPACING = 160
 
 local function valid(entity)
     return entity ~= nil and (not entity.IsNull or not entity:IsNull())
@@ -81,7 +83,7 @@ function M.claim(wall, unit)
     local state = state_for(wall, unit)
     clean(state)
     local unit_index = entindex(unit)
-    local count = math.max(1, math.floor(global_rules.wall_engagement_slot_count))
+    local count = SLOT_COUNT
     for slot = 1, count do
         if state.slots[slot] == unit_index then return slot end
     end
@@ -92,7 +94,7 @@ function M.claim(wall, unit)
     local best_slot, best_distance = nil, nil
     for slot = 1, count do
         if state.slots[slot] == nil then
-            local offset = slot_offset(slot, count, global_rules.wall_engagement_slot_spacing)
+            local offset = slot_offset(slot, count, SLOT_SPACING)
             local point = wall_position + lateral * offset
             local delta = unit_position - point
             local distance = delta.x * delta.x + delta.y * delta.y
@@ -125,85 +127,27 @@ function M.position(wall, slot, queue_index)
     if not valid(wall) then return nil end
     local state = states[entindex(wall)]
     if not state then return nil end
-    local count = math.max(1, math.floor(global_rules.wall_engagement_slot_count))
+    local count = SLOT_COUNT
     slot = math.max(1, math.min(count, tonumber(slot) or 1))
     local lateral, normal = state.lateral, state.normal
     local lateral_offset = slot_offset(
         slot,
         count,
-        global_rules.wall_engagement_slot_spacing
+        SLOT_SPACING
     )
-    local normal_offset = global_rules.wall_engagement_normal_offset
+    local normal_offset = NORMAL_OFFSET
         + math.max(0, tonumber(queue_index) or 0)
-            * global_rules.wall_engagement_queue_spacing
+            * QUEUE_SPACING
     return wall:GetAbsOrigin()
         + lateral * lateral_offset
         + normal * normal_offset
 end
 
-local function debug_circle(center, radius, r, g, b)
-    if type(DebugDrawCircle) ~= "function" then return end
-    DebugDrawCircle(center, Vector(r, g, b), 180, radius, false, global_rules.wall_engagement_debug_duration)
-end
-
-local function debug_line(start_position, end_position, r, g, b)
-    if type(DebugDrawLine) ~= "function" then return end
-    DebugDrawLine(start_position, end_position, r, g, b, false,
-        global_rules.wall_engagement_debug_duration)
-end
-
-function M.debug_draw_engagement(wall, unit)
-    if global_rules.wall_engagement_debug_enabled <= 0
-        or type(DebugDrawCircle) ~= "function"
-        or not alive(wall)
-    then
-        return
-    end
-    local state = state_for(wall, unit or wall)
-    local count = math.max(1, math.floor(global_rules.wall_engagement_slot_count))
-    local z = global_rules.wall_engagement_debug_z_offset
-    for slot = 1, count do
-        local point = M.position(wall, slot, 0)
-        point.z = point.z + z
-        local occupied = state.slots[slot] ~= nil
-        debug_circle(point, global_rules.wave_ground_monster_hull_radius,
-            occupied and 255 or 0, occupied and 64 or 255, 0)
-    end
-    local origin = wall:GetAbsOrigin()
-    local half_depth = global_rules.wave_ground_monster_hull_radius
-    for boundary = 1, count + 1 do
-        local lateral_offset = slot_offset(
-            boundary,
-            count + 1,
-            global_rules.wall_engagement_slot_spacing
-        )
-        local center = origin
-            + state.lateral * lateral_offset
-            + state.normal * global_rules.wall_engagement_normal_offset
-        center.z = center.z + z
-        debug_line(
-            center - state.normal * half_depth,
-            center + state.normal * half_depth,
-            0, 220, 220
-        )
-    end
-end
-
-function M.debug_draw_queue(wall, unit, position)
-    if global_rules.wall_engagement_debug_enabled <= 0
-        or not position
-        or type(DebugDrawCircle) ~= "function"
-    then
-        return
-    end
-    local point = Vector(position.x, position.y, position.z + global_rules.wall_engagement_debug_z_offset)
-    debug_circle(point, global_rules.wave_ground_monster_hull_radius, 255, 180, 0)
-end
 function M.queue_position(wall, unit)
     if not alive(wall) or not alive(unit) then return nil end
     local state = state_for(wall, unit)
     clean(state)
-    local count = math.max(1, math.floor(global_rules.wall_engagement_slot_count))
+    local count = SLOT_COUNT
     local unit_index = entindex(unit)
     if not unit_index then return nil end
     if state.waiters[unit_index] == nil then
