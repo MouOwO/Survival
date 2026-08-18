@@ -48,6 +48,7 @@ local M = {
     TOWER_FUSION_ELIGIBILITY_REQUEST = "tower.fusion_eligibility.request",
     TOWER_FUSION_STATE_CHANGED = "tower.fusion_state.changed",
     WORKER_TRAIN_REQUEST = "worker.train.request",
+    LUMBERJACK_FUSION_REQUEST = "lumberjack.fusion.request",
     WORKER_LIST_REQUEST = "worker.list.request",
     WORKER_DISMISS_REQUEST = "worker.dismiss.request",
     WORKER_TRAINING_GET_REQUEST = "worker.training.get.request",
@@ -69,6 +70,7 @@ local M = {
     TREE_SPAWNED = "tree.spawned",
     TREE_HIT = "tree.hit",
     TREE_DESTROYED = "tree.destroyed",
+    TREE_DEPLETED = "tree.depleted",
     TREE_CHANGED = "tree.changed",
 
     WAVE_CHANGED = "wave.changed",

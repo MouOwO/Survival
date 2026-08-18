@@ -27,6 +27,17 @@ function M:OnCreated(params)
         params.technology_lumber_efficiency
     ) or 0
     self.player_id = tonumber(params.player_id) or -1
+    self.fusion_count = math.max(1, tonumber(params.fusion_count) or 1)
+    self.wood_multiplier_chance_pct = math.max(
+        0, tonumber(params.wood_multiplier_chance_pct) or 0
+    )
+    self.gold_per_hit_flat = math.max(0, tonumber(params.gold_per_hit_flat) or 0)
+    self.tree_damage_chance_pct = math.max(
+        0, tonumber(params.tree_damage_chance_pct) or 0
+    )
+    self.personality_attack_growth_per_hit = math.max(
+        0, tonumber(params.personality_attack_growth_per_hit) or 0
+    )
     self.technology_crit_chance = math.max(
         0, tonumber(params.technology_crit_chance) or 0
     )
@@ -63,6 +74,13 @@ end
 
 function M:SetTreeLumberEfficiency(buff)
     self.tree_lumber_efficiency_buff = math.max(0, tonumber(buff) or 0)
+    self.lumber_efficiency = self.base_lumber_efficiency
+        + self.tree_lumber_efficiency_buff
+        + self.technology_lumber_efficiency
+end
+
+function M:SetBaseLumberEfficiency(value)
+    self.base_lumber_efficiency = math.max(0, tonumber(value) or 0)
     self.lumber_efficiency = self.base_lumber_efficiency
         + self.tree_lumber_efficiency_buff
         + self.technology_lumber_efficiency
@@ -153,6 +171,19 @@ function M:OnAttackLanded(keys)
     if target:entindex() ~= self.tree_entindex then return end
     self.manual_control = false
     self.manual_idle_since = nil
+    if self.tree_damage_chance_pct > 0
+        and RandomFloat(0, 100) < self.tree_damage_chance_pct then
+        local health = target:GetHealth()
+        local amount = math.max(1, math.floor(target:GetMaxHealth() * 0.01))
+        if health > 1 then target:SetHealth(math.max(1, health - amount)) end
+    end
+    if target:GetHealth() <= 1 then
+        event_bus.emit(events.TREE_DEPLETED, {
+            attacker = parent,
+            target = target,
+            player_id = self.player_id,
+        })
+    end
     sound_service.play("worker_lumberjack_tree_impact", {
         unit = target,
         source = target,
@@ -174,6 +205,10 @@ function M:OnAttackLanded(keys)
         base_lumber_efficiency = self.base_lumber_efficiency
             + self.technology_lumber_efficiency,
         critical_chance_pct = self.technology_crit_chance or 0,
+        fusion_count = self.fusion_count,
+        wood_multiplier_chance_pct = self.wood_multiplier_chance_pct,
+        gold_per_hit_flat = self.gold_per_hit_flat,
+        personality_attack_growth_per_hit = self.personality_attack_growth_per_hit,
         source = "lumberjack",
     })
 end

@@ -530,6 +530,14 @@ function M.precache(context)
         "building_hero_altar",
         "npc_survival_upgrade_material",
         "npc_survival_lumberjack",
+        "npc_survival_super_lumberjack_01",
+        "npc_survival_super_lumberjack_02",
+        "npc_survival_super_lumberjack_03",
+        "npc_survival_super_lumberjack_04",
+        "npc_survival_super_lumberjack_05",
+        "npc_survival_super_lumberjack_06",
+        "npc_survival_super_lumberjack_07",
+        "npc_survival_super_lumberjack_08",
         "npc_survival_repairer",
         "enemy_tree",
         "npc_survival_wave_monster",
@@ -786,6 +794,7 @@ local function initialize_services()
     building_upgrade_system.init()
     tree_system.init()
     worker_system.init()
+    require("systems/lumberjack_fusion_service").init()
     hero_skill_system.init()
     hero_skill_pool_service.init()
     hero_skill_choice_service.init()

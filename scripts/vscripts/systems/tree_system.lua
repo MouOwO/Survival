@@ -161,16 +161,22 @@ local function on_tree_hit(payload)
         or payload.base_lumber_efficiency
     local efficiency = math.max(0, math.floor(
         (tonumber(base_efficiency) or 0) + lumber_efficiency_buff(tree_level)
+            * math.max(1, tonumber(payload.fusion_count) or 1)
     ))
     local critical = payload.critical == true
         or payload.source == "lumberjack"
         and RandomFloat(0, 100)
             < math.max(0, tonumber(payload.critical_chance_pct) or 0)
     if critical then efficiency = efficiency * 2 end
+    if tonumber(payload.wood_multiplier_chance_pct)
+        and RandomFloat(0, 100) < tonumber(payload.wood_multiplier_chance_pct) then
+        efficiency = efficiency * 10
+    end
     if efficiency <= 0 then return end
     local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
         team = payload.team,
         wood = efficiency,
+        gold = tonumber(payload.gold_per_hit_flat) or 0,
         reason = payload.source == "hero"
             and "hero_tree_hit" or "lumberjack_hit",
     })

@@ -4,6 +4,8 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-18，伐木工点击融合完成自动验证）：普通LV1五合一、LV2-LV8三合一生成对应超级伐木工；独立CSV管理8级配方和11项性格，LV1-LV7每次从11项性格池等概率随机抽取1项且允许重复，LV8无技能。服务端同玩家/同队/同级预校验、施法者等级匹配、pending锁、目标先建后原子提交、净人口释放及失败无副作用已接入；规则/事务/生产注册投影Lua 5.1、契约、语法、CSV生成一致、UTF-8和限定diff通过。下一步Workshop Tools冷启动逐级验收，未经实机确认不得记录完成。
+
 - 当前插入任务（2026-08-17，肉鸽奖励 UI、通用效果运行时与指定三卡调试入口完成自动验证）：四张权威 CSV 已覆盖 31 张卡、31 个效果、38 个强类型参数和 21 条生命周期规则；服务端 offer/token/队列、Panorama 独立 overlay、Boss 全有效玩家发放及 `rogue <card_id1> <card_id2> <card_id3>`正式运行时调试链已接入。当前只启用 `fiscal_subsidy`、`radiant_sapling`、`fortifications`，尚未 Workshop Tools 冷启动或双客户端验收。后续开发先读 `ROGUE_REWARD_INTEGRATION.md`，实机基线命令为 `rogue fiscal_subsidy radiant_sapling fortifications`。
 - 当前插入任务（2026-08-15，Builder动态管理域与全链路安全枚举完成自动验证）：Builder服务端仅枚举`0..GetAbilityCount()-1`，保留index 0等非管理Ability，并以动态起点连续维护六个CSV业务槽与尾随Blink；快捷键仍由`builder_slot_order`投影`Q/W/E/R/T/A`和名称映射`D`。四份Panorama实体Ability访问统一消费runtime `ability_count`，固定24/64仅保留为HUD节点枚举。专项行为/契约、研究与Grid回归、Lua 5.1语法、CSV生成一致、双仓限定检查和四份JS强制编译通过；下一步冷启动短测高级研究所和农场并确认无`invalid index`或布局重建失败。
 - 当前插入任务（2026-08-15，Ability runtime重建与安全枚举完成自动验证）：已恢复`upgrade_level(..., display)`及默认空表；服务端通过`survival_ability_runtime`的`unit:<entindex>`发布真实`GetAbilityCount()`并在销毁时清理，两份Panorama仅按该元数据访问实体Ability，不再固定探测无效索引。高级研究所十槽HUD几何外推保持不变。专项Lua 5.1、契约、研究回归、语法、UTF-8、限定diff和两份JS强制编译均通过；下一步冷启动Workshop Tools确认runtime重建、主城Tooltip及控制台无`8..17`索引告警。

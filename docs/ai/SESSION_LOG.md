@@ -1,4 +1,16 @@
 - 2026-08-18：完成已验收城墙碰撞/接敌实现的收敛清理。删除地面怪Hull、接敌槽、排队点和边界的全部`DebugDrawCircle`/`DebugDrawLine`绘制；移除CSV、生成Lua和运行时配置中的全部`wall_engagement_*`/`wall_collision_*`规则，将四槽接敌、80间距、288法向、160排队、24/48阈值，以及3x10空气墙、188基础法向、38/10间距、Hull 8和既有方位修正固化为对应模块私有常量。怪物Hull等通用规则继续保留。专项测试增加禁止加载`global_rules`及固定几何断言；Lua 5.1行为与语法、残留引用搜索和`git diff --check`通过，仍需Workshop Tools冷启动确认彩色图形消失且隐藏空气墙、排队和补位行为不变。
+## 2026-08-18 - 普通伐木工点击融合超级伐木工
+
+- 本轮按用户调整后的范围审计并补齐 Tooltip：融合LV1-LV8原有配方说明已确认完整；新增11项性格技能的中英文标题/说明到`resource`、`resource/localization`和`panorama/localization`六个标准入口，中文内容逐字消费`lumberjack_personality_definitions.csv`。
+- 扩展`test_lumberjack_fusion_contract.ps1`按性格CSV校验全部22个Tooltip token，并保持融合8级token检查；契约、目标Lua 5.1语法、严格UTF-8和限定`git diff --check`通过。未修改融合数值继承或运行时逻辑；仍需Workshop Tools实机确认悬停显示。
+- 用户确认LV1五合一、LV2-LV8三合一；超级单位攻击汇总材料攻击，攻击间隔减少0.5秒，科技攻击成长、减甲和采集效率按材料数`n`继承；LV8无技能。
+- 新增独立融合与性格CSV、生成Lua、8个融合Ability、8个超级单位和服务端融合事务。材料扫描只消费`WORKER_LIST_REQUEST`注册表并按玩家/队伍/等级过滤；目标先以0人口暂存，提交成功后一次性净释放人口，失败静默回滚目标注册。
+- 用户补全11项性格并确认每次LV1-LV7合成从11项完整池等概率随机抽取1项，允许重复；LV8无性格。采集成长、树最大生命1%扣减、采集加成、伐木工攻速/攻击、树耗尽后最多3次捡漏和英雄/箭塔攻速光环进入既有工人、树、资源与Modifier链。
+- 自动验证通过：融合契约、规则Lua 5.1、事务Lua 5.1、15个目标Lua语法、KV括号、严格UTF-8、定向生成和限定diff检查。尚未Workshop Tools实机验证，不记录为用户验收或制作完成。
+- 本轮补齐融合资源与主城门槛：LV1/LV2为主城LV4及10000/20000木材，LV3-LV8为主城LV5及30000-80000木材、5000-50000金币。目标创建前先原子扣费，创建、注册或提交失败按原额退款；材料当前科技攻击快照求和后剥离单个科技增量，目标BAT直接减少0.5秒。
+- 新增/更新事务测试覆盖不同材料攻击力、城市等级拒绝、资源不足无副作用和提交失败退款；`LUMBERJACK_FUSION_CONTRACT_PASS`、`LUMBERJACK_FUSION_RULES_LUA51_PASS`、`LUMBERJACK_FUSION_TRANSACTION_LUA51_PASS`、Lua 5.1语法、严格UTF-8和限定diff检查通过。仍未进行Workshop Tools实机验证。
+- 中断恢复后补齐服务端施法者等级与配方等级匹配校验，并移除融合服务未使用的科技管理器引用；新增真实`worker_system.register_fused_lumberjack()`生产投影测试，验证材料当前攻击总和保持不变、后续科技按五合/三合数量增长且BAT减免持续保留。融合契约、规则/事务/生产投影Lua 5.1、目标语法、CSV生成逐字节一致、严格UTF-8和限定diff均通过；修理工独立契约仍有既有数值失败，未越界修改。仍未进行Workshop Tools实机验证。
+
 - 2026-08-17：修复`construction_order`实机无法领取。根因是效果注册表存在两个同名handler，后置旧实现覆盖额度实现并尝试创建已删除道具，导致领取事务失败。现删除旧handler，并为专项测试增加“handler只能注册一次”的回归断言；专项Lua 5.1测试、目标语法与建筑批量升级契约通过，Workshop Tools仍需复验领取和下一次升级消费。
 - 2026-08-17：修复`feast`升级覆盖问题。`feast`现在在领取时按当时实际城墙最大生命记录一次固定生命增量；后续等级和科技重算使用“正常生命+固定增量”，不再按每级倍率翻倍，也不会重复叠加。新增`FEAST_WALL_HEALTH_PROJECTION_LUA51_PASS`覆盖等级、科技、重复重算和玩家隔离；五卡专项、肉鸽回归、建筑升级契约、Lua 5.1语法和`git diff --check`通过，Workshop Tools残血升级仍待实机验收。
 - 2026-08-17：修复`weakening_orb`开局无法领取。根因是旧handler只检查紧邻下一波，而N1第1至第4波均为纯普通波，导致`next_wave_special_target_missing`并触发奖励失败保护。现改为从下一波向后搜索首个特殊正式波，同波优先`assault_boss`否则`wave_leader`；无后续特殊波时领取成功并立即完成为空效果。新增真实生成波次查询测试和运行时空完成契约测试，相关回归通过。

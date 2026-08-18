@@ -264,6 +264,160 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_fuse_lumberjack_01"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_fuse_lumberjack"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+    }
+    "ability_fuse_lumberjack_02"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_fuse_lumberjack"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+    }
+    "ability_fuse_lumberjack_03"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_fuse_lumberjack"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+    }
+    "ability_fuse_lumberjack_04"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_fuse_lumberjack"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+    }
+    "ability_fuse_lumberjack_05"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_fuse_lumberjack"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+    }
+    "ability_fuse_lumberjack_06"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_fuse_lumberjack"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+    }
+    "ability_fuse_lumberjack_07"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_fuse_lumberjack"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+    }
+    "ability_fuse_lumberjack_08"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_fuse_lumberjack"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "furion_force_of_nature"
+        "MaxLevel" "1"
+    }
+
+    "ability_lumberjack_personality_self_pua"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "sven_gods_strength"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_leader"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "wisp_overcharge"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_study"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "keeper_of_the_light_illuminate"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_heavy_hand"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "tiny_toss"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_cheer"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "drow_ranger_marksmanship"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_high_pressure"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "axe_berserkers_call"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_efficiency"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "alchemist_chemical_rage"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_chosen"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "bounty_hunter_jinada"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_workaholic"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "juggernaut_omnislash"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_discoverer"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "alchemist_goblins_greed"
+        "MaxLevel" "1"
+    }
+    "ability_lumberjack_personality_scavenger"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/ability_lumberjack_personality"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+        "AbilityTextureName" "riki_tricks_of_the_trade"
+        "MaxLevel" "1"
+    }
+
     "ability_train_repairer"
     {
         "BaseClass"          "ability_lua"

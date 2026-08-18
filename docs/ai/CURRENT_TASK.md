@@ -1,3 +1,11 @@
+## 当前插入任务（2026-08-18）：普通伐木工点击合成超级伐木工
+
+- 普通伐木工LV1使用5合1，LV2-LV8使用3合1；每级普通伐木工挂载对应无目标融合Ability，只有同玩家、同队、同等级、存活且未参与其他融合的普通伐木工可作为材料。LV1/LV2要求主城LV4并消耗10000/20000木材；LV3-LV8要求主城LV5并消耗30000/40000/50000/60000/70000/80000木材及5000/8000/15000/30000/40000/50000金币。失败不改变材料、资源或人口，服务端按caster加pending锁防重复请求。
+- 配方和11项性格技能分别以`lumberjack_fusion_definitions.csv`、`lumberjack_personality_definitions.csv`为权威源。超级LV1-LV7每次从完整11项性格池等概率随机抽取1项，允许不同超级伐木工重复；超级LV8无性格技能。
+- 超级伐木工攻击力汇总每个材料当前科技后攻击力，合成注册时剥离已包含的单个科技攻击增量，之后按材料数`n`重新投影，避免科技重复计算；基础采集量同样汇总，攻击间隔按对应普通单位间隔减少0.5秒。每击成长、减甲、效率和树等级收益按材料数`n`投影；人口以材料总占用减目标占用一次性净释放。
+- 自动验证通过：`LUMBERJACK_FUSION_CONTRACT_PASS`、`LUMBERJACK_FUSION_RULES_LUA51_PASS`、`LUMBERJACK_FUSION_TRANSACTION_LUA51_PASS`、`LUMBERJACK_FUSION_WORKER_PROJECTION_LUA51_PASS`、目标Lua 5.1语法、严格UTF-8、定向CSV生成与限定`git diff --check`；规则/事务/生产注册投影测试覆盖主城等级、施法者等级错配、资源不足、提交失败退款、不同材料攻击快照、科技不重复计算、LV1五合一、LV2-LV8三合一和BAT减少。既有`test_repair_worker_percentage_contract.ps1`仍因修理工独立数值契约失败，本任务未修改该无关回归。尚未Workshop Tools冷启动实测融合按钮、模型/技能栏、性格实际触发、光环叠加、人口和死亡释放。
+- Tooltip已补齐：融合LV1-LV8以及11项性格技能均在`resource`、`resource/localization`、`panorama/localization`的中英文入口拥有标题和说明；性格中文名称/说明由`lumberjack_personality_definitions.csv`逐字校验。`LUMBERJACK_FUSION_CONTRACT_PASS`、目标Lua 5.1语法、严格UTF-8和限定`git diff --check`通过；未修改数值继承逻辑，仍需Workshop Tools确认实际悬停显示。
+
 ## 当前插入任务（2026-08-17）：修复建造密令无法领取
 
 - 实机发现点击`construction_order`后奖励界面不关闭。根因是`rogue_effect_registry.lua`中`grant_building_upgrade_action`被重复注册，后置旧handler覆盖了已实现的额度handler，并尝试创建已经删除的`item_survival_rogue_construction_order`，导致效果事务失败。

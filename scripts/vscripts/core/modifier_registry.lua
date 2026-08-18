@@ -37,6 +37,14 @@ local modifiers = {
         path = "modifiers/modifier_lumberjack_ai",
     },
     {
+        name = "modifier_lumberjack_personality",
+        path = "modifiers/modifier_lumberjack_personality",
+    },
+    {
+        name = "modifier_lumberjack_cheer",
+        path = "modifiers/modifier_lumberjack_cheer",
+    },
+    {
         name = "modifier_tree_progression",
         path = "modifiers/modifier_tree_progression",
     },
