@@ -33,7 +33,7 @@ M.wave_monster_round_robin_enabled = M.number(
 )
 M.wave_ground_monster_hull_radius = M.number(
     "wave_ground_monster_hull_radius",
-    12
+    30
 )
 M.repair_detection_range = M.number(
     "repair_detection_range",
