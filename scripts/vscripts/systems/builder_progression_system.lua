@@ -96,10 +96,19 @@ end
 local function rogue_consumed(state)
     return event_bus.request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, {
         player_id = state.player_id,
+        reward_type = "builder_start",
     }) == true
 end
 
+local function free_hero_altar(state)
+    return require("systems/rogue_effect_state_service").numeric(
+        state.player_id, "builder_free_hero_altar") > 0
+end
+
 local function can_activate(state, row)
+    if row.building_id == "hero_altar" and free_hero_altar(state) then
+        return count(state, "hero_altar") < 1 and not state.hero_summoned
+    end
     if row.building_id == "building_research_lab"
         and count(state, "building_research_lab") >= 1 then
         return false
@@ -139,6 +148,9 @@ local function should_show(state, row)
         return false
     end
     if count_limit_reached(state, row) then return false end
+    if row.building_id == "hero_altar" and free_hero_altar(state) then
+        return true
+    end
     local prerequisite = tostring(row.requires_building_id or "")
     return prerequisite == "" or count(state, prerequisite) > 0
 end
@@ -244,6 +256,21 @@ local function desired_layout(state, stage_rows, domain_start)
     local result = {}
     local target_by_index = {}
     domain_start = math.max(0, tonumber(domain_start) or 0)
+    if free_hero_altar(state) and count(state, "hero_altar") < 1 then
+        for _, row in ipairs(stages.rows or {}) do
+            if row.enabled ~= false and row.building_id == "hero_altar" then
+                local found = false
+                for _, existing in ipairs(stage_rows) do
+                    if existing.ability_name == row.ability_name then found = true break end
+                end
+                if not found then
+                    managed_abilities[row.ability_name] = true
+                    table.insert(stage_rows, row)
+                end
+                break
+            end
+        end
+    end
     for _, row in ipairs(stage_rows) do
         if row.ability_name ~= BUILDER_ROGUE_ABILITY then
         if should_show(state, row) then

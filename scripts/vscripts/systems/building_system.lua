@@ -23,6 +23,7 @@ local construction_visual = require(
     "systems/building_construction_visual_service"
 )
 local action_cooldown_rollback = require("core/action_cooldown_rollback")
+local rogue_effect_state = require("systems/rogue_effect_state_service")
 local player_tower_limits = require("systems/player_tower_limit_service")
 local building_defeat_rules = require("systems/building_defeat_rules")
 local M = {}
@@ -587,7 +588,10 @@ local function can_place(payload)
         return { ok = false, error = "请先建造研究所" }
     end
     if definition.unlock_city_level
-        and main_city_level(team) < definition.unlock_city_level then
+        and main_city_level(team) < definition.unlock_city_level
+        and not (definition.id == "hero_altar"
+            and rogue_effect_state.numeric(builder.player_id,
+                "builder_free_hero_altar") > 0) then
         return {
             ok = false,
             error = "主城达到Lv." .. tostring(definition.unlock_city_level) .. "后解锁",
@@ -623,10 +627,14 @@ local function start_building(payload)
         return check
     end
     local cost = check.definition.build_cost
+    local free_hero_altar = check.definition.id == "hero_altar"
+        and rogue_effect_state.numeric(check.player_id,
+            "builder_free_hero_altar") > 0
+    local charged_cost = free_hero_altar and { wood = 0, gold = 0 } or cost
     local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         team = check.team,
-        wood = cost.wood,
-        gold = cost.gold,
+        wood = charged_cost.wood,
+        gold = charged_cost.gold,
         population = check.definition.population_cost or 0,
         reason = "build:" .. check.definition.id,
     })
@@ -645,8 +653,8 @@ local function start_building(payload)
     if not unit then
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
             team = check.team,
-            wood = cost.wood,
-            gold = cost.gold,
+            wood = charged_cost.wood,
+            gold = charged_cost.gold,
             reason = "build_refund:" .. check.definition.id,
         })
         event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
@@ -692,7 +700,8 @@ local function start_building(payload)
         constructing = true,
         cleaned = false,
         build_task = payload.build_task,
-        build_cost = cost,
+        build_cost = charged_cost,
+        free_hero_altar = free_hero_altar,
     }
     unit.survival_grid_x = state.grid_x
     unit.survival_grid_y = state.grid_y
@@ -790,6 +799,11 @@ local function start_building(payload)
         end
         state.build_cost = nil
         state.build_task = nil
+        if state.free_hero_altar then
+            rogue_effect_state.consume_numeric(
+                state.player_id, "builder_free_hero_altar", 1)
+            state.free_hero_altar = nil
+        end
         -- Keep ability entity indexes stable for runtime tooltip data. Activate
         -- once now and once after the construction modifier state has replicated.
         scheduler.after(0.1, function()

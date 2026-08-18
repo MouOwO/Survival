@@ -8,6 +8,13 @@
 - 用户补充确认“啦啦队”也必须影响伐木工。目标范围现为所属玩家英雄、箭塔以及工人注册表中全部`worker_type=lumberjack`的普通/超级伐木工（包含啦啦队自身）；修理工保持排除，同队其他玩家单位仍由`player_id`隔离。
 - 2026-08-18修复早建箭塔漏享“啦啦队”：原刷新仅依赖`FindUnitsInRadius(DOTA_UNIT_TARGET_ALL, FLAG_NONE)`，建筑实体可能未进入该扫描结果，且后续无状态变化时不会补投射。现保留英雄/伐木工扫描，并额外通过建筑系统权威`BUILDING_LIST_REQUEST`按玩家枚举已完成箭塔、解析实体并去重应用同一CSV驱动Modifier；不扩大到其他建筑。
 
+## 当前任务（2026-08-19）：暂时关闭 Builder 开局三选一自动弹窗
+
+- 用户确认 Builder/Boss 双池和 21 张 Builder 卡目前表现无异常；该结论记录为当前阶段实机反馈，但不扩大解释为所有卡牌边界均已逐项验收。
+- Builder 已有专门的肉鸽奖励入口 `ability_survival_rogue_reward`，因此 `rogue_reward_service.lua` 暂时注释 `BUILDER_READY` 自动创建 `builder_start` offer 的订阅。Builder 创建完成时不再写入活动奖励 NetTable，也不会自动显示三选一 UI。
+- 专门入口仍通过 `ROGUE_REWARD_OPEN_REQUEST`、`source="builder"` 创建并显示 Builder offer；Boss 奖励、双池隔离、可见 offer 门控、队列提升、领取、重抽和效果运行时保持原逻辑。
+- 自动订阅代码完整保留为逐行注释，并说明恢复方法；后续需要重新启用开局自动弹出时，取消该代码块注释即可，预留的 `builder_ready` 标记继续负责一次性触发和失败重试。
+
 ## 本次任务（2026-08-18）：Builder 开局肉鸽奖励固定 G 键并修复刷新/输入/Tooltip
 
 - `builder_ability_stages.csv` 将 `ability_survival_rogue_reward` 从 W 业务槽改为独立 `slot_order=7`；Builder 的六个建筑槽和 Blink 仍由原有布局管理，肉鸽 Ability 在布局完成后单独追加，因此建墙阶段刷新不会删除或复制未消费奖励。

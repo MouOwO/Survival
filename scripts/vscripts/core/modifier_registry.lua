@@ -186,6 +186,10 @@ local modifiers = {
         path = "modifiers/modifier_rogue_reward_effects",
     },
     {
+        name = "modifier_rogue_sharp_volley_growth",
+        path = "modifiers/modifier_rogue_reward_effects",
+    },
+    {
         name = "modifier_rogue_lumberjack_attack_speed",
         path = "modifiers/modifier_rogue_reward_effects",
     },

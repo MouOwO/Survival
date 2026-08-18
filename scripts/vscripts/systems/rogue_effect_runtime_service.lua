@@ -7,6 +7,7 @@ local effect_registry = require("systems/rogue_effect_registry")
 local event_registry = require("systems/rogue_event_registry")
 local predicate_registry = require("systems/rogue_predicate_registry")
 local effect_state = require("systems/rogue_effect_state_service")
+local builder_effects = require("systems/rogue_builder_start_effect_service")
 
 local M = {}
 local effects_by_card = {}
@@ -137,6 +138,7 @@ local function create_instance(grant, effect)
         effect_instance_id = "effect:" .. tostring(next_effect_instance_id),
         player_id = grant.player_id,
         card_id = grant.card_id,
+        reward_type = grant.reward_type,
         effect = effect,
         params = params_by_effect[effect.effect_id] or {},
         status = "pending",
@@ -232,7 +234,7 @@ function M.unbind(instance_or_id, target_key)
     return false
 end
 
-function M.grant(player_id, card_id, grant_id)
+function M.grant(player_id, card_id, grant_id, reward_type)
     player_id = tonumber(player_id)
     card_id = tostring(card_id or "")
     if player_id == nil or player_id < 0 or not PlayerResource:GetPlayer(player_id) then
@@ -265,6 +267,7 @@ function M.grant(player_id, card_id, grant_id)
 
     local grant = {
         grant_id = grant_id, player_id = player_id, card_id = card_id,
+        reward_type = tostring(reward_type or "boss"),
         effect_instance_ids = {}, status = "applying",
     }
     for _, effect in ipairs(selected) do
@@ -312,6 +315,7 @@ function M.init()
     next_grant_id, next_effect_instance_id = 0, 0
     next_phase_instance_id, next_target_binding_id = 0, 0
     effect_state.reset()
+    builder_effects.init()
     rebuild_config()
     local subscribed = {}
     for _, rules in pairs(rules_by_effect) do

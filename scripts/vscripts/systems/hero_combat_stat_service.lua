@@ -214,6 +214,12 @@ local function recalculate(player_id, reason)
         tonumber(hero_technology.armor_reduction_per_attack) or 0
     local researcher_critical_chance_pct =
         tonumber(hero_technology.critical_chance_pct) or 0
+    local researcher_attack_speed_pct =
+        tonumber(hero_technology.attack_speed_bonus_pct) or 0
+    local researcher_attack_interval_flat =
+        tonumber(hero_technology.attack_interval_flat) or 0
+    local researcher_all_attributes =
+        tonumber(hero_technology.all_attributes_flat) or 0
     local monkey_w = state.hero_id == "hero_monkey_king"
         and has_skill(player_id, "skill_monkey_king_fury")
     local monkey_e = state.hero_id == "hero_monkey_king"
@@ -266,14 +272,17 @@ local function recalculate(player_id, reason)
         + engine_weapon_attack_bonus
     local unscaled_strength = state.base.strength + weapon_strength
         + progression_attributes
+        + researcher_all_attributes
         + equipment_stats.all_attributes_flat
         + (tonumber(monkey_bonus.strength) or 0)
     local unscaled_agility = state.base.agility + weapon_agility
         + progression_attributes
+        + researcher_all_attributes
         + equipment_stats.all_attributes_flat
         + (tonumber(monkey_bonus.agility) or 0)
     local unscaled_intellect = state.base.intellect + weapon_intellect
         + progression_attributes
+        + researcher_all_attributes
         + equipment_stats.all_attributes_flat
         + (tonumber(monkey_bonus.intellect) or 0)
     local strength_bonus = unscaled_strength * essence_attributes_pct / 100
@@ -284,6 +293,7 @@ local function recalculate(player_id, reason)
             state.definition,
             state.engine_base_attack_time
         ) - (tonumber(essence.attack_interval_flat) or 0)
+            - researcher_attack_interval_flat
             - (monkey_w
                 and (tonumber(monkey_config.w_attack_interval_reduction) or 0)
                 or 0))
@@ -354,7 +364,7 @@ local function recalculate(player_id, reason)
         -- 攻速百分比直接投影，避免读取引擎当前帧临时攻击间隔。
         attack_speed = hero_combat_stat_math.attacks_per_second(
             base_attack_time,
-            equipment_stats.attack_speed_pct
+            equipment_stats.attack_speed_pct + researcher_attack_speed_pct
         ),
         attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100),
         strength = unscaled_strength + strength_bonus,
@@ -396,6 +406,8 @@ local function recalculate(player_id, reason)
     state.snapshot = next_snapshot
     state.exclusive_attack_multiplier = exclusive_attack_multiplier
     apply_base_projection(state)
+    safe_call(state.unit, "SetBaseAttackTime", base_attack_time
+        / math.max(0.01, 1 + researcher_attack_speed_pct / 100))
     state.unit.survival_seven_sins_final_damage_pct =
         tonumber(essence.final_damage_pct) or 0
     local research_modifier = state.unit:FindModifierByName(

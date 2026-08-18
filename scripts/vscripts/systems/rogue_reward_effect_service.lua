@@ -3,10 +3,11 @@ local runtime = require("systems/rogue_effect_runtime_service")
 local M = {}
 local next_compat_grant = 0
 
-function M.apply(player_id, card_id)
+function M.apply(player_id, card_id, reward_type)
     next_compat_grant = next_compat_grant + 1
     return runtime.grant(player_id, card_id,
-        "compat:" .. tostring(player_id) .. ":" .. tostring(next_compat_grant))
+        "compat:" .. tostring(player_id) .. ":" .. tostring(next_compat_grant),
+        reward_type)
 end
 
 function M.init()

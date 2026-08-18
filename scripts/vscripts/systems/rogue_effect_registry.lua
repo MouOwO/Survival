@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local effect_state = require("systems/rogue_effect_state_service")
+local builder_effects = require("systems/rogue_builder_start_effect_service")
 
 local M = {}
 local handlers = {}
@@ -301,6 +302,7 @@ handlers.grant_random_cards = {
             player_id = instance.player_id,
             parent_card_id = instance.card_id,
             parent_grant_id = instance.grant_id,
+            reward_type = instance.reward_type,
             count = tonumber(instance.params.count) or 3,
         })
         return result and result.ok == true, result and result.error
@@ -467,7 +469,8 @@ handlers.training_capacity_flat = {
 handlers.next_hero_reroll_count = {
     apply = function(instance)
         return effect_state.add_numeric(instance.player_id,
-            "next_rogue_reroll_count", tonumber(instance.params.count) or 1)
+            "next_rogue_reroll_count:" .. tostring(instance.reward_type or "boss"),
+            tonumber(instance.params.count) or 1)
     end,
 }
 
@@ -622,6 +625,15 @@ handlers.training_dummy_attack_gain = {
             wall_entindex = wall:entindex(),
         })
         return true
+    end,
+}
+
+handlers.builder_start_effect = {
+    apply = function(instance)
+        return builder_effects.apply(instance)
+    end,
+    remove = function(instance, reason)
+        builder_effects.remove(instance, reason)
     end,
 }
 

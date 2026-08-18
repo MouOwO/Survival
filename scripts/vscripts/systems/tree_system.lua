@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/tree_config")
 local particle_manager = require("core/particle_manager")
+local rogue_effect_state = require("systems/rogue_effect_state_service")
 
 local M = {}
 local current_tree = nil
@@ -11,6 +12,29 @@ local reserved_grid = nil
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
+end
+
+local function wall_is_under_attack(player_id)
+    local response = event_bus.request(events.BUILDING_LIST_REQUEST, {
+        player_id = player_id,
+    }) or {}
+    local wall = nil
+    for _, building in ipairs(response.buildings or response) do
+        if building.building_id == "wall" and valid_entity(building.unit) then
+            wall = building.unit
+            break
+        end
+    end
+    if not wall or not Entities or not Entities.FindAllByClassname then return false end
+    for _, unit in ipairs(Entities:FindAllByClassname("npc_dota_creature") or {}) do
+        if valid_entity(unit) and unit:IsAlive()
+            and (unit.survival_is_wave_monster == true
+                or unit.survival_is_challenge_monster == true)
+            and unit.GetAttackTarget and unit:GetAttackTarget() == wall then
+            return true
+        end
+    end
+    return false
 end
 
 local function level_row(level)
@@ -159,10 +183,30 @@ local function on_tree_hit(payload)
     local base_efficiency = payload.source == "hero"
         and config.hero_base_lumber_efficiency
         or payload.base_lumber_efficiency
+    local hero_wood_bonus_pct = 0
+    if payload.source == "hero" then
+        hero_wood_bonus_pct = rogue_effect_state.numeric(payload.player_id,
+            "builder_hero_wood_bonus_pct")
+    elseif payload.source == "lumberjack" then
+        local peaceful = rogue_effect_state.numeric(payload.player_id,
+            "builder_peaceful_wood_per_hit")
+        if peaceful > 0 and not wall_is_under_attack(payload.player_id) then
+            base_efficiency = (tonumber(base_efficiency) or 0)
+                + peaceful
+        end
+        if payload.attacker and payload.attacker.survival_super_lumberjack then
+            payload.critical_chance_pct = (tonumber(payload.critical_chance_pct) or 0)
+                + rogue_effect_state.numeric(payload.player_id,
+                    "builder_super_lumberjack_crit_pct")
+        end
+    end
     local efficiency = math.max(0, math.floor(
         (tonumber(base_efficiency) or 0) + lumber_efficiency_buff(tree_level)
             * math.max(1, tonumber(payload.fusion_count) or 1)
     ))
+    if hero_wood_bonus_pct > 0 then
+        efficiency = math.floor(efficiency * (1 + hero_wood_bonus_pct / 100))
+    end
     local critical = payload.critical == true
         or payload.source == "lumberjack"
         and RandomFloat(0, 100)

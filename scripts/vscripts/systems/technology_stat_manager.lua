@@ -48,7 +48,11 @@ local function fresh_values()
             attack_bonus_pct = 0,
             critical_chance_pct = 0,
             armor_reduction_per_attack = 0,
+            attack_speed_bonus_pct = 0,
+            attack_interval_flat = 0,
+            all_attributes_flat = 0,
         },
+        gold_mine = { income_bonus_pct = 0 },
     }
 end
 
@@ -325,7 +329,16 @@ local CHALLENGE_EFFECT_FIELDS = {
 }
 
 local ROGUE_EFFECT_FIELDS = {
+    wall_armor_flat = { "wall", "technology_armor_bonus", 1 / 3 },
     tower_attack_speed_bonus_pct = { "tower", "attack_speed_bonus_pct", 1 },
+    tower_attack_flat = { "tower", "attack_flat", 1 },
+    tower_attack_range_flat = { "tower", "attack_range_bonus", 1 },
+    lumberjack_attack_speed_pct = { "lumberjack", "attack_speed_bonus_pct", 1 },
+    lumberjack_wood_per_hit = { "lumberjack", "wood_per_hit_bonus", 1 },
+    hero_attack_speed_pct = { "hero", "attack_speed_bonus_pct", 1 },
+    hero_attack_interval_flat = { "hero", "attack_interval_flat", 1 },
+    hero_all_attributes_flat = { "hero", "all_attributes_flat", 1 },
+    gold_mine_income_pct = { "gold_mine", "income_bonus_pct", 1 },
 }
 
 local function add_rogue_effects(payload)

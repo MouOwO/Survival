@@ -185,6 +185,11 @@ local function filter(_, keys)
     if anti_air_rules.has_damage_taken_aura(victim) then
         multiplier = multiplier * 1.2
     end
+    if attacker.IsRealHero and attacker:IsRealHero()
+        and tostring(victim.survival_encounter_id or ""):match("^encounter_rebirth_") then
+        multiplier = multiplier * (1 + rogue_effect_state.numeric(
+            attacker.survival_player_id, "builder_rebirth_boss_damage_pct") / 100)
+    end
     keys.damage = math.max(0, keys.damage * multiplier)
     local post_multiplier_damage = keys.damage
     local damage_type = tonumber(keys.damagetype_const or keys.damagetype)
@@ -229,6 +234,17 @@ local function filter(_, keys)
         keys.damage = math.max(0, keys.damage * armor_multiplier)
     end
     if victim.survival_building_id == "wall" then
+        local wall_player_id = tonumber(victim.survival_player_id)
+        local reduction = rogue_effect_state.numeric(wall_player_id,
+            "builder_wall_damage_reduction_pct")
+        local threshold = rogue_effect_state.numeric(wall_player_id,
+            "builder_wall_low_health_threshold_pct")
+        if threshold > 0 and victim:GetHealth() / math.max(1, victim:GetMaxHealth())
+            <= threshold / 100 then
+            reduction = reduction + rogue_effect_state.numeric(wall_player_id,
+                "builder_wall_low_health_reduction_pct")
+        end
+        keys.damage = keys.damage * math.max(0, 1 - reduction / 100)
         local cap_pct = rogue_effect_state.wall_damage_cap(victim)
         if cap_pct and cap_pct > 0 then
             keys.damage = math.min(

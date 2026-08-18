@@ -222,6 +222,8 @@ local function start_encounter(payload)
     monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius*0.1)
     unit.survival_movement_type = archetype.movement_type or "ground"
     unit.survival_movement_type_override = encounter.movement_type_override
+    unit.survival_encounter_id = encounter_id
+    unit.survival_is_boss = encounter.encounter_type == "rebirth_boss"
     local health = tonumber(profile.health or archetype.health)
     if health and health > 0 then
         unit:SetBaseMaxHealth(health)

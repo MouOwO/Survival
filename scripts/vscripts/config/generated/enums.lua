@@ -66,6 +66,7 @@ M.rows = {
     { enum_name = "rogue_effect_type", enum_value = "grant_random_cards", sort_order = 32, enabled = true },
     { enum_name = "rogue_effect_type", enum_value = "wall_health_multiplier", sort_order = 33, enabled = true },
     { enum_name = "rogue_effect_type", enum_value = "owned_target_attacker_armor_reduction", sort_order = 34, enabled = true },
+    { enum_name = "rogue_effect_type", enum_value = "builder_start_effect", sort_order = 35, enabled = true },
     { enum_name = "rogue_execution_mode", enum_value = "instant_transaction", sort_order = 1, enabled = true },
     { enum_name = "rogue_execution_mode", enum_value = "continuous_projection", sort_order = 2, enabled = true },
     { enum_name = "rogue_execution_mode", enum_value = "timed_state", sort_order = 3, enabled = true },

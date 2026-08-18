@@ -24,6 +24,14 @@ function M.add_numeric(player_id, effect_type, value)
     return true
 end
 
+function M.set_numeric(player_id, effect_type, value)
+    player_id = tonumber(player_id)
+    if player_id == nil then return false end
+    numeric_effects_by_player[player_id] = numeric_effects_by_player[player_id] or {}
+    numeric_effects_by_player[player_id][tostring(effect_type)] = tonumber(value) or 0
+    return true
+end
+
 function M.numeric(player_id, effect_type)
     local values = numeric_effects_by_player[tonumber(player_id)] or {}
     return tonumber(values[tostring(effect_type)]) or 0

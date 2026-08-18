@@ -84,6 +84,23 @@ function modifier_rogue_tower_growth:GetModifierBaseDamageOutgoing_Percentage()
     return (self.value or 10) * self:GetStackCount()
 end
 
+modifier_rogue_sharp_volley_growth = class({})
+function modifier_rogue_sharp_volley_growth:IsHidden() return false end
+function modifier_rogue_sharp_volley_growth:IsPurgable() return false end
+function modifier_rogue_sharp_volley_growth:RemoveOnDeath() return true end
+function modifier_rogue_sharp_volley_growth:OnCreated(params)
+    self:SetStackCount(math.max(0, tonumber(params and params.value) or 0))
+end
+function modifier_rogue_sharp_volley_growth:AddGrowth(value)
+    self:SetStackCount(self:GetStackCount() + math.max(0, tonumber(value) or 0))
+end
+function modifier_rogue_sharp_volley_growth:DeclareFunctions()
+    return { MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE }
+end
+function modifier_rogue_sharp_volley_growth:GetModifierPreAttack_BonusDamage()
+    return self:GetStackCount()
+end
+
 modifier_rogue_lumberjack_attack_speed = class({})
 function modifier_rogue_lumberjack_attack_speed:IsHidden() return false end
 function modifier_rogue_lumberjack_attack_speed:IsPurgable() return false end
@@ -141,5 +158,6 @@ return {
     base_tower_attack = modifier_rogue_base_tower_attack,
     weakening_attack = modifier_rogue_weakening_attack,
     tower_growth = modifier_rogue_tower_growth,
+    sharp_volley_growth = modifier_rogue_sharp_volley_growth,
     lumberjack_attack_speed = modifier_rogue_lumberjack_attack_speed,
 }

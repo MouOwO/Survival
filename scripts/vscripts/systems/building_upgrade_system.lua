@@ -646,6 +646,15 @@ local function upgrade_city(state)
             next_level,
             "city_level_population"
         )
+        if rogue_effect_state.has_effect(state.player_id,
+            "builder_main_city_wood_refund") then
+            event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                team = state.team,
+                wood = tonumber(cost and cost.wood) or 0,
+                gold = 0,
+                reason = "rogue_reward:infrastructure_maniac_start",
+            })
+        end
         publish(state, "city_upgraded")
         refresh_team_farms(state.team)
         play_upgrade_sound(state)
