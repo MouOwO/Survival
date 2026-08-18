@@ -6,6 +6,7 @@ local hero_skill_definitions = require("config/generated/hero_skill_definitions"
 local hero_passive_definitions = require("config/hero_passive_skill_definitions")
 local hero_skill_tooltip = require("ui/hero_skill_tooltip_view_model")
 local research_events = require("research/research_event_names")
+local builder_ability_stages = require("config/generated/builder_ability_stages")
 
 local M = {}
 
@@ -15,6 +16,13 @@ local tower_trace_by_ability = {}
 local hero_runtime_trace_by_unit = {}
 local hero_skill_by_ability = {}
 local research_transaction_by_team = {}
+local builder_slot_order_by_ability = {}
+
+for _, row in ipairs(builder_ability_stages.rows or {}) do
+    if row.enabled ~= false and row.ability_name then
+        builder_slot_order_by_ability[row.ability_name] = tonumber(row.slot_order) or 0
+    end
+end
 
 for _, definition in ipairs(hero_skill_definitions.rows or {}) do
     if definition.ability_name and definition.ability_name ~= "" then
@@ -321,6 +329,10 @@ local function publish(state)
         runtime.ability_name = ability_name
         runtime.owner_entindex = unit_key
         runtime.ability_entindex = ability:entindex()
+        if state.building_id == "builder" then
+            runtime.builder_slot_order = builder_slot_order_by_ability[ability_name]
+                or 0
+        end
         runtime.resource_version =
             resource_state and resource_state.version or 0
         sync_research_ability_active(ability, runtime)

@@ -6,6 +6,8 @@ local training = require("config/generated/training_definitions")
 local M = {}
 local BUILDER_BLINK_ABILITY = "ability_survival_builder_blink"
 local BUILDER_SLOT_COUNT = 6
+local BUILDER_ROGUE_ABILITY = "ability_survival_rogue_reward"
+local BUILDER_ROGUE_SLOT_ORDER = 7
 
 local state_by_team = {}
 local managed_abilities = {}
@@ -22,6 +24,10 @@ local function is_managed_ability(name)
             name,
             "^ability_survival_builder_slot_[1-6]_placeholder$"
         ) ~= nil
+end
+
+local function is_layout_ability(name)
+    return is_managed_ability(name) and name ~= BUILDER_ROGUE_ABILITY
 end
 
 local function valid_entity(entity)
@@ -78,6 +84,21 @@ local function rows_for(stage_id)
     return rows
 end
 
+local function rogue_row()
+    for _, row in ipairs(stages.rows or {}) do
+        if row.enabled ~= false and row.ability_name == BUILDER_ROGUE_ABILITY then
+            return row
+        end
+    end
+    return nil
+end
+
+local function rogue_consumed(state)
+    return event_bus.request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, {
+        player_id = state.player_id,
+    }) == true
+end
+
 local function can_activate(state, row)
     if row.building_id == "building_research_lab"
         and count(state, "building_research_lab") >= 1 then
@@ -114,10 +135,7 @@ local function should_show(state, row)
     if state.fusion_completed and row.building_id == "arrow_tower" then
         return false
     end
-    if row.ability_name == "ability_survival_rogue_reward"
-        and event_bus.request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, {
-            player_id = state.player_id,
-        }) == true then
+    if row.ability_name == BUILDER_ROGUE_ABILITY and rogue_consumed(state) then
         return false
     end
     if count_limit_reached(state, row) then return false end
@@ -227,6 +245,7 @@ local function desired_layout(state, stage_rows, domain_start)
     local target_by_index = {}
     domain_start = math.max(0, tonumber(domain_start) or 0)
     for _, row in ipairs(stage_rows) do
+        if row.ability_name ~= BUILDER_ROGUE_ABILITY then
         if should_show(state, row) then
             local relative_index = math.max(
                 0,
@@ -238,6 +257,7 @@ local function desired_layout(state, stage_rows, domain_start)
                 row = row,
             }
             target_by_index[relative_index] = target
+        end
         end
     end
     for relative_index = 0, BUILDER_SLOT_COUNT - 1 do
@@ -257,6 +277,24 @@ local function desired_layout(state, stage_rows, domain_start)
     return result
 end
 
+local function ensure_rogue_ability(state, builder)
+    local row = rogue_row()
+    if not row or rogue_consumed(state) then
+        if builder:FindAbilityByName(BUILDER_ROGUE_ABILITY) then
+            builder:RemoveAbility(BUILDER_ROGUE_ABILITY)
+        end
+        return
+    end
+    if tonumber(row.slot_order) ~= BUILDER_ROGUE_SLOT_ORDER then return end
+    local ability = builder:FindAbilityByName(BUILDER_ROGUE_ABILITY)
+    if not ability then ability = builder:AddAbility(BUILDER_ROGUE_ABILITY) end
+    if ability then
+        ability:SetLevel(1)
+        ability:SetHidden(false)
+        ability:SetActivated(true)
+    end
+end
+
 local function layout_is_valid(builder, desired, entries)
     entries = entries or enumerate_abilities(builder)
     local expected_by_index = {}
@@ -271,7 +309,7 @@ local function layout_is_valid(builder, desired, entries)
     local managed_count = 0
     for _, entry in ipairs(entries) do
         actual_by_index[entry.index] = entry.name
-        if is_managed_ability(entry.name) then
+        if is_layout_ability(entry.name) then
             managed_count = managed_count + 1
             if expected_by_index[entry.index] ~= entry.name then return false end
         end
@@ -290,7 +328,7 @@ local function capture_cooldowns(builder, entries)
     local result = {}
     entries = entries or enumerate_abilities(builder)
     for _, entry in ipairs(entries) do
-        if is_managed_ability(entry.name) then
+        if is_layout_ability(entry.name) then
             local remaining = 0
             if entry.ability.GetCooldownTimeRemaining then
                 remaining = math.max(
@@ -308,7 +346,7 @@ local function remove_managed_instances(builder, entries)
     local counts = {}
     entries = entries or enumerate_abilities(builder)
     for _, entry in ipairs(entries) do
-        if is_managed_ability(entry.name) then
+        if is_layout_ability(entry.name) then
             counts[entry.name] = (counts[entry.name] or 0) + 1
         end
     end
@@ -368,6 +406,10 @@ end
 local function configure_layout(state, stage_rows)
     local builder = state.builder
     if not valid_entity(builder) then return end
+    if rogue_consumed(state)
+        and builder:FindAbilityByName(BUILDER_ROGUE_ABILITY) then
+        builder:RemoveAbility(BUILDER_ROGUE_ABILITY)
+    end
     local entries, reported_count = enumerate_abilities(builder)
     local domain_start = management_domain_start(entries, reported_count)
     local desired = desired_layout(state, stage_rows, domain_start)
@@ -399,6 +441,7 @@ local function configure_layout(state, stage_rows)
             configure_ability(state, target, ability)
         end
     end
+    ensure_rogue_ability(state, builder)
 end
 
 local function public_counts(state)

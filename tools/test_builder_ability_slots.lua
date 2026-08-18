@@ -115,6 +115,13 @@ local function count_named(name)
 end
 
 event_bus.reset()
+local rogue_consumed = false
+event_bus.handle_request(events.BUILDING_LIST_REQUEST, function()
+    return { buildings = {} }
+end)
+event_bus.handle_request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, function()
+    return rogue_consumed
+end)
 local progression = require("systems/builder_progression_system")
 progression.init()
 local unmanaged = builder:InjectAbility("ability_unmanaged_builder_intrinsic", 0, 0)
@@ -125,6 +132,7 @@ event_bus.emit(events.BUILDER_READY, {
 })
 
 local initial_wall = builder:FindAbilityByName("ability_build_wall")
+local initial_rogue = builder:FindAbilityByName("ability_survival_rogue_reward")
 local initial_blink = builder:FindAbilityByName("ability_survival_builder_blink")
 assert(initial_wall and initial_wall.level == 1
         and initial_wall.hidden == false and initial_wall.active == true,
@@ -132,8 +140,12 @@ assert(initial_wall and initial_wall.level == 1
 assert(initial_blink and initial_blink.level == 1
         and initial_blink.hidden == false and initial_blink.active == true,
     "blink must stay enabled in the natural tail slot")
+assert(initial_rogue and initial_rogue.level == 1
+        and initial_rogue.hidden == false and initial_rogue.active == true,
+    "the one-shot rogue reward must be visible and active at game start")
 assert(ability_at(0, "ability_unmanaged_builder_intrinsic") == unmanaged,
     "the non-managed prefix ability must be preserved")
+ability_at(8, "ability_survival_rogue_reward")
 for index = 2, 6 do
     local placeholder = ability_at(
         index,
@@ -152,6 +164,7 @@ event_bus.emit(events.BUILDING_CHANGED, {
     level = 0,
 })
 ability_at(1, "ability_build_wall")
+ability_at(8, "ability_survival_rogue_reward")
 ability_at(7, "ability_survival_builder_blink")
 
 event_bus.emit(events.BUILDING_CREATED, {
@@ -159,8 +172,32 @@ event_bus.emit(events.BUILDING_CREATED, {
     building_id = "wall",
     level = 1,
 })
+assert(ability_at(8, "ability_survival_rogue_reward") == initial_rogue,
+    "wall stage refresh must preserve the unconsumed G reward instance")
 assert(builder:FindAbilityByName("ability_build_wall") == nil,
     "wall ability must be removed after stage change")
+ability_at(1, "ability_build_main_city")
+ability_at(7, "ability_survival_builder_blink")
+
+rogue_consumed = true
+event_bus.emit(events.ROGUE_REWARD_CHANGED, {
+    player_id = 0,
+    reason = "builder_consumed",
+})
+assert(builder:FindAbilityByName("ability_survival_rogue_reward") == nil,
+    "consumed rogue reward ability must be removed permanently")
+local consumed_placeholder = ability_at(2, "ability_survival_builder_slot_2_placeholder")
+assert(consumed_placeholder.hidden == true and consumed_placeholder.active == false,
+    "the independent G reward must not replace the W-slot placeholder")
+event_bus.emit(events.BUILDING_CHANGED, {
+    team = 2,
+    building_id = "main_city",
+    level = 0,
+})
+assert(builder:FindAbilityByName("ability_survival_rogue_reward") == nil,
+    "later builder synchronization must not restore the consumed reward")
+ability_at(2, "ability_survival_builder_slot_2_placeholder")
+
 ability_at(1, "ability_build_main_city")
 ability_at(7, "ability_survival_builder_blink")
 

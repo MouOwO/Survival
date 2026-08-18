@@ -929,13 +929,20 @@ local function register_ability_cast_request()
             and not is_point_target then
             handled_directly = true
             direct_result_required = true
-            if not ability:IsActivated() or ability:IsHidden() then
+            print("[SURVIVAL_CAST][SERVER] ROGUE_REWARD_BEGIN player="
+                .. tostring(player_id) .. " unit=" .. tostring(entindex)
+                .. " ability=" .. tostring(ability_entindex))
+            if not ability:IsActivated() or ability:IsHidden()
+                or unit:FindAbilityByName(ability_name) ~= ability then
                 direct_result = { ok = false, error = "rogue_reward_unavailable" }
             else
                 direct_result = event_bus.request(events.ROGUE_REWARD_OPEN_REQUEST, {
                     player_id = player_id, source = "builder",
                 }) or { ok = false, error = "rogue_reward_unhandled" }
             end
+            print("[SURVIVAL_CAST][SERVER] ROGUE_REWARD_END ok="
+                .. tostring(direct_result and direct_result.ok == true)
+                .. " error=" .. tostring(direct_result and direct_result.error or ""))
         elseif challenge_auto_matches and owner_matches and not passive
             and not is_point_target then
             handled_directly = true

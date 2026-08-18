@@ -11,11 +11,24 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local M = {}
 local builder_slot_order_by_ability = {}
+local tooltip_definitions = require("config/generated/tooltip_definitions")
 for _, row in ipairs(builder_ability_stages.rows or {}) do
     if row.enabled ~= false and row.ability_name then
         builder_slot_order_by_ability[row.ability_name] =
             tonumber(row.slot_order) or 0
     end
+end
+local function rogue_reward_runtime()
+    local row = (tooltip_definitions.by_id or {})["ability:ability_survival_rogue_reward"] or {}
+    return {
+        available = 1,
+        can_afford = 1,
+        builder_slot_order = builder_slot_order_by_ability["ability_survival_rogue_reward"] or 7,
+        display_name = row.name or "肉鸽奖励",
+        upgrade_description = row.desc or "打开肉鸽三选一奖励。",
+        status_text = "可打开三选一奖励",
+        fields = {{ label = "快捷键", value = "G" }},
+    }
 end
 local function cost_data(cost)
     return {
@@ -247,6 +260,9 @@ local function population_training(state, resources)
     return completed and result or with_affordability(result, cost, 0, resources)
 end
 local function build_ability(ability_name, state, resources)
+    if ability_name == "ability_survival_rogue_reward" then
+        return rogue_reward_runtime()
+    end
     local definitions = {
         ability_build_wall = buildings.wall,
         ability_build_main_city = buildings.main_city,

@@ -1,3 +1,12 @@
+## 本次任务（2026-08-18）：Builder 开局肉鸽奖励固定 G 键并修复刷新/输入/Tooltip
+
+- `builder_ability_stages.csv` 将 `ability_survival_rogue_reward` 从 W 业务槽改为独立 `slot_order=7`；Builder 的六个建筑槽和 Blink 仍由原有布局管理，肉鸽 Ability 在布局完成后单独追加，因此建墙阶段刷新不会删除或复制未消费奖励。
+- 奖励消费状态仍由 `rogue_reward_service` 权威维护；`builder_progression_system` 是唯一 Ability 移除者。成功打开后发布 `ROGUE_REWARD_CHANGED`，同步立即移除肉鸽 Ability，后续阶段刷新不会恢复。
+- `rogue_reward_rules.csv` 新增 Tooltip 名称、描述和图标字段；`build_tooltip_definitions.py` 从该 CSV 生成统一 Tooltip CSV/Lua，runtime 显示名称、描述和 G 快捷键字段均来自生成配置。
+- `combat_stats.js`、`hud_takeover.js`、`ability_tooltip.js` 将 Builder `slot_order=7` 统一投影为 G；点击和键盘均进入 `ui_ability_cast_request`/肉鸽奖励请求链，不再走原生 Ability 执行回退。三份 content 源已强制编译到 game 产物。
+- 自动验证通过：Builder Ability 槽位 Lua 5.1 行为、肉鸽奖励服务行为、肉鸽集成契约、Ability utility 顺序契约、目标 Lua 5.1 语法、Tooltip/Builder 定向生成、三份 Panorama Resource Compiler（各 `1 compiled, 0 failed, 0 skipped`）及 `git diff --check`。`test_ability_input_lifecycle_contract.ps1` 仍受既有 `building_move.js` 的无关 `BUILDER_D_CONFLICT_GUARD_MISSING` 阻断，未修改无关文件。
+- 尚未 Workshop Tools 冷启动实机验收；需确认开局 G 标签、建墙后 G Ability 保留、鼠标点击和 G 键均弹出三选一，以及消费后 Ability 只移除一次。
+
 ## 当前任务补充（2026-08-18）：融合运行时错误与七塔批量升级卡顿定位
 
 - 已获用户批准进入执行模式。本轮先实施低风险诊断与幂等同步：`building_upgrade_system.lua`增加源码指纹，确认Workshop Tools实际加载版本；`tower_ability_sync.lua`以CSV生成路线行的`record_id/active_skill_ids/skill_ids/融合状态`生成签名，同一实体配置未变化时跳过Remove/AddAbility重建，并记录同步开始、跳过、结束及耗时。
@@ -55,6 +64,7 @@
 - 建造者开局第2业务槽新增一次性技能。服务端成功创建或排队奖励后记录已消费，立即触发Builder权威布局同步并永久替换为隐藏占位；动态creature技能通过UI路由直达同一服务端请求，Lua`OnSpellStart`保留为原生施放入口。
 - 效果首版完成：金币和当前木材百分比走既有资源事务；防御塔攻速进入`technology_stat_manager`独立rogue永久层并沿既有`TECHNOLOGY_STATS_CHANGED`刷新所有塔。Panorama为独立overlay，整卡点击领取，使用Dota Ability图标、窄高牌面、悬停抬升缩放、翻牌和错峰入场，不含第三方代码或素材。
 - 自动验证通过：`ROGUE_REWARD_SERVICE_LUA51_PASS`覆盖三卡去重、一次重抽、旧token、防重复领取、未领取可再出现、队列提升和3种效果；目标Lua 5.1语法、97模块配置`--check-only`、31卡/3启用契约、严格UTF-8和限定`git diff --check`通过。新JS、CSS、XML及manifest加载链均为`1 compiled, 0 failed, 0 skipped`。
+- 2026-08-18接入修复：`core/events.lua`补齐六个肉鸽请求/变更事件常量，避免服务、Builder同步、主动技能与Boss派发使用空事件名；`ability_runtime_service.lua`从生成的Builder阶段配置按技能名发布`builder_slot_order`，开局肉鸽技能固定投影为W槽。Builder行为测试新增开局W显示、消费后真实技能移除、隐藏占位和后续同步不恢复覆盖；专项契约同时锁定奖励服务初始化、主动技能统一请求、正式波次Boss向活动玩家派发及CSV槽位来源。
 - 验证边界：尚未Workshop Tools冷启动实测开局技能槽、Boss击杀触发、连续奖励排队、三卡点击、重抽动画、资源到账与塔攻速实际刷新；自动测试和Resource Compiler结果不等于引擎实机验收。
 
 # 当前任务（2026-08-16）：挑战怪失败判定与零碰撞体

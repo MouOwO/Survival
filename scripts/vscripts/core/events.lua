@@ -138,6 +138,13 @@ local M = {
     HERO_SKILL_POOL_DRAW_REQUEST = "hero.skill.pool.draw.request",
     HERO_SKILL_CHOICE_CREATE_REQUEST = "hero.skill.choice.create.request",
     HERO_SKILL_CHOICE_GET_REQUEST = "hero.skill.choice.get.request",
+
+    ROGUE_REWARD_OPEN_REQUEST = "rogue.reward.open.request",
+    ROGUE_REWARD_SELECT_REQUEST = "rogue.reward.select.request",
+    ROGUE_REWARD_REROLL_REQUEST = "rogue.reward.reroll.request",
+    ROGUE_REWARD_GRANT_RANDOM_REQUEST = "rogue.reward.grant_random.request",
+    ROGUE_REWARD_CONSUMED_GET_REQUEST = "rogue.reward.consumed.get.request",
+    ROGUE_REWARD_CHANGED = "rogue.reward.changed",
     HERO_SKILL_CHOICE_SELECT_REQUEST = "hero.skill.choice.select.request",
     HERO_SKILL_CHOICE_CHANGED = "hero.skill.choice.changed",
 
@@ -217,6 +224,13 @@ local M = {
     PERMANENT_REWARD_EFFECTS_GET_REQUEST = "permanent_reward.effects.get.request",
     PERMANENT_REWARD_EFFECTS_CHANGED = "permanent_reward.effects.changed",
     FISHING_REWARD_GRANTED = "fishing.reward.granted",
+
+    ROGUE_REWARD_OPEN_REQUEST = "rogue.reward.open.request",
+    ROGUE_REWARD_SELECT_REQUEST = "rogue.reward.select.request",
+    ROGUE_REWARD_REROLL_REQUEST = "rogue.reward.reroll.request",
+    ROGUE_REWARD_GRANT_RANDOM_REQUEST = "rogue.reward.grant_random.request",
+    ROGUE_REWARD_CONSUMED_GET_REQUEST = "rogue.reward.consumed.get.request",
+    ROGUE_REWARD_CHANGED = "rogue.reward.changed",
 }
 
 return M

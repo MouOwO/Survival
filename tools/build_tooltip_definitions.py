@@ -50,6 +50,7 @@ def main():
         clean(row.get("tooltip_id")): row
         for row in read_csv(OUT_CSV)
         if clean(row.get("tooltip_id")).startswith("ability:ability_build_")
+        or clean(row.get("tooltip_id")) == "ability:ability_survival_rogue_reward"
     }
     hero = read_csv(CSV_ROOT / "英雄系统" / "hero_skill_definitions.csv")
     for row in hero:
@@ -166,6 +167,27 @@ def main():
             existing.get("name"),
             level_one.get("wood_cost"), level_one.get("gold_cost"),
             existing.get("desc"), existing.get("icon"), row.get("building_id"),
+        )
+
+    rogue_rules = read_csv(CSV_ROOT / "肉鸽奖励系统" / "rogue_reward_rules.csv")
+    rogue_reward = next(
+        (row for row in rogue_rules
+         if clean(row.get("rule_id")) == "default_rogue_reward"
+         and clean(row.get("enabled", "1")).lower() not in {"0", "false", "no"}),
+        None,
+    )
+    if rogue_reward:
+        add(
+            out,
+            "ability:ability_survival_rogue_reward",
+            "ability",
+            "ability_survival_rogue_reward",
+            rogue_reward.get("tooltip_name"),
+            "0",
+            "0",
+            rogue_reward.get("tooltip_desc"),
+            rogue_reward.get("tooltip_icon"),
+            "builder_rogue_reward",
         )
 
     catalog = read_csv(CSV_ROOT / "物品系统" / "content_catalog.csv")

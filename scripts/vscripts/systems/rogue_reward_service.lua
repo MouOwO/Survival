@@ -184,7 +184,10 @@ local function open(payload)
     elseif not create_offer(player_id, source) then
         return { ok = false, error = "pool_exhausted" }
     end
-    if source == "builder" then state.consumed_builder = true end
+    if source == "builder" then
+        state.consumed_builder = true
+        publish(player_id, "builder_consumed")
+    end
     return { ok = true, queued = queued }
 end
 

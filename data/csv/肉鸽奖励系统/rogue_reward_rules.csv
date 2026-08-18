@@ -1,4 +1,4 @@
-rule_id,choice_count,free_reroll_count,exclude_claimed,unique_within_offer,enabled,notes
-#中文名:规则ID,候选数量,免费重抽次数,排除已领取卡,同次选项不重复,是否启用,备注
-#types:string,number,number,boolean,boolean,boolean,string
-default_rogue_reward,3,1,1,1,1,正式Boss与开局技能共用；未选择和被重抽的卡不会永久排除。
+rule_id,choice_count,free_reroll_count,exclude_claimed,unique_within_offer,enabled,tooltip_name,tooltip_desc,tooltip_icon,notes
+#中文名:规则ID,候选数量,免费重抽次数,排除已领取卡,同次选项不重复,是否启用,提示名称,提示描述,提示图标,备注
+#types:string,number,number,boolean,boolean,boolean,string,string,string,string
+default_rogue_reward,3,1,1,1,1,肉鸽奖励,打开肉鸽三选一奖励。建造者开局固定显示在G键槽位，成功打开后移除。,item_tome_of_knowledge,正式Boss与开局技能共用；未选择和被重抽的卡不会永久排除。
