@@ -56,7 +56,6 @@ local function distance_2d(a, b)
 end
 
 local function move_to(parent, position)
-    parent:SetForceAttackTarget(nil)
     ExecuteOrderFromTable({
         UnitIndex = parent:entindex(),
         OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
@@ -69,6 +68,29 @@ local function same_position(a, b)
     return a ~= nil and b ~= nil and distance_2d(a, b) <= 1
 end
 
+local function debug_draw_hull(parent)
+    if global_rules.wall_engagement_debug_enabled <= 0
+        or type(DebugDrawCircle) ~= "function"
+    then
+        return
+    end
+    local origin = parent:GetAbsOrigin()
+    local raised = Vector(origin.x, origin.y,
+        origin.z + global_rules.wall_engagement_debug_z_offset)
+    local radius = global_rules.wave_ground_monster_hull_radius
+    if parent.GetHullRadius then
+        local ok, actual = pcall(parent.GetHullRadius, parent)
+        if ok and tonumber(actual) and tonumber(actual) > 0 then
+            radius = tonumber(actual)
+        end
+    end
+    DebugDrawCircle(raised, Vector(0, 160, 255), 220, radius, false,
+        global_rules.wall_engagement_debug_duration)
+    if type(DebugDrawLine) == "function" then
+        DebugDrawLine(origin, raised, 0, 160, 255, false,
+            global_rules.wall_engagement_debug_duration)
+    end
+end
 function M:MoveToOnce(parent, position, navigation_key)
     if self.navigation_key == navigation_key
         and same_position(self.navigation_position, position)
@@ -81,6 +103,8 @@ function M:MoveToOnce(parent, position, navigation_key)
 end
 
 function M:UpdateGroundEngagement(parent, wall)
+    debug_draw_hull(parent)
+    wall_engagement_slots.debug_draw_engagement(wall, parent)
     local previous_slot = self.engagement_slot
     self.engagement_slot = wall_engagement_slots.claim(wall, parent)
     if previous_slot ~= self.engagement_slot then
@@ -95,6 +119,7 @@ function M:UpdateGroundEngagement(parent, wall)
     else
         local queue_slot, queue_row
         position, queue_slot, queue_row = wall_engagement_slots.queue_position(wall, parent)
+        wall_engagement_slots.debug_draw_queue(wall, parent, position)
         navigation_key = "queue:" .. tostring(queue_slot) .. ":" .. tostring(queue_row)
     end
     if not position then return false end
@@ -146,7 +171,21 @@ function M:OnIntervalThink()
     end
     if not team_alignment.are_enemies(parent, wall) then return end
 
-    if is_ground(parent) and self:UpdateGroundEngagement(parent, wall) then return end
+    if is_ground(parent) then
+        -- Engagement positions only control movement. The wall remains the
+        -- unit's sole target even while it waits behind the front row.
+        parent:SetForceAttackTarget(wall)
+        self:UpdateGroundEngagement(parent, wall)
+        if parent:GetAttackTarget() ~= wall then
+            ExecuteOrderFromTable({
+                UnitIndex = parent:entindex(),
+                OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+                TargetIndex = wall:entindex(),
+                Queue = false,
+            })
+        end
+        return
+    end
 
     parent:SetForceAttackTarget(wall)
     if parent:GetAttackTarget() ~= wall then

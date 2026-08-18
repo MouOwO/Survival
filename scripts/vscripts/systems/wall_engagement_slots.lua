@@ -141,6 +141,64 @@ function M.position(wall, slot, queue_index)
         + normal * normal_offset
 end
 
+local function debug_circle(center, radius, r, g, b)
+    if type(DebugDrawCircle) ~= "function" then return end
+    DebugDrawCircle(center, Vector(r, g, b), 180, radius, false, global_rules.wall_engagement_debug_duration)
+end
+
+local function debug_line(start_position, end_position, r, g, b)
+    if type(DebugDrawLine) ~= "function" then return end
+    DebugDrawLine(start_position, end_position, r, g, b, false,
+        global_rules.wall_engagement_debug_duration)
+end
+
+function M.debug_draw_engagement(wall, unit)
+    if global_rules.wall_engagement_debug_enabled <= 0
+        or type(DebugDrawCircle) ~= "function"
+        or not alive(wall)
+    then
+        return
+    end
+    local state = state_for(wall, unit or wall)
+    local count = math.max(1, math.floor(global_rules.wall_engagement_slot_count))
+    local z = global_rules.wall_engagement_debug_z_offset
+    for slot = 1, count do
+        local point = M.position(wall, slot, 0)
+        point.z = point.z + z
+        local occupied = state.slots[slot] ~= nil
+        debug_circle(point, global_rules.wave_ground_monster_hull_radius,
+            occupied and 255 or 0, occupied and 64 or 255, 0)
+    end
+    local origin = wall:GetAbsOrigin()
+    local half_depth = global_rules.wave_ground_monster_hull_radius
+    for boundary = 1, count + 1 do
+        local lateral_offset = slot_offset(
+            boundary,
+            count + 1,
+            global_rules.wall_engagement_slot_spacing
+        )
+        local center = origin
+            + state.lateral * lateral_offset
+            + state.normal * global_rules.wall_engagement_normal_offset
+        center.z = center.z + z
+        debug_line(
+            center - state.normal * half_depth,
+            center + state.normal * half_depth,
+            0, 220, 220
+        )
+    end
+end
+
+function M.debug_draw_queue(wall, unit, position)
+    if global_rules.wall_engagement_debug_enabled <= 0
+        or not position
+        or type(DebugDrawCircle) ~= "function"
+    then
+        return
+    end
+    local point = Vector(position.x, position.y, position.z + global_rules.wall_engagement_debug_z_offset)
+    debug_circle(point, global_rules.wave_ground_monster_hull_radius, 255, 180, 0)
+end
 function M.queue_position(wall, unit)
     if not alive(wall) or not alive(unit) then return nil end
     local state = state_for(wall, unit)

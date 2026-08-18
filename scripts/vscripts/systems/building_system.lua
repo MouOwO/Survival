@@ -14,6 +14,7 @@ local grid_config = require("config/grid_config")
 local grid_placement_config = require("config/grid_placement_config")
 local building_population = require("systems/building_population_service")
 local building_hull_scale = require("systems/building_hull_scale")
+local wall_collision_barrier_service = require("systems/wall_collision_barrier_service")
 local war3_armor_target = require("systems/war3_armor_target")
 local blink_destination = require("systems/blink_destination")
 local building_visual = require("systems/building_visual_service")
@@ -513,6 +514,7 @@ local function recover_building(unit)
         if not unit:HasModifier("modifier_building_damage_sound") then
             unit:AddNewModifier(unit, nil, "modifier_building_damage_sound", {})
         end
+        wall_collision_barrier_service.create(unit)
     end
     buildings[entindex] = state
     change_count(state.player_id, class_id_for_state(state) or state.building_id, 1)
@@ -726,6 +728,9 @@ local function start_building(payload)
             construction_visual.cancel(construction_visual_state)
             if not state.cleaned then
                 state.cleaned = true
+                if state.building_id == "wall" then
+                    wall_collision_barrier_service.clear(state.unit)
+                end
                 buildings[state.entindex] = nil
                 change_count(check.player_id, check.definition.id, -1)
                 event_bus.request(events.GRID_RELEASE_REQUEST, {
@@ -777,6 +782,9 @@ local function start_building(payload)
         unit:SetHealth(maximum_health)
         unit:SetControllableByPlayer(check.player_id, true)
         state.constructing = false
+        if check.definition.id == "wall" then
+            wall_collision_barrier_service.create(unit)
+        end
         if check.definition.build_once then
             wall_ever_built[check.player_id] = true
         end
@@ -1040,6 +1048,9 @@ local function on_entity_killed(payload)
     if not state then return end
     if state.cleaned then return end
     state.cleaned = true
+    if state.building_id == "wall" then
+        wall_collision_barrier_service.clear(victim)
+    end
     local reservation_cleared = false
     for class_index = 1, 7 do
         local class_id = "class_" .. tostring(class_index)
