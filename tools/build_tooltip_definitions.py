@@ -85,6 +85,50 @@ def main():
             row.get("source") or skill_id,
         )
 
+    lumberjack_fusions = read_csv(
+        CSV_ROOT / "建筑与工人系统" / "lumberjack_fusion_definitions.csv"
+    )
+    for row in lumberjack_fusions:
+        if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:
+            continue
+        ability = clean(row.get("ability_id"))
+        if not ability:
+            continue
+        add(
+            out,
+            "ability:" + ability,
+            "ability",
+            ability,
+            row.get("display_name"),
+            row.get("wood_cost"),
+            row.get("gold_cost"),
+            row.get("notes"),
+            "furion_force_of_nature",
+            row.get("fusion_id") or ability,
+        )
+
+    lumberjack_personalities = read_csv(
+        CSV_ROOT / "建筑与工人系统" / "lumberjack_personality_definitions.csv"
+    )
+    for row in lumberjack_personalities:
+        if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:
+            continue
+        ability = clean(row.get("ability_name"))
+        if not ability:
+            continue
+        add(
+            out,
+            "ability:" + ability,
+            "ability",
+            ability,
+            row.get("name"),
+            "0",
+            "0",
+            row.get("description"),
+            "",
+            row.get("skill_id") or ability,
+        )
+
     altar_actions = read_csv(CSV_ROOT / "商店系统" / "altar_actions.csv")
     for row in altar_actions:
         if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:

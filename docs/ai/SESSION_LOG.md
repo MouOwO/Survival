@@ -9,6 +9,7 @@
 - 用户补全11项性格并确认每次LV1-LV7合成从11项完整池等概率随机抽取1项，允许重复；LV8无性格。采集成长、树最大生命1%扣减、采集加成、伐木工攻速/攻击、树耗尽后最多3次捡漏和英雄/箭塔攻速光环进入既有工人、树、资源与Modifier链。
 - 自动验证通过：融合契约、规则Lua 5.1、事务Lua 5.1、15个目标Lua语法、KV括号、严格UTF-8、定向生成和限定diff检查。尚未Workshop Tools实机验证，不记录为用户验收或制作完成。
 - 本轮补齐融合资源与主城门槛：LV1/LV2为主城LV4及10000/20000木材，LV3-LV8为主城LV5及30000-80000木材、5000-50000金币。目标创建前先原子扣费，创建、注册或提交失败按原额退款；材料当前科技攻击快照求和后剥离单个科技增量，目标BAT直接减少0.5秒。
+- 本轮补齐动态伐木工Ability的中央Tooltip数据：`build_tooltip_definitions.py`从融合/性格权威CSV生成8+11条Ability Tooltip，`client_data_service.lua`将统一Ability行先投影到`survival_ability_data`，再由既有专用配置覆盖；专项契约同步校验数量、LV8无性格、CSV/生成Lua/key唯一性及runtime投影。定向/全量生成、契约、真实服务投影Lua 5.1测试、既有融合规则/事务/工人投影回归、Lua 5.1语法、严格UTF-8和限定`git diff --check`均通过；Workshop Tools悬停显示仍需实机确认。
 - 新增/更新事务测试覆盖不同材料攻击力、城市等级拒绝、资源不足无副作用和提交失败退款；`LUMBERJACK_FUSION_CONTRACT_PASS`、`LUMBERJACK_FUSION_RULES_LUA51_PASS`、`LUMBERJACK_FUSION_TRANSACTION_LUA51_PASS`、Lua 5.1语法、严格UTF-8和限定diff检查通过。仍未进行Workshop Tools实机验证。
 - 中断恢复后补齐服务端施法者等级与配方等级匹配校验，并移除融合服务未使用的科技管理器引用；新增真实`worker_system.register_fused_lumberjack()`生产投影测试，验证材料当前攻击总和保持不变、后续科技按五合/三合数量增长且BAT减免持续保留。融合契约、规则/事务/生产投影Lua 5.1、目标语法、CSV生成逐字节一致、严格UTF-8和限定diff均通过；修理工独立契约仍有既有数值失败，未越界修改。仍未进行Workshop Tools实机验证。
 

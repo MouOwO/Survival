@@ -96,6 +96,24 @@ local function publish_ability(ability_name, definition)
 end
 
 local function publish_abilities()
+    for _, definition in ipairs(tooltip_config.rows or {}) do
+        if definition.tooltip_type == "ability" and definition.id
+            and definition.id ~= "" then
+            publish_ability(definition.id, {
+                abilityid = definition.id,
+                tooltip_id = definition.tooltip_id,
+                abilityname = definition.name,
+                abilitydesc = definition.desc,
+                abilityicon = definition.icon ~= ""
+                    and definition.icon or definition.id,
+                fields = {
+                    { label = "所需木材", value = tonumber(definition.needwood) or 0 },
+                    { label = "所需金币", value = tonumber(definition.needgold) or 0 },
+                },
+            })
+        end
+    end
+
     for ability_name, definition in pairs(ability_config) do
         publish_ability(ability_name, definition)
     end

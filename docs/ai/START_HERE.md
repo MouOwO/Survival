@@ -5,6 +5,7 @@
 ## 当前任务
 
 - 当前插入任务（2026-08-18，伐木工点击融合完成自动验证）：普通LV1五合一、LV2-LV8三合一生成对应超级伐木工；独立CSV管理8级配方和11项性格，LV1-LV7每次从11项性格池等概率随机抽取1项且允许重复，LV8无技能。服务端同玩家/同队/同级预校验、施法者等级匹配、pending锁、目标先建后原子提交、净人口释放及失败无副作用已接入；规则/事务/生产注册投影Lua 5.1、契约、语法、CSV生成一致、UTF-8和限定diff通过。下一步Workshop Tools冷启动逐级验收，未经实机确认不得记录完成。
+- 本次Tooltip增量已接入同一任务：两份伐木工CSV生成的8条融合/11条性格Ability定义现在进入`survival_ability_data`，静态统一Tooltip与原有英雄/防御塔/专用Ability配置保持明确覆盖顺序；专项契约覆盖数量、LV8空技能、key去重和CSV/Lua/runtime投影。下一步仍为Workshop Tools冷启动后悬停动态融合与性格技能。
 
 - 当前插入任务（2026-08-17，肉鸽奖励 UI、通用效果运行时与指定三卡调试入口完成自动验证）：四张权威 CSV 已覆盖 31 张卡、31 个效果、38 个强类型参数和 21 条生命周期规则；服务端 offer/token/队列、Panorama 独立 overlay、Boss 全有效玩家发放及 `rogue <card_id1> <card_id2> <card_id3>`正式运行时调试链已接入。当前只启用 `fiscal_subsidy`、`radiant_sapling`、`fortifications`，尚未 Workshop Tools 冷启动或双客户端验收。后续开发先读 `ROGUE_REWARD_INTEGRATION.md`，实机基线命令为 `rogue fiscal_subsidy radiant_sapling fortifications`。
 - 当前插入任务（2026-08-17，持久化在线计时钓鱼奖励纵向切片自动验证完成）：已实现CSV权威定义、Supabase单事务grant/永久聚合/冻结计时/幂等migration、Python 3.14 loopback鉴权API、Steam Account ID Lua HTTP Provider、在线session租约和永久效果独立投影。生产奖励因完整清单缺失及三条定义待复核而全部禁用并失败关闭；本机无PostgreSQL/Supabase CLI且未提供项目凭据，尚未执行远端migration或Workshop Tools实机。详细阻断、测试与启动步骤见`CURRENT_TASK.md`顶部和`FISHING_REWARD_INTEGRATION.md`。
