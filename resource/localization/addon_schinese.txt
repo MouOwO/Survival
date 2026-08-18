@@ -549,7 +549,7 @@
         "DOTA_Tooltip_ability_ability_lumberjack_personality_heavy_hand" "手很重"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_heavy_hand_Description" "每次采集有1%概率直接减少资源树生命值1点"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_cheer" "啦啦队"
-        "DOTA_Tooltip_ability_ability_lumberjack_personality_cheer_Description" "为所属玩家英雄和防御塔增加10%攻速，多个可叠加"
+        "DOTA_Tooltip_ability_ability_lumberjack_personality_cheer_Description" "为所属玩家英雄、箭塔和所有伐木工增加10%攻速，多个可叠加"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_high_pressure" "血压高"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_high_pressure_Description" "伐木工攻击力增加20%"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_efficiency" "效率"

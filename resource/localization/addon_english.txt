@@ -532,7 +532,7 @@
         "DOTA_Tooltip_ability_ability_lumberjack_personality_heavy_hand" "Heavy Hand"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_heavy_hand_Description" "Each collection has a 1% chance to directly reduce the resource tree's health by 1."
         "DOTA_Tooltip_ability_ability_lumberjack_personality_cheer" "Cheer Squad"
-        "DOTA_Tooltip_ability_ability_lumberjack_personality_cheer_Description" "Allied heroes and defense towers gain 10% attack speed. Multiple instances stack."
+        "DOTA_Tooltip_ability_ability_lumberjack_personality_cheer_Description" "This player's hero, arrow towers, and all Lumberjacks gain 10% attack speed. Multiple instances stack."
         "DOTA_Tooltip_ability_ability_lumberjack_personality_high_pressure" "Short Temper"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_high_pressure_Description" "Increases Lumberjack attack damage by 20%."
         "DOTA_Tooltip_ability_ability_lumberjack_personality_efficiency" "Efficiency"

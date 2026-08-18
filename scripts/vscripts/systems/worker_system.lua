@@ -88,15 +88,42 @@ local function leader_bonus_for(state)
     return bonus
 end
 
+local function apply_cheer_buff(unit, player_id, bonus_pct)
+    if not valid_entity(unit) then return end
+    local worker_state = unit.entindex and workers[unit:entindex()] or nil
+    local unit_player_id = tonumber(unit.survival_player_id)
+    if unit_player_id == nil and unit.GetPlayerOwnerID then
+        unit_player_id = tonumber(unit:GetPlayerOwnerID())
+    end
+    local eligible = unit.IsRealHero and unit:IsRealHero()
+        or unit.survival_building_id == "arrow_tower"
+        or worker_state and worker_state.worker_type == "lumberjack"
+    if not eligible or unit_player_id ~= player_id then return end
+    local modifier = unit:FindModifierByName("modifier_lumberjack_cheer")
+    if bonus_pct > 0 then
+        modifier = modifier or unit:AddNewModifier(
+            nil, nil, "modifier_lumberjack_cheer", {}
+        )
+        if modifier then
+            modifier:SetStackCount(math.floor(bonus_pct + 0.5))
+            if unit.CalculateStatBonus then unit:CalculateStatBonus(true) end
+        end
+    elseif modifier then
+        modifier:Destroy()
+    end
+end
+
 local function refresh_cheer_buffs(player_id)
     if not PlayerResource or not PlayerResource.GetTeam then return end
     local team = PlayerResource:GetTeam(player_id)
     if not team or not FindUnitsInRadius then return end
-    local count = 0
+    local bonus_pct = 0
     for _, state in pairs(workers) do
         if state.player_id == player_id and valid_entity(state.unit)
             and personality_has(state.unit, "lumberjack_personality_cheer") then
-            count = count + 1
+            bonus_pct = bonus_pct + personality_value(
+                state.unit, "owner_attack_speed_pct"
+            )
         end
     end
     local units = FindUnitsInRadius(
@@ -104,19 +131,22 @@ local function refresh_cheer_buffs(player_id)
         DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL,
         DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false
     )
+    local seen = {}
     for _, unit in ipairs(units or {}) do
-        local eligible = unit.IsRealHero and unit:IsRealHero()
-            or unit.survival_building_id == "arrow_tower"
-        if eligible then
-            local modifier = unit:FindModifierByName("modifier_lumberjack_cheer")
-            if count > 0 then
-                modifier = modifier or unit:AddNewModifier(
-                    nil, nil, "modifier_lumberjack_cheer", {}
-                )
-                if modifier then modifier:SetStackCount(count) end
-            elseif modifier then
-                modifier:Destroy()
-            end
+        if valid_entity(unit) then
+            seen[unit:entindex()] = true
+            apply_cheer_buff(unit, player_id, bonus_pct)
+        end
+    end
+    local building_list = event_bus.request(events.BUILDING_LIST_REQUEST, {
+        player_id = player_id,
+    }) or {}
+    for _, building in ipairs(building_list.buildings or {}) do
+        local entindex = tonumber(building.entindex)
+        if building.building_id == "arrow_tower" and entindex
+            and not seen[entindex] and type(EntIndexToHScript) == "function" then
+            local ok, unit = pcall(EntIndexToHScript, entindex)
+            if ok then apply_cheer_buff(unit, player_id, bonus_pct) end
         end
     end
 end
@@ -292,6 +322,23 @@ local function record_population_training_success(team, training_id)
     return population_training_state(key)
 end
 
+local function apply_lumberjack_attack(state, technology_attack)
+    local base_min = tonumber(state.base_damage_min)
+    local base_max = tonumber(state.base_damage_max)
+    if base_min == nil or base_max == nil then return end
+    local multiplier = tonumber(state.technology_multiplier) or 1
+    local total_growth = (tonumber(technology_attack) or 0) * multiplier
+        + (tonumber(state.personality_attack_growth) or 0)
+    local attack_pct = 1 + (tonumber(state.personality_attack_pct) or 0) / 100
+    local minimum = (base_min + total_growth) * attack_pct
+    local maximum = (base_max + total_growth) * attack_pct
+    state.unit:SetBaseDamageMin(minimum)
+    state.unit:SetBaseDamageMax(maximum)
+    if state.unit.CalculateStatBonus then state.unit:CalculateStatBonus(true) end
+    state.unit.survival_attack_min = minimum
+    state.unit.survival_attack_max = maximum
+end
+
 local function refresh_worker_technology(player_id)
     local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
     local efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
@@ -311,21 +358,12 @@ local function refresh_worker_technology(player_id)
             ) * (1 + (speed_pct + (state.personality_attack_speed_pct or 0)
                 + leader_bonus_for(state)) / 100))
             local base_interval = 1 / speed
-            state.unit:SetBaseAttackTime(math.max(0.05, base_interval
+            local final_attack_interval = math.max(0.05, base_interval
                 - interval_reduction - (state.fusion_interval_reduction or 0)
-                - (state.personality_attack_interval_flat or 0)))
-            local base_min = tonumber(state.base_damage_min)
-            local base_max = tonumber(state.base_damage_max)
-            if base_min ~= nil and base_max ~= nil then
-                local total_growth = attack_growth * multiplier
-                    + (state.personality_attack_growth or 0)
-                local total_attack = (base_min + total_growth)
-                    * (1 + (state.personality_attack_pct or 0) / 100)
-                state.unit:SetBaseDamageMin(total_attack)
-                state.unit:SetBaseDamageMax(total_attack)
-                state.unit.survival_attack_min = total_attack
-                state.unit.survival_attack_max = total_attack
-            end
+                - (state.personality_attack_interval_flat or 0))
+            state.unit:SetBaseAttackTime(final_attack_interval)
+            state.unit.survival_attack_speed = 1 / final_attack_interval
+            apply_lumberjack_attack(state, attack_growth)
             state.technology_attack_growth = attack_growth * multiplier
             state.technology_armor_reduction = armor_reduction * multiplier
             state.technology_efficiency = efficiency * multiplier
@@ -366,14 +404,20 @@ local function on_tree_hit(payload)
     local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
     local amount = tonumber(lumberjack.attack_gain_per_attack) or 0
     local attacker_state = nil
-    for _, state in pairs(workers) do
-        if state.unit == payload.attacker then attacker_state = state break end
-    end
+    local attacker = payload.attacker
+    local attacker_entindex = valid_entity(attacker) and attacker:entindex() or nil
+    if attacker_entindex then attacker_state = workers[attacker_entindex] end
     if attacker_state and (attacker_state.personality_attack_growth_per_hit or 0) > 0 then
         attacker_state.personality_attack_growth =
-            attacker_state.personality_attack_growth
+            (attacker_state.personality_attack_growth or 0)
                 + attacker_state.personality_attack_growth_per_hit
-        refresh_worker_technology(player_id)
+        apply_lumberjack_attack(attacker_state, lumberjack.attack_flat)
+        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+            unit = attacker_state.unit,
+            entindex = attacker_entindex,
+            player_id = player_id,
+            reason = "lumberjack_self_pua_growth",
+        })
     end
     if amount <= 0 then return end
     event_bus.request(events.TECHNOLOGY_STATS_GROWTH_ADD_REQUEST, {
@@ -923,8 +967,10 @@ function M.commit_lumberjack_fusion(materials, target, data)
     end
     if target.SetModelScale then target:SetModelScale(tonumber(data.model_scale) or 1) end
     local target_state = workers[target_entindex]
+    local removed_entindexes = {}
     for _, state in ipairs(states) do
         if state.unit:entindex() ~= target_entindex then
+            removed_entindexes[#removed_entindexes + 1] = state.unit:entindex()
             workers[state.unit:entindex()] = nil
             state.unit:ForceKill(false)
         end
@@ -932,6 +978,12 @@ function M.commit_lumberjack_fusion(materials, target, data)
     target.survival_lumberjack_fusion_pending = nil
     refresh_worker_technology(target_state.player_id)
     refresh_cheer_buffs(target_state.player_id)
+    event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+        unit = target,
+        entindex = target:entindex(),
+        player_id = target_state.player_id,
+        reason = "lumberjack_fusion_completed",
+    })
     event_bus.emit(events.WORKER_CHANGED, {
         team = target_state.team,
         player_id = target_state.player_id,
@@ -940,6 +992,7 @@ function M.commit_lumberjack_fusion(materials, target, data)
         super_lumberjack = true,
         unit = target,
         entindex = target:entindex(),
+        removed_entindexes = removed_entindexes,
     })
     return { ok = true, population_released = 0, population_preserved = preserved_population }
 end
@@ -993,7 +1046,11 @@ local function remove_worker(worker, entindex, reason)
     })
     event_bus.emit(events.WORKER_CHANGED, {
         team = state.team,
+        player_id = state.player_id,
         count_delta = -1,
+        worker_type = state.worker_type,
+        entindex = entindex,
+        removed = true,
     })
     return state
 end
@@ -1133,6 +1190,11 @@ function M.init()
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
     event_bus.subscribe(events.BUILDING_CREATED, function(payload)
+        if payload and payload.player_id ~= nil then
+            refresh_cheer_buffs(tonumber(payload.player_id))
+        end
+    end)
+    event_bus.subscribe(events.BUILDING_DESTROYED, function(payload)
         if payload and payload.player_id ~= nil then
             refresh_cheer_buffs(tonumber(payload.player_id))
         end

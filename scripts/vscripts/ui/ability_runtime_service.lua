@@ -440,6 +440,21 @@ local function on_resources(payload)
 end
 
 local function on_worker_changed(payload)
+    if not payload then return end
+    for _, entindex in ipairs(payload.removed_entindexes or {}) do
+        clear_unit({ entindex = tonumber(entindex) })
+    end
+    if payload.removed == true or payload.removed == 1 then
+        clear_unit({ entindex = tonumber(payload.entindex) })
+    elseif valid_entity(payload.unit) or payload.entindex then
+        local worker_payload = {}
+        for key, value in pairs(payload) do worker_payload[key] = value end
+        worker_payload.building_id = payload.worker_type or "lumberjack"
+        worker_payload.level = valid_entity(payload.unit)
+            and tonumber(payload.unit.survival_lumberjack_level)
+            or payload.level
+        publish_unit(worker_payload)
+    end
     for _, state in pairs(state_by_unit) do
         if state.team == payload.team and (
             state.building_id == "main_city"

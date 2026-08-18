@@ -1,3 +1,13 @@
+## 当前插入任务（2026-08-18）：伐木工性格结算、融合技能实时刷新与被动技能 Tooltip
+
+- 用户已批准进入执行模式。“手很重”改为每次采集有1%概率减少资源树最大生命值的1%，概率和百分比均以`lumberjack_personality_definitions.csv`的`effect_value`为权威；整数伤害向下取整且最低1点，继续通过树木最低生命/耗尽升级链处理，不直接杀死资源树实体。
+- 原地融合后必须立即重发目标伐木工的`survival_ability_runtime`和真实`ability_count`，清理已移除融合Ability并发布新性格Ability，使当前选中单位的技能栏和自定义Tooltip无需重新选择即可刷新。
+- 性格等被动Ability保留图标与悬停Tooltip，但统一不显示Q/W/E/R等快捷键，也不得进入键盘主动施法槽位；主动融合技能和既有工具技能快捷键语义保持不变。
+- 本轮同时完成已批准的“啦啦队”修复：所属玩家英雄和全部箭塔获得CSV驱动的可叠加百分比攻速Buff，并提供可见UI状态。修改必须保留game/content两个仓库现有未提交Tooltip改动，完成后执行CSV/Tooltip生成、Lua 5.1测试与语法、专项契约、Panorama强制编译、严格UTF-8和双仓限定diff检查；Workshop Tools冷启动仍作为最终实机验收。
+- 生产实现已完成：“手很重”仅在木材/金币成功入账后判定，按`floor(max_health * effect_value / 100)`且最低1点扣血，Heavy Hand与普通攻击耗尽均保持`TREE_DEPLETED`通知，Heavy Hand到1点时调用树实体权威升级回调；融合后的目标工人立即重发Ability runtime、材料工人与普通死亡工人的旧runtime显式发布`removed=1`，并更新目标真实`ability_count`；Panorama被动Ability不显示快捷键且不消耗后续主动技能序号；“啦啦队”按同玩家隔离并将每个CSV百分比叠加为可见百分比攻速Modifier。
+- 用户补充确认“啦啦队”也必须影响伐木工。目标范围现为所属玩家英雄、箭塔以及工人注册表中全部`worker_type=lumberjack`的普通/超级伐木工（包含啦啦队自身）；修理工保持排除，同队其他玩家单位仍由`player_id`隔离。
+- 2026-08-18修复早建箭塔漏享“啦啦队”：原刷新仅依赖`FindUnitsInRadius(DOTA_UNIT_TARGET_ALL, FLAG_NONE)`，建筑实体可能未进入该扫描结果，且后续无状态变化时不会补投射。现保留英雄/伐木工扫描，并额外通过建筑系统权威`BUILDING_LIST_REQUEST`按玩家枚举已完成箭塔、解析实体并去重应用同一CSV驱动Modifier；不扩大到其他建筑。
+
 ## 本次任务（2026-08-18）：Builder 开局肉鸽奖励固定 G 键并修复刷新/输入/Tooltip
 
 - `builder_ability_stages.csv` 将 `ability_survival_rogue_reward` 从 W 业务槽改为独立 `slot_order=7`；Builder 的六个建筑槽和 Blink 仍由原有布局管理，肉鸽 Ability 在布局完成后单独追加，因此建墙阶段刷新不会删除或复制未消费奖励。
@@ -639,6 +649,15 @@
 - 已同步：定向生成`tower_skill_definitions.lua`，统一生成Tooltip CSV/Lua，六份中英本地化镜像同步五级即时倍率和纯视觉雷柱说明；塔配置README明确`strike_count`只表示视觉次数。技能ID和最高等级未变化，Ability KV无需修改。
 - 自动验证通过：`LIGHTNING_TOWER_KILL_TRIGGER_LUA51_PASS/CONTRACT_PASS`，覆盖五级倍率、触发栈内即时伤害、单次范围查询、双目标各一次伤害/事件、5至9道视觉、视觉零查询/零伤害/零事件、原塔归因、连锁风暴，以及扩散30%/200%/排除原目标/非递归；怪物War3护甲、终极塔和本地化回归通过。5个目标Lua语法、塔技能和Tooltip生成逐字节一致、CSV 19列结构、配置CheckOnly、15个目标文件严格UTF-8/BOM及限定diff通过。
 - 尚需Workshop Tools完全冷启动：确认LV1至LV5击杀瞬间立即跳血一次，实际倍率和物理护甲链正确；一秒内仅显示5至9道随机雷柱且不再追加伤害/扩散判定；多个目标各结算一次；风暴击杀继续连锁；独立雷电扩散保持每目标一次30%判定。自动测试不能替代引擎实机验收。
+
+## 当前修复任务（2026-08-18）：善于发现与融合后伐木工战斗属性UI刷新
+
+- 根因确认：融合目标沿用已有永久`modifier_lumberjack_ai`，再次`AddNewModifier`只刷新同名Modifier；原实现没有`OnRefresh`，因此融合后新增性格参数没有写入实际攻击实例。“善于发现”的CSV、生成配置、`TREE_HIT`金币载荷和资源服务均存在，但运行时`gold_per_hit_flat`仍保持旧值0。
+- 修复：`modifier_lumberjack_ai`统一由参数应用函数处理`OnCreated/OnRefresh`，使“善于发现”每次成功采集增加CSV配置的10金币，并同时保证其他融合性格参数可即时刷新。
+- 融合属性投影：伐木工重算最终攻击间隔后同步写回`survival_attack_speed`；融合完成且科技、性格和啦啦队重算结束后派发`UNIT_COMBAT_STATS_CHANGED`。现有`ui_request_router`只对当前选中该实体的玩家即时推送`ui_selected_unit_stats_snapshot`，攻击力与每秒攻击次数不再停留在融合前快照。
+- 自动验证通过：目标Lua 5.1语法、`LUMBERJACK_DISCOVERER_GOLD_CONTRACT_PASS`、`LUMBERJACK_PERSONALITY_RUNTIME_CONTRACT_PASS`及限定`git diff --check`。仍需Workshop Tools冷启动确认每次成功采集金币+10、头顶金币数字，以及融合时保持选中状态后攻击力/攻速立即更新。
+- 2026-08-18追加修复：自我PUA每次成功采集后的攻击力成长原本已正确写入实体和`survival_attack_min/max`，但没有派发战斗属性刷新事件。现于成长重算完成后派发`UNIT_COMBAT_STATS_CHANGED`，由现有选中单位快照链即时刷新攻击力UI；成长数值仍完全读取CSV的每次+5，科技成长逻辑不变。
+- 2026-08-18表现修复：“善于发现”不再调用官方`OVERHEAD_ALERT_GOLD`。资源增加成功后改为向所属玩家发送金矿既有的`survival_gold_mine_income_number`，目标实体为触发采集的伐木工，复用金矿黄色上浮金币数字；`critical=0`且全链不调用声音API，因此没有音效。金币结算和CSV每次+10保持不变。
 
 ## 当前插入任务（2026-08-11）：Ability Tooltip 几何诊断作用域异常
 

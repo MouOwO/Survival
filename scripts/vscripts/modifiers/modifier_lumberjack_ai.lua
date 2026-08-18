@@ -16,8 +16,8 @@ function M:IsHidden() return true end
 function M:IsPurgable() return false end
 function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
-function M:OnCreated(params)
-    if not IsServer() then return end
+local function apply_runtime_params(self, params)
+    params = params or {}
     self.tree_entindex = tonumber(params.tree_entindex) or -1
     self.base_lumber_efficiency = tonumber(params.base_lumber_efficiency) or 1
     self.tree_lumber_efficiency_buff = tonumber(
@@ -50,9 +50,19 @@ function M:OnCreated(params)
     self.lumber_efficiency = self.base_lumber_efficiency
         + self.tree_lumber_efficiency_buff
         + self.technology_lumber_efficiency
+end
+
+function M:OnCreated(params)
+    if not IsServer() then return end
+    apply_runtime_params(self, params)
     self.manual_control = false
     self.manual_idle_since = nil
     self:StartIntervalThink(THINK_INTERVAL)
+end
+
+function M:OnRefresh(params)
+    if not IsServer() then return end
+    apply_runtime_params(self, params)
 end
 
 function M:OnPlayerOrder(order_type, target)
@@ -171,12 +181,6 @@ function M:OnAttackLanded(keys)
     if target:entindex() ~= self.tree_entindex then return end
     self.manual_control = false
     self.manual_idle_since = nil
-    if self.tree_damage_chance_pct > 0
-        and RandomFloat(0, 100) < self.tree_damage_chance_pct then
-        local health = target:GetHealth()
-        local amount = math.max(1, math.floor(target:GetMaxHealth() * 0.01))
-        if health > 1 then target:SetHealth(math.max(1, health - amount)) end
-    end
     if target:GetHealth() <= 1 then
         event_bus.emit(events.TREE_DEPLETED, {
             attacker = parent,
@@ -208,6 +212,7 @@ function M:OnAttackLanded(keys)
         fusion_count = self.fusion_count,
         wood_multiplier_chance_pct = self.wood_multiplier_chance_pct,
         gold_per_hit_flat = self.gold_per_hit_flat,
+        tree_damage_chance_pct = self.tree_damage_chance_pct,
         personality_attack_growth_per_hit = self.personality_attack_growth_per_hit,
         source = "lumberjack",
     })

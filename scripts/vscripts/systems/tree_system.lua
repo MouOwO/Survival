@@ -181,9 +181,45 @@ local function on_tree_hit(payload)
             and "hero_tree_hit" or "lumberjack_hit",
     })
     if not result or result.ok ~= true then return end
+    local tree_damage_pct = math.max(
+        0, tonumber(payload.tree_damage_chance_pct) or 0
+    )
+    if current_tree:GetHealth() > 1 and tree_damage_pct > 0
+        and RandomFloat(0, 100) < tree_damage_pct then
+        local amount = math.max(1, math.floor(
+            current_tree:GetMaxHealth() * tree_damage_pct / 100
+        ))
+        local health = current_tree:GetHealth()
+        if health > 1 then
+            current_tree:SetHealth(math.max(1, health - amount))
+        end
+        if current_tree:GetHealth() <= 1 then
+            event_bus.emit(events.TREE_DEPLETED, {
+                attacker = attacker,
+                target = current_tree,
+                player_id = payload.player_id,
+            })
+            local callback = current_tree.survival_tree_depleted_callback
+            if type(callback) == "function" then callback(current_tree) end
+        end
+    end
     local player = payload.player_id ~= nil
         and PlayerResource:GetPlayer(payload.player_id) or nil
     particle_manager.show_green_number(attacker, efficiency, player)
+    local gold_amount = math.max(0, math.floor(
+        tonumber(payload.gold_per_hit_flat) or 0
+    ))
+    if player and gold_amount > 0 then
+        CustomGameEventManager:Send_ServerToPlayer(
+            player,
+            "survival_gold_mine_income_number",
+            {
+                target_entindex = attacker:entindex(),
+                amount = gold_amount,
+                critical = 0,
+            }
+        )
+    end
 end
 
 local function on_building_created(payload)
