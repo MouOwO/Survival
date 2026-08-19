@@ -320,11 +320,23 @@ local function spawn_member(session, member)
         )
     end
 
+    local collision_profile = wave_monster_collision.profile(member, archetype)
     local unit = CreateUnitByName(
-        archetype.unit_name, position, true, nil, nil, DOTA_TEAM_BADGUYS
+        archetype.unit_name,
+        position,
+        not collision_profile.apply_before_placement,
+        nil,
+        nil,
+        DOTA_TEAM_BADGUYS
     )
     if not valid(unit) then return nil, "challenge_unit_create_failed" end
+    if collision_profile.apply_before_placement then
+        monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
+    end
     FindClearSpaceForUnit(unit, position, true)
+    if not collision_profile.apply_before_placement then
+        monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
+    end
     if archetype.model_path and archetype.model_path ~= "" then
         unit:SetModel(archetype.model_path)
         unit:SetOriginalModel(archetype.model_path)
@@ -348,8 +360,6 @@ local function spawn_member(session, member)
     if unit.Script_SetAttackRange and combat_archetype.attack_range then
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
-    local collision_profile = wave_monster_collision.profile(member, archetype)
-    monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
     apply_combat_stats(unit, combat_archetype, combat_profile)
     monster_visual.apply(unit, archetype)
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end

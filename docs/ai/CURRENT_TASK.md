@@ -1,3 +1,10 @@
+## 当前插入任务（2026-08-19）：练功房怪物独立碰撞 profile
+
+- 用户确认四个练功房怪物使用Hull半径12并保留单位间碰撞；正式地面波次怪继续使用32，不启用练功房专属`NO_UNIT_COLLISION`。
+- 权威数据已调整：`global_rules.csv`删除重复的旧`wave_ground_monster_hull_radius=30`行，保留唯一32并新增`practice_monster_hull_radius=12`；`encounter_members.csv`新增`collision_profile`列，仅四个`practice_*`成员填写`practice`，其余挑战成员为空。两份生成Lua均由项目生成器定向重建。
+- `wave_monster_collision.lua`按成员profile选择练功房Hull，正式波次、飞行怪和建筑挑战怪规则保持独立。`challenge_session_service.lua`仅对练功房关闭`CreateUnitByName`默认clear-space，先应用12 Hull再显式`FindClearSpaceForUnit()`；其他挑战成员仍按旧时序在放置后应用Hull。
+- 自动验证通过：`PRACTICE_MONSTER_COLLISION_CONTRACT_PASS`、`PRACTICE_MONSTER_COLLISION_LUA51_PASS`、目标Lua 5.1语法、18列成员CSV schema、两份生成Lua逐字节一致、目标严格UTF-8及限定`git diff --check`。挑战profile契约的本任务部分输出`CHALLENGE_COMBAT_PROFILES_LUA51_PASS`后，被既有无关N2转生护甲断言阻断；全量配置`CheckOnly`被既有`generated/rogue_reward_effects.lua`的U+FFFD阻断，本轮未越界修复。尚需Workshop Tools冷启动分别验收正式波次Hull 32及四个练功房的初始分散、移动和接敌表现。
+
 ## 当前插入任务（2026-08-18）：伐木工性格结算、融合技能实时刷新与被动技能 Tooltip
 
 - 用户已批准进入执行模式。“手很重”改为每次采集有1%概率减少资源树最大生命值的1%，概率和百分比均以`lumberjack_personality_definitions.csv`的`effect_value`为权威；整数伤害向下取整且最低1点，继续通过树木最低生命/耗尽升级链处理，不直接杀死资源树实体。

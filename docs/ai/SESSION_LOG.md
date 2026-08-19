@@ -1,3 +1,9 @@
+## 2026-08-19 - 练功房怪物独立碰撞 profile
+
+- 用户最终选择练功房Hull 12并保留单位间碰撞。`global_rules.csv`删除重复旧值30，正式地面怪保留唯一32，新增练功房12；`encounter_members.csv`新增`collision_profile`并只标记四个`practice_*`成员，避免硬编码遭遇ID或影响挑战05至11。
+- 共享碰撞解析器按CSV成员profile选择练功房Hull。练功房创建关闭引擎默认clear-space，先设置12 Hull再显式放置；其他挑战成员继续按原时序处理。定向生成更新`global_rules.lua`和`encounter_members.lua`。
+- 专项契约、Lua 5.1行为、目标Lua 5.1语法、18列CSV schema、两份生成逐字节一致、目标严格UTF-8和限定diff通过。既有挑战profile总契约后续失败于N2转生护甲断言；配置`CheckOnly`失败于既有`rogue_reward_effects.lua` U+FFFD，均未越界修改。尚未Workshop Tools实机验证。
+
 ## 2026-08-15 - 全部怪物碰撞与精英/Boss攻击范围统一
 
 - 用户要求所有Boss、精英怪与小怪使用相同碰撞体，并将Boss和精英怪攻击范围增加36且同步CSV。地面怪统一基础HullRadius 32，飞行怪统一10；研究所挑战怪、飞行精英/领头/Boss不再使用0 Hull或无单位碰撞。

@@ -1,8 +1,13 @@
 # Project Context
 
+## 正式波次与练功房怪物碰撞边界（2026-08-19）
+
+- `global_rules.csv.wave_ground_monster_hull_radius`只作为正式/默认地面怪基础Hull，当前为32；四个练功房成员必须由`encounter_members.csv.collision_profile=practice`显式识别，并读取独立的`practice_monster_hull_radius`，当前为12。不得通过硬编码遭遇ID、成员ID前缀或共享原型推断练功房身份。
+- 练功房保留单位间碰撞，不启用`NO_UNIT_COLLISION`。由于`CreateUnitByName(..., true, ...)`会在创建阶段先按默认Hull执行clear-space，练功房必须关闭该默认行为，先应用profile Hull，再显式调用`FindClearSpaceForUnit()`；其他挑战成员维持原生成时序。后续若实机仍拥挤，必须由用户确认后再单独评估练功房专属无单位碰撞，不能影响正式波次。
+
 ## 全部怪物碰撞与精英/Boss攻击范围统一（2026-08-15）
 
-- 所有怪物按移动类型使用与小怪相同的基础HullRadius：地面怪统一读取`global_rules.csv.wave_ground_monster_hull_radius=32`，飞行怪统一为10；不再为精英、领头怪、Boss或研究所挑战怪保留0 Hull和无单位碰撞。正式波次、挑战副本、野外/转生遭遇及研究所挑战生成边界均消费同一碰撞解析器。
+- 未配置独立碰撞profile的怪物按移动类型使用与小怪相同的基础HullRadius：地面怪统一读取`global_rules.csv.wave_ground_monster_hull_radius=32`，飞行怪统一为10；不再为精英、领头怪、Boss或研究所挑战怪保留0 Hull和无单位碰撞。正式波次、挑战副本、野外/转生遭遇及研究所挑战生成边界均消费同一碰撞解析器；练功房例外以上方2026-08-19章节为准。
 - `monster_archetypes.csv`中全部`rank=elite/boss`原型，以及`building_challenge_definitions.csv`中全部Boss，攻击范围均在原值上增加36并生成到Lua。新增或修改怪物时必须先维护CSV，运行时不得再次叠加36。
 
 ## 伐木工融合与性格技能边界（2026-08-18）

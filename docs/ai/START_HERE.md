@@ -4,6 +4,7 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-19，练功房怪物碰撞 profile 自动验证完成）：正式地面波次怪继续使用CSV权威Hull 32；四个练功房成员由`encounter_members.csv.collision_profile=practice`显式归类，使用独立CSV规则Hull 12并保留单位间碰撞。练功房创建时关闭默认clear-space，先应用12 Hull再显式`FindClearSpaceForUnit()`，其他挑战成员保持原放置时序。专项契约、Lua 5.1行为/语法、18列CSV schema、定向生成逐字节一致、严格UTF-8和限定diff通过；下一步Workshop Tools冷启动分别观察正式波次与四个练功房的初始站位和移动拥挤，自动验证不等于引擎实机验收。
 - 当前插入任务（2026-08-18，伐木工点击融合完成自动验证）：普通LV1五合一、LV2-LV8三合一生成对应超级伐木工；独立CSV管理8级配方和11项性格，LV1-LV7每次从11项性格池等概率随机抽取1项且允许重复，LV8无技能。服务端同玩家/同队/同级预校验、施法者等级匹配、pending锁、目标先建后原子提交、净人口释放及失败无副作用已接入；规则/事务/生产注册投影Lua 5.1、契约、语法、CSV生成一致、UTF-8和限定diff通过。下一步Workshop Tools冷启动逐级验收，未经实机确认不得记录完成。
 - 本次Tooltip增量已接入同一任务：两份伐木工CSV生成的8条融合/11条性格Ability定义现在进入`survival_ability_data`，静态统一Tooltip与原有英雄/防御塔/专用Ability配置保持明确覆盖顺序；专项契约覆盖数量、LV8空技能、key去重和CSV/Lua/runtime投影。下一步仍为Workshop Tools冷启动后悬停动态融合与性格技能。
 
