@@ -73,7 +73,7 @@ local function precache_initial_resource(resource_type, path, context)
     return ok
 end
 
-local function precache_initial_row(row, context)
+local function precache_row_resources(row, context, mark_asset_ready)
     local ok = precache_initial_resource("model", row.primary_model, context)
     for _, path in ipairs(row.attachment_models or {}) do
         ok = precache_initial_resource("model", path, context) and ok
@@ -84,11 +84,6 @@ local function precache_initial_row(row, context)
     for _, path in ipairs(row.sound_resources or {}) do
         ok = precache_initial_resource("soundfile", path, context) and ok
     end
-    local state = set_state(row.asset_id, ok and STATE.READY or STATE.FAILED, {
-        completed_at = now(),
-        source = "initial",
-    })
-    initial_states[row.asset_id] = state
     local status = ok and STATE.READY or STATE.FAILED
     local function remember(resource_type, path)
         local key = set_resource_state(resource_type, path, status)
@@ -104,6 +99,18 @@ local function precache_initial_row(row, context)
     for _, path in ipairs(row.sound_resources or {}) do
         remember("soundfile", path)
     end
+    if mark_asset_ready then
+        local state = set_state(row.asset_id, status, {
+            completed_at = now(),
+            source = "initial",
+        })
+        initial_states[row.asset_id] = state
+    end
+    return ok
+end
+
+local function precache_initial_row(row, context)
+    return precache_row_resources(row, context, true)
 end
 
 local function append_resource(result, seen, resource_type, path, asset_id,
@@ -156,6 +163,12 @@ end
 function M.precache_initial(context)
     for _, row in ipairs(catalog.group("initial_required")) do
         precache_initial_row(row, context)
+    end
+end
+
+function M.precache_group(context, group_name)
+    for _, row in ipairs(catalog.group(group_name)) do
+        precache_row_resources(row, context, false)
     end
 end
 
@@ -434,6 +447,26 @@ begin_async_request = function(asset_id, request_source)
     logger.info("AssetPreload", "started id=" .. asset_id
         .. " source=" .. tostring(request_source or "background"))
 
+    local resources = {}
+    append_asset_resources(resources, {}, row)
+    local resource_keys = {}
+    for _, resource in ipairs(resources) do
+        local resource_key = tostring(resource.resource_type) .. ":"
+            .. tostring(resource.path)
+        if initial_resource_states[resource_key] == STATE.FAILED then
+            logger.warn("AssetPreload", "startup resource unavailable id="
+                .. asset_id .. " type=" .. tostring(resource.resource_type)
+                .. " path=" .. tostring(resource.path))
+            finish(asset_id, false, "resource_precache_failed")
+            return false
+        end
+        resource_keys[#resource_keys + 1] = set_resource_state(
+            resource.resource_type,
+            resource.path,
+            STATE.LOADING
+        )
+    end
+
     local async_name = row.async_unit_name
     local request_generation = generation
     if type(PrecacheUnitByNameAsync) == "function"
@@ -443,6 +476,9 @@ begin_async_request = function(asset_id, request_source)
             async_name,
             function()
                 if request_generation == generation then
+                    for _, key in ipairs(resource_keys) do
+                        resource_states[key] = STATE.READY
+                    end
                     finish(asset_id, true, "unit_async")
                 end
             end,
@@ -633,17 +669,11 @@ function M.queue_resources(resources, options)
                 resource_states[resource.key] = STATE.FAILED
                 failed_count = failed_count + 1
             end
-        elseif (resource.resource_type == "model"
-                or resource.resource_type == "particle"
-                or resource.resource_type == "soundfile")
-            and type(PrecacheResource) == "function" then
-            local resource_type, path = string.match(
-                resource.key, "^([^:]+):(.+)$"
-            )
-            local ok = pcall(PrecacheResource, resource_type, path, nil)
-            resource_states[resource.key] = ok and STATE.READY or STATE.FAILED
-            if ok then queued_count = queued_count + 1
-            else failed_count = failed_count + 1 end
+        elseif resource.resource_type == "model"
+            or resource.resource_type == "particle"
+            or resource.resource_type == "soundfile" then
+            resource_states[resource.key] = STATE.FAILED
+            failed_count = failed_count + 1
         else
             resource_states[resource.key] = STATE.FAILED
             failed_count = failed_count + 1

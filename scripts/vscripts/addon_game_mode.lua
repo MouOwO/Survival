@@ -757,6 +757,7 @@ function M.precache(context)
         end
     end
     asset_preload_service.precache_initial(context)
+    asset_preload_service.precache_group(context, "hero_permanent")
     hero_cosmetic_service.precache(context)
 end
 

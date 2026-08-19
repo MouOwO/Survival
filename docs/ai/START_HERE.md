@@ -5,6 +5,10 @@
 ## 当前任务
 
 - 当前插入任务（2026-08-19，练功房怪物碰撞 profile 自动验证完成）：正式地面波次怪继续使用CSV权威Hull 32；四个练功房成员由`encounter_members.csv.collision_profile=practice`显式归类，使用独立CSV规则Hull 12并保留单位间碰撞。练功房创建时关闭默认clear-space，先应用12 Hull再显式`FindClearSpaceForUnit()`，其他挑战成员保持原放置时序。专项契约、Lua 5.1行为/语法、18列CSV schema、定向生成逐字节一致、严格UTF-8和限定diff通过；下一步Workshop Tools冷启动分别观察正式波次与四个练功房的初始站位和移动拥挤，自动验证不等于引擎实机验收。
+- 当前复核任务（2026-08-19，英雄永久异步预载与召唤READY门禁）：生产实现已存在且本轮重新核对通过；六英雄bundle、代理KV、饰品/常驻粒子、渐进加载和按玩家generation召唤门禁一致，目标契约、Lua 5.1语法、目标生成一致、严格UTF-8与限定diff通过。全量配置CheckOnly仍受无关既有`rogue_reward_effects.lua`替换字符阻断。下一步完全Stop并冷启动Workshop Tools，记录六bundle READY时序、帧尖峰/显存，测试两玩家同英雄并发、加载中改选、失败重试和六英雄最终外观；未经实机不得称为完成。
+- 当前修复进度（2026-08-19，英雄bundle资源完成门禁）：已补齐Doom 7项、Shadow Fiend 1项、Axe 5项ReplaceHero原生穿戴预载依赖，并让bundle READY覆盖CSV主体/附件/粒子/声音资源请求后再等待代理回调；当前VPK索引21个目标模型全部存在。专项Lua 5.1、契约、生成一致、严格UTF-8、VPK索引和限定diff通过。下一步完全Stop并冷启动Workshop Tools，分别观察三英雄替换时序、模型告警和Axe `Hero_Axe.Footsteps.Automaton`音效告警；未经实机不得称为完成。
+- 当前生命周期修正（2026-08-19）：英雄bundle静态资源已改为在地图`Precache(context)`有效上下文注册，运行期不再调用`PrecacheResource(..., nil)`；bundle仍只在精确代理异步回调后READY，启动注册失败会FAILED且不启动代理。专项行为、契约、Lua 5.1语法、严格UTF-8与限定diff通过；下一步Workshop Tools完全Stop后冷启动验证Doom、Shadow Fiend、Axe及多人客户端时序。
+- 已完成资源依赖修复（2026-08-20用户实机验收）：Shadow Fiend新增3项、Drow Ranger新增7项ReplaceHero原生穿戴模型，已同步权威CSV、生成Lua、代理KV和专项契约/行为测试；用户确认两名英雄模型成功加载。后续新增英雄默认穿戴时，复用CSV登记、生成配置、代理KV `precache`、只预载不重复挂载、精确代理回调后READY的完整流程。
 - 当前插入任务（2026-08-18，伐木工点击融合完成自动验证）：普通LV1五合一、LV2-LV8三合一生成对应超级伐木工；独立CSV管理8级配方和11项性格，LV1-LV7每次从11项性格池等概率随机抽取1项且允许重复，LV8无技能。服务端同玩家/同队/同级预校验、施法者等级匹配、pending锁、目标先建后原子提交、净人口释放及失败无副作用已接入；规则/事务/生产注册投影Lua 5.1、契约、语法、CSV生成一致、UTF-8和限定diff通过。下一步Workshop Tools冷启动逐级验收，未经实机确认不得记录完成。
 - 本次Tooltip增量已接入同一任务：两份伐木工CSV生成的8条融合/11条性格Ability定义现在进入`survival_ability_data`，静态统一Tooltip与原有英雄/防御塔/专用Ability配置保持明确覆盖顺序；专项契约覆盖数量、LV8空技能、key去重和CSV/Lua/runtime投影。下一步仍为Workshop Tools冷启动后悬停动态融合与性格技能。
 

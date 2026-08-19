@@ -1,5 +1,12 @@
 # Project Context
 
+## 英雄原生Wearable预载经验（2026-08-20）
+
+- `ReplaceHeroWithNoTransfer()` 可能在英雄替换时实例化 Dota 原生默认 wearable；即使英雄主体和代理已预载，未声明的肩甲、手臂、头部、武器、披风等模型仍会产生 `nonresident model` 警告或加载时序问题。
+- 处理流程必须先从 CSV 权威数据确认英雄主体和所有实际默认 wearable，再把 wearable 模型写入 `data/csv/资源系统/asset_catalog.csv` 对应英雄 bundle 的 `attachment_models`，通过生成器更新 `config/generated/asset_catalog.lua`，并同步 `scripts/npc/npc_units_custom.txt` 中同名 `asset_proxy_hero_*` 的 `precache` 块。
+- 原生 wearable 只用于预载，禁止加入 `asset_components.csv` 或项目运行时 cosmetic 挂载列表，否则会与 Dota 原生 wearable 重复创建。资源完成状态必须覆盖主体、附件、粒子和声音的显式请求，并在精确 `PrecacheUnitByNameAsync()` 代理回调后才发布 bundle `READY`。
+- 自动契约和 Lua 5.1 模拟只能证明声明、生成和门禁逻辑；只有 Workshop Tools 完全冷启动并实际召唤目标英雄后，才能确认模型告警消失、最终外观正确和真实加载时序。用户已确认本次 Shadow Fiend/Drow Ranger 修复实机成功。
+
 ## 正式波次与练功房怪物碰撞边界（2026-08-19）
 
 - `global_rules.csv.wave_ground_monster_hull_radius`只作为正式/默认地面怪基础Hull，当前为32；四个练功房成员必须由`encounter_members.csv.collision_profile=practice`显式识别，并读取独立的`practice_monster_hull_radius`，当前为12。不得通过硬编码遭遇ID、成员ID前缀或共享原型推断练功房身份。

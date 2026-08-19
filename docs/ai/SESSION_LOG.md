@@ -1,8 +1,43 @@
+## 2026-08-20 - Shadow Fiend/Drow Ranger 模型加载用户验收
+
+- 用户确认 Shadow Fiend 和 Drow Ranger 成功加载模型，本任务完成 Workshop Tools 实机验收。
+- 结论：当 `ReplaceHeroWithNoTransfer()` 使用 Dota 原生默认 wearable 时，必须把实际会被引擎实例化的 wearable 模型登记为英雄 bundle 的预载依赖，并同时写入对应 `asset_proxy_hero_*` 的 KV `precache` 块。
+- 这些原生 wearable 只能作为预载依赖进入 `asset_catalog.csv` 的 `attachment_models`，不能进入 `asset_components.csv` 或项目运行时饰品挂载列表，否则会与 Dota 原生 wearable 重复创建。
+- 资源数据必须先修改 `data/csv/资源系统/asset_catalog.csv`，再定向生成 `scripts/vscripts/config/generated/asset_catalog.lua`；Lua bundle 在所有主体/附件资源请求完成后仍需等待精确 `PrecacheUnitByNameAsync()` 代理回调，不能仅凭代理 `READY` 推断未声明资源已完成。
+- 自动契约、Lua 5.1 行为/语法、生成一致性、严格 UTF-8 和限定 `git diff --check` 通过；本次用户实机确认补齐最终证据链。后续新增或替换英雄默认穿戴时，按本记录复用同一排查和登记流程。
+
+## 2026-08-19 - Shadow Fiend/Drow Ranger 原生穿戴预载依赖
+
+- 在既有英雄bundle资源完成门禁基础上，向权威`data/csv/资源系统/asset_catalog.csv`补入影魔3项和黑暗游侠7项ReplaceHero原生穿戴模型，并同步两个`asset_proxy_hero_*`的KV `precache`块；不修改`asset_components.csv`，因此不会由项目重复创建饰品实体。
+- 扩展`tools/test_hero_bundle_resource_contract.ps1`和`tools/test_hero_bundle_resource_completion.lua`，覆盖十项模型的CSV/代理声明、显式资源请求和资源失败门禁。通过`HERO_BUNDLE_RESOURCE_CONTRACT_PASS`、`HERO_BUNDLE_RESOURCE_COMPLETION_LUA51_PASS`、`LUAC_PASS`、`ASSET_CATALOG_GENERATED_COMPARE_PASS`、`HERO_RESOURCE_STRICT_UTF8_PASS`、`HERO_TARGET_MODEL_CONTRACT_PASS count=10`及限定`git diff --check`。
+- 当前`pak01_dir.vpk`文件存在，但本机未找到可读取VPK目录索引的命令行工具，因此VPK路径存在性保持未验证；仍需Workshop Tools完全Stop后冷启动并召唤两名英雄，确认模型告警、LOADING/READY时序和外观。
+
+## 2026-08-19 - 英雄bundle Precache context 生命周期修正
+
+- 修复`asset_preload_service`在游戏运行期调用`PrecacheResource(..., nil)`的问题。CSV `hero_permanent`组的主体模型、附件模型、粒子和声音现由`addon_game_mode.precache(context)`使用引擎有效context统一注册；该阶段只记录静态资源状态，不提前将bundle标记READY。
+- 运行期bundle请求仅启动`PrecacheUnitByNameAsync`代理，精确回调后才把资源及bundle设为READY。启动静态注册FAILED时以`resource_precache_failed`拒绝并不启动代理；无代理direct资源运行期请求明确FAILED，避免pcall伪成功。
+- 本轮通过`HERO_BUNDLE_RESOURCE_COMPLETION_LUA51_PASS`、`HERO_BUNDLE_RESOURCE_CONTRACT_PASS`、两个生产Lua的Lua 5.1语法、目标严格UTF-8和限定`git diff --check`。未执行Workshop Tools冷启动或多客户端实机验证。
+
 ## 2026-08-19 - 练功房怪物独立碰撞 profile
 
 - 用户最终选择练功房Hull 12并保留单位间碰撞。`global_rules.csv`删除重复旧值30，正式地面怪保留唯一32，新增练功房12；`encounter_members.csv`新增`collision_profile`并只标记四个`practice_*`成员，避免硬编码遭遇ID或影响挑战05至11。
 - 共享碰撞解析器按CSV成员profile选择练功房Hull。练功房创建关闭引擎默认clear-space，先设置12 Hull再显式放置；其他挑战成员继续按原时序处理。定向生成更新`global_rules.lua`和`encounter_members.lua`。
 - 专项契约、Lua 5.1行为、目标Lua 5.1语法、18列CSV schema、两份生成逐字节一致、目标严格UTF-8和限定diff通过。既有挑战profile总契约后续失败于N2转生护甲断言；配置`CheckOnly`失败于既有`rogue_reward_effects.lua` U+FFFD，均未越界修改。尚未Workshop Tools实机验证。
+
+# 2026-08-19 — 英雄永久异步预载与召唤READY门禁续会话复核
+
+- 用户批准继续执行既定方案。恢复后发现生产实现与`CURRENT_TASK.md`记录已存在，Git跟踪文件无未提交差异；工作区仅有一批用户既有未跟踪测试文件，本轮未触碰。
+- 重新从权威CSV核对六条`hero_permanent`bundle：Doom、Shadow Fiend、Drow仅主体；Axe为Searing Annihilator五件套；Monkey King为Demon Trickster四件套和四条persistent ambient；Blademaster为Cyclopean Marauder五件套。共14个组件、4条常驻粒子，与生成Lua、`asset_proxy_hero_*` KV和`hero_cosmetic_service`一致。
+- 召唤链复核确认：`GAME_STARTED`后30秒渐进窗口按0.8比例分发六项；目标英雄请求使用urgent/retry；同玩家同英雄合并完成回调，改选通过generation覆盖旧请求，不同玩家按`player_id`隔离；READY回调重新进入`summon()`执行祭坛、主城、VIP、位置和重复召唤校验；FAILED通知、清理pending并允许后续重试。`addhero`只在异步召唤成功回调后增加资源、解锁商城和显示完成。
+- 本轮实际执行：`HERO_RESOURCE_TARGET_CONTRACT_PASS bundles=6 components=14 persistent_effects=4`；10个相关生产/生成Lua通过Lua 5.1.5 `luac -p`，输出`HERO_RESOURCE_LUAC51_PASS files=10`；三份目标CSV使用当前生成器在临时目录重建后与仓库生成Lua逐行一致；目标严格UTF-8与限定`git diff --check`通过。
+- 验证边界：全量`build_configs.ps1 -CheckOnly`输出`CONFIG_VERIFY files=104 bad_utf8=1`并失败，唯一`U+FFFD`替换字符位于无关既有`config/generated/rogue_reward_effects.lua`，本轮未修改。专项历史测试脚本当前不在工作树中，因此没有把文档历史PASS冒充本轮执行结果。尚未Workshop Tools冷启动或多客户端实机，仍需检查READY时序、帧尖峰、显存、六英雄外观、加载中改选、同英雄并发、失败重试、客户端闪退和新`.mdmp`。
+
+# 2026-08-19 — 英雄bundle显式资源完成门禁修复
+
+- `asset_preload_service`原先只等待`PrecacheUnitByNameAsync`代理回调，未消费CSV bundle展开的附件、粒子和声音资源。现在每个bundle启动时统一展开并调用`PrecacheResource`，显式资源请求失败会在代理请求前进入FAILED，READY仍以精确代理回调为最终完成信号。
+- 权威`asset_catalog.csv`新增ReplaceHero原生穿戴预载依赖：Doom 7项、Shadow Fiend 1项、Axe 5项；生成`asset_catalog.lua`并同步六英雄代理KV。依赖没有写入`asset_components.csv`，避免`hero_cosmetic_service`将原生组件再次生成；Axe现有Searing Annihilator五件项目饰品保持不变。
+- 本轮自动验证：`HERO_BUNDLE_RESOURCE_COMPLETION_LUA51_PASS`、`HERO_BUNDLE_RESOURCE_CONTRACT_PASS`、`HERO_RESOURCE_LUAC51_PASS files=7`、`ASSET_CATALOG_GENERATED_MATCH_PASS`、`HERO_RESOURCE_STRICT_UTF8_PASS files=6`、`HERO_RESOURCE_VPK_INDEX_PASS models=21`和限定`git diff --check`通过。全量配置CheckOnly仍受无关既有`rogue_reward_effects.lua`的U+FFFD阻断。
+- 边界：`Hero_Axe.Footsteps.Automaton`没有在当前addon/VPK索引中找到事件定义；VPK仅确认Automaton攻击音频文件，未将未经映射证明的事件或音效写入CSV。尚未Workshop Tools冷启动、性能/显存或实机模型告警验证。
 
 ## 2026-08-15 - 全部怪物碰撞与精英/Boss攻击范围统一
 

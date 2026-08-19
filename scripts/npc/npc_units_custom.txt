@@ -837,11 +837,28 @@
     {
         "BaseClass" "npc_dota_creature"
         "Model" "models/heroes/doom/doom.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/doom/belt.vmdl"
+            "model" "models/heroes/doom/bracer.vmdl"
+            "model" "models/heroes/doom/doom_helm.vmdl"
+            "model" "models/heroes/doom/doom_sword.vmdl"
+            "model" "models/heroes/doom/shoulders.vmdl"
+            "model" "models/heroes/doom/tail.vmdl"
+            "model" "models/heroes/doom/wings.vmdl"
+        }
     }
     "asset_proxy_hero_shadow_fiend"
     {
         "BaseClass" "npc_dota_creature"
         "Model" "models/heroes/shadow_fiend/shadow_fiend.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/nevermore/wings.vmdl"
+            "model" "models/heroes/shadow_fiend/shadow_fiend_shoulders.vmdl"
+            "model" "models/heroes/shadow_fiend/shadow_fiend_arms.vmdl"
+            "model" "models/heroes/shadow_fiend/shadow_fiend_head.vmdl"
+        }
     }
     "asset_proxy_hero_axe"
     {
@@ -849,6 +866,11 @@
         "Model" "models/heroes/axe/axe.vmdl"
         "precache"
         {
+            "model" "models/heroes/axe/axe_armor.vmdl"
+            "model" "models/heroes/axe/axe_belt.vmdl"
+            "model" "models/heroes/axe/axe_hair.vmdl"
+            "model" "models/heroes/axe/axe_ponytail.vmdl"
+            "model" "models/heroes/axe/axe_weapon.vmdl"
             "model" "models/items/axe/searing_annihilator_head/searing_annihilator_head.vmdl"
             "model" "models/items/axe/searing_annihilator_armor/searing_annihilator_armor.vmdl"
             "model" "models/items/axe/searing_annihilator_weapon/searing_annihilator_weapon.vmdl"
@@ -860,6 +882,16 @@
     {
         "BaseClass" "npc_dota_creature"
         "Model" "models/heroes/drow/drow_base.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/drow/drow_weapon.vmdl"
+            "model" "models/heroes/drow/drow_cape.vmdl"
+            "model" "models/heroes/drow/drow_bracer.vmdl"
+            "model" "models/heroes/drow/drow_armor.vmdl"
+            "model" "models/heroes/drow/drow_legs.vmdl"
+            "model" "models/heroes/drow/drow_haircowl.vmdl"
+            "model" "models/heroes/drow/drow_quiver.vmdl"
+        }
     }
     "asset_proxy_hero_monkey_king"
     {
