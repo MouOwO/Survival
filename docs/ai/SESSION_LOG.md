@@ -1,3 +1,8 @@
+## 2026-08-15 - 全部怪物碰撞与精英/Boss攻击范围统一
+
+- 用户要求所有Boss、精英怪与小怪使用相同碰撞体，并将Boss和精英怪攻击范围增加36且同步CSV。地面怪统一基础HullRadius 32，飞行怪统一10；研究所挑战怪、飞行精英/领头/Boss不再使用0 Hull或无单位碰撞。
+- `monster_archetypes.csv`的30个精英/Boss原型和`building_challenge_definitions.csv`的5个Boss均在原攻击范围上增加36并定向生成。正式波次、挑战副本、野外/转生遭遇和研究所挑战生成边界统一应用碰撞解析及CSV射程。
+
 - 2026-08-18：修复 Builder Blink/肉鸽奖励 D/G 映射与双 Tooltip。`combat_stats.js`和`hud_takeover.js`将`ability_survival_rogue_reward`声明为G utility；Builder键盘D/G优先按`ability_survival_builder_blink`/`ability_survival_rogue_reward`实体名称定位，避免压缩显示序号在空槽、追加和移除后交换身份。`ability_tooltip.js`的原生Ability Tooltip入口改为纯隐藏，`hud_takeover.js`在当前自定义技能hover存活期间以0/30/80/160ms有界抑制Valve异步重建的Ability/Text/Title Tooltip，不影响物品和商店Tooltip。三份Panorama均由Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`；utility顺序契约、严格UTF-8和`git diff --check`通过。肉鸽集成契约仍在既有事件名断言处提前失败，输入生命周期契约仍只失败于既有`BUILDER_D_CONFLICT_GUARD_MISSING`。尚需Workshop Tools冷启动确认Blink显示/触发D、肉鸽显示/触发G、只显示自定义Tooltip及消费后只移除一次。
 - 2026-08-18：修复Builder和伐木工Tooltip首帧接管。根因是`unitAbilityCount()`等待`survival_ability_runtime["unit:<entindex>"]`，且`customTooltipAbility()`未识别伐木工融合/性格Ability；首次选中时技能枚举为空或被判定为非托管，随后第一次施法发布runtime后才恢复。现三份Panorama源码在runtime计数缺失时使用24槽、连续4个空槽停止的有界引擎扫描；`ability_tooltip.js`按单位名识别普通/超级伐木工并接管`ability_fuse_lumberjack_01..08`、`ability_lumberjack_personality_*`，外部代理完整scope同步包含伐木工。三份JS强制编译均`OK: 1 compiled, 0 failed, 0 skipped`，高级研究所契约、严格UTF-8和限定`git diff --check`通过；输入生命周期仍被既有`BUILDER_D_CONFLICT_GUARD_MISSING`阻断，Workshop Tools冷启动仍待确认。
 - 2026-08-18：用户实机确认Builder和伐木工Tooltip显示正常，并要求后续新技能统一复用本流程。已将长期规则写入`PROJECT_CONTEXT.md`和`DECISIONS.md`：基础数据必须来自业务CSV，经过Tooltip生成器、`client_data_service.lua` runtime投影、`ability_tooltip.js`/`hud_takeover.js`接管、必要的`combat_stats.js`枚举同步、Resource Compiler强制编译、自动契约和Workshop Tools冷启动验收；不得只补localization或只补CSV文案。

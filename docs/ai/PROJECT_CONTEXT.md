@@ -1,5 +1,10 @@
 # Project Context
 
+## 全部怪物碰撞与精英/Boss攻击范围统一（2026-08-15）
+
+- 所有怪物按移动类型使用与小怪相同的基础HullRadius：地面怪统一读取`global_rules.csv.wave_ground_monster_hull_radius=32`，飞行怪统一为10；不再为精英、领头怪、Boss或研究所挑战怪保留0 Hull和无单位碰撞。正式波次、挑战副本、野外/转生遭遇及研究所挑战生成边界均消费同一碰撞解析器。
+- `monster_archetypes.csv`中全部`rank=elite/boss`原型，以及`building_challenge_definitions.csv`中全部Boss，攻击范围均在原值上增加36并生成到Lua。新增或修改怪物时必须先维护CSV，运行时不得再次叠加36。
+
 ## 伐木工融合与性格技能边界（2026-08-18）
 
 ## Tooltip 技能接入标准流程（2026-08-18）
