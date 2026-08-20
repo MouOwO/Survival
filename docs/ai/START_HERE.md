@@ -4,6 +4,7 @@
 
 ## 当前任务
 
+- 当前插入任务（2026-08-20，高级伐木工“效率”综合采集量加成自动验证完成）：`ability_lumberjack_personality_efficiency`已从攻击间隔减少30%改为当前综合采集量增加30%。基础、树等级、科技和固定加成先汇总，按伐木工实体累计小数余数后发放整数木材，暴击/10倍倍率保持后置；CSV、生成Lua、统一Tooltip和六份本地化已同步。专项Lua 5.1行为/契约、伐木工融合契约、语法、生成一致、严格UTF-8和限定diff通过；下一步Workshop Tools冷启动验收实际产量、浮字和Tooltip。
 - 当前插入任务（2026-08-19，练功房怪物碰撞 profile 自动验证完成）：正式地面波次怪继续使用CSV权威Hull 32；四个练功房成员由`encounter_members.csv.collision_profile=practice`显式归类，使用独立CSV规则Hull 12并保留单位间碰撞。练功房创建时关闭默认clear-space，先应用12 Hull再显式`FindClearSpaceForUnit()`，其他挑战成员保持原放置时序。专项契约、Lua 5.1行为/语法、18列CSV schema、定向生成逐字节一致、严格UTF-8和限定diff通过；下一步Workshop Tools冷启动分别观察正式波次与四个练功房的初始站位和移动拥挤，自动验证不等于引擎实机验收。
 - 当前复核任务（2026-08-19，英雄永久异步预载与召唤READY门禁）：生产实现已存在且本轮重新核对通过；六英雄bundle、代理KV、饰品/常驻粒子、渐进加载和按玩家generation召唤门禁一致，目标契约、Lua 5.1语法、目标生成一致、严格UTF-8与限定diff通过。全量配置CheckOnly仍受无关既有`rogue_reward_effects.lua`替换字符阻断。下一步完全Stop并冷启动Workshop Tools，记录六bundle READY时序、帧尖峰/显存，测试两玩家同英雄并发、加载中改选、失败重试和六英雄最终外观；未经实机不得称为完成。
 - 当前修复进度（2026-08-19，英雄bundle资源完成门禁）：已补齐Doom 7项、Shadow Fiend 1项、Axe 5项ReplaceHero原生穿戴预载依赖，并让bundle READY覆盖CSV主体/附件/粒子/声音资源请求后再等待代理回调；当前VPK索引21个目标模型全部存在。专项Lua 5.1、契约、生成一致、严格UTF-8、VPK索引和限定diff通过。下一步完全Stop并冷启动Workshop Tools，分别观察三英雄替换时序、模型告警和Axe `Hero_Axe.Footsteps.Automaton`音效告警；未经实机不得称为完成。

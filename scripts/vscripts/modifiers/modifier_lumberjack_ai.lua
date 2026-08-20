@@ -31,6 +31,9 @@ local function apply_runtime_params(self, params)
     self.wood_multiplier_chance_pct = math.max(
         0, tonumber(params.wood_multiplier_chance_pct) or 0
     )
+    self.wood_total_bonus_pct = math.max(
+        0, tonumber(params.wood_total_bonus_pct) or 0
+    )
     self.gold_per_hit_flat = math.max(0, tonumber(params.gold_per_hit_flat) or 0)
     self.tree_damage_chance_pct = math.max(
         0, tonumber(params.tree_damage_chance_pct) or 0
@@ -211,6 +214,7 @@ function M:OnAttackLanded(keys)
         critical_chance_pct = self.technology_crit_chance or 0,
         fusion_count = self.fusion_count,
         wood_multiplier_chance_pct = self.wood_multiplier_chance_pct,
+        wood_total_bonus_pct = self.wood_total_bonus_pct,
         gold_per_hit_flat = self.gold_per_hit_flat,
         tree_damage_chance_pct = self.tree_damage_chance_pct,
         personality_attack_growth_per_hit = self.personality_attack_growth_per_hit,

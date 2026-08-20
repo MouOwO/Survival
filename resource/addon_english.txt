@@ -534,7 +534,7 @@
         "DOTA_Tooltip_ability_ability_lumberjack_personality_high_pressure" "Short Temper"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_high_pressure_Description" "Increases Lumberjack attack damage by 20%."
         "DOTA_Tooltip_ability_ability_lumberjack_personality_efficiency" "Efficiency"
-        "DOTA_Tooltip_ability_ability_lumberjack_personality_efficiency_Description" "Reduces the Lumberjack's attack interval by 30%."
+        "DOTA_Tooltip_ability_ability_lumberjack_personality_efficiency_Description" "Increases the Lumberjack's total wood gathered per collection by 30%."
         "DOTA_Tooltip_ability_ability_lumberjack_personality_chosen" "Chosen One"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_chosen_Description" "Each collection has a 1% chance to grant 10 times the wood."
         "DOTA_Tooltip_ability_ability_lumberjack_personality_workaholic" "Workaholic"

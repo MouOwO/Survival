@@ -14,6 +14,13 @@
 - 已恢复 owner-aware 原生 Tooltip 隐藏，并以 `nativeTooltipSuppressionSerial` 将 `0/30/80/160/300ms` 有限压制及现有 50ms 悬停会话绑定到当前 Ability/source panel；鼠标退出、切换技能、渲染失败和 context shutdown 会使旧回调失效。项目技能不存在 `DOTAShowAbilityTooltip` 回退，CSV Tooltip 与动态等级渲染链未修改。
 - 自动验证通过：`ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS`、专项 PowerShell 语法、目标严格 UTF-8、content/game 限定 `diff --check`；`ability_tooltip.js` 强制编译为 `OK: 1 compiled, 0 failed, 0 skipped`，产物 101135 字节、时间 `2026-08-20 17:50:13`。输入生命周期回归被既有无关 `BUILDING_D_CONFLICT_GUARD_MISSING` 阻断；高级研究契约自身含历史编码损坏，PowerShell 无法解析，均未改无关文件迎合。仍需 Workshop Tools 完全 Stop 后冷启动确认五个终极塔技能只显示自定义 Tooltip、长悬停和 Alt 不恢复原生层，并复测动态等级与点击行为。
 
+## 当前插入任务（2026-08-20）：高级伐木工“效率”改为综合采集量加成
+
+- 用户确认`ability_lumberjack_personality_efficiency`不再减少攻击间隔，改为每次采集按当前综合采集数量的130%结算，即基础采集量、资源树等级收益、科技收益及固定采集加成先汇总，再增加30%。
+- 小数按伐木工实体独立累计余数：每次只发放整数木材，长期收益保持接近130%；该倍率在现有采集暴击和“天选之子”10倍倍率之前结算。权威数值和文案继续来自`lumberjack_personality_definitions.csv`。
+- 实施范围限定为性格CSV/生成配置、伐木工采集载荷、资源树结算、Tooltip同步和专项测试；不得触碰工作区中其他既有未提交修改。完成后执行CSV生成一致、Lua 5.1行为/语法、契约、严格UTF-8和限定`git diff --check`，Workshop Tools仍需冷启动实机验收。
+- 生产实现与自动验证已完成：CSV效果类型改为`wood_total_bonus_pct=30`，伐木工AI通过`TREE_HIT`传递，资源树在综合整数采集量形成后按实体保存小数余数，并在资源成功入账后提交余数；暴击及10倍倍率继续位于其后。统一Tooltip和六份本地化已同步。`LUMBERJACK_EFFICIENCY_LUA51_PASS`、`LUMBERJACK_EFFICIENCY_CONTRACT_PASS`、`LUMBERJACK_FUSION_CONTRACT_PASS`、目标Lua 5.1语法、CSV/生成Lua一致、严格UTF-8及限定`git diff --check`通过；尚需Workshop Tools冷启动确认LV7性格实际产量序列、浮字和Tooltip，自动验证不等于实机验收。
+
 ## 当前插入任务（2026-08-19）：练功房怪物独立碰撞 profile
 
 - 用户确认四个练功房怪物使用Hull半径12并保留单位间碰撞；正式地面波次怪继续使用32，不启用练功房专属`NO_UNIT_COLLISION`。

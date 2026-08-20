@@ -12,6 +12,13 @@
 - `ability_tooltip.js` 已恢复 owner-aware 隐藏。悬停开始执行 `0/30/80/160/300ms` 有限压制，现有 50ms cursor session 在鼠标仍位于代理时继续隐藏；`nativeTooltipSuppressionSerial` 在退出、切换、渲染失败和 shutdown 时使旧回调失效。没有永久新增调度链，没有恢复 `DOTAShowAbilityTooltip`，也未修改 CSV、动态等级或点击/施法分流。
 - 自动结果：终极塔专项契约与 PowerShell 语法、目标严格 UTF-8、限定 diff 检查通过；Resource Compiler 为 `OK: 1 compiled, 0 failed, 0 skipped`，`ability_tooltip.vjs_c` 更新为 101135 字节、`2026-08-20 17:50:13`。扩展输入契约在既有 `BUILDING_D_CONFLICT_GUARD_MISSING` 处失败，高级研究契约因自身历史编码损坏无法解析，未修改无关实现或测试。最终必须完全 Stop/Run Workshop Tools，验证终极塔五槽短悬停、长悬停、Alt、技能切换、动态等级和点击输入；自动编译不等于引擎实机验收。
 
+## 2026-08-20 - 高级伐木工“效率”改为综合采集量加成
+
+- 用户确认`ability_lumberjack_personality_efficiency`从攻击间隔减少30%改为当前综合采集数量增加30%，并采用每个伐木工独立累计小数余数的整数发放方案。
+- 权威性格CSV效果类型改为`wood_total_bonus_pct`；生成性格Lua、统一Tooltip CSV/Lua及六份中英文本地化同步。`worker_system`不再把该性格投影为攻速，`modifier_lumberjack_ai`把百分比写入既有`TREE_HIT`载荷。
+- `tree_system`在基础、树等级、科技和固定采集加成汇总后应用1.30，余数保存在攻击者实体并仅在资源成功入账后提交；暴击和“天选之子”10倍保持后置。专项行为覆盖5木材连续发放6/7、实体隔离、暴击顺序、非伐木工无效和整数综合量。
+- 自动验证通过：`LUMBERJACK_EFFICIENCY_LUA51_PASS`、`LUMBERJACK_EFFICIENCY_CONTRACT_PASS`、`LUMBERJACK_FUSION_CONTRACT_PASS`、目标Lua 5.1语法、CSV/生成Lua一致、严格UTF-8和限定`git diff --check`。未执行Workshop Tools冷启动，实际产量、浮字及Tooltip仍需实机验收。
+
 ## 2026-08-20 - Shadow Fiend/Drow Ranger 模型加载用户验收
 
 - 用户确认 Shadow Fiend 和 Drow Ranger 成功加载模型，本任务完成 Workshop Tools 实机验收。
