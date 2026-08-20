@@ -49,7 +49,7 @@ The grant subscriber emits `UI_NOTIFICATION` with `audience = "all"`. The announ
 
 ## Setup
 
-1. Create a Supabase project and run `D:\survival_database\supabase\migrations\202608170001_fishing_rewards.sql` in the SQL editor.
+1. Create a Supabase project and run `D:\survival_database\supabase\migrations\202608170001_fishing_rewards.sql`, then `D:\survival_database\supabase\migrations\202608200001_player_gameplay_stats.sql`, in that order in the SQL editor.
 2. Confirm and enable at least one reward in `fishing_reward_definitions.csv`, incrementing `definition_version` whenever definitions change.
 3. Regenerate the two Lua configs with the project config generator.
 4. Create `D:\survival_database\.env` from `D:\survival_database\.env.example`. Set `SURVIVAL_ADDON_ROOT` to this addon and keep the API token, account-ID pepper, and Supabase key server-only.
@@ -78,4 +78,4 @@ The fixture uses definition version `9001`, a fixed 10-second interval, and perm
 
 ## Validation Boundary
 
-Python unit tests use a fake RPC client and a real loopback HTTP server. Lua tests use Lua 5.1 mocks. Contract tests inspect SQL and trust boundaries. These checks do not prove that a live Supabase project accepts the migration, nor that Dota Workshop Tools exposes the expected HTTP and connection-state behavior. Both require live validation after credentials and confirmed rewards are available.
+Python unit tests use a fake RPC client and a real loopback HTTP server. Lua tests use Lua 5.1 mocks. Contract tests inspect SQL and trust boundaries. A live Supabase/Python API integration passed on 2026-08-20 with the Automation 9001 fixture, including profile initialization, 36 gameplay fields, adjacent heartbeat accumulation, idempotency, lease takeover, revision, and public-data isolation. This does not prove that Dota Workshop Tools exposes the expected HTTP and connection-state behavior; Workshop Tools still requires live validation with the `http_fishing` override and server-only token.

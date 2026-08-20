@@ -39,6 +39,23 @@
 - 运行期bundle请求仅启动`PrecacheUnitByNameAsync`代理，精确回调后才把资源及bundle设为READY。启动静态注册FAILED时以`resource_precache_failed`拒绝并不启动代理；无代理direct资源运行期请求明确FAILED，避免pcall伪成功。
 - 本轮通过`HERO_BUNDLE_RESOURCE_COMPLETION_LUA51_PASS`、`HERO_BUNDLE_RESOURCE_CONTRACT_PASS`、两个生产Lua的Lua 5.1语法、目标严格UTF-8和限定`git diff --check`。未执行Workshop Tools冷启动或多客户端实机验证。
 
+# 2026-08-20 玩家数据库玩法属性字段
+
+## 2026-08-20 - 永久累计在线时长接入
+
+- 在既有玩家玩法属性 CSV 中新增 `online_seconds_total`，默认 `0`，通过生成器重建 `player_gameplay_stats.lua` 和配置索引；Python CSV loader、初始化 payload、Lua Fixture 和档案校验同步支持 36 个字段。
+- `player_profile_service.lua` 对完整档案中的旧 `save.gameplay_stats` 按 CSV 逐字段补齐缺失值，保留已有统计；累计值继续只存在私有 `save.gameplay_stats`，不发布到公开 NetTable。
+- `202608200001_player_gameplay_stats.sql` 增加非负列、旧表兼容 `ALTER TABLE`、默认初始化和心跳 RPC 覆盖。心跳在幂等返回之后执行 session/租约校验，仅同 session 相邻差值累计，重试、新 session、超租约和离线间隔不重复计入。
+- 自动验证通过：Python 16 项单元测试（含首次、正常相邻、新 session 活跃租约拒绝、新 session 超租约、同 session 超租约、重复 request_id）、`GAMEPLAY_STATS_CONTRACT_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、Lua 5.1 档案行为、目标 `luac5.1`、严格 UTF-8、CSV/生成 Lua 一致和限定差异检查。
+- `test_fishing_contract.ps1` 仍被既有共享资源即时奖励失败关闭断言阻断；没有 PostgreSQL/Supabase CLI 或真实 `.env` 凭据，migration、远端 API 和 Workshop Tools 均未实机验证。
+- 2026-08-20 后续真实联调：本机 `.env` 的 Supabase Project URL 与新版 Secret key 配置有效，`start_fishing_api.ps1 -Automation9001` 成功连接远端并同步定义。真实 `/v1/profile` 创建专用测试档案并返回36个CSV玩法字段；心跳验证首次0秒、同session有效相邻约2秒累计2秒、重复request响应完全一致且不重复累计、活跃租约拒绝新session、超租约新session不计算离线间隔，最终profile为2秒/revision 1，公开数据不含玩法统计。测试API已停止。
+- 本轮复测通过 Python 16项、`GAMEPLAY_STATS_CONTRACT_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、`PLAYER_PROFILE_SERVICE_LUA51_PASS`、7个目标Lua 5.1语法、CSV定向生成逐字节一致、11个目标文件严格UTF-8与双仓限定`git diff --check`。`test_fishing_contract.ps1`和`test_fishing_reward_service.lua`仍只失败于既有共享团队即时奖励隔离断言，未越界修改。Workshop Tools未运行，HTTP Provider实机仍待完成。
+
+- 确认身份边界：Dota 本局 `PlayerID` 是临时槽位整数；服务端 `GetSteamAccountID()` 的 Account ID 以数字字符串进入 Python，HMAC-SHA256 后以 64 位十六进制 `text` 作为数据库永久 `player_id`，原始 Steam 身份不入库。
+- 新增 CSV 权威 `player_gameplay_stats.csv`，覆盖用户清单中除身份外的 35 个经济、英雄、防御塔、城墙和伐木工字段及临时默认值。百分比按百分点存储，定向生成 `player_gameplay_stats.lua` 并加入生成索引。
+- 独立数据库仓库新增 `player_gameplay_stats` migration、CSV loader 和幂等初始化 RPC；`/v1/profile` 与心跳先确保属性行存在，档案响应在私有 `save.gameplay_stats` 返回数值。Lua Fixture 从生成 CSV 注入，档案服务对已有字段执行类型/范围校验，对旧 schema version 1 快照缺失分区时按 CSV 补齐。
+- 自动验证通过：Python 11 项单元测试、`GAMEPLAY_STATS_CONTRACT_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、`PLAYER_PROFILE_SERVICE_LUA51_PASS`、目标 `LUAC_PASS`、Fixture/CSV 生成一致、严格 UTF-8 和双仓限定 `git diff --check`。未连接 Supabase/PostgreSQL，migration 和 Workshop Tools HTTP 实机联调均未执行。
+
 ## 2026-08-19 - 练功房怪物独立碰撞 profile
 
 - 用户最终选择练功房Hull 12并保留单位间碰撞。`global_rules.csv`删除重复旧值30，正式地面怪保留唯一32，新增练功房12；`encounter_members.csv`新增`collision_profile`并只标记四个`practice_*`成员，避免硬编码遭遇ID或影响挑战05至11。

@@ -2,6 +2,12 @@
 
 > 这是新会话的唯一恢复入口。当前只恢复多人联机工程；旧任务全部暂停并已归档。
 
+## 最新任务检查点（2026-08-20）
+
+- 玩家数据库字段链路已新增 `online_seconds_total`：CSV、生成 Lua、Python 初始化、Supabase schema/RPC、Lua 档案补字段和心跳累计契约均已更新。
+- 自动验证通过：Python 16 项单元测试、在线时长模拟边界、`GAMEPLAY_STATS_CONTRACT_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、Lua 5.1 档案行为、目标 `luac5.1`、严格 UTF-8、CSV/生成 Lua 一致和限定 `diff --check`。
+- 真实 Supabase 与本机 Python API 已于 2026-08-20 联调通过：Automation 9001 启动同步定义成功，`/v1/profile` 返回 36 个 CSV 字段；首次心跳累计 0、同 session 租约内约 2 秒累计 2、重复 `request_id` 不重复累计、活跃租约拒绝新 session、超租约新 session 不累计离线间隔，最终 profile/revision 一致且公开数据不含 `gameplay_stats`。测试进程已停止，Workshop Tools HTTP Provider 实机联调仍待执行。
+
 ## 当前任务
 
 - 当前插入任务（2026-08-20，高级伐木工“效率”综合采集量加成自动验证完成）：`ability_lumberjack_personality_efficiency`已从攻击间隔减少30%改为当前综合采集量增加30%。基础、树等级、科技和固定加成先汇总，按伐木工实体累计小数余数后发放整数木材，暴击/10倍倍率保持后置；CSV、生成Lua、统一Tooltip和六份本地化已同步。专项Lua 5.1行为/契约、伐木工融合契约、语法、生成一致、严格UTF-8和限定diff通过；下一步Workshop Tools冷启动验收实际产量、浮字和Tooltip。
@@ -107,8 +113,8 @@
 
 ## 最后可靠检查点
 
-- 2026-08-17钓鱼奖励基础设施、安全全员公告与自动验证完成。grant仅在中奖玩家本地投影成功后按ID发布一次；公告只含服务端玩家名、CSV奖励名和数值，UI路由保留个人通知。默认`local_fixture`档案路径不变；生产奖励池为空仍阻止Python API启动。10秒/9001测试fixture仅可在Tools Mode加显式ConVar下加载。仍未执行Supabase migration或Workshop Tools双客户端实机，不得宣称上线。
-- 同日后端与Supabase文件已迁到独立`D:\survival_database`仓库，生产CSV仍只在addon。Python经`SURVIVAL_ADDON_ROOT`读取CSV，并以独立pepper对Steam Account ID做HMAC后入库；目标仓库提供loopback安全启动脚本和9001 fixture开关。本机`.env`已安全生成Token/pepper但Supabase URL/Key为空，尚无真实项目，不能启动或称为远端验证。
+- 2026-08-20真实 Supabase/Python API 联调已通过，证明两份 migration 的核心表、5个RPC、Secret key权限、档案初始化和在线时长租约/幂等语义可用。Automation 9001 已向当前测试项目同步定义；默认`local_fixture`档案路径与生产禁用奖励保持不变。尚未执行Workshop Tools HTTP Provider双客户端、重连和API重启实机，不得宣称游戏端上线。
+- 同日后端与Supabase文件已迁到独立`D:\survival_database`仓库，生产CSV仍只在addon。Python经`SURVIVAL_ADDON_ROOT`读取CSV，并以独立pepper对Steam Account ID做HMAC后入库；目标仓库提供loopback安全启动脚本和9001 fixture开关。本机`.env`现已配置真实 Project URL 与新版 Secret key，凭据只保存在该忽略文件且不得进入Lua、聊天或Git。
 - 2026-08-12玩家档案Fixture纵向切片代码与自动测试完成；已增加公开投影成功日志，可直接核对玩家0/1的Fixture账号、revision及公开白名单字段。VIP权威CSV默认关闭，Mock账号验证后再投影。尚未Workshop Tools实机验证，也未接HTTP/数据库。
 - 2026-08-12 Game/Content物理目录已统一为全小写`survival`，用户Workshop Tools实机确认小地图正常显示。旧混合大小写资产索引备份仍位于`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`；该问题已关闭，不再恢复为活跃迁移任务。
 - 2026-08-10空区域配置兼容策略已落地：CSV无启用`hero_movable`业务行时保持旧地图导航与Grid建造，区域拒绝仍返回可渲染红格；等待Workshop Tools实机验证。
@@ -129,7 +135,7 @@
 
 ## 下一步唯一动作
 
-创建Supabase项目，在SQL Editor执行`D:\survival_database\supabase\migrations\202608170001_fishing_rewards.sql`，再仅在本机`D:\survival_database\.env`填写`SUPABASE_URL`和`SUPABASE_SECRET_KEY`。随后先用`start_fishing_api.ps1 -Automation9001`验证远端RPC，再完全冷启动Workshop Tools进行双客户端、重试、断线、API重启和Supabase故障联调；生产奖励CSV仍全禁用，不得作为正式奖励验收。
+完全冷启动Workshop Tools：启动`start_fishing_api.ps1 -Automation9001`，在服务端设置`survival_player_profile_provider http_fishing`、`survival_fishing_api_token <本机FISHING_API_TOKEN>`和`survival_fishing_reward_fixture automation_9001`，验证真实Steam Account ID档案加载、相邻心跳累计、重复请求、断线重连、API重启和Supabase故障恢复。生产奖励CSV仍全禁用，不得作为正式奖励验收；Automation 9001 仅限Tools Mode。
 
 ## 恢复顺序
 

@@ -7,6 +7,15 @@
 - 原生 wearable 只用于预载，禁止加入 `asset_components.csv` 或项目运行时 cosmetic 挂载列表，否则会与 Dota 原生 wearable 重复创建。资源完成状态必须覆盖主体、附件、粒子和声音的显式请求，并在精确 `PrecacheUnitByNameAsync()` 代理回调后才发布 bundle `READY`。
 - 自动契约和 Lua 5.1 模拟只能证明声明、生成和门禁逻辑；只有 Workshop Tools 完全冷启动并实际召唤目标英雄后，才能确认模型告警消失、最终外观正确和真实加载时序。用户已确认本次 Shadow Fiend/Drow Ranger 修复实机成功。
 
+## 玩家数据库玩法属性字段（2026-08-20）
+
+- `data/csv/玩家档案系统/player_gameplay_stats.csv` 是玩家开局经济、英雄、防御塔、城墙和伐木工 35 个属性的唯一默认值来源；`scripts/vscripts/config/generated/player_gameplay_stats.lua` 由生成器产生，禁止直接手改。
+- `player_id` 在数据库属性表中是 64 位小写十六进制 HMAC-SHA256 伪名文本，外部原始身份来自服务端 `PlayerResource:GetSteamAccountID()`；Dota 本局 `PlayerID` 槽位不得作为永久数据库主键。
+- 百分比字段使用百分点存储，`15` 表示 `15%`；整数资源/生命/攻击/积分使用 `bigint`，可带小数的速率、效率、护甲和攻击间隔使用 `numeric(20,6)`。百分比边界按 CSV 与 migration 约束执行。
+- `player_gameplay_stats` 由 `ensure_player_gameplay_stats` 首次幂等创建，属性进入档案私有 `save.gameplay_stats`，不得进入公开 NetTable。
+- `online_seconds_total` 是玩家永久累计在线总秒数，默认值来自同一份玩家属性 CSV。数据库心跳 RPC 只累计同一 `session_id` 租约内的有效相邻心跳差值；首次、新 session、超租约和掉线间隔均为 0，重复 `request_id` 返回已保存响应且不得再次更新统计。钓鱼响应中的 `elapsed_seconds` 仍是奖励倒计时差值，不是永久在线总时长。
+- 当前真实 Supabase 项目已执行两份 migration，并于 2026-08-20 通过 Secret key + REST RPC 验证档案初始化、36字段、在线时长累计、幂等、租约排他、超租约接管、revision和公开数据隔离。Automation 9001 定义已同步到该测试项目；这不等于生产奖励启用，也不等于 Workshop Tools 实机通过。
+
 ## 正式波次与练功房怪物碰撞边界（2026-08-19）
 
 - `global_rules.csv.wave_ground_monster_hull_radius`只作为正式/默认地面怪基础Hull，当前为32；四个练功房成员必须由`encounter_members.csv.collision_profile=practice`显式识别，并读取独立的`practice_monster_hull_radius`，当前为12。不得通过硬编码遭遇ID、成员ID前缀或共享原型推断练功房身份。

@@ -21,6 +21,18 @@
 - 实施范围限定为性格CSV/生成配置、伐木工采集载荷、资源树结算、Tooltip同步和专项测试；不得触碰工作区中其他既有未提交修改。完成后执行CSV生成一致、Lua 5.1行为/语法、契约、严格UTF-8和限定`git diff --check`，Workshop Tools仍需冷启动实机验收。
 - 生产实现与自动验证已完成：CSV效果类型改为`wood_total_bonus_pct=30`，伐木工AI通过`TREE_HIT`传递，资源树在综合整数采集量形成后按实体保存小数余数，并在资源成功入账后提交余数；暴击及10倍倍率继续位于其后。统一Tooltip和六份本地化已同步。`LUMBERJACK_EFFICIENCY_LUA51_PASS`、`LUMBERJACK_EFFICIENCY_CONTRACT_PASS`、`LUMBERJACK_FUSION_CONTRACT_PASS`、目标Lua 5.1语法、CSV/生成Lua一致、严格UTF-8及限定`git diff --check`通过；尚需Workshop Tools冷启动确认LV7性格实际产量序列、浮字和Tooltip，自动验证不等于实机验收。
 
+## 当前任务（2026-08-20）：玩家永久累计在线时长接入
+
+- 已在既有 35 个玩法属性字段基础上新增 `online_seconds_total`，CSV 默认值为整数 `0`，单位为秒，仍由 `data/csv/玩家档案系统/player_gameplay_stats.csv` 权威定义；生成配置已重建。
+- Dota 本局 `PlayerID` 仅是 `0..3` 的槽位整数；正式永久身份使用服务端 `PlayerResource:GetSteamAccountID()`，Python API 接收数字字符串并以 HMAC-SHA256 生成 64 位十六进制文本，数据库 `player_gameplay_stats.player_id` 使用该文本外键，不保存原始 Steam Account ID。
+- Supabase migration `D:\survival_database\supabase\migrations\202608200001_player_gameplay_stats.sql` 增加非负 `online_seconds_total`、旧列兼容 `ALTER TABLE`、初始化默认 `0`，并在同名 migration 末尾覆盖心跳 RPC。
+- 心跳只在同一 `session_id`、上次心跳存在且差值不超过租约时按相邻差值累计；首次、新 session、超租约和掉线间隔累计 `0`。幂等 `request_id` 在数据库事务最前返回原响应，因此重试不重复累计。`elapsed_seconds` 仍只用于钓鱼奖励倒计时。
+- Python `/v1/profile` 和心跳继续通过 `save.gameplay_stats` 返回累计值；Lua 档案服务会按 CSV 默认值补齐旧档案缺失字段，不覆盖已有统计。在线时长不进入公开 NetTable。
+- 自动验证通过：后端 16 项 Python 单元测试、在线时长五类边界模拟、`GAMEPLAY_STATS_CONTRACT_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、`PLAYER_PROFILE_SERVICE_LUA51_PASS`、目标 Lua 5.1 语法、Fixture/CSV 生成一致、严格 UTF-8 和限定 `git diff --check`。
+- 真实 Supabase/Python API 联调已通过：Automation 9001 启动时 `sync_fishing_reward_definitions` 成功；专用测试账号的 `/v1/profile` 初始化返回 schema 1、36 个玩法字段、初始在线时长 0；首次心跳累计 0、同 session 约 2 秒相邻心跳累计 2、重复 `request_id` 返回完全相同响应且不重复累计、活跃租约期间新 session 被拒绝、租约后新 session 不累计离线间隔，最终 profile 总值 2、revision 1，公开区不含 `gameplay_stats`。API测试进程已停止。
+- 既有 `test_fishing_contract.ps1` 本轮仍在“玩家即时奖励必须在共享资源写入前失败关闭”断言处失败；目标玩法字段文件和本轮改动未修改该既有资源边界，未为本任务越界调整。
+- 尚未完成 Workshop Tools 实机 HTTP Provider 联调。当前 Dota/Tools 未运行，默认档案规则仍为 `local_fixture`；下一步需在 Tools Mode 显式启用 `http_fishing`、本机API token与`automation_9001`，验证真实Steam Account ID、重连、API重启及Supabase故障恢复，未经实机确认不得称为游戏端验收。
+
 ## 当前插入任务（2026-08-19）：练功房怪物独立碰撞 profile
 
 - 用户确认四个练功房怪物使用Hull半径12并保留单位间碰撞；正式地面波次怪继续使用32，不启用练功房专属`NO_UNIT_COLLISION`。

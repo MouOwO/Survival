@@ -5,6 +5,7 @@ local json_decoder = require("core/json_decoder")
 local entitlement_service = require("systems/player_entitlement_service")
 local rules = require("config/generated/player_profile_rules")
 local public_fields = require("config/generated/player_profile_public_fields")
+local gameplay_stats = require("config/generated/player_gameplay_stats")
 local achievement_definitions = require("config/generated/achievement_definitions")
 local entitlement_definitions = require("config/generated/entitlement_definitions")
 
@@ -74,6 +75,53 @@ local function validate_achievements(value)
     return true
 end
 
+local function validate_gameplay_stats(value)
+    if type(value) ~= "table" or value == json_decoder.null then
+        return false, "gameplay_stats_invalid"
+    end
+    for _, definition in ipairs(gameplay_stats.rows or {}) do
+        if definition.enabled ~= false then
+            local field_id = tostring(definition.field_id)
+            local number = value[field_id]
+            if type(number) ~= "number" then
+                return false, "gameplay_stat_invalid:" .. field_id
+            end
+            if definition.storage_type == "integer" and number ~= math.floor(number) then
+                return false, "gameplay_stat_not_integer:" .. field_id
+            end
+            if definition.min_value ~= nil and number < tonumber(definition.min_value) then
+                return false, "gameplay_stat_below_min:" .. field_id
+            end
+            if definition.max_value ~= nil and number > tonumber(definition.max_value) then
+                return false, "gameplay_stat_above_max:" .. field_id
+            end
+        end
+    end
+    return true
+end
+
+local function gameplay_stats_defaults()
+    local result = {}
+    for _, definition in ipairs(gameplay_stats.rows or {}) do
+        if definition.enabled ~= false then
+            result[tostring(definition.field_id)] = tonumber(definition.default_value) or 0
+        end
+    end
+    return result
+end
+
+local function fill_gameplay_stats_defaults(value)
+    for _, definition in ipairs(gameplay_stats.rows or {}) do
+        if definition.enabled ~= false then
+            local field_id = tostring(definition.field_id)
+            if value[field_id] == nil then
+                value[field_id] = tonumber(definition.default_value) or 0
+            end
+        end
+    end
+    return value
+end
+
 local function validate_snapshot(snapshot, expected_account_id)
     if type(snapshot) ~= "table" then
         return false, "snapshot_invalid"
@@ -99,6 +147,16 @@ local function validate_snapshot(snapshot, expected_account_id)
     if type(snapshot.save) ~= "table" or snapshot.save == json_decoder.null
         or type(snapshot.public) ~= "table" or snapshot.public == json_decoder.null then
         return false, "profile_sections_invalid"
+    end
+    if snapshot.save.gameplay_stats == nil
+        or snapshot.save.gameplay_stats == json_decoder.null then
+        snapshot.save.gameplay_stats = gameplay_stats_defaults()
+    else
+        fill_gameplay_stats_defaults(snapshot.save.gameplay_stats)
+    end
+    ok, reason = validate_gameplay_stats(snapshot.save.gameplay_stats)
+    if not ok then
+        return false, reason
     end
     return true
 end

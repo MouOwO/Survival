@@ -1,5 +1,17 @@
 # Decisions
 
+## 2026-08-20：玩家属性数据库使用 HMAC 身份和 CSV 默认值
+
+- 决定：Dota 的局内 `PlayerID` 只表示本局槽位，数据库永久身份必须从服务端 `PlayerResource:GetSteamAccountID()`解析；后端接收数字字符串后以独立 pepper 做 HMAC-SHA256，数据库使用 64 位十六进制 `text`，不保存原始 Steam Account ID。
+- 决定：玩家 35 个玩法属性以 `player_gameplay_stats.csv` 为唯一临时默认值源，生成 Lua、Python API 初始化 payload、Lua Fixture 校验和 PostgreSQL 字段类型/范围均从这份 CSV 对齐。
+- 原因：避免将可复用的本局槽位误当永久账号，也避免数值在 SQL、Lua 和客户端之间出现第二套硬编码；HMAC 伪名保留跨局稳定查询能力并降低数据库泄露时的直接身份暴露。
+
+## 2026-08-20：永久在线时长只累计租约内相邻心跳
+
+- 决定：`online_seconds_total` 使用整数秒保存永久累计值，唯一增量来自同一 `session_id` 且上次心跳未超过租约的相邻心跳差值；首次心跳、新 session、超租约和离线间隔不计入。
+- 决定：`heartbeat_fishing_session()` 在同一事务内先检查 `request_id` 幂等记录，再锁定 session 和玩家统计行并累计；响应中的 `elapsed_seconds` 保留钓鱼奖励语义，不作为在线时长输入。
+- 原因：墙钟时间不能区分有效在线与掉线，客户端上报计时也不可信；复用服务端 session 租约、玩家行锁和已有 idempotency 表可以避免重试、并发接管和 API 重启导致重复累计。
+
 ## 2026-08-18：所有新技能统一走 CSV 到自定义 Tooltip 的完整接入流程
 
 - 决定：新技能 Tooltip 的基础数据必须来自对应业务 CSV，禁止在 Panorama 或 Lua 中另行硬编码名称、描述、图标和基础数值。CSV 修改后必须重新生成统一 Tooltip CSV/Lua，并由 `client_data_service.lua` 投影到客户端 Tooltip NetTable。
