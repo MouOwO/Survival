@@ -41,6 +41,22 @@
 
 ## 2026-08-15 - 全部怪物碰撞与精英/Boss攻击范围统一
 
+- 2026-08-19：用户实测确认直接创建方案仍表现为点击无结果，要求依据历史可用版本排查。定位提交`0a69953`确认“原本塔底子上召唤”实际是销毁七塔后在施法塔精确原点创建新实体。当前安全事务在消费前检查该原点，却错误把新终极塔entindex作为单值忽略，逻辑网格仍看到施法塔并返回`build_cell_occupied`。复核启动链确认真实处理器`grid_placement_system.lua`会以单值参数处理逻辑占格、以集合参数处理附近实体扫描；修复因此使用施法塔作为`ignore_entindex`，并在`ignore_entindexes`中包含预创建终极塔和七座待消费塔，避免新塔自身触发`unit_blocked`。按用户批准保留prepare→consume→commit、点击直派、CSV技能和失败清理，并补齐终极塔移动成功返回值；专项测试约束两层忽略身份及grid_check→consume→occupy顺序。
+
+- 2026-08-19：用户实机否定建筑系统管理终极塔的融合替换方案，要求回归此前可直接召唤终极塔的实现。已撤销本轮新增的终极塔建筑定义、占地字段、Builder owner、建筑注册、融合替换事件及网格扩展，恢复`tower_fusion_service.lua`直接创建、初始化、消费七塔后占格的流程；此前UI点击直接派发权威融合请求的修复保留。
+
+- 2026-08-19：用户实机确认七塔合一服务端点击直派仍未解决问题，否定继续围绕`OnSpellStart`修补。复查确认终极塔由融合服务手工创建、占格和维护状态，未进入真实Builder及`building_system`注册生命周期；旧事务测试的创建Mock掩盖了该缺口，且旧`ignore_entindexes`参数从未被网格系统实现。方案改为建筑系统权威的融合替换prepare/commit/rollback事务，终极塔建筑身份和占地继续由CSV提供，真实Builder作为owner，提交前失败不消费材料。
+
+- 2026-08-19：修复七塔合一满足`7/7`后点击只有施法动作、没有进入合成。根因与项目既有动态建筑Ability限制一致：`npc_dota_creature`可能接受`CastAbilityNoTarget`并播放动作，但不可靠进入Lua `OnSpellStart()`；此前箭塔升级/转职已有服务端直接派发，`ability_tower_fusion`却仍仅依赖原生回调。现`ui_request_router.lua`在所有权、Ability实体身份、激活/隐藏/可施放检查后直接请求权威`TOWER_FUSION_REQUEST`，Ability脚本回调继续作为其他入口回退；融合CSV和prepare/consume/commit事务未变，并新增直接派发及融合失败/成功日志。自动验证不能替代Workshop Tools冷启动实机融合。
+
+- 2026-08-19：排查神秘之塔转职闪退，确认`tower_class_mystery.csv`的首阶段LV1-5引用不存在的`tower_laser_keeper_forgotten`，而权威资源CSV仅定义并预载`tower_keeper_of_the_light`。按最小风险方案将首阶段恢复为已有Keeper基础资源，不启用只存在于临时迁移脚本、尚未进入资源CSV的四件饰品；专项契约新增路线资源引用存在性检查，并把激光间隔断言同步为技能CSV当前1秒权威值。仍需Workshop Tools完全冷启动实测转职。
+
+- 2026-08-19：修复七塔合一“材料塔正确销毁但终极塔未出现”。实机记录确认旧版在`CreateUnitByName()`后对普通`npc_dota_creature`调用不存在的`SetInvulnerable`，且旧事务先消费材料再初始化成品，Lua异常因此造成不可回滚损失。当前源码删除无效API，并将融合改为prepare/consume/commit：终极塔先按`tower_fusion_runtime.csv`与技能绑定CSV预创建、初始化并忽略七座材料验证原点网格，成功后才销毁七塔并正式占格/发布runtime；初始化或网格失败不消费材料，消费失败清理预创建实体。自动验证不能替代Workshop Tools冷启动实机融合。
+
+- 2026-08-19：紧急修复箭塔技能升级“追加而非替换”。根因是队列同步器清理管理技能时只收集当前CSV行及当前`tower_skill_runtime`快照；升级到新技能等级后，旧等级技能已不在两者中，因此不会被`RemoveAbility()`，新等级技能随后被追加。现在同步器从`tower_route_config`枚举基础箭塔及该塔七条CSV路线的全部技能，并结合上一轮实际挂载集合清理旧实例，再按当前CSV行重建目标技能；未修改防御塔CSV业务数据。
+
+- 2026-08-19：用户确认新的闪退复现条件为多座防御塔同时转职期间点击其他防御塔。修复将箭塔动态Ability结构变更统一交给`tower_ability_sync.lua`的按实体去重FIFO队列；每个Scheduler tick最多处理一座塔，同塔新请求以代际覆盖旧请求，实体失效或代际过期时跳过。排队期间实体标记`survival_tower_ability_sync_pending`，`ability_runtime_service.lua`缓存最新建筑状态但暂停枚举Ability；完成或幂等跳过后通过`TOWER_ABILITY_SYNC_COMPLETED`重新发布稳定快照。5级基础箭塔的七个转职按钮及路线数量限制仍读取既有配置和`TOWER_CLASS_SLOT_REQUEST`权威状态，未修改防御塔CSV数值、费用或技能数据。新增Lua 5.1行为测试和PowerShell契约；自动验证不能替代Workshop Tools引擎闪退回归。
+
 - 用户要求所有Boss、精英怪与小怪使用相同碰撞体，并将Boss和精英怪攻击范围增加36且同步CSV。地面怪统一基础HullRadius 32，飞行怪统一10；研究所挑战怪、飞行精英/领头/Boss不再使用0 Hull或无单位碰撞。
 - `monster_archetypes.csv`的30个精英/Boss原型和`building_challenge_definitions.csv`的5个Boss均在原攻击范围上增加36并定向生成。正式波次、挑战副本、野外/转生遭遇和研究所挑战生成边界统一应用碰撞解析及CSV射程。
 
@@ -2828,3 +2844,17 @@
 - `hud_takeover.js`与`survival_grid_placement.js`移除固定`0..23`实体扫描；连同`ability_tooltip.js`和`combat_stats.js`统一消费`unit:<entindex>.ability_count`。固定24/64只用于Valve `AbilityN`节点扫描，Builder视觉和输入继续消费CSV生成的`builder_slot_order`。
 - 自动通过：Builder动态域Lua 5.1行为与同步/挑战契约、Ability runtime发布行为/契约、研究所runtime/同步/高级研究/Grid回归、输入生命周期、utility顺序、目标Lua 5.1语法、Builder CSV生成9行一致和双仓限定`diff --check`。四份JS强制编译均为`1 compiled, 0 failed, 0 skipped`。
 - `test_builder_hero_replacement_contract.ps1`已通过本轮相对域检查，但随后被前序异步预载召唤实现的显式`SetOwner()`触发旧ownership禁令；对应Builder英雄替换Lua行为通过，本轮未改召唤逻辑。尚需Workshop Tools冷启动短测高级研究所与农场并确认无`invalid index`和布局重建失败，自动验证不等于实机验收。
+
+## 2026-08-19 - Machine-gun promotion and ultimate-tower fusion lifecycle fix
+
+- Root cause narrowed to lifecycle overlap rather than duplicate Ability IDs: delayed machine-gun burst callbacks could outlive modifier refresh/promotion, while fusion destroyed material towers and created route proxies in the same frame.
+- modifier_tower_attack_effects.lua now validates sequence generation, modifier parent identity, and entity validity before every delayed machine-gun hit. OnRefresh cancels anti-air and machine-gun tasks and clears transient attack state.
+- tower_fusion_service.lua now sends only the seven selected route towers to BUILDING_FUSION_CONSUME_REQUEST instead of every living arrow tower owned by the player.
+- Validation passed: MACHINE_GUN_ATTACK_INTERVAL_CONTRACT_PASS, ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS, TOWER_MACHINE_GUN_VISUAL_PASS, Lua 5.1 syntax for production/test files, and scoped git diff --check. Workshop Tools cold-start verification is still required; automated tests are not engine crash validation.
+
+## 2026-08-19 - 终极之塔单实体技能合并
+
+- `data/csv/建筑与工人系统/防御塔/ultimate_tower_skill_bindings.csv` 新增13个技能的五类绑定、展示槽顺序、来源塔和触发阶段；`tower_fusion_runtime.csv` 新增 `base_attack_speed=3` 与绑定配置ID，五个聚合槽和移动/拆除工具槽保持配置顺序。
+- 终极之塔融合运行时改为只创建一个实体，主塔隐藏加载并执行13个真实技能，挂载 `modifier_tower_attack_effects`，按 `SetBaseAttackTime(1 / attack_speed)` 实现每秒3次攻击；移除七个代理的创建、跟随、扫描攻击和代理弹道回调。
+- 终极塔不进入机枪多跳序列，但普通攻击命中仍执行赏金金币与爆矢计数；闪电链使用去重集合，风暴/扩散伤害经过技能伤害请求，不重新触发普通攻击技能或递归扩散。
+- 通过：`ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS`、`LIGHTNING_FROST_PHYSICAL_CONTRACT_PASS`、目标 Lua 5.1 语法、限定 `git diff --check`。配置 `build_configs.ps1 -CheckOnly` 仍被工作区既有 `rogue_reward_effects.lua` 替换字符阻断，非本任务修改；尚未进行 Workshop Tools 冷启动实机验收。

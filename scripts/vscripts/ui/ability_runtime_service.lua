@@ -63,6 +63,14 @@ local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
 
+local function safe_method_number(entity, method_name, fallback)
+    local method = entity and entity[method_name]
+    if type(method) ~= "function" then return fallback end
+    local ok, value = pcall(method, entity)
+    if not ok or value == nil then return fallback end
+    return tonumber(value) or fallback
+end
+
 local function unit_from_payload(payload)
     if valid_entity(payload.unit) then
         return payload.unit
@@ -258,6 +266,21 @@ local function publish(state)
     end
 
     reconcile_authoritative_unit_state(state)
+    local unit_key = unit:entindex()
+    state_by_unit[unit_key] = state
+    if state.building_id == "arrow_tower"
+        and unit.survival_tower_ability_sync_pending then
+        CustomNetTables:SetTableValue(
+            "survival_ability_runtime",
+            "unit:" .. tostring(unit_key),
+            {
+                owner_entindex = unit_key,
+                ability_count = 0,
+                sync_pending = 1,
+            }
+        )
+        return 0
+    end
     if state.building_id == "building_research_lab"
         or state.building_id == "building_advanced_research_lab" then
         local research_state = event_bus.request(research_events.STATE_GET_REQUESTED, {
@@ -274,14 +297,13 @@ local function publish(state)
             and progression.snapshot.rebirth_level) or 0
     end
 
-    local unit_key = unit:entindex()
-    state_by_unit[unit_key] = state
     CustomNetTables:SetTableValue(
         "survival_ability_runtime",
         "unit:" .. tostring(unit_key),
         {
             owner_entindex = unit_key,
-            ability_count = math.max(0, tonumber(unit:GetAbilityCount()) or 0),
+            ability_count = math.max(0,
+                safe_method_number(unit, "GetAbilityCount", 0) or 0),
         }
     )
     local resource_state = resources(state.team)
@@ -551,6 +573,9 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)
     event_bus.subscribe(events.BUILDING_DESTROYED, clear_unit)
+    event_bus.subscribe(events.TOWER_ABILITY_SYNC_COMPLETED, publish_unit)
+    event_bus.subscribe(events.TOWER_FUSION_RUNTIME_CHANGED, publish_unit)
+    event_bus.subscribe(events.TOWER_FUSION_RUNTIME_REMOVED, clear_unit)
     event_bus.subscribe(events.BUILDER_UNLOCK_CHANGED, publish_unit)
     event_bus.subscribe(events.BUILDER_STAGE_CHANGED, publish_unit)
     event_bus.subscribe(

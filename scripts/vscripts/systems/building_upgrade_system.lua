@@ -244,32 +244,7 @@ end
 local function set_class_buttons(unit, active)
     local state = buildings[unit:entindex()]
     if not state then return end
-    for _, class_data in ipairs(state.definition.class_options or {}) do
-        local available = active
-        if available then
-            local snapshot = event_bus.request(events.TOWER_CLASS_SLOT_REQUEST, {
-                operation = "snapshot",
-                player_id = state.player_id,
-                class_id = class_data.id,
-            }) or {}
-            local count = tonumber(snapshot.count) or 0
-            local pending = tonumber(snapshot.pending) or 0
-            local maximum = tonumber(snapshot.maximum)
-                or tonumber(global_rules.tower_class_max_count) or 5
-            available = maximum <= 0 or count + pending < maximum
-        end
-        local ability = unit:FindAbilityByName(class_data.ability)
-        if available and not ability then
-            ability = unit:AddAbility(class_data.ability)
-            if ability then ability:SetLevel(1) end
-        end
-        if not available and ability then
-            unit:RemoveAbility(class_data.ability)
-            ability = nil
-        end
-        if ability then ability:SetActivated(true) end
-    end
-    tower_utility_abilities.sync(state, tower_routes.current(state))
+    tower_ability_sync.sync(state, tower_routes.current(state), true)
 end
 
 local function refresh_class_buttons(state, tower_class_counts)
@@ -277,24 +252,7 @@ local function refresh_class_buttons(state, tower_class_counts)
         or not valid_entity(state.unit) then
         return
     end
-    for _, class_data in ipairs(state.definition.class_options or {}) do
-        local snapshot = tower_class_counts and tower_class_counts[class_data.id] or {}
-        local count = tonumber(snapshot.count) or 0
-        local pending = tonumber(snapshot.pending) or 0
-        local maximum = tonumber(snapshot.maximum)
-            or tonumber(global_rules.tower_class_max_count) or 5
-        local available = maximum <= 0 or count + pending < maximum
-        local ability = state.unit:FindAbilityByName(class_data.ability)
-        if available and not ability then
-            ability = state.unit:AddAbility(class_data.ability)
-            if ability then ability:SetLevel(1) end
-        elseif not available and ability then
-            state.unit:RemoveAbility(class_data.ability)
-            ability = nil
-        end
-        if ability then ability:SetActivated(true) end
-    end
-    tower_utility_abilities.sync(state, tower_routes.current(state))
+    tower_ability_sync.sync(state, tower_routes.current(state), true)
 end
 
 local function base_health(state)
@@ -1198,6 +1156,7 @@ end
 
 function M.init()
     upgrade_process.reset()
+    tower_ability_sync.reset()
     buildings = {}
     event_bus.handle_request(events.BUILDING_UPGRADE_QUOTE_REQUEST, upgrade_quote)
     event_bus.subscribe(events.BUILDING_CREATED, on_created)

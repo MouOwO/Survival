@@ -1,0 +1,16 @@
+﻿binding_id,slot_category,display_slot,skill_id,source_tower,trigger_phase,enabled,notes
+#中文名:绑定ID,技能槽类别,展示槽顺序,技能ID,来源塔,触发阶段,是否启用,备注
+#types:string,string,number,string,string,string,boolean,string
+ultimate_direct_piercing,直接作用于普通攻击,1,piercing_ballista_lv05,anti_air_tower,on_attack_landed,1,命中后施加穿甲减益
+ultimate_direct_critical,直接作用于普通攻击,1,critical_strike_lv05,death_tower,on_attack_start,1,普通攻击暴击判定
+ultimate_direct_multi,直接作用于普通攻击,1,multi_attack_lv05,multi_tower,on_attack_landed,1,额外目标分裂箭不生成普通攻击递归
+ultimate_attack_bounty,由普通攻击引出,2,bounty_machine_gun_lv05,machine_gun_tower,on_attack_landed,1,命中后奖励金币
+ultimate_attack_ice,由普通攻击引出,2,ice_blizzard_lv05,frost_tower,on_attack_landed,1,命中后概率触发暴风雪
+ultimate_attack_explosive,由普通攻击引出,2,explosive_gatling_lv01,machine_gun_tower,on_attack_landed,1,只计数不改为机枪多跳
+ultimate_attack_arcane,由普通攻击引出,2,arcane_cannon_lv05,mystery_tower,on_kill,1,击杀后叠加面板伤害Buff
+ultimate_panel_frost,面板被动,3,frost_attack_lv05,frost_tower,on_attack_landed,1,命中附加范围减速伤害
+ultimate_panel_death,面板被动,3,death_grenade_lv01,death_tower,on_attack_landed,1,仅对原目标追加技能伤害
+ultimate_aura_polar,光环,4,polar_obelisk_lv01,frost_tower,aura_interval,1,范围内敌人攻击速度降低
+ultimate_secondary_lightning,次生技能,5,lightning_strike_lv05,lightning_tower,secondary_chain,1,链条以去重集合终止
+ultimate_secondary_storm,次生技能,5,lightning_storm_lv05,lightning_tower,secondary_storm,1,风暴伤害不重新触发普通攻击技能
+ultimate_secondary_diffusion,次生技能,5,lightning_diffusion_lv01,lightning_tower,secondary_diffusion,1,扩散链禁止递归扩散

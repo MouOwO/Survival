@@ -30,6 +30,8 @@ local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
 local buildings = {}
+local fusion_replacements = {}
+local fusion_replacement_sequence = 0
 local tower_limits = player_tower_limits.new(function()
     return global_rules.tower_class_max_count
 end)
@@ -1053,6 +1055,7 @@ local function consume_for_fusion(payload)
     end
     return { ok = true, consumed = #states }
 end
+
 local function on_building_changed(payload)
     local state = buildings[payload.entindex]
     if not state then return end

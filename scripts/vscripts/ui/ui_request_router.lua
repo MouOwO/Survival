@@ -799,6 +799,9 @@ local function register_ability_cast_request()
         local tower_action = tower_upgrade_mode ~= nil or tower_class_index ~= nil
         local tower_ability_matches = tower_action and unit_valid
             and ability_valid and unit:FindAbilityByName(ability_name) == ability
+        local tower_fusion_matches = ability_name == "ability_tower_fusion"
+            and unit_valid and ability_valid
+            and unit:FindAbilityByName(ability_name) == ability
         local building_upgrade_action = ({
             ability_upgrade_wall = true,
             ability_upgrade_city = true,
@@ -905,6 +908,28 @@ local function register_ability_cast_request()
                 print("[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index="
                     .. tostring(tower_class_index))
             end
+        elseif tower_fusion_matches and owner_matches and not passive
+            and not is_point_target then
+            -- Dynamic Lua abilities on npc_dota_creature towers may accept the
+            -- cast order without reliably entering OnSpellStart. Dispatch the
+            -- same authoritative fusion request directly after server checks.
+            handled_directly = true
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden()
+                or not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "七塔合一技能当前不可用" }
+            else
+                direct_result = event_bus.request(events.TOWER_FUSION_REQUEST, {
+                    caster = unit,
+                    ability = ability,
+                    source = "ui_ability_cast_request",
+                }) or { ok = false, error = "七塔合一请求无响应" }
+            end
+            print("[SURVIVAL_CAST][SERVER] TOWER_FUSION_DISPATCHED unit="
+                .. tostring(entindex) .. " ok="
+                .. tostring(direct_result and direct_result.ok == true)
+                .. " error="
+                .. tostring(direct_result and direct_result.error or ""))
         elseif gold_mine_ability_matches and owner_matches and not passive
             and not is_point_target then
             handled_directly = true
@@ -1116,6 +1141,15 @@ local function register_building_move_request()
             tonumber(payload.entindex),
             Vector(x, y, z)
         )
+        if not ok and error_code == "building_not_found" then
+            local result = event_bus.request(events.TOWER_FUSION_MOVE_REQUEST, {
+                player_id = player_id,
+                entindex = tonumber(payload.entindex),
+                position = Vector(x, y, z),
+            })
+            ok = result and result.ok == true
+            error_code = result and result.error or "ultimate_tower_not_found"
+        end
         send_to_player("ui_building_move_result", player_id, {
             success = ok and 1 or 0,
             error = error_code or "",
@@ -1134,6 +1168,17 @@ local function register_arrow_tower_destroy_request()
                 player_id,
                 tonumber(payload.entindex)
             )
+            if not ok and error_code == "tower_not_owned" then
+                local result = event_bus.request(
+                    events.TOWER_FUSION_DESTROY_REQUEST,
+                    {
+                        player_id = player_id,
+                        entindex = tonumber(payload.entindex),
+                    }
+                )
+                ok = result and result.ok == true
+                error_code = result and result.error or "ultimate_tower_not_found"
+            end
             send_to_player("ui_arrow_tower_destroy_result", player_id, {
                 success = ok and 1 or 0,
                 error = error_code or "",

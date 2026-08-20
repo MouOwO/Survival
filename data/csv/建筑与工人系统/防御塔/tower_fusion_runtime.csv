@@ -1,4 +1,4 @@
-﻿config_id,route_ids,unit_name,display_name,model_name,base_attack_multiplier,passive_slot_ability_ids,enabled
-#中文名:配置ID,路线ID,单位名,显示名,模型名称,基础攻击力合并倍率,七个被动技能槽接口,是否启用
-#types:string,list,string,string,string,number,list,boolean
-ultimate_tower,class_1|class_2|class_3|class_4|class_5|class_6|class_7,npc_dota_unit_ultimate_tower,终极之塔,models/creeps/roshan/roshan.vmdl,3,ultimate_tower_passive_1|ultimate_tower_passive_2|ultimate_tower_passive_3|ultimate_tower_passive_4|ultimate_tower_passive_5|ultimate_tower_passive_6|ultimate_tower_passive_7,1
+﻿config_id,route_ids,unit_name,display_name,model_name,base_attack_multiplier,base_attack_speed,skill_binding_config_id,passive_slot_ability_ids,utility_ability_ids,enabled
+#中文名:配置ID,路线ID,单位名,显示名,模型名称,基础攻击力合并倍率,基础攻速(次/秒),技能绑定配置ID,五个聚合展示槽,辅助技能槽,是否启用
+#types:string,list,string,string,string,number,number,string,list,list,boolean
+ultimate_tower,class_1|class_2|class_3|class_4|class_5|class_6|class_7,npc_dota_unit_ultimate_tower,终极之塔,models/creeps/roshan/roshan.vmdl,3,3,ultimate_tower,ultimate_tower_passive_1|ultimate_tower_passive_2|ultimate_tower_passive_3|ultimate_tower_passive_4|ultimate_tower_passive_5,ability_building_blink|ability_destroy_arrow_tower,1

@@ -2,7 +2,7 @@
 -- Source: tower_fusion_runtime.csv
 local M = {}
 M.rows = {
-    { config_id = "ultimate_tower", route_ids = {"class_1", "class_2", "class_3", "class_4", "class_5", "class_6", "class_7"}, unit_name = "npc_dota_unit_ultimate_tower", display_name = "终极之塔", model_name = "models/creeps/roshan/roshan.vmdl", base_attack_multiplier = 3, passive_slot_ability_ids = {"ultimate_tower_passive_1", "ultimate_tower_passive_2", "ultimate_tower_passive_3", "ultimate_tower_passive_4", "ultimate_tower_passive_5", "ultimate_tower_passive_6", "ultimate_tower_passive_7"}, enabled = true },
+    { config_id = "ultimate_tower", route_ids = {"class_1", "class_2", "class_3", "class_4", "class_5", "class_6", "class_7"}, unit_name = "npc_dota_unit_ultimate_tower", display_name = "终极之塔", model_name = "models/creeps/roshan/roshan.vmdl", base_attack_multiplier = 3, base_attack_speed = 3, skill_binding_config_id = "ultimate_tower", passive_slot_ability_ids = {"ultimate_tower_passive_1", "ultimate_tower_passive_2", "ultimate_tower_passive_3", "ultimate_tower_passive_4", "ultimate_tower_passive_5"}, utility_ability_ids = {"ability_building_blink", "ability_destroy_arrow_tower"}, enabled = true },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

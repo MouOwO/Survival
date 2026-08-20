@@ -50,8 +50,22 @@ def main():
         clean(row.get("tooltip_id")): row
         for row in read_csv(OUT_CSV)
         if clean(row.get("tooltip_id")).startswith("ability:ability_build_")
+        or clean(row.get("tooltip_id")).startswith("ability:ultimate_tower_passive_")
         or clean(row.get("tooltip_id")) == "ability:ability_survival_rogue_reward"
     }
+    for row in existing_tooltips.values():
+        add(
+            out,
+            clean(row.get("tooltip_id")),
+            clean(row.get("tooltip_type")),
+            clean(row.get("id")),
+            row.get("name"),
+            row.get("needwood"),
+            row.get("needgold"),
+            row.get("desc"),
+            row.get("icon"),
+            row.get("source_id"),
+        )
     hero = read_csv(CSV_ROOT / "英雄系统" / "hero_skill_definitions.csv")
     for row in hero:
         if clean(row.get("enabled", "1")).lower() in {"0", "false", "no"}:

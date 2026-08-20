@@ -5,6 +5,21 @@
 - `wave_monster_collision.lua`按成员profile选择练功房Hull，正式波次、飞行怪和建筑挑战怪规则保持独立。`challenge_session_service.lua`仅对练功房关闭`CreateUnitByName`默认clear-space，先应用12 Hull再显式`FindClearSpaceForUnit()`；其他挑战成员仍按旧时序在放置后应用Hull。
 - 自动验证通过：`PRACTICE_MONSTER_COLLISION_CONTRACT_PASS`、`PRACTICE_MONSTER_COLLISION_LUA51_PASS`、目标Lua 5.1语法、18列成员CSV schema、两份生成Lua逐字节一致、目标严格UTF-8及限定`git diff --check`。挑战profile契约的本任务部分输出`CHALLENGE_COMBAT_PROFILES_LUA51_PASS`后，被既有无关N2转生护甲断言阻断；全量配置`CheckOnly`被既有`generated/rogue_reward_effects.lua`的U+FFFD阻断，本轮未越界修复。尚需Workshop Tools冷启动分别验收正式波次Hull 32及四个练功房的初始分散、移动和接敌表现。
 
+## 当前任务（2026-08-19）：七塔合一点击无响应
+
+- 用户再次实测确认回退后仍点不动，要求以历史可用版本为准停止盲目回退。已定位确切基线提交`0a69953`（2026-08-18“最终塔提交”）：该版本销毁七塔后在施法塔精确原点创建新终极塔，并非保留原实体变身。当前确定性阻断是安全事务在消费前检查原点网格时把新终极塔entindex作为单值`ignore_entindex`，而逻辑网格真正记录的是尚未消费的施法塔，因此返回`build_cell_occupied`。复核启动链确认真实处理器是`grid_placement_system.lua`而非旧`grid_system.lua`：单值参数负责逻辑占格，集合参数负责附近实体扫描。用户批准保留prepare→consume→commit安全事务；最终预检查以施法塔entindex作为单值忽略，并以集合忽略预创建终极塔及七座即将消费的材料塔，同时保留点击直派、CSV技能和失败清理；另修复`move_state()`成功路径缺少返回值。
+- 用户否定将终极塔纳入建筑系统的融合替换事务，要求回归此前可以直接召唤终极塔的实现。已撤销`ultimate_tower`建筑定义、Builder owner、建筑注册和融合替换事件，恢复由`tower_fusion_service.lua`直接`CreateUnitByName()`，按`prepare → BUILDING_FUSION_CONSUME_REQUEST → commit`完成初始化、材料消费和占格；点击直派修复继续保留。
+- 用户实机确认服务端点击直派方案仍失败，并指出终极塔没有进入绑定真实Builder的建筑预建造/注册生命周期。复查确认上一方案只修请求入口，`tower_fusion_service.lua`仍自行`CreateUnitByName`、占格和维护状态，绕过`building_system`建筑注册；旧事务测试Mock了创建实体，无法证明引擎建筑生命周期。另确认旧代码传入的`ignore_entindexes`未被`grid_system.lua`实现，所谓忽略七座材料塔的网格预验证实际无效。
+- 已批准改为建筑系统权威的融合替换事务：从CSV取得终极塔建筑身份与占地，真实Builder作为创建owner；prepare阶段不消费材料，融合服务完成专属属性/技能初始化后再commit，建筑系统重新验证并消费七塔、注册成品和占格；失败rollback保留材料。终极塔不进入Builder普通技能栏。
+- 用户实机确认七条路线资格显示`7/7`且点击后施法塔有动作，但材料塔未被消费、终极塔未生成。该表现说明客户端施法请求已发出，但动态`npc_dota_creature`上的`ability_tower_fusion`可能只接受了施法动作而未可靠进入`OnSpellStart()`。
+- 已批准按最小范围修复：`ui_request_router.lua`在完成玩家归属、Ability实体身份、激活/隐藏/可施放校验后，直接派发权威`TOWER_FUSION_REQUEST`，保留Ability自身`OnSpellStart()`作为非自定义UI入口的回退；融合CSV、七塔选择、消耗及prepare/consume/commit事务不变。新增点击路由专项契约和融合成功/失败诊断日志，仍需Workshop Tools完全冷启动实测。
+- 自动验证已通过：两个生产Lua文件的Lua 5.1语法检查、`TOWER_FUSION_TRANSACTION_LUA51_PASS`、`TOWER_FUSION_CAST_ROUTE_CONTRACT_PASS`、`ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS`、严格UTF-8检查及限定范围`git diff --check`。这些检查不是Dota引擎实机验证。
+
+## 前一任务（2026-08-19）：神秘之塔转职闪退排查
+
+- 用户确认转职神秘之塔会闪退并已批准执行最小修复。权威路线CSV的神秘塔LV1-5引用不存在的`model_asset_id=tower_laser_keeper_forgotten`，而权威`asset_catalog.csv`及生成Lua只有已预载的基础资源`tower_keeper_of_the_light`；本轮不启用未落入资源CSV的临时饰品迁移数据。
+- 最小修复将神秘塔LV1-5统一指向`tower_keeper_of_the_light`并重新生成Lua；专项契约校验神秘路线每个`model_asset_id`均存在于资源CSV、首阶段模型/资源固定一致，并将激光伤害间隔期望同步为技能CSV当前权威值1秒。自动验证不能替代Workshop Tools完全冷启动后的转职实机回归。
+
 ## 当前插入任务（2026-08-18）：伐木工性格结算、融合技能实时刷新与被动技能 Tooltip
 
 - 用户已批准进入执行模式。“手很重”改为每次采集有1%概率减少资源树最大生命值的1%，概率和百分比均以`lumberjack_personality_definitions.csv`的`effect_value`为权威；整数伤害向下取整且最低1点，继续通过树木最低生命/耗尽升级链处理，不直接杀死资源树实体。
@@ -44,6 +59,7 @@
 - `building_visual_service.matches()`会跳过相同模型路径的`SetModel`，模型变化不是普通升级必经步骤；模型异步预载只在资源未Ready时排队。因此当前日志中的Monkey King附件资源错误不是七塔普通升级卡顿的充分根因，而是独立的英雄附件资源加载问题。
 - 本轮已保留技能槽顺序语义，并将无变化的同步改为基于CSV签名的幂等短路；Workshop Tools仍需记录七塔升级完成时间、`tower_ability_sync.sync()`耗时和最终技能显示状态，以确认同帧峰值是否下降且动作没有回归。
 - 静态验证已通过：`tower_fusion_service.lua` Lua 5.1语法、现有`BUILDING_BATCH_UPGRADE_CONTRACT_PASS`和限定文件`git diff --check`。当前未发现独立的箭塔融合契约脚本；融合成功、终极塔位置/属性/能力及七塔实际卡顿仍需冷启动Workshop Tools实机确认。
+- 2026-08-19复核并加固融合事务：旧版普通单位实体调用不存在的`SetInvulnerable`会在七塔消费后中断创建；当前源码已删除该API。融合现改为先按CSV配置预创建并完整初始化终极塔、忽略七座待消费材料验证原点网格，成功后才请求销毁七塔并提交占格/runtime；初始化异常或网格失败不消费材料，消费失败会删除预创建实体。专项契约禁止无效API并约束prepare→consume→commit顺序；仍需Workshop Tools完全冷启动确认实机加载新脚本。
 
 ## 当前插入任务（2026-08-18）：普通伐木工点击合成超级伐木工
 

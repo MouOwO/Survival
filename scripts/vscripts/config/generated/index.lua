@@ -93,6 +93,7 @@ M["tower_skill_definitions"] = require("config/generated/tower_skill_definitions
 M["tower_skill_sound_definitions"] = require("config/generated/tower_skill_sound_definitions")
 M["training_definitions"] = require("config/generated/training_definitions")
 M["ui_unlock_rules"] = require("config/generated/ui_unlock_rules")
+M["ultimate_tower_skill_bindings"] = require("config/generated/ultimate_tower_skill_bindings")
 M["unit_display_names"] = require("config/generated/unit_display_names")
 M["wall_visual_levels"] = require("config/generated/wall_visual_levels")
 M["war3_damage_calculator_mystery_experiment"] = require("config/generated/war3_damage_calculator_mystery_experiment")

@@ -143,6 +143,7 @@ local function uses_multi_replacement_arrows(unit)
 end
 
 local function uses_machine_gun_attack(unit)
+    if unit and unit.survival_ultimate_tower then return false end
     return skill_matching(unit, "machine_gun_") ~= nil
         or skill_matching(unit, "bounty_machine_gun_") ~= nil
         or skill_matching(unit, "explosive_gatling_") ~= nil
@@ -607,6 +608,15 @@ local function fire_machine_gun_hit(modifier, tower, target, hit_index)
     return true
 end
 
+local function machine_gun_sequence_is_current(modifier, tower, sequence)
+    if not modifier or modifier.machine_gun_sequence ~= sequence
+        or not valid(tower) then
+        return false
+    end
+    local ok, parent = pcall(function() return modifier:GetParent() end)
+    return ok and parent == tower and valid(parent)
+end
+
 local function stop_machine_gun_sequences(modifier)
     modifier.machine_gun_sequence =
         (tonumber(modifier.machine_gun_sequence) or 0) + 1
@@ -624,6 +634,9 @@ local function start_machine_gun_sequence(modifier, tower, target, skill)
     local sequence = modifier.machine_gun_sequence
     modifier.machine_gun_task_ids = modifier.machine_gun_task_ids or {}
     local function fire(hit_index)
+        if not machine_gun_sequence_is_current(modifier, tower, sequence) then
+            return
+        end
         if not fire_machine_gun_hit(modifier, tower, target, hit_index)
             or hit_index >= hit_count then
             return
@@ -636,6 +649,9 @@ local function start_machine_gun_sequence(modifier, tower, target, skill)
         modifier.machine_gun_task_ids[task_id] = true
         scheduler.after(machine_gun_interval(tower, skill), function()
             modifier.machine_gun_task_ids[task_id] = nil
+            if not machine_gun_sequence_is_current(modifier, tower, sequence) then
+                return false
+            end
             fire(next_index)
             return false
         end, task_id)
@@ -1426,6 +1442,11 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
         critical_source = self.pending_critical_source,
         skills = skills,
     })
+    if caster.survival_ultimate_tower then
+        -- The ultimate tower keeps the bounty/gatling effects but deliberately
+        -- does not enter the machine-gun multi-hit attack sequence.
+        apply_machine_gun_hit_effects(self, caster, primary)
+    end
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
     local drag_net = skill_matching(caster, "drag_net_")
@@ -1499,6 +1520,17 @@ function modifier_tower_attack_effects:OnDestroy()
     reset_laser(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     self.polar_obelisk_sound_active = false
+end
+
+function modifier_tower_attack_effects:OnRefresh()
+    if not IsServer() then return end
+    stop_anti_air_sequence(self)
+    stop_machine_gun_sequences(self)
+    self.gatling_target_entindex = nil
+    self.gatling_target_hits = 0
+    self.current_attack_target = nil
+    self.pending_critical_multiplier = nil
+    self.pending_critical_source = nil
 end
 
 M._start_anti_air_sequence_for_test = start_anti_air_sequence
