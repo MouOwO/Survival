@@ -1,4 +1,5 @@
 local skill_config = require("config/generated/tower_skill_definitions")
+local fusion_runtime = require("config/generated/tower_fusion_runtime")
 local tower_special_skill_system = require("systems/tower_special_skill_system")
 
 local M = class({})
@@ -26,6 +27,13 @@ _G.ability_tower_passive = M
 for _, definition in ipairs(skill_config.rows or {}) do
     if definition.enabled ~= false and definition.skill_id then
         _G[definition.skill_id] = M
+    end
+end
+for _, definition in ipairs(fusion_runtime.rows or {}) do
+    if definition.enabled ~= false then
+        for _, ability_id in ipairs(definition.passive_slot_ability_ids or {}) do
+            _G[ability_id] = M
+        end
     end
 end
 

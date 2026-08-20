@@ -196,7 +196,6 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
         footprint = selected[1].definition
             and selected[1].definition.footprint or { x = 2, y = 2 },
     }
-    add_ultimate_skills(unit)
     unit:AddNewModifier(unit, nil, "modifier_tower_attack_effects", {})
     for index, ability_name in ipairs(config().passive_slot_ability_ids or {}) do
         local ability = unit:AddAbility(ability_name)
@@ -215,6 +214,10 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
             ability:SetActivated(true)
         end
     end
+    -- AbilityLayout is the native visible bar size. Add every visible slot
+    -- before the hidden runtime skills so the engine's natural indices remain
+    -- 0..4 for the aggregate passives and 5..6 for the utility abilities.
+    add_ultimate_skills(unit)
     local ignored_entindexes = { [unit:entindex()] = true }
     for _, source in ipairs(selected) do
         ignored_entindexes[source.entindex] = true

@@ -518,22 +518,6 @@
         "AbilityTextureName" "crystal_maiden_brilliance_aura"
         "MaxLevel"           "1"
     }
-    "ultimate_tower_passive_6"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "death_prophet_spirit_siphon"
-        "MaxLevel"           "1"
-    }
-    "ultimate_tower_passive_7"
-    {
-        "BaseClass"          "ability_lua"
-        "ScriptFile"         "abilities/ability_tower_passive"
-        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-        "AbilityTextureName" "skywrath_mage_ancient_seal"
-        "MaxLevel"           "1"
-    }
 
     "ability_upgrade_tower_lv01"
     {

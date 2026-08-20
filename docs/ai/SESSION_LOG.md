@@ -1,3 +1,17 @@
+## 2026-08-20 - 终极之塔聚合技能 Tooltip 数据接入
+
+- 用户批准继续执行终极之塔原生气泡替换。调用链复核确认 `ability_tooltip.js` 从 `survival_ability_data` 读取 Ability 定义，再按 `tooltip_id` 从 `survival_tooltips` 读取统一 Tooltip；终极塔的 `building_*` owner 已命中现有 `managedUpgrade()`，无需新增 Panorama Tooltip 系统。
+- 本轮先补充权威 `tooltip_definitions.csv` 的五条 `ultimate_tower_passive_1..5`，标题、复合描述和图标沿用终极塔专项契约；随后由 `build_tooltip_definitions.py` 生成 Lua 配置。
+- 当前仅记录执行起点，自动契约、生成一致性、Lua 语法、编码和 Workshop Tools 冷启动结果待本轮验证后追加。
+- 实现完成：删除 Tooltip CSV 中五条聚合技能的旧重复占位行，保留 CSV 权威的新标题、复合描述和图标；重新生成 `tooltip_definitions.lua`；同步中英文原生回退文本；删除 `npc_abilities_custom.txt` 中未再使用的 `ultimate_tower_passive_6/7`。
+- 验证通过：`ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS`、CSV 五条记录唯一性、生成 Lua 内容与 CSV 一致、目标 Lua 5.1 语法、Ability KV 结构、严格 UTF-8 和限定 `git diff --check`。`ability_tooltip.js` 已有 `managedUpgrade()` 路径直接复用，未新增 Tooltip 系统。Workshop Tools 冷启动仍待用户实机确认五个槽位的实际悬停内容和动态等级显示。
+- 后续实机截图发现主城完成后仅 `Q` 建造防御塔缺失。根因是删除 `ultimate_tower_passive_6/7` 时误删相邻 `ability_survival_builder_slot_6_placeholder` 完整定义及 `ability_build_arrow_tower` 定义头，使箭塔字段串入 `slot_5_placeholder`；KV 大括号仍平衡，原结构检查无法发现。
+- 已恢复两个原有独立 KV 定义，不回退终极塔五技能、融合服务或 Tooltip 修改。终极塔专项契约现结构化读取 `builder_ability_stages.csv`，要求全部启用 Ability、六个 Builder 占位 Ability 和 `ultimate_tower_passive_1..5` 均有唯一顶层 KV 定义，并检查箭塔 Ability 的脚本、POINT 行为、图标、等级字段及禁止 `passive_6/7`。
+- 本轮验证通过：`ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS`、`BUILDER_ABILITY_SLOTS_LUA51_PASS`、`ability_build_arrow_tower.lua` Lua 5.1 语法、Ability KV 引号感知括号检查、四个目标文件严格 UTF-8 和限定 `git diff --check`。全量 `build_configs.ps1 -CheckOnly` 仍因无关既有 `config/generated/rogue_reward_effects.lua` 含唯一 U+FFFD 而报告 `files=105 bad_utf8=1`，未越界修改。尚需 Workshop Tools 冷启动验证 `Q` 恢复、七路线、融合、五聚合技能、两工具技能与五个 Tooltip。
+- 后续实机反馈为自定义 Tooltip 已显示但 Valve 原生 Tooltip 同时存在。对比 `.cline_tmp/tooltip_full_override_20260728/ability_tooltip.before.js` 确认旧成功路径会遍历 source panel 祖先和 `AbilityButton/ButtonWell/AbilityImage` owner，并在悬停生命周期重复派发 `DOTAHideAbilityTooltip`；当前生产版只对外置代理单次隐藏，无法覆盖 Valve 祖先稍后异步创建的 Tooltip。
+- `ability_tooltip.js` 已恢复 owner-aware 隐藏。悬停开始执行 `0/30/80/160/300ms` 有限压制，现有 50ms cursor session 在鼠标仍位于代理时继续隐藏；`nativeTooltipSuppressionSerial` 在退出、切换、渲染失败和 shutdown 时使旧回调失效。没有永久新增调度链，没有恢复 `DOTAShowAbilityTooltip`，也未修改 CSV、动态等级或点击/施法分流。
+- 自动结果：终极塔专项契约与 PowerShell 语法、目标严格 UTF-8、限定 diff 检查通过；Resource Compiler 为 `OK: 1 compiled, 0 failed, 0 skipped`，`ability_tooltip.vjs_c` 更新为 101135 字节、`2026-08-20 17:50:13`。扩展输入契约在既有 `BUILDING_D_CONFLICT_GUARD_MISSING` 处失败，高级研究契约因自身历史编码损坏无法解析，未修改无关实现或测试。最终必须完全 Stop/Run Workshop Tools，验证终极塔五槽短悬停、长悬停、Alt、技能切换、动态等级和点击输入；自动编译不等于引擎实机验收。
+
 ## 2026-08-20 - Shadow Fiend/Drow Ranger 模型加载用户验收
 
 - 用户确认 Shadow Fiend 和 Drow Ranger 成功加载模型，本任务完成 Workshop Tools 实机验收。

@@ -1,3 +1,19 @@
+## 当前任务（2026-08-20）：终极之塔聚合技能自定义 Tooltip
+
+- 用户已批准执行。已确认自定义 Tooltip 链路由 `survival_ability_data`、`survival_tooltips` 和 `ability_tooltip.js` 共同完成；终极塔属于 `building_*` 单位，现有 `managedUpgrade()` 已覆盖其悬停接管，不新增独立 Panorama 气泡系统。
+- 当前缺口是 `data/csv/公共规则/tooltip_definitions.csv` 缺少 `ultimate_tower_passive_1..5` 有效数据。本轮将以该 CSV 为权威源补齐五条聚合技能 Tooltip，并定向生成 `config/generated/tooltip_definitions.lua`。
+- 图二对应数据采用既有终极塔专项契约规定的五个标题、复合描述和图标；动态等级、运行时字段继续复用现有 Ability Tooltip 渲染链。
+- 自动验证和 Workshop Tools 冷启动结果将在本任务完成后追加；自动检查不能替代引擎实机验收。
+- 已完成实现：CSV 中仅保留五条 `ultimate_tower_passive_1..5` 聚合 Tooltip 定义，并重新生成 Tooltip Lua；同步更新中英文原生回退文案，删除 `npc_abilities_custom.txt` 中残留的 `ultimate_tower_passive_6/7` KV。现有 `ability_tooltip.js` 的 `managedUpgrade()` 接管链未修改。
+- 自动验证通过：`ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS`、五条 CSV 唯一性/生成内容检查、目标 Lua 5.1 语法、KV 括号结构、严格 UTF-8、生成一致性和限定 `git diff --check`。尚未进行 Workshop Tools 冷启动实机悬停验收。
+- 实机插入回归：用户截图确认主城已建成后仅 `Q` 建造防御塔缺失，其余 Builder 技能正常。已定位到删除终极塔旧 `ultimate_tower_passive_6/7` 时误删相邻的 `ability_survival_builder_slot_6_placeholder` 完整块及 `ability_build_arrow_tower` 定义头，导致箭塔建造字段串入 `slot_5_placeholder`；KV 大括号仍平衡，所以原结构检查未发现语义串块。
+- 用户已批准完整修复与终极塔同轮回归。实施边界为恢复上述两个原有独立 KV 定义，并扩展专项契约，结构化读取 Builder 阶段 CSV 后校验所有启用 Ability 和六个占位 Ability 均存在唯一顶层 KV 定义，同时固定检查箭塔建造块的脚本、行为、图标和等级；终极塔仅保留五个聚合技能，既有融合与 Tooltip 实现不回退。
+- 修复与自动回归已完成：`ability_survival_builder_slot_6_placeholder` 和 `ability_build_arrow_tower` 已恢复为独立 KV 块；专项契约现在校验 Builder CSV 启用 Ability、六个占位 Ability、终极塔五个聚合 Ability 的顶层定义唯一性，并固定检查箭塔建造块字段归属及禁止 `ultimate_tower_passive_6/7`。`ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS`、`BUILDER_ABILITY_SLOTS_LUA51_PASS`、箭塔 Ability Lua 5.1 语法、KV 引号感知括号结构、目标严格 UTF-8 和限定 `git diff --check` 通过。
+- 全量 `build_configs.ps1 -CheckOnly` 未通过：现有 105 个生成 Lua 中唯一失败文件仍为无关的 `config/generated/rogue_reward_effects.lua`，含历史 U+FFFD；本轮未修改该数据来绕过检查。最终仍需 Workshop Tools 完全停止后冷启动，依次确认 `Q` 建造防御塔、七路线建造、终极塔融合、五个聚合技能、两个工具技能和五个自定义 Tooltip；自动验证不等于引擎实机验收。
+- 用户随后确认自定义 Tooltip 已出现但 Valve 原生 Ability Tooltip 仍会同时显示。历史实现对 source panel、祖先及 `AbilityButton/ButtonWell/AbilityImage` owner 派发隐藏事件，并在悬停期间重复压制；当前生产版仅对代理单次隐藏，Valve 祖先异步重建 Tooltip 后会重新出现。生产配置仍为 `abilities:false/abilityTooltips:true`，故修复位于选择性外置代理，不启用完整技能栏接管。
+- 已恢复 owner-aware 原生 Tooltip 隐藏，并以 `nativeTooltipSuppressionSerial` 将 `0/30/80/160/300ms` 有限压制及现有 50ms 悬停会话绑定到当前 Ability/source panel；鼠标退出、切换技能、渲染失败和 context shutdown 会使旧回调失效。项目技能不存在 `DOTAShowAbilityTooltip` 回退，CSV Tooltip 与动态等级渲染链未修改。
+- 自动验证通过：`ULTIMATE_TOWER_SKILL_BAR_CONTRACT_PASS`、专项 PowerShell 语法、目标严格 UTF-8、content/game 限定 `diff --check`；`ability_tooltip.js` 强制编译为 `OK: 1 compiled, 0 failed, 0 skipped`，产物 101135 字节、时间 `2026-08-20 17:50:13`。输入生命周期回归被既有无关 `BUILDING_D_CONFLICT_GUARD_MISSING` 阻断；高级研究契约自身含历史编码损坏，PowerShell 无法解析，均未改无关文件迎合。仍需 Workshop Tools 完全 Stop 后冷启动确认五个终极塔技能只显示自定义 Tooltip、长悬停和 Alt 不恢复原生层，并复测动态等级与点击行为。
+
 ## 当前插入任务（2026-08-19）：练功房怪物独立碰撞 profile
 
 - 用户确认四个练功房怪物使用Hull半径12并保留单位间碰撞；正式地面波次怪继续使用32，不启用练功房专属`NO_UNIT_COLLISION`。
