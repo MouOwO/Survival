@@ -879,8 +879,8 @@ function M.register_fused_lumberjack(worker, data)
         worker, "attack_growth"
     )
     local personality_attack_pct = personality_value(worker, "lumberjack_attack_pct")
-    local personality_speed_pct = personality_value(
-        worker, "lumberjack_attack_speed_pct"
+    local personality_wood_total_bonus_pct = personality_value(
+        worker, "wood_total_bonus_pct"
     )
     local personality_wood_flat = personality_value(worker, "wood_per_hit_flat")
     local personality_interval_flat = personality_value(worker, "attack_interval_flat")
@@ -904,6 +904,7 @@ function M.register_fused_lumberjack(worker, data)
         player_id = player_id,
         fusion_count = fusion_count,
         wood_multiplier_chance_pct = personality_wood_multiplier_chance,
+        wood_total_bonus_pct = personality_wood_total_bonus_pct,
         gold_per_hit_flat = personality_gold_per_hit,
         wood_per_hit_flat = personality_wood_flat,
         tree_damage_chance_pct = personality_tree_damage_chance,
@@ -927,7 +928,8 @@ function M.register_fused_lumberjack(worker, data)
         personality_attack_growth = 0,
         personality_attack_growth_per_hit = personality_attack_growth_per_hit,
         personality_attack_pct = personality_attack_pct,
-        personality_attack_speed_pct = personality_speed_pct,
+        personality_attack_speed_pct = 0,
+        personality_wood_total_bonus_pct = personality_wood_total_bonus_pct,
         personality_attack_interval_flat = personality_interval_flat,
         personality_wood_per_hit_flat = personality_wood_flat,
         lumber_efficiency = wood_per_hit + tree_lumber_efficiency_buff

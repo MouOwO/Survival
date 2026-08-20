@@ -548,7 +548,7 @@
         "DOTA_Tooltip_ability_ability_lumberjack_personality_high_pressure" "血压高"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_high_pressure_Description" "伐木工攻击力增加20%"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_efficiency" "效率"
-        "DOTA_Tooltip_ability_ability_lumberjack_personality_efficiency_Description" "伐木工攻击间隔减少30%"
+        "DOTA_Tooltip_ability_ability_lumberjack_personality_efficiency_Description" "当前综合采集数量增加30%"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_chosen" "天选之子"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_chosen_Description" "每次采集有1%概率获得10倍木材"
         "DOTA_Tooltip_ability_ability_lumberjack_personality_workaholic" "工作狂"

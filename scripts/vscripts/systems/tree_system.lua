@@ -207,6 +207,16 @@ local function on_tree_hit(payload)
     if hero_wood_bonus_pct > 0 then
         efficiency = math.floor(efficiency * (1 + hero_wood_bonus_pct / 100))
     end
+    local wood_total_bonus_pct = math.max(
+        0, tonumber(payload.wood_total_bonus_pct) or 0
+    )
+    local next_wood_fraction = nil
+    if payload.source == "lumberjack" and wood_total_bonus_pct > 0 then
+        local exact = efficiency * (1 + wood_total_bonus_pct / 100)
+            + (tonumber(attacker.survival_wood_fraction) or 0)
+        efficiency = math.floor(exact + 0.0000001)
+        next_wood_fraction = exact - efficiency
+    end
     local critical = payload.critical == true
         or payload.source == "lumberjack"
         and RandomFloat(0, 100)
@@ -225,6 +235,9 @@ local function on_tree_hit(payload)
             and "hero_tree_hit" or "lumberjack_hit",
     })
     if not result or result.ok ~= true then return end
+    if next_wood_fraction ~= nil then
+        attacker.survival_wood_fraction = next_wood_fraction
+    end
     local tree_damage_pct = math.max(
         0, tonumber(payload.tree_damage_chance_pct) or 0
     )

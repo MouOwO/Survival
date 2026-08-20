@@ -1,3 +1,10 @@
+## 当前插入任务（2026-08-20）：高级伐木工“效率”改为综合采集量加成
+
+- 用户确认`ability_lumberjack_personality_efficiency`不再减少攻击间隔，改为每次采集按当前综合采集数量的130%结算，即基础采集量、资源树等级收益、科技收益及固定采集加成先汇总，再增加30%。
+- 小数按伐木工实体独立累计余数：每次只发放整数木材，长期收益保持接近130%；该倍率在现有采集暴击和“天选之子”10倍倍率之前结算。权威数值和文案继续来自`lumberjack_personality_definitions.csv`。
+- 实施范围限定为性格CSV/生成配置、伐木工采集载荷、资源树结算、Tooltip同步和专项测试；不得触碰工作区中其他既有未提交修改。完成后执行CSV生成一致、Lua 5.1行为/语法、契约、严格UTF-8和限定`git diff --check`，Workshop Tools仍需冷启动实机验收。
+- 生产实现与自动验证已完成：CSV效果类型改为`wood_total_bonus_pct=30`，伐木工AI通过`TREE_HIT`传递，资源树在综合整数采集量形成后按实体保存小数余数，并在资源成功入账后提交余数；暴击及10倍倍率继续位于其后。统一Tooltip和六份本地化已同步。`LUMBERJACK_EFFICIENCY_LUA51_PASS`、`LUMBERJACK_EFFICIENCY_CONTRACT_PASS`、`LUMBERJACK_FUSION_CONTRACT_PASS`、目标Lua 5.1语法、CSV/生成Lua一致、严格UTF-8及限定`git diff --check`通过；尚需Workshop Tools冷启动确认LV7性格实际产量序列、浮字和Tooltip，自动验证不等于实机验收。
+
 ## 当前插入任务（2026-08-19）：练功房怪物独立碰撞 profile
 
 - 用户确认四个练功房怪物使用Hull半径12并保留单位间碰撞；正式地面波次怪继续使用32，不启用练功房专属`NO_UNIT_COLLISION`。
