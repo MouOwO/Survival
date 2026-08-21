@@ -67,6 +67,10 @@ function M.fetch_snapshot(account_id, on_success, on_error)
         on_success, on_error)
 end
 
+function M.online_checkpoint(payload, on_success, on_error)
+    request("/v1/online-time/checkpoint", payload, on_success, on_error)
+end
+
 function M.heartbeat(payload, on_success, on_error)
     request("/v1/fishing/heartbeat", payload, on_success, on_error)
 end

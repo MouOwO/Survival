@@ -13,6 +13,8 @@ local M = {}
 local profiles_by_player = {}
 local player_by_account = {}
 local provider = nil
+local provider_id = nil
+local injected_provider = false
 local active_rule = nil
 local load_generation_by_player = {}
 local revision_high_water_by_account = {}
@@ -23,6 +25,43 @@ local function register_server_convar(name, default_value)
             Convars:RegisterConvar(name, default_value, "Survival server config", 0)
         end)
     end
+end
+
+local function configured_provider_id()
+    local result = tostring(active_rule and active_rule.provider_id or "")
+    if Convars and type(Convars.GetStr) == "function" then
+        local override = tostring(
+            Convars:GetStr("survival_player_profile_provider") or ""
+        )
+        if override ~= "" then result = override end
+    end
+    return result
+end
+
+local function ensure_provider()
+    if injected_provider then return provider ~= nil end
+    local next_provider_id = configured_provider_id()
+    if not string.match(next_provider_id, "^[a-z][a-z0-9_]*$") then
+        return false, "player profile provider_id invalid: " .. next_provider_id
+    end
+    if provider ~= nil and provider_id == next_provider_id then return true end
+    local ok, next_provider = pcall(
+        require,
+        "systems/player_profile_providers/" .. next_provider_id .. "_provider"
+    )
+    if not ok then
+        return false, "profile_provider_load_failed:" .. tostring(next_provider)
+    end
+    if type(next_provider.init) ~= "function"
+        or type(next_provider.resolve_account_id) ~= "function"
+        or type(next_provider.fetch_snapshot) ~= "function" then
+        return false, "player profile provider contract invalid"
+    end
+    next_provider.init()
+    provider = next_provider
+    provider_id = next_provider_id
+    logger.info("PlayerProfile", "provider_initialized provider_id=" .. provider_id)
+    return true
 end
 
 local function copy(value, seen)
@@ -261,12 +300,13 @@ local function publish_public_profile(player_id, reason)
         projection
     )
     local diagnostic_account_id = "<redacted>"
-    if tostring(active_rule.provider_id) == "local_fixture" then
+    local diagnostic_provider_id = provider_id or tostring(active_rule.provider_id)
+    if diagnostic_provider_id == "local_fixture" then
         diagnostic_account_id = tostring(profile.account_id)
     end
     logger.info("PlayerProfile", string.format(
         "public_profile_published provider_id=%s player_id=%s account_id=%s revision=%s title_id=%s achievement_score=%s vip_badge=%s highest_difficulty=%s reason=%s",
-        tostring(active_rule.provider_id),
+        diagnostic_provider_id,
         tostring(player_id),
         diagnostic_account_id,
         tostring(projection.revision),
@@ -375,8 +415,10 @@ function M.load_player(player_id, reason)
         return { ok = false, error = "player_id_invalid" }
     end
     invalidate_player(player_id, "loading")
-    if provider == nil then
-        return { ok = false, error = "profile_provider_unavailable" }
+    local provider_ok, provider_error = ensure_provider()
+    if not provider_ok then
+        logger.warn("PlayerProfile", tostring(provider_error))
+        return { ok = false, error = tostring(provider_error) }
     end
     local resolve_ok, account_id = pcall(provider.resolve_account_id, player_id)
     if not resolve_ok then
@@ -534,6 +576,11 @@ local function get_profile_request(payload)
     return { ok = true, profile = profile }
 end
 
+function M.get_provider()
+    if not ensure_provider() then return nil end
+    return provider
+end
+
 function M.get_profile(player_id)
     local profile = profiles_by_player[tonumber(player_id)]
     return profile and copy(profile) or nil
@@ -561,6 +608,7 @@ function M.init(options)
     revision_high_water_by_account = {}
     register_server_convar("survival_player_profile_provider", "")
     register_server_convar("survival_fishing_api_token", "")
+    register_server_convar("survival_fishing_reward_fixture", "")
     active_rule = nil
     for _, row in ipairs(rules.rows or {}) do
         if row.enabled ~= false then
@@ -571,29 +619,19 @@ function M.init(options)
     if not active_rule then
         error("player profile rule missing")
     end
-    if options and options.provider then
+    provider = nil
+    provider_id = nil
+    injected_provider = options and options.provider ~= nil or false
+    if injected_provider then
         provider = options.provider
-    else
-        local provider_id = tostring(active_rule.provider_id or "")
-        if Convars and type(Convars.GetStr) == "function" then
-            local override = tostring(
-                Convars:GetStr("survival_player_profile_provider") or ""
-            )
-            if override ~= "" then provider_id = override end
+        provider_id = "injected"
+        if type(provider.init) ~= "function"
+            or type(provider.resolve_account_id) ~= "function"
+            or type(provider.fetch_snapshot) ~= "function" then
+            error("player profile provider contract invalid")
         end
-        if not string.match(provider_id, "^[a-z][a-z0-9_]*$") then
-            error("player profile provider_id invalid: " .. provider_id)
-        end
-        provider = require(
-            "systems/player_profile_providers/" .. provider_id .. "_provider"
-        )
+        provider.init()
     end
-    if type(provider.init) ~= "function"
-        or type(provider.resolve_account_id) ~= "function"
-        or type(provider.fetch_snapshot) ~= "function" then
-        error("player profile provider contract invalid")
-    end
-    provider.init()
     event_bus.handle_request(events.PLAYER_PROFILE_GET_REQUEST, get_profile_request)
     if active_rule.load_on_hero_ready ~= false then
         event_bus.subscribe(events.HERO_READY, function(payload)

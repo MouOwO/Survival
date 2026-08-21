@@ -1,3 +1,10 @@
+## 2026-08-21 - Dota HTTP Provider 联调恢复检查
+
+- 复核确认外围链路为 `Dota server Lua -> loopback Python API -> Supabase PostgreSQL`，数据库仓库位于 `D:\survival_database`；客户端不持有 Supabase 凭据。
+- 修正 `player_profile_service.lua` 的 Provider 初始化时序：三个服务器 ConVar 在服务初始化时注册，Provider 在档案加载前解析，晚设置 `survival_player_profile_provider http_fishing` 可以生效；Provider 切换会重新初始化，注入 Provider 仍优先保留。
+- 新增 `tools/test_player_profile_provider_selection.lua`，覆盖 ConVar 注册、默认 `local_fixture`、晚切换 `http_fishing`、恢复默认和注入 Provider。同步修正数据库契约对已移除旧 Lua 测试和局内奖励 CSV schema 的过时依赖。
+- 自动验证通过：Lua 5.1 行为测试、目标 Lua 语法、PowerShell Fishing 契约、Python 20 项单测、严格 UTF-8、限定 `git diff --check`。`.env` 已生成但 Supabase URL/Secret key 为空，未执行真实 API 或 Workshop Tools 验证。
+
 ## 2026-08-20 - 终极之塔聚合技能 Tooltip 数据接入
 
 - 用户批准继续执行终极之塔原生气泡替换。调用链复核确认 `ability_tooltip.js` 从 `survival_ability_data` 读取 Ability 定义，再按 `tooltip_id` 从 `survival_tooltips` 读取统一 Tooltip；终极塔的 `building_*` owner 已命中现有 `managedUpgrade()`，无需新增 Panorama Tooltip 系统。

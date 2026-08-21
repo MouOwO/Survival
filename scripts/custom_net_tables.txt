@@ -4,6 +4,7 @@
     [
         "survival_ability_data",
         "survival_ability_runtime",
+        "survival_ui_state",
         "survival_shop_config",
         "survival_item_config",
         "survival_item_tooltips",

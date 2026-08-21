@@ -1,5 +1,21 @@
 ## 当前插入任务（2026-08-21）：局内钓鱼抽奖系统
 
+## 本次难度选择与在线时长联调结果（2026-08-21）
+
+- 已修复难度选择 UI 的确定性事件名断链：服务端 `ui_snapshot_service.lua` 实际发送 `survival_ui_private_snapshot`，Panorama 原先只订阅不存在的 `ui_state_snapshot`；现已改为订阅实际事件并重新编译 `survival_ui.vjs_c`。
+- API 已通过 `D:\survival_database\start_fishing_api.ps1 -Automation9001` 启动并实测监听 `127.0.0.1:8765`。`GET /health` 返回 200；合法认证和 payload 的 `/v1/online-time/checkpoint` 返回 502 `supabase_rpc_rejected`，证明路由已命中，原 404 已排除；畸形 `account_id` 返回 400 `account_id_invalid`。
+- 后端 `server.py` 现将 CSV 规则中的 `online_time_lease_seconds` 显式传入 `FishingApplication`，不再使用应用默认值。
+- 自动验证：Python 20 项单元测试通过；目标 Panorama Resource Compiler 返回 `OK: 1 compiled, 0 failed, 0 skipped`；`difficulty_config.lua` 和 `wave_system.lua` 的 `luac5.1` 语法通过。当前仓库没有独立 `test_wave_difficulty.lua`，因此未将不存在的行为测试记为通过。
+- 剩余事项：502 需要检查 Supabase RPC/远端 migration 或函数权限；需 Workshop Tools 完全冷启动验证难度面板、N1-N5 选择、选择后倒计时/波次启动、断线与重连。API 测试进程已停止，未覆盖用户已有未提交修改。
+
+## 本次联调恢复检查点（2026-08-21）
+
+- 已确认数据库仓库位于 `D:\survival_database`，架构仍为 `Dota server Lua -> 127.0.0.1:8765 Python API -> Supabase PostgreSQL`；客户端不直接连接 Supabase。
+- `player_profile_service.lua` 已注册 `survival_player_profile_provider`、`survival_fishing_api_token`、`survival_fishing_reward_fixture` 三个 ConVar；Provider 在每次 `load_player()` 前解析，支持晚设置 `http_fishing`、Provider ID 切换和测试注入 Provider，默认仍为 CSV 规则中的 `local_fixture`。
+- 本机 `.env` 已生成到 `D:\survival_database\.env`，随机 Token/pepper 和当前 addon/Python 路径已写入；`SUPABASE_URL` 与 `SUPABASE_SECRET_KEY` 仍为空，未写入或暴露凭据，因此真实 API 尚未启动。
+- 本轮自动验证通过：`PLAYER_PROFILE_PROVIDER_SELECTION_LUA51_PASS`、`PROFILE_FISHING_LUA51_PASS`、`FISHING_REWARD_CONTRACT_PASS`、Python 20 项单元测试、严格 UTF-8 和限定 `git diff --check`。已修正后端测试对局内奖励 CSV 的过时 schema 预期；局内钓鱼 CSV 不被后端局外奖励 loader 复用。
+- 下一步：用户填写 `.env` 的 Supabase URL/Secret key 后启动 `start_fishing_api.ps1 -Automation9001`，再在 Workshop Tools 冷启动前设置 `http_fishing`、匹配 API Token 和 `automation_9001`，验证真实 Steam Account ID 档案加载、心跳、重连和 API 重启恢复。自动验证不等于 Supabase 或引擎实机验收。
+
 - 用户确认每名在线好人方玩家在难度选择成功后的480秒整数倍节点分别独立抽奖；0秒不触发，每份结果通过全体系统播报展示给所有玩家。
 - 截图数据共27行、原始出现次数129；用户确认删除B级“名称待复核/奖励正文待复核”，将S级“鬼森子”按增加伐木工攻速4倍处理，将SS级普通金枪鱼按伐木工攻速5%处理。删除后正式池26行、总权重128。
 - 实现边界：新增局内钓鱼CSV和独立Lua服务，不复用需要HTTP/数据库的局外`fishing_reward_service`；资源奖励沿用现有team-scoped资源事务，测试命令为`fish <钓鱼ID>`和`fish random`。

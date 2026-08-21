@@ -791,6 +791,7 @@ local function initialize_services()
     resource_system.init()
     player_entitlement_service.init()
     require("systems/player_profile_service").init()
+    require("systems/online_time_service").init()
     require("systems/permanent_reward_effect_service").init()
     require("systems/fishing_reward_service").init()
     hero_progression_system.init()
@@ -865,6 +866,7 @@ function M.activate()
         nil
     )
     ListenToGameEvent("player_disconnect", on_player_disconnected, nil)
+    ListenToGameEvent("game_end", function() require("systems/online_time_service").finish() end, nil)
     ListenToGameEvent(
         "dota_player_pick_hero",
         on_hero_picked,
