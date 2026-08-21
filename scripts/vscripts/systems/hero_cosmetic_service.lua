@@ -1,10 +1,12 @@
 local config = require("config/hero_cosmetics_config")
 local asset_catalog = require("config/asset_catalog")
+local scheduler = require("core/scheduler")
 local logger = require("core/logger")
 
 local M = {}
 
 local cosmetics_by_hero = {}
+local SPAWN_PARTICLE_LIFETIME_SECONDS = 1.5
 
 local function definition_for(hero_id)
     local asset = asset_catalog.resolve_bundle(
@@ -16,12 +18,17 @@ local function definition_for(hero_id)
         wearables[#wearables + 1] = {
             id = component.component_id,
             model = component.model_path,
+            skin = component.model_skin,
+            material_group = component.material_group,
         }
     end
     local particles = {}
+    local spawn_particles = {}
     for _, effect in ipairs(asset.effects or {}) do
-        if effect.effect_role == "ambient" then
-            particles[#particles + 1] = {
+        local target = effect.effect_role == "spawn"
+            and spawn_particles or particles
+        if effect.effect_role == "ambient" or effect.effect_role == "spawn" then
+            target[#target + 1] = {
                 id = effect.effect_id,
                 path = effect.particle_path,
                 owner = effect.owner_component_id,
@@ -31,11 +38,15 @@ local function definition_for(hero_id)
     end
     local local_definition = config[hero_id] or {}
     return {
+        body_model = local_definition.body_model,
+        body_skin = local_definition.body_skin,
         material_group = asset.material_group,
+        activity_modifiers = asset.activity_modifiers or {},
         hide_default_wearables = local_definition.hide_default_wearables
             ~= false and #wearables > 0,
         wearables = wearables,
         particles = particles,
+        spawn_particles = spawn_particles,
     }
 end
 
@@ -78,6 +89,12 @@ local function clear_cosmetics(hero_entindex)
     for _, particle_id in ipairs(state.particles or {}) do
         destroy_particle(particle_id)
     end
+    for _, task_id in ipairs(state.spawn_cleanup_tasks or {}) do
+        scheduler.cancel(task_id)
+    end
+    for _, particle_id in ipairs(state.spawn_particles or {}) do
+        destroy_particle(particle_id)
+    end
     for _, wearable in ipairs(state.wearables or {}) do
         remove_entity(wearable)
     end
@@ -118,15 +135,15 @@ end
 
 local function normalize_wearable(entry, index)
     if type(entry) == "string" then
-        return "wearable_" .. tostring(index), entry
+        return "wearable_" .. tostring(index), entry, {}
     end
     if type(entry) == "table" then
-        return entry.id or "wearable_" .. tostring(index), entry.model
+        return entry.id or "wearable_" .. tostring(index), entry.model, entry
     end
-    return "wearable_" .. tostring(index), nil
+    return "wearable_" .. tostring(index), nil, {}
 end
 
-local function spawn_wearable(hero, component_id, model_path)
+local function spawn_wearable(hero, component_id, model_path, appearance)
     if not model_path or model_path == "" then
         logger.warn("HeroCosmetic", "missing model for " .. tostring(component_id))
         return nil
@@ -136,7 +153,6 @@ local function spawn_wearable(hero, component_id, model_path)
         "prop_dynamic",
         {
             model = model_path,
-            DefaultAnim = "idle",
         }
     )
     if not ok or not valid_entity(wearable) then
@@ -148,8 +164,37 @@ local function spawn_wearable(hero, component_id, model_path)
         return nil
     end
 
-    safe_call(wearable, "SetOwner", hero)
-    safe_call(wearable, "FollowEntity", hero, true)
+    appearance = appearance or {}
+    if appearance.skin ~= nil then
+        safe_call(wearable, "SetSkin", tonumber(appearance.skin) or 0)
+    end
+    if appearance.material_group then
+        safe_call(wearable, "SetMaterialGroup", appearance.material_group)
+    end
+    local owner_call_ok, owner_result = safe_call(wearable, "SetOwner", hero)
+    local follow_call_ok, follow_result = safe_call(
+        wearable,
+        "FollowEntity",
+        hero,
+        true
+    )
+    local index_ok, entity_index = safe_call(wearable, "entindex")
+    local class_ok, class_name = safe_call(wearable, "GetClassname")
+    local effects_ok, render_effects = safe_call(wearable, "GetEffects")
+    local null_ok, is_null = safe_call(wearable, "IsNull")
+    logger.info(
+        "HeroCosmetic",
+        "wearable component=" .. tostring(component_id)
+            .. " model=" .. tostring(model_path)
+            .. " entity=" .. tostring(index_ok and entity_index or "unknown")
+            .. " class=" .. tostring(class_ok and class_name or "unknown")
+            .. " null=" .. tostring(null_ok and is_null or false)
+            .. " effects=" .. tostring(effects_ok and render_effects or "unknown")
+            .. " owner_call=" .. tostring(owner_call_ok)
+            .. " owner_result=" .. tostring(owner_result)
+            .. " follow_call=" .. tostring(follow_call_ok)
+            .. " follow_result=" .. tostring(follow_result)
+    )
     return wearable
 end
 
@@ -248,6 +293,13 @@ function M.apply(hero, hero_id)
         show_default_wearables(hero)
     end
 
+    if definition.body_model and definition.body_model ~= "" then
+        safe_call(hero, "SetOriginalModel", definition.body_model)
+        safe_call(hero, "SetModel", definition.body_model)
+    end
+    if definition.body_skin ~= nil then
+        safe_call(hero, "SetSkin", tonumber(definition.body_skin) or 0)
+    end
     if definition.material_group then
         safe_call(
             hero,
@@ -255,12 +307,21 @@ function M.apply(hero, hero_id)
             definition.material_group
         )
     end
+    for _, modifier in ipairs(definition.activity_modifiers or {}) do
+        safe_call(hero, "AddActivityModifier", modifier.modifier_name)
+    end
 
     local spawned = {}
     local components = {}
     for index, entry in ipairs(definition.wearables or {}) do
-        local component_id, model_path = normalize_wearable(entry, index)
-        local wearable = spawn_wearable(hero, component_id, model_path)
+        local component_id, model_path, appearance =
+            normalize_wearable(entry, index)
+        local wearable = spawn_wearable(
+            hero,
+            component_id,
+            model_path,
+            appearance
+        )
         if wearable then
             table.insert(spawned, wearable)
             components[component_id] = wearable
@@ -268,25 +329,61 @@ function M.apply(hero, hero_id)
     end
 
     local particles = {}
+    local spawn_particles = {}
     for _, particle in ipairs(definition.particles or {}) do
         local particle_id = spawn_particle(hero, particle, components)
         if particle_id ~= nil then
             table.insert(particles, particle_id)
         end
     end
+    for _, particle in ipairs(definition.spawn_particles or {}) do
+        local particle_id = spawn_particle(hero, particle, components)
+        if particle_id ~= nil then
+            table.insert(spawn_particles, particle_id)
+        end
+    end
 
     cosmetics_by_hero[hero_entindex] = {
         wearables = spawned,
         particles = particles,
+        spawn_particles = spawn_particles,
+        spawn_cleanup_tasks = {},
         cosmetic_id = hero_id,
     }
+    local state = cosmetics_by_hero[hero_entindex]
+    for _, particle_id in ipairs(spawn_particles) do
+        local task_id
+        task_id = scheduler.after(
+            SPAWN_PARTICLE_LIFETIME_SECONDS,
+            function()
+                for index, active_task_id in ipairs(state.spawn_cleanup_tasks or {}) do
+                    if active_task_id == task_id then
+                        table.remove(state.spawn_cleanup_tasks, index)
+                        break
+                    end
+                end
+                for index, active_id in ipairs(state.spawn_particles or {}) do
+                    if active_id == particle_id then
+                        table.remove(state.spawn_particles, index)
+                        break
+                    end
+                end
+                destroy_particle(particle_id)
+            end,
+            "hero_cosmetic_spawn_" .. tostring(hero_entindex)
+                .. "_" .. tostring(particle_id)
+        )
+        table.insert(state.spawn_cleanup_tasks, task_id)
+    end
     logger.info(
         "HeroCosmetic",
         hero_id
         .. " applied wearables="
         .. tostring(#spawned)
         .. " particles="
-        .. tostring(#particles)
+        .. tostring(#particles + #spawn_particles)
+        .. " ambient=" .. tostring(#(definition.particles or {}))
+        .. " spawn=" .. tostring(#spawn_particles)
     )
     return true
 end

@@ -92,15 +92,10 @@ local M = {
         },
     },
     hero_blademaster = {
-        material_group = "1",
+        body_model = "models/heroes/juggernaut/juggernaut_arcana.vmdl",
+        body_skin = 0,
         hide_default_wearables = true,
-        wearables = {
-            "models/items/sven/gaze_cyclopean_marauder/gaze_cyclopean_marauder.vmdl",
-            "models/items/sven/pauldron_cyclopean_marauder/pauldron_cyclopean_marauder.vmdl",
-            "models/items/sven/gauntlet_cyclopean_marauder/gauntlet_cyclopean_marauder.vmdl",
-            "models/items/sven/fauld_cyclopean_marauder/fauld_cyclopean_marauder.vmdl",
-            "models/items/sven/greatsword_cyclopean_marauder/greatsword_cyclopean_marauder.vmdl",
-        },
+        wearables = {},
     },
 }
 

@@ -749,7 +749,13 @@ function M.build(ability_name, state, resources)
         return population_training(state, resources)
     end
     if ability_name == "ability_upgrade_farm" then
-        return upgrade_level(buildings.farm, state.level, resources, state)
+        return upgrade_level(
+            buildings.farm,
+            state.level,
+            resources,
+            state,
+            { health = false, armor = false }
+        )
     end
     if ability_name == "ability_upgrade_tower"
         or ability_name == "ability_upgrade_tower_lv01"

@@ -1,9 +1,9 @@
 ﻿hero_id,projectile_speed,projectile_model,attack_capability,enabled,notes
 #中文名:英雄ID,弹道速度,弹道特效资源,攻击能力,是否启用,备注
 #types:string,number,string,enum,boolean,string
-hero_doom,3000,,ranged,1,远程攻击能力；无自定义可见弹道，攻击距离读取英雄表。
+hero_doom,,,melee,1,近战即时结算；无飞行弹道，攻击距离读取英雄表。
 hero_shadow_fiend,900,particles/units/heroes/hero_nevermore/nevermore_base_attack.vpcf,ranged,1,远程攻击弹道。
-hero_axe,3000,,ranged,1,远程攻击能力；无自定义可见弹道，攻击距离读取英雄表。
+hero_axe,,,melee,1,近战即时结算；无飞行弹道，攻击距离读取英雄表。
 hero_drow_ranger,1250,particles/units/heroes/hero_drow/drow_base_attack.vpcf,ranged,1,远程攻击弹道。
 hero_monkey_king,,,melee,1,近战即时结算；无飞行弹道，攻击距离读取英雄表。
-hero_blademaster,3000,,ranged,1,远程攻击能力；无自定义可见弹道，攻击距离读取英雄表。
+hero_blademaster,,,melee,1,近战即时结算；无飞行弹道，攻击距离读取英雄表。

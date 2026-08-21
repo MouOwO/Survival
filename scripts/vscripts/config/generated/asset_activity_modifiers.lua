@@ -4,6 +4,7 @@ local M = {}
 M.rows = {
     { modifier_key = "challenge_monster_primal_beast_svarog:less_brow", asset_id = "challenge_monster_primal_beast_svarog", modifier_name = "less_brow", sort_order = 1, enabled = true, notes = "Svarog头部官方动作修饰。" },
     { modifier_key = "challenge_monster_terrorblade_fractal_horns:abysm", asset_id = "challenge_monster_terrorblade_fractal_horns", modifier_name = "abysm", sort_order = 1, enabled = true, notes = "Fractal Horns官方Arcana动作修饰。" },
+    { modifier_key = "hero_permanent_hero_blademaster:arcana", asset_id = "hero_permanent_hero_blademaster", modifier_name = "arcana", sort_order = 1, enabled = true, notes = "剑心之遗官方动作修饰。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

@@ -616,7 +616,7 @@
     "npc_survival_drow_companion"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/drow/drow.vmdl"
+        "Model"                  "models/heroes/drow/drow_base.vmdl"
         "Level"                  "1"
         "ConsideredHero"         "0"
         "HasInventory"           "0"
@@ -912,14 +912,26 @@
     "asset_proxy_hero_blademaster"
     {
         "BaseClass" "npc_dota_creature"
-        "Model" "models/heroes/sven/sven.vmdl"
+        "Model" "models/heroes/juggernaut/juggernaut_arcana.vmdl"
         "precache"
         {
-            "model" "models/items/sven/gaze_cyclopean_marauder/gaze_cyclopean_marauder.vmdl"
-            "model" "models/items/sven/pauldron_cyclopean_marauder/pauldron_cyclopean_marauder.vmdl"
-            "model" "models/items/sven/gauntlet_cyclopean_marauder/gauntlet_cyclopean_marauder.vmdl"
-            "model" "models/items/sven/fauld_cyclopean_marauder/fauld_cyclopean_marauder.vmdl"
-            "model" "models/items/sven/greatsword_cyclopean_marauder/greatsword_cyclopean_marauder.vmdl"
+            "model" "models/heroes/juggernaut/juggernaut_arcana.vmdl"
+            "model" "models/heroes/juggernaut/juggernaut.vmdl"
+            "model" "models/heroes/juggernaut/jugg_bracers.vmdl"
+            "model" "models/heroes/juggernaut/jugg_cape.vmdl"
+            "model" "models/heroes/juggernaut/jugg_mask.vmdl"
+            "model" "models/heroes/juggernaut/juggernaut_pants.vmdl"
+            "model" "models/heroes/juggernaut/jugg_sword.vmdl"
+            "model" "models/items/juggernaut/armor_for_the_favorite_arms/armor_for_the_favorite_arms.vmdl"
+            "model" "models/items/juggernaut/armor_for_the_favorite_back/armor_for_the_favorite_back.vmdl"
+            "model" "models/items/juggernaut/armor_for_the_favorite_head/armor_for_the_favorite_head.vmdl"
+            "model" "models/items/juggernaut/armor_for_the_favorite_legs/armor_for_the_favorite_legs.vmdl"
+            "model" "models/items/juggernaut/fall20_juggernaut_katz_weapon/fall20_juggernaut_katz_weapon.vmdl"
+            "particle" "particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_ambient.vpcf"
+            "particle" "particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_loadout_spawn_model.vpcf"
+            "particle" "particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_loadout_spawn_model_energy.vpcf"
+            "particle" "particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_loadout_spawn_model_glow.vpcf"
+            "particle" "particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_loadout_spawn_light.vpcf"
         }
     }
 }
