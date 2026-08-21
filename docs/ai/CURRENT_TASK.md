@@ -1,3 +1,10 @@
+## 当前插入任务（2026-08-21）：局内钓鱼抽奖系统
+
+- 用户确认每名在线好人方玩家在难度选择成功后的480秒整数倍节点分别独立抽奖；0秒不触发，每份结果通过全体系统播报展示给所有玩家。
+- 截图数据共27行、原始出现次数129；用户确认删除B级“名称待复核/奖励正文待复核”，将S级“鬼森子”按增加伐木工攻速4倍处理，将SS级普通金枪鱼按伐木工攻速5%处理。删除后正式池26行、总权重128。
+- 实现边界：新增局内钓鱼CSV和独立Lua服务，不复用需要HTTP/数据库的局外`fishing_reward_service`；资源奖励沿用现有team-scoped资源事务，测试命令为`fish <钓鱼ID>`和`fish random`。
+- 本轮完成后记录CSV生成、Lua 5.1语法、定向行为测试和Workshop Tools实机验证边界。
+
 ## 当前任务（2026-08-20）：终极之塔聚合技能自定义 Tooltip
 
 - 用户已批准执行。已确认自定义 Tooltip 链路由 `survival_ability_data`、`survival_tooltips` 和 `ability_tooltip.js` 共同完成；终极塔属于 `building_*` 单位，现有 `managedUpgrade()` 已覆盖其悬停接管，不新增独立 Panorama 气泡系统。
@@ -253,6 +260,14 @@
 - 2026-08-20用户实机验收：用户确认 Shadow Fiend 与 Drow Ranger 模型成功加载。上述十项原生 wearable 预载依赖、CSV 到生成 Lua、代理 KV 和 READY 门禁链路验证完成，本任务不再处于待验收状态。后续英雄默认穿戴资源继续遵循“CSV 权威登记、生成配置、代理 precache、只预载不重复挂载、精确代理回调后 READY”的流程。
 
 # Current Task
+
+## 当前插入任务（2026-08-21）：局内钓鱼抽奖系统
+
+- 已读取用户提供的 `D:\tooltip文件夹\钓到物奖励效果统计.csv`。文件实际是 WPS OLE/BIFF 工作簿而非文本 CSV，已通过 WPS COM 只读提取 `Sheet1`：原始 27 条记录、出现次数合计 129。
+- 已按确认口径整理为项目权威 `data/csv/玩家档案系统/fishing_reward_definitions.csv`：删除待复核 B 级条目，修订 `鬼索子` 为伐木工攻速提高 4 倍、普通 `金枪鱼` 为伐木工攻速+5%，正式池 26 条、总权重 128；基础数据全部来自 CSV。
+- 新增独立 `systems/fishing_service.lua`，不复用局外 HTTP/档案钓鱼服务。首次难度选择成功事件后启动计时，0 秒不抽奖，之后每 480 秒遍历在线玩家并独立按权重抽奖；结果通过 `UI_NOTIFICATION` 的 `audience="all"` 全体播报。
+- 奖励投影复用资源事务、`TECHNOLOGY_STATS_ROGUE_ADD_REQUEST` 和现有建筑列表/实体接口；持续金币/木材由局内服务按秒结算，墙生命奖励保留到后续新建墙。`fish <reward_id|random>` 已接入作弊命令。
+- 自动验证通过：配置生成成功、26 条/128 权重/无待复核行/局内间隔 480 秒、Lua 5.1 行为测试 `FISHING_SERVICE_PASS`、目标 Lua 语法 `FISHING_FINAL_LUA_PASS` 和限定 `git diff --check`。尚未进行 Workshop Tools 冷启动、多人实机播报和实体效果验收。
 
 ## 当前插入任务（2026-08-15）：Builder动态管理域与全链路Ability安全枚举
 

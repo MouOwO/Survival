@@ -107,6 +107,7 @@ local M = {
     TECHNOLOGY_STATS_GET_REQUEST = "technology.stats.get.request",
     TECHNOLOGY_STATS_GROWTH_ADD_REQUEST = "technology.stats.growth.add.request",
     TECHNOLOGY_STATS_CHANGED = "technology.stats.changed",
+    FISHING_STARTED = "fishing.started",
     TRAINING_ROOM_STATE_CHANGED = "training_room.state.changed",
     TRAINING_ROOM_EXIT_REQUEST = "training_room.exit.request",
     RESEARCH_UPGRADE_REQUEST = "research:upgrade_requested",

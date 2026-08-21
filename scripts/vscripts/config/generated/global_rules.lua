@@ -13,8 +13,6 @@ M.rows = {
     { rule_id = "wave_monster_round_robin_enabled", value = 1, description = "每波普通怪按类型循环；地面飞行混合时按两地面一飞行（0关闭1开启）", enabled = true },
     { rule_id = "wave_ground_monster_hull_radius", value = 32, description = "正式波次及默认地面怪统一基础碰撞半径", enabled = true },
     { rule_id = "practice_monster_hull_radius", value = 12, description = "练功房怪物统一基础碰撞半径", enabled = true },
-    { rule_id = "wave_ground_monster_hull_radius", value = 30, description = "所有地面小怪、精英怪和Boss统一基础碰撞半径", enabled = true },
-    { rule_id = "wave_ground_monster_hull_radius", value = 32, description = "所有地面小怪、精英怪和Boss统一基础碰撞半径", enabled = true },
     { rule_id = "repair_detection_range", value = 99999, description = "修理师自动感知受损建筑的范围", enabled = true },
     { rule_id = "building_challenge_hull_radius", value = 0, description = "所有挑战怪的基础碰撞半径", enabled = true },
     { rule_id = "building_challenge_lifetime_seconds", value = 60, description = "挑战怪存活达到该秒数时挑战失败", enabled = true },

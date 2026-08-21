@@ -14,6 +14,7 @@ local armor_engine_diagnostic = require("debug/armor_engine_diagnostic")
 local building_system = require("systems/building_system")
 local global_rules = require("config/global_rules")
 local rogue_reward_service = require("systems/rogue_reward_service")
+local fishing_service = require("systems/fishing_service")
 
 local M = {}
 
@@ -790,6 +791,15 @@ local function show_rogue_offer(context)
     return true
 end
 
+local function grant_fishing_reward(context)
+    if #context.args ~= 1 then
+        return false, "usage: fish <reward_id|random>"
+    end
+    local result = fishing_service.grant(context.player_id, context.args[1])
+    return result and result.ok == true,
+        result and result.error or "fishing_reward_failed"
+end
+
 local function on_scale_selection_changed(_, payload)
     local player_id = tonumber(payload and payload.PlayerID)
     if not valid_player_id(player_id) then return end
@@ -830,6 +840,7 @@ local COMMANDS = {
     scale = scale_selected_wall,
     scalemonster = scale_monsters,
     rogue = show_rogue_offer,
+    fish = grant_fishing_reward,
 }
 
 local function on_player_chat(keys)
@@ -889,13 +900,14 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, items, hero, skill, weapon growth"
+        "ready: addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, items, hero, skill, weapon growth"
     )
 end
 
 M._test = {
     unlock_skill = unlock_skill,
     show_rogue_offer = show_rogue_offer,
+    grant_fishing_reward = grant_fishing_reward,
 }
 
 return M
