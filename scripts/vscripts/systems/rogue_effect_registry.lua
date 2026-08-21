@@ -377,6 +377,7 @@ handlers.lumberjack_attack_speed_bonus_pct = {
 handlers.grant_gold_flat = {
     apply = function(instance)
         local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = instance.player_id,
             team = team_for(instance),
             gold = tonumber(instance.params.value) or 0,
             wood = 0,
@@ -390,6 +391,7 @@ handlers.grant_current_wood_pct = {
     apply = function(instance)
         local team = team_for(instance)
         local resource = event_bus.request(events.RESOURCE_GET_REQUEST, {
+            player_id = instance.player_id,
             team = team,
         }) or {}
         local amount = math.floor(
@@ -397,6 +399,7 @@ handlers.grant_current_wood_pct = {
                 * (tonumber(instance.params.value) or 0) / 100
         )
         local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = instance.player_id,
             team = team,
             gold = 0,
             wood = amount,
@@ -570,6 +573,7 @@ handlers.building_count_gold = {
         local amount = #building_list(instance.player_id) * difficulty
             * (tonumber(instance.params.value_per_target) or 100)
         local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = instance.player_id,
             team = team_for(instance), gold = amount, wood = 0,
             reason = "rogue_reward:" .. instance.card_id,
         })

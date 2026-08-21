@@ -2,7 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 
 local M = {}
-local resource_by_team = {}
+local resource_by_player = {}
 local city_level_by_team = {}
 local worker_count_by_team = {}
 local wave = {}
@@ -15,7 +15,7 @@ local function mark_dirty(team)
 end
 
 local function on_resource_changed(payload)
-    resource_by_team[payload.team] = payload
+    resource_by_player[payload.player_id] = payload
     mark_dirty(payload.team)
 end
 
@@ -67,9 +67,9 @@ end
 
 local function build_snapshot(payload)
     local team = payload.team
-    local resource = resource_by_team[team]
+    local resource = resource_by_player[payload.player_id]
     if not resource then
-        local requested = event_bus.request(events.RESOURCE_GET_REQUEST, { team = team })
+        local requested = event_bus.request(events.RESOURCE_GET_REQUEST, { player_id = payload.player_id })
         resource = requested or {
             wood = 0,
             gold = 0,
@@ -77,7 +77,7 @@ local function build_snapshot(payload)
             max_population = 0,
             version = 0,
         }
-        resource_by_team[team] = resource
+        resource_by_player[payload.player_id] = resource
     end
     if advanced_research_unlocked_by_team[team] == nil then
         local result = event_bus.request(events.BUILDING_LIST_REQUEST, {
@@ -108,7 +108,7 @@ local function build_snapshot(payload)
 end
 
 function M.init()
-    resource_by_team = {}
+    resource_by_player = {}
     city_level_by_team = {}
     worker_count_by_team = {}
     wave = {}

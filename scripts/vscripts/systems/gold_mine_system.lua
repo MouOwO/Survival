@@ -122,6 +122,7 @@ end
 
 local function spend(state, cost, reason)
     return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+        player_id = state.player_id,
         team = state.team,
         wood = cost.wood or 0,
         gold = cost.gold or 0,
@@ -430,6 +431,7 @@ local function tick()
                 1 + (tonumber(gold_mine.income_bonus_pct) or 0) / 100
             ))
             local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                player_id = state.player_id,
                 team = state.team, gold = amount,
                 reason = crit and "gold_mine_critical_income" or "gold_mine_income",
             })

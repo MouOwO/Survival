@@ -228,6 +228,7 @@ local function on_tree_hit(payload)
     end
     if efficiency <= 0 then return end
     local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = payload.player_id,
         team = payload.team,
         wood = efficiency,
         gold = tonumber(payload.gold_per_hit_flat) or 0,

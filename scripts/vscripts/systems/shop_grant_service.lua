@@ -247,8 +247,9 @@ function M.grant(player_id, team, entry, state)
     return { ok = false, error = "unsupported_grant_type" }
 end
 
-function M.refund(team, entry)
+function M.refund(player_id, team, entry)
     return event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = player_id,
         team = team,
         wood = entry.woodcost or 0,
         gold = entry.goldcost or 0,

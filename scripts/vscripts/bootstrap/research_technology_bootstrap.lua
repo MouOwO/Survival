@@ -23,11 +23,13 @@ end
 local function resources(player_id)
     local team = team_for(player_id)
     if team == nil then return nil end
-    return event_bus.request(events.RESOURCE_GET_REQUEST, { team = team })
+    return event_bus.request(events.RESOURCE_GET_REQUEST, {
+        player_id = player_id, team = team })
 end
 
 local function spend(player_id, cost, tech_id)
     return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+        player_id = player_id,
         team = team_for(player_id),
         gold = cost.gold,
         wood = cost.wood,
@@ -38,6 +40,7 @@ end
 
 local function refund(player_id, cost, tech_id)
     return event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = player_id,
         team = team_for(player_id),
         gold = cost.gold,
         wood = cost.wood,

@@ -21,15 +21,13 @@ local function publish_player(player_id)
     if not snapshot then return false end
     sequence = sequence + 1
     snapshot.sequence = sequence
-    CustomNetTables:SetTableValue(
-        "survival_ui_state",
-        "player_" .. tostring(player_id),
+    local player = PlayerResource:GetPlayer(player_id)
+    if not player then return false end
+    CustomGameEventManager:Send_ServerToPlayer(
+        player,
+        "survival_ui_private_snapshot",
         snapshot
     )
-
-    -- CustomNetTable 已足够同步常规 HUD 状态。此前每次 dirty 同时再
-    -- 发送一份相同的 CustomGameEvent，倒计时每秒都会触发所有玩家的双份
-    -- UI 更新，形成明显的周期性帧尖峰。
     return true
 end
 

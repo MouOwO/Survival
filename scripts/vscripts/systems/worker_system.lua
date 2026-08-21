@@ -444,12 +444,14 @@ local function on_tree_depleted(payload)
             attacker, "tree_death_wood_pct"
         ) then return end
     local resources = event_bus.request(events.RESOURCE_GET_REQUEST, {
+        player_id = state.player_id,
         team = state.team,
     }) or {}
     local wood = math.floor((tonumber(resources.wood) or 0) * 0.10)
     if wood <= 0 then return end
     state.scavenger_uses = (state.scavenger_uses or 0) + 1
     event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = state.player_id,
         team = state.team,
         wood = wood,
         reason = "lumberjack_scavenger",
@@ -577,6 +579,7 @@ local function train_worker_one(payload)
             return { ok = false, error = error_message }
         end
         local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+            player_id = city_state.player_id,
             team = team,
             wood = state.wood_cost,
             gold = state.gold_cost,
@@ -586,6 +589,7 @@ local function train_worker_one(payload)
         if not spend or not spend.ok then return spend end
         local completed_state = record_population_training_success(team, training_id)
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = city_state.player_id,
             team = team,
             max_population = tonumber(training.population_add) or 0,
             reason = "population_training:" .. training_id,
@@ -646,6 +650,7 @@ local function train_worker_one(payload)
         and math.max(0, tonumber(payload.gold_cost_override) or 0)
         or tonumber(training.gold_cost) or 0
     local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+        player_id = city_state.player_id,
         team = city_state.team,
         wood = wood_cost,
         gold = gold_cost,
@@ -668,12 +673,14 @@ local function train_worker_one(payload)
     )
     if not worker then
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = city_state.player_id,
             team = city_state.team,
             wood = wood_cost,
             gold = gold_cost,
             reason = "train_refund:" .. training_id,
         })
         event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+            player_id = city_state.player_id,
             team = city_state.team,
             population = tonumber(training.population_cost) or 0,
             reason = "train_refund:" .. training_id,
@@ -1042,6 +1049,7 @@ local function remove_worker(worker, entindex, reason)
     end
     refresh_cheer_buffs(state.player_id)
     event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+        player_id = state.player_id,
         team = state.team,
         population = state.population,
         reason = reason or (state.worker_type .. "_died"),
@@ -1103,6 +1111,7 @@ local function train_worker(payload)
     })
     if not city_state then return { ok = false, error = "training_building_missing" } end
     local resources = event_bus.request(events.RESOURCE_GET_REQUEST, {
+        player_id = city_state.player_id,
         team = city_state.team,
     })
     local population_cost = math.max(0, tonumber(training.population_cost) or 0) * count

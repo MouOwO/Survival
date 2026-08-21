@@ -212,6 +212,7 @@ local function change_resource(context, resource_name, command)
     }
     changes[resource_name] = amount
     local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = context.player_id,
         team = changes.team,
         wood = changes.wood,
         gold = changes.gold,
@@ -452,6 +453,7 @@ local function add_test_hero(context)
             return false
         end
         local resources = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = context.player_id,
             team = context.team,
             wood = 100000000,
             gold = 100000000,

@@ -106,8 +106,9 @@ local function spawn_target(player_id, action, marker)
     return target
 end
 
-local function spend(team, gold, reason)
+local function spend(player_id, team, gold, reason)
     return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+        player_id = player_id,
         team = team,
         wood = 0,
         gold = math.max(0, tonumber(gold) or 0),
@@ -136,7 +137,7 @@ local function start_fee_task(player_id, state)
                 return false
             end
         end
-        local result = spend(state.team, cost, "endless_training_periodic_fee")
+        local result = spend(player_id, state.team, cost, "endless_training_periodic_fee")
         if not result or not result.ok then
             clear_state(player_id, "training_room_gold_not_enough")
             notify(
@@ -180,6 +181,7 @@ function M.enter(player_id, action_id)
     )
     local minimum_gold = entry_cost + periodic_cost
     local resources = event_bus.request(events.RESOURCE_GET_REQUEST, {
+        player_id = player_id,
         team = team,
     })
     if not resources then
@@ -203,7 +205,7 @@ function M.enter(player_id, action_id)
             return { ok = false, error = "练功目标生成失败" }
         end
     end
-    local paid = spend(team, entry_cost, "altar_travel_entry:" .. action.action_id)
+    local paid = spend(player_id, team, entry_cost, "altar_travel_entry:" .. action.action_id)
     if not paid or not paid.ok then
         if valid(target) then UTIL_Remove(target) end
         return { ok = false, error = "金币不足" }

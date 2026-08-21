@@ -81,9 +81,10 @@ local function fusion_cost(row)
     }
 end
 
-local function refund_cost(team, cost)
+local function refund_cost(player_id, team, cost)
     if cost.wood <= 0 and cost.gold <= 0 then return end
     event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = player_id,
         team = team,
         wood = cost.wood,
         gold = cost.gold,
@@ -166,6 +167,7 @@ local function fuse(payload)
     end
     local cost = fusion_cost(row)
     local spent = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+        player_id = player_id,
         team = caster:GetTeamNumber(),
         wood = cost.wood,
         gold = cost.gold,
@@ -184,13 +186,13 @@ local function fuse(payload)
         for _, material in ipairs(materials) do
             material.survival_lumberjack_fusion_pending = nil
         end
-        refund_cost(caster:GetTeamNumber(), cost)
+        refund_cost(player_id, caster:GetTeamNumber(), cost)
         pending_by_caster[caster_key] = nil
         return data or { ok = false, error = "fusion_target_config_failed" }
     end
     local committed = worker_system.commit_lumberjack_fusion(materials, target, data)
     if not committed or not committed.ok then
-        refund_cost(caster:GetTeamNumber(), cost)
+        refund_cost(player_id, caster:GetTeamNumber(), cost)
         for _, material in ipairs(materials) do
             material.survival_lumberjack_fusion_pending = nil
         end

@@ -313,6 +313,7 @@ local function spend(state, cost, reason)
     if not cost then return { ok = false, error = "升级费用未配置" } end
     if state.free_upgrade_request == true then
         return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+            player_id = state.player_id,
             team = state.team,
             wood = 0,
             gold = 0,
@@ -321,6 +322,7 @@ local function spend(state, cost, reason)
         })
     end
     return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+        player_id = state.player_id,
         team = state.team,
         wood = cost.wood or 0,
         gold = cost.gold or 0,
@@ -345,6 +347,7 @@ local function refund_spend(state, cost, reason)
     local population = math.max(0, tonumber(cost.population) or 0)
     if wood > 0 or gold > 0 then
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = state.player_id,
             team = state.team,
             wood = wood,
             gold = gold,
@@ -353,6 +356,7 @@ local function refund_spend(state, cost, reason)
     end
     if population > 0 then
         event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+            player_id = state.player_id,
             team = state.team,
             population = population,
             reason = (reason or "tower_upgrade_refund") .. "_population",
@@ -607,6 +611,7 @@ local function upgrade_city(state)
         if rogue_effect_state.has_effect(state.player_id,
             "builder_main_city_wood_refund") then
             event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                player_id = state.player_id,
                 team = state.team,
                 wood = tonumber(cost and cost.wood) or 0,
                 gold = 0,

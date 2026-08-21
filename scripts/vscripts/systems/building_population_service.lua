@@ -10,6 +10,7 @@ function M.grant_level(state, level, reason)
     if amount <= 0 then return 0 end
 
     event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = state.player_id,
         team = state.team,
         max_population = amount,
         reason = reason or "building_level_population",

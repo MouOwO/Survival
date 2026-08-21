@@ -22,6 +22,7 @@ end
 local function add_resource(player_id, values, reason)
     values = values or {}
     local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = player_id,
         team = team_for(player_id),
         wood = tonumber(values.wood) or 0,
         gold = tonumber(values.gold) or 0,

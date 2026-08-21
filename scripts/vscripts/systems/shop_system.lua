@@ -167,7 +167,8 @@ local function snapshot_context(player_id, reason, mode)
         reason = reason,
         resources = event_bus.request(
             events.RESOURCE_GET_REQUEST,
-            { team = team }
+            {
+        player_id = player_id, team = team }
         ) or {},
         purchased_count = state.purchased_count,
         city_level = state.city_level_by_team[team] or 0,
@@ -533,6 +534,7 @@ local function purchase(payload)
         local spend = event_bus.request(
             events.RESOURCE_TRY_SPEND_REQUEST,
             {
+                player_id = player_id,
                 team = team,
                 wood = entry.woodcost,
                 gold = entry.goldcost,
@@ -553,7 +555,7 @@ local function purchase(payload)
             }
         ) or { ok = false, error = "encounter_reentry_handler_missing" }
         if not resumed.ok then
-            local refund = grant_service.refund(team, entry)
+            local refund = grant_service.refund(player_id, team, entry)
             local result = {
                 ok = false,
                 error = resumed.error or "encounter_reentry_failed",
@@ -671,6 +673,7 @@ local function purchase(payload)
     local spend = event_bus.request(
         events.RESOURCE_TRY_SPEND_REQUEST,
         {
+            player_id = player_id,
             team = team,
             wood = entry.woodcost,
             gold = entry.goldcost,
@@ -695,7 +698,7 @@ local function purchase(payload)
         state
     )
     if not granted or not granted.ok then
-        grant_service.refund(team, entry)
+        grant_service.refund(player_id, team, entry)
         if not silent_notification then
             notify(
                 player_id,

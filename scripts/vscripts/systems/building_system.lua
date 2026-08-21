@@ -393,6 +393,7 @@ local function release_population(state, reason)
     local population = population_to_release(state)
     if population <= 0 then return 0 end
     event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+        player_id = state.player_id,
         team = state.team,
         population = population,
         reason = reason,
@@ -634,6 +635,7 @@ local function start_building(payload)
             "builder_free_hero_altar") > 0
     local charged_cost = free_hero_altar and { wood = 0, gold = 0 } or cost
     local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+        player_id = check.player_id,
         team = check.team,
         wood = charged_cost.wood,
         gold = charged_cost.gold,
@@ -654,12 +656,14 @@ local function start_building(payload)
     )
     if not unit then
         event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = check.player_id,
             team = check.team,
             wood = charged_cost.wood,
             gold = charged_cost.gold,
             reason = "build_refund:" .. check.definition.id,
         })
         event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+            player_id = check.player_id,
             team = check.team,
             population = check.definition.population_cost or 0,
             reason = "build_population_refund:" .. check.definition.id,
@@ -753,6 +757,7 @@ local function start_building(payload)
                 release_population(state, "building_construction_failed")
                 if state.build_cost then
                     event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                        player_id = state.player_id,
                         team = state.team,
                         wood = state.build_cost.wood,
                         gold = state.build_cost.gold,
@@ -1154,6 +1159,7 @@ local function on_entity_killed(payload)
     if state.constructing then
         if state.build_cost then
             event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                player_id = state.player_id,
                 team = state.team,
                 wood = state.build_cost.wood,
                 gold = state.build_cost.gold,

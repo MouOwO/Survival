@@ -106,6 +106,7 @@ local function grant_reward(payload)
     local resource_result = { ok = true }
     if resources.wood ~= 0 or resources.gold ~= 0 then
         resource_result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = player_id,
             team = payload.team,
             wood = resources.wood,
             gold = resources.gold,

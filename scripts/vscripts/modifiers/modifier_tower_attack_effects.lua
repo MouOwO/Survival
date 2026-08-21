@@ -538,6 +538,7 @@ local function apply_machine_gun_hit_effects(modifier, tower, target)
         local gold = math.max(0, tonumber(bounty.damage_multiplier) or 0)
         if gold > 0 then
             local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                player_id = tonumber(tower.survival_player_id),
                 team = tower:GetTeamNumber(),
                 gold = gold,
                 reason = "tower_bounty_machine_gun_attack",

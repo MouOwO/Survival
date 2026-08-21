@@ -85,13 +85,13 @@ local function unit_from_payload(payload)
     return ok and valid_entity(entity) and entity or nil
 end
 
-local function resources(team)
-    if not team then
+local function resources(player_id)
+    if player_id == nil then
         return nil
     end
     return event_bus.request(
         events.RESOURCE_GET_REQUEST,
-        { team = team }
+        { player_id = player_id }
     )
 end
 
@@ -306,7 +306,7 @@ local function publish(state)
                 safe_method_number(unit, "GetAbilityCount", 0) or 0),
         }
     )
-    local resource_state = resources(state.team)
+    local resource_state = resources(state.player_id)
     local current = {}
     local tower_transitions = 0
 
