@@ -6,6 +6,7 @@ local region_service = require("systems/forbidden_region_service")
 local M = {}
 local occupied = {}
 local marker_regions = {}
+local reconcile_occupied
 
 local function number(value, fallback)
     local result = tonumber(value)
@@ -313,6 +314,7 @@ end
 local function can_place(payload)
     local position = payload and payload.position
     if not position then return { ok = false, error = "invalid_position", cells = {} } end
+    reconcile_occupied()
     local footprint = normalized_footprint(payload.footprint)
     local anchor_x, anchor_y = snap_anchor(position)
     local grid_x = start_cell(anchor_x, footprint.x)
@@ -398,6 +400,40 @@ local function release(payload)
     return true
 end
 
+local function clear_occupied_entindex(entindex)
+    for x, column in pairs(occupied) do
+        for y, occupant in pairs(column) do
+            if occupant == entindex then
+                column[y] = nil
+            end
+        end
+        if next(column) == nil then occupied[x] = nil end
+    end
+end
+
+local function occupied_entity_is_valid(unit)
+    if not unit or unit:IsNull() then return false end
+    if unit_is_dead(unit) then return false end
+    return unit.survival_is_building == true
+        or unit.survival_building_id ~= nil
+end
+
+reconcile_occupied = function()
+    if type(EntIndexToHScript) ~= "function" then return end
+    local checked = {}
+    for _, column in pairs(occupied) do
+        for _, entindex in pairs(column) do
+            if entindex ~= nil and not checked[entindex] then
+                checked[entindex] = true
+                local ok, unit = pcall(EntIndexToHScript, entindex)
+                if not ok or not occupied_entity_is_valid(unit) then
+                    clear_occupied_entindex(entindex)
+                end
+            end
+        end
+    end
+end
+
 local function load_marker_regions()
     marker_regions = {}
     for _, row in ipairs(config.forbidden_markers or {}) do
@@ -432,5 +468,6 @@ M._unit_is_dead_for_test = unit_is_dead
 M._nearby_units_for_footprint_for_test = nearby_units_for_footprint
 M._occupied_for_test = function() return occupied end
 M._can_place_for_test = can_place
+M._reconcile_occupied_for_test = reconcile_occupied
 
 return M
