@@ -165,9 +165,15 @@ local function apply_base_projection(state)
         -- Keep the legacy damage multiplier on native basic attacks while the
         -- logical/UI attack remains the unmultiplied CSV value.
         local multiplier = tonumber(state.exclusive_attack_multiplier) or 1
-        local minimum = math.max(0, state.engine_base_attack_min * multiplier)
+        local attribute_attack_bonus = tonumber(state.attribute_attack_bonus) or 0
+        local minimum = math.max(0,
+            (state.engine_base_attack_min
+                + attribute_attack_bonus * state.damage_multiplier)
+                * multiplier)
         local maximum = math.max(minimum,
-            state.engine_base_attack_max * multiplier)
+            (state.engine_base_attack_max
+                + attribute_attack_bonus * state.damage_multiplier)
+                * multiplier)
         safe_call(unit, "SetBaseDamageMin", minimum)
         safe_call(unit, "SetBaseDamageMax", maximum)
         safe_call(unit, "CalculateStatBonus", true)
@@ -288,6 +294,23 @@ local function recalculate(player_id, reason)
     local strength_bonus = unscaled_strength * essence_attributes_pct / 100
     local agility_bonus = unscaled_agility * essence_attributes_pct / 100
     local intellect_bonus = unscaled_intellect * essence_attributes_pct / 100
+    local final_strength = unscaled_strength + strength_bonus
+    local final_intellect = unscaled_intellect + intellect_bonus
+    local attribute_health_bonus = hero_combat_stat_math.strength_health_bonus(
+        final_strength,
+        global_rules.hero_strength_health_per_point
+    )
+    local attribute_attack_bonus = hero_combat_stat_math.intellect_attack_bonus(
+        final_intellect,
+        global_rules.hero_intellect_attack_per_point
+    )
+    hero_health_guard.preserve_missing(state.unit, function()
+        hero_stat_adapter.apply_configured_health(
+            state.unit,
+            state.definition,
+            attribute_health_bonus
+        )
+    end, "attribute_health_refresh")
     local base_attack_time = math.max(0.1,
         hero_combat_stat_math.configured_base_attack_time(
             state.definition,
@@ -310,17 +333,22 @@ local function recalculate(player_id, reason)
         weapon_content_id = equipment.main_hand_content_id or "",
         weapon_name = equipment.main_hand_name ~= ""
             and equipment.main_hand_name or "未装备武器",
-        attack_min = (debug_attack or ((state.base.attack_min + weapon_attack_min)
+        attack_min = (debug_attack or ((state.base.attack_min + weapon_attack_min
+            + attribute_attack_bonus)
             * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
             + equipment_stats.attack_flat
             + researcher_attack_flat
             + progression_attack_flat)) * exclusive_attack_multiplier,
-        attack_max = (debug_attack or ((state.base.attack_max + weapon_attack_max)
+        attack_max = (debug_attack or ((state.base.attack_max + weapon_attack_max
+            + attribute_attack_bonus)
             * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
             + equipment_stats.attack_flat
             + researcher_attack_flat
             + progression_attack_flat)) * exclusive_attack_multiplier,
+        health = current_health or safe_get(state.unit, "GetMaxHealth", 1),
         max_health = safe_get(state.unit, "GetMaxHealth", 1),
+        attribute_health_bonus = attribute_health_bonus,
+        attribute_attack_bonus = attribute_attack_bonus,
         researcher_attack_pct = researcher_attack_pct,
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
@@ -346,10 +374,12 @@ local function recalculate(player_id, reason)
         progression_attack_flat = progression_attack_flat,
         base_attack_time = base_attack_time,
         hero_damage_multiplier = hero_damage_multiplier,
-        engine_attack_min = state.engine_base_attack_min
-            * exclusive_attack_multiplier + engine_bonus_attack,
-        engine_attack_max = state.engine_base_attack_max
-            * exclusive_attack_multiplier + engine_bonus_attack,
+        engine_attack_min = (state.engine_base_attack_min
+            + attribute_attack_bonus * state.damage_multiplier)
+                * exclusive_attack_multiplier + engine_bonus_attack,
+        engine_attack_max = (state.engine_base_attack_max
+            + attribute_attack_bonus * state.damage_multiplier)
+                * exclusive_attack_multiplier + engine_bonus_attack,
         debug_attack_override = debug_attack or 0,
         -- The equipment aggregation snapshot already owns the authoritative
         -- War3/CSV armor value. Do not derive the HUD value from this frame's
@@ -367,9 +397,9 @@ local function recalculate(player_id, reason)
             equipment_stats.attack_speed_pct + researcher_attack_speed_pct
         ),
         attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100),
-        strength = unscaled_strength + strength_bonus,
+        strength = final_strength,
         agility = unscaled_agility + agility_bonus,
-        intellect = unscaled_intellect + intellect_bonus,
+        intellect = final_intellect,
         hero_base_attack_min = state.base.attack_min,
         hero_base_attack_max = state.base.attack_max,
         weapon_base_attack_min = value(definition, "base_attack_min", 0),
@@ -405,6 +435,7 @@ local function recalculate(player_id, reason)
     next_snapshot.refresh_version = tonumber(state.refresh_version) or 0
     state.snapshot = next_snapshot
     state.exclusive_attack_multiplier = exclusive_attack_multiplier
+    state.attribute_attack_bonus = attribute_attack_bonus
     apply_base_projection(state)
     safe_call(state.unit, "SetBaseAttackTime", base_attack_time
         / math.max(0.01, 1 + researcher_attack_speed_pct / 100))

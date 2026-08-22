@@ -43,6 +43,14 @@ M.repair_detection_range = M.number(
     "repair_detection_range",
     FIND_UNITS_EVERYWHERE or 99999
 )
+M.hero_strength_health_per_point = M.number(
+    "hero_strength_health_per_point",
+    5
+)
+M.hero_intellect_attack_per_point = M.number(
+    "hero_intellect_attack_per_point",
+    0.1
+)
 M.building_challenge_hull_radius = M.number(
     "building_challenge_hull_radius",
     0

@@ -14,8 +14,8 @@ The trust path is fixed:
 
 ## Authoritative Data
 
-- `data/csv/玩家档案系统/fishing_system_rules.csv` owns heartbeat, lease, timer range, and definition version.
-- `data/csv/玩家档案系统/fishing_reward_definitions.csv` owns stable reward IDs, weights, effect keys, ranges, stacking, caps, and enablement.
+- `data/csv/挑战与奖励系统/fishing_system_rules.csv` owns the in-match fishing interval and definition version. It is local match configuration and is not persisted to the database.
+- `data/csv/挑战与奖励系统/fishing_reward_definitions.csv` owns the in-match reward IDs, weights, effect keys, ranges, stacking, caps, and enablement. It is separate from the out-of-match HTTP/profile fishing tables.
 - Generated Lua files under `scripts/vscripts/config/generated/` are outputs and must not be edited directly.
 - A definition version is immutable. Reusing a version with a different SHA-256 hash is rejected by the database.
 

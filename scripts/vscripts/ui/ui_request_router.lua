@@ -102,6 +102,12 @@ local function unit_combat_snapshot(unit)
         or safe_number(unit, "GetPhysicalArmorValue", nil, false)
         or tonumber(unit.survival_armor)
         or safe_number(unit, "GetPhysicalArmorBaseValue", 0)
+    local effective_war3_armor = custom_war3_armor
+        and (tonumber(unit.survival_effective_war3_armor)
+            or tonumber(unit.survival_armor)
+            or tonumber(unit.survival_base_war3_armor)
+            or 0)
+        or nil
     return {
         entindex = unit:entindex(),
         unit_name = internal_name,
@@ -123,10 +129,8 @@ local function unit_combat_snapshot(unit)
         -- 必须读取包含 Modifier 加减值的当前有效护甲；基础护甲和配置缓存
         -- 无法反映攻击减甲科技的实时叠层。
         runtime_armor = runtime_armor,
-        armor = custom_war3_armor
-            and (tonumber(unit.survival_effective_war3_armor) or 0) or nil,
-        effective_war3_armor = custom_war3_armor
-            and (tonumber(unit.survival_effective_war3_armor) or 0) or nil,
+        armor = effective_war3_armor,
+        effective_war3_armor = effective_war3_armor,
         armor_mapping_version = armor_mapping_version,
         -- attack_speed 表示当前每秒攻击次数，不是 BAT，也不是 Dota
         -- 百分比攻速；非英雄单位必须包含光环等临时 Modifier。

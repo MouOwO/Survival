@@ -1,3 +1,37 @@
+## 当前修复项（2026-08-22）：防御塔右键手动选择攻击目标
+
+- 用户实机确认已完成建造的防御塔右键敌人完全无效；根因是原生 `DOTA_UNIT_ORDER_ATTACK_TARGET` 虽被 OrderFilter 放行，却没有持久化到 `modifier_tower_auto_attack`，自动索敌循环会继续接管目标。
+- 修复：玩家拥有的箭塔对合法敌方目标发出攻击订单时，OrderFilter 调用 modifier 的 `SetManualTarget()` 并设置 `SetForceAttackTarget()`；手动目标有效时优先保持，死亡、越界、同队、树目标或防空规则不合法后清除并恢复自动索敌。非拥有者订单、树目标和防空塔对地目标仍拒绝。
+- 验证：`TOWER_MANUAL_TARGET_ORDER_PASS`、`TOWER_MANUAL_TARGET_MODIFIER_PASS`、四个目标文件 Lua 5.1 语法和限定 `git diff --check` 通过。现有 `test_tower_tree_target_rules.lua` 因调用当前已不存在的 `tree_damage_rules.is_tower()` 失败，`test_anti_air_tower.lua` 在既有连射断言处失败，均非本次修改引入。仍需 Workshop Tools 冷启动确认选塔右键敌人、目标死亡后自动接管及防空目标限制。
+## 当前修复项（2026-08-22）：熔火核心批量物品无法自动合成
+
+- 根因：地面熔火核心包的共享拾取逻辑 `challenge_ground_reward_claim.lua` 固定向逻辑库存登记 `count=1`，没有读取物品包的 `GetCurrentCharges()`；因此包内显示4个Lv1核心时，自动合成服务实际只能看到1个。
+- 修复：领取时优先读取有效 charges 作为登记数量，无效或缺失时回退为1；合成仍只读取权威逻辑库存，避免从可视物品直接扣除。
+- 验证：4个Lv1批量登记后合成为1个Lv2并保留1个Lv1；地面奖励领取、完整武器合成、Lua 5.1语法和限定 `git diff --check` 均通过。仍需 Workshop Tools 实机确认真实地面包拾取后的 charges 与界面刷新。
+
+## 当前任务（2026-08-22）：英雄与防御塔 A 键攻击范围显示
+
+- 用户已确认交互：按住 `A` 显示当前选中英雄或防御塔的攻击范围；按住 `A` 后左键点击敌人完全复用 Dota 原生 A-click，不自定义接管左键，不新增隐藏技能。
+- 实施边界：Panorama 只监听 A 的按下/释放并请求范围视觉；服务端按玩家控制权、单位类型和运行时最终攻击范围创建/销毁范围粒子。原生 `DOTA_UNIT_ORDER_ATTACK_TARGET` 与现有 OrderFilter 保持不变。
+- 英雄射程读取必须兼容 `survival_attack_range`、`Script_GetAttackRange()`、`GetAttackRange()` 和 CSV 回退；防御塔射程使用 CSV `tower_attack_range` 及运行时科技加成，禁止客户端硬编码基础数值。
+- 本轮尚未完成 Workshop Tools 冷启动实机确认，范围粒子的控制点表现和原生 A-click 目标切换仍需验收。
+
+## 当前任务（2026-08-22）：接入远端剑圣模型更新
+
+- 已确认远端 `origin/dev` 比本地多提交 `f26e020`，内容为剑圣从 Sven 模型切换至 Juggernaut Arcana 模型，并同步更新英雄/资源 CSV、生成 Lua、预载 KV 和英雄饰品运行时。
+- 旧路径 `data/csv/玩家档案系统/fishing_reward_definitions.csv` 与 `fishing_system_rules.csv` 的删除属于既有钓鱼配置迁移，不是本次拉取冲突；权威数据在 `data/csv/挑战与奖励系统/`。
+- 当前唯一与远端重叠的本地编译产物是 `panorama/scripts/custom_game/combat_stats.vjs_c`，拉取前需保留本地版本以便比较，再采用远端或重新编译结果解决。
+- 已 fast-forward 接入远端 `f26e020`；`combat_stats.vjs_c` 使用 Content 侧 `combat_stats.js` 重新强制编译，结果为 `OK: 1 compiled, 0 failed, 0 skipped`。
+- 远端随提交带入的 `combat_stats.vjs_c.BASE.vjs_c`、`.LOCAL.vjs_c`、`.REMOTE.vjs_c` 是二进制冲突辅助残留，已删除；既有 `survival_ui.vjs_c` 冲突快照未触碰。
+- 剑圣资源预载契约、英雄饰品服务 Lua 5.1 行为测试、相关 Lua 5.1 语法和 `git diff --check` 均通过；仍需 Workshop Tools 冷启动确认模型、饰品和出生粒子实机表现。
+
+## 当前任务（2026-08-22）：英雄最终属性换算优化
+
+- 用户确认按最终属性值结算：最终力量每点提供5点最大生命值，最终智力每点提供0.1点攻击力，敏捷不提供额外效果。
+- 权威换算系数写入`data/csv/公共规则/global_rules.csv`，运行时在`hero_combat_stat_service.lua`最终属性汇总点统一计算，避免装备、科技、进阶、永久奖励、七宗罪和专属技能产生重复或遗漏。
+- 基础生命继续沿用CSV英雄生命、倍率和隐藏基础生命Modifier；属性生命通过同一Modifier刷新并使用现有生命保护逻辑。基础攻击已经应用的伤害倍率不重复计算，智力攻击加成按实体攻击链单独应用。
+- 本轮验证范围为CSV生成、Lua 5.1语法、英雄战斗属性定向测试、目标文件严格UTF-8和限定`git diff --check`；Workshop Tools实机属性变化仍需单独验收。
+
 ## 当前插入任务（2026-08-21）：局内钓鱼抽奖系统
 
 ## 本次难度选择与在线时长联调结果（2026-08-21）
@@ -280,7 +314,7 @@
 ## 当前插入任务（2026-08-21）：局内钓鱼抽奖系统
 
 - 已读取用户提供的 `D:\tooltip文件夹\钓到物奖励效果统计.csv`。文件实际是 WPS OLE/BIFF 工作簿而非文本 CSV，已通过 WPS COM 只读提取 `Sheet1`：原始 27 条记录、出现次数合计 129。
-- 已按确认口径整理为项目权威 `data/csv/玩家档案系统/fishing_reward_definitions.csv`：删除待复核 B 级条目，修订 `鬼索子` 为伐木工攻速提高 4 倍、普通 `金枪鱼` 为伐木工攻速+5%，正式池 26 条、总权重 128；基础数据全部来自 CSV。
+- 已按确认口径整理为项目权威 `data/csv/挑战与奖励系统/fishing_reward_definitions.csv`：删除待复核 B 级条目，修订 `鬼索子` 为伐木工攻速提高 4 倍、普通 `金枪鱼` 为伐木工攻速+5%，正式池 26 条、总权重 128；基础数据全部来自 CSV。该表属于局内奖励，不写入数据库；局外 HTTP 钓鱼仍属于玩家档案域。
 - 新增独立 `systems/fishing_service.lua`，不复用局外 HTTP/档案钓鱼服务。首次难度选择成功事件后启动计时，0 秒不抽奖，之后每 480 秒遍历在线玩家并独立按权重抽奖；结果通过 `UI_NOTIFICATION` 的 `audience="all"` 全体播报。
 - 奖励投影复用资源事务、`TECHNOLOGY_STATS_ROGUE_ADD_REQUEST` 和现有建筑列表/实体接口；持续金币/木材由局内服务按秒结算，墙生命奖励保留到后续新建墙。`fish <reward_id|random>` 已接入作弊命令。
 - 自动验证通过：配置生成成功、26 条/128 权重/无待复核行/局内间隔 480 秒、Lua 5.1 行为测试 `FISHING_SERVICE_PASS`、目标 Lua 语法 `FISHING_FINAL_LUA_PASS` 和限定 `git diff --check`。尚未进行 Workshop Tools 冷启动、多人实机播报和实体效果验收。

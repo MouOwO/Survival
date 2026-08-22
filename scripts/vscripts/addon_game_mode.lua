@@ -84,6 +84,7 @@ local tower_special_skill_system = require("systems/tower_special_skill_system")
 local tower_magic_supreme_system = require("systems/tower_magic_supreme_system")
 local tower_fusion_service = require("systems/tower_fusion_service")
 local tree_attack_order_filter = require("systems/tree_attack_order_filter")
+local attack_range_display_service = require("systems/attack_range_display_service")
 local tree_system = require("systems/tree_system")
 local worker_system = require("systems/worker_system")
 local player_entitlement_service =
@@ -739,6 +740,11 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
+        "particles/ui_mouseactions/range_finder_tower_aoe.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
         "particles/survival_monkey_king/survival_monkey_king_staff_drop.vpcf",
         context
     )
@@ -772,6 +778,8 @@ local function initialize_services()
     combat_bootstrap.init()
     assert(tree_attack_order_filter.register(),
         "tree attack order filter registration failed")
+    assert(attack_range_display_service.init(),
+        "attack range display service initialization failed")
 
     tower_magic_supreme_system.init()
     tower_fusion_service.init()

@@ -25,6 +25,8 @@ M.rows = {
     { rule_id = "tree_lumber_efficiency_buff_per_level", value = 1, description = "资源树从LV2起每级增加的伐木效率", enabled = true },
     { rule_id = "hero_base_lumber_efficiency", value = 13, description = "英雄每次攻击资源树的基础木材收益", enabled = true },
     { rule_id = "hero_meta_all_attributes_bonus", value = 0, description = "全体英雄局外全属性加成", enabled = true },
+    { rule_id = "hero_strength_health_per_point", value = 5, description = "英雄每点最终力量提供的最大生命值", enabled = true },
+    { rule_id = "hero_intellect_attack_per_point", value = 0.1, description = "英雄每点最终智力提供的攻击力", enabled = true },
     { rule_id = "hero_meta_damage_multiplier", value = 1, description = "全体英雄局外伤害倍率", enabled = true },
     { rule_id = "hero_meta_max_health_multiplier", value = 1, description = "全体英雄局外最大生命倍率", enabled = true },
     { rule_id = "hero_meta_max_mana_multiplier", value = 1, description = "全体英雄局外最大魔法倍率", enabled = true },

@@ -67,6 +67,7 @@ local function apply_combat_stats(unit, definition)
     local base_war3_armor = number(definition, "base_war3_armor")
         or number(definition, "base_armor")
     if base_war3_armor ~= nil then
+        unit.survival_base_war3_armor = base_war3_armor
         safe_call(unit, "SetPhysicalArmorBaseValue",
             armor_balance.from_war3(base_war3_armor))
     end
@@ -203,18 +204,21 @@ function M.apply_configured_mana(unit, definition, fill_to_maximum)
     return target, adjustment, native_maximum, regeneration
 end
 
-function M.configured_max_health(definition)
+function M.configured_max_health(definition, attribute_health_bonus)
     local base = number(definition, "base_health")
     if not base or base <= 0 then return nil end
     local multiplier = number(definition, "max_health_multiplier") or 1
     local global_multiplier = global_rules.number(
         "hero_meta_max_health_multiplier", 1
     )
-    return math.max(1, math.floor(base * multiplier * global_multiplier))
+    return math.max(1, math.floor(
+        base * multiplier * global_multiplier
+            + (tonumber(attribute_health_bonus) or 0)
+    ))
 end
 
-function M.apply_configured_health(unit, definition)
-    local target = M.configured_max_health(definition)
+function M.apply_configured_health(unit, definition, attribute_health_bonus)
+    local target = M.configured_max_health(definition, attribute_health_bonus)
     if not target or not unit or unit:IsNull() then return nil end
     local modifier_name = "modifier_survival_hero_base_health"
     local modifier = unit.FindModifierByName

@@ -69,6 +69,7 @@ function modifier_tower_auto_attack:OnAttackStart(params)
     end
     tower:SetForceAttackTarget(nil)
     self.forced_target = nil
+    self.manual_target = nil
     if tower.Stop then tower:Stop() end
 end
 
@@ -91,19 +92,48 @@ function modifier_tower_auto_attack:ResetTarget()
     if not IsServer() then return end
     local tower = self:GetParent()
     self.forced_target = nil
+    self.manual_target = nil
     if valid(tower) then tower:SetForceAttackTarget(nil) end
 end
 
+function modifier_tower_auto_attack:SetManualTarget(target)
+    if not IsServer() then return end
+    local tower = self:GetParent()
+    if not valid(tower) or not valid(target)
+        or tree_damage_rules.is_tree(target)
+        or not anti_air_rules.can_attack(tower, target)
+        or target:GetTeamNumber() == tower:GetTeamNumber() then
+        return
+    end
+    self.manual_target = target
+    self.forced_target = nil
+    tower:SetForceAttackTarget(target)
+    self.forced_target = target
+    print(string.format("[TOWER_MANUAL_TARGET] tower=%s target=%s action=set",
+        tostring(tower:entindex()), tostring(target:entindex())))
+end
 function modifier_tower_auto_attack:OnIntervalThink()
     if not IsServer() then return end
     local tower = self:GetParent()
     if not valid(tower) then return end
 
-    local target = tower:GetAttackTarget()
-    local distance = valid(target)
+    local target = self.manual_target
+    local manual_distance = valid(target)
         and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
         or 99999
     local attack_range = current_attack_range(tower)
+    if target and (not valid(target) or tree_damage_rules.is_tree(target)
+        or target.IsAlive and not target:IsAlive()
+        or not anti_air_rules.can_attack(tower, target)
+        or target:GetTeamNumber() == tower:GetTeamNumber()
+        or manual_distance > attack_range + 96) then
+        self.manual_target = nil
+        target = nil
+    end
+    if not target then target = tower:GetAttackTarget() end
+    local distance = valid(target)
+        and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
+        or 99999
     if tree_damage_rules.is_tree(target)
         or is_training_dummy(target) and find_target(tower) ~= target
         or not anti_air_rules.can_attack(tower, target) then
@@ -143,6 +173,7 @@ function modifier_tower_auto_attack:OnDestroy()
         local tower = self:GetParent()
         if valid(tower) then tower:SetForceAttackTarget(nil) end
         self.forced_target = nil
+        self.manual_target = nil
     end
 end
 

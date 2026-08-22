@@ -580,7 +580,6 @@ local function mine_level_upgrade(state, resources)
         fields = {
             { label = "等级", value = tostring(level) .. " → " .. tostring(level + 1) },
             { label = "生命", value = value_delta(current_data.health, target_data.health) },
-            { label = "护甲", value = value_delta(current_data.armor, target_data.armor) },
             { label = "每秒金币", value = value_delta(
                 state.income_per_second,
                 gold_mine.normal_income(level + 1, state.efficiency_level or 0)

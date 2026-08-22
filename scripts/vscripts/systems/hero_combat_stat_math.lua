@@ -23,4 +23,12 @@ function M.engine_base_damage(logical_damage, damage_multiplier)
         * (tonumber(damage_multiplier) or 1)
 end
 
+function M.strength_health_bonus(strength, health_per_point)
+    return (tonumber(strength) or 0) * (tonumber(health_per_point) or 0)
+end
+
+function M.intellect_attack_bonus(intellect, attack_per_point)
+    return (tonumber(intellect) or 0) * (tonumber(attack_per_point) or 0)
+end
+
 return M

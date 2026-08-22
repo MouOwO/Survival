@@ -5,6 +5,15 @@ local content_id_aliases = require("config/content_id_aliases")
 
 local M = {}
 
+local function claim_count(item)
+    if item and item.GetCurrentCharges then
+        local ok, charges = pcall(item.GetCurrentCharges, item)
+        local count = ok and math.floor(tonumber(charges) or 0) or 0
+        if count > 0 then return count end
+    end
+    return 1
+end
+
 function M.claim(self, caster)
     if not IsServer() then return false end
     local player_id = caster and caster:GetPlayerOwnerID() or -1
@@ -12,6 +21,7 @@ function M.claim(self, caster)
     local original_content_id = tostring(self.survival_content_id or "")
     local content_id = content_id_aliases.canonical(original_content_id)
     local reward_key = tostring(self.survival_reward_key or "unknown")
+    local claim_quantity = claim_count(self)
     print(string.format(
         "[CHALLENGE_REWARD_CLAIM] implementation=shared player=%s owner=%s key=%s content=%s entindex=%s claimed=%s ground=%s action=start",
         tostring(player_id), tostring(owner_id), reward_key,
@@ -59,7 +69,7 @@ function M.claim(self, caster)
     local result = event_bus.request(events.CONTENT_INVENTORY_GRANT_REQUEST, {
         player_id = player_id,
         content_id = content_id,
-        count = 1,
+        count = claim_quantity,
         reason = "challenge_ground_reward_pickup",
     })
     local granted_count = result and result.snapshot and result.snapshot.counts

@@ -43,7 +43,7 @@
 ## 持久化在线计时钓鱼奖励边界（2026-08-17）
 
 - 信任链固定为Dota服务端Lua -> 仅loopback监听且Bearer认证的Python API -> Supabase PostgreSQL。Steam Account ID由服务端`PlayerResource:GetSteamAccountID()`解析；Lua和客户端不得持有Supabase URL、service-role key或数据库凭据。
-- `fishing_system_rules.csv`是心跳、租约、60至600秒区间和定义版本权威源；`fishing_reward_definitions.csv`是奖励ID、权重、效果键、范围、叠加、上限和启用状态权威源。定义版本与SHA-256绑定且数据库不可更新/删除；更改定义必须升版本。
+- 局外 HTTP/档案钓鱼的表仍属于玩家档案域并参与数据库定义校验；局内钓鱼使用`data/csv/挑战与奖励系统/fishing_system_rules.csv`和`fishing_reward_definitions.csv`，只作为本局抽奖配置，不写入数据库。
 - 在线时间只由同一session租约内相邻心跳差值累计。首次、新session、超租约和离线时间均扣0秒；单账号只允许一个活动租约，异常断线最多等待15秒接管且等待期间冻结。
 - grant历史、永久聚合、档案revision、下个区间和幂等响应必须在`heartbeat_fishing_session()`一个数据库事务中提交。`reward_grants`不可变，`player_effect_totals`是当前投影；Lua使用同一request ID重试并按grant ID做同局应用去重。
 - 永久效果通过`permanent_reward_effect_service`从既有已校验档案`save.permanent_effects`恢复，不能混入单局科技或挑战状态。当前适配键为英雄全属性/攻击、伐木工攻速百分比和金矿收益百分比。团队资源未玩家隔离前，禁止把玩家永久开局资源直接加入共享team账户。

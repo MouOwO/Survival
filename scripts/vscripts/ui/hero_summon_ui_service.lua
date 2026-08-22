@@ -103,6 +103,12 @@ end
 
 local function on_shop_unlock(payload)
     send(payload.player_id, "ui_shop_unlock_state", payload)
+    if tonumber(payload.unlocked) == 1 then
+        send(payload.player_id, "ui_notification", {
+            message = "英雄已召唤，装备商店已解锁",
+            level = "info",
+        })
+    end
 end
 
 function M.init()

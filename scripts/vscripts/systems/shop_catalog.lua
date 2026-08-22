@@ -144,6 +144,8 @@ local function apply_listing(entry)
     entry.woodcost = number(listing.wood_cost)
     entry.goldcost = number(listing.gold_cost)
     entry.purchase_limit = number(listing.purchase_limit)
+    entry.refresh_interval_seconds = number(listing.refresh_interval_seconds)
+    entry.refresh_stock = number(listing.refresh_stock)
     entry.enabled = true
     return entry
 end
@@ -206,6 +208,8 @@ local function make_entry(rule, row)
         disabled_reason_text =
             field(row, "disabled_reason_text", ""),
         purchase_limit = content_id == "item_forging_hammer" and 4 or number(field(row, "purchase_limit", 0)),
+        refresh_interval_seconds = number(field(row, "refresh_interval_seconds", 0)),
+        refresh_stock = number(field(row, "refresh_stock", 0)),
         order = number(field(row, "shop_sort_order", 0)),
         min_city_level =
             number(field(row, "required_city_level", 0)),
@@ -264,6 +268,10 @@ end
 
 function M.find_entry(entry_id)
     return entries_by_id[entry_id]
+end
+
+function M.entries()
+    return entries
 end
 
 function M.listed_in_shop(entry)
@@ -344,6 +352,11 @@ local function project_entry(player_id, entry, context)
         purchase_condition_text = entry.condition_text,
         owned_count = count,
         purchase_limit = entry.purchase_limit,
+        stock = context.refresh_stock and context.refresh_stock[entry.entryid]
+            and context.refresh_stock[entry.entryid].stock or nil,
+        refresh_interval_seconds = tonumber(entry.refresh_interval_seconds) or 0,
+        refresh_remaining = context.refresh_stock and context.refresh_stock[entry.entryid]
+            and context.refresh_stock[entry.entryid].refresh_remaining or 0,
         technology_track = entry.technology_track,
         unlock_technology_group = entry.unlock_technology_group,
         technology_phase = entry.technology_phase,
@@ -367,6 +380,13 @@ local function project_entry(player_id, entry, context)
     if item.challenge_active == 1 and entry.contenttype == "challenge" then
         item.wood_cost = 0
         item.gold_cost = 0
+    end
+    if item.stock ~= nil and item.stock <= 0 then
+        item.purchasable = 0
+        item.disabled_reason = "库存不足（"
+            .. string.format("%.1f", item.refresh_remaining)
+            .. "秒后刷新）"
+        item.disabled_reason_code = "refresh_stock_empty"
     end
     if not ok then
         if reason == "金币不足" then
