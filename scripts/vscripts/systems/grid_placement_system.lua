@@ -177,6 +177,12 @@ local function construction_building_is_logical_only(unit, payload)
         or unit:GetTeamNumber() == number(payload.team, DOTA_TEAM_GOODGUYS)
 end
 
+local function unit_is_dead(unit)
+    if not unit or not unit.IsAlive then return false end
+    local ok, alive = pcall(unit.IsAlive, unit)
+    return ok and alive == false
+end
+
 local function has_unit(center, payload)
     local size = number(config.cell_size, 128)
     local half = size * 0.5
@@ -201,6 +207,7 @@ local function has_unit(center, payload)
     local ignored_set = payload.ignore_entindexes or {}
     for _, unit in ipairs(units) do
         if unit and not unit:IsNull()
+            and not unit_is_dead(unit)
             and unit:entindex() ~= ignored
             and ignored_set[unit:entindex()] ~= true
             and not unit.survival_is_grid_preview
@@ -421,6 +428,7 @@ end
 
 M._unit_overlaps_cell_for_test = unit_overlaps_cell
 M._has_unit_for_test = has_unit
+M._unit_is_dead_for_test = unit_is_dead
 M._nearby_units_for_footprint_for_test = nearby_units_for_footprint
 M._occupied_for_test = function() return occupied end
 M._can_place_for_test = can_place

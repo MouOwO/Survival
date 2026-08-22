@@ -12,7 +12,7 @@ local state = {}
 local TECHNOLOGY_RESEARCH_DURATION = 2
 local AUTO_RESEARCH_RETRY_INTERVAL = 1
 local queue_auto_research
-local schedule_stock_refresh
+local push_snapshot
 
 local function game_time()
     return GameRules and GameRules.GetGameTime
@@ -41,8 +41,7 @@ local function reset_state()
         research_scope_by_player = {},
         research_source_entindex_by_player = {},
         auto_research_by_team = {},
-        refresh_stock_by_player = {},
-        refresh_next_by_player = {},
+        purchase_cooldown_until_by_player = {},
     }
 end
 local function valid_player_id(player_id)
@@ -96,36 +95,36 @@ local function owned_content(player_id)
     end
     return result
 end
-local function refresh_entry_stock(player_id, entry)
-    local interval = tonumber(entry and entry.refresh_interval_seconds) or 0
-    local amount = tonumber(entry and entry.refresh_stock) or 0
-    if interval <= 0 or amount <= 0 then return nil, nil end
-    state.refresh_stock_by_player[player_id] =
-        state.refresh_stock_by_player[player_id] or {}
-    state.refresh_next_by_player[player_id] =
-        state.refresh_next_by_player[player_id] or {}
-    local stocks = state.refresh_stock_by_player[player_id]
-    local next_times = state.refresh_next_by_player[player_id]
-    local entry_id = entry.entryid
-    local now = game_time()
-    if stocks[entry_id] == nil then
-        stocks[entry_id] = amount
-        next_times[entry_id] = now + interval
-    elseif now >= (next_times[entry_id] or now + interval) then
-        stocks[entry_id] = math.min(amount, stocks[entry_id] + amount)
-        next_times[entry_id] = now + interval
-    end
-    return stocks[entry_id], next_times[entry_id]
+local function purchase_cooldown_remaining(player_id, entry)
+    local duration = tonumber(entry and entry.purchase_cooldown_seconds) or 0
+    if duration <= 0 then return 0 end
+    local by_entry = state.purchase_cooldown_until_by_player[player_id] or {}
+    return math.max(0, (by_entry[entry.entryid] or 0) - game_time())
 end
-local function refresh_stock_snapshot(player_id)
+local function set_purchase_cooldown(player_id, entry)
+    local duration = tonumber(entry and entry.purchase_cooldown_seconds) or 0
+    if duration <= 0 then return end
+    state.purchase_cooldown_until_by_player[player_id] =
+        state.purchase_cooldown_until_by_player[player_id] or {}
+    state.purchase_cooldown_until_by_player[player_id][entry.entryid] =
+        game_time() + duration
+    scheduler.after(duration, function()
+        if purchase_cooldown_remaining(player_id, entry) <= 0
+            and state.opened_players[player_id] then
+            push_snapshot(player_id, "purchase_cooldown_finished")
+        end
+    end, "shop_purchase_cooldown:" .. tostring(player_id)
+        .. ":" .. tostring(entry.entryid))
+end
+local function purchase_cooldown_snapshot(player_id)
     local result = {}
     for _, entry in ipairs(catalog.entries()) do
-        local stock, next_time = refresh_entry_stock(player_id, entry)
-        if stock ~= nil then
+        local remaining = purchase_cooldown_remaining(player_id, entry)
+        if remaining > 0 then
             result[entry.entryid] = {
-                stock = stock,
-                refresh_interval_seconds = tonumber(entry.refresh_interval_seconds),
-                refresh_remaining = math.max(0, (next_time or 0) - game_time()),
+                remaining = remaining,
+                total = tonumber(entry.purchase_cooldown_seconds) or 0,
+                until_time = game_time() + remaining,
             }
         end
     end
@@ -236,8 +235,7 @@ local function snapshot_context(player_id, reason, mode)
         research_scope = state.research_scope_by_player[player_id] or "",
         research_source_entindex =
             state.research_source_entindex_by_player[player_id] or -1,
-        auto_research = state.auto_research_by_team[team] or {},
-        refresh_stock = refresh_stock_snapshot(player_id),
+        purchase_cooldowns = purchase_cooldown_snapshot(player_id),
     }
 end
 local function build_snapshot(player_id, reason, mode)
@@ -305,13 +303,13 @@ local function build_patch(previous, current)
         technology_cooldown_source_group = current.technology_cooldown_source_group,
         technology_cooldown_source_entry = current.technology_cooldown_source_entry,
         technology_cooldown_sequence = current.technology_cooldown_sequence,
-        refresh_stock = current.refresh_stock,
+        purchase_cooldowns = current.purchase_cooldowns,
     }
     if not values_equal(previous.resources or {}, current.resources or {}) then
         patch.resources = current.resources
     end
-    if not values_equal(previous.refresh_stock or {}, current.refresh_stock or {}) then
-        patch.refresh_stock = current.refresh_stock
+    if not values_equal(previous.purchase_cooldowns or {}, current.purchase_cooldowns or {}) then
+        patch.purchase_cooldowns = current.purchase_cooldowns
     end
     if previous.ui_mode ~= current.ui_mode
         or previous.config_version ~= current.config_version
@@ -319,7 +317,7 @@ local function build_patch(previous, current)
         patch.categories = current.categories
     end
     local changed_any = patch.resources ~= nil or patch.categories ~= nil
-        or patch.refresh_stock ~= nil
+        or patch.purchase_cooldowns ~= nil
         or #changed > 0 or #removed > 0
     return changed_any and patch or nil
 end
@@ -344,7 +342,7 @@ local function publish_snapshot(player_id, reason)
         snapshot = outgoing,
     })
 end
-local function push_snapshot(player_id, reason)
+push_snapshot = function(player_id, reason)
     if not state.opened_players[player_id] then return end
     state.pending_push_reason[player_id] = reason or "changed"
     scheduler.after(0.05, function()
@@ -352,13 +350,6 @@ local function push_snapshot(player_id, reason)
         state.pending_push_reason[player_id] = nil
         if pending_reason then publish_snapshot(player_id, pending_reason) end
     end, "shop_snapshot_push_" .. tostring(player_id))
-end
-schedule_stock_refresh = function(player_id)
-    scheduler.after(1, function()
-        if not state.opened_players[player_id] then return end
-        push_snapshot(player_id, "stock_refresh")
-        schedule_stock_refresh(player_id)
-    end, "shop_stock_refresh_" .. tostring(player_id))
 end
 local function push_team(team, reason)
     for player_id, _ in pairs(state.opened_players) do
@@ -422,7 +413,6 @@ local function open_shop(payload)
         state.research_source_entindex_by_player[player_id] = source_entindex
     end
     state.opened_players[player_id] = mode
-    schedule_stock_refresh(player_id)
     local snapshot = build_snapshot(player_id, "opened", mode)
     snapshot.full = 1
     state.snapshot_cache_by_player[player_id] = snapshot
@@ -438,7 +428,6 @@ local function close_shop(payload)
     state.research_scope_by_player[payload.player_id] = nil
     state.research_source_entindex_by_player[payload.player_id] = nil
     scheduler.cancel("shop_snapshot_push_" .. tostring(payload.player_id))
-    scheduler.cancel("shop_stock_refresh_" .. tostring(payload.player_id))
     return { ok = true }
 end
 local function cached_result(player_id, request_id)
@@ -473,9 +462,14 @@ local function purchase(payload)
     if not entry then
         return { ok = false, error = "shop_entry_invalid" }
     end
-    local stock = refresh_entry_stock(player_id, entry)
-    if stock ~= nil and stock <= 0 then
-        return { ok = false, error = "知识之书库存不足" }
+    local cooldown_remaining = purchase_cooldown_remaining(player_id, entry)
+    if cooldown_remaining > 0 then
+        return {
+            ok = false,
+            error = "purchase_cooldown",
+            error_code = "purchase_cooldown",
+            cooldown_remaining = cooldown_remaining,
+        }
     end
     local technology_group = entry.definition
         and entry.definition.technology_group or ""
@@ -769,9 +763,7 @@ local function purchase(payload)
         state.purchased_count[player_id] or {}
     local counts = state.purchased_count[player_id]
     counts[entry.entryid] = (counts[entry.entryid] or 0) + 1
-    if stock ~= nil then
-        state.refresh_stock_by_player[player_id][entry.entryid] = stock - 1
-    end
+    set_purchase_cooldown(player_id, entry)
     if not silent_notification then
         notify(player_id, "购买成功：" .. catalog.content_name(entry))
     end

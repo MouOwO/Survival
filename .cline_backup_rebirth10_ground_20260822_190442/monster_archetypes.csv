@@ -51,7 +51,7 @@ rebirth_boss_06,六转Boss,boss,boss,npc_survival_wave_monster,models/heroes/aby
 rebirth_boss_07,七转Boss,boss,boss,npc_survival_wave_monster,models/heroes/terrorblade/terrorblade.vmdl,,DOTA_TEAM_BADGUYS,1,1,1.5,400,216,flying,melee,,临时测试数值：根据N1强度曲线推导，待平衡,160400000,6048480,250,1.8,,,,
 rebirth_boss_08,八转Boss,boss,boss,npc_survival_wave_monster,models/heroes/tidehunter/tidehunter.vmdl,,DOTA_TEAM_BADGUYS,1,1,1.55,400,216,ground,melee,,临时测试数值：根据N1强度曲线推导，待平衡,320400000,18048480,280,1.9,,,,
 rebirth_boss_09,九转Boss,boss,boss,npc_survival_wave_monster,models/heroes/tiny/tiny_01/tiny_01.vmdl,,DOTA_TEAM_BADGUYS,1,1,1.55,400,216,ground,melee,,临时测试数值：根据N1强度曲线推导，待平衡,440400000,30048480,310,2,,,,
-rebirth_boss_10,十转Boss,boss,boss,npc_survival_wave_monster,models/heroes/terrorblade/terrorblade.vmdl,,DOTA_TEAM_BADGUYS,1,1,1.65,400,236,ground,melee,,临时测试数值：根据N1强度曲线推导，待平衡,840400000,44448476,340,2,,,,
+rebirth_boss_10,十转Boss,boss,boss,npc_survival_wave_monster,models/heroes/terrorblade/terrorblade.vmdl,,DOTA_TEAM_BADGUYS,1,1,1.65,400,236,flying,melee,,临时测试数值：根据N1强度曲线推导，待平衡,840400000,44448476,340,2,,,,
 ten_sin_01,十宗罪一,boss,boss,npc_survival_wave_monster,models/heroes/undying/undying_flesh_golem.vmdl,,DOTA_TEAM_BADGUYS,1,1,1.45,400,216,ground,melee,,临时测试数值：根据N1强度曲线推导，待平衡,2000010,130002,719,2,,,,
 ten_sin_02,十宗罪二,boss,boss,npc_survival_wave_monster,models/heroes/axe/axe.vmdl,,DOTA_TEAM_BADGUYS,1,1,1.45,400,216,ground,melee,,临时测试数值：根据N1强度曲线推导，待平衡,3000010,145002,799,2,,,,
 ten_sin_03,十宗罪三,boss,boss,npc_survival_wave_monster,models/heroes/terrorblade/terrorblade.vmdl,,DOTA_TEAM_BADGUYS,1,1,1.5,400,216,flying,melee,,临时测试数值：根据N1强度曲线推导，待平衡,4000010,160002,879,2,,,,

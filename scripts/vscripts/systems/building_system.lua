@@ -44,6 +44,36 @@ local COLLIDING_BUILDINGS = {
 local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
+local function release_grid_for_state(state, unit)
+    if not state then return end
+    unit = unit or state.unit
+    local entindex = state.entindex
+        or (valid_entity(unit) and unit:entindex())
+    event_bus.request(events.GRID_RELEASE_REQUEST, {
+        grid_x = state.grid_x,
+        grid_y = state.grid_y,
+        footprint = state.definition and state.definition.footprint,
+        entindex = entindex,
+    })
+end
+local function release_grid_for_unit(unit)
+    if not valid_entity(unit) then return end
+    local building_id = unit.survival_building_id
+    local definition = building_id and config[building_id] or nil
+    local footprint = unit.survival_grid_footprint
+        or (definition and definition.footprint)
+    if unit.survival_grid_x == nil
+        or unit.survival_grid_y == nil
+        or not footprint then
+        return
+    end
+    event_bus.request(events.GRID_RELEASE_REQUEST, {
+        grid_x = unit.survival_grid_x,
+        grid_y = unit.survival_grid_y,
+        footprint = footprint,
+        entindex = unit:entindex(),
+    })
+end
 local function position_is_clear(position)
     local traversable = true
     local blocked = false
@@ -711,6 +741,10 @@ local function start_building(payload)
     }
     unit.survival_grid_x = state.grid_x
     unit.survival_grid_y = state.grid_y
+    unit.survival_grid_footprint = {
+        x = state.definition.footprint.x,
+        y = state.definition.footprint.y,
+    }
     unit.survival_route_level = 1
     unit.survival_population_occupied = state.population_occupied
     change_count(check.player_id, check.definition.id, 1)
@@ -748,12 +782,7 @@ local function start_building(payload)
                 end
                 buildings[state.entindex] = nil
                 change_count(check.player_id, check.definition.id, -1)
-                event_bus.request(events.GRID_RELEASE_REQUEST, {
-                    grid_x = state.grid_x,
-                    grid_y = state.grid_y,
-                    footprint = state.definition.footprint,
-                    entindex = state.entindex,
-                })
+                release_grid_for_state(state, unit)
                 release_population(state, "building_construction_failed")
                 if state.build_cost then
                     event_bus.request(events.RESOURCE_ADD_REQUEST, {
@@ -1116,7 +1145,10 @@ local function on_entity_killed(payload)
     clear_build_task(victim, victim.survival_build_task)
     construction_visual.cancel(victim)
     local state = buildings[victim:entindex()]
-    if not state then return end
+    if not state then
+        release_grid_for_unit(victim)
+        return
+    end
     if state.cleaned then return end
     state.cleaned = true
     if state.building_id == "wall" then
@@ -1146,12 +1178,7 @@ local function on_entity_killed(payload)
             reason = "tower_destroyed",
         })
     end
-    event_bus.request(events.GRID_RELEASE_REQUEST, {
-        grid_x = state.grid_x,
-        grid_y = state.grid_y,
-        footprint = state.definition.footprint,
-        entindex = victim:entindex(),
-    })
+    release_grid_for_state(state, victim)
     if not state.constructing then
         event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
     end
@@ -1290,6 +1317,8 @@ M._population_to_release_for_test = population_to_release
 M._recover_existing_for_test = recover_existing_buildings
 M._anchor_building_for_test = anchor_building
 M._clear_build_task_for_test = clear_build_task
+M._release_grid_for_state_for_test = release_grid_for_state
+M._release_grid_for_unit_for_test = release_grid_for_unit
 M._building_limit_for_test = {
     reached = building_limit_reached,
     count_for = count_for,

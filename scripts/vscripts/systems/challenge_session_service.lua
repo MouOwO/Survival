@@ -261,6 +261,44 @@ local function spawn_point_for(session, member, location)
     return point, expected
 end
 
+local function spread_maintain_count_position(session, member, location, point)
+    if not point or member.spawn_mode ~= "maintain_count"
+        or #((location and location.spawn_target_names) or {}) ~= 1
+        or session.challenge.challenge_id == "challenge_10" then
+        return point and point:GetAbsOrigin() or nil
+    end
+
+    local origin = point:GetAbsOrigin()
+    local radius = math.max(120, (tonumber(location.room_radius) or 1200) * 0.5)
+    session.spawn_serial = (tonumber(session.spawn_serial) or 0) + 1
+    local slot = (session.spawn_serial - 1) % 10
+    local ring = math.floor((session.spawn_serial - 1) / 10)
+    local ring_radius = math.min(radius, 260 + ring * 180)
+    local angle = math.rad(slot * 36 + ring * 18)
+    local candidate = GetGroundPosition(origin + Vector(
+        math.cos(angle) * ring_radius,
+        math.sin(angle) * ring_radius,
+        0
+    ), point)
+    if not GridNav:IsBlocked(candidate) and GridNav:IsTraversable(candidate) then
+        return candidate
+    end
+
+    for attempt = 1, 12 do
+        local fallback_angle = angle + math.rad(attempt * 30)
+        local fallback = GetGroundPosition(origin + Vector(
+            math.cos(fallback_angle) * ring_radius,
+            math.sin(fallback_angle) * ring_radius,
+            0
+        ), point)
+        if not GridNav:IsBlocked(fallback)
+            and GridNav:IsTraversable(fallback) then
+            return fallback
+        end
+    end
+    return origin
+end
+
 local function spawn_member(session, member)
     local location = locations.by_id[member.location_id]
     local archetype = archetypes.by_id[member.archetype_id]
@@ -275,7 +313,9 @@ local function spawn_member(session, member)
     if profile_error then return nil, profile_error end
 
     local point, expected = spawn_point_for(session, member, location)
-    local position = point and point:GetAbsOrigin() or nil
+    local position = spread_maintain_count_position(
+        session, member, location, point
+    )
     if position and session.challenge.challenge_id == "challenge_10" then
         session.spawn_serial = (tonumber(session.spawn_serial) or 0) + 1
         local slot = (session.spawn_serial - 1) % 10

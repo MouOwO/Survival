@@ -144,8 +144,7 @@ local function apply_listing(entry)
     entry.woodcost = number(listing.wood_cost)
     entry.goldcost = number(listing.gold_cost)
     entry.purchase_limit = number(listing.purchase_limit)
-    entry.refresh_interval_seconds = number(listing.refresh_interval_seconds)
-    entry.refresh_stock = number(listing.refresh_stock)
+    entry.purchase_cooldown_seconds = number(listing.purchase_cooldown_seconds)
     entry.enabled = true
     return entry
 end
@@ -208,8 +207,7 @@ local function make_entry(rule, row)
         disabled_reason_text =
             field(row, "disabled_reason_text", ""),
         purchase_limit = content_id == "item_forging_hammer" and 4 or number(field(row, "purchase_limit", 0)),
-        refresh_interval_seconds = number(field(row, "refresh_interval_seconds", 0)),
-        refresh_stock = number(field(row, "refresh_stock", 0)),
+        purchase_cooldown_seconds = number(field(row, "purchase_cooldown_seconds", 0)),
         order = number(field(row, "shop_sort_order", 0)),
         min_city_level =
             number(field(row, "required_city_level", 0)),
@@ -352,11 +350,10 @@ local function project_entry(player_id, entry, context)
         purchase_condition_text = entry.condition_text,
         owned_count = count,
         purchase_limit = entry.purchase_limit,
-        stock = context.refresh_stock and context.refresh_stock[entry.entryid]
-            and context.refresh_stock[entry.entryid].stock or nil,
-        refresh_interval_seconds = tonumber(entry.refresh_interval_seconds) or 0,
-        refresh_remaining = context.refresh_stock and context.refresh_stock[entry.entryid]
-            and context.refresh_stock[entry.entryid].refresh_remaining or 0,
+        purchase_cooldown_seconds = tonumber(entry.purchase_cooldown_seconds) or 0,
+        purchase_cooldown_remaining = context.purchase_cooldowns
+            and context.purchase_cooldowns[entry.entryid]
+            and context.purchase_cooldowns[entry.entryid].remaining or 0,
         technology_track = entry.technology_track,
         unlock_technology_group = entry.unlock_technology_group,
         technology_phase = entry.technology_phase,
@@ -381,12 +378,12 @@ local function project_entry(player_id, entry, context)
         item.wood_cost = 0
         item.gold_cost = 0
     end
-    if item.stock ~= nil and item.stock <= 0 then
+    if item.purchase_cooldown_remaining > 0 then
         item.purchasable = 0
-        item.disabled_reason = "库存不足（"
-            .. string.format("%.1f", item.refresh_remaining)
-            .. "秒后刷新）"
-        item.disabled_reason_code = "refresh_stock_empty"
+        item.disabled_reason = "购买冷却中（"
+            .. string.format("%.1f", item.purchase_cooldown_remaining)
+            .. "秒后可再次购买）"
+        item.disabled_reason_code = "purchase_cooldown"
     end
     if not ok then
         if reason == "金币不足" then
