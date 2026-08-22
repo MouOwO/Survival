@@ -1,6 +1,6 @@
-shop_entry_id,category_id,content_id,display_name,wood_cost,gold_cost,purchase_limit,visible_condition,purchasable_condition,disabled_reason_key,server_action,enabled,review_status,source,notes,purchase_cooldown_seconds
-#中文名:商店条目ID,分类ID,内容ID,显示名称,木材消耗,金币消耗,购买上限,显示条件,可购买条件,禁用原因键,服务端操作,是否启用,审核状态,来源,备注,购买冷却秒数
-#types:string,enum,string,string,number,number,number,string,string,string,string,boolean,enum,string,string,number
+shop_entry_id,category_id,content_id,display_name,wood_cost,gold_cost,purchase_limit,visible_condition,purchasable_condition,disabled_reason_key,server_action,enabled,review_status,source,notes,purchase_cooldown_seconds,stock_max,stock_replenish_seconds
+#中文名:商店条目ID,分类ID,内容ID,显示名称,木材消耗,金币消耗,购买上限,显示条件,可购买条件,禁用原因键,服务端操作,是否启用,审核状态,来源,备注,购买冷却秒数,商城库存上限,商城补货秒数
+#types:string,enum,string,string,number,number,number,string,string,string,string,boolean,enum,string,string,number,number,number
 shop_weapon_growth_sword_01,weapon,weapon_growth_sword_01,成长之剑,0,100,1,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行9,购买成长之剑/英雄每次攻击增加攻击力+1/攻击200次使该武器进化/成长之剑LVMAX+吸血面具自动合成幻影之剑
 shop_item_forging_hammer,item,item_forging_hammer,锻造之锤,5000,1000,5,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行10,英雄每次攻击成长之剑额外+1次数，可叠加。（非装备类似于BUFF）
 shop_equipment_attack_gloves_01,weapon,equipment_attack_gloves_01,加速手套LV1,0,200,5,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行11,增加英雄20%攻击速度，重复购买升级，最高5级。/加速手套LVMAX+灼热之刃LVMAX+铁甲LVMAX+合成宝石=浴火熔铠LV1
@@ -8,8 +8,8 @@ shop_equipment_burning_blade_01,weapon,equipment_burning_blade_01,灼热之刃LV
 shop_equipment_iron_armor_01,weapon,equipment_iron_armor_01,铁甲LV1,0,200,5,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行13,增加英雄10点护甲，5000点生命值，重复购买升级，最高5级。
 shop_item_death_mask,item,item_death_mask,死亡面罩,10000,300,1,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行14,英雄的攻击造成的伤害50%吸血。
 shop_item_small_polar_crystal,item,item_small_polar_crystal,小极地晶石,0,1000,1,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行15,全属性+1000/击杀200个冰之幽魂升级。
-shop_item_knowledge_book,item,item_knowledge_book,知识之书,0,50000,0,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行16,增加30000全属性，15000攻击力。,10
-shop_item_super_knowledge_book,item,item_super_knowledge_book,超级知识之书,500000,500000,0,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行17,增加300000全属性，150000攻击力。,10
+shop_item_knowledge_book,item,item_knowledge_book,知识之书,0,50000,0,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行16,增加30000全属性，15000攻击力。,0,99,10
+shop_item_super_knowledge_book,item,item_super_knowledge_book,超级知识之书,500000,500000,0,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行17,增加300000全属性，150000攻击力。,0,99,10
 shop_service_early_final_boss,item,service_early_final_boss,提前通关,0,50000,1,altar_used==true,server_projection.purchasable==true,shop_condition_not_met,grant_content,1,ok,英雄相关建筑/行18,支付50000金币后终止并清理当前普通波，立即完整生成第30波；清空第30波后胜利。开局15分钟后可用，每局限购一次。
 shop_challenge_01,challenge,challenge_01,木材练功房,2000,0,0,altar_used==true,server_projection.purchasable==true,challenge_condition_not_met,start_challenge,1,ok,英雄相关建筑/行22,击杀每个怪物获得100木材。
 shop_challenge_02,challenge,challenge_02,金币练功房,10000,50,0,altar_used==true,server_projection.purchasable==true,challenge_condition_not_met,start_challenge,1,ok,英雄相关建筑/行23,击杀每个怪物获得100金币。

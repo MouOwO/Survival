@@ -42,6 +42,7 @@ local function reset_state()
         research_source_entindex_by_player = {},
         auto_research_by_team = {},
         purchase_cooldown_until_by_player = {},
+        stock_by_player = {},
     }
 end
 local function valid_player_id(player_id)
@@ -129,6 +130,60 @@ local function purchase_cooldown_snapshot(player_id)
         end
     end
     return result
+end
+local function stock_state(player_id, entry)
+    local maximum = math.max(0, tonumber(entry and entry.stock_max) or 0)
+    if maximum <= 0 then return nil end
+    state.stock_by_player[player_id] = state.stock_by_player[player_id] or {}
+    local stock = state.stock_by_player[player_id][entry.entryid]
+    if not stock then
+        stock = { count = maximum, next_replenish_at = 0 }
+        state.stock_by_player[player_id][entry.entryid] = stock
+    end
+    stock.count = math.max(0, math.min(maximum, tonumber(stock.count) or maximum))
+    return stock, maximum
+end
+local function stock_snapshot(player_id)
+    local result = {}
+    for _, entry in ipairs(catalog.entries()) do
+        local stock, maximum = stock_state(player_id, entry)
+        if stock then
+            result[entry.entryid] = {
+                count = stock.count,
+                maximum = maximum,
+                replenish_seconds = tonumber(entry.stock_replenish_seconds) or 0,
+                replenish_remaining = stock.next_replenish_at > 0
+                    and math.max(0, stock.next_replenish_at - game_time()) or 0,
+            }
+        end
+    end
+    return result
+end
+local function replenish_stock(player_id, entry)
+    local stock, maximum = stock_state(player_id, entry)
+    if not stock or stock.count >= maximum then return end
+    stock.count = stock.count + 1
+    stock.next_replenish_at = 0
+    local duration = tonumber(entry.stock_replenish_seconds) or 0
+    if stock.count < maximum and duration > 0 then
+        stock.next_replenish_at = game_time() + duration
+        scheduler.after(duration, function() replenish_stock(player_id, entry) end,
+            "shop_stock_replenish:" .. tostring(player_id) .. ":" .. tostring(entry.entryid))
+    end
+    push_snapshot(player_id, "shop_stock_replenished")
+end
+local function consume_stock(player_id, entry)
+    local stock, maximum = stock_state(player_id, entry)
+    if not stock then return true end
+    if stock.count <= 0 then return false end
+    stock.count = stock.count - 1
+    local duration = tonumber(entry.stock_replenish_seconds) or 0
+    if stock.count < maximum and duration > 0 and stock.next_replenish_at <= game_time() then
+        stock.next_replenish_at = game_time() + duration
+        scheduler.after(duration, function() replenish_stock(player_id, entry) end,
+            "shop_stock_replenish:" .. tostring(player_id) .. ":" .. tostring(entry.entryid))
+    end
+    return true
 end
 local function summon_snapshot(player_id)
     local result = event_bus.request(
@@ -236,6 +291,7 @@ local function snapshot_context(player_id, reason, mode)
         research_source_entindex =
             state.research_source_entindex_by_player[player_id] or -1,
         purchase_cooldowns = purchase_cooldown_snapshot(player_id),
+        shop_stock = stock_snapshot(player_id),
     }
 end
 local function build_snapshot(player_id, reason, mode)
@@ -304,12 +360,16 @@ local function build_patch(previous, current)
         technology_cooldown_source_entry = current.technology_cooldown_source_entry,
         technology_cooldown_sequence = current.technology_cooldown_sequence,
         purchase_cooldowns = current.purchase_cooldowns,
+        shop_stock = current.shop_stock,
     }
     if not values_equal(previous.resources or {}, current.resources or {}) then
         patch.resources = current.resources
     end
     if not values_equal(previous.purchase_cooldowns or {}, current.purchase_cooldowns or {}) then
         patch.purchase_cooldowns = current.purchase_cooldowns
+    end
+    if not values_equal(previous.shop_stock or {}, current.shop_stock or {}) then
+        patch.shop_stock = current.shop_stock
     end
     if previous.ui_mode ~= current.ui_mode
         or previous.config_version ~= current.config_version
@@ -318,6 +378,7 @@ local function build_patch(previous, current)
     end
     local changed_any = patch.resources ~= nil or patch.categories ~= nil
         or patch.purchase_cooldowns ~= nil
+        or patch.shop_stock ~= nil
         or #changed > 0 or #removed > 0
     return changed_any and patch or nil
 end
@@ -470,6 +531,10 @@ local function purchase(payload)
             error_code = "purchase_cooldown",
             cooldown_remaining = cooldown_remaining,
         }
+    end
+    local stock = stock_state(player_id, entry)
+    if stock and stock.count <= 0 then
+        return { ok = false, error = "shop_stock_empty", error_code = "shop_stock_empty" }
     end
     local technology_group = entry.definition
         and entry.definition.technology_group or ""
@@ -763,6 +828,7 @@ local function purchase(payload)
         state.purchased_count[player_id] or {}
     local counts = state.purchased_count[player_id]
     counts[entry.entryid] = (counts[entry.entryid] or 0) + 1
+    consume_stock(player_id, entry)
     set_purchase_cooldown(player_id, entry)
     if not silent_notification then
         notify(player_id, "购买成功：" .. catalog.content_name(entry))
