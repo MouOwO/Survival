@@ -15,6 +15,7 @@ local technology_stat_manager = require("systems/technology_stat_manager")
 local hero_combat_stat_math = require("systems/hero_combat_stat_math")
 local hero_stat_adapter = require("systems/hero_stat_adapter")
 local monkey_runtime = require("config/generated/monkey_king_exclusive_runtime")
+local blademaster_runtime = require("config/generated/blademaster_exclusive_runtime")
 
 local M = {}
 local state_by_player = {}
@@ -230,9 +231,28 @@ local function recalculate(player_id, reason)
         and has_skill(player_id, "skill_monkey_king_fury")
     local monkey_e = state.hero_id == "hero_monkey_king"
         and has_skill(player_id, "skill_monkey_king_swiftness")
+    local blademaster_q = state.hero_id == "hero_blademaster"
+        and has_skill(player_id, "skill_blademaster_exclusive")
+    local blademaster_r = state.hero_id == "hero_blademaster"
+        and has_skill(player_id, "skill_blademaster_mobility")
     local monkey_config = monkey_runtime.by_id.monkey_king_exclusive or {}
+    local blademaster_config = blademaster_runtime.by_id.blademaster_exclusive or {}
+    local monkey_critical_chance_pct = monkey_e
+        and math.max(0, tonumber(monkey_config.e_critical_chance_pct) or 0)
+        or 0
+    local blademaster_bonus_result = event_bus.request(
+        events.BLADEMASTER_BONUS_STATS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local blademaster_bonus = blademaster_bonus_result
+        and blademaster_bonus_result.snapshot or {}
+    local blademaster_growth_multiplier = 1
+        + math.max(0, tonumber(blademaster_bonus.attack_pct) or 0) / 100
     local exclusive_attack_multiplier = monkey_e
-        and math.max(1, tonumber(monkey_config.e_attack_multiplier) or 1) or 1
+        and math.max(1, tonumber(monkey_config.e_attack_multiplier) or 1)
+        or (blademaster_r and math.max(1,
+            (tonumber(blademaster_config.r_attack_multiplier) or 1)
+                * blademaster_growth_multiplier) or 1)
     local monkey_bonus_result = event_bus.request(
         events.MONKEY_KING_BONUS_STATS_GET_REQUEST,
         { player_id = player_id }
@@ -320,6 +340,9 @@ local function recalculate(player_id, reason)
             - researcher_attack_interval_flat
             - (monkey_w
                 and (tonumber(monkey_config.w_attack_interval_reduction) or 0)
+                or 0)
+            - (blademaster_r
+                and (tonumber(blademaster_config.r_attack_interval_reduction) or 0)
                 or 0))
     local hero_damage_multiplier = state.damage_multiplier
     local next_snapshot = {
@@ -354,12 +377,20 @@ local function recalculate(player_id, reason)
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
         researcher_critical_chance_pct = researcher_critical_chance_pct,
-        critical_chance_pct = researcher_critical_chance_pct,
-        critical_damage_pct = monkey_w
-            and (tonumber(monkey_config.w_critical_damage_pct) or 200) or 200,
+        critical_chance_pct = researcher_critical_chance_pct
+            + monkey_critical_chance_pct
+            + (blademaster_q and math.max(0,
+                tonumber(blademaster_config.q_critical_chance_pct) or 0) or 0),
+        critical_damage_pct = (monkey_w
+            and (tonumber(monkey_config.w_critical_damage_pct) or 200) or 200)
+            + (blademaster_q and math.max(0,
+                tonumber(blademaster_config.q_critical_damage_bonus_pct) or 0) or 0),
         exclusive_attack_multiplier = exclusive_attack_multiplier,
         monkey_king_w_unlocked = monkey_w and 1 or 0,
         monkey_king_e_unlocked = monkey_e and 1 or 0,
+        blademaster_q_unlocked = blademaster_q and 1 or 0,
+        blademaster_r_unlocked = blademaster_r and 1 or 0,
+        blademaster_attack_growth_pct = tonumber(blademaster_bonus.attack_pct) or 0,
         seven_sins_attack_bonus_pct = essence_attack_pct,
         seven_sins_final_damage_pct = tonumber(essence.final_damage_pct) or 0,
         seven_sins_all_attributes_pct = essence_attributes_pct,
@@ -638,6 +669,7 @@ function M.init()
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, on_progression_changed)
     event_bus.subscribe(events.HERO_SKILL_CHANGED, on_progression_changed)
     event_bus.subscribe(events.MONKEY_KING_BONUS_STATS_CHANGED, on_progression_changed)
+    event_bus.subscribe(events.BLADEMASTER_BONUS_STATS_CHANGED, on_progression_changed)
 end
 
 M._test = {

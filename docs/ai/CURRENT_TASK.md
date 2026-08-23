@@ -20,6 +20,28 @@
 - player_disconnect 入口现在记录原始 PlayerID/playerid/userid/UserID 解析结果，并在没有直接 PlayerID 时尝试通过 PlayerInstanceFromIndex(userid) 回退解析；无法解析时明确记录 disconnect_ignored。
 - 在线服务增加 checkpoint 开始、session/provider/account 缺失、断开请求、在途 final 排队和 game_end final 入口日志；业务请求与 final 排队语义保持不变。
 - 自动验证：在线服务 luac5.1 和 FISHING_REWARD_CONTRACT_PASS 通过；完整 addon 的 luac5.1 仍被既有 initialize_services 超过 60 个 upvalue 限制阻断，尚不能称全文件语法通过。仍需 Workshop Tools 实机确认 game_end_final_requested、HTTP final=true、callback 完成和 API 收到单个 final 请求。
+
+## 当前修复项（2026-08-24）：齐天大圣与剑圣专属技能未进入技能栏
+
+- 本轮追加用户需求：修复齐天大圣R Tooltip，删除已废弃的“主动无冷却，在英雄当前位置与城墙之间移动同一座终极塔”描述；以英雄技能CSV为权威，统一中英文本地化镜像。
+- 本轮同时继续处理剑圣视觉与暴击门控：Q仅消费最终暴击攻击伤害事件；E通过独立视觉半径控制点扩大原生剑刃风暴粒子。Workshop Tools当前仍无法连接，自动检查不能替代实机验收。
+
+- 用户纠正问题方向：当前首要故障不是技能数值或攻击触发，而是专属 Ability 没有进入原生技能栏。
+- 根因：英雄原生 Ability 仅被隐藏但仍占据低位实体槽；专属技能动态追加后依赖真实引擎中不可靠的`SetAbilityIndex()`换位，导致服务端能找到 Ability 但原生`AbilityN`没有对应按钮。
+- 修复方案：`hero_skill_system.lua`以专属/公共技能和三个工具技能构造权威顺序，移除原生及过期 Ability；发现实体槽位不一致时保存冷却，并严格按权威顺序重新`AddAbility()`，确保齐天大圣和剑圣的四个专属技能真实占据Q/W/E/R。
+- 验证范围：Lua 5.1语法、技能栏顺序契约、齐天大圣/剑圣专项契约和限定`git diff --check`；Workshop Tools仍需冷启动确认原生按钮实际出现、锁定置灰及解锁激活。
+
+- 本轮用户确认截图对应英雄为剑圣，截图中的“踏风/增加移动速度”是旧版剑圣R文案，不是齐天大圣技能。本轮已移除英雄技能同步中的全部`SetAbilityIndex()`调用，并将剑圣Q/W/E/R在正式中英文资源中的Tooltip同步到当前CSV；齐天大圣CSV与运行配置本轮不改，仅保留工作区既有修改。
+- 本轮验证：剑圣专项契约、`hero_skill_system.lua` Lua 5.1语法和`git diff --check`通过；`test_alt_hero_ability_contract.ps1`仍在既有Builder-stage断言处提前失败，未触及剑圣断言。Workshop Tools仍需冷启动实机确认剑圣Q/W/E/R、锁定显示和解锁激活。
+- 本轮新增剑圣视觉：Q 触发在主目标位置创建 Legion Commander `legion_commander_odds.vpcf`，E 触发在主目标位置创建 Juggernaut `juggernaut_blade_fury.vpcf`，E 粒子与风暴生命周期同步清理；两个粒子已加入 `addon_game_mode.lua` 的地图预加载。伤害与触发概率未改。
+
+## 当前实施任务（2026-08-24）：齐天大圣 W/E/R 方案调整
+
+- 用户批准调整齐天大圣专属技能：E 增加20%暴击率、最终攻击力保持独立3倍乘区，并仅在本体主普通攻击实际暴击时对主目标追加逻辑全属性×5纯粹伤害；W 改为2000%暴击伤害、攻击间隔减少0.1秒、每60秒永久复利增加2%全属性，并维持唯一永久守家镜像；R 终极塔继承英雄最终攻击与暴击伤害。
+- 用户确认 W 分身暴击口径：完整继承本体最终暴击率；分身暴击伤害由本体存档暴击伤害加成再额外增加750%。存档相关数值必须通过现有英雄权威战斗快照计算，不读取或反推Dota原生三维。
+- 实施以`data/csv/英雄系统/monkey_king_exclusive_runtime.csv`和英雄技能说明CSV为权威源，重新生成Lua；运行时复用`monkey_king_exclusive_service.lua`、`hero_combat_stat_service.lua`、`tower_fusion_service.lua`及既有最终暴击事件，不新建重复战斗系统。
+- 验证范围：CSV/生成Lua一致、W唯一永久分身和Q隔离、分身暴击继承、E本体主暴击边界、R最终攻击/暴击伤害继承、Lua 5.1行为与语法、相关回归及限定`git diff --check`。自动验证不等于Workshop Tools实机验收。
+
 ## 当前联调状态（2026-08-23）：多人生产联调阻塞
 ## 当前修复项（2026-08-23）：资源树、十宗罪预生成与箭塔手动选敌
 

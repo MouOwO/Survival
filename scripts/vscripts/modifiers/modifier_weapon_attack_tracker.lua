@@ -50,7 +50,9 @@ end
 
 local function diagnostic_hero(attacker)
     local hero_id = tostring(attacker and attacker.survival_hero_id or "")
-    return hero_id == "hero_slark" or hero_id == "hero_blademaster"
+    return hero_id == "hero_slark"
+        or hero_id == "hero_blademaster"
+        or hero_id == "hero_monkey_king"
 end
 
 local function should_diagnose(modifier)
@@ -195,6 +197,7 @@ function modifier_weapon_attack_tracker:OnAttackLanded(params)
         critical = critical,
         critical_multiplier = critical_multiplier,
         damage = tonumber(params.damage) or 0,
+        final_damage = tonumber(params.damage) or 0,
         target_was_killed = target.IsAlive and not target:IsAlive() or false,
     }
     event_bus.emit(events.WEAPON_ATTACK_LANDED, payload)

@@ -135,56 +135,93 @@ local function publish(player_id, reason)
     event_bus.emit(events.HERO_SKILL_CHANGED, data)
 end
 
-local function preserve_native_abilities(unit)
+local function desired_ability_names(state)
+    local result = {}
+    for _, skill_id in ipairs(state.order) do
+        local definition = skills.by_id[skill_id]
+        if definition and definition.enabled ~= false
+            and definition.ability_name
+            and definition.ability_name ~= "" then
+            result[#result + 1] = definition.ability_name
+        end
+    end
+    result[#result + 1] = BALL_LIGHTNING_ABILITY
+    result[#result + 1] = RETURN_HOME_ABILITY
+    result[#result + 1] = PICKUP_MATERIALS_ABILITY
+    return result
+end
+
+local function remove_unmanaged_abilities(state, desired)
+    local allowed = {}
+    for _, name in ipairs(desired) do
+        allowed[name] = true
+    end
+    local removals = {}
+    local unit = state.unit
     local count = math.max(0, tonumber(unit:GetAbilityCount()) or 0)
     for index = 0, count - 1 do
         local ability = unit:GetAbilityByIndex(index)
         if ability and not ability:IsNull() then
             local name = ability:GetAbilityName()
-            if name ~= RETURN_HOME_ABILITY
-                and name ~= PICKUP_MATERIALS_ABILITY
-                and not string.find(name or "", "^ability_survival_") then
-                ability:SetHidden(true)
-                ability:SetActivated(false)
+            if name and name ~= "" and not allowed[name] then
+                removals[#removals + 1] = name
             end
         end
     end
-end
-local function ability_map(state)
-    local result = {
-        [BALL_LIGHTNING_ABILITY] = true,
-        [RETURN_HOME_ABILITY] = true,
-        [PICKUP_MATERIALS_ABILITY] = true,
-    }
-    for skill_id, _ in pairs(state.levels) do
-        local definition = skills.by_id[skill_id]
-        if definition and definition.ability_name
-            and definition.ability_name ~= "" then
-            result[definition.ability_name] = true
-        end
+    for _, name in ipairs(removals) do
+        unit:RemoveAbility(name)
     end
-    return result
 end
 
-local function remove_unowned_custom_abilities(state)
-    local allowed = ability_map(state)
-    for _, definition in ipairs(skills.rows or {}) do
-        local name = definition.ability_name
-        if name and name ~= "" and not allowed[name] then
-            local ability = state.unit:FindAbilityByName(name)
-            if ability and not ability:IsNull() then
-                state.unit:RemoveAbility(name)
-            end
+local function ability_layout_matches(unit, desired)
+    for index, name in ipairs(desired) do
+        local ability = unit:GetAbilityByIndex(index - 1)
+        if not ability or ability:IsNull()
+            or ability:GetAbilityName() ~= name then
+            return false
+        end
+    end
+    return true
+end
+
+local function rebuild_ability_layout(state, desired)
+    local cooldowns = {}
+    for _, name in ipairs(desired) do
+        local ability = state.unit:FindAbilityByName(name)
+        if ability and not ability:IsNull() and ability.GetCooldownTimeRemaining then
+            cooldowns[name] = math.max(
+                0,
+                tonumber(ability:GetCooldownTimeRemaining()) or 0
+            )
+        end
+    end
+    for _, name in ipairs(desired) do
+        if state.unit:FindAbilityByName(name) then
+            state.unit:RemoveAbility(name)
+        end
+    end
+    for _, name in ipairs(desired) do
+        local ability = state.unit:AddAbility(name)
+        if not ability then
+            error("failed to rebuild ability layout: " .. tostring(name))
+        end
+        local remaining = cooldowns[name] or 0
+        if remaining > 0 and ability.StartCooldown then
+            ability:StartCooldown(remaining)
         end
     end
 end
+
 local function synchronize_unit_impl(state)
     if not valid_entity(state.unit) then
         error("combat hero is not valid")
     end
 
-    preserve_native_abilities(state.unit)
-    remove_unowned_custom_abilities(state)
+    local desired = desired_ability_names(state)
+    remove_unmanaged_abilities(state, desired)
+    if not ability_layout_matches(state.unit, desired) then
+        rebuild_ability_layout(state, desired)
+    end
     if state.unit.SetAbilityPoints then
         state.unit:SetAbilityPoints(0)
     end
@@ -208,8 +245,16 @@ local function synchronize_unit_impl(state)
             ability:SetLevel(locked and 1 or state.levels[skill_id])
             ability:SetHidden(false)
             ability:SetActivated(not locked)
-            if ability.SetAbilityIndex then
-                ability:SetAbilityIndex(index - 1)
+            if state.hero_id == "hero_monkey_king"
+                or state.hero_id == "hero_blademaster" then
+                print(string.format(
+                    "[HERO_SKILL_SYNC] player=%s hero=%s skill=%s ability=%s "
+                        .. "locked=%s level=%s activated=%s entindex=%s",
+                    tostring(state.player_id), tostring(state.hero_id),
+                    tostring(skill_id), tostring(definition.ability_name),
+                    tostring(locked), tostring(state.levels[skill_id]),
+                    tostring(ability:IsActivated()), tostring(ability:entindex())
+                ))
             end
         end
     end
@@ -223,9 +268,6 @@ local function synchronize_unit_impl(state)
     ball_lightning:SetLevel(1)
     ball_lightning:SetHidden(false)
     ball_lightning:SetActivated(true)
-    if ball_lightning.SetAbilityIndex then
-        ball_lightning:SetAbilityIndex(#state.order)
-    end
     local return_ability = state.unit:FindAbilityByName(RETURN_HOME_ABILITY)
     if not return_ability then
         return_ability = state.unit:AddAbility(RETURN_HOME_ABILITY)
@@ -236,9 +278,6 @@ local function synchronize_unit_impl(state)
     return_ability:SetLevel(1)
     return_ability:SetHidden(false)
     return_ability:SetActivated(true)
-    if return_ability.SetAbilityIndex then
-        return_ability:SetAbilityIndex(#state.order + 1)
-    end
     local pickup_ability = state.unit:FindAbilityByName(PICKUP_MATERIALS_ABILITY)
     if not pickup_ability then
         pickup_ability = state.unit:AddAbility(PICKUP_MATERIALS_ABILITY)
@@ -249,9 +288,6 @@ local function synchronize_unit_impl(state)
     pickup_ability:SetLevel(1)
     pickup_ability:SetHidden(false)
     pickup_ability:SetActivated(true)
-    if pickup_ability.SetAbilityIndex then
-        pickup_ability:SetAbilityIndex(#state.order + 2)
-    end
     hero_health_guard.preserve_current(state.unit, function()
         if state.unit.CalculateStatBonus then
             state.unit:CalculateStatBonus(true)
@@ -366,6 +402,29 @@ local function grant_request(payload)
         tostring(payload.skill_id or ""),
         payload.levels
     )
+end
+
+local function on_skill_reward(payload)
+    local effect = payload and payload.effect or {}
+    if effect.effect_type ~= "grant_exclusive_skill" then return end
+    local skill_id = tostring(effect.skill_id or "")
+    if skill_id == "" then
+        print(string.format(
+            "[HERO_SKILL_REWARD_REJECTED] player=%s reason=skill_id_missing",
+            tostring(payload and payload.player_id)
+        ))
+        return
+    end
+    local result = grant_request({
+        player_id = payload.player_id,
+        skill_id = skill_id,
+        levels = effect.value,
+    })
+    print(string.format(
+        "[HERO_SKILL_REWARD] player=%s skill=%s ok=%s error=%s level=%s",
+        tostring(payload.player_id), skill_id, tostring(result and result.ok),
+        tostring(result and result.error), tostring(result and result.level)
+    ))
 end
 
 local function grant_skill_points_request(payload)
@@ -495,7 +554,8 @@ local function initialize_hero(payload)
     for _, row in ipairs(exclusive_skills.rows or {}) do
         if definition
             and (definition.vip_required ~= true
-                or payload.hero_id == "hero_monkey_king")
+                or payload.hero_id == "hero_monkey_king"
+                or payload.hero_id == "hero_blademaster")
             and row.enabled ~= false and row.guaranteed == true
             and row.hero_id == payload.hero_id then
             state.levels[row.skill_id] = 0
@@ -504,7 +564,6 @@ local function initialize_hero(payload)
         end
     end
 
-    preserve_native_abilities(state.unit)
     synchronize_unit(state)
     publish(state.player_id, "exclusive_skills_locked")
 
@@ -548,6 +607,7 @@ function M.init()
         events.HERO_SKILL_POINT_UPGRADE_REQUEST,
         upgrade_with_skill_point_request
     )
+    event_bus.subscribe(events.HERO_SKILL_REWARD_REQUEST, on_skill_reward)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
 end
 

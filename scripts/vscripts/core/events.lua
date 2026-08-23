@@ -215,6 +215,8 @@ local M = {
     HERO_COMBAT_STATS_CHANGED = "hero.combat_stats.changed",
     MONKEY_KING_BONUS_STATS_GET_REQUEST = "monkey_king.bonus_stats.get.request",
     MONKEY_KING_BONUS_STATS_CHANGED = "monkey_king.bonus_stats.changed",
+    BLADEMASTER_BONUS_STATS_GET_REQUEST = "blademaster.bonus_stats.get.request",
+    BLADEMASTER_BONUS_STATS_CHANGED = "blademaster.bonus_stats.changed",
     COMBAT_DAMAGE_RESOLVED = "combat.damage.resolved",
     UNIT_COMBAT_STATS_CHANGED = "unit.combat_stats.changed",
 

@@ -1,4 +1,4 @@
-﻿config_id,q_proc_chance_pct,q_length,q_total_width,q_attribute_multiplier,q_max_health_pct,q_max_health_hit_limit,w_critical_damage_pct,w_attack_interval_reduction,w_growth_interval,w_growth_pct,w_clone_respawn_delay,w_clone_war3_armor,e_attack_multiplier,e_attribute_multiplier,r_cooldown,enabled
-#中文名:配置ID,Q触发概率,Q长度,Q总宽度,Q全属性倍率,Q最大生命百分比,Q生命伤害次数,W暴击伤害百分比,W攻击间隔减少,W成长间隔,W成长百分比,W分身重生延迟,W分身War3护甲,E攻击乘区,E全属性倍率,R冷却,是否启用
-#types:string,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,boolean
-monkey_king_exclusive,10,1200,200,30,10,3,2200,0.1,60,2,1,10,3,5,0,1
+config_id,q_proc_chance_pct,q_length,q_total_width,q_attribute_multiplier,q_max_health_pct,q_max_health_hit_limit,w_critical_damage_pct,w_attack_interval_reduction,w_growth_interval,w_growth_pct,w_clone_respawn_delay,w_clone_war3_armor,w_clone_critical_damage_bonus_pct,w_clone_permanent,e_critical_chance_pct,e_attack_multiplier,e_attribute_multiplier,r_cooldown,enabled
+#中文名:配置ID,Q触发概率,Q长度,Q总宽度,Q全属性倍率,Q最大生命百分比,Q生命伤害次数,W暴击伤害百分比,W攻击间隔减少,W成长间隔,W成长百分比,W分身重生延迟,W分身War3护甲,W分身额外暴击伤害,W分身永久存在,E暴击率,E攻击乘区,E全属性倍率,R冷却,是否启用
+#types:string,number,number,number,number,number,number,number,number,number,number,number,number,number,boolean,number,number,number,number,boolean
+monkey_king_exclusive,10,1200,200,30,10,3,2000,0.1,60,2,1,10,1000,1,20,3,5,0,1

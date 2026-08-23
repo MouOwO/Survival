@@ -406,9 +406,16 @@ local function remove_unwanted_clone_abilities(clone)
     end
 end
 
+local function apply_clone_no_collision(clone)
+    if clone and clone.SetHullRadius then
+        clone:SetHullRadius(0)
+    end
+end
+
 local function sync_clone(current, hero)
     local clone = current.clone
     if not alive(clone) or not alive(hero) then return end
+    apply_clone_no_collision(clone)
     local stats = combat_snapshot(current.player_id)
     local previous_max = math.max(1, tonumber(clone:GetMaxHealth()) or 1)
     local health_pct = math.max(0, tonumber(clone:GetHealth()) or 0) / previous_max
@@ -445,9 +452,19 @@ local function sync_clone(current, hero)
     clone.survival_agility = tonumber(stats.agility) or 0
     clone.survival_intellect = tonumber(stats.intellect) or 0
     clone.survival_combat_refresh_version = tonumber(stats.refresh_version) or 0
+    clone.survival_critical_chance_pct = math.max(0,
+        tonumber(stats.critical_chance_pct) or 0)
+    clone.survival_critical_damage_pct = math.max(100,
+        tonumber(stats.critical_damage_pct) or 200)
+        + math.max(0,
+            tonumber(runtime().w_clone_critical_damage_bonus_pct) or 0)
     local clone_modifier = clone:FindModifierByName("modifier_monkey_king_clone")
     if clone_modifier and clone_modifier.SetCombatSnapshot then
-        clone_modifier:SetCombatSnapshot(stats)
+        local clone_stats = {}
+        for key, value in pairs(stats) do clone_stats[key] = value end
+        clone_stats.critical_chance_pct = clone.survival_critical_chance_pct
+        clone_stats.critical_damage_pct = clone.survival_critical_damage_pct
+        clone_modifier:SetCombatSnapshot(clone_stats)
     end
     if clone.CalculateStatBonus then clone:CalculateStatBonus(true) end
 end
@@ -471,7 +488,9 @@ local function create_clone(player_id)
     if player and clone.SetOwner then clone:SetOwner(player) end
     clone:SetControllableByPlayer(player_id, true)
     clone.survival_monkey_king_clone = true
+    clone.survival_permanent_summon = runtime().w_clone_permanent ~= false
     clone.survival_display_name = "混沌神猿分身"
+    apply_clone_no_collision(clone)
     if clone.SetBaseStrength then clone:SetBaseStrength(0) end
     if clone.SetBaseAgility then clone:SetBaseAgility(0) end
     if clone.SetBaseIntellect then clone:SetBaseIntellect(0) end

@@ -76,10 +76,14 @@ assert sound in game_mode, "Storm Spirit sound resource is not precached"
 
 skills = read(ROOT / "scripts/vscripts/systems/hero_skill_system.lua")
 assert 'BALL_LIGHTNING_ABILITY = "ability_survival_hero_ball_lightning"' in skills
-ball_index = skills.index("ball_lightning:SetAbilityIndex(#state.order)")
-return_index = skills.index("return_ability:SetAbilityIndex(#state.order + 1)")
-pickup_index = skills.index("pickup_ability:SetAbilityIndex(#state.order + 2)")
-assert ball_index < return_index < pickup_index, "hero utility slot order changed"
+assert "local function desired_ability_names(state)" in skills
+ball_order = skills.index("result[#result + 1] = BALL_LIGHTNING_ABILITY")
+return_order = skills.index("result[#result + 1] = RETURN_HOME_ABILITY")
+pickup_order = skills.index("result[#result + 1] = PICKUP_MATERIALS_ABILITY")
+assert ball_order < return_order < pickup_order, "hero utility slot order changed"
+assert "local function rebuild_ability_layout(state, desired)" in skills
+assert "local ability = state.unit:AddAbility(name)" in skills, \
+    "hero ability bar no longer rebuilds in authoritative add order"
 
 combat = read(CONTENT / "panorama/scripts/custom_game/combat_stats.js")
 hud = read(CONTENT / "panorama/scripts/custom_game/hud_takeover.js")

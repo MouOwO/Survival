@@ -18,6 +18,36 @@ local function config()
     return runtime.by_id.ultimate_tower or {}
 end
 
+local function hero_r_active(player_id)
+    local result = event_bus.request(events.HERO_SKILL_STATE_GET_REQUEST, {
+        player_id = player_id,
+    })
+    for _, skill in ipairs(result and result.snapshot
+            and result.snapshot.skills or {}) do
+        if skill.skill_id == "skill_monkey_king_agility"
+            or skill.skill_id == "skill_blademaster_mobility" then
+            return skill.locked ~= 1 and (tonumber(skill.level) or 0) > 0
+        end
+    end
+    return false
+end
+
+local function refresh_inherited_hero_stats(state, snapshot)
+    if not state or not state.unit or state.unit:IsNull()
+        or not hero_r_active(state.player_id)
+        or not snapshot then return end
+    local attack = (tonumber(state.fused_base_attack) or 0)
+        + ((tonumber(snapshot.engine_attack_min) or 0)
+        + (tonumber(snapshot.engine_attack_max) or 0)) * 0.5
+    state.unit:SetBaseDamageMin(math.max(0, attack))
+    state.unit:SetBaseDamageMax(math.max(0, attack))
+    state.base_attack = math.max(0, attack)
+    state.unit.survival_inherited_critical_chance_pct = math.max(0,
+        tonumber(snapshot.critical_chance_pct) or 0)
+    state.unit.survival_inherited_critical_damage_pct = math.max(100,
+        tonumber(snapshot.critical_damage_pct) or 200)
+end
+
 local function valid(unit)
     return unit and not unit:IsNull()
 end
@@ -177,6 +207,21 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
         local actual = source.attack_damage
         attack = attack + base * multiplier + math.max(0, actual - base)
     end
+    local fused_attack = attack
+    local hero_stats_result = event_bus.request(
+        events.HERO_COMBAT_STATS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local hero_stats = hero_stats_result and hero_stats_result.snapshot or {}
+    if hero_r_active(player_id) then
+        attack = fused_attack + math.max(0,
+            ((tonumber(hero_stats.engine_attack_min) or 0)
+                + (tonumber(hero_stats.engine_attack_max) or 0)) * 0.5)
+        unit.survival_inherited_critical_chance_pct = math.max(0,
+            tonumber(hero_stats.critical_chance_pct) or 0)
+        unit.survival_inherited_critical_damage_pct = math.max(100,
+            tonumber(hero_stats.critical_damage_pct) or 200)
+    end
     unit:SetBaseMaxHealth(math.max(1, maximum))
     unit:SetMaxHealth(math.max(1, maximum))
     unit:SetHealth(math.max(1, math.min(maximum, current)))
@@ -192,6 +237,7 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
         team_number = team_number,
         unit = unit,
         base_attack = attack,
+        fused_base_attack = fused_attack,
         at_wall = false,
         footprint = selected[1].definition
             and selected[1].definition.footprint or { x = 2, y = 2 },
@@ -581,6 +627,14 @@ local function on_building(payload)
     end
 end
 
+local function on_hero_combat_stats_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    for _, state in ipairs(player_ultimates(player_id)) do
+        refresh_inherited_hero_stats(state, payload.snapshot)
+    end
+end
+
 function M.init()
     ultimate_by_player = {}
     state_by_entindex = {}
@@ -604,6 +658,8 @@ function M.init()
         end)
     event_bus.subscribe(events.BUILDING_CREATED, on_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building)
+    event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED,
+        on_hero_combat_stats_changed)
 end
 
 M._test = {

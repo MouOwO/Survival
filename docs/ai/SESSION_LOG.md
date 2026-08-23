@@ -18,6 +18,14 @@
 - 修复 addon_game_mode.lua 的 player_disconnect 入口：记录原始事件字段，支持直接 PlayerID/playerid，并对 userid/UserID 通过 PlayerInstanceFromIndex 执行回退解析；无法得到合法槽位时不调用下游服务。
 - 修复 online_time_service.lua 的关键诊断日志，覆盖请求开始、提前跳过原因、断开 final、在途 final 排队和 game_end final 入口。
 - 结论：正常游戏结束没有 player_disconnect 并不代表 final 缺失，必须观察 game_end_final_requested 和后续请求 final=true。
+
+## 2026-08-24 - 剑圣暴击特效门控与齐天大圣R Tooltip修复
+
+- 剑圣Q范围复制伤害和视觉从普通攻击落地事件移至`HERO_FINAL_CRITICAL_ATTACK_DAMAGE`，并要求事件确认`critical=true`；非暴击不再触发Q伤害或特效，保留主攻击、英雄身份、分身排除和不可递归伤害边界。
+- 剑圣E增加CSV权威配置`e_visual_radius=600`，生成配置同步；原生剑刃风暴粒子在CP1写入`Vector(radius, 0, 0)`，持续时间、逐秒伤害、去重、销毁和释放逻辑保持不变。
+- 齐天大圣R的六份中英文Tooltip镜像删除旧的主动无冷却和英雄/城墙移动描述，统一为终极塔继承英雄最终攻击力和暴击伤害，终极塔自身D技能仍可移动。
+- 已更新剑圣与齐天大圣契约以覆盖最终暴击门控、E视觉半径控制点、粒子清理及R旧文案删除。Workshop Tools当前无法连接，实机粒子范围和地面效果仍待冷启动验收。
+
 ## 2026-08-23 - 记录多人数据库联调当前进度
 
 - 用户要求暂停在多人联调阶段并记录当前进度与经验；本条作为后续会话恢复依据。

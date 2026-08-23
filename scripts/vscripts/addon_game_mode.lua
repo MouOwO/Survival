@@ -540,6 +540,16 @@ function M.precache(context)
         "particles/items_fx/blink_dagger_end.vpcf",
         context
     )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_legion_commander/legion_commander_odds.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_juggernaut/juggernaut_blade_fury.vpcf",
+        context
+    )
     local units = {
         "npc_dota_hero_undying",
         "npc_survival_builder_proxy",
@@ -854,6 +864,7 @@ local function initialize_services()
     game_info_service.init()
     hero_passive_skill_service.init()
     monkey_king_exclusive_service.init()
+    require("systems/blademaster_exclusive_service").init()
     hero_summon_system.init()
     require("systems/hero_boundary_guard_service").init()
     builder_progression_system.init()
