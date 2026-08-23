@@ -1,5 +1,18 @@
 # Decisions
 
+## 2026-08-23：罪渊复用练功房刷新、碰撞与AI路径
+
+- 决定：罪渊成员`seven_sins_minion`通过`encounter_members.csv.collision_profile=practice`加入冰霜之地、熔火核心低阶房已使用的共享路径；识别依据只允许是成员profile，禁止在生成器中继续保留`challenge_10`专用位置分支。
+- 决定：罪渊单标记生成锚点最多向入口方向内移192，先应用练功房Hull 12，再执行`FindClearSpaceForUnit()`；最终落点是各怪物700索敌、1200脱战和步行回归的home。不得恢复固定槽位、双半径环形刷新、精确位置覆盖或越界传送。
+- 决定：本次只统一空间、碰撞、AI和维护行为。罪渊仍维持10只、死亡0.5秒补满，怪物战斗Profile不变，七宗罪精华仍使用原40%概率、权重、地面落点与不限数量规则。
+
+## 2026-08-23：英雄弹道速度采用巫师之刃风格的动态Modifier投影
+
+- 决定：`hero_attack_projectiles.csv`继续作为英雄目标弹速和攻击能力的权威源；当前Shadow Fiend与Drow Ranger的目标弹速均为3000。远程英雄使用隐藏永久、不可驱散、死亡不移除的`modifier_survival_hero_projectile_speed`，通过`MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS`和`GetModifierProjectileSpeedBonus()`投影到原生普通攻击弹道。
+- 决定：Modifier加成按`目标弹速-首次读取并缓存的原生基础弹速`动态计算，重复应用只更新同一实例，必须先扣除旧加成，禁止把已经加成后的运行值当作新的原生基准。不同原生弹速的英雄因此可以同时得到最终3000；不能直接照搬巫师之刃固定`+300`。
+- 决定：不创建真实隐藏巫师之刃物品，避免占用背包、进入装备/库存/合成/Tooltip/存档链。`SetProjectileSpeed(3000)`只保留为Modifier读回异常时的兼容兜底，正常路径优先由原生Modifier属性提供速度。
+- 决定：近战攻击能力不附加弹速Modifier；远程Modifier刷新后必须重新读回并输出`configured/native/bonus/modifier/fallback/before/after`诊断字段。自动契约和Lua模拟测试不能宣称实际引擎弹道已验收，Workshop Tools必须完全冷启动后单独确认。
+
 ## 2026-08-20：玩家属性数据库使用 HMAC 身份和 CSV 默认值
 
 - 决定：Dota 的局内 `PlayerID` 只表示本局槽位，数据库永久身份必须从服务端 `PlayerResource:GetSteamAccountID()`解析；后端接收数字字符串后以独立 pepper 做 HMAC-SHA256，数据库使用 64 位十六进制 `text`，不保存原始 Steam Account ID。

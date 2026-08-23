@@ -532,6 +532,7 @@ local function on_hero_summoned(payload)
         ensure_modifier("modifier_equipment_effects")
         safe_call(payload.unit, "CalculateStatBonus", true)
     end, "hero_summoned_equipment_health")
+    hero_stat_adapter.reapply_projectile_stats(payload.unit, definition)
     ensure_modifier("modifier_weapon_attack_tracker")
     local snapshot = recalculate(payload.player_id, "hero_summoned") or {}
     print(string.format(
@@ -562,6 +563,7 @@ local function on_changed(payload)
             if modifier and modifier.ForceRefresh then modifier:ForceRefresh() end
             safe_call(state.unit, "CalculateStatBonus", true)
         end, "equipment_refresh:" .. tostring(payload.reason or "changed"))
+        hero_stat_adapter.reapply_projectile_stats(state.unit, state.definition)
     end
     recalculate(player_id, payload.reason)
 end

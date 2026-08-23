@@ -261,40 +261,26 @@ local function spawn_point_for(session, member, location)
     return point, expected
 end
 
-local function spread_maintain_count_position(session, member, location, point)
+local function maintain_count_spawn_position(session, member, location, point)
     if not point or member.spawn_mode ~= "maintain_count"
-        or #((location and location.spawn_target_names) or {}) ~= 1
-        or session.challenge.challenge_id == "challenge_10" then
+        or member.collision_profile ~= "practice"
+        or #((location and location.spawn_target_names) or {}) ~= 1 then
         return point and point:GetAbsOrigin() or nil
     end
 
     local origin = point:GetAbsOrigin()
-    local radius = math.max(120, (tonumber(location.room_radius) or 1200) * 0.5)
-    session.spawn_serial = (tonumber(session.spawn_serial) or 0) + 1
-    local slot = (session.spawn_serial - 1) % 10
-    local ring = math.floor((session.spawn_serial - 1) / 10)
-    local ring_radius = math.min(radius, 260 + ring * 180)
-    local angle = math.rad(slot * 36 + ring * 18)
-    local candidate = GetGroundPosition(origin + Vector(
-        math.cos(angle) * ring_radius,
-        math.sin(angle) * ring_radius,
-        0
-    ), point)
-    if not GridNav:IsBlocked(candidate) and GridNav:IsTraversable(candidate) then
-        return candidate
-    end
+    local entry = marker(location.entry_target_name)
+    if not entry then return origin end
 
-    for attempt = 1, 12 do
-        local fallback_angle = angle + math.rad(attempt * 30)
-        local fallback = GetGroundPosition(origin + Vector(
-            math.cos(fallback_angle) * ring_radius,
-            math.sin(fallback_angle) * ring_radius,
-            0
-        ), point)
-        if not GridNav:IsBlocked(fallback)
-            and GridNav:IsTraversable(fallback) then
-            return fallback
-        end
+    local inward = entry:GetAbsOrigin() - origin
+    inward.z = 0
+    local distance = inward:Length2D()
+    if distance <= 0 then return origin end
+
+    local inset = math.min(192, distance * 0.25)
+    local anchor = GetGroundPosition(origin + inward:Normalized() * inset, point)
+    if not GridNav:IsBlocked(anchor) and GridNav:IsTraversable(anchor) then
+        return anchor
     end
     return origin
 end
@@ -313,23 +299,9 @@ local function spawn_member(session, member)
     if profile_error then return nil, profile_error end
 
     local point, expected = spawn_point_for(session, member, location)
-    local position = spread_maintain_count_position(
+    local position = maintain_count_spawn_position(
         session, member, location, point
     )
-    if position and session.challenge.challenge_id == "challenge_10" then
-        session.spawn_serial = (tonumber(session.spawn_serial) or 0) + 1
-        local slot = (session.spawn_serial - 1) % 10
-        local angle = math.rad(slot * 36)
-        local radius = slot % 2 == 0 and 300 or 460
-        local candidate = GetGroundPosition(position + Vector(
-            math.cos(angle) * radius,
-            math.sin(angle) * radius,
-            0
-        ), point)
-        if not GridNav:IsBlocked(candidate) and GridNav:IsTraversable(candidate) then
-            position = candidate
-        end
-    end
     if not position and WOOD_STRENGTH_ENCOUNTERS[session.encounter_id] then
         local hero = hero_for(session.player_id)
         if alive(hero) then
@@ -361,10 +333,11 @@ local function spawn_member(session, member)
     end
 
     local collision_profile = wave_monster_collision.profile(member, archetype)
+    local create_clear_space = not collision_profile.apply_before_placement
     local unit = CreateUnitByName(
         archetype.unit_name,
         position,
-        not collision_profile.apply_before_placement,
+        create_clear_space,
         nil,
         nil,
         DOTA_TEAM_BADGUYS
@@ -417,13 +390,15 @@ local function spawn_member(session, member)
         home = home_marker and home_marker:GetAbsOrigin() or position
     end
     local hero = hero_for(session.player_id)
+    local aggro_radius = tonumber(session.encounter.aggro_radius) or 700
+    local leash_radius = tonumber(session.encounter.leash_radius) or 1200
     unit:AddNewModifier(unit, nil, "modifier_practice_monster_ai", {
         hero_entindex = hero and hero:entindex() or -1,
         home_x = home.x,
         home_y = home.y,
         home_z = home.z,
-        aggro_radius = tonumber(session.encounter.aggro_radius) or 700,
-        leash_radius = tonumber(session.encounter.leash_radius) or 1200,
+        aggro_radius = aggro_radius,
+        leash_radius = leash_radius,
     })
 
     session.monsters[unit:entindex()] = unit

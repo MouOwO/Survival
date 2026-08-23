@@ -19,7 +19,7 @@ end
 local function safe_call(target, method_name, ...)
     local method = target and target[method_name]
     if type(method) ~= "function" then
-        return false
+        return false, "missing_method"
     end
     return pcall(method, target, ...)
 end
@@ -52,6 +52,100 @@ local function apply_primary_stats(unit, definition)
     safe_call(unit, "SetIntellectGain", 0)
 end
 
+local function apply_projectile_stats(unit, definition)
+    local projectile = (projectile_config.by_id or {})[definition.hero_id]
+    if projectile and projectile.enabled == false then projectile = nil end
+    projectile = projectile or definition
+    local projectile_speed = number(projectile, "projectile_speed")
+    local projectile_model = projectile.projectile_model
+    local attack_capability = projectile.attack_capability
+    local before_speed = safe_get(unit, "GetProjectileSpeed")
+    local modifier_name = "modifier_survival_hero_projectile_speed"
+    local modifier = unit.FindModifierByName
+        and unit:FindModifierByName(modifier_name) or nil
+    local old_bonus = modifier and modifier.GetStackCount
+        and tonumber(modifier:GetStackCount()) or 0
+    local native_speed = unit.survival_native_projectile_speed
+    local projectile_speed_bonus = 0
+    local modifier_applied = false
+    local fallback = "none"
+    local setter_ok, setter_result = nil, nil
+
+    if attack_capability == "melee" then
+        setter_ok, setter_result = safe_call(unit, "SetRangedProjectileName", "")
+        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_MELEE_ATTACK)
+        if modifier then
+            safe_call(unit, "RemoveModifierByName", modifier_name)
+        end
+        unit.survival_native_projectile_speed = nil
+    else
+        projectile_speed = projectile_speed and projectile_speed > 0
+            and projectile_speed or 3000
+        if native_speed == nil then
+            native_speed = math.max(
+                1,
+                math.floor((tonumber(before_speed) or projectile_speed) - old_bonus)
+            )
+            unit.survival_native_projectile_speed = native_speed
+        end
+        projectile_speed_bonus = math.floor(projectile_speed - native_speed)
+        if not modifier then
+            modifier = unit:AddNewModifier(unit, nil, modifier_name, {
+                projectile_speed_bonus = projectile_speed_bonus,
+            })
+        elseif modifier.SetProjectileSpeedBonus then
+            modifier:SetProjectileSpeedBonus(projectile_speed_bonus)
+        elseif modifier.SetStackCount then
+            modifier:SetStackCount(projectile_speed_bonus)
+        end
+        modifier_applied = modifier ~= nil
+        safe_call(unit, "CalculateStatBonus", true)
+
+        local modifier_speed = safe_get(unit, "GetProjectileSpeed")
+        if modifier_speed ~= projectile_speed then
+            safe_call(unit, "RemoveModifierByName", modifier_name)
+            modifier_applied = false
+            setter_ok, setter_result = safe_call(
+                unit, "SetProjectileSpeed", projectile_speed
+            )
+            fallback = "set_target_without_modifier"
+        end
+        if projectile_model and projectile_model ~= "" then
+            safe_call(unit, "SetRangedProjectileName", projectile_model)
+        else
+            safe_call(unit, "SetRangedProjectileName", "")
+        end
+        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_RANGED_ATTACK)
+    end
+
+    local after_speed = safe_get(unit, "GetProjectileSpeed")
+    local unit_name = safe_get(unit, "GetUnitName")
+    local entindex = safe_get(unit, "entindex")
+    logger.info(
+        "HeroProjectile",
+        string.format(
+            "hero=%s unit=%s entindex=%s configured=%s native=%s bonus=%s "
+                .. "modifier=%s fallback=%s setter_ok=%s setter_result=%s "
+                .. "before=%s after=%s capability=%s",
+            tostring(definition.hero_id), tostring(unit_name), tostring(entindex),
+            tostring(projectile_speed), tostring(native_speed),
+            tostring(projectile_speed_bonus), tostring(modifier_applied),
+            tostring(fallback), tostring(setter_ok), tostring(setter_result),
+            tostring(before_speed), tostring(after_speed),
+            tostring(attack_capability or "ranged")
+        )
+    )
+    unit.survival_projectile_speed = projectile_speed
+    unit.survival_attack_capability = attack_capability or "ranged"
+end
+
+function M.reapply_projectile_stats(unit, definition)
+    if not unit or unit:IsNull() or not definition then
+        return
+    end
+    apply_projectile_stats(unit, definition)
+end
+
 local function apply_combat_stats(unit, definition)
     set_if_present(unit, definition, "base_damage_min", "SetBaseDamageMin")
     set_if_present(unit, definition, "base_damage_max", "SetBaseDamageMax")
@@ -78,27 +172,6 @@ local function apply_combat_stats(unit, definition)
         "SetBaseMagicalResistanceValue"
     )
     set_if_present(unit, definition, "move_speed", "SetBaseMoveSpeed")
-    local projectile = (projectile_config.by_id or {})[definition.hero_id]
-    if projectile and projectile.enabled == false then projectile = nil end
-    projectile = projectile or definition
-    local projectile_speed = number(projectile, "projectile_speed")
-    local projectile_model = projectile.projectile_model
-    local attack_capability = projectile.attack_capability
-    if attack_capability == "melee" then
-        safe_call(unit, "SetRangedProjectileName", "")
-        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_MELEE_ATTACK)
-    elseif projectile_speed and projectile_speed > 0 then
-        safe_call(unit, "SetProjectileSpeed", projectile_speed)
-        if projectile_model and projectile_model ~= "" then
-            safe_call(unit, "SetRangedProjectileName", projectile_model)
-        end
-        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_RANGED_ATTACK)
-    else
-        safe_call(unit, "SetProjectileSpeed", 3000)
-        safe_call(unit, "SetRangedProjectileName", "")
-        safe_call(unit, "SetAttackCapability", DOTA_UNIT_CAP_RANGED_ATTACK)
-    end
-    unit.survival_attack_capability = attack_capability or "ranged"
 end
 
 local function apply_range(unit, definition)
@@ -280,6 +353,10 @@ function M.apply(unit, definition)
     apply_level(unit, definition)
     local configured_health = M.apply_configured_health(unit, definition)
     local configured_mana = M.apply_configured_mana(unit, definition, true)
+    -- Health, mana, and level initialization can recalculate native hero stats.
+    -- Apply projectile fields last so that the final active entity keeps the
+    -- configured attack capability and projectile speed.
+    apply_projectile_stats(unit, definition)
 
     logger.info(
         "HeroStat",

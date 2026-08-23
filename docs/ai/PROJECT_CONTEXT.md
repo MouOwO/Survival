@@ -18,8 +18,13 @@
 
 ## 正式波次与练功房怪物碰撞边界（2026-08-19）
 
-- `global_rules.csv.wave_ground_monster_hull_radius`只作为正式/默认地面怪基础Hull，当前为32；四个练功房成员必须由`encounter_members.csv.collision_profile=practice`显式识别，并读取独立的`practice_monster_hull_radius`，当前为12。不得通过硬编码遭遇ID、成员ID前缀或共享原型推断练功房身份。
-- 练功房保留单位间碰撞，不启用`NO_UNIT_COLLISION`。由于`CreateUnitByName(..., true, ...)`会在创建阶段先按默认Hull执行clear-space，练功房必须关闭该默认行为，先应用profile Hull，再显式调用`FindClearSpaceForUnit()`；其他挑战成员维持原生成时序。后续若实机仍拥挤，必须由用户确认后再单独评估练功房专属无单位碰撞，不能影响正式波次。
+- `global_rules.csv.wave_ground_monster_hull_radius`只作为正式/默认地面怪基础Hull，当前为32；四个练功房以及已批准复用其刷新行为的冰霜之地、熔火核心低阶房和罪渊成员，必须由`encounter_members.csv.collision_profile=practice`显式识别，并读取独立的`practice_monster_hull_radius`，当前为12。不得通过硬编码遭遇ID、成员ID前缀或共享原型推断身份。
+- `practice` profile保留单位间碰撞，不启用`NO_UNIT_COLLISION`。由于`CreateUnitByName(..., true, ...)`会在创建阶段先按默认Hull执行clear-space，此profile必须关闭该默认行为，先应用Hull 12，再显式调用`FindClearSpaceForUnit()`；其他挑战成员维持原生成时序。后续若实机仍拥挤，必须由用户确认后再单独评估profile专属无单位碰撞，不能影响正式波次。
+
+## 维护数量挑战复用练功房刷新规则（2026-08-23）
+
+- 冰霜之地、熔火核心低阶房和罪渊均通过成员的`collision_profile=practice`复用练功房生成、碰撞与AI路径。仅当成员为`maintain_count`且地点只有一个生成标记时，生成锚点才允许沿“生成点到入口点”方向向内调整，最大192；随后先应用Hull 12，再由`FindClearSpaceForUnit()`分散，并以最终位置作为各自回归点。
+- 禁止为罪渊恢复固定槽位、300/460双半径环形位置、`SetAbsOrigin()`精确放置或边界传送。共享AI使用700索敌、1200脱战范围，丢失目标后步行回归。各房间原有成员身份、战斗Profile、10只上限、0.5秒补满和掉落规则保持独立；罪渊仍按原40%概率及既有权重掉落七宗罪精华。
 
 ## 全部怪物碰撞与精英/Boss攻击范围统一（2026-08-15）
 
@@ -472,6 +477,9 @@
 - `data/csv/英雄系统/hero_attack_projectiles.csv`同时是英雄弹道和攻击能力的权威源；`attack_capability`显式使用`melee`或`ranged`，禁止用0速度、空速度或极高速度隐式表达即时结算。
 - `hero_stat_adapter.lua`按该字段投影引擎能力。`melee`表示无飞行弹道、攻击前摇结束时由引擎直接结算；`ranged`继续消费`projectile_speed`和可选`projectile_model`。
 - 攻击能力与攻击距离是独立配置：近战能力仍可通过`modifier_survival_hero_attack_range`获得CSV指定的远距离。当前齐天大圣为`melee`且攻击/索敌1000；不应为了即时结算另写伤害或绕过原生普通攻击事件链。
+- 远程英雄的最终弹速投影使用隐藏永久`modifier_survival_hero_projectile_speed`和`MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS`；`GetModifierProjectileSpeedBonus()`返回`目标弹速-首次缓存的原生基础弹速`，禁止使用巫师之刃式固定加成，因为不同英雄的原生弹速不同。当前Shadow Fiend与Drow Ranger的CSV目标弹速均为3000。
+- `hero_stat_adapter.lua`必须保存`survival_native_projectile_speed`，在召唤、属性重算、装备刷新和热重载后更新同一Modifier而不是叠加新实例；正常路径由Modifier提供最终弹速，读回不等于配置目标时才移除Modifier并使用`SetProjectileSpeed(3000)`兜底。Setter是兼容回退，不是首选投影路径；近战英雄不得附加该弹速Modifier。
+- 弹速诊断必须同时记录`configured/native/bonus/modifier/fallback/before/after`。自动测试可证明动态加成、最终3000和刷新幂等，但不能替代Workshop Tools完全冷启动后的实际攻击弹道验证。
 
 ## 资源树承伤与箭塔目标规则（2026-08-03）
 

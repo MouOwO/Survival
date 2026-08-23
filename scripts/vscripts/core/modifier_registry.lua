@@ -102,6 +102,10 @@ local modifiers = {
         path = "modifiers/modifier_survival_hero_attack_range",
     },
     {
+        name = "modifier_survival_hero_projectile_speed",
+        path = "modifiers/modifier_survival_hero_projectile_speed",
+    },
+    {
         name = "modifier_survival_drow_companion_invulnerable",
         path = "modifiers/modifier_survival_drow_companion_invulnerable",
     },

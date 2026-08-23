@@ -1,3 +1,23 @@
+## 2026-08-23 - 罪渊刷新逻辑纳入练功房共享路径
+
+- 用户确认冰霜之地与熔火核心的刷新修复正确，并指出罪渊遗漏。复核确认`seven_sins_minion`原本同为单标记、维持10只、0.5秒补满，但缺少`collision_profile=practice`，且生产代码显式排除`challenge_10`后再执行300/460双半径固定环形刷新。
+- 本轮将罪渊成员标记为`practice`，移除`challenge_10`单点内缩例外和专属固定环形分支。罪渊现在与冰霜之地、熔火核心一致：单点锚点最多向入口内移192，Hull 12先于放置应用，由`FindClearSpaceForUnit()`分散，最终位置作为700/1200 AI的独立home，脱战后步行回归。
+- 保持不变：罪渊怪物ID与战斗Profile、10只上限、0.5秒补满，以及40%七宗罪精华概率、既有7种权重项、掉落位置和数量不限规则。
+- 自动验证通过：维护刷新边界契约显示3个挑战共享practice路径；数量契约确认4个练功房及3个维护型挑战均为10只/0.5秒；AI Lua测试确认700索敌、1200脱战和步行回归；3个目标Lua通过Lua 5.1编译，PowerShell解析和`git diff --check`通过。全量Lua检查仍只失败于既有`addon_game_mode.lua:848`超过60个upvalue；`build_configs.ps1 -CheckOnly`仍因无有效Python 3阻塞。Workshop Tools罪渊实机验收仍待执行。
+
+## 2026-08-23 - 四个练功房怪物数量调整为10
+
+- 用户要求木材、金币、属性和大属性练功房由8只改为10只。`monster_encounters.csv`四个遭遇的`max_alive`与`encounter_members.csv`四个成员的`spawn_count/max_alive`同步改为10，并同步生成Lua；`maintain_count`与0.5秒补满规则保持不变。
+- 新增专项契约，逐个约束四个成员和四个遭遇的CSV及生成Lua数量一致，避免只修改其中一层。冰霜之地和其他挑战房数量不在本次范围内。
+
+## 2026-08-23 - Shadow Fiend/Drow Ranger 弹道速度改为巫师之刃风格Modifier投影
+
+- 用户批准记录本次弹道速度调整逻辑：`hero_attack_projectiles.csv`是目标弹速权威源，Shadow Fiend与Drow Ranger最终目标均为3000；攻击能力仍由同表的`melee/ranged`显式字段控制。
+- 新增并注册隐藏永久`modifier_survival_hero_projectile_speed`，通过`MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS`和`GetModifierProjectileSpeedBonus()`返回动态加成。公式为`3000-首次缓存的原生基础弹速`，不使用固定巫师之刃加成；刷新只更新同一Modifier，避免叠加。
+- `hero_stat_adapter.lua`在召唤、属性重算、装备刷新和热重载后的重投影阶段读回弹速并记录`configured/native/bonus/modifier/fallback/before/after`。Modifier正常生效时不调用Setter；读回异常时移除Modifier并回退到`SetProjectileSpeed(3000)`。
+- 自动行为测试覆盖不同原生基准：Shadow Fiend模拟为`900+2100=3000`，Drow Ranger模拟为`1200+1800=3000`，并验证刷新幂等；英雄弹道契约通过，目标Lua文件单独Lua 5.1编译通过，PowerShell契约和`git diff --check`通过。
+- 当前限制：尚未完成Workshop Tools/Dota完全冷启动后的实际普通攻击弹道确认；全项目Lua语法检查仍被既有`addon_game_mode.lua`函数超过60个upvalue阻断，不能把该项目级检查失败归因于本次Modifier。
+
 ## 2026-08-21 - Dota HTTP Provider 联调恢复检查
 
 - 复核确认外围链路为 `Dota server Lua -> loopback Python API -> Supabase PostgreSQL`，数据库仓库位于 `D:\survival_database`；客户端不持有 Supabase 凭据。
