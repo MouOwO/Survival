@@ -284,9 +284,9 @@ local function on_player_connected(keys)
 end
 
 local function on_player_disconnected(keys)
-    require("systems/fishing_reward_service").disconnect(
-        tonumber(keys.PlayerID or keys.playerid)
-    )
+    local player_id = tonumber(keys.PlayerID or keys.playerid)
+    require("systems/fishing_reward_service").disconnect(player_id)
+    require("systems/online_time_service").disconnect(player_id)
 end
 
 local function initialize_survival_hero(hero)
@@ -802,6 +802,7 @@ local function initialize_services()
     require("systems/online_time_service").init()
     require("systems/permanent_reward_effect_service").init()
     require("systems/fishing_reward_service").init()
+    require("systems/star_blessing_reward_service").init()
     hero_progression_system.init()
     research_technology_bootstrap.init()
     require("systems/research_lab_ability_sync").init()

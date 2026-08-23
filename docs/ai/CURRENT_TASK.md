@@ -1,76 +1,131 @@
-## 当前修复项（2026-08-22）：防御塔销毁占格未返还与挑战房间刷怪范围过大
+## 当前联调状态（2026-08-23）：多人生产联调阻塞
 
-- 用户反馈：防御塔销毁后仍占用建造格；挑战房间怪物刷新范围过大，可能刷出房间。
-- 根因：建筑死亡事件在内存建筑状态缺失时直接返回，未使用单位保存的网格坐标释放占格；单生成点维护刷怪使用的分散半径过大。
-- 修复：建筑创建时保存网格坐标与footprint，正常销毁和施工失败统一释放；状态缺失时从单位元数据和CSV建筑定义兜底释放。单生成点维护刷新范围改为`challenge_locations.csv.room_radius`的50%，保留GridNav检查与现有多点/十宗罪例外。
-- 验证：挑战刷怪契约、目标Lua 5.1语法（去除既有BOM后）和限定`git diff --check`通过；现有`test_tower_population_occupancy.lua`在本轮前置资源Mock断言处失败，未进入销毁逻辑。仍需Workshop Tools冷启动实测防御塔销毁后原格可建造，以及冰霜之地/熔火核心怪物不越界。
+- 当前进度已推进到“Supabase 迁移核对 + 生产双玩家端到端联调”，暂时卡在多人联调阶段；本次记录作为后续会话恢复的最新任务状态。
+- 已完成后端配置、启动脚本、环境模板和 Lua API 调用链复核；已确认 Python API 绑定 `127.0.0.1:8765`，数据库访问由主机 API 完成。
+- 已确认推荐 LAN 拓扑：主机运行 Dota、Lua、Python API 和 Supabase 访问；其他玩家只加入主机创建的 Dota 对局，不直接调用主机 API。
+- 已确认玩家永久身份使用服务端 `PlayerResource:GetSteamAccountID()`，经过共享服务端 pepper 派生数据库身份；Dota 本局 `PlayerID` 仅用于本局槽位和命令参数，不能作为数据库主键。
+- 已确认现有自动化和玩法代码已覆盖 checkpoint 奖励、最终结算、`grant_id`/`request_id` 幂等和重连档案恢复；这些结果不等于生产双玩家实机验收。
+- 当前阻塞：独立数据库仓库中的 migration `202608230006` 与 `202608230007` 尚未确认在目标 Supabase 按顺序执行，且需要先核对其依赖迁移；迁移状态确认前不进行生产结论判断。
+- 多人生产验收必须去掉 `-Automation9001` 和 `-Workshop60Seconds`，使用两个不同 Steam 账号验证独立档案、session、在线累计、checkpoint、600 秒奖励、断线/结束结算、重连恢复、跨玩家隔离、重复请求和 API 重启。
+- 若未来要求其他电脑直接调用 API，需要另立任务设计 LAN 绑定、认证、网络限制、防火墙和 TLS；当前不得把 API 改为 `0.0.0.0`。
 
-## 当前修复项（2026-08-22）：箭塔销毁后原格仍提示单位阻挡
+## 当前任务（2026-08-23）：正式在线奖励切换为十分钟派发
 
-- 用户实机复现：箭塔销毁后立即在原位置预建造仍提示“地形、建筑、树木、单位或禁建区阻挡”。
-- 调查结论：第一轮已释放`grid_placement_system.lua`的逻辑`occupied`表，但实体阻挡路径仍从`FindUnitsInRadius()`结果检查单位；死亡箭塔在实体尚未移除的窗口内仍会被判定为`unit_blocked`。
-- 本轮修复：实体阻挡检查跳过`IsAlive()==false`的死亡单位，保留存活单位、树木、地形、禁建区和逻辑网格检查；增加死亡后重建行为契约测试。
-- 验证状态：待执行Lua 5.1语法、死亡后重建行为测试、网格释放契约和限定`git diff --check`；自动测试不等于Workshop Tools实机验收。
+- 用户已确认 Workshop Tools 中生产 version 3 奖励、档案永久效果、防御塔每秒攻击力投影和客户端公告完整出现。
+- 已批准正式配置采用：每 600 秒派发一次奖励；定期 checkpoint 从 60 秒降低为 300 秒；租约调整为 450 秒；正常断开和对局结束发送 `final=true` 立即结算。
+- 实施必须以 `data/csv/玩家档案系统/fishing_system_rules.csv` 为权威源并重新生成 Lua。退出上报不能替代定期 checkpoint，因为崩溃、断电和网络异常不保证执行退出回调。
+- 已完成正式切换：CSV 与生成 Lua 为 checkpoint 300 秒、租约 450 秒、奖励区间固定 600 秒；`player_disconnect` 和 `game_end` 均触发 final 结算。
+- Lua 对在途 checkpoint 的退出请求使用 `final_requested` 排队，避免并发请求丢失最终结算；API 新增严格 `final` 布尔校验与透传，Supabase 前向 migration 在幂等结算后按账号/session 删除活动租约。
+- 自动验证已通过：29 项后端 unittest、Lua 5.1 行为、目标 Lua 语法、CSV/生成 Lua 契约、严格 UTF-8 和限定 `git diff --check`。尚需执行新 Supabase migration 并进行 Workshop Tools 冷启动实机验证。
 
-## 当前修复项（2026-08-22）：预建造校验前同步清理失效网格占用
+## 本次修复（2026-08-23）：在线奖励本地校验诊断与公告事件常量
 
-- 用户实机确认上一轮“实体死亡过滤”未生效，进一步批准在唤出预建造网格时刷新服务端占用状态。
-- 根因修正：`grid_placement_system.lua`的`occupied`逻辑表可能在拆除事件丢失、顺序异常或实体延迟移除时保留旧entindex；即使后续实体阻挡检查跳过死亡单位，前置`build_cell_occupied`仍会拒绝建造。
-- 本轮修复：每次服务端`grid.can_place`开始时遍历逻辑占用者，清理死亡、Null、无法解析或不再是Survival建筑的entindex及其全部格子；存活建筑继续保留，实体阻挡死亡过滤仍保留为第二层保护。
-- 验证状态：待执行Lua 5.1语法、预建造占用同步行为测试、网格释放契约和限定`git diff --check`；自动测试不等于Workshop Tools实机验收。
+- 已确认 `online_time_service.lua` 的 grant 校验此前对所有拒绝只返回 `nil`，无法区分奖励 ID、启用状态、scope、版本和数值范围问题；同时缺少 `grant_id` 时仍可能进入 validated 列表后被静默跳过。
+- 已增加无敏感数据的 `grant_rejected` 原因日志，并将缺少 `grant_id` 纳入校验失败；日志只输出 reward ID、definition version、amount 和拒绝原因。
+- 已补齐 `events.UI_NOTIFICATION = "ui.notification"`。现有 `ui_request_router.lua` 已订阅该事件，并仅对显式 `audience="all"` 调用 `Send_ServerToAllClients`，因此星之庇佑公告可到达现有 Panorama 通知容器。
+- 已扩展 `tools/test_online_time_debug_checkpoint.lua`：覆盖合法 grant、未知/禁用奖励、缺少 grant ID、scope/version 不匹配及数值上下界拒绝。
+- 当前验证：在线时长 Lua 5.1 行为测试通过；相关 Lua 文件语法检查通过；UI 路由语法检查通过；限定 `git diff --check` 通过。Supabase REST 只读查询仍受现有凭据 401 阻断，未将本地检查称为远端数据库验证；Workshop Tools 永久效果、重登录和公告仍需实机确认。
 
-## 当前任务（2026-08-22）：调查英雄十转Boss异常
+## 本轮诊断（2026-08-23）：在线里程碑 grant ID 版本冲突
 
-- 用户反馈：英雄十转Boss存在Bug，当前先调查，不修改生产代码。
-- 调查范围：权威挑战/遭遇CSV、十转Boss生成点与成员、转生等级门禁、奖励/死亡处理、英雄传送和UI状态。
+- 已确认 `checkpoint_online_time(...)` 的旧 milestone ID 仅由 `account_id + milestone` 生成；定义版本从旧奖励切换到星之庇佑时可能复用同一 `grant_id`，由 `grant_out_of_match_reward` 正确拒绝为 `grant_id_conflict`，外层 API 映射为 HTTP 502。
+- 数据库仓库新增前向迁移 `D:\survival_database\supabase\migrations\202608230006_include_definition_version_in_online_grant_id.sql`：将新 ID 绑定 `definition_version`，不删除、更新或覆盖 `reward_grants` 历史账本。
+- 已增加数据库契约测试，要求迁移重编译七参数 `checkpoint_online_time`，检查旧表达式替换为 `:star:v<definition_version>:<milestone>`，并禁止修改历史 grant。
+- 只读 Supabase REST 查询因当前 `.env` key 返回 401，尚未取得真实 `reward_grants` 行、definition hash 或远端迁移状态；8765 API 当前未监听。不得将本地 SQL/单元结果称为远端数据库验证。
+- 当前验证：Python 28 项单元测试通过；目标 Lua 5.1 语法检查通过；新增 SQL/测试文件严格 UTF-8 与限定 `git diff --check` 通过。PowerShell 契约测试曾因 Dota 进程锁定星之庇佑 CSV 未完成，需释放文件锁后重跑；Workshop Tools 实机和迁移执行仍待完成。
 
-## 当前任务（2026-08-22）：排查冰霜之地与熔火核心挑战怪物卡位
+## 本次修复（2026-08-23）：首次登录 gameplay stats 正间隔初始化
 
-- 用户反馈：挑战冰霜之地和挑战熔火核心lv1~lv3的怪物刷新后会卡在一起，无法移动。
-- 根因：两个挑战分别需要维持8只和10只怪物，但地点CSV各只有一个生成点；维护数量刷新会重复使用同一位置，导致初始/补怪堆叠。地图中未找到可直接复用的额外挑战生成点。
-- 修复：`challenge_session_service.lua` 对“维护数量 + 单一生成点”的挑战按`room_radius`生成环形分散候选位置，使用`spawn_serial`轮换并检查GridNav可通行；候选失败时回退到原生成点。十宗罪既有十点逻辑和多点练功房逻辑不变。
-- 验证：`CHALLENGE_MAINTAIN_SPAWN_CONTRACT_PASS`、目标Lua 5.1语法、PowerShell语法及限定`git diff --check`通过。尚需Workshop Tools冷启动实测冰霜之地和熔火核心低阶怪物初始移动、死亡补怪和房间边界表现。
+- 已确认首次登录自动绑定 Steam Account ID 和重复登录幂等链路保持不变；实际 502 根因是 `tower_attack_interval=0` 触发数据库 `> 0` 检查约束。
+- 已修复权威 CSV 的 `tower_attack_interval` 默认值/最小值为 `1.7 / 0.01`，恢复本批损坏的中文 UTF-8 与其他被归零的历史默认值，并保留现有两个星之庇佑字段；已按 CSV 重新生成 `player_gameplay_stats.lua`。
+- 独立数据库新增 `202608230005_fix_gameplay_stats_attack_interval.sql`：缺失或非正间隔统一回退 `1.7`，保留 Steam 派生账号创建和两层 `on conflict ... do nothing` 幂等行为，不放宽数据库约束。
+- 自动验证：目标 Lua 语法、目标文件严格 UTF-8、CSV/生成 Lua 关键字段一致性通过；完整后端测试与 Supabase migration/Workshop Tools 实机仍需继续确认，数据库迁移尚未在目标 Supabase 执行。
 
-## 当前任务（2026-08-22）：知识之书购买冷却按购买成功时间计算
+## 当前任务（2026-08-23）：删除旧局内钓鱼数据库持久化链路
 
-- 用户确认知识之书和超级知识之书无购买上限；每次成功购买后独立进入10秒冷却。冷却必须从购买成功时开始，禁止按固定10秒周期刷新库存。
-- 权威数据来自data/csv/商店系统/shop_entries.csv；本轮将移除书籍的固定库存刷新字段，新增CSV驱动的purchase_cooldown_seconds，并同步生成商店配置。
-- 服务端按玩家和商店条目记录冷却截止时间，购买失败不启动冷却；普通购买上限和其他商城条目行为保持不变。
-- 验证要求：商店配置生成一致、知识之书专项Lua行为测试、相关Lua 5.1语法、现有商城回归和限定git diff --check。自动验证不等于Workshop Tools实机验收。
+- 已确认删除范围仅为旧 `fishing_states`、`fishing_sessions`、`fishing_idempotency`、`heartbeat_fishing_session(...)` RPC、Python `/v1/fishing/heartbeat` 入口和 Lua Provider 遗留 heartbeat 方法。
+- 必须完整保留星之庇佑在线链路：`online_time_sessions`、`online_time_idempotency`、`checkpoint_online_time(...)`、`reward_grants`、`player_effect_totals`、`star_blessing_reward_definition_sets`、`star_blessing_reward_definitions` 及对应同步、发奖和档案投影。
+- 实施方式为新增前向 Supabase 清理迁移，不改写既有历史迁移；局内 `fishing_reward_service.lua` 不依赖数据库，不在删除范围。
+- 当前状态：代码与迁移已实施，自动验证完成。数据库迁移尚未在目标 Supabase 执行，Workshop Tools 实机仍需单独验证；当前会话已完成静态、单元和 Lua 检查。
 
-## 当前修复项（2026-08-22）：防御塔右键手动选择攻击目标
+## 本次需求复核（2026-08-23）：首次登录自动建档与跨电脑数据库验证
 
-- 用户实机确认已完成建造的防御塔右键敌人完全无效；根因是原生 `DOTA_UNIT_ORDER_ATTACK_TARGET` 虽被 OrderFilter 放行，却没有持久化到 `modifier_tower_auto_attack`，自动索敌循环会继续接管目标。
-- 修复：玩家拥有的箭塔对合法敌方目标发出攻击订单时，OrderFilter 调用 modifier 的 `SetManualTarget()` 并设置 `SetForceAttackTarget()`；手动目标有效时优先保持，死亡、越界、同队、树目标或防空规则不合法后清除并恢复自动索敌。非拥有者订单、树目标和防空塔对地目标仍拒绝。
-- 验证：`TOWER_MANUAL_TARGET_ORDER_PASS`、`TOWER_MANUAL_TARGET_MODIFIER_PASS`、四个目标文件 Lua 5.1 语法和限定 `git diff --check` 通过。现有 `test_tower_tree_target_rules.lua` 因调用当前已不存在的 `tree_damage_rules.is_tower()` 失败，`test_anti_air_tower.lua` 在既有连射断言处失败，均非本次修改引入。仍需 Workshop Tools 冷启动确认选塔右键敌人、目标死亡后自动接管及防空目标限制。
-## 当前修复项（2026-08-22）：熔火核心批量物品无法自动合成
+- 已确认该功能主体已经存在：`HERO_READY`触发档案加载，Lua服务端读取`PlayerResource:GetSteamAccountID(player_id)`，HTTP `POST /v1/profile`在同一请求内执行“确保账号存在 + 返回档案”。首次请求通过`ensure_player_gameplay_stats`幂等创建`survival_players`和`player_gameplay_stats`；已有Steam Account ID直接返回已有档案。
+- 当前永久数据库键不是Dota本局`PlayerID`，也不是数据库中的原始Steam Account ID，而是Python使用稳定`FISHING_ACCOUNT_ID_PEPPER`计算的64位小写HMAC-SHA256伪名。该pepper必须在所有独立主机上保持一致且不得随意更换。
+- `player_gameplay_stats.csv`是36个局内玩法字段的权威默认值源。当前数据库表字段为完整非空玩法字段，首次档案会返回完整`save.gameplay_stats`；“有内容才下发、无内容省略”应先限定到成就、库存、外观等可选分区，不能直接套用到核心玩法数值。
+- 已完成真实Python API -> Supabase联调和Workshop Tools HTTP Provider到服务端grant的部分实机验证。仍未完成真实Steam账号冷启动、同账号二次登录、双账号隔离、断线重连/API重启、第二台电脑独立主机和正式商品支付发货验收。
+- 下一步需求输入：确认数据库不可用时是拒绝进入、只读默认档案降级还是允许进入但关闭永久系统；确认商品类型（永久权益/库存/订阅/礼包）、订单幂等键、退款撤销和多处同时登录规则。未确认前不新增支付或商品发货 schema。
 
-- 根因：地面熔火核心包的共享拾取逻辑 `challenge_ground_reward_claim.lua` 固定向逻辑库存登记 `count=1`，没有读取物品包的 `GetCurrentCharges()`；因此包内显示4个Lv1核心时，自动合成服务实际只能看到1个。
-- 修复：领取时优先读取有效 charges 作为登记数量，无效或缺失时回退为1；合成仍只读取权威逻辑库存，避免从可视物品直接扣除。
-- 验证：4个Lv1批量登记后合成为1个Lv2并保留1个Lv1；地面奖励领取、完整武器合成、Lua 5.1语法和限定 `git diff --check` 均通过。仍需 Workshop Tools 实机确认真实地面包拾取后的 charges 与界面刷新。
+## 本次修复（2026-08-23）：在线 checkpoint 跨 Run 幂等 ID 复用
 
-## 当前任务（2026-08-22）：英雄与防御塔 A 键攻击范围显示
+- 远端数据确认 Workshop Tools 每次 Run 都重新生成 `session_id=game-1-player-0` 及相同序号的 `request_id`；`online_time_idempotency` 因而直接返回历史 JSON，跳过当前累计与60秒奖励里程碑循环。这同时解释了重复出现的 `119/178/238/299` 以及旧响应缺字段导致的 `online_seconds_total=None`。
+- `online_time_service.lua` 现为每次 Lua 模块生命周期生成包含引擎随机片段的 runtime nonce，并写入 session ID；同一 session 的 request ID 继续按序递增，重新初始化后不再复用旧 session/request ID。API 允许的字符集和128字符上限保持满足；未修改 CSV、生成配置、Supabase 数据或历史幂等记录。
+- Lua 5.1 行为测试已覆盖 runtime nonce、同 session 稳定性、request ID 递增和重新初始化唯一性。`ONLINE_TIME_DEBUG_CHECKPOINT_LUA51_PASS`、目标 `luac5.1` 语法、`FISHING_REWARD_CONTRACT_PASS`、严格 UTF-8 与限定 `git diff --check` 通过。
+- 已完成 `production_60s` Workshop Tools 回归：日志出现 `elapsed_seconds=39 online_seconds_total=930 grant_count=1 validated_grant_count=1`。这证明新 session ID、Python API、Supabase version 3 grant 和 Lua 本地定义校验已贯通；仍需在同一回归中确认 `profile_refresh_completed`、永久效果投影、公告和重复 grant 发布去重，不能把 `validated_grant_count=1` 单独称为完整奖励验收。
 
-- 用户已确认交互：按住 `A` 显示当前选中英雄或防御塔的攻击范围；按住 `A` 后左键点击敌人完全复用 Dota 原生 A-click，不自定义接管左键，不新增隐藏技能。
-- 实施边界：Panorama 只监听 A 的按下/释放并请求范围视觉；服务端按玩家控制权、单位类型和运行时最终攻击范围创建/销毁范围粒子。原生 `DOTA_UNIT_ORDER_ATTACK_TARGET` 与现有 OrderFilter 保持不变。
-- 英雄射程读取必须兼容 `survival_attack_range`、`Script_GetAttackRange()`、`GetAttackRange()` 和 CSV 回退；防御塔射程使用 CSV `tower_attack_range` 及运行时科技加成，禁止客户端硬编码基础数值。
-- 本轮尚未完成 Workshop Tools 冷启动实机确认，范围粒子的控制点表现和原生 A-click 目标切换仍需验收。
+## 本次日志分析与修复（2026-08-22）：奖励 grant 的 pgcrypto schema 解析错误
 
-## 当前任务（2026-08-22）：接入远端剑圣模型更新
+- 已记录本轮 checkpoint 联调日志：普通 checkpoint 多次返回 `200`；四次在达到在线奖励里程碑时返回 `502`，Supabase 明确报 `42883 function digest(text, unknown) does not exist`；另有两次返回 `503 supabase_unavailable: no_detail`，后续请求恢复 `200`。
+- 根因已确认：`grant_out_of_match_reward` 使用 `SECURITY DEFINER SET search_path = public`，但目标 Supabase 的 `pgcrypto` 常见安装位置为 `extensions` schema，奖励触发时无法解析未限定的 `digest()`；因此非奖励 checkpoint 正常，奖励 checkpoint 才失败。
+- 已将源 migration 的函数 search path 改为 `public, extensions`，并新增 `D:\survival_database\supabase\migrations\202608220003_fix_reward_grant_pgcrypto_search_path.sql`，用于直接修复已部署目标项目，无需重写奖励函数。
+- 当前必须动作：在目标 Supabase 项目执行 `202608220003_fix_reward_grant_pgcrypto_search_path.sql`（若迁移工具按序执行，也需确认 `202608210002` 已执行），然后重启 API，再用 Automation9001 验证 checkpoint 返回的 `grants`、永久效果和公告。
+- 当前新 RPC 客户端对重复传输失败生成的 503 必定带 `function/transport/attempts` 详情；本批日志仍显示 `no_detail`，说明运行中的 API 很可能尚未重启、仍在使用旧代码。仍未确认目标项目实际 extension schema、RPC 锁等待/延迟、503 的具体传输根因、Dota 断线重连/API 重启和多人并发行为。上述日志没有暴露 request ID/延迟，不能仅凭 HTTP 状态完成实机验收。
 
-- 已确认远端 `origin/dev` 比本地多提交 `f26e020`，内容为剑圣从 Sven 模型切换至 Juggernaut Arcana 模型，并同步更新英雄/资源 CSV、生成 Lua、预载 KV 和英雄饰品运行时。
-- 旧路径 `data/csv/玩家档案系统/fishing_reward_definitions.csv` 与 `fishing_system_rules.csv` 的删除属于既有钓鱼配置迁移，不是本次拉取冲突；权威数据在 `data/csv/挑战与奖励系统/`。
-- 当前唯一与远端重叠的本地编译产物是 `panorama/scripts/custom_game/combat_stats.vjs_c`，拉取前需保留本地版本以便比较，再采用远端或重新编译结果解决。
-- 已 fast-forward 接入远端 `f26e020`；`combat_stats.vjs_c` 使用 Content 侧 `combat_stats.js` 重新强制编译，结果为 `OK: 1 compiled, 0 failed, 0 skipped`。
-- 远端随提交带入的 `combat_stats.vjs_c.BASE.vjs_c`、`.LOCAL.vjs_c`、`.REMOTE.vjs_c` 是二进制冲突辅助残留，已删除；既有 `survival_ui.vjs_c` 冲突快照未触碰。
-- 剑圣资源预载契约、英雄饰品服务 Lua 5.1 行为测试、相关 Lua 5.1 语法和 `git diff --check` 均通过；仍需 Workshop Tools 冷启动确认模型、饰品和出生粒子实机表现。
 
-## 当前任务（2026-08-22）：英雄最终属性换算优化
+## 本次修复（2026-08-22）：Supabase RPC 响应前断连
 
-- 用户确认按最终属性值结算：最终力量每点提供5点最大生命值，最终智力每点提供0.1点攻击力，敏捷不提供额外效果。
-- 权威换算系数写入`data/csv/公共规则/global_rules.csv`，运行时在`hero_combat_stat_service.lua`最终属性汇总点统一计算，避免装备、科技、进阶、永久奖励、七宗罪和专属技能产生重复或遗漏。
-- 基础生命继续沿用CSV英雄生命、倍率和隐藏基础生命Modifier；属性生命通过同一Modifier刷新并使用现有生命保护逻辑。基础攻击已经应用的伤害倍率不重复计算，智力攻击加成按实体攻击链单独应用。
-- 本轮验证范围为CSV生成、Lua 5.1语法、英雄战斗属性定向测试、目标文件严格UTF-8和限定`git diff --check`；Workshop Tools实机属性变化仍需单独验收。
+- 日志显示 `RemoteDisconnected` 发生在 `urllib.request.urlopen()` 读取 HTTP 响应头之前，原实现未捕获该异常，导致 checkpoint 路由返回未分类的 500。
+- `D:\survival_database\backend\fishing_api\supabase.py` 现将响应前的 `RemoteDisconnected`、连接重置、BrokenPipe、超时和 `URLError` 做一次 100ms 有界重试；仍失败时返回 503 `supabase_unavailable`，并记录 RPC 名称、传输异常类型和尝试次数。明确的 HTTP 4xx/5xx 不重试，保留数据库错误详情。
+- 新增两项断连行为测试；Python unittest 共25项、compileall和限定 `git diff --check` 通过。Python客户端实际调用目标 Supabase 已返回预期的 `400 P0001 gameplay_stats_payload_invalid`，证明当前网络、凭据和 RPC 路由可达。
+- 运行中的 API 进程必须重启后才会加载修复。仍需观察重启后的真实 checkpoint 日志；若再次出现 `supabase_unavailable`，请提供同一时间段的 API 日志和 request ID。
+
+## 本次联调修正（2026-08-22）：Automation9001 一分钟内奖励检查
+
+- 已确认原有 Automation9001 夹具的奖励间隔为 10 秒，但在线检查点 RPC 原先把 600 秒硬编码在 SQL 中，且客户端每 60 秒才发送一次 checkpoint，因此单靠启动夹具不会在一分钟内正确发奖。
+- 后端 checkpoint 现在传入规则 CSV 的 `reward_interval_min/max_seconds`；Supabase migration `202608210002_online_time_checkpoints.sql` 改为按 `p_interval_max_seconds` 结算里程碑。生产仍由 CSV 的 60 至 600 秒控制，Automation9001 在第一个约 60 秒检查点一次性返回已达到的 10 秒测试里程碑。
+- Python 未处理异常现在记录 traceback，便于定位日志中的 500；新增 checkpoint 参数契约测试。后端 23 项 unittest、Python compileall、Lua 5.1 语法和数据库 migration 静态检查通过。
+- 运行前必须将该 migration 在目标 Supabase 项目重新执行；否则远端仍是旧 RPC 签名。Workshop Tools 仍需用 `-Automation9001`、`http_fishing` 和 `survival_fishing_reward_fixture automation_9001` 实测奖励返回、永久效果刷新和公告。
+
+## 本次修复（2026-08-22）：在线检查点超时与断开连接处理
+
+- Python API 的默认 Supabase RPC 超时从 8 秒调整为 20 秒，当前 `.env` 同步为 20 秒；Dota HTTP Provider 的绝对超时调整为 30 秒，避免客户端与后端同时在 8 秒边界主动断开。
+- `server.py` 的响应写入现在捕获 `BrokenPipeError`/`ConnectionResetError`，客户端提前断开时只记录简短信息，不再产生次生线程 traceback。
+- 新增 Supabase RPC 超时单元测试；后端 22 项测试、Python 编译、Lua 5.1 语法、CSV 版本契约和限定 `git diff --check` 已通过。
+- 当前 CSV 权威源与启用奖励版本均为 `3`。仍需在目标 Supabase 项目直接检查 RPC、锁等待和实际延迟，并在 Workshop Tools 做断线/重连实机验证。
+
+## 当前任务（2026-08-22）：星之庇佑钓鱼奖励数据更新
+
+## 本轮实施（2026-08-23）：星之庇佑共享奖励定义与紧凑 Grant 契约
+
+- 新增 `D:\survival_database\supabase\migrations\202608230001_star_blessing_reward_definitions.sql`：创建星之庇佑定义集/定义表，同版本 hash 冲突、重复 ID、非 `star_blessing_*` ID 和非永久 scope 均失败关闭；先重编译 grant/checkpoint/heartbeat 依赖，再删除旧定义表。
+- 后端默认同步 `star_blessing_reward_definitions.csv`，调用 `sync_star_blessing_reward_definitions`；grant/checkpoint/heartbeat HTTP 不再返回 profile、effect、展示字段或 hash，只返回 `grant_id/reward_id/amount/definition_version`。
+- Lua 收到紧凑 grant 后按本地生成星之庇佑定义校验，再刷新玩家档案；档案快照和 `permanent_reward_effect_service` 投影完成后才发布 `FISHING_REWARD_GRANTED`。Automation9001 已改为 `star_blessing_automation_9001` + `hero_all_attributes_flat`。
+- 用户已在目标 Supabase 项目执行 `202608230001_star_blessing_reward_definitions.sql`；当前阶段进入 Workshop Tools HTTP Provider 联调。执行后仍需用 API 健康检查和定义同步日志确认迁移无误，并重启 API 使最新代码生效。
+- 联调命令保持为：`survival_player_profile_provider http_fishing`、`survival_fishing_api_token <本机FISHING_API_TOKEN>`、`survival_fishing_reward_fixture automation_9001`。`http_fishing` 是 Provider 名，`automation_9001` 是 Tools fixture 选择值；实际奖励 ID 才是 `star_blessing_automation_9001`。
+- 自动验证通过：Python 25 项 unittest、Python compileall、PowerShell `FISHING_REWARD_CONTRACT_PASS`、SQL 静态契约、目标 Lua `LUAC_PASS`、严格 UTF-8 和双仓限定 `git diff --check`。远端 migration 已由用户执行，但本轮尚未取得远端 SQL 执行结果，也尚未完成 Workshop Tools 实机验证。
+
+## 本轮实施（2026-08-23）：checkpoint 诊断与 Tools 快速触发
+
+- Python API `server.py` 现在对 `/v1/online-time/checkpoint` 记录非敏感摘要：`elapsed_seconds`、`online_seconds_total`、grant 数量和 reward ID；不记录账号、Token 或 `grant_id`。
+- Lua checkpoint 增加响应、grant 本地校验、档案刷新、永久投影、grant 发布和公告日志。Automation9001 的 `hero_all_attributes_flat` 投影值会在 `profile_refresh_completed` 中输出；公告由 `star_blessing_reward_service` 单独发布，旧 `fishing_reward_service` 忽略 `star_blessing_*`，避免重复公告。
+- 新增 Tools-only 命令 `survival_online_checkpoint_now [player_id]`，精确要求 `IsInToolsMode()`、`survival_fishing_reward_fixture=automation_9001`、`survival_player_profile_provider=http_fishing` 和已有 HERO_READY session；命令只触发既有 checkpoint 函数。
+- 自动验证通过：Python 26 项 unittest、Python compileall、`ONLINE_TIME_DEBUG_CHECKPOINT_LUA51_PASS`、目标 Lua `luac5.1 -p`、`FISHING_REWARD_CONTRACT_PASS`、严格 UTF-8 和双仓限定 `git diff --check`。仍未完成 Workshop Tools 实机 grant、永久属性、公告和重复 grant_id 验收。
+- 真实 API/Supabase 探针通过：同 session 首次响应 `elapsed_seconds=0/online_seconds_total=0/grants=[]`，约 11 秒后响应 `elapsed_seconds=11/online_seconds_total=11` 并返回 Automation9001 grant；相同 request ID 重放保持同一业务响应，profile revision 保持 1 且 `save.permanent_effects.hero_all_attributes_flat=5`。这确认数据库 grant、永久聚合和请求幂等，但不等于 Workshop Tools 实机验证。
+- API 已在本轮代码后以 `start_fishing_api.ps1 -Automation9001` 重启，当前监听 `127.0.0.1:8765`；新日志已输出安全摘要。下一步在 Workshop Tools 的 HERO_READY 后执行 `survival_online_checkpoint_now 0`，观察 Lua 阶段日志、英雄逻辑三维 +5、全员公告及重复响应不重复发布。
+
+## 本轮实机结果（2026-08-23）：Workshop Tools checkpoint 已贯通至 grant 返回
+
+- 用户在 Workshop Tools 的 HERO_READY 会话中执行 `survival_online_checkpoint_now 0`；`0` 已确认是正确的 Dota `PlayerID` 槽位参数，Lua 内部通过 `PlayerResource:GetSteamAccountID(0)` 解析永久账号身份，不应改传 Steam ID。
+- 实机日志确认在线时长链路有效：`online_seconds_total` 从 `476`、`596` 增长到 `656`，并出现 `elapsed_seconds=60`；这证明 Tools -> Lua -> HTTP Provider -> Python API -> Supabase 的身份、租约和累计逻辑已实际工作。
+- API 实机日志 `checkpoint_response elapsed_seconds=60 online_seconds_total=656 grant_count=6 reward_ids=test_hero_attack_flat` 确认 Supabase 在一次检查点返回了 6 个 grant；从 596 到 656 跨过 600、610、620、630、640、650 六个 10 秒里程碑，数量符合 Automation9001 的间隔计算。
+- 当前不是“没有 grant”，而是服务端返回的 `test_hero_attack_flat` 与 Lua Automation9001 本地权威定义预期的 `star_blessing_automation_9001` 不一致；因此 Lua 本地 `validated_grant_count` 预计为 0，不应继续到档案刷新、永久属性投影、`grant_published` 和全员公告。
+- 本次已完成 Workshop Tools 到服务端 grant 返回的实机联调；尚未完成星之庇佑奖励定义一致性、Lua `hero_all_attributes_flat=5`、全员公告和重复 grant 发布去重验收。当前服务端/数据库 definition version 9001 的实际定义仍需核对，不能记录为完整奖励功能验收。
+
+- 用户确认删除错误且尚未接入的 `通用存档` 内容；已删除临时 `archive_reward_definitions.csv`，不再保留独立通用存档配置。
+- 桌面文件 `C:\Users\UserComputer\Desktop\通关存档效果(1).csv` 实际是 ZIP/OOXML 工作簿而非文本 CSV，已直接解析其中唯一工作表，恢复 26 条星之庇佑/钓鱼奖励。
+- 已用这 26 条工作簿记录重写 `data/csv/玩家档案系统/fishing_reward_definitions.csv`，保留名称、进度、识别状态、效果和原始数值；工作簿未提供权重，暂按每条 `weight=1`。
+- 已接入且启用的效果仅包括当前服务/字段能明确消费的初始木材、墙生命、英雄全属性、墙伤害格挡、金矿效率、每秒木材、伐木工攻速、伐木效率和英雄攻击减甲；其余效果保留在 CSV 但 `enabled=0`，备注标记待接入。
+- 定义版本已提升为 `3`；本轮未生成 `fishing_reward_definitions.lua`，未修改钓鱼运行时、数据库或 Supabase 定义。
 
 ## 当前插入任务（2026-08-21）：局内钓鱼抽奖系统
 
@@ -354,7 +409,7 @@
 ## 当前插入任务（2026-08-21）：局内钓鱼抽奖系统
 
 - 已读取用户提供的 `D:\tooltip文件夹\钓到物奖励效果统计.csv`。文件实际是 WPS OLE/BIFF 工作簿而非文本 CSV，已通过 WPS COM 只读提取 `Sheet1`：原始 27 条记录、出现次数合计 129。
-- 已按确认口径整理为项目权威 `data/csv/挑战与奖励系统/fishing_reward_definitions.csv`：删除待复核 B 级条目，修订 `鬼索子` 为伐木工攻速提高 4 倍、普通 `金枪鱼` 为伐木工攻速+5%，正式池 26 条、总权重 128；基础数据全部来自 CSV。该表属于局内奖励，不写入数据库；局外 HTTP 钓鱼仍属于玩家档案域。
+- 已按确认口径整理为项目权威 `data/csv/玩家档案系统/fishing_reward_definitions.csv`：删除待复核 B 级条目，修订 `鬼索子` 为伐木工攻速提高 4 倍、普通 `金枪鱼` 为伐木工攻速+5%，正式池 26 条、总权重 128；基础数据全部来自 CSV。
 - 新增独立 `systems/fishing_service.lua`，不复用局外 HTTP/档案钓鱼服务。首次难度选择成功事件后启动计时，0 秒不抽奖，之后每 480 秒遍历在线玩家并独立按权重抽奖；结果通过 `UI_NOTIFICATION` 的 `audience="all"` 全体播报。
 - 奖励投影复用资源事务、`TECHNOLOGY_STATS_ROGUE_ADD_REQUEST` 和现有建筑列表/实体接口；持续金币/木材由局内服务按秒结算，墙生命奖励保留到后续新建墙。`fish <reward_id|random>` 已接入作弊命令。
 - 自动验证通过：配置生成成功、26 条/128 权重/无待复核行/局内间隔 480 秒、Lua 5.1 行为测试 `FISHING_SERVICE_PASS`、目标 Lua 语法 `FISHING_FINAL_LUA_PASS` 和限定 `git diff --check`。尚未进行 Workshop Tools 冷启动、多人实机播报和实体效果验收。
@@ -789,9 +844,9 @@
 - 首版实现完整快照、`revision/update_id`增量、幂等、迟到更新拒绝、版本缺口要求重新拉取，以及现有`player_entitlement_service`原子投影。未来HTTP Provider必须复用同一JSON解析、schema校验和提交入口。
 - 自动验证至少包含Lua 5.1 JSON/快照/增量行为、PowerShell契约、CSV生成与JSON生成一致性、现有商城权益回归、Lua 5.1语法、严格UTF-8和限定`git diff --check`。Workshop Tools验证只确认引擎初始化与NetTable发布，不等同远端数据库验证。
 - 首版生产实现已完成：统一JSON解码、Fixture Provider、完整快照、增量事务、账号绑定、代际去重、旧快照/迟到回调拒绝、VIP失败关闭、服务端完整档案查询、公开白名单NetTable及变更元事件均已接入。VIP CSV默认值已从测试期true改为false；只有验证通过的档案可授予。
-- 当前样本账号：玩家0=`mock_account_10001`（VIP、N2、120成就分），玩家1=`mock_account_10002`（非VIP、N1、0分），玩家2/3为预留非VIP空样本。详细协议和后续HTTP/数据库迁移见`docs/ai/PLAYER_PROFILE_INTEGRATION.md`。
-- 尚未实施：真实Steam身份解析、Mock HTTP、正式数据库、支付回调、存档写回和长期库存投影。仍需Workshop Tools冷启动确认主入口加载、VIP商城链及公开NetTable；自动测试不得描述为引擎或远端验证。
-- 最终自动验证通过：`PLAYER_PROFILE_SERVICE_LUA51_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、多人阶段1三项回归、5份CSV及生成Lua逐字节一致、生成索引一致、Fixture JSON/Lua一致、14个目标Lua的`luac5.1`语法、24个本轮文件严格UTF-8、新增docs行编码、5份CSV结构、Python语法及限定`git diff --check`。这些结果不等于Workshop Tools、双客户端或后端实机验证。
+- 已归档（2026-08-12）样本账号：玩家0=`mock_account_10001`（VIP、N2、120成就分），玩家1=`mock_account_10002`（非VIP、N1、0分），玩家2/3为预留非VIP空样本；这些仅属于`local_fixture`，不代表正式Steam账号。
+- 已归档的旧限制：当时尚未实施真实Steam身份解析、Mock HTTP和正式数据库。当前真实HTTP、Supabase和Steam身份链路已接入；支付回调、存档写回和长期库存投影仍未完成。
+- 已归档的自动验证记录：`PLAYER_PROFILE_SERVICE_LUA51_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`等历史结果不等于Workshop Tools、双客户端或后端实机验证；当前验证边界以本文件顶部为准。
 
 ## 当前实施任务（2026-08-11）：第7塔路线由魔法塔重构为防空塔
 
@@ -1329,3 +1384,9 @@
 - 已完成：`feast`领取时记录实际固定增加量；城墙等级/科技重算在正常生命结果上加回该固定值，不按后续等级重复乘2，也不会在重复重算时叠加。
 - 新增`tools/test_feast_wall_health_projection.lua`，直接验证正常等级生命1500加固定1000得到2500、20%科技只乘等级基础生命得到2800、后续等级与重复重算均只携带原固定值一次，并验证玩家隔离。
 - 自动验证通过：`FEAST_WALL_HEALTH_PROJECTION_LUA51_PASS`、五卡handler固定增量断言、肉鸽运行时/奖励服务回归、建筑批量升级契约、本批目标Lua 5.1语法和`git diff --check`；尚未执行Workshop Tools实机残血升级验收。
+## 本轮实施（2026-08-23）：生产星之庇佑定义同步与一分钟 Tools 测试
+
+- 新增 `D:\survival_database\supabase\migrations\202608230002_sync_star_blessing_v3.sql`，由权威 `star_blessing_reward_definitions.csv` 生成并同步 definition version `3`、26 条启用奖励，SHA-256 为 `4842c33bf94962584d11ddeab709c73e3053cacc499017e26ea8c6a18a16de3b`；若数据库已有冲突的 version `3`，事务失败并回滚，不覆盖不可变定义。
+- 旧 definition version `9001` 保留为历史测试版本，不再尝试修改其 `test_hero_attack_flat` 数据。新增后端 `fishing_system_rules_60s.csv`，只在 `start_fishing_api.ps1 -Workshop60Seconds` 时使用生产奖励 CSV + 固定 60 秒奖励间隔；生产 `fishing_system_rules.csv` 仍保持最高 600 秒。
+- Tools 命令 `survival_online_checkpoint_now 0` 现在允许 `survival_fishing_reward_fixture=production_60s`，但仍要求 Tools Mode、`http_fishing` 和 HERO_READY session。该 ConVar 值只放行调试命令；Lua 奖励校验继续读取生产生成定义。
+- 后端 27 项单元测试通过。用户仍需在目标 Supabase 执行新 SQL、用 `-Workshop60Seconds` 重启 API，并在全新 Workshop Tools session 设置 `survival_fishing_reward_fixture production_60s` 后完成实机奖励、档案投影和公告验收。

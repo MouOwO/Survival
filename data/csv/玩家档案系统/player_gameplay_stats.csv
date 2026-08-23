@@ -1,4 +1,4 @@
-﻿field_id,storage_type,default_value,unit,min_value,max_value,enabled,notes
+field_id,storage_type,default_value,unit,min_value,max_value,enabled,notes
 #中文表头:字段ID,存储类型,临时默认值,单位,最小值,最大值,是否启用,备注
 #types:string,string,number,string,number,number,boolean,string
 initial_wood,integer,10,wood,0,,1,玩家初始木材数量。
@@ -15,6 +15,7 @@ hero_basic_attack_growth,decimal,1,attack_per_attack,0,,1,英雄每次普通攻�
 hero_final_damage_bonus_pct,percentage,0,percent,0,10000,1,英雄最终伤害增加百分比；15表示15%。
 hero_attack_armor_reduction,decimal,0,armor,0,,1,英雄攻击附带的初始减甲量。
 hero_attribute_growth,decimal,1,attribute_per_growth,0,,1,英雄攻击三围成长量。
+hero_attributes_per_second,decimal,0,attributes_per_second,0,,1,星之庇佑每秒增加的英雄全属性。
 hero_critical_damage_bonus_pct,percentage,0,percent,0,10000,1,英雄暴击伤害增加百分比；25表示25%。
 hero_attack_bonus_pct,percentage,0,percent,0,10000,1,英雄攻击力加成百分比；20表示20%。
 hero_health_bonus_pct,percentage,0,percent,0,10000,1,英雄生命值加成百分比；20表示20%。
@@ -26,6 +27,7 @@ tower_attack_armor_reduction,decimal,0,armor,0,,1,防御塔攻击附带的减甲
 tower_critical_chance_pct,percentage,0,percent,0,100,1,防御塔暴击几率百分比；15表示15%。
 tower_attack_interval,decimal,1.7,seconds,0.01,,1,防御塔攻击间隔，单位为秒。
 tower_final_damage_bonus_pct,percentage,0,percent,0,10000,1,防御塔最终伤害增加百分比；15表示15%。
+tower_attack_per_second,decimal,0,attack_per_second,0,,1,星之庇佑每秒增加的防御塔攻击力。
 wall_damage_block,decimal,0,damage,0,,1,城墙每次抵挡的固定伤害。
 wall_damage_reduction_pct,percentage,0,percent,0,100,1,城墙伤害减免百分比；20表示20%。
 wall_armor_bonus_pct,percentage,0,percent,0,10000,1,城墙防御力加成百分比；20表示20%。

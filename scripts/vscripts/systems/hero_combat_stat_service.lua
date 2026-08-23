@@ -260,6 +260,7 @@ local function recalculate(player_id, reason)
     local essence_attack_pct = tonumber(essence.attack_bonus_pct) or 0
     researcher_armor_reduction = researcher_armor_reduction
         + (tonumber(essence.armor_reduction_per_attack) or 0)
+        + (tonumber(permanent.hero_attack_armor_reduction) or 0)
     local essence_attributes_pct = tonumber(essence.all_attributes_pct) or 0
     local engine_research_attack_bonus = (((state.engine_base_attack_min
         + state.engine_base_attack_max

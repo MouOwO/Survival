@@ -30,6 +30,7 @@ local function new_account()
         gold_fraction = 0,
         debug_mode = false,
         initialized = false,
+        profile_initial_wood = 0,
     }
 end
 
@@ -88,12 +89,24 @@ local function initialize_from_profile(payload)
     local player_id = normalized_player_id(payload and payload.player_id)
     if player_id == nil then return false end
     local account = get_account(player_id)
-    if account.initialized then return true end
     local stats = gameplay_stats(player_id)
     if not stats then return false end
+    local profile_initial_wood = math.max(0, tonumber(stats.initial_wood) or 0)
+    if account.initialized then
+        local delta = profile_initial_wood - (tonumber(account.profile_initial_wood) or 0)
+        if delta > 0 then
+            account.wood = account.wood + delta
+            account.profile_initial_wood = profile_initial_wood
+            publish(player_id, "profile_initial_wood_reward")
+        end
+        account.wood_per_second = math.max(0, tonumber(stats.wood_per_second) or 0)
+        account.gold_per_second = math.max(0, tonumber(stats.gold_per_second) or 0)
+        return true
+    end
     account.team = PlayerResource and PlayerResource.GetTeam
         and PlayerResource:GetTeam(player_id) or nil
-    account.wood = math.max(0, tonumber(stats.initial_wood) or config.initial_wood)
+    account.profile_initial_wood = profile_initial_wood
+    account.wood = config.initial_wood + profile_initial_wood
     account.gold = math.max(0, tonumber(stats.initial_gold) or config.initial_gold)
     account.max_population = math.max(0,
         tonumber(stats.initial_population_cap) or config.initial_max_population)

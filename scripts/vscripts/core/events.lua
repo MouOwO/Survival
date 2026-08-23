@@ -230,6 +230,7 @@ local M = {
     PERMANENT_REWARD_EFFECTS_GET_REQUEST = "permanent_reward.effects.get.request",
     PERMANENT_REWARD_EFFECTS_CHANGED = "permanent_reward.effects.changed",
     FISHING_REWARD_GRANTED = "fishing.reward.granted",
+    UI_NOTIFICATION = "ui.notification",
 
     ROGUE_REWARD_OPEN_REQUEST = "rogue.reward.open.request",
     ROGUE_REWARD_SELECT_REQUEST = "rogue.reward.select.request",

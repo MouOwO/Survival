@@ -1,17 +1,18 @@
 # Decisions
 
-## 2026-08-23：罪渊复用练功房刷新、碰撞与AI路径
+## 2026-08-23：多人联调保持 API loopback，采用主机 Dota 拓扑
 
-- 决定：罪渊成员`seven_sins_minion`通过`encounter_members.csv.collision_profile=practice`加入冰霜之地、熔火核心低阶房已使用的共享路径；识别依据只允许是成员profile，禁止在生成器中继续保留`challenge_10`专用位置分支。
-- 决定：罪渊单标记生成锚点最多向入口方向内移192，先应用练功房Hull 12，再执行`FindClearSpaceForUnit()`；最终落点是各怪物700索敌、1200脱战和步行回归的home。不得恢复固定槽位、双半径环形刷新、精确位置覆盖或越界传送。
-- 决定：本次只统一空间、碰撞、AI和维护行为。罪渊仍维持10只、死亡0.5秒补满，怪物战斗Profile不变，七宗罪精华仍使用原40%概率、权重、地面落点与不限数量规则。
+- 决定：LAN 联调时由主机运行 Dota、Lua、Python API 和 Supabase 访问；其他玩家只加入主机的 Dota 对局，不直接调用主机 Python API。
+- 决定：继续保持 Python API 绑定 `127.0.0.1:8765`，不得为方便双机测试直接暴露到 `0.0.0.0`。
+- 原因：Lua 服务端是 API 的调用方，客户端没有直接访问数据库或 API 的必要；维持 loopback 可以缩小认证和网络暴露面。若需求改变，LAN API 暴露必须另行设计认证、网络限制、防火墙和 TLS。
+- 决定：生产双玩家验收必须使用两个不同 Steam 账号，并把本局 `PlayerID` 与数据库永久身份分离；生产测试不得使用 Automation/Workshop fixture 启动参数。
 
-## 2026-08-23：英雄弹道速度采用巫师之刃风格的动态Modifier投影
 
-- 决定：`hero_attack_projectiles.csv`继续作为英雄目标弹速和攻击能力的权威源；当前Shadow Fiend与Drow Ranger的目标弹速均为3000。远程英雄使用隐藏永久、不可驱散、死亡不移除的`modifier_survival_hero_projectile_speed`，通过`MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS`和`GetModifierProjectileSpeedBonus()`投影到原生普通攻击弹道。
-- 决定：Modifier加成按`目标弹速-首次读取并缓存的原生基础弹速`动态计算，重复应用只更新同一实例，必须先扣除旧加成，禁止把已经加成后的运行值当作新的原生基准。不同原生弹速的英雄因此可以同时得到最终3000；不能直接照搬巫师之刃固定`+300`。
-- 决定：不创建真实隐藏巫师之刃物品，避免占用背包、进入装备/库存/合成/Tooltip/存档链。`SetProjectileSpeed(3000)`只保留为Modifier读回异常时的兼容兜底，正常路径优先由原生Modifier属性提供速度。
-- 决定：近战攻击能力不附加弹速Modifier；远程Modifier刷新后必须重新读回并输出`configured/native/bonus/modifier/fallback/before/after`诊断字段。自动契约和Lua模拟测试不能宣称实际引擎弹道已验收，Workshop Tools必须完全冷启动后单独确认。
+## 2026-08-23：删除旧局内钓鱼持久化，在线奖励使用独立 checkpoint
+
+- 决定：删除 `fishing_states`、`fishing_sessions`、`fishing_idempotency`、`heartbeat_fishing_session(...)` 及其 Python/Lua HTTP 入口；旧 `save.fishing` 档案分区不再发布。该决定覆盖下方 2026-08-20 和 2026-08-17 中复用旧 heartbeat 的设计。
+- 决定：永久在线计时与星之庇佑继续由 `online_time_sessions`、`online_time_idempotency` 和 `checkpoint_online_time(...)` 负责；`reward_grants`、`player_effect_totals`、星之庇佑定义表、档案永久效果与玩法字段完整保留。
+- 原因：局内钓鱼奖励已经与在线永久奖励分离，保留两套 session、幂等和计时状态会形成重复入口与错误恢复风险。数据库清理通过新增前向迁移完成，历史迁移保持审计记录不改写。
 
 ## 2026-08-20：玩家属性数据库使用 HMAC 身份和 CSV 默认值
 
@@ -19,11 +20,11 @@
 - 决定：玩家 35 个玩法属性以 `player_gameplay_stats.csv` 为唯一临时默认值源，生成 Lua、Python API 初始化 payload、Lua Fixture 校验和 PostgreSQL 字段类型/范围均从这份 CSV 对齐。
 - 原因：避免将可复用的本局槽位误当永久账号，也避免数值在 SQL、Lua 和客户端之间出现第二套硬编码；HMAC 伪名保留跨局稳定查询能力并降低数据库泄露时的直接身份暴露。
 
-## 2026-08-20：永久在线时长只累计租约内相邻心跳
+## 2026-08-20：永久在线时长只累计租约内相邻 checkpoint
 
-- 决定：`online_seconds_total` 使用整数秒保存永久累计值，唯一增量来自同一 `session_id` 且上次心跳未超过租约的相邻心跳差值；首次心跳、新 session、超租约和离线间隔不计入。
-- 决定：`heartbeat_fishing_session()` 在同一事务内先检查 `request_id` 幂等记录，再锁定 session 和玩家统计行并累计；响应中的 `elapsed_seconds` 保留钓鱼奖励语义，不作为在线时长输入。
-- 原因：墙钟时间不能区分有效在线与掉线，客户端上报计时也不可信；复用服务端 session 租约、玩家行锁和已有 idempotency 表可以避免重试、并发接管和 API 重启导致重复累计。
+- 决定：`online_seconds_total` 使用整数秒保存永久累计值，唯一增量来自同一 `session_id` 且上次 checkpoint 未超过租约的相邻 checkpoint；首次、新 session、超租约和离线间隔不计入。
+- 决定：在线 checkpoint 在同一事务内先检查请求幂等记录，再锁定在线 session 和玩家统计行并累计；响应中的 `elapsed_seconds` 只表示本次在线累计差值。
+- 原因：墙钟时间不能区分有效在线与掉线，客户端上报计时也不可信；独立在线 session、玩家行锁和在线幂等表可以避免重试、并发接管和 API 重启导致重复累计。
 
 ## 2026-08-18：所有新技能统一走 CSV 到自定义 Tooltip 的完整接入流程
 

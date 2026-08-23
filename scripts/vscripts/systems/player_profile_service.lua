@@ -409,7 +409,7 @@ function M.apply_snapshot(player_id, snapshot, reason)
     return { ok = true, account_id = account_id, revision = snapshot.revision }
 end
 
-function M.load_player(player_id, reason)
+function M.load_player(player_id, reason, on_success, on_error)
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
@@ -452,6 +452,9 @@ function M.load_player(player_id, reason)
         result.pending = false
         if not result.ok then
             logger.warn("PlayerProfile", tostring(result.error))
+            if type(on_error) == "function" then on_error(result.error) end
+        elseif type(on_success) == "function" then
+            on_success(result)
         end
     end, function(fetch_error_message)
         if load_generation_by_player[player_id] ~= generation or completed then
@@ -460,6 +463,7 @@ function M.load_player(player_id, reason)
         completed = true
         result = { ok = false, pending = false, error = tostring(fetch_error_message) }
         logger.warn("PlayerProfile", tostring(fetch_error_message))
+        if type(on_error) == "function" then on_error(result.error) end
     end)
     if not fetch_ok and load_generation_by_player[player_id] == generation
         and not completed then
@@ -469,6 +473,7 @@ function M.load_player(player_id, reason)
             pending = false,
             error = "provider_fetch_failed:" .. tostring(fetch_error),
         }
+        if type(on_error) == "function" then on_error(result.error) end
         logger.warn("PlayerProfile", result.error)
     end
     if completed then

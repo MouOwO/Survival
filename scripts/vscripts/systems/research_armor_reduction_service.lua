@@ -80,6 +80,14 @@ local function on_main_attack_landed(payload)
         technology and technology.final and technology.final.hero
             and technology.final.hero.armor_reduction_per_attack
     ) or 0
+    local permanent = event_bus.request(
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    reduction = reduction + tonumber(
+        permanent and permanent.totals
+            and permanent.totals.hero_attack_armor_reduction
+    ) or 0
     if reduction <= 0 then
         if diagnostic then
             print(string.format(

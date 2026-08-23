@@ -2,13 +2,35 @@
 
 > 这是新会话的唯一恢复入口。当前只恢复多人联机工程；旧任务全部暂停并已归档。
 
-## 最新任务检查点（2026-08-20）
+## 当前恢复重点（2026-08-23）
 
+- 当前卡点是 Supabase migration 核对和生产双玩家端到端联调，不是 API 是否需要对 LAN 客户端开放。
+- 推荐拓扑：主机运行 Dota、Lua、Python API（`127.0.0.1:8765`）和 Supabase 访问；其他电脑只加入主机的 Dota 对局。
+- 不得将 API 改绑到 `0.0.0.0`。如需客户端直接访问 API，必须单独设计认证、网络限制、防火墙和 TLS。
+- 下一步顺序：按依赖核对并执行 `D:\survival_database\supabase\migrations\202608230006*.sql`、`202608230007*.sql`；生产模式启动 API；主机冷启动 Workshop Tools/生产大厅；使用两个不同 Steam 账号执行双玩家验收。
+- 双玩家验收范围：首次建档、独立 session/累计值、300 秒 checkpoint、600 秒奖励、断线和对局结束结算、重连恢复、跨玩家隔离、重复 `grant_id`/`request_id`、API 重启。
+- 生产测试不得带 `-Automation9001` 或 `-Workshop60Seconds`。自动测试、模拟测试和单玩家 Tools 结果不能记为生产双玩家验收。
+
+## 最新任务检查点（2026-08-23）
+
+- 最新诊断：里程碑 502 的数据库根因是旧 `checkpoint_online_time` 生成的 grant ID 未包含 `definition_version`，奖励定义切换后可能与历史 `reward_grants` 冲突。已新增 `D:\survival_database\supabase\migrations\202608230006_include_definition_version_in_online_grant_id.sql` 和契约覆盖；当前 `.env` key 对 Supabase REST 返回 401，尚未确认真实冲突行或远端迁移状态。
+
+- 已复核首次登录账号链路：真实`http_fishing` Provider通过服务端`GetSteamAccountID()`调用`POST /v1/profile`；Python/Supabase在同一请求内幂等创建新账号或返回已有档案。当前缺口是正式商品/支付、稀疏可选字段协议、多电脑独立主机和真实Steam账号冷启动回归，详见`PLAYER_PROFILE_INTEGRATION.md`与`CURRENT_TASK.md`。
+
+- 已确认生产60秒 checkpoint 的直接根因是 Lua 每次 Workshop Run 复用 `game-1-player-0` 及相同序号 request ID，Supabase 幂等表重放历史响应而未进入当前里程碑循环。runtime nonce 修复已通过 Lua 5.1、语法、Fishing 契约、严格 UTF-8 和限定 diff 检查；Workshop Tools 回归已出现 `grant_count=1 validated_grant_count=1`，证明 version 3 grant 已被 Lua 接受。剩余检查是档案刷新、永久效果、公告和重复 grant 发布去重。
 - 玩家数据库字段链路已新增 `online_seconds_total`：CSV、生成 Lua、Python 初始化、Supabase schema/RPC、Lua 档案补字段和心跳累计契约均已更新。
 - 自动验证通过：Python 16 项单元测试、在线时长模拟边界、`GAMEPLAY_STATS_CONTRACT_PASS`、`PLAYER_PROFILE_CONTRACT_PASS`、Lua 5.1 档案行为、目标 `luac5.1`、严格 UTF-8、CSV/生成 Lua 一致和限定 `diff --check`。
 - 真实 Supabase 与本机 Python API 已于 2026-08-20 联调通过：Automation 9001 启动同步定义成功，`/v1/profile` 返回 36 个 CSV 字段；首次心跳累计 0、同 session 租约内约 2 秒累计 2、重复 `request_id` 不重复累计、活跃租约拒绝新 session、超租约新 session 不累计离线间隔，最终 profile/revision 一致且公开数据不含 `gameplay_stats`。测试进程已停止，Workshop Tools HTTP Provider 实机联调仍待执行。
+- 用户已在目标 Supabase 项目执行 `202608230001_star_blessing_reward_definitions.sql`。当前进入 Workshop Tools HTTP Provider 联调阶段；`survival_player_profile_provider http_fishing` 和 `survival_fishing_reward_fixture automation_9001` 保持原值，实际奖励 ID 为 `star_blessing_automation_9001`。
+- 本轮已增加 API checkpoint 非敏感摘要日志，以及 Tools 专用 `survival_online_checkpoint_now [player_id]` 立即请求命令。命令仅在 Tools Mode、fixture=`automation_9001`、Provider=`http_fishing` 且玩家已有 session 时执行，仍完整经过 Python API、Supabase RPC、档案刷新、永久效果投影和公告链路。
+- 真实 loopback API -> Supabase 探针已通过：首次 checkpoint 为 0 秒无 grant，间隔约 11 秒后返回 `star_blessing_automation_9001`/version 9001/amount 5，累计 11 秒；相同 request ID 重放不增加累计或 revision，profile 为 revision 1、`hero_all_attributes_flat=5`。API 已用 `-Automation9001` 重启并保持监听 `127.0.0.1:8765`。
+- 2026-08-23 Workshop Tools 实机已确认 checkpoint 链路可达服务端 grant：`survival_online_checkpoint_now 0` 使用正确的 Dota `PlayerID`，在线累计从 `596` 到 `656` 秒时 API 返回 `grant_count=6`。但返回 ID 为旧的 `test_hero_attack_flat`，不是 Automation9001 预期的 `star_blessing_automation_9001`；Lua 因本地 grant 校验不匹配尚未完成永久属性与公告投影。因此当前状态是“实机 checkpoint/grant 返回成功，奖励定义同步未完成”，不是完整奖励验收。
+
+- 已生成 `D:\survival_database\supabase\migrations\202608230002_sync_star_blessing_v3.sql`，用于按权威 CSV 发布生产 definition version 3 的 26 条奖励；另新增 `-Workshop60Seconds` + `production_60s` Tools-only 一分钟验证模式，生产 600 秒规则未改。旧 9001 不可变且不再覆盖。用户尚未执行新 SQL，也尚未进行该模式的 Workshop Tools 实机验证。
 
 ## 当前任务
+
+- 2026-08-23旧局内钓鱼数据库持久化删除已完成代码实施和自动验证：清理迁移为`D:\survival_database\supabase\migrations\202608230003_remove_legacy_fishing_persistence.sql`，Python/Lua heartbeat入口已移除，星之庇佑在线checkpoint和永久奖励链路保留。下一步唯一外部动作是先在目标Supabase执行该迁移，再做Workshop Tools冷启动回归；不得把本地契约或Lua模拟称为数据库/引擎实机验证。
 
 - 当前插入任务（2026-08-20，高级伐木工“效率”综合采集量加成自动验证完成）：`ability_lumberjack_personality_efficiency`已从攻击间隔减少30%改为当前综合采集量增加30%。基础、树等级、科技和固定加成先汇总，按伐木工实体累计小数余数后发放整数木材，暴击/10倍倍率保持后置；CSV、生成Lua、统一Tooltip和六份本地化已同步。专项Lua 5.1行为/契约、伐木工融合契约、语法、生成一致、严格UTF-8和限定diff通过；下一步Workshop Tools冷启动验收实际产量、浮字和Tooltip。
 - 当前插入任务（2026-08-19，练功房怪物碰撞 profile 自动验证完成）：正式地面波次怪继续使用CSV权威Hull 32；四个练功房成员由`encounter_members.csv.collision_profile=practice`显式归类，使用独立CSV规则Hull 12并保留单位间碰撞。练功房创建时关闭默认clear-space，先应用12 Hull再显式`FindClearSpaceForUnit()`，其他挑战成员保持原放置时序。专项契约、Lua 5.1行为/语法、18列CSV schema、定向生成逐字节一致、严格UTF-8和限定diff通过；下一步Workshop Tools冷启动分别观察正式波次与四个练功房的初始站位和移动拥挤，自动验证不等于引擎实机验收。
@@ -44,7 +66,7 @@
 - 已完成插入任务（2026-08-12，用户实机验收通过）：`combat_stats.js`无有效选中单位分支已从不存在的`refreshOfficialReturnHomeHotkey()`改用现有`refreshOfficialUtilityHotkeys([])`，保留后续1秒刷新。专项契约、严格UTF-8、限定diff通过，`combat_stats.vjs_c`定向编译为`1 compiled, 0 failed, 0 skipped`；用户确认Workshop Tools中不再出现该ReferenceError，任务关闭。
 
 - 当前插入任务（2026-08-11，生产实现与自动验证完成）：基础箭塔/路线计数及并发预占已改为玩家作用域；七塔合一支持每玩家最多5座终极塔，材料不消耗且每座永久仅参与一次；齐天大圣R整组原子迁移全部终极塔并保留相对位置；任意已完工城墙死亡一次性触发全队失败，施工墙和主城不直接失败。专项Lua 5.1/契约、语法、生成一致、UTF-8/BOM和限定diff通过；下一步Workshop Tools完全冷启动实机验收，详见`CURRENT_TASK.md`顶部。
-- 当前实施任务（2026-08-12）：外围玩家档案本地Fixture纵向切片已完成生产实现，包含CSV schema/公开白名单/开发账号映射、JSON Fixture生成、统一Provider、完整快照与增量revision/update_id、异步generation、VIP失败关闭、服务端私有档案和公开NetTable。专项Lua 5.1与契约已通过；真实HTTP、数据库、支付、Steam身份和写回尚未实现。下一步冷启动Workshop Tools验证玩家0 VIP、玩家1非VIP和公开表字段；详细协议见`PLAYER_PROFILE_INTEGRATION.md`。
+- 已归档（2026-08-12，历史基础）：外围玩家档案本地Fixture纵向切片已完成生产实现，包含CSV schema/公开白名单/开发账号映射、JSON Fixture生成、完整快照与增量revision/update_id、异步generation、VIP失败关闭、服务端私有档案和公开NetTable。真实HTTP、Supabase和Steam身份链路随后已接入；当前状态以本文件顶部和`PLAYER_PROFILE_INTEGRATION.md`为准。
 - 逐波模型加载经验已沉淀到`WAVE_MODEL_LOADING_TROUBLESHOOTING.md`，包括W12 Visage告警的确定根因、CSV优先原则、正式/dev/出生统一解析、session租约、urgent并行、禁止误用`asset_preload.retire()`、复发排查顺序和未来逐波换模清单。用户2026-08-11后续观察中暂未再发现加载问题；只能记为阶段性有效，新增模型后仍需冷启动分别验证`monster<N>`与正式波次。
 - 当前插入任务（2026-08-11）：闪电魔塔击杀风暴已改为死亡点500范围即时单次物理伤害，LV1至LV5使用触发时塔攻击快照110%/120%/130%/140%/150%；每目标只受伤和发布一次`TOWER_LIGHTNING_HIT`。随后一秒内5/6/7/8/9道雷柱仅作视觉，不查询敌人、不伤害、不触发扩散。原塔归因、风暴连锁击杀及独立雷电扩散30%/200%/非递归规则保留。CSV、生成Lua、Tooltip和六份本地化已同步；专项Lua 5.1行为/契约、相关回归、5个Lua语法、生成逐字节一致、配置CheckOnly、UTF-8/BOM和限定diff通过。下一步Workshop Tools冷启动实测即时伤害时点、物理护甲结果、纯视觉雷柱数量、扩散和连锁风暴，尚未实机验收。
 - 当前插入任务（2026-08-11）：`ability_tooltip.js:997` 的几何诊断越作用域 `active.engineSlot` 已修正为函数参数 `binding.engineSlot`，并强制重编译 `ability_tooltip.vjs_c`。源码/产物作用域契约、输入生命周期契约、严格UTF-8和限定diff通过；完整内存生命周期契约仍被既有无关`SURVIVAL_UI_CONTEXT_GUARD_MISSING`阻断。下一步完全冷启动Workshop Tools确认不再出现`active is not defined`，尚未实机验收。
@@ -113,7 +135,7 @@
 
 ## 最后可靠检查点
 
-- 2026-08-20真实 Supabase/Python API 联调已通过，证明两份 migration 的核心表、5个RPC、Secret key权限、档案初始化和在线时长租约/幂等语义可用。Automation 9001 已向当前测试项目同步定义；默认`local_fixture`档案路径与生产禁用奖励保持不变。尚未执行Workshop Tools HTTP Provider双客户端、重连和API重启实机，不得宣称游戏端上线。
+- 2026-08-23 已完成一次 Workshop Tools HTTP Provider 到 Supabase grant 返回的实机检查；但远端返回旧奖励 ID `test_hero_attack_flat`，仍需修复/核对 definition version 9001 后再验证 Lua 永久效果、公告、重复 grant、重连和 API 重启，暂不得宣称游戏端奖励上线。
 - 同日后端与Supabase文件已迁到独立`D:\survival_database`仓库，生产CSV仍只在addon。Python经`SURVIVAL_ADDON_ROOT`读取CSV，并以独立pepper对Steam Account ID做HMAC后入库；目标仓库提供loopback安全启动脚本和9001 fixture开关。本机`.env`现已配置真实 Project URL 与新版 Secret key，凭据只保存在该忽略文件且不得进入Lua、聊天或Git。
 - 2026-08-12玩家档案Fixture纵向切片代码与自动测试完成；已增加公开投影成功日志，可直接核对玩家0/1的Fixture账号、revision及公开白名单字段。VIP权威CSV默认关闭，Mock账号验证后再投影。尚未Workshop Tools实机验证，也未接HTTP/数据库。
 - 2026-08-12 Game/Content物理目录已统一为全小写`survival`，用户Workshop Tools实机确认小地图正常显示。旧混合大小写资产索引备份仍位于`C:\Users\UserComputer\AppData\Local\Temp\survival_file_mod_backup_20260812_151927`；该问题已关闭，不再恢复为活跃迁移任务。
@@ -135,7 +157,7 @@
 
 ## 下一步唯一动作
 
-完全冷启动Workshop Tools：启动`start_fishing_api.ps1 -Automation9001`，在服务端设置`survival_player_profile_provider http_fishing`、`survival_fishing_api_token <本机FISHING_API_TOKEN>`和`survival_fishing_reward_fixture automation_9001`，验证真实Steam Account ID档案加载、相邻心跳累计、重复请求、断线重连、API重启和Supabase故障恢复。生产奖励CSV仍全禁用，不得作为正式奖励验收；Automation 9001 仅限Tools Mode。
+先核对目标 Supabase 的 definition version `9001` 实际奖励行和 `checkpoint_online_time` 当前函数，确保返回 `star_blessing_automation_9001`；然后重启 API、使用新 session 再执行 `survival_online_checkpoint_now 0`，验证 Lua `validated_grant_count`、`hero_all_attributes_flat=5`、`grant_published`、一次全员公告及重复 grant 不重复投影。最后再验证断线重连、API 重启和 Supabase 故障恢复。生产奖励 CSV 仍全禁用；Automation9001 仅限 Tools Mode。
 
 ## 恢复顺序
 

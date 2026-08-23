@@ -1,5 +1,13 @@
 # Known Issues
 
+## 2026-08-23：Supabase 迁移与生产双玩家联调尚未完成
+
+- 当前可复现的工程阻塞是：独立数据库仓库中的 `202608230006`、`202608230007` migration 尚未确认在目标 Supabase 按依赖顺序执行；在确认前不能把本地 SQL 契约、Python 测试或单玩家 Tools 结果当作生产数据库验收。
+- 生产双玩家端到端测试尚未完成，待覆盖两个不同 Steam 账号的建档、独立 session/累计值、300 秒 checkpoint、600 秒奖励、断线/对局结束结算、重连恢复、跨玩家隔离、重复 `grant_id`/`request_id` 和 API 重启。
+- 当前 API 仅监听 `127.0.0.1:8765`。这意味着其他电脑不能直接调用 API，但不阻断其他玩家通过 LAN 加入主机 Dota 对局；直接 API 访问需求必须另立安全设计任务。
+- 生产联调必须省略 `-Automation9001` 和 `-Workshop60Seconds`；fixture 模式只用于自动化或 Tools 快速验证。
+
+
 ## 2026-08-13：神秘塔升级边界的particles.dll空读崩溃待实机复验
 
 - 两份当前minidump均为`particles.dll`近同偏移的空指针读取访问冲突，且发生在基础箭塔约1秒转职为神秘塔的完成边界；没有native符号栈，因此不能仅凭偏移唯一证明具体引擎对象。
@@ -14,6 +22,11 @@
 - 需要在Hammer中补充可靠边界点或直接把确认后的坐标写入CSV，再通过`tools.build_configs.py`生成配置，才能启用严格白名单。当前兼容修复仍需Workshop Tools冷启动验证Grid显示、合法建造和区域拒绝红格反馈。
 
 ## 当前已知问题
+
+0. **在线奖励跨 Workshop Run 的幂等 ID 复用已修复；后续维护必须保持唯一性。**
+   - 旧问题：Lua `generation` 每次重启从0开始，重复生成 `game-1-player-0` 及相同序号 request ID；Supabase 幂等表会返回旧响应，看似累计在线但不执行当前奖励里程碑。
+   - 当前修复：`scripts/vscripts/systems/online_time_service.lua` 在模块生命周期生成 runtime nonce，并将其纳入 `session_id`；测试覆盖同 session 稳定、request ID 递增和重新初始化不复用。
+   - 维护规则：不要改回仅依赖内存 generation 的 ID；调试时先检查 API 返回的 `definition_version`/`reward_id`，再检查 Lua 的 `validated_grant_count`。`grant_count=1 validated_grant_count=1` 表示 grant 已通过本地定义校验，但不等于永久效果和公告已完成验收。
 
 0. **addon根目录大小写迁移已完成，小地图实机恢复；自动契约仍有旧哈希产物残留。**
    - 2026-08-12 Game/Content物理目录已统一为全小写`survival`，用户Workshop Tools实机确认小地图正常显示。根因是物理目录`Survival`与编译资源`dota_addons/survival`的file-mod身份冲突；后续不得恢复大写目录，也不得通过并存目录、复制或junction创建第二个身份。

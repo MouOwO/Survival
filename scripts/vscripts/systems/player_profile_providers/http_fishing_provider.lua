@@ -25,7 +25,7 @@ local function request(path, payload, on_success, on_error)
         "application/json; charset=utf-8", json_encoder.encode(payload)
     )
     if type(http.SetHTTPRequestAbsoluteTimeoutMS) == "function" then
-        http:SetHTTPRequestAbsoluteTimeoutMS(8000)
+        http:SetHTTPRequestAbsoluteTimeoutMS(30000)
     end
     http:Send(function(response)
         local status = tonumber(response and response.StatusCode) or 0
@@ -69,10 +69,6 @@ end
 
 function M.online_checkpoint(payload, on_success, on_error)
     request("/v1/online-time/checkpoint", payload, on_success, on_error)
-end
-
-function M.heartbeat(payload, on_success, on_error)
-    request("/v1/fishing/heartbeat", payload, on_success, on_error)
 end
 
 function M.rule()

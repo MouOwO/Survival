@@ -20,6 +20,7 @@ end
 
 local function reward_definition(payload)
     local reward_id = tostring(payload and payload.reward_id or "")
+    if string.match(reward_id, "^star_blessing_") then return nil end
     local definition_version = tonumber(payload and payload.definition_version)
     for _, row in ipairs(active_reward_definitions().rows or {}) do
         if tostring(row.reward_id or "") == reward_id

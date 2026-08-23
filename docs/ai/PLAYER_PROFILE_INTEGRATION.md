@@ -2,7 +2,17 @@
 
 ## 目标与当前状态
 
-本模块为付费权益、成就、长期存档和公开玩家信息提供可替换的数据接入层。当前完成的是本地Fixture纵向切片：运行时接口、JSON协议、校验、版本控制、权益投影和公开NetTable均已落地；尚未实现真实HTTP、数据库、支付回调或游戏结果写回。
+本模块为付费权益、成就、长期存档和公开玩家信息提供可替换的数据接入层。运行时接口、JSON协议、校验、版本控制、权益投影和公开NetTable已经落地；真实HTTP与Supabase数据库的玩家档案纵向链路也已接入并完成本机真实联调。支付回调、正式商品发货、游戏结果写回和多电脑独立主机验收仍未完成。
+
+当前首次登录协议是“查询并确保建档”而不是先查询再注册：Lua服务端在档案加载时从`PlayerResource:GetSteamAccountID(player_id)`取得稳定Steam Account ID，调用`POST /v1/profile`。Python边界将该身份转换为HMAC伪名后调用`ensure_player_gameplay_stats`；不存在的账号在数据库事务中创建，已存在的账号幂等跳过创建，随后返回同一份档案快照。客户端不能提交或决定账号身份。
+
+真实信任链固定为：
+
+```text
+Dota服务端Lua -> 127.0.0.1 Python API -> HTTPS Supabase PostgreSQL
+```
+
+`D:\survival_database`中的API只监听loopback，因此第二台电脑作为加入者不需要运行API；若第二台电脑也独立主持游戏，则必须部署API并使用同一Supabase项目、同一个`FISHING_ACCOUNT_ID_PEPPER`，否则同一Steam账号会被计算成不同数据库身份。
 
 当前权威源：
 
@@ -23,8 +33,8 @@
 ## 身份边界
 
 - `player_id`只表示当前比赛中的Dota玩家槽位，会随每局变化，禁止作为永久档案主键。
-- `account_id`是档案协议中的永久键。当前Fixture使用`mock_account_*`。
-- 正式环境仍需选择：直接使用Steam Account ID，或由后端把Steam Account ID映射为自有账号ID。
+- `account_id`是Lua档案协议中的稳定键。正式HTTP Provider使用服务端解析的Steam Account ID字符串；Supabase内部的`player_id`则是该ID经过独立pepper计算的64位小写HMAC-SHA256文本。
+- 数据库不保存原始Steam Account ID。`FISHING_ACCOUNT_ID_PEPPER`必须长期稳定、单独备份且只存在Python服务端环境；更换它会让所有现有玩家看起来像新账号。
 - 无论采用哪一种，Lua只消费稳定字符串`account_id`；同一局中同一`account_id`不能绑定两个`player_id`。
 - 客户端提交的`player_id/account_id`都不能作为身份凭证。正式Provider必须从服务器可信的玩家连接身份解析账号。
 
@@ -148,7 +158,7 @@ end
 
 ## 私密与公开数据边界
 
-完整档案只存在Lua服务端内存。当前唯一公开表是：
+完整档案只存在Lua服务端内存。HTTP返回的完整档案不能直接发布到客户端；当前唯一公开表是：
 
 - NetTable：`survival_player_public_profiles`
 - Key：当前局`player_id`
@@ -180,6 +190,20 @@ end
 
 Fixture Lua不能放入`config/generated/`，因为CSV全量生成器会清理该目录中的非CSV模块。
 
+## 首次登录与字段语义
+
+- `POST /v1/profile`同时承担首次建档和已有账号读取，成功响应必须包含`schema_version`、`account_id`、`revision`以及协议要求的分区。
+- `player_gameplay_stats`是局内启动数值，当前由`player_gameplay_stats.csv`提供完整默认值，数据库列为非空字段；首次建档会返回36个玩法字段，不是稀疏字段集合。
+- 可选业务分区（例如成就、库存、外观和非核心资料）可以采用稀疏JSON：只有有内容的字段才返回。`0`、`false`和空字符串若是有效业务值，不能因为“看起来为空”而省略。
+- 客户端必须把“字段不存在”与数值`0`、布尔值`false`区分处理。`null`是否表示删除或未配置必须由具体分区协议声明；核心玩法字段不使用`null`代替默认值。
+- 账号根记录、档案revision、商品权益、订单和库存不应合并成一个不可审计JSON blob。商品系统应使用订单幂等、权益账本和当前投影。
+
+## 商品与账号后续边界
+
+- 商品购买请求必须由服务端校验Steam身份对应的账号、商品定义、价格和订单幂等键；客户端不能声明“支付成功”或直接授予商品。
+- 推荐将永久权益、可消耗库存、限时订阅和一次性礼包分开建模，并明确退款、撤销、过期和重复回调语义。
+- 游戏结果写回应使用`match_completed`、`achievement_progressed`或`save_checkpoint`等语义事件，由后端计算最终档案；禁止接受客户端任意JSON Patch。
+
 ## Mock HTTP与正式后端迁移顺序
 
 ### 阶段A：只读Mock HTTP
@@ -207,12 +231,14 @@ Fixture Lua不能放入`config/generated/`，因为CSV全量生成器会清理�
 - 账号表、档案快照、权益账本、成就进度、存档、支付订单和幂等事件应分层建模；不要把完整档案只存成一个不可审计JSON blob。
 - 权益建议使用不可变账本/来源记录加当前投影，支持退款、撤销、到期和客服审计。
 - 数据库revision必须在同一事务中递增，并与事件/更新ID唯一约束绑定。
-- 正式上线前必须确定Steam Account ID直用还是映射自有账号ID。
+- 当前正式身份决策已确定：Lua协议使用服务端Steam Account ID字符串，数据库使用`FISHING_ACCOUNT_ID_PEPPER`计算的HMAC伪名；后续商品系统不得另造第二套身份键。
 
 ## 当前限制与实机验证
 
-- 当前没有真实HTTP、数据库、支付或写回。
-- `mock_player_account_bindings.csv`只是开发映射，不验证Steam身份。
+- 真实Supabase/Python API联调已通过：首次`/v1/profile`会创建账号并返回36个CSV玩法字段；已有账号会读取同一档案。已覆盖初始化、在线时长、幂等和公开数据隔离。
+- Workshop Tools已实际确认HTTP Provider能够通过Lua、Python API和Supabase返回在线检查点grant；但完整账号冷启动、断线重连、API重启、多Steam账号并发首次建档和第二台电脑独立主机仍需专项验收。
+- `mock_player_account_bindings.csv`只是本地Fixture映射，不验证真实Steam身份；使用`local_fixture`时不能把它描述为正式账号登录。
+- 当前尚无正式支付回调、订单发货、游戏结果写回或库存长期投影。
 - `save`首版只读保留，未覆盖现有单局`hero_progression_system`或内容库存，避免把外围长期存档错误注入局内状态。
 - 自动测试证明Lua 5.1模拟和静态契约，不等于Workshop Tools引擎验证。
-- Workshop Tools冷启动需确认：玩家0加载`mock_account_10001`后VIP商城链有效；玩家1加载`mock_account_10002`后VIP入口保持锁定；`survival_player_public_profiles`只有白名单字段；控制台没有Lua异常。
+- Workshop Tools下一轮需确认：真实Steam账号首次建档、同账号二次登录读取原revision、两个Steam账号互不串档、API不可用时的失败策略、`survival_player_public_profiles`只有白名单字段，以及控制台没有Lua异常。

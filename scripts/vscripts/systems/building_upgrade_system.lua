@@ -109,8 +109,15 @@ local function apply_research_technology(state)
         local base_damage = tonumber(state.research_base_attack_damage)
             or unit:GetBaseDamageMin()
         local tower = technology.tower or {}
-        local bonus = tonumber(tower.attack_flat) or 0
-        local bonus_pct = tonumber(tower.attack_bonus_pct) or 0
+        local permanent_result = event_bus.request(
+            events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+            { player_id = player_id }
+        )
+        local permanent = permanent_result and permanent_result.totals or {}
+        local bonus = (tonumber(tower.attack_flat) or 0)
+            + (tonumber(permanent.tower_attack_flat) or 0)
+        local bonus_pct = (tonumber(tower.attack_bonus_pct) or 0)
+            + (tonumber(permanent.tower_attack_bonus_pct) or 0)
         local damage = (base_damage + bonus) * (1 + bonus_pct / 100)
         unit:SetBaseDamageMin(damage)
         unit:SetBaseDamageMax(damage)
@@ -1175,6 +1182,8 @@ function M.init()
     event_bus.handle_request(events.BUILDING_UPGRADE_FREE_REQUEST, on_free_upgrade_request)
     event_bus.handle_request(events.TOWER_CLASS_REQUEST, on_class_request)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,
+        on_technology_stats_changed)
 end
 
 M._base_health_for_test = base_health

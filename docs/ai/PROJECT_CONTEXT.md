@@ -1,5 +1,13 @@
 # Project Context
 
+## LAN 多人联调与 API 安全边界（2026-08-23）
+
+- 当前架构的推荐 LAN 拓扑是：主机同时运行 Dota 对局、Lua 服务端逻辑、Python API 和 Supabase 访问；其他电脑只作为玩家加入主机的 Dota 对局，不直接访问 Python API。
+- Python API 默认绑定 `127.0.0.1:8765`，这是有意保留的安全边界。不要为了让其他电脑直接请求 API 而临时改成 `0.0.0.0`；这会扩大攻击面，且现有认证、网络限制、防火墙和 TLS 设计不足以支持该部署方式。
+- 玩家数据库身份必须由服务端 `PlayerResource:GetSteamAccountID()`取得，并通过共享 server-side pepper 派生；本局 `PlayerID` 只用于 Dota 槽位和本局命令参数，不能跨局或跨玩家作为数据库身份。
+- 生产双玩家联调应使用两个不同 Steam 账号，在主机创建生产测试大厅，验证账号创建/恢复、独立 session 与累计值、checkpoint/奖励、最终结算、重连、幂等、API 重启和跨玩家隔离。`-Automation9001`、`-Workshop60Seconds` 只属于 Tools/fixture 验证。
+- API 变更为 LAN 可访问地址必须作为独立安全设计任务处理，至少明确认证、允许网段、Windows 防火墙、请求重放防护和 TLS 方案，并增加对应部署与回归测试。
+
 ## 英雄原生Wearable预载经验（2026-08-20）
 
 - `ReplaceHeroWithNoTransfer()` 可能在英雄替换时实例化 Dota 原生默认 wearable；即使英雄主体和代理已预载，未声明的肩甲、手臂、头部、武器、披风等模型仍会产生 `nonresident model` 警告或加载时序问题。
@@ -14,17 +22,13 @@
 - 百分比字段使用百分点存储，`15` 表示 `15%`；整数资源/生命/攻击/积分使用 `bigint`，可带小数的速率、效率、护甲和攻击间隔使用 `numeric(20,6)`。百分比边界按 CSV 与 migration 约束执行。
 - `player_gameplay_stats` 由 `ensure_player_gameplay_stats` 首次幂等创建，属性进入档案私有 `save.gameplay_stats`，不得进入公开 NetTable。
 - `online_seconds_total` 是玩家永久累计在线总秒数，默认值来自同一份玩家属性 CSV。数据库心跳 RPC 只累计同一 `session_id` 租约内的有效相邻心跳差值；首次、新 session、超租约和掉线间隔均为 0，重复 `request_id` 返回已保存响应且不得再次更新统计。钓鱼响应中的 `elapsed_seconds` 仍是奖励倒计时差值，不是永久在线总时长。
+- 在线 checkpoint 的 `session_id` 必须包含每次 Lua/Workshop Run 生命周期生成的 runtime nonce；同一 session 内 `request_id` 递增，但跨 Run 不得复用旧 ID。否则 Supabase `online_time_idempotency` 会直接重放历史 JSON，绕过当前在线累计和奖励里程碑循环。production 60 秒联调的成功信号是服务端返回 version 3 奖励且 Lua 日志出现 `grant_count>0 validated_grant_count>0`；这只证明 grant 已被本地接受，档案刷新、永久效果、公告和重复发布仍需单独观察。
 - 当前真实 Supabase 项目已执行两份 migration，并于 2026-08-20 通过 Secret key + REST RPC 验证档案初始化、36字段、在线时长累计、幂等、租约排他、超租约接管、revision和公开数据隔离。Automation 9001 定义已同步到该测试项目；这不等于生产奖励启用，也不等于 Workshop Tools 实机通过。
 
 ## 正式波次与练功房怪物碰撞边界（2026-08-19）
 
-- `global_rules.csv.wave_ground_monster_hull_radius`只作为正式/默认地面怪基础Hull，当前为32；四个练功房以及已批准复用其刷新行为的冰霜之地、熔火核心低阶房和罪渊成员，必须由`encounter_members.csv.collision_profile=practice`显式识别，并读取独立的`practice_monster_hull_radius`，当前为12。不得通过硬编码遭遇ID、成员ID前缀或共享原型推断身份。
-- `practice` profile保留单位间碰撞，不启用`NO_UNIT_COLLISION`。由于`CreateUnitByName(..., true, ...)`会在创建阶段先按默认Hull执行clear-space，此profile必须关闭该默认行为，先应用Hull 12，再显式调用`FindClearSpaceForUnit()`；其他挑战成员维持原生成时序。后续若实机仍拥挤，必须由用户确认后再单独评估profile专属无单位碰撞，不能影响正式波次。
-
-## 维护数量挑战复用练功房刷新规则（2026-08-23）
-
-- 冰霜之地、熔火核心低阶房和罪渊均通过成员的`collision_profile=practice`复用练功房生成、碰撞与AI路径。仅当成员为`maintain_count`且地点只有一个生成标记时，生成锚点才允许沿“生成点到入口点”方向向内调整，最大192；随后先应用Hull 12，再由`FindClearSpaceForUnit()`分散，并以最终位置作为各自回归点。
-- 禁止为罪渊恢复固定槽位、300/460双半径环形位置、`SetAbsOrigin()`精确放置或边界传送。共享AI使用700索敌、1200脱战范围，丢失目标后步行回归。各房间原有成员身份、战斗Profile、10只上限、0.5秒补满和掉落规则保持独立；罪渊仍按原40%概率及既有权重掉落七宗罪精华。
+- `global_rules.csv.wave_ground_monster_hull_radius`只作为正式/默认地面怪基础Hull，当前为32；四个练功房成员必须由`encounter_members.csv.collision_profile=practice`显式识别，并读取独立的`practice_monster_hull_radius`，当前为12。不得通过硬编码遭遇ID、成员ID前缀或共享原型推断练功房身份。
+- 练功房保留单位间碰撞，不启用`NO_UNIT_COLLISION`。由于`CreateUnitByName(..., true, ...)`会在创建阶段先按默认Hull执行clear-space，练功房必须关闭该默认行为，先应用profile Hull，再显式调用`FindClearSpaceForUnit()`；其他挑战成员维持原生成时序。后续若实机仍拥挤，必须由用户确认后再单独评估练功房专属无单位碰撞，不能影响正式波次。
 
 ## 全部怪物碰撞与精英/Boss攻击范围统一（2026-08-15）
 
@@ -45,14 +49,14 @@
 - 11项性格定义以`lumberjack_personality_definitions.csv`为权威。超级LV1-LV7每次从完整池等概率随机挂载1项，允许重复；LV8无性格。超级攻击与基础采集量汇总材料基础值，科技和树等级增益按材料数量投影，每击成长的全局累计只提交一次，避免`n²`放大。
 
 
-## 持久化在线计时钓鱼奖励边界（2026-08-17）
+## 星之庇佑在线计时与永久奖励边界（2026-08-23）
 
 - 信任链固定为Dota服务端Lua -> 仅loopback监听且Bearer认证的Python API -> Supabase PostgreSQL。Steam Account ID由服务端`PlayerResource:GetSteamAccountID()`解析；Lua和客户端不得持有Supabase URL、service-role key或数据库凭据。
-- 局外 HTTP/档案钓鱼的表仍属于玩家档案域并参与数据库定义校验；局内钓鱼使用`data/csv/挑战与奖励系统/fishing_system_rules.csv`和`fishing_reward_definitions.csv`，只作为本局抽奖配置，不写入数据库。
-- 在线时间只由同一session租约内相邻心跳差值累计。首次、新session、超租约和离线时间均扣0秒；单账号只允许一个活动租约，异常断线最多等待15秒接管且等待期间冻结。
-- grant历史、永久聚合、档案revision、下个区间和幂等响应必须在`heartbeat_fishing_session()`一个数据库事务中提交。`reward_grants`不可变，`player_effect_totals`是当前投影；Lua使用同一request ID重试并按grant ID做同局应用去重。
+- `fishing_system_rules.csv`继续提供在线 checkpoint 间隔、租约、奖励间隔和定义版本；`star_blessing_reward_definitions.csv`是星之庇佑奖励 ID、权重、效果键、范围、叠加、上限和启用状态权威源。定义版本与 SHA-256 绑定且不可变；更改定义必须升版本。
+- 在线时间只由 `checkpoint_online_time(...)` 按同一 session 租约内相邻 checkpoint 差值累计。首次、新 session、超租约和离线时间均累计 0 秒；`online_time_sessions` 与 `online_time_idempotency` 是该链路独立状态。
+- 旧局内钓鱼 `fishing_states`、`fishing_sessions`、`fishing_idempotency`、`heartbeat_fishing_session(...)` 和 HTTP heartbeat 已于 2026-08-23 删除，不得恢复或用于在线时长。`reward_grants` 不可变，`player_effect_totals` 是永久效果当前投影；Lua 按 grant ID 做同局发布去重。
 - 永久效果通过`permanent_reward_effect_service`从既有已校验档案`save.permanent_effects`恢复，不能混入单局科技或挑战状态。当前适配键为英雄全属性/攻击、伐木工攻速百分比和金矿收益百分比。团队资源未玩家隔离前，禁止把玩家永久开局资源直接加入共享team账户。
-- 即时资源尚无数据库提交后Lua崩溃的持久投递ack，生产不得启用immediate奖励。当前三条歧义奖励全部禁用；生产池为空导致API启动失败是有意失败关闭。
+- 星之庇佑只允许永久奖励；即时资源不进入该定义表。生产池为空导致 API 启动失败是有意失败关闭。
 - 钓鱼grant必须由Lua按本地CSV生成定义复核版本、ID、效果、scope、enabled和整数数值范围。永久效果仅在中奖玩家档案快照及其独立永久投影成功后发布一次`FISHING_REWARD_GRANTED`；即时资源因当前账户仍是team-scoped而在共享账户写入前失败关闭。成功事件只含白名单业务字段，不能携带raw grant、账号、Token、档案或definition hash。
 - 钓鱼成功公告由`FISHING_REWARD_GRANTED`订阅者构造，只使用服务端玩家名、CSV `display_name`和已校验amount，并通过显式`UI_NOTIFICATION.audience="all"`广播。UI路由只有该显式值才调用`Send_ServerToAllClients`，其他通知继续定向；客户端只接收`message/level`。自动化fixture固定definition version 9001/10秒，Lua端仅在Tools Mode且`survival_fishing_reward_fixture=automation_9001`时加载。
 
@@ -477,9 +481,6 @@
 - `data/csv/英雄系统/hero_attack_projectiles.csv`同时是英雄弹道和攻击能力的权威源；`attack_capability`显式使用`melee`或`ranged`，禁止用0速度、空速度或极高速度隐式表达即时结算。
 - `hero_stat_adapter.lua`按该字段投影引擎能力。`melee`表示无飞行弹道、攻击前摇结束时由引擎直接结算；`ranged`继续消费`projectile_speed`和可选`projectile_model`。
 - 攻击能力与攻击距离是独立配置：近战能力仍可通过`modifier_survival_hero_attack_range`获得CSV指定的远距离。当前齐天大圣为`melee`且攻击/索敌1000；不应为了即时结算另写伤害或绕过原生普通攻击事件链。
-- 远程英雄的最终弹速投影使用隐藏永久`modifier_survival_hero_projectile_speed`和`MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS`；`GetModifierProjectileSpeedBonus()`返回`目标弹速-首次缓存的原生基础弹速`，禁止使用巫师之刃式固定加成，因为不同英雄的原生弹速不同。当前Shadow Fiend与Drow Ranger的CSV目标弹速均为3000。
-- `hero_stat_adapter.lua`必须保存`survival_native_projectile_speed`，在召唤、属性重算、装备刷新和热重载后更新同一Modifier而不是叠加新实例；正常路径由Modifier提供最终弹速，读回不等于配置目标时才移除Modifier并使用`SetProjectileSpeed(3000)`兜底。Setter是兼容回退，不是首选投影路径；近战英雄不得附加该弹速Modifier。
-- 弹速诊断必须同时记录`configured/native/bonus/modifier/fallback/before/after`。自动测试可证明动态加成、最终3000和刷新幂等，但不能替代Workshop Tools完全冷启动后的实际攻击弹道验证。
 
 ## 资源树承伤与箭塔目标规则（2026-08-03）
 

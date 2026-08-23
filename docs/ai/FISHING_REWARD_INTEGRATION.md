@@ -1,4 +1,4 @@
-# Fishing Reward Integration
+# Star Blessing Reward Integration
 
 ## Architecture
 
@@ -14,8 +14,8 @@ The trust path is fixed:
 
 ## Authoritative Data
 
-- `data/csv/挑战与奖励系统/fishing_system_rules.csv` owns the in-match fishing interval and definition version. It is local match configuration and is not persisted to the database.
-- `data/csv/挑战与奖励系统/fishing_reward_definitions.csv` owns the in-match reward IDs, weights, effect keys, ranges, stacking, caps, and enablement. It is separate from the out-of-match HTTP/profile fishing tables.
+- `data/csv/玩家档案系统/fishing_system_rules.csv` owns checkpoint timing, lease, reward interval, and definition version.
+- `data/csv/玩家档案系统/star_blessing_reward_definitions.csv` owns stable star blessing IDs, weights, effect keys, ranges, stacking, caps, and enablement.
 - Generated Lua files under `scripts/vscripts/config/generated/` are outputs and must not be edited directly.
 - A definition version is immutable. Reusing a version with a different SHA-256 hash is rejected by the database.
 
@@ -23,11 +23,10 @@ The current production CSV intentionally has no enabled rewards. Three recovered
 
 ## Timer And Transaction Semantics
 
-- A first heartbeat creates a timer without consuming time.
-- A later heartbeat consumes only the elapsed time since the previous heartbeat when it is from the same session and within the configured lease.
-- Disconnect stops Lua heartbeats. A heartbeat after the lease or from a new session consumes zero offline time, preserving the remaining duration.
-- One unique session row exists per Steam Account ID. A different session is rejected while the 15-second lease is active, preventing concurrent sessions from alternating ownership or double-counting. An abrupt disconnect may therefore wait up to one lease before reconnect takeover; the timer remains frozen during that wait.
-- Grant history, permanent aggregate update, profile revision increment, next 60-600 second interval, and idempotency response are committed by `heartbeat_fishing_session()` in one transaction.
+- A first online checkpoint establishes the current session without consuming time.
+- A later checkpoint increments `online_seconds_total` only for the same session within the configured lease. New sessions, expired leases, and offline gaps add zero seconds.
+- `checkpoint_online_time()` owns `online_time_sessions` and `online_time_idempotency`, grants each crossed reward milestone, and records an idempotent response in one transaction.
+- The retired in-match fishing path (`fishing_states`, `fishing_sessions`, `fishing_idempotency`, `heartbeat_fishing_session()`, and `/v1/fishing/heartbeat`) is removed by the latest cleanup migration. It is not part of online timing.
 - `reward_grants` is append-only application data; `player_effect_totals` is its current permanent projection.
 
 ## Runtime Projection
@@ -49,8 +48,8 @@ The grant subscriber emits `UI_NOTIFICATION` with `audience = "all"`. The announ
 
 ## Setup
 
-1. Create a Supabase project and run `D:\survival_database\supabase\migrations\202608170001_fishing_rewards.sql`, then `D:\survival_database\supabase\migrations\202608200001_player_gameplay_stats.sql`, in that order in the SQL editor.
-2. Confirm and enable at least one reward in `fishing_reward_definitions.csv`, incrementing `definition_version` whenever definitions change.
+1. Create a Supabase project and run the baseline migrations, then apply `D:\survival_database\supabase\migrations\202608230001_star_blessing_reward_definitions.sql` after the existing reward-grant and checkpoint migrations.
+2. Confirm and enable at least one reward in `star_blessing_reward_definitions.csv`, incrementing `definition_version` whenever definitions change.
 3. Regenerate the two Lua configs with the project config generator.
 4. Create `D:\survival_database\.env` from `D:\survival_database\.env.example`. Set `SURVIVAL_ADDON_ROOT` to this addon and keep the API token, account-ID pepper, and Supabase key server-only.
 5. Start the API from the independent database repository:
@@ -74,7 +73,9 @@ For isolated Workshop Tools testing, point Python to the fixture CSVs without ch
 & 'D:\survival_database\start_fishing_api.ps1' -Automation9001
 ```
 
-The fixture uses definition version `9001`, a fixed 10-second interval, and permanent `hero_attack_flat +5`. Immediate failure-closed behavior is covered by Lua tests rather than the database-backed fixture, so a committed immediate grant cannot block the permanent integration test. Lua accepts the matching test definition only when both `IsInToolsMode()` is true and the server ConVar `survival_fishing_reward_fixture` is exactly `automation_9001`. Never use this ConVar in production.
+The fixture uses definition version `9001`, a fixed 10-second interval, and permanent `hero_all_attributes_flat +5`. The Tools-only command `survival_online_checkpoint_now [player_id]` can trigger the existing checkpoint path immediately after HERO_READY. It requires Tools Mode, the exact `automation_9001` fixture, the `http_fishing` provider, and an existing player session. It does not bypass the Python API, Supabase RPC, profile refresh, permanent projection, or announcement path. Never use this ConVar or command in production.
+
+The API logs only checkpoint timing totals, grant count, and reward IDs. Lua logs the sequence `checkpoint_response`, `profile_refresh_started`, `profile_refresh_completed`, `grant_published`, and `reward_announced`; account IDs, tokens, and grant IDs are excluded from diagnostics.
 
 ## Validation Boundary
 
