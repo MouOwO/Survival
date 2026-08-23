@@ -1,5 +1,12 @@
 # Known Issues
 
+## 2026-08-24：Workshop Tools 终局未观察到 Survival final/API 回调
+
+- 可复现测试结果：对局约 74 秒进入 `DOTA_GAMERULES_STATE_POST_GAME`，Dota 控制台重复输出 `invalid order (19). Target NPC is dead.`，但未采集到 Survival 的 `game_end_final_requested`、`player_disconnect`、`HTTP final=true`、callback 完成或 API 业务请求日志。
+- 当前影响：无法确认客户端/引擎事件是否到达 `addon_game_mode.lua`，也无法确认 `online_time_service.finish()` 是否调用、HTTP Provider 是否发出请求、API 是否收到请求或 Supabase 是否完成结算；因此不能宣称 `FINALIZING -> CLOSED`、最终结算或 lease recovery 已通过。
+- `Target NPC is dead` 是原生无效订单提示，不应直接解释为在线服务失败原因。需要独立的 Survival 服务端日志或 API access log 证明业务链路断点。
+- 已知边界：`/health` 返回 HTTP 200 只代表 API 进程存活；健康检查不是本局请求验证。下一次测试必须保存同一时间窗口内的 Dota Lua 日志、API 请求摘要和后端日志，并使用 `player_id/account_id/session_id/sequence/final` 关联。
+
 ## 2026-08-23：Supabase 迁移与生产双玩家联调尚未完成
 
 - 当前可复现的工程阻塞是：独立数据库仓库中的 `202608230006`、`202608230007` migration 尚未确认在目标 Supabase 按依赖顺序执行；在确认前不能把本地 SQL 契约、Python 测试或单玩家 Tools 结果当作生产数据库验收。
@@ -232,3 +239,9 @@
 - 静态测试和Lua Mock只能证明调用顺序，不能证明Dota原生英雄初始化后会保留Setter结果；此前自动测试通过但实机失败，后续不得将Mock描述为引擎验证。
 - 已采用的规避方案：使用`MODIFIER_PROPERTY_HEALTH_BONUS`隐藏永久Modifier补足到CSV目标，因为现有真实装备生命加成已由实机证明有效。
 - 已解决：隐藏永久Modifier第二版已由用户在Workshop Tools中确认英雄血量正常。后续防回归时查看`[HERO_CONFIGURED_HEALTH]`中的`configured/native/bonus/engine_max/engine_current`，不得恢复直接Setter方案。
+
+## 2026-08-23：数据库后端测试中文路径编码回归
+
+- 可复现现象：运行 `D:\survival_database\backend\tests` 时，`test_match_reward_csv_is_rejected_by_out_of_match_backend` 将中文目录 `data/csv/玩家档案系统/fishing_reward_definitions.csv` 解析成乱码路径，导致 `FileNotFoundError`；当前测试还引用已从 addon 删除的旧 fixture。
+- 当前影响：后端 29 项单元测试中该项失败；独立 PowerShell `FISHING_REWARD_CONTRACT_PASS` 仍通过。该问题与 Supabase 远端 HTTP 401 是两个独立问题。
+- 处理边界：后续若修复，必须先确认测试应迁移到现行 `star_blessing_reward_definitions.csv` 还是保留历史 fixture；不能仅为通过测试恢复已删除业务数据。

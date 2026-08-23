@@ -1,3 +1,25 @@
+## 本轮实机结果（2026-08-24）：终局未观察到失败回调或 API 业务请求
+
+- 本次 Workshop Tools 对局约运行 `74` 秒后进入 `DOTA_GAMERULES_STATE_POST_GAME`；用户提供的日志只包含 Dota 原生 `Target NPC is dead` / `invalid order (19)`、终局统计和 Match signout 信息。
+- 当前没有观察到 Survival 业务日志 `game_end_final_requested`、`player_disconnect`、`HTTP final=true`、final callback 完成或 API checkpoint/final 请求摘要，因此本次不能证明 `FINALIZING -> CLOSED`、最终结算或数据库持久化发生。
+- `Target NPC is dead` 只能说明游戏代码向已死亡 NPC 执行了无效订单，不能作为在线 session 失败回调、断线回调或 API 失败的证据；它与 Survival finalization 链路暂时分开记录。
+- `http://127.0.0.1:8765/health` 返回 HTTP 200 只证明 API 进程可达，不证明本局 Lua 发出了业务 HTTP 请求，也不证明 Supabase 收到或提交了 final 请求。
+- 当前实机结论为“失败且断点未知”，不是“API 成功”或“终局 final 已完成”。由于没有业务请求日志，暂不能区分 game_end 入口未执行、日志未采集、Provider 未初始化、请求未发送，还是回调在请求后丢失。
+- 明日恢复顺序：先冷启动并确认服务端日志文件/控制台采集方式；再用单玩家最短复现确认 session 创建和 60 秒 checkpoint；随后分别观察 `game_end` 入口、HTTP 发出、HTTP 状态、callback 和 `final=true`；最后才恢复双玩家断线/重连与 180 秒 lease 测试。
+
+## 本轮实施（2026-08-24）：多人断线 session 隔离与 60 秒租约检查
+
+- 已将权威 `data/csv/玩家档案系统/fishing_system_rules.csv` 调整为 60 秒 online checkpoint、180 秒 online lease；奖励周期仍为 600 秒，并已通过生成器同步 `fishing_system_rules.lua`。
+- 在线服务现在区分 `ACTIVE`、`FINALIZING`、`CLOSED`；断线玩家的旧 session 从可重连表摘除但保留在 finalizing 表中，最终请求完成后关闭。重连可立即创建新的 `session_id`，永久累计时间仍由后端按账号/session 规则恢复，断线间隔不累计。
+- `player_disconnect` 继续只调用对应玩家的 `online_time_service.disconnect()`，没有新增 defeat 或全局 `GAME_FINISHED`；`game_end -> finish()` 仍逐玩家 final，重复 final 通过 session 状态和对象身份抑制。
+- 自动验证：`LUAC_PASS`、`ONLINE_TIME_DEBUG_CHECKPOINT_LUA51_PASS`、`CSV_GENERATED_FISHING_RULES_PASS`、`STRICT_UTF8_PASS` 和限定 `git diff --check` 通过。尚未启动本机 API，也未进行 Workshop Tools 双玩家断线/重连实机验收。
+
+## 本次修复（2026-08-23）：断开事件字段诊断与 game_end final 结算
+
+- 已根据 Workshop Tools 日志确认：checkpoint HTTP 已返回 200，游戏结束不应期待额外 player_disconnect；最终请求由 game_end -> online_time_service.finish() 发起。
+- player_disconnect 入口现在记录原始 PlayerID/playerid/userid/UserID 解析结果，并在没有直接 PlayerID 时尝试通过 PlayerInstanceFromIndex(userid) 回退解析；无法解析时明确记录 disconnect_ignored。
+- 在线服务增加 checkpoint 开始、session/provider/account 缺失、断开请求、在途 final 排队和 game_end final 入口日志；业务请求与 final 排队语义保持不变。
+- 自动验证：在线服务 luac5.1 和 FISHING_REWARD_CONTRACT_PASS 通过；完整 addon 的 luac5.1 仍被既有 initialize_services 超过 60 个 upvalue 限制阻断，尚不能称全文件语法通过。仍需 Workshop Tools 实机确认 game_end_final_requested、HTTP final=true、callback 完成和 API 收到单个 final 请求。
 ## 当前联调状态（2026-08-23）：多人生产联调阻塞
 ## 当前修复项（2026-08-23）：资源树、十宗罪预生成与箭塔手动选敌
 
@@ -1407,3 +1429,47 @@
 - 旧 definition version `9001` 保留为历史测试版本，不再尝试修改其 `test_hero_attack_flat` 数据。新增后端 `fishing_system_rules_60s.csv`，只在 `start_fishing_api.ps1 -Workshop60Seconds` 时使用生产奖励 CSV + 固定 60 秒奖励间隔；生产 `fishing_system_rules.csv` 仍保持最高 600 秒。
 - Tools 命令 `survival_online_checkpoint_now 0` 现在允许 `survival_fishing_reward_fixture=production_60s`，但仍要求 Tools Mode、`http_fishing` 和 HERO_READY session。该 ConVar 值只放行调试命令；Lua 奖励校验继续读取生产生成定义。
 - 后端 27 项单元测试通过。用户仍需在目标 Supabase 执行新 SQL、用 `-Workshop60Seconds` 重启 API，并在全新 Workshop Tools session 设置 `survival_fishing_reward_fixture production_60s` 后完成实机奖励、档案投影和公告验收。
+
+## 当前总计划（2026-08-23）：单问题单门禁推进多人与数据库
+
+用户已确认按“解决一个问题，再进入下一个问题”的顺序推进。当前不开发公网 HTTP 暴露，也不提前开发正式支付购买系统；每一阶段必须完成对应静态/自动/实机门禁后才能进入下一阶段。
+
+### 推进顺序与门禁
+
+1. **数据库迁移与生产状态核对**：核对独立仓库 `D:\survival_database` 的迁移依赖、执行顺序和目标 Supabase 远端状态，优先处理 `202608230006*.sql`、`202608230007*.sql` 及其前置迁移。门禁：远端函数、奖励定义版本和历史账本状态可核对；未完成前不作生产结论。
+2. **主机 API 与 Dota 对局冷启动**：主机运行 Dota/Lua、Python API（`127.0.0.1:8765`）并访问 Supabase，确认生产模式可启动。门禁：无 fixture 参数时地图正常进入，API 可用性和失败策略有明确日志。
+3. **双玩家房间加入**：使用两个不同 Steam 账号，在当前 Dota/Workshop Tools 版本实测主机创建对局、第二客户端加入的实际入口；不把 `connect` 或好友大厅假设当成已验证事实。门禁：两名玩家同时进入同一局，服务端分别识别玩家身份。
+4. **双玩家数据库隔离**：验证首次建档、独立 `session`、在线累计、checkpoint、600 秒奖励、断线/结束结算、重连、重复 `request_id`/`grant_id`、API 重启和跨玩家隔离。门禁：两个账号档案、revision、奖励和永久效果互不串线。
+5. **两人最小可玩切片**：逐项迁移仍按 team/global 保存的经济、Builder、建筑上限、英雄、城墙和波次状态；先完成两玩家而不是直接承诺四玩家。门禁：每名玩家可独立进行一轮核心玩法，空间共享、支援和 owner 规则符合既定设计。
+6. **多人结算与异常恢复**：验证玩家失败、胜利、支援归属、掉线、重连、主机/API/数据库异常和对局结束清理。门禁：状态生命周期、奖励归属和恢复策略可重复验证。
+7. **扩展到四玩家与性能回归**：在两人切片稳定后扩展东南西北四槽位，测试实体数量、网络同步、帧率和长局稳定性。门禁：四人局无跨玩家污染和不可接受性能退化。
+8. **正式商品/支付系统**：最后再设计商品、订单幂等、权益账本、发货、退款、撤销、过期和客服审计；商品定义继续以 CSV 为权威源。门禁：后端验签和事务链完成前，客户端不得授予付费权益。
+
+### 当前唯一动作
+
+先完成第 1 项：只读核对 `D:\survival_database\supabase\migrations` 的迁移依赖、目标状态和当前凭据可用性；若远端状态无法确认，记录为外部阻塞，不跳到下一项。
+## 第1项执行结果（2026-08-23）：远端 Supabase 状态暂无法确认
+
+- 已由本地代理只读检查 `D:\survival_database\supabase\migrations`：目标文件 `202608230006_include_definition_version_in_online_grant_id.sql` 与 `202608230007_finalize_online_time_session.sql` 均存在；本地迁移依赖顺序为基础奖励/玩家属性/奖励账本/在线 checkpoint/奖励定义/清理/属性修复后，再执行 006、007。
+- 已检查 `D:\survival_database\.env`：`SUPABASE_URL`、`SUPABASE_SECRET_KEY`、`FISHING_ACCOUNT_ID_PEPPER` 均已配置；只确认存在和格式前缀，未输出秘密值。
+- 已对目标 Supabase REST 进行只读查询：奖励定义、`reward_grants`、`online_time_sessions`、`online_time_idempotency` 以及可能的迁移记录表均返回 HTTP `401 Unauthorized`。因此当前不能证明 006/007 已在目标项目执行，也不能读取真实函数定义或历史账本。
+- 本地 `FISHING_REWARD_CONTRACT_PASS` 通过；Python 单元测试 29 项中 28 项通过，1 项因测试直接拼接中文目录路径后乱码，找不到已删除的旧 fixture `fishing_reward_definitions.csv`。该失败不代表远端数据库失败，也未修改测试迎合。
+- 当前门禁状态：**第1项未通过，原因是远端凭据/项目授权阻塞**。不得进入主机冷启动或生产双玩家结论。
+
+### 需要的外部动作
+
+- 由项目所有者在 Supabase Dashboard 确认当前 Project URL 与 Secret key 属于同一个项目，并生成/提供一个当前有效的 `sb_secret_...` key；密钥不要发送到聊天中，可直接更新 `D:\survival_database\.env`。
+- 或者由项目所有者在目标 Supabase SQL Editor 执行只读核对：确认 `public.checkpoint_online_time` 同时存在七参数和八参数签名，七参数函数定义包含 `:star:v` 与 `p_definition_version`，八参数函数定义包含 `p_final` 和删除对应 `online_time_sessions` 的逻辑；同时核对奖励定义版本和 migration 执行记录。
+- 凭据修复后由本地代理重新执行只读 REST 探针；在确认远端状态前不执行 migration，避免重复或顺序错误。
+## 第1项复核结论（2026-08-23）：跳过凭据配置动作，保留远端状态风险标记
+
+- 用户确认此前数据库曾经成功连接，认为当前不应重复配置 `SUPABASE_URL` 与 `SUPABASE_SECRET_KEY`。第二轮只读探针验证：Supabase 根 URL 返回 HTTP 404（域名可达），REST 根路径和目标表在仅 `apikey`、`apikey + Authorization` 两种请求下均返回 HTTP 401。
+- 结论：跳过“让用户重新配置 URL/key”的人工动作；但不能把远端 migration 状态记录为已确认。当前已完成本地 migration 文件、依赖、契约和 API 调用链核对，远端 006/007 仍标记为“未验证”。
+- 进度策略：不让 REST 401 阻断后续 Dota 主机冷启动和房间加入验证；真正需要数据库读写时，使用本地 API 的实际请求结果作为下一处门禁。若生产 API 仍因 Supabase 认证失败，则回到数据库凭据/项目授权问题单独处理。
+## 第1项实机结果（2026-08-23）：202608230007 已在远端生效
+
+- 用户已在目标 Supabase SQL Editor 执行 `D:\survival_database\supabase\migrations\202608230007_finalize_online_time_session.sql`。
+- 真实 API 日志确认 `FISHING_API_READY http://127.0.0.1:8765`，首次 checkpoint 返回 `200`、`elapsed_seconds=0`、`online_seconds_total=4163`、`grant_count=0`；同一 session 后续 checkpoint 返回 `200`、`elapsed_seconds=4`、`online_seconds_total=4167`、`grant_count=0`。
+- 该结果证明带 `p_final` 的八参数 `checkpoint_online_time` RPC 已被 Supabase/PostgREST 发现并成功执行，之前的 `PGRST202` 已解决；首次不累计、同 session 只累计相邻在线差值均符合规则。
+- `grant_count=0` 正常：当前正式奖励间隔为 600 秒，本次只累计约 4 秒，未达到奖励里程碑。
+- 当前门禁状态：`202608230007` 远端执行和 API checkpoint 基础链路通过；`202608230006` 的 definition-version grant ID 逻辑仍需在奖励触发前或 SQL Editor 中单独确认，不能随 007 一起标记完成。

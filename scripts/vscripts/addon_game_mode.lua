@@ -283,7 +283,24 @@ local function on_player_connected(keys)
 end
 
 local function on_player_disconnected(keys)
-    local player_id = tonumber(keys.PlayerID or keys.playerid)
+    keys = keys or {}
+    local direct_player_id = tonumber(keys.PlayerID or keys.playerid)
+    local userid = tonumber(keys.userid or keys.UserID)
+    local player_id = direct_player_id
+    if player_id == nil and userid ~= nil
+        and type(PlayerInstanceFromIndex) == "function" then
+        local player = PlayerInstanceFromIndex(userid)
+        if player and type(player.GetPlayerID) == "function" then
+            player_id = tonumber(player:GetPlayerID())
+        end
+    end
+    print("[OnlineTime] disconnect_event player_id=" .. tostring(player_id)
+        .. " direct_player_id=" .. tostring(direct_player_id)
+        .. " userid=" .. tostring(userid))
+    if player_id == nil or player_id < 0 then
+        print("[OnlineTime] disconnect_ignored reason=player_id_unresolved")
+        return
+    end
     require("systems/fishing_reward_service").disconnect(player_id)
     require("systems/online_time_service").disconnect(player_id)
 end

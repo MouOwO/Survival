@@ -1,5 +1,11 @@
 # AI Session Recovery - Start Here
 
+## 最新失败检查点（2026-08-24）：Workshop Tools 未观察到终局业务回调
+
+- 本次实机对局约 74 秒后进入 `DOTA_GAMERULES_STATE_POST_GAME`；用户提供的日志只有 Dota 原生 `invalid order (19). Target NPC is dead.` 和终局 signout 信息，没有 Survival 的失败回调或 API 业务请求证据。
+- 当前不要把这次结果解释为 Supabase lease 过期、数据库拒绝或 `FINALIZING` 逻辑失败，因为尚未证明 Lua 进入 `game_end`/`player_disconnect` 入口，更尚未证明 HTTP 请求发出。
+- `/health` HTTP 200 仍只代表 API 进程存活。下一次恢复时先确认 Dota 服务端业务日志确实被保存，再逐层验证 session、checkpoint、game_end、final HTTP 和 callback；暂缓双玩家 race 与 180 秒 lease 验收。
+
 > 这是新会话的唯一恢复入口。当前只恢复多人联机工程；旧任务全部暂停并已归档。
 
 ## 当前恢复重点（2026-08-23）
@@ -172,3 +178,21 @@
 8. 仅需历史证据时读取`docs/ai/SESSION_LOG.md`和`docs/ai/archive/`
 
 恢复后先向用户复述当前阶段、最后检查点、未知项和下一步，再修改代码。
+
+## 当前执行计划（2026-08-23）
+
+- 用户确认采用单问题单门禁顺序：数据库状态核对 → 主机 API/Dota 冷启动 → 双玩家房间加入 → 双玩家数据库隔离 → 两人最小玩法切片 → 异常恢复与结算 → 四玩家性能回归 → 正式商品/支付。
+- 当前唯一动作是第 1 项数据库迁移与远端状态核对；未完成该门禁前，不修改 API 绑定、不进行公网暴露、不开发支付发货 schema。
+- 推荐拓扑保持不变：主机运行 Dota、Lua、`127.0.0.1:8765` Python API 和 Supabase 访问；加入者只加入主机 Dota 对局。
+## 第1项状态（2026-08-23）
+
+- 本机 migration 文件核对完成，远端 Supabase 只读查询全部返回 `401 Unauthorized`，所以 `202608230006`、`202608230007` 是否执行仍未知。
+- 当前阻塞是目标 Supabase 凭据/项目授权，不是局域网或 Dota 房间问题。下一步先修复同项目有效 key，或由用户在 SQL Editor 完成只读核对；未确认前不进入生产 API/双玩家验收。
+## 第1项复核结论（2026-08-23）
+
+- 不重复要求用户配置 Supabase URL/key；根 URL 可达，但 REST 当前返回 401，因此远端 migration 只记为未验证，不伪造“已执行”结论。
+- 按用户确认，下一步可进入主机 API/Dota 冷启动和房间加入验证；数据库真实读写仍受 401 风险门禁约束，生产双玩家数据库验收不能提前宣称通过。
+## 最新验证（2026-08-23）：007 checkpoint RPC 已恢复
+
+- 用户执行 `202608230007_finalize_online_time_session.sql` 后，生产 API checkpoint 连续返回 `200`；首次累计 0 秒，后续同 session 累计约 4 秒，当前未达到 600 秒奖励阈值。
+- `PGRST202` 已解决。下一项只需确认 `202608230006` 的 definition-version grant ID 逻辑，然后再进入主机冷启动/双玩家房间验收；不要把本次 4 秒 checkpoint 结果描述为奖励验收。

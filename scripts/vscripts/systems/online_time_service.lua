@@ -7,7 +7,9 @@ local production_definitions = require("config/generated/star_blessing_reward_de
 
 local M = {}
 local sessions = {}
+local finalizing_sessions = {}
 local generation = 0
+local session_sequence = 0
 
 local function runtime_id()
     local parts = {}
@@ -29,6 +31,9 @@ local runtime_nonce = runtime_id()
 local task_id = "online_time_checkpoint"
 local debug_command_registered = false
 local checkpoint
+local SESSION_ACTIVE = "ACTIVE"
+local SESSION_FINALIZING = "FINALIZING"
+local SESSION_CLOSED = "CLOSED"
 
 local function convar(name)
     if not Convars or type(Convars.GetStr) ~= "function" then return "" end
@@ -88,12 +93,24 @@ end
 local function complete_checkpoint(player_id, state, final)
     state.in_flight = false
     if final then
-        sessions[player_id] = nil
+        state.status = SESSION_CLOSED
+        if sessions[player_id] == state then
+            sessions[player_id] = nil
+        end
+        if finalizing_sessions[player_id] == state then
+            finalizing_sessions[player_id] = nil
+        end
+        print("[OnlineTime] session_closed player_id=" .. tostring(player_id)
+            .. " session_id=" .. tostring(state.session_id))
         return
     end
     if state.final_requested then
         state.final_requested = false
         checkpoint(player_id, true)
+        return
+    end
+    if state.status ~= SESSION_ACTIVE or sessions[player_id] ~= state then
+        return
     end
 end
 
@@ -136,23 +153,53 @@ local function request_id(player_id, state)
 end
 
 checkpoint = function(player_id, final)
-    local state = sessions[player_id]
-    if not state then return end
+    player_id = tonumber(player_id)
+    local state = sessions[player_id] or finalizing_sessions[player_id]
+    if not state then
+        print("[OnlineTime] checkpoint_skipped reason=session_missing player_id="
+            .. tostring(player_id) .. " final=" .. tostring(final == true))
+        return
+    end
+    if state.status == SESSION_CLOSED then
+        print("[OnlineTime] checkpoint_skipped reason=session_closed player_id="
+            .. tostring(player_id) .. " final=" .. tostring(final == true))
+        return
+    end
     if state.in_flight then
-        if final then state.final_requested = true end
+        if final then
+            state.final_requested = true
+            state.status = SESSION_FINALIZING
+            print("[OnlineTime] final_checkpoint_queued player_id="
+                .. tostring(player_id))
+        end
         return
     end
     local provider = profile_service.get_provider()
-    if not provider or type(provider.online_checkpoint) ~= "function" then return end
+    if not provider or type(provider.online_checkpoint) ~= "function" then
+        print("[OnlineTime] checkpoint_skipped reason=provider_unavailable player_id="
+            .. tostring(player_id) .. " final=" .. tostring(final == true))
+        return
+    end
     local account_id = provider.resolve_account_id(player_id)
-    if not account_id then return end
+    if not account_id then
+        print("[OnlineTime] checkpoint_skipped reason=account_id_unresolved player_id="
+            .. tostring(player_id) .. " final=" .. tostring(final == true))
+        return
+    end
     state.in_flight = true
+    if final then
+        state.status = SESSION_FINALIZING
+        finalizing_sessions[player_id] = state
+    end
     local payload = {
         account_id = tostring(account_id),
         session_id = state.session_id,
         request_id = request_id(player_id, state),
         final = final == true,
     }
+    print("[OnlineTime] checkpoint_request_started player_id=" .. tostring(player_id)
+        .. " request_id=" .. tostring(payload.request_id)
+        .. " final=" .. tostring(payload.final))
     provider.online_checkpoint(payload, function(response)
         state.last_success = GameRules:GetGameTime()
         local grants = {}
@@ -220,14 +267,19 @@ local function start(player_id)
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then return end
     local current = sessions[player_id]
-    if current then return end
-    local next_generation = generation
+    if current then
+        print("[OnlineTime] session_start_skipped reason=session_present player_id="
+            .. tostring(player_id) .. " status=" .. tostring(current.status))
+        return
+    end
+    session_sequence = session_sequence + 1
     sessions[player_id] = {
         session_id = string.format("game-%s-%d-player-%d", runtime_nonce,
-            next_generation, player_id),
+            session_sequence, player_id),
         sequence = 0,
         in_flight = false,
         final_requested = false,
+        status = SESSION_ACTIVE,
         grants = {},
     }
     checkpoint(player_id, false)
@@ -236,6 +288,7 @@ end
 function M.init()
     generation = generation + 1
     sessions = {}
+    finalizing_sessions = {}
     local active_rule = rule()
     if not active_rule then return end
     local interval = math.max(5, tonumber(active_rule.online_time_checkpoint_interval_seconds) or 60)
@@ -260,13 +313,36 @@ end
 
 function M.disconnect(player_id)
     player_id = tonumber(player_id)
+    print("[OnlineTime] disconnect_requested player_id=" .. tostring(player_id)
+        .. " session_present=" .. tostring(sessions[player_id] ~= nil))
     if sessions[player_id] then
+        local state = sessions[player_id]
+        state.status = SESSION_FINALIZING
+        sessions[player_id] = nil
+        finalizing_sessions[player_id] = state
+        print("[OnlineTime] session_detached_for_final player_id=" .. tostring(player_id)
+            .. " session_id=" .. tostring(state.session_id))
         checkpoint(player_id, true)
     end
 end
 
 function M.finish()
-    for player_id in pairs(sessions) do checkpoint(player_id, true) end
+    print("[OnlineTime] game_end_final_requested")
+    local pending = {}
+    for player_id, state in pairs(sessions) do
+        state.status = SESSION_FINALIZING
+        pending[player_id] = state
+        sessions[player_id] = nil
+        finalizing_sessions[player_id] = state
+    end
+    for player_id, state in pairs(pending) do
+        if state.in_flight then
+            state.final_requested = true
+            print("[OnlineTime] final_checkpoint_queued player_id=" .. tostring(player_id))
+        else
+            checkpoint(player_id, true)
+        end
+    end
 end
 
 M._test = {

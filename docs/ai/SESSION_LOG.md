@@ -1,3 +1,23 @@
+## 2026-08-24 - Workshop Tools 终局失败：未观察到失败回调或 API 业务请求
+
+- 用户提供的失败局日志显示对局约运行 `74` 秒后进入 `DOTA_GAMERULES_STATE_POST_GAME`，随后只有 Dota 原生无效订单、Match signout 和自定义游戏统计输出。
+- 重复出现的 `Game code (account 0) tried to execute invalid order (19). Target NPC is dead.` 记录为原生死亡目标订单警告；目前没有证据表明它触发或替代了 Survival 的在线 session finalization。
+- 本次未观察到 `game_end_final_requested`、`player_disconnect`、`HTTP final=true`、final callback 完成、API checkpoint/final 摘要或后端写入结果；因此真实引擎/API 验收失败，`ACTIVE`/`FINALIZING`/`CLOSED` 和 180 秒 lease 仍未实机确认。
+- API `/health` 的 HTTP 200 仅确认 loopback API 存活，不能证明本局 Lua 请求到达 API。当前断点未定位，待明日按“日志采集 -> session 创建 -> checkpoint 发出 -> game_end 入口 -> final HTTP -> callback”顺序缩小范围。
+- 本次只更新 AI 工作记录，未修改玩法代码、CSV、生成 Lua、数据库仓库或用户已有未提交业务修改。
+
+## 2026-08-24 - 多人断线 session 隔离与 60 秒检查
+
+- 按已批准方案修改在线规则 CSV：checkpoint 60 秒、lease 180 秒，600 秒奖励周期保持不变，并通过 `tools/build_configs.py` 生成目标 Lua 配置。
+- `online_time_service.lua` 增加 `ACTIVE`/`FINALIZING`/`CLOSED` 状态和独立 finalizing session 表；断线只结算对应玩家，重连使用新的 session ID，不发布全局失败事件。
+- Lua 5.1 行为测试、语法、CSV/生成一致性、严格 UTF-8 和限定差异检查通过。API 端点与 Workshop Tools 双玩家验证仍未执行。
+
+## 2026-08-23 - 在线奖励退出结算诊断修复
+
+- 用户提供的 API 日志确认两个 checkpoint 请求均收到 HTTP 200，其中一个返回 grant_count=1 reward_ids=star_blessing_008；问题边界收敛到 Dota 退出事件与 final 请求观察。
+- 修复 addon_game_mode.lua 的 player_disconnect 入口：记录原始事件字段，支持直接 PlayerID/playerid，并对 userid/UserID 通过 PlayerInstanceFromIndex 执行回退解析；无法得到合法槽位时不调用下游服务。
+- 修复 online_time_service.lua 的关键诊断日志，覆盖请求开始、提前跳过原因、断开 final、在途 final 排队和 game_end final 入口。
+- 结论：正常游戏结束没有 player_disconnect 并不代表 final 缺失，必须观察 game_end_final_requested 和后续请求 final=true。
 ## 2026-08-23 - 记录多人数据库联调当前进度
 
 - 用户要求暂停在多人联调阶段并记录当前进度与经验；本条作为后续会话恢复依据。
@@ -3017,3 +3037,27 @@
 - 用户在重启 `-Workshop60Seconds` API、重新 Run Workshop Tools 并使用 `production_60s` 后得到：`elapsed_seconds=39 online_seconds_total=930 grant_count=1 validated_grant_count=1`。
 - 该结果确认：新 runtime nonce 防止跨 Run 幂等重放；在线总时长仍正常累计；服务端已返回 production definition version 3 的奖励；Lua 本地 CSV 生成定义成功接受 grant。此前 `definition_version=9001` 的 Automation9001 响应不应与生产模式混淆。
 - 当前状态应记录为“checkpoint -> Supabase -> version 3 grant -> Lua 本地校验联调成功”。仍需观察 `profile_refresh_started/profile_refresh_completed/grant_published`、永久效果实际投影、全员公告及相同 grant 的重复发布去重；这些尚未由本条日志单独证明。
+
+## 2026-08-23 - 用户确认按单问题单门禁推进
+
+- 用户确认采纳以下主线：先解决数据库迁移和生产状态，再验证主机 API/Dota 冷启动，再实测双玩家房间加入和双玩家数据库隔离，随后完成两人最小可玩切片、异常恢复、四人性能回归，最后开发正式商品/支付。
+- 当前不把 Python API 改为 `0.0.0.0`，不让其他客户端直接访问 API；主机运行 Dota、Lua、loopback Python API 和 Supabase，加入者只加入主机 Dota 对局。
+- 本次仅更新计划与决策文档，未修改 Lua、CSV、生成配置、数据库仓库或用户已有未跟踪文件。
+## 2026-08-23 - 第1项数据库迁移状态核对结果
+
+- 按用户确认的单问题单门禁计划，由本地代理检查了 `D:\survival_database\supabase\migrations` 和本机环境配置。
+- `202608230006`、`202608230007` 本地文件存在，内容分别用于版本绑定 milestone grant ID、增加 `p_final` 在线结算入口并删除对应活动 session；本地契约测试输出 `FISHING_REWARD_CONTRACT_PASS`。
+- 使用当前 `.env` 对目标 Supabase 执行奖励定义、奖励账本、在线 session、幂等表和迁移记录的只读 REST 查询，全部返回 HTTP 401。没有执行任何 SQL 写操作或 migration。
+- Python 单元测试 29 项中 28 项通过；唯一失败是测试直接拼接中文历史 fixture 路径，在当前调用链中变成乱码并找不到已删除文件。该问题未修改，不能与远端迁移状态混淆。
+- 当前第1项门禁未通过。需要先确认 Project URL 与 `sb_secret_...` key 匹配并有效，或由用户在 Supabase SQL Editor 执行只读核对。
+## 2026-08-23 - Supabase 401复核与推进决策
+
+- 用户确认此前已成功连接数据库，不执行重复换 key 操作。
+- 第二轮只读探针：项目根 URL HTTP 404，REST 根路径和奖励定义表查询在两种标准 key header 组合下均 HTTP 401；说明 URL 网络可达，但当前 REST 身份未被接受。
+- 决定：不让“重新配置凭据”阻断 Dota 主机冷启动/房间加入；远端 006/007 migration 保持未验证标记，数据库生产读写仍需以实际 API 请求结果判定。
+## 2026-08-23 - 202608230007远端执行确认
+
+- 用户在目标 Supabase SQL Editor 执行 `202608230007_finalize_online_time_session.sql`。
+- 生产 API 真实日志：首次 checkpoint `200 / elapsed_seconds=0 / online_seconds_total=4163 / grant_count=0`；同一 session 后续 checkpoint `200 / elapsed_seconds=4 / online_seconds_total=4167 / grant_count=0`。
+- 结论：八参数 `checkpoint_online_time(..., p_final)` 已在远端生效，Supabase schema cache 已能解析新函数；首次不累计和相邻 checkpoint 累计约4秒符合在线租约语义。由于未达到600秒，grant_count=0不构成异常。
+- 202608230006仍未单独确认，后续奖励触发测试前必须核对其版本绑定逻辑。
