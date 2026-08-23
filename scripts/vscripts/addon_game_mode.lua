@@ -114,7 +114,6 @@ local monster_spawn_service =
     require("systems/monster_spawn_service")
 local asset_preload_service = require("systems/asset_preload_service")
 local monster_visual_service = require("systems/monster_visual_service")
-local unit_health_bar_service = require("systems/unit_health_bar_service")
 local challenge_session_service =
     require("systems/challenge_session_service")
 local training_room_service = require("systems/training_room_service")
@@ -764,16 +763,19 @@ function M.precache(context)
     end
     asset_preload_service.precache_initial(context)
     asset_preload_service.precache_group(context, "hero_permanent")
+    asset_preload_service.precache_group(context, "challenge_visuals")
     hero_cosmetic_service.precache(context)
 end
 
 local function initialize_services()
+    local unit_health_bar_service = require("systems/unit_health_bar_service")
     hero_anchor_service.init()
     require("systems/forbidden_region_service").init()
     require("systems/player_context_service").init()
     builder_service.init()
     asset_preload_service.init()
     require("systems/hero_asset_preload_service").init()
+    require("systems/challenge_asset_preload_service").init()
     unit_health_bar_service.init()
     combat_bootstrap.init()
     assert(tree_attack_order_filter.register(),

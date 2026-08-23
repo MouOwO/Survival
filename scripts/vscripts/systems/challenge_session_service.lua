@@ -21,6 +21,7 @@ local destination_validation = require("systems/destination_validation_service")
 local monster_visual = require("systems/challenge_monster_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
 local wave_monster_collision = require("systems/wave_monster_collision")
+local challenge_11_staging = "modifier_challenge_11_staging"
 
 local M = {}
 local sessions = {}
@@ -28,6 +29,7 @@ local foreground_encounter_by_player = {}
 local monster_meta = {}
 local auto_test_started = {}
 local abyss_cleared_stage_by_player = {}
+local challenge_11_prepared_by_player = {}
 -- Set true only when validating the seven-sins / ten-sins map markers.
 -- Normal challenge purchases must not create unrelated boss encounters.
 local AUTO_START_CHALLENGE_TESTS = false
@@ -195,12 +197,20 @@ local function remove_dead(session)
 end
 
 local function destroy_session_monsters(session)
+    local all_monsters = {}
     for entindex, unit in pairs(session.monsters or {}) do
+        all_monsters[entindex] = unit
+    end
+    for entindex, unit in pairs(session.prepared_monsters or {}) do
+        all_monsters[entindex] = unit
+    end
+    for entindex, unit in pairs(all_monsters) do
         monster_meta[entindex] = nil
         if valid(unit) then monster_visual.clear(unit) end
         if alive(unit) then UTIL_Remove(unit) end
     end
     session.monsters = {}
+    session.prepared_monsters = {}
     session.monster_count = 0
 end
 
@@ -343,6 +353,9 @@ local function spawn_member(session, member)
         DOTA_TEAM_BADGUYS
     )
     if not valid(unit) then return nil, "challenge_unit_create_failed" end
+    if session.challenge.challenge_id == "challenge_11" then
+        unit:AddNewModifier(unit, nil, challenge_11_staging, {})
+    end
     if collision_profile.apply_before_placement then
         monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
     end
@@ -419,6 +432,92 @@ local function spawn_member(session, member)
         reward_profile_id = member.reward_profile_id,
     })
     return unit
+end
+
+local function release_challenge_11_unit(unit)
+    if not valid(unit) then return end
+    unit:RemoveModifierByName(challenge_11_staging)
+    if unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
+end
+
+local function prepare_challenge_11(player_id, team, difficulty_id)
+    if challenge_11_prepared_by_player[player_id] then return true end
+    local encounter = encounters.by_id.encounter_challenge_11
+    local challenge = challenge_for_encounter("encounter_challenge_11")
+    local list = members_for("encounter_challenge_11")
+    if not encounter or not challenge or #list == 0 then return false end
+    local session = {
+        player_id = player_id,
+        team = team,
+        challenge = challenge,
+        encounter = encounter,
+        encounter_id = "encounter_challenge_11",
+        difficulty_id = difficulty_id,
+        members = list,
+        monsters = {},
+        monster_count = 0,
+        prepared_monsters = {},
+        spawn_mode = "simultaneous",
+        status = "staging",
+        generation = DoUniqueString("challenge_11_staging"),
+    }
+    for _, member in ipairs(list) do
+        local unit, error_message = spawn_member(session, member)
+        if not unit then
+            destroy_session_monsters(session)
+            print("[Challenge11] staging failed: " .. tostring(error_message))
+            return false
+        end
+        session.prepared_monsters[unit:entindex()] = unit
+    end
+    session.monsters = {}
+    session.monster_count = 0
+    challenge_11_prepared_by_player[player_id] = session
+    return true
+end
+
+local function activate_prepared_challenge_11(session)
+    local staged = session.prepared_monsters
+        and next(session.prepared_monsters) and session
+        or challenge_11_prepared_by_player[session.player_id]
+    if not staged then return false end
+    local target_member = session.members[1]
+    local selected_entindex = nil
+    for entindex, unit in pairs(staged.prepared_monsters or {}) do
+        local meta = monster_meta[entindex]
+        if meta and meta.member
+            and meta.member.member_id == target_member.member_id then
+            selected_entindex = entindex
+            session.monsters[entindex] = unit
+            session.monster_count = session.monster_count + 1
+            monster_meta[entindex] = {
+                player_id = session.player_id,
+                team = session.team,
+                encounter_id = session.encounter_id,
+                member = target_member,
+            }
+            release_challenge_11_unit(unit)
+            break
+        end
+    end
+    if not selected_entindex then return false end
+    session.prepared_monsters = staged.prepared_monsters
+    challenge_11_prepared_by_player[session.player_id] = nil
+    return true
+end
+
+local function activate_prepared_member(session, member)
+    for entindex, unit in pairs(session.prepared_monsters or {}) do
+        local meta = monster_meta[entindex]
+        if meta and meta.member
+            and meta.member.member_id == member.member_id then
+            session.monsters[entindex] = unit
+            session.monster_count = session.monster_count + 1
+            release_challenge_11_unit(unit)
+            return true
+        end
+    end
+    return false
 end
 
 local function current_member(session)
@@ -532,6 +631,9 @@ end
 local function fill_current(session)
     local member = current_member(session)
     if not member then return false, "challenge_member_not_found" end
+    if session.challenge.challenge_id == "challenge_11" then
+        return activate_prepared_member(session, member)
+    end
     if member.spawn_mode == "maintain_count" then
         remove_dead(session)
         local target = math.max(1, tonumber(member.max_alive) or 1)
@@ -545,6 +647,9 @@ local function fill_current(session)
 end
 
 local function fill_initial(session)
+    if session.challenge.challenge_id == "challenge_11" then
+        return activate_prepared_challenge_11(session)
+    end
     if session.spawn_mode ~= "simultaneous" then return fill_current(session) end
     for _, member in ipairs(session.members) do
         local ok, error_message = fill_member(session, member)
@@ -639,6 +744,30 @@ local function complete_session(session)
         session.stage = 1
     else
         publish(session, "completed", { reward_result = reward_result or {} })
+        return
+    end
+
+    -- Ten-sins bosses are already staged in the room. Advance and teleport in
+    -- the kill callback instead of waiting for a zero-second scheduler task.
+    if session.challenge.challenge_id == "challenge_11" then
+        session.status = "active"
+        session.generation = DoUniqueString("challenge_completion")
+        session.killed_members = 0
+        session.completion_drop_position = nil
+        local ok, error_message = fill_initial(session)
+        if not ok then
+            block_session(session, error_message)
+            return
+        end
+        if should_teleport_after_completion(session) then
+            ok, error_message = teleport_to_current(session)
+            if not ok then
+                destroy_session_monsters(session)
+                block_session(session, error_message)
+                return
+            end
+        end
+        publish(session, "active", { reward_result = reward_result or {} })
         return
     end
 
@@ -1195,12 +1324,26 @@ local function start_auto_tests(payload)
     end, "challenge_auto_test:" .. player_id)
 end
 
+local function prepare_after_hero_summoned(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil or player_id < 0 then return end
+    local wave_state = event_bus.request(events.WAVE_STATE_GET_REQUEST, {})
+    local difficulty_id = wave_state and wave_state.ok
+        and tostring(wave_state.difficulty_id or "") or difficulty_config.default_id
+    prepare_challenge_11(
+        player_id,
+        tonumber(payload.team) or PlayerResource:GetTeam(player_id),
+        difficulty_id
+    )
+end
+
 function M.init()
     sessions = {}
     foreground_encounter_by_player = {}
     monster_meta = {}
     auto_test_started = {}
     abyss_cleared_stage_by_player = {}
+    challenge_11_prepared_by_player = {}
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
     event_bus.subscribe(
         events.MONSTER_ENCOUNTER_CHANGED,
@@ -1208,6 +1351,7 @@ function M.init()
     )
     event_bus.subscribe(events.SEVEN_SINS_COMPLETED, on_seven_sins_completed)
     event_bus.subscribe(events.HERO_READY, start_auto_tests)
+    event_bus.subscribe(events.HERO_SUMMONED, prepare_after_hero_summoned)
 end
 
 return M

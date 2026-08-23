@@ -1,4 +1,21 @@
 ## 当前联调状态（2026-08-23）：多人生产联调阻塞
+## 当前修复项（2026-08-23）：资源树、十宗罪预生成与箭塔手动选敌
+
+- `data/csv/资源系统/world_visual_definitions.csv`中的资源树`model_scale`已从3调整为1.5，并由生成器同步`config/generated/world_visual_definitions.lua`；基础模型和位置未变。
+- `modifier_single_health_bar`已回退到修改前的原生引擎血条实现；移除超大生命值自定义NetTable、`MODIFIER_STATE_NO_HEALTH_BAR`和对应Panorama编译资源改动。
+- 十宗罪继续由CSV定义成员、模型和数值；英雄召唤后一次性创建十个Boss，使用隐藏的无敌/眩晕/定身阶段Modifier停留在房间内，正式进入挑战后按阶段解除对应Boss限制并复用实体。
+- 十宗罪击杀确认并完成材料处理后，直接在击杀回调中激活下一层预生成Boss并执行阶段入口传送，不再经过0秒调度器等待；其他挑战刷新时序保持不变。
+- 箭塔保留建筑身份和玩家控制能力，仅允许拥有者右键指定合法攻击目标；移动类订单被拒绝，目标失效后恢复自动索敌。
+- `challenge_asset_preload_service.lua`仍在`HERO_READY`后从生成的`encounter_members`、`monster_archetypes`和CSV资产目录收集挑战模型并异步预载。尚未执行Workshop Tools冷启动，仍需实测树尺寸、原生血条、十宗罪预生成/激活时序和箭塔右键选敌。
+
+## 当前修复项（2026-08-23）：VIP英雄基础攻速与普通英雄统一
+
+- 用户反馈：VIP英雄剑圣和齐天大圣的实际攻速远高于普通英雄小黑和影魔。
+- 根因：`data/csv/英雄系统/hero_definitions.csv`中两名VIP英雄的基础`attack_speed`为1.5，普通英雄为0.7；项目该字段表示每秒攻击次数。
+- 本轮修复：将`hero_monkey_king`和`hero_blademaster`的基础`attack_speed`统一调整为0.7，并重新生成英雄配置；保留剑圣转生后“迅影”等独立专属攻速效果。
+- 验证要求：CSV生成配置一致性、VIP/普通英雄基础攻速定向契约、Lua 5.1语法和限定`git diff --check`；Workshop Tools冷启动后仍需实测实际攻击间隔。
+
+## 当前修复项（2026-08-22）：防御塔销毁占格未返还与挑战房间刷怪范围过大
 
 - 当前进度已推进到“Supabase 迁移核对 + 生产双玩家端到端联调”，暂时卡在多人联调阶段；本次记录作为后续会话恢复的最新任务状态。
 - 已完成后端配置、启动脚本、环境模板和 Lua API 调用链复核；已确认 Python API 绑定 `127.0.0.1:8765`，数据库访问由主机 API 完成。

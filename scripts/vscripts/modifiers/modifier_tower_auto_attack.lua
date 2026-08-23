@@ -130,17 +130,19 @@ function modifier_tower_auto_attack:OnIntervalThink()
         self.manual_target = nil
         target = nil
     end
+    -- A player-selected target has priority over the engine's acquisition
+    -- target until it becomes invalid or leaves attack range.
     if not target then target = tower:GetAttackTarget() end
     local distance = valid(target)
         and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
         or 99999
-    if tree_damage_rules.is_tree(target)
+    if not self.manual_target and tree_damage_rules.is_tree(target)
         or is_training_dummy(target) and find_target(tower) ~= target
         or not anti_air_rules.can_attack(tower, target) then
         tower:SetForceAttackTarget(nil)
         self.forced_target = nil
     end
-    if not valid(target) or tree_damage_rules.is_tree(target)
+    if not valid(target) or not self.manual_target and tree_damage_rules.is_tree(target)
         or is_training_dummy(target) and find_target(tower) ~= target
         or not anti_air_rules.can_attack(tower, target)
         or target:GetTeamNumber() == tower:GetTeamNumber()

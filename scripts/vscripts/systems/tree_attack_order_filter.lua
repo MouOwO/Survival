@@ -38,6 +38,9 @@ local function filter(_, keys)
             tonumber(keys.position_z) or 0
         )
         for _, unit in ipairs(ordered_units(keys)) do
+            if tree_damage_rules.is_arrow_tower(unit) then
+                return false
+            end
             if destination_validation.is_constrained_hero(unit) then
                 local allowed = destination_validation.validate(position, unit)
                 if not allowed then return false end

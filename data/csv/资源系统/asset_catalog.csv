@@ -22,6 +22,7 @@ monster_ogre_magi,食人魔怪模型,model_bundle,models/heroes/ogre_magi/ogre_m
 monster_tiny,小小怪模型,model_bundle,models/heroes/tiny/tiny_01/tiny_01.vmdl,,,,,,idle,1,,,zombie_stream,12,745,19,streamed,asset_proxy_monster_tiny,monster_undying,1,基础Tiny模型；饰品最大形态路径核验后另建资源包。
 monster_ursa,熊战士怪模型,model_bundle,models/heroes/ursa/ursa.vmdl,,,,,,idle,1,,,zombie_stream,13,740,20,streamed,asset_proxy_monster_ursa,monster_undying,1,按首次波次进入后台加载队列。
 monster_terrorblade,恐怖利刃怪模型,model_bundle,models/heroes/terrorblade/terrorblade.vmdl,,,,,,idle,1,,,zombie_stream,14,735,20,streamed,asset_proxy_monster_terrorblade,monster_undying,1,按首次波次进入后台加载队列。
+challenge_10_terrorblade_fractal,七宗罪恐怖利刃外观,model_bundle,models/heroes/terrorblade/terrorblade_arcana.vmdl,,,,,,idle,1,,,challenge_visuals,1,734,0,streamed,asset_proxy_monster_terrorblade,monster_terrorblade,1,挑战10专用外观；由挑战10/11预载服务提前加载。
 monster_tidehunter,潮汐怪模型,model_bundle,models/heroes/tidehunter/tidehunter.vmdl,,,,,,idle,1,,,zombie_stream,15,730,21,streamed,asset_proxy_monster_tidehunter,monster_undying,1,按首次波次进入后台加载队列。
 monster_pudge,屠夫怪模型,model_bundle,models/heroes/pudge/pudge.vmdl,,,,,,idle,1,,,zombie_stream,16,725,24,streamed,asset_proxy_monster_pudge,monster_undying,1,按首次波次进入后台加载队列。
 monster_rubick,飞毯法师模型,model_bundle,models/heroes/rubick/rubick.vmdl,,particles/units/heroes/hero_rubick/rubick_base_attack.vpcf,,,,idle,1,,,zombie_stream,17,720,16,streamed,asset_proxy_monster_rubick,monster_undying,1,N1第16波首次使用；也供魔法至尊塔复用。

@@ -14,7 +14,6 @@
         "survival_combat_stats",
         "survival_combat_debug",
         "survival_game_info",
-        "survival_hero_health_bar",
         "survival_tooltips",
         "survival_content_inventory",
         "survival_weapon_state",
