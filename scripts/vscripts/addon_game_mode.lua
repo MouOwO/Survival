@@ -393,9 +393,12 @@ local function on_npc_spawned(keys)
 end
 
 local function on_game_state_changed()
-    if GameRules:State_Get()
-        == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+    local state = GameRules:State_Get()
+    if state == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
         event_bus.emit(events.GAME_STARTED, {})
+    elseif state == DOTA_GAMERULES_STATE_POST_GAME then
+        print("[OnlineTime] game_state_post_game")
+        require("systems/online_time_service").finish("game_rules_state_change")
     end
 end
 
@@ -905,7 +908,9 @@ function M.activate()
         nil
     )
     ListenToGameEvent("player_disconnect", on_player_disconnected, nil)
-    ListenToGameEvent("game_end", function() require("systems/online_time_service").finish() end, nil)
+    ListenToGameEvent("game_end", function()
+        require("systems/online_time_service").finish("game_end")
+    end, nil)
     ListenToGameEvent(
         "dota_player_pick_hero",
         on_hero_picked,

@@ -1,3 +1,25 @@
+## 2026-08-24 - 数据库工作切换为 AI CTO 架构审查模式
+
+- 已阅读 `docs/ai/AI_CTO.md`，并按恢复顺序复核 `START_HERE.md`、`CURRENT_TASK.md`、`PROJECT_CONTEXT.md`、`DECISIONS.md`、`KNOWN_ISSUES.md`、本机工具链和两仓 Git 状态。
+- 已从权威 CSV 核对玩家 36 个永久玩法字段、60 秒 checkpoint、180 秒 lease、600 秒奖励周期、definition version 3 和 profile schema version 1；CSV/生成配置继续作为业务配置权威源。
+- 已核对 Lua online session、Python `FishingApplication`/`SupabaseRpcClient`、基础在线 checkpoint migration 及 006/007 migration。确认真实链路为 Lua -> loopback Python API -> Supabase RPC；手册中的 FastAPI 是目标描述，不是当前生产实现事实。
+- 架构瓶颈归纳为远端 migration/函数状态可观测性不足、跨 Lua/Python/PostgreSQL 幂等身份容易失配、终局 final 链路缺少统一 TraceID/阶段证据。后续数据库任务先完成架构、API、事务、恢复和测试矩阵审查，再实施代码。
+- 本轮只更新 AI 工作记录；未修改 Gameplay、Python、SQL、CSV、生成 Lua 或两仓其他用户已有未提交内容。
+
+## 2026-08-24 - 城墙毁坏直接触发失败局在线最终结算
+
+- 因实机仍未观察到 `POST_GAME` 后的 Survival final 回调，已将 `online_time_service.finish("wall_destroyed")` 接入已完工城墙死亡的失败闩锁分支，并置于 `GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)` 之前。
+- 保留 `game_rules_state_change`/`game_end` 兼容入口；统一 session 状态保证不会重复发送 final。未调用 `disconnect()`，因为城墙毁坏是全局失败而不是玩家断线。
+- 新增/扩展 POST_GAME 契约和 Lua 行为测试；`ONLINE_TIME_POST_GAME_CONTRACT_PASS`、`ONLINE_TIME_DEBUG_CHECKPOINT_LUA51_PASS`、`BUILDING_DEFEAT_RULES_LUA51_PASS`、目标语法、严格 UTF-8 和限定差异检查通过。行为覆盖直接 final、在途排队 final 和后续终局事件幂等。
+- 七塔融合宽回归在本次城墙断言前被既有过期的 `max_count_per_player=5` 期望阻断；当前权威 CSV 和生成 Lua 都没有该字段，本轮未改无关数据。Workshop Tools 实机复验仍待用户执行。
+
+## 2026-08-24 - POST_GAME 在线最终结算入口修复
+
+- 用户补充的 API 日志显示终局前连续三个 `/v1/online-time/checkpoint` 均返回 200，并产生 `star_blessing_004/019/011` 及后续 `/v1/profile`；进入 `POST_GAME` 后没有 final checkpoint，确认普通数据库和奖励链路正常，终局调用未发生。
+- `addon_game_mode.lua` 的 `game_rules_state_change` 现处理 `DOTA_GAMERULES_STATE_POST_GAME` 并调用带来源的 `online_time_service.finish()`；`game_end` 继续作为兼容入口。在线服务日志新增 `source`，已有 ACTIVE/FINALIZING 迁移使重复终局入口不重复发送 final。
+- 新增 PowerShell POST_GAME 静态契约，并扩展 Lua 5.1 行为测试覆盖首次 finish 发送 `final=true`、第二终局入口不重复发送。契约、行为、目标语法、严格 UTF-8 和限定 diff 检查通过；尚未 Workshop Tools 实机复验。
+- 本轮未修改权威 CSV、生成 Lua、Supabase migration、Python API 或用户已有 Panorama/粒子编译产物。
+
 ## 2026-08-24 - Workshop Tools 终局失败：未观察到失败回调或 API 业务请求
 
 - 用户提供的失败局日志显示对局约运行 `74` 秒后进入 `DOTA_GAMERULES_STATE_POST_GAME`，随后只有 Dota 原生无效订单、Match signout 和自定义游戏统计输出。

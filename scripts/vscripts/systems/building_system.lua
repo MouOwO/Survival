@@ -26,6 +26,7 @@ local action_cooldown_rollback = require("core/action_cooldown_rollback")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 local player_tower_limits = require("systems/player_tower_limit_service")
 local building_defeat_rules = require("systems/building_defeat_rules")
+local online_time_service = require("systems/online_time_service")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
@@ -1198,6 +1199,7 @@ local function on_entity_killed(payload)
     end
     if building_defeat_rules.should_trigger(defeat_triggered, state) then
         defeat_triggered = true
+        online_time_service.finish("wall_destroyed")
         GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
     end
 end

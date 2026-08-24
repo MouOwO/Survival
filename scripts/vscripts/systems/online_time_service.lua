@@ -90,7 +90,7 @@ local function validated_grant(grant)
     }
 end
 
-local function complete_checkpoint(player_id, state, final)
+local function complete_checkpoint(player_id, state, final, current_request_id)
     state.in_flight = false
     if final then
         state.status = SESSION_CLOSED
@@ -101,7 +101,7 @@ local function complete_checkpoint(player_id, state, final)
             finalizing_sessions[player_id] = nil
         end
         print("[OnlineTime] session_closed player_id=" .. tostring(player_id)
-            .. " session_id=" .. tostring(state.session_id))
+            .. " session_id=" .. tostring(state.session_id) .. " request_id=" .. tostring(current_request_id) .. " final=true")
         return
     end
     if state.final_requested then
@@ -114,7 +114,7 @@ local function complete_checkpoint(player_id, state, final)
     end
 end
 
-local function publish_grants(player_id, state, grants, final)
+local function publish_grants(player_id, state, grants, final, current_request_id)
     print("[OnlineTime] profile_refresh_started player_id=" .. tostring(player_id)
         .. " grant_count=" .. tostring(#grants))
     profile_service.load_player(player_id, "star_blessing_grant", function()
@@ -132,11 +132,11 @@ local function publish_grants(player_id, state, grants, final)
                     .. " amount=" .. tostring(grant.amount))
             end
         end
-        complete_checkpoint(player_id, state, final)
+        complete_checkpoint(player_id, state, final, current_request_id)
     end, function(error_code)
         print("[OnlineTime] profile_refresh_failed player_id=" .. tostring(player_id)
             .. " error=" .. tostring(error_code))
-        complete_checkpoint(player_id, state, final)
+        complete_checkpoint(player_id, state, final, current_request_id)
     end)
 end
 
@@ -197,7 +197,7 @@ checkpoint = function(player_id, final)
         request_id = request_id(player_id, state),
         final = final == true,
     }
-    print("[OnlineTime] checkpoint_request_started player_id=" .. tostring(player_id)
+    print("[OnlineTime] checkpoint_request_started player_id=" .. tostring(player_id) .. " session_id=" .. tostring(payload.session_id)
         .. " request_id=" .. tostring(payload.request_id)
         .. " final=" .. tostring(payload.final))
     provider.online_checkpoint(payload, function(response)
@@ -217,20 +217,20 @@ checkpoint = function(player_id, final)
                     .. " amount=" .. tostring(grant and grant.amount or ""))
             end
         end
-        print("[OnlineTime] checkpoint_response player_id=" .. tostring(player_id)
+        print("[OnlineTime] checkpoint_response player_id=" .. tostring(player_id) .. " session_id=" .. tostring(payload.session_id) .. " request_id=" .. tostring(payload.request_id) .. " final=" .. tostring(payload.final)
             .. " elapsed_seconds=" .. tostring(response and response.elapsed_seconds)
             .. " online_seconds_total=" .. tostring(response and response.online_seconds_total)
             .. " grant_count=" .. tostring(#raw_grants)
             .. " validated_grant_count=" .. tostring(#grants))
         if #grants > 0 then
-            publish_grants(player_id, state, grants, final)
+            publish_grants(player_id, state, grants, final, payload.request_id)
             return
         end
-        complete_checkpoint(player_id, state, final)
+        complete_checkpoint(player_id, state, final, payload.request_id)
     end, function(error_code)
-        print("[OnlineTime] checkpoint_failed player_id=" .. tostring(player_id)
+        print("[OnlineTime] checkpoint_failed player_id=" .. tostring(player_id) .. " session_id=" .. tostring(payload.session_id) .. " request_id=" .. tostring(payload.request_id) .. " final=" .. tostring(payload.final)
             .. " error=" .. tostring(error_code))
-        complete_checkpoint(player_id, state, final)
+        complete_checkpoint(player_id, state, final, payload.request_id)
     end)
 end
 
@@ -326,8 +326,8 @@ function M.disconnect(player_id)
     end
 end
 
-function M.finish()
-    print("[OnlineTime] game_end_final_requested")
+function M.finish(source)
+    print("[OnlineTime] game_end_final_requested source=" .. tostring(source or "unknown"))
     local pending = {}
     for player_id, state in pairs(sessions) do
         state.status = SESSION_FINALIZING
