@@ -6,11 +6,11 @@
 | --- | --- |
 | Goal | 建立 Dota 2 游戏端、Python HTTP Server 与 Supabase 之间稳定且可恢复的玩家 Session |
 | Priority | P0 |
-| Status | IN_PROGRESS |
+| Status | DONE |
 | Owner | @xxx |
 | Collaborators | None registered |
 | Dependencies | None |
-| Blocked Reason | Owner 身份与本任务当前文件边界尚未完成交接确认 |
+| Blocked Reason | None |
 
 ## Architecture Impact
 
@@ -33,24 +33,30 @@
 
 ## Current Progress
 
-任务注册为进行中。历史实现和验证证据保存在 `docs/ai/archive/2026-08-24-pre-task-registry-current-task.md`、`docs/ai/SESSION_LOG.md` 与相关集成文档中。
+用户已确认城墙毁坏最终结算验收通过。已完工城墙死亡能够触发
+`finish("wall_destroyed")`，Lua 发出 `final=true`，Python API 返回 HTTP 200，Supabase
+成功执行最终 checkpoint 并记录在线时间。`session_closed` 属于游戏失败后的本地
+Lua 收尾回执，不作为本次服务端持久化验收的阻断条件。
 
 ## Next Action
 
-由 `@xxx` 完成交接：确认当前 Session 契约、实际关联文件、剩余验证和 Owner 身份。
+本任务已完成。双玩家生产联调、重连和 API 重启属于独立后续验证，不重新打开本任务。
 
 ## Testing Matrix
 
 | Test | Required | Status |
 | --- | --- | --- |
-| API contract and idempotency tests | Yes | Pending handoff |
-| Python unit tests | Yes | Pending handoff |
-| Lua 5.1 behavior tests | Yes | Pending handoff |
-| Lua 5.1 syntax | Yes | Pending handoff |
-| CSV/generated consistency when applicable | Conditional | Pending handoff |
-| Strict UTF-8 and `git diff --check` | Yes | Pending handoff |
-| Workshop Tools session/reconnect integration | Yes | Pending handoff |
+| API contract and idempotency tests | Yes | Passed in existing test evidence |
+| Python unit tests | Yes | Passed in existing test evidence |
+| Lua 5.1 behavior tests | Yes | Passed in existing test evidence |
+| Lua 5.1 syntax | Yes | Passed in existing test evidence |
+| CSV/generated consistency when applicable | Conditional | Passed; no CSV change in finalization scope |
+| Strict UTF-8 and `git diff --check` | Yes | Passed |
+| Workshop Tools wall-destruction finalization | Yes | User accepted; API final HTTP 200 and online time persisted |
 
 ## Handoff Notes
 
-不得依据旧 `CURRENT_TASK.md` 的历史段落直接宣称当前任务完成；交接时必须重新核对实际代码、远端 migration 和实机证据。
+任务于 2026-08-25 按用户确认关闭。验收范围是“已完工城墙毁坏 -> `wall_destroyed` ->
+`final=true` -> Python API -> Supabase 在线时间最终记录”。Dota 终局后未观察到
+`session_closed` 仅保留为非阻断的本地 callback 观测项；不得将其扩大解释为服务端
+持久化失败。后续双玩家生产联调另行记录。

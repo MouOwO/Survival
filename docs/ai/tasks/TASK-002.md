@@ -10,7 +10,7 @@
 | Owner | @xxx |
 | Collaborators | None registered |
 | Dependencies | TASK-001 must be DONE |
-| Blocked Reason | TASK-001 尚未 DONE，当前不可进入实现 |
+| Blocked Reason | None; TASK-001 dependency satisfied |
 
 ## Architecture Impact
 
@@ -29,23 +29,23 @@
 
 ## Current Progress
 
-需求已登记，尚未因依赖门禁进入实现。
+需求已登记，`TASK-001` 依赖已满足；尚未登记本任务 Affected Files 或进入实现。
 
 ## Next Action
 
-等待 `TASK-001` 完成；随后核对 API Contract、CSV 规则、RPC 签名和现有测试。
+由 Owner 登记 Affected Files，并核对 API Contract、CSV 规则、RPC 签名和现有测试。
 
 ## Testing Matrix
 
 | Test | Required | Status |
 | --- | --- | --- |
-| Checkpoint API/RPC contract | Yes | Blocked |
-| Duplicate request and retry idempotency | Yes | Blocked |
-| Lua 5.1 scheduling behavior | Yes | Blocked |
-| CSV/generated consistency | Yes | Blocked |
-| Python and SQL tests | Yes | Blocked |
-| Workshop Tools checkpoint integration | Yes | Blocked |
+| Checkpoint API/RPC contract | Yes | Not started |
+| Duplicate request and retry idempotency | Yes | Not started |
+| Lua 5.1 scheduling behavior | Yes | Not started |
+| CSV/generated consistency | Yes | Not started |
+| Python and SQL tests | Yes | Not started |
+| Workshop Tools checkpoint integration | Yes | Not started |
 
 ## Handoff Notes
 
-`READY` 不表示可立即实现；Dependency 未完成时保持门禁。
+`TASK-001` 依赖已于 2026-08-25 解除。`READY` 仍要求实现前完成文件边界和测试矩阵复核。

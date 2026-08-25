@@ -10,7 +10,7 @@ SurvivalContent 是 Dota 2 Arcade 生存塔防项目，包含英雄成长、防�
 
 **Backend Integration Phase**
 
-当前主链：
+当前已验证的本地 Workshop 主链：
 
 ```text
 Dota server Lua -> 127.0.0.1 Python API -> HTTPS Supabase RPC/PostgreSQL
@@ -19,6 +19,7 @@ Dota server Lua -> 127.0.0.1 Python API -> HTTPS Supabase RPC/PostgreSQL
 - Python 当前实现是 `ThreadingHTTPServer + FishingApplication + SupabaseRpcClient`，不是 FastAPI。
 - Panorama 不直接访问 HTTP；Lua 不直接访问 SQL；Python 是唯一数据库入口。
 - `data/csv/` 是业务配置权威源，`scripts/vscripts/config/generated/` 是生成结果。
+- 正常发布 Arcade 的 Game Server/Lua 主机与 loopback 归属尚未证实，当前是 `MODEL-D`；详见 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md`。
 
 ## Current Priority
 
@@ -28,10 +29,11 @@ P0 是 Player Session、在线 checkpoint 和终局 finalization 的稳定联调
 
 ## Current Blockers
 
-- `TASK-001` 已登记为 `IN_PROGRESS`，Owner 为 `@xxx`，但 Owner 身份和 Affected Files 尚未完成交接确认。
-- `TASK-002` 与 `TASK-003` 依赖 `TASK-001`，依赖完成前不得进入实现。
-- 2026-08-24 的自动测试覆盖了终局多入口幂等；Workshop Tools 仍需确认 `wall_destroyed` / `POST_GAME` 能产生单次 `final=true` HTTP 200 和 `session_closed`。
-- 生产双玩家端到端验收尚未完成。
+- `TASK-001` 已于 2026-08-25 按用户确认完成：已完工城墙毁坏能够产生单次 `final=true`，并由 Python API/Supabase 成功记录最终在线时间。
+- `TASK-002` 与 `TASK-003` 不再因 `TASK-001` 的城墙 final 验收而阻塞。
+- Dota 终局后的 `session_closed` 本地 callback 未作为本次服务端持久化验收阻断项，保留为非阻断观测事项。
+- 生产双玩家端到端验收仍是独立后续工作，不等同于 `TASK-001` 本次城墙毁坏范围。
+- 生产 Session Foundation 在发布 Lobby 拓扑实验完成前暂停；不得假定 Lobby Owner 就是 Game Server 或 Python 主机。
 
 ## Minimum Required Context
 

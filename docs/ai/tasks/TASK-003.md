@@ -10,7 +10,7 @@
 | Owner | UNASSIGNED |
 | Collaborators | None registered |
 | Dependencies | TASK-001 must be DONE |
-| Blocked Reason | TASK-001 尚未 DONE，当前不可进入实现 |
+| Blocked Reason | Owner unassigned; TASK-001 dependency satisfied |
 
 ## Architecture Impact
 
@@ -29,21 +29,21 @@
 
 ## Current Progress
 
-任务已登记。相关历史实现和 Workshop Tools 未决证据位于归档、`PROJECT_CONTEXT.md` 与 `KNOWN_ISSUES.md`。
+任务已登记，`TASK-001` 依赖已满足。城墙毁坏服务端 final 已验收；本任务其余范围需在分配 Owner 后重新界定。
 
 ## Next Action
 
-等待 `TASK-001` 完成，然后分配唯一 Owner 并核对当前终局入口与实机日志。
+分配唯一 Owner、登记 Affected Files，并核对正常终局、断线入口与剩余 callback 观测范围。
 
 ## Testing Matrix
 
 | Test | Required | Status |
 | --- | --- | --- |
-| Disconnect/final state behavior | Yes | Blocked |
-| Multiple final entry idempotency | Yes | Blocked |
-| Lua 5.1 syntax and behavior | Yes | Blocked |
-| HTTP final callback integration | Yes | Blocked |
-| Workshop Tools normal end and wall-destroyed end | Yes | Blocked |
+| Disconnect/final state behavior | Yes | Not started for remaining scope |
+| Multiple final entry idempotency | Yes | Existing evidence; recheck when scope starts |
+| Lua 5.1 syntax and behavior | Yes | Existing evidence; recheck when scope starts |
+| HTTP final callback integration | Yes | Wall-destroyed server persistence accepted |
+| Workshop Tools normal end and wall-destroyed end | Yes | Wall-destroyed accepted; normal end not started |
 
 ## Handoff Notes
 

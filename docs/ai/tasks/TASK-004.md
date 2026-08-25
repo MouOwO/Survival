@@ -10,7 +10,7 @@
 | Owner | UNASSIGNED |
 | Collaborators | None registered |
 | Dependencies | TASK-001 must be DONE |
-| Blocked Reason | 尚未完成需求分析，且依赖 TASK-001 |
+| Blocked Reason | 尚未完成需求分析；TASK-001 dependency satisfied |
 
 ## Architecture Impact
 
@@ -34,7 +34,7 @@
 
 ## Next Action
 
-等待 `TASK-001` 完成，再明确属性清单、同步时机、冲突策略与数据版本。
+明确属性清单、同步时机、冲突策略与数据版本后再进入 `READY`。
 
 ## Testing Matrix
 

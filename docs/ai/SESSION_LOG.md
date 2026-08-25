@@ -1,3 +1,17 @@
+## 2026-08-25 - Multiplayer Topology 调查报告完成
+
+- 新增 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md`，按代码、CSV、Workshop 记录和官方通用 Steamworks 文档逐项回答 15 个调查问题，并记录 Lobby、Match、Game Server、Client、Player Session 与 Backend Session 边界。
+- 当前 Python 强制绑定 loopback，且由独立 PowerShell/Python 进程启动；Lua Provider 从权威 CSV 读取 `http://127.0.0.1:8765`。这些证据只证明 Lua 与 Python 同机时的候选 `MODEL-A`，不能证明正常发布 Arcade 的服务器位置。
+- 正常发布 Arcade 归类为 `MODEL-D`：Lobby Owner 与 Game Server 不得默认等同，Lua 主机、loopback 归属、owner 离开和 reconnect 行为需通过最小发布 Lobby 实验确认。生产 Session Foundation 在此之前暂停。
+- TASK-001 的本地 Workshop 城墙 final 验收在原范围内继续有效；本轮未修改 Gameplay、Python、SQL、CSV 或生成文件。先前只读 `.env` 检索涉及的凭据应轮换，文档未记录任何秘密值。
+
+## 2026-08-25 - TASK-001 城墙毁坏最终结算验收完成
+
+- 用户提供的 Workshop Tools 失败局日志确认：`game_end_final_requested source=wall_destroyed` 后，Lua 发出唯一可识别的 `final=true` 请求；同一 `session_id/request_id` 在 Python API 返回 `http_status=200`。
+- API 返回 `elapsed_seconds=11`、`online_seconds_total=5774`、`grant_count=0`；Supabase 最终 checkpoint 成功记录在线时间，`grant_count=0` 符合本次未跨奖励里程碑的结果。
+- 用户确认本次“城墙被毁 -> 在线时间最终记录”验收通过，`TASK-001` 按任务状态规范标记为 `DONE`。`session_closed` 是失败局结束后的本地 Lua 收尾回执，未作为服务端持久化验收阻断项。
+- 双玩家生产联调、重连、API 重启及其他 Session 扩展验证不纳入本次城墙验收，作为独立后续工作保留。
+
 ## 2026-08-24 - 数据库工作切换为 AI CTO 架构审查模式
 
 - 已阅读 `docs/ai/AI_CTO.md`，并按恢复顺序复核 `START_HERE.md`、`CURRENT_TASK.md`、`PROJECT_CONTEXT.md`、`DECISIONS.md`、`KNOWN_ISSUES.md`、本机工具链和两仓 Git 状态。

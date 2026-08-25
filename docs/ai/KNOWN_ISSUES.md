@@ -6,19 +6,19 @@ Last Reviewed: 2026-08-25
 
 ## ISSUE-001
 
-**Status:** TESTING
+**Status:** RESOLVED FOR ACCEPTED SCOPE
 
 **Priority:** P0
 
-**Symptom:** Workshop Tools 终局曾进入 `POST_GAME`，但未观察到 Survival final HTTP callback 或 `session_closed`。
+**Symptom:** Workshop Tools 城墙毁坏后曾无法确认最终在线结算是否发出。
 
 **Known Cause:** `game_end` 在该实机路径不能作为唯一终局入口；项目已增加 `POST_GAME` 和已完工城墙毁坏入口。
 
 **Current Workaround:** 使用幂等 `online_time_service.finish(source)` 覆盖 `wall_destroyed`、`POST_GAME` 和 `game_end`。
 
-**Next Action:** 冷启动 Workshop Tools，分别验证正常终局和城墙毁坏，关联 Dota 日志、HTTP 200、`final=true` 与唯一 `session_closed`。
+**Next Action:** 无。城墙毁坏范围已由用户验收通过；`session_closed` 仅作为失败局后的本地 callback 观测项保留，不阻断服务端结算。
 
-**Last Verified:** 2026-08-24；STATIC / CONTRACT / SIMULATION 通过，WORKSHOP 未复验。
+**Last Verified:** 2026-08-25；WORKSHOP 城墙毁坏、`final=true`、API HTTP 200 和在线时间持久化已由用户确认。
 
 ## ISSUE-002
 
@@ -26,15 +26,15 @@ Last Reviewed: 2026-08-25
 
 **Priority:** P0
 
-**Symptom:** 生产双玩家端到端联调尚未完成。
+**Symptom:** 正常发布 Arcade 的 Game Server/Lua 主机、Lobby Owner、Python 主机和 loopback 边界未知，生产双玩家端到端联调尚未完成。
 
-**Known Cause:** 需要两个真实 Steam 账号和完整主机环境。
+**Known Cause:** 当前只有本地 Workshop 同机证据；通用 Steamworks 文档不能证明 Dota Arcade 的具体分配模型，需要两个或三个真实 Steam 账号和发布 Lobby 实验。
 
-**Current Workaround:** 单玩家 Tools、Python 和 Supabase 测试只用于分层验证，不作为生产双玩家验收。
+**Current Workaround:** 正常 Arcade 归类为 `MODEL-D`；单玩家 Tools、Python 和 Supabase 测试只用于分层验证，不作为生产双玩家验收，也不继续扩展生产 Session 架构。
 
-**Next Action:** 验证双账号建档、独立 session/累计、checkpoint/奖励、终局、重连、幂等、API 重启和跨玩家隔离。
+**Next Action:** 先执行 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md` 的最小发布 Lobby 实验，确认 Lua 执行主机与 `127.0.0.1:8765` 归属；再验证双账号建档、独立 session/累计、owner/non-owner 离开、终局、重连、幂等、API 重启和跨玩家隔离。
 
-**Last Verified:** 2026-08-24。
+**Last Verified:** 2026-08-25；STATIC INVESTIGATION，未完成 PRODUCTION 验证。
 
 ## ISSUE-003
 

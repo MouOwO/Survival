@@ -1,13 +1,13 @@
 # Project Context
 
 Status: FACT
-Last Verified: 2026-08-24
+Last Verified: 2026-08-25
 
 ## Project Identity
 
 - SurvivalContent 是 Dota 2 Arcade 生存塔防项目。
 - 主要玩法包含英雄成长、防御塔、工人、资源、波次、挑战、奖励和永久玩家档案。
-- 游戏运行层使用 Dota 2 Lua 与 Panorama；永久数据通过本机 Python HTTP API 接入 Supabase PostgreSQL。
+- 游戏运行层使用 Dota 2 Lua 与 Panorama；当前已验证的本地 Workshop 路径通过同机 Python HTTP API 接入 Supabase PostgreSQL。
 
 ## Current Architecture
 
@@ -28,8 +28,9 @@ Supabase PostgreSQL
 ```
 
 - Python API 位于独立 `D:\survival_database` 仓库，当前不是 FastAPI。
-- 推荐多人拓扑是主机运行 Dota 服务端、Python API 和 Supabase 访问；加入者只连接 Dota 对局。
-- Python API 保持绑定 `127.0.0.1:8765`。改为 LAN 暴露必须另立安全设计任务。
+- 本地 Workshop/LAN 候选拓扑是同一主机运行 Dota 服务端 Lua、Python API 和 Supabase 访问；该结论不得外推为正常发布 Arcade 的事实。
+- 正常发布 Arcade 中 Lobby Owner、Game Server、Lua 运行主机和 Python 主机的关系尚未证实，当前归类为 `MODEL-D`。见 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md`。
+- Python API 保持绑定 `127.0.0.1:8765`；它只适用于 Lua 与 Python 同机的拓扑。不得为探测拓扑直接改绑 LAN 地址。
 
 ## Authority And Trust Boundaries
 
@@ -53,6 +54,7 @@ Supabase PostgreSQL
 - 在线时长只累计同一 session、租约内相邻 checkpoint 的有效差值；首次、新 session、超租约和离线间隔累计 0。
 - Session ID 必须包含每次运行唯一 nonce，避免跨 Workshop Run 重放历史幂等响应。
 - `reward_grants` 是不可变发放记录，`player_effect_totals` 是永久效果当前投影。
+- 已完工城墙毁坏通过 `finish("wall_destroyed")` 进入共享 final 状态机；验收服务端持久化以 Lua `final=true`、Python API HTTP 200 和 Supabase 返回最终在线累计为证据。终局后的本地 `session_closed` callback 可独立观测，不否定已成功提交的服务端 final。
 
 详细契约见 `PLAYER_PROFILE_INTEGRATION.md` 与 `FISHING_REWARD_INTEGRATION.md`。
 

@@ -479,11 +479,11 @@ Sprint 范围和门禁见 `CURRENT_SPRINT.md`。
 
 ### TASK-001 Player Session
 
-- Status: `IN_PROGRESS`
+- Status: `DONE`
 - Owner: `@xxx`
 - Dependency: None
 - Detail: `tasks/TASK-001.md`
-- Blocker: Owner 身份与 Affected Files 尚未完成交接确认。
+- Blocker: None；2026-08-25 用户确认城墙毁坏最终结算验收通过。
 
 ### TASK-002 Online Checkpoint
 
@@ -491,7 +491,7 @@ Sprint 范围和门禁见 `CURRENT_SPRINT.md`。
 - Owner: `@xxx`
 - Dependency: `TASK-001 must be DONE`
 - Detail: `tasks/TASK-002.md`
-- Blocker: Dependency 未完成，当前不可进入实现。
+- Blocker: None；进入实现前仍需登记 Affected Files。
 
 ### TASK-003 Offline Finalization
 
@@ -499,7 +499,7 @@ Sprint 范围和门禁见 `CURRENT_SPRINT.md`。
 - Owner: `UNASSIGNED`
 - Dependency: `TASK-001 must be DONE`
 - Detail: `tasks/TASK-003.md`
-- Blocker: Dependency 未完成；需要分配唯一 Owner。
+- Blocker: 需要分配唯一 Owner 并登记 Affected Files。
 
 ## P1
 
@@ -519,10 +519,10 @@ Sprint 范围和门禁见 `CURRENT_SPRINT.md`。
 
 ## Current Blockers
 
-1. `TASK-001` 的 `@xxx` 尚未映射到明确协作者，且 Task 文件未登记具体 Affected Files。
-2. `TASK-002`、`TASK-003` 和 `TASK-004` 受 `TASK-001` 依赖门禁阻塞。
-3. 终局 finalization 的 STATIC / CONTRACT / SIMULATION 已有通过记录，但截至 2026-08-24 仍缺 Workshop Tools 冷启动复验。
-4. 生产双玩家端到端验收尚未完成。
+1. 正常发布 Arcade 的 Game Server/Lua 主机与 `127.0.0.1` 归属仍为 `MODEL-D`；生产 Session Foundation 必须先完成 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md` 的最小发布 Lobby 实验。
+2. `TASK-003` 尚未分配唯一 Owner；`TASK-002`、`TASK-003` 和 `TASK-004` 进入实现前仍需登记 Affected Files。
+3. Dota 终局后的 `session_closed` callback 尚未完全观察到，但不阻断已通过的本地 Workshop 城墙毁坏服务端 final 持久化验收。
+4. 生产双玩家端到端验收尚未完成，作为独立后续工作保留。
 
 ## Collaboration Chain
 
@@ -546,7 +546,7 @@ PROJECT -> CURRENT_SPRINT -> CURRENT_TASK -> TASK -> Files -> Tests
 
 ## Next Recommended Action
 
-由 `TASK-001` 的 Owner 完成交接，明确身份、实际 Affected Files、剩余验证和下一步。依赖解除前不要启动 `TASK-002` 或 `TASK-003` 的实现。
+`TASK-001` 的本地 Workshop 验收已完成。涉及生产 Session 的下一步是执行拓扑报告中的发布 Lobby 实验；其他任务启动前确认唯一 Owner、Affected Files 和对应 Testing Matrix。
 
 ## History
 

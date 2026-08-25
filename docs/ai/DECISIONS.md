@@ -6,13 +6,13 @@ Last Reviewed: 2026-08-25
 
 ## DECISION-001
 
-**Decision:** 多人联调采用主机 Dota 拓扑，Python API 保持绑定 `127.0.0.1:8765`。
+**Decision:** 本地 Workshop/LAN 联调采用候选同机拓扑，Python API 保持绑定 `127.0.0.1:8765`；正常发布 Arcade 拓扑暂定 `MODEL-D`。
 
-**Reason:** Lua 服务端是 API 调用方，加入者无需直接访问 Python；loopback 缩小认证和网络暴露面。
+**Reason:** 当前代码与 Workshop 证据只证明 Lua 和 Python 同机时 loopback 可用；没有 Dota Arcade 专属证据证明 Lobby Owner 就是 Game Server 或 Lua 主机。loopback 仍用于缩小本地认证和网络暴露面。
 
-**Impact:** LAN API 暴露必须另立安全任务，包含认证、网段、防火墙和 TLS。
+**Impact:** 生产 Session Foundation 在最小拓扑实验完成前暂停；不得把 Lobby Owner、Game Server、Lua 主机和 Python 主机视为同一实体。LAN API 暴露仍必须另立安全任务。
 
-**Date:** 2026-08-23
+**Date:** 2026-08-23; qualified 2026-08-25
 
 ## DECISION-002
 
@@ -80,6 +80,6 @@ Last Reviewed: 2026-08-25
 
 **Reason:** Workshop Tools 中 `game_end` 不能作为唯一可靠入口。
 
-**Impact:** `POST_GAME`、`game_end` 和 `wall_destroyed` 共享状态机，不得重复 final；该行为仍需 Workshop 复验。
+**Impact:** `POST_GAME`、`game_end` 和 `wall_destroyed` 共享状态机，不得重复 final；城墙毁坏到服务端 final 持久化已完成 Workshop 验收。
 
-**Date:** 2026-08-24
+**Date:** 2026-08-24; accepted 2026-08-25
