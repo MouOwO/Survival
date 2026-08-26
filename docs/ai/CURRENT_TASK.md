@@ -1,3 +1,11 @@
+## 当前实施任务（2026-08-26）：LAN 多人活动槽位与初始化诊断
+
+- 用户确认 PC-B 曾通过 `connect 192.168.1.134:27015` 加载 `template_map`，但双方无英雄/Builder，随后快速出现“与主机的连接受到干扰”；该结果只证明地图加载，不证明活动玩家槽位或同步会话成立。
+- 根因审计发现生产入口只在 `Activate()` 固定分配玩家0；`player_connect_full` 到达英雄选择后会跳过分队。实施边界是：在 `FinishCustomGameSetup()` 前分配全部已连接玩家，兼容连接事件字段解析，并增加分队/英雄/断开结构化日志；不修改CSV多人容量、API loopback、Session、数据库或生成配置。
+- 晚于 setup 的裸 IP 直连不能被代码安全伪装成大厅活动玩家；若日志报告 `assignment_window_closed`，必须使用 Hidden/Friends Only 大厅让两名玩家在启动前进入好人方槽位。自动测试只能验证 Lua 行为和静态契约，稳定 UDP、实际 PlayerID、英雄/Builder可见性仍需 Workshop Tools 双机验收。
+- 实施完成：新增 `multiplayer_player_service.lua`，统一解析 `PlayerID/playerid/userid`、在 setup 窗口内分配已连接玩家并记录结构化日志；`addon_game_mode.lua` 在配置阶段和 `FinishCustomGameSetup()` 前调用该服务，并记录连接、英雄就绪和断开解析结果。新增 Lua 5.1 行为测试覆盖直接字段、userid 回退、批量分配、晚加入拒绝和非法 ID。
+- 自动验证通过：`MULTIPLAYER_PLAYER_SERVICE_LUA51_PASS`、`MULTIPLAYER_PLAYER_LUAC_PASS`、`ADDON_GAME_MODE_LUAC_PASS`、`MULTIPLAYER_PLAYER_CONTRACT_PASS`、`CSV_GENERATED_MULTIPLAYER_RULES_PASS`、`STRICT_UTF8_PASS` 和限定 `TARGET_DIFF_CHECK_PASS`。这些结果不是 Workshop Tools 双机验证；UDP 稳定性、实际活动槽位和玩家1地图 Marker 仍待实机确认。
+
 ## 本轮实机结果（2026-08-24）：终局未观察到失败回调或 API 业务请求
 
 - 本次 Workshop Tools 对局约运行 `74` 秒后进入 `DOTA_GAMERULES_STATE_POST_GAME`；用户提供的日志只包含 Dota 原生 `Target NPC is dead` / `invalid order (19)`、终局统计和 Match signout 信息。

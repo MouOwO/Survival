@@ -1,6 +1,6 @@
 # AI Session Recovery - Start Here
 
-Last Verified: 2026-08-25
+Last Verified: 2026-08-26
 
 ## Project
 
@@ -34,6 +34,7 @@ P0 是 Player Session、在线 checkpoint 和终局 finalization 的稳定联调
 - Dota 终局后的 `session_closed` 本地 callback 未作为本次服务端持久化验收阻断项，保留为非阻断观测事项。
 - 生产双玩家端到端验收仍是独立后续工作，不等同于 `TASK-001` 本次城墙毁坏范围。
 - 生产 Session Foundation 在发布 Lobby 拓扑实验完成前暂停；不得假定 Lobby Owner 就是 Game Server 或 Python 主机。
+- LAN 直连已出现“地图可加载但无英雄/Builder且快速断联”；生产入口已补充 setup 前全连接玩家分队、连接字段兼容和结构化诊断，但尚未完成 Workshop 双机验收。下一可靠检查点是 Hidden/Friends Only 大厅中两名玩家启动前进入好人方，并确认 `status`、PlayerID、`hero_ready` 和 `BUILDER_READY`。
 
 ## Minimum Required Context
 

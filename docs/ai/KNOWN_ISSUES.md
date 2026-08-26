@@ -26,15 +26,15 @@ Last Reviewed: 2026-08-25
 
 **Priority:** P0
 
-**Symptom:** 正常发布 Arcade 的 Game Server/Lua 主机、Lobby Owner、Python 主机和 loopback 边界未知，生产双玩家端到端联调尚未完成。
+**Symptom:** 正常发布 Arcade 的 Game Server/Lua 主机、Lobby Owner、Python 主机和 loopback 边界未知，生产双玩家端到端联调尚未完成。LAN 裸 IP 直连曾加载地图，但双方无英雄/Builder并快速断联，活动玩家槽位和稳定同步均未证明。
 
 **Known Cause:** 当前只有本地 Workshop 同机证据；通用 Steamworks 文档不能证明 Dota Arcade 的具体分配模型，需要两个或三个真实 Steam 账号和发布 Lobby 实验。
 
-**Current Workaround:** 正常 Arcade 归类为 `MODEL-D`；单玩家 Tools、Python 和 Supabase 测试只用于分层验证，不作为生产双玩家验收，也不继续扩展生产 Session 架构。
+**Current Workaround:** 正常 Arcade 归类为 `MODEL-D`；单玩家 Tools、Python 和 Supabase 测试只用于分层验证，不作为生产双玩家验收，也不继续扩展生产 Session 架构。LAN 验证优先使用 Hidden/Friends Only 大厅，让所有玩家在 setup 结束前进入好人方；服务端结构化日志区分分队成功、`assignment_window_closed`、英雄就绪和断开字段解析。
 
-**Next Action:** 先执行 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md` 的最小发布 Lobby 实验，确认 Lua 执行主机与 `127.0.0.1:8765` 归属；再验证双账号建档、独立 session/累计、owner/non-owner 离开、终局、重连、幂等、API 重启和跨玩家隔离。
+**Next Action:** 先用两账号大厅验证主机 `status` 为2、两端活动 PlayerID 为0/1、服务端出现双方 `hero_ready`，并区分玩家1 Marker 缺失与网络断联；随后执行 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md` 的最小发布 Lobby 实验，确认 Lua 执行主机与 `127.0.0.1:8765` 归属，再验证双账号 Session 隔离与离开/重连。
 
-**Last Verified:** 2026-08-25；STATIC INVESTIGATION，未完成 PRODUCTION 验证。
+**Last Verified:** 2026-08-26；STATIC/SIMULATION/LUAC，未完成 WORKSHOP 或 PRODUCTION 验证。
 
 ## ISSUE-003
 

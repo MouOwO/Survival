@@ -1,3 +1,10 @@
+# 2026-08-26 - LAN 多人活动槽位入口与结构化诊断
+
+- 用户反馈 PC-B 通过 LAN 地址加载 `template_map` 后双方没有英雄/Builder，并很快出现连接中断；审计确认这不能证明活动玩家槽位或服务端同步成功。
+- 生产入口原先只在 Activate 固定尝试玩家0，且连接回调在英雄选择后静默跳过分队。新增 `multiplayer_player_service.lua`，从多人 CSV 生成配置读取容量，统一解析 `PlayerID/playerid/userid`，在 setup 窗口内分配全部已连接玩家，并对窗口关闭、英雄就绪和断开解析输出无敏感信息的结构化日志。
+- `addon_game_mode.lua` 在游戏规则配置阶段和 `FinishCustomGameSetup()` 前批量分队；晚于 setup 的裸 IP 直连继续失败关闭，不冒险修改已开始对局的队伍。若出现 `assignment_window_closed`，双机验收应改用 Hidden/Friends Only 大厅并在启动前进入好人方。
+- 自动验证通过：Lua 5.1 行为、目标 Lua 语法、入口契约、多人 CSV 与生成 Lua 一致性、严格 UTF-8 和限定 diff。尚未执行 Workshop Tools 双机实测；UDP 稳定性、实际 PlayerID、双方英雄和玩家1 Builder Marker 均未验收。
+
 ## 2026-08-25 - Multiplayer Topology 调查报告完成
 
 - 新增 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md`，按代码、CSV、Workshop 记录和官方通用 Steamworks 文档逐项回答 15 个调查问题，并记录 Lobby、Match、Game Server、Client、Player Session 与 Backend Session 边界。

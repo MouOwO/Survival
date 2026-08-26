@@ -1,5 +1,6 @@
 local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
 local multiplayer_rules = require("config/generated/multiplayer_rules")
+local multiplayer_player_service = require("systems/multiplayer_player_service")
 
 local function configured_max_players()
     local rule = (multiplayer_rules.by_id or {}).default_multiplayer
@@ -235,16 +236,6 @@ local initialized = false
 local replacing_forced_hero = {}
 local ready_hero_entindex_by_player = {}
 
-local function assign_player_to_survival_team(player_id)
-    if player_id == nil or player_id < 0 then
-        return
-    end
-    if GameRules:State_Get() >= DOTA_GAMERULES_STATE_HERO_SELECTION then
-        return
-    end
-    PlayerResource:SetCustomTeamAssignment(player_id, DOTA_TEAM_GOODGUYS)
-end
-
 local function configure_game_rules()
     local launch_rules_applied, launch_error = configure_survival_launch_rules()
     if not launch_rules_applied then
@@ -263,7 +254,7 @@ local function configure_game_rules()
         configured_max_players()
     )
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
-    assign_player_to_survival_team(0)
+    multiplayer_player_service.assign_connected_players("configure_game_rules")
     GameRules:SetHeroRespawnEnabled(true)
     GameRules:SetPreGameTime(5)
     GameRules:SetGoldPerTick(0)
@@ -277,26 +268,32 @@ local function configure_game_rules()
 end
 
 local function on_player_connected(keys)
-    local player_id = tonumber(keys.PlayerID)
-    assign_player_to_survival_team(player_id)
-    require("systems/fishing_reward_service").connect(player_id)
+    local player_id, resolution, userid =
+        multiplayer_player_service.resolve_player_id(keys)
+    local assigned, assignment_error =
+        multiplayer_player_service.assign_to_survival_team(
+            player_id,
+            "player_connect_full"
+        )
+    print("[MULTIPLAYER_PLAYER] connect_full player_id=" .. tostring(player_id)
+        .. " resolution=" .. tostring(resolution)
+        .. " userid=" .. tostring(userid)
+        .. " assigned=" .. tostring(assigned)
+        .. " assignment_error=" .. tostring(assignment_error))
+    if player_id ~= nil then
+        require("systems/fishing_reward_service").connect(player_id)
+    end
 end
 
 local function on_player_disconnected(keys)
     keys = keys or {}
     local direct_player_id = tonumber(keys.PlayerID or keys.playerid)
-    local userid = tonumber(keys.userid or keys.UserID)
-    local player_id = direct_player_id
-    if player_id == nil and userid ~= nil
-        and type(PlayerInstanceFromIndex) == "function" then
-        local player = PlayerInstanceFromIndex(userid)
-        if player and type(player.GetPlayerID) == "function" then
-            player_id = tonumber(player:GetPlayerID())
-        end
-    end
+    local player_id, resolution, userid =
+        multiplayer_player_service.resolve_player_id(keys)
     print("[OnlineTime] disconnect_event player_id=" .. tostring(player_id)
         .. " direct_player_id=" .. tostring(direct_player_id)
-        .. " userid=" .. tostring(userid))
+        .. " userid=" .. tostring(userid)
+        .. " resolution=" .. tostring(resolution))
     if player_id == nil or player_id < 0 then
         print("[OnlineTime] disconnect_ignored reason=player_id_unresolved")
         return
@@ -333,6 +330,10 @@ local function initialize_survival_hero(hero)
         player_id = player_id,
         team = hero:GetTeamNumber(),
     })
+    print("[MULTIPLAYER_PLAYER] hero_ready player_id=" .. tostring(player_id)
+        .. " team=" .. tostring(hero:GetTeamNumber())
+        .. " entindex=" .. tostring(hero_entindex)
+        .. " unit=" .. tostring(unit_name))
     ui_snapshot_service.publish_player(player_id)
 end
 
@@ -921,6 +922,7 @@ function M.activate()
     ListenToGameEvent("dota_item_picked_up", on_item_picked_up, nil)
     -- End setup only after every HERO_READY subscriber and engine listener is
     -- installed; forced hero creation can happen synchronously from here.
+    multiplayer_player_service.assign_connected_players("before_finish_setup")
     GameRules:FinishCustomGameSetup()
     logger.info(
         "Addon",
