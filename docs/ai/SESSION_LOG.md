@@ -1,3 +1,10 @@
+# 2026-08-27 - 多人 setup 等待窗口与玩家波次 Marker 映射
+
+- 权威 `multiplayer_rules.csv` 新增 `setup_wait_seconds=15`；入口不再于 `Activate()` 同步调用 `FinishCustomGameSetup()`，而是在等待期间处理连接事件，并于窗口结束前再次分配全部已连接玩家。
+- 权威 `player_slots.csv` 将 PlayerID 0..3 明确映射到 Hammer 既有命名 `monsterborn_player1..4`，避免根据 0/1 基索引猜测；使用通用生成器函数定向重建两份多人 Lua 配置。
+- 本轮边界不包含 Hammer 地图编辑，也不包含 `wave_system.lua` 的每玩家通道重构。四个 `player_0_builder_spawn` 至 `player_3_builder_spawn` 仍须在 Hammer 中补齐并编译，然后执行 Hidden/Friends Only 双机验证。
+- 自动检查不能证明 UDP 稳定、真实 PlayerID、地图产物加载、双方实体可见性或 Builder 控制权；这些仍是 Workshop Tools 实机验收项。
+
 # 2026-08-26 - LAN 多人活动槽位入口与结构化诊断
 
 - 用户反馈 PC-B 通过 LAN 地址加载 `template_map` 后双方没有英雄/Builder，并很快出现连接中断；审计确认这不能证明活动玩家槽位或服务端同步成功。

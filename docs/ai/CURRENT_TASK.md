@@ -1,4 +1,12 @@
-## 当前实施任务（2026-08-26）：LAN 多人活动槽位与初始化诊断
+## 当前实施任务（2026-08-27）：多人启动窗口、槽位 Marker 与双机验证
+
+- 本轮已将多人启动等待窗口纳入权威 `multiplayer_rules.csv`，默认 `setup_wait_seconds=15`；`addon_game_mode.lua` 不再在 `Activate()` 同步结束 setup，而是在等待期间接收并分配连接玩家，结束前再次批量分配。
+- `player_slots.csv` 已显式映射：player 0..3 -> `monsterborn_player1..4`，并由项目生成器定向重建 `multiplayer_rules.lua` 与 `player_slots.lua`，未直接手改生成配置。
+- Hammer 仍缺少或尚未确认 `player_0_builder_spawn` 至 `player_3_builder_spawn`；本轮没有伪造地图实体，也没有开始改造 `wave_system.lua` 的全局城墙、出生与统计状态。
+- 下一可靠检查点：编译含四个 Builder marker 的地图后，通过 Hidden/Friends Only 大厅让 A/B 在启动前加入；确认 A/B 分别为 PlayerID 0/1、双方 `hero_ready`/`BUILDER_READY`、Builder 位置和所有权、彼此实体可见性。
+- 自动验证只覆盖 CSV/生成配置、Lua 5.1 行为、语法和静态契约；UDP、地图 marker、实体同步与控制权必须在 Workshop Tools 双机实测。
+
+## 前序实施（2026-08-26）：LAN 多人活动槽位与初始化诊断
 
 - 用户确认 PC-B 曾通过 `connect 192.168.1.134:27015` 加载 `template_map`，但双方无英雄/Builder，随后快速出现“与主机的连接受到干扰”；该结果只证明地图加载，不证明活动玩家槽位或同步会话成立。
 - 根因审计发现生产入口只在 `Activate()` 固定分配玩家0；`player_connect_full` 到达英雄选择后会跳过分队。实施边界是：在 `FinishCustomGameSetup()` 前分配全部已连接玩家，兼容连接事件字段解析，并增加分队/英雄/断开结构化日志；不修改CSV多人容量、API loopback、Session、数据库或生成配置。

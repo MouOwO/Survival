@@ -7,13 +7,18 @@ local function configured_max_players()
     return math.max(1, math.floor(tonumber(rule and rule.max_players) or 1))
 end
 
+local function configured_setup_wait_seconds()
+    local rule = (multiplayer_rules.by_id or {}).default_multiplayer
+    return math.max(0, math.floor(tonumber(rule and rule.setup_wait_seconds) or 0))
+end
+
 local function configure_survival_launch_rules()
     local game_mode = GameRules:GetGameModeEntity()
     if not game_mode then
         return false, "game_mode_entity_unavailable"
     end
     game_mode:SetCustomGameForceHero(SURVIVAL_FORCE_HERO)
-    GameRules:SetCustomGameSetupTimeout(0)
+    GameRules:SetCustomGameSetupTimeout(configured_setup_wait_seconds())
     GameRules:SetHeroSelectionTime(0)
     GameRules:SetShowcaseTime(0)
     GameRules:SetStrategyTime(0)
@@ -23,7 +28,7 @@ local function configure_survival_launch_rules()
     )
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
     GameRules:EnableCustomGameSetupAutoLaunch(true)
-    GameRules:SetCustomGameSetupAutoLaunchDelay(0)
+    GameRules:SetCustomGameSetupAutoLaunchDelay(configured_setup_wait_seconds())
     return true, nil
 end
 
@@ -40,6 +45,8 @@ local launch_map_name = GetMapName and GetMapName() or "unknown"
 print(
     "[SURVIVAL_LAUNCH_RULES] phase=module_load map=" .. tostring(launch_map_name)
         .. " ok=" .. tostring(launch_rules_ok)
+        .. " max_players=" .. tostring(configured_max_players())
+        .. " setup_wait_seconds=" .. tostring(configured_setup_wait_seconds())
         .. " deferred=" .. tostring(
             launch_rules_error == "game_mode_entity_unavailable"
         )
@@ -892,6 +899,10 @@ function M.activate()
     replacing_forced_hero = {}
     ready_hero_entindex_by_player = {}
 
+    print("[MULTIPLAYER_SESSION] activate map=" .. tostring(GetMapName and GetMapName() or "unknown")
+        .. " max_players=" .. tostring(configured_max_players())
+        .. " setup_wait_seconds=" .. tostring(configured_setup_wait_seconds()))
+
     event_bus.reset()
     configure_game_rules()
     scheduler.init()
@@ -920,10 +931,16 @@ function M.activate()
     ListenToGameEvent("npc_spawned", on_npc_spawned, nil)
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
     ListenToGameEvent("dota_item_picked_up", on_item_picked_up, nil)
-    -- End setup only after every HERO_READY subscriber and engine listener is
-    -- installed; forced hero creation can happen synchronously from here.
+    -- Keep setup open for the CSV-defined join window. Connection events can
+    -- assign players during this interval; the final sweep catches players
+    -- whose connection event arrived before this listener was installed.
     multiplayer_player_service.assign_connected_players("before_finish_setup")
-    GameRules:FinishCustomGameSetup()
+    scheduler.after(configured_setup_wait_seconds(), function()
+        multiplayer_player_service.assign_connected_players("setup_wait_elapsed")
+        GameRules:FinishCustomGameSetup()
+        print("[MULTIPLAYER_SESSION] setup_finished wait_seconds="
+            .. tostring(configured_setup_wait_seconds()))
+    end, "multiplayer_finish_custom_game_setup")
     logger.info(
         "Addon",
         "initialized V1.6 logical weapon growth core"
