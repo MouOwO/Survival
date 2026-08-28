@@ -1,3 +1,12 @@
+# 2026-08-28 — 研究所所有研究技能排除 A 键
+
+- 用户确认普通与高级研究所的研究技能全部排除 `A`，从 `Q/W/E/R/T/S` 开始顺序分配；最终高级十槽为 `Q/W/E/R/T/S/D/F/G/H`。
+- 同步修改 `combat_stats.js` 官方角标/输入命中、`hud_takeover.js` 研究角标和 `ui_bootstrap.js` 的 `H` fallback；Builder/英雄 Blink 与箭塔移动的 `D` 映射保持不变。
+- 权威 `research_lab_abilities.csv` 的普通第六槽和高级第六至第十槽备注改为 `S/D/F/G/H`，并通过项目生成器同步 `research_lab_abilities.lua`；Ability KV、XML 和科技数值未改。
+- 三份 Panorama JS 强制定向编译均返回 `OK: 1 compiled, 0 failed, 0 skipped`；CSV/生成 Lua 映射、严格 UTF-8、生成 Lua `luac5.1` 和限定 `git diff --check` 通过。
+- 全量配置生成器的生成阶段成功，但其既有全量 `U+FFFD` 门禁失败；无关生成文件已恢复，未覆盖用户原有工作区修改。
+- 尚需 Workshop Tools 完全冷启动确认高级研究所 `Q/W/E/R/T/S/D/F/G/H` 显示与输入一致、`A` 不触发研究，并回归英雄原生 `A` 攻击及 `D` 行为。
+
 # 2026-08-27 - 多人 setup 等待窗口与玩家波次 Marker 映射
 
 - 权威 `multiplayer_rules.csv` 新增 `setup_wait_seconds=15`；入口不再于 `Activate()` 同步调用 `FinishCustomGameSetup()`，而是在等待期间处理连接事件，并于窗口结束前再次分配全部已连接玩家。

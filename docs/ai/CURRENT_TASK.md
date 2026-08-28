@@ -1,3 +1,12 @@
+## 当前插入任务（2026-08-28）：研究所所有研究技能排除 A 键
+
+- 用户追加确认普通与高级研究所的研究技能均不得占用 `A`，统一从 `Q/W/E/R/T/S` 顺序继续分配。
+- 当前映射为：普通研究所 `Q/W/E/R/T/S`；高级研究所 `Q/W/E/R/T/S/D/F/G/H`。`D` 继续保留给 Builder/英雄 Blink 与箭塔移动，未改 Builder 技能映射。
+- 已同步修改 `combat_stats.js` 的官方角标、研究输入命中映射，`hud_takeover.js` 的研究角标，以及 `ui_bootstrap.js` 的 `H` fallback 注册；CSV 备注与生成 Lua 同步更新，Ability KV/XML 未修改。
+- 三份 Panorama 源码已重新编译为游戏侧 `.vjs_c`，均为 `OK: 1 compiled, 0 failed, 0 skipped`；CSV/生成 Lua 映射、严格 UTF-8、生成 Lua `luac5.1` 和限定 `git diff --check` 已通过。
+- 全量 `build_configs.ps1` 已完成 CSV→Lua 生成，但最终全量 UTF-8 门禁被仓库既有的其他生成 Lua `U+FFFD` 阻断；已清理本轮无关生成差异，仅保留研究所 CSV 对应生成 Lua。
+- 仍待 Workshop Tools 完全冷启动：确认高级研究所十槽显示/输入为 `Q/W/E/R/T/S/D/F/G/H`，`A` 不触发研究，英雄原生 `A` 攻击、Builder/英雄 Blink 和箭塔移动 `D` 不回归。
+
 ## 当前实施任务（2026-08-27）：多人启动窗口、槽位 Marker 与双机验证
 
 - 本轮已将多人启动等待窗口纳入权威 `multiplayer_rules.csv`，默认 `setup_wait_seconds=15`；`addon_game_mode.lua` 不再在 `Activate()` 同步结束 setup，而是在等待期间接收并分配连接玩家，结束前再次批量分配。
