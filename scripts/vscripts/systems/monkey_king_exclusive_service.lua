@@ -3,6 +3,7 @@ local events = require("core/events")
 local combat_events = require("combat/combat_events")
 local scheduler = require("core/scheduler")
 local config = require("config/generated/monkey_king_exclusive_runtime")
+local hero_cosmetic_service = require("systems/hero_cosmetic_service")
 
 local M = {}
 M.sound_service = require("core/sound_service")
@@ -490,6 +491,7 @@ local function create_clone(player_id)
     clone.survival_monkey_king_clone = true
     clone.survival_permanent_summon = runtime().w_clone_permanent ~= false
     clone.survival_display_name = "混沌神猿分身"
+    hero_cosmetic_service.apply(clone, "hero_monkey_king")
     apply_clone_no_collision(clone)
     if clone.SetBaseStrength then clone:SetBaseStrength(0) end
     if clone.SetBaseAgility then clone:SetBaseAgility(0) end

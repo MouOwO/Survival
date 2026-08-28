@@ -1,0 +1,10 @@
+"AddonInfo"
+{
+    "maps"              "phase2a_lab"
+    "IsPlayable"        "1"
+    "EnablePickRules"   "0"
+    "phase2a_lab"
+    {
+        "MaxPlayers"    "1"
+    }
+}

@@ -183,6 +183,8 @@ function M.apply(unit, data)
         return false, "upgrade_preload_failed"
     end
     local same_model = M.matches(unit, data)
+    local previous_asset_id = unit.survival_model_asset_id
+    local previous_model_path = unit.survival_applied_model_path
 
     if requested_asset_id and asset and asset.asset_id == requested_asset_id
         and not preload.is_ready(requested_asset_id) then
@@ -191,7 +193,6 @@ function M.apply(unit, data)
             return status ~= preload.STATE.FAILED
                 and status ~= preload.STATE.RETIRED, status
         end
-        local previous_asset_id = unit.survival_model_asset_id
         unit.survival_model_asset_id = requested_asset_id
         unit.survival_pending_model_asset_id = requested_asset_id
         unit.survival_pending_previous_model_asset_id = previous_asset_id
@@ -253,11 +254,21 @@ function M.apply(unit, data)
     local appearance_ok, appearance_status, components =
         appearance.Refresh(unit, asset)
     if not appearance_ok then
-        clear_activity_modifiers(unit)
-        clear_particles(unit)
-        clear_bodygroups(unit)
-        unit.survival_model_asset_id = nil
-        unit.survival_applied_model_path = nil
+        if previous_model_path and previous_model_path ~= model_path then
+            safe_call(unit, "SetModel", previous_model_path)
+            safe_call(unit, "SetOriginalModel", previous_model_path)
+            local previous_asset = catalog.resolve(previous_asset_id)
+            apply_activity_modifiers(unit, previous_asset)
+            reset_main_animation(unit, previous_asset)
+            apply_bodygroups(unit, previous_asset)
+            if previous_asset and tonumber(previous_asset.model_scale) then
+                safe_call(unit, "SetModelScale", tonumber(previous_asset.model_scale))
+            end
+            safe_call(unit, "SetSkin",
+                previous_asset and tonumber(previous_asset.model_skin) or 0)
+        end
+        unit.survival_model_asset_id = previous_asset_id
+        unit.survival_applied_model_path = previous_model_path
         unit.survival_pending_model_asset_id = nil
         unit.survival_pending_previous_model_asset_id = nil
         return false, appearance_status

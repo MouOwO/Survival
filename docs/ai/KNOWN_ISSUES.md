@@ -1,6 +1,6 @@
 # Known Issues
 
-Last Reviewed: 2026-08-25
+Last Reviewed: 2026-08-27
 
 本文件只记录当前仍存在的问题。已解决和历史问题见 `archive/2026-08-25-pre-knowledge-refactor/KNOWN_ISSUES.md` 与 `SESSION_LOG.md`。
 
@@ -99,3 +99,19 @@ Last Reviewed: 2026-08-25
 **Next Action:** 保持当前检测流程，不因 PATH 缺失直接判定工具不可用。
 
 **Last Verified:** 2026-08-25，本机四个配置路径均存在。
+
+## ISSUE-007
+
+**Status:** BLOCKED
+
+**Priority:** P2
+
+**Symptom:** 用户实机确认隔离 `survival_phase2a/phase2a_lab` 的 A `DirectUnitSanity` 可见、B `portrait_world_unit Background` 纯黑、C `Prop_dynamic Background Control` 可见。A/B/C 分层结果已将当前失败点收敛到 B 的 `portrait_world_unit` 实体契约。
+
+**Known Cause:** Base 最小实体契约、相机、灯光、background map、scene packaging 和 C `prop_dynamic` 对照均已通过静态或实机检查。编译后 `default_ents.vents_c` 明确包含 `portrait_world_unit`、`npc_dota_hero_axe` 和 `[PR#]phase2a_axe_portrait_unit`，但 Stage 1 运行时执行 `ent_find portrait_world_unit` 与 `ent_find phase2a_axe_portrait_unit` 均返回 `Found 0 matches.`；当前工具运行时没有把该编译实体暴露为可查找实体。
+
+**Current Workaround:** 按 Phase 2A 首个失败即停止规则，不加载 Head `22217` 或后续 ItemDef；正式 HUD、世界模型和生产饰品系统不受影响。
+
+**Next Action:** 当前结论固定为 `PORTRAIT_RUNTIME_ENTITY_MISSING` 并停止 Phase 2A。除非另立任务取得官方 portrait world 运行时加载/实体系统契约的新证据，否则不再调整 B、不加载 Head `22217`、Weapon、其它 ItemDef 或 Phase 2B，也不修改正式 `survival`。
+
+**Last Verified:** 2026-08-27；`DATA_INVALID` 已消失并出现单 Base `[PHASE2A] LOAD`。A=PASS、B=FAIL/黑屏、C=PASS；编译实体 lump 含目标 classname、Axe unit name 和 targetname，但两条只读 `ent_find` 均为 0。`HEAD_RESOURCE_COUNT=0`，未加载 `22217`。

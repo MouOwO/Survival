@@ -68,6 +68,35 @@ local function base_damage_outgoing_pct(unit)
     return total
 end
 
+local function apply_portrait_metadata(unit, snapshot)
+    snapshot = snapshot or {}
+    snapshot.model_asset_id = ""
+    snapshot.portrait_unit_name = ""
+    snapshot.portrait_item_def = ""
+
+    if not unit then return snapshot end
+    local asset_id = tostring(unit.survival_model_asset_id or "")
+    local asset = asset_catalog.get(asset_id)
+    if not asset then
+        local hero_id = tostring(unit.survival_hero_id or "")
+        if hero_id == "" then hero_id = tostring(snapshot.hero_id or "") end
+        if hero_id ~= "" then
+            asset_id = "hero_permanent_" .. hero_id
+            asset = asset_catalog.get(asset_id)
+        end
+    end
+    if not asset and unit.survival_monkey_king_clone == true then
+        asset_id = "hero_permanent_hero_monkey_king"
+        asset = asset_catalog.get(asset_id)
+    end
+    if not asset then return snapshot end
+
+    snapshot.model_asset_id = tostring(asset.asset_id or asset_id or "")
+    snapshot.portrait_unit_name = tostring(asset.portrait_unit_name or "")
+    snapshot.portrait_item_def = tostring(asset.portrait_item_def or "")
+    return snapshot
+end
+
 local function unit_combat_snapshot(unit)
     local strength = safe_number(unit, "GetStrength", 0)
     local agility = safe_number(unit, "GetAgility", 0)
@@ -91,8 +120,6 @@ local function unit_combat_snapshot(unit)
         or (configured_name and configured_name.enabled ~= false
             and configured_name.display_name)
         or internal_name
-    local model_asset_id = unit.survival_model_asset_id or ""
-    local visual_asset = asset_catalog.get(model_asset_id)
     local absolute_level = tonumber(unit.survival_level)
         or safe_number(unit, "GetLevel", 1)
     local armor_mapping_version = tonumber(unit.survival_armor_mapping_version) or 1
@@ -108,7 +135,7 @@ local function unit_combat_snapshot(unit)
             or tonumber(unit.survival_base_war3_armor)
             or 0)
         or nil
-    return {
+    return apply_portrait_metadata(unit, {
         entindex = unit:entindex(),
         unit_name = internal_name,
         display_name = display_name,
@@ -139,11 +166,8 @@ local function unit_combat_snapshot(unit)
         strength = strength,
         agility = agility,
         intellect = intellect,
-        model_asset_id = model_asset_id,
-        portrait_unit_name = visual_asset and visual_asset.portrait_unit_name or "",
-        portrait_item_def = visual_asset and visual_asset.portrait_item_def or "",
         source = "selected_unit_runtime",
-    }
+    })
 end
 
 local function valid_player_id(player_id)
@@ -238,7 +262,7 @@ local function hero_ui_snapshot(player_id, entindex, unit)
     -- Never replace one field with a transient engine-frame value here: doing
     -- so made request responses alternate between projected armor and zero
     -- while the regular NetTable still contained the stable hero snapshot.
-    return combat_stat_projection.for_ui(snapshot)
+    return combat_stat_projection.for_ui(apply_portrait_metadata(unit, snapshot))
 end
 
 local function register_selected_unit_stats_request()
@@ -332,9 +356,14 @@ local function on_hero_combat_stats_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     local snapshot = payload and payload.snapshot
     if not valid_player_id(player_id) or type(snapshot) ~= "table" then return end
-    if tonumber(selected_unit_by_player[player_id])
-        ~= tonumber(snapshot.entindex) then return end
-    local projected = combat_stat_projection.for_ui(snapshot)
+    local selected_entindex = tonumber(selected_unit_by_player[player_id])
+    if selected_entindex ~= tonumber(snapshot.entindex) then return end
+    local ok, unit = pcall(EntIndexToHScript, selected_entindex)
+    if not ok or not unit or unit:IsNull() then return end
+    local decorated = {}
+    for key, value in pairs(snapshot) do decorated[key] = value end
+    apply_portrait_metadata(unit, decorated)
+    local projected = combat_stat_projection.for_ui(decorated)
     projected.success = 1
     projected.reason = payload.reason or snapshot.reason
         or "hero_combat_stats_changed"
@@ -1301,6 +1330,7 @@ function M.init()
 end
 
 M._test = {
+    apply_portrait_metadata = apply_portrait_metadata,
     on_notification = on_notification,
 }
 

@@ -252,7 +252,6 @@ local function configure_game_rules()
     print("[SURVIVAL_LAUNCH_RULES] phase=activate ok=true deferred=false error=nil")
     local game_mode = GameRules:GetGameModeEntity()
     game_mode:SetBuybackEnabled(false)
-    game_mode:SetCameraDistanceOverride(1500)
     game_mode:SetFixedRespawnTime(2)
     -- Human players must never occupy the enemy team. Allowing Badguys
     -- player slots made early Workshop runs assign the local player there.
@@ -551,18 +550,11 @@ function M.precache(context)
         "particles/items_fx/blink_dagger_end.vpcf",
         context
     )
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_legion_commander/legion_commander_odds.vpcf",
-        context
-    )
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_juggernaut/juggernaut_blade_fury.vpcf",
-        context
-    )
     local units = {
         "npc_dota_hero_undying",
+        "npc_dota_hero_legion_commander",
+        "npc_dota_hero_juggernaut",
+        "asset_proxy_hero_monkey_king",
         "npc_survival_builder_proxy",
         "npc_survival_doom_infernal",
         "npc_survival_drow_companion",
@@ -902,6 +894,14 @@ function M.activate()
     print("[MULTIPLAYER_SESSION] activate map=" .. tostring(GetMapName and GetMapName() or "unknown")
         .. " max_players=" .. tostring(configured_max_players())
         .. " setup_wait_seconds=" .. tostring(configured_setup_wait_seconds()))
+
+    local runtime_modifiers_valid, runtime_modifier_count_or_error =
+        modifier_registry.register()
+    assert(runtime_modifiers_valid,
+        "runtime modifier registry validation failed: "
+        .. tostring(runtime_modifier_count_or_error))
+    print("[SURVIVAL_MODIFIER_BOOTSTRAP] phase=activate registry_refreshed=true count="
+        .. tostring(runtime_modifier_count_or_error))
 
     event_bus.reset()
     configure_game_rules()

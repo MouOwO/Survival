@@ -11,11 +11,55 @@ function modifier_single_health_bar:GetAttributes()
     return MODIFIER_ATTRIBUTE_PERMANENT
 end
 
+local TABLE = "survival_hero_health_bar"
+
+local function publish(unit, value)
+    if not CustomNetTables or not unit or not unit.entindex then
+        return
+    end
+    CustomNetTables:SetTableValue(
+        TABLE,
+        "unit_" .. tostring(unit:entindex()),
+        value
+    )
+end
+
+function modifier_single_health_bar:OnCreated()
+    self:publish_state()
+    self:StartIntervalThink(0.1)
+end
+
+function modifier_single_health_bar:OnIntervalThink()
+    self:publish_state()
+end
+
+function modifier_single_health_bar:publish_state()
+    local unit = self:GetParent()
+    if not unit or (unit.IsNull and unit:IsNull()) then
+        return
+    end
+    publish(unit, {
+        entindex = unit:entindex(),
+        health = math.max(0, unit:GetHealth()),
+        max_health = math.max(1, unit:GetMaxHealth()),
+        alive = unit:IsAlive() and 1 or 0,
+        team = unit:GetTeamNumber(),
+    })
+end
+
+function modifier_single_health_bar:OnDestroy()
+    local unit = self:GetParent()
+    if unit and (not unit.IsNull or not unit:IsNull()) then
+        publish(unit, { removed = 1 })
+    end
+end
+
 function modifier_single_health_bar:CheckState()
-    -- Keep this modifier as a compatibility marker, but let the engine render
-    -- its native overhead health bars. This also removes the old 10 Hz
-    -- CustomNetTable publishing path used by the Panorama world-bar overlay.
-    return {}
+    local states = {}
+    if MODIFIER_STATE_NO_HEALTH_BAR ~= nil then
+        states[MODIFIER_STATE_NO_HEALTH_BAR] = true
+    end
+    return states
 end
 
 return modifier_single_health_bar

@@ -1,4 +1,5 @@
 local M = {}
+local unit_health_bar_service = require("systems/unit_health_bar_service")
 
 local phase_by_player = {}
 local hero_by_player = {}
@@ -40,9 +41,11 @@ function M.isolate_placeholder(player_id, hero)
     if hero.SetMoveCapability then
         hero:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
     end
+    hero.survival_hide_custom_health_bar = true
     if hero.AddNewModifier and not hero:HasModifier("modifier_survival_placeholder_anchor") then
         hero:AddNewModifier(hero, nil, "modifier_survival_placeholder_anchor", {})
     end
+    unit_health_bar_service.exclude(hero)
     if hero.SetAbsOrigin then
         hero:SetAbsOrigin(Vector(0, 0, -10000))
     end

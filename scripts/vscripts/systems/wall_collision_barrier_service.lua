@@ -1,3 +1,5 @@
+local unit_health_bar_service = require("systems/unit_health_bar_service")
+
 local M = {}
 local barriers_by_wall = {}
 local COLUMN_COUNT = 3
@@ -101,6 +103,7 @@ function M.create(wall)
                 barrier.survival_wall_collision_side = side.id
                 barrier.survival_wall_collision_column = column
                 barrier.survival_wall_collision_segment = segment
+                unit_health_bar_service.exclude(barrier)
                 barrier:AddNoDraw()
                 barrier:AddNewModifier(
                     barrier,

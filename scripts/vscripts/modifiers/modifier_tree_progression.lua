@@ -65,12 +65,8 @@ function M:OnTakeDamage(params)
     if type(callback) ~= "function" then return end
 
     self.upgrade_pending = true
-    scheduler.after(0, function()
-        self.upgrade_pending = false
-        if parent and not parent:IsNull() then
-            callback(parent)
-        end
-    end, "tree_depleted_" .. tostring(parent:entindex()))
+    callback(parent)
+    self.upgrade_pending = false
 end
 
 return M

@@ -8,6 +8,7 @@ local M = {}
 local states = {}
 local sequence = 0
 local storms = {}
+local visual_casters = {}
 local create_clone
 
 local Q_SKILL = "skill_blademaster_exclusive"
@@ -15,8 +16,10 @@ local W_SKILL = "skill_blademaster_agility"
 local R_SKILL = "skill_blademaster_mobility"
 local Q_ABILITY = "ability_survival_blademaster_exclusive"
 local E_ABILITY = "ability_survival_blademaster_swiftness"
-local Q_PARTICLE = "particles/units/heroes/hero_legion_commander/legion_commander_odds.vpcf"
-local E_PARTICLE = "particles/units/heroes/hero_juggernaut/juggernaut_blade_fury.vpcf"
+local Q_VISUAL_UNIT = "npc_dota_hero_legion_commander"
+local Q_VISUAL_ABILITY = "legion_commander_overwhelming_odds"
+local E_VISUAL_UNIT = "npc_dota_hero_juggernaut"
+local E_VISUAL_ABILITY = "juggernaut_blade_fury"
 
 local function row()
     return runtime_config.by_id.blademaster_exclusive or {}
@@ -70,32 +73,107 @@ local function ability(unit, name)
     return valid(unit) and unit:FindAbilityByName(name) or nil
 end
 
-local function destroy_particle(particle, immediate)
-    if not particle then return end
-    ParticleManager:DestroyParticle(particle, immediate == true)
-    ParticleManager:ReleaseParticleIndex(particle)
+local function remove_visual_caster(unit)
+    if not valid(unit) then return end
+    visual_casters[unit] = nil
+    if type(UTIL_Remove) == "function" then
+        UTIL_Remove(unit)
+    elseif unit.RemoveSelf then
+        unit:RemoveSelf()
+    end
 end
 
-local function q_impact_visual(position, owner)
-    if not position or not ParticleManager then return end
-    local particle = ParticleManager:CreateParticle(
-        Q_PARTICLE, PATTACH_WORLDORIGIN, owner
-    )
-    if not particle then return end
-    ParticleManager:SetParticleControl(particle, 0, position)
-    ParticleManager:ReleaseParticleIndex(particle)
+local function remove_visual_casters_for_owner(owner)
+    local pending = {}
+    for caster, visual in pairs(visual_casters) do
+        if owner == nil or visual.owner == owner then
+            pending[#pending + 1] = caster
+        end
+    end
+    for _, caster in ipairs(pending) do
+        remove_visual_caster(caster)
+    end
 end
 
-local function create_storm_visual(position, owner)
-    if not position or not ParticleManager then return nil end
-    local particle = ParticleManager:CreateParticle(
-        E_PARTICLE, PATTACH_WORLDORIGIN, owner
-    )
-    if not particle then return nil end
-    ParticleManager:SetParticleControl(particle, 0, position)
-    local radius = math.max(1, tonumber(row().e_visual_radius) or 600)
-    ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
-    return particle
+local function hide_unit_and_wearables(unit)
+    if not valid(unit) then return end
+    unit:AddNoDraw()
+    if not unit.FirstMoveChild then return end
+    local child = unit:FirstMoveChild()
+    while valid(child) do
+        if child.AddNoDraw then child:AddNoDraw() end
+        child = child.NextMovePeer and child:NextMovePeer() or nil
+    end
+end
+
+local function create_visual_caster(unit_name, position, owner, hidden)
+    if not position or not alive(owner) then return nil end
+    local unit = CreateUnitByName(unit_name, position, false,
+        owner, owner, owner:GetTeamNumber())
+    if not valid(unit) then return nil end
+    unit.survival_visual_only = true
+    unit.survival_blademaster_visual_caster = true
+    unit:SetControllableByPlayer(owner:GetPlayerOwnerID(), false)
+    unit:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+    unit:SetHullRadius(0)
+    if unit.SetDayTimeVisionRange then unit:SetDayTimeVisionRange(0) end
+    if unit.SetNightTimeVisionRange then unit:SetNightTimeVisionRange(0) end
+    unit:AddNewModifier(unit, nil, "modifier_invulnerable", {})
+    unit:AddNewModifier(unit, nil, "modifier_phased", {})
+    if hidden then hide_unit_and_wearables(unit) end
+    visual_casters[unit] = { owner = owner }
+    return unit
+end
+
+local function native_ability(unit, ability_name)
+    if not valid(unit) then return nil end
+    local native = unit:FindAbilityByName(ability_name)
+        or unit:AddAbility(ability_name)
+    if native then
+        native:SetLevel(1)
+        native:SetHidden(false)
+        native:SetActivated(true)
+    end
+    return native
+end
+
+local function q_impact_visual(position, owner, player_id)
+    -- A point-target native ability must enter the engine order path. Calling
+    -- CastAbilityOnPosition on a non-controllable temporary hero can animate
+    -- without executing the native ability effect in Workshop Tools.
+    local caster = create_visual_caster(Q_VISUAL_UNIT, position, owner, false)
+    local native = native_ability(caster, Q_VISUAL_ABILITY)
+    if not native then
+        remove_visual_caster(caster)
+        return nil
+    end
+    if ExecuteOrderFromTable and DOTA_UNIT_ORDER_CAST_POSITION then
+        ExecuteOrderFromTable({
+            UnitIndex = caster:entindex(),
+            OrderType = DOTA_UNIT_ORDER_CAST_POSITION,
+            AbilityIndex = native:entindex(),
+            Position = position,
+            Queue = false,
+        })
+    else
+        caster:CastAbilityOnPosition(position, native, player_id)
+    end
+    hide_unit_and_wearables(caster)
+    scheduler.after(math.max(1, native:GetCastPoint() + 1), function()
+        remove_visual_caster(caster)
+    end, "blademaster_q_visual:" .. tostring(caster:entindex()))
+    return caster
+end
+
+local function create_storm_visual(position, owner, player_id)
+    local caster = create_visual_caster(E_VISUAL_UNIT, position, owner, false)
+    local native = native_ability(caster, E_VISUAL_ABILITY)
+    if not native then
+        remove_visual_caster(caster)
+        return nil
+    end
+    caster:CastAbilityNoTarget(native, player_id)
+    return caster
 end
 
 local function deal(player_id, attacker, target, ability_name, damage, source)
@@ -131,7 +209,7 @@ local function q_replicate(payload)
         or attacker.survival_blademaster_clone == true then return false end
     local damage = math.max(0, tonumber(payload.final_damage) or 0)
     if damage <= 0 then return false end
-    q_impact_visual(target:GetAbsOrigin(), attacker)
+    q_impact_visual(target:GetAbsOrigin(), attacker, payload.player_id)
     for _, enemy in ipairs(FindUnitsInRadius(
         attacker:GetTeamNumber(), target:GetAbsOrigin(), nil,
         math.max(1, tonumber(row().q_radius) or 600),
@@ -150,7 +228,7 @@ local function storm_tick(id)
     local storm = storms[id]
     if not storm or not alive(storm.attacker)
         or GameRules:GetGameTime() >= storm.expires_at then
-        if storm then destroy_particle(storm.particle, true) end
+        if storm then remove_visual_caster(storm.visual_caster) end
         storms[id] = nil
         return false
     end
@@ -182,8 +260,8 @@ local function start_storm(payload)
         snapshot = stats(payload.player_id),
         expires_at = GameRules:GetGameTime() + duration,
     }
-    storms[id].particle = create_storm_visual(
-        storms[id].position, payload.attacker
+    storms[id].visual_caster = create_storm_visual(
+        storms[id].position, payload.attacker, payload.player_id
     )
     scheduler.every(math.max(0.1, tonumber(row().e_tick_interval) or 1),
         function() return storm_tick(id) end, "blademaster_storm:" .. id)
@@ -245,7 +323,13 @@ end
 
 local function on_entity_killed(payload)
     local victim = payload and payload.victim
-    if not valid(victim) or victim.survival_blademaster_clone ~= true then return end
+    if not valid(victim) then return end
+    if victim.survival_blademaster_visual_caster == true then
+        remove_visual_caster(victim)
+        return
+    end
+    remove_visual_casters_for_owner(victim)
+    if victim.survival_blademaster_clone ~= true then return end
     local player_id = tonumber(victim:GetPlayerOwnerID())
     if player_id == nil then return end
     local current = state(player_id)
@@ -259,8 +343,10 @@ local function on_entity_killed(payload)
 end
 
 function M.init()
+    remove_visual_casters_for_owner(nil)
     states = {}
     storms = {}
+    visual_casters = {}
     sequence = 0
     event_bus.handle_request(events.BLADEMASTER_BONUS_STATS_GET_REQUEST,
         function(payload)

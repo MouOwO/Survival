@@ -449,6 +449,10 @@ begin_async_request = function(asset_id, request_source)
 
     local resources = {}
     append_asset_resources(resources, {}, row)
+    logger.info("AssetPreload", "expanded id=" .. asset_id
+        .. " resources=" .. tostring(#resources)
+        .. " components=" .. tostring(#(row.components or {}))
+        .. " effects=" .. tostring(#(row.effects or {})))
     local resource_keys = {}
     for _, resource in ipairs(resources) do
         local resource_key = tostring(resource.resource_type) .. ":"
@@ -694,6 +698,11 @@ function M.status(asset_id)
     local copy = {}
     for key, value in pairs(state) do copy[key] = value end
     return copy
+end
+
+function M.resource_status(resource_type, path)
+    local key = tostring(resource_type or "") .. ":" .. tostring(path or "")
+    return resource_states[key] or STATE.NOT_REQUESTED
 end
 
 function M.retire(asset_id)

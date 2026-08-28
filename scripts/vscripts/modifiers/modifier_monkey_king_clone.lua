@@ -9,6 +9,12 @@ function modifier_monkey_king_clone:IsHidden() return true end
 function modifier_monkey_king_clone:IsPurgable() return false end
 function modifier_monkey_king_clone:RemoveOnDeath() return false end
 
+function modifier_monkey_king_clone:CheckState()
+    return {
+        [MODIFIER_STATE_NO_UNIT_COLLISION] = true,
+    }
+end
+
 function modifier_monkey_king_clone:OnCreated(params)
     self.player_id = tonumber(params and params.player_id)
         or self:GetParent():GetPlayerOwnerID()

@@ -1,4 +1,28 @@
 ## 已完成任务（2026-08-28）：研究所所有研究技能排除 A 键
+## 当前实施任务补充（2026-08-28）：恢复主宰原生摄像机
+
+- 用户确认前序主宰摄像机修改在本次外观恢复后仍然生效，要求恢复剑圣（Juggernaut）的标准原生摄像机设定。
+- 根因是 `scripts/vscripts/addon_game_mode.lua` 在全局 `configure_game_rules()` 中调用 `SetCameraDistanceOverride(1500)`；该覆盖并非主宰专属，而是影响整个自定义游戏。
+- 最小修复已移除该全局覆盖，不新增相机数值，不修改主宰外观、头像、技能、永久分身或任何 CSV；移除覆盖后由 Dota 引擎恢复原生摄像机链路。
+- 自动验证需覆盖 Lua 5.1 语法、主宰资源/头像契约和限定 `git diff --check`；最终镜头距离、视角高度及跟随表现仍需 Dota 完全退出后的冷启动实机确认。
+
+## 当前实施任务补充（2026-08-28）：主宰头像残留与齐天大圣确定性原生外观
+
+- 用户冷启动实机反馈：选中主宰后官方头像区域仍显示上一个单位；齐天大圣世界外观未恢复。用户批准对齐天大圣当前外观链进行大修，同时必须保留既有 WebM 头像、永久分身战斗行为和已暂存的无碰撞修改。
+- 主宰头像根因包含两层：`ui_bootstrap.js::ResolveDisplayUnit()` 原先无条件优先可能滞后的 `GetLocalPlayerPortraitUnit()`；现按选择/查询事件维护显示身份模式，普通选择优先 `GetSelectedEntities()`，查询事件才优先 Portrait Unit，同一次真实选择后的 250ms 内拒绝伴随 query 事件把身份切回旧 Portrait。HUD 覆盖层继续按 CSV `portrait_unit_name` 和当前实体双重门禁：齐天大圣显示 WebM，主宰显示内置 `npc_dota_hero_juggernaut` 静态头像，其他单位保持 Valve 原生头像；`portraits_custom.txt` 中 Juggernaut 不再设置 `PortraitHideHero=1`。
+- 齐天大圣外观基础数据继续以资源 CSV 为权威：`asset_catalog.csv` 固定原生主体和本机 `items_game.txt` 已确认的四个官方 `default_item` 模型（Head 594、Armor 608、Weapon 609、Shoulders 657）；`asset_components.csv` 将四件定义为 `dota_item_wearable`，`asset_effects.csv` 不包含齐天大圣项目粒子。运行时隐藏 `ReplaceHeroWith`/`CreateUnitByName` 已实例化的旧 wearable，强制 CSV 原生主体，再事务挂载四件原生 wearable；本体和永久分身复用同一外观服务，不恢复 Demon Trickster。
+- `asset_proxy_hero_monkey_king` 仅预载原生主体加四件默认 wearable；CSV 已重建 `asset_catalog.lua`、`asset_components.lua`、`asset_effects.lua`。完整生成器成功写出 109 个模块，最终仍仅被既有无关 `generated/rogue_reward_effects.lua` 的 U+FFFD 阻断。
+- 自动验证通过：`HERO_COSMETIC_SERVICE_PASS`、`SELECTED_UNIT_COSMETIC_PORTRAIT_PASS`、`HERO_ASSET_PRELOAD_SERVICE_PASS`、`MONKEY_KING_W_ER_CONTRACT_PASS`、相关 Lua 5.1 语法、HUD XML 解析和双仓限定 `diff --check`。`ui_bootstrap.js`、`combat_stats.js`、HUD CSS 各 `1 compiled, 0 failed`，HUD XML 完整依赖链 `9 compiled, 0 failed`。工作区既有且被忽略的 `test_asset_bundle_config.lua` 仍按旧永久英雄组件总量契约阻断；未修改该测试或无关防御塔数据。仍需 Dota 完全停止后冷启动，实机确认主宰头像切换及齐天大圣本体/分身外观。
+
+## 当前实施任务（2026-08-28）：恢复剑圣原生模型与默认穿戴
+
+- 用户要求恢复剑圣（Blademaster/Juggernaut）的原生主体模型和默认穿戴，同时保留齐天大圣的自定义 WebM 头像、分身行为及既有 staged 修改。
+- 权威 `data/csv/资源系统/asset_catalog.csv` 现将 `hero_permanent_hero_blademaster` 设置为原生 `models/heroes/juggernaut/juggernaut.vmdl`，并仅预载主宰原生主体加五个默认 wearable 模型；`asset_components.csv` 和 `asset_effects.csv` 不再包含主宰项目饰品或 Arcana 粒子。
+- `hero_cosmetics_config.lua` 删除剑圣 `body_model/body_skin` 覆盖并设置 `hide_default_wearables=false`；`asset_proxy_hero_blademaster` 同步只预载六个原生模型。生成 Lua 由 `build_configs.ps1` 从 CSV 重建，未直接编辑生成文件。
+- 新增/扩展 `test_selected_unit_cosmetic_portrait.lua` 回归断言，固定主宰原生模型、默认资源、无项目组件/粒子和无头像 `portrait_item_def`，并继续检查齐天大圣头像元数据无 bundle 依赖及现有 WebM 链路。
+- 自动验证：头像/资源专项 Lua 5.1.5 行为测试、外观服务 Lua 5.1.5 行为测试、5 个目标 Lua `luac5.1 -p` 和限定 `git diff --check` 通过。完整 `build_configs.ps1` 已成功生成 109 个配置模块，但最终 `CONFIG_VERIFY files=109 bad_utf8=1` 仍被既有无关 `rogue_reward_effects.lua` 的 U+FFFD 阻断；尚未进行 Dota 冷启动实机确认。
+
+## 当前实施任务（2026-08-26）：LAN 多人活动槽位与初始化诊断
 
 **状态：已完成（用户确认）**
 
@@ -25,6 +49,78 @@
 - 晚于 setup 的裸 IP 直连不能被代码安全伪装成大厅活动玩家；若日志报告 `assignment_window_closed`，必须使用 Hidden/Friends Only 大厅让两名玩家在启动前进入好人方槽位。自动测试只能验证 Lua 行为和静态契约，稳定 UDP、实际 PlayerID、英雄/Builder可见性仍需 Workshop Tools 双机验收。
 - 实施完成：新增 `multiplayer_player_service.lua`，统一解析 `PlayerID/playerid/userid`、在 setup 窗口内分配已连接玩家并记录结构化日志；`addon_game_mode.lua` 在配置阶段和 `FinishCustomGameSetup()` 前调用该服务，并记录连接、英雄就绪和断开解析结果。新增 Lua 5.1 行为测试覆盖直接字段、userid 回退、批量分配、晚加入拒绝和非法 ID。
 - 自动验证通过：`MULTIPLAYER_PLAYER_SERVICE_LUA51_PASS`、`MULTIPLAYER_PLAYER_LUAC_PASS`、`ADDON_GAME_MODE_LUAC_PASS`、`MULTIPLAYER_PLAYER_CONTRACT_PASS`、`CSV_GENERATED_MULTIPLAYER_RULES_PASS`、`STRICT_UTF8_PASS` 和限定 `TARGET_DIFF_CHECK_PASS`。这些结果不是 Workshop Tools 双机验证；UDP 稳定性、实际活动槽位和玩家1地图 Marker 仍待实机确认。
+
+## 当前实施任务（2026-08-27）：Cosmetic Portrait Phase 2A 能力尖峰
+
+- 仅以普通英雄 Axe 验证 `DOTAScenePanel`/`portrait_world_unit` 能否渲染多个官方经济物品 ItemDef；当前客户端 `items_game.txt` 已确认 Head `22217`、Armor `22215`、Weapon `22218`、Belt `22216`、Arms `22219`。
+- 第一优先级是审计当前 Workshop Tools/Hammer 的 `portrait_world_unit` 实体契约：真实 ItemDef/DefIndex 字段、多饰品形式、style/skin 与默认 wearable 行为。字段契约确认前不得创建推测性 `.vmap`，不得把 ItemDef 传给旧 `SetUnit` 第二参数。
+- 若实体不存在、没有经济 ItemDef 能力或合法字段无法确认，立即停止 Phase 2A；不得切换英雄或技术路线。能力确认后只按 Base Axe → Head → Head+Weapon → 五件逐级测试，每级失败即停止。
+- 实验必须与生产 HUD、世界模型和饰品系统隔离；不得修改 `template_map.vmap`、`combat_stats.js`、`survival_hud.xml`、CSV schema、`hero_cosmetic_service.lua`、剑圣、齐天大圣或现有世界 `prop_dynamic` 饰品系统；Phase 2A 完成后不自动进入 Phase 2B。
+
+### Phase 2A 当前实施状态（2026-08-27）
+
+- 已在 `spikes/portrait_world_unit_phase2a` 建立隔离源，并由 `data/axe_stages.csv` 作为阶段、ItemDef、style、镜头和期望结果的唯一生成输入；没有修改生产 CSV 或生产 addon 的 Manifest/HUD。
+- 已生成 sibling addon `survival_phase2a`：可玩入口为 `phase2a_lab`，场景资源依次为 `phase2a_portrait/axe_base`、`axe_head`、`axe_head_weapon` 和 `axe_all_five`。当前只激活 Base；B 的 `portrait_world_unit` 已按 `base_minimal` 契约使用 `MapUnitName=npc_dota_hero_axe`、`m_iTeamNum=2`、`ModelScale=1`、`StartDisabled=0`、`skip_background_entities=1`、`suppress_intro_effects=1`、`skip_pet_spawn=1`、`spawn_wearable_item_defs=0`，无 `EnableAutoStyles`、非必要背景/动画/courier 选项、`item_def0..7`、`style_index0..7`、`activity`、`activity_modifier` 或 cosmetic 字段；`parentname`/`parentAttachmentName` 为空。没有使用 `SetUnit` 传 ItemDef，也没有添加 `skin_override`。
+- 当前 Base-only 契约执行 `tools/test_portrait_world_unit_phase2a_contract.ps1 -GeneratedContentRoot ...\survival_phase2a` 输出 `PORTRAIT_WORLD_UNIT_PHASE2A_CONTRACT_PASS`；PowerShell 解析、生成 XML 解析和限定 `git diff --check` 通过。B `axe_base` 单独重新编译为 `OK: 7 compiled, 0 failed`，VPK 非空且不早于源 VMAP。
+- 已冷启动并进入 `survival_phase2a/phase2a_lab` 的 Stage 1 `Base Axe`；VConsole 出现 `[PHASE2A] LOAD stage=base map=phase2a_portrait/axe_base expected=none`，未再出现 `DATA_INVALID`，证明 `Phase2APortraitData` 的单 Base 固定数组及 A/B/C 绑定已被运行时消费者接受。
+- 用户已人工确认正式环境 Axe 基准：世界模型正常；正式左下 `Portrait` 为基础 Axe；当前未同步自定义饰品。该截图/状态仅作为 `Phase 2A Baseline`，不作为隔离 Test 1 或 Head `22217` 的渲染通过证据。
+- 当前执行边界：先在隔离 addon 中完成 Test 1（Base Axe）并填写五项观察；仅当 Test 1 PASS 后加载 Head `22217`，随后停止，不测试 Weapon、其余 ItemDef 或 Phase 2B。保持正式 HUD、世界 `prop_dynamic` 系统、Juggernaut 和 Monkey King 不变。
+- 本轮已将隔离 CSV 镜头改为精确瞄准 `portrait_world_unit` 原点 `(0 0 -1.7000000477)` 的 `11.553546 171.313448 0.000000`，构建器强制唯一相机名为 `hero_camera`、两个父级字段为空，并拒绝 `loadout_camera_model` 与旧 `herocamera`；Panorama 四个静态绑定同步为 `hero_camera`。
+- 历史相机/绑定修复曾完成四阶段资源编译；当前执行边界已收紧为 Base-only，后续 Head/Weapon/五件 scene 均不生成、不编译、不激活。
+- WORKSHOP 实机结论保持 A `DirectUnitSanity=PASS`、B `portrait_world_unit Background=FAIL/黑屏`、C `Prop_dynamic Background Control=PASS`；本轮没有重新判定外观、wearable、Style 0 或动画，也没有加载 Head `22217`。
+- Renderer Sanity 已扩展为 Base-only 三面板：A `DirectUnitSanity`（仅 `unit="npc_dota_hero_axe"`）、B `BackgroundSceneSanity`（`map="phase2a_portrait/axe_base" camera="hero_camera"`）和 C `BackgroundPropControl`（`map="phase2a_portrait/axe_prop_control" camera="hero_camera"`）。C scene 由独立 `renderer_sanity_control.csv` 生成，只含 Axe `prop_dynamic`、普通 `red_box` `prop_dynamic`、无 parent `point_camera` 和 `env_global_light`，不含 `portrait_world_unit` 或 ItemDef；不修改 B 的既有 `hero_camera`。
+- 用户已实机确认 A 可见（PASS）、B 纯黑（FAIL）、C 可见（PASS），且 `map_enable_portrait_worlds => Portrait world usage: Enabled`。按用户规则只修正并复测 B Base 实体契约，不进入 Head `22217`、Weapon、其它 ItemDef、Phase 2B 或正式 `survival`。
+- 用户最新实机确认：A `DirectUnitSanity=PASS`、B `portrait_world_unit Background=FAIL/黑屏`、C `Prop_dynamic Background Control=PASS`。由此确认 DOTAScenePanel renderer、直接英雄、background map、camera、light 和 scene packaging 均正常，当前唯一剩余失败点是 B 的 `portrait_world_unit` 实体契约；本轮暂停 ItemDef `22217`。
+- 本轮实体契约审计确认 B 原先虽使用正确的 `MapUnitName`，但继承了官方 prefab 的 `m_iTeamNum=4`、`spawn_wearable_item_defs=1`、`activity`/`activity_modifier` 和 `item_def`/`style_index` 字段。已将 `data/axe_stages.csv` 与生成器改为 CSV 驱动的 Base-only 最小配置，并在生成后契约中禁止 `unit_name`、`NPCScriptName`、`CustomNPCName`、`model`、`hero`、`arcana`、`persona`、`cosmetic` 及 parent 关系。
+- 本轮选择性构建已重新生成并编译 B `axe_base`：Resource Compiler `7 compiled, 0 failed`，B `.vpk` 非空且不早于内容 `.vmap`；C 场景编译汇总为 `7 compiled, 0 failed`，但 C `.vpk` 写入被当前 Dota 实例占用而未覆盖，故完整构建命令最终因 C 新鲜度检查失败。Panorama 五项资源均 `1 compiled, 0 failed`。Head `axe_head.vmap/.vpk` 仍不存在，未生成或编译 `22217`。
+- 编译后实体 lump `axe_base.vpk/.../entities/default_ents.vents_c` 已通过 `resourceinfo` 确认包含 `classname=portrait_world_unit`、`MapUnitName=npc_dota_hero_axe` 和 `[PR#]phase2a_axe_portrait_unit`。在同一 Stage 1 运行会话中只读执行 `ent_find portrait_world_unit` 与 `ent_find phase2a_axe_portrait_unit`，两者均输出 `Found 0 matches.`；没有执行 `ent_fire`、`ent_setpos`、`ent_setang` 或 `ent_create`。最终结论：`PORTRAIT_RUNTIME_ENTITY_MISSING`。
+- 本轮执行 `tools/build_portrait_world_unit_phase2a.ps1 -SceneAndPanoramaOnly`：首次编译实际成功但新鲜度校验错误地把场景 `.vpk` 当作源文件而失败；构建器已修正为内容侧 `.vmap` 对游戏侧 `.vpk`，并新增契约断言锁定选择性模式、非空输出和时间戳校验。修正后输出 `PORTRAIT_WORLD_UNIT_PHASE2A_BUILD_PASS`；B `axe_base.vpk`、C `axe_prop_control.vpk` 各 `7 compiled, 0 failed`，五个 Panorama 资源各 `1 compiled, 0 failed`，所有目标产物均非空且不早于源文件。
+- 选择性编译保持 `phase2a_lab.vmap/.vpk` 不变，`axe_head.vmap/.vpk` 不存在，B/C 生成物继续不含 Head `22217`（C 也不含 `portrait_world_unit`）。Resource Compiler 日志仍有官方开发资源的通用 `ERROR_FILEOPEN` 启动警告，但目标资源汇总均为 `0 failed`；该警告不能作为场景实机通过证据。
+- `HEAD_RESOURCE_COUNT=0`；`axe_head.vmap/.vpk` 仍不存在，运行数据 `expectedItems=none`。Phase 2A 按运行时实体缺失结论停止，不调查 Head `22217`、Weapon、其它 ItemDef 或 Phase 2B，也不修改正式 `survival`。
+- 最终分层审计：修复后的 `axe_base.vpk` `resourceinfo -all` 输出为 5,778 bytes，实体 lump 包含 `portrait_world_unit`、`MapUnitName=npc_dota_hero_axe`、`[PR#]phase2a_axe_portrait_unit`、`[PR#]hero_camera` 和 `[PR#]light_hero`；Base 内容 VMAP/游戏 VPK 时间戳分别为 `2026-08-27T14:50:47.2377143Z` / `2026-08-27T14:50:48.7675234Z`。
+- 为绕开运行中实例对正式控制 VPK 的锁定，独立命名的 `axe_prop_control_verify_20260827` 编译结果为 `7 compiled, 0 failed`；其 `resourceinfo -all` 输出为 3,997 bytes，实体 lump 具有 Axe、`prop_control_red_box`、`prop_control_key_light`、`hero_camera`，弱引用同时包含 `models/heroes/axe/axe.vmdl` 和 `models/props_gameplay/red_box.vmdl`。临时 `.vmap/.vpk` 已删除，`C:\Users\li\AppData\Local\Temp\phase2a_*_default_ents_all*.txt` 证据保留。
+- 正式 `axe_prop_control.vpk` 的 `resourceinfo -all` 读取成功但仍为旧产物：3,826 bytes、弱引用只有 Axe 而没有 `models/props_gameplay/red_box.vmdl`；其时间戳 `2026-08-27T13:00:22.3510906Z` 早于内容 VMAP `2026-08-27T14:50:47.3955253Z`，`CONTROL_GAME_IS_FRESH=0`。当前 Dota PID `22760` 仍以 `-addon survival_phase2a -tools -steam -map phase2a_lab` 运行并持有该输出，未强制终止进程或覆盖用户正在使用的 VPK。
+- 因正式控制 VPK 尚未刷新，修复后的 Base/控制场景尚未完成同一冷启动下的 A/B/C 实机复测；现有运行日志和 `ent_find` 结果不能证明本轮正式控制 VPK 已加载。待 Dota 释放锁后，仅重跑 `build_portrait_world_unit_phase2a.ps1 -SceneAndPanoramaOnly`，随后重新审计正式控制 lump 并再决定是否进行运行时验收；继续禁止加载 Head `22217`、Weapon、其他 ItemDef 或 Phase 2B。
+- 最终复跑使用内容侧 `D:\steam\steamapps\common\dota 2 beta\content\dota_addons\survival_phase2a` 作为 `-GeneratedContentRoot`，输出 `PORTRAIT_WORLD_UNIT_PHASE2A_CONTRACT_PASS`；此前把游戏侧编译目录作为该参数导致的 `MISSING_FILE` 已确认是验证参数错误，不是生成文件缺失。
+- 最终自动验证完成：源契约与内容侧生成后契约均输出 `PORTRAIT_WORLD_UNIT_PHASE2A_CONTRACT_PASS`；生成 Panorama XML 解析、两个 Phase 2A PowerShell 文件解析、七个目标 CSV/Markdown/PowerShell/任务文档的严格 UTF-8、无行尾空白和终止 LF 检查，以及限定 `git diff --check` 均通过。
+
+## 当前实施任务（2026-08-27）：选中单位头像重构 Phase 1
+
+- 服务端 `ui_request_router.lua` 新增共享 `apply_portrait_metadata(unit, snapshot)`；元数据只从 `asset_catalog.csv` 的生成配置读取，按当前 `survival_model_asset_id`、权威英雄 ID、严格 `survival_monkey_king_clone == true` 身份解析。
+- `model_asset_id`、`portrait_unit_name`、`portrait_item_def` 在无有效资产时统一为空字符串；不得保留旧快照值，也不按单位名猜测齐天大圣分身身份。
+- 普通单位 `unit_combat_snapshot()`、英雄 `hero_ui_snapshot()` 和 `HERO_COMBAT_STATS_CHANGED` 即时推送均应用同一元数据 helper；`combat_stat_projection.for_ui()` 的浅拷贝保留三个字段且不修改 combat service 权威快照。
+- Panorama 仅删除快照回调内不存在的 `showNativePortrait()` 调用；既有齐天大圣 WebM 覆盖层、Valve 原生头像回退、世界模型和 wearable 生命周期不变。本阶段未修改 CSV、生成配置或英雄饰品服务。
+- 自动验证：六英雄/显式资产/缺失资产/普通 fallback/齐天大圣本体与严格分身身份的 Lua 模拟测试通过，投影字段保留测试通过，三个目标 Lua 5.1 语法通过，`combat_stats.js` 强制编译为 `OK: 1 compiled, 0 failed, 0 skipped`。最终仍需 Workshop Tools 冷启动实机确认英雄、分身、建筑和无头像单位切换。
+
+## 当前实施任务（2026-08-26）：齐天大圣基础原生模型与头像
+
+- 齐天大圣原生 `DOTAScenePanel` 动画实机表现不稳定，已批准改用录制的 WebM 动态头像；资源来源为外部录制素材，接入后仅齐天大圣使用视频，其他英雄和建筑保留原生头像链路并可回退。
+- 已放弃不受当前 Panorama 解析器支持的 `DOTAUnitImage` 和静态图片路径；齐天大圣使用独立 `MoviePanel` 覆盖官方头像，其他英雄和建筑继续由 Valve 原生头像链路显示，不传入任何饰品定义或 Bundle。
+- 权威 `asset_catalog.csv` 已清空齐天大圣 `portrait_item_def`；`asset_components.csv` 和 `asset_effects.csv` 已删除齐天大圣四件 Demon Trickster 组件及四条 ambient 粒子。`hero_cosmetics_config.lua` 同步为空外观，世界模型只保留基础原生模型；其他英雄和建筑外观不变。
+- `hero_cosmetic_service.lua` 已移除齐天大圣专属饰品预载 READY 门禁，避免基础原生模型因已删除的饰品事务被阻断。
+- 验证范围：CSV/生成一致性、头像专项测试、Lua 5.1 语法、Panorama 编译、限定 `git diff --check`；最终仍需 Workshop Tools 冷启动实机确认。
+- WebM 不再挂载于固定折叠的 `SurvivalHeroBottomHUD`；现由 `SurvivalHUDRoot` 下独立、无点击命中的覆盖层承载，并按 Valve 官方 portrait 候选节点的窗口坐标和实际 UI scale 同步几何。
+- 覆盖层仅在当前权威快照实体等于实际显示实体且 `portrait_unit_name=npc_dota_hero_monkey_king` 时显示；选择切换或其他英雄、建筑、无单位状态只折叠自定义视频，不修改 Valve 官方头像节点。
+- 选择事件会立即隐藏旧视频状态，100ms sentinel 负责处理 Valve portrait 节点重建及分辨率/UI scale 几何变化；播放按单位状态去重，继续强制循环和静音。
+- 自动验证完成：`SELECTED_UNIT_COSMETIC_PORTRAIT_PASS`、专项测试 Lua 5.1 语法、content/game 限定 `git diff --check` 均通过；`combat_stats.js`、`survival_hud.css` 分别为 `OK: 1 compiled, 0 failed`，native CSS 为 `OK: 5 compiled, 0 failed`，HUD XML 依赖链为 `OK: 9 compiled, 0 failed`。尚未执行 Workshop Tools 冷启动实机头像对齐、切换、重生、循环和静音验收。
+
+## 当前实施任务（2026-08-24）：剑圣 Q/E 原生视觉施法
+
+- 用户批准将 Q/E 改为真实原生技能视觉施法：Q 使用隐藏的 Legion Commander 施放 `legion_commander_overwhelming_odds`，E 在目标点创建可见的 Juggernaut 施放 `juggernaut_blade_fury`。
+- 两类短生命周期实体均使用 `survival_visual_only` 标记、不可控、禁攻、零碰撞和无视野范围；Q 隐藏主体及 wearable，E 保留完整主宰模型与原生技能特效。施法结束、拥有者死亡、实体死亡或服务重置时清理。
+- `damage_filter_service.lua` 在消费战斗事务前拒绝视觉实体造成的所有伤害；Q 原有 600 范围复制伤害和 E 原有后端 tick 伤害继续通过 `DEAL_REQUEST`，数值仍来自 `blademaster_exclusive_runtime.csv`。
+- 已删除 Q/E 手工粒子、E 外圈粒子和 `e_visual_outer_count` 配置；预加载改为原生 Legion Commander/Juggernaut 单位。生成配置已同步。
+- 自动验证：专项契约、目标 Lua 5.1 语法、PowerShell 语法和限定 `git diff --check` 已通过；完整配置生成成功但既有全局 `CONFIG_VERIFY files=108 bad_utf8=1` 仍阻断脚本最终状态。尚未执行 Workshop Tools 冷启动实机视觉与伤害验收。
+- 用户反馈 Q 暴击时没有特效。根因定位为点目标原生技能使用 `CastAbilityOnPosition` 施法时，临时军团同时处于不可控/隐藏状态，Workshop Tools 可能只接受动作而未执行原生 Ability 效果。现改为优先提交 `DOTA_UNIT_ORDER_CAST_POSITION` 引擎位置施法订单，显式激活原生 Ability，订单提交后再隐藏军团；旧 API 仅作兼容回退。
+- 本轮修复验证：`BLADEMASTER_EXCLUSIVE_CONTRACT_PASS`、剑圣服务 Lua 5.1、PowerShell 契约语法通过；仍需冷启动实机确认暴击时 Q 完整特效出现且军团不可见。
+
+## 当前实施任务（2026-08-24）：齐天大圣 W 分身无视单位碰撞
+
+- 用户批准齐天大圣二技能永久守家分身新增无视单位碰撞，使其能够穿过城墙周围由隐藏单位组成的碰撞屏障返回守家位置。
+- 实现边界：在既有 `modifier_monkey_king_clone` 上声明 `MODIFIER_STATE_NO_UNIT_COLLISION=true`，并保留分身创建与同步阶段的 `SetHullRadius(0)` 兜底；不修改其他英雄、普通单位、城墙屏障几何或齐天大圣技能数值。
+- 本需求不新增基础数值，既有齐天大圣运行参数继续以 `data/csv/英雄系统/monkey_king_exclusive_runtime.csv` 为权威源，不修改自动生成 Lua。
+- 验证范围：齐天大圣 W/E/R 专项契约、分身 Modifier Lua 5.1 语法、严格 UTF-8 和限定 `git diff --check`。自动验证不等于 Workshop Tools 实机验收，仍需冷启动确认分身能穿过城墙并回到守家区域。
+- 自动验证完成：`MONKEY_KING_W_ER_CONTRACT_PASS`、`MONKEY_KING_CLONE_NO_COLLISION_LUA51_PASS`、分身 Modifier `luac5.1 -p`、`STRICT_UTF8_PASS` 和限定 `git diff --check` 均通过；尚未执行 Workshop Tools 实机验证。
 
 ## 本轮实机结果（2026-08-24）：终局未观察到失败回调或 API 业务请求
 

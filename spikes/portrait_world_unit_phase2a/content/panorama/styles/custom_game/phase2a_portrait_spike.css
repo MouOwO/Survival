@@ -1,0 +1,278 @@
+.Phase2ARoot {
+    width: 100%;
+    height: 100%;
+    background-color: #05080ce8;
+}
+
+.Phase2AWindow {
+    width: 1880px;
+    height: 900px;
+    horizontal-align: center;
+    vertical-align: center;
+    flow-children: down;
+    padding: 24px;
+    background-color: #101820fa;
+    border: 2px solid #60788b;
+    box-shadow: #000000 0px 0px 28px 4px;
+}
+
+.Phase2ATitle {
+    width: 100%;
+    color: #f2d18a;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.Phase2ASubtitle {
+    width: 100%;
+    margin-top: 4px;
+    color: #b8c6d2;
+    font-size: 17px;
+    text-align: center;
+}
+
+.Phase2ABody {
+    width: 100%;
+    height: fill-parent-flow(1.0);
+    margin-top: 18px;
+    flow-children: right;
+}
+
+.Phase2ASceneColumn {
+    width: 1120px;
+    height: 100%;
+    flow-children: down;
+}
+
+.Phase2AStageLabel {
+    width: 100%;
+    height: 36px;
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: semi-bold;
+    text-align: center;
+}
+
+.Phase2ASceneHost {
+    width: 340px;
+    height: 340px;
+    background-color: #000000;
+    border: 1px solid #7d94a5;
+    overflow: clip;
+}
+
+.RendererSanityRow {
+    width: 100%;
+    height: 402px;
+    flow-children: right;
+    horizontal-align: center;
+}
+
+.RendererSanityCard {
+    width: 360px;
+    height: 402px;
+    flow-children: down;
+    padding: 8px;
+    background-color: #080d12;
+    border: 1px solid #405664;
+}
+
+.RendererSanityCard.BackgroundCard {
+    margin-left: 16px;
+}
+
+.RendererSanityCard.ControlCard {
+    margin-left: 16px;
+}
+
+.RendererSanityLabel {
+    width: 100%;
+    height: 34px;
+    color: #f2d18a;
+    font-size: 18px;
+    font-weight: semi-bold;
+    text-align: center;
+}
+
+#DirectUnitSanity {
+    width: 340px;
+    height: 340px;
+    background-color: #000000;
+    border: 1px solid #7d94a5;
+}
+
+.BackgroundSceneSanity {
+    width: 340px;
+    height: 340px;
+}
+
+#BackgroundPropControl {
+    width: 340px;
+    height: 340px;
+    background-color: #000000;
+    border: 1px solid #7d94a5;
+}
+
+.BackgroundPropControl {
+    width: 340px;
+    height: 340px;
+}
+
+.RendererSanityBinding {
+    width: 100%;
+    height: 24px;
+    color: #9fc7dd;
+    font-size: 13px;
+    text-align: center;
+}
+
+.RendererSanityDecision {
+    width: 100%;
+    height: 52px;
+    margin-top: 8px;
+    padding: 7px;
+    color: #d2dde5;
+    font-size: 14px;
+    text-align: center;
+    background-color: #15232e;
+    border: 1px solid #405664;
+}
+
+.Phase2AStageItems {
+    width: 100%;
+    height: 38px;
+    margin-top: 8px;
+    color: #9fc7dd;
+    font-size: 17px;
+    text-align: center;
+}
+
+.Phase2AControlColumn {
+    width: fill-parent-flow(1.0);
+    height: 100%;
+    margin-left: 24px;
+    flow-children: down;
+    padding: 18px;
+    background-color: #0a1118e8;
+    border: 1px solid #334653;
+}
+
+.Phase2ASectionTitle {
+    width: 100%;
+    margin-bottom: 12px;
+    color: #e6edf2;
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.MetricRow {
+    width: 100%;
+    height: 58px;
+    margin-bottom: 7px;
+    flow-children: right;
+    vertical-align: center;
+}
+
+.MetricLabel {
+    width: 142px;
+    color: #c7d2da;
+    font-size: 17px;
+    vertical-align: center;
+}
+
+.MetricChoice {
+    width: 126px;
+    height: 40px;
+    margin-right: 8px;
+    vertical-align: center;
+    background-color: #1c2a35;
+    border: 1px solid #506574;
+}
+
+.MetricChoice:hover {
+    brightness: 1.35;
+}
+
+.MetricChoice.Selected {
+    background-color: #31596c;
+    border: 2px solid #a7d7ec;
+}
+
+.MetricChoice Label {
+    horizontal-align: center;
+    vertical-align: center;
+    color: #e9eff3;
+    font-size: 15px;
+}
+
+.Phase2AStatus {
+    width: 100%;
+    min-height: 64px;
+    margin-top: 14px;
+    padding: 10px;
+    color: #cdd8df;
+    font-size: 17px;
+    background-color: #15232e;
+    border: 1px solid #405664;
+}
+
+.Phase2AStatus.StatusSuccess {
+    color: #b8efbd;
+    border-color: #4f9b5a;
+}
+
+.Phase2AStatus.StatusFailure {
+    color: #ffb5ad;
+    border-color: #b34a42;
+}
+
+.Phase2AButtons {
+    width: 100%;
+    height: 58px;
+    margin-top: 16px;
+    flow-children: right;
+}
+
+.Phase2AButton {
+    width: 180px;
+    height: 46px;
+    margin-right: 10px;
+    border: 1px solid #8ea3b0;
+}
+
+.Phase2AButton:hover {
+    brightness: 1.35;
+}
+
+.Phase2AButton.Secondary {
+    background-color: #263846;
+}
+
+.Phase2AButton.Failure {
+    background-color: #6e2823;
+}
+
+.Phase2AButton.Success {
+    background-color: #28653a;
+}
+
+.Phase2AButton.Disabled {
+    saturation: 0;
+    opacity: 0.35;
+}
+
+.Phase2AButton Label {
+    horizontal-align: center;
+    vertical-align: center;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: semi-bold;
+}
+
+.Phase2AConsoleHint {
+    width: 100%;
+    margin-top: 12px;
+    color: #8798a5;
+    font-size: 14px;
+}

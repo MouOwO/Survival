@@ -58,6 +58,10 @@ local function filter(_, keys)
     -- reflection rule. Equipment auras submit their own independent damage.
     local attacker, victim = resolve_combatants(keys)
     if not valid(attacker) or not valid(victim) then return false end
+    -- Native abilities are used by short-lived visual casters only to let the
+    -- engine assemble their complete effects. Their damage must never enter
+    -- the addon transaction pipeline or affect any gameplay unit.
+    if attacker.survival_visual_only == true then return false end
     local diagnostic = should_diagnose(attacker)
     if diagnostic then
         print(string.format(

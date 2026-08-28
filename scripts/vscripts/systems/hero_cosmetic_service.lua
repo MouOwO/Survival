@@ -6,6 +6,7 @@ local logger = require("core/logger")
 local M = {}
 
 local cosmetics_by_hero = {}
+local generation_by_hero = {}
 local SPAWN_PARTICLE_LIFETIME_SECONDS = 1.5
 
 local function definition_for(hero_id)
@@ -38,7 +39,8 @@ local function definition_for(hero_id)
     end
     local local_definition = config[hero_id] or {}
     return {
-        body_model = local_definition.body_model,
+        body_model = local_definition.body_model
+            or (local_definition.use_asset_body_model and asset.primary_model),
         body_skin = local_definition.body_skin,
         material_group = asset.material_group,
         activity_modifiers = asset.activity_modifiers or {},
@@ -81,6 +83,18 @@ local function destroy_particle(particle_id)
     safe_call(ParticleManager, "ReleaseParticleIndex", particle_id)
 end
 
+local function clear_pending_cosmetics(wearables, particles, spawn_particles)
+    for _, particle_id in ipairs(particles or {}) do
+        destroy_particle(particle_id)
+    end
+    for _, particle_id in ipairs(spawn_particles or {}) do
+        destroy_particle(particle_id)
+    end
+    for _, wearable in ipairs(wearables or {}) do
+        remove_entity(wearable)
+    end
+end
+
 local function clear_cosmetics(hero_entindex)
     local state = cosmetics_by_hero[hero_entindex]
     if not state then
@@ -101,7 +115,7 @@ local function clear_cosmetics(hero_entindex)
     cosmetics_by_hero[hero_entindex] = nil
 end
 
-local function hide_default_wearables(hero)
+local function hide_default_wearables(hero, custom_wearables)
     local ok, child = safe_call(hero, "FirstMoveChild")
     if not ok then
         return
@@ -109,12 +123,43 @@ local function hide_default_wearables(hero)
 
     local no_draw = rawget(_G, "EF_NODRAW") or 32
 
-    while valid_entity(child) do
-        local next_ok, next_child = safe_call(child, "NextMovePeer")
-        local class_ok, class_name = safe_call(child, "GetClassname")
-        if class_ok and class_name == "dota_item_wearable" then
-            safe_call(child, "AddEffects", no_draw)
+    -- 记录我们自己生成的 wearable
+    local custom_indices = {}
+
+    for _, wearable in ipairs(custom_wearables or {}) do
+        if valid_entity(wearable) then
+            local index_ok, index =
+                safe_call(wearable, "entindex")
+
+            if index_ok and index then
+                custom_indices[index] = true
+            end
         end
+    end
+
+    while valid_entity(child) do
+        local next_ok, next_child =
+            safe_call(child, "NextMovePeer")
+
+        local class_ok, class_name =
+            safe_call(child, "GetClassname")
+
+        if class_ok and class_name == "dota_item_wearable" then
+
+            local index_ok, child_index =
+                safe_call(child, "entindex")
+
+            -- 只隐藏 Valve 原生 wearable
+            -- 不隐藏我们刚刚生成的 custom wearable
+            if not (
+                index_ok
+                and child_index
+                and custom_indices[child_index]
+            ) then
+                safe_call(child, "AddEffects", no_draw)
+            end
+        end
+
         child = next_ok and next_child or nil
     end
 end
@@ -150,7 +195,7 @@ local function spawn_wearable(hero, component_id, model_path, appearance)
     end
     local ok, wearable = pcall(
         SpawnEntityFromTableSynchronous,
-        "prop_dynamic",
+        "dota_item_wearable",
         {
             model = model_path,
         }
@@ -195,6 +240,16 @@ local function spawn_wearable(hero, component_id, model_path, appearance)
             .. " follow_call=" .. tostring(follow_call_ok)
             .. " follow_result=" .. tostring(follow_result)
     )
+    if not owner_call_ok or owner_result == false
+        or not follow_call_ok or follow_result == false then
+        logger.warn(
+            "HeroCosmetic",
+            "failed to attach wearable " .. tostring(component_id)
+                .. ": " .. tostring(model_path)
+        )
+        remove_entity(wearable)
+        return nil
+    end
     return wearable
 end
 
@@ -283,34 +338,9 @@ function M.apply(hero, hero_id)
     if not definition then
         return false
     end
-
     local hero_entindex = hero:entindex()
-    clear_cosmetics(hero_entindex)
-
-    if definition.hide_default_wearables then
-        hide_default_wearables(hero)
-    else
-        show_default_wearables(hero)
-    end
-
-    if definition.body_model and definition.body_model ~= "" then
-        safe_call(hero, "SetOriginalModel", definition.body_model)
-        safe_call(hero, "SetModel", definition.body_model)
-    end
-    if definition.body_skin ~= nil then
-        safe_call(hero, "SetSkin", tonumber(definition.body_skin) or 0)
-    end
-    if definition.material_group then
-        safe_call(
-            hero,
-            "SetMaterialGroup",
-            definition.material_group
-        )
-    end
-    for _, modifier in ipairs(definition.activity_modifiers or {}) do
-        safe_call(hero, "AddActivityModifier", modifier.modifier_name)
-    end
-
+    local generation = (generation_by_hero[hero_entindex] or 0) + 1
+    generation_by_hero[hero_entindex] = generation
     local spawned = {}
     local components = {}
     for index, entry in ipairs(definition.wearables or {}) do
@@ -325,22 +355,82 @@ function M.apply(hero, hero_id)
         if wearable then
             table.insert(spawned, wearable)
             components[component_id] = wearable
+        else
+            for _, pending in ipairs(spawned) do remove_entity(pending) end
+            logger.warn(
+                "HeroCosmetic",
+                tostring(hero_id) .. " transaction aborted component="
+                    .. tostring(component_id) .. " generation=" .. tostring(generation)
+            )
+            return false
         end
+    end
+
+    if generation_by_hero[hero_entindex] ~= generation then
+        for _, pending in ipairs(spawned) do remove_entity(pending) end
+        return false
+    end
+
+    clear_cosmetics(hero_entindex)
+    if definition.hide_default_wearables then
+        hide_default_wearables(hero, spawned)
+    else
+        show_default_wearables(hero)
+    end
+
+    if definition.body_model and definition.body_model ~= "" then
+        local original_ok, original_result = safe_call(
+            hero, "SetOriginalModel", definition.body_model
+        )
+        local model_ok, model_result = safe_call(
+            hero, "SetModel", definition.body_model
+        )
+        if not original_ok or original_result == false
+            or not model_ok or model_result == false then
+            clear_pending_cosmetics(spawned, {}, {})
+            logger.warn("HeroCosmetic", tostring(hero_id)
+                .. " transaction aborted body_model="
+                .. tostring(definition.body_model))
+            return false
+        end
+    end
+    if definition.body_skin ~= nil then
+        safe_call(hero, "SetSkin", tonumber(definition.body_skin) or 0)
+    end
+    if definition.material_group then
+        safe_call(hero, "SetMaterialGroup", definition.material_group)
+    end
+    for _, modifier in ipairs(definition.activity_modifiers or {}) do
+        safe_call(hero, "AddActivityModifier", modifier.modifier_name)
     end
 
     local particles = {}
     local spawn_particles = {}
     for _, particle in ipairs(definition.particles or {}) do
         local particle_id = spawn_particle(hero, particle, components)
-        if particle_id ~= nil then
-            table.insert(particles, particle_id)
+        if particle_id == nil then
+            clear_pending_cosmetics(spawned, particles, spawn_particles)
+            logger.warn(
+                "HeroCosmetic",
+                tostring(hero_id) .. " transaction aborted particle="
+                    .. tostring(particle.id) .. " generation=" .. tostring(generation)
+            )
+            return false
         end
+        table.insert(particles, particle_id)
     end
     for _, particle in ipairs(definition.spawn_particles or {}) do
         local particle_id = spawn_particle(hero, particle, components)
-        if particle_id ~= nil then
-            table.insert(spawn_particles, particle_id)
+        if particle_id == nil then
+            clear_pending_cosmetics(spawned, particles, spawn_particles)
+            logger.warn(
+                "HeroCosmetic",
+                tostring(hero_id) .. " transaction aborted spawn_particle="
+                    .. tostring(particle.id) .. " generation=" .. tostring(generation)
+            )
+            return false
         end
+        table.insert(spawn_particles, particle_id)
     end
 
     cosmetics_by_hero[hero_entindex] = {
@@ -349,6 +439,7 @@ function M.apply(hero, hero_id)
         spawn_particles = spawn_particles,
         spawn_cleanup_tasks = {},
         cosmetic_id = hero_id,
+        generation = generation,
     }
     local state = cosmetics_by_hero[hero_entindex]
     for _, particle_id in ipairs(spawn_particles) do
@@ -356,6 +447,10 @@ function M.apply(hero, hero_id)
         task_id = scheduler.after(
             SPAWN_PARTICLE_LIFETIME_SECONDS,
             function()
+                if cosmetics_by_hero[hero_entindex] ~= state
+                    or generation_by_hero[hero_entindex] ~= generation then
+                    return
+                end
                 for index, active_task_id in ipairs(state.spawn_cleanup_tasks or {}) do
                     if active_task_id == task_id then
                         table.remove(state.spawn_cleanup_tasks, index)
@@ -392,7 +487,9 @@ function M.clear(hero)
     if not valid_entity(hero) then
         return
     end
-    clear_cosmetics(hero:entindex())
+    local entindex = hero:entindex()
+    generation_by_hero[entindex] = (generation_by_hero[entindex] or 0) + 1
+    clear_cosmetics(entindex)
 end
 
 return M

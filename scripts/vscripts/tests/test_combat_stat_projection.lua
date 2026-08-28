@@ -24,6 +24,9 @@ local runtime = {
     strength = 20,
     agility = 30,
     intellect = 40,
+    model_asset_id = "hero_permanent_hero_blademaster",
+    portrait_unit_name = "npc_dota_hero_juggernaut",
+    portrait_item_def = "9059",
 }
 local projected = projection.for_ui(runtime)
 close(projected.armor, 10, "projected armor")
@@ -34,6 +37,10 @@ assert(projected.armor_unit == "war3_display", "armor unit marker mismatch")
 assert(projected.stat_units_version == 2, "stat unit version mismatch")
 assert(projected.stat_tooltips.armor.unit == "war3_display",
     "armor tooltip unit mismatch")
+assert(projected.model_asset_id == runtime.model_asset_id
+        and projected.portrait_unit_name == runtime.portrait_unit_name
+        and projected.portrait_item_def == runtime.portrait_item_def,
+    "UI projection dropped portrait metadata")
 close(projected.stat_tooltips.armor.display_value, 10,
     "armor tooltip display value")
 close(projected.stat_tooltips.armor.runtime_value, 10 / 3,
