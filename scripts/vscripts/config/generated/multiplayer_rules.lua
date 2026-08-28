@@ -2,7 +2,7 @@
 -- Source: multiplayer_rules.csv
 local M = {}
 M.rows = {
-    { rule_id = "default_multiplayer", max_players = 4, initial_slice_players = 2, shared_wave_clock = true, allow_cross_lane_hero_support = true, player_zero_legacy_fallback = true, setup_wait_seconds = 15, enabled = true, notes = "最多4名玩家；先完成2人纵向切片。服务端权威结算，客户端只提交操作意图；启动阶段等待联机玩家进入活动槽位。" },
+    { rule_id = "default_multiplayer", max_players = 4, initial_slice_players = 2, shared_wave_clock = true, allow_cross_lane_hero_support = true, player_zero_legacy_fallback = true, setup_wait_seconds = 60, enabled = true, notes = "最多4名玩家；先完成2人纵向切片。服务端权威结算，客户端只提交操作意图；启动阶段等待联机玩家进入活动槽位。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

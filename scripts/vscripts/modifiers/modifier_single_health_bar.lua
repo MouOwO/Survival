@@ -35,7 +35,12 @@ end
 
 function modifier_single_health_bar:publish_state()
     local unit = self:GetParent()
-    if not unit or (unit.IsNull and unit:IsNull()) then
+    if not unit or (unit.IsNull and unit:IsNull())
+        or not unit.entindex
+        or not unit.GetHealth
+        or not unit.GetMaxHealth
+        or not unit.IsAlive
+        or not unit.GetTeamNumber then
         return
     end
     publish(unit, {

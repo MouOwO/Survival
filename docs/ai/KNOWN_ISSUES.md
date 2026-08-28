@@ -22,19 +22,19 @@ Last Reviewed: 2026-08-27
 
 ## ISSUE-002
 
-**Status:** BLOCKED
+**Status:** TESTING
 
 **Priority:** P0
 
-**Symptom:** 正常发布 Arcade 的 Game Server/Lua 主机、Lobby Owner、Python 主机和 loopback 边界未知，生产双玩家端到端联调尚未完成。LAN 裸 IP 直连曾加载地图，但双方无英雄/Builder并快速断联，活动玩家槽位和稳定同步均未证明。
+**Symptom:** 正常发布 Arcade 的 Game Server/Lua 主机、Lobby Owner、Python 主机和 loopback 边界仍未知。LAN 裸 IP 双机现已取得独立 PlayerID 并可观察双方操作同步，但 Player 1 的独立 Builder 修复仍待双机冷启动验收。
 
-**Known Cause:** 当前只有本地 Workshop 同机证据；通用 Steamworks 文档不能证明 Dota Arcade 的具体分配模型，需要两个或三个真实 Steam 账号和发布 Lobby 实验。
+**Known Cause:** Builder 缺失已定位为地图缺少 `player_1_builder_spawn`，不是 PlayerID 或网络同步失败；Player 0 依靠旧坐标回退掩盖了同一地图缺口。正常发布 Arcade 的具体分配模型仍需要两个或三个真实 Steam 账号和发布 Lobby 实验。
 
-**Current Workaround:** 正常 Arcade 归类为 `MODEL-D`；单玩家 Tools、Python 和 Supabase 测试只用于分层验证，不作为生产双玩家验收，也不继续扩展生产 Session 架构。LAN 验证优先使用 Hidden/Friends Only 大厅，让所有玩家在 setup 结束前进入好人方；服务端结构化日志区分分队成功、`assignment_window_closed`、英雄就绪和断开字段解析。
+**Current Workaround:** 正常 Arcade 继续归类为 `MODEL-D`。LAN setup 权威窗口现为 60 秒，`template_map` 已新增四个 Builder Marker 并重建 VPK；服务端结构化日志区分分队成功、`assignment_window_closed`、英雄就绪、Builder 就绪和断开字段解析。
 
-**Next Action:** 先用两账号大厅验证主机 `status` 为2、两端活动 PlayerID 为0/1、服务端出现双方 `hero_ready`，并区分玩家1 Marker 缺失与网络断联；随后执行 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md` 的最小发布 Lobby 实验，确认 Lua 执行主机与 `127.0.0.1:8765` 归属，再验证双账号 Session 隔离与离开/重连。
+**Next Action:** 双机冷启动确认双方 `hero_ready` 和真实 `BUILDER_READY`，Player 1 Builder 出现在 `(0,-256,256)` 附近且双方只能控制自己的 `npc_survival_builder_proxy`，并确认不再出现 `modifier_single_health_bar IsAlive` 错误；随后执行 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md` 的最小发布 Lobby 实验。
 
-**Last Verified:** 2026-08-26；STATIC/SIMULATION/LUAC，未完成 WORKSHOP 或 PRODUCTION 验证。
+**Last Verified:** 2026-08-28；用户确认 LAN 双机独立 PlayerID 和操作同步；Builder 修复为 STATIC/CONTRACT/SIMULATION/LUAC/BUILD，尚未完成修复后的双机 WORKSHOP 或 PRODUCTION 验证。
 
 ## ISSUE-003
 

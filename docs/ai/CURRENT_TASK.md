@@ -1,3 +1,13 @@
+## 当前实施任务（2026-08-28）：双玩家独立 Builder 出生与血条异常修复
+
+- 用户已实机确认 LAN 双机联机、PlayerID 和双方操作同步成功；新问题是 Player 0 有真实 Builder，Player 1 只能看到地下且不可移动的 Undying 占位英雄，并伴随 `modifier_single_health_bar.lua:45 IsAlive` 错误。
+- 根因闭环：`template_map.vmap` 原有 `monsterborn_player1..4`，但缺少全部 `player_0_builder_spawn..player_3_builder_spawn`。Player 0 因 CSV 允许旧坐标回退仍能创建 `npc_survival_builder_proxy`；Player 1 按 CSV 失败关闭，真实 Builder 未创建，HUD 暴露了被取消控制、禁移动并移至地下的英雄替换锚点。
+- Content 地图现新增四个 `info_target`：Player 0 `(0,0,256)`、Player 1 `(0,-256,256)`、Player 2 `(0,-512,256)`、Player 3 `(0,256,256)`。Y 轴沿用既有四条 `monsterborn_player1..4` 通道映射，X/Z 使用 Player 0 已验证的 Builder 侧旧出生位置；未把 Builder 放到怪物出生端。
+- `template_map.vmap` 已完成 KeyValues2 -> binary -> KeyValues2 DMX 往返检查，四个 Builder Marker 和四个波次 Marker 均唯一；Resource Compiler 返回 `OK: 191 compiled, 0 failed, 0 skipped`，生成 `maps/template_map.vpk`。
+- `modifier_single_health_bar` 现在在发布前验证 parent 的实体索引、生命、存活和队伍方法，生命周期结束或不完整 handle 不再调用不存在的 `IsAlive()`；专项 Lua 5.1 测试覆盖不完整 parent 安静跳过及正常投影。
+- 用户已将权威 `multiplayer_rules.csv` 的 `setup_wait_seconds` 调整为 60，当前生成 Lua 与 CSV 定向重建结果逐字节一致。
+- 自动验证通过：`MULTIPLAYER_BUILDER_MARKERS_CONTRACT_PASS`、`MULTIPLAYER_PLAYER_SERVICE_LUA51_PASS`、`SINGLE_HEALTH_BAR_MODIFIER_LUA51_PASS`、目标 `luac5.1`、CSV/生成一致性、目标严格 UTF-8、双仓限定 `diff --check` 和地图编译。仍需双机 Workshop 冷启动确认 Player 1 出现真实 `BUILDER_READY`、位置/模型/控制权正确且血条错误不再出现。
+
 ## 已完成任务（2026-08-28）：研究所所有研究技能排除 A 键
 ## 当前实施任务补充（2026-08-28）：恢复主宰原生摄像机
 

@@ -1,3 +1,9 @@
+## 2026-08-28 - 双玩家独立 Builder Marker 与血条生命周期保护
+
+- 用户实机确认 LAN 双机 PlayerID 和操作同步成功，但 Player 1 没有可控 Builder，只显示地下、不可移动且模型不同的“建造者”。静态和地图审计确认该实体是 Undying 英雄替换占位锚点；真实 `npc_survival_builder_proxy` 因 `player_1_builder_spawn` 缺失按 CSV 失败关闭。Player 0 正常是因为其槽位允许回退到 `(0,0,256)`。
+- `template_map.vmap` 新增四个 `info_target`：`player_0_builder_spawn=(0,0,256)`、`player_1_builder_spawn=(0,-256,256)`、`player_2_builder_spawn=(0,-512,256)`、`player_3_builder_spawn=(0,256,256)`；Y 轴对应现有 `monsterborn_player1..4` 通道，Builder 保持在 X=0 侧而非 X=-3968 的怪物出生端。DMX 文本/二进制往返确认八个 Marker 均唯一，Resource Compiler 返回 `191 compiled, 0 failed` 并重建 `template_map.vpk`。
+- `modifier_single_health_bar.publish_state()` 在读取前验证完整 NPC 方法，避免占位隔离或实体生命周期结束时对不完整 parent 调用 `IsAlive()`。新增 Lua 5.1 行为测试和地图/CSV Marker 契约；多人玩家服务、目标 Lua 5.1 语法、60 秒 CSV/生成一致性、严格 UTF-8、双仓限定 `diff --check` 均通过。自动检查不等于 Workshop 实机，下一步双机冷启动验收双方 Builder 位置、模型、所有权和血条日志。
+
 # 2026-08-28 — 研究所所有研究技能排除 A 键
 
 - 用户确认普通与高级研究所的研究技能全部排除 `A`，从 `Q/W/E/R/T/S` 开始顺序分配；最终高级十槽为 `Q/W/E/R/T/S/D/F/G/H`。
