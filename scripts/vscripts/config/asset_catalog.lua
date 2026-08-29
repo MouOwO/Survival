@@ -3,6 +3,12 @@ local generated_activity_modifiers = require("config/generated/asset_activity_mo
 local generated_bodygroups = require("config/generated/asset_bodygroups")
 local generated_components = require("config/generated/asset_components")
 local generated_effects = require("config/generated/asset_effects")
+local generated_native_wearable_stages = require(
+    "config/generated/asset_native_wearable_stages"
+)
+local generated_native_wearables = require(
+    "config/generated/asset_native_wearables"
+)
 local generated_sounds = require("config/generated/asset_sounds")
 local tower_skills = require("config/generated/tower_skill_definitions")
 
@@ -20,6 +26,8 @@ local M = {
     bodygroups = generated_bodygroups.rows or {},
     components = generated_components.rows or {},
     effects = generated_effects.rows or {},
+    native_wearable_stages = generated_native_wearable_stages.rows or {},
+    native_wearables = generated_native_wearables.rows or {},
     sounds = generated_sounds.rows or {},
     by_model = {},
     by_particle = {},
@@ -86,6 +94,8 @@ local function initialize_bundle(asset)
         sounds = {},
     }
     asset.skills = {}
+    asset.native_wearable_stage = nil
+    asset.native_wearables = {}
 
     asset.attachment_models = asset.attachment_models or {}
     asset.attachment_ids = asset.attachment_ids or {}
@@ -103,6 +113,77 @@ for _, asset in ipairs(M.rows) do
     assert_unique(seen_asset_ids, asset_id, "asset_catalog duplicate asset_id")
     M.by_id[asset_id] = asset
     initialize_bundle(asset)
+end
+
+local seen_native_wearable_assets = {}
+for _, stage in ipairs(sorted_rows(
+        M.native_wearable_stages,
+        "asset_id"
+    )) do
+    local asset = require_asset(
+        stage,
+        "asset_native_wearable_stages",
+        "asset_id"
+    )
+    local asset_id = tostring(stage.asset_id or "")
+    assert(nonempty(stage.hero_unit_name),
+        "asset_native_wearable_stages hero_unit_name missing: " .. asset_id)
+    assert(nonempty(stage.body_model),
+        "asset_native_wearable_stages body_model missing: " .. asset_id)
+    assert_unique(
+        seen_native_wearable_assets,
+        asset_id,
+        "asset_native_wearable_stages duplicate asset_id"
+    )
+    assert(asset.primary_model == stage.body_model,
+        "native wearable body model diverged from asset_catalog: " .. asset_id)
+    asset.native_wearable_stage = stage
+end
+
+local seen_native_wearable_keys = {}
+local native_item_defs_by_asset = {}
+for _, wearable in ipairs(sorted_rows(
+        M.native_wearables,
+        "wearable_key"
+    )) do
+    local asset = require_asset(
+        wearable,
+        "asset_native_wearables",
+        "wearable_key"
+    )
+    local asset_id = asset.asset_id
+    local wearable_key = tostring(wearable.wearable_key or "")
+    local item_def = tostring(wearable.item_def or "")
+    assert(asset.native_wearable_stage ~= nil,
+        "native wearable references an undeclared stage: " .. wearable_key)
+    assert(nonempty(wearable_key),
+        "asset_native_wearables contains an empty wearable_key")
+    assert_unique(seen_native_wearable_keys, wearable_key,
+        "asset_native_wearables duplicate wearable_key")
+    assert(wearable.hero_unit_name
+            == asset.native_wearable_stage.hero_unit_name,
+        "native wearable hero identity mismatch: " .. wearable_key)
+    native_item_defs_by_asset[asset_id]
+        = native_item_defs_by_asset[asset_id] or {}
+    if nonempty(item_def) then
+        assert(nonempty(wearable.model_path),
+            "native wearable model_path missing: " .. wearable_key)
+        assert(tonumber(item_def) ~= nil,
+            "native wearable ItemDef is not numeric: " .. wearable_key)
+        assert_unique(
+            native_item_defs_by_asset[asset_id],
+            item_def,
+            "native wearable duplicate ItemDef for " .. asset_id
+        )
+        asset.attachment_models[#asset.attachment_models + 1]
+            = wearable.model_path
+    end
+    asset.native_wearables[#asset.native_wearables + 1] = wearable
+end
+
+for asset_id in pairs(seen_native_wearable_assets) do
+    assert(#M.by_id[asset_id].native_wearables > 0,
+        "native wearable stage has no declaration rows: " .. asset_id)
 end
 
 local seen_activity_modifier_keys = {}

@@ -18,9 +18,6 @@ local WAVE_OF_TERROR_SPEED = 1560
 local WAVE_OF_TERROR_DISTANCE = 1200
 local WAVE_OF_TERROR_HALF_WIDTH = 112
 local WAVE_CLEANUP_GRACE = 0.25
-local DROW_FROST_HIT_PARTICLE =
-    "particles/econ/items/drow/drow_arcana/drow_arcana_frost_arrow_debuff.vpcf"
-local DROW_TOWER_ASSET_ID = "tower_multi_drow_dread_retribution"
 local DEATH_CRITICAL_ASSET_IDS = {
     bone_cannon = "tower_death_nevermore_sundered_souls",
 }
@@ -382,28 +379,6 @@ function M.on_burning_wave_projectile_hit(ability, target, _, extra_data)
     return false
 end
 
-local function frost_arrow_hit_particle(tower, target)
-    if tower.survival_model_asset_id ~= DROW_TOWER_ASSET_ID then return end
-    local particle = ParticleManager:CreateParticle(
-        DROW_FROST_HIT_PARTICLE,
-        PATTACH_ABSORIGIN_FOLLOW,
-        target
-    )
-    local function cleanup()
-        ParticleManager:DestroyParticle(particle, false)
-        ParticleManager:ReleaseParticleIndex(particle)
-    end
-    if target.SetContextThink then
-        target:SetContextThink(
-            "survival_drow_frost_hit_" .. tostring(particle),
-            cleanup,
-            0.45
-        )
-    else
-        cleanup()
-    end
-end
-
 trigger_burning_great_arrow = function(payload)
     local skill = skill_matching(payload.skills, "burning_great_arrow_")
     if not skill or not owns_ability(payload.tower, skill) then return end
@@ -436,7 +411,6 @@ local function on_attack_landed(payload)
     -- killed its primary target. Path effects still need the target's final
     -- position, so only the tower must remain alive here.
     if not valid(payload.tower) or not exists(payload.target) then return end
-    frost_arrow_hit_particle(payload.tower, payload.target)
     update_bone_counter(payload)
     trigger_death_critical_particle(payload)
     trigger_death_grenade(payload)

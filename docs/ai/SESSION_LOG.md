@@ -18,6 +18,12 @@
 - `template_map.vmap` 新增四个 `info_target`：`player_0_builder_spawn=(0,0,256)`、`player_1_builder_spawn=(0,-256,256)`、`player_2_builder_spawn=(0,-512,256)`、`player_3_builder_spawn=(0,256,256)`；Y 轴对应现有 `monsterborn_player1..4` 通道，Builder 保持在 X=0 侧而非 X=-3968 的怪物出生端。DMX 文本/二进制往返确认八个 Marker 均唯一，Resource Compiler 返回 `191 compiled, 0 failed` 并重建 `template_map.vpk`。
 - `modifier_single_health_bar.publish_state()` 在读取前验证完整 NPC 方法，避免占位隔离或实体生命周期结束时对不完整 parent 调用 `IsAlive()`。新增 Lua 5.1 行为测试和地图/CSV Marker 契约；多人玩家服务、目标 Lua 5.1 语法、60 秒 CSV/生成一致性、严格 UTF-8、双仓限定 `diff --check` 均通过。自动检查不等于 Workshop 实机，下一步双机冷启动验收双方 Builder 位置、模型、所有权和血条日志。
 
+# 2026-08-29 - Templar Assassin 死亡塔头像场景探针实机验收
+
+- Workshop Tools 运行中的 Dota 进程参数确认为 `-addon survival_ta_portrait_probe -tools`，窗口响应正常；运行画面显示 TA 主体以及 CSV 解析出的 `head`、`shoulder`、`armor` 三个穿戴件。
+- 通过约 3 秒间隔的两帧截图对比，TA 的 `idle` 姿态发生变化，头发、肩部和护甲保持附着并随主体同步变化，没有原点堆叠、刚性留置或明显漂移；探针界面随后记录为 `PASS`。截图保存在 `%TEMP%\survival_ta_portrait_probe_frame_a.png`、`%TEMP%\survival_ta_portrait_probe_frame_b.png` 和 `%TEMP%\survival_ta_portrait_probe_pass.png`。
+- 本轮 `game\dota\console.log` 最后写入时间为本次启动前，未获得本轮 `[TA_PORTRAIT_PROBE]` 或 `[TA_PORTRAIT_PROBE_RESULT]` 文本日志；本次 `PASS` 结论来自运行时界面和动态截图，不把静态合同、资源编译或旧日志当作实机证据。
+
 # 2026-08-28 — 研究所所有研究技能排除 A 键
 
 - 用户确认普通与高级研究所的研究技能全部排除 `A`，从 `Q/W/E/R/T/S` 开始顺序分配；最终高级十槽为 `Q/W/E/R/T/S/D/F/G/H`。
@@ -3320,3 +3326,17 @@
 - 生产 API 真实日志：首次 checkpoint `200 / elapsed_seconds=0 / online_seconds_total=4163 / grant_count=0`；同一 session 后续 checkpoint `200 / elapsed_seconds=4 / online_seconds_total=4167 / grant_count=0`。
 - 结论：八参数 `checkpoint_online_time(..., p_final)` 已在远端生效，Supabase schema cache 已能解析新函数；首次不累计和相邻 checkpoint 累计约4秒符合在线租约语义。由于未达到600秒，grant_count=0不构成异常。
 - 202608230006仍未单独确认，后续奖励触发测试前必须核对其版本绑定逻辑。
+
+# 2026-08-29 - 21个原生英雄塔阶段改为AttachWearables视觉载体
+
+- 本轮完成21个原生英雄塔阶段的视觉载体审计与收尾。权威CSV为`asset_native_wearable_stages.csv`和`asset_native_wearables.csv`，共21个阶段、94条穿戴记录；21个塔路线资源ID与阶段表完全对应，ItemDef顺序、主体模型和代理KV逐项一致，审计无错误。
+- `native_wearable_carrier_service.lua`以独立`asset_proxy_*`单位承载基础英雄主体和KV `Creature.AttachWearables`，对载体设置owner、FollowEntity和不可选/无碰撞保护Modifier；载体创建失败时保留旧有效载体，清理时删除载体并恢复建筑原始RenderAlpha。补充了无状态清理保护、失败替换保留、跟随和entindex复用迟到清理测试。
+- `building_visual_service.lua`的native分支只调用载体服务，不再调用旧`asset_components`组件链；建筑本体优先`SetRenderAlpha(0)`隐藏并保留实体交互，无该API时回退`AddNoDraw()`。升级、路线刷新、移动、死亡和融合仍复用原建筑实体与既有业务链，死亡/融合路径先清理载体再释放建筑状态。
+- `modifier_tower_attack_effects.lua`将死亡塔/闪电塔的攻击手势转发到视觉载体，隐藏建筑本体不再直接播放英雄动作；多重塔测试同步到当前CSV权威的Luna、Medusa原生弹道，未改变伤害、目标、穿甲或技能结算。
+- `build_tower_native_wearable_units.py`修正了`--check`比较时对CRLF的读取规范化问题；当前`TOWER_NATIVE_WEARABLE_UNITS_CURRENT`。10个目标生成Lua与CSV重建结果在换行规范化后全部一致，新增两个native wearable生成模块字节级一致。
+- 资源审计通过：114个主体/穿戴模型路径在本机VPK索引中全部存在；原生阶段没有遗留`asset_components`或旧七塔模型引用，`asset_catalog`附件字段均为空。唯一保留的阶段ambient记录是Ancient Apparition路线的`Ice Vortex`技能视觉，不是旧饰品常驻效果。
+- 七份塔路线CSV相对`HEAD`仅有允许的视觉字段变化：`model_name`，以及多重/神秘路线对应主体的`projectile_model`；没有攻击数值、费用、人口、技能、升级描述或融合字段变化。
+- 定向Lua 5.1测试通过：`NATIVE_WEARABLE_CARRIER_SERVICE_PASS`、`BUILDING_VISUAL_SERVICE_PASS`、`DEATH_TOWER_ANIMATION_CONTRACT_PASS`、`DEV_ASSET_PRELOAD_PASS`、`TOWER_MULTI_ATTACK_RUNTIME_PASS`、`TOWER_REBUILD_AFTER_DEATH_PASS`、`ASSET_BUNDLE_CONFIG_PASS`、各路线视觉/预载测试和`PHOENIX_LASER_CONTRACT_PASS`。相关目标Lua、Python工具和测试均通过语法检查，限定`git diff --check`通过。
+- 全量测试共142项，102项通过、40项失败；相较本轮迁移前的99通过/43失败，已消除三个直接受影响的旧契约失败，未产生新的失败。剩余失败集合均属于迁移前既有失败，主要包括无关BOM文件、陈旧业务基线和其他系统测试夹具；`test_building_upgrade_process.lua`的粒子销毁参数断言也属于既有不一致。
+- 全量603个Lua文件直接运行`luac5.1 -p`时有6个既有UTF-8 BOM文件失败；去除BOM后603个文件全部通过语法检查。当前`build_configs.ps1 -CheckOnly`仍报告`CONFIG_VERIFY files=111 bad_utf8=1`，唯一异常是无关既有`config/generated/rogue_reward_effects.lua`中的`U+FFFD`，本轮未修改。
+- 自动验证不能替代Dota运行时验证。本轮尚未在真实Dota中逐阶段确认载体生成、原生穿戴可见性、跟随/闪烁、不可选状态、建筑选择控制、攻击动作、升级替换、失败重试、死亡重建和融合清理；这些仍需完全退出Workshop Tools后冷启动验收。

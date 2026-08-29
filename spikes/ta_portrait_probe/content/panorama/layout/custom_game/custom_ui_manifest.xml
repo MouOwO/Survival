@@ -1,0 +1,5 @@
+<root>
+    <Panel hittest="false">
+        <CustomUIElement type="Hud" layoutfile="file://{resources}/layout/custom_game/ta_portrait_probe.xml" />
+    </Panel>
+</root>

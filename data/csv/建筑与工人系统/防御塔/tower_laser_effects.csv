@@ -1,4 +1,4 @@
-﻿effect_key,skill_id,model_asset_id,particle_name,beam_mode,attack_point,beam_update_interval,visual_refresh_interval,visual_segment_duration,source_offset_z,target_offset_z,damage_increment_pct,max_damage_multiplier,enabled,notes
+effect_key,skill_id,model_asset_id,particle_name,beam_mode,attack_point,beam_update_interval,visual_refresh_interval,visual_segment_duration,source_offset_z,target_offset_z,damage_increment_pct,max_damage_multiplier,enabled,notes
 #中文名:特效记录键,#中文名:技能ID,模型资源ID,特效资源,光束模式,攻击前摇,光束坐标刷新间隔,视觉段重播间隔,视觉段保留时间,起点高度偏移,终点高度偏移,每秒递增伤害(%),最高伤害倍率,是否启用,备注
 #types:string,#types:string,string,string,string,number,number,number,number,number,number,number,number,boolean,string
 laser_lv01:default,laser_lv01,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
@@ -6,4 +6,3 @@ laser_lv02:default,laser_lv02,,particles/units/heroes/hero_tinker/tinker_laser.v
 laser_lv03:default,laser_lv03,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
 laser_lv04:default,laser_lv04,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
 laser_lv05:default,laser_lv05,,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,持续重播相互重叠的激光段；视觉刷新不影响每秒伤害计时。
-laser_lv05:tower_laser_death_prophet_brightshroud,laser_lv05,tower_laser_death_prophet_brightshroud,particles/units/heroes/hero_tinker/tinker_laser.vpcf,segmented,0,0.03,0.12,0.18,160,70,5,5,1,光明尸衣之魂阶段完整沿用已验证的普通激光塔Tinker Laser视觉与分段生命周期。

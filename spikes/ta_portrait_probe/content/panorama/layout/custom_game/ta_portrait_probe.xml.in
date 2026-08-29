@@ -1,0 +1,36 @@
+<root>
+    <styles>
+        <include src="file://{resources}/styles/custom_game/ta_portrait_probe.css" />
+    </styles>
+    <scripts>
+        <include src="file://{resources}/scripts/custom_game/ta_portrait_probe_data.js" />
+        <include src="file://{resources}/scripts/custom_game/ta_portrait_probe.js" />
+    </scripts>
+    <Panel class="TAPortraitProbeRoot" hittest="false">
+        <Label class="ProbeTitle" text="Templar Assassin runtime wearable probe" />
+        <Panel class="StaticBaseline" hittest="false">
+            <Label class="BaselineTitle" text="Static body-only rendering baseline" />
+            <Label class="BaselineWarning" text="Not bone-merge evidence" />
+            <DOTAScenePanel
+                id="TAPortraitScene"
+                class="TAPortraitScene"
+                map="__SCENE_MAP__"
+                camera="__CAMERA_NAME__"
+                light="__LIGHT_TARGETNAME__"
+                particleonly="__PARTICLE_ONLY__"
+                hittest="false" />
+        </Panel>
+        <Panel class="ProbeControls" hittest="true">
+            <Label id="ProbeStatus" class="ProbeStatus" text="Awaiting runtime entities" />
+            <Button class="ProbeButton Pass" onactivate="GameUI.CustomUIConfig().TAPortraitProbe.Record('PASS')">
+                <Label text="Pass after multi-frame check" />
+            </Button>
+            <Button class="ProbeButton Warning" onactivate="GameUI.CustomUIConfig().TAPortraitProbe.Record('PARENTING_VISIBLE_BONE_MERGE_FAIL')">
+                <Label text="Rigid / detached wearable" />
+            </Button>
+            <Button class="ProbeButton Fail" onactivate="GameUI.CustomUIConfig().TAPortraitProbe.Record('RENDER_FAIL')">
+                <Label text="Render failed" />
+            </Button>
+        </Panel>
+    </Panel>
+</root>

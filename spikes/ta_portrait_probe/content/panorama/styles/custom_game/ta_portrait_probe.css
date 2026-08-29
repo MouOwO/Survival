@@ -1,0 +1,121 @@
+.TAPortraitProbeRoot {
+    width: 100%;
+    height: 100%;
+}
+
+.ProbeTitle {
+    horizontal-align: center;
+    margin-top: 20px;
+    padding: 8px 16px;
+    color: #f2edf7;
+    font-size: 25px;
+    font-weight: semi-bold;
+    background-color: #101215e8;
+    border: 1px solid #665676;
+}
+
+.StaticBaseline {
+    width: 330px;
+    height: 390px;
+    horizontal-align: right;
+    vertical-align: top;
+    margin-top: 76px;
+    margin-right: 20px;
+    background-color: #101215ed;
+    border: 1px solid #665676;
+}
+
+.BaselineTitle {
+    horizontal-align: center;
+    margin-top: 8px;
+    color: #e4ddec;
+    font-size: 16px;
+}
+
+.BaselineWarning {
+    horizontal-align: center;
+    margin-top: 30px;
+    color: #e3b25f;
+    font-size: 14px;
+}
+
+.TAPortraitScene {
+    width: 308px;
+    height: 330px;
+    horizontal-align: center;
+    vertical-align: bottom;
+    margin-bottom: 8px;
+    background-color: #050607;
+    border: 1px solid #3f3548;
+}
+
+.ProbeControls {
+    horizontal-align: center;
+    vertical-align: bottom;
+    margin-bottom: 24px;
+    flow-children: right;
+}
+
+.ProbeStatus {
+    width: 330px;
+    height: 42px;
+    padding-top: 10px;
+    color: #c8cdd2;
+    font-size: 15px;
+    text-align: center;
+    background-color: #20252af2;
+    border: 1px solid #485159;
+}
+
+.ProbeStatus.Ready {
+    color: #fff3d4;
+    border-color: #b79d4c;
+}
+
+.ProbeStatus.Passed {
+    color: #e8fff1;
+    border-color: #4e9667;
+}
+
+.ProbeStatus.Failed {
+    color: #fff0ed;
+    border-color: #ad5d55;
+}
+
+.ProbeButton {
+    min-width: 145px;
+    height: 42px;
+    margin-left: 8px;
+    padding: 9px 14px 0;
+    background-color: #2a3035f2;
+    border: 1px solid #59636b;
+}
+
+.ProbeButton:hover {
+    brightness: 1.3;
+}
+
+.ProbeButton:active {
+    brightness: 0.8;
+}
+
+.ProbeButton Label {
+    horizontal-align: center;
+    color: #f4f6f7;
+    font-size: 14px;
+}
+
+.ProbeButton.Pass {
+    background-color: #28583af2;
+    border-color: #56a672;
+}
+
+.ProbeButton.Warning {
+    background-color: #645223f2;
+    border-color: #b79d4c;
+}
+
+.ProbeButton.Fail {
+    background-color: #652f2bf2;
+    border-color: #b56159;
+}

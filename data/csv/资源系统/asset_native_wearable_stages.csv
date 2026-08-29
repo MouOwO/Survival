@@ -1,0 +1,24 @@
+asset_id,hero_unit_name,body_model,display_name,enabled,notes
+#中文名:资源ID,英雄单位名,基础主体模型,显示名称,是否启用,备注
+#types:string,string,string,string,boolean,string
+tower_death_templar_assassin,npc_dota_hero_templar_assassin,models/heroes/lanaya/lanaya.vmdl,Templar Assassin基础外观 死亡之塔,1,死亡路线第一阶段；ItemDef仅来自本地items_game.txt的default_item
+tower_death_nevermore_sundered_souls,npc_dota_hero_skeleton_king,models/heroes/wraith_king/wraith_king.vmdl,Wraith King基础外观 碎骨重炮,1,死亡路线第二阶段；保留旧资源ID以驱动技能和弹道分支
+tower_death_warlock_seam_ripper,npc_dota_hero_phantom_assassin,models/heroes/phantom_assassin/phantom_assassin.vmdl,Phantom Assassin基础外观 死神榴弹炮,1,死亡路线第三阶段；不挂载Persona默认物品
+tower_frost_lich_rime_lord,npc_dota_hero_lich,models/heroes/lich/lich.vmdl,Lich基础外观 冰霜之塔,1,冰霜路线第一阶段
+tower_frost_crystal_maiden_winter_raven,npc_dota_hero_crystal_maiden,models/heroes/crystal_maiden/crystal_maiden.vmdl,Crystal Maiden基础外观 寒冰尖塔,1,冰霜路线第二阶段
+tower_frost_ancient_apparition,npc_dota_hero_ancient_apparition,models/heroes/ancient_apparition/ancient_apparition.vmdl,Ancient Apparition基础外观 极地方尖碑,1,冰霜路线第三阶段
+tower_lightning_zeus_tempest,npc_dota_hero_zuus,models/heroes/zeus/zeus.vmdl,Zeus基础外观 闪电塔,1,闪电路线第一阶段
+tower_lightning_leshrac,npc_dota_hero_leshrac,models/heroes/leshrac/leshrac.vmdl,Leshrac基础外观 闪电魔塔,1,闪电路线第二阶段
+tower_lightning_razor_voidstorm,npc_dota_hero_razor,models/heroes/razor/razor.vmdl,Razor基础外观 雷电扩散,1,闪电路线第三阶段
+tower_machine_gun_sniper_occultist,npc_dota_hero_sniper,models/heroes/sniper/sniper.vmdl,Sniper基础外观 机枪塔,1,机枪路线第一阶段
+tower_machine_gun_bounty_heartless,npc_dota_hero_bounty_hunter,models/heroes/bounty_hunter/bounty_hunter.vmdl,Bounty Hunter基础外观 赏金机枪,1,机枪路线第二阶段
+tower_machine_gun_windranger_rising_gale,npc_dota_hero_windrunner,models/heroes/windrunner/windrunner.vmdl,Windranger基础外观 爆矢加特林,1,机枪路线第三阶段
+tower_multi_medusa_anamnessa,npc_dota_hero_vengefulspirit,models/heroes/vengeful/vengeful.vmdl,Vengeful Spirit基础外观 多重塔,1,多重路线第一阶段
+tower_multi_drow_dread_retribution,npc_dota_hero_luna,models/heroes/luna/luna.vmdl,Luna基础外观 穿透弩炮,1,多重路线第二阶段
+tower_multi_vengeful_shen_screeauk,npc_dota_hero_medusa,models/heroes/medusa/medusa.vmdl,Medusa基础外观 炙热巨箭塔,1,多重路线第三阶段
+tower_keeper_of_the_light,npc_dota_hero_storm_spirit,models/heroes/storm_spirit/storm_spirit.vmdl,Storm Spirit基础外观 神秘之塔,1,神秘路线第一阶段；保留已有资源ID避免转职引用失效
+tower_laser_od_blackgate,npc_dota_hero_wisp,models/heroes/wisp/wisp.vmdl,Io基础外观 魔能炮,1,神秘路线第二阶段；本地经济数据无可挂载基础模型物品
+tower_laser_death_prophet_brightshroud,npc_dota_hero_tinker,models/heroes/tinker/tinker.vmdl,Tinker基础外观 魔能之眼,1,神秘路线第三阶段；激光行为继续读取tower_laser_effects.csv
+tower_anti_air_gyro_swooping,npc_dota_hero_gyrocopter,models/heroes/gyro/gyro.vmdl,Gyrocopter基础外观 防空塔,1,防空路线第一阶段
+tower_anti_air_batrider_empiric,npc_dota_hero_batrider,models/heroes/batrider/batrider.vmdl,Batrider基础外观 防空火炮,1,防空路线第二阶段
+tower_anti_air_skywrath_empyrean,npc_dota_hero_skywrath_mage,models/heroes/skywrath_mage/skywrath_mage.vmdl,Skywrath Mage基础外观 空域霸主,1,防空路线第三阶段
