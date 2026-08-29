@@ -306,6 +306,11 @@ local function on_player_disconnected(keys)
     end
     require("systems/fishing_reward_service").disconnect(player_id)
     require("systems/online_time_service").disconnect(player_id)
+    event_bus.emit(events.PLAYER_DISCONNECTED, {
+        player_id = player_id,
+        resolution = resolution,
+    })
+    require("systems/player_context_service").unregister_player(player_id)
 end
 
 local function initialize_survival_hero(hero)

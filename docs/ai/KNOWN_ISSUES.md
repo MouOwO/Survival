@@ -32,9 +32,9 @@ Last Reviewed: 2026-08-27
 
 **Current Workaround:** 正常 Arcade 继续归类为 `MODEL-D`。LAN setup 权威窗口现为 60 秒，`template_map` 已新增四个 Builder Marker 并重建 VPK；服务端结构化日志区分分队成功、`assignment_window_closed`、英雄就绪、Builder 就绪和断开字段解析。
 
-**Next Action:** 双机冷启动确认双方 `hero_ready` 和真实 `BUILDER_READY`，Player 1 Builder 出现在 `(0,-256,256)` 附近且双方只能控制自己的 `npc_survival_builder_proxy`，并确认不再出现 `modifier_single_health_bar IsAlive` 错误；随后执行 `architecture/MULTIPLAYER_TOPOLOGY_REPORT.md` 的最小发布 Lobby 实验。
+**Next Action:** 双机冷启动确认双方 `hero_ready`/`BUILDER_READY`、`monsterborn_player1/2` 各自出怪并攻击对应城墙、双方只能控制自己的单位；Player 1 退出后其 Builder/建筑/工人/波次怪消失且通道停用，Player 0 继续运行不判负。确认不再出现 `modifier_single_health_bar SetTableValue` 和旧 `monsterborn/monsterorn` 日志后，再执行最小发布 Lobby 实验。
 
-**Last Verified:** 2026-08-28；用户确认 LAN 双机独立 PlayerID 和操作同步；Builder 修复为 STATIC/CONTRACT/SIMULATION/LUAC/BUILD，尚未完成修复后的双机 WORKSHOP 或 PRODUCTION 验证。
+**Last Verified:** 2026-08-29；用户确认 LAN 双机独立 PlayerID 和操作同步；玩家隔离、断线清理、波次通道和日志修复为 STATIC/CONTRACT/SIMULATION/LUAC，尚未完成修复后的双机 WORKSHOP 或 PRODUCTION 验证。
 
 ## ISSUE-003
 

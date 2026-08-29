@@ -1197,11 +1197,35 @@ local function on_entity_killed(payload)
         end
         rollback_build_cooldown(state.build_task)
     end
-    if building_defeat_rules.should_trigger(defeat_triggered, state) then
+    if victim.survival_disconnect_cleanup ~= true
+        and building_defeat_rules.should_trigger(defeat_triggered, state) then
         defeat_triggered = true
         online_time_service.finish("wall_destroyed")
         GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
     end
+end
+
+local function on_player_disconnected(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    local removed = 0
+    local targets = {}
+    for _, state in pairs(buildings) do
+        if state.player_id == player_id and valid_entity(state.unit) then
+            targets[#targets + 1] = state.unit
+        end
+    end
+    for _, unit in ipairs(targets) do
+        if valid_entity(unit) then
+            removed = removed + 1
+            unit.survival_disconnect_cleanup = true
+            if unit.ForceKill then unit:ForceKill(false)
+            elseif UTIL_Remove then UTIL_Remove(unit) end
+        end
+    end
+    print(string.format(
+        "[PLAYER_ASSET_CLEANUP] player=%s asset=building requested=%s",
+        tostring(player_id), tostring(removed)))
 end
 function M.relocate_building(unit, position)
     return require("systems/building_relocation").move(unit, position)
@@ -1307,6 +1331,7 @@ function M.init()
     event_bus.handle_request(events.TOWER_CLASS_SLOT_REQUEST, tower_class_slot_request)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
     local recovered = recover_existing_buildings()
     logger.info("BuildingSystem", "initialized recovered=" .. tostring(recovered))
 end

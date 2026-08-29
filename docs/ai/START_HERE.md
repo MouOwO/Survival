@@ -34,7 +34,7 @@ P0 是 Player Session、在线 checkpoint 和终局 finalization 的稳定联调
 - Dota 终局后的 `session_closed` 本地 callback 未作为本次服务端持久化验收阻断项，保留为非阻断观测事项。
 - 生产双玩家端到端验收仍是独立后续工作，不等同于 `TASK-001` 本次城墙毁坏范围。
 - 生产 Session Foundation 在发布 Lobby 拓扑实验完成前暂停；不得假定 Lobby Owner 就是 Game Server 或 Python 主机。
-- LAN 双机已由用户确认联机、独立 PlayerID 和操作同步成功。Player 1 Builder 缺失已定位为 `template_map` 缺少四个 Builder Marker：Player 0 依赖旧坐标回退，Player 1 按 CSV 失败关闭并暴露地下 Undying 占位锚点。地图现已新增 `player_0_builder_spawn..player_3_builder_spawn`、完成 DMX 往返并以 `191 compiled, 0 failed` 重建 VPK；setup 权威 CSV 已由用户调为 60 秒，血条 Modifier 也补齐无效 parent 方法保护。下一可靠检查点是双机冷启动确认双方真实 `BUILDER_READY`、仅控制各自 `npc_survival_builder_proxy`，且不再出现 `modifier_single_health_bar IsAlive` 错误。
+- LAN 双机已由用户确认联机、独立 PlayerID 和操作同步成功。地图含四个 Builder Marker 与 `monsterborn_player1..4` 并已重建 VPK；运行时现按 `player_slots.csv` 为每个活动玩家生成独立普通波次，绑定各自城墙。Builder progression 和唯一 Order Filter 已按玩家隔离；断线会销毁该玩家 Builder、建筑、工人和波次怪，并停用其本局出怪通道，断线城墙不触发全局失败。血条发布也补齐 `CustomNetTables.SetTableValue` 方法保护。自动契约、Lua 5.1 行为/语法、编码和限定 diff 已通过；下一可靠检查点是双机冷启动实测双方各自出怪/目标/控制权，以及 Player 1 退出后 Player 0 继续运行且控制台无旧 Marker 或 NetTable 错误。
 
 ## Minimum Required Context
 

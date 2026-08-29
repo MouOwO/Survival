@@ -149,7 +149,21 @@ function M.owner_player_id(unit)
         and entity_owner ~= registered_owner then
         return nil
     end
-    return registered_owner or entity_owner
+    local authoritative = registered_owner or entity_owner
+    if authoritative ~= nil then return authoritative end
+    local engine_owner = nil
+    if unit.GetPlayerOwnerID then
+        local ok, value = pcall(unit.GetPlayerOwnerID, unit)
+        if ok then engine_owner = normalized_player_id(value) end
+    end
+    if engine_owner == nil and unit.GetPlayerOwner then
+        local ok, player = pcall(unit.GetPlayerOwner, unit)
+        if ok and player and player.GetPlayerID then
+            local id_ok, value = pcall(player.GetPlayerID, player)
+            if id_ok then engine_owner = normalized_player_id(value) end
+        end
+    end
+    return engine_owner
 end
 
 function M.is_owned_by(player_id, unit)
@@ -163,6 +177,19 @@ function M.unregister_unit(unit)
     if entindex == nil then return false end
     owner_by_entindex[entindex] = nil
     return true
+end
+
+function M.unregister_player(player_id)
+    player_id = normalized_player_id(player_id)
+    if player_id == nil then return 0 end
+    local removed = 0
+    for entindex, owner in pairs(owner_by_entindex) do
+        if owner == player_id then
+            owner_by_entindex[entindex] = nil
+            removed = removed + 1
+        end
+    end
+    return removed
 end
 
 rebuild_slots()

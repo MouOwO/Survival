@@ -174,3 +174,4 @@ __pycache__/
 /tools/test_spirit_bomb_contract.ps1
 /tools/test_spirit_bomb_state.lua
 /tools/test_technology_stat_manager_generated_levels.lua
+/luac.out

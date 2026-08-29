@@ -9,7 +9,7 @@ local BUILDER_SLOT_COUNT = 6
 local BUILDER_ROGUE_ABILITY = "ability_survival_rogue_reward"
 local BUILDER_ROGUE_SLOT_ORDER = 7
 
-local state_by_team = {}
+local state_by_player = {}
 local managed_abilities = {}
 
 local function placeholder_name(slot_order)
@@ -48,12 +48,15 @@ local function create_state()
     }
 end
 
-local function ensure(team)
-    if not state_by_team[team] then
-        state_by_team[team] = create_state()
-        state_by_team[team].team = team
+local function ensure(player_id, team)
+    player_id = tonumber(player_id)
+    if player_id == nil or player_id < 0 then return nil end
+    if not state_by_player[player_id] then
+        state_by_player[player_id] = create_state()
+        state_by_player[player_id].player_id = player_id
     end
-    return state_by_team[team]
+    if team ~= nil then state_by_player[player_id].team = team end
+    return state_by_player[player_id]
 end
 
 local function count(state, building_id)
@@ -508,7 +511,8 @@ local function sync(state)
 end
 
 local function on_builder_ready(payload)
-    local state = ensure(payload.team)
+    local state = ensure(payload.player_id, payload.team)
+    if not state then return end
     state.builder = payload.builder
     state.player_id = payload.player_id
     rebuild_building_counts(state)
@@ -535,7 +539,8 @@ local function on_builder_ready(payload)
 end
 
 local function on_building_created(payload)
-    local state = ensure(payload.team)
+    local state = state_by_player[tonumber(payload.player_id)]
+    if not state then return end
     local building_id = tostring(payload.building_id or "")
     if building_id == "arrow_tower" then
         apply_tower_identity(state, payload, 1)
@@ -553,7 +558,8 @@ local function on_building_created(payload)
 end
 
 local function on_building_changed(payload)
-    local state = ensure(payload.team)
+    local state = state_by_player[tonumber(payload.player_id)]
+    if not state then return end
     if payload.building_id == "arrow_tower" then
         apply_tower_identity(state, payload, 0)
         sync(state)
@@ -566,7 +572,8 @@ local function on_building_changed(payload)
 end
 
 local function on_building_destroyed(payload)
-    local state = ensure(payload.team)
+    local state = state_by_player[tonumber(payload.player_id)]
+    if not state then return end
     local building_id = tostring(payload.building_id or "")
     if building_id == "arrow_tower" then
         apply_tower_identity(state, payload, -1)
@@ -581,7 +588,8 @@ local function on_building_destroyed(payload)
 end
 
 local function on_hero_summoned(payload)
-    local state = ensure(payload.team)
+    local state = state_by_player[tonumber(payload.player_id)]
+    if not state then return end
     state.hero_summoned = true
     sync(state)
 end
@@ -589,7 +597,7 @@ end
 local function on_fusion_completed(payload)
     if not payload or payload.reason ~= "fusion_completed" then return end
     local player_id = tonumber(payload and payload.player_id)
-    for _, state in pairs(state_by_team) do
+    for _, state in pairs(state_by_player) do
         if state.player_id == player_id then
             state.fusion_completed = true
             sync(state)
@@ -598,7 +606,7 @@ local function on_fusion_completed(payload)
 end
 
 function M.init()
-    state_by_team = {}
+    state_by_player = {}
     managed_abilities = {}
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
@@ -606,12 +614,31 @@ function M.init()
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.TOWER_FUSION_STATE_CHANGED, on_fusion_completed)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id ~= nil then state_by_player[player_id] = nil end
+    end)
     event_bus.subscribe(events.ROGUE_REWARD_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
-        for _, state in pairs(state_by_team) do
+        for _, state in pairs(state_by_player) do
             if state.player_id == player_id then sync(state) end
         end
     end)
+end
+
+function M._state_snapshot_for_test(player_id)
+    local state = state_by_player[tonumber(player_id)]
+    if not state then return nil end
+    local counts = {}
+    for key, value in pairs(state.counts) do counts[key] = value end
+    return {
+        player_id = state.player_id,
+        team = state.team,
+        stage_id = state.stage_id,
+        wall_built_once = state.wall_built_once,
+        city_level = state.city_level,
+        counts = counts,
+    }
 end
 
 return M

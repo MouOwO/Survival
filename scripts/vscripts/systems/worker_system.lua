@@ -1145,6 +1145,23 @@ local function on_entity_killed(payload)
     )
 end
 
+local function on_player_disconnected(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    local targets = {}
+    for _, state in pairs(workers) do
+        if state.player_id == player_id and valid_entity(state.unit) then
+            targets[#targets + 1] = state.unit
+        end
+    end
+    for _, worker in ipairs(targets) do
+        if valid_entity(worker) and worker.ForceKill then worker:ForceKill(false) end
+    end
+    print(string.format(
+        "[PLAYER_ASSET_CLEANUP] player=%s asset=worker requested=%s",
+        tostring(player_id), tostring(#targets)))
+end
+
 function M.init()
     workers = {}
     current_tree_entindex = -1
@@ -1165,6 +1182,7 @@ function M.init()
         end
         return result
     end)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
     event_bus.handle_request(
         events.WORKER_TRAINING_GET_REQUEST,
         function(payload)

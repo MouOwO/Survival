@@ -14,7 +14,9 @@ end
 local TABLE = "survival_hero_health_bar"
 
 local function publish(unit, value)
-    if not CustomNetTables or not unit or not unit.entindex then
+    if not CustomNetTables
+        or type(CustomNetTables.SetTableValue) ~= "function"
+        or not unit or not unit.entindex then
         return
     end
     CustomNetTables:SetTableValue(

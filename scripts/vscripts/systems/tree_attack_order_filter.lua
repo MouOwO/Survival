@@ -3,10 +3,7 @@ local repair_order_service = require("systems/repair_order_service")
 local lumberjack_order_service = require("systems/lumberjack_order_service")
 local destination_validation = require("systems/destination_validation_service")
 local anti_air_rules = require("systems/anti_air_rules")
-local function owner_player_id(unit)
-    return tonumber(unit and unit.survival_player_id)
-        or (unit and unit.GetPlayerOwnerID and unit:GetPlayerOwnerID())
-end
+local player_context = require("systems/player_context_service")
 
 local M = {}
 local registered = false
@@ -27,6 +24,16 @@ local function ordered_units(keys)
 end
 
 local function filter(_, keys)
+    local issuer = tonumber(keys.issuer_player_id_const)
+        or tonumber(keys.issuer_player_id)
+        or tonumber(keys.player_id)
+    local units = ordered_units(keys)
+    if issuer ~= nil and issuer >= 0 then
+        for _, unit in ipairs(units) do
+            local owner = player_context.owner_player_id(unit)
+            if owner == nil or owner ~= issuer then return false end
+        end
+    end
     lumberjack_order_service.process(keys)
     if repair_order_service.process(keys) then return false end
     local order_type = tonumber(keys.order_type)
@@ -37,7 +44,7 @@ local function filter(_, keys)
             tonumber(keys.position_y) or 0,
             tonumber(keys.position_z) or 0
         )
-        for _, unit in ipairs(ordered_units(keys)) do
+        for _, unit in ipairs(units) do
             if tree_damage_rules.is_arrow_tower(unit) then
                 return false
             end
@@ -50,12 +57,9 @@ local function filter(_, keys)
     end
     if order_type ~= tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET) then return true end
     local target = entity(keys.entindex_target)
-    local issuer = tonumber(keys.issuer_player_id_const)
-        or tonumber(keys.issuer_player_id)
-        or tonumber(keys.player_id)
-    for _, unit in ipairs(ordered_units(keys)) do
+    for _, unit in ipairs(units) do
         if tree_damage_rules.is_arrow_tower(unit) then
-            local owner = owner_player_id(unit)
+            local owner = player_context.owner_player_id(unit)
             if issuer ~= nil and issuer >= 0 and owner ~= nil
                 and issuer ~= owner then
                 return false

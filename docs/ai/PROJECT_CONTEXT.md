@@ -66,6 +66,9 @@ Supabase PostgreSQL
 - 真实逐单位碰撞的穿透直线技能使用 `ProjectileManager:CreateLinearProjectile()`。
 - 攻击射程复用项目现有回退辅助函数。
 - 定时逻辑优先使用项目 scheduler，并明确结束与清理路径。
+- 多人 Builder progression、建筑数量、普通波次 Marker、怪物城墙目标和断线生命周期均以数字 `player_id` 隔离；同属 `DOTA_TEAM_GOODGUYS` 不能作为共享或所有权依据。
+- 玩家命令统一经过唯一 ExecuteOrderFilter；真实玩家命令的全部单位必须解析为该玩家 owner，系统/AI issuer `-1` 保持放行。服务端注册身份和 `survival_player_id` 优先于普通 creature 不可靠的引擎 owner getter。
+- 普通波次出生点由 `player_slots.csv::wave_spawn_marker` 权威映射。玩家断线后该槽位本局不再生成波次怪，其他玩家通道继续运行。
 
 ## Current Development Phase
 

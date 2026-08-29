@@ -28,6 +28,7 @@ local M = {}
 local state = {}
 local enemies = {}
 local wall_entindex = -1
+local wall_by_player = {}
 local generation_token = 0
 local difficulty_id = difficulty_config.default_id
 local difficulty_selected = false
@@ -47,6 +48,8 @@ local wave_resource_sessions = {}
 local wave_model_leases = {}
 local dev_resident_models = {}
 local next_wave_resource_session_id = 0
+local wave_channels = {}
+local disconnected_players = {}
 
 local function movement_type_for(row)
     local definition = archetypes.by_id[row.archetype_id] or {}
@@ -81,7 +84,7 @@ local function wave_model_paths(wave)
     return model_paths
 end
 
-local function acquire_wave_model_resources(number, wave, token, is_dev)
+local function acquire_wave_model_resources(number, wave, token, is_dev, multiplier)
     next_wave_resource_session_id = next_wave_resource_session_id + 1
     local session_id = string.format(
         "%s:%d:%d",
@@ -93,6 +96,7 @@ local function acquire_wave_model_resources(number, wave, token, is_dev)
     for _, row in ipairs((wave and wave.batches) or {}) do
         planned = planned + (tonumber(row.monster_count) or 0)
     end
+    planned = planned * math.max(1, math.floor(tonumber(multiplier) or 1))
     local session = {
         session_id = session_id,
         wave_number = number,
@@ -264,6 +268,50 @@ local function find_monster_spawn_marker()
     return monster_spawn_marker_service.find()
 end
 
+local function configured_wave_channel(player_id)
+    local slot = player_context.slot(player_id)
+    local marker_name = tostring(slot and slot.wave_spawn_marker or "")
+    if marker_name == "" or not Entities or not Entities.FindByName then return nil end
+    local ok, marker = pcall(Entities.FindByName, Entities, nil, marker_name)
+    if not ok or not valid(marker) then
+        print(string.format(
+            "[MonsterSpawnMarker] missing player=%s map=%s expected=%s source=player_slots.csv",
+            tostring(player_id), tostring(GetMapName and GetMapName() or "unknown"),
+            marker_name))
+        return nil
+    end
+    return { player_id = player_id, marker = marker, marker_name = marker_name }
+end
+
+local function rebuild_wave_channels()
+    wave_channels = {}
+    local player_ids = player_context.active_player_ids()
+    for _, player_id in ipairs(player_ids) do
+        local channel = disconnected_players[player_id] ~= true
+            and configured_wave_channel(player_id) or nil
+        if channel then wave_channels[player_id] = channel end
+    end
+    if #player_ids == 0 and not PlayerResource then
+        local marker = monster_spawn_marker or find_monster_spawn_marker()
+        if marker then wave_channels[-1] = { player_id = -1, marker = marker } end
+    end
+    return wave_channels
+end
+
+local function active_wave_channels()
+    local result = {}
+    for _, channel in pairs(wave_channels) do result[#result + 1] = channel end
+    table.sort(result, function(left, right) return left.player_id < right.player_id end)
+    return result
+end
+
+local function wall_for_channel(channel)
+    if channel and channel.player_id ~= nil and channel.player_id >= 0 then
+        return wall_by_player[channel.player_id] or -1
+    end
+    return wall_entindex
+end
+
 local function reset()
     state = { current_wave = 0, total_waves = 0, status = "waiting", timer = 0,
         planned = 0, pending = 0, spawned = 0, alive = 0, killed = 0,
@@ -321,8 +369,11 @@ end
 
 local function set_wall(enemy)
     if not valid(enemy) then return end
+    local meta = enemies[enemy:entindex()]
+    local target_wall = meta and meta.player_id ~= nil
+        and meta.player_id >= 0 and meta.wall_entindex or wall_entindex
     local modifier = enemy:FindModifierByName("modifier_enemy_wall_ai")
-    if modifier and modifier.SetWallEntIndex then modifier:SetWallEntIndex(wall_entindex) end
+    if modifier and modifier.SetWallEntIndex then modifier:SetWallEntIndex(target_wall or -1) end
 end
 
 local function update_targets()
@@ -433,11 +484,16 @@ local function apply_stats(unit, row, definition, movement_type)
     end
 end
 
-local function spawn_one(row, token, wave_number, normal_instance_index, session)
+local function spawn_one(row, token, wave_number, normal_instance_index, session, channel)
     if token ~= generation_token then return end
     state.pending = math.max(0, state.pending - 1)
     if session and not session.released then
         session.pending = math.max(0, session.pending - 1)
+    end
+    if channel and wave_channels[channel.player_id] ~= channel then
+        release_wave_model_resources(session, "player_channel_inactive")
+        check_final_victory()
+        return
     end
     local definition = archetypes.by_id[row.archetype_id]
     if not definition then
@@ -447,7 +503,8 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         check_final_victory()
         return
     end
-    local marker = monster_spawn_marker or find_monster_spawn_marker()
+    local marker = channel and channel.marker
+        or monster_spawn_marker or find_monster_spawn_marker()
     if not marker then
         state.failed_spawn = state.failed_spawn + 1
         publish("monster_spawn_marker_missing")
@@ -490,9 +547,10 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     unit.survival_wave_movement_type = collision_profile.movement_type
     unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
     unit.survival_is_wave_monster = true
+    unit.survival_player_id = channel and channel.player_id or nil
     unit.survival_monster_role = row.member_role or "normal"
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
-        wall_entindex = wall_entindex,
+        wall_entindex = wall_for_channel(channel),
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
     local is_assault_boss = row.member_role == "assault_boss"
@@ -502,6 +560,8 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         unit = unit,
         is_boss = is_assault_boss,
         base_hull_radius = base_hull_radius,
+        player_id = channel and channel.player_id or nil,
+        wall_entindex = wall_for_channel(channel),
         wave_resource_session_id = session and session.session_id or nil,
     }
     state.spawned = state.spawned + 1
@@ -515,15 +575,16 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         entindex = unit:entindex(),
         monster_source = "wave",
         wave_number = wave_number,
+        player_id = channel and channel.player_id or nil,
         member_role = row.member_role or (is_assault_boss and "assault_boss" or "normal"),
         is_boss = is_assault_boss,
     })
     publish("enemy_spawned")
 end
 
-local function spawn_callback(row, token, wave_number, normal_instance_index, session)
+local function spawn_callback(row, token, wave_number, normal_instance_index, session, channel)
     return function()
-        spawn_one(row, token, wave_number, normal_instance_index, session)
+        spawn_one(row, token, wave_number, normal_instance_index, session, channel)
     end
 end
 
@@ -580,14 +641,23 @@ local function start_wave(number, reason)
     state.status, state.timer = "spawning", 0
     state.planned, state.pending, state.spawned, state.killed, state.failed_spawn = 0, 0, 0, 0, 0
     state.final_wave_generation_completed = false
-    for _, row in ipairs(wave.batches) do state.planned = state.planned + (row.monster_count or 0) end
+    local channels = active_wave_channels()
+    if #channels == 0 then
+        state.status = "spawn_channel_missing"
+        publish("player_wave_spawn_marker_missing")
+        return false, "player_wave_spawn_marker_missing"
+    end
+    for _, row in ipairs(wave.batches) do
+        state.planned = state.planned + (row.monster_count or 0) * #channels
+    end
     state.pending = state.planned
     local token = generation_token
     local resource_session = acquire_wave_model_resources(
         number,
         wave,
         token,
-        false
+        false,
+        #channels
     )
     publish(reason or "wave_started")
     if number < state.total_waves then
@@ -603,13 +673,16 @@ local function start_wave(number, reason)
         end
         local delay = next_delay
         last_delay = delay
-        scheduler.after(delay, spawn_callback(
-            row,
-            token,
-            number,
-            visual_instance_index,
-            resource_session
-        ))
+        for _, channel in ipairs(channels) do
+            scheduler.after(delay, spawn_callback(
+                row,
+                token,
+                number,
+                visual_instance_index,
+                resource_session,
+                channel
+            ))
+        end
         next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
     end
     scheduler.after(last_delay + 0.05, function()
@@ -666,7 +739,16 @@ local function on_killed(payload)
     state.killed = state.killed + 1
     if meta.is_boss then
         state.boss_alive = false
-        for _, player_id in ipairs(player_context.active_player_ids()) do
+        for _, remaining in pairs(enemies) do
+            if remaining.is_boss then state.boss_alive = true; break end
+        end
+        local reward_players = {}
+        if meta.player_id ~= nil and meta.player_id >= 0 then
+            reward_players[1] = meta.player_id
+        else
+            reward_players = player_context.active_player_ids()
+        end
+        for _, player_id in ipairs(reward_players) do
             event_bus.request(events.ROGUE_REWARD_OPEN_REQUEST, {
                 player_id = player_id, source = "boss",
             })
@@ -786,6 +868,14 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason)
     state.status = "dev_spawn"
     state.planned, state.pending, state.spawned, state.killed, state.failed_spawn = 0, 0, 0, 0, 0
     state.boss_alive = false
+    if next(wave_channels) == nil then rebuild_wave_channels() end
+    local channels = active_wave_channels()
+    local channel = channels[1]
+    if not channel then
+        state.status = "spawn_channel_missing"
+        publish("player_wave_spawn_marker_missing")
+        return false
+    end
     for _, row in ipairs(wave.batches) do state.planned = state.planned + (row.monster_count or 0) end
     state.pending = state.planned
     local resource_session = acquire_wave_model_resources(
@@ -809,7 +899,8 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason)
             token,
             number,
             visual_instance_index,
-            resource_session
+            resource_session,
+            channel
         ))
         next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
     end
@@ -961,16 +1052,17 @@ end
 function M.get_difficulty() return difficulty_id end
 function M.current_wave_number() return tonumber(state.current_wave) or 0 end
 
-function M.spawn_challenge_monster(row, challenge_definition)
+function M.spawn_challenge_monster(row, challenge_definition, player_id)
     row = row or {}
     local definition = challenge_definition or {}
     if definition.enabled == false or not definition.unit_name
         or not definition.model_path then
         return nil, "challenge_archetype_missing"
     end
-    local marker = monster_spawn_marker or find_monster_spawn_marker()
-    if not marker then return nil, "monster_spawn_marker_missing" end
-    monster_spawn_marker = marker
+    player_id = tonumber(player_id)
+    local channel = player_id and wave_channels[player_id] or nil
+    local marker = channel and channel.marker or nil
+    if not marker then return nil, "player_wave_spawn_marker_missing" end
     local position = marker:GetAbsOrigin()
     position.z = GetGroundHeight(position, nil) + 32
     local unit = CreateUnitByName(
@@ -1003,16 +1095,18 @@ function M.spawn_challenge_monster(row, challenge_definition)
     )
     unit.survival_is_boss = true
     unit.survival_is_challenge_monster = true
+    unit.survival_player_id = player_id
     unit.survival_wave_movement_type = collision_profile.movement_type
     unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
-        wall_entindex = wall_entindex,
+        wall_entindex = wall_by_player[player_id] or -1,
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
     event_bus.emit(events.MONSTER_SPAWNED, {
         unit = unit,
         entindex = unit:entindex(),
         monster_source = "building_challenge",
+        player_id = player_id,
         is_boss = true,
     })
     return unit
@@ -1061,6 +1155,13 @@ end
 M._wave_model_paths_for_test = wave_model_paths
 M._acquire_wave_model_resources_for_test = acquire_wave_model_resources
 M._release_wave_model_resources_for_test = release_wave_model_resources
+M._wave_channels_for_test = function()
+    local result = {}
+    for player_id, channel in pairs(wave_channels) do
+        result[player_id] = channel.marker_name or "legacy"
+    end
+    return result
+end
 
 function M.init()
     monster_spawn_marker = nil
@@ -1077,7 +1178,9 @@ function M.init()
     next_wave_resource_session_id = 0
     scheduler.cancel(DEV_PRELOAD_TASK_ID)
     scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
-    reset(); enemies = {}; wall_entindex = -1; generation_token = 0; dev_mode = false
+    reset(); enemies = {}; wall_entindex = -1; wall_by_player = {}
+    wave_channels = {}; disconnected_players = {}
+    generation_token = 0; dev_mode = false
     rebuild_waves()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)
     event_bus.handle_request(events.WAVE_STATE_GET_REQUEST, get_wave_state)
@@ -1085,6 +1188,7 @@ function M.init()
     event_bus.subscribe(events.GAME_STARTED, function()
         game_started = true
         game_started_at = current_game_time()
+        rebuild_wave_channels()
         if difficulty_selected then
             start_countdown(wave_timing_config.initial_delay_seconds)
             return
@@ -1095,8 +1199,51 @@ function M.init()
     end)
     event_bus.subscribe(events.WAVE_START_NEXT, start_next_wave)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
-    event_bus.subscribe(events.BUILDING_CREATED, function(payload) if payload.building_id == "wall" then wall_entindex = payload.entindex; update_targets() end end)
-    event_bus.subscribe(events.BUILDING_DESTROYED, function(payload) if payload.building_id == "wall" and wall_entindex == payload.entindex then wall_entindex = -1; update_targets() end end)
+    event_bus.subscribe(events.BUILDING_CREATED, function(payload)
+        if payload.building_id ~= "wall" then return end
+        local player_id = tonumber(payload.player_id)
+        if player_id ~= nil then wall_by_player[player_id] = payload.entindex end
+        wall_entindex = payload.entindex
+        update_targets()
+    end)
+    event_bus.subscribe(events.BUILDING_DESTROYED, function(payload)
+        if payload.building_id ~= "wall" then return end
+        local player_id = tonumber(payload.player_id)
+        if player_id ~= nil and wall_by_player[player_id] == payload.entindex then
+            wall_by_player[player_id] = nil
+        end
+        if wall_entindex == payload.entindex then wall_entindex = -1 end
+        update_targets()
+    end)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id == nil then return end
+        disconnected_players[player_id] = true
+        wave_channels[player_id] = nil
+        wall_by_player[player_id] = nil
+        local removed = 0
+        for entindex, meta in pairs(enemies) do
+            if meta.player_id == player_id then
+                enemies[entindex] = nil
+                state.alive = math.max(0, state.alive - 1)
+                local session = meta.wave_resource_session_id
+                    and wave_resource_sessions[meta.wave_resource_session_id] or nil
+                if session then session.alive = math.max(0, session.alive - 1) end
+                if valid(meta.unit) then
+                    meta.unit.survival_wave_cleanup = true
+                    monster_visual_service.cleanup(meta.unit)
+                    if UTIL_Remove then UTIL_Remove(meta.unit) end
+                end
+                release_wave_model_resources(session, "player_disconnected")
+                removed = removed + 1
+            end
+        end
+        print(string.format(
+            "[PLAYER_WAVE_CHANNEL] player=%s active=false monsters_removed=%s",
+            tostring(player_id), tostring(removed)))
+        publish("player_wave_channel_disabled")
+        check_final_victory()
+    end)
     publish("initial")
 end
 

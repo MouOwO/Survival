@@ -1,3 +1,17 @@
+# 2026-08-29 - 修复商店 Tooltip JavaScript 括号语法错误
+
+- `content/dota_addons/Survival/panorama/scripts/custom_game/shop_tooltip.js` 的库存补货文本使用了嵌套三元表达式，`setText(` 调用少关闭一个右括号，导致 Panorama 报 `missing ) after argument list`。
+- 改为先构造 `stockText`，再按 `stock_replenish_remaining` 追加“秒后补货”，最后调用 `setText`；显示内容和商店 CSV 权威数据没有改变。
+- Node.js `node --check`、严格 UTF-8、限定 `git diff --check` 通过；Resource Compiler 返回 `OK: 1 compiled, 0 failed, 0 skipped`，已同步生成 `game/.../shop_tooltip.vjs_c`。
+
+# 2026-08-29 - 玩家退出清理、独立波次通道与服务端所有权门禁
+
+- 根据实机日志确认 `template_map` 编译内容已有 `monsterborn_player1..4`，实际不出怪根因是 `wave_system` 仍使用旧全局 `monsterborn/monsterorn` 单例。现按 `player_slots.csv::wave_spawn_marker` 为活动玩家建立通道，同一正式波次按通道展开；怪物记录所属 `player_id` 并绑定该玩家城墙，挑战建筑怪同步按玩家通道生成。Boss 奖励只发给所属玩家，`boss_alive` 按剩余 Boss 重算。
+- `player_disconnect` 新增统一 `PLAYER_DISCONNECTED` 业务事件。Builder 直接移除；建筑和工人复用既有死亡清理链；断线城墙以 `survival_disconnect_cleanup` 跳过全局失败；该玩家已生成的正式波次怪移除，待执行 spawn 回调因通道身份失效而跳过，本局通道不因 `PlayerResource` 短暂残留重新启用。正式战斗英雄没有安全的永久移除/禁复活接口，本轮未盲目 ForceKill。
+- Builder progression 从 `state_by_team` 迁为 `state_by_player`，断线后状态删除且迟到的建筑死亡事件不会重新创建。唯一 ExecuteOrderFilter 在维修和伐木副作用前检查全部命令单位 owner；注册表/`survival_player_id` 为权威，引擎 owner API 仅作无 metadata 时回退；跨玩家、混合 owner 和未解析实体拒绝，系统/AI issuer `-1` 放行，原箭塔禁攻击树规则保留。
+- 血条 Modifier 在调用前验证 `CustomNetTables.SetTableValue` 方法，全仓确认无生产代码重写 `CustomNetTables`。新增 PowerShell 契约及四项 Lua 5.1 行为测试；目标语法、严格 UTF-8、CSV/生成 Marker 一致、限定 `diff --check` 和现有最终波回归通过。三个旧波次测试存在任务前基线/当前配置失败，其中视觉测试用 HEAD 原版波次系统复现同一护甲断言失败。
+- 工作区开始前已有 `.gitignore` 修改和 `tests/lua/test_rogue_rewards_08_18.lua` 删除，本轮未触碰或恢复。自动验证不等于 Workshop；下一步双机冷启动验收出怪通道、城墙目标、控制隔离、退出清理和控制台日志。
+
 ## 2026-08-28 - 双玩家独立 Builder Marker 与血条生命周期保护
 
 - 用户实机确认 LAN 双机 PlayerID 和操作同步成功，但 Player 1 没有可控 Builder，只显示地下、不可移动且模型不同的“建造者”。静态和地图审计确认该实体是 Undying 英雄替换占位锚点；真实 `npc_survival_builder_proxy` 因 `player_1_builder_spawn` 缺失按 CSV 失败关闭。Player 0 正常是因为其槽位允许回退到 `(0,0,256)`。

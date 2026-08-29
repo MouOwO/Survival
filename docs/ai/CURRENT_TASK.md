@@ -1,3 +1,16 @@
+## 当前实施任务（2026-08-29）：玩家退出资产清理、出怪通道停用与多人日志修复
+
+- 用户要求在玩家直接退出/断线后销毁该玩家的 Builder、建筑及其他玩家资产，并永久停用该玩家本局对应的普通波次出怪通道；其他仍在线玩家及其出怪通道必须继续运行。
+- 同步处理实机日志：`modifier_single_health_bar.lua:20` 对缺少 `SetTableValue` 的 NetTable 对象调用报错；`MonsterSpawnMarker` 在 `template_map` 仍查找旧全局 `monsterborn/monsterorn`，导致多人普通波次无法从 `player_slots.csv` 权威映射的 `monsterborn_player1..4` 出怪。
+- 本任务与既有多人隔离任务合并实施：Builder progression 改为按 `player_id`，唯一 ExecuteOrderFilter 增加服务端所有权门禁，并审计自定义建造/维修/伐木入口。
+- 修改前工作区已有用户改动：`.gitignore` 被修改、`tests/lua/test_rogue_rewards_08_18.lua` 被删除；本任务不得触碰、恢复或覆盖。
+- 生产实现已完成：断线事件发布 `PLAYER_DISCONNECTED`；Builder 直接移除，全部注册建筑和工人按既有死亡清理链销毁；断线城墙带清理标记，不触发其他玩家的全局失败；对应普通波次通道永久停用且已生成波次怪移除。正式战斗英雄因主英雄复活契约未盲目 `ForceKill`，不在本轮退出清理范围。
+- 普通波次按当前活动玩家将同一批次扩展到各自 CSV `wave_spawn_marker`，怪物绑定所属 `player_id` 和该玩家城墙；挑战建筑怪也按玩家通道生成。真实游戏不再查找旧全局 `monsterborn/monsterorn`；该回退只保留给无 `PlayerResource` 的纯 Lua 旧测试。
+- Builder progression 已从同队共享改为 `state_by_player`；唯一 ExecuteOrderFilter 在维修/伐木副作用前检查全部命令单位权威 owner，拒绝跨玩家、混合 owner 和未解析实体，issuer `-1`/系统命令保持放行。Grid 自定义事件原有注册 Builder 对照保持使用。
+- `modifier_single_health_bar` 发布前验证 `CustomNetTables.SetTableValue` 是否为函数，运行时 NetTable 方法不可用时安静跳过；全仓未发现生产代码覆盖 `CustomNetTables` 全局。
+- 自动验证通过：`MULTIPLAYER_PLAYER_ISOLATION_CONTRACT_PASS`、4 项新增 Lua 5.1 行为测试、`WAVE_EARLY_FINAL_PASS`、目标 Lua 5.1 语法（`building_system.lua` 按既有去 BOM 临时副本）、严格 UTF-8、Player Slots CSV/生成 Lua 一致和限定 `diff --check`。既有 `test_wave_difficulty_builder.lua`、`test_wave_difficulty_selection.lua` 在当前配置期望处失败；`test_wave_monster_visual_integration.lua` 的护甲断言在 HEAD 基线同样失败，均未为本任务修改。
+- 尚需双机 Workshop 冷启动：确认两个 Marker 同时出怪并各自攻击对应城墙；Player 1 退出后 Builder、建筑、工人和其波次怪消失，Player 0 继续出怪且不判负；控制他人/混合框选命令被拒绝；控制台不再出现 `SetTableValue` 和旧 `monsterborn/monsterorn` 日志。
+
 ## 当前实施任务（2026-08-28）：双玩家独立 Builder 出生与血条异常修复
 
 - 用户已实机确认 LAN 双机联机、PlayerID 和双方操作同步成功；新问题是 Player 0 有真实 Builder，Player 1 只能看到地下且不可移动的 Undying 占位英雄，并伴随 `modifier_single_health_bar.lua:45 IsAlive` 错误。

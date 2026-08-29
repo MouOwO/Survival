@@ -189,7 +189,8 @@ local function summon(state, definition, source_ability)
     end
     local unit, spawn_error = wave_system.spawn_challenge_monster(
         row,
-        definition
+        definition,
+        state.player_id
     )
     if not unit then return { ok = false, error = spawn_error } end
 

@@ -167,11 +167,28 @@ local function get_builder(payload)
     }
 end
 
+local function on_player_disconnected(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local builder = player_id and builder_by_player[player_id] or nil
+    if player_id == nil then return end
+    builder_by_player[player_id] = nil
+    initialized_player[player_id] = nil
+    if valid_entity(builder) then
+        player_context.unregister_unit(builder)
+        if UTIL_Remove then UTIL_Remove(builder) end
+    end
+    publish_identity(player_id, nil)
+    print(string.format(
+        "[PLAYER_ASSET_CLEANUP] player=%s asset=builder removed=%s",
+        tostring(player_id), tostring(valid_entity(builder))))
+end
+
 function M.init()
     builder_by_player = {}
     initialized_player = {}
     event_bus.handle_request(events.BUILDER_GET_REQUEST, get_builder)
     event_bus.subscribe(events.HERO_READY, create_builder)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
 end
 
 return M
