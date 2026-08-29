@@ -92,6 +92,11 @@ local function apply_portrait_metadata(unit, snapshot)
     if not asset then return snapshot end
 
     snapshot.model_asset_id = tostring(asset.asset_id or asset_id or "")
+    -- Only the 21 CSV-declared native wearable stages may opt into the custom
+    -- portrait ScenePanel. Heroes, monsters and other tower-like assets keep
+    -- their asset identity for the rest of the UI but publish no custom
+    -- portrait metadata, so the client remains on Valve's native portrait.
+    if asset.native_wearable_stage == nil then return snapshot end
     snapshot.portrait_unit_name = tostring(asset.portrait_unit_name or "")
     snapshot.portrait_item_def = tostring(asset.portrait_item_def or "")
     return snapshot

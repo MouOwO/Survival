@@ -12,7 +12,9 @@ function M:OnCreated(params)
 end
 function M:ApplyPosition()
     local unit = self:GetParent()
-    if unit and not unit:IsNull() then unit:SetAbsOrigin(self.target) end
+    if unit and not unit:IsNull() then
+        unit:SetAbsOrigin(self.target)
+    end
 end
 function M:OnIntervalThink()
     self:ApplyPosition()

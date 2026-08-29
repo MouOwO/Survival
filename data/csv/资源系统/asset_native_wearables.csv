@@ -1,97 +1,97 @@
-wearable_key,asset_id,item_def,hero_unit_name,slot,model_path,sort_order,enabled,notes
-#中文名:穿戴记录键,资源ID,物品定义,英雄单位名,槽位,模型路径,排序,是否启用,备注
-#types:string,string,string,string,string,string,number,boolean,string
-death_templar_assassin_head,tower_death_templar_assassin,173,npc_dota_hero_templar_assassin,head,models/heroes/lanaya/lanaya_hair.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础头部
-death_templar_assassin_shoulder,tower_death_templar_assassin,174,npc_dota_hero_templar_assassin,shoulder,models/heroes/lanaya/lanaya_cowl_shoulder.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础肩部
-death_templar_assassin_armor,tower_death_templar_assassin,175,npc_dota_hero_templar_assassin,armor,models/heroes/lanaya/lanaya_bracers_skirt.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础护甲
-death_wraith_king_head,tower_death_nevermore_sundered_souls,148,npc_dota_hero_skeleton_king,head,models/heroes/wraith_king/wraith_king_head.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础头部
-death_wraith_king_weapon,tower_death_nevermore_sundered_souls,149,npc_dota_hero_skeleton_king,,models/heroes/wraith_king/wraith_king_weapon.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础武器
-death_wraith_king_shoulder,tower_death_nevermore_sundered_souls,150,npc_dota_hero_skeleton_king,shoulder,models/heroes/wraith_king/wraith_king_shoulder.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础肩部
-death_wraith_king_arms,tower_death_nevermore_sundered_souls,151,npc_dota_hero_skeleton_king,arms,models/heroes/wraith_king/wraith_king_gauntlet.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础手臂
-death_wraith_king_back,tower_death_nevermore_sundered_souls,152,npc_dota_hero_skeleton_king,back,models/heroes/wraith_king/wraith_king_cape.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础披风
-death_wraith_king_armor,tower_death_nevermore_sundered_souls,500,npc_dota_hero_skeleton_king,armor,models/heroes/wraith_king/wraith_king_chest.vmdl,6,1,items_game.txt 中 prefab=default_item 的基础胸甲
-death_phantom_assassin_head,tower_death_warlock_seam_ripper,137,npc_dota_hero_phantom_assassin,head,models/heroes/phantom_assassin/phantom_assassin_helmet.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础头部
-death_phantom_assassin_shoulder,tower_death_warlock_seam_ripper,138,npc_dota_hero_phantom_assassin,shoulder,models/heroes/phantom_assassin/phantom_assassin_shoulders.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础肩部
-death_phantom_assassin_back,tower_death_warlock_seam_ripper,139,npc_dota_hero_phantom_assassin,back,models/heroes/phantom_assassin/phantom_assassin_cape.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础披风
-death_phantom_assassin_weapon,tower_death_warlock_seam_ripper,140,npc_dota_hero_phantom_assassin,,models/heroes/phantom_assassin/phantom_assassin_weapon.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础武器
-death_phantom_assassin_daggers,tower_death_warlock_seam_ripper,141,npc_dota_hero_phantom_assassin,belt,models/heroes/phantom_assassin/phantom_assassin_daggers.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础匕首
-frost_lich_belt,tower_frost_lich_rime_lord,331,npc_dota_hero_lich,belt,models/heroes/lich/lich_dress.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础腰带
-frost_lich_neck,tower_frost_lich_rime_lord,332,npc_dota_hero_lich,neck,models/heroes/lich/lich_neck_rock.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础颈部
-frost_lich_arms,tower_frost_lich_rime_lord,333,npc_dota_hero_lich,arms,models/heroes/lich/lich_bracer.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础手臂
-frost_lich_back,tower_frost_lich_rime_lord,334,npc_dota_hero_lich,back,models/heroes/lich/lich_horns.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础背部
-frost_crystal_maiden_cape,tower_frost_crystal_maiden_winter_raven,38,npc_dota_hero_crystal_maiden,back,models/heroes/crystal_maiden/crystal_maiden_cape.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础披风
-frost_crystal_maiden_shoulders,tower_frost_crystal_maiden_winter_raven,39,npc_dota_hero_crystal_maiden,shoulder,models/heroes/crystal_maiden/crystal_maiden_shoulders.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础肩部
-frost_crystal_maiden_staff,tower_frost_crystal_maiden_winter_raven,40,npc_dota_hero_crystal_maiden,,models/heroes/crystal_maiden/crystal_maiden_staff.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础武器
-frost_crystal_maiden_cuffs,tower_frost_crystal_maiden_winter_raven,41,npc_dota_hero_crystal_maiden,arms,models/heroes/crystal_maiden/crystal_maiden_cuffs.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础手臂
-frost_crystal_maiden_head,tower_frost_crystal_maiden_winter_raven,311,npc_dota_hero_crystal_maiden,head,models/heroes/crystal_maiden/head_item.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础头部
-frost_ancient_apparition_shoulder,tower_frost_ancient_apparition,648,npc_dota_hero_ancient_apparition,shoulder,models/heroes/ancient_apparition/ancient_apparition_shoulder.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础肩部
-frost_ancient_apparition_tail,tower_frost_ancient_apparition,652,npc_dota_hero_ancient_apparition,,models/heroes/ancient_apparition/ancient_apparition_tail.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础尾部
-lightning_zeus_bracers,tower_lightning_zeus_tempest,589,npc_dota_hero_zuus,arms,models/heroes/zeus/zeus_bracers.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础手臂
-lightning_zeus_hair,tower_lightning_zeus_tempest,604,npc_dota_hero_zuus,head,models/heroes/zeus/zeus_hair.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础头部
-lightning_zeus_belt,tower_lightning_zeus_tempest,606,npc_dota_hero_zuus,belt,models/heroes/zeus/zeus_belt.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础腰带
-lightning_zeus_vest,tower_lightning_zeus_tempest,607,npc_dota_hero_zuus,armor,models/heroes/zeus/zeus_vest.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础胸甲
-lightning_leshrac_armor,tower_lightning_leshrac,345,npc_dota_hero_leshrac,armor,models/heroes/leshrac/leshrac_armor.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础护甲
-lightning_leshrac_head,tower_lightning_leshrac,346,npc_dota_hero_leshrac,head,models/heroes/leshrac/leshrac_head.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础头部
-lightning_leshrac_tail,tower_lightning_leshrac,347,npc_dota_hero_leshrac,,models/heroes/leshrac/leshrac_tail.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础尾部
-lightning_razor_weapon,tower_lightning_razor_voidstorm,340,npc_dota_hero_razor,,models/heroes/razor/razor_weapon.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础武器
-lightning_razor_head,tower_lightning_razor_voidstorm,341,npc_dota_hero_razor,head,models/heroes/razor/razor_head.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础头部
-lightning_razor_armor,tower_lightning_razor_voidstorm,342,npc_dota_hero_razor,armor,models/heroes/razor/razor_armor.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础护甲
-lightning_razor_bracers,tower_lightning_razor_voidstorm,343,npc_dota_hero_razor,arms,models/heroes/razor/razor_bracers.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础手臂
-lightning_razor_robe,tower_lightning_razor_voidstorm,344,npc_dota_hero_razor,back,models/heroes/razor/razor_robe.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础披风
-machine_gun_sniper_weapon,tower_machine_gun_sniper_occultist,281,npc_dota_hero_sniper,,models/heroes/sniper/weapon.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础武器
-machine_gun_sniper_cape,tower_machine_gun_sniper_occultist,282,npc_dota_hero_sniper,back,models/heroes/sniper/cape.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础披风
-machine_gun_sniper_head,tower_machine_gun_sniper_occultist,283,npc_dota_hero_sniper,head,models/heroes/sniper/headitem.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础头部
-machine_gun_sniper_shoulder,tower_machine_gun_sniper_occultist,284,npc_dota_hero_sniper,shoulder,models/heroes/sniper/shoulder.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础肩部
-machine_gun_sniper_bracer,tower_machine_gun_sniper_occultist,285,npc_dota_hero_sniper,arms,models/heroes/sniper/bracer.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础手臂
-machine_gun_bounty_right_weapon,tower_machine_gun_bounty_heartless,50,npc_dota_hero_bounty_hunter,,models/heroes/bounty_hunter/bounty_hunter_rweapon.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础右手武器
-machine_gun_bounty_left_weapon,tower_machine_gun_bounty_heartless,51,npc_dota_hero_bounty_hunter,offhand_weapon,models/heroes/bounty_hunter/bounty_hunter_lweapon.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础左手武器
-machine_gun_bounty_backpack,tower_machine_gun_bounty_heartless,52,npc_dota_hero_bounty_hunter,back,models/heroes/bounty_hunter/bounty_hunter_backpack.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础背包
-machine_gun_bounty_pads,tower_machine_gun_bounty_heartless,53,npc_dota_hero_bounty_hunter,shoulder,models/heroes/bounty_hunter/bounty_hunter_pads.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础肩部
-machine_gun_bounty_bweapon,tower_machine_gun_bounty_heartless,54,npc_dota_hero_bounty_hunter,weapon,models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础武器
-machine_gun_bounty_bandana,tower_machine_gun_bounty_heartless,55,npc_dota_hero_bounty_hunter,head,models/heroes/bounty_hunter/bounty_hunter_bandana.vmdl,6,1,items_game.txt 中 prefab=default_item 的基础头部
-machine_gun_windrunner_head,tower_machine_gun_windranger_rising_gale,21,npc_dota_hero_windrunner,head,models/heroes/windrunner/windrunner_head.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础头部
-machine_gun_windrunner_bow,tower_machine_gun_windranger_rising_gale,22,npc_dota_hero_windrunner,,models/heroes/windrunner/windrunner_bow.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础武器
-machine_gun_windrunner_shoulderpads,tower_machine_gun_windranger_rising_gale,23,npc_dota_hero_windrunner,shoulder,models/heroes/windrunner/windrunner_shoulderpads.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础肩部
-machine_gun_windrunner_cape,tower_machine_gun_windranger_rising_gale,24,npc_dota_hero_windrunner,back,models/heroes/windrunner/windrunner_cape.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础披风
-machine_gun_windrunner_quiver,tower_machine_gun_windranger_rising_gale,25,npc_dota_hero_windrunner,back,models/heroes/windrunner/windrunner_quiver.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础箭袋
-multi_vengeful_hair,tower_multi_medusa_anamnessa,441,npc_dota_hero_vengefulspirit,head,models/heroes/vengeful/vengeful_hair.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础头部
-multi_vengeful_weapon,tower_multi_medusa_anamnessa,442,npc_dota_hero_vengefulspirit,,models/heroes/vengeful/vengeful_weapon.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础武器
-multi_vengeful_upperbody,tower_multi_medusa_anamnessa,445,npc_dota_hero_vengefulspirit,armor,models/heroes/vengeful/vengeful_upperbody.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础上身
-multi_vengeful_lowerbody,tower_multi_medusa_anamnessa,447,npc_dota_hero_vengefulspirit,legs,models/heroes/vengeful/vengeful_lowerbody.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础下身
-multi_luna_weapon,tower_multi_drow_dread_retribution,448,npc_dota_hero_luna,,models/heroes/luna/luna_weapon.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础武器
-multi_luna_shield,tower_multi_drow_dread_retribution,449,npc_dota_hero_luna,offhand_weapon,models/heroes/luna/luna_shield.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础副手
-multi_luna_helmet,tower_multi_drow_dread_retribution,450,npc_dota_hero_luna,head,models/heroes/luna/luna_helmet.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础头部
-multi_luna_shoulder,tower_multi_drow_dread_retribution,451,npc_dota_hero_luna,shoulder,models/heroes/luna/luna_shoulder.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础肩部
-multi_luna_mount,tower_multi_drow_dread_retribution,452,npc_dota_hero_luna,mount,models/heroes/luna/luna_mount.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础坐骑
-multi_luna_head,tower_multi_drow_dread_retribution,453,npc_dota_hero_luna,body_head,models/heroes/luna/luna_head.vmdl,6,1,items_game.txt 中 prefab=default_item 的基础头部
-multi_medusa_bow,tower_multi_vengeful_shen_screeauk,381,npc_dota_hero_medusa,,models/heroes/medusa/medusa_bow.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础武器
-multi_medusa_veil,tower_multi_vengeful_shen_screeauk,382,npc_dota_hero_medusa,head,models/heroes/medusa/medusa_veil.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础头部
-multi_medusa_torso,tower_multi_vengeful_shen_screeauk,383,npc_dota_hero_medusa,armor,models/heroes/medusa/medusa_torso.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础躯干
-multi_medusa_arms,tower_multi_vengeful_shen_screeauk,384,npc_dota_hero_medusa,arms,models/heroes/medusa/medusa_arms.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础手臂
-multi_medusa_tail,tower_multi_vengeful_shen_screeauk,385,npc_dota_hero_medusa,legs,models/heroes/medusa/medusa_tail.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础尾部
-mystery_storm_hat,tower_keeper_of_the_light,308,npc_dota_hero_storm_spirit,head,models/heroes/storm_spirit/storm_hat.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础头部
-mystery_storm_shoulder,tower_keeper_of_the_light,309,npc_dota_hero_storm_spirit,shoulder,models/heroes/storm_spirit/storm_shoulder.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础肩部
-mystery_storm_shirt,tower_keeper_of_the_light,310,npc_dota_hero_storm_spirit,armor,models/heroes/storm_spirit/storm_shirt.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础护甲
-mystery_wisp_body,tower_laser_od_blackgate,,npc_dota_hero_wisp,body,,1,1,本地 items_game.txt 没有 Wisp 可挂载的默认模型物品，保持 body-only
-mystery_tinker_right_arm,tower_laser_death_prophet_brightshroud,367,npc_dota_hero_tinker,arms,models/heroes/tinker/tinker_right_arm.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础右臂
-mystery_tinker_left_arm,tower_laser_death_prophet_brightshroud,463,npc_dota_hero_tinker,arms,models/heroes/tinker/tinker_left_arm.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础左臂
-mystery_tinker_shoulders,tower_laser_death_prophet_brightshroud,464,npc_dota_hero_tinker,shoulder,models/heroes/tinker/tinker_shoulders.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础肩部
-mystery_tinker_helmet,tower_laser_death_prophet_brightshroud,465,npc_dota_hero_tinker,head,models/heroes/tinker/tinker_helmet.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础头部
-mystery_tinker_body_head,tower_laser_death_prophet_brightshroud,466,npc_dota_hero_tinker,body_head,models/heroes/tinker/tinker_body_head.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础头部
-mystery_tinker_cape,tower_laser_death_prophet_brightshroud,467,npc_dota_hero_tinker,back,models/heroes/tinker/tinker_cape.vmdl,6,1,items_game.txt 中 prefab=default_item 的基础披风
-anti_air_gyro_bottles,tower_anti_air_gyro_swooping,126,npc_dota_hero_gyrocopter,back,models/heroes/gyro/gyro_bottles.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础背部
-anti_air_gyro_body_head,tower_anti_air_gyro_swooping,131,npc_dota_hero_gyrocopter,body_head,models/heroes/gyro/gyro_head.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础头部
-anti_air_gyro_goggles,tower_anti_air_gyro_swooping,176,npc_dota_hero_gyrocopter,head,models/heroes/gyro/gyro_goggles.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础头部
-anti_air_gyro_guns,tower_anti_air_gyro_swooping,177,npc_dota_hero_gyrocopter,,models/heroes/gyro/gyro_guns.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础武器
-anti_air_gyro_propeller,tower_anti_air_gyro_swooping,178,npc_dota_hero_gyrocopter,misc,models/heroes/gyro/gyro_propeller.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础杂项
-anti_air_gyro_missile,tower_anti_air_gyro_swooping,179,npc_dota_hero_gyrocopter,offhand_weapon,models/heroes/gyro/gyro_missile.vmdl,6,1,items_game.txt 中 prefab=default_item 的基础副手
-anti_air_batrider_head,tower_anti_air_batrider_empiric,375,npc_dota_hero_batrider,head,models/heroes/batrider/batrider_head.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础头部
-anti_air_batrider_cloak,tower_anti_air_batrider_empiric,376,npc_dota_hero_batrider,shoulder,models/heroes/batrider/batrider_cloak.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础肩部
-anti_air_batrider_belt,tower_anti_air_batrider_empiric,377,npc_dota_hero_batrider,belt,models/heroes/batrider/batrider_belt.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础腰带
-anti_air_batrider_mount,tower_anti_air_batrider_empiric,378,npc_dota_hero_batrider,mount,models/heroes/batrider/batrider_mount.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础坐骑
-anti_air_skywrath_weapon,tower_anti_air_skywrath_empyrean,420,npc_dota_hero_skywrath_mage,,models/heroes/skywrath_mage/skywrath_mage_staff.vmdl,1,1,items_game.txt 中 prefab=default_item 的基础武器
-anti_air_skywrath_head,tower_anti_air_skywrath_empyrean,421,npc_dota_hero_skywrath_mage,head,models/heroes/skywrath_mage/skywrath_mage_head.vmdl,2,1,items_game.txt 中 prefab=default_item 的基础头部
-anti_air_skywrath_wings,tower_anti_air_skywrath_empyrean,422,npc_dota_hero_skywrath_mage,back,models/heroes/skywrath_mage/skywrath_mage_wings.vmdl,3,1,items_game.txt 中 prefab=default_item 的基础翅膀
-anti_air_skywrath_belt,tower_anti_air_skywrath_empyrean,423,npc_dota_hero_skywrath_mage,belt,models/heroes/skywrath_mage/skywrath_mage_belt.vmdl,4,1,items_game.txt 中 prefab=default_item 的基础腰带
-anti_air_skywrath_shoulder,tower_anti_air_skywrath_empyrean,424,npc_dota_hero_skywrath_mage,shoulder,models/heroes/skywrath_mage/skywrath_mage_shoulders.vmdl,5,1,items_game.txt 中 prefab=default_item 的基础肩部
-anti_air_skywrath_arms,tower_anti_air_skywrath_empyrean,425,npc_dota_hero_skywrath_mage,arms,models/heroes/skywrath_mage/skywrath_mage_bracers.vmdl,6,1,items_game.txt 中 prefab=default_item 的基础手臂
+wearable_key,asset_id,item_def,hero_unit_name,slot,model_path,sort_order,enabled,entity_class,attach_mode,notes
+#中文名:穿戴记录键,资源ID,物品定义,英雄单位名,槽位,模型路径,排序,是否启用,实体类型,挂载方式,备注
+#types:string,string,string,string,string,string,number,boolean,string,enum,string
+death_templar_assassin_head,tower_death_templar_assassin,173,npc_dota_hero_templar_assassin,head,models/heroes/lanaya/lanaya_hair.vmdl,1,1,prop_dynamic,bone_merge,
+death_templar_assassin_shoulder,tower_death_templar_assassin,174,npc_dota_hero_templar_assassin,shoulder,models/heroes/lanaya/lanaya_cowl_shoulder.vmdl,2,1,prop_dynamic,bone_merge,
+death_templar_assassin_armor,tower_death_templar_assassin,175,npc_dota_hero_templar_assassin,armor,models/heroes/lanaya/lanaya_bracers_skirt.vmdl,3,1,prop_dynamic,bone_merge,
+death_wraith_king_head,tower_death_nevermore_sundered_souls,148,npc_dota_hero_skeleton_king,head,models/heroes/wraith_king/wraith_king_head.vmdl,1,1,prop_dynamic,bone_merge,
+death_wraith_king_weapon,tower_death_nevermore_sundered_souls,149,npc_dota_hero_skeleton_king,,models/heroes/wraith_king/wraith_king_weapon.vmdl,2,1,prop_dynamic,bone_merge,
+death_wraith_king_shoulder,tower_death_nevermore_sundered_souls,150,npc_dota_hero_skeleton_king,shoulder,models/heroes/wraith_king/wraith_king_shoulder.vmdl,3,1,prop_dynamic,bone_merge,
+death_wraith_king_arms,tower_death_nevermore_sundered_souls,151,npc_dota_hero_skeleton_king,arms,models/heroes/wraith_king/wraith_king_gauntlet.vmdl,4,1,prop_dynamic,bone_merge,
+death_wraith_king_back,tower_death_nevermore_sundered_souls,152,npc_dota_hero_skeleton_king,back,models/heroes/wraith_king/wraith_king_cape.vmdl,5,1,prop_dynamic,bone_merge,
+death_wraith_king_armor,tower_death_nevermore_sundered_souls,500,npc_dota_hero_skeleton_king,armor,models/heroes/wraith_king/wraith_king_chest.vmdl,6,1,prop_dynamic,bone_merge,
+death_phantom_assassin_head,tower_death_warlock_seam_ripper,137,npc_dota_hero_phantom_assassin,head,models/heroes/phantom_assassin/phantom_assassin_helmet.vmdl,1,1,prop_dynamic,bone_merge,
+death_phantom_assassin_shoulder,tower_death_warlock_seam_ripper,138,npc_dota_hero_phantom_assassin,shoulder,models/heroes/phantom_assassin/phantom_assassin_shoulders.vmdl,2,1,prop_dynamic,bone_merge,
+death_phantom_assassin_back,tower_death_warlock_seam_ripper,139,npc_dota_hero_phantom_assassin,back,models/heroes/phantom_assassin/phantom_assassin_cape.vmdl,3,1,prop_dynamic,bone_merge,
+death_phantom_assassin_weapon,tower_death_warlock_seam_ripper,140,npc_dota_hero_phantom_assassin,,models/heroes/phantom_assassin/phantom_assassin_weapon.vmdl,4,1,prop_dynamic,bone_merge,
+death_phantom_assassin_daggers,tower_death_warlock_seam_ripper,141,npc_dota_hero_phantom_assassin,belt,models/heroes/phantom_assassin/phantom_assassin_daggers.vmdl,5,1,prop_dynamic,bone_merge,
+frost_lich_belt,tower_frost_lich_rime_lord,331,npc_dota_hero_lich,belt,models/heroes/lich/lich_dress.vmdl,1,1,prop_dynamic,bone_merge,
+frost_lich_neck,tower_frost_lich_rime_lord,332,npc_dota_hero_lich,neck,models/heroes/lich/lich_neck_rock.vmdl,2,1,prop_dynamic,bone_merge,
+frost_lich_arms,tower_frost_lich_rime_lord,333,npc_dota_hero_lich,arms,models/heroes/lich/lich_bracer.vmdl,3,1,prop_dynamic,bone_merge,
+frost_lich_back,tower_frost_lich_rime_lord,334,npc_dota_hero_lich,back,models/heroes/lich/lich_horns.vmdl,4,1,prop_dynamic,bone_merge,
+frost_crystal_maiden_cape,tower_frost_crystal_maiden_winter_raven,38,npc_dota_hero_crystal_maiden,back,models/heroes/crystal_maiden/crystal_maiden_cape.vmdl,1,1,prop_dynamic,bone_merge,
+frost_crystal_maiden_shoulders,tower_frost_crystal_maiden_winter_raven,39,npc_dota_hero_crystal_maiden,shoulder,models/heroes/crystal_maiden/crystal_maiden_shoulders.vmdl,2,1,prop_dynamic,bone_merge,
+frost_crystal_maiden_staff,tower_frost_crystal_maiden_winter_raven,40,npc_dota_hero_crystal_maiden,,models/heroes/crystal_maiden/crystal_maiden_staff.vmdl,3,1,prop_dynamic,bone_merge,
+frost_crystal_maiden_cuffs,tower_frost_crystal_maiden_winter_raven,41,npc_dota_hero_crystal_maiden,arms,models/heroes/crystal_maiden/crystal_maiden_cuffs.vmdl,4,1,prop_dynamic,bone_merge,
+frost_crystal_maiden_head,tower_frost_crystal_maiden_winter_raven,311,npc_dota_hero_crystal_maiden,head,models/heroes/crystal_maiden/head_item.vmdl,5,1,prop_dynamic,bone_merge,
+frost_ancient_apparition_shoulder,tower_frost_ancient_apparition,648,npc_dota_hero_ancient_apparition,shoulder,models/heroes/ancient_apparition/ancient_apparition_shoulder.vmdl,1,1,prop_dynamic,bone_merge,
+frost_ancient_apparition_tail,tower_frost_ancient_apparition,652,npc_dota_hero_ancient_apparition,,models/heroes/ancient_apparition/ancient_apparition_tail.vmdl,2,1,prop_dynamic,bone_merge,
+lightning_zeus_bracers,tower_lightning_zeus_tempest,589,npc_dota_hero_zuus,arms,models/heroes/zeus/zeus_bracers.vmdl,1,1,prop_dynamic,bone_merge,
+lightning_zeus_hair,tower_lightning_zeus_tempest,604,npc_dota_hero_zuus,head,models/heroes/zeus/zeus_hair.vmdl,2,1,prop_dynamic,bone_merge,
+lightning_zeus_belt,tower_lightning_zeus_tempest,606,npc_dota_hero_zuus,belt,models/heroes/zeus/zeus_belt.vmdl,3,1,prop_dynamic,bone_merge,
+lightning_zeus_vest,tower_lightning_zeus_tempest,607,npc_dota_hero_zuus,armor,models/heroes/zeus/zeus_vest.vmdl,4,1,prop_dynamic,bone_merge,
+lightning_leshrac_armor,tower_lightning_leshrac,345,npc_dota_hero_leshrac,armor,models/heroes/leshrac/leshrac_armor.vmdl,1,1,prop_dynamic,bone_merge,
+lightning_leshrac_head,tower_lightning_leshrac,346,npc_dota_hero_leshrac,head,models/heroes/leshrac/leshrac_head.vmdl,2,1,prop_dynamic,bone_merge,
+lightning_leshrac_tail,tower_lightning_leshrac,347,npc_dota_hero_leshrac,,models/heroes/leshrac/leshrac_tail.vmdl,3,1,prop_dynamic,bone_merge,
+lightning_razor_weapon,tower_lightning_razor_voidstorm,340,npc_dota_hero_razor,,models/heroes/razor/razor_weapon.vmdl,1,1,prop_dynamic,bone_merge,
+lightning_razor_head,tower_lightning_razor_voidstorm,341,npc_dota_hero_razor,head,models/heroes/razor/razor_head.vmdl,2,1,prop_dynamic,bone_merge,
+lightning_razor_armor,tower_lightning_razor_voidstorm,342,npc_dota_hero_razor,armor,models/heroes/razor/razor_armor.vmdl,3,1,prop_dynamic,bone_merge,
+lightning_razor_bracers,tower_lightning_razor_voidstorm,343,npc_dota_hero_razor,arms,models/heroes/razor/razor_bracers.vmdl,4,1,prop_dynamic,bone_merge,
+lightning_razor_robe,tower_lightning_razor_voidstorm,344,npc_dota_hero_razor,back,models/heroes/razor/razor_robe.vmdl,5,1,prop_dynamic,bone_merge,
+machine_gun_sniper_weapon,tower_machine_gun_sniper_occultist,281,npc_dota_hero_sniper,,models/heroes/sniper/weapon.vmdl,1,1,prop_dynamic,bone_merge,
+machine_gun_sniper_cape,tower_machine_gun_sniper_occultist,282,npc_dota_hero_sniper,back,models/heroes/sniper/cape.vmdl,2,1,prop_dynamic,bone_merge,
+machine_gun_sniper_head,tower_machine_gun_sniper_occultist,283,npc_dota_hero_sniper,head,models/heroes/sniper/headitem.vmdl,3,1,prop_dynamic,bone_merge,
+machine_gun_sniper_shoulder,tower_machine_gun_sniper_occultist,284,npc_dota_hero_sniper,shoulder,models/heroes/sniper/shoulder.vmdl,4,1,prop_dynamic,bone_merge,
+machine_gun_sniper_bracer,tower_machine_gun_sniper_occultist,285,npc_dota_hero_sniper,arms,models/heroes/sniper/bracer.vmdl,5,1,prop_dynamic,bone_merge,
+machine_gun_bounty_right_weapon,tower_machine_gun_bounty_heartless,50,npc_dota_hero_bounty_hunter,,models/heroes/bounty_hunter/bounty_hunter_rweapon.vmdl,1,1,prop_dynamic,bone_merge,
+machine_gun_bounty_left_weapon,tower_machine_gun_bounty_heartless,51,npc_dota_hero_bounty_hunter,offhand_weapon,models/heroes/bounty_hunter/bounty_hunter_lweapon.vmdl,2,1,prop_dynamic,bone_merge,
+machine_gun_bounty_backpack,tower_machine_gun_bounty_heartless,52,npc_dota_hero_bounty_hunter,back,models/heroes/bounty_hunter/bounty_hunter_backpack.vmdl,3,1,prop_dynamic,bone_merge,
+machine_gun_bounty_pads,tower_machine_gun_bounty_heartless,53,npc_dota_hero_bounty_hunter,shoulder,models/heroes/bounty_hunter/bounty_hunter_pads.vmdl,4,1,prop_dynamic,bone_merge,
+machine_gun_bounty_bweapon,tower_machine_gun_bounty_heartless,54,npc_dota_hero_bounty_hunter,weapon,models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl,5,1,prop_dynamic,bone_merge,
+machine_gun_bounty_bandana,tower_machine_gun_bounty_heartless,55,npc_dota_hero_bounty_hunter,head,models/heroes/bounty_hunter/bounty_hunter_bandana.vmdl,6,1,prop_dynamic,bone_merge,
+machine_gun_windrunner_head,tower_machine_gun_windranger_rising_gale,21,npc_dota_hero_windrunner,head,models/heroes/windrunner/windrunner_head.vmdl,1,1,prop_dynamic,bone_merge,
+machine_gun_windrunner_bow,tower_machine_gun_windranger_rising_gale,22,npc_dota_hero_windrunner,,models/heroes/windrunner/windrunner_bow.vmdl,2,1,prop_dynamic,bone_merge,
+machine_gun_windrunner_shoulderpads,tower_machine_gun_windranger_rising_gale,23,npc_dota_hero_windrunner,shoulder,models/heroes/windrunner/windrunner_shoulderpads.vmdl,3,1,prop_dynamic,bone_merge,
+machine_gun_windrunner_cape,tower_machine_gun_windranger_rising_gale,24,npc_dota_hero_windrunner,back,models/heroes/windrunner/windrunner_cape.vmdl,4,1,prop_dynamic,bone_merge,
+machine_gun_windrunner_quiver,tower_machine_gun_windranger_rising_gale,25,npc_dota_hero_windrunner,back,models/heroes/windrunner/windrunner_quiver.vmdl,5,1,prop_dynamic,bone_merge,
+multi_vengeful_hair,tower_multi_medusa_anamnessa,441,npc_dota_hero_vengefulspirit,head,models/heroes/vengeful/vengeful_hair.vmdl,1,1,prop_dynamic,bone_merge,
+multi_vengeful_weapon,tower_multi_medusa_anamnessa,442,npc_dota_hero_vengefulspirit,,models/heroes/vengeful/vengeful_weapon.vmdl,2,1,prop_dynamic,bone_merge,
+multi_vengeful_upperbody,tower_multi_medusa_anamnessa,445,npc_dota_hero_vengefulspirit,armor,models/heroes/vengeful/vengeful_upperbody.vmdl,3,1,prop_dynamic,bone_merge,
+multi_vengeful_lowerbody,tower_multi_medusa_anamnessa,447,npc_dota_hero_vengefulspirit,legs,models/heroes/vengeful/vengeful_lowerbody.vmdl,4,1,prop_dynamic,bone_merge,
+multi_luna_weapon,tower_multi_drow_dread_retribution,448,npc_dota_hero_luna,,models/heroes/luna/luna_weapon.vmdl,1,1,prop_dynamic,bone_merge,
+multi_luna_shield,tower_multi_drow_dread_retribution,449,npc_dota_hero_luna,offhand_weapon,models/heroes/luna/luna_shield.vmdl,2,1,prop_dynamic,bone_merge,
+multi_luna_helmet,tower_multi_drow_dread_retribution,450,npc_dota_hero_luna,head,models/heroes/luna/luna_helmet.vmdl,3,1,prop_dynamic,bone_merge,
+multi_luna_shoulder,tower_multi_drow_dread_retribution,451,npc_dota_hero_luna,shoulder,models/heroes/luna/luna_shoulder.vmdl,4,1,prop_dynamic,bone_merge,
+multi_luna_mount,tower_multi_drow_dread_retribution,452,npc_dota_hero_luna,mount,models/heroes/luna/luna_mount.vmdl,5,1,prop_dynamic,bone_merge,
+multi_luna_head,tower_multi_drow_dread_retribution,453,npc_dota_hero_luna,body_head,models/heroes/luna/luna_head.vmdl,6,1,prop_dynamic,bone_merge,
+multi_medusa_bow,tower_multi_vengeful_shen_screeauk,381,npc_dota_hero_medusa,,models/heroes/medusa/medusa_bow.vmdl,1,1,prop_dynamic,bone_merge,
+multi_medusa_veil,tower_multi_vengeful_shen_screeauk,382,npc_dota_hero_medusa,head,models/heroes/medusa/medusa_veil.vmdl,2,1,prop_dynamic,bone_merge,
+multi_medusa_torso,tower_multi_vengeful_shen_screeauk,383,npc_dota_hero_medusa,armor,models/heroes/medusa/medusa_torso.vmdl,3,1,prop_dynamic,bone_merge,
+multi_medusa_arms,tower_multi_vengeful_shen_screeauk,384,npc_dota_hero_medusa,arms,models/heroes/medusa/medusa_arms.vmdl,4,1,prop_dynamic,bone_merge,
+multi_medusa_tail,tower_multi_vengeful_shen_screeauk,385,npc_dota_hero_medusa,legs,models/heroes/medusa/medusa_tail.vmdl,5,1,prop_dynamic,bone_merge,
+mystery_storm_hat,tower_keeper_of_the_light,308,npc_dota_hero_storm_spirit,head,models/heroes/storm_spirit/storm_hat.vmdl,1,1,prop_dynamic,bone_merge,
+mystery_storm_shoulder,tower_keeper_of_the_light,309,npc_dota_hero_storm_spirit,shoulder,models/heroes/storm_spirit/storm_shoulder.vmdl,2,1,prop_dynamic,bone_merge,
+mystery_storm_shirt,tower_keeper_of_the_light,310,npc_dota_hero_storm_spirit,armor,models/heroes/storm_spirit/storm_shirt.vmdl,3,1,prop_dynamic,bone_merge,
+mystery_wisp_body,tower_laser_od_blackgate,,npc_dota_hero_wisp,body,,1,1,prop_dynamic,bone_merge,
+mystery_tinker_right_arm,tower_laser_death_prophet_brightshroud,367,npc_dota_hero_tinker,arms,models/heroes/tinker/tinker_right_arm.vmdl,1,1,prop_dynamic,bone_merge,
+mystery_tinker_left_arm,tower_laser_death_prophet_brightshroud,463,npc_dota_hero_tinker,arms,models/heroes/tinker/tinker_left_arm.vmdl,2,1,prop_dynamic,bone_merge,
+mystery_tinker_shoulders,tower_laser_death_prophet_brightshroud,464,npc_dota_hero_tinker,shoulder,models/heroes/tinker/tinker_shoulders.vmdl,3,1,prop_dynamic,bone_merge,
+mystery_tinker_helmet,tower_laser_death_prophet_brightshroud,465,npc_dota_hero_tinker,head,models/heroes/tinker/tinker_helmet.vmdl,4,1,prop_dynamic,bone_merge,
+mystery_tinker_body_head,tower_laser_death_prophet_brightshroud,466,npc_dota_hero_tinker,body_head,models/heroes/tinker/tinker_body_head.vmdl,5,1,prop_dynamic,bone_merge,
+mystery_tinker_cape,tower_laser_death_prophet_brightshroud,467,npc_dota_hero_tinker,back,models/heroes/tinker/tinker_cape.vmdl,6,1,prop_dynamic,bone_merge,
+anti_air_gyro_bottles,tower_anti_air_gyro_swooping,126,npc_dota_hero_gyrocopter,back,models/heroes/gyro/gyro_bottles.vmdl,1,1,prop_dynamic,bone_merge,
+anti_air_gyro_body_head,tower_anti_air_gyro_swooping,131,npc_dota_hero_gyrocopter,body_head,models/heroes/gyro/gyro_head.vmdl,2,1,prop_dynamic,bone_merge,
+anti_air_gyro_goggles,tower_anti_air_gyro_swooping,176,npc_dota_hero_gyrocopter,head,models/heroes/gyro/gyro_goggles.vmdl,3,1,prop_dynamic,bone_merge,
+anti_air_gyro_guns,tower_anti_air_gyro_swooping,177,npc_dota_hero_gyrocopter,,models/heroes/gyro/gyro_guns.vmdl,4,1,prop_dynamic,bone_merge,
+anti_air_gyro_propeller,tower_anti_air_gyro_swooping,178,npc_dota_hero_gyrocopter,misc,models/heroes/gyro/gyro_propeller.vmdl,5,1,prop_dynamic,bone_merge,
+anti_air_gyro_missile,tower_anti_air_gyro_swooping,179,npc_dota_hero_gyrocopter,offhand_weapon,models/heroes/gyro/gyro_missile.vmdl,6,1,prop_dynamic,bone_merge,
+anti_air_batrider_head,tower_anti_air_batrider_empiric,375,npc_dota_hero_batrider,head,models/heroes/batrider/batrider_head.vmdl,1,1,prop_dynamic,bone_merge,
+anti_air_batrider_cloak,tower_anti_air_batrider_empiric,376,npc_dota_hero_batrider,shoulder,models/heroes/batrider/batrider_cloak.vmdl,2,1,prop_dynamic,bone_merge,
+anti_air_batrider_belt,tower_anti_air_batrider_empiric,377,npc_dota_hero_batrider,belt,models/heroes/batrider/batrider_belt.vmdl,3,1,prop_dynamic,bone_merge,
+anti_air_batrider_mount,tower_anti_air_batrider_empiric,378,npc_dota_hero_batrider,mount,models/heroes/batrider/batrider_mount.vmdl,4,1,prop_dynamic,bone_merge,
+anti_air_skywrath_weapon,tower_anti_air_skywrath_empyrean,420,npc_dota_hero_skywrath_mage,,models/heroes/skywrath_mage/skywrath_mage_staff.vmdl,1,1,prop_dynamic,bone_merge,
+anti_air_skywrath_head,tower_anti_air_skywrath_empyrean,421,npc_dota_hero_skywrath_mage,head,models/heroes/skywrath_mage/skywrath_mage_head.vmdl,2,1,prop_dynamic,bone_merge,
+anti_air_skywrath_wings,tower_anti_air_skywrath_empyrean,422,npc_dota_hero_skywrath_mage,back,models/heroes/skywrath_mage/skywrath_mage_wings.vmdl,3,1,prop_dynamic,bone_merge,
+anti_air_skywrath_belt,tower_anti_air_skywrath_empyrean,423,npc_dota_hero_skywrath_mage,belt,models/heroes/skywrath_mage/skywrath_mage_belt.vmdl,4,1,prop_dynamic,bone_merge,
+anti_air_skywrath_shoulder,tower_anti_air_skywrath_empyrean,424,npc_dota_hero_skywrath_mage,shoulder,models/heroes/skywrath_mage/skywrath_mage_shoulders.vmdl,5,1,prop_dynamic,bone_merge,
+anti_air_skywrath_arms,tower_anti_air_skywrath_empyrean,425,npc_dota_hero_skywrath_mage,arms,models/heroes/skywrath_mage/skywrath_mage_bracers.vmdl,6,1,prop_dynamic,bone_merge,

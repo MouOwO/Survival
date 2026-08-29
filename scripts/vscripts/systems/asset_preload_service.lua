@@ -78,6 +78,9 @@ local function precache_row_resources(row, context, mark_asset_ready)
     for _, path in ipairs(row.attachment_models or {}) do
         ok = precache_initial_resource("model", path, context) and ok
     end
+    for _, component in ipairs(row.components or {}) do
+        ok = precache_initial_resource("model", component.model_path, context) and ok
+    end
     for _, path in ipairs(row.particle_resources or {}) do
         ok = precache_initial_resource("particle", path, context) and ok
     end
@@ -92,6 +95,9 @@ local function precache_row_resources(row, context, mark_asset_ready)
     remember("model", row.primary_model)
     for _, path in ipairs(row.attachment_models or {}) do
         remember("model", path)
+    end
+    for _, component in ipairs(row.components or {}) do
+        remember("model", component.model_path)
     end
     for _, path in ipairs(row.particle_resources or {}) do
         remember("particle", path)
@@ -133,6 +139,9 @@ local function append_asset_resources(result, seen, asset)
         asset.asset_id, asset.async_unit_name)
     for _, path in ipairs(asset.attachment_models or {}) do
         append_resource(result, seen, "model", path)
+    end
+    for _, component in ipairs(asset.components or {}) do
+        append_resource(result, seen, "model", component.model_path)
     end
     for _, path in ipairs(asset.particle_resources or {}) do
         append_resource(result, seen, "particle", path)

@@ -1,3 +1,17 @@
+## 当前实施任务（2026-08-30）：原 Building 世界外观与 21 阶段组件恢复
+
+- Portrait 全局污染修复：普通单位、英雄和怪物现在完全沿用 Valve 原生 Portrait；仅 CSV 投影出的 21 个 `tower_*` 阶段启用独立 `SurvivalTowerPortraitOverlay` / `SurvivalTowerPortraitScene`，并调用 `portrait_unit_name -> DOTAScenePanel.SetUnit(...)`。移除了普通英雄的 Movie/Image 自定义运行时和隐藏旧 ScenePanel，不修改世界模型方案。
+- 根因是旧 Portrait 逻辑把 Monkey King/Juggernaut 也纳入自定义分支，并且 `officialPortraitPanel()` 找不到视觉子节点时可能回退到共享 `PortraitGroup`，随后单一全局状态把共享节点设为 `opacity=0.01`；Valve 选择切换/重建后该值无法可靠恢复，造成所有单位头像继承分辨率/清晰度异常。
+- 现已禁止 `PortraitGroup` 作为 opacity 目标；被压低的官方视觉节点按节点记录并在塔切换、普通单位切换、重建和上下文残留清理时恢复。额外清理旧版本可能遗留在 `PortraitGroup` 或原生视觉叶节点上的精确 `0.01`，不改原生尺寸、transform 或全局 UI scale。塔 overlay 保持完整矩形、局部 `overflow: clip` 和不透明底层遮罩，黑边不再通过缩放 ScenePanel 处理。
+- 本轮自动验证：`SELECTED_UNIT_COSMETIC_PORTRAIT_PASS`、`NATIVE_PORTRAIT_RUNTIME_CONTRACT_PASS`、HUD XML 单一 `DOTAScenePanel` 解析、目标 Panorama JS/CSS/XML 强制编译和 UTF-8/diff 检查通过；尚需 Workshop Tools 冷启动确认普通单位清晰度、塔黑边及切换后 opacity 的最终实机表现。
+
+- 本轮目标是让21个Stage由原Building承载英雄主体、骨骼、选择、移动和攻击；`asset_native_wearable_stages.csv`与`asset_native_wearables.csv`仍是阶段/穿戴数据源，93条有效模型记录投影到`asset_components.csv`，运行时统一生成`prop_dynamic`并执行`SetOwner(Building) -> FollowEntity(Building, true)`。
+- `async_unit_name`和代理KV只承担主体与穿戴模型预载，不参与世界显示；历史`native_wearable_carrier_service.lua`仅保留为兼容测试文件，生产路径不再引用独立carrier。Io的模型空记录合法地生成零组件。
+- `model_appearance_service`按Building对象、组件签名和实体marker复用/恢复组件；阶段替换先完整创建新组件，成功后再清理旧组件，失败保留旧完整外观。死亡、融合、清理和热重载会移除组件及残留旧carrier，不改变Building业务实体。
+- Portrait身份继续使用`portrait_unit_name -> DOTAScenePanel.SetUnit(portraitUnit, "default", false)`；取消ScenePanel的80%缩放，覆盖层显示时可逆降低底层官方Portrait透明度，隐藏/切换时恢复原值。黑边继续由overlay裁切处理。
+- 已完成：TA及21阶段CSV投影、原Building主体/攻击/移动解绑、组件服务事务与live恢复、Io零组件、Stage/Bundle/Building/Portrait契约同步。
+- 自动验证：`HERO_BODY_STAGE_CONTRACT_PASS stages=21 wearables=94 components=93`、`ASSET_BUNDLE_CONFIG_PASS`、`BUILDING_VISUAL_SERVICE_PASS`、`ASSET_PRELOAD_SERVICE_PASS`、`DEATH_TOWER_ANIMATION_CONTRACT_PASS`、`NATIVE_WEARABLE_CARRIER_SERVICE_PASS`兼容夹具、Portrait合同、目标Lua 5.1（BOM剥离副本）和`build_tower_native_wearable_units.py --check`通过；`combat_stats.js`经Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`，生产代码carrier引用扫描和`git diff --check`通过。完整配置CheckOnly仍被既有无关`rogue_reward_effects.lua`的单个U+FFFD阻断；尚需Workshop Tools冷启动实机验证。
+
 ## 当前实施任务（2026-08-29）：玩家退出资产清理、出怪通道停用与多人日志修复
 
 - 用户要求在玩家直接退出/断线后销毁该玩家的 Builder、建筑及其他玩家资产，并永久停用该玩家本局对应的普通波次出怪通道；其他仍在线玩家及其出怪通道必须继续运行。

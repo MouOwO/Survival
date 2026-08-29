@@ -88,6 +88,7 @@
 /tatus --short --untracked-files=no  grep -E 'ability_tooltipcontent_catalogchallenge_definitionsshop_entriestooltip_definitions'  head -40
 /total 148
 /scripts/vscripts/tests/*
+!/scripts/vscripts/tests/test_native_wearable_carrier_service.lua
 !/scripts/vscripts/tests/test_tower_rebuild_after_death.lua
 !/scripts/vscripts/tests/generated_fishing_reward_definitions.lua
 !/scripts/vscripts/tests/test_fishing_reward_service.lua

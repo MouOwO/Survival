@@ -1,3 +1,37 @@
+# 2026-08-30 - 原Building主体与prop_dynamic组件迁移自动验证收尾
+
+- 同日补修 Portrait 全局污染：普通单位/英雄/怪物不再进入自定义 Movie/Image/Scene 路径，HUD 只保留一个塔专用 `SurvivalTowerPortraitOverlay -> SurvivalTowerPortraitScene`；21 个塔阶段仍严格读取 CSV `portrait_unit_name` 并调用 `SetUnit`。世界模型和 Building `prop_dynamic` 组件方案未改动。
+- 实际根因是旧逻辑同时放行 Monkey King/Juggernaut，并在找不到视觉叶节点时把共享 `PortraitGroup` 作为 opacity 目标；单一 `dimmedNativePortrait` 状态无法覆盖 Valve 选择切换/节点重建，`opacity=0.01` 因而污染后续所有官方 Portrait。现改为叶节点限定、按节点保存/恢复，并清理旧版本遗留的精确 `0.01`。
+- 自定义塔 overlay 使用完整矩形和局部 `overflow: clip`/不透明底层，不通过 ScenePanel 整体缩放处理黑边；普通路径隐藏 overlay、恢复原生节点且不调用 `SetUnit`。`SELECTED_UNIT_COSMETIC_PORTRAIT_PASS`、`NATIVE_PORTRAIT_RUNTIME_CONTRACT_PASS`、XML 单 ScenePanel、JS/CSS/XML 强制编译（分别 `1/1/9 compiled, 0 failed, 0 skipped` 的目标输出链）和限定 diff 检查通过；仍需 Workshop Tools 冷启动实机确认清晰度、黑边与切换恢复。
+
+- 21个Stage继续由原Building承担主体、选择、移动、Blink和攻击；94条wearable数据中93条有效模型已从CSV投影为`prop_dynamic`组件，Io空模型记录生成零组件。生产路径不再引用`native_wearable_carrier`或`native_carrier`，旧服务仅作为兼容夹具保留。
+- `model_appearance_service`完成事务替换、live marker恢复、重复组件清理、旧carrier清理和延迟失效重试；收尾修复了Lua 5.1本地函数前置声明，并保留组件模型marker。Portrait继续使用`portrait_unit_name -> SetUnit`，已移除80% ScenePanel缩放并补全矩形/UI scale诊断。
+- 自动验证通过：Building、Bundle、Preload、死亡动画、死亡重建、兼容载体与Portrait Lua测试，21阶段合同`stages=21 wearables=94 components=93`，Portrait运行时合同，目标Lua 5.1语法，CSV生成器`--check`，生产carrier引用扫描和`git diff --check`。`combat_stats.js`经Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。
+- 完整配置`CheckOnly`仍仅被既有无关`config/generated/rogue_reward_effects.lua`中的单个U+FFFD阻断。自动检查与模拟夹具不等于引擎实机验收，仍需Workshop Tools冷启动验证TA Stage 1→2→3、21阶段、Io、移动/攻击、死亡重建、存档恢复、热重载、清理和Portrait构图。
+
+# 2026-08-29 - World Carrier live恢复与唯一性修复
+
+- 实机一个Building出现两个光头TA的来源已闭环：旧实现只查询模块内`carriers_by_unit`；service reload/registry丢失后旧carrier及其children继续存在，下一次视觉Apply却重新创建第二个carrier。
+- carrier服务现扫描live `npc_dota_creature`和`dota_item_wearable`，同时校验实际owner对象、owner entindex、asset、UnitName/body及CSV wearable key/ItemDef/model/class；恢复完整state后删除同Building其余重复/不完整主体和children。旧版显式child缺少新marker时也可按owner指针与既有身份字段恢复。
+- Stage replace保持先完整创建、后提交和清理旧state；失败保留旧完整carrier。entindex reuse按owner对象身份隔离，旧对象迟到Clear不删除新对象carrier；隐藏方式与原始RenderAlpha持久到Building/carrier以支持reload后清理。
+- 本轮冻结Portrait，不修改`portrait_unit_name -> SetUnit`、Panel scale、CSV geometry或21阶段offset。生成器当前明确生成显式runtime wearable合同并删除代理KV `Creature.AttachWearables`；真实Python 3.13执行`--check`为`TOWER_NATIVE_WEARABLE_UNITS_CURRENT`，未写入生成产物。
+- 自动验证通过：载体专项Lua行为、Building visual、死亡重建、21阶段/94 wearable合同、目标Lua 5.1语法和限定diff检查。模拟测试不等于Workshop Tools实机，仍需冷启动确认每个Building最终一个active visual carrier。
+
+# 2026-08-29 - 原生阶段饰品实机修复与 Portrait 构图缩放
+
+- 用户正式`survival`实机截图确认：Stage 1 Templar Assassin主体可见，但`Creature.AttachWearables`没有形成正确可见挂载；HUD官方Portrait anchor/overlay区域正确，`DOTAScenePanel.SetUnit()`默认构图过近。该结果否定了“代理KV静态AttachWearables正确即可证明运行时穿戴成功”的假设。
+- 运行时已保留`asset.async_unit_name -> CreateUnitByName`独立主体与建筑显式位置/朝向同步；94条`asset_native_wearables.csv`行补齐`entity_class=dota_item_wearable`、`attach_mode=bone_merge`，carrier按CSV顺序显式创建子实体并执行`SetOwner(carrier) -> FollowEntity(carrier, true)`。代理KV删除`Creature.AttachWearables`，仅保留主体和穿戴模型`precache`；ItemDef仍作为CSV身份、顺序和诊断字段保留。
+- carrier现以主体加全部子wearable作为原子事务：同阶段复用核对key/ItemDef/实体类型和数量，任一子实体创建/挂载失败保留旧完整载体；缺少已提交子wearable会触发整套重建；替换、死亡/融合、清理和entindex复用删除主体及附件。日志增加wearable数量、key、ItemDef、模型、实体和挂载阶段。
+- Portrait仅对Stage原生`DOTAScenePanel`统一应用`scale3d(0.8, 0.8, 1.0)`并以中心缩放，overlay仍严格裁切在官方Portrait矩形并提供背景遮罩；Monkey King WebM、Juggernaut静态图、官方回退和`SetUnit(portraitUnit, "default", false)`未改变。
+- 自动验证通过：`NATIVE_WEARABLE_CARRIER_SERVICE_PASS`（含显式子实体、失败回滚、缺件重建）、`BUILDING_VISUAL_SERVICE_PASS`、`SELECTED_UNIT_COSMETIC_PORTRAIT_PASS`、`NATIVE_WEARABLE_STAGE_CONTRACT_PASS stages=21 wearables=94`、`NATIVE_PORTRAIT_RUNTIME_CONTRACT_PASS`、配置加载`stages=21 wearables=94`、目标Lua 5.1语法、CSV生成器`--check`；Panorama强制编译JS/CSS/XML分别为`1/1/9 compiled, 0 failed, 0 skipped`，两仓限定`git diff --check`通过。
+- 尚需Workshop Tools冷启动实机：Stage 1→2→3观察三个显式wearable在多个动画帧中随主体骨骼变形，验证移动/Blink/攻击朝向、死亡重建、存档恢复、清理及80% Portrait构图，并回归全部21阶段。自动检查和模拟夹具不等于引擎实机验收。
+
+# 2026-08-29 - 21阶段原生英雄载体与HUD Portrait运行时诊断（前置记录）
+- 前置记录时，生产资产以`data/csv/资源系统/asset_native_wearable_stages.csv`、`asset_native_wearables.csv`和生成配置为权威；当时的静态契约曾校验代理KV `Creature.AttachWearables`，但没有引擎实际实例化证据。
+- 前置载体实现保留`asset.async_unit_name`独立代理主体、显式位置/朝向同步和去重诊断；实机截图随后确认主体可见但饰品挂载不可接受，因此本条记录的`AttachWearables`结论已由紧随其后的修复记录取代。
+- 前置Portrait实现已记录官方anchor、layer/anchor/overlay实际矩形、ScenePanel矩形和UI scale；实机截图随后确认anchor区域正确、构图过近，因此缩放结论已由紧随其后的修复记录取代。Monkey King WebM、Juggernaut静态图和官方回退在整个过程中保持不变。
+- 剩余唯一验证边界：完全停止Workshop Tools后冷启动正式`survival`，按Stage 1→2→3观察控制台诊断、原生穿戴可见性、移动/Blink/攻击朝向、升级替换、死亡重建、存档恢复和清理；Portrait需依据新矩形日志判断是否仅需统一构图缩放。
+
 # 2026-08-29 - 修复商店 Tooltip JavaScript 括号语法错误
 
 - `content/dota_addons/Survival/panorama/scripts/custom_game/shop_tooltip.js` 的库存补货文本使用了嵌套三元表达式，`setText(` 调用少关闭一个右括号，导致 Panorama 报 `missing ) after argument list`。
@@ -3327,10 +3361,10 @@
 - 结论：八参数 `checkpoint_online_time(..., p_final)` 已在远端生效，Supabase schema cache 已能解析新函数；首次不累计和相邻 checkpoint 累计约4秒符合在线租约语义。由于未达到600秒，grant_count=0不构成异常。
 - 202608230006仍未单独确认，后续奖励触发测试前必须核对其版本绑定逻辑。
 
-# 2026-08-29 - 21个原生英雄塔阶段改为AttachWearables视觉载体
+# 2026-08-29 - 21个原生英雄塔阶段初版视觉载体（已被显式子实体方案取代）
 
 - 本轮完成21个原生英雄塔阶段的视觉载体审计与收尾。权威CSV为`asset_native_wearable_stages.csv`和`asset_native_wearables.csv`，共21个阶段、94条穿戴记录；21个塔路线资源ID与阶段表完全对应，ItemDef顺序、主体模型和代理KV逐项一致，审计无错误。
-- `native_wearable_carrier_service.lua`以独立`asset_proxy_*`单位承载基础英雄主体和KV `Creature.AttachWearables`，对载体设置owner、FollowEntity和不可选/无碰撞保护Modifier；载体创建失败时保留旧有效载体，清理时删除载体并恢复建筑原始RenderAlpha。补充了无状态清理保护、失败替换保留、跟随和entindex复用迟到清理测试。
+- 初版`native_wearable_carrier_service.lua`曾以独立`asset_proxy_*`单位承载基础英雄主体并依赖KV `Creature.AttachWearables`；该方案随后经正式实机截图证实饰品不可接受，已由本文件顶部记录的显式`dota_item_wearable`子实体方案取代。初版同时包含owner设置、不可选/无碰撞保护Modifier、显式同步建筑坐标和朝向（`SetAngles`优先、`SetForwardVector`回退）、失败保留旧载体、清理恢复RenderAlpha及entindex复用测试，这些生命周期契约由后续实现继续保留。
 - `building_visual_service.lua`的native分支只调用载体服务，不再调用旧`asset_components`组件链；建筑本体优先`SetRenderAlpha(0)`隐藏并保留实体交互，无该API时回退`AddNoDraw()`。升级、路线刷新、移动、死亡和融合仍复用原建筑实体与既有业务链，死亡/融合路径先清理载体再释放建筑状态。
 - `modifier_tower_attack_effects.lua`将死亡塔/闪电塔的攻击手势转发到视觉载体，隐藏建筑本体不再直接播放英雄动作；多重塔测试同步到当前CSV权威的Luna、Medusa原生弹道，未改变伤害、目标、穿甲或技能结算。
 - `build_tower_native_wearable_units.py`修正了`--check`比较时对CRLF的读取规范化问题；当前`TOWER_NATIVE_WEARABLE_UNITS_CURRENT`。10个目标生成Lua与CSV重建结果在换行规范化后全部一致，新增两个native wearable生成模块字节级一致。
@@ -3340,3 +3374,5 @@
 - 全量测试共142项，102项通过、40项失败；相较本轮迁移前的99通过/43失败，已消除三个直接受影响的旧契约失败，未产生新的失败。剩余失败集合均属于迁移前既有失败，主要包括无关BOM文件、陈旧业务基线和其他系统测试夹具；`test_building_upgrade_process.lua`的粒子销毁参数断言也属于既有不一致。
 - 全量603个Lua文件直接运行`luac5.1 -p`时有6个既有UTF-8 BOM文件失败；去除BOM后603个文件全部通过语法检查。当前`build_configs.ps1 -CheckOnly`仍报告`CONFIG_VERIFY files=111 bad_utf8=1`，唯一异常是无关既有`config/generated/rogue_reward_effects.lua`中的`U+FFFD`，本轮未修改。
 - 自动验证不能替代Dota运行时验证。本轮尚未在真实Dota中逐阶段确认载体生成、原生穿戴可见性、跟随/闪烁、不可选状态、建筑选择控制、攻击动作、升级替换、失败重试、死亡重建和融合清理；这些仍需完全退出Workshop Tools后冷启动验收。
+- 最终收尾补充：搬迁、闪烁、stationary位置纠正和攻击开始路径均显式调用carrier同步；同阶段刷新复用现有carrier，阶段替换同步失败保留旧carrier。选中单位HUD为21个CSV原生塔阶段接入`DOTAScenePanel.SetUnit(portrait_unit_name, "default", false)`，齐天大圣WebM、主宰静态图和官方头像回退保持不变。
+- 最终自动验证通过：carrier、选中单位Portrait、建筑视觉、死亡塔、阶段路线、闪电视觉和死亡重建7项Lua行为测试；7个目标Lua文件的Lua 5.1语法；21阶段CSV与代理生成一致性；JS/CSS/XML Resource Compiler分别为`1 compiled, 0 failed`、`1 compiled, 0 failed`、`9 compiled, 0 failed`；Game/Content两工作区`git diff --check`通过。仍未完成Dota实机验收。

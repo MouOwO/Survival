@@ -154,19 +154,29 @@ for _, wearable in ipairs(sorted_rows(
     local asset_id = asset.asset_id
     local wearable_key = tostring(wearable.wearable_key or "")
     local item_def = tostring(wearable.item_def or "")
+    local model_path = tostring(wearable.model_path or "")
+    local entity_class = tostring(wearable.entity_class or "")
+    local attach_mode = tostring(wearable.attach_mode or "")
     assert(asset.native_wearable_stage ~= nil,
         "native wearable references an undeclared stage: " .. wearable_key)
     assert(nonempty(wearable_key),
         "asset_native_wearables contains an empty wearable_key")
     assert_unique(seen_native_wearable_keys, wearable_key,
         "asset_native_wearables duplicate wearable_key")
+    assert(entity_class == "prop_dynamic",
+        "tower world component source must use prop_dynamic: "
+            .. wearable_key)
+    assert(attach_mode == "bone_merge",
+        "native wearable attach_mode must be bone_merge: " .. wearable_key)
     assert(wearable.hero_unit_name
             == asset.native_wearable_stage.hero_unit_name,
         "native wearable hero identity mismatch: " .. wearable_key)
+    assert((item_def ~= "") == (model_path ~= ""),
+        "native wearable item_def/model_path must be paired: " .. wearable_key)
     native_item_defs_by_asset[asset_id]
         = native_item_defs_by_asset[asset_id] or {}
     if nonempty(item_def) then
-        assert(nonempty(wearable.model_path),
+        assert(nonempty(model_path),
             "native wearable model_path missing: " .. wearable_key)
         assert(tonumber(item_def) ~= nil,
             "native wearable ItemDef is not numeric: " .. wearable_key)
@@ -175,8 +185,6 @@ for _, wearable in ipairs(sorted_rows(
             item_def,
             "native wearable duplicate ItemDef for " .. asset_id
         )
-        asset.attachment_models[#asset.attachment_models + 1]
-            = wearable.model_path
     end
     asset.native_wearables[#asset.native_wearables + 1] = wearable
 end
