@@ -1198,6 +1198,11 @@ local function on_entity_killed(payload)
         rollback_build_cooldown(state.build_task)
     end
     if victim.survival_disconnect_cleanup ~= true
+        and require("systems/multiplayer_player_service").is_disconnected(state.player_id) then
+        require("systems/multiplayer_player_service").defeat(
+            state.player_id, "wall_destroyed_while_disconnected"
+        )
+    elseif victim.survival_disconnect_cleanup ~= true
         and building_defeat_rules.should_trigger(defeat_triggered, state) then
         defeat_triggered = true
         online_time_service.finish("wall_destroyed")

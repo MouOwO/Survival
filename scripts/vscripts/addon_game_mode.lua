@@ -288,6 +288,7 @@ local function on_player_connected(keys)
         .. " assigned=" .. tostring(assigned)
         .. " assignment_error=" .. tostring(assignment_error))
     if player_id ~= nil then
+        multiplayer_player_service.mark_connected(player_id)
         require("systems/fishing_reward_service").connect(player_id)
     end
 end
@@ -305,13 +306,23 @@ local function on_player_disconnected(keys)
         print("[OnlineTime] disconnect_ignored reason=player_id_unresolved")
         return
     end
+    multiplayer_player_service.mark_disconnected(player_id)
     require("systems/fishing_reward_service").disconnect(player_id)
     require("systems/online_time_service").disconnect(player_id)
-    event_bus.emit(events.PLAYER_DISCONNECTED, {
-        player_id = player_id,
-        resolution = resolution,
-    })
     require("systems/player_context_service").unregister_player(player_id)
+end
+
+local function schedule_unbuilt_wall_defeat_check()
+    local delay = require("config/wave_timing_config").initial_delay_seconds
+    scheduler.after(delay, function()
+        local building_system = require("systems/building_system")
+        for _, player_id in ipairs(multiplayer_player_service.participating_player_ids()) do
+            if not building_system.wall_for_player(player_id) then
+                multiplayer_player_service.defeat(player_id, "wall_not_built_in_time")
+            end
+        end
+        return false
+    end, "player_unbuilt_wall_defeat")
 end
 
 local function initialize_survival_hero(hero)
@@ -922,6 +933,15 @@ function M.activate()
     event_bus.reset()
     configure_game_rules()
     scheduler.init()
+    event_bus.subscribe(events.GAME_STARTED, function()
+        schedule_unbuilt_wall_defeat_check()
+    end)
+    event_bus.subscribe(events.PLAYER_DEFEATED, function()
+        if multiplayer_player_service.all_participants_defeated() then
+            require("systems/online_time_service").finish("all_players_defeated")
+            GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
+        end
+    end)
     sound_service.init()
     initialize_services()
 

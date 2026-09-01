@@ -31,6 +31,15 @@
 - 已完成：TA及21阶段CSV投影、原Building主体/攻击/移动解绑、组件服务事务与live恢复、Io零组件、Stage/Bundle/Building/Portrait契约同步。
 - 自动验证：`HERO_BODY_STAGE_CONTRACT_PASS stages=21 wearables=94 components=93`、`ASSET_BUNDLE_CONFIG_PASS`、`BUILDING_VISUAL_SERVICE_PASS`、`ASSET_PRELOAD_SERVICE_PASS`、`DEATH_TOWER_ANIMATION_CONTRACT_PASS`、`NATIVE_WEARABLE_CARRIER_SERVICE_PASS`兼容夹具、Portrait合同、目标Lua 5.1（BOM剥离副本）和`build_tower_native_wearable_units.py --check`通过；`combat_stats.js`经Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`，生产代码carrier引用扫描和`git diff --check`通过。完整配置CheckOnly仍被既有无关`rogue_reward_effects.lua`的单个U+FFFD阻断；尚需Workshop Tools冷启动实机验证。
 
+## 当前实施任务（2026-08-29）：玩家建墙期限与断线判负
+
+- 用户要求限定修改：开局后 150 秒内未建造城墙的参与玩家直接判负并停止其后续出怪；断线玩家保留 20 秒恢复窗口，超过 20 秒判负；若断线 20 秒内其已完工城墙被摧毁，也立即判负。
+- 150 秒期限复用 `wave_timing_config.initial_delay_seconds`，其权威值来自 `data/csv/怪物与波次系统/wave_timing_rules.csv`，本轮不修改 CSV 或生成配置。
+- 判负状态在 `multiplayer_player_service` 中幂等维护；判负后复用既有 `PLAYER_DISCONNECTED` 资产/波次清理链。所有参与玩家均判负后才触发全局失败。
+- 本轮未修改碰撞屏障、怪物 AI、目标回退、正常在线玩家城墙失败入口及其他玩法逻辑。
+- 自动验证已通过：`MULTIPLAYER_PLAYER_DEFEAT_LUA51_PASS`、`MULTIPLAYER_PLAYER_ISOLATION_CONTRACT_PASS`、`WAVE_EARLY_FINAL_PASS`、目标 `luac5.1`、CSV/生成配置期限一致、严格 UTF-8 和限定 `git diff --check`。
+- 尚需 Workshop Tools 双客户端确认：150 秒未建墙、断线 20 秒判负、断线窗口内墙毁坏判负、判负玩家停止出怪且其他在线玩家继续运行。
+
 ## 当前实施任务（2026-08-29）：玩家退出资产清理、出怪通道停用与多人日志修复
 
 - 用户要求在玩家直接退出/断线后销毁该玩家的 Builder、建筑及其他玩家资产，并永久停用该玩家本局对应的普通波次出怪通道；其他仍在线玩家及其出怪通道必须继续运行。
