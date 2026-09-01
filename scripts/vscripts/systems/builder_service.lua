@@ -1,7 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local definitions = require("config/generated/builder_definitions")
-local cosmetic_service = require("systems/hero_cosmetic_service")
 local player_context = require("systems/player_context_service")
 
 local M = {}
@@ -96,7 +95,6 @@ local function create_builder(payload)
     end
     FindClearSpaceForUnit(builder, position, true)
 
-    cosmetic_service.apply(builder, "builder_undying")
     builder_by_player[player_id] = builder
     publish_identity(player_id, builder)
 

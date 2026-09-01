@@ -126,9 +126,9 @@ def sync_component_csv(
         }
         component_rows.append([values.get(header, "") for header in headers])
 
-    if len(component_rows) != 93:
+    if len(component_rows) != 97:
         raise RuntimeError(
-            f"expected 93 projected world components, found {len(component_rows)}"
+            f"expected 97 projected world components, found {len(component_rows)}"
         )
     io_asset_id = "tower_laser_od_blackgate"
     if counts.get(io_asset_id) != 0:

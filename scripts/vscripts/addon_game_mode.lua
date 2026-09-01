@@ -135,6 +135,7 @@ local polar_crystal_progression_service =
     require("systems/polar_crystal_progression_service")
 local wave_system = require("systems/wave_system")
 local buff_definitions = require("config/generated/buff_definitions")
+local builder_definitions = require("config/generated/builder_definitions")
 local content_inventory_service =
     require("systems/content_inventory_service")
 local inventory_transaction_service =
@@ -545,6 +546,15 @@ function M.precache(context)
             challenge_models[model_path] = true
         end
     end
+    local precached_builder_models = {}
+    for _, builder in ipairs(builder_definitions.rows or {}) do
+        local model_name = tostring(builder.model_name or "")
+        if builder.enabled ~= false and model_name ~= ""
+            and not precached_builder_models[model_name] then
+            PrecacheResource("model", model_name, context)
+            precached_builder_models[model_name] = true
+        end
+    end
     PrecacheResource(
         "particle",
         "particles/items_fx/blink_dagger_start.vpcf",
@@ -798,6 +808,7 @@ function M.precache(context)
     end
     asset_preload_service.precache_initial(context)
     asset_preload_service.precache_group(context, "hero_permanent")
+    asset_preload_service.precache_group(context, "monster_default_wearables")
     asset_preload_service.precache_group(context, "challenge_visuals")
     hero_cosmetic_service.precache(context)
 end

@@ -1,4 +1,7 @@
 local scheduler = require("core/scheduler")
+local event_bus = require("core/event_bus")
+local events = require("core/events")
+local armor_balance = require("config/armor_balance")
 
 local M = { runners = {} }
 M.sound_service = require("core/sound_service")
@@ -70,21 +73,75 @@ function M.summon_locked(attacker, skill_id)
     return true
 end
 
-local function configure_summon(unit, context, attack, attack_speed, health, armor)
+local function inherited_stats(attributes, definition, level)
+    attributes = attributes or {}
+    local attack_pct = level_value(
+        definition, "attack_inherit_pct", level, 100
+    ) / 100
+    local attack_speed_pct = level_value(
+        definition, "attack_speed_inherit_pct", level, 100
+    ) / 100
+    local health_pct = level_value(
+        definition, "health_inherit_pct", level, 100
+    ) / 100
+    local armor_pct = level_value(
+        definition, "armor_inherit_pct", level, 100
+    ) / 100
+    local fallback_attack = tonumber(attributes.attack) or 0
+    local armor = tonumber(attributes.runtime_armor) or 0
+    if attributes.armor_unit == "war3_display"
+        and tonumber(attributes.armor) ~= nil then
+        armor = armor_balance.from_war3(attributes.armor)
+    end
+    return {
+        attack_min = (tonumber(attributes.attack_min) or fallback_attack)
+            * attack_pct,
+        attack_max = (tonumber(attributes.attack_max) or fallback_attack)
+            * attack_pct,
+        attack_speed = (tonumber(attributes.attack_speed) or 0)
+            * attack_speed_pct,
+        max_health = (tonumber(attributes.max_health) or 1) * health_pct,
+        armor = armor * armor_pct,
+    }
+end
+
+local function apply_combat_stats(unit, attributes, definition, level,
+        preserve_health)
+    if not valid(unit) then return false end
+    local stats = inherited_stats(attributes, definition, level)
+    local health_fraction = 1
+    if preserve_health and unit.GetMaxHealth and unit.GetHealth then
+        local previous_max = math.max(1, tonumber(unit:GetMaxHealth()) or 1)
+        health_fraction = math.max(0, math.min(
+            1, (tonumber(unit:GetHealth()) or previous_max) / previous_max
+        ))
+    end
+    local attack_min = math.max(1, math.floor(stats.attack_min))
+    local attack_max = math.max(attack_min, math.floor(stats.attack_max))
+    unit:SetBaseDamageMin(attack_min)
+    unit:SetBaseDamageMax(attack_max)
+    local attack_time = base_attack_time(stats.attack_speed)
+    if attack_time and unit.SetBaseAttackTime then
+        unit:SetBaseAttackTime(attack_time)
+        unit.survival_attack_speed = stats.attack_speed
+    end
+    unit:SetPhysicalArmorBaseValue(stats.armor)
+    local maximum = math.max(1, math.floor(stats.max_health))
+    unit:SetBaseMaxHealth(maximum)
+    unit:SetMaxHealth(maximum)
+    unit:SetHealth(math.max(1, math.min(
+        maximum, math.floor(maximum * health_fraction)
+    )))
+    return true
+end
+
+local function configure_summon(unit, context, definition)
     unit:SetOwner(context.attacker)
     if unit.SetPlayerID then unit:SetPlayerID(context.player_id) end
     unit:SetControllableByPlayer(context.player_id, true)
-    unit:SetBaseDamageMin(math.max(1, math.floor(attack)))
-    unit:SetBaseDamageMax(math.max(1, math.floor(attack)))
-    local attack_time = base_attack_time(attack_speed)
-    if attack_time and unit.SetBaseAttackTime then
-        unit:SetBaseAttackTime(attack_time)
-        unit.survival_attack_speed = attack_speed
-    end
-    unit:SetPhysicalArmorBaseValue(tonumber(armor) or 0)
-    unit:SetBaseMaxHealth(math.max(1, math.floor(health)))
-    unit:SetMaxHealth(math.max(1, math.floor(health)))
-    unit:SetHealth(math.max(1, math.floor(health)))
+    apply_combat_stats(
+        unit, context.attributes, definition, context.level, false
+    )
 end
 
 local function create_summon(context, definition, unit_name, invulnerable)
@@ -93,16 +150,6 @@ local function create_summon(context, definition, unit_name, invulnerable)
         return false
     end
     local duration = level_value(definition, "duration", context.level, 10)
-    local attack = (tonumber(context.attributes.attack) or 0)
-        * level_value(definition, "attack_inherit_pct", context.level, 100) / 100
-    local attack_speed = (tonumber(context.attributes.attack_speed) or 0)
-        * level_value(
-            definition, "attack_speed_inherit_pct", context.level, 100
-        ) / 100
-    local health = (tonumber(context.attributes.max_health) or 1)
-        * level_value(definition, "health_inherit_pct", context.level, 100) / 100
-    local armor = (tonumber(context.attributes.runtime_armor) or 0)
-        * level_value(definition, "armor_inherit_pct", context.level, 100) / 100
     local position = context.attacker:GetAbsOrigin()
         + context.attacker:GetForwardVector() * 160
     local unit = CreateUnitByName(
@@ -110,7 +157,7 @@ local function create_summon(context, definition, unit_name, invulnerable)
         context.attacker:GetTeamNumber()
     )
     if not valid(unit) then return false end
-    configure_summon(unit, context, attack, attack_speed, health, armor)
+    configure_summon(unit, context, definition)
     unit.survival_exclusive_summon = true
     unit.survival_summon_skill_id = context.skill_id
     if invulnerable then
@@ -130,7 +177,13 @@ local function create_summon(context, definition, unit_name, invulnerable)
             { player_id = context.player_id }
         )
     end
-    local state = { unit = unit, expires_at = game_time() + duration }
+    local state = {
+        unit = unit,
+        expires_at = game_time() + duration,
+        player_id = tonumber(context.player_id),
+        definition = definition,
+        level = context.level,
+    }
     exclusive_summons[key] = state
     scheduler.after(duration, function()
         if exclusive_summons[key] ~= state then return end
@@ -263,15 +316,39 @@ function M.on_drow_companion_attack_fired(attacker, primary_target)
     return true
 end
 
+local function on_hero_combat_stats_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local snapshot = payload and payload.snapshot
+    if player_id == nil or type(snapshot) ~= "table" then return end
+    for _, state in pairs(exclusive_summons) do
+        if state.player_id == player_id and alive(state.unit) then
+            apply_combat_stats(
+                state.unit,
+                snapshot,
+                state.definition,
+                state.level,
+                true
+            )
+        end
+    end
+end
+
 function M.init(dependencies)
     assert(type(dependencies and dependencies.deal_group) == "function")
     deal_group = dependencies.deal_group
     exclusive_summons = {}
     shadow_raze_stacks = {}
+    event_bus.subscribe(
+        events.HERO_COMBAT_STATS_CHANGED,
+        on_hero_combat_stats_changed
+    )
 end
 
 M._test = {
     base_attack_time = base_attack_time,
+    inherited_stats = inherited_stats,
+    apply_combat_stats = apply_combat_stats,
+    on_hero_combat_stats_changed = on_hero_combat_stats_changed,
     live_raze_layers = live_raze_layers,
     active_summons = function() return exclusive_summons end,
 }

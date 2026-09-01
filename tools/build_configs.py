@@ -22,6 +22,12 @@ MONSTER_VISUAL_FILES = {
     "monster_visual_effects.csv",
     "wave_visual_definitions.csv",
 }
+STRICT_CSV_SHAPE_FILES = {
+    "asset_catalog.csv",
+    "asset_components.csv",
+    "building_challenge_definitions.csv",
+    "monster_archetypes.csv",
+}
 
 # These CSVs preserve values extracted from the original War3 map. Generated
 # Lua names the unit explicitly so runtime code cannot confuse source armor
@@ -150,6 +156,27 @@ def csv_dict_rows(source: Path) -> list[tuple[int, dict[str, str]]]:
         fields = fields + [""] * (len(headers) - len(fields))
         result.append((line, dict(zip(headers, fields))))
     return result
+
+
+def validate_strict_csv_shapes(sources: list[Path]) -> None:
+    """Reject shifted or truncated rows in the asset/wearable source CSVs."""
+    for source in sources:
+        if source.name not in STRICT_CSV_SHAPE_FILES:
+            continue
+        with source.open("r", encoding="utf-8-sig", newline="") as handle:
+            rows = list(csv.reader(handle))
+        if not rows:
+            raise ValueError(f"empty CSV: {source}")
+        expected = len(rows[0])
+        for line_number, fields in enumerate(rows[1:], 2):
+            if not fields or not fields[0].strip() or fields[0].strip().startswith("#"):
+                continue
+            if len(fields) != expected:
+                raise ValueError(
+                    f"CSV column count mismatch: {source}"
+                    f" (line {line_number} has {len(fields)} columns;"
+                    f" expected {expected})\nrow: {fields}"
+                )
 
 
 def validate_rogue_reward_definitions(files: list[Path]) -> None:
@@ -579,6 +606,90 @@ def validate_monster_visual_definitions(sources: list[Path]) -> None:
             raise ValueError(f"wave has invalid support_every_nth: {wave_number}")
 
 
+def validate_monster_default_wearables(sources: list[Path]) -> None:
+    """Validate monster default wearable references before generating Lua."""
+    by_name = {source.name: source for source in sources}
+    catalog_source = by_name.get("asset_catalog.csv")
+    archetype_source = by_name.get("monster_archetypes.csv")
+    building_source = by_name.get("building_challenge_definitions.csv")
+    if not catalog_source:
+        return
+
+    catalog = {
+        row.get("asset_id", "").strip(): row
+        for row in read_data_rows(catalog_source)
+        if row.get("asset_id", "").strip()
+    }
+    components_by_asset: dict[str, list[dict[str, str]]] = {}
+    component_source = by_name.get("asset_components.csv")
+    if component_source:
+        for row in read_data_rows(component_source):
+            components_by_asset.setdefault(
+                row.get("asset_id", "").strip(), []
+            ).append(row)
+
+    references: list[tuple[str, dict[str, str]]] = []
+    for source in (archetype_source, building_source):
+        if not source:
+            continue
+        for row in read_data_rows(source):
+            asset_id = row.get("default_wearable_asset_id", "").strip()
+            if asset_id:
+                references.append((source.name, row))
+
+    for source_name, row in references:
+        asset_id = row["default_wearable_asset_id"].strip()
+        asset = catalog.get(asset_id)
+        identity = row.get("archetype_id", row.get("challenge_id", "")).strip()
+        if not asset:
+            raise ValueError(
+                f"{source_name} {identity} references missing default wearable "
+                f"asset: {asset_id}"
+            )
+        if asset.get("asset_type", "").strip() != "model_bundle":
+            raise ValueError(
+                f"{source_name} {identity} default wearable is not a model bundle: "
+                f"{asset_id}"
+            )
+        model_path = row.get("model_path", "").strip()
+        if model_path and asset.get("primary_model", "").strip() != model_path:
+            raise ValueError(
+                f"{source_name} {identity} model does not match default wearable: "
+                f"{asset_id}"
+            )
+        if asset.get("load_group", "").strip() != "monster_default_wearables":
+            raise ValueError(
+                f"default wearable asset has invalid load_group: {asset_id}"
+            )
+        if asset.get("attachment_models", "").strip():
+            raise ValueError(
+                f"default wearable asset must declare models as components: {asset_id}"
+            )
+        if row.get("model_asset_id", "").strip():
+            raise ValueError(
+                f"{source_name} {identity} cannot combine model_asset_id and "
+                f"default_wearable_asset_id"
+            )
+        components = [
+            component for component in components_by_asset.get(asset_id, [])
+            if component.get("enabled", "").strip().lower()
+            not in {"0", "false", "no", "n", "off"}
+        ]
+        if not components:
+            raise ValueError(f"default wearable asset has no components: {asset_id}")
+        for component in components:
+            if component.get("entity_class", "").strip() != "prop_dynamic":
+                raise ValueError(
+                    f"default wearable component must use prop_dynamic: "
+                    f"{component.get('component_key', '')}"
+                )
+            if component.get("attach_mode", "").strip() != "bone_merge":
+                raise ValueError(
+                    f"default wearable component must use bone_merge: "
+                    f"{component.get('component_key', '')}"
+                )
+
+
 def build(source: Path, output: Path) -> None:
     raw = source.read_bytes()
     for encoding in ("utf-8-sig", "utf-8", "gb18030", "gbk"):
@@ -696,8 +807,10 @@ def main() -> int:
     if not files:
         print(f"ERROR: no CSV files under {CSV_ROOT}", file=sys.stderr)
         return 11
+    validate_strict_csv_shapes(files)
     validate_sound_cue_uniqueness(files)
     validate_monster_visual_definitions(files)
+    validate_monster_default_wearables(files)
     validate_rogue_reward_definitions(files)
 
     tooltip_builder = ROOT / "tools" / "build_tooltip_definitions.py"

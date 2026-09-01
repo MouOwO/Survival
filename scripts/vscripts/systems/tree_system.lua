@@ -3,6 +3,7 @@ local events = require("core/events")
 local config = require("config/tree_config")
 local particle_manager = require("core/particle_manager")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
+local tree_damage_rules = require("systems/tree_damage_rules")
 
 local M = {}
 local current_tree = nil
@@ -180,6 +181,7 @@ local function on_tree_hit(payload)
     end
     local attacker = payload.attacker
     if not valid_entity(attacker) then return end
+    if not tree_damage_rules.is_allowed_tree_attacker(attacker) then return end
     local base_efficiency = payload.source == "hero"
         and config.hero_base_lumber_efficiency
         or payload.base_lumber_efficiency

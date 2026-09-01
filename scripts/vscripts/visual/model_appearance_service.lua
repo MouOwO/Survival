@@ -400,8 +400,15 @@ function M.Apply(unit, appearance)
             safe_call(wearable, "SetModel", model_path)
             safe_call(wearable, "SetOriginalModel", model_path)
             local owner_ok = safe_call(wearable, "SetOwner", unit)
+            -- Parent first so the component follows the owner's transform;
+            -- FollowEntity with bone merging then binds it to the skeleton.
+            safe_call(wearable, "SetParent", unit, "")
             local follow_ok = safe_call(wearable, "FollowEntity", unit, true)
             if owner_ok and follow_ok then
+                local bone_merge = rawget(_G, "EF_BONEMERGE")
+                if type(bone_merge) == "number" then
+                    safe_call(wearable, "AddEffects", bone_merge)
+                end
                 safe_call(wearable, "SetSolid", rawget(_G, "SOLID_NONE") or 0)
                 local skin = component and component.model_skin
                     or appearance and appearance.model_skin

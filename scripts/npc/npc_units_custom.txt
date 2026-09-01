@@ -336,7 +336,7 @@
     "npc_survival_builder_proxy"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/courier/courier_mech/courier_mech.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -668,6 +668,73 @@
     "asset_proxy_monster_lich" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lich/lich.vmdl" }
     "asset_proxy_monster_juggernaut" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/juggernaut/juggernaut.vmdl" }
     "asset_proxy_monster_warlock" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/warlock/warlock.vmdl" }
+    "asset_proxy_monster_default_wraith_king"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/wraith_king/wraith_king.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/wraith_king/wraith_king_head.vmdl"
+            "model" "models/heroes/wraith_king/wraith_king_weapon.vmdl"
+            "model" "models/heroes/wraith_king/wraith_king_shoulder.vmdl"
+            "model" "models/heroes/wraith_king/wraith_king_gauntlet.vmdl"
+            "model" "models/heroes/wraith_king/wraith_king_cape.vmdl"
+            "model" "models/heroes/wraith_king/wraith_king_chest.vmdl"
+        }
+    }
+    "asset_proxy_monster_default_lich"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/lich/lich.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/lich/lich_dress.vmdl"
+            "model" "models/heroes/lich/lich_neck_rock.vmdl"
+            "model" "models/heroes/lich/lich_bracer.vmdl"
+            "model" "models/heroes/lich/lich_horns.vmdl"
+        }
+    }
+    "asset_proxy_monster_default_warlock"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/warlock/warlock.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/warlock/warlock_staff.vmdl"
+            "model" "models/heroes/warlock/warlock_lantern.vmdl"
+            "model" "models/heroes/warlock/warlock_cape.vmdl"
+            "model" "models/heroes/warlock/warlock_shoulder.vmdl"
+            "model" "models/heroes/warlock/warlock_bracers.vmdl"
+            "model" "models/heroes/warlock/warlock_robe.vmdl"
+            "model" "models/heroes/warlock/warlock_bag.vmdl"
+        }
+    }
+    "asset_proxy_monster_default_sniper"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/sniper/sniper.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/sniper/weapon.vmdl"
+            "model" "models/heroes/sniper/cape.vmdl"
+            "model" "models/heroes/sniper/headitem.vmdl"
+            "model" "models/heroes/sniper/shoulder.vmdl"
+            "model" "models/heroes/sniper/bracer.vmdl"
+        }
+    }
+    "asset_proxy_monster_default_juggernaut"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/juggernaut/juggernaut.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/juggernaut/jugg_bracers.vmdl"
+            "model" "models/heroes/juggernaut/jugg_cape.vmdl"
+            "model" "models/heroes/juggernaut/jugg_mask.vmdl"
+            "model" "models/heroes/juggernaut/juggernaut_pants.vmdl"
+            "model" "models/heroes/juggernaut/jugg_sword.vmdl"
+        }
+    }
     "asset_proxy_tower_keeper_of_the_light"
     {
         "BaseClass"              "npc_dota_creature"
@@ -715,7 +782,7 @@
     "asset_proxy_tower_lightning_zeus_tempest"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/zeus/zeus.vmdl"
+        "Model"                  "models/heroes/zeus/zeus_arcana.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -730,10 +797,7 @@
         "VisionNighttimeRange"   "0"
         "precache"
         {
-            "model" "models/heroes/zeus/zeus_bracers.vmdl"
-            "model" "models/heroes/zeus/zeus_hair.vmdl"
-            "model" "models/heroes/zeus/zeus_belt.vmdl"
-            "model" "models/heroes/zeus/zeus_vest.vmdl"
+            "model" "models/heroes/zeus/zeus_hair_arcana.vmdl"
         }
     }
     "asset_proxy_tower_lightning_disruptor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/disruptor/disruptor.vmdl" }
@@ -756,15 +820,17 @@
         "VisionNighttimeRange"   "0"
         "precache"
         {
-            "model" "models/heroes/leshrac/leshrac_armor.vmdl"
-            "model" "models/heroes/leshrac/leshrac_head.vmdl"
-            "model" "models/heroes/leshrac/leshrac_tail.vmdl"
+            "model" "models/items/leshrac/dark_forest_punisher_head/dark_forest_punisher_head.vmdl"
+            "model" "models/items/leshrac/dark_forest_punisher_weapon/dark_forest_punisher_weapon.vmdl"
+            "model" "models/items/leshrac/dark_forest_punisher_tail/dark_forest_punisher_tail.vmdl"
+            "model" "models/items/leshrac/dark_forest_punisher_misc/dark_forest_punisher_misc.vmdl"
+            "model" "models/items/leshrac/dark_forest_punisher_back/dark_forest_punisher_back.vmdl"
         }
     }
     "asset_proxy_tower_lightning_razor_voidstorm"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/razor/razor.vmdl"
+        "Model"                  "models/items/razor/razor_arcana/razor_arcana.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -779,11 +845,11 @@
         "VisionNighttimeRange"   "0"
         "precache"
         {
-            "model" "models/heroes/razor/razor_weapon.vmdl"
-            "model" "models/heroes/razor/razor_head.vmdl"
-            "model" "models/heroes/razor/razor_armor.vmdl"
-            "model" "models/heroes/razor/razor_bracers.vmdl"
-            "model" "models/heroes/razor/razor_robe.vmdl"
+            "model" "models/items/razor/razor_arcana/razor_arcana_weapon.vmdl"
+            "model" "models/items/razor/razor_arcana/razor_arcana_head.vmdl"
+            "model" "models/items/razor/razor_arcana/razor_arcana_armor_refit.vmdl"
+            "model" "models/items/razor/razor_arcana/razor_arcana_arms.vmdl"
+            "model" "models/heroes/razor/razor_robe_refit.vmdl"
         }
     }
     "asset_proxy_tower_laser_death_prophet_brightshroud"
@@ -990,9 +1056,10 @@
         "ProjectileModel"        "particles/units/heroes/hero_templar_assassin/templar_assassin_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/lanaya/lanaya_hair.vmdl"
-            "model" "models/heroes/lanaya/lanaya_cowl_shoulder.vmdl"
-            "model" "models/heroes/lanaya/lanaya_bracers_skirt.vmdl"
+            "model" "models/items/lanaya/templar_assasin_false_devotion_armor/templar_assasin_false_devotion_armor.vmdl"
+            "model" "models/items/lanaya/templar_assasin_false_devotion_head/templar_assasin_false_devotion_head.vmdl"
+            "model" "models/items/lanaya/templar_assasin_false_devotion_shoulder/templar_assasin_false_devotion_shoulder.vmdl"
+            "model" "models/items/lanaya/templar_assasin_false_devotion_weapon/templar_assasin_false_devotion_weapon.vmdl"
         }
     }
     "asset_proxy_tower_death_nevermore_sundered_souls"
@@ -1014,12 +1081,12 @@
         "ProjectileModel"        "particles/units/heroes/hero_nevermore/nevermore_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/wraith_king/wraith_king_head.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_weapon.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_shoulder.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_gauntlet.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_cape.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_chest.vmdl"
+            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_arms/wraith_king_darkfeather_tyrant_arms.vmdl"
+            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_armor/wraith_king_darkfeather_tyrant_armor.vmdl"
+            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_back/wraith_king_darkfeather_tyrant_back.vmdl"
+            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_head/wraith_king_darkfeather_tyrant_head.vmdl"
+            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_shoulder/wraith_king_darkfeather_tyrant_shoulder.vmdl"
+            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_weapon/wraith_king_darkfeather_tyrant_weapon.vmdl"
         }
     }
     "asset_proxy_tower_death_warlock_seam_ripper"
@@ -1041,11 +1108,11 @@
         "ProjectileModel"        "particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/phantom_assassin/phantom_assassin_helmet.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_shoulders.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_cape.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_weapon.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_daggers.vmdl"
+            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_weapon/ti9_cache_pa_gothic_hunter_weapon.vmdl"
+            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_shoulder/ti9_cache_pa_gothic_hunter_shoulder.vmdl"
+            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_head/ti9_cache_pa_gothic_hunter_head.vmdl"
+            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_belt/ti9_cache_pa_gothic_hunter_belt.vmdl"
+            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_back/ti9_cache_pa_gothic_hunter_back.vmdl"
         }
     }
     "asset_proxy_tower_frost_lich_rime_lord"
@@ -1067,16 +1134,17 @@
         "ProjectileModel"        "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/lich/lich_dress.vmdl"
-            "model" "models/heroes/lich/lich_neck_rock.vmdl"
-            "model" "models/heroes/lich/lich_bracer.vmdl"
-            "model" "models/heroes/lich/lich_horns.vmdl"
+            "model" "models/items/lich/lich_rime_lord_back/lich_rime_lord_back.vmdl"
+            "model" "models/items/lich/lich_rime_lord_belt/lich_rime_lord_belt.vmdl"
+            "model" "models/items/lich/lich_rime_lord_arms/lich_rime_lord_arms.vmdl"
+            "model" "models/items/lich/lich_rime_lord_neck/lich_rime_lord_neck.vmdl"
+            "model" "models/items/lich/lich_rime_lord_head/lich_rime_lord_head.vmdl"
         }
     }
     "asset_proxy_tower_frost_crystal_maiden_winter_raven"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/crystal_maiden/crystal_maiden.vmdl"
+        "Model"                  "models/heroes/crystal_maiden/crystal_maiden_arcana.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1092,11 +1160,12 @@
         "ProjectileModel"        "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/crystal_maiden/crystal_maiden_cape.vmdl"
-            "model" "models/heroes/crystal_maiden/crystal_maiden_shoulders.vmdl"
-            "model" "models/heroes/crystal_maiden/crystal_maiden_staff.vmdl"
-            "model" "models/heroes/crystal_maiden/crystal_maiden_cuffs.vmdl"
-            "model" "models/heroes/crystal_maiden/head_item.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_arms.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_back.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_head_refit.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_shoulder_refit.vmdl"
+            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_weapon.vmdl"
+            "model" "models/heroes/crystal_maiden/crystal_maiden_arcana_back_refit.vmdl"
         }
     }
     "asset_proxy_tower_frost_ancient_apparition"
@@ -1118,8 +1187,10 @@
         "ProjectileModel"        "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/ancient_apparition/ancient_apparition_shoulder.vmdl"
-            "model" "models/heroes/ancient_apparition/ancient_apparition_tail.vmdl"
+            "model" "models/items/ancient_apparition/extremely_cold_shackles_tail/extremely_cold_shackles_tail.vmdl"
+            "model" "models/items/ancient_apparition/extremely_cold_shackles_shoulder/extremely_cold_shackles_shoulder.vmdl"
+            "model" "models/items/ancient_apparition/extremely_cold_shackles_head/extremely_cold_shackles_head.vmdl"
+            "model" "models/items/ancient_apparition/extremely_cold_shackles_arms/extremely_cold_shackles_arms.vmdl"
         }
     }
     "asset_proxy_tower_lion" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lion/lion.vmdl" "ProjectileModel" "particles/units/heroes/hero_lion/lion_base_attack.vpcf" }

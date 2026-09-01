@@ -159,7 +159,26 @@ function M.queue_wave(wave_number, options)
         end
     end
     local resources = asset_preload.resources_for_models({}, pending)
-    return asset_preload.queue_resources(resources, options)
+    local ok, status, queued_count, failed_count =
+        asset_preload.queue_resources(resources, options)
+    -- Keep the monster-visual API's historical state contract: a successful
+    -- async request is loading until its exact resource callback fires.
+    if ok then
+        if status == "queued" then
+            status = "loading"
+        elseif status == "ready" then
+            for _, resource in ipairs(resources) do
+                if asset_preload.resource_status(
+                    resource.resource_type,
+                    resource.path
+                ) == "loading" then
+                    status = "loading"
+                    break
+                end
+            end
+        end
+    end
+    return ok, status, queued_count, failed_count
 end
 
 function M.precache_range(context, first_wave, last_wave)

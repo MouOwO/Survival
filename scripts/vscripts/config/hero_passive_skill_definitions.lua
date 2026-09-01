@@ -334,7 +334,7 @@ M.rows = {
         attack_speed_inherit_pct = { 100 },
         health_inherit_pct = { 100 }, armor_inherit_pct = { 100 },
         level_text = {
-            "攻击命中10%概率召唤地狱火，继承100%攻击力、攻击速度、最大生命和防御，持续10秒；存续期间跳过概率判定。",
+            "攻击命中10%概率召唤地狱火，完整同步英雄攻击力、攻击速度、最大生命和防御，持续10秒；存续期间随英雄面板变化并跳过概率判定。",
         },
     }),
     skill({
@@ -360,11 +360,12 @@ M.rows = {
         skill_id = "skill_drow_companion", display_name = "小游侠",
         icon_name = "drow_ranger_multishot", max_level = 1,
         trigger_chance = { 0.10 }, damage_multiplier = { 0 },
-        duration = { 10.0 }, attack_inherit_pct = { 150 },
+        duration = { 10.0 }, attack_inherit_pct = { 100 },
         attack_speed_inherit_pct = { 100 },
+        health_inherit_pct = { 100 }, armor_inherit_pct = { 100 },
         attack_range = { 1200 }, max_targets = { 5 },
         level_text = {
-            "攻击命中10%概率召唤无敌小游侠，继承150%攻击力和100%攻击速度，攻击主目标及最近另外4个敌人，持续10秒；存续期间跳过概率判定。",
+            "攻击命中10%概率召唤无敌小游侠，完整同步英雄攻击力、攻击速度、最大生命和防御，攻击主目标及最近另外4个敌人，持续10秒；存续期间随英雄面板变化。",
         },
     }),
 }

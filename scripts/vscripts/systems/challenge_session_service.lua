@@ -19,6 +19,7 @@ local molten_core_rules = require("config/molten_core_challenge_rules")
 local hero_return_home = require("systems/hero_return_home_service")
 local destination_validation = require("systems/destination_validation_service")
 local monster_visual = require("systems/challenge_monster_visual_service")
+local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
 local wave_monster_collision = require("systems/wave_monster_collision")
 local challenge_11_staging = "modifier_challenge_11_staging"
@@ -206,7 +207,10 @@ local function destroy_session_monsters(session)
     end
     for entindex, unit in pairs(all_monsters) do
         monster_meta[entindex] = nil
-        if valid(unit) then monster_visual.clear(unit) end
+        if valid(unit) then
+            monster_visual.clear(unit)
+            monster_hero_visual_service.clear(unit)
+        end
         if alive(unit) then UTIL_Remove(unit) end
     end
     session.monsters = {}
@@ -388,6 +392,11 @@ local function spawn_member(session, member)
     end
     apply_combat_stats(unit, combat_archetype, combat_profile)
     monster_visual.apply(unit, archetype)
+    pcall(monster_hero_visual_service.apply, unit, archetype, {
+        challenge = true,
+        allow_outside_formal_wave = true,
+        model_path = archetype.model_path,
+    })
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
 
     local home = nil
@@ -1104,6 +1113,7 @@ local function on_killed(payload)
     if not meta then return end
     monster_meta[entindex] = nil
     monster_visual.clear(victim)
+    monster_hero_visual_service.clear(victim)
     local session = get_session(meta.player_id, meta.encounter_id)
     if not session then return end
     session.monsters[entindex] = nil

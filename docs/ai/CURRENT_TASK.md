@@ -1,14 +1,33 @@
+## 当前实施任务（2026-09-01）：死亡之塔“暗刃高手”世界饰品试装
+
+- 用户要求仅替换死亡路线第一阶段“死亡之塔”的世界模型饰品，观察英雄主体塔能否使用圣堂刺客“暗刃高手（Darkblade Adept）”套装；头像不得随饰品变化。主体仍为 `models/heroes/lanaya/lanaya.vmdl`，不修改塔数值、技能、弹道或阶段路由。
+- `asset_native_wearables.csv` 已将该阶段的三件默认饰品替换为本机 `items_game.txt` 核对过的四件套：护甲 ItemDef `28624`、头部 `28735`、肩部 `28736`、武器 `28738`。世界显示继续由原 Building 上的四个 `prop_dynamic + bone_merge` 组件完成；bundle ItemDef `29158` 仅作为套装身份核对证据，不写入运行时或头像配置。
+- 套装的肩部、肩后辉光和武器三个官方常驻粒子已进入 `asset_effects.csv`，分别绑定对应世界组件；四个模型和三个粒子均已在本机 Dota VPK 资源索引确认存在，并进入初始预载/代理预缓存。当前合同总量为 21 个阶段、95 条穿戴声明和 94 个有效世界组件。
+- 头像链保持独立：`portrait_unit_name=npc_dota_hero_templar_assassin`，`portrait_item_def` 为空，没有改动 Panorama 文件或 `DOTAScenePanel.SetUnit` 参数。因此本次只改变世界中的死亡之塔外观，不会主动更换头像饰品。
+- 自动验证通过：塔穿戴投影合同与 `--check`、AssetBundle、DeathTowerTemplarVisual、TowerMultiVisual、BuildingVisualService、AssetPreloadService、SelectedUnitCosmeticPortrait、资源索引存在性和限定 `git diff --check`。仍需 Workshop Tools 完全冷启动，实机确认四件套骨骼对齐、攻击/待机动作、三个常驻粒子位置、升级/重复生成清理，以及头像确实保持原样。
+
+## 当前实施任务（2026-08-31）：怪物默认英雄穿戴 CSV 与正式波次精确预载收口
+
+- 已严格核对 `building_challenge_definitions.csv`、`asset_catalog.csv`、`asset_components.csv` 和 `monster_archetypes.csv`：有效数据行分别为 20、27、15、26 列，默认穿戴资源 ID 只位于各自表头的最后字段；五套默认穿戴资产的组件均为 `prop_dynamic` + `bone_merge`，资产行不再重复填写 `attachment_models`。
+- 已补齐生成器的目标 CSV 行宽拒绝校验和默认穿戴引用校验：缺失资产、模型不匹配、错误 `load_group`、主体/组件重复表达、组件类型或挂载模式错误都会在生成前失败；四个受影响生成 Lua 已按 CSV 定向重生成。
+- `asset_preload_service.resources_for_assets()` 现在按精确 `asset_id` 展开主体、组件、粒子和音效，并让所有子资源保留所属资产身份；正式波次 W6-W30 从当前波次原型收集 `default_wearable_asset_id` 后与模型/视觉资源合并进入同一预载队列，W1-W5 保持中性视觉排除。
+- 自动验证通过：默认穿戴 Python 合同、精确默认穿戴预载、MonsterHeroVisual、AssetBundle、基础 AssetPreload、urgent 并行预载、波次模型生命周期、挑战预载/视觉服务、目标 Lua 5.1 语法、严格 UTF-8/BOM/CSV 行宽和 `git diff --check`。无关的 `test_challenge_monster_visual_config.lua` 旧射程断言与 `test_wave_monster_visual_integration.lua` 旧护甲断言未被本任务改动。
+- 生成器全量输出中的无关 churn 已恢复；四个任务产物和用户既有的 `builder_definitions.lua` 变更保留。仍需 Workshop Tools 冷启动验证预载错误、穿戴骨骼对齐/动画、重复生成和所有清理路径；自动合同或 Lua 模拟不等于引擎实机验收。
+
 ## 当前实施任务（2026-08-30）：原 Building 世界外观与 21 阶段组件恢复
 
 - Portrait 全局污染修复：普通单位、英雄和怪物现在完全沿用 Valve 原生 Portrait；仅 CSV 投影出的 21 个 `tower_*` 阶段启用独立 `SurvivalTowerPortraitOverlay` / `SurvivalTowerPortraitScene`，并调用 `portrait_unit_name -> DOTAScenePanel.SetUnit(...)`。移除了普通英雄的 Movie/Image 自定义运行时和隐藏旧 ScenePanel，不修改世界模型方案。
 - 根因是旧 Portrait 逻辑把 Monkey King/Juggernaut 也纳入自定义分支，并且 `officialPortraitPanel()` 找不到视觉子节点时可能回退到共享 `PortraitGroup`，随后单一全局状态把共享节点设为 `opacity=0.01`；Valve 选择切换/重建后该值无法可靠恢复，造成所有单位头像继承分辨率/清晰度异常。
-- 现已禁止 `PortraitGroup` 作为 opacity 目标；被压低的官方视觉节点按节点记录并在塔切换、普通单位切换、重建和上下文残留清理时恢复。额外清理旧版本可能遗留在 `PortraitGroup` 或原生视觉叶节点上的精确 `0.01`，不改原生尺寸、transform 或全局 UI scale。塔 overlay 保持完整矩形、局部 `overflow: clip` 和不透明底层遮罩，黑边不再通过缩放 ScenePanel 处理。
+- 现已禁止 `PortraitGroup` 作为 opacity 目标；塔显示期间只把实际原生 `DOTAScenePanel` 视觉叶节点设为 `opacity=0`，并按节点记录原值，在塔切换、普通单位切换、重建和上下文关闭时恢复。塔专用 overlay 会临时挂到该原生 Scene 的直接父容器、排在原生 Scene 之后并继承其 `z-index`，从而与原生画像处于同一 HUD 层；隐藏时收回 XML 宿主，避免热重载遗留游离面板。仍保留对旧版本精确 `0.01` 残留的清理，不改原生尺寸、transform 或全局 UI scale。塔 overlay 保持完整矩形、局部 `overflow: clip` 和不透明底层遮罩；旧版`0.80`缩放保持移除，当前仅塔Scene内容采用独立`0.90`构图缩放。
+- 箭塔选择过渡不再调用完整隐藏后短暂恢复原生 Scene。客户端按稳定单位名 `building_arrow_tower` 或所有塔阶段共有的 `ability_destroy_arrow_tower` 立即识别目标；新快照等待期间保持原生 Scene `opacity=0`、折叠自定义 Scene 内容并显示现有不透明 overlay 背景，快照到达后直接 `SetUnit` 显示新塔。普通英雄/单位仍在确认不是箭塔时恢复 Valve 原生画像，不新增轮询或全局永久遮罩。
+- 同一箭塔实体重复选择时严格按 `entindex + 当前权威快照 + portraitKey` 做身份短路，不再折叠或重显自定义 Scene、不进入过渡遮罩，也不重复调用 `SetUnit`。原生锚点、可见性或透明度的瞬时变化不得把同一实体误判为画像切换；0.10 秒既有哨兵独立负责几何与 Valve HUD 重建自愈。现有 `activePortraitKey` 继续保证相同画像资产不重置 Scene。可见的 `DOTAScenePanel` 仍由引擎逐帧绘制，因此该优化降低的是重复状态切换和 Scene 重置成本，不宣称停止 GPU 帧渲染。
 - 本轮自动验证：`SELECTED_UNIT_COSMETIC_PORTRAIT_PASS`、`NATIVE_PORTRAIT_RUNTIME_CONTRACT_PASS`、HUD XML 单一 `DOTAScenePanel` 解析、目标 Panorama JS/CSS/XML 强制编译和 UTF-8/diff 检查通过；尚需 Workshop Tools 冷启动确认普通单位清晰度、塔黑边及切换后 opacity 的最终实机表现。
+- 用户已确认当前版本达到阶段性满意状态，以上 Portrait 隔离方案和自动验证结果作为当前基线记录；Workshop Tools 冷启动实机验证仍保留为后续事项，不将其等同于已完成的实机验收。
 
 - 本轮目标是让21个Stage由原Building承载英雄主体、骨骼、选择、移动和攻击；`asset_native_wearable_stages.csv`与`asset_native_wearables.csv`仍是阶段/穿戴数据源，93条有效模型记录投影到`asset_components.csv`，运行时统一生成`prop_dynamic`并执行`SetOwner(Building) -> FollowEntity(Building, true)`。
 - `async_unit_name`和代理KV只承担主体与穿戴模型预载，不参与世界显示；历史`native_wearable_carrier_service.lua`仅保留为兼容测试文件，生产路径不再引用独立carrier。Io的模型空记录合法地生成零组件。
 - `model_appearance_service`按Building对象、组件签名和实体marker复用/恢复组件；阶段替换先完整创建新组件，成功后再清理旧组件，失败保留旧完整外观。死亡、融合、清理和热重载会移除组件及残留旧carrier，不改变Building业务实体。
-- Portrait身份继续使用`portrait_unit_name -> DOTAScenePanel.SetUnit(portraitUnit, "default", false)`；取消ScenePanel的80%缩放，覆盖层显示时可逆降低底层官方Portrait透明度，隐藏/切换时恢复原值。黑边继续由overlay裁切处理。
+- Portrait身份继续使用`portrait_unit_name -> DOTAScenePanel.SetUnit(portraitUnit, "default", false)`；塔专用Scene内容按用户确认的`0.90`基线从中心缩放，overlay矩形、裁切、角标、单位名和原生Portrait不缩放。覆盖层显示时将实际原生 Scene 透明度可逆设为 `0`，并把自定义 Scene overlay 挂到同一直接父层；隐藏、普通单位切换和上下文重载时恢复原生透明度、收回 overlay 并清除Scene inline transform。
 - 已完成：TA及21阶段CSV投影、原Building主体/攻击/移动解绑、组件服务事务与live恢复、Io零组件、Stage/Bundle/Building/Portrait契约同步。
 - 自动验证：`HERO_BODY_STAGE_CONTRACT_PASS stages=21 wearables=94 components=93`、`ASSET_BUNDLE_CONFIG_PASS`、`BUILDING_VISUAL_SERVICE_PASS`、`ASSET_PRELOAD_SERVICE_PASS`、`DEATH_TOWER_ANIMATION_CONTRACT_PASS`、`NATIVE_WEARABLE_CARRIER_SERVICE_PASS`兼容夹具、Portrait合同、目标Lua 5.1（BOM剥离副本）和`build_tower_native_wearable_units.py --check`通过；`combat_stats.js`经Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`，生产代码carrier引用扫描和`git diff --check`通过。完整配置CheckOnly仍被既有无关`rogue_reward_effects.lua`的单个U+FFFD阻断；尚需Workshop Tools冷启动实机验证。
 

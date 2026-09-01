@@ -5,6 +5,7 @@ local definitions = require("config/generated/building_challenge_definitions")
 local wave_rows = require("config/generated/building_challenge_waves")
 local global_rules = require("config/global_rules")
 local wave_system = require("systems/wave_system")
+local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 
 local M = {}
 local TASK_ID = "building_challenge_auto_summon"
@@ -127,6 +128,7 @@ local function settle(meta, status)
     if team_alive and team_alive[meta.challenge_id] == meta.unit then
         team_alive[meta.challenge_id] = nil
     end
+    monster_hero_visual_service.clear(meta.unit)
     return true
 end
 
@@ -297,6 +299,13 @@ end
 
 local function on_building_destroyed(payload)
     if payload and payload.building_id == "building_challenge" then
+        local building_entindex = tonumber(payload.entindex)
+        for entindex, meta in pairs(monster_meta) do
+            if meta.building_entindex == building_entindex then
+                settle(meta, "building_destroyed")
+                if valid(meta.unit) then UTIL_Remove(meta.unit) end
+            end
+        end
         states[tonumber(payload.entindex)] = nil
     end
 end

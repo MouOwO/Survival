@@ -45,10 +45,12 @@ end
 
 function M:GetModifierIncomingDamage_Percentage(params)
     params = params or {}
-    if tree_damage_rules.is_arrow_tower(params.attacker) then return -100 end
+    if not tree_damage_rules.is_allowed_tree_attacker(params.attacker) then
+        return -100
+    end
     -- DamageFilter owns final classification and can consume the attack evidence
     -- recorded by this modifier. Modifier damage params can omit the category or
-    -- report 0 for a real ranged attack, so keep only the tower-identity backstop.
+    -- report 0 for a real ranged attack, so keep only the attacker whitelist backstop.
     return 0
 end
 

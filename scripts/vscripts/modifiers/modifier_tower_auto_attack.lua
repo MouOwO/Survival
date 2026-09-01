@@ -79,10 +79,10 @@ function modifier_tower_auto_attack:OnCreated()
     local tower = self:GetParent()
     if valid(tower) then
         if tower.SetAcquisitionRange then
-            tower:SetAcquisitionRange(math.max(
-                global_rules.tower_acquisition_range,
-                current_attack_range(tower)
-            ))
+            -- Native acquisition sees the hostile resource tree and starts an
+            -- attack animation before Lua can reject it. Custom interval
+            -- targeting below already selects every valid tower target.
+            tower:SetAcquisitionRange(0)
         end
     end
     self:StartIntervalThink(0.25)

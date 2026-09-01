@@ -216,15 +216,20 @@ local function attribute_snapshot(player_id)
     local strength = tonumber(stats.strength) or 0
     local agility = tonumber(stats.agility) or 0
     local intelligence = tonumber(stats.intellect) or 0
+    local attack_min = tonumber(stats.attack_min) or 0
+    local attack_max = tonumber(stats.attack_max) or attack_min
     return {
         strength = strength,
         agility = agility,
         intelligence = intelligence,
         all_attributes = strength + agility + intelligence,
-        attack = ((tonumber(stats.attack_min) or 0)
-            + (tonumber(stats.attack_max) or 0)) * 0.5,
+        attack = (attack_min + attack_max) * 0.5,
+        attack_min = attack_min,
+        attack_max = attack_max,
         attack_speed = tonumber(stats.attack_speed) or 0,
         max_health = tonumber(stats.max_health) or 1,
+        armor = tonumber(stats.armor),
+        armor_unit = stats.armor_unit,
         runtime_armor = tonumber(stats.runtime_armor) or 0,
     }
 end

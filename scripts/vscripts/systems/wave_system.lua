@@ -14,6 +14,7 @@ local wave_timing_config = require("config/wave_timing_config")
 local asset_catalog = require("config/asset_catalog")
 local monster_visual_config = require("config/monster_visual_config")
 local monster_visual_service = require("systems/monster_visual_service")
+local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
 local monster_corpse_lifecycle_service = require(
     "systems/monster_corpse_lifecycle_service"
@@ -82,6 +83,23 @@ local function wave_model_paths(wave)
     end
     table.sort(model_paths)
     return model_paths
+end
+
+local function wave_default_wearable_asset_ids(number, wave)
+    number = tonumber(number)
+    if not number or number < 6 or number > 30 then return {} end
+    local asset_ids = {}
+    local seen = {}
+    for _, row in ipairs((wave and wave.batches) or {}) do
+        local definition = archetypes.by_id[row.archetype_id] or {}
+        local asset_id = tostring(definition.default_wearable_asset_id or "")
+        if asset_id ~= "" and not definition.model_asset_id and not seen[asset_id] then
+            seen[asset_id] = true
+            asset_ids[#asset_ids + 1] = asset_id
+        end
+    end
+    table.sort(asset_ids)
+    return asset_ids
 end
 
 local function acquire_wave_model_resources(number, wave, token, is_dev, multiplier)
@@ -216,9 +234,13 @@ local function queue_wave_assets(number)
     if not wave then return false, "wave_not_found", 0, 0 end
     local model_paths = wave_model_paths(wave)
     local visual_resources = monster_visual_config.resources_for_wave(number)
-    local resources = asset_preload.resources_for_models(
+    local model_resources = asset_preload.resources_for_models(
         model_paths,
         visual_resources
+    )
+    local resources = asset_preload.resources_for_assets(
+        wave_default_wearable_asset_ids(number, wave),
+        model_resources
     )
     local ok, status, queued_count, failed_count = asset_preload.queue_resources(
         resources,
@@ -535,6 +557,11 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     if resolved_visual then
         pcall(monster_visual_service.apply, unit, resolved_visual)
     end
+    pcall(monster_hero_visual_service.apply, unit, definition, {
+        formal_wave = true,
+        wave_number = wave_number,
+        model_path = model_path_for(row, definition),
+    })
     local base_hull_radius = collision_profile.base_hull_radius
     local hull_ok, hull_error = monster_hull_scale.apply(
         unit,
@@ -727,6 +754,7 @@ local function on_killed(payload)
     local entindex = victim:entindex()
     local meta = enemies[entindex]
     if not meta then return end
+    monster_hero_visual_service.clear(victim)
     monster_visual_service.cleanup(victim)
     enemies[entindex] = nil
     state.alive = math.max(0, state.alive - 1)
@@ -773,6 +801,7 @@ local function clear_normal_wave_enemies()
         local unit = meta and meta.unit
         if valid(unit) then
             unit.survival_wave_cleanup = true
+            monster_hero_visual_service.clear(unit)
             monster_visual_service.cleanup(unit)
             UTIL_Remove(unit)
             removed = removed + 1
@@ -1098,6 +1127,12 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     unit.survival_player_id = player_id
     unit.survival_wave_movement_type = collision_profile.movement_type
     unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
+    pcall(monster_hero_visual_service.apply, unit, definition, {
+        challenge = true,
+        allow_outside_formal_wave = true,
+        model_path = definition.model_path,
+        default_wearable_asset_id = definition.default_wearable_asset_id,
+    })
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
         wall_entindex = wall_by_player[player_id] or -1,
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
@@ -1153,6 +1188,8 @@ function M._resource_snapshot_for_test()
 end
 
 M._wave_model_paths_for_test = wave_model_paths
+M._wave_default_wearable_asset_ids_for_test = wave_default_wearable_asset_ids
+M._queue_wave_assets_for_test = queue_wave_assets
 M._acquire_wave_model_resources_for_test = acquire_wave_model_resources
 M._release_wave_model_resources_for_test = release_wave_model_resources
 M._wave_channels_for_test = function()

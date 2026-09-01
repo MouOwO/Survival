@@ -13,6 +13,7 @@ local difficulty_config = require("config/difficulty_config")
 local challenge_sessions = require("systems/challenge_session_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
 local wave_monster_collision = require("systems/wave_monster_collision")
+local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 
 local M = {}
 
@@ -213,6 +214,11 @@ local function start_encounter(payload)
         return { ok = false, error = "unit_create_failed" }
     end
 
+    if archetype.model_path and archetype.model_path ~= "" then
+        unit:SetModel(archetype.model_path)
+        unit:SetOriginalModel(archetype.model_path)
+    end
+    unit:SetModelScale(tonumber(archetype.model_scale) or 1)
     if marker.GetForwardVector and unit.SetForwardVector then
         unit:SetForwardVector(marker:GetForwardVector())
     end
@@ -268,6 +274,11 @@ local function start_encounter(payload)
     if not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
+    pcall(monster_hero_visual_service.apply, unit, archetype, {
+        encounter = true,
+        allow_outside_formal_wave = true,
+        model_path = archetype.model_path,
+    })
 
     if hero_entry then
         local player_id = tonumber(payload.player_id)
@@ -396,6 +407,7 @@ local function on_entity_killed(payload)
 
     active_by_entindex[entindex] = nil
     active_by_encounter[meta.encounter_id] = nil
+    monster_hero_visual_service.clear(victim)
 
     event_bus.emit(events.MONSTER_KILLED, {
         victim = victim,

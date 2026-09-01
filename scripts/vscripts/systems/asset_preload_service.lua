@@ -138,17 +138,34 @@ local function append_asset_resources(result, seen, asset)
     append_resource(result, seen, "model", asset.primary_model,
         asset.asset_id, asset.async_unit_name)
     for _, path in ipairs(asset.attachment_models or {}) do
-        append_resource(result, seen, "model", path)
+        append_resource(result, seen, "model", path, asset.asset_id)
     end
     for _, component in ipairs(asset.components or {}) do
-        append_resource(result, seen, "model", component.model_path)
+        append_resource(result, seen, "model", component.model_path, asset.asset_id)
     end
     for _, path in ipairs(asset.particle_resources or {}) do
-        append_resource(result, seen, "particle", path)
+        append_resource(result, seen, "particle", path, asset.asset_id)
     end
     for _, path in ipairs(asset.sound_resources or {}) do
-        append_resource(result, seen, "soundfile", path)
+        append_resource(result, seen, "soundfile", path, asset.asset_id)
     end
+end
+
+local function append_extra_resources(result, seen, extra_resources)
+    for _, resource in ipairs(extra_resources or {}) do
+        append_resource(result, seen, resource.resource_type, resource.path,
+            resource.asset_id, resource.async_unit_name)
+    end
+end
+
+function M.resources_for_assets(asset_ids, extra_resources)
+    local result = {}
+    local seen = {}
+    for _, asset_id in ipairs(asset_ids or {}) do
+        append_asset_resources(result, seen, catalog.resolve(asset_id))
+    end
+    append_extra_resources(result, seen, extra_resources)
+    return result
 end
 
 function M.resources_for_models(model_paths, extra_resources)
@@ -162,10 +179,7 @@ function M.resources_for_models(model_paths, extra_resources)
             append_resource(result, seen, "model", model_path)
         end
     end
-    for _, resource in ipairs(extra_resources or {}) do
-        append_resource(result, seen, resource.resource_type, resource.path,
-            resource.asset_id, resource.async_unit_name)
-    end
+    append_extra_resources(result, seen, extra_resources)
     return result
 end
 

@@ -2,7 +2,7 @@
 -- Source: asset_native_wearable_stages.csv
 local M = {}
 M.rows = {
-    { asset_id = "tower_death_templar_assassin", hero_unit_name = "npc_dota_hero_templar_assassin", body_model = "models/heroes/lanaya/lanaya.vmdl", display_name = "Templar Assassin基础外观 死亡之塔", enabled = true, notes = "死亡路线第一阶段；ItemDef仅来自本地items_game.txt的default_item" },
+    { asset_id = "tower_death_templar_assassin", hero_unit_name = "npc_dota_hero_templar_assassin", body_model = "models/heroes/lanaya/lanaya.vmdl", display_name = "Darkblade Adept 死亡之塔", enabled = true, notes = "死亡路线第一阶段；世界模型使用暗刃高手四件套；头像继续使用独立ScenePanel且portrait_item_def保持为空" },
     { asset_id = "tower_death_nevermore_sundered_souls", hero_unit_name = "npc_dota_hero_skeleton_king", body_model = "models/heroes/wraith_king/wraith_king.vmdl", display_name = "Wraith King基础外观 碎骨重炮", enabled = true, notes = "死亡路线第二阶段；保留旧资源ID以驱动技能和弹道分支" },
     { asset_id = "tower_death_warlock_seam_ripper", hero_unit_name = "npc_dota_hero_phantom_assassin", body_model = "models/heroes/phantom_assassin/phantom_assassin.vmdl", display_name = "Phantom Assassin基础外观 死神榴弹炮", enabled = true, notes = "死亡路线第三阶段；不挂载Persona默认物品" },
     { asset_id = "tower_frost_lich_rime_lord", hero_unit_name = "npc_dota_hero_lich", body_model = "models/heroes/lich/lich.vmdl", display_name = "Lich基础外观 冰霜之塔", enabled = true, notes = "冰霜路线第一阶段" },

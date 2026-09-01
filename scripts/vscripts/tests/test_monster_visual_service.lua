@@ -46,11 +46,24 @@ local attachments = {}
 SpawnEntityFromTableSynchronous = function(entity_class, data)
     assert(entity_class == "prop_dynamic" and data.solid == "0")
     local entity = { null = false }
+    entity.calls = {}
     function entity:IsNull() return self.null end
-    function entity:SetOwner(owner) self.owner = owner end
-    function entity:SetParent(owner) self.parent = owner end
-    function entity:FollowEntity(owner, merge) self.follow = owner; self.merge = merge end
-    function entity:AddEffects(effect) self.effect = effect end
+    function entity:SetOwner(owner)
+        self.calls[#self.calls + 1] = "SetOwner"
+        self.owner = owner
+    end
+    function entity:SetParent(owner)
+        self.calls[#self.calls + 1] = "SetParent"
+        self.parent = owner
+    end
+    function entity:FollowEntity(owner, merge)
+        self.calls[#self.calls + 1] = "FollowEntity"
+        self.follow = owner; self.merge = merge
+    end
+    function entity:AddEffects(effect)
+        self.calls[#self.calls + 1] = "AddEffects"
+        self.effect = effect
+    end
     attachments[#attachments + 1] = entity
     return entity
 end
@@ -82,7 +95,12 @@ assert(ok and asset_id == "test_visual")
 assert(unit.model == resolved.model_path and unit.original_model == resolved.model_path)
 assert(unit.scale == 1.75 and unit.survival_monster_visual_role == "stage_boss")
 assert(#attachments == 1 and attachments[1].owner == unit
-    and attachments[1].follow == unit and attachments[1].merge == true)
+    and attachments[1].parent == unit
+    and attachments[1].follow == unit and attachments[1].merge == true
+    and attachments[1].effect == EF_BONEMERGE
+    and table.concat(attachments[1].calls, ",")
+        == "SetOwner,SetParent,FollowEntity,AddEffects",
+    "component attachment order or bone merge was not preserved")
 local state = assert(service._state_for_test(unit.index))
 assert(#state.particles == 2, "per-unit particle limit was not enforced")
 

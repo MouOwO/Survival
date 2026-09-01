@@ -22,7 +22,7 @@ initial_wood,10,队伍开局木材,1
 initial_population,0,队伍开局已用人口,1
 initial_max_population,0,队伍开局人口上限,1
 tree_lumber_efficiency_buff_per_level,1,资源树从LV2起每级增加的伐木效率,1
-hero_base_lumber_efficiency,13,英雄每次攻击资源树的基础木材收益,1
+hero_base_lumber_efficiency,10,英雄每次攻击资源树的基础木材收益,1
 hero_meta_all_attributes_bonus,0,全体英雄局外全属性加成,1
 hero_strength_health_per_point,5,英雄每点最终力量提供的最大生命值,1
 hero_intellect_attack_per_point,0.1,英雄每点最终智力提供的攻击力,1

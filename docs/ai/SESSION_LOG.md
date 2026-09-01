@@ -1,11 +1,21 @@
+# 2026-08-31 - 怪物默认英雄穿戴 CSV 与正式波次精确预载收口
+
+- 严格核对四份权威 CSV：`building_challenge_definitions.csv` 为 20 列，`asset_catalog.csv` 为 27 列，`asset_components.csv` 为 15 列，`monster_archetypes.csv` 为 26 列；默认穿戴 ID 均处于最后字段，五个默认资源及其 27 个组件行的宽度和 `attachment_models` 空值符合约定。
+- 生成器新增目标 CSV 行宽拒绝和默认穿戴引用校验；资产必须是 `monster_default_wearables` 的 `model_bundle`，主体模型一致，组件必须是 `prop_dynamic`/`bone_merge`，且不能与特殊 `model_asset_id` 并存。定向重生成只更新 `asset_catalog.lua`、`asset_components.lua`、`monster_archetypes.lua` 和 `building_challenge_definitions.lua`，保留用户既有 `builder_definitions.lua` 变更并清理无关生成 churn。
+- 修复共享模型反查导致的精确资产丢失：`resources_for_assets()` 以目标资产 ID 展开完整 Bundle，子资源保留所属资产身份；正式波次只在 W6-W30 将 CSV 默认穿戴资产加入队列，W1-W5 继续不应用默认英雄穿戴视觉。新增精确 Wraith King 组件预载合同。
+- 已通过默认穿戴合同、精确预载、MonsterHeroVisual、AssetBundle、AssetPreload、urgent 并行、波次模型生命周期、挑战预载/视觉服务、Lua 5.1 语法、严格 CSV/UTF-8/BOM 与 `git diff --check`。`unittest discover` 未发现 Python `unittest` 用例而返回 `NO TESTS RAN`；独立 Python 合同通过。两个不相关旧 Lua 断言仍分别是 challenge 10 射程和旧护甲投影，不在本任务范围内。
+- Workshop Tools 冷启动、实际穿戴对齐/动画、重复生成、死亡/清理和引擎 precache 日志仍待实机确认，不能将模拟测试记为实机验收。
+
 # 2026-08-30 - 原Building主体与prop_dynamic组件迁移自动验证收尾
 
+- 用户确认当前版本已达到阶段性满意状态；本轮 Portrait 隔离修复及自动验证结果作为当前基线保留，Workshop Tools 冷启动实机验证仍列为后续事项。
+- 用户随后确认塔Portrait内容采用保守`0.90`缩放：只对`SurvivalTowerPortraitScene`从中心施加inline transform，外层overlay、裁切、角标、单位名和原生Portrait几何保持固定；隐藏、普通单位切换及上下文关闭统一清除transform，HUD/热重载后塔路径会重新应用。CSV头像字段保持唯一数据来源且未修改，最终构图仍需Workshop Tools实机校准。
 - 同日补修 Portrait 全局污染：普通单位/英雄/怪物不再进入自定义 Movie/Image/Scene 路径，HUD 只保留一个塔专用 `SurvivalTowerPortraitOverlay -> SurvivalTowerPortraitScene`；21 个塔阶段仍严格读取 CSV `portrait_unit_name` 并调用 `SetUnit`。世界模型和 Building `prop_dynamic` 组件方案未改动。
 - 实际根因是旧逻辑同时放行 Monkey King/Juggernaut，并在找不到视觉叶节点时把共享 `PortraitGroup` 作为 opacity 目标；单一 `dimmedNativePortrait` 状态无法覆盖 Valve 选择切换/节点重建，`opacity=0.01` 因而污染后续所有官方 Portrait。现改为叶节点限定、按节点保存/恢复，并清理旧版本遗留的精确 `0.01`。
-- 自定义塔 overlay 使用完整矩形和局部 `overflow: clip`/不透明底层，不通过 ScenePanel 整体缩放处理黑边；普通路径隐藏 overlay、恢复原生节点且不调用 `SetUnit`。`SELECTED_UNIT_COSMETIC_PORTRAIT_PASS`、`NATIVE_PORTRAIT_RUNTIME_CONTRACT_PASS`、XML 单 ScenePanel、JS/CSS/XML 强制编译（分别 `1/1/9 compiled, 0 failed, 0 skipped` 的目标输出链）和限定 diff 检查通过；仍需 Workshop Tools 冷启动实机确认清晰度、黑边与切换恢复。
+- 自定义塔 overlay 使用完整矩形和局部 `overflow: clip`/不透明底层，overlay本身不缩放；普通路径隐藏 overlay、恢复原生节点且不调用 `SetUnit`。原隔离修复的自动验证通过；其后用户批准塔Scene内容采用独立`0.90`构图缩放，新增验证结果以本段顶部记录为准，仍需 Workshop Tools 冷启动实机确认清晰度、黑边与切换恢复。
 
 - 21个Stage继续由原Building承担主体、选择、移动、Blink和攻击；94条wearable数据中93条有效模型已从CSV投影为`prop_dynamic`组件，Io空模型记录生成零组件。生产路径不再引用`native_wearable_carrier`或`native_carrier`，旧服务仅作为兼容夹具保留。
-- `model_appearance_service`完成事务替换、live marker恢复、重复组件清理、旧carrier清理和延迟失效重试；收尾修复了Lua 5.1本地函数前置声明，并保留组件模型marker。Portrait继续使用`portrait_unit_name -> SetUnit`，已移除80% ScenePanel缩放并补全矩形/UI scale诊断。
+- `model_appearance_service`完成事务替换、live marker恢复、重复组件清理、旧carrier清理和延迟失效重试；收尾修复了Lua 5.1本地函数前置声明，并保留组件模型marker。Portrait继续使用`portrait_unit_name -> SetUnit`；旧版80% ScenePanel缩放已移除，随后按用户批准改为90%塔内容缩放，并保留矩形/UI scale诊断。
 - 自动验证通过：Building、Bundle、Preload、死亡动画、死亡重建、兼容载体与Portrait Lua测试，21阶段合同`stages=21 wearables=94 components=93`，Portrait运行时合同，目标Lua 5.1语法，CSV生成器`--check`，生产carrier引用扫描和`git diff --check`。`combat_stats.js`经Resource Compiler强制编译为`1 compiled, 0 failed, 0 skipped`。
 - 完整配置`CheckOnly`仍仅被既有无关`config/generated/rogue_reward_effects.lua`中的单个U+FFFD阻断。自动检查与模拟夹具不等于引擎实机验收，仍需Workshop Tools冷启动验证TA Stage 1→2→3、21阶段、Io、移动/攻击、死亡重建、存档恢复、热重载、清理和Portrait构图。
 

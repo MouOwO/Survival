@@ -66,7 +66,7 @@ local function filter(_, keys)
             end
         end
         if tree_damage_rules.is_tree(target)
-            and tree_damage_rules.is_arrow_tower(unit) then
+            and not tree_damage_rules.is_allowed_tree_attacker(unit) then
             return false
         end
         if anti_air_rules.is_anti_air_tower(unit)

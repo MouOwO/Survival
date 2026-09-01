@@ -91,7 +91,7 @@ local function filter(_, keys)
         or tonumber(damage_category) == 0
     local attack_evidence = false
     if tree_damage_rules.is_tree(victim)
-        and not tree_damage_rules.is_arrow_tower(attacker)
+        and tree_damage_rules.is_allowed_tree_attacker(attacker)
         and (tree_damage_rules.is_basic_attack_category(damage_category)
             or category_is_unknown)
         and (not inflictor_index or inflictor_index <= 0) then

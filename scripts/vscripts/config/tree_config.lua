@@ -41,7 +41,7 @@ local M = {
     ),
     hero_base_lumber_efficiency = global_rules.number(
         "hero_base_lumber_efficiency",
-        13
+        10
     ),
 }
 
