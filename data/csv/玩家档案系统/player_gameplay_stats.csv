@@ -17,10 +17,10 @@ hero_attack_armor_reduction,decimal,0,armor,0,,1,英雄攻击附带的初始减�
 hero_attribute_growth,decimal,1,attribute_per_growth,0,,1,英雄攻击三围成长量。
 hero_attributes_per_second,decimal,0,attributes_per_second,0,,1,星之庇佑每秒增加的英雄全属性。
 hero_critical_damage_bonus_pct,percentage,0,percent,0,10000,1,英雄暴击伤害增加百分比；25表示25%。
-hero_attack_bonus_pct,percentage,0,percent,0,10000,1,英雄攻击力加成百分比；20表示20%。
-hero_health_bonus_pct,percentage,0,percent,0,10000,1,英雄生命值加成百分比；20表示20%。
-hero_armor_bonus_pct,percentage,0,percent,0,10000,1,英雄护甲加成百分比；20表示20%。
-hero_damage_reduction_pct,percentage,0,percent,0,100,1,英雄伤害减免百分比；10表示10%。
+hero_attack_bonus_pct,percentage,0,percent,0,10000,1,按英雄当前面板攻击力（含融合装备）计算的百分比加成；20表示20%。
+hero_health_bonus_pct,percentage,0,percent,0,10000,1,按英雄当前面板生命值（含融合装备）计算的百分比加成；20表示20%。
+hero_armor_bonus_pct,percentage,0,percent,0,10000,1,按英雄当前面板护甲（含融合装备）计算的百分比加成；20表示20%。
+hero_damage_reduction_pct,percentage,0,percent,0,100,1,英雄当前承受伤害的减免百分比；10表示10%，基于实际面板伤害结算。
 tower_attack_bonus_pct,percentage,0,percent,0,10000,1,防御塔攻击力加成百分比；20表示20%。
 tower_attack_speed_bonus_pct,percentage,0,percent,0,10000,1,防御塔攻速加成百分比；20表示20%。
 tower_attack_armor_reduction,decimal,0,armor,0,,1,防御塔攻击附带的减甲数量。
@@ -39,3 +39,59 @@ wall_health_per_second,decimal,0,health_per_second,0,,1,城墙每秒生命值增
 lumberjack_attack_growth,decimal,1,attack_per_growth,0,,1,伐木工每次攻击后的攻击力成长量。
 lumberjack_attack_speed_bonus_pct,percentage,0,percent,0,10000,1,伐木工攻速加成百分比；20表示20%。
 online_seconds_total,integer,0,seconds,0,,1,玩家永久累计在线时长；只累计同一session租约内的有效相邻心跳秒数，不计算掉线间隔。
+hero_initial_attributes,decimal,0,attributes,0,,1,英雄初始全属性；力量、敏捷、智力同步增加，英雄无升级时也作为基础属性使用。
+hero_attribute_bonus_pct,percentage,0,percent,0,10000,1,英雄全属性百分比加成；15表示15%。
+hero_attributes_per_damage,decimal,0,attributes_per_damage,0,,1,英雄每次造成伤害后的全属性增加量。
+hero_rebirth_attribute_bonus_pct,percentage,0,percent,0,10000,1,英雄每次转生获得的全属性百分比加成。
+hero_attack_armor_reduction_pct,percentage,0,percent,0,100,1,英雄攻击附带的百分比减甲；15表示15%。
+hero_critical_chance_pct,percentage,0,percent,0,100,1,英雄暴击几率百分比。
+hero_attack_speed_bonus_pct,percentage,0,percent,0,10000,1,英雄攻击速度百分比加成。
+hero_attack_interval_reduction,decimal,0,seconds,0,,1,英雄攻击间隔减少量；词条“英雄攻击间隔-1”按增量减少间隔。
+hero_damage_bonus_flat,decimal,0,damage,0,,1,英雄造成的固定伤害加成。
+hero_initial_health,decimal,0,health,0,,1,英雄初始生命值。
+hero_initial_armor,decimal,0,armor,0,,1,英雄初始护甲值。
+hero_attack_attribute_efficiency_pct,percentage,0,percent,0,10000,1,英雄攻击获得属性时的效率百分比。
+hero_attack_range,decimal,0,range,0,,1,英雄攻击范围增加量。
+hero_damage_wood_flat,decimal,0,wood,0,,1,英雄造成伤害时获得的固定木材。
+hero_damage_gold_flat,decimal,0,gold,0,,1,英雄造成伤害时获得的固定金币。
+hero_attack_gold_flat,decimal,0,gold,0,,1,英雄普通攻击时获得的固定金币。
+hero_attack_wood_flat,decimal,0,wood,0,,1,英雄普通攻击时获得的固定木材。
+hero_damage_wood_bonus_pct,percentage,0,percent,0,10000,1,英雄造成伤害获得木材的百分比加成。
+hero_attack_per_second,decimal,0,attack_per_second,0,,1,英雄每秒攻击力成长。
+tower_attack_flat,decimal,0,attack,0,,1,箭塔固定攻击力加成。
+tower_attack_interval_reduction,decimal,0,seconds,0,,1,箭塔攻击间隔减少量；词条“箭塔攻击间隔-1”按增量减少间隔。
+tower_critical_damage_bonus_pct,percentage,0,percent,0,10000,1,箭塔暴击伤害百分比加成。
+tower_damage_attack_growth,decimal,0,attack_per_damage,0,,1,箭塔每次造成伤害后的攻击力增加量。
+tower_basic_attack_growth,decimal,0,attack_per_attack,0,,1,箭塔每次普通攻击后的攻击力增加量。
+tower_attack_range,decimal,0,range,0,,1,箭塔攻击范围增加量。
+gold_mine_yield_bonus_pct,percentage,0,percent,0,10000,1,金矿每次产出的百分比加成。
+gold_mine_yield_flat,decimal,0,gold_per_cycle,0,,1,金矿每次产出的固定金币。
+gold_mine_final_output_flat,decimal,0,gold,0,,1,金矿最终产量固定增加量。
+gold_mine_income_interval_reduction,decimal,0,seconds,0,,1,金矿收益间隔减少量。
+gold_mine_build_cap,integer,0,count,0,,1,金矿可建造数量上限增加量。
+training_room_income_bonus_pct,percentage,0,percent,0,10000,1,练功房收益百分比加成。
+farmer_cap,integer,0,count,0,,1,农民上限增加量。
+faith_settlement_bonus,decimal,0,faith,0,,1,天狱模式结算时获得的信仰值增加量。
+item_pool_size_reduction,integer,0,count,0,,1,物品池总数量减少量；运行时不得低于零。
+weapon_upgrade_requirement_reduction,integer,0,count,0,,1,武器升级需求次数减少量；运行时不得低于零。
+technology_cost_refund_pct,percentage,0,percent,0,100,1,科技总费用返还百分比。
+technology_wood_cost_refund_pct,percentage,0,percent,0,100,1,科技木材费用返还百分比。
+technology_gold_cost_refund_pct,percentage,0,percent,0,100,1,科技金币费用返还百分比。
+lumberjack_efficiency,decimal,0,efficiency,0,,1,伐木效率固定增加量，与每次伐木固定数量分开计算。
+lumberjack_attack_interval_reduction,decimal,0,seconds,0,,1,伐木工攻击间隔减少量。
+lumberjack_attack_range,decimal,0,range,0,,1,伐木工攻击范围增加量。
+lumberjack_harvest_yield_bonus_pct,percentage,0,percent,0,10000,1,伐木最终收益百分比加成。
+lumberjack_critical_chance_pct,percentage,0,percent,0,100,1,伐木暴击几率百分比。
+lumberjack_critical_yield_bonus_pct,percentage,0,percent,0,10000,1,伐木暴击收益百分比加成。
+wall_armor_per_second,decimal,0,armor_per_second,0,,1,城墙每秒护甲增加量。
+global_final_damage_bonus_pct,percentage,0,percent,0,10000,1,所有单位最终伤害百分比加成。
+global_attack_armor_reduction,decimal,0,armor,0,,1,所有攻击通用的固定减甲量。
+team_hero_wall_armor_bonus,decimal,0,armor,0,,1,对所有联机玩家英雄和城墙生效的护甲增加量。
+enemy_initial_armor_reduction,decimal,0,armor,0,,1,地图上所有敌方单位的初始护甲减少量。
+# TODO: 每秒回血；作用对象和计算时机尚未确定，暂不生成运行时字段。
+# TODO: 英雄生命护甲加成；同时增加生命和护甲的具体计算方式尚未确定。
+# TODO: 初级防御塔强化科技；记录科技等级还是直接属性加成尚未确定。
+# TODO: 初级城墙强化科技；记录科技等级还是直接属性加成尚未确定。
+# TODO: 英雄初始金币；与玩家初始金币的关系尚未确定。
+# REMOVED: 塔生命+1、塔生命加成+1%；箭塔不会掉血，不进入玩家基础字段。
+# REMOVED: 箭塔木材攻击减甲+1；项目不存在箭塔攻击树木逻辑。

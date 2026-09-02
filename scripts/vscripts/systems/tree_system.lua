@@ -223,7 +223,12 @@ local function on_tree_hit(payload)
         or payload.source == "lumberjack"
         and RandomFloat(0, 100)
             < math.max(0, tonumber(payload.critical_chance_pct) or 0)
-    if critical then efficiency = efficiency * 2 end
+    if critical then
+        efficiency = math.floor(efficiency * (
+            2 + math.max(0,
+                tonumber(payload.critical_yield_bonus_pct) or 0) / 100
+        ))
+    end
     if tonumber(payload.wood_multiplier_chance_pct)
         and RandomFloat(0, 100) < tonumber(payload.wood_multiplier_chance_pct) then
         efficiency = efficiency * 10

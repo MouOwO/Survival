@@ -341,13 +341,32 @@ end
 
 local function refresh_worker_technology(player_id)
     local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
-    local efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
-    local speed_pct = tonumber(lumberjack.attack_speed_bonus_pct) or 0
-    local interval_reduction = tonumber(lumberjack.attack_interval_flat) or 0
-    local crit_chance = tonumber(lumberjack.critical_chance_pct) or 0
+    local permanent_result = event_bus.request(
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local permanent = permanent_result and permanent_result.totals or {}
+    -- lumberjack_attack_efficiency is the profile baseline (13 by default),
+    -- not a hero-tree bonus. Apply only its delta over the configured default
+    -- to each training tier so higher-tier worker bases remain intact.
+    local profile_base_delta = (tonumber(permanent.lumberjack_attack_efficiency)
+        or 13) - 13
+    local efficiency = (tonumber(lumberjack.wood_per_hit_bonus) or 0)
+        + profile_base_delta
+        + (tonumber(permanent.lumberjack_efficiency) or 0)
+    local speed_pct = (tonumber(lumberjack.attack_speed_bonus_pct) or 0)
+        + (tonumber(permanent.lumberjack_attack_speed_bonus_pct) or 0)
+    local interval_reduction = (tonumber(lumberjack.attack_interval_flat) or 0)
+        + (tonumber(permanent.lumberjack_attack_interval_reduction) or 0)
+    local crit_chance = (tonumber(lumberjack.critical_chance_pct) or 0)
+        + (tonumber(permanent.lumberjack_critical_chance_pct) or 0)
     local attack_growth = tonumber(lumberjack.attack_flat) or 0
-    local attack_gain_per_attack = tonumber(lumberjack.attack_gain_per_attack) or 0
-    local armor_reduction = tonumber(lumberjack.armor_reduction_per_attack) or 0
+    local attack_gain_per_attack = (tonumber(lumberjack.attack_gain_per_attack) or 0)
+        + (tonumber(permanent.lumberjack_attack_growth) or 0)
+    local armor_reduction = (tonumber(lumberjack.armor_reduction_per_attack) or 0)
+        + armor_balance.from_war3_linear(
+            tonumber(permanent.global_attack_armor_reduction) or 0
+        )
     for entindex, state in pairs(workers) do
         if state.worker_type == "lumberjack"
             and state.player_id == player_id and valid_entity(state.unit) then
@@ -363,6 +382,18 @@ local function refresh_worker_technology(player_id)
                 - (state.personality_attack_interval_flat or 0))
             state.unit:SetBaseAttackTime(final_attack_interval)
             state.unit.survival_attack_speed = 1 / final_attack_interval
+            local range = math.max(0, (tonumber(state.base_attack_range)
+                or tonumber(state.unit.survival_attack_range) or 400)
+                + (tonumber(permanent.lumberjack_attack_range) or 0))
+            if state.unit.Script_SetAttackRange then
+                state.unit:Script_SetAttackRange(range)
+            end
+            if state.unit.SetAcquisitionRange then
+                state.unit:SetAcquisitionRange(range)
+            end
+            state.unit.survival_attack_range = range
+            state.unit.survival_gameplay_final_damage_pct =
+                tonumber(permanent.global_final_damage_bonus_pct) or 0
             apply_lumberjack_attack(state, attack_growth)
             state.technology_attack_growth = attack_growth * multiplier
             state.technology_armor_reduction = armor_reduction * multiplier
@@ -374,6 +405,12 @@ local function refresh_worker_technology(player_id)
             end
             if modifier and modifier.SetTechnologyCritChance then
                 modifier:SetTechnologyCritChance(crit_chance)
+            end
+            if modifier and modifier.SetHarvestBonuses then
+                modifier:SetHarvestBonuses(
+                    permanent.lumberjack_harvest_yield_bonus_pct,
+                    permanent.lumberjack_critical_yield_bonus_pct
+                )
             end
             if modifier and modifier.SetTechnologyArmorReduction then
                 modifier:SetTechnologyArmorReduction(state.technology_armor_reduction)
@@ -402,7 +439,13 @@ local function on_tree_hit(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil then return end
     local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
-    local amount = tonumber(lumberjack.attack_gain_per_attack) or 0
+    local permanent_result = event_bus.request(
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local permanent = permanent_result and permanent_result.totals or {}
+    local amount = (tonumber(lumberjack.attack_gain_per_attack) or 0)
+        + (tonumber(permanent.lumberjack_attack_growth) or 0)
     local attacker_state = nil
     local attacker = payload.attacker
     local attacker_entindex = valid_entity(attacker) and attacker:entindex() or nil
@@ -637,7 +680,13 @@ local function train_worker_one(payload)
                 existing_count = existing_count + 1
             end
         end
-        local max_count = tonumber(training.max_count) or 0
+        local permanent = event_bus.request(
+            events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+            { player_id = city_state.player_id }
+        )
+        local max_count = (tonumber(training.max_count) or 0)
+            + (tonumber(permanent and permanent.totals
+                and permanent.totals.farmer_cap) or 0)
         if max_count > 0 and existing_count >= max_count then
             return { ok = false, error = "training_max_count_reached" }
         end
@@ -783,6 +832,7 @@ local function train_worker_one(payload)
         base_damage_min = base_attack,
         base_damage_max = base_attack,
         base_attack_speed = attack_speed,
+        base_attack_range = attack_range,
         base_lumber_efficiency = tonumber(training.wood_per_hit) or 0,
         tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
         technology_efficiency = technology_efficiency,
@@ -927,6 +977,7 @@ function M.register_fused_lumberjack(worker, data)
         base_damage_min = inherited_base_attack,
         base_damage_max = inherited_base_attack,
         base_attack_speed = attack_speed,
+        base_attack_range = tonumber(data.attack_range) or 400,
         fusion_interval_reduction = tonumber(data.fusion_interval_reduction) or 0,
         technology_multiplier = fusion_count,
         base_lumber_efficiency = wood_per_hit,
@@ -1218,6 +1269,8 @@ function M.init()
     event_bus.subscribe(events.TREE_DEPLETED, on_tree_depleted)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,
+        on_technology_stats_changed)
     event_bus.subscribe(events.BUILDING_CREATED, function(payload)
         if payload and payload.player_id ~= nil then
             refresh_cheer_buffs(tonumber(payload.player_id))

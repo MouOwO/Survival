@@ -1,9 +1,11 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local armor_balance = require("config/armor_balance")
 
 local M = {}
 local hit_count_by_target = {}
+local last_attack_id_by_target = {}
 local callback_count = 0
 
 print("[RESEARCH_ARMOR_SERVICE_LOAD] version=20260801_upstream_diagnostic")
@@ -75,19 +77,53 @@ local function on_main_attack_landed(payload)
         end
         return
     end
-    local technology = technology_stat_manager.get(player_id)
-    local reduction = tonumber(
-        technology and technology.final and technology.final.hero
-            and technology.final.hero.armor_reduction_per_attack
-    ) or 0
+    local attack_id = payload and payload.attack_id
+    if attack_id ~= nil then
+        local attack_key = tostring(safe_call(attacker, "entindex", attacker))
+            .. ":" .. tostring(safe_call(target, "entindex", target))
+        if last_attack_id_by_target[attack_key] == attack_id then
+            return
+        end
+        last_attack_id_by_target[attack_key] = attack_id
+    end
     local permanent = event_bus.request(
         events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
         { player_id = player_id }
     )
-    reduction = reduction + tonumber(
+    local technology = technology_stat_manager.get(player_id)
+    local reduction = permanent and permanent.test_isolation and 0 or tonumber(
+        technology and technology.final and technology.final.hero
+            and technology.final.hero.armor_reduction_per_attack
+    ) or 0
+    local permanent_fixed_war3 = tonumber(
         permanent and permanent.totals
             and permanent.totals.hero_attack_armor_reduction
     ) or 0
+    local global_fixed_war3 = tonumber(permanent and permanent.totals
+        and permanent.totals.global_attack_armor_reduction) or 0
+    -- Gameplay-stat armor values are authored in visible War3 units. The
+    -- reduction modifier accepts Dota runtime armor; research technology
+    -- values are already converted by research_effect_service.
+    reduction = reduction + armor_balance.from_war3_linear(
+        permanent_fixed_war3 + global_fixed_war3
+    )
+    local percent = tonumber(permanent and permanent.totals
+        and permanent.totals.hero_attack_armor_reduction_pct) or 0
+    if percent > 0 then
+        local current_war3 = tonumber(target.survival_effective_war3_armor)
+        if current_war3 ~= nil then
+            -- The reduction modifier accepts legacy Dota-armor units and
+            -- projects them back to War3 units for mapped monsters.
+            reduction = reduction + armor_balance.from_war3_linear(
+                math.max(0, current_war3) * percent / 100
+            )
+        else
+            local current_armor = tonumber(safe_call(
+                target, "GetPhysicalArmorValue", 0, false
+            )) or 0
+            reduction = reduction + math.max(0, current_armor) * percent / 100
+        end
+    end
     if reduction <= 0 then
         if diagnostic then
             print(string.format(
@@ -162,6 +198,7 @@ end
 
 function M.init()
     hit_count_by_target = {}
+    last_attack_id_by_target = {}
     callback_count = 0
     local subscription = event_bus.subscribe(
         events.HERO_MAIN_ATTACK_LANDED,
@@ -173,6 +210,38 @@ function M.init()
         tostring(subscription ~= nil),
         tostring(subscription and subscription.token)
     ))
+end
+
+-- An isolated field test must not inherit a cumulative shred modifier from a
+-- previous order. This command is developer-only, so clearing the shared
+-- combat targets is intentional and keeps the next hit deterministic.
+function M.reset_for_isolated_test()
+    hit_count_by_target = {}
+    last_attack_id_by_target = {}
+    if not Entities or type(Entities.FindAllByClassname) ~= "function" then
+        return true
+    end
+    for _, class_name in ipairs({ "npc_dota_creature", "npc_dota_building" }) do
+        for _, unit in ipairs(Entities:FindAllByClassname(class_name) or {}) do
+            if valid_unit(unit) then
+                if type(unit.HasModifier) == "function"
+                    and unit:HasModifier("modifier_research_armor_reduction") then
+                    unit:RemoveModifierByName("modifier_research_armor_reduction")
+                end
+                if tonumber(unit.survival_war3_armor) ~= nil then
+                    unit.survival_war3_armor_reduction = 0
+                    unit.survival_effective_war3_armor =
+                        armor_balance.effective_war3_armor(
+                            unit.survival_war3_armor,
+                            0,
+                            unit.survival_minimum_war3_armor,
+                            unit.survival_poison_cloud_armor_reduction_pct
+                        )
+                end
+            end
+        end
+    end
+    return true
 end
 
 M._test = { on_main_attack_landed = on_main_attack_landed }

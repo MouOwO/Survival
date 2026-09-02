@@ -25,6 +25,8 @@ function M:ApplyValues(params)
         or self.final_damage_pct or 0
     self.armor_reduction = tonumber(params.armor_reduction)
         or self.armor_reduction or 0
+    self.gameplay_armor_bonus = tonumber(params.gameplay_armor_bonus)
+        or self.gameplay_armor_bonus or 0
     if IsServer() then
         self:GetParent().survival_research_final_damage_pct =
             self.final_damage_pct
@@ -32,13 +34,14 @@ function M:ApplyValues(params)
 end
 
 function M:SetTechnologyValues(attack_pct, final_damage_pct, armor_reduction,
-        critical_chance_pct)
+        critical_chance_pct, gameplay_armor_bonus)
     self.attack_pct = math.max(0, tonumber(attack_pct) or 0)
     self.final_damage_pct = math.max(0, tonumber(final_damage_pct) or 0)
     self.armor_reduction = math.max(0, tonumber(armor_reduction) or 0)
     self.critical_chance_pct = math.max(
         0, tonumber(critical_chance_pct) or 0
     )
+    self.gameplay_armor_bonus = tonumber(gameplay_armor_bonus) or 0
     self:GetParent().survival_research_final_damage_pct =
         self.final_damage_pct
     self:ForceRefresh()
@@ -51,7 +54,11 @@ function M:OnDestroy()
 end
 
 function M:DeclareFunctions()
-    return {}
+    return { MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS }
+end
+
+function M:GetModifierPhysicalArmorBonus()
+    return armor_balance.from_war3(self.gameplay_armor_bonus or 0)
 end
 
 local D = modifier_research_armor_reduction

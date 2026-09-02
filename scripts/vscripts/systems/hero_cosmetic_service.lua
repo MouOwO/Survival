@@ -19,6 +19,7 @@ local function definition_for(hero_id)
         wearables[#wearables + 1] = {
             id = component.component_id,
             model = component.model_path,
+            entity_class = component.entity_class,
             skin = component.model_skin,
             material_group = component.material_group,
         }
@@ -34,6 +35,7 @@ local function definition_for(hero_id)
                 path = effect.particle_path,
                 owner = effect.owner_component_id,
                 attach_type = effect.attach_type,
+                attachment_point = effect.attachment_point,
             }
         end
     end
@@ -115,14 +117,133 @@ local function clear_cosmetics(hero_entindex)
     cosmetics_by_hero[hero_entindex] = nil
 end
 
-local function hide_default_wearables(hero, custom_wearables)
-    local ok, child = safe_call(hero, "FirstMoveChild")
-    if not ok then
-        return
+local function walk_children(hero, visitor)
+    local visited = {}
+    local function visit(child)
+        if not valid_entity(child) then return end
+        local index_ok, index = safe_call(child, "entindex")
+        local key = index_ok and index or child
+        if visited[key] then return end
+        visited[key] = true
+        visitor(child)
     end
 
-    local no_draw = rawget(_G, "EF_NODRAW") or 32
+    local ok, child = safe_call(hero, "FirstMoveChild")
+    while ok and valid_entity(child) do
+        local next_ok, next_child = safe_call(child, "NextMovePeer")
+        visit(child)
+        child = next_child
+        ok = next_ok
+    end
 
+    -- Some ReplaceHeroWith paths expose native wearables through GetChildren
+    -- but not through the move-peer chain. Keep this as a compatibility
+    -- fallback; the entindex guard prevents duplicate processing.
+    local children_ok, children = safe_call(hero, "GetChildren")
+    if children_ok and type(children) == "table" then
+        for _, candidate in pairs(children) do
+            visit(candidate)
+        end
+    end
+end
+
+-- ReplaceHeroWith may expose Valve's native wearables as standalone entities
+-- owned by the hero instead of move-children.  This is the same ownership
+-- sweep used by the building appearance service; keep it local so hero
+-- cosmetics do not depend on one particular engine parenting layout.
+local function entity_belongs_to(entity, owner)
+    local visited = {}
+    local function matches(candidate, depth)
+        if candidate == owner then return true end
+        if candidate == nil or type(candidate) == "number"
+            or type(candidate) == "string" then
+            return false
+        end
+        if not valid_entity(candidate) or depth <= 0 then return false end
+        local index_ok, index = safe_call(candidate, "entindex")
+        local key = index_ok and index or candidate
+        if visited[key] then return false end
+        visited[key] = true
+        for _, method_name in ipairs({
+            "GetOwner",
+            "GetOwnerEntity",
+            "GetParent",
+            "GetMoveParent",
+        }) do
+            local ok, parent = safe_call(candidate, method_name)
+            if ok and parent ~= nil and matches(parent, depth - 1) then
+                return true
+            end
+        end
+        return candidate.owner == owner
+    end
+
+    -- Keep all parent/owner forms in the recursive check: some native
+    -- wearables are parented through an intermediate carrier or player owner.
+    -- The bounded depth and entindex guard prevent engine-side cycles.
+    return matches(entity, 4)
+end
+
+local function each_live_entity(class_name, visitor)
+    local entities_api = rawget(_G, "Entities")
+    if not entities_api then return end
+    local seen = {}
+    local function visit(entity)
+        if not valid_entity(entity) then return end
+        local index_ok, index = safe_call(entity, "entindex")
+        local key = index_ok and index or entity
+        if seen[key] then return end
+        seen[key] = true
+        visitor(entity)
+    end
+
+    if type(entities_api.FindAllByClassname) == "function" then
+        local ok, entities = pcall(
+            entities_api.FindAllByClassname,
+            entities_api,
+            class_name
+        )
+        if ok then
+            for _, entity in ipairs(entities or {}) do visit(entity) end
+        end
+    end
+    if type(entities_api.FindByClassname) == "function" then
+        local previous = nil
+        for _ = 1, 4096 do
+            local ok, entity = pcall(
+                entities_api.FindByClassname,
+                entities_api,
+                previous,
+                class_name
+            )
+            if not ok or not valid_entity(entity) or entity == previous then
+                break
+            end
+            visit(entity)
+            previous = entity
+        end
+    end
+end
+
+local function apply_native_wearable_visibility(child, visible)
+    if visible then
+        safe_call(child, "RemoveNoDraw")
+        safe_call(child, "RemoveEffects", rawget(_G, "EF_NODRAW") or 32)
+        if type(child.SetRenderAlpha) == "function" then
+            safe_call(child, "SetRenderAlpha", 255)
+        end
+        return
+    end
+    -- SetRenderAlpha is a reliable fallback for wearables materialized outside
+    -- the hero's child chain; AddNoDraw/EF_NODRAW remains the hard hide path.
+    if type(child.SetRenderAlpha) == "function" then
+        safe_call(child, "SetRenderAlpha", 0)
+    end
+    safe_call(child, "AddNoDraw")
+    safe_call(child, "AddEffects", rawget(_G, "EF_NODRAW") or 32)
+end
+
+local function hide_default_wearables(hero, custom_wearables, pass_label)
     -- 记录我们自己生成的 wearable
     local custom_indices = {}
 
@@ -137,14 +258,27 @@ local function hide_default_wearables(hero, custom_wearables)
         end
     end
 
-    while valid_entity(child) do
-        local next_ok, next_child =
-            safe_call(child, "NextMovePeer")
+    local child_native_count = 0
+    local hidden_count = 0
+    local global_native_count = 0
+    local owner_match_count = 0
+    local unmatched_models = {}
+    local hidden_entities = {}
+    local function hide_once(entity)
+        local index_ok, index = safe_call(entity, "entindex")
+        local key = index_ok and index or entity
+        if hidden_entities[key] then return end
+        hidden_entities[key] = true
+        apply_native_wearable_visibility(entity, false)
+        hidden_count = hidden_count + 1
+    end
 
+    walk_children(hero, function(child)
         local class_ok, class_name =
             safe_call(child, "GetClassname")
 
         if class_ok and class_name == "dota_item_wearable" then
+            child_native_count = child_native_count + 1
 
             local index_ok, child_index =
                 safe_call(child, "entindex")
@@ -156,26 +290,51 @@ local function hide_default_wearables(hero, custom_wearables)
                 and child_index
                 and custom_indices[child_index]
             ) then
-                safe_call(child, "AddEffects", no_draw)
+                hide_once(child)
             end
         end
+    end)
 
-        child = next_ok and next_child or nil
-    end
+    each_live_entity("dota_item_wearable", function(wearable)
+        global_native_count = global_native_count + 1
+        local index_ok, wearable_index = safe_call(wearable, "entindex")
+        if index_ok and wearable_index and custom_indices[wearable_index] then
+            return
+        end
+        if entity_belongs_to(wearable, hero) then
+            owner_match_count = owner_match_count + 1
+            hide_once(wearable)
+        elseif #unmatched_models < 8 then
+            local model_ok, model_path = safe_call(wearable, "GetModelName")
+            unmatched_models[#unmatched_models + 1] = model_ok
+                and tostring(model_path or "<empty>") or "<unknown>"
+        end
+    end)
+
+    logger.info(
+        "HeroCosmetic",
+        "native_hide hero=" .. tostring(hero:entindex())
+            .. " pass=" .. tostring(pass_label or "immediate")
+            .. " child=" .. tostring(child_native_count)
+            .. " global=" .. tostring(global_native_count)
+            .. " owner_match=" .. tostring(owner_match_count)
+            .. " hidden=" .. tostring(hidden_count)
+            .. " unmatched_models=" .. table.concat(unmatched_models, "|")
+    )
 end
 
 local function show_default_wearables(hero)
-    local ok, child = safe_call(hero, "FirstMoveChild")
-    if not ok then return end
-    local no_draw = rawget(_G, "EF_NODRAW") or 32
-    while valid_entity(child) do
-        local next_ok, next_child = safe_call(child, "NextMovePeer")
+    walk_children(hero, function(child)
         local class_ok, class_name = safe_call(child, "GetClassname")
         if class_ok and class_name == "dota_item_wearable" then
-            safe_call(child, "RemoveEffects", no_draw)
+            apply_native_wearable_visibility(child, true)
         end
-        child = next_ok and next_child or nil
-    end
+    end)
+    each_live_entity("dota_item_wearable", function(wearable)
+        if entity_belongs_to(wearable, hero) then
+            apply_native_wearable_visibility(wearable, true)
+        end
+    end)
 end
 
 local function normalize_wearable(entry, index)
@@ -195,7 +354,7 @@ local function spawn_wearable(hero, component_id, model_path, appearance)
     end
     local ok, wearable = pcall(
         SpawnEntityFromTableSynchronous,
-        "dota_item_wearable",
+        tostring(appearance.entity_class or "dota_item_wearable"),
         {
             model = model_path,
         }
@@ -287,6 +446,22 @@ local function spawn_particle(hero, particle, components)
         )
         return nil
     end
+    if particle.attachment_point and particle.attachment_point ~= "" then
+        local origin_ok, origin = safe_call(owner, "GetAbsOrigin")
+        if origin_ok and origin ~= nil then
+            safe_call(
+                ParticleManager,
+                "SetParticleControlEnt",
+                particle_id,
+                0,
+                owner,
+                rawget(_G, "PATTACH_POINT_FOLLOW") or 5,
+                particle.attachment_point,
+                origin,
+                true
+            )
+        end
+    end
     return particle_id
 end
 
@@ -372,9 +547,7 @@ function M.apply(hero, hero_id)
     end
 
     clear_cosmetics(hero_entindex)
-    if definition.hide_default_wearables then
-        hide_default_wearables(hero, spawned)
-    else
+    if not definition.hide_default_wearables then
         show_default_wearables(hero)
     end
 
@@ -399,6 +572,13 @@ function M.apply(hero, hero_id)
     end
     if definition.material_group then
         safe_call(hero, "SetMaterialGroup", definition.material_group)
+    end
+    -- SetModel/SetOriginalModel can recreate or re-expose Valve's native
+    -- wearables. Hide them only after the final body model is in place; custom
+    -- prop_dynamic components remain visible because the helper filters by
+    -- classname and custom entity index.
+    if definition.hide_default_wearables then
+        hide_default_wearables(hero, spawned, "immediate")
     end
     for _, modifier in ipairs(definition.activity_modifiers or {}) do
         safe_call(hero, "AddActivityModifier", modifier.modifier_name)
@@ -442,6 +622,27 @@ function M.apply(hero, hero_id)
         generation = generation,
     }
     local state = cosmetics_by_hero[hero_entindex]
+    if definition.hide_default_wearables and GameRules then
+        -- ReplaceHeroWith can materialize native wearables over several frames.
+        -- Use a few short, generation-guarded passes instead of changing the
+        -- hero model architecture or hiding the playable hero itself.
+        for retry, delay in ipairs({ 0.10, 0.35, 0.80 }) do
+            scheduler.after(
+                delay,
+                function()
+                    if cosmetics_by_hero[hero_entindex] ~= state
+                        or generation_by_hero[hero_entindex] ~= generation
+                        or not valid_entity(hero) then
+                        return
+                    end
+                    hide_default_wearables(hero, state.wearables,
+                        "delayed_" .. tostring(retry))
+                end,
+                "hero_cosmetic_hide_" .. tostring(hero_entindex)
+                    .. "_" .. tostring(retry)
+            )
+        end
+    end
     for _, particle_id in ipairs(spawn_particles) do
         local task_id
         task_id = scheduler.after(

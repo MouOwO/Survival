@@ -26,7 +26,7 @@ local runtime = {
     intellect = 40,
     model_asset_id = "hero_permanent_hero_blademaster",
     portrait_unit_name = "npc_dota_hero_juggernaut",
-    portrait_item_def = "9059",
+    portrait_item_def = "",
 }
 local projected = projection.for_ui(runtime)
 close(projected.armor, 10, "projected armor")

@@ -34,6 +34,12 @@ local function apply_runtime_params(self, params)
     self.wood_total_bonus_pct = math.max(
         0, tonumber(params.wood_total_bonus_pct) or 0
     )
+    self.permanent_harvest_bonus_pct = math.max(
+        0, tonumber(params.permanent_harvest_bonus_pct) or 0
+    )
+    self.critical_yield_bonus_pct = math.max(
+        0, tonumber(params.critical_yield_bonus_pct) or 0
+    )
     self.gold_per_hit_flat = math.max(0, tonumber(params.gold_per_hit_flat) or 0)
     self.tree_damage_chance_pct = math.max(
         0, tonumber(params.tree_damage_chance_pct) or 0
@@ -107,6 +113,15 @@ function M:SetTechnologyLumberEfficiency(value)
 end
 function M:SetTechnologyCritChance(value)
     self.technology_crit_chance = math.max(0, tonumber(value) or 0)
+end
+
+function M:SetHarvestBonuses(harvest_bonus_pct, critical_yield_bonus_pct)
+    self.permanent_harvest_bonus_pct = math.max(
+        0, tonumber(harvest_bonus_pct) or 0
+    )
+    self.critical_yield_bonus_pct = math.max(
+        0, tonumber(critical_yield_bonus_pct) or 0
+    )
 end
 
 function M:SetTechnologyArmorReduction(value)
@@ -214,7 +229,9 @@ function M:OnAttackLanded(keys)
         critical_chance_pct = self.technology_crit_chance or 0,
         fusion_count = self.fusion_count,
         wood_multiplier_chance_pct = self.wood_multiplier_chance_pct,
-        wood_total_bonus_pct = self.wood_total_bonus_pct,
+        wood_total_bonus_pct = (self.wood_total_bonus_pct or 0)
+            + (self.permanent_harvest_bonus_pct or 0),
+        critical_yield_bonus_pct = self.critical_yield_bonus_pct or 0,
         gold_per_hit_flat = self.gold_per_hit_flat,
         tree_damage_chance_pct = self.tree_damage_chance_pct,
         personality_attack_growth_per_hit = self.personality_attack_growth_per_hit,

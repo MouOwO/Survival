@@ -38,6 +38,40 @@ local function technology_level(player_id, group)
     return tonumber(levels[group]) or 0
 end
 
+local function permanent_stats(player_id)
+    -- Gold mines can be initialized by isolated map/test flows before the
+    -- permanent-profile service has registered its request handler.
+    local ok, result = pcall(
+        event_bus.request,
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    if not ok then return {} end
+    return result and result.totals or {}
+end
+
+local function profile_income(state, base_amount)
+    local permanent = permanent_stats(state.player_id)
+    local technology = {}
+    local technology_ok, technology_state = pcall(
+        technology_stat_manager.get,
+        state.player_id
+    )
+    if technology_ok and technology_state then
+        technology = technology_state.final.gold_mine or {}
+    end
+    local percent = (tonumber(technology.income_bonus_pct) or 0)
+        + (tonumber(permanent.gold_mine_efficiency_pct) or 0)
+        + (tonumber(permanent.gold_mine_yield_bonus_pct) or 0)
+    local amount = ((tonumber(base_amount) or 0)
+        + (tonumber(permanent.gold_mine_yield_flat) or 0))
+        * (1 + percent / 100)
+        + (tonumber(permanent.gold_mine_final_output_flat) or 0)
+    local interval = math.max(0.05, config.production_interval
+        - (tonumber(permanent.gold_mine_income_interval_reduction) or 0))
+    return math.max(0, amount), interval, percent
+end
+
 local function set_ability_visible(unit, ability_name, visible)
     local ability = unit:FindAbilityByName(ability_name)
     if not ability then return end
@@ -86,6 +120,10 @@ local function publish(state)
         "gold_mine_crit"
     )
     local level_data = config.level_data(state.mine_level) or {}
+    local normal_income, effective_interval, profile_percent = profile_income(
+        state,
+        config.normal_income(state.mine_level, efficiency_level)
+    )
     event_bus.emit(events.GOLD_MINE_CHANGED, {
         unit = state.unit,
         entindex = state.unit:entindex(),
@@ -96,8 +134,9 @@ local function publish(state)
         mine_level = state.mine_level,
         efficiency_level = efficiency_level,
         crit_level = crit_level,
-        income_per_second = config.normal_income(state.mine_level, efficiency_level),
-        efficiency_percent = config.efficiency_percent(efficiency_level),
+        income_per_second = normal_income / effective_interval,
+        efficiency_percent = config.efficiency_percent(efficiency_level)
+            + profile_percent,
         efficiency_bonus = config.efficiency_bonus(
             tonumber(level_data.base_income) or 0,
             efficiency_level
@@ -424,12 +463,11 @@ local function tick()
                 efficiency_level,
                 crit
             )
-            local gold_mine = technology_stat_manager.get(
-                state.player_id
-            ).final.gold_mine or {}
-            amount = math.floor(amount * (
-                1 + (tonumber(gold_mine.income_bonus_pct) or 0) / 100
-            ))
+            local exact, effective_interval = profile_income(state, amount)
+            exact = exact * config.production_interval / effective_interval
+                + (tonumber(state.income_fraction) or 0)
+            amount = math.floor(exact + 0.0000001)
+            state.income_fraction = exact - amount
             local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
                 player_id = state.player_id,
                 team = state.team, gold = amount,
@@ -468,6 +506,13 @@ function M.init()
     event_bus.handle_request(events.GOLD_MINE_LEVEL_UPGRADE_REQUEST, upgrade_mine)
     event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
+        for _, state in pairs(state_by_entindex) do
+            if state.player_id == tonumber(payload and payload.player_id) then
+                publish(state)
+            end
+        end
+    end)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, function(payload)
         for _, state in pairs(state_by_entindex) do
             if state.player_id == tonumber(payload and payload.player_id) then
                 publish(state)

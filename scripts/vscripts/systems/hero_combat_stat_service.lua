@@ -16,6 +16,7 @@ local hero_combat_stat_math = require("systems/hero_combat_stat_math")
 local hero_stat_adapter = require("systems/hero_stat_adapter")
 local monkey_runtime = require("config/generated/monkey_king_exclusive_runtime")
 local blademaster_runtime = require("config/generated/blademaster_exclusive_runtime")
+local armor_balance = require("config/armor_balance")
 
 local M = {}
 local state_by_player = {}
@@ -273,6 +274,28 @@ local function recalculate(player_id, reason)
         { player_id = player_id }
     )
     local permanent = permanent_result and permanent_result.totals or {}
+    researcher_attack_pct = researcher_attack_pct
+        + (tonumber(permanent.hero_attack_bonus_pct) or 0)
+    researcher_armor_reduction = researcher_armor_reduction
+        + armor_balance.from_war3_linear(
+            tonumber(permanent.global_attack_armor_reduction) or 0
+        )
+    researcher_critical_chance_pct = researcher_critical_chance_pct
+        + (tonumber(permanent.hero_critical_chance_pct) or 0)
+    researcher_attack_speed_pct = researcher_attack_speed_pct
+        + (tonumber(permanent.hero_attack_speed_bonus_pct) or 0)
+    researcher_attack_interval_flat = researcher_attack_interval_flat
+        + (tonumber(permanent.hero_attack_interval_reduction) or 0)
+    local armor_flat_bonus = (tonumber(permanent.hero_initial_armor) or 0)
+        + (tonumber(permanent.team_hero_wall_armor_bonus) or 0)
+    -- Percentage armor bonuses use the current panel, including fused
+    -- equipment armor and already-added flat hero/team armor.
+    local panel_armor = authoritative_war3_armor + armor_flat_bonus
+    local gameplay_armor_bonus = panel_armor
+            * (tonumber(permanent.hero_armor_bonus_pct) or 0) / 100
+        + armor_flat_bonus
+    authoritative_war3_armor = authoritative_war3_armor
+        + gameplay_armor_bonus
     local progression_attributes = (tonumber(progression.all_attributes) or 0)
         + (tonumber(permanent.hero_all_attributes_flat) or 0)
     local progression_attack_flat = (tonumber(progression.attack_flat) or 0)
@@ -280,12 +303,22 @@ local function recalculate(player_id, reason)
     local essence_attack_pct = tonumber(essence.attack_bonus_pct) or 0
     researcher_armor_reduction = researcher_armor_reduction
         + (tonumber(essence.armor_reduction_per_attack) or 0)
-        + (tonumber(permanent.hero_attack_armor_reduction) or 0)
+        + armor_balance.from_war3_linear(
+            tonumber(permanent.hero_attack_armor_reduction) or 0
+        )
     local essence_attributes_pct = tonumber(essence.all_attributes_pct) or 0
+    -- Percentage attack bonuses use the current displayed panel. Include
+    -- equipment and all flat attack already present before applying the
+    -- percentage; equipment still contributes its flat value separately via
+    -- modifier_equipment_effects.
+    local total_attack_pct = researcher_attack_pct + essence_attack_pct
+    local flat_panel_attack = equipment_stats.attack_flat
+        + researcher_attack_flat + progression_attack_flat
     local engine_research_attack_bonus = (((state.engine_base_attack_min
         + state.engine_base_attack_max
         + weapon_attack_min + weapon_attack_max)
-        * 0.5) * (researcher_attack_pct + essence_attack_pct) / 100
+        * 0.5) * total_attack_pct / 100
+        + flat_panel_attack * total_attack_pct / 100
         + researcher_attack_flat
         + progression_attack_flat) * exclusive_attack_multiplier
     local engine_weapon_attack_bonus = (debug_attack
@@ -297,30 +330,48 @@ local function recalculate(player_id, reason)
             * exclusive_attack_multiplier
     local engine_bonus_attack = engine_research_attack_bonus
         + engine_weapon_attack_bonus
-    local unscaled_strength = state.base.strength + weapon_strength
+    local raw_strength = state.base.strength + weapon_strength
         + progression_attributes
         + researcher_all_attributes
         + equipment_stats.all_attributes_flat
         + (tonumber(monkey_bonus.strength) or 0)
-    local unscaled_agility = state.base.agility + weapon_agility
+    local raw_agility = state.base.agility + weapon_agility
         + progression_attributes
         + researcher_all_attributes
         + equipment_stats.all_attributes_flat
         + (tonumber(monkey_bonus.agility) or 0)
-    local unscaled_intellect = state.base.intellect + weapon_intellect
+    local raw_intellect = state.base.intellect + weapon_intellect
         + progression_attributes
         + researcher_all_attributes
         + equipment_stats.all_attributes_flat
         + (tonumber(monkey_bonus.intellect) or 0)
+    local rebirth_level = math.max(0,
+        tonumber(progression.rebirth_level) or 0)
+    local gameplay_attribute_multiplier =
+        (1 + (tonumber(permanent.hero_attribute_bonus_pct) or 0) / 100)
+        * (1 + rebirth_level
+            * (tonumber(permanent.hero_rebirth_attribute_bonus_pct) or 0)
+                / 100)
+    local unscaled_strength = raw_strength * gameplay_attribute_multiplier
+    local unscaled_agility = raw_agility * gameplay_attribute_multiplier
+    local unscaled_intellect = raw_intellect * gameplay_attribute_multiplier
     local strength_bonus = unscaled_strength * essence_attributes_pct / 100
     local agility_bonus = unscaled_agility * essence_attributes_pct / 100
     local intellect_bonus = unscaled_intellect * essence_attributes_pct / 100
     local final_strength = unscaled_strength + strength_bonus
     local final_intellect = unscaled_intellect + intellect_bonus
-    local attribute_health_bonus = hero_combat_stat_math.strength_health_bonus(
+    local base_attribute_health_bonus = hero_combat_stat_math.strength_health_bonus(
         final_strength,
         global_rules.hero_strength_health_per_point
-    )
+    ) + (tonumber(permanent.hero_initial_health) or 0)
+    -- Health percentage uses the current panel, including fused equipment
+    -- health and the configured/attribute health already on the hero.
+    local configured_panel_health = hero_stat_adapter.configured_max_health(
+        state.definition, base_attribute_health_bonus
+    ) or value(state.definition, "base_health", 0)
+    local panel_health = configured_panel_health + equipment_stats.health_flat
+    local attribute_health_bonus = base_attribute_health_bonus
+        + panel_health * (tonumber(permanent.hero_health_bonus_pct) or 0) / 100
     local attribute_attack_bonus = hero_combat_stat_math.intellect_attack_bonus(
         final_intellect,
         global_rules.hero_intellect_attack_per_point
@@ -358,22 +409,19 @@ local function recalculate(player_id, reason)
         weapon_name = equipment.main_hand_name ~= ""
             and equipment.main_hand_name or "未装备武器",
         attack_min = (debug_attack or ((state.base.attack_min + weapon_attack_min
-            + attribute_attack_bonus)
-            * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
-            + equipment_stats.attack_flat
-            + researcher_attack_flat
-            + progression_attack_flat)) * exclusive_attack_multiplier,
+            + attribute_attack_bonus + flat_panel_attack)
+            * (1 + total_attack_pct / 100))) * exclusive_attack_multiplier,
         attack_max = (debug_attack or ((state.base.attack_max + weapon_attack_max
-            + attribute_attack_bonus)
-            * (1 + (researcher_attack_pct + essence_attack_pct) / 100)
-            + equipment_stats.attack_flat
-            + researcher_attack_flat
-            + progression_attack_flat)) * exclusive_attack_multiplier,
+            + attribute_attack_bonus + flat_panel_attack)
+            * (1 + total_attack_pct / 100))) * exclusive_attack_multiplier,
         health = current_health or safe_get(state.unit, "GetMaxHealth", 1),
         max_health = safe_get(state.unit, "GetMaxHealth", 1),
         attribute_health_bonus = attribute_health_bonus,
         attribute_attack_bonus = attribute_attack_bonus,
         researcher_attack_pct = researcher_attack_pct,
+        hero_attack_bonus_pct = tonumber(permanent.hero_attack_bonus_pct) or 0,
+        hero_health_bonus_pct = tonumber(permanent.hero_health_bonus_pct) or 0,
+        hero_armor_bonus_pct = tonumber(permanent.hero_armor_bonus_pct) or 0,
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
         researcher_critical_chance_pct = researcher_critical_chance_pct,
@@ -384,7 +432,8 @@ local function recalculate(player_id, reason)
         critical_damage_pct = (monkey_w
             and (tonumber(monkey_config.w_critical_damage_pct) or 200) or 200)
             + (blademaster_q and math.max(0,
-                tonumber(blademaster_config.q_critical_damage_bonus_pct) or 0) or 0),
+                tonumber(blademaster_config.q_critical_damage_bonus_pct) or 0) or 0)
+            + (tonumber(permanent.hero_critical_damage_bonus_pct) or 0),
         exclusive_attack_multiplier = exclusive_attack_multiplier,
         monkey_king_w_unlocked = monkey_w and 1 or 0,
         monkey_king_e_unlocked = monkey_e and 1 or 0,
@@ -473,6 +522,26 @@ local function recalculate(player_id, reason)
         / math.max(0.01, 1 + researcher_attack_speed_pct / 100))
     state.unit.survival_seven_sins_final_damage_pct =
         tonumber(essence.final_damage_pct) or 0
+    state.unit.survival_gameplay_final_damage_pct =
+        (tonumber(permanent.hero_final_damage_bonus_pct) or 0)
+        + (tonumber(permanent.global_final_damage_bonus_pct) or 0)
+    state.unit.survival_gameplay_damage_bonus_flat =
+        tonumber(permanent.hero_damage_bonus_flat) or 0
+    state.unit.survival_gameplay_damage_reduction_pct = math.max(0,
+        math.min(100, tonumber(permanent.hero_damage_reduction_pct) or 0))
+    local attack_range = value(state.definition, "attack_range", 0)
+        + (tonumber(permanent.hero_attack_range) or 0)
+    if attack_range > 0 then
+        safe_call(state.unit, "Script_SetAttackRange", attack_range)
+        safe_call(state.unit, "SetAcquisitionRange", attack_range + 200)
+        state.unit.survival_attack_range = attack_range
+        local range_modifier = state.unit:FindModifierByName(
+            "modifier_survival_hero_attack_range"
+        )
+        if range_modifier and range_modifier.SetAttackRange then
+            range_modifier:SetAttackRange(attack_range)
+        end
+    end
     local research_modifier = state.unit:FindModifierByName(
         "modifier_research_technology"
     ) or state.unit:AddNewModifier(
@@ -483,7 +552,8 @@ local function recalculate(player_id, reason)
             researcher_attack_pct,
             researcher_final_damage_pct,
             researcher_armor_reduction,
-            researcher_critical_chance_pct
+            researcher_critical_chance_pct,
+            gameplay_armor_bonus
         )
     end
     local modifier = state.unit:FindModifierByName(

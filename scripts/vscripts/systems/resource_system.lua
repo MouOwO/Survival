@@ -31,6 +31,8 @@ local function new_account()
         debug_mode = false,
         initialized = false,
         profile_initial_wood = 0,
+        profile_initial_gold = 0,
+        profile_initial_population_cap = 0,
     }
 end
 
@@ -92,24 +94,52 @@ local function initialize_from_profile(payload)
     local stats = gameplay_stats(player_id)
     if not stats then return false end
     local profile_initial_wood = math.max(0, tonumber(stats.initial_wood) or 0)
+    local profile_initial_gold = math.max(0, tonumber(stats.initial_gold) or 0)
+    local profile_initial_population_cap = math.max(0,
+        tonumber(stats.initial_population_cap) or config.initial_max_population)
     if account.initialized then
-        local delta = profile_initial_wood - (tonumber(account.profile_initial_wood) or 0)
-        if delta > 0 then
-            account.wood = account.wood + delta
-            account.profile_initial_wood = profile_initial_wood
-            publish(player_id, "profile_initial_wood_reward")
+        local wood_delta = profile_initial_wood
+            - (tonumber(account.profile_initial_wood) or 0)
+        local gold_delta = profile_initial_gold
+            - (tonumber(account.profile_initial_gold) or 0)
+        local population_delta = profile_initial_population_cap
+            - (tonumber(account.profile_initial_population_cap) or 0)
+        if payload and payload.reason == "incremental" then
+            account.wood = math.max(0, account.wood + wood_delta)
+            account.gold = math.max(0, account.gold + gold_delta)
+        else
+            if wood_delta > 0 then
+                account.wood = account.wood + wood_delta
+            end
+            if gold_delta > 0 then
+                account.gold = account.gold + gold_delta
+            end
         end
+        account.profile_initial_wood = profile_initial_wood
+        account.profile_initial_gold = profile_initial_gold
+        account.profile_initial_population_cap = profile_initial_population_cap
         account.wood_per_second = math.max(0, tonumber(stats.wood_per_second) or 0)
         account.gold_per_second = math.max(0, tonumber(stats.gold_per_second) or 0)
+        if payload and payload.reason == "incremental" then
+            account.max_population = math.max(account.population,
+                account.max_population + population_delta)
+        else
+            account.max_population = math.max(account.max_population,
+                profile_initial_population_cap)
+        end
+        if wood_delta ~= 0 or gold_delta ~= 0 or population_delta ~= 0 then
+            publish(player_id, "profile_initial_resource_reward")
+        end
         return true
     end
     account.team = PlayerResource and PlayerResource.GetTeam
         and PlayerResource:GetTeam(player_id) or nil
     account.profile_initial_wood = profile_initial_wood
+    account.profile_initial_gold = profile_initial_gold
+    account.profile_initial_population_cap = profile_initial_population_cap
     account.wood = config.initial_wood + profile_initial_wood
-    account.gold = math.max(0, tonumber(stats.initial_gold) or config.initial_gold)
-    account.max_population = math.max(0,
-        tonumber(stats.initial_population_cap) or config.initial_max_population)
+    account.gold = config.initial_gold + profile_initial_gold
+    account.max_population = profile_initial_population_cap
     account.wood_per_second = math.max(0, tonumber(stats.wood_per_second) or 0)
     account.gold_per_second = math.max(0, tonumber(stats.gold_per_second) or 0)
     account.initialized = true

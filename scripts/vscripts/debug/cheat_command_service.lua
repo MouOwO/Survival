@@ -15,6 +15,9 @@ local building_system = require("systems/building_system")
 local global_rules = require("config/global_rules")
 local rogue_reward_service = require("systems/rogue_reward_service")
 local fishing_service = require("systems/fishing_service")
+local gameplay_stats_order_service = require(
+    "systems/player_gameplay_stats_order_service"
+)
 
 local M = {}
 
@@ -228,6 +231,53 @@ end
 
 local function add_wood(context)
     return change_resource(context, "wood", "addwood")
+end
+
+local function order_gameplay_stat(context)
+    if #context.args ~= 2 then
+        return false, "usage: order <field_id> <delta>"
+    end
+    local result = gameplay_stats_order_service.order(
+        context.player_id, context.args[1], context.args[2]
+    )
+    if not result or result.ok ~= true then
+        return false, result and result.error or "gameplay_stat_order_failed"
+    end
+    notify(context, string.format(
+        "词条已更新：%s %+g（当前 %g）",
+        tostring(result.field_id), tonumber(result.delta) or 0,
+        tonumber(result.new_value) or 0
+    ))
+    return true
+end
+
+local function test_gameplay_stat(context)
+    if #context.args ~= 2 then
+        return false, "usage: ordertest <field_id> <absolute_value>"
+    end
+    local result = gameplay_stats_order_service.test_order(
+        context.player_id, context.args[1], context.args[2]
+    )
+    if not result or result.ok ~= true then
+        return false, result and result.error or "gameplay_stat_test_failed"
+    end
+    notify(context, string.format(
+        "单词条测试：仅保留 %s = %g（其他词条已归零）",
+        tostring(result.field_id), tonumber(result.value) or 0
+    ))
+    return true
+end
+
+local function reset_gameplay_stats(context)
+    if #context.args ~= 0 then
+        return false, "usage: orderreset"
+    end
+    local result = gameplay_stats_order_service.reset_defaults(context.player_id)
+    if not result or result.ok ~= true then
+        return false, result and result.error or "gameplay_stat_reset_failed"
+    end
+    notify(context, "基础词条已恢复为字段表默认值，单词条隔离已关闭")
+    return true
 end
 
 local function summoned_hero(player_id)
@@ -813,6 +863,9 @@ local COMMANDS = {
     shopshow = show_shop,
     addgold = add_gold,
     addwood = add_wood,
+    order = order_gameplay_stat,
+    ordertest = test_gameplay_stat,
+    orderreset = reset_gameplay_stats,
     addhero = add_test_hero,
     addattack = add_attack,
     addarmor = add_armor,
@@ -902,7 +955,7 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, items, hero, skill, weapon growth"
+        "ready: addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
     )
 end
 

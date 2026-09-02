@@ -1,12 +1,20 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
+local armor_balance = require("config/armor_balance")
 
 local M = {}
 local totals_by_player = {}
 local hero_ticks_by_player = {}
 local tower_ticks_by_player = {}
 local tower_damage_bonus_by_player = {}
+local hero_damage_attack_bonus_by_player = {}
+local hero_basic_attack_bonus_by_player = {}
+local hero_growth_attributes_by_player = {}
+local tower_basic_attack_bonus_by_player = {}
+local wall_ticks_by_player = {}
+local test_isolated_field_by_player = {}
+local refresh_existing_enemy_armor = nil
 
 local function copy(source)
     local result = {}
@@ -16,17 +24,44 @@ local function copy(source)
     return result
 end
 
+local function add_values(target, source)
+    for key, value in pairs(source or {}) do
+        key = tostring(key)
+        target[key] = (tonumber(target[key]) or 0) + (tonumber(value) or 0)
+    end
+    return target
+end
+
 local function refresh(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
     local profile_service = require("systems/player_profile_service")
     local profile = profile_service.get_profile(player_id)
-    totals_by_player[player_id] = copy(
-        profile and profile.save and profile.save.permanent_effects or {}
-    )
+    local save = profile and profile.save or {}
+    local isolated_field = test_isolated_field_by_player[player_id]
+    if isolated_field then
+        totals_by_player[player_id] = {
+            [isolated_field] = tonumber(
+                save.gameplay_stats and save.gameplay_stats[isolated_field]
+            ) or 0,
+        }
+    else
+        totals_by_player[player_id] = add_values(
+            copy(save.permanent_effects), save.gameplay_stats
+        )
+    end
     hero_ticks_by_player[player_id] = hero_ticks_by_player[player_id] or 0
     tower_ticks_by_player[player_id] = tower_ticks_by_player[player_id] or 0
     tower_damage_bonus_by_player[player_id] = tower_damage_bonus_by_player[player_id] or 0
+    hero_damage_attack_bonus_by_player[player_id] =
+        hero_damage_attack_bonus_by_player[player_id] or 0
+    hero_basic_attack_bonus_by_player[player_id] =
+        hero_basic_attack_bonus_by_player[player_id] or 0
+    hero_growth_attributes_by_player[player_id] =
+        hero_growth_attributes_by_player[player_id] or 0
+    tower_basic_attack_bonus_by_player[player_id] =
+        tower_basic_attack_bonus_by_player[player_id] or 0
+    wall_ticks_by_player[player_id] = wall_ticks_by_player[player_id] or 0
     print("[PermanentReward] projection_refreshed player_id=" .. tostring(player_id)
         .. " revision=" .. tostring(profile and profile.revision or 0)
         .. " hero_all_attributes_flat="
@@ -36,6 +71,15 @@ local function refresh(payload)
         totals = copy(totals_by_player[player_id]),
         revision = profile and profile.revision or 0,
     })
+    for other_player_id in pairs(totals_by_player) do
+        if other_player_id ~= player_id then
+            event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
+                player_id = other_player_id,
+                reason = "shared_gameplay_stats_changed",
+            })
+        end
+    end
+    if refresh_existing_enemy_armor then refresh_existing_enemy_armor() end
 end
 
 local function valid_entity(unit)
@@ -80,18 +124,175 @@ end
 
 local function on_damage(payload)
     local player_id = tonumber(payload and payload.player_id)
-    if player_id == nil then return end
-    local attacker = payload.attacker
-    local flat = M.value(player_id, "tower_damage_attack_flat")
-    if flat > 0 and attacker and attacker.survival_building_id
-        and attacker.SetBaseDamageMin then
-        tower_damage_bonus_by_player[player_id] =
-            (tower_damage_bonus_by_player[player_id] or 0) + flat
+    if player_id == nil or not payload.owner_hero
+        or payload.attacker ~= payload.owner_hero then return end
+    local attack_growth = M.value(player_id, "hero_damage_attack_growth")
+    local attribute_growth = M.value(player_id, "hero_attributes_per_damage")
+    if attack_growth > 0 then
+        hero_damage_attack_bonus_by_player[player_id] =
+            (hero_damage_attack_bonus_by_player[player_id] or 0) + attack_growth
+    end
+    if attribute_growth > 0 then
+        hero_growth_attributes_by_player[player_id] =
+            (hero_growth_attributes_by_player[player_id] or 0) + attribute_growth
+    end
+    local wood = M.value(player_id, "hero_damage_wood_flat")
+    wood = wood * (1 + M.value(player_id, "hero_damage_wood_bonus_pct") / 100)
+    local gold = M.value(player_id, "hero_damage_gold_flat")
+    if wood ~= 0 or gold ~= 0 then
+        event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = player_id,
+            wood = wood,
+            gold = gold,
+            reason = "gameplay_stats_hero_damage_resource",
+        })
+    end
+    if attack_growth > 0 or attribute_growth > 0 then
         event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
             player_id = player_id,
-            reason = "star_blessing_tower_damage_attack_flat",
-            amount = flat,
-            damage = tonumber(payload.final_damage) or 0,
+            reason = "gameplay_stats_hero_damage_growth",
+        })
+    end
+end
+
+local function shared_value(effect_key)
+    local total = 0
+    for _, values in pairs(totals_by_player) do
+        total = total + (tonumber(values[effect_key]) or 0)
+    end
+    return total
+end
+
+local function apply_enemy_initial_armor(unit, confirmed_monster)
+    if not valid_entity(unit) or not (confirmed_monster == true
+        or unit.survival_is_wave_monster == true
+        or unit.survival_is_challenge_monster == true) then return end
+    local reduction = math.max(0, shared_value("enemy_initial_armor_reduction"))
+    local previous_armor = nil
+    local next_armor = nil
+    if tonumber(unit.survival_war3_armor) ~= nil then
+        previous_armor = tonumber(unit.survival_effective_war3_armor)
+            or tonumber(unit.survival_war3_armor) or 0
+        unit.survival_gameplay_base_war3_armor =
+            tonumber(unit.survival_gameplay_base_war3_armor)
+                or tonumber(unit.survival_war3_armor) or 0
+        local value = unit.survival_gameplay_base_war3_armor - reduction
+        unit.survival_war3_armor = value
+        unit.survival_effective_war3_armor = armor_balance.effective_war3_armor(
+            value,
+            unit.survival_war3_armor_reduction,
+            unit.survival_minimum_war3_armor,
+            unit.survival_poison_cloud_armor_reduction_pct
+        )
+        unit.survival_armor = value
+        next_armor = unit.survival_effective_war3_armor
+    elseif unit.GetPhysicalArmorBaseValue and unit.SetPhysicalArmorBaseValue then
+        unit.survival_gameplay_base_armor =
+            tonumber(unit.survival_gameplay_base_armor)
+                or tonumber(unit:GetPhysicalArmorBaseValue()) or 0
+        previous_armor = tonumber(unit:GetPhysicalArmorBaseValue()) or 0
+        next_armor = unit.survival_gameplay_base_armor - reduction
+        unit:SetPhysicalArmorBaseValue(next_armor)
+    end
+    if previous_armor ~= nil and next_armor ~= nil
+        and math.abs(previous_armor - next_armor) > 0.0001
+        and type(unit.entindex) == "function" then
+        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+            entindex = unit:entindex(),
+            unit = unit,
+            reason = "enemy_initial_armor_reduction",
+            armor = next_armor,
+        })
+    end
+end
+
+refresh_existing_enemy_armor = function()
+    if not Entities or type(Entities.FindAllByClassname) ~= "function" then return end
+    for _, class_name in ipairs({ "npc_dota_creature", "npc_dota_building" }) do
+        for _, unit in ipairs(Entities:FindAllByClassname(class_name) or {}) do
+            local enemy = false
+            if unit and type(unit.GetTeamNumber) == "function" then
+                local ok, team = pcall(unit.GetTeamNumber, unit)
+                enemy = ok and team == (rawget(_G, "DOTA_TEAM_BADGUYS") or 3)
+            end
+            apply_enemy_initial_armor(unit, enemy)
+        end
+    end
+end
+
+local function apply_wall_tick(player_id)
+    local health = M.value(player_id, "wall_health_per_second")
+    local armor = M.value(player_id, "wall_armor_per_second")
+    if health <= 0 and armor <= 0 then return end
+    wall_ticks_by_player[player_id] = (wall_ticks_by_player[player_id] or 0) + 1
+    event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
+        player_id = player_id,
+        reason = "gameplay_stats_wall_growth_per_second",
+        tick = wall_ticks_by_player[player_id],
+    })
+end
+
+local function on_hero_attack(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil or payload.is_multishot_secondary == true then return end
+    local attack_growth = M.value(player_id, "hero_basic_attack_growth")
+    local attribute_growth = M.value(player_id, "hero_attribute_growth")
+    attribute_growth = attribute_growth * (1
+        + M.value(player_id, "hero_attack_attribute_efficiency_pct") / 100)
+    if attack_growth > 0 then
+        hero_basic_attack_bonus_by_player[player_id] =
+            (hero_basic_attack_bonus_by_player[player_id] or 0) + attack_growth
+    end
+    if attribute_growth > 0 then
+        hero_growth_attributes_by_player[player_id] =
+            (hero_growth_attributes_by_player[player_id] or 0) + attribute_growth
+    end
+    local wood = M.value(player_id, "hero_attack_wood_flat")
+    local gold = M.value(player_id, "hero_attack_gold_flat")
+    if wood ~= 0 or gold ~= 0 then
+        event_bus.request(events.RESOURCE_ADD_REQUEST, {
+            player_id = player_id,
+            wood = wood,
+            gold = gold,
+            reason = "gameplay_stats_hero_attack_resource",
+        })
+    end
+    if attack_growth > 0 or attribute_growth > 0 then
+        event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
+            player_id = player_id,
+            reason = "gameplay_stats_hero_attack_growth",
+        })
+    end
+end
+
+local function on_tower_attack(payload)
+    local tower = payload and payload.tower
+    local player_id = tower and tonumber(tower.survival_player_id)
+    if player_id == nil then return end
+    local damage_growth = M.value(player_id, "tower_damage_attack_growth")
+    local attack_growth = M.value(player_id, "tower_basic_attack_growth")
+    if damage_growth > 0 then
+        tower_damage_bonus_by_player[player_id] =
+            (tower_damage_bonus_by_player[player_id] or 0) + damage_growth
+    end
+    if attack_growth > 0 then
+        tower_basic_attack_bonus_by_player[player_id] =
+            (tower_basic_attack_bonus_by_player[player_id] or 0) + attack_growth
+    end
+    local reduction = armor_balance.from_war3_linear(
+        M.value(player_id, "tower_attack_armor_reduction")
+            + M.value(player_id, "global_attack_armor_reduction")
+    )
+    local target = payload.target
+    if reduction > 0 and target and not target:IsNull() then
+        target:AddNewModifier(tower, nil, "modifier_research_armor_reduction", {
+            armor_reduction_per_attack = reduction,
+        })
+    end
+    if damage_growth > 0 or attack_growth > 0 then
+        event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
+            player_id = player_id,
+            reason = "gameplay_stats_tower_attack_growth",
         })
     end
 end
@@ -102,18 +303,78 @@ local function get(payload)
         return { ok = false, error = "player_id_invalid" }
     end
     local totals = copy(totals_by_player[player_id])
+    local isolated_field = test_isolated_field_by_player[player_id]
+    if not isolated_field then
+        totals.team_hero_wall_armor_bonus = shared_value(
+            "team_hero_wall_armor_bonus"
+        )
+        totals.enemy_initial_armor_reduction = shared_value(
+            "enemy_initial_armor_reduction"
+        )
+    end
     totals.hero_all_attributes_flat = (totals.hero_all_attributes_flat or 0)
+        + (totals.hero_initial_attributes or 0)
         + (totals.hero_attributes_per_second or 0)
+            * (hero_ticks_by_player[player_id] or 0)
+        + (hero_growth_attributes_by_player[player_id] or 0)
+    totals.hero_attack_flat = (totals.hero_attack_flat or 0)
+        + (totals.hero_initial_attack or 0)
+        + (hero_damage_attack_bonus_by_player[player_id] or 0)
+        + (hero_basic_attack_bonus_by_player[player_id] or 0)
+        + (totals.hero_attack_per_second or 0)
             * (hero_ticks_by_player[player_id] or 0)
     totals.tower_attack_flat = (totals.tower_attack_flat or 0)
         + (totals.tower_attack_per_second or 0)
             * (tower_ticks_by_player[player_id] or 0)
         + (tower_damage_bonus_by_player[player_id] or 0)
-    return { ok = true, totals = totals }
+        + (tower_basic_attack_bonus_by_player[player_id] or 0)
+    totals.wall_health_growth_flat = (totals.wall_health_per_second or 0)
+        * (wall_ticks_by_player[player_id] or 0)
+    totals.wall_armor_growth_flat = (totals.wall_armor_per_second or 0)
+        * (wall_ticks_by_player[player_id] or 0)
+    return {
+        ok = true,
+        totals = totals,
+        test_isolation = isolated_field ~= nil,
+        isolated_field_id = isolated_field,
+    }
 end
 
 function M.value(player_id, effect_key)
     return tonumber((totals_by_player[tonumber(player_id)] or {})[effect_key]) or 0
+end
+
+function M.set_test_isolation(player_id, field_id, defer_refresh)
+    player_id = tonumber(player_id)
+    field_id = tostring(field_id or "")
+    if player_id == nil or player_id < 0 or field_id == "" then
+        return false, "test_isolation_invalid"
+    end
+    test_isolated_field_by_player[player_id] = field_id
+    hero_ticks_by_player[player_id] = 0
+    tower_ticks_by_player[player_id] = 0
+    tower_damage_bonus_by_player[player_id] = 0
+    hero_damage_attack_bonus_by_player[player_id] = 0
+    hero_basic_attack_bonus_by_player[player_id] = 0
+    hero_growth_attributes_by_player[player_id] = 0
+    tower_basic_attack_bonus_by_player[player_id] = 0
+    wall_ticks_by_player[player_id] = 0
+    if defer_refresh ~= true then
+        refresh({ player_id = player_id, reason = "gameplay_stats_test_isolation" })
+    end
+    return true
+end
+
+function M.clear_test_isolation(player_id, defer_refresh)
+    player_id = tonumber(player_id)
+    if player_id == nil or player_id < 0 then
+        return false, "test_isolation_invalid"
+    end
+    test_isolated_field_by_player[player_id] = nil
+    if defer_refresh ~= true then
+        refresh({ player_id = player_id, reason = "gameplay_stats_test_reset" })
+    end
+    return true
 end
 
 function M.init()
@@ -121,13 +382,28 @@ function M.init()
     hero_ticks_by_player = {}
     tower_ticks_by_player = {}
     tower_damage_bonus_by_player = {}
+    hero_damage_attack_bonus_by_player = {}
+    hero_basic_attack_bonus_by_player = {}
+    hero_growth_attributes_by_player = {}
+    tower_basic_attack_bonus_by_player = {}
+    wall_ticks_by_player = {}
+    test_isolated_field_by_player = {}
     event_bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, get)
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, refresh)
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
+    event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_hero_attack)
+    event_bus.subscribe(events.TOWER_ATTACK_LANDED, on_tower_attack)
+    event_bus.subscribe(events.MONSTER_SPAWNED, function(payload)
+        apply_enemy_initial_armor(
+            payload and (payload.unit or payload.monster),
+            true
+        )
+    end)
     scheduler.every(1, function()
         for player_id in pairs(totals_by_player) do
             apply_hero_tick(player_id)
             apply_tower_tick(player_id)
+            apply_wall_tick(player_id)
         end
         return true
     end, "star_blessing_effect_ticks")

@@ -436,7 +436,8 @@ local function roll_tower_critical(tower, target)
         0, tonumber(tower.survival_super_tower_crit_chance) or 0
     )
     if RandomFloat(0, 100) < research_chance and multiplier < 200 then
-        multiplier = 200
+        multiplier = math.max(200,
+            tonumber(tower.survival_gameplay_critical_damage_pct) or 200)
         source = "research_critical"
     end
     return multiplier > 100 and multiplier / 100 or 1, source

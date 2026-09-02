@@ -76,6 +76,12 @@ local function apply_portrait_metadata(unit, snapshot)
 
     if not unit then return snapshot end
     local asset_id = tostring(unit.survival_model_asset_id or "")
+    if asset_id == "" then
+        -- Monster hero visuals keep their asset identity separately from the
+        -- building model_asset_id field; use it for the independent portrait
+        -- ScenePanel without changing the world appearance ownership.
+        asset_id = tostring(unit.survival_monster_default_wearable_asset_id or "")
+    end
     local asset = asset_catalog.get(asset_id)
     if not asset then
         local hero_id = tostring(unit.survival_hero_id or "")
@@ -92,11 +98,21 @@ local function apply_portrait_metadata(unit, snapshot)
     if not asset then return snapshot end
 
     snapshot.model_asset_id = tostring(asset.asset_id or asset_id or "")
-    -- Only the 21 CSV-declared native wearable stages may opt into the custom
-    -- portrait ScenePanel. Heroes, monsters and other tower-like assets keep
-    -- their asset identity for the rest of the UI but publish no custom
-    -- portrait metadata, so the client remains on Valve's native portrait.
-    if asset.native_wearable_stage == nil then return snapshot end
+    -- Native wearable tower stages, Boss hero bundles, and explicitly opted-in
+    -- permanent heroes use the custom portrait ScenePanel. Their world model is
+    -- intentionally independent of the portrait unit, so the client can render
+    -- the standard Valve hero portrait while the selected entity keeps its
+    -- decorated body in-world.
+    local is_boss_portrait = asset.load_group == "monster_default_wearables"
+        and tostring(asset.portrait_unit_name or "") ~= ""
+    local is_split_hero_portrait = asset.asset_id
+        == "hero_permanent_hero_blademaster"
+        and tostring(asset.portrait_unit_name or "") ~= ""
+    if asset.native_wearable_stage == nil
+        and not is_boss_portrait
+        and not is_split_hero_portrait then
+        return snapshot
+    end
     snapshot.portrait_unit_name = tostring(asset.portrait_unit_name or "")
     snapshot.portrait_item_def = tostring(asset.portrait_item_def or "")
     return snapshot
@@ -341,11 +357,25 @@ local function on_unit_combat_stats_changed(payload)
             local reason = tostring(payload.reason or "")
             if reason:match("^poison_cloud_armor_")
                 or reason == "research_armor_reduction" then
-                local runtime_armor = safe_number(
-                    unit, "GetPhysicalArmorValue", nil, false
-                )
-                snapshot.runtime_armor = runtime_armor
-                snapshot.armor = armor_balance.to_war3(runtime_armor)
+                local custom_war3_armor = tonumber(
+                    unit.survival_armor_mapping_version
+                ) == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+                if custom_war3_armor then
+                    -- Custom War3 targets deliberately keep native armor at
+                    -- zero. Their effective project-owned value is the one
+                    -- used by damage resolution and must remain authoritative.
+                    snapshot.runtime_armor = 0
+                    snapshot.armor = tonumber(
+                        unit.survival_effective_war3_armor
+                    ) or tonumber(unit.survival_war3_armor) or 0
+                    snapshot.effective_war3_armor = snapshot.armor
+                else
+                    local runtime_armor = safe_number(
+                        unit, "GetPhysicalArmorValue", nil, false
+                    )
+                    snapshot.runtime_armor = runtime_armor
+                    snapshot.armor = armor_balance.to_war3(runtime_armor)
+                end
                 snapshot.armor_unit = "war3_display"
                 snapshot.stat_units_version = 2
             end

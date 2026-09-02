@@ -203,9 +203,20 @@ local function tower_class_slot_request(payload)
     publish_tower_class_counts(player_id, "reservation_created")
     return snapshot
 end
-local function building_limit_reached(definition, existing_count)
+local function building_limit_reached(definition, existing_count, player_id)
+    local extra = 0
+    if definition and definition.id == "gold_mine" and player_id ~= nil then
+        local ok, permanent = pcall(
+            event_bus.request,
+            events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+            { player_id = player_id }
+        )
+        if not ok then permanent = nil end
+        extra = tonumber(permanent and permanent.totals
+            and permanent.totals.gold_mine_build_cap) or 0
+    end
     return player_tower_limits.limit_reached(
-        definition and definition.max_count,
+        (tonumber(definition and definition.max_count) or 0) + extra,
         existing_count
     )
 end
@@ -614,7 +625,8 @@ local function can_place(payload)
     if definition.build_once and wall_ever_built[builder.player_id] then
         return { ok = false, error = "城墙整局只能建造一次" }
     end
-    if building_limit_reached(definition, count_for(builder.player_id, definition.id)) then
+    if building_limit_reached(definition,
+        count_for(builder.player_id, definition.id), builder.player_id) then
         return { ok = false, error = "建筑数量已达上限" }
     end
     if definition.id == "building_challenge"

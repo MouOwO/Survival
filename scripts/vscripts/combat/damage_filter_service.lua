@@ -155,6 +155,8 @@ local function filter(_, keys)
         return false
     end
     local source_bonus = record and tonumber(record.post_damage_bonus_pct) or 0
+    keys.damage = math.max(0, (tonumber(keys.damage) or 0)
+        + (tonumber(attacker.survival_gameplay_damage_bonus_flat) or 0))
     local filter_input_damage = tonumber(keys.damage) or 0
     local global_bonus = tonumber(config.global_post_bonus_pct) or 0
     local research_bonus = math.max(
@@ -165,6 +167,10 @@ local function filter(_, keys)
         0,
         tonumber(attacker.survival_seven_sins_final_damage_pct) or 0
     ) / 100
+    local gameplay_bonus = math.max(
+        0,
+        tonumber(attacker.survival_gameplay_final_damage_pct) or 0
+    ) / 100
     local target_reduction = record and tonumber(record.target_post_reduction_pct) or 0
     local boss_multiplier = 1
     if config.boss_rules.enabled and victim:HasModifier("modifier_boss") then
@@ -172,6 +178,7 @@ local function filter(_, keys)
     end
     local multiplier = math.max(config.minimum_post_multiplier,
         1 + source_bonus + global_bonus + research_bonus + seven_sins_bonus
+            + gameplay_bonus
             - target_reduction)
         * boss_multiplier
     if rogue_effect_state.has_effect(attacker.survival_player_id,
@@ -248,7 +255,11 @@ local function filter(_, keys)
             reduction = reduction + rogue_effect_state.numeric(wall_player_id,
                 "builder_wall_low_health_reduction_pct")
         end
+        reduction = reduction + math.max(0,
+            tonumber(victim.survival_gameplay_damage_reduction_pct) or 0)
         keys.damage = keys.damage * math.max(0, 1 - reduction / 100)
+        keys.damage = math.max(0, keys.damage
+            - math.max(0, tonumber(victim.survival_gameplay_damage_block) or 0))
         local cap_pct = rogue_effect_state.wall_damage_cap(victim)
         if cap_pct and cap_pct > 0 then
             keys.damage = math.min(
@@ -256,6 +267,11 @@ local function filter(_, keys)
                 math.max(0, tonumber(victim:GetMaxHealth()) or 0) * cap_pct / 100
             )
         end
+    elseif tonumber(victim.survival_gameplay_damage_reduction_pct) then
+        keys.damage = keys.damage * math.max(0, 1
+            - math.max(0,
+                tonumber(victim.survival_gameplay_damage_reduction_pct) or 0)
+                / 100)
     end
     if detailed_diagnostics and monster_physical_diagnostic_count < 40
         and victim.survival_monster_corpse == true

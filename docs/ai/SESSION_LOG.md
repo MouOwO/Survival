@@ -1,3 +1,35 @@
+# 2026-09-02 - 主宰原生饰品叠加的架构修复
+
+- 实机反馈主宰目标饰品出现但与原生基础穿戴叠加。与成功的防御塔链路对比后确认，英雄 ReplaceHero 路径的原生 `dota_item_wearable` 不保证出现在 move-child 链，原先的子节点隐藏扫描存在结构性漏网。
+- `hero_cosmetic_service.lua` 新增全局 `dota_item_wearable` owner/parent 扫描，并以 `SetRenderAlpha(0)` + `AddNoDraw` + `EF_NODRAW` 组合隐藏；自定义 `prop_dynamic` 仍按 entindex 排除。显示恢复路径也同步支持全局扫描。
+- 换模完成后增加 0.10/0.35/0.80 秒三次 generation 保护隐藏重试，覆盖引擎异步重新物化原生饰品的窗口。没有改用独立视觉载体，因此保留最小修改范围和英雄实体的战斗/选择架构。
+- 为实机定位继续叠加根因，隐藏 pass 输出 child/global/owner_match/hidden 计数及最多八个未匹配模型；通过各次 pass 的变化可判断 owner 归属失败还是引擎延迟生成。
+- 用户提供的主宰实机日志中 immediate 与 delayed pass 始终 `child=0 global=0 owner_match=0 hidden=0`，已排除 native wearable owner 和晚生成；可见基础部件属于 `juggernaut_arcana.vmdl` 内置网格。另有 Kantusa 粒子 `attach_sword` 不存在于 `generic_wep_broadsword.vmdl` 的独立挂点警告，后续需将该粒子改挂主体或使用模型实际挂点。
+- `test_hero_cosmetic_service.lua`、`test_selected_unit_cosmetic_portrait.lua` 与 `git diff --check` 通过；等待 Workshop Tools 冷启动验证叠加问题是否消失。
+
+# 2026-09-02 - 主宰“剑心之遗·起源”混搭饰品
+
+- 主宰世界外观启用剑心之遗 Arcana 主体的官方红色 `style 1 / skin 1`，以 `prop_dynamic + bone_merge` 挂载远古流犯头、手、背、腿四个 Arcana 兼容模型和古卷之剑坎图沙 ItemDef `4101`，并隐藏默认五槽穿戴。三项官方动作修饰与六个常驻粒子一并进入永久英雄 Bundle 和异步代理预载；坎图沙粒子 CP0 使用官方 `attach_sword` 挂点。
+- 针对实机出现的原生基础饰品叠加，英雄外观服务新增 `FirstMoveChild/NextMovePeer` 与 `GetChildren()` 双链去重遍历，只隐藏原生 `dota_item_wearable`，保留自定义 `prop_dynamic` 饰品。
+- 进一步确认叠加来自 `SetModel/SetOriginalModel` 在隐藏之后重新暴露 Valve wearable；现将隐藏时机后移到最终主体换模之后，避免顺序覆盖。
+- 引擎仍可能在换模后一帧异步生成 wearable，现增加一次 0.10 秒、带 generation 校验的补偿隐藏任务，避免初次隐藏被异步重建覆盖。
+- 实机仍显示基础件后，改用项目 `native_wearable_carrier_service` 已验证的 `AddNoDraw()` 隐藏 API，同时保留 `EF_NODRAW` 兼容回退。
+- 主宰选择头像改用现有世界/头像分离链：服务端只为 `hero_permanent_hero_blademaster` 发布 `npc_dota_hero_juggernaut`，不发布 ItemDef；客户端同层 ScenePanel 因此渲染标准基础主宰，世界 Arcana 模型不会污染头像，连续点击仍受既有实体身份门控保护。
+- AssetBundle、SelectedUnit Portrait、Combat Projection、PropDynamic 组件合同、目标 Lua 语法、CSV 合同和 12 条本机 VPK 路径验证通过；`combat_stats.js` 强制编译为 `1 compiled, 0 failed, 0 skipped`。当前环境的 `python/python3` 是 Windows Store 占位程序且 `py` 无已安装解释器，因此本次四个生成 Lua 按生成器格式手动同步；实机仍需冷启动确认 skin 1 红色材质、穿戴骨骼、粒子和基础头像。
+
+# 2026-09-02 - Boss 非挑战状态 idle 动画恢复
+
+- 实机发现新 Boss 英雄主体在未进入挑战时静止。通用 `npc_survival_wave_monster` 换模后并非所有引擎路径都会自动播放英雄模型 idle；组件 `DefaultAnim` 也无法代替主体动画状态。
+- `monster_hero_visual_service.lua` 现在在饰品 Bundle 应用成功后，显式对主体及全部骨骼合并组件播放声明的 idle 序列，按 `ResetSequenceInfo -> ResetSequence -> SetSequence -> SetAnimation` 做兼容回退并恢复播放速率；失败时保持原有外观，不阻断生成。
+- 自动验证通过 MonsterVisual resolver/service、Boss wearable contract、Lua 5.1 语法和限定差异检查。下一步仍需 Workshop Tools 冷启动确认非挑战待机循环、移动/攻击动画、粒子同步和死亡重建。
+
+# 2026-09-02 - 第一批转生与十宗罪 Boss 英雄饰品
+
+- 20 个目标 Boss 已各自映射到独立 `monster_boss_*` Bundle：十个转生 Boss 使用 Undying/Bloodseeker/Dragon Knight/Sven/Bane/Lifestealer/Dark Willow/Grimstroke/Spectre/Doom，十宗罪使用 Necrophos/Riki/Alchemist/Morphling/Ursa/Pudge/Wraith King/Rubick/Queen of Pain/Mars；仅修改世界模型与默认穿戴资源引用，所有战斗、波次、挑战和奖励字段保持不变。
+- 新增 94 个 `prop_dynamic + bone_merge` 组件和 39 个官方常驻粒子。炼金术士按需求用 Eternal Radiance ItemDef `7627`、Midas Knuckles ItemDef `9568` 替换 Potion Potentate 的同槽部件；Spectre/Pudge/Wraith King/Queen of Pain 使用对应官方 Arcana body。代理 KV 同步预载主体、组件和粒子。
+- 所有 Boss 资源的 `portrait_unit_name` 现在显式指向对应标准英雄单位，`portrait_item_def` 保持为空；服务端发布头像身份，客户端独立 ScenePanel 隐藏错误原生模型并显示基础英雄头像，世界饰品与头像彻底分离。本轮新增了该 Monster Portrait 分支，没有改变头像饰品。153 个唯一模型/粒子路径经本机 VPK 索引确认存在。
+- 自动验证通过：CSV 全量生成、`build_boss_cosmetic_batch.py --check`、`MONSTER_HERO_WEARABLE_CONTRACT_PASS assets=25 mappings=27`、`ASSET_BUNDLE_CONFIG_PASS`、MonsterVisual resolver/service。既有 `test_wave_monster_visual_integration.lua` 在生命值断言处失败，本任务没有修改该波次逻辑。最终仍需 Workshop Tools 冷启动实机验收 20 个 Boss 的挂载、动画、粒子、清理及原生头像。
+
 # 2026-08-31 - 怪物默认英雄穿戴 CSV 与正式波次精确预载收口
 
 - 严格核对四份权威 CSV：`building_challenge_definitions.csv` 为 20 列，`asset_catalog.csv` 为 27 列，`asset_components.csv` 为 15 列，`monster_archetypes.csv` 为 26 列；默认穿戴 ID 均处于最后字段，五个默认资源及其 27 个组件行的宽度和 `attachment_models` 空值符合约定。
@@ -3386,3 +3418,46 @@
 - 自动验证不能替代Dota运行时验证。本轮尚未在真实Dota中逐阶段确认载体生成、原生穿戴可见性、跟随/闪烁、不可选状态、建筑选择控制、攻击动作、升级替换、失败重试、死亡重建和融合清理；这些仍需完全退出Workshop Tools后冷启动验收。
 - 最终收尾补充：搬迁、闪烁、stationary位置纠正和攻击开始路径均显式调用carrier同步；同阶段刷新复用现有carrier，阶段替换同步失败保留旧carrier。选中单位HUD为21个CSV原生塔阶段接入`DOTAScenePanel.SetUnit(portrait_unit_name, "default", false)`，齐天大圣WebM、主宰静态图和官方头像回退保持不变。
 - 最终自动验证通过：carrier、选中单位Portrait、建筑视觉、死亡塔、阶段路线、闪电视觉和死亡重建7项Lua行为测试；7个目标Lua文件的Lua 5.1语法；21阶段CSV与代理生成一致性；JS/CSS/XML Resource Compiler分别为`1 compiled, 0 failed`、`1 compiled, 0 failed`、`9 compiled, 0 failed`；Game/Content两工作区`git diff --check`通过。仍未完成Dota实机验收。
+# 2026-09-02 - 主宰基部保留与齐天大圣饰品
+
+- 按用户确认移除主宰远古流犯四件组件与古卷之剑坎图沙，仅保留剑心之遗起源红色 Arcana 主体（含主体常驻粒子），同时删除其五个组件粒子和无效 `attach_sword` 预载，头像保持标准主宰。
+- 齐天大圣新增伏魔行者铠甲/肩铠/战棍与擎天大圣头部：组件使用官方模型路径和 `prop_dynamic + bone_merge`，三项伏魔行者常驻粒子按组件绑定；头像仍是标准齐天大圣。
+- 资产 CSV、生成配置、预缓存 KV 和 Lua 合同测试均已同步；自动测试通过，实机仍需冷启动验收。
+# 2026-09-02 - 英雄饰品批次修正（斧王、黑暗游侠与 DOOM）
+
+- 用户更正英雄分配：撤销误加的斯拉克预备饰品，仅保留斧王“熔焰之拳”和黑暗游侠“漂泊群岛异客”；两者继续使用世界 `prop_dynamic + bone_merge` 组件和原生头像。
+- 末日使者永久 Bundle 改用 Eternal Daemon Prince of Khorne（ItemDef `21033`），挂载七个官方部件；战斧与头盔使用 style 1 alternate 模型并设置部件 `model_skin=1`，同步预载 Doom 武器常驻粒子。
+- 已同步 CSV、生成 Lua、代理 KV、选中单位合同，并确认源码中不再存在 `hero_permanent_hero_slark`、`shadow_deep_*` 或 `fall20_slark` 残留。自动测试全部通过，实机冷启动验收仍待执行。
+## 2026-09-02 - gameplay_stats 运行时字段接线修复
+
+- `order` 已能更新私有档案，但永久效果投影只读取 `permanent_effects`，导致多数新增基础字段不进入英雄、塔、墙、伐木工与金矿运行时。本轮统一合并 `permanent_effects + gameplay_stats`，所有既有消费者继续通过同一个效果查询/变更事件刷新。
+- 修复人口上限即时增量；隔离英雄与伐木工砍树效率；接入伐木工全套采集字段和农民上限；接入金矿收益、间隔和建造上限；接入英雄、箭塔、城墙的攻击、成长、攻速、护甲、生命、减伤、暴击、减甲及共享/全局字段。英雄护甲不仅更新面板，也使用运行时 modifier 参与承伤；War3 百分比减甲先换算为减甲 modifier 接受的单位。
+- 自动验证：15 个目标 Lua 语法通过；Worker 两项、Gold Mine 两项、Combat Stat、Armor Reduction/Mapping、自定义怪物护甲/毒甲测试通过；临时夹具额外验证效果合并、英雄本体过滤、动态增长、资源奖励和人口即时刷新。既有 `test_armor_balance.lua` modern-asymptote 断言失败，与本轮修改文件无关。
+## 2026-09-02 - 英雄攻击减甲单位与重复事件修复
+
+- 复核确认英雄攻击减甲由 `HERO_MAIN_ATTACK_LANDED` 触发，目标每次命中累积固定减甲，直到目标最小护甲；不是首击直接清空。问题来自 gameplay stats 使用 War3 显示护甲单位，而研究减甲 modifier 参数使用 Dota 运行时单位。
+- 固定减甲进入 modifier 前统一使用 `armor_balance.from_war3_linear` 转换；百分比减甲按当前 War3 护甲计算后再转换。英雄、箭塔、伐木工和全局固定减甲路径同步修正。
+- 增加同一攻击 ID 的攻击者/目标去重，防止同一次普攻被重复事件派发而重复叠加。减甲映射、战斗投影和 Lua 语法验证通过。
+
+## 2026-09-02 - gameplay_stats 单词条隔离测试模式
+
+- 增加 `ordertest <field_id> <absolute_value>`：模拟服务端 JSON 只携带一个 gameplay stat，档案服务在接收边界将缺失字段展开为中性值，本地 fixture 同样只持久化目标字段并在同局重载时保持隔离。
+- 隔离投影屏蔽永久奖励并清除字段产生的本局成长计数；减甲链额外清除旧 modifier 和命中去重状态，并在隔离期间不叠加科技减甲。
+- 增加 `orderreset` 恢复 CSV 默认快照；原 `order` 继续表示增量更新。新增两项 Lua 合同测试均通过，相关六个运行时 Lua 文件通过 `luac -p`，既有 Armor Reduction/Mapping 与 Combat Stat 三项回归通过。
+
+## 2026-09-02 - 单词条隔离实机验收完成
+
+- 用户已确认单词条隔离命令解决了英雄攻击减甲测试中的字段叠加/历史状态污染问题。
+- `ordertest hero_attack_armor_reduction 10` 作为后续减甲排错标准命令，`orderreset` 作为恢复默认字段入口；本项实机验收完成。
+
+## 2026-09-02 - 英雄面板百分比基数修正
+
+- 修正英雄攻击/生命/护甲百分比字段：百分比基数改为包含武器、融合装备、属性和已存在固定加成的当前面板值，避免只按英雄配置裸值计算。
+- 伤害减免百分比明确在 DamageFilter 按实际当前承受伤害结算，并增加 0%–100% 边界保护；未引入英雄裸值持久化字段。
+- 同步 `player_gameplay_stats.csv` 与生成配置说明；`hero_combat_stat_service.lua` 通过可重算面板组成值应用百分比，避免装备融合后的重复刷新产生累乘。
+
+## 2026-09-02 - 防御塔攻速与护甲 UI 即时刷新
+
+- 根因是塔的百分比攻速只写入引擎 BAT，`BUILDING_CHANGED` 仍携带建塔时缓存的 `survival_attack_speed`，并覆盖 ScanPanel 现场快照。现在同一次重算会写入最终每秒攻击次数、攻击间隔和引擎 BAT，UI 推送值与实际攻击频率保持一致。
+- 护甲链审计发现并修复两处遗漏：敌军初始减甲改变后补发选中单位战斗数值事件；自定义 War3 护甲目标的动态减甲事件改读 `survival_effective_war3_armor`，不再把原生零护甲占位转换成 UI 的 0。
+- 敌军初始护甲重算现在会保留目标已有的固定减甲、最低护甲限制和毒云百分比减甲。目标语法及塔攻速、选中单位推送、敌军初始护甲、护甲映射、毒云、档案隔离回归通过；实机冷启动验收待用户执行。

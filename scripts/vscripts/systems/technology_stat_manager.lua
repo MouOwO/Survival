@@ -433,7 +433,14 @@ function M.training_room_multiplier(player_id, target)
         or tonumber(target.survival_training_owner_player_id) ~= tonumber(player_id) then
         return 1
     end
-    return math.max(1, number(runtime.training_room_income_multiplier, 1))
+    local permanent = event_bus.request(
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local bonus_pct = tonumber(permanent and permanent.totals
+        and permanent.totals.training_room_income_bonus_pct) or 0
+    return math.max(1, number(runtime.training_room_income_multiplier, 1)
+        * (1 + bonus_pct / 100))
 end
 
 function M.init()

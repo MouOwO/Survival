@@ -122,12 +122,19 @@ end
 
 function modifier_survival_managed_buff:RefreshManaged(value, duration, max_stacks)
     if not IsServer() then return end
+    local previous_value = tonumber(self.value) or 0
+    local previous_stacks = tonumber(self:GetStackCount()) or 0
     self:ApplyManaged(
         value,
         duration,
         max_stacks
     )
-    publish_combat_stats_changed(self, "managed_buff_refreshed", true)
+    -- Aura duration renewal alone does not change the displayed stat. Avoid a
+    -- redundant selected-unit rerender unless value or effective stacks moved.
+    if math.abs((tonumber(self.value) or 0) - previous_value) > 0.0001
+        or (tonumber(self:GetStackCount()) or 0) ~= previous_stacks then
+        publish_combat_stats_changed(self, "managed_buff_refreshed", true)
+    end
 end
 
 function modifier_survival_managed_buff:ApplyManaged(value, duration, max_stacks)

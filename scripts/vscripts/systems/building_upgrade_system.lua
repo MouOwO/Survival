@@ -100,6 +100,19 @@ local function configured_base_attack_time(state)
     return nil
 end
 
+local function apply_tower_attack_time(unit, base_attack_time, attack_speed_bonus)
+    local final_attack_time = math.max(0.0001,
+        tonumber(base_attack_time) or 1)
+        / math.max(0.01, 1 + (tonumber(attack_speed_bonus) or 0) / 100)
+    local attacks_per_second = 1 / final_attack_time
+    unit:SetBaseAttackTime(final_attack_time)
+    -- BUILDING_CHANGED publishes this project-owned value to the custom
+    -- ScanPanel. Keep it synchronized with the BAT applied to the engine.
+    unit.survival_attack_speed = attacks_per_second
+    unit.survival_attack_interval = final_attack_time
+    return final_attack_time, attacks_per_second
+end
+
 local function apply_research_technology(state)
     local unit = state.unit
     if not valid_entity(unit) then return end
@@ -126,26 +139,56 @@ local function apply_research_technology(state)
         unit.survival_super_tower_crit_chance =
             tonumber(tower.critical_chance_pct) or 0
         local attack_speed_bonus = tonumber(tower.attack_speed_bonus_pct) or 0
+        attack_speed_bonus = attack_speed_bonus
+            + (tonumber(permanent.tower_attack_speed_bonus_pct) or 0)
         -- GetBaseAttackTime has different native signatures between the Dev
         -- harness and the live engine. The CSV route data is authoritative for
         -- tower attack speed, so do not call the engine getter here.
         local base_attack_time = tonumber(unit.survival_research_base_attack_time)
             or configured_base_attack_time(state) or 1
         unit.survival_research_base_attack_time = base_attack_time
-        unit:SetBaseAttackTime(base_attack_time / math.max(0.01, 1 + attack_speed_bonus / 100))
+        local profile_interval = tonumber(permanent.tower_attack_interval)
+        if profile_interval and profile_interval > 0 then
+            base_attack_time = math.min(base_attack_time, profile_interval)
+        end
+        base_attack_time = math.max(0.05, base_attack_time
+            - (tonumber(permanent.tower_attack_interval_reduction) or 0))
+        apply_tower_attack_time(unit, base_attack_time, attack_speed_bonus)
         local attack_range = tower_combat_rules.attack_range(
             tower.attack_range_bonus
-        )
+        ) + (tonumber(permanent.tower_attack_range) or 0)
         set_attack_range(unit, attack_range)
+        unit.survival_super_tower_crit_chance =
+            (tonumber(unit.survival_super_tower_crit_chance) or 0)
+            + (tonumber(permanent.tower_critical_chance_pct) or 0)
+        unit.survival_inherited_critical_damage_pct = 200
+            + (tonumber(permanent.tower_critical_damage_bonus_pct) or 0)
+        unit.survival_gameplay_critical_damage_pct = 200
+            + (tonumber(permanent.tower_critical_damage_bonus_pct) or 0)
+        unit.survival_gameplay_final_damage_pct =
+            (tonumber(permanent.tower_final_damage_bonus_pct) or 0)
+            + (tonumber(permanent.global_final_damage_bonus_pct) or 0)
     elseif state.building_id == "wall" then
         local data = state.definition.levels[state.level or 1] or {}
         local base_health = tonumber(data.health) or unit:GetMaxHealth()
         local wall = technology.wall or {}
+        local permanent_result = event_bus.request(
+            events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+            { player_id = player_id }
+        )
+        local permanent = permanent_result and permanent_result.totals or {}
         local bonus_pct = (tonumber(wall.health_bonus_pct) or 0)
             + (tonumber(wall.technology_health_bonus_pct) or 0)
+            + (tonumber(permanent.wall_health_bonus_pct) or 0)
         -- Technology/challenge aggregation retains the legacy Dota-armor unit.
         -- Convert it back to the CSV-authored War3 value for custom mitigation.
+        local base_war3_armor = tonumber(data.war3_armor or data.armor) or 0
         local armor_bonus = (tonumber(wall.technology_armor_bonus) or 0) * 3
+            + (tonumber(permanent.wall_armor) or 0)
+            + (tonumber(permanent.wall_armor_growth_flat) or 0)
+            + (tonumber(permanent.team_hero_wall_armor_bonus) or 0)
+            + base_war3_armor
+                * (tonumber(permanent.wall_armor_bonus_pct) or 0) / 100
         local old_max = math.max(1, unit:GetMaxHealth())
         local old_health = math.max(0, unit:GetHealth())
         local health_ratio = old_health / old_max
@@ -153,6 +196,8 @@ local function apply_research_technology(state)
             base_health,
             bonus_pct,
             rogue_effect_state.wall_health_flat(player_id)
+                + (tonumber(permanent.wall_initial_health) or 0)
+                + (tonumber(permanent.wall_health_growth_flat) or 0)
         )
         unit:SetBaseMaxHealth(max_health)
         unit:SetMaxHealth(max_health)
@@ -163,6 +208,19 @@ local function apply_research_technology(state)
             data.war3_armor or data.armor,
             armor_bonus
         )
+        unit.survival_gameplay_damage_reduction_pct =
+            tonumber(permanent.wall_damage_reduction_pct) or 0
+        unit.survival_gameplay_damage_block =
+            tonumber(permanent.wall_damage_block) or 0
+        unit.survival_gameplay_health_growth_per_second =
+            tonumber(permanent.wall_health_per_second) or 0
+        unit.survival_gameplay_armor_growth_per_second =
+            tonumber(permanent.wall_armor_per_second) or 0
+        if unit.SetBaseHealthRegen then
+            unit:SetBaseHealthRegen(
+                tonumber(permanent.wall_health_regen_per_second) or 0
+            )
+        end
         dev_wall_stats.apply(state)
     end
 end
@@ -1187,5 +1245,6 @@ function M.init()
 end
 
 M._base_health_for_test = base_health
+M._apply_tower_attack_time_for_test = apply_tower_attack_time
 
 return M

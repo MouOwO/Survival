@@ -149,6 +149,45 @@ local function gameplay_stats_defaults()
     return result
 end
 
+-- Isolated gameplay-stat packets are deliberately sparse: the mock JSON only
+-- carries the one field under test. Expand that payload into a schema-valid
+-- neutral snapshot at the profile boundary. Absolute fields whose schema
+-- cannot accept zero retain their authored default value.
+local function isolated_gameplay_stats(patch)
+    if type(patch) ~= "table" or patch == json_decoder.null then
+        return nil, "isolated_gameplay_stats_invalid"
+    end
+    local result = {}
+    local field_count = 0
+    for _, definition in ipairs(gameplay_stats.rows or {}) do
+        if definition.enabled ~= false then
+            local field_id = tostring(definition.field_id)
+            local minimum = tonumber(definition.min_value)
+            local neutral = 0
+            if minimum ~= nil and minimum > 0 then
+                neutral = tonumber(definition.default_value) or minimum
+            end
+            result[field_id] = neutral
+        end
+    end
+    for field_id, value in pairs(patch) do
+        local definition = gameplay_stats.by_id[tostring(field_id)]
+        if not definition or definition.enabled == false then
+            return nil, "gameplay_stat_unknown:" .. tostring(field_id)
+        end
+        if type(value) ~= "number" or value ~= value
+            or value == math.huge or value == -math.huge then
+            return nil, "gameplay_stat_invalid:" .. tostring(field_id)
+        end
+        field_count = field_count + 1
+        result[tostring(field_id)] = value
+    end
+    if field_count ~= 1 then
+        return nil, "isolated_gameplay_stats_requires_one_field"
+    end
+    return result
+end
+
 local function fill_gameplay_stats_defaults(value)
     for _, definition in ipairs(gameplay_stats.rows or {}) do
         if definition.enabled ~= false then
@@ -519,6 +558,22 @@ function M.apply_incremental(update)
     if type(changes) ~= "table" or changes == json_decoder.null then
         return { ok = false, error = "changes_invalid" }
     end
+    local gameplay_stats_mode = update.gameplay_stats_mode
+    if gameplay_stats_mode ~= nil and gameplay_stats_mode ~= "isolated_test" then
+        return { ok = false, error = "gameplay_stats_mode_unsupported" }
+    end
+    if gameplay_stats_mode == "isolated_test" then
+        local save_patch = changes.save
+        local sparse = type(save_patch) == "table"
+            and save_patch.gameplay_stats or nil
+        local expanded, isolation_error = isolated_gameplay_stats(sparse)
+        if not expanded then
+            return { ok = false, error = isolation_error }
+        end
+        changes = copy(changes)
+        changes.save = copy(save_patch)
+        changes.save.gameplay_stats = expanded
+    end
     local allowed_sections = {
         entitlements = true,
         achievements = true,
@@ -543,6 +598,11 @@ function M.apply_incremental(update)
     local ok, validation_error = validate_entitlements(next_profile.entitlements)
     if ok then
         ok, validation_error = validate_achievements(next_profile.achievements)
+    end
+    if ok then
+        ok, validation_error = validate_gameplay_stats(
+            next_profile.save and next_profile.save.gameplay_stats
+        )
     end
     if not ok then
         return { ok = false, error = validation_error }
