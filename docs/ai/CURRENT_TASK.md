@@ -872,3 +872,9 @@ PROJECT -> CURRENT_SPRINT -> CURRENT_TASK -> TASK -> Files -> Tests
 - 补齐 `enemy_initial_armor_reduction` 对当前已选怪物的 `UNIT_COMBAT_STATS_CHANGED` 派发，并在重算敌军初始护甲时保留已有固定减甲、最低护甲和毒云百分比状态，不再把有效护甲直接覆盖为新的基础护甲。
 - 修复自定义 War3 护甲单位收到减甲事件时误读引擎原生 `0` 护甲占位值的问题；ScanPanel 现在读取与伤害过滤一致的 `survival_effective_war3_armor`。
 - 攻速 Aura 仅续期且数值/层数未变化时不再派发冗余 UI 刷新，避免相同单位无意义重渲染。目标 Lua 语法检查及塔攻速快照、选中单位攻速/护甲推送、敌军初始护甲事件、护甲映射、毒云与 gameplay stats 隔离专项测试通过；仍需 Workshop Tools 实机验证连续选中箭塔/怪物时的即时数值变化。
+
+## 当前实施任务补充（2026-09-02）：伐木工攻击成长 ScanPanel 即时刷新
+
+- `lumberjack_attack_growth` 的成长计算原本已经正确写入伐木工的 `survival_attack_min/max`，但 `refresh_worker_technology()` 没有在攻击面板发生变化时派发 `UNIT_COMBAT_STATS_CHANGED`，因此选中的伐木工 UI 会延迟到下一次请求才更新。
+- 现在科技学习、`order`/`ordertest` 更新或每次砍树触发成长后，只要攻击力缓存实际变化，就复用同一 `UNIT_COMBAT_STATS_CHANGED` 事件立即刷新 ScanPanel；数值和层数未变化时不派发冗余事件。
+- 目标 Lua 语法、伐木工训练、档案隔离和选中单位推送回归通过；`lumberjack_attack_growth` 仍保持“每次攻击后增加”的语义，命令执行本身只改变下一次攻击的成长量，不会凭空增加当前攻击力。

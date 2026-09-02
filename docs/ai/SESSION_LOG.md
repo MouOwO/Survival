@@ -3467,3 +3467,9 @@
 - 根因是塔的百分比攻速只写入引擎 BAT，`BUILDING_CHANGED` 仍携带建塔时缓存的 `survival_attack_speed`，并覆盖 ScanPanel 现场快照。现在同一次重算会写入最终每秒攻击次数、攻击间隔和引擎 BAT，UI 推送值与实际攻击频率保持一致。
 - 护甲链审计发现并修复三处遗漏：敌军初始减甲改变后补发选中单位战斗数值事件；隔离测试清除旧减甲后延迟一帧推送恢复值；自定义 War3 护甲目标的动态减甲事件改读 `survival_effective_war3_armor`，不再把原生零护甲占位转换成 UI 的 0。
 - 敌军初始护甲重算现在会保留目标已有的固定减甲、最低护甲限制和毒云百分比减甲；Aura 仅续期且数值/层数不变时不再触发冗余 ScanPanel 重渲染。目标语法及塔攻速、选中单位推送、敌军初始护甲、护甲映射、毒云、档案隔离回归通过；实机冷启动验收待用户执行。
+
+## 2026-09-02 - 伐木工攻击成长 ScanPanel 即时刷新
+
+- 根因确认：`lumberjack_attack_growth` 通过 `TECHNOLOGY_STATS_GROWTH_ADD_REQUEST` 和 `TECHNOLOGY_STATS_CHANGED` 正确重算伐木工攻击力，但 `refresh_worker_technology()` 只改写实体字段，没有向当前选中单位发 `UNIT_COMBAT_STATS_CHANGED`。
+- 现在仅在 `survival_attack_min/max` 发生实际变化时派发该事件，科技学习、永久字段更新和砍树后的成长共用同一条 UI 推送链；无变化刷新不会产生额外 ScanPanel 渲染。
+- 已通过 `luac -p`、伐木工训练、gameplay stats 隔离和选中单位攻速/护甲推送测试。字段语义保持不变：`ordertest lumberjack_attack_growth 10` 设置的是每次后续攻击增加 10 点，当前攻击力会在下一次有效砍树后立即显示增长。
