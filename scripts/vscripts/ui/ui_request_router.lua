@@ -28,6 +28,14 @@ local function safe_number(entity, method_name, fallback, ...)
 end
 
 local function effective_attack_speed(unit)
+    -- Arrow towers have a project-owned final BAT after gameplay-stats effects
+    -- are applied. Prefer that cache: some engine builds keep
+    -- GetAttacksPerSecond stale for one or more frames after SetBaseAttackTime,
+    -- which made a freshly selected tower panel show the old speed.
+    local project_speed = tonumber(unit and unit.survival_attack_speed)
+    if project_speed and unit.survival_building_id == "arrow_tower" then
+        return project_speed
+    end
     -- 非英雄单位需要反映光环等临时 Modifier。false 表示不忽略临时攻速；
     -- 自定义英雄仍由 hero_ui_snapshot 的配置权威链路接管。
     local attacks_per_second = safe_number(
@@ -44,7 +52,7 @@ local function effective_attack_speed(unit)
     if seconds_per_attack and seconds_per_attack > 0 then
         return 1 / seconds_per_attack
     end
-    return tonumber(unit.survival_attack_speed)
+    return project_speed
         or (1 / math.max(0.01,
             safe_number(unit, "GetBaseAttackTime", 2)))
 end
