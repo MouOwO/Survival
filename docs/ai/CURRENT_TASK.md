@@ -868,7 +868,7 @@ PROJECT -> CURRENT_SPRINT -> CURRENT_TASK -> TASK -> Files -> Tests
 ## 当前实施任务补充（2026-09-02）：防御塔攻速与护甲 UI 即时刷新
 
 - 修复 `tower_attack_speed_bonus_pct` 只改变引擎 `BaseAttackTime`、未同步自定义 ScanPanel 数据的问题：箭塔每次科技/档案效果重算后，同时更新 `survival_attack_speed` 与 `survival_attack_interval`，随后由既有 `BUILDING_CHANGED` 快照立即推送新攻速。
-- 审计护甲刷新链：英雄面板护甲继续由 `HERO_COMBAT_STATS_CHANGED` 推送；墙体护甲通过 `PERMANENT_REWARD_EFFECTS_CHANGED -> BUILDING_CHANGED` 推送；攻击固定减甲和毒云百分比减甲通过 `UNIT_COMBAT_STATS_CHANGED` 推送。
+- 审计护甲刷新链：英雄面板护甲继续由 `HERO_COMBAT_STATS_CHANGED` 推送；墙体护甲通过 `PERMANENT_REWARD_EFFECTS_CHANGED -> BUILDING_CHANGED` 推送；攻击固定减甲、毒云百分比减甲及隔离测试清除旧减甲均通过 `UNIT_COMBAT_STATS_CHANGED` 推送。
 - 补齐 `enemy_initial_armor_reduction` 对当前已选怪物的 `UNIT_COMBAT_STATS_CHANGED` 派发，并在重算敌军初始护甲时保留已有固定减甲、最低护甲和毒云百分比状态，不再把有效护甲直接覆盖为新的基础护甲。
 - 修复自定义 War3 护甲单位收到减甲事件时误读引擎原生 `0` 护甲占位值的问题；ScanPanel 现在读取与伤害过滤一致的 `survival_effective_war3_armor`。
-- 三个目标 Lua 文件语法检查及塔攻速快照、选中单位攻速/护甲推送、敌军初始护甲事件、护甲映射、毒云与 gameplay stats 隔离专项测试通过；仍需 Workshop Tools 实机验证连续选中箭塔/怪物时的即时数值变化。
+- 攻速 Aura 仅续期且数值/层数未变化时不再派发冗余 UI 刷新，避免相同单位无意义重渲染。目标 Lua 语法检查及塔攻速快照、选中单位攻速/护甲推送、敌军初始护甲事件、护甲映射、毒云与 gameplay stats 隔离专项测试通过；仍需 Workshop Tools 实机验证连续选中箭塔/怪物时的即时数值变化。

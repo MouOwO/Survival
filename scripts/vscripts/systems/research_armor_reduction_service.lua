@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local armor_balance = require("config/armor_balance")
 
@@ -224,8 +225,12 @@ function M.reset_for_isolated_test()
     for _, class_name in ipairs({ "npc_dota_creature", "npc_dota_building" }) do
         for _, unit in ipairs(Entities:FindAllByClassname(class_name) or {}) do
             if valid_unit(unit) then
-                if type(unit.HasModifier) == "function"
-                    and unit:HasModifier("modifier_research_armor_reduction") then
+                local had_modifier = type(unit.HasModifier) == "function"
+                    and unit:HasModifier("modifier_research_armor_reduction")
+                local previous_effective = tonumber(
+                    unit.survival_effective_war3_armor
+                )
+                if had_modifier then
                     unit:RemoveModifierByName("modifier_research_armor_reduction")
                 end
                 if tonumber(unit.survival_war3_armor) ~= nil then
@@ -237,6 +242,23 @@ function M.reset_for_isolated_test()
                             unit.survival_minimum_war3_armor,
                             unit.survival_poison_cloud_armor_reduction_pct
                         )
+                end
+                local custom_changed = previous_effective ~= nil
+                    and math.abs(previous_effective - (tonumber(
+                        unit.survival_effective_war3_armor
+                    ) or previous_effective)) > 0.0001
+                if (had_modifier or custom_changed)
+                    and type(unit.entindex) == "function" then
+                    local target = unit
+                    local entindex = unit:entindex()
+                    scheduler.after(0, function()
+                        if not valid_unit(target) then return end
+                        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+                            unit = target,
+                            entindex = entindex,
+                            reason = "research_armor_reset",
+                        })
+                    end, "research_armor_reset_ui_" .. tostring(entindex))
                 end
             end
         end
