@@ -80,6 +80,12 @@
 - 改为先构造 `stockText`，再按 `stock_replenish_remaining` 追加“秒后补货”，最后调用 `setText`；显示内容和商店 CSV 权威数据没有改变。
 - Node.js `node --check`、严格 UTF-8、限定 `git diff --check` 通过；Resource Compiler 返回 `OK: 1 compiled, 0 failed, 0 skipped`，已同步生成 `game/.../shop_tooltip.vjs_c`。
 
+# 2026-08-29 - 玩家建墙期限与断线判负
+
+- 按用户限定范围新增玩家级幂等判负：开局后复用 CSV 权威首波延迟 `150s` 检查未建墙玩家；断线进入 `20s` grace，超时判负；窗口内城墙被摧毁立即判负。
+- 判负后发布 `PLAYER_DEFEATED`，并复用既有 `PLAYER_DISCONNECTED` 清理链停止该玩家后续出怪、清理其存量怪物和资产；仅所有参与玩家均判负时触发全局失败。
+- 未修改 CSV、生成配置、碰撞、怪物 AI、目标回退及其他玩法逻辑。自动验证通过 `MULTIPLAYER_PLAYER_DEFEAT_LUA51_PASS`、多人契约、早期终波回归、目标 Lua 5.1 语法、严格 UTF-8、CSV/生成一致和限定 `git diff --check`；尚需双客户端 Workshop 实机验证。
+
 # 2026-08-29 - 玩家退出清理、独立波次通道与服务端所有权门禁
 
 - 根据实机日志确认 `template_map` 编译内容已有 `monsterborn_player1..4`，实际不出怪根因是 `wave_system` 仍使用旧全局 `monsterborn/monsterorn` 单例。现按 `player_slots.csv::wave_spawn_marker` 为活动玩家建立通道，同一正式波次按通道展开；怪物记录所属 `player_id` 并绑定该玩家城墙，挑战建筑怪同步按玩家通道生成。Boss 奖励只发给所属玩家，`boss_alive` 按剩余 Boss 重算。

@@ -2,6 +2,7 @@ local M = {
     GAME_STARTED = "game.started",
     HERO_READY = "player.hero_ready",
     PLAYER_DISCONNECTED = "player.disconnected",
+    PLAYER_DEFEATED = "player.defeated",
     BUILDER_READY = "player.builder_ready",
     BUILDER_GET_REQUEST = "player.builder_get.request",
     HERO_REPLACEMENT_SELECT = "hero.replacement.select",
