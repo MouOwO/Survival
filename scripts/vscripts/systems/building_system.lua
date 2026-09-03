@@ -25,6 +25,7 @@ local construction_visual = require(
 local action_cooldown_rollback = require("core/action_cooldown_rollback")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 local player_tower_limits = require("systems/player_tower_limit_service")
+local building_count_limits = require("systems/building_count_limit_service")
 local building_defeat_rules = require("systems/building_defeat_rules")
 local online_time_service = require("systems/online_time_service")
 local M = {}
@@ -204,20 +205,11 @@ local function tower_class_slot_request(payload)
     return snapshot
 end
 local function building_limit_reached(definition, existing_count, player_id)
-    local extra = 0
-    if definition and definition.id == "gold_mine" and player_id ~= nil then
-        local ok, permanent = pcall(
-            event_bus.request,
-            events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-            { player_id = player_id }
-        )
-        if not ok then permanent = nil end
-        extra = tonumber(permanent and permanent.totals
-            and permanent.totals.gold_mine_build_cap) or 0
-    end
-    return player_tower_limits.limit_reached(
-        (tonumber(definition and definition.max_count) or 0) + extra,
-        existing_count
+    return building_count_limits.reached(
+        definition and definition.max_count,
+        existing_count,
+        definition and definition.id,
+        player_id
     )
 end
 local function has_completed_building(player_id, building_id)

@@ -98,7 +98,8 @@ local function default_fields(context)
         )
         fields[#fields + 1] = field(
             "hero_health_regen", "英雄每秒回血",
-            safe_number(hero, "GetHealthRegen", 0), "hero", 150
+            number(combat.health_regen_per_second,
+                safe_number(hero, "GetHealthRegen", 0)), "hero", 150
         )
     else
         fields[#fields + 1] = field(

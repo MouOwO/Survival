@@ -34,6 +34,11 @@ package.loaded["systems/technology_stat_manager"] = {
         return { final = { lumberjack = {} } }
     end,
 }
+package.loaded["systems/player_profile_service"] = {
+    get_profile = function()
+        return { save = { gameplay_stats = { lumberjack_attack_range = 125 } } }
+    end,
+}
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
@@ -69,6 +74,8 @@ local function worker()
     function unit:SetBaseDamageMin(value) self.damage_min = value end
     function unit:SetBaseDamageMax(value) self.damage_max = value end
     function unit:SetBaseAttackTime(value) self.base_attack_time = value end
+    function unit:Script_SetAttackRange(value) self.attack_range = value end
+    function unit:SetAcquisitionRange(value) self.acquisition_range = value end
     function unit:HasModifier(name) return self.modifiers[name] ~= nil end
     function unit:AddNewModifier(_, _, name, values)
         self.modifiers[name] = values or {}
@@ -218,6 +225,9 @@ for _, candidate in ipairs(created) do
 end
 assert(first_lumberjack and first_lumberjack.damage_min == 22,
     "LV1 worker did not receive configured stats and lumberjack AI")
+assert(first_lumberjack.attack_range == 525
+        and first_lumberjack.acquisition_range == 525,
+    "lumberjack attack range gameplay stat was not applied")
 
 -- Even a stale explicit LV1 request must resolve to the currently unlocked
 -- tier; clients cannot bypass or roll back the shared training progression.

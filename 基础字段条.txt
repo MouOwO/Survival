@@ -1,5 +1,7 @@
 initial_wood
 initial_gold
+hero_initial_gold
+health_regen_per_second
 wood_per_second
 lumberjack_attack_efficiency
 gold_per_second
@@ -46,6 +48,7 @@ hero_attack_speed_bonus_pct
 hero_attack_interval_reduction
 hero_damage_bonus_flat
 hero_initial_health
+hero_health_regen_per_second
 hero_initial_armor
 hero_attack_attribute_efficiency_pct
 hero_attack_range
@@ -56,6 +59,7 @@ hero_attack_wood_flat
 hero_damage_wood_bonus_pct
 hero_attack_per_second
 tower_attack_flat
+tower_health_regen_per_second
 tower_attack_interval_reduction
 tower_critical_damage_bonus_pct
 tower_damage_attack_growth

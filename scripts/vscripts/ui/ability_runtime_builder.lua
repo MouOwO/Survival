@@ -7,8 +7,10 @@ local research_lab_abilities = require("config/generated/research_lab_abilities"
 local builder_ability_stages = require("config/generated/builder_ability_stages")
 local research_config = require("config/research_technology_config")
 local research_description = require("research/research_technology_description")
+local research_cost_service = require("research/research_cost_service")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local building_count_limits = require("systems/building_count_limit_service")
 local M = {}
 local builder_slot_order_by_ability = {}
 local tooltip_definitions = require("config/generated/tooltip_definitions")
@@ -280,7 +282,9 @@ local function build_ability(ability_name, state, resources)
     end
     local required = definition.unlock_city_level or 0
     local city_level = state and state.city_level or 0
-    local maximum = definition.max_count or 0
+    local maximum = building_count_limits.maximum(
+        definition.max_count, definition.id, state and state.player_id
+    )
     local built = count(state or {}, definition.id)
     local unlocked = city_level >= required
     local under_limit = maximum <= 0 or built < maximum
@@ -326,6 +330,7 @@ end
 local function research_upgrade(ability_name, state, resources)
     local mapping = research_lab_abilities.by_id[ability_name]
     if not mapping then return nil end
+    local player_id = state and state.player_id
     local definition = research_config.by_legacy_group[mapping.technology_group]
     if not definition or (state.building_id ~= nil
         and state.building_id ~= mapping.building_id) then
@@ -370,7 +375,10 @@ local function research_upgrade(ability_name, state, resources)
             fields = research_description.fields(definition, current, current),
         }
     end
-    local cost = research_config.cost_for_level(definition, target) or {}
+    local base_cost = research_config.cost_for_level(definition, target) or {}
+    local cost = research_cost_service.for_player(
+        base_cost, event_bus, events, player_id
+    )
     local status_code = "available"
     local status = "可以研究"
     local available = true

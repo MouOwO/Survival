@@ -5,6 +5,9 @@ local shop_listings = require("config/generated/shop_entries")
 local evaluator = require("systems/shop_condition_evaluator")
 local research_config = require("config/research_technology_config")
 local research_description = require("research/research_technology_description")
+local research_cost_service = require("research/research_cost_service")
+local event_bus = require("core/event_bus")
+local events = require("core/events")
 local challenge_runtime_rules = require("config/challenge_runtime_rules")
 
 local M = {}
@@ -427,7 +430,10 @@ local function project_entry(player_id, entry, context)
     if research then
         local target_level = tonumber(item.next_technology_level) or 0
         local current_level = tonumber(item.technology_level) or 0
-        local cost = research_config.cost_for_level(research, target_level)
+        local base_cost = research_config.cost_for_level(research, target_level)
+        local cost = research_cost_service.for_player(
+            base_cost, event_bus, events, player_id
+        )
         item.name = research.display_name .. " Lv."
             .. tostring(target_level)
         item.description = research_description.build(

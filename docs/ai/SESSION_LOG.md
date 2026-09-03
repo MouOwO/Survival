@@ -106,6 +106,12 @@
 - 通过约 3 秒间隔的两帧截图对比，TA 的 `idle` 姿态发生变化，头发、肩部和护甲保持附着并随主体同步变化，没有原点堆叠、刚性留置或明显漂移；探针界面随后记录为 `PASS`。截图保存在 `%TEMP%\survival_ta_portrait_probe_frame_a.png`、`%TEMP%\survival_ta_portrait_probe_frame_b.png` 和 `%TEMP%\survival_ta_portrait_probe_pass.png`。
 - 本轮 `game\dota\console.log` 最后写入时间为本次启动前，未获得本轮 `[TA_PORTRAIT_PROBE]` 或 `[TA_PORTRAIT_PROBE_RESULT]` 文本日志；本次 `PASS` 结论来自运行时界面和动态截图，不把静态合同、资源编译或旧日志当作实机证据。
 
+# 2026-08-29 - Templar Assassin 死亡塔头像场景探针实机验收
+
+- Workshop Tools 运行中的 Dota 进程参数确认为 `-addon survival_ta_portrait_probe -tools`，窗口响应正常；运行画面显示 TA 主体以及 CSV 解析出的 `head`、`shoulder`、`armor` 三个穿戴件。
+- 通过约 3 秒间隔的两帧截图对比，TA 的 `idle` 姿态发生变化，头发、肩部和护甲保持附着并随主体同步变化，没有原点堆叠、刚性留置或明显漂移；探针界面随后记录为 `PASS`。截图保存在 `%TEMP%\survival_ta_portrait_probe_frame_a.png`、`%TEMP%\survival_ta_portrait_probe_frame_b.png` 和 `%TEMP%\survival_ta_portrait_probe_pass.png`。
+- 本轮 `game\dota\console.log` 最后写入时间为本次启动前，未获得本轮 `[TA_PORTRAIT_PROBE]` 或 `[TA_PORTRAIT_PROBE_RESULT]` 文本日志；本次 `PASS` 结论来自运行时界面和动态截图，不把静态合同、资源编译或旧日志当作实机证据。
+
 # 2026-08-28 — 研究所所有研究技能排除 A 键
 
 - 用户确认普通与高级研究所的研究技能全部排除 `A`，从 `Q/W/E/R/T/S` 开始顺序分配；最终高级十槽为 `Q/W/E/R/T/S/D/F/G/H`。

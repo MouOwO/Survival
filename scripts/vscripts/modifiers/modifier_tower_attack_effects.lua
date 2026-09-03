@@ -20,6 +20,9 @@ local tower_combat_rules = require("config/tower_combat_rules")
 local anti_air_rules = require("systems/anti_air_rules")
 local tower_multi_damage = require("systems/tower_multi_damage")
 local tower_laser_damage = require("systems/tower_laser_damage")
+local native_wearable_carrier = require(
+    "visual/native_wearable_carrier_service"
+)
 
 local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
     and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
@@ -1273,6 +1276,12 @@ function modifier_tower_attack_effects:OnAttackStart(params)
             pcall(caster.StartGesture, caster, attack_activity)
         end
     end
+    native_wearable_carrier.StartGesture(
+        caster,
+        rawget(_G, "ACT_DOTA_ATTACK"),
+        skill_matching(caster, "lightning_strike_")
+            and LIGHTNING_ATTACK_PLAYBACK_RATE or nil
+    )
     event_bus.emit(events.TOWER_ATTACK_START, {
         tower = caster,
         target = target,

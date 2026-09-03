@@ -2,11 +2,34 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local weapons = require("config/generated/weapon_definitions")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local player_profile_service = require("systems/player_profile_service")
 
 local M = {}
 local state_by_player = {}
 local FORGING_HAMMER_ID = "item_forging_hammer"
 local FORGING_HAMMER_LIMIT = 4
+
+local function requirement_reduction(player_id)
+    local projected = event_bus.request(
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id }
+    )
+    local totals = projected and projected.totals or {}
+    local result = tonumber(totals.weapon_upgrade_requirement_reduction)
+    if result == nil then
+        local profile = player_profile_service.get_profile(player_id)
+        local stats = profile and profile.save
+            and profile.save.gameplay_stats or {}
+        result = tonumber(stats.weapon_upgrade_requirement_reduction)
+    end
+    return math.max(0, math.floor(tonumber(result) or 0))
+end
+
+local function requirement_for(player_id, definition)
+    local target = tonumber(definition and definition.progression_value) or 0
+    if target <= 0 then target = 200 end
+    return math.max(1, target - requirement_reduction(player_id))
+end
 
 local function state(player_id)
     state_by_player[player_id] = state_by_player[player_id] or {
@@ -26,11 +49,7 @@ end
 local function snapshot(player_id)
     local current = state(player_id)
     local definition = weapons.by_id[current.content_id] or {}
-    local target = tonumber(definition.progression_value) or 0
-    if current.series_id == "ice_blade" and target <= 0
-        and tostring(definition.next_content_id or "") ~= "" then
-        target = 200
-    end
+    local target = requirement_for(player_id, definition)
     local inventory = event_bus.request(
         events.CONTENT_INVENTORY_GET_REQUEST,
         { player_id = player_id }
@@ -104,7 +123,7 @@ local function on_equipped(payload)
 end
 
 local function upgrade_if_ready(player_id, current, definition)
-    local target = tonumber(definition.progression_value) or 0
+    local target = requirement_for(player_id, definition)
     local next_id = tostring(definition.next_content_id or "")
     if definition.progression_type ~= "normal_attack_count"
         or target <= 0 or next_id == ""

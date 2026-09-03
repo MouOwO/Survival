@@ -4,6 +4,7 @@ local config = require("config/workers_config")
 local training_definitions = require("config/generated/training_definitions")
 local global_rules = require("config/global_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local player_profile_service = require("systems/player_profile_service")
 local worker_training_progress = require("systems/worker_training_progress")
 local armor_balance = require("config/armor_balance")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
@@ -346,6 +347,16 @@ local function refresh_worker_technology(player_id, refresh_reason)
         { player_id = player_id }
     )
     local permanent = permanent_result and permanent_result.totals or {}
+    -- The profile stat service is the source of truth for gameplay_stats. Keep
+    -- a direct fallback here because a worker can be created in the same
+    -- frame as the permanent-effect projection refresh; without it the range
+    -- bonus would be lost until another unrelated profile event arrived.
+    local profile = player_profile_service.get_profile(player_id)
+    local profile_stats = profile and profile.save
+        and profile.save.gameplay_stats or {}
+    local profile_range = tonumber(profile_stats.lumberjack_attack_range) or 0
+    local projected_range = tonumber(permanent.lumberjack_attack_range) or 0
+    local lumberjack_attack_range = math.max(projected_range, profile_range)
     -- lumberjack_attack_efficiency is the profile baseline (13 by default),
     -- not a hero-tree bonus. Apply only its delta over the configured default
     -- to each training tier so higher-tier worker bases remain intact.
@@ -386,7 +397,7 @@ local function refresh_worker_technology(player_id, refresh_reason)
             state.unit.survival_attack_speed = 1 / final_attack_interval
             local range = math.max(0, (tonumber(state.base_attack_range)
                 or tonumber(state.unit.survival_attack_range) or 400)
-                + (tonumber(permanent.lumberjack_attack_range) or 0))
+                + lumberjack_attack_range)
             if state.unit.Script_SetAttackRange then
                 state.unit:Script_SetAttackRange(range)
             end
@@ -689,23 +700,6 @@ local function train_worker_one(payload)
                 "repairer_training_capacity_flat:" .. tostring(training_id)
             )
         if not progress or (max_count > 0 and progress.count >= max_count) then
-            return { ok = false, error = "training_max_count_reached" }
-        end
-    elseif not is_lumberjack then
-        local existing_count = 0
-        for _, state in pairs(workers) do
-            if state.training_id == training_id and valid_entity(state.unit) then
-                existing_count = existing_count + 1
-            end
-        end
-        local permanent = event_bus.request(
-            events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-            { player_id = city_state.player_id }
-        )
-        local max_count = (tonumber(training.max_count) or 0)
-            + (tonumber(permanent and permanent.totals
-                and permanent.totals.farmer_cap) or 0)
-        if max_count > 0 and existing_count >= max_count then
             return { ok = false, error = "training_max_count_reached" }
         end
     end

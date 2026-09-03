@@ -94,9 +94,14 @@ local function initialize_from_profile(payload)
     local stats = gameplay_stats(player_id)
     if not stats then return false end
     local profile_initial_wood = math.max(0, tonumber(stats.initial_wood) or 0)
-    local profile_initial_gold = math.max(0, tonumber(stats.initial_gold) or 0)
+    -- Hero-start gold is another opening grant for the same player wallet;
+    -- combine it before delta tracking so profile refreshes remain idempotent.
+    local profile_initial_gold = math.max(0,
+        (tonumber(stats.initial_gold) or 0)
+            + (tonumber(stats.hero_initial_gold) or 0))
     local profile_initial_population_cap = math.max(0,
         tonumber(stats.initial_population_cap) or config.initial_max_population)
+        + math.max(0, tonumber(stats.farmer_cap) or 0)
     if account.initialized then
         local wood_delta = profile_initial_wood
             - (tonumber(account.profile_initial_wood) or 0)

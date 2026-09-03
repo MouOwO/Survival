@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local stages = require("config/generated/builder_ability_stages")
 local training = require("config/generated/training_definitions")
+local building_count_limits = require("systems/building_count_limit_service")
 
 local M = {}
 local BUILDER_BLINK_ABILITY = "ability_survival_builder_blink"
@@ -123,7 +124,9 @@ local function can_activate(state, row)
     if state.city_level < (tonumber(row.required_city_level) or 0) then
         return false
     end
-    local maximum = tonumber(row.max_building_count) or 0
+    local maximum = building_count_limits.maximum(
+        row.max_building_count, row.building_id, state.player_id
+    )
     if maximum > 0 and count(state, row.building_id) >= maximum then
         return false
     end
@@ -139,8 +142,12 @@ local function can_activate(state, row)
 end
 
 local function count_limit_reached(state, row)
-    local maximum = tonumber(row.max_building_count) or 0
-    return maximum > 0 and count(state, row.building_id) >= maximum
+    return building_count_limits.reached(
+        row.max_building_count,
+        count(state, row.building_id),
+        row.building_id,
+        state.player_id
+    )
 end
 
 local function should_show(state, row)
@@ -623,6 +630,11 @@ function M.init()
         for _, state in pairs(state_by_player) do
             if state.player_id == player_id then sync(state) end
         end
+    end)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        local state = player_id ~= nil and state_by_player[player_id] or nil
+        if state then sync(state) end
     end)
 end
 

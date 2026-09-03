@@ -1,6 +1,5 @@
 local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
 local multiplayer_rules = require("config/generated/multiplayer_rules")
-local multiplayer_player_service = require("systems/multiplayer_player_service")
 
 local function configured_max_players()
     local rule = (multiplayer_rules.by_id or {}).default_multiplayer
@@ -13,11 +12,10 @@ local function configured_setup_wait_seconds()
 end
 
 local function configure_survival_launch_rules()
-    local game_mode = GameRules:GetGameModeEntity()
-    if not game_mode then
-        return false, "game_mode_entity_unavailable"
-    end
-    game_mode:SetCustomGameForceHero(SURVIVAL_FORCE_HERO)
+    -- These rules belong to GameRules itself and must be applied immediately.
+    -- During module loading the GameModeEntity can still be unavailable; an
+    -- early return before these calls would leave the default All Pick phase
+    -- active whenever a later gameplay require is slow or fails.
     GameRules:SetCustomGameSetupTimeout(configured_setup_wait_seconds())
     GameRules:SetHeroSelectionTime(0)
     GameRules:SetShowcaseTime(0)
@@ -29,12 +27,18 @@ local function configure_survival_launch_rules()
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
     GameRules:EnableCustomGameSetupAutoLaunch(true)
     GameRules:SetCustomGameSetupAutoLaunchDelay(configured_setup_wait_seconds())
+
+    local game_mode = GameRules:GetGameModeEntity()
+    if not game_mode then
+        return false, "game_mode_entity_unavailable"
+    end
+    game_mode:SetCustomGameForceHero(SURVIVAL_FORCE_HERO)
     return true, nil
 end
 
--- Apply launch-critical rules before loading gameplay modules when the engine
--- entity already exists. Some Workshop startup paths create it only before
--- Activate; that case is recorded as deferred and retried there.
+-- Apply GameRules launch values before loading gameplay modules. The forced
+-- hero is applied here when possible, or retried from Activate after the
+-- GameModeEntity has been created.
 local launch_call_ok, launch_rules_applied, launch_rules_error =
     pcall(configure_survival_launch_rules)
 local launch_rules_ok = launch_call_ok and launch_rules_applied == true
@@ -53,6 +57,7 @@ print(
         .. " error=" .. tostring(launch_rules_error)
 )
 
+local multiplayer_player_service = require("systems/multiplayer_player_service")
 local modifier_registry = require("core/modifier_registry")
 local modifiers_valid, modifier_count_or_error = modifier_registry.register()
 assert(modifiers_valid,

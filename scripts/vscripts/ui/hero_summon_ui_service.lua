@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 
 local M = {}
+local shop_unlocked_by_player = {}
 
 local function valid_player_id(player_id)
     return player_id ~= nil
@@ -102,8 +103,15 @@ local function on_state_changed(payload)
 end
 
 local function on_shop_unlock(payload)
-    send(payload.player_id, "ui_shop_unlock_state", payload)
-    if tonumber(payload.unlocked) == 1 then
+    local player_id = tonumber(payload and payload.player_id)
+    local unlocked = tonumber(payload and payload.unlocked) == 1
+    local was_unlocked = player_id ~= nil
+        and shop_unlocked_by_player[player_id] == true
+    if player_id ~= nil then
+        shop_unlocked_by_player[player_id] = unlocked
+    end
+    send(player_id, "ui_shop_unlock_state", payload)
+    if unlocked and not was_unlocked then
         send(payload.player_id, "ui_notification", {
             message = "英雄已召唤，装备商店已解锁",
             level = "info",
@@ -112,6 +120,7 @@ local function on_shop_unlock(payload)
 end
 
 function M.init()
+    shop_unlocked_by_player = {}
     register_snapshot()
     register_summon()
     event_bus.subscribe(events.HERO_ALTAR_OPEN_REQUEST, on_altar_open)

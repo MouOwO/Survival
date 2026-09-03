@@ -3,6 +3,8 @@ field_id,storage_type,default_value,unit,min_value,max_value,enabled,notes
 #types:string,string,number,string,number,number,boolean,string
 initial_wood,integer,10,wood,0,,1,玩家初始木材数量。
 initial_gold,integer,0,gold,0,,1,玩家初始金币数量。
+hero_initial_gold,integer,0,gold,0,,1,每名英雄提供的初始金币；与玩家初始金币叠加。
+health_regen_per_second,decimal,0,health_per_second,0,,1,英雄和防御塔每秒回血。
 wood_per_second,decimal,1,wood_per_second,0,,1,玩家每秒木材增加量。
 lumberjack_attack_efficiency,integer,13,wood_per_attack,0,,1,伐木工每次攻击的基础采集值。
 gold_per_second,decimal,0,gold_per_second,0,,1,玩家每秒金币增加量。
@@ -25,7 +27,7 @@ tower_attack_bonus_pct,percentage,0,percent,0,10000,1,防御塔攻击力加成�
 tower_attack_speed_bonus_pct,percentage,0,percent,0,10000,1,防御塔攻速加成百分比；20表示20%。
 tower_attack_armor_reduction,decimal,0,armor,0,,1,防御塔攻击附带的减甲数量。
 tower_critical_chance_pct,percentage,0,percent,0,100,1,防御塔暴击几率百分比；15表示15%。
-tower_attack_interval,decimal,1.7,seconds,0.01,,1,防御塔攻击间隔，单位为秒。
+tower_attack_interval,decimal,0,seconds,0,,1,防御塔攻击间隔减少量；与 tower_attack_interval_reduction 叠加。
 tower_final_damage_bonus_pct,percentage,0,percent,0,10000,1,防御塔最终伤害增加百分比；15表示15%。
 tower_attack_per_second,decimal,0,attack_per_second,0,,1,星之庇佑每秒增加的防御塔攻击力。
 wall_damage_block,decimal,0,damage,0,,1,城墙每次抵挡的固定伤害。
@@ -34,7 +36,7 @@ wall_armor_bonus_pct,percentage,0,percent,0,10000,1,城墙防御力加成百分�
 wall_health_regen_per_second,decimal,0,health_per_second,0,,1,城墙每秒回血增加量。
 wall_initial_health,integer,1000,health,0,,1,城墙初始生命值。
 wall_armor,decimal,0,armor,0,,1,城墙初始护甲值。
-wall_health_bonus_pct,percentage,0,percent,0,10000,1,城墙生命值加成百分比；20表示20%。
+wall_health_bonus_pct,percentage,0,percent,0,10000,1,城墙生命值加成百分比；20表示20%；直接等价于初级城墙强化科技。
 wall_health_per_second,decimal,0,health_per_second,0,,1,城墙每秒生命值增加量。
 lumberjack_attack_growth,decimal,1,attack_per_growth,0,,1,伐木工每次攻击后的攻击力成长量。
 lumberjack_attack_speed_bonus_pct,percentage,0,percent,0,10000,1,伐木工攻速加成百分比；20表示20%。
@@ -49,6 +51,7 @@ hero_attack_speed_bonus_pct,percentage,0,percent,0,10000,1,英雄攻击速度百
 hero_attack_interval_reduction,decimal,0,seconds,0,,1,英雄攻击间隔减少量；词条“英雄攻击间隔-1”按增量减少间隔。
 hero_damage_bonus_flat,decimal,0,damage,0,,1,英雄造成的固定伤害加成。
 hero_initial_health,decimal,0,health,0,,1,英雄初始生命值。
+hero_health_regen_per_second,decimal,0,health_per_second,0,,1,英雄每秒回血。
 hero_initial_armor,decimal,0,armor,0,,1,英雄初始护甲值。
 hero_attack_attribute_efficiency_pct,percentage,0,percent,0,10000,1,英雄攻击获得属性时的效率百分比。
 hero_attack_range,decimal,0,range,0,,1,英雄攻击范围增加量。
@@ -58,7 +61,8 @@ hero_attack_gold_flat,decimal,0,gold,0,,1,英雄普通攻击时获得的固定�
 hero_attack_wood_flat,decimal,0,wood,0,,1,英雄普通攻击时获得的固定木材。
 hero_damage_wood_bonus_pct,percentage,0,percent,0,10000,1,英雄造成伤害获得木材的百分比加成。
 hero_attack_per_second,decimal,0,attack_per_second,0,,1,英雄每秒攻击力成长。
-tower_attack_flat,decimal,0,attack,0,,1,箭塔固定攻击力加成。
+tower_attack_flat,decimal,0,attack,0,,1,所有防御塔固定攻击力加成；直接等价于初级防御塔强化科技。
+tower_health_regen_per_second,decimal,0,health_per_second,0,,1,防御塔每秒回血。
 tower_attack_interval_reduction,decimal,0,seconds,0,,1,箭塔攻击间隔减少量；词条“箭塔攻击间隔-1”按增量减少间隔。
 tower_critical_damage_bonus_pct,percentage,0,percent,0,10000,1,箭塔暴击伤害百分比加成。
 tower_damage_attack_growth,decimal,0,attack_per_damage,0,,1,箭塔每次造成伤害后的攻击力增加量。
@@ -70,13 +74,13 @@ gold_mine_final_output_flat,decimal,0,gold,0,,1,金矿最终产量固定增加�
 gold_mine_income_interval_reduction,decimal,0,seconds,0,,1,金矿收益间隔减少量。
 gold_mine_build_cap,integer,0,count,0,,1,金矿可建造数量上限增加量。
 training_room_income_bonus_pct,percentage,0,percent,0,10000,1,练功房收益百分比加成。
-farmer_cap,integer,0,count,0,,1,农民上限增加量。
+farmer_cap,integer,0,population,0,,1,直接增加玩家人口上限（兼容旧字段名）。
 faith_settlement_bonus,decimal,0,faith,0,,1,天狱模式结算时获得的信仰值增加量。
 item_pool_size_reduction,integer,0,count,0,,1,物品池总数量减少量；运行时不得低于零。
 weapon_upgrade_requirement_reduction,integer,0,count,0,,1,武器升级需求次数减少量；运行时不得低于零。
-technology_cost_refund_pct,percentage,0,percent,0,100,1,科技总费用返还百分比。
-technology_wood_cost_refund_pct,percentage,0,percent,0,100,1,科技木材费用返还百分比。
-technology_gold_cost_refund_pct,percentage,0,percent,0,100,1,科技金币费用返还百分比。
+technology_cost_refund_pct,percentage,0,percent,0,100,1,科技总费用折扣百分比（兼容旧字段名）。
+technology_wood_cost_refund_pct,percentage,0,percent,0,100,1,科技木材费用折扣百分比（兼容旧字段名）。
+technology_gold_cost_refund_pct,percentage,0,percent,0,100,1,科技金币费用折扣百分比（兼容旧字段名）。
 lumberjack_efficiency,decimal,0,efficiency,0,,1,伐木效率固定增加量，与每次伐木固定数量分开计算。
 lumberjack_attack_interval_reduction,decimal,0,seconds,0,,1,伐木工攻击间隔减少量。
 lumberjack_attack_range,decimal,0,range,0,,1,伐木工攻击范围增加量。
@@ -85,13 +89,12 @@ lumberjack_critical_chance_pct,percentage,0,percent,0,100,1,伐木暴击几率�
 lumberjack_critical_yield_bonus_pct,percentage,0,percent,0,10000,1,伐木暴击收益百分比加成。
 wall_armor_per_second,decimal,0,armor_per_second,0,,1,城墙每秒护甲增加量。
 global_final_damage_bonus_pct,percentage,0,percent,0,10000,1,所有单位最终伤害百分比加成。
-global_attack_armor_reduction,decimal,0,armor,0,,1,所有攻击通用的固定减甲量。
+global_attack_armor_reduction,decimal,0,armor,0,,1,所有英雄、伐木工和防御塔攻击敌人时通用的固定减甲量。
 team_hero_wall_armor_bonus,decimal,0,armor,0,,1,对所有联机玩家英雄和城墙生效的护甲增加量。
 enemy_initial_armor_reduction,decimal,0,armor,0,,1,地图上所有敌方单位的初始护甲减少量。
-# TODO: 每秒回血；作用对象和计算时机尚未确定，暂不生成运行时字段。
-# TODO: 英雄生命护甲加成；同时增加生命和护甲的具体计算方式尚未确定。
-# TODO: 初级防御塔强化科技；记录科技等级还是直接属性加成尚未确定。
-# TODO: 初级城墙强化科技；记录科技等级还是直接属性加成尚未确定。
-# TODO: 英雄初始金币；与玩家初始金币的关系尚未确定。
-# REMOVED: 塔生命+1、塔生命加成+1%；箭塔不会掉血，不进入玩家基础字段。
-# REMOVED: 箭塔木材攻击减甲+1；项目不存在箭塔攻击树木逻辑。
+# 已启用：每秒回血分别作用于英雄和防御塔，在每秒运行时心跳结算。
+# 已启用：hero_health_bonus_pct 与 hero_armor_bonus_pct 均按英雄当前面板值计算。
+# 已启用：tower_attack_flat 与 wall_health_bonus_pct 分别直接等价于初级防御塔/城墙强化科技。
+# 已启用：hero_initial_gold 与 initial_gold 共同计入玩家开局金币，数值叠加。
+# 已调整：原“塔生命+1、塔生命加成+1%”改为城墙生命字段，不作用于箭塔。
+# 已调整：原“箭塔木材攻击减甲+1”统一按 global_attack_armor_reduction 作用于敌人。

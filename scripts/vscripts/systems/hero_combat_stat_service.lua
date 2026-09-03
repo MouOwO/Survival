@@ -424,6 +424,8 @@ local function recalculate(player_id, reason)
         hero_attack_bonus_pct = tonumber(permanent.hero_attack_bonus_pct) or 0,
         hero_health_bonus_pct = tonumber(permanent.hero_health_bonus_pct) or 0,
         hero_armor_bonus_pct = tonumber(permanent.hero_armor_bonus_pct) or 0,
+        health_regen_per_second = (tonumber(permanent.health_regen_per_second) or 0)
+            + (tonumber(permanent.hero_health_regen_per_second) or 0),
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
         researcher_critical_chance_pct = researcher_critical_chance_pct,

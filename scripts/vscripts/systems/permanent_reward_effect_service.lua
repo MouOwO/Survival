@@ -122,6 +122,47 @@ local function apply_tower_tick(player_id)
     })
 end
 
+local function heal_unit(unit, amount)
+    if amount <= 0 or not valid_entity(unit) then return false end
+    if unit.IsAlive and not unit:IsAlive() then return false end
+    if type(unit.GetHealth) ~= "function"
+        or type(unit.GetMaxHealth) ~= "function"
+        or type(unit.SetHealth) ~= "function" then
+        return false
+    end
+    local ok_health, health = pcall(unit.GetHealth, unit)
+    local ok_max, maximum = pcall(unit.GetMaxHealth, unit)
+    if not ok_health or not ok_max then return false end
+    health = tonumber(health) or 0
+    maximum = tonumber(maximum) or 0
+    if maximum <= 0 or health >= maximum then return false end
+    pcall(unit.SetHealth, unit, math.min(maximum, health + amount))
+    return true
+end
+
+local function apply_health_regen_tick(player_id)
+    local hero_amount = math.max(0,
+        M.value(player_id, "health_regen_per_second")
+            + M.value(player_id, "hero_health_regen_per_second"))
+    if hero_amount > 0 then
+        heal_unit(player_unit(player_id), hero_amount)
+    end
+    local tower_amount = math.max(0,
+        M.value(player_id, "health_regen_per_second")
+            + M.value(player_id, "tower_health_regen_per_second"))
+    if tower_amount <= 0 or not Entities
+        or type(Entities.FindAllByClassname) ~= "function" then return end
+    for _, class_name in ipairs({ "npc_dota_creature", "npc_dota_building" }) do
+        for _, unit in ipairs(Entities:FindAllByClassname(class_name) or {}) do
+            if valid_entity(unit)
+                and tonumber(unit.survival_player_id) == tonumber(player_id)
+                and tostring(unit.survival_building_id or "") == "arrow_tower" then
+                heal_unit(unit, tower_amount)
+            end
+        end
+    end
+end
+
 local function on_damage(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil or not payload.owner_hero
@@ -404,6 +445,7 @@ function M.init()
             apply_hero_tick(player_id)
             apply_tower_tick(player_id)
             apply_wall_tick(player_id)
+            apply_health_regen_tick(player_id)
         end
         return true
     end, "star_blessing_effect_ticks")

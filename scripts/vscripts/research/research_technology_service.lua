@@ -1,5 +1,7 @@
 local config = require("config/research_technology_config")
 local event_names = require("research/research_event_names")
+local research_cost_service = require("research/research_cost_service")
+local events = require("core/events")
 
 local M = {}
 M.__index = M
@@ -86,7 +88,10 @@ function M:BeginUpgrade(payload)
         ))
     end
 
-    local cost = config.cost_for_level(definition, target_level)
+    local base_cost = config.cost_for_level(definition, target_level)
+    local cost = research_cost_service.for_player(
+        base_cost, self.event_bus, events, player_id
+    )
     local required = definition.prerequisite or {}
     if required.tech_id and self.repository:GetLevel(
         player_id,

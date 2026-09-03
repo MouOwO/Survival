@@ -111,6 +111,7 @@
 !/scripts/vscripts/tests/test_building_batch_upgrade_service.lua
 !/scripts/vscripts/tests/test_gold_mine_batch_upgrade_service.lua
 !/scripts/vscripts/tests/test_gold_mine_auto_upgrade_coordinator.lua
+!/scripts/vscripts/tests/test_gold_mine_build_cap.lua
 !/scripts/vscripts/tests/test_earth_line_visual.lua
 !/scripts/vscripts/tests/test_wave_difficulty_builder.lua
 !/scripts/vscripts/tests/test_wave_difficulty_selection.lua

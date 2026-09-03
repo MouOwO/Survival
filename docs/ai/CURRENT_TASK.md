@@ -135,6 +135,22 @@
 - 本轮验证通过：九项专项 Lua 行为测试全部通过（含已按当前无 Phoenix 专属覆盖合同同步的 `test_phoenix_laser_contract.lua`）；128 个 Lua 文件通过 Lua 5.1 语法检查；8 个目标生成模块与 CSV 临时重建结果逐字节一致；三份塔路线 CSV 的非视觉字段无差异；目标运行时范围无已退役 Phoenix/Muerta/Drow Arcana 资源引用；`git diff --check` 通过。
 - `build_configs.ps1 -CheckOnly` 仍仅被既有无关 `scripts/vscripts/config/generated/rogue_reward_effects.lua` 的单个 `U+FFFD` 阻断；本任务目标文件严格 UTF-8 解码无替换字符。完整生成目录共 109 个 Lua，其中该无关文件是唯一编码异常，未为本任务修改。
 
+## 当前实施任务（2026-08-29）：七路线原生 Dota 塔模型替换
+
+- 用户已批准将七条防御塔路线从英雄主体/穿戴视觉替换为七个互不重复的 Dota 原生塔模型；每条路线的全部 20 个升级等级统一使用同一模型，融合/肉山塔保持不变。
+- 权威映射为：死亡 `tower_dragon_black.vmdl`、冰霜 `tower_radiant_rock_golem.vmdl`、闪电 `tower_dragon_white.vmdl`、机枪 `tower_upgrade.vmdl`、多重 `tower_good2.vmdl`、神秘/激光 `tower_bad.vmdl`、防空 `tower_dire_rock_golem.vmdl`。完整路径已在本机 VPK 索引确认存在。
+- 所有既有 `model_asset_id` 必须保持不变，以继续驱动弹道、技能粒子和运行时分支；玩法数值、费用、人口、技能、升级描述、融合配置均不得改变。删除路线资产的英雄穿戴、饰品常驻粒子、英雄头像元数据和仅适用于英雄主体的手动攻击动作，保留攻击弹道及全部技能效果。
+- 验证范围：七路线模型唯一性、路线内阶段一致性、21 个资源 ID 保留、英雄资源清理、预载代理、融合 Roshan 配置、CSV 生成、Lua 5.1 语法、专项行为测试和 `git diff --check`。自动验证不能替代 Workshop Tools 冷启动后的尺寸、碰撞、待机/攻击/死亡动作、升级、清理和融合塔实机验收。
+
+## 当前实施任务（2026-08-28）：死亡、多重与激光塔九阶段恢复原生英雄外观
+
+- 用户要求将死亡塔、多重塔和激光塔三个阶段链的九个视觉阶段恢复为指定英雄主体与官方原生穿戴，同时保持既有技能、伤害、弹道和激光行为不变。基础数据继续以 `data/csv/` 为唯一权威来源，生成 Lua 只能通过 `build_configs.ps1` 重建。
+- 当前 CSV 映射依次为 Templar Assassin、Wraith King、Phantom Assassin、Vengeful Spirit、Luna、Medusa、Storm Spirit、Io 和 Tinker；原生组件数固定为 `3/6/5/4/6/5/3/0/6`，所有 `portrait_item_def` 为空。Io 使用原生无穿戴主体，不新增组件或资产特效；激光继续统一读取 `tower_laser_effects.csv` 的 Tinker Laser。
+- 当前 CSV 生成合同总量为 `asset_components=116`、`asset_effects=118`；旧测试的 `>=126/137` 阈值属于历史饰品数据，必须改为精确 CSV 合同，禁止通过虚构资源补齐。需补充 `asset_proxy_tower_laser_od_blackgate` 的 Io 主体预载，并删除测试中的 Drow Arcana、Death Prophet 等过期外观预期。
+- 自动验证范围包括完整 CSV 生成、Lua 5.1 语法、九阶段路由/bundle/预载/头像聚焦测试、旧外观引用审计和限定 `git diff --check`。自动化结果不等于 Dota 实机验收；最终仍需完全退出 Dota 后冷启动，逐阶段确认世界模型、原生穿戴、头像、弹道和持续激光表现。
+- 本轮验证通过：九项专项 Lua 行为测试全部通过（含已按当前无 Phoenix 专属覆盖合同同步的 `test_phoenix_laser_contract.lua`）；128 个 Lua 文件通过 Lua 5.1 语法检查；8 个目标生成模块与 CSV 临时重建结果逐字节一致；三份塔路线 CSV 的非视觉字段无差异；目标运行时范围无已退役 Phoenix/Muerta/Drow Arcana 资源引用；`git diff --check` 通过。
+- `build_configs.ps1 -CheckOnly` 仍仅被既有无关 `scripts/vscripts/config/generated/rogue_reward_effects.lua` 的单个 `U+FFFD` 阻断；本任务目标文件严格 UTF-8 解码无替换字符。完整生成目录共 109 个 Lua，其中该无关文件是唯一编码异常，未为本任务修改。
+
 ## 已完成任务（2026-08-28）：研究所所有研究技能排除 A 键
 ## 当前实施任务补充（2026-08-28）：恢复主宰原生摄像机
 

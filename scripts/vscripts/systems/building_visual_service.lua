@@ -2,11 +2,21 @@ local catalog = require("config/asset_catalog")
 local preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
 local appearance = require("visual/model_appearance_service")
+local native_carrier = require("visual/native_wearable_carrier_service")
 
 local M = {}
 local activity_modifiers_by_unit = {}
 local particles_by_unit = {}
 local bodygroups_by_unit = {}
+local NATIVE_TOWER_MODELS = {
+    ["models/props_structures/tower_dragon_black.vmdl"] = true,
+    ["models/props_structures/rock_golem/tower_radiant_rock_golem.vmdl"] = true,
+    ["models/props_structures/tower_dragon_white.vmdl"] = true,
+    ["models/props_structures/tower_upgrade/tower_upgrade.vmdl"] = true,
+    ["models/props_structures/tower_good2.vmdl"] = true,
+    ["models/props_structures/tower_bad.vmdl"] = true,
+    ["models/props_structures/rock_golem/tower_dire_rock_golem.vmdl"] = true,
+}
 
 local function valid_entity(entity)
     if not entity then return false end
@@ -108,10 +118,20 @@ local function reset_main_animation(unit, asset)
     -- SetModel can leave an existing building entity on the previous model's
     -- sequence/animation graph. Refresh that state before selecting the new
     -- bundle's configured default sequence.
+    -- bundle's configured default sequence. Most assets still fall back to
+    -- idle when they do not specify one; native tower models explicitly skip
+    -- that fallback so the engine can select their own activity graph.
     safe_call(unit, "ResetSequenceInfo")
     local sequence = "idle"
     if asset and asset.default_sequence ~= nil then
         sequence = tostring(asset.default_sequence or "")
+    end
+    local sequence = "idle"
+    if asset and asset.default_sequence ~= nil then
+        sequence = tostring(asset.default_sequence or "")
+    end
+    if asset and NATIVE_TOWER_MODELS[tostring(asset.primary_model or "")] then
+        sequence = ""
     end
     if sequence ~= "" then safe_call(unit, "ResetSequence", sequence) end
     safe_call(unit, "SetPlaybackRate", 1)
@@ -172,11 +192,19 @@ end
 function M.matches(unit, data)
     if not valid_entity(unit) then return false end
     local model_path, asset, requested_asset_id = M.resolve(data)
+    local model_path, asset, requested_asset_id = M.resolve(data)
+    local appearance_matches
+    if native_carrier.IsNativeWearableAsset(asset) then
+        appearance_matches = native_carrier.Matches(unit, asset)
+    else
+        appearance_matches = not native_carrier.Has(unit)
+    end
     return model_path ~= nil and model_path ~= ""
         and unit.survival_applied_model_path == model_path
         and unit.survival_model_asset_id == requested_asset_id
         and unit.survival_pending_model_asset_id == nil
         and appearance.Matches(unit, asset)
+        and appearance_matches
 end
 
 function M.apply(unit, data)
@@ -266,8 +294,16 @@ function M.apply(unit, data)
     else
         safe_call(unit, "SetSkin", 0)
     end
-    local appearance_ok, appearance_status, components =
-        appearance.Refresh(unit, asset)
+    local use_native_carrier = native_carrier.IsNativeWearableAsset(asset)
+    local appearance_ok, appearance_status, components
+    if use_native_carrier then
+        appearance_ok, appearance_status = native_carrier.Refresh(unit, asset)
+        if appearance_ok then appearance.Clear(unit) end
+    else
+        appearance_ok, appearance_status, components =
+            appearance.Refresh(unit, asset)
+        if appearance_ok then native_carrier.Clear(unit) end
+    end
     if not appearance_ok then
         if previous_model_path and previous_model_path ~= model_path then
             safe_call(unit, "SetModel", previous_model_path)
@@ -301,6 +337,7 @@ function M.clear(unit)
     if valid_entity(unit) then
         clear_activity_modifiers(unit)
         appearance.Clear(unit)
+        native_carrier.Clear(unit)
         clear_particles(unit)
         clear_bodygroups(unit)
     end

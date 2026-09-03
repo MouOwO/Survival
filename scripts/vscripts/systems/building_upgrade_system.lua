@@ -7,6 +7,7 @@ local tower_ability_sync = require("systems/tower_ability_sync")
 local global_rules = require("config/global_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local player_profile_service = require("systems/player_profile_service")
 local building_population = require("systems/building_population_service")
 local building_visual = require("systems/building_visual_service")
 local asset_preload = require("systems/asset_preload_service")
@@ -118,6 +119,9 @@ local function apply_research_technology(state)
     if not valid_entity(unit) then return end
     local player_id = state.player_id
     local technology = technology_stat_manager.get(player_id).final
+    local profile = player_profile_service.get_profile(player_id)
+    local profile_stats = profile and profile.save
+        and profile.save.gameplay_stats or {}
     if state.building_id == "arrow_tower" then
         local base_damage = tonumber(state.research_base_attack_damage)
             or unit:GetBaseDamageMin()
@@ -147,12 +151,15 @@ local function apply_research_technology(state)
         local base_attack_time = tonumber(unit.survival_research_base_attack_time)
             or configured_base_attack_time(state) or 1
         unit.survival_research_base_attack_time = base_attack_time
-        local profile_interval = tonumber(permanent.tower_attack_interval)
-        if profile_interval and profile_interval > 0 then
-            base_attack_time = math.min(base_attack_time, profile_interval)
-        end
+        -- Both interval fields are additive reductions. They intentionally
+        -- stack instead of one replacing the other; the gameplay-stats field
+        -- is no longer interpreted as an absolute BAT.
+        local profile_interval_reduction = tonumber(permanent.tower_attack_interval)
+            or tonumber(profile_stats.tower_attack_interval) or 0
         base_attack_time = math.max(0.05, base_attack_time
-            - (tonumber(permanent.tower_attack_interval_reduction) or 0))
+            - profile_interval_reduction
+            - (tonumber(permanent.tower_attack_interval_reduction)
+                or tonumber(profile_stats.tower_attack_interval_reduction) or 0))
         apply_tower_attack_time(unit, base_attack_time, attack_speed_bonus)
         local attack_range = tower_combat_rules.attack_range(
             tower.attack_range_bonus
