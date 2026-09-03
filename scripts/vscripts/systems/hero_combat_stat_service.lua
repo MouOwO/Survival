@@ -189,6 +189,8 @@ local function recalculate(player_id, reason)
     end
     local current_health = state.unit.IsAlive and state.unit:IsAlive()
         and safe_get(state.unit, "GetHealth", nil) or nil
+    local current_max_health = state.unit.IsAlive and state.unit:IsAlive()
+        and safe_get(state.unit, "GetMaxHealth", nil) or nil
     local equipment, growth = weapon_snapshot(player_id)
     local equipment_stats = get_all_equipment_stats(player_id)
     local definition = weapons.by_id[equipment.main_hand_content_id] or {}
@@ -572,10 +574,28 @@ local function recalculate(player_id, reason)
         })
     end
     if projection_refresh_required and current_health and current_health > 0
+        and current_max_health and current_max_health > 0
         and state.unit:IsAlive() then
+        local final_max_health = safe_get(
+            state.unit, "GetMaxHealth", current_max_health
+        )
+        local expected_health = hero_health_guard.current_after_maximum_change(
+            current_health,
+            current_max_health,
+            final_max_health
+        )
+        local actual_health = safe_get(state.unit, "GetHealth", 0)
+        -- The health modifier projection normally applies this value during
+        -- the refresh. If a native stat recalculation temporarily retained the
+        -- old current health, restore the intended increase before scheduling
+        -- the guard that protects against a later engine refill.
+        if final_max_health > current_max_health
+            and actual_health < expected_health then
+            safe_call(state.unit, "SetHealth", expected_health)
+        end
         hero_health_guard.protect_value(
             state.unit,
-            current_health,
+            expected_health,
             "combat_recalculate:" .. tostring(reason or "changed")
         )
     end

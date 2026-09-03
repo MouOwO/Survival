@@ -6,6 +6,21 @@ local function valid(unit)
     return unit and not unit:IsNull()
 end
 
+-- When a maximum-health modifier changes, preserve the absolute amount of
+-- damage already taken. This is the same projection used by wall upgrades:
+-- a full-health hero remains full, while a damaged hero keeps the same missing
+-- health instead of retaining the old current-health value.
+function M.current_after_maximum_change(old_current, old_maximum, new_maximum)
+    local previous_maximum = math.max(1, tonumber(old_maximum) or 1)
+    local previous_current = math.max(0, math.min(
+        previous_maximum,
+        tonumber(old_current) or 0
+    ))
+    local maximum = math.max(1, tonumber(new_maximum) or 1)
+    local missing = math.max(0, previous_maximum - previous_current)
+    return math.max(1, math.min(maximum, maximum - missing))
+end
+
 local function restore_if_refilled(unit, health, source, phase, full_only)
     if not valid(unit) or not unit.IsAlive or not unit:IsAlive()
         or not unit.GetHealth or not unit.GetMaxHealth or not unit.SetHealth
@@ -99,7 +114,9 @@ function M.preserve_missing(unit, callback, source)
     if alive and health and health > 0 and missing ~= nil
         and valid(unit) and unit.IsAlive and unit:IsAlive() then
         local next_maximum = math.max(1, tonumber(unit:GetMaxHealth()) or 1)
-        local desired = math.max(1, math.min(next_maximum, next_maximum - missing))
+        local desired = M.current_after_maximum_change(
+            health, maximum, next_maximum
+        )
         local current = math.max(0, tonumber(unit:GetHealth()) or 0)
         if math.abs(current - desired) > 0.5 then
             unit:SetHealth(desired)

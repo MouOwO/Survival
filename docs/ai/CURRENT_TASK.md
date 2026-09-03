@@ -38,6 +38,22 @@
 - 官方 `particle_create` 常驻粒子已按完整 wearable component ID 绑定：异界暴君 3 个、蛮夷低语 4 个、冬鸦之巢 3 个、释放天启 4 个、太虚风暴玄宇 3 个；Lich、Zeus、Leshrac未虚构额外常驻粒子。八个主体、37 个世界组件及 18 个相关常驻粒子（含 Ancient Apparition 原有 Ice Vortex）均已在本机 VPK 索引确认存在。当前合同总量为 21 个阶段、98 条穿戴声明和 97 个有效世界组件；全资源表为 154 个组件、128 条特效。
 - 所有阶段继续只设置 `portrait_unit_name`，`portrait_item_def` 全部为空；Arcana 主体只用于世界模型，不向自定义 ScenePanel 传入饰品 ItemDef。自动验证通过：生成器 `--check`、21 阶段投影合同、第一批精确 ItemDef/头像/粒子 owner 专项测试、AssetBundle、FrostRoute、Death/Multi Visual、BuildingVisualService、AssetPreloadService、SelectedUnitCosmeticPortrait 和全部新增 VPK 路径存在性。仍需 Workshop Tools 完全冷启动逐阶段确认骨骼对齐、refit 部件、常驻粒子、攻击/待机动作、升级重建及头像保持原样。
 
+## 当前实施任务（2026-09-02）：主宰“尊享·剑心之遗”二阶段 3D 头像
+
+- 用户要求主宰（Juggernaut）在穿戴“尊享·剑心之遗（Bladeform Legacy）”后，小头像同时显示主体和五件 3D 饰品，并使用二阶段 Origins 外观。
+- `asset_catalog.csv`、`asset_components.csv`、`asset_effects.csv` 与 `hero_cosmetics_config.lua` 已切换到 `juggernaut_arcana.vmdl`、四件 armor_for_the_favorite 部件和 Katz 武器（`skin=1`），保留 Arcana 常驻/出生特效与 `arcana` 动作修饰器；生成配置已同步。
+- Panorama 新增仅针对 `hero_permanent_hero_blademaster + npc_dota_hero_juggernaut` 的独立 Scene overlay，挂载到原生头像同层并隐藏原生像素，其他英雄/单位继续使用 Valve 原生头像。
+- 追加修复 `ui_request_router.apply_portrait_metadata` 的资源白名单：原逻辑只允许 21 个原生塔穿戴阶段发布头像元数据，会把永久英雄的主宰资源清空；现在仅额外放行 `hero_permanent_hero_blademaster`，避免其他英雄误进入自定义头像链。
+- 由于既有 ISSUE-007 记录显示 `portrait_world_unit` 在当前运行时可能找不到实体并黑屏，曾制作静态 `prop_dynamic` 主体 + 五个 `bone_merge` 饰品场景并修正官方 `debut_camera` 挂点；实机截图显示该自制相机仍不适合主宰构图，因此当前 Panorama 改用 Dota 自带 `backgrounds/hero_showcase_juggernaut_arcana` 场景，优先使用官方主宰相机和模型构图。自制 v3 地图包保留作后续备用。
+- 自动验证通过：英雄饰品 Lua 行为测试（5 组件、4 出生特效、武器二阶段材质）、全项目 Lua 5.1 语法（496 文件）、VMAP 资源编译（7 compiled, 0 failed）和 Panorama 强制编译（9 compiled, 0 failed）。仍需 Workshop Tools 冷启动进入游戏确认模型骨骼对齐、相机裁切、特效可见性及小头像切换恢复。
+
+## 当前实施任务（2026-09-02）：知识之书增加三围后的英雄生命投影修复
+
+- 修复知识之书/超级知识之书触发全属性重算后，英雄最大生命增加但当前生命仍停留在购买前数值，导致生命百分比下降的问题。
+- 根因是 `hero_combat_stat_service.recalculate()` 在属性健康投影完成后，仍用重算前的旧当前生命调用 `hero_health_guard.protect_value()`，把合法的生命增加误判为引擎回填并回退。
+- 现改为按城墙升级同一语义计算：保留重算前的绝对缺失生命值；满血英雄随最大生命增加保持满血，受伤英雄保持相同缺失生命值。若引擎重算暂时未补足当前生命，会在最终保护前恢复预期值。
+- 新增 `tools/test_hero_health_guard.lua` 覆盖满血、受伤、低血、无变化和最大生命下降场景。登记的 Lua 5.1 编译器路径失效，但本机备用路径可用，已完成项目语法、行为测试与 `git diff --check`；仍需 Workshop Tools 冷启动确认实际血条百分比和数值。
+
 ## 当前实施任务（2026-09-01）：死亡之塔“暗刃高手”世界饰品试装
 
 - 用户要求仅替换死亡路线第一阶段“死亡之塔”的世界模型饰品，观察英雄主体塔能否使用圣堂刺客“暗刃高手（Darkblade Adept）”套装；头像不得随饰品变化。主体仍为 `models/heroes/lanaya/lanaya.vmdl`，不修改塔数值、技能、弹道或阶段路由。

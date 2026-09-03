@@ -1,6 +1,11 @@
 ﻿component_key,asset_id,component_id,model_path,entity_class,parent_component_id,attach_mode,attachment_point,default_sequence,model_scale,model_skin,material_group,sort_order,enabled,notes
 #中文名:组件记录键,资源ID,组件ID,模型路径,实体类型,父组件ID,挂载方式,挂点,默认动作,模型缩放,模型皮肤,材质组,排序,是否启用,备注
 #types:string,string,string,string,string,string,enum,string,string,number,number,string,number,boolean,string
+hero_permanent_hero_blademaster:arms,hero_permanent_hero_blademaster,arms,models/items/juggernaut/armor_for_the_favorite_arms/armor_for_the_favorite_arms.vmdl,prop_dynamic,,bone_merge,,idle,1,,,1,1,尊享·剑心之遗 Arms。
+hero_permanent_hero_blademaster:back,hero_permanent_hero_blademaster,back,models/items/juggernaut/armor_for_the_favorite_back/armor_for_the_favorite_back.vmdl,prop_dynamic,,bone_merge,,idle,1,,,2,1,尊享·剑心之遗 Back。
+hero_permanent_hero_blademaster:head,hero_permanent_hero_blademaster,head,models/items/juggernaut/armor_for_the_favorite_head/armor_for_the_favorite_head.vmdl,prop_dynamic,,bone_merge,,idle,1,,,3,1,尊享·剑心之遗 Head。
+hero_permanent_hero_blademaster:legs,hero_permanent_hero_blademaster,legs,models/items/juggernaut/armor_for_the_favorite_legs/armor_for_the_favorite_legs.vmdl,prop_dynamic,,bone_merge,,idle,1,,,4,1,尊享·剑心之遗 Legs。
+hero_permanent_hero_blademaster:weapon,hero_permanent_hero_blademaster,weapon,models/items/juggernaut/fall20_juggernaut_katz_weapon/fall20_juggernaut_katz_weapon.vmdl,prop_dynamic,,bone_merge,,idle,1,1,,5,1,尊享·剑心之遗 Weapon，二阶段材质。
 challenge_monster_beastmaster_legacy:shoulder,challenge_monster_beastmaster_legacy,shoulder,models/items/beastmaster/ti9_cache_beast_master_dinosaurs_telep_shoulder/ti9_cache_beast_master_dinosaurs_telep_shoulder.vmdl,prop_dynamic,,bone_merge,,idle,1,,,1,1,Legacy of a Lost Age Armor（物品13370）。
 challenge_monster_beastmaster_legacy:head,challenge_monster_beastmaster_legacy,head,models/items/beastmaster/ti9_cache_beast_master_dinosaurs_telepathy_head/ti9_cache_beast_master_dinosaurs_telepathy_head.vmdl,prop_dynamic,,bone_merge,,idle,1,,,2,1,Legacy of a Lost Age Helm（物品13373）。
 challenge_monster_beastmaster_legacy:belt,challenge_monster_beastmaster_legacy,belt,models/items/beastmaster/ti9_cache_beast_master_dinosaurs_telepathy_belt/ti9_cache_beast_master_dinosaurs_telepathy_belt.vmdl,prop_dynamic,,bone_merge,,idle,1,,,3,1,Legacy of a Lost Age Belt（物品13374）。
