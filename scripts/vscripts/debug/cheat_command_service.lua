@@ -233,9 +233,14 @@ local function add_wood(context)
     return change_resource(context, "wood", "addwood")
 end
 
+local reset_gameplay_stats
+
 local function order_gameplay_stat(context)
+    if #context.args == 1 and string.lower(tostring(context.args[1])) == "reset" then
+        return reset_gameplay_stats(context)
+    end
     if #context.args ~= 2 then
-        return false, "usage: order <field_id> <delta>"
+        return false, "usage: order <field_id> <delta> | order reset"
     end
     local result = gameplay_stats_order_service.order(
         context.player_id, context.args[1], context.args[2]
@@ -243,8 +248,16 @@ local function order_gameplay_stat(context)
     if not result or result.ok ~= true then
         return false, result and result.error or "gameplay_stat_order_failed"
     end
+    if result.persisted == false then
+        local message = result.bridge_queued
+            and "本局词条已更新，已发送本地桥接进程；等待桥接写入 JSON："
+            or "本局词条已更新，但本地 JSON 写入失败，重启后不会保留："
+        notify(context, message .. tostring(result.persist_error or "unknown_error"),
+            result.bridge_queued and "info" or "error")
+        return true
+    end
     notify(context, string.format(
-        "词条已更新：%s %+g（当前 %g）",
+        "词条已更新并写入本地 JSON：%s %+g（当前 %g）",
         tostring(result.field_id), tonumber(result.delta) or 0,
         tonumber(result.new_value) or 0
     ))
@@ -261,22 +274,40 @@ local function test_gameplay_stat(context)
     if not result or result.ok ~= true then
         return false, result and result.error or "gameplay_stat_test_failed"
     end
+    if result.persisted == false then
+        local message = result.bridge_queued
+            and "本局单词条测试已生效，已发送本地桥接进程；等待桥接写入 JSON："
+            or "本局单词条测试已生效，但本地 JSON 写入失败："
+        notify(context, message .. tostring(result.persist_error or "unknown_error"),
+            result.bridge_queued and "info" or "error")
+        return true
+    end
     notify(context, string.format(
-        "单词条测试：仅保留 %s = %g（其他词条已归零）",
+        "单词条测试已写入本地 JSON：仅保留 %s = %g（其他词条已归零）",
         tostring(result.field_id), tonumber(result.value) or 0
     ))
     return true
 end
 
-local function reset_gameplay_stats(context)
-    if #context.args ~= 0 then
-        return false, "usage: orderreset"
+reset_gameplay_stats = function(context)
+    local order_alias = #context.args == 1
+        and string.lower(tostring(context.args[1])) == "reset"
+    if #context.args ~= 0 and not order_alias then
+        return false, "usage: order reset | orderreset"
     end
     local result = gameplay_stats_order_service.reset_defaults(context.player_id)
     if not result or result.ok ~= true then
         return false, result and result.error or "gameplay_stat_reset_failed"
     end
-    notify(context, "基础词条已恢复为字段表默认值，单词条隔离已关闭")
+    if result.persisted == false then
+        local message = result.bridge_queued
+            and "本局基础词条已重置，已发送本地桥接进程；等待桥接写入 JSON："
+            or "本局基础词条已重置，但本地 JSON 写入失败："
+        notify(context, message .. tostring(result.persist_error or "unknown_error"),
+            result.bridge_queued and "info" or "error")
+        return true
+    end
+    notify(context, "基础词条已恢复为字段表默认值并写入本地 JSON，单词条隔离已关闭")
     return true
 end
 
@@ -955,7 +986,7 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
+        "ready: addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
     )
 end
 

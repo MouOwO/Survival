@@ -11,6 +11,11 @@ local gameplay_stats = require("config/generated/player_gameplay_stats")
 local profile_service = require("systems/player_profile_service")
 
 local M = {}
+
+-- TODO(HTTP/Supabase integration): order packets currently use the local
+-- file-backed JSON provider. Once the service endpoint is approved, replace
+-- this persistence call with the HTTP response while retaining apply_packet's
+-- schema/revision/idempotency validation.
 local sequence = 0
 
 local function copy_table(value)
@@ -171,6 +176,34 @@ local function persist_local_snapshot(player_id, packet)
     )
 end
 
+-- VScript cannot use Lua file I/O in the shipped Dota VM. Emit a dedicated,
+-- machine-readable line for the optional local bridge process instead. The
+-- bridge tails console.log and writes the same snapshot to the mock JSON;
+-- HTTP/Supabase remains the production replacement (TODO below).
+local function emit_bridge_packet(packet)
+    if type(packet) ~= "table" or type(packet.account_id) ~= "string" then
+        return false
+    end
+    local changes = packet.changes and packet.changes.save
+    local stats = changes and changes.gameplay_stats
+    if type(stats) ~= "table" then return false end
+    local payload = {
+        schema_version = tonumber(packet.schema_version) or 1,
+        account_id = packet.account_id,
+        revision = tonumber(packet.revision) or 0,
+        gameplay_stats_mode = packet.gameplay_stats_mode,
+        gameplay_stats = stats,
+        source = "survival_local_fixture_bridge",
+    }
+    local ok, encoded = pcall(json_encoder.encode, payload)
+    if not ok then
+        logger.warn("GameplayStats", "local_fixture_bridge_encode_failed:" .. tostring(encoded))
+        return false
+    end
+    logger.info("LocalFixtureBridge", "PERSIST_BRIDGE " .. tostring(encoded))
+    return true
+end
+
 function M.apply_packet(packet)
     if type(packet) == "string" then
         local decode_ok, decoded = pcall(json_decoder.decode, packet)
@@ -198,8 +231,13 @@ function M.apply_packet(packet)
         local persisted, persist_error = persist_local_snapshot(player_id, packet)
         if persisted == false then
             result.persist_error = persist_error
+            logger.warn("GameplayStats", string.format(
+                "local_fixture_persist_failed player=%s account=%s error=%s",
+                tostring(player_id), tostring(packet.account_id),
+                tostring(persist_error)))
         end
         result.persisted = persisted ~= false
+        result.bridge_queued = emit_bridge_packet(packet)
     end
     result.packet_json = packet_json
     return result

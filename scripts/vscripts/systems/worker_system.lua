@@ -339,7 +339,7 @@ local function apply_lumberjack_attack(state, technology_attack)
     state.unit.survival_attack_max = maximum
 end
 
-local function refresh_worker_technology(player_id)
+local function refresh_worker_technology(player_id, refresh_reason)
     local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
     local permanent_result = event_bus.request(
         events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
@@ -371,6 +371,8 @@ local function refresh_worker_technology(player_id)
         if state.worker_type == "lumberjack"
             and state.player_id == player_id and valid_entity(state.unit) then
             local multiplier = tonumber(state.technology_multiplier) or 1
+            local previous_attack_min = tonumber(state.unit.survival_attack_min)
+            local previous_attack_max = tonumber(state.unit.survival_attack_max)
             local speed = math.max(0.01, (
                 tonumber(state.base_attack_speed)
                     or tonumber(config.attack_rate) or 0.5
@@ -395,6 +397,22 @@ local function refresh_worker_technology(player_id)
             state.unit.survival_gameplay_final_damage_pct =
                 tonumber(permanent.global_final_damage_bonus_pct) or 0
             apply_lumberjack_attack(state, attack_growth)
+            local next_attack_min = tonumber(state.unit.survival_attack_min)
+            local next_attack_max = tonumber(state.unit.survival_attack_max)
+            if previous_attack_min ~= nil and previous_attack_max ~= nil
+                and next_attack_min ~= nil and next_attack_max ~= nil
+                and (math.abs(next_attack_min - previous_attack_min) > 0.0001
+                    or math.abs(next_attack_max - previous_attack_max) > 0.0001) then
+                -- The technology path writes the real unit damage immediately;
+                -- publish the same change so a selected lumberjack's ScanPanel
+                -- does not wait for a second selection/request to refresh.
+                event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+                    unit = state.unit,
+                    entindex = entindex,
+                    player_id = player_id,
+                    reason = refresh_reason or "lumberjack_technology_changed",
+                })
+            end
             state.technology_attack_growth = attack_growth * multiplier
             state.technology_armor_reduction = armor_reduction * multiplier
             state.technology_efficiency = efficiency * multiplier
@@ -431,7 +449,7 @@ end
 local function on_technology_stats_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
-    refresh_worker_technology(player_id)
+    refresh_worker_technology(player_id, payload.reason)
 end
 
 local function on_tree_hit(payload)

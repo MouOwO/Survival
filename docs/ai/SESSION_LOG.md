@@ -3467,3 +3467,53 @@
 - 根因是塔的百分比攻速只写入引擎 BAT，`BUILDING_CHANGED` 仍携带建塔时缓存的 `survival_attack_speed`，并覆盖 ScanPanel 现场快照。现在同一次重算会写入最终每秒攻击次数、攻击间隔和引擎 BAT，UI 推送值与实际攻击频率保持一致。
 - 护甲链审计发现并修复三处遗漏：敌军初始减甲改变后补发选中单位战斗数值事件；隔离测试清除旧减甲后延迟一帧推送恢复值；自定义 War3 护甲目标的动态减甲事件改读 `survival_effective_war3_armor`，不再把原生零护甲占位转换成 UI 的 0。
 - 敌军初始护甲重算现在会保留目标已有的固定减甲、最低护甲限制和毒云百分比减甲；Aura 仅续期且数值/层数不变时不再触发冗余 ScanPanel 重渲染。目标语法及塔攻速、选中单位推送、敌军初始护甲、护甲映射、毒云、档案隔离回归通过；实机冷启动验收待用户执行。
+
+## 2026-09-02 - 伐木工攻击成长 ScanPanel 即时刷新
+
+- 根因确认：`lumberjack_attack_growth` 通过 `TECHNOLOGY_STATS_GROWTH_ADD_REQUEST` 和 `TECHNOLOGY_STATS_CHANGED` 正确重算伐木工攻击力，但 `refresh_worker_technology()` 只改写实体字段，没有向当前选中单位发 `UNIT_COMBAT_STATS_CHANGED`。
+- 现在仅在 `survival_attack_min/max` 发生实际变化时派发该事件，科技学习、永久字段更新和砍树后的成长共用同一条 UI 推送链；无变化刷新不会产生额外 ScanPanel 渲染。
+- 已通过 `luac -p`、伐木工训练、gameplay stats 隔离和选中单位攻速/护甲推送测试。字段语义保持不变：`ordertest lumberjack_attack_growth 10` 设置的是每次后续攻击增加 10 点，当前攻击力会在下一次有效砍树后立即显示增长。
+
+## 2026-09-02 - 本地 JSON 模拟档案跨重启加载
+
+- 根因确认：此前 `local_fixture_provider` 的 `persist_gameplay_stats` 只写入 Lua 进程内表，Provider 在重启时清空覆盖层，因此 `order` 修改不会进入下一局。
+- 现在 Provider 优先从 `data/mock/player_profiles.json` 读取档案，并在本地订单成功后把完整 gameplay stats、revision 写回该文件；`ordertest` 额外写入 `gameplay_stats_mode=isolated_test` 和稀疏目标字段，重启后仍保持单词条隔离。
+- JSON 文件读写明确标记为 `TODO(HTTP/Supabase integration)`，暂不发 HTTP 请求；未来切换正式服务端时沿用 `player_profile_service` 的同一快照/增量校验契约。
+- 已完成 Lua 语法检查及既有档案增量/隔离回归；尚待实机“执行命令→完全重启→观察字段恢复”的最终验收。
+
+## 2026-09-02 - 本地 JSON 写入失败复核与路径修正
+
+- 用户实机确认执行 `order initial_wood 10` 后 `data/mock/player_profiles.json` 中没有 `save.gameplay_stats.initial_wood`。代码复核确认局内增量与文件持久化是先后两步，旧命令层忽略了第二步的 `persist_error`，因此此前成功通知只能证明内存更新，不能证明 JSON 写入。
+- Provider 改为覆盖 Dota 常见启动工作目录、脚本源路径推导及当前工作区绝对回退；成功读取 JSON 后锁定该实体路径并只回写此文件。命令成功文案现在区分“局内已更新”和“JSON 已写入”，写入失败会直接显示错误码并记录日志。
+- 隔离档案测试改用内存文件句柄，避免自动测试污染真实 mock JSON。目标 Lua 语法与内存写回断言通过；Dota VScript 是否开放 `io.open` 仍需本次实机提示确认，未经确认不再把跨重启文件持久化标记为验收成功。
+
+## 2026-09-02 - VScript 文件持久化能力确认
+
+- 实机日志确认 `fixture_file_io_unavailable`：VScript VM 中不存在可用的 Lua `io.open`，所以此前没有真正打开或写入 JSON；不是 `data/mock` 的 Windows 权限问题。
+- 检查发现 `data/mock` 与 `game/dota/save` 均有操作系统写权限，后者只是安装目录中的普通 save 目录，不能因为目录存在就推断 VScript 可以访问。当前没有 Unity 式持久化目录 API 或通用 Lua 文件写入 API 可用。
+- 如需在不联调 HTTP 的情况下继续修改物理 JSON，必须引入 addon 外部的本地桥接进程；否则将模拟服务端包保持为手工 JSON/生成 Lua fixture，待正式 HTTP/Supabase Provider 接入。此前的错误提示与 TODO 已保留，防止静默丢失持久化。
+
+## 2026-09-02 - 本地 JSON 桥接进程与 order reset
+
+- 新增 `tools/local_fixture_bridge.ps1`：监听 `game/dota/console.log` 的 `PERSIST_BRIDGE` 专用行，将账号、revision、完整/稀疏 gameplay stats 和隔离标记写回 `data/mock/player_profiles.json`，按 revision 丢弃旧事件，并用临时文件替换写入。
+- VScript 订单服务在无法使用 `io.open` 时仍会发出桥接事件；命令提示改为“已发送本地桥接进程，等待写入”，桥接未启动不会伪装成已持久化。
+- 新增 `order reset` 别名，调用现有默认字段重置逻辑；`orderreset` 保持兼容。目标 Lua 与 PowerShell 语法检查通过，实机需带 `-condebug` 验证日志监听和重启读取。
+
+## 2026-09-03 - 箭塔攻击间隔面板攻速同步
+
+- 箭塔选中面板偶尔显示旧攻速的根因是 `ui_request_router` 在请求阶段优先读取引擎 `GetAttacksPerSecond`；`SetBaseAttackTime` 后该值可能暂时未刷新，覆盖了 `building_upgrade_system` 已计算的 `survival_attack_speed`。
+- 对箭塔改为优先读取项目最终攻速缓存，并在 `BUILDING_CHANGED` 快照补充 `attack_interval`；最终面板攻速与实际 BAT/攻击间隔一致。`tower_attack_interval` 的绝对上限和 `tower_attack_interval_reduction` 的减少量计算保持不变。
+- Lua 语法、Combat Stat Projection 与 gameplay stats 订单回归通过；待 Workshop Tools 实机执行 `ordertest tower_attack_interval 0.5` 或 `ordertest tower_attack_interval_reduction 0.5` 后确认选中箭塔面板。
+
+## 2026-09-03 - 恢复英雄攻击属性效率的独立字段语义
+
+- 用户确认 `hero_attack_attribute_efficiency_pct` 只作用于普通攻击属性成长 `hero_attribute_growth`，不作用于造成伤害属性成长 `hero_attributes_per_damage`。
+- 已撤销上一版对 `COMBAT_DAMAGE_RESOLVED` 的效率换算，恢复原有独立逻辑；实机看到的 13 是默认普通攻击成长 1 经 200% 效率后得到 3，再加伤害成长 10。
+- 测试覆盖更新为：伤害成长 10 保持 10，普通攻击成长 1 在效率 200% 时为 3；目标 Lua 语法、效率测试、战斗面板投影与订单隔离回归通过。
+
+## 2026-09-03 - 修复金矿收益间隔导致单跳产量放大
+
+- 实机发现执行 `gold_mine_income_interval_reduction` 后，金矿单次收益从 33 变为 660。根因是全局 1 秒 tick 将 `33 / 0.05` 作为一次发放量，模拟了总收益却破坏了单周期产量。
+- 改为每个金矿实体使用独立 `scheduler.after` 链：有效间隔为 0.05 秒时每次仍发放 33，下一次在 0.05 秒后执行；删除固定全局金矿生产 tick。
+- 词条/科技变化会在间隔真的变化时重排任务，普通永久属性刷新不会重置金矿计时。金矿销毁、创建和升级均同步维护生产任务。
+- 新增 `test_gold_mine_income_interval.lua`，并通过该测试、金矿自动升级、Lua 语法和战斗投影回归。

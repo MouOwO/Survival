@@ -13,6 +13,7 @@ local technology_by_player = {}
 local auto_upgrade_by_entindex = {}
 local auto_sequence = 0
 local upgrade_mine
+local schedule_production
 local GOLD_MINE_ABILITIES = {
     level = "ability_upgrade_gold_mine",
     efficiency = "ability_upgrade_gold_mine_efficiency",
@@ -364,6 +365,7 @@ upgrade_mine = function(payload)
             state.unit.__building_level = target_level
             apply_level_stats(state)
             publish(state)
+            schedule_production(state)
             event_bus.emit(events.BUILDING_CHANGED, {
                 unit = state.unit, entindex = state.unit:entindex(),
                 player_id = state.player_id, team = state.team,
@@ -417,6 +419,7 @@ local function on_technology_changed(payload)
     for _, state in pairs(state_by_entindex) do
         if state.player_id == payload.player_id then
             publish(state)
+            schedule_production(state)
         end
     end
 end
@@ -431,7 +434,9 @@ local function on_created(payload)
         team = payload.team,
         mine_level = tonumber(payload.level) or 1,
     }
-    publish(state_by_entindex[entindex])
+    local state = state_by_entindex[entindex]
+    publish(state)
+    schedule_production(state)
 end
 
 local function on_destroyed(payload)
@@ -440,59 +445,79 @@ local function on_destroyed(payload)
         local entindex = tonumber(payload.entindex)
         auto_upgrade_by_entindex[entindex] = nil
         scheduler.cancel("gold_mine_auto_upgrade_" .. tostring(entindex))
+        scheduler.cancel("gold_mine_production_" .. tostring(entindex))
         state_by_entindex[payload.entindex] = nil
     end
 end
 
-local function tick()
-    for entindex, state in pairs(state_by_entindex) do
-        if not valid(state.unit) or not state.unit:IsAlive() then
-            state_by_entindex[entindex] = nil
-        else
-            local efficiency_level = technology_level(
-                state.player_id,
-                "gold_mine_efficiency"
+local function production_task_id(state)
+    return "gold_mine_production_" .. tostring(state.unit:entindex())
+end
+
+local function produce_once(state)
+    local efficiency_level = technology_level(
+        state.player_id,
+        "gold_mine_efficiency"
+    )
+    local crit_level = technology_level(state.player_id, "gold_mine_crit")
+    local crit = RandomFloat(0, 100) < config.crit_chance(crit_level)
+    local base_amount = config.income_amount(
+        state.mine_level,
+        efficiency_level,
+        crit
+    )
+    -- The interval reduction changes how often this callback runs. It must
+    -- not be converted into a payout multiplier (e.g. 33 / 0.05 = 660),
+    -- otherwise a single production event pays for many cycles at once.
+    local exact = profile_income(state, base_amount)
+        + (tonumber(state.income_fraction) or 0)
+    local amount = math.floor(exact + 0.0000001)
+    state.income_fraction = exact - amount
+    local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
+        player_id = state.player_id,
+        team = state.team, gold = amount,
+        reason = crit and "gold_mine_critical_income" or "gold_mine_income",
+    })
+    if result and result.ok then
+        local player = PlayerResource:GetPlayer(state.player_id)
+        if player then
+            CustomGameEventManager:Send_ServerToPlayer(
+                player,
+                "survival_gold_mine_income_number",
+                {
+                    target_entindex = state.unit:entindex(),
+                    amount = math.floor(amount + 0.5),
+                    critical = crit and 1 or 0,
+                }
             )
-            local crit_level = technology_level(
-                state.player_id,
-                "gold_mine_crit"
-            )
-            local crit = RandomFloat(0, 100) < config.crit_chance(crit_level)
-            local amount = config.income_amount(
-                state.mine_level,
-                efficiency_level,
-                crit
-            )
-            local exact, effective_interval = profile_income(state, amount)
-            exact = exact * config.production_interval / effective_interval
-                + (tonumber(state.income_fraction) or 0)
-            amount = math.floor(exact + 0.0000001)
-            state.income_fraction = exact - amount
-            local result = event_bus.request(events.RESOURCE_ADD_REQUEST, {
-                player_id = state.player_id,
-                team = state.team, gold = amount,
-                reason = crit and "gold_mine_critical_income" or "gold_mine_income",
-            })
-            if result and result.ok then
-                local player = PlayerResource:GetPlayer(state.player_id)
-                if player then
-                    CustomGameEventManager:Send_ServerToPlayer(
-                        player,
-                        "survival_gold_mine_income_number",
-                        {
-                            target_entindex = state.unit:entindex(),
-                            amount = math.floor(amount + 0.5),
-                            critical = crit and 1 or 0,
-                        }
-                    )
-                end
-            end
         end
     end
-    return config.production_interval
+end
+
+schedule_production = function(state, force)
+    if not valid(state.unit) or not state.unit:IsAlive() then return end
+    local task_id = production_task_id(state)
+    local _, effective_interval = profile_income(state, 0)
+    if force ~= true and state.production_interval == effective_interval then
+        return
+    end
+    scheduler.cancel(task_id)
+    state.production_interval = effective_interval
+    scheduler.after(effective_interval, function()
+        if state_by_entindex[state.unit:entindex()] ~= state
+            or not valid(state.unit) or not state.unit:IsAlive() then
+            return false
+        end
+        produce_once(state)
+        schedule_production(state, true)
+        return false
+    end, task_id)
 end
 
 function M.init()
+    -- Remove the pre-refactor global production task when Workshop Tools
+    -- reloads Lua modules without resetting the scheduler instance.
+    scheduler.cancel("gold_mine_production")
     state_by_entindex = {}
     technology_by_player = {}
     auto_upgrade_by_entindex = {}
@@ -509,6 +534,7 @@ function M.init()
         for _, state in pairs(state_by_entindex) do
             if state.player_id == tonumber(payload and payload.player_id) then
                 publish(state)
+                schedule_production(state)
             end
         end
     end)
@@ -516,12 +542,12 @@ function M.init()
         for _, state in pairs(state_by_entindex) do
             if state.player_id == tonumber(payload and payload.player_id) then
                 publish(state)
+                schedule_production(state)
             end
         end
     end)
     event_bus.subscribe(events.BUILDING_CREATED, on_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)
-    scheduler.every(config.production_interval, tick, "gold_mine_production")
 end
 
 return M

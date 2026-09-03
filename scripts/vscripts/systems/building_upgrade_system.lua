@@ -275,6 +275,7 @@ local function apply_tower(unit, data, level)
     attacks_per_second = math.max(0.01, attacks_per_second)
     unit.survival_attack_speed = attacks_per_second
     unit.survival_research_base_attack_time = 1 / attacks_per_second
+    unit.survival_attack_interval = unit.survival_research_base_attack_time
     unit:SetBaseAttackTime(unit.survival_research_base_attack_time)
     if not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
@@ -363,6 +364,10 @@ publish = function(state, reason)
         attack_max = state.unit.survival_attack_max,
         runtime_armor = state.unit.survival_armor,
         attack_speed = state.unit.survival_attack_speed,
+        attack_interval = state.unit.survival_attack_interval
+            or (tonumber(state.unit.survival_attack_speed) or 0) > 0
+                and 1 / tonumber(state.unit.survival_attack_speed)
+            or 0,
         base_health = base_health(state),
         base_attack_damage = state.building_id == "arrow_tower"
             and tonumber((arrow_data(state.level) or {}).base_attack_damage)

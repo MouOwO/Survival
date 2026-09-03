@@ -888,3 +888,50 @@ PROJECT -> CURRENT_SPRINT -> CURRENT_TASK -> TASK -> Files -> Tests
 - 补齐 `enemy_initial_armor_reduction` 对当前已选怪物的 `UNIT_COMBAT_STATS_CHANGED` 派发，并在重算敌军初始护甲时保留已有固定减甲、最低护甲和毒云百分比状态，不再把有效护甲直接覆盖为新的基础护甲。
 - 修复自定义 War3 护甲单位收到减甲事件时误读引擎原生 `0` 护甲占位值的问题；ScanPanel 现在读取与伤害过滤一致的 `survival_effective_war3_armor`。
 - 攻速 Aura 仅续期且数值/层数未变化时不再派发冗余 UI 刷新，避免相同单位无意义重渲染。目标 Lua 语法检查及塔攻速快照、选中单位攻速/护甲推送、敌军初始护甲事件、护甲映射、毒云与 gameplay stats 隔离专项测试通过；仍需 Workshop Tools 实机验证连续选中箭塔/怪物时的即时数值变化。
+
+## 当前实施任务补充（2026-09-02）：伐木工攻击成长 ScanPanel 即时刷新
+
+- `lumberjack_attack_growth` 的成长计算原本已经正确写入伐木工的 `survival_attack_min/max`，但 `refresh_worker_technology()` 没有在攻击面板发生变化时派发 `UNIT_COMBAT_STATS_CHANGED`，因此选中的伐木工 UI 会延迟到下一次请求才更新。
+- 现在科技学习、`order`/`ordertest` 更新或每次砍树触发成长后，只要攻击力缓存实际变化，就复用同一 `UNIT_COMBAT_STATS_CHANGED` 事件立即刷新 ScanPanel；数值和层数未变化时不派发冗余事件。
+- 目标 Lua 语法、伐木工训练、档案隔离和选中单位推送回归通过；`lumberjack_attack_growth` 仍保持“每次攻击后增加”的语义，命令执行本身只改变下一次攻击的成长量，不会凭空增加当前攻击力。
+
+## 当前实施任务补充（2026-09-02）：本地 JSON 模拟档案跨重启加载
+
+- 实机复核发现首次实现没有真正写入 `data/mock/player_profiles.json`：`order` 先成功更新局内档案，随后文件持久化失败，但命令层忽略了 `persist_error`，仍显示普通成功提示；原实现同时只尝试两个相对路径，无法覆盖 Dota 从 `game/bin/win64` 等目录启动的情况。
+- `local_fixture_provider` 现在枚举 addon root、`game/`、`game/dota/`、`game/bin/win64/` 对应路径，优先使用脚本绝对来源推导路径，并为当前本地工作区保留显式回退；读取成功后记录唯一实体路径，写入时只回写该路径，避免在错误工作目录生成同名文件。
+- `order`/`ordertest`/`orderreset` 只有在文件写入成功后才显示“已写入本地 JSON”；失败时会在游戏通知与 `[GameplayStats]` 日志中直接给出 `fixture_file_io_unavailable`、`fixture_file_not_resolved` 或带路径的写入错误，明确提示本局有效但重启不保留。
+- JSON 文件传输当前是本地文件模拟服务端包；代码中已加入 `TODO(HTTP/Supabase integration)`，后续验收通过后只替换 Provider 的读写实现，不改变 JSON 解码、revision、幂等和档案服务契约。
+- 已通过目标 Lua 语法与内存文件持久化测试；需实机重新执行一次 `order initial_wood 10`，先确认提示为“已写入本地 JSON”且文件出现 `save.gameplay_stats.initial_wood`，再完全重启验证读取。若提示 `fixture_file_io_unavailable`，说明当前 Dota VScript VM 禁止 Lua 文件 I/O，必须改用本地桥接进程或后续 HTTP Provider，不能继续伪装为写入成功。
+
+## 当前实施任务补充（2026-09-02）：VScript 文件持久化能力确认
+
+- 实机日志已返回 `fixture_file_io_unavailable`。这不是 Windows ACL 或 `data/mock` 路径权限错误，而是 Dota VScript VM 中 `io`/`io.open` 不可用，代码无法从 Lua 直接打开任何本地文件。
+- `game/dota/save` 目录在安装目录中确实存在且操作系统权限可写，但它不是向 VScript 暴露的 Unity `persistentDataPath`；当前没有可用的通用 Lua 文件写入接口可以把 JSON 写入该目录。
+- 因此“游戏内命令直接改写 `data/mock/player_profiles.json`”无法仅靠 addon Lua 完成。保留当前失败提示和 `TODO(HTTP/Supabase integration)`，避免把只更新内存误认为跨重启持久化。若继续保持无 HTTP 的测试方案，需要另行决定本地桥接进程（监听游戏日志/命令并写 JSON）或改用引擎归档 ConVar 作为临时存储；两者都不是 VScript 直接 JSON 写入。
+
+## 当前实施任务补充（2026-09-02）：本地 JSON 桥接进程与重置命令
+
+- 新增 `tools/local_fixture_bridge.ps1`。它监听 Dota 的 `game/dota/console.log` 中专用 `PERSIST_BRIDGE` 行，把 `order`、`ordertest`、`order reset` 产生的 gameplay stats 快照写回 `data/mock/player_profiles.json`；使用临时文件替换，避免写入半截 JSON。
+- 启动 Workshop Tools 时需要带 `-condebug`，然后在 addon 根目录运行：`powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\local_fixture_bridge.ps1`。桥接进程从日志末尾开始监听，不会把旧历史订单重新覆盖到当前档案；按 revision 拒绝迟到事件。
+- `order reset` 现在与 `orderreset` 等价，恢复字段表默认值（绝大多数为 0），并通过相同桥接事件持久化。桥接进程未启动时，游戏仍会显示“等待桥接写入 JSON”，不会伪报物理文件已写入。
+- 桥接脚本仅为本地测试替代方案，后续服务端验收时继续按 `TODO(HTTP/Supabase integration)` 替换 Provider，不改变增量包契约。
+
+## 当前实施任务补充（2026-09-03）：箭塔攻击间隔面板攻速同步
+
+- `tower_attack_interval`/`tower_attack_interval_reduction` 的最终计算本来已经写入箭塔 `SetBaseAttackTime` 与 `survival_attack_speed`；问题出在选中单位请求时优先调用引擎 `GetAttacksPerSecond`，部分引擎帧仍返回旧值，覆盖了刚计算出的项目缓存。
+- `ui_request_router.effective_attack_speed()` 现在对 `survival_building_id == "arrow_tower"` 优先使用项目最终攻速缓存；`BUILDING_CHANGED` 同时携带最终 `attack_interval`，自定义 ScanPanel 通过攻速计算出的间隔与实际 BAT 保持一致。
+- 注意：`tower_attack_interval` 是“绝对攻击间隔上限”（默认 1.7 秒），减少量词条应使用 `tower_attack_interval_reduction`；`order` 是增量命令，单字段精确测试可使用 `ordertest tower_attack_interval 0.5`。目标 Lua 语法和战斗面板投影回归通过，仍需实机选中箭塔验证。
+
+## 当前实施任务补充（2026-09-03）：恢复英雄攻击属性效率的独立字段语义
+
+- 用户确认 `hero_attack_attribute_efficiency_pct` 只作用于 `hero_attribute_growth`（每次普通攻击成长），不作用于 `hero_attributes_per_damage`（每次造成伤害成长）。
+- 已撤销上一版对伤害成长的效率换算，恢复两个字段独立处理；普通攻击同时造成伤害时，攻击成长按效率换算，伤害成长保持原始数值。
+- `test_hero_attack_attribute_efficiency.lua` 已同步覆盖该边界：伤害成长 10 在效率 200% 时仍为 10，普通攻击成长 1 在效率 200% 时为 3。
+- 已通过目标 Lua 语法、效率行为测试、战斗面板投影和 gameplay stats 订单隔离回归。
+
+## 当前实施任务补充（2026-09-03）：金矿收益间隔减少改为真实生产频率
+
+- `gold_mine_income_interval_reduction` 原本在固定 1 秒总计时器中按 `production_interval / effective_interval` 放大单次发放量；当有效间隔为 0.05 秒时，33 金币被错误合并成单次 660 金币。
+- 金矿现在为每个实体建立独立生产调度，减少量只缩短两次生产之间的间隔；每次生产仍按当前金矿等级、科技和词条计算一次正常/暴击产量，不再把多个周期折算到一跳中。
+- 词条或科技更新时，仅在有效间隔实际变化时重排该金矿计时器，普通收益/属性等其他档案事件不会反复重置生产计时。
+- 已通过金矿间隔行为测试、金矿自动升级回归、目标 Lua 语法和战斗面板投影测试。
