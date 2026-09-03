@@ -4,7 +4,7 @@ field_id,storage_type,default_value,unit,min_value,max_value,enabled,notes
 initial_wood,integer,10,wood,0,,1,玩家初始木材数量。
 initial_gold,integer,0,gold,0,,1,玩家初始金币数量。
 hero_initial_gold,integer,0,gold,0,,1,每名英雄提供的初始金币；与玩家初始金币叠加。
-health_regen_per_second,decimal,0,health_per_second,0,,1,英雄和防御塔每秒回血。
+health_regen_per_second,percentage,0,percent,0,10000,1,英雄和防御塔每秒回血百分比；按最大生命值百分比结算。
 wood_per_second,decimal,1,wood_per_second,0,,1,玩家每秒木材增加量。
 lumberjack_attack_efficiency,integer,13,wood_per_attack,0,,1,伐木工每次攻击的基础采集值。
 gold_per_second,decimal,0,gold_per_second,0,,1,玩家每秒金币增加量。
@@ -51,7 +51,7 @@ hero_attack_speed_bonus_pct,percentage,0,percent,0,10000,1,英雄攻击速度百
 hero_attack_interval_reduction,decimal,0,seconds,0,,1,英雄攻击间隔减少量；词条“英雄攻击间隔-1”按增量减少间隔。
 hero_damage_bonus_flat,decimal,0,damage,0,,1,英雄造成的固定伤害加成。
 hero_initial_health,decimal,0,health,0,,1,英雄初始生命值。
-hero_health_regen_per_second,decimal,0,health_per_second,0,,1,英雄每秒回血。
+hero_health_regen_per_second,percentage,0,percent,0,10000,1,英雄每秒回血百分比；按最大生命值百分比结算。
 hero_initial_armor,decimal,0,armor,0,,1,英雄初始护甲值。
 hero_attack_attribute_efficiency_pct,percentage,0,percent,0,10000,1,英雄攻击获得属性时的效率百分比。
 hero_attack_range,decimal,0,range,0,,1,英雄攻击范围增加量。
@@ -62,7 +62,7 @@ hero_attack_wood_flat,decimal,0,wood,0,,1,英雄普通攻击时获得的固定�
 hero_damage_wood_bonus_pct,percentage,0,percent,0,10000,1,英雄造成伤害获得木材的百分比加成。
 hero_attack_per_second,decimal,0,attack_per_second,0,,1,英雄每秒攻击力成长。
 tower_attack_flat,decimal,0,attack,0,,1,所有防御塔固定攻击力加成；直接等价于初级防御塔强化科技。
-tower_health_regen_per_second,decimal,0,health_per_second,0,,1,防御塔每秒回血。
+tower_health_regen_per_second,percentage,0,percent,0,10000,1,防御塔每秒回血百分比；按最大生命值百分比结算。
 tower_attack_interval_reduction,decimal,0,seconds,0,,1,箭塔攻击间隔减少量；词条“箭塔攻击间隔-1”按增量减少间隔。
 tower_critical_damage_bonus_pct,percentage,0,percent,0,10000,1,箭塔暴击伤害百分比加成。
 tower_damage_attack_growth,decimal,0,attack_per_damage,0,,1,箭塔每次造成伤害后的攻击力增加量。
@@ -92,7 +92,7 @@ global_final_damage_bonus_pct,percentage,0,percent,0,10000,1,所有单位最终�
 global_attack_armor_reduction,decimal,0,armor,0,,1,所有英雄、伐木工和防御塔攻击敌人时通用的固定减甲量。
 team_hero_wall_armor_bonus,decimal,0,armor,0,,1,对所有联机玩家英雄和城墙生效的护甲增加量。
 enemy_initial_armor_reduction,decimal,0,armor,0,,1,地图上所有敌方单位的初始护甲减少量。
-# 已启用：每秒回血分别作用于英雄和防御塔，在每秒运行时心跳结算。
+# 已启用：每秒回血分别作用于英雄和防御塔，按最大生命值百分比在每秒运行时心跳结算。
 # 已启用：hero_health_bonus_pct 与 hero_armor_bonus_pct 均按英雄当前面板值计算。
 # 已启用：tower_attack_flat 与 wall_health_bonus_pct 分别直接等价于初级防御塔/城墙强化科技。
 # 已启用：hero_initial_gold 与 initial_gold 共同计入玩家开局金币，数值叠加。

@@ -374,6 +374,8 @@ local function recalculate(player_id, reason)
     local panel_health = configured_panel_health + equipment_stats.health_flat
     local attribute_health_bonus = base_attribute_health_bonus
         + panel_health * (tonumber(permanent.hero_health_bonus_pct) or 0) / 100
+    local health_regen_pct = (tonumber(permanent.health_regen_per_second) or 0)
+        + (tonumber(permanent.hero_health_regen_per_second) or 0)
     local attribute_attack_bonus = hero_combat_stat_math.intellect_attack_bonus(
         final_intellect,
         global_rules.hero_intellect_attack_per_point
@@ -424,8 +426,9 @@ local function recalculate(player_id, reason)
         hero_attack_bonus_pct = tonumber(permanent.hero_attack_bonus_pct) or 0,
         hero_health_bonus_pct = tonumber(permanent.hero_health_bonus_pct) or 0,
         hero_armor_bonus_pct = tonumber(permanent.hero_armor_bonus_pct) or 0,
-        health_regen_per_second = (tonumber(permanent.health_regen_per_second) or 0)
-            + (tonumber(permanent.hero_health_regen_per_second) or 0),
+        health_regen_pct = health_regen_pct,
+        health_regen_per_second = safe_get(state.unit, "GetMaxHealth", 0)
+            * health_regen_pct / 100,
         researcher_final_damage_pct = researcher_final_damage_pct,
         researcher_armor_reduction = researcher_armor_reduction,
         researcher_critical_chance_pct = researcher_critical_chance_pct,

@@ -122,8 +122,8 @@ local function apply_tower_tick(player_id)
     })
 end
 
-local function heal_unit(unit, amount)
-    if amount <= 0 or not valid_entity(unit) then return false end
+local function heal_unit(unit, percent)
+    if percent <= 0 or not valid_entity(unit) then return false end
     if unit.IsAlive and not unit:IsAlive() then return false end
     if type(unit.GetHealth) ~= "function"
         or type(unit.GetMaxHealth) ~= "function"
@@ -136,6 +136,8 @@ local function heal_unit(unit, amount)
     health = tonumber(health) or 0
     maximum = tonumber(maximum) or 0
     if maximum <= 0 or health >= maximum then return false end
+    local amount = maximum * percent / 100
+    if amount <= 0 then return false end
     pcall(unit.SetHealth, unit, math.min(maximum, health + amount))
     return true
 end
@@ -144,8 +146,12 @@ local function apply_health_regen_tick(player_id)
     local hero_amount = math.max(0,
         M.value(player_id, "health_regen_per_second")
             + M.value(player_id, "hero_health_regen_per_second"))
-    if hero_amount > 0 then
-        heal_unit(player_unit(player_id), hero_amount)
+    local hero = player_unit(player_id)
+    if valid_entity(hero) then
+        hero.survival_gameplay_health_regen_pct = hero_amount
+        if hero_amount > 0 then
+            heal_unit(hero, hero_amount)
+        end
     end
     local tower_amount = math.max(0,
         M.value(player_id, "health_regen_per_second")
@@ -157,6 +163,7 @@ local function apply_health_regen_tick(player_id)
             if valid_entity(unit)
                 and tonumber(unit.survival_player_id) == tonumber(player_id)
                 and tostring(unit.survival_building_id or "") == "arrow_tower" then
+                unit.survival_gameplay_health_regen_pct = tower_amount
                 heal_unit(unit, tower_amount)
             end
         end
