@@ -131,6 +131,9 @@ local function apply_research_technology(state)
             { player_id = player_id }
         )
         local permanent = permanent_result and permanent_result.totals or {}
+        unit.survival_gameplay_health_regen_pct =
+            (tonumber(permanent.health_regen_per_second) or 0)
+                + (tonumber(permanent.tower_health_regen_per_second) or 0)
         local bonus = (tonumber(tower.attack_flat) or 0)
             + (tonumber(permanent.tower_attack_flat) or 0)
         local bonus_pct = (tonumber(tower.attack_bonus_pct) or 0)
