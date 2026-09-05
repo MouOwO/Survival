@@ -2,17 +2,23 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local armor_balance = require("config/armor_balance")
+local map_level_effect_rules = require("config/generated/map_level_effect_rules")
 
 local M = {}
 local totals_by_player = {}
 local hero_ticks_by_player = {}
 local tower_ticks_by_player = {}
+local hero_tick_attributes_by_player = {}
+local hero_tick_attack_by_player = {}
+local tower_tick_attack_by_player = {}
 local tower_damage_bonus_by_player = {}
 local hero_damage_attack_bonus_by_player = {}
 local hero_basic_attack_bonus_by_player = {}
 local hero_growth_attributes_by_player = {}
 local tower_basic_attack_bonus_by_player = {}
 local wall_ticks_by_player = {}
+local wall_tick_health_by_player = {}
+local wall_tick_armor_by_player = {}
 local test_isolated_field_by_player = {}
 local refresh_existing_enemy_armor = nil
 
@@ -32,6 +38,26 @@ local function add_values(target, source)
     return target
 end
 
+-- Map level is stored once as permanent player progression. Its gameplay
+-- effects stay data-driven here instead of being copied into every item that
+-- grants a level.
+local function apply_map_level_effects(target)
+    for _, rule in ipairs(map_level_effect_rules.rows or {}) do
+        if rule.enabled ~= false and rule.stacking_rule == "add" then
+            local source_field_id = tostring(rule.source_field_id or "")
+            local target_field_id = tostring(rule.target_field_id or "")
+            local level = tonumber(target[source_field_id]) or 0
+            local value_per_level = tonumber(rule.value_per_level) or 0
+            if source_field_id ~= "" and target_field_id ~= ""
+                and level > 0 and value_per_level ~= 0 then
+                target[target_field_id] = (tonumber(target[target_field_id]) or 0)
+                    + level * value_per_level
+            end
+        end
+    end
+    return target
+end
+
 local function refresh(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
@@ -46,12 +72,18 @@ local function refresh(payload)
             ) or 0,
         }
     else
-        totals_by_player[player_id] = add_values(
+        totals_by_player[player_id] = apply_map_level_effects(add_values(
             copy(save.permanent_effects), save.gameplay_stats
-        )
+        ))
     end
     hero_ticks_by_player[player_id] = hero_ticks_by_player[player_id] or 0
     tower_ticks_by_player[player_id] = tower_ticks_by_player[player_id] or 0
+    hero_tick_attributes_by_player[player_id] =
+        hero_tick_attributes_by_player[player_id] or 0
+    hero_tick_attack_by_player[player_id] =
+        hero_tick_attack_by_player[player_id] or 0
+    tower_tick_attack_by_player[player_id] =
+        tower_tick_attack_by_player[player_id] or 0
     tower_damage_bonus_by_player[player_id] = tower_damage_bonus_by_player[player_id] or 0
     hero_damage_attack_bonus_by_player[player_id] =
         hero_damage_attack_bonus_by_player[player_id] or 0
@@ -62,10 +94,16 @@ local function refresh(payload)
     tower_basic_attack_bonus_by_player[player_id] =
         tower_basic_attack_bonus_by_player[player_id] or 0
     wall_ticks_by_player[player_id] = wall_ticks_by_player[player_id] or 0
+    wall_tick_health_by_player[player_id] =
+        wall_tick_health_by_player[player_id] or 0
+    wall_tick_armor_by_player[player_id] =
+        wall_tick_armor_by_player[player_id] or 0
     print("[PermanentReward] projection_refreshed player_id=" .. tostring(player_id)
         .. " revision=" .. tostring(profile and profile.revision or 0)
         .. " hero_all_attributes_flat="
-        .. tostring(totals_by_player[player_id].hero_all_attributes_flat or 0))
+        .. tostring(totals_by_player[player_id].hero_all_attributes_flat or 0)
+        .. " map_level="
+        .. tostring(totals_by_player[player_id].map_level or 0))
     event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
         player_id = player_id,
         totals = copy(totals_by_player[player_id]),
@@ -97,15 +135,23 @@ local function player_unit(player_id)
 end
 
 local function apply_hero_tick(player_id)
-    local amount = M.value(player_id, "hero_attributes_per_second")
-    if amount <= 0 then return end
+    local attribute_amount = M.value(player_id, "hero_attributes_per_second")
+    local attack_amount = M.value(player_id, "hero_attack_per_second")
+    if attribute_amount <= 0 and attack_amount <= 0 then return end
     local hero = player_unit(player_id)
     if not valid_entity(hero) or (hero.IsAlive and not hero:IsAlive()) then return end
     hero_ticks_by_player[player_id] = (hero_ticks_by_player[player_id] or 0) + 1
+    hero_tick_attributes_by_player[player_id] =
+        (hero_tick_attributes_by_player[player_id] or 0)
+            + math.max(0, attribute_amount)
+    hero_tick_attack_by_player[player_id] =
+        (hero_tick_attack_by_player[player_id] or 0)
+            + math.max(0, attack_amount)
     event_bus.emit(events.HERO_PROGRESSION_CHANGED, {
         player_id = player_id,
         reason = "star_blessing_attributes_per_second",
-        amount = amount,
+        amount = attribute_amount,
+        attack_amount = attack_amount,
         tick = hero_ticks_by_player[player_id],
     })
 end
@@ -114,6 +160,8 @@ local function apply_tower_tick(player_id)
     local amount = M.value(player_id, "tower_attack_per_second")
     if amount <= 0 then return end
     tower_ticks_by_player[player_id] = (tower_ticks_by_player[player_id] or 0) + 1
+    tower_tick_attack_by_player[player_id] =
+        (tower_tick_attack_by_player[player_id] or 0) + amount
     event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
         player_id = player_id,
         reason = "star_blessing_tower_attack_per_second",
@@ -266,6 +314,10 @@ local function apply_wall_tick(player_id)
     local armor = M.value(player_id, "wall_armor_per_second")
     if health <= 0 and armor <= 0 then return end
     wall_ticks_by_player[player_id] = (wall_ticks_by_player[player_id] or 0) + 1
+    wall_tick_health_by_player[player_id] =
+        (wall_tick_health_by_player[player_id] or 0) + math.max(0, health)
+    wall_tick_armor_by_player[player_id] =
+        (wall_tick_armor_by_player[player_id] or 0) + math.max(0, armor)
     event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
         player_id = player_id,
         reason = "gameplay_stats_wall_growth_per_second",
@@ -355,24 +407,19 @@ local function get(payload)
     end
     totals.hero_all_attributes_flat = (totals.hero_all_attributes_flat or 0)
         + (totals.hero_initial_attributes or 0)
-        + (totals.hero_attributes_per_second or 0)
-            * (hero_ticks_by_player[player_id] or 0)
+        + (hero_tick_attributes_by_player[player_id] or 0)
         + (hero_growth_attributes_by_player[player_id] or 0)
     totals.hero_attack_flat = (totals.hero_attack_flat or 0)
         + (totals.hero_initial_attack or 0)
         + (hero_damage_attack_bonus_by_player[player_id] or 0)
         + (hero_basic_attack_bonus_by_player[player_id] or 0)
-        + (totals.hero_attack_per_second or 0)
-            * (hero_ticks_by_player[player_id] or 0)
+        + (hero_tick_attack_by_player[player_id] or 0)
     totals.tower_attack_flat = (totals.tower_attack_flat or 0)
-        + (totals.tower_attack_per_second or 0)
-            * (tower_ticks_by_player[player_id] or 0)
+        + (tower_tick_attack_by_player[player_id] or 0)
         + (tower_damage_bonus_by_player[player_id] or 0)
         + (tower_basic_attack_bonus_by_player[player_id] or 0)
-    totals.wall_health_growth_flat = (totals.wall_health_per_second or 0)
-        * (wall_ticks_by_player[player_id] or 0)
-    totals.wall_armor_growth_flat = (totals.wall_armor_per_second or 0)
-        * (wall_ticks_by_player[player_id] or 0)
+    totals.wall_health_growth_flat = wall_tick_health_by_player[player_id] or 0
+    totals.wall_armor_growth_flat = wall_tick_armor_by_player[player_id] or 0
     return {
         ok = true,
         totals = totals,
@@ -394,12 +441,17 @@ function M.set_test_isolation(player_id, field_id, defer_refresh)
     test_isolated_field_by_player[player_id] = field_id
     hero_ticks_by_player[player_id] = 0
     tower_ticks_by_player[player_id] = 0
+    hero_tick_attributes_by_player[player_id] = 0
+    hero_tick_attack_by_player[player_id] = 0
+    tower_tick_attack_by_player[player_id] = 0
     tower_damage_bonus_by_player[player_id] = 0
     hero_damage_attack_bonus_by_player[player_id] = 0
     hero_basic_attack_bonus_by_player[player_id] = 0
     hero_growth_attributes_by_player[player_id] = 0
     tower_basic_attack_bonus_by_player[player_id] = 0
     wall_ticks_by_player[player_id] = 0
+    wall_tick_health_by_player[player_id] = 0
+    wall_tick_armor_by_player[player_id] = 0
     if defer_refresh ~= true then
         refresh({ player_id = player_id, reason = "gameplay_stats_test_isolation" })
     end
@@ -422,12 +474,17 @@ function M.init()
     totals_by_player = {}
     hero_ticks_by_player = {}
     tower_ticks_by_player = {}
+    hero_tick_attributes_by_player = {}
+    hero_tick_attack_by_player = {}
+    tower_tick_attack_by_player = {}
     tower_damage_bonus_by_player = {}
     hero_damage_attack_bonus_by_player = {}
     hero_basic_attack_bonus_by_player = {}
     hero_growth_attributes_by_player = {}
     tower_basic_attack_bonus_by_player = {}
     wall_ticks_by_player = {}
+    wall_tick_health_by_player = {}
+    wall_tick_armor_by_player = {}
     test_isolated_field_by_player = {}
     event_bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, get)
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, refresh)

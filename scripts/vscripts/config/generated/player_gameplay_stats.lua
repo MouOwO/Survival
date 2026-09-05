@@ -12,6 +12,7 @@ M.rows = {
     { field_id = "gold_mine_efficiency_pct", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 10000, enabled = true, notes = "金矿收益百分比；15表示15%。" },
     { field_id = "initial_population_cap", storage_type = "integer", default_value = 0, unit = "population", min_value = 0, enabled = true, notes = "玩家初始人口上限。" },
     { field_id = "starjoy_points", storage_type = "integer", default_value = 0, unit = "points", min_value = 0, enabled = true, notes = "星悦积分。" },
+    { field_id = "map_level", storage_type = "integer", default_value = 0, unit = "level", min_value = 0, enabled = true, notes = "玩家永久地图等级；等级本身是成长维度，实际加成由map_level_effect_rules派生。" },
     { field_id = "hero_initial_attack", storage_type = "integer", default_value = 100, unit = "attack", min_value = 0, enabled = true, notes = "英雄初始攻击力。" },
     { field_id = "hero_damage_attack_growth", storage_type = "decimal", default_value = 1, unit = "attack_per_damage", min_value = 0, enabled = true, notes = "英雄每次造成伤害后的攻击力增加量。" },
     { field_id = "hero_basic_attack_growth", storage_type = "decimal", default_value = 1, unit = "attack_per_attack", min_value = 0, enabled = true, notes = "英雄每次普通攻击后的攻击力增加量。" },

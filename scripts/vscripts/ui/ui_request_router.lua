@@ -1338,9 +1338,50 @@ local function register_rogue_reward_requests()
     end)
 end
 
+local function register_lottery_requests()
+    CustomGameEventManager:RegisterListener("ui_lottery_snapshot_request", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        local result = event_bus.request(events.LOTTERY_SNAPSHOT_REQUEST, {
+            player_id = player_id,
+            pool_id = tostring(payload and payload.pool_id or "map"),
+        })
+        send_to_player("ui_lottery_snapshot", player_id, result and result.snapshot or {
+            ok = false, error = result and result.error or "lottery_snapshot_failed",
+        })
+    end)
+    CustomGameEventManager:RegisterListener("ui_lottery_draw_request", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        local result = event_bus.request(events.LOTTERY_DRAW_REQUEST, {
+            player_id = player_id,
+            pool_id = tostring(payload and payload.pool_id or "map"),
+            count = tonumber(payload and payload.count) or 1,
+            request_id = tostring(payload and payload.request_id or ""),
+        }) or { ok = false, error = "lottery_draw_failed" }
+        send_to_player("ui_lottery_result", player_id, result)
+    end)
+    CustomGameEventManager:RegisterListener("ui_lottery_exchange_request", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        local result = event_bus.request(events.LOTTERY_EXCHANGE_REQUEST, {
+            player_id = player_id,
+            pool_id = tostring(payload and payload.pool_id or "map"),
+            item_id = tostring(payload and payload.item_id or ""),
+            request_id = tostring(payload and payload.request_id or ""),
+        }) or { ok = false, error = "lottery_exchange_failed" }
+        send_to_player("ui_lottery_exchange_result", player_id, result)
+    end)
+end
+
 local function on_shop_state_changed(payload)
     if not payload or not payload.snapshot then return end
     send_to_player("ui_shop_snapshot", payload.player_id, payload.snapshot)
+end
+
+local function on_lottery_changed(payload)
+    if not payload or not payload.snapshot then return end
+    send_to_player("ui_lottery_snapshot", payload.player_id, payload.snapshot)
 end
 
 function M.init()
@@ -1366,10 +1407,12 @@ function M.init()
     register_arrow_tower_destroy_request()
     register_return_home_request()
     register_rogue_reward_requests()
+    register_lottery_requests()
     event_bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, on_hero_combat_stats_changed)
     event_bus.subscribe(events.UI_NOTIFICATION, on_notification)
     event_bus.subscribe(events.SHOP_STATE_CHANGED, on_shop_state_changed)
+    event_bus.subscribe(events.LOTTERY_CHANGED, on_lottery_changed)
 end
 
 M._test = {

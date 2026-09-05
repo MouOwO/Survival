@@ -1,0 +1,7 @@
+pool_id,display_name,description,ticket_content_id,single_cost,ten_cost,pool_group,ui_order,enabled,review_status,notes
+#中文名:奖池ID,显示名称,客户端描述,消耗券内容ID,单抽消耗,十连消耗,奖池分组,UI排序,是否启用,审核状态,备注
+#types:string,string,string,string,number,number,string,number,boolean,string,string
+map,地图抽奖,N/R/SR/SSR/UR综合奖池 · 十连至少SR,lottery_ticket,1,10,map,1,1,ok,UR基础概率1%；仅直接十连触发至少SR；连续十次单抽不保底。
+cultivation,修仙宝箱,特殊奖池 · 十连至少UR,special_lottery_ticket,1,10,special,2,1,needs_confirmation,当前与其他特殊池共用联调道具；仅直接十连触发至少UR。
+dragon_knight,龙骑宝箱,特殊奖池 · 十连至少UR,special_lottery_ticket,1,10,special,3,1,needs_confirmation,当前与其他特殊池共用联调道具；仅直接十连触发至少UR。
+summer,暑期宝箱,特殊奖池 · 十连至少UR,special_lottery_ticket,1,10,special,4,1,needs_confirmation,当前与其他特殊池共用联调道具；仅直接十连触发至少UR。

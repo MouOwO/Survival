@@ -1,4 +1,4 @@
-﻿content_id,legacy_id,content_type,content_subtype,name,description,icon,enabled,source_sheet,source_row,shop_candidate,review_status,notes
+content_id,legacy_id,content_type,content_subtype,name,description,icon,enabled,source_sheet,source_row,shop_candidate,review_status,notes
 #中文名:内容ID,旧版ID,内容类型,内容子类型,名称,描述,图标,是否启用,来源工作表,来源行,商店候选,审核状态,备注
 #types:string,string,enum,enum,string,string,string,boolean,string,number,boolean,enum,string
 weapon_growth_sword_01,1001,weapon,main_weapon,成长之剑Lv1,英雄每次攻击增加1点攻击力  攻击200次使该武器进化    成长之剑Lvmax＋吸血面罩 自动合成幻影之剑,,1,武器合成/Sheet1,2,1,ok,
@@ -109,3 +109,94 @@ building_research_lab,,building,buildable,研究所,,,1,设计拆分,,0,ok,
 building_advanced_research_lab,,building,buildable,高级研究所,,,1,设计拆分,,0,ok,
 building_gold_mine,,building,buildable,金矿,主城3级解锁；具体建造费用由building_levels或正式配置补充。,,1,设计拆分,,0,ok,
 building_hero_altar,,building,buildable,英雄祭坛,祭坛建造前置为主城3级；祭坛被使用后shop_root_visible=true。,,1,设计拆分,,0,ok,
+lottery_ticket,,material,lottery_currency,地图抽奖券,用于地图抽奖；由地图玩法产出。,,1,抽奖系统,,0,ok,逻辑资产；服务端内容背包持有。
+special_lottery_ticket,,material,premium_lottery_currency,特殊抽奖券,用于修仙、龙骑和暑期特殊宝箱；仅由支付后台验签发放。,,1,抽奖系统,,0,needs_confirmation,不可加入消耗木材或金币的普通shop_entries表。
+lottery_attribute_crystal,,item,lottery_reward,属性结晶,英雄全属性+50,item_daedalus,1,积分道具,5,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_protection_crystal,,item,lottery_reward,防护结晶,墙护甲+2,item_crimson_guard,1,积分道具,6,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_nature_crystal,,item,lottery_reward,自然结晶,伐木速度+2%,item_ogre_axe,1,积分道具,7,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_bombardment_crystal,,item,lottery_reward,炮击结晶,塔攻击+30,item_daedalus,1,积分道具,8,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_recovery_crystal,,item,lottery_reward,回复结晶,墙每秒回血+5,item_crimson_guard,1,积分道具,9,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_resistance_crystal,,item,lottery_reward,抵抗结晶,墙伤害格挡+10,item_crimson_guard,1,积分道具,10,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_expansion_crystal,,item,lottery_reward,膨胀结晶,墙每秒生命+1,item_crimson_guard,1,积分道具,11,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_shooting_crystal,,item,lottery_reward,射击结晶,塔攻击力+50,item_daedalus,1,积分道具,12,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_wealth_crystal,,item,lottery_reward,财富结晶,金矿效率+2%,item_ogre_axe,1,积分道具,13,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_lumber_crystal,,item,lottery_reward,伐木结晶,开局木材+30,item_ogre_axe,1,积分道具,14,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_recovery_spirit,,item,lottery_reward,回复精神,墙每秒回血+10,item_crimson_guard,1,积分道具,15,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_life_spirit,,item,lottery_reward,生命精神,墙生命值+1000,item_crimson_guard,1,积分道具,16,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_nature_spirit,,item,lottery_reward,自然精神,每秒木材+1,item_ogre_axe,1,积分道具,17,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_sharp_spirit,,item,lottery_reward,锋锐精神,防御塔攻击+100,item_mjollnir,1,积分道具,18,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_divine_spirit,,item,lottery_reward,神赐精神,金矿收益+3（不叠加任何加成）,item_ogre_axe,1,积分道具,19,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_universal_tool,,item,lottery_reward,万能工具,伐木工攻速+3% 金矿效率+3% 星悦积分+10,item_ogre_axe,1,积分道具,20,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_gale_bow,,item,lottery_reward,疾风弓,英雄攻速+5% 最终伤害+5% 星悦积分+10,item_daedalus,1,积分道具,21,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_swift_emblem,,item,lottery_reward,快速纹章,箭塔攻速+5% 箭塔最终伤害+5% 星悦积分+10,item_mjollnir,1,积分道具,22,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_quick_dry_cement,,item,lottery_reward,速干水泥,箭塔每秒攻击+1 英雄每秒属性+1 星悦积分+10,item_mjollnir,1,积分道具,23,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_windspeed_bowstring,,item,lottery_reward,风速弓弦,英雄攻速+5% 箭塔攻速+5% 星悦积分+10,item_mjollnir,1,积分道具,24,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_hippogryph_onslaught,,item,lottery_reward,角鹰魔攻,英雄攻击加成+3% 英雄三围加成+3% 星悦积分+20,item_daedalus,1,积分道具,25,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_soul_devouring_blade,,item,lottery_reward,噬魂灵剑,英雄造成伤害加攻击+2 英雄造成伤害加三围+1 星悦积分+20,item_daedalus,1,积分道具,26,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_tower_retrofit,,item,lottery_reward,箭塔改造,箭塔攻速+20% 箭塔每秒攻击+2 箭塔攻击加成+5% 星悦 积分+20,item_mjollnir,1,积分道具,27,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_steel_wall,,item,lottery_reward,钢铁城墙,墙生命+3000 墙护甲+10 墙每秒生命+5 墙生命加成+5% 星悦积分+20,item_crimson_guard,1,积分道具,28,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_gathering_grimoire,,item,lottery_reward,采集秘典,伐木效率+1 人口+1 伐木工攻速+5% 星悦积分+20,item_ogre_axe,1,积分道具,29,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_gathering_divine_codex,,item,lottery_reward,采集神典,每秒金币+2 伐木效率+2 伐木工攻击间隔-0.02 墙每秒生命+30 墙伤害减免+3%星悦积分+30,item_crimson_guard,1,积分道具,30,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_aaron_cannon,,item,lottery_reward,亚伦巨炮,伐木效率+1 箭塔攻速+15% 英雄攻速+15% 箭塔最终伤害+15% 英雄最终伤害+15% 星悦积分+30,item_mjollnir,1,积分道具,31,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_darksteel_wall,,item,lottery_reward,玄铁城墙,墙生命+5000 墙护甲+20 墙每秒生命+8 墙每秒护甲+0.1 星悦积分+30,item_crimson_guard,1,积分道具,32,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_lumber_legacy,,item,lottery_reward,伐木传承,伐木效率+2 人口+2 伐木工攻速+8% 星悦积分+30,item_ogre_axe,1,积分道具,33,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_titan_shield,,item,lottery_reward,泰坦巨盾,英雄生命值+50000 英雄全属性+3000 英雄护甲+100 星悦积分+30,item_daedalus,1,积分道具,34,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_reincarnation_orb,,item,lottery_reward,轮回宝珠,伐木效率+3 英雄攻速+20% 英雄最终伤害+20% 箭塔攻击加成10% 墙生命加成+10% 英雄每次转生全属性加成+2% 星悦积分+200,item_crimson_guard,1,积分道具,35,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_time_orb,,item,lottery_reward,时间宝珠,伐木效率+3 金矿建造上限+1 防御塔攻击成长+1 英雄每秒属性+30 箭塔每秒攻击+30 击杀进攻boss后英雄攻击加成+2% 星悦积分+200,item_mjollnir,1,积分道具,36,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_divine_tower_blessing,,item,lottery_reward,神塔赐福,每秒木材+30 箭塔攻击加成+30% 箭塔攻击成长+3 箭塔木材攻击减甲+0.2 箭塔暴击几率+5% 箭塔暴击伤害+20% 星悦积分+200,item_mjollnir,1,积分道具,37,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_abundance_blessing,,item,lottery_reward,丰饶赐福,金矿收益+20% 伐木工攻速+15% 伐木工攻击成长+10 伐木效率+5 墙每秒生命+100 初始人口+3 星悦积分+200,item_crimson_guard,1,积分道具,38,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_omniscience_blessing,,item,lottery_reward,全知赐福,伐木工攻速+20% 箭塔攻击成长+1 箭塔最终伤害+20% 箭塔攻击加成+10% 墙减伤+5% 每1级地图等级，墙生命加成+1% 墙每秒生命+5 星悦积分+200,item_crimson_guard,1,积分道具,39,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_unbreakable_fortress,,item,lottery_reward,不破要塞,墙护甲+200 墙每秒护甲+0.1 英雄减伤+5% 英雄生命加成+30% 英雄生命加成+30%、英雄护甲加成+30% 星悦积分+200,item_crimson_guard,1,积分道具,40,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_struggle_diary,,item,lottery_reward,奋斗日记,箭塔造成伤害攻击+10 箭塔攻击减甲+0.1 箭塔暴击几率+20% 箭塔暴击伤害+50% 上班福利增加20%积分获取 星悦积分+200,item_mjollnir,1,积分道具,41,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_chosen_hero,,item,lottery_reward,神选英雄,英雄攻击加成+8% 英雄三围加成+8% 箭塔攻击加成+8% 英雄造成伤害攻击+0.3*地图等级 英雄造成伤害三围+0.3*地图等级 箭塔造成伤害攻击+0.3*地图等级 星悦积分+200,item_mjollnir,1,积分道具,42,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_chief_god_blessing,,item,lottery_reward,主神赐福,英雄造成伤害木材+5 英雄造成伤害攻击+5 英雄造成伤害三围+5 英雄攻击减甲+2 英雄最终伤害+20% 星悦积分+200,item_ogre_axe,1,积分道具,43,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_ember_of_legacy,,item,lottery_reward,薪火余烬,英雄攻击攻击+0.1 数量大于10：英雄每秒属性+100 数量大于50：英雄攻击全属性+100 数量大于100：最终伤害+10% 数量大于200：英雄攻击加成加成+30% 数量大于300：英雄全属性加成+30% 数量大于400：英雄攻击减甲+30 数量大于600：英雄攻击全属性+40 数量大于800：英雄最终伤害+120% 数量大于1000：英雄攻击减甲+50 数量大于1500：英雄攻击全属性+60,item_daedalus,1,积分道具,44,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_lumber_immortal,,item,lottery_reward,伐木仙人,伐木工效率+5 伐木工攻速+20% 每秒金币+100 每秒木材+100 地图等级+1 伐木工对树的伤害翻倍 开局获得一个桃木仙人 伐木工融合之后直接被桃木仙人吃掉且继承性格 这个功能可以先不做 这是为了游戏简洁做的 金矿也有合体金矿都先不做,item_ogre_axe,1,积分道具,45,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_supreme_fishing_rod,,item,lottery_reward,极品钓鱼杆,箭塔造成伤害攻击+10 箭塔攻击减甲+0.1 箭塔攻击速度+30% 局内局外钓鱼时间缩短一倍 地图等级+1 星悦积分+88,item_mjollnir,1,积分道具,46,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_flame_wall,,item,lottery_reward,烈焰城墙,地图等级+1 墙护甲+500 墙每秒护甲+0.2 墙生命加成+30% 墙护甲加成+30% 墙每秒生命+100 城墙附带的灼烧每秒最大生命值1%的伤害（可以做成攻击反弹1%固定血量的伤害） 金矿上限数量+1 星悦积分+200,item_crimson_guard,1,积分道具,47,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_magical_girl_juggernaut,,item,lottery_reward,魔法少女（剑圣）,地图等级+1 英雄攻击减甲+10 英雄攻击攻击+10 英雄攻击全属性+10 英雄攻击全属性+10 英雄攻击化成+10% 英雄最终伤害+10% 解锁英雄：魔法少女 星悦积分+200 拥有剑圣和魔法少女时额外获得属性：英雄攻击获得属性提高30% 英雄全属性加成+30%，攻击减甲+20 减少0.1攻击间隔 开局自带1转技能,item_daedalus,1,积分道具,48,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_forest_burning_edge,,item,lottery_reward,焚林之锋,英雄开局获得成长之剑和铁甲（都是LV1 可以改成免费购买） 箭塔造成伤害攻击+20 箭塔最终伤害+30% 箭塔攻击减甲+0.5 英雄攻击减甲+10 英雄攻击全属性+10 英雄全属性加成+10% 星悦积分+200,item_mjollnir,1,积分道具,49,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_endless_growth_ring,,item,lottery_reward,无尽年轮,无尽年轮练功房消耗金币降低25% 英雄攻击获得属性提高10% 英雄最终伤害+10% 英雄攻击减甲+10 武器成长速度加倍 星悦积分+200,item_ogre_axe,1,积分道具,50,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_lumber_fury,,item,lottery_reward,伐木之怒,1~7级农民上限+1（涉及到伐木工合体） 伐木工伐木收益+25% 每秒金币+100 每秒木材+500 伐木效率+10 金矿收益+10% 英雄造成伤害木材+5 星悦积分+200,item_ogre_axe,1,积分道具,51,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_candle_dragon_wing,,item,lottery_reward,烛龙之翼,英雄暴击几率+10% 英雄暴击伤害+100% 英雄最终伤害+20% 英雄全属性加成+10% 英雄攻击加成+10% 英雄攻击加成+10% 英雄攻击减甲+10 金矿上限数量+1 星悦积分+200,item_ogre_axe,1,积分道具,52,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_oak_bulwark,,item,lottery_reward,橡木壁垒,墙护甲+30 墙每秒护甲+0.1 墙生命加成+10% 墙护甲加成+10% 墙每秒生命+10 星悦积分+88,item_crimson_guard,1,积分道具,53,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_seed_of_all_wood,,item,lottery_reward,万木之种,金矿效率+10% 伐木效率+2 每秒金币+10 每秒木材+10 伐木工攻速+10% 星悦积分+88,item_ogre_axe,1,积分道具,54,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_sharpwood_tower_core,,item,lottery_reward,锐木塔源,箭塔攻速+15% 箭塔最终伤害+15% 箭塔攻击减甲+0.1 箭塔每秒攻击+20 箭塔造成伤害攻击+3 星悦积分+88,item_mjollnir,1,积分道具,55,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_hero_medal,,item,lottery_reward,英雄勋章,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_daedalus,1,积分道具,56,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_monkey_king,,item,lottery_reward,齐天大圣,地图等级+1 英雄攻击减甲+10 英雄攻击攻击+10 英雄攻击全属性+10 英雄攻击全属性+10 英雄攻击化成+10% 英雄最终伤害+10% 解锁英雄：魔法少女 星悦积分+200 拥有齐天大圣和剑圣时额外获得属性：英雄攻击获得属性提高30% 英雄全属性加成+30%，攻击减甲+20 减少0.1攻击间隔 开局自带一转技能,item_daedalus,1,积分道具,57,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_immortal_nirvana,,item,lottery_reward,不灭涅槃,英雄暴击伤害+100% 英雄最终伤害+20% 英雄全属性加成+20% 英雄攻击加成+20% 英雄攻击减甲+20 10转后额外获得5技能点数 星悦积分+200,item_daedalus,1,积分道具,58,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_soul_lock_box,,item,lottery_reward,锁魂匣,金矿收益+30% 伐木效率+20 伐木工攻速+20% 地图等级+1 金矿建造上限+1 每次获得宝物可获得一次刷新次数 星悦积分+200,item_ogre_axe,1,积分道具,59,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_sky_turning_seal,,item,lottery_reward,焕天印,英雄每秒属性+1000 英雄攻击加成+20% 英雄全属性加成+15% 英雄最终伤害+20% 英雄攻击减甲+15 星悦积分+200 对转生怪物造成额外50%伤害 每次选择技能获得一次刷新机会,item_daedalus,1,积分道具,60,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_heaven_devouring_pill,,item,lottery_reward,万噬通天丹,墙减伤+10% 墙护甲+500 墙每秒护甲+0.1 每秒金币+50 每秒木材+50 伐木工攻速+10% 伐木效率+15 金矿效率+15% 10转后获得一个吞噬天丹 可以吞噬一件魔导器（魔导器是啥还不知道 没氪金 后续再做吧） 星悦积分+200,item_crimson_guard,1,积分道具,61,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_heaven_reaching_tower_seal,,item,lottery_reward,通天塔印,英雄最终伤害+20% 箭塔最终伤害+20% 箭塔攻击加成+30% 箭塔攻击减甲+0.2 箭塔造成伤害加攻击+10 箭塔每秒攻击+50 箭塔暴击几率+10% 箭塔暴击伤害+100% 星悦积分+200 （可以消耗资源直接建造一个终极之塔）,item_mjollnir,1,积分道具,62,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_sovereign_under_heaven,,item,lottery_reward,君临天下,英雄初始属性+1000000 英雄造成伤害加攻击+30 英雄暴击伤害+100% 英雄攻击减甲+15 英雄攻击全属性+15 英雄全属性加成+15% 英雄最终伤害+15% 英雄攻击间隔-0.03 星悦积分+200,item_daedalus,1,积分道具,63,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_greenwood_rampart,,item,lottery_reward,青林筑垣,墙护甲+30 墙每秒护甲+0.1 墙生命加成+10% 墙护甲加成+10% 墙每秒生命+10 星悦积分+88,item_crimson_guard,1,积分道具,64,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_lumber_expert,,item,lottery_reward,伐木高手,金矿效率+10% 伐木效率+2 每秒金币+10 每秒木材+10 伐木工攻速+10% 星悦积分+88,item_ogre_axe,1,积分道具,65,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_woodforged_thousand_arrows,,item,lottery_reward,木筑万锋,箭塔攻速+15% 箭塔最终伤害+15% 箭塔攻击减甲+0.1 箭塔每秒攻击+20 箭塔造成伤害攻击+3 星悦积分+88,item_mjollnir,1,积分道具,66,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_greenwood_nirvana,,item,lottery_reward,青林涅槃,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_daedalus,1,积分道具,67,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_fallen_sky_mine,,item,lottery_reward,堕落天矿,每秒金币+60 每秒木材+60 伐木效率+15 金矿效率+25% 金矿收益间隔时间-0.1 可以制造一个特殊金矿 占用全部金矿上限 继承全部金矿收益与资源消耗（可以后边再做） 星悦积分+200 （）,item_ogre_axe,1,积分道具,68,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_jade_purity_sword_immortal,,item,lottery_reward,玉清剑仙,地图等级+1 英雄攻击减甲+15 英雄攻击攻击+15 英雄攻击全属性+15 英雄攻击加成+15% 英雄全属性加成10% 英雄最终伤害+10% 星悦积分+200,item_daedalus,1,积分道具,69,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_immortal_slaying_sword_array,,item,lottery_reward,诛仙剑阵,英雄暴击伤害+200% 英雄攻击全属性+20 英雄全属性加成+20% 英雄最终伤害+20% 星悦积分+200 英雄攻击减甲百分比+10%,item_daedalus,1,积分道具,70,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_investiture_of_gods,,item,lottery_reward,封神榜,英雄攻击属性效率+8% 箭塔攻击加成+35%；箭塔最终伤害+35%；箭塔攻击间隔-0.1；英雄最终伤害+30%；英雄全属性加成+30%；英雄攻击减甲+20；星悦积分+200；每10波获得一个封神榜，可以进阶魔导器为光明版。,item_mjollnir,1,积分道具,71,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_heavenly_puppet,,item,lottery_reward,天道傀儡,墙减伤+10% 墙护甲+500 墙每秒护甲+0.1 英雄最终伤害+10% 英雄全属性加成+10% 农民工拥有自动训练功能 天狱模式下结算信仰值+30%（还没做） 星悦积分+200,item_crimson_guard,1,积分道具,72,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_mountain_sea_kunpeng,,item,lottery_reward,山海鲲鹏,英雄初始属性+150000 英雄造成伤害加攻击+40 英雄暴击伤害+150% 英雄攻击减甲+20 英雄攻击全属性+20 英雄全属性加成+20% 英雄最终伤害+20% 星悦积分+200 每有一条鱼英雄额外获得全属性加成0.05%,item_daedalus,1,积分道具,73,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_reincarnation_immortal_stele,,item,lottery_reward,轮回仙碑,英雄每秒属性+1500 英雄攻击加成+20% 英雄全属性加成+20 英雄最终伤害+20% 英雄攻击减甲+20 星悦积分+200 每获得1次胜利英雄最终伤害+0.07%（苟发育没说上限 但是咱默认个5000次吧）,item_daedalus,1,积分道具,74,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_ancient_pine_fortification,,item,lottery_reward,苍松固城,墙护甲+30 墙每秒护甲+0.1 墙生命加成+10% 墙护甲加成+10% 墙每秒生命+10 星悦积分+88,item_crimson_guard,1,积分道具,75,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_woodcraft_grandmaster,,item,lottery_reward,研木宗师,金矿效率+10% 伐木效率+2 每秒金币+10 每秒木材+10 伐木工攻速+10% 星悦积分+88,item_ogre_axe,1,积分道具,76,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_forestcast_thousand_bolts,,item,lottery_reward,林铸千矢,箭塔攻速+15% 箭塔最终伤害+15% 箭塔攻击减甲+0.1 箭塔每秒攻击+20 箭塔造成伤害攻击+3 星悦积分+88,item_mjollnir,1,积分道具,77,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_emerald_wood_origin,,item,lottery_reward,翠木归元,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_daedalus,1,积分道具,78,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_dimensional_barrier,,item,lottery_reward,次元屏障,地图等级+1 墙减伤+10% 墙护甲+500 墙每秒护甲+012 英雄最终伤害+15% 英雄全属性加成+15% 英雄攻击全属性+15 英雄攻击减甲+15 英雄造成伤害攻击+15 墙获得屏障 效果是吸收等值血量的伤害 刷新间隔40秒 持续10秒,item_crimson_guard,1,积分道具,79,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_orbital_cannon_core,,item,lottery_reward,轨道炮核心,英雄攻击间隔-0.03英雄初始属性+20W英雄造成伤害加攻击+40英雄暴击伤害+150%英雄攻击减甲+20英雄攻击全属性+20英雄全属性加成+20%英雄最终伤害+20%在城墙处架设一台轨道炮每波开始(包含无尽)时将会自动释放每0.5秒造成英雄全属性*10的伤害并触发英雄攻击减甲与英雄造成伤害加属性持续10秒内置冷却10（功能可以修改为 英雄10转之后可以建造一个新箭塔 效果为攻击间隔0.5 攻速100% 拥有一个技能 刀刀烈火 造成英雄全属性X10伤害 没有多重效果 继承英雄减甲且造成伤害增加英雄全属性 加多少全属性跟英雄一样）,item_crimson_guard,1,积分道具,80,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_dragon_knight_vanguard_mk1,,item,lottery_reward,龙骑尖兵1型,效果待策划补充,item_ultimate_scepter,0,积分道具,81,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_nano_cluster,,item,lottery_reward,纳米集群,英雄攻击减甲百分比+8%英雄最终伤害+20%英雄全属性加成+20%英雄攻击全属性+20英雄造成伤害加攻击20英雄攻击减甲+20星悦积分+200对进攻BOSS触发双倍攻击减甲效果,item_daedalus,1,积分道具,82,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_cyber_overlord,,item,lottery_reward,赛博主宰,英雄攻击属性效率+8% 英雄最终伤害+25%英雄攻击减甲+25英雄全属性加成+25%英雄攻击全属性+25英雄暴击伤害+200%星悦积分+200获得英雄翅膀:赛博主宰（后续再做皮肤） 购买后自动激活,item_daedalus,1,积分道具,83,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_neural_reconstruction_module,,item,lottery_reward,神经重构模块,箭塔攻击减甲+1箭塔最终伤害+30%箭塔攻击加成+35%英雄全属性加成+15%英雄最终伤害+15%英雄造成伤害加攻击+35英雄攻击全属性+15%终极塔花费资源融合进英雄继承其攻击力与50%的攻击减甲合成前最终伤害与暴击伤害并且附带自动学习暴风雪减速技能融合后英雄如果是龙骑尖兵将会进化 （就先加属性吧 太难 后续攻坚）,item_mjollnir,1,积分道具,84,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_void_signal_terminal,,item,lottery_reward,虚空信号终端,每秒金币+70每秒木材+70伐木效率+15金矿效率+25%英雄全属性加成+15%英雄最终伤害+15%英雄每秒属性+2000英雄攻击加成+20%星悦积分+200每日必定掉落一件双传说词条存档装备（后续攻坚）,item_ogre_axe,1,积分道具,85,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_nitride_alloy_wall,,item,lottery_reward,氮化合金护墙,墙护甲+30墙每秒护甲+0.1墙生命加成+10%墙护甲加成+10%墙每秒生命+10星悦积分+88购买后自动激活,item_crimson_guard,1,积分道具,86,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_data_unit,,item,lottery_reward,数据单元,金矿效率+10%伐木效率+2每秒金币+10每秒木材+10伐木工攻速+10%星悦积分+88购买后自动激活,item_ogre_axe,1,积分道具,87,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_pulse_conduction_turret,,item,lottery_reward,脉冲传导炮台,箭塔攻速+15% 箭塔最终伤害+15%箭塔攻击减甲+0.1箭塔每秒攻击+20箭塔造成伤害加攻击+3星悦积分+88 购买后自动激活,item_mjollnir,1,积分道具,88,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_cybernetic_implant,,item,lottery_reward,义体插件,英雄攻击全属性+5英雄全属性加成+8%英雄攻击减甲+4英雄攻击加成+10%英雄最终伤害10%星悦积分+88购买后自动激活,item_daedalus,1,积分道具,89,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_crystalline_armor,,item,lottery_reward,晶态护甲,墙护甲+30墙每秒护甲+0.1生命加成+10%墙护甲加成+10%墙每秒生命+10英雄全属性加成+8%星悦积分+88购买后自动激活,item_crimson_guard,1,积分道具,90,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_signal_hub,,item,lottery_reward,信号枢纽,金矿效率+10%伐木效率+2每秒金币+10每秒木材+10伐木工攻速+10%英雄全属性加成+8%星悦积分+88购买后自动激活,item_ogre_axe,1,积分道具,91,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_magnetic_disruption_turret,,item,lottery_reward,磁扰炮台,箭塔攻速+15%箭塔最终伤害+15%箭塔攻击减甲+0.1箭塔每秒攻击+20箭塔造成伤害加攻击+3英雄全属性加成+8%星悦积分+88购买后自动激活,item_mjollnir,1,积分道具,92,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_rift_implant,,item,lottery_reward,裂痕插件,英雄攻击全属性+8 英雄全属性加成+8% 英雄攻击减甲+8 英雄攻击加成+10% 英雄最终伤害10% 星悦积分+88 购买后自动激活,item_daedalus,1,积分道具,93,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。

@@ -1,0 +1,5 @@
+currency_id,display_name,acquisition_policy,commerce_sku,client_visible,enabled,review_status,notes
+#中文名:货币ID,显示名称,获取策略,付费商品SKU,客户端可见,是否启用,审核状态,备注
+#types:string,string,string,string,boolean,boolean,string,string
+lottery_ticket,地图抽奖券,gameplay_reward,,1,1,ok,普通地图玩法产出；不得通过付费接口冒充发放。
+special_lottery_ticket,特殊抽奖券,external_purchase_only,,1,1,needs_confirmation,仅允许支付后台验签后写入内容背包；正式SKU待支付平台确认。

@@ -12,7 +12,10 @@
       },
       "save": {
         "highest_difficulty": "N2",
-        "total_wins": 5
+        "total_wins": 5,
+        "content_inventory": {
+          "special_lottery_ticket": 1000
+        }
       },
       "public": {
         "title_id": "veteran",

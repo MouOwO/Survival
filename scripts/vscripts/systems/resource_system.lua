@@ -14,6 +14,13 @@ local function normalized_player_id(value)
 end
 
 local function gameplay_stats(player_id)
+    local ok, projected = pcall(event_bus.request,
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id })
+    if ok and projected and projected.ok == true
+        and type(projected.totals) == "table" then
+        return projected.totals
+    end
     local profile = require("systems/player_profile_service").get_profile(player_id)
     return profile and profile.save and profile.save.gameplay_stats or nil
 end
@@ -223,6 +230,18 @@ local function handle_release_pop(payload)
     return { ok = true, snapshot = snapshot(player_id) }
 end
 
+local function on_permanent_projection_changed(payload)
+    -- Growth ticks reuse the same event to refresh unit panels. Resource
+    -- income only needs a refresh when the authoritative base projection was
+    -- rebuilt (that payload includes totals).
+    if type(payload and payload.totals) == "table" then
+        initialize_from_profile({
+            player_id = payload.player_id,
+            reason = "incremental",
+        })
+    end
+end
+
 function M.init()
     accounts = {}
     version = 0
@@ -232,6 +251,8 @@ function M.init()
     event_bus.handle_request(events.RESOURCE_RELEASE_POP_REQUEST, handle_release_pop)
     event_bus.handle_request(events.RESOURCE_DEBUG_SET_REQUEST, handle_debug_set)
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, initialize_from_profile)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,
+        on_permanent_projection_changed)
 end
 
 M._test = {

@@ -145,6 +145,7 @@ local content_inventory_service =
     require("systems/content_inventory_service")
 local inventory_transaction_service =
     require("systems/inventory_transaction_service")
+local lottery_service = require("systems/lottery_service")
 local weapon_equipment_service =
     require("systems/weapon_equipment_service")
 local weapon_synthesis_service =
@@ -885,6 +886,7 @@ local function initialize_services()
     hero_skill_choice_service.init()
     content_inventory_service.init()
     inventory_transaction_service.init()
+    lottery_service.init()
     polar_crystal_progression_service.init()
     challenge_upgrade_material_service.init()
     seven_sins_essence_service.init()

@@ -15,6 +15,7 @@ local account_by_player_id = {}
 local gameplay_stats_overrides_by_account = {}
 local isolated_gameplay_stat_by_account = {}
 local profile_revisions_by_account = {}
+local memory_only_notice_emitted = false
 
 -- TODO(HTTP/Supabase): this file-backed packet is only a local server
 -- substitute. Replace read/write_fixture_file with the HTTP provider after
@@ -127,7 +128,17 @@ end
 
 local function write_fixture_file(data)
     if not io or type(io.open) ~= "function" then
-        return false, "fixture_file_io_unavailable"
+        -- Dota's VScript sandbox does not expose loose-file writes. The local
+        -- fixture has already been updated in decoded_fixture at this point,
+        -- so keep it as a same-session mock store. This fallback belongs only
+        -- to the development fixture provider; a production HTTP provider
+        -- must still report a real persistence failure to the profile service.
+        if not memory_only_notice_emitted then
+            memory_only_notice_emitted = true
+            print("[PLAYER_PROFILE_FIXTURE] file I/O unavailable; "
+                .. "using same-session memory persistence")
+        end
+        return true, "fixture_memory_only"
     end
     if not active_fixture_path then
         return false, "fixture_file_not_resolved"
@@ -158,6 +169,7 @@ function M.init()
     gameplay_stats_overrides_by_account = {}
     isolated_gameplay_stat_by_account = {}
     profile_revisions_by_account = {}
+    memory_only_notice_emitted = false
     for _, row in ipairs(bindings.rows or {}) do
         if row.enabled ~= false then
             account_by_player_id[tonumber(row.player_id)] = tostring(row.account_id)
@@ -181,6 +193,21 @@ function M.persist_gameplay_stats(account_id, stats, revision)
     profile.save = profile.save or {}
     profile.save.gameplay_stats = copy_table(stats)
     profile.gameplay_stats_mode = nil
+    profile.revision = tonumber(revision) or profile.revision or 0
+    local persisted, persist_error = write_fixture_file(data)
+    if not persisted then return false, persist_error end
+    return true
+end
+
+function M.persist_save(account_id, save, revision)
+    account_id = tostring(account_id or "")
+    if account_id == "" or type(save) ~= "table" then
+        return false, "save_persist_invalid"
+    end
+    local data = ensure_fixture()
+    local profile = data.profiles and data.profiles[account_id]
+    if type(profile) ~= "table" then return false, "fixture_profile_not_found" end
+    profile.save = copy_table(save)
     profile.revision = tonumber(revision) or profile.revision or 0
     local persisted, persist_error = write_fixture_file(data)
     if not persisted then return false, persist_error end

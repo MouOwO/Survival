@@ -233,6 +233,71 @@ local function add_wood(context)
     return change_resource(context, "wood", "addwood")
 end
 
+local function lottery_cheat_allowed()
+    if type(IsInToolsMode) == "function" and IsInToolsMode() then
+        return true
+    end
+    if GameRules and type(GameRules.IsCheatMode) == "function" then
+        local ok, enabled = pcall(function()
+            return GameRules:IsCheatMode()
+        end)
+        return ok and enabled == true
+    end
+    return false
+end
+
+local function grant_lottery_tickets(context)
+    if not lottery_cheat_allowed() then
+        return false, "tools_mode_or_cheats_required"
+    end
+    if #context.args ~= 1 then
+        return false, "usage: choujiang <amount>"
+    end
+
+    local raw_amount = tonumber(context.args[1])
+    if not raw_amount or raw_amount ~= math.floor(raw_amount)
+        or raw_amount < 1 or raw_amount > 100000 then
+        return false, "amount_must_be_an_integer_between_1_and_100000"
+    end
+
+    local result = event_bus.request(
+        events.CONTENT_INVENTORY_GRANT_REQUEST,
+        {
+            player_id = context.player_id,
+            content_id = "lottery_ticket",
+            count = raw_amount,
+            reason = "cheat_choujiang",
+        }
+    )
+    if not result or result.ok ~= true then
+        return false, result and result.error
+            or "lottery_ticket_grant_failed"
+    end
+
+    local total = tonumber(
+        result.snapshot
+        and result.snapshot.counts
+        and result.snapshot.counts.lottery_ticket
+    ) or 0
+    local lottery = event_bus.request(events.LOTTERY_SNAPSHOT_REQUEST, {
+        player_id = context.player_id,
+        pool_id = "map",
+    })
+    if lottery and lottery.ok == true and lottery.snapshot then
+        event_bus.emit(events.LOTTERY_CHANGED, {
+            player_id = context.player_id,
+            snapshot = lottery.snapshot,
+        })
+    end
+
+    notify(context, string.format(
+        "已获得地图抽奖券 ×%d（当前共 %d 张）",
+        raw_amount,
+        total
+    ))
+    return true
+end
+
 local reset_gameplay_stats
 
 local function order_gameplay_stat(context)
@@ -894,6 +959,7 @@ local COMMANDS = {
     shopshow = show_shop,
     addgold = add_gold,
     addwood = add_wood,
+    choujiang = grant_lottery_tickets,
     order = order_gameplay_stat,
     ordertest = test_gameplay_stat,
     orderreset = reset_gameplay_stats,
@@ -986,7 +1052,7 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
+        "ready: choujiang <amount>, addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
     )
 end
 
@@ -994,6 +1060,7 @@ M._test = {
     unlock_skill = unlock_skill,
     show_rogue_offer = show_rogue_offer,
     grant_fishing_reward = grant_fishing_reward,
+    grant_lottery_tickets = grant_lottery_tickets,
 }
 
 return M

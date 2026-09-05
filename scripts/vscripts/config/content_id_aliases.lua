@@ -5,6 +5,10 @@ local M = {}
 
 local aliases = {
     challenge_synthesis_gem = "material_synthesis_gem",
+    -- The first lottery prototype misread these two workbook names. Preserve
+    -- existing local profiles while moving to the verified source names.
+    lottery_flame_crystal = "lottery_nature_crystal",
+    lottery_burst_crystal = "lottery_bombardment_crystal",
 }
 
 function M.canonical(content_id)

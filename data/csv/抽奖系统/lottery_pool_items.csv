@@ -1,0 +1,7 @@
+membership_id,pool_id,item_id,item_weight,enabled,review_status,notes
+#中文名:成员ID,奖池ID,道具ID或通配符,同品质内权重,是否启用,审核状态,备注
+#types:string,string,string,number,boolean,string,string
+map_all,map,*,1,1,ok,自动纳入全部已启用积分道具并按品质分组等权抽取。
+cultivation_all,cultivation,*,1,1,needs_confirmation,特殊池暂时共用全部已启用积分道具。
+dragon_knight_all,dragon_knight,*,1,1,needs_confirmation,特殊池暂时共用全部已启用积分道具。
+summer_all,summer,*,1,1,needs_confirmation,特殊池暂时共用全部已启用积分道具。

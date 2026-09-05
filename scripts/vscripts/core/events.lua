@@ -167,6 +167,10 @@ local M = {
     CONTENT_INVENTORY_TRANSACTION_REQUEST = "content.inventory.transaction.request",
     CONTENT_INVENTORY_GET_REQUEST = "content.inventory.get.request",
     CONTENT_INVENTORY_CHANGED = "content.inventory.changed",
+    LOTTERY_DRAW_REQUEST = "lottery.draw.request",
+    LOTTERY_EXCHANGE_REQUEST = "lottery.exchange.request",
+    LOTTERY_SNAPSHOT_REQUEST = "lottery.snapshot.request",
+    LOTTERY_CHANGED = "lottery.changed",
     INVENTORY_TRANSACTION_EXECUTE_REQUEST = "inventory.transaction.execute.request",
     INVENTORY_TRANSACTION_ROLLBACK_REQUEST = "inventory.transaction.rollback.request",
 

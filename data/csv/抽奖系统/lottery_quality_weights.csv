@@ -1,0 +1,23 @@
+weight_id,pool_id,quality,weight,enabled,review_status,notes
+#中文名:权重ID,奖池ID,品质,万分比权重,是否启用,审核状态,备注
+#types:string,string,string,number,boolean,string,string
+map_n,map,n,6850,1,ok,68.5%；为新增UR 1%从原N 69.5%扣除。
+map_r,map,r,2500,1,ok,25%。
+map_sr,map,sr,400,1,ok,4%。
+map_ssr,map,ssr,150,1,ok,1.5%。
+map_ur,map,ur,100,1,ok,1%。
+cultivation_n,cultivation,n,5950,1,needs_confirmation,特殊池临时联调概率59.5%。
+cultivation_r,cultivation,r,2500,1,needs_confirmation,特殊池临时联调概率25%。
+cultivation_sr,cultivation,sr,400,1,needs_confirmation,特殊池临时联调概率4%。
+cultivation_ssr,cultivation,ssr,150,1,needs_confirmation,特殊池临时联调概率1.5%。
+cultivation_ur,cultivation,ur,1000,1,needs_confirmation,特殊池临时联调概率10%；正式数值待确认。
+dragon_knight_n,dragon_knight,n,5950,1,needs_confirmation,特殊池临时联调概率59.5%。
+dragon_knight_r,dragon_knight,r,2500,1,needs_confirmation,特殊池临时联调概率25%。
+dragon_knight_sr,dragon_knight,sr,400,1,needs_confirmation,特殊池临时联调概率4%。
+dragon_knight_ssr,dragon_knight,ssr,150,1,needs_confirmation,特殊池临时联调概率1.5%。
+dragon_knight_ur,dragon_knight,ur,1000,1,needs_confirmation,特殊池临时联调概率10%；正式数值待确认。
+summer_n,summer,n,5950,1,needs_confirmation,特殊池临时联调概率59.5%。
+summer_r,summer,r,2500,1,needs_confirmation,特殊池临时联调概率25%。
+summer_sr,summer,sr,400,1,needs_confirmation,特殊池临时联调概率4%。
+summer_ssr,summer,ssr,150,1,needs_confirmation,特殊池临时联调概率1.5%。
+summer_ur,summer,ur,1000,1,needs_confirmation,特殊池临时联调概率10%；正式数值待确认。

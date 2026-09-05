@@ -651,6 +651,66 @@ function M.get_profile(player_id)
     return profile and copy(profile) or nil
 end
 
+-- Atomically replace one or more private save subsections. The candidate is
+-- validated and persisted before it becomes the live profile, so inventory
+-- ownership and a lottery item's gameplay-stat deltas cannot split across
+-- two revisions.
+function M.update_save_sections(player_id, replacements, reason)
+    player_id = tonumber(player_id)
+    if player_id == nil or player_id < 0 or type(replacements) ~= "table" then
+        return { ok = false, error = "save_sections_invalid" }
+    end
+    local profile = profiles_by_player[player_id]
+    if not profile or type(profile.save) ~= "table" then
+        return { ok = false, error = "profile_not_loaded" }
+    end
+    local next_profile = copy(profile)
+    local replacement_count = 0
+    for raw_section, value in pairs(replacements) do
+        local section = tostring(raw_section or "")
+        if section == "" or type(value) ~= "table"
+            or value == json_decoder.null then
+            return { ok = false, error = "save_section_invalid:" .. section }
+        end
+        next_profile.save[section] = copy(value)
+        replacement_count = replacement_count + 1
+    end
+    if replacement_count == 0 then
+        return { ok = false, error = "save_sections_empty" }
+    end
+    local valid, validation_error = validate_gameplay_stats(
+        next_profile.save.gameplay_stats)
+    if not valid then return { ok = false, error = validation_error } end
+    next_profile.revision = (tonumber(profile.revision) or 0) + 1
+    if provider and type(provider.persist_save) == "function" then
+        local persisted, persist_error = provider.persist_save(
+            next_profile.account_id, next_profile.save, next_profile.revision)
+        if persisted == false then
+            return { ok = false, error = tostring(persist_error or "save_persist_failed") }
+        end
+    end
+    profiles_by_player[player_id] = next_profile
+    revision_high_water_by_account[next_profile.account_id] = math.max(
+        tonumber(revision_high_water_by_account[next_profile.account_id]) or 0,
+        next_profile.revision
+    )
+    publish_public_profile(player_id, reason or "save_changed")
+    event_bus.emit(events.PLAYER_PROFILE_CHANGED, {
+        player_id = player_id,
+        account_id = next_profile.account_id,
+        revision = next_profile.revision,
+        reason = tostring(reason or "save_changed"),
+    })
+    return { ok = true, revision = next_profile.revision }
+end
+
+-- Apply a small account-scoped save section update from a server subsystem.
+function M.update_save_section(player_id, section, value, reason)
+    section = tostring(section or "")
+    if section == "" then return { ok = false, error = "save_section_invalid" } end
+    return M.update_save_sections(player_id, { [section] = value }, reason)
+end
+
 function M.get_public_profile(player_id)
     local profile = profiles_by_player[tonumber(player_id)]
     if not profile then
