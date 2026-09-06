@@ -352,7 +352,21 @@ local function schedule_verification(unit, appearance, generation)
 end
 
 function M.Clear(unit)
-    if not valid(unit) or type(unit.entindex) ~= "function" then return false end
+    if not unit then return false end
+    if not valid(unit) then
+        -- The engine may remove a corpse before its visual cleanup tick.
+        -- Use owner identity rather than calling entindex on a null handle.
+        for index, state in pairs(states_by_unit) do
+            if state.owner == unit then
+                remove_all(state.wearables)
+                states_by_unit[index] = nil
+                generation_by_unit[index] = (generation_by_unit[index] or 0) + 1
+                verification_retries_by_unit[index] = nil
+            end
+        end
+        return true
+    end
+    if type(unit.entindex) ~= "function" then return false end
     remove_legacy_carriers(unit)
     local entindex = unit:entindex()
     local state = states_by_unit[entindex]

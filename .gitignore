@@ -134,6 +134,10 @@
 !/scripts/vscripts/tests/test_archive_live_effects.lua
 !/scripts/vscripts/tests/test_monster_visual_config.lua
 !/scripts/vscripts/tests/test_monster_visual_service.lua
+!/scripts/vscripts/tests/test_monster_cosmetic_details.lua
+!/scripts/vscripts/tests/test_wave_monster_cosmetics.lua
+!/scripts/vscripts/tests/test_tower_hero_visual_regression.lua
+!/scripts/vscripts/tests/test_wave_model_resource_lifecycle.lua
 !/scripts/vscripts/tests/test_wave_monster_visual_integration.lua
 !/scripts/vscripts/tests/test_weapon_legend_abyss_proc.lua
 !/scripts/vscripts/tests/test_sound_service.lua
@@ -187,3 +191,7 @@ __pycache__/
 /tools/test_spirit_bomb_state.lua
 /tools/test_technology_stat_manager_generated_levels.lua
 /luac.out
+
+# Regression tests for monster cosmetics and corpse cleanup.
+!/scripts/vscripts/tests/test_archive_monster_cosmetics.lua
+!/scripts/vscripts/tests/test_monster_corpse_outfit.lua

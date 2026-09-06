@@ -177,6 +177,7 @@ function M.summon(caster, challenge_id, ability)
     if not row or not row.enabled then return false, "挑战属性尚未配置" end
     local unit, reason = wave.spawn_challenge_monster(row, {
         unit_name = "npc_survival_wave_monster", model_path = definition.model_path,
+        default_wearable_asset_id = definition.default_wearable_asset_id,
         model_scale = definition.model_scale, movement_type = "ground", attack_type = "melee",
         move_speed = row.move_speed, attack_range = row.attack_range,
     }, state.player_id)
@@ -202,7 +203,7 @@ local function killed(payload)
     if not meta or (unit and meta.unit ~= unit) then return end
     bosses[id] = nil
     meta.state.active_boss = nil
-    require("systems/monster_hero_visual_service").clear(meta.unit)
+    require("systems/monster_hero_visual_service").on_death(meta.unit)
     archive.record_challenge(meta.state.player_id, meta.challenge_id, meta.sequence, meta.state.difficulty_id)
     publish(meta.state)
 end
@@ -253,7 +254,23 @@ function M.precache(precache_context)
     end
     add(rule.building_model)
     add(require("systems/archive_endless_config").rules.model_path)
-    for _, row in ipairs(definitions.rows) do if row.enabled then add(row.model_path) end end
+    local catalog = require("config/asset_catalog")
+    for _, row in ipairs(definitions.rows) do
+        if row.enabled then
+            add(row.model_path)
+            local asset = catalog.resolve(row.default_wearable_asset_id)
+            if asset then
+                add(asset.primary_model)
+                for _, component in ipairs(asset.components or {}) do add(component.model_path) end
+                for _, effect in ipairs(asset.effects or {}) do
+                    if effect.enabled ~= false and not seen[effect.particle_path] then
+                        PrecacheResource("particle", effect.particle_path, precache_context)
+                        seen[effect.particle_path] = true
+                    end
+                end
+            end
+        end
+    end
 end
 function M.init()
     players, hubs, bosses = {}, {}, {}

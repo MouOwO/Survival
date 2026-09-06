@@ -2,6 +2,7 @@ local catalog = require("config/asset_catalog")
 local preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
 local appearance = require("visual/model_appearance_service")
+-- Only used to clean up carriers left by an older script version.
 local native_carrier = require("visual/native_wearable_carrier_service")
 
 local M = {}
@@ -117,15 +118,10 @@ end
 local function reset_main_animation(unit, asset)
     -- SetModel can leave an existing building entity on the previous model's
     -- sequence/animation graph. Refresh that state before selecting the new
-    -- bundle's configured default sequence.
     -- bundle's configured default sequence. Most assets still fall back to
     -- idle when they do not specify one; native tower models explicitly skip
     -- that fallback so the engine can select their own activity graph.
     safe_call(unit, "ResetSequenceInfo")
-    local sequence = "idle"
-    if asset and asset.default_sequence ~= nil then
-        sequence = tostring(asset.default_sequence or "")
-    end
     local sequence = "idle"
     if asset and asset.default_sequence ~= nil then
         sequence = tostring(asset.default_sequence or "")
@@ -192,19 +188,12 @@ end
 function M.matches(unit, data)
     if not valid_entity(unit) then return false end
     local model_path, asset, requested_asset_id = M.resolve(data)
-    local model_path, asset, requested_asset_id = M.resolve(data)
-    local appearance_matches
-    if native_carrier.IsNativeWearableAsset(asset) then
-        appearance_matches = native_carrier.Matches(unit, asset)
-    else
-        appearance_matches = not native_carrier.Has(unit)
-    end
     return model_path ~= nil and model_path ~= ""
         and unit.survival_applied_model_path == model_path
         and unit.survival_model_asset_id == requested_asset_id
         and unit.survival_pending_model_asset_id == nil
         and appearance.Matches(unit, asset)
-        and appearance_matches
+        and unit.survival_native_wearable_hide_mode == nil
 end
 
 function M.apply(unit, data)
@@ -259,6 +248,7 @@ function M.apply(unit, data)
     end
 
     if not same_model then
+        native_carrier.Clear(unit)
         unit:SetModel(model_path)
         unit:SetOriginalModel(model_path)
     end
@@ -294,16 +284,7 @@ function M.apply(unit, data)
     else
         safe_call(unit, "SetSkin", 0)
     end
-    local use_native_carrier = native_carrier.IsNativeWearableAsset(asset)
-    local appearance_ok, appearance_status, components
-    if use_native_carrier then
-        appearance_ok, appearance_status = native_carrier.Refresh(unit, asset)
-        if appearance_ok then appearance.Clear(unit) end
-    else
-        appearance_ok, appearance_status, components =
-            appearance.Refresh(unit, asset)
-        if appearance_ok then native_carrier.Clear(unit) end
-    end
+    local appearance_ok, appearance_status, components = appearance.Refresh(unit, asset)
     if not appearance_ok then
         if previous_model_path and previous_model_path ~= model_path then
             safe_call(unit, "SetModel", previous_model_path)

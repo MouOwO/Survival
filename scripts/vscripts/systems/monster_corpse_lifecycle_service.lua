@@ -3,6 +3,8 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local rules = require("config/generated/global_rules")
 
+local hero_visual = require("systems/monster_hero_visual_service")
+
 local M = {}
 
 local TASK_ID = "monster_corpse_lifecycle"
@@ -53,6 +55,7 @@ local function update_corpses()
     local remaining = 0
     for unit, state in pairs(corpses) do
         if not valid(unit) then
+            hero_visual.clear(unit)
             corpses[unit] = nil
         elseif state.hidden_at then
             if now - state.hidden_at >= REMOVE_DELAY_SECONDS then
@@ -69,6 +72,9 @@ local function update_corpses()
                 z = state.origin.z - SINK_DEPTH * progress,
             })
             if progress >= 1 then
+                -- Keep the outfit on the animated corpse through the entire
+                -- hold/sink phase, then remove it alongside the hidden body.
+                hero_visual.clear(unit)
                 hide(unit)
                 state.hidden_at = now
             end

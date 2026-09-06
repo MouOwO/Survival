@@ -801,7 +801,7 @@ local function on_killed(payload)
     local entindex = victim:entindex()
     local meta = enemies[entindex]
     if not meta then return end
-    monster_hero_visual_service.clear(victim)
+    monster_hero_visual_service.on_death(victim)
     monster_visual_service.cleanup(victim)
     enemies[entindex] = nil
     state.alive = math.max(0, state.alive - 1)

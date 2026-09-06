@@ -646,7 +646,8 @@ def validate_monster_default_wearables(sources: list[Path]) -> None:
                 f"{source_name} {identity} references missing default wearable "
                 f"asset: {asset_id}"
             )
-        if asset.get("asset_type", "").strip() != "model_bundle":
+        asset_type = asset.get("asset_type", "").strip()
+        if asset_type not in {"model_bundle", "model"}:
             raise ValueError(
                 f"{source_name} {identity} default wearable is not a model bundle: "
                 f"{asset_id}"
@@ -675,7 +676,9 @@ def validate_monster_default_wearables(sources: list[Path]) -> None:
             if component.get("enabled", "").strip().lower()
             not in {"0", "false", "no", "n", "off"}
         ]
-        if not components:
+        # Explicit model assets (e.g. an Elder Dragon form) are complete bodies.
+        # Bundles still require their declared wearable components.
+        if not components and asset_type == "model_bundle":
             raise ValueError(f"default wearable asset has no components: {asset_id}")
         for component in components:
             if component.get("entity_class", "").strip() != "prop_dynamic":

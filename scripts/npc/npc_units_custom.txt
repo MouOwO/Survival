@@ -760,6 +760,7 @@
             "model" "models/heroes/storm_spirit/storm_shirt.vmdl"
         }
     }
+
     "asset_proxy_tower_laser_od_blackgate"
     {
         "BaseClass"              "npc_dota_creature"
@@ -778,72 +779,9 @@
         "VisionNighttimeRange"   "0"
         "ProjectileModel"        "particles/units/heroes/hero_wisp/wisp_base_attack.vpcf"
     }
-    "asset_proxy_tower_keeper_of_the_light"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/storm_spirit/storm_spirit.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_stormspirit/stormspirit_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/storm_spirit/storm_hat.vmdl"
-            "model" "models/heroes/storm_spirit/storm_shoulder.vmdl"
-            "model" "models/heroes/storm_spirit/storm_shirt.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "308"
-                }
-                "2"
-                {
-                    "ItemDef" "309"
-                }
-                "3"
-                {
-                    "ItemDef" "310"
-                }
-            }
-        }
-    }
-    "asset_proxy_tower_laser_od_blackgate"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/wisp/wisp.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_wisp/wisp_base_attack.vpcf"
-        "Creature"
-        {
-            "AttachWearables"
-            {
-            }
-        }
-    }
+
+
+
     "asset_proxy_tower_obsidian_destroyer" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/obsidian_destroyer/obsidian_destroyer.vmdl" "ProjectileModel" "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_base_attack.vpcf" }
     "asset_proxy_tower_zuus" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/zuus/zuus.vmdl" }
     "asset_proxy_tower_lightning_zeus_tempest"
@@ -867,52 +805,8 @@
             "model" "models/heroes/zeus/zeus_hair_arcana.vmdl"
         }
     }
-    "asset_proxy_tower_lightning_zeus_tempest"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/zeus/zeus.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "precache"
-        {
-            "model" "models/heroes/zeus/zeus_bracers.vmdl"
-            "model" "models/heroes/zeus/zeus_hair.vmdl"
-            "model" "models/heroes/zeus/zeus_belt.vmdl"
-            "model" "models/heroes/zeus/zeus_vest.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "589"
-                }
-                "2"
-                {
-                    "ItemDef" "604"
-                }
-                "3"
-                {
-                    "ItemDef" "606"
-                }
-                "4"
-                {
-                    "ItemDef" "607"
-                }
-            }
-        }
-    }
+
+
     "asset_proxy_tower_lightning_disruptor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/disruptor/disruptor.vmdl" }
     "asset_proxy_tower_lightning_razor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/razor/razor.vmdl" }
     "asset_proxy_tower_lightning_leshrac"
@@ -940,6 +834,7 @@
             "model" "models/items/leshrac/dark_forest_punisher_back/dark_forest_punisher_back.vmdl"
         }
     }
+
     "asset_proxy_tower_lightning_razor_voidstorm"
     {
         "BaseClass"              "npc_dota_creature"
@@ -965,6 +860,7 @@
             "model" "models/heroes/razor/razor_robe_refit.vmdl"
         }
     }
+
     "asset_proxy_tower_laser_death_prophet_brightshroud"
     {
         "BaseClass"              "npc_dota_creature"
@@ -992,6 +888,7 @@
             "model" "models/heroes/tinker/tinker_cape.vmdl"
         }
     }
+
     "asset_proxy_tower_anti_air_gyro_swooping"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1019,6 +916,7 @@
             "model" "models/heroes/gyro/gyro_missile.vmdl"
         }
     }
+
     "asset_proxy_tower_anti_air_batrider_empiric"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1044,6 +942,7 @@
             "model" "models/heroes/batrider/batrider_mount.vmdl"
         }
     }
+
     "asset_proxy_tower_anti_air_skywrath_empyrean"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1071,316 +970,13 @@
             "model" "models/heroes/skywrath_mage/skywrath_mage_bracers.vmdl"
         }
     }
-    "asset_proxy_tower_lightning_leshrac"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/leshrac/leshrac.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "precache"
-        {
-            "model" "models/heroes/leshrac/leshrac_armor.vmdl"
-            "model" "models/heroes/leshrac/leshrac_head.vmdl"
-            "model" "models/heroes/leshrac/leshrac_tail.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "345"
-                }
-                "2"
-                {
-                    "ItemDef" "346"
-                }
-                "3"
-                {
-                    "ItemDef" "347"
-                }
-            }
-        }
-    }
-    "asset_proxy_tower_lightning_razor_voidstorm"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/razor/razor.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "precache"
-        {
-            "model" "models/heroes/razor/razor_weapon.vmdl"
-            "model" "models/heroes/razor/razor_head.vmdl"
-            "model" "models/heroes/razor/razor_armor.vmdl"
-            "model" "models/heroes/razor/razor_bracers.vmdl"
-            "model" "models/heroes/razor/razor_robe.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "340"
-                }
-                "2"
-                {
-                    "ItemDef" "341"
-                }
-                "3"
-                {
-                    "ItemDef" "342"
-                }
-                "4"
-                {
-                    "ItemDef" "343"
-                }
-                "5"
-                {
-                    "ItemDef" "344"
-                }
-            }
-        }
-    }
-    "asset_proxy_tower_laser_death_prophet_brightshroud"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/tinker/tinker.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_tinker/tinker_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/tinker/tinker_right_arm.vmdl"
-            "model" "models/heroes/tinker/tinker_left_arm.vmdl"
-            "model" "models/heroes/tinker/tinker_shoulders.vmdl"
-            "model" "models/heroes/tinker/tinker_helmet.vmdl"
-            "model" "models/heroes/tinker/tinker_body_head.vmdl"
-            "model" "models/heroes/tinker/tinker_cape.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "367"
-                }
-                "2"
-                {
-                    "ItemDef" "463"
-                }
-                "3"
-                {
-                    "ItemDef" "464"
-                }
-                "4"
-                {
-                    "ItemDef" "465"
-                }
-                "5"
-                {
-                    "ItemDef" "466"
-                }
-                "6"
-                {
-                    "ItemDef" "467"
-                }
-            }
-        }
-    }
-    "asset_proxy_tower_anti_air_gyro_swooping"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/gyro/gyro.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/gyro/gyro_bottles.vmdl"
-            "model" "models/heroes/gyro/gyro_head.vmdl"
-            "model" "models/heroes/gyro/gyro_goggles.vmdl"
-            "model" "models/heroes/gyro/gyro_guns.vmdl"
-            "model" "models/heroes/gyro/gyro_propeller.vmdl"
-            "model" "models/heroes/gyro/gyro_missile.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "126"
-                }
-                "2"
-                {
-                    "ItemDef" "131"
-                }
-                "3"
-                {
-                    "ItemDef" "176"
-                }
-                "4"
-                {
-                    "ItemDef" "177"
-                }
-                "5"
-                {
-                    "ItemDef" "178"
-                }
-                "6"
-                {
-                    "ItemDef" "179"
-                }
-            }
-        }
-    }
-    "asset_proxy_tower_anti_air_batrider_empiric"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/batrider/batrider.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/batrider/batrider_head.vmdl"
-            "model" "models/heroes/batrider/batrider_cloak.vmdl"
-            "model" "models/heroes/batrider/batrider_belt.vmdl"
-            "model" "models/heroes/batrider/batrider_mount.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "375"
-                }
-                "2"
-                {
-                    "ItemDef" "376"
-                }
-                "3"
-                {
-                    "ItemDef" "377"
-                }
-                "4"
-                {
-                    "ItemDef" "378"
-                }
-            }
-        }
-    }
-    "asset_proxy_tower_anti_air_skywrath_empyrean"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/skywrath_mage/skywrath_mage.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/skywrath_mage/skywrath_mage_staff.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_head.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_wings.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_belt.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_shoulders.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_bracers.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "420"
-                }
-                "2"
-                {
-                    "ItemDef" "421"
-                }
-                "3"
-                {
-                    "ItemDef" "422"
-                }
-                "4"
-                {
-                    "ItemDef" "423"
-                }
-                "5"
-                {
-                    "ItemDef" "424"
-                }
-                "6"
-                {
-                    "ItemDef" "425"
-                }
-            }
-        }
-    }
+
+
+
+
+
+
+
     "asset_proxy_tower_machine_gun_sniper_occultist"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1406,33 +1002,8 @@
             "model" "models/heroes/sniper/shoulder.vmdl"
             "model" "models/heroes/sniper/bracer.vmdl"
         }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "281"
-                }
-                "2"
-                {
-                    "ItemDef" "282"
-                }
-                "3"
-                {
-                    "ItemDef" "283"
-                }
-                "4"
-                {
-                    "ItemDef" "284"
-                }
-                "5"
-                {
-                    "ItemDef" "285"
-                }
-            }
-        }
     }
+
     "asset_proxy_tower_machine_gun_bounty_heartless"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1459,37 +1030,8 @@
             "model" "models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl"
             "model" "models/heroes/bounty_hunter/bounty_hunter_bandana.vmdl"
         }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "50"
-                }
-                "2"
-                {
-                    "ItemDef" "51"
-                }
-                "3"
-                {
-                    "ItemDef" "52"
-                }
-                "4"
-                {
-                    "ItemDef" "53"
-                }
-                "5"
-                {
-                    "ItemDef" "54"
-                }
-                "6"
-                {
-                    "ItemDef" "55"
-                }
-            }
-        }
     }
+
     "asset_proxy_tower_machine_gun_windranger_rising_gale"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1515,33 +1057,8 @@
             "model" "models/heroes/windrunner/windrunner_cape.vmdl"
             "model" "models/heroes/windrunner/windrunner_quiver.vmdl"
         }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "21"
-                }
-                "2"
-                {
-                    "ItemDef" "22"
-                }
-                "3"
-                {
-                    "ItemDef" "23"
-                }
-                "4"
-                {
-                    "ItemDef" "24"
-                }
-                "5"
-                {
-                    "ItemDef" "25"
-                }
-            }
-        }
     }
+
     "asset_proxy_tower_death_templar_assassin"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1566,46 +1083,8 @@
             "model" "models/items/lanaya/templar_assasin_false_devotion_shoulder/templar_assasin_false_devotion_shoulder.vmdl"
             "model" "models/items/lanaya/templar_assasin_false_devotion_weapon/templar_assasin_false_devotion_weapon.vmdl"
         }
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/lanaya/lanaya.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_templar_assassin/templar_assassin_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/lanaya/lanaya_hair.vmdl"
-            "model" "models/heroes/lanaya/lanaya_cowl_shoulder.vmdl"
-            "model" "models/heroes/lanaya/lanaya_bracers_skirt.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "173"
-                }
-                "2"
-                {
-                    "ItemDef" "174"
-                }
-                "3"
-                {
-                    "ItemDef" "175"
-                }
-            }
-        }
     }
+
     "asset_proxy_tower_death_nevermore_sundered_souls"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1631,44 +1110,9 @@
             "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_head/wraith_king_darkfeather_tyrant_head.vmdl"
             "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_shoulder/wraith_king_darkfeather_tyrant_shoulder.vmdl"
             "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_weapon/wraith_king_darkfeather_tyrant_weapon.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_head.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_weapon.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_shoulder.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_gauntlet.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_cape.vmdl"
-            "model" "models/heroes/wraith_king/wraith_king_chest.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "148"
-                }
-                "2"
-                {
-                    "ItemDef" "149"
-                }
-                "3"
-                {
-                    "ItemDef" "150"
-                }
-                "4"
-                {
-                    "ItemDef" "151"
-                }
-                "5"
-                {
-                    "ItemDef" "152"
-                }
-                "6"
-                {
-                    "ItemDef" "500"
-                }
-            }
         }
     }
+
     "asset_proxy_tower_death_warlock_seam_ripper"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1693,39 +1137,9 @@
             "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_head/ti9_cache_pa_gothic_hunter_head.vmdl"
             "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_belt/ti9_cache_pa_gothic_hunter_belt.vmdl"
             "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_back/ti9_cache_pa_gothic_hunter_back.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_helmet.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_shoulders.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_cape.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_weapon.vmdl"
-            "model" "models/heroes/phantom_assassin/phantom_assassin_daggers.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "137"
-                }
-                "2"
-                {
-                    "ItemDef" "138"
-                }
-                "3"
-                {
-                    "ItemDef" "139"
-                }
-                "4"
-                {
-                    "ItemDef" "140"
-                }
-                "5"
-                {
-                    "ItemDef" "141"
-                }
-            }
         }
     }
+
     "asset_proxy_tower_frost_lich_rime_lord"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1750,53 +1164,13 @@
             "model" "models/items/lich/lich_rime_lord_arms/lich_rime_lord_arms.vmdl"
             "model" "models/items/lich/lich_rime_lord_neck/lich_rime_lord_neck.vmdl"
             "model" "models/items/lich/lich_rime_lord_head/lich_rime_lord_head.vmdl"
-            "model" "models/heroes/lich/lich_dress.vmdl"
-            "model" "models/heroes/lich/lich_neck_rock.vmdl"
-            "model" "models/heroes/lich/lich_bracer.vmdl"
-            "model" "models/heroes/lich/lich_horns.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "331"
-                }
-                "2"
-                {
-                    "ItemDef" "332"
-                }
-                "3"
-                {
-                    "ItemDef" "333"
-                }
-                "4"
-                {
-                    "ItemDef" "334"
-                }
-            }
         }
     }
+
     "asset_proxy_tower_frost_crystal_maiden_winter_raven"
     {
         "BaseClass"              "npc_dota_creature"
         "Model"                  "models/heroes/crystal_maiden/crystal_maiden_arcana.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/crystal_maiden/crystal_maiden.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1818,39 +1192,9 @@
             "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_shoulder_refit.vmdl"
             "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_weapon.vmdl"
             "model" "models/heroes/crystal_maiden/crystal_maiden_arcana_back_refit.vmdl"
-            "model" "models/heroes/crystal_maiden/crystal_maiden_cape.vmdl"
-            "model" "models/heroes/crystal_maiden/crystal_maiden_shoulders.vmdl"
-            "model" "models/heroes/crystal_maiden/crystal_maiden_staff.vmdl"
-            "model" "models/heroes/crystal_maiden/crystal_maiden_cuffs.vmdl"
-            "model" "models/heroes/crystal_maiden/head_item.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "38"
-                }
-                "2"
-                {
-                    "ItemDef" "39"
-                }
-                "3"
-                {
-                    "ItemDef" "40"
-                }
-                "4"
-                {
-                    "ItemDef" "41"
-                }
-                "5"
-                {
-                    "ItemDef" "311"
-                }
-            }
         }
     }
+
     "asset_proxy_tower_frost_ancient_apparition"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1874,24 +1218,9 @@
             "model" "models/items/ancient_apparition/extremely_cold_shackles_shoulder/extremely_cold_shackles_shoulder.vmdl"
             "model" "models/items/ancient_apparition/extremely_cold_shackles_head/extremely_cold_shackles_head.vmdl"
             "model" "models/items/ancient_apparition/extremely_cold_shackles_arms/extremely_cold_shackles_arms.vmdl"
-            "model" "models/heroes/ancient_apparition/ancient_apparition_shoulder.vmdl"
-            "model" "models/heroes/ancient_apparition/ancient_apparition_tail.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "648"
-                }
-                "2"
-                {
-                    "ItemDef" "652"
-                }
-            }
         }
     }
+
     "asset_proxy_tower_lion" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lion/lion.vmdl" "ProjectileModel" "particles/units/heroes/hero_lion/lion_base_attack.vpcf" }
     "asset_proxy_tower_lina" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/lina/lina.vmdl" "ProjectileModel" "particles/units/heroes/hero_lina/lina_base_attack.vpcf" }
     "asset_proxy_tower_multi_medusa_anamnessa"
@@ -1919,6 +1248,7 @@
             "model" "models/heroes/vengeful/vengeful_lowerbody.vmdl"
         }
     }
+
     "asset_proxy_tower_multi_drow_dread_retribution"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1946,6 +1276,7 @@
             "model" "models/heroes/luna/luna_head.vmdl"
         }
     }
+
     "asset_proxy_tower_multi_vengeful_shen_screeauk"
     {
         "BaseClass"              "npc_dota_creature"
@@ -1972,162 +1303,10 @@
             "model" "models/heroes/medusa/medusa_tail.vmdl"
         }
     }
-    "asset_proxy_tower_multi_medusa_anamnessa"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/vengeful/vengeful.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_vengeful/vengeful_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/vengeful/vengeful_hair.vmdl"
-            "model" "models/heroes/vengeful/vengeful_weapon.vmdl"
-            "model" "models/heroes/vengeful/vengeful_upperbody.vmdl"
-            "model" "models/heroes/vengeful/vengeful_lowerbody.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "441"
-                }
-                "2"
-                {
-                    "ItemDef" "442"
-                }
-                "3"
-                {
-                    "ItemDef" "445"
-                }
-                "4"
-                {
-                    "ItemDef" "447"
-                }
-            }
-        }
-    }
-    "asset_proxy_tower_multi_drow_dread_retribution"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/luna/luna.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_luna/luna_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/luna/luna_weapon.vmdl"
-            "model" "models/heroes/luna/luna_shield.vmdl"
-            "model" "models/heroes/luna/luna_helmet.vmdl"
-            "model" "models/heroes/luna/luna_shoulder.vmdl"
-            "model" "models/heroes/luna/luna_mount.vmdl"
-            "model" "models/heroes/luna/luna_head.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "448"
-                }
-                "2"
-                {
-                    "ItemDef" "449"
-                }
-                "3"
-                {
-                    "ItemDef" "450"
-                }
-                "4"
-                {
-                    "ItemDef" "451"
-                }
-                "5"
-                {
-                    "ItemDef" "452"
-                }
-                "6"
-                {
-                    "ItemDef" "453"
-                }
-            }
-        }
-    }
-    "asset_proxy_tower_multi_vengeful_shen_screeauk"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/medusa/medusa.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_medusa/medusa_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/heroes/medusa/medusa_bow.vmdl"
-            "model" "models/heroes/medusa/medusa_veil.vmdl"
-            "model" "models/heroes/medusa/medusa_torso.vmdl"
-            "model" "models/heroes/medusa/medusa_arms.vmdl"
-            "model" "models/heroes/medusa/medusa_tail.vmdl"
-        }
-        "Creature"
-        {
-            "AttachWearables"
-            {
-                "1"
-                {
-                    "ItemDef" "381"
-                }
-                "2"
-                {
-                    "ItemDef" "382"
-                }
-                "3"
-                {
-                    "ItemDef" "383"
-                }
-                "4"
-                {
-                    "ItemDef" "384"
-                }
-                "5"
-                {
-                    "ItemDef" "385"
-                }
-            }
-        }
-    }
+
+
+
+
     "asset_proxy_wall_tiny_large_form" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/tiny/tiny_04/tiny_04.vmdl" "ProjectileModel" "particles/units/heroes/hero_tiny/tiny_ambient_lvl4.vpcf" }
     "asset_proxy_wall_tiny_anthozoan_huge" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/tiny_anthozoa_giant_back/tiny_anthozoa_giant_back.vmdl" "ProjectileModel" "particles/econ/items/tiny/tiny_anthozoa/tiny_anthozoa_back.vpcf" }
     "asset_proxy_wall_tiny_stronghold_fortress" { "BaseClass" "npc_dota_creature" "Model" "models/items/tiny/lionheart_kings_moving_castle_t4/lionheart_kings_moving_castle_t4.vmdl" "ProjectileModel" "particles/econ/items/tiny/lionheart/lvl4/lionheart_lvl4_ambient.vpcf" }
@@ -2548,4 +1727,904 @@
         }
     }
     // END BOSS_COSMETIC_BATCH
+    // BEGIN WAVE_MONSTER_COSMETICS
+    "asset_proxy_monster_wave_humanoid_red_axe"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/axe/axe.vmdl"
+        "precache"
+        {
+            "model" "models/items/axe/oglodi_big_boss_weapon/oglodi_big_boss_weapon.vmdl"
+            "model" "models/items/axe/oglodi_big_boss_misc/oglodi_big_boss_misc.vmdl"
+            "model" "models/items/axe/oglodi_big_boss_head/oglodi_big_boss_head.vmdl"
+            "model" "models/items/axe/oglodi_big_boss_belt/oglodi_big_boss_belt.vmdl"
+            "model" "models/items/axe/ti9_jungle_axe/axe_ti9__undie.vmdl"
+            "model" "models/items/axe/oglodi_big_boss_armor/oglodi_big_boss_armor.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_skeleton_melee"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/clinkz/clinkz.vmdl"
+        "precache"
+        {
+            "model" "models/items/clinkz/khans_champion_weapon/khans_champion_weapon.vmdl"
+            "model" "models/items/clinkz/khans_champion_head/khans_champion_head.vmdl"
+            "model" "models/items/clinkz/khans_champion_back/khans_champion_back.vmdl"
+            "model" "models/items/clinkz/khans_champion_shoulder/khans_champion_shoulder.vmdl"
+            "model" "models/items/clinkz/khans_champion_gloves/khans_champion_gloves.vmdl"
+            "model" "models/heroes/clinkz/clinkz_head.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_orc_large_melee"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/beastmaster/beastmaster.vmdl"
+        "precache"
+        {
+            "model" "models/items/beastmaster/beast_heart_marauder_weapon/beast_heart_marauder_weapon.vmdl"
+            "model" "models/items/beastmaster/beast_heart_marauder_belt/beast_heart_marauder_belt.vmdl"
+            "model" "models/items/beastmaster/beast_heart_marauder_arms/beast_heart_marauder_arms.vmdl"
+            "model" "models/items/beastmaster/beast_heart_marauder_head/beast_heart_marauder_head.vmdl"
+            "model" "models/items/beastmaster/beast_heart_marauder_shoulder/beast_heart_marauder_shoulder.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_orc_small_axe"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/ogre_magi/ogre_magi.vmdl"
+        "precache"
+        {
+            "model" "models/items/ogre_magi/ogre_cosmic/ogre_cosmic_weapon.vmdl"
+            "model" "models/items/ogre_magi/ogre_cosmic/ogre_cosmic_back.vmdl"
+            "model" "models/items/ogre_magi/ogre_cosmic/ogre_cosmic_belt.vmdl"
+            "model" "models/items/ogre_magi/ogre_cosmic/ogre_cosmic_arms.vmdl"
+            "model" "models/items/ogre_magi/ogre_cosmic/ogre_cosmic_head.vmdl"
+            "particle" "particles/econ/items/ogre_magi/ogre_cosmic/ogre_cosmic_weapon_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_demon_purple_melee"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/blood_seeker/blood_seeker.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/blood_seeker/neck.vmdl"
+            "model" "models/heroes/blood_seeker/belt.vmdl"
+            "model" "models/heroes/blood_seeker/bracer.vmdl"
+            "model" "models/heroes/blood_seeker/cape.vmdl"
+            "model" "models/heroes/blood_seeker/helmet.vmdl"
+            "model" "models/heroes/blood_seeker/weapon.vmdl"
+            "model" "models/heroes/blood_seeker/weapon_offhand.vmdl"
+            "particle" "particles/econ/events/diretide_2020/hero_spooky_ambient/hero_spooky_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_boss_dreadlord"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl"
+        "precache"
+        {
+            "model" "models/items/underlord/demonforged_armor_armor/demonforged_armor_armor.vmdl"
+            "model" "models/items/underlord/demonforged_armor_head/demonforged_armor_head.vmdl"
+            "model" "models/items/underlord/demonforged_armor_weapon/demonforged_armor_weapon.vmdl"
+            "model" "models/heroes/abyssal_underlord/mesh/underlord_head.vmdl"
+            "particle" "particles/econ/items/underlord/underlord_ti10_cache/underlord_ti10_cache_armor.vpcf"
+            "particle" "particles/units/heroes/heroes_underlord/underlord_ambient.vpcf"
+            "particle" "particles/econ/items/underlord/underlord_ti10_cache/underlord_ti10_cache_head.vpcf"
+            "particle" "particles/econ/items/underlord/underlord_ti10_cache/underlord_ti10_cache_weapon.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_beast_green_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/tidehunter/tidehunter.vmdl"
+        "precache"
+        {
+            "model" "models/items/tidehunter/horror_from_the_deep_back/horror_from_the_deep_back.vmdl"
+            "model" "models/items/tidehunter/horror_from_the_deep_belt/horror_from_the_deep_belt.vmdl"
+            "model" "models/items/tidehunter/horror_from_the_deep_head/horror_from_the_deep_head.vmdl"
+            "model" "models/items/tidehunter/horror_from_the_deep_off_hand/horror_from_the_deep_off_hand.vmdl"
+            "model" "models/items/tidehunter/horror_from_the_deep_arms/horror_from_the_deep_arms.vmdl"
+            "model" "models/items/tidehunter/horror_from_the_deep_weapon/horror_from_the_deep_weapon.vmdl"
+            "particle" "particles/econ/items/tidehunter/tidehunter_ti10_cache/tidehunter_ti10_cache_back.vpcf"
+            "particle" "particles/econ/items/tidehunter/tidehunter_ti10_cache/tidehunter_ti10_cache_belt.vpcf"
+            "particle" "particles/econ/items/tidehunter/tidehunter_ti10_cache/tidehunter_ti10_cache_head.vpcf"
+            "particle" "particles/econ/items/tidehunter/tidehunter_ti10_cache/tidehunter_ti10_cache_offhand.vpcf"
+            "particle" "particles/econ/items/tidehunter/tidehunter_ti10_cache/tidehunter_ti10_cache_arms.vpcf"
+            "particle" "particles/econ/items/tidehunter/tidehunter_ti10_cache/tidehunter_ti10_cache_weapon.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_skeleton_bone"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/pugna/pugna.vmdl"
+        "precache"
+        {
+            "model" "models/items/pugna/furious_phantasm_weapon/furious_phantasm_weapon.vmdl"
+            "model" "models/items/pugna/furious_phantasm_shoulder/furious_phantasm_shoulder.vmdl"
+            "model" "models/items/pugna/furious_phantasm_head/furious_phantasm_head.vmdl"
+            "model" "models/items/pugna/furious_phantasm_belt/furious_phantasm_belt.vmdl"
+            "model" "models/items/pugna/furious_phantasm_back/furious_phantasm_back.vmdl"
+            "model" "models/items/pugna/furious_phantasm_arms/furious_phantasm_arms.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_flying_red_gargoyle"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/dragon_knight/legacy_of_the_winterwyrm_form_of_the_winterwyrm/legacy_of_the_winterwyrm_form_of_the_winterwyrm.vmdl"
+        "precache"
+        {
+        }
+    }
+    "asset_proxy_monster_wave_dragon_red_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/dragon_knight/mh_dragon_knight/mh_dragon_knight_rathalos_capcom.vmdl"
+        "precache"
+        {
+        }
+    }
+    "asset_proxy_monster_wave_dragon_red_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/dragon_knight/fireborn_dragon/fireborn_dragon.vmdl"
+        "precache"
+        {
+        }
+    }
+    "asset_proxy_monster_wave_orc_brown_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/magnataur/magnataur.vmdl"
+        "precache"
+        {
+            "model" "models/items/magnataur/magnus_dark_carnival/magnus_dark_carnival_arms.vmdl"
+            "model" "models/items/magnataur/magnus_dark_carnival/magnus_dark_carnival_weapon.vmdl"
+            "model" "models/items/magnataur/magnus_dark_carnival/magnus_dark_carnival_belt.vmdl"
+            "model" "models/items/magnataur/magnus_dark_carnival/magnus_dark_carnival_head.vmdl"
+            "model" "models/items/magnataur/magnus_dark_carnival/magnus_dark_carnival_horn.vmdl"
+            "particle" "particles/econ/items/magnataur/magnus_dark_carnival/magnus_dark_carnival_belt_ambient.vpcf"
+            "particle" "particles/econ/items/magnataur/magnus_dark_carnival/magnus_dark_carnival_head_ambient.vpcf"
+            "particle" "particles/econ/items/magnataur/magnus_dark_carnival/magnus_dark_carnival_misc_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_orc_brown_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/magnataur/magnataur.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/magnataur/magnataur_weapon.vmdl"
+            "model" "models/heroes/magnataur/magnataur_belt.vmdl"
+            "model" "models/heroes/magnataur/magnataur_bracers.vmdl"
+            "model" "models/heroes/magnataur/magnataur_hair.vmdl"
+            "model" "models/heroes/magnataur/magnataur_horn.vmdl"
+            "particle" "particles/econ/events/diretide_2020/hero_spooky_ambient/hero_spooky_ambient_ghost.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_flying_green_head"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/visage/visage.vmdl"
+        "precache"
+        {
+            "model" "models/items/visage/bound_of_the_soul_keeper_armor/bound_of_the_soul_keeper_armor.vmdl"
+            "model" "models/items/visage/bound_of_the_soul_keeper_head/bound_of_the_soul_keeper_head.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_dragon_purple_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/viper/viper.vmdl"
+        "precache"
+        {
+            "model" "models/items/viper/viper_beetle_head/viper_beetle_head.vmdl"
+            "model" "models/items/viper/viper_beetle_back/viper_beetle_back.vmdl"
+            "model" "models/items/viper/viper_beetle_tail/viper_beetle_tail.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_dragon_purple_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/viper/viper.vmdl"
+        "precache"
+        {
+            "model" "models/items/viper/blight_wyrm_head/blight_wyrm_head.vmdl"
+            "model" "models/items/viper/blight_wyrm_tail/blight_wyrm_tail.vmdl"
+            "model" "models/items/viper/blight_wyrm_back/blight_wyrm_back.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_dwarf_white_rifle"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/hoodwink/hoodwink.vmdl"
+        "precache"
+        {
+            "model" "models/items/hoodwink/hoodwink_tribal_elves_weapon/hoodwink_tribal_elves_weapon.vmdl"
+            "model" "models/items/hoodwink/hoodwink_tribal_elves_tail/hoodwink_tribal_elves_tail.vmdl"
+            "model" "models/items/hoodwink/hoodwink_tribal_elves_back/hoodwink_tribal_elves_back.vmdl"
+            "model" "models/items/hoodwink/hoodwink_tribal_elves_armor/hoodwink_tribal_elves_armor.vmdl"
+            "particle" "particles/econ/items/hoodwink/hoodwink_2023_cc/hoodwink_2023_cc_weapon_ambient.vpcf"
+            "particle" "particles/econ/items/hoodwink/hoodwink_2023_cc/hoodwink_2023_cc_head_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_orc_longnose_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/spirit_breaker/spirit_breaker.vmdl"
+        "precache"
+        {
+            "model" "models/items/spirit_breaker/frost_beast_arms/frost_beast_arms.vmdl"
+            "model" "models/items/spirit_breaker/frost_beast_belt/frost_beast_belt.vmdl"
+            "model" "models/items/spirit_breaker/frost_beast_head/frost_beast_head.vmdl"
+            "model" "models/items/spirit_breaker/frost_beast_shoulders/frost_beast_shoulders.vmdl"
+            "model" "models/items/spirit_breaker/frost_beast_tail/frost_beast_tail.vmdl"
+            "model" "models/items/spirit_breaker/frost_beast_weapon/frost_beast_weapon.vmdl"
+            "model" "models/heroes/spirit_breaker/spirit_breaker_head.vmdl"
+            "particle" "particles/econ/items/spirit_breaker/sb_2024_cc_frostbeast_head/sb_2024_cc_frostbeast_head_ambient.vpcf"
+            "particle" "particles/econ/items/spirit_breaker/sb_2024_cc_frostbeast_shoulders/sb_2024_cc_frostbeast_shoulders_ambient.vpcf"
+            "particle" "particles/econ/items/spirit_breaker/sb_2024_cc_frostbeast_weapon/sb_2024_cc_frostbeast_weapon.vpcf"
+            "particle" "particles/units/heroes/hero_spirit_breaker/spirit_breaker_ambient_head_fire.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_orc_longnose_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/spirit_breaker/spirit_breaker.vmdl"
+        "precache"
+        {
+            "model" "models/items/spirit_breaker/sb_ice_weapon_final/sb_ice_weapon_final.vmdl"
+            "model" "models/items/spirit_breaker/sb_ice_shoulder_final/sb_ice_shoulder_final.vmdl"
+            "model" "models/items/spirit_breaker/sb_ice_head_final/sb_ice_head_final.vmdl"
+            "model" "models/items/spirit_breaker/sb_ice_tail_final/sb_ice_tail_final.vmdl"
+            "model" "models/items/spirit_breaker/sb_ice_arms_final/sb_ice_arms_final.vmdl"
+            "model" "models/items/spirit_breaker/sb_ice_belt_final/sb_ice_belt_final.vmdl"
+            "model" "models/heroes/spirit_breaker/spirit_breaker_head.vmdl"
+            "particle" "particles/units/heroes/hero_spirit_breaker/spirit_breaker_ambient_head_fire.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_flying_carpet_mage"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/dark_willow/dark_willow.vmdl"
+        "precache"
+        {
+            "model" "models/items/dark_willow/dark_willow_iron_thorn_head/dark_willow_iron_thorn_head.vmdl"
+            "model" "models/items/dark_willow/dark_willow_iron_thorn_armor/dark_willow_iron_thorn_armor.vmdl"
+            "model" "models/items/dark_willow/dark_willow_iron_thorn_back/dark_willow_iron_thorn_back.vmdl"
+            "model" "models/items/dark_willow/dark_willow_iron_thorn_off_hand/dark_willow_iron_thorn_off_hand.vmdl"
+            "model" "models/items/dark_willow/dark_willow_iron_thorn_belt/dark_willow_iron_thorn_belt.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_carpet_red_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/dark_willow/dark_willow.vmdl"
+        "precache"
+        {
+            "model" "models/items/dark_willow/the_naughty_witch_from_dark_woods_off_hand/the_naughty_witch_from_dark_woods_off_hand.vmdl"
+            "model" "models/items/dark_willow/the_naughty_witch_from_dark_woods_head/the_naughty_witch_from_dark_woods_head.vmdl"
+            "model" "models/items/dark_willow/the_naughty_witch_from_dark_woods_belt/the_naughty_witch_from_dark_woods_belt.vmdl"
+            "model" "models/items/dark_willow/the_naughty_witch_from_dark_woods_back/the_naughty_witch_from_dark_woods_back.vmdl"
+            "model" "models/items/dark_willow/the_naughty_witch_from_dark_woods_armor/the_naughty_witch_from_dark_woods_armor.vmdl"
+            "particle" "particles/units/heroes/hero_dark_willow/dark_willow_lantern_ambient_fairy.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_carpet_red_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/dark_willow/dark_willow.vmdl"
+        "precache"
+        {
+            "model" "models/items/dark_willow/winter_2018_rose_willow_off_hand/winter_2018_rose_willow_off_hand.vmdl"
+            "model" "models/items/dark_willow/winter_2018_rose_willow_back/winter_2018_rose_willow_back.vmdl"
+            "model" "models/items/dark_willow/winter_2018_rose_willow_belt/winter_2018_rose_willow_belt.vmdl"
+            "model" "models/items/dark_willow/winter_2018_rose_willow_armor/winter_2018_rose_willow_armor.vmdl"
+            "model" "models/items/dark_willow/winter_2018_rose_willow_head/winter_2018_rose_willow_head.vmdl"
+            "particle" "particles/units/heroes/hero_dark_willow/dark_willow_lantern_ambient_fairy.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_undead_red_mage_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/troll_warlord/troll_warlord.vmdl"
+        "precache"
+        {
+            "model" "models/items/troll_warlord/the_sharpest_rhyme_weapon/the_sharpest_rhyme_weapon.vmdl"
+            "model" "models/items/troll_warlord/the_sharpest_rhyme_shoulders/the_sharpest_rhyme_shoulders.vmdl"
+            "model" "models/items/troll_warlord/the_sharpest_rhyme_head/the_sharpest_rhyme_head.vmdl"
+            "model" "models/items/troll_warlord/the_sharpest_rhyme_armor/the_sharpest_rhyme_armor.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_undead_red_mage_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/troll_warlord/troll_warlord.vmdl"
+        "precache"
+        {
+            "model" "models/items/troll_warlord/mohawk_armor/mohawk_armor.vmdl"
+            "model" "models/items/troll_warlord/mohawk_head/mohawk_head.vmdl"
+            "model" "models/items/troll_warlord/mohawk_weapon_all/mohawk_weapon_all.vmdl"
+            "model" "models/items/troll_warlord/mohawk_shoulder/mohawk_shoulder.vmdl"
+            "particle" "particles/econ/items/troll_warlord/spring_2021_troll_mohawk/spring_2021_troll_weapon_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_golem_gray_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/dark_seer/dark_seer.vmdl"
+        "precache"
+        {
+            "model" "models/items/dark_seer/imperious_tactician_back/imperious_tactician_back.vmdl"
+            "model" "models/items/dark_seer/imperious_tactician_shoulder/imperious_tactician_shoulder.vmdl"
+            "model" "models/items/dark_seer/imperious_tactician_belt/imperious_tactician_belt.vmdl"
+            "model" "models/items/dark_seer/imperious_tactician_arms/imperious_tactician_arms.vmdl"
+            "model" "models/items/dark_seer/imperious_tactician_head/imperious_tactician_head.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_golem_gray_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/dark_seer/dark_seer.vmdl"
+        "precache"
+        {
+            "model" "models/items/dark_seer/ti8_darkseer_fungous_general_belt/ti8_darkseer_fungous_general_belt.vmdl"
+            "model" "models/items/dark_seer/ti8_darkseer_fungous_general_head/ti8_darkseer_fungous_general_head.vmdl"
+            "model" "models/items/dark_seer/ti8_darkseer_fungous_general_shoulder/ti8_darkseer_fungous_general_shoulder.vmdl"
+            "model" "models/items/dark_seer/ti8_darkseer_fungous_general_arms/ti8_darkseer_fungous_general_arms.vmdl"
+            "model" "models/items/dark_seer/ti8_darkseer_fungous_general_back/ti8_darkseer_fungous_general_back.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_beast_striped_red"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/dragon_knight/dragon_knight.vmdl"
+        "precache"
+        {
+            "model" "models/items/dragon_knight/ti9_cache_dk_scorching_amber_dragoon_shoulder/ti9_cache_dk_scorching_amber_dragoon_shoulder.vmdl"
+            "model" "models/items/dragon_knight/ti9_cache_dk_scorching_amber_dragoon_head/ti9_cache_dk_scorching_amber_dragoon_head.vmdl"
+            "model" "models/items/dragon_knight/ti9_cache_dk_scorching_amber_dragoon_weapon/ti9_cache_dk_scorching_amber_dragoon_weapon.vmdl"
+            "model" "models/items/dragon_knight/ti9_cache_dk_scorching_amber_dragoon_off_hand/ti9_cache_dk_scorching_amber_dragoon_off_hand.vmdl"
+            "model" "models/items/dragon_knight/ti9_cache_dk_scorching_amber_dragoon_back/ti9_cache_dk_scorching_amber_dragoon_back.vmdl"
+            "model" "models/items/dragon_knight/ti9_cache_dk_scorching_amber_dragoon_arms/ti9_cache_dk_scorching_amber_dragoon_arms.vmdl"
+            "particle" "particles/econ/items/dragon_knight/dk_scorching_amber/dk_scorching_chest_ambient.vpcf"
+            "particle" "particles/econ/items/dragon_knight/dk_scorching_amber/dk_scorching_head_ambient.vpcf"
+            "particle" "particles/econ/items/dragon_knight/dk_scorching_amber/dk_scorching_sword_ambient.vpcf"
+            "particle" "particles/econ/items/dragon_knight/dk_scorching_amber/dk_scorching_shield_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_boss_blade_demon"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/nightstalker/nightstalker.vmdl"
+        "precache"
+        {
+            "model" "models/items/nightstalker/dusk_reaper_arms/dusk_reaper_arms.vmdl"
+            "model" "models/items/nightstalker/dusk_reaper_back/dusk_reaper_back.vmdl"
+            "model" "models/items/nightstalker/dusk_reaper_head/dusk_reaper_head.vmdl"
+            "model" "models/items/nightstalker/dusk_reaper_legs/dusk_reaper_legs.vmdl"
+            "model" "models/items/nightstalker/dusk_reaper_tail/dusk_reaper_tail.vmdl"
+            "particle" "particles/econ/items/nightstalker/nightstalker_dusk_reaper/nightstalker_dusk_reaper_arms_night.vpcf"
+            "particle" "particles/econ/items/nightstalker/nightstalker_dusk_reaper/nightstalker_dusk_reaper_back_night.vpcf"
+            "particle" "particles/econ/items/nightstalker/nightstalker_dusk_reaper/nightstalker_dusk_reaper_head_night.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_sea_beast_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/siren/siren.vmdl"
+        "precache"
+        {
+            "model" "models/items/siren/memento_of_lament/memento_of_lament.vmdl"
+            "model" "models/items/siren/tear_of_lament/tear_of_lament.vmdl"
+            "model" "models/items/siren/curse_of_lament/curse_of_lament.vmdl"
+            "model" "models/items/siren/marks_of_lament/marks_of_lament.vmdl"
+            "model" "models/items/siren/cries_of_lament/cries_of_lament.vmdl"
+            "particle" "particles/econ/items/naga/lament/lament_shield_ambient.vpcf"
+            "particle" "particles/econ/items/naga/lament/lament_weapon_ambient.vpcf"
+            "particle" "particles/econ/items/naga/lament/lament_head_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_sea_beast_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/siren/siren.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/siren/siren_armor.vmdl"
+            "model" "models/heroes/siren/siren_hair.vmdl"
+            "model" "models/heroes/siren/siren_tail.vmdl"
+            "model" "models/heroes/siren/siren_weapon.vmdl"
+            "model" "models/heroes/siren/siren_weapon_offhand.vmdl"
+            "particle" "particles/econ/events/diretide_2020/hero_spooky_ambient/hero_spooky_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_armored_horned_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/axe/axe.vmdl"
+        "precache"
+        {
+            "model" "models/items/axe/axe_winter_2025_belt_alt/axe_winter_2025_belt_alt.vmdl"
+            "model" "models/items/axe/axe_winter_2025_head_alt/axe_winter_2025_head_alt.vmdl"
+            "model" "models/items/axe/axe_winter_2025_armor_alt/axe_winter_2025_armor_alt.vmdl"
+            "model" "models/items/axe/axe_winter_2025_misc_alt/axe_winter_2025_misc_alt.vmdl"
+            "model" "models/items/axe/axe_winter_2025_weapon_alt/axe_winter_2025_weapon_alt.vmdl"
+            "particle" "particles/econ/items/axe/axe_winter_2025/axe_winter_2025_head_alt_ambient.vpcf"
+            "particle" "particles/econ/items/axe/axe_winter_2025/axe_winter_2025_armor_alt_ambient.vpcf"
+            "particle" "particles/econ/items/axe/axe_winter_2025/axe_winter_2025_misc_alt_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_armored_horned_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/axe/axe.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/axe/axe_weapon.vmdl"
+            "model" "models/heroes/axe/axe_ponytail.vmdl"
+            "model" "models/heroes/axe/axe_armor.vmdl"
+            "model" "models/heroes/axe/axe_belt.vmdl"
+            "model" "models/items/axe/ti9_jungle_axe/axe_ti9__undie.vmdl"
+            "particle" "particles/econ/events/diretide_2020/hero_spooky_ambient/hero_spooky_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_wave_dragon_black_red_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/winterwyvern/winterwyvern.vmdl"
+        "precache"
+        {
+            "model" "models/items/winter_wyvern/spring2021_frost_thorn_back/spring2021_frost_thorn_back.vmdl"
+            "model" "models/items/winter_wyvern/spring2021_frost_thorn_head/spring2021_frost_thorn_head.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_dragon_black_red_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/winterwyvern/winterwyvern.vmdl"
+        "precache"
+        {
+            "model" "models/items/winter_wyvern/wyvern_of_the_sea_back/wyvern_of_the_sea_back.vmdl"
+            "model" "models/items/winter_wyvern/wyvern_of_the_sea_head/wyvern_of_the_sea_head.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_stitcher_large"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/pudge/pudge.vmdl"
+        "precache"
+        {
+            "model" "models/items/pudge/aberrant_observer_back/aberrant_observer_back.vmdl"
+            "model" "models/items/pudge/aberrant_observer_belt/aberrant_observer_belt.vmdl"
+            "model" "models/items/pudge/aberrant_observer_head/aberrant_observer_head.vmdl"
+            "model" "models/items/pudge/aberrant_observer_hook/aberrant_observer_hook.vmdl"
+            "model" "models/items/pudge/aberrant_observer_offhand/aberrant_observer_offhand.vmdl"
+            "model" "models/items/pudge/aberrant_observer_left_arm/aberrant_observer_left_arm.vmdl"
+            "model" "models/items/pudge/aberrant_observer_right_arm/aberrant_observer_right_arm.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_stitcher_small"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/pudge/pudge.vmdl"
+        "precache"
+        {
+            "model" "models/items/pudge/bogatyr_pudge_arms_lv/bogatyr_pudge_arms_lv.vmdl"
+            "model" "models/items/pudge/bogatyr_pudge_belt_lv/bogatyr_pudge_belt_lv.vmdl"
+            "model" "models/items/pudge/bogatyr_pudge_shoulder_lv/bogatyr_pudge_shoulder_lv.vmdl"
+            "model" "models/items/pudge/bogatyr_pudge_back_lv/bogatyr_pudge_back_lv.vmdl"
+            "model" "models/items/pudge/bogatyr_pudge_head/bogatyr_pudge_head.vmdl"
+            "model" "models/items/pudge/bogatyr_pudge_offhand_lv/bogatyr_pudge_offhand_lv.vmdl"
+            "model" "models/items/pudge/bogatyr_pudge_weapon_lv/bogatyr_pudge_weapon_lv.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_flying_black_bone"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/visage/visage.vmdl"
+        "precache"
+        {
+            "model" "models/items/visage/soul_reaper_armor/soul_reaper_armor.vmdl"
+            "model" "models/items/visage/soul_reaper_head/soul_reaper_head.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_golem_green_fire"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/necrolyte/necrolyte.vmdl"
+        "precache"
+        {
+            "model" "models/items/necrolyte/necro_plague_doctor/necro_plague_doctor_head.vmdl"
+            "model" "models/items/necrolyte/necro_plague_doctor/necro_plague_doctor_beard.vmdl"
+            "model" "models/items/necrolyte/necro_plague_doctor/necro_plague_doctor_robe.vmdl"
+            "model" "models/items/necrolyte/necro_plague_doctor/necro_plague_doctor_legs.vmdl"
+            "model" "models/items/necrolyte/necro_plague_doctor/necro_plague_doctor_weapon.vmdl"
+        }
+    }
+    "asset_proxy_monster_wave_boss_twinblade_demon"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/terrorblade/terrorblade_arcana.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/terrorblade/horns_arcana.vmdl"
+            "model" "models/heroes/terrorblade/wings.vmdl"
+            "model" "models/heroes/terrorblade/weapon.vmdl"
+            "model" "models/heroes/terrorblade/armor.vmdl"
+            "particle" "particles/econ/items/terrorblade/terrorblade_horns_arcana/terrorblade_ambient_body_arcana_horns.vpcf"
+            "particle" "particles/econ/items/terrorblade/terrorblade_horns_arcana/terrorblade_ambient_eyes_arcana_horns.vpcf"
+            "particle" "particles/units/heroes/hero_terrorblade/terrorblade_ambient_sword_l.vpcf"
+            "particle" "particles/units/heroes/hero_terrorblade/terrorblade_ambient_sword_r.vpcf"
+            "particle" "particles/units/heroes/hero_terrorblade/terrorblade_ambient_sword_blade.vpcf"
+            "particle" "particles/units/heroes/hero_terrorblade/terrorblade_ambient_sword_blade_2.vpcf"
+        }
+    }
+    // END WAVE_MONSTER_COSMETICS
+    // BEGIN ARCHIVE_MONSTER_COSMETICS
+    "asset_proxy_monster_archive_shadow_1"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/shadow_demon/shadow_demon.vmdl"
+        "precache"
+        {
+            "model" "models/items/shadow_demon/the_gate_of_hell_armor/the_gate_of_hell_armor.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_back/the_gate_of_hell_back.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_belt/the_gate_of_hell_belt.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_tail/the_gate_of_hell_tail.vmdl"
+            "particle" "particles/econ/items/shadow_demon/gate_of_hell/gate_of_hell_back_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_shadow_2"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/shadow_demon/shadow_demon.vmdl"
+        "precache"
+        {
+            "model" "models/items/shadow_demon/the_gate_of_hell_armor/the_gate_of_hell_armor.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_back/the_gate_of_hell_back.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_belt/the_gate_of_hell_belt.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_tail/the_gate_of_hell_tail.vmdl"
+            "particle" "particles/econ/items/shadow_demon/gate_of_hell/gate_of_hell_back_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_shadow_3"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/shadow_demon/shadow_demon.vmdl"
+        "precache"
+        {
+            "model" "models/items/shadow_demon/the_gate_of_hell_armor/the_gate_of_hell_armor.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_back/the_gate_of_hell_back.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_belt/the_gate_of_hell_belt.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_tail/the_gate_of_hell_tail.vmdl"
+            "particle" "particles/econ/items/shadow_demon/gate_of_hell/gate_of_hell_back_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_shadow_4"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/shadow_demon/shadow_demon.vmdl"
+        "precache"
+        {
+            "model" "models/items/shadow_demon/the_gate_of_hell_armor/the_gate_of_hell_armor.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_back/the_gate_of_hell_back.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_belt/the_gate_of_hell_belt.vmdl"
+            "model" "models/items/shadow_demon/the_gate_of_hell_tail/the_gate_of_hell_tail.vmdl"
+            "particle" "particles/econ/items/shadow_demon/gate_of_hell/gate_of_hell_back_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_cage_1"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl"
+        "precache"
+        {
+        }
+    }
+    "asset_proxy_monster_archive_cage_2"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl"
+        "precache"
+        {
+        }
+    }
+    "asset_proxy_monster_archive_cage_3"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/dragon_knight/silver_dragon_king_dragon/silver_dragon_king_dragon.vmdl"
+        "precache"
+        {
+        }
+    }
+    "asset_proxy_monster_archive_cage_4"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/jakiro/jakiro.vmdl"
+        "precache"
+        {
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_back/jakiro_ancestral_heritage_back.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_tail/jakiro_ancestral_heritage_tail.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_body_head/jakiro_ancestral_heritage_body_head.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_head/jakiro_ancestral_heritage_head.vmdl"
+            "particle" "particles/econ/items/jakiro/jakiro_ancestral_heritage/jakiro_ancestral_heritage_back_ambient.vpcf"
+            "particle" "particles/econ/items/jakiro/jakiro_ancestral_heritage/jakiro_ancestral_heritage_tail_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_cage_5"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/jakiro/jakiro.vmdl"
+        "precache"
+        {
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_back/jakiro_ancestral_heritage_back.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_tail/jakiro_ancestral_heritage_tail.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_body_head/jakiro_ancestral_heritage_body_head.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_head/jakiro_ancestral_heritage_head.vmdl"
+            "particle" "particles/econ/items/jakiro/jakiro_ancestral_heritage/jakiro_ancestral_heritage_back_ambient.vpcf"
+            "particle" "particles/econ/items/jakiro/jakiro_ancestral_heritage/jakiro_ancestral_heritage_tail_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_cage_6"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/jakiro/jakiro.vmdl"
+        "precache"
+        {
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_back/jakiro_ancestral_heritage_back.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_tail/jakiro_ancestral_heritage_tail.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_body_head/jakiro_ancestral_heritage_body_head.vmdl"
+            "model" "models/items/jakiro/jakiro_ancestral_heritage_head/jakiro_ancestral_heritage_head.vmdl"
+            "particle" "particles/econ/items/jakiro/jakiro_ancestral_heritage/jakiro_ancestral_heritage_back_ambient.vpcf"
+            "particle" "particles/econ/items/jakiro/jakiro_ancestral_heritage/jakiro_ancestral_heritage_tail_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_01"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/sven/sven.vmdl"
+        "precache"
+        {
+            "model" "models/items/sven/shattered_greatsword/shattered_greatsword.vmdl"
+            "model" "models/items/sven/endless_fury_sven_arms/endless_fury_sven_arms.vmdl"
+            "model" "models/items/sven/endless_fury_sven_back/endless_fury_sven_back.vmdl"
+            "model" "models/items/sven/endless_fury_sven_belt/endless_fury_sven_belt.vmdl"
+            "model" "models/items/sven/endless_fury_sven_head/endless_fury_sven_head.vmdl"
+            "model" "models/items/sven/endless_fury_sven_shoulder/endless_fury_sven_shoulder.vmdl"
+            "particle" "particles/econ/items/sven/sven_shattered_great_sword/sven_shattered_greatsword_ambient.vpcf"
+            "particle" "particles/econ/items/sven/sven_endless_fury/sven_endless_fury_arms.vpcf"
+            "particle" "particles/econ/items/sven/sven_endless_fury/sven_endless_fury_belt.vpcf"
+            "particle" "particles/econ/items/sven/sven_endless_fury/sven_endless_fury_head.vpcf"
+            "particle" "particles/econ/items/sven/sven_endless_fury/sven_endless_fury_shoulder.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_02"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/mars/mars.vmdl"
+        "precache"
+        {
+            "model" "models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon.vmdl"
+            "model" "models/items/mars/mars_ragnarok_legs_alt/mars_ragnarok_legs_alt.vmdl"
+            "model" "models/items/mars/mars_ragnarok_armor_alt/mars_ragnarok_armor_alt.vmdl"
+            "model" "models/items/mars/mars_ragnarok_offhand_weapon_alt/mars_ragnarok_offhand_weapon_alt.vmdl"
+            "particle" "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_ambient.vpcf"
+            "particle" "particles/econ/items/mars/mars_ragnarok/mars_ragnarok_armor_alt_ambient.vpcf"
+            "particle" "particles/econ/items/mars/mars_ragnarok/mars_ragnarok_offhand_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_03"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/doom/doom.vmdl"
+        "precache"
+        {
+            "model" "models/items/doom/pyre/pyre.vmdl"
+            "model" "models/items/doom/ti8_doom_obsidian_overlord_back/ti8_doom_obsidian_overlord_back.vmdl"
+            "model" "models/items/doom/ti8_doom_obsidian_overlord_tail/ti8_doom_obsidian_overlord_tail.vmdl"
+            "model" "models/items/doom/ti8_doom_obsidian_overlord_shoulder/ti8_doom_obsidian_overlord_shoulder.vmdl"
+            "model" "models/items/doom/ti8_doom_obsidian_overlord_head/ti8_doom_obsidian_overlord_head.vmdl"
+            "model" "models/items/doom/ti8_doom_obsidian_overlord_belt/ti8_doom_obsidian_overlord_belt.vmdl"
+            "model" "models/items/doom/ti8_doom_obsidian_overlord_arms/ti8_doom_obsidian_overlord_arms.vmdl"
+            "particle" "particles/units/heroes/hero_doom_bringer/doom_bringer_ambient.vpcf"
+            "particle" "particles/econ/items/doom/doom_obsidian/doom_obsidian_wings_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_04"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/spectre/spectre_arcana/spectre_arcana_base.vmdl"
+        "precache"
+        {
+            "model" "models/items/spectre/spectre_diffusal.vmdl"
+            "model" "models/items/spectre/spectre_arcana/spectre_arcana_head.vmdl"
+            "model" "models/items/spectre/spectre_arcana/spectre_arcana_shoulder.vmdl"
+            "model" "models/items/spectre/spectre_arcana/spectre_arcana_misc.vmdl"
+            "model" "models/items/spectre/spectre_arcana/spectre_arcana_skirt.vmdl"
+            "particle" "particles/econ/items/spectre/spectre_weapon_diffusal/spectre_diffusal_ambient.vpcf"
+            "particle" "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_head.vpcf"
+            "particle" "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_shoulder.vpcf"
+            "particle" "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_bracers.vpcf"
+            "particle" "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_skirt.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_05"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/faceless_void/faceless_void_arcana/faceless_void_arcana_base.vmdl"
+        "precache"
+        {
+            "model" "models/items/faceless_void/battlefury/battlefury.vmdl"
+            "model" "models/items/faceless_void/faceless_void_arcana/faceless_void_arcana_belt.vmdl"
+            "model" "models/items/faceless_void/faceless_void_arcana/faceless_void_arcana_bracer.vmdl"
+            "model" "models/items/faceless_void/faceless_void_arcana/faceless_void_arcana_shoulder.vmdl"
+            "particle" "particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_glow_bfury.vpcf"
+            "particle" "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_ambient_belt.vpcf"
+            "particle" "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_ambient_shoulder.vpcf"
+            "particle" "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_06"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/antimage/antimage.vmdl"
+        "precache"
+        {
+            "model" "models/items/antimage/skullbasher/skullbasher.vmdl"
+            "model" "models/items/antimage/skullbasher/skullbasher_offhand.vmdl"
+            "model" "models/items/antimage/am_eternal_reaper_armor/am_eternal_reaper_armor.vmdl"
+            "model" "models/items/antimage/am_eternal_reaper_arms/am_eternal_reaper_arms.vmdl"
+            "model" "models/items/antimage/am_eternal_reaper_belt/am_eternal_reaper_belt.vmdl"
+            "model" "models/items/antimage/am_eternal_reaper_head/am_eternal_reaper_head.vmdl"
+            "model" "models/items/antimage/am_eternal_reaper_shoulders/am_eternal_reaper_shoulders.vmdl"
+            "particle" "particles/econ/items/antimage/antimage_weapon_basher_ti5/antimage_ambient_skullbasher.vpcf"
+            "particle" "particles/econ/items/antimage/antimage_weapon_basher_ti5/antimage_ambient_skullbasher_offhand.vpcf"
+            "particle" "particles/econ/items/antimage/am_eternal_reaper/am_eternal_armor_ambient.vpcf"
+            "particle" "particles/econ/items/antimage/am_eternal_reaper/am_eternal_head_ambient.vpcf"
+            "particle" "particles/econ/items/antimage/am_eternal_reaper/am_eternal_shoulder_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_07"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/kunkka/kunkka.vmdl"
+        "precache"
+        {
+            "model" "models/items/kunkka/kunkka_shadow_blade/kunkka_shadow_blade.vmdl"
+            "model" "models/items/kunkka/inquisitor_tide_misc/inquisitor_tide_misc.vmdl"
+            "model" "models/items/kunkka/inquisitor_tide_glove/inquisitor_tide_glove.vmdl"
+            "model" "models/items/kunkka/inquisitor_tide_back/inquisitor_tide_back.vmdl"
+            "model" "models/items/kunkka/inquisitor_tide_legs/inquisitor_tide_legs.vmdl"
+            "model" "models/items/kunkka/inquisitor_tide_head/inquisitor_tide_head.vmdl"
+            "model" "models/items/kunkka/inquisitor_tide_belt/inquisitor_tide_belt.vmdl"
+            "model" "models/items/kunkka/inquisitor_tide_shoulder/inquisitor_tide_shoulder.vmdl"
+            "particle" "particles/econ/items/kunkka/kunkka_weapon_shadow/kunkka_weapon_glow_shadow_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_08"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/pudge/arcana/pudge_arcana_base.vmdl"
+        "precache"
+        {
+            "model" "models/items/pudge/pudge_skeleton_hook_body.vmdl"
+            "model" "models/items/pudge/arcana/pudge_arcana_back.vmdl"
+            "model" "models/heroes/pudge/leftweapon.vmdl"
+            "particle" "particles/econ/items/pudge/pudge_arcana/pudge_arcana_base_ambient.vpcf"
+            "particle" "particles/econ/items/pudge/pudge_arcana/pudge_arcana_back_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_09"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/weaver/weaver.vmdl"
+        "precache"
+        {
+            "model" "models/items/weaver/weaver_immortal_head_ti7/weaver_immortal_head_ti7.vmdl"
+            "model" "models/items/weaver/spring2021_dimension_ripper_arms/spring2021_dimension_ripper_arms.vmdl"
+            "model" "models/items/weaver/spring2021_dimension_ripper_back/spring2021_dimension_ripper_back.vmdl"
+            "model" "models/items/weaver/spring2021_dimension_ripper_legs/spring2021_dimension_ripper_legs.vmdl"
+            "model" "models/items/weaver/spring2021_dimension_ripper_misc/spring2021_dimension_ripper_misc.vmdl"
+            "particle" "particles/econ/items/weaver/weaver_immortal_ti7/weaver_ti7_golden_immortal_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_10"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/legion_commander/legion_commander.vmdl"
+        "precache"
+        {
+            "model" "models/items/legion_commander/demon_sword.vmdl"
+            "model" "models/items/legion_commander/apostle_of_war_legs_alt/apostle_of_war_legs_alt.vmdl"
+            "model" "models/items/legion_commander/apostle_of_war_back_alt/apostle_of_war_back_alt.vmdl"
+            "model" "models/items/legion_commander/apostle_of_war_head_alt/apostle_of_war_head_alt.vmdl"
+            "model" "models/items/legion_commander/apostle_of_war_arms_alt/apostle_of_war_arms_alt.vmdl"
+            "model" "models/items/legion_commander/apostle_of_war_shoulders_alt/apostle_of_war_shoulders_alt.vmdl"
+            "particle" "particles/econ/items/legion/legion_weapon_voth_domosh/legion_ambient_arcana.vpcf"
+            "particle" "particles/econ/items/legion/legion_weapon_voth_domosh/legion_arcana_weapon.vpcf"
+            "particle" "particles/econ/items/legion/legion_weapon_voth_domosh/legion_arcana_weapon_offhand.vpcf"
+            "particle" "particles/econ/items/legion/apostle_of_war_alt/apostle_of_war_alt_head_ambient.vpcf"
+            "particle" "particles/econ/items/legion/apostle_of_war_alt/apostle_of_war_alt_arms_ambient.vpcf"
+            "particle" "particles/econ/items/legion/apostle_of_war_alt/apostle_of_war_alt_shoulders_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_11"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/heroes/clinkz/clinkz.vmdl"
+        "precache"
+        {
+            "model" "models/items/clinkz/clinkz_ti9_immortal_weapon/clinkz_ti9_immortal_weapon.vmdl"
+            "model" "models/items/clinkz/degraded_soul_hunter_gloves/degraded_soul_hunter_gloves.vmdl"
+            "model" "models/items/clinkz/degraded_soul_hunter_back/degraded_soul_hunter_back.vmdl"
+            "model" "models/items/clinkz/degraded_soul_hunter_head/degraded_soul_hunter_head.vmdl"
+            "model" "models/items/clinkz/degraded_soul_hunter_shoulder/degraded_soul_hunter_shoulder.vmdl"
+            "model" "models/heroes/clinkz/clinkz_head.vmdl"
+            "particle" "particles/econ/items/clinkz/clinkz_ti9_immortal/clinkz_ti9_weapon_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_hunt_12"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/rubick/rubick_arcana/rubick_arcana_base.vmdl"
+        "precache"
+        {
+            "model" "models/items/rubick/rubick_arcana/rubick_arcana_back.vmdl"
+            "model" "models/items/rubick/force_staff/force_staff.vmdl"
+            "model" "models/items/rubick/rubick_inherited_will_shoulder/rubick_inherited_will_shoulder.vmdl"
+            "model" "models/items/rubick/rubick_inherited_will_head/rubick_inherited_will_head.vmdl"
+            "particle" "particles/econ/items/rubick/rubick_arcana/rubick_arc_ambient_default.vpcf"
+            "particle" "particles/econ/items/rubick/rubick_force_ambient/rubick_force_ambient.vpcf"
+            "particle" "particles/econ/items/rubick/rubick_cc_2024_inherited_will_shoulder/rubick_cc_2024_inherited_will_shoulder_ambient.vpcf"
+            "particle" "particles/econ/items/rubick/rubick_cc_2024_inherited_will_head/rubick_cc_2024_inherited_will_head_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_social_friend"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl"
+        "precache"
+        {
+            "model" "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana_head.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_weapon.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_cape.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_bracers.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_belt.vmdl"
+            "particle" "particles/econ/items/ogre_magi/ogre_magi_arcana/ogre_magi_arcana_ambient.vpcf"
+            "particle" "particles/econ/items/ogre_magi/ogre_magi_arcana/ogre_magi_arcana_horns_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_social_ex"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl"
+        "precache"
+        {
+            "model" "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana_head.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_weapon.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_cape.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_bracers.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_belt.vmdl"
+            "particle" "particles/econ/items/ogre_magi/ogre_magi_arcana/ogre_magi_arcana_ambient.vpcf"
+            "particle" "particles/econ/items/ogre_magi/ogre_magi_arcana/ogre_magi_arcana_horns_ambient.vpcf"
+        }
+    }
+    "asset_proxy_monster_archive_social_beast"
+    {
+        "BaseClass" "npc_dota_creature"
+        "Model" "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl"
+        "precache"
+        {
+            "model" "models/items/ogre_magi/ogre_arcana/ogre_magi_arcana_head.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_weapon.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_cape.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_bracers.vmdl"
+            "model" "models/heroes/ogre_magi/ogre_magi_belt.vmdl"
+            "particle" "particles/econ/items/ogre_magi/ogre_magi_arcana/ogre_magi_arcana_ambient.vpcf"
+            "particle" "particles/econ/items/ogre_magi/ogre_magi_arcana/ogre_magi_arcana_horns_ambient.vpcf"
+        }
+    }
+    // END ARCHIVE_MONSTER_COSMETICS
 }
