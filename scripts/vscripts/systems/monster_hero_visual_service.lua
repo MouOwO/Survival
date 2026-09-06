@@ -1,6 +1,7 @@
 local catalog = require("config/asset_catalog")
 local appearance = require("visual/model_appearance_service")
 local logger = require("core/logger")
+local cosmetic_details = require("visual/monster_cosmetic_details")
 
 local M = {}
 
@@ -69,7 +70,7 @@ local function requested_asset_id(archetype, options)
     )
     if asset_id == "" then return nil, "default_wearable_not_declared" end
     local asset = catalog.resolve(asset_id)
-    if not asset or asset.asset_type ~= "model_bundle"
+    if not asset or (asset.asset_type ~= "model_bundle" and asset.asset_type ~= "model")
         or not nonempty(asset.primary_model) then
         return nil, "default_wearable_asset_invalid"
     end
@@ -91,10 +92,12 @@ function M.apply(unit, archetype, options)
     if not asset then return false, reason end
     local ok, status, components = appearance.Apply(unit, asset)
     if not ok then
+        cosmetic_details.clear(unit)
         logger.warn("MonsterHeroVisual", "apply failed asset="
             .. tostring(asset.asset_id) .. " reason=" .. tostring(status))
         return false, status or "appearance_apply_failed"
     end
+    cosmetic_details.apply(unit, asset, components)
     play_idle(unit, asset.default_sequence)
     for component_id, component in pairs(components or {}) do
         local declaration = nil
@@ -111,11 +114,22 @@ function M.apply(unit, archetype, options)
     return true, asset.asset_id
 end
 
+-- Tracked corpses retain bone-merged components, skins and activities until
+-- the corpse service finishes sinking them. Forced cleanup still uses clear.
+function M.on_death(unit)
+    if valid(unit) and unit.survival_monster_corpse == true
+        and unit.survival_wave_cleanup ~= true then
+        return true
+    end
+    return M.clear(unit)
+end
+
 function M.clear(unit)
-    if not valid(unit) then return false end
+    if not unit then return false end
     -- Do not clear a challenge-specific appearance that this service did not
     -- create. Special outfits use the existing challenge visual service.
     if unit.survival_monster_default_wearable_asset_id ~= nil then
+        cosmetic_details.clear(unit)
         appearance.Clear(unit)
     end
     unit.survival_monster_default_wearable_asset_id = nil

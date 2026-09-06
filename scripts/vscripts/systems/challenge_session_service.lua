@@ -1113,7 +1113,7 @@ local function on_killed(payload)
     if not meta then return end
     monster_meta[entindex] = nil
     monster_visual.clear(victim)
-    monster_hero_visual_service.clear(victim)
+    monster_hero_visual_service.on_death(victim)
     local session = get_session(meta.player_id, meta.encounter_id)
     if not session then return end
     session.monsters[entindex] = nil

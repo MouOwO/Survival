@@ -407,7 +407,7 @@ local function on_entity_killed(payload)
 
     active_by_entindex[entindex] = nil
     active_by_encounter[meta.encounter_id] = nil
-    monster_hero_visual_service.clear(victim)
+    monster_hero_visual_service.on_death(victim)
 
     event_bus.emit(events.MONSTER_KILLED, {
         victim = victim,
