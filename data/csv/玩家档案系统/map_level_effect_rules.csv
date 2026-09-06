@@ -1,5 +1,5 @@
 rule_id,source_field_id,target_field_id,value_per_level,stacking_rule,enabled,notes
 #中文表头:规则ID,等级字段ID,目标增益字段ID,每级数值,叠加规则,是否启用,备注
 #types:string,string,string,number,string,boolean,string
-map_level_wall_health_bonus_pct,map_level,wall_health_bonus_pct,1,add,1,每1级地图等级使城墙生命加成增加1%。
-map_level_wall_health_per_second,map_level,wall_health_per_second,5,add,1,每1级地图等级使城墙每秒生命增加5。
+map_level_wall_initial_health,map_level,wall_initial_health,100,add,1,每1级地图等级使城墙初始生命增加100。
+map_level_wall_health_regen,map_level,wall_health_regen_per_second,5,add,1,每1级地图等级使城墙每秒回血增加5。
