@@ -84,6 +84,9 @@ local function enabled_categories()
 end
 
 local renderers = {}
+renderers.fishing = function(profile) return (require("systems/archive_fishing_view").project(profile)) end
+renderers.map_level = function(_, archive) return require("systems/archive_online_rewards").rows(archive, "map_level") end
+renderers.work = function(_, archive) return require("systems/archive_online_rewards").rows(archive, "work") end
 renderers.friend = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "friend") end
 renderers.ex = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "ex") end
 renderers.beast = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "beast") end
@@ -153,9 +156,16 @@ function M.snapshot(player_id, category_id)
     local category = categories.by_id[category_id]
     if not category or not category.enabled then return { ok = false, error = "category_invalid" } end
     local projector = renderers[category_id]
+    local fishing
+    if category_id == "fishing" then
+        local _; _, fishing = require("systems/archive_fishing_view").project(profile)
+    end
     return { ok = true, category_id = category_id, revision = profile.revision,
+        fishing = fishing,
         categories = enabled_categories(), has_pass = has_pass(profile) and 1 or 0,
         rows = projector and projector(profile, saved(profile)) or {},
+        online = (category_id == "map_level" or category_id == "work")
+            and require("systems/archive_online_rewards").info(saved(profile)) or nil,
         social = require("systems/archive_social_rewards").info(saved(profile), category_id),
         last_draw = saved(profile).social_last_draw,
         pending = pending[player_id] and next(pending[player_id]) ~= nil and 1 or 0 }
@@ -189,7 +199,10 @@ local function local_settle(player_id, command)
     end
     local archive, stats = saved(profile), copy(profile.save.gameplay_stats)
     if archive.processed[command.id] then return { ok = true, duplicate = true } end
-    if command.kind == "boss_kill" then
+    if command.kind == "online_checkpoint" or command.kind == "work_upgrade" then
+        local ok, reason = require("systems/archive_online_rewards").apply(command, archive, stats, apply_effects)
+        if not ok then return { ok = false, terminal = true, error = reason } end
+    elseif command.kind == "boss_kill" then
         archive.boss_kills=(tonumber(archive.boss_kills) or 0)+1
     elseif command.kind == "daily_init" or command.kind == "daily_claim" then
         local ok,reason=require("systems/archive_daily_rewards").apply(command,archive,stats,has_pass(profile),apply_effects)
@@ -228,7 +241,8 @@ local function local_settle(player_id, command)
     else
         return { ok = false, error = "archive_command_invalid" }
     end
-    archive.processed[command.id] = true
+    -- Online checkpoints are deduplicated by their cumulative session cursor, without one saved ID per minute.
+    if command.kind ~= "online_checkpoint" then archive.processed[command.id] = true end
     -- Only current match IDs are needed locally; completed milestones and
     -- counts are permanent. Remote providers must keep durable grant records.
     local prefix = session_id .. ":"
@@ -368,6 +382,31 @@ function M.social_draw(player_id, pool_id, request_id)
     return enqueue(player_id, {id=session_id..":social_draw:"..request_id, kind="social_draw", pool_id=pool_id})
 end
 
+function M.zaixian(context)
+    local allowed = type(IsInToolsMode) == "function" and IsInToolsMode()
+        or GameRules and GameRules.IsCheatMode and GameRules:IsCheatMode()
+    if not allowed then return false, "tools_mode_or_cheats_required" end
+    local args = context.args or {}
+    local minutes = tonumber(args[1])
+    if #args ~= 1 or not integer(minutes) or minutes < 1 or minutes > 1000000 then
+        return false, "用法：zaixian <1..1000000分钟>（累加在线时间）"
+    end
+    local profile = profiles.get_profile(context.player_id)
+    if not profile then return false, "profile_not_loaded" end
+    serial = (serial or 0) + 1
+    -- A separate cursor per invocation exercises the real settlement without advancing the live clock.
+    local id = session_id .. ":zaixian:" .. serial
+    local multiplier = has_pass(profile) and 2 or 1
+    local result = enqueue(context.player_id, { id = id, kind = "online_checkpoint", session = id,
+        actual_seconds = minutes * 60, map_seconds = minutes * 60 * multiplier, test_only = true })
+    if result.ok then
+        bus.emit(events.UI_NOTIFICATION, { player_id = context.player_id, level = "info",
+            message = "模拟在线增加" .. minutes .. "分钟，地图有效时长增加" .. minutes * multiplier
+                .. "分钟，软妹币增加" .. minutes .. (result.pending and "（等待保存）" or "") })
+    end
+    return result.ok, result.error
+end
+
 function M.yitie(context)
     local allowed = type(IsInToolsMode) == "function" and IsInToolsMode()
         or GameRules and GameRules.IsCheatMode and GameRules:IsCheatMode()
@@ -387,6 +426,17 @@ function M.promote(player_id, fragment_id, request_id)
     end
     return enqueue(player_id, { id = session_id .. ":promotion:" .. request_id,
         kind = "promotion", fragment_id = tostring(fragment_id or ""), day_key = day_key() })
+end
+
+function M.work_upgrade(player_id, item_id, expected_level)
+    local item = require("config/generated/archive_work_items").by_id[tostring(item_id or "")]
+    expected_level = tonumber(expected_level)
+    if not item or not item.enabled or not integer(expected_level) or expected_level >= item.max_level then
+        return { ok = false, error = "福利请求无效" }
+    end
+    -- Identity is the intended level, not a client nonce: repeated clicks cannot charge twice.
+    return enqueue(player_id, { id = session_id .. ":work:" .. item.item_id .. ":" .. expected_level,
+        kind = "work_upgrade", item_id = item.item_id, expected_level = expected_level })
 end
 
 function M.cheat(context)
@@ -415,10 +465,34 @@ function M.init()
     archive_players = {}
     serial = 0
     session_id = runtime_id()
+    local online_clock = require("systems/archive_online_clock")
+    online_clock.init(session_id, enqueue)
     bus.subscribe(events.PLAYER_PROFILE_CHANGED, function(payload)
         local id = tonumber(payload.player_id)
-        if id then archive_players[id]=true; send(id); if daily_viewers[id] then M.send_daily(id) end; if not busy[id] then flush(id) end end
+        if id then
+            archive_players[id]=true
+            online_clock.observe(id, profiles.get_profile(id))
+            send(id)
+            if daily_viewers[id] then M.send_daily(id) end
+            if not busy[id] then flush(id) end
+        end
     end)
+    bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
+        local id = tonumber(payload.player_id)
+        if id then online_clock.disconnect(id) end
+    end)
+    scheduler.every(1, function()
+        -- Iterate valid slots as well as profile events, so reopening the archive is never needed to earn time.
+        for id = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
+            if PlayerResource and PlayerResource:IsValidPlayerID(id) then
+                local profile = profiles.get_profile(id)
+                if profile then
+                    archive_players[id] = true
+                    online_clock.sample(id, profile)
+                end
+            end
+        end
+    end, "archive_online_clock")
     bus.subscribe("archive.wave_boss_killed",function(payload) M.record_boss(payload.player_id,payload.kill_id) end)
     local daily_times, pass_states = {}, {}
     CustomGameEventManager:RegisterListener("survival_daily_request",function(_,payload)
@@ -496,6 +570,18 @@ function M.init()
     end)
     local promotion_times = {}
     local draw_times = {}
+    local work_times = {}
+    CustomGameEventManager:RegisterListener("survival_archive_work_upgrade", function(_, payload)
+        local id = tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local now = GameRules:GetGameTime()
+        if work_times[id] and now - work_times[id] < 0.3 then return end
+        work_times[id] = now
+        online_clock.flush(id)
+        local result = M.work_upgrade(id, payload.item_id, payload.expected_level)
+        if not result.ok then bus.emit(events.UI_NOTIFICATION, { player_id = id, level = "error", message = result.error }) end
+        send(id)
+    end)
     CustomGameEventManager:RegisterListener("survival_archive_social_draw", function(_, payload)
         local id = tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end

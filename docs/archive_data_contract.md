@@ -268,4 +268,30 @@ BOSS存档仅监听主线wave_system内部已登记的is_boss死亡事件，在�
 
 后端存档适配器需支持boss_kill、daily_init、daily_claim，验证击杀证据、服务器日期、月卡有效期、补签窗口和领取幂等，重算奖励并同事务写入。在线时长/胜场奖励不在本次签到任务范围，未读取为签到奖励。
 
+### 钓鱼存档展示
+
+`archive_fishing_items.csv` 从“钓鱼存档”sheet导入26项，使用已联调的 `star_blessing_001`～`star_blessing_026` 永久奖励ID，独立于局内 `fishing_reward_definitions` 奖池。名称及展示上限按工作簿；重复映射不新增ID，不改在线checkpoint、掉率、定义版本、发奖或效果投影。品质原表未定义，展示统一N白色名字，自制鱼字图标。所有项目均显示，已拥有点亮、未拥有置灰，不提供抽奖/领取按钮。
+
+展示读取 `save.fishing_inventory = {reward_id: granted_count}`。数量必须来自 `reward_grants` 成功发奖记录的count，不是amount之和，不从永久属性倒推，不统计未结算在线奖励。字段缺失显示“库存待同步”，空对象才代表确实没有物品；超过表格上限的既有数量照实显示。此次只展示上限，不更改后端物品限制。
+
+本地后端源码现有 `fishing_profile_json` 未返回库存，需在原Supabase项目执行 `tools/sql/202609060001_archive_fishing_inventory.sql`。该脚本从现有成功发奖表按账户和物品聚合，在原函数save中增加字段，保留其他函数正文与所有原字段；重复执行无修改。它不新增发奖，也不修改历史属性。`POST /v1/profile` 的Python转发和Lua profile保存已有透传能力，因此无需重写已联调接口。脚本在本次任务中仅准备，未执行到远端数据库；执行后重新载入玩家档案即可显示历史数量，后续现有profile刷新事件自动更新界面。
+
+两处旧服配置与工作簿效果不同：`star_blessing_015` 清晏旧服为墙护甲加成+2%，工作簿为墙护甲+2；`star_blessing_025` 霍云旧服为箭塔造成伤害攻击+1，工作簿为英雄造成伤害攻击+1。展示description按现有实际配置，workbook_description保留原文。由于本次只要求显示，未修改已联调的不可变奖励定义或追溯结算。
+
+验证：`test_archive_service.lua`覆盖库存缺失/空库存、玩家隔离、数量更新、超过上限照实显示、读取不写档；`tools/test_archive_ui.js`覆盖已拥有状态、无点击行为、tooltip及待同步提示。
+
+### 地图等级与上班福利（实现细节）
+
+新增 `archive_map_levels.csv`（34级，累计门槛1H～1112H）及 `archive_work_items.csv`（34个独立项目，各激活一次，消耗600～24000软妹币），由 `tools/import_archive_online.ps1` 读取工作簿同名sheet生成。同名福利保留独立ID。地图等级基础效果修正为每级城墙初始生命+100、每秒回血+5，由 `map_level_effect_rules.csv` 派生；逐级奖励只结算一次并叠加。H按3600秒解释，不重算或累加表内“所需总时间”。
+
+按本次用户要求，实际连接在线60秒获得1软妹币，通行证不增加软妹币；通行证有效期间地图等级时长加倍，到期后的时间按正常倍率，新购买不追溯旧时间。旧表内“10分钟10币/通行证15币”不用于本次实现。档案加载后即开始观察，无需打开UI。服务端每秒采样连接状态，正常相邻样本才计时；掉线、时钟倒退及超过5秒的采样间隔不补计，暂停/服务器停顿不补发。每60秒及断线保存，未满一分钟的已保存余秒跨局累计；进程异常退出最多丢失当前未保存的一分钟。原HTTP在线奖励系统的 `online_seconds_total` 及既有收益保持独立，不按不明历史通行证状态补算新系统时间。
+
+持久化在 `save.archive.online`：`actual_seconds` 实际在线秒、`map_seconds` 加权秒、`coins` 未消费软妹币、`map_level` 此系统已解锁等级、`work_levels` 激活次数和 `cursors[session]` 累计计时游标。原有其他来源的gameplay_stats.map_level保留；本系统新增等级按增量叠加。计时与升级复用archive原子事务，和gameplay_stats一并保存，失败进重试队列。在线命令不逐分钟积累processed记录，由游标去重。成功后的UI随存档刷新，沿用原有通关后属性冻结规则，通关后新增属性下局生效。
+
+客户端仅新增 `survival_archive_work_upgrade {item_id, expected_level}`，身份使用引擎PlayerID；不接收价格、余额、时长或奖励数值。服务端校验余额、配置上限和目标等级，0.3秒节流，重复点击不能重复扣币。两页snapshot附带 `online` 展示数据，地图等级自动解锁、福利点击小格激活，已激活格置灰。无客户端计时上报接口。
+
+远端archive适配器需实现 `online_checkpoint {session,actual_seconds,map_seconds}` 和 `work_upgrade {item_id,expected_level}`，仅接受可信游戏服务器身份，使用在线租约、通行证有效期重算时间，维护持久化session游标防跨服重放；余额、激活次数及永久奖励必须同事务写入。不得将公开客户端的累计秒数直接记账。本地实现已接入现有persist_save和set_provider接口，真实后端仍需按该契约联调。
+
+验证：`test_archive_online.lua`覆盖双倍及到期、断线重连、跨局余秒、乱序重试、扣币失败回滚和最高34级；`test_archive_live_effects.lua`覆盖每级生命/回血及通关冻结；`tools/test_archive_ui.js`覆盖余额、激活点击和等级时长展示。
+
 验证：test_archive_service.lua（21次循环、扣重、失败回滚、补签、月卡过期、UTC+8零点）；test_archive_live_effects.lua（到期撤销BOSS层且不改冻结的其他属性）；test_wave_early_final.lua archive（波次事件归属与重复死亡）；node tools/test_daily_ui.js（宝箱状态、签到补签意图、购买禁用与午夜刷新）。游戏界面已强制编译，尚需实机交互和支付联调。

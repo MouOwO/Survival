@@ -98,8 +98,13 @@
         }
         if (Number(item.completed) === 1) art.AddClass("ArchiveCompleted");
         if (isDrawPage() && !(Number(item.count) > 0)) art.AddClass("ArchiveCompleted");
+        if (current === "fishing" && !(Number(item.count) > 0)) art.AddClass("ArchiveCompleted");
         var count = Math.max(0, Number(item.count) || 0), target = Number(item.target) || 1;
-        label(art, (current === "clear" || current === "endless" || current === "boss" ? Math.min(count, target) : count) + "/" + target, "ArchiveCount");
+        if (current === "fishing" && Number(item.count_known) !== 1) {
+            label(art, "待同步", "ArchiveCount");
+            return;
+        }
+        label(art, (current === "clear" || current === "endless" || current === "boss" || current === "map_level" ? Math.min(count, target) : count) + "/" + target + (current === "map_level" ? "分" : ""), "ArchiveCount");
     }
     function render(data) {
         if (data.category_id !== current) return;
@@ -132,6 +137,23 @@
             label(card, item.name, "ArchiveItemName");
             card.SetPanelEvent("onmouseover", function () { tooltip(item); });
             card.SetPanelEvent("onmouseout", hideTooltip);
+            if (current === "work") {
+                card.AddClass("ArchiveWorkCard");
+                var canUpgrade = Number(item.can_upgrade) === 1 && Number(data.pending) !== 1;
+                card.SetHasClass("ArchiveWorkAvailable", canUpgrade);
+                label(card, Number(item.completed) === 1 ? "已激活" : item.cost + "软妹币", "ArchiveWorkCost");
+                card.SetPanelEvent("onactivate", function () {
+                    if (!canUpgrade) return;
+                    canUpgrade = false;
+                    card.RemoveClass("ArchiveWorkAvailable");
+                    panel("ArchiveStatus").text = "正在激活福利…";
+                    hideTooltip();
+                    GameEvents.SendCustomGameEventToServer("survival_archive_work_upgrade", {
+                        item_id: item.id, expected_level: Number(item.level) || 0
+                    });
+                    $.Schedule(0.5, request);
+                });
+            }
             if (current === "fragment") {
                 card.AddClass("ArchiveFragmentCard");
                 label(card, "Lv" + (Number(item.level) || 0), "ArchiveFragmentLevel");
@@ -179,6 +201,24 @@
             panel("ArchiveSummary").text = "波次BOSS击杀 " + (rows.length ? rows[0].count : 0) + " 次 · 已激活 " + done + " / " + rows.length;
             panel("ArchiveHint").text = "只记录主线波次BOSS · 月卡有效时门槛减半，到期恢复原门槛";
             panel("ArchiveStatus").text = "按当前门槛激活效果 · 击杀记录永久保留";
+        }
+        if (current === "fishing") {
+            var fishing = data.fishing || {};
+            panel("ArchiveSummary").text = Number(fishing.ready) === 1 ? "已拥有 " + fishing.owned + " / " + fishing.types + " 种 · 共 " + fishing.total + " 件" : "库存待同步";
+            panel("ArchiveHint").text = "在线奖励获得 · 已拥有点亮，未拥有置灰 · 悬停查看单件效果";
+            panel("ArchiveStatus").text = Number(fishing.ready) === 1 ? "展示服务器钓鱼记录 · 数量随档案同步" : "服务器尚未返回钓鱼库存数量";
+        }
+        if ((current === "map_level" || current === "work") && data.online) {
+            var online = data.online;
+            if (current === "map_level") {
+                var minutes = Math.floor(Number(online.map_seconds) / 60);
+                panel("ArchiveSummary").text = "等级 " + online.level + " / " + online.max_level;
+                panel("ArchiveHint").text = "累计有效在线 " + Math.floor(minutes / 60) + "小时" + (minutes % 60) + "分钟 · " + (Number(data.has_pass) === 1 ? "通行证双倍计时" : "正常计时");
+            } else {
+                panel("ArchiveSummary").text = "软妹币：" + online.coins + " · 已激活 " + done + " / " + rows.length;
+                panel("ArchiveHint").text = "实际在线每分钟获得1软妹币 · 点击小格消耗软妹币激活 · 同名项目独立叠加";
+            }
+            panel("ArchiveStatus").text = Number(data.pending) === 1 ? "正在保存进度…" : "进度每分钟保存 · 奖励永久保留；通关后新增属性于下局生效";
         }
     }
     GameEvents.Subscribe("survival_archive_snapshot", function (data) {
