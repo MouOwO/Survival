@@ -2,7 +2,7 @@ local M = {
     ability_build_wall = {
         abilityid = "ability_build_wall",
         abilityname = "建造城墙",
-        abilitydesc = "在指定位置建造城墙。城墙整局只能建造一次，且可以被选中并继续升级。",
+        abilitydesc = "在指定位置建造城墙，可选中并升级。通常整局只能建造一次；开启无尽后，城墙被摧毁会结束无尽但不判负，可免费重建并继续其他挑战。",
         abilityicon = "tusk_ice_shards",
     },
     ability_build_main_city = {
@@ -188,4 +188,13 @@ ability_summon_blademaster = {
 },
 }
 
+for _, row in ipairs(require("config/generated/archive_challenge_definitions").rows) do
+    local name = "ability_archive_" .. row.challenge_id
+    M[name] = { abilityid = name, abilityname = row.display_name,
+        abilitydesc = "当前关卡≥N" .. row.min_difficulty .. "。" .. row.description,
+        abilityicon = row.ability_icon }
+end
+M.ability_archive_finish = { abilityid = "ability_archive_finish", abilityname = "结束存档挑战",
+    abilitydesc = "结束自己的挑战；所有玩家结束后胜利结算。未击败的BOSS不会获得奖励。",
+    abilityicon = "chen_hand_of_god" }
 return M

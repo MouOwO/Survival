@@ -3,9 +3,12 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local armor_balance = require("config/armor_balance")
 local map_level_effect_rules = require("config/generated/map_level_effect_rules")
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 local totals_by_player = {}
+local live_draw_ids = {}
+local boss_effects_by_player = {}
 local hero_ticks_by_player = {}
 local tower_ticks_by_player = {}
 local hero_tick_attributes_by_player = {}
@@ -61,11 +64,26 @@ end
 local function refresh(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
+    local live_draw = payload and payload.reason == "archive_social_draw"
+    local boss_refresh = payload and (payload.reason == "archive_boss_refresh" or payload.reason == "archive_boss_kill")
+    local frozen = phase_guard.post_clear_frozen() and totals_by_player[player_id] ~= nil
+    if frozen and not live_draw and not boss_refresh then return end
     local profile_service = require("systems/player_profile_service")
     local profile = profile_service.get_profile(player_id)
     local save = profile and profile.save or {}
     local isolated_field = test_isolated_field_by_player[player_id]
-    if isolated_field then
+    if frozen and live_draw then
+        -- Apply only this committed draw, preserving all other post-clear
+        -- frozen stats. Failed writes and duplicate commands emit no refresh.
+        local draw = save.archive and save.archive.social_last_draw or {}
+        if not draw.id or live_draw_ids[player_id] == draw.id then return end
+        live_draw_ids[player_id] = draw.id
+        for field, delta in pairs(draw.effects or {}) do
+            totals_by_player[player_id][field] = (tonumber(totals_by_player[player_id][field]) or 0) + delta
+        end
+    elseif frozen and boss_refresh then
+        -- Only the entitlement-dependent BOSS layer changes after clear.
+    elseif isolated_field then
         totals_by_player[player_id] = {
             [isolated_field] = tonumber(
                 save.gameplay_stats and save.gameplay_stats[isolated_field]
@@ -76,6 +94,14 @@ local function refresh(payload)
             copy(save.permanent_effects), save.gameplay_stats
         ))
     end
+    local _, boss_effects=require("systems/archive_boss_rewards").project(profile)
+    if frozen then
+        for field,value in pairs(boss_effects_by_player[player_id] or {}) do
+            totals_by_player[player_id][field]=(totals_by_player[player_id][field] or 0)-value
+        end
+    end
+    for field,value in pairs(boss_effects) do totals_by_player[player_id][field]=(totals_by_player[player_id][field] or 0)+value end
+    boss_effects_by_player[player_id]=boss_effects
     hero_ticks_by_player[player_id] = hero_ticks_by_player[player_id] or 0
     tower_ticks_by_player[player_id] = tower_ticks_by_player[player_id] or 0
     hero_tick_attributes_by_player[player_id] =
@@ -108,6 +134,7 @@ local function refresh(payload)
         player_id = player_id,
         totals = copy(totals_by_player[player_id]),
         revision = profile and profile.revision or 0,
+        reason = payload and payload.reason or "profile_changed",
     })
     for other_player_id in pairs(totals_by_player) do
         if other_player_id ~= player_id then
@@ -135,6 +162,7 @@ local function player_unit(player_id)
 end
 
 local function apply_hero_tick(player_id)
+    if phase_guard.post_clear_frozen() then return end
     local attribute_amount = M.value(player_id, "hero_attributes_per_second")
     local attack_amount = M.value(player_id, "hero_attack_per_second")
     if attribute_amount <= 0 and attack_amount <= 0 then return end
@@ -157,6 +185,7 @@ local function apply_hero_tick(player_id)
 end
 
 local function apply_tower_tick(player_id)
+    if phase_guard.post_clear_frozen() then return end
     local amount = M.value(player_id, "tower_attack_per_second")
     if amount <= 0 then return end
     tower_ticks_by_player[player_id] = (tower_ticks_by_player[player_id] or 0) + 1
@@ -191,6 +220,7 @@ local function heal_unit(unit, percent)
 end
 
 local function apply_health_regen_tick(player_id)
+    if phase_guard.post_clear_frozen() then return end
     local hero_amount = math.max(0,
         M.value(player_id, "health_regen_per_second")
             + M.value(player_id, "hero_health_regen_per_second"))
@@ -222,6 +252,7 @@ local function on_damage(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil or not payload.owner_hero
         or payload.attacker ~= payload.owner_hero then return end
+    if phase_guard.post_clear_frozen() then return end
     local attack_growth = M.value(player_id, "hero_damage_attack_growth")
     local attribute_growth = M.value(player_id, "hero_attributes_per_damage")
     if attack_growth > 0 then
@@ -317,6 +348,7 @@ refresh_existing_enemy_armor = function()
 end
 
 local function apply_wall_tick(player_id)
+    if phase_guard.post_clear_frozen() then return end
     local health = M.value(player_id, "wall_health_per_second")
     local armor = M.value(player_id, "wall_armor_per_second")
     if health <= 0 and armor <= 0 then return end
@@ -335,6 +367,7 @@ end
 local function on_hero_attack(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil or payload.is_multishot_secondary == true then return end
+    if phase_guard.post_clear_frozen() then return end
     local attack_growth = M.value(player_id, "hero_basic_attack_growth")
     local attribute_growth = M.value(player_id, "hero_attribute_growth")
     attribute_growth = attribute_growth * (1
@@ -369,6 +402,7 @@ local function on_tower_attack(payload)
     local tower = payload and payload.tower
     local player_id = tower and tonumber(tower.survival_player_id)
     if player_id == nil then return end
+    if phase_guard.post_clear_frozen() then return end
     local damage_growth = M.value(player_id, "tower_damage_attack_growth")
     local attack_growth = M.value(player_id, "tower_basic_attack_growth")
     if damage_growth > 0 then
@@ -479,6 +513,8 @@ end
 
 function M.init()
     totals_by_player = {}
+    live_draw_ids = {}
+    boss_effects_by_player = {}
     hero_ticks_by_player = {}
     tower_ticks_by_player = {}
     hero_tick_attributes_by_player = {}

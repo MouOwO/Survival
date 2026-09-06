@@ -4,6 +4,7 @@ local combat_events = require("combat/combat_events")
 local scheduler = require("core/scheduler")
 local config = require("config/generated/monkey_king_exclusive_runtime")
 local hero_cosmetic_service = require("systems/hero_cosmetic_service")
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 M.sound_service = require("core/sound_service")
@@ -521,6 +522,7 @@ local function schedule_clone_respawn(player_id)
 end
 
 local function growth_tick(player_id)
+    if phase_guard.post_clear_frozen() then return end
     if not skill_active(player_id, W_SKILL) then return end
     local stats = combat_snapshot(player_id)
     local current = state(player_id)

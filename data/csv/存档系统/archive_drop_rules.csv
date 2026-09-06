@@ -1,0 +1,7 @@
+rule_id,quality,weight,base_count,pass_bonus_count,pass_entitlement_id,enabled,notes
+#中文表头:规则ID,品质,品质权重,基础掉落数,通行证额外数,通行证权益ID,启用,备注
+#types:string,string,number,number,number,string,boolean,string
+white,white,33,2,1,archive_pass,1,27.5%；剩余30%均分补到四品质；品质内等概率。
+blue,blue,29,2,1,archive_pass,1,24.1666667%；品质内等概率。
+purple,purple,29,2,1,archive_pass,1,24.1666667%；品质内等概率。
+green,green,29,2,1,archive_pass,1,24.1666667%；品质内等概率。

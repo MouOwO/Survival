@@ -1,0 +1,7 @@
+challenge_id,source_boss_difficulty,drop_count,pass_extra_count,allow_duplicates,enabled,notes
+#中文表头:挑战ID,工作簿物品池难度,固定掉落数量,通行证额外数量,允许重复,启用,说明
+#types:string,string,number,number,boolean,boolean,string
+shadow_1,n1,2,0,1,1,从工作簿虚空之影N1对应物品池独立随机2次，允许重复，最终固定2件。
+shadow_2,n2,2,0,1,1,从工作簿虚空之影N2对应物品池独立随机2次，允许重复，最终固定2件。
+shadow_3,n3,2,0,1,1,从工作簿虚空之影N3对应物品池独立随机2次，允许重复，最终固定2件。
+shadow_4,n4,2,1,1,1,沿用既有虚空之影4规则；基础2件，通行证额外1件。

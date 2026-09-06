@@ -1,0 +1,4 @@
+rule_id,building_unlock_difficulty,building_spacing,building_offset_y,building_model,building_model_scale,base_fragment_daily_limit,pass_fragment_daily_limit,cage_daily_limit,pass_cage_daily_limit,cage_drop_count,pass_cage_extra_count,day_timezone_offset,final_boss_shadow_drops_enabled
+#中文表头:规则ID,建筑解锁难度,建筑并排间距,距出生口Y偏移,建筑模型,建筑缩放,碎片日上限,通行证碎片日上限,牢笼材料日总上限,通行证牢笼日上限,牢笼掉落件数,通行证额外牢笼件数,日重置时区秒差,保留普通最终BOSS虚空掉落
+#types:string,number,number,number,string,number,number,number,number,number,number,number,number,boolean
+default,3,240,360,models/props_structures/radiant_ancient001.vmdl,0.3,20,40,30,90,1,1,28800,0

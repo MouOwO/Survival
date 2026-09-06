@@ -1,0 +1,14 @@
+item_id,display_name,description,effect_ids,effect_values,max_owned,quality,enabled
+#types:string,string,string,list,list,number,string,boolean
+"daily_growth_gem","成长宝石","英雄每秒攻击+1","hero_attack_per_second","1","999999","R","1"
+"daily_regen_shard","回血碎片","墙每秒回血+2","wall_health_regen_per_second","2","999999","R","1"
+"daily_attribute_gem","攻击宝石","英雄每秒三围+1","hero_attributes_per_second","1","999999","R","1"
+"daily_attack_shard","攻击碎片","塔攻击+5","tower_attack_flat","5","999999","R","1"
+"daily_health_gem","生命宝石","墙生命+50","wall_initial_health","50","999999","R","1"
+"daily_wood_gem","木材宝石","开局木材+3","initial_wood","3","999999","R","1"
+"daily_block_shard","格挡碎片","墙格挡+3","wall_damage_block","3","999999","R","1"
+"daily_attribute_shard","属性碎片","英雄全属性+10","hero_initial_attributes","10","999999","R","1"
+"daily_gold_gem","金币宝石","开局金币+1","initial_gold","1","999999","R","1"
+"daily_wealth_talisman","聚财古符","开局木材+50；开局金币+50；伐木工攻速+3%；伐木效率+1；金矿收益+5%；人口+1","initial_wood|initial_gold|lumberjack_attack_speed_bonus_pct|lumberjack_attack_efficiency|gold_mine_efficiency_pct|initial_population_cap","50|50|3|1|5|1","1","SSR","1"
+"daily_ancient_tree","古树眷顾","开局木材+300；开局金币+300；伐木效率+3；金矿收益+5%；英雄全属性加成+9%；星悦积分+128","initial_wood|initial_gold|lumberjack_attack_efficiency|gold_mine_efficiency_pct|hero_attribute_bonus_pct|starjoy_points","300|300|3|5|9|128","1","SSR","1"
+"daily_forest_origin","森罗本源","开局木材+200；开局金币+200；伐木效率+1；金矿收益+5%；人口+1；英雄全属性加成+8%；星悦积分+88","initial_wood|initial_gold|lumberjack_attack_efficiency|gold_mine_efficiency_pct|initial_population_cap|hero_attribute_bonus_pct|starjoy_points","200|200|1|5|1|8|88","1","SSR","1"

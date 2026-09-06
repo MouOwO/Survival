@@ -62,6 +62,13 @@ local function filter(_, keys)
     -- engine assemble their complete effects. Their damage must never enter
     -- the addon transaction pipeline or affect any gameplay unit.
     if attacker.survival_visual_only == true then return false end
+    if attacker.survival_endless_attack_scale then
+        local inflictor = tonumber(keys.entindex_inflictor_const or keys.entindex_inflictor)
+        local category = keys.damage_category_const or keys.damage_category
+        keys.damage = require("combat/endless_stat_projection").outgoing(attacker, keys.damage,
+            (not inflictor or inflictor <= 0) and (category == nil or tonumber(category) == 0
+                or tree_damage_rules.is_basic_attack_category(category)))
+    end
     local diagnostic = should_diagnose(attacker)
     if diagnostic then
         print(string.format(
@@ -319,6 +326,12 @@ local function filter(_, keys)
     end
     event_bus.emit(events.DAMAGE_FILTERED, payload)
     event_bus.emit(events.DAMAGE_RESOLVED, payload)
+    if victim.survival_endless_health_scale or attacker.survival_endless_attack_scale then
+        keys.damage = require("combat/endless_stat_projection").incoming(victim, keys.damage)
+        -- A hit beyond native health capacity is already lethal; never send
+        -- infinity or oversized floats into the engine damage event.
+        keys.damage = math.min(keys.damage, 1e30)
+    end
     return true
 end
 

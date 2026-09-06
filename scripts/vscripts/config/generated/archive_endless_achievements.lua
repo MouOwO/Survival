@@ -1,0 +1,61 @@
+-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.
+-- Source: archive_endless_achievements.csv
+local M = {}
+M.rows = {
+    { achievement_id = "endless_1", display_name = "无尽存档1", required_score = 1000, description = "伐木效率+1", effect_ids = {"lumberjack_efficiency"}, effect_values = {"1"}, enabled = true },
+    { achievement_id = "endless_2", display_name = "无尽存档2", required_score = 3000, description = "英雄攻击加成+3%", effect_ids = {"hero_attack_bonus_pct"}, effect_values = {"3"}, enabled = true },
+    { achievement_id = "endless_3", display_name = "无尽存档3", required_score = 5000, description = "箭塔每秒攻击+2", effect_ids = {"tower_attack_per_second"}, effect_values = {"2"}, enabled = true },
+    { achievement_id = "endless_4", display_name = "无尽存档4", required_score = 8000, description = "墙减伤+2%", effect_ids = {"wall_damage_reduction_pct"}, effect_values = {"2"}, enabled = true },
+    { achievement_id = "endless_5", display_name = "无尽存档5", required_score = 12000, description = "箭塔攻速+2%", effect_ids = {"tower_attack_speed_bonus_pct"}, effect_values = {"2"}, enabled = true },
+    { achievement_id = "endless_6", display_name = "无尽存档6", required_score = 16000, description = "英雄攻击成长+1", effect_ids = {"hero_basic_attack_growth"}, effect_values = {"1"}, enabled = true },
+    { achievement_id = "endless_7", display_name = "无尽存档7", required_score = 20000, description = "墙生命加成+10%", effect_ids = {"wall_health_bonus_pct"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_8", display_name = "无尽存档8", required_score = 25000, description = "箭塔攻击加成+10%", effect_ids = {"tower_attack_bonus_pct"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_9", display_name = "无尽存档9", required_score = 30000, description = "伐木效率+2", effect_ids = {"lumberjack_efficiency"}, effect_values = {"2"}, enabled = true },
+    { achievement_id = "endless_10", display_name = "无尽存档10", required_score = 40000, description = "英雄攻击属性成长+2", effect_ids = {"hero_attribute_growth"}, effect_values = {"2"}, enabled = true },
+    { achievement_id = "endless_11", display_name = "无尽存档11", required_score = 60000, description = "英雄全属性加成+5%", effect_ids = {"hero_attribute_bonus_pct"}, effect_values = {"5"}, enabled = true },
+    { achievement_id = "endless_12", display_name = "无尽存档12", required_score = 80000, description = "每秒木材+5", effect_ids = {"wood_per_second"}, effect_values = {"5"}, enabled = true },
+    { achievement_id = "endless_13", display_name = "无尽存档13", required_score = 100000, description = "金矿效率+10%", effect_ids = {"gold_mine_yield_bonus_pct"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_14", display_name = "无尽存档14", required_score = 120000, description = "英雄攻击减甲+5", effect_ids = {"hero_attack_armor_reduction"}, effect_values = {"5"}, enabled = true },
+    { achievement_id = "endless_15", display_name = "无尽存档15", required_score = 150000, description = "英雄初始属性+3000", effect_ids = {"hero_initial_attributes"}, effect_values = {"3000"}, enabled = true },
+    { achievement_id = "endless_16", display_name = "无尽存档16", required_score = 180000, description = "墙减伤+3%", effect_ids = {"wall_damage_reduction_pct"}, effect_values = {"3"}, enabled = true },
+    { achievement_id = "endless_17", display_name = "无尽存档17", required_score = 210000, description = "墙每秒护甲+0.1", effect_ids = {"wall_armor_per_second"}, effect_values = {"0.1"}, enabled = true },
+    { achievement_id = "endless_18", display_name = "无尽存档18", required_score = 240000, description = "墙每秒生命+10", effect_ids = {"wall_health_per_second"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_19", display_name = "无尽存档19", required_score = 270000, description = "箭塔攻速+8%", effect_ids = {"tower_attack_speed_bonus_pct"}, effect_values = {"8"}, enabled = true },
+    { achievement_id = "endless_20", display_name = "无尽存档20", required_score = 300000, description = "箭塔暴击几率+3%", effect_ids = {"tower_critical_chance_pct"}, effect_values = {"3"}, enabled = true },
+    { achievement_id = "endless_21", display_name = "无尽存档21", required_score = 350000, description = "箭塔暴击伤害+10%", effect_ids = {"tower_critical_damage_bonus_pct"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_22", display_name = "无尽存档22", required_score = 400000, description = "箭塔每秒攻击+2", effect_ids = {"tower_attack_per_second"}, effect_values = {"2"}, enabled = true },
+    { achievement_id = "endless_23", display_name = "无尽存档23", required_score = 450000, description = "伐木工攻速+10%", effect_ids = {"lumberjack_attack_speed_bonus_pct"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_24", display_name = "无尽存档24", required_score = 500000, description = "英雄攻击间隔-0.05", effect_ids = {"hero_attack_interval_reduction"}, effect_values = {"0.05"}, enabled = true },
+    { achievement_id = "endless_25", display_name = "无尽存档25", required_score = 550000, description = "墙护甲+10", effect_ids = {"wall_armor"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_26", display_name = "无尽存档26", required_score = 600000, description = "墙护甲加成+10%", effect_ids = {"wall_armor_bonus_pct"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_27", display_name = "无尽存档27", required_score = 650000, description = "伐木效率+5", effect_ids = {"lumberjack_efficiency"}, effect_values = {"5"}, enabled = true },
+    { achievement_id = "endless_28", display_name = "无尽存档28", required_score = 700000, description = "伐木工攻速+15%", effect_ids = {"lumberjack_attack_speed_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_29", display_name = "无尽存档29", required_score = 750000, description = "英雄攻击属性成长+5", effect_ids = {"hero_attribute_growth"}, effect_values = {"5"}, enabled = true },
+    { achievement_id = "endless_30", display_name = "无尽存档30", required_score = 800000, description = "英雄最终伤害+15%", effect_ids = {"hero_final_damage_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_31", display_name = "无尽存档31", required_score = 900000, description = "箭塔最终伤害+15%", effect_ids = {"tower_final_damage_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_32", display_name = "无尽存档32", required_score = 1000000, description = "墙生命加成+15%", effect_ids = {"wall_health_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_33", display_name = "无尽存档33", required_score = 1200000, description = "人口+10", effect_ids = {"initial_population_cap"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_34", display_name = "无尽存档34", required_score = 1400000, description = "伐木效率+10", effect_ids = {"lumberjack_efficiency"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_35", display_name = "无尽存档35", required_score = 1600000, description = "英雄攻击属性成长+6", effect_ids = {"hero_attribute_growth"}, effect_values = {"6"}, enabled = true },
+    { achievement_id = "endless_36", display_name = "无尽存档36", required_score = 1800000, description = "英雄最终伤害+15%", effect_ids = {"hero_final_damage_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_37", display_name = "无尽存档37", required_score = 2000000, description = "英雄全属性加成+10%", effect_ids = {"hero_attribute_bonus_pct"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_38", display_name = "无尽存档38", required_score = 2300000, description = "墙生命加成+15%", effect_ids = {"wall_health_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_39", display_name = "无尽存档39", required_score = 2600000, description = "墙护甲加成+15%", effect_ids = {"wall_armor_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_40", display_name = "无尽存档40", required_score = 3000000, description = "英雄最终伤害+15%", effect_ids = {"hero_final_damage_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_41", display_name = "无尽存档41", required_score = 3200000, description = "箭塔最终伤害+30%", effect_ids = {"tower_final_damage_bonus_pct"}, effect_values = {"30"}, enabled = true },
+    { achievement_id = "endless_42", display_name = "无尽存档42", required_score = 3400000, description = "英雄攻击减甲+15", effect_ids = {"hero_attack_armor_reduction"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_43", display_name = "无尽存档43", required_score = 3600000, description = "英雄攻击属性成长+10", effect_ids = {"hero_attribute_growth"}, effect_values = {"10"}, enabled = true },
+    { achievement_id = "endless_44", display_name = "无尽存档44", required_score = 3800000, description = "英雄全属性加成+20%", effect_ids = {"hero_attribute_bonus_pct"}, effect_values = {"20"}, enabled = true },
+    { achievement_id = "endless_45", display_name = "无尽存档45", required_score = 4000000, description = "墙生命加成+30%", effect_ids = {"wall_health_bonus_pct"}, effect_values = {"30"}, enabled = true },
+    { achievement_id = "endless_46", display_name = "无尽存档46", required_score = 4300000, description = "墙护甲加成+30%", effect_ids = {"wall_armor_bonus_pct"}, effect_values = {"30"}, enabled = true },
+    { achievement_id = "endless_47", display_name = "无尽存档47", required_score = 4600000, description = "英雄最终伤害+15%", effect_ids = {"hero_final_damage_bonus_pct"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_48", display_name = "无尽存档48", required_score = 5000000, description = "箭塔最终伤害+30%", effect_ids = {"tower_final_damage_bonus_pct"}, effect_values = {"30"}, enabled = true },
+    { achievement_id = "endless_49", display_name = "无尽存档49", required_score = 5500000, description = "英雄攻击减甲+15", effect_ids = {"hero_attack_armor_reduction"}, effect_values = {"15"}, enabled = true },
+    { achievement_id = "endless_50", display_name = "无尽存档50", required_score = 6000000, description = "英雄攻击属性成长+10", effect_ids = {"hero_attribute_growth"}, effect_values = {"10"}, enabled = true },
+}
+M.by_id = {}
+for _, row in ipairs(M.rows) do
+    local key = row["achievement_id"]
+    if key ~= nil then M.by_id[key] = row end
+end
+return M

@@ -23,13 +23,23 @@ local function map_level_effects(item)
     return result
 end
 
-local function map_level_effect_marker(item_id)
-    return inventory_aliases.canonical(item_id) .. MAP_LEVEL_EFFECT_MARKER_SUFFIX
+local function item_effect_marker(item_id, copy_index)
+    local marker = inventory_aliases.canonical(item_id)
+    copy_index = math.max(1, math.floor(tonumber(copy_index) or 1))
+    if copy_index > 1 then
+        marker = marker .. ":copy:" .. tostring(copy_index)
+    end
+    return marker
 end
 
-local function additional_effect_markers(item)
+local function map_level_effect_marker(item_id, copy_index)
+    return item_effect_marker(item_id, copy_index)
+        .. MAP_LEVEL_EFFECT_MARKER_SUFFIX
+end
+
+local function additional_effect_markers(item, copy_index)
     if #map_level_effects(item) == 0 then return nil end
-    return { map_level_effect_marker(item.id) }
+    return { map_level_effect_marker(item.id, copy_index) }
 end
 
 local function seed_random()
@@ -128,36 +138,43 @@ local function sync_owned_item_effects(player_id)
     for content_id, count in pairs(inventory.counts or {}) do
         local canonical_id = inventory_aliases.canonical(content_id)
         local item = config.by_id[canonical_id]
-        if item and (tonumber(count) or 0) > 0 then
-            local result = event_bus.request(events.CONTENT_INVENTORY_GRANT_REQUEST, {
-                player_id = player_id,
-                content_id = canonical_id,
-                count = 0,
-                apply_effects_only = true,
-                effect_marker_id = canonical_id,
-                additional_effect_marker_ids = additional_effect_markers(item),
-                gameplay_stat_effects = item.effects,
-                reason = "lottery_owned_effect_migration",
-            })
-            if not result or result.ok ~= true then
-                return false, result and result.error
-                    or "lottery_owned_effect_migration_failed"
-            end
-            local level_effects = map_level_effects(item)
-            if #level_effects > 0 then
-                local level_result = event_bus.request(
-                    events.CONTENT_INVENTORY_GRANT_REQUEST, {
+        local owned_count = math.min(
+            math.max(0, math.floor(tonumber(count) or 0)),
+            item and math.max(1, math.floor(tonumber(item.max_owned) or 1)) or 0)
+        if item and owned_count > 0 then
+            for copy_index = 1, owned_count do
+                local result = event_bus.request(events.CONTENT_INVENTORY_GRANT_REQUEST, {
+                    player_id = player_id,
+                    content_id = canonical_id,
+                    count = 0,
+                    apply_effects_only = true,
+                    effect_marker_id = item_effect_marker(canonical_id, copy_index),
+                    additional_effect_marker_ids = additional_effect_markers(
+                        item, copy_index),
+                    gameplay_stat_effects = item.effects,
+                    reason = "lottery_owned_effect_migration",
+                })
+                if not result or result.ok ~= true then
+                    return false, result and result.error
+                        or "lottery_owned_effect_migration_failed"
+                end
+                local level_effects = map_level_effects(item)
+                if #level_effects > 0 then
+                    local level_result = event_bus.request(
+                        events.CONTENT_INVENTORY_GRANT_REQUEST, {
                         player_id = player_id,
                         content_id = canonical_id,
                         count = 0,
                         apply_effects_only = true,
-                        effect_marker_id = map_level_effect_marker(canonical_id),
+                        effect_marker_id = map_level_effect_marker(
+                            canonical_id, copy_index),
                         gameplay_stat_effects = level_effects,
                         reason = "lottery_map_level_effect_migration",
                     })
-                if not level_result or level_result.ok ~= true then
-                    return false, level_result and level_result.error
-                        or "lottery_map_level_effect_migration_failed"
+                    if not level_result or level_result.ok ~= true then
+                        return false, level_result and level_result.error
+                            or "lottery_map_level_effect_migration_failed"
+                    end
                 end
             end
         end
@@ -263,28 +280,6 @@ local function random_quality(pool)
     return "n"
 end
 
-local function random_quality_at_least(pool, target_quality)
-    local minimum_rank = quality_rank(target_quality)
-    local total = 0
-    for _, quality in ipairs(config.quality_order) do
-        if quality_rank(quality) >= minimum_rank then
-            total = total + math.max(0,
-                tonumber(pool.quality_weights[quality]) or 0)
-        end
-    end
-    if total <= 0 then return target_quality end
-    local roll = math.random(1, total)
-    local cursor = 0
-    for _, quality in ipairs(config.quality_order) do
-        if quality_rank(quality) >= minimum_rank then
-            cursor = cursor + math.max(0,
-                tonumber(pool.quality_weights[quality]) or 0)
-            if roll <= cursor then return quality end
-        end
-    end
-    return target_quality
-end
-
 local function random_item_for_quality(pool, quality)
     local rows = pool.by_quality[quality] or {}
     local total = 0
@@ -321,21 +316,21 @@ local function batch_guarantee(pool, draw_count)
     return selected
 end
 
-local function item_owned(counts, item)
-    if (tonumber(counts[item.id]) or 0) > 0 then return true end
-    for _, content_id in ipairs(item.ownership_ids or {}) do
-        local canonical = inventory_aliases.canonical(content_id)
-        if (tonumber(counts[canonical]) or 0) > 0 then return true end
-    end
-    return false
-end
-
 local function item_owned_count(counts, item)
     local total = tonumber(counts[item.id]) or 0
     for _, content_id in ipairs(item.ownership_ids or {}) do
         total = total + (tonumber(counts[inventory_aliases.canonical(content_id)]) or 0)
     end
     return total
+end
+
+local function item_owned(counts, item)
+    return item_owned_count(counts, item) > 0
+end
+
+local function item_at_limit(counts, item)
+    return item_owned_count(counts, item)
+        >= math.max(1, math.floor(tonumber(item.max_owned) or 1))
 end
 
 local function convert_duplicate(player_id, item)
@@ -351,13 +346,17 @@ local function convert_duplicate(player_id, item)
 end
 
 local function grant_item(player_id, item, counts)
-    if item_owned(counts, item) then return convert_duplicate(player_id, item) end
+    if item_at_limit(counts, item) then
+        return convert_duplicate(player_id, item)
+    end
+    local copy_index = item_owned_count(counts, item) + 1
     local result = event_bus.request(events.CONTENT_INVENTORY_GRANT_REQUEST, {
         player_id = player_id,
         content_id = inventory_aliases.canonical(item.id),
         count = 1,
-        effect_marker_id = inventory_aliases.canonical(item.id),
-        additional_effect_marker_ids = additional_effect_markers(item),
+        effect_marker_id = item_effect_marker(item.id, copy_index),
+        additional_effect_marker_ids = additional_effect_markers(
+            item, copy_index),
         gameplay_stat_effects = item.effects,
         reason = "lottery_grant",
     })
@@ -418,8 +417,10 @@ local function snapshot(player_id, reason, requested_pool_id)
             duplicate_points = item.duplicate_points,
             exchange_points = item.exchange_points,
             exchange_enabled = item.exchange_enabled,
+            max_owned = item.max_owned,
             owned = item_owned(inventory.counts or {}, item),
             owned_count = item_owned_count(inventory.counts or {}, item),
+            at_max_owned = item_at_limit(inventory.counts or {}, item),
         }
     end
     local pools = {}
@@ -500,8 +501,9 @@ local function draw(payload)
     for draw_index = 1, count do
         local forced_quality = nil
         if guarantee and draw_index == count and not guarantee_hit then
-            forced_quality = random_quality_at_least(
-                pool, guarantee.target_quality)
+            -- The guarantee supplies its configured quality exactly. Higher
+            -- qualities, especially map-pool UR, remain natural rolls only.
+            forced_quality = guarantee.target_quality
         end
         local item = draw_one(pool, current, forced_quality)
         local grant = item and grant_item(player_id, item, counts)
@@ -580,7 +582,7 @@ local function exchange(payload)
     if busy_by_player[player_id] then return { ok = false, error = "lottery_player_busy" } end
     hydrate(player_id)
     local inventory = inventory_snapshot(player_id)
-    if item_owned(inventory.counts or {}, item) then
+    if item_at_limit(inventory.counts or {}, item) then
         local owned = { ok = false, error = "lottery_item_owned" }
         exchange_cache[player_id][request_id] = owned
         return owned
@@ -596,6 +598,7 @@ local function exchange(payload)
         exchange_cache[player_id][request_id] = result
         return result
     end
+    local copy_index = item_owned_count(inventory.counts or {}, item) + 1
     busy_by_player[player_id] = true
     local stats_order = require("systems/player_gameplay_stats_order_service")
     local debit = stats_order.order(player_id, config.starjoy_stat_id, -cost)
@@ -606,8 +609,9 @@ local function exchange(payload)
     local grant = event_bus.request(events.CONTENT_INVENTORY_GRANT_REQUEST, {
         player_id = player_id, content_id = inventory_aliases.canonical(item.id),
         count = 1,
-        effect_marker_id = inventory_aliases.canonical(item.id),
-        additional_effect_marker_ids = additional_effect_markers(item),
+        effect_marker_id = item_effect_marker(item.id, copy_index),
+        additional_effect_marker_ids = additional_effect_markers(
+            item, copy_index),
         gameplay_stat_effects = item.effects,
         reason = "lottery_points_exchange:" .. pool.id,
     })
@@ -668,8 +672,8 @@ function M.init()
         end
     end)
     print("[LOTTERY_INIT] pools=map,cultivation,dragon_knight,summer "
-        .. "map_ur=1% special_ur=10%(provisional) "
-        .. "map_ten_pull=SR special_ten_pull=UR singles=no_batch_guarantee")
+        .. "map_ur=0.1%(natural_only) special_ur=10%(provisional) "
+        .. "map_ten_pull=exact_SR special_ten_pull=UR singles=no_batch_guarantee")
 end
 
 M._test = {

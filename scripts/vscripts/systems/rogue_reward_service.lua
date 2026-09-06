@@ -28,6 +28,7 @@ local function state_for(player_id)
             -- 预留给 Builder 创建完成后自动弹出奖励的旧流程。
             -- 当前改为通过专门入口手动打开，恢复自动弹出时可继续使用此幂等标记。
             builder_ready = false,
+            history = {},
             visible_reward_type = nil,
         }
     end
@@ -61,7 +62,7 @@ local function publish(player_id, reason, reward_type_id)
         or DEFAULT_REWARD_TYPE
     local pool_state = pool_for(state, reward_type_id)
     local offer = pool_state.offer
-    local payload = { active = offer and 1 or 0, reason = reason or "changed" }
+    local payload = { active = offer and 1 or 0, reason = reason or "changed", history = state.history }
     if offer then
         payload.token = offer.token
         payload.rerolls_remaining = offer.rerolls_remaining
@@ -358,6 +359,12 @@ local function select_card(payload)
         return result or { ok = false, error = "effect_failed" }
     end
     pool_state.claimed[card_id] = true
+    local selected = (cards.by_id or {})[card_id]
+    if selected then
+        table.insert(state.history, 1, {card_id=card_id, name=selected.display_name,
+            description=selected.description, reward_type=offer.reward_type})
+        while #state.history > 4 do table.remove(state.history) end
+    end
     pool_state.offer = nil
     if state.visible_reward_type == offer.reward_type then
         state.visible_reward_type = nil

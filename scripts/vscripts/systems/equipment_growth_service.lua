@@ -3,6 +3,7 @@ local events = require("core/events")
 local levels = require("config/equipment_level_definitions")
 local weapons = require("config/generated/weapon_definitions")
 local player_profile_service = require("systems/player_profile_service")
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 local progress, attack_seen = {}, {}
@@ -55,6 +56,7 @@ local function advance(p, kind, amount, why)
 end
 local function on_attack(x)
  local p,r=tonumber(x.player_id),tonumber(x.record); if not p or not r then return end
+ if phase_guard.post_clear_frozen() then return end
  attack_seen[p]=attack_seen[p] or {}; if attack_seen[p][r] then print("[WEAPON_ATTACK_DEDUP] record="..r); return end
  attack_seen[p][r]=true; trim(attack_seen[p],MAX_RECORDS)
  local id=equipped(p); local d=levels.by_id[id]
@@ -111,6 +113,7 @@ local function on_entity_killed(x)
  if victim.IsBuilding and victim:IsBuilding() then return end
  local player_id,owner=owner_player_id(attacker)
  if not player_id then return end
+ if phase_guard.post_clear_frozen() then return end
  if victim.GetTeamNumber
    and tonumber(victim:GetTeamNumber())==attributed_team(player_id,owner,attacker) then return end
  advance(player_id,"valid_enemy_kill_count",1,"legal_enemy_kill")

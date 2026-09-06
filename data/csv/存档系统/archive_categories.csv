@@ -1,0 +1,17 @@
+category_id,display_name,renderer,sort_order,enabled
+#中文表头:分页ID,名称,展示器,排序,启用
+#types:string,string,string,number,boolean
+"endless","无尽存档","achievements","60","1"
+"clear","通关存档","achievements","10","1"
+"shadow","虚空之影","inventory","20","1"
+"points","积分道具","inventory","30","1"
+"map_level","地图等级","placeholder","40","0"
+"work","上班福利","placeholder","50","0"
+"gift","福利礼包","placeholder","60","0"
+"fragment","神兵碎片","inventory","40","1"
+"pet","秘法牢笼","inventory","50","1"
+"boss","boss存档","achievements","90","1"
+"shop","商城道具","placeholder","100","0"
+"friend","我的好基友","collection","61","1"
+"ex","我的前女友","collection","62","1"
+"beast","瑞兽赐福","collection","63","1"

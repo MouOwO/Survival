@@ -44,6 +44,7 @@ M.rows = {
     { field_id = "lumberjack_attack_speed_bonus_pct", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 10000, enabled = true, notes = "伐木工攻速加成百分比；20表示20%。" },
     { field_id = "online_seconds_total", storage_type = "integer", default_value = 0, unit = "seconds", min_value = 0, enabled = true, notes = "玩家永久累计在线时长；只累计同一session租约内的有效相邻心跳秒数，不计算掉线间隔。" },
     { field_id = "hero_initial_attributes", storage_type = "decimal", default_value = 0, unit = "attributes", min_value = 0, enabled = true, notes = "英雄初始全属性；力量、敏捷、智力同步增加，英雄无升级时也作为基础属性使用。" },
+    { field_id = "hero_attributes_per_level", storage_type = "decimal", default_value = 0, unit = "attributes_per_level", min_value = 0, enabled = true, notes = "英雄每级额外全属性；按当前英雄等级乘算，等级1也计入一级。" },
     { field_id = "hero_attribute_bonus_pct", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 10000, enabled = true, notes = "英雄全属性百分比加成；15表示15%。" },
     { field_id = "hero_attributes_per_damage", storage_type = "decimal", default_value = 0, unit = "attributes_per_damage", min_value = 0, enabled = true, notes = "英雄每次造成伤害后的全属性增加量。" },
     { field_id = "hero_rebirth_attribute_bonus_pct", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 10000, enabled = true, notes = "英雄每次转生获得的全属性百分比加成。" },

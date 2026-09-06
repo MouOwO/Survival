@@ -45,10 +45,12 @@ function modifier_single_health_bar:publish_state()
         or not unit.GetTeamNumber then
         return
     end
+    local projection = require("combat/endless_stat_projection")
     publish(unit, {
         entindex = unit:entindex(),
-        health = math.max(0, unit:GetHealth()),
-        max_health = math.max(1, unit:GetMaxHealth()),
+        health = projection.for_ui(unit, math.max(0, unit:GetHealth()), "health"),
+        max_health = projection.for_ui(unit, math.max(1, unit:GetMaxHealth()), "health"),
+        health_scale = string.format("%.17g", tonumber(unit.survival_endless_health_scale) or 1),
         alive = unit:IsAlive() and 1 or 0,
         team = unit:GetTeamNumber(),
     })

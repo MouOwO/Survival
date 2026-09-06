@@ -50,19 +50,27 @@ local function default_fields(context)
     local technology = context.technology.final or {}
     local tower = technology.tower or {}
     local wall = technology.wall or {}
+    local permanent = context.permanent or {}
     local combat = context.combat
     local hero = context.hero
     local wall_health_pct = number(wall.health_bonus_pct)
         + number(wall.technology_health_bonus_pct)
+        + number(permanent.wall_health_bonus_pct)
 
     local fields = {
-        field("tower_attack_per_second", "防御塔每秒攻击加", "未启用", "building", 10),
+        field("tower_attack_per_second", "防御塔每秒攻击加",
+            number(permanent.tower_attack_per_second), "building", 10),
         field("tower_attack_flat", "防御塔攻击固定加成",
-            number(tower.attack_flat), "building", 20),
+            number(tower.attack_flat) + number(permanent.tower_attack_flat),
+            "building", 20),
         field("tower_attack_bonus_pct", "防御塔攻击百分比加成",
-            number(tower.attack_bonus_pct), "building", 30, { suffix = "%" }),
-        field("wall_armor_per_second", "城墙护甲每秒加", "未启用", "building", 40),
-        field("wall_health_per_second", "城墙血量每秒加", "未启用", "building", 50),
+            number(tower.attack_bonus_pct)
+                + number(permanent.tower_attack_bonus_pct),
+            "building", 30, { suffix = "%" }),
+        field("wall_armor_per_second", "城墙护甲每秒加",
+            number(permanent.wall_armor_per_second), "building", 40),
+        field("wall_health_per_second", "城墙血量每秒加",
+            number(permanent.wall_health_per_second), "building", 50),
         field("wall_armor_technology_bonus", "城墙当前护甲科技加成",
             number(wall.technology_armor_bonus), "building", 60),
         field("wall_health_technology_bonus", "城墙当前血量科技加成",
@@ -144,14 +152,21 @@ local function build_snapshot(player_id, reason)
         events.TECHNOLOGY_STATS_GET_REQUEST,
         { player_id = player_id }
     )
+    local permanent_response = event_bus.request(
+        events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id }
+    )
     local combat = combat_response and combat_response.ok
         and combat_response.snapshot or nil
     local technology = technology_response and technology_response.ok
         and technology_response.snapshot or { final = {} }
+    local permanent = permanent_response and permanent_response.ok
+        and permanent_response.totals or {}
     local context = {
         player_id = player_id,
         combat = combat,
         technology = technology,
+        permanent = permanent,
         hero = resolve_hero(combat),
     }
     local fields = default_fields(context)
@@ -212,6 +227,7 @@ function M.init()
     event_bus.subscribe(events.HERO_SUMMONED, publish_payload)
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, publish_payload)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, publish_payload)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, publish_payload)
     event_bus.subscribe(events.EQUIPMENT_STATS_CHANGED, publish_payload)
     CustomGameEventManager:RegisterListener("ui_game_info_request", function(_, payload)
         local player_id = tonumber(payload and payload.PlayerID)

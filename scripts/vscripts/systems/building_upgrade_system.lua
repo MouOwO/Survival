@@ -114,7 +114,7 @@ local function apply_tower_attack_time(unit, base_attack_time, attack_speed_bonu
     return final_attack_time, attacks_per_second
 end
 
-local function apply_research_technology(state)
+local function apply_research_technology(state, reason)
     local unit = state.unit
     if not valid_entity(unit) then return end
     local player_id = state.player_id
@@ -178,6 +178,14 @@ local function apply_research_technology(state)
         unit.survival_gameplay_final_damage_pct =
             (tonumber(permanent.tower_final_damage_bonus_pct) or 0)
             + (tonumber(permanent.global_final_damage_bonus_pct) or 0)
+        if tostring(reason or ""):match("^lottery")
+            or tostring(reason or "") == "incremental" then
+            print(string.format(
+                "[TOWER_PERMANENT_APPLIED] player=%s tower=%s base=%s flat=%s pct=%s final=%s reason=%s",
+                tostring(player_id), tostring(unit:entindex()),
+                tostring(base_damage), tostring(bonus), tostring(bonus_pct),
+                tostring(damage), tostring(reason)))
+        end
     elseif state.building_id == "wall" then
         local data = state.definition.levels[state.level or 1] or {}
         local base_health = tonumber(data.health) or unit:GetMaxHealth()
@@ -619,7 +627,7 @@ local function on_technology_stats_changed(payload)
     recover_player_towers(player_id)
     for _, state in pairs(buildings) do
         if tonumber(state.player_id) == player_id then
-            apply_research_technology(state)
+            apply_research_technology(state, payload.reason)
             publish(state, "technology_stats_changed")
         end
     end

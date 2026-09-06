@@ -175,12 +175,13 @@ local function unit_combat_snapshot(unit)
         max_level = internal_name == tree_config.unit_name
             and tonumber(tree_config.max_level) or nil,
         tower_class = unit.survival_tower_class or "",
-        health = safe_number(unit, "GetHealth", 0),
-        max_health = safe_number(unit, "GetMaxHealth", 0),
+        health = require("combat/endless_stat_projection").for_ui(unit, safe_number(unit, "GetHealth", 0), "health"),
+        max_health = require("combat/endless_stat_projection").for_ui(unit, safe_number(unit, "GetMaxHealth", 0), "health"),
+        health_scale = string.format("%.17g", tonumber(unit.survival_endless_health_scale) or 1),
         mana = safe_number(unit, "GetMana", 0),
         max_mana = safe_number(unit, "GetMaxMana", 0),
-        attack_min = attack_min,
-        attack_max = attack_max,
+        attack_min = require("combat/endless_stat_projection").for_ui(unit, attack_min, "attack"),
+        attack_max = require("combat/endless_stat_projection").for_ui(unit, attack_max, "attack"),
         base_damage_outgoing_pct = outgoing_pct,
         -- 必须读取包含 Modifier 加减值的当前有效护甲；基础护甲和配置缓存
         -- 无法反映攻击减甲科技的实时叠层。

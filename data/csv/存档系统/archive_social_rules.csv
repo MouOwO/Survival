@@ -1,0 +1,5 @@
+pool_id,display_name,currency_id,currency_name,daily_limit,draw_cost,unlock_count,enabled
+#types:string,string,string,string,number,number,number,boolean
+friend,我的好基友,yitie,义帖,10,1,100,1
+ex,我的前女友,invitation,邀请函,10,1,0,1
+beast,瑞兽赐福,blessing_ticket,福签,10,1,100,1

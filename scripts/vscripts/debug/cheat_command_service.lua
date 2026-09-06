@@ -18,6 +18,13 @@ local fishing_service = require("systems/fishing_service")
 local gameplay_stats_order_service = require(
     "systems/player_gameplay_stats_order_service"
 )
+local scheduler = require("core/scheduler")
+local hero_skill_definitions = require(
+    "config/generated/hero_skill_definitions"
+)
+local hero_skill_pool_members = require(
+    "config/generated/hero_skill_pool_members"
+)
 
 local M = {}
 
@@ -25,6 +32,10 @@ local ADD_MONSTER_POSITION = Vector(-1280, 1088, 64)
 local ADD_MONSTER_DEFAULT_ARGS = { "1000000000", "200", "1", "1" }
 local ADD_MONSTER_MOVE_SPEED = 600
 local MONKEY_KING_E_SKILL = "skill_monkey_king_swiftness"
+local WUDI_HERO_ID = "hero_monkey_king"
+local WUDI_ATTACK = 1111111111
+local WUDI_ATTACKS_PER_SECOND = 5
+local WUDI_SETUP_RETRY_COUNT = 40
 local selected_entindex_by_player = {}
 
 local HERO_ALIASES = {
@@ -414,9 +425,20 @@ local function add_hero_combat_bonus(context, command, modifier_name, label)
 end
 
 local function add_attack(context)
-    return add_hero_combat_bonus(
-        context, "addattack", "modifier_debug_attack_bonus", "攻击力"
-    )
+    local amount = tonumber(context.args[1])
+    if #context.args ~= 1 or not amount or amount ~= amount
+        or amount == math.huge or amount == -math.huge then
+        return false, "usage: addattack <amount>"
+    end
+    local result = event_bus.request(events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST, {
+        player_id = context.player_id, attack_delta = amount,
+    })
+    if not result or not result.ok then
+        return false, result and result.error or "debug_attack_failed"
+    end
+    notify(context, string.format("英雄攻击力 %+.0f，当前攻击力 %.0f",
+        amount, tonumber(result.snapshot and result.snapshot.attack_min) or 0))
+    return true
 end
 
 local function add_armor(context)
@@ -645,6 +667,204 @@ local function add_test_hero(context)
     end
     if not finish_test_environment(summoned) then
         return false, "test_environment_setup_failed"
+    end
+    return true
+end
+
+local function random_index(minimum, maximum)
+    if type(RandomInt) == "function" then
+        return RandomInt(minimum, maximum)
+    end
+    return math.random(minimum, maximum)
+end
+
+local function shuffle(values)
+    for index = #values, 2, -1 do
+        local other = random_index(1, index)
+        values[index], values[other] = values[other], values[index]
+    end
+end
+
+local function grant_wudi_skill(
+        player_id, skill_id, current_level, currently_locked)
+    local definition = hero_skill_definitions.by_id[skill_id]
+    local maximum = definition and math.max(
+        1,
+        tonumber(definition.max_level) or 1
+    ) or 1
+    if (tonumber(current_level) or 0) >= maximum
+        and currently_locked ~= 1 then
+        return true
+    end
+    local result = event_bus.request(events.HERO_SKILL_GRANT_REQUEST, {
+        player_id = player_id,
+        skill_id = skill_id,
+        levels = maximum,
+        source = "cheat_wudi",
+    })
+    if result and (result.ok == true
+        or result.error == "skill_already_max") then
+        return true
+    end
+    return false, result and result.error or "skill_grant_failed"
+end
+
+local function configure_wudi(context)
+    local state_result = event_bus.request(
+        events.HERO_SKILL_STATE_GET_REQUEST,
+        { player_id = context.player_id }
+    )
+    local snapshot = state_result and state_result.snapshot
+    if not state_result or not state_result.ok or not snapshot
+        or snapshot.hero_ready ~= 1 then
+        return false, "combat_hero_not_ready"
+    end
+
+    for _, skill in ipairs(snapshot.skills or {}) do
+        local ok, error_code = grant_wudi_skill(
+            context.player_id,
+            tostring(skill.skill_id or ""),
+            skill.level,
+            skill.locked
+        )
+        if not ok then return false, error_code end
+    end
+
+    state_result = event_bus.request(
+        events.HERO_SKILL_STATE_GET_REQUEST,
+        { player_id = context.player_id }
+    )
+    snapshot = state_result and state_result.snapshot
+    if not snapshot then return false, "skill_state_failed" end
+
+    local owned = {}
+    for _, skill in ipairs(snapshot.skills or {}) do
+        owned[tostring(skill.skill_id or "")] = true
+    end
+    local candidates = {}
+    for _, member in ipairs(hero_skill_pool_members.rows or {}) do
+        local skill_id = tostring(member.skill_id or "")
+        local definition = hero_skill_definitions.by_id[skill_id]
+        if member.enabled ~= false and member.pool_id == "public_pool"
+            and definition and definition.enabled ~= false
+            and definition.is_public == true and not owned[skill_id] then
+            candidates[#candidates + 1] = skill_id
+        end
+    end
+    shuffle(candidates)
+
+    local public_count = tonumber(snapshot.public_skill_count) or 0
+    local public_capacity = tonumber(snapshot.public_skill_capacity) or 3
+    local missing = math.max(0, public_capacity - public_count)
+    for index = 1, math.min(missing, #candidates) do
+        local skill_id = candidates[index]
+        local ok, error_code = grant_wudi_skill(
+            context.player_id,
+            skill_id,
+            0
+        )
+        if not ok then return false, error_code end
+    end
+
+    local combat = event_bus.request(
+        events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST,
+        {
+            player_id = context.player_id,
+            attack = WUDI_ATTACK,
+            attack_speed = WUDI_ATTACKS_PER_SECOND,
+        }
+    )
+    if not combat or not combat.ok then
+        return false, combat and combat.error
+            or "combat_stats_override_failed"
+    end
+    local speed_ok, speed_error = attack_speed_cheat.set_rate(
+        context.player_id,
+        WUDI_ATTACKS_PER_SECOND
+    )
+    if not speed_ok then return false, speed_error end
+
+    state_result = event_bus.request(
+        events.HERO_SKILL_STATE_GET_REQUEST,
+        { player_id = context.player_id }
+    )
+    snapshot = state_result and state_result.snapshot or snapshot
+    local skill_names = {}
+    for _, skill in ipairs(snapshot.skills or {}) do
+        if (tonumber(skill.level) or 0) > 0 and skill.locked ~= 1 then
+            skill_names[#skill_names + 1] = tostring(
+                skill.display_name or skill.skill_id
+            )
+        end
+    end
+    return true, {
+        hero_id = snapshot.hero_id,
+        skills = skill_names,
+    }
+end
+
+local function schedule_wudi_setup(context)
+    local attempts = 0
+    scheduler.after(0.05, function()
+        attempts = attempts + 1
+        local ok, result_or_error = configure_wudi(context)
+        if ok then
+            local details = result_or_error or {}
+            notify(context, string.format(
+                "无敌测试英雄已就绪：攻击力%d，攻速%d，技能[%s]",
+                WUDI_ATTACK,
+                WUDI_ATTACKS_PER_SECOND,
+                table.concat(details.skills or {}, "、")
+            ))
+            return false
+        end
+        if result_or_error == "combat_hero_not_ready"
+            and attempts < WUDI_SETUP_RETRY_COUNT then
+            return 0.05
+        end
+        notify(
+            context,
+            "无敌测试英雄配置失败：" .. tostring(result_or_error),
+            "error"
+        )
+        return false
+    end, "cheat_wudi_setup_" .. tostring(context.player_id))
+end
+
+local function wudi(context)
+    if not lottery_cheat_allowed() then
+        return false, "tools_mode_or_cheats_required"
+    end
+
+    local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+        player_id = context.player_id,
+    })
+    if summoned and summoned.ok then
+        schedule_wudi_setup(context)
+        return true
+    end
+
+    summoned = event_bus.request(events.HERO_SUMMON_REQUEST, {
+        player_id = context.player_id,
+        hero_id = WUDI_HERO_ID,
+        reason = "cheat_wudi",
+        debug_bypass = true,
+        on_completed = function(result)
+            if not result or result.ok ~= true then
+                notify(context, "无敌测试英雄召唤失败："
+                    .. tostring(result and result.error or "unknown"), "error")
+                return
+            end
+            schedule_wudi_setup(context)
+        end,
+    })
+    if not summoned or not summoned.ok then
+        return false, summoned and summoned.error or "hero_summon_failed"
+    end
+    if summoned.pending ~= true then
+        schedule_wudi_setup(context)
+    else
+        notify(context, "无敌测试英雄资源正在准备，完成后自动配置")
     end
     return true
 end
@@ -960,10 +1180,13 @@ local COMMANDS = {
     addgold = add_gold,
     addwood = add_wood,
     choujiang = grant_lottery_tickets,
+    tongguan = function(context) return require("systems/archive_service").cheat(context) end,
     order = order_gameplay_stat,
     ordertest = test_gameplay_stat,
     orderreset = reset_gameplay_stats,
     addhero = add_test_hero,
+    wudi = wudi,
+    yitie = function(context) return require("systems/archive_service").yitie(context) end,
     addattack = add_attack,
     addarmor = add_armor,
     blood = change_hero_health,
@@ -1052,7 +1275,7 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: choujiang <amount>, addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
+        "ready: wudi, choujiang <amount>, addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
     )
 end
 
@@ -1061,6 +1284,8 @@ M._test = {
     show_rogue_offer = show_rogue_offer,
     grant_fishing_reward = grant_fishing_reward,
     grant_lottery_tickets = grant_lottery_tickets,
+    configure_wudi = configure_wudi,
+    wudi = wudi,
 }
 
 return M

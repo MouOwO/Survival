@@ -59,6 +59,14 @@ local M = {
     },
 }
 
+-- N6-N10 currently have independent CSV copies of N5 for archive unlock testing.
+for number = 6, 10 do
+    M.rows[#M.rows + 1] = {
+        difficulty_id = "N" .. number, display_name = "N" .. number, subtitle = "30 波",
+        description = "当前使用N5的测试数值。", source_difficulty_id = "N5",
+        total_waves = 30, stat_multiplier = 1.0, enabled = true, wave_overrides = {},
+    }
+end
 M.by_id = {}
 for _, definition in ipairs(M.rows) do
     M.by_id[definition.difficulty_id] = definition

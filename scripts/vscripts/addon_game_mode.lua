@@ -323,7 +323,8 @@ local function schedule_unbuilt_wall_defeat_check()
     scheduler.after(delay, function()
         local building_system = require("systems/building_system")
         for _, player_id in ipairs(multiplayer_player_service.participating_player_ids()) do
-            if not building_system.wall_for_player(player_id) then
+            if not building_system.wall_for_player(player_id)
+                and not require("systems/archive_endless_service").can_rebuild_wall(player_id) then
                 multiplayer_player_service.defeat(player_id, "wall_not_built_in_time")
             end
         end
@@ -828,6 +829,7 @@ function M.precache(context)
     asset_preload_service.precache_group(context, "monster_default_wearables")
     asset_preload_service.precache_group(context, "challenge_visuals")
     hero_cosmetic_service.precache(context)
+    require("systems/archive_challenge_service").precache(context)
 end
 
 local function initialize_services()
@@ -887,6 +889,8 @@ local function initialize_services()
     content_inventory_service.init()
     inventory_transaction_service.init()
     lottery_service.init()
+    require("systems/archive_service").init()
+    require("systems/archive_challenge_service").init()
     polar_crystal_progression_service.init()
     challenge_upgrade_material_service.init()
     seven_sins_essence_service.init()

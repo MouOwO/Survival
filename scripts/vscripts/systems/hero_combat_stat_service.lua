@@ -166,13 +166,14 @@ local function apply_base_projection(state)
         safe_call(unit, "CalculateStatBonus", true)
         -- Keep the legacy damage multiplier on native basic attacks while the
         -- logical/UI attack remains the unmultiplied CSV value.
+        local debug_attack = tonumber(state.debug_attack_override)
         local multiplier = tonumber(state.exclusive_attack_multiplier) or 1
         local attribute_attack_bonus = tonumber(state.attribute_attack_bonus) or 0
-        local minimum = math.max(0,
+        local minimum = debug_attack and 0 or math.max(0,
             (state.engine_base_attack_min
                 + attribute_attack_bonus * state.damage_multiplier)
                 * multiplier)
-        local maximum = math.max(minimum,
+        local maximum = debug_attack and 0 or math.max(minimum,
             (state.engine_base_attack_max
                 + attribute_attack_bonus * state.damage_multiplier)
                 * multiplier)
@@ -215,6 +216,7 @@ local function recalculate(player_id, reason)
         + value(growth, "growth_intellect", 0)
     local scale = 1
     local debug_attack = tonumber(state.debug_attack_override)
+    local debug_attack_speed = tonumber(state.debug_attack_speed_override)
     local hero_technology = technology_stat_manager.get(player_id).final.hero or {}
     local researcher_attack_flat = tonumber(hero_technology.attack_flat) or 0
     local researcher_attack_pct = tonumber(hero_technology.attack_bonus_pct) or 0
@@ -300,6 +302,8 @@ local function recalculate(player_id, reason)
         + gameplay_armor_bonus
     local progression_attributes = (tonumber(progression.all_attributes) or 0)
         + (tonumber(permanent.hero_all_attributes_flat) or 0)
+        + (tonumber(permanent.hero_attributes_per_level) or 0)
+            * math.max(1, safe_get(state.unit, "GetLevel", 1))
     local progression_attack_flat = (tonumber(progression.attack_flat) or 0)
         + (tonumber(permanent.hero_attack_flat) or 0)
     local essence_attack_pct = tonumber(essence.attack_bonus_pct) or 0
@@ -316,20 +320,19 @@ local function recalculate(player_id, reason)
     local total_attack_pct = researcher_attack_pct + essence_attack_pct
     local flat_panel_attack = equipment_stats.attack_flat
         + researcher_attack_flat + progression_attack_flat
-    local engine_research_attack_bonus = (((state.engine_base_attack_min
-        + state.engine_base_attack_max
-        + weapon_attack_min + weapon_attack_max)
-        * 0.5) * total_attack_pct / 100
-        + flat_panel_attack * total_attack_pct / 100
-        + researcher_attack_flat
-        + progression_attack_flat) * exclusive_attack_multiplier
+    local engine_research_attack_bonus = debug_attack and 0 or (
+        ((state.engine_base_attack_min
+            + state.engine_base_attack_max
+            + weapon_attack_min + weapon_attack_max)
+            * 0.5) * total_attack_pct / 100
+            + flat_panel_attack * total_attack_pct / 100
+            + researcher_attack_flat
+            + progression_attack_flat
+    ) * exclusive_attack_multiplier
     local engine_weapon_attack_bonus = (debug_attack
-        and (debug_attack
-            - ((state.engine_base_attack_min
-                + state.engine_base_attack_max) * 0.5)
-            - equipment_stats.attack_flat)
-        or ((weapon_attack_min + weapon_attack_max) * 0.5))
-            * exclusive_attack_multiplier
+        and (debug_attack - equipment_stats.attack_flat)
+        or ((weapon_attack_min + weapon_attack_max) * 0.5)
+            * exclusive_attack_multiplier)
     local engine_bonus_attack = engine_research_attack_bonus
         + engine_weapon_attack_bonus
     local raw_strength = state.base.strength + weapon_strength
@@ -412,12 +415,12 @@ local function recalculate(player_id, reason)
         weapon_content_id = equipment.main_hand_content_id or "",
         weapon_name = equipment.main_hand_name ~= ""
             and equipment.main_hand_name or "未装备武器",
-        attack_min = (debug_attack or ((state.base.attack_min + weapon_attack_min
+        attack_min = debug_attack or (((state.base.attack_min + weapon_attack_min
             + attribute_attack_bonus + flat_panel_attack)
-            * (1 + total_attack_pct / 100))) * exclusive_attack_multiplier,
-        attack_max = (debug_attack or ((state.base.attack_max + weapon_attack_max
+            * (1 + total_attack_pct / 100)) * exclusive_attack_multiplier),
+        attack_max = debug_attack or (((state.base.attack_max + weapon_attack_max
             + attribute_attack_bonus + flat_panel_attack)
-            * (1 + total_attack_pct / 100))) * exclusive_attack_multiplier,
+            * (1 + total_attack_pct / 100)) * exclusive_attack_multiplier),
         health = current_health or safe_get(state.unit, "GetMaxHealth", 1),
         max_health = safe_get(state.unit, "GetMaxHealth", 1),
         attribute_health_bonus = attribute_health_bonus,
@@ -462,13 +465,14 @@ local function recalculate(player_id, reason)
         progression_attack_flat = progression_attack_flat,
         base_attack_time = base_attack_time,
         hero_damage_multiplier = hero_damage_multiplier,
-        engine_attack_min = (state.engine_base_attack_min
+        engine_attack_min = debug_attack or ((state.engine_base_attack_min
             + attribute_attack_bonus * state.damage_multiplier)
-                * exclusive_attack_multiplier + engine_bonus_attack,
-        engine_attack_max = (state.engine_base_attack_max
+                * exclusive_attack_multiplier + engine_bonus_attack),
+        engine_attack_max = debug_attack or ((state.engine_base_attack_max
             + attribute_attack_bonus * state.damage_multiplier)
-                * exclusive_attack_multiplier + engine_bonus_attack,
+                * exclusive_attack_multiplier + engine_bonus_attack),
         debug_attack_override = debug_attack or 0,
+        debug_attack_speed_override = debug_attack_speed or 0,
         -- The equipment aggregation snapshot already owns the authoritative
         -- War3/CSV armor value. Do not derive the HUD value from this frame's
         -- engine armor: ForceRefresh/CalculateStatBonus may not have exposed the
@@ -480,10 +484,11 @@ local function recalculate(player_id, reason)
         runtime_armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
         -- 配置值使用“每秒攻击次数”。由配置 BAT、固定间隔变化和装备
         -- 攻速百分比直接投影，避免读取引擎当前帧临时攻击间隔。
-        attack_speed = hero_combat_stat_math.attacks_per_second(
-            base_attack_time,
-            equipment_stats.attack_speed_pct + researcher_attack_speed_pct
-        ),
+        attack_speed = debug_attack_speed
+            or hero_combat_stat_math.attacks_per_second(
+                base_attack_time,
+                equipment_stats.attack_speed_pct + researcher_attack_speed_pct
+            ),
         attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100),
         strength = final_strength,
         agility = unscaled_agility + agility_bonus,
@@ -702,6 +707,7 @@ local function on_progression_changed(payload)
 end
 
 local function debug_set_attack(payload)
+    payload = payload or {}
     local player_id = tonumber(payload.player_id)
     local state = current(player_id)
     if not state or not state.unit or state.unit:IsNull() then
@@ -710,11 +716,47 @@ local function debug_set_attack(payload)
     if payload.reset == true then
         state.debug_attack_override = nil
     else
-        local attack = tonumber(payload.attack)
-        if not attack or attack < 0 or attack > 9000000000000000 then
-            return { ok = false, error = "debug_attack_invalid" }
+        local has_delta = payload.attack_delta ~= nil
+        local has_attack = payload.attack ~= nil or has_delta
+        local has_attack_speed = payload.attack_speed ~= nil
+        if not has_attack and not has_attack_speed then
+            return { ok = false, error = "debug_combat_stats_missing" }
         end
-        state.debug_attack_override = attack
+        local attack = nil
+        local attack_speed = nil
+        if has_attack then
+            attack = tonumber(payload.attack)
+            if has_delta then
+                local delta = tonumber(payload.attack_delta)
+                if payload.attack ~= nil or not delta or delta ~= delta
+                    or delta == math.huge or delta == -math.huge then
+                    return { ok = false, error = "debug_attack_invalid" }
+                end
+                local snapshot = state.snapshot or recalculate(player_id, "debug_attack_read")
+                attack = (tonumber(state.debug_attack_override)
+                    or tonumber(snapshot and snapshot.attack_min) or 0) + delta
+            end
+            if not attack or attack ~= attack or attack < 0 or attack > 9000000000000000 then
+                return { ok = false, error = "debug_attack_invalid" }
+            end
+        end
+        if has_attack_speed then
+            attack_speed = tonumber(payload.attack_speed)
+            if not attack_speed or attack_speed <= 0 or attack_speed > 100 then
+                return { ok = false, error = "debug_attack_speed_invalid" }
+            end
+        end
+        if has_attack then
+            state.debug_attack_override = attack
+            -- The debug projection now owns the final attack value. Remove
+            -- legacy addattack bonuses so they cannot apply a second time.
+            if state.unit.RemoveModifierByName then
+                state.unit:RemoveModifierByName("modifier_debug_attack_bonus")
+            end
+        end
+        if has_attack_speed then
+            state.debug_attack_speed_override = attack_speed
+        end
     end
     local snapshot = recalculate(player_id, payload.reset == true
         and "debug_attack_reset" or "debug_attack_override")
@@ -726,6 +768,9 @@ local function get_stats(payload)
     local state = current(player_id)
     if not state then
         return { ok = false, error = "hero_not_summoned" }
+    end
+    if state.snapshot and state.snapshot.level ~= safe_get(state.unit, "GetLevel", 1) then
+        recalculate(player_id, "hero_level_changed")
     end
     return {
         ok = true,

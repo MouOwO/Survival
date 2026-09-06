@@ -1,4 +1,3 @@
-require("modifiers/modifier_building_blink_move")
 local logger = require("core/logger")
 
 local M = {}
@@ -215,15 +214,8 @@ local modifiers = {
     },
 }
 
-local function link(definition)
-    LinkLuaModifier(
-        definition.name,
-        definition.path,
-        definition.motion_type or LUA_MODIFIER_MOTION_NONE
-    )
-    require(definition.path)
-
-    if _G[definition.name] == nil then
+local function validate_definition(definition)
+    if type(_G[definition.name]) ~= "table" then
         error(
             "modifier class was not created: "
             .. definition.name
@@ -234,8 +226,25 @@ local function link(definition)
 end
 
 function M.register()
+    -- Loading a modifier can load other modifier files and replace their class
+    -- tables. Finish all such work before binding any final classes to the
+    -- engine. require() alone only validates Lua's module cache, not a binding.
+    local loaded_paths = {}
     for _, definition in ipairs(modifiers) do
-        link(definition)
+        if not loaded_paths[definition.path] then
+            require(definition.path)
+            loaded_paths[definition.path] = true
+        end
+    end
+    for _, definition in ipairs(modifiers) do
+        validate_definition(definition)
+    end
+    for _, definition in ipairs(modifiers) do
+        LinkLuaModifier(
+            definition.name,
+            "modifier_bindings/" .. definition.name,
+            definition.motion_type or LUA_MODIFIER_MOTION_NONE
+        )
     end
     print("[ModifierRegistry] LinkLuaModifier refreshed count=" .. tostring(#modifiers))
     logger.info(
@@ -248,7 +257,7 @@ end
 function M.validate()
     local missing = {}
     for _, definition in ipairs(modifiers) do
-        if _G[definition.name] == nil then
+        if type(_G[definition.name]) ~= "table" then
             missing[#missing + 1] = definition.name
         end
     end

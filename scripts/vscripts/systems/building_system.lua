@@ -614,7 +614,9 @@ local function can_place(payload)
     end
     local team = DOTA_TEAM_GOODGUYS
     team_alignment.enforce(caster, team, "builder_caster")
-    if definition.build_once and wall_ever_built[builder.player_id] then
+    if definition.build_once and wall_ever_built[builder.player_id]
+        and not (definition.id == "wall"
+            and require("systems/archive_endless_service").can_rebuild_wall(builder.player_id)) then
         return { ok = false, error = "城墙整局只能建造一次" }
     end
     if building_limit_reached(definition,
@@ -668,8 +670,12 @@ local function start_building(payload)
     local free_hero_altar = check.definition.id == "hero_altar"
         and rogue_effect_state.numeric(check.player_id,
             "builder_free_hero_altar") > 0
-    local charged_cost = free_hero_altar and { wood = 0, gold = 0 } or cost
-    local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+    -- Post-clear resources are frozen. Rebuilding an endless participant's
+    -- wall must not spend resources or reserve population again.
+    local free_wall_rebuild = check.definition.id == "wall"
+        and require("systems/archive_endless_service").can_rebuild_wall(check.player_id)
+    local charged_cost = (free_hero_altar or free_wall_rebuild) and { wood = 0, gold = 0 } or cost
+    local spend = free_wall_rebuild and { ok = true } or event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         player_id = check.player_id,
         team = check.team,
         wood = charged_cost.wood,
@@ -1200,6 +1206,14 @@ local function on_entity_killed(payload)
             state.build_cost = nil
         end
         rollback_build_cooldown(state.build_task)
+    end
+    local endless_wall = state.building_id == "wall"
+        and victim.survival_disconnect_cleanup ~= true
+        and require("systems/archive_endless_service").on_wall_destroyed(state.player_id)
+    if endless_wall then
+        -- Keep the player and archive hubs alive; normal cleanup above has
+        -- already released the building count, collision and grid occupancy.
+        return
     end
     if victim.survival_disconnect_cleanup ~= true
         and require("systems/multiplayer_player_service").is_disconnected(state.player_id) then

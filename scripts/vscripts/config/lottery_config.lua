@@ -83,6 +83,7 @@ for _, row in ipairs(item_rows.rows or {}) do
             duplicate_points = math.max(0, math.floor(tonumber(row.duplicate_points) or 0)),
             exchange_points = math.max(0, math.floor(tonumber(row.exchange_points) or 0)),
             exchange_enabled = row.exchange_enabled ~= false,
+            max_owned = math.max(1, math.floor(tonumber(row.max_owned) or 1)),
         }
         assert(item.id ~= "" and M.by_id[item.id] == nil,
             "lottery duplicate or empty item id: " .. tostring(item.id))
@@ -166,6 +167,7 @@ local function add_member(pool, source, item_weight)
         duplicate_points = source.duplicate_points,
         exchange_points = source.exchange_points,
         exchange_enabled = source.exchange_enabled,
+        max_owned = source.max_owned,
         item_weight = math.max(0, tonumber(item_weight) or 0),
     }
     assert(pool.by_id[member.id] == nil,

@@ -1,7 +1,7 @@
 rule_id,pool_id,target_quality,threshold,trigger_mode,priority,enabled,review_status,notes
 #中文名:规则ID,奖池ID,保底品质,批量抽数,触发方式,优先级,是否启用,审核状态,备注
 #types:string,string,string,number,string,number,boolean,string,string
-map_sr_ten_pull,map,sr,10,batch_only,10,1,ok,仅一次十连请求生效；连续十次单抽不触发保底。
+map_sr_ten_pull,map,sr,10,batch_only,10,1,ok,仅一次十连请求生效；未自然获得SR或更高品质时固定补SR，不会由保底补出UR；连续十次单抽不触发保底。
 cultivation_ur_ten_pull,cultivation,ur,10,batch_only,30,1,ok,仅一次十连请求生效；连续十次单抽不触发保底。
 dragon_knight_ur_ten_pull,dragon_knight,ur,10,batch_only,30,1,ok,仅一次十连请求生效；连续十次单抽不触发保底。
 summer_ur_ten_pull,summer,ur,10,batch_only,30,1,ok,仅一次十连请求生效；连续十次单抽不触发保底。

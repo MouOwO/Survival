@@ -207,10 +207,14 @@ function M.persist_save(account_id, save, revision)
     local data = ensure_fixture()
     local profile = data.profiles and data.profiles[account_id]
     if type(profile) ~= "table" then return false, "fixture_profile_not_found" end
+    local previous_save, previous_revision = profile.save, profile.revision
     profile.save = copy_table(save)
     profile.revision = tonumber(revision) or profile.revision or 0
     local persisted, persist_error = write_fixture_file(data)
-    if not persisted then return false, persist_error end
+    if not persisted then
+        profile.save, profile.revision = previous_save, previous_revision
+        return false, persist_error
+    end
     return true
 end
 

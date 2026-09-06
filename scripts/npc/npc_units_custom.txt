@@ -1,4 +1,5 @@
-﻿"DOTAUnits"
+﻿#base "npc_archive_challenges_units.txt"
+"DOTAUnits"
 {
     // ArmorPhysical is always a Dota 2 actual armor value. War3 source armor
     // is divided by 3 before it reaches this engine-facing fallback config.

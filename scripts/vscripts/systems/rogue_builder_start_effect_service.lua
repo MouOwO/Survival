@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local effect_state = require("systems/rogue_effect_state_service")
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 local subscriptions = {}
@@ -99,6 +100,7 @@ local function on_tower_attack_landed(payload)
     local tower = payload and (payload.tower or payload.attacker or payload.unit)
     local player_id = owner_player_id(tower)
     if player_id == nil then return end
+    if phase_guard.post_clear_frozen() then return end
     local amount = effect_state.numeric(player_id, "builder_tower_attack_per_hit")
     if amount <= 0 then return end
     local modifier = tower:FindModifierByName("modifier_rogue_sharp_volley_growth")

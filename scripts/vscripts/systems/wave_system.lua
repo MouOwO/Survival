@@ -24,6 +24,8 @@ local wave_monster_collision = require("systems/wave_monster_collision")
 local wave_special_target = require("systems/wave_special_target")
 local global_rules = require("config/global_rules")
 local player_context = require("systems/player_context_service")
+local archive_challenge_rules = require("config/generated/archive_challenge_rules").by_id.default
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 local state = {}
@@ -40,11 +42,12 @@ local monster_spawn_marker = nil
 local monster_hull_multiplier = 1
 local game_started_at = nil
 local memory_cleared_wave = -1
-local EARLY_FINAL_UNLOCK_SECONDS = 15 * 60
+local EARLY_FINAL_UNLOCK_SECONDS = 1 * 60
 local FINAL_WAVE_NUMBER = 30
 local DEV_PRELOAD_POLL_INTERVAL = 0.05
 local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
 local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
+local ARCHIVE_CHALLENGE_RETRY_TASK_ID = "archive_challenge_begin_retry"
 local wave_resource_sessions = {}
 local wave_model_leases = {}
 local dev_resident_models = {}
@@ -335,6 +338,7 @@ local function wall_for_channel(channel)
 end
 
 local function reset()
+    phase_guard.reset()
     state = { current_wave = 0, total_waves = 0, status = "waiting", timer = 0,
         planned = 0, pending = 0, spawned = 0, alive = 0, killed = 0,
         failed_spawn = 0, boss_alive = false, difficulty_id = difficulty_id,
@@ -342,7 +346,8 @@ local function reset()
         difficulty_options = difficulty_config.client_options(),
         final_wave_generation_completed = false,
         early_final_used = false,
-        victory_settled = false }
+        victory_settled = false,
+        post_clear_frozen = false }
 end
 
 local function publish(reason)
@@ -368,9 +373,48 @@ end
 local function settle_victory_once()
     if state.victory_settled then return false end
     state.victory_settled = true
-    state.status = "victory"
+    state.status = "cleared"
+    state.post_clear_frozen = true
+    phase_guard.set_post_clear_frozen(true)
     state.timer = 0
     publish("final_wave_cleared")
+    local archive_players = {}
+    if not dev_mode then
+        for _, player_id in ipairs(player_context.active_player_ids()) do
+            if disconnected_players[player_id] ~= true then
+                archive_players[#archive_players + 1] = player_id
+                event_bus.emit("archive.final_wave_cleared", {
+                    player_id = player_id, difficulty_id = difficulty_id,
+                })
+            end
+        end
+    end
+    local function begin_archive_phase()
+        local phase = event_bus.request("archive.challenge_begin", {
+            player_ids = archive_players, difficulty_id = difficulty_id,
+        })
+        if not (phase and phase.ok and phase.keep_running) then return false end
+        state.status = "archive_challenges"
+        publish("archive_challenges_started")
+        return true
+    end
+    if begin_archive_phase() then return true end
+    local difficulty_number = tonumber(tostring(difficulty_id):match("[Nn](%d+)")) or 0
+    if difficulty_number >= (tonumber(archive_challenge_rules.building_unlock_difficulty) or 3) then
+        state.status = "archive_challenges_pending"
+        publish("archive_challenges_pending")
+        scheduler.every(1, function()
+            if not state.post_clear_frozen then return false end
+            archive_players = {}
+            for _, player_id in ipairs(player_context.active_player_ids()) do
+                if disconnected_players[player_id] ~= true then
+                    archive_players[#archive_players + 1] = player_id
+                end
+            end
+            return not begin_archive_phase()
+        end, ARCHIVE_CHALLENGE_RETRY_TASK_ID)
+        return true
+    end
     if GameRules and GameRules.SetGameWinner then
         GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
     end
@@ -586,6 +630,9 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     enemies[unit:entindex()] = {
         unit = unit,
         is_boss = is_assault_boss,
+        wave_number = wave_number,
+        is_final_boss = is_assault_boss and (wave_number == FINAL_WAVE_NUMBER
+            or (state.early_final_used ~= true and wave_number == state.total_waves)),
         base_hull_radius = base_hull_radius,
         player_id = channel and channel.player_id or nil,
         wall_entindex = wall_for_channel(channel),
@@ -777,6 +824,8 @@ local function on_killed(payload)
             reward_players = player_context.active_player_ids()
         end
         for _, player_id in ipairs(reward_players) do
+            event_bus.emit("archive.wave_boss_killed", {player_id=player_id,
+                kill_id=tostring(meta.wave_number)..":"..tostring(entindex)})
             event_bus.request(events.ROGUE_REWARD_OPEN_REQUEST, {
                 player_id = player_id, source = "boss",
             })
@@ -829,6 +878,7 @@ local function get_wave_state()
         early_final_used = state.early_final_used == true,
         early_final_remaining = early_final_remaining(),
         victory_settled = state.victory_settled == true,
+        post_clear_frozen = state.post_clear_frozen == true,
         next_wave_number = next_wave_number,
         next_special_wave_number = next_special_wave_number,
         next_special_role = next_special_role,
@@ -849,7 +899,7 @@ local function request_early_final()
     if remaining > 0 then
         return {
             ok = false,
-            error = "开局15分钟后可用",
+            error = "开局1分钟后可用",
             remaining_seconds = remaining,
         }
     end
@@ -1081,6 +1131,11 @@ end
 function M.get_difficulty() return difficulty_id end
 function M.current_wave_number() return tonumber(state.current_wave) or 0 end
 
+function M.get_player_spawn_marker(player_id)
+    local channel = wave_channels[tonumber(player_id)]
+    return channel and channel.marker or nil
+end
+
 function M.spawn_challenge_monster(row, challenge_definition, player_id)
     row = row or {}
     local definition = challenge_definition or {}
@@ -1111,18 +1166,21 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
         attack = tonumber(row.attack) or 2,
         armor = tonumber(row.war3_armor or row.armor) or 2,
         attack_speed = tonumber(row.attack_speed) or 1,
-        is_boss = true,
-        member_role = "assault_boss",
+        is_boss = definition.endless ~= true,
+        member_role = definition.endless and "normal" or "assault_boss",
         is_challenge_monster = true,
     }
     local collision_profile = wave_monster_collision.profile(combat_row, definition)
+    if definition.endless or combat_row.health > 100000000 or combat_row.attack > 100000000 then
+        combat_row = require("combat/endless_stat_projection").prepare(unit, combat_row)
+    end
     apply_stats(unit, combat_row, definition, collision_profile.movement_type)
     monster_hull_scale.apply(
         unit,
         1,
         collision_profile.base_hull_radius
     )
-    unit.survival_is_boss = true
+    unit.survival_is_boss = definition.endless ~= true
     unit.survival_is_challenge_monster = true
     unit.survival_player_id = player_id
     unit.survival_wave_movement_type = collision_profile.movement_type
@@ -1142,7 +1200,7 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
         entindex = unit:entindex(),
         monster_source = "building_challenge",
         player_id = player_id,
-        is_boss = true,
+        is_boss = definition.endless ~= true,
     })
     return unit
 end

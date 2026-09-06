@@ -10,6 +10,18 @@ $itemOutput = Join-Path $lotteryRoot 'lottery_item_definitions.csv'
 $poolOutput = Join-Path $lotteryRoot 'lottery_pool_items.csv'
 $catalogOutput = Join-Path $repo 'data\csv\物品系统\content_catalog.csv'
 $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+$existingMaxOwned = @{}
+if (Test-Path -LiteralPath $itemOutput) {
+    foreach ($existing in (Import-Csv -LiteralPath $itemOutput | Where-Object {
+        $_.item_id -and -not ([string]$_.item_id).StartsWith('#')
+    })) {
+        $configuredMax = 0
+        if ([int]::TryParse([string]$existing.max_owned, [ref]$configuredMax) `
+            -and $configuredMax -ge 1) {
+            $existingMaxOwned[[string]$existing.item_id] = $configuredMax
+        }
+    }
+}
 
 $itemIds = @'
 lottery_attribute_crystal
@@ -295,12 +307,17 @@ for ($sourceRow = 5; $sourceRow -le 93; $sourceRow++) {
         Where-Object { $_ -ne '' })
     $effectIds = @($effectTokens | ForEach-Object { ($_ -split '=', 2)[0] })
     $effectValues = @($effectTokens | ForEach-Object { ($_ -split '=', 2)[1] })
+    $itemId = $itemIds[$sourceRow - 5]
+    $maxOwned = if ($existingMaxOwned.ContainsKey($itemId)) {
+        $existingMaxOwned[$itemId]
+    } else { 1 }
     $items.Add([pscustomobject]@{
-        item_id=$itemIds[$sourceRow - 5]; display_name=$name; item_type='积分道具'
+        item_id=$itemId; display_name=$name; item_type='积分道具'
         duration_type='permanent'; duration_text='永久'; description=$description
         quality=$rarity; icon_type='item'; icon=(Icon-For $description)
         duplicate_points=$duplicateByRarity[$rarity]; exchange_points=$exchangePoints
         exchange_enabled=$(if ($enabled) { 1 } else { 0 })
+        max_owned=$maxOwned
         effect_ids=($effectIds -join '|'); effect_values=($effectValues -join '|')
         effect_status=$effectStatus
         source_row=$sourceRow; enabled=$(if ($enabled) { 1 } else { 0 })
@@ -313,12 +330,12 @@ if ($items.Count -ne 89 -or $itemIds.Count -ne 89) {
 
 $headers = @('item_id','display_name','item_type','duration_type','duration_text',
     'description','quality','icon_type','icon','duplicate_points','exchange_points',
-    'exchange_enabled','effect_ids','effect_values','effect_status','source_row','enabled',
+    'exchange_enabled','max_owned','effect_ids','effect_values','effect_status','source_row','enabled',
     'review_status','notes')
 $itemLines = [Collections.Generic.List[string]]::new()
 $itemLines.Add($headers -join ',')
-$itemLines.Add('#中文名:道具ID,显示名称,类型,期限类型,期限显示,效果简介,品质,图标类型,图标,重复分解积分,兑换积分,允许积分兑换,增益字段ID数组,增益数值数组,效果实现状态,来源行,是否启用,审核状态,备注')
-$itemLines.Add('#types:string,string,string,string,string,string,string,string,string,number,number,boolean,list,list,string,number,boolean,string,string')
+$itemLines.Add('#中文名:道具ID,显示名称,类型,期限类型,期限显示,效果简介,品质,图标类型,图标,重复分解积分,兑换积分,允许积分兑换,最多持有量,增益字段ID数组,增益数值数组,效果实现状态,来源行,是否启用,审核状态,备注')
+$itemLines.Add('#types:string,string,string,string,string,string,string,string,string,number,number,boolean,number,list,list,string,number,boolean,string,string')
 foreach ($item in $items) {
     $values = @(foreach ($header in $headers) { Csv $item.$header })
     $itemLines.Add($values -join ',')

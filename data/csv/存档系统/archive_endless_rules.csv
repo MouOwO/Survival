@@ -1,0 +1,3 @@
+rule_id,monsters_per_wave,time_limit_seconds,score_block_size,score_multiplier,score_offset,model_path,model_scale,move_speed,attack_speed,attack_range,magic_resistance
+#types:string,number,number,number,number,number,string,number,number,number,number,number
+default,5,60,10,7,-6,models/heroes/nevermore/nevermore.vmdl,0.9,280,1,160,0

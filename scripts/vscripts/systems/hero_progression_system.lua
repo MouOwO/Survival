@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 
@@ -151,6 +152,7 @@ end
 local function on_attack_landed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
+    if phase_guard.post_clear_frozen() then return end
     local state = get_state(player_id)
     local gain = tonumber(state.attack_all_attribute_gain) or 0
     if gain <= 0 then return end

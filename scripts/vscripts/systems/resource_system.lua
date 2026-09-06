@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local config = require("config/resources_config")
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 local accounts = {}
@@ -79,6 +80,7 @@ local function start_income_task(player_id, account)
     scheduler.cancel(task_id)
     scheduler.every(1, function()
         if accounts[player_id] ~= account or not account.initialized then return false end
+        if phase_guard.post_clear_frozen() then return true end
         local wood_exact = account.wood_per_second + account.wood_fraction
         local gold_exact = account.gold_per_second + account.gold_fraction
         local wood = math.floor(wood_exact)
@@ -100,6 +102,7 @@ local function initialize_from_profile(payload)
     local account = get_account(player_id)
     local stats = gameplay_stats(player_id)
     if not stats then return false end
+    if account.initialized and phase_guard.post_clear_frozen() then return true end
     local profile_initial_wood = math.max(0, tonumber(stats.initial_wood) or 0)
     -- Hero-start gold is another opening grant for the same player wallet;
     -- combine it before delta tracking so profile refreshes remain idempotent.
@@ -180,6 +183,7 @@ end
 local function handle_spend(payload)
     local account, player_id, error_code = require_account(payload)
     if not account then return { ok = false, error = error_code } end
+    if phase_guard.post_clear_frozen() then return { ok = false, error = "post_clear_frozen" } end
     local wood = math.max(0, tonumber(payload.wood) or 0)
     local gold = math.max(0, tonumber(payload.gold) or 0)
     local population = math.max(0, tonumber(payload.population) or 0)
@@ -200,6 +204,7 @@ end
 local function handle_add(payload)
     local account, player_id, error_code = require_account(payload)
     if not account then return { ok = false, error = error_code } end
+    if phase_guard.post_clear_frozen() then return { ok = false, error = "post_clear_frozen" } end
     account.wood = math.max(0, account.wood + (tonumber(payload.wood) or 0))
     account.gold = math.max(0, account.gold + (tonumber(payload.gold) or 0))
     account.max_population = math.max(0,
@@ -211,6 +216,7 @@ end
 local function handle_debug_set(payload)
     local account, player_id, error_code = require_account(payload)
     if not account then return { ok = false, error = error_code } end
+    if phase_guard.post_clear_frozen() then return { ok = false, error = "post_clear_frozen" } end
     local amount = math.max(0, tonumber(payload.amount) or 100000000)
     account.wood = amount
     account.gold = amount
@@ -224,6 +230,7 @@ end
 local function handle_release_pop(payload)
     local account, player_id, error_code = require_account(payload)
     if not account then return { ok = false, error = error_code } end
+    if phase_guard.post_clear_frozen() then return { ok = false, error = "post_clear_frozen" } end
     account.population = math.max(0,
         account.population - math.max(0, tonumber(payload.population) or 0))
     publish(player_id, payload.reason or "release_population")

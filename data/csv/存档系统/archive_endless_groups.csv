@@ -1,0 +1,4 @@
+group_id,min_difficulty,max_difficulty,wave_group,enabled,notes
+#types:string,number,number,string,boolean,string
+tier1,1,10,tier1,1,工作簿N1-N10完整1000波
+tier2,11,20,tier1,1,用户确认所有难度统一使用无尽波次属性

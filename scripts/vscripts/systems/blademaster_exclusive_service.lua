@@ -3,6 +3,7 @@ local events = require("core/events")
 local combat_events = require("combat/combat_events")
 local scheduler = require("core/scheduler")
 local runtime_config = require("config/generated/blademaster_exclusive_runtime")
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 local states = {}
@@ -311,6 +312,7 @@ create_clone = function(player_id)
 end
 
 local function growth_tick(player_id)
+    if phase_guard.post_clear_frozen() then return end
     if not skill_active(player_id, R_SKILL) then return end
     state(player_id).attack_pct = state(player_id).attack_pct
         + math.max(0, tonumber(row().r_growth_pct) or 0)

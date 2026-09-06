@@ -87,7 +87,7 @@ function M.evaluate(player_id, entry, context)
         and context.debug_all_unlocked ~= true then
         local wave = context.wave_state or {}
         if wave.game_started ~= true then
-            return false, "游戏开始15分钟后可用", count
+            return false, "游戏开始1分钟后可用", count
         end
         if wave.early_final_used == true then
             return false, "本局已购买提前通关", count
@@ -98,7 +98,7 @@ function M.evaluate(player_id, entry, context)
         end
         local remaining = tonumber(wave.early_final_remaining) or 0
         if remaining > 0 then
-            return false, "开局15分钟后可用（剩余"
+            return false, "开局1分钟后可用（剩余"
                 .. tostring(math.ceil(remaining)) .. "秒）", count
         end
     end

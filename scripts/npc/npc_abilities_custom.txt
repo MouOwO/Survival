@@ -1,4 +1,5 @@
-﻿"DOTAAbilities"
+﻿#base "npc_archive_challenges_abilities.txt"
+"DOTAAbilities"
 {
     "ability_build_wall"
     {

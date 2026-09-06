@@ -3,6 +3,7 @@ local events = require("core/events")
 local weapons = require("config/generated/weapon_definitions")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local player_profile_service = require("systems/player_profile_service")
+local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
 local state_by_player = {}
@@ -208,6 +209,7 @@ end
 local function on_attack_landed(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil or payload.is_main_attack == false then return end
+    if phase_guard.post_clear_frozen() then return end
     local data = snapshot(player_id)
     if data.series_id ~= "growth_sword" and data.series_id ~= "frost_blade" then
         return
@@ -277,6 +279,7 @@ end
 local function on_damage_dealt(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil or (tonumber(payload.final_damage) or 0) <= 0 then return end
+    if phase_guard.post_clear_frozen() then return end
     local data = snapshot(player_id)
     if data.series_id ~= "ice_blade" and data.series_id ~= "epic_icefire"
         and data.series_id ~= "legend_abyss" then

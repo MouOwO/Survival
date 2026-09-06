@@ -106,4 +106,13 @@ close(run(801, DAMAGE_TYPE_PHYSICAL, { damage_kind = "ability" }).damage,
 assert(filter_service._add_damage_flag_for_test(512, 512) == 512)
 assert(filter_service._add_damage_flag_for_test(2, 512) == 514)
 
+entities[2].survival_endless_health_scale = 100
+close(run(33400, DAMAGE_TYPE_PHYSICAL).damage, 100, "endless health projection after armor")
+entities[1].survival_endless_attack_scale = 20
+close(run(1670, DAMAGE_TYPE_PHYSICAL).damage, 100, "endless basic attack with omitted category")
+entities[1].survival_endless_attack_scale = 1e40
+assert(run(1e8, DAMAGE_TYPE_PHYSICAL, nil, 3).damage == 1e30, "native float overflow guard")
+entities[1].survival_endless_attack_scale = nil
+entities[2].survival_endless_health_scale = nil
+
 print("CUSTOM_MONSTER_ARMOR_PASS")
