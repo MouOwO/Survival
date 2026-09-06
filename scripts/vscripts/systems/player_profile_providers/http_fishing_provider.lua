@@ -30,7 +30,9 @@ local function request(path, payload, on_success, on_error)
     http:Send(function(response)
         local status = tonumber(response and response.StatusCode) or 0
         if status ~= 200 then
-            on_error("http_status_" .. tostring(status))
+            local parsed, body = pcall(json_decoder.decode, tostring(response and response.Body or ""))
+            on_error(parsed and type(body) == "table" and type(body.error) == "string"
+                and body.error or "http_status_" .. tostring(status), status)
             return
         end
         local ok, decoded = pcall(
@@ -69,6 +71,14 @@ end
 
 function M.online_checkpoint(payload, on_success, on_error)
     request("/v1/online-time/checkpoint", payload, on_success, on_error)
+end
+
+function M.archive_enabled()
+    return convar("survival_archive_http_enabled") == "1"
+end
+
+function M.archive_submit(payload, on_success, on_error)
+    request("/v1/archive/command", payload, on_success, on_error)
 end
 
 function M.rule()

@@ -137,18 +137,18 @@
             label(card, item.name, "ArchiveItemName");
             card.SetPanelEvent("onmouseover", function () { tooltip(item); });
             card.SetPanelEvent("onmouseout", hideTooltip);
-            if (current === "work") {
+            if (current === "work" || current === "building") {
                 card.AddClass("ArchiveWorkCard");
                 var canUpgrade = Number(item.can_upgrade) === 1 && Number(data.pending) !== 1;
                 card.SetHasClass("ArchiveWorkAvailable", canUpgrade);
-                label(card, Number(item.completed) === 1 ? "已激活" : item.cost + "软妹币", "ArchiveWorkCost");
+                label(card, Number(item.completed) === 1 ? (current === "building" ? "已满级" : "已激活") : item.cost + (current === "building" ? "信仰值" : "软妹币"), "ArchiveWorkCost");
                 card.SetPanelEvent("onactivate", function () {
                     if (!canUpgrade) return;
                     canUpgrade = false;
                     card.RemoveClass("ArchiveWorkAvailable");
-                    panel("ArchiveStatus").text = "正在激活福利…";
+                    panel("ArchiveStatus").text = current === "building" ? "正在保存建筑升级…" : "正在激活福利…";
                     hideTooltip();
-                    GameEvents.SendCustomGameEventToServer("survival_archive_work_upgrade", {
+                    GameEvents.SendCustomGameEventToServer(current === "building" ? "survival_archive_building_upgrade" : "survival_archive_work_upgrade", {
                         item_id: item.id, expected_level: Number(item.level) || 0
                     });
                     $.Schedule(0.5, request);
@@ -196,6 +196,12 @@
             panel("ArchiveHint").text = "每次消耗" + social.draw_cost + "张" + social.currency_name + " · 剩余数量决定抽取权重 · 重复获得叠加效果";
             panel("ArchiveSummary").text = "已拥有 " + ownedTypes + " / " + rows.length + " 种 · 共 " + social.total + " 件";
             panel("ArchiveStatus").text = Number(data.pending) === 1 ? "奖励正在保存…" : current === "friend" && Number(social.unlocked) === 1 ? "已集齐100件 · 我的大基巴已解锁（入口预留）" : "挑战3获取" + social.currency_name + " · 每项挑战每日最多10张 · 奖励效果按持有数量叠加";
+        }
+        if (current === "building" && data.buildings) {
+            var buildings = data.buildings;
+            panel("ArchiveSummary").text = "信仰值：" + buildings.faith + " · 今日获取 " + buildings.earned_today + "/" + buildings.daily_cap;
+            panel("ArchiveHint").text = "每次通关+" + buildings.per_clear + "信仰值 · 每日上限" + buildings.daily_cap + " · 余额累积 · 通行证不加成";
+            panel("ArchiveStatus").text = Number(data.pending) === 1 ? "正在保存建筑升级…" : "点击激活或升级 · 每项最多5级 · 通关后新增效果于下局生效";
         }
         if (current === "boss") {
             panel("ArchiveSummary").text = "波次BOSS击杀 " + (rows.length ? rows[0].count : 0) + " 次 · 已激活 " + done + " / " + rows.length;

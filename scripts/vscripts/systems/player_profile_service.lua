@@ -656,6 +656,10 @@ end
 -- ownership and a lottery item's gameplay-stat deltas cannot split across
 -- two revisions.
 function M.update_save_sections(player_id, replacements, reason)
+    -- HTTP-authoritative rooms must never acknowledge a local-only permanent write.
+    if provider and provider.archive_enabled and provider.archive_enabled() then
+        return { ok = false, error = "remote_save_requires_server_transaction" }
+    end
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 or type(replacements) ~= "table" then
         return { ok = false, error = "save_sections_invalid" }
@@ -734,6 +738,7 @@ function M.init(options)
     register_server_convar("survival_player_profile_provider", "")
     register_server_convar("survival_fishing_api_token", "")
     register_server_convar("survival_fishing_reward_fixture", "")
+    register_server_convar("survival_archive_http_enabled", "0")
     active_rule = nil
     for _, row in ipairs(rules.rows or {}) do
         if row.enabled ~= false then

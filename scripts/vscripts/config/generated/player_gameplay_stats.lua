@@ -95,6 +95,10 @@ M.rows = {
     { field_id = "global_attack_armor_reduction", storage_type = "decimal", default_value = 0, unit = "armor", min_value = 0, enabled = true, notes = "所有英雄、伐木工和防御塔攻击敌人时通用的固定减甲量。" },
     { field_id = "team_hero_wall_armor_bonus", storage_type = "decimal", default_value = 0, unit = "armor", min_value = 0, enabled = true, notes = "对所有联机玩家英雄和城墙生效的护甲增加量。" },
     { field_id = "enemy_initial_armor_reduction", storage_type = "decimal", default_value = 0, unit = "armor", min_value = 0, enabled = true, notes = "地图上所有敌方单位的初始护甲减少量。" },
+    { field_id = "wall_wave_boss_stun_seconds", storage_type = "decimal", default_value = 0, unit = "seconds", min_value = 0, max_value = 10, enabled = true, notes = "主线波次BOSS攻击城墙后的眩晕秒数。" },
+    { field_id = "hero_attack_pct_per_minute", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 100, enabled = true, notes = "每60秒累计增加英雄攻击加成百分比。" },
+    { field_id = "tower_attack_pct_per_minute", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 100, enabled = true, notes = "每60秒累计增加箭塔攻击加成百分比。" },
+    { field_id = "hero_attributes_pct_per_minute", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 100, enabled = true, notes = "每60秒累计增加英雄全属性加成百分比。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

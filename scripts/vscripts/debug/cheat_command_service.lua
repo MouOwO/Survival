@@ -1188,6 +1188,7 @@ local COMMANDS = {
     wudi = wudi,
     yitie = function(context) return require("systems/archive_service").yitie(context) end,
     zaixian = function(context) return require("systems/archive_service").zaixian(context) end,
+    xinyang = function(context) return require("systems/archive_service").xinyang(context) end,
     addattack = add_attack,
     addarmor = add_armor,
     blood = change_hero_health,
@@ -1276,7 +1277,7 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: wudi, choujiang <amount>, addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
+        "ready: wudi, xinyang <amount>, choujiang <amount>, addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
     )
 end
 

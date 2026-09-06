@@ -16,3 +16,4 @@ category_id,display_name,renderer,sort_order,enabled
 "ex","我的前女友","collection","62","1"
 "beast","瑞兽赐福","collection","63","1"
 "fishing","钓鱼存档","inventory","64","1"
+"building","存档建筑","upgrades","65","1"

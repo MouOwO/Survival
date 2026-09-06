@@ -13,6 +13,20 @@ function M:IsHidden() return true end
 function M:IsPurgable() return false end
 function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
+function M:DeclareFunctions() return { MODIFIER_EVENT_ON_ATTACK_LANDED } end
+function M:OnAttackLanded(params)
+    if not IsServer() then return end
+    local parent, wall = self:GetParent(), params.target
+    if params.attacker ~= parent or parent.survival_is_wave_monster ~= true
+        or parent.survival_is_boss ~= true or not wall or wall:IsNull()
+        or wall:entindex() ~= self.wall_entindex then return end
+    local player_id = tonumber(wall.survival_player_id)
+    if player_id == nil and wall.GetPlayerOwnerID then player_id = wall:GetPlayerOwnerID() end
+    if player_id == nil or player_id < 0 then player_id = parent.survival_player_id end
+    local duration = require("systems/permanent_reward_effect_service").value(player_id, "wall_wave_boss_stun_seconds")
+    if duration > 0 then parent:AddNewModifier(wall, nil, "modifier_stunned", {duration=duration}) end
+end
+
 function M:OnCreated(params)
     self.no_unit_collision = tonumber(params.no_unit_collision) == 1
     if not IsServer() then return end

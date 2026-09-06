@@ -86,6 +86,7 @@ end
 local renderers = {}
 renderers.fishing = function(profile) return (require("systems/archive_fishing_view").project(profile)) end
 renderers.map_level = function(_, archive) return require("systems/archive_online_rewards").rows(archive, "map_level") end
+renderers.building = function(_, archive) return require("systems/archive_building_rewards").rows(archive) end
 renderers.work = function(_, archive) return require("systems/archive_online_rewards").rows(archive, "work") end
 renderers.friend = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "friend") end
 renderers.ex = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "ex") end
@@ -162,6 +163,7 @@ function M.snapshot(player_id, category_id)
     end
     return { ok = true, category_id = category_id, revision = profile.revision,
         fishing = fishing,
+        buildings = category_id == "building" and require("systems/archive_building_rewards").info(saved(profile), require("systems/archive_calendar").day()) or nil,
         categories = enabled_categories(), has_pass = has_pass(profile) and 1 or 0,
         rows = projector and projector(profile, saved(profile)) or {},
         online = (category_id == "map_level" or category_id == "work")
@@ -197,52 +199,9 @@ local function local_settle(player_id, command)
     if not provider or type(provider.persist_save) ~= "function" then
         return { ok = false, error = "archive_provider_required" }
     end
-    local archive, stats = saved(profile), copy(profile.save.gameplay_stats)
-    if archive.processed[command.id] then return { ok = true, duplicate = true } end
-    if command.kind == "online_checkpoint" or command.kind == "work_upgrade" then
-        local ok, reason = require("systems/archive_online_rewards").apply(command, archive, stats, apply_effects)
-        if not ok then return { ok = false, terminal = true, error = reason } end
-    elseif command.kind == "boss_kill" then
-        archive.boss_kills=(tonumber(archive.boss_kills) or 0)+1
-    elseif command.kind == "daily_init" or command.kind == "daily_claim" then
-        local ok,reason=require("systems/archive_daily_rewards").apply(command,archive,stats,has_pass(profile),apply_effects)
-        if not ok then return {ok=false,terminal=true,error=reason} end
-    elseif command.kind == "clear" then
-        local difficulty = command.difficulty_id
-        archive.clear_counts[difficulty] = (archive.clear_counts[difficulty] or 0) + command.count
-        for _, item in ipairs(achievements.rows) do
-            if item.enabled and item.difficulty_id == difficulty
-                and archive.clear_counts[difficulty] >= item.required_count
-                and not archive.completed[item.achievement_id] then
-                apply_effects(stats, item)
-                archive.completed[item.achievement_id] = true
-            end
-        end
-    elseif command.kind == "endless" then
-        local config = require("systems/archive_endless_config")
-        if not config.wave(command.difficulty, command.wave) then return { ok = false, terminal = true, error = "endless_wave_invalid" } end
-        archive.endless_score = (tonumber(archive.endless_score) or 0) + config.score(command.wave)
-        archive.endless_best_wave = math.max(tonumber(archive.endless_best_wave) or 0, command.wave)
-        for _, item in ipairs(require("config/generated/archive_endless_achievements").rows) do
-            if item.enabled and archive.endless_score >= item.required_score and not archive.completed[item.achievement_id] then
-                apply_effects(stats, item)
-                archive.completed[item.achievement_id] = true
-            end
-        end
-    elseif command.kind == "challenge" then
-        local ok, reason = challenge_rewards.apply(command, archive, stats, has_pass(profile), apply_effects)
-        if not ok then return { ok = false, error = reason } end
-    elseif command.kind == "social_draw" or command.kind == "social_ticket_cheat" then
-        local ok, reason = require("systems/archive_social_rewards").apply(command, archive, stats, apply_effects)
-        if not ok then return { ok=false, error=reason, terminal=true } end
-    elseif command.kind == "promotion" then
-        local ok, reason = challenge_rewards.promote(command, archive, stats, apply_effects)
-        if not ok then return { ok = false, error = reason, terminal = true } end
-    else
-        return { ok = false, error = "archive_command_invalid" }
-    end
-    -- Online checkpoints are deduplicated by their cumulative session cursor, without one saved ID per minute.
-    if command.kind ~= "online_checkpoint" then archive.processed[command.id] = true end
+    local result = require("systems/archive_settlement").settle(profile, command, has_pass(profile))
+    if not result.ok or result.duplicate then return result end
+    local archive, stats = result.archive, result.gameplay_stats
     -- Only current match IDs are needed locally; completed milestones and
     -- counts are permanent. Remote providers must keep durable grant records.
     local prefix = session_id .. ":"
@@ -265,11 +224,14 @@ local function flush(player_id)
             busy[player_id] = nil
             scheduler.cancel("archive_remote_timeout:" .. player_id)
             if result and (result.ok or result.terminal) then queue[id] = nil end
+            if result and result.terminal and not result.ok then
+                bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=result.error or "存档请求被拒绝"})
+            end
             send(player_id)
             if M.send_daily and daily_viewers[player_id] then M.send_daily(player_id) end
         end
         if remote_provider then
-            scheduler.after(15, function()
+            scheduler.after(35, function()
                 complete({ ok = false, error = "archive_provider_timeout" })
             end, "archive_remote_timeout:" .. player_id)
             -- Adapter submits intent to the trusted backend. It must apply
@@ -290,6 +252,8 @@ local function flush(player_id)
 end
 
 local function enqueue(player_id, command)
+    local adapter = require("systems/archive_http_adapter")
+    if adapter.enabled() then remote_provider = adapter end
     player_id = tonumber(player_id)
     if not integer(player_id) then return { ok = false, error = "player_invalid" } end
     pending[player_id] = pending[player_id] or {}
@@ -342,7 +306,7 @@ end
 function M.record_clear(player_id, difficulty_id)
     local difficulty = string.lower(tostring(difficulty_id or ""))
     return enqueue(player_id, { id = session_id .. ":clear", kind = "clear",
-        difficulty_id = difficulty, count = 1 })
+        difficulty_id = difficulty, count = 1, day_key = tostring(require("systems/archive_calendar").day()) })
 end
 
 function M.record_endless_wave(player_id, wave_number, difficulty)
@@ -407,6 +371,25 @@ function M.zaixian(context)
     return result.ok, result.error
 end
 
+function M.xinyang(context)
+    local allowed = type(IsInToolsMode) == "function" and IsInToolsMode()
+        or GameRules and GameRules.IsCheatMode and GameRules:IsCheatMode()
+    if not allowed then return false, "tools_mode_or_cheats_required" end
+    local args = context.args or {}
+    local amount = tonumber(args[1])
+    if #args ~= 1 or not integer(amount) or amount < 1 or amount > 1000000000 then
+        return false, "用法：xinyang <1..1000000000整数>（添加信仰值）"
+    end
+    serial = (serial or 0) + 1
+    local result = enqueue(context.player_id, {id=session_id..":xinyang:"..serial,
+        kind="faith_cheat",amount=amount})
+    if result.ok then
+        bus.emit(events.UI_NOTIFICATION, {player_id=context.player_id,level="info",
+            message="添加信仰值"..amount.."的请求已提交，请在存档建筑查看余额"})
+    end
+    return result.ok, result.error
+end
+
 function M.yitie(context)
     local allowed = type(IsInToolsMode) == "function" and IsInToolsMode()
         or GameRules and GameRules.IsCheatMode and GameRules:IsCheatMode()
@@ -426,6 +409,18 @@ function M.promote(player_id, fragment_id, request_id)
     end
     return enqueue(player_id, { id = session_id .. ":promotion:" .. request_id,
         kind = "promotion", fragment_id = tostring(fragment_id or ""), day_key = day_key() })
+end
+
+function M.building_upgrade(player_id, item_id, expected_level)
+    local item = require("config/generated/archive_building_items").by_id[tostring(item_id or "")]
+    expected_level = tonumber(expected_level)
+    if not item or not item.enabled or not integer(expected_level) or expected_level >= item.max_level then
+        return {ok=false,error="建筑升级请求无效"}
+    end
+    -- A failed purchase must remain retryable after earning more faith in the same session.
+    serial = (serial or 0) + 1
+    return enqueue(player_id, {id=session_id .. ":building:" .. item.item_id .. ":" .. expected_level .. ":" .. serial,
+        kind="building_upgrade",item_id=item.item_id,expected_level=expected_level})
 end
 
 function M.work_upgrade(player_id, item_id, expected_level)
@@ -455,7 +450,7 @@ function M.cheat(context)
     if not known then return false, "archive_difficulty_invalid" end
     serial = (serial or 0) + 1
     local result = enqueue(context.player_id, { id = session_id .. ":cheat:" .. serial,
-        kind = "clear", difficulty_id = difficulty, count = count, test_only = true })
+        kind = "clear", difficulty_id = difficulty, count = count, day_key = tostring(require("systems/archive_calendar").day()), test_only = true })
     return result.ok, result.error
 end
 
@@ -467,6 +462,8 @@ function M.init()
     session_id = runtime_id()
     local online_clock = require("systems/archive_online_clock")
     online_clock.init(session_id, enqueue)
+    local http_adapter = require("systems/archive_http_adapter")
+    if http_adapter.enabled() then M.set_provider(http_adapter) end
     bus.subscribe(events.PLAYER_PROFILE_CHANGED, function(payload)
         local id = tonumber(payload.player_id)
         if id then
@@ -482,6 +479,7 @@ function M.init()
         if id then online_clock.disconnect(id) end
     end)
     scheduler.every(1, function()
+        if http_adapter.enabled() then return end -- Remote online credit consumes the existing DB checkpoint only.
         -- Iterate valid slots as well as profile events, so reopening the archive is never needed to earn time.
         for id = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
             if PlayerResource and PlayerResource:IsValidPlayerID(id) then
@@ -570,6 +568,17 @@ function M.init()
     end)
     local promotion_times = {}
     local draw_times = {}
+    local building_times = {}
+    CustomGameEventManager:RegisterListener("survival_archive_building_upgrade", function(_, payload)
+        local id = tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local now = GameRules:GetGameTime()
+        if building_times[id] and now - building_times[id] < 0.3 then return end
+        building_times[id] = now
+        local result = M.building_upgrade(id, payload.item_id, payload.expected_level)
+        if not result.ok then bus.emit(events.UI_NOTIFICATION, {player_id=id,level="error",message=result.error}) end
+        send(id)
+    end)
     local work_times = {}
     CustomGameEventManager:RegisterListener("survival_archive_work_upgrade", function(_, payload)
         local id = tonumber(payload.PlayerID)

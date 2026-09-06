@@ -8,6 +8,7 @@ local phase_guard = require("systems/gameplay_phase_guard")
 local M = {}
 local totals_by_player = {}
 local live_draw_ids = {}
+local minute_growth = {}
 local boss_effects_by_player = {}
 local hero_ticks_by_player = {}
 local tower_ticks_by_player = {}
@@ -159,6 +160,22 @@ local function player_unit(player_id)
         player_id = player_id,
     })
     return result and (result.hero or result.unit)
+end
+
+local function apply_minute_tick(player_id)
+    if phase_guard.post_clear_frozen() then return end
+    local s = minute_growth[player_id] or {seconds=0,hero=0,tower=0,attributes=0}
+    minute_growth[player_id] = s
+    s.seconds = s.seconds + 1
+    if s.seconds < 60 then return end
+    s.seconds = 0
+    s.hero = s.hero + M.value(player_id, "hero_attack_pct_per_minute")
+    s.tower = s.tower + M.value(player_id, "tower_attack_pct_per_minute")
+    s.attributes = s.attributes + M.value(player_id, "hero_attributes_pct_per_minute")
+    if s.hero > 0 or s.tower > 0 or s.attributes > 0 then
+        event_bus.emit(events.HERO_PROGRESSION_CHANGED, {player_id=player_id,reason="archive_building_minute_growth"})
+        event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id=player_id,reason="archive_building_minute_growth"})
+    end
 end
 
 local function apply_hero_tick(player_id)
@@ -459,6 +476,10 @@ local function get(payload)
         + (tower_tick_attack_by_player[player_id] or 0)
         + (tower_damage_bonus_by_player[player_id] or 0)
         + (tower_basic_attack_bonus_by_player[player_id] or 0)
+    local growth = minute_growth[player_id] or {}
+    totals.hero_attack_bonus_pct = (totals.hero_attack_bonus_pct or 0) + (growth.hero or 0)
+    totals.tower_attack_bonus_pct = (totals.tower_attack_bonus_pct or 0) + (growth.tower or 0)
+    totals.hero_attribute_bonus_pct = (totals.hero_attribute_bonus_pct or 0) + (growth.attributes or 0)
     totals.wall_health_growth_flat = wall_tick_health_by_player[player_id] or 0
     totals.wall_armor_growth_flat = wall_tick_armor_by_player[player_id] or 0
     return {
@@ -479,6 +500,7 @@ function M.set_test_isolation(player_id, field_id, defer_refresh)
     if player_id == nil or player_id < 0 or field_id == "" then
         return false, "test_isolation_invalid"
     end
+    minute_growth[player_id] = nil
     test_isolated_field_by_player[player_id] = field_id
     hero_ticks_by_player[player_id] = 0
     tower_ticks_by_player[player_id] = 0
@@ -515,6 +537,7 @@ function M.init()
     totals_by_player = {}
     live_draw_ids = {}
     boss_effects_by_player = {}
+    minute_growth = {}
     hero_ticks_by_player = {}
     tower_ticks_by_player = {}
     hero_tick_attributes_by_player = {}
@@ -542,6 +565,7 @@ function M.init()
     end)
     scheduler.every(1, function()
         for player_id in pairs(totals_by_player) do
+            apply_minute_tick(player_id)
             apply_hero_tick(player_id)
             apply_tower_tick(player_id)
             apply_wall_tick(player_id)

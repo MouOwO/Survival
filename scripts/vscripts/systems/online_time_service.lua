@@ -201,6 +201,9 @@ checkpoint = function(player_id, final)
         .. " request_id=" .. tostring(payload.request_id)
         .. " final=" .. tostring(payload.final))
     provider.online_checkpoint(payload, function(response)
+        if response and response.profile and tostring(response.profile.account_id) == tostring(account_id) then
+            profile_service.apply_snapshot(player_id, response.profile, "archive_online_checkpoint")
+        end
         state.last_success = GameRules:GetGameTime()
         local grants = {}
         local raw_grants = response and response.grants or {}

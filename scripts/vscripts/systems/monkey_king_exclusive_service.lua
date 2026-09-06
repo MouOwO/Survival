@@ -429,13 +429,7 @@ local function sync_clone(current, hero)
         and tonumber(health_modifier:GetStackCount()) or 0
     local native_maximum = math.max(1, previous_max - old_health_bonus)
     local health_bonus = math.max(0, math.floor(maximum - native_maximum))
-    health_modifier = clone:AddNewModifier(
-        clone, nil, "modifier_survival_hero_base_health",
-        { health_bonus = health_bonus }
-    ) or health_modifier
-    if health_modifier and health_modifier.SetHealthBonus then
-        health_modifier:SetHealthBonus(health_bonus)
-    end
+    health_modifier = require("systems/hero_base_health_service").apply(clone, health_bonus)
     if clone.CalculateStatBonus then clone:CalculateStatBonus(true) end
     local projected_maximum = math.max(1, tonumber(clone:GetMaxHealth()) or maximum)
     clone:SetHealth(math.max(1, math.min(

@@ -303,18 +303,11 @@ function M.apply_configured_health(unit, definition, attribute_health_bonus)
     local health_bonus = math.max(0, math.floor(target - native_maximum))
 
     hero_health_guard.preserve_missing(unit, function()
-        if not modifier then
-            modifier = unit:AddNewModifier(unit, nil, modifier_name, {
-                health_bonus = health_bonus,
-            })
-        elseif modifier.SetHealthBonus then
-            modifier:SetHealthBonus(health_bonus)
-        else
-            modifier:SetStackCount(health_bonus)
-        end
+        modifier = require("systems/hero_base_health_service").apply(unit, health_bonus)
         safe_call(unit, "CalculateStatBonus", true)
     end, "configured_base_health")
 
+    if not modifier then return nil end
     unit.survival_base_max_health = target
     unit.survival_native_max_health = native_maximum
     unit.survival_base_health_bonus = health_bonus

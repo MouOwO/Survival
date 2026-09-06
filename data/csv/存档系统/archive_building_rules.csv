@@ -1,0 +1,4 @@
+rule_id,faith_per_clear,faith_daily_cap,day_timezone_offset
+#中文表头:规则ID,每次通关信仰,每日获取上限,时区偏移秒
+#types:string,number,number,number
+default,400,4000,28800

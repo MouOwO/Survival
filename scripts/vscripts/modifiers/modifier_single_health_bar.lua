@@ -1,6 +1,4 @@
-if LinkLuaModifier then
-    LinkLuaModifier("modifier_single_health_bar", "modifiers/modifier_single_health_bar", LUA_MODIFIER_MOTION_NONE)
-end
+-- Linked through modifier_bindings by the registry; do not relink a cached module.
 modifier_single_health_bar = class({})
 _G.modifier_single_health_bar = modifier_single_health_bar
 
@@ -13,20 +11,22 @@ end
 
 local TABLE = "survival_hero_health_bar"
 
-local function publish(unit, value)
+local function publish(unit, value, cached_entindex)
     if not CustomNetTables
         or type(CustomNetTables.SetTableValue) ~= "function"
-        or not unit or not unit.entindex then
+        or (not cached_entindex and (not unit or not unit.entindex)) then
         return
     end
     CustomNetTables:SetTableValue(
         TABLE,
-        "unit_" .. tostring(unit:entindex()),
+        "unit_" .. tostring(cached_entindex or unit:entindex()),
         value
     )
 end
 
 function modifier_single_health_bar:OnCreated()
+    if not IsServer() then return end
+    self.health_bar_entindex = self:GetParent():entindex()
     self:publish_state()
     self:StartIntervalThink(0.1)
 end
@@ -36,6 +36,7 @@ function modifier_single_health_bar:OnIntervalThink()
 end
 
 function modifier_single_health_bar:publish_state()
+    if not IsServer() then return end
     local unit = self:GetParent()
     if not unit or (unit.IsNull and unit:IsNull())
         or not unit.entindex
@@ -43,6 +44,13 @@ function modifier_single_health_bar:publish_state()
         or not unit.GetMaxHealth
         or not unit.IsAlive
         or not unit.GetTeamNumber then
+        publish(nil, { removed = 1 }, self.health_bar_entindex)
+        return
+    end
+    if unit.survival_hide_custom_health_bar
+        or (unit.IsNoDraw and unit:IsNoDraw())
+        or (unit.GetClassname and unit:GetClassname() == "npc_dota_thinker") then
+        publish(unit, { removed = 1 })
         return
     end
     local projection = require("combat/endless_stat_projection")
@@ -53,14 +61,14 @@ function modifier_single_health_bar:publish_state()
         health_scale = string.format("%.17g", tonumber(unit.survival_endless_health_scale) or 1),
         alive = unit:IsAlive() and 1 or 0,
         team = unit:GetTeamNumber(),
+        unit_name = unit.GetUnitName and unit:GetUnitName() or nil,
     })
 end
 
 function modifier_single_health_bar:OnDestroy()
-    local unit = self:GetParent()
-    if unit and (not unit.IsNull or not unit:IsNull()) then
-        publish(unit, { removed = 1 })
-    end
+    if not IsServer() then return end
+    -- The parent may already be invalid when RemoveSelf/ReplaceHeroWith destroys it.
+    publish(nil, { removed = 1 }, self.health_bar_entindex)
 end
 
 function modifier_single_health_bar:CheckState()

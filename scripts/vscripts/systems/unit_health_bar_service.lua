@@ -19,6 +19,7 @@ local function is_excluded(unit)
         EXCLUDED_UNIT_NAMES[unit_name]
         or unit.survival_wall_collision_barrier
         or unit.survival_hide_custom_health_bar
+        or (unit.GetClassname and unit:GetClassname() == "npc_dota_thinker")
         or (unit.HasModifier
             and unit:HasModifier("modifier_survival_placeholder_anchor"))
     )

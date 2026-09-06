@@ -1,0 +1,12 @@
+item_id,display_name,max_level,cost,description,effect_ids,effect_values,enabled
+#中文表头:建筑ID,名称,等级上限,每级信仰消耗,每级效果,词条数组,数值数组,启用
+#types:string,string,number,number,string,list,list,boolean
+building_01,玲珑心,5,3000,科技木材费用减免5% × 等级,technology_wood_cost_refund_pct,5,1
+building_02,圣剑,5,3000,英雄攻击减甲+3 × 等级,hero_attack_armor_reduction,3,1
+building_03,赤红甲,5,3000,墙减伤+1% × 等级,wall_damage_reduction_pct,1,1
+building_04,大剑,5,3000,英雄与箭塔每次造成伤害攻击+10 × 等级,hero_damage_attack_growth|tower_damage_attack_growth,10|10,1
+building_05,深渊之刃,5,3000,每波BOSS攻击城墙时被击晕2秒 × 等级,wall_wave_boss_stun_seconds,2,1
+building_06,板甲,5,3000,墙护甲+1% × 等级,wall_armor_bonus_pct,1,1
+building_07,秘法鞋,5,3000,科技金币费用减免5% × 等级,technology_gold_cost_refund_pct,5,1
+building_08,狂战斧,5,3000,每60秒英雄与箭塔攻击加成+1% × 等级,hero_attack_pct_per_minute|tower_attack_pct_per_minute,1|1,1
+building_09,雷神之锤,5,3000,每60秒英雄三围加成+2% × 等级,hero_attributes_pct_per_minute,2,1
