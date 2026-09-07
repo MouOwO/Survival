@@ -1,0 +1,422 @@
+<root>
+    <styles>
+        <include src="file://{resources}/styles/custom_game/survival_hud.css" />
+        <include src="file://{resources}/styles/custom_game/survival_hud_native.css" />
+        <include src="file://{resources}/styles/custom_game/hero_world_health_bar.css" />
+        <include src="file://{resources}/styles/custom_game/ability_tooltip.css" />
+        <include src="file://{resources}/styles/custom_game/inventory_tooltip.css" />
+        <include src="file://{resources}/styles/custom_game/shop.css" />
+        <include src="file://{resources}/styles/custom_game/combat_stats.css" />
+        <include src="file://{resources}/styles/custom_game/weapon_growth_hud.css" />
+        <include src="file://{resources}/styles/custom_game/game_info_panel.css" />
+        <include src="file://{resources}/styles/custom_game/gold_mine_income_numbers.css" />
+        <include src="file://{resources}/styles/custom_game/lottery.css" />
+        <include src="file://{resources}/styles/custom_game/archive_difficulty.css" />
+        <include src="file://{resources}/styles/custom_game/lottery_celestial.css" />
+    </styles>
+    <scripts>
+        <include src="file://{resources}/scripts/custom_game/reward_presentation.js" />
+        <include src="file://{resources}/scripts/custom_game/ui_bootstrap.js" />
+        <include src="file://{resources}/scripts/custom_game/hero_world_health_bar.js" />
+        <include src="file://{resources}/scripts/custom_game/attack_range_input.js" />
+        <include src="file://{resources}/scripts/custom_game/gold_mine_income_numbers.js" />
+        <include src="file://{resources}/scripts/custom_game/survival_ui.js" />
+        <include src="file://{resources}/scripts/custom_game/building_move.js" />
+        <include src="file://{resources}/scripts/custom_game/tooltip_position.js" />
+        <include src="file://{resources}/scripts/custom_game/ability_tooltip.js" />
+        <include src="file://{resources}/scripts/custom_game/inventory_tooltip.js" />
+        <include src="file://{resources}/scripts/custom_game/shop_tooltip.js" />
+        <include src="file://{resources}/scripts/custom_game/shop_ui.js" />
+        <include src="file://{resources}/scripts/custom_game/shop_debug.js" />
+        <include src="file://{resources}/scripts/custom_game/combat_stats.js" />
+        <include src="file://{resources}/scripts/custom_game/portrait_camera_editor.js" />
+        <include src="file://{resources}/scripts/custom_game/lottery_ui.js" />
+
+        <include src="file://{resources}/scripts/custom_game/hud_takeover.js" />
+        <include src="file://{resources}/scripts/custom_game/weapon_growth_hud.js" />
+        <include src="file://{resources}/scripts/custom_game/game_info_panel.js" />
+    </scripts>
+    <Panel class="SurvivalHUDRoot Theme_Native" hittest="false">
+        <Panel id="SurvivalHeroWorldHealthBars" hittest="false" hittestchildren="false" />
+        <Panel id="GoldMineIncomeNumbers" hittest="false" hittestchildren="false" />
+        <Panel id="SurvivalTowerPortraitOverlay" class="SurvivalTowerPortraitOverlay" hittest="false" hittestchildren="false">
+            <DOTAScenePanel id="SurvivalTowerPortraitScene" class="SurvivalTowerPortraitScene" hittest="false" />
+        </Panel>
+        <!-- Fixed background scene containing the Bladeform Legacy Origins
+             model and its wearable parts. It is mounted only for Juggernaut. -->
+        <Panel id="SurvivalJuggernautPortraitOverlay" class="SurvivalJuggernautPortraitOverlay" hittest="false" hittestchildren="false">
+            <DOTAScenePanel id="SurvivalJuggernautPortraitScene" class="SurvivalJuggernautPortraitScene" map="portraits/juggernaut_arcana_origins_v5" camera="jugg_portrait_camera" particleonly="false" hittest="false" />
+        </Panel>
+        <Panel id="SurvivalPortraitCameraEditor" class="SurvivalPortraitCameraEditor Hidden" hittest="true" hittestchildren="true">
+            <Panel class="PortraitCameraEditorHeader">
+                <Label class="PortraitCameraEditorTitle" text="主宰 ScanPanel 镜头校准器" />
+                <Button class="PortraitCameraEditorClose" onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.SetVisible(false)"><Label text="×" /></Button>
+            </Panel>
+            <Label id="PortraitCameraEditorStatus" class="PortraitCameraEditorStatus" text="准备就绪" />
+            <Panel class="PortraitCameraEditorRows">
+                <Panel class="PortraitCameraEditorRow"><Label text="X" /><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('x', -10)"><Label text="-10" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('x', -1)"><Label text="-1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('x', 1)"><Label text="+1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('x', 10)"><Label text="+10" /></Button></Panel>
+                <Panel class="PortraitCameraEditorRow"><Label text="Y" /><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('y', -10)"><Label text="-10" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('y', -1)"><Label text="-1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('y', 1)"><Label text="+1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('y', 10)"><Label text="+10" /></Button></Panel>
+                <Panel class="PortraitCameraEditorRow"><Label text="Z" /><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('z', -10)"><Label text="-10" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('z', -1)"><Label text="-1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('z', 1)"><Label text="+1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('z', 10)"><Label text="+10" /></Button></Panel>
+                <Panel class="PortraitCameraEditorRow"><Label text="Pitch" /><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('pitch', -5)"><Label text="-5" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('pitch', -1)"><Label text="-1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('pitch', 1)"><Label text="+1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('pitch', 5)"><Label text="+5" /></Button></Panel>
+                <Panel class="PortraitCameraEditorRow"><Label text="Yaw" /><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('yaw', -5)"><Label text="-5" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('yaw', -1)"><Label text="-1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('yaw', 1)"><Label text="+1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('yaw', 5)"><Label text="+5" /></Button></Panel>
+                <Panel class="PortraitCameraEditorRow"><Label text="Roll" /><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('roll', -5)"><Label text="-5" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('roll', -1)"><Label text="-1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('roll', 1)"><Label text="+1" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Nudge('roll', 5)"><Label text="+5" /></Button></Panel>
+            </Panel>
+            <Label id="PortraitCameraEditorValues" class="PortraitCameraEditorValues" text="" />
+            <Panel class="PortraitCameraEditorActions">
+                <Button onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Reset()"><Label text="重置" /></Button>
+                <Button class="Primary" onactivate="GameUI.CustomUIConfig().SurvivalPortraitCameraEditor.Confirm()"><Label text="确定并输出" /></Button>
+            </Panel>
+        </Panel>
+        <Panel id="TopBar">
+            <Label id="WoodValue" text="木材 0" />
+            <Label id="GoldValue" text="金币 0" />
+            <Label id="PopulationValue" text="人口 0/0" />
+            <Label id="CityLevelValue" text="主城 Lv.0" />
+        </Panel>
+        <Panel id="WaveBar">
+            <Label id="WaveNumber" text="波次 0/30" />
+            <Label id="WaveState" text="等待" />
+            <Label id="WaveTimer" text="30" />
+            <Label id="AliveValue" text="存活 0" />
+            <Label id="PendingValue" text="待生成 0" />
+        </Panel>
+
+        <Panel id="DifficultySelectionOverlay" class="DifficultySelectionHidden" hittest="true">
+            <Panel id="DifficultySelectionDialog" hittest="true">
+                <Label id="DifficultySelectionTitle" text="选择游戏难度" />
+                <Label id="DifficultySelectionHint" text="难度选定后，本局将无法更改" />
+                <Panel id="DifficultySelectionButtons" hittest="true">
+                    <Label id="DifficultySelectionLoading" text="正在读取难度配置……" />
+                </Panel>
+                <Label id="DifficultySelectionError" text="" />
+            </Panel>
+        </Panel>
+
+        <!-- 左上角商店入口；主界面从左侧滑入。 -->
+        <Button id="CustomShopButton" class="Locked" hittest="true" onactivate="GameUI.CustomUIConfig().SurvivalShop.ToggleShop()">
+            <DOTAItemImage id="CustomShopButtonIcon" itemname="item_ironwood_tree" />
+            <Label id="CustomShopButtonLabel" text="商店" />
+        </Button>
+        <Button id="LotteryButton" hittest="true" onactivate="GameUI.CustomUIConfig().SurvivalLottery.Toggle()">
+            <DOTAItemImage id="LotteryButtonIcon" itemname="item_treasure_chest" />
+            <Label id="LotteryButtonLabel" text="抽奖" />
+        </Button>
+        <Panel id="LotteryWindow" class="LotteryWindow LotteryClosed" hittest="true">
+    <Panel id="LotteryCelestialHeader">
+        <Label id="LotteryBrand" text="✧  地图抽奖" />
+        <Panel id="LotteryPoolTabs" />
+        <Panel id="LotteryWallet"><Button id="LotteryTicketPurchase" onactivate="GameUI.CustomUIConfig().SurvivalLottery.Feature('purchase')"><Label id="LotteryTicketValue" text="抽奖券  —" /><Label text="＋" /></Button><Label id="LotteryPointValue" text="星悦积分  —" /></Panel>
+        <Button id="LotteryCloseButton" onactivate="GameUI.CustomUIConfig().SurvivalLottery.Close()"><Label text="×" /></Button>
+    </Panel>
+    <Panel id="LotteryShopLinks"><Button onactivate="GameUI.CustomUIConfig().SurvivalLottery.Feature('purchase')"><Label text="购买抽奖券  〉" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalLottery.Feature('firstgift')"><Label text="首充礼包 · 连领3天  〉" /></Button></Panel>
+    <Panel id="LotteryHeroCopy">
+        <Button id="LotteryAnnouncement" onactivate="GameUI.CustomUIConfig().SurvivalLottery.Feature('announcement')"><Label text="开奖公告  〉" /></Button>
+        <Label id="LotteryTitle" text="地图宝箱" />
+        <Label id="LotteryTagline" text="探索秘境 · 开启珍藏" />
+        <Panel id="LotteryGuaranteeRow"><Label id="LotteryGuaranteeValue" text="正在读取保底规则…" /></Panel>
+        <Label id="LotterySubtitle" text="正在读取奖池…" /><Label id="LotteryTierValue" text="地图奖池" />
+    </Panel>
+    <Panel id="LotteryResultStage">
+        <Label id="LotteryResultHeading" text="✧   获得奖励   ✧" />
+        <Panel id="LotteryItemList" />
+        <Panel id="LotteryResultActions"><Button id="LotteryConfirm" class="LotteryIvoryButton" onactivate="GameUI.CustomUIConfig().SurvivalLottery.CloseResult()"><Label text="确认" /></Button><Button id="LotteryAgain" class="LotteryGoldButton" onactivate="GameUI.CustomUIConfig().SurvivalLottery.DrawAgain()"><Label id="LotteryAgainText" text="再开一次" /></Button></Panel>
+    </Panel>
+    <Panel id="LotteryRevealStage" hittest="false" hittestchildren="false"><Panel class="LotteryRevealOrbit" /><Panel class="LotteryRevealOrbit Inner" /><DOTAItemImage class="LotteryRevealChest" itemname="item_treasure_chest" /><Label id="LotteryRevealPhase" text="福签汇入" /></Panel>
+    <Button id="LotterySkipReveal" onactivate="GameUI.CustomUIConfig().SurvivalLottery.SkipReveal()"><Label text="跳过  》" /></Button>
+    <Panel id="LotteryCelestialFooter">
+        <Panel id="LotteryUtility"><Button onactivate="GameUI.CustomUIConfig().SurvivalLottery.Feature('details')"><Label text="▤  奖池详情" /></Button><Button onactivate="GameUI.CustomUIConfig().SurvivalLottery.Feature('history')"><Label text="▱  抽奖记录" /></Button><ToggleButton id="LotterySkipAnimation" onactivate="GameUI.CustomUIConfig().SurvivalLottery.SetSkipAnimation()"><Label text="跳过动画" /></ToggleButton></Panel>
+        <Panel id="LotteryActions"><Panel class="LotteryActionBlock"><Button id="LotterySingleButton" class="LotteryIvoryButton" onactivate="GameUI.CustomUIConfig().SurvivalLottery.DrawSingle()"><Label text="✧  开启1个" /></Button><Label id="LotterySingleCost" class="LotteryCostLabel" text="正在读取消耗…" /><Button class="LotteryPrivilege" onactivate="GameUI.CustomUIConfig().SurvivalLottery.Feature('privilege')"><Label text="抽奖券礼包特权" /></Button></Panel><Panel class="LotteryActionBlock"><Button id="LotteryTenButton" class="LotteryGoldButton" onactivate="GameUI.CustomUIConfig().SurvivalLottery.DrawTen()"><Label text="✧  开启10个" /></Button><Label id="LotteryTenCost" class="LotteryCostLabel" text="正在读取消耗…" /></Panel></Panel>
+    </Panel>
+    <Panel id="LotterySmallActions"><Button id="LotteryBackButton" onactivate="GameUI.CustomUIConfig().SurvivalLottery.Close()"><Label text="‹ 返回" /></Button><Button id="LotteryRefreshButton" onactivate="GameUI.CustomUIConfig().SurvivalLottery.Refresh()"><Label text="刷新" /></Button></Panel>
+    <Label id="LotteryStatus" text="正在读取奖池…" />
+    <Panel id="LotteryInfoOverlay" class="LotteryInfoHidden"><Panel id="LotteryInfoDialog"><Panel id="LotteryInfoHeader"><Label id="LotteryInfoTitle" /><Button onactivate="GameUI.CustomUIConfig().SurvivalLottery.CloseInfo()"><Label text="×" /></Button></Panel><Label id="LotteryInfoNote" /><Panel id="LotteryInfoList" /></Panel></Panel>
+</Panel>
+
+        <Panel id="LotteryItemTooltip" class="Hidden" hittest="false" hittestchildren="false">
+            <Panel id="LotteryTooltipHeader">
+                <Panel id="LotteryTooltipIconHost" />
+                <Panel id="LotteryTooltipTitleBlock">
+                    <Label id="LotteryTooltipName" text="道具名称" />
+                    <Label id="LotteryTooltipType" text="类型：积分道具" />
+                    <Label id="LotteryTooltipDuration" text="期限：永久" />
+                </Panel>
+            </Panel>
+            <Label id="LotteryTooltipDescription" text="简介：" />
+        </Panel>
+        <Panel id="HeroCombatDebugPanel" hittest="false">
+            <Label id="HeroCombatDebugTitle" text="英雄伤害 / 科技状态" />
+            <Panel id="HeroCombatDamageSummary">
+                <Label class="HeroCombatDamageKey" text="累计伤害" />
+                <Label id="HeroCombatTotalDamage" class="HeroCombatDamageValue MonoNumbersFont" text="0" />
+            </Panel>
+            <Label id="HeroCombatLastDamage" text="最近伤害 0 · 命中 0 次" />
+            <Panel id="HeroCombatSkillDamageSummary">
+                <Label class="HeroCombatDamageKey" text="累计技能伤害" />
+                <Label id="HeroCombatSkillTotalDamage" class="HeroCombatDamageValue HeroCombatSkillDamageValue MonoNumbersFont" text="0" />
+            </Panel>
+            <Label id="HeroCombatSkillLastDamage" text="最近技能伤害 0 · 命中 0 次" />
+            <Label id="HeroCombatTechnologySummary" text="" />
+            <Panel id="HeroTechnologyHeader">
+                <Label text="当前已激活科技" />
+            </Panel>
+            <Panel id="HeroTechnologyList">
+                <Label id="HeroTechnologyEmpty" text="暂无已激活科技" />
+            </Panel>
+        </Panel>
+        <Panel id="ShopBackdrop" hittest="true">
+            <Button id="ShopBackdropClick" hittest="true" onactivate="GameUI.CustomUIConfig().SurvivalShop.Close()" />
+        </Panel>
+
+        <Panel id="CustomShopWindow" class="ShopDrawer Closed" hittest="true">
+            <Panel id="ShopHeader">
+                <Panel id="ShopModeToggles">
+                    <Button id="ShopModeShop" class="ShopModeToggle" onactivate="GameUI.CustomUIConfig().SurvivalShop.Open()"><Label text="商店" /></Button>
+                    <Button id="ShopModeChallenge" class="ShopModeToggle" onactivate="GameUI.CustomUIConfig().SurvivalShop.OpenChallenge()"><Label text="挑战" /></Button>
+                    <Button id="ShopModeLottery" class="ShopModeToggle" onactivate="GameUI.CustomUIConfig().SurvivalLottery.OpenFromShop()"><Label text="积分兑换" /></Button>
+                </Panel>
+                <Panel id="ShopTitleBlock">
+                    <Label id="ShopTitle" text="生存商店" />
+                    <Label id="ShopSubtitle" text="右键购买 · 每次打开均从服务器同步" />
+                </Panel>
+                <Button id="ShopRefreshButton" onactivate="GameUI.CustomUIConfig().SurvivalShop.Refresh()">
+                    <Label text="刷新" />
+                </Button>
+                <Button id="ShopCloseButton" onactivate="GameUI.CustomUIConfig().SurvivalShop.Close()">
+                    <Label text="×" />
+                </Button>
+            </Panel>
+            <Panel id="ShopBody">
+                <Panel id="ShopShelfArea">
+                    <Panel id="ShopLoading">
+                        <Label text="正在向服务器请求商店数据……" />
+                    </Panel>
+                    <Panel id="ShopItemList" />
+                </Panel>
+            </Panel>
+            <Panel id="ShopFooter">
+                <Label id="ShopResourceSummary" text="木材 0 · 金币 0" />
+                <Label id="ShopStatus" text="" />
+            </Panel>
+        </Panel>
+
+        <Panel id="ShopEntryTooltip" class="Hidden" hittest="false" hittestchildren="false">
+            <Panel id="ShopTooltipHeader">
+                <Panel id="ShopTooltipIconHost" />
+                <Panel id="ShopTooltipTitleBlock">
+                    <Label id="ShopTooltipTitle" text="商品" />
+                    <Label id="ShopTooltipType" text="物品" />
+                </Panel>
+            </Panel>
+            <Label id="ShopTooltipDescription" text="" />
+            <Panel id="ShopTooltipCostRow">
+                <Panel class="TooltipCostBlock">
+                    <DOTAItemImage class="TooltipCostIcon" itemname="item_ironwood_tree" />
+                    <Label id="ShopTooltipWoodCost" class="TooltipCostValue" text="0" />
+                </Panel>
+                <Panel class="TooltipCostBlock">
+                    <DOTAItemImage class="TooltipCostIcon" itemname="item_hand_of_midas" />
+                    <Label id="ShopTooltipGoldCost" class="TooltipCostValue" text="0" />
+                </Panel>
+            </Panel>
+            <Label id="ShopTooltipCondition" text="" />
+            <Label id="ShopTooltipOwned" text="" />
+            <Panel id="ShopTooltipFields" />
+            <Label id="ShopTooltipStatus" text="" />
+        </Panel>
+
+        <Panel id="CustomAbilityTooltip" class="Hidden" hittest="false" hittestchildren="false">
+            <Label id="CustomAbilityExtensionLabel" text="生存防守 · 自定义技能详情" />
+            <Panel id="AbilityTooltipHeader">
+                <Panel id="AbilityTooltipTitleBlock">
+                    <Panel id="CustomAbilityTitleRow">
+                        <Label id="CustomAbilityTitle" text="技能" />
+                        <Label id="CustomAbilityLevel" text="" />
+                        <Label id="CustomAbilityType" text="技能" />
+                    </Panel>
+                </Panel>
+            </Panel>
+            <Label id="CustomAbilityDescription" text="" />
+            <Panel id="CustomAbilityCostRow">
+                <Panel id="CustomAbilityGoldCostBlock" class="AbilityCostBlock">
+                    <Image class="AbilityCostIcon" src="file://{images}/custom_game/st2_darkfantasy/icons/st2_icon_gold.png" hittest="false" />
+                    <Label id="CustomAbilityGoldCost" class="AbilityCostValue" text="0" />
+                </Panel>
+                <Panel id="CustomAbilityWoodCostBlock" class="AbilityCostBlock">
+                    <Image class="AbilityCostIcon" src="file://{images}/custom_game/st2_darkfantasy/icons/st2_icon_wood.png" hittest="false" />
+                    <Label id="CustomAbilityWoodCost" class="AbilityCostValue" text="0" />
+                </Panel>
+            </Panel>
+            <Panel id="CustomAbilityFields" />
+            <Label id="CustomAbilityStatus" text="" />
+        </Panel>
+
+        <Panel id="CustomInventoryItemTooltip" class="Hidden" hittest="false" hittestchildren="false">
+            <Label id="CustomInventoryItemCategory" text="生存防守 · 物品详情" />
+            <Panel id="CustomInventoryItemHeader">
+                <DOTAItemImage id="CustomInventoryItemIcon" itemname="item_ironwood_tree" hittest="false" />
+                <Panel id="CustomInventoryItemTitleBlock">
+                    <Label id="CustomInventoryItemTitle" text="物品" />
+                    <Panel id="CustomInventoryItemMetaRow">
+                        <Label id="CustomInventoryItemType" text="物品" />
+                        <Label id="CustomInventoryItemLevel" text="" />
+                    </Panel>
+                </Panel>
+            </Panel>
+            <Label id="CustomInventoryItemDescription" text="" />
+            <Panel id="CustomInventoryItemFields" />
+            <Label id="CustomInventoryItemStatus" text="" />
+        </Panel>
+
+        <!-- Selective managed actions keep Valve visuals but receive mouse input
+             from outside the AbilityN ancestry, preventing native hover creation. -->
+        <Panel id="SurvivalManagedAbilityProxyLayer" hittest="false" hittestchildren="true" />
+
+        <!-- The independent skill proxy is positioned over Valve AbilityN but is
+             not its descendant, so native ability tooltip ancestry is avoided. -->
+        <Panel id="SurvivalAbilityTakeoverLayer" hittest="false" hittestchildren="true">
+            <Panel id="AbilityCalibrationContainerBounds" class="AbilityCalibrationBounds ContainerBounds" hittest="false" hittestchildren="false" />
+            <Panel id="AbilityCalibrationVisualBounds" class="AbilityCalibrationBounds VisualBounds" hittest="false" hittestchildren="false" />
+            <Panel id="AbilityCalibrationRowBounds" class="AbilityCalibrationBounds RowBounds" hittest="false" hittestchildren="false" />
+            <Panel id="AbilityCalibrationAnchor" class="AbilityCalibrationAnchor" hittest="false" hittestchildren="false">
+                <Panel class="AbilityCalibrationAnchorHorizontal" />
+                <Panel class="AbilityCalibrationAnchorVertical" />
+            </Panel>
+            <Panel id="SurvivalAbilityTakeoverRow" hittest="false" hittestchildren="true" />
+        </Panel>
+
+        <Panel id="SurvivalAbilityCalibrationPanel" class="Hidden" hittest="true" hittestchildren="true">
+            <Panel class="AbilityCalibrationHeader">
+                <Label class="AbilityCalibrationTitle" text="技能行锚点校准器" />
+                <Button class="AbilityCalibrationClose" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationVisible(false)">
+                    <Label text="×" />
+                </Button>
+            </Panel>
+            <Label id="AbilityCalibrationStatus" text="锚点：左上 (top_left)    偏移：X=0  Y=0" />
+            <Label id="AbilityCalibrationDetails" text="等待完整技能映射。" />
+            <Label class="AbilityCalibrationLegend" text="蓝：Valve 容器　黄：原生可见技能　绿：项目技能行　红：当前锚点" />
+            <Panel class="AbilityCalibrationContent">
+                <Panel class="AbilityCalibrationAnchorGrid">
+                    <Panel class="AbilityCalibrationButtonRow">
+                        <Button id="AbilityCalibration_top_left" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('top_left')"><Label text="左上" /></Button>
+                        <Button id="AbilityCalibration_top_center" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('top_center')"><Label text="中上" /></Button>
+                        <Button id="AbilityCalibration_top_right" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('top_right')"><Label text="右上" /></Button>
+                    </Panel>
+                    <Panel class="AbilityCalibrationButtonRow">
+                        <Button id="AbilityCalibration_middle_left" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('middle_left')"><Label text="左中" /></Button>
+                        <Button id="AbilityCalibration_center" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('center')"><Label text="中心" /></Button>
+                        <Button id="AbilityCalibration_middle_right" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('middle_right')"><Label text="右中" /></Button>
+                    </Panel>
+                    <Panel class="AbilityCalibrationButtonRow">
+                        <Button id="AbilityCalibration_bottom_left" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('bottom_left')"><Label text="左下" /></Button>
+                        <Button id="AbilityCalibration_bottom_center" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('bottom_center')"><Label text="中下" /></Button>
+                        <Button id="AbilityCalibration_bottom_right" class="AbilityCalibrationChoice" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.SetCalibrationAlignment('bottom_right')"><Label text="右下" /></Button>
+                    </Panel>
+                </Panel>
+                <Panel class="AbilityCalibrationNudges">
+                    <Panel class="AbilityCalibrationNudgeRow">
+                        <Label text="X" />
+                        <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.NudgeCalibration(-5, 0)"><Label text="-5" /></Button>
+                        <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.NudgeCalibration(-1, 0)"><Label text="-1" /></Button>
+                        <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.NudgeCalibration(1, 0)"><Label text="+1" /></Button>
+                        <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.NudgeCalibration(5, 0)"><Label text="+5" /></Button>
+                    </Panel>
+                    <Panel class="AbilityCalibrationNudgeRow">
+                        <Label text="Y" />
+                        <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.NudgeCalibration(0, -5)"><Label text="-5" /></Button>
+                        <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.NudgeCalibration(0, -1)"><Label text="-1" /></Button>
+                        <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.NudgeCalibration(0, 1)"><Label text="+1" /></Button>
+                        <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.NudgeCalibration(0, 5)"><Label text="+5" /></Button>
+                    </Panel>
+                </Panel>
+            </Panel>
+            <Panel class="AbilityCalibrationActions">
+                <Button onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.ResetCalibration()"><Label text="重置为左上 / 0,0" /></Button>
+                <Button class="Primary" onactivate="GameUI.CustomUIConfig().SurvivalAbilityTakeover.DumpCalibration()"><Label text="输出当前参数" /></Button>
+            </Panel>
+        </Panel>
+
+        <!-- Read-only growth status. It never overlaps or receives input from
+             Valve inventory slots, so drag/use/swap behavior stays native. -->
+        <Panel id="WeaponGrowthHUD" class="Hidden" hittest="false" hittestchildren="false">
+            <Panel id="WeaponGrowthHeader">
+                <Label id="WeaponGrowthName" text="成长装备" />
+                <Label id="WeaponGrowthStage" text="" />
+            </Panel>
+            <Panel id="WeaponGrowthProgressTrack">
+                <Panel id="WeaponGrowthProgressFill" />
+                <Label id="WeaponGrowthProgressText" class="MonoNumbersFont" text="0 / 0" />
+            </Panel>
+            <Label id="WeaponGrowthDetails" text="" />
+        </Panel>
+
+        <Panel id="GameInfoPanel" class="GameInfoClosed" hittest="false" hittestchildren="false">
+            <Panel id="GameInfoHeader">
+                <Label id="GameInfoTitle" text="游戏信息" />
+                <Button id="GameInfoCloseButton" hittest="true" onactivate="GameUI.CustomUIConfig().SurvivalGameInfo.Close()">
+                    <Label text="×" />
+                </Button>
+            </Panel>
+            <Panel id="GameInfoColumns">
+                <Panel id="GameInfoBuildingColumn" class="GameInfoColumn" />
+                <Panel id="GameInfoHeroColumn" class="GameInfoColumn" />
+            </Panel>
+        </Panel>
+
+        <!-- Reborn lower_hud -> center_with_stats -> center_block 等价结构。 -->
+        <Panel id="SurvivalHeroBottomHUD" class="SurvivalHeroBottomHUD HudHidden" hittest="false">
+            <Panel id="SurvivalLowerHUD" class="SurvivalLowerHUD" hittest="false">
+                <Panel id="SurvivalCenterWithStats" class="SurvivalCenterWithStats" hittest="false">
+                    <Panel id="SurvivalCenterBlock" class="SurvivalCenterBlock" hittest="false">
+            <Panel id="SurvivalNativeCenterBackground" hittest="false" />
+            <Panel id="SurvivalHeroPortraitBlock" class="SurvivalHeroPortraitBlock" hittest="true">
+                <Panel id="SurvivalNativePortraitFrame" hittest="false" />
+                <Panel id="SurvivalHeroLevelBadge"><Label id="SurvivalHeroLevel" text="1" /></Panel>
+            </Panel>
+            <Panel id="SurvivalHeroInfo" class="SurvivalHeroInfo">
+                <Panel id="SurvivalHeroNameRow"><Label id="SurvivalHeroName" text="农民" /><Label id="SurvivalHeroLevelText" class="Hidden" text="" /></Panel>
+                <Panel id="SurvivalHeroStats" class="SurvivalHeroStats">
+                    <Panel class="SurvivalStatRow Attack"><Image class="SurvivalStatIconImage" src="file://{images}/custom_game/survival_native/icon_damage.png" hittest="false" /><Label id="CombatAttackValue" class="SurvivalStatValue MonoNumbersFont" text="0" /></Panel>
+                    <Panel class="SurvivalStatRow Armor"><Image class="SurvivalStatIconImage" src="file://{images}/custom_game/survival_native/icon_armor.png" hittest="false" /><Label id="CombatArmorValue" class="SurvivalStatValue MonoNumbersFont" text="0" /></Panel>
+                    <Panel class="SurvivalStatRow AttackSpeed"><Image class="SurvivalStatIconImage" src="file://{images}/custom_game/survival_native/icon_attack_speed.png" hittest="false" /><Label id="CombatAttackSpeedValue" class="SurvivalStatValue MonoNumbersFont" text="0" /></Panel>
+                    <Panel class="SurvivalStatRow Strength"><Image class="SurvivalStatIconImage" src="file://{images}/custom_game/survival_native/icon_strength.png" hittest="false" /><Label id="CombatStrengthValue" class="SurvivalStatValue MonoNumbersFont" text="0" /></Panel>
+                    <Panel class="SurvivalStatRow Agility"><Image class="SurvivalStatIconImage" src="file://{images}/custom_game/survival_native/icon_agility.png" hittest="false" /><Label id="CombatAgilityValue" class="SurvivalStatValue MonoNumbersFont" text="0" /></Panel>
+                    <Panel class="SurvivalStatRow Intellect"><Image class="SurvivalStatIconImage" src="file://{images}/custom_game/survival_native/icon_intelligence.png" hittest="false" /><Label id="CombatIntellectValue" class="SurvivalStatValue MonoNumbersFont" text="0" /></Panel>
+                </Panel>
+            </Panel>
+            <Panel id="SurvivalHeroAbilityBar" class="SurvivalHeroAbilityBar" hittest="true">
+                <Panel id="SurvivalHeroBars" class="SurvivalHeroBars">
+                    <Panel id="SurvivalHeroHealthBar" class="SurvivalHeroHealthBar"><Panel id="SurvivalHeroHealthFill" /></Panel>
+                    <Label id="SurvivalHeroHealthText" class="SurvivalBarText" text="0 / 0" />
+                    <Panel id="SurvivalHeroManaBar" class="SurvivalHeroManaBar"><Panel id="SurvivalHeroManaFill" /></Panel>
+                    <Label id="SurvivalHeroManaText" class="SurvivalBarText" text="0 / 0" />
+                </Panel>
+                <Panel id="SurvivalHeroAbilitySlots" class="SurvivalHeroAbilitySlots" hittest="true" />
+            </Panel>
+            <Panel id="SurvivalNativeAbilityInsetLeft" hittest="false" />
+            <Panel id="SurvivalNativeAbilityInsetRight" hittest="false" />
+            <Panel id="SurvivalHeroInventory" class="SurvivalHeroInventory" hittest="true" />
+                    </Panel>
+                </Panel>
+            </Panel>
+        </Panel>
+
+        <Panel id="ArrowTowerDestroyConfirm" class="ArrowTowerDestroyConfirm Hidden" hittest="true">
+            <Panel class="ArrowTowerDestroyBackdrop" hittest="true" />
+            <Panel class="ArrowTowerDestroyDialog" hittest="true">
+                <Label class="ArrowTowerDestroyTitle" text="确认销毁箭塔？" />
+                <Label class="ArrowTowerDestroyMessage" text="不会返还木材或金币。网格、人口和数量名额会正常释放。" />
+                <Panel class="ArrowTowerDestroyActions">
+                    <Button class="ArrowTowerDestroyCancel" onactivate="GameUI.CustomUIConfig().SurvivalArrowTowerTools.Cancel()"><Label text="取消  Esc" /></Button>
+                    <Button class="ArrowTowerDestroyConfirmButton" onactivate="GameUI.CustomUIConfig().SurvivalArrowTowerTools.Confirm()"><Label text="确认" /></Button>
+                </Panel>
+            </Panel>
+        </Panel>
+        <Label id="SurvivalPointTargetHint" class="SurvivalPointTargetHint" text="" />
+      <Panel id="NotificationContainer" />
+    </Panel>
+</root>
+
+
+
+
+

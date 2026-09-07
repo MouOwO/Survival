@@ -2,12 +2,21 @@
     "use strict";
     var current = "clear", opened = false, latest = 0, assembly = null;
     var categories = [], tooltipVisible = false, requestGeneration = 0, tooltipGeneration = 0;
+    // Match the actual archive definitions, not the example names in the style reference.
+    var buildingIcons = {
+        building_01: "item_octarine_core", building_02: "item_rapier", building_03: "item_crimson_guard",
+        building_04: "item_claymore", building_05: "item_abyssal_blade", building_06: "item_platemail",
+        building_07: "item_arcane_boots", building_08: "item_bfury", building_09: "item_mjollnir"
+    };
     function isDrawPage() { return current === "friend" || current === "ex" || current === "beast"; }
     function showDrawBar() {
         var visible = isDrawPage();
         panel("ArchiveContent").SetHasClass("ArchiveHasDraw", visible);
         panel("ArchiveDrawBar").SetHasClass("ArchiveHidden", !visible);
         panel("ArchiveDrawBar").style.visibility = visible ? "visible" : "collapse";
+        panel("ArchiveContent").SetHasClass("ArchiveBuildingPage", current === "building");
+        panel("ArchiveFaith").AddClass("ArchiveHidden");
+        panel("ArchiveFaith").text = "";
     }
     function panel(id) { return $("#" + id); }
     function array(value) {
@@ -71,6 +80,8 @@
                 panel("ArchiveEmpty").text = "正在读取存档…";
                 panel("ArchivePageTitle").text = category.name;
                 panel("ArchiveSummary").text = "";
+                panel("ArchiveHint").text = "";
+                panel("ArchiveStatus").text = "正在同步档案…";
                 showDrawBar();
                 panel("ArchiveDraw").enabled = false;
                 panel("ArchiveTickets").text = "正在读取抽奖券…";
@@ -88,7 +99,10 @@
         art.AddClass("ArchiveArt_" + (item.icon_style || "seal"));
         art.AddClass("ArchiveQuality_" + (item.quality || "gold"));
         art.hittest = false;
-        if (current === "points" && item.icon_type !== "custom") {
+        if (current === "building" && buildingIcons[item.id]) {
+            GameUI.CustomUIConfig().SurvivalRewardPresentation.CreateIcon(art,
+                { icon_type: "item", icon: buildingIcons[item.id] }, "ArchiveRewardIcon");
+        } else if (current === "points" && item.icon_type !== "custom") {
             GameUI.CustomUIConfig().SurvivalRewardPresentation.CreateIcon(art, item, "ArchiveRewardIcon");
         } else {
         var shape = $.CreatePanel("Panel", art, "");
@@ -96,7 +110,8 @@
         shape.hittest = false;
         label(art, item.rune || String(item.name || "印").substring(0, 1), "ArchiveRune");
         }
-        if (Number(item.completed) === 1) art.AddClass("ArchiveCompleted");
+        if (Number(item.completed) === 1) art.AddClass(current === "building" ? "ArchiveMaxed" : "ArchiveCompleted");
+        if (current === "building" && !(Number(item.count) > 0)) art.AddClass("ArchiveUnowned");
         if (isDrawPage() && !(Number(item.count) > 0)) art.AddClass("ArchiveCompleted");
         if (current === "fishing" && !(Number(item.count) > 0)) art.AddClass("ArchiveCompleted");
         var count = Math.max(0, Number(item.count) || 0), target = Number(item.target) || 1;
@@ -200,6 +215,8 @@
         if (current === "building" && data.buildings) {
             var buildings = data.buildings;
             panel("ArchiveSummary").text = "信仰值：" + buildings.faith + " · 今日获取 " + buildings.earned_today + "/" + buildings.daily_cap;
+            panel("ArchiveFaith").text = "信仰值：" + buildings.faith;
+            panel("ArchiveFaith").RemoveClass("ArchiveHidden");
             panel("ArchiveHint").text = "每次通关+" + buildings.per_clear + "信仰值 · 每日上限" + buildings.daily_cap + " · 余额累积 · 通行证不加成";
             panel("ArchiveStatus").text = Number(data.pending) === 1 ? "正在保存建筑升级…" : "点击激活或升级 · 每项最多5级 · 通关后新增效果于下局生效";
         }

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>苟发育 · 存档—瑞兽赐福 · 视觉预览</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="reference.css"></head>
+<body>
+<div class="review-bar"><div><span class="review-dot"></span>苟发育 <span class="review-divider">/</span> 存档 UI 视觉提案 <span class="version">02</span></div><span>以参考图为主 · 尚未替换游戏版本</span></div>
+<main class="archive" aria-label="存档" role="dialog">
+  <header class="window-header"><div class="title-emblem" aria-hidden="true">✧</div><h1>存档</h1><div class="heading-divider"></div><p id="subtitle"></p><span class="header-note">每一份珍藏，皆为征途留痕</span><button class="close" aria-label="关闭存档">×</button></header>
+  <div class="window-body">
+    <aside><div class="nav-caption">存档分类<span>ARCHIVE</span></div><nav aria-label="存档分类" id="nav"></nav><div class="nav-bottom"><span>✧</span><p>征途留痕<br><small>永久成长</small></p></div></aside>
+    <section class="content">
+      <header class="page-header"><div class="page-heading"><div class="page-mark" aria-hidden="true">✦</div><div><div class="eyebrow">珍藏 · 瑞兽</div><h2>瑞兽赐福</h2></div></div><div class="collection"><span id="summary">已拥有 <b>6</b>/40 种 · 共 <b>6</b> 件</span><small id="summary-source">示例统计 · 玩家明细待接入</small><div class="collection-track"><i></i></div></div><p class="short-rule" id="short-rule"></p></header>
+      <div class="grid-caption"><span>全部珍藏 <b>40</b></span><span id="data-note">文字印章为现有占位图 · “—”为持有数量待接入</span></div>
+      <div id="grid" class="grid" tabindex="0" aria-label="40种瑞兽物品，可独立滚动"></div>
+      <footer class="page-footer"><div class="action-row"><div class="recent"><span class="recent-emblem" aria-hidden="true">✧</span><div><small>最近获得</small><p id="recent">获得：七禽扇</p></div><span class="example" id="recent-example">示例</span></div><div class="currency"><span class="ticket-icon" aria-hidden="true">福</span><div><small>福签余额<span class="example" id="ticket-example">示例</span></small><p id="tickets">福签：<b>95</b></p></div></div><button id="draw" disabled><span aria-hidden="true">✦</span>抽奖 ×1</button></div><div class="rules"><span class="rule-icon">i</span><p id="full-rule"></p></div></footer>
+    </section>
+  </div>
+</main>
+<div class="review-footer"><span>滚动物品区 · 悬停或聚焦查看项目原有效果</span><button id="reopen" hidden>重新打开预览</button><button id="states-toggle">查看交互状态</button><span id="font-status"></span></div>
+<section class="state-board" hidden><h3>组件状态验证 <small>独立样式样本，不代表玩家持有数据</small></h3><div class="state-samples"><div class="sample"><div class="seal">印</div><span>普通 / 待接入</span></div><div class="sample unowned"><div class="seal">印</div><span>未获得 · 文字不置灰</span></div><div class="sample owned"><div class="seal">印</div><span>已获得 · 图标恢复色彩</span></div><div class="sample maxed"><div class="seal">印</div><span>已达上限 · 轻量标记 ✓</span></div><button class="demo-draw">抽奖 ×1</button><button class="demo-draw" disabled>抽奖 ×1</button></div></section>
+<div id="tooltip" role="tooltip" hidden><small>瑞兽赐福 · 永久效果</small><h3></h3><p></p><div class="tooltip-count"></div><div class="tooltip-foot">效果按数量叠加</div></div>
+<div class="toast" role="status" hidden></div>
+<script src="data.js"></script><script src="app.js"></script>
+</body></html>

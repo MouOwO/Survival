@@ -12,6 +12,8 @@ $files += @('scripts/custom_game/reward_presentation.js', 'scripts/custom_game/l
 $files += @('scripts/custom_game/combat_stats.js')
 $files += @('scripts/custom_game/daily_rewards.js', 'styles/custom_game/daily_rewards.css')
 $files += @('scripts/custom_game/treasure_history.js')
+$files += @('styles/custom_game/archive_gothic.css')
+$assets = @('images/custom_game/archive_moon/window.png', 'images/custom_game/archive_moon/tab.png', 'images/custom_game/archive_moon/tab_selected.png')
 $hudPath = Join-Path $contentRoot 'panorama/layout/custom_game/survival_hud.xml'
 $hudText = [IO.File]::ReadAllText($hudPath)
 $sharedScript = 'file://{resources}/scripts/custom_game/reward_presentation.js'
@@ -23,7 +25,7 @@ if (-not $hudText.Contains($difficultyStyle)) {
     if (-not $hudText.Contains('</styles>')) { throw 'HUD styles section missing' }
     $hudText = $hudText.Replace('</styles>', ('    <include src="' + $difficultyStyle + '" />' + "`r`n    </styles>"))
 }
-foreach ($relative in $files) {
+foreach ($relative in ($files + $assets)) {
     if (-not (Test-Path (Join-Path $source $relative))) { throw "Missing source: $relative" }
 }
 if (-not (Test-Path $manifest)) { throw "Missing manifest: $manifest" }
@@ -35,11 +37,13 @@ if (-not ($xml.root.Panel.CustomUIElement | Where-Object { $_.layoutfile -eq $la
     $xml.root.Panel.AppendChild($node) | Out-Null
 }
 if ($CheckOnly) {
-    Write-Host "ARCHIVE_DEPLOY_CHECK_PASS: 4 sources; archive Hud and difficulty layout; target $contentRoot"
+    Write-Host "ARCHIVE_DEPLOY_CHECK_PASS: $($files.Count) sources, $($assets.Count) images; target $contentRoot"
     exit 0
 }
-foreach ($relative in $files) {
-    Copy-Item -LiteralPath (Join-Path $source $relative) -Destination (Join-Path $contentRoot ('panorama/' + $relative)) -Force
+foreach ($relative in ($files + $assets)) {
+    $destination = Join-Path $contentRoot ('panorama/' + $relative)
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+    Copy-Item -LiteralPath (Join-Path $source $relative) -Destination $destination -Force
 }
 $settings = [Xml.XmlWriterSettings]::new()
 $settings.Indent = $true; $settings.Encoding = [Text.UTF8Encoding]::new($false)

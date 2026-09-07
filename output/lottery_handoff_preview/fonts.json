@@ -1,0 +1,18 @@
+{
+  "h2": [
+    {
+      "familyName": "SimSun",
+      "postScriptName": "SimSun",
+      "isCustomFont": false,
+      "glyphCount": 4
+    }
+  ],
+  ".name": [
+    {
+      "familyName": "Microsoft YaHei",
+      "postScriptName": "MicrosoftYaHei",
+      "isCustomFont": false,
+      "glyphCount": 4
+    }
+  ]
+}
