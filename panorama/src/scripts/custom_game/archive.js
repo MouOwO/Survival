@@ -1,6 +1,8 @@
 (function () {
     "use strict";
     var current = "clear", opened = false, latest = 0, assembly = null;
+    var filterMode = "all", lastData = null, fitGeneration = 0;
+    var navIcons = {clear:"clear",shadow:"void",points:"points",fragment:"weapon",pet:"spell",endless:"endless",friend:"friends",ex:"ex",beast:"blessing"};
     var categories = [], tooltipVisible = false, requestGeneration = 0, tooltipGeneration = 0;
     // Match the actual archive definitions, not the example names in the style reference.
     var buildingIcons = {
@@ -55,7 +57,10 @@
         hideTooltip();
         panel("ArchiveTooltipName").text = item.name || "";
         panel("ArchiveTooltipName").style.color = GameUI.CustomUIConfig().SurvivalRewardPresentation.NameColor(item.quality);
-        panel("ArchiveTooltipEffect").text = item.description || "暂无效果说明";
+        var details = [item.description || "暂无效果说明"];
+        if (item.unlock_condition || item.condition_text) details.unshift(item.unlock_condition || item.condition_text);
+        else if ((current === "clear" || current === "endless") && Number(item.target) > 0) details.unshift("解锁条件：" + (current === "clear" ? (item.rune || "对应难度") + "通关 " : "无尽累计积分 ") + item.target + (current === "clear" ? " 次" : " 分"));
+        panel("ArchiveTooltipEffect").text = details.join("\n");
         panel("ArchiveTooltip").RemoveClass("ArchiveHidden");
         tooltipVisible = true;
         positionTooltip(tooltipGeneration);
@@ -70,10 +75,12 @@
             toggle.group = "ArchiveCategories";
             toggle.AddClass("ArchiveTab");
             toggle.checked = category.id === current;
+            var glyph=$.CreatePanel("Panel",toggle,"");glyph.AddClass("ArchiveKitIcon");glyph.AddClass("KitIcon_"+(navIcons[category.id] || "book"));glyph.hittest=false;
+            toggle.enabled = Number(category.disabled) !== 1;
             label(toggle, category.name);
             toggle.SetPanelEvent("onactivate", function () {
-                if (current === category.id) return;
-                current = category.id;
+                if (Number(category.disabled) === 1 || current === category.id) return;
+                current = category.id; filterMode="all"; lastData=null;
                 hideTooltip();
                 panel("ArchiveGrid").RemoveAndDeleteChildren();
                 panel("ArchiveEmpty").RemoveClass("ArchiveHidden");
@@ -105,26 +112,28 @@
         } else if (current === "points" && item.icon_type !== "custom") {
             GameUI.CustomUIConfig().SurvivalRewardPresentation.CreateIcon(art, item, "ArchiveRewardIcon");
         } else {
-        var shape = $.CreatePanel("Panel", art, "");
-        shape.AddClass("ArchiveGlyph");
-        shape.hittest = false;
-        label(art, item.rune || String(item.name || "印").substring(0, 1), "ArchiveRune");
+        var styleArt={scroll:"02",seal:"01",crystal:"04",sword:"05",flower:"06",hourglass:"10"};
+        art.AddClass("KitArt_"+(styleArt[item.icon_style] || "03"));
         }
         if (Number(item.completed) === 1) art.AddClass(current === "building" ? "ArchiveMaxed" : "ArchiveCompleted");
         if (current === "building" && !(Number(item.count) > 0)) art.AddClass("ArchiveUnowned");
         if (isDrawPage() && !(Number(item.count) > 0)) art.AddClass("ArchiveCompleted");
         if (current === "fishing" && !(Number(item.count) > 0)) art.AddClass("ArchiveCompleted");
-        var count = Math.max(0, Number(item.count) || 0), target = Number(item.target) || 1;
-        if (current === "fishing" && Number(item.count_known) !== 1) {
-            label(art, "待同步", "ArchiveCount");
-            return;
+        var count=Number(item.count),target=Number(item.target);
+        if (item.count !== undefined && isFinite(count) && item.target !== undefined && isFinite(target) && target > 0 && !(current === "fishing" && Number(item.count_known) !== 1)) {
+            label(parent,Math.max(0,count)+"/"+target,"ArchiveCount");
         }
-        label(art, (current === "clear" || current === "endless" || current === "boss" || current === "map_level" ? Math.min(count, target) : count) + "/" + target + (current === "map_level" ? "分" : ""), "ArchiveCount");
+    }
+    function cardFrame(card) {
+        var frame=$.CreatePanel("Panel",card,"");frame.AddClass("ArchiveNineCard");frame.hittest=false;frame.hittestchildren=false;
+        [0,1,2].forEach(function(y){var row=$.CreatePanel("Panel",frame,"");row.AddClass(y===1?"ArchiveNineMiddle":"ArchiveNineEdge");[0,1,2].forEach(function(x){var part=$.CreatePanel("Panel",row,"");part.AddClass(x===1?"ArchiveNineStretch":"ArchiveNineCorner");part.AddClass("ArchiveSlice_"+y+x);});});
     }
     function render(data) {
         if (data.category_id !== current) return;
-        hideTooltip();
-        categories = array(data.categories);
+        hideTooltip(); lastData=data;
+        ["all","unlocked","locked"].forEach(function(mode){panel("ArchiveFilter_"+mode).checked=mode===filterMode;});
+        var order=["clear","shadow","points","fragment","pet","endless","friend","ex","beast"];
+        categories = array(data.categories).sort(function(a,b){var ai=order.indexOf(a.id),bi=order.indexOf(b.id);return (ai<0?100:ai)-(bi<0?100:bi);});
         tabs();
         var social = data.social, socialPage = isDrawPage();
         showDrawBar();
@@ -142,14 +151,19 @@
                 $.Schedule(0.5, request);
             });
         }
-        var rows = array(data.rows), done = 0, ownedTypes = 0;
+        var rows = array(data.rows), done = 0, ownedTypes = 0, visibleCount=0;
         panel("ArchiveGrid").RemoveAndDeleteChildren();
         rows.forEach(function (item) {
+            var unlocked = item.unlocked !== undefined ? Number(item.unlocked) === 1 : (current === "clear" || current === "endless" || current === "pet" || current === "boss" || current === "map_level") && item.completed !== undefined ? Number(item.completed) === 1 : null;
+            if (filterMode !== "all" && (unlocked === null || unlocked !== (filterMode === "unlocked"))) return;
+            visibleCount++;
             var card = $.CreatePanel("Panel", panel("ArchiveGrid"), "");
             card.AddClass("ArchiveCard");
             card.hittestchildren = false;
             icon(card, item);
             label(card, item.name, "ArchiveItemName");
+            if (unlocked !== null) { var status=label(card,unlocked?"已解锁":"未解锁","ArchiveUnlockBadge");status.AddClass(unlocked?"Unlocked":"Locked"); }
+            cardFrame(card);
             card.SetPanelEvent("onmouseover", function () { tooltip(item); });
             card.SetPanelEvent("onmouseout", hideTooltip);
             if (current === "work" || current === "building") {
@@ -195,6 +209,8 @@
             if (Number(item.count) > 0) ownedTypes += 1;
             if (Number(item.completed) === 1) done += 1;
         });
+        done=rows.filter(function(item){return Number(item.completed)===1;}).length;
+        ownedTypes=rows.filter(function(item){return Number(item.count)>0;}).length;
         var title = categories.filter(function (category) { return category.id === current; })[0];
         panel("ArchivePageTitle").text = title ? title.name : "存档";
         panel("ArchiveSummary").text = current === "endless" ? "累计积分 " + (rows.length ? Number(rows[0].count) || 0 : 0) + " · 已完成 " + done + " / " + rows.length : current === "clear" ? "已完成 " + done + " / " + rows.length : "已拥有 " + ownedTypes + " 种";
@@ -202,8 +218,8 @@
             current === "shadow" ? "虚空之影1～3按对应N级物品池独立随机2次 · 允许重复" :
             current === "fragment" ? "神兽狩猎获得碎片 · 每20片晋升1级 · 每种每日20片，通行证40片" :
             current === "pet" ? "秘法牢笼挑战掉落材料 · 每日30件，通行证90件" : "展示已拥有的积分道具";
-        panel("ArchiveEmpty").SetHasClass("ArchiveHidden", rows.length > 0);
-        panel("ArchiveEmpty").text = current === "shadow" ? "尚未获得虚空之影道具" :
+        panel("ArchiveEmpty").SetHasClass("ArchiveHidden", visibleCount > 0);
+        panel("ArchiveEmpty").text = filterMode !== "all" ? "当前筛选下暂无存档" : current === "shadow" ? "尚未获得虚空之影道具" :
             current === "pet" ? "尚未获得秘法牢笼材料" : "尚未拥有积分道具";
         panel("ArchiveStatus").text = Number(data.pending) === 1 ? "奖励正在保存…" :
             current === "shadow" ? (Number(data.has_pass) === 1 ? "通行证生效 · 每次掉落 3 件" : "每次掉落 2 件") : "效果自动生效";
@@ -271,8 +287,14 @@
             : "无尽结束 · 已通过" + (data.cleared || 0) + "波 · " + data.score + "分 · " + (data.reason || "");
         if (opened && current === "endless" && data.remaining === 0) request();
     });
+    function watchFit() {
+        var generation=++fitGeneration;
+        function fit(){if(!opened || generation!==fitGeneration)return;var root=$.GetContextPanel(),w=(root.actuallayoutwidth||1672)/(root.actualuiscale_x||1),h=(root.actuallayoutheight||941)/(root.actualuiscale_y||1),scale=Math.min(w/1672,h/941);panel("ArchiveWindow").style.transform="scale3d("+scale+","+scale+",1)";$.Schedule(.25,fit);}fit();
+    }
     function close() {
-        opened = false;
+        opened = false; fitGeneration++;
+        panel("ArchiveScrim").AddClass("ArchiveHidden");
+        var layers=GameUI.CustomUIConfig().SurvivalUILayers;if(layers)layers.Close("archive");
         panel("ArchiveWindow").AddClass("ArchiveHidden");
         hideTooltip();
     }
@@ -280,9 +302,13 @@
         Toggle: function () {
             if (opened) { close(); return; }
             opened = true;
+            panel("ArchiveScrim").RemoveClass("ArchiveHidden");
+            var layers=GameUI.CustomUIConfig().SurvivalUILayers;if(layers)layers.Open("archive",panel("ArchiveWindow"),close);
+            watchFit();
             panel("ArchiveWindow").RemoveClass("ArchiveHidden");
             request();
         },
+        Filter: function(mode){if(["all","unlocked","locked"].indexOf(mode)<0)return;filterMode=mode;if(lastData)render(lastData);},
         Close: close,
         Refresh: request
     };

@@ -1,0 +1,1518 @@
+{
+  "reference_size": [
+    1672,
+    941
+  ],
+  "assets": [
+    {
+      "file": "exact_crops/nav_clear.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        184,
+        577,
+        252
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_clear.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        194,
+        411,
+        242
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/clear_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/clear_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/clear_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/clear_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/nav_void.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        258,
+        577,
+        326
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_void.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        268,
+        411,
+        316
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/void_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/void_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/void_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/void_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/nav_points.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        330,
+        577,
+        398
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_points.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        340,
+        411,
+        388
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/points_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/points_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/points_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/points_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/nav_weapon.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        403,
+        577,
+        471
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_weapon.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        413,
+        411,
+        461
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/weapon_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/weapon_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/weapon_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/weapon_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/nav_spell.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        476,
+        577,
+        544
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_spell.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        486,
+        411,
+        534
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/spell_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/spell_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/spell_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/spell_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/nav_endless.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        549,
+        577,
+        617
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_endless.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        559,
+        411,
+        607
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/endless_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/endless_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/endless_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/endless_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/nav_friends.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        623,
+        577,
+        691
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_friends.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        633,
+        411,
+        681
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/friends_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/friends_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/friends_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/friends_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/nav_ex.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        696,
+        577,
+        764
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_ex.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        706,
+        411,
+        754
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/ex_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/ex_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/ex_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/ex_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/nav_blessing.png",
+      "size": [
+        242,
+        68
+      ],
+      "source_rect": [
+        335,
+        769,
+        577,
+        837
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/icon_blessing.png",
+      "size": [
+        44,
+        48
+      ],
+      "source_rect": [
+        367,
+        779,
+        411,
+        827
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/blessing_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/blessing_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/blessing_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/blessing_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/icon_close.png",
+      "size": [
+        39,
+        40
+      ],
+      "source_rect": [
+        1265,
+        108,
+        1304,
+        148
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/close_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/close_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/close_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/close_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/icon_hint.png",
+      "size": [
+        22,
+        24
+      ],
+      "source_rect": [
+        1162,
+        235,
+        1184,
+        259
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/hint_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/hint_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/hint_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/hint_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/icon_book.png",
+      "size": [
+        43,
+        30
+      ],
+      "source_rect": [
+        816,
+        52,
+        859,
+        82
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "icons_rgba/book_normal.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/book_hover.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/book_selected.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "icons_rgba/book_disabled.png",
+      "size": [
+        64,
+        64
+      ],
+      "source_rect": null,
+      "type": "extracted_recolored_alpha"
+    },
+    {
+      "file": "exact_crops/card_01.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        605,
+        320,
+        767,
+        474
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_01.png",
+      "size": [
+        130,
+        95
+      ],
+      "source_rect": [
+        620,
+        330,
+        750,
+        425
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_02.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        779,
+        320,
+        941,
+        474
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_02.png",
+      "size": [
+        130,
+        95
+      ],
+      "source_rect": [
+        794,
+        330,
+        924,
+        425
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_03.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        953,
+        320,
+        1115,
+        474
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_03.png",
+      "size": [
+        130,
+        95
+      ],
+      "source_rect": [
+        968,
+        330,
+        1098,
+        425
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_04.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        1127,
+        320,
+        1289,
+        474
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_04.png",
+      "size": [
+        130,
+        95
+      ],
+      "source_rect": [
+        1142,
+        330,
+        1272,
+        425
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_05.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        605,
+        486,
+        767,
+        640
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_05.png",
+      "size": [
+        130,
+        96
+      ],
+      "source_rect": [
+        620,
+        494,
+        750,
+        590
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_06.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        779,
+        486,
+        941,
+        640
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_06.png",
+      "size": [
+        130,
+        96
+      ],
+      "source_rect": [
+        794,
+        494,
+        924,
+        590
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_07.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        953,
+        486,
+        1115,
+        640
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_07.png",
+      "size": [
+        130,
+        96
+      ],
+      "source_rect": [
+        968,
+        494,
+        1098,
+        590
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_08.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        1127,
+        486,
+        1289,
+        640
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_08.png",
+      "size": [
+        130,
+        96
+      ],
+      "source_rect": [
+        1142,
+        494,
+        1272,
+        590
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_09.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        605,
+        648,
+        767,
+        802
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_09.png",
+      "size": [
+        130,
+        96
+      ],
+      "source_rect": [
+        620,
+        653,
+        750,
+        749
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_10.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        779,
+        648,
+        941,
+        802
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_10.png",
+      "size": [
+        130,
+        96
+      ],
+      "source_rect": [
+        794,
+        653,
+        924,
+        749
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_11.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        953,
+        648,
+        1115,
+        802
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_11.png",
+      "size": [
+        130,
+        96
+      ],
+      "source_rect": [
+        968,
+        653,
+        1098,
+        749
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/card_12.png",
+      "size": [
+        162,
+        154
+      ],
+      "source_rect": [
+        1127,
+        648,
+        1289,
+        802
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "art_tiles/art_12.png",
+      "size": [
+        130,
+        96
+      ],
+      "source_rect": [
+        1142,
+        653,
+        1272,
+        749
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/header.png",
+      "size": [
+        1002,
+        129
+      ],
+      "source_rect": [
+        335,
+        36,
+        1337,
+        165
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/sidebar.png",
+      "size": [
+        242,
+        681
+      ],
+      "source_rect": [
+        335,
+        165,
+        577,
+        846
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/panel.png",
+      "size": [
+        762,
+        681
+      ],
+      "source_rect": [
+        575,
+        165,
+        1337,
+        846
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/filter_selected.png",
+      "size": [
+        147,
+        38
+      ],
+      "source_rect": [
+        610,
+        271,
+        757,
+        309
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/filter_normal.png",
+      "size": [
+        127,
+        35
+      ],
+      "source_rect": [
+        769,
+        272,
+        896,
+        307
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/scrollbar.png",
+      "size": [
+        21,
+        487
+      ],
+      "source_rect": [
+        1294,
+        315,
+        1315,
+        802
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/status_unlocked.png",
+      "size": [
+        128,
+        27
+      ],
+      "source_rect": [
+        623,
+        446,
+        751,
+        473
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "exact_crops/status_locked.png",
+      "size": [
+        129,
+        27
+      ],
+      "source_rect": [
+        1144,
+        446,
+        1273,
+        473
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/ivory_texture.png",
+      "size": [
+        150,
+        50
+      ],
+      "source_rect": [
+        990,
+        181,
+        1140,
+        231
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/teal_texture.png",
+      "size": [
+        45,
+        18
+      ],
+      "source_rect": [
+        436,
+        263,
+        481,
+        281
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_00.png",
+      "size": [
+        12,
+        12
+      ],
+      "source_rect": [
+        605,
+        320,
+        617,
+        332
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_01.png",
+      "size": [
+        138,
+        12
+      ],
+      "source_rect": [
+        617,
+        320,
+        755,
+        332
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_02.png",
+      "size": [
+        12,
+        12
+      ],
+      "source_rect": [
+        755,
+        320,
+        767,
+        332
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_10.png",
+      "size": [
+        12,
+        130
+      ],
+      "source_rect": [
+        605,
+        332,
+        617,
+        462
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_11.png",
+      "size": [
+        138,
+        130
+      ],
+      "source_rect": [
+        617,
+        332,
+        755,
+        462
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_12.png",
+      "size": [
+        12,
+        130
+      ],
+      "source_rect": [
+        755,
+        332,
+        767,
+        462
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_20.png",
+      "size": [
+        12,
+        12
+      ],
+      "source_rect": [
+        605,
+        462,
+        617,
+        474
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_21.png",
+      "size": [
+        138,
+        12
+      ],
+      "source_rect": [
+        617,
+        462,
+        755,
+        474
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "background_tiles/card_slice_22.png",
+      "size": [
+        12,
+        12
+      ],
+      "source_rect": [
+        755,
+        462,
+        767,
+        474
+      ],
+      "type": "exact_crop"
+    },
+    {
+      "file": "reusable/toggle_normal.png",
+      "size": [
+        256,
+        76
+      ],
+      "source_rect": [
+        20,
+        60,
+        492,
+        211
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/toggle_hover.png",
+      "size": [
+        256,
+        76
+      ],
+      "source_rect": [
+        532,
+        60,
+        1004,
+        211
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/toggle_selected.png",
+      "size": [
+        256,
+        76
+      ],
+      "source_rect": [
+        1044,
+        60,
+        1516,
+        211
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/button_normal.png",
+      "size": [
+        256,
+        76
+      ],
+      "source_rect": [
+        20,
+        254,
+        492,
+        402
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/button_hover.png",
+      "size": [
+        256,
+        76
+      ],
+      "source_rect": [
+        532,
+        254,
+        1004,
+        402
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/button_pressed.png",
+      "size": [
+        256,
+        76
+      ],
+      "source_rect": [
+        1044,
+        254,
+        1516,
+        402
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/card_normal.png",
+      "size": [
+        176,
+        176
+      ],
+      "source_rect": [
+        20,
+        414,
+        492,
+        786
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/card_hover.png",
+      "size": [
+        176,
+        176
+      ],
+      "source_rect": [
+        532,
+        414,
+        1004,
+        786
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/card_selected.png",
+      "size": [
+        176,
+        176
+      ],
+      "source_rect": [
+        1044,
+        414,
+        1516,
+        786
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/badge_progress.png",
+      "size": [
+        140,
+        44
+      ],
+      "source_rect": [
+        20,
+        801,
+        492,
+        936
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/badge_unlocked.png",
+      "size": [
+        140,
+        44
+      ],
+      "source_rect": [
+        532,
+        801,
+        1004,
+        936
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "reusable/badge_locked.png",
+      "size": [
+        140,
+        44
+      ],
+      "source_rect": [
+        1044,
+        801,
+        1516,
+        936
+      ],
+      "type": "generated_blank_background_removed"
+    },
+    {
+      "file": "background_tiles/shell_body.png",
+      "size": [
+        1002,
+        758
+      ],
+      "source_rect": [
+        335,
+        90,
+        1337,
+        848
+      ],
+      "type": "generated_blank_shell_crop"
+    }
+  ]
+}
