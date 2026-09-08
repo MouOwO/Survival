@@ -1,0 +1,119 @@
+{
+  "geometry": {
+    "header": {
+      "x": 0,
+      "y": 4,
+      "width": 1045,
+      "height": 72
+    },
+    "tabs": {
+      "x": 21,
+      "y": 76,
+      "width": 1003,
+      "height": 52
+    },
+    "grid": {
+      "x": 40,
+      "y": 157,
+      "width": 647,
+      "height": 322
+    },
+    "card": {
+      "x": 40,
+      "y": 157,
+      "width": 147,
+      "height": 154
+    },
+    "details": {
+      "x": 711,
+      "y": 145,
+      "width": 290,
+      "height": 359
+    },
+    "footer": {
+      "x": 21,
+      "y": 510,
+      "width": 1003,
+      "height": 67
+    },
+    "confirm": {
+      "x": 807,
+      "y": 522,
+      "width": 196,
+      "height": 46
+    }
+  },
+  "grid": {
+    "visible": 8,
+    "scroll": true
+  },
+  "fonts": {
+    "h1": [
+      {
+        "familyName": "SimSun",
+        "postScriptName": "SimSun",
+        "isCustomFont": false,
+        "glyphCount": 4
+      }
+    ],
+    ".reward span": [
+      {
+        "familyName": "Microsoft YaHei",
+        "postScriptName": "MicrosoftYaHei",
+        "isCustomFont": false,
+        "glyphCount": 4
+      }
+    ]
+  },
+  "screens": [
+    {
+      "width": 1280,
+      "height": 720,
+      "rect": {
+        "width": 814.7865600585938,
+        "height": 467.8199462890625,
+        "left": 232.60675048828125,
+        "top": 147.0900115966797,
+        "right": 1047.393310546875,
+        "bottom": 614.9099578857422
+      }
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "rect": {
+        "width": 1247.41650390625,
+        "height": 716.219970703125,
+        "left": 336.291748046875,
+        "top": 202.8900146484375,
+        "right": 1583.708251953125,
+        "bottom": 919.1099853515625
+      }
+    },
+    {
+      "width": 2560,
+      "height": 1080,
+      "rect": {
+        "width": 1247.41650390625,
+        "height": 716.219970703125,
+        "left": 656.291748046875,
+        "top": 202.8900146484375,
+        "right": 1903.708251953125,
+        "bottom": 919.1099853515625
+      }
+    },
+    {
+      "width": 3840,
+      "height": 2160,
+      "rect": {
+        "width": 2545.306640625,
+        "height": 1461.419921875,
+        "left": 647.3468017578125,
+        "top": 370.2900390625,
+        "right": 3192.6534423828125,
+        "bottom": 1831.7099609375
+      }
+    }
+  ],
+  "native_game_capture": false
+}

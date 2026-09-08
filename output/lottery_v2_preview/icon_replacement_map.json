@@ -1,0 +1,23 @@
+{
+  "scope": "lottery_module_all_functional_button_and_entry_icons",
+  "mandatory_replace": true,
+  "icons_root": "icons/",
+  "mapping": {
+    "奖池详情入口与弹窗标题": "pool.svg",
+    "抽奖记录入口与记录弹窗": "history.svg",
+    "票券余额、单抽、十连": "ticket.svg",
+    "购买抽奖券与余额加号": "plus.svg",
+    "首充礼包": "gift.svg",
+    "开奖公告": "announcement.svg",
+    "主界面及各弹窗关闭": "close.svg",
+    "跳过动画未勾选": "checkbox_off.svg",
+    "跳过动画已勾选": "checkbox_on.svg",
+    "跳转箭头": "chevron.svg",
+    "规则说明与帮助": "info.svg",
+    "需图标的确认按钮": "check.svg",
+    "需图标的再抽按钮": "refresh.svg",
+    "选中装饰与中性占位": "star.svg"
+  },
+  "do_not_replace": "actual_reward_item_art_with_generic_icons",
+  "note": "SVG files define exact reusable functional symbols; generated screenshot is layout/art reference only."
+}

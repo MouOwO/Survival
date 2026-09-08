@@ -8,7 +8,7 @@ $hud = Join-Path $contentRoot 'layout/custom_game/survival_hud.xml'
 $source = Join-Path $repo 'panorama/src'
 $files = @('scripts/custom_game/ui_layers.js', 'scripts/custom_game/lottery_ui.js', 'styles/custom_game/lottery_celestial.css', 'images/custom_game/lottery_celestial/home.png', 'images/custom_game/lottery_celestial/results.png')
 $handoff = Join-Path $source 'images/custom_game/lottery_handoff'
-$files += Get-ChildItem -LiteralPath $handoff -File | ForEach-Object { 'images/custom_game/lottery_handoff/' + $_.Name }
+$files += Get-ChildItem -LiteralPath $handoff -File -Recurse | ForEach-Object { 'images/custom_game/lottery_handoff/' + $_.FullName.Substring($handoff.Length + 1).Replace('\', '/') }
 foreach ($relative in $files) { if (-not (Test-Path -LiteralPath (Join-Path $source $relative))) { throw "Missing: $relative" } }
 $fragment = [IO.File]::ReadAllText((Join-Path $source 'layout/custom_game/lottery_window.xml'))
 [xml]$validFragment = $fragment
@@ -39,5 +39,10 @@ $compiler = Join-Path $gameRoot 'bin/win64/resourcecompiler.exe'
 foreach ($file in @((Join-Path $contentRoot 'scripts/custom_game/ui_layers.js'), (Join-Path $contentRoot 'styles/custom_game/lottery_celestial.css'), (Join-Path $contentRoot 'scripts/custom_game/lottery_ui.js'), $hud)) {
     & $compiler -i $file -game (Join-Path $gameRoot 'dota') -f
     if ($LASTEXITCODE -ne 0) { throw "Compile failed: $file" }
+}
+# Dynamic JS image paths are not automatically discovered by the layout compiler.
+foreach ($icon in (Get-ChildItem -LiteralPath (Join-Path $contentRoot 'images/custom_game/lottery_handoff/icons') -Filter '*.svg' -File)) {
+    & $compiler -i $icon.FullName -game (Join-Path $gameRoot 'dota') -f
+    if ($LASTEXITCODE -ne 0) { throw "Icon compile failed: $($icon.Name)" }
 }
 Write-Output 'LOTTERY_PANORAMA_DEPLOY_PASS'

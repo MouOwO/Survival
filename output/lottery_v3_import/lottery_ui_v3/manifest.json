@@ -1,0 +1,1045 @@
+{
+  "version": 3,
+  "source": "05_reference/source.png",
+  "source_size": [
+    1672,
+    941
+  ],
+  "exact_crops": [
+    {
+      "id": "pool_details_icon",
+      "file": "01_exact_crops/pool_details_icon.png",
+      "source_rect": [
+        61,
+        856,
+        32,
+        39
+      ],
+      "native_size": [
+        32,
+        39
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": false,
+      "enabled": true
+    },
+    {
+      "id": "pool_details_entry",
+      "file": "01_exact_crops/pool_details_entry.png",
+      "source_rect": [
+        60,
+        851,
+        153,
+        46
+      ],
+      "native_size": [
+        153,
+        46
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "history_icon",
+      "file": "01_exact_crops/history_icon.png",
+      "source_rect": [
+        265,
+        854,
+        37,
+        43
+      ],
+      "native_size": [
+        37,
+        43
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": false,
+      "enabled": true
+    },
+    {
+      "id": "history_entry",
+      "file": "01_exact_crops/history_entry.png",
+      "source_rect": [
+        262,
+        851,
+        159,
+        47
+      ],
+      "native_size": [
+        159,
+        47
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "skip_checkbox",
+      "file": "01_exact_crops/skip_checkbox.png",
+      "source_rect": [
+        618,
+        865,
+        33,
+        33
+      ],
+      "native_size": [
+        33,
+        33
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": false,
+      "enabled": true
+    },
+    {
+      "id": "skip_entry",
+      "file": "01_exact_crops/skip_entry.png",
+      "source_rect": [
+        617,
+        861,
+        150,
+        39
+      ],
+      "native_size": [
+        150,
+        39
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "modal_close",
+      "file": "01_exact_crops/modal_close.png",
+      "source_rect": [
+        1194,
+        185,
+        39,
+        43
+      ],
+      "native_size": [
+        39,
+        43
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": false,
+      "enabled": true
+    },
+    {
+      "id": "screen_close",
+      "file": "01_exact_crops/screen_close.png",
+      "source_rect": [
+        1599,
+        24,
+        43,
+        41
+      ],
+      "native_size": [
+        43,
+        41
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": false,
+      "enabled": true
+    },
+    {
+      "id": "single_button",
+      "file": "01_exact_crops/single_button.png",
+      "source_rect": [
+        971,
+        831,
+        310,
+        73
+      ],
+      "native_size": [
+        310,
+        73
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "ten_button",
+      "file": "01_exact_crops/ten_button.png",
+      "source_rect": [
+        1295,
+        831,
+        319,
+        73
+      ],
+      "native_size": [
+        319,
+        73
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "single_ticket",
+      "file": "01_exact_crops/single_ticket.png",
+      "source_rect": [
+        1039,
+        841,
+        45,
+        52
+      ],
+      "native_size": [
+        45,
+        52
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "ten_ticket",
+      "file": "01_exact_crops/ten_ticket.png",
+      "source_rect": [
+        1379,
+        841,
+        47,
+        52
+      ],
+      "native_size": [
+        47,
+        52
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "single_caption",
+      "file": "01_exact_crops/single_caption.png",
+      "source_rect": [
+        1064,
+        901,
+        170,
+        25
+      ],
+      "native_size": [
+        170,
+        25
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "ten_caption",
+      "file": "01_exact_crops/ten_caption.png",
+      "source_rect": [
+        1380,
+        901,
+        182,
+        25
+      ],
+      "native_size": [
+        182,
+        25
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "currency_ticket",
+      "file": "01_exact_crops/currency_ticket.png",
+      "source_rect": [
+        1371,
+        21,
+        53,
+        47
+      ],
+      "native_size": [
+        53,
+        47
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "currency_bar",
+      "file": "01_exact_crops/currency_bar.png",
+      "source_rect": [
+        1369,
+        20,
+        198,
+        51
+      ],
+      "native_size": [
+        198,
+        51
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "currency_plus",
+      "file": "01_exact_crops/currency_plus.png",
+      "source_rect": [
+        1540,
+        29,
+        22,
+        33
+      ],
+      "native_size": [
+        22,
+        33
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": false,
+      "enabled": true
+    },
+    {
+      "id": "purchase_link",
+      "file": "01_exact_crops/purchase_link.png",
+      "source_rect": [
+        1424,
+        74,
+        143,
+        33
+      ],
+      "native_size": [
+        143,
+        33
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "promotion_link",
+      "file": "01_exact_crops/promotion_link.png",
+      "source_rect": [
+        1395,
+        106,
+        241,
+        35
+      ],
+      "native_size": [
+        241,
+        35
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "page_logo",
+      "file": "01_exact_crops/page_logo.png",
+      "source_rect": [
+        3,
+        0,
+        105,
+        108
+      ],
+      "native_size": [
+        105,
+        108
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "page_title",
+      "file": "01_exact_crops/page_title.png",
+      "source_rect": [
+        114,
+        24,
+        137,
+        42
+      ],
+      "native_size": [
+        137,
+        42
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "announcement",
+      "file": "01_exact_crops/announcement.png",
+      "source_rect": [
+        155,
+        253,
+        145,
+        40
+      ],
+      "native_size": [
+        145,
+        40
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "pool_modal",
+      "file": "01_exact_crops/pool_modal.png",
+      "source_rect": [
+        415,
+        162,
+        843,
+        617
+      ],
+      "native_size": [
+        843,
+        617
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "modal_title",
+      "file": "01_exact_crops/modal_title.png",
+      "source_rect": [
+        764,
+        189,
+        155,
+        47
+      ],
+      "native_size": [
+        155,
+        47
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "title_ornament_left",
+      "file": "01_exact_crops/title_ornament_left.png",
+      "source_rect": [
+        668,
+        192,
+        66,
+        34
+      ],
+      "native_size": [
+        66,
+        34
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "title_ornament_right",
+      "file": "01_exact_crops/title_ornament_right.png",
+      "source_rect": [
+        940,
+        192,
+        67,
+        34
+      ],
+      "native_size": [
+        67,
+        34
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "pool_tab_selected",
+      "file": "01_exact_crops/pool_tab_selected.png",
+      "source_rect": [
+        439,
+        249,
+        199,
+        57
+      ],
+      "native_size": [
+        199,
+        57
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "pool_tab_second",
+      "file": "01_exact_crops/pool_tab_second.png",
+      "source_rect": [
+        638,
+        249,
+        203,
+        57
+      ],
+      "native_size": [
+        203,
+        57
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "pool_tab_third",
+      "file": "01_exact_crops/pool_tab_third.png",
+      "source_rect": [
+        841,
+        249,
+        194,
+        57
+      ],
+      "native_size": [
+        194,
+        57
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "pool_tab_fourth",
+      "file": "01_exact_crops/pool_tab_fourth.png",
+      "source_rect": [
+        1035,
+        249,
+        199,
+        57
+      ],
+      "native_size": [
+        199,
+        57
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "pool_tab_gold_line",
+      "file": "01_exact_crops/pool_tab_gold_line.png",
+      "source_rect": [
+        438,
+        289,
+        201,
+        24
+      ],
+      "native_size": [
+        201,
+        24
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "pool_tab_diamond",
+      "file": "01_exact_crops/pool_tab_diamond.png",
+      "source_rect": [
+        529,
+        292,
+        21,
+        22
+      ],
+      "native_size": [
+        21,
+        22
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "card_cell",
+      "file": "01_exact_crops/card_cell.png",
+      "source_rect": [
+        465,
+        328,
+        167,
+        157
+      ],
+      "native_size": [
+        167,
+        157
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "card_medallion",
+      "file": "01_exact_crops/card_medallion.png",
+      "source_rect": [
+        481,
+        343,
+        137,
+        109
+      ],
+      "native_size": [
+        137,
+        109
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "card_label",
+      "file": "01_exact_crops/card_label.png",
+      "source_rect": [
+        498,
+        453,
+        105,
+        28
+      ],
+      "native_size": [
+        105,
+        28
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "scroll_track",
+      "file": "01_exact_crops/scroll_track.png",
+      "source_rect": [
+        1217,
+        328,
+        13,
+        316
+      ],
+      "native_size": [
+        13,
+        316
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "scroll_thumb",
+      "file": "01_exact_crops/scroll_thumb.png",
+      "source_rect": [
+        1217,
+        328,
+        13,
+        128
+      ],
+      "native_size": [
+        13,
+        128
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "rules_note",
+      "file": "01_exact_crops/rules_note.png",
+      "source_rect": [
+        575,
+        667,
+        507,
+        33
+      ],
+      "native_size": [
+        507,
+        33
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "guarantee_pill",
+      "file": "01_exact_crops/guarantee_pill.png",
+      "source_rect": [
+        658,
+        700,
+        354,
+        55
+      ],
+      "native_size": [
+        354,
+        55
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "modal_corner_tl",
+      "file": "01_exact_crops/modal_corner_tl.png",
+      "source_rect": [
+        415,
+        162,
+        44,
+        44
+      ],
+      "native_size": [
+        44,
+        44
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "modal_corner_tr",
+      "file": "01_exact_crops/modal_corner_tr.png",
+      "source_rect": [
+        1212,
+        162,
+        44,
+        44
+      ],
+      "native_size": [
+        44,
+        44
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "modal_corner_bl",
+      "file": "01_exact_crops/modal_corner_bl.png",
+      "source_rect": [
+        415,
+        734,
+        44,
+        44
+      ],
+      "native_size": [
+        44,
+        44
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "modal_corner_br",
+      "file": "01_exact_crops/modal_corner_br.png",
+      "source_rect": [
+        1212,
+        734,
+        44,
+        44
+      ],
+      "native_size": [
+        44,
+        44
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "main_pool_tab",
+      "file": "01_exact_crops/main_pool_tab.png",
+      "source_rect": [
+        329,
+        20,
+        151,
+        62
+      ],
+      "native_size": [
+        151,
+        62
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "main_badge",
+      "file": "01_exact_crops/main_badge.png",
+      "source_rect": [
+        565,
+        11,
+        82,
+        34
+      ],
+      "native_size": [
+        82,
+        34
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": true
+    },
+    {
+      "id": "legacy_sidebar_archive",
+      "file": "01_exact_crops/legacy_sidebar_archive.png",
+      "source_rect": [
+        43,
+        177,
+        48,
+        76
+      ],
+      "native_size": [
+        48,
+        76
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": false
+    },
+    {
+      "id": "legacy_sidebar_building",
+      "file": "01_exact_crops/legacy_sidebar_building.png",
+      "source_rect": [
+        43,
+        284,
+        47,
+        79
+      ],
+      "native_size": [
+        47,
+        79
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": false
+    },
+    {
+      "id": "legacy_sidebar_lottery",
+      "file": "01_exact_crops/legacy_sidebar_lottery.png",
+      "source_rect": [
+        20,
+        387,
+        94,
+        108
+      ],
+      "native_size": [
+        94,
+        108
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": false
+    },
+    {
+      "id": "legacy_sidebar_bag",
+      "file": "01_exact_crops/legacy_sidebar_bag.png",
+      "source_rect": [
+        45,
+        532,
+        46,
+        77
+      ],
+      "native_size": [
+        46,
+        77
+      ],
+      "kind": "source_pixels_unmodified",
+      "background": "baked_source_background",
+      "text_baked": true,
+      "enabled": false
+    },
+    {
+      "id": "pool_details_icon.rgba",
+      "files": [
+        "02_rgba_icons/pool_details_icon_normal.png",
+        "02_rgba_icons/pool_details_icon_hover.png",
+        "02_rgba_icons/pool_details_icon_pressed.png",
+        "02_rgba_icons/pool_details_icon_disabled.png"
+      ],
+      "kind": "source_silhouette_extraction_and_color_normalization",
+      "native_size": [
+        48,
+        55
+      ],
+      "padding": 8,
+      "alpha": "real_RGBA",
+      "note": "approximate mask; not pixel-identical to source"
+    },
+    {
+      "id": "history_icon.rgba",
+      "files": [
+        "02_rgba_icons/history_icon_normal.png",
+        "02_rgba_icons/history_icon_hover.png",
+        "02_rgba_icons/history_icon_pressed.png",
+        "02_rgba_icons/history_icon_disabled.png"
+      ],
+      "kind": "source_silhouette_extraction_and_color_normalization",
+      "native_size": [
+        53,
+        59
+      ],
+      "padding": 8,
+      "alpha": "real_RGBA",
+      "note": "approximate mask; not pixel-identical to source"
+    },
+    {
+      "id": "skip_checkbox.rgba",
+      "files": [
+        "02_rgba_icons/skip_checkbox_normal.png",
+        "02_rgba_icons/skip_checkbox_hover.png",
+        "02_rgba_icons/skip_checkbox_pressed.png",
+        "02_rgba_icons/skip_checkbox_disabled.png"
+      ],
+      "kind": "source_silhouette_extraction_and_color_normalization",
+      "native_size": [
+        49,
+        49
+      ],
+      "padding": 8,
+      "alpha": "real_RGBA",
+      "note": "approximate mask; not pixel-identical to source"
+    },
+    {
+      "id": "modal_close.rgba",
+      "files": [
+        "02_rgba_icons/modal_close_normal.png",
+        "02_rgba_icons/modal_close_hover.png",
+        "02_rgba_icons/modal_close_pressed.png",
+        "02_rgba_icons/modal_close_disabled.png"
+      ],
+      "kind": "source_silhouette_extraction_and_color_normalization",
+      "native_size": [
+        55,
+        59
+      ],
+      "padding": 8,
+      "alpha": "real_RGBA",
+      "note": "approximate mask; not pixel-identical to source"
+    },
+    {
+      "id": "screen_close.rgba",
+      "files": [
+        "02_rgba_icons/screen_close_normal.png",
+        "02_rgba_icons/screen_close_hover.png",
+        "02_rgba_icons/screen_close_pressed.png",
+        "02_rgba_icons/screen_close_disabled.png"
+      ],
+      "kind": "source_silhouette_extraction_and_color_normalization",
+      "native_size": [
+        59,
+        57
+      ],
+      "padding": 8,
+      "alpha": "real_RGBA",
+      "note": "approximate mask; not pixel-identical to source"
+    },
+    {
+      "id": "currency_plus.rgba",
+      "files": [
+        "02_rgba_icons/currency_plus_normal.png",
+        "02_rgba_icons/currency_plus_hover.png",
+        "02_rgba_icons/currency_plus_pressed.png",
+        "02_rgba_icons/currency_plus_disabled.png"
+      ],
+      "kind": "source_silhouette_extraction_and_color_normalization",
+      "native_size": [
+        38,
+        49
+      ],
+      "padding": 8,
+      "alpha": "real_RGBA",
+      "note": "approximate mask; not pixel-identical to source"
+    },
+    {
+      "id": "title_ornament_left.rgba",
+      "files": [
+        "02_rgba_icons/title_ornament_left_normal.png",
+        "02_rgba_icons/title_ornament_left_hover.png",
+        "02_rgba_icons/title_ornament_left_pressed.png",
+        "02_rgba_icons/title_ornament_left_disabled.png"
+      ],
+      "kind": "source_silhouette_extraction_and_color_normalization",
+      "native_size": [
+        82,
+        50
+      ],
+      "padding": 8,
+      "alpha": "real_RGBA",
+      "note": "approximate mask; not pixel-identical to source"
+    },
+    {
+      "id": "title_ornament_right.rgba",
+      "files": [
+        "02_rgba_icons/title_ornament_right_normal.png",
+        "02_rgba_icons/title_ornament_right_hover.png",
+        "02_rgba_icons/title_ornament_right_pressed.png",
+        "02_rgba_icons/title_ornament_right_disabled.png"
+      ],
+      "kind": "source_silhouette_extraction_and_color_normalization",
+      "native_size": [
+        83,
+        50
+      ],
+      "padding": 8,
+      "alpha": "real_RGBA",
+      "note": "approximate mask; not pixel-identical to source"
+    }
+  ],
+  "raw_crops_count": 49,
+  "state_assets": "03_states contains supplementary vector redrawing plus true RGBA exports; not original observed states",
+  "disabled_legacy_sidebar": "archived for complete source coverage; DO NOT restore deleted navigation",
+  "nine_slice": {
+    "card_border_insets": [
+      12,
+      12,
+      12,
+      12
+    ],
+    "original_cell_size": [
+      167,
+      157
+    ]
+  },
+  "supplemental_panel": "imagegen reconstruction; not pixel exact",
+  "business_data": "all real values, pool ids, reward images from project"
+}

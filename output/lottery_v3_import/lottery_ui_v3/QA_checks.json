@@ -1,0 +1,625 @@
+{
+  "source_crop_pixel_match_count": 49,
+  "rgba_files_verified": 56,
+  "rgba_details": [
+    {
+      "file": "02_rgba_icons/currency_plus_disabled.png",
+      "size": [
+        38,
+        49
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/title_ornament_right_normal.png",
+      "size": [
+        83,
+        50
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/screen_close_normal.png",
+      "size": [
+        59,
+        57
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/history_icon_disabled.png",
+      "size": [
+        53,
+        59
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/title_ornament_right_hover.png",
+      "size": [
+        83,
+        50
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/modal_close_hover.png",
+      "size": [
+        55,
+        59
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/skip_checkbox_hover.png",
+      "size": [
+        49,
+        49
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/skip_checkbox_pressed.png",
+      "size": [
+        49,
+        49
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/skip_checkbox_disabled.png",
+      "size": [
+        49,
+        49
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/modal_close_pressed.png",
+      "size": [
+        55,
+        59
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/history_icon_normal.png",
+      "size": [
+        53,
+        59
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/title_ornament_right_disabled.png",
+      "size": [
+        83,
+        50
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/pool_details_icon_normal.png",
+      "size": [
+        48,
+        55
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/pool_details_icon_disabled.png",
+      "size": [
+        48,
+        55
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/currency_plus_normal.png",
+      "size": [
+        38,
+        49
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/title_ornament_left_normal.png",
+      "size": [
+        82,
+        50
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/skip_checkbox_normal.png",
+      "size": [
+        49,
+        49
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/title_ornament_left_hover.png",
+      "size": [
+        82,
+        50
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/title_ornament_left_disabled.png",
+      "size": [
+        82,
+        50
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/history_icon_hover.png",
+      "size": [
+        53,
+        59
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/currency_plus_hover.png",
+      "size": [
+        38,
+        49
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/history_icon_pressed.png",
+      "size": [
+        53,
+        59
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/pool_details_icon_pressed.png",
+      "size": [
+        48,
+        55
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/screen_close_pressed.png",
+      "size": [
+        59,
+        57
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/screen_close_hover.png",
+      "size": [
+        59,
+        57
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/modal_close_normal.png",
+      "size": [
+        55,
+        59
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/title_ornament_left_pressed.png",
+      "size": [
+        82,
+        50
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/screen_close_disabled.png",
+      "size": [
+        59,
+        57
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/pool_details_icon_hover.png",
+      "size": [
+        48,
+        55
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/modal_close_disabled.png",
+      "size": [
+        55,
+        59
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/currency_plus_pressed.png",
+      "size": [
+        38,
+        49
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "02_rgba_icons/title_ornament_right_pressed.png",
+      "size": [
+        83,
+        50
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/button_gold_hover.png",
+      "size": [
+        312,
+        72
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/button_gold_disabled.png",
+      "size": [
+        312,
+        72
+      ],
+      "alpha_range": [
+        0,
+        166
+      ]
+    },
+    {
+      "file": "03_states/tab_hover_overlay.png",
+      "size": [
+        201,
+        24
+      ],
+      "alpha_range": [
+        0,
+        166
+      ]
+    },
+    {
+      "file": "03_states/card_outline_hover.png",
+      "size": [
+        167,
+        157
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/checkbox_checked_hover.png",
+      "size": [
+        33,
+        33
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/button_gold_normal.png",
+      "size": [
+        312,
+        72
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/checkbox_checked_normal.png",
+      "size": [
+        33,
+        33
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/entry_hover_underline.png",
+      "size": [
+        155,
+        8
+      ],
+      "alpha_range": [
+        0,
+        128
+      ]
+    },
+    {
+      "file": "03_states/ticket_hover.png",
+      "size": [
+        48,
+        48
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/card_outline_normal.png",
+      "size": [
+        167,
+        157
+      ],
+      "alpha_range": [
+        0,
+        232
+      ]
+    },
+    {
+      "file": "03_states/card_outline_pressed.png",
+      "size": [
+        167,
+        157
+      ],
+      "alpha_range": [
+        0,
+        232
+      ]
+    },
+    {
+      "file": "03_states/card_outline_disabled.png",
+      "size": [
+        167,
+        157
+      ],
+      "alpha_range": [
+        0,
+        151
+      ]
+    },
+    {
+      "file": "03_states/card_outline_selected.png",
+      "size": [
+        167,
+        157
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/ticket_normal.png",
+      "size": [
+        48,
+        48
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/button_ivory_disabled.png",
+      "size": [
+        312,
+        72
+      ],
+      "alpha_range": [
+        0,
+        166
+      ]
+    },
+    {
+      "file": "03_states/button_ivory_hover.png",
+      "size": [
+        312,
+        72
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/button_ivory_pressed.png",
+      "size": [
+        312,
+        72
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/button_gold_pressed.png",
+      "size": [
+        312,
+        72
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/ticket_disabled.png",
+      "size": [
+        48,
+        48
+      ],
+      "alpha_range": [
+        0,
+        166
+      ]
+    },
+    {
+      "file": "03_states/checkbox_checked_disabled.png",
+      "size": [
+        33,
+        33
+      ],
+      "alpha_range": [
+        0,
+        166
+      ]
+    },
+    {
+      "file": "03_states/checkbox_checked_pressed.png",
+      "size": [
+        33,
+        33
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/button_ivory_normal.png",
+      "size": [
+        312,
+        72
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/tab_selected_overlay.png",
+      "size": [
+        201,
+        24
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "03_states/ticket_pressed.png",
+      "size": [
+        48,
+        48
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    }
+  ],
+  "visual_preview_reviewed": true,
+  "runtime_game_test": false,
+  "approximate_masks": "icons retain source silhouettes but colors normalized; check at final display size"
+}

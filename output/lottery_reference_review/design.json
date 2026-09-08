@@ -1,0 +1,82 @@
+{
+  "reference": "v2 pool_details_reference.png; 1672 x 941",
+  "reference_crop": {
+    "x": 266,
+    "y": 155,
+    "width": 1140,
+    "height": 646
+  },
+  "normalization": "Uniform scale 1045/1140; center vertically with 3.9167px padding. Never stretch reference axes separately.",
+  "canvas": {
+    "width": 1045,
+    "height": 600
+  },
+  "header": {
+    "x": 0,
+    "y": 4,
+    "width": 1045,
+    "height": 72,
+    "font": 30
+  },
+  "close": {
+    "x": 973,
+    "y": 22,
+    "width": 38,
+    "height": 38
+  },
+  "tabs": {
+    "x": 21,
+    "y": 76,
+    "width": 1003,
+    "height": 52,
+    "font": 22,
+    "tabWidth": 198,
+    "note": "Reference tabs occupy the left 792px of a 1003px background strip; do not redistribute across the full strip."
+  },
+  "grid": {
+    "x": 40,
+    "y": 157,
+    "width": 647,
+    "height": 322
+  },
+  "card": {
+    "width": 147,
+    "height": 154,
+    "gapX": 14,
+    "gapY": 14,
+    "columns": 4,
+    "rows": 2,
+    "font": 18
+  },
+  "item_image": {
+    "width": 110,
+    "height": 80,
+    "source_ratio": "88:64"
+  },
+  "details": {
+    "x": 711,
+    "y": 145,
+    "width": 290,
+    "height": 359,
+    "font": 18,
+    "titleFont": 23,
+    "imageWidth": 152,
+    "imageHeight": 110.545
+  },
+  "footer": {
+    "x": 21,
+    "y": 510,
+    "width": 1003,
+    "height": 67,
+    "font": 17
+  },
+  "confirm": {
+    "x": 807,
+    "y": 522,
+    "width": 196,
+    "height": 46,
+    "font": 23
+  },
+  "tolerance_design_px": 2,
+  "notes": "Measured from supplied raster to nearest design pixel. No live independent right panel exists in the other reference; user explicitly selected this v2 reference. Source includes placeholders; production keeps actual items. Header ornament/font exact matching remains separate from structural validation."
+}

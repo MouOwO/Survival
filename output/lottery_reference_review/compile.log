@@ -1,0 +1,255 @@
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\scripts\custom_game\ui_layers.js
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Leaked KeyValues blocks: 162
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\styles\custom_game\lottery_celestial.css
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\button_gold.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\button_ivory.svg
+  +- dota_addons\survival\panorama\images\custom_game\lottery_handoff\card_back_png.vtex
+       Read 1 Input(s): 24ms
+       Ran Texture Processors: 7ms
+       Generated Mips and Output: 13ms
+       Encoding 1024x1536x1 texture to DXT5 (Q=3): 61ms
+  +- dota_addons\survival\panorama\images\custom_game\lottery_handoff\card_front_png.vtex
+       Read 1 Input(s): 21ms
+       Ran Texture Processors: 7ms
+       Generated Mips and Output: 9ms
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\checkbox_off.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\checkbox_on.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\close.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\pool_fixed.svg
+  +- dota_addons\survival\panorama\images\custom_game\lottery_handoff\pool_panel_png.vtex
+       Read 1 Input(s): 23ms
+       Ran Texture Processors: 8ms
+       Generated Mips and Output: 5ms
+  +- dota_addons\survival\panorama\images\custom_game\lottery_handoff\scene_clean_png.vtex
+       Read 1 Input(s): 25ms
+       Ran Texture Processors: 8ms
+       Generated Mips and Output: 4ms
+       Encoding 1672x941x1 texture to DXT5 (Q=3): 61ms
+
+-----------------------------------------------------------------
+ OK: 5 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Leaked KeyValues blocks: 162
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\scripts\custom_game\lottery_ui.js
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Leaked KeyValues blocks: 162
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\layout\custom_game\survival_hud.xml
+- dota_addons\survival\panorama\scripts\custom_game\ability_tooltip.js
+- dota_addons\survival\panorama\scripts\custom_game\attack_range_input.js
+- dota_addons\survival\panorama\scripts\custom_game\building_move.js
+- dota_addons\survival\panorama\scripts\custom_game\combat_stats.js
+- dota_addons\survival\panorama\scripts\custom_game\game_info_panel.js
+- dota_addons\survival\panorama\scripts\custom_game\gold_mine_income_numbers.js
+- dota_addons\survival\panorama\scripts\custom_game\hero_world_health_bar.js
+- dota_addons\survival\panorama\scripts\custom_game\hud_takeover.js
+- dota_addons\survival\panorama\scripts\custom_game\inventory_tooltip.js
+- dota_addons\survival\panorama\scripts\custom_game\lottery_ui.js
+- dota_addons\survival\panorama\scripts\custom_game\portrait_camera_editor.js
+- dota_addons\survival\panorama\scripts\custom_game\reward_presentation.js
+- dota_addons\survival\panorama\scripts\custom_game\shop_debug.js
+- dota_addons\survival\panorama\scripts\custom_game\shop_tooltip.js
+- dota_addons\survival\panorama\scripts\custom_game\shop_ui.js
+- dota_addons\survival\panorama\scripts\custom_game\survival_ui.js
+- dota_addons\survival\panorama\scripts\custom_game\tooltip_position.js
+- dota_addons\survival\panorama\scripts\custom_game\ui_bootstrap.js
+- dota_addons\survival\panorama\scripts\custom_game\ui_layers.js
+- dota_addons\survival\panorama\scripts\custom_game\weapon_growth_hud.js
+- dota_addons\survival\panorama\styles\custom_game\ability_tooltip.css
+- dota_addons\survival\panorama\styles\custom_game\archive_difficulty.css
+- dota_addons\survival\panorama\styles\custom_game\combat_stats.css
+- dota_addons\survival\panorama\styles\custom_game\game_info_panel.css
+- dota_addons\survival\panorama\styles\custom_game\gold_mine_income_numbers.css
+- dota_addons\survival\panorama\styles\custom_game\hero_world_health_bar.css
+- dota_addons\survival\panorama\styles\custom_game\inventory_tooltip.css
+- dota_addons\survival\panorama\styles\custom_game\lottery.css
+- dota_addons\survival\panorama\styles\custom_game\lottery_celestial.css
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\button_gold.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\button_ivory.svg
+  +- dota_addons\survival\panorama\images\custom_game\lottery_handoff\card_back_png.vtex
+       Read 1 Input(s): 25ms
+       Ran Texture Processors: 7ms
+       Generated Mips and Output: 13ms
+       Encoding 1024x1536x1 texture to DXT5 (Q=3): 59ms
+  +- dota_addons\survival\panorama\images\custom_game\lottery_handoff\card_front_png.vtex
+       Read 1 Input(s): 21ms
+       Ran Texture Processors: 7ms
+       Generated Mips and Output: 9ms
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\checkbox_off.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\checkbox_on.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\close.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\pool_fixed.svg
+  +- dota_addons\survival\panorama\images\custom_game\lottery_handoff\pool_panel_png.vtex
+       Read 1 Input(s): 23ms
+       Ran Texture Processors: 7ms
+       Generated Mips and Output: 5ms
+  +- dota_addons\survival\panorama\images\custom_game\lottery_handoff\scene_clean_png.vtex
+       Read 1 Input(s): 24ms
+       Ran Texture Processors: 8ms
+       Generated Mips and Output: 5ms
+       Encoding 1672x941x1 texture to DXT5 (Q=3): 67ms
+- dota_addons\survival\panorama\styles\custom_game\shop.css
+- dota_addons\survival\panorama\styles\custom_game\survival_hud.css
+- dota_addons\survival\panorama\styles\custom_game\survival_hud_native.css
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\ability_bg_png.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\ability_inset_shadow_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 8x194x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\inventory_item_well_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 76x57x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\inventory_panel_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 206x112x1 texture to DXT5 (Q=3): 3ms
+- dota_addons\survival\panorama\styles\custom_game\weapon_growth_hud.css
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\announcement.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\check.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\chevron.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\gift.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\history.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\info.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\plus.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\pool.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\refresh.svg
+- dota_addons\survival\panorama\images\custom_game\lottery_handoff\icons\ticket.svg
+  +- dota_addons\survival\panorama\images\custom_game\st2_darkfantasy\icons\st2_icon_gold_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\custom_game\st2_darkfantasy\icons\st2_icon_wood_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\icon_agility_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 24x24x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\icon_armor_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 32x32x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\icon_attack_speed_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 32x32x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\icon_damage_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 32x32x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\icon_intelligence_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 24x24x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\survival_native\icon_strength_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 24x24x1 texture to BGRA8888 (Q=3): 0ms
+
+-----------------------------------------------------------------
+ OK: 9 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Leaked KeyValues blocks: 162
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\announcement.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\check.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\checkbox_off.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\checkbox_on.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\chevron.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\close.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\gift.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\history.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\info.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\plus.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\pool.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\refresh.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\sound.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\star.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\images\custom_game\lottery_handoff\icons\ticket.svg
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+LOTTERY_PANORAMA_DEPLOY_PASS

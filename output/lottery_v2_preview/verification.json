@@ -1,0 +1,357 @@
+{
+  "pools": [
+    {
+      "pool": "map",
+      "count": 88,
+      "scrolling": true,
+      "broken": 0,
+      "selected": "属性结晶"
+    },
+    {
+      "pool": "cultivation",
+      "count": 88,
+      "scrolling": true,
+      "broken": 0,
+      "selected": "属性结晶"
+    },
+    {
+      "pool": "dragon_knight",
+      "count": 88,
+      "scrolling": true,
+      "broken": 0,
+      "selected": "属性结晶"
+    },
+    {
+      "pool": "summer",
+      "count": 88,
+      "scrolling": true,
+      "broken": 0,
+      "selected": "属性结晶"
+    }
+  ],
+  "icons": [
+    {
+      "name": "ticket",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 88,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 138,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 158,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "plus",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 36,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 60,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 76,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "gift",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 106,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 186,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 265,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "announcement",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 70,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 108,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 203,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "pool",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 118,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 146,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 169,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "history",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 94,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 164,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 256,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "close",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 23,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 35,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 88,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "checkbox_off",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 76,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 64,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 156,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "checkbox_on",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 88,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 85,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 198,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "chevron",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 21,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 27,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 56,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "info",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 80,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 119,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 182,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "check",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 19,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 33,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 74,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "refresh",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 64,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 95,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 156,
+          "black": 0
+        }
+      ]
+    },
+    {
+      "name": "star",
+      "checks": [
+        {
+          "size": 16,
+          "cornerAlpha": 0,
+          "painted": 68,
+          "black": 0
+        },
+        {
+          "size": 24,
+          "cornerAlpha": 0,
+          "painted": 108,
+          "black": 0
+        },
+        {
+          "size": 32,
+          "cornerAlpha": 0,
+          "painted": 176,
+          "black": 0
+        }
+      ]
+    }
+  ],
+  "runtime": "Chrome component preview, not Dota"
+}
