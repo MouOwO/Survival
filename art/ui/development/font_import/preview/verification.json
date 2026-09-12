@@ -1,0 +1,84 @@
+{
+  "kind": "browser_font_specimen_NOT_native_Dota",
+  "actual_rendered_fonts": [
+    {
+      "id": "title",
+      "fonts": [
+        {
+          "familyName": "Source Han Serif SC",
+          "postScriptName": "SourceHanSerifSC-Bold",
+          "isCustomFont": true,
+          "glyphCount": 11
+        }
+      ]
+    },
+    {
+      "id": "medium",
+      "fonts": [
+        {
+          "familyName": "Source Han Sans SC Medium",
+          "postScriptName": "SourceHanSansSC-Medium",
+          "isCustomFont": true,
+          "glyphCount": 2
+        }
+      ]
+    },
+    {
+      "id": "body",
+      "fonts": [
+        {
+          "familyName": "Source Han Sans SC",
+          "postScriptName": "SourceHanSansSC-Regular",
+          "isCustomFont": true,
+          "glyphCount": 20
+        }
+      ]
+    }
+  ],
+  "screens": [
+    {
+      "width": 1280,
+      "height": 720,
+      "rect": {
+        "x": 192,
+        "y": 16,
+        "width": 896,
+        "height": 688
+      },
+      "clipped": []
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "rect": {
+        "x": 277.58135986328125,
+        "y": 16,
+        "width": 1364.83740234375,
+        "height": 1048
+      },
+      "clipped": []
+    },
+    {
+      "width": 2560,
+      "height": 1440,
+      "rect": {
+        "x": 363.16278076171875,
+        "y": 16,
+        "width": 1833.67431640625,
+        "height": 1408
+      },
+      "clipped": []
+    },
+    {
+      "width": 3440,
+      "height": 1440,
+      "rect": {
+        "x": 803.1627807617188,
+        "y": 16,
+        "width": 1833.67431640625,
+        "height": 1408
+      },
+      "clipped": []
+    }
+  ]
+}

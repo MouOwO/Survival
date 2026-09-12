@@ -1,0 +1,167 @@
+#DailyEntry, #PassEntry { margin-top: 154px; height: 52px; background-color: #182d32ee; border: 1px solid #a28b56; flow-children: right; padding: 8px; }
+#DailyEntry { margin-left: 282px; width: 150px; }
+#PassEntry { margin-left: 442px; width: 80px; }
+#DailyEntry .label, #PassEntry .label { vertical-align: center; horizontal-align: center; font-size: 19px; color: #f3dfae; }
+#DailyChest { width: 32px; height: 32px; margin-right: 8px; }
+.ChestBase { width: 28px; height: 20px; margin-top: 12px; background-color: #956b30; border: 2px solid #edc675; }
+.ChestLid { width: 30px; height: 12px; margin-top: 3px; background-color: #cf9e47; border: 2px solid #f6d995; border-radius: 5px 5px 0px 0px; }
+.ChestLock { width: 6px; height: 9px; margin: 15px 0px 0px 12px; background-color: #ffe1a0; }
+.DailyClaimed .ChestLid { transform: translateY(-6px) rotateZ(-15deg); background-color: #746542; }
+.DailyClaimed .ChestBase { brightness: 0.7; }
+.DailyCanClaim #DailyChest { animation-name: DailyChestBounce; animation-duration: 1.2s; animation-iteration-count: infinite; }
+@keyframes DailyChestBounce { 0% { transform: translateY(0px); } 45% { transform: translateY(-6px); } 100% { transform: translateY(0px); } }
+/* 1672 x 941 reference. Modal local origin = (164,94); one shared uniform fit. */
+#DailyWindow { width:1348px; height:758px; padding:0px; display:block; overflow:clip; }
+#DailyWindow .label { color:#254356; text-shadow:none; white-space:normal; font-size:20px; }
+#DailyFrame { width:100%; height:100%; }
+.DailyFramePart { ignore-parent-flow:true; }
+#DailyHeader { width:100%; height:94px; }
+#DailyWindow #DailyHeading { position:absolute;left:613px;top:21px; width:250px; height:60px; font-size:38px; color:#f4ead1; }
+#DailyClose { position:absolute;left:1256px;top:17px; width:64px; height:64px; background-color:transparent; border:0px; }
+.DailyIconArt { width:64px; height:64px; background-size:100% 100%; vertical-align:center; }
+#DailyClose .DailyIconArt { width:80px; height:80px; left:50%;top:50%;transform:translate(-50%,-50%); }
+#DailyClaimPage { width:100%; height:100%; }
+#DailyWindow #DailySubtitle { position:absolute;left:76px;top:116px; width:750px; height:52px; font-size:32px; font-family:"Source Han Serif SC"; font-weight:bold; }
+#DailyPassStatus { position:absolute;left:1057px;top:96px; width:253px; height:54px; background-size:100% 100%; }
+#DailyPassStatus .DailyIconArt { margin-left:20px; }
+#DailyWindow #DailyPassStatusText { margin-left:85px; width:165px; vertical-align:center; font-size:20px; }
+#DailyWindow #DailyCount { position:absolute;left:1057px;top:150px; width:253px; height:30px; text-align:center; font-size:18px; }
+#DailyCards { width:100%; height:608px; overflow:clip; }
+#DailyWindow .DailyNormalCard, #DailyWindow .DailyWeekCard { display:block; margin:0px; padding:0px; border:0px; background-color:transparent; overflow:clip; }
+.DailyTodayBorder { width:100%; height:100%; }
+#DailyWindow .DailyDay { position:absolute;left:0px;top:23px; width:100%; text-align:center; font-size:22px; font-weight:500; }
+.DailyItems { position:absolute;left:0px;top:65px; width:100%; height:216px; display:flex;flex-direction:column; }
+.DailyReward { width:100%; height:216px; }
+.DailyItemArt { width:146px; height:150px; left:50%;transform:translateX(-50%); }
+#DailyWindow .DailyRewardName { width:100%; margin-top:153px; text-align:center; font-size:20px; padding:0px 7px; }
+.DailyMultiItem .DailyReward { height:104px; }
+.DailyMultiItem .DailyItemArt { width:80px; height:78px; }
+#DailyWindow .DailyMultiItem .DailyRewardName { margin-top:77px; font-size:16px; }
+.DailyNormalCard > .DailyStateIcon { position:absolute;left:44px;top:283px; width:64px; height:64px; }
+#DailyWindow .DailyCardStatus { position:absolute;left:5px;top:336px; width:143px; text-align:center; color:#637783; }
+.DailyFuture .DailyItemArt { saturation:0.65; }
+.DailyBaseReward { position:absolute;left:18px;top:60px; width:284px; height:128px; }
+.DailyBaseReward .DailyReward { width:100%; height:100%; }
+.DailyBaseReward .DailyItemArt { width:106px; height:106px; horizontal-align:left; }
+#DailyWindow .DailyBaseReward .DailyRewardName { position:absolute;left:114px;top:18px; width:163px; margin-top:0px; }
+#DailyWindow .DailyBaseStatus { position:absolute;left:114px;top:80px; width:163px; font-size:16px; text-align:center; }
+.DailyPremiumReward { position:absolute;left:16px;top:195px; width:288px; height:204px; }
+.DailyPremiumBadge { position:absolute;left:0px;top:0px; width:139px; height:40px; }
+#DailyWindow .DailyPremiumTag { position:absolute;left:0px;top:5px; width:139px; color:#fff3d9; text-align:center; }
+.DailyPremiumArt { position:absolute;left:93px;top:5px; width:190px; height:153px; }
+#DailyWindow .DailyPremiumName { position:absolute;left:3px;top:50px; width:145px; font-size:19px; }
+.DailyPremiumReward .DailyStateIcon { position:absolute;left:1px;top:93px; width:64px; height:64px; }
+#DailyWindow .DailyPremiumState { position:absolute;left:0px;top:157px; width:288px; text-align:center; font-size:20px; }
+#DailyWindow #DailyRuleLine { position:absolute;left:98px;top:617px; width:1180px; height:42px; font-size:19px; }
+#DailyRules { position:absolute;left:41px;top:681px; width:190px; height:54px; }
+#DailyRules .label { margin-left:62px; vertical-align:center; }
+#DailyMakeup { position:absolute;left:630px;top:666px; width:318px; height:70px; margin:0px; padding:0px; }
+#DailyClaim { position:absolute;left:998px;top:666px; width:318px; height:70px; margin:0px; padding:0px; }
+#DailyClaim .label, #DailyMakeup .label { width:100%; left:50%;top:50%;transform:translate(-50%,-50%); text-align:center; font-size:24px; }
+#DailyClaim.UIDisabled { opacity:1; saturation:1; brightness:1; }
+.DailySpinner { width:40px; height:40px; margin-left:24px; vertical-align:center; animation-name:DailySpin; animation-duration:0.8s; animation-iteration-count:infinite; }
+@keyframes DailySpin { 0% { transform:rotateZ(0deg); } 100% { transform:rotateZ(360deg); } }
+#DailyWindow #DailyNotice { position:absolute;left:245px;top:687px; width:370px; height:48px; color:#8a5137; font-size:16px; }
+#DailyPassPage { position:absolute;left:60px;top:125px; width:1230px; height:470px; display:flex;flex-direction:column; }
+#DailyPassPage > .label { margin-bottom:15px; }
+#DailySpecials { width:100%; height:210px; display:flex;flex-direction:row; }
+#DailyWindow .DailySpecial { width:370px; height:185px; margin-right:22px; padding:25px; display:flex;flex-direction:column; }
+#PassPurchase, #DailyBack { width:318px; height:70px; }
+#DailyRulesText { position:absolute;left:60px;top:110px; width:1228px; height:480px; background-color:#eef0edf9; border:1px solid #b8a57e; padding:35px; overflow:auto; z-index:50; }
+#DailyWindow #DailyRulesBody { width:100%; font-size:22px; }
+
+#DailyHeader { z-index:10; }
+/* Generated from supplied runtime assets; no exact/baked labels. */
+.DailyClaimSkin { background-image: url("../../../panorama/src/images/ui/daily_rewards/buttons/claim_normal.png"); background-size: 100% 100%; }
+.DailyClaimSkin:hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/buttons/claim_hover.png"); }
+.DailyClaimSkin:active { background-image: url("../../../panorama/src/images/ui/daily_rewards/buttons/claim_pressed.png"); }
+.DailyClaimSkin:disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/buttons/claim_disabled.png"); }
+.DailyNormalCard { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_empty.png"); background-size: 100% 100%; }
+.DailyNormalCard:hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_empty_hover.png"); }
+.DailyNormalCard:active { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_empty_pressed.png"); }
+.DailyNormalCard:disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_empty_disabled.png"); }
+.DailyWeekCard { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/week_end_body.png"); background-size: 100% 100%; }
+.DailyWeekCard:hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/week_end_hover.png"); }
+.DailyWeekCard:active { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/week_end_pressed.png"); }
+.DailyWeekCard:disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/week_end_disabled.png"); }
+.DailyIcon_close_local .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/close_local_normal.png"); }
+.DailyIcon_close_local:hover .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/close_local_hover.png"); }
+.DailyIcon_close_local:active .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/close_local_pressed.png"); }
+.DailyIcon_close_local:disabled .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/close_local_disabled.png"); }
+.DailyIcon_rules_local .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/rules_local_normal.png"); }
+.DailyIcon_rules_local:hover .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/rules_local_hover.png"); }
+.DailyIcon_rules_local:active .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/rules_local_pressed.png"); }
+.DailyIcon_rules_local:disabled .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/rules_local_disabled.png"); }
+.DailyIcon_pass .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/pass_normal.png"); }
+.DailyIcon_pass:hover .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/pass_hover.png"); }
+.DailyIcon_pass:active .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/pass_pressed.png"); }
+.DailyIcon_pass:disabled .DailyIconArt { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/pass_disabled.png"); }
+.DailyPreload_daily_item_coins { background-image: url("../../../panorama/src/images/ui/daily_rewards/items/coins_medallion.png"); }
+.DailyPreload_daily_item_wood { background-image: url("../../../panorama/src/images/ui/daily_rewards/items/wood_medallion.png"); }
+.DailyPreload_daily_item_book { background-image: url("../../../panorama/src/images/ui/daily_rewards/items/book_medallion.png"); }
+.DailyPreload_daily_item_ticket { background-image: url("../../../panorama/src/images/ui/daily_rewards/items/ticket_medallion.png"); }
+.DailyPreload_daily_item_crystals { background-image: url("../../../panorama/src/images/ui/daily_rewards/items/crystals_medallion.png"); }
+.DailyPreload_daily_item_material { background-image: url("../../../panorama/src/images/ui/daily_rewards/items/material_medallion.png"); }
+.DailyPreload_daily_card_body { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_body.png"); }
+.DailyPreload_daily_card_week_end { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/week_end_body.png"); }
+.DailyPreload_daily_badge_pass_active { background-image: url("../../../panorama/src/images/ui/daily_rewards/badges/pass_active.png"); }
+.DailyPreload_daily_badge_premium { background-image: url("../../../panorama/src/images/ui/daily_rewards/badges/premium.png"); }
+.DailyPreload_daily_badge_today { background-image: url("../../../panorama/src/images/ui/daily_rewards/badges/today.png"); }
+.DailyPreload_daily_button_claim_normal { background-image: url("../../../panorama/src/images/ui/daily_rewards/buttons/claim_normal.png"); }
+.DailyPreload_shared_candidate_daily_window { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/empty_window_candidate.png"); }
+.DailyPreload_daily_icon_calendar_normal { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/calendar_normal.png"); }
+.DailyPreload_daily_icon_close_local_normal { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/close_local_normal.png"); }
+.DailyPreload_daily_icon_info_normal { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/info_normal.png"); }
+.DailyPreload_daily_icon_rules_local_normal { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/rules_local_normal.png"); }
+.DailyPreload_daily_icon_pass_normal { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/pass_normal.png"); }
+.DailyPreload_daily_icon_claimed { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/check_claimed.png"); }
+.DailyPreload_daily_item_weapon { background-image: url("../../../panorama/src/images/ui/daily_rewards/items/weapon_estimated_alpha.png"); }
+.DailyPreload_daily_item_ticket_small { background-image: url("../../../panorama/src/images/ui/daily_rewards/items/ticket_small_estimated_alpha.png"); }
+.DailyPreload_daily_button_claim_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/buttons/claim_hover.png"); }
+.DailyPreload_daily_card_week_end_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/week_end_hover.png"); }
+.DailyPreload_daily_card_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_hover.png"); }
+.DailyPreload_daily_button_claim_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/buttons/claim_pressed.png"); }
+.DailyPreload_daily_card_week_end_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/week_end_pressed.png"); }
+.DailyPreload_daily_card_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_pressed.png"); }
+.DailyPreload_daily_button_claim_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/buttons/claim_disabled.png"); }
+.DailyPreload_daily_card_week_end_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/week_end_disabled.png"); }
+.DailyPreload_daily_card_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_disabled.png"); }
+.DailyPreload_daily_icon_calendar_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/calendar_hover.png"); }
+.DailyPreload_daily_icon_calendar_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/calendar_pressed.png"); }
+.DailyPreload_daily_icon_calendar_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/calendar_disabled.png"); }
+.DailyPreload_daily_icon_close_local_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/close_local_hover.png"); }
+.DailyPreload_daily_icon_close_local_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/close_local_pressed.png"); }
+.DailyPreload_daily_icon_close_local_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/close_local_disabled.png"); }
+.DailyPreload_daily_icon_info_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/info_hover.png"); }
+.DailyPreload_daily_icon_info_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/info_pressed.png"); }
+.DailyPreload_daily_icon_info_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/info_disabled.png"); }
+.DailyPreload_daily_icon_rules_local_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/rules_local_hover.png"); }
+.DailyPreload_daily_icon_rules_local_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/rules_local_pressed.png"); }
+.DailyPreload_daily_icon_rules_local_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/rules_local_disabled.png"); }
+.DailyPreload_daily_icon_pass_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/pass_hover.png"); }
+.DailyPreload_daily_icon_pass_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/pass_pressed.png"); }
+.DailyPreload_daily_icon_pass_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/pass_disabled.png"); }
+.DailyPreload_daily_badge_pass_inactive { background-image: url("../../../panorama/src/images/ui/daily_rewards/badges/pass_inactive.png"); }
+.DailyPreload_daily_card_border_today { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/today_border.png"); }
+.DailyPreload_daily_card_empty { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_empty.png"); }
+.DailyPreload_daily_card_empty_hover { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_empty_hover.png"); }
+.DailyPreload_daily_card_empty_pressed { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_empty_pressed.png"); }
+.DailyPreload_daily_card_empty_disabled { background-image: url("../../../panorama/src/images/ui/daily_rewards/cards/day_empty_disabled.png"); }
+.DailyPreload_daily_icon_lock { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/lock.png"); }
+.DailyPreload_daily_icon_clock { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/clock.png"); }
+.DailyPreload_daily_icon_spinner { background-image: url("../../../panorama/src/images/ui/daily_rewards/icons/spinner.png"); }
+.DailyPreload_shared_candidate_daily_window_r0c0 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r0c0.png"); }
+.DailyPreload_shared_candidate_daily_window_r0c1 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r0c1.png"); }
+.DailyPreload_shared_candidate_daily_window_r0c2 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r0c2.png"); }
+.DailyPreload_shared_candidate_daily_window_r1c0 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r1c0.png"); }
+.DailyPreload_shared_candidate_daily_window_r1c1 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r1c1.png"); }
+.DailyPreload_shared_candidate_daily_window_r1c2 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r1c2.png"); }
+.DailyPreload_shared_candidate_daily_window_r2c0 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r2c0.png"); }
+.DailyPreload_shared_candidate_daily_window_r2c1 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r2c1.png"); }
+.DailyPreload_shared_candidate_daily_window_r2c2 { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/nine/r2c2.png"); }
+.DailyPreload_shared_candidate_daily_window_layout { background-image: url("../../../panorama/src/images/ui/daily_rewards/frame/window_layout_candidate.png"); }
+
+*{box-sizing:border-box}.panel{position:absolute}.label{display:block;position:absolute;line-height:1.45;font-family:"Source Han Sans SC";pointer-events:none}.ArchiveHidden,.UIClosed{display:none!important}.UIModalScrim{position:fixed;inset:0;width:100%;height:100%}.DailyText{position:relative}.DailyItems .DailyReward{position:relative;flex-shrink:0}.DailyNormalCard,.DailyWeekCard{background-size:100% 100%}#DailyClaimPage,#DailyFrame,#DailyHeader{pointer-events:none}#DailyClaimPage>.panel,#DailyHeader>.panel{pointer-events:auto}#DailyCards{pointer-events:none}#DailyCards>.panel{pointer-events:auto}#DailyHeading{pointer-events:none!important}#DailyWindow .DailyDay{left:0;top:23px}#DailyWindow .DailyRewardName{left:0}.DailyItemArt{top:0}.DailySpecial .label{position:relative}#DailyPassPage>.label{position:relative}#DailyPassPage #DailySpecials,#DailyPassPage .button{position:relative}#DailyClaim .label,#DailyMakeup .label{top:50%;transform:translateY(-50%);left:0}#DailyPassStatusText{top:13px}#DailyHeader{z-index:10}#DailyClose .DailyIconArt{left:-8px;top:-8px;transform:none}.DailyBaseReward .DailyItemArt{left:0;transform:none}#DailyRules .label{top:12px}#DailyWindow .DailySection{font-size:28px}body{margin:0;background:#263b42;width:100vw;height:100vh;position:relative;overflow:hidden}#DailyHeading{font-family:"Source Han Serif SC"!important;font-weight:700!important}
+@font-face{font-family:"Source Han Sans SC";font-weight:400;src:url('../../../panorama/fonts/Radiance-Survival-SourceHanSansSC-Regular.otf')}
+@font-face{font-family:"Source Han Sans SC";font-weight:500;src:url('../../../panorama/fonts/Radiance-Survival-SourceHanSansSC-Medium.otf')}
+@font-face{font-family:"Source Han Serif SC";font-weight:700;src:url('../../../panorama/fonts/Radiance-Survival-SourceHanSerifSC-Bold.otf')}

@@ -1,0 +1,508 @@
+{
+  "kind": "isolated_dota_font_libraries_not_game_capture",
+  "os_font_installation": false,
+  "game_fonts_conf_loaded": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\core\\panorama\\fonts\\fonts.conf",
+  "native_addon_mount_verified": false,
+  "files_scanned": {
+    "panorama/src": 21,
+    "panorama/localization": 2,
+    "resource": 6,
+    "data/csv": 144,
+    "scripts/vscripts": 621,
+    "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama": 43
+  },
+  "encoding_review_files": [
+    "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\resource\\custom_game_whitelist.txt"
+  ],
+  "gb18030_sources": [
+    "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\data\\csv\\挑战与奖励系统\\building_challenge_waves.csv",
+    "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\data\\csv\\英雄系统\\hero_definitions.csv"
+  ],
+  "presentation_fallbacks": {
+    "💰": "金币",
+    "🌲": "木材"
+  },
+  "unique_printable_characters": 1738,
+  "fonts": [
+    {
+      "file": "Radiance-Survival-SourceHanSansSC-Regular.otf",
+      "sha256": "f1d8611151880c6c336aabeac4640ef434fa13cbfbf1ffe82d0a71b2a5637256",
+      "weight": 400,
+      "fontconfig_selected_file": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSansSC-Regular.otf",
+      "fontconfig_weight": 80,
+      "freetype_cff_rasterization": "passed_14_16_18_20_24_30_38_44px",
+      "missing_characters": [
+        {
+          "character": "ģ",
+          "codepoint": "U+0123",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ľ",
+          "codepoint": "U+013E",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ŀ",
+          "codepoint": "U+013F",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ŷ",
+          "codepoint": "U+0176",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ƿ",
+          "codepoint": "U+01F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȡ",
+          "codepoint": "U+0221",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȴ",
+          "codepoint": "U+0234",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȷ",
+          "codepoint": "U+0237",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʱ",
+          "codepoint": "U+02B1",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʼ",
+          "codepoint": "U+02BC",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʽ",
+          "codepoint": "U+02BD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "˷",
+          "codepoint": "U+02F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "̡",
+          "codepoint": "U+0321",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ͷ",
+          "codepoint": "U+0376",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ѡ",
+          "codepoint": "U+0461",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ҡ",
+          "codepoint": "U+04A1",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ӱ",
+          "codepoint": "U+04F0",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ӳ",
+          "codepoint": "U+04F2",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ӽ",
+          "codepoint": "U+04FD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ԭ",
+          "codepoint": "U+052D",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ִ",
+          "codepoint": "U+05B4",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ֵ",
+          "codepoint": "U+05B5",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effect_params.csv"
+        },
+        {
+          "character": "ַ",
+          "codepoint": "U+05B7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effect_params.csv"
+        },
+        {
+          "character": "ע",
+          "codepoint": "U+05E2",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ܷ",
+          "codepoint": "U+0737",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ܼ",
+          "codepoint": "U+073C",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "߷",
+          "codepoint": "U+07F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "�",
+          "codepoint": "U+FFFD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "🌲",
+          "codepoint": "U+1F332",
+          "first_file": "data/csv/建筑与工人系统/防御塔/arrow_tower_base.csv"
+        },
+        {
+          "character": "💰",
+          "codepoint": "U+1F4B0",
+          "first_file": "data/csv/建筑与工人系统/防御塔/arrow_tower_base.csv"
+        }
+      ]
+    },
+    {
+      "file": "Radiance-Survival-SourceHanSansSC-Medium.otf",
+      "sha256": "1df61d31687d04fd2f928a3bb6ca6cd61f0e988cc267cf317f32406edbb49f70",
+      "weight": 500,
+      "fontconfig_selected_file": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSansSC-Medium.otf",
+      "fontconfig_weight": 100,
+      "freetype_cff_rasterization": "passed_14_16_18_20_24_30_38_44px",
+      "missing_characters": [
+        {
+          "character": "ģ",
+          "codepoint": "U+0123",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ľ",
+          "codepoint": "U+013E",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ŀ",
+          "codepoint": "U+013F",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ŷ",
+          "codepoint": "U+0176",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ƿ",
+          "codepoint": "U+01F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȡ",
+          "codepoint": "U+0221",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȴ",
+          "codepoint": "U+0234",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȷ",
+          "codepoint": "U+0237",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʱ",
+          "codepoint": "U+02B1",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʼ",
+          "codepoint": "U+02BC",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʽ",
+          "codepoint": "U+02BD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "˷",
+          "codepoint": "U+02F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "̡",
+          "codepoint": "U+0321",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ͷ",
+          "codepoint": "U+0376",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ѡ",
+          "codepoint": "U+0461",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ҡ",
+          "codepoint": "U+04A1",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ӱ",
+          "codepoint": "U+04F0",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ӳ",
+          "codepoint": "U+04F2",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ӽ",
+          "codepoint": "U+04FD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ԭ",
+          "codepoint": "U+052D",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ִ",
+          "codepoint": "U+05B4",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ֵ",
+          "codepoint": "U+05B5",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effect_params.csv"
+        },
+        {
+          "character": "ַ",
+          "codepoint": "U+05B7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effect_params.csv"
+        },
+        {
+          "character": "ע",
+          "codepoint": "U+05E2",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ܷ",
+          "codepoint": "U+0737",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ܼ",
+          "codepoint": "U+073C",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "߷",
+          "codepoint": "U+07F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "�",
+          "codepoint": "U+FFFD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "🌲",
+          "codepoint": "U+1F332",
+          "first_file": "data/csv/建筑与工人系统/防御塔/arrow_tower_base.csv"
+        },
+        {
+          "character": "💰",
+          "codepoint": "U+1F4B0",
+          "first_file": "data/csv/建筑与工人系统/防御塔/arrow_tower_base.csv"
+        }
+      ]
+    },
+    {
+      "file": "Radiance-Survival-SourceHanSerifSC-Bold.otf",
+      "sha256": "706b8c0de2deff6cbc0c87e2cdedfd33a78b7ffd76cebb4549012f197ba611fe",
+      "weight": 700,
+      "fontconfig_selected_file": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSerifSC-Bold.otf",
+      "fontconfig_weight": 200,
+      "freetype_cff_rasterization": "passed_14_16_18_20_24_30_38_44px",
+      "missing_characters": [
+        {
+          "character": "ģ",
+          "codepoint": "U+0123",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ľ",
+          "codepoint": "U+013E",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ŀ",
+          "codepoint": "U+013F",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ŷ",
+          "codepoint": "U+0176",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ƿ",
+          "codepoint": "U+01F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȡ",
+          "codepoint": "U+0221",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȴ",
+          "codepoint": "U+0234",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ȷ",
+          "codepoint": "U+0237",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʱ",
+          "codepoint": "U+02B1",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʼ",
+          "codepoint": "U+02BC",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ʽ",
+          "codepoint": "U+02BD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "˷",
+          "codepoint": "U+02F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "̡",
+          "codepoint": "U+0321",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ͷ",
+          "codepoint": "U+0376",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ѡ",
+          "codepoint": "U+0461",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ҡ",
+          "codepoint": "U+04A1",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ӱ",
+          "codepoint": "U+04F0",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "Ӳ",
+          "codepoint": "U+04F2",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ӽ",
+          "codepoint": "U+04FD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ԭ",
+          "codepoint": "U+052D",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ִ",
+          "codepoint": "U+05B4",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ֵ",
+          "codepoint": "U+05B5",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effect_params.csv"
+        },
+        {
+          "character": "ַ",
+          "codepoint": "U+05B7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effect_params.csv"
+        },
+        {
+          "character": "ע",
+          "codepoint": "U+05E2",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ܷ",
+          "codepoint": "U+0737",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "ܼ",
+          "codepoint": "U+073C",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "߷",
+          "codepoint": "U+07F7",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "�",
+          "codepoint": "U+FFFD",
+          "first_file": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv"
+        },
+        {
+          "character": "🌲",
+          "codepoint": "U+1F332",
+          "first_file": "data/csv/建筑与工人系统/防御塔/arrow_tower_base.csv"
+        },
+        {
+          "character": "💰",
+          "codepoint": "U+1F4B0",
+          "first_file": "data/csv/建筑与工人系统/防御塔/arrow_tower_base.csv"
+        }
+      ]
+    }
+  ]
+}

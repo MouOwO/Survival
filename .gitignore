@@ -201,3 +201,46 @@ __pycache__/
 # Regression tests for monster cosmetics and corpse cleanup.
 !/scripts/vscripts/tests/test_archive_monster_cosmetics.lua
 !/scripts/vscripts/tests/test_monster_corpse_outfit.lua
+
+# Generated UI evidence removed after release; keep source artwork and build inputs.
+/ui/archive_beast_preview/preview-tooltip.png
+/ui/archive_beast_preview/preview.png
+/ui/archive_kit_import/overlay.png
+/ui/archive_kit_import/preview.png
+/ui/archive_kit_import/side.png
+/ui/lottery_compact_preview/real-grid.png
+/ui/lottery_compact_preview/reference-comparison.png
+/ui/lottery_compact_preview/selected-tab.png
+/ui/lottery_compact_preview/test-grid.png
+/ui/lottery_handoff_preview/components.png
+/ui/lottery_handoff_preview/home-1280.png
+/ui/lottery_handoff_preview/home-2560.png
+/ui/lottery_handoff_preview/home.png
+/ui/lottery_handoff_preview/pool.png
+/ui/lottery_handoff_preview/single.png
+/ui/lottery_handoff_preview/ten.png
+/ui/lottery_reference_review/actual-1045.png
+/ui/lottery_reference_review/overlay-50.png
+/ui/lottery_reference_review/side-by-side.png
+/ui/lottery_v2_preview/icon-states.png
+/ui/lottery_v2_preview/pool-cultivation.png
+/ui/lottery_v2_preview/pool-dragon_knight.png
+/ui/lottery_v2_preview/pool-map.png
+/ui/lottery_v2_preview/pool-summer.png
+/ui/lottery_v3_import/states.png
+/ui/**/*.log
+/ui/**/*.webm
+/ui/**/*.mp4
+/ui/**/*.avi
+/ui/**/_frames/
+/ui/**/edge_profile/
+/ui/**/browser_profile/
+
+# UI authoring generated artifacts (source assets remain tracked).
+/ui/**/evidence/
+/ui/**/backups/
+/ui/**/browser_cache*/
+/ui/**/.font_inspect_deps/
+/ui/**/*.log
+/ui/**/backups/
+/ui/**/__pycache__/

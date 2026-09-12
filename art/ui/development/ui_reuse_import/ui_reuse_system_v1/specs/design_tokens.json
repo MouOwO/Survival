@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "status": "proposed_normalized_tokens_not_exact_sampling",
+  "design_source_px": [
+    1672,
+    941
+  ],
+  "panorama_logical_reference_height": 1080,
+  "source_to_logical_scale": 1.1477151965993624,
+  "colors": {
+    "surface_teal": "#173743",
+    "surface_teal_light": "#244C5A",
+    "surface_ivory": "#EFEADF",
+    "border_champagne": "#C7B88F",
+    "text_on_dark": "#D0D6D5",
+    "text_on_light": "#203E4A",
+    "accent_jade": "#83B8AC",
+    "disabled": "#849294"
+  },
+  "scrim_alpha": 0.55,
+  "spacing": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    32
+  ],
+  "fonts": {
+    "title": "Source Han Serif SC",
+    "body": "Source Han Sans SC",
+    "fallback": "project_approved_chinese_font"
+  },
+  "source_design_sizes": {
+    "title": 26,
+    "body": 16,
+    "caption": 13,
+    "icon_glyph": 28,
+    "icon_hit_area": [
+      56,
+      64
+    ]
+  },
+  "motion_ms": {
+    "hover": 100,
+    "pressed": 60,
+    "modal": 160,
+    "tooltip_delay": 180
+  },
+  "top_icon_hover_scale": 1.0,
+  "roguelike_hover_scale": 1.035,
+  "modal_size_presets_source_units": {
+    "small": [
+      720,
+      480
+    ],
+    "medium": [
+      1002,
+      758
+    ],
+    "wide": [
+      1208,
+      806
+    ]
+  },
+  "state_policy": [
+    "disabled overrides interaction",
+    "selected persists over hover",
+    "hover and selected are separate flags",
+    "busy locks repeat submission"
+  ],
+  "frame_policy": "corner dimensions fixed; horizontal edges stretch in x only; vertical edges stretch in y only; center fill separately; do not assign slice insets before clean source exists"
+}

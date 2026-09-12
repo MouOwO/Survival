@@ -1,9 +1,10 @@
-LinkLuaModifier("modifier_weapon_stat_projection", "modifiers/modifier_weapon_stat_projection", LUA_MODIFIER_MOTION_NONE)
+-- Engine binding is owned by core/modifier_registry and modifier_bindings.
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 
 modifier_weapon_stat_projection = class({})
+_G.modifier_weapon_stat_projection = modifier_weapon_stat_projection
 
 local critical_records = {}
 local displayed_damage_records = {}

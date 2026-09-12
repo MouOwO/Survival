@@ -1,0 +1,98 @@
+[
+  {
+    "case": "future_day",
+    "ordinary": "not_open",
+    "premium": "not_open",
+    "button": "disabled",
+    "label": "尚未开放",
+    "overlay": "clock"
+  },
+  {
+    "case": "today_no_pass",
+    "ordinary": "claimable",
+    "premium": "requires_pass",
+    "button": "normal",
+    "label": "领取今日奖励",
+    "overlay": "none"
+  },
+  {
+    "case": "today_already_claimed",
+    "ordinary": "claimed",
+    "premium": "not_applicable",
+    "button": "disabled",
+    "label": "今日已领取",
+    "overlay": "check"
+  },
+  {
+    "case": "week_end_no_pass",
+    "ordinary": "claimable",
+    "premium": "requires_pass",
+    "button": "normal",
+    "label": "领取今日奖励",
+    "overlay": "premium_lock_only"
+  },
+  {
+    "case": "week_end_with_pass",
+    "ordinary": "claimable",
+    "premium": "claimable",
+    "button": "normal",
+    "label": "领取今日奖励",
+    "overlay": "gold"
+  },
+  {
+    "case": "week_end_base_claimed_bonus_ready",
+    "ordinary": "claimed",
+    "premium": "claimable",
+    "button": "normal",
+    "label": "领取通行证奖励",
+    "overlay": "gold_on_bonus"
+  },
+  {
+    "case": "week_end_bonus_claimed_base_ready",
+    "ordinary": "claimable",
+    "premium": "claimed",
+    "button": "normal",
+    "label": "领取今日奖励",
+    "overlay": "gold_on_base"
+  },
+  {
+    "case": "week_end_all_claimed",
+    "ordinary": "claimed",
+    "premium": "claimed",
+    "button": "disabled",
+    "label": "今日已领取",
+    "overlay": "check"
+  },
+  {
+    "case": "pass_expired",
+    "ordinary": "server_status",
+    "premium": "requires_pass",
+    "button": "based_on_ordinary",
+    "label": "依据普通奖励状态",
+    "overlay": "premium_lock_only"
+  },
+  {
+    "case": "request_pending",
+    "ordinary": "keep_last_server_status",
+    "premium": "keep_last_server_status",
+    "button": "busy",
+    "label": "领取中…",
+    "overlay": "spinner"
+  },
+  {
+    "case": "request_failed",
+    "ordinary": "last_confirmed_server_status",
+    "premium": "last_confirmed_server_status",
+    "button": "restore",
+    "label": "重试领取",
+    "overlay": "inline_error"
+  },
+  {
+    "case": "week_reset",
+    "ordinary": "new_server_week_state",
+    "premium": "new_server_week_state",
+    "button": "recalculate",
+    "label": "依据新周状态",
+    "overlay": "reset_old_local_visual_state"
+  }
+]

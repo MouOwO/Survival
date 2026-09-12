@@ -1,0 +1,57 @@
+/* Design space 1672 x 941. Only the outer canvas scales. Native components keep their bindings. */
+#MainHudSkin {width:1672px;height:941px;align:center bottom;flow-children:none;transform-origin:50% 100%;}
+#MainHudSkin Label {text-shadow:none;color:#dce2e2;font-size:16px;}
+.MainHudHidden {visibility:collapse;}
+#MainHudTop {position:12px 8px 0px;width:631px;height:64px;flow-children:right;background-color:gradient(linear,0% 0%,0% 100%,from(#09202b66),to(#09202b00));}
+.MainHudIconButton {width:57px;height:60px;margin-right:13px;background-color:transparent;border:0px;transition-property:brightness;transition-duration:.12s;overflow:noclip;}
+.MainHudIconButton Image {width:64px;height:64px;horizontal-align:center;position:0px -13px 0px;}
+.MainHudIconButton Label {width:100%;height:24px;position:0px 38px 0px;text-align:center;font-size:16px;}
+.MainHudIconButton:hover {brightness:1.16;}
+.MainHudIconButton:active {brightness:.88;}
+.MainHudIconButton.Unavailable {opacity:.48;}
+#MainHudHideEffects {position:24px 79px 0px;height:26px;width:142px;opacity:.55;}
+#MainHudHideEffects Label {font-size:15px;}
+#MainHudWave {width:223px;height:67px;horizontal-align:center;position:0px 0px 0px;background-color:gradient(linear,0% 0%,0% 100%,from(#071e2baa),to(#071e2b00));}
+#MainHudWaveText {position:8px 8px 0px;width:207px;height:29px;font-size:22px;text-align:center;}
+#MainHudWaveTrack {position:28px 41px 0px;width:163px;height:9px;border:1px solid #27515a;background-color:#091e28;border-radius:4px;}
+#MainHudWaveFill {height:100%;width:0%;background-color:#55cdd0;border-radius:3px;}
+#MainHudScore {position:1203px 16px 0px;width:454px;height:104px;background-color:#09222bd9;}
+#MainHudScoreHeader {position:20px 11px 0px;width:420px;height:28px;flow-children:right;border-bottom:1px solid #62756c;}
+#MainHudScoreHeader Label {width:72px;font-size:16px;color:#e1cfa1;}
+#MainHudScoreHeader Label:first-child {width:152px;}
+#MainHudScoreHeader #MainHudDifficulty {width:52px;}
+#MainHudScoreRows {position:12px 43px 0px;width:430px;height:40px;flow-children:down;overflow:squish scroll;}
+.MainHudScoreRow {width:430px;height:29px;flow-children:right;}
+.MainHudScoreRow Label {width:76px;font-size:16px;text-overflow:ellipsis;white-space:nowrap;}
+.MainHudScoreRow .MainHudPlayerName {width:164px;}
+#MainHudResourcesExtra {position:14px 82px 0px;width:424px;height:21px;font-size:13px;color:#b6cbc9;}
+#MainHudHeroText {position:459px 750px 0px;width:532px;height:165px;}
+#MainHudHeroName {position:160px 13px 0px;width:242px;height:28px;font-size:21px;text-overflow:ellipsis;white-space:nowrap;}
+#MainHudHeroLevel {position:410px 14px 0px;width:106px;height:24px;font-size:18px;color:#e7c989;text-align:right;}
+#MainHudHealthTrack,#MainHudManaTrack {position:162px 49px 0px;width:344px;height:20px;background-image:url("ui-resource://project.custom_game.main_hud_v1.hp_track_clean");background-size:100% 100%;border:1px solid #4e7675;border-radius:3px;}
+#MainHudManaTrack {position:162px 75px 0px;background-image:url("ui-resource://project.custom_game.main_hud_v1.mp_track_clean");}
+#MainHudHealthFill,#MainHudManaFill {width:0%;height:100%;background-image:url("ui-resource://project.custom_game.main_hud_v1.hp_fill_clean");background-size:100% 100%;}
+#MainHudManaFill {background-image:url("ui-resource://project.custom_game.main_hud_v1.mp_fill_clean");}
+#MainHudHealthText,#MainHudManaText {width:100%;text-align:center;font-size:16px;color:#f0f1e8;}
+#MainHudStats {position:142px 105px 0px;width:390px;height:49px;flow-children:right;}
+.MainHudStat {width:78px;height:49px;}
+.MainHudStat Image {position:-17px -17px 0px;width:64px;height:64px;}
+.MainHudStat Label {position:27px 0px 0px;font-size:15px;}
+.MainHudStat .MainHudStatValue {position:22px 24px 0px;width:56px;font-size:15px;text-align:center;text-overflow:shrink;}
+#MainHudCurrency {position:1091px 735px 0px;width:150px;height:30px;}
+#MainHudCurrency Image {position:-13px -17px 0px;width:64px;height:64px;}
+#MainHudCurrencyText {position:42px 3px 0px;width:104px;height:25px;font-size:18px;}
+#MainHudTools {position:291px 702px 0px;width:51px;height:201px;flow-children:down;}
+.MainHudUtility {width:51px;height:49px;margin-bottom:2px;background-color:#14333edb;}
+.MainHudUtility Image {width:64px;height:64px;align:center center;}
+.MainHudUtility:hover {brightness:1.15;}
+.MainHudUtility.Unavailable {opacity:.45;}
+#MainHudSocial {position:543px 76px 0px;width:192px;height:140px;background-color:#102b37f5;border:1px solid #8b9280;padding:8px;flow-children:down;}
+#MainHudSocial Button {width:176px;height:36px;}
+#MainHudSocial Button:hover {background-color:#355360;}
+#MainHudSocial Label {align:center center;}
+#MainHudNotice {position:18px 120px 0px;width:460px;background-color:#102b37f0;padding:10px;font-size:16px;}
+.MainHudFrame {flow-children:none;}
+.MainHudFrame Image {background-size:100% 100%;}
+/* Existing debug and resource controls retain data bindings; the skin mirrors their live values. */
+.MainHudSkinReady #TopBar,.MainHudSkinReady #WaveBar {opacity:0;}

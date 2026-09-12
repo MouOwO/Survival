@@ -18,6 +18,7 @@ local M = {}
 local synthesis_requests = {}
 local building_snapshot_sequence = 0
 local selected_unit_by_player = {}
+local building_push_coalescer
 
 local function safe_number(entity, method_name, fallback, ...)
     local method = entity and entity[method_name]
@@ -415,16 +416,14 @@ local function on_hero_combat_stats_changed(payload)
     send_to_player("ui_selected_unit_stats_snapshot", player_id, projected)
 end
 
-local function send_building_snapshot(payload, phase)
+local function build_building_snapshot(payload)
     local player_id = tonumber(payload and payload.player_id)
     local entindex = tonumber(payload and payload.entindex)
     if not valid_player_id(player_id) or not entindex then return end
     local ok, unit = pcall(EntIndexToHScript, entindex)
     if not ok or not unit or unit:IsNull() then return end
     local snapshot = unit_combat_snapshot(unit)
-    building_snapshot_sequence = building_snapshot_sequence + 1
     snapshot.success = 1
-    snapshot.refresh_sequence = building_snapshot_sequence
     snapshot.reason = payload.reason or "building_changed"
     snapshot.display_name = payload.display_name or snapshot.display_name
     snapshot.unit_name = snapshot.display_name
@@ -440,27 +439,34 @@ local function send_building_snapshot(payload, phase)
         or tonumber(payload.armor)
         or snapshot.runtime_armor
     snapshot.attack_speed = tonumber(payload.attack_speed) or snapshot.attack_speed
-    snapshot.push_phase = phase or "immediate"
+    snapshot.push_phase = "coalesced"
     snapshot = combat_stat_projection.for_ui(snapshot)
-    print(string.format(
+    return snapshot
+end
+
+building_push_coalescer = require("ui/stat_push_coalescer").new({
+    scheduler = scheduler,
+    is_selected = function(player_id, entindex)
+        return valid_player_id(player_id)
+            and tonumber(selected_unit_by_player[player_id]) == entindex
+    end,
+    build = build_building_snapshot,
+    send = function(player_id, snapshot)
+    building_snapshot_sequence = building_snapshot_sequence + 1
+    snapshot.refresh_sequence = building_snapshot_sequence
+    if _G.SURVIVAL_STATS_DEBUG == true then print(string.format(
         "[SURVIVAL_STATS][SERVER] BUILDING_PUSH player=%s unit=%s phase=%s sequence=%s level=%s attack=%s-%s armor=%s",
-        tostring(player_id), tostring(entindex), tostring(snapshot.push_phase),
+        tostring(player_id), tostring(snapshot.entindex), tostring(snapshot.push_phase),
         tostring(snapshot.refresh_sequence), tostring(snapshot.level),
         tostring(snapshot.attack_min), tostring(snapshot.attack_max),
         tostring(snapshot.armor)
-    ))
+    )) end
     send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
-end
+    end,
+})
 
 local function publish_building_snapshot(payload)
-    send_building_snapshot(payload, "immediate")
-    local entindex = tonumber(payload and payload.entindex)
-    if not entindex then return end
-    local delayed_payload = {}
-    for key, value in pairs(payload) do delayed_payload[key] = value end
-    scheduler.after(0.15, function()
-        send_building_snapshot(delayed_payload, "delayed")
-    end, "building_snapshot_refresh_" .. tostring(entindex))
+    building_push_coalescer.push(payload)
 end
 
 local function register_building_snapshot_push()
@@ -1323,18 +1329,28 @@ local function register_rogue_reward_requests()
     CustomGameEventManager:RegisterListener("ui_rogue_reward_select", function(_, payload)
         local player_id = source_player_id(payload)
         if not valid_player_id(player_id) then return end
-        event_bus.request(events.ROGUE_REWARD_SELECT_REQUEST, {
+        local result = event_bus.request(events.ROGUE_REWARD_SELECT_REQUEST, {
             player_id = player_id,
             token = tostring(payload and payload.token or ""),
             card_id = tostring(payload and payload.card_id or ""),
+        })
+        send_to_player("ui_rogue_reward_result", player_id, {
+            token = tostring(payload and payload.token or ""),
+            action = "select", ok = result and result.ok or false,
+            error = result and result.error or nil,
         })
     end)
     CustomGameEventManager:RegisterListener("ui_rogue_reward_reroll", function(_, payload)
         local player_id = source_player_id(payload)
         if not valid_player_id(player_id) then return end
-        event_bus.request(events.ROGUE_REWARD_REROLL_REQUEST, {
+        local result = event_bus.request(events.ROGUE_REWARD_REROLL_REQUEST, {
             player_id = player_id,
             token = tostring(payload and payload.token or ""),
+        })
+        send_to_player("ui_rogue_reward_result", player_id, {
+            token = tostring(payload and payload.token or ""),
+            action = "reroll", ok = result and result.ok or false,
+            error = result and result.error or nil,
         })
     end)
 end
@@ -1390,6 +1406,7 @@ local function on_lottery_changed(payload)
 end
 
 function M.init()
+    building_push_coalescer.reset()
     synthesis_requests = {}
     building_snapshot_sequence = 0
     selected_unit_by_player = {}

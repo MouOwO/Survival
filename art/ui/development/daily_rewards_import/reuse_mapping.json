@@ -1,0 +1,426 @@
+[
+  {
+    "id": "daily.item.coins",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/items/coins_medallion.png",
+    "quality": "source_pixels_geometric_alpha"
+  },
+  {
+    "id": "daily.item.wood",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/items/wood_medallion.png",
+    "quality": "source_pixels_geometric_alpha"
+  },
+  {
+    "id": "daily.item.book",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/items/book_medallion.png",
+    "quality": "source_pixels_geometric_alpha"
+  },
+  {
+    "id": "daily.item.ticket",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/items/ticket_medallion.png",
+    "quality": "source_pixels_geometric_alpha"
+  },
+  {
+    "id": "daily.item.crystals",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/items/crystals_medallion.png",
+    "quality": "source_pixels_geometric_alpha"
+  },
+  {
+    "id": "daily.item.material",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/items/material_medallion.png",
+    "quality": "source_pixels_geometric_alpha"
+  },
+  {
+    "id": "daily.card.body",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/day_body.png",
+    "quality": "imagegen_inpainted_plate_crop"
+  },
+  {
+    "id": "daily.card.week_end",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/week_end_body.png",
+    "quality": "imagegen_inpainted_plate_crop"
+  },
+  {
+    "id": "daily.badge.pass.active",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/badges/pass_active.png",
+    "quality": "imagegen_inpainted_plate_geometric_alpha"
+  },
+  {
+    "id": "daily.badge.premium",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/badges/premium.png",
+    "quality": "imagegen_inpainted_plate_geometric_alpha"
+  },
+  {
+    "id": "daily.badge.today",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/badges/today.png",
+    "quality": "imagegen_inpainted_plate_geometric_alpha"
+  },
+  {
+    "id": "daily.button.claim.normal",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/buttons/claim_normal.png",
+    "quality": "imagegen_inpainted_plate_geometric_alpha"
+  },
+  {
+    "id": "shared.candidate.daily_window",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/empty_window_candidate.png",
+    "quality": "imagegen_inpainted_manual_alpha_clip"
+  },
+  {
+    "id": "daily.icon.calendar.normal",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/calendar_normal.png",
+    "quality": "source_silhouette_color_matte_extraction"
+  },
+  {
+    "id": "daily.icon.close_local.normal",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/close_local_normal.png",
+    "quality": "source_silhouette_color_matte_extraction"
+  },
+  {
+    "id": "daily.icon.info.normal",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/info_normal.png",
+    "quality": "source_silhouette_color_matte_extraction"
+  },
+  {
+    "id": "daily.icon.rules_local.normal",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/rules_local_normal.png",
+    "quality": "source_silhouette_color_matte_extraction"
+  },
+  {
+    "id": "daily.icon.pass.normal",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/pass_normal.png",
+    "quality": "source_silhouette_color_matte_extraction"
+  },
+  {
+    "id": "daily.icon.claimed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/check_claimed.png",
+    "quality": "source_pixels_geometric_alpha"
+  },
+  {
+    "id": "daily.item.weapon",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/items/weapon_estimated_alpha.png",
+    "quality": "source_pixels_manual_silhouette_alpha"
+  },
+  {
+    "id": "daily.item.ticket_small",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/items/ticket_small_estimated_alpha.png",
+    "quality": "source_pixels_manual_silhouette_alpha"
+  },
+  {
+    "id": "daily.button.claim.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/buttons/claim_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.week_end.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/week_end_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/day_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.button.claim.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/buttons/claim_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.week_end.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/week_end_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/day_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.button.claim.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/buttons/claim_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.week_end.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/week_end_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/day_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.calendar.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/calendar_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.calendar.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/calendar_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.calendar.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/calendar_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.close_local.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/close_local_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.close_local.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/close_local_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.close_local.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/close_local_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.info.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/info_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.info.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/info_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.info.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/info_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.rules_local.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/rules_local_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.rules_local.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/rules_local_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.rules_local.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/rules_local_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.pass.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/pass_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.pass.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/pass_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.pass.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/pass_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.badge.pass.inactive",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/badges/pass_inactive.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.border.today",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/today_border.png",
+    "quality": "source_border_nine_region_adaptation"
+  },
+  {
+    "id": "icon.close",
+    "action": "reuse_existing",
+    "quality": "byte_identical_existing_shared_asset"
+  },
+  {
+    "id": "icon.pool_details",
+    "action": "reuse_existing",
+    "quality": "byte_identical_existing_shared_asset"
+  },
+  {
+    "id": "icon.history",
+    "action": "reuse_existing",
+    "quality": "byte_identical_existing_shared_asset"
+  },
+  {
+    "id": "badge.locked",
+    "action": "reuse_existing",
+    "quality": "byte_identical_existing_shared_asset"
+  },
+  {
+    "id": "button.ivory.normal",
+    "action": "reuse_existing",
+    "quality": "byte_identical_existing_shared_asset"
+  },
+  {
+    "id": "button.ivory.hover",
+    "action": "reuse_existing",
+    "quality": "byte_identical_existing_shared_asset"
+  },
+  {
+    "id": "button.ivory.pressed",
+    "action": "reuse_existing",
+    "quality": "byte_identical_existing_shared_asset"
+  },
+  {
+    "id": "button.ivory.disabled",
+    "action": "reuse_existing",
+    "quality": "byte_identical_existing_shared_asset"
+  },
+  {
+    "id": "daily.card.empty",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/day_empty.png",
+    "quality": "inpainted_border_with_flat_content_fill"
+  },
+  {
+    "id": "daily.card.empty.hover",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/day_empty_hover.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.empty.pressed",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/day_empty_pressed.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.card.empty.disabled",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/cards/day_empty_disabled.png",
+    "quality": "deterministic_state_from_base"
+  },
+  {
+    "id": "daily.icon.lock",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/lock.png",
+    "quality": "new_minimal_geometric_supplement"
+  },
+  {
+    "id": "daily.icon.clock",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/clock.png",
+    "quality": "new_minimal_geometric_supplement"
+  },
+  {
+    "id": "daily.icon.spinner",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/icons/spinner.png",
+    "quality": "new_minimal_geometric_supplement"
+  },
+  {
+    "id": "shared.candidate.daily_window.r0c0",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r0c0.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.r0c1",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r0c1.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.r0c2",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r0c2.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.r1c0",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r1c0.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.r1c1",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r1c1.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.r1c2",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r1c2.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.r2c0",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r2c0.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.r2c1",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r2c1.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.r2c2",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/nine/r2c2.png",
+    "quality": "nine_region_of_inpainted_shell"
+  },
+  {
+    "id": "shared.candidate.daily_window.layout",
+    "action": "local_skin",
+    "file": "ui/daily_rewards/frame/window_layout_candidate.png",
+    "quality": "nine_region_adapted_inpainted_shell"
+  }
+]

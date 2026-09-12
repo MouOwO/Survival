@@ -1,0 +1,652 @@
+.SurvivalHUDRoot {
+    width: 100%;
+    height: 100%;
+}
+
+.SurvivalTowerPortraitOverlay {
+    width: 1px;
+    height: 1px;
+    position: 0px 0px 0px;
+    visibility: collapse;
+    overflow: clip;
+    /* Keep the scene in the normal HUD layer so Valve's portrait frame can paint above it. */
+    z-index: 0;
+    clip: rect(0px, 100%, 100%, 0px);
+    background-color: #10151aff;
+    border: 0px solid transparent;
+}
+
+.SurvivalTowerPortraitOverlay .SurvivalTowerPortraitScene {
+    width: 100%;
+    height: 100%;
+    position: 0px 0px 0px;
+    visibility: collapse;
+    overflow: clip;
+}
+
+.SurvivalJuggernautPortraitOverlay {
+    width: 180px;
+    height: 180px;
+    position: 20px 520px 0px;
+    visibility: visible;
+    overflow: clip;
+    z-index: 10;
+    background-color: transparent;
+}
+
+.SurvivalJuggernautPortraitOverlay .SurvivalJuggernautPortraitScene {
+    width: 100%;
+    height: 100%;
+    position: 0px 0px 0px;
+    visibility: visible;
+    overflow: clip;
+}
+
+.SurvivalPortraitCameraEditor {
+    width: 360px;
+    height: 365px;
+    position: 24px 180px 0px;
+    flow-children: down;
+    padding: 10px;
+    background-color: #10151fee;
+    border: 1px solid #65758fff;
+    box-shadow: 0px 0px 12px #000000aa;
+    z-index: 20;
+}
+
+.SurvivalPortraitCameraEditor.Hidden { visibility: collapse; }
+
+.PortraitCameraEditorHeader {
+    width: 100%;
+    height: 30px;
+    flow-children: right;
+}
+
+.PortraitCameraEditorTitle {
+    color: #f2d38aff;
+    font-size: 18px;
+    vertical-align: center;
+}
+
+.PortraitCameraEditorClose {
+    width: 28px;
+    height: 26px;
+    horizontal-align: right;
+}
+
+.PortraitCameraEditorClose Label {
+    horizontal-align: center;
+    color: #ffffffff;
+    font-size: 20px;
+}
+
+.PortraitCameraEditorStatus,
+.PortraitCameraEditorValues {
+    width: 100%;
+    color: #cbd6e5ff;
+    font-size: 14px;
+    margin-top: 4px;
+    white-space: normal;
+}
+
+.PortraitCameraEditorRows {
+    width: 100%;
+    flow-children: down;
+    margin-top: 8px;
+}
+
+.PortraitCameraEditorRow {
+    width: 100%;
+    height: 34px;
+    flow-children: right;
+}
+
+.PortraitCameraEditorRow > Label {
+    width: 55px;
+    color: #f2d38aff;
+    vertical-align: center;
+    font-size: 15px;
+}
+
+.PortraitCameraEditorRow Button,
+.PortraitCameraEditorActions Button {
+    width: 58px;
+    height: 27px;
+    margin-right: 4px;
+    background-color: #26364cff;
+    border: 1px solid #536b83ff;
+}
+
+.PortraitCameraEditorRow Button Label,
+.PortraitCameraEditorActions Button Label {
+    horizontal-align: center;
+    vertical-align: center;
+    color: #e6edf5ff;
+    font-size: 13px;
+}
+
+.PortraitCameraEditorActions {
+    width: 100%;
+    flow-children: right;
+    margin-top: 8px;
+}
+
+.PortraitCameraEditorActions Button.Primary {
+    width: 150px;
+    background-color: #426b4dff;
+}
+
+#CustomShopButton {
+    horizontal-align: left;
+    vertical-align: top;
+    margin-left: 24px;
+    margin-top: 96px;
+    width: 128px;
+    height: 42px;
+    flow-children: right;
+    padding: 5px 9px;
+    background-color: #101820ee;
+    border: 1px solid #7894a8;
+}
+
+#CustomShopButton:hover {
+    background-color: #263b4cee;
+    border-color: #d6b36a;
+}
+
+#CustomShopButtonIcon {
+    width: 28px;
+    height: 28px;
+    margin-right: 7px;
+}
+
+#CustomShopButtonLabel {
+    color: #e8edf2;
+    vertical-align: center;
+    font-size: 16px;
+}
+
+#ShopBackdrop {
+    width: 100%;
+    height: 100%;
+    background-color: #00000099;
+    opacity: 0;
+    z-index: 20;
+    transition-property: opacity;
+    transition-duration: 0.26s;
+}
+
+#ShopBackdrop.ShopOpen {
+    opacity: 1;
+}
+
+#ShopBackdropClick {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: 0px solid transparent;
+}
+
+#CustomShopWindow.ShopDrawer {
+    horizontal-align: left;
+    vertical-align: center;
+    margin-left: 20px;
+    z-index: 21;
+    transform: translateX(-1100px);
+    opacity: 0;
+    transition-property: transform, opacity;
+    transition-duration: 0.30s;
+    transition-timing-function: ease-out;
+}
+
+#CustomShopWindow.ShopDrawer.ShopOpen {
+    transform: translateX(0px);
+    opacity: 1;
+}
+
+#CustomShopWindow.ShopDrawer.Closed {
+    visibility: visible;
+    transform: translateX(-1100px);
+    opacity: 0;
+}
+
+#TopBar {
+    horizontal-align: center;
+    margin-top: 12px;
+    flow-children: right;
+    padding: 8px 14px;
+    background-color: #101820e8;
+    border: 1px solid #6f8799aa;
+}
+
+#TopBar Label, #WaveBar Label {
+    color: white;
+    font-size: 18px;
+    margin: 0 12px;
+    text-shadow: 1px 1px 2px 2 #000000;
+}
+
+#WaveBar {
+    horizontal-align: center;
+    margin-top: 62px;
+    flow-children: right;
+    padding: 6px 12px;
+    background-color: #17110de8;
+    border: 1px solid #8f6b43aa;
+}
+
+.ArrowTowerDestroyConfirm {
+    width: 100%;
+    height: 100%;
+    z-index: 6000;
+}
+
+.ArrowTowerDestroyConfirm.Hidden {
+    visibility: collapse;
+}
+
+.ArrowTowerDestroyBackdrop {
+    width: 100%;
+    height: 100%;
+    background-color: #000000aa;
+}
+
+.ArrowTowerDestroyDialog {
+    width: 440px;
+    min-height: 190px;
+    horizontal-align: center;
+    vertical-align: center;
+    flow-children: down;
+    padding: 24px;
+    background-color: #151b20fa;
+    border: 1px solid #9b5b52;
+    border-radius: 4px;
+    box-shadow: #000000cc 0px 0px 20px 2px;
+}
+
+.ArrowTowerDestroyTitle {
+    horizontal-align: center;
+    color: #f2e7df;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.ArrowTowerDestroyMessage {
+    width: 100%;
+    margin-top: 14px;
+    color: #c7cdd2;
+    font-size: 17px;
+    text-align: center;
+    white-space: normal;
+}
+
+.ArrowTowerDestroyActions {
+    horizontal-align: center;
+    margin-top: 22px;
+    flow-children: right;
+}
+
+.ArrowTowerDestroyActions Button {
+    width: 150px;
+    height: 40px;
+    margin: 0px 6px;
+    border-radius: 3px;
+}
+
+.ArrowTowerDestroyActions Label {
+    horizontal-align: center;
+    vertical-align: center;
+    color: white;
+    font-size: 17px;
+}
+
+.ArrowTowerDestroyCancel {
+    background-color: #34414a;
+    border: 1px solid #71818c;
+}
+
+.ArrowTowerDestroyConfirmButton {
+    background-color: #6a2d28;
+    border: 1px solid #bd7369;
+}
+
+/* 自定义底栏采用 Reborn center_block 的 145px 底部骨架。 */
+#SurvivalHeroBottomHUD {
+    horizontal-align: center;
+    vertical-align: bottom;
+    width: 920px;
+    height: 145px;
+    padding: 0px;
+    flow-children: none;
+    background-color: transparent;
+    border: 0px solid transparent;
+    transition-property: transform, opacity;
+    transition-duration: 0.45s;
+    transition-timing-function: ease-out;
+    z-index: 50;
+}
+
+#SurvivalHeroBottomHUD.HudHidden {
+    transform: translateY(145px);
+    opacity: 0;
+    visibility: collapse;
+}
+
+.SurvivalHeroPortraitBlock {
+    width: 116px;
+    height: 208px;
+    flow-children: none;
+    margin-right: 0px;
+    vertical-align: bottom;
+    position: 0px 0px 0px;
+}
+
+.SurvivalHeroPortrait {
+    width: 116px;
+    height: 112px;
+    position: 0px 0px 0px;
+    background-color: #273747;
+    border: 1px solid #8fa6b7;
+}
+
+#SurvivalHeroLevelBadge {
+    width: 28px;
+    height: 24px;
+    margin-top: -28px;
+    margin-left: 4px;
+    background-color: #080b0eee;
+    border: 1px solid #d6b36a;
+}
+#SurvivalHeroLevel { color: #f4d58a; font-size: 16px; text-align: center; horizontal-align: center; vertical-align: center; }
+
+.SurvivalHeroInfo {
+    width: 238px;
+    height: 208px;
+    flow-children: none;
+    margin-right: 0px;
+}
+#SurvivalHeroNameRow { width: 100%; height: 23px; flow-children: right; }
+#SurvivalHeroName, #SurvivalHeroLevelText { color: #e8edf2; font-size: 16px; font-weight: bold; margin-right: 10px; }
+.SurvivalHeroBars { width: 100%; height: 48px; }
+.SurvivalHeroHealthBar, .SurvivalHeroManaBar { width: 100%; height: 10px; background-color: #20252b; border: 1px solid #0b0e10; }
+.SurvivalHeroHealthBar { position: 0px 0px 0px; }
+.SurvivalHeroManaBar { height: 20px; position: 0px 28px 0px; }
+#SurvivalHeroHealthFill { width: 100%; height: 100%; background-color: #53a956; }
+#SurvivalHeroManaFill { width: 70%; height: 100%; background-color: #4c8ed1; }
+.SurvivalBarText { width: 100%; height: 18px; color: white; font-size: 12px; text-align: center; z-index: 2; }
+#SurvivalHeroHealthText { position: 0px 10px 0px; }
+#SurvivalHeroManaText { position: 0px 30px 0px; }
+
+.SurvivalHeroStats {
+    width: 100%;
+    height: 90px;
+    flow-children: down;
+    margin-top: 20px;
+    padding-top: 0px;
+}
+.SurvivalHeroStats .SurvivalStatRow { width: 100%; height: 15px; margin: 0px; }
+.SurvivalHeroStats .SurvivalStatRow Label { font-size: 12px; }
+.SurvivalHeroStats .SurvivalStatValue { horizontal-align: right; }
+
+.SurvivalHeroAbilityBar {
+    width: 320px;
+    height: 138px;
+    flow-children: none;
+    horizontal-align: center;
+    vertical-align: bottom;
+    margin-right: 0px;
+    padding: 6px;
+    background-color: #080b0ecc;
+    border: 1px solid #526879;
+}
+
+.SurvivalAbilitySlot {
+    width: 48px;
+    height: 48px;
+    margin: 3px;
+    padding: 0px;
+    border: 1px solid #798b96;
+    transition-property: transform, brightness;
+    transition-duration: 0.10s;
+}
+.SurvivalAbilitySlot:hover {
+    transform: scale3d(1.10, 1.10, 1.0);
+    brightness: 1.18;
+    z-index: 10;
+}
+.SurvivalAbilitySlot:active {
+    transform: scale3d(0.92, 0.92, 1.0);
+    brightness: 0.82;
+}
+.SurvivalAbilitySlot DOTAAbilityImage {
+    width: 100%;
+    height: 100%;
+}
+.SurvivalAbilityHotkey {
+    horizontal-align: left;
+    vertical-align: top;
+    min-width: 16px;
+    height: 16px;
+    padding: 0px 3px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    background-color: #05080bcc;
+    border: 1px solid #a4b4bf;
+    z-index: 4;
+}
+.SurvivalAbilitySlot.DOTADisabled { saturation: 0.2; brightness: 0.65; }
+.SurvivalAbilityLevel { color: white; font-size: 12px; horizontal-align: right; vertical-align: bottom; text-shadow: 1px 1px 2px 2 #000000; }
+
+.SurvivalHeroInventory {
+    width: 180px;
+    height: 120px;
+    padding: 4px;
+    background-color: #080b0ecc;
+    border: 1px solid #526879;
+}
+.SurvivalInventorySlot {
+    width: 52px;
+    height: 52px;
+    margin: 0px;
+    border: 1px solid #798b96;
+}
+#inventory_slot_0 { position: 4px 4px 0px; }
+#inventory_slot_1 { position: 60px 4px 0px; }
+#inventory_slot_2 { position: 116px 4px 0px; }
+#inventory_slot_3 { position: 4px 60px 0px; }
+#inventory_slot_4 { position: 60px 60px 0px; }
+#inventory_slot_5 { position: 116px 60px 0px; }
+.SurvivalInventorySlot Label { color: #d6b36a; horizontal-align: right; vertical-align: bottom; font-size: 12px; }
+
+.SurvivalHeroCoreStats { visibility: collapse; }
+
+.SurvivalStatRow {
+    width: 100%;
+    height: 19px;
+    flow-children: right;
+}
+
+.SurvivalStatRow Label {
+    color: #dce5eb;
+    font-size: 15px;
+    vertical-align: center;
+    text-shadow: 1px 1px 2px 2 #000000;
+}
+
+.SurvivalStatIcon {
+    width: 24px;
+    text-align: center;
+    margin-right: 5px;
+}
+
+.SurvivalStatValue {
+    width: 70px;
+    margin-left: 8px;
+    text-align: right;
+    color: white;
+    font-weight: bold;
+}
+
+.SurvivalStatRow.Strength .SurvivalStatIcon { color: #e45b4f; }
+.SurvivalStatRow.Agility .SurvivalStatIcon { color: #6fc95c; }
+.SurvivalStatRow.Intellect .SurvivalStatIcon { color: #49a9de; }
+
+.SurvivalPointTargetHint {
+    horizontal-align: center;
+    vertical-align: top;
+    margin-top: 110px;
+    padding: 8px 18px;
+    background-color: #101820ee;
+    border: 1px solid #d9a441;
+    border-radius: 4px;
+    color: #ffe7a0;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px 2.0 #000000;
+    visibility: collapse;
+    z-index: 1200;
+}
+
+.SurvivalPointTargetHint.PointTargetActive {
+    visibility: visible;
+}
+
+#NotificationContainer {
+    width: 420px;
+    height: 260px;
+    horizontal-align: right;
+    vertical-align: top;
+    margin-top: 110px;
+    margin-right: 24px;
+    flow-children: down;
+}
+
+.Notification {
+    width: 100%;
+    min-height: 42px;
+    margin-bottom: 6px;
+    padding: 8px 12px;
+    background-color: #17212ddd;
+    border: 1px solid #6f8799aa;
+}
+
+.Notification.error {
+    background-color: #4a1717ee;
+    border-color: #c65b5b;
+}
+
+.Notification Label {
+    color: white;
+    font-size: 17px;
+}
+
+
+#DifficultySelectionOverlay {
+    width: 100%;
+    height: 100%;
+    background-color: #030609dd;
+    z-index: 5000;
+}
+
+#DifficultySelectionOverlay.DifficultySelectionHidden {
+    visibility: collapse;
+}
+
+#DifficultySelectionDialog {
+    width: 1280px;
+    min-height: 250px;
+    horizontal-align: center;
+    vertical-align: center;
+    flow-children: down;
+    padding: 30px 38px 34px 38px;
+    background-color: gradient(linear, 0% 0%, 0% 100%, from(#19242ff7), to(#0b1118fa));
+    border: 2px solid #9a8156;
+    box-shadow: #000000cc 0px 0px 28px 4px;
+}
+
+#DifficultySelectionTitle {
+    horizontal-align: center;
+    color: #f4dda4;
+    font-size: 36px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 3px 3 #000000;
+}
+
+#DifficultySelectionHint {
+    horizontal-align: center;
+    margin-top: 4px;
+    margin-bottom: 22px;
+    color: #aebbc5;
+    font-size: 17px;
+}
+
+#DifficultySelectionButtons {
+    width: 100%;
+    flow-children: right;
+}
+
+.DifficultyOptionButton {
+    width: 228px;
+    height: 72px;
+    flow-children: none;
+    margin-right: 12px;
+    padding: 14px 16px;
+    background-color: gradient(linear, 0% 0%, 100% 0%, from(#172532), to(#243848));
+    border: 1px solid #72889a;
+    transition-property: brightness, transform, border;
+    transition-duration: 0.12s;
+}
+
+.DifficultyOptionButton:hover {
+    brightness: 1.35;
+    transform: translateX(4px);
+    border: 1px solid #e0bb6c;
+}
+
+.DifficultyOptionButton:active {
+    brightness: 0.75;
+    transform: translateX(7px);
+}
+
+.DifficultyPending .DifficultyOptionButton {
+    wash-color: #66717a;
+    saturation: 0.2;
+}
+
+.DifficultyOptionHeader {
+    width: 100%;
+    flow-children: right;
+}
+
+.DifficultyOptionName {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.DifficultyOptionSubtitle {
+    horizontal-align: right;
+    color: #efcf83;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#DifficultySelectionLoading {
+    horizontal-align: center;
+    margin-top: 45px;
+    color: #c9d3da;
+    font-size: 20px;
+}
+
+#DifficultySelectionError {
+    min-height: 25px;
+    horizontal-align: center;
+    margin-top: 8px;
+    color: #e7a26e;
+    font-size: 17px;
+}
+
+

@@ -1,0 +1,1152 @@
+[
+  {
+    "id": "icon.nav.return",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.nav.settings",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.nav.treasure",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.nav.archive",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.nav.equipment",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.nav.lottery",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.nav.benefit",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.nav.appearance",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.nav.social",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.close",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_alpha_needs_edge_check",
+    "alpha_range": [
+      0,
+      243
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.archive.void",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      234
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.archive.points",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      243
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.archive.weapon",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      245
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.archive.spell",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      244
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.archive.endless",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      233
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.archive.friends",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      214
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.archive.ex",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      230
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.archive.blessing",
+    "size": [
+      64,
+      64
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.pool_details",
+    "size": [
+      48,
+      55
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.history",
+    "size": [
+      53,
+      59
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.add",
+    "size": [
+      38,
+      49
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "checkbox.off",
+    "size": [
+      49,
+      49
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "extracted_recolored_alpha",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "button.ivory.normal",
+    "size": [
+      312,
+      72
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "button.ivory.hover",
+    "size": [
+      312,
+      72
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "button.ivory.pressed",
+    "size": [
+      312,
+      72
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "button.ivory.disabled",
+    "size": [
+      312,
+      72
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      166
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "button.gold.normal",
+    "size": [
+      312,
+      72
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "button.gold.hover",
+    "size": [
+      312,
+      72
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "button.gold.pressed",
+    "size": [
+      312,
+      72
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "button.gold.disabled",
+    "size": [
+      312,
+      72
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      166
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "overlay.tab_selected_overlay",
+    "size": [
+      201,
+      24
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "overlay.tab_hover_overlay",
+    "size": [
+      201,
+      24
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      166
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "overlay.entry_hover_underline",
+    "size": [
+      155,
+      8
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      128
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "card.border.normal",
+    "size": [
+      167,
+      157
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      232
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "card.border.hover",
+    "size": [
+      167,
+      157
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "card.border.pressed",
+    "size": [
+      167,
+      157
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      232
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "card.border.disabled",
+    "size": [
+      167,
+      157
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      151
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "card.border.selected",
+    "size": [
+      167,
+      157
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "checkbox.on.normal",
+    "size": [
+      33,
+      33
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "checkbox.on.hover",
+    "size": [
+      33,
+      33
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "checkbox.on.pressed",
+    "size": [
+      33,
+      33
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "checkbox.on.disabled",
+    "size": [
+      33,
+      33
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      166
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "icon.ticket",
+    "size": [
+      48,
+      48
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "existing_procedural_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "nav.toggle.normal",
+    "size": [
+      256,
+      76
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "generated_candidate_needs_alignment",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "nav.toggle.hover",
+    "size": [
+      256,
+      76
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "generated_candidate_needs_alignment",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "nav.toggle.selected",
+    "size": [
+      256,
+      76
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "generated_candidate_needs_alignment",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "badge.progress",
+    "size": [
+      140,
+      44
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "generated_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "badge.unlocked",
+    "size": [
+      140,
+      44
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "generated_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "badge.locked",
+    "size": [
+      140,
+      44
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "generated_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "card.body.ivory",
+    "size": [
+      176,
+      176
+    ],
+    "color_type": 6,
+    "has_alpha": true,
+    "quality": "generated_candidate",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "texture.ivory",
+    "size": [
+      150,
+      50
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "source_sample_not_seamless"
+  },
+  {
+    "id": "texture.teal",
+    "size": [
+      45,
+      18
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "source_sample_not_seamless"
+  },
+  {
+    "id": "scene.treasure",
+    "size": [
+      1672,
+      941
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "generated_flat_background"
+  },
+  {
+    "id": "roguelike.back",
+    "size": [
+      352,
+      816
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "opaque_original_crop"
+  },
+  {
+    "id": "roguelike.combat",
+    "size": [
+      352,
+      816
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "opaque_original_crop"
+  },
+  {
+    "id": "roguelike.growth",
+    "size": [
+      352,
+      816
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "opaque_original_crop"
+  },
+  {
+    "id": "roguelike.defense",
+    "size": [
+      352,
+      816
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "opaque_original_crop"
+  },
+  {
+    "id": "frame.hud.tl",
+    "size": [
+      12,
+      12
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "exact_border_band_reference"
+  },
+  {
+    "id": "frame.hud.top",
+    "size": [
+      508,
+      12
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "exact_border_band_reference"
+  },
+  {
+    "id": "frame.hud.tr",
+    "size": [
+      12,
+      12
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "exact_border_band_reference"
+  },
+  {
+    "id": "frame.hud.left",
+    "size": [
+      12,
+      141
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "exact_border_band_reference"
+  },
+  {
+    "id": "frame.hud.right",
+    "size": [
+      12,
+      141
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "exact_border_band_reference"
+  },
+  {
+    "id": "frame.hud.bl",
+    "size": [
+      12,
+      12
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "exact_border_band_reference"
+  },
+  {
+    "id": "frame.hud.bottom",
+    "size": [
+      508,
+      12
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "exact_border_band_reference"
+  },
+  {
+    "id": "frame.hud.br",
+    "size": [
+      12,
+      12
+    ],
+    "color_type": 2,
+    "has_alpha": false,
+    "quality": "exact_border_band_reference"
+  }
+]

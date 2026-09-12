@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "modified_fonts": false,
+  "registration": "Dota client custom font directory: panorama/fonts/",
+  "filename_compatibility": "Radiance-Survival- prefix is accepted by the installed fonts.conf <fontpattern>Radiance</fontpattern>. Font bytes, internal Source Han families, PostScript names and OTF format stay unchanged. No stock font is replaced.",
+  "native_addon_verification": "pending_in_game",
+  "files": [
+    {
+      "file": "fonts/SourceHanSansSC-Regular.otf",
+      "source_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/2.005R/OTF/SimplifiedChinese/SourceHanSansSC-Regular.otf",
+      "bytes": 16529832,
+      "sha256": "f1d8611151880c6c336aabeac4640ef434fa13cbfbf1ffe82d0a71b2a5637256",
+      "family": "Source Han Sans SC",
+      "subfamily": "Regular",
+      "full_name": "Source Han Sans SC",
+      "postscript_name": "SourceHanSansSC-Regular",
+      "typographic_family": null,
+      "typographic_subfamily": null,
+      "version": "Version 2.005;addfeatures 5.0.0b21",
+      "weight": 400,
+      "glyphs": 65535,
+      "outline": "CFF",
+      "variable": false,
+      "missing_ui_sample_characters": [],
+      "runtime": "panorama/fonts/Radiance-Survival-SourceHanSansSC-Regular.otf"
+    },
+    {
+      "file": "fonts/SourceHanSansSC-Medium.otf",
+      "source_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/2.005R/OTF/SimplifiedChinese/SourceHanSansSC-Medium.otf",
+      "bytes": 16546328,
+      "sha256": "1df61d31687d04fd2f928a3bb6ca6cd61f0e988cc267cf317f32406edbb49f70",
+      "family": "Source Han Sans SC Medium",
+      "subfamily": "Regular",
+      "full_name": "Source Han Sans SC Medium",
+      "postscript_name": "SourceHanSansSC-Medium",
+      "typographic_family": "Source Han Sans SC",
+      "typographic_subfamily": "Medium",
+      "version": "Version 2.005;addfeatures 5.0.0b21",
+      "weight": 500,
+      "glyphs": 65535,
+      "outline": "CFF",
+      "variable": false,
+      "missing_ui_sample_characters": [],
+      "runtime": "panorama/fonts/Radiance-Survival-SourceHanSansSC-Medium.otf"
+    },
+    {
+      "file": "licenses/source-han-sans-LICENSE.txt",
+      "source_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/2.005R/LICENSE.txt",
+      "bytes": 4463,
+      "sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "runtime": "panorama/fonts/licenses/source-han-sans-LICENSE.txt"
+    },
+    {
+      "file": "fonts/SourceHanSerifSC-Bold.otf",
+      "source_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/2.003R/OTF/SimplifiedChinese/SourceHanSerifSC-Bold.otf",
+      "bytes": 25521732,
+      "sha256": "706b8c0de2deff6cbc0c87e2cdedfd33a78b7ffd76cebb4549012f197ba611fe",
+      "family": "Source Han Serif SC",
+      "subfamily": "Bold",
+      "full_name": "Source Han Serif SC Bold",
+      "postscript_name": "SourceHanSerifSC-Bold",
+      "typographic_family": null,
+      "typographic_subfamily": null,
+      "version": "Version 2.003;hotconv 1.1.1;makeotfexe 2.6.0",
+      "weight": 700,
+      "glyphs": 65535,
+      "outline": "CFF",
+      "variable": false,
+      "missing_ui_sample_characters": [],
+      "runtime": "panorama/fonts/Radiance-Survival-SourceHanSerifSC-Bold.otf"
+    },
+    {
+      "file": "licenses/source-han-serif-LICENSE.txt",
+      "source_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/2.003R/LICENSE.txt",
+      "bytes": 4463,
+      "sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903",
+      "runtime": "panorama/fonts/licenses/source-han-serif-LICENSE.txt"
+    }
+  ]
+}

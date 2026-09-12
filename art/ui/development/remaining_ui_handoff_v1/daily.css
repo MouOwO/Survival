@@ -1,0 +1,53 @@
+/* daily_assembly_v3: 1344 x 752, live data uses existing seven-claim cycle. */
+#DailyWindow.RHWindow {border-radius:0px;overflow:noclip;}
+#DailyWindow.RHWindow #DailyFrame {visibility:collapse;}
+#DailyWindow.RHWindow #DailyHeader {width:1344px;height:84px;z-index:3;}
+#DailyWindow.RHWindow #DailyHeading {position:0px 17px 0px;width:280px;height:56px;horizontal-align:center;text-align:center;font-family:"Source Han Serif SC";font-size:38px;font-weight:bold;color:#f4edd9;}
+#DailyWindow.RHWindow .RHTitleOrnamentLeft {position:414px 0px 0px;width:56px;}
+#DailyWindow.RHWindow .RHTitleOrnamentRight {horizontal-align:right;margin-right:419px;width:56px;}
+#DailyWindow.RHWindow #DailyClose {position:1270px 26px 0px;width:32px;height:32px;background-image:none;}
+#DailyWindow.RHWindow #DailyClaimPage {z-index:2;}
+#DailyWindow.RHWindow #DailySubtitle {position:42px 116px 0px;width:850px;height:59px;font-family:"Source Han Serif SC";font-weight:bold;font-size:32px;}
+#DailyWindow.RHWindow #DailyPassStatus {position:1074px 107px 0px;width:232px;height:42px;}
+#DailyWindow.RHWindow #DailyPassStatus .DailyIconArt {visibility:collapse;}
+#DailyWindow.RHWindow #DailyPassStatusText {width:100%;margin:0px;text-align:center;font-size:22px;color:#f4f3e8;}
+#DailyWindow.RHWindow #DailyPassStatus .RHDailyPassSkin {z-index:0;}
+#DailyWindow.RHWindow #DailyPassStatusText {z-index:2;}
+#DailyWindow.RHWindow #DailyCount {position:1074px 158px 0px;width:232px;height:32px;font-size:18px;}
+#DailyWindow.RHWindow #DailyCards {height:595px;}
+#DailyWindow.RHWindow .DailyNormalCard,#DailyWindow.RHWindow .DailyWeekCard {background-image:none;background-color:transparent;border:0px;}
+.RHDailyCardBase {width:100%;height:100%;z-index:0;}
+.RHDailyCurrent .RHDailyCardBase {wash-color:#fff1cf;brightness:1.025;}
+#DailyWindow.RHWindow .DailyDay {position:0px 18px 0px;z-index:2;font-family:"Source Han Serif SC";font-size:23px;font-weight:bold;}
+#DailyWindow.RHWindow .DailyItems {position:0px 81px 0px;width:153px;height:230px;z-index:2;}
+#DailyWindow.RHWindow .DailyItemArt {width:134px;height:134px;}
+#DailyWindow.RHWindow .DailyRewardName {margin-top:157px;font-size:20px;}
+#DailyWindow.RHWindow .DailyMultiItem .DailyReward {height:109px;}
+#DailyWindow.RHWindow .DailyMultiItem .DailyItemArt {width:80px;height:78px;}
+#DailyWindow.RHWindow .DailyMultiItem .DailyRewardName {margin-top:79px;font-size:16px;}
+#DailyWindow.RHWindow .DailyNormalCard > .DailyStateIcon {position:60px 302px 0px;width:32px;height:32px;z-index:2;}
+#DailyWindow.RHWindow .DailyCardStatus {position:5px 338px 0px;font-size:20px;z-index:2;}
+#DailyWindow.RHWindow .DailyBaseReward {position:15px 67px 0px;width:280px;height:120px;z-index:2;}
+#DailyWindow.RHWindow .DailyBaseReward .DailyItemArt {width:113px;height:113px;}
+#DailyWindow.RHWindow .DailyBaseReward .DailyRewardName {position:120px 17px 0px;width:159px; margin:0px;}
+#DailyWindow.RHWindow .DailyBaseStatus {position:120px 83px 0px;width:159px;}
+#DailyWindow.RHWindow .DailyPremiumReward {position:23px 204px 0px;width:270px;height:178px;border-top:1px solid #c9bc94;z-index:2;}
+#DailyWindow.RHWindow .DailyPremiumBadge {position:0px 10px 0px;width:126px;height:32px;}
+#DailyWindow.RHWindow .DailyPremiumTag {position:0px 12px 0px;width:126px;font-size:19px;}
+#DailyWindow.RHWindow .DailyPremiumName {position:0px 53px 0px;width:130px;height:52px;font-size:19px;}
+#DailyWindow.RHWindow .DailyPremiumArt {position:111px 0px 0px;width:154px;height:144px;}
+#DailyWindow.RHWindow .DailyPremiumReward .DailyStateIcon {position:16px 97px 0px;width:32px;height:32px;}
+#DailyWindow.RHWindow .DailyPremiumState {position:0px 145px 0px;width:270px;height:30px;font-size:19px;}
+#DailyWindow.RHWindow #DailyRuleLine {position:42px 605px 0px;width:1266px;height:55px;padding:11px 0px;border-top:1px solid #b9c0b8;border-bottom:1px solid #b9c0b8;font-size:19px;}
+#DailyWindow.RHWindow #DailyRules {position:43px 677px 0px;width:190px;height:45px;background-color:transparent;}
+#DailyWindow.RHWindow #DailyRules .DailyIconArt {width:32px;height:32px;background-image:asset(daily_rules);}
+#DailyWindow.RHWindow #DailyRules Label {margin-left:46px;font-size:22px;}
+#DailyWindow.RHWindow #DailyMakeup {visibility:collapse;}
+#DailyWindow.RHWindow #DailyClaim {position:1006px 669px 0px;width:304px;height:64px;}
+#DailyWindow.RHWindow #DailyClaimText {margin:0px;padding:0px;font-size:25px;z-index:2;}
+#DailyWindow.RHWindow #DailyNotice {position:260px 679px 0px;width:720px;height:45px;font-size:18px;z-index:4;}
+#DailyWindow.RHWindow #DailyRulesText {z-index:20;}
+#DailyWindow.RHWindow #DailyPassPage {z-index:2;}
+#DailyWindow.RHWindow #DailyTooltip {position:450px 465px 0px;width:440px;height:fit-children;flow-children:down;padding:18px 22px;background-color:#173744;opacity:1;border:1px solid #bea57a;z-index:100;}
+#DailyWindow.RHWindow #DailyTooltipName {font-family:"Source Han Serif SC";font-size:25px;color:#f5e8c9;width:100%;}
+#DailyWindow.RHWindow #DailyTooltipEffect {font-size:20px;color:#f0ede2;width:100%;margin-top:12px;white-space:normal;}

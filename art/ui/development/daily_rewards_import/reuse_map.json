@@ -1,0 +1,72 @@
+[
+  {
+    "component": "ModalShell",
+    "action": "reuse_contract",
+    "existing_assets": [
+      "icon.close"
+    ],
+    "local_candidate": "shared.candidate.daily_window",
+    "rule": "共用现有关闭/遮罩/层级逻辑；新壳仅视觉候选，确认后统一升级所有弹窗，不能只给每日奖励另建永久壳。"
+  },
+  {
+    "component": "ActionButton",
+    "action": "reuse_component_skin_variant",
+    "existing_assets": [
+      "button.ivory.normal",
+      "button.ivory.hover",
+      "button.ivory.pressed",
+      "button.ivory.disabled"
+    ],
+    "local_candidate": "daily.button.claim.normal",
+    "rule": "现有组件增加同系列skin引用，保持回调/禁用/busy逻辑；本页皮肤更贴确认稿，旧皮肤不擅自覆盖。"
+  },
+  {
+    "component": "IconButton.close",
+    "action": "reuse",
+    "existing_assets": [
+      "icon.close"
+    ],
+    "local_candidate": "daily.icon.close_local.normal"
+  },
+  {
+    "component": "IconButton.rules",
+    "action": "reuse_semantics",
+    "existing_assets": [
+      "icon.pool_details"
+    ],
+    "local_candidate": "daily.icon.rules_local.normal",
+    "rule": "奖励说明使用说明文档语义，不把它误接到抽奖记录。"
+  },
+  {
+    "component": "Tooltip",
+    "action": "reuse_component",
+    "rule": "沿用全局tooltip，装备属性由真实配置传入；不新建一套详情窗口。"
+  },
+  {
+    "component": "DailyRewardCard",
+    "action": "extend_CardShell",
+    "local_assets": [
+      "daily.card.empty",
+      "daily.card.border.today"
+    ],
+    "rule": "普通卡仅一个模板，循环6次；物品/天数/数量/状态传数据。"
+  },
+  {
+    "component": "WeekEndRewardCard",
+    "action": "new_composition_of_existing_primitives",
+    "local_assets": [
+      "daily.card.week_end"
+    ],
+    "rule": "布局是普通奖励槽+通行证奖励槽，资格分别判断。"
+  },
+  {
+    "component": "PassStatusBadge",
+    "action": "reuse_badge_pattern",
+    "local_assets": [
+      "daily.badge.pass.active",
+      "daily.badge.pass.inactive",
+      "daily.icon.pass.normal"
+    ],
+    "rule": "状态文字动态，未持有只锁通行证奖励。"
+  }
+]

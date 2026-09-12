@@ -1,0 +1,36 @@
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
+const repo=path.resolve(__dirname,'../../../..'),build=JSON.parse(fs.readFileSync(path.join(__dirname,'build.json'))),candidate=path.join(__dirname,'candidate/panorama');
+const read=f=>fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n');
+const js=read(path.join(candidate,build.inputs.find(p=>p.includes('lottery_ui_remaining'))));
+const baseline=read(path.join(__dirname,'baseline/content/scripts/custom_game/lottery_ui_handoff_bb9968eef7.js'));
+for(const [start,end] of [['    function draw(count)','    function renderResult(payload)'],['    function renderResult(payload)','    function rewardDetails'],['    function selectDetailPool','    function selectPool']])assert.equal(js.slice(js.indexOf(start),js.indexOf(end)),baseline.slice(baseline.indexOf(start),baseline.indexOf(end)),'Preserve transaction/result/detail request logic');
+let suite=read(path.join(repo,'tools/test_lottery_ui.js'));
+suite=suite.replaceAll("'免费开启1个'","'免费单抽'");
+suite=suite.replaceAll('nodes.LotteryInfoTabs.children.length,4','nodes.LotteryInfoTabs.children.filter(c=>c.BHasClass("LotteryPoolTab")).length,4');
+suite=suite.replace("fs.readFileSync('panorama/src/layout/custom_game/lottery_window.xml','utf8')",'candidateXml');
+suite=suite.replace("vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui.js','utf8'),env);",'Panel.prototype.Children=function(){return this.children;};vm.runInNewContext(candidateView,env);vm.runInNewContext(candidateHelper,env);vm.runInNewContext(candidateJs,env);');
+suite+=`
+events.ui_lottery_result({ok:1,request_id:requests.at(-1).p.request_id,pool_id:'map',results:results(1),snapshot:snapshot('map',19)});advance(3);
+ui.CloseInfo();ui.CloseResult();ui.SelectPool('map');events.ui_lottery_snapshot(snapshot('map',20));ui.Feature('history');
+const beforeHistory=requests.length;
+nodes.LotteryInfoTabs.children[1].events.onactivate();
+assert.equal(requests.length,beforeHistory,'history filtering must not request or select another main pool');
+assert.equal(nodes.LotteryTitle.text,'地图宝箱');
+assert(nodes.LotteryInfoTabs.children[1].BHasClass('Selected'));
+ui.CloseInfo();assert.equal(nodes.LotteryTitle.text,'地图宝箱');assert(nodes.LotterySingleButton.enabled);
+console.log('REMAINING_HISTORY_PASS: independent pool filter, close preserves main pool and drawing unlocks');
+ui.CloseResult();events.ui_lottery_snapshot(snapshot('map',40));
+nodes.LotterySkipAnimation.checked=false;ui.SetSkipAnimation();ui.DrawTen();
+const lateRequest=requests.at(-1),beforeClose=requests.length;ui.Close();ui.DrawTen();assert.equal(requests.length,beforeClose,'pending remains guarded while closed');
+const longRewards=results(10);longRewards[0].name='用于检查换行的超长真实数据形态物品名称';longRewards[0].count=123456;longRewards[1]={...longRewards[0],duplicate:1,converted_points:250};
+const latePayload={ok:1,request_id:lateRequest.p.request_id,pool_id:'map',results:longRewards,snapshot:snapshot('map',30)};
+events.ui_lottery_result(latePayload);advance(6);assert(nodes.LotteryWindow.BHasClass('LotteryClosed'),'late results never reopen a dismissed window');
+ui.Open();assert.equal(nodes.LotteryItemList.children.length,10);assert(allText(nodes.LotteryItemList).includes(longRewards[0].name));
+events.ui_lottery_result(latePayload);assert.equal(nodes.LotteryItemList.children.length,10,'replayed result does not append cards');
+const beforeConfirm=requests.length;ui.CloseResult();ui.CloseResult();assert.equal(requests.length,beforeConfirm,'confirmation only dismisses results');
+ui.DrawTen();const revealRequest=requests.at(-1);events.ui_lottery_result({...latePayload,request_id:revealRequest.p.request_id,snapshot:snapshot('map',20)});
+const beforeSkip=requests.length;ui.SkipReveal();ui.SkipReveal();advance(6);assert.equal(requests.length,beforeSkip);assert(!nodes.LotteryWindow.BHasClass('LotteryAnimating'));assert.equal(nodes.LotteryItemList.children.length,10);
+console.log('RESULT_LIFECYCLE_PASS: closed pending, late reply, ten independent rewards, long names/counts, replay, repeated confirm/skip');
+`;
+vm.runInNewContext(suite,{require:require('module').createRequire(path.join(repo,'tools/test_lottery_ui.js')),console,candidateXml:read(path.join(candidate,'layout/custom_game/survival_hud.xml')),candidateView:read(path.join(__dirname,'baseline/content/scripts/custom_game/lottery_handoff_bb9968eef7.js')),candidateHelper:read(path.join(candidate,build.inputs.find(p=>/^scripts\/custom_game\/remaining_/.test(p)))),candidateJs:js},{filename:'remaining_lottery_behavior.cjs'});
+

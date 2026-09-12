@@ -1,0 +1,2 @@
+const fs=require('fs'),p=require('path');const dir=p.resolve(__dirname,'../../../../panorama/src/images/custom_game/archive_polish_v1/nav');
+for(const f of fs.readdirSync(dir)){if(!f.endsWith('.svg'))continue;let s=fs.readFileSync(p.join(dir,f),'utf8');if(!/<g\b/.test(s))continue;s=s.replace(/<g[^>]*>/,'').replace('</g>','');s=s.replace(/<(path|rect|circle)\b([^>]*?)\/>/g,(_,tag,attrs)=>'<'+tag+' '+(attrs.includes('fill=')?'':'fill="none" ')+'stroke="#e8c98a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"'+attrs+'/>');fs.writeFileSync(p.join(dir,f),s)}

@@ -26,7 +26,7 @@ foreach ($id in @('LotteryWindow','LotterySingleButton','LotteryTenButton','Lott
 }
 if ($CheckOnly) { Write-Output 'LOTTERY_DEPLOY_CHECK_PASS'; exit 0 }
 # Preserve the live HUD before the scoped replacement, including unrelated user edits.
-$backupDir = Join-Path $repo 'output/lottery_celestial/backups'
+$backupDir = Join-Path $repo 'ui/lottery_celestial/backups'
 New-Item -ItemType Directory -Force -Path $backupDir | Out-Null
 Copy-Item -LiteralPath $hud -Destination (Join-Path $backupDir ((Get-Date -Format 'yyyyMMdd_HHmmss_fff') + '_survival_hud.xml'))
 foreach ($relative in $files) {

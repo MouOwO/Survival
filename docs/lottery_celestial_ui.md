@@ -8,7 +8,7 @@
 - 主题：`panorama/src/styles/custom_game/lottery_celestial.css`（在现有 lottery.css 之后加载，保留 HUD 入口和 tooltip 样式）
 - 交互：`panorama/src/scripts/custom_game/lottery_ui.js`
 - 素材：`panorama/src/images/custom_game/lottery_celestial/home.png`、`results.png`，1672×941。两张均为不透明背景，无透明切图依赖。
-- 部署：`powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy_lottery_panorama.ps1`；只替换当前 content HUD 中的 LotteryWindow 片段并追加主题引用，不覆盖其他 HUD 源码。写入前备份当前 HUD 到 `output/lottery_celestial/backups/`。
+- 部署：`powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy_lottery_panorama.ps1`；只替换当前 content HUD 中的 LotteryWindow 片段并追加主题引用，不覆盖其他 HUD 源码。写入前备份当前 HUD 到 `ui/lottery_celestial/backups/`。
 - 检查：`node tools/test_lottery_ui.js`；部署脚本支持 `-CheckOnly`。
 
 ## 功能对应

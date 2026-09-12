@@ -1,0 +1,17 @@
+{
+  "all_copied_assets_sha256_match_source": true,
+  "all_alias_targets_resolve": true,
+  "all_component_asset_ids_resolve": true,
+  "all_page_components_resolve": true,
+  "component_count": 22,
+  "page_count": 7,
+  "engine_runtime_tested": false,
+  "pending_assets_explicit": [
+    "frame.window",
+    "texture.ivory.seamless",
+    "texture.header.seamless",
+    "scene.neutral",
+    "icon.shop",
+    "icon.search"
+  ]
+}

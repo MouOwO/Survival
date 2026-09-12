@@ -1,0 +1,13 @@
+const fs=require('fs'),p=require('path'),vm=require('vm'),assert=require('assert');
+const repo=p.resolve(__dirname,'../../../..'),build=JSON.parse(fs.readFileSync(p.join(__dirname,'build.json'))),candidate=p.join(__dirname,'candidate/panorama');
+const read=f=>fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n');
+const candidateRogue=read(p.join(candidate,build.inputs.find(f=>/scripts.*rogue_remaining/.test(f))));
+const candidateHelper=read(p.join(candidate,build.inputs.find(f=>/^scripts\/custom_game\/remaining_/.test(f))));
+const candidateArt=read(p.join(candidate,build.inputs.find(f=>/^scripts\/custom_game\/rogue_art_/.test(f))));
+const original=read(p.join(__dirname,'baseline/content/scripts/custom_game/rogue_reward_ui.js'));
+assert.equal(candidateRogue.slice(candidateRogue.indexOf('function choose('),candidateRogue.indexOf('function createCard(')),original.slice(original.indexOf('function choose('),original.indexOf('function createCard(')),'Server-owned selection and repeat guard unchanged');
+let suite=read(p.join(repo,'tools/test_rogue_reward_ui.js'));
+suite=suite.replace("vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/rogue_reward_ui.js','utf8'),env);","Panel.prototype.SetImage=function(s){this.image=s;};Panel.prototype.SetScaling=function(s){this.scaling=s;};vm.runInNewContext(candidateHelper,env);vm.runInNewContext(candidateArt,env);vm.runInNewContext(candidateRogue,env);");
+suite=suite.replace('left+136+dx','left+145+dx').replace('advance(1.01)','advance(1.31)').replace('advance(.51)','advance(.50)');
+suite+=`\nconst front=flip(0).children[0];assert(front.children.some(p=>p.classes.has('RogueOptionIllustration')&&p.image.includes('frozen_wall.vtex')));config.SurvivalRogueReward.Dispose();send(data);assert.equal(nodes.RogueRewardCards.children.length,0);assert.equal(jobs.size,0);`;
+vm.runInNewContext(suite,{require:require('module').createRequire(p.join(repo,'tools/test_rogue_reward_ui.js')),console,candidateRogue,candidateHelper,candidateArt},{filename:'remaining_rogue_behavior.cjs'});

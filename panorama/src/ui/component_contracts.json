@@ -1,0 +1,427 @@
+{
+  "ModalShell": {
+    "purpose": "共用弹窗壳",
+    "props": [
+      "title",
+      "sizePreset",
+      "closePolicy",
+      "content",
+      "tabs",
+      "sidebar"
+    ],
+    "asset_ids": [
+      "icon.close"
+    ],
+    "pending_asset_ids": [
+      "frame.window"
+    ],
+    "layout": "scrim + frame + header + content + optional footer",
+    "states": [
+      "closed",
+      "opening",
+      "open",
+      "closing"
+    ],
+    "rules": [
+      "scrim置于window后方且只接收窗口外点击",
+      "只关闭最上层且不触发官方退出",
+      "窗口内部交互不冒泡为关闭"
+    ]
+  },
+  "FullscreenShell": {
+    "purpose": "共用全屏页面外层",
+    "props": [
+      "sceneId",
+      "themeArtId",
+      "header",
+      "navigation",
+      "content",
+      "footer",
+      "closePolicy"
+    ],
+    "asset_ids": [
+      "icon.close"
+    ],
+    "layout": "scene + optional art + reading gradient + shared chrome + content",
+    "rules": [
+      "场景层与按钮分开",
+      "可按主题复用同一场景ID",
+      "合成主题背景未分层时作为整张主题资产处理，不伪造透明立绘"
+    ]
+  },
+  "HUDShell": {
+    "purpose": "局内轻量HUD",
+    "props": [
+      "nativeBindings",
+      "safeArea"
+    ],
+    "asset_ids": [
+      "icon.nav.return"
+    ],
+    "rules": [
+      "实时地图始终由游戏渲染",
+      "保留官方退出、技能、物品和小地图逻辑",
+      "不能用整幅商城框架包住HUD"
+    ]
+  },
+  "IconButton": {
+    "purpose": "共用极简图标入口",
+    "props": [
+      "iconId",
+      "label",
+      "action",
+      "enabled",
+      "selected"
+    ],
+    "asset_ids": [
+      "icon.nav.settings"
+    ],
+    "states": [
+      "normal",
+      "hover",
+      "pressed",
+      "disabled",
+      "selected"
+    ],
+    "rules": [
+      "图形尺寸与命中区域分开",
+      "默认灰白，悬停只提亮",
+      "不能用emoji或字体字符替代缺失图标"
+    ]
+  },
+  "ActionButton": {
+    "purpose": "通用操作按钮",
+    "props": [
+      "label",
+      "iconId",
+      "variant",
+      "enabled",
+      "busy",
+      "action"
+    ],
+    "asset_ids": [
+      "button.ivory.normal",
+      "button.ivory.hover",
+      "button.ivory.pressed",
+      "button.ivory.disabled",
+      "button.gold.normal",
+      "button.gold.hover",
+      "button.gold.pressed",
+      "button.gold.disabled"
+    ],
+    "states": [
+      "normal",
+      "hover",
+      "pressed",
+      "disabled",
+      "busy"
+    ],
+    "rules": [
+      "iconId可空，文字独立",
+      "共享一族资源，不按页面复制",
+      "busy锁定重复操作，实际请求逻辑由页面控制"
+    ]
+  },
+  "NavToggle": {
+    "purpose": "左侧分类",
+    "props": [
+      "itemId",
+      "label",
+      "iconId",
+      "selected",
+      "enabled"
+    ],
+    "asset_ids": [
+      "nav.toggle.normal",
+      "nav.toggle.hover",
+      "nav.toggle.selected"
+    ],
+    "states": [
+      "normal",
+      "hover",
+      "pressed",
+      "selected",
+      "disabled"
+    ],
+    "rules": [
+      "组选中唯一",
+      "selected+hover不得退回未选中底板",
+      "各状态同尺寸同锚点，disabled由统一样式减淡"
+    ]
+  },
+  "TabBar": {
+    "purpose": "顶部分栏",
+    "props": [
+      "items",
+      "selectedId",
+      "onChange"
+    ],
+    "asset_ids": [
+      "overlay.tab_selected_overlay",
+      "overlay.tab_hover_overlay"
+    ],
+    "rules": [
+      "标签文字独立",
+      "五个商城分栏不各自保存一份标题栏图片"
+    ]
+  },
+  "CardShell": {
+    "purpose": "列表单元外观",
+    "props": [
+      "bodyVariant",
+      "artId",
+      "title",
+      "slots",
+      "selected",
+      "hoverable"
+    ],
+    "asset_ids": [
+      "card.body.ivory",
+      "card.border.hover",
+      "card.border.selected"
+    ],
+    "rules": [
+      "共享底板与状态层",
+      "已有边框与overlay不能重复叠亮",
+      "图像与业务文字分开",
+      "长方形肉鸽牌不是简单拉长方形商品卡"
+    ]
+  },
+  "ArchiveCard": {
+    "purpose": "存档单元",
+    "extends": "CardShell",
+    "props": [
+      "entryId",
+      "artId",
+      "name",
+      "current",
+      "required",
+      "unlocked",
+      "tooltipData"
+    ],
+    "asset_ids": [
+      "badge.progress",
+      "badge.unlocked",
+      "badge.locked"
+    ],
+    "rules": [
+      "只有提供current/required时显示角标",
+      "分母由配置决定，不能写死10",
+      "解锁条件/效果只进tooltip"
+    ]
+  },
+  "ProductCard": {
+    "purpose": "普通商品",
+    "extends": "CardShell",
+    "props": [
+      "sku",
+      "artId",
+      "name",
+      "kind",
+      "duration",
+      "prices",
+      "oldPrices",
+      "saleEndsAt",
+      "purchaseState"
+    ],
+    "asset_ids": [],
+    "rules": [
+      "保留多币种信息，不擅自推定并付或二选一",
+      "标签、价格、活动期来自业务配置"
+    ]
+  },
+  "BundleCard": {
+    "purpose": "组合礼包",
+    "extends": "ProductCard",
+    "props": [
+      "items",
+      "totalPrice",
+      "discount",
+      "action"
+    ],
+    "asset_ids": [
+      "button.ivory.normal"
+    ],
+    "rules": [
+      "内容商品循环复用小图项",
+      "只有组合数据不同，不新造大背景"
+    ]
+  },
+  "VipBundleCard": {
+    "purpose": "VIP条件礼包",
+    "extends": "BundleCard",
+    "props": [
+      "requiredVipLevel",
+      "currentVipLevel",
+      "eligible"
+    ],
+    "asset_ids": [
+      "button.ivory.disabled"
+    ],
+    "rules": [
+      "未达成时禁用按钮，保留内容可读性",
+      "资格由真实业务决定，不靠截图数字推定"
+    ]
+  },
+  "ProgressBadge": {
+    "purpose": "当前/目标角标",
+    "props": [
+      "current",
+      "required",
+      "visible"
+    ],
+    "asset_ids": [
+      "badge.progress"
+    ],
+    "rules": [
+      "数字程序绘制",
+      "不裁一套1/10到10/10图片"
+    ]
+  },
+  "ProgressBar": {
+    "purpose": "生命/魔法/计时进度",
+    "props": [
+      "current",
+      "max",
+      "variant",
+      "label"
+    ],
+    "asset_ids": [],
+    "rules": [
+      "轨道与填充独立",
+      "保留官方数值逻辑",
+      "裁有数字的旧条只当对照"
+    ]
+  },
+  "PriceLabel": {
+    "purpose": "多币种价格",
+    "props": [
+      "prices",
+      "originalPrices",
+      "paymentMode"
+    ],
+    "asset_ids": [],
+    "rules": [
+      "格式化展示，不计算虚构汇率",
+      "原价删线用程序，不画进商品图"
+    ]
+  },
+  "Checkbox": {
+    "purpose": "复选项",
+    "props": [
+      "checked",
+      "enabled",
+      "label",
+      "onChange"
+    ],
+    "asset_ids": [
+      "checkbox.off",
+      "checkbox.on.normal",
+      "checkbox.on.hover",
+      "checkbox.on.pressed",
+      "checkbox.on.disabled"
+    ],
+    "rules": [
+      "checked是业务状态，不等同hover",
+      "两种PNG画布不同，按paint bounds对齐"
+    ]
+  },
+  "Tooltip": {
+    "purpose": "所有页面共用浮层",
+    "props": [
+      "title",
+      "body",
+      "anchor",
+      "richContent"
+    ],
+    "asset_ids": [],
+    "pending_asset_ids": [
+      "frame.window"
+    ],
+    "rules": [
+      "在viewport边缘避让",
+      "不能重新撑开主列表",
+      "必要时用轻量边框皮肤，不套巨大标题冠饰"
+    ]
+  },
+  "FilterBar": {
+    "purpose": "搜索/币种/类型/排序",
+    "props": [
+      "search",
+      "currency",
+      "type",
+      "purchaseableOnly",
+      "discountOnly",
+      "sort"
+    ],
+    "asset_ids": [],
+    "rules": [
+      "同一行为组只实现一次",
+      "不同页面通过开关props显示需要的字段"
+    ]
+  },
+  "RewardGrid": {
+    "purpose": "奖池或结果列表",
+    "props": [
+      "items",
+      "columns",
+      "selectedId",
+      "onInspect"
+    ],
+    "asset_ids": [
+      "card.body.ivory"
+    ],
+    "rules": [
+      "物品图案保留真实资源",
+      "不能把所有奖励替换为星形通用图标"
+    ]
+  },
+  "AugmentChoiceGroup": {
+    "purpose": "肉鸽三选一",
+    "props": [
+      "choices",
+      "onChoose",
+      "reducedMotion"
+    ],
+    "asset_ids": [
+      "roguelike.back"
+    ],
+    "rules": [
+      "三卡共用同一背面",
+      "弹出位置层/翻面层/悬停层拆开",
+      "背面绘制一次资产、三个实例引用"
+    ]
+  },
+  "DrawResultSequence": {
+    "purpose": "单抽/十连的共用动效控制",
+    "props": [
+      "confirmedResults",
+      "count",
+      "skip",
+      "reducedMotion"
+    ],
+    "asset_ids": [
+      "icon.ticket"
+    ],
+    "rules": [
+      "count仅控制排列与错峰，不复制动画系统",
+      "先锁定服务端结果，跳过动画不重新抽奖"
+    ]
+  },
+  "ModalManager": {
+    "purpose": "统一弹窗开关与层级",
+    "props": [
+      "stack",
+      "open",
+      "closeTop",
+      "closePolicy"
+    ],
+    "asset_ids": [],
+    "rules": [
+      "重复打开同页应更新或聚焦",
+      "关闭取消timer和订阅",
+      "遮罩层数量由栈管理",
+      "商城购买确认与普通关闭独立处理"
+    ]
+  }
+}

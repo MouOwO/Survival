@@ -1,0 +1,502 @@
+{
+  "main_hud_exact_v1/03_alpha_helpers/return_64.png": {
+    "target": "icon.nav.return",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "main_hud_exact_v1/03_alpha_helpers/settings_64.png": {
+    "target": "icon.nav.settings",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "main_hud_exact_v1/03_alpha_helpers/treasure_64.png": {
+    "target": "icon.nav.treasure",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "main_hud_exact_v1/03_alpha_helpers/archive_64.png": {
+    "target": "icon.nav.archive",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "main_hud_exact_v1/03_alpha_helpers/equipment_64.png": {
+    "target": "icon.nav.equipment",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "main_hud_exact_v1/03_alpha_helpers/lottery_64.png": {
+    "target": "icon.nav.lottery",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "main_hud_exact_v1/03_alpha_helpers/benefit_64.png": {
+    "target": "icon.nav.benefit",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "main_hud_exact_v1/03_alpha_helpers/appearance_64.png": {
+    "target": "icon.nav.appearance",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "main_hud_exact_v1/03_alpha_helpers/social_64.png": {
+    "target": "icon.nav.social",
+    "migration": "candidate_requires_visual_check",
+    "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半"
+  },
+  "archive_ui_kit_v1/icons_rgba/close_normal.png": {
+    "target": "icon.close",
+    "migration": "shared_normal_plus_state",
+    "note": "保留状态效果与点击规则"
+  },
+  "archive_ui_kit_v1/icons_rgba/void_normal.png": {
+    "target": "icon.archive.void",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案"
+  },
+  "archive_ui_kit_v1/icons_rgba/points_normal.png": {
+    "target": "icon.archive.points",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案"
+  },
+  "archive_ui_kit_v1/icons_rgba/weapon_normal.png": {
+    "target": "icon.archive.weapon",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案"
+  },
+  "archive_ui_kit_v1/icons_rgba/spell_normal.png": {
+    "target": "icon.archive.spell",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案"
+  },
+  "archive_ui_kit_v1/icons_rgba/endless_normal.png": {
+    "target": "icon.archive.endless",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案"
+  },
+  "archive_ui_kit_v1/icons_rgba/friends_normal.png": {
+    "target": "icon.archive.friends",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案"
+  },
+  "archive_ui_kit_v1/icons_rgba/ex_normal.png": {
+    "target": "icon.archive.ex",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案"
+  },
+  "archive_ui_kit_v1/icons_rgba/blessing_normal.png": {
+    "target": "icon.archive.blessing",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案"
+  },
+  "lottery_ui_v3/02_rgba_icons/pool_details_icon_normal.png": {
+    "target": "icon.pool_details",
+    "migration": "candidate_requires_visual_check",
+    "note": "来自V3；原画布边距不同，用paint bounds对齐"
+  },
+  "lottery_ui_v3/02_rgba_icons/history_icon_normal.png": {
+    "target": "icon.history",
+    "migration": "candidate_requires_visual_check",
+    "note": "来自V3；原画布边距不同，用paint bounds对齐"
+  },
+  "lottery_ui_v3/02_rgba_icons/currency_plus_normal.png": {
+    "target": "icon.add",
+    "migration": "candidate_requires_visual_check",
+    "note": "来自V3；原画布边距不同，用paint bounds对齐"
+  },
+  "lottery_ui_v3/02_rgba_icons/skip_checkbox_normal.png": {
+    "target": "checkbox.off",
+    "migration": "candidate_requires_visual_check",
+    "note": "来自V3；原画布边距不同，用paint bounds对齐"
+  },
+  "lottery_ui_v3/03_states/button_ivory_normal.png": {
+    "target": "button.ivory.normal",
+    "migration": "candidate_requires_visual_check",
+    "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理"
+  },
+  "lottery_ui_v3/03_states/button_ivory_hover.png": {
+    "target": "button.ivory.hover",
+    "migration": "candidate_requires_visual_check",
+    "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理"
+  },
+  "lottery_ui_v3/03_states/button_ivory_pressed.png": {
+    "target": "button.ivory.pressed",
+    "migration": "candidate_requires_visual_check",
+    "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理"
+  },
+  "lottery_ui_v3/03_states/button_ivory_disabled.png": {
+    "target": "button.ivory.disabled",
+    "migration": "candidate_requires_visual_check",
+    "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理"
+  },
+  "lottery_ui_v3/03_states/button_gold_normal.png": {
+    "target": "button.gold.normal",
+    "migration": "candidate_requires_visual_check",
+    "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理"
+  },
+  "lottery_ui_v3/03_states/button_gold_hover.png": {
+    "target": "button.gold.hover",
+    "migration": "candidate_requires_visual_check",
+    "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理"
+  },
+  "lottery_ui_v3/03_states/button_gold_pressed.png": {
+    "target": "button.gold.pressed",
+    "migration": "candidate_requires_visual_check",
+    "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理"
+  },
+  "lottery_ui_v3/03_states/button_gold_disabled.png": {
+    "target": "button.gold.disabled",
+    "migration": "candidate_requires_visual_check",
+    "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理"
+  },
+  "lottery_ui_v3/03_states/tab_selected_overlay.png": {
+    "target": "overlay.tab_selected_overlay",
+    "migration": "candidate_requires_visual_check",
+    "note": "保持选中与悬停独立；关闭选中时清理高亮"
+  },
+  "lottery_ui_v3/03_states/tab_hover_overlay.png": {
+    "target": "overlay.tab_hover_overlay",
+    "migration": "candidate_requires_visual_check",
+    "note": "保持选中与悬停独立；关闭选中时清理高亮"
+  },
+  "lottery_ui_v3/03_states/entry_hover_underline.png": {
+    "target": "overlay.entry_hover_underline",
+    "migration": "candidate_requires_visual_check",
+    "note": "保持选中与悬停独立；关闭选中时清理高亮"
+  },
+  "lottery_ui_v3/03_states/card_outline_normal.png": {
+    "target": "card.border.normal",
+    "migration": "candidate_requires_visual_check",
+    "note": "只作为独立状态叠层；不得与底板自带边框双重叠加"
+  },
+  "lottery_ui_v3/03_states/card_outline_hover.png": {
+    "target": "card.border.hover",
+    "migration": "candidate_requires_visual_check",
+    "note": "只作为独立状态叠层；不得与底板自带边框双重叠加"
+  },
+  "lottery_ui_v3/03_states/card_outline_pressed.png": {
+    "target": "card.border.pressed",
+    "migration": "candidate_requires_visual_check",
+    "note": "只作为独立状态叠层；不得与底板自带边框双重叠加"
+  },
+  "lottery_ui_v3/03_states/card_outline_disabled.png": {
+    "target": "card.border.disabled",
+    "migration": "candidate_requires_visual_check",
+    "note": "只作为独立状态叠层；不得与底板自带边框双重叠加"
+  },
+  "lottery_ui_v3/03_states/card_outline_selected.png": {
+    "target": "card.border.selected",
+    "migration": "candidate_requires_visual_check",
+    "note": "只作为独立状态叠层；不得与底板自带边框双重叠加"
+  },
+  "lottery_ui_v3/03_states/checkbox_checked_normal.png": {
+    "target": "checkbox.on.normal",
+    "migration": "candidate_requires_visual_check",
+    "note": "checked与off画布不同，统一视觉框后切换"
+  },
+  "lottery_ui_v3/03_states/checkbox_checked_hover.png": {
+    "target": "checkbox.on.hover",
+    "migration": "candidate_requires_visual_check",
+    "note": "checked与off画布不同，统一视觉框后切换"
+  },
+  "lottery_ui_v3/03_states/checkbox_checked_pressed.png": {
+    "target": "checkbox.on.pressed",
+    "migration": "candidate_requires_visual_check",
+    "note": "checked与off画布不同，统一视觉框后切换"
+  },
+  "lottery_ui_v3/03_states/checkbox_checked_disabled.png": {
+    "target": "checkbox.on.disabled",
+    "migration": "candidate_requires_visual_check",
+    "note": "checked与off画布不同，统一视觉框后切换"
+  },
+  "lottery_ui_v3/03_states/ticket_normal.png": {
+    "target": "icon.ticket",
+    "migration": "candidate_requires_visual_check",
+    "note": ""
+  },
+  "archive_ui_kit_v1/reusable/toggle_normal.png": {
+    "target": "nav.toggle.normal",
+    "migration": "candidate_requires_visual_check",
+    "note": "沿用旧存档底板候选；不同态图形边界需固定对齐，不能按各态alpha裁边"
+  },
+  "archive_ui_kit_v1/reusable/toggle_hover.png": {
+    "target": "nav.toggle.hover",
+    "migration": "candidate_requires_visual_check",
+    "note": "沿用旧存档底板候选；不同态图形边界需固定对齐，不能按各态alpha裁边"
+  },
+  "archive_ui_kit_v1/reusable/toggle_selected.png": {
+    "target": "nav.toggle.selected",
+    "migration": "candidate_requires_visual_check",
+    "note": "沿用旧存档底板候选；不同态图形边界需固定对齐，不能按各态alpha裁边"
+  },
+  "archive_ui_kit_v1/reusable/badge_progress.png": {
+    "target": "badge.progress",
+    "migration": "candidate_requires_visual_check",
+    "note": "当前/目标与解锁字样由数据渲染，不画进底板"
+  },
+  "archive_ui_kit_v1/reusable/badge_unlocked.png": {
+    "target": "badge.unlocked",
+    "migration": "candidate_requires_visual_check",
+    "note": "当前/目标与解锁字样由数据渲染，不画进底板"
+  },
+  "archive_ui_kit_v1/reusable/badge_locked.png": {
+    "target": "badge.locked",
+    "migration": "candidate_requires_visual_check",
+    "note": "当前/目标与解锁字样由数据渲染，不画进底板"
+  },
+  "archive_ui_kit_v1/reusable/card_normal.png": {
+    "target": "card.body.ivory",
+    "migration": "candidate_requires_visual_check",
+    "note": "存档卡/商品卡可共用内容底板概念；允许按皮肤选择细框，避免重复叠框"
+  },
+  "archive_ui_kit_v1/background_tiles/ivory_texture.png": {
+    "target": "texture.ivory",
+    "migration": "candidate_requires_visual_check",
+    "note": "底纹样本不保证平铺无缝，不可直接铺满大屏"
+  },
+  "archive_ui_kit_v1/background_tiles/teal_texture.png": {
+    "target": "texture.teal",
+    "migration": "candidate_requires_visual_check",
+    "note": "底纹样本不保证平铺无缝，不可直接铺满大屏"
+  },
+  "lottery_ui_handoff_v2/assets/scene_clean.png": {
+    "target": "scene.treasure",
+    "migration": "candidate_requires_visual_check",
+    "note": "可共享同主题背景板；宝箱与景观已合成，不能当成独立纯场景/透明宝箱层"
+  },
+  "roguelike_ui_v1/assets/back.png": {
+    "target": "roguelike.back",
+    "migration": "candidate_requires_visual_check",
+    "note": "卡框与立绘合成、保留深青背景；共用同一张back，暂不强行与方形奖励卡合并"
+  },
+  "roguelike_ui_v1/assets/combat.png": {
+    "target": "roguelike.combat",
+    "migration": "candidate_requires_visual_check",
+    "note": "卡框与立绘合成、保留深青背景；共用同一张back，暂不强行与方形奖励卡合并"
+  },
+  "roguelike_ui_v1/assets/growth.png": {
+    "target": "roguelike.growth",
+    "migration": "candidate_requires_visual_check",
+    "note": "卡框与立绘合成、保留深青背景；共用同一张back，暂不强行与方形奖励卡合并"
+  },
+  "roguelike_ui_v1/assets/defense.png": {
+    "target": "roguelike.defense",
+    "migration": "candidate_requires_visual_check",
+    "note": "卡框与立绘合成、保留深青背景；共用同一张back，暂不强行与方形奖励卡合并"
+  },
+  "main_hud_exact_v1/02_frames/hero_tl.png": {
+    "target": "frame.hud.tl",
+    "migration": "candidate_requires_visual_check",
+    "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格"
+  },
+  "main_hud_exact_v1/02_frames/hero_top.png": {
+    "target": "frame.hud.top",
+    "migration": "candidate_requires_visual_check",
+    "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格"
+  },
+  "main_hud_exact_v1/02_frames/hero_tr.png": {
+    "target": "frame.hud.tr",
+    "migration": "candidate_requires_visual_check",
+    "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格"
+  },
+  "main_hud_exact_v1/02_frames/hero_left.png": {
+    "target": "frame.hud.left",
+    "migration": "candidate_requires_visual_check",
+    "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格"
+  },
+  "main_hud_exact_v1/02_frames/hero_right.png": {
+    "target": "frame.hud.right",
+    "migration": "candidate_requires_visual_check",
+    "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格"
+  },
+  "main_hud_exact_v1/02_frames/hero_bl.png": {
+    "target": "frame.hud.bl",
+    "migration": "candidate_requires_visual_check",
+    "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格"
+  },
+  "main_hud_exact_v1/02_frames/hero_bottom.png": {
+    "target": "frame.hud.bottom",
+    "migration": "candidate_requires_visual_check",
+    "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格"
+  },
+  "main_hud_exact_v1/02_frames/hero_br.png": {
+    "target": "frame.hud.br",
+    "migration": "candidate_requires_visual_check",
+    "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格"
+  },
+  "lottery_ui_handoff/icons/close.svg": {
+    "target": "icon.close",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff/icons/pool.svg": {
+    "target": "icon.pool_details",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff/icons/history.svg": {
+    "target": "icon.history",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff/icons/plus.svg": {
+    "target": "icon.add",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff/icons/ticket.svg": {
+    "target": "icon.ticket",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff/icons/gift.svg": {
+    "target": "icon.nav.benefit",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff/icons/checkbox_off.svg": {
+    "target": "checkbox.off",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff/icons/checkbox_on.svg": {
+    "target": "checkbox.on.normal",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff/assets/button_ivory.svg": {
+    "target": "button.ivory.normal",
+    "migration": "replace_with_shared_component",
+    "note": "按组件状态选择资源，不只替换normal"
+  },
+  "lottery_ui_handoff/assets/button_gold.svg": {
+    "target": "button.gold.normal",
+    "migration": "replace_with_shared_component",
+    "note": "按组件状态选择资源，不只替换normal"
+  },
+  "lottery_ui_handoff_v2/icons/close.svg": {
+    "target": "icon.close",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff_v2/icons/pool.svg": {
+    "target": "icon.pool_details",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff_v2/icons/history.svg": {
+    "target": "icon.history",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff_v2/icons/plus.svg": {
+    "target": "icon.add",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff_v2/icons/ticket.svg": {
+    "target": "icon.ticket",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff_v2/icons/gift.svg": {
+    "target": "icon.nav.benefit",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff_v2/icons/checkbox_off.svg": {
+    "target": "checkbox.off",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff_v2/icons/checkbox_on.svg": {
+    "target": "checkbox.on.normal",
+    "migration": "replace_semantic_reference_after_visual_check",
+    "note": "改引用到共用ID，保留原事件行为；旧SVG不删除"
+  },
+  "lottery_ui_handoff_v2/assets/button_ivory.svg": {
+    "target": "button.ivory.normal",
+    "migration": "replace_with_shared_component",
+    "note": "按组件状态选择资源，不只替换normal"
+  },
+  "lottery_ui_handoff_v2/assets/button_gold.svg": {
+    "target": "button.gold.normal",
+    "migration": "replace_with_shared_component",
+    "note": "按组件状态选择资源，不只替换normal"
+  },
+  "lottery_ui_v3/02_rgba_icons/screen_close_normal.png": {
+    "target": "icon.close",
+    "migration": "replace_with_shared_icon_and_state",
+    "note": "状态由组件统一控制；动作继续区分close_current与exit_official"
+  },
+  "lottery_ui_v3/02_rgba_icons/modal_close_normal.png": {
+    "target": "icon.close",
+    "migration": "replace_with_shared_icon_and_state",
+    "note": "状态由组件统一控制；动作继续区分close_current与exit_official"
+  },
+  "lottery_ui_v3/02_rgba_icons/screen_close_hover.png": {
+    "target": "icon.close",
+    "migration": "replace_with_shared_icon_and_state",
+    "note": "状态由组件统一控制；动作继续区分close_current与exit_official"
+  },
+  "lottery_ui_v3/02_rgba_icons/modal_close_hover.png": {
+    "target": "icon.close",
+    "migration": "replace_with_shared_icon_and_state",
+    "note": "状态由组件统一控制；动作继续区分close_current与exit_official"
+  },
+  "lottery_ui_v3/02_rgba_icons/screen_close_pressed.png": {
+    "target": "icon.close",
+    "migration": "replace_with_shared_icon_and_state",
+    "note": "状态由组件统一控制；动作继续区分close_current与exit_official"
+  },
+  "lottery_ui_v3/02_rgba_icons/modal_close_pressed.png": {
+    "target": "icon.close",
+    "migration": "replace_with_shared_icon_and_state",
+    "note": "状态由组件统一控制；动作继续区分close_current与exit_official"
+  },
+  "lottery_ui_v3/02_rgba_icons/screen_close_disabled.png": {
+    "target": "icon.close",
+    "migration": "replace_with_shared_icon_and_state",
+    "note": "状态由组件统一控制；动作继续区分close_current与exit_official"
+  },
+  "lottery_ui_v3/02_rgba_icons/modal_close_disabled.png": {
+    "target": "icon.close",
+    "migration": "replace_with_shared_icon_and_state",
+    "note": "状态由组件统一控制；动作继续区分close_current与exit_official"
+  },
+  "archive_ui_kit_v1/reusable/button_normal.png": {
+    "target": "button.ivory.normal",
+    "migration": "visual_migration_candidate",
+    "note": "更换为统一简化按钮会有材质差异，需一次状态样例验收，不能静默替换"
+  },
+  "archive_ui_kit_v1/reusable/button_hover.png": {
+    "target": "button.ivory.hover",
+    "migration": "visual_migration_candidate",
+    "note": "更换为统一简化按钮会有材质差异，需一次状态样例验收，不能静默替换"
+  },
+  "archive_ui_kit_v1/reusable/button_pressed.png": {
+    "target": "button.ivory.pressed",
+    "migration": "visual_migration_candidate",
+    "note": "更换为统一简化按钮会有材质差异，需一次状态样例验收，不能静默替换"
+  },
+  "archive_ui_kit_v1/icons_rgba/close_hover.png": {
+    "target": "icon.close",
+    "migration": "shared_normal_plus_state",
+    "note": "保留状态效果与点击规则"
+  },
+  "archive_ui_kit_v1/icons_rgba/close_selected.png": {
+    "target": "icon.close",
+    "migration": "shared_normal_plus_state",
+    "note": "保留状态效果与点击规则"
+  },
+  "archive_ui_kit_v1/icons_rgba/close_disabled.png": {
+    "target": "icon.close",
+    "migration": "shared_normal_plus_state",
+    "note": "保留状态效果与点击规则"
+  },
+  "lottery_ui_handoff/assets/scene_clean.png": {
+    "target": "scene.treasure",
+    "migration": "identical_bytes_alias",
+    "note": "内容SHA256完全一致，只统一资源引用"
+  }
+}

@@ -34,13 +34,17 @@ function M.snapshot(profile,day,pass)
     local daily=profile.save.archive and profile.save.archive.daily_rewards
         or {first_day=day,claimed={},count=0,item_counts={}}
     local cycle={}
+    local claimed_today=daily.claimed[tostring(day)] == true
+    local current=(claimed_today and math.max(0,daily.count-1) or daily.count)%7+1
     for _, row in ipairs(schedule.rows) do
         local rewards={}
         for i,id in ipairs(row.item_ids) do
             local item=items.by_id[id]
-            rewards[#rewards+1]={name=item.display_name,count=tonumber(row.item_counts[i]),description=item.description}
+            rewards[#rewards+1]={id=id,name=item.display_name,count=tonumber(row.item_counts[i]),description=item.description,quality=item.quality}
         end
-        cycle[#cycle+1]={day=row.day_id,rewards=rewards}
+        cycle[#cycle+1]={day=row.day_id,rewards=rewards,
+            status=row.day_id<current and "claimed" or row.day_id==current and (claimed_today and "claimed" or "claimable") or "not_open",
+            is_today=row.day_id==current and 1 or 0}
     end
     local missed={}
     for d=math.max(daily.first_day,day-rules.makeup_days+1),day-1 do
@@ -49,10 +53,15 @@ function M.snapshot(profile,day,pass)
     local specials={}
     for i,id in ipairs(rules.pass_item_ids) do
         local item=items.by_id[id]
-        specials[#specials+1]={day=tonumber(rules.pass_milestones[i]),name=item.display_name,description=item.description,owned=daily.item_counts[id] or 0}
+        specials[#specials+1]={id=id,day=tonumber(rules.pass_milestones[i]),name=item.display_name,description=item.description,owned=daily.item_counts[id] or 0}
     end
     local entitlement=(profile.entitlements or {})[rules.pass_entitlement_id] or {}
     return {today=day,claimed=daily.claimed[tostring(day)] and 1 or 0,count=daily.count,
+        cycle_mode="claim_count",current_day=current,period_id=tostring(math.floor(math.max(0,daily.count-(claimed_today and 1 or 0))/7)),
+        ordinary_status=claimed_today and "claimed" or "claimable",
+        premium={status="unconfigured",name="周末高级装备",description="周周期与装备候选池尚未配置；现有累计签到通行证奖励仍按原规则发放。"},
+        subtitle="每日领取 · 七次循环",rule_text="每日零点刷新；断签不重置累计进度。通行证奖励按累计签到次数发放。",
+        makeup_days=rules.makeup_days,
         next_day=daily.count%7+1,has_pass=pass and 1 or 0,expires_at=tostring(entitlement.expires_at or ""),
         missed=missed,cycle=cycle,specials=specials,price=rules.price_text,duration_days=rules.duration_days,
         purchase_enabled=rules.purchase_enabled and 1 or 0}

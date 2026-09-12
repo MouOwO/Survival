@@ -1,0 +1,31 @@
+/* Preview-specific geometry; other accepted pages keep their shared styles. */
+.RCWindow .RCTabs {width:1110px;overflow:noclip;}
+.RCWindow .RCTab {width:185px;height:58px;flow-children:none;}
+.RCWindow .RCTabText {align:center center;font-size:22px;color:#f4e8ce;z-index:2;}
+.RCWindow .RCNavGlow {width:185px;}
+.RCWindow .RCProductHover {visibility:collapse;opacity:0;}
+.RCWindow .RCProduct:hover .RCProductHover {visibility:visible;opacity:1;}
+.RCWindow .RCProductEffect {color:#fff5e2;}
+.RCWindow .RCProductName {position:10px 199px 0px;width:205px;height:38px;font-size:21px;text-align:center;white-space:nowrap;text-overflow:shrink;z-index:2;}
+.RCWindow .RCBundles .RCProductName {position:22px 12px 0px;width:496px;height:38px;font-size:24px;}
+.RCWindow .RCStockState {position:105px 12px 0px;width:105px;height:29px;background-color:#284750df;color:#ffedc4;text-align:center;font-size:18px;z-index:3;}
+.RCWindow .RCOrderBody {height:490px;}
+.RCWindow .RCOrderArt {position:30px 90px 0px;width:140px;height:140px;}
+.RCWindow .RCOrderHint {position:190px 114px 0px;width:640px;height:98px;overflow:squish scroll;text-align:left;}
+.RCWindow .RCQuantity {position:302px 237px 0px;}
+.RCWindow .RCMethods {position:216px 305px 0px;width:440px;}
+.RCWindow .RCOrderBack {position:130px 408px 0px;width:260px;height:64px;}
+.RCWindow .RCOrderConfirm {position:470px 408px 0px;width:270px;height:64px;}
+.RCWindow .RCOrderBack Label,.RCWindow .RCQRBack Label,.RCWindow .RCQRRetry Label {align:center center;font-size:23px;}
+.RCWindow .RCOrderStatus {position:48px 680px 0px;width:864px;height:36px;font-size:18px;}
+.RCWindow .RCQRHint {position:0px 106px 0px;width:100%;height:32px;text-align:center;font-size:19px;}
+.RCWindow .RCQR {position:319px 149px 0px;width:232px;height:232px;background-color:white;overflow:clip;box-shadow:none;border:0px;}
+.RCWindow .RCQRCode {position:0px 0px 0px;width:232px;height:232px;wash-color:white;opacity:1;}
+.RCWindow .RCQRState {width:210px;white-space:normal;color:#375462;}
+.RCWindow .RCExpiry {position:0px 385px 0px;height:32px;}
+.RCWindow .RCQRBack {position:305px 425px 0px;width:260px;height:56px;}
+.RCWindow .RCQRRetry {position:600px 235px 0px;width:210px;height:56px;}
+.RCWindow .RCPreviewControls {position:36px 615px 0px;width:890px;height:51px;flow-children:right;z-index:5;}
+.RCWindow .RCPreviewState {width:145px;height:44px;margin-right:3px;}
+.RCWindow .RCPreviewState Label {font-size:16px;align:center center;}
+.RCWindow .RCStateSelected {brightness:1.22;}

@@ -1,0 +1,218 @@
+[
+  {
+    "id": "achievement_shared",
+    "name": "通关与无尽共用成就徽章",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/achievement_shared.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "8114b68d5392ca1676696054f50daeec0a319ea3826ae9770cfd5eef9d008216"
+  },
+  {
+    "id": "work_theme_01",
+    "name": "老板凝视",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_01.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "c8f456321ae595928fa39b468ad883968dc7f84eb14d7f7611ac2b38e51b7dd6"
+  },
+  {
+    "id": "work_theme_02",
+    "name": "996",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_02.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "dae45d5e31ce263b86bf5df2c2b16614581fd5ac613516a7636c8d11c3e12088"
+  },
+  {
+    "id": "work_theme_03",
+    "name": "继续努力",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_03.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "f95e1e216da293a7295b51f7e9c665fe6a8e252fc1c7953d0d1fc8b57afcd2bc"
+  },
+  {
+    "id": "work_theme_04",
+    "name": "不要猝死",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_04.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "5661e758868c15b76186d40cdc6dce977bf0b2a1fee8c672396288f4379936d7"
+  },
+  {
+    "id": "work_theme_05",
+    "name": "老板买车",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_05.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "d17193f03152f44dc4eb60724d1eb7000f64a069df7512d47145b402932a82b6"
+  },
+  {
+    "id": "work_theme_06",
+    "name": "带薪拉屎",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_06.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "62166571b1242bd8f2a5be155423dc1ea5dcdf8684ba4f9760ffb2610e580201"
+  },
+  {
+    "id": "work_theme_07",
+    "name": "今晚加班",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_07.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "d57166e4f363c60ee18d7030171438b974ec6bab74eaaf774f249773db78889f"
+  },
+  {
+    "id": "work_theme_08",
+    "name": "拼好饭",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_08.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "f96ab9ca5e9ec068e3e733fa4c6337d77df51c8605953921f0a801793d7af234"
+  },
+  {
+    "id": "work_theme_09",
+    "name": "脂肪肝",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_09.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "36b8cc550de91559ad2ef42f90b03f87532421e19ae05a74feff3b5bde144411"
+  },
+  {
+    "id": "work_theme_10",
+    "name": "胃结石",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_10.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "3f156f4c5c7834c3a95658df5994db04a1e6a0ab0d8a462a0d81049a0ce73f4b"
+  },
+  {
+    "id": "work_theme_11",
+    "name": "高血压",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_11.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "268a63ef0bf1ca5da2c63b615d24c8c8cd94d5e32eae79fd49648ad862c1218d"
+  },
+  {
+    "id": "work_theme_12",
+    "name": "鸡汤",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_12.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "c61f55f197159e40628f7b7a259a7e1dab3c9c420b2bbb8f23b61ad200af0064"
+  },
+  {
+    "id": "work_theme_13",
+    "name": "画饼",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_13.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "3eb2c0eee954dfb9845f10267d928000129c13ca76e633b8d1f5f2e5217ca303"
+  },
+  {
+    "id": "work_theme_14",
+    "name": "摸鱼",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_14.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "021d6583ad2aa01d3441469cd1eb2332f32334d21a5a367781eb87757b51dac5"
+  },
+  {
+    "id": "work_theme_15",
+    "name": "咖啡",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_15.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "7e5da390f94105726765b4ea5a9c2446877573395a73a545225d99368bf25e6e"
+  },
+  {
+    "id": "work_theme_16",
+    "name": "健身房",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_16.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "8566dd5781fba745cf8da149091f2df5b31b42fd7007bb5fccfed3915adc0073"
+  },
+  {
+    "id": "work_theme_17",
+    "name": "内卷",
+    "path": "panorama/src/images/custom_game/archive_polish_v1/work_theme_17.png",
+    "width": 1254,
+    "height": 1254,
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "42c0976a12a4b6a11d9437af6c44fd3cc6db9d16951371372a4a4bb16ed45690"
+  }
+]

@@ -108,6 +108,7 @@ local function build_snapshot(payload)
 end
 
 function M.init()
+    require("ui/boss_warning_ui_service").init()
     resource_by_player = {}
     city_level_by_team = {}
     worker_count_by_team = {}

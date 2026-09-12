@@ -1,0 +1,95 @@
+{
+  "version": "9d3f5d9a06",
+  "created": "2026-09-11T18:04:33.121Z",
+  "mappedAssetCount": 63,
+  "generatedIconCount": 335,
+  "packAssetsByteIdenticalToHandoff": true,
+  "automaticProbes": false,
+  "inputs": [
+    {
+      "file": "layout/custom_game/remaining_9d3f5d9a06_assets.xml",
+      "sha256": "71d17abd947af395839082d73e57302791898419737e22ef13abe51f4741a5f5"
+    },
+    {
+      "file": "styles/custom_game/remaining_9d3f5d9a06.css",
+      "sha256": "1afbb37416716ae96e9145d495ed51f94410d998ed472853f85d8fbff0d8ddea"
+    },
+    {
+      "file": "scripts/custom_game/remaining_9d3f5d9a06.js",
+      "sha256": "9b5eb6ebeeebd3c5ace052b073654723f7a7d140cedcadbc5db5b33908afa43b"
+    },
+    {
+      "file": "scripts/custom_game/lottery_ui_remaining_9d3f5d9a06.js",
+      "sha256": "38030ecba6feaab60d78f50277f72277dc2134d6041ca15c9201a43d8189bdff"
+    },
+    {
+      "file": "layout/custom_game/survival_hud.xml",
+      "sha256": "81f197a86e4e83fe60c2dbbf05a2e503fef409d0bb3e3c164fb09053992f83aa"
+    },
+    {
+      "file": "scripts/custom_game/common/ui_components.js",
+      "sha256": "6935638f9ae6919a147948971a049a4ed387f3ff36837fab23c0f49f54dfa876"
+    },
+    {
+      "file": "scripts/custom_game/ui_layers.js",
+      "sha256": "b7e7fb4be8d4977db56f6578cd4f7d5c2783f7ddf940f21d56d9835143bab011"
+    },
+    {
+      "file": "scripts/custom_game/item_art_remaining_9d3f5d9a06.js",
+      "sha256": "1e152ebab26346095f9210b0543aa8b77dac7690d9f3b51d7653d188c41a441f"
+    },
+    {
+      "file": "scripts/custom_game/shop_remaining_9d3f5d9a06.js",
+      "sha256": "5b4bcb54d5bf89ac0702ff3436df32562e21913046a5d14a6c356103c894c07f"
+    },
+    {
+      "file": "scripts/custom_game/shop_tooltip_remaining_9d3f5d9a06.js",
+      "sha256": "c6609b420380513701a0caf7fb68581a58ed4da5622d6d718a0969973c0853ea"
+    },
+    {
+      "file": "scripts/custom_game/geometry_remaining_9d3f5d9a06.js",
+      "sha256": "7cf9f2674367c63a664f852826ede856a00b6ed3970c66e29a9f46a66380e10b"
+    },
+    {
+      "file": "scripts/custom_game/topnav_remaining_9d3f5d9a06.js",
+      "sha256": "1e205e56849f64dcc41155d867466b0a1b761a42a786b00d220df6056ec3562b"
+    },
+    {
+      "file": "scripts/custom_game/commerce_remaining_9d3f5d9a06.js",
+      "sha256": "ed65c47e0c4a74866c5aca8d8fd8a7cf016a477d4b1ee1690a016b0b7720494c"
+    },
+    {
+      "file": "scripts/custom_game/boss_warning_remaining_9d3f5d9a06.js",
+      "sha256": "67e6eeed762e34827480175e3b1cdde3c702c3a55a76c4c3b759a416ea2c8f7f"
+    },
+    {
+      "file": "scripts/custom_game/navigation_remaining_9d3f5d9a06.js",
+      "sha256": "9dfdf2abea099967b1689f4f956c7a2ded4d80f0a85cbf1872650fb2c4e5f03a"
+    },
+    {
+      "file": "scripts/custom_game/icons_remaining_9d3f5d9a06.js",
+      "sha256": "7e18f92b948f77549dc439bfba151150e91ad07b087578c661f8e8078e307855"
+    },
+    {
+      "file": "scripts/custom_game/daily_remaining_9d3f5d9a06.js",
+      "sha256": "dddb514a2e7e2fcfbf1e77d286801aeff939963ee4856a900c04a7b0a67a42a4"
+    },
+    {
+      "file": "layout/custom_game/archive.xml",
+      "sha256": "a03850bded9c3722785017936e19c4175230922ed3f156e75744c1b95450028a"
+    },
+    {
+      "file": "scripts/custom_game/rogue_art_remaining_9d3f5d9a06.js",
+      "sha256": "05287d4af758cef5086ee04292065611b977d7f442da23c1deaea788dd5bcd1e"
+    },
+    {
+      "file": "scripts/custom_game/rogue_remaining_9d3f5d9a06.js",
+      "sha256": "6f0013b22fea1b1837f82c70fa6558b14d045567afd5a6053eaaac2148232cd1"
+    },
+    {
+      "file": "layout/custom_game/rogue_reward_ui.xml",
+      "sha256": "9c869416d1215e268cb1431b334587fc0be71aef3f27daf0ad080d24f7367980"
+    }
+  ],
+  "note": "Archive icon originals are generated art, validated against project CSV. Behavior tests use mocks; actual game evidence is listed separately. No live payment validated."
+}

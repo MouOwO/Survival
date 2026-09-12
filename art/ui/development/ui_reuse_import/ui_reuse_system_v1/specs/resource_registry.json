@@ -1,0 +1,1467 @@
+{
+  "version": "1.0.0",
+  "status": "curated_assets_and_specs_not_game_integrated",
+  "design_reference": [
+    1672,
+    941
+  ],
+  "assets": {
+    "icon.nav.return": {
+      "file": "shared/icon/nav/return.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/return_64.png",
+      "source_sha256": "e7632ad0639904ab3fca9d0ffafb5803da687063fcdc9c603279dde4db13e67a",
+      "file_size": 2247,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        21,
+        19,
+        39,
+        43
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.nav.settings": {
+      "file": "shared/icon/nav/settings.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/settings_64.png",
+      "source_sha256": "e4f2c93ca0304e47527b64829d3fb059bd02096dcaf626e8116f6738a64d71da",
+      "file_size": 3118,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        21,
+        18,
+        47,
+        45
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.nav.treasure": {
+      "file": "shared/icon/nav/treasure.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/treasure_64.png",
+      "source_sha256": "a23d82f5ab97b3576dc1b6a518ec8bda0c8cc0b753091e4c738a1c61bcf24f4d",
+      "file_size": 3106,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        17,
+        20,
+        45,
+        44
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.nav.archive": {
+      "file": "shared/icon/nav/archive.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/archive_64.png",
+      "source_sha256": "f72d49a8f777cc555db6f3fe7a840e49e1d2aa9c8e72d5f8f4d9aa2f81213444",
+      "file_size": 2490,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        19,
+        18,
+        43,
+        45
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.nav.equipment": {
+      "file": "shared/icon/nav/equipment.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/equipment_64.png",
+      "source_sha256": "06faaea6af8a1c5c70c57a796ce61447e995af35e5c382000015179036a8e5cb",
+      "file_size": 2869,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        17,
+        19,
+        43,
+        44
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.nav.lottery": {
+      "file": "shared/icon/nav/lottery.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/lottery_64.png",
+      "source_sha256": "26736dbdd6ab70d6ea3170654eb080ef25b9cf270230710dae5b860ed0628c8a",
+      "file_size": 2616,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        17,
+        18,
+        46,
+        46
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.nav.benefit": {
+      "file": "shared/icon/nav/benefit.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/benefit_64.png",
+      "source_sha256": "6e2bf9fb5ddeb9da1ade471a698a77f0e9771b50d627f65005ae68364ede0987",
+      "file_size": 2373,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        17,
+        19,
+        44,
+        45
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.nav.appearance": {
+      "file": "shared/icon/nav/appearance.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/appearance_64.png",
+      "source_sha256": "f6f0b8c1625cb4038ed05f57306aef158184e73e2cd1f557a3c9d7488636c738",
+      "file_size": 2859,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        18,
+        18,
+        45,
+        45
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.nav.social": {
+      "file": "shared/icon/nav/social.png",
+      "source": "main_hud_exact_v1/03_alpha_helpers/social_64.png",
+      "source_sha256": "478cf9df4bb3bf4777a88842deb151f45933b4d0aadfac58740d4379407fb91e",
+      "file_size": 2435,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        18,
+        19,
+        47,
+        42
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "主界面极简图标为主来源；64画布内图形约28–34px，不再次缩半",
+      "recommended_display": {
+        "target_glyph_px": 28,
+        "hit_area_px": [
+          56,
+          64
+        ]
+      },
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.close": {
+      "file": "shared/icon/close.png",
+      "source": "archive_ui_kit_v1/icons_rgba/close_normal.png",
+      "source_sha256": "abf09aa54a261eaf31af405fd824c2a1bb0f8c2d797d36d94b8563a2963f79de",
+      "file_size": 1055,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        16,
+        16,
+        47,
+        47
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_alpha_needs_edge_check",
+      "note": "统一弹窗与全屏页关闭图形；关闭当前层的动作不等于官方退出",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.archive.void": {
+      "file": "shared/icon/archive/void.png",
+      "source": "archive_ui_kit_v1/icons_rgba/void_normal.png",
+      "source_sha256": "cc6b8836edbc900b3f0c9db841bfe019223411453b371f1ca6938552247ef7f4",
+      "file_size": 1169,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        11,
+        9,
+        52,
+        54
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.archive.points": {
+      "file": "shared/icon/archive/points.png",
+      "source": "archive_ui_kit_v1/icons_rgba/points_normal.png",
+      "source_sha256": "e4f28898782b210d3d71102d30dbf8c56f06b00c61310009a3ac8be9f03b6f51",
+      "file_size": 1425,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        14,
+        11,
+        47,
+        52
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.archive.weapon": {
+      "file": "shared/icon/archive/weapon.png",
+      "source": "archive_ui_kit_v1/icons_rgba/weapon_normal.png",
+      "source_sha256": "e3f03248e2e8e928c049660e180f53aa16eb40f76fb09837bb7fff82242bff9d",
+      "file_size": 1093,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        14,
+        11,
+        49,
+        52
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.archive.spell": {
+      "file": "shared/icon/archive/spell.png",
+      "source": "archive_ui_kit_v1/icons_rgba/spell_normal.png",
+      "source_sha256": "6d05467438ab6abe2beeca20e33a359064d1d0981a18c4d0255281e328bd6507",
+      "file_size": 1549,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        13,
+        11,
+        50,
+        55
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.archive.endless": {
+      "file": "shared/icon/archive/endless.png",
+      "source": "archive_ui_kit_v1/icons_rgba/endless_normal.png",
+      "source_sha256": "3cc34c7f517e01072384675744bfd570fafba40416e0a5f48fa80c86f90a1ec7",
+      "file_size": 1174,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        10,
+        22,
+        53,
+        43
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.archive.friends": {
+      "file": "shared/icon/archive/friends.png",
+      "source": "archive_ui_kit_v1/icons_rgba/friends_normal.png",
+      "source_sha256": "667221ca75e76c83557524a9a887d899b35f7998fc6adca976c4cc1e8649ad46",
+      "file_size": 1398,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        12,
+        14,
+        50,
+        47
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.archive.ex": {
+      "file": "shared/icon/archive/ex.png",
+      "source": "archive_ui_kit_v1/icons_rgba/ex_normal.png",
+      "source_sha256": "a96f92c2a545f49bd822d61ab0c50fa4841e6a76f31c1a8b572de6f2f60c80c3",
+      "file_size": 1569,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        14,
+        11,
+        49,
+        53
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.archive.blessing": {
+      "file": "shared/icon/archive/blessing.png",
+      "source": "archive_ui_kit_v1/icons_rgba/blessing_normal.png",
+      "source_sha256": "ef92d686301193976c58b244d2a0ff484c578e2b96753ec9146ffb9ce5dde842",
+      "file_size": 1370,
+      "size": [
+        64,
+        64
+      ],
+      "paint_bounds_xyxy": [
+        10,
+        8,
+        53,
+        53
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "存档分类专有语义，可跨同义页面复用；不替换实际奖励图案",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.pool_details": {
+      "file": "shared/icon/pool_details.png",
+      "source": "lottery_ui_v3/02_rgba_icons/pool_details_icon_normal.png",
+      "source_sha256": "8254c559ad31eb0cfbb39ab8aa66791fa6a69b05fb4e3a1f164751d083b28906",
+      "file_size": 769,
+      "size": [
+        48,
+        55
+      ],
+      "paint_bounds_xyxy": [
+        11,
+        10,
+        36,
+        42
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "来自V3；原画布边距不同，用paint bounds对齐",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.history": {
+      "file": "shared/icon/history.png",
+      "source": "lottery_ui_v3/02_rgba_icons/history_icon_normal.png",
+      "source_sha256": "d7b6605a4f7e9e5b4200f62c5ac51f8ca8234086d9a68dab18032582e3e82e27",
+      "file_size": 913,
+      "size": [
+        53,
+        59
+      ],
+      "paint_bounds_xyxy": [
+        10,
+        14,
+        39,
+        45
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "来自V3；原画布边距不同，用paint bounds对齐",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.add": {
+      "file": "shared/icon/add.png",
+      "source": "lottery_ui_v3/02_rgba_icons/currency_plus_normal.png",
+      "source_sha256": "0e6f50fd27ea6c43178300a58418480bee282cacb8c829281d2e202546d8f544",
+      "file_size": 728,
+      "size": [
+        38,
+        49
+      ],
+      "paint_bounds_xyxy": [
+        8,
+        10,
+        30,
+        41
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "来自V3；原画布边距不同，用paint bounds对齐",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "checkbox.off": {
+      "file": "shared/checkbox/off.png",
+      "source": "lottery_ui_v3/02_rgba_icons/skip_checkbox_normal.png",
+      "source_sha256": "e03e2975f5b5db48dff14d782a0b3935778808fb8941b7f73e3873c1ca49bcdc",
+      "file_size": 560,
+      "size": [
+        49,
+        49
+      ],
+      "paint_bounds_xyxy": [
+        10,
+        11,
+        36,
+        36
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "extracted_recolored_alpha",
+      "note": "来自V3；原画布边距不同，用paint bounds对齐",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "button.ivory.normal": {
+      "file": "shared/button/ivory/normal.png",
+      "source": "lottery_ui_v3/03_states/button_ivory_normal.png",
+      "source_sha256": "b240aa70690d62af0027a4b746d7b1a0dc9cadea48b31c654d26d19d9b01cec9",
+      "file_size": 2816,
+      "size": [
+        312,
+        72
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        4,
+        312,
+        68
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理",
+      "recommended_display": {
+        "canvas_size": [
+          312,
+          72
+        ]
+      },
+      "state_policy": "explicit_state_family"
+    },
+    "button.ivory.hover": {
+      "file": "shared/button/ivory/hover.png",
+      "source": "lottery_ui_v3/03_states/button_ivory_hover.png",
+      "source_sha256": "6c404f335af47cd71cbc855ef02393d5492ccc9f150cda86ec7f06f6ff9e95a0",
+      "file_size": 2607,
+      "size": [
+        312,
+        72
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        4,
+        312,
+        68
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理",
+      "recommended_display": {
+        "canvas_size": [
+          312,
+          72
+        ]
+      },
+      "state_policy": "explicit_state_family"
+    },
+    "button.ivory.pressed": {
+      "file": "shared/button/ivory/pressed.png",
+      "source": "lottery_ui_v3/03_states/button_ivory_pressed.png",
+      "source_sha256": "30d6552a3f3219ee16f9e78f5544f631053164808f19533e9c08bb9b381069c5",
+      "file_size": 2972,
+      "size": [
+        312,
+        72
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        4,
+        312,
+        68
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理",
+      "recommended_display": {
+        "canvas_size": [
+          312,
+          72
+        ]
+      },
+      "state_policy": "explicit_state_family"
+    },
+    "button.ivory.disabled": {
+      "file": "shared/button/ivory/disabled.png",
+      "source": "lottery_ui_v3/03_states/button_ivory_disabled.png",
+      "source_sha256": "d9854ac76c3122defd68f91e942f48ff77503b7c6d342e2103d9980f1b9d8737",
+      "file_size": 2777,
+      "size": [
+        312,
+        72
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        4,
+        312,
+        68
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理",
+      "recommended_display": {
+        "canvas_size": [
+          312,
+          72
+        ]
+      },
+      "state_policy": "explicit_state_family"
+    },
+    "button.gold.normal": {
+      "file": "shared/button/gold/normal.png",
+      "source": "lottery_ui_v3/03_states/button_gold_normal.png",
+      "source_sha256": "aa981739abbac606def46fda90cb84b1121d3ccfb8f0b1231291c8c85ec79653",
+      "file_size": 2688,
+      "size": [
+        312,
+        72
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        4,
+        312,
+        68
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理",
+      "recommended_display": {
+        "canvas_size": [
+          312,
+          72
+        ]
+      },
+      "state_policy": "explicit_state_family"
+    },
+    "button.gold.hover": {
+      "file": "shared/button/gold/hover.png",
+      "source": "lottery_ui_v3/03_states/button_gold_hover.png",
+      "source_sha256": "a67521688089bf8dbc227fe44ebc73c1a42546d04e98e9e5e1fd6b68c8398d84",
+      "file_size": 2587,
+      "size": [
+        312,
+        72
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        4,
+        312,
+        68
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理",
+      "recommended_display": {
+        "canvas_size": [
+          312,
+          72
+        ]
+      },
+      "state_policy": "explicit_state_family"
+    },
+    "button.gold.pressed": {
+      "file": "shared/button/gold/pressed.png",
+      "source": "lottery_ui_v3/03_states/button_gold_pressed.png",
+      "source_sha256": "af73f6a8ae66162266a500603dcc953d5c0f4fe0628f5dab55bb1b94c2975db6",
+      "file_size": 2905,
+      "size": [
+        312,
+        72
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        4,
+        312,
+        68
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理",
+      "recommended_display": {
+        "canvas_size": [
+          312,
+          72
+        ]
+      },
+      "state_policy": "explicit_state_family"
+    },
+    "button.gold.disabled": {
+      "file": "shared/button/gold/disabled.png",
+      "source": "lottery_ui_v3/03_states/button_gold_disabled.png",
+      "source_sha256": "e8ceb401f30cd53978ec2901cbb772a721c81aeece12efab1fefd0eecb556e2f",
+      "file_size": 2676,
+      "size": [
+        312,
+        72
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        4,
+        312,
+        68
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "统一简化无字按钮候选；旧V3补做图，非原效果图逐像素纹理",
+      "recommended_display": {
+        "canvas_size": [
+          312,
+          72
+        ]
+      },
+      "state_policy": "explicit_state_family"
+    },
+    "overlay.tab_selected_overlay": {
+      "file": "shared/overlay/tab_selected_overlay.png",
+      "source": "lottery_ui_v3/03_states/tab_selected_overlay.png",
+      "source_sha256": "59dd3c9f52ec19ce3cc787bd46d6376f609dfcf2e818cd55797c455c875c11dc",
+      "file_size": 967,
+      "size": [
+        201,
+        24
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        3,
+        201,
+        19
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "保持选中与悬停独立；关闭选中时清理高亮",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "overlay.tab_hover_overlay": {
+      "file": "shared/overlay/tab_hover_overlay.png",
+      "source": "lottery_ui_v3/03_states/tab_hover_overlay.png",
+      "source_sha256": "4aba7e594329381c382c32756206afa877cf7471bd411fcc1c143ccf66470830",
+      "file_size": 149,
+      "size": [
+        201,
+        24
+      ],
+      "paint_bounds_xyxy": [
+        10,
+        10,
+        191,
+        12
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "保持选中与悬停独立；关闭选中时清理高亮",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "overlay.entry_hover_underline": {
+      "file": "shared/overlay/entry_hover_underline.png",
+      "source": "lottery_ui_v3/03_states/entry_hover_underline.png",
+      "source_sha256": "487bbe54b95fc1c6d320d00bf69d922d966cf8f9364cb84f93c38a27b06fc8a3",
+      "file_size": 131,
+      "size": [
+        155,
+        8
+      ],
+      "paint_bounds_xyxy": [
+        0,
+        3,
+        155,
+        5
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "保持选中与悬停独立；关闭选中时清理高亮",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "card.border.normal": {
+      "file": "shared/card/border/normal.png",
+      "source": "lottery_ui_v3/03_states/card_outline_normal.png",
+      "source_sha256": "fdd9b3c4e70bca0df1313391b90949292685f6975eb13adac0360f7f44c63b63",
+      "file_size": 721,
+      "size": [
+        167,
+        157
+      ],
+      "paint_bounds_xyxy": [
+        1,
+        1,
+        166,
+        156
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "只作为独立状态叠层；不得与底板自带边框双重叠加",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "card.border.hover": {
+      "file": "shared/card/border/hover.png",
+      "source": "lottery_ui_v3/03_states/card_outline_hover.png",
+      "source_sha256": "daa146af8157f67a6ec4b3fa46819fe2fec9468398b835f43ce718d72135e532",
+      "file_size": 687,
+      "size": [
+        167,
+        157
+      ],
+      "paint_bounds_xyxy": [
+        1,
+        1,
+        166,
+        156
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "只作为独立状态叠层；不得与底板自带边框双重叠加",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "card.border.pressed": {
+      "file": "shared/card/border/pressed.png",
+      "source": "lottery_ui_v3/03_states/card_outline_pressed.png",
+      "source_sha256": "9746ec32e3b7f5acbbc8b7150f8b16e17e5454c9dbcd98b9ca7fc0ba8fc2faaf",
+      "file_size": 718,
+      "size": [
+        167,
+        157
+      ],
+      "paint_bounds_xyxy": [
+        1,
+        1,
+        166,
+        156
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "只作为独立状态叠层；不得与底板自带边框双重叠加",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "card.border.disabled": {
+      "file": "shared/card/border/disabled.png",
+      "source": "lottery_ui_v3/03_states/card_outline_disabled.png",
+      "source_sha256": "06314585300d8c7c310a1cb34fc256a607cbca1fbc21902d59f3871992741e34",
+      "file_size": 717,
+      "size": [
+        167,
+        157
+      ],
+      "paint_bounds_xyxy": [
+        1,
+        1,
+        166,
+        156
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "只作为独立状态叠层；不得与底板自带边框双重叠加",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "card.border.selected": {
+      "file": "shared/card/border/selected.png",
+      "source": "lottery_ui_v3/03_states/card_outline_selected.png",
+      "source_sha256": "ef7789a0df08fecbb867fe1068bc1a26de652c0a0b62599c9550af8048fbb12f",
+      "file_size": 703,
+      "size": [
+        167,
+        157
+      ],
+      "paint_bounds_xyxy": [
+        1,
+        1,
+        166,
+        156
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "只作为独立状态叠层；不得与底板自带边框双重叠加",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "checkbox.on.normal": {
+      "file": "shared/checkbox/on/normal.png",
+      "source": "lottery_ui_v3/03_states/checkbox_checked_normal.png",
+      "source_sha256": "5f592b24453edf1f55f2cbd0a0eb31b9af7e42c110b38318d7d7b519d5eca693",
+      "file_size": 415,
+      "size": [
+        33,
+        33
+      ],
+      "paint_bounds_xyxy": [
+        3,
+        3,
+        30,
+        30
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "checked与off画布不同，统一视觉框后切换",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "checkbox.on.hover": {
+      "file": "shared/checkbox/on/hover.png",
+      "source": "lottery_ui_v3/03_states/checkbox_checked_hover.png",
+      "source_sha256": "a7aa46b115663c50bcd6d595878ec2a2baffc231e8de68feca69b52521ae7257",
+      "file_size": 396,
+      "size": [
+        33,
+        33
+      ],
+      "paint_bounds_xyxy": [
+        3,
+        3,
+        30,
+        30
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "checked与off画布不同，统一视觉框后切换",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "checkbox.on.pressed": {
+      "file": "shared/checkbox/on/pressed.png",
+      "source": "lottery_ui_v3/03_states/checkbox_checked_pressed.png",
+      "source_sha256": "d2b1d7852b78b8d5533cc76733f393ffc2e2408b2a2bc576a8ba427630416f69",
+      "file_size": 421,
+      "size": [
+        33,
+        33
+      ],
+      "paint_bounds_xyxy": [
+        3,
+        3,
+        30,
+        30
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "checked与off画布不同，统一视觉框后切换",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "checkbox.on.disabled": {
+      "file": "shared/checkbox/on/disabled.png",
+      "source": "lottery_ui_v3/03_states/checkbox_checked_disabled.png",
+      "source_sha256": "5fb159309ecabe7437f818c78521ab31f7a9360f712e5514b14cc48419fe0cae",
+      "file_size": 408,
+      "size": [
+        33,
+        33
+      ],
+      "paint_bounds_xyxy": [
+        3,
+        3,
+        30,
+        30
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "checked与off画布不同，统一视觉框后切换",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "icon.ticket": {
+      "file": "shared/icon/ticket.png",
+      "source": "lottery_ui_v3/03_states/ticket_normal.png",
+      "source_sha256": "eed8a440cdbf8aab3714b4a04fd9daad562f6735308a2b1bf78ae25b89fd599a",
+      "file_size": 656,
+      "size": [
+        48,
+        48
+      ],
+      "paint_bounds_xyxy": [
+        10,
+        4,
+        38,
+        44
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "existing_procedural_candidate",
+      "note": "",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "nav.toggle.normal": {
+      "file": "shared/nav/toggle/normal.png",
+      "source": "archive_ui_kit_v1/reusable/toggle_normal.png",
+      "source_sha256": "5d1c015da2cca5bcd97a877e28cc32db501b473c6dbcb93134e0cee84c5dd46c",
+      "file_size": 22212,
+      "size": [
+        256,
+        76
+      ],
+      "paint_bounds_xyxy": [
+        4,
+        11,
+        252,
+        64
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "generated_candidate_needs_alignment",
+      "note": "沿用旧存档底板候选；不同态图形边界需固定对齐，不能按各态alpha裁边",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "nav.toggle.hover": {
+      "file": "shared/nav/toggle/hover.png",
+      "source": "archive_ui_kit_v1/reusable/toggle_hover.png",
+      "source_sha256": "a4317bf0c1910585ebd9939e9e9f03c7d5a559f6a14a3954027c2bc02180c4be",
+      "file_size": 24984,
+      "size": [
+        256,
+        76
+      ],
+      "paint_bounds_xyxy": [
+        4,
+        10,
+        252,
+        65
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "generated_candidate_needs_alignment",
+      "note": "沿用旧存档底板候选；不同态图形边界需固定对齐，不能按各态alpha裁边",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "nav.toggle.selected": {
+      "file": "shared/nav/toggle/selected.png",
+      "source": "archive_ui_kit_v1/reusable/toggle_selected.png",
+      "source_sha256": "ee2bb95df1665b3d368eb9f7f8aa708066aa5fca9d29a5ac9736762428cd7ae6",
+      "file_size": 21028,
+      "size": [
+        256,
+        76
+      ],
+      "paint_bounds_xyxy": [
+        4,
+        11,
+        252,
+        64
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "generated_candidate_needs_alignment",
+      "note": "沿用旧存档底板候选；不同态图形边界需固定对齐，不能按各态alpha裁边",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "badge.progress": {
+      "file": "shared/badge/progress.png",
+      "source": "archive_ui_kit_v1/reusable/badge_progress.png",
+      "source_sha256": "8290b54f9bf12b997efe7a49fd07b02d55170a8e6f7e49680990bdebdd779330",
+      "file_size": 8543,
+      "size": [
+        140,
+        44
+      ],
+      "paint_bounds_xyxy": [
+        4,
+        4,
+        136,
+        39
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "generated_candidate",
+      "note": "当前/目标与解锁字样由数据渲染，不画进底板",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "badge.unlocked": {
+      "file": "shared/badge/unlocked.png",
+      "source": "archive_ui_kit_v1/reusable/badge_unlocked.png",
+      "source_sha256": "9c75d8042dabb594ba4699e1e02ae326c8a7bd85c702e4eb1e17d47b03eca36e",
+      "file_size": 9032,
+      "size": [
+        140,
+        44
+      ],
+      "paint_bounds_xyxy": [
+        4,
+        4,
+        136,
+        39
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "generated_candidate",
+      "note": "当前/目标与解锁字样由数据渲染，不画进底板",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "badge.locked": {
+      "file": "shared/badge/locked.png",
+      "source": "archive_ui_kit_v1/reusable/badge_locked.png",
+      "source_sha256": "db64c5fc43a915dd02f891929c6d454a834ac3e614ab56cde522c63cec5ec948",
+      "file_size": 8832,
+      "size": [
+        140,
+        44
+      ],
+      "paint_bounds_xyxy": [
+        4,
+        4,
+        136,
+        39
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "generated_candidate",
+      "note": "当前/目标与解锁字样由数据渲染，不画进底板",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "card.body.ivory": {
+      "file": "shared/card/body/ivory.png",
+      "source": "archive_ui_kit_v1/reusable/card_normal.png",
+      "source_sha256": "9edb6b106aac46d88fe59880508066076fc438507a131626629263f04e5b0f50",
+      "file_size": 36950,
+      "size": [
+        176,
+        176
+      ],
+      "paint_bounds_xyxy": [
+        4,
+        5,
+        172,
+        170
+      ],
+      "transparent": true,
+      "scope": "shared",
+      "quality": "generated_candidate",
+      "note": "存档卡/商品卡可共用内容底板概念；允许按皮肤选择细框，避免重复叠框",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "texture.ivory": {
+      "file": "shared/texture/ivory.png",
+      "source": "archive_ui_kit_v1/background_tiles/ivory_texture.png",
+      "source_sha256": "2adf38b837d3fb55a3858509b727672d6b78f04a97c9815054a9d773ee9d833e",
+      "file_size": 7640,
+      "size": [
+        150,
+        50
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "shared",
+      "quality": "source_sample_not_seamless",
+      "note": "底纹样本不保证平铺无缝，不可直接铺满大屏",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "texture.teal": {
+      "file": "shared/texture/teal.png",
+      "source": "archive_ui_kit_v1/background_tiles/teal_texture.png",
+      "source_sha256": "48d456b5bbc7d79b904aa97bde4b9f71fa9e6b8e24a65fa559105273f608864b",
+      "file_size": 681,
+      "size": [
+        45,
+        18
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "shared",
+      "quality": "source_sample_not_seamless",
+      "note": "底纹样本不保证平铺无缝，不可直接铺满大屏",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "scene.treasure": {
+      "file": "page_assets/scene/treasure.png",
+      "source": "lottery_ui_handoff_v2/assets/scene_clean.png",
+      "source_sha256": "ed3ffd239298351b94bb0f44a064fced050ac31e8c6a7ed1e2bee197cbc65ffb",
+      "file_size": 2702458,
+      "size": [
+        1672,
+        941
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "generated_flat_background",
+      "note": "可共享同主题背景板；宝箱与景观已合成，不能当成独立纯场景/透明宝箱层",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "roguelike.back": {
+      "file": "page_assets/roguelike/back.png",
+      "source": "roguelike_ui_v1/assets/back.png",
+      "source_sha256": "7fb54970b9e1a3b80c666ac9719c12b67dd2007be70aea9648b01d17e0fe3383",
+      "file_size": 506565,
+      "size": [
+        352,
+        816
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "opaque_original_crop",
+      "note": "卡框与立绘合成、保留深青背景；共用同一张back，暂不强行与方形奖励卡合并",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "roguelike.combat": {
+      "file": "page_assets/roguelike/combat.png",
+      "source": "roguelike_ui_v1/assets/combat.png",
+      "source_sha256": "1afb4872d577c85b56dddce4eeda4c29f7738e64a79461bf78bda24428721cad",
+      "file_size": 490330,
+      "size": [
+        352,
+        816
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "opaque_original_crop",
+      "note": "卡框与立绘合成、保留深青背景；共用同一张back，暂不强行与方形奖励卡合并",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "roguelike.growth": {
+      "file": "page_assets/roguelike/growth.png",
+      "source": "roguelike_ui_v1/assets/growth.png",
+      "source_sha256": "4b4b6bbc3673f897de4012143372263cb88e363548dd7effe5fbfb3a42daa348",
+      "file_size": 496804,
+      "size": [
+        352,
+        816
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "opaque_original_crop",
+      "note": "卡框与立绘合成、保留深青背景；共用同一张back，暂不强行与方形奖励卡合并",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "roguelike.defense": {
+      "file": "page_assets/roguelike/defense.png",
+      "source": "roguelike_ui_v1/assets/defense.png",
+      "source_sha256": "54604448689021c3fa86bf7eff802b7f67439b48ea975f726f5ffdf3503b8e19",
+      "file_size": 501964,
+      "size": [
+        352,
+        816
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "opaque_original_crop",
+      "note": "卡框与立绘合成、保留深青背景；共用同一张back，暂不强行与方形奖励卡合并",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "frame.hud.tl": {
+      "file": "page_assets/frame/hud/tl.png",
+      "source": "main_hud_exact_v1/02_frames/hero_tl.png",
+      "source_sha256": "98dd2ad0b213e19cad1e4a84787f187db35fe21bda242334dd319af7afcea066",
+      "file_size": 512,
+      "size": [
+        12,
+        12
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "exact_border_band_reference",
+      "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "frame.hud.top": {
+      "file": "page_assets/frame/hud/top.png",
+      "source": "main_hud_exact_v1/02_frames/hero_top.png",
+      "source_sha256": "499b2b33815eef21071bfcb71dd6aaa7f9c6d99187a0bfd182d66bea5c2af6ef",
+      "file_size": 7093,
+      "size": [
+        508,
+        12
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "exact_border_band_reference",
+      "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "frame.hud.tr": {
+      "file": "page_assets/frame/hud/tr.png",
+      "source": "main_hud_exact_v1/02_frames/hero_tr.png",
+      "source_sha256": "b7a76aec5ff35edcd57e7b2d146538bc0b1c10e921434e38e89e2229d8a3a15d",
+      "file_size": 470,
+      "size": [
+        12,
+        12
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "exact_border_band_reference",
+      "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "frame.hud.left": {
+      "file": "page_assets/frame/hud/left.png",
+      "source": "main_hud_exact_v1/02_frames/hero_left.png",
+      "source_sha256": "63452e378a2e37954aaca568e9e9bb0024e8e53c3308295fb6203b90938563b0",
+      "file_size": 2994,
+      "size": [
+        12,
+        141
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "exact_border_band_reference",
+      "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "frame.hud.right": {
+      "file": "page_assets/frame/hud/right.png",
+      "source": "main_hud_exact_v1/02_frames/hero_right.png",
+      "source_sha256": "0f57255b667ae12658f288d7786769f862db46315ebde9bec7d882cc6e47e1fa",
+      "file_size": 2771,
+      "size": [
+        12,
+        141
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "exact_border_band_reference",
+      "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "frame.hud.bl": {
+      "file": "page_assets/frame/hud/bl.png",
+      "source": "main_hud_exact_v1/02_frames/hero_bl.png",
+      "source_sha256": "dd6af4151224daf123dbe676adebb38dab6d575d635baa5e57f8192bd3800518",
+      "file_size": 451,
+      "size": [
+        12,
+        12
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "exact_border_band_reference",
+      "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "frame.hud.bottom": {
+      "file": "page_assets/frame/hud/bottom.png",
+      "source": "main_hud_exact_v1/02_frames/hero_bottom.png",
+      "source_sha256": "e4033ab40b05f78f393c9b17a182116911ead815d2553b3e1fc52e7a350a5e9c",
+      "file_size": 8028,
+      "size": [
+        508,
+        12
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "exact_border_band_reference",
+      "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    },
+    "frame.hud.br": {
+      "file": "page_assets/frame/hud/br.png",
+      "source": "main_hud_exact_v1/02_frames/hero_br.png",
+      "source_sha256": "a11a2f23a2b29676d1424909d217acae5309593ea1fd5bfb86f4f31b334c1286",
+      "file_size": 448,
+      "size": [
+        12,
+        12
+      ],
+      "paint_bounds_xyxy": null,
+      "transparent": false,
+      "scope": "page_specific",
+      "quality": "exact_border_band_reference",
+      "note": "保留原图像素，但带相邻背景；不是现成任意尺寸透明九宫格",
+      "recommended_display": null,
+      "state_policy": "normal_asset_plus_component_state"
+    }
+  },
+  "pending_assets": {
+    "frame.window": "需要从选定窗口母版一次性制作干净通用边框；现有矩形边框带与整块shell_body均不是无损透明九宫格",
+    "texture.ivory.seamless": "当前只有样本，需精修一次或先用统一纯色",
+    "texture.header.seamless": "当前只有样本，需精修一次或先用统一渐变",
+    "scene.neutral": "可选；无主题纯场景尚未独立。不得冒充已拆出宝箱与景观",
+    "icon.shop": "商城标题图标尚无批准的独立透明源，先复用语义明确的宝物/商城图标候选后一次定稿，不截每个分栏一份",
+    "icon.search": "现有批准极简体系中未有独立搜索源，先复用项目已有已验收资源或一次补齐，禁止emoji兜底"
+  }
+}

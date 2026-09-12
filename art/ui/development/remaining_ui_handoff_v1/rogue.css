@@ -1,0 +1,24 @@
+/* roguelike_alpha_v1: 352 x 816 sources, 290 x 672 design rectangles. */
+/* Transparent mandatory-choice input surface; no full-screen painted backdrop. */
+#RogueRewardBackdrop {background-image:none;background-color:transparent;}
+/* Hover grows beyond the original slot. Preserve clipping only for text scroll. */
+#RogueRewardSurface,#RogueRewardCards,
+#RogueRewardSurface .RogueSlot,#RogueRewardSurface .RoguePick,
+#RogueRewardSurface .RogueFlip {overflow:noclip;}
+#RogueRewardSurface .RogueSlot {width:290px;height:672px;transition-duration:.65s,.12s;}
+#RogueRewardSurface .RogueFront,#RogueRewardSurface .RogueBack {background-color:transparent;}
+#RogueRewardSurface .RogueArt_combat {background-image:asset(rogue_combat);}
+#RogueRewardSurface .RogueArt_growth {background-image:asset(rogue_growth);}
+#RogueRewardSurface .RogueArt_defense {background-image:asset(rogue_defense);}
+#RogueRewardSurface .RogueBack {background-image:asset(rogue_back);}
+#RogueRewardSurface .RogueCopy {position:27px 429px 0px;width:236px;height:210px;}
+#RogueRewardSurface .RogueCardName {font-family:"Source Han Serif SC";font-weight:bold;font-size:26px;color:#254755;}
+#RogueRewardSurface .RogueCardDescription {font-family:"Source Han Sans SC";font-size:18px;line-height:24px;color:#3e5962;}
+#RogueRewardSurface .RogueRewardTitle {font-family:"Source Han Serif SC";font-weight:bold;}
+#RogueRewardSurface .RoguePick {box-shadow:none;transition-duration:.16s;transition-property:transform,brightness;}
+#RogueRewardSurface .RoguePick:enabled:hover {box-shadow:none;brightness:1.06;transform:translate3d(0px,-4px,0px) scale3d(1.035,1.035,1);}
+#RogueRewardSurface .RogueChosen .RoguePick {box-shadow:none;brightness:1.10;}
+#RogueRewardStatus {position:400px 146px 0px;height:30px;}
+#RogueRewardReroll {visibility:collapse;}
+/* Keep this control above the cards, clear of a widened native combat HUD. */
+#RogueReducedMotion {position:1130px 118px 0px;}

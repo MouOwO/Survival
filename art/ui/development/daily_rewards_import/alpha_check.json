@@ -1,0 +1,770 @@
+[
+  {
+    "id": "daily.item.coins",
+    "size": [
+      146,
+      150
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.item.wood",
+    "size": [
+      146,
+      150
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.item.book",
+    "size": [
+      146,
+      150
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.item.ticket",
+    "size": [
+      146,
+      150
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.item.crystals",
+    "size": [
+      146,
+      150
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.item.material",
+    "size": [
+      146,
+      150
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.body",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGB"
+  },
+  {
+    "id": "daily.card.week_end",
+    "size": [
+      320,
+      405
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGB"
+  },
+  {
+    "id": "daily.badge.pass.active",
+    "size": [
+      253,
+      54
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.badge.premium",
+    "size": [
+      139,
+      40
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.badge.today",
+    "size": [
+      236,
+      43
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.button.claim.normal",
+    "size": [
+      318,
+      70
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window",
+    "size": [
+      1554,
+      852
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.icon.calendar.normal",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.close_local.normal",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.info.normal",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.rules_local.normal",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.pass.normal",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.claimed",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.item.weapon",
+    "size": [
+      203,
+      190
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.item.ticket_small",
+    "size": [
+      108,
+      97
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.button.claim.hover",
+    "size": [
+      318,
+      70
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.week_end.hover",
+    "size": [
+      320,
+      405
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGB"
+  },
+  {
+    "id": "daily.card.hover",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGB"
+  },
+  {
+    "id": "daily.button.claim.pressed",
+    "size": [
+      318,
+      70
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.week_end.pressed",
+    "size": [
+      320,
+      405
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGB"
+  },
+  {
+    "id": "daily.card.pressed",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGB"
+  },
+  {
+    "id": "daily.button.claim.disabled",
+    "size": [
+      318,
+      70
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.week_end.disabled",
+    "size": [
+      320,
+      405
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGB"
+  },
+  {
+    "id": "daily.card.disabled",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGB"
+  },
+  {
+    "id": "daily.icon.calendar.hover",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.calendar.pressed",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.calendar.disabled",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      97
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.close_local.hover",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.close_local.pressed",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.close_local.disabled",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      97
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.info.hover",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.info.pressed",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.info.disabled",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      97
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.rules_local.hover",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.rules_local.pressed",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.rules_local.disabled",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      97
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.pass.hover",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.pass.pressed",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.pass.disabled",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      97
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.badge.pass.inactive",
+    "size": [
+      253,
+      54
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.border.today",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.empty",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.empty.hover",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.empty.pressed",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.card.empty.disabled",
+    "size": [
+      153,
+      385
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "daily.icon.lock",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.clock",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "daily.icon.spinner",
+    "size": [
+      64,
+      64
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "P"
+  },
+  {
+    "id": "shared.candidate.daily_window.r0c0",
+    "size": [
+      32,
+      32
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.r0c1",
+    "size": [
+      1490,
+      32
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.r0c2",
+    "size": [
+      32,
+      32
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.r1c0",
+    "size": [
+      32,
+      788
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.r1c1",
+    "size": [
+      1490,
+      788
+    ],
+    "alpha": [
+      255,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.r1c2",
+    "size": [
+      32,
+      788
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.r2c0",
+    "size": [
+      32,
+      32
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.r2c1",
+    "size": [
+      1490,
+      32
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.r2c2",
+    "size": [
+      32,
+      32
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "id": "shared.candidate.daily_window.layout",
+    "size": [
+      1348,
+      758
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "mode": "RGBA"
+  }
+]

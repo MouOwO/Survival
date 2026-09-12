@@ -1,0 +1,12 @@
+.HandoffBossWarning {width:100%;height:100%;z-index:30;opacity:0;transition-property:opacity;transition-duration:.3s;}
+.HandoffBossWarning.BossWarningVisible {opacity:1;transition-duration:.2s;}
+.BossWarningEdge {width:100%;height:100%;background-color:gradient(radial,50% 50%,0% 0%,70% 70%,from(#541e2600),color-stop(.62,#541e2600),to(#541e2699));}
+.BossWarningBand {width:100%;height:260px;vertical-align:center;background-color:gradient(linear,0% 0%,0% 100%,from(#161e2600),color-stop(.3,#161e263d),color-stop(.7,#161e263d),to(#161e2600));}
+.BossWarningDesign {width:1672px;height:941px;align:center center;overflow:noclip;}
+.BossWarningIcon {position:813px 369px 0px;width:46px;height:46px;}
+.BossWarningLineLeft,.BossWarningLineRight {width:265px;height:1px;background-color:#d9aa77;position:462px 393px 0px;}
+.BossWarningLineRight {position:945px 393px 0px;}
+/* Declare the script-loaded image as a compiler dependency. */
+.BossWarningAssetDependency {background-image:asset(boss_warning_icon);}
+.BossWarningTitle {position:336px 419px 0px;width:1000px;height:92px;font-family:"Source Han Sans SC";font-weight:bold;font-size:72px;text-align:center;color:#f3dcad;text-shadow:0px 2px 3px 1 #18202a88;}
+.BossWarningSubtitle {position:536px 523px 0px;width:600px;height:44px;font-family:"Source Han Sans SC";font-size:26px;text-align:center;color:#ecd5ae;}

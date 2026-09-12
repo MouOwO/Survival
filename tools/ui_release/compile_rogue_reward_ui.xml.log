@@ -1,0 +1,132 @@
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\layout\custom_game\rogue_reward_ui.xml
+- dota_addons\survival\panorama\scripts\custom_game\common\ui_components.js
+- dota_addons\survival\panorama\scripts\custom_game\common\ui_registry.js
+- dota_addons\survival\panorama\scripts\custom_game\remaining_5d5c1152eb.js
+- dota_addons\survival\panorama\scripts\custom_game\rogue_art_remaining_5d5c1152eb.js
+- dota_addons\survival\panorama\scripts\custom_game\rogue_remaining_5d5c1152eb.js
+- dota_addons\survival\panorama\scripts\custom_game\ui_layers.js
+- dota_addons\survival\panorama\styles\custom_game\common\ui_components.css
+  +- dota_addons\survival\panorama\images\ui\shared\badge\progress_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 140x44x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\button\gold\disabled_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\button\gold\hover_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\button\gold\normal_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\button\gold\pressed_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\button\ivory\disabled_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\button\ivory\hover_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\button\ivory\normal_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\button\ivory\pressed_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\card\body\ivory_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\card\border\hover_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\card\border\selected_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\checkbox\on\disabled_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 33x33x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\checkbox\on\hover_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 33x33x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\checkbox\on\pressed_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 33x33x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\nav\toggle\hover_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\nav\toggle\normal_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\nav\toggle\selected_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\overlay\tab_hover_overlay_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\shared\overlay\tab_selected_overlay_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+- dota_addons\survival\panorama\styles\custom_game\common\ui_typography.css
+- dota_addons\survival\panorama\styles\custom_game\remaining_5d5c1152eb.css
+  +- dota_addons\survival\panorama\images\custom_game\archive_handoff_v1\content_background_png.vtex
+       Read 1 Input(s): 5ms
+       Ran Texture Processors: 3ms
+       Generated Mips and Output: 3ms
+  +- dota_addons\survival\panorama\images\custom_game\archive_handoff_v1\interaction_components_v2_card_normal_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\custom_game\remaining_handoff_ready\boss_warning_icon_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 32x32x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\remaining_handoff_ready\daily_rules_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 64x64x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\remaining_handoff_ready\rogue_back_png.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 352x816x1 texture to BGRA8888 (Q=3): 1ms
+  +- dota_addons\survival\panorama\images\custom_game\remaining_handoff_ready\rogue_combat_png.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 352x816x1 texture to BGRA8888 (Q=3): 1ms
+  +- dota_addons\survival\panorama\images\custom_game\remaining_handoff_ready\rogue_defense_png.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 352x816x1 texture to BGRA8888 (Q=3): 1ms
+  +- dota_addons\survival\panorama\images\custom_game\remaining_handoff_ready\rogue_growth_png.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 352x816x1 texture to BGRA8888 (Q=3): 1ms
+  +- dota_addons\survival\panorama\images\custom_game\remaining_handoff_ready\scroll_thumb_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 16x72x1 texture to BGRA8888 (Q=3): 0ms
+  +- dota_addons\survival\panorama\images\custom_game\remaining_handoff_ready\scroll_track_png.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 16x240x1 texture to BGRA8888 (Q=3): 0ms
+- dota_addons\survival\panorama\styles\custom_game\rogue_reward_ui.css
+  +- dota_addons\survival\panorama\images\ui\page_assets\roguelike\back_png.vtex
+       Read 1 Input(s): 4ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\page_assets\roguelike\combat_png.vtex
+       Read 1 Input(s): 4ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\page_assets\roguelike\defense_png.vtex
+       Read 1 Input(s): 4ms
+       Generated Mips and Output: 0ms
+  +- dota_addons\survival\panorama\images\ui\page_assets\roguelike\growth_png.vtex
+       Read 1 Input(s): 4ms
+       Generated Mips and Output: 0ms
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Leaked KeyValues blocks: 162

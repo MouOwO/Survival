@@ -1,0 +1,21 @@
+test_lottery.cjs
+LOTTERY_UI_PASS: single/ten, request guard, server data, replay, skipped/cancelled reveal, stale pools, balance, details, history, placeholders, XML callbacks
+LOTTERY_LAYER_PASS: numeric-only styles, nested modal, repeated close, original layer restored
+LOTTERY_V2_PASS: four pools, real selection, empty/loading/stale states, modal draw guard and close
+LOTTERY_FIXED_DESIGN_PASS: native scale compensation, uniform transform, shared modal sizing
+LOTTERY_REAL_ART_PASS: configured resources on pool/results, real names/counts retained
+LOTTERY_INDEPENDENT_DETAILS_PASS: modal selection, late response and subsequent draw remain isolated; shared shell; legacy frame removed
+REMAINING_HISTORY_PASS: independent pool filter, close preserves main pool and drawing unlocks
+RESULT_LIFECYCLE_PASS: closed pending, late reply, ten independent rewards, long names/counts, replay, repeated confirm/skip
+
+test_daily.cjs
+DAILY_UI_PASS: production shared components, seven cards, independent slots, busy/failed/retry, sequence, day reset, purchase, close and cleanup
+
+test_rogue.cjs
+ROGUE_UI_PASS: same launch origin, midpoint face switch, ready lock, real data, repeat guard, error retry, reroll, reduced motion and timer cleanup
+
+test_commerce.cjs
+COMMERCE_COMPONENT_PASS: empty states, 4x2/2x2 structures, authoritative price gate, explicit method, duplicate guard, mismatched/stale/expired order and lifecycle. No live payment tested.
+
+test_archive_icons.cjs
+ARCHIVE_ICONS_PASS: 335 ID mappings, aspect ratio, real counts, category isolation, lazy read-only preview, shared shop/reward art, safe reload, business code unchanged

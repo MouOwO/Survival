@@ -234,7 +234,7 @@
 - 隔离 sibling addon `survival_ta_portrait_probe` 已改为可玩运行时探针：Lua 生成一个播放 `idle` 的 TA `prop_dynamic` 主体和三个 CSV 穿戴 `prop_dynamic`；每件穿戴严格按生产顺序执行 `SetOwner(body)` 后 `FollowEntity(body, true)`，且不接收独立动画命令。正式 `survival` 运行逻辑和生产 CSV 未为探针改写。
 - 主体模型、动画和缩放来自 `asset_catalog.csv`，死亡塔引用由 `tower_class_death.csv` 交叉确认；三个穿戴的模型、实体类型、`bone_merge` 元数据、缩放和排序来自 `asset_components.csv`。spike 自己的 `scene.csv` 只提供地图、变换、镜头和灯光参数；生成器据此输出 `ta_portrait_probe_runtime_config.lua`，运行时 Lua 不硬编码模型路径。
 - 静态 `DOTAScenePanel` 已降级为有明确标签的 body-only 渲染基线，不再承载穿戴或骨骼跟随结论。生成 VMAP 只包含 `worldspawn`、一个静态 TA body、一个 `env_global_light` 和一个 `point_camera`；最终 `default_ents.vents_c` 经 `resourceinfo` 解码确认恰好一个 `prop_dynamic`，三个穿戴模型和 `ta_portrait_wearable_*` 实体均不存在。
-- 已新增 `tools/build_ta_portrait_probe.ps1`、`tools/test_ta_portrait_probe_contract.ps1` 和 `spikes/ta_portrait_probe`；生成目标严格限定为 `content/dota_addons/survival_ta_portrait_probe` 与 `game/dota_addons/survival_ta_portrait_probe`，入口地图为 `ta_portrait_probe_lab`，背景场景为 `ta_portrait/templar_assassin`。
+- 已新增 `tools/build_ta_portrait_probe.ps1`、`tools/test_ta_portrait_probe_contract.ps1` 和 `ui/ta_portrait_probe`；生成目标严格限定为 `content/dota_addons/survival_ta_portrait_probe` 与 `game/dota_addons/survival_ta_portrait_probe`，入口地图为 `ta_portrait_probe_lab`，背景场景为 `ta_portrait/templar_assassin`。
 - 运行时加入重复初始化保护、实体/序列/API 结果校验、失败清理、命名实体清理、结构化日志和 NetTable readiness；自动状态固定为 `visual_verdict=pending`。Panorama 只有在 body entindex 与三个穿戴均就绪后才锁定运行时主体镜头，并要求人工观察多个不同 `idle` 帧后记录结果。
 - 自动验证通过：源与生成后 `TA_PORTRAIT_PROBE_CONTRACT_PASS`、两个 PowerShell AST 解析、源/生成运行时与生成配置 Lua 5.1 语法、限定 `git diff --check`。Resource Compiler 通过：入口地图 `13 compiled, 0 failed`、body-only scene `7 compiled, 0 failed`、5 个 Panorama 资源各 `1 compiled, 0 failed`；所有 VPK 与 Panorama 编译产物均已生成且非空。
 - 编译器仍输出本机官方开发资源的 `ERROR_FILEOPEN`、`Leaked KeyValues blocks: 162` 和未签名提示（缺少 `src/devtools/bin/certificates/game/dota/vpk.publickey.vdf`）；目标资源汇总为 0 failed，VPK 已生成且不早于内容 VMAP。上述工具噪声和未签名状态均不是 Workshop Tools 实机通过证据。
@@ -249,7 +249,7 @@
 
 ### Phase 2A 当前实施状态（2026-08-27）
 
-- 已在 `spikes/portrait_world_unit_phase2a` 建立隔离源，并由 `data/axe_stages.csv` 作为阶段、ItemDef、style、镜头和期望结果的唯一生成输入；没有修改生产 CSV 或生产 addon 的 Manifest/HUD。
+- 已在 `ui/portrait_world_unit_phase2a` 建立隔离源，并由 `data/axe_stages.csv` 作为阶段、ItemDef、style、镜头和期望结果的唯一生成输入；没有修改生产 CSV 或生产 addon 的 Manifest/HUD。
 - 已生成 sibling addon `survival_phase2a`：可玩入口为 `phase2a_lab`，场景资源依次为 `phase2a_portrait/axe_base`、`axe_head`、`axe_head_weapon` 和 `axe_all_five`。当前只激活 Base；B 的 `portrait_world_unit` 已按 `base_minimal` 契约使用 `MapUnitName=npc_dota_hero_axe`、`m_iTeamNum=2`、`ModelScale=1`、`StartDisabled=0`、`skip_background_entities=1`、`suppress_intro_effects=1`、`skip_pet_spawn=1`、`spawn_wearable_item_defs=0`，无 `EnableAutoStyles`、非必要背景/动画/courier 选项、`item_def0..7`、`style_index0..7`、`activity`、`activity_modifier` 或 cosmetic 字段；`parentname`/`parentAttachmentName` 为空。没有使用 `SetUnit` 传 ItemDef，也没有添加 `skin_override`。
 - 当前 Base-only 契约执行 `tools/test_portrait_world_unit_phase2a_contract.ps1 -GeneratedContentRoot ...\survival_phase2a` 输出 `PORTRAIT_WORLD_UNIT_PHASE2A_CONTRACT_PASS`；PowerShell 解析、生成 XML 解析和限定 `git diff --check` 通过。B `axe_base` 单独重新编译为 `OK: 7 compiled, 0 failed`，VPK 非空且不早于源 VMAP。
 - 已冷启动并进入 `survival_phase2a/phase2a_lab` 的 Stage 1 `Base Axe`；VConsole 出现 `[PHASE2A] LOAD stage=base map=phase2a_portrait/axe_base expected=none`，未再出现 `DATA_INVALID`，证明 `Phase2APortraitData` 的单 Base 固定数组及 A/B/C 绑定已被运行时消费者接受。

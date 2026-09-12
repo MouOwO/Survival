@@ -1,0 +1,107 @@
+{
+  "archive": {
+    "shell": "ModalShell",
+    "sizePreset": "medium",
+    "components": [
+      "NavToggle",
+      "ArchiveCard",
+      "ProgressBadge",
+      "Tooltip"
+    ],
+    "shared_theme": "jade_ivory",
+    "background": "live_game_plus_scrim",
+    "data": "existing_archive_config"
+  },
+  "shop": {
+    "shell": "ModalShell",
+    "sizePreset": "wide",
+    "components": [
+      "TabBar",
+      "FilterBar",
+      "ProductCard",
+      "BundleCard",
+      "VipBundleCard",
+      "PriceLabel",
+      "Tooltip"
+    ],
+    "shared_theme": "jade_ivory",
+    "background": "live_game_plus_scrim",
+    "tabs": {
+      "home": [
+        "ProductCard"
+      ],
+      "bundles": [
+        "BundleCard"
+      ],
+      "sale": [
+        "ProductCard",
+        "PriceLabel"
+      ],
+      "vip": [
+        "VipBundleCard"
+      ],
+      "all": [
+        "FilterBar",
+        "ProductCard"
+      ]
+    },
+    "data": "existing_shop_config"
+  },
+  "pool_details": {
+    "shell": "ModalShell",
+    "sizePreset": "wide",
+    "components": [
+      "TabBar",
+      "RewardGrid",
+      "Tooltip"
+    ],
+    "shared_theme": "jade_ivory",
+    "background": "inherit_underlying_page_plus_scrim",
+    "data": "existing_pool_config"
+  },
+  "draw_history": {
+    "shell": "ModalShell",
+    "sizePreset": "medium",
+    "components": [
+      "TabBar",
+      "FilterBar"
+    ],
+    "shared_theme": "jade_ivory",
+    "background": "inherit_underlying_page_plus_scrim",
+    "data": "server_history"
+  },
+  "lottery": {
+    "shell": "FullscreenShell",
+    "components": [
+      "TabBar",
+      "ActionButton",
+      "IconButton",
+      "Checkbox",
+      "DrawResultSequence"
+    ],
+    "shared_theme": "jade_ivory",
+    "sceneId": "scene.treasure",
+    "data": "existing_four_pools"
+  },
+  "roguelike": {
+    "shell": "FullscreenShell",
+    "components": [
+      "AugmentChoiceGroup",
+      "Tooltip"
+    ],
+    "shared_theme": "jade_ivory",
+    "background": "live_game_plus_scrim",
+    "data": "existing_roguelike_choices"
+  },
+  "main_hud": {
+    "shell": "HUDShell",
+    "components": [
+      "IconButton",
+      "ProgressBar",
+      "Tooltip"
+    ],
+    "shared_theme": "jade_ivory",
+    "background": "live_game",
+    "data": "native_and_existing_custom_bindings"
+  }
+}

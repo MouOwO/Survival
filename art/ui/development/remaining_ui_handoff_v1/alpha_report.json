@@ -1,0 +1,778 @@
+[
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_top_left.png",
+    "source": "window_foundation_v1/assets/top_left.png",
+    "size": [
+      32,
+      58
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_top.png",
+    "source": "window_foundation_v1/assets/top.png",
+    "size": [
+      616,
+      58
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_top_right.png",
+    "source": "window_foundation_v1/assets/top_right.png",
+    "size": [
+      32,
+      58
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_left.png",
+    "source": "window_foundation_v1/assets/left.png",
+    "size": [
+      32,
+      134
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_center.png",
+    "source": "window_foundation_v1/assets/center.png",
+    "size": [
+      616,
+      134
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_right.png",
+    "source": "window_foundation_v1/assets/right.png",
+    "size": [
+      32,
+      134
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_bottom_left.png",
+    "source": "window_foundation_v1/assets/bottom_left.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_bottom.png",
+    "source": "window_foundation_v1/assets/bottom.png",
+    "size": [
+      616,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_bottom_right.png",
+    "source": "window_foundation_v1/assets/bottom_right.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_header_texture.png",
+    "source": "window_foundation_v1/assets/header_texture.png",
+    "size": [
+      120,
+      32
+    ],
+    "mode": "RGB",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_title_ornament_left.png",
+    "source": "window_foundation_v1/assets/title_ornament_left.png",
+    "size": [
+      48,
+      27
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_title_ornament_right.png",
+    "source": "window_foundation_v1/assets/title_ornament_right.png",
+    "size": [
+      48,
+      27
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_close_normal.png",
+    "source": "window_foundation_v1/assets/close_normal.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_close_hover.png",
+    "source": "window_foundation_v1/assets/close_hover.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/window_close_pressed.png",
+    "source": "window_foundation_v1/assets/close_pressed.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/tab_left.png",
+    "source": "pool_grid_v2/assets/tab_left.png",
+    "size": [
+      199,
+      56
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/tab_middle.png",
+    "source": "pool_grid_v2/assets/tab_middle.png",
+    "size": [
+      199,
+      56
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      128,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/tab_right.png",
+    "source": "pool_grid_v2/assets/tab_right.png",
+    "size": [
+      199,
+      56
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/tab_glow.png",
+    "source": "pool_grid_v2/assets/interaction_components_v2_tab_selected_overlay.png",
+    "size": [
+      640,
+      190
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/reward_card.png",
+    "source": "pool_grid_v2/assets/interaction_components_v2_card_normal.png",
+    "size": [
+      200,
+      190
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/pool_content.png",
+    "source": "pool_grid_v2/assets/content_material.png",
+    "size": [
+      796,
+      451
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      255,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/history_empty.png",
+    "source": "lottery_history_assembly_v1/assets/history_empty_icon.png",
+    "size": [
+      82,
+      82
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/history_icon.png",
+    "source": "lottery_history_assembly_v1/assets/lottery_ui_v3_history_icon_normal.png",
+    "size": [
+      53,
+      59
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/scroll_thumb.png",
+    "source": "pool_grid_v2/assets/detail_controls_v1_scroll_thumb_normal.png",
+    "size": [
+      16,
+      72
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/scroll_track.png",
+    "source": "pool_grid_v2/assets/detail_controls_v1_scroll_track.png",
+    "size": [
+      16,
+      240
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/button_secondary_normal.png",
+    "source": "interaction_components_v2/assets/button_secondary_normal.png",
+    "size": [
+      156,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/button_secondary_hover.png",
+    "source": "interaction_components_v2/assets/button_secondary_hover.png",
+    "size": [
+      156,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/button_secondary_pressed.png",
+    "source": "interaction_components_v2/assets/button_secondary_pressed.png",
+    "size": [
+      156,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/button_secondary_disabled.png",
+    "source": "interaction_components_v2/assets/button_secondary_disabled.png",
+    "size": [
+      156,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/rogue_back.png",
+    "source": "roguelike_alpha_v1/assets/back.png",
+    "size": [
+      352,
+      816
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/rogue_combat.png",
+    "source": "roguelike_alpha_v1/assets/combat.png",
+    "size": [
+      352,
+      816
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/rogue_defense.png",
+    "source": "roguelike_alpha_v1/assets/defense.png",
+    "size": [
+      352,
+      816
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/rogue_growth.png",
+    "source": "roguelike_alpha_v1/assets/growth.png",
+    "size": [
+      352,
+      816
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_card_normal_native.png",
+    "source": "shop_interaction_states_v1/assets/card_normal_native.png",
+    "size": [
+      300,
+      364
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_card_hover_native.png",
+    "source": "shop_interaction_states_v1/assets/card_hover_native.png",
+    "size": [
+      300,
+      364
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_product_hover_scrim.png",
+    "source": "shop_interaction_states_v1/assets/product_hover_scrim.png",
+    "size": [
+      261,
+      191
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_payment_normal.png",
+    "source": "shop_interaction_states_v1/assets/payment_normal.png",
+    "size": [
+      181,
+      54
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_payment_selected.png",
+    "source": "shop_interaction_states_v1/assets/payment_selected.png",
+    "size": [
+      181,
+      54
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_qr_loading.png",
+    "source": "shop_interaction_states_v1/assets/qr_loading.png",
+    "size": [
+      225,
+      225
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_qr_outer.png",
+    "source": "shop_interaction_states_v1/assets/qr_outer.png",
+    "size": [
+      269,
+      269
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_quantity_step.png",
+    "source": "shop_interaction_states_v1/assets/quantity_step.png",
+    "size": [
+      47,
+      45
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_quantity_value.png",
+    "source": "shop_interaction_states_v1/assets/quantity_value.png",
+    "size": [
+      95,
+      45
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_icon_points_dark.png",
+    "source": "shop_interaction_states_v1/assets/icon_points_dark.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_icon_u_currency_dark.png",
+    "source": "shop_interaction_states_v1/assets/icon_u_currency_dark.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/button_primary_normal.png",
+    "source": "shop_interaction_states_v1/assets/button_primary_normal.png",
+    "size": [
+      156,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/button_primary_hover.png",
+    "source": "shop_interaction_states_v1/assets/button_primary_hover.png",
+    "size": [
+      156,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/button_primary_pressed.png",
+    "source": "shop_interaction_states_v1/assets/button_primary_pressed.png",
+    "size": [
+      156,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/button_primary_disabled.png",
+    "source": "shop_interaction_states_v1/assets/button_primary_disabled.png",
+    "size": [
+      156,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_bundle_compact.png",
+    "source": "shop_bundle_grid_v2/assets/bundle_compact.png",
+    "size": [
+      540,
+      276
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/shop_bundle_footer_compact.png",
+    "source": "shop_bundle_grid_v2/assets/bundle_footer_compact.png",
+    "size": [
+      538,
+      90
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/action_check.png",
+    "source": "detail_controls_v1/assets/icon_check_dark.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/action_chevron.png",
+    "source": "detail_controls_v1/assets/icon_chevron_down_light.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_day.png",
+    "source": "daily_assembly_v3/assets/day_card.png",
+    "size": [
+      153,
+      390
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_week.png",
+    "source": "daily_assembly_v3/assets/week_card.png",
+    "size": [
+      310,
+      390
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_calendar.png",
+    "source": "daily_assembly_v3/assets/runtime_calendar_normal.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_claimed.png",
+    "source": "daily_assembly_v3/assets/runtime_check_claimed.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_crystals.png",
+    "source": "daily_assembly_v3/assets/runtime_crystals_medallion.png",
+    "size": [
+      146,
+      150
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_rules.png",
+    "source": "daily_assembly_v3/assets/runtime_rules_local_normal.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "P",
+    "alphaRange": null
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_premium.png",
+    "source": "daily_assembly_v3/assets/detail_controls_v1_badge_pass.png",
+    "size": [
+      112,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_ready.png",
+    "source": "daily_assembly_v3/assets/detail_controls_v1_badge_ready.png",
+    "size": [
+      112,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_locked.png",
+    "source": "daily_assembly_v3/assets/detail_controls_v1_badge_locked.png",
+    "size": [
+      112,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  },
+  {
+    "file": "images/custom_game/remaining_handoff_ready/daily_info.png",
+    "source": "daily_assembly_v3/assets/detail_controls_v1_icon_info_dark.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ]
+  }
+]
