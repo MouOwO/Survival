@@ -138,14 +138,26 @@ profiles[2] = new_profile(); tasks.archive_retry()
 assert(profiles[2].save.archive.clear_counts.n3 == 1)
 -- Snapshot identity is injected PlayerID; forged player_id is ignored.
 packets = {}; time = 5
-listeners.survival_archive_request(nil, { PlayerID = 1, player_id = 0, category_id = "clear" })
-assert(#packets == 4, "44 rows paginated into private chunks")
+listeners.survival_archive_request(nil, { PlayerID = 1, player_id = 0, category_id = "clear", prefetch = 1 })
+local clear_chunks=0
+for _,packet in ipairs(packets) do if packet.data.category_id=="clear" then clear_chunks=clear_chunks+1 end end
+assert(clear_chunks == 4, "44 rows paginated into private chunks during all-page prefetch")
 for _, packet in ipairs(packets) do assert(packet.id == 1 and #packet.data.rows <= 12) end
 local n = #packets
 listeners.survival_archive_request(nil, { PlayerID = 1, category_id = "shadow" })
 assert(#packets == n, "request throttling")
 listeners.survival_archive_request(nil, { PlayerID = -1, category_id = "clear" })
 assert(#packets == n)
+time = 6
+listeners.survival_archive_request(nil, { PlayerID = 1, category_id = "shadow" })
+assert(#packets == n, "unchanged page requests do not resend snapshots")
+assert(cheat(1, "n4", 1))
+assert(#packets > n, "archive changes are pushed without a tab request")
+for index=n+1,#packets do
+    local packet=packets[index].data
+    assert(packet.delta==1 and packet.base_sequence, "existing pages receive versioned patches only")
+    for _,operation in ipairs(packet.rows) do assert(operation.path, "patches carry changed paths") end
+end
 -- Upper ownership cap suppresses both extra copies and duplicate effects.
 profiles[3] = new_profile()
 profiles[3].save.archive = { shadow_counts = { shadow_01 = 429 } }

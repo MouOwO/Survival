@@ -6,12 +6,14 @@ import math
 from pathlib import Path
 
 MODULES = ("archive_settlement", "archive_challenge_rewards", "archive_social_rewards",
-           "archive_daily_rewards", "archive_online_rewards", "archive_endless_config", "archive_building_rewards")
+           "archive_daily_rewards", "archive_online_rewards", "archive_endless_config", "archive_building_rewards", "lottery_http_settlement")
 
 def read_csv(path):
     lines = path.read_text(encoding="utf-8-sig").splitlines()
     header = next(csv.reader([lines[0]]))
-    types = next(x[7:].split(",") for x in lines if x.startswith("#types:"))
+    type_line = next((x for x in lines if x.startswith("#types:")), None)
+    if type_line is None: raise ValueError(f"csv_types_missing:{path.name}")
+    types = type_line[7:].split(",")
     if len(header) != len(types):
         raise ValueError(f"csv_types_mismatch:{path.name}")
     rows, seen = [], set()
@@ -36,9 +38,14 @@ def read_csv(path):
     return {"key": header[0], "rows": rows}
 
 def build(root: Path):
-    files = sorted((root / "data/csv/存档系统").glob("*.csv"))
+    # Presentation-only sheets use composite keys and are not settlement rules.
+    presentation = {"archive_icon_presentation", "archive_item_icons", "archive_navigation_icons"}
+    files = sorted(p for p in (root / "data/csv/存档系统").glob("*.csv") if p.stem not in presentation)
+    files += sorted((root / "data/csv/抽奖系统").glob("*.csv"))
     files += [root / "data/csv/玩家档案系统" / (n+".csv") for n in ("player_gameplay_stats","map_level_effect_rules")]
     sources = {"systems/"+n+".lua": (root/"scripts/vscripts/systems"/(n+".lua")).read_text(encoding="utf-8-sig") for n in MODULES}
+    for name in ("lottery_config", "content_id_aliases"):
+        sources["config/"+name+".lua"] = (root/"scripts/vscripts/config"/(name+".lua")).read_text(encoding="utf-8-sig")
     for name in ("json_encoder","json_decoder"):
         sources["core/"+name+".lua"] = (root/"scripts/vscripts/core"/(name+".lua")).read_text(encoding="utf-8-sig")
     sources["worker.lua"] = (root/"server/archive_backend/worker.lua").read_text(encoding="utf-8-sig")
@@ -67,4 +74,3 @@ class Bundle:
         for path,source in data["sources"].items():
             if (self.directory/path).read_text(encoding="utf-8")!=source: raise ValueError("bundle_source_mismatch")
         self.tables={name:{row[cfg["key"]]:row for row in cfg["rows"]} for name,cfg in self.configs.items()}
-

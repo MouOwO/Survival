@@ -526,9 +526,8 @@ local function on_builder_ready(payload)
     local repair = (training.by_id or {}).train_repairer_01 or {}
     if valid_entity(payload.builder)
         and not payload.builder:HasModifier("modifier_repair_worker_ai") then
-        payload.builder:AddNewModifier(
+        require("core/modifier_registry").ensure(
             payload.builder,
-            nil,
             "modifier_repair_worker_ai",
             {
                 repair_max_health_pct_per_second = tonumber(

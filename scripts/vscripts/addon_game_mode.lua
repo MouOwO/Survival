@@ -616,6 +616,17 @@ function M.precache(context)
     for _, unit_name in ipairs(units) do
         PrecacheUnitByNameSync(unit_name, context)
     end
+    local challenge_unit_names = {}
+    for _, module in ipairs({"monster_archetypes", "building_challenge_definitions"}) do
+        for _, row in ipairs(require("config/generated/" .. module).rows or {}) do
+            local name = row.unit_name
+            if name and name:find("npc_survival_named_", 1, true) == 1
+                and not challenge_unit_names[name] then
+                PrecacheUnitByNameSync(name, context)
+                challenge_unit_names[name] = true
+            end
+        end
+    end
     for _, model_name in ipairs({
         "models/heroes/sniper/sniper.vmdl",
         "models/heroes/skywrath_mage/skywrath_mage.vmdl",
@@ -628,6 +639,7 @@ function M.precache(context)
         "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf",
         context
     )
+    PrecacheResource("particle", "particles/units/heroes/hero_riki/riki_smokebomb.vpcf", context)
     PrecacheResource(
         "model",
         "models/heroes/skywrath_mage/skywrath_mage.vmdl",

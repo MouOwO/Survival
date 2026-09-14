@@ -332,6 +332,11 @@ local function filter(_, keys)
         -- infinity or oversized floats into the engine damage event.
         keys.damage = math.min(keys.damage, 1e30)
     end
+    if tree_damage_rules.is_tree(victim) then
+        -- Resource trees advance at 1 HP; never pass a lethal/overflowing hit
+        -- to native integer health, even if the protection modifier is missing.
+        keys.damage = math.min(keys.damage, math.max(0, victim:GetHealth() - 1))
+    end
     return true
 end
 

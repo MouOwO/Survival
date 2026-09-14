@@ -348,7 +348,7 @@ local function spawn_member(session, member)
 
     local collision_profile = wave_monster_collision.profile(member, archetype)
     local create_clear_space = not collision_profile.apply_before_placement
-    local unit = CreateUnitByName(
+    local created, unit = pcall(CreateUnitByName,
         archetype.unit_name,
         position,
         create_clear_space,
@@ -356,7 +356,11 @@ local function spawn_member(session, member)
         nil,
         DOTA_TEAM_BADGUYS
     )
-    if not valid(unit) then return nil, "challenge_unit_create_failed" end
+    if not created or not valid(unit) then
+        print("[CHALLENGE_SPAWN_FAILED] member=" .. tostring(member.member_id)
+            .. " unit=" .. tostring(archetype.unit_name) .. " detail=" .. tostring(unit))
+        return nil, "challenge_unit_create_failed:" .. tostring(archetype.unit_name)
+    end
     if session.challenge.challenge_id == "challenge_11" then
         unit:AddNewModifier(unit, nil, challenge_11_staging, {})
     end

@@ -101,13 +101,17 @@ local function apply_level(tree, level)
     )
     local row = level_row(tree_level)
     clear_armor_reduction(tree)
-    tree:SetBaseMaxHealth(row.health)
-    tree:SetMaxHealth(row.health)
+    local projected = require("combat/endless_stat_projection").prepare(tree, {
+        health = row.health, attack = 0,
+    })
+    projected.health = math.max(1, math.floor(projected.health + 0.5))
+    tree:SetBaseMaxHealth(projected.health)
+    tree:SetMaxHealth(projected.health)
     tree:SetPhysicalArmorBaseValue(row.armor)
     tree.survival_minimum_armor = row.minimum_armor
     tree.survival_tree_level = tree_level
     tree.survival_level = tree_level
-    tree:SetHealth(row.health)
+    tree:SetHealth(projected.health)
 end
 
 local function reserve_tree_grid(entindex)
@@ -162,7 +166,7 @@ local function spawn_tree(payload)
     tree.survival_tree_depleted_callback = upgrade_tree
     apply_level(tree, tree_level)
     if not tree:HasModifier("modifier_tree_progression") then
-        tree:AddNewModifier(tree, nil, "modifier_tree_progression", {})
+        require("core/modifier_registry").ensure(tree, "modifier_tree_progression", {})
     end
     current_tree = tree
     reserve_tree_grid(tree:entindex())

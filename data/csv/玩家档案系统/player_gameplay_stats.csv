@@ -5,7 +5,7 @@ initial_wood,integer,10,wood,0,,1,玩家初始木材数量。
 initial_gold,integer,0,gold,0,,1,玩家初始金币数量。
 hero_initial_gold,integer,0,gold,0,,1,每名英雄提供的初始金币；与玩家初始金币叠加。
 health_regen_per_second,percentage,0,percent,0,10000,1,英雄和防御塔每秒回血百分比；按最大生命值百分比结算。
-wood_per_second,decimal,1,wood_per_second,0,,1,玩家每秒木材增加量。
+wood_per_second,decimal,0,wood_per_second,0,,1,默认不自动产出木材；仅计入实际获得的每秒木材奖励。
 lumberjack_attack_efficiency,integer,13,wood_per_attack,0,,1,伐木工每次攻击的基础采集值。
 gold_per_second,decimal,0,gold_per_second,0,,1,玩家每秒金币增加量。
 gold_mine_efficiency_pct,percentage,0,percent,0,10000,1,金矿收益百分比；15表示15%。

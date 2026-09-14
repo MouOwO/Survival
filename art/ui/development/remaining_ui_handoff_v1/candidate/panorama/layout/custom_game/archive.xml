@@ -64,7 +64,7 @@
             </Panel>
         </Panel>
         <Panel id="ArchiveTooltip" class="ArchiveHidden" hittest="false" hittestchildren="false">
-            <Panel id="ArchiveTooltipFrame" hittest="false" /><Panel id="ArchiveTooltipBody"><Label id="ArchiveTooltipName" /><Panel id="ArchiveTooltipState"><Image id="ArchiveTooltipStateIcon" /><Label id="ArchiveTooltipStateText" /></Panel><Image id="ArchiveTooltipDivider" /><Label class="ArchiveDetailHeading" text="存档效果" /><Label id="ArchiveTooltipEffect" /><Label class="ArchiveDetailHeading" text="解锁条件" /><Label id="ArchiveTooltipCondition" /><Panel id="ArchiveTooltipProgressRow"><Label text="当前进度" /><Label id="ArchiveTooltipProgress" /></Panel></Panel>
+            <Panel id="ArchiveTooltipFrame" hittest="false" /><Panel id="ArchiveTooltipBody"><Label id="ArchiveTooltipName" /><Panel id="ArchiveTooltipState"><Image id="ArchiveTooltipStateIcon" /><Label id="ArchiveTooltipStateText" /></Panel><Image id="ArchiveTooltipDivider" /><Label class="ArchiveDetailHeading" text="效果" /><Label id="ArchiveTooltipEffect" /><Label id="ArchiveTooltipCondition" visible="false" /><Panel id="ArchiveTooltipProgressRow"><Label text="当前进度" /><Label id="ArchiveTooltipProgress" /></Panel></Panel>
         </Panel>
     </Panel>
 </root>

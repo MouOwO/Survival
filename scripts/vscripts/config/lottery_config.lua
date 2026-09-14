@@ -18,7 +18,8 @@ local M = {
     -- Local map-lottery bootstrap retained for the current test phase. Paid
     -- special tickets are deliberately absent and must come from a verified
     -- backend grant (or the local mock profile during development).
-    test_initial_tickets = { lottery_ticket = 1000 },
+    -- HTTP integration: never bootstrap paid or test currency locally.
+    test_initial_tickets = {},
     currencies = {},
     pools = {},
     pool_order = {},
@@ -212,4 +213,27 @@ for _, pool in ipairs(M.pool_order) do
     end)
 end
 
+-- Deterministic fingerprint includes private weights, but only the digest is public.
+local notices = require("config/generated/lottery_pool_updates")
+local function canonical(value)
+    if type(value) ~= "table" then return type(value) .. ":" .. tostring(value) end
+    local keys, parts = {}, {}
+    for key in pairs(value) do keys[#keys + 1] = key end
+    table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+    for _, key in ipairs(keys) do
+        local part = canonical(key) .. canonical(value[key])
+        parts[#parts + 1] = tostring(#part) .. ":" .. part
+    end
+    return "{" .. table.concat(parts) .. "}"
+end
+for _, pool in ipairs(M.pool_order) do
+    pool.update_notice = notices.by_id[pool.id] or {}
+    local source = canonical(pool)
+    local a, b = 5381, 52711
+    for i = 1, #source do
+        a = (a * 33 + string.byte(source, i)) % 2147483647
+        b = (b * 131 + string.byte(source, i)) % 2147483629
+    end
+    pool.revision = tostring(a) .. "-" .. tostring(b)
+end
 return M

@@ -6,7 +6,7 @@ M.rows = {
     { field_id = "initial_gold", storage_type = "integer", default_value = 0, unit = "gold", min_value = 0, enabled = true, notes = "玩家初始金币数量。" },
     { field_id = "hero_initial_gold", storage_type = "integer", default_value = 0, unit = "gold", min_value = 0, enabled = true, notes = "每名英雄提供的初始金币；与玩家初始金币叠加。" },
     { field_id = "health_regen_per_second", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 10000, enabled = true, notes = "英雄和防御塔每秒回血百分比；按最大生命值百分比结算。" },
-    { field_id = "wood_per_second", storage_type = "decimal", default_value = 1, unit = "wood_per_second", min_value = 0, enabled = true, notes = "玩家每秒木材增加量。" },
+    { field_id = "wood_per_second", storage_type = "decimal", default_value = 0, unit = "wood_per_second", min_value = 0, enabled = true, notes = "默认不自动产出木材；仅计入实际获得的每秒木材奖励。" },
     { field_id = "lumberjack_attack_efficiency", storage_type = "integer", default_value = 13, unit = "wood_per_attack", min_value = 0, enabled = true, notes = "伐木工每次攻击的基础采集值。" },
     { field_id = "gold_per_second", storage_type = "decimal", default_value = 0, unit = "gold_per_second", min_value = 0, enabled = true, notes = "玩家每秒金币增加量。" },
     { field_id = "gold_mine_efficiency_pct", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 10000, enabled = true, notes = "金矿收益百分比；15表示15%。" },

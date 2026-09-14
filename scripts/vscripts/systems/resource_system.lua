@@ -103,7 +103,8 @@ local function initialize_from_profile(payload)
     local stats = gameplay_stats(player_id)
     if not stats then return false end
     if account.initialized and phase_guard.post_clear_frozen() then return true end
-    local profile_initial_wood = math.max(0, tonumber(stats.initial_wood) or 0)
+    -- The HTTP field already includes the base opening amount; it is not a bonus.
+    local profile_initial_wood = math.max(0, tonumber(stats.initial_wood) or config.initial_wood)
     -- Hero-start gold is another opening grant for the same player wallet;
     -- combine it before delta tracking so profile refreshes remain idempotent.
     local profile_initial_gold = math.max(0,
@@ -152,7 +153,7 @@ local function initialize_from_profile(payload)
     account.profile_initial_wood = profile_initial_wood
     account.profile_initial_gold = profile_initial_gold
     account.profile_initial_population_cap = profile_initial_population_cap
-    account.wood = config.initial_wood + profile_initial_wood
+    account.wood = profile_initial_wood
     account.gold = config.initial_gold + profile_initial_gold
     account.max_population = profile_initial_population_cap
     account.wood_per_second = math.max(0, tonumber(stats.wood_per_second) or 0)

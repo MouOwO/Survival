@@ -218,10 +218,10 @@ local function pickup_nearby(payload)
     }
 end
 
-function M.nearby(caster, player_id)
+function M.nearby(caster, player_id, target_origin)
     player_id = tonumber(player_id)
     if not valid(caster) or player_id == nil or player_id < 0 then return {} end
-    local origin = caster:GetAbsOrigin()
+    local origin = target_origin or caster:GetAbsOrigin()
     local result = {}
     for _, drop in pairs(drops) do
         if not drop.consumed and drop.player_id == player_id and valid(drop.unit) then

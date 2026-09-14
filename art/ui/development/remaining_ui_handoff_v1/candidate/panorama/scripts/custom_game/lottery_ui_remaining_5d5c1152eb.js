@@ -14,7 +14,7 @@
     var requestSerial = 0;
     var selectedPoolId = "map";
     var visibleResults = [];
-    var activeTooltipItem = null;
+    var activeTooltipItem = null, archiveEffectTooltipActive = false;
     var animating = false, animationSerial = 0, skipAnimation = !!$("#LotterySkipAnimation").checked;
     var resultCards = [], lastDrawCount = 1, history = [], seenResults = {};
     var activeRequest = null, opened = false, switchingPool = false;
@@ -143,12 +143,22 @@
     }
 
     function hideTooltip() {
+        if(archiveEffectTooltipActive){var archiveTip=GameUI.CustomUIConfig().ArchiveHandoff;if(archiveTip)archiveTip.Hide();archiveEffectTooltipActive=false;}
         activeTooltipItem = null;
         var tooltip = panel("LotteryItemTooltip");
         if (tooltip) tooltip.AddClass("Hidden");
     }
 
     function showTooltip(item, sourcePanel, simple) {
+        hideTooltip();
+        if(simple){
+            var archiveTip=GameUI.CustomUIConfig().ArchiveHandoff;
+            if(archiveTip&&archiveTip.ShowEffectOnly&&item&&sourcePanel){
+                archiveEffectTooltipActive=true;
+                archiveTip.ShowEffectOnly({name:item.name||item.id||'未命名道具',description:item.description||'暂无效果说明'},sourcePanel);
+            }
+            return;
+        }
         var tooltip = panel("LotteryItemTooltip");
         var iconHost = panel("LotteryTooltipIconHost");
         if (!tooltip || !iconHost || !item || !sourcePanel) return;
@@ -506,6 +516,15 @@
 
     function feature(name) {
         if (pending || animating) return;
+        if (name === "purchase") {
+            var selectedTicketPool = state && (state.selected_pool || state);
+            var commerce = GameUI.CustomUIConfig().SurvivalCommerceView;
+            hideTooltip();
+            if (commerce && commerce.OpenTicketPurchase && selectedTicketPool) {
+                commerce.OpenTicketPurchase({id:selectedTicketPool.id || selectedPoolId,display_name:selectedTicketPool.display_name || selectedPoolId,ticket_name:selectedTicketPool.ticket_name || "抽奖券"});
+            } else { setText("LotteryStatus", "抽奖券演示界面尚未就绪，请稍后重试"); }
+            return;
+        }
         var host = panel("LotteryInfoList"), overlay = panel("LotteryInfoOverlay");
         if (!host || !overlay) return;
         hideTooltip(); host.RemoveAndDeleteChildren(); poolCards = [];

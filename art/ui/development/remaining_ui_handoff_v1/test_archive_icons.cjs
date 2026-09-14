@@ -52,10 +52,7 @@ for(let i=0;i<entries.length;i++){
  assert.equal(card.children[1].text,(i+1)+' / 430','Actual owned count must survive icon override');
  if(row.portrait){const art=card.children[0],im=art.children[0];assert(art.classes.includes('ArchivePortraitViewport'));assert.equal(parseFloat(im.style.width),parseFloat(im.style.height),'Portrait keeps the master aspect ratio');assert.equal(parseFloat(im.style.width),row.display_width/row.portrait[2]);}
  if(row.tint_icon)assert.equal(card.children[0].children[0].style.washColor,row.tone_color);
- const corner=card.children.find(c=>c.classes.includes('ArchiveHoverCorner'));
- assert(corner&&!corner.hittest&&!corner.hittestchildren,'Every mapped category has a non-interactive foreground star');
- assert.equal(corner.children.length,3,'Foreground uses the same three-row grid as the frame');
- corner.children.forEach((r,y)=>r.children.forEach((t,x)=>assert.equal(t.style.opacity,x===0&&y===0?undefined:'0','Only the original upper-left tile is painted')));
+ assert(!card.children.some(c=>c.classes.includes('ArchiveHoverCorner')),'Archive icons no longer create the hover star overlay');
 }
 view.Icon(root,{id:'shadow_01'},'friend',{});view.Icon(root,{id:'unmapped_test_item'},'shadow',{});assert.equal(fallback,2);
 view.Init();view.Observe({category_id:'shadow'});

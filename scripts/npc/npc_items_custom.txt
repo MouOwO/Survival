@@ -17,7 +17,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_challenge_reward_runtime"
-        "AbilityTextureName" "item_recipe"
+        "AbilityTextureName" "item_ultimate_orb"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -30,7 +30,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_recipe"
+        "AbilityTextureName" "survival_shop_v2/shop_11"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -43,7 +43,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_recipe"
+        "AbilityTextureName" "survival_shop_v2/shop_10"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -56,7 +56,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_recipe"
+        "AbilityTextureName" "survival_shop_v2/shop_10"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -69,7 +69,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_recipe"
+        "AbilityTextureName" "survival_shop_v2/shop_10"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -82,7 +82,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_recipe"
+        "AbilityTextureName" "survival_shop_v2/shop_10"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -95,7 +95,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_recipe"
+        "AbilityTextureName" "survival_shop_v2/shop_14"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -108,7 +108,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_lifesteal"
+        "AbilityTextureName" "survival_shop_v2/shop_04"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -121,7 +121,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_mystic_staff"
+        "AbilityTextureName" "survival_shop_v2/shop_06"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -134,7 +134,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_mystic_staff"
+        "AbilityTextureName" "survival_shop_v2/shop_06"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -147,7 +147,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_broadsword"
+        "AbilityTextureName" "survival_shop_v2/swords_00"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -160,7 +160,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_broadsword"
+        "AbilityTextureName" "survival_shop_v2/swords_01"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -173,7 +173,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_broadsword"
+        "AbilityTextureName" "survival_shop_v2/swords_02"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -186,7 +186,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_broadsword"
+        "AbilityTextureName" "survival_shop_v2/swords_03"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -199,7 +199,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_broadsword"
+        "AbilityTextureName" "survival_shop_v2/swords_04"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -212,7 +212,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_crystalys"
+        "AbilityTextureName" "survival_shop_v2/swords_05"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -225,7 +225,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_crystalys"
+        "AbilityTextureName" "survival_shop_v2/swords_06"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -238,7 +238,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_crystalys"
+        "AbilityTextureName" "survival_shop_v2/swords_07"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -251,7 +251,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_crystalys"
+        "AbilityTextureName" "survival_shop_v2/swords_08"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -264,7 +264,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_crystalys"
+        "AbilityTextureName" "survival_shop_v2/swords_09"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -277,7 +277,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_daedalus"
+        "AbilityTextureName" "survival_shop_v2/swords_10"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -290,7 +290,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_daedalus"
+        "AbilityTextureName" "survival_shop_v2/swords_11"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -303,7 +303,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_daedalus"
+        "AbilityTextureName" "survival_shop_v2/swords_12"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -316,7 +316,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_daedalus"
+        "AbilityTextureName" "survival_shop_v2/swords_13"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -329,7 +329,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_daedalus"
+        "AbilityTextureName" "survival_shop_v2/swords_14"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -342,7 +342,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_shop_v2/swords_15"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -355,7 +355,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_shop_v2/swords_16"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -368,7 +368,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_shop_v2/swords_16"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -381,7 +381,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_shop_v2/swords_17"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -394,7 +394,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_shop_v2/swords_18"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -407,7 +407,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_shop_v2/swords_18"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -420,7 +420,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_shop_v2/swords_19"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -433,7 +433,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_shop_v2/swords_19"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -446,7 +446,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_20"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -459,7 +459,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_20"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -472,7 +472,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_24"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -485,7 +485,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_21"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -498,7 +498,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_21"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -511,7 +511,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_22"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -524,7 +524,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_22"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -537,7 +537,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_22"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -550,7 +550,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_23"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -563,7 +563,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_23"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -576,7 +576,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_rapier"
+        "AbilityTextureName" "survival_shop_v2/swords_24"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -589,7 +589,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_gloves"
+        "AbilityTextureName" "survival_shop_v2/shop_01"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -602,7 +602,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_blades_of_attack"
+        "AbilityTextureName" "survival_shop_v2/shop_02"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -615,7 +615,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_chainmail"
+        "AbilityTextureName" "survival_shop_v2/shop_03"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -628,7 +628,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "item_platemail"
+        "AbilityTextureName" "survival_shop_v2/shop_12"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"

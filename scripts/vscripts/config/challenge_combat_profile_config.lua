@@ -1,4 +1,5 @@
 local generated = require("config/generated/challenge_combat_profiles")
+local difficulties = require("config/difficulty_config")
 
 local M = {
     by_member = {},
@@ -19,6 +20,13 @@ function M.resolve(member_id, difficulty_id)
     local profiles = M.by_member[tostring(member_id or "")]
     if not profiles then return nil, nil end
     local profile = profiles[tostring(difficulty_id or "")]
+    if not profile then
+        -- N6-N10 explicitly reuse N5 balance while testing unlocks. Resolve
+        -- the same source difficulty as waves instead of rejecting every room.
+        local difficulty = difficulties.get(difficulty_id)
+        local source = difficulty and difficulty.source_difficulty_id
+        if source and source ~= difficulty_id then profile = profiles[source] end
+    end
     if not profile then
         return nil, "challenge_combat_profile_missing:"
             .. tostring(member_id) .. ":" .. tostring(difficulty_id)

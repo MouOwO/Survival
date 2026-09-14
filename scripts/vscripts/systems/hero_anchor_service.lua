@@ -43,7 +43,7 @@ function M.isolate_placeholder(player_id, hero)
     end
     hero.survival_hide_custom_health_bar = true
     if hero.AddNewModifier and not hero:HasModifier("modifier_survival_placeholder_anchor") then
-        hero:AddNewModifier(hero, nil, "modifier_survival_placeholder_anchor", {})
+        require("core/modifier_registry").ensure(hero, "modifier_survival_placeholder_anchor", {})
     end
     unit_health_bar_service.exclude(hero)
     if hero.SetAbsOrigin then

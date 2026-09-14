@@ -1,0 +1,7 @@
+pool_id,title,effective_date,summary
+#中文名:宝箱ID,公告标题,生效日期文本,更新说明
+#types:string,string,string,string
+map,地图宝箱奖励更新公告,,本次奖池内容已更新，以下为当前可获得的奖励。
+cultivation,修仙宝箱奖励更新公告,,本次奖池内容已更新，以下为当前可获得的奖励。
+dragon_knight,龙骑宝箱奖励更新公告,,本次奖池内容已更新，以下为当前可获得的奖励。
+summer,暑期宝箱奖励更新公告,,本次奖池内容已更新，以下为当前可获得的奖励。

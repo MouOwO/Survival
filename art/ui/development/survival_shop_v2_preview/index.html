@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>生存商店 · 第一版视觉预览</title>
+<link rel="stylesheet" href="preview.css">
+<body>
+<main class="stage">
+ <button id="opener" onclick="openShop()" aria-label="打开生存商店">▣</button>
+ <div class="scene-mark">SURVIVAL<span>生存商店 · 视觉方案 02</span></div>
+ <aside id="drawer" aria-label="生存商店">
+  <header><span class="crest">◇</span><h1>生存商店</h1><button onclick="closeShop()" aria-label="关闭">×</button></header>
+  <nav><button class="selected" data-tab="shop" onclick="selectTab('shop')">商店</button><button data-tab="challenge" onclick="selectTab('challenge')">挑战</button></nav>
+  <div id="content"></div>
+  <footer><span>右键购买</span><span class="wallet"><i class="gold"></i>125,000 <i class="wood"></i>60,000</span></footer>
+ </aside>
+ <div id="tooltip" hidden></div>
+ <section id="notes"><div class="eyebrow">FIRST LOOK / 01</div><h2>小图标，也有完整的世界。</h2><p>深色场景衬托装备轮廓。<br>红、蓝书籍和不同阶段的武器，<br>一眼就能分辨。</p><div class="line"></div><p class="small">左侧滑入 · 90 × 90 装备图标<br>两栏切换 · 精简悬浮提示</p><div class="controls"><button onclick="replay()">重播滑入</button><button onclick="showGallery()">武器进阶图鉴</button></div><p class="disclaimer">可交互效果稿 / 非游戏截图<br>库存与购买状态为预览数据</p></section>
+ <section id="gallery" hidden><div class="gallery-head"><div><div class="eyebrow">ORIGINAL ART / 02</div><h2>武器进阶外观</h2><p>五组配色，每组五阶外观样稿；正式等级映射待接入。</p></div><button onclick="hideGallery()">返回商店 ×</button></div><div id="swords"></div></section>
+ <div id="notice" role="status"></div>
+</main>
+<script src="preview.js"></script></body></html>

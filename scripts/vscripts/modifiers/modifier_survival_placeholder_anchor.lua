@@ -1,8 +1,4 @@
-LinkLuaModifier(
-    "modifier_survival_placeholder_anchor",
-    "modifiers/modifier_survival_placeholder_anchor",
-    LUA_MODIFIER_MOTION_NONE
-)
+-- Engine registration belongs to core/modifier_registry and its scope binding.
 
 modifier_survival_placeholder_anchor = class({})
 local M = modifier_survival_placeholder_anchor

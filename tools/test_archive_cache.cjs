@@ -1,0 +1,15 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');const cfg={};
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/ui_snapshot_cache.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg}});cfg.SurvivalSnapshotCache.Warm=()=>{};
+const events={},renders=[],env={pageCache:{},pageAssemblies:{},pageVersions:{},array:v=>Array.isArray(v)?v:Object.values(v||{}),GameEvents:{Subscribe:(n,f)=>events[n]=f},GameUI:{CustomUIConfig:()=>cfg},render:x=>renders.push(x),request:()=>{throw Error('unexpected resync')},buildingIcons:{},A:{},panel:()=>({}),opened:false,$:{Schedule(){}}};
+const code=fs.readFileSync('panorama/src/scripts/custom_game/archive_180de7e38b.js','utf8');
+vm.runInNewContext(code.slice(code.indexOf('    GameEvents.Subscribe("survival_archive_snapshot"'),code.indexOf('    GameEvents.Subscribe("survival_endless_state"')),env);
+const send=events.survival_archive_snapshot;
+send({ok:1,category_id:'clear',sequence:1,chunk:2,chunks:2,rows:[{id:'b',count:0}]});
+send({ok:1,category_id:'shadow',sequence:2,chunk:1,chunks:1,rows:[{id:'s',count:1}]});
+send({ok:1,category_id:'clear',sequence:1,chunk:1,chunks:2,rows:[{id:'a',count:0}]});
+assert.equal(env.pageCache.clear.rows.length,2);assert.equal(env.pageCache.shadow.rows[0].count,1);
+send({ok:1,category_id:'clear',sequence:3,base_sequence:1,delta:1,chunk:1,chunks:1,rows:[{path:['rows','2','count'],value:5}]});
+assert.equal(env.pageCache.clear.rows[1].count,5);assert.equal(env.pageCache.clear.rows[0].count,0);
+send({ok:1,category_id:'clear',sequence:1,chunk:1,chunks:1,rows:[]});assert.equal(env.pageCache.clear.rows.length,2);
+assert(!code.includes('$.Schedule(0.18'));
+console.log('ARCHIVE_CACHE_PASS: interleaved page chunks, incremental row update, stale packets rejected, no artificial tab delay');

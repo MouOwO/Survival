@@ -878,6 +878,9 @@ local function get_wave_state()
         game_started = game_started == true,
         early_final_used = state.early_final_used == true,
         early_final_remaining = early_final_remaining(),
+        early_final_cooldown_total = EARLY_FINAL_UNLOCK_SECONDS,
+        early_final_cooldown_until = game_started_at
+            and (game_started_at + EARLY_FINAL_UNLOCK_SECONDS) or 0,
         victory_settled = state.victory_settled == true,
         post_clear_frozen = state.post_clear_frozen == true,
         next_wave_number = next_wave_number,

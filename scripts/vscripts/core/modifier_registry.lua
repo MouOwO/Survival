@@ -248,7 +248,7 @@ function M.register()
     for _, definition in ipairs(modifiers) do
         LinkLuaModifier(
             definition.name,
-            "modifier_bindings/" .. definition.name,
+            "modifier_bindings/" .. definition.name .. ".lua",
             definition.motion_type or LUA_MODIFIER_MOTION_NONE
         )
     end
@@ -293,7 +293,7 @@ function M.ensure(unit, name, params)
     assert(definition, "Unregistered modifier requested: " .. tostring(name))
     require(definition.path)
     validate_definition(definition)
-    LinkLuaModifier(name, "modifier_bindings/" .. name,
+    LinkLuaModifier(name, "modifier_bindings/" .. name .. ".lua",
         definition.motion_type or LUA_MODIFIER_MOTION_NONE)
     local created = unit:AddNewModifier(unit, nil, name, params or {})
     if not created then

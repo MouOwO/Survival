@@ -20,7 +20,10 @@ FIELDS = {
     "daily_init": {"today"}, "daily_claim": {"today","target_day"},
     "work_upgrade": {"item_id","expected_level"},
     "building_upgrade": {"item_id","expected_level"},
-    "faith_cheat": {"amount"},  # Authenticated game-server intent; never a client UI action.
+    # No simulated currency/faith grants in the HTTP integration.
+    "lottery_draw": {"pool_id","count","request_id"},
+    "lottery_exchange": {"pool_id","item_id","request_id"},
+    "lottery_read": {"pool_id","revision","read_action","request_id"},
 }
 
 def object_maps(value):
@@ -64,6 +67,12 @@ class ArchiveService:
             if not max(3,definition["min_difficulty"])<=difficulty<=20: raise ArchiveError("archive_challenge_locked")
             c["difficulty_id"]="n"+str(difficulty);integer("kill_sequence",1,100000)
         if kind=="daily_claim": integer("target_day",0,1000000)
+        if kind.startswith("lottery_"):
+            if c.get("pool_id") not in self.bundle.tables["lottery_pool_definitions"]: raise ArchiveError("lottery_pool_invalid")
+            if not isinstance(c.get("request_id"),str) or not re.fullmatch(r"[A-Za-z0-9_:.-]{1,96}",c["request_id"]): raise ArchiveError("lottery_request_id_invalid")
+            if kind=="lottery_draw" and (type(c.get("count")) is not int or c["count"] not in (1,10)): raise ArchiveError("lottery_count_invalid")
+            if kind=="lottery_exchange" and c.get("item_id") not in self.bundle.tables["lottery_item_definitions"]: raise ArchiveError("lottery_item_invalid")
+            if kind=="lottery_read" and (c.get("read_action") not in ("visit","details","notice") or not isinstance(c.get("revision"),str)): raise ArchiveError("lottery_read_invalid")
         if kind=="faith_cheat": integer("amount",1,1000000000)
         if kind=="social_draw" and c.get("pool_id") not in self.bundle.tables["archive_social_rules"]: raise ArchiveError("archive_pool_invalid")
         if kind=="promotion" and c.get("fragment_id") not in self.bundle.tables["archive_fragment_definitions"]: raise ArchiveError("archive_fragment_invalid")
@@ -125,9 +134,14 @@ class ArchiveService:
             archive=result.get("archive",{})
             archive.pop("processed",None) # DB receipts, not ever-growing Lua IDs, own remote deduplication.
             if isinstance(archive.get("online"),dict): archive["online"]["cursors"]={}
-            committed=self.app.rpc_client.rpc("archive_commit",{"p_account":account,"p_id":operation_id,
+            commit_payload={"p_account":account,"p_id":operation_id,
                 "p_revision":profile["revision"],"p_archive":archive,"p_deltas":deltas,
-                "p_error":None if result.get("ok") else result.get("error","archive_rejected")})
+                "p_error":None if result.get("ok") else result.get("error","archive_rejected")}
+            rpc="archive_commit"
+            if command["kind"].startswith("lottery_"):
+                rpc="archive_commit_lottery"
+                commit_payload.update(p_inventory=result.get("content_inventory",{}),p_response=result.get("response",{}))
+            committed=self.app.rpc_client.rpc(rpc,commit_payload)
             if committed.get("error")!="archive_revision_conflict": return committed
             prepared=self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":operation_id})
         return {"ok":False,"error":"archive_busy_retry"}
@@ -149,6 +163,14 @@ class ArchiveService:
             self.finish_prepared(account,pending["id"],self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":pending["id"]}))
         value=self.app.rpc_client.rpc("get_fishing_profile",{"p_account_id":account})
         return self.app._public_response(value,account,payload["account_id"])
+
+    def lottery_snapshot(self,payload):
+        if payload.get("config_hash")!=self.bundle.hash:
+            return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
+        profile=self.profile({"account_id":payload.get("account_id")})
+        projected=self.settle(profile,{"id":"lottery_snapshot","kind":"lottery_snapshot"},False)
+        projected["config_hash"]=self.bundle.hash
+        return projected
 
 def install(application,addon_root,lua):
     root=Path(addon_root)

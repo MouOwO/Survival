@@ -1,0 +1,417 @@
+{
+  "bytes": 8827620.0,
+  "files": [
+    {
+      "bytes": 1371322,
+      "relative": "panorama\\images\\custom_game\\archive_gothic\\tab.png",
+      "sha256": "F367F45D22C4706A5FA49D0CE02B64E51CC964A3A214822F3F9B3BA715866EF8"
+    },
+    {
+      "bytes": 2354748,
+      "relative": "panorama\\images\\custom_game\\archive_gothic\\window.png",
+      "sha256": "78800DAF43352394A7EA3615D76EF0C0D984BA7FF97E3653B8AAFA4938248096"
+    },
+    {
+      "bytes": 817,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\beast_01.vtex",
+      "sha256": "6A82745FA1448AB0EF4AC5202FF045D588C6927AC7355281CA016C34E19157AE"
+    },
+    {
+      "bytes": 817,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\beast_02.vtex",
+      "sha256": "F7B8553604AF7F78F6E6385283C5140F15BAA0AE6478526C5915E43A49A7D5F0"
+    },
+    {
+      "bytes": 817,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\beast_03.vtex",
+      "sha256": "BD6AE21AA7C38754286B40DA10AE7D904FF2B914EB184556C896DF1A3DBC46C7"
+    },
+    {
+      "bytes": 820,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\building_01.vtex",
+      "sha256": "B0D9A4F369411536B3B47FAD9A0F2EC32E3B8F21EE2A5B742E3D60F2B0217E64"
+    },
+    {
+      "bytes": 820,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\building_02.vtex",
+      "sha256": "24D5F75C294FB53B10DAC7E1E7874778E201589670D3BCABBDDC4F81CFF3E75F"
+    },
+    {
+      "bytes": 820,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\building_03.vtex",
+      "sha256": "77C7555E1A4322F9D877530D3FBD8F61AEB224639751E053C9088007BF88117F"
+    },
+    {
+      "bytes": 816,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\cage_01.vtex",
+      "sha256": "11A0966FDAC620DD2867DBA3FECF03ACFC9FDED4071DF1FA4EF7C6D850394ED5"
+    },
+    {
+      "bytes": 816,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\cage_02.vtex",
+      "sha256": "1A6F8769DCF7D093E14E6EB6895E48DE78DECE34703863FBCBD3D2A5F32A31AF"
+    },
+    {
+      "bytes": 816,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\cage_03.vtex",
+      "sha256": "375BE406ADE2D20133DDA13CCDEE9313CB0357D744C514252CE991AD65C5EC9C"
+    },
+    {
+      "bytes": 814,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\ex_01.vtex",
+      "sha256": "20C4CECCCB77DAD9B2AD53EB4A6E8D6AD312E65E9ECAF83E2DCD860DE0E9FA90"
+    },
+    {
+      "bytes": 814,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\ex_02.vtex",
+      "sha256": "E16A22FB11D7BC94673B324B55C28B49A41EC61FE7663F6CC23B7302D2D71F99"
+    },
+    {
+      "bytes": 814,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\ex_03.vtex",
+      "sha256": "0B1A5973A242F4E4D47D74ECBBFDE844267B120840D38F1990A6848D06402540"
+    },
+    {
+      "bytes": 820,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\fragment_01.vtex",
+      "sha256": "1B770173098812D28916251F837B7C41410A973BD13E8539C47E9D5D8B9AE127"
+    },
+    {
+      "bytes": 820,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\fragment_02.vtex",
+      "sha256": "862E6FB8044EB01AA043D9D1EBEB950850A6A4C066B3D3268422CAE5203B925C"
+    },
+    {
+      "bytes": 820,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\fragment_03.vtex",
+      "sha256": "8AC5AE0FF44B78AFBD9C094073E8B7601AD9B9A111C32DBA066AF1AE9783DB5A"
+    },
+    {
+      "bytes": 818,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\friend_01.vtex",
+      "sha256": "4A2ECDAE122CA33ACE47251C2FCC8E9F9CEF8EEFB3B108272AC28AD61C8404AF"
+    },
+    {
+      "bytes": 818,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\friend_02.vtex",
+      "sha256": "46024871C677E177E1C004F1E8699E657153AEBB23E5BE59BAB6D21C852AA4DF"
+    },
+    {
+      "bytes": 818,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\friend_03.vtex",
+      "sha256": "FF445D00137A86B9F1EFBDA44C09F1212143E4244B7A8CDFDA67569CA5AC83B2"
+    },
+    {
+      "bytes": 834,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\lottery_attribute_crystal.vtex",
+      "sha256": "8A9D119E39C6F6427E54CCA75891C388924C8291AE6669DAD0E6D17F8A37B30A"
+    },
+    {
+      "bytes": 831,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\lottery_nature_crystal.vtex",
+      "sha256": "B4A7FE0D3F9A34B3EC335714415FCED79597487076DF4073D7B6FA3AC9242B81"
+    },
+    {
+      "bytes": 835,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\lottery_protection_crystal.vtex",
+      "sha256": "544A358E8C1CF0A4D2297A9BEC15A8A94C290149FB2BE39327A3A59638AC9F0D"
+    },
+    {
+      "bytes": 821,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\shadow_01.vtex",
+      "sha256": "FE747DEB23721C1560FA92B2B4EC4EB065B171A5B550E2C51AC08F49C6EEA4C3"
+    },
+    {
+      "bytes": 821,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\shadow_02.vtex",
+      "sha256": "5A69C823F0063290044B2E2E2A2DB4EC8103165302DCF5EA31E8C9781CA2739B"
+    },
+    {
+      "bytes": 821,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\shadow_03.vtex",
+      "sha256": "9CAB72E580433F3323AD9AF2DC608F3BDBA4E5080355158E569F92B1D93D617B"
+    },
+    {
+      "bytes": 821,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\shadow_04.vtex",
+      "sha256": "52D908C7A35F857707FB4337F55663F8FA246A2E8B1E3F7A7078CC3229E04F45"
+    },
+    {
+      "bytes": 840,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\shop_equipment_attack_gloves_01.vtex",
+      "sha256": "E3E63BD49034F518B4372E1FE94225A7C3147445C5F1233A351BF474136C06A3"
+    },
+    {
+      "bytes": 833,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\shop_item_forging_hammer.vtex",
+      "sha256": "E56C410F4511B4B8D7D82F958288A7BEBF97BBA0A9093CA79BA0979E12098DF5"
+    },
+    {
+      "bytes": 836,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\shop_weapon_growth_sword_01.vtex",
+      "sha256": "0E2B72AB5252D2A50543893FAD8E96D7379F79E311B2CD96328F87CA22F3AE2E"
+    },
+    {
+      "bytes": 826,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\star_blessing_001.vtex",
+      "sha256": "A20DE3580092D27D68BC1D2A51849625EAB95C693F35F6DFEB5090E2DA7E188C"
+    },
+    {
+      "bytes": 826,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\star_blessing_002.vtex",
+      "sha256": "92211BD66EA7E4D361E60EBD7EA05317090BEF4BA72EFDB20DF6B2F28BA89CD7"
+    },
+    {
+      "bytes": 826,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_256\\star_blessing_003.vtex",
+      "sha256": "AE9A356550FDDFC6FF1FDDF56225CF08C80614CB25069414722285CE5520F5A1"
+    },
+    {
+      "bytes": 860,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\beast_01.vtex",
+      "sha256": "149DEE7BD7AE5D1B68CB1C594F6D4AFDCF28DC3D7BFF608E12C74FEDE05D67B8"
+    },
+    {
+      "bytes": 860,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\beast_02.vtex",
+      "sha256": "906E45F5B829CB5782CE3206A8FE832AFFDE1D81825CBA3599A74F4AF51C670B"
+    },
+    {
+      "bytes": 860,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\beast_03.vtex",
+      "sha256": "4057276DA05605D766CFA0DAB3FF5D4A33BF04A2A1AB0ADD1239258016194234"
+    },
+    {
+      "bytes": 863,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\building_01.vtex",
+      "sha256": "95B00D67C33A6AF1E3E90DB585C13EF7674D5317A08DD61DD50FA4D2C0665A69"
+    },
+    {
+      "bytes": 863,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\building_02.vtex",
+      "sha256": "BA10FDA92F4CDDAFBFA50F70C9F012569131315D8A9F2AA6E2C0D5B6CEC52AB6"
+    },
+    {
+      "bytes": 863,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\building_03.vtex",
+      "sha256": "15613076AA1D290C16D16E0FA03C4DE3E0919A951861AD5D26648CCA19B5BE88"
+    },
+    {
+      "bytes": 859,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\cage_01.vtex",
+      "sha256": "77299B83D3EDFF0F40D14720F10DDB517127D5057A37C0BE7FE099AE7E3E3BCE"
+    },
+    {
+      "bytes": 859,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\cage_02.vtex",
+      "sha256": "9C7770E7BC9C483911D7BDF9E2DA7C9F2A6ED29CCEF9DA439BB02300A8A58BBB"
+    },
+    {
+      "bytes": 859,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\cage_03.vtex",
+      "sha256": "9AF6C83B180B5C582CFBDFA04D87359BAFB77B8798B10572E8F5D5385ABC0804"
+    },
+    {
+      "bytes": 857,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\ex_01.vtex",
+      "sha256": "6C555742FF16D9EC28ADA2BC7CB0729DE031AC60ACB5A2EE28CAF84EB7374A78"
+    },
+    {
+      "bytes": 857,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\ex_02.vtex",
+      "sha256": "38D50467703C4C19ABDAA849C9F3CF5DC658885B4F97069FF62F8905766B3655"
+    },
+    {
+      "bytes": 857,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\ex_03.vtex",
+      "sha256": "EE0DEFE3D1B910F837648891543E98E1DF5F09CF9E02376D1428E0DA521F1D54"
+    },
+    {
+      "bytes": 863,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\fragment_01.vtex",
+      "sha256": "DFF773DEB23FA6D2169F2AE31408F9B14682C1720F6AC3D81170B98FFF30D066"
+    },
+    {
+      "bytes": 863,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\fragment_02.vtex",
+      "sha256": "CADF76E4B025BB68B5C7BF54F52D880D2794F2FC844BC575B24141C4EDA815E2"
+    },
+    {
+      "bytes": 863,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\fragment_03.vtex",
+      "sha256": "EF84CBEAB6D63DDB07A218D2EE7A2EABE481597CE7F9D0EE3499CF788D180767"
+    },
+    {
+      "bytes": 861,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\friend_01.vtex",
+      "sha256": "4C3F8860DF02C7C037DEA263077C82B35B2B4DB1BFCD7B0BF5D57EB8FF06A054"
+    },
+    {
+      "bytes": 861,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\friend_02.vtex",
+      "sha256": "8E83128E7E19B069EB5D1E86ED4A443A7F17C64EF9B1526FEF9E2F156A9B014D"
+    },
+    {
+      "bytes": 861,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\friend_03.vtex",
+      "sha256": "F149EC53D12E07B9B72605F2F6CF3A4323647BB21084D0435D284CE363D7D2E1"
+    },
+    {
+      "bytes": 877,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\lottery_attribute_crystal.vtex",
+      "sha256": "0673C37622A897718ECD2B642F451DC87D7C8809910D53D051B7AC3ECA46A2E2"
+    },
+    {
+      "bytes": 874,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\lottery_nature_crystal.vtex",
+      "sha256": "DF3FAD1E482DD720C8717EAF7F243FDA138D34BBE20AC05457FEFCAA6208F57E"
+    },
+    {
+      "bytes": 878,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\lottery_protection_crystal.vtex",
+      "sha256": "B12064EB869BE29DF2565683DCED45D17A1DAC600334876FE1D7477115C7CAD4"
+    },
+    {
+      "bytes": 864,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\shadow_01.vtex",
+      "sha256": "AAC0F40827DA152A24ACA53D00109E1FC7E0CB86C7632B0B7F4A361A2ACE129A"
+    },
+    {
+      "bytes": 864,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\shadow_02.vtex",
+      "sha256": "803CA1EAF9F39B096547C5D2FE470301A1E1A33D60CFA1B7BF77A1E7DD49944A"
+    },
+    {
+      "bytes": 864,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\shadow_03.vtex",
+      "sha256": "986FFA307C45A3F5A427C9DB10BA9F23294DF8E1213545257DBE8403CE1A080C"
+    },
+    {
+      "bytes": 864,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\shadow_04.vtex",
+      "sha256": "7FE63DE6A83DC1CAAE732DA15C96F9EB966E87507DC8C1A22348D9C1597D8334"
+    },
+    {
+      "bytes": 883,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\shop_equipment_attack_gloves_01.vtex",
+      "sha256": "E493872160347FF223726D740AFBF65498357697AC2CE6FDD35188C627815600"
+    },
+    {
+      "bytes": 876,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\shop_item_forging_hammer.vtex",
+      "sha256": "8DDC265F676C05649F7165846DE29AE0526CA396DA7821C05E1DD60BA55E9E6A"
+    },
+    {
+      "bytes": 879,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\shop_weapon_growth_sword_01.vtex",
+      "sha256": "4B618EF261834E1D703E5AE84CE7A6BA3B75C25608A3BB10E70735E1A9547ABD"
+    },
+    {
+      "bytes": 869,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\star_blessing_001.vtex",
+      "sha256": "7E154FF2B13B9DE0CFFE32AAA191F9A6C00368AE8D935215F48C390C8DE0B9A4"
+    },
+    {
+      "bytes": 869,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\star_blessing_002.vtex",
+      "sha256": "EAFEF78C6A26BFF38A318415B04E855E93DCEE7E40C394725A764BED36B72899"
+    },
+    {
+      "bytes": 869,
+      "relative": "panorama\\images\\custom_game\\archive_gpu_bgra\\star_blessing_003.vtex",
+      "sha256": "A0C7C20C66C3C9968A8923BC2476B32131F852E364FF0397676DE0AB15D1A992"
+    },
+    {
+      "bytes": 17609,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\bars\\st2_top_resource_360x42.png",
+      "sha256": "DFD0C8311500EC516C94BAF1855C6A2717D6CD6BF14BB9DFE42468555A6AC86E"
+    },
+    {
+      "bytes": 21569,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\bars\\st2_top_wave_520x40.png",
+      "sha256": "8698A5A3B8C0BC2AC8C810A6E99682A65B62FB3EABA589DF1B54668BBBC7311C"
+    },
+    {
+      "bytes": 6785,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\common\\st2_shop_button_128x42.png",
+      "sha256": "AEF0E2347CDC1A9550E00A7E986259D168F3138D64B62ECCF3DBA14C16A0DFB6"
+    },
+    {
+      "bytes": 2388,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\hero\\st2_level_badge_34x32.png",
+      "sha256": "EC8B75DD42C6041F9EF3FF913FDC86E712965F12EC47414B3127F1A36FE7E7DB"
+    },
+    {
+      "bytes": 18806,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\hero\\st2_portrait_overlay_124x120.png",
+      "sha256": "E6231887364238CF2FECF3EB84152591BD04C18F490A23DB3BF913897C67AA7F"
+    },
+    {
+      "bytes": 18441,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\hero\\st2_stats_frame_238x96.png",
+      "sha256": "79399E6509A362A16F2D770846B8E6421B6A1817ED4BD809ED10522CC9223EBD"
+    },
+    {
+      "bytes": 17359,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\inventory\\st2_inventory_panel_180x120.png",
+      "sha256": "C6E0CA7C19774A100724963D586446C09D1D97E9986874339136E9B919E558F5"
+    },
+    {
+      "bytes": 4691,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\inventory\\st2_inventory_slot_54x54.png",
+      "sha256": "8A9BE663BD4BEBD670521563C050EDD023F839AFF404E119E551814647114A62"
+    },
+    {
+      "bytes": 3600,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\skills\\st2_hp_frame_238x18.png",
+      "sha256": "E0EF98935DC1EE712CA67C24606FC0CA30B555D53F24FCF70C505B0FF1575D88"
+    },
+    {
+      "bytes": 3672,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\skills\\st2_mp_frame_238x18.png",
+      "sha256": "F718C00C624F0580A8E92CF40EF7A1C1944F468D16D5B7A4B19BF70D71AA8026"
+    },
+    {
+      "bytes": 25531,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\skills\\st2_skill_panel_320x138.png",
+      "sha256": "EBDB3FFF64C6E37652E213784B29F94ACC01D38E736719E53C0745D768202835"
+    },
+    {
+      "bytes": 5256,
+      "relative": "panorama\\images\\custom_game\\st2_localmount\\skills\\st2_skill_slot_54x54.png",
+      "sha256": "E99A22CBED023A18401419AAE4B390D8501073F157DE32E49BA2DC17C695DD17"
+    },
+    {
+      "bytes": 697,
+      "relative": "panorama\\styles\\custom_game\\survival_dota_theme.css",
+      "sha256": "EBC37D722F870A50C843F8E3F47AC543894BA466128A718C2046D559F2ED49BC"
+    },
+    {
+      "bytes": 11303,
+      "relative": "panorama\\styles\\custom_game\\survival_hud_st2_local.css",
+      "sha256": "74891417C9B6B5BA3FF0F99F19BBE555B92E035F88D37AEA3185F83B86152935"
+    },
+    {
+      "bytes": 20930,
+      "relative": "panorama\\scripts\\custom_game\\shop_ui.js.orig",
+      "sha256": "9E62B34A883EFA177F15799CD118AC90368ADB46439ACB65E10CF0811AC7C0C0"
+    },
+    {
+      "bytes": 1812832,
+      "relative": "materials\\example\\sand_path_example_color.tif",
+      "sha256": "FB903B140D42C76F2CCC21F5F33683C72D8CB8A8B3BE4FFEDEF2C224E95DC4D9"
+    },
+    {
+      "bytes": 2335852,
+      "relative": "materials\\example\\sand_path_example_normal.tif",
+      "sha256": "6342C2E5B557AB205145D2C1864EB98DE00879379D59129EA92259DF2F0ACE43"
+    },
+    {
+      "bytes": 721924,
+      "relative": "materials\\example\\sand_path_example_refl.tif",
+      "sha256": "F1B44C8926B99694701E2C6E7F30EC8B480EB0918A7A684861E58848405FBBEE"
+    }
+  ],
+  "count": 82,
+  "backup": "D:\\survival_ui_backups\\content_cleanup_20260912"
+}

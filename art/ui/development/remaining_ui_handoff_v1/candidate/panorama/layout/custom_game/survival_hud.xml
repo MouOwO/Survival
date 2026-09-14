@@ -179,7 +179,7 @@
                     <Label id="LotteryTooltipDuration" text="期限：永久" />
                 </Panel>
             </Panel>
-            <Label id="LotteryTooltipDescription" text="简介：" />
+            <Label id="LotteryTooltipEffectHeading" text="效果" /><Label id="LotteryTooltipDescription" text="简介：" />
         </Panel>
         <Panel id="HeroCombatDebugPanel" hittest="false">
             <Label id="HeroCombatDebugTitle" text="英雄伤害 / 科技状态" />

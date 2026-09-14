@@ -143,7 +143,8 @@ M.wall = {
     footprint = { x = 4, y = 4 }, hull_radius = 256,
     max_count = 1, build_once = true,
     show_health_bar = true, selectable = true,
-    abilities = { "ability_upgrade_wall" }, levels = wall_levels,
+    abilities = { "ability_upgrade_wall", "ability_upgrade_wall_9_1" }, levels = wall_levels,
+    quick_upgrade_target_level = 25, -- CSV level 25 is 城墙_9_1.
 }
 
 M.main_city = {

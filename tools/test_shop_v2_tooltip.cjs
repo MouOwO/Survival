@@ -1,0 +1,17 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const nodes={};for(const id of ['ShopEntryTooltip','ShopTooltipIconHost','ShopTooltipFields','CustomShopWindow','ShopTooltipTitle','ShopTooltipWoodCost','ShopTooltipGoldCost','ShopTooltipType','ShopTooltipDescription','ShopTooltipCondition','ShopTooltipOwned','ShopTooltipStatus'])nodes[id]={style:{},visible:true,parent:{visible:true},GetParent(){return this.parent},RemoveAndDeleteChildren(){},SetHasClass(){},RemoveClass(){},AddClass(){}};
+const $=id=>nodes[id.slice(1)];$.Schedule=()=>{};
+const cfg={SurvivalItemArt:{Create:()=>true}},env={$,GameUI:{CustomUIConfig:()=>cfg},CustomNetTables:{GetTableValue:()=>({name:'fallback',needwood:25,needgold:10})}};
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/shop_tooltip_remaining_5d5c1152eb.js','utf8'),env);
+cfg.SurvivalShopTooltip.Show({name:'知识之书',description:'获得经验。',gold_cost:50000,wood_cost:0,purchasable:1});
+assert.equal(nodes.ShopTooltipDescription.text,'获得经验。');assert(nodes.ShopTooltipDescription.visible);
+assert.equal(nodes.ShopTooltipTitle.text,'知识之书');assert.equal(nodes.ShopTooltipGoldCost.text,'50000');assert(nodes.ShopTooltipGoldCost.parent.visible);assert(!nodes.ShopTooltipWoodCost.parent.visible);
+for(const suffix of ['Type','Fields','Condition','Owned','Status'])assert.equal(nodes['ShopTooltip'+suffix].visible,false);
+cfg.SurvivalShopTooltip.Show({name:'木材挑战',gold_cost:0,wood_cost:2000});assert(!nodes.ShopTooltipGoldCost.parent.visible);assert(nodes.ShopTooltipWoodCost.parent.visible);
+cfg.SurvivalShopTooltip.Show({name:'免费',gold_cost:0,wood_cost:0});assert(!nodes.ShopTooltipGoldCost.parent.visible&&!nodes.ShopTooltipWoodCost.parent.visible);
+assert.equal(nodes.ShopTooltipDescription.text,'');assert(!nodes.ShopTooltipDescription.visible);
+cfg.SurvivalShopTooltip.Show({name:'fallback'});assert.equal(nodes.ShopTooltipGoldCost.text,'10');assert.equal(nodes.ShopTooltipWoodCost.text,'25');
+env.CustomNetTables.GetTableValue=()=>({desc:'配置中的商品效果'});
+cfg.SurvivalShopTooltip.Show({name:'商品'});assert.equal(nodes.ShopTooltipDescription.text,'配置中的商品效果');assert(nodes.ShopTooltipDescription.visible);
+cfg.SurvivalShopTooltip.Show({name:'科技',content_type:'technology',description:'当前等级的效果'});assert.equal(nodes.ShopTooltipDescription.text,'当前等级的效果');
+console.log('SHOP_V2_TOOLTIP_PASS: icon/title/effect/nonzero costs; description fallback and clearing on entry changes');

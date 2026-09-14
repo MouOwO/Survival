@@ -887,6 +887,7 @@ local function register_ability_cast_request()
             and unit:FindAbilityByName(ability_name) == ability
         local building_upgrade_action = ({
             ability_upgrade_wall = true,
+            ability_upgrade_wall_9_1 = true,
             ability_upgrade_city = true,
             ability_upgrade_farm = true,
         })[ability_name] == true
@@ -1359,39 +1360,46 @@ local function register_lottery_requests()
     CustomGameEventManager:RegisterListener("ui_lottery_snapshot_request", function(_, payload)
         local player_id = source_player_id(payload)
         if not valid_player_id(player_id) then return end
+        local function complete(result)
+            local snapshot={}
+            for k,v in pairs(result and result.snapshot or {ok=false,error=result and result.error or 'lottery_snapshot_failed'}) do snapshot[k]=v end
+            snapshot.snapshot_scope=tostring(payload and payload.snapshot_scope or 'main')
+            snapshot.snapshot_request_id=tonumber(payload and payload.snapshot_request_id) or 0
+            send_to_player('ui_lottery_snapshot',player_id,snapshot)
+        end
         local result = event_bus.request(events.LOTTERY_SNAPSHOT_REQUEST, {
+            complete = complete,
+            prefetch = tonumber(payload and payload.prefetch) or 0,
+            read_action = tostring(payload and payload.read_action or ""),
+            revision = tostring(payload and payload.revision or ""),
             player_id = player_id,
             pool_id = tostring(payload and payload.pool_id or "map"),
         })
-        local snapshot = result and result.snapshot or {
-            ok = false, error = result and result.error or "lottery_snapshot_failed",
-        }
-        -- UI response routing only; does not change pool selection or rewards.
-        snapshot.snapshot_scope = tostring(payload and payload.snapshot_scope or "main")
-        snapshot.snapshot_request_id = tonumber(payload and payload.snapshot_request_id) or 0
-        send_to_player("ui_lottery_snapshot", player_id, snapshot)
+        if not (result and result.pending) then complete(result) end
     end)
     CustomGameEventManager:RegisterListener("ui_lottery_draw_request", function(_, payload)
         local player_id = source_player_id(payload)
         if not valid_player_id(player_id) then return end
         local result = event_bus.request(events.LOTTERY_DRAW_REQUEST, {
+            complete = function(result) send_to_player('ui_lottery_result',player_id,result) end,
             player_id = player_id,
             pool_id = tostring(payload and payload.pool_id or "map"),
             count = tonumber(payload and payload.count) or 1,
             request_id = tostring(payload and payload.request_id or ""),
         }) or { ok = false, error = "lottery_draw_failed" }
-        send_to_player("ui_lottery_result", player_id, result)
+        if not result.pending then send_to_player("ui_lottery_result", player_id, result) end
     end)
     CustomGameEventManager:RegisterListener("ui_lottery_exchange_request", function(_, payload)
         local player_id = source_player_id(payload)
         if not valid_player_id(player_id) then return end
         local result = event_bus.request(events.LOTTERY_EXCHANGE_REQUEST, {
+            complete = function(result) send_to_player('ui_lottery_exchange_result',player_id,result) end,
             player_id = player_id,
             pool_id = tostring(payload and payload.pool_id or "map"),
             item_id = tostring(payload and payload.item_id or ""),
             request_id = tostring(payload and payload.request_id or ""),
         }) or { ok = false, error = "lottery_exchange_failed" }
-        send_to_player("ui_lottery_exchange_result", player_id, result)
+        if not result.pending then send_to_player("ui_lottery_exchange_result", player_id, result) end
     end)
 end
 

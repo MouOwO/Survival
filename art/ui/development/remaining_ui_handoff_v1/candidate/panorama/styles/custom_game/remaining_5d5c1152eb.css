@@ -166,7 +166,7 @@
 #RogueRewardSurface .RogueArt_growth {background-image:url("file://{images}/custom_game/remaining_handoff_ready/rogue_growth.png");}
 #RogueRewardSurface .RogueArt_defense {background-image:url("file://{images}/custom_game/remaining_handoff_ready/rogue_defense.png");}
 #RogueRewardSurface .RogueBack {background-image:url("file://{images}/custom_game/remaining_handoff_ready/rogue_back.png");}
-#RogueRewardSurface .RogueCopy {position:27px 429px 0px;width:236px;height:210px;}
+#RogueRewardSurface .RogueCopy {position:27px 454px 0px;width:236px;height:168px;z-index:2;}
 #RogueRewardSurface .RogueCardName {font-family:"Source Han Serif SC";font-weight:bold;font-size:26px;color:#254755;}
 #RogueRewardSurface .RogueCardDescription {font-family:"Source Han Sans SC";font-size:18px;line-height:24px;color:#3e5962;}
 #RogueRewardSurface .RogueRewardTitle {font-family:"Source Han Serif SC";font-weight:bold;}
@@ -397,3 +397,51 @@ RadioButton:selected .ArchiveFilter_selected {visibility:visible;}
 #LotteryMainCanvas .LHSingleHover {visibility:collapse;}
 #LotteryMainCanvas .PolishSingleHover {z-index:1;wash-color:#e8c780;opacity:0;transition-property:opacity;transition-duration:.08s;}
 #LotteryMainCanvas #LotterySingleButton:enabled:hover .PolishSingleHover {opacity:.3;}
+
+/* Shared confirmed storefront presentation; transaction and unlock logic stay in SurvivalShop. */
+#CustomShopWindow.UIModal.RHSurvivalShop {flow-children:none;background-color:transparent;border:0px;border-radius:0px;}
+#CustomShopWindow.RHSurvivalShop #ShopHeader {position:0px 0px 0px;width:1208px;height:84px;flow-children:none;padding:0px;z-index:3;}
+#CustomShopWindow.RHSurvivalShop #ShopTitleBlock {position:390px 10px 0px;width:440px;height:64px;}
+#CustomShopWindow.RHSurvivalShop #ShopTitle {width:440px;text-align:center;color:#f4e8cc;font-size:36px;}
+#CustomShopWindow.RHSurvivalShop #ShopSubtitle {visibility:collapse;}
+#CustomShopWindow.RHSurvivalShop #ShopModeToggles {position:44px 105px 0px;width:597px;height:59px;margin:0px;overflow:noclip;}
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle {width:199px;height:59px;margin:0px;border:0px;background-color:transparent;flow-children:none;}
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle Label {z-index:3;font-size:23px;color:#eee3c8;}
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle.Selected {brightness:1.25;border-bottom:2px solid #e8c679;}
+#CustomShopWindow.RHSurvivalShop #ShopRefreshButton {position:1008px 22px 0px;width:100px;height:42px;margin:0px;}
+#CustomShopWindow.RHSurvivalShop #ShopCloseButton {position:1142px 22px 0px;width:38px;height:38px;margin:0px;}
+#CustomShopWindow.RHSurvivalShop #ShopBody {position:40px 175px 0px;width:1128px;height:555px;margin:0px;}
+#CustomShopWindow.RHSurvivalShop #ShopShelfArea {background-color:transparent;background-image:none;border:0px;}
+#CustomShopWindow.RHSurvivalShop #ShopItemList {padding:0px 10px;}
+#CustomShopWindow.RHSurvivalShop #ShopFooter {position:44px 746px 0px;width:1120px;height:40px;background-color:transparent;}
+#CustomShopWindow.RHSurvivalShop #ShopFooter Label {color:#375462;}
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct {width:205px;height:249px;margin:8px 14px 14px 0px;padding:0px;background-color:transparent;background-image:none;border:0px;box-shadow:none;flow-children:none;}
+#CustomShopWindow.RHSurvivalShop .ShopItemFrame {position:20px 15px 0px;width:165px;height:165px;z-index:2;}
+.RHShopCardBase {width:100%;height:100%;z-index:0;}
+.RHShopName {position:10px 180px 0px;width:185px;height:30px;text-align:center;text-overflow:shrink;font-size:20px;color:#375462;z-index:2;}
+.RHShopPrice {position:10px 213px 0px;width:185px;height:26px;text-align:center;text-overflow:shrink;font-size:17px;color:#375462;z-index:2;}
+.RHShopHover {width:100%;height:100%;background-color:#000c;z-index:5;visibility:collapse;}
+.ShopShelfSlot:hover .RHShopHover {visibility:visible;}
+.RHShopEffect {position:14px 15px 0px;width:177px;height:155px;font-size:18px;color:#fff3da;white-space:normal;overflow:squish scroll;}
+.RHShopBuy {position:22px 182px 0px;width:160px;height:50px;}
+.RHShopBuy Label {align:center center;font-size:21px;}
+#LotteryInfoDialog .LotteryPoolTab,#LotteryInfoDialog .LotteryPoolTab:hover,#LotteryInfoDialog .LotteryPoolTab:active {transform:none;pre-transform-scale2d:1;box-shadow:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab:active {brightness:1;background-color:transparent;}
+.RCWindow .RCProduct .UIPriceLabel {position:10px 229px 0px;width:205px;height:30px;flow-children:none;}
+.RCWindow .RCProduct .UIPriceRow {horizontal-align:center;vertical-align:center;flow-children:right;height:28px;}
+.RCWindow .RCProduct .UIPrice {width:fit-children;height:28px;vertical-align:center;margin:0px;text-align:center;}
+.UIPriceRow {flow-children:right;}
+.UIPriceCurrencyIcon {width:22px;height:22px;vertical-align:center;margin-left:5px;}
+
+#CustomShopWindow.RHSurvivalShop .ShopCardName {visibility:collapse;}
+
+.RCWindow .RCBundles .RCProduct .UIPriceLabel {position:28px 210px 0px;width:270px;height:40px;}
+
+/* Lottery actions: crisp rarity outline; ticket cost duplicates the action caption. */
+#LotteryMainCanvas #LHTenQuality {font-weight:bold;text-shadow:0px 0px 1px 2 #211329;}
+#LotteryMainCanvas #LotteryCelestialFooter .LHCost {visibility:collapse;}
+
+/* Archive and pool-item tooltips share the effect section vocabulary and typography. */
+#LotteryItemTooltip #LotteryTooltipEffectHeading {visibility:collapse;}
+#LotteryItemTooltip.LotterySimpleTooltip #LotteryTooltipEffectHeading {visibility:visible;color:#ede3bf;font-size:15px;font-weight:medium;margin-top:12px;margin-bottom:6px;text-shadow:none;}
+#LotteryItemTooltip.LotterySimpleTooltip #LotteryTooltipDescription {margin-top:0px;}

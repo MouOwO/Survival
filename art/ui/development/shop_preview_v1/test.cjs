@@ -12,6 +12,20 @@ const view=cfg.SurvivalCommerceView;view.Open();assert.equal(all().filter(x=>x.c
 click('立即购买');click('+');click('+');assert.equal(view.Inspect().quantity,3);click('确认模拟订单');click('生成模拟订单…');assert.equal(timers.size,1);flush();assert.equal(view.Inspect().order.quantity,3);assert.equal(view.Inspect().order.amount,360);
 for(const state of ['loading','qr_failed','expired','complete','failed','waiting']){view.PreviewState(state);assert.equal(view.Inspect().order.state,state);assert.equal(timers.size,state==='waiting'?1:0);}
 click('返回商城');assert.equal(timers.size,0);assert.equal(view.Inspect().order,null);click('立即购买');assert.equal(view.Inspect().quantity,1);click('确认模拟订单');view.Close();assert.equal(timers.size,0);assert.equal(view.Inspect().product,null);
+// The ticket entry shares the order renderer without touching game data.
+for(const pool of [{id:'map',ticket_name:'地图抽奖券'},{id:'treasure',ticket_name:'宝物抽奖券'}]){
+ assert.equal(view.OpenTicketPurchase(pool),true);
+ assert.equal(view.OpenTicketPurchase({id:'other'}),false,'Repeated entry cannot replace an active order');
+ click('+');assert.equal(view.Inspect().quantity,2);
+ click('确认模拟订单');flush();
+ assert.equal(view.Inspect().order.product_id,'preview_ticket_'+pool.id);
+ assert.equal(view.Inspect().order.name,pool.ticket_name);
+ assert.equal(view.Inspect().order.quantity,2);assert.equal(view.Inspect().order.amount,2);
+ view.PreviewState('expired');assert.equal(timers.size,0);click('重新演示');assert.equal(timers.size,1);
+ click('返回抽奖');assert.equal(view.Inspect().product,null);assert.equal(view.Inspect().order,null);assert.equal(timers.size,0);
+}
+assert.equal(view.OpenTicketPurchase(null),false);
+view.OpenTicketPurchase({id:'map',ticket_name:'地图抽奖券'});click('确认模拟订单');view.Close();assert.equal(timers.size,0,'Closing pending ticket order cancels it');
 view.Open();view.Dispose();assert.equal(timers.size,0);
 for(const file of ['data.js','view.js'])assert(!/SendCustomGameEventToServer|CreateHTTPRequest|https?:\/\//.test(fs.readFileSync(__dirname+'/'+file,'utf8')));
 console.log('SHOP_PREVIEW_PASS: local catalog, quantity/amount, duplicate order guard, all six states, close/reopen cancellation, no network/server calls');

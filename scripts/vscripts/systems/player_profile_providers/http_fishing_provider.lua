@@ -81,6 +81,10 @@ function M.archive_submit(payload, on_success, on_error)
     request("/v1/archive/command", payload, on_success, on_error)
 end
 
+function M.lottery_snapshot(payload, on_success, on_error)
+    request("/v1/lottery/snapshot", payload, on_success, on_error)
+end
+
 function M.rule()
     return active_rule
 end

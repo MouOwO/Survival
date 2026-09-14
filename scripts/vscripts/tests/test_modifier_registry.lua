@@ -9,6 +9,7 @@ for name, path in source:gmatch('name%s*=%s*"([^"]+)"%s*,%s*path%s*=%s*"([^"]+)"
 end
 assert(#names > 20)
 local loads, links, bindings = 0, 0, {}
+local includes = 0
 LUA_MODIFIER_MOTION_NONE = 0
 LUA_MODIFIER_MOTION_HORIZONTAL = 1
 package.loaded["core/logger"] = { info = function() end }
@@ -23,13 +24,21 @@ for path, list in pairs(by_path) do
         return true
     end
 end
+DoIncludeScript = function(path, scope)
+    includes = includes + 1
+    for _, name in ipairs(assert(by_path[path])) do
+        local definition = { engine_included = true }
+        rawset(scope, name, definition)
+        _G[name] = definition
+    end
+end
 LinkLuaModifier = function(name, path, motion)
     assert(loads == #paths, "binding happened before all definitions loaded")
-    assert(type(_G[name]) == "table" and path == "modifier_bindings/" .. name)
+    assert(type(_G[name]) == "table" and path == "modifier_bindings/" .. name .. ".lua")
     assert(motion == 0 or motion == 1)
     -- Engine script scopes are separate from Lua's cached module globals.
     local scope = setmetatable({}, { __index = _G })
-    local entry = assert(loadfile("scripts/vscripts/" .. path .. ".lua"))
+    local entry = assert(loadfile("scripts/vscripts/" .. path))
     setfenv(entry, scope); entry()
     assert(rawget(scope, name) == _G[name], "class was not exported into engine scope")
     bindings[name] = rawget(scope, name); links = links + 1
@@ -37,6 +46,7 @@ end
 local registry = require("core/modifier_registry")
 assert(links == 0 and loads == 0, "requiring registry must not partially bootstrap")
 assert(registry.register())
+assert(includes==4, "reported property modifiers must execute in the engine scope despite cached require")
 assert(links == #names and bindings[names[1]].final)
 local reported = {
     "wall_collision_barrier",
@@ -50,6 +60,16 @@ bindings = {} -- Simulate engine bindings needing refresh, Lua cache intact.
 assert(registry.register())
 assert(loads == #paths and links == #names * 2)
 for _, name in ipairs(names) do assert(bindings[name] == _G[name]) end
+for _, name in ipairs({"modifier_survival_placeholder_anchor", "modifier_single_health_bar", "modifier_repair_worker_ai", "modifier_survival_hero_base_health", "modifier_weapon_stat_projection", "modifier_research_technology", "modifier_equipment_effects"}) do
+    bindings[name] = nil -- Engine entry lost while Lua require cache survives.
+    local unit = {IsNull=function() return false end,FindModifierByName=function() return nil end}
+    unit.AddNewModifier=function(_,_,_,requested,params)
+        assert(requested==name and bindings[name]==_G[name], "must rebind before creation")
+        return {name=requested,params=params}
+    end
+    local created=registry.ensure(unit,name,{player_id=2})
+    assert(created and created.params.player_id==2)
+end
 _G[names[1]] = true
 assert(not registry.validate())
 local before = links

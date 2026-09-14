@@ -89,6 +89,12 @@ local M = {
         abilitydesc = "消耗资源提升城墙等级、生命值和护甲。升级条件和费用由服务端实时校验。",
         abilityicon = "ogre_magi_bloodlust",
     },
+    ability_upgrade_wall_9_1 = {
+        abilityid = "ability_upgrade_wall_9_1",
+        abilityname = "城墙直升9-1",
+        abilitydesc = "仅限1-1城墙。一次消耗从1-1逐级升至9-1的全部木材和金币，直接升至9-1。普通升级一次后此技能消失。",
+        abilityicon = "omniknight_guardian_angel",
+    },
     ability_upgrade_city = {
         abilityid = "ability_upgrade_city",
         abilityname = "升级主城",

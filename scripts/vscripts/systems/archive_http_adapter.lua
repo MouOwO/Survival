@@ -9,6 +9,7 @@ function M.submit(player_id,command,complete)
     local provider=profiles.get_provider()
     local account=provider and provider.resolve_account_id(player_id)
     if not account then complete({ok=false,error="account_id_unresolved"});return end
+    if not provider or type(provider.archive_submit)~='function' then complete({ok=false,terminal=true,error='http_profile_required'});return end
     provider.archive_submit({account_id=account,config_hash=bundle.hash,command=command},function(result)
         if result.profile then
             if tostring(result.profile.account_id)~=tostring(account) then

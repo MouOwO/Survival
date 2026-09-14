@@ -1,12 +1,12 @@
 # UI 统一目录
 
-- `sources/`：实际图片源和纹理配方，按已有资源相对路径存放。
+- `sources/`：实际图片源和纹理配方。
 - `development/`：当前 UI 构建、测试、公共组件及交接素材。
-- `00_公共组件` 等中文分类目录：源文件快捷方式，供美术快速定位。
-- `../index.html`：中文搜索与缩略图入口。
+- 中文分类目录：打开实际源图的快捷方式。
+- `../index.html`：素材搜索与缩略图。
 
-根目录 ui 已删除。panorama/src/images 与正式 content/panorama/images 是指向 sources 的目录联接，保留引擎需要的资源路径。图片只需编辑 sources 中的一份；游戏仍须重新编译纹理才能看到修改。
+美术修改 art/ui/sources。运行 tools/art_assets/sync_content_images.ps1，将内容同步到正式 content/dota_addons/Survival/panorama/images 的实体目录，然后重新编译。正式 tools/ui_release/compile.ps1 已自动包含同步步骤。
 
-游戏运行代码及已编译资源仍位于引擎要求的 panorama 目录。不要将生成的 .vtex_c 文件当作绘图源。
+工程内 panorama/src/images 保留兼容联接；content 图片目录不能用联接，Source 2 资源扫描曾因此将图片误判为丢失。运行纹理仍由引擎生成在 game 的 panorama/images，不能直接替代原图编辑。
 
-迁移前备份：D:/survival_ui_backups/release_5d5c1152eb/art_source_unification.zip。换机器或移动目录后需重建本机联接与美术快捷方式，详见 ../README.md。
+修复这类缺图后，旧工具会话可能继续抑制失败资源重试。请保存 Hammer 工作并重启工具会话，再验收游戏画面。

@@ -16,6 +16,7 @@ local session_id, serial, remote_provider
 local server_clock
 local daily_viewers, purchase_provider = {}, nil
 local archive_players = {}
+local sent_pages = {}
 
 local function runtime_id()
     local parts = { "archive" }
@@ -173,22 +174,33 @@ function M.snapshot(player_id, category_id)
         pending = pending[player_id] and next(pending[player_id]) ~= nil and 1 or 0 }
 end
 
-local function send(player_id)
+local function send_page(player_id, category_id)
     if not CustomGameEventManager or not PlayerResource then return end
     local player = PlayerResource:GetPlayer(player_id)
     if not player then return end
-    local result = M.snapshot(player_id, selected[player_id] or "clear")
+    local result = M.snapshot(player_id, category_id)
+    if not result.ok then return end
+    sent_pages[player_id] = sent_pages[player_id] or {}
+    local previous = sent_pages[player_id][category_id]
+    local changes = previous and require("core/ui_snapshot_delta").diff(previous.data,result)
+    if changes and #changes==0 then return end
     serial = (serial or 0) + 1
-    local rows = result.rows or {}
+    local rows = changes or result.rows or {}
     local chunks = math.max(1, math.ceil(#rows / 12))
     for chunk = 1, chunks do
-        local packet = copy(result)
+        local packet = changes and {ok=true,category_id=category_id,delta=1,base_sequence=previous.sequence} or copy(result)
         packet.rows = {}
         for index = (chunk - 1) * 12 + 1, math.min(chunk * 12, #rows) do
             packet.rows[#packet.rows + 1] = rows[index]
         end
         packet.sequence, packet.chunk, packet.chunks = serial, chunk, chunks
         CustomGameEventManager:Send_ServerToPlayer(player, "survival_archive_snapshot", packet)
+    end
+    sent_pages[player_id][category_id]={sequence=serial,data=copy(result)}
+end
+local function send(player_id)
+    for _, category in ipairs(enabled_categories()) do
+        if categories.by_id[category.id] then send_page(player_id,category.id) end
     end
 end
 
@@ -467,6 +479,7 @@ function M.cheat(context)
 end
 
 function M.init()
+    sent_pages = {}
     pending, busy, selected, throttles = {}, {}, {}, {}
     daily_viewers = {}
     archive_players = {}
@@ -573,6 +586,7 @@ function M.init()
         local now = GameRules:GetGameTime()
         if throttles[id] and now - throttles[id] < 0.15 then return end
         throttles[id] = now
+        if payload.prefetch == 1 then sent_pages[id] = nil end
         local category = categories.by_id[tostring(payload.category_id or "clear")]
         if not category or not category.enabled then return end
         selected[id] = category.category_id

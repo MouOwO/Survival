@@ -11,7 +11,7 @@
 #RogueRewardSurface .RogueArt_growth {background-image:asset(rogue_growth);}
 #RogueRewardSurface .RogueArt_defense {background-image:asset(rogue_defense);}
 #RogueRewardSurface .RogueBack {background-image:asset(rogue_back);}
-#RogueRewardSurface .RogueCopy {position:27px 429px 0px;width:236px;height:210px;}
+#RogueRewardSurface .RogueCopy {position:27px 454px 0px;width:236px;height:168px;z-index:2;}
 #RogueRewardSurface .RogueCardName {font-family:"Source Han Serif SC";font-weight:bold;font-size:26px;color:#254755;}
 #RogueRewardSurface .RogueCardDescription {font-family:"Source Han Sans SC";font-size:18px;line-height:24px;color:#3e5962;}
 #RogueRewardSurface .RogueRewardTitle {font-family:"Source Han Serif SC";font-weight:bold;}

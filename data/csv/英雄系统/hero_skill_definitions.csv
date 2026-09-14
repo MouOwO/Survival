@@ -1,4 +1,4 @@
-﻿skill_id,ability_name,display_name,description,skill_type,max_level,base_weight,is_public,exclusive_hero_id,vip_only,effect_type,effect_value_per_level,icon_name,enabled,notes
+skill_id,ability_name,display_name,description,skill_type,max_level,base_weight,is_public,exclusive_hero_id,vip_only,effect_type,effect_value_per_level,icon_name,enabled,notes
 #中文名:技能ID,技能名称ID,显示名称,描述,技能类型,最高等级,基础权重,是否公共技能,专属英雄ID,仅限VIP,效果类型,每级效果数值,图标名称,是否启用,备注
 #types:string,string,string,string,enum,number,number,boolean,string,boolean,enum,number,string,boolean,string
 proto_flame_burst,ability_survival_flame_burst,爆炎弹·被动,等级1：攻击命中时有15%概率引爆目标位置，对500范围造成全属性×4纯粹伤害。 等级2：主爆炸命中的敌人被点燃，在3秒内总计受到全属性×2.2额外伤害。再次点燃会替换旧点燃并重新持续3秒。 等级3：点燃最多叠加5层；每层拥有独立的3秒持续时间和属性快照，超过5层时替换最早到期的一层。 等级4：完整继承等级3效果，无额外变化。 等级5：主爆炸后同时喷射3颗小火球，0.5秒后落在主爆炸中心200范围内的随机位置。每颗对250范围造成全属性×3伤害，并分别施加1层点燃。,passive,5,100,1,,0,passive_proc,,lina_dragon_slave,1,运行时效果见config/hero_passive_skill_definitions.lua。
@@ -23,6 +23,6 @@ skill_monkey_king_fury,ability_survival_monkey_king_fury,齐天大圣专属：�
 skill_monkey_king_swiftness,ability_survival_monkey_king_swiftness,齐天大圣专属：齐天,六转激活。暴击率增加20%，最终攻击力使用独立三倍乘区；仅本体主普通攻击实际暴击时对主目标追加全属性×5纯粹伤害。,passive,1,0,0,hero_monkey_king,1,monkey_king_e,0,monkey_king_tree_dance,1,固定E槽；次级攻击、分身、技能和塔不触发附伤。
 skill_monkey_king_agility,ability_survival_monkey_king_agility,齐天大圣专属：身外化身,十转激活。终极塔继承英雄最终攻击力和暴击伤害；终极塔自身D技能仍可移动。,active,1,0,0,hero_monkey_king,1,monkey_king_r,0,monkey_king_mischief,1,固定R槽；不再提供英雄与城墙之间的移动切换。
 skill_blademaster_exclusive,ability_survival_blademaster_exclusive,剑圣专属：致命一击,一转激活。暴击率增加30%，暴击伤害额外增加1500%；本体主普通攻击实际暴击时，以主目标为中心对600范围内每个敌人追加一次该次暴击的最终攻击伤害，并播放压倒性优势特效。,passive,1,0,0,hero_blademaster,1,blademaster_q,0,juggernaut_blade_dance,1,固定Q槽；范围复制伤害不可暴击且不递归触发技能。
-skill_blademaster_agility,ability_survival_blademaster_agility,剑圣专属：幻象,一转激活。召唤唯一永久守家幻象，继承英雄最终战斗数值；分身拥有Q技能，完整继承暴击率，并额外获得750%暴击伤害。,passive,1,0,0,hero_blademaster,1,blademaster_w,0,juggernaut_illusion,1,固定W槽；分身攻击不触发额外普通攻击事件。
+skill_blademaster_agility,ability_survival_blademaster_agility,剑圣专属：幻象,一转激活。召唤唯一永久守家幻象，继承英雄最终战斗数值；分身拥有Q技能，完整继承暴击率，并额外获得750%暴击伤害。,passive,1,0,0,hero_blademaster,1,blademaster_w,0,phantom_lancer_juxtapose,1,固定W槽；分身攻击不触发额外普通攻击事件。
 skill_blademaster_swiftness,ability_survival_blademaster_swiftness,剑圣专属：剑刃风暴,一转激活。本体主普通攻击命中时有10%概率对目标位置释放持续3秒的剑刃风暴；每秒对600范围内敌人造成全属性×25纯粹伤害。,passive,1,0,0,hero_blademaster,1,blademaster_e,0,juggernaut_blade_fury,1,固定E槽；风暴持续期间不会重复触发。
 skill_blademaster_mobility,ability_survival_blademaster_mobility,剑圣专属：剑心犹在,一转激活。攻击间隔减少0.1秒；每150秒永久增加1%攻击力；最终攻击力使用独立三倍乘区；终极塔继承英雄完整暴击率和暴击伤害。,passive,1,0,0,hero_blademaster,1,blademaster_r,0,juggernaut_omni_slash,1,固定R槽；专属技能不能使用转生技能点升级。

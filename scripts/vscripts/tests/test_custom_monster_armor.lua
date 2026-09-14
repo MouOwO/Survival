@@ -8,7 +8,8 @@ package.loaded["config/generated/global_rules"] = {
     by_id = { runtime_detailed_diagnostics = { value = 0, enabled = true } },
 }
 package.loaded["systems/tree_damage_rules"] = {
-    is_tree = function() return false end,
+    is_tree = function(unit) return unit and unit.test_tree == true end,
+    is_allowed_tree_attacker = function() return true end,
     is_arrow_tower = function() return false end,
     is_basic_attack_category = function() return false end,
     consume_basic_attack = function() return false end,
@@ -115,4 +116,10 @@ assert(run(1e8, DAMAGE_TYPE_PHYSICAL, nil, 3).damage == 1e30, "native float over
 entities[1].survival_endless_attack_scale = nil
 entities[2].survival_endless_health_scale = nil
 
-print("CUSTOM_MONSTER_ARMOR_PASS")
+entities[2].test_tree = true
+entities[2].GetHealth = function() return 100000000 end
+entities[2].survival_endless_health_scale = 10000000
+close(run(1e30, DAMAGE_TYPE_PHYSICAL).damage, 99999999, "tree lethal hit stops at one HP")
+entities[2].GetHealth = function() return 1 end
+close(run(1e30, DAMAGE_TYPE_PHYSICAL).damage, 0, "tree cannot lose its last HP")
+print("CUSTOM_MONSTER_ARMOR_PASS: tree overflow and lethal damage protected")

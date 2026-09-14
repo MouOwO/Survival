@@ -449,6 +449,11 @@ local function spawn_particle(hero, particle, components)
     if particle.attachment_point and particle.attachment_point ~= "" then
         local origin_ok, origin = safe_call(owner, "GetAbsOrigin")
         if origin_ok and origin ~= nil then
+            local attachment_ok, attachment = safe_call(owner, "ScriptLookupAttachment", particle.attachment_point)
+            if not attachment_ok or (tonumber(attachment) or 0) <= 0 then
+                safe_call(ParticleManager, "SetParticleControl", particle_id, 0, origin)
+                return particle_id
+            end
             safe_call(
                 ParticleManager,
                 "SetParticleControlEnt",

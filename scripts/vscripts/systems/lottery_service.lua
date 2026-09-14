@@ -11,6 +11,7 @@ local exchange_cache = {}
 local busy_by_player = {}
 local hydrating_by_player = {}
 local random_seeded = false
+local sent_pools, cache_serial, publishing = {}, 0, {}
 local MAP_LEVEL_EFFECT_MARKER_SUFFIX = ":map_level:v1"
 
 local function map_level_effects(item)
@@ -190,6 +191,9 @@ local function persist_state(player_id, state)
         pools[pool_id] = {
             draws = math.max(0, math.floor(tonumber(value.draws) or 0)),
             pity_counts = copy_pity(value.pity_counts),
+            visited_revision = value.visited_revision,
+            notice_revision = value.notice_revision,
+            details_revision = value.details_revision,
         }
     end
     local value = {
@@ -224,6 +228,9 @@ local function hydrate(player_id)
                     local current = selected_pool_state(state, pool)
                     current.draws = math.max(0, math.floor(tonumber(value.draws) or 0))
                     current.pity_counts = copy_pity(value.pity_counts)
+                    current.visited_revision = value.visited_revision
+                    current.notice_revision = value.notice_revision
+                    current.details_revision = value.details_revision
                     selected_pool_state(state, pool)
                 end
             end
@@ -385,6 +392,10 @@ local function pool_public(pool, inventory, state)
     local currency = config.currencies[pool.ticket_content_id] or {}
     return {
         id = pool.id,
+        revision = pool.revision,
+        update_notice = pool.update_notice,
+        update_unread = state.details_revision ~= pool.revision,
+        notice_unread = state.notice_revision ~= pool.revision,
         display_name = pool.display_name,
         description = pool.description,
         pool_group = pool.pool_group,
@@ -451,10 +462,33 @@ local function snapshot(player_id, reason, requested_pool_id)
 end
 
 local function publish(player_id, reason, pool_id)
-    event_bus.emit(events.LOTTERY_CHANGED, {
-        player_id = player_id,
-        snapshot = snapshot(player_id, reason, pool_id),
-    })
+    if publishing[player_id] then return end
+    publishing[player_id]=true
+    sent_pools[player_id]=sent_pools[player_id] or {}
+    for _, pool in ipairs(config.pool_order) do
+        local data=snapshot(player_id,"cache",pool.id)
+        local previous=sent_pools[player_id][pool.id]
+        local changes=previous and require("core/ui_snapshot_delta").diff(previous.data,data)
+        if not changes or #changes>0 then
+            cache_serial=cache_serial+1
+            if changes then
+                local chunks=math.max(1,math.ceil(#changes/12))
+                for chunk=1,chunks do
+                    local part={}
+                    for i=(chunk-1)*12+1,math.min(chunk*12,#changes) do part[#part+1]=changes[i] end
+                    event_bus.emit(events.LOTTERY_CHANGED,{player_id=player_id,snapshot={
+                        snapshot_scope="cache_patch",selected_pool_id=pool.id,cache_sequence=cache_serial,
+                        base_sequence=previous.sequence,chunk=chunk,chunks=chunks,changes=part}})
+                end
+            else
+                local packet={};for k,v in pairs(data) do packet[k]=v end
+                packet.snapshot_scope="cache";packet.cache_sequence=cache_serial
+                event_bus.emit(events.LOTTERY_CHANGED,{player_id=player_id,snapshot=packet})
+            end
+            sent_pools[player_id][pool.id]={data=data,sequence=cache_serial}
+        end
+    end
+    publishing[player_id]=nil
 end
 
 local function draw(payload)
@@ -645,10 +679,35 @@ local function get_snapshot(payload)
     if not valid_player_id(player_id) then return { ok = false, error = "player_id_invalid" } end
     local pool = pool_config(payload and payload.pool_id)
     if not pool then return { ok = false, error = "lottery_pool_invalid" } end
-    return { ok = true, snapshot = snapshot(player_id, "request", pool.id) }
+    local state = hydrate(player_id)
+    if payload.prefetch == 1 then
+        sent_pools[player_id]=nil
+        publish(player_id,"prefetch",pool.id)
+    end
+    local current = selected_pool_state(state, pool)
+    local action = tostring(payload.read_action or "")
+    local read_error = nil
+    local field = ({visit = "visited_revision", notice = "notice_revision", details = "details_revision"})[action]
+    if field and (action == "visit" or tostring(payload.revision or "") == pool.revision)
+        and current[field] ~= pool.revision then
+        local previous = current[field]
+        current[field] = pool.revision
+        local profile = profile_service.get_profile(player_id)
+        if not profile or type(profile.save) ~= "table" or not persist_state(player_id, state) then
+            current[field] = previous
+            read_error = "lottery_read_save_failed"
+        end
+    end
+    local result = snapshot(player_id, "request", pool.id)
+    result.read_error = read_error
+    return { ok = true, snapshot = result }
 end
 
 function M.init()
+    -- Local prototype retained below for source history only; never registered in live integration.
+    require('systems/lottery_http_service').init()
+    do return end
+    sent_pools, cache_serial, publishing = {}, 0, {}
     state_by_player, request_cache, exchange_cache, busy_by_player = {}, {}, {}, {}
     hydrating_by_player = {}
     random_seeded = false
@@ -664,11 +723,12 @@ function M.init()
     end)
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
-        if valid_player_id(player_id) and state_by_player[player_id]
+        if valid_player_id(player_id)
             and not busy_by_player[player_id]
             and not hydrating_by_player[player_id] then
-            state_by_player[player_id].initialized = false
+            player_state(player_id).initialized = false
             hydrate(player_id)
+            publish(player_id,"profile_changed",config.default_pool_id)
         end
     end)
     print("[LOTTERY_INIT] pools=map,cultivation,dragon_knight,summer "

@@ -27,3 +27,8 @@
 .RHAction Label {z-index:2;}
 .RHAction:disabled {opacity:1;}
 .RHAction:disabled Label {color:#657a81;}
+
+/* Archive and pool-item tooltips share the effect section vocabulary and typography. */
+#LotteryItemTooltip #LotteryTooltipEffectHeading {visibility:collapse;}
+#LotteryItemTooltip.LotterySimpleTooltip #LotteryTooltipEffectHeading {visibility:visible;color:#ede3bf;font-size:15px;font-weight:medium;margin-top:12px;margin-bottom:6px;text-shadow:none;}
+#LotteryItemTooltip.LotterySimpleTooltip #LotteryTooltipDescription {margin-top:0px;}

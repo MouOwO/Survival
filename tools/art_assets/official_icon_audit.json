@@ -1,0 +1,17 @@
+{
+  "official_vpk": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota\\pak01_dir.vpk",
+  "missing": [],
+  "hidden_without_icon": [
+    "ability_survival_builder_slot_1_placeholder",
+    "ability_survival_builder_slot_2_placeholder",
+    "ability_survival_builder_slot_3_placeholder",
+    "ability_survival_builder_slot_4_placeholder",
+    "ability_survival_builder_slot_5_placeholder",
+    "ability_survival_builder_slot_6_placeholder"
+  ],
+  "counts": {
+    "npc_abilities_custom.txt": 216,
+    "npc_archive_challenges_abilities.txt": 27,
+    "npc_items_custom.txt": 56
+  }
+}

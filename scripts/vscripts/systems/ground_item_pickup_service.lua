@@ -43,8 +43,8 @@ local function allowed(item, player_id)
     return true
 end
 
-function M.nearby(caster, player_id)
-    local origin = caster:GetAbsOrigin()
+function M.nearby(caster, player_id, target_origin)
+    local origin = target_origin or caster:GetAbsOrigin()
     local result = {}
     if not Entities or not Entities.FindAllByClassname then return result end
     for _, container in ipairs(Entities:FindAllByClassname("dota_item_drop") or {}) do

@@ -7,7 +7,10 @@ if 'SURVIVAL_ARCHIVE_HTTP' not in text:
     text=text.replace('import json\n','import json\nimport os\n')
     text=text.replace('response = application.profile(payload)',
         'response = application.archive.profile(payload) if getattr(application, "archive", None) else application.profile(payload)')
-    text=text.replace('elif self.path == "/v1/rewards/grant":', '''elif self.path == "/v1/archive/config":
+    text=text.replace('elif self.path == "/v1/rewards/grant":', '''elif self.path == "/v1/lottery/snapshot":
+                    if not getattr(application, "archive", None): raise ApiError("archive_disabled", 503)
+                    response = application.archive.lottery_snapshot(payload)
+                elif self.path == "/v1/archive/config":
                     if not getattr(application, "archive", None): raise ApiError("archive_disabled", 503)
                     response = {"ok": True, "protocol": 1, "config_hash": application.archive.bundle.hash}
                 elif self.path == "/v1/archive/command":
@@ -29,6 +32,11 @@ if 'SURVIVAL_ARCHIVE_HTTP' not in text:
         application.archive = install(application, os.environ["SURVIVAL_ADDON_ROOT"],
             os.environ.get("ARCHIVE_LUA_PATH", r"C:\Program Files\lua\bin\lua5.1.exe"))
     return application''')
+if '/v1/lottery/snapshot' not in text:
+    text=text.replace('elif self.path == "/v1/archive/config":', '''elif self.path == "/v1/lottery/snapshot":
+                    if not getattr(application, "archive", None): raise ApiError("archive_disabled", 503)
+                    response = application.archive.lottery_snapshot(payload)
+                elif self.path == "/v1/archive/config":''')
 target=root/'server/staged/fishing_api/server.py'
 target.parent.mkdir(parents=True,exist_ok=True)
 target.write_text(text,encoding='utf-8')

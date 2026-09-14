@@ -1,0 +1,14 @@
+# Machine-local generated index; rebuild from tools/art_assets and project CSVs.
+/ui/*/
+!/ui/development/
+!/ui/sources/
+/ui/development/**/evidence/
+/ui/development/**/before/
+/ui/development/**/backups/
+/ui/development/**/browser_cache*/
+/index.html
+/catalog.json
+/shortcuts.json
+/verification.json
+/UI素材总表.csv
+/Content文件总表.csv

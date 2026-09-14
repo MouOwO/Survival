@@ -83,8 +83,7 @@ function M.evaluate(player_id, entry, context)
     if limit > 0 and count >= limit and not active_rebirth then
         return false, "已达到购买上限", count
     end
-    if entry.contentid == "service_early_final_boss"
-        and context.debug_all_unlocked ~= true then
+    if entry.contentid == "service_early_final_boss" then
         local wave = context.wave_state or {}
         if wave.game_started ~= true then
             return false, "游戏开始1分钟后可用", count

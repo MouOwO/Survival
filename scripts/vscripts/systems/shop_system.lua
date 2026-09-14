@@ -1129,6 +1129,11 @@ function M.init()
     event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
     event_bus.subscribe(research_events.LEVEL_CHANGED, on_research_level_changed)
     event_bus.subscribe(events.GAME_STARTED, function()
+        scheduler.after(0.1, function()
+            for player_id, _ in pairs(state.opened_players) do
+                push_snapshot(player_id, "early_final_cooldown_started")
+            end
+        end, "shop_early_final_cooldown_start")
         scheduler.after(1 * 60, function()
             for player_id, _ in pairs(state.opened_players) do
                 push_snapshot(player_id, "early_final_unlocked")

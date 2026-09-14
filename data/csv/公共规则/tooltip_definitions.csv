@@ -27,7 +27,7 @@ ability:ability_repairer_suicide,ability,ability_repairer_suicide,自我销毁,0
 ability:ability_survival_arcane_barrage,ability,ability_survival_arcane_barrage,奥术弹幕·被动,0,0,等级1：普通攻击命中时有10%概率触发：以目标位置为中心，在500范围内于1秒内随机落下5颗飞弹。每颗飞弹对落点150范围造成全属性总和×2纯粹伤害。施法结束前不能再次触发。 等级2：飞弹落点区域半径缩小至200，其他效果不变。 等级3：每轮飞弹数量增加至7颗，其他效果不变。 等级4：完整继承等级3效果，无额外变化。 等级5：炮击区域持续3秒，每秒释放一轮7颗飞弹，共3轮、总计21颗飞弹。施法结束前不能再次触发。,skywrath_mage_arcane_bolt,proto_arcane_barrage
 ability:ability_survival_axe_counter_helix,ability,ability_survival_axe_counter_helix,斧王专属：反击螺旋,0,0,一转后激活。普通攻击命中时有10%概率以被攻击目标为中心触发反击螺旋，对400范围内敌人造成触发时全属性×30纯粹伤害。,axe_counter_helix,skill_axe_counter_helix
 ability:ability_survival_blade_nova,ability,ability_survival_blade_nova,剑刃震荡·被动,0,0,等级1：普通攻击命中时有15%概率沿英雄面向发射脉冲。脉冲总宽度200，长度等于英雄攻击射程，对路径内所有敌人造成触发时全属性总和×4纯粹伤害。 等级2：每道脉冲最先命中的目标受到双倍伤害。 等级3：伤害随目标沿脉冲方向的距离线性提高：英雄近端为全属性×4，射程末端最高为全属性×8；首个目标仍会受到双倍伤害。 等级4：完整继承等级3效果，无额外变化。 等级5：脉冲射程提高50%；每次触发有30%概率沿同一路径同时发射3道脉冲。三道分别造成完整伤害，同一敌人可被三道分别命中。,juggernaut_blade_fury,proto_blade_nova
-ability:ability_survival_blademaster_agility,ability,ability_survival_blademaster_agility,剑圣专属：幻象,0,0,一转激活。召唤唯一永久守家幻象，继承英雄最终战斗数值；分身拥有Q技能，完整继承暴击率，并额外获得750%暴击伤害。,juggernaut_illusion,skill_blademaster_agility
+ability:ability_survival_blademaster_agility,ability,ability_survival_blademaster_agility,剑圣专属：幻象,0,0,一转激活。召唤唯一永久守家幻象，继承英雄最终战斗数值；分身拥有Q技能，完整继承暴击率，并额外获得750%暴击伤害。,phantom_lancer_juxtapose,skill_blademaster_agility
 ability:ability_survival_blademaster_exclusive,ability,ability_survival_blademaster_exclusive,剑圣专属：致命一击,0,0,一转激活。暴击率增加30%，暴击伤害额外增加1500%；本体主普通攻击实际暴击时，以主目标为中心对600范围内每个敌人追加一次该次暴击的最终攻击伤害，并播放压倒性优势特效。,juggernaut_blade_dance,skill_blademaster_exclusive
 ability:ability_survival_blademaster_mobility,ability,ability_survival_blademaster_mobility,剑圣专属：剑心犹在,0,0,一转激活。攻击间隔减少0.1秒；每150秒永久增加1%攻击力；最终攻击力使用独立三倍乘区；终极塔继承英雄完整暴击率和暴击伤害。,juggernaut_omni_slash,skill_blademaster_mobility
 ability:ability_survival_blademaster_swiftness,ability,ability_survival_blademaster_swiftness,剑圣专属：剑刃风暴,0,0,一转激活。本体主普通攻击命中时有10%概率对目标位置释放持续3秒的剑刃风暴；每秒对600范围内敌人造成全属性×25纯粹伤害。,juggernaut_blade_fury,skill_blademaster_swiftness
@@ -47,7 +47,7 @@ ability:ability_survival_monkey_king_exclusive,ability,ability_survival_monkey_k
 ability:ability_survival_monkey_king_fury,ability,ability_survival_monkey_king_fury,齐天大圣专属：混沌神猿,0,0,三转激活。暴击伤害为2000%，攻击间隔减少0.1秒；每60秒永久复利增加2%全属性，并召唤唯一永久镜像分身守家。分身拥有Q技能，完整继承本体暴击率，并额外获得1000%暴击伤害。,monkey_king_jingu_mastery,skill_monkey_king_fury
 ability:ability_survival_monkey_king_swiftness,ability,ability_survival_monkey_king_swiftness,齐天大圣专属：齐天,0,0,六转激活。暴击率增加20%，最终攻击力使用独立三倍乘区；仅本体主普通攻击实际暴击时对主目标追加全属性×5纯粹伤害。,monkey_king_tree_dance,skill_monkey_king_swiftness
 ability:ability_survival_poison_cloud,ability,ability_survival_poison_cloud,毒云·被动,0,0,等级1：普通攻击命中时，12%概率在目标位置生成400范围毒云，持续5秒；第1至第5秒各造成一次触发时全属性总和×1纯粹伤害。毒云活动期间同一英雄不会再次触发毒云。 等级2：毒云每次整秒伤害命中使敌人的实时总护甲降低20%，最多3层（60%）；离开毒云或毒云消失时立即恢复毒云降低的护甲。 等级3：触发概率提高至20%，毒云持续时间增加至7秒，因此第1至第7秒各造成一次伤害。 等级4：完整继承等级3效果，无额外变化。 等级5：毒云中的敌人死亡时，以死亡位置为中心对300范围造成一次触发时全属性总和×3纯粹伤害；死亡爆炸可继续引发毒云内敌人的连锁爆炸。,viper_nethertoxin,proto_poison_cloud
-ability:ability_survival_rogue_reward,ability,ability_survival_rogue_reward,肉鸽奖励,0,0,打开肉鸽三选一奖励。建造者开局固定显示在G键槽位，成功打开后移除。,item_tome_of_knowledge,builder_rogue_reward
+ability:ability_survival_rogue_reward,ability,ability_survival_rogue_reward,肉鸽奖励,0,0,打开肉鸽三选一奖励。建造者开局固定显示在G键槽位，成功打开后移除。,invoker_invoke,builder_rogue_reward
 ability:ability_survival_shadow_fiend_raze,ability,ability_survival_shadow_fiend_raze,影魔专属：影压,0,0,一转后激活。普通攻击命中时有10%概率在目标位置释放250范围影压。影压先增加1层再造成纯粹伤害，1至5层分别为全属性×27.5、×30、×32.5、×35、×37.5；最多5层，每层独立持续3秒。,nevermore_shadowraze1,skill_shadow_fiend_raze
 ability:ability_survival_void_pulse,ability,ability_survival_void_pulse,虚空震爆·被动,0,0,等级1：普通攻击命中时有15%概率从攻击者位置释放龙卷风。龙卷风以500速度追踪原攻击目标，第一次到达后附着跟随目标；目标死亡则停在死亡位置。持续3秒，在生成时及第1、2秒实时读取全属性，对中心300范围造成全属性×2纯粹伤害。 等级2：完整继承等级1效果，无额外变化。 等级3：龙卷风中心600范围内的敌人持续降低20%移动速度；被主龙卷伤害命中的敌人在仍处于该范围时额外降低15%，总计35%，离开范围立即移除。 等级4：完整继承等级3效果，无额外变化。 等级5：主龙卷结束时，按仍存活的已命中不同目标数量在结束位置生成小龙卷。小龙卷随机选择这些目标的方向，以相同速度移动2秒，每秒造成主龙卷60%的实时属性伤害，并仅施加20%范围减速。,invoker_tornado,proto_void_pulse
 ability:airspace_overlord_lv01,ability,airspace_overlord_lv01,空域霸主LV1,0,0,500范围内敌方单位最终承伤提高20%；飞行敌人攻击速度额外降低20%,,airspace_overlord_lv01
@@ -151,7 +151,7 @@ inventory_item:challenge_08,inventory_item,challenge_08,挑战熔火核心lv4宝
 inventory_item:challenge_09,inventory_item,challenge_09,挑战冰烬挽歌,0,0,击败BOSS后掉落冰魂焰魄。当满足装备升级进化条件时，拾取掉落精华即可升级进化。,,challenge_09
 inventory_item:challenge_10,inventory_item,challenge_10,进入七宗罪,0,0,场内维持10只相同小怪；每只怪物死亡有40%概率按权重掉落七种精华，掉落数量不限。,,challenge_10
 inventory_item:challenge_11,inventory_item,challenge_11,进入罪渊（十宗罪）,0,0,持有深渊审判才能进入；武器+N进入第N+1层，击杀对应Boss后自动合成升阶。,,challenge_11
-inventory_item:challenge_synthesis_gem,inventory_item,challenge_synthesis_gem,挑战合成宝石,0,0,击败BOSS后掉落合成宝石,item_recipe,challenge_synthesis_gem
+inventory_item:challenge_synthesis_gem,inventory_item,challenge_synthesis_gem,挑战合成宝石,0,0,击败BOSS后掉落合成宝石,item_gem,challenge_synthesis_gem
 inventory_item:equipment_attack_gloves_01,inventory_item,equipment_attack_gloves_01,加速手套Lv1,0,0,"增加英雄20%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_01
 inventory_item:equipment_attack_gloves_02,inventory_item,equipment_attack_gloves_02,加速手套Lv2,0,0,"增加英雄40%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_02
 inventory_item:equipment_attack_gloves_03,inventory_item,equipment_attack_gloves_03,加速手套Lv3,0,0,"增加英雄60%的攻击速度,重复购买升级，最高5级。  加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1",item_gloves,equipment_attack_gloves_03
@@ -198,52 +198,52 @@ inventory_item:item_super_knowledge_book,inventory_item,item_super_knowledge_boo
 inventory_item:lottery_aaron_cannon,inventory_item,lottery_aaron_cannon,亚伦巨炮,0,0,伐木效率+1 箭塔攻速+15% 英雄攻速+15% 箭塔最终伤害+15% 英雄最终伤害+15% 星悦积分+30,item_mjollnir,lottery_aaron_cannon
 inventory_item:lottery_abundance_blessing,inventory_item,lottery_abundance_blessing,丰饶赐福,0,0,金矿收益+20% 伐木工攻速+15% 伐木工攻击成长+10 伐木效率+5 墙每秒生命+100 初始人口+3 星悦积分+200,item_crimson_guard,lottery_abundance_blessing
 inventory_item:lottery_ancient_pine_fortification,inventory_item,lottery_ancient_pine_fortification,苍松固城,0,0,墙护甲+30 墙每秒护甲+0.1 墙生命加成+10% 墙护甲加成+10% 墙每秒生命+10 星悦积分+88,item_crimson_guard,lottery_ancient_pine_fortification
-inventory_item:lottery_attribute_crystal,inventory_item,lottery_attribute_crystal,属性结晶,0,0,英雄全属性+50,item_daedalus,lottery_attribute_crystal
-inventory_item:lottery_bombardment_crystal,inventory_item,lottery_bombardment_crystal,炮击结晶,0,0,塔攻击+30,item_daedalus,lottery_bombardment_crystal
+inventory_item:lottery_attribute_crystal,inventory_item,lottery_attribute_crystal,属性结晶,0,0,英雄全属性+50,item_greater_crit,lottery_attribute_crystal
+inventory_item:lottery_bombardment_crystal,inventory_item,lottery_bombardment_crystal,炮击结晶,0,0,塔攻击+30,item_greater_crit,lottery_bombardment_crystal
 inventory_item:lottery_candle_dragon_wing,inventory_item,lottery_candle_dragon_wing,烛龙之翼,0,0,英雄暴击几率+10% 英雄暴击伤害+100% 英雄最终伤害+20% 英雄全属性加成+10% 英雄攻击加成+10% 英雄攻击加成+10% 英雄攻击减甲+10 金矿上限数量+1 星悦积分+200,item_ogre_axe,lottery_candle_dragon_wing
 inventory_item:lottery_chief_god_blessing,inventory_item,lottery_chief_god_blessing,主神赐福,0,0,英雄造成伤害木材+5 英雄造成伤害攻击+5 英雄造成伤害三围+5 英雄攻击减甲+2 英雄最终伤害+20% 星悦积分+200,item_ogre_axe,lottery_chief_god_blessing
 inventory_item:lottery_chosen_hero,inventory_item,lottery_chosen_hero,神选英雄,0,0,英雄攻击加成+8% 英雄三围加成+8% 箭塔攻击加成+8% 英雄造成伤害攻击+0.3*地图等级 英雄造成伤害三围+0.3*地图等级 箭塔造成伤害攻击+0.3*地图等级 星悦积分+200,item_mjollnir,lottery_chosen_hero
 inventory_item:lottery_crystalline_armor,inventory_item,lottery_crystalline_armor,晶态护甲,0,0,墙护甲+30墙每秒护甲+0.1生命加成+10%墙护甲加成+10%墙每秒生命+10英雄全属性加成+8%星悦积分+88购买后自动激活,item_crimson_guard,lottery_crystalline_armor
-inventory_item:lottery_cyber_overlord,inventory_item,lottery_cyber_overlord,赛博主宰,0,0,英雄攻击属性效率+8% 英雄最终伤害+25%英雄攻击减甲+25英雄全属性加成+25%英雄攻击全属性+25英雄暴击伤害+200%星悦积分+200获得英雄翅膀:赛博主宰（后续再做皮肤） 购买后自动激活,item_daedalus,lottery_cyber_overlord
-inventory_item:lottery_cybernetic_implant,inventory_item,lottery_cybernetic_implant,义体插件,0,0,英雄攻击全属性+5英雄全属性加成+8%英雄攻击减甲+4英雄攻击加成+10%英雄最终伤害10%星悦积分+88购买后自动激活,item_daedalus,lottery_cybernetic_implant
+inventory_item:lottery_cyber_overlord,inventory_item,lottery_cyber_overlord,赛博主宰,0,0,英雄攻击属性效率+8% 英雄最终伤害+25%英雄攻击减甲+25英雄全属性加成+25%英雄攻击全属性+25英雄暴击伤害+200%星悦积分+200获得英雄翅膀:赛博主宰（后续再做皮肤） 购买后自动激活,item_greater_crit,lottery_cyber_overlord
+inventory_item:lottery_cybernetic_implant,inventory_item,lottery_cybernetic_implant,义体插件,0,0,英雄攻击全属性+5英雄全属性加成+8%英雄攻击减甲+4英雄攻击加成+10%英雄最终伤害10%星悦积分+88购买后自动激活,item_greater_crit,lottery_cybernetic_implant
 inventory_item:lottery_darksteel_wall,inventory_item,lottery_darksteel_wall,玄铁城墙,0,0,墙生命+5000 墙护甲+20 墙每秒生命+8 墙每秒护甲+0.1 星悦积分+30,item_crimson_guard,lottery_darksteel_wall
 inventory_item:lottery_data_unit,inventory_item,lottery_data_unit,数据单元,0,0,金矿效率+10%伐木效率+2每秒金币+10每秒木材+10伐木工攻速+10%星悦积分+88购买后自动激活,item_ogre_axe,lottery_data_unit
 inventory_item:lottery_dimensional_barrier,inventory_item,lottery_dimensional_barrier,次元屏障,0,0,地图等级+1 墙减伤+10% 墙护甲+500 墙每秒护甲+012 英雄最终伤害+15% 英雄全属性加成+15% 英雄攻击全属性+15 英雄攻击减甲+15 英雄造成伤害攻击+15 墙获得屏障 效果是吸收等值血量的伤害 刷新间隔40秒 持续10秒,item_crimson_guard,lottery_dimensional_barrier
 inventory_item:lottery_divine_spirit,inventory_item,lottery_divine_spirit,神赐精神,0,0,金矿收益+3（不叠加任何加成）,item_ogre_axe,lottery_divine_spirit
 inventory_item:lottery_divine_tower_blessing,inventory_item,lottery_divine_tower_blessing,神塔赐福,0,0,每秒木材+30 箭塔攻击加成+30% 箭塔攻击成长+3 箭塔木材攻击减甲+0.2 箭塔暴击几率+5% 箭塔暴击伤害+20% 星悦积分+200,item_mjollnir,lottery_divine_tower_blessing
-inventory_item:lottery_ember_of_legacy,inventory_item,lottery_ember_of_legacy,薪火余烬,0,0,英雄攻击攻击+0.1 数量大于10：英雄每秒属性+100 数量大于50：英雄攻击全属性+100 数量大于100：最终伤害+10% 数量大于200：英雄攻击加成加成+30% 数量大于300：英雄全属性加成+30% 数量大于400：英雄攻击减甲+30 数量大于600：英雄攻击全属性+40 数量大于800：英雄最终伤害+120% 数量大于1000：英雄攻击减甲+50 数量大于1500：英雄攻击全属性+60,item_daedalus,lottery_ember_of_legacy
-inventory_item:lottery_emerald_wood_origin,inventory_item,lottery_emerald_wood_origin,翠木归元,0,0,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_daedalus,lottery_emerald_wood_origin
+inventory_item:lottery_ember_of_legacy,inventory_item,lottery_ember_of_legacy,薪火余烬,0,0,英雄攻击攻击+0.1 数量大于10：英雄每秒属性+100 数量大于50：英雄攻击全属性+100 数量大于100：最终伤害+10% 数量大于200：英雄攻击加成加成+30% 数量大于300：英雄全属性加成+30% 数量大于400：英雄攻击减甲+30 数量大于600：英雄攻击全属性+40 数量大于800：英雄最终伤害+120% 数量大于1000：英雄攻击减甲+50 数量大于1500：英雄攻击全属性+60,item_greater_crit,lottery_ember_of_legacy
+inventory_item:lottery_emerald_wood_origin,inventory_item,lottery_emerald_wood_origin,翠木归元,0,0,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_greater_crit,lottery_emerald_wood_origin
 inventory_item:lottery_endless_growth_ring,inventory_item,lottery_endless_growth_ring,无尽年轮,0,0,无尽年轮练功房消耗金币降低25% 英雄攻击获得属性提高10% 英雄最终伤害+10% 英雄攻击减甲+10 武器成长速度加倍 星悦积分+200,item_ogre_axe,lottery_endless_growth_ring
 inventory_item:lottery_expansion_crystal,inventory_item,lottery_expansion_crystal,膨胀结晶,0,0,墙每秒生命+1,item_crimson_guard,lottery_expansion_crystal
 inventory_item:lottery_fallen_sky_mine,inventory_item,lottery_fallen_sky_mine,堕落天矿,0,0,每秒金币+60 每秒木材+60 伐木效率+15 金矿效率+25% 金矿收益间隔时间-0.1 可以制造一个特殊金矿 占用全部金矿上限 继承全部金矿收益与资源消耗（可以后边再做） 星悦积分+200 （）,item_ogre_axe,lottery_fallen_sky_mine
 inventory_item:lottery_flame_wall,inventory_item,lottery_flame_wall,烈焰城墙,0,0,地图等级+1 墙护甲+500 墙每秒护甲+0.2 墙生命加成+30% 墙护甲加成+30% 墙每秒生命+100 城墙附带的灼烧每秒最大生命值1%的伤害（可以做成攻击反弹1%固定血量的伤害） 金矿上限数量+1 星悦积分+200,item_crimson_guard,lottery_flame_wall
 inventory_item:lottery_forest_burning_edge,inventory_item,lottery_forest_burning_edge,焚林之锋,0,0,英雄开局获得成长之剑和铁甲（都是LV1 可以改成免费购买） 箭塔造成伤害攻击+20 箭塔最终伤害+30% 箭塔攻击减甲+0.5 英雄攻击减甲+10 英雄攻击全属性+10 英雄全属性加成+10% 星悦积分+200,item_mjollnir,lottery_forest_burning_edge
 inventory_item:lottery_forestcast_thousand_bolts,inventory_item,lottery_forestcast_thousand_bolts,林铸千矢,0,0,箭塔攻速+15% 箭塔最终伤害+15% 箭塔攻击减甲+0.1 箭塔每秒攻击+20 箭塔造成伤害攻击+3 星悦积分+88,item_mjollnir,lottery_forestcast_thousand_bolts
-inventory_item:lottery_gale_bow,inventory_item,lottery_gale_bow,疾风弓,0,0,英雄攻速+5% 最终伤害+5% 星悦积分+10,item_daedalus,lottery_gale_bow
+inventory_item:lottery_gale_bow,inventory_item,lottery_gale_bow,疾风弓,0,0,英雄攻速+5% 最终伤害+5% 星悦积分+10,item_greater_crit,lottery_gale_bow
 inventory_item:lottery_gathering_divine_codex,inventory_item,lottery_gathering_divine_codex,采集神典,0,0,每秒金币+2 伐木效率+2 伐木工攻击间隔-0.02 墙每秒生命+30 墙伤害减免+3%星悦积分+30,item_crimson_guard,lottery_gathering_divine_codex
 inventory_item:lottery_gathering_grimoire,inventory_item,lottery_gathering_grimoire,采集秘典,0,0,伐木效率+1 人口+1 伐木工攻速+5% 星悦积分+20,item_ogre_axe,lottery_gathering_grimoire
-inventory_item:lottery_greenwood_nirvana,inventory_item,lottery_greenwood_nirvana,青林涅槃,0,0,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_daedalus,lottery_greenwood_nirvana
+inventory_item:lottery_greenwood_nirvana,inventory_item,lottery_greenwood_nirvana,青林涅槃,0,0,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_greater_crit,lottery_greenwood_nirvana
 inventory_item:lottery_greenwood_rampart,inventory_item,lottery_greenwood_rampart,青林筑垣,0,0,墙护甲+30 墙每秒护甲+0.1 墙生命加成+10% 墙护甲加成+10% 墙每秒生命+10 星悦积分+88,item_crimson_guard,lottery_greenwood_rampart
 inventory_item:lottery_heaven_devouring_pill,inventory_item,lottery_heaven_devouring_pill,万噬通天丹,0,0,墙减伤+10% 墙护甲+500 墙每秒护甲+0.1 每秒金币+50 每秒木材+50 伐木工攻速+10% 伐木效率+15 金矿效率+15% 10转后获得一个吞噬天丹 可以吞噬一件魔导器（魔导器是啥还不知道 没氪金 后续再做吧） 星悦积分+200,item_crimson_guard,lottery_heaven_devouring_pill
 inventory_item:lottery_heaven_reaching_tower_seal,inventory_item,lottery_heaven_reaching_tower_seal,通天塔印,0,0,英雄最终伤害+20% 箭塔最终伤害+20% 箭塔攻击加成+30% 箭塔攻击减甲+0.2 箭塔造成伤害加攻击+10 箭塔每秒攻击+50 箭塔暴击几率+10% 箭塔暴击伤害+100% 星悦积分+200 （可以消耗资源直接建造一个终极之塔）,item_mjollnir,lottery_heaven_reaching_tower_seal
 inventory_item:lottery_heavenly_puppet,inventory_item,lottery_heavenly_puppet,天道傀儡,0,0,墙减伤+10% 墙护甲+500 墙每秒护甲+0.1 英雄最终伤害+10% 英雄全属性加成+10% 农民工拥有自动训练功能 天狱模式下结算信仰值+30%（还没做） 星悦积分+200,item_crimson_guard,lottery_heavenly_puppet
-inventory_item:lottery_hero_medal,inventory_item,lottery_hero_medal,英雄勋章,0,0,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_daedalus,lottery_hero_medal
-inventory_item:lottery_hippogryph_onslaught,inventory_item,lottery_hippogryph_onslaught,角鹰魔攻,0,0,英雄攻击加成+3% 英雄三围加成+3% 星悦积分+20,item_daedalus,lottery_hippogryph_onslaught
-inventory_item:lottery_immortal_nirvana,inventory_item,lottery_immortal_nirvana,不灭涅槃,0,0,英雄暴击伤害+100% 英雄最终伤害+20% 英雄全属性加成+20% 英雄攻击加成+20% 英雄攻击减甲+20 10转后额外获得5技能点数 星悦积分+200,item_daedalus,lottery_immortal_nirvana
-inventory_item:lottery_immortal_slaying_sword_array,inventory_item,lottery_immortal_slaying_sword_array,诛仙剑阵,0,0,英雄暴击伤害+200% 英雄攻击全属性+20 英雄全属性加成+20% 英雄最终伤害+20% 星悦积分+200 英雄攻击减甲百分比+10%,item_daedalus,lottery_immortal_slaying_sword_array
+inventory_item:lottery_hero_medal,inventory_item,lottery_hero_medal,英雄勋章,0,0,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_greater_crit,lottery_hero_medal
+inventory_item:lottery_hippogryph_onslaught,inventory_item,lottery_hippogryph_onslaught,角鹰魔攻,0,0,英雄攻击加成+3% 英雄三围加成+3% 星悦积分+20,item_greater_crit,lottery_hippogryph_onslaught
+inventory_item:lottery_immortal_nirvana,inventory_item,lottery_immortal_nirvana,不灭涅槃,0,0,英雄暴击伤害+100% 英雄最终伤害+20% 英雄全属性加成+20% 英雄攻击加成+20% 英雄攻击减甲+20 10转后额外获得5技能点数 星悦积分+200,item_greater_crit,lottery_immortal_nirvana
+inventory_item:lottery_immortal_slaying_sword_array,inventory_item,lottery_immortal_slaying_sword_array,诛仙剑阵,0,0,英雄暴击伤害+200% 英雄攻击全属性+20 英雄全属性加成+20% 英雄最终伤害+20% 星悦积分+200 英雄攻击减甲百分比+10%,item_greater_crit,lottery_immortal_slaying_sword_array
 inventory_item:lottery_investiture_of_gods,inventory_item,lottery_investiture_of_gods,封神榜,0,0,英雄攻击属性效率+8% 箭塔攻击加成+35%；箭塔最终伤害+35%；箭塔攻击间隔-0.1；英雄最终伤害+30%；英雄全属性加成+30%；英雄攻击减甲+20；星悦积分+200；每10波获得一个封神榜，可以进阶魔导器为光明版。,item_mjollnir,lottery_investiture_of_gods
-inventory_item:lottery_jade_purity_sword_immortal,inventory_item,lottery_jade_purity_sword_immortal,玉清剑仙,0,0,地图等级+1 英雄攻击减甲+15 英雄攻击攻击+15 英雄攻击全属性+15 英雄攻击加成+15% 英雄全属性加成10% 英雄最终伤害+10% 星悦积分+200,item_daedalus,lottery_jade_purity_sword_immortal
+inventory_item:lottery_jade_purity_sword_immortal,inventory_item,lottery_jade_purity_sword_immortal,玉清剑仙,0,0,地图等级+1 英雄攻击减甲+15 英雄攻击攻击+15 英雄攻击全属性+15 英雄攻击加成+15% 英雄全属性加成10% 英雄最终伤害+10% 星悦积分+200,item_greater_crit,lottery_jade_purity_sword_immortal
 inventory_item:lottery_life_spirit,inventory_item,lottery_life_spirit,生命精神,0,0,墙生命值+1000,item_crimson_guard,lottery_life_spirit
 inventory_item:lottery_lumber_crystal,inventory_item,lottery_lumber_crystal,伐木结晶,0,0,开局木材+30,item_ogre_axe,lottery_lumber_crystal
 inventory_item:lottery_lumber_expert,inventory_item,lottery_lumber_expert,伐木高手,0,0,金矿效率+10% 伐木效率+2 每秒金币+10 每秒木材+10 伐木工攻速+10% 星悦积分+88,item_ogre_axe,lottery_lumber_expert
 inventory_item:lottery_lumber_fury,inventory_item,lottery_lumber_fury,伐木之怒,0,0,1~7级农民上限+1（涉及到伐木工合体） 伐木工伐木收益+25% 每秒金币+100 每秒木材+500 伐木效率+10 金矿收益+10% 英雄造成伤害木材+5 星悦积分+200,item_ogre_axe,lottery_lumber_fury
 inventory_item:lottery_lumber_immortal,inventory_item,lottery_lumber_immortal,伐木仙人,0,0,伐木工效率+5 伐木工攻速+20% 每秒金币+100 每秒木材+100 地图等级+1 伐木工对树的伤害翻倍 开局获得一个桃木仙人 伐木工融合之后直接被桃木仙人吃掉且继承性格 这个功能可以先不做 这是为了游戏简洁做的 金矿也有合体金矿都先不做,item_ogre_axe,lottery_lumber_immortal
 inventory_item:lottery_lumber_legacy,inventory_item,lottery_lumber_legacy,伐木传承,0,0,伐木效率+2 人口+2 伐木工攻速+8% 星悦积分+30,item_ogre_axe,lottery_lumber_legacy
-inventory_item:lottery_magical_girl_juggernaut,inventory_item,lottery_magical_girl_juggernaut,魔法少女（剑圣）,0,0,地图等级+1 英雄攻击减甲+10 英雄攻击攻击+10 英雄攻击全属性+10 英雄攻击全属性+10 英雄攻击化成+10% 英雄最终伤害+10% 解锁英雄：魔法少女 星悦积分+200 拥有剑圣和魔法少女时额外获得属性：英雄攻击获得属性提高30% 英雄全属性加成+30%，攻击减甲+20 减少0.1攻击间隔 开局自带1转技能,item_daedalus,lottery_magical_girl_juggernaut
+inventory_item:lottery_magical_girl_juggernaut,inventory_item,lottery_magical_girl_juggernaut,魔法少女（剑圣）,0,0,地图等级+1 英雄攻击减甲+10 英雄攻击攻击+10 英雄攻击全属性+10 英雄攻击全属性+10 英雄攻击化成+10% 英雄最终伤害+10% 解锁英雄：魔法少女 星悦积分+200 拥有剑圣和魔法少女时额外获得属性：英雄攻击获得属性提高30% 英雄全属性加成+30%，攻击减甲+20 减少0.1攻击间隔 开局自带1转技能,item_greater_crit,lottery_magical_girl_juggernaut
 inventory_item:lottery_magnetic_disruption_turret,inventory_item,lottery_magnetic_disruption_turret,磁扰炮台,0,0,箭塔攻速+15%箭塔最终伤害+15%箭塔攻击减甲+0.1箭塔每秒攻击+20箭塔造成伤害加攻击+3英雄全属性加成+8%星悦积分+88购买后自动激活,item_mjollnir,lottery_magnetic_disruption_turret
-inventory_item:lottery_monkey_king,inventory_item,lottery_monkey_king,齐天大圣,0,0,地图等级+1 英雄攻击减甲+10 英雄攻击攻击+10 英雄攻击全属性+10 英雄攻击全属性+10 英雄攻击化成+10% 英雄最终伤害+10% 解锁英雄：魔法少女 星悦积分+200 拥有齐天大圣和剑圣时额外获得属性：英雄攻击获得属性提高30% 英雄全属性加成+30%，攻击减甲+20 减少0.1攻击间隔 开局自带一转技能,item_daedalus,lottery_monkey_king
-inventory_item:lottery_mountain_sea_kunpeng,inventory_item,lottery_mountain_sea_kunpeng,山海鲲鹏,0,0,英雄初始属性+150000 英雄造成伤害加攻击+40 英雄暴击伤害+150% 英雄攻击减甲+20 英雄攻击全属性+20 英雄全属性加成+20% 英雄最终伤害+20% 星悦积分+200 每有一条鱼英雄额外获得全属性加成0.05%,item_daedalus,lottery_mountain_sea_kunpeng
-inventory_item:lottery_nano_cluster,inventory_item,lottery_nano_cluster,纳米集群,0,0,英雄攻击减甲百分比+8%英雄最终伤害+20%英雄全属性加成+20%英雄攻击全属性+20英雄造成伤害加攻击20英雄攻击减甲+20星悦积分+200对进攻BOSS触发双倍攻击减甲效果,item_daedalus,lottery_nano_cluster
+inventory_item:lottery_monkey_king,inventory_item,lottery_monkey_king,齐天大圣,0,0,地图等级+1 英雄攻击减甲+10 英雄攻击攻击+10 英雄攻击全属性+10 英雄攻击全属性+10 英雄攻击化成+10% 英雄最终伤害+10% 解锁英雄：魔法少女 星悦积分+200 拥有齐天大圣和剑圣时额外获得属性：英雄攻击获得属性提高30% 英雄全属性加成+30%，攻击减甲+20 减少0.1攻击间隔 开局自带一转技能,item_greater_crit,lottery_monkey_king
+inventory_item:lottery_mountain_sea_kunpeng,inventory_item,lottery_mountain_sea_kunpeng,山海鲲鹏,0,0,英雄初始属性+150000 英雄造成伤害加攻击+40 英雄暴击伤害+150% 英雄攻击减甲+20 英雄攻击全属性+20 英雄全属性加成+20% 英雄最终伤害+20% 星悦积分+200 每有一条鱼英雄额外获得全属性加成0.05%,item_greater_crit,lottery_mountain_sea_kunpeng
+inventory_item:lottery_nano_cluster,inventory_item,lottery_nano_cluster,纳米集群,0,0,英雄攻击减甲百分比+8%英雄最终伤害+20%英雄全属性加成+20%英雄攻击全属性+20英雄造成伤害加攻击20英雄攻击减甲+20星悦积分+200对进攻BOSS触发双倍攻击减甲效果,item_greater_crit,lottery_nano_cluster
 inventory_item:lottery_nature_crystal,inventory_item,lottery_nature_crystal,自然结晶,0,0,伐木速度+2%,item_ogre_axe,lottery_nature_crystal
 inventory_item:lottery_nature_spirit,inventory_item,lottery_nature_spirit,自然精神,0,0,每秒木材+1,item_ogre_axe,lottery_nature_spirit
 inventory_item:lottery_neural_reconstruction_module,inventory_item,lottery_neural_reconstruction_module,神经重构模块,0,0,箭塔攻击减甲+1箭塔最终伤害+30%箭塔攻击加成+35%英雄全属性加成+15%英雄最终伤害+15%英雄造成伤害加攻击+35英雄攻击全属性+15%终极塔花费资源融合进英雄继承其攻击力与50%的攻击减甲合成前最终伤害与暴击伤害并且附带自动学习暴风雪减速技能融合后英雄如果是龙骑尖兵将会进化 （就先加属性吧 太难 后续攻坚）,item_mjollnir,lottery_neural_reconstruction_module
@@ -256,26 +256,26 @@ inventory_item:lottery_pulse_conduction_turret,inventory_item,lottery_pulse_cond
 inventory_item:lottery_quick_dry_cement,inventory_item,lottery_quick_dry_cement,速干水泥,0,0,箭塔每秒攻击+1 英雄每秒属性+1 星悦积分+10,item_mjollnir,lottery_quick_dry_cement
 inventory_item:lottery_recovery_crystal,inventory_item,lottery_recovery_crystal,回复结晶,0,0,墙每秒回血+5,item_crimson_guard,lottery_recovery_crystal
 inventory_item:lottery_recovery_spirit,inventory_item,lottery_recovery_spirit,回复精神,0,0,墙每秒回血+10,item_crimson_guard,lottery_recovery_spirit
-inventory_item:lottery_reincarnation_immortal_stele,inventory_item,lottery_reincarnation_immortal_stele,轮回仙碑,0,0,英雄每秒属性+1500 英雄攻击加成+20% 英雄全属性加成+20 英雄最终伤害+20% 英雄攻击减甲+20 星悦积分+200 每获得1次胜利英雄最终伤害+0.07%（苟发育没说上限 但是咱默认个5000次吧）,item_daedalus,lottery_reincarnation_immortal_stele
+inventory_item:lottery_reincarnation_immortal_stele,inventory_item,lottery_reincarnation_immortal_stele,轮回仙碑,0,0,英雄每秒属性+1500 英雄攻击加成+20% 英雄全属性加成+20 英雄最终伤害+20% 英雄攻击减甲+20 星悦积分+200 每获得1次胜利英雄最终伤害+0.07%（苟发育没说上限 但是咱默认个5000次吧）,item_greater_crit,lottery_reincarnation_immortal_stele
 inventory_item:lottery_reincarnation_orb,inventory_item,lottery_reincarnation_orb,轮回宝珠,0,0,伐木效率+3 英雄攻速+20% 英雄最终伤害+20% 箭塔攻击加成10% 墙生命加成+10% 英雄每次转生全属性加成+2% 星悦积分+200,item_crimson_guard,lottery_reincarnation_orb
 inventory_item:lottery_resistance_crystal,inventory_item,lottery_resistance_crystal,抵抗结晶,0,0,墙伤害格挡+10,item_crimson_guard,lottery_resistance_crystal
-inventory_item:lottery_rift_implant,inventory_item,lottery_rift_implant,裂痕插件,0,0,英雄攻击全属性+8 英雄全属性加成+8% 英雄攻击减甲+8 英雄攻击加成+10% 英雄最终伤害10% 星悦积分+88 购买后自动激活,item_daedalus,lottery_rift_implant
+inventory_item:lottery_rift_implant,inventory_item,lottery_rift_implant,裂痕插件,0,0,英雄攻击全属性+8 英雄全属性加成+8% 英雄攻击减甲+8 英雄攻击加成+10% 英雄最终伤害10% 星悦积分+88 购买后自动激活,item_greater_crit,lottery_rift_implant
 inventory_item:lottery_seed_of_all_wood,inventory_item,lottery_seed_of_all_wood,万木之种,0,0,金矿效率+10% 伐木效率+2 每秒金币+10 每秒木材+10 伐木工攻速+10% 星悦积分+88,item_ogre_axe,lottery_seed_of_all_wood
 inventory_item:lottery_sharp_spirit,inventory_item,lottery_sharp_spirit,锋锐精神,0,0,防御塔攻击+100,item_mjollnir,lottery_sharp_spirit
 inventory_item:lottery_sharpwood_tower_core,inventory_item,lottery_sharpwood_tower_core,锐木塔源,0,0,箭塔攻速+15% 箭塔最终伤害+15% 箭塔攻击减甲+0.1 箭塔每秒攻击+20 箭塔造成伤害攻击+3 星悦积分+88,item_mjollnir,lottery_sharpwood_tower_core
-inventory_item:lottery_shooting_crystal,inventory_item,lottery_shooting_crystal,射击结晶,0,0,塔攻击力+50,item_daedalus,lottery_shooting_crystal
+inventory_item:lottery_shooting_crystal,inventory_item,lottery_shooting_crystal,射击结晶,0,0,塔攻击力+50,item_greater_crit,lottery_shooting_crystal
 inventory_item:lottery_signal_hub,inventory_item,lottery_signal_hub,信号枢纽,0,0,金矿效率+10%伐木效率+2每秒金币+10每秒木材+10伐木工攻速+10%英雄全属性加成+8%星悦积分+88购买后自动激活,item_ogre_axe,lottery_signal_hub
-inventory_item:lottery_sky_turning_seal,inventory_item,lottery_sky_turning_seal,焕天印,0,0,英雄每秒属性+1000 英雄攻击加成+20% 英雄全属性加成+15% 英雄最终伤害+20% 英雄攻击减甲+15 星悦积分+200 对转生怪物造成额外50%伤害 每次选择技能获得一次刷新机会,item_daedalus,lottery_sky_turning_seal
-inventory_item:lottery_soul_devouring_blade,inventory_item,lottery_soul_devouring_blade,噬魂灵剑,0,0,英雄造成伤害加攻击+2 英雄造成伤害加三围+1 星悦积分+20,item_daedalus,lottery_soul_devouring_blade
+inventory_item:lottery_sky_turning_seal,inventory_item,lottery_sky_turning_seal,焕天印,0,0,英雄每秒属性+1000 英雄攻击加成+20% 英雄全属性加成+15% 英雄最终伤害+20% 英雄攻击减甲+15 星悦积分+200 对转生怪物造成额外50%伤害 每次选择技能获得一次刷新机会,item_greater_crit,lottery_sky_turning_seal
+inventory_item:lottery_soul_devouring_blade,inventory_item,lottery_soul_devouring_blade,噬魂灵剑,0,0,英雄造成伤害加攻击+2 英雄造成伤害加三围+1 星悦积分+20,item_greater_crit,lottery_soul_devouring_blade
 inventory_item:lottery_soul_lock_box,inventory_item,lottery_soul_lock_box,锁魂匣,0,0,金矿收益+30% 伐木效率+20 伐木工攻速+20% 地图等级+1 金矿建造上限+1 每次获得宝物可获得一次刷新次数 星悦积分+200,item_ogre_axe,lottery_soul_lock_box
-inventory_item:lottery_sovereign_under_heaven,inventory_item,lottery_sovereign_under_heaven,君临天下,0,0,英雄初始属性+1000000 英雄造成伤害加攻击+30 英雄暴击伤害+100% 英雄攻击减甲+15 英雄攻击全属性+15 英雄全属性加成+15% 英雄最终伤害+15% 英雄攻击间隔-0.03 星悦积分+200,item_daedalus,lottery_sovereign_under_heaven
+inventory_item:lottery_sovereign_under_heaven,inventory_item,lottery_sovereign_under_heaven,君临天下,0,0,英雄初始属性+1000000 英雄造成伤害加攻击+30 英雄暴击伤害+100% 英雄攻击减甲+15 英雄攻击全属性+15 英雄全属性加成+15% 英雄最终伤害+15% 英雄攻击间隔-0.03 星悦积分+200,item_greater_crit,lottery_sovereign_under_heaven
 inventory_item:lottery_steel_wall,inventory_item,lottery_steel_wall,钢铁城墙,0,0,墙生命+3000 墙护甲+10 墙每秒生命+5 墙生命加成+5% 星悦积分+20,item_crimson_guard,lottery_steel_wall
 inventory_item:lottery_struggle_diary,inventory_item,lottery_struggle_diary,奋斗日记,0,0,箭塔造成伤害攻击+10 箭塔攻击减甲+0.1 箭塔暴击几率+20% 箭塔暴击伤害+50% 上班福利增加20%积分获取 星悦积分+200,item_mjollnir,lottery_struggle_diary
 inventory_item:lottery_supreme_fishing_rod,inventory_item,lottery_supreme_fishing_rod,极品钓鱼杆,0,0,箭塔造成伤害攻击+10 箭塔攻击减甲+0.1 箭塔攻击速度+30% 局内局外钓鱼时间缩短一倍 地图等级+1 星悦积分+88,item_mjollnir,lottery_supreme_fishing_rod
 inventory_item:lottery_swift_emblem,inventory_item,lottery_swift_emblem,快速纹章,0,0,箭塔攻速+5% 箭塔最终伤害+5% 星悦积分+10,item_mjollnir,lottery_swift_emblem
 inventory_item:lottery_ticket,inventory_item,lottery_ticket,地图抽奖券,0,0,用于地图抽奖；由地图玩法产出。,,lottery_ticket
 inventory_item:lottery_time_orb,inventory_item,lottery_time_orb,时间宝珠,0,0,伐木效率+3 金矿建造上限+1 防御塔攻击成长+1 英雄每秒属性+30 箭塔每秒攻击+30 击杀进攻boss后英雄攻击加成+2% 星悦积分+200,item_mjollnir,lottery_time_orb
-inventory_item:lottery_titan_shield,inventory_item,lottery_titan_shield,泰坦巨盾,0,0,英雄生命值+50000 英雄全属性+3000 英雄护甲+100 星悦积分+30,item_daedalus,lottery_titan_shield
+inventory_item:lottery_titan_shield,inventory_item,lottery_titan_shield,泰坦巨盾,0,0,英雄生命值+50000 英雄全属性+3000 英雄护甲+100 星悦积分+30,item_greater_crit,lottery_titan_shield
 inventory_item:lottery_tower_retrofit,inventory_item,lottery_tower_retrofit,箭塔改造,0,0,箭塔攻速+20% 箭塔每秒攻击+2 箭塔攻击加成+5% 星悦 积分+20,item_mjollnir,lottery_tower_retrofit
 inventory_item:lottery_unbreakable_fortress,inventory_item,lottery_unbreakable_fortress,不破要塞,0,0,墙护甲+200 墙每秒护甲+0.1 英雄减伤+5% 英雄生命加成+30% 英雄生命加成+30%、英雄护甲加成+30% 星悦积分+200,item_crimson_guard,lottery_unbreakable_fortress
 inventory_item:lottery_universal_tool,inventory_item,lottery_universal_tool,万能工具,0,0,伐木工攻速+3% 金矿效率+3% 星悦积分+10,item_ogre_axe,lottery_universal_tool
@@ -284,12 +284,12 @@ inventory_item:lottery_wealth_crystal,inventory_item,lottery_wealth_crystal,财�
 inventory_item:lottery_windspeed_bowstring,inventory_item,lottery_windspeed_bowstring,风速弓弦,0,0,英雄攻速+5% 箭塔攻速+5% 星悦积分+10,item_mjollnir,lottery_windspeed_bowstring
 inventory_item:lottery_woodcraft_grandmaster,inventory_item,lottery_woodcraft_grandmaster,研木宗师,0,0,金矿效率+10% 伐木效率+2 每秒金币+10 每秒木材+10 伐木工攻速+10% 星悦积分+88,item_ogre_axe,lottery_woodcraft_grandmaster
 inventory_item:lottery_woodforged_thousand_arrows,inventory_item,lottery_woodforged_thousand_arrows,木筑万锋,0,0,箭塔攻速+15% 箭塔最终伤害+15% 箭塔攻击减甲+0.1 箭塔每秒攻击+20 箭塔造成伤害攻击+3 星悦积分+88,item_mjollnir,lottery_woodforged_thousand_arrows
-inventory_item:material_ice_soul_ember,inventory_item,material_ice_soul_ember,冰魂焰魄,0,0,极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决,item_recipe,material_ice_soul_ember
-inventory_item:material_molten_core_01,inventory_item,material_molten_core_01,熔火核心Lv1,0,0,熔火核心Lv1*3 合成熔火核心Lv2,item_recipe,material_molten_core_01
-inventory_item:material_molten_core_02,inventory_item,material_molten_core_02,熔火核心Lv2,0,0,熔火核心Lv2*3 合成熔火核心Lv3,item_recipe,material_molten_core_02
-inventory_item:material_molten_core_03,inventory_item,material_molten_core_03,熔火核心Lv3,0,0,可用熔火核心Lv3升级装备 狱火熔铠Lv1,item_recipe,material_molten_core_03
-inventory_item:material_molten_core_04,inventory_item,material_molten_core_04,熔火核心Lv4,0,0,与狱火熔铠Lv4自动合成狱火熔铠Lvmax。拾取后保存在背包中，仅在合成成功时消耗。,item_recipe,material_molten_core_04
-inventory_item:material_synthesis_gem,inventory_item,material_synthesis_gem,合成宝石,0,0,加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1。拾取后保存在背包中，仅在合成成功时消耗。,item_recipe,material_synthesis_gem
+inventory_item:material_ice_soul_ember,inventory_item,material_ice_soul_ember,冰魂焰魄,0,0,极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决,item_shivas_guard,material_ice_soul_ember
+inventory_item:material_molten_core_01,inventory_item,material_molten_core_01,熔火核心Lv1,0,0,熔火核心Lv1*3 合成熔火核心Lv2,item_soul_booster,material_molten_core_01
+inventory_item:material_molten_core_02,inventory_item,material_molten_core_02,熔火核心Lv2,0,0,熔火核心Lv2*3 合成熔火核心Lv3,item_soul_booster,material_molten_core_02
+inventory_item:material_molten_core_03,inventory_item,material_molten_core_03,熔火核心Lv3,0,0,可用熔火核心Lv3升级装备 狱火熔铠Lv1,item_soul_booster,material_molten_core_03
+inventory_item:material_molten_core_04,inventory_item,material_molten_core_04,熔火核心Lv4,0,0,与狱火熔铠Lv4自动合成狱火熔铠Lvmax。拾取后保存在背包中，仅在合成成功时消耗。,item_soul_booster,material_molten_core_04
+inventory_item:material_synthesis_gem,inventory_item,material_synthesis_gem,合成宝石,0,0,加速手套max＋灼热之刃max＋铁甲max＋合成宝石 ＝ 狱火熔铠Lv1。拾取后保存在背包中，仅在合成成功时消耗。,item_gem,material_synthesis_gem
 inventory_item:rebirth_challenge_01,inventory_item,rebirth_challenge_01,挑战1转,0,0,获得英雄专属技能/提高英雄2000全属性/增加攻击全属性+1/解锁分裂多重攻击,,rebirth_challenge_01
 inventory_item:rebirth_challenge_02,inventory_item,rebirth_challenge_02,挑战2转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄3000全属性/增加攻击全属性+2/多重攻击+1,,rebirth_challenge_02
 inventory_item:rebirth_challenge_03,inventory_item,rebirth_challenge_03,挑战3转,0,0,获得随机技能，获得相同的技能时升级技能/提高英雄5000全属性/增加攻击全属性+3/多重攻击+1,,rebirth_challenge_03
@@ -311,12 +311,12 @@ inventory_item:weapon_epic_icefire_04,inventory_item,weapon_epic_icefire_04,史�
 inventory_item:weapon_epic_icefire_05,inventory_item,weapon_epic_icefire_05,史诗：冰火裁决+5,0,0,增加属性  - 45W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 750护甲  - 全属性+20000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_05
 inventory_item:weapon_epic_icefire_06,inventory_item,weapon_epic_icefire_06,史诗：冰火裁决+6,0,0,增加属性  - 50W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 800护甲  - 全属性+25000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_skadi,weapon_epic_icefire_06
 inventory_item:weapon_frost_blade_01,inventory_item,weapon_frost_blade_01,霜之剑刃Lv1,0,0,"英雄每次攻击增加6点攻击力 +50%吸血   攻击250次使该武器进化
-| RESULT: 成长之剑Lvmax + 死亡面罩 -> 霜之剑刃Lv1",item_crystalys,weapon_frost_blade_01
-inventory_item:weapon_frost_blade_02,inventory_item,weapon_frost_blade_02,霜之剑刃Lv2,0,0,英雄每次攻击增加7点攻击力 +50%吸血   攻击300次使该武器进化,item_crystalys,weapon_frost_blade_02
-inventory_item:weapon_frost_blade_03,inventory_item,weapon_frost_blade_03,霜之剑刃Lv3,0,0,英雄每次攻击增加8点攻击力 +50%吸血   攻击350次使该武器进化,item_crystalys,weapon_frost_blade_03
-inventory_item:weapon_frost_blade_04,inventory_item,weapon_frost_blade_04,霜之剑刃Lv4,0,0,英雄每次攻击增加9点攻击力 +50%吸血   攻击400次使该武器进化,item_crystalys,weapon_frost_blade_04
+| RESULT: 成长之剑Lvmax + 死亡面罩 -> 霜之剑刃Lv1",item_lesser_crit,weapon_frost_blade_01
+inventory_item:weapon_frost_blade_02,inventory_item,weapon_frost_blade_02,霜之剑刃Lv2,0,0,英雄每次攻击增加7点攻击力 +50%吸血   攻击300次使该武器进化,item_lesser_crit,weapon_frost_blade_02
+inventory_item:weapon_frost_blade_03,inventory_item,weapon_frost_blade_03,霜之剑刃Lv3,0,0,英雄每次攻击增加8点攻击力 +50%吸血   攻击350次使该武器进化,item_lesser_crit,weapon_frost_blade_03
+inventory_item:weapon_frost_blade_04,inventory_item,weapon_frost_blade_04,霜之剑刃Lv4,0,0,英雄每次攻击增加9点攻击力 +50%吸血   攻击400次使该武器进化,item_lesser_crit,weapon_frost_blade_04
 inventory_item:weapon_frost_blade_max,inventory_item,weapon_frost_blade_max,霜之剑刃Lvmax,0,0,"英雄每次攻击增加10点攻击力 +50%吸血   +大极地晶石+霜之剑刃max+合成宝石=极寒之刃
-| INGREDIENT: 霜之剑刃Lvmax + 大极地晶石 + 合成宝石 -> 极寒之刃Lv1",item_crystalys,weapon_frost_blade_max
+| INGREDIENT: 霜之剑刃Lvmax + 大极地晶石 + 合成宝石 -> 极寒之刃Lv1",item_lesser_crit,weapon_frost_blade_max
 inventory_item:weapon_growth_sword_01,inventory_item,weapon_growth_sword_01,成长之剑Lv1,0,0,英雄每次攻击增加1点攻击力  攻击200次使该武器进化    成长之剑Lvmax＋吸血面罩 自动合成幻影之剑,item_broadsword,weapon_growth_sword_01
 inventory_item:weapon_growth_sword_02,inventory_item,weapon_growth_sword_02,成长之剑Lv2,0,0,英雄每次攻击增加2点攻击力  攻击200次使该武器进化,item_broadsword,weapon_growth_sword_02
 inventory_item:weapon_growth_sword_03,inventory_item,weapon_growth_sword_03,成长之剑Lv3,0,0,英雄每次攻击增加3点攻击力  攻击200次使该武器进化,item_broadsword,weapon_growth_sword_03
@@ -324,12 +324,12 @@ inventory_item:weapon_growth_sword_04,inventory_item,weapon_growth_sword_04,成�
 inventory_item:weapon_growth_sword_max,inventory_item,weapon_growth_sword_max,成长之剑Lvmax,0,0,"英雄每次攻击增加5点攻击力  ＋吸血面罩 自动合成霜之剑刃
 | INGREDIENT: 成长之剑Lvmax + 死亡面罩 -> 霜之剑刃Lv1",item_broadsword,weapon_growth_sword_max
 inventory_item:weapon_ice_blade_01,inventory_item,weapon_ice_blade_01,极寒之刃Lv1,0,0,"+50%吸血 +50%暴击2倍 每次造成伤害提高12点攻击力 全属性+2000  可通过击杀敌人升级武器
-| RESULT: 霜之剑刃Lvmax + 大极地晶石 + 合成宝石 -> 极寒之刃Lv1",item_daedalus,weapon_ice_blade_01
-inventory_item:weapon_ice_blade_02,inventory_item,weapon_ice_blade_02,极寒之刃Lv2,0,0,+50%吸血 +50%暴击2倍 每次造成伤害提高13点攻击力 全属性+2500  可通过击杀敌人升级武器,item_daedalus,weapon_ice_blade_02
-inventory_item:weapon_ice_blade_03,inventory_item,weapon_ice_blade_03,极寒之刃Lv3,0,0,+50%吸血 +50%暴击2倍 全属性+3000 每次造成伤害提高14点攻击力  可通过击杀敌人升级武器,item_daedalus,weapon_ice_blade_03
-inventory_item:weapon_ice_blade_04,inventory_item,weapon_ice_blade_04,极寒之刃Lv4,0,0,+50%吸血 +50%暴击5倍 全属性+3500 每次造成伤害提高15点攻击力  可通过击杀敌人升级武器,item_daedalus,weapon_ice_blade_04
+| RESULT: 霜之剑刃Lvmax + 大极地晶石 + 合成宝石 -> 极寒之刃Lv1",item_greater_crit,weapon_ice_blade_01
+inventory_item:weapon_ice_blade_02,inventory_item,weapon_ice_blade_02,极寒之刃Lv2,0,0,+50%吸血 +50%暴击2倍 每次造成伤害提高13点攻击力 全属性+2500  可通过击杀敌人升级武器,item_greater_crit,weapon_ice_blade_02
+inventory_item:weapon_ice_blade_03,inventory_item,weapon_ice_blade_03,极寒之刃Lv3,0,0,+50%吸血 +50%暴击2倍 全属性+3000 每次造成伤害提高14点攻击力  可通过击杀敌人升级武器,item_greater_crit,weapon_ice_blade_03
+inventory_item:weapon_ice_blade_04,inventory_item,weapon_ice_blade_04,极寒之刃Lv4,0,0,+50%吸血 +50%暴击5倍 全属性+3500 每次造成伤害提高15点攻击力  可通过击杀敌人升级武器,item_greater_crit,weapon_ice_blade_04
 inventory_item:weapon_ice_blade_max,inventory_item,weapon_ice_blade_max,极寒之刃Lvmax,0,0,"+50%吸血 +50%暴击5倍 全属性+5000 每次造成伤害提高16点攻击力  极寒之刃max＋狱火熔铠max＋冰魂焰魄 ＝  史诗：冰火裁决
-| INGREDIENT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决",item_daedalus,weapon_ice_blade_max
+| INGREDIENT: 极寒之刃Lvmax + 狱火熔铠Lvmax + 冰魂焰魄 -> 史诗：冰火裁决",item_greater_crit,weapon_ice_blade_max
 inventory_item:weapon_legend_abyss_00,inventory_item,weapon_legend_abyss_00,传说：深渊审判,0,0,增加属性  - 60W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 850护甲  - 全属性+30000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_00
 inventory_item:weapon_legend_abyss_01,inventory_item,weapon_legend_abyss_01,传说：深渊审判+1,0,0,增加属性  - 70W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 850护甲  - 全属性+50000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_01
 inventory_item:weapon_legend_abyss_02,inventory_item,weapon_legend_abyss_02,传说：深渊审判+2,0,0,增加属性  - 80W攻击力  - 400%攻速  - 100%吸血  - 100W生命值  - 850护甲  - 全属性+100000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_02

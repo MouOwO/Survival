@@ -5,6 +5,7 @@ local items = require("config/generated/item_definitions")
 local content = require("config/generated/content_catalog")
 local equipment = require("config/equipment_definitions")
 local logger = require("core/logger")
+local original_icons = require("config/inventory_original_icons")
 
 local M = {}
 local state_by_player = {}
@@ -80,8 +81,9 @@ local function add_content_shell(current, content_id, definition, quantity)
     end
     item.survival_content_id = content_id
     publish_item_identity(item, content_id, false)
-    if item.SetAbilityTextureName and tostring(definition.icon_name or "") ~= "" then
-        pcall(item.SetAbilityTextureName, item, tostring(definition.icon_name))
+    local icon = original_icons[content_id] or definition.icon_name
+    if item.SetAbilityTextureName and tostring(icon or "") ~= "" then
+        pcall(item.SetAbilityTextureName, item, tostring(icon))
     end
     if item.SetCurrentCharges then
         if content_id == "item_small_polar_crystal" then
@@ -159,8 +161,9 @@ local function adopt_content_shell(payload)
     item.survival_owner_player_id = player_id
     current.content_shells[content_id] = item
     publish_item_identity(item, content_id, false)
-    if item.SetAbilityTextureName and tostring(definition.icon_name or "") ~= "" then
-        pcall(item.SetAbilityTextureName, item, tostring(definition.icon_name))
+    local icon = original_icons[content_id] or definition.icon_name
+    if item.SetAbilityTextureName and tostring(icon or "") ~= "" then
+        pcall(item.SetAbilityTextureName, item, tostring(icon))
     end
     return {
         ok = true,
@@ -314,7 +317,18 @@ local function add_shell(current, definition, slot, explicit_item_name)
             { player_id = current.hero:GetPlayerOwnerID() }
         )
         if growth and growth.snapshot then
-            set_item_counter(item, growth.snapshot)
+            local counter = growth.snapshot
+            if definition.progression_type == "monster_kill_count" then
+                local progress = event_bus.request(events.EQUIPMENT_GROWTH_GET_REQUEST,
+                    {player_id = current.hero:GetPlayerOwnerID()})
+                local value = progress and progress.progress
+                    and tonumber(progress.progress[definition.content_id]) or 0
+                local target = tonumber(counter.stage_attack_target)
+                    or tonumber(definition.progression_value) or 0
+                counter = {stage_attack_target = target,
+                    stage_attack_remaining = math.max(0, target - value)}
+            end
+            set_item_counter(item, counter)
         end
     elseif slot == "crystal" and current.hero.GetPlayerOwnerID
         and item_name == "item_survival_small_polar_crystal" then
@@ -445,9 +459,17 @@ local function on_hero_summoned(payload)
 end
 
 local function on_growth_changed(payload)
-    if payload.snapshot then
-        set_main_hand_counter(tonumber(payload.player_id), payload.snapshot)
-    end
+    if not payload.snapshot then return end
+    local player_id = tonumber(payload.player_id)
+    local equipped = state(player_id).equipped_by_slot.main_hand
+    local definition = weapons.by_id[equipped] or {}
+    local content_id = payload.content_id or payload.snapshot.content_id
+    if content_id and content_id ~= equipped then return end
+    -- Damage-based stat growth also publishes a fresh attack counter (zero for
+    -- ice blade). Only equipment kill progression owns this weapon's charges.
+    if definition.progression_type == "monster_kill_count"
+        and payload.content_id ~= equipped then return end
+    set_main_hand_counter(player_id, payload.snapshot)
 end
 
 local function on_polar_crystal_progress(payload)

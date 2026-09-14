@@ -1,0 +1,15 @@
+local event_bus = require("core/event_bus")
+local events = require("core/events")
+local M = class({})
+
+function M:GetBehavior() return DOTA_ABILITY_BEHAVIOR_NO_TARGET end
+function M:GetManaCost() return 0 end
+function M:OnSpellStart()
+    local result = event_bus.request(events.BUILDING_UPGRADE_REQUEST, {
+        building = self:GetCaster(), source_ability = self, upgrade_mode = "wall_9_1",
+    })
+    if not result or not result.ok then self:EndCooldown() end
+end
+
+_G.ability_upgrade_wall_9_1 = M
+return M

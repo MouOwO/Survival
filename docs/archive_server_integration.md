@@ -1,5 +1,41 @@
 # 全存档 HTTP 联调方案
 
+## 2026-09-14：默认木材纠正
+
+修复 `resource_system.lua` 将本地 10 与 HTTP 档案初始木材 10 重复相加的问题，档案字段现在作为完整开局数量。`player_gameplay_stats.csv` 的 `wood_per_second` 默认值从 1 改为 0；实际奖励仍可增加该字段。已执行 `202609140003_remove_default_wood_income.sql`，用一次性迁移记录扣除已有云档的旧基础 +1/s，并增加档案 revision，不反复扣减、不重置其他奖励。新配置 hash 为 `78b3d33d78e5bc4adc10dc15ae0bfe5f969f377a4ac0d6f0eadcacbbb98adb56`。
+
+后端已同步重启，日志改为 `output/backend_integration/wood_fix_stdout.log`、`wood_fix_stderr.log`。通过真实 HTTP 复查当前账号：`initial_wood=10`、`wood_per_second=0`，游戏/后端 hash 一致。开局资源、30 次收入 tick、重复档案刷新、实际收益奖励及通关冻结测试通过，16 项后端回归通过。已通过控制台重新加载联调局。
+
+## 2026-09-14：HTTP 权威联调已接通
+
+- 当前存档、抽奖使用同一份 CSV 生成不可变后端包，当前 hash 为 `c9c0b2ba60ee0368f92f3c1d6b21038743edfd33cc6aa2eb2b5c356a55103ef5`。纯展示图标表由 UI 构建器处理，不进入结算包。`build_archive_configs.ps1`、`build_lottery_configs.ps1` 和 `build_archive_server_bundle.py` 同步游戏/后端配置；修改结算 CSV 后须构建、同步配置并重启 HTTP 和新游戏局，不能在旧局混用 hash。
+- 主抽奖新增 `/v1/lottery/snapshot`；抽取、积分兑换、已读记录经 `/v1/archive/command` 的 `lottery_*` 命令，由 Python 调用共享 Lua 结算，HTTP 返回奖池内容及结果。游戏只缓存展示数据和转发操作，不再注册原本地抽奖实现，不自动赠送 1000 张测试券。价格、权重、保底、奖励属性来自后端加载的 CSV；客户端不得提交 results/roll/价格。
+- 已停用 `commerce_remaining_5d5c1152eb.js` 的本地商品预览、假订单、模拟二维码/支付成功入口，并编译到游戏；抽奖券购买提示暂未开放。真实支付接口未实现，不能用演示订单代替入账。
+- `player_profile_rules.csv` 默认 `http_fishing`，联调运行时拒绝本地 provider 和 isolated_test；本地单元测试仍可显式注入测试替身。游戏连接阶段预取档案，后续 UI 保持缓存与版本化增量；HTTP 故障不会回退假档案。HTTP 不再接受 faith_cheat。
+- 用户授权后已通过已打开的 SQL Editor 执行 `202609140001_http_lottery.sql`（扣券、发奖、属性与回执在一个事务内）和 `202609140002_gameplay_stats_csv_bounds.sql`。后者根据 97 项当前 CSV 同步列默认值/约束，修复真实初始化暴露的旧 tower_attack_interval 约束；不重写玩家既有数值。用户先前执行的建筑字段迁移也已只读复查成功。
+- 后端代码已部署到 `D:\survival_database\backend`，`.env` 持久设置 `SURVIVAL_ARCHIVE_HTTP=1`，8765 服务已由后台进程运行，日志为 `output/backend_integration/http_lottery_stdout.log` 和 `http_lottery_stderr.log`。原黑窗口进程已结束，无需同时再次启动占用端口。
+- 实际 Steam 账户通过真实 HTTP/Supabase 验证了四个奖池读取、visit 入库、重复请求回执一致、独立 profile 请求读回；未赠送测试货币、未用真实货币抽奖。16 项后端测试覆盖模拟数据库事务与真实 Lua 的十连保底、余额不足、丢回包重试、兑换、已读；游戏传输缓存/异步结果/增量回归通过。
+- 真实数据库补充通过零券抽奖失败路径：返回 `lottery_ticket_insufficient`，库存保持不变。再次开局后 HTTP online checkpoint 读回先前累计的 153 秒，确认不是新局内存重新从零初始化；未代替有余额抽奖成功发奖的验收。
+- 已通过 VConsole 加载本机私有 `survival_archive_http_local.cfg` 并重开地图。新局后端记录 `/v1/profile`、`/v1/lottery/snapshot`、`/v1/online-time/checkpoint` 均 HTTP 200，控制台确认 provider=http_fishing。真实有余额的抽奖发奖、兑换和断网/重启恢复仍需后续游戏操作验收，不以只读/visit 测试替代。私有 cfg 含 API token，不得提交或分享。
+
+下面保留此前阶段记录，当前状态以上述实连结果为准。
+
+## 2026-09-14：页面预取与持久化联调进展
+
+### 后续实连检查（用户启动 HTTP 后）
+
+用户开启扩展并重启后，运行中的 `/v1/archive/config` 已返回 HTTP 200，摘要与游戏一致。本机私有 `survival_archive_http_local.cfg` 已准备（包含令牌，不纳入仓库、不分享），用于新局 HTTP 配置。进一步通过 Python 检查第三份迁移的四个字段时，数据库返回 HTTP 400 / PostgreSQL `42703`；至少一列尚不存在。因此先执行 `server/migrations/202609060003_archive_buildings.sql` 再开新局，目前尚未完成玩家存档保存/退出读回验收。`tools/probe_archive_database.py` 已包含这项字段检查。
+
+本机 `/health` 已返回成功，四张存档表的空结果只读探测均为 HTTP 200，先前 TLS 阻塞已恢复。运行中的服务 `/v1/archive/config` 返回 HTTP 503 / `archive_disabled`。使用现有后端环境并设置 `SURVIVAL_ARCHIVE_HTTP=1` 执行真实 `build_application`，已成功完成扩展初始化及数据库配置同步；配置摘要 `52705dcb84a6c7cf141fbd69144931d4d2dd6fdd490ed1736706ae523d0dc7ca` 与游戏生成配置一致。未修改玩家档案，尚未验收三端保存读回。保留用户现有黑窗口进程；下一步在该窗口 Ctrl+C 后，设置 `$env:SURVIVAL_ARCHIVE_HTTP='1'` 并重新运行 `D:\survival_database\start_fishing_api.ps1`，再检查运行中存档路由。以下 TLS 失败描述为此前记录。
+
+- 存档和地图抽奖 UI 初始化时主动预取全部分类/宝箱；游戏端收到玩家档案后也主动推送。切换已缓存的标签不再请求页面数据，存档原有 0.18 秒人工等待已移除。档案尚未到达时仍等待真实数据，不伪造就绪状态。
+- 后续游戏端对每页快照做字段差异比较，仅推送变化；包含基础序号、更新序号和分片信息。客户端按分类独立组装、拒绝旧序号，基础版本不匹配时重新预取恢复。首次加载/重连恢复允许全量，正常切页不触发全量刷新。此处增量指游戏 Lua 到 Panorama；不代表现有 HTTP profile 响应也已改成增量协议。
+- 存档复用没有变化的条目面板；两套界面在收取数据后分批预热图标。图片解码与实际首帧表现仍需 Dota 实机验收，不能保证所有机器零卡顿。宝箱访问/奖池详情已读操作仍会提交记录，抽奖和兑换仍需权威操作回执。
+- 奖池来自本地 CSV 生成的 Lua 配置；目前没有在线热更新配置下载器。主抽奖仍由游戏 Lua 结算，尚未接入 HTTP 发货事务，不能将此次缓存修改视为抽奖持久化完成。
+- 已通过 JS 缓存、存档分片交错、宝箱切换、增量应用及 Lua 存档/HTTP 适配器/在线进度回归；相关 Panorama 脚本和布局已编译。后端 13 项测试通过，使用真实本地 HTTP 和 Lua，但数据库仍是测试替身。
+- 实际读取后端环境：`SURVIVAL_ARCHIVE_HTTP` 未启用；没有数据库直连/管理 SQL 凭据。原 API 尝试启动后报 `FISHING_API_STARTUP_ERROR supabase_unavailable` 并退出。对四张存档表进行 `limit=0` 只读探测时，Python 默认代理与直连均报 `SSL: UNEXPECTED_EOF_WHILE_READING`，PowerShell 也无法完成 TLS 连接。因此本次未确认远端迁移状态、未写玩家数据、未完成真实持久化验收。探测工具为 `tools/probe_archive_database.py`，凭据仅从后端环境读取。
+- 下一步：先恢复后端到 Supabase 的 HTTPS 连接，然后核对并依次执行 `202609060001_archive_stat_columns.sql`、`202609060002_all_archive.sql`、`202609060003_archive_buildings.sql`；启用扩展，以 HTTP 模式开新局，验证操作前后 revision、重连读回与重复操作不重复发奖。远端 SQL 需通过项目 SQL 管理入口或数据库连接执行，Data API secret 不能代替 SQL 管理权限。
+
 本轮目标是扩展现有 `Dota server Lua → loopback Python → Supabase` 链路，让存档读取及操作统一走权威后端。保持原有账户HMAC、钓鱼奖励和在线checkpoint；不把Panorama或房主电脑等同可信专用服务器，不开放公网监听。
 
 ## 先处理的风险

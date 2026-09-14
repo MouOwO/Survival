@@ -1,0 +1,18 @@
+/* Approved original-icon drawer, scoped to survival shop only. */
+#CustomShopWindow.UIModal.RHSurvivalShop,
+#CustomShopWindow.UIModal.RHSurvivalShop.UIClosed { visibility:visible; opacity:1; transition-property:position; transition-duration:0.28s; transition-timing-function:ease-out; }
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct:hover { width:90px; height:90px; margin:6px 14px 18px 0px; }
+#CustomShopWindow.RHSurvivalShop .ShopStockLabel { align:right bottom; position:0px 0px 0px; color:#ffffff; font-size:15px; font-weight:bold; background-color:transparent; background-image:none; padding:0px; margin:0px 3px 2px 0px; text-shadow:0px 0px 2px 3 #000000; z-index:10; }
+#CustomShopWindow.RHSurvivalShop .RHShopPrices,
+#CustomShopWindow.RHSurvivalShop .ShopCardName { visibility:collapse; }
+#ShopEntryTooltip.UITooltip { width:300px; min-height:0px; padding:14px; background-color:#19262dfc; wash-color:none; }
+#ShopTooltipHeader { height:50px; }
+#ShopTooltipIconHost,.ShopTooltipMainIcon { width:48px; height:48px; }
+#ShopTooltipTitle { font-size:19px; max-width:210px; white-space:normal; }
+#ShopTooltipCostRow { height:30px; margin-top:10px; }
+#ShopEntryTooltip .TooltipCostBlock { width:130px; height:28px; }
+#ShopEntryTooltip .TooltipCostIcon { width:21px; height:21px; vertical-align:center; }
+#ShopTooltipType,#ShopTooltipCondition,#ShopTooltipOwned,#ShopTooltipFields,#ShopTooltipStatus { visibility:collapse; }
+
+#ShopEntryTooltip #ShopTooltipDescription { visibility:visible; width:100%; height:fit-children; white-space:normal; font-size:16px; line-height:22px; color:#dce3e6; margin-top:10px; }

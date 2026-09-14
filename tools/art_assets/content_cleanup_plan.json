@@ -1,0 +1,80 @@
+{
+  "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival",
+  "retained_image_families": [
+    "archive_gpu_regular",
+    "archive_gpu_small",
+    "archive_handoff_v1",
+    "archive_heads_v2",
+    "archive_items_v1",
+    "archive_items_v2",
+    "archive_kit",
+    "archive_moon",
+    "archive_polish_v1",
+    "archive_portraits_v1",
+    "handoff_v1",
+    "hud_resources_v1",
+    "lottery_celestial",
+    "lottery_handoff",
+    "lottery_handoff_v1",
+    "main_hud_v1",
+    "remaining_handoff",
+    "remaining_handoff_ready",
+    "rogue_cards_gpu",
+    "rogue_cards_v1",
+    "rogue_clean_base_v1",
+    "roguelike_v1",
+    "shop_preview_v1",
+    "st2_darkfantasy",
+    "survival_native"
+  ],
+  "remove": [
+    {
+      "relative": "panorama/images/custom_game/archive_gothic",
+      "files": 2,
+      "bytes": 3726070,
+      "reason": "No folder reference in project UI, game code, data or retained texture recipes"
+    },
+    {
+      "relative": "panorama/images/custom_game/archive_gpu_256",
+      "files": 31,
+      "bytes": 25486,
+      "reason": "No folder reference in project UI, game code, data or retained texture recipes"
+    },
+    {
+      "relative": "panorama/images/custom_game/archive_gpu_bgra",
+      "files": 31,
+      "bytes": 26819,
+      "reason": "No folder reference in project UI, game code, data or retained texture recipes"
+    },
+    {
+      "relative": "panorama/images/custom_game/st2_localmount",
+      "files": 12,
+      "bytes": 145707,
+      "reason": "No folder reference in project UI, game code, data or retained texture recipes"
+    },
+    {
+      "relative": "panorama/styles/custom_game/survival_dota_theme.css",
+      "files": 1,
+      "bytes": 697,
+      "reason": "Unreferenced legacy style, editor backup, or sample textures"
+    },
+    {
+      "relative": "panorama/styles/custom_game/survival_hud_st2_local.css",
+      "files": 1,
+      "bytes": 11303,
+      "reason": "Unreferenced legacy style, editor backup, or sample textures"
+    },
+    {
+      "relative": "panorama/scripts/custom_game/shop_ui.js.orig",
+      "files": 1,
+      "bytes": 20930,
+      "reason": "Unreferenced legacy style, editor backup, or sample textures"
+    },
+    {
+      "relative": "materials/example",
+      "files": 3,
+      "bytes": 4870608,
+      "reason": "Unreferenced legacy style, editor backup, or sample textures"
+    }
+  ]
+}

@@ -244,3 +244,27 @@ __pycache__/
 /ui/**/*.log
 /ui/**/backups/
 /ui/**/__pycache__/
+
+# Machine-local execution output and debugger state are not release inputs.
+/output/
+/panorama_debugger.cfg
+/tools/**/*.log
+/tools/ui_release/compiled.json
+/art/ui/development/survival_shop_v2_preview/0*.png
+/art/ui/development/survival_shop_v2_preview/verification.json
+/tools/art_assets/rogue_alpha_fix/*.before.*
+/tools/art_assets/rogue_alpha_fix/*.fixed.png
+
+# Regression coverage for the current gameplay/UI/HTTP integration.
+!/scripts/vscripts/tests/test_challenge_unit_names.lua
+!/scripts/vscripts/tests/test_hero_base_health_binding.lua
+!/scripts/vscripts/tests/test_ice_blade_counter.lua
+!/scripts/vscripts/tests/test_lottery_http_service.lua
+!/scripts/vscripts/tests/test_post_clear_freeze.lua
+!/scripts/vscripts/tests/test_practice_difficulty_profiles.lua
+!/scripts/vscripts/tests/test_resource_opening_wood.lua
+!/scripts/vscripts/tests/test_shop_early_final_cooldown.lua
+!/scripts/vscripts/tests/test_targeted_area_pickup.lua
+!/scripts/vscripts/tests/test_tree_health_projection.lua
+!/scripts/vscripts/tests/test_ui_snapshot_delta.lua
+!/scripts/vscripts/tests/test_wall_quick_upgrade.lua

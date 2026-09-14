@@ -2,6 +2,7 @@ $ErrorActionPreference='Stop'
 $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $engine=[IO.Path]::GetFullPath((Join-Path $repo '../../..'))
 $content=Join-Path $engine 'content/dota_addons/Survival/panorama'
+& (Join-Path $repo 'tools/art_assets/sync_content_images.ps1')
 $plan=Get-Content (Join-Path $PSScriptRoot 'plan.json') -Raw | ConvertFrom-Json
 $compiler=Join-Path $engine 'game/bin/win64/resourcecompiler.exe'
 foreach($rel in @($plan.sources.PSObject.Properties.Name | Where-Object { $_.EndsWith('.xml') })){

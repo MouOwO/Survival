@@ -41,6 +41,9 @@ end
 local function ensure_provider()
     if injected_provider then return provider ~= nil end
     local next_provider_id = configured_provider_id()
+    if next_provider_id ~= 'http_fishing' then
+        return false, 'local_profile_disabled_for_http_integration'
+    end
     if not string.match(next_provider_id, "^[a-z][a-z0-9_]*$") then
         return false, "player profile provider_id invalid: " .. next_provider_id
     end
@@ -563,6 +566,7 @@ function M.apply_incremental(update)
         return { ok = false, error = "gameplay_stats_mode_unsupported" }
     end
     if gameplay_stats_mode == "isolated_test" then
+        if not injected_provider then return {ok=false,error='isolated_test_disabled_for_http_integration'} end
         local save_patch = changes.save
         local sparse = type(save_patch) == "table"
             and save_patch.gameplay_stats or nil
@@ -738,7 +742,7 @@ function M.init(options)
     register_server_convar("survival_player_profile_provider", "")
     register_server_convar("survival_fishing_api_token", "")
     register_server_convar("survival_fishing_reward_fixture", "")
-    register_server_convar("survival_archive_http_enabled", "0")
+    register_server_convar("survival_archive_http_enabled", "1")
     active_rule = nil
     for _, row in ipairs(rules.rows or {}) do
         if row.enabled ~= false then
@@ -763,9 +767,31 @@ function M.init(options)
         provider.init()
     end
     event_bus.handle_request(events.PLAYER_PROFILE_GET_REQUEST, get_profile_request)
+    -- Start account loading while the map/player is connecting, before hero selection.
+    if GameRules and type(GameRules.GetGameModeEntity)=='function' then
+        local loading, next_retry = {}, {}
+        require('core/scheduler').every(1,function()
+            for id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do
+                if PlayerResource and PlayerResource:IsValidPlayerID(id)
+                    and tonumber(PlayerResource:GetSteamAccountID(id) or 0)>0
+                    and not profiles_by_player[id] and not loading[id]
+                    and GameRules:GetGameTime()>=(next_retry[id] or -math.huge) then
+                    local player_id=id
+                    loading[player_id]=true
+                    local function finished()
+                        loading[player_id]=nil;next_retry[player_id]=GameRules:GetGameTime()+5
+                    end
+                    local result=M.load_player(player_id,'map_loading',finished,finished)
+                    if not result.pending then finished() end
+                end
+            end
+        end,'http_profile_preload')
+    end
     if active_rule.load_on_hero_ready ~= false then
         event_bus.subscribe(events.HERO_READY, function(payload)
-            M.load_player(payload.player_id, "hero_ready")
+            if profiles_by_player[payload.player_id] then
+                event_bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=payload.player_id,reason='hero_ready_cached'})
+            else M.load_player(payload.player_id, "hero_ready") end
         end)
     end
 end

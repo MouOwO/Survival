@@ -25,7 +25,7 @@ class Database:
     def resume(self,a,i):
         op=self.ops[(a,i)]
         return copy.deepcopy({'ok':not op.get('error'),'terminal':op['done'],'done':op['done'],'error':op.get('error'),
-            'profile':self.profile(a),'command':op['command'],'has_pass':op['pass']})
+            'profile':self.profile(a),'command':op['command'],'has_pass':op['pass'],'response':op.get('response')})
     def rpc(self,name,p):
         with self.lock:
             a=p.get('p_account',p.get('p_account_id'));i=p.get('p_id')
@@ -42,7 +42,7 @@ class Database:
                 if op['fingerprint']!=p['p_fingerprint']:return {'ok':False,'terminal':True,'error':'archive_id_conflict'}
                 return self.resume(a,i)
             if name=='archive_resume':return self.resume(a,i)
-            if name=='archive_commit':
+            if name in ('archive_commit','archive_commit_lottery'):
                 op=self.ops[(a,i)];profile=self.profile(a)
                 if op['done']:return self.resume(a,i)
                 if self.conflict:
@@ -50,6 +50,9 @@ class Database:
                 if p['p_revision']!=profile['revision']:return {'ok':False,'error':'archive_revision_conflict'}
                 if not p['p_error']:
                     profile['save']['archive']=copy.deepcopy(p['p_archive'])
+                    if name=='archive_commit_lottery':
+                        profile['save']['content_inventory']=copy.deepcopy(p['p_inventory'])
+                        op['response']=copy.deepcopy(p['p_response'])
                     for key,delta in p['p_deltas'].items():profile['save']['gameplay_stats'][key]+=delta
                     profile['revision']+=1
                 op['done']=True;op['error']=p['p_error']
@@ -105,10 +108,8 @@ class ArchiveTests(unittest.TestCase):
             with self.assertRaises(ArchiveError): self.send('building_upgrade',**values)
     def test_faith_cheat_persists_and_upgrades(self):
         payload=self.command('faith_cheat',amount=15000)
-        self.db.lose_reply=True
-        with self.assertRaises(TimeoutError): self.service.command(payload)
-        self.assertTrue(self.service.command(payload)['ok'])
-        self.assertEqual(self.profile['save']['archive']['buildings']['faith'],15000)
+        with self.assertRaises(ArchiveError): self.service.command(payload)
+        self.profile['save']['archive']['buildings']={'faith':15000,'levels':{},'earned_by_day':{}}
         for level in range(5):
             self.assertTrue(self.send('building_upgrade',item_id='building_01',expected_level=level)['ok'])
         self.assertEqual(self.profile['save']['archive']['buildings']['faith'],0)
@@ -204,5 +205,48 @@ class ArchiveTests(unittest.TestCase):
         self.service=ArchiveService(self.app,self.bundle,self.service.lua)
         result=self.service.profile({'account_id':'100'})
         self.assertEqual(result['save']['archive']['clear_counts']['n1'],1)
+
+    def test_lottery_atomic_ten_and_lost_reply(self):
+        self.profile['save']['content_inventory']={'lottery_ticket':100}
+        payload=self.command('lottery_draw',pool_id='map',count=10,request_id='draw_1')
+        self.db.lose_reply=True
+        with self.assertRaises(TimeoutError):self.service.command(payload)
+        result=self.service.command(payload)
+        self.assertTrue(result['ok'],result)
+        response=result['response'];self.assertEqual(len(response['results']),10)
+        self.assertTrue(response['guarantee_satisfied'])
+        revision=self.profile['revision'];inventory=copy.deepcopy(self.profile['save']['content_inventory'])
+        self.assertLess(inventory['lottery_ticket'],100)
+        again=self.service.command(payload)
+        self.assertEqual(again['response'],response)
+        self.assertEqual(self.profile['revision'],revision)
+        self.assertEqual(self.profile['save']['content_inventory'],inventory)
+        self.assertEqual(self.profile['save']['archive']['lottery_state']['pools']['map']['draws'],10)
+
+    def test_lottery_rejects_without_local_grant(self):
+        before=copy.deepcopy(self.profile)
+        result=self.send('lottery_draw',pool_id='map',count=10,request_id='empty_1')
+        self.assertFalse(result['ok']);self.assertEqual(result['error'],'lottery_ticket_insufficient')
+        self.assertEqual(self.profile,before)
+        with self.assertRaises(ArchiveError):self.send('lottery_draw',pool_id='map',count=10,request_id='forged_1',results=[])
+
+    def test_lottery_snapshot_and_read_and_exchange(self):
+        projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
+        self.assertTrue(projection['ok'],projection)
+        snapshots=projection['snapshots'];self.assertEqual(len(snapshots),4)
+        selected=next(s for s in snapshots if s['selected_pool_id']=='map')
+        ranks={'ur':5,'ssr':4,'sr':3,'r':2,'n':1}
+        values=[ranks[i['quality']] for i in selected['items']]
+        self.assertEqual(values,sorted(values,reverse=True))
+        self.assertNotIn('quality_weights',selected['selected_pool'])
+        self.assertEqual(selected['tickets'],0)
+        self.assertTrue(self.send('lottery_read',pool_id='map',read_action='details',revision=selected['selected_pool']['revision'],request_id='read_1')['ok'])
+        after=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
+        self.assertFalse(next(s for s in after['snapshots'] if s['selected_pool_id']=='map')['selected_pool']['update_unread'])
+        item=next(i for i in selected['items'] if i['exchange_enabled'] and i['exchange_points']>0)
+        self.profile['save']['gameplay_stats']['starjoy_points']=item['exchange_points']
+        self.assertTrue(self.send('lottery_exchange',pool_id='map',item_id=item['id'],request_id='exchange_1')['ok'])
+        self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],0)
+        self.assertEqual(self.profile['save']['content_inventory'][item['id']],1)
 
 if __name__=='__main__':unittest.main()

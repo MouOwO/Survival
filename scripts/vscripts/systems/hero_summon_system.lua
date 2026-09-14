@@ -164,7 +164,7 @@ local function initialize_replacement(player_id, team, altar, definition)
         return nil, move_error
     end
     if not unit:HasModifier("modifier_single_health_bar") then
-        unit:AddNewModifier(unit, nil, "modifier_single_health_bar", {
+        require("core/modifier_registry").ensure(unit, "modifier_single_health_bar", {
             player_id = player_id,
         })
     end

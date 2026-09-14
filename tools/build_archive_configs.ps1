@@ -7,7 +7,9 @@ Invoke-Expression $builder.Substring($start, $builder.LastIndexOf('Get-ChildItem
 $outputRoot = Join-Path $repo 'scripts/vscripts/config/generated'
 $utf8NoBom = [Text.UTF8Encoding]::new($false)
 $sourceRoot = Join-Path $repo 'data/csv/存档系统'
-Get-ChildItem $sourceRoot -Filter '*.csv' | ForEach-Object { Build-One $_ }
+Get-ChildItem $sourceRoot -Filter '*.csv' | Where-Object {
+    $_.BaseName -notin @('archive_icon_presentation','archive_item_icons','archive_navigation_icons')
+} | ForEach-Object { Build-One $_ }
 foreach ($name in @('player_gameplay_stats', 'entitlement_definitions', 'map_level_effect_rules')) {
     $file = Get-ChildItem (Join-Path $repo 'data/csv') -Recurse -Filter ($name + '.csv') | Select-Object -First 1
     Build-One $file

@@ -61,6 +61,7 @@ let css=read(p.join(here,'common.css'))+'\n'+read(p.join(here,'lottery_dialogs.c
 css+='\n'+read(p.join(here,'lottery_results.css'))+'\n'+read(p.join(here,'boss_warning.css'));
 css+='\n'+read(p.join(repo,'art/ui/development/shop_preview_v1/style.css'));
 css+='\n'+read(p.join(repo,'art/ui/development/archive_polish_v1/nine_slice.css'));
+css+='\n'+read(p.join(here,'shop_visual.css'));
 css=css.replace(/asset\(([\w]+)\)/g,(_,k)=>{if(!assetPaths[k])throw Error('Missing asset '+k);return 'url("'+assetPaths[k]+'")';});
 const bossWarning=read(p.join(here,'boss_warning.js')).replace('/*WARNING_ICON*/',JSON.stringify(assetPaths.boss_warning_icon));
 // UI components may retain an earlier registry across native layout reloads.
@@ -69,7 +70,7 @@ const dailyConfig={SurvivalUIRegistry:{assets:{}}};
 require('vm').runInNewContext(read(p.join(source,'scripts/custom_game/daily_resources.js')),{GameUI:{CustomUIConfig:()=>dailyConfig}});
 const dailyResources=dailyConfig.SurvivalUIRegistry.assets;
 for(const entry of Object.values(dailyResources))if(!fs.existsSync(p.join(current,'images',entry.runtime)))throw Error('Missing delivered daily resource '+entry.runtime);
-let helper=read(p.join(here,'common.js')).replace('/*ASSETS*/',JSON.stringify(assetPaths)).replace('/*DAILY_RESOURCES*/',JSON.stringify(dailyResources));
+let helper=read(p.join(here,'common.js')).replace('    cfg.RemainingHandoff=R;',read(p.join(here,'shop_visual.js'))+'\n    cfg.RemainingHandoff=R;').replace('/*ASSETS*/',JSON.stringify(assetPaths)).replace('/*DAILY_RESOURCES*/',JSON.stringify(dailyResources));
 helper=read(p.join(repo,'art/ui/development/archive_polish_v1/nine_slice.js'))+'\n'+helper;
 let daily=read(p.join(source,'scripts/custom_game/daily_rewards.js'));
 daily=require('../ui_stage3_v1/patch_daily.cjs')(daily);
@@ -94,7 +95,11 @@ daily=daily.replace("if(today&&!last)image(card,'daily.card.border.today','Daily
 daily=daily.replace("p('DailyPassStatus').style.backgroundImage='url(\"'+U.Asset(Number(data.has_pass)===1?'daily.badge.pass.active':'daily.badge.pass.inactive')+'\")';","RH.DailyPass(p('DailyPassStatus'),Number(data.has_pass)===1);");
 daily=require('../../../../tools/patch_daily_panel_lifetime.cjs')(daily);
 let archive=read(p.join(source,'layout/custom_game/archive.xml'));
+write('scripts/custom_game/archive_handoff_180de7e38b.js',require('../../../../tools/patch_shared_archive_tooltip.cjs').archive(read(p.join(source,'scripts/custom_game/archive_handoff_180de7e38b.js'))));
+archive=require('../../../../tools/patch_tooltip_effect_display.cjs').archive(archive);
 let controller=read(p.join(source,'scripts/custom_game/lottery_ui_handoff_bb9968eef7.js'));
+controller=require('../../../../tools/patch_lottery_ticket_purchase.cjs')(controller);
+controller=require('../../../../tools/patch_shared_archive_tooltip.cjs').lottery(controller);
 controller=controller.replace('duplicate.text = "重复物品，已转化为"','duplicate.text = "已转化 "').replace('+ Number(item.converted_points || 0) + "积分"','+ Number(item.converted_points || 0) + " 积分"');
 controller=controller.replace('LH=GameUI.CustomUIConfig().LotteryHandoff;','LH=GameUI.CustomUIConfig().LotteryHandoff, RH=GameUI.CustomUIConfig().RemainingHandoff;');
 controller=controller.replace('if (target) target.text = String(value === undefined ? "" : value);','if (target) { target.text = String(value === undefined ? "" : value); if(id === "LotteryInfoRules"){target.html=true;target.text=RH.QualityText(value);} }');
@@ -127,6 +132,7 @@ controller=controller.slice(0,begin)+`            var entries=history.filter(fun
             setText("LotteryInfoRules", "共 "+total+" 条奖励记录");
 `+controller.slice(end);
 let hud=read(p.join(source,'layout/custom_game/survival_hud.xml'));
+hud=require('../../../../tools/patch_tooltip_effect_display.cjs').lottery(hud);
 hud=hud.replace(/<Image class="LotteryFunctionIcon " src="file:\/\/\{images\}\/custom_game\/lottery_handoff\/icons\/(?:check|refresh)\.svg" hittest="false" \/>/g,'');
 hud=hud.replace('file://{images}/custom_game/lottery_handoff/icons/chevron.svg',assetPaths.action_chevron);
 let rogue=read(p.join(source,'scripts/custom_game/rogue_reward_ui.js'));
@@ -152,6 +158,7 @@ const navigation=read(p.join(here,'archive_navigation.js')).replace('/*ARCHIVE_N
 const icons=read(p.join(here,'archive_icons.js')).replace('/*ICON_ENTRIES*/',JSON.stringify(iconEntries));
 const itemArt=read(p.join(here,'item_art.js')).replace('/*ICON_ENTRIES*/',JSON.stringify(iconEntries));
 let shop=read(p.join(source,'scripts/custom_game/shop_ui.js'));
+shop=require('../../../../tools/patch_shop_visual.cjs')(shop);
 const shopIconAnchor='function createEntryIcon(parent, entry, className) {';
 if(shop.split(shopIconAnchor).length!==2)throw Error('Shop icon entry anchor changed');
 shop=shop.replace(shopIconAnchor,shopIconAnchor+'\n        var art=GameUI.CustomUIConfig().SurvivalItemArt; if(art&&art.Create(parent,entry,className))return;');
@@ -183,7 +190,7 @@ const resourceArtEnd=resourceArtSource.indexOf('return resource;}',resourceArtSt
 if(resourceArtStart<0||resourceArtEnd<resourceArtStart)throw Error('Resource icon shared block missing');
 hudController=hudController.replace(/if\(key==="top_gold"\|\|key==="top_wood"\)\{var resource=create\("Image"[\s\S]*?return resource;\}/,resourceArtSource.slice(resourceArtStart,resourceArtEnd));
 if(!hudController.includes("var topScale=Math.min(w/1672,h/941);place(top,(w-1672*topScale)/2,0,1672,941);style(top,{transform:\"scale3d(\"+topScale+\",\"+topScale+\",1)\"});"))throw Error('HUD backdrop layout anchor changed');
-hudController=hudController.replace("var topScale=Math.min(w/1672,h/941);place(top,(w-1672*topScale)/2,0,1672,941);style(top,{transform:\"scale3d(\"+topScale+\",\"+topScale+\",1)\"});","var topScale=Math.min(w/1672,h/941);place(top,(w-1672*topScale)/2,0,1672,941);style(top,{transform:\"scale3d(\"+topScale+\",\"+topScale+\",1)\"});\n        var backdropBleed=(w-1672*topScale)/(2*topScale)+24;\n        place(nodes.HandoffTopBackdrop,-backdropBleed,0,1672+backdropBleed,941);");
+if(!hudController.includes('place(topBackdrop,-24,0,w+48,941*topScale);'))throw Error('Screen-width backdrop layout missing');
 if(!hudController.includes("        var inv=native(\"inventory\");place(inv,g.inventoryX+15,55,358,242);style(inv,{overflow:\"noclip\",transform:\"none\",boxShadow:\"none\",backgroundImage:\"none\",backgroundColor:\"transparent\"});"))throw Error('Inventory cleanup anchor changed');
 hudController=hudController.replace("        var inv=native(\"inventory\");place(inv,g.inventoryX+15,55,358,242);style(inv,{overflow:\"noclip\",transform:\"none\",boxShadow:\"none\",backgroundImage:\"none\",backgroundColor:\"transparent\"});","        var inv=native(\"inventory\");place(inv,g.inventoryX+15,55,358,242);style(inv,{overflow:\"noclip\",transform:\"none\",boxShadow:\"none\",backgroundImage:\"none\",backgroundColor:\"transparent\"});\n        // Clear native inventory separators; the shared skin owns all framing.\n        [inv,inv.FindChildTraverse(\"inventory_items\"),inv.FindChildTraverse(\"inventory_list_container\"),inv.FindChildTraverse(\"inventory_list\"),inv.FindChildTraverse(\"inventory_list2\")].forEach(function(p){\n            style(p,{border:\"0px\",boxShadow:\"none\",backgroundImage:\"none\",backgroundColor:\"transparent\"});\n        });\n        for(var cleanSlot=0;cleanSlot<6;cleanSlot++){\n            var nativeSlot=inv.FindChildTraverse(\"inventory_slot_\"+cleanSlot);\n            style(nativeSlot,{border:\"0px\",boxShadow:\"none\",backgroundImage:\"none\",backgroundColor:\"transparent\"});\n        }\n        // End native inventory separator cleanup.\n");
 hudController=hudController.replace("place(inventory,g.inventoryX,23,401,307);","place(inventory,g.inventoryX,23,401,307);\n            var inventoryPaper=nodes.HandoffInventoryPaper||create(\"Panel\",background,\"HandoffInventoryPaper\",false);\n            place(inventoryPaper,g.inventoryX+12,49,366,263);style(inventoryPaper,{backgroundColor:\"#10303b\",borderRadius:\"3px\"});");

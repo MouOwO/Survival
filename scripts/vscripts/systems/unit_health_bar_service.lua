@@ -67,8 +67,7 @@ local function attach(unit)
     if unit.HasModifier and unit:HasModifier("modifier_single_health_bar") then
         return false
     end
-    unit:AddNewModifier(unit, nil, "modifier_single_health_bar", {})
-    return true
+    return require("core/modifier_registry").ensure(unit, "modifier_single_health_bar", {}) ~= nil
 end
 
 local function clear_excluded_unit(unit)

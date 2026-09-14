@@ -1,4 +1,5 @@
 local buildings = require("config/buildings_config")
+local wall_upgrade_rules = require("systems/wall_upgrade_rules")
 local gold_mine = require("config/gold_mine_config")
 local tower_routes = require("config/tower_route_config")
 local altar_actions = require("config/generated/altar_actions")
@@ -730,6 +731,21 @@ function M.build(ability_name, state, resources)
             can_afford = 1,
             status_text = "",
         }
+    end
+    if ability_name == "ability_upgrade_wall_9_1" then
+        local quote, error_message = wall_upgrade_rules.quote(buildings.wall, state.level, true)
+        if not quote then return {available = 0, can_afford = 0, status_text = error_message} end
+        local current = buildings.wall.levels[state.level] or {}
+        local result = merge({
+            available = 1, current_level = state.level, next_level = quote.target_level,
+            status_text = "直升9-1（仅限未升级的城墙）",
+            fields = {
+                {label = "等级", value = "1-1 → 9-1"},
+                {label = "生命", value = value_delta(current.health, quote.data.health)},
+                {label = "护甲", value = value_delta(current.war3_armor, quote.data.war3_armor)},
+            },
+        }, cost_data(quote.cost))
+        return mark_upgrade_state(with_affordability(result, quote.cost, 0, resources), state)
     end
     if ability_name == "ability_upgrade_wall" then
         return upgrade_level(buildings.wall, state.level, resources, state)

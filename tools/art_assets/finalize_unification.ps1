@@ -27,5 +27,6 @@ foreach ($target in $targets) {
     Get-ChildItem -LiteralPath $target -Directory -Recurse -Force | Sort-Object {$_.FullName.Length} -Descending | ForEach-Object {Remove-Item -LiteralPath $_.FullName -Force}
     Remove-Item -LiteralPath $target -Force
 }
-foreach ($target in $targets[1..2]) {New-Item -ItemType Junction -Path $target -Target $source | Out-Null}
-Write-Output 'Old UI directory removed; both engine source paths now point to art/ui/sources.'
+New-Item -ItemType Junction -Path $targets[1] -Target $source | Out-Null
+& (Join-Path $PSScriptRoot 'sync_content_images.ps1')
+Write-Output 'Old UI directory removed; content images use verified physical copies.'

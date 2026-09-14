@@ -801,7 +801,7 @@ local function train_worker_one(payload)
             worker:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
         end
         worker.survival_worker_type = "repairer"
-        worker:AddNewModifier(worker, nil, "modifier_repair_worker_ai", {
+        require("core/modifier_registry").ensure(worker, "modifier_repair_worker_ai", {
             repair_max_health_pct_per_second = tonumber(
                 training.repair_max_health_pct_per_second
             ) or 0,

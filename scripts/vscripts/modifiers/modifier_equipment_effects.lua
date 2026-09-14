@@ -1,5 +1,3 @@
-LinkLuaModifier("modifier_equipment_effects", "modifiers/modifier_equipment_effects", LUA_MODIFIER_MOTION_NONE)
-
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local hero_health_guard = require("core/hero_health_guard")
@@ -7,6 +5,7 @@ local armor_balance = require("config/armor_balance")
 
 local M = {}
 modifier_equipment_effects = class({})
+_G.modifier_equipment_effects = modifier_equipment_effects
 
 local function equipment_values(player_id)
     local response = event_bus.request(events.EQUIPMENT_STATS_GET_REQUEST,

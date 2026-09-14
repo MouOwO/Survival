@@ -1,0 +1,34 @@
+[
+  {
+    "root": "layout/custom_game/custom_ui_manifest.xml",
+    "exit_code": 0
+  },
+  {
+    "root": "layout/custom_game/remaining_5d5c1152eb_assets.xml",
+    "exit_code": 0
+  },
+  {
+    "root": "layout/custom_game/survival_hud.xml",
+    "exit_code": 0
+  },
+  {
+    "root": "layout/custom_game/archive.xml",
+    "exit_code": 0
+  },
+  {
+    "root": "layout/custom_game/rogue_reward_ui.xml",
+    "exit_code": 0
+  },
+  {
+    "root": "layout/custom_game/survival_grid_placement.xml",
+    "exit_code": 0
+  },
+  {
+    "root": "layout/custom_game/hero_skill_ui.xml",
+    "exit_code": 0
+  },
+  {
+    "root": "layout/custom_game/font_test.xml",
+    "exit_code": 0
+  }
+]

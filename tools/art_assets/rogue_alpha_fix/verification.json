@@ -1,0 +1,12 @@
+{
+  "size": [
+    824,
+    1908
+  ],
+  "mode": "RGBA",
+  "transparent_pixels": 57307,
+  "original_rgb_unchanged": true,
+  "interior_opaque": true,
+  "method": "Exterior-connected neutral matte alpha removal; generated candidates rejected (no alpha)",
+  "runtime_validation": "Not yet visually verified in game"
+}

@@ -143,6 +143,7 @@
         hideValveShopWindow();
         if (!byId("CustomShopWindow")) return;
         updateModeText();
+        var R=GameUI.CustomUIConfig().RemainingHandoff;if(R)R.SurvivalShopWindow();
         setOpenState(true);
         requestSnapshot();
     }
@@ -154,6 +155,7 @@
         hideValveShopWindow();
         if (!byId("CustomShopWindow")) return;
         updateModeText();
+        var R=GameUI.CustomUIConfig().RemainingHandoff;if(R)R.SurvivalShopWindow();
         setOpenState(true);
         requestSnapshot();
     }
@@ -166,6 +168,7 @@
         hideValveShopWindow();
         if (!byId("CustomShopWindow")) return;
         updateModeText();
+        var R=GameUI.CustomUIConfig().RemainingHandoff;if(R)R.SurvivalShopWindow();
         setOpenState(true);
         requestSnapshot();
     }
@@ -348,6 +351,7 @@
     }
 
     function updateEntryCard(card, entry) {
+        if(card && card.__rhShopBuy)U.State.Set(card.__rhShopBuy,{enabled:entry.purchasable===1});
         if (!card || !entry) return;
         card.SetHasClass("Unavailable", entry.purchasable !== 1);
         card.SetHasClass("Technology", entry.content_type === "technology");
@@ -571,6 +575,8 @@
                     purchase(entryById(card.GetAttributeString("entry_id", "")));
                 }
             });
+            var R=GameUI.CustomUIConfig().RemainingHandoff;
+            if(R)R.SurvivalShopCard(card,entry,function(){purchase(entryById(card.GetAttributeString("entry_id","")));});
             updateEntryCard(card, entry);
         });
 
@@ -709,6 +715,7 @@
         researchSourceEntindex = Number(payload.source_entindex || -1);
         hideValveShopWindow();
         updateModeText();
+        var R=GameUI.CustomUIConfig().RemainingHandoff;if(R)R.SurvivalShopWindow();
         setOpenState(true);
         onSnapshot(payload.snapshot || {});
     }

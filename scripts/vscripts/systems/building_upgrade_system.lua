@@ -18,6 +18,7 @@ local tower_utility_abilities = require("systems/tower_utility_ability_sync")
 local dev_wall_stats = require("debug/dev_wall_stats")
 local war3_armor_target = require("systems/war3_armor_target")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
+local wall_upgrade_rules = require("systems/wall_upgrade_rules")
 
 local M = {}
 print("[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter")
@@ -361,6 +362,7 @@ local function configured_display_name(state, route_row)
 end
 
 publish = function(state, reason)
+    wall_upgrade_rules.sync(state, upgrade_process.is_active(state.unit))
     local route_row = state.building_id == "arrow_tower"
         and tower_routes.current(state) or nil
     local display_name = configured_display_name(state, route_row)
@@ -601,6 +603,7 @@ local function recover_state(unit)
         end
     end
     refresh_farm_upgrade_ability(state)
+    wall_upgrade_rules.sync(state, upgrade_process.is_active(state.unit))
     return state
 end
 
@@ -633,12 +636,11 @@ local function on_technology_stats_changed(payload)
     end
 end
 
-local function upgrade_wall(state)
-    local next_level = state.level + 1
-    local data = state.definition.levels[next_level]
-    if not data then return { ok = false, error = "城墙已达最高等级" } end
-    if next_level > 1 and data.requires_city_level
-        and data.requires_city_level > 0 then
+local function upgrade_wall(state, mode)
+    local quote, error_message = wall_upgrade_rules.quote(state.definition, state.level, mode == "wall_9_1")
+    if not quote then return {ok = false, error = error_message} end
+    local next_level, data = quote.target_level, quote.data
+    if quote.requires_city_level > 0 then
         local city_level = 0
         for _, building in pairs(buildings) do
             if building.team == state.team
@@ -647,15 +649,15 @@ local function upgrade_wall(state)
                 city_level = math.max(city_level, building.level or 0)
             end
         end
-        if city_level < data.requires_city_level then
+        if city_level < quote.requires_city_level then
             return {
                 ok = false,
-                error = "基地达到Lv." .. tostring(data.requires_city_level)
+                error = "基地达到Lv." .. tostring(quote.requires_city_level)
                     .. "后才能升级城墙",
             }
         end
     end
-    local cost = charged_cost(state, data.upgrade_cost)
+    local cost = mode == "wall_9_1" and quote.cost or charged_cost(state, quote.cost)
     local result = spend(state, cost, "upgrade_wall")
     if not result or not result.ok then return result end
     local pending = start_upgrade(state, data, next_level, function()
@@ -934,10 +936,19 @@ local function upgrade_quote(payload)
         return { ok = false, error = "建筑正在升级中" }
     end
 
-    local mode = payload.upgrade_mode == "max" and "max" or "one"
+    local mode = payload.upgrade_mode == "wall_9_1" and "wall_9_1"
+        or payload.upgrade_mode == "max" and "max" or "one"
     local target_level = state.level + 1
     local cost = nil
-    if state.building_id == "arrow_tower" then
+    if mode == "wall_9_1" then
+        if state.building_id ~= "wall" then return {ok = false, error = "仅城墙可直升9-1"} end
+        local quote, error_message = wall_upgrade_rules.quote(state.definition, state.level, true)
+        if not quote then return {ok = false, error = error_message} end
+        if quote.requires_city_level > team_city_level(state.team) then
+            return {ok = false, error = "主城等级不足，无法直升9-1"}
+        end
+        target_level, cost = quote.target_level, quote.cost
+    elseif state.building_id == "arrow_tower" then
         if not state.tower_class and state.level >= 5 then
             return { ok = false, error = "请先选择防御塔转职" }
         end
@@ -1027,6 +1038,7 @@ local function on_upgrade_request(payload)
 
     local free_effect_type = "grant_building_upgrade_action"
     local has_free_upgrade = payload.system_free_upgrade ~= true
+        and payload.upgrade_mode ~= "wall_9_1"
         and rogue_effect_state.numeric(state.player_id, free_effect_type) > 0
     local requested_mode = payload.upgrade_mode or "one"
     if has_free_upgrade then
@@ -1035,7 +1047,7 @@ local function on_upgrade_request(payload)
     end
 
     local ok, result = pcall(function()
-        if state.building_id == "wall" then return upgrade_wall(state) end
+        if state.building_id == "wall" then return upgrade_wall(state, requested_mode) end
         if state.building_id == "main_city" then return upgrade_city(state) end
         if state.building_id == "building_farm" or state.building_id == "farm" then
             return upgrade_farm(state)
@@ -1064,6 +1076,9 @@ end
 
 local function on_free_upgrade_request(payload)
     payload = payload or {}
+    if payload.upgrade_mode == "wall_9_1" then
+        return {ok = false, error = "直升9-1需要支付累计升级费用"}
+    end
     payload.silent_notification = true
     payload.system_free_upgrade = true
     local quote = upgrade_quote(payload)
@@ -1202,6 +1217,7 @@ local function on_created(payload)
         )
     end
     refresh_farm_upgrade_ability(state)
+    wall_upgrade_rules.sync(state, upgrade_process.is_active(state.unit))
 end
 
 local function on_destroyed(payload)
@@ -1219,6 +1235,7 @@ local function on_building_changed(payload)
         state.population_occupied = tonumber(payload.population_occupied)
             or state.population_occupied
         refresh_farm_upgrade_ability(state)
+        wall_upgrade_rules.sync(state, upgrade_process.is_active(state.unit))
     end
     if payload.building_id == "main_city" then refresh_team_farms(payload.team) end
 end

@@ -1,0 +1,236 @@
+[
+  {
+    "id": "ability_challenge_monster_03",
+    "old": "skeleton_king_vampiric_aura",
+    "new": "lycan_feral_impulse",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_lumberjack_personality_workaholic",
+    "old": "juggernaut_omnislash",
+    "new": "juggernaut_omni_slash",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_power_training",
+    "old": "item_blades_of_attack",
+    "new": "sven_gods_strength",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_vitality_training",
+    "old": "item_vitality_booster",
+    "new": "centaur_great_fortitude",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_agility_training",
+    "old": "item_eagle",
+    "new": "morphling_morph_agi",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_intellect_training",
+    "old": "item_mystic_staff",
+    "new": "silencer_glaives_of_wisdom",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_armor_training",
+    "old": "item_chainmail",
+    "new": "dragon_knight_dragon_blood",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_attack_speed_training",
+    "old": "item_gloves",
+    "new": "invoker_alacrity",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_move_speed_training",
+    "old": "item_boots",
+    "new": "windrunner_windrun",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_health_regen_training",
+    "old": "item_ring_of_regen",
+    "new": "huskar_inner_vitality",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_mana_regen_training",
+    "old": "item_void_stone",
+    "new": "crystal_maiden_brilliance_aura",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_return_home",
+    "old": "item_tpscroll",
+    "new": "furion_teleportation",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_rogue_reward",
+    "old": "item_tome_of_knowledge",
+    "new": "invoker_invoke",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_survival_pickup_materials",
+    "old": "item_recipe",
+    "new": "alchemist_goblins_greed",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_research_lumberjack_speed",
+    "old": "ability_train_lumberjack",
+    "new": "alchemist_goblins_greed",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_research_advanced_lumberjack_speed",
+    "old": "ability_train_lumberjack",
+    "new": "alchemist_goblins_greed",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_research_tower_attack",
+    "old": "ability_upgrade_attack",
+    "new": "sven_great_cleave",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_research_advanced_tower_attack",
+    "old": "ability_upgrade_attack",
+    "new": "sven_great_cleave",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_research_wall_health",
+    "old": "ability_upgrade_wall",
+    "new": "treant_living_armor",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_research_advanced_wall_health",
+    "old": "ability_upgrade_wall",
+    "new": "treant_living_armor",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_research_ars_03",
+    "old": "ability_upgrade_wall",
+    "new": "treant_living_armor",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "ability_research_ars_05",
+    "old": "ability_upgrade_attack",
+    "new": "sven_great_cleave",
+    "file": "scripts/npc/npc_abilities_custom.txt"
+  },
+  {
+    "id": "item_survival_challenge_reward",
+    "old": "item_recipe",
+    "new": "item_ultimate_orb",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_synthesis_gem_shell",
+    "old": "item_recipe",
+    "new": "item_gem",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_molten_core_01_shell",
+    "old": "item_recipe",
+    "new": "item_soul_booster",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_molten_core_02_shell",
+    "old": "item_recipe",
+    "new": "item_soul_booster",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_molten_core_03_shell",
+    "old": "item_recipe",
+    "new": "item_soul_booster",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_molten_core_04_shell",
+    "old": "item_recipe",
+    "new": "item_soul_booster",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_ice_soul_ember_shell",
+    "old": "item_recipe",
+    "new": "item_shivas_guard",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_frost_blade_01",
+    "old": "item_crystalys",
+    "new": "item_lesser_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_frost_blade_02",
+    "old": "item_crystalys",
+    "new": "item_lesser_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_frost_blade_03",
+    "old": "item_crystalys",
+    "new": "item_lesser_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_frost_blade_04",
+    "old": "item_crystalys",
+    "new": "item_lesser_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_frost_blade_max",
+    "old": "item_crystalys",
+    "new": "item_lesser_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_ice_blade_01",
+    "old": "item_daedalus",
+    "new": "item_greater_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_ice_blade_02",
+    "old": "item_daedalus",
+    "new": "item_greater_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_ice_blade_03",
+    "old": "item_daedalus",
+    "new": "item_greater_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_ice_blade_04",
+    "old": "item_daedalus",
+    "new": "item_greater_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  },
+  {
+    "id": "item_survival_ice_blade_max",
+    "old": "item_daedalus",
+    "new": "item_greater_crit",
+    "file": "scripts/npc/npc_items_custom.txt"
+  }
+]

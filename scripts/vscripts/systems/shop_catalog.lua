@@ -389,6 +389,16 @@ local function project_entry(player_id, entry, context)
         technology_cooldown_source_entry = context.technology_cooldown_source_entry or "",
         technology_cooldown_sequence = context.technology_cooldown_sequence or 0,
     }
+    if entry.contentid == "service_early_final_boss" then
+        local wave = context.wave_state or {}
+        local cooling = wave.early_final_used ~= true and wave.victory_settled ~= true
+            and (tonumber(wave.current_wave) or 0) < (tonumber(wave.total_waves) or 30)
+        item.early_final_cooldown_remaining = cooling
+            and (tonumber(wave.early_final_remaining) or 60) or 0
+        item.early_final_cooldown_total = tonumber(wave.early_final_cooldown_total) or 60
+        item.early_final_cooldown_until = cooling and wave.game_started == true
+            and (tonumber(wave.early_final_cooldown_until) or 0) or 0
+    end
     if item.stock_max > 0 and item.stock <= 0 then
         item.purchasable = 0
         item.disabled_reason = "商城库存补充中"

@@ -1,4 +1,5 @@
 modifier_repair_worker_ai = class({})
+_G.modifier_repair_worker_ai = modifier_repair_worker_ai
 local M = modifier_repair_worker_ai
 local repair_math = require("core/repair_math")
 

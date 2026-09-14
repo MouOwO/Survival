@@ -6,6 +6,7 @@ local MAX_SELECTED_BUILDINGS = 64
 
 local ordinary_upgrade_abilities = {
     ability_upgrade_wall = { wall = true },
+    ability_upgrade_wall_9_1 = { wall = true },
     ability_upgrade_city = { main_city = true },
     ability_upgrade_farm = { building_farm = true, farm = true },
 }
@@ -120,7 +121,8 @@ function M.execute(payload)
     local player_id = tonumber(payload.player_id)
     local primary = payload.primary
     local ability_name = tostring(payload.ability_name or "")
-    local upgrade_mode = ability_name == "ability_upgrade_tower_max"
+    local upgrade_mode = ability_name == "ability_upgrade_wall_9_1" and "wall_9_1"
+        or ability_name == "ability_upgrade_tower_max"
         and "max" or "one"
     local tower_single = ability_name == "ability_upgrade_tower"
         or ability_name == "ability_upgrade_tower_lv01"
