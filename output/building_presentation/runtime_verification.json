@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-16",
+  "map": "template_map",
+  "status": "PASS",
+  "scope": "main_city_lv01 construction presentation service and final facing",
+  "white_shell_visible_in_game": true,
+  "white_shell_world_origin": [0, 128, 128],
+  "building_world_origin": [0, 128, 128],
+  "entity_angles_before_and_after": [0, 0, 0],
+  "model_door_faces": "world_south_negative_Y",
+  "reveal_seconds": 0.9,
+  "alpha_samples": [{"seconds": 0, "alpha": 255}, {"seconds": 0.1, "alpha": 246}, {"seconds": 0.45, "alpha": 106}],
+  "white_shell_count_at_1_1_seconds": 0,
+  "white_shell_count_after_probe_cleanup": 0,
+  "white_screenshot": "white_visible_final.png",
+  "final_screenshot": "south_visible_final.png",
+  "limits": "Other 23 models and upgrade final-model matching verified by compiled asset audits / regression tests, not individually viewed live. Earlier stale background screenshots are excluded."
+}

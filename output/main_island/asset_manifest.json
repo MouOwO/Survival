@@ -1,0 +1,1156 @@
+[
+  {
+    "name": "m01_player_platform",
+    "label": "M01 玩家平台基体",
+    "category": "structure",
+    "triangles": 7568,
+    "vertices": 4542,
+    "bounds": [
+      [
+        -1536.0,
+        -768.0001831054688,
+        -480.0
+      ],
+      [
+        1536.0,
+        1280.0001220703125,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/mortar.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m02_arm_left",
+    "label": "M02 连接通道 左",
+    "category": "structure",
+    "triangles": 2624,
+    "vertices": 1584,
+    "bounds": [
+      [
+        -1535.999755859375,
+        640.0000610351562,
+        -480.0
+      ],
+      [
+        -319.9996643066406,
+        2816.0,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/mortar.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m02_arm_right",
+    "label": "M02 连接通道 右",
+    "category": "structure",
+    "triangles": 2624,
+    "vertices": 1584,
+    "bounds": [
+      [
+        320.0002746582031,
+        639.9999389648438,
+        -480.0
+      ],
+      [
+        1536.0003662109375,
+        2816.0,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/mortar.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m03_stair_treads",
+    "label": "M03 迎敌阶梯 · 16 级",
+    "category": "structure",
+    "triangles": 4020,
+    "vertices": 2168,
+    "bounds": [
+      [
+        -288.0,
+        0.2499660849571228,
+        -4.75
+      ],
+      [
+        288.00006103515625,
+        512.0,
+        244.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/mortar.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m03_stair_cheek_left",
+    "label": "M03 阶梯侧帮 -1",
+    "category": "structure",
+    "triangles": 2040,
+    "vertices": 1088,
+    "bounds": [
+      [
+        -43.000003814697266,
+        -43.000003814697266,
+        0.0
+      ],
+      [
+        43.000064849853516,
+        555.0,
+        354.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m03_stair_cheek_right",
+    "label": "M03 阶梯侧帮 1",
+    "category": "structure",
+    "triangles": 2040,
+    "vertices": 1088,
+    "bounds": [
+      [
+        -43.000003814697266,
+        -43.000003814697266,
+        0.0
+      ],
+      [
+        43.000064849853516,
+        555.0,
+        354.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m04_inner_bank_256",
+    "label": "M04 内岸直墙",
+    "category": "structure",
+    "triangles": 1572,
+    "vertices": 840,
+    "bounds": [
+      [
+        -128.0,
+        -58.0000114440918,
+        -375.0
+      ],
+      [
+        128.0,
+        58.0000114440918,
+        15.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/mortar.vmat",
+      "materials/main_island/rock_wet.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m05_bank_concave",
+    "label": "M05 内岸折角 -1",
+    "category": "structure",
+    "triangles": 1704,
+    "vertices": 912,
+    "bounds": [
+      [
+        -122.0,
+        -58.00000762939453,
+        -375.0
+      ],
+      [
+        64.00000762939453,
+        128.0,
+        15.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/mortar.vmat",
+      "materials/main_island/rock_wet.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m05_bank_convex",
+    "label": "M05 内岸折角 1",
+    "category": "structure",
+    "triangles": 1704,
+    "vertices": 912,
+    "bounds": [
+      [
+        -64.0,
+        -58.00000762939453,
+        -375.0
+      ],
+      [
+        122.00001525878906,
+        128.0,
+        15.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/mortar.vmat",
+      "materials/main_island/rock_wet.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m06_outer_corner",
+    "label": "M06 外岸转角基体",
+    "category": "structure",
+    "triangles": 196,
+    "vertices": 112,
+    "bounds": [
+      [
+        -222.49148559570312,
+        -185.8468017578125,
+        -480.0
+      ],
+      [
+        213.10302734375,
+        128.00001525878906,
+        93.33179473876953
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/mortar.vmat",
+      "materials/main_island/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m07_paving_clean",
+    "label": "M07 干净地坪",
+    "category": "floor",
+    "triangles": 288,
+    "vertices": 160,
+    "bounds": [
+      [
+        -128.10000610351562,
+        -128.00001525878906,
+        -15.0
+      ],
+      [
+        128.10000610351562,
+        128.00001525878906,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/mortar.vmat",
+      "materials/main_island/moss.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m07_paving_worn",
+    "label": "M07 轻磨损地坪",
+    "category": "floor",
+    "triangles": 324,
+    "vertices": 192,
+    "bounds": [
+      [
+        -128.1000213623047,
+        -128.00001525878906,
+        -15.0
+      ],
+      [
+        128.10000610351562,
+        128.00001525878906,
+        0.7000046372413635
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/mortar.vmat",
+      "materials/main_island/moss.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m07_paving_moss",
+    "label": "M07 边缘苔痕地坪",
+    "category": "floor",
+    "triangles": 2088,
+    "vertices": 1240,
+    "bounds": [
+      [
+        -136.9829559326172,
+        -157.31077575683594,
+        -15.0
+      ],
+      [
+        148.0434112548828,
+        206.05540466308594,
+        0.550000011920929
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/mortar.vmat",
+      "materials/main_island/moss.vmat",
+      "materials/main_island/leaf_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m08_coping_straight",
+    "label": "M08 岸沿压顶 straight",
+    "category": "structure",
+    "triangles": 240,
+    "vertices": 128,
+    "bounds": [
+      [
+        -127.50000762939453,
+        -58.0000114440918,
+        -15.0
+      ],
+      [
+        127.50000762939453,
+        58.0000114440918,
+        15.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone_light.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m08_coping_corner",
+    "label": "M08 岸沿压顶 corner",
+    "category": "structure",
+    "triangles": 240,
+    "vertices": 128,
+    "bounds": [
+      [
+        -63.50000762939453,
+        -58.00000762939453,
+        -15.0
+      ],
+      [
+        122.00001525878906,
+        127.5,
+        15.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone_light.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m08_coping_end",
+    "label": "M08 岸沿压顶 end",
+    "category": "structure",
+    "triangles": 60,
+    "vertices": 32,
+    "bounds": [
+      [
+        -31.5000057220459,
+        -58.000003814697266,
+        -15.0
+      ],
+      [
+        31.5000057220459,
+        58.000003814697266,
+        15.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone_light.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m09_cliff_straight",
+    "label": "M09 外岸岩壁 straight",
+    "category": "structure",
+    "triangles": 816,
+    "vertices": 692,
+    "bounds": [
+      [
+        -132.6962432861328,
+        -116.56892395019531,
+        -487.0049743652344
+      ],
+      [
+        132.97218322753906,
+        90.00001525878906,
+        47.772117614746094
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/rock.vmat",
+      "materials/main_island/moss.vmat",
+      "materials/main_island/rock_wet.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m09_cliff_bulge",
+    "label": "M09 外岸岩壁 bulge",
+    "category": "structure",
+    "triangles": 816,
+    "vertices": 692,
+    "bounds": [
+      [
+        -142.53390502929688,
+        -149.44215393066406,
+        -483.2292175292969
+      ],
+      [
+        131.36976623535156,
+        90.00001525878906,
+        -8.689593315124512
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/rock.vmat",
+      "materials/main_island/moss.vmat",
+      "materials/main_island/rock_wet.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m09_cliff_recess",
+    "label": "M09 外岸岩壁 recess",
+    "category": "structure",
+    "triangles": 816,
+    "vertices": 692,
+    "bounds": [
+      [
+        -142.0972900390625,
+        -83.95867156982422,
+        -487.93475341796875
+      ],
+      [
+        128.0,
+        90.00001525878906,
+        36.12636947631836
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/rock.vmat",
+      "materials/main_island/moss.vmat",
+      "materials/main_island/rock_wet.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m10_transition_dry",
+    "label": "M10 石土草过渡 dry",
+    "category": "nature",
+    "triangles": 1976,
+    "vertices": 1064,
+    "bounds": [
+      [
+        -126.64717864990234,
+        -78.52515411376953,
+        -4.739579200744629
+      ],
+      [
+        132.70469665527344,
+        75.33673095703125,
+        5.314747333526611
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/earth.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m10_transition_wet",
+    "label": "M10 石土草过渡 wet",
+    "category": "nature",
+    "triangles": 1976,
+    "vertices": 1064,
+    "bounds": [
+      [
+        -134.77183532714844,
+        -69.45753479003906,
+        -4.65803861618042
+      ],
+      [
+        116.20072174072266,
+        76.0226821899414,
+        5.329525470733643
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/rock_wet.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m11_shore_foam",
+    "label": "M11 岸线碎沫",
+    "category": "water",
+    "triangles": 468,
+    "vertices": 252,
+    "bounds": [
+      [
+        -126.0,
+        -38.32485580444336,
+        0.0
+      ],
+      [
+        131.0,
+        13.245884895324707,
+        0.10000000149011612
+      ]
+    ],
+    "materials": [
+      "materials/main_island/foam.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m12_water_tile",
+    "label": "M12 深蓝水面模块",
+    "category": "water",
+    "triangles": 2,
+    "vertices": 4,
+    "bounds": [
+      [
+        -512.0000610351562,
+        -512.0000610351562,
+        0.0
+      ],
+      [
+        512.0000610351562,
+        512.0000610351562,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/water.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m12_vortex_surface",
+    "label": "M12 中央缓涡水面",
+    "category": "water",
+    "triangles": 4992,
+    "vertices": 2561,
+    "bounds": [
+      [
+        -1600.0,
+        -1600.0,
+        0.0
+      ],
+      [
+        1600.0,
+        1600.0,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/water.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m13_lowwall_256",
+    "label": "M13 外边界矮墙",
+    "category": "structure",
+    "triangles": 732,
+    "vertices": 392,
+    "bounds": [
+      [
+        -128.0,
+        -58.0000114440918,
+        0.0
+      ],
+      [
+        128.0,
+        58.0000114440918,
+        105.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/mortar.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m13_short_post",
+    "label": "M13 边界短柱",
+    "category": "structure",
+    "triangles": 360,
+    "vertices": 192,
+    "bounds": [
+      [
+        -52.50000762939453,
+        -52.50000762939453,
+        0.0
+      ],
+      [
+        52.50000762939453,
+        52.50000762939453,
+        179.0
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/stone_cool.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m14_banner_post",
+    "label": "M14 独立旗杆",
+    "category": "feature",
+    "triangles": 262,
+    "vertices": 143,
+    "bounds": [
+      [
+        -56.000003814697266,
+        -38.00000762939453,
+        0.0
+      ],
+      [
+        56.00000762939453,
+        74.00000762939453,
+        498.5
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone_light.vmat",
+      "materials/main_island/bronze.vmat",
+      "materials/main_island/gold.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m14_flag_teal",
+    "label": "M14 玩家旗帜 teal",
+    "category": "feature",
+    "triangles": 336,
+    "vertices": 207,
+    "bounds": [
+      [
+        -84.92500305175781,
+        -21.500003814697266,
+        128.0
+      ],
+      [
+        84.92500305175781,
+        44.60496139526367,
+        467.70001220703125
+      ]
+    ],
+    "materials": [
+      "materials/main_island/bronze.vmat",
+      "materials/main_island/gold.vmat",
+      "materials/main_island/teal.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m14_flag_blue_cloth",
+    "label": "M14 玩家旗帜 blue_cloth",
+    "category": "feature",
+    "triangles": 336,
+    "vertices": 207,
+    "bounds": [
+      [
+        -84.92500305175781,
+        -21.500003814697266,
+        128.0
+      ],
+      [
+        84.92500305175781,
+        44.60496139526367,
+        467.70001220703125
+      ]
+    ],
+    "materials": [
+      "materials/main_island/bronze.vmat",
+      "materials/main_island/gold.vmat",
+      "materials/main_island/blue_cloth.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m14_flag_ochre_cloth",
+    "label": "M14 玩家旗帜 ochre_cloth",
+    "category": "feature",
+    "triangles": 336,
+    "vertices": 207,
+    "bounds": [
+      [
+        -84.92500305175781,
+        -21.500003814697266,
+        128.0
+      ],
+      [
+        84.92500305175781,
+        44.60496139526367,
+        467.70001220703125
+      ]
+    ],
+    "materials": [
+      "materials/main_island/bronze.vmat",
+      "materials/main_island/gold.vmat",
+      "materials/main_island/ochre_cloth.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m14_flag_rose_cloth",
+    "label": "M14 玩家旗帜 rose_cloth",
+    "category": "feature",
+    "triangles": 336,
+    "vertices": 207,
+    "bounds": [
+      [
+        -84.92500305175781,
+        -21.500003814697266,
+        128.0
+      ],
+      [
+        84.92500305175781,
+        44.60496139526367,
+        467.70001220703125
+      ]
+    ],
+    "materials": [
+      "materials/main_island/bronze.vmat",
+      "materials/main_island/gold.vmat",
+      "materials/main_island/rose_cloth.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m15_rock_1",
+    "label": "M15 岩石 1",
+    "category": "nature",
+    "triangles": 52,
+    "vertices": 28,
+    "bounds": [
+      [
+        -148.52281188964844,
+        -118.81779479980469,
+        -31.495939254760742
+      ],
+      [
+        163.7637176513672,
+        113.36205291748047,
+        362.2750549316406
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m15_rock_2",
+    "label": "M15 岩石 2",
+    "category": "nature",
+    "triangles": 52,
+    "vertices": 28,
+    "bounds": [
+      [
+        -96.37987518310547,
+        -75.3514633178711,
+        -12.174139022827148
+      ],
+      [
+        107.59920501708984,
+        81.44497680664062,
+        230.27894592285156
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m15_rock_3",
+    "label": "M15 岩石 3",
+    "category": "nature",
+    "triangles": 52,
+    "vertices": 28,
+    "bounds": [
+      [
+        -52.979740142822266,
+        -45.21435546875,
+        -13.050201416015625
+      ],
+      [
+        60.519222259521484,
+        51.47517776489258,
+        138.61851501464844
+      ]
+    ],
+    "materials": [
+      "materials/main_island/stone.vmat",
+      "materials/main_island/stone_cool.vmat",
+      "materials/main_island/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m16_cherry_1",
+    "label": "M16 疏朗樱树 1",
+    "category": "nature",
+    "triangles": 6960,
+    "vertices": 8320,
+    "bounds": [
+      [
+        -228.92738342285156,
+        -192.9044189453125,
+        -4.0314788818359375
+      ],
+      [
+        245.29000854492188,
+        152.3968963623047,
+        466.84686279296875
+      ]
+    ],
+    "materials": [
+      "materials/main_island/wood.vmat",
+      "materials/main_island/pink.vmat",
+      "materials/main_island/pink_light.vmat",
+      "materials/main_island/pink_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m16_cherry_2",
+    "label": "M16 疏朗樱树 2",
+    "category": "nature",
+    "triangles": 6960,
+    "vertices": 8320,
+    "bounds": [
+      [
+        -230.5929412841797,
+        -166.68638610839844,
+        -4.0314788818359375
+      ],
+      [
+        242.25401306152344,
+        190.92593383789062,
+        467.5991516113281
+      ]
+    ],
+    "materials": [
+      "materials/main_island/wood.vmat",
+      "materials/main_island/pink.vmat",
+      "materials/main_island/pink_light.vmat",
+      "materials/main_island/pink_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m17_grass",
+    "label": "M17 边缘地被 grass",
+    "category": "nature",
+    "triangles": 144,
+    "vertices": 180,
+    "bounds": [
+      [
+        -39.475318908691406,
+        -39.08026123046875,
+        0.0
+      ],
+      [
+        47.056884765625,
+        34.655948638916016,
+        62.194942474365234
+      ]
+    ],
+    "materials": [
+      "materials/main_island/leaf.vmat",
+      "materials/main_island/leaf_light.vmat",
+      "materials/main_island/leaf_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m17_fern",
+    "label": "M17 边缘地被 fern",
+    "category": "nature",
+    "triangles": 1188,
+    "vertices": 1170,
+    "bounds": [
+      [
+        -48.215152740478516,
+        -55.114219665527344,
+        -0.30873966217041016
+      ],
+      [
+        56.14286804199219,
+        56.666954040527344,
+        44.32838821411133
+      ]
+    ],
+    "materials": [
+      "materials/main_island/leaf.vmat",
+      "materials/main_island/leaf_light.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m17_shrub",
+    "label": "M17 边缘地被 shrub",
+    "category": "nature",
+    "triangles": 528,
+    "vertices": 576,
+    "bounds": [
+      [
+        -44.618629455566406,
+        -50.576927185058594,
+        -0.5349369049072266
+      ],
+      [
+        49.25251770019531,
+        46.792720794677734,
+        64.58256530761719
+      ]
+    ],
+    "materials": [
+      "materials/main_island/wood.vmat",
+      "materials/main_island/leaf.vmat",
+      "materials/main_island/leaf_light.vmat",
+      "materials/main_island/leaf_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m17_flowers",
+    "label": "M17 边缘地被 flowers",
+    "category": "nature",
+    "triangles": 792,
+    "vertices": 810,
+    "bounds": [
+      [
+        -42.75730895996094,
+        -46.86567306518555,
+        -0.5119152069091797
+      ],
+      [
+        38.658660888671875,
+        52.04719924926758,
+        60.316307067871094
+      ]
+    ],
+    "materials": [
+      "materials/main_island/gold.vmat",
+      "materials/main_island/wood.vmat",
+      "materials/main_island/leaf.vmat",
+      "materials/main_island/leaf_light.vmat",
+      "materials/main_island/leaf_dark.vmat",
+      "materials/main_island/flower.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "m17_moss",
+    "label": "M17 边缘地被 moss",
+    "category": "nature",
+    "triangles": 600,
+    "vertices": 360,
+    "bounds": [
+      [
+        -59.02035903930664,
+        -61.80354690551758,
+        0.0
+      ],
+      [
+        52.52814483642578,
+        62.0657958984375,
+        0.25
+      ]
+    ],
+    "materials": [
+      "materials/main_island/moss.vmat",
+      "materials/main_island/leaf_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  }
+]

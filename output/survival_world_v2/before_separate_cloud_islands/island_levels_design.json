@@ -1,0 +1,115 @@
+{
+  "source": "template_map.vmap",
+  "water": 416,
+  "bed": 396,
+  "attack": 640,
+  "tower": 768,
+  "stairStart": 1792,
+  "stairEnd": 2304,
+  "stairWidth": 576,
+  "outward": 512,
+  "lateral": 256,
+  "crossHalfLength": 2304,
+  "crossHalfWidth": 576,
+  "taperStart": 1152,
+  "taperEnd": 2048,
+  "gateWaterWidth": 640,
+  "flights": [
+    {
+      "q": 0,
+      "foot": [
+        1110,
+        2688
+      ],
+      "landing": [
+        1920,
+        2688
+      ],
+      "attack": [
+        2560,
+        2688
+      ],
+      "towerLeft": [
+        256,
+        3584
+      ],
+      "towerRight": [
+        256,
+        1792
+      ],
+      "steps": 16
+    },
+    {
+      "q": 1,
+      "foot": [
+        -1152,
+        4950
+      ],
+      "landing": [
+        -1152,
+        5760
+      ],
+      "attack": [
+        -1152,
+        6400
+      ],
+      "towerLeft": [
+        -2048,
+        4096
+      ],
+      "towerRight": [
+        -256,
+        4096
+      ],
+      "steps": 16
+    },
+    {
+      "q": 2,
+      "foot": [
+        -3414,
+        2688
+      ],
+      "landing": [
+        -4224,
+        2688
+      ],
+      "attack": [
+        -4864,
+        2688
+      ],
+      "towerLeft": [
+        -2560,
+        1792
+      ],
+      "towerRight": [
+        -2560,
+        3584
+      ],
+      "steps": 16
+    },
+    {
+      "q": 3,
+      "foot": [
+        -1152,
+        426
+      ],
+      "landing": [
+        -1152,
+        -384
+      ],
+      "attack": [
+        -1152,
+        -1024
+      ],
+      "towerLeft": [
+        -256,
+        1280
+      ],
+      "towerRight": [
+        -2048,
+        1280
+      ],
+      "steps": 16
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "builtAt": "2026-09-15T03:42:58.5195361Z",
+  "map": "survival_basin_review",
+  "navigation": "[BASIN_NAV_SUMMARY]\tsamples=150\tfailed=0",
+  "bidirectionalPaths": [
+    "09/15 11:45:21 [VScript] [BASIN_PATH]\t0\ttrue\ttrue",
+    "09/15 11:45:21 [VScript] [BASIN_PATH]\t1\ttrue\ttrue",
+    "09/15 11:45:21 [VScript] [BASIN_PATH]\t2\ttrue\ttrue",
+    "09/15 11:45:21 [VScript] [BASIN_PATH]\t3\ttrue\ttrue"
+  ],
+  "screenshots": [
+    {
+      "name": "overview",
+      "title": "整体结构",
+      "description": "中央低盆地与四座高平台；东桃花、北冰雪、西松林、南暖砂。"
+    },
+    {
+      "name": "basin",
+      "title": "中央出生盆地",
+      "description": "中心是浅水洼，四个出口通向阶梯。"
+    },
+    {
+      "name": "peach",
+      "title": "东 · 桃花青石",
+      "description": "偏青绿的石地、苔草过渡与边缘桃花。"
+    },
+    {
+      "name": "snow",
+      "title": "北 · 冰雪石庭",
+      "description": "冷灰石地与积雪混合，内部保持平坦。"
+    },
+    {
+      "name": "snow_material_close",
+      "title": "冰雪平台 · 新材质近景",
+      "description": "独立 Blender 石板模型烘焙颜色与法线；地面仍然平坦，积雪沿边缘覆盖。"
+    },
+    {
+      "name": "pine",
+      "title": "西 · 松林苔地",
+      "description": "草、土、岩石与旧石路连续混合。"
+    },
+    {
+      "name": "sand",
+      "title": "南 · 暖砂石庭",
+      "description": "暖色砂土与岩石地表；内部无水域。"
+    },
+    {
+      "name": "stair_gate",
+      "title": "阶梯与城墙缺口",
+      "description": "单一窄通道可上下往返，顶端预留城墙位置。"
+    }
+  ],
+  "scope": "Independent central battlefield sample. Main map not replaced; production wave and builder configuration not migrated."
+}

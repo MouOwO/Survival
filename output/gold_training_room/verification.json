@@ -1,0 +1,191 @@
+{
+  "status": "PASS",
+  "custom_modules": 29,
+  "native_models": [
+    "models/props_foliage/tree_pine01.vmdl"
+  ],
+  "material_sets": 15,
+  "walkable_support_variant": true,
+  "instances": 599,
+  "emission": false,
+  "source2_bounds_and_dependencies": [
+    {
+      "name": "b01_floor_a",
+      "bounds_error": 1.52587890625e-05,
+      "physics": false,
+      "triangles": 288
+    },
+    {
+      "name": "b01_floor_b",
+      "bounds_error": 1.52587890625e-05,
+      "physics": false,
+      "triangles": 288
+    },
+    {
+      "name": "b02_floor_worn",
+      "bounds_error": 1.52587890625e-05,
+      "physics": false,
+      "triangles": 324
+    },
+    {
+      "name": "b01_niche_floor",
+      "bounds_error": 1.51356735e-05,
+      "physics": false,
+      "triangles": 160
+    },
+    {
+      "name": "b03_wall_256",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 1840
+    },
+    {
+      "name": "b03_wall_128",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 980
+    },
+    {
+      "name": "b04_pillar",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 480
+    },
+    {
+      "name": "b04_pillar_coin",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 1264
+    },
+    {
+      "name": "b05_corner",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 1960
+    },
+    {
+      "name": "b06_arc_60",
+      "bounds_error": 5.71533203128638e-05,
+      "physics": true,
+      "triangles": 700
+    },
+    {
+      "name": "b07_teleport_base",
+      "bounds_error": 1.1026661e-05,
+      "physics": false,
+      "triangles": 4628
+    },
+    {
+      "name": "b08_spawn_inlay",
+      "bounds_error": 1.8592266845640637e-05,
+      "physics": false,
+      "triangles": 3564
+    },
+    {
+      "name": "b09_coin_stele",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 360
+    },
+    {
+      "name": "b09_coin_relief",
+      "bounds_error": 7.814697262631398e-06,
+      "physics": false,
+      "triangles": 4760
+    },
+    {
+      "name": "b10_brazier_plinth",
+      "bounds_error": 4.185302735493224e-06,
+      "physics": false,
+      "triangles": 180
+    },
+    {
+      "name": "b10_bronze_bowl",
+      "bounds_error": 4.237060544198812e-06,
+      "physics": false,
+      "triangles": 1500
+    },
+    {
+      "name": "b11_rock_1",
+      "bounds_error": 1.0075683590571316e-05,
+      "physics": false,
+      "triangles": 364
+    },
+    {
+      "name": "b11_rock_2",
+      "bounds_error": 7.597656249913598e-06,
+      "physics": false,
+      "triangles": 364
+    },
+    {
+      "name": "b11_rock_3",
+      "bounds_error": 1.0837402342644964e-05,
+      "physics": false,
+      "triangles": 364
+    },
+    {
+      "name": "b12_rubble",
+      "bounds_error": 1.186767578076342e-05,
+      "physics": false,
+      "triangles": 780
+    },
+    {
+      "name": "b12_ground_patch",
+      "bounds_error": 8.43994141064286e-06,
+      "physics": false,
+      "triangles": 76
+    },
+    {
+      "name": "b13_grass_small",
+      "bounds_error": 1.8208007794839887e-06,
+      "physics": false,
+      "triangles": 72
+    },
+    {
+      "name": "b13_grass_large",
+      "bounds_error": 8.099365231828415e-06,
+      "physics": false,
+      "triangles": 144
+    },
+    {
+      "name": "b13_fern",
+      "bounds_error": 4.066162112792426e-06,
+      "physics": false,
+      "triangles": 1188
+    },
+    {
+      "name": "b14_shrub",
+      "bounds_error": 6.187744141072926e-06,
+      "physics": false,
+      "triangles": 528
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "bounds_error": 7.739501953096806e-06,
+      "physics": false,
+      "triangles": 792
+    },
+    {
+      "name": "b16_banner",
+      "bounds_error": 1.0000000003174137e-05,
+      "physics": false,
+      "triangles": 336
+    },
+    {
+      "name": "b16_moss_patch",
+      "bounds_error": 6.350097656593334e-06,
+      "physics": false,
+      "triangles": 600
+    },
+    {
+      "name": "room_earth_base",
+      "bounds_error": 0.00010390624993306119,
+      "physics": false,
+      "triangles": 188
+    }
+  ],
+  "compiled_map": "gold_training_room_review.vpk",
+  "markers": 10,
+  "main_map_modified": false,
+  "runtime_verified": false
+}

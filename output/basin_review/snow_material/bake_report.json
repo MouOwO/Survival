@@ -1,0 +1,15 @@
+{
+  "status": "complete",
+  "seconds": 625.4112484455109,
+  "stoneObjects": 113,
+  "textureSize": 2048,
+  "mapping": "unique arena UV; world x [-1280,1280], y [1600,4160]",
+  "normalConvention": "tangent +X -Y +Z",
+  "files": [
+    "D:\\steam\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\basin_review\\snow_material\\snow_slate_color.png",
+    "D:\\steam\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\basin_review\\snow_material\\snow_slate_normal.png",
+    "D:\\steam\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\basin_review\\snow_material\\snow_slate_roughness.png",
+    "D:\\steam\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\basin_review\\snow_material\\snow_slate_reflectance.png"
+  ],
+  "source": "independent Blender geometry and procedural stone paint; no concept image sampled"
+}

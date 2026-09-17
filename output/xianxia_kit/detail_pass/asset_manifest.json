@@ -1,0 +1,149 @@
+[
+  {
+    "name": "a01_pavilion_detail",
+    "category": "architecture",
+    "triangles": 41746,
+    "bounds": [
+      [
+        -264.8000183105469,
+        -327.0,
+        0.0
+      ],
+      [
+        264.8000183105469,
+        266.0000305175781,
+        560.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_roof.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "Added curved brackets and outward-facing ceramic tile-end disks. Same approved base dimensions.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v01_pine_rooted_0",
+    "category": "vegetation",
+    "triangles": 22170,
+    "bounds": [
+      [
+        -215.9962615966797,
+        -222.3004913330078,
+        -5.900416374206543
+      ],
+      [
+        266.5978698730469,
+        243.4325408935547,
+        626.4395141601562
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_leaf.vmat"
+    ],
+    "notes": "Visible tapering roots ground the trunk without opaque canopy clusters.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v01_pine_rooted_1",
+    "category": "vegetation",
+    "triangles": 22170,
+    "bounds": [
+      [
+        -177.6283416748047,
+        -217.5505828857422,
+        -11.514946937561035
+      ],
+      [
+        305.46282958984375,
+        249.6713104248047,
+        468.99993896484375
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_leaf.vmat"
+    ],
+    "notes": "Visible tapering roots ground the trunk without opaque canopy clusters.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t08_platform_edge",
+    "category": "terrain",
+    "triangles": 730,
+    "bounds": [
+      [
+        -128.0,
+        -34.32009506225586,
+        -128.0
+      ],
+      [
+        128.0,
+        27.000015258789062,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_rock.vmat"
+    ],
+    "notes": "256-unit sockets; 128-unit shallow solid face; top z=0; no gold stripe or overhanging paper plane.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t08_platform_corner",
+    "category": "terrain",
+    "triangles": 978,
+    "bounds": [
+      [
+        -128.0,
+        -34.32009506225586,
+        -128.0
+      ],
+      [
+        144.00003051757812,
+        187.0,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_rock.vmat"
+    ],
+    "notes": "256-unit sockets; 128-unit shallow solid face; top z=0; no gold stripe or overhanging paper plane.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t08_stair_cheek",
+    "category": "terrain",
+    "triangles": 352,
+    "bounds": [
+      [
+        -1.62124638336536e-06,
+        -14.000030517578125,
+        -128.0
+      ],
+      [
+        256.0,
+        14.0,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat"
+    ],
+    "notes": "Side coping matches existing eight 32-unit treads with 16-unit drops. Decorative side only; does not cover walking lanes.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  }
+]

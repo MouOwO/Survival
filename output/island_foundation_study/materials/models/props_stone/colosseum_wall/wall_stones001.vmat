@@ -1,0 +1,27 @@
+"Layer0"
+{
+	"shader"	"global_lit_simple.vfx"
+	"F_NORMAL_MAP"	"1"
+	"F_SPECULAR"	"1"
+	"F_TINT_MASK"	"1"
+	"g_flBumpStrength"	"1"
+	"g_flSpecularBloom"	"0"
+	"g_flSpecularIntensity"	"1"
+	"g_vColorTint"	"[0.403922 0.509804 0.176471 1.000000]"
+	"g_vColorTint2"	"[0.588235 0.596078 0.454902 1.000000]"
+	"g_vTexCoordOffset"	"[0.000000 0.000000 0.000000 0.000000]"
+	"g_vTexCoordScale"	"[1.000000 1.000000 0.000000 0.000000]"
+	"TextureTintMask"	"materials/models/props_stone/colosseum_wall/wall_stonesmoss001_mask.png"
+	"TextureColor"	"materials/models/props_stone/colosseum_wall/wall_stonesmoss001_color.png"
+	"TextureReflectance"	"materials/models/props_stone/colosseum_wall/wall_stones001_refl.png"
+	"TextureSelfIllumMask"	"materials/models/props_stone/colosseum_wall/wall_stones001_3e64b676_selfillum.png"
+	"TextureBloom"	"materials/models/props_stone/colosseum_wall/wall_stones001_3e64b676_bloom.png"
+	"TextureNormal"	"materials/models/props_stone/colosseum_wall/wall_stones001_normal.png"
+	"Compiled Textures"
+	{
+		"g_tTintMask"	"materials/models/props_stone/colosseum_wall/wall_stonesmoss001_mask_psd_2861f262.vtex"
+		"g_tColor"	"materials/models/props_stone/colosseum_wall/wall_stonesmoss001_color_psd_bb9de158.vtex"
+		"g_tSpecular"	"materials/models/props_stone/colosseum_wall/wall_stones001_refl_psd_3e64b676.vtex"
+		"g_tNormal"	"materials/models/props_stone/colosseum_wall/wall_stones001_normal_psd_e8360108.vtex"
+	}
+}

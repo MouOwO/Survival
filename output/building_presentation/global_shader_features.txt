@@ -1,0 +1,6178 @@
+	Resource Type: Shader [Version 71] [Header Version: 12]
+	File Size: 6322 bytes
+
+
+--- (No External Resource References Found)
+
+
+--- Resource Blocks: Count 2 ---
+	-- Block: DATA  Size: 5933   bytes [Offset:     40]
+	-- Block: RED2  Size: 338    bytes [Offset:   5984]
+
+
+--- Data for block "DATA" ---
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	m_nVersion = 1
+	m_description = "Simple Dota shader, mostly used for static props."
+	m_bDevShader = false
+	m_bHasShaderProgram = 
+	[
+		true, true, true, false,
+		false, false, false, false,
+	]
+	m_modeArray = 
+	[
+		{
+			m_szName = "Default"
+			m_szShaderFallback = ""
+			m_staticComboSettings = [  ]
+		},
+		{
+			m_szName = "DotaDeferred"
+			m_szShaderFallback = ""
+			m_staticComboSettings = 
+			[
+				{
+					m_szStaticCombo = "S_MODE_DEFERRED"
+					m_nValue = 1
+				},
+			]
+		},
+		{
+			m_szName = "DotaForward"
+			m_szShaderFallback = ""
+			m_staticComboSettings = 
+			[
+				{
+					m_szStaticCombo = "S_MODE_FORWARD"
+					m_nValue = 1
+				},
+			]
+		},
+		{
+			m_szName = "Depth"
+			m_szShaderFallback = ""
+			m_staticComboSettings = 
+			[
+				{
+					m_szStaticCombo = "S_MODE_DEPTH"
+					m_nValue = 1
+				},
+			]
+		},
+		{
+			m_szName = "ToolsVis"
+			m_szShaderFallback = ""
+			m_staticComboSettings = 
+			[
+				{
+					m_szStaticCombo = "S_MODE_TOOLS_VIS"
+					m_nValue = 1
+				},
+			]
+		},
+		{
+			m_szName = "ToolsWireframe"
+			m_szShaderFallback = ""
+			m_staticComboSettings = 
+			[
+				{
+					m_szStaticCombo = "S_MODE_TOOLS_WIREFRAME"
+					m_nValue = 1
+				},
+			]
+		},
+	]
+	m_programData = 
+	{
+		m_programHashes = 
+		[
+			{
+				m_nHashChar = #[ 5A 13 63 B4 F6 9D 98 1E 93 93 13 92 A8 8B 2E CF ]
+			},
+			{
+				m_nHashChar = #[ 7E 25 CF 42 6D 3F 4D 33 40 1A E8 F1 16 F9 94 23 ]
+			},
+			{
+				m_nHashChar = #[ 6B 04 9B 45 ED E0 38 F5 7E 9E F6 90 C8 D8 D3 73 ]
+			},
+			{
+				m_nHashChar = #[ B6 BC 00 56 01 FF 86 41 0D E5 34 BD 63 BC 1C FD ]
+			},
+			{
+				m_nHashChar = #[ 66 99 98 6A E3 CD 9A 5F 26 DE 5F FF CC 84 DF A7 ]
+			},
+			{
+				m_nHashChar = #[ 66 99 98 6A E3 CD 9A 5F 26 DE 5F FF CC 84 DF A7 ]
+			},
+			{
+				m_nHashChar = #[ 17 1F 88 A4 C4 6B 5F 9E 2A 8E DE 39 CE A4 6E 24 ]
+			},
+			{
+				m_nHashChar = #[ 17 1F 88 A4 C4 6B 5F 9E 2A 8E DE 39 CE A4 6E 24 ]
+			},
+		]
+		m_variableDescriptionVersionHash = 
+		{
+			m_nHashChar = #[ 96 42 28 E5 F9 19 42 85 C5 4D 88 63 ED 41 E2 32 ]
+		}
+		m_nVariableSourceMax = 19
+		m_staticComboArray = 
+		[
+			{
+				m_szName = "F_NORMAL_MAP"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 1
+				m_szAliasName = "Normal Maps"
+			},
+			{
+				m_szName = "F_RENDER_BACKFACES"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 2
+				m_szAliasName = "2-Sided Rendering"
+			},
+			{
+				m_szName = "F_ALPHA_TEST"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 4
+				m_szAliasName = "Translucent"
+			},
+			{
+				m_szName = "F_ALPHA_STIPPLE"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 8
+				m_szAliasName = "Translucent"
+			},
+			{
+				m_szName = "F_TRANSLUCENT"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 16
+				m_szAliasName = "Translucent"
+			},
+			{
+				m_szName = "F_ADDITIVE_BLEND"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 32
+				m_szAliasName = "Translucent"
+			},
+			{
+				m_szName = "F_ALPHA_ANGLE_POWER"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 64
+				m_szAliasName = "Translucent"
+			},
+			{
+				m_szName = "F_DRAW_WITH_NON_TRANSLUCENT"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 128
+				m_szAliasName = "Translucent"
+			},
+			{
+				m_szName = "F_SOLID_COLOR"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 256
+				m_szAliasName = "Solid Color"
+			},
+			{
+				m_szName = "F_SPECULAR"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 512
+				m_szAliasName = "Specular"
+			},
+			{
+				m_szName = "F_SCROLL_UV"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 2
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = 
+				[
+					"Disabled",
+					"Scroll Color Only",
+					"Scroll All Textures",
+				]
+				m_nComboIndexValue = 1024
+				m_szAliasName = "Scroll UV"
+			},
+			{
+				m_szName = "F_MOD_2X"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 3072
+				m_szAliasName = "Mod2X"
+			},
+			{
+				m_szName = "F_OVERLAY"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 6144
+				m_szAliasName = "Overlay"
+			},
+			{
+				m_szName = "F_FULLBRIGHT"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 12288
+				m_szAliasName = "Fullbright"
+			},
+			{
+				m_szName = "F_ALLOW_LIGHTING_ON_TRANSLUCENT"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 24576
+				m_szAliasName = "Lit Translucent"
+			},
+			{
+				m_szName = "F_PAINT_VERTEX_COLORS"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 49152
+				m_szAliasName = "Vertex Color"
+			},
+			{
+				m_szName = "F_TINT_MASK"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 98304
+				m_szAliasName = "Tint Mask"
+			},
+			{
+				m_szName = "F_TINT_MASK_2"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 196608
+				m_szAliasName = "Tint Mask 2"
+			},
+			{
+				m_szName = "F_MODULATE_SPECULAR_BY_ALPHA"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 393216
+				m_szAliasName = "Modulate Specular by Alpha Tint"
+			},
+			{
+				m_szName = "F_DO_NOT_REFLECT"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 786432
+				m_szAliasName = "Do not Reflect"
+			},
+			{
+				m_szName = "F_DO_NOT_CAST_SHADOWS"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 1572864
+				m_szAliasName = "Do not Cast Shadows"
+			},
+			{
+				m_szName = "F_CAST_SHADOWS_ONLY"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 3145728
+				m_szAliasName = "Cast Shadows Only"
+			},
+			{
+				m_szName = "F_ENABLE_WIND"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 6291456
+				m_szAliasName = "Enable wind"
+			},
+			{
+				m_szName = "F_TRAVELLING_WIND_OBJECT_X"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 12582912
+				m_szAliasName = "Wind that follows object X"
+			},
+			{
+				m_szName = "F_TRAVELLING_WIND_OBJECT_Z"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 25165824
+				m_szAliasName = "Wind that follows object Z"
+			},
+			{
+				m_szName = "F_FLIP_TRAVELLING_WIND"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 50331648
+				m_szAliasName = "Flip direction of travelling wind"
+			},
+			{
+				m_szName = "F_PARALLAX_MAP"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 100663296
+				m_szAliasName = "Parallax Mapping"
+			},
+			{
+				m_szName = "F_AO_MAP"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 201326592
+				m_szAliasName = "Ambient Occlusion Map"
+			},
+			{
+				m_szName = "F_DISABLE_FOG_IN_TRANSLUCENT"
+				m_comboType = "VFX_COMBO_UNKNOWN"
+				m_nCompareValue = 0
+				m_nMin = 0
+				m_nMax = 1
+				m_shaderComboSourceType = 0
+				m_iFeatureIndex = -1
+				m_stringArray = [  ]
+				m_nComboIndexValue = 402653184
+				m_szAliasName = "Disable Fog in Translucent"
+			},
+		]
+		m_staticComboRuleArray = 
+		[
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					7, 4, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Requires Translucent"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					6, 4, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Requires Translucent"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					4, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Translucent and Alpha Test are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					5, 4, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Requires translucency"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					3, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Alpha stipple requires alpha test"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					17, 16, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Tint Mask 2 require Tint Mask"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					18, 8, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "ModulateSpecularByAlpha and SolidColor are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					18, 11, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "ModulateSpecularByAlpha and Mod 2X are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					18, 13, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "ModulateSpecularByAlpha and Fullbright are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					18, 4, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "ModulateSpecularByAlpha and Translucent are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					18, 9, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "ModulateSpecularByAlpha requires Specular"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					10, 11, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Scroll UV and Mod 2X are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					8, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Alpha Test and Solid Color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					8, 4, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Translucent and Solid Color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					8, 9, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Specular and Solid Color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					8, 12, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Overlay and Solid Color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					8, 11, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Mod 2X and Solid Color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					8, 10, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Scroll UV and Solid Color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					8, 16, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Tint mask and Solid Color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					8, 17, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Tint mask 2 and Solid Color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					13, 9, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Fullbright and Specular are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					13, 11, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Fullbright and Mod 2X are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					13, 12, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Fullbright and Overlay are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					11, 16, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Mod 2X and tint mask are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					11, 17, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Mod 2X and tint mask 2 are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					14, 4, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Lighting on translucent requires translucent"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					14, 13, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Lighting on translucent and fullbright are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					14, 11, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Lighting on translucent and Mod 2X are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					20, 21, 4, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 3, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Cast Shadow Only, Do not Cast Shadows, and Translucent are mutually exclusive"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					19, 21, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Cast Shadow Only and Do not Reflect are mutually exclusive"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					12, 21, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Overlay and Cast Shadow Only are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					12, 20, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Overlay and Do Not Cast Shadow Only are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					12, 10, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Overlay and scroll UV are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					12, 1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Overlay and render backfaces are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					12, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Overlay and alpha test are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					22, 12, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Wind and Overlay are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					22, 10, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Wind and Scroll UV are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					23, 22, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Wind that follows object X requires wind"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					24, 22, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Wind that follows object Z requires wind"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					23, 24, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Travelling wind cannot follow both object X and object Z"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					25, 23, 24, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 3, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Flip must have travelling wind defined"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					26, 12, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Parallax mapping requires overlay"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					26, 0, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Parallax mapping requires normal map"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					26, 11, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Parallax mapping and mod2x are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					26, 10, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Parallax mapping and scroll UV are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					27, 26, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Ambient Occlusion Map and parallax mapping are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					27, 12, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Ambient Occlusion Map overlay are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					27, 11, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Ambient Occlusion Map and mod2x are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					27, 10, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Ambient Occlusion Map and scroll UV are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					27, 5, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Ambient Occlusion Map and additive blend are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					27, 8, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Ambient Occlusion Map and solid color are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					27, 13, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Ambient Occlusion Map and fullbright are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					27, 4, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Ambient Occlusion Map and translucent are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_REQUIRES"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					28, 4, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Disable Fog in Translucent requires Translucent"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					28, 12, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Disable Fog in Translucent and overlay are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					28, 5, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Disable Fog in Translucent and additive blending are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					28, 27, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Disable Fog in Translucent and ao map are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					28, 26, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Disable Fog in Translucent and parallax map are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					28, 23, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Disable Fog in Translucent and travelling wind are not compatible"
+			},
+			{
+				m_rule = "VFX_RULE_ALLOW_NUM"
+				m_ruleType = "VFX_RULE_TYPE_FEATURE"
+				m_argTypeArray = 
+				[
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_FEATURE",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+					"VFX_RULE_TYPE_UNKNOWN",
+				]
+				m_argIndexArray = 
+				[
+					28, 24, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_argValueArray = 
+				[
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_nExtraRuleData = 
+				[
+					1, 2, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+					-1, -1, -1, -1,
+				]
+				m_szErrorString = "Disable Fog in Translucent and travelling wind are not compatible"
+			},
+		]
+		m_dynamicComboArray = [  ]
+		m_dynamicComboRuleArray = [  ]
+		m_variableDescriptionArray = 
+		[
+			{
+				m_szName = "DefaultSamplerState"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901771
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DotaGlobalParams_t"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = "DotaGlobalParams_t"
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 21
+				m_registerType = 8
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "PerViewConstantBuffer_t"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = "PerViewConstantBuffer_t"
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 21
+				m_registerType = 8
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = true
+			},
+			{
+				m_szName = "TextureWindMaskHigh"
+				m_szUiGroup = "Wind/40"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 1.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 1
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "mask"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureWindMaskLow"
+				m_szUiGroup = "Wind/30"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 1.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 1
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "mask"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureWindRandomNoise"
+				m_szUiGroup = "Wind/50"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = "materials/dev/two_channel_noise.psd"
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "noise"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flFlipDirection"
+				m_szUiGroup = ""
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1A 19 07 00 00 80 3F 0D 04 0D 00 16 00 07 00 00 80 3F 18 02 1B 00 07 00 00 80 3F 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flTravellingWindMagnitude"
+				m_szUiGroup = "Wind/130"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 10.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 200.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flTravellingWindSpeed"
+				m_szUiGroup = "Wind/120"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 5.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 50.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flTravellingWindWavelength"
+				m_szUiGroup = "Wind/110"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 20.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.1, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 200.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flWindFlexibility"
+				m_szUiGroup = "Wind/60"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.3, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 1.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flWindHighFrequencyEffects"
+				m_szUiGroup = "Wind/80"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D 69 B0 BF 29 07 CD CC 4C 3D 15 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 5.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flWindLinearity"
+				m_szUiGroup = "Wind/100"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 1.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flWindLowFrequencyEffects"
+				m_szUiGroup = "Wind/70"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D 8D B7 44 A8 07 00 00 00 3F 15 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 5.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flWindSpeedMultiplier"
+				m_szUiGroup = "Wind/90"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 2.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vTexCoordOffset"
+				m_szUiGroup = "Color/40"
+				m_uiType = 4
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 2
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1.0, -1.0, 0.0, 0.0 ]
+				m_flMax = [ 1.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vTexCoordScale"
+				m_szUiGroup = "Color/30"
+				m_uiType = 4
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 2
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 64.0, 64.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vWindDir"
+				m_szUiGroup = ""
+				m_uiType = 4
+				m_flUiStep = 0.0
+				m_pSourceString = "WindDir"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.707, 0.707, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vWindOffset"
+				m_szUiGroup = ""
+				m_uiType = 4
+				m_flUiStep = 0.0
+				m_pSourceString = "WindOffset"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.25, 0.2, 0.21, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vWindStrengthFreqMulHighStrength"
+				m_szUiGroup = ""
+				m_uiType = 4
+				m_flUiStep = 0.0
+				m_pSourceString = "WindStrengthFreq"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 4
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 4
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.25, 0.03, 0.003, 0.25 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_instanceBuffer"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = "InstanceBuffer"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 27
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = true
+			},
+			{
+				m_szName = "g_tWindMask"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 2
+				m_nChannelInfoIndex = [ 0, 1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tWindNoise"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 1
+				m_nChannelInfoIndex = [ 2, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_transformBuffer"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = "TransformBuffer"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 27
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = true
+			},
+			{
+				m_szName = "AddressU"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901761
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "AddressU"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901761
+				m_intDefault = [ 3, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "AddressV"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901762
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "AddressV"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901762
+				m_intDefault = [ 3, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "BackStencilFunc"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901791
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "BlendEnable"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 9
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 512
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294901801
+				m_intDefault = [ 1, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "BlendOpAlpha"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 512
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294901808
+				m_intDefault = [ 4, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "BorderColor"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 4
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901764
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "BorderColor"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 4
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901764
+				m_flDefault = [ 1.0, 1.0, 1.0, 1.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "ColorWriteEnable0"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 512
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294901809
+				m_intDefault = [ 7, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "ColorWriteEnable0"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1F 21 85 7A 3D 04 0A 00 12 00 07 00 00 E0 40 02 17 00 07 00 00 70 41 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 512
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294901809
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "ComparisonFunc"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901770
+				m_intDefault = [ 3, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "CullMode"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901761
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "CullMode"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901761
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "CullMode"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1A 01 04 07 00 0F 00 07 00 00 00 00 02 14 00 07 00 00 80 3F 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901761
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DepthBias"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901762
+				m_intDefault = [ -10, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DepthBias"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 19 2D 25 6D E4 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901762
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DepthBiasClamp"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901764
+				m_flDefault = [ -0.0005, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DepthWriteEnable"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 9
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901777
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DstBlend"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 512
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294901804
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DstBlend"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = 
+				#[
+					07 00 00 80 3F 04 12 00 0A 00 07 00 00 00 00 02 14 00 1A 05 04 19 00 21 00 07 00 00 80 3F 02 26
+					00 07 00 00 A0 40 00
+				]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 512
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294901804
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "FillMode"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901760
+				m_intDefault = [ 1, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "Filter"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901760
+				m_intDefault = [ 20, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "Filter"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901760
+				m_intDefault = [ 21, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "Filter"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901760
+				m_intDefault = [ 149, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "SFMLightsConstantBuffer_t"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = "SFMLightsConstantBuffer_t"
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 21
+				m_registerType = 8
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "SlopeScaleDepthBias"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901763
+				m_flDefault = [ -0.5, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "SlopeScaleDepthBias"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 19 CC 04 D4 08 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 128
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901763
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "SrcBlend"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 512
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294901803
+				m_intDefault = [ 8, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "StencilEnable"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1F A1 D0 52 1E 04 0A 00 12 00 19 A1 D0 52 1E 02 17 00 07 00 00 00 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 9
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901781
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "StencilFunc"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901787
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "StencilReadMask"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1F 78 FB 14 05 04 0A 00 12 00 19 78 FB 14 05 02 17 00 07 00 00 7F 43 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901782
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "StencilRef"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1F 11 44 D9 DA 04 0A 00 12 00 19 11 44 D9 DA 02 17 00 07 00 00 80 3F 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 4
+				m_nTypeSpecificBits = 4294901792
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureAmbientOcclusionMap"
+				m_szUiGroup = "Ambient Occlusion Map"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "ao"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureBloom"
+				m_szUiGroup = "Specular"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "bloom"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureColor"
+				m_szUiGroup = "Color/10"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 1.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 1
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "color"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureNormal"
+				m_szUiGroup = "Normal Map,20"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.5, 0.5, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "normal"
+				m_inputProcessingCommand = "NormalizeNormals"
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureNormalAlpha"
+				m_szUiGroup = "Normal Map,21"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "trans"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureParallaxMask"
+				m_szUiGroup = "Parallax/0"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.5, 0.5, 0.5, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "height"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureReflectance"
+				m_szUiGroup = "Specular"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.1, 0.1, 0.1, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "refl"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureScrollSpeed"
+				m_szUiGroup = "Scroll UV"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "scroll"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureSelfIllumMask"
+				m_szUiGroup = "Self Illum"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "selfillum"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureTintMask"
+				m_szUiGroup = "Color/11"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "mask"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureTintMask2"
+				m_szUiGroup = "Color/12"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.5, 0.5, 0.5, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "mask"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "TextureTranslucency"
+				m_szUiGroup = "Translucent"
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 7
+				m_nContextStateAffectedByVariable = 2048
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = -1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = 8
+				m_szTextureFileEnding = "trans"
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_bLightingOnly"
+				m_szUiGroup = ""
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = "g_bLightingOnly"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_bRenderBackfaces"
+				m_szUiGroup = ""
+				m_uiType = 5
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1A 01 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 9
+				m_registerType = 1
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flAlphaAnglePower"
+				m_szUiGroup = "Translucent"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 8.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flAlphaTestReference"
+				m_szUiGroup = "Translucent"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.7, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.01, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 0.99, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flBumpStrength"
+				m_szUiGroup = "Normal Map"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 10.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flGradientBottom"
+				m_szUiGroup = "Ambient Occlusion Map/4"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -4096.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 4096.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flGradientColorMultiplier"
+				m_szUiGroup = "Ambient Occlusion Map/2"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 16.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flGradientTop"
+				m_szUiGroup = "Ambient Occlusion Map/3"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 200.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -4096.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 4096.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flOpacityScale"
+				m_szUiGroup = "Translucent"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 1.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flOverbrightFactor"
+				m_szUiGroup = "Translucent"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 100.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flParallaxStrength"
+				m_szUiGroup = "Parallax/1"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.02, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 0.05, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flScrollUvSpeed"
+				m_szUiGroup = "Scroll UV"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 10.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flSpecularBloom"
+				m_szUiGroup = "Specular"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 10.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_flSpecularIntensity"
+				m_szUiGroup = "Specular"
+				m_uiType = 1
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 1
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMax = [ 7.0, 1.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vAmbientOcclusionColor"
+				m_szUiGroup = "Ambient Occlusion Map/5"
+				m_uiType = 2
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D 49 06 11 C1 06 1F 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vColorTint"
+				m_szUiGroup = "Color,10/20"
+				m_uiType = 2
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D 85 79 A7 20 06 1F 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vColorTint2"
+				m_szUiGroup = "Color,10/21"
+				m_uiType = 2
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D 48 56 E0 F9 06 1F 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vColorTint3"
+				m_szUiGroup = "Color,10/22"
+				m_uiType = 2
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D 8E 28 93 AF 06 1F 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vColorTint4"
+				m_szUiGroup = "Color,10/23"
+				m_uiType = 2
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D 25 66 63 18 06 1F 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vGradientBottomColor"
+				m_szUiGroup = "Ambient Occlusion Map/1"
+				m_uiType = 2
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D EF 9A E3 D4 06 1F 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vGradientTopColor"
+				m_szUiGroup = "Ambient Occlusion Map/0"
+				m_uiType = 2
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 7
+				m_pCompiledExpression = #[ 1D 62 55 20 C7 06 1F 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 3
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 3
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 1.0, 1.0, 1.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vScrollUvDirection"
+				m_szUiGroup = "Scroll UV"
+				m_uiType = 4
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 2
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 2
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 1.0, 0.0, 0.0 ]
+				m_flMin = [ -10.0, -10.0, 0.0, 0.0 ]
+				m_flMax = [ 10.0, 10.0, 1.0, 1.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tAOMap"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 1
+				m_nChannelInfoIndex = [ 13, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tClouds"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = "CloudTexture"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967041
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tColor"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 1
+				m_nChannelInfoIndex = [ 3, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tColor"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 23
+				m_nChannelCount = 2
+				m_nChannelInfoIndex = [ 3, 5, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tColor"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967041
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 1
+				m_nChannelInfoIndex = [ 3, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tColor"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967041
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 23
+				m_nChannelCount = 2
+				m_nChannelInfoIndex = [ 3, 5, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tFow"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = "FowTexture"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tNormal"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 23
+				m_nChannelCount = 1
+				m_nChannelInfoIndex = [ 4, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tNormal"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 23
+				m_nChannelCount = 2
+				m_nChannelInfoIndex = [ 4, 9, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tParallaxMask"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 1
+				m_nChannelInfoIndex = [ 14, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tSFMCookieTextureArray"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = "SFMLightCookieTexture"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 23
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tSFMShadowDepthTexture"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = "SFMShadowDepthTexture"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 23
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tScrollSpeed"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967041
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 1
+				m_nChannelInfoIndex = [ 10, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tScrollSpeed"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967041
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 23
+				m_nChannelCount = 2
+				m_nChannelInfoIndex = [ 10, 5, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tSfmSsao"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = "SfmSsaoTexture"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967041
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tShadowDepthTexture"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = "GlobalShadowDepthTexture"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tSpecular"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967041
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 3
+				m_nChannelInfoIndex = [ 6, 7, 8, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tTintMask"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 1
+				m_nChannelInfoIndex = [ 11, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tTintMask"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = 16
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967040
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 20
+				m_nChannelCount = 2
+				m_nChannelInfoIndex = [ 11, 12, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+		]
+		m_textureChannelProcessorArray = 
+		[
+			{
+				m_nChannelDesc = #[ 00 FF FF FF ]
+				m_nInputTextures = [ 4, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 10 FF FF FF ]
+				m_nInputTextures = [ 3, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 00 11 FF FF ]
+				m_nInputTextures = [ 5, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 00 11 22 FF ]
+				m_nInputTextures = [ 59, -1, -1, -1 ]
+				m_outputColorSpace = 1
+				m_mipProcessingCommand = "Nice"
+			},
+			{
+				m_nChannelDesc = #[ 30 11 FF FF ]
+				m_nInputTextures = [ 60, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "MipNormal"
+			},
+			{
+				m_nChannelDesc = #[ 30 FF FF FF ]
+				m_nInputTextures = [ 68, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 00 FF FF FF ]
+				m_nInputTextures = [ 63, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 10 FF FF FF ]
+				m_nInputTextures = [ 65, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 20 FF FF FF ]
+				m_nInputTextures = [ 58, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 00 FF FF FF ]
+				m_nInputTextures = [ 61, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 10 FF FF FF ]
+				m_nInputTextures = [ 64, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 10 FF FF FF ]
+				m_nInputTextures = [ 66, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 20 FF FF FF ]
+				m_nInputTextures = [ 67, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 10 FF FF FF ]
+				m_nInputTextures = [ 57, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Box"
+			},
+			{
+				m_nChannelDesc = #[ 10 FF FF FF ]
+				m_nInputTextures = [ 62, -1, -1, -1 ]
+				m_outputColorSpace = 0
+				m_mipProcessingCommand = "Nice"
+			},
+		]
+		m_vsInputSignatureArray = [  ]
+		m_staticComboData = [  ]
+		m_staticComboIDs = [  ]
+		m_byteCodeData = [  ]
+		m_attributes = [  ]
+	}
+}
+
+--- Data for block "RED2" ---
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	m_InputDependencies = [  ]
+	m_AdditionalInputDependencies = [  ]
+	m_ArgumentDependencies = [  ]
+	m_SpecialDependencies = [  ]
+	m_SpecialInputDependencies = [  ]
+	m_AdditionalRelatedFiles = [  ]
+	m_ChildResourceList = [  ]
+	m_WeakReferenceList = [  ]
+	m_SearchableUserData = null
+	m_SubassetReferences = null
+	m_SubassetDefinitions = null
+}
+

@@ -1,0 +1,12 @@
+{
+  "restoredFrom": "before_separate_cloud_islands",
+  "geometry": "original continuous mountains retained",
+  "source": "Valve mod_mines_rock_000: stone001 and gravel002",
+  "treatment": "Low contrast stone body, sparse gravel on gentle slopes, shared soil foot transition",
+  "normalStrength": 0.7,
+  "transition": [
+    160,
+    640
+  ],
+  "clouds": "restored pre-island arrangement; no new cloud sea base"
+}

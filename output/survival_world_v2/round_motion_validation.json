@@ -1,0 +1,24 @@
+{
+  "shots": [
+    {
+      "name": "world_v2_ocean_motion_a_0002.tga",
+      "time": 1789432845295.536
+    },
+    {
+      "name": "world_v2_ocean_motion_b_0002.tga",
+      "time": 1789432850294.0332
+    }
+  ],
+  "intervalSeconds": 4.998497314453125,
+  "crop": {
+    "x": 600,
+    "y": 330,
+    "width": 400,
+    "height": 300
+  },
+  "meanAbsoluteRgbDifference": 1.5354722222222426,
+  "changedPixelFraction": 0.24976666666666666,
+  "maxRgbDifference": 9.666666666666666,
+  "visualMotionDetected": true,
+  "limitation": "Verifies rendered texture/normal motion only, not physical wave displacement."
+}

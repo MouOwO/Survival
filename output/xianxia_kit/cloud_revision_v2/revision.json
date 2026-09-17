@@ -1,0 +1,13 @@
+{
+  "resolution": [
+    2048,
+    1536
+  ],
+  "variants": [
+    "c01_cloud_sea",
+    "c02_cliff_cloud",
+    "c03_cloud_band",
+    "c04_thin_mist"
+  ],
+  "approximation": "Fixed-view Cycles volume bake; sparse cards only. Approved models and materials unchanged."
+}

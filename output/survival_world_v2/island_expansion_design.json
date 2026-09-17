@@ -1,0 +1,103 @@
+{
+  "outward": 512,
+  "waterWidth": 1152,
+  "waterLength": 4608,
+  "taperStart": 1152,
+  "taperEnd": 2048,
+  "gateWaterWidth": 640,
+  "stairWidth": 576,
+  "towerStairCutout": {
+    "start": 2432,
+    "end": 3072,
+    "inner": 512,
+    "previousOuter": 896
+  },
+  "banks": [],
+  "gardens": [
+    {
+      "q": 0,
+      "x": 2748,
+      "y": 1738,
+      "z": 692.0625,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 0,
+      "x": 1798,
+      "y": 3768,
+      "z": 768,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 0,
+      "x": 3268,
+      "y": 2788,
+      "z": 640,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 1,
+      "x": -202,
+      "y": 6588,
+      "z": 692.0625,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 1,
+      "x": -2232,
+      "y": 5638,
+      "z": 768,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 1,
+      "x": -1252,
+      "y": 7108,
+      "z": 640,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 2,
+      "x": -5052,
+      "y": 3638,
+      "z": 692.0625,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 2,
+      "x": -4102,
+      "y": 1608,
+      "z": 768,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 2,
+      "x": -5572,
+      "y": 2588,
+      "z": 640,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 3,
+      "x": -2102,
+      "y": -1212,
+      "z": 692.0625,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 3,
+      "x": -72,
+      "y": -262,
+      "z": 768,
+      "ground": "meadow/soil"
+    },
+    {
+      "q": 3,
+      "x": -1052,
+      "y": -1732,
+      "z": 640,
+      "ground": "meadow/soil"
+    }
+  ],
+  "style": "rounded meadow islands with natural stone shore slopes"
+}

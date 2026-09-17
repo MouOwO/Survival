@@ -1,0 +1,28 @@
+"Layer0"
+{
+	"shader"	"global_lit_simple.vfx"
+	"F_MODULATE_SPECULAR_BY_ALPHA"	"1"
+	"F_NORMAL_MAP"	"1"
+	"F_SPECULAR"	"1"
+	"F_TINT_MASK"	"1"
+	"g_flBumpStrength"	"1"
+	"g_flSpecularBloom"	"0"
+	"g_flSpecularIntensity"	"0.5"
+	"g_vColorTint"	"[1.000000 1.000000 1.000000 0.000000]"
+	"g_vColorTint2"	"[0.792157 0.721569 0.611765 0.000000]"
+	"g_vTexCoordOffset"	"[0.000000 0.000000 0.000000 0.000000]"
+	"g_vTexCoordScale"	"[1.000000 1.000000 0.000000 0.000000]"
+	"TextureTintMask"	"[1.000000 1.000000 1.000000 0.000000]"
+	"TextureNormal"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_normal.png"
+	"TextureColor"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_color.png"
+	"TextureReflectance"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_refl.png"
+	"TextureSelfIllumMask"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_ddc4da63_selfillum.png"
+	"TextureBloom"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_ddc4da63_bloom.png"
+	"Compiled Textures"
+	{
+		"g_tNormal"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_normal_psd_f0428309.vtex"
+		"g_tColor"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_color_psd_929555fe.vtex"
+		"g_tSpecular"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_refl_psd_ddc4da63.vtex"
+		"g_tTintMask"	"maps/ti10_assets/cliffs/ti10_tileset_cliffs_vmat_g_ttintmask_670d93d.vtex"
+	}
+}

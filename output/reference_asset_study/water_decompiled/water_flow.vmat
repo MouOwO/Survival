@@ -1,0 +1,31 @@
+"Layer0"
+{
+	"shader"	"global_lit_simple.vfx"
+	"F_ADDITIVE_BLEND"	"1"
+	"F_PAINT_VERTEX_COLORS"	"1"
+	"F_SCROLL_UV"	"1"
+	"F_TINT_MASK"	"1"
+	"F_TRANSLUCENT"	"1"
+	"g_flOpacityScale"	"1"
+	"g_flOverbrightFactor"	"1"
+	"g_flScrollUvSpeed"	"1.5"
+	"g_vColorTint"	"[0.831373 0.992157 0.992157 0.000000]"
+	"g_vColorTint2"	"[1.000000 1.000000 1.000000 0.000000]"
+	"g_vScrollUvDirection"	"[0.000000 -1.000000 0.000000 0.000000]"
+	"g_vTexCoordOffset"	"[0.000000 0.000000 0.000000 0.000000]"
+	"g_vTexCoordScale"	"[1.000000 1.000000 0.000000 0.000000]"
+	"TextureTintMask"	"[1.000000 1.000000 1.000000 0.000000]"
+	"TextureColor"	"materials/nature/water_foam_02_color.png"
+	"TextureScrollSpeed"	"materials/nature/water_foam_02_trans.png"
+	"TextureTranslucency"	"materials/nature/water_foam_02_trans_afe8af1f_trans.png"
+	"Compiled Textures"
+	{
+		"g_tColor"	"materials/nature/water_foam_02_color_psd_589c8514.vtex"
+		"g_tScrollSpeed"	"materials/nature/water_foam_02_trans_psd_afe8af1f.vtex"
+		"g_tTintMask"	"materials/water/water_flow_vmat_g_ttintmask_670d93d.vtex"
+	}
+	"Attributes"
+	{
+		"dota.nav.walkable"	"1"
+	}
+}

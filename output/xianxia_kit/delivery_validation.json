@@ -1,0 +1,73 @@
+{
+  "time": "2026-09-14T18:12:56.6792755Z",
+  "models": 26,
+  "triangles": 192446,
+  "surfaceChecks": true,
+  "cloudEdgeChecks": true,
+  "meshChecks": true,
+  "compile": [
+    {
+      "name": "model_compile",
+      "ok": true
+    },
+    {
+      "name": "cloud_texture_compile",
+      "ok": true
+    },
+    {
+      "name": "cloud_compile",
+      "ok": true
+    },
+    {
+      "name": "water_compile",
+      "ok": true
+    },
+    {
+      "name": "map_compile",
+      "ok": true
+    }
+  ],
+  "mainMapModified": false,
+  "reviewMap": "xianxia_kit_review",
+  "limitations": [
+    "First-pass stylized geometry and materials, lower detail than concept boards",
+    "Cloud cards use baked fixed-angle light, not runtime volumes",
+    "LOD variants require manual selection",
+    "Gameplay collisions must be authored separately"
+  ],
+  "mapPackage": {
+    "file": "maps/xianxia_kit_review.vpk",
+    "modified": "2026-09-14T18:05:04.609Z",
+    "sha256": "cc87bfbc85d37dafae3c423a2a5e41b8d1c44a50930ca384bff517f7b10be211"
+  },
+  "utilityMaterials": [
+    "xx_waterbed"
+  ],
+  "compiledModelCoordinateCheck": {
+    "name": "t01_shore_straight",
+    "bounds": [
+      [
+        -259.070251,
+        -79.279442,
+        -248.000031
+      ],
+      [
+        257,
+        65.000046,
+        1.5E-05
+      ]
+    ],
+    "matchesBlenderWithin": 0.001
+  },
+  "finalRuntimeReview": {
+    "checked": [
+      "Module orientation and roof faces correct",
+      "Stairs and gateway visibly open",
+      "Waterbed stripes removed",
+      "Clouds render but thick clouds remain lumpy and wisps too linear",
+      "Water detail weaker than reference"
+    ],
+    "components": "xianxia_kit_components_0005.tga",
+    "assembly": "xianxia_kit_assembly_0005.tga"
+  }
+}

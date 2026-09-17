@@ -1,0 +1,13 @@
+{
+  "x": 0,
+  "y": -14000,
+  "rx": 850,
+  "ry": 560,
+  "bed": 640,
+  "water": 704,
+  "rim": 740,
+  "navigation": "decorative inaccessible mountain",
+  "trees": 17,
+  "rocks": 30,
+  "mistEmitters": 5
+}

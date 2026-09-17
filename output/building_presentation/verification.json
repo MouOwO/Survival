@@ -1,0 +1,311 @@
+{
+  "status": "PASS",
+  "model_yaw": 0,
+  "baked_yaw_degrees": -90,
+  "model_scale": 1.0,
+  "model_source_scale": 2.0,
+  "footprint": [
+    2,
+    2
+  ],
+  "world_footprint": 128,
+  "particle_sources": 2,
+  "effect": "iridescent_top_down_reveal",
+  "reveal_seconds": 1.5,
+  "white_material": {
+    "status": "PASS",
+    "compiled_texture": "materials/survival_buildings/build_white_glow_color_png_d554c4f6.vtex",
+    "width": 8,
+    "height": 8,
+    "minimum_rgba": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "maximum_rgba": [
+      255,
+      255,
+      255,
+      255
+    ]
+  },
+  "flow_material": {
+    "animated_color_uv": true,
+    "unique_colors": 827,
+    "compiled_texture": "materials/survival_buildings/build_flow_color_png_c58b87e5.vtex",
+    "stages": [
+      {
+        "roof_alpha": 255,
+        "floor_alpha": 255,
+        "step": 0
+      },
+      {
+        "roof_alpha": 0,
+        "floor_alpha": 255,
+        "step": 24
+      },
+      {
+        "roof_alpha": 0,
+        "floor_alpha": 0,
+        "step": 48
+      }
+    ],
+    "status": "PASS",
+    "materials": 49,
+    "separate_alpha_uv": true
+  },
+  "white_shells": {
+    "status": "PASS",
+    "count": 24,
+    "models": [
+      {
+        "name": "main_city_lv01",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "main_city_lv02",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "main_city_lv03",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "main_city_lv04",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "main_city_lv05",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "population_farm_lv01",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "population_farm_lv02",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "population_farm_lv03",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "population_farm_lv04",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "population_farm_lv05",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv01",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv02",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv03",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv04",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv05",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv06",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv07",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv08",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv09",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "gold_mine_lv10",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "research_lab",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "advanced_research_lab",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "hero_altar",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      },
+      {
+        "name": "challenge_arena",
+        "material": "build_flow",
+        "material_groups": 49,
+        "matches_building_bounds": true,
+        "physics": false,
+        "hitboxes": false
+      }
+    ]
+  },
+  "workshop_verified": false,
+  "tests": [
+    {
+      "test": "test_unique_building_models",
+      "status": "PASS"
+    },
+    {
+      "test": "test_farm_fixed_visual",
+      "status": "PASS"
+    },
+    {
+      "test": "test_reference_building_collision",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_visual_service",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_hero_visual_regression",
+      "status": "PASS"
+    },
+    {
+      "test": "test_gold_mine_batch_upgrade_service",
+      "status": "PASS"
+    },
+    {
+      "test": "test_gold_mine_auto_upgrade_coordinator",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_grid_alignment",
+      "status": "PASS"
+    },
+    {
+      "test": "test_grid_placement_collision",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_rebuild_after_death",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_construction_visual_service",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_upgrade_process",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_white_shell",
+      "status": "PASS"
+    }
+  ]
+}

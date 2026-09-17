@@ -1,0 +1,20 @@
+"Layer0"
+{
+	"shader"	"global_lit_simple.vfx"
+	"F_TRANSLUCENT"	"1"
+	"g_flOpacityScale"	"1"
+	"g_vColorTint"	"[1.000000 1.000000 1.000000 0.000000]"
+	"g_vTexCoordOffset"	"[0.000000 0.000000 0.000000 0.000000]"
+	"g_vTexCoordScale"	"[1.000000 1.000000 0.000000 0.000000]"
+	"TextureColor"	"materials/tools/toolsnodraw_color.png"
+	"TextureTranslucency"	"materials/tools/toolsnodraw_3140b9c7_trans.png"
+	"Compiled Textures"
+	{
+		"g_tColor"	"materials/tools/toolsnodraw_color_tga_3140b9c7.vtex"
+	}
+	"Attributes"
+	{
+		"mapbuilder.nodraw"	"1"
+		"tools.toolsmaterial"	"1"
+	}
+}

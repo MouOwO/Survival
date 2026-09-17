@@ -1,0 +1,923 @@
+<!-- dmx encoding keyvalues2 4 format vmap 40 -->
+"$prefix_element$"
+{
+	"id" "elementid" "1afd9113-0ed8-44b1-9530-f5f7305bf384"
+	"asset_preview_thumbnail" "binary" 
+	"
+		FFD8FFE000104A46494600010101006000600000FFDB004300030202030202030303030403030405
+		0805050404050A070706080C0A0C0C0B0A0B0B0D0E12100D0E110E0B0B1016101113141515150C0F
+		171816141812141514FFDB00430103040405040509050509140D0B0D141414141414141414141414
+		1414141414141414141414141414141414141414141414141414141414141414141414141414FFC0
+		0011080200020003012200021101031101FFC4001F00000105010101010101000000000000000001
+		02030405060708090A0BFFC400B5100002010303020403050504040000017D010203000411051221
+		31410613516107227114328191A1082342B1C11552D1F02433627282090A161718191A2526272829
+		2A3435363738393A434445464748494A535455565758595A636465666768696A737475767778797A
+		838485868788898A92939495969798999AA2A3A4A5A6A7A8A9AAB2B3B4B5B6B7B8B9BAC2C3C4C5C6
+		C7C8C9CAD2D3D4D5D6D7D8D9DAE1E2E3E4E5E6E7E8E9EAF1F2F3F4F5F6F7F8F9FAFFC4001F010003
+		0101010101010101010000000000000102030405060708090A0BFFC400B511000201020404030407
+		05040400010277000102031104052131061241510761711322328108144291A1B1C109233352F015
+		6272D10A162434E125F11718191A262728292A35363738393A434445464748494A53545556575859
+		5A636465666768696A737475767778797A82838485868788898A92939495969798999AA2A3A4A5A6
+		A7A8A9AAB2B3B4B5B6B7B8B9BAC2C3C4C5C6C7C8C9CAD2D3D4D5D6D7D8D9DAE2E3E4E5E6E7E8E9EA
+		F2F3F4F5F6F7F8F9FAFFDA000C03010002110311003F00FCAAA28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A28
+		00A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2800A28A2803DC7F69FF008ABE
+		0DF89571E1D8FC21E18F0E787D2C12E1AE66F0EE8C34F5B83218F6AC9D0B95F2D88C8C0F30E09C9C
+		78751450014514500145145001451450014514500145145001451450014514500145145001451450
+		01451450014514500145145001451450014514500145145001451450014514500145145001451450
+		01451450014514500145145001451450014514500145145001451450014514500145145001451450
+		01451450014514500145145001451450014514500145145001451450014514500145145001451450
+		01451450014514500145145001451450014514500145145001451450014514500145145001451450
+		01451450014514500145145001451450014514500145145001451450014514500145145001451450
+		01451450014514500145145001451450014514500145145001451450014514500145145001451450
+		01451450014514500145145001451450014514500145145001451450014514500145145001451450
+		01451450014514500145145001451450014514500145145001451450014514500145145001451450
+		014514500145145001451450014514500145145001451450075FF14F51F066ABE2A371E03D26FF00
+		45D08C08BF64D465F324128C8620EE6E0F07AF5CF4180390AEEBE337C3387E1378C8E8506B035D8F
+		ECD1CFF6B16AD6E0EECF01589240C75CF35C2D001451450014514500145145001451450014514500
+		14514500145145001451450014514500145145001451450014514500145145001451450014514500
+		14514500145145001451450014514500145145001451450014514500145145001451450014514500
+		1451450014514500145145001451450014514500145145001456CF8AFC15E21F026A31D8789741D4
+		FC3D7F244274B5D56CE4B595A324A870B22825495619E9953E958D40051451400514514005145140
+		05145140051451400514514005145140051451400514514005145140051451400514514005145140
+		05145140051451400514514005145140051451400514514005145140051451400514514005145140
+		05145140051451400514514005145140051451400514514005145140051452AB32306525581C820E
+		083401EADFB49EA7F11755F1D584BF1374FBDD375E1A644B0457EB28736FBE4208F31DCE3799475C
+		70780735E515DFFC6AF8BFA8FC6AF14DAEB9A98BA13DBD92592FDAEF5AE9B6ABC8E30CC0103321E3
+		EBEB5C05001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		00145145001451450014514500145145001451450014514500145145001451450014514500145145
+		0014514500145145007FFFD9
+	"
+	"asset_preview_thumbnail_format" "string" "jpg"
+	"map_asset_references" "string_array" 
+	[
+		"materials/dev/fow_clouds_00.vtex",
+		"materials/dev/fow_drifts_00.vtex",
+		"materials/skybox/sky_dota_000.vmat",
+		"materials/dev/fow_clouds_01.vtex"
+	]
+}
+"CMapRootElement"
+{
+	"id" "elementid" "40661adf-ce5e-4b4e-8450-34b266bbe013"
+	"isprefab" "bool" "0"
+	"editorbuild" "int" "8901"
+	"editorversion" "int" "400"
+	"itemFile" "string" ""
+	"defaultcamera" "CStoredCamera"
+	{
+		"id" "elementid" "00c88793-b5f9-4e88-b6d0-369fe42e3110"
+		"position" "vector3" "0 -1000 1000"
+		"lookat" "vector3" "-0.0056621712 -999.1889648438 999.4150390625"
+	}
+
+	"3dcameras" "CStoredCameras"
+	{
+		"id" "elementid" "47e9d7b0-e98d-4ff2-9760-412fa16b10bd"
+		"activecamera" "int" "-1"
+		"cameras" "element_array" 
+		[
+		]
+	}
+
+	"world" "CMapWorld"
+	{
+		"id" "elementid" "c4d891f6-d98c-4585-b08e-3a89d787b20f"
+		"nodeID" "int" "1"
+		"referenceID" "uint64" "0x0"
+		"children" "element_array" 
+		[
+			"CMapEntity"
+			{
+				"id" "elementid" "c3d9ea85-b983-483a-8fe2-46c6b6f99ff1"
+				"nodeID" "int" "2"
+				"referenceID" "uint64" "0x3d12846466d94f0d"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "0c751820-df62-4eb1-86ea-5aae8e83f560"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "ed362eb1-86a2-4a37-bfc4-0b2ce7cafc7d"
+					"classname" "string" "game_ragdoll_manager"
+					"targetname" "string" ""
+					"vscripts" "string" ""
+					"MaxRagdollCount" "string" "-1"
+					"MaxRagdollCountDX8" "string" "-1"
+					"SaveImportant" "string" "0"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 64"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+			"CMapEntity"
+			{
+				"id" "elementid" "1748fa1e-9d58-4021-8155-962cd3c29f86"
+				"nodeID" "int" "3"
+				"referenceID" "uint64" "0xfe4901ce52f28cfb"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "ab9b0ace-ed5b-4c6c-aeba-b98099162bad"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "5f9f03d2-fc63-4564-90df-53f737b5e888"
+					"classname" "string" "water_lod_control"
+					"targetname" "string" ""
+					"vscripts" "string" ""
+					"cheapwaterstartdistance" "string" "10000"
+					"cheapwaterenddistance" "string" "20000"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 32"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+			"CMapEntity"
+			{
+				"id" "elementid" "676f269b-6b42-4944-b4dc-918bf29dfa1c"
+				"nodeID" "int" "4"
+				"referenceID" "uint64" "0xcd7cf5e59771dd10"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "a7a5c6a8-6d42-4e51-a3b1-cffb259764b2"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "1c353409-0a40-4e27-b482-92e7ff96a631"
+					"classname" "string" "env_global_light"
+					"targetname" "string" ""
+					"vscripts" "string" ""
+					"StartDisabled" "string" "0"
+					"ambientangles" "string" "0 107 0"
+					"color" "string" "194 181 181 0"
+					"lightscale" "string" "5.000000"
+					"ambientcolor1" "string" "84 142 254 0"
+					"ambientscale1" "string" "1.750000"
+					"ambientcolor2" "string" "166 233 248 255"
+					"ambientscale2" "string" "0.500000"
+					"ambientcolor3" "string" "166 233 248 255"
+					"groundscale" "string" "0.600000"
+					"specularangles" "string" "55 300 0"
+					"specularpower" "string" "14"
+					"specularindependence" "string" "0"
+					"specularcolor" "string" "83 174 201 255"
+					"fov" "string" "5"
+					"nearz" "string" "4"
+					"enableshadows" "string" "1"
+					"fow_darkness" "string" "2.7"
+					"background_clear_not_required" "string" "0"
+					"SkyboxSlot" "string" ""
+					"enable_separate_skybox_fog" "string" "0"
+					"height_fog_color" "string" "255 255 255 0"
+					"height_fog_max_z" "string" "512.0"
+					"height_fog_density" "string" "0.0"
+					"height_fog_falloff" "string" "1.0"
+					"height_fog_texture0" "string" "materials/dev/fow_clouds_00.vtex"
+					"height_fog_texture1" "string" "materials/dev/fow_drifts_00.vtex"
+					"height_fog_rotation0" "string" "0.0"
+					"height_fog_scale0" "string" "4096.0"
+					"height_fog_scroll0U" "string" "5"
+					"height_fog_scroll0V" "string" "-5"
+					"height_fog_rotation1" "string" "0.0"
+					"height_fog_scale1" "string" "2048.0"
+					"height_fog_scroll1U" "string" "10"
+					"height_fog_scroll1V" "string" "-10"
+					"height_fog_exclusion_inner_radius" "string" "0"
+					"height_fog_exclusion_height_bias" "string" "128"
+					"height_fog_type" "string" "0"
+					"height_fog_caustic_speed_scale" "string" "1"
+					"height_fog_caustic_amplitude_scale" "string" "0.1"
+					"cloud2direction" "string" "0 145 0"
+					"cloud2speed" "string" "80"
+					"cloud1direction" "string" "0 165 0"
+					"cloud1speed" "string" "120"
+					"cloudscale" "string" "6500"
+					"texturename" "string" "materials/effects/light_clouds_00.vtex"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 256"
+				"angles" "qangle" "66 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+			"CMapEntity"
+			{
+				"id" "elementid" "2fd4c0c1-3bd3-4b40-970e-d15ea6b4b8bc"
+				"nodeID" "int" "5"
+				"referenceID" "uint64" "0xc81106aa4a06f0df"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "5ec70a84-e592-454f-b090-498a714c2c79"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "64018ca0-d647-48b4-932a-1a008054c845"
+					"classname" "string" "env_tonemap_controller"
+					"targetname" "string" "tonemapcontroller"
+					"vscripts" "string" ""
+					"MinExposure" "string" "1.000000"
+					"MaxExposure" "string" "1.000000"
+					"percent_bright_pixels" "string" "-1.0"
+					"percent_target" "string" "-1.0"
+					"rate" "string" "2.0"
+					"master" "string" "0"
+					"bloom_strength" "string" "-1"
+					"bloom_start_value" "string" "-1"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 192"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+			"CMapEntity"
+			{
+				"id" "elementid" "40ee8d1c-7d70-4ca6-a39b-74000a8c1d08"
+				"nodeID" "int" "6"
+				"referenceID" "uint64" "0x91cd601ba101e2af"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "a3211693-9e58-478e-8b4a-cafd7576b280"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "6c9c2cb0-5db8-4ae2-8699-014f1a90196d"
+					"classname" "string" "ent_dota_lightinfo"
+					"targetname" "string" ""
+					"vscripts" "string" ""
+					"color_day" "string" "216 208 207 255"
+					"color_night" "string" "149 172 253 255"
+					"light_scale_day" "string" "5.000000"
+					"light_scale_night" "string" "5.000000"
+					"ambient_color_day" "string" "63 144 169 255"
+					"ambient_color_night" "string" "37 98 197 255"
+					"ambient_scale_day" "string" "5"
+					"ambient_scale_night" "string" "5"
+					"shadow_color_day" "string" "230 175 177 255"
+					"shadow_color_night" "string" "138 160 255 255"
+					"shadow_secondary_color_day" "string" "230 175 177 255"
+					"shadow_secondary_color_night" "string" "138 160 255 255"
+					"shadow_scale_day" "string" "1"
+					"shadow_scale_night" "string" "1.5"
+					"shadow_ground_scale_day" "string" "1"
+					"shadow_ground_scale_night" "string" "1.5"
+					"specular_color_day" "string" "81 196 232 255"
+					"specular_color_night" "string" "95 162 221 255"
+					"specular_power_day" "string" "-1"
+					"specular_power_night" "string" "-1"
+					"specular_independence_day" "string" "0"
+					"specular_independence_night" "string" "0"
+					"specular_direction_day" "string" "64 283 0"
+					"specular_direction_night" "string" "64 283 0"
+					"inspector_specular_direction_day" "string" "33 0 0"
+					"inspector_specular_direction_night" "string" "33 0 0"
+					"light_direction_day" "string" "66 -33 0"
+					"light_direction_night" "string" "66 -33 0"
+					"ambient_direction_day" "string" "0 23 0"
+					"ambient_direction_night" "string" "0 23 0"
+					"ambient_shadow_amount" "string" "0"
+					"fog_color_day" "string" "149 239 255 255"
+					"fog_color_night" "string" "99 140 206 255"
+					"inspector_view_fog_color_day" "string" "142 161 191 255"
+					"inspector_view_fog_color_night" "string" "67 87 143 255"
+					"fog_start_day" "string" "1250"
+					"fog_start_night" "string" "1250"
+					"fog_end_day" "string" "4500"
+					"fog_end_night" "string" "4500"
+					"fog_height_day" "string" "0"
+					"fog_height_night" "string" "0.090000"
+					"fog_hight_color_day" "string" "83 107 129"
+					"fog_hight_color_night" "string" "45 119 255"
+					"fow_darkess_day" "string" "2.7"
+					"fow_darkess_night" "string" "2.7"
+					"fow_color_r_day" "string" "1"
+					"fow_color_g_day" "string" "2"
+					"fow_color_b_day" "string" "4"
+					"fow_color_r_night" "string" "2"
+					"fow_color_g_night" "string" "2"
+					"fow_color_b_night" "string" "5"
+					"farz_override" "string" "0"
+					"inner_radius" "string" "8000"
+					"outer_radius" "string" "10000"
+					"weather_type" "string" "-1"
+					"lightning_spec_pow_scale_min" "string" "1"
+					"lightning_spec_pow_scale_max" "string" "1"
+					"lightning_period_min" "string" "0"
+					"lightning_period_max" "string" "0"
+					"lightning_duration_min" "string" "0"
+					"lightning_duration_max" "string" "0"
+					"lightning_fluctuation_min" "string" "0"
+					"lightning_fluctuation_max" "string" "0"
+					"lightning_sound" "string" ""
+					"lightning_color" "string" "255 255 255"
+					"lightning_intensity_min" "string" "0"
+					"lightning_intensity_max" "string" "0"
+					"lightning_elevation" "string" "60.0"
+					"lightning_specular_intensity" "string" "1.0"
+					"wind_angle" "string" "0 45 0"
+					"wind_amount_day" "string" ".5"
+					"wind_amount_night" "string" ".5"
+					"min_wind" "string" "25.0"
+					"max_wind" "string" "90"
+					"min_gust" "string" "25"
+					"max_gust" "string" "90.0"
+					"min_gust_delay" "string" "0"
+					"max_gust_delay" "string" "10.0"
+					"gust_duration" "string" "10.0"
+					"gust_dir_change" "string" "20.0"
+					"skybox_angle_day" "string" "0 0 0"
+					"skybox_angle_night" "string" "0 0 0"
+					"skybox_material_day" "string" "materials/skybox/sky_dota_000.vmat"
+					"skybox_material_night" "string" "materials/skybox/sky_dota_000.vmat"
+					"skybox_tint_color_day" "string" "255 255 255 0"
+					"skybox_tint_color_night" "string" "127 143 197 255"
+					"skybox_fog_type" "string" "2"
+					"skybox_angular_fog_max_end" "string" "12.0"
+					"skybox_angular_fog_max_start" "string" "0.0"
+					"skybox_angular_fog_min_start" "string" "0.0"
+					"skybox_angular_fog_min_end" "string" "-95.0"
+					"height_fog_color_day" "string" "199 229 248 255"
+					"height_fog_color_night" "string" "111 157 223 255"
+					"height_fog_max_z" "string" "512"
+					"height_fog_density_day" "string" "0"
+					"height_fog_density_night" "string" ".1"
+					"height_fog_falloff" "string" ".125"
+					"height_fog_texture0" "string" "materials/dev/fow_clouds_01.vtex"
+					"height_fog_texture1" "string" "materials/dev/fow_clouds_01.vtex"
+					"height_fog_rotation0" "string" "-45"
+					"height_fog_scale0" "string" "1024"
+					"height_fog_scroll0U_day" "string" "33"
+					"height_fog_scroll0V_day" "string" "-33"
+					"height_fog_scroll0U_night" "string" "33"
+					"height_fog_scroll0V_night" "string" "-33"
+					"height_fog_rotation1" "string" "0"
+					"height_fog_scale1" "string" "1024"
+					"height_fog_scroll1U_day" "string" "33"
+					"height_fog_scroll1V_day" "string" "-33"
+					"height_fog_scroll1U_night" "string" "33"
+					"height_fog_scroll1V_night" "string" "-33"
+					"height_fog_exclusion_inner_radius" "string" "1024"
+					"height_fog_exclusion_height_bias" "string" "128"
+					"height_fog_type" "string" "0"
+					"height_fog_caustic_speed_scale" "string" "1"
+					"height_fog_caustic_amplitude_scale" "string" "0.1"
+					"weather_effect" "string" ""
+					"color_warp_texture" "string" ""
+					"color_warp_blend_to_full" "string" "1"
+					"preview_day_or_night" "string" "0"
+					"preview_inspector_view" "string" "0"
+					"SkyboxSlot" "string" ""
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 2"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+			"CMapEntity"
+			{
+				"id" "elementid" "7537aacc-42bc-4197-892f-d49d8fe9a584"
+				"nodeID" "int" "7"
+				"referenceID" "uint64" "0xe22af92404c799a8"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "f315bc80-f8ff-40a2-a2fe-16f69bb35052"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "af27dfc9-43ad-4aa2-a1ff-24d5bd30dad1"
+					"classname" "string" "ent_dota_game_events"
+					"targetname" "string" "ent_dota_endgameevent"
+					"vscripts" "string" ""
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 512"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+			"CMapEntity"
+			{
+				"id" "elementid" "47c93d27-d508-415d-b371-ce06efc0bd8e"
+				"nodeID" "int" "8"
+				"referenceID" "uint64" "0x269de5b221b93faf"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "51345138-25d5-4113-ac01-bdf166b1666f"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "ce57b52b-1d6c-4fed-9a37-254f235c6d6f"
+					"classname" "string" "env_fog_controller"
+					"targetname" "string" "goodside_fog"
+					"vscripts" "string" ""
+					"mincpulevel" "string" "0"
+					"maxcpulevel" "string" "0"
+					"mingpulevel" "string" "0"
+					"maxgpulevel" "string" "0"
+					"disableX360" "string" "0"
+					"fogenable" "string" "1"
+					"fogblend" "string" "0"
+					"use_angles" "string" "0"
+					"fogcolor" "string" "149 239 255 255"
+					"fogcolor2" "string" "149 239 255 255"
+					"fogdir" "string" "1 0 0"
+					"fogstart" "string" "3000"
+					"fogend" "string" "4500"
+					"fogmaxdensity" "string" "1"
+					"fogexponent" "string" "2"
+					"foglerptime" "string" "5"
+					"farz" "string" "-1"
+					"HDRColorScale" "string" "1.000000"
+					"spawnflags" "string" "1"
+					"maxdxlevel" "string" "0"
+					"mindxlevel" "string" "0"
+					"no_reflection_fog" "string" "1"
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			},
+			"CMapEntity"
+			{
+				"id" "elementid" "e7609591-4f45-4125-89ea-e031c666bdf8"
+				"nodeID" "int" "9"
+				"referenceID" "uint64" "0x514197a4896ced22"
+				"children" "element_array" 
+				[
+				]
+				"variableTargetKeys" "string_array" 
+				[
+				]
+				"variableNames" "string_array" 
+				[
+				]
+				"relayPlugData" "DmePlugList"
+				{
+					"id" "elementid" "a9d1141f-1f3e-4649-b067-622cf6dce4c2"
+					"names" "string_array" 
+					[
+					]
+					"dataTypes" "int_array" 
+					[
+					]
+					"plugTypes" "int_array" 
+					[
+					]
+					"descriptions" "string_array" 
+					[
+					]
+				}
+
+				"connectionsData" "element_array" 
+				[
+				]
+				"entity_properties" "EditGameClassProps"
+				{
+					"id" "elementid" "3f87397b-986a-4f34-a09b-a70e92e0f211"
+					"classname" "string" "env_soundscape"
+					"targetname" "string" "default_day"
+					"vscripts" "string" ""
+					"parentname" "string" ""
+					"parentAttachmentName" "string" ""
+					"local.origin" "string" ""
+					"local.angles" "string" ""
+					"local.scales" "string" ""
+					"useLocalOffset" "string" "0"
+					"StartDisabled" "string" "0"
+					"radius" "string" "16000"
+					"soundscape" "string" "default_day"
+					"position0" "string" ""
+					"position1" "string" ""
+					"position2" "string" ""
+					"position3" "string" ""
+					"position4" "string" ""
+					"position5" "string" ""
+					"position6" "string" ""
+					"position7" "string" ""
+				}
+
+				"hitNormal" "vector3" "0 0 1"
+				"isProceduralEntity" "bool" "0"
+				"origin" "vector3" "0 0 0"
+				"angles" "qangle" "0 0 0"
+				"scales" "vector3" "1 1 1"
+				"transformLocked" "bool" "0"
+				"force_hidden" "bool" "0"
+				"editorOnly" "bool" "0"
+			}
+		]
+		"variableTargetKeys" "string_array" 
+		[
+		]
+		"variableNames" "string_array" 
+		[
+		]
+		"relayPlugData" "DmePlugList"
+		{
+			"id" "elementid" "7f561665-7e64-48a4-a8ae-ea1443ae92f1"
+			"names" "string_array" 
+			[
+			]
+			"dataTypes" "int_array" 
+			[
+			]
+			"plugTypes" "int_array" 
+			[
+			]
+			"descriptions" "string_array" 
+			[
+			]
+		}
+
+		"connectionsData" "element_array" 
+		[
+		]
+		"entity_properties" "EditGameClassProps"
+		{
+			"id" "elementid" "c112005a-5bfa-4b36-9bca-bc24f8b10d91"
+			"classname" "string" "worldspawn"
+			"targetname" "string" ""
+			"skyname" "string" "sky_day01_01"
+			"startdark" "string" "0"
+			"startcolor" "string" "0 0 0"
+			"pvstype" "string" "0"
+			"newunit" "string" "0"
+			"maxpropscreenwidth" "string" "-1"
+			"minpropscreenwidth" "string" "0"
+			"vrchaperone" "string" "0"
+			"vrmovement" "string" "0"
+			"OptimizedHeightFieldName" "string" ""
+			"prefab_has_runtime_entity_by_default" "string" "0"
+		}
+
+		"nextDecalID" "int" "0"
+		"fixupEntityNames" "bool" "1"
+		"mapUsageType" "string" "standard"
+		"origin" "vector3" "0 0 0"
+		"angles" "qangle" "0 0 0"
+		"scales" "vector3" "1 1 1"
+		"transformLocked" "bool" "0"
+		"force_hidden" "bool" "0"
+		"editorOnly" "bool" "0"
+	}
+
+	"visbility" "CVisibilityMgr"
+	{
+		"id" "elementid" "2afe2105-27b4-4e80-bcd5-03ae03eccf37"
+		"nodeID" "int" "0"
+		"referenceID" "uint64" "0x0"
+		"children" "element_array" 
+		[
+		]
+		"variableTargetKeys" "string_array" 
+		[
+		]
+		"variableNames" "string_array" 
+		[
+		]
+		"nodes" "element_array" 
+		[
+		]
+		"hiddenFlags" "int_array" 
+		[
+		]
+		"origin" "vector3" "0 0 0"
+		"angles" "qangle" "0 0 0"
+		"scales" "vector3" "1 1 1"
+		"transformLocked" "bool" "0"
+		"force_hidden" "bool" "0"
+		"editorOnly" "bool" "0"
+	}
+
+	"mapVariables" "CMapVariableSet"
+	{
+		"id" "elementid" "7979ea27-10ae-4789-84f8-f6aef4bdbb57"
+		"variableNames" "string_array" 
+		[
+		]
+		"variableValues" "string_array" 
+		[
+		]
+		"variableTypeNames" "string_array" 
+		[
+		]
+		"variableTypeParameters" "string_array" 
+		[
+		]
+		"m_ChoiceGroups" "element_array" 
+		[
+		]
+	}
+
+	"rootSelectionSet" "CMapSelectionSet"
+	{
+		"id" "elementid" "2bb5c1b8-fecc-4b73-926f-78b190a4f97a"
+		"children" "element_array" 
+		[
+		]
+		"selectionSetName" "string" ""
+		"selectionSetData" "element" ""
+	}
+
+	"m_ReferencedMeshSnapshots" "element_array" 
+	[
+	]
+	"m_bIsCordoning" "bool" "0"
+	"m_bCordonsVisible" "bool" "0"
+	"nodeInstanceData" "element_array" 
+	[
+	]
+}
+

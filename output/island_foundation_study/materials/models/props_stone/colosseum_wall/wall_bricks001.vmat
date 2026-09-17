@@ -1,0 +1,23 @@
+"Layer0"
+{
+	"shader"	"global_lit_simple.vfx"
+	"F_NORMAL_MAP"	"1"
+	"F_SPECULAR"	"1"
+	"g_flBumpStrength"	"1"
+	"g_flSpecularBloom"	"0"
+	"g_flSpecularIntensity"	"1"
+	"g_vColorTint"	"[1.000000 1.000000 1.000000 0.000000]"
+	"g_vTexCoordOffset"	"[0.000000 0.000000 0.000000 0.000000]"
+	"g_vTexCoordScale"	"[1.000000 1.000000 0.000000 0.000000]"
+	"TextureColor"	"materials/models/props_stone/colosseum_wall/wall_bricks001_color.png"
+	"TextureNormal"	"materials/models/props_stone/colosseum_wall/wall_bricks001_normal.png"
+	"TextureReflectance"	"materials/models/props_stone/colosseum_wall/wall_bricks001_refl.png"
+	"TextureSelfIllumMask"	"materials/models/props_stone/colosseum_wall/wall_bricks001_1bb38aac_selfillum.png"
+	"TextureBloom"	"materials/models/props_stone/colosseum_wall/wall_bricks001_1bb38aac_bloom.png"
+	"Compiled Textures"
+	{
+		"g_tColor"	"materials/models/props_stone/colosseum_wall/wall_bricks001_color_psd_7c2f54d7.vtex"
+		"g_tNormal"	"materials/models/props_stone/colosseum_wall/wall_bricks001_normal_psd_a1df6f08.vtex"
+		"g_tSpecular"	"materials/models/props_stone/colosseum_wall/wall_bricks001_refl_psd_1bb38aac.vtex"
+	}
+}

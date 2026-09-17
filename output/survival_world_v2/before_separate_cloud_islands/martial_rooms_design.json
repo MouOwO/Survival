@@ -1,0 +1,7445 @@
+{
+  "theme": "肃杀的日式荒寺庭院",
+  "rooms": [
+    {
+      "name": "rebirth_01",
+      "biome": "forest",
+      "props": 16
+    },
+    {
+      "name": "rebirth_02",
+      "biome": "forest",
+      "props": 15
+    },
+    {
+      "name": "rebirth_03",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "rebirth_04",
+      "biome": "forest",
+      "props": 15
+    },
+    {
+      "name": "rebirth_05",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "rebirth_06",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "rebirth_07",
+      "biome": "forest",
+      "props": 15
+    },
+    {
+      "name": "rebirth_08",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "rebirth_09",
+      "biome": "forest",
+      "props": 15
+    },
+    {
+      "name": "rebirth_10",
+      "biome": "forest",
+      "props": 16
+    },
+    {
+      "name": "flame_troll",
+      "biome": "volcanic",
+      "props": 17
+    },
+    {
+      "name": "ice_elegy",
+      "biome": "snow",
+      "props": 17
+    },
+    {
+      "name": "synthesis_gem",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "commandment_01",
+      "biome": "forest",
+      "props": 14
+    },
+    {
+      "name": "commandment_02",
+      "biome": "forest",
+      "props": 13
+    },
+    {
+      "name": "commandment_03",
+      "biome": "forest",
+      "props": 13
+    },
+    {
+      "name": "commandment_04",
+      "biome": "forest",
+      "props": 14
+    },
+    {
+      "name": "commandment_05",
+      "biome": "forest",
+      "props": 14
+    },
+    {
+      "name": "commandment_06",
+      "biome": "forest",
+      "props": 14
+    },
+    {
+      "name": "commandment_07",
+      "biome": "forest",
+      "props": 13
+    },
+    {
+      "name": "commandment_08",
+      "biome": "forest",
+      "props": 13
+    },
+    {
+      "name": "commandment_09",
+      "biome": "forest",
+      "props": 13
+    },
+    {
+      "name": "commandment_10",
+      "biome": "forest",
+      "props": 13
+    },
+    {
+      "name": "commandment_empty_10",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "commandment_empty_11",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "polar_crystal_mobs",
+      "biome": "snow",
+      "props": 18
+    },
+    {
+      "name": "molten_core_mobs",
+      "biome": "volcanic",
+      "props": 18
+    },
+    {
+      "name": "seven_sins",
+      "biome": "volcanic",
+      "props": 17
+    },
+    {
+      "name": "training_p0_wood",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "training_p0_gold",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "training_p0_attributes",
+      "biome": "snow",
+      "props": 17
+    },
+    {
+      "name": "training_p0_greater_attributes",
+      "biome": "volcanic",
+      "props": 17
+    },
+    {
+      "name": "training_p1_wood",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "training_p1_gold",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "training_p1_attributes",
+      "biome": "snow",
+      "props": 17
+    },
+    {
+      "name": "training_p1_greater_attributes",
+      "biome": "volcanic",
+      "props": 17
+    },
+    {
+      "name": "training_p2_wood",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "training_p2_gold",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "training_p2_attributes",
+      "biome": "snow",
+      "props": 17
+    },
+    {
+      "name": "training_p2_greater_attributes",
+      "biome": "volcanic",
+      "props": 17
+    },
+    {
+      "name": "training_p3_wood",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "training_p3_gold",
+      "biome": "forest",
+      "props": 17
+    },
+    {
+      "name": "training_p3_attributes",
+      "biome": "snow",
+      "props": 17
+    },
+    {
+      "name": "training_p3_greater_attributes",
+      "biome": "volcanic",
+      "props": 17
+    },
+    {
+      "name": "endless_p0",
+      "biome": "forest",
+      "props": 18
+    },
+    {
+      "name": "endless_p1",
+      "biome": "forest",
+      "props": 18
+    },
+    {
+      "name": "endless_p2",
+      "biome": "forest",
+      "props": 18
+    },
+    {
+      "name": "endless_p3",
+      "biome": "forest",
+      "props": 18
+    },
+    {
+      "name": "original_challenge_reserve",
+      "biome": "forest",
+      "props": 23
+    }
+  ],
+  "removedProps": 2896,
+  "removedTrees": 828,
+  "instances": [
+    {
+      "room": "rebirth_01",
+      "x": -9349.5,
+      "y": 11316.64,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_01",
+      "x": -8651.22,
+      "y": 11362.56,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_01",
+      "x": -9096.5,
+      "y": 11408.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_01",
+      "x": -8828.32,
+      "y": 11408.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_01",
+      "x": -8550.02,
+      "y": 10647.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_01",
+      "x": -9389.98,
+      "y": 11028,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_01",
+      "x": -9131.92,
+      "y": 10319.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_01",
+      "x": -8565.2,
+      "y": 10864,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_01",
+      "x": -9268.223399352704,
+      "y": 11218.86988406914,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 79
+    },
+    {
+      "room": "rebirth_01",
+      "x": -8935.386976672517,
+      "y": 10341.122019985183,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 158
+    },
+    {
+      "room": "rebirth_01",
+      "x": -8722.776667241153,
+      "y": 11279.557233750496,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 237
+    },
+    {
+      "room": "rebirth_01",
+      "x": -9368.880724388,
+      "y": 10774.581088341498,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 316
+    },
+    {
+      "room": "rebirth_01",
+      "x": -8629.498206458164,
+      "y": 10580.195788982792,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 395
+    },
+    {
+      "room": "rebirth_01",
+      "x": -9072.826797132453,
+      "y": 11371.586187153383,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 474
+    },
+    {
+      "room": "rebirth_01",
+      "x": -9158.993112783977,
+      "y": 10399.908567749619,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 553
+    },
+    {
+      "room": "rebirth_01",
+      "x": -9298.9,
+      "y": 10463.84,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_02",
+      "x": -8590.5,
+      "y": 9732.64,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 37
+    },
+    {
+      "room": "rebirth_02",
+      "x": -9288.78,
+      "y": 9778.56,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_02",
+      "x": -9096.5,
+      "y": 9824.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_02",
+      "x": -8828.32,
+      "y": 9824.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_02",
+      "x": -8550.02,
+      "y": 9063.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_02",
+      "x": -9389.98,
+      "y": 9444,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_02",
+      "x": -9131.92,
+      "y": 8735.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_02",
+      "x": -8814.001379609163,
+      "y": 8795.734887221042,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 171
+    },
+    {
+      "room": "rebirth_02",
+      "x": -8832.343356144695,
+      "y": 9773.523716536323,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 250
+    },
+    {
+      "room": "rebirth_02",
+      "x": -9328.826843088535,
+      "y": 9037.089616698706,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 329
+    },
+    {
+      "room": "rebirth_02",
+      "x": -8578.948338890572,
+      "y": 9144.389130529786,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 408
+    },
+    {
+      "room": "rebirth_02",
+      "x": -9187.36266135107,
+      "y": 9722.724288847654,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 487
+    },
+    {
+      "room": "rebirth_02",
+      "x": -9040.781741344279,
+      "y": 8763.285067117664,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 566
+    },
+    {
+      "room": "rebirth_02",
+      "x": -8648.344989262596,
+      "y": 9598.62197488987,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 645
+    },
+    {
+      "room": "rebirth_02",
+      "x": -8641.1,
+      "y": 8879.84,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 31
+    },
+    {
+      "room": "rebirth_03",
+      "x": -9349.5,
+      "y": 8148.64,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 74
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8651.22,
+      "y": 8194.56,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_03",
+      "x": -9096.5,
+      "y": 8240.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8828.32,
+      "y": 8240.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8550.02,
+      "y": 7479.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_03",
+      "x": -9389.98,
+      "y": 7860,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_03",
+      "x": -9131.92,
+      "y": 7151.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8640.542000743006,
+      "y": 8000.927252249978,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 26
+    },
+    {
+      "room": "rebirth_03",
+      "x": -9371.761946515504,
+      "y": 7760.175593578833,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 105
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8707.487577219381,
+      "y": 7296.514132767032,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 184
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8955.033246636427,
+      "y": 8220.441171834107,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 263
+    },
+    {
+      "room": "rebirth_03",
+      "x": -9254.56497251065,
+      "y": 7322.755486675245,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 342
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8565.678544673676,
+      "y": 7721.510644141459,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 421
+    },
+    {
+      "room": "rebirth_03",
+      "x": -9281.176721356193,
+      "y": 8031.656217793417,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 500
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8915.82254405027,
+      "y": 7175.921478960199,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 579
+    },
+    {
+      "room": "rebirth_03",
+      "x": -8738.65028003516,
+      "y": 8126.646077042635,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 658
+    },
+    {
+      "room": "rebirth_03",
+      "x": -9298.9,
+      "y": 7295.84,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 62
+    },
+    {
+      "room": "rebirth_04",
+      "x": -8590.5,
+      "y": 6564.64,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 111
+    },
+    {
+      "room": "rebirth_04",
+      "x": -9288.78,
+      "y": 6610.56,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_04",
+      "x": -9096.5,
+      "y": 6656.4800000000005,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_04",
+      "x": -8828.32,
+      "y": 6656.4800000000005,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_04",
+      "x": -8550.02,
+      "y": 5895.5199999999995,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_04",
+      "x": -9389.98,
+      "y": 6276,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_04",
+      "x": -9131.92,
+      "y": 5567.5199999999995,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_04",
+      "x": -8727.996803970102,
+      "y": 6532.690144975806,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 39
+    },
+    {
+      "room": "rebirth_04",
+      "x": -9367.712186710614,
+      "y": 6014.223322654703,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 118
+    },
+    {
+      "room": "rebirth_04",
+      "x": -8625.999834938806,
+      "y": 5835.377508657231,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 197
+    },
+    {
+      "room": "rebirth_04",
+      "x": -9079.149960534647,
+      "y": 6617.362150199321,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 276
+    },
+    {
+      "room": "rebirth_04",
+      "x": -9153.17470918246,
+      "y": 5644.003823671654,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 355
+    },
+    {
+      "room": "rebirth_04",
+      "x": -8796.028238591858,
+      "y": 5638.138463756903,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 592
+    },
+    {
+      "room": "rebirth_04",
+      "x": -8851.010801325054,
+      "y": 6613.61545692471,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 671
+    },
+    {
+      "room": "rebirth_04",
+      "x": -8641.1,
+      "y": 5711.84,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 93
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9349.5,
+      "y": 4980.639999999999,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 148
+    },
+    {
+      "room": "rebirth_05",
+      "x": -8651.22,
+      "y": 5026.5599999999995,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9096.5,
+      "y": 5072.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_05",
+      "x": -8828.32,
+      "y": 5072.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_05",
+      "x": -8550.02,
+      "y": 4311.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9389.98,
+      "y": 4692,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9131.92,
+      "y": 3983.5200000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_05",
+      "x": -8838.522464059184,
+      "y": 5024.3474429111175,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 52
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9325.747386598843,
+      "y": 4277.592382045547,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 131
+    },
+    {
+      "room": "rebirth_05",
+      "x": -8577.306612312617,
+      "y": 4400.612097850692,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 210
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9192.861096501261,
+      "y": 4966.105509334771,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 289
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9034.32187690637,
+      "y": 4009.8675747334805,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 368
+    },
+    {
+      "room": "rebirth_05",
+      "x": -8652.364749428762,
+      "y": 4853.329338381844,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 447
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9373.69326232092,
+      "y": 4566.780541860395,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 526
+    },
+    {
+      "room": "rebirth_05",
+      "x": -8692.819158747487,
+      "y": 4145.530024155968,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 605
+    },
+    {
+      "room": "rebirth_05",
+      "x": -8974.714903260934,
+      "y": 5052.76440056329,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 684
+    },
+    {
+      "room": "rebirth_05",
+      "x": -9298.9,
+      "y": 4127.84,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 124
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8590.5,
+      "y": 3396.6400000000003,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 185
+    },
+    {
+      "room": "rebirth_06",
+      "x": -9288.78,
+      "y": 3442.5600000000004,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_06",
+      "x": -9096.5,
+      "y": 3488.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8828.32,
+      "y": 3488.48,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8550.02,
+      "y": 2727.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_06",
+      "x": -9389.98,
+      "y": 3108,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_06",
+      "x": -9131.92,
+      "y": 2399.52,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8961.582253705308,
+      "y": 3468.6865194465745,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 65
+    },
+    {
+      "room": "rebirth_06",
+      "x": -9249.868170603762,
+      "y": 2564.8335158790123,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 144
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8566.049973527515,
+      "y": 2977.990940114563,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 223
+    },
+    {
+      "room": "rebirth_06",
+      "x": -9285.326246704735,
+      "y": 3273.0830171834423,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 302
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8909.337056129523,
+      "y": 2425.1263718731316,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 381
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8744.05670455908,
+      "y": 3379.4439453386235,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 460
+    },
+    {
+      "room": "rebirth_06",
+      "x": -9363.5758768119,
+      "y": 2821.274944300596,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 539
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8616.034521300278,
+      "y": 2689.3835413037987,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 618
+    },
+    {
+      "room": "rebirth_06",
+      "x": -9097.96951998325,
+      "y": 3441.8860529500394,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 697
+    },
+    {
+      "room": "rebirth_06",
+      "x": -8641.1,
+      "y": 2543.8399999999997,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 155
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9349.5,
+      "y": 1812.639999999999,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 222
+    },
+    {
+      "room": "rebirth_07",
+      "x": -8651.22,
+      "y": 1858.559999999999,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9096.5,
+      "y": 1904.479999999999,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_07",
+      "x": -8828.32,
+      "y": 1904.479999999999,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_07",
+      "x": -8550.02,
+      "y": 1143.5199999999988,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9389.98,
+      "y": 1523.9999999999989,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9131.92,
+      "y": 815.5199999999987,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9085.444531182384,
+      "y": 1863.0057293598134,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 78
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9147.308321418088,
+      "y": 888.2216751465421,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 157
+    },
+    {
+      "room": "rebirth_07",
+      "x": -8790.135407301737,
+      "y": 889.8508760792924,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 394
+    },
+    {
+      "room": "rebirth_07",
+      "x": -8857.28848029325,
+      "y": 1864.0464355170561,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 473
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9315.937777249432,
+      "y": 1087.4690773223315,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 552
+    },
+    {
+      "room": "rebirth_07",
+      "x": -8572.994425359693,
+      "y": 1257.5103737204058,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 631
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9209.024436343485,
+      "y": 1783.5428038411455,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 710
+    },
+    {
+      "room": "rebirth_07",
+      "x": -9298.9,
+      "y": 959.8399999999988,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 186
+    },
+    {
+      "room": "rebirth_08",
+      "x": -8590.5,
+      "y": 228.64000000000033,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 259
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9288.78,
+      "y": 274.5600000000004,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9096.5,
+      "y": 320.48000000000036,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_08",
+      "x": -8828.32,
+      "y": 320.48000000000036,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_08",
+      "x": -8550.02,
+      "y": -440.47999999999985,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9389.98,
+      "y": -59.999999999999716,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9131.92,
+      "y": -768.4799999999999,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9198.301151304096,
+      "y": 209.3719643818236,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 91
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9027.845162809299,
+      "y": -743.4141884838006,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 170
+    },
+    {
+      "room": "rebirth_08",
+      "x": -8656.467716832762,
+      "y": 107.95147910466687,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 249
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9374.124517491831,
+      "y": -193.6949939211008,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 328
+    },
+    {
+      "room": "rebirth_08",
+      "x": -8688.080764549723,
+      "y": -600.6039589972247,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 407
+    },
+    {
+      "room": "rebirth_08",
+      "x": -8981.265367581773,
+      "y": 300.59673730963357,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 486
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9235.320439920662,
+      "y": -620.3556372963358,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 565
+    },
+    {
+      "room": "rebirth_08",
+      "x": -8567.802006376254,
+      "y": -164.59216464599132,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 644
+    },
+    {
+      "room": "rebirth_08",
+      "x": -9297.292469522572,
+      "y": 84.822007812847,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 723
+    },
+    {
+      "room": "rebirth_08",
+      "x": -8641.1,
+      "y": -624.1599999999999,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 217
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9349.5,
+      "y": -1355.3600000000006,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 296
+    },
+    {
+      "room": "rebirth_09",
+      "x": -8651.22,
+      "y": -1309.4400000000005,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9096.5,
+      "y": -1263.5200000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_09",
+      "x": -8828.32,
+      "y": -1263.5200000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_09",
+      "x": -8550.02,
+      "y": -2024.4800000000007,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9389.98,
+      "y": -1644.0000000000007,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9131.92,
+      "y": -2352.480000000001,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9289.393169678515,
+      "y": -1485.576389503563,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 104
+    },
+    {
+      "room": "rebirth_09",
+      "x": -8902.867459379513,
+      "y": -2325.5328118826815,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 183
+    },
+    {
+      "room": "rebirth_09",
+      "x": -8749.52231683841,
+      "y": -1367.8722545862754,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 262
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9361.992244937968,
+      "y": -1938.9671505023143,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 341
+    },
+    {
+      "room": "rebirth_09",
+      "x": -8612.902288866635,
+      "y": -2055.156061489134,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 420
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9104.168295157202,
+      "y": -1312.8642683320963,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 499
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9129.409346177154,
+      "y": -2290.394635343827,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 578
+    },
+    {
+      "room": "rebirth_09",
+      "x": -9298.9,
+      "y": -2208.1600000000008,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 248
+    },
+    {
+      "room": "rebirth_10",
+      "x": -8590.5,
+      "y": -2939.3600000000015,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 333
+    },
+    {
+      "room": "rebirth_10",
+      "x": -9288.78,
+      "y": -2893.4400000000014,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "rebirth_10",
+      "x": -9096.5,
+      "y": -2847.520000000002,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_10",
+      "x": -8828.32,
+      "y": -2847.520000000002,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_10",
+      "x": -8550.02,
+      "y": -3608.480000000002,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_10",
+      "x": -9389.98,
+      "y": -3228.000000000002,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "rebirth_10",
+      "x": -9131.92,
+      "y": -3936.480000000002,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "rebirth_10",
+      "x": -8784.289693061488,
+      "y": -3858.3135520626506,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 196
+    },
+    {
+      "room": "rebirth_10",
+      "x": -8863.59568499642,
+      "y": -2885.654625113462,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 275
+    },
+    {
+      "room": "rebirth_10",
+      "x": -9312.490230486752,
+      "y": -3671.753834030157,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 354
+    },
+    {
+      "room": "rebirth_10",
+      "x": -8571.766959366969,
+      "y": -3486.1460697164566,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 433
+    },
+    {
+      "room": "rebirth_10",
+      "x": -9214.280575403302,
+      "y": -2973.5279794750945,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 512
+    },
+    {
+      "room": "rebirth_10",
+      "x": -9008.301303515407,
+      "y": -3914.4455730450723,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 591
+    },
+    {
+      "room": "rebirth_10",
+      "x": -8669.284914053198,
+      "y": -3040.682026600637,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 670
+    },
+    {
+      "room": "rebirth_10",
+      "x": -9374.783059961352,
+      "y": -3387.1988947457503,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 749
+    },
+    {
+      "room": "rebirth_10",
+      "x": -8641.1,
+      "y": -3792.160000000002,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 279
+    },
+    {
+      "room": "flame_troll",
+      "x": -7854.5,
+      "y": 11112,
+      "theme": "martial_volcanic",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 370
+    },
+    {
+      "room": "flame_troll",
+      "x": -7029.26,
+      "y": 11168,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "flame_troll",
+      "x": -7555.5,
+      "y": 11224,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "flame_troll",
+      "x": -7238.56,
+      "y": 11224,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "flame_troll",
+      "x": -6909.66,
+      "y": 10296,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "flame_troll",
+      "x": -7902.34,
+      "y": 10760,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "flame_troll",
+      "x": -7597.36,
+      "y": 9896,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "flame_troll",
+      "x": -7883.986255890737,
+      "y": 10586.611623957306,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 130
+    },
+    {
+      "room": "flame_troll",
+      "x": -7067.310079928355,
+      "y": 10108.00086882788,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 209
+    },
+    {
+      "room": "flame_troll",
+      "x": -7427.051586452454,
+      "y": 11199.380062814525,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 288
+    },
+    {
+      "room": "flame_troll",
+      "x": -7713.671759628867,
+      "y": 10069.913677560984,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 367
+    },
+    {
+      "room": "flame_troll",
+      "x": -6931.613838244438,
+      "y": 10642.730653855577,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 446
+    },
+    {
+      "room": "flame_troll",
+      "x": -7797.3057787339085,
+      "y": 10928.18801797517,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 525
+    },
+    {
+      "room": "flame_troll",
+      "x": -7303.822231318885,
+      "y": 9934.7679512754,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 604
+    },
+    {
+      "room": "flame_troll",
+      "x": -7165.246600289593,
+      "y": 11113.051245636025,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 683
+    },
+    {
+      "room": "flame_troll",
+      "x": -7862.912438974387,
+      "y": 10370.3465621148,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 762
+    },
+    {
+      "room": "flame_troll",
+      "x": -7794.7,
+      "y": 10072,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 310
+    },
+    {
+      "room": "ice_elegy",
+      "x": -6957.5,
+      "y": 9032,
+      "theme": "martial_snow",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 407
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7782.74,
+      "y": 9088,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7555.5,
+      "y": 9144,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7238.56,
+      "y": 9144,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "ice_elegy",
+      "x": -6909.66,
+      "y": 8216,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7902.34,
+      "y": 8680,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7597.36,
+      "y": 7816,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7867.2706414529075,
+      "y": 8310.274466642066,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 143
+    },
+    {
+      "room": "ice_elegy",
+      "x": -6980.384255958695,
+      "y": 8187.767171142263,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 222
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7571.846819051187,
+      "y": 9080.311835850087,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 301
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7587.2511089164145,
+      "y": 7887.71189823088,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 380
+    },
+    {
+      "room": "ice_elegy",
+      "x": -6973.091314162743,
+      "y": 8752.38663799254,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 459
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7862.612032880516,
+      "y": 8670.943886747431,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 538
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7166.120184696068,
+      "y": 7926.269809678227,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 617
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7302.835466902277,
+      "y": 9104.941981246538,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 696
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7797.88612831301,
+      "y": 8112.918322507758,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 775
+    },
+    {
+      "room": "ice_elegy",
+      "x": -7017.3,
+      "y": 7992,
+      "theme": "martial_snow",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 341
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7854.5,
+      "y": 6952,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 444
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7029.26,
+      "y": 7008,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7555.5,
+      "y": 7064,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7238.56,
+      "y": 7064,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -6909.66,
+      "y": 6136,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7902.34,
+      "y": 6600,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7597.36,
+      "y": 5736,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7806.580777425905,
+      "y": 6050.117729875657,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 156
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -6934.033598226804,
+      "y": 6295.39286488434,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 235
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7700.83140002996,
+      "y": 6904.014164544994,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 314
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7443.551271571359,
+      "y": 5761.974637721778,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 393
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7055.839213319708,
+      "y": 6836.0752248416275,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 472
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7884.388155917841,
+      "y": 6395.4965286528995,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 551
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7051.286566977277,
+      "y": 5970.560350919341,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 630
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7450.259303529314,
+      "y": 7037.255210307907,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 709
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7695.500192155651,
+      "y": 5890.485029153552,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 788
+    },
+    {
+      "room": "synthesis_gem",
+      "x": -7794.7,
+      "y": 5912,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 372
+    },
+    {
+      "room": "commandment_01",
+      "x": 5681,
+      "y": 2016.8,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 481
+    },
+    {
+      "room": "commandment_01",
+      "x": 5046.2,
+      "y": 2067.2,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_01",
+      "x": 5221,
+      "y": 2117.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_01",
+      "x": 5464.8,
+      "y": 2117.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_01",
+      "x": 5717.8,
+      "y": 1282.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_01",
+      "x": 5188.8,
+      "y": 922.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_01",
+      "x": 5103.921229127459,
+      "y": 1072.9846435971206,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 169
+    },
+    {
+      "room": "commandment_01",
+      "x": 5420.406489152165,
+      "y": 959.3559439073273,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 406
+    },
+    {
+      "room": "commandment_01",
+      "x": 5516.023890914776,
+      "y": 2022.372361908572,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 485
+    },
+    {
+      "room": "commandment_01",
+      "x": 4986.339870959966,
+      "y": 1340.4306494265577,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 564
+    },
+    {
+      "room": "commandment_01",
+      "x": 5671.17784969997,
+      "y": 1282.2115419825802,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 643
+    },
+    {
+      "room": "commandment_01",
+      "x": 5191.797096800633,
+      "y": 2049.9353697275556,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 722
+    },
+    {
+      "room": "commandment_01",
+      "x": 5213.295865658945,
+      "y": 976.9627297694743,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 801
+    },
+    {
+      "room": "commandment_01",
+      "x": 5635,
+      "y": 1080.8,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 403
+    },
+    {
+      "room": "commandment_02",
+      "x": 6049,
+      "y": 2016.8,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 518
+    },
+    {
+      "room": "commandment_02",
+      "x": 6683.8,
+      "y": 2067.2,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_02",
+      "x": 6279,
+      "y": 2117.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_02",
+      "x": 6522.8,
+      "y": 2117.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_02",
+      "x": 6775.8,
+      "y": 1282.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_02",
+      "x": 6246.8,
+      "y": 922.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_02",
+      "x": 6260.106250838916,
+      "y": 983.4785827981323,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 182
+    },
+    {
+      "room": "commandment_02",
+      "x": 6583.65185978803,
+      "y": 1026.3825153025173,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 419
+    },
+    {
+      "room": "commandment_02",
+      "x": 6467.531138106637,
+      "y": 2084.38442729915,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 498
+    },
+    {
+      "room": "commandment_02",
+      "x": 6096.004731296779,
+      "y": 1182.0332828650617,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 577
+    },
+    {
+      "room": "commandment_02",
+      "x": 6153.387086915998,
+      "y": 1955.8207956455813,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 735
+    },
+    {
+      "room": "commandment_02",
+      "x": 6382.98192291084,
+      "y": 944.2582294825451,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 814
+    },
+    {
+      "room": "commandment_02",
+      "x": 6095,
+      "y": 1080.8,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 434
+    },
+    {
+      "room": "commandment_03",
+      "x": 7797,
+      "y": 2016.8,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 555
+    },
+    {
+      "room": "commandment_03",
+      "x": 7162.2,
+      "y": 2067.2,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_03",
+      "x": 7337,
+      "y": 2117.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_03",
+      "x": 7580.8,
+      "y": 2117.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_03",
+      "x": 7833.8,
+      "y": 1282.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_03",
+      "x": 7304.8,
+      "y": 922.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_03",
+      "x": 7429.055746624627,
+      "y": 945.1206432748854,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 195
+    },
+    {
+      "room": "commandment_03",
+      "x": 7717.260992049834,
+      "y": 1919.2396968505834,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 274
+    },
+    {
+      "room": "commandment_03",
+      "x": 7728.817176182636,
+      "y": 1140.4670533727535,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 432
+    },
+    {
+      "room": "commandment_03",
+      "x": 7412.02845158693,
+      "y": 2092.5921109668348,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 511
+    },
+    {
+      "room": "commandment_03",
+      "x": 7234.078332933654,
+      "y": 1055.855250110099,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 590
+    },
+    {
+      "room": "commandment_03",
+      "x": 7553.718364965864,
+      "y": 966.440838932107,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 827
+    },
+    {
+      "room": "commandment_03",
+      "x": 7751,
+      "y": 1080.8,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 465
+    },
+    {
+      "room": "commandment_04",
+      "x": 4991,
+      "y": 320.80000000000086,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 592
+    },
+    {
+      "room": "commandment_04",
+      "x": 5625.8,
+      "y": 371.20000000000095,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_04",
+      "x": 5221,
+      "y": 421.60000000000093,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_04",
+      "x": 5464.8,
+      "y": 421.60000000000093,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_04",
+      "x": 5717.8,
+      "y": -413.5999999999991,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_04",
+      "x": 5188.8,
+      "y": -773.5999999999991,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_04",
+      "x": 5426.192583710421,
+      "y": -734.432402885393,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 208
+    },
+    {
+      "room": "commandment_04",
+      "x": 5510.805700196005,
+      "y": 330.8670020595841,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 287
+    },
+    {
+      "room": "commandment_04",
+      "x": 4988.242445248658,
+      "y": -364.40356734149844,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 366
+    },
+    {
+      "room": "commandment_04",
+      "x": 5673.592719411354,
+      "y": -405.26644720405704,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 445
+    },
+    {
+      "room": "commandment_04",
+      "x": 5186.336367105206,
+      "y": 350.2129509517356,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 524
+    },
+    {
+      "room": "commandment_04",
+      "x": 5218.927030397741,
+      "y": -722.0745360777818,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 603
+    },
+    {
+      "room": "commandment_04",
+      "x": 5540.757704350918,
+      "y": -654.6041734879976,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 840
+    },
+    {
+      "room": "commandment_04",
+      "x": 5037,
+      "y": -615.1999999999991,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 496
+    },
+    {
+      "room": "commandment_05",
+      "x": 6739,
+      "y": 320.80000000000086,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 629
+    },
+    {
+      "room": "commandment_05",
+      "x": 6104.2,
+      "y": 371.20000000000095,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_05",
+      "x": 6279,
+      "y": 421.60000000000093,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_05",
+      "x": 6522.8,
+      "y": 421.60000000000093,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_05",
+      "x": 6775.8,
+      "y": -413.5999999999991,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_05",
+      "x": 6246.8,
+      "y": -773.5999999999991,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_05",
+      "x": 6588.731103819696,
+      "y": -664.7484908342929,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 221
+    },
+    {
+      "room": "commandment_05",
+      "x": 6461.685680958231,
+      "y": 390.1732262067618,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 300
+    },
+    {
+      "room": "commandment_05",
+      "x": 6099.538392905273,
+      "y": -521.4713912895595,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 379
+    },
+    {
+      "room": "commandment_05",
+      "x": 6148.912144819542,
+      "y": 253.66840523308923,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 537
+    },
+    {
+      "room": "commandment_05",
+      "x": 6388.936628909465,
+      "y": -751.9454748433774,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 616
+    },
+    {
+      "room": "commandment_05",
+      "x": 6646.5484072496465,
+      "y": 242.9502575613795,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 695
+    },
+    {
+      "room": "commandment_05",
+      "x": 6682.2769061263625,
+      "y": -534.022481132161,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 853
+    },
+    {
+      "room": "commandment_05",
+      "x": 6693,
+      "y": -615.1999999999991,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 527
+    },
+    {
+      "room": "commandment_06",
+      "x": 7107,
+      "y": 320.80000000000086,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 666
+    },
+    {
+      "room": "commandment_06",
+      "x": 7741.8,
+      "y": 371.20000000000095,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_06",
+      "x": 7337,
+      "y": 421.60000000000093,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_06",
+      "x": 7580.8,
+      "y": 421.60000000000093,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_06",
+      "x": 7833.8,
+      "y": -413.5999999999991,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_06",
+      "x": 7304.8,
+      "y": -773.5999999999991,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_06",
+      "x": 7732.705350826372,
+      "y": -548.4707872195609,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 234
+    },
+    {
+      "room": "commandment_06",
+      "x": 7406.1129921581905,
+      "y": 395.50453731481014,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 313
+    },
+    {
+      "room": "commandment_06",
+      "x": 7238.906207793731,
+      "y": -645.6044393788421,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 392
+    },
+    {
+      "room": "commandment_06",
+      "x": 7559.428933069648,
+      "y": -726.9098841564498,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 629
+    },
+    {
+      "room": "commandment_06",
+      "x": 7610.857518769619,
+      "y": 343.5679865208133,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 708
+    },
+    {
+      "room": "commandment_06",
+      "x": 7110.504716830492,
+      "y": -390.6401708587488,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 787
+    },
+    {
+      "room": "commandment_06",
+      "x": 7796.313845902937,
+      "y": -379.3094816238653,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 866
+    },
+    {
+      "room": "commandment_06",
+      "x": 7153,
+      "y": -615.1999999999991,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 558
+    },
+    {
+      "room": "commandment_07",
+      "x": 5681,
+      "y": -1375.2000000000005,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 703
+    },
+    {
+      "room": "commandment_07",
+      "x": 5046.2,
+      "y": -1324.8000000000004,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_07",
+      "x": 5221,
+      "y": -1274.4000000000005,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_07",
+      "x": 5464.8,
+      "y": -1274.4000000000005,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_07",
+      "x": 5717.8,
+      "y": -2109.6000000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_07",
+      "x": 5188.8,
+      "y": -2469.6000000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_07",
+      "x": 5675.919153857304,
+      "y": -2092.6843781076013,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 247
+    },
+    {
+      "room": "commandment_07",
+      "x": 5180.91484306304,
+      "y": -1349.6473137529708,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 326
+    },
+    {
+      "room": "commandment_07",
+      "x": 5224.588863390164,
+      "y": -2420.9687530861047,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 405
+    },
+    {
+      "room": "commandment_07",
+      "x": 5545.679729768998,
+      "y": -2345.3544784846977,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 642
+    },
+    {
+      "room": "commandment_07",
+      "x": 5386.022288656469,
+      "y": -1301.3461867579836,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 721
+    },
+    {
+      "room": "commandment_07",
+      "x": 5052.615640949706,
+      "y": -2239.4672608365368,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 800
+    },
+    {
+      "room": "commandment_07",
+      "x": 5635,
+      "y": -2311.2000000000003,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 589
+    },
+    {
+      "room": "commandment_08",
+      "x": 6049,
+      "y": -1375.2000000000005,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 740
+    },
+    {
+      "room": "commandment_08",
+      "x": 6683.8,
+      "y": -1324.8000000000004,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_08",
+      "x": 6279,
+      "y": -1274.4000000000005,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_08",
+      "x": 6522.8,
+      "y": -1274.4000000000005,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_08",
+      "x": 6775.8,
+      "y": -2109.6000000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_08",
+      "x": 6246.8,
+      "y": -2469.6000000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_08",
+      "x": 6144.5014055576885,
+      "y": -1448.5965404487588,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 339
+    },
+    {
+      "room": "commandment_08",
+      "x": 6394.892661300931,
+      "y": -2447.998305385555,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 418
+    },
+    {
+      "room": "commandment_08",
+      "x": 6642.183315353211,
+      "y": -1446.7069543463142,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 497
+    },
+    {
+      "room": "commandment_08",
+      "x": 6685.941158097515,
+      "y": -2222.672836476994,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 655
+    },
+    {
+      "room": "commandment_08",
+      "x": 6330.418290690518,
+      "y": -1304.6624202534827,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 734
+    },
+    {
+      "room": "commandment_08",
+      "x": 6195.742406561226,
+      "y": -2357.2626457984156,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 813
+    },
+    {
+      "room": "commandment_08",
+      "x": 6095,
+      "y": -2311.2000000000003,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 620
+    },
+    {
+      "room": "commandment_09",
+      "x": 7797,
+      "y": -1375.2000000000005,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 777
+    },
+    {
+      "room": "commandment_09",
+      "x": 7162.2,
+      "y": -1324.8000000000004,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_09",
+      "x": 7337,
+      "y": -1274.4000000000005,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_09",
+      "x": 7580.8,
+      "y": -1274.4000000000005,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_09",
+      "x": 7833.8,
+      "y": -2109.6000000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_09",
+      "x": 7304.8,
+      "y": -2469.6000000000004,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_09",
+      "x": 7565.1113592566635,
+      "y": -2420.1162917457887,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 431
+    },
+    {
+      "room": "commandment_09",
+      "x": 7605.464294871177,
+      "y": -1348.4758209890626,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 510
+    },
+    {
+      "room": "commandment_09",
+      "x": 7112.768859637861,
+      "y": -2095.26295878769,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 589
+    },
+    {
+      "room": "commandment_09",
+      "x": 7798.3710008061535,
+      "y": -2066.56054996347,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 668
+    },
+    {
+      "room": "commandment_09",
+      "x": 7280.875718931263,
+      "y": -1362.0645679413733,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 747
+    },
+    {
+      "room": "commandment_09",
+      "x": 7357.769635617297,
+      "y": -2428.796554774247,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 826
+    },
+    {
+      "room": "commandment_09",
+      "x": 7751,
+      "y": -2311.2000000000003,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 651
+    },
+    {
+      "room": "commandment_10",
+      "x": 4991,
+      "y": -3071.2,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 814
+    },
+    {
+      "room": "commandment_10",
+      "x": 5625.8,
+      "y": -3020.7999999999997,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_10",
+      "x": 5221,
+      "y": -2970.3999999999996,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_10",
+      "x": 5464.8,
+      "y": -2970.3999999999996,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_10",
+      "x": 5717.8,
+      "y": -3805.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_10",
+      "x": 5188.8,
+      "y": -4165.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_10",
+      "x": 5550.546827810117,
+      "y": -4035.9807842760174,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 444
+    },
+    {
+      "room": "commandment_10",
+      "x": 5380.115084216113,
+      "y": -2996.153745015739,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 523
+    },
+    {
+      "room": "commandment_10",
+      "x": 5056.452429217254,
+      "y": -3942.5979413589625,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 602
+    },
+    {
+      "room": "commandment_10",
+      "x": 5073.646914340848,
+      "y": -3164.080318899305,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 760
+    },
+    {
+      "room": "commandment_10",
+      "x": 5354.780114830353,
+      "y": -4143.249455618034,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 839
+    },
+    {
+      "room": "commandment_10",
+      "x": 5570.6817927493585,
+      "y": -3124.326557927755,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 918
+    },
+    {
+      "room": "commandment_10",
+      "x": 5037,
+      "y": -4007.2000000000003,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 682
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6739,
+      "y": -3071.2,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 851
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6104.2,
+      "y": -3020.7999999999997,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6279,
+      "y": -2970.3999999999996,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6522.8,
+      "y": -2970.3999999999996,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6775.8,
+      "y": -3805.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6012.2,
+      "y": -3388,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6246.8,
+      "y": -4165.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6637.753209740224,
+      "y": -3136.475575360947,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 299
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6027.996842460708,
+      "y": -3627.9232735312853,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 378
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6689.528933615466,
+      "y": -3911.2313301092017,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 457
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6324.560256403503,
+      "y": -3002.347408141063,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 536
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6200.786068289315,
+      "y": -4058.221430744751,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 615
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6748.128061368541,
+      "y": -3411.3428017786687,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 694
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6065.428979796112,
+      "y": -3308.602888359181,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 773
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6524.00023198121,
+      "y": -4106.862180512824,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 852
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6531.0240286126,
+      "y": -3033.418301091683,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 931
+    },
+    {
+      "room": "commandment_empty_10",
+      "x": 6693,
+      "y": -4007.2000000000003,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 713
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7107,
+      "y": -3071.2,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 888
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7741.8,
+      "y": -3020.7999999999997,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7337,
+      "y": -2970.3999999999996,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7580.8,
+      "y": -2970.3999999999996,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7833.8,
+      "y": -3805.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7070.2,
+      "y": -3388,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7304.8,
+      "y": -4165.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7600.030869703955,
+      "y": -3040.6567700812925,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 312
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7115.121866908875,
+      "y": -3799.8272610980484,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 391
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7800.337420898951,
+      "y": -3753.76065152302,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 470
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7275.625317961486,
+      "y": -3062.466350744006,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 549
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7363.539344107365,
+      "y": -4127.1107089923,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 628
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7758.715776451911,
+      "y": -3249.719932604885,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 707
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7088.534660395633,
+      "y": -3477.8545264068057,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 786
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7680.82705518692,
+      "y": -4019.103632470322,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 865
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7478.30337190816,
+      "y": -2993.4732466383907,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 944
+    },
+    {
+      "room": "commandment_empty_11",
+      "x": 7153,
+      "y": -4007.2000000000003,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 744
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 6072,
+      "y": 4367.2,
+      "theme": "martial_snow",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 925
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 4945.92,
+      "y": 3214.4,
+      "theme": "martial_snow",
+      "model": "models/props_tree/tree_dead_02.vmdl",
+      "scale": 0.55,
+      "yaw": 1325
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5056.32,
+      "y": 4428.8,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5336,
+      "y": 4490.4,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5726.08,
+      "y": 4490.4,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 6130.88,
+      "y": 3469.6,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 4909.12,
+      "y": 3980,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5284.48,
+      "y": 3029.6,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5581.114117530697,
+      "y": 4460.197540494268,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 325
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5078.979915732932,
+      "y": 3293.562731040091,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 404
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 6108.700648837592,
+      "y": 3747.0678149109485,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 483
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5093.607491888169,
+      "y": 4245.492013022732,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 562
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5559.561323630967,
+      "y": 3057.590888240106,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 641
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5888.101438862229,
+      "y": 4309.462695699352,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 720
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 4938.0648502617405,
+      "y": 3652.8111229804426,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 799
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 6009.342625158368,
+      "y": 3368.473229585094,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 878
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5380.920223241694,
+      "y": 4444.078424503348,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 957
+    },
+    {
+      "room": "polar_crystal_mobs",
+      "x": 5998.4,
+      "y": 3223.2,
+      "theme": "martial_snow",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 775
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 6716,
+      "y": 4367.2,
+      "theme": "martial_volcanic",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 962
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7842.08,
+      "y": 3214.4,
+      "theme": "martial_volcanic",
+      "model": "models/props_tree/tree_dead_02.vmdl",
+      "scale": 0.55,
+      "yaw": 1378
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7731.68,
+      "y": 4428.8,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7084,
+      "y": 4490.4,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7474.08,
+      "y": 4490.4,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7878.88,
+      "y": 3469.6,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 6657.12,
+      "y": 3980,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7032.48,
+      "y": 3029.6,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7147.552659910518,
+      "y": 4449.112632383119,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 338
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 6967.008550463089,
+      "y": 3154.9366912782843,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 417
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7831.938907564758,
+      "y": 3962.4092883213543,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 496
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 6738.0636924162945,
+      "y": 4066.8262236241067,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 575
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7484.888202553982,
+      "y": 3105.501979367704,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 654
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7478.365472380411,
+      "y": 4417.534569768085,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 733
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 6741.1517861825605,
+      "y": 3445.663067133498,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 812
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 7833.911529929557,
+      "y": 3565.6207101802906,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 891
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 6961.013924348652,
+      "y": 4360.742330958391,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 970
+    },
+    {
+      "room": "molten_core_mobs",
+      "x": 6789.6,
+      "y": 3223.2,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 806
+    },
+    {
+      "room": "seven_sins",
+      "x": 7739.5,
+      "y": 10988,
+      "theme": "martial_volcanic",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 999
+    },
+    {
+      "room": "seven_sins",
+      "x": 6787.3,
+      "y": 11072,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "seven_sins",
+      "x": 7049.5,
+      "y": 11156,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "seven_sins",
+      "x": 7415.2,
+      "y": 11156,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "seven_sins",
+      "x": 7794.7,
+      "y": 9764,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "seven_sins",
+      "x": 6649.3,
+      "y": 10460,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "seven_sins",
+      "x": 7001.2,
+      "y": 9164,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "seven_sins",
+      "x": 6949.6316797449945,
+      "y": 10994.999062737152,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 351
+    },
+    {
+      "room": "seven_sins",
+      "x": 7097.998338420572,
+      "y": 9224.536000940385,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 430
+    },
+    {
+      "room": "seven_sins",
+      "x": 7677.076803662124,
+      "y": 10703.347052735347,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 509
+    },
+    {
+      "room": "seven_sins",
+      "x": 6675.475222080011,
+      "y": 10294.877017364908,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 588
+    },
+    {
+      "room": "seven_sins",
+      "x": 7572.192351979088,
+      "y": 9417.920325658346,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 667
+    },
+    {
+      "room": "seven_sins",
+      "x": 7252.53884099053,
+      "y": 11118.529717184087,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 746
+    },
+    {
+      "room": "seven_sins",
+      "x": 6826.810627405854,
+      "y": 9489.747704780268,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 825
+    },
+    {
+      "room": "seven_sins",
+      "x": 7773.747315546469,
+      "y": 10189.043987877083,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 904
+    },
+    {
+      "room": "seven_sins",
+      "x": 6804.2251432166895,
+      "y": 10787.457844649263,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 983
+    },
+    {
+      "room": "seven_sins",
+      "x": 7670.5,
+      "y": 9428,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 837
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -9050.5,
+      "y": 14312,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1036
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8225.26,
+      "y": 14368,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8751.5,
+      "y": 14424,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8434.56,
+      "y": 14424,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8105.66,
+      "y": 13496,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -9098.34,
+      "y": 13960,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8793.36,
+      "y": 13096,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8953.738060414486,
+      "y": 14193.797488251064,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 364
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8562.135418660333,
+      "y": 13122.225860418033,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 443
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8308.9998395899,
+      "y": 14265.921740629276,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 522
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -9073.581497586641,
+      "y": 13652.330951356176,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 601
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8200.155114549785,
+      "y": 13412.721686700925,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 680
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8722.511129643897,
+      "y": 14379.361336754118,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 759
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8826.279476644693,
+      "y": 13194.689166686188,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 838
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8151.0274675397695,
+      "y": 13973.587864835583,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 917
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -9042.199582866117,
+      "y": 14010.602833749814,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 996
+    },
+    {
+      "room": "training_p0_wood",
+      "x": -8990.7,
+      "y": 13272,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 868
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -6681.5,
+      "y": 14312,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1073
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7506.74,
+      "y": 14368,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7279.5,
+      "y": 14424,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -6962.56,
+      "y": 14424,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -6633.66,
+      "y": 13496,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7626.34,
+      "y": 13960,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7321.36,
+      "y": 13096,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7563.891381257403,
+      "y": 14029.573779362414,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 377
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -6946.603135179422,
+      "y": 13168.895219781974,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 456
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -6966.3321190263,
+      "y": 14361.381146182313,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 535
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7554.550974646818,
+      "y": 13465.008289501051,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 614
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -6668.11928977964,
+      "y": 13593.270191198442,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 693
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7386.000584134593,
+      "y": 14300.657374304415,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 772
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7214.680293042019,
+      "y": 13130.1058955102,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 851
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -6749.228443290437,
+      "y": 14147.451129021552,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 930
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -7606.362137880646,
+      "y": 13819.009752810694,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1009
+    },
+    {
+      "room": "training_p0_gold",
+      "x": -6741.3,
+      "y": 13272,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 899
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -6106.5,
+      "y": 14312,
+      "theme": "martial_snow",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1110
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5281.26,
+      "y": 14368,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5807.5,
+      "y": 14424,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5490.56,
+      "y": 14424,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5161.66,
+      "y": 13496,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -6154.34,
+      "y": 13960,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5849.36,
+      "y": 13096,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -6132.680595696525,
+      "y": 13839.650831044519,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 390
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5348.554599378807,
+      "y": 13271.916288538885,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 469
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5639.267325683472,
+      "y": 14399.509166982252,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 548
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5995.046792981084,
+      "y": 13305.808031151513,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 627
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5180.115874199205,
+      "y": 13789.713525254378,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 706
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -6025.084770719552,
+      "y": 14170.410997958601,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 785
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5595.008294898655,
+      "y": 13125.572230956343,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 864
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -5383.729460635912,
+      "y": 14284.377568879107,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 943
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -6125.111727786413,
+      "y": 13621.791103354753,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1022
+    },
+    {
+      "room": "training_p0_attributes",
+      "x": -6046.7,
+      "y": 13272,
+      "theme": "martial_snow",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 930
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -3737.5,
+      "y": 14312,
+      "theme": "martial_volcanic",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1147
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4562.74,
+      "y": 14368,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4335.5,
+      "y": 14424,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4018.56,
+      "y": 14424,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -3689.66,
+      "y": 13496,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4682.34,
+      "y": 13960,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4377.36,
+      "y": 13096,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4656.217151252896,
+      "y": 13642.134541183568,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 403
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -3780.0063787039894,
+      "y": 13421.467773540358,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 482
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4313.988371762968,
+      "y": 14376.670949751382,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 561
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4403.410976509596,
+      "y": 13189.907192285145,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 640
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -3737.6705191891915,
+      "y": 13983.324183960336,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 719
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4629.1737161654655,
+      "y": 14001.038967308134,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 798
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -3981.34147617328,
+      "y": 13181.520380233847,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 877
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4044.377472975399,
+      "y": 14371.31359525571,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 956
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -4599.330220635993,
+      "y": 13437.74830332504,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1035
+    },
+    {
+      "room": "training_p0_greater_attributes",
+      "x": -3797.3,
+      "y": 13272,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 961
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 701.5,
+      "y": 14312,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1184
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1526.74,
+      "y": 14368,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1000.5,
+      "y": 14424,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1317.44,
+      "y": 14424,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1646.34,
+      "y": 13496,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 653.6600000000001,
+      "y": 13960,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 958.64,
+      "y": 13096,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 729.0734391482049,
+      "y": 13455.85470263374,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 416
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1613.8373088181238,
+      "y": 13603.292503969778,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 495
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 887.4920797136962,
+      "y": 14295.04372706084,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 574
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1072.9512501976392,
+      "y": 13128.354931373973,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 653
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1526.034304090337,
+      "y": 14155.644709451144,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 732
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 672.9863563288,
+      "y": 13808.688002477638,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 811
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1476.8146601055387,
+      "y": 13292.6166462476,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 890
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 1145.473234111059,
+      "y": 14399.971348099974,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 969
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 829.8552386665656,
+      "y": 13284.426679252858,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1048
+    },
+    {
+      "room": "training_p1_wood",
+      "x": 761.3,
+      "y": 13272,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 992
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 3070.5,
+      "y": 14312,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1221
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2245.26,
+      "y": 14368,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2472.5,
+      "y": 14424,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2789.44,
+      "y": 14424,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 3118.34,
+      "y": 13496,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2125.66,
+      "y": 13960,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2430.64,
+      "y": 13096,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2290.4921625414836,
+      "y": 13298.569905206909,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 429
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 3099.4620590098816,
+      "y": 13800.056608215018,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 508
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2249.9981620639082,
+      "y": 14162.409255522234,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 587
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2692.6587546005685,
+      "y": 13127.019201504194,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 666
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2889.8907016168714,
+      "y": 14290.247293155673,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 745
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2156.6215038422943,
+      "y": 13611.695471112133,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 824
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 3039.814620071867,
+      "y": 13448.26990419779,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 903
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2471.7554907372964,
+      "y": 14367.618801865532,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 982
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 2425.561013754233,
+      "y": 13176.442820095903,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1061
+    },
+    {
+      "room": "training_p1_gold",
+      "x": 3010.7,
+      "y": 13272,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1023
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3645.5,
+      "y": 14312,
+      "theme": "martial_snow",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1258
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 4470.74,
+      "y": 14368,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3944.5,
+      "y": 14424,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 4261.44,
+      "y": 14424,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 4590.34,
+      "y": 13496,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3597.66,
+      "y": 13960,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3902.64,
+      "y": 13096,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3883.514476267871,
+      "y": 13185.274558512243,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 442
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 4539.568985465604,
+      "y": 13993.002001428062,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 521
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3647.968243634855,
+      "y": 13991.41195867224,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 600
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 4305.630157827237,
+      "y": 13186.027341624787,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 679
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 4228.208312329632,
+      "y": 14374.299885775214,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 758
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3684.622514483375,
+      "y": 13428.84123467036,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 837
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 4562.983117261429,
+      "y": 13633.64128380013,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 916
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3812.3609861651853,
+      "y": 14277.34021732059,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 995
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 4039.9938792611106,
+      "y": 13124.091136006125,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1074
+    },
+    {
+      "room": "training_p1_attributes",
+      "x": 3705.3,
+      "y": 13272,
+      "theme": "martial_snow",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1054
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 6014.5,
+      "y": 14312,
+      "theme": "martial_volcanic",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1295
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5189.26,
+      "y": 14368,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5416.5,
+      "y": 14424,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5733.44,
+      "y": 14424,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 6062.34,
+      "y": 13496,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5069.66,
+      "y": 13960,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5374.64,
+      "y": 13096,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5496.602977008352,
+      "y": 13126.769432000736,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 455
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5937.198546107747,
+      "y": 14163.734647405987,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 534
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5088.459808292864,
+      "y": 13798.353497910928,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 613
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5898.426252797612,
+      "y": 13299.753936961286,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 692
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5553.731460761558,
+      "y": 14399.789513245716,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 771
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5251.650651731937,
+      "y": 13277.557310517224,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 850
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 6041.442112483547,
+      "y": 13831.058801232617,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 929
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5179.815934333901,
+      "y": 14137.742110147205,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1008
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5659.575302727878,
+      "y": 13132.362462765588,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1087
+    },
+    {
+      "room": "training_p1_greater_attributes",
+      "x": 5954.7,
+      "y": 13272,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1085
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -9050.5,
+      "y": -6008,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1332
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8225.26,
+      "y": -5952,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8751.5,
+      "y": -5896,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8434.56,
+      "y": -5896,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8105.66,
+      "y": -6824,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -9098.34,
+      "y": -6360,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8793.36,
+      "y": -7224,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8523.692705558025,
+      "y": -7191.368013279239,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 468
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8340.559312363252,
+      "y": -6024.021885326672,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 547
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -9065.523354699584,
+      "y": -6718.361311506005,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 626
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8180.468797726278,
+      "y": -6862.642894103795,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 705
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8759.57579587009,
+      "y": -5955.7138235257435,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 784
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8791.353388538118,
+      "y": -7147.733972151153,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 863
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8165.424148750507,
+      "y": -6298.297920100814,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 942
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -9055.913085942735,
+      "y": -6357.86723281529,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1021
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8369.76407506116,
+      "y": -7119.531728863577,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1100
+    },
+    {
+      "room": "training_p2_wood",
+      "x": -8990.7,
+      "y": -7048,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1116
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -6681.5,
+      "y": -6008,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1369
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7506.74,
+      "y": -5952,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7279.5,
+      "y": -5896,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -6962.56,
+      "y": -5896,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -6633.66,
+      "y": -6824,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7626.34,
+      "y": -6360,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7321.36,
+      "y": -7224,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -6911.453646480317,
+      "y": -7129.315339996471,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 481
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7003.241059366784,
+      "y": -5942.874744751061,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 560
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7535.317510505777,
+      "y": -6899.979084147522,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 639
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -6659.54962343851,
+      "y": -6676.187912446106,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 718
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7417.860901178648,
+      "y": -6048.825489897082,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 797
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7176.305828684862,
+      "y": -7196.9948942008605,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 876
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -6773.910434590899,
+      "y": -6132.6034492388035,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 955
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -7608.369273441271,
+      "y": -6552.74647061942,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1034
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -6781.243167822446,
+      "y": -6998.084160391539,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1113
+    },
+    {
+      "room": "training_p2_gold",
+      "x": -6741.3,
+      "y": -7048,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1147
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -6106.5,
+      "y": -6008,
+      "theme": "martial_snow",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1406
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5281.26,
+      "y": -5952,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5807.5,
+      "y": -5896,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5490.56,
+      "y": -5896,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5161.66,
+      "y": -6824,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -6154.34,
+      "y": -6360,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5849.36,
+      "y": -7224,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5320.049236376165,
+      "y": -7012.988206979838,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 494
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5678.007098740424,
+      "y": -5920.559919877618,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 573
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5966.47158873473,
+      "y": -7049.185678279365,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 652
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5183.479829143959,
+      "y": -6478.656404770944,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 731
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -6048.703403429869,
+      "y": -6190.668884392468,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 810
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5556.843801737827,
+      "y": -7185.529271035402,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 889
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5416.343757199289,
+      "y": -6007.653914012684,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 968
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -6115.221149857186,
+      "y": -6748.317208126153,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1047
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -5225.970246919473,
+      "y": -6834.87277588854,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1126
+    },
+    {
+      "room": "training_p2_attributes",
+      "x": -6046.7,
+      "y": -7048,
+      "theme": "martial_snow",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1178
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -3737.5,
+      "y": -6008,
+      "theme": "martial_volcanic",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1443
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4562.74,
+      "y": -5952,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4335.5,
+      "y": -5896,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4018.56,
+      "y": -5896,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -3689.66,
+      "y": -6824,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4682.34,
+      "y": -6360,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4377.36,
+      "y": -7224,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -3760.8626391847038,
+      "y": -6853.476412542002,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 507
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4350.8658041662675,
+      "y": -5959.204746787031,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 586
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4368.21818811035,
+      "y": -7151.756802517982,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 665
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -3752.647399973265,
+      "y": -6288.879614690244,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 744
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4642.299032731084,
+      "y": -6367.721670510134,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 823
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -3947.0252845009695,
+      "y": -7114.430153305444,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 902
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4081.814860625964,
+      "y": -5935.361110999793,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 981
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -4578.4848263002195,
+      "y": -6925.935127551959,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1060
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -3711.8839580815115,
+      "y": -6645.456983461121,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1139
+    },
+    {
+      "room": "training_p2_greater_attributes",
+      "x": -3797.3,
+      "y": -7048,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1209
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 701.5,
+      "y": -6008,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1480
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1526.74,
+      "y": -5952,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1000.5,
+      "y": -5896,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1317.44,
+      "y": -5896,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1646.34,
+      "y": -6824,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 653.6600000000001,
+      "y": -6360,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 958.64,
+      "y": -7224,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1621.7943974102084,
+      "y": -6665.986672286918,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 520
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 855.9926190729461,
+      "y": -6055.125103596984,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 599
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1111.4065935722604,
+      "y": -7197.914058212844,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 678
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1500.872286349391,
+      "y": -6124.949506407394,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 757
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 671.6056298774871,
+      "y": -6563.10489973804,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 836
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1504.0110895850553,
+      "y": -6990.475623263911,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 915
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1106.7817686175238,
+      "y": -5922.6169198852895,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 994
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 859.6681983442618,
+      "y": -7068.66740461013,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1073
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 1621.0034924001106,
+      "y": -6447.894332373849,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1152
+    },
+    {
+      "room": "training_p3_wood",
+      "x": 761.3,
+      "y": -7048,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1240
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 3070.5,
+      "y": -6008,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1517
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2245.26,
+      "y": -5952,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2472.5,
+      "y": -5896,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2789.44,
+      "y": -5896,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 3118.34,
+      "y": -6824,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2125.66,
+      "y": -6360,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2430.64,
+      "y": -7224,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 3095.4739246601894,
+      "y": -6468.392919416614,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 533
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2226.879606864247,
+      "y": -6199.176628338641,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 612
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2730.710595075589,
+      "y": -7183.25714215826,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 691
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2856.9423140394215,
+      "y": -6002.494006022582,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 770
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2167.1169961070837,
+      "y": -6758.192129993193,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 849
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 3057.298573948301,
+      "y": -6825.482620797956,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 928
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2435.4985154727233,
+      "y": -5970.636280859419,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 1007
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 2461.4993840559005,
+      "y": -7162.906963081772,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1086
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 3044.9888327735825,
+      "y": -6261.0190352292075,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1165
+    },
+    {
+      "room": "training_p3_gold",
+      "x": 3010.7,
+      "y": -7048,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1271
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 3645.5,
+      "y": -6008,
+      "theme": "martial_snow",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1554
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4470.74,
+      "y": -5952,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 3944.5,
+      "y": -5896,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4261.44,
+      "y": -5896,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4590.34,
+      "y": -6824,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 3597.66,
+      "y": -6360,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 3902.64,
+      "y": -7224,
+      "theme": "martial_snow",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4524.015828428666,
+      "y": -6279.532331555512,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 546
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 3635.4345518678165,
+      "y": -6377.626477138096,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 625
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4339.650904613211,
+      "y": -7109.183340083842,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 704
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4190.614618943354,
+      "y": -5933.187146638209,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 783
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 3705.9936601671575,
+      "y": -6934.385137621304,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 862
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4569.087800203638,
+      "y": -6635.18040075035,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 941
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 3781.9949822847816,
+      "y": -6074.841370894171,
+      "theme": "martial_snow",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 1020
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4078.6315525539367,
+      "y": -7199.669676311107,
+      "theme": "martial_snow",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1099
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 4428.649437874003,
+      "y": -6102.646448610066,
+      "theme": "martial_snow",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1178
+    },
+    {
+      "room": "training_p3_attributes",
+      "x": 3705.3,
+      "y": -7048,
+      "theme": "martial_snow",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1302
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 6014.5,
+      "y": -6008,
+      "theme": "martial_volcanic",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1591
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5189.26,
+      "y": -5952,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5416.5,
+      "y": -5896,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5733.44,
+      "y": -5896,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 6062.34,
+      "y": -6824,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5069.66,
+      "y": -6360,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5374.64,
+      "y": -7224,
+      "theme": "martial_volcanic",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5911.563093329479,
+      "y": -6117.409528728863,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 559
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5087.705852643825,
+      "y": -6573.462515501935,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 638
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5925.172610796321,
+      "y": -6982.7543194093505,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 717
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5515.076375883522,
+      "y": -5923.63614939285,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 796
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5281.860078390317,
+      "y": -7074.886939252909,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 875
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 6035.5855476058605,
+      "y": -6437.711018066082,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 954
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5158.2357798412995,
+      "y": -6225.298020706153,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 1033
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5697.228839104278,
+      "y": -7175.450849696217,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1112
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5780.4069548880125,
+      "y": -5987.874684180624,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1191
+    },
+    {
+      "room": "training_p3_greater_attributes",
+      "x": 5954.7,
+      "y": -7048,
+      "theme": "martial_volcanic",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1333
+    },
+    {
+      "room": "endless_p0",
+      "x": -540.5,
+      "y": -9712.8,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1628
+    },
+    {
+      "room": "endless_p0",
+      "x": 655.96,
+      "y": -10865.6,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_02.vmdl",
+      "scale": 0.55,
+      "yaw": 2332
+    },
+    {
+      "room": "endless_p0",
+      "x": 538.6600000000001,
+      "y": -9651.2,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "endless_p0",
+      "x": -149.5,
+      "y": -9589.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p0",
+      "x": 264.96000000000004,
+      "y": -9589.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p0",
+      "x": 695.06,
+      "y": -10610.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "endless_p0",
+      "x": -603.06,
+      "y": -10100,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "endless_p0",
+      "x": -204.24,
+      "y": -11050.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p0",
+      "x": 344.372021739531,
+      "y": -9701.228155582245,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 572
+    },
+    {
+      "room": "endless_p0",
+      "x": -545.6336043996894,
+      "y": -10548.816647132815,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 651
+    },
+    {
+      "room": "endless_p0",
+      "x": 619.3620922692082,
+      "y": -10601.625212320738,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 730
+    },
+    {
+      "room": "endless_p0",
+      "x": -207.17861010872056,
+      "y": -9676.226691989132,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 809
+    },
+    {
+      "room": "endless_p0",
+      "x": -154.3196725556908,
+      "y": -10986.933405898317,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 888
+    },
+    {
+      "room": "endless_p0",
+      "x": 594.3367805967584,
+      "y": -9981.08977318442,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 967
+    },
+    {
+      "room": "endless_p0",
+      "x": -561.6193526403742,
+      "y": -10152.429044281222,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 1046
+    },
+    {
+      "room": "endless_p0",
+      "x": 392.95130664090055,
+      "y": -10905.81526657465,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1125
+    },
+    {
+      "room": "endless_p0",
+      "x": 142.40888783646074,
+      "y": -9624.409788769159,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1204
+    },
+    {
+      "room": "endless_p0",
+      "x": -462.3,
+      "y": -10856.8,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1364
+    },
+    {
+      "room": "endless_p1",
+      "x": 3944.5,
+      "y": -9712.8,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1665
+    },
+    {
+      "room": "endless_p1",
+      "x": 2748.04,
+      "y": -10865.6,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_02.vmdl",
+      "scale": 0.55,
+      "yaw": 2385
+    },
+    {
+      "room": "endless_p1",
+      "x": 2865.34,
+      "y": -9651.2,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "endless_p1",
+      "x": 3162.5,
+      "y": -9589.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p1",
+      "x": 3576.96,
+      "y": -9589.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p1",
+      "x": 4007.06,
+      "y": -10610.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "endless_p1",
+      "x": 2708.94,
+      "y": -10100,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "endless_p1",
+      "x": 3107.76,
+      "y": -11050.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p1",
+      "x": 3474.409186265133,
+      "y": -9628.295119319993,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 585
+    },
+    {
+      "room": "endless_p1",
+      "x": 2856.5964922273047,
+      "y": -10741.010781774416,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 664
+    },
+    {
+      "room": "endless_p1",
+      "x": 3980.37667606364,
+      "y": -10391.37253628818,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 743
+    },
+    {
+      "room": "endless_p1",
+      "x": 2942.371452369851,
+      "y": -9793.826370437615,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 822
+    },
+    {
+      "room": "endless_p1",
+      "x": 3348.0252920306816,
+      "y": -11023.910509452164,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 901
+    },
+    {
+      "room": "endless_p1",
+      "x": 3788.3256391230375,
+      "y": -9809.006707779192,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 980
+    },
+    {
+      "room": "endless_p1",
+      "x": 2733.9175195903777,
+      "y": -10369.005284285582,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 1059
+    },
+    {
+      "room": "endless_p1",
+      "x": 3847.2198094156247,
+      "y": -10758.787153555335,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1138
+    },
+    {
+      "room": "endless_p1",
+      "x": 3261.248515021235,
+      "y": -9624.470029323265,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1217
+    },
+    {
+      "room": "endless_p1",
+      "x": 3866.3,
+      "y": -10856.8,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1395
+    },
+    {
+      "room": "endless_p2",
+      "x": 6083.5,
+      "y": -9712.8,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1702
+    },
+    {
+      "room": "endless_p2",
+      "x": 7279.96,
+      "y": -10865.6,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_02.vmdl",
+      "scale": 0.55,
+      "yaw": 2438
+    },
+    {
+      "room": "endless_p2",
+      "x": 7162.66,
+      "y": -9651.2,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "endless_p2",
+      "x": 6474.5,
+      "y": -9589.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p2",
+      "x": 6888.96,
+      "y": -9589.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p2",
+      "x": 7319.0599999999995,
+      "y": -10610.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "endless_p2",
+      "x": 6020.9400000000005,
+      "y": -10100,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "endless_p2",
+      "x": 6419.76,
+      "y": -11050.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p2",
+      "x": 6593.348730107198,
+      "y": -9621.30428776703,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 598
+    },
+    {
+      "room": "endless_p2",
+      "x": 6306.626819378909,
+      "y": -10893.068754402395,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 677
+    },
+    {
+      "room": "endless_p2",
+      "x": 7282.058311189374,
+      "y": -10174.315712229498,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 756
+    },
+    {
+      "room": "endless_p2",
+      "x": 6131.54457308665,
+      "y": -9961.58768596913,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 835
+    },
+    {
+      "room": "endless_p2",
+      "x": 6851.321174057716,
+      "y": -10993.781810794982,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 914
+    },
+    {
+      "room": "endless_p2",
+      "x": 6941.290323642027,
+      "y": -9685.638094478987,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 993
+    },
+    {
+      "room": "endless_p2",
+      "x": 6088.949959697121,
+      "y": -10580.909710372684,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 1072
+    },
+    {
+      "room": "endless_p2",
+      "x": 7254.849588478281,
+      "y": -10569.928206156039,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1151
+    },
+    {
+      "room": "endless_p2",
+      "x": 6389.311738000392,
+      "y": -9690.83713135668,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1230
+    },
+    {
+      "room": "endless_p2",
+      "x": 6161.7,
+      "y": -10856.8,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1426
+    },
+    {
+      "room": "endless_p3",
+      "x": 10568.5,
+      "y": -9712.8,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_01.vmdl",
+      "scale": 0.63,
+      "yaw": 1739
+    },
+    {
+      "room": "endless_p3",
+      "x": 9372.04,
+      "y": -10865.6,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_02.vmdl",
+      "scale": 0.55,
+      "yaw": 2491
+    },
+    {
+      "room": "endless_p3",
+      "x": 9489.34,
+      "y": -9651.2,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "endless_p3",
+      "x": 9786.5,
+      "y": -9589.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p3",
+      "x": 10200.96,
+      "y": -9589.6,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p3",
+      "x": 10631.06,
+      "y": -10610.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "endless_p3",
+      "x": 9332.94,
+      "y": -10100,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "endless_p3",
+      "x": 9731.76,
+      "y": -11050.4,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "endless_p3",
+      "x": 9719.595658748296,
+      "y": -9680.922116890679,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 611
+    },
+    {
+      "room": "endless_p3",
+      "x": 9791.298551169477,
+      "y": -10990.494443565569,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 690
+    },
+    {
+      "room": "endless_p3",
+      "x": 10525.390676882753,
+      "y": -9971.14738801434,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 769
+    },
+    {
+      "room": "endless_p3",
+      "x": 9372.0501897567,
+      "y": -10163.517472538351,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 848
+    },
+    {
+      "room": "endless_p3",
+      "x": 10337.331189941824,
+      "y": -10899.41956494473,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 927
+    },
+    {
+      "room": "endless_p3",
+      "x": 10068.392125655888,
+      "y": -9622.74501605215,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1006
+    },
+    {
+      "room": "endless_p3",
+      "x": 9499.375562081865,
+      "y": -10767.940867508547,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 1085
+    },
+    {
+      "room": "endless_p3",
+      "x": 10606.723983467798,
+      "y": -10357.242888012086,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1164
+    },
+    {
+      "room": "endless_p3",
+      "x": 9544.133775828559,
+      "y": -9817.184129207479,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1243
+    },
+    {
+      "room": "endless_p3",
+      "x": 10490.3,
+      "y": -10856.8,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1457
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -11321.52,
+      "y": -1267.2,
+      "theme": "martial_forest",
+      "model": "models/props_tree/tree_dead_02.vmdl",
+      "scale": 0.55,
+      "yaw": 2544
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -11638.92,
+      "y": 2265.6,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "scale": 1.3,
+      "yaw": 180
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -13501,
+      "y": 2444.7999999999997,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -12379.52,
+      "y": 2444.7999999999997,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -11215.72,
+      "y": -524.8000000000001,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -14728.28,
+      "y": 960,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 90
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -13649.12,
+      "y": -1804.7999999999997,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_1.vmdl",
+      "scale": 0.72,
+      "yaw": 0
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -14116.971540367267,
+      "y": 1828.465255214667,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 624
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -12971.59304198633,
+      "y": -1727.9999408182407,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 703
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -11827.62808612596,
+      "y": 1829.1311095331262,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 782
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -14658.565467298627,
+      "y": 144.39218610535394,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 861
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -11631.326030036687,
+      "y": -930.3842754789835,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 940
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -13260.831512672446,
+      "y": 2337.968728571086,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1019
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -13887.099288395324,
+      "y": -1402.9630270008852,
+      "theme": "martial_forest",
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "scale": 0.88,
+      "yaw": 1098
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -11334.828464943685,
+      "y": 840.7066215832072,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "scale": 0.75,
+      "yaw": 1177
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -14469.16780897612,
+      "y": 1275.7352663585498,
+      "theme": "martial_forest",
+      "model": "models/props_nature/branches001.vmdl",
+      "scale": 0.9,
+      "yaw": 1256
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -14347.4,
+      "y": -1241.6,
+      "theme": "martial_forest",
+      "model": "models/props_nature/stump001.vmdl",
+      "scale": 0.74,
+      "yaw": 1488
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -14495.52,
+      "y": -396.80000000000007,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_2.vmdl",
+      "scale": 1.05,
+      "yaw": 35
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -14347.4,
+      "y": -473.60000000000014,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks003.vmdl",
+      "scale": 1.15,
+      "yaw": 35
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -12337.2,
+      "y": 2291.2,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_2.vmdl",
+      "scale": 1.05,
+      "yaw": 165
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -12189.08,
+      "y": 2214.4,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks003.vmdl",
+      "scale": 1.15,
+      "yaw": 165
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -11490.8,
+      "y": -576,
+      "theme": "martial_forest",
+      "model": "maps/journey_assets/props/walls_128/wall_jrny_radiant_128_str_2.vmdl",
+      "scale": 1.05,
+      "yaw": 280
+    },
+    {
+      "room": "original_challenge_reserve",
+      "x": -11342.68,
+      "y": -652.8,
+      "theme": "martial_forest",
+      "model": "models/props_nature/chipped_rocks003.vmdl",
+      "scale": 1.15,
+      "yaw": 280
+    }
+  ]
+}

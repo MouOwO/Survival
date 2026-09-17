@@ -1,0 +1,9 @@
+{
+  "particles": 6,
+  "fragment_model": "wall_death_shard",
+  "fragment_triangles": 8,
+  "shake_seconds": 1.0,
+  "burst_seconds": 0.34,
+  "fragment_max_lifetime": 1.45,
+  "cleanup_seconds": 2.6
+}

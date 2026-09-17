@@ -1,0 +1,2489 @@
+{
+  "map": "survival_world_v2",
+  "builtAt": "2026-09-13T02:34:03.562Z",
+  "checkedAt": "2026-09-13T02:40:35.990Z",
+  "vpkBytes": 17226516,
+  "vpkSha256": "eec4147a78ccd697537b0ab80bbc17eb73fe71e6bbab764386bcfd01b3af19c3",
+  "materials": [
+    {
+      "name": "ocean_water.vmat_c",
+      "modifiedAt": "2026-09-13T01:30:41.478Z",
+      "sha256": "9d70dffcb8b306d7e771de0186e0d7e6aab67ce77c03bfacc3b705db19ac1e22"
+    },
+    {
+      "name": "shallow_water.vmat_c",
+      "modifiedAt": "2026-09-12T15:13:15.893Z",
+      "sha256": "d3bca22919e1b3fded67d6f7100c409d475c7945e722a5afc5b6b66e3c550c4c"
+    },
+    {
+      "name": "stone_paving.vmat_c",
+      "modifiedAt": "2026-09-12T13:56:36.578Z",
+      "sha256": "d7f8af3d82d41f2a106e597e51b3c2dfff3e4fb98149aaedc0559caa8a83c8b5"
+    },
+    {
+      "name": "transition_corrupt.vmat_c",
+      "modifiedAt": "2026-09-13T01:30:37.213Z",
+      "sha256": "6825305b1d7296b50482efecddd66d73a8faa931724526a3790435aa0b35f707"
+    },
+    {
+      "name": "transition_forest.vmat_c",
+      "modifiedAt": "2026-09-13T02:17:32.837Z",
+      "sha256": "52ee262afce081ec268abafaaad0b2fa1858f0857e330cd849af254a9558bbd1"
+    },
+    {
+      "name": "transition_snow.vmat_c",
+      "modifiedAt": "2026-09-13T01:30:25.097Z",
+      "sha256": "97490bfd6f906ba0b47d1545142195f59b7752a7db02b8f415c51af50df7cf24"
+    },
+    {
+      "name": "transition_thaw.vmat_c",
+      "modifiedAt": "2026-09-13T01:30:29.031Z",
+      "sha256": "675e98f8bbd8c754c43bd5f46513897d38d821394efa4663641abe15a7928821"
+    },
+    {
+      "name": "transition_volcanic.vmat_c",
+      "modifiedAt": "2026-09-13T01:55:37.713Z",
+      "sha256": "4f87e3ae4cdbf529ce375974923e5b11bb4aaba2c4c577bc4bb9231fe19be991"
+    }
+  ],
+  "navigation": {
+    "samples": 132,
+    "failures": 0,
+    "shallowCrossingSamples": 50,
+    "continuousHeight": "09/13 10:36:55 [VScript] [WORLD_V2_SHALLOW_HEIGHT]\t396\t396\tPASS",
+    "paths": "09/13 10:36:55 [VScript] [WORLD_V2_SHALLOW_PATH]\ttrue\ttrue\tPASS"
+  },
+  "elevation": "09/13 10:36:55 [VScript] [WORLD_V2_ELEVATION]\t268\t652\tPASS",
+  "compiledLilyModels": 0,
+  "missingProjectMaterials": 0,
+  "screenshots": [
+    {
+      "view": "overview",
+      "source": "world_v2_overview_0025.tga",
+      "timestamp": "2026-09-13T02:37:07.743Z"
+    },
+    {
+      "view": "central_island",
+      "source": "world_v2_central_island_0025.tga",
+      "timestamp": "2026-09-13T02:37:15.745Z"
+    },
+    {
+      "view": "upper_training",
+      "source": "world_v2_upper_training_0025.tga",
+      "timestamp": "2026-09-13T02:37:39.742Z"
+    },
+    {
+      "view": "lower_training",
+      "source": "world_v2_lower_training_0025.tga",
+      "timestamp": "2026-09-13T02:37:47.741Z"
+    },
+    {
+      "view": "snow_camps",
+      "source": "world_v2_snow_camps_0025.tga",
+      "timestamp": "2026-09-13T02:37:55.743Z"
+    },
+    {
+      "view": "boss_islands",
+      "source": "world_v2_boss_islands_0025.tga",
+      "timestamp": "2026-09-13T02:38:03.741Z"
+    },
+    {
+      "view": "tree_close",
+      "source": "world_v2_tree_close_0024.tga",
+      "timestamp": "2026-09-13T02:38:11.745Z"
+    },
+    {
+      "view": "shallow_lake",
+      "source": "world_v2_shallow_lake_0018.tga",
+      "timestamp": "2026-09-13T02:37:23.740Z"
+    },
+    {
+      "view": "volcanic_arena",
+      "source": "world_v2_volcanic_arena_0018.tga",
+      "timestamp": "2026-09-13T02:37:31.744Z"
+    },
+    {
+      "view": "camp_transition",
+      "source": "world_v2_camp_transition_0006.tga",
+      "timestamp": "2026-09-13T02:38:19.739Z"
+    },
+    {
+      "view": "mountain_canopy",
+      "source": "world_v2_mountain_canopy_0006.tga",
+      "timestamp": "2026-09-13T02:38:27.743Z"
+    },
+    {
+      "view": "grass_paving",
+      "source": "world_v2_grass_paving_0006.tga",
+      "timestamp": "2026-09-13T02:38:35.744Z"
+    }
+  ],
+  "terrainSeams": [
+    "09/13 10:36:55 [VScript] [WORLD_V2_TERRAIN_SEAM]\tdirt_paving\t396\t396\tPASS",
+    "09/13 10:36:55 [VScript] [WORLD_V2_TERRAIN_SEAM]\tgrass_paving\t396\t396\tPASS",
+    "09/13 10:36:55 [VScript] [WORLD_V2_TERRAIN_SEAM]\tgrass_snow\t524\t524\tPASS"
+  ],
+  "terrain": {
+    "mainIsland": "four rotated original U islands",
+    "sourceMap": "template_map.vmap",
+    "crossCenter": [
+      -1152,
+      2688
+    ],
+    "crossLength": 3584,
+    "crossWidth": 640,
+    "groundSurfaceZ": 396,
+    "waterZ": 416,
+    "transitionWidth": 440,
+    "architecture": "continuous closed heightfield",
+    "preserved": [
+      -5632,
+      -1792,
+      3328,
+      7168
+    ],
+    "gridStep": 128,
+    "meshAudit": [
+      {
+        "chunk": [
+          0,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          0
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          16
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          32
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          48
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          64
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          80
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          96
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          112
+        ],
+        "vertices": 186,
+        "topTriangles": 176
+      },
+      {
+        "chunk": [
+          96,
+          112
+        ],
+        "vertices": 88,
+        "topTriangles": 64
+      },
+      {
+        "chunk": [
+          112,
+          112
+        ],
+        "vertices": 88,
+        "topTriangles": 64
+      },
+      {
+        "chunk": [
+          128,
+          112
+        ],
+        "vertices": 88,
+        "topTriangles": 64
+      },
+      {
+        "chunk": [
+          144,
+          112
+        ],
+        "vertices": 214,
+        "topTriangles": 232
+      },
+      {
+        "chunk": [
+          160,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          112
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          128
+        ],
+        "vertices": 126,
+        "topTriangles": 128
+      },
+      {
+        "chunk": [
+          144,
+          128
+        ],
+        "vertices": 164,
+        "topTriangles": 192
+      },
+      {
+        "chunk": [
+          160,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          128
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          144
+        ],
+        "vertices": 126,
+        "topTriangles": 128
+      },
+      {
+        "chunk": [
+          144,
+          144
+        ],
+        "vertices": 164,
+        "topTriangles": 192
+      },
+      {
+        "chunk": [
+          160,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          144
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          160
+        ],
+        "vertices": 126,
+        "topTriangles": 128
+      },
+      {
+        "chunk": [
+          144,
+          160
+        ],
+        "vertices": 164,
+        "topTriangles": 192
+      },
+      {
+        "chunk": [
+          160,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          160
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          176
+        ],
+        "vertices": 258,
+        "topTriangles": 320
+      },
+      {
+        "chunk": [
+          96,
+          176
+        ],
+        "vertices": 202,
+        "topTriangles": 256
+      },
+      {
+        "chunk": [
+          112,
+          176
+        ],
+        "vertices": 202,
+        "topTriangles": 256
+      },
+      {
+        "chunk": [
+          128,
+          176
+        ],
+        "vertices": 202,
+        "topTriangles": 256
+      },
+      {
+        "chunk": [
+          144,
+          176
+        ],
+        "vertices": 274,
+        "topTriangles": 352
+      },
+      {
+        "chunk": [
+          160,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          176
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          192
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          208
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          224
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          0,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          16,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          32,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          48,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          64,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          80,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          96,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          112,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          128,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          144,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          160,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          176,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          192,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          208,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          224,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      },
+      {
+        "chunk": [
+          240,
+          240
+        ],
+        "vertices": 354,
+        "topTriangles": 512
+      }
+    ],
+    "canopyCount": 2541,
+    "groundRoots": [
+      {
+        "name": "n11_20_center",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n11_20_camp_0",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n11_20_camp_1",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n11_20_camp_2",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n11_20_camp_3",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n21_30_courtyard",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n21_30_camp_0",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n21_30_camp_1",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n21_30_camp_2",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n21_30_camp_3",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n31_40_corridor",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n31_40_camp_0",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n31_40_camp_1",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n31_40_camp_2",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n31_40_camp_3",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "n41_50_snowfield",
+        "theme": "snow",
+        "z": 524
+      },
+      {
+        "name": "n41_50_camp_0",
+        "theme": "thaw",
+        "z": 524
+      },
+      {
+        "name": "n41_50_camp_1",
+        "theme": "thaw",
+        "z": 524
+      },
+      {
+        "name": "n41_50_camp_2",
+        "theme": "thaw",
+        "z": 524
+      },
+      {
+        "name": "n41_50_camp_3",
+        "theme": "thaw",
+        "z": 524
+      },
+      {
+        "name": "n51_60_corruption",
+        "theme": "corrupt",
+        "z": 396
+      },
+      {
+        "name": "n51_60_shared_camp",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_01",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_02",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_03",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_04",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_05",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_06",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_07",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_08",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_09",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "rebirth_10",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "flame_troll",
+        "theme": "volcanic",
+        "z": 396
+      },
+      {
+        "name": "ice_elegy",
+        "theme": "snow",
+        "z": 396
+      },
+      {
+        "name": "synthesis_gem",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_01",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_02",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_03",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_04",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_05",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_06",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_07",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_08",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_09",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_10",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_empty_10",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "commandment_empty_11",
+        "theme": "forest",
+        "z": 396
+      },
+      {
+        "name": "polar_crystal_mobs",
+        "theme": "snow",
+        "z": 396
+      },
+      {
+        "name": "molten_core_mobs",
+        "theme": "volcanic",
+        "z": 396
+      },
+      {
+        "name": "seven_sins",
+        "theme": "volcanic",
+        "z": 396
+      },
+      {
+        "name": "training_p0_wood",
+        "theme": "forest",
+        "z": 268
+      },
+      {
+        "name": "training_p0_gold",
+        "theme": "forest",
+        "z": 268
+      },
+      {
+        "name": "training_p0_attributes",
+        "theme": "snow",
+        "z": 268
+      },
+      {
+        "name": "training_p0_greater_attributes",
+        "theme": "volcanic",
+        "z": 268
+      },
+      {
+        "name": "training_p1_wood",
+        "theme": "forest",
+        "z": 268
+      },
+      {
+        "name": "training_p1_gold",
+        "theme": "forest",
+        "z": 268
+      },
+      {
+        "name": "training_p1_attributes",
+        "theme": "snow",
+        "z": 268
+      },
+      {
+        "name": "training_p1_greater_attributes",
+        "theme": "volcanic",
+        "z": 268
+      },
+      {
+        "name": "training_p2_wood",
+        "theme": "forest",
+        "z": 652
+      },
+      {
+        "name": "training_p2_gold",
+        "theme": "forest",
+        "z": 652
+      },
+      {
+        "name": "training_p2_attributes",
+        "theme": "snow",
+        "z": 652
+      },
+      {
+        "name": "training_p2_greater_attributes",
+        "theme": "volcanic",
+        "z": 652
+      },
+      {
+        "name": "training_p3_wood",
+        "theme": "forest",
+        "z": 652
+      },
+      {
+        "name": "training_p3_gold",
+        "theme": "forest",
+        "z": 652
+      },
+      {
+        "name": "training_p3_attributes",
+        "theme": "snow",
+        "z": 652
+      },
+      {
+        "name": "training_p3_greater_attributes",
+        "theme": "volcanic",
+        "z": 652
+      },
+      {
+        "name": "endless_p0",
+        "theme": "forest",
+        "z": 652
+      },
+      {
+        "name": "endless_p1",
+        "theme": "forest",
+        "z": 652
+      },
+      {
+        "name": "endless_p2",
+        "theme": "forest",
+        "z": 652
+      },
+      {
+        "name": "endless_p3",
+        "theme": "forest",
+        "z": 652
+      },
+      {
+        "name": "original_challenge_reserve",
+        "theme": "forest",
+        "z": 396
+      }
+    ],
+    "lilySource": "Native tileset entities disabled"
+  },
+  "scenery": {
+    "count": 2633,
+    "markerClearance": 340,
+    "collision": "none"
+  }
+}

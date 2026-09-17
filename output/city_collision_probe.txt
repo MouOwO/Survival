@@ -1,0 +1,756 @@
+--- Info for resource file "D:/steam/steamapps/common/dota 2 beta/game/dota_addons/survival/models/survival_buildings/main_city_lv01.vmdl_c" ---
+	Input Path: "D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival\models\survival_buildings\main_city_lv01.vmdl_c"
+	Resource Name: "models/survival_buildings/main_city_lv01.vmdl"
+	ID: 3AD7FCC94CCE7DF1
+	Resource Type: vmdl = 1818520950 (0x6C646D76) [Version 1]
+	File Size: 1,077,895 bytes
+
+
+--- Resource External Refs: ---
+	Id:               Resource Name:                                  
+	DFB802968E225E6C  materials/survival_buildings/main_city_lv01.vmat
+
+
+--- Resource Blocks: Count 8 ---
+	-- Block 0: MVTX 	Size: 1,039,077    bytes [+11b padding]
+	-- Block 1: MIDX 	Size: 30,520       bytes [+8b padding]
+	-- Block 2: MDAT 	Size: 1,765        bytes [+11b padding]
+	-- Block 3: PHYS 	Size: 2,918        bytes [+10b padding]
+	-- Block 4: CTRL 	Size: 841          bytes [+3b padding]
+	-- Block 5: RERL 	Size: 77           bytes [+7b padding]
+	-- Block 6: RED2 	Size: 1,559        bytes [+9b padding]
+	-- Block 7: DATA 	Size: 967          bytes [+0b padding]
+
+--- vmdl block MVTX (1039077 bytes) ---
+	Referenced by embedded mesh = main_city_lv01
+		Vertices = 80161
+		VertexSize = 24 bytes
+		Total Size = 1.92 MB (1.04 MB encoded @ 13.0 bytes per vertex v1)
+		Creation Flags =
+		Usage = MESH_BUFFER_USAGE_VB
+		Input Layout Fields
+			position0 R32G32B32_FLOAT @0-12
+			texcoord0 R16G16_SNORM @12-16
+			normal0 R32_UINT @16-20
+			blendindices0 R8G8B8A8_UINT @20-24
+--- vmdl block MIDX (30520 bytes) ---
+	Referenced by embedded mesh = main_city_lv01
+		Indices = 90939
+		Triangles = 30313
+		IndexSize = 4 bytes
+		Total Size = 363.76 KB (30.52 KB encoded @ 1.0 bytes per triangle v1)
+		Creation Flags =
+		Usage = MESH_BUFFER_USAGE_IB
+--- vmdl block MDAT (1765 bytes) ---
+{
+	_class = "CRenderMesh"
+	m_sceneObjects = 
+	[
+		{
+			m_vMinBounds = [ -59.0, -58.135063, 0.0000030710785 ]
+			m_vMaxBounds = [ 59.0, 58.135063, 76.28017 ]
+			m_drawCalls = 
+			[
+				{
+					m_flUvDensity = 1718.6187
+					m_vTintColor = [ 1.0, 1.0, 1.0 ]
+					m_flAlpha = 1.0
+					m_nNumMeshlets = 0
+					m_nFirstMeshlet = 0
+					m_nAppliedIndexOffset = 0
+					m_nDepthVertexBufferIndex = 255
+					m_nMeshletPackedIVBIndex = 255
+					m_rigidMeshParts = [  ]
+					m_rootBvhNodes = [  ]
+					m_nPrimitiveType = "RENDER_PRIM_TRIANGLES"
+					m_nBaseVertex = 0
+					m_nVertexCount = 80161
+					m_nStartIndex = 0
+					m_nIndexCount = 90939
+					m_indexBuffer = 
+					{
+						m_hBuffer = 0
+						m_nBindOffsetBytes = 0
+					}
+					m_meshletPackedIVB = 
+					{
+						m_hBuffer = 0
+						m_nBindOffsetBytes = 0
+					}
+					m_material = resource:"materials/survival_buildings/main_city_lv01.vmat"
+					m_vertexBuffers = 
+					[
+						{
+							m_hBuffer = 0
+							m_nBindOffsetBytes = 0
+						},
+					]
+					m_bUseCompressedNormalTangent = true
+					m_bIsNotMatchedToMaterial = true
+				},
+			]
+			m_drawBounds = [  ]
+			m_meshlets = [  ]
+			m_rtProxyDrawCalls = [  ]
+			m_vTintColor = [ 0.0, 0.0, 0.0, 0.0 ]
+		},
+	]
+	m_constraints = [  ]
+	m_skeleton = 
+	{
+		m_bones = 
+		[
+			{
+				m_boneName = "root"
+				m_parentName = ""
+				m_invBindPose = 
+				[
+					0.00000035762787, 1.0, -0.000000000000014210855, -0.0,
+					-1.0, 0.00000035762787, 0.00000025431177, -0.0,
+					0.00000025431177, -0.00000000000009947598, 1.0, -0.0,
+				]
+				m_bbox = 
+				{
+					m_vecCenter = [ 0.0, -0.0000019073486, 38.14009 ]
+					m_vecSize = [ 58.135063, 59.0, 38.140076 ]
+				}
+				m_flSphereRadius = 83.85132
+			},
+		]
+		m_boneParents = [  ]
+		m_nBoneWeightCount = 1
+	}
+	m_bUseUV2ForCharting = false
+	m_bEmbeddedMapMesh = false
+	m_meshDeformParams = 
+	{
+		m_flTensionCompressScale = 0.0
+		m_flTensionStretchScale = 0.0
+		m_bRecomputeSmoothNormalsAfterAnimation = false
+		m_bComputeDynamicMeshTensionAfterAnimation = false
+		m_bSmoothNormalsAcrossUvSeams = false
+		m_bEnableEyeBulgeDeformation = false
+	}
+	m_pGroomData = null
+	m_attachments = [  ]
+	m_hitboxsets = 
+	[
+		{
+			key = "default"
+			value = 
+			{
+				m_name = "default"
+				m_nNameHash = 1977497166
+				m_HitBoxes = 
+				[
+					{
+						m_name = "root"
+						m_sSurfaceProperty = "default"
+						m_sBoneName = "root"
+						m_vMinBounds = [ -59.0, -59.0, 0.0 ]
+						m_vMaxBounds = [ 59.0, 59.0, 76.28017 ]
+						m_flShapeRadius = 0.0
+						m_nBoneNameHash = 3153423456
+						m_nGroupId = 0
+						m_nShapeType = 0
+						m_bTranslationOnly = false
+						m_CRC = 1510498574
+						m_cRenderColor = [ 0, 0, 0, 0 ]
+						m_nHitBoxIndex = 0
+					},
+				]
+				m_SourceFilename = ""
+			}
+		},
+		{
+			key = "select_low"
+			value = 
+			{
+				m_name = "select_low"
+				m_nNameHash = 3944345580
+				m_HitBoxes = 
+				[
+					{
+						m_name = "root1"
+						m_sSurfaceProperty = "default"
+						m_sBoneName = "root"
+						m_vMinBounds = [ -59.0, -59.0, 0.0 ]
+						m_vMaxBounds = [ 59.0, 59.0, 76.28017 ]
+						m_flShapeRadius = 0.0
+						m_nBoneNameHash = 3153423456
+						m_nGroupId = 0
+						m_nShapeType = 0
+						m_bTranslationOnly = false
+						m_CRC = 1510498574
+						m_cRenderColor = [ 0, 0, 0, 0 ]
+						m_nHitBoxIndex = 1
+					},
+				]
+				m_SourceFilename = ""
+			}
+		},
+		{
+			key = "select_high"
+			value = 
+			{
+				m_name = "select_high"
+				m_nNameHash = 2570599
+				m_HitBoxes = 
+				[
+					{
+						m_name = "root2"
+						m_sSurfaceProperty = "default"
+						m_sBoneName = "root"
+						m_vMinBounds = [ -43.0, -43.0, 0.0 ]
+						m_vMaxBounds = [ 43.0, 43.0, 76.28017 ]
+						m_flShapeRadius = 0.0
+						m_nBoneNameHash = 3153423456
+						m_nGroupId = 0
+						m_nShapeType = 0
+						m_bTranslationOnly = false
+						m_CRC = 4041738478
+						m_cRenderColor = [ 0, 0, 0, 0 ]
+						m_nHitBoxIndex = 2
+					},
+				]
+				m_SourceFilename = ""
+			}
+		},
+	]
+	m_morphSet = resource:""
+}
+--- vmdl block PHYS (2918 bytes) ---
+{
+	m_nFlags = 0
+	m_nRefCounter = 0
+	m_bonesHash = [ 3153423456 ]
+	m_boneNames = 
+	[
+		"root",
+	]
+	m_indexNames = [ 0 ]
+	m_indexHash = [ 0 ]
+	m_bindPose = 
+	[
+		[
+			0.00000035762787, -0.99999994, 0.00000025431177, 0.0,
+			0.99999994, 0.00000035762787, -0.00000000000008526513, 0.0,
+			0.0, 0.00000025431177, 1.0, 0.0,
+		],
+	]
+	m_parts = 
+	[
+		{
+			m_nFlags = 0
+			m_flMass = 0.0
+			m_rnShape = 
+			{
+				m_spheres = [  ]
+				m_capsules = [  ]
+				m_hulls = 
+				[
+					{
+						m_nCollisionAttributeIndex = 0
+						m_nSurfacePropertyIndex = 0
+						m_UserFriendlyName = ""
+						m_bUserFriendlyNameSealed = false
+						m_bUserFriendlyNameLong = false
+						m_nToolMaterialHash = 0
+						m_Hull = 
+						{
+							m_vCentroid = [ 0.0, 0.000006612106, 26.0 ]
+							m_flMaxAngularRadius = 54.589382
+							m_Bounds = 
+							{
+								m_vMinBounds = [ -47.999996, -47.999996, -0.000012206965 ]
+								m_vMaxBounds = [ 47.999996, 48.000008, 52.00001 ]
+							}
+							m_vOrthographicAreas = [ 1.0, 1.0, 0.75308645 ]
+							m_MassProperties = 
+							[
+								252490000.0, -0.5333252, 0.0000015707483, 0.00000012295833,
+								-0.5333252, 252490000.0, 25.37355, 0.000006550627,
+								0.0000015707483, 25.37355, 352263420.0, 26.0,
+							]
+							m_flVolume = 338868.22
+							m_flSurfaceArea = 28316.236
+							m_nFlags = 0
+							m_pRegionSVM = 
+							{
+								m_Planes = 
+#[
+EC 5B F1 27 D7 96 92 B4 00 00 80 BF 00 00 00 00 61 83 6C BF 03 EF C3 3E AA FE D0 B3 88 62 31 42
+									19 EF C3 BE 5D 83 6C 3F 82 47 7C B4 88 62 31 42 03 EF C3 3E 61 83 6C 3F 86 47 7C B4 88 62 31 42
+									61 83 6C 3F 03 EF C3 BE AA FE D0 33 88 62 31 42 19 EF C3 3E 5D 83 6C BF 82 47 7C 34 88 62 31 42
+									03 EF C3 BE 61 83 6C BF 86 47 7C 34 88 62 31 42 EC 5B F1 A7 D7 96 92 34 00 00 80 3F 00 00 50 42
+									5D 83 6C BF 19 EF C3 BE C0 FE D0 33 88 62 31 42 5D 83 6C 3F 19 EF C3 3E C0 FE D0 B3 88 62 31 42
+									19 EF C3 3E 5E 83 6C BF 83 47 7C 34 57 F3 92 41 5E 83 6C 3F 19 EF C3 3E 9E 63 E0 B3 88 62 31 C2
+									19 EF C3 BE 5E 83 6C 3F 83 47 7C B4 4B F3 92 41 00 00 00 00 58 88 88 34 00 00 80 3F 00 00 00 00
+									5E 83 6C BF 19 EF C3 BE C0 FE D0 33 57 F3 92 41 19 EF C3 3E 5E 83 6C BF 48 6E 87 34 88 62 31 C2
+									5E 83 6C 3F 19 EF C3 3E C0 FE D0 B3 4B F3 92 41 00 00 00 00 58 88 88 34 00 00 80 3F 00 00 00 00
+									19 EF C3 BE 5E 83 6C 3F 83 47 7C B4 57 F3 92 41 5E 83 6C BF 19 EF C3 BE 9E 63 E0 33 88 62 31 C2
+									19 EF C3 3E 5E 83 6C BF 83 47 7C 34 4B F3 92 41 00 00 00 00 58 88 88 34 00 00 80 3F 00 00 00 00
+									5E 83 6C 3F 19 EF C3 3E C0 FE D0 B3 57 F3 92 41 19 EF C3 BE 5E 83 6C 3F 48 6E 87 B4 88 62 31 C2
+									5E 83 6C BF 19 EF C3 BE C0 FE D0 33 4B F3 92 41 00 00 00 00 58 88 88 34 00 00 80 3F 00 00 00 00
+									00 00 00 00 58 88 88 34 00 00 80 3F 00 00 50 42 03 EF C3 BE 61 83 6C BF 86 47 7C 34 56 F3 92 C1
+									00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 00 00 5D 83 6C 3F 19 EF C3 3E C0 FE D0 B3 56 F3 92 C1
+									00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 00 00 03 EF C3 3E 61 83 6C 3F 86 47 7C B4 4B F3 92 C1
+									00 00 00 00 58 88 88 34 00 00 80 3F 00 00 50 42 19 EF C3 3E 5D 83 6C BF 82 47 7C 34 4B F3 92 C1
+									5E 83 6C BF 19 EF C3 BE C0 FE D0 33 57 F3 92 41 00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 50 C2
+									5E 83 6C 3F 19 EF C3 3E C0 FE D0 B3 4B F3 92 41 19 EF C3 3E 5E 83 6C BF 48 6E 87 34 89 62 31 C2
+									62 83 6C BF 03 EF C3 3E AA FE D0 B3 4B F3 92 41 03 EF C3 BE 62 83 6C BF 4A 6E 87 34 89 62 31 C2
+									62 83 6C 3F 03 EF C3 BE AA FE D0 33 57 F3 92 41 00 00 00 00 58 88 88 34 00 00 80 3F 00 00 00 00
+									00 00 00 00 58 88 88 34 00 00 80 3F 00 00 50 42 61 83 6C BF 03 EF C3 3E AA FE D0 B3 56 F3 92 C1
+									00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 00 00 19 EF C3 3E 5D 83 6C BF 82 47 7C 34 56 F3 92 C1
+									00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 00 00 61 83 6C 3F 03 EF C3 BE AA FE D0 33 4B F3 92 C1
+									00 00 00 00 58 88 88 34 00 00 80 3F 00 00 50 42 5D 83 6C BF 19 EF C3 BE C0 FE D0 33 4B F3 92 C1
+									00 00 00 00 58 88 88 34 00 00 80 3F 00 00 50 42 03 EF C3 3E 61 83 6C 3F 86 47 7C B4 56 F3 92 C1
+									00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 00 00 5D 83 6C BF 19 EF C3 BE C0 FE D0 33 56 F3 92 C1
+									00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 00 00 03 EF C3 BE 61 83 6C BF 86 47 7C 34 4B F3 92 C1
+									00 00 00 00 58 88 88 34 00 00 80 3F 00 00 50 42 19 EF C3 BE 5D 83 6C 3F 82 47 7C B4 4B F3 92 C1
+									5E 83 6C 3F 19 EF C3 3E C0 FE D0 B3 57 F3 92 41 00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 50 C2
+									5E 83 6C BF 19 EF C3 BE C0 FE D0 33 4B F3 92 41 19 EF C3 BE 5E 83 6C 3F 48 6E 87 B4 89 62 31 C2
+									62 83 6C 3F 03 EF C3 BE AA FE D0 33 4B F3 92 41 03 EF C3 3E 62 83 6C 3F 4A 6E 87 B4 89 62 31 C2
+									62 83 6C BF 03 EF C3 3E AA FE D0 B3 57 F3 92 41 00 00 00 00 58 88 88 34 00 00 80 3F 00 00 00 00
+									00 00 00 00 58 88 88 34 00 00 80 3F 00 00 50 42 61 83 6C 3F 03 EF C3 BE AA FE D0 33 56 F3 92 C1
+									00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 00 00 19 EF C3 BE 5D 83 6C 3F 82 47 7C B4 56 F3 92 C1
+									00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 00 00 61 83 6C BF 03 EF C3 3E AA FE D0 B3 4B F3 92 C1
+									00 00 00 00 58 88 88 34 00 00 80 3F 00 00 50 42 5D 83 6C 3F 19 EF C3 3E C0 FE D0 B3 4B F3 92 C1
+									62 83 6C BF 03 EF C3 3E AA FE D0 B3 57 F3 92 41 03 EF C3 3E 62 83 6C 3F 4A 6E 87 B4 88 62 31 C2
+									62 83 6C 3F 03 EF C3 BE AA FE D0 33 4B F3 92 41 00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 50 C2
+									03 EF C3 BE 62 83 6C BF 87 47 7C 34 57 F3 92 41 62 83 6C BF 03 EF C3 3E 88 63 E0 B3 88 62 31 C2
+									03 EF C3 3E 62 83 6C 3F 87 47 7C B4 4B F3 92 41 00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 50 C2
+									62 83 6C 3F 03 EF C3 BE AA FE D0 33 57 F3 92 41 03 EF C3 BE 62 83 6C BF 4A 6E 87 34 88 62 31 C2
+									62 83 6C BF 03 EF C3 3E AA FE D0 B3 4B F3 92 41 00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 50 C2
+									03 EF C3 3E 62 83 6C 3F 87 47 7C B4 57 F3 92 41 62 83 6C 3F 03 EF C3 BE 88 63 E0 33 88 62 31 C2
+									03 EF C3 BE 62 83 6C BF 87 47 7C 34 4B F3 92 41 00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 50 C2
+									19 EF C3 3E 5E 83 6C BF 83 47 7C 34 57 F3 92 41 00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 50 C2
+									19 EF C3 BE 5E 83 6C 3F 83 47 7C B4 4B F3 92 41 5E 83 6C 3F 19 EF C3 3E 9E 63 E0 B3 89 62 31 C2
+									03 EF C3 BE 62 83 6C BF 87 47 7C 34 4B F3 92 41 62 83 6C 3F 03 EF C3 BE 88 63 E0 33 89 62 31 C2
+									03 EF C3 3E 62 83 6C 3F 87 47 7C B4 57 F3 92 41 00 00 00 00 58 88 88 34 00 00 80 3F 00 00 00 00
+									19 EF C3 BE 5E 83 6C 3F 83 47 7C B4 57 F3 92 41 00 00 00 00 58 88 88 B4 00 00 80 BF 00 00 50 C2
+									19 EF C3 3E 5E 83 6C BF 83 47 7C 34 4B F3 92 41 5E 83 6C BF 19 EF C3 BE 9E 63 E0 33 89 62 31 C2
+									03 EF C3 3E 62 83 6C 3F 87 47 7C B4 4B F3 92 41 62 83 6C BF 03 EF C3 3E 88 63 E0 B3 89 62 31 C2
+									03 EF C3 BE 62 83 6C BF 87 47 7C 34 57 F3 92 41 00 00 00 00 58 88 88 34 00 00 80 3F 00 00 00 00
+								]
+								m_Nodes = 
+#[
+00 00 00 80 01 00 0A 80 02 00 07 80 03 00 16 80 04 00 0E 80 05 00 22 80 06 00 1B 80 07 00 67 80
+									08 00 3E 80 09 00 5E 80 0A 00 26 80 0B 00 5A 80 0C 00 62 80 0D 00 43 80 0E 00 2B 80 00 00 00 60
+									0E 00 66 80 0F 00 17 80 10 00 3F 80 11 00 0B 80 12 00 5F 80 13 00 0F 80 14 00 12 80 15 00 4B 80
+									16 00 58 80 17 00 54 80 18 00 4E 80 19 00 35 80 1A 00 21 80 1B 00 31 80 1C 00 09 80 06 05 00 20
+									1C 00 68 80 00 00 00 60 1C 00 18 80 00 00 00 60 1C 00 40 80 00 00 00 60 1C 00 0C 80 00 00 00 60
+									1C 00 60 80 00 00 00 60 1C 00 10 80 1D 00 27 80 1E 00 13 80 07 00 00 60 1E 00 4A 80 1F 00 5D 80
+									20 00 57 80 21 00 25 80 22 00 53 80 23 00 3D 80 24 00 4F 80 25 00 05 80 26 00 04 80 27 00 08 80
+									28 00 01 80 29 00 02 80 2A 00 03 80 2B 00 2D 80 00 00 00 00 09 06 00 20 2E 00 00 40 01 07 00 20
+									06 00 00 40 0A 00 00 20 1A 00 00 40 05 01 00 20 00 00 00 40 07 02 00 20 2A 00 00 40 0F 03 00 20
+									02 00 00 40 00 00 00 60 1E 00 28 80 00 00 00 60 04 00 00 40 0E 1C 00 20 1C 00 4C 80 07 00 00 60
+									1C 00 5C 80 07 00 00 60 1C 00 56 80 07 00 00 60 1C 00 24 80 07 00 00 60 1C 00 52 80 07 00 00 60
+									1C 00 3A 80 1D 00 65 80 1E 00 50 80 1F 00 47 80 20 00 06 80 21 00 33 80 00 00 00 00 21 00 45 80
+									00 00 00 00 21 00 1F 80 00 00 00 00 21 00 1D 80 00 00 00 00 21 00 2F 80 00 00 00 00 21 00 39 80
+									10 00 00 40 08 04 00 20 0E 00 00 40 04 19 00 20 20 00 00 40 02 0B 00 20 28 00 00 40 0B 08 00 20
+									26 00 00 40 03 0D 00 20 0C 00 00 40 0C 10 00 20 24 00 00 40 0D 14 00 20 18 00 00 40 07 00 00 60
+									2C 00 00 40 11 00 64 80 22 00 00 40 06 00 00 60 10 00 49 80 06 00 00 60 00 00 00 00 04 00 00 60
+									14 00 00 40 08 00 00 60 1C 00 00 40 01 00 00 60 0A 00 00 40 02 00 00 60 08 00 00 40 03 00 00 60
+									12 00 00 40 09 00 00 60 16 00 00 40 00 17 00 20 2C 00 00 40 05 00 00 60 1E 00 00 40
+								]
+							}
+							m_Vertices = #[ 2D 1E 29 25 21 2A 2E 2B 11 2F 1D 26 2C 22 28 12 ]
+							m_VertexPositions = 
+#[
+FF FF 3F 42 C8 EE FE 37 00 00 50 42 00 00 90 37 FF FF 3F C2 84 CC 4C 37 FF FF 3F C2 E2 44 84 B6
+								00 00 50 42 00 00 90 B7 02 00 40 42 FD FF 4F 42 00 00 90 37 FC FF 3F C2 03 00 50 42 FF FF 3F C2
+								00 00 90 B7 00 00 90 2C FF FF 3F 42 00 00 90 37 00 00 90 AC BA C3 07 C2 B4 C3 07 42 8E D0 10 B7
+								B4 C3 07 42 BA C3 07 42 94 D0 10 B7 BA C3 07 42 B4 C3 07 C2 8E D0 10 37 B4 C3 07 C2 BA C3 07 C2
+								94 D0 10 37 BA C3 07 C2 B7 C3 07 42 FE FF 4F 42 B4 C3 07 42 BD C3 07 42 FE FF 4F 42 BA C3 07 42
+								B1 C3 07 C2 02 00 50 42 B4 C3 07 C2 B7 C3 07 C2 02 00 50 42 00 00 90 B7 FF FF 3F 42 84 CC 4C B7
+							]
+							m_Edges = 
+#[
+2A 01 0A 00 1D 00 05 08 0E 03 07 00 09 02 0F 02 2E 05 08 00 11 04 06 09 1A 07 09 00 15 06 01 05
+								2B 09 0B 01 0C 08 07 02 27 0B 05 01 01 0A 02 08 13 0D 0B 02 26 0C 03 07 04 0F 0F 00 12 0E 08 03
+								0F 11 0C 03 2C 10 08 09 25 13 0F 03 03 12 03 02 2F 15 0D 04 18 14 09 05 23 17 06 04 05 16 00 09
+								1F 19 0D 05 22 18 04 07 00 1B 01 00 1E 1A 0A 06 1B 1D 0E 06 28 1C 0A 08 21 1F 01 06 07 1E 04 05
+								19 21 0E 07 1C 20 04 06 2D 23 0D 07 14 22 00 04 0D 25 0C 07 10 24 03 03 29 27 0B 07 08 26 02 01
+								0B 29 0E 08 20 28 02 07 02 2B 05 00 0A 2A 07 01 17 2D 0C 09 24 2C 00 07 06 2F 06 00 16 2E 09 04
+							]
+							m_Faces = #[ 00 08 0C 10 14 18 1C 20 28 2C ]
+							m_Planes = 
+#[
+EC 5B F1 27 D7 96 92 B4 00 00 80 BF 00 00 00 00 61 83 6C BF 03 EF C3 3E AA FE D0 B3 88 62 31 42
+								19 EF C3 BE 5D 83 6C 3F 82 47 7C B4 88 62 31 42 03 EF C3 3E 61 83 6C 3F 86 47 7C B4 88 62 31 42
+								61 83 6C 3F 03 EF C3 BE AA FE D0 33 88 62 31 42 19 EF C3 3E 5D 83 6C BF 82 47 7C 34 88 62 31 42
+								03 EF C3 BE 61 83 6C BF 86 47 7C 34 88 62 31 42 EC 5B F1 A7 D7 96 92 34 00 00 80 3F 00 00 50 42
+								5D 83 6C BF 19 EF C3 BE C0 FE D0 33 88 62 31 42 5D 83 6C 3F 19 EF C3 3E C0 FE D0 B3 88 62 31 42
+							]
+						}
+					},
+				]
+				m_meshes = [  ]
+				m_CollisionAttributeIndices = [  ]
+			}
+			m_nCollisionAttributeIndex = 0
+			m_nReserved = 0
+			m_flInertiaScale = 1.0
+			m_flLinearDamping = 0.0
+			m_flAngularDamping = 0.0
+			m_flLinearDrag = 1.0
+			m_flAngularDrag = 1.0
+			m_bOverrideMassCenter = false
+			m_vMassCenterOverride = [ 0.0, 0.0, 0.0 ]
+		},
+	]
+	m_shapeMarkups = [  ]
+	m_constraints2 = [  ]
+	m_joints = [  ]
+	m_pFeModel = null
+	m_boneParents = [ 0 ]
+	m_surfacePropertyHashes = [ 4244373185 ]
+	m_collisionAttributes = 
+	[
+		{
+			m_nIncludeDetailLayerCount = 0
+			m_CollisionGroup = 1977497166
+			m_InteractAs = [  ]
+			m_InteractWith = [  ]
+			m_InteractExclude = [  ]
+			m_DetailLayers = [  ]
+			m_CollisionGroupString = "default"
+			m_InteractAsStrings = [  ]
+			m_InteractWithStrings = [  ]
+			m_InteractExcludeStrings = [  ]
+			m_DetailLayerStrings = [  ]
+		},
+	]
+	m_debugPartNames = [  ]
+	m_embeddedKeyvalues = ""
+}
+--- vmdl block CTRL (841 bytes) ---
+{
+	embedded_meshes = 
+	[
+		{
+			m_Name = "main_city_lv01"
+			m_nMeshIndex = 0
+			m_nDataBlock = 2
+			m_nMorphBlock = -1
+			m_vertexBuffers = 
+			[
+				{
+					m_nBlockIndex = 0
+					m_nElementCount = 80161
+					m_nElementSizeInBytes = 24
+					m_bMeshoptCompressed = true
+					m_bMeshoptIndexSequence = false
+					m_nMeshoptMeshletEncodeVersion = -1
+					m_bCompressedZSTD = false
+					m_bCreateBufferSRV = false
+					m_bCreateBufferUAV = false
+					m_bCreateRawBuffer = false
+					m_bCreatePooledBuffer = false
+					m_nBufferUsage = 1
+					m_inputLayoutFields = 
+					[
+						{
+							m_pSemanticName = "position"
+							m_nSemanticIndex = 0
+							m_Format = 6
+							m_nOffset = 0
+							m_nSlot = 0
+							m_nSlotType = "RENDER_SLOT_PER_VERTEX"
+							m_szShaderSemantic = ""
+						},
+						{
+							m_pSemanticName = "texcoord"
+							m_nSemanticIndex = 0
+							m_Format = 37
+							m_nOffset = 12
+							m_nSlot = 0
+							m_nSlotType = "RENDER_SLOT_PER_VERTEX"
+							m_szShaderSemantic = ""
+						},
+						{
+							m_pSemanticName = "normal"
+							m_nSemanticIndex = 0
+							m_Format = 42
+							m_nOffset = 16
+							m_nSlot = 0
+							m_nSlotType = "RENDER_SLOT_PER_VERTEX"
+							m_szShaderSemantic = ""
+						},
+						{
+							m_pSemanticName = "blendindices"
+							m_nSemanticIndex = 0
+							m_Format = 30
+							m_nOffset = 20
+							m_nSlot = 0
+							m_nSlotType = "RENDER_SLOT_PER_VERTEX"
+							m_szShaderSemantic = ""
+						},
+					]
+				},
+			]
+			m_indexBuffers = 
+			[
+				{
+					m_nBlockIndex = 1
+					m_nElementCount = 90939
+					m_nElementSizeInBytes = 4
+					m_bMeshoptCompressed = true
+					m_bMeshoptIndexSequence = false
+					m_nMeshoptMeshletEncodeVersion = -1
+					m_bCompressedZSTD = false
+					m_bCreateBufferSRV = false
+					m_bCreateBufferUAV = false
+					m_bCreateRawBuffer = false
+					m_bCreatePooledBuffer = false
+					m_nBufferUsage = 2
+					m_inputLayoutFields = [  ]
+				},
+			]
+			m_toolsBuffers = [  ]
+			m_nVBIBBlock = -1
+			m_nToolsVBBlock = -1
+		},
+	]
+	embedded_physics = 
+	{
+		phys_data_block = 3
+	}
+}
+--- RERL Block (ResourceExtRefList_t) ---
+	ResourceRefInfoList (1):
+		DFB802968E225E6C -> "materials/survival_buildings/main_city_lv01.vmat"
+
+--- RED2 Block (CResourceEditInfo) ---
+{
+	m_InputDependencies = 
+	[
+		{
+			m_RelativeFilename = "models/survival_buildings/main_city_lv01.fbx"
+			m_SearchPath = "dota_addons/survival"
+			m_nFileCRC = 3426602231
+			m_bOptional = false
+			m_bFileExists = true
+			m_bIsGameFile = false
+		},
+		{
+			m_RelativeFilename = "models/survival_buildings/main_city_lv01.vmdl"
+			m_SearchPath = "dota_addons/survival"
+			m_nFileCRC = 4158664034
+			m_bOptional = false
+			m_bFileExists = true
+			m_bIsGameFile = false
+		},
+		{
+			m_RelativeFilename = "models/survival_buildings/main_city_lv01_collision.obj"
+			m_SearchPath = "dota_addons/survival"
+			m_nFileCRC = 792451456
+			m_bOptional = false
+			m_bFileExists = true
+			m_bIsGameFile = false
+		},
+	]
+	m_AdditionalInputDependencies = [  ]
+	m_ArgumentDependencies = 
+	[
+		{
+			m_ParameterName = "___OverrideInputData___"
+			m_ParameterType = "BinaryBlobArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "create_pooled_vb"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "embedded_aggregate_mesh"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "embedded_map_mesh"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "force_up_to_date_materials"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "generate_draw_bounds"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "generate_meshlets"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "keep_vertices"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "mapbuilder_entity_classname"
+			m_ParameterType = "StringArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+		{
+			m_ParameterName = "meshlets_max_tri_count"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 3212836864
+			m_nFingerprintDefault = 3212836864
+		},
+		{
+			m_ParameterName = "meshlets_max_vertex_count"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 3212836864
+			m_nFingerprintDefault = 3212836864
+		},
+		{
+			m_ParameterName = "preserve_tangents"
+			m_ParameterType = "FloatArg"
+			m_nFingerprint = 0
+			m_nFingerprintDefault = 0
+		},
+	]
+	m_SpecialDependencies = 
+	[
+		{
+			m_String = "ModelDoc Compiler Version"
+			m_CompilerIdentifier = "CompileModel"
+			m_nFingerprint = 3
+			m_nUserData = 0
+		},
+	]
+	m_SpecialInputDependencies = [  ]
+	m_AdditionalRelatedFiles = 
+	[
+		{
+			m_RelativeFilename = "models/survival_buildings/main_city_lv01.fbx"
+			m_SearchPath = "dota_addons/survival"
+			m_bIsGameFile = false
+		},
+		{
+			m_RelativeFilename = "models/survival_buildings/main_city_lv01_collision.obj"
+			m_SearchPath = "dota_addons/survival"
+			m_bIsGameFile = false
+		},
+	]
+	m_ChildResourceList = [  ]
+	m_WeakReferenceList = [  ]
+	m_SearchableUserData = 
+	{
+		bounds_longest = 118.0
+		bounds_x = 118.0
+		bounds_y = 116.27013
+		bounds_z = 76.28017
+		compile_warnings = 1
+		generate_meshlets = 0
+		IsChildResource = 0
+		model_animgraph2ref_count = 0
+		model_archetype_id = ""
+		model_bodygroup_count = 0
+		model_bone_count = 1
+		model_bone_weight_count = 1
+		model_has_embedded_animation = 0
+		model_is_modeldoc = 1
+		model_lod0_triangle_count = 30313
+		model_lod0_vertex_count = 80161
+		model_lod_count = 0
+		model_materialgroup_count = 0
+		model_nmskeletonref_count = 0
+		model_primary_associated_entity = ""
+		model_total_triangle_count = 30313
+		model_total_vertex_count = 80161
+		morph = 0
+		morph_atlas_pixels = 0
+		physics_joint_count = 0
+		physics_shape_count = 1
+		physics_shape_hull_count = 1
+	}
+	m_SubassetReferences = 
+	{
+		collision_prop = 
+		{
+			default = 1
+		}
+		surface_prop = 
+		{
+			default = 1
+			stone = 1
+		}
+	}
+	m_SubassetDefinitions = null
+}
+--- vmdl block DATA (967 bytes) ---
+{
+	m_name = "models/survival_buildings/main_city_lv01.vmdl"
+	m_modelInfo = 
+	{
+		m_nFlags = 8389632
+		m_vHullMin = [ 0.0, 0.0, 0.0 ]
+		m_vHullMax = [ 0.0, 0.0, 0.0 ]
+		m_vViewMin = [ 0.0, 0.0, 0.0 ]
+		m_vViewMax = [ 0.0, 0.0, 0.0 ]
+		m_flMass = 0.0
+		m_vEyePosition = [ 0.0, 0.0, 0.0 ]
+		m_flMaxEyeDeflection = 0.0
+		m_sSurfaceProperty = ""
+		m_keyValueText = ""
+	}
+	m_ExtParts = [  ]
+	m_refMeshes = [  ]
+	m_refMeshGroupMasks = [ 18446744073709551615 ]
+	m_refPhysGroupMasks = [  ]
+	m_refLODGroupMasks = [ 255 ]
+	m_lodGroupSwitchDistances = [  ]
+	m_refPhysicsData = [  ]
+	m_refPhysicsHitboxData = [  ]
+	m_refAnimGroups = [  ]
+	m_refSequenceGroups = [  ]
+	m_meshGroups = [  ]
+	m_materialGroups = [  ]
+	m_nDefaultMeshGroupMask = 18446744073709551615
+	m_modelSkeleton = 
+	{
+		m_boneName = 
+		[
+			"root",
+		]
+		m_nParent = [ -1 ]
+		m_boneSphere = [ 83.85132 ]
+		m_nFlag = [ 261520 ]
+		m_bonePosParent = 
+		[
+			[ -0.0, -0.0, -0.0 ],
+		]
+		m_boneRotParent = 
+		[
+			[ 0.00000008991281, 0.000000089912774, 0.70710665, 0.7071069 ],
+		]
+		m_boneScaleParent = [ 1.0 ]
+	}
+	m_remappingTable = [ 0, 0, 0, 0 ]
+	m_remappingTableStarts = [ 0 ]
+	m_boneFlexDrivers = [  ]
+	m_pModelConfigList = null
+	m_BodyGroupsHiddenInTools = [  ]
+	m_refAnimIncludeModels = [  ]
+	m_AnimatedMaterialAttributes = [  ]
+	m_animGraph2Refs = [  ]
+	m_vecNmSkeletonRefs = [  ]
+}

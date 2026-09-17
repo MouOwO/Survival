@@ -1,0 +1,212 @@
+[
+  {
+    "name": "wall_lv01",
+    "stage": 1,
+    "display_name": "原木城墙",
+    "dimensions": [
+      248.0,
+      247.74156188964844,
+      164.3885955810547
+    ],
+    "triangles": 10376,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv02",
+    "stage": 2,
+    "display_name": "木石城墙",
+    "dimensions": [
+      248.0,
+      247.74156188964844,
+      164.3885955810547
+    ],
+    "triangles": 15836,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv03",
+    "stage": 3,
+    "display_name": "青石城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      163.23194885253906
+    ],
+    "triangles": 15932,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv04",
+    "stage": 4,
+    "display_name": "青铜城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      168.2926788330078
+    ],
+    "triangles": 22668,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv05",
+    "stage": 5,
+    "display_name": "苍蓝城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      168.2926788330078
+    ],
+    "triangles": 22668,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv06",
+    "stage": 6,
+    "display_name": "碧玉城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      171.80152893066406
+    ],
+    "triangles": 24956,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv07",
+    "stage": 7,
+    "display_name": "赤铜城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      173.12307739257812
+    ],
+    "triangles": 25052,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv08",
+    "stage": 8,
+    "display_name": "紫晶城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      187.64703369140625
+    ],
+    "triangles": 25180,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv09",
+    "stage": 9,
+    "display_name": "白金城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      189.28787231445312
+    ],
+    "triangles": 25500,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  },
+  {
+    "name": "wall_lv10",
+    "stage": 10,
+    "display_name": "天辉晶冠城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      201.61831665039062
+    ],
+    "triangles": 26684,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 118
+  }
+]

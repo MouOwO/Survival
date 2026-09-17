@@ -1,0 +1,56 @@
+[
+  {
+    "id": "D1",
+    "name": "开阔草坪 · Anemo 场景资源演示",
+    "kind": "Unity 资源包演示图，仅作外观参考",
+    "note": "看大面积草地的冷暖变化、不同密度的草、少量裸露地面。建筑和树木退到边缘，中央仍然开阔。",
+    "source": "https://www.gameassetdeals.com/asset/208171/anemo-open-world-stylized-island-environment",
+    "url": "https://assetstorev1-prd-cdn.unity3d.com/package-screenshot/e7197e6f-3e8b-4cb6-b9c9-83926d860c86_scaled.jpg",
+    "file": "D1.jpg"
+  },
+  {
+    "id": "D2",
+    "name": "起伏草甸 · 原神蒙德原野",
+    "kind": "HoYoLAB 玩家实机截图；第三人称视角",
+    "note": "看连续的大块草色、稀疏花草与远近层次。只参考色彩和疏密，高草密度与地势不能直接照搬到俯视战斗场地。",
+    "source": "https://www.hoyolab.com/article/271831",
+    "url": "https://upload-os-bbs.hoyolab.com/upload/2021/03/29/104988318/642ad371086cdc4497a13d2dc4ceb223_2327693248005770345.png",
+    "file": "D2.png"
+  },
+  {
+    "id": "E1",
+    "name": "中央留白 · TFT 灵魂莲华场地",
+    "kind": "游戏场地展示图，来自 Mobalytics",
+    "note": "看中央连续的开阔地面如何通过大尺度纹样和材质变化获得细节；桃花、建筑与水景集中在场地外围。适合讨论主城或大挑战房的留白。",
+    "source": "https://mobalytics.gg/blog/tft/tft-positioning-guide-how-to-get-the-most-from-your-units/",
+    "url": "https://cdnportal.mobalytics.gg/production/2025/07/TFT-Set-15-Spirit-Blossom-Arena-2000x1125.jpg",
+    "file": "E1.jpg"
+  },
+  {
+    "id": "E2",
+    "name": "旧石与苔草 · LoL Arena",
+    "kind": "Riot 官方场地展示图",
+    "note": "看低对比石纹、裂缝和苔草如何共同组成大片地面。此图中央有障碍，借鉴地面处理即可，不照搬障碍布局。",
+    "source": "https://www.leagueoflegends.com/en-gb/news/dev/dev-leveling-up-arena/",
+    "url": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/0db09579a157f5f7e6d793bdf8ee3d41503a7c99-1416x1080.jpg",
+    "file": "E2.jpg"
+  },
+  {
+    "id": "F1",
+    "name": "开阔旧石平台 · LoL Arena",
+    "kind": "游戏场地展示图，来自 AltChar",
+    "note": "看大块旧石地面、环形纹理和少量苔草形成的变化。重点观察三个开阔平台内部，布局和外围构筑物仅作背景。",
+    "source": "https://www.altchar.com/game-news/league-of-legends-arena-2v2v2v2-game-mode-will-return-during-the-msi-event-aIyWU9z6BCyU",
+    "url": "https://media.altchar.com/prod/images/gm_article_promo_image/62531f0a5263-desert-oasis.png",
+    "file": "F1.png"
+  },
+  {
+    "id": "F2",
+    "name": "冰雪战斗空地 · LoL Arena",
+    "kind": "竞技场展示图转载，来自 Wallpaper Abyss",
+    "note": "看浅色空地里的冰裂纹、深浅冰色、积雪和边缘岩石。适合讨论冰雪练功房，中央仍保留大面积活动空间。",
+    "source": "https://wall.alphacoders.com/big.php?i=1320097",
+    "url": "https://images6.alphacoders.com/132/thumb-1920-1320097.jpeg",
+    "file": "F2.jpg"
+  }
+]

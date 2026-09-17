@@ -1,0 +1,325 @@
+{
+  "removedUnsupportedProps": 1,
+  "markers": [
+    {
+      "name": "n01_10_player_0",
+      "supported": true
+    },
+    {
+      "name": "n01_10_player_1",
+      "supported": true
+    },
+    {
+      "name": "n01_10_player_2",
+      "supported": true
+    },
+    {
+      "name": "n01_10_player_3",
+      "supported": true
+    },
+    {
+      "name": "n01_10_monster_spawn",
+      "supported": true
+    },
+    {
+      "name": "n11_20_player_0",
+      "supported": true
+    },
+    {
+      "name": "n11_20_player_1",
+      "supported": true
+    },
+    {
+      "name": "n11_20_player_2",
+      "supported": true
+    },
+    {
+      "name": "n11_20_player_3",
+      "supported": true
+    },
+    {
+      "name": "n11_20_monster_spawn",
+      "supported": true
+    },
+    {
+      "name": "n21_30_player_0",
+      "supported": true
+    },
+    {
+      "name": "n21_30_player_1",
+      "supported": true
+    },
+    {
+      "name": "n21_30_player_2",
+      "supported": true
+    },
+    {
+      "name": "n21_30_player_3",
+      "supported": true
+    },
+    {
+      "name": "n21_30_monster_spawn",
+      "supported": true
+    },
+    {
+      "name": "n31_40_player_0",
+      "supported": true
+    },
+    {
+      "name": "n31_40_monster_0",
+      "supported": true
+    },
+    {
+      "name": "n31_40_player_1",
+      "supported": true
+    },
+    {
+      "name": "n31_40_monster_1",
+      "supported": true
+    },
+    {
+      "name": "n31_40_player_2",
+      "supported": true
+    },
+    {
+      "name": "n31_40_monster_2",
+      "supported": true
+    },
+    {
+      "name": "n31_40_player_3",
+      "supported": true
+    },
+    {
+      "name": "n31_40_monster_3",
+      "supported": true
+    },
+    {
+      "name": "n41_50_player_0",
+      "supported": true
+    },
+    {
+      "name": "n41_50_monster_0",
+      "supported": true
+    },
+    {
+      "name": "n41_50_player_1",
+      "supported": true
+    },
+    {
+      "name": "n41_50_monster_1",
+      "supported": true
+    },
+    {
+      "name": "n41_50_player_2",
+      "supported": true
+    },
+    {
+      "name": "n41_50_monster_2",
+      "supported": true
+    },
+    {
+      "name": "n41_50_player_3",
+      "supported": true
+    },
+    {
+      "name": "n41_50_monster_3",
+      "supported": true
+    },
+    {
+      "name": "n51_60_player_shared",
+      "supported": true
+    },
+    {
+      "name": "n51_60_monster_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_01_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_02_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_03_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_04_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_05_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_06_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_07_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_08_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_09_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "rebirth_10_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "flame_troll_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "ice_elegy_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "synthesis_gem_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_01_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_02_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_03_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_04_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_05_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_06_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_07_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_08_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_09_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "commandment_10_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "polar_crystal_mobs_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "molten_core_mobs_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "seven_sins_boss_spawn",
+      "supported": true
+    },
+    {
+      "name": "training_p0_wood_center",
+      "supported": true
+    },
+    {
+      "name": "training_p0_gold_center",
+      "supported": true
+    },
+    {
+      "name": "training_p0_attributes_center",
+      "supported": true
+    },
+    {
+      "name": "training_p0_greater_attributes_center",
+      "supported": true
+    },
+    {
+      "name": "training_p1_wood_center",
+      "supported": true
+    },
+    {
+      "name": "training_p1_gold_center",
+      "supported": true
+    },
+    {
+      "name": "training_p1_attributes_center",
+      "supported": true
+    },
+    {
+      "name": "training_p1_greater_attributes_center",
+      "supported": true
+    },
+    {
+      "name": "training_p2_wood_center",
+      "supported": true
+    },
+    {
+      "name": "training_p2_gold_center",
+      "supported": true
+    },
+    {
+      "name": "training_p2_attributes_center",
+      "supported": true
+    },
+    {
+      "name": "training_p2_greater_attributes_center",
+      "supported": true
+    },
+    {
+      "name": "training_p3_wood_center",
+      "supported": true
+    },
+    {
+      "name": "training_p3_gold_center",
+      "supported": true
+    },
+    {
+      "name": "training_p3_attributes_center",
+      "supported": true
+    },
+    {
+      "name": "training_p3_greater_attributes_center",
+      "supported": true
+    },
+    {
+      "name": "endless_p0_center",
+      "supported": true
+    },
+    {
+      "name": "endless_p1_center",
+      "supported": true
+    },
+    {
+      "name": "endless_p2_center",
+      "supported": true
+    },
+    {
+      "name": "endless_p3_center",
+      "supported": true
+    },
+    {
+      "name": "original_challenge_center",
+      "supported": true
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "complete": true,
+  "items": [
+    {
+      "name": "c01_cloud_sea",
+      "size": [
+        1536,
+        896
+      ],
+      "alpha": "straight RGBA on transparent film",
+      "kind": 1
+    },
+    {
+      "name": "c02_cliff_cloud",
+      "size": [
+        1536,
+        896
+      ],
+      "alpha": "straight RGBA on transparent film",
+      "kind": 2
+    },
+    {
+      "name": "c03_cloud_band",
+      "size": [
+        1536,
+        896
+      ],
+      "alpha": "straight RGBA on transparent film",
+      "kind": 3
+    },
+    {
+      "name": "c04_thin_mist",
+      "size": [
+        1536,
+        896
+      ],
+      "alpha": "straight RGBA on transparent film",
+      "kind": 4
+    }
+  ],
+  "lighting": "fixed soft morning lighting",
+  "runtimeLimitation": "Baked oblique-view RGBA; cannot substitute for true runtime volume. Use at intended view and limited scale; do not tile dense copies."
+}

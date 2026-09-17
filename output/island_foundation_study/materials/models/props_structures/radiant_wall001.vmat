@@ -1,0 +1,23 @@
+"Layer0"
+{
+	"shader"	"global_lit_simple.vfx"
+	"F_NORMAL_MAP"	"1"
+	"F_SPECULAR"	"1"
+	"g_flBumpStrength"	"1"
+	"g_flSpecularBloom"	"0"
+	"g_flSpecularIntensity"	"1"
+	"g_vColorTint"	"[1.000000 1.000000 1.000000 0.000000]"
+	"g_vTexCoordOffset"	"[0.000000 0.000000 0.000000 0.000000]"
+	"g_vTexCoordScale"	"[1.000000 1.000000 0.000000 0.000000]"
+	"TextureColor"	"materials/models/props_structures/radiant_wall001_color.png"
+	"TextureReflectance"	"materials/models/props_structures/radiant_wall001_color.png"
+	"TextureSelfIllumMask"	"materials/models/props_structures/radiant_wall001_5759c2fd_selfillum.png"
+	"TextureBloom"	"materials/models/props_structures/radiant_wall001_5759c2fd_bloom.png"
+	"TextureNormal"	"materials/models/props_structures/radiant_wall001_normal.png"
+	"Compiled Textures"
+	{
+		"g_tColor"	"materials/models/props_structures/radiant_wall001_color_psd_bcd77ad.vtex"
+		"g_tSpecular"	"materials/models/props_structures/radiant_wall001_color_psd_5759c2fd.vtex"
+		"g_tNormal"	"materials/models/props_structures/radiant_wall001_normal_psd_1003d672.vtex"
+	}
+}

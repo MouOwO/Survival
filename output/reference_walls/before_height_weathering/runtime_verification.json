@@ -1,0 +1,35 @@
+{
+  "status": "PASS_WITH_SCOPED_COVERAGE",
+  "date": "2026-09-16",
+  "map": "template_map",
+  "models_rendered": 10,
+  "fixture_batches": [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]],
+  "model_scale": 1.0,
+  "preserved_yaw": 180,
+  "grid_dimensions": [4, 4],
+  "grid_world_width": 256,
+  "visual_observations": [
+    "All ten compiled models rendered with textures and distinct stage details.",
+    "Mesh silhouettes fit within the drawn 4x4 grid at scale 1.",
+    "The selected gameplay wall in the second capture displays 原木城墙·Ⅱ."
+  ],
+  "screenshots": [
+    "runtime_01_05_fixed.png",
+    "runtime_06_10_visible.png"
+  ],
+  "excluded_captures": {
+    "runtime_01_05.png": "Invalid initial camera target; not evidence.",
+    "runtime_06_10.png": "Background-window black capture; not evidence."
+  },
+  "limitations": [
+    "The first valid capture includes a postgame banner; it verifies model rendering, not construction timing.",
+    "Did not manually click and upgrade every one of the 30 gameplay levels.",
+    "Collision and hitbox coverage comes from compiled asset inspection; props were visual fixtures.",
+    "Per-model flow meshes and lifecycle integration were checked offline, not timed live for every wall."
+  ],
+  "cleanup": {
+    "temporary_wall_props_remaining": 0,
+    "camera_released": true,
+    "console_marker": "WALL_REVIEW_CLEANUP 0"
+  }
+}

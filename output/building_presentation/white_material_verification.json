@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "compiled_texture": "materials/survival_buildings/build_white_glow_color_png_d554c4f6.vtex",
+  "width": 8,
+  "height": 8,
+  "minimum_rgba": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "maximum_rgba": [
+    255,
+    255,
+    255,
+    255
+  ]
+}

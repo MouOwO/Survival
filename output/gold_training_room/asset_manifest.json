@@ -1,0 +1,829 @@
+[
+  {
+    "name": "b01_floor_a",
+    "label": "标准石板 A",
+    "category": "floor",
+    "triangles": 288,
+    "vertices": 160,
+    "bounds": [
+      [
+        -128.00001525878906,
+        -128.00001525878906,
+        -15.0
+      ],
+      [
+        128.10000610351562,
+        128.00001525878906,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b01_floor_b",
+    "label": "标准石板 B",
+    "category": "floor",
+    "triangles": 288,
+    "vertices": 160,
+    "bounds": [
+      [
+        -128.10000610351562,
+        -128.00001525878906,
+        -15.0
+      ],
+      [
+        128.10000610351562,
+        128.00001525878906,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b02_floor_worn",
+    "label": "破损石板",
+    "category": "floor",
+    "triangles": 324,
+    "vertices": 192,
+    "bounds": [
+      [
+        -128.10000610351562,
+        -128.00001525878906,
+        -15.0
+      ],
+      [
+        128.10000610351562,
+        128.00001525878906,
+        0.7000046372413635
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b01_niche_floor",
+    "label": "弧墙内侧半圆石板",
+    "category": "floor",
+    "triangles": 160,
+    "vertices": 96,
+    "bounds": [
+      [
+        -253.93446350097656,
+        0.9999697208404541,
+        -14.0
+      ],
+      [
+        253.93446350097656,
+        253.93446350097656,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b03_wall_256",
+    "label": "直线墙段 256",
+    "category": "wall",
+    "triangles": 1840,
+    "vertices": 984,
+    "bounds": [
+      [
+        -128.0,
+        -28.000015258789062,
+        -2.795560836791992
+      ],
+      [
+        128.0,
+        28.000015258789062,
+        176.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b03_wall_128",
+    "label": "直线墙段 128",
+    "category": "wall",
+    "triangles": 980,
+    "vertices": 524,
+    "bounds": [
+      [
+        -64.0,
+        -28.0000057220459,
+        0.0
+      ],
+      [
+        64.0,
+        28.0000057220459,
+        176.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b04_pillar",
+    "label": "独立墙柱",
+    "category": "wall",
+    "triangles": 480,
+    "vertices": 256,
+    "bounds": [
+      [
+        -42.000003814697266,
+        -42.000003814697266,
+        0.0
+      ],
+      [
+        42.000003814697266,
+        42.000003814697266,
+        228.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b04_pillar_coin",
+    "label": "金币墙柱",
+    "category": "wall",
+    "triangles": 1264,
+    "vertices": 666,
+    "bounds": [
+      [
+        -42.000003814697266,
+        -48.95105743408203,
+        0.0
+      ],
+      [
+        42.000003814697266,
+        42.000003814697266,
+        228.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat",
+      "materials/gold_training_room/bronze.vmat",
+      "materials/gold_training_room/gold.vmat",
+      "materials/gold_training_room/teal.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b05_corner",
+    "label": "90 度转角墙",
+    "category": "wall",
+    "triangles": 1960,
+    "vertices": 1048,
+    "bounds": [
+      [
+        -28.000003814697266,
+        -28.000015258789062,
+        -1.834708333015442
+      ],
+      [
+        128.0,
+        128.0,
+        176.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 2,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b06_arc_60",
+    "label": "60 度弧形墙段",
+    "category": "wall",
+    "triangles": 700,
+    "vertices": 400,
+    "bounds": [
+      [
+        -141.4845428466797,
+        197.69210815429688,
+        0.0
+      ],
+      [
+        141.48460388183594,
+        283.8338317871094,
+        173.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat"
+    ],
+    "collision_hulls": 5,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b07_teleport_base",
+    "label": "传送石台与金属嵌件（无光）",
+    "category": "feature",
+    "triangles": 4628,
+    "vertices": 2423,
+    "bounds": [
+      [
+        -184.99667358398438,
+        -184.99667358398438,
+        0.0
+      ],
+      [
+        184.99667358398438,
+        184.99667358398438,
+        19.250003814697266
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/mortar.vmat",
+      "materials/gold_training_room/bronze.vmat",
+      "materials/gold_training_room/gold.vmat",
+      "materials/gold_training_room/teal.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b08_spawn_inlay",
+    "label": "中央刷怪金属地纹（无光）",
+    "category": "feature",
+    "triangles": 3564,
+    "vertices": 1847,
+    "bounds": [
+      [
+        -312.0,
+        -312.0,
+        -3.5042262077331543
+      ],
+      [
+        312.0,
+        312.0,
+        4.550008773803711
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/bronze.vmat",
+      "materials/gold_training_room/gold.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b09_coin_stele",
+    "label": "金币标识碑框",
+    "category": "feature",
+    "triangles": 360,
+    "vertices": 192,
+    "bounds": [
+      [
+        -79.5,
+        -39.0000114440918,
+        0.0
+      ],
+      [
+        79.5,
+        22.000009536743164,
+        194.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone_light.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/mortar.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b09_coin_relief",
+    "label": "金币浮雕嵌件",
+    "category": "feature",
+    "triangles": 4760,
+    "vertices": 2690,
+    "bounds": [
+      [
+        -46.000003814697266,
+        -59.0,
+        41.0
+      ],
+      [
+        43.999996185302734,
+        -14.99999713897705,
+        99.95105743408203
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/bronze.vmat",
+      "materials/gold_training_room/gold.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b10_brazier_plinth",
+    "label": "青铜灯具石基",
+    "category": "feature",
+    "triangles": 180,
+    "vertices": 96,
+    "bounds": [
+      [
+        -39.000003814697266,
+        -39.000003814697266,
+        0.0
+      ],
+      [
+        39.000003814697266,
+        39.000003814697266,
+        65.5
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_light.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b10_bronze_bowl",
+    "label": "青铜火盆（无火焰）",
+    "category": "feature",
+    "triangles": 1500,
+    "vertices": 762,
+    "bounds": [
+      [
+        -49.20000076293945,
+        -49.20000076293945,
+        0.0
+      ],
+      [
+        49.20000076293945,
+        49.20000076293945,
+        46.092323303222656
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/bronze.vmat",
+      "materials/gold_training_room/gold.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b11_rock_1",
+    "label": "大岩石",
+    "category": "nature",
+    "triangles": 364,
+    "vertices": 196,
+    "bounds": [
+      [
+        -121.24188995361328,
+        -102.2451400756836,
+        -13.370763778686523
+      ],
+      [
+        124.38970947265625,
+        99.64376068115234,
+        286.4582824707031
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/rock.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b11_rock_2",
+    "label": "中岩石",
+    "category": "nature",
+    "triangles": 364,
+    "vertices": 196,
+    "bounds": [
+      [
+        -78.60833740234375,
+        -81.39114379882812,
+        -5.122804641723633
+      ],
+      [
+        76.88524627685547,
+        80.2214584350586,
+        159.92367553710938
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/rock.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b11_rock_3",
+    "label": "小岩石",
+    "category": "nature",
+    "triangles": 364,
+    "vertices": 196,
+    "bounds": [
+      [
+        -40.95656204223633,
+        -38.0564079284668,
+        -2.210289478302002
+      ],
+      [
+        45.623329162597656,
+        39.40849685668945,
+        75.49916076660156
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/rock.vmat",
+      "materials/gold_training_room/moss.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b12_rubble",
+    "label": "碎石散落组",
+    "category": "nature",
+    "triangles": 780,
+    "vertices": 420,
+    "bounds": [
+      [
+        -85.43891906738281,
+        -63.828495025634766,
+        -3.3863351345062256
+      ],
+      [
+        87.39933776855469,
+        56.07160186767578,
+        14.907554626464844
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/stone.vmat",
+      "materials/gold_training_room/stone_cool.vmat",
+      "materials/gold_training_room/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b12_ground_patch",
+    "label": "不规则泥土接地片",
+    "category": "nature",
+    "triangles": 76,
+    "vertices": 40,
+    "bounds": [
+      [
+        -89.93768310546875,
+        -69.56928253173828,
+        -0.30000001192092896
+      ],
+      [
+        82.5046615600586,
+        79.18510437011719,
+        0.20000000298023224
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/earth.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b13_grass_small",
+    "label": "小草丛",
+    "category": "nature",
+    "triangles": 72,
+    "vertices": 90,
+    "bounds": [
+      [
+        -18.28264617919922,
+        -23.964967727661133,
+        0.0
+      ],
+      [
+        24.883527755737305,
+        22.54344367980957,
+        37.694366455078125
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/leaf.vmat",
+      "materials/gold_training_room/leaf_light.vmat",
+      "materials/gold_training_room/leaf_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b13_grass_large",
+    "label": "大草丛",
+    "category": "nature",
+    "triangles": 144,
+    "vertices": 180,
+    "bounds": [
+      [
+        -35.764041900634766,
+        -36.77307891845703,
+        0.0
+      ],
+      [
+        42.540191650390625,
+        38.30223846435547,
+        62.33230972290039
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/leaf.vmat",
+      "materials/gold_training_room/leaf_light.vmat",
+      "materials/gold_training_room/leaf_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b13_fern",
+    "label": "蕨类",
+    "category": "nature",
+    "triangles": 1188,
+    "vertices": 1170,
+    "bounds": [
+      [
+        -57.66080093383789,
+        -60.03081512451172,
+        -0.30873966217041016
+      ],
+      [
+        50.78065490722656,
+        61.48004150390625,
+        49.16608810424805
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/leaf.vmat",
+      "materials/gold_training_room/leaf_light.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b14_shrub",
+    "label": "低灌木",
+    "category": "nature",
+    "triangles": 528,
+    "vertices": 576,
+    "bounds": [
+      [
+        -46.26931381225586,
+        -41.05851364135742,
+        -0.4613933563232422
+      ],
+      [
+        45.37628173828125,
+        36.502685546875,
+        65.06636047363281
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/wood.vmat",
+      "materials/gold_training_room/leaf.vmat",
+      "materials/gold_training_room/leaf_light.vmat",
+      "materials/gold_training_room/leaf_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b14_shrub_flowers",
+    "label": "低灌木与小花",
+    "category": "nature",
+    "triangles": 792,
+    "vertices": 810,
+    "bounds": [
+      [
+        -45.00777816772461,
+        -51.77779006958008,
+        -0.5445718765258789
+      ],
+      [
+        34.43024826049805,
+        44.3364143371582,
+        64.05098724365234
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/gold.vmat",
+      "materials/gold_training_room/wood.vmat",
+      "materials/gold_training_room/leaf.vmat",
+      "materials/gold_training_room/leaf_light.vmat",
+      "materials/gold_training_room/leaf_dark.vmat",
+      "materials/gold_training_room/flower.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b16_banner",
+    "label": "青铜支架与青绿挂旗",
+    "category": "feature",
+    "triangles": 336,
+    "vertices": 207,
+    "bounds": [
+      [
+        -39.5,
+        -10.000001907348633,
+        0.0
+      ],
+      [
+        39.5,
+        20.74649429321289,
+        158.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/bronze.vmat",
+      "materials/gold_training_room/gold.vmat",
+      "materials/gold_training_room/teal.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "b16_moss_patch",
+    "label": "独立苔痕薄片",
+    "category": "nature",
+    "triangles": 600,
+    "vertices": 360,
+    "bounds": [
+      [
+        -70.9305419921875,
+        -62.381553649902344,
+        0.0
+      ],
+      [
+        63.74720001220703,
+        67.09764862060547,
+        0.25
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/moss.vmat",
+      "materials/gold_training_room/leaf_dark.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "room_earth_base",
+    "label": "房间外沿土层",
+    "category": "terrain",
+    "triangles": 188,
+    "vertices": 96,
+    "bounds": [
+      [
+        -1330.70849609375,
+        -1451.3663330078125,
+        -27.0
+      ],
+      [
+        1307.627197265625,
+        1574.2501220703125,
+        -14.0
+      ]
+    ],
+    "materials": [
+      "materials/gold_training_room/earth.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  }
+]

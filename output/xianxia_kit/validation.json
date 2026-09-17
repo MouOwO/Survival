@@ -1,0 +1,142 @@
+{
+  "materials": [
+    {
+      "name": "xx_stone",
+      "seamToSameAxisInterior": [
+        1.2605443000793457,
+        1.2780143022537231
+      ],
+      "normalUnitMaxError": 0.0062787532806396484,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_rock",
+      "seamToSameAxisInterior": [
+        1.0407276153564453,
+        0.9815161228179932
+      ],
+      "normalUnitMaxError": 0.006514787673950195,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_roof",
+      "seamToSameAxisInterior": [
+        0.8950790166854858,
+        1.2731664180755615
+      ],
+      "normalUnitMaxError": 0.00013840198516845703,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_wood",
+      "seamToSameAxisInterior": [
+        1.8531248569488525,
+        1.1521791219711304
+      ],
+      "normalUnitMaxError": 0.0050414204597473145,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_grass",
+      "seamToSameAxisInterior": [
+        0.7956181168556213,
+        1.2472809553146362
+      ],
+      "normalUnitMaxError": 0.0057218074798583984,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_earth",
+      "seamToSameAxisInterior": [
+        1.0084452629089355,
+        1.0191541910171509
+      ],
+      "normalUnitMaxError": 0.0009990930557250977,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_ground_blend",
+      "seamToSameAxisInterior": [
+        0.9591128826141357,
+        1.1509970426559448
+      ],
+      "normalUnitMaxError": 0.005230545997619629,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_bronze",
+      "seamToSameAxisInterior": [
+        0.9756794571876526,
+        1.1818467378616333
+      ],
+      "normalUnitMaxError": 0.00013840198516845703,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_array",
+      "seamToSameAxisInterior": [
+        0,
+        0
+      ],
+      "normalUnitMaxError": 0.006392717361450195,
+      "finite": true,
+      "pass": true
+    },
+    {
+      "name": "xx_water",
+      "seamToSameAxisInterior": [
+        0,
+        0
+      ],
+      "normalUnitMaxError": 0.001920461654663086,
+      "finite": true,
+      "pass": true
+    }
+  ],
+  "clouds": [
+    {
+      "name": "c01_cloud_sea",
+      "borderAlphaMax": 0,
+      "visibleFraction": 0.16617039271763392,
+      "softEdgePixels": 49103,
+      "transparentPixels": 1145465,
+      "pass": true,
+      "method": "raw straight-RGBA PNG decoded without color conversion"
+    },
+    {
+      "name": "c02_cliff_cloud",
+      "borderAlphaMax": 0,
+      "visibleFraction": 0.17845589773995535,
+      "softEdgePixels": 50769,
+      "transparentPixels": 1128589,
+      "pass": true,
+      "method": "raw straight-RGBA PNG decoded without color conversion"
+    },
+    {
+      "name": "c03_cloud_band",
+      "borderAlphaMax": 0,
+      "visibleFraction": 0.08368137904575892,
+      "softEdgePixels": 115154,
+      "transparentPixels": 1257819,
+      "pass": true,
+      "method": "raw straight-RGBA PNG decoded without color conversion"
+    },
+    {
+      "name": "c04_thin_mist",
+      "borderAlphaMax": 0,
+      "visibleFraction": 0.041003999255952384,
+      "softEdgePixels": 56432,
+      "transparentPixels": 1310567,
+      "pass": true,
+      "method": "raw straight-RGBA PNG decoded without color conversion"
+    }
+  ]
+}

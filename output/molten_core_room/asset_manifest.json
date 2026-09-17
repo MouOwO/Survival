@@ -1,0 +1,861 @@
+[
+  {
+    "name": "f01_floor_a",
+    "label": "F01 标准玄武岩石板 A",
+    "category": "floor",
+    "triangles": 552,
+    "vertices": 296,
+    "bounds": [
+      [
+        -128.00001525878906,
+        -128.00001525878906,
+        -17.0
+      ],
+      [
+        128.00001525878906,
+        128.00001525878906,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/mortar.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f01_floor_b",
+    "label": "F01 标准玄武岩石板 B",
+    "category": "floor",
+    "triangles": 552,
+    "vertices": 296,
+    "bounds": [
+      [
+        -128.00001525878906,
+        -128.00001525878906,
+        -17.0
+      ],
+      [
+        128.00001525878906,
+        128.00001525878906,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/mortar.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f02_floor_scorched",
+    "label": "F02 焦痕石板",
+    "category": "floor",
+    "triangles": 1280,
+    "vertices": 688,
+    "bounds": [
+      [
+        -128.00001525878906,
+        -128.00001525878906,
+        -17.0
+      ],
+      [
+        128.00001525878906,
+        128.00001525878906,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/stone_scorched.vmat",
+      "materials/molten_core_room/charred.vmat",
+      "materials/molten_core_room/mortar.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f01_niche_floor",
+    "label": "F01 传送龛半圆铺地",
+    "category": "floor",
+    "triangles": 160,
+    "vertices": 96,
+    "bounds": [
+      [
+        -253.93446350097656,
+        0.9999697208404541,
+        -14.0
+      ],
+      [
+        253.93446350097656,
+        253.93446350097656,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/stone_cool.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f03_wall_256",
+    "label": "F03 直线墙段 256",
+    "category": "wall",
+    "triangles": 1632,
+    "vertices": 872,
+    "bounds": [
+      [
+        -128.0,
+        -40.0000114440918,
+        0.0
+      ],
+      [
+        128.0,
+        40.0000114440918,
+        186.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/mortar.vmat",
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/iron.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f03_wall_128",
+    "label": "F03 直线墙段 128",
+    "category": "wall",
+    "triangles": 1032,
+    "vertices": 552,
+    "bounds": [
+      [
+        -64.0,
+        -40.00000762939453,
+        0.0
+      ],
+      [
+        64.0,
+        40.00000762939453,
+        186.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/mortar.vmat",
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/iron.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f04_pillar_body",
+    "label": "F04 包铜墙柱",
+    "category": "wall",
+    "triangles": 1932,
+    "vertices": 1056,
+    "bounds": [
+      [
+        -50.25,
+        -50.250003814697266,
+        0.0
+      ],
+      [
+        50.25000762939453,
+        50.25000762939453,
+        214.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/copper.vmat",
+      "materials/molten_core_room/patina.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f04_pillar_cap",
+    "label": "F04 可拆柱顶",
+    "category": "wall",
+    "triangles": 132,
+    "vertices": 72,
+    "bounds": [
+      [
+        -36.500003814697266,
+        -36.500003814697266,
+        -1.0
+      ],
+      [
+        36.500003814697266,
+        36.500003814697266,
+        36.5
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/bronze.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f05_corner",
+    "label": "F05 直角墙段",
+    "category": "wall",
+    "triangles": 2064,
+    "vertices": 1104,
+    "bounds": [
+      [
+        -40.000003814697266,
+        -40.0000114440918,
+        0.0
+      ],
+      [
+        128.0,
+        128.0,
+        186.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/mortar.vmat",
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/iron.vmat"
+    ],
+    "collision_hulls": 2,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f06_arc_60",
+    "label": "F06 弧形背墙 · 60 度",
+    "category": "wall",
+    "triangles": 1228,
+    "vertices": 672,
+    "bounds": [
+      [
+        -147.55233764648438,
+        192.45106506347656,
+        0.0
+      ],
+      [
+        147.55239868164062,
+        295.8256530761719,
+        186.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/bronze.vmat"
+    ],
+    "collision_hulls": 5,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f07_portal_ring",
+    "label": "F07 传送底座石环",
+    "category": "feature",
+    "triangles": 3144,
+    "vertices": 1672,
+    "bounds": [
+      [
+        -191.0,
+        -191.0,
+        0.0
+      ],
+      [
+        191.0,
+        191.0,
+        24.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_light.vmat",
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/copper.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f07_portal_inlay",
+    "label": "F07 铜质青色嵌片 · 无光",
+    "category": "feature",
+    "triangles": 3120,
+    "vertices": 1620,
+    "bounds": [
+      [
+        -145.0,
+        -145.0,
+        0.0
+      ],
+      [
+        145.0,
+        145.0,
+        9.149999618530273
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/iron.vmat",
+      "materials/molten_core_room/patina.vmat",
+      "materials/molten_core_room/teal.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f08_spawn_inlay",
+    "label": "F08 中央平铺铜纹 · 无光",
+    "category": "feature",
+    "triangles": 2712,
+    "vertices": 1428,
+    "bounds": [
+      [
+        -322.5,
+        -322.5,
+        0.30000001192092896
+      ],
+      [
+        322.5,
+        322.5,
+        0.550000011920929
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/copper.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f09_trough_straight",
+    "label": "F09 熔岩槽直线外壳",
+    "category": "exterior",
+    "triangles": 612,
+    "vertices": 328,
+    "bounds": [
+      [
+        -128.0,
+        -50.50001525878906,
+        -14.0
+      ],
+      [
+        128.0,
+        50.50001525878906,
+        18.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/charred.vmat",
+      "materials/molten_core_room/bronze.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f09_trough_end",
+    "label": "F09 熔岩槽封闭端头",
+    "category": "exterior",
+    "triangles": 672,
+    "vertices": 360,
+    "bounds": [
+      [
+        -128.0,
+        -50.50001525878906,
+        -14.0
+      ],
+      [
+        128.0,
+        50.50001525878906,
+        18.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/charred.vmat",
+      "materials/molten_core_room/bronze.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f09_trough_corner",
+    "label": "F09 熔岩槽直角外壳",
+    "category": "exterior",
+    "triangles": 260,
+    "vertices": 140,
+    "bounds": [
+      [
+        -80.0,
+        -49.00000762939453,
+        -14.0
+      ],
+      [
+        49.0000114440918,
+        80.0,
+        18.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/charred.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f09_lava_straight",
+    "label": "F09 独立熔岩表面 · 无光",
+    "category": "exterior",
+    "triangles": 12,
+    "vertices": 8,
+    "bounds": [
+      [
+        -126.0,
+        -30.000015258789062,
+        -2.0
+      ],
+      [
+        126.0,
+        30.000015258789062,
+        -1.5
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/lava.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f09_lava_corner",
+    "label": "F09 独立熔岩表面 · 无光转角",
+    "category": "exterior",
+    "triangles": 20,
+    "vertices": 12,
+    "bounds": [
+      [
+        -80.0,
+        -29.000003814697266,
+        -2.0
+      ],
+      [
+        29.000009536743164,
+        80.0,
+        -1.5
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/lava.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f10_brazier_bracket",
+    "label": "F10 炉火灯具支架",
+    "category": "feature",
+    "triangles": 352,
+    "vertices": 192,
+    "bounds": [
+      [
+        -46.500003814697266,
+        -64.25,
+        -51.0
+      ],
+      [
+        46.500003814697266,
+        45.000003814697266,
+        38.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/copper.vmat",
+      "materials/molten_core_room/iron.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f10_brazier_bowl",
+    "label": "F10 暗铁铜边火盆 · 无火焰",
+    "category": "feature",
+    "triangles": 2224,
+    "vertices": 1139,
+    "bounds": [
+      [
+        -61.20000076293945,
+        -61.20000076293945,
+        0.0
+      ],
+      [
+        61.20000076293945,
+        61.20000076293945,
+        57.092323303222656
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/charred.vmat",
+      "materials/molten_core_room/copper.vmat",
+      "materials/molten_core_room/iron.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f11_fire_stele",
+    "label": "F11 火焰标识碑主体",
+    "category": "feature",
+    "triangles": 772,
+    "vertices": 416,
+    "bounds": [
+      [
+        -79.0,
+        -43.25000762939453,
+        0.0
+      ],
+      [
+        79.0,
+        23.000009536743164,
+        194.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_edge.vmat",
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/copper.vmat",
+      "materials/molten_core_room/iron.vmat",
+      "materials/molten_core_room/patina.vmat"
+    ],
+    "collision_hulls": 1,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f11_flame_emblem",
+    "label": "F11 独立铜质火焰徽记",
+    "category": "feature",
+    "triangles": 108,
+    "vertices": 58,
+    "bounds": [
+      [
+        -44.000003814697266,
+        -35.750003814697266,
+        32.0
+      ],
+      [
+        41.999996185302734,
+        -32.99999237060547,
+        172.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/copper.vmat",
+      "materials/molten_core_room/iron.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f12_rock_1",
+    "label": "F12 大火山岩",
+    "category": "exterior",
+    "triangles": 52,
+    "vertices": 28,
+    "bounds": [
+      [
+        -120.17705535888672,
+        -98.91925048828125,
+        -11.474000930786133
+      ],
+      [
+        126.80343627929688,
+        107.20628356933594,
+        325.9994201660156
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f12_rock_2",
+    "label": "F12 中火山岩",
+    "category": "exterior",
+    "triangles": 52,
+    "vertices": 28,
+    "bounds": [
+      [
+        -79.3661880493164,
+        -68.54145050048828,
+        -3.331721782684326
+      ],
+      [
+        78.17034912109375,
+        80.04853057861328,
+        188.78025817871094
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f12_rock_3",
+    "label": "F12 小火山岩",
+    "category": "exterior",
+    "triangles": 52,
+    "vertices": 28,
+    "bounds": [
+      [
+        -38.2362174987793,
+        -44.65084457397461,
+        -1.9499297142028809
+      ],
+      [
+        48.775203704833984,
+        37.54997634887695,
+        98.21074676513672
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f12_rock_4",
+    "label": "F12 扁平火山岩",
+    "category": "exterior",
+    "triangles": 52,
+    "vertices": 28,
+    "bounds": [
+      [
+        -92.29975128173828,
+        -82.56580352783203,
+        -3.631049394607544
+      ],
+      [
+        109.08892059326172,
+        94.2221908569336,
+        76.77616882324219
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f14_rubble",
+    "label": "F14 火山碎石组",
+    "category": "exterior",
+    "triangles": 988,
+    "vertices": 532,
+    "bounds": [
+      [
+        -93.05475616455078,
+        -47.1934700012207,
+        -2.4666261672973633
+      ],
+      [
+        93.80457305908203,
+        50.45146942138672,
+        15.681307792663574
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/stone.vmat",
+      "materials/molten_core_room/stone_cool.vmat",
+      "materials/molten_core_room/charred.vmat",
+      "materials/molten_core_room/rock.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f14_ash_patch",
+    "label": "F14 不规则焦灰接地片",
+    "category": "exterior",
+    "triangles": 600,
+    "vertices": 350,
+    "bounds": [
+      [
+        -83.56388854980469,
+        -37.22498321533203,
+        -0.5
+      ],
+      [
+        94.25242614746094,
+        50.52426528930664,
+        -0.020051155239343643
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/charred.vmat",
+      "materials/molten_core_room/ash.vmat",
+      "materials/molten_core_room/earth.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "f16_banner",
+    "label": "F16 入口青铜挂旗",
+    "category": "feature",
+    "triangles": 104,
+    "vertices": 66,
+    "bounds": [
+      [
+        -30.999996185302734,
+        -6.850000858306885,
+        30.0
+      ],
+      [
+        30.999996185302734,
+        3.0000033378601074,
+        171.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/bronze.vmat",
+      "materials/molten_core_room/copper.vmat",
+      "materials/molten_core_room/teal.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  },
+  {
+    "name": "room_ash_base",
+    "label": "房间外围焦灰基底",
+    "category": "terrain",
+    "triangles": 188,
+    "vertices": 96,
+    "bounds": [
+      [
+        -1351.223388671875,
+        -1444.35791015625,
+        -27.0
+      ],
+      [
+        1308.2481689453125,
+        1558.94287109375,
+        -15.0
+      ]
+    ],
+    "materials": [
+      "materials/molten_core_room/earth.vmat"
+    ],
+    "collision_hulls": 0,
+    "import_scale": 0.01,
+    "pivot": "module origin, Z=0 walking plane or bottom",
+    "emissive": false
+  }
+]

@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "map": "gold_training_room_review",
+  "scope": "Visual sample and sampled navigation; not a full combat/teleport reward playthrough.",
+  "screenshot": "previews/runtime_complete.png",
+  "verified": {
+    "loadedCustomModels": true,
+    "renderedRoom": true,
+    "entryTraversable": true,
+    "homeTraversable": true,
+    "spawn01Traversable": true,
+    "spawn05Traversable": true,
+    "centerTraversable": true,
+    "eastWallTraversable": false,
+    "outsideEastWallTraversable": false,
+    "unitWalk": {
+      "from": [
+        0,
+        0,
+        127.25
+      ],
+      "destination": [
+        0,
+        900,
+        128
+      ],
+      "observed": [
+        0,
+        899.993896,
+        127.25
+      ]
+    },
+    "reviewCleanup": true
+  },
+  "notVerified": [
+    "Full challenge gameplay and reward loop",
+    "All spawn points in a combat session",
+    "FPS benchmark"
+  ],
+  "notes": [
+    "The production main map was not modified.",
+    "Room floor uses dota.nav.walkable=1; this was required for navigation on custom world meshes.",
+    "The wall movement probe remained inside the room; it is not treated as an isolated collision test because normal builder AI was active."
+  ],
+  "consoleEvidence": "GOLD_ROOM_WALL_END\tVector 0000000000EA56F0 [927.205383 159.205505 127.250000]\nGOLD_ROOM_MAP\tgold_training_room_review\t10\nGOLD_ROOM_MARKER\tchallenge_02_entry\t0\t1096\t152\t127.25\ttrue\tfalse\nGOLD_ROOM_MARKER\tchallenge_02_home\t0\t900\t152\t127.25\ttrue\tfalse\nGOLD_ROOM_MARKER\tchallenge_02_spawn_01\t340\t-140\t152\t127.25\ttrue\tfalse\nGOLD_ROOM_MARKER\tchallenge_02_spawn_05\t-340\t-140\t152\t127.25\ttrue\tfalse\nGOLD_ROOM_NAV\t0\ttrue\tfalse\nGOLD_ROOM_NAV\t900\ttrue\tfalse\nGOLD_ROOM_NAV\t1024\tfalse\tfalse\nGOLD_ROOM_NAV\t1200\tfalse\tfalse\nGOLD_ROOM_WALL_END\tVector 0000000000EA56F0 [927.205383 159.205505 127.250000]\nGOLD_ROOM_REVIEW_CLEAN\nGOLD_ROOM_MAP\tgold_training_room_review\t10\nGOLD_ROOM_MARKER\tchallenge_02_entry\t0\t1096\t152\t127.25\ttrue\tfalse\nGOLD_ROOM_MARKER\tchallenge_02_home\t0\t900\t152\t127.25\ttrue\tfalse\nGOLD_ROOM_MARKER\tchallenge_02_spawn_01\t340\t-140\t152\t127.25\ttrue\tfalse\nGOLD_ROOM_MARKER\tchallenge_02_spawn_05\t-340\t-140\t152\t127.25\ttrue\tfalse\nGOLD_ROOM_NAV\t0\ttrue\tfalse\nGOLD_ROOM_NAV\t900\ttrue\tfalse\nGOLD_ROOM_NAV\t1024\tfalse\tfalse\nGOLD_ROOM_NAV\t1200\tfalse\tfalse\nGOLD_ROOM_REVIEW_CLEAN"
+}

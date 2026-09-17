@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "[VScript][L2] [NATIVE_PATH]\t0\ttrue\ttrue\n[VScript][L2] [NATIVE_PATH]\t0\ttrue\ttrue\n[VScript][L2] [NATIVE_PATH]\t1\ttrue\ttrue\n[VScript][L2] [NATIVE_PATH]\t2\ttrue\ttrue\n[VScript][L2] [NATIVE_PATH]\t3\ttrue\ttrue\n[VScript][L2] [NATIVE_PATH]\t1\ttrue\ttrue\n[VScript][L2] [NATIVE_PATH]\t2\ttrue\ttrue\n[VScript][L2] [NATIVE_PATH]\t3\ttrue\ttrue\n[VScript][L2] [NATIVE_CAPTURE_COMPLETE]\n[VScript][L2] [NATIVE_CAPTURE_COMPLETE]"
+    }
+  ]
+}

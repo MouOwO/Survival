@@ -1,0 +1,30 @@
+{
+  "builtAt": "2026-09-15T11:24:23.327Z",
+  "vpkSha256": "4268f3ad01c4c25b1b2830ff973635b034ae28c78c927f54ce501e6251b368ba",
+  "captures": [
+    {
+      "key": "overview",
+      "label": "单平台整体",
+      "name": "basin_natural_overview_0004.tga",
+      "time": 1789471531208.1313
+    },
+    {
+      "key": "ground",
+      "label": "冷色石地与开放场地",
+      "name": "basin_natural_ground_0004.tga",
+      "time": 1789471539214.2952
+    },
+    {
+      "key": "shore",
+      "label": "浅水与湿润岸边",
+      "name": "basin_natural_shore_0004.tga",
+      "time": 1789471547207.2317
+    },
+    {
+      "key": "entry",
+      "label": "保留的原生入口",
+      "name": "basin_natural_entry_0004.tga",
+      "time": 1789471555206.469
+    }
+  ]
+}

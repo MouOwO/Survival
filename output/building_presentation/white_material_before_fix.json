@@ -1,0 +1,18 @@
+{
+  "status": "FAIL",
+  "compiled_texture": "materials/survival_buildings/build_white_glow_vmat_g_tcolor_58d603b0.vtex",
+  "width": 1,
+  "height": 1,
+  "minimum_rgba": [
+    0,
+    1,
+    0,
+    255
+  ],
+  "maximum_rgba": [
+    0,
+    1,
+    0,
+    255
+  ]
+}

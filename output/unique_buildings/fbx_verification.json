@@ -1,0 +1,170 @@
+[
+  {
+    "name": "main_city_lv01",
+    "vertices": 17266,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "main_city_lv02",
+    "vertices": 20353,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "main_city_lv03",
+    "vertices": 23210,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "main_city_lv04",
+    "vertices": 33754,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "main_city_lv05",
+    "vertices": 21713,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "population_farm_lv01",
+    "vertices": 14987,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "population_farm_lv02",
+    "vertices": 15972,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "population_farm_lv03",
+    "vertices": 21229,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "population_farm_lv04",
+    "vertices": 28040,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "population_farm_lv05",
+    "vertices": 29692,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv01",
+    "vertices": 4818,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv02",
+    "vertices": 11517,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv03",
+    "vertices": 12525,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv04",
+    "vertices": 12595,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv05",
+    "vertices": 13747,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv06",
+    "vertices": 16011,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv07",
+    "vertices": 11232,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv08",
+    "vertices": 9983,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv09",
+    "vertices": 16133,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "gold_mine_lv10",
+    "vertices": 21813,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "research_lab",
+    "vertices": 14722,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "advanced_research_lab",
+    "vertices": 18842,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "hero_altar",
+    "vertices": 10538,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  },
+  {
+    "name": "challenge_arena",
+    "vertices": 19546,
+    "uv": "BuildingAtlas",
+    "root": "root",
+    "status": "PASS"
+  }
+]

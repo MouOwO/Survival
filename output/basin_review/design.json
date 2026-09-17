@@ -1,0 +1,696 @@
+{
+  "map": "survival_basin_review",
+  "center": [
+    0,
+    0
+  ],
+  "basinRadius": 1280,
+  "puddleRadius": 490,
+  "puddleDepth": 16,
+  "courtRadius": 1152,
+  "courtOffset": 2880,
+  "courtHeight": 640,
+  "stairWidth": 512,
+  "stairRise": 512,
+  "stairRun": 1024,
+  "wallGapWidth": 512,
+  "themes": [
+    "peach",
+    "snow",
+    "pine",
+    "sand"
+  ],
+  "patches": [
+    {
+      "name": "basin",
+      "closed": true,
+      "topFaces": 2782
+    },
+    {
+      "name": "court_peach",
+      "closed": true,
+      "topFaces": 2157
+    },
+    {
+      "name": "court_snow",
+      "closed": true,
+      "topFaces": 2157
+    },
+    {
+      "name": "court_pine",
+      "closed": true,
+      "topFaces": 2156
+    },
+    {
+      "name": "court_sand",
+      "closed": true,
+      "topFaces": 2157
+    }
+  ],
+  "props": [
+    {
+      "model": "t06_rail_post",
+      "x": 2110,
+      "y": -320,
+      "z": 640,
+      "scale": 0.95
+    },
+    {
+      "model": "t06_rail_post",
+      "x": 2110,
+      "y": 320,
+      "z": 640,
+      "scale": 0.95
+    },
+    {
+      "model": "models/props_nature/river_rocks001.vmdl",
+      "x": 2390.1148893951577,
+      "y": -749.0244177646555,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "models/props_tree/tree_oak_01.vmdl",
+      "x": 2404.3503240562054,
+      "y": -812.4464360233883,
+      "z": 640,
+      "scale": 1.6
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 2335.1148893951577,
+      "y": -809.0244177646555,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 2405.1148893951577,
+      "y": -809.0244177646555,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": 3388.0045626507904,
+      "y": -757.413601888677,
+      "z": 630,
+      "scale": 1.4000000000000001
+    },
+    {
+      "model": "models/props_tree/tree_oak_01.vmdl",
+      "x": 3451.954402682018,
+      "y": -769.0505241613556,
+      "z": 640,
+      "scale": 1.85
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 3333.0045626507904,
+      "y": -817.413601888677,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 3403.0045626507904,
+      "y": -817.413601888677,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "x": 3773.5277722684796,
+      "y": 107.74098656002742,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "models/props_tree/tree_oak_01.vmdl",
+      "x": 3812.9060824503044,
+      "y": 159.4550918623912,
+      "z": 640,
+      "scale": 1.6
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 3718.5277722684796,
+      "y": 47.74098656002742,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 3788.5277722684796,
+      "y": 47.74098656002742,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks001.vmdl",
+      "x": 3348.4125263702263,
+      "y": 762.6366796446798,
+      "z": 630,
+      "scale": 1.4000000000000001
+    },
+    {
+      "model": "models/props_tree/tree_oak_01.vmdl",
+      "x": 3332.3814262222522,
+      "y": 825.6287730219095,
+      "z": 640,
+      "scale": 1.85
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 3293.4125263702263,
+      "y": 702.6366796446798,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 3363.4125263702263,
+      "y": 702.6366796446798,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": 2481.089025900862,
+      "y": 806.765167036404,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "models/props_tree/tree_oak_01.vmdl",
+      "x": 2419.2190027807465,
+      "y": 826.692541151333,
+      "z": 640,
+      "scale": 1.6
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 2426.089025900862,
+      "y": 746.765167036404,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": 2496.089025900862,
+      "y": 746.765167036404,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "t06_rail_post",
+      "x": 320.0000000000001,
+      "y": 2110,
+      "z": 640,
+      "scale": 0.95
+    },
+    {
+      "model": "t06_rail_post",
+      "x": -319.9999999999999,
+      "y": 2110,
+      "z": 640,
+      "scale": 0.95
+    },
+    {
+      "model": "models/props_nature/river_rocks001.vmdl",
+      "x": 749.0244177646556,
+      "y": 2390.1148893951577,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "models/props_tree/tree_pine_01_heavysnow.vmdl",
+      "x": 812.4464360233884,
+      "y": 2404.3503240562054,
+      "z": 640,
+      "scale": 1.25
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": 809.0244177646556,
+      "y": 2335.1148893951577,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": 809.0244177646556,
+      "y": 2405.1148893951577,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": 757.4136018886772,
+      "y": 3388.0045626507904,
+      "z": 630,
+      "scale": 1.4000000000000001
+    },
+    {
+      "model": "models/props_tree/tree_pine_01_heavysnow.vmdl",
+      "x": 769.0505241613558,
+      "y": 3451.954402682018,
+      "z": 640,
+      "scale": 1.35
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": 817.4136018886772,
+      "y": 3333.0045626507904,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": 817.4136018886772,
+      "y": 3403.0045626507904,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "x": -107.7409865600272,
+      "y": 3773.5277722684796,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "models/props_tree/tree_pine_01_heavysnow.vmdl",
+      "x": -159.455091862391,
+      "y": 3812.9060824503044,
+      "z": 640,
+      "scale": 1.25
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": -47.740986560027196,
+      "y": 3718.5277722684796,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": -47.74098656002719,
+      "y": 3788.5277722684796,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks001.vmdl",
+      "x": -762.6366796446796,
+      "y": 3348.4125263702263,
+      "z": 630,
+      "scale": 1.4000000000000001
+    },
+    {
+      "model": "models/props_tree/tree_pine_01_heavysnow.vmdl",
+      "x": -825.6287730219093,
+      "y": 3332.3814262222522,
+      "z": 640,
+      "scale": 1.35
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": -702.6366796446796,
+      "y": 3293.4125263702263,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": -702.6366796446796,
+      "y": 3363.4125263702263,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": -806.7651670364039,
+      "y": 2481.089025900862,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "models/props_tree/tree_pine_01_heavysnow.vmdl",
+      "x": -826.6925411513329,
+      "y": 2419.2190027807465,
+      "z": 640,
+      "scale": 1.25
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": -746.7651670364039,
+      "y": 2426.089025900862,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/chipped_rocks002.vmdl",
+      "x": -746.7651670364039,
+      "y": 2496.089025900862,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "t06_rail_post",
+      "x": -2110,
+      "y": 320.0000000000003,
+      "z": 640,
+      "scale": 0.95
+    },
+    {
+      "model": "t06_rail_post",
+      "x": -2110,
+      "y": -319.9999999999997,
+      "z": 640,
+      "scale": 0.95
+    },
+    {
+      "model": "models/props_nature/river_rocks001.vmdl",
+      "x": -2390.1148893951577,
+      "y": 749.0244177646558,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_01.vmdl",
+      "x": -2404.3503240562054,
+      "y": 812.4464360233886,
+      "z": 640,
+      "scale": 1.65
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -2335.1148893951577,
+      "y": 809.0244177646558,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -2405.1148893951577,
+      "y": 809.0244177646558,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": -3388.0045626507904,
+      "y": 757.4136018886775,
+      "z": 630,
+      "scale": 1.4000000000000001
+    },
+    {
+      "model": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_01.vmdl",
+      "x": -3451.954402682018,
+      "y": 769.0505241613561,
+      "z": 640,
+      "scale": 1.7999999999999998
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -3333.0045626507904,
+      "y": 817.4136018886775,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -3403.0045626507904,
+      "y": 817.4136018886775,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "x": -3773.5277722684796,
+      "y": -107.74098656002695,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_01.vmdl",
+      "x": -3812.9060824503044,
+      "y": -159.45509186239076,
+      "z": 640,
+      "scale": 1.65
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -3718.5277722684796,
+      "y": -47.74098656002697,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -3788.5277722684796,
+      "y": -47.74098656002696,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks001.vmdl",
+      "x": -3348.4125263702263,
+      "y": -762.6366796446794,
+      "z": 630,
+      "scale": 1.4000000000000001
+    },
+    {
+      "model": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_01.vmdl",
+      "x": -3332.3814262222522,
+      "y": -825.6287730219091,
+      "z": 640,
+      "scale": 1.7999999999999998
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -3293.4125263702263,
+      "y": -702.6366796446794,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -3363.4125263702263,
+      "y": -702.6366796446794,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": -2481.089025900862,
+      "y": -806.7651670364037,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_01.vmdl",
+      "x": -2419.2190027807465,
+      "y": -826.6925411513326,
+      "z": 640,
+      "scale": 1.65
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -2426.089025900862,
+      "y": -746.7651670364037,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "models/props_nature/fern002.vmdl",
+      "x": -2496.089025900862,
+      "y": -746.7651670364037,
+      "z": 640,
+      "scale": 0.7
+    },
+    {
+      "model": "t06_rail_post",
+      "x": -320.0000000000004,
+      "y": -2110,
+      "z": 640,
+      "scale": 0.95
+    },
+    {
+      "model": "t06_rail_post",
+      "x": 319.9999999999996,
+      "y": -2110,
+      "z": 640,
+      "scale": 0.95
+    },
+    {
+      "model": "models/props_nature/river_rocks001.vmdl",
+      "x": -749.0244177646559,
+      "y": -2390.1148893951577,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "v03_grass",
+      "x": -669.0244177646559,
+      "y": -2340.1148893951577,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": -669.0244177646559,
+      "y": -2375.1148893951577,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": -669.0244177646559,
+      "y": -2410.1148893951577,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": -757.4136018886776,
+      "y": -3388.0045626507904,
+      "z": 630,
+      "scale": 1.4000000000000001
+    },
+    {
+      "model": "v03_grass",
+      "x": -677.4136018886776,
+      "y": -3338.0045626507904,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": -677.4136018886776,
+      "y": -3373.0045626507904,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": -677.4136018886777,
+      "y": -3408.0045626507904,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "models/props_nature/river_rocks003.vmdl",
+      "x": 107.74098656002673,
+      "y": -3773.5277722684796,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "v03_grass",
+      "x": 187.74098656002673,
+      "y": -3723.5277722684796,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": 187.74098656002673,
+      "y": -3758.5277722684796,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": 187.7409865600267,
+      "y": -3793.5277722684796,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "models/props_nature/river_rocks001.vmdl",
+      "x": 762.6366796446792,
+      "y": -3348.4125263702263,
+      "z": 630,
+      "scale": 1.4000000000000001
+    },
+    {
+      "model": "v03_grass",
+      "x": 842.6366796446792,
+      "y": -3298.4125263702263,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": 842.6366796446792,
+      "y": -3333.4125263702263,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": 842.6366796446792,
+      "y": -3368.4125263702263,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": 806.7651670364036,
+      "y": -2481.089025900862,
+      "z": 630,
+      "scale": 1.1
+    },
+    {
+      "model": "v03_grass",
+      "x": 886.7651670364036,
+      "y": -2431.089025900862,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": 886.7651670364036,
+      "y": -2466.089025900862,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "v03_grass",
+      "x": 886.7651670364036,
+      "y": -2501.089025900862,
+      "z": 640,
+      "scale": 0.9
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": 820.2438661763952,
+      "y": 820.243866176395,
+      "z": 218.8050344921508,
+      "scale": 1.4
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": -820.243866176395,
+      "y": 820.2438661763952,
+      "z": 218.80503449215075,
+      "scale": 1.4
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": -820.2438661763953,
+      "y": -820.243866176395,
+      "z": 250.23200254488626,
+      "scale": 1.4
+    },
+    {
+      "model": "models/props_nature/river_rocks002.vmdl",
+      "x": 820.2438661763949,
+      "y": -820.2438661763953,
+      "z": 250.23200254488626,
+      "scale": 1.4
+    }
+  ]
+}

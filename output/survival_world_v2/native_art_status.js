@@ -1,0 +1,1 @@
+window.nativeArtVerified=true;

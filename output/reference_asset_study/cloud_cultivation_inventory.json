@@ -1,0 +1,2354 @@
+[
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_01.vmdl_c",
+    "size": 56789
+  },
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_01_inspector.vmdl_c",
+    "size": 60289
+  },
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_01_stump.vmdl_c",
+    "size": 5271
+  },
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_02.vmdl_c",
+    "size": 54421
+  },
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_02_inspector.vmdl_c",
+    "size": 58497
+  },
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_02_stump.vmdl_c",
+    "size": 5079
+  },
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_03.vmdl_c",
+    "size": 50517
+  },
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_03_inspector.vmdl_c",
+    "size": 55969
+  },
+  {
+    "path": "maps/journey_assets/props/trees/journey_armandpine/journey_armandpine_03_stump.vmdl_c",
+    "size": 5079
+  },
+  {
+    "path": "maps/jungle_assets/temple/jungle_temple_01.vmdl_c",
+    "size": 80098
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_bowl_01.vmdl_c",
+    "size": 12356
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_bowl_coals_01.vmdl_c",
+    "size": 8442
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_bricks_endcap_01.vmdl_c",
+    "size": 13341
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_bricks_top_01.vmdl_c",
+    "size": 9578
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_bricks_top_02.vmdl_c",
+    "size": 11002
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_bricks_top_03.vmdl_c",
+    "size": 9930
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_column_01.vmdl_c",
+    "size": 8390
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_column_02.vmdl_c",
+    "size": 8406
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_corner_ext_01.vmdl_c",
+    "size": 33178
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_corner_int_01.vmdl_c",
+    "size": 31002
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_endcap_01.vmdl_c",
+    "size": 10294
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_endcap_01_headpiece.vmdl_c",
+    "size": 24912
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_entrance_01.vmdl_c",
+    "size": 65015
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_entrance_door_01.vmdl_c",
+    "size": 18572
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_01.vmdl_c",
+    "size": 8150
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_02.vmdl_c",
+    "size": 9958
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_03.vmdl_c",
+    "size": 8102
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_04.vmdl_c",
+    "size": 10454
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_05.vmdl_c",
+    "size": 20902
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_06.vmdl_c",
+    "size": 7334
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_07.vmdl_c",
+    "size": 8774
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_08.vmdl_c",
+    "size": 17366
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_rubble_09.vmdl_c",
+    "size": 29702
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_spout.vmdl_c",
+    "size": 7922
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_spout_round.vmdl_c",
+    "size": 7464
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_stair_column_l_01.vmdl_c",
+    "size": 32078
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_stair_column_r_01.vmdl_c",
+    "size": 32078
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_stair_column_serpent.vmdl_c",
+    "size": 50449
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_statue_01.vmdl_c",
+    "size": 78486
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_str_01.vmdl_c",
+    "size": 84451
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_str_02.vmdl_c",
+    "size": 87715
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_str_03.vmdl_c",
+    "size": 59203
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_str_half_01.vmdl_c",
+    "size": 21272
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_str_qrtr_01.vmdl_c",
+    "size": 14472
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_trim_ext_01.vmdl_c",
+    "size": 35512
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_trim_ext_02.vmdl_c",
+    "size": 25560
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_trim_int_01.vmdl_c",
+    "size": 42072
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_trim_int_02.vmdl_c",
+    "size": 28232
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_trim_str_01.vmdl_c",
+    "size": 34440
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_trim_str_02.vmdl_c",
+    "size": 25240
+  },
+  {
+    "path": "maps/jungle_assets/temple/temple_warddisc_01.vmdl_c",
+    "size": 10568
+  },
+  {
+    "path": "maps/reef_assets/models/props/naga_city/darkreef_naga_gazebo_000.vmdl_c",
+    "size": 398187
+  },
+  {
+    "path": "maps/ti10_assets/gazebo/gazebo_ti10_01.vmdl_c",
+    "size": 17280
+  },
+  {
+    "path": "models/creeps/pine_cone/pine_cone.vmdl_c",
+    "size": 273985
+  },
+  {
+    "path": "models/heroes/antimage_female/debut/lm_am_debut_temple_interior.vmdl_c",
+    "size": 911965
+  },
+  {
+    "path": "models/heroes/antimage_female/debut/lm_am_debut_temple_interior_lightshell.vmdl_c",
+    "size": 769240
+  },
+  {
+    "path": "models/heroes/antimage_female/debut/models/am_debut_temple_lantern.vmdl_c",
+    "size": 42923
+  },
+  {
+    "path": "models/heroes/antimage_female/debut/models/am_debut_temple_lantern2.vmdl_c",
+    "size": 51035
+  },
+  {
+    "path": "models/heroes/antimage_female/debut/models/am_debut_temple_truss.vmdl_c",
+    "size": 10185
+  },
+  {
+    "path": "models/heroes/antimage_female/debut/models/am_temple.vmdl_c",
+    "size": 3425855
+  },
+  {
+    "path": "models/heroes/dawnbreaker/debut/models/trees/pine_01_revamp/pine_01_revamp.vmdl_c",
+    "size": 799785
+  },
+  {
+    "path": "models/heroes/dawnbreaker/debut/models/trees/pine_01_revamp/pine_01_revamp_bg.vmdl_c",
+    "size": 27973
+  },
+  {
+    "path": "models/heroes/dawnbreaker/debut/models/trees/pine_01_revamp/pine_01_revamp_low.vmdl_c",
+    "size": 246710
+  },
+  {
+    "path": "models/heroes/dawnbreaker/debut/models/trees/pine_02_revamp/pine_02_revamp.vmdl_c",
+    "size": 752345
+  },
+  {
+    "path": "models/heroes/dawnbreaker/debut/models/trees/pine_02_revamp/pine_02_revamp_bg.vmdl_c",
+    "size": 38981
+  },
+  {
+    "path": "models/heroes/dawnbreaker/debut/models/trees/pine_02_revamp/pine_02_revamp_low.vmdl_c",
+    "size": 232886
+  },
+  {
+    "path": "models/heroes/mirana_persona/debut/models/background/mirana_persona_temple.vmdl_c",
+    "size": 74729
+  },
+  {
+    "path": "models/heroes/primal_beast/pine_cone_proj_fx.vmdl_c",
+    "size": 34890
+  },
+  {
+    "path": "models/items/clinkz/demonspinerecurve_lod1/demonspinerecurve_lod1.vmdl_c",
+    "size": 20725
+  },
+  {
+    "path": "models/items/disruptor/ti9_cache_disruptor_temple_defender_arms/ti9_cache_disruptor_temple_defender_arms.vmdl_c",
+    "size": 55371
+  },
+  {
+    "path": "models/items/disruptor/ti9_cache_disruptor_temple_defender_back/ti9_cache_disruptor_temple_defender_back.vmdl_c",
+    "size": 61632
+  },
+  {
+    "path": "models/items/disruptor/ti9_cache_disruptor_temple_defender_head/ti9_cache_disruptor_temple_defender_head.vmdl_c",
+    "size": 66302
+  },
+  {
+    "path": "models/items/disruptor/ti9_cache_disruptor_temple_defender_legs/ti9_cache_disruptor_temple_defender_legs.vmdl_c",
+    "size": 211687
+  },
+  {
+    "path": "models/items/disruptor/ti9_cache_disruptor_temple_defender_shoulder/ti9_cache_disruptor_temple_defender_shoulder.vmdl_c",
+    "size": 64152
+  },
+  {
+    "path": "models/items/disruptor/ti9_cache_disruptor_temple_defender_weapon/ti9_cache_disruptor_temple_defender_weapon.vmdl_c",
+    "size": 60299
+  },
+  {
+    "path": "models/items/dragon_knight/guardian_of_the_rising_dragon_temple_dragon/guardian_of_the_rising_dragon_temple_dragon.vmdl_c",
+    "size": 245499
+  },
+  {
+    "path": "models/items/faceless_void/viridus_spine/viridus_spine.vmdl_c",
+    "size": 30703
+  },
+  {
+    "path": "models/items/lanaya/blessed_gifts_of_the_temple_armor/blessed_gifts_of_the_temple_armor.vmdl_c",
+    "size": 180997
+  },
+  {
+    "path": "models/items/lanaya/blessed_gifts_of_the_temple_head/blessed_gifts_of_the_temple_head.vmdl_c",
+    "size": 132078
+  },
+  {
+    "path": "models/items/lanaya/blessed_gifts_of_the_temple_shoulder/blessed_gifts_of_the_temple_shoulder.vmdl_c",
+    "size": 130252
+  },
+  {
+    "path": "models/items/lanaya/blessed_gifts_of_the_temple_weapon/blessed_gifts_of_the_temple_weapon.vmdl_c",
+    "size": 89255
+  },
+  {
+    "path": "models/items/nerubian_assassin/shadow_spine/shadow_spine.vmdl_c",
+    "size": 56504
+  },
+  {
+    "path": "models/items/nerubian_assassin/spines_of_the_predator/spines_of_the_predator.vmdl_c",
+    "size": 57005
+  },
+  {
+    "path": "models/items/skeleton_king/weapon_spine_sword.vmdl_c",
+    "size": 22958
+  },
+  {
+    "path": "models/items/skeleton_king/spine_splitter/spine_splitter.vmdl_c",
+    "size": 32278
+  },
+  {
+    "path": "models/items/tidehunter/tidehunter_skull_spines.vmdl_c",
+    "size": 46809
+  },
+  {
+    "path": "models/items/tidehunter/tidehunter_skull_spines_lod.vmdl_c",
+    "size": 20994
+  },
+  {
+    "path": "models/items/tidehunter/tidehunter_spines.vmdl_c",
+    "size": 26794
+  },
+  {
+    "path": "models/items/ursa/gloves_alpine.vmdl_c",
+    "size": 22757
+  },
+  {
+    "path": "models/items/ursa/hat_alpine.vmdl_c",
+    "size": 32503
+  },
+  {
+    "path": "models/items/ursa/pants_alpine.vmdl_c",
+    "size": 21677
+  },
+  {
+    "path": "models/items/ursa/scarf_alpine.vmdl_c",
+    "size": 44509
+  },
+  {
+    "path": "models/items/ursa/alpine_stalker/alpine_stalker_arms.vmdl_c",
+    "size": 224346
+  },
+  {
+    "path": "models/items/ursa/alpine_stalker/alpine_stalker_back.vmdl_c",
+    "size": 527920
+  },
+  {
+    "path": "models/items/ursa/alpine_stalker/alpine_stalker_belt.vmdl_c",
+    "size": 207085
+  },
+  {
+    "path": "models/items/ursa/alpine_stalker/alpine_stalker_head.vmdl_c",
+    "size": 179168
+  },
+  {
+    "path": "models/items/wraith_king/spine_splitter/spine_splitter.vmdl_c",
+    "size": 15606
+  },
+  {
+    "path": "models/items/wraith_king/weapon_spine_sword/weapon_spine_sword.vmdl_c",
+    "size": 20569
+  },
+  {
+    "path": "models/props_foliage/tree_pine01.vmdl_c",
+    "size": 18110
+  },
+  {
+    "path": "models/props_foliage/tree_pine01_4cluster.vmdl_c",
+    "size": 24711
+  },
+  {
+    "path": "models/props_foliage/tree_pine01_8cluster.vmdl_c",
+    "size": 22503
+  },
+  {
+    "path": "models/props_gameplay/temple_arrowhead.vmdl_c",
+    "size": 50136
+  },
+  {
+    "path": "models/props_gameplay/temple_portal001.vmdl_c",
+    "size": 309431
+  },
+  {
+    "path": "models/props_nature/pinecones_01.vmdl_c",
+    "size": 6848
+  },
+  {
+    "path": "models/props_nature/pinecones_02.vmdl_c",
+    "size": 6080
+  },
+  {
+    "path": "models/props_nature/pinecones_03.vmdl_c",
+    "size": 7648
+  },
+  {
+    "path": "models/props_nature/temple_floor_ivy001.vmdl_c",
+    "size": 18933
+  },
+  {
+    "path": "models/props_nature/temple_floor_ivy002.vmdl_c",
+    "size": 19301
+  },
+  {
+    "path": "models/props_nature/temple_pillar_ivy001.vmdl_c",
+    "size": 111190
+  },
+  {
+    "path": "models/props_nature/temple_pillar_ivy002.vmdl_c",
+    "size": 102838
+  },
+  {
+    "path": "models/props_nature/temple_pillar_ivy003.vmdl_c",
+    "size": 88390
+  },
+  {
+    "path": "models/props_nature/temple_thorns001.vmdl_c",
+    "size": 29250
+  },
+  {
+    "path": "models/props_nature/temple_thorns002.vmdl_c",
+    "size": 28226
+  },
+  {
+    "path": "models/props_nature/temple_thorns003.vmdl_c",
+    "size": 23170
+  },
+  {
+    "path": "models/props_nature/temple_thorns004.vmdl_c",
+    "size": 29266
+  },
+  {
+    "path": "models/props_nature/temple_wall_ivy001.vmdl_c",
+    "size": 29876
+  },
+  {
+    "path": "models/props_nature/temple_wall_ivy002.vmdl_c",
+    "size": 13044
+  },
+  {
+    "path": "models/props_structures/column_temple_dire_00.vmdl_c",
+    "size": 156731
+  },
+  {
+    "path": "models/props_structures/column_temple_dire_01.vmdl_c",
+    "size": 70907
+  },
+  {
+    "path": "models/props_structures/column_temple_dire_02.vmdl_c",
+    "size": 51531
+  },
+  {
+    "path": "models/props_structures/column_temple_dire_03.vmdl_c",
+    "size": 42251
+  },
+  {
+    "path": "models/props_structures/column_temple_dire_04.vmdl_c",
+    "size": 220267
+  },
+  {
+    "path": "models/props_structures/column_temple_dire_05.vmdl_c",
+    "size": 157803
+  },
+  {
+    "path": "models/props_structures/column_temple_radiant_00.vmdl_c",
+    "size": 162750
+  },
+  {
+    "path": "models/props_structures/column_temple_radiant_01.vmdl_c",
+    "size": 70702
+  },
+  {
+    "path": "models/props_structures/column_temple_radiant_02.vmdl_c",
+    "size": 51758
+  },
+  {
+    "path": "models/props_structures/column_temple_radiant_03.vmdl_c",
+    "size": 42478
+  },
+  {
+    "path": "models/props_structures/column_temple_radiant_04.vmdl_c",
+    "size": 220142
+  },
+  {
+    "path": "models/props_structures/column_temple_radiant_05.vmdl_c",
+    "size": 157742
+  },
+  {
+    "path": "models/props_structures/temple_car001.vmdl_c",
+    "size": 650723
+  },
+  {
+    "path": "models/props_structures/temple_statue001.vmdl_c",
+    "size": 11638
+  },
+  {
+    "path": "models/props_structures/temple_statue002.vmdl_c",
+    "size": 12646
+  },
+  {
+    "path": "models/props_tree/temple_tree001.vmdl_c",
+    "size": 72348
+  },
+  {
+    "path": "models/props_tree/tree_pine_00.vmdl_c",
+    "size": 207788
+  },
+  {
+    "path": "models/props_tree/tree_pine_01.vmdl_c",
+    "size": 46942
+  },
+  {
+    "path": "models/props_tree/tree_pine_01_destruction.vmdl_c",
+    "size": 38965
+  },
+  {
+    "path": "models/props_tree/tree_pine_01_heavysnow.vmdl_c",
+    "size": 35028
+  },
+  {
+    "path": "models/props_tree/tree_pine_01_heavysnow_inspector.vmdl_c",
+    "size": 24080
+  },
+  {
+    "path": "models/props_tree/tree_pine_01_inspector.vmdl_c",
+    "size": 44700
+  },
+  {
+    "path": "models/props_tree/tree_pine_01_inspector_test.vmdl_c",
+    "size": 48649
+  },
+  {
+    "path": "models/props_tree/tree_pine_01_sfm.vmdl_c",
+    "size": 23110
+  },
+  {
+    "path": "models/props_tree/tree_pine_02.vmdl_c",
+    "size": 49613
+  },
+  {
+    "path": "models/props_tree/tree_pine_02_destruction.vmdl_c",
+    "size": 36967
+  },
+  {
+    "path": "models/props_tree/tree_pine_02_heavysnow.vmdl_c",
+    "size": 42612
+  },
+  {
+    "path": "models/props_tree/tree_pine_02_heavysnow_inspector.vmdl_c",
+    "size": 29552
+  },
+  {
+    "path": "models/props_tree/tree_pine_02_inspector.vmdl_c",
+    "size": 46940
+  },
+  {
+    "path": "models/props_tree/tree_pine_02_sfm.vmdl_c",
+    "size": 22630
+  },
+  {
+    "path": "models/props_tree/tree_pine_03.vmdl_c",
+    "size": 38300
+  },
+  {
+    "path": "models/props_tree/tree_pine_03b.vmdl_c",
+    "size": 52575
+  },
+  {
+    "path": "models/props_tree/tree_pine_03b_destruction.vmdl_c",
+    "size": 36970
+  },
+  {
+    "path": "models/props_tree/tree_pine_03b_inspector.vmdl_c",
+    "size": 43677
+  },
+  {
+    "path": "models/props_tree/tree_pine_03b_sfm.vmdl_c",
+    "size": 20887
+  },
+  {
+    "path": "models/props_tree/tree_pine_04.vmdl_c",
+    "size": 69777
+  },
+  {
+    "path": "models/props_tree/tree_pine_05.vmdl_c",
+    "size": 195980
+  },
+  {
+    "path": "models/props_tree/tree_pine_snow_01.vmdl_c",
+    "size": 48026
+  },
+  {
+    "path": "models/props_tree/tree_pine_snow_01_destruction.vmdl_c",
+    "size": 38748
+  },
+  {
+    "path": "models/props_tree/tree_pine_snow_02.vmdl_c",
+    "size": 50969
+  },
+  {
+    "path": "models/props_tree/tree_pine_snow_02_destruction.vmdl_c",
+    "size": 36750
+  },
+  {
+    "path": "models/props_tree/tree_pine_snow_03b.vmdl_c",
+    "size": 49276
+  },
+  {
+    "path": "models/props_tree/tree_pine_snow_03b_destruction.vmdl_c",
+    "size": 29770
+  },
+  {
+    "path": "models/props_tree/tree_pinestatic_02.vmdl_c",
+    "size": 20068
+  },
+  {
+    "path": "models/props_tree/tree_pinestatic_03b.vmdl_c",
+    "size": 22325
+  },
+  {
+    "path": "models/props_tree/armandpine/armandpine_01.vmdl_c",
+    "size": 36767
+  },
+  {
+    "path": "models/props_tree/armandpine/armandpine_02.vmdl_c",
+    "size": 35519
+  },
+  {
+    "path": "models/props_tree/armandpine/armandpine_03.vmdl_c",
+    "size": 33007
+  },
+  {
+    "path": "maps/journey_assets/particles/journey_fountain_radiant_mist.vpcf_c",
+    "size": 3872
+  },
+  {
+    "path": "models/events/crownfall/survivors/background/particles/survivors_bg_clouds.vpcf_c",
+    "size": 3308
+  },
+  {
+    "path": "models/events/crownfall/survivors/background/particles/survivors_bg_clouds_night.vpcf_c",
+    "size": 3392
+  },
+  {
+    "path": "models/events/crownfall/survivors/background/particles/survivors_bg_clouds_top.vpcf_c",
+    "size": 3249
+  },
+  {
+    "path": "models/events/crownfall/survivors/background/particles/survivors_bg_clouds_top_night.vpcf_c",
+    "size": 3308
+  },
+  {
+    "path": "models/heroes/dawnbreaker/debut/particles/ambient/battlemaiden_debut_cloud_fx_ambient.vpcf_c",
+    "size": 4099
+  },
+  {
+    "path": "models/heroes/dawnbreaker/debut/particles/ambient/battlemaiden_debut_cloud_fx_ambient_foreground.vpcf_c",
+    "size": 3708
+  },
+  {
+    "path": "models/heroes/kez/debut/particles/kez_debut_clouds_background.vpcf_c",
+    "size": 3407
+  },
+  {
+    "path": "models/heroes/kez/debut/particles/kez_debut_clouds_background_large.vpcf_c",
+    "size": 3517
+  },
+  {
+    "path": "models/heroes/kez/debut/particles/kez_debut_clouds_background_parallax.vpcf_c",
+    "size": 3481
+  },
+  {
+    "path": "models/heroes/kez/debut/particles/kez_debut_clouds_bottom.vpcf_c",
+    "size": 3368
+  },
+  {
+    "path": "models/heroes/kez/debut/particles/kez_debut_clouds_feather_mask.vpcf_c",
+    "size": 3705
+  },
+  {
+    "path": "models/heroes/kez/debut/particles/kez_debut_clouds_static.vpcf_c",
+    "size": 2735
+  },
+  {
+    "path": "models/items/drow/drow_arcana/debut/particles/ambient/drow_arcana_debut_snow_cloud.vpcf_c",
+    "size": 3822
+  },
+  {
+    "path": "models/items/drow/drow_arcana/debut/particles/ambient/drow_arcana_debut_snow_cloud_init.vpcf_c",
+    "size": 3541
+  },
+  {
+    "path": "models/items/razor/razor_arcana/debut/particles/razor_env_rain/razor_env_rain_cloud_light_strike_sky_random.vpcf_c",
+    "size": 3920
+  },
+  {
+    "path": "models/items/razor/razor_arcana/debut/particles/razor_env_rain/razor_env_rain_cloud_lightning_strike_01.vpcf_c",
+    "size": 3651
+  },
+  {
+    "path": "models/items/razor/razor_arcana/debut/particles/razor_env_rain/razor_env_rain_cloud_lightning_strike_02.vpcf_c",
+    "size": 3646
+  },
+  {
+    "path": "models/items/razor/razor_arcana/debut/particles/razor_env_rain/razor_env_rain_cloud_lightning_strike_03.vpcf_c",
+    "size": 3637
+  },
+  {
+    "path": "models/items/razor/razor_arcana/debut/particles/razor_env_rain/razor_env_rain_cloud_lightning_strike_04.vpcf_c",
+    "size": 3637
+  },
+  {
+    "path": "models/items/razor/razor_arcana/debut/particles/razor_env_rain/razor_env_rain_cloud_lightning_strike_05.vpcf_c",
+    "size": 3633
+  },
+  {
+    "path": "models/items/razor/razor_arcana/debut/particles/razor_env_rain/razor_env_rain_cloud_lightning_strike_base.vpcf_c",
+    "size": 3106
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds.vpcf_c",
+    "size": 4200
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_flowing.vpcf_c",
+    "size": 4364
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_flowing_shadows.vpcf_c",
+    "size": 3924
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_flowing_tex.vpcf_c",
+    "size": 3843
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_flowing_tex_larger.vpcf_c",
+    "size": 3965
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_pushed.vpcf_c",
+    "size": 3610
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_pushed_map.vpcf_c",
+    "size": 4156
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_sky.vpcf_c",
+    "size": 4229
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_sky_circle.vpcf_c",
+    "size": 3513
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_sky_circle_gradient.vpcf_c",
+    "size": 3678
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_sky_circle_static.vpcf_c",
+    "size": 3504
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_sky_circle_static_2.vpcf_c",
+    "size": 3614
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_sky_circle_static_top.vpcf_c",
+    "size": 3504
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_sky_top.vpcf_c",
+    "size": 3421
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_static_map.vpcf_c",
+    "size": 4165
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crowfall_clouds_track.vpcf_c",
+    "size": 4335
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crownfall_clouds_flowing_layer.vpcf_c",
+    "size": 4258
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crownfall_clouds_flowing_layer_dusky.vpcf_c",
+    "size": 4175
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/crownfall_clouds_flowing_mainscreen.vpcf_c",
+    "size": 3925
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/dawn/crowfall_clouds_flowing_dawn.vpcf_c",
+    "size": 4415
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/dawn/crowfall_clouds_flowing_tex_dawn.vpcf_c",
+    "size": 3836
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/dawn/crowfall_clouds_flowing_tex_larger_dawn.vpcf_c",
+    "size": 3933
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/night/crowfall_clouds_flowing_night.vpcf_c",
+    "size": 4380
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/night/crowfall_clouds_flowing_tex_larger_night.vpcf_c",
+    "size": 3959
+  },
+  {
+    "path": "models/items/vengefulspirit/vengeful_spirit_arcana/debut/particles/night/crowfall_clouds_flowing_tex_night.vpcf_c",
+    "size": 3855
+  },
+  {
+    "path": "particles/dev/new_heroes/new_hero_cloud.vpcf_c",
+    "size": 2725
+  },
+  {
+    "path": "particles/dire_fx/tower_bad_face_end_cloud.vpcf_c",
+    "size": 1957
+  },
+  {
+    "path": "particles/econ/courier/courier_beetlejaw/courier_beetlejaw_ambient_cloud_l.vpcf_c",
+    "size": 2203
+  },
+  {
+    "path": "particles/econ/courier/courier_beetlejaw/courier_beetlejaw_ambient_cloud_r.vpcf_c",
+    "size": 2223
+  },
+  {
+    "path": "particles/econ/courier/courier_beetlejaw_gold/courier_beetlejaw_gold_ambient_cloud_l.vpcf_c",
+    "size": 2219
+  },
+  {
+    "path": "particles/econ/courier/courier_beetlejaw_gold/courier_beetlejaw_gold_ambient_cloud_r.vpcf_c",
+    "size": 2239
+  },
+  {
+    "path": "particles/econ/courier/courier_mechjaw/courier_mechjaw_ambient_cloud_l.vpcf_c",
+    "size": 2203
+  },
+  {
+    "path": "particles/econ/courier/courier_mechjaw/courier_mechjaw_ambient_cloud_r.vpcf_c",
+    "size": 2223
+  },
+  {
+    "path": "particles/econ/courier/courier_smeevil/courier_smeevil_crab_cloud.vpcf_c",
+    "size": 2542
+  },
+  {
+    "path": "particles/econ/courier/courier_ti10/courier_flying_dire_ti10_cloud.vpcf_c",
+    "size": 4366
+  },
+  {
+    "path": "particles/econ/courier/courier_ti10/courier_flying_rad_ti10_cloud.vpcf_c",
+    "size": 4144
+  },
+  {
+    "path": "particles/econ/courier/courier_ti10/courier_flying_rad_ti10_cloud_gold.vpcf_c",
+    "size": 4640
+  },
+  {
+    "path": "particles/econ/courier/courier_ti10/courier_flying_rad_ti10_cloud_gold_shad.vpcf_c",
+    "size": 3777
+  },
+  {
+    "path": "particles/econ/courier/courier_ti10/courier_flying_rad_ti10_cloud_shadow.vpcf_c",
+    "size": 3628
+  },
+  {
+    "path": "particles/econ/events/diretide_2020/emblem/fall20_emblem_effect_candle_cloud.vpcf_c",
+    "size": 3803
+  },
+  {
+    "path": "particles/econ/events/diretide_2020/emblem/fall20_emblem_gem_blue_cloud.vpcf_c",
+    "size": 3840
+  },
+  {
+    "path": "particles/econ/events/diretide_2020/emblem/fall20_emblem_gem_green_cloud.vpcf_c",
+    "size": 3787
+  },
+  {
+    "path": "particles/econ/events/diretide_2020/emblem/fall20_emblem_gem_red_cloud.vpcf_c",
+    "size": 3807
+  },
+  {
+    "path": "particles/econ/events/diretide_2020/emblem/fall20_emblem_gem_yellow_cloud.vpcf_c",
+    "size": 3813
+  },
+  {
+    "path": "particles/econ/events/diretide_2020/emblem/fall20_emblem_v1_effect_candle_cloud.vpcf_c",
+    "size": 3803
+  },
+  {
+    "path": "particles/econ/events/diretide_2020/emblem/fall20_emblem_v2_effect_candle_cloud.vpcf_c",
+    "size": 3398
+  },
+  {
+    "path": "particles/econ/events/diretide_2020/emblem/fall20_emblem_v3_effect_candle_cloud.vpcf_c",
+    "size": 3448
+  },
+  {
+    "path": "particles/econ/events/fall_major_2016/teleport_team_flair_ground_decal_cloud9.vpcf_c",
+    "size": 2034
+  },
+  {
+    "path": "particles/econ/events/frostivus_2023/dashboard_treasure_ambient_clouds.vpcf_c",
+    "size": 2486
+  },
+  {
+    "path": "particles/econ/events/snowball/snowball_projectile_explosion_cloud.vpcf_c",
+    "size": 2458
+  },
+  {
+    "path": "particles/econ/events/ti9/shovel_dig_dust_cloud.vpcf_c",
+    "size": 2544
+  },
+  {
+    "path": "particles/econ/events/ti9/shovel_smoke_cloud.vpcf_c",
+    "size": 2599
+  },
+  {
+    "path": "particles/econ/events/ti9/high_five/high_five_impact_snow_clouds.vpcf_c",
+    "size": 2522
+  },
+  {
+    "path": "particles/econ/items/ancient_apparition/ancient_apparation_ti8/ancient_ice_vortex_ti8_spiral_cloud.vpcf_c",
+    "size": 2662
+  },
+  {
+    "path": "particles/econ/items/ancient_apparition/ancient_apparation_ti8/ancient_ice_vortex_ti8_spiral_cloudb.vpcf_c",
+    "size": 2673
+  },
+  {
+    "path": "particles/econ/items/bloodseeker/2022_taunt/bloodseeker_taunt_ice_explosion_cloud.vpcf_c",
+    "size": 3516
+  },
+  {
+    "path": "particles/econ/items/centaur/centaur_2022_immortal/centaur_2022_immortal_stampede_crimson_overhead_cloudy.vpcf_c",
+    "size": 3620
+  },
+  {
+    "path": "particles/econ/items/centaur/centaur_2022_immortal/centaur_2022_immortal_stampede_gold_overhead_cloudy.vpcf_c",
+    "size": 3579
+  },
+  {
+    "path": "particles/econ/items/centaur/centaur_2022_immortal/centaur_2022_immortal_stampede_overhead_cloudy.vpcf_c",
+    "size": 3564
+  },
+  {
+    "path": "particles/econ/items/crystal_maiden/crystal_maiden_taunt/crystal_maiden_taunt_cloud.vpcf_c",
+    "size": 2503
+  },
+  {
+    "path": "particles/econ/items/dark_willow/dark_willow_immortal_2021/dw_2021_willow_wisp_spell_debuff_cloud.vpcf_c",
+    "size": 4162
+  },
+  {
+    "path": "particles/econ/items/dawnbreaker/forger_stars/forger_stars_celestial_hammer_grounded_impact_debris_dustcloud.vpcf_c",
+    "size": 3557
+  },
+  {
+    "path": "particles/econ/items/dazzle/dazzle_darkclaw/dazzle_darkclaw_talon_explosion_cloud.vpcf_c",
+    "size": 2216
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill.vpcf_c",
+    "size": 4020
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill_red.vpcf_c",
+    "size": 3140
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase.vpcf_c",
+    "size": 5326
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_aoe_edge.vpcf_c",
+    "size": 4104
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_edge.vpcf_c",
+    "size": 3158
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside.vpcf_c",
+    "size": 4931
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside_edge.vpcf_c",
+    "size": 3662
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_outside.vpcf_c",
+    "size": 5580
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_particles.vpcf_c",
+    "size": 3853
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_01.vpcf_c",
+    "size": 3722
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_outside_01.vpcf_c",
+    "size": 3699
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_under.vpcf_c",
+    "size": 3672
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_suckinward_endcap_cloudbase_main.vpcf_c",
+    "size": 3625
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_suckinward_endcap_cloudbase_main_underfill.vpcf_c",
+    "size": 3063
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_suckinward_endcap_cloudbase_outside.vpcf_c",
+    "size": 3332
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_suckinward_endcap_cloudbase_particles.vpcf_c",
+    "size": 3628
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloud_underfill.vpcf_c",
+    "size": 4072
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase.vpcf_c",
+    "size": 5255
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_inside.vpcf_c",
+    "size": 4979
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_outside.vpcf_c",
+    "size": 5542
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_particles.vpcf_c",
+    "size": 4009
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase.vpcf_c",
+    "size": 5381
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase_inside.vpcf_c",
+    "size": 5002
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase_particles.vpcf_c",
+    "size": 4003
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_ti8_immortal_weapon/disruptor_ti8_immortal_ambient_cloud.vpcf_c",
+    "size": 2293
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_ti8_immortal_weapon/disruptor_ti8_immortal_ambient_cloud_b.vpcf_c",
+    "size": 2594
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_ti8_immortal_weapon/disruptor_ti8_immortal_crimson_ambient_cloud.vpcf_c",
+    "size": 2293
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_ti8_immortal_weapon/disruptor_ti8_immortal_crimson_ambient_cloud_b.vpcf_c",
+    "size": 2644
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_ti8_immortal_weapon/disruptor_ti8_immortal_thunder_strike_buff_bg_cloud.vpcf_c",
+    "size": 2262
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_ti8_immortal_weapon/disruptor_ti8_immortal_thunder_strike_buff_bg_cloud_b.vpcf_c",
+    "size": 2801
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_ti8_immortal_weapon/disruptor_ti8_immortal_thunder_strike_buff_crimson_bg_cloud.vpcf_c",
+    "size": 2306
+  },
+  {
+    "path": "particles/econ/items/disruptor/disruptor_ti8_immortal_weapon/disruptor_ti8_immortal_thunder_strike_buff_crimson_bg_cloud_b.vpcf_c",
+    "size": 2843
+  },
+  {
+    "path": "particles/econ/items/drow/drow_arcana/drow_arcana_base_attack_trail_cloudy.vpcf_c",
+    "size": 3095
+  },
+  {
+    "path": "particles/econ/items/drow/drow_arcana/drow_arcana_base_attack_v2_trail_cloudy.vpcf_c",
+    "size": 3087
+  },
+  {
+    "path": "particles/econ/items/drow/drow_arcana/drow_arcana_loadout_spawn_silence_cloud.vpcf_c",
+    "size": 3450
+  },
+  {
+    "path": "particles/econ/items/drow/drow_arcana/drow_arcana_loadout_spawn_silence_v2_cloud.vpcf_c",
+    "size": 3447
+  },
+  {
+    "path": "particles/econ/items/drow/drow_arcana/drow_arcana_v2_base_attack_trail_cloudy.vpcf_c",
+    "size": 3087
+  },
+  {
+    "path": "particles/econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_totem_cast_clouds.vpcf_c",
+    "size": 2596
+  },
+  {
+    "path": "particles/econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_totem_cast_clouds_end.vpcf_c",
+    "size": 2780
+  },
+  {
+    "path": "particles/econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_totem_leap_v2_clouds.vpcf_c",
+    "size": 2597
+  },
+  {
+    "path": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_spiral_cloud.vpcf_c",
+    "size": 2662
+  },
+  {
+    "path": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_spiral_cloudb.vpcf_c",
+    "size": 2657
+  },
+  {
+    "path": "particles/econ/items/enigma/ti9_cache_enigma_lord_armor/ti9_cache_enigma_lord_armor_ambient_cloud.vpcf_c",
+    "size": 3067
+  },
+  {
+    "path": "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_chronosphere_tentacle_child_cloudy.vpcf_c",
+    "size": 2806
+  },
+  {
+    "path": "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_chronosphere_v2_tentacle_child_cloudy.vpcf_c",
+    "size": 2811
+  },
+  {
+    "path": "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_loadout_tentacle_cloudy.vpcf_c",
+    "size": 2721
+  },
+  {
+    "path": "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_time_lock_bash_tentacle_cloudy_ground.vpcf_c",
+    "size": 2685
+  },
+  {
+    "path": "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_time_lock_v2_bash_tentacle_cloudy_ground.vpcf_c",
+    "size": 2685
+  },
+  {
+    "path": "particles/econ/items/huskar/huskar_searing_dominator/huskar_searing_lifebreak_body_flame_cloud.vpcf_c",
+    "size": 2371
+  },
+  {
+    "path": "particles/econ/items/huskar/huskar_searing_dominator/huskar_searing_lifebreak_cast_cloud.vpcf_c",
+    "size": 2382
+  },
+  {
+    "path": "particles/econ/items/keeper_of_the_light/kotl_ti7_illuminate/kotl_ti7_illuminate_clouds.vpcf_c",
+    "size": 2631
+  },
+  {
+    "path": "particles/econ/items/keeper_of_the_light/kotl_ti7_illuminate/kotl_ti7_illuminate_lightstorm_cloud_thick.vpcf_c",
+    "size": 3071
+  },
+  {
+    "path": "particles/econ/items/keeper_of_the_light/kotl_ti7_illuminate/kotl_ti7_illuminate_lightstorm_cloud_trail.vpcf_c",
+    "size": 2931
+  },
+  {
+    "path": "particles/econ/items/keeper_of_the_light/kotl_ti7_illuminate/kotl_ti7_illuminate_wings_cloud_thick.vpcf_c",
+    "size": 2727
+  },
+  {
+    "path": "particles/econ/items/leshrac/leshrac_tormented_staff/leshrac_base_attack_launch_cloud_tormented.vpcf_c",
+    "size": 2107
+  },
+  {
+    "path": "particles/econ/items/leshrac/leshrac_tormented_staff_retro/leshrac_base_attack_retro_launch_cloud_tormented.vpcf_c",
+    "size": 2252
+  },
+  {
+    "path": "particles/econ/items/lich/frozenworlds/lich_frozenworlds_head_ambient_eyes_glow_mist.vpcf_c",
+    "size": 2231
+  },
+  {
+    "path": "particles/econ/items/lich/lich_ti10_immortal_head/lich_ti10_immortal_gaze_cloud.vpcf_c",
+    "size": 2302
+  },
+  {
+    "path": "particles/econ/items/lina/lina_ti6/lina_ti6_laguna_blade_shock_cloud.vpcf_c",
+    "size": 2481
+  },
+  {
+    "path": "particles/econ/items/lion/lion_ti8/lion_spell_finger_ti8_core_cloud.vpcf_c",
+    "size": 2608
+  },
+  {
+    "path": "particles/econ/items/lion/lion_ti8/lion_spell_finger_ti8_crimson_core_cloud.vpcf_c",
+    "size": 3860
+  },
+  {
+    "path": "particles/econ/items/lycan/lycan_cache_2021/lycan_cache_2021_arms_cloud.vpcf_c",
+    "size": 4124
+  },
+  {
+    "path": "particles/econ/items/medusa/medusa_ti10_taunt/medusa_taunt_cloud.vpcf_c",
+    "size": 2516
+  },
+  {
+    "path": "particles/econ/items/medusa/medusa_ti10_taunt/medusa_taunt_loadout_cloud.vpcf_c",
+    "size": 2406
+  },
+  {
+    "path": "particles/econ/items/mirana/mirana_persona/mirana_dark_moon_spell_arrow_cloud.vpcf_c",
+    "size": 2478
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud.vpcf_c",
+    "size": 3173
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_puff.vpcf_c",
+    "size": 2435
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_rays.vpcf_c",
+    "size": 2374
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_rays_sharp.vpcf_c",
+    "size": 2395
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_smoke.vpcf_c",
+    "size": 3523
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_smoke_b.vpcf_c",
+    "size": 3325
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_smoke_b_lower.vpcf_c",
+    "size": 3321
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_smoke_light.vpcf_c",
+    "size": 3080
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_smoke_shadow.vpcf_c",
+    "size": 3353
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_smoke_trail.vpcf_c",
+    "size": 3365
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/monkey_arcana_cloud_start.vpcf_c",
+    "size": 2369
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/death/mk_arcana_spring_death_channel_cloud.vpcf_c",
+    "size": 2233
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/fire/mk_arcana_fire_spring_channel_cloud.vpcf_c",
+    "size": 2280
+  },
+  {
+    "path": "particles/econ/items/monkey_king/arcana/water/mk_spring_arcana_water_channel_cloud.vpcf_c",
+    "size": 2277
+  },
+  {
+    "path": "particles/econ/items/necrolyte/necronub_base_attack/necrolyte_base_attack_ka_cloud.vpcf_c",
+    "size": 2214
+  },
+  {
+    "path": "particles/econ/items/necrolyte/necronub_death_pulse/necrolyte_pulse_ka_enemy_explosion_cloud.vpcf_c",
+    "size": 2395
+  },
+  {
+    "path": "particles/econ/items/necrolyte/necrophos_sullen/necro_sullen_pulse_enemy_explosion_cloud.vpcf_c",
+    "size": 2405
+  },
+  {
+    "path": "particles/econ/items/necrolyte/necrophos_sullen_gold/necro_sullen_pulse_enemy_explosion_cloud_gold.vpcf_c",
+    "size": 2400
+  },
+  {
+    "path": "particles/econ/items/ogre_magi/ogre_magi_arcana/ogre_magi_arcana_loadout_clouds.vpcf_c",
+    "size": 2722
+  },
+  {
+    "path": "particles/econ/items/ogre_magi/ogre_ti10_taunt/ogre_arcana_taunt_cloud.vpcf_c",
+    "size": 2756
+  },
+  {
+    "path": "particles/econ/items/ogre_magi/ogre_ti10_taunt/ogre_arcana_taunt_cloud_small.vpcf_c",
+    "size": 2762
+  },
+  {
+    "path": "particles/econ/items/ogre_magi/ogre_ti10_taunt/ogre_arcana_taunt_sec_style_cloud.vpcf_c",
+    "size": 2738
+  },
+  {
+    "path": "particles/econ/items/ogre_magi/ogre_ti10_taunt/ogre_arcana_taunt_sec_style_cloud_small.vpcf_c",
+    "size": 2778
+  },
+  {
+    "path": "particles/econ/items/ogre_magi/ogre_ti10_taunt/ogre_taunt_cloud.vpcf_c",
+    "size": 2717
+  },
+  {
+    "path": "particles/econ/items/ogre_magi/ogre_ti10_taunt/ogre_taunt_cloud_small.vpcf_c",
+    "size": 2762
+  },
+  {
+    "path": "particles/econ/items/ogre_magi/ogre_ti8_immortal_weapon/ogre_ti8_immortal_bloodlust_overhead_cloud.vpcf_c",
+    "size": 2492
+  },
+  {
+    "path": "particles/econ/items/oracle/oracle_carnival/oracle_carnival_base_attack_cloud.vpcf_c",
+    "size": 2680
+  },
+  {
+    "path": "particles/econ/items/oracle/oracle_final_prophecy/oracle_final_prophecy_back_clouds.vpcf_c",
+    "size": 3518
+  },
+  {
+    "path": "particles/econ/items/pudge/pudge_immortal_arm/pudge_immortal_arm_rot_body_decay_cloud.vpcf_c",
+    "size": 2499
+  },
+  {
+    "path": "particles/econ/items/pudge/pudge_immortal_arm/pudge_immortal_arm_rot_gold_body_decay_cloud.vpcf_c",
+    "size": 2508
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_base_ambient_game_core_cloudy.vpcf_c",
+    "size": 3788
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_cyclone_core_cloudy.vpcf_c",
+    "size": 3651
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_cyclone_v2_core_cloudy.vpcf_c",
+    "size": 3718
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_eye_of_the_storm_rain_cloud.vpcf_c",
+    "size": 3148
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_eye_of_the_storm_rain_cloud_ring.vpcf_c",
+    "size": 4322
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_eye_of_the_storm_rain_storm_clouds.vpcf_c",
+    "size": 3947
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_eye_of_the_storm_rain_v2_cloud.vpcf_c",
+    "size": 3148
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_eye_of_the_storm_rain_v2_cloud_ring.vpcf_c",
+    "size": 4309
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_eye_of_the_storm_rain_v2_storm_clouds.vpcf_c",
+    "size": 3936
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_eye_of_the_storm_storm_clouds_backdrop.vpcf_c",
+    "size": 3166
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_loadout_storm_clouds.vpcf_c",
+    "size": 4123
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_loadout_storm_clouds_v2.vpcf_c",
+    "size": 4280
+  },
+  {
+    "path": "particles/econ/items/razor/razor_arcana/razor_arcana_v2_eye_of_the_storm_storm_clouds_backdrop.vpcf_c",
+    "size": 3166
+  },
+  {
+    "path": "particles/econ/items/rubick/rubick_arcana/rbck_arc_revenant_aoe_cloudy.vpcf_c",
+    "size": 4460
+  },
+  {
+    "path": "particles/econ/items/shadow_demon/sd_ti7_shadow_poison/sd_ti7_golden_shadow_poison_proj_ground_cloud.vpcf_c",
+    "size": 2780
+  },
+  {
+    "path": "particles/econ/items/shadow_demon/sd_ti7_shadow_poison/sd_ti7_shadow_poison_proj_ground_cloud.vpcf_c",
+    "size": 2768
+  },
+  {
+    "path": "particles/econ/items/slardar/slardar_ti10_head/slardar_ti10_amp_damage_cloud.vpcf_c",
+    "size": 2893
+  },
+  {
+    "path": "particles/econ/items/slardar/slardar_ti10_head/slardar_ti10_amp_damage_cloudbase.vpcf_c",
+    "size": 3094
+  },
+  {
+    "path": "particles/econ/items/slardar/slardar_ti10_head/slardar_ti10_gold_amp_damage_cloud.vpcf_c",
+    "size": 2727
+  },
+  {
+    "path": "particles/econ/items/slardar/slardar_ti10_head/slardar_ti10_gold_amp_damage_cloudbase.vpcf_c",
+    "size": 3094
+  },
+  {
+    "path": "particles/econ/items/spectre/spectre_2022_cc/spectre_2022_cc_head_ambient_cloud.vpcf_c",
+    "size": 2883
+  },
+  {
+    "path": "particles/econ/items/spectre/spectre_2022_cc/spectre_2022_cc_weapon_ambient_clouds.vpcf_c",
+    "size": 3622
+  },
+  {
+    "path": "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_cloud.vpcf_c",
+    "size": 4130
+  },
+  {
+    "path": "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_cloud_body.vpcf_c",
+    "size": 4122
+  },
+  {
+    "path": "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_cloud_debut.vpcf_c",
+    "size": 4146
+  },
+  {
+    "path": "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_v2_cloud.vpcf_c",
+    "size": 4119
+  },
+  {
+    "path": "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_v2_cloud_body.vpcf_c",
+    "size": 4117
+  },
+  {
+    "path": "particles/econ/items/spectre/spectre_arcana/spectre_arcana_ambient_v2_cloud_debut.vpcf_c",
+    "size": 4135
+  },
+  {
+    "path": "particles/econ/items/storm_spirit/storm_spirit_orchid_hat/stormspirit_orchid_ball_trail_cloud.vpcf_c",
+    "size": 2261
+  },
+  {
+    "path": "particles/econ/items/storm_spirit/storm_spirit_orchid_hat/stormspirit_tyrian_orchid_ball_trail_cloud.vpcf_c",
+    "size": 3842
+  },
+  {
+    "path": "particles/econ/items/storm_spirit/storm_spirit_orchid_hat_retro/stormspirit_orchid_retro_ball_trail_cloud.vpcf_c",
+    "size": 2403
+  },
+  {
+    "path": "particles/econ/items/undying/undying_manyone/undying_pale_tombstone_cloud.vpcf_c",
+    "size": 2309
+  },
+  {
+    "path": "particles/econ/items/undying/undying_pale_augur/undying_pale_augur_decay_cloud.vpcf_c",
+    "size": 2280
+  },
+  {
+    "path": "particles/econ/items/venomancer/veno_2022_immortal_ward/veno_2022_immortal_ward_projectile_model_dart_cloud.vpcf_c",
+    "size": 2580
+  },
+  {
+    "path": "particles/econ/items/venomancer/veno_ti8_immortal_head/veno_ti8_immortal_gale_dart_cloud.vpcf_c",
+    "size": 2575
+  },
+  {
+    "path": "particles/econ/items/viper/viper_immortal_tail_ti8/viper_immortal_ti8_nethertoxin_cloud.vpcf_c",
+    "size": 2671
+  },
+  {
+    "path": "particles/econ/items/viper/viper_ti7_immortal/viper_poison_attack_ti7_cloud_trail.vpcf_c",
+    "size": 2407
+  },
+  {
+    "path": "particles/econ/items/viper/viper_ti7_immortal/viper_poison_crimson_attack_ti7_cloud_trail.vpcf_c",
+    "size": 2423
+  },
+  {
+    "path": "particles/econ/items/warlock/warlock_staff_hellborn/warlock_upheaval_hellborn_clouds_aaa.vpcf_c",
+    "size": 2460
+  },
+  {
+    "path": "particles/econ/items/weaver/weaver_golden_immortal_ti7/weaver_golden_swarm_projectile_ti7_model_cloud.vpcf_c",
+    "size": 2546
+  },
+  {
+    "path": "particles/econ/items/weaver/weaver_immortal_ti7/weaver_swarm_projectile_ti7_model_cloud.vpcf_c",
+    "size": 2546
+  },
+  {
+    "path": "particles/econ/items/windrunner/windrunner_ti6/windrunner_spell_powershot_channel_ti6_shock_cloud.vpcf_c",
+    "size": 2515
+  },
+  {
+    "path": "particles/econ/items/windrunner/windrunner_ti6/windrunner_spell_powershot_ti6_cloud.vpcf_c",
+    "size": 2346
+  },
+  {
+    "path": "particles/econ/items/witch_doctor/wd_2021_cache/wd_2021_cache_head_cloud.vpcf_c",
+    "size": 3916
+  },
+  {
+    "path": "particles/econ/items/wraith_king/wraith_king_ti6_bracer/wraith_king_ti6_hellfireblast_explosion_cloud.vpcf_c",
+    "size": 2100
+  },
+  {
+    "path": "particles/econ/items/zeus/arcana_chariot/testclouds.vpcf_c",
+    "size": 1481
+  },
+  {
+    "path": "particles/econ/taunts/razor/razor_taunt_cloud.vpcf_c",
+    "size": 3066
+  },
+  {
+    "path": "particles/econ/taunts/venomancer/banana_mech/veno_tnt_banana_mech_cloud.vpcf_c",
+    "size": 2443
+  },
+  {
+    "path": "particles/econ/treasures/rarities_benefactor_cloud.vpcf_c",
+    "size": 3385
+  },
+  {
+    "path": "particles/events/crownfall/fish_burrow_dustcloud_linger.vpcf_c",
+    "size": 2842
+  },
+  {
+    "path": "particles/events/crownfall/survivors/abilities/techies/remote_mines/techies_remote_mine_growcloud.vpcf_c",
+    "size": 2395
+  },
+  {
+    "path": "particles/events/crownfall/survivors/abilities/techies/remote_mines/techies_remote_mines_detonatecloud.vpcf_c",
+    "size": 2455
+  },
+  {
+    "path": "particles/events/ti7_teams/teleport_ti7_cloud9.vpcf_c",
+    "size": 3005
+  },
+  {
+    "path": "particles/hw_fx/snowball_summon_aoe_snow_clouds.vpcf_c",
+    "size": 3220
+  },
+  {
+    "path": "particles/items2_fx/paintball_detonation_cloud.vpcf_c",
+    "size": 3277
+  },
+  {
+    "path": "particles/items2_fx/paintball_projectile_cloudy.vpcf_c",
+    "size": 3160
+  },
+  {
+    "path": "particles/items2_fx/skadi_projectile_explosion_cloud.vpcf_c",
+    "size": 2148
+  },
+  {
+    "path": "particles/items2_fx/smooth_stone_explode_cloud.vpcf_c",
+    "size": 3754
+  },
+  {
+    "path": "particles/items3_fx/mage_slayer_debuff_cloud.vpcf_c",
+    "size": 3170
+  },
+  {
+    "path": "particles/items3_fx/mage_slayer_debuff_cloud_c.vpcf_c",
+    "size": 3061
+  },
+  {
+    "path": "particles/items3_fx/nemesis_curse_debuff_overhead_clouds.vpcf_c",
+    "size": 3792
+  },
+  {
+    "path": "particles/items4_fx/combo_breaker_spell_cloud.vpcf_c",
+    "size": 2475
+  },
+  {
+    "path": "particles/items4_fx/nullifier_mute_debuff_cloud.vpcf_c",
+    "size": 2289
+  },
+  {
+    "path": "particles/items5_fx/giant_maul_debuff_following_cloud.vpcf_c",
+    "size": 3963
+  },
+  {
+    "path": "particles/items6_fx/chitin_scepter_effect_cloud.vpcf_c",
+    "size": 4315
+  },
+  {
+    "path": "particles/items_fx/avianas_feather_cloud.vpcf_c",
+    "size": 4640
+  },
+  {
+    "path": "particles/items_fx/bloodstone_projectile_explosion_cloud.vpcf_c",
+    "size": 2736
+  },
+  {
+    "path": "particles/items_fx/ethereal_blade_explosion_cloud.vpcf_c",
+    "size": 2269
+  },
+  {
+    "path": "particles/items_fx/manacles_of_power_effect_electric_cloud.vpcf_c",
+    "size": 2681
+  },
+  {
+    "path": "particles/items_fx/manacles_of_power_effect_electric_cloud2.vpcf_c",
+    "size": 2593
+  },
+  {
+    "path": "particles/neutral_fx/fell_spirit_proj_enemy_explosion_cloud.vpcf_c",
+    "size": 2508
+  },
+  {
+    "path": "particles/ui/ddb_s2_cloud.vpcf_c",
+    "size": 2810
+  },
+  {
+    "path": "particles/ui/ddb_s2_cloud2.vpcf_c",
+    "size": 4689
+  },
+  {
+    "path": "particles/ui/static_fog_cloud_contrast.vpcf_c",
+    "size": 2420
+  },
+  {
+    "path": "particles/ui/ui_progressbar_burner_cloud.vpcf_c",
+    "size": 1984
+  },
+  {
+    "path": "particles/ui/battle_pass/ui_dashboard_aghanim_clouds.vpcf_c",
+    "size": 3679
+  },
+  {
+    "path": "particles/ui/battle_pass/ui_dashboard_aghanim_clouds_b.vpcf_c",
+    "size": 3646
+  },
+  {
+    "path": "particles/ui/hud/custom_hud_aghs2_clouds.vpcf_c",
+    "size": 3017
+  },
+  {
+    "path": "particles/ui/hud/custom_hud_ti10_clouds.vpcf_c",
+    "size": 2947
+  },
+  {
+    "path": "particles/ui/hud/healthbar_burner_cloud.vpcf_c",
+    "size": 2047
+  },
+  {
+    "path": "particles/ui/hud/ui_hud_bp_2024_inventory_clouds_fx.vpcf_c",
+    "size": 3759
+  },
+  {
+    "path": "particles/ui/hud/ui_hud_bp_2024_inventory_clouds_fx_bokeh.vpcf_c",
+    "size": 3960
+  },
+  {
+    "path": "particles/ui/hud/ui_hud_bp_2024_timer_circus_ambient_dust_clouds.vpcf_c",
+    "size": 3891
+  },
+  {
+    "path": "particles/ui/maps/underlord_clouds.vpcf_c",
+    "size": 2331
+  },
+  {
+    "path": "particles/units/heroes/hero_batrider/batrider_clouds.vpcf_c",
+    "size": 2295
+  },
+  {
+    "path": "particles/units/heroes/hero_batrider/batrider_flaming_lasso_electric_cloud.vpcf_c",
+    "size": 2608
+  },
+  {
+    "path": "particles/units/heroes/hero_batrider/batrider_flaming_lasso_electric_cloud2.vpcf_c",
+    "size": 2516
+  },
+  {
+    "path": "particles/units/heroes/hero_batrider/portrait_batrider_cloud2.vpcf_c",
+    "size": 2218
+  },
+  {
+    "path": "particles/units/heroes/hero_beastmaster/beastmaster_boar_attack_cloud.vpcf_c",
+    "size": 2098
+  },
+  {
+    "path": "particles/units/heroes/hero_centaur/centaur_stampede_cloud.vpcf_c",
+    "size": 2613
+  },
+  {
+    "path": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_flame_cloud.vpcf_c",
+    "size": 2380
+  },
+  {
+    "path": "particles/units/heroes/hero_dark_willow/dark_willow_willowisp_base_attack_launch_cloud.vpcf_c",
+    "size": 2229
+  },
+  {
+    "path": "particles/units/heroes/hero_dark_willow/dark_willow_wisp_spell_debuff_cloud.vpcf_c",
+    "size": 2565
+  },
+  {
+    "path": "particles/units/heroes/hero_dawnbreaker/dawnbreaker_celestial_hammer_grounded_impact_debris_dustcloud.vpcf_c",
+    "size": 3400
+  },
+  {
+    "path": "particles/units/heroes/hero_dawnbreaker/dawnbreaker_defeat_cloud_v2.vpcf_c",
+    "size": 3296
+  },
+  {
+    "path": "particles/units/heroes/hero_dazzle/dazzle_shadow_wave_inverse_rope_cloud.vpcf_c",
+    "size": 3258
+  },
+  {
+    "path": "particles/units/heroes/hero_dazzle/dazzle_shadow_wave_rope_cloud.vpcf_c",
+    "size": 2242
+  },
+  {
+    "path": "particles/units/heroes/hero_disruptor/disruptor_thunder_strike_buff_cloud.vpcf_c",
+    "size": 2195
+  },
+  {
+    "path": "particles/units/heroes/hero_disruptor/disruptor_thunder_strike_buff_cloud_c.vpcf_c",
+    "size": 2276
+  },
+  {
+    "path": "particles/units/heroes/hero_gyrocopter/gyrocopter_clouds.vpcf_c",
+    "size": 2313
+  },
+  {
+    "path": "particles/units/heroes/hero_jakiro/jakiro_clouds.vpcf_c",
+    "size": 2302
+  },
+  {
+    "path": "particles/units/heroes/hero_juggernaut/juggernaut_portrait_backgroundclouds.vpcf_c",
+    "size": 2249
+  },
+  {
+    "path": "particles/units/heroes/hero_juggernaut/juggernaut_vaulted_strike_takeoff_poof_cloud.vpcf_c",
+    "size": 4074
+  },
+  {
+    "path": "particles/units/heroes/hero_keeper_of_the_light/kotl_illuminate_impact_hero_clouds.vpcf_c",
+    "size": 2552
+  },
+  {
+    "path": "particles/units/heroes/hero_keeper_of_the_light/kotl_illuminate_mount_clouds.vpcf_c",
+    "size": 2658
+  },
+  {
+    "path": "particles/units/heroes/hero_lich/lich_gaze_cloud.vpcf_c",
+    "size": 2278
+  },
+  {
+    "path": "particles/units/heroes/hero_life_stealer/life_stealer_infested_unit_cloud.vpcf_c",
+    "size": 2415
+  },
+  {
+    "path": "particles/units/heroes/hero_life_stealer/life_stealer_infested_unit_cloud_core.vpcf_c",
+    "size": 2490
+  },
+  {
+    "path": "particles/units/heroes/hero_life_stealer/life_stealer_infested_unit_cloud_ground.vpcf_c",
+    "size": 2635
+  },
+  {
+    "path": "particles/units/heroes/hero_life_stealer/life_stealer_infested_unit_cloud_wisps.vpcf_c",
+    "size": 2534
+  },
+  {
+    "path": "particles/units/heroes/hero_lion/lion_spell_finger_of_death_core_cloud.vpcf_c",
+    "size": 2429
+  },
+  {
+    "path": "particles/units/heroes/hero_lone_druid/lone_druid_bear_spawn_glow_cloud.vpcf_c",
+    "size": 2097
+  },
+  {
+    "path": "particles/units/heroes/hero_meepo/meepo_burrow_dustcloud.vpcf_c",
+    "size": 3212
+  },
+  {
+    "path": "particles/units/heroes/hero_meepo/meepo_burrow_dustcloud_linger.vpcf_c",
+    "size": 2156
+  },
+  {
+    "path": "particles/units/heroes/hero_mirana/mirana_spell_arrow_cloud.vpcf_c",
+    "size": 2327
+  },
+  {
+    "path": "particles/units/heroes/hero_monkey_king/monkey_king_spring_channel_cloud.vpcf_c",
+    "size": 2297
+  },
+  {
+    "path": "particles/units/heroes/hero_muerta/muerta_calling_aoe_cloudy.vpcf_c",
+    "size": 4445
+  },
+  {
+    "path": "particles/units/heroes/hero_muerta/muerta_calling_impact_cloud.vpcf_c",
+    "size": 2783
+  },
+  {
+    "path": "particles/units/heroes/hero_muerta/muerta_spell_amp_steal_debuff_cloud.vpcf_c",
+    "size": 3235
+  },
+  {
+    "path": "particles/units/heroes/hero_muerta/muerta_spell_amp_steal_debuff_cloud_c.vpcf_c",
+    "size": 3089
+  },
+  {
+    "path": "particles/units/heroes/hero_necrolyte/necrolyte_base_attack_cloud.vpcf_c",
+    "size": 2188
+  },
+  {
+    "path": "particles/units/heroes/hero_necrolyte/necrolyte_death_seeker_enemy_explosion_cloud.vpcf_c",
+    "size": 2379
+  },
+  {
+    "path": "particles/units/heroes/hero_necrolyte/necrolyte_death_seeker_linear_enemy_explosion_cloud.vpcf_c",
+    "size": 2420
+  },
+  {
+    "path": "particles/units/heroes/hero_necrolyte/necrolyte_pulse_enemy_explosion_cloud.vpcf_c",
+    "size": 2379
+  },
+  {
+    "path": "particles/units/heroes/hero_necrolyte/necrolyte_sadist_cloud.vpcf_c",
+    "size": 2214
+  },
+  {
+    "path": "particles/units/heroes/hero_nevermore/nevermore_wings_cloud_line_a.vpcf_c",
+    "size": 2815
+  },
+  {
+    "path": "particles/units/heroes/hero_nevermore/nevermore_wings_cloud_line_a_swirl.vpcf_c",
+    "size": 2610
+  },
+  {
+    "path": "particles/units/heroes/hero_nevermore/nevermore_wings_cloud_line_b.vpcf_c",
+    "size": 2855
+  },
+  {
+    "path": "particles/units/heroes/hero_nevermore/nevermore_wings_cloud_line_b_swirl.vpcf_c",
+    "size": 2651
+  },
+  {
+    "path": "particles/units/heroes/hero_nyx_assassin/nyx_assassin_burrow_dustcloud.vpcf_c",
+    "size": 2575
+  },
+  {
+    "path": "particles/units/heroes/hero_nyx_assassin/nyx_assassin_burrow_dustcloud_linger.vpcf_c",
+    "size": 2172
+  },
+  {
+    "path": "particles/units/heroes/hero_nyx_assassin/nyx_assassin_burrow_water_dustcloud_linger.vpcf_c",
+    "size": 2238
+  },
+  {
+    "path": "particles/units/heroes/hero_obsidian_destroyer/obsidian_death_cloud.vpcf_c",
+    "size": 2363
+  },
+  {
+    "path": "particles/units/heroes/hero_oracle/oracle_base_attack_cloud.vpcf_c",
+    "size": 2217
+  },
+  {
+    "path": "particles/units/heroes/hero_oracle/oracle_death_cloud.vpcf_c",
+    "size": 2500
+  },
+  {
+    "path": "particles/units/heroes/hero_razor/razor_rain_storm_cloud.vpcf_c",
+    "size": 2843
+  },
+  {
+    "path": "particles/units/heroes/hero_razor/storm_lightning_01_cloud.vpcf_c",
+    "size": 2704
+  },
+  {
+    "path": "particles/units/heroes/hero_razor_reduced_flash/razor_rain_storm_cloud_reduced_flash.vpcf_c",
+    "size": 2395
+  },
+  {
+    "path": "particles/units/heroes/hero_razor_reduced_flash/storm_lightning_01_cloud_reduced_flash.vpcf_c",
+    "size": 2748
+  },
+  {
+    "path": "particles/units/heroes/hero_ringmaster/ringmaster_innate_whoopee_cushion_cloud.vpcf_c",
+    "size": 4013
+  },
+  {
+    "path": "particles/units/heroes/hero_rubick/rubick_finger_of_death_core_cloud.vpcf_c",
+    "size": 2532
+  },
+  {
+    "path": "particles/units/heroes/hero_sandking/sandking_epicenter_tell_cloud.vpcf_c",
+    "size": 2572
+  },
+  {
+    "path": "particles/units/heroes/hero_sandking/sandking_portrait_backgroundclouds.vpcf_c",
+    "size": 2245
+  },
+  {
+    "path": "particles/units/heroes/hero_sandking/sandking_sandstorm_cloud.vpcf_c",
+    "size": 4207
+  },
+  {
+    "path": "particles/units/heroes/hero_sandking/sandking_sandstorm_cloud_center.vpcf_c",
+    "size": 3181
+  },
+  {
+    "path": "particles/units/heroes/hero_sandking/sandking_sandstorm_cloud_low.vpcf_c",
+    "size": 3577
+  },
+  {
+    "path": "particles/units/heroes/hero_sandking/sandking_sandstorm_cloud_mid.vpcf_c",
+    "size": 4489
+  },
+  {
+    "path": "particles/units/heroes/hero_shadow_demon/shadow_demon_demonic_purge_debuff_cloud.vpcf_c",
+    "size": 2357
+  },
+  {
+    "path": "particles/units/heroes/hero_shadow_demon/shadow_demon_disruption_cast_cast_cloud.vpcf_c",
+    "size": 2561
+  },
+  {
+    "path": "particles/units/heroes/hero_shadow_demon/shadow_demon_disruption_cast_cloud.vpcf_c",
+    "size": 2127
+  },
+  {
+    "path": "particles/units/heroes/hero_shadow_demon/shadow_demon_disruption_clouds_black.vpcf_c",
+    "size": 2358
+  },
+  {
+    "path": "particles/units/heroes/hero_shadow_demon/shadow_demon_disruption_clouds_red.vpcf_c",
+    "size": 2371
+  },
+  {
+    "path": "particles/units/heroes/hero_slardar/slardar_amp_damage_cloud.vpcf_c",
+    "size": 3011
+  },
+  {
+    "path": "particles/units/heroes/hero_slardar/slardar_amp_damage_cloud_b.vpcf_c",
+    "size": 2213
+  },
+  {
+    "path": "particles/units/heroes/hero_slardar/slardar_amp_damage_cloud_c.vpcf_c",
+    "size": 2231
+  },
+  {
+    "path": "particles/units/heroes/hero_snapfire/hero_snapfire_landing_page_clouds.vpcf_c",
+    "size": 2844
+  },
+  {
+    "path": "particles/units/heroes/hero_spirit_breaker/spirit_breaker_magnet_redirect_cloud.vpcf_c",
+    "size": 3485
+  },
+  {
+    "path": "particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning_trail_cloud.vpcf_c",
+    "size": 2287
+  },
+  {
+    "path": "particles/units/heroes/hero_techies/techies_remote_mine_growcloud.vpcf_c",
+    "size": 2350
+  },
+  {
+    "path": "particles/units/heroes/hero_techies/techies_remote_mines_detonatecloud.vpcf_c",
+    "size": 2423
+  },
+  {
+    "path": "particles/units/heroes/hero_techies/techies_remote_mines_detonatecloud_loadout.vpcf_c",
+    "size": 2341
+  },
+  {
+    "path": "particles/units/heroes/hero_tidehunter/tidehunter_leviathan_fish_backing_clouds.vpcf_c",
+    "size": 3713
+  },
+  {
+    "path": "particles/units/heroes/hero_venomancer/veno_tnt_banana_cloud.vpcf_c",
+    "size": 2394
+  },
+  {
+    "path": "particles/units/heroes/hero_venomancer/venomancer_noxious_plague_spread_clouds.vpcf_c",
+    "size": 3971
+  },
+  {
+    "path": "particles/units/heroes/hero_venomancer/venomancer_venomousgale_cloud_trail.vpcf_c",
+    "size": 2549
+  },
+  {
+    "path": "particles/units/heroes/hero_venomancer/venomancer_venomousgale_cloud_trail_b.vpcf_c",
+    "size": 2859
+  },
+  {
+    "path": "particles/units/heroes/hero_viper/viper_loadout_cloud.vpcf_c",
+    "size": 2185
+  },
+  {
+    "path": "particles/units/heroes/hero_viper/viper_loadout_clouds.vpcf_c",
+    "size": 2311
+  },
+  {
+    "path": "particles/units/heroes/hero_viper/viper_nose_dive_takeoff_poof_cloud.vpcf_c",
+    "size": 2959
+  },
+  {
+    "path": "particles/units/heroes/hero_viper/viper_poison_attack_cloud_trail.vpcf_c",
+    "size": 2685
+  },
+  {
+    "path": "particles/units/heroes/hero_void_spirit/void_spirit_disruption_cast_cloud.vpcf_c",
+    "size": 2128
+  },
+  {
+    "path": "particles/units/heroes/hero_void_spirit/void_spirit_disruption_clouds_black.vpcf_c",
+    "size": 2201
+  },
+  {
+    "path": "particles/units/heroes/hero_void_spirit/void_spirit_disruption_clouds_red.vpcf_c",
+    "size": 2345
+  },
+  {
+    "path": "particles/units/heroes/hero_void_spirit/void_spirit_entryportal_cloud.vpcf_c",
+    "size": 2655
+  },
+  {
+    "path": "particles/units/heroes/hero_void_spirit/void_spirit_exitportal_cloud.vpcf_c",
+    "size": 2655
+  },
+  {
+    "path": "particles/units/heroes/hero_void_spirit/planeshift/planeshift_aether_cloud.vpcf_c",
+    "size": 3809
+  },
+  {
+    "path": "particles/units/heroes/hero_void_spirit/planeshift/planeshift_aether_cloud_center.vpcf_c",
+    "size": 3200
+  },
+  {
+    "path": "particles/units/heroes/hero_void_spirit/planeshift/planeshift_aether_cloud_mid.vpcf_c",
+    "size": 3817
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud.vpcf_c",
+    "size": 2132
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_death.vpcf_c",
+    "size": 2594
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_death_flash.vpcf_c",
+    "size": 2468
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_death_flek.vpcf_c",
+    "size": 2611
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground.vpcf_c",
+    "size": 2523
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_beam.vpcf_c",
+    "size": 2359
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_beam_glow.vpcf_c",
+    "size": 2358
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_dark.vpcf_c",
+    "size": 2108
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_edge.vpcf_c",
+    "size": 2181
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_ember.vpcf_c",
+    "size": 2345
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_glow.vpcf_c",
+    "size": 2331
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_haze.vpcf_c",
+    "size": 2517
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_inner.vpcf_c",
+    "size": 3007
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_inner_arc.vpcf_c",
+    "size": 2607
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_inner_arc_b.vpcf_c",
+    "size": 2626
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_light.vpcf_c",
+    "size": 2096
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_sparks.vpcf_c",
+    "size": 2589
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_ground_start.vpcf_c",
+    "size": 2485
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_overhead.vpcf_c",
+    "size": 2836
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_overhead_core.vpcf_c",
+    "size": 2740
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_overhead_electric.vpcf_c",
+    "size": 2258
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_overhead_flare.vpcf_c",
+    "size": 2161
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_overhead_glow.vpcf_c",
+    "size": 2310
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_overhead_hot.vpcf_c",
+    "size": 2141
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_overhead_mist.vpcf_c",
+    "size": 2231
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_overhead_spark.vpcf_c",
+    "size": 2356
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike.vpcf_c",
+    "size": 3314
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_arc_a.vpcf_c",
+    "size": 3238
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_arc_b.vpcf_c",
+    "size": 1915
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_beam_glow.vpcf_c",
+    "size": 2108
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_glow.vpcf_c",
+    "size": 2078
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_highlight.vpcf_c",
+    "size": 2735
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_impact.vpcf_c",
+    "size": 2360
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_impact_b.vpcf_c",
+    "size": 2039
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_impact_glow.vpcf_c",
+    "size": 1833
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_impact_spark.vpcf_c",
+    "size": 2093
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_impact_streak.vpcf_c",
+    "size": 2230
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_light.vpcf_c",
+    "size": 1888
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_modglow.vpcf_c",
+    "size": 2108
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_sparks.vpcf_c",
+    "size": 2076
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_start.vpcf_c",
+    "size": 2132
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_start_b.vpcf_c",
+    "size": 1961
+  },
+  {
+    "path": "particles/units/heroes/hero_zeus/zeus_cloud_strike_thin.vpcf_c",
+    "size": 2644
+  },
+  {
+    "path": "particles/units/unit_greevil/loot_greevil_death_cloud.vpcf_c",
+    "size": 2249
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_bank_01.vpcf_c",
+    "size": 2199
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch.vpcf_c",
+    "size": 2111
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch2.vpcf_c",
+    "size": 2592
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch3.vpcf_c",
+    "size": 2578
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch4.vpcf_c",
+    "size": 2101
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch5.vpcf_c",
+    "size": 2375
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch6.vpcf_c",
+    "size": 2565
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch6_dark.vpcf_c",
+    "size": 2669
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch6_guilds.vpcf_c",
+    "size": 2670
+  },
+  {
+    "path": "particles/world_environmental_fx/fog_lowpatch7.vpcf_c",
+    "size": 2556
+  },
+  {
+    "path": "particles/world_environmental_fx/map_riverflow_waterfall_side_splash_mist.vpcf_c",
+    "size": 3996
+  },
+  {
+    "path": "particles/world_environmental_fx/map_riverflow_waterfall_splash_mist.vpcf_c",
+    "size": 3997
+  },
+  {
+    "path": "particles/world_environmental_fx/map_riverflow_waterfall_splash_mist_small.vpcf_c",
+    "size": 3832
+  },
+  {
+    "path": "particles/world_environmental_fx/map_riverflow_waterfall_splash_small_mist.vpcf_c",
+    "size": 3969
+  },
+  {
+    "path": "particles/world_environmental_fx/map_riverflow_waterfall_top_splash_mist.vpcf_c",
+    "size": 4349
+  },
+  {
+    "path": "particles/world_fountain_of_life/fol_ambient_mist.vpcf_c",
+    "size": 2149
+  },
+  {
+    "path": "particles/world_outpost/world_outpost_dire_ambient_mist.vpcf_c",
+    "size": 2507
+  },
+  {
+    "path": "particles/world_outpost/world_outpost_radiant_ambient_mist.vpcf_c",
+    "size": 2527
+  },
+  {
+    "path": "particles/world_outpost/world_outpost_uncaptured_ambient_mist.vpcf_c",
+    "size": 2947
+  },
+  {
+    "path": "particles/world_tower/tower_upgrade/ti7_radiant_tower_orb_line_mist.vpcf_c",
+    "size": 2330
+  },
+  {
+    "path": "particles/world_tower/tower_upgrade/ti7_radiant_tower_orb_mist.vpcf_c",
+    "size": 2301
+  }
+]

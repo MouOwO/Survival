@@ -1,0 +1,54 @@
+{
+  "models": [
+    {
+      "name": "a01_pavilion_detail",
+      "triangles": 41746,
+      "nonFiniteCoordinates": 0,
+      "degenerateFaces": 0,
+      "pass": true
+    },
+    {
+      "name": "v01_pine_rooted_0",
+      "triangles": 22170,
+      "nonFiniteCoordinates": 0,
+      "degenerateFaces": 0,
+      "pass": true
+    },
+    {
+      "name": "v01_pine_rooted_1",
+      "triangles": 22170,
+      "nonFiniteCoordinates": 0,
+      "degenerateFaces": 0,
+      "pass": true
+    },
+    {
+      "name": "t08_platform_edge",
+      "triangles": 730,
+      "nonFiniteCoordinates": 0,
+      "degenerateFaces": 0,
+      "pass": true
+    },
+    {
+      "name": "t08_platform_corner",
+      "triangles": 978,
+      "nonFiniteCoordinates": 0,
+      "degenerateFaces": 0,
+      "pass": true
+    },
+    {
+      "name": "t08_stair_cheek",
+      "triangles": 352,
+      "nonFiniteCoordinates": 0,
+      "degenerateFaces": 0,
+      "pass": true
+    }
+  ],
+  "stairBoundsZ": [
+    -128.0,
+    0.0
+  ],
+  "stairSocketWidth": 256,
+  "riser": 16,
+  "stepCount": 8,
+  "pass": true
+}

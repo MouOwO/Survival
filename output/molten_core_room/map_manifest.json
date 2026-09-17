@@ -1,0 +1,26 @@
+{
+  "review": "molten_core_room_review",
+  "prefab": "prefabs/molten_core_room",
+  "instances": 450,
+  "customAssets": 30,
+  "nativeAssets": [],
+  "markers": [
+    "challenge_07_entry",
+    "challenge_07_home",
+    "challenge_07_boss_spawn",
+    "challenge_07_spawn_01",
+    "challenge_07_spawn_02",
+    "challenge_07_spawn_03",
+    "challenge_07_spawn_04",
+    "challenge_07_spawn_05",
+    "challenge_07_spawn_06",
+    "challenge_07_spawn_07",
+    "challenge_07_spawn_08",
+    "challenge_07_spawn_09",
+    "challenge_07_spawn_10"
+  ],
+  "floorZ": 128,
+  "openGridCells": 1066,
+  "emissiveEntities": 0,
+  "mainMapModified": false
+}

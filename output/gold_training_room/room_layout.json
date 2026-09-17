@@ -1,0 +1,7312 @@
+{
+  "interior": [
+    2048,
+    2304
+  ],
+  "floor_z": 0,
+  "wall_height": 176,
+  "placements": [
+    {
+      "name": "room_earth_base",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "05 Ground"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -896,
+        -1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -640,
+        -1024,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -384,
+        -1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -128,
+        -1024,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        128,
+        -1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        384,
+        -1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        640,
+        -1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        896,
+        -1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -896,
+        -768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -640,
+        -768,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -384,
+        -768,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -128,
+        -768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        128,
+        -768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        384,
+        -768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        640,
+        -768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        896,
+        -768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -896,
+        -512,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -640,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -384,
+        -512,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -128,
+        -512,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        128,
+        -512,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        384,
+        -512,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        640,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        896,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -896,
+        -256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -640,
+        -256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -384,
+        -256,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        -128,
+        -256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        128,
+        -256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        384,
+        -256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        640,
+        -256,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        896,
+        -256,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -896,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        -640,
+        0,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -384,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -128,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        128,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        384,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        640,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        896,
+        0,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -896,
+        256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -640,
+        256,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        -384,
+        256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -128,
+        256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        128,
+        256,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        384,
+        256,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        640,
+        256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        896,
+        256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -896,
+        512,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        -640,
+        512,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -384,
+        512,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -128,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        128,
+        512,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        384,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        640,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        896,
+        512,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -896,
+        768,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -640,
+        768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -384,
+        768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -128,
+        768,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        128,
+        768,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        384,
+        768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        640,
+        768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        896,
+        768,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        -896,
+        1024,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        -640,
+        1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        -384,
+        1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b02_floor_worn",
+      "origin": [
+        -128,
+        1024,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        128,
+        1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        384,
+        1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_a",
+      "origin": [
+        640,
+        1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_floor_b",
+      "origin": [
+        896,
+        1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b01_niche_floor",
+      "origin": [
+        0,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -768,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -512,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -256,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        0,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        256,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        512,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        768,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -1024,
+        -896,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -1024,
+        -640,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -1024,
+        -384,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -1024,
+        -128,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -1024,
+        128,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -1024,
+        384,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -1024,
+        640,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -1024,
+        896,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        1024,
+        -896,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        1024,
+        -640,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        1024,
+        -384,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        1024,
+        -128,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        1024,
+        128,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        1024,
+        384,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        1024,
+        640,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        1024,
+        896,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -512,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        -768,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_128",
+      "origin": [
+        -320,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        512,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_256",
+      "origin": [
+        768,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b03_wall_128",
+      "origin": [
+        320,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b05_corner",
+      "origin": [
+        -1024,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar",
+      "origin": [
+        -1024,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b05_corner",
+      "origin": [
+        1024,
+        -1152,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar",
+      "origin": [
+        1024,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b05_corner",
+      "origin": [
+        1024,
+        1152,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar",
+      "origin": [
+        1024,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b05_corner",
+      "origin": [
+        -1024,
+        1152,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar",
+      "origin": [
+        -1024,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b06_arc_60",
+      "origin": [
+        0,
+        1152,
+        0
+      ],
+      "yaw": -60,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b06_arc_60",
+      "origin": [
+        0,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b06_arc_60",
+      "origin": [
+        0,
+        1152,
+        0
+      ],
+      "yaw": 60,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar_coin",
+      "origin": [
+        -256,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar_coin",
+      "origin": [
+        256,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar_coin",
+      "origin": [
+        -384,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar_coin",
+      "origin": [
+        384,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar",
+      "origin": [
+        -1024,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar",
+      "origin": [
+        -1024,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar",
+      "origin": [
+        1024,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b04_pillar",
+      "origin": [
+        1024,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "b07_teleport_base",
+      "origin": [
+        0,
+        1096,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b08_spawn_inlay",
+      "origin": [
+        0,
+        -140,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b16_banner",
+      "origin": [
+        -448,
+        1117,
+        18
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b16_banner",
+      "origin": [
+        448,
+        1117,
+        18
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b09_coin_stele",
+      "origin": [
+        -720,
+        -1204,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b09_coin_relief",
+      "origin": [
+        -720,
+        -1204,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b10_brazier_plinth",
+      "origin": [
+        -1024,
+        0,
+        176
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b10_bronze_bowl",
+      "origin": [
+        -1024,
+        0,
+        242
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b10_brazier_plinth",
+      "origin": [
+        1024,
+        0,
+        176
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b10_bronze_bowl",
+      "origin": [
+        1024,
+        0,
+        242
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b10_brazier_plinth",
+      "origin": [
+        -226,
+        1120,
+        176
+      ],
+      "yaw": 0,
+      "scale": 0.6,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b10_bronze_bowl",
+      "origin": [
+        -226,
+        1120,
+        215.6
+      ],
+      "yaw": 0,
+      "scale": 0.6,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b10_brazier_plinth",
+      "origin": [
+        226,
+        1120,
+        176
+      ],
+      "yaw": 0,
+      "scale": 0.6,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b10_bronze_bowl",
+      "origin": [
+        226,
+        1120,
+        215.6
+      ],
+      "yaw": 0,
+      "scale": 0.6,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "b11_rock_1",
+      "origin": [
+        -1080,
+        -1180,
+        -15
+      ],
+      "yaw": 232,
+      "scale": 1.05,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -980.25,
+        -1232.5,
+        -15
+      ],
+      "yaw": 128,
+      "scale": 0.9450000000000001,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -1143.0,
+        -1080.25,
+        -15
+      ],
+      "yaw": 231,
+      "scale": 0.63,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -975.0,
+        -1104.4,
+        -15
+      ],
+      "yaw": 14,
+      "scale": 0.63,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -985.7718862655663,
+        -1252.4126640304066,
+        -13
+      ],
+      "yaw": 328,
+      "scale": 1.295981340896786,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -932.4939076684511,
+        -1188.343706083464,
+        -13
+      ],
+      "yaw": 233,
+      "scale": 1.2407329556965028,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1015.1294519284496,
+        -1092.3107426266988,
+        -13
+      ],
+      "yaw": 287,
+      "scale": 1.3044686229383897,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1191.6544464702167,
+        -1173.0879463218434,
+        -13
+      ],
+      "yaw": 12,
+      "scale": 1.1872090843355163,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1020.5722512198482,
+        -1352.03108608604,
+        -13
+      ],
+      "yaw": 158,
+      "scale": 1.491265619704314,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -997.9984652860709,
+        -1297.4699989603027,
+        -13
+      ],
+      "yaw": 86,
+      "scale": 1.2253418890923928,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1157.9570000604522,
+        -1321.5358266476962,
+        -13
+      ],
+      "yaw": 323,
+      "scale": 1.4059715500903178,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1225.316231437296,
+        -1140.5134142363083,
+        -13
+      ],
+      "yaw": 335,
+      "scale": 1.1651290730745347,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -986.6655106732535,
+        -1351.390045946533,
+        -13
+      ],
+      "yaw": 47,
+      "scale": 1.198061816944663,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1221.412490209357,
+        -1185.1809477119336,
+        -13
+      ],
+      "yaw": 285,
+      "scale": 1.4216552190190583,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1207.124038812092,
+        -1041.649650943663,
+        -13
+      ],
+      "yaw": 85,
+      "scale": 1.5451113554497367,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1024.8884406483537,
+        -1358.2763015266614,
+        -13
+      ],
+      "yaw": 319,
+      "scale": 1.2633687413711872,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1130,
+        -1290,
+        -13
+      ],
+      "yaw": 47,
+      "scale": 1.05,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_1",
+      "origin": [
+        1130,
+        -1150,
+        -15
+      ],
+      "yaw": 292,
+      "scale": 1.2,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        1244.0,
+        -1210.0,
+        -15
+      ],
+      "yaw": 336,
+      "scale": 1.08,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        1058.0,
+        -1036.0,
+        -15
+      ],
+      "yaw": 124,
+      "scale": 0.72,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        1250.0,
+        -1063.6,
+        -15
+      ],
+      "yaw": 353,
+      "scale": 0.72,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1276.8021783819927,
+        -1041.1086457865513,
+        -13
+      ],
+      "yaw": 123,
+      "scale": 1.611979166898333,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1062.438558402048,
+        -1278.6274244347942,
+        -13
+      ],
+      "yaw": 41,
+      "scale": 1.277663890504995,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1104.7524143854382,
+        -1282.8768421886025,
+        -13
+      ],
+      "yaw": 208,
+      "scale": 1.328392694290713,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1064.5198594150716,
+        -1046.8673397052066,
+        -13
+      ],
+      "yaw": 10,
+      "scale": 1.3808096380839765,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1303.302085641676,
+        -1254.4910406420613,
+        -13
+      ],
+      "yaw": 97,
+      "scale": 1.2116298684014488,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1236.6371398308193,
+        -1058.7267817180418,
+        -13
+      ],
+      "yaw": 253,
+      "scale": 1.2406521659229068,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1038.2129462624198,
+        -1033.0027404052114,
+        -13
+      ],
+      "yaw": 96,
+      "scale": 1.1894565901357772,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        962.6865012004471,
+        -1211.4920534470016,
+        -13
+      ],
+      "yaw": 27,
+      "scale": 1.3665426762502135,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        978.0296064811146,
+        -1124.7989693575257,
+        -13
+      ],
+      "yaw": 234,
+      "scale": 1.2578023496599093,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1244.4315948550686,
+        -960.5595028693544,
+        -13
+      ],
+      "yaw": 37,
+      "scale": 1.3169796610249227,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1296.2977450677774,
+        -1218.216367978363,
+        -13
+      ],
+      "yaw": 97,
+      "scale": 1.3943941511056386,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1027.0611086228203,
+        -1040.0659071261693,
+        -13
+      ],
+      "yaw": 176,
+      "scale": 1.5812574093632972,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1080,
+        -1260,
+        -13
+      ],
+      "yaw": 257,
+      "scale": 1.2,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_1",
+      "origin": [
+        -1060,
+        1200,
+        -15
+      ],
+      "yaw": 54,
+      "scale": 0.98,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -966.9,
+        1151.0,
+        -15
+      ],
+      "yaw": 52,
+      "scale": 0.882,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -1118.8,
+        1293.1,
+        -15
+      ],
+      "yaw": 48,
+      "scale": 0.588,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -962.0,
+        1270.56,
+        -15
+      ],
+      "yaw": 265,
+      "scale": 0.588,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1017.9005754805216,
+        1359.7222853372327,
+        -13
+      ],
+      "yaw": 358,
+      "scale": 1.5551333808616985,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1154.0851693947682,
+        1274.2736893727754,
+        -13
+      ],
+      "yaw": 189,
+      "scale": 1.6171231939986728,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1174.5687974930618,
+        1321.6000509512558,
+        -13
+      ],
+      "yaw": 104,
+      "scale": 1.368039047222167,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1016.966480727782,
+        1365.8295862892417,
+        -13
+      ],
+      "yaw": 341,
+      "scale": 1.5054352393441421,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1123.3002973541252,
+        1273.5464538079295,
+        -13
+      ],
+      "yaw": 278,
+      "scale": 1.3682957447839175,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -969.084521687538,
+        1284.3275930949517,
+        -13
+      ],
+      "yaw": 198,
+      "scale": 1.6465884223376,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -938.1851777109653,
+        1146.8184238469457,
+        -13
+      ],
+      "yaw": 61,
+      "scale": 1.5848036375018586,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1008.7568900056024,
+        1277.7315311793377,
+        -13
+      ],
+      "yaw": 272,
+      "scale": 1.4980341250225861,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -899.3145316226492,
+        1257.067492324603,
+        -13
+      ],
+      "yaw": 205,
+      "scale": 1.5682568993145438,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1084.246599043856,
+        1090.365688971879,
+        -13
+      ],
+      "yaw": 66,
+      "scale": 1.2856880158393411,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -946.7184793559197,
+        1185.161625547966,
+        -13
+      ],
+      "yaw": 45,
+      "scale": 1.3213432886389118,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1139.9783824102103,
+        1266.9314060710421,
+        -13
+      ],
+      "yaw": 196,
+      "scale": 1.5226007102424408,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1110,
+        1090,
+        -13
+      ],
+      "yaw": 89,
+      "scale": 0.98,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_1",
+      "origin": [
+        1060,
+        1230,
+        -15
+      ],
+      "yaw": 132,
+      "scale": 1.25,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        1178.75,
+        1167.5,
+        -15
+      ],
+      "yaw": 176,
+      "scale": 1.125,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        985.0,
+        1348.75,
+        -15
+      ],
+      "yaw": 252,
+      "scale": 0.75,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        1185.0,
+        1320.0,
+        -15
+      ],
+      "yaw": 71,
+      "scale": 0.75,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1028.1241671235014,
+        1082.4893868536371,
+        -13
+      ],
+      "yaw": 52,
+      "scale": 1.3357358707821527,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1195.0269366146458,
+        1303.8444893084168,
+        -13
+      ],
+      "yaw": 135,
+      "scale": 1.6279718022536618,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        975.6211127129792,
+        1044.315775277578,
+        -13
+      ],
+      "yaw": 110,
+      "scale": 1.5893678167361167,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        978.5426157752431,
+        1103.7976575109356,
+        -13
+      ],
+      "yaw": 113,
+      "scale": 1.4568058007538138,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        953.2930222123472,
+        1168.1713420669462,
+        -13
+      ],
+      "yaw": 25,
+      "scale": 1.319372454337171,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1022.4774162268254,
+        1104.9363362876438,
+        -13
+      ],
+      "yaw": 287,
+      "scale": 1.3506418620274667,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1210.257892589199,
+        1191.2020699861516,
+        -13
+      ],
+      "yaw": 240,
+      "scale": 1.5985692275628793,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1054.430223426602,
+        1045.3890624254693,
+        -13
+      ],
+      "yaw": 219,
+      "scale": 1.4801853199760415,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1060.9906576150333,
+        1401.7353510293212,
+        -13
+      ],
+      "yaw": 196,
+      "scale": 1.5638675739278831,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1192.2613610916521,
+        1350.0090208217514,
+        -13
+      ],
+      "yaw": 191,
+      "scale": 1.6205803614025485,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1043.8006290460207,
+        1429.5462721051726,
+        -13
+      ],
+      "yaw": 329,
+      "scale": 1.4983980061707283,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        932.4841664321721,
+        1318.5941512726245,
+        -13
+      ],
+      "yaw": 289,
+      "scale": 1.2598555793240334,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1010,
+        1120,
+        -13
+      ],
+      "yaw": 293,
+      "scale": 1.25,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_1",
+      "origin": [
+        -1110,
+        710,
+        -15
+      ],
+      "yaw": 93,
+      "scale": 0.65,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -1048.25,
+        677.5,
+        -15
+      ],
+      "yaw": 290,
+      "scale": 0.5850000000000001,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -1149.0,
+        771.75,
+        -15
+      ],
+      "yaw": 159,
+      "scale": 0.39,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        -1045.0,
+        756.8,
+        -15
+      ],
+      "yaw": 14,
+      "scale": 0.39,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1199.4634770490084,
+        734.2520960074141,
+        -13
+      ],
+      "yaw": 171,
+      "scale": 1.493796278516136,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1038.6904992385746,
+        782.8419330147224,
+        -13
+      ],
+      "yaw": 309,
+      "scale": 1.5947692519613117,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1081.1564754769124,
+        827.6930289719222,
+        -13
+      ],
+      "yaw": 251,
+      "scale": 1.465995428620969,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1047.364670934944,
+        678.7876422890789,
+        -13
+      ],
+      "yaw": 357,
+      "scale": 1.491426482999669,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1023.5156049209851,
+        781.4046059840234,
+        -13
+      ],
+      "yaw": 149,
+      "scale": 1.5956771786070405,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1213.53270507784,
+        753.8190023673392,
+        -13
+      ],
+      "yaw": 154,
+      "scale": 1.6083687923892769,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1176.3167958435763,
+        779.6025199322943,
+        -13
+      ],
+      "yaw": 231,
+      "scale": 1.4068436167750369,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1162.0445545036757,
+        631.7187369106454,
+        -13
+      ],
+      "yaw": 341,
+      "scale": 1.4823410105202457,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1106.6512487316,
+        634.8108218262289,
+        -13
+      ],
+      "yaw": 76,
+      "scale": 1.2337932260522038,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1174.4234812915647,
+        777.4574740737982,
+        -13
+      ],
+      "yaw": 277,
+      "scale": 1.504661516156646,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1043.0983873189798,
+        716.0537064246525,
+        -13
+      ],
+      "yaw": 235,
+      "scale": 1.610719879552775,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1216.663130525367,
+        690.6218164710801,
+        -13
+      ],
+      "yaw": 56,
+      "scale": 1.2611024203815413,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1160,
+        600,
+        -13
+      ],
+      "yaw": 346,
+      "scale": 0.65,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_1",
+      "origin": [
+        1160,
+        -720,
+        -15
+      ],
+      "yaw": 299,
+      "scale": 0.65,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        1221.75,
+        -752.5,
+        -15
+      ],
+      "yaw": 299,
+      "scale": 0.5850000000000001,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        1121.0,
+        -658.25,
+        -15
+      ],
+      "yaw": 144,
+      "scale": 0.39,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b11_rock_2",
+      "origin": [
+        1225.0,
+        -673.2,
+        -15
+      ],
+      "yaw": 120,
+      "scale": 0.39,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1220.0771403770495,
+        -794.3780115949827,
+        -13
+      ],
+      "yaw": 317,
+      "scale": 1.247371760126996,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1272.5227549482624,
+        -762.7762068832051,
+        -13
+      ],
+      "yaw": 288,
+      "scale": 1.3043366871996602,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1091.9987447402052,
+        -629.9189050445091,
+        -13
+      ],
+      "yaw": 54,
+      "scale": 1.440413823109714,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1248.9959692917873,
+        -728.2849527274989,
+        -13
+      ],
+      "yaw": 219,
+      "scale": 1.5739225698572663,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1117.6010180810947,
+        -781.3010351281324,
+        -13
+      ],
+      "yaw": 235,
+      "scale": 1.3451795970092022,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1243.6238758308707,
+        -673.9846996062894,
+        -13
+      ],
+      "yaw": 171,
+      "scale": 1.2174535393930428,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1138.027547133102,
+        -634.3086138976006,
+        -13
+      ],
+      "yaw": 42,
+      "scale": 1.5141163608742216,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1124.175123831265,
+        -652.028015323523,
+        -13
+      ],
+      "yaw": 2,
+      "scale": 1.3459571347334416,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1223.5665673618707,
+        -783.5111736260226,
+        -13
+      ],
+      "yaw": 305,
+      "scale": 1.2024562693220222,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1108.3178059829831,
+        -635.269966841022,
+        -13
+      ],
+      "yaw": 314,
+      "scale": 1.2796192436382379,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1170.6868283832166,
+        -629.8509404468225,
+        -13
+      ],
+      "yaw": 180,
+      "scale": 1.4574196533440638,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1159.00358518702,
+        -828.4658522316599,
+        -13
+      ],
+      "yaw": 260,
+      "scale": 1.2643910282183932,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1110,
+        -830,
+        -13
+      ],
+      "yaw": 182,
+      "scale": 0.65,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1063.2522139816635,
+        138.5290457708213,
+        -13
+      ],
+      "yaw": 224,
+      "scale": 1.499000934486462,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1063.2522139816635,
+        138.5290457708213,
+        -14
+      ],
+      "yaw": 244,
+      "scale": 0.6714649357028645,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1063.2522139816635,
+        138.5290457708213,
+        -13
+      ],
+      "yaw": 268,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -1121.1161694598482,
+        958.5716043951197,
+        -13
+      ],
+      "yaw": 166,
+      "scale": 1.8344913352113972,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1192.7623315769797,
+        -83.90157366420294,
+        -13
+      ],
+      "yaw": 337,
+      "scale": 1.2212388353884294,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1164.6046112962445,
+        2.121142837202342,
+        -13
+      ],
+      "yaw": 348,
+      "scale": 1.7799375928936212,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1164.6046112962445,
+        2.121142837202342,
+        -14
+      ],
+      "yaw": 292,
+      "scale": 0.4810478228503528,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1092.0005308217821,
+        -709.3119818913871,
+        -13
+      ],
+      "yaw": 40,
+      "scale": 1.5280333772487975,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1092.0005308217821,
+        -709.3119818913871,
+        -13
+      ],
+      "yaw": 259,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1144.0297753843035,
+        -642.2654704905644,
+        -13
+      ],
+      "yaw": 193,
+      "scale": 1.270929238503829,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1234.7195846243296,
+        -846.04595798264,
+        -13
+      ],
+      "yaw": 112,
+      "scale": 1.3767224170418713,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1234.7195846243296,
+        -846.04595798264,
+        -14
+      ],
+      "yaw": 80,
+      "scale": 0.5232585840734995,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1118.0089828873183,
+        -460.3948627183613,
+        -13
+      ],
+      "yaw": 305,
+      "scale": 1.411925542598874,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1061.2385882726414,
+        -104.56602585181986,
+        -13
+      ],
+      "yaw": 204,
+      "scale": 1.502697305042513,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1061.2385882726414,
+        -104.56602585181986,
+        -13
+      ],
+      "yaw": 225,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -1155.7679131613777,
+        1231.953342628015,
+        -13
+      ],
+      "yaw": 136,
+      "scale": 1.8305060707033451,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1155.7679131613777,
+        1231.953342628015,
+        -14
+      ],
+      "yaw": 264,
+      "scale": 0.69311535489081,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1088.6780888486549,
+        -491.9747319254832,
+        -13
+      ],
+      "yaw": 315,
+      "scale": 1.17060403249672,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1164.2135252112057,
+        648.1901915933822,
+        -13
+      ],
+      "yaw": 280,
+      "scale": 1.6582993967189639,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1172.9247875932945,
+        635.107851448535,
+        -13
+      ],
+      "yaw": 186,
+      "scale": 1.7004531076089129,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1172.9247875932945,
+        635.107851448535,
+        -14
+      ],
+      "yaw": 343,
+      "scale": 0.5886971898228022,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1172.9247875932945,
+        635.107851448535,
+        -13
+      ],
+      "yaw": 173,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -1221.1034385233145,
+        -1021.7205911041578,
+        -13
+      ],
+      "yaw": 273,
+      "scale": 1.3059985439857893,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1159.064601678228,
+        -734.2643047997749,
+        -13
+      ],
+      "yaw": 342,
+      "scale": 1.1599956185449485,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1129.9194098359283,
+        916.9237427283556,
+        -13
+      ],
+      "yaw": 331,
+      "scale": 1.2501682333177915,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1129.9194098359283,
+        916.9237427283556,
+        -14
+      ],
+      "yaw": 248,
+      "scale": 0.7907102920146902,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1212.52087388747,
+        -17.167049521085573,
+        -13
+      ],
+      "yaw": 63,
+      "scale": 1.5126314090926192,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1212.52087388747,
+        -17.167049521085573,
+        -13
+      ],
+      "yaw": 335,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1162.6646063057383,
+        994.27044871013,
+        -13
+      ],
+      "yaw": 221,
+      "scale": 1.3421560419535448,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1101.0024988822965,
+        -771.636434306964,
+        -13
+      ],
+      "yaw": 140,
+      "scale": 1.767764452849781,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1101.0024988822965,
+        -771.636434306964,
+        -14
+      ],
+      "yaw": 78,
+      "scale": 0.5139905485586997,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1112.8679882225647,
+        796.2415528088541,
+        -13
+      ],
+      "yaw": 0,
+      "scale": 1.7571468405442268,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1196.745441600488,
+        1210.8871416394545,
+        -13
+      ],
+      "yaw": 330,
+      "scale": 1.7563530813524122,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1196.745441600488,
+        1210.8871416394545,
+        -13
+      ],
+      "yaw": 241,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1207.571321306243,
+        725.7168761736718,
+        -13
+      ],
+      "yaw": 204,
+      "scale": 1.7385060248503006,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1207.571321306243,
+        725.7168761736718,
+        -14
+      ],
+      "yaw": 329,
+      "scale": 0.6686197512084837,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1168.9504916479345,
+        329.55068895515615,
+        -13
+      ],
+      "yaw": 178,
+      "scale": 1.778625221502296,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1116.9057881373424,
+        560.4968443936821,
+        -13
+      ],
+      "yaw": 109,
+      "scale": 1.2158940916101464,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1109.254441624363,
+        487.8734818564999,
+        -13
+      ],
+      "yaw": 306,
+      "scale": 1.5502718070749042,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1109.254441624363,
+        487.8734818564999,
+        -14
+      ],
+      "yaw": 255,
+      "scale": 0.6186427452940872,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1109.254441624363,
+        487.8734818564999,
+        -13
+      ],
+      "yaw": 292,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1199.844057489879,
+        -579.0972875912149,
+        -13
+      ],
+      "yaw": 107,
+      "scale": 1.3696240234178267,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1146.835066813732,
+        564.8667364221626,
+        -13
+      ],
+      "yaw": 149,
+      "scale": 1.7837054402699817,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1159.8633660860216,
+        -18.14187279422049,
+        -13
+      ],
+      "yaw": 335,
+      "scale": 1.4872476441325153,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1159.8633660860216,
+        -18.14187279422049,
+        -14
+      ],
+      "yaw": 144,
+      "scale": 0.35835460988475293,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1114.5128909908174,
+        867.5254176651408,
+        -13
+      ],
+      "yaw": 219,
+      "scale": 1.8397564190792264,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1114.5128909908174,
+        867.5254176651408,
+        -13
+      ],
+      "yaw": 228,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1129.232182345618,
+        237.9419216434826,
+        -13
+      ],
+      "yaw": 205,
+      "scale": 1.39465703529919,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1217.0653221695427,
+        138.86644698169425,
+        -13
+      ],
+      "yaw": 191,
+      "scale": 1.5018055206821948,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1217.0653221695427,
+        138.86644698169425,
+        -14
+      ],
+      "yaw": 75,
+      "scale": 0.42488992351169874,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1101.1055655232697,
+        -1140.013867559791,
+        -13
+      ],
+      "yaw": 77,
+      "scale": 1.5077497454159483,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1210.5128622679345,
+        -536.6082147740279,
+        -13
+      ],
+      "yaw": 53,
+      "scale": 1.5242806877146005,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1210.5128622679345,
+        -536.6082147740279,
+        -13
+      ],
+      "yaw": 66,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1217.648298347486,
+        -706.5364453400706,
+        -13
+      ],
+      "yaw": 199,
+      "scale": 1.2419757949033725,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1217.648298347486,
+        -706.5364453400706,
+        -14
+      ],
+      "yaw": 275,
+      "scale": 0.4167831361738609,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1122.5433361072467,
+        -1050.2360305801399,
+        -13
+      ],
+      "yaw": 335,
+      "scale": 1.3524054643516048,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1093.6510908413475,
+        1150.2581821326635,
+        -13
+      ],
+      "yaw": 76,
+      "scale": 1.6344455884601647,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1128.2965212968172,
+        356.7228590890468,
+        -13
+      ],
+      "yaw": 330,
+      "scale": 1.4260400610333739,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1128.2965212968172,
+        356.7228590890468,
+        -14
+      ],
+      "yaw": 134,
+      "scale": 0.6866639040399574,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1128.2965212968172,
+        356.7228590890468,
+        -13
+      ],
+      "yaw": 341,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1108.0088217460907,
+        -863.9619339060152,
+        -13
+      ],
+      "yaw": 260,
+      "scale": 1.46717560990708,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1180.5220014803788,
+        861.0483749893708,
+        -13
+      ],
+      "yaw": 74,
+      "scale": 1.6545869577172676,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1105.358855211574,
+        894.3436939782705,
+        -13
+      ],
+      "yaw": 266,
+      "scale": 1.3950225365237205,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1105.358855211574,
+        894.3436939782705,
+        -14
+      ],
+      "yaw": 41,
+      "scale": 0.42766434830841105,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1135.261582071376,
+        -416.56927199534516,
+        -13
+      ],
+      "yaw": 256,
+      "scale": 1.4567319978667141,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1135.261582071376,
+        -416.56927199534516,
+        -13
+      ],
+      "yaw": 41,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1158.685601792898,
+        -414.64687626577245,
+        -13
+      ],
+      "yaw": 267,
+      "scale": 1.6862500801918916,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -1156.1190118501572,
+        154.21161464928673,
+        -13
+      ],
+      "yaw": 71,
+      "scale": 1.374049932279216,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1156.1190118501572,
+        154.21161464928673,
+        -14
+      ],
+      "yaw": 178,
+      "scale": 0.46335528117295954,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1126.8248906335189,
+        360.2607523723941,
+        -13
+      ],
+      "yaw": 281,
+      "scale": 1.2908432572936623,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1225.4734879024727,
+        -90.5070370563792,
+        -13
+      ],
+      "yaw": 122,
+      "scale": 1.5283168969758878,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1225.4734879024727,
+        -90.5070370563792,
+        -13
+      ],
+      "yaw": 6,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1131.1829133326526,
+        -1086.0577414997977,
+        -13
+      ],
+      "yaw": 184,
+      "scale": 1.7195929266534262,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1131.1829133326526,
+        -1086.0577414997977,
+        -14
+      ],
+      "yaw": 323,
+      "scale": 0.7919317511008128,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1236.5129200822737,
+        -552.3712706853298,
+        -13
+      ],
+      "yaw": 303,
+      "scale": 1.4647169759218335,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1195.76715753996,
+        -48.86948037038405,
+        -13
+      ],
+      "yaw": 82,
+      "scale": 1.3176957710268828,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -1100.7445741401343,
+        787.7413074412186,
+        -13
+      ],
+      "yaw": 250,
+      "scale": 1.254212955429203,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1100.7445741401343,
+        787.7413074412186,
+        -14
+      ],
+      "yaw": 312,
+      "scale": 0.6530142294035801,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1100.7445741401343,
+        787.7413074412186,
+        -13
+      ],
+      "yaw": 306,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -1200.32605024144,
+        -718.0760254650805,
+        -13
+      ],
+      "yaw": 216,
+      "scale": 1.3065964709641193,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -1222.6780923895583,
+        850.3879420454605,
+        -13
+      ],
+      "yaw": 137,
+      "scale": 1.3057514655884663,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1115.4543085787802,
+        -732.7189571504906,
+        -13
+      ],
+      "yaw": 120,
+      "scale": 1.4615110290532096,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1115.4543085787802,
+        -732.7189571504906,
+        -14
+      ],
+      "yaw": 42,
+      "scale": 0.7261176413352677,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -1160.9464159501347,
+        -519.0775197737186,
+        -13
+      ],
+      "yaw": 304,
+      "scale": 1.3401039903114007,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -1160.9464159501347,
+        -519.0775197737186,
+        -13
+      ],
+      "yaw": 305,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1148.6759020621355,
+        411.3136522736072,
+        -13
+      ],
+      "yaw": 339,
+      "scale": 1.1793411914093128,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -1060.322463155547,
+        -563.605909059438,
+        -13
+      ],
+      "yaw": 0,
+      "scale": 1.658983396960653,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -1060.322463155547,
+        -563.605909059438,
+        -14
+      ],
+      "yaw": 172,
+      "scale": 0.7115211725525861,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1086.7030836731794,
+        1147.5340756761225,
+        -13
+      ],
+      "yaw": 309,
+      "scale": 1.1768488637602248,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1086.7030836731794,
+        1147.5340756761225,
+        -14
+      ],
+      "yaw": 102,
+      "scale": 0.7017117443838277,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1086.7030836731794,
+        1147.5340756761225,
+        -13
+      ],
+      "yaw": 149,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        1083.8481690126093,
+        -832.4430241065069,
+        -13
+      ],
+      "yaw": 242,
+      "scale": 1.2504693807222003,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1087.7089215891433,
+        -402.78719472756643,
+        -13
+      ],
+      "yaw": 251,
+      "scale": 1.4399513153622692,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1146.8104818559748,
+        747.3802315612495,
+        -13
+      ],
+      "yaw": 234,
+      "scale": 1.261670360021407,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1146.8104818559748,
+        747.3802315612495,
+        -14
+      ],
+      "yaw": 345,
+      "scale": 0.7813305540331434,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1224.970760077518,
+        619.3080205300589,
+        -13
+      ],
+      "yaw": 87,
+      "scale": 1.4291574366604567,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1224.970760077518,
+        619.3080205300589,
+        -13
+      ],
+      "yaw": 161,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1218.7203217923923,
+        965.2933049839298,
+        -13
+      ],
+      "yaw": 266,
+      "scale": 1.2835762446685026,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1127.751268464566,
+        -220.73357478790285,
+        -13
+      ],
+      "yaw": 267,
+      "scale": 1.317922969248379,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1127.751268464566,
+        -220.73357478790285,
+        -14
+      ],
+      "yaw": 172,
+      "scale": 0.4817196522109253,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1197.0898431367275,
+        923.3871410416195,
+        -13
+      ],
+      "yaw": 358,
+      "scale": 1.27895880723752,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1181.8809889239906,
+        804.6734607193962,
+        -13
+      ],
+      "yaw": 172,
+      "scale": 1.6298464135952373,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1181.8809889239906,
+        804.6734607193962,
+        -13
+      ],
+      "yaw": 16,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1109.265880764347,
+        -1071.9826924593613,
+        -13
+      ],
+      "yaw": 267,
+      "scale": 1.1514564687704445,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1109.265880764347,
+        -1071.9826924593613,
+        -14
+      ],
+      "yaw": 295,
+      "scale": 0.60829465258883,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1123.7067254361725,
+        -126.30466469430803,
+        -13
+      ],
+      "yaw": 352,
+      "scale": 1.1630998824316559,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1189.4928722846794,
+        108.05626233914586,
+        -13
+      ],
+      "yaw": 244,
+      "scale": 1.3440469838319578,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        1201.1873676342223,
+        1157.1445457322666,
+        -13
+      ],
+      "yaw": 123,
+      "scale": 1.1668432331568068,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1201.1873676342223,
+        1157.1445457322666,
+        -14
+      ],
+      "yaw": 179,
+      "scale": 0.37737221782315233,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1201.1873676342223,
+        1157.1445457322666,
+        -13
+      ],
+      "yaw": 27,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1077.4270690498538,
+        -413.3808516183358,
+        -13
+      ],
+      "yaw": 57,
+      "scale": 1.4652059877020789,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1121.3260036965653,
+        -900.4268440747069,
+        -13
+      ],
+      "yaw": 347,
+      "scale": 1.2214738570012225,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1167.7855148431806,
+        -333.710102826204,
+        -13
+      ],
+      "yaw": 115,
+      "scale": 1.8479706390887078,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1167.7855148431806,
+        -333.710102826204,
+        -14
+      ],
+      "yaw": 304,
+      "scale": 0.4260087841137561,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1219.785127916042,
+        -865.3794925380525,
+        -13
+      ],
+      "yaw": 167,
+      "scale": 1.5065553434205718,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1219.785127916042,
+        -865.3794925380525,
+        -13
+      ],
+      "yaw": 104,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1133.3631248941076,
+        -1153.8264748291663,
+        -13
+      ],
+      "yaw": 20,
+      "scale": 1.686242766477064,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1097.0842427495777,
+        611.2742311759409,
+        -13
+      ],
+      "yaw": 4,
+      "scale": 1.7658934345761836,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1097.0842427495777,
+        611.2742311759409,
+        -14
+      ],
+      "yaw": 294,
+      "scale": 0.7400678004864275,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1168.2448011827803,
+        -399.00288379502706,
+        -13
+      ],
+      "yaw": 67,
+      "scale": 1.2691155733029538,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1143.1498863817685,
+        1118.4486446558708,
+        -13
+      ],
+      "yaw": 352,
+      "scale": 1.428588717374904,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1143.1498863817685,
+        1118.4486446558708,
+        -13
+      ],
+      "yaw": 76,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1205.6076750658308,
+        -714.91301265971,
+        -13
+      ],
+      "yaw": 333,
+      "scale": 1.6120703915831855,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1205.6076750658308,
+        -714.91301265971,
+        -14
+      ],
+      "yaw": 142,
+      "scale": 0.5003873023585736,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1078.016705206346,
+        721.7182446175862,
+        -13
+      ],
+      "yaw": 270,
+      "scale": 1.7154326397775812,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1146.714071588732,
+        459.1713202314204,
+        -13
+      ],
+      "yaw": 131,
+      "scale": 1.360242701034266,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1097.45176902307,
+        -1158.9619026308892,
+        -13
+      ],
+      "yaw": 6,
+      "scale": 1.3407220152411896,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1097.45176902307,
+        -1158.9619026308892,
+        -14
+      ],
+      "yaw": 208,
+      "scale": 0.5262647101281583,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1097.45176902307,
+        -1158.9619026308892,
+        -13
+      ],
+      "yaw": 148,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1112.025245431174,
+        -723.8338176703792,
+        -13
+      ],
+      "yaw": 140,
+      "scale": 1.3677172865524239,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1189.1488389193692,
+        669.7589330088736,
+        -13
+      ],
+      "yaw": 88,
+      "scale": 1.1633247411417909,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1141.021913211798,
+        930.4216387220868,
+        -13
+      ],
+      "yaw": 222,
+      "scale": 1.7932205062597557,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1141.021913211798,
+        930.4216387220868,
+        -14
+      ],
+      "yaw": 111,
+      "scale": 0.6472633798996077,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1228.0240863472482,
+        -532.4487877621519,
+        -13
+      ],
+      "yaw": 136,
+      "scale": 1.366657299737681,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1228.0240863472482,
+        -532.4487877621519,
+        -13
+      ],
+      "yaw": 235,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        1209.6508864902585,
+        455.8025079883255,
+        -13
+      ],
+      "yaw": 151,
+      "scale": 1.2369396648496775,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        1210.8975578150298,
+        796.6491346773164,
+        -13
+      ],
+      "yaw": 349,
+      "scale": 1.4956593818173554,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1210.8975578150298,
+        796.6491346773164,
+        -14
+      ],
+      "yaw": 282,
+      "scale": 0.49927681777845156,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1088.2377348654302,
+        -776.810797286,
+        -13
+      ],
+      "yaw": 98,
+      "scale": 1.2875224470885664,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1210.2051044688978,
+        -346.86783828213277,
+        -13
+      ],
+      "yaw": 42,
+      "scale": 1.2217873470131977,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1210.2051044688978,
+        -346.86783828213277,
+        -13
+      ],
+      "yaw": 244,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1205.4718863977805,
+        398.46252017859365,
+        -13
+      ],
+      "yaw": 333,
+      "scale": 1.3578344857071187,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1205.4718863977805,
+        398.46252017859365,
+        -14
+      ],
+      "yaw": 26,
+      "scale": 0.3866856556396909,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1237.9993252635181,
+        -902.0176629798323,
+        -13
+      ],
+      "yaw": 283,
+      "scale": 1.1861896686656428,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1230.0176761715472,
+        160.6339753789623,
+        -13
+      ],
+      "yaw": 286,
+      "scale": 1.750455735809906,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1081.869987233984,
+        -57.10446876214928,
+        -13
+      ],
+      "yaw": 337,
+      "scale": 1.4215835558444199,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1081.869987233984,
+        -57.10446876214928,
+        -14
+      ],
+      "yaw": 277,
+      "scale": 0.3892460733546524,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1081.869987233984,
+        -57.10446876214928,
+        -13
+      ],
+      "yaw": 268,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1157.8646921299385,
+        797.4926824679383,
+        -13
+      ],
+      "yaw": 93,
+      "scale": 1.268498688130433,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1211.4134828680142,
+        861.4185908576915,
+        -13
+      ],
+      "yaw": 124,
+      "scale": 1.2644071119307756,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1097.6164839243831,
+        326.2920482517802,
+        -13
+      ],
+      "yaw": 85,
+      "scale": 1.640159737172382,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1097.6164839243831,
+        326.2920482517802,
+        -14
+      ],
+      "yaw": 48,
+      "scale": 0.6181039440826461,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1219.0171037902592,
+        949.6528645051585,
+        -13
+      ],
+      "yaw": 28,
+      "scale": 1.6164816854425164,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1219.0171037902592,
+        949.6528645051585,
+        -13
+      ],
+      "yaw": 146,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1087.9987311236355,
+        786.9218787295604,
+        -13
+      ],
+      "yaw": 80,
+      "scale": 1.2492549984311048,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        1111.1530531140545,
+        -830.2953556149273,
+        -13
+      ],
+      "yaw": 138,
+      "scale": 1.6427720675807367,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1111.1530531140545,
+        -830.2953556149273,
+        -14
+      ],
+      "yaw": 18,
+      "scale": 0.37770936241097003,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1183.7139988287113,
+        585.4580314841062,
+        -13
+      ],
+      "yaw": 317,
+      "scale": 1.4249595690382992,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        1077.612538177096,
+        503.14119415055234,
+        -13
+      ],
+      "yaw": 201,
+      "scale": 1.412240435494563,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1077.612538177096,
+        503.14119415055234,
+        -13
+      ],
+      "yaw": 92,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1191.6012525472515,
+        -37.43339661594746,
+        -13
+      ],
+      "yaw": 235,
+      "scale": 1.6347411480964942,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1191.6012525472515,
+        -37.43339661594746,
+        -14
+      ],
+      "yaw": 17,
+      "scale": 0.7950679437805808,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1060.3522821963027,
+        431.76482788607905,
+        -13
+      ],
+      "yaw": 24,
+      "scale": 1.7373097557580053,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1092.4561305343686,
+        474.27516309689804,
+        -13
+      ],
+      "yaw": 272,
+      "scale": 1.6484764222759622,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1122.6236970404968,
+        -736.3145247798038,
+        -13
+      ],
+      "yaw": 224,
+      "scale": 1.5786772302279681,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1122.6236970404968,
+        -736.3145247798038,
+        -14
+      ],
+      "yaw": 252,
+      "scale": 0.4684042693504684,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1122.6236970404968,
+        -736.3145247798038,
+        -13
+      ],
+      "yaw": 166,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        1210.707053778788,
+        -462.7863144775671,
+        -13
+      ],
+      "yaw": 41,
+      "scale": 1.7275314315266839,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        1074.684053028733,
+        917.2169862847991,
+        -13
+      ],
+      "yaw": 103,
+      "scale": 1.188463240512468,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        1234.4995485157388,
+        510.34184668386456,
+        -13
+      ],
+      "yaw": 26,
+      "scale": 1.6559243505291756,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1234.4995485157388,
+        510.34184668386456,
+        -14
+      ],
+      "yaw": 77,
+      "scale": 0.3629223898646109,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1089.8769997866152,
+        -356.50680375304216,
+        -13
+      ],
+      "yaw": 233,
+      "scale": 1.634057878515239,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1089.8769997866152,
+        -356.50680375304216,
+        -13
+      ],
+      "yaw": 310,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        1172.9297369690312,
+        559.1403166224989,
+        -13
+      ],
+      "yaw": 14,
+      "scale": 1.4707551192140622,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1148.304883137869,
+        -1157.806023358687,
+        -13
+      ],
+      "yaw": 227,
+      "scale": 1.7922034794384967,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1148.304883137869,
+        -1157.806023358687,
+        -14
+      ],
+      "yaw": 96,
+      "scale": 0.4560111602213033,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -725.351513018849,
+        -1352.2424140872236,
+        -13
+      ],
+      "yaw": 309,
+      "scale": 1.6157695881977499,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -725.351513018849,
+        -1352.2424140872236,
+        -14
+      ],
+      "yaw": 203,
+      "scale": 0.3618580882936804,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -725.351513018849,
+        -1352.2424140872236,
+        -13
+      ],
+      "yaw": 128,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -1022.116057782096,
+        -1317.0332558934979,
+        -13
+      ],
+      "yaw": 355,
+      "scale": 1.4850745468073812,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -9.905914800201117,
+        -1330.1554756619505,
+        -13
+      ],
+      "yaw": 0,
+      "scale": 1.4604044542750587,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        575.4356201808544,
+        -1280.792325328579,
+        -13
+      ],
+      "yaw": 82,
+      "scale": 1.3462503474148715,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        575.4356201808544,
+        -1280.792325328579,
+        -14
+      ],
+      "yaw": 141,
+      "scale": 0.5760732876515083,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1000.8509820884262,
+        -1255.9144718320235,
+        -13
+      ],
+      "yaw": 286,
+      "scale": 1.7359085321515964,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        1000.8509820884262,
+        -1255.9144718320235,
+        -13
+      ],
+      "yaw": 233,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -294.6747566012375,
+        -1341.984136016086,
+        -13
+      ],
+      "yaw": 178,
+      "scale": 1.4290442708134676,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        310.9619571966389,
+        -1361.3306288588656,
+        -13
+      ],
+      "yaw": 314,
+      "scale": 1.258876631033446,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        310.9619571966389,
+        -1361.3306288588656,
+        -14
+      ],
+      "yaw": 310,
+      "scale": 0.6920040755634098,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        201.4772880012165,
+        -1221.3206914160803,
+        -13
+      ],
+      "yaw": 329,
+      "scale": 1.5656678175196528,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -699.354130708523,
+        -1344.1998511929644,
+        -13
+      ],
+      "yaw": 159,
+      "scale": 1.7536072208459443,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -699.354130708523,
+        -1344.1998511929644,
+        -13
+      ],
+      "yaw": 311,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        355.4386467150398,
+        -1193.8995276045487,
+        -13
+      ],
+      "yaw": 201,
+      "scale": 1.7653290313481087,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        355.4386467150398,
+        -1193.8995276045487,
+        -14
+      ],
+      "yaw": 89,
+      "scale": 0.6860977086472304,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -208.8146964259613,
+        -1283.95541055967,
+        -13
+      ],
+      "yaw": 244,
+      "scale": 1.1649630614098063,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        213.23020573218173,
+        -1364.7279459436133,
+        -13
+      ],
+      "yaw": 140,
+      "scale": 1.8210042456762752,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -37.46787179312844,
+        -1285.7702332837669,
+        -13
+      ],
+      "yaw": 304,
+      "scale": 1.5126993887443652,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -37.46787179312844,
+        -1285.7702332837669,
+        -14
+      ],
+      "yaw": 20,
+      "scale": 0.5031547622006868,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -37.46787179312844,
+        -1285.7702332837669,
+        -13
+      ],
+      "yaw": 222,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        453.65440720129004,
+        -1215.6569132680222,
+        -13
+      ],
+      "yaw": 200,
+      "scale": 1.727932131656201,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        732.3977253572782,
+        -1249.9569839289088,
+        -13
+      ],
+      "yaw": 87,
+      "scale": 1.2652275557887178,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        76.90295317623372,
+        -1225.3555317636417,
+        -13
+      ],
+      "yaw": 292,
+      "scale": 1.1864274306866203,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        76.90295317623372,
+        -1225.3555317636417,
+        -14
+      ],
+      "yaw": 235,
+      "scale": 0.6819577044498127,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        993.9115824900346,
+        -1349.9174950460113,
+        -13
+      ],
+      "yaw": 160,
+      "scale": 1.5610082757545902,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        993.9115824900346,
+        -1349.9174950460113,
+        -13
+      ],
+      "yaw": 59,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        718.3565503584423,
+        -1239.804191181561,
+        -13
+      ],
+      "yaw": 63,
+      "scale": 1.4867695883740129,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -212.30083558247532,
+        -1301.0765581898418,
+        -13
+      ],
+      "yaw": 324,
+      "scale": 1.380179972139182,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -212.30083558247532,
+        -1301.0765581898418,
+        -14
+      ],
+      "yaw": 233,
+      "scale": 0.4771554410347305,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        1001.3537945873434,
+        -1306.4826713361283,
+        -13
+      ],
+      "yaw": 205,
+      "scale": 1.2133157118503728,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -502.8241935368909,
+        -1302.7809821572039,
+        -13
+      ],
+      "yaw": 249,
+      "scale": 1.8229548884777245,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -502.8241935368909,
+        -1302.7809821572039,
+        -13
+      ],
+      "yaw": 133,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -569.7263243218042,
+        -1358.4705301648921,
+        -13
+      ],
+      "yaw": 291,
+      "scale": 1.3381365290413856,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -569.7263243218042,
+        -1358.4705301648921,
+        -14
+      ],
+      "yaw": 209,
+      "scale": 0.6666860591973154,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        265.3157264273841,
+        -1274.014834498973,
+        -13
+      ],
+      "yaw": 256,
+      "scale": 1.2754746204454162,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        278.9762469735681,
+        -1314.943061798301,
+        -13
+      ],
+      "yaw": 82,
+      "scale": 1.808150503459041,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -956.8844917819254,
+        -1333.956677851317,
+        -13
+      ],
+      "yaw": 263,
+      "scale": 1.3104534659383322,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -956.8844917819254,
+        -1333.956677851317,
+        -14
+      ],
+      "yaw": 282,
+      "scale": 0.4299569874654656,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -956.8844917819254,
+        -1333.956677851317,
+        -13
+      ],
+      "yaw": 321,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        908.5039403174108,
+        -1240.1123819638283,
+        -13
+      ],
+      "yaw": 152,
+      "scale": 1.7903499939927205,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -782.4443108550947,
+        -1289.5942908255913,
+        -13
+      ],
+      "yaw": 12,
+      "scale": 1.2977678504034644,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        113.06837404713951,
+        -1234.960931463706,
+        -13
+      ],
+      "yaw": 330,
+      "scale": 1.8170629939603453,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        113.06837404713951,
+        -1234.960931463706,
+        -14
+      ],
+      "yaw": 252,
+      "scale": 0.7908915345651635,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -933.5739562523956,
+        -1293.9616846095782,
+        -13
+      ],
+      "yaw": 122,
+      "scale": 1.5526762861780452,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -933.5739562523956,
+        -1293.9616846095782,
+        -13
+      ],
+      "yaw": 123,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -429.65708206313,
+        -1271.6398244730747,
+        -13
+      ],
+      "yaw": 285,
+      "scale": 1.3839274925832445,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -932.0465729443766,
+        -1223.2513370202528,
+        -13
+      ],
+      "yaw": 353,
+      "scale": 1.5872526333108925,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -932.0465729443766,
+        -1223.2513370202528,
+        -14
+      ],
+      "yaw": 319,
+      "scale": 0.6965904976741246,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        9.205856747047392,
+        -1253.1273390863626,
+        -13
+      ],
+      "yaw": 149,
+      "scale": 1.651342258973244,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -143.21297243828587,
+        -1276.1751545390182,
+        -13
+      ],
+      "yaw": 177,
+      "scale": 1.2708530397552107,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -143.21297243828587,
+        -1276.1751545390182,
+        -13
+      ],
+      "yaw": 7,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        911.2768864240081,
+        -1307.0086429016378,
+        -13
+      ],
+      "yaw": 52,
+      "scale": 1.7503668178657596,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        911.2768864240081,
+        -1307.0086429016378,
+        -14
+      ],
+      "yaw": 349,
+      "scale": 0.6057561110537855,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        734.9937238017037,
+        -1200.1032884658587,
+        -13
+      ],
+      "yaw": 325,
+      "scale": 1.634426726319659,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -244.6029911950444,
+        -1267.6361050904127,
+        -13
+      ],
+      "yaw": 125,
+      "scale": 1.6516246571460271,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        157.0896603418164,
+        -1335.9925930333036,
+        -13
+      ],
+      "yaw": 343,
+      "scale": 1.4738275801405027,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        157.0896603418164,
+        -1335.9925930333036,
+        -14
+      ],
+      "yaw": 76,
+      "scale": 0.43694769321492,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        157.0896603418164,
+        -1335.9925930333036,
+        -13
+      ],
+      "yaw": 205,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        685.2795473062702,
+        -1335.3545660419945,
+        -13
+      ],
+      "yaw": 2,
+      "scale": 1.4811844024573908,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -488.7735711139537,
+        -1320.9492721121824,
+        -13
+      ],
+      "yaw": 35,
+      "scale": 1.6646699284089714,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -699.1728589079498,
+        -1200.70989547029,
+        -13
+      ],
+      "yaw": 288,
+      "scale": 1.5144284517634516,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -699.1728589079498,
+        -1200.70989547029,
+        -14
+      ],
+      "yaw": 188,
+      "scale": 0.521817229680856,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        640.3050807202974,
+        -1351.5464155497882,
+        -13
+      ],
+      "yaw": 17,
+      "scale": 1.6386273541719643,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        640.3050807202974,
+        -1351.5464155497882,
+        -13
+      ],
+      "yaw": 80,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -111.40161685393696,
+        -1237.082692839401,
+        -13
+      ],
+      "yaw": 262,
+      "scale": 1.273859950311365,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        381.1295103586542,
+        -1362.2412013716412,
+        -13
+      ],
+      "yaw": 277,
+      "scale": 1.766311886288662,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        381.1295103586542,
+        -1362.2412013716412,
+        -14
+      ],
+      "yaw": 24,
+      "scale": 0.38664903719992194,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -1009.3733238755838,
+        -1217.9054506792552,
+        -13
+      ],
+      "yaw": 293,
+      "scale": 1.3005169151136848,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        579.5057956161711,
+        -1352.1902488491924,
+        -13
+      ],
+      "yaw": 272,
+      "scale": 1.7799807607590479,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        579.5057956161711,
+        -1352.1902488491924,
+        -13
+      ],
+      "yaw": 308,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        898.4490108316872,
+        -1224.192648496005,
+        -13
+      ],
+      "yaw": 245,
+      "scale": 1.156389068075691,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        898.4490108316872,
+        -1224.192648496005,
+        -14
+      ],
+      "yaw": 197,
+      "scale": 0.7123592465940758,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -561.2574329296142,
+        -1251.8299279629937,
+        -13
+      ],
+      "yaw": 124,
+      "scale": 1.7069607609462722,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        346.1161557387038,
+        -1355.507124371875,
+        -13
+      ],
+      "yaw": 151,
+      "scale": 1.494601368849965,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        726.0772564484901,
+        -1210.1880682178996,
+        -13
+      ],
+      "yaw": 200,
+      "scale": 1.3108316386710408,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        726.0772564484901,
+        -1210.1880682178996,
+        -14
+      ],
+      "yaw": 251,
+      "scale": 0.3636475906712126,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        726.0772564484901,
+        -1210.1880682178996,
+        -13
+      ],
+      "yaw": 48,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        629.4515680192533,
+        -1240.351320118214,
+        -13
+      ],
+      "yaw": 186,
+      "scale": 1.5668669256622956,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        471.15685726073343,
+        -1346.4039047468946,
+        -13
+      ],
+      "yaw": 28,
+      "scale": 1.599148751064854,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -25.170743857839057,
+        -1224.0363412688039,
+        -13
+      ],
+      "yaw": 297,
+      "scale": 1.764077372697825,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -25.170743857839057,
+        -1224.0363412688039,
+        -14
+      ],
+      "yaw": 146,
+      "scale": 0.6327094534030436,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -254.9832282042994,
+        -1293.0012639716,
+        -13
+      ],
+      "yaw": 50,
+      "scale": 1.813036389496565,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -254.9832282042994,
+        -1293.0012639716,
+        -13
+      ],
+      "yaw": 278,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        857.0286615953321,
+        -1289.1786438888264,
+        -13
+      ],
+      "yaw": 60,
+      "scale": 1.7586985119085718,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        854.4046586346628,
+        -1303.4881322880271,
+        -13
+      ],
+      "yaw": 302,
+      "scale": 1.506881768124478,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        854.4046586346628,
+        -1303.4881322880271,
+        -14
+      ],
+      "yaw": 165,
+      "scale": 0.5163770508964699,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -487.92133523600955,
+        1251.9720150416174,
+        -13
+      ],
+      "yaw": 86,
+      "scale": 1.4931827706433505,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -395.0221158282301,
+        1303.0374721788105,
+        -13
+      ],
+      "yaw": 350,
+      "scale": 1.3679135009981862,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        808.5124065204673,
+        1338.839903014671,
+        -13
+      ],
+      "yaw": 202,
+      "scale": 1.6287227065722634,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        808.5124065204673,
+        1338.839903014671,
+        -13
+      ],
+      "yaw": 290,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        518.660838874986,
+        1292.139806173183,
+        -13
+      ],
+      "yaw": 217,
+      "scale": 1.4938567531138796,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        745.8816071019207,
+        1250.2567244002378,
+        -13
+      ],
+      "yaw": 342,
+      "scale": 1.5735642566377888,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        745.8816071019207,
+        1250.2567244002378,
+        -14
+      ],
+      "yaw": 42,
+      "scale": 0.4385047756371326,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -769.7681520919372,
+        1230.266875057362,
+        -13
+      ],
+      "yaw": 194,
+      "scale": 1.8276563358329807,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -833.4606508992479,
+        1262.5552028002867,
+        -13
+      ],
+      "yaw": 219,
+      "scale": 1.7572145794514862,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -833.4606508992479,
+        1262.5552028002867,
+        -13
+      ],
+      "yaw": 6,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -971.0422229055102,
+        1259.442838790699,
+        -13
+      ],
+      "yaw": 279,
+      "scale": 1.6351816940207247,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        990.8360966660473,
+        1214.0922817608675,
+        -13
+      ],
+      "yaw": 100,
+      "scale": 1.41665693069344,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        990.8360966660473,
+        1214.0922817608675,
+        -14
+      ],
+      "yaw": 90,
+      "scale": 0.7813777977901532,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        990.8360966660473,
+        1214.0922817608675,
+        -13
+      ],
+      "yaw": 121,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        809.899751084974,
+        1243.1966922197673,
+        -13
+      ],
+      "yaw": 89,
+      "scale": 1.5757063370352342,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        336.89629817941363,
+        1196.5610085638218,
+        -13
+      ],
+      "yaw": 320,
+      "scale": 1.5947502169445835,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -659.4470951478097,
+        1250.1366536935716,
+        -13
+      ],
+      "yaw": 141,
+      "scale": 1.4774484102383747,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -659.4470951478097,
+        1250.1366536935716,
+        -13
+      ],
+      "yaw": 252,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        383.1862988954615,
+        1359.8929408694075,
+        -13
+      ],
+      "yaw": 212,
+      "scale": 1.666211128216873,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -598.0383152788253,
+        1222.2285023813643,
+        -13
+      ],
+      "yaw": 137,
+      "scale": 1.7320095444214092,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -598.0383152788253,
+        1222.2285023813643,
+        -14
+      ],
+      "yaw": 248,
+      "scale": 0.5766052893559142,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        918.9753612723571,
+        1272.592957074901,
+        -13
+      ],
+      "yaw": 183,
+      "scale": 1.3833379751054955,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -637.0088194558052,
+        1306.2837204556286,
+        -13
+      ],
+      "yaw": 299,
+      "scale": 1.1629183879819496,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -637.0088194558052,
+        1306.2837204556286,
+        -13
+      ],
+      "yaw": 104,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        1036.6867388367828,
+        1270.1315392200322,
+        -13
+      ],
+      "yaw": 328,
+      "scale": 1.5404903107631185,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        1036.6867388367828,
+        1270.1315392200322,
+        -14
+      ],
+      "yaw": 329,
+      "scale": 0.37998732162861926,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -986.9153455090681,
+        1344.8625914346585,
+        -13
+      ],
+      "yaw": 276,
+      "scale": 1.38117059788457,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        957.1245186895337,
+        1198.433583335806,
+        -13
+      ],
+      "yaw": 198,
+      "scale": 1.3466149471811086,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -722.0204050124833,
+        1346.3149965881053,
+        -13
+      ],
+      "yaw": 302,
+      "scale": 1.6619999929490645,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -722.0204050124833,
+        1346.3149965881053,
+        -14
+      ],
+      "yaw": 86,
+      "scale": 0.7823928569287748,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        -722.0204050124833,
+        1346.3149965881053,
+        -13
+      ],
+      "yaw": 96,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        -818.2039762645413,
+        1192.1672574019376,
+        -13
+      ],
+      "yaw": 72,
+      "scale": 1.5660116804104596,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        999.4399899755406,
+        1213.1785810367974,
+        -13
+      ],
+      "yaw": 93,
+      "scale": 1.5993808124570614,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -557.8448874431806,
+        1330.828472928745,
+        -13
+      ],
+      "yaw": 339,
+      "scale": 1.2377337701738276,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -557.8448874431806,
+        1330.828472928745,
+        -14
+      ],
+      "yaw": 14,
+      "scale": 0.7642319314492573,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        923.9445219560191,
+        1259.5709622521822,
+        -13
+      ],
+      "yaw": 182,
+      "scale": 1.7011173525992775,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        923.9445219560191,
+        1259.5709622521822,
+        -13
+      ],
+      "yaw": 119,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        976.8693478463856,
+        1291.4521316992623,
+        -13
+      ],
+      "yaw": 113,
+      "scale": 1.6667566910460265,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        772.3256939645935,
+        1352.0210918769876,
+        -13
+      ],
+      "yaw": 292,
+      "scale": 1.3114360977401538,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        581.263893403509,
+        1345.9166644787877,
+        -13
+      ],
+      "yaw": 256,
+      "scale": 1.7720289206357789,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        581.263893403509,
+        1345.9166644787877,
+        -13
+      ],
+      "yaw": 140,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -1024.9630381547213,
+        1364.6148779430412,
+        -13
+      ],
+      "yaw": 237,
+      "scale": 1.6375670661361283,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_fern",
+      "origin": [
+        545.1133816035294,
+        1244.136750485821,
+        -13
+      ],
+      "yaw": 42,
+      "scale": 1.7734435155918917,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub_flowers",
+      "origin": [
+        -775.8365288768093,
+        1348.276033143144,
+        -13
+      ],
+      "yaw": 245,
+      "scale": 1.6159773254342151,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        -615.7255450301357,
+        1293.9153968408064,
+        -13
+      ],
+      "yaw": 168,
+      "scale": 1.733235045671094,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        -615.7255450301357,
+        1293.9153968408064,
+        -14
+      ],
+      "yaw": 220,
+      "scale": 0.4005302537965366,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b14_shrub",
+      "origin": [
+        -962.6373244501854,
+        1202.9251904106268,
+        -13
+      ],
+      "yaw": 217,
+      "scale": 1.750687204139453,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_large",
+      "origin": [
+        592.4326477845148,
+        1294.1224626020598,
+        -13
+      ],
+      "yaw": 157,
+      "scale": 1.6644941579865142,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_ground_patch",
+      "origin": [
+        592.4326477845148,
+        1294.1224626020598,
+        -13
+      ],
+      "yaw": 306,
+      "scale": 1.1,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        811.7965768360709,
+        1304.5174891549802,
+        -13
+      ],
+      "yaw": 40,
+      "scale": 1.6247073370564422,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b12_rubble",
+      "origin": [
+        811.7965768360709,
+        1304.5174891549802,
+        -14
+      ],
+      "yaw": 193,
+      "scale": 0.44012394595746374,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -980,
+        985.1886502139287,
+        0
+      ],
+      "yaw": 2,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        980,
+        273.11771661162857,
+        0
+      ],
+      "yaw": 321,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        980,
+        -626.6248558909244,
+        0
+      ],
+      "yaw": 63,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -980,
+        -229.0096136383154,
+        0
+      ],
+      "yaw": 256,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -980,
+        853.8630585981805,
+        0
+      ],
+      "yaw": 141,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -980,
+        600.9529627888141,
+        0
+      ],
+      "yaw": 59,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -980,
+        849.2679904207268,
+        0
+      ],
+      "yaw": 260,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        980,
+        -631.0860291575714,
+        0
+      ],
+      "yaw": 269,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        980,
+        -402.0874167458627,
+        0
+      ],
+      "yaw": 120,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        980,
+        942.9781340266597,
+        0
+      ],
+      "yaw": 88,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -980,
+        548.06714051434,
+        0
+      ],
+      "yaw": 329,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        980,
+        737.941708865337,
+        0
+      ],
+      "yaw": 104,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        980,
+        556.7557049305133,
+        0
+      ],
+      "yaw": 245,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -980,
+        193.72790859961037,
+        0
+      ],
+      "yaw": 249,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        980,
+        414.93937902210723,
+        0
+      ],
+      "yaw": 340,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -980,
+        -743.4191111120758,
+        0
+      ],
+      "yaw": 79,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -514.428101780406,
+        1104,
+        0
+      ],
+      "yaw": 224,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -317.7174591510732,
+        -1104,
+        0
+      ],
+      "yaw": 291,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -716.5061135188531,
+        -1104,
+        0
+      ],
+      "yaw": 105,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -651.4459582834136,
+        -1104,
+        0
+      ],
+      "yaw": 96,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -695.679778195127,
+        1104,
+        0
+      ],
+      "yaw": 322,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        699.2417756864766,
+        -1104,
+        0
+      ],
+      "yaw": 240,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -655.1383714642423,
+        1104,
+        0
+      ],
+      "yaw": 337,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -652.7903755586424,
+        -1104,
+        0
+      ],
+      "yaw": 147,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        138.14616097181352,
+        -1104,
+        0
+      ],
+      "yaw": 7,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b13_grass_small",
+      "origin": [
+        -761.7467109346408,
+        1104,
+        0
+      ],
+      "yaw": 308,
+      "scale": 0.55,
+      "native": false,
+      "group": "04 Edge planting"
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        861.5880724645133,
+        1126,
+        25
+      ],
+      "yaw": 179,
+      "scale": 0.8704532574192643,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        1.4549047118015324,
+        -1126,
+        25
+      ],
+      "yaw": 188,
+      "scale": 0.9179250569282825,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        -708.140675663011,
+        1126,
+        25
+      ],
+      "yaw": 346,
+      "scale": 0.6291736559956106,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        396.64417517880815,
+        -1126,
+        25
+      ],
+      "yaw": 146,
+      "scale": 0.9495726051732807,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        915.590226861716,
+        1126,
+        25
+      ],
+      "yaw": 219,
+      "scale": 0.8869102840656096,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        -51.42966050956613,
+        -1126,
+        25
+      ],
+      "yaw": 84,
+      "scale": 0.7685680471236882,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        -697.4049910937401,
+        1126,
+        25
+      ],
+      "yaw": 150,
+      "scale": 0.9317592744828692,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        -548.8362575898916,
+        -1126,
+        25
+      ],
+      "yaw": 115,
+      "scale": 0.8379227879525578,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        407.69081036291755,
+        1126,
+        25
+      ],
+      "yaw": 171,
+      "scale": 1.0304986574313604,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        -637.253944652517,
+        1126,
+        25
+      ],
+      "yaw": 75,
+      "scale": 0.8174357471720048,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        116.90196413256626,
+        1126,
+        25
+      ],
+      "yaw": 56,
+      "scale": 1.0411284088271016,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        776.0356611685272,
+        -1126,
+        25
+      ],
+      "yaw": 204,
+      "scale": 0.9784514579162138,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        645.418838054431,
+        -1126,
+        25
+      ],
+      "yaw": 347,
+      "scale": 0.9857997061748157,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        330.39747908890286,
+        1126,
+        25
+      ],
+      "yaw": 187,
+      "scale": 0.7018268073700629,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        -208.99852687845384,
+        1126,
+        25
+      ],
+      "yaw": 270,
+      "scale": 0.8778009579358077,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        892.5994957815881,
+        1126,
+        25
+      ],
+      "yaw": 238,
+      "scale": 0.7543066428499418,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        -172.12904138414262,
+        -1126,
+        25
+      ],
+      "yaw": 146,
+      "scale": 0.8337225953628722,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "b16_moss_patch",
+      "origin": [
+        430.2106185305797,
+        1126,
+        25
+      ],
+      "yaw": 304,
+      "scale": 0.8253917116794398,
+      "native": false,
+      "group": "04 Edge planting",
+      "pitch": 90
+    },
+    {
+      "name": "models/props_foliage/tree_pine01.vmdl",
+      "origin": [
+        890,
+        1440,
+        -9
+      ],
+      "yaw": 25,
+      "scale": 1.2,
+      "native": true,
+      "group": "06 Native pine"
+    },
+    {
+      "name": "models/props_foliage/tree_pine01.vmdl",
+      "origin": [
+        -1210,
+        940,
+        -9
+      ],
+      "yaw": 144,
+      "scale": 0.85,
+      "native": true,
+      "group": "06 Native pine"
+    }
+  ],
+  "markers": [
+    {
+      "name": "challenge_02_entry",
+      "origin": [
+        0,
+        1096,
+        24
+      ],
+      "role": "teleport arrival"
+    },
+    {
+      "name": "challenge_02_home",
+      "origin": [
+        0,
+        900,
+        24
+      ],
+      "role": "room home"
+    },
+    {
+      "name": "challenge_02_spawn_01",
+      "origin": [
+        340.0,
+        -140.0,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_02_spawn_02",
+      "origin": [
+        240.416,
+        100.416,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_02_spawn_03",
+      "origin": [
+        0.0,
+        200.0,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_02_spawn_04",
+      "origin": [
+        -240.416,
+        100.416,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_02_spawn_05",
+      "origin": [
+        -340.0,
+        -140.0,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_02_spawn_06",
+      "origin": [
+        -240.416,
+        -380.416,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_02_spawn_07",
+      "origin": [
+        -0.0,
+        -480.0,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_02_spawn_08",
+      "origin": [
+        240.416,
+        -380.416,
+        24
+      ],
+      "role": "monster spawn"
+    }
+  ],
+  "native_models": [
+    "models/props_foliage/tree_pine01.vmdl"
+  ],
+  "emissive": false
+}

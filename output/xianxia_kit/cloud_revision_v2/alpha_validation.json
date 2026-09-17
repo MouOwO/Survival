@@ -1,0 +1,46 @@
+[
+  {
+    "name": "c01_cloud_sea",
+    "dimensions": [
+      2048,
+      1536
+    ],
+    "borderAlphaMax": 0,
+    "visibleFraction": 0.1994037628173828,
+    "softPixels": 189041,
+    "alphaPass": true
+  },
+  {
+    "name": "c02_cliff_cloud",
+    "dimensions": [
+      2048,
+      1536
+    ],
+    "borderAlphaMax": 0,
+    "visibleFraction": 0.18017069498697916,
+    "softPixels": 183133,
+    "alphaPass": true
+  },
+  {
+    "name": "c03_cloud_band",
+    "dimensions": [
+      2048,
+      1536
+    ],
+    "borderAlphaMax": 0,
+    "visibleFraction": 0.11210441589355469,
+    "softPixels": 352650,
+    "alphaPass": true
+  },
+  {
+    "name": "c04_thin_mist",
+    "dimensions": [
+      2048,
+      1536
+    ],
+    "borderAlphaMax": 0,
+    "visibleFraction": 0.09360694885253906,
+    "softPixels": 294462,
+    "alphaPass": true
+  }
+]

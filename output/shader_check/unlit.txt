@@ -1,0 +1,267 @@
+	Resource Type: Shader [Version 71] [Header Version: 12]
+	File Size: 1618 bytes
+
+
+--- (No External Resource References Found)
+
+
+--- Resource Blocks: Count 2 ---
+	-- Block: DATA  Size: 1232   bytes [Offset:     40]
+	-- Block: RED2  Size: 338    bytes [Offset:   1280]
+
+
+--- Data for block "DATA" ---
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	m_nVersion = 0
+	m_description = ""
+	m_bDevShader = true
+	m_bHasShaderProgram = 
+	[
+		true, true, true, false,
+		false, false, false, false,
+	]
+	m_modeArray = 
+	[
+		{
+			m_szName = "Default"
+			m_szShaderFallback = ""
+			m_staticComboSettings = [  ]
+		},
+	]
+	m_programData = 
+	{
+		m_programHashes = 
+		[
+			{
+				m_nHashChar = #[ 1F 87 91 B8 90 B1 CC 3F A0 D8 0F E5 92 99 0A E4 ]
+			},
+			{
+				m_nHashChar = #[ 26 1A CA 5A EC 81 B1 FF 22 6B 48 4B 4B C2 26 61 ]
+			},
+			{
+				m_nHashChar = #[ A6 47 AC CE 7D 42 8A A6 70 C8 06 14 F8 31 6A 95 ]
+			},
+			{
+				m_nHashChar = #[ 6E 51 3C 66 0B 4D 54 EA 1A F4 EB 80 EC D8 D7 08 ]
+			},
+			{
+				m_nHashChar = #[ D5 E7 1B 74 74 06 1C 04 CE 38 08 61 3C 10 A1 D7 ]
+			},
+			{
+				m_nHashChar = #[ D5 E7 1B 74 74 06 1C 04 CE 38 08 61 3C 10 A1 D7 ]
+			},
+			{
+				m_nHashChar = #[ B3 98 66 EB 5D ED F9 BD 0A 2D F1 2A CE 4F 07 11 ]
+			},
+			{
+				m_nHashChar = #[ B3 98 66 EB 5D ED F9 BD 0A 2D F1 2A CE 4F 07 11 ]
+			},
+		]
+		m_variableDescriptionVersionHash = 
+		{
+			m_nHashChar = #[ 96 42 28 E5 F9 19 42 85 C5 4D 88 63 ED 41 E2 32 ]
+		}
+		m_nVariableSourceMax = 19
+		m_staticComboArray = [  ]
+		m_staticComboRuleArray = [  ]
+		m_dynamicComboArray = [  ]
+		m_dynamicComboRuleArray = [  ]
+		m_variableDescriptionArray = 
+		[
+			{
+				m_szName = "PerViewConstantBuffer_t"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = "PerViewConstantBuffer_t"
+				m_sourceType = 0
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 21
+				m_registerType = 8
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = true
+			},
+			{
+				m_szName = "AddressU"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901761
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "AddressV"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901762
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "AddressW"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901763
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "Filter"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 6
+				m_nContextStateAffectedByVariable = 4096
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 0
+				m_nTypeSpecificBits = 4294901760
+				m_intDefault = [ 21, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "StencilRef"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 4
+				m_nTypeSpecificBits = 4294901792
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_tGBufferAlbedo"
+				m_szUiGroup = ""
+				m_uiType = 3
+				m_flUiStep = 0.0
+				m_pSourceString = "GBufferAlbedo"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 14
+				m_registerType = 4
+				m_nContextStateAffectedByVariable = 6144
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294967041
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_defaultInputTexture = ""
+				m_outputTextureFormat = 4294967295
+				m_nChannelCount = 0
+				m_nChannelInfoIndex = [ -1, -1, -1, -1 ]
+				m_inputColorSpace = 0
+				m_nMinPrecisionBits = -1
+				m_szTextureFileEnding = ""
+				m_inputProcessingCommand = ""
+				m_nMaxRes = 0
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+		]
+		m_textureChannelProcessorArray = [  ]
+		m_vsInputSignatureArray = [  ]
+		m_staticComboData = [  ]
+		m_staticComboIDs = [  ]
+		m_byteCodeData = [  ]
+		m_attributes = [  ]
+	}
+}
+
+--- Data for block "RED2" ---
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	m_InputDependencies = [  ]
+	m_AdditionalInputDependencies = [  ]
+	m_ArgumentDependencies = [  ]
+	m_SpecialDependencies = [  ]
+	m_SpecialInputDependencies = [  ]
+	m_AdditionalRelatedFiles = [  ]
+	m_ChildResourceList = [  ]
+	m_WeakReferenceList = [  ]
+	m_SearchableUserData = null
+	m_SubassetReferences = null
+	m_SubassetDefinitions = null
+}
+

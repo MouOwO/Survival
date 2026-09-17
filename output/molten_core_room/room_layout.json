@@ -1,0 +1,5531 @@
+{
+  "interior": [
+    2048,
+    2304
+  ],
+  "floor_z": 0,
+  "wall_height": 186,
+  "placements": [
+    {
+      "name": "room_ash_base",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "05 Ground"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -896,
+        -1024,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -640,
+        -1024,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -384,
+        -1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -128,
+        -1024,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        128,
+        -1024,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        384,
+        -1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        640,
+        -1024,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        -1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -896,
+        -768,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -640,
+        -768,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -384,
+        -768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -128,
+        -768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        128,
+        -768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        384,
+        -768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        640,
+        -768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        -768,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -896,
+        -512,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -640,
+        -512,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -384,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -128,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        128,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        384,
+        -512,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        640,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        -512,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -896,
+        -256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -640,
+        -256,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -384,
+        -256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -128,
+        -256,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        128,
+        -256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        384,
+        -256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        640,
+        -256,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        -256,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -896,
+        0,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -640,
+        0,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -384,
+        0,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -128,
+        0,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        128,
+        0,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        384,
+        0,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        640,
+        0,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        0,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -896,
+        256,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -640,
+        256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -384,
+        256,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -128,
+        256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        128,
+        256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        384,
+        256,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        640,
+        256,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        256,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -896,
+        512,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -640,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -384,
+        512,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        -128,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        128,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        384,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        640,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        512,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -896,
+        768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -640,
+        768,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -384,
+        768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        -128,
+        768,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_a",
+      "origin": [
+        128,
+        768,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        384,
+        768,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_floor_b",
+      "origin": [
+        640,
+        768,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        768,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -896,
+        1024,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -640,
+        1024,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -384,
+        1024,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        -128,
+        1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        128,
+        1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        384,
+        1024,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        640,
+        1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f02_floor_scorched",
+      "origin": [
+        896,
+        1024,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f01_niche_floor",
+      "origin": [
+        0,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "01 Paving"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -768,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -512,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -256,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        0,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        256,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        512,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        768,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -1024,
+        -896,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -1024,
+        -640,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -1024,
+        -384,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -1024,
+        -128,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -1024,
+        128,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -1024,
+        384,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -1024,
+        640,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -1024,
+        896,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        1024,
+        -896,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        1024,
+        -640,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        1024,
+        -384,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        1024,
+        -128,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        1024,
+        128,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        1024,
+        384,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        1024,
+        640,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        1024,
+        896,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -512,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        -768,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_128",
+      "origin": [
+        -320,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        512,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_256",
+      "origin": [
+        768,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f03_wall_128",
+      "origin": [
+        320,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f05_corner",
+      "origin": [
+        -1024,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        -1024,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        -1024,
+        -1152,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f05_corner",
+      "origin": [
+        1024,
+        -1152,
+        0
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        1024,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        1024,
+        -1152,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f05_corner",
+      "origin": [
+        1024,
+        1152,
+        0
+      ],
+      "yaw": 180,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        1024,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        1024,
+        1152,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f05_corner",
+      "origin": [
+        -1024,
+        1152,
+        0
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        -1024,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        -1024,
+        1152,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f06_arc_60",
+      "origin": [
+        0,
+        1152,
+        0
+      ],
+      "yaw": -60,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f06_arc_60",
+      "origin": [
+        0,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f06_arc_60",
+      "origin": [
+        0,
+        1152,
+        0
+      ],
+      "yaw": 60,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        129.50000000000003,
+        1376.3005795801696,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        129.50000000000003,
+        1376.3005795801696,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        -129.49999999999994,
+        1376.3005795801696,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        -129.49999999999994,
+        1376.3005795801696,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        -256,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        -256,
+        1152,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        256,
+        1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        256,
+        1152,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        -384,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        -384,
+        -1152,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        384,
+        -1152,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        384,
+        -1152,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        -1024,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        -1024,
+        -512,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        -1024,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        -1024,
+        512,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        1024,
+        -512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        1024,
+        -512,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_body",
+      "origin": [
+        1024,
+        512,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f04_pillar_cap",
+      "origin": [
+        1024,
+        512,
+        214
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "02 Enclosure"
+    },
+    {
+      "name": "f07_portal_ring",
+      "origin": [
+        0,
+        1096,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f07_portal_inlay",
+      "origin": [
+        0,
+        1096,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f08_spawn_inlay",
+      "origin": [
+        0,
+        -140,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f16_banner",
+      "origin": [
+        -360,
+        1108,
+        20
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f16_banner",
+      "origin": [
+        360,
+        1108,
+        20
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f11_fire_stele",
+      "origin": [
+        0,
+        -1190,
+        -4
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f11_flame_emblem",
+      "origin": [
+        0,
+        -1190,
+        -4
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f10_brazier_bracket",
+      "origin": [
+        -1024,
+        0,
+        180
+      ],
+      "yaw": 0,
+      "scale": 1.25,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f10_brazier_bowl",
+      "origin": [
+        -1024,
+        0,
+        227.5
+      ],
+      "yaw": 0,
+      "scale": 1.25,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f10_brazier_bracket",
+      "origin": [
+        1024,
+        0,
+        180
+      ],
+      "yaw": 0,
+      "scale": 1.25,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f10_brazier_bowl",
+      "origin": [
+        1024,
+        0,
+        227.5
+      ],
+      "yaw": 0,
+      "scale": 1.25,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f10_brazier_bracket",
+      "origin": [
+        -220,
+        1130,
+        180
+      ],
+      "yaw": 0,
+      "scale": 0.7,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f10_brazier_bowl",
+      "origin": [
+        -220,
+        1130,
+        206.6
+      ],
+      "yaw": 0,
+      "scale": 0.7,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f10_brazier_bracket",
+      "origin": [
+        220,
+        1130,
+        180
+      ],
+      "yaw": 0,
+      "scale": 0.7,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f10_brazier_bowl",
+      "origin": [
+        220,
+        1130,
+        206.6
+      ],
+      "yaw": 0,
+      "scale": 0.7,
+      "native": false,
+      "group": "03 Functional landmarks"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        -1024,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        -1024,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        -768,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        -768,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        -512,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        -512,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        -256,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        -256,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        0,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        0,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        256,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        256,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        512,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        512,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        768,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        768,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -1104,
+        1024,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        1024,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        -1024,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        -1024,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        -768,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        -768,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        -512,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        -512,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        -256,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        -256,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        0,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        0,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        256,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        256,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        512,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        512,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        768,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        768,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        1104,
+        1024,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        1024,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -896,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -896,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -640,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -640,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -384,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -384,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        -128,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -128,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        128,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        128,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        384,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        384,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        640,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        640,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_straight",
+      "origin": [
+        896,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        896,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_corner",
+      "origin": [
+        -1104,
+        -1232,
+        -8
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_corner",
+      "origin": [
+        -1104,
+        -1232,
+        -8
+      ],
+      "yaw": 270,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_corner",
+      "origin": [
+        1104,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_corner",
+      "origin": [
+        1104,
+        -1232,
+        -8
+      ],
+      "yaw": 0,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_end",
+      "origin": [
+        -1104,
+        1280,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        -1104,
+        1280,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_trough_end",
+      "origin": [
+        1104,
+        1280,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f09_lava_straight",
+      "origin": [
+        1104,
+        1280,
+        -8
+      ],
+      "yaw": 90,
+      "scale": 1,
+      "native": false,
+      "group": "06 Lava channels"
+    },
+    {
+      "name": "f12_rock_1",
+      "origin": [
+        -1260,
+        -1340,
+        -18
+      ],
+      "yaw": 328,
+      "scale": 1.2,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        -1355,
+        -1288,
+        -18
+      ],
+      "yaw": 213,
+      "scale": 1.02,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        -1160,
+        -1405,
+        -18
+      ],
+      "yaw": 83,
+      "scale": 0.9359999999999999,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        -1225,
+        -1250,
+        -18
+      ],
+      "yaw": 123,
+      "scale": 0.78,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_4",
+      "origin": [
+        -1340,
+        -1455,
+        -18
+      ],
+      "yaw": 215,
+      "scale": 1.2,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_1",
+      "origin": [
+        1250,
+        -1350,
+        -18
+      ],
+      "yaw": 112,
+      "scale": 1.05,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        1155,
+        -1298,
+        -18
+      ],
+      "yaw": 9,
+      "scale": 0.8925,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        1350,
+        -1415,
+        -18
+      ],
+      "yaw": 267,
+      "scale": 0.8190000000000001,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        1285,
+        -1260,
+        -18
+      ],
+      "yaw": 29,
+      "scale": 0.6825000000000001,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_4",
+      "origin": [
+        1170,
+        -1465,
+        -18
+      ],
+      "yaw": 321,
+      "scale": 1.05,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_1",
+      "origin": [
+        -1250,
+        1320,
+        -18
+      ],
+      "yaw": 124,
+      "scale": 1.2,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        -1345,
+        1372,
+        -18
+      ],
+      "yaw": 143,
+      "scale": 1.02,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        -1150,
+        1255,
+        -18
+      ],
+      "yaw": 130,
+      "scale": 0.9359999999999999,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        -1215,
+        1410,
+        -18
+      ],
+      "yaw": 31,
+      "scale": 0.78,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_4",
+      "origin": [
+        -1330,
+        1205,
+        -18
+      ],
+      "yaw": 141,
+      "scale": 1.2,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_1",
+      "origin": [
+        1250,
+        1360,
+        -18
+      ],
+      "yaw": 13,
+      "scale": 1.3,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        1155,
+        1412,
+        -18
+      ],
+      "yaw": 329,
+      "scale": 1.105,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        1350,
+        1295,
+        -18
+      ],
+      "yaw": 317,
+      "scale": 1.014,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_2",
+      "origin": [
+        1285,
+        1450,
+        -18
+      ],
+      "yaw": 343,
+      "scale": 0.8450000000000001,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_4",
+      "origin": [
+        1170,
+        1245,
+        -18
+      ],
+      "yaw": 256,
+      "scale": 1.3,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1229.8659743631222,
+        -557.5049613301283,
+        -14
+      ],
+      "yaw": 17,
+      "scale": 0.6055589810818562,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1229.8659743631222,
+        -557.5049613301283,
+        -14.15
+      ],
+      "yaw": 141,
+      "scale": 1.3020256965003045,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -1229.8659743631222,
+        -557.5049613301283,
+        -16
+      ],
+      "yaw": 340,
+      "scale": 1.0110568831190905,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1237.581689769269,
+        916.3352610481484,
+        -14
+      ],
+      "yaw": 78,
+      "scale": 0.8690690297961711,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1237.581689769269,
+        916.3352610481484,
+        -14.15
+      ],
+      "yaw": 57,
+      "scale": 1.0298712612228953,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1256.8410096198734,
+        -302.1749642471151,
+        -14
+      ],
+      "yaw": 314,
+      "scale": 0.5776019943312402,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1256.8410096198734,
+        -302.1749642471151,
+        -14.15
+      ],
+      "yaw": 272,
+      "scale": 1.3794612493024885,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1221.060159681826,
+        -10.163643314384217,
+        -14
+      ],
+      "yaw": 38,
+      "scale": 0.9902244357530547,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1221.060159681826,
+        -10.163643314384217,
+        -14.15
+      ],
+      "yaw": 326,
+      "scale": 1.0120392270684844,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1217.5983772408408,
+        683.2379349240296,
+        -14
+      ],
+      "yaw": 178,
+      "scale": 0.6346287425177499,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1217.5983772408408,
+        683.2379349240296,
+        -14.15
+      ],
+      "yaw": 260,
+      "scale": 1.0652277511705903,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1237.3877451029762,
+        -283.17642731951605,
+        -14
+      ],
+      "yaw": 87,
+      "scale": 0.7724295529508967,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1237.3877451029762,
+        -283.17642731951605,
+        -14.15
+      ],
+      "yaw": 131,
+      "scale": 1.1553135000558625,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -1237.3877451029762,
+        -283.17642731951605,
+        -16
+      ],
+      "yaw": 140,
+      "scale": 1.0862458917316307,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1232.1842243163933,
+        3.0283318232138754,
+        -14
+      ],
+      "yaw": 238,
+      "scale": 1.0779211178217807,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1232.1842243163933,
+        3.0283318232138754,
+        -14.15
+      ],
+      "yaw": 72,
+      "scale": 0.976606625851717,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1225.6972484110736,
+        907.1242070064841,
+        -14
+      ],
+      "yaw": 147,
+      "scale": 0.6037537689626122,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1225.6972484110736,
+        907.1242070064841,
+        -14.15
+      ],
+      "yaw": 148,
+      "scale": 1.5027159367576404,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1179.797954964667,
+        -30.745311367254544,
+        -14
+      ],
+      "yaw": 241,
+      "scale": 0.6066908983830824,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1179.797954964667,
+        -30.745311367254544,
+        -14.15
+      ],
+      "yaw": 129,
+      "scale": 1.2173865613100294,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1246.878581319629,
+        -281.22733542009075,
+        -14
+      ],
+      "yaw": 58,
+      "scale": 0.5107277713824678,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1246.878581319629,
+        -281.22733542009075,
+        -14.15
+      ],
+      "yaw": 307,
+      "scale": 1.0945428747028394,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1225.445438174224,
+        287.8913887905551,
+        -14
+      ],
+      "yaw": 344,
+      "scale": 0.5869247713832155,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1225.445438174224,
+        287.8913887905551,
+        -14.15
+      ],
+      "yaw": 295,
+      "scale": 1.2694919203063015,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -1225.445438174224,
+        287.8913887905551,
+        -16
+      ],
+      "yaw": 233,
+      "scale": 1.2728764312897165,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1254.263007325348,
+        -703.6304466327301,
+        -14
+      ],
+      "yaw": 325,
+      "scale": 0.9620663235194633,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1254.263007325348,
+        -703.6304466327301,
+        -14.15
+      ],
+      "yaw": 65,
+      "scale": 1.2481548917757879,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1244.440670613875,
+        -287.1104193873955,
+        -14
+      ],
+      "yaw": 235,
+      "scale": 0.5202096769340258,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1244.440670613875,
+        -287.1104193873955,
+        -14.15
+      ],
+      "yaw": 179,
+      "scale": 1.2746787071370935,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1248.1435650421795,
+        553.2872572499944,
+        -14
+      ],
+      "yaw": 100,
+      "scale": 1.159564179586991,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1248.1435650421795,
+        553.2872572499944,
+        -14.15
+      ],
+      "yaw": 8,
+      "scale": 1.4463978133204975,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1172.2946803905536,
+        200.21068062956783,
+        -14
+      ],
+      "yaw": 78,
+      "scale": 0.9210957717733108,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1172.2946803905536,
+        200.21068062956783,
+        -14.15
+      ],
+      "yaw": 174,
+      "scale": 1.1755610250303303,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1252.3532086551068,
+        -94.01193171650448,
+        -14
+      ],
+      "yaw": 100,
+      "scale": 1.1473108707496316,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1252.3532086551068,
+        -94.01193171650448,
+        -14.15
+      ],
+      "yaw": 115,
+      "scale": 1.0340724406444093,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -1252.3532086551068,
+        -94.01193171650448,
+        -16
+      ],
+      "yaw": 304,
+      "scale": 1.033389942404956,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1212.5186309407027,
+        -1074.7718453877733,
+        -14
+      ],
+      "yaw": 112,
+      "scale": 0.651596040957415,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1212.5186309407027,
+        -1074.7718453877733,
+        -14.15
+      ],
+      "yaw": 110,
+      "scale": 1.4227230809991953,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1253.5071486246163,
+        -908.0371679127327,
+        -14
+      ],
+      "yaw": 135,
+      "scale": 1.0341876205059393,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1253.5071486246163,
+        -908.0371679127327,
+        -14.15
+      ],
+      "yaw": 222,
+      "scale": 1.057184882213495,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1218.8362585767727,
+        -755.8283175122815,
+        -14
+      ],
+      "yaw": 248,
+      "scale": 0.9457958065734726,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1218.8362585767727,
+        -755.8283175122815,
+        -14.15
+      ],
+      "yaw": 192,
+      "scale": 1.437100482473753,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1177.7491818772903,
+        -558.712981298633,
+        -14
+      ],
+      "yaw": 157,
+      "scale": 0.6889056298600098,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1177.7491818772903,
+        -558.712981298633,
+        -14.15
+      ],
+      "yaw": 52,
+      "scale": 1.4579956092557886,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1179.1925972092208,
+        357.74404895408065,
+        -14
+      ],
+      "yaw": 83,
+      "scale": 0.7548755777473536,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1179.1925972092208,
+        357.74404895408065,
+        -14.15
+      ],
+      "yaw": 223,
+      "scale": 1.5830313286087163,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -1179.1925972092208,
+        357.74404895408065,
+        -16
+      ],
+      "yaw": 78,
+      "scale": 0.8126046927650232,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1177.8495604822192,
+        -742.8978416841196,
+        -14
+      ],
+      "yaw": 69,
+      "scale": 1.0554851559427378,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1177.8495604822192,
+        -742.8978416841196,
+        -14.15
+      ],
+      "yaw": 162,
+      "scale": 1.15629110114165,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1255.70347749718,
+        964.9218463687894,
+        -14
+      ],
+      "yaw": 249,
+      "scale": 1.1151958607736348,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1255.70347749718,
+        964.9218463687894,
+        -14.15
+      ],
+      "yaw": 285,
+      "scale": 0.9389665080047224,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -1262.110387143193,
+        -777.7632806039073,
+        -14
+      ],
+      "yaw": 142,
+      "scale": 1.1953998817452476,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -1262.110387143193,
+        -777.7632806039073,
+        -14.15
+      ],
+      "yaw": 224,
+      "scale": 0.9756017474324977,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1255.5739673773278,
+        -534.318270462737,
+        -14
+      ],
+      "yaw": 276,
+      "scale": 0.7223361484405625,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1255.5739673773278,
+        -534.318270462737,
+        -14.15
+      ],
+      "yaw": 221,
+      "scale": 1.4394020995376922,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        1255.5739673773278,
+        -534.318270462737,
+        -16
+      ],
+      "yaw": 184,
+      "scale": 0.7983225965439148,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1239.5656563582606,
+        939.7213197203228,
+        -14
+      ],
+      "yaw": 354,
+      "scale": 0.545425269050054,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1239.5656563582606,
+        939.7213197203228,
+        -14.15
+      ],
+      "yaw": 306,
+      "scale": 1.346198911295521,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1278.693670022996,
+        842.648314679934,
+        -14
+      ],
+      "yaw": 173,
+      "scale": 0.9604184981634594,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1278.693670022996,
+        842.648314679934,
+        -14.15
+      ],
+      "yaw": 286,
+      "scale": 1.1688929960877479,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1188.3311918047652,
+        -1047.5609022101776,
+        -14
+      ],
+      "yaw": 322,
+      "scale": 0.9507944716775045,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1188.3311918047652,
+        -1047.5609022101776,
+        -14.15
+      ],
+      "yaw": 287,
+      "scale": 1.3762984964551146,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1198.9670791123353,
+        -72.83170245219708,
+        -14
+      ],
+      "yaw": 103,
+      "scale": 0.6356639414262178,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1198.9670791123353,
+        -72.83170245219708,
+        -14.15
+      ],
+      "yaw": 310,
+      "scale": 1.2148068556796903,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1228.5626518687525,
+        912.8625372175529,
+        -14
+      ],
+      "yaw": 48,
+      "scale": 1.197343594320671,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1228.5626518687525,
+        912.8625372175529,
+        -14.15
+      ],
+      "yaw": 152,
+      "scale": 1.2970940290342403,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        1228.5626518687525,
+        912.8625372175529,
+        -16
+      ],
+      "yaw": 188,
+      "scale": 0.9419345622670212,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1240.7664670308493,
+        -713.3856782877956,
+        -14
+      ],
+      "yaw": 319,
+      "scale": 0.9703112913544787,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1240.7664670308493,
+        -713.3856782877956,
+        -14.15
+      ],
+      "yaw": 354,
+      "scale": 1.439682007213893,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1211.1041180630696,
+        -433.42086622029206,
+        -14
+      ],
+      "yaw": 81,
+      "scale": 0.6451348272176427,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1211.1041180630696,
+        -433.42086622029206,
+        -14.15
+      ],
+      "yaw": 221,
+      "scale": 1.5878538750032232,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1247.6121464108014,
+        1118.0169552645566,
+        -14
+      ],
+      "yaw": 338,
+      "scale": 1.0269647413458562,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1247.6121464108014,
+        1118.0169552645566,
+        -14.15
+      ],
+      "yaw": 211,
+      "scale": 0.9684210224429188,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1263.7915039669365,
+        1024.4738309808836,
+        -14
+      ],
+      "yaw": 261,
+      "scale": 0.678713971272441,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1263.7915039669365,
+        1024.4738309808836,
+        -14.15
+      ],
+      "yaw": 95,
+      "scale": 1.2180386808381811,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1259.1297576626816,
+        -34.62489512559932,
+        -14
+      ],
+      "yaw": 6,
+      "scale": 0.8091795805031163,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1259.1297576626816,
+        -34.62489512559932,
+        -14.15
+      ],
+      "yaw": 34,
+      "scale": 1.167252720821701,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        1259.1297576626816,
+        -34.62489512559932,
+        -16
+      ],
+      "yaw": 180,
+      "scale": 0.9093549190509275,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1251.604331575593,
+        1151.615707807905,
+        -14
+      ],
+      "yaw": 230,
+      "scale": 0.9476988682557581,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1251.604331575593,
+        1151.615707807905,
+        -14.15
+      ],
+      "yaw": 11,
+      "scale": 1.387829241847725,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1183.2569038989614,
+        -1083.223837139561,
+        -14
+      ],
+      "yaw": 119,
+      "scale": 0.503656600692362,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1183.2569038989614,
+        -1083.223837139561,
+        -14.15
+      ],
+      "yaw": 191,
+      "scale": 0.9972739539591746,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1222.6263002993817,
+        -314.86557090183,
+        -14
+      ],
+      "yaw": 89,
+      "scale": 0.7918694321940487,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1222.6263002993817,
+        -314.86557090183,
+        -14.15
+      ],
+      "yaw": 191,
+      "scale": 1.225278165352576,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1277.2639799446852,
+        -572.3620132728282,
+        -14
+      ],
+      "yaw": 5,
+      "scale": 0.7959336171507431,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1277.2639799446852,
+        -572.3620132728282,
+        -14.15
+      ],
+      "yaw": 290,
+      "scale": 0.9445900208203316,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1235.5849483250506,
+        -1099.0731790138173,
+        -14
+      ],
+      "yaw": 119,
+      "scale": 1.0420677871809452,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1235.5849483250506,
+        -1099.0731790138173,
+        -14.15
+      ],
+      "yaw": 204,
+      "scale": 1.0550396583938855,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        1235.5849483250506,
+        -1099.0731790138173,
+        -16
+      ],
+      "yaw": 82,
+      "scale": 0.9675225813892923,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1229.8899145027926,
+        -601.619122451651,
+        -14
+      ],
+      "yaw": 173,
+      "scale": 0.6440907470707331,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1229.8899145027926,
+        -601.619122451651,
+        -14.15
+      ],
+      "yaw": 326,
+      "scale": 1.492485956810913,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1240.098543058137,
+        -866.1579342732681,
+        -14
+      ],
+      "yaw": 179,
+      "scale": 0.6243872111179418,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1240.098543058137,
+        -866.1579342732681,
+        -14.15
+      ],
+      "yaw": 175,
+      "scale": 1.1543638677933243,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1263.0066517300247,
+        -226.77159760178813,
+        -14
+      ],
+      "yaw": 211,
+      "scale": 0.5803013942432632,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1263.0066517300247,
+        -226.77159760178813,
+        -14.15
+      ],
+      "yaw": 59,
+      "scale": 1.1974996298196219,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1172.8508316814475,
+        166.08487995521682,
+        -14
+      ],
+      "yaw": 298,
+      "scale": 0.5973830985189511,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1172.8508316814475,
+        166.08487995521682,
+        -14.15
+      ],
+      "yaw": 355,
+      "scale": 1.25710864299281,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1245.1595378719032,
+        -206.17999933678595,
+        -14
+      ],
+      "yaw": 244,
+      "scale": 0.9486072087187807,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1245.1595378719032,
+        -206.17999933678595,
+        -14.15
+      ],
+      "yaw": 328,
+      "scale": 1.4085810685266456,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        1245.1595378719032,
+        -206.17999933678595,
+        -16
+      ],
+      "yaw": 89,
+      "scale": 1.2604148892680427,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1177.8555943604208,
+        -633.116757869806,
+        -14
+      ],
+      "yaw": 30,
+      "scale": 0.8056556987675101,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1177.8555943604208,
+        -633.116757869806,
+        -14.15
+      ],
+      "yaw": 249,
+      "scale": 1.5919668927760933,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1278.518419497606,
+        234.92275297736137,
+        -14
+      ],
+      "yaw": 233,
+      "scale": 0.736288983309259,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1278.518419497606,
+        234.92275297736137,
+        -14.15
+      ],
+      "yaw": 279,
+      "scale": 1.5486353649460396,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        1257.479712188673,
+        276.31906807074824,
+        -14
+      ],
+      "yaw": 147,
+      "scale": 0.9830640889524999,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        1257.479712188673,
+        276.31906807074824,
+        -14.15
+      ],
+      "yaw": 11,
+      "scale": 1.2430173295233005,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -386.9493387196976,
+        -1329.8002548088816,
+        -14
+      ],
+      "yaw": 284,
+      "scale": 0.9129182364901188,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -386.9493387196976,
+        -1329.8002548088816,
+        -14.15
+      ],
+      "yaw": 122,
+      "scale": 1.54276870801215,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -386.9493387196976,
+        -1329.8002548088816,
+        -16
+      ],
+      "yaw": 197,
+      "scale": 1.1253601660432502,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -589.5205276372255,
+        -1290.5737150316645,
+        -14
+      ],
+      "yaw": 135,
+      "scale": 1.1235370098871962,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -589.5205276372255,
+        -1290.5737150316645,
+        -14.15
+      ],
+      "yaw": 197,
+      "scale": 1.0055378572301084,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -170.85311781918472,
+        -1366.0190694290122,
+        -14
+      ],
+      "yaw": 307,
+      "scale": 1.0207767701297847,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -170.85311781918472,
+        -1366.0190694290122,
+        -14.15
+      ],
+      "yaw": 124,
+      "scale": 1.1992782556501738,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        986.588881127195,
+        -1312.5373843045081,
+        -14
+      ],
+      "yaw": 195,
+      "scale": 0.9492452991807172,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        986.588881127195,
+        -1312.5373843045081,
+        -14.15
+      ],
+      "yaw": 197,
+      "scale": 1.0321722767296801,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        439.0713009759445,
+        -1379.0878574678131,
+        -14
+      ],
+      "yaw": 208,
+      "scale": 0.7056912658954549,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        439.0713009759445,
+        -1379.0878574678131,
+        -14.15
+      ],
+      "yaw": 64,
+      "scale": 1.1406954770009126,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -559.1479204731922,
+        -1339.1834796943072,
+        -14
+      ],
+      "yaw": 143,
+      "scale": 0.7218795699100058,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -559.1479204731922,
+        -1339.1834796943072,
+        -14.15
+      ],
+      "yaw": 287,
+      "scale": 1.387663594032906,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -559.1479204731922,
+        -1339.1834796943072,
+        -16
+      ],
+      "yaw": 92,
+      "scale": 1.1223917643006331,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        486.08338275231995,
+        -1323.3583377420914,
+        -14
+      ],
+      "yaw": 155,
+      "scale": 0.5378784124689697,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        486.08338275231995,
+        -1323.3583377420914,
+        -14.15
+      ],
+      "yaw": 114,
+      "scale": 1.5203098989501616,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -894.4232328564972,
+        -1313.9088767714468,
+        -14
+      ],
+      "yaw": 15,
+      "scale": 0.6931808981822595,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -894.4232328564972,
+        -1313.9088767714468,
+        -14.15
+      ],
+      "yaw": 129,
+      "scale": 0.9084671065927727,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        791.2573571297462,
+        -1335.4061121405916,
+        -14
+      ],
+      "yaw": 292,
+      "scale": 0.7066449628642855,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        791.2573571297462,
+        -1335.4061121405916,
+        -14.15
+      ],
+      "yaw": 276,
+      "scale": 1.3707912254862635,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        149.93455674764323,
+        -1371.0860990761742,
+        -14
+      ],
+      "yaw": 28,
+      "scale": 0.7271825766108219,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        149.93455674764323,
+        -1371.0860990761742,
+        -14.15
+      ],
+      "yaw": 88,
+      "scale": 1.1868172468136022,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -631.5590892228869,
+        -1366.841047218673,
+        -14
+      ],
+      "yaw": 187,
+      "scale": 0.6540228463968113,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -631.5590892228869,
+        -1366.841047218673,
+        -14.15
+      ],
+      "yaw": 199,
+      "scale": 1.1016087501716911,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -631.5590892228869,
+        -1366.841047218673,
+        -16
+      ],
+      "yaw": 250,
+      "scale": 0.7833367477662553,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -344.7734860657174,
+        -1318.2425887577024,
+        -14
+      ],
+      "yaw": 277,
+      "scale": 0.8159669513900083,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -344.7734860657174,
+        -1318.2425887577024,
+        -14.15
+      ],
+      "yaw": 74,
+      "scale": 1.0944094654522258,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        546.8489971189097,
+        -1344.1295120180698,
+        -14
+      ],
+      "yaw": 2,
+      "scale": 1.0921065807453982,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        546.8489971189097,
+        -1344.1295120180698,
+        -14.15
+      ],
+      "yaw": 167,
+      "scale": 1.1767727109319728,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        274.2232579672095,
+        -1335.0836327391364,
+        -14
+      ],
+      "yaw": 261,
+      "scale": 1.070278404718823,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        274.2232579672095,
+        -1335.0836327391364,
+        -14.15
+      ],
+      "yaw": 184,
+      "scale": 1.4785823965123035,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        406.586218634495,
+        -1366.6506560449086,
+        -14
+      ],
+      "yaw": 151,
+      "scale": 1.000437582554801,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        406.586218634495,
+        -1366.6506560449086,
+        -14.15
+      ],
+      "yaw": 330,
+      "scale": 1.4969030034293773,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        176.78273285323894,
+        -1283.1224464053964,
+        -14
+      ],
+      "yaw": 193,
+      "scale": 0.6923920287505836,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        176.78273285323894,
+        -1283.1224464053964,
+        -14.15
+      ],
+      "yaw": 23,
+      "scale": 1.5803783270429208,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        176.78273285323894,
+        -1283.1224464053964,
+        -16
+      ],
+      "yaw": 74,
+      "scale": 0.7613392263107951,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        239.89537004362592,
+        -1351.7295102031146,
+        -14
+      ],
+      "yaw": 156,
+      "scale": 0.6303086708206246,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        239.89537004362592,
+        -1351.7295102031146,
+        -14.15
+      ],
+      "yaw": 318,
+      "scale": 1.361038804017128,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -340.11237735711643,
+        -1297.9565239638089,
+        -14
+      ],
+      "yaw": 193,
+      "scale": 1.1538386778831975,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -340.11237735711643,
+        -1297.9565239638089,
+        -14.15
+      ],
+      "yaw": 38,
+      "scale": 0.9751396690760269,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        35.35687818718452,
+        -1324.0520605259755,
+        -14
+      ],
+      "yaw": 331,
+      "scale": 0.8040792565426922,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        35.35687818718452,
+        -1324.0520605259755,
+        -14.15
+      ],
+      "yaw": 188,
+      "scale": 1.2162526532798603,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        34.20175158335019,
+        -1281.0781403266158,
+        -14
+      ],
+      "yaw": 134,
+      "scale": 0.9292200205988355,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        34.20175158335019,
+        -1281.0781403266158,
+        -14.15
+      ],
+      "yaw": 51,
+      "scale": 1.1112926829226972,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        490.8690195517306,
+        -1355.41299709206,
+        -14
+      ],
+      "yaw": 235,
+      "scale": 1.1636372834466553,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        490.8690195517306,
+        -1355.41299709206,
+        -14.15
+      ],
+      "yaw": 55,
+      "scale": 1.4892346693967076,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        490.8690195517306,
+        -1355.41299709206,
+        -16
+      ],
+      "yaw": 235,
+      "scale": 0.9462556899863522,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -738.5529465091957,
+        -1334.1280300269384,
+        -14
+      ],
+      "yaw": 71,
+      "scale": 1.116052019168709,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -738.5529465091957,
+        -1334.1280300269384,
+        -14.15
+      ],
+      "yaw": 5,
+      "scale": 1.5372757796694092,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        260.93248762999883,
+        -1338.0404404224325,
+        -14
+      ],
+      "yaw": 296,
+      "scale": 0.7042000481296588,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        260.93248762999883,
+        -1338.0404404224325,
+        -14.15
+      ],
+      "yaw": 354,
+      "scale": 1.0415986273907745,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        847.3091475822353,
+        -1296.2724926038018,
+        -14
+      ],
+      "yaw": 0,
+      "scale": 0.676859752578544,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        847.3091475822353,
+        -1296.2724926038018,
+        -14.15
+      ],
+      "yaw": 133,
+      "scale": 1.164990080444288,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -758.0138222947294,
+        1361.453706223928,
+        -14
+      ],
+      "yaw": 290,
+      "scale": 1.1339172150043826,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -758.0138222947294,
+        1361.453706223928,
+        -14.15
+      ],
+      "yaw": 270,
+      "scale": 1.3026827430977197,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -758.0138222947294,
+        1361.453706223928,
+        -16
+      ],
+      "yaw": 195,
+      "scale": 0.7239859131840853,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        773.9378106486422,
+        1304.6228791649519,
+        -14
+      ],
+      "yaw": 145,
+      "scale": 0.6149467891754282,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        773.9378106486422,
+        1304.6228791649519,
+        -14.15
+      ],
+      "yaw": 154,
+      "scale": 1.259705745541881,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        864.3379526766166,
+        1357.5564739059535,
+        -14
+      ],
+      "yaw": 163,
+      "scale": 0.8693522104747993,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        864.3379526766166,
+        1357.5564739059535,
+        -14.15
+      ],
+      "yaw": 352,
+      "scale": 0.9220126956784197,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        451.6389325095945,
+        1364.341292989632,
+        -14
+      ],
+      "yaw": 238,
+      "scale": 0.9664062254967927,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        451.6389325095945,
+        1364.341292989632,
+        -14.15
+      ],
+      "yaw": 280,
+      "scale": 1.011192489696606,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        451.6389325095945,
+        1364.341292989632,
+        -16
+      ],
+      "yaw": 30,
+      "scale": 0.8080431172482503,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        894.4345513302108,
+        1371.1852493197582,
+        -14
+      ],
+      "yaw": 347,
+      "scale": 0.5010482145371495,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        894.4345513302108,
+        1371.1852493197582,
+        -14.15
+      ],
+      "yaw": 131,
+      "scale": 1.4264045098222873,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        924.5671979518324,
+        1374.5326191595398,
+        -14
+      ],
+      "yaw": 260,
+      "scale": 0.6683884152676733,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        924.5671979518324,
+        1374.5326191595398,
+        -14.15
+      ],
+      "yaw": 299,
+      "scale": 1.5398217295318488,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        520.99940793667,
+        1350.8562667138135,
+        -14
+      ],
+      "yaw": 299,
+      "scale": 1.0741248896940354,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        520.99940793667,
+        1350.8562667138135,
+        -14.15
+      ],
+      "yaw": 61,
+      "scale": 1.4505297266500317,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        520.99940793667,
+        1350.8562667138135,
+        -16
+      ],
+      "yaw": 350,
+      "scale": 0.9564529990166502,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        888.1592140092791,
+        1339.420800814092,
+        -14
+      ],
+      "yaw": 115,
+      "scale": 0.5494592219415455,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        888.1592140092791,
+        1339.420800814092,
+        -14.15
+      ],
+      "yaw": 11,
+      "scale": 1.5901763160836202,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        531.9748792599325,
+        1347.22070524979,
+        -14
+      ],
+      "yaw": 109,
+      "scale": 1.1098329811844616,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        531.9748792599325,
+        1347.22070524979,
+        -14.15
+      ],
+      "yaw": 92,
+      "scale": 0.9361108849609657,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        477.60191011970255,
+        1330.7789693752331,
+        -14
+      ],
+      "yaw": 294,
+      "scale": 1.0059051110970296,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        477.60191011970255,
+        1330.7789693752331,
+        -14.15
+      ],
+      "yaw": 325,
+      "scale": 1.2406594750665727,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -576.2109962588871,
+        1314.9352020477115,
+        -14
+      ],
+      "yaw": 86,
+      "scale": 0.5587741604751174,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -576.2109962588871,
+        1314.9352020477115,
+        -14.15
+      ],
+      "yaw": 217,
+      "scale": 1.0875155021232021,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f12_rock_3",
+      "origin": [
+        -576.2109962588871,
+        1314.9352020477115,
+        -16
+      ],
+      "yaw": 197,
+      "scale": 0.734878679584334,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        430.68002387470847,
+        1295.5066860538661,
+        -14
+      ],
+      "yaw": 346,
+      "scale": 0.8965121073673821,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        430.68002387470847,
+        1295.5066860538661,
+        -14.15
+      ],
+      "yaw": 162,
+      "scale": 1.476841204738716,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -613.9630032461714,
+        1290.0812407562676,
+        -14
+      ],
+      "yaw": 204,
+      "scale": 0.5933253578019314,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -613.9630032461714,
+        1290.0812407562676,
+        -14.15
+      ],
+      "yaw": 323,
+      "scale": 1.1793547270875044,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        541.5267259948173,
+        1310.9389687131868,
+        -14
+      ],
+      "yaw": 96,
+      "scale": 0.7424548391684362,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        541.5267259948173,
+        1310.9389687131868,
+        -14.15
+      ],
+      "yaw": 209,
+      "scale": 0.923852334631282,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        939.8263938800558,
+        1332.0540603539096,
+        -14
+      ],
+      "yaw": 74,
+      "scale": 0.9519715768634303,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        939.8263938800558,
+        1332.0540603539096,
+        -14.15
+      ],
+      "yaw": 102,
+      "scale": 1.4072245995503612,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_rubble",
+      "origin": [
+        -953.0437247097146,
+        1347.161080910143,
+        -14
+      ],
+      "yaw": 341,
+      "scale": 0.5368852627018191,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -953.0437247097146,
+        1347.161080910143,
+        -14.15
+      ],
+      "yaw": 190,
+      "scale": 1.0857467355921258,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        -904.4179791315842,
+        0.01
+      ],
+      "yaw": 274,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        -617.0487482107374,
+        0.01
+      ],
+      "yaw": 345,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        -557.1570708822202,
+        0.01
+      ],
+      "yaw": 48,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        -982.1831969894056,
+        0.01
+      ],
+      "yaw": 226,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        818.8172125230508,
+        0.01
+      ],
+      "yaw": 275,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        739.2029537128794,
+        0.01
+      ],
+      "yaw": 18,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        656.7558730870494,
+        0.01
+      ],
+      "yaw": 208,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        405.10419760086916,
+        0.01
+      ],
+      "yaw": 195,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        -652.4818091541066,
+        0.01
+      ],
+      "yaw": 16,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        -106.49296046816983,
+        0.01
+      ],
+      "yaw": 172,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        414.01490328760883,
+        0.01
+      ],
+      "yaw": 215,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        -806.0075497094634,
+        0.01
+      ],
+      "yaw": 98,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        -701.4982553863045,
+        0.01
+      ],
+      "yaw": 124,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        -682.8655781828979,
+        0.01
+      ],
+      "yaw": 263,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        -542.777859698307,
+        0.01
+      ],
+      "yaw": 80,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        666.5031968619589,
+        0.01
+      ],
+      "yaw": 115,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        -852.7046319870782,
+        0.01
+      ],
+      "yaw": 263,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        717.4843465306919,
+        0.01
+      ],
+      "yaw": 336,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        73.54619455151555,
+        0.01
+      ],
+      "yaw": 323,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        -970.5319097320294,
+        0.01
+      ],
+      "yaw": 137,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        -981,
+        -265.91967571082273,
+        0.01
+      ],
+      "yaw": 123,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    },
+    {
+      "name": "f14_ash_patch",
+      "origin": [
+        981,
+        -33.48922644631989,
+        0.01
+      ],
+      "yaw": 225,
+      "scale": 0.4,
+      "native": false,
+      "group": "04 Exterior details"
+    }
+  ],
+  "markers": [
+    {
+      "name": "challenge_07_entry",
+      "origin": [
+        0,
+        1096,
+        24
+      ],
+      "role": "teleport arrival"
+    },
+    {
+      "name": "challenge_07_home",
+      "origin": [
+        0,
+        900,
+        24
+      ],
+      "role": "room home"
+    },
+    {
+      "name": "challenge_07_boss_spawn",
+      "origin": [
+        0,
+        -140,
+        24
+      ],
+      "role": "existing challenge configuration spawn"
+    },
+    {
+      "name": "challenge_07_spawn_01",
+      "origin": [
+        365.0,
+        -140.0,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_02",
+      "origin": [
+        295.291,
+        74.542,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_03",
+      "origin": [
+        112.791,
+        207.136,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_04",
+      "origin": [
+        -112.791,
+        207.136,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_05",
+      "origin": [
+        -295.291,
+        74.542,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_06",
+      "origin": [
+        -365.0,
+        -140.0,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_07",
+      "origin": [
+        -295.291,
+        -354.542,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_08",
+      "origin": [
+        -112.791,
+        -487.136,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_09",
+      "origin": [
+        112.791,
+        -487.136,
+        24
+      ],
+      "role": "monster spawn"
+    },
+    {
+      "name": "challenge_07_spawn_10",
+      "origin": [
+        295.291,
+        -354.542,
+        24
+      ],
+      "role": "monster spawn"
+    }
+  ],
+  "native_models": [],
+  "emissive": false
+}

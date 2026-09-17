@@ -1,0 +1,122 @@
+[
+  {
+    "name": "main_city_lv01",
+    "color_empty_before": 3590805,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "main_city_lv02",
+    "color_empty_before": 3597227,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "main_city_lv03",
+    "color_empty_before": 3698645,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "main_city_lv04",
+    "color_empty_before": 3814088,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "main_city_lv05",
+    "color_empty_before": 3569207,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "population_farm_lv01",
+    "color_empty_before": 3514428,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "population_farm_lv02",
+    "color_empty_before": 3487622,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "population_farm_lv03",
+    "color_empty_before": 3662185,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "population_farm_lv04",
+    "color_empty_before": 3685624,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "population_farm_lv05",
+    "color_empty_before": 3730542,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv01",
+    "color_empty_before": 3033694,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv02",
+    "color_empty_before": 3494226,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv03",
+    "color_empty_before": 3527972,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv04",
+    "color_empty_before": 3476710,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv05",
+    "color_empty_before": 3535540,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv06",
+    "color_empty_before": 3576543,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv07",
+    "color_empty_before": 3432735,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv08",
+    "color_empty_before": 3443862,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv09",
+    "color_empty_before": 3547062,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "gold_mine_lv10",
+    "color_empty_before": 3618754,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "research_lab",
+    "color_empty_before": 3487685,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "advanced_research_lab",
+    "color_empty_before": 3544713,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "hero_altar",
+    "color_empty_before": 3289230,
+    "normal_empty_before": 0
+  },
+  {
+    "name": "challenge_arena",
+    "color_empty_before": 3548564,
+    "normal_empty_before": 0
+  }
+]
