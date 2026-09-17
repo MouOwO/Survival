@@ -1,0 +1,47 @@
+UI stage 3 verification — 2026-09-12
+Final candidate/deployment: d2a2939bd1
+
+Executed successfully during final build verification:
+node art/ui/development/remaining_ui_handoff_v1/test_lottery.cjs
+  LOTTERY_UI_PASS / LOTTERY_LAYER_PASS / LOTTERY_V2_PASS
+  LOTTERY_FIXED_DESIGN_PASS / LOTTERY_REAL_ART_PASS
+  LOTTERY_INDEPENDENT_DETAILS_PASS / REMAINING_HISTORY_PASS / RESULT_LIFECYCLE_PASS
+node art/ui/development/remaining_ui_handoff_v1/test_daily.cjs
+  DAILY_UI_PASS
+node art/ui/development/remaining_ui_handoff_v1/test_rogue.cjs
+  ROGUE_UI_PASS
+node art/ui/development/remaining_ui_handoff_v1/test_commerce.cjs
+  COMMERCE_COMPONENT_PASS — no live payment tested
+node art/ui/development/remaining_ui_handoff_v1/test_archive_icons.cjs
+  ARCHIVE_ICONS_PASS — 335 mappings
+node art/ui/development/ui_stage3_v1/test_art.cjs
+  ROGUE_ART_PASS — 52 CSV/audit/master mappings, 1024x1536 RGBA, 232x348 design
+node art/ui/development/ui_stage3_v1/test_geometry.cjs
+  STAGE3_GEOMETRY_PASS — five viewports, fixed portrait origin, square slots
+  Gameplay >10 skills NOT tested; geometry checks only.
+node ui/modal_input_fix_v1/test_modal_input.cjs
+  SHARED_UI_PASS / MODAL_INPUT_PASS — 15 repeated stack cycles
+
+Final deployment:
+pwsh -NoProfile -File art/ui/development/remaining_ui_handoff_v1/deploy_test.ps1 -ReuseVerifiedTextures
+  All resourcecompiler batches: 0 failed
+  LOTTERY_TEST_DEPLOY_PASS
+  formalUiUnchanged=true; acceptedTestModulesUnchanged=true
+  Version/hash details in ../remaining_ui_handoff_v1/deployment_verification.json
+
+UI_STAGE3_TEST_COMMAND_REMOVED:
+Isolated addon_game_mode.lua restored byte-for-byte from before/test_addon_game_mode.lua.
+Source and restored SHA256 compared equal. Next map uses original deadlines.
+Production server files unchanged; no payment performed.
+
+Actual native captures:
+1768x992 and 1280x720; see evidence/manifest.json for explicit allowlist and hashes.
+29 evidence entries: 23 still captures plus 6 continuous-capture AVI recordings.
+Failed/defeat/debug screenshots excluded. Static art preview is not runtime validation.
+
+NOT PASSED / NOT VERIFIED:
+Rogue blank-frame top seam; reduced-motion checkbox glyph absent in actual runtime.
+A speculative shared flow-layout change was reverted (not claimed fixed).
+Points/U-coin catalog adapter and live payment unavailable; seventh-day premium equipment unconfigured.
+Cross-session history/fishing inventory integration unavailable.
+Full natural seven-day cycle, all >10 gameplay skills, every font installation/weight and all extreme texts not verified.

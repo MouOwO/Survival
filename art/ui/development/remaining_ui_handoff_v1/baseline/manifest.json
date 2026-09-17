@@ -1,0 +1,1810 @@
+{
+  "created": "2026-09-10T12:28:41.294Z",
+  "roots": {
+    "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival_ui_handoff_v1\\panorama",
+    "runtime": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival_ui_handoff_v1\\panorama",
+    "formal": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src"
+  },
+  "records": [
+    {
+      "kind": "content",
+      "relative": "layout/custom_game/archive.xml",
+      "sha256": "fd3fa821d74aea6b32af8503f6fb7c384fefb284eaed16d494b3180d1ccee2e8"
+    },
+    {
+      "kind": "content",
+      "relative": "layout/custom_game/custom_ui_manifest.xml",
+      "sha256": "2eea502afc0370dc1b7276398d5f260be76c6594e9eadf3725fd28b08f599555"
+    },
+    {
+      "kind": "content",
+      "relative": "layout/custom_game/font_test.xml",
+      "sha256": "6cdfa06f2d03f1077bc1323552bad5e640eb9fe3dc97942ff605f35fa1b53f31"
+    },
+    {
+      "kind": "content",
+      "relative": "layout/custom_game/hero_skill_ui.xml",
+      "sha256": "b48e8e385f8c06a9e6503776e281213180450603e35be959645040a41caa9cf8"
+    },
+    {
+      "kind": "content",
+      "relative": "layout/custom_game/lottery_window.xml",
+      "sha256": "a994b5d66c8d4406d80957c756002a52be18067e24dd478fee56fa5edfca958f"
+    },
+    {
+      "kind": "content",
+      "relative": "layout/custom_game/rogue_reward_ui.xml",
+      "sha256": "849fd08d2e6c16a5259733ac2848b19e338c840cbe8ff26e5c4b6402e0f76bf7"
+    },
+    {
+      "kind": "content",
+      "relative": "layout/custom_game/survival_grid_placement.xml",
+      "sha256": "50666e207b62cb27a480d88c705929490e971150e20edbb4645dcac7c3251e5e"
+    },
+    {
+      "kind": "content",
+      "relative": "layout/custom_game/survival_hud.xml",
+      "sha256": "82623c0701f422595fc8d36fe2a19f58f05014ac8422c6524cae4a48950dc76e"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/ability_tooltip.js",
+      "sha256": "d9380345a83706f13a253c580c977223c17de3ec35712dc83af70715a4af20c3"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive.js",
+      "sha256": "2652756feff7de8f4c8d12b15ebc8eb9b3d86cd90524eedf875df77e19cfdb8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_180de7e38b.js",
+      "sha256": "2652756feff7de8f4c8d12b15ebc8eb9b3d86cd90524eedf875df77e19cfdb8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_67a5db276f.js",
+      "sha256": "2652756feff7de8f4c8d12b15ebc8eb9b3d86cd90524eedf875df77e19cfdb8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_69e4b7ae06.js",
+      "sha256": "2652756feff7de8f4c8d12b15ebc8eb9b3d86cd90524eedf875df77e19cfdb8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_7d12726fe1.js",
+      "sha256": "2652756feff7de8f4c8d12b15ebc8eb9b3d86cd90524eedf875df77e19cfdb8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_95b24dbef9.js",
+      "sha256": "2652756feff7de8f4c8d12b15ebc8eb9b3d86cd90524eedf875df77e19cfdb8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_c799d725d6.js",
+      "sha256": "2652756feff7de8f4c8d12b15ebc8eb9b3d86cd90524eedf875df77e19cfdb8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_fae43f5733.js",
+      "sha256": "2652756feff7de8f4c8d12b15ebc8eb9b3d86cd90524eedf875df77e19cfdb8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff.js",
+      "sha256": "2a3660b769e9282e22223c899d29bc4699b89a1dea144923c0500af0d50622d0"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff_180de7e38b.js",
+      "sha256": "2a3660b769e9282e22223c899d29bc4699b89a1dea144923c0500af0d50622d0"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff_67a5db276f.js",
+      "sha256": "e74c74cc54f21b4ebf3d72f5595376dfb32416fc99873ef86359dfbc19abeb23"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff_69e4b7ae06.js",
+      "sha256": "b79d934a7c3541243ef502ee5f171de8cfa8d7030dd7da3222e22013c6f4570a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff_7d12726fe1.js",
+      "sha256": "e74c74cc54f21b4ebf3d72f5595376dfb32416fc99873ef86359dfbc19abeb23"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff_95b24dbef9.js",
+      "sha256": "e74c74cc54f21b4ebf3d72f5595376dfb32416fc99873ef86359dfbc19abeb23"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff_assets.js",
+      "sha256": "06d12d651f4056ba9151789bd8c8b061bb913709477567259dee33502bd272a6"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff_c799d725d6.js",
+      "sha256": "e22369eb0596b71cf65985d711b6178c1d1824cbd18fd64baab87d6ff820edcb"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/archive_handoff_fae43f5733.js",
+      "sha256": "819386e11a119e7d9777a2341e0320d49e01f7b094f3af2ff8bc7cd49f37b191"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/attack_range_input.js",
+      "sha256": "c70ca051a22b7d3fd437da1d3b45703fd843b9cc87426ea1c3a8d8c75d20c7b1"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/building_move.js",
+      "sha256": "d546f14b5d5bce850cc0194d5553294c25a923c19965f4006804a76d60bffd22"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats.js",
+      "sha256": "aa2701b100c17144972ab8a567733f2f234ebddd7ae0e7b12b652d218628da9a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v10.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v11.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v12.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v13.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v14.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v16.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v17.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v9.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/combat_stats_handoff_v9b.js",
+      "sha256": "c2c6566d9237469223e083f7ad2fbbef4f0a6b2b9ca8f07bbe2b058f4448391a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/common/ui_components.js",
+      "sha256": "e05ae4862c0ce9198a728ad9038b9ea858903e0cbbbe480ca78fbc47bf83d865"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/common/ui_project_resources.json",
+      "sha256": "6b8e2324565d59b5f148e24abc6fa98bd711d98f68c7b6fbfce92ba3883ddfc2"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/common/ui_registry.js",
+      "sha256": "c5d44bc87f8d3bbb00b64da2483d75aae0c33b2f82afdae32d43edecefa55ab9"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/common/ui_typography.js",
+      "sha256": "4f0595c0ed267e35579aabd51bd0fae8e3ddc4e880f8c34cb727e10318e5d2dd"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/daily_resources.js",
+      "sha256": "cdb99023ed69803d116188acf681ecabbfb850f84af943fc56cb31e209511a63"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/daily_rewards.js",
+      "sha256": "812a158813a3b256f621e50af923078a3669ba070c9871bbe3f1a3d46f2de1e0"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/game_info_panel.js",
+      "sha256": "9b7c831f44952d21f996b063e7c94af9c095a5ad2f7d145f0144435e17da71c7"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/gold_mine_income_numbers.js",
+      "sha256": "95eb4afeadcbd20901e332448fcfc8499332427a1ed98507073f65446bb793f4"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_assets.js",
+      "sha256": "ac11d2ee0abdcb9670691a3ba0deaccc6d7e84d319df3f0a3e52f4e55d4cb839"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_boot.js",
+      "sha256": "07d327612fcd4a12152ec4d3b24d523e7a755650731c6353a0cf4bca6e652f57"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry.js",
+      "sha256": "6a0d80e0e8f377dfa90810ade729567d41baabe6218a5a44e24e77739cbbd4dc"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v10.js",
+      "sha256": "57a051d6a9863a81e735c7d47f8d5ffa6fd9a09fc3a6eaf7eeb6a16db2c6a04f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v11.js",
+      "sha256": "57a051d6a9863a81e735c7d47f8d5ffa6fd9a09fc3a6eaf7eeb6a16db2c6a04f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v12.js",
+      "sha256": "57a051d6a9863a81e735c7d47f8d5ffa6fd9a09fc3a6eaf7eeb6a16db2c6a04f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v13.js",
+      "sha256": "57a051d6a9863a81e735c7d47f8d5ffa6fd9a09fc3a6eaf7eeb6a16db2c6a04f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v14.js",
+      "sha256": "57a051d6a9863a81e735c7d47f8d5ffa6fd9a09fc3a6eaf7eeb6a16db2c6a04f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v15.js",
+      "sha256": "6a0d80e0e8f377dfa90810ade729567d41baabe6218a5a44e24e77739cbbd4dc"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v16.js",
+      "sha256": "6a0d80e0e8f377dfa90810ade729567d41baabe6218a5a44e24e77739cbbd4dc"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v17.js",
+      "sha256": "6a0d80e0e8f377dfa90810ade729567d41baabe6218a5a44e24e77739cbbd4dc"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v9.js",
+      "sha256": "57a051d6a9863a81e735c7d47f8d5ffa6fd9a09fc3a6eaf7eeb6a16db2c6a04f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v9b.js",
+      "sha256": "57a051d6a9863a81e735c7d47f8d5ffa6fd9a09fc3a6eaf7eeb6a16db2c6a04f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud.js",
+      "sha256": "db55beffe537acdaeeb19ca8d98976448ee610dba8d122a4beff49f280d8f8a6"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v10.js",
+      "sha256": "fa0746600714cdf5a87a0b88de482fb3cb1797ea959f1b6d7b54a7882c8e4250"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v11.js",
+      "sha256": "f43ed9b9c50f19066a38fcd0ef9162458969d0c682f847c3a596e4cc8c75e9e7"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v12.js",
+      "sha256": "dc85cfcb5247c8dfedbd624cb1561ed8cf1d8dedcad2415969579ec39255b1ab"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v13.js",
+      "sha256": "73515a52a2b4c229170d985e282abbca1653f6c3931d54f8231f8d38e055d83c"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v14.js",
+      "sha256": "10c3b2ca6ad0570956e0d4a6310a2d389859093cbb9a413eeca9e7f55a412970"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v16.js",
+      "sha256": "c1ec1205744e2230344f864c5830022608d42d4222ec4e575add46f600166dcf"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v17.js",
+      "sha256": "c11b265dce02aafda4e40b9199eff9f8ab64c4f028dcd845ea89e41e94ef7118"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v9.js",
+      "sha256": "8d09f095b497e6d138090b8af21607659f00116fea52bc590c793ce96999c26d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v9b.js",
+      "sha256": "fa0746600714cdf5a87a0b88de482fb3cb1797ea959f1b6d7b54a7882c8e4250"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/hero_skill_ui.js",
+      "sha256": "c6ed939e6c9c424f5f5886760720574b4fe7a80aaa667827cd515f27f6b926da"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/hero_world_health_bar.js",
+      "sha256": "3ae3cdf6565ac33d5e32ecad3d0634e09c5277446b3985f8248e65f220a87828"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/hud_takeover.js",
+      "sha256": "e8c3deeb8e3a56eb7cfa773abbf38ebff648a588ffefad9833629e89408de791"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/inventory_tooltip.js",
+      "sha256": "644ba5c77b3ee7f2cf70245a7fd3f0faf3b922ffb70fe4664d05924cb7946668"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_handoff_03454b44a8.js",
+      "sha256": "f618acf97d41b1d380bc5b51a3da46ba47b3c77373939bb0bcfa25db17e5c972"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_handoff_0d1f57e430.js",
+      "sha256": "be090cb1f87c1646927d717c8025897fafc4e05b26d397748f9f1629edb0ef4d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_handoff_79478c4dbf.js",
+      "sha256": "f7747aff32e76947faa90a1f0845a0006e206b6cc234e1ce9eff9868dcb0354a"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_handoff_80e56f7ad0.js",
+      "sha256": "a5ee30e73ea5f2dd08d68c11fd40421e804e8e52fe2de7582ea6bf96ab018a20"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_handoff_bb9968eef7.js",
+      "sha256": "a54b98db93a9404580b2ee96783a0db87a15452ea84701b123422e4863534408"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_handoff_ef48d27640.js",
+      "sha256": "12207ab671eb7b3560c0b19e1f4413ea68bdcfca3361b7f4e658de56fbfbfe0e"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_ui.js",
+      "sha256": "3150e9629c7c6f3269d1ec3050b370b0d90398bde1b7e49abf9e17fcf4f495f6"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_ui_handoff_03454b44a8.js",
+      "sha256": "235fa094aae79093ea349a2cac45a935fcd16e4ca3840aa82229f33bd2a4237f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_ui_handoff_0d1f57e430.js",
+      "sha256": "42ac1744fcf045e15780a07bf9775a6a13cdd927a3615a076c07568c48594939"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_ui_handoff_79478c4dbf.js",
+      "sha256": "3747cbd610d83ac17c222a457be6487c0fb9dfb18b3fd5a97ce50f7027bdb0b4"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_ui_handoff_80e56f7ad0.js",
+      "sha256": "235fa094aae79093ea349a2cac45a935fcd16e4ca3840aa82229f33bd2a4237f"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_ui_handoff_bb9968eef7.js",
+      "sha256": "42ac1744fcf045e15780a07bf9775a6a13cdd927a3615a076c07568c48594939"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/lottery_ui_handoff_ef48d27640.js",
+      "sha256": "42ac1744fcf045e15780a07bf9775a6a13cdd927a3615a076c07568c48594939"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/main_hud_assets.js",
+      "sha256": "538716275ad343b29531717580dbbbd56bc8b4c0f2e0571cb254e5dfbe0521ff"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/main_hud_skin.js",
+      "sha256": "e297508c43c2c5a225b0a5229e141b8a050db03b9b1d22f149379e15219749ac"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/portrait_camera_editor.js",
+      "sha256": "ac8ac539c737a5d173731eface954a963c41297c62aacf4c70591fa48b477c1c"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/reward_presentation.js",
+      "sha256": "cf2f365a74f17e7f7c327fbce1d19930a60697d03cc83583c406e1f34b1370ac"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/rogue_reward_ui.js",
+      "sha256": "0f6df353fe7f227039e174d73c16314a9b0fb9a22aa7a863c9b165ca6bf53a8d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/shop_debug.js",
+      "sha256": "7167acfec41796a076b2a35d2327b22dd33bae6aad9d86aa2d73c2fe9b5a7daf"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/shop_tooltip.js",
+      "sha256": "55a4f8a495518b1a094c9c536bf063a0e38512ed9d97a8250de7146e11d08801"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/shop_ui.js",
+      "sha256": "dfd603c90f801dfeaa663de6ea1b6add70898c73229a9b74b702d6550b33a14e"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/shop_ui.js.orig",
+      "sha256": "9e62b34a883efa177f15799cd118ac90368adb46439acb65e10cf0811ac7c0c0"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/survival_grid_placement.js",
+      "sha256": "b17fc7afa870563a62658411886ee4c85f2bd59b4aed520c9ce20ac104815de9"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/survival_ui.js",
+      "sha256": "bb171fbe823759e95cf2c7d04e56ed9fa148e8f0fc30677fa6c7544cbbf342a5"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/tooltip_position.js",
+      "sha256": "c463f4be4ebab4feb29f5ea212fc01b7020818fbe5965eea27c332eee967b40d"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/treasure_history.js",
+      "sha256": "045c5e0c8f2e286a90c8fb7f0ead1fc96e0b5299dad9500dfa98cb08bacf6dc0"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/ui_bootstrap.js",
+      "sha256": "69605edcb0e01f9e66f507ecb978899b5a3134819745733b6b7e5648af38dee7"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/ui_layers.js",
+      "sha256": "57624115c78bc43d13d225a81e12b47d27151f43d7deb6565f4cf24c6638ab26"
+    },
+    {
+      "kind": "content",
+      "relative": "scripts/custom_game/weapon_growth_hud.js",
+      "sha256": "c2f3494a6e26b25f9c4302eaa1fa343a1775fe431dea55960e494a0ab8db886f"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/ability_tooltip.css",
+      "sha256": "eafb983e79271f36770f9c4c22b3130a126bef81328d5fe6c4aebd89b148cee8"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive.css",
+      "sha256": "f99499a6308bfe6bd5475d5b04972a12c71d836bf8c54e8eabc25dfead591662"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_difficulty.css",
+      "sha256": "d27683c64cb255de9f66e95fab63dd0c670523e9861e595c7156de082bfc5df0"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_gothic.css",
+      "sha256": "0bb5ca6337a22d610ab8641f10f6ff71c1f666bc14534da3af36c43dc96d8989"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_handoff.css",
+      "sha256": "69afdea3c8bd0c4cd9024c43dc9dc58881e72869a7a25dc320874236530c98a0"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_handoff_180de7e38b.css",
+      "sha256": "69afdea3c8bd0c4cd9024c43dc9dc58881e72869a7a25dc320874236530c98a0"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_handoff_67a5db276f.css",
+      "sha256": "f54e20c7e7d08302744e9cb218165f0c495562e7d8f03000b9ca8a4dd1c741e8"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_handoff_69e4b7ae06.css",
+      "sha256": "80f0d7796d27e34ae76dbf0c5f656adf1af600c483cb27497c52d86e49bd4a25"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_handoff_7d12726fe1.css",
+      "sha256": "05fb30606cd8a37758d86b802a3a31c492d26191d11fe016b2061eb52e3bd7c1"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_handoff_95b24dbef9.css",
+      "sha256": "69afdea3c8bd0c4cd9024c43dc9dc58881e72869a7a25dc320874236530c98a0"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_handoff_c799d725d6.css",
+      "sha256": "6a70a26463b80c3e67c854fd1a1cce5456daa9aa13e58eed789bc05a535ef0c0"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_handoff_fae43f5733.css",
+      "sha256": "c53e200b7f707d4493c2cf5a0b8b968166f5325fd03a30e2d7b82a394c4e58a4"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_kit.css",
+      "sha256": "cc1e36c871ae2bd6f5b1fa59834fb723c3c29773d76ffe903220bb03ddee767a"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_typography.css",
+      "sha256": "284b1fab26ad231b8d567c444117c4676c388ed9ba08382fe391c5b0851e574d"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_typography_180de7e38b.css",
+      "sha256": "284b1fab26ad231b8d567c444117c4676c388ed9ba08382fe391c5b0851e574d"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_typography_67a5db276f.css",
+      "sha256": "284b1fab26ad231b8d567c444117c4676c388ed9ba08382fe391c5b0851e574d"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_typography_7d12726fe1.css",
+      "sha256": "284b1fab26ad231b8d567c444117c4676c388ed9ba08382fe391c5b0851e574d"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_typography_95b24dbef9.css",
+      "sha256": "284b1fab26ad231b8d567c444117c4676c388ed9ba08382fe391c5b0851e574d"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/archive_typography_fae43f5733.css",
+      "sha256": "284b1fab26ad231b8d567c444117c4676c388ed9ba08382fe391c5b0851e574d"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/combat_stats.css",
+      "sha256": "f4d1102c26c067831ff9b9ee36d9178785d0027ed612ba2232e780c7078078df"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/common/font_test.css",
+      "sha256": "c6da4e0b795776e96613435169be1bb12dc8928ab407cf996e17a7f24448e418"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/common/ui_assets.css",
+      "sha256": "207da6d5fb22df8697662453746952b75e321098ece0f44008d700b25f98162c"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/common/ui_components.css",
+      "sha256": "cf1d8bfe4362c78a4f5381220d84d502102b4f005de9eb1ac5d20baa366ae3e9"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/common/ui_typography.css",
+      "sha256": "d0bb1015f86742e7cc9a745b99af2d34503aef4ae2895f29e188215357272317"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/daily_assets.css",
+      "sha256": "73db3800002b162a9d3ef9c40aa70594cbc3e34c76604d41ca15b2df4f8d4b17"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/daily_rewards.css",
+      "sha256": "849c4acade2fe3403fa6f986874e1a67fb645b3c7579e38dd9c31bc8c3e682dc"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/game_info_panel.css",
+      "sha256": "d5752a1e41b08e34eabe1fb6f3ee4d2c89bd8f099d4040c45808b2722b0d0fc7"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/gold_mine_income_numbers.css",
+      "sha256": "f56da2c8a8140bdec93733d89e5285ada41c206fca2871f34aa714f1addcd745"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/handoff_assets.css",
+      "sha256": "1ed72d27f7bb751dff48de1c979faf3f4a051106cc6cfe565ed22c0f4fa4fd5c"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/handoff_v1.css",
+      "sha256": "4e70df2a53da7f931e684f7805a313e4a062fff3a8d6a4b4aae6917a7119aad2"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/hero_skill_ui.css",
+      "sha256": "4dd84ef59c161f1795015828cc67c96ac0535bd11bdd432e10965b76d7944664"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/hero_world_health_bar.css",
+      "sha256": "c46f948977f90ea3402874fa46f6ae1601c6b2a131cc05cb6271521dabfd5356"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/inventory_tooltip.css",
+      "sha256": "383b60275591c79576c8270de6c12ce928e6b82cd8268d9f59c9497eb56afd0d"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/lottery.css",
+      "sha256": "25254a9e4eb0a21e6a7ccb075c92634b7b9c99bd8e61ed4739f3f365838c6d0e"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/lottery_celestial.css",
+      "sha256": "f1d2b49840fb32905c89785924a8c8dac88d788deb17ecff3521c69021b9899c"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/lottery_handoff_03454b44a8.css",
+      "sha256": "b3a4527bfe6a51ef15410c218467c4b9c2fff0bff0016597f8eced1434839e1d"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/lottery_handoff_0d1f57e430.css",
+      "sha256": "e2e9ace6864f44fcc4cb721f198bb6d77b475fdad801a22124a74573c6c9bb3e"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/lottery_handoff_79478c4dbf.css",
+      "sha256": "115f617ec931fad3d428ed7b57f72a41ebb3132b9e183a2b3c7b8c146fca2d28"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/lottery_handoff_80e56f7ad0.css",
+      "sha256": "10cde214c718cc73982bc755818acce5be582de6053205f9400d8aa6f45c1244"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/lottery_handoff_bb9968eef7.css",
+      "sha256": "f1e33522f088cb3b2182fb9e11bee29fd3ed72da23799b9d7e8005449f1bff5c"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/lottery_handoff_ef48d27640.css",
+      "sha256": "e2e9ace6864f44fcc4cb721f198bb6d77b475fdad801a22124a74573c6c9bb3e"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/main_hud_assets.css",
+      "sha256": "628b5c34f8e8278fa852c7a12457a18df2a19fbd75070d0a6e16f5a22ec91408"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/main_hud_skin.css",
+      "sha256": "492e00a28c660e31135980ccbadc5fa8abe1bafcf962c824340214a375e0eaac"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/rogue_reward_ui.css",
+      "sha256": "10965fa7bb75b2a19c73c93e1b4d84fc736abfd8c01e4f04f807bda37c86f240"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/shop.css",
+      "sha256": "c28aff1bc62b0fea57f2c4f91e70e8de76e4e36e586a2227dfaff57dbe3fd25b"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/survival_dota_theme.css",
+      "sha256": "ebc37d722f870a50c843f8e3f47ac543894ba466128a718c2046d559f2ed49bc"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/survival_grid_placement.css",
+      "sha256": "eeeba7f507937d339b3d1261dd71c5b7ea350a693c0fc373356693f4d18eb964"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/survival_hud.css",
+      "sha256": "67f6bd22a777be0e7bafd7ea34088e09457365da121fcf5d8f49a691a0a45d6e"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/survival_hud_native.css",
+      "sha256": "6421a38b563eecc86efe117de46b9a538677a333007c8ea94bd1cbcde794d2df"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/survival_hud_st2_local.css",
+      "sha256": "74891417c9b6b5ba3ff0f99f19bbe555b92e035f88d37aea3185f83b86152935"
+    },
+    {
+      "kind": "content",
+      "relative": "styles/custom_game/weapon_growth_hud.css",
+      "sha256": "44865bfdf463b572d2f3f512259574738e21bc2c3ff063bfea912a35bd70afcd"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/archive.vxml_c",
+      "sha256": "37c2085627bdc000bfc64359f4dc6aed3718cbe020047778991c013dec7f8b1e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/custom_ui_manifest.vxml_c",
+      "sha256": "9b29a8954616dabe63a37e6997d5f1edbc981291c8992b9b8306620b01057713"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/custom_ui_manifest.vxml_c.BASE.vxml_c",
+      "sha256": "9fe8d391418699e34eb646cbd0f429b08f513dfc9c0bea0521670467ede746c0"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/custom_ui_manifest.vxml_c.LOCAL.vxml_c",
+      "sha256": "6f791f9069a6548b404f966ee8105d1bb5e7ab0ccdff6646cfbbf35b08e94bc2"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/custom_ui_manifest.vxml_c.REMOTE.vxml_c",
+      "sha256": "dfdfe20bb3ccead5b6c4cf80b9da11c2f114bb4281955a14d4e827663b4ece05"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/font_test.vxml_c",
+      "sha256": "b0cff13fc4c00333cecae8d7c203fcb04c909b7b674fa60f9646a71c66541594"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/hero_skill_ui.vxml_c",
+      "sha256": "b56c0f50a7c2dbc2017b696b5f0ac6a97156f5b2cc4cebab20d7811c8e4f76ec"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/rogue_reward_ui.vxml_c",
+      "sha256": "3166ae2fda8aa3c791d55fbe9d4c4afbc5a7bb80d45061481547b2c3bceff7a1"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/survival_grid_placement.vxml_c",
+      "sha256": "d468e037f8f1e51633feb9cdd9236c2d2a4b6a8331d5179e391109eaa0a7745a"
+    },
+    {
+      "kind": "runtime",
+      "relative": "layout/custom_game/survival_hud.vxml_c",
+      "sha256": "7f0860cae0c38f4dea943050ca898a711d5c38cd31907847f81c54c01e9241d9"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/ability_tooltip.vjs_c",
+      "sha256": "2761cacf4b22a1f006b0e46ed7afb60d0944ee43ff746da66a68265f3ff3073e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/ability_tooltip.vjs_c.BASE.vjs_c",
+      "sha256": "08ab1193dcc1a921a42a72698dcae51cc4d8ca7737d63950e7b3893383c4be5b"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/ability_tooltip.vjs_c.LOCAL.vjs_c",
+      "sha256": "ef9d890401b46c451c266f0440313d70b54e6c9e42b37c85e7d657d47fcb63d1"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/ability_tooltip.vjs_c.REMOTE.vjs_c",
+      "sha256": "6cf9fc6b04f27fe0793f1d653d36e36148e24e56f9512e8ff8f49140e9eb0e78"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive.vjs_c",
+      "sha256": "8862a4240723cb018717b7f2775d490e7f569ada07f148685f4e43ec6219a490"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_180de7e38b.vjs_c",
+      "sha256": "dc2ec8204f35e30c12b127e641cc7f5f7d76ec9a77845045dde8616afe31fbc6"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_67a5db276f.vjs_c",
+      "sha256": "e095f375305850c7c743b7cbf0513323a45613076b28325ca2e9b2a604286990"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_69e4b7ae06.vjs_c",
+      "sha256": "8e0e1a064224c76def3551676f86077b89ff62a3cbbf816554301da6a0f6c67e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_7d12726fe1.vjs_c",
+      "sha256": "988da9a5afd9d94c82c9c0c8f21d9966730a8efdb714f193c9a324206e757171"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_95b24dbef9.vjs_c",
+      "sha256": "d1cbe9fbe631f1b1937772c4a82c15db06d0d770de08622ac514398cfa667814"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_c799d725d6.vjs_c",
+      "sha256": "bf8ff40655842138fc66875f3241ce822a59bf6a3e74d6867fea5e65fe2dc4f5"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_fae43f5733.vjs_c",
+      "sha256": "26c01e4bcb3fd9137ac4a47fbd28052e337e34acc07c5d3434ccca167a9c0515"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff.vjs_c",
+      "sha256": "6c4e5daadc60c8518439f796b5407c1f4c74f22f042ea9150b62fe95459a64e7"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff_180de7e38b.vjs_c",
+      "sha256": "15a802e18c04248d281e18fa9bfad13c6c56eb42ebade2291fa27ef2ef2d6e1e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff_67a5db276f.vjs_c",
+      "sha256": "fadabca7988adf59757d16ec21cc75331a1ddd2d0a5a39b04981b100a7d56b0e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff_69e4b7ae06.vjs_c",
+      "sha256": "2afcacf6ce12ec15f557266d4e638483a0f362b45ffb7b3672e041b9f38b6d7d"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff_7d12726fe1.vjs_c",
+      "sha256": "2429f2512691374863f5424c0ff9b327903999bc070b972021c10eef4d80e519"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff_95b24dbef9.vjs_c",
+      "sha256": "111342ff0a26e76e481ad9979f948f5894110e52278644433289bdf4e51b758b"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff_assets.vjs_c",
+      "sha256": "ea1d0b3b8b618bf680fb16f3346ebe8bd3ba6a8821458238cef5afba08b83dfc"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff_c799d725d6.vjs_c",
+      "sha256": "e742182548ca03a291a12413ef39c3c06ff8d3cd802ae7b29c0bacfcea655b2e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/archive_handoff_fae43f5733.vjs_c",
+      "sha256": "521c4775c46b399597c84b6c2164d2d15c2b06cc29f4f9a2dc3c3ab328a31819"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/attack_range_input.vjs_c",
+      "sha256": "9506d2e2bbf20fd01252adefcaeef4d9c4bce8425497f171bfddd484cbc347f3"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/building_move.vjs_c",
+      "sha256": "345d8456113931d1047b0c9d3076a4111320b295d4760f5b89394049feee62b0"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats.vjs_c",
+      "sha256": "09d17427ef731a0e9efb282a107449aeefbf22f4452e11ede196b6a3fdc43715"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v10.vjs_c",
+      "sha256": "858f40d3f9ac3f32b774d33e850a925eeea794d942b6dfc085d3c1a289f6f34a"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v11.vjs_c",
+      "sha256": "1b943126465e2daa9ea49336730db7685d747199bff118e2ad61c7b0751b1df8"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v12.vjs_c",
+      "sha256": "8c7967b1ce0aef67ead45a7e1a2b359699753101a965adfb983ef2553c635b7f"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v13.vjs_c",
+      "sha256": "f6ee6763ab5216cc2143c7838d83cc0b35a93460f79a5ec10a7580a7de7f55bf"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v14.vjs_c",
+      "sha256": "13f17a948c1ce86f2c7afb6d0e885a51186326d715c1939c7237abdb15ebb208"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v16.vjs_c",
+      "sha256": "17f5b3352f9681ee4473b8803ebfc679d1a3293696c431df05e0659794da57af"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v17.vjs_c",
+      "sha256": "0254f1e9ec11b10fd21b4fd28322f09e5928c5e77b00974c5e7129d2ffded020"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v9.vjs_c",
+      "sha256": "dbce5f803c3e55f85c28b569c1fe59a54270982be6db30d893a2509c513a8f48"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/combat_stats_handoff_v9b.vjs_c",
+      "sha256": "f612d04e14c504062aa00615195a0837734e95e9e37c63e6aab2cf0991b46e1f"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/common/ui_components.vjs_c",
+      "sha256": "f070f3caf8903fb8fecb0ae5503c96d94ce795899d78ec64a8510ffdb9312086"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/common/ui_registry.vjs_c",
+      "sha256": "54468cb71a4f2914ce88dfb2d570a48e73714742d07f6cadd8303245af37dec4"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/common/ui_typography.vjs_c",
+      "sha256": "f9ffff2c0d51bb07ed352f4a88ef74f4aefb742df83611de2d4426d31f828485"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/daily_resources.vjs_c",
+      "sha256": "8bbf6cbb5ab6de86e25259a256d6bb01cc8c0f428fb412003cff7dd3e779d9fd"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/daily_rewards.vjs_c",
+      "sha256": "8a957d2af394b4ae10053109015314226746c513143f7cd011cbb6e1ec2a3a77"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/game_info_panel.vjs_c",
+      "sha256": "1d0d1dc2ab393191c138df6f73a8e78da26855ee1813558fd6506cde84cfc550"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/gold_mine_income_numbers.vjs_c",
+      "sha256": "b845080516731dbe6f96ac706e3a599d5f9cde04b5fc985ea9839d77b17126cf"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_assets.vjs_c",
+      "sha256": "cb3566741bd0d8c6ee227f2fb3076d6b376c16c3a1ba0d1fdf5b9ea2c1506f5c"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_boot.vjs_c",
+      "sha256": "9ae095d50ad33c05550436606cf8339eab3ee4d21faac504da2f1e3a09ad0c60"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry.vjs_c",
+      "sha256": "079dfc5acd35902ab8dbecf2815fb2f7f29fd52477e9b9ecc565e58666bb2aba"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v10.vjs_c",
+      "sha256": "8f8fa8539b55e633ea50a167d67272df68ae9b0008350059d7cc8b199c772b86"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v11.vjs_c",
+      "sha256": "566ea595d7dd5b82eda76c072c0eb1dfba4a4283e117efc64a0a0c204be6276f"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v12.vjs_c",
+      "sha256": "bc209c7c8b759db0c2b3df83f099c4deb913560e7402647481105bce259302b2"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v13.vjs_c",
+      "sha256": "167dc1abfeb18f6a6d2caa372fee8d76b9ef7c765b54d23dc666b74b5f5d6b60"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v14.vjs_c",
+      "sha256": "cfdaa43a523e190abdb2ef5a2df434ce7ec40e0e81f68644585b3ebef9d3833e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v15.vjs_c",
+      "sha256": "bbc7628dddc3b2b991e85c114fee8ee90318ded1422fc214334cc8a9f0943424"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v16.vjs_c",
+      "sha256": "e7de4d8bad6893dacf3ce608446cfa5ead0591b6a278b54774f737600e2c50dc"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v17.vjs_c",
+      "sha256": "350ab30cfdc22fe446b934f6dc75c50f299c9a9485443ce30b26ca02d1d3997c"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v9.vjs_c",
+      "sha256": "5b6d3dddb20090a54fc5bca055b13af41751e1e35ab031f5462200ff0a47c383"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_geometry_handoff_v9b.vjs_c",
+      "sha256": "44604b5c9e4810b4d0c8a57ce362e918993c89ae25ec286d455fd197a3f13bab"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud.vjs_c",
+      "sha256": "0cfdd002737c3a396766cee3302bf0845c18603eb60b6cd7780cd90b4d0d804b"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v10.vjs_c",
+      "sha256": "1870f701b3db0f30b61efb3e524192e60ffbf4b0b67d06e952ed0a41aa909014"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v11.vjs_c",
+      "sha256": "dacdd7a90f74cf82f8b8f5fff3e47cf71bcc34de8960750e6900dce46c26bad1"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v12.vjs_c",
+      "sha256": "0dedf076370a9f902c28838e83db75b7eea49df3d65c871b0e4fa37c3585aa5e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v13.vjs_c",
+      "sha256": "3c6924765316914fd922dc45e02c57e1826643df30bdc791c9d8522c3ce8725d"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v14.vjs_c",
+      "sha256": "a4805e0f4808c139235506aee901cdeedd3730bfee612ab6e44ab1ce1dab535d"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v16.vjs_c",
+      "sha256": "13abe12866a437eff3c7346b8a3e14d940f4c9cd960f6e89f797924201a99628"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v17.vjs_c",
+      "sha256": "a549da5071e49294b81c0729decfbc1615b4cf867cc465eefd3144a6876493a4"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v9.vjs_c",
+      "sha256": "ab5fe0dd3b4a4a5304b9bbf594e71554003420a95db1e9b43c816a1752f777e0"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/handoff_hud_handoff_v9b.vjs_c",
+      "sha256": "7ec1ad24b9bdbdadfdc2e4b2fe9cec1aa6c8a9c9febf36285237eac32c4cea59"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/hero_skill_ui.vjs_c",
+      "sha256": "4ff8a67f8951cfd568d5dcec0701c128d7e07b2c7ff9aad7ab803e3dbc39c584"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/hero_world_health_bar.vjs_c",
+      "sha256": "8ddf9cc99603307d78184bcfb4a210bca8df8e9e1acff3702835813fad7795cb"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/hud_takeover.vjs_c",
+      "sha256": "6407fa873a710d0820d053a1fb0219b9c0d6de3e2c7441dfc290a0b6c73520b4"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/inventory_tooltip.vjs_c",
+      "sha256": "9efc41fb3e79661091ff4e9b978252ee2ee3b15dc2007c9a074d0e9e91ec6eb6"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_handoff_03454b44a8.vjs_c",
+      "sha256": "f0c818e8962213df0d7f4ed87bb4da6e5485c8421115c17584ab7d470534ba51"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_handoff_0d1f57e430.vjs_c",
+      "sha256": "2a7ebbd4d13285023892aa9f92dcdc52db004518647dcf6be5a6bec2d7d38998"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_handoff_79478c4dbf.vjs_c",
+      "sha256": "591d0c8e57a7c5ab0f6062bc76f4d3717b5156ef18908aa4984fc52e9d7b777f"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_handoff_80e56f7ad0.vjs_c",
+      "sha256": "287d2e06ef03811df1161c4e93c85dbafd17ae9a2e13a497b09a48f3b2a90113"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_handoff_bb9968eef7.vjs_c",
+      "sha256": "e17f147b95ff44cf2d067a83638ef55fd5b72b331b28fe1f7bc160ee1a8e1ed8"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_handoff_ef48d27640.vjs_c",
+      "sha256": "56de9fa529dce62f4752578ba140952396653d94f11ad699fd092018607c2589"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_ui.vjs_c",
+      "sha256": "cf3c96f7d5f50d17b77dfe5113917fb69733edcb2d77dcbe03653a94c4232b06"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_ui_handoff_03454b44a8.vjs_c",
+      "sha256": "fe25916d459e139b18a63a13edda68f2bcef4396f7c0dcc8b5826a7c3841f0f2"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_ui_handoff_0d1f57e430.vjs_c",
+      "sha256": "26ab0d0f039ba802cddc86b787a13d062fbe665ac8daf5e865283aea2a5d31dd"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_ui_handoff_79478c4dbf.vjs_c",
+      "sha256": "79bb000a250d5bdcb3bfdf4978d74e012e31ca5ceee03bfe0bf0acb8c257940d"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_ui_handoff_80e56f7ad0.vjs_c",
+      "sha256": "5d96f81cde9a56e5a0d3b4edefc37c8dd908b39fd2987bca1e725adb82d0fa67"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_ui_handoff_bb9968eef7.vjs_c",
+      "sha256": "4ef84e19f1ec9a20b2604e24ae6866ce1b3b7dcc27239d6f02cfa6096f473d2f"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/lottery_ui_handoff_ef48d27640.vjs_c",
+      "sha256": "3fa5fc03d286318c945d099cf4cb24eb649e5b6327836336e288d96f87457754"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/main_hud_assets.vjs_c",
+      "sha256": "94b28c844c8893c442ab3bab7acafa4437ecbe9ce7e9c1dfc3403c42f99d9781"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/main_hud_skin.vjs_c",
+      "sha256": "d5acc1e6ad34a2dbb8f32201ef418efbfceb1f6ea18a5301b344501bf701e845"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/portrait_camera_editor.vjs_c",
+      "sha256": "6d9bc353715eb7c405f3da6aef57c57f313232e3265e7f22acdeed0d1384322f"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/reward_presentation.vjs_c",
+      "sha256": "29a43db1507f193a4f59428df5b69c23d0bc20c81d3074d18318e598406943d9"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/rogue_reward_ui.vjs_c",
+      "sha256": "26c754b92475d1e2da3c04d542c25e7cf6a92dc559f25aa22938832381261189"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/shop_debug.vjs_c",
+      "sha256": "feb57875ebf2a5b09c5e0d490adffc8ef0a29adafd0716e5187cc1414f414985"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/shop_tooltip.vjs_c",
+      "sha256": "dcd07a7349dbcc04fe275e672d6e20e74bcc78b2aff46355ca37d18106d4e24e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/shop_tooltip.vjs_c.BASE.vjs_c",
+      "sha256": "c28e1839d41092294ae8af1cdde40b3ff61b98f62b899d52eed7968a86b8009b"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/shop_tooltip.vjs_c.LOCAL.vjs_c",
+      "sha256": "a046cc73c160bea13000916874878fdd629c0424980149d6aacb0c5bbaacaf68"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/shop_tooltip.vjs_c.REMOTE.vjs_c",
+      "sha256": "993911ee5ea6d5774ba571877b0e5a35a1d287110f0c2854d5adedd793e49de4"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/shop_ui.vjs_c",
+      "sha256": "3e05d7768df8a4fa191ecc460a70205ee8b0420891116546f4697b0c911f548d"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/survival_grid_placement.vjs_c",
+      "sha256": "c96fb0c9d1c4369e509eb4d206d8d261c927cea4b3ad99da46168137e8a10bba"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/survival_ui.vjs_c",
+      "sha256": "9fa3632343cf5f3d7d08dc9a70c583576a3dd1a9d4735f5ca767afd4f1006817"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/survival_ui.vjs_c.BASE.vjs_c",
+      "sha256": "7cf79675d93215ec76f3b5bf248da7f94f70ff2e504d887b76287c67189d0fae"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/survival_ui.vjs_c.LOCAL.vjs_c",
+      "sha256": "9f0bdccd9cb3044827ea699402e712494be83fb6e55ad41ec4848c37dc8d359e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/survival_ui.vjs_c.REMOTE.vjs_c",
+      "sha256": "2fecf361ace34d99112facff58adb6a72812a47e27bed7cc604d00cbccc6e7bf"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/tooltip_position.vjs_c",
+      "sha256": "249574ba5c5dc542fd9752d2575f5b790054dad70fdf18436145e14a0eebba21"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/treasure_history.vjs_c",
+      "sha256": "898cf727ac9bb2c6319281a179be222fd5eafc95f7df9e226779363da551c511"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/ui_bootstrap.vjs_c",
+      "sha256": "eb34f3d62d5267d5e025aa43105fb10c8696aba7e5e897c483ad297a4c89f302"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/ui_layers.vjs_c",
+      "sha256": "08f59182df5d887217cc47c86b201fdf94573a7458ad74ee6526e1f0ee88ee16"
+    },
+    {
+      "kind": "runtime",
+      "relative": "scripts/custom_game/weapon_growth_hud.vjs_c",
+      "sha256": "12c0a5abb1eb6f398f0f342c3928bc45b5db964d6fa6320e940f7da88f7f1bf4"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/ability_tooltip.vcss_c",
+      "sha256": "8212e88a93157b697b3157b80af9163701f0d057e25d02b5ccdeae101c7ced25"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive.vcss_c",
+      "sha256": "a2c5368a793cf6f685890b5717cbf6b9d6cbdb3f020ca6e9e18ebcfc65b7a61e"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_difficulty.vcss_c",
+      "sha256": "c2de95f6fa1f5a0637723633054ce7346a81783980f62257ac7887abc9859ab4"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_gothic.vcss_c",
+      "sha256": "c82a072251a40316e94105f155e0bea14bcc4c66e5e8a8f6c48cae8d13ee21a6"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_handoff.vcss_c",
+      "sha256": "9437326b5caf717870dc3db94a9516a8a040947b4301eed01f2c3db082595361"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_handoff_180de7e38b.vcss_c",
+      "sha256": "1a72b418a0519043131f86bcdfcdf7325387e2df5e31454d6685639877a3e4a5"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_handoff_67a5db276f.vcss_c",
+      "sha256": "e60282b360b7a3a173e4ba5471ac38835ae0a0cd650adf22dd63d20bb5205546"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_handoff_69e4b7ae06.vcss_c",
+      "sha256": "53a76a0370c15c70a1ca1fd428f13894a02e49d6fd6f909ca4c9ac4844977b05"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_handoff_7d12726fe1.vcss_c",
+      "sha256": "d83396f2f8d58e2130f7f9500a00905e97b866426ff464134e9533f2c1dace05"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_handoff_95b24dbef9.vcss_c",
+      "sha256": "791b42de41e37c8ddc79441d586c998815ce4a3951727ed24ffd19f6d20e1015"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_handoff_c799d725d6.vcss_c",
+      "sha256": "fa42d6e9f4f32bdb94aaf257b8bd1f1f1e00896c3561876d0662a391553bcf83"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_handoff_fae43f5733.vcss_c",
+      "sha256": "58769718adbbde09422ca0d6020a3dfc724a4b315b20a678ca1dc06769e5b803"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_kit.vcss_c",
+      "sha256": "a29aba374682d07b4eb36de626604becdd1a8ac365ad10d2f9c5d51359c35289"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_typography_180de7e38b.vcss_c",
+      "sha256": "e6fc49afc8b45448823bbd3a9d9e45b798d308abf6dce816cb2efbdf28d93965"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_typography_67a5db276f.vcss_c",
+      "sha256": "1be690b3d25dde6fc966db2380e854cf1027f5247f6cbe01d65daebeefaa538a"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_typography_7d12726fe1.vcss_c",
+      "sha256": "06c3dd7ca09ec5142d26f5246920aa8f3629a4577d6fb2aa433f7b5b29258412"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_typography_95b24dbef9.vcss_c",
+      "sha256": "c6319f97c10d2bfbeeceeec5ec05af36c81f707cd61a192567faf5884f9bd0c8"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/archive_typography_fae43f5733.vcss_c",
+      "sha256": "5443106d9f47c5d7177b27ee0d85c3c20c887113bf638eaddfc5740ffcfa9e9b"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/combat_stats.vcss_c",
+      "sha256": "528260a31537581455c94cb4d82fe1d774b99342e9b0397ebf21697a7bafbeea"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/common/font_test.vcss_c",
+      "sha256": "f324c25f10bef98b79b2689ff97354931a11a5bccb6ef53e2ce339ec663621fa"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/common/ui_assets.vcss_c",
+      "sha256": "cb97b8779642a6446e5d2286f566e182d43b2f41d0054b2bd221c426b7c495d9"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/common/ui_components.vcss_c",
+      "sha256": "125e2f54856dc75ac48d72b89c644920a62d8d0111147aacf8c39be862c5ee87"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/common/ui_typography.vcss_c",
+      "sha256": "fb20c191079590a02afeda4410197650d9f4306d6e7ddd022b654ad9166941fc"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/daily_assets.vcss_c",
+      "sha256": "c19f01b8d4f1602ac39a4b6ecd8a206dbf3bbd7d8ac4e0ee2f733dec78fdc7ff"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/daily_rewards.vcss_c",
+      "sha256": "605838579c293db7b691c35db10503e452784b6bc03477c381ecf59f5a8c9387"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/game_info_panel.vcss_c",
+      "sha256": "b2c03e77da60f78242d14829ddead340e65d9de61c806c8a4b3010c6bd827542"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/gold_mine_income_numbers.vcss_c",
+      "sha256": "91f5fb289d2a887152829ea742b63f52ba892188b780d459748590477eaab9cb"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/handoff_assets.vcss_c",
+      "sha256": "2519fd9188b3d20deab066f5b0d2a5d22e9596068e66300f2413420513d787db"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/handoff_v1.vcss_c",
+      "sha256": "21b1cbcbc4b0a652b11056442d88f728632799067f071b30dcc296d4e86fe8c7"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/hero_skill_ui.vcss_c",
+      "sha256": "0bad80782478ae8400b4e4c949145aea404cc4cf1073830bca3007d36e756a80"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/hero_world_health_bar.vcss_c",
+      "sha256": "2dda6257243c47d6fe457c0217ba572aa3694e989f396c484dcffedb02b30cf4"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/inventory_tooltip.vcss_c",
+      "sha256": "a0d9ebfba67e8d07ab391ef1c6c35c4e146e56a99d4128689975105cbcd5a514"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/lottery.vcss_c",
+      "sha256": "ba7a994082c7d1655af038a833bf4dd8a65d84ac50c936452bea574781f57bc4"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/lottery_celestial.vcss_c",
+      "sha256": "fc1af5a2bdc104107aae066ca2d99b0a0899b0b9cf3edcbd72e0e6a389e39aa7"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/lottery_handoff_03454b44a8.vcss_c",
+      "sha256": "f33bc5c05d78f1f06b7363159023148cb2d1f027f630e5d499913b691c84158d"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/lottery_handoff_0d1f57e430.vcss_c",
+      "sha256": "caeffa91710d841c5460f95c4a9bf0a0a88e3d74e23a1d64b1f6715ad86fce6c"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/lottery_handoff_79478c4dbf.vcss_c",
+      "sha256": "6716a3d18e43a2844da9d7688d0ee51b2cfb7850b25379c4bee6cac6e1b8c22a"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/lottery_handoff_80e56f7ad0.vcss_c",
+      "sha256": "250ef71221a8088df52ab62032f24f99cf8e556c13b426146e0dbf5495b8333d"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/lottery_handoff_bb9968eef7.vcss_c",
+      "sha256": "4833dc649cb70648595c2510bcf26f5e5ae78d33817d4c0fcf6e581ebf1e699a"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/lottery_handoff_ef48d27640.vcss_c",
+      "sha256": "6929a7e85e0b8b9816ad0fe5075d5cbef83502d0d7582126469879f196f3e383"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/main_hud_assets.vcss_c",
+      "sha256": "b4aea2c1a1c3341a14a60f682f09c20dc026f9fadf96ac3f6a982b44f390252d"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/main_hud_skin.vcss_c",
+      "sha256": "d17b82b5ba19c3e2f1d525a73c7c9c23c442575fcdb427821c507c6f68a4d68a"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/rogue_reward_ui.vcss_c",
+      "sha256": "84828080b835f463707a4f7ff3c43f036305860a5d90b9be164cce07ac561c3a"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/shop.vcss_c",
+      "sha256": "7d5d86d44c6bc9242d53d8df9f1441665ce5bc552f3088198b6d15e5834ad71b"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/survival_dota_theme.vcss_c",
+      "sha256": "5837fb8b76e04851a9d238ade9cd28ab169d4c4fdd34edce12d2478033734734"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/survival_grid_placement.vcss_c",
+      "sha256": "430f4d85299bc43f329dc386ec534944b48037e380b5ef7fee0abfc16eba9863"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/survival_hud.vcss_c",
+      "sha256": "8b16f77e70fcb669c327f0fa473582ea68841f59003e2a4eb265e350340c51bb"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/survival_hud_native.vcss_c",
+      "sha256": "ae4ea25fd5a9016d5dbaf56217dcf2fb9abe4fdc82ac1fdc00340d12ef024c3f"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/survival_hud_st2_local.vcss_c",
+      "sha256": "4d5ec975a16e21bc1e3c92b7cbf5afd0c60a078fd10555a83709f6fd8d319e02"
+    },
+    {
+      "kind": "runtime",
+      "relative": "styles/custom_game/weapon_growth_hud.vcss_c",
+      "sha256": "1b773277bdd038d4190176c3def50dd670ba7817ee32bd7626f582a24713d5f6"
+    },
+    {
+      "kind": "formal",
+      "relative": "layout/custom_game/archive.xml",
+      "sha256": "c8b6c12c828a7f2ca54eb5812cd04b9980a7b991590d3960b4a9b43b0ffead90"
+    },
+    {
+      "kind": "formal",
+      "relative": "layout/custom_game/font_test.xml",
+      "sha256": "6cdfa06f2d03f1077bc1323552bad5e640eb9fe3dc97942ff605f35fa1b53f31"
+    },
+    {
+      "kind": "formal",
+      "relative": "layout/custom_game/lottery_window.xml",
+      "sha256": "3a0c79d6d9486aac7d2428a500f607bde73b543e2e9a36a25a30b3f0b87c0c8b"
+    },
+    {
+      "kind": "formal",
+      "relative": "layout/custom_game/rogue_reward_ui.xml",
+      "sha256": "849fd08d2e6c16a5259733ac2848b19e338c840cbe8ff26e5c4b6402e0f76bf7"
+    },
+    {
+      "kind": "formal",
+      "relative": "layout/custom_game/survival_hud.xml",
+      "sha256": "5acc5d6d3b9073cffb011a727f4c4b4c1be19ce40f209123ab907728799bd252"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/ability_tooltip.js",
+      "sha256": "8ec8991ebe9e5d7004986a834c4505a76e50f2481ab140ce26e1b50dddc101d7"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/archive.js",
+      "sha256": "d7edaf9d9485ad0f6ea26f50336d7f8104ca856507b7909d3040450b32d3bd0f"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/combat_stats.js",
+      "sha256": "aa2701b100c17144972ab8a567733f2f234ebddd7ae0e7b12b652d218628da9a"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/common/ui_components.js",
+      "sha256": "e05ae4862c0ce9198a728ad9038b9ea858903e0cbbbe480ca78fbc47bf83d865"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/common/ui_project_resources.json",
+      "sha256": "6b8e2324565d59b5f148e24abc6fa98bd711d98f68c7b6fbfce92ba3883ddfc2"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/common/ui_registry.js",
+      "sha256": "c5d44bc87f8d3bbb00b64da2483d75aae0c33b2f82afdae32d43edecefa55ab9"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/common/ui_typography.js",
+      "sha256": "4f0595c0ed267e35579aabd51bd0fae8e3ddc4e880f8c34cb727e10318e5d2dd"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/daily_resources.js",
+      "sha256": "cdb99023ed69803d116188acf681ecabbfb850f84af943fc56cb31e209511a63"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/daily_rewards.js",
+      "sha256": "812a158813a3b256f621e50af923078a3669ba070c9871bbe3f1a3d46f2de1e0"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/handoff_assets.js",
+      "sha256": "ac11d2ee0abdcb9670691a3ba0deaccc6d7e84d319df3f0a3e52f4e55d4cb839"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/handoff_boot.js",
+      "sha256": "07d327612fcd4a12152ec4d3b24d523e7a755650731c6353a0cf4bca6e652f57"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/handoff_geometry.js",
+      "sha256": "6a0d80e0e8f377dfa90810ade729567d41baabe6218a5a44e24e77739cbbd4dc"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/handoff_hud.js",
+      "sha256": "db55beffe537acdaeeb19ca8d98976448ee610dba8d122a4beff49f280d8f8a6"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/hero_world_health_bar.js",
+      "sha256": "3ae3cdf6565ac33d5e32ecad3d0634e09c5277446b3985f8248e65f220a87828"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/lottery_ui.js",
+      "sha256": "3150e9629c7c6f3269d1ec3050b370b0d90398bde1b7e49abf9e17fcf4f495f6"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/main_hud_assets.js",
+      "sha256": "538716275ad343b29531717580dbbbd56bc8b4c0f2e0571cb254e5dfbe0521ff"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/main_hud_skin.js",
+      "sha256": "e297508c43c2c5a225b0a5229e141b8a050db03b9b1d22f149379e15219749ac"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/portrait_camera_editor.js",
+      "sha256": "df96152fbbbc77e16ad3d58571377d6c64c1cf6309c99d5354489d0f666cfa8f"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/reward_presentation.js",
+      "sha256": "cf2f365a74f17e7f7c327fbce1d19930a60697d03cc83583c406e1f34b1370ac"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/rogue_reward_ui.js",
+      "sha256": "0f6df353fe7f227039e174d73c16314a9b0fb9a22aa7a863c9b165ca6bf53a8d"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/shop_ui.js",
+      "sha256": "dfd603c90f801dfeaa663de6ea1b6add70898c73229a9b74b702d6550b33a14e"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/treasure_history.js",
+      "sha256": "045c5e0c8f2e286a90c8fb7f0ead1fc96e0b5299dad9500dfa98cb08bacf6dc0"
+    },
+    {
+      "kind": "formal",
+      "relative": "scripts/custom_game/ui_layers.js",
+      "sha256": "57624115c78bc43d13d225a81e12b47d27151f43d7deb6565f4cf24c6638ab26"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/archive.css",
+      "sha256": "f99499a6308bfe6bd5475d5b04972a12c71d836bf8c54e8eabc25dfead591662"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/archive_difficulty.css",
+      "sha256": "d27683c64cb255de9f66e95fab63dd0c670523e9861e595c7156de082bfc5df0"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/archive_gothic.css",
+      "sha256": "0bb5ca6337a22d610ab8641f10f6ff71c1f666bc14534da3af36c43dc96d8989"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/archive_kit.css",
+      "sha256": "3556792c8b6f948c8215928b79c521f6d28b6cc57865eaf4293ef81b6a198aa7"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/common/font_test.css",
+      "sha256": "c6da4e0b795776e96613435169be1bb12dc8928ab407cf996e17a7f24448e418"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/common/ui_assets.css",
+      "sha256": "1552d6766f9cd97d3296ce870b352510eccef113dbcb0785b86934cab419108e"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/common/ui_components.css",
+      "sha256": "7dd595621c9242b43f3923cbc990d4ff1609dfe898b3031a90aea2fdf4d182f8"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/common/ui_typography.css",
+      "sha256": "d0bb1015f86742e7cc9a745b99af2d34503aef4ae2895f29e188215357272317"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/daily_assets.css",
+      "sha256": "73db3800002b162a9d3ef9c40aa70594cbc3e34c76604d41ca15b2df4f8d4b17"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/daily_rewards.css",
+      "sha256": "849c4acade2fe3403fa6f986874e1a67fb645b3c7579e38dd9c31bc8c3e682dc"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/handoff_assets.css",
+      "sha256": "1ed72d27f7bb751dff48de1c979faf3f4a051106cc6cfe565ed22c0f4fa4fd5c"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/handoff_v1.css",
+      "sha256": "4e70df2a53da7f931e684f7805a313e4a062fff3a8d6a4b4aae6917a7119aad2"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/lottery.css",
+      "sha256": "25254a9e4eb0a21e6a7ccb075c92634b7b9c99bd8e61ed4739f3f365838c6d0e"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/lottery_celestial.css",
+      "sha256": "e265fb687da2af8d96ce2bb7794366a76b3e36a2d9b5894e0031c8db24ca0f11"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/main_hud_assets.css",
+      "sha256": "2f64b5095dd0f7f766051cabdd63c19bc4662f92989f5585f1cc677d9b259bf8"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/main_hud_skin.css",
+      "sha256": "dbb8a692655b5f7c0c18f6e0ca36821a52b047171c38d6d1e7fa61787a446623"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/rogue_reward_ui.css",
+      "sha256": "cca10b21e7643dbf7945d6bc4b82f79f390e4ebffb89e809bcdcc9a775728773"
+    },
+    {
+      "kind": "formal",
+      "relative": "styles/custom_game/shop.css",
+      "sha256": "c28aff1bc62b0fea57f2c4f91e70e8de76e4e36e586a2227dfaff57dbe3fd25b"
+    }
+  ]
+}

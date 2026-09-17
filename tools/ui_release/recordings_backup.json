@@ -1,0 +1,152 @@
+[
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\boss.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\boss.avi",
+    "sha256": "809d4ff19e06b97f4b4eada8836b01dbe2eb625f46aa30243f184ae894f61317",
+    "bytes": 40068092
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\boss_retry.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\boss_retry.avi",
+    "sha256": "44b777f403b2eae758822cc46abe22f3041a9c9e1a2e2e8749d89399462c7e5b",
+    "bytes": 39026428
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\rogue.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\rogue.avi",
+    "sha256": "51bbaf6eb4744883ba47be7f7dedeab94288cfe838200c1ea2e64b1dd92a89aa",
+    "bytes": 48593586
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\single.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\single.avi",
+    "sha256": "9257e66f2ba5dda90e8e6da056f3cc6403cfed03a5fa5d8628986e6cf353b47a",
+    "bytes": 44615984
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\ten.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\ten.avi",
+    "sha256": "19cc43e4ab4fc0434c15b64da36698f788563135e69c733cac34875d60f2047b",
+    "bytes": 45114744
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\ten_skip.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\ten_skip.avi",
+    "sha256": "6245c876e94141208505eccb8ba49c1471ebdcefa6dfd58f4bc927c4e071cf5c",
+    "bytes": 39575506
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\ten_skip_final.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\ten_skip_final.avi",
+    "sha256": "de2f4a6eb044eec60b8c5392189502f86dc9d67d854cf209a34235a20abf0149",
+    "bytes": 39732378
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\ten_skip_pointer.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\ten_skip_pointer.avi",
+    "sha256": "6d9919a01f79b6bd35d069f4edf7af9a8b481e6e8b09d7e2d2fca6ddfe26b5ec",
+    "bytes": 39714858
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_state_completion_v1\\evidence\\ten_skip_verified.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_state_completion_v1\\evidence\\ten_skip_verified.avi",
+    "sha256": "7d87c97517283257edb05195e0b62fe59e121c258f050098484de5e7f96f919b",
+    "bytes": 39067888
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\boss_current.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\boss_current.avi",
+    "sha256": "0aa500bee894620b6a97eeb2dd9ae0ce210af9d9168abef4d1fb87a6c7a04747",
+    "bytes": 29837468
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\boss_wave10.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\boss_wave10.avi",
+    "sha256": "6fb995b1c809bd6a5318877b41e584ef6606694787ddc0666f669f618c1e6712",
+    "bytes": 63946716
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\rogue_1280.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\rogue_1280.avi",
+    "sha256": "b1d51cf116c5f4aa0bdc6df14aa3bacfd0bdfb9ca2f4dc2e359303d2e64220f6",
+    "bytes": 31593552
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\rogue_delivered.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\rogue_delivered.avi",
+    "sha256": "70b05c456bab6c73b2551586dd5a7f5dfa922ad04f50a0e6c5a4fa9212de2e5a",
+    "bytes": 50815528
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\rogue_delivered_1280.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\rogue_delivered_1280.avi",
+    "sha256": "81be8245e6ccf0878908497cf45b60bee035e0442f533434a246069fb3f0b8c0",
+    "bytes": 29141548
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\rogue_final.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\rogue_final.avi",
+    "sha256": "eddd7926335c449ec76f7eca3b13112fc0136c56e25f0b850e3ae4dd91f05067",
+    "bytes": 62973938
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\rogue_first.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\rogue_first.avi",
+    "sha256": "58f2f7b51a5cdec781e08947ca9a51f2e72329def55ee205a323848895b625a0",
+    "bytes": 39777128
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\rogue_frame_retry.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\rogue_frame_retry.avi",
+    "sha256": "0276747302792ff87face8c304366ca1ecae3d8708b1be53fa14030c5ecfa89d",
+    "bytes": 34736226
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\single_final.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\single_final.avi",
+    "sha256": "7b2425cdbee01f21dfec5985d8e94d699245c89e4404c5d3e193dade48628446",
+    "bytes": 55417040
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\ten_final.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\ten_final.avi",
+    "sha256": "f435be63754853f644bfbeaa1c34864cb545026e25ee3ce1ee77f35e039181c6",
+    "bytes": 55410294
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\ui_stage3_v1\\evidence\\ten_skip_final.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\ui_stage3_v1\\evidence\\ten_skip_final.avi",
+    "sha256": "ae7111151ee26d93c17267fa529279546b4262b2bdd4abb0a74fe248a0e3972f",
+    "bytes": 42955630
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\shop_preview_v1\\evidence\\final.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\shop_preview_v1\\evidence\\final.avi",
+    "sha256": "d2212a8a807922aecccf0bd5d74dab9257473e5dcbe800d9ea0c035ccd7397f5",
+    "bytes": 105937886
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\shop_preview_v1\\evidence\\walkthrough.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\shop_preview_v1\\evidence\\walkthrough.avi",
+    "sha256": "8c0b52cb4d0cb117e87fa07a8eb54bf0cb1a476ff84076d13ceed154da6c070b",
+    "bytes": 112425102
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\remaining_ui_handoff_v1\\evidence\\button_hover.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\remaining_ui_handoff_v1\\evidence\\button_hover.avi",
+    "sha256": "e520725377687c86c1067e1e5b348e0a553b9deea85571722a2fa64e5413dc56",
+    "bytes": 8537442
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\remaining_ui_handoff_v1\\evidence\\rogue_hover_fix.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\remaining_ui_handoff_v1\\evidence\\rogue_hover_fix.avi",
+    "sha256": "7f2e98edf85d597e72034f4349ec7a218e897fe6afd08a40f50174693d4ee25f",
+    "bytes": 67926002
+  },
+  {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\spikes\\remaining_ui_handoff_v1\\evidence\\rogue_motion.avi",
+    "backup": "D:\\survival_ui_backups\\release_5d5c1152eb\\recordings\\spikes\\remaining_ui_handoff_v1\\evidence\\rogue_motion.avi",
+    "sha256": "ff6822680bb5f8d2decb72eaed774559687269408ecbd48b4f811f7072b3c50a",
+    "bytes": 35936766
+  }
+]

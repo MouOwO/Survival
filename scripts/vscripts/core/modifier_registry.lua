@@ -1,8 +1,13 @@
 local logger = require("core/logger")
 
 local M = {}
+local retry_by_unit = setmetatable({}, { __mode = "k" })
 
 local modifiers = {
+    {
+        name = "modifier_wall_collision_barrier",
+        path = "modifiers/modifier_wall_collision_barrier",
+    },
     {
         name = "modifier_building_blink_move",
         path = "modifiers/modifier_building_blink_move",
@@ -226,6 +231,7 @@ local function validate_definition(definition)
 end
 
 function M.register()
+    retry_by_unit = setmetatable({}, { __mode = "k" })
     -- Loading a modifier can load other modifier files and replace their class
     -- tables. Finish all such work before binding any final classes to the
     -- engine. require() alone only validates Lua's module cache, not a binding.
@@ -265,6 +271,39 @@ function M.validate()
         return false, table.concat(missing, ",")
     end
     return true, #modifiers
+end
+
+-- Lua's require cache can survive an engine script reload. Rebind the exported
+-- engine entry before creating a missing projection, not the definition module.
+-- Existing instances are reused; failed creation is retried at most every 5s.
+function M.ensure(unit, name, params)
+    if not unit or (unit.IsNull and unit:IsNull()) then return nil end
+    local existing = unit:FindModifierByName(name)
+    if existing then
+        if retry_by_unit[unit] then retry_by_unit[unit][name] = nil end
+        return existing
+    end
+    local now = GameRules and GameRules.GetGameTime and GameRules:GetGameTime() or 0
+    local retries = retry_by_unit[unit]
+    if retries and retries[name] and now < retries[name] then return nil end
+    local definition
+    for _, entry in ipairs(modifiers) do
+        if entry.name == name then definition = entry; break end
+    end
+    assert(definition, "Unregistered modifier requested: " .. tostring(name))
+    require(definition.path)
+    validate_definition(definition)
+    LinkLuaModifier(name, "modifier_bindings/" .. name,
+        definition.motion_type or LUA_MODIFIER_MOTION_NONE)
+    local created = unit:AddNewModifier(unit, nil, name, params or {})
+    if not created then
+        retries = retries or {}
+        retry_by_unit[unit] = retries
+        retries[name] = now + 5
+    elseif retries then
+        retries[name] = nil
+    end
+    return created
 end
 
 return M

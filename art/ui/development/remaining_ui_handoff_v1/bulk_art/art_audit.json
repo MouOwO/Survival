@@ -1,0 +1,8284 @@
+{
+  "total": 331,
+  "completed": 331,
+  "corner_alpha_tolerance": 1,
+  "pending": [],
+  "issues": [],
+  "items": [
+    {
+      "item_id": "lottery_attribute_crystal",
+      "category_id": "points",
+      "name": "属性结晶",
+      "path": "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3467f6b573637b28e870562ecb68ccf414202803ab3055d04ec9d4cd336f870c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        251,
+        70,
+        1021,
+        1135
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_protection_crystal",
+      "category_id": "points",
+      "name": "防护结晶",
+      "path": "custom_game/archive_items_v2/lottery_protection_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c743792e4a1592477d452bc65c82d124c002114c9d11599aa2c55668a862b8b1",
+      "real_alpha": true,
+      "alpha_bounds": [
+        206,
+        103,
+        1068,
+        1129
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_nature_crystal",
+      "category_id": "points",
+      "name": "自然结晶",
+      "path": "custom_game/archive_items_v2/lottery_nature_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b414720487673563ecfd4d968f9ccefaf33ceefb8747d74f64fe29d97eeaf8c8",
+      "real_alpha": true,
+      "alpha_bounds": [
+        140,
+        73,
+        1068,
+        1196
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_bombardment_crystal",
+      "category_id": "points",
+      "name": "炮击结晶",
+      "path": "custom_game/archive_items_v2/lottery_bombardment_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6d2e0811055ad094c0d3c45f0dcc157590bade7d3216936093bb2648b057a0ad",
+      "real_alpha": true,
+      "alpha_bounds": [
+        97,
+        74,
+        1180,
+        1197
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_recovery_crystal",
+      "category_id": "points",
+      "name": "回复结晶",
+      "path": "custom_game/archive_items_v2/lottery_recovery_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e136c1d833aa19d3d3e9ad1408292981ee040b603084906b18a13cd466aebc8f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        223,
+        68,
+        1050,
+        1193
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_resistance_crystal",
+      "category_id": "points",
+      "name": "抵抗结晶",
+      "path": "custom_game/archive_items_v2/lottery_resistance_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "64957e8c94a7e9874e9a015f7dd39f22c3c9f50856257c6ba821d958e4282081",
+      "real_alpha": true,
+      "alpha_bounds": [
+        262,
+        62,
+        1044,
+        1192
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_expansion_crystal",
+      "category_id": "points",
+      "name": "膨胀结晶",
+      "path": "custom_game/archive_items_v2/lottery_expansion_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "30676e041b9153e273fb32eb1e201c27f00afc432ee806661208e85cd5ee9887",
+      "real_alpha": true,
+      "alpha_bounds": [
+        181,
+        76,
+        1102,
+        1186
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_shooting_crystal",
+      "category_id": "points",
+      "name": "射击结晶",
+      "path": "custom_game/archive_items_v2/lottery_shooting_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "70a2337b445d8ce8768181e9deccef9fb4f4fdc5a4128d3378c4ba657d135b7f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        200,
+        110,
+        1159,
+        1096
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_wealth_crystal",
+      "category_id": "points",
+      "name": "财富结晶",
+      "path": "custom_game/archive_items_v2/lottery_wealth_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "42b5551df47ad373275f79a6bd59f324fe8f7a81a01286b2e475c474beebf67d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        188,
+        85,
+        1061,
+        1174
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_lumber_crystal",
+      "category_id": "points",
+      "name": "伐木结晶",
+      "path": "custom_game/archive_items_v2/lottery_lumber_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "917adddd56f50c234fef98eb5b6e413e5fa54d0d539c81354f7a91af924cf11f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        205,
+        63,
+        1120,
+        1183
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_recovery_spirit",
+      "category_id": "points",
+      "name": "回复精神",
+      "path": "custom_game/archive_items_v2/lottery_recovery_spirit.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "90ba905939b2a5890f5ce208a5bdb0e8040a108aa33ab0a876b21881a42af827",
+      "real_alpha": true,
+      "alpha_bounds": [
+        192,
+        53,
+        1217,
+        1124
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_life_spirit",
+      "category_id": "points",
+      "name": "生命精神",
+      "path": "custom_game/archive_items_v2/lottery_life_spirit.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3d594d9bd0747d5a6469b3ca02e6111abbd7ce035d14b23c2bf33a35869d86f8",
+      "real_alpha": true,
+      "alpha_bounds": [
+        133,
+        63,
+        1120,
+        1156
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_nature_spirit",
+      "category_id": "points",
+      "name": "自然精神",
+      "path": "custom_game/archive_items_v2/lottery_nature_spirit.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7006b01525361ef90423656feae34ba75f5dafaae5582ffe26e97b4fd85062c3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        165,
+        85,
+        1130,
+        1168
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_sharp_spirit",
+      "category_id": "points",
+      "name": "锋锐精神",
+      "path": "custom_game/archive_items_v2/lottery_sharp_spirit.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "10a528dc19d0ad132b91570b1b74b1a35c97cb87c3cae8ceab727a04da8bb820",
+      "real_alpha": true,
+      "alpha_bounds": [
+        163,
+        67,
+        1131,
+        1192
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_divine_spirit",
+      "category_id": "points",
+      "name": "神赐精神",
+      "path": "custom_game/archive_items_v2/lottery_divine_spirit.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "99ec69e4731ab8e16553c0edb97bc68471d1fcb2fdc0a43366959b33eb475b61",
+      "real_alpha": true,
+      "alpha_bounds": [
+        147,
+        68,
+        1118,
+        1186
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_universal_tool",
+      "category_id": "points",
+      "name": "万能工具",
+      "path": "custom_game/archive_items_v2/lottery_universal_tool.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "cc319f38ec054716f85013dd7c7b0dbdccb958b8ccfb0cb36a7f6492e999f2bc",
+      "real_alpha": true,
+      "alpha_bounds": [
+        82,
+        143,
+        1199,
+        1120
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_gale_bow",
+      "category_id": "points",
+      "name": "疾风弓",
+      "path": "custom_game/archive_items_v2/lottery_gale_bow.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "add7115b8db8225ec0b8c82c7b516db105a558ff91dd16842acf21a3697f2990",
+      "real_alpha": true,
+      "alpha_bounds": [
+        113,
+        49,
+        1210,
+        1207
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_swift_emblem",
+      "category_id": "points",
+      "name": "快速纹章",
+      "path": "custom_game/archive_items_v2/lottery_swift_emblem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7edc21a09a2746aef421b6ba0e8f3f5630fb8c60bf4a62c1e32c57740c3a58be",
+      "real_alpha": true,
+      "alpha_bounds": [
+        146,
+        78,
+        1179,
+        1160
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_quick_dry_cement",
+      "category_id": "points",
+      "name": "速干水泥",
+      "path": "custom_game/archive_items_v2/lottery_quick_dry_cement.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0af927fb7127bf3282d9dce8ee0674a67584a7464e3551676382cd62ec74dae2",
+      "real_alpha": true,
+      "alpha_bounds": [
+        124,
+        63,
+        1127,
+        1193
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_windspeed_bowstring",
+      "category_id": "points",
+      "name": "风速弓弦",
+      "path": "custom_game/archive_items_v2/lottery_windspeed_bowstring.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9c1e6710aa4a432000e193ee78e4e02ffc9a26d1435baf516b08338e3594791d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        67,
+        109,
+        1187,
+        1146
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_hippogryph_onslaught",
+      "category_id": "points",
+      "name": "角鹰魔攻",
+      "path": "custom_game/archive_items_v2/lottery_hippogryph_onslaught.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ca0afbe67973ea92eb40931ecae981a3dd6dbc747f791a72aeec034a84bc4b6b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        66,
+        19,
+        1205,
+        1214
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_soul_devouring_blade",
+      "category_id": "points",
+      "name": "噬魂灵剑",
+      "path": "custom_game/archive_items_v2/lottery_soul_devouring_blade.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "379ab1fec3bdc7f72b9fb6a172bba395e3f3b9bcbe7fa5e7c4c1bd58ec7abf3d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        31,
+        41,
+        1223,
+        1216
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_tower_retrofit",
+      "category_id": "points",
+      "name": "箭塔改造",
+      "path": "custom_game/archive_items_v2/lottery_tower_retrofit.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "611e8cbae9c9d77ab055e2d42946a07508140d1554828d88fad82bbe7b7dbf7e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        243,
+        132,
+        1126,
+        1142
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_steel_wall",
+      "category_id": "points",
+      "name": "钢铁城墙",
+      "path": "custom_game/archive_items_v2/lottery_steel_wall.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "47571d4217f8493f67cff5ebf41c161b5a9d7c89afa8075b5463d915d65e9f4b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        68,
+        152,
+        1199,
+        1152
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_gathering_grimoire",
+      "category_id": "points",
+      "name": "采集秘典",
+      "path": "custom_game/archive_items_v2/lottery_gathering_grimoire.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1e99b65d6fdfafa0b00574bb5f103f8ee17186f654a014e2246a2b807c9a26e0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        104,
+        66,
+        1143,
+        1186
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_gathering_divine_codex",
+      "category_id": "points",
+      "name": "采集神典",
+      "path": "custom_game/archive_items_v2/lottery_gathering_divine_codex.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1050cb05ecfbb9625d7708c5cd8e0f9ad41cf9190ce0e53178f86b35be7d2348",
+      "real_alpha": true,
+      "alpha_bounds": [
+        49,
+        83,
+        1205,
+        1211
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_aaron_cannon",
+      "category_id": "points",
+      "name": "亚伦巨炮",
+      "path": "custom_game/archive_items_v2/lottery_aaron_cannon.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "91a54297e17d2e4cf47adef357903559c2ad8309de27c14247051bba60c68b80",
+      "real_alpha": true,
+      "alpha_bounds": [
+        11,
+        58,
+        1241,
+        1145
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_darksteel_wall",
+      "category_id": "points",
+      "name": "玄铁城墙",
+      "path": "custom_game/archive_items_v2/lottery_darksteel_wall.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "923b274ad9a30f17f4014280c774f4c7f294dd80afc80610599ab0c8e97772e0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        35,
+        86,
+        1224,
+        1169
+      ],
+      "corner_alpha": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_lumber_legacy",
+      "category_id": "points",
+      "name": "伐木传承",
+      "path": "custom_game/archive_items_v2/lottery_lumber_legacy.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d30549b6cdae9c81d7a8214ead7e20965ea9b687677ee2666e57c14fb20617f7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        106,
+        64,
+        1211,
+        1200
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_titan_shield",
+      "category_id": "points",
+      "name": "泰坦巨盾",
+      "path": "custom_game/archive_items_v2/lottery_titan_shield.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3c1a3750ddd38be7a40707375a713cbad2fc5bfa63c2e746c4351ce10879fddd",
+      "real_alpha": true,
+      "alpha_bounds": [
+        77,
+        6,
+        1177,
+        1224
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_reincarnation_orb",
+      "category_id": "points",
+      "name": "轮回宝珠",
+      "path": "custom_game/archive_items_v2/lottery_reincarnation_orb.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6296904da2085ec1bd0c551aa27c8b4c0be127486ef8c5d5f28ebe1366f4a5a7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        39,
+        19,
+        1227,
+        1186
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_time_orb",
+      "category_id": "points",
+      "name": "时间宝珠",
+      "path": "custom_game/archive_items_v2/lottery_time_orb.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "aa76af4a9e1d5c18511c5001a1845f7346af683165e2e0a8e6ebe2eb11b91b08",
+      "real_alpha": true,
+      "alpha_bounds": [
+        126,
+        30,
+        1195,
+        1212
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_divine_tower_blessing",
+      "category_id": "points",
+      "name": "神塔赐福",
+      "path": "custom_game/archive_items_v2/lottery_divine_tower_blessing.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "460b4a669f4b4e7a935812d5cf5c392e17fa5440bc1d102f77e7eb02109769d4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        296,
+        35,
+        1025,
+        1221
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_abundance_blessing",
+      "category_id": "points",
+      "name": "丰饶赐福",
+      "path": "custom_game/archive_items_v2/lottery_abundance_blessing.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "82f118dd50a2298a7663092a7e888f75d01ea5f07c54e0e7c3139b44fba30e5b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        60,
+        34,
+        1196,
+        1229
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_omniscience_blessing",
+      "category_id": "points",
+      "name": "全知赐福",
+      "path": "custom_game/archive_items_v2/lottery_omniscience_blessing.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e87fb6b6e131da5d0a9c9fca786c8d12a3ea4b4c35f0ed57231825c74a011645",
+      "real_alpha": true,
+      "alpha_bounds": [
+        112,
+        33,
+        1142,
+        1228
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_unbreakable_fortress",
+      "category_id": "points",
+      "name": "不破要塞",
+      "path": "custom_game/archive_items_v2/lottery_unbreakable_fortress.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c766f9bd90a39c0c179be51da6c6ee5a3c8bf56116fd74057863117867e9a729",
+      "real_alpha": true,
+      "alpha_bounds": [
+        65,
+        63,
+        1203,
+        1208
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_struggle_diary",
+      "category_id": "points",
+      "name": "奋斗日记",
+      "path": "custom_game/archive_items_v2/lottery_struggle_diary.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b7eadd16d7dc2cf8bc80097d733c739ecc8bb4f22d743a8ed80160ca165aa205",
+      "real_alpha": true,
+      "alpha_bounds": [
+        132,
+        22,
+        1205,
+        1183
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_chosen_hero",
+      "category_id": "points",
+      "name": "神选英雄",
+      "path": "custom_game/archive_items_v2/lottery_chosen_hero.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "2b5f0047e18313e7a734edd96bb1fe75949651d0b3711fd29fdfeff23cffe85b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        41,
+        65,
+        1215,
+        1126
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_chief_god_blessing",
+      "category_id": "points",
+      "name": "主神赐福",
+      "path": "custom_game/archive_items_v2/lottery_chief_god_blessing.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6f63e3324b88672894fe8d9190b3110bef5ad1a8021dff7ff3fb6191f5c9baee",
+      "real_alpha": true,
+      "alpha_bounds": [
+        51,
+        40,
+        1207,
+        1224
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_ember_of_legacy",
+      "category_id": "points",
+      "name": "薪火余烬",
+      "path": "custom_game/archive_items_v2/lottery_ember_of_legacy.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f5afdde4cb83772b0d3199d19b3de0a8673485f34af45d72a499b9639c9411f3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        191,
+        67,
+        1103,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_lumber_immortal",
+      "category_id": "points",
+      "name": "伐木仙人",
+      "path": "custom_game/archive_items_v2/lottery_lumber_immortal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6b082d5102e087798ace990a2bad8a81954501ac0e42d16486bf970131f6216a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        151,
+        83,
+        1098,
+        1171
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_supreme_fishing_rod",
+      "category_id": "points",
+      "name": "极品钓鱼杆",
+      "path": "custom_game/archive_items_v2/lottery_supreme_fishing_rod.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "38eab987c59da04de8dae94b9cf005533078ee44068ce984de600b8c389f11c0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        76,
+        64,
+        1207,
+        1218
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_flame_wall",
+      "category_id": "points",
+      "name": "烈焰城墙",
+      "path": "custom_game/archive_items_v2/lottery_flame_wall.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d151c3422c3752c36835ee50910ad44050bfe59102543859f3be51ee904c1741",
+      "real_alpha": true,
+      "alpha_bounds": [
+        87,
+        62,
+        1223,
+        1214
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_magical_girl_juggernaut",
+      "category_id": "points",
+      "name": "魔法少女（剑圣）",
+      "path": "custom_game/archive_items_v2/lottery_magical_girl_juggernaut.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "33aea526b67b70e76696d5aa17a3ac137229b268d87a5eccb19be40ca0c7294a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        101,
+        17,
+        1205,
+        1231
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_forest_burning_edge",
+      "category_id": "points",
+      "name": "焚林之锋",
+      "path": "custom_game/archive_items_v2/lottery_forest_burning_edge.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "48a1cd26577b1f6db6961cbd99068a2ed2f1ac0fb6e5d9bf8aed4771d188585d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        40,
+        70,
+        1214,
+        1192
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_endless_growth_ring",
+      "category_id": "points",
+      "name": "无尽年轮",
+      "path": "custom_game/archive_items_v2/lottery_endless_growth_ring.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7fcb1d4e71fc0b3122966db4d054636addd08625da1b34cfc11057686dca26be",
+      "real_alpha": true,
+      "alpha_bounds": [
+        82,
+        55,
+        1173,
+        1178
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_lumber_fury",
+      "category_id": "points",
+      "name": "伐木之怒",
+      "path": "custom_game/archive_items_v2/lottery_lumber_fury.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b0a9e16592ca1ebc8199d930c726505f65b881c02ad73401565653618d2fec2f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        117,
+        60,
+        1165,
+        1165
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_candle_dragon_wing",
+      "category_id": "points",
+      "name": "烛龙之翼",
+      "path": "custom_game/archive_items_v2/lottery_candle_dragon_wing.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "afd0c3f919231f32ec0677e41b0dffaff6cbeefcac1bc9ea76db222d014f4a86",
+      "real_alpha": true,
+      "alpha_bounds": [
+        38,
+        75,
+        1216,
+        1186
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_oak_bulwark",
+      "category_id": "points",
+      "name": "橡木壁垒",
+      "path": "custom_game/archive_items_v2/lottery_oak_bulwark.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "58ed6f33fe64b041e3bcf87f6882037387cdccaf4358353f6f5b4e381adc5519",
+      "real_alpha": true,
+      "alpha_bounds": [
+        54,
+        111,
+        1199,
+        1151
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_seed_of_all_wood",
+      "category_id": "points",
+      "name": "万木之种",
+      "path": "custom_game/archive_items_v2/lottery_seed_of_all_wood.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5b929ead3ae26afe65bc69d1a2eacb204a686c0f9741b1472d1f297574e91901",
+      "real_alpha": true,
+      "alpha_bounds": [
+        138,
+        70,
+        1147,
+        1191
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_sharpwood_tower_core",
+      "category_id": "points",
+      "name": "锐木塔源",
+      "path": "custom_game/archive_items_v2/lottery_sharpwood_tower_core.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "aeb9bee1aeeae67e8e59311e0c55a97ef45132d48b7239cfa7373036f8b73cbc",
+      "real_alpha": true,
+      "alpha_bounds": [
+        50,
+        43,
+        1204,
+        1216
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_hero_medal",
+      "category_id": "points",
+      "name": "英雄勋章",
+      "path": "custom_game/archive_items_v2/lottery_hero_medal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5d9338b36bd493201ca5209e7da272b87a5c2c6d99e205354d631dba646a29cb",
+      "real_alpha": true,
+      "alpha_bounds": [
+        120,
+        80,
+        1134,
+        1122
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_monkey_king",
+      "category_id": "points",
+      "name": "齐天大圣",
+      "path": "custom_game/archive_items_v2/lottery_monkey_king.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5fb580acb1c9b10b41926c7774732e6be58a8f0c3e97506241c780c7d233668f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        55,
+        40,
+        1221,
+        1215
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_immortal_nirvana",
+      "category_id": "points",
+      "name": "不灭涅槃",
+      "path": "custom_game/archive_items_v2/lottery_immortal_nirvana.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ca7030089c80c4cb3cc5d6e10c07e4b029c82076a764ae7fd26a8ec5818d581f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        140,
+        29,
+        1144,
+        1168
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_soul_lock_box",
+      "category_id": "points",
+      "name": "锁魂匣",
+      "path": "custom_game/archive_items_v2/lottery_soul_lock_box.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1d968630753cea7b7dff87762b87f9e216ffbde9ecafea91f19dceaa295b75b5",
+      "real_alpha": true,
+      "alpha_bounds": [
+        102,
+        104,
+        1187,
+        1195
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_sky_turning_seal",
+      "category_id": "points",
+      "name": "焕天印",
+      "path": "custom_game/archive_items_v2/lottery_sky_turning_seal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "90a2382dee909813210ec8bc9b08ea6fea6d5a6487036967a96aa0ebdd8037d4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        64,
+        38,
+        1187,
+        1184
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_heaven_devouring_pill",
+      "category_id": "points",
+      "name": "万噬通天丹",
+      "path": "custom_game/archive_items_v2/lottery_heaven_devouring_pill.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d0e216c3dbb48654798d1ca3bb538f9d9c55e813ff6641c1d69b6bdab871931a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        118,
+        94,
+        1155,
+        1168
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_heaven_reaching_tower_seal",
+      "category_id": "points",
+      "name": "通天塔印",
+      "path": "custom_game/archive_items_v2/lottery_heaven_reaching_tower_seal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "77ef49bae4d139d7ffce12fbfbb73fa6cbd9e26771bc1621126807ec75bf9e39",
+      "real_alpha": true,
+      "alpha_bounds": [
+        214,
+        4,
+        1040,
+        1250
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_sovereign_under_heaven",
+      "category_id": "points",
+      "name": "君临天下",
+      "path": "custom_game/archive_items_v2/lottery_sovereign_under_heaven.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6b1f689dafc946dc2c6b7b2f09989b09a99218ce1d08937964d689e1341a010e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        123,
+        32,
+        1131,
+        1234
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_greenwood_rampart",
+      "category_id": "points",
+      "name": "青林筑垣",
+      "path": "custom_game/archive_items_v2/lottery_greenwood_rampart.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ab4b912a1ac6afc57d4297a8c6999a358600cf6fea4dfc727d064ec9780e1120",
+      "real_alpha": true,
+      "alpha_bounds": [
+        100,
+        96,
+        1188,
+        1210
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_lumber_expert",
+      "category_id": "points",
+      "name": "伐木高手",
+      "path": "custom_game/archive_items_v2/lottery_lumber_expert.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6d9b2a35c55f47a55184241aa426b93c915700432901a2d8d69dd4acf49677ae",
+      "real_alpha": true,
+      "alpha_bounds": [
+        97,
+        43,
+        1169,
+        1187
+      ],
+      "corner_alpha": [
+        1,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_woodforged_thousand_arrows",
+      "category_id": "points",
+      "name": "木筑万锋",
+      "path": "custom_game/archive_items_v2/lottery_woodforged_thousand_arrows.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "15fb7edd8492a4f7a2e3ea5df137f910b95cc2e4859051476944b0ef4cab7b9e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        151,
+        23,
+        1203,
+        1203
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_greenwood_nirvana",
+      "category_id": "points",
+      "name": "青林涅槃",
+      "path": "custom_game/archive_items_v2/lottery_greenwood_nirvana.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4b2962f5e40cee5689a26a8f634c831926135ef6fdf031a701158ca962b3ed77",
+      "real_alpha": true,
+      "alpha_bounds": [
+        155,
+        91,
+        1122,
+        1165
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_fallen_sky_mine",
+      "category_id": "points",
+      "name": "堕落天矿",
+      "path": "custom_game/archive_items_v2/lottery_fallen_sky_mine.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b80510dc63ed3b5113ace66057d8ee783660e968db9d1c6dde937db092e1770b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        99,
+        45,
+        1158,
+        1183
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_jade_purity_sword_immortal",
+      "category_id": "points",
+      "name": "玉清剑仙",
+      "path": "custom_game/archive_items_v2/lottery_jade_purity_sword_immortal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1131d891848516f191ba36c8df79414e94aac4aa8f9bd0676bf12ea906ae0a4f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        188,
+        41,
+        1223,
+        1236
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_immortal_slaying_sword_array",
+      "category_id": "points",
+      "name": "诛仙剑阵",
+      "path": "custom_game/archive_items_v2/lottery_immortal_slaying_sword_array.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "111c5d0ce816ab3c523e6aeeaa23c69a42e8802e9efdcf47fd4e5b43bf4b0dcf",
+      "real_alpha": true,
+      "alpha_bounds": [
+        85,
+        22,
+        1184,
+        1239
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_investiture_of_gods",
+      "category_id": "points",
+      "name": "封神榜",
+      "path": "custom_game/archive_items_v2/lottery_investiture_of_gods.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a04eedb1554efa61761344839b5c799ac8d4271204282c15ce9f8098dde30dae",
+      "real_alpha": true,
+      "alpha_bounds": [
+        33,
+        53,
+        1232,
+        1199
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_heavenly_puppet",
+      "category_id": "points",
+      "name": "天道傀儡",
+      "path": "custom_game/archive_items_v2/lottery_heavenly_puppet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d8dc3fc04996c49318b7576a911bfa4d62979f55b2d41d5b76b25380ecdb4b7c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        99,
+        1,
+        1202,
+        1239
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_mountain_sea_kunpeng",
+      "category_id": "points",
+      "name": "山海鲲鹏",
+      "path": "custom_game/archive_items_v2/lottery_mountain_sea_kunpeng.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bcc5b532c2879bd2ff613b81792fb73feafe06a96a977c522822e0e268be1aa6",
+      "real_alpha": true,
+      "alpha_bounds": [
+        35,
+        37,
+        1225,
+        1220
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_reincarnation_immortal_stele",
+      "category_id": "points",
+      "name": "轮回仙碑",
+      "path": "custom_game/archive_items_v2/lottery_reincarnation_immortal_stele.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "13e585ae0ebafb902b8e5d0a910e0fcb23d481b88fdf4bd58ba3f33262d1c08e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        246,
+        49,
+        1017,
+        1208
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_ancient_pine_fortification",
+      "category_id": "points",
+      "name": "苍松固城",
+      "path": "custom_game/archive_items_v2/lottery_ancient_pine_fortification.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6681643bc6c7201649b6f102f79e98a949b3cdcfe1437955b4725526cecfd9f2",
+      "real_alpha": true,
+      "alpha_bounds": [
+        81,
+        58,
+        1194,
+        1209
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_woodcraft_grandmaster",
+      "category_id": "points",
+      "name": "研木宗师",
+      "path": "custom_game/archive_items_v2/lottery_woodcraft_grandmaster.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "03f0ba5ced468a1a1cbb970b2ddacc5243b50d2b4836be309b0d4aabb402c9a0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        135,
+        88,
+        1162,
+        1160
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_forestcast_thousand_bolts",
+      "category_id": "points",
+      "name": "林铸千矢",
+      "path": "custom_game/archive_items_v2/lottery_forestcast_thousand_bolts.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "458fa53896662f97a31f7afc9e423da573a116ecb68a7f5dcc325257d1d4e962",
+      "real_alpha": true,
+      "alpha_bounds": [
+        249,
+        49,
+        1198,
+        1190
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_emerald_wood_origin",
+      "category_id": "points",
+      "name": "翠木归元",
+      "path": "custom_game/archive_items_v2/lottery_emerald_wood_origin.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "afaf15f2268a8bdafabc75cdce2e3c57feccbe5f611bcaa98128b8f625c965b4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        100,
+        50,
+        1129,
+        1191
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_dimensional_barrier",
+      "category_id": "points",
+      "name": "次元屏障",
+      "path": "custom_game/archive_items_v2/lottery_dimensional_barrier.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "da3a5d80b5a7efa97dfe262a0b0710d70dc3956a5321120e18d42c114373e804",
+      "real_alpha": true,
+      "alpha_bounds": [
+        92,
+        53,
+        1163,
+        1206
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_orbital_cannon_core",
+      "category_id": "points",
+      "name": "轨道炮核心",
+      "path": "custom_game/archive_items_v2/lottery_orbital_cannon_core.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b23dd108242bdaf72e9e89414c79af3050105b73d918910461f77f31e3a63296",
+      "real_alpha": true,
+      "alpha_bounds": [
+        132,
+        45,
+        1183,
+        1212
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_nano_cluster",
+      "category_id": "points",
+      "name": "纳米集群",
+      "path": "custom_game/archive_items_v2/lottery_nano_cluster.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bfbc40550f93e7da4c6afcc7e048c2b654485f9b8ee72c4a214699c69407fe3a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        117,
+        124,
+        1143,
+        1121
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_cyber_overlord",
+      "category_id": "points",
+      "name": "赛博主宰",
+      "path": "custom_game/archive_items_v2/lottery_cyber_overlord.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b94f073f218fd9ab6ca259ba0c95da33ba8ac78151c590c3f96a686dd1943ed4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        86,
+        92,
+        1168,
+        1153
+      ],
+      "corner_alpha": [
+        1,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_neural_reconstruction_module",
+      "category_id": "points",
+      "name": "神经重构模块",
+      "path": "custom_game/archive_items_v2/lottery_neural_reconstruction_module.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ef13fef8117f5adb990af6ebcbcafc851949809d2305f3c0640e31a7f097c3d7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        80,
+        34,
+        1174,
+        1198
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_void_signal_terminal",
+      "category_id": "points",
+      "name": "虚空信号终端",
+      "path": "custom_game/archive_items_v2/lottery_void_signal_terminal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "674814fc41ec2a2e267d5e332362dfddbba184cfcb864b60bb627f3ff6d4bd26",
+      "real_alpha": true,
+      "alpha_bounds": [
+        166,
+        2,
+        1129,
+        1252
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_nitride_alloy_wall",
+      "category_id": "points",
+      "name": "氮化合金护墙",
+      "path": "custom_game/archive_items_v2/lottery_nitride_alloy_wall.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "43314e666ac2864fe165b7feadc36907d6a7ca133d016de9c16a469161397495",
+      "real_alpha": true,
+      "alpha_bounds": [
+        73,
+        61,
+        1210,
+        1173
+      ],
+      "corner_alpha": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_data_unit",
+      "category_id": "points",
+      "name": "数据单元",
+      "path": "custom_game/archive_items_v2/lottery_data_unit.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "70476b6fd7b25572cddfeabb60c5aca12fde0f1c7b17d13db41216c02df6e091",
+      "real_alpha": true,
+      "alpha_bounds": [
+        102,
+        116,
+        1173,
+        1112
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_pulse_conduction_turret",
+      "category_id": "points",
+      "name": "脉冲传导炮台",
+      "path": "custom_game/archive_items_v2/lottery_pulse_conduction_turret.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "2b72d9a7c4638587a2395f0fe296e26715c3892a3b1cdce966cbde28d5a31a12",
+      "real_alpha": true,
+      "alpha_bounds": [
+        142,
+        88,
+        1180,
+        1169
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_cybernetic_implant",
+      "category_id": "points",
+      "name": "义体插件",
+      "path": "custom_game/archive_items_v2/lottery_cybernetic_implant.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0d9a76e74d094ccb3b38ab68af643b1efb232e6c99187a520dba88a9bd1a1009",
+      "real_alpha": true,
+      "alpha_bounds": [
+        172,
+        120,
+        1186,
+        1117
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_crystalline_armor",
+      "category_id": "points",
+      "name": "晶态护甲",
+      "path": "custom_game/archive_items_v2/lottery_crystalline_armor.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "34a7429306d58782da139ab506a7c8c58140e8bbd99767389f74bae2ff5cf915",
+      "real_alpha": true,
+      "alpha_bounds": [
+        85,
+        117,
+        1169,
+        1159
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_signal_hub",
+      "category_id": "points",
+      "name": "信号枢纽",
+      "path": "custom_game/archive_items_v2/lottery_signal_hub.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "56dd1c998435b3d122d37b8cd2e73425dc6f188c3daecb980473ee6c021636d4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        185,
+        49,
+        1109,
+        1210
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_magnetic_disruption_turret",
+      "category_id": "points",
+      "name": "磁扰炮台",
+      "path": "custom_game/archive_items_v2/lottery_magnetic_disruption_turret.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "448f3e794f138eff52ff65a8b2f6392e0d1c47ea90f5fa7bce5ef35e63662720",
+      "real_alpha": true,
+      "alpha_bounds": [
+        221,
+        73,
+        1205,
+        1168
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "lottery_rift_implant",
+      "category_id": "points",
+      "name": "裂痕插件",
+      "path": "custom_game/archive_items_v2/lottery_rift_implant.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "56e75498918540e7132628f493ccbbba6979eb0b809e1d4c9fcf123af7291160",
+      "real_alpha": true,
+      "alpha_bounds": [
+        234,
+        67,
+        1067,
+        1136
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_growth_gem",
+      "category_id": "points",
+      "name": "成长宝石",
+      "path": "custom_game/archive_items_v2/daily_growth_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "474828c462bd007f177d8b3b33c71015f0a44c9a95e63dba2c3cf5eab5d62315",
+      "real_alpha": true,
+      "alpha_bounds": [
+        220,
+        70,
+        1055,
+        1185
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_regen_shard",
+      "category_id": "points",
+      "name": "回血碎片",
+      "path": "custom_game/archive_items_v2/daily_regen_shard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6fd34b2c8fdeaa36a62323556dcf60353e4df5e4a84d90f82f7f16e3dc11ba60",
+      "real_alpha": true,
+      "alpha_bounds": [
+        279,
+        52,
+        1037,
+        1186
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_attribute_gem",
+      "category_id": "points",
+      "name": "攻击宝石",
+      "path": "custom_game/archive_items_v2/daily_attribute_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c697eb9f59844457c2e67b94270a0ed28a4c4adf6c558a27a358ac7e6288efa7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        202,
+        101,
+        1117,
+        1127
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_attack_shard",
+      "category_id": "points",
+      "name": "攻击碎片",
+      "path": "custom_game/archive_items_v2/daily_attack_shard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e29db47316f2cc5d3080063a1c71ade53761f68108ea7658619bfbf5941c0e8d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        251,
+        136,
+        1132,
+        1106
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_health_gem",
+      "category_id": "points",
+      "name": "生命宝石",
+      "path": "custom_game/archive_items_v2/daily_health_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e8c2b463f1d5086c871f66986adad0d5b191bfabb8fc016342f8db2fc63029c7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        112,
+        49,
+        1144,
+        1190
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_wood_gem",
+      "category_id": "points",
+      "name": "木材宝石",
+      "path": "custom_game/archive_items_v2/daily_wood_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bae542e90b8fa563446059addce7e9a00e36b85b184d796b87f776ce0b242d2c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        198,
+        142,
+        1184,
+        1113
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_block_shard",
+      "category_id": "points",
+      "name": "格挡碎片",
+      "path": "custom_game/archive_items_v2/daily_block_shard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b55fc8a91cc8b3650e02effae3df699e5ca3ecf81448ab1f1bd265a276146b29",
+      "real_alpha": true,
+      "alpha_bounds": [
+        197,
+        68,
+        1126,
+        1185
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_attribute_shard",
+      "category_id": "points",
+      "name": "属性碎片",
+      "path": "custom_game/archive_items_v2/daily_attribute_shard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a2bc380bb79d36736dfa8da85996cbd2d77c2bb392cf5fd9c11a19bc9283c9bb",
+      "real_alpha": true,
+      "alpha_bounds": [
+        308,
+        80,
+        994,
+        1104
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_gold_gem",
+      "category_id": "points",
+      "name": "金币宝石",
+      "path": "custom_game/archive_items_v2/daily_gold_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a94cb39b3eddf91c3985024442d0976e47b34606ac8f9f773bf417b0a57dca2b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        157,
+        66,
+        1111,
+        1197
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_wealth_talisman",
+      "category_id": "points",
+      "name": "聚财古符",
+      "path": "custom_game/archive_items_v2/daily_wealth_talisman.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9388739fff1b3d85974ead6d800280428ed8df8b5961f83f911407dd128a9cde",
+      "real_alpha": true,
+      "alpha_bounds": [
+        310,
+        54,
+        1064,
+        1224
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_ancient_tree",
+      "category_id": "points",
+      "name": "古树眷顾",
+      "path": "custom_game/archive_items_v2/daily_ancient_tree.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1db4dd8179dd2e4da4a0482443a2b1545ae4aa5dce427e1a030c01418edb7085",
+      "real_alpha": true,
+      "alpha_bounds": [
+        123,
+        76,
+        1129,
+        1176
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "daily_forest_origin",
+      "category_id": "points",
+      "name": "森罗本源",
+      "path": "custom_game/archive_items_v2/daily_forest_origin.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4751e2ae90d7fe58cba1089f84560ea371ae1f03bf824d1d1b5e6fddd2cb44fc",
+      "real_alpha": true,
+      "alpha_bounds": [
+        131,
+        44,
+        1119,
+        1211
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_01",
+      "category_id": "fragment",
+      "name": "神兵-破碎大剑",
+      "path": "custom_game/archive_items_v2/fragment_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a7a392912c7d7d1f40a2a4381fbe3a1912d7b942d0c7eed32dd58e344cbf883d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        134,
+        64,
+        1188,
+        1189
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_02",
+      "category_id": "fragment",
+      "name": "神兵-始祖之祸",
+      "path": "custom_game/archive_items_v2/fragment_02.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "505ef7f453eab933a4571d8e3770d98371ab7cc2e982f094a180214ffa3d2bcf",
+      "real_alpha": true,
+      "alpha_bounds": [
+        224,
+        58,
+        1155,
+        1204
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_03",
+      "category_id": "fragment",
+      "name": "神兵-焚焰",
+      "path": "custom_game/archive_items_v2/fragment_03.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5d9e558361f8f9add79dfb1b224a72e4e01341356bbdb2b4df33f657c979150e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        123,
+        38,
+        1210,
+        1215
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_04",
+      "category_id": "fragment",
+      "name": "神兵-净魂之刃",
+      "path": "custom_game/archive_items_v2/fragment_04.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "95213983d69a12def244c49299185bf7e4a7f1593e39c91864be366b36c2f64a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        42,
+        38,
+        1231,
+        1174
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_05",
+      "category_id": "fragment",
+      "name": "神兵-狂战斧",
+      "path": "custom_game/archive_items_v2/fragment_05.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bf528a94a767ef24e351262def33576b366777f59446efa8efc9b085ea32d2f0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        81,
+        30,
+        1167,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_06",
+      "category_id": "fragment",
+      "name": "神兵-碎颅锤",
+      "path": "custom_game/archive_items_v2/fragment_06.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "2dcb0035869d2fef265c90eed075c9227006f91478dcda5d1325da7f42222ebe",
+      "real_alpha": true,
+      "alpha_bounds": [
+        81,
+        10,
+        1175,
+        1230
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_07",
+      "category_id": "fragment",
+      "name": "神兵-影刃",
+      "path": "custom_game/archive_items_v2/fragment_07.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4d6792505f800cc7170b5e876f2b21f0a78c3e0c3807d18b403fde3bc122456d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        80,
+        29,
+        1209,
+        1232
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_08",
+      "category_id": "fragment",
+      "name": "神兵-龙爪弯钩",
+      "path": "custom_game/archive_items_v2/fragment_08.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bc84b6366ef4a748807abc311fd2cbd1d2bcec90b2240d8b823a45f544c3f907",
+      "real_alpha": true,
+      "alpha_bounds": [
+        163,
+        59,
+        1210,
+        1139
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_09",
+      "category_id": "fragment",
+      "name": "神兵-纯金之触",
+      "path": "custom_game/archive_items_v2/fragment_09.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4e10555959b0b837a07a7425e68e802d6d1ab2485bc4781669bcf35274430916",
+      "real_alpha": true,
+      "alpha_bounds": [
+        218,
+        32,
+        1170,
+        1220
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_10",
+      "category_id": "fragment",
+      "name": "神兵-战鬼双刃",
+      "path": "custom_game/archive_items_v2/fragment_10.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1183f3aedbc00d9b473fd90caa73fedc796c3d69cc2332566b39f2d639609f11",
+      "real_alpha": true,
+      "alpha_bounds": [
+        59,
+        88,
+        1204,
+        1178
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_11",
+      "category_id": "fragment",
+      "name": "神兵-魔头之命",
+      "path": "custom_game/archive_items_v2/fragment_11.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3e8ec155efc174a56b93b6c924f4d02aaf888736b65ef4e06f88e1a5c7237b84",
+      "real_alpha": true,
+      "alpha_bounds": [
+        66,
+        66,
+        1191,
+        1223
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "fragment_12",
+      "category_id": "fragment",
+      "name": "神兵-魔导师密钥",
+      "path": "custom_game/archive_items_v2/fragment_12.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d22453abaa60e838baa0c4158a67399c1c2f302e0bdb6f8dd2a2e0462bcfdfdb",
+      "real_alpha": true,
+      "alpha_bounds": [
+        90,
+        62,
+        1175,
+        1203
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_01",
+      "category_id": "pet",
+      "name": "黑龙之牙",
+      "path": "custom_game/archive_items_v2/cage_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "77866af285900c1727f8b5bf603ade6705c31a9c8368428e589b29df095204c0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        133,
+        40,
+        1173,
+        1172
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_02",
+      "category_id": "pet",
+      "name": "黑龙之爪",
+      "path": "custom_game/archive_items_v2/cage_02.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d41e5dd516af1178f78b929c835bb08c8a45e094cf073c4f7aebb076c0ba47cb",
+      "real_alpha": true,
+      "alpha_bounds": [
+        91,
+        74,
+        1222,
+        1166
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_03",
+      "category_id": "pet",
+      "name": "暮光沙漏",
+      "path": "custom_game/archive_items_v2/cage_03.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "deb1757ace47fa93266ec6f6276590772cd8efacd0d05711fa4eb90308e3eb09",
+      "real_alpha": true,
+      "alpha_bounds": [
+        202,
+        16,
+        1066,
+        1222
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_04",
+      "category_id": "pet",
+      "name": "源质胸甲",
+      "path": "custom_game/archive_items_v2/cage_04.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "305e03c4d2453e1da353562dc9c4d23ee2690dea744a23a7c5e705f91019622a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        42,
+        63,
+        1215,
+        1208
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_05",
+      "category_id": "pet",
+      "name": "熔岩之血",
+      "path": "custom_game/archive_items_v2/cage_05.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1ddfd01c646fb83dd168751d4f3b1530bc9c1ad8b724bb775be17ffbfff3e513",
+      "real_alpha": true,
+      "alpha_bounds": [
+        208,
+        15,
+        1051,
+        1193
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_06",
+      "category_id": "pet",
+      "name": "灭世咆哮",
+      "path": "custom_game/archive_items_v2/cage_06.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4f1734b687d02043bd9847414738e15464b021b4d3f702d1ef2e425c36741e64",
+      "real_alpha": true,
+      "alpha_bounds": [
+        135,
+        44,
+        1084,
+        1206
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_07",
+      "category_id": "pet",
+      "name": "源质碎片",
+      "path": "custom_game/archive_items_v2/cage_07.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9f3df94d3de22f237ce65731e489372533aefb395540c6bb54cdde1f6e4649af",
+      "real_alpha": true,
+      "alpha_bounds": [
+        335,
+        50,
+        1023,
+        1177
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_08",
+      "category_id": "pet",
+      "name": "疯狂呓语",
+      "path": "custom_game/archive_items_v2/cage_08.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "67d9b3c823492e701b66c0f0b4f6349a4392a98ead6f65a7788981bbb25f09f4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        117,
+        54,
+        1188,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_09",
+      "category_id": "pet",
+      "name": "黑龙之魂",
+      "path": "custom_game/archive_items_v2/cage_09.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5b69dde9ded8836dc97438789d36b914837ccb9de9066f4862137ec8d9c7ad9e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        225,
+        47,
+        1106,
+        1179
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_10",
+      "category_id": "pet",
+      "name": "红龙之牙",
+      "path": "custom_game/archive_items_v2/cage_10.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "dbf172d3368998cdffd0979e7622407beaa0594491e557a196897266eca72172",
+      "real_alpha": true,
+      "alpha_bounds": [
+        130,
+        72,
+        1125,
+        1179
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_11",
+      "category_id": "pet",
+      "name": "红龙之爪",
+      "path": "custom_game/archive_items_v2/cage_11.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0b0aadd3391c251e2946f6ed8f6938d8703b9782d2c4eafd56362483fc634734",
+      "real_alpha": true,
+      "alpha_bounds": [
+        153,
+        61,
+        1134,
+        1189
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_12",
+      "category_id": "pet",
+      "name": "新生龙卵",
+      "path": "custom_game/archive_items_v2/cage_12.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "404e48dfe15ea1dfad9a7bb8063dddd4954cf288deb4d0312e430ccd82ad363b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        190,
+        67,
+        1071,
+        1175
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_13",
+      "category_id": "pet",
+      "name": "红龙之血",
+      "path": "custom_game/archive_items_v2/cage_13.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "330b6cc647bc5b0006da7ec448cf7def2f0e5247c679dc13b547d824af2cb1ec",
+      "real_alpha": true,
+      "alpha_bounds": [
+        278,
+        21,
+        1031,
+        1199
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_14",
+      "category_id": "pet",
+      "name": "生命精华",
+      "path": "custom_game/archive_items_v2/cage_14.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "07a7f551bac5e6bc2b03d4ff4d83ec9407ac0a8ff070b769932b1ca3fcc698a0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        130,
+        17,
+        1122,
+        1218
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_15",
+      "category_id": "pet",
+      "name": "红龙之怒（疑似）",
+      "path": "custom_game/archive_items_v2/cage_15.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "89a2972a41185dcedfa22c82aedbc64471c79ec1fbea11387752e7a2d7ac6c7d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        271,
+        5,
+        1060,
+        1221
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_16",
+      "category_id": "pet",
+      "name": "龙群·龙群号角（疑似）",
+      "path": "custom_game/archive_items_v2/cage_16.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6a2c82eba1b177f27d1fc27450879376a6855f028da32bfb129d2673b40322eb",
+      "real_alpha": true,
+      "alpha_bounds": [
+        23,
+        31,
+        1245,
+        1223
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_17",
+      "category_id": "pet",
+      "name": "龙血契约",
+      "path": "custom_game/archive_items_v2/cage_17.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7bf8272ca2804a62532bcc5a1fadcb0212fb4f14a43c93918dcd54402e814753",
+      "real_alpha": true,
+      "alpha_bounds": [
+        307,
+        11,
+        1193,
+        1236
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_18",
+      "category_id": "pet",
+      "name": "红龙之魂",
+      "path": "custom_game/archive_items_v2/cage_18.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0e627217e3fdaa5fefa17a66d73883d6b34b6882a78385a7646235ec1d1e9a23",
+      "real_alpha": true,
+      "alpha_bounds": [
+        207,
+        33,
+        1119,
+        1209
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_19",
+      "category_id": "pet",
+      "name": "巨龙之牙",
+      "path": "custom_game/archive_items_v2/cage_19.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "113a811648a03982ba1b1ca4cf11b6f36990ba350e11c39140da8489efb07e05",
+      "real_alpha": true,
+      "alpha_bounds": [
+        125,
+        66,
+        1124,
+        1182
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_20",
+      "category_id": "pet",
+      "name": "冰霜之爪",
+      "path": "custom_game/archive_items_v2/cage_20.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f6f86524aa0363a4ed306b51a8a6d202e0aa3fa9883a8d36d0f1ec06167685ce",
+      "real_alpha": true,
+      "alpha_bounds": [
+        119,
+        85,
+        1197,
+        1174
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_21",
+      "category_id": "pet",
+      "name": "冰霜核心",
+      "path": "custom_game/archive_items_v2/cage_21.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a368d18268e80b7ce559e3738547ebb5480153dee5e3d8c1aa4c31d1d0a0ec44",
+      "real_alpha": true,
+      "alpha_bounds": [
+        214,
+        18,
+        1096,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_22",
+      "category_id": "pet",
+      "name": "白骨之刺",
+      "path": "custom_game/archive_items_v2/cage_22.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "da491fa8e62cf0f164ad80a527fb77c70b7de1491db7b91f3f3eb7675db195bf",
+      "real_alpha": true,
+      "alpha_bounds": [
+        205,
+        69,
+        1122,
+        1191
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_23",
+      "category_id": "pet",
+      "name": "凛风护甲",
+      "path": "custom_game/archive_items_v2/cage_23.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1dd989b82b5daae224a5d5736914f43c610433bbccdc18fdcb9fd061b80a2c70",
+      "real_alpha": true,
+      "alpha_bounds": [
+        73,
+        85,
+        1192,
+        1201
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_24",
+      "category_id": "pet",
+      "name": "霜寒悲叹",
+      "path": "custom_game/archive_items_v2/cage_24.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b1b716c0046b7ac0ec75af4dcbf713512509b670e4db0aa74fea1ba81a962041",
+      "real_alpha": true,
+      "alpha_bounds": [
+        255,
+        11,
+        1079,
+        1237
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_25",
+      "category_id": "pet",
+      "name": "极寒龙息",
+      "path": "custom_game/archive_items_v2/cage_25.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "57444411c3f070df26f23780b7605d97f8246374fffac28413719d341c5c4ca8",
+      "real_alpha": true,
+      "alpha_bounds": [
+        157,
+        14,
+        1103,
+        1240
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_26",
+      "category_id": "pet",
+      "name": "绝望龙环",
+      "path": "custom_game/archive_items_v2/cage_26.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "2ea51d355e8e0ddc3863ec8f2688b679c96b55f2b5459f21101deceafe279c3d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        177,
+        54,
+        1105,
+        1158
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_27",
+      "category_id": "pet",
+      "name": "冰龙之魂",
+      "path": "custom_game/archive_items_v2/cage_27.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4ae4d9d4f1fe653ff08265450a2cadb497e7362c29e0d8313e1ef286e23509eb",
+      "real_alpha": true,
+      "alpha_bounds": [
+        207,
+        37,
+        1111,
+        1190
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_28",
+      "category_id": "pet",
+      "name": "绿龙之牙",
+      "path": "custom_game/archive_items_v2/cage_28.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a955945436f81e4f99d7246d46cad0d8c55fe636f32c2b418969e9358caa320a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        97,
+        38,
+        1172,
+        1207
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_29",
+      "category_id": "pet",
+      "name": "绿龙之爪",
+      "path": "custom_game/archive_items_v2/cage_29.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d0c04d3d5f3ff7d1ce1b381a0636668409ef6d2fbb28a2dca49ca009584b5f40",
+      "real_alpha": true,
+      "alpha_bounds": [
+        122,
+        66,
+        1178,
+        1162
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_30",
+      "category_id": "pet",
+      "name": "翡翠沙漏",
+      "path": "custom_game/archive_items_v2/cage_30.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "df922025a00f19ea6e941347451fb4ba8ea4e4379820f5284d4694a33b3e0810",
+      "real_alpha": true,
+      "alpha_bounds": [
+        250,
+        14,
+        1022,
+        1222
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_31",
+      "category_id": "pet",
+      "name": "源生胸甲",
+      "path": "custom_game/archive_items_v2/cage_31.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b2f2aadc6ec0b18064980311c6d7595795e6f512cae63eea23b60cab1b4dd355",
+      "real_alpha": true,
+      "alpha_bounds": [
+        56,
+        34,
+        1220,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_32",
+      "category_id": "pet",
+      "name": "翡翠之血",
+      "path": "custom_game/archive_items_v2/cage_32.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b429649b996b5f2ef2b06448e83f8dcbc9f201bb8723ac680138cd863be624d0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        192,
+        20,
+        1088,
+        1222
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_33",
+      "category_id": "pet",
+      "name": "梦魇咆哮",
+      "path": "custom_game/archive_items_v2/cage_33.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f4584704467ed0081b42d6882f0198a66ef271a7e25afa3d0f701dcd4a00f5c8",
+      "real_alpha": true,
+      "alpha_bounds": [
+        279,
+        40,
+        1062,
+        1189
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_34",
+      "category_id": "pet",
+      "name": "源生鳞片",
+      "path": "custom_game/archive_items_v2/cage_34.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "11f4d80bb5a0a28c335c6b08b93a3068220c61cde0ad4348e432de0c2d617926",
+      "real_alpha": true,
+      "alpha_bounds": [
+        321,
+        86,
+        1137,
+        1167
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_35",
+      "category_id": "pet",
+      "name": "腐梦呓语",
+      "path": "custom_game/archive_items_v2/cage_35.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b06deb92e3be80e7bacdff1a738de7e15a4f59fff198be5cdf4584836549369e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        240,
+        25,
+        1068,
+        1230
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_36",
+      "category_id": "pet",
+      "name": "绿龙之魂",
+      "path": "custom_game/archive_items_v2/cage_36.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ee715652b4041aa514bf5425238422846b6a00d6147c9ae1b67060cac862ea3b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        199,
+        22,
+        1092,
+        1221
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_37",
+      "category_id": "pet",
+      "name": "蓝龙之牙",
+      "path": "custom_game/archive_items_v2/cage_37.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5be4ed3f92bf95ef4abc18b7ea6ccb808e3d45ebc448641865a62a53a65f6da4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        79,
+        35,
+        1175,
+        1212
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_38",
+      "category_id": "pet",
+      "name": "蓝龙之爪",
+      "path": "custom_game/archive_items_v2/cage_38.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0119cf779dfaab1b6af40596ded594e567de2673fe133b73cff00138ad33a4eb",
+      "real_alpha": true,
+      "alpha_bounds": [
+        118,
+        58,
+        1177,
+        1187
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_39",
+      "category_id": "pet",
+      "name": "星界沙漏",
+      "path": "custom_game/archive_items_v2/cage_39.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0794c4ad27b30ef11613895f872ff4d024ec9df6c5b31625a7942713c81202e7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        219,
+        14,
+        1066,
+        1228
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_40",
+      "category_id": "pet",
+      "name": "奥能胸甲（疑似）",
+      "path": "custom_game/archive_items_v2/cage_40.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "761ce0cc282eb1c24c2275a671da36d882929be278db1d6977094430d9bd317e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        52,
+        97,
+        1215,
+        1183
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_41",
+      "category_id": "pet",
+      "name": "星核之血",
+      "path": "custom_game/archive_items_v2/cage_41.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9d81f899c4f78f3439a270bbcd252e64549c8369625fb1fa4f1a8f3576f5be5e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        223,
+        53,
+        1028,
+        1199
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_42",
+      "category_id": "pet",
+      "name": "虚空咆哮",
+      "path": "custom_game/archive_items_v2/cage_42.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5c1b3730e4e4fb8633cba0b0fe4fe5be17e9e614b8460847c05bb24995bc4def",
+      "real_alpha": true,
+      "alpha_bounds": [
+        174,
+        19,
+        1122,
+        1229
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_43",
+      "category_id": "pet",
+      "name": "奥能碎片",
+      "path": "custom_game/archive_items_v2/cage_43.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "5df52525218fe3b65c5f9d07f53e6d4a88736887625e01cfde51864e8f1132db",
+      "real_alpha": true,
+      "alpha_bounds": [
+        310,
+        13,
+        1021,
+        1207
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_44",
+      "category_id": "pet",
+      "name": "星界呓语（疑似）",
+      "path": "custom_game/archive_items_v2/cage_44.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f99180298f366daf410db82badb3f976db5e5eb9e38ecbeeed5da20af69f0e4f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        273,
+        42,
+        1078,
+        1197
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_45",
+      "category_id": "pet",
+      "name": "蓝龙之魂",
+      "path": "custom_game/archive_items_v2/cage_45.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ff2142e36f1c6b4ef7627bec1dd4570b107673199473398b11bd02a8db9a6916",
+      "real_alpha": true,
+      "alpha_bounds": [
+        254,
+        33,
+        1072,
+        1223
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_46",
+      "category_id": "pet",
+      "name": "青铜龙之牙",
+      "path": "custom_game/archive_items_v2/cage_46.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0b552af0be044b1e5cf5ec741c7c6328c78631e79c2a91cc8a605886223e1616",
+      "real_alpha": true,
+      "alpha_bounds": [
+        224,
+        66,
+        1055,
+        1179
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_47",
+      "category_id": "pet",
+      "name": "青铜龙之爪",
+      "path": "custom_game/archive_items_v2/cage_47.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f2f08c491561adce320887d4579109862a2b4bf41ff7972b04a57d57fe27f410",
+      "real_alpha": true,
+      "alpha_bounds": [
+        110,
+        79,
+        1178,
+        1161
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_48",
+      "category_id": "pet",
+      "name": "时序沙漏",
+      "path": "custom_game/archive_items_v2/cage_48.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "12b441fbf5aff7fd64a0ecda448b2739d3874808250d8312cf821be54e192310",
+      "real_alpha": true,
+      "alpha_bounds": [
+        202,
+        35,
+        1120,
+        1236
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_49",
+      "category_id": "pet",
+      "name": "纪元胸甲",
+      "path": "custom_game/archive_items_v2/cage_49.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f5ef6fcde44b0318b8748ea32e42734cce9f5d6054433e58aed2cbb648512f56",
+      "real_alpha": true,
+      "alpha_bounds": [
+        34,
+        86,
+        1214,
+        1173
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_50",
+      "category_id": "pet",
+      "name": "时序之血",
+      "path": "custom_game/archive_items_v2/cage_50.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8659732a321dc72fda4c543a1399405d34a8d7266175918a51ecbdf2fe4cc6e6",
+      "real_alpha": true,
+      "alpha_bounds": [
+        173,
+        17,
+        1154,
+        1213
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_51",
+      "category_id": "pet",
+      "name": "纪元咆哮",
+      "path": "custom_game/archive_items_v2/cage_51.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "20e7ab110d2b0675437e66e3b74134df0d82665bb516a6574625bfdd7eb357cf",
+      "real_alpha": true,
+      "alpha_bounds": [
+        224,
+        45,
+        1112,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_52",
+      "category_id": "pet",
+      "name": "时序碎片",
+      "path": "custom_game/archive_items_v2/cage_52.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bf7b2e58fec8ef4705899558cc2d3f0a88cf6789f1208581ed0f33cf3b5240cf",
+      "real_alpha": true,
+      "alpha_bounds": [
+        261,
+        12,
+        1027,
+        1236
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_53",
+      "category_id": "pet",
+      "name": "轮回呓语",
+      "path": "custom_game/archive_items_v2/cage_53.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b04b932cbb6b6b78c01f375f610e3061aabc62fc373c8a1b2efcf41359c4ca66",
+      "real_alpha": true,
+      "alpha_bounds": [
+        176,
+        52,
+        1116,
+        1199
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "cage_54",
+      "category_id": "pet",
+      "name": "青铜龙之魂",
+      "path": "custom_game/archive_items_v2/cage_54.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e01f92f768537c26e9f29a2e8a38e327190737fa25a9dac70a963cf75322dbf5",
+      "real_alpha": true,
+      "alpha_bounds": [
+        197,
+        21,
+        1108,
+        1219
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_01",
+      "category_id": "friend",
+      "name": "哆啦A梦",
+      "path": "custom_game/archive_items_v2/friend_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ee335e31d1bf05f1d886223174a5afb760462e52260f28ac0f87343d055d480c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        245,
+        151,
+        976,
+        1107
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_02",
+      "category_id": "friend",
+      "name": "孙悟空",
+      "path": "custom_game/archive_items_v2/friend_02.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "da4b02ee0ba5b05a0b96b478b30a51a7790f74dc21a7a385d7435dc652c28d52",
+      "real_alpha": true,
+      "alpha_bounds": [
+        190,
+        22,
+        1106,
+        1232
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_03",
+      "category_id": "friend",
+      "name": "路飞",
+      "path": "custom_game/archive_items_v2/friend_03.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "fb099913db35cfb0bcc13752c09c7e5524f7ddb5ba6bcce430603e56d6511758",
+      "real_alpha": true,
+      "alpha_bounds": [
+        243,
+        63,
+        1013,
+        1203
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_04",
+      "category_id": "friend",
+      "name": "漩涡鸣人",
+      "path": "custom_game/archive_items_v2/friend_04.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1b2249972a3bb0ddf0602a38203922bf941103156cb9aa7a89dafe03fe4f6dd2",
+      "real_alpha": true,
+      "alpha_bounds": [
+        314,
+        27,
+        1025,
+        1209
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_05",
+      "category_id": "friend",
+      "name": "江户川柯南",
+      "path": "custom_game/archive_items_v2/friend_05.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "33f96ab2e2bba6be5cfe8ffb74f9fc4f86192be5e0e25bc336020140a80393f8",
+      "real_alpha": true,
+      "alpha_bounds": [
+        266,
+        20,
+        927,
+        1208
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_06",
+      "category_id": "friend",
+      "name": "樱木花道",
+      "path": "custom_game/archive_items_v2/friend_06.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bec3eb7774b83d7092ba26293aecf327ba03abc65a8b1232d9537b00a1b33cb7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        328,
+        34,
+        932,
+        1221
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_07",
+      "category_id": "friend",
+      "name": "宇智波佐助",
+      "path": "custom_game/archive_items_v2/friend_07.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "05e8927956d3918943fcf685f1e8a1517aa8b1b0cceb2a38ed6fd6e35018c32a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        322,
+        19,
+        996,
+        1228
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_08",
+      "category_id": "friend",
+      "name": "贝吉塔",
+      "path": "custom_game/archive_items_v2/friend_08.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "2945bf47f1683ab51ada20429aca1bd25458e5290a27b2a0689e71844a709013",
+      "real_alpha": true,
+      "alpha_bounds": [
+        344,
+        17,
+        982,
+        1217
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_09",
+      "category_id": "friend",
+      "name": "流川枫",
+      "path": "custom_game/archive_items_v2/friend_09.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ca10e3a967c6be4c3473c3cd41e0cdb045053a517af6afc1b8f5c2f30c86ebcb",
+      "real_alpha": true,
+      "alpha_bounds": [
+        360,
+        29,
+        883,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_10",
+      "category_id": "friend",
+      "name": "旗木卡卡西",
+      "path": "custom_game/archive_items_v2/friend_10.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c13ddcdf8c6e3e9a9718fd020560a2acbfce2d805d29c5cfde5d7b9937109646",
+      "real_alpha": true,
+      "alpha_bounds": [
+        359,
+        29,
+        978,
+        1224
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_11",
+      "category_id": "friend",
+      "name": "利威尔",
+      "path": "custom_game/archive_items_v2/friend_11.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "293e9e7577cac700ac64240d8b135d515e83c35b7974744399e3aae854db3a6a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        175,
+        40,
+        1000,
+        1217
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_12",
+      "category_id": "friend",
+      "name": "艾伦·耶格尔",
+      "path": "custom_game/archive_items_v2/friend_12.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "eaa5bdf8e0436b2e2bcf540395d49e453ee555e9d7a7e0e618a04f980ffad295",
+      "real_alpha": true,
+      "alpha_bounds": [
+        78,
+        37,
+        1197,
+        1211
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_13",
+      "category_id": "friend",
+      "name": "黑崎一护",
+      "path": "custom_game/archive_items_v2/friend_13.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e2af80396d585c133b00c27c3fcbfcc72bef23408e5f0d5eeb62657bda5f3134",
+      "real_alpha": true,
+      "alpha_bounds": [
+        134,
+        29,
+        1161,
+        1220
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_14",
+      "category_id": "friend",
+      "name": "灶门炭治郎",
+      "path": "custom_game/archive_items_v2/friend_14.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "67ed6b9a975ee580bd63701e539ff1d6350f47909ada16559e9f3b3a6c7c9156",
+      "real_alpha": true,
+      "alpha_bounds": [
+        188,
+        48,
+        1010,
+        1201
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_15",
+      "category_id": "friend",
+      "name": "五条悟",
+      "path": "custom_game/archive_items_v2/friend_15.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e59879be008e7c2beb375a1dd05863a7bc46ea9e83698c35c8b851523b976118",
+      "real_alpha": true,
+      "alpha_bounds": [
+        293,
+        42,
+        919,
+        1211
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_16",
+      "category_id": "friend",
+      "name": "坂田银时",
+      "path": "custom_game/archive_items_v2/friend_16.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3f19893d6f2eda9b0aa77dd6b82e75c5c23db62337c8a2d8e63164cb42784458",
+      "real_alpha": true,
+      "alpha_bounds": [
+        270,
+        9,
+        983,
+        1242
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_17",
+      "category_id": "friend",
+      "name": "犬夜叉",
+      "path": "custom_game/archive_items_v2/friend_17.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "08f56b04d0f2e0f1a4d5a510ec47818c2d0a36fa24f6a3ad55718b68bfff8cf5",
+      "real_alpha": true,
+      "alpha_bounds": [
+        166,
+        63,
+        1081,
+        1193
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_18",
+      "category_id": "friend",
+      "name": "宇智波鼬",
+      "path": "custom_game/archive_items_v2/friend_18.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0418b5437ffe1fcde19b161026b7b10e9acd82758f3fbb715cd158eaa65e2354",
+      "real_alpha": true,
+      "alpha_bounds": [
+        222,
+        51,
+        1028,
+        1206
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_19",
+      "category_id": "friend",
+      "name": "埼玉",
+      "path": "custom_game/archive_items_v2/friend_19.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "40681187b6499d851f4ac7fc2d7d4cef553af7dc9dbd459843e62452b0b7945c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        196,
+        48,
+        1055,
+        1212
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_20",
+      "category_id": "friend",
+      "name": "鲁路修",
+      "path": "custom_game/archive_items_v2/friend_20.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b426cf0ab338f390e91a6ca1cfa060bf5c763127cb6065faf966f73819e1501c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        187,
+        28,
+        1095,
+        1226
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_21",
+      "category_id": "friend",
+      "name": "夜神月",
+      "path": "custom_game/archive_items_v2/friend_21.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "cf97ae1e7091acc933704d1265923497634551f953285241798a5e3553469afa",
+      "real_alpha": true,
+      "alpha_bounds": [
+        356,
+        35,
+        895,
+        1219
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_22",
+      "category_id": "friend",
+      "name": "爱德华",
+      "path": "custom_game/archive_items_v2/friend_22.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f2f291c76343a24e162afa536edbf0970d38d0e45b3f2aaaf70cfdd1aba85ff3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        220,
+        54,
+        1038,
+        1206
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_23",
+      "category_id": "friend",
+      "name": "自来也",
+      "path": "custom_game/archive_items_v2/friend_23.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "15897f5a65c4e83ba970e2387dbabb1e578a3a544ca4a8477247994c1d4db687",
+      "real_alpha": true,
+      "alpha_bounds": [
+        234,
+        43,
+        1021,
+        1209
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_24",
+      "category_id": "friend",
+      "name": "桐谷和人",
+      "path": "custom_game/archive_items_v2/friend_24.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8a0d8ca9bfa9cadfffd85ca2b29b5cd9db9bc7814acfb800c21e4a5e06d7be08",
+      "real_alpha": true,
+      "alpha_bounds": [
+        173,
+        23,
+        1009,
+        1230
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_25",
+      "category_id": "friend",
+      "name": "萧炎",
+      "path": "custom_game/archive_items_v2/friend_25.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e8b9728ceccf620d36ea025b602f0e658ede1a1a5cb0c4b01169f9b531a2bdb3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        241,
+        11,
+        1053,
+        1230
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_26",
+      "category_id": "friend",
+      "name": "唐三",
+      "path": "custom_game/archive_items_v2/friend_26.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0850a8b6962a6de71891f21aef5060a230e6cf0aeaeaf25fb574c64ca32ed13a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        155,
+        51,
+        1104,
+        1210
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_27",
+      "category_id": "friend",
+      "name": "石昊",
+      "path": "custom_game/archive_items_v2/friend_27.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "505dd186b605f63dda6b45734a8207abc29f26394473d068c59a0e804839a498",
+      "real_alpha": true,
+      "alpha_bounds": [
+        279,
+        13,
+        987,
+        1237
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_28",
+      "category_id": "friend",
+      "name": "叶凡",
+      "path": "custom_game/archive_items_v2/friend_28.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "997bf99ff8283fcd602a97bdddb9c936bbe033a8576473245cc5390f101ead8d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        155,
+        33,
+        1145,
+        1206
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_29",
+      "category_id": "friend",
+      "name": "韩立",
+      "path": "custom_game/archive_items_v2/friend_29.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "75141b482aaebfbd9888e8378d344562eecef472619a3790c8a31406afa014d3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        175,
+        38,
+        1081,
+        1220
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_30",
+      "category_id": "friend",
+      "name": "叶修",
+      "path": "custom_game/archive_items_v2/friend_30.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d4730ff41a13b00f9f53638a6be69927acb75e4379148d72a63b51bd9947c8e6",
+      "real_alpha": true,
+      "alpha_bounds": [
+        150,
+        30,
+        1217,
+        1219
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_31",
+      "category_id": "friend",
+      "name": "王林",
+      "path": "custom_game/archive_items_v2/friend_31.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ce1aeb5b58c05c5e2d9921112ff166835eb2a739f8db30fa58dae27cc8a51144",
+      "real_alpha": true,
+      "alpha_bounds": [
+        141,
+        28,
+        1139,
+        1215
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_32",
+      "category_id": "friend",
+      "name": "张小凡",
+      "path": "custom_game/archive_items_v2/friend_32.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "81a66142fad648fb50843289fd479cfe58cbbce56a41f3e347c5191382f5b6ec",
+      "real_alpha": true,
+      "alpha_bounds": [
+        240,
+        16,
+        1003,
+        1237
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_33",
+      "category_id": "friend",
+      "name": "范闲",
+      "path": "custom_game/archive_items_v2/friend_33.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bd0504670ad4792cd4ba43eec69ae7aef2f88c7a807ee60316efea70e9ad88fc",
+      "real_alpha": true,
+      "alpha_bounds": [
+        246,
+        16,
+        1038,
+        1231
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_34",
+      "category_id": "friend",
+      "name": "许七安",
+      "path": "custom_game/archive_items_v2/friend_34.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e36cc9da368fa5c45436955629174ad22054df341af6a01cb03500cd7fc32352",
+      "real_alpha": true,
+      "alpha_bounds": [
+        234,
+        21,
+        1025,
+        1221
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_35",
+      "category_id": "friend",
+      "name": "秦羽",
+      "path": "custom_game/archive_items_v2/friend_35.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "282d8d7412a29b3d1abe85ffb501e0f5f06913a7b567d33e578a4ab34163abe6",
+      "real_alpha": true,
+      "alpha_bounds": [
+        212,
+        25,
+        1057,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_36",
+      "category_id": "friend",
+      "name": "徐凤年",
+      "path": "custom_game/archive_items_v2/friend_36.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b2fbe4a42b9246dba604f0f4b665f5ca1c84626596caa8370087daffe98b6585",
+      "real_alpha": true,
+      "alpha_bounds": [
+        123,
+        29,
+        1110,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_37",
+      "category_id": "friend",
+      "name": "牧尘",
+      "path": "custom_game/archive_items_v2/friend_37.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a7881ad3869ceec3538ad9645c400a56cb8aaffbd5995cd50b431b391c497946",
+      "real_alpha": true,
+      "alpha_bounds": [
+        158,
+        29,
+        1085,
+        1219
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_38",
+      "category_id": "friend",
+      "name": "老天师",
+      "path": "custom_game/archive_items_v2/friend_38.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "58669d71b1486cdec19e068ce683a21b81abdc649c6ab3892e74b7b035e54c00",
+      "real_alpha": true,
+      "alpha_bounds": [
+        287,
+        16,
+        1015,
+        1231
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_39",
+      "category_id": "friend",
+      "name": "唐三",
+      "path": "custom_game/archive_items_v2/friend_39.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7a6c6783c9998b8dbe25f3404f245176baa63d08941dc5e6ca7a9afe967abd15",
+      "real_alpha": true,
+      "alpha_bounds": [
+        130,
+        51,
+        1167,
+        1206
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "friend_40",
+      "category_id": "friend",
+      "name": "袁天罡",
+      "path": "custom_game/archive_items_v2/friend_40.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e7ff2bc41673e1fc7a6225ac1706a247d9a7d23c0892de20b0a70b991b1a2be4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        202,
+        50,
+        1092,
+        1215
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_01",
+      "category_id": "ex",
+      "name": "胡桃",
+      "path": "custom_game/archive_items_v2/ex_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "54331109ae128eea4bee66db0a09967d93f9224fa8783533a85b4f0d1846d885",
+      "real_alpha": true,
+      "alpha_bounds": [
+        133,
+        29,
+        1126,
+        1224
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_02",
+      "category_id": "ex",
+      "name": "雷电将军",
+      "path": "custom_game/archive_items_v2/ex_02.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8e3574e59bddc8ebdaaf36361531bd861cec4f277bd30ec6de0c2ee56ebf509b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        200,
+        49,
+        1095,
+        1201
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_03",
+      "category_id": "ex",
+      "name": "刻晴",
+      "path": "custom_game/archive_items_v2/ex_03.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "fbd368da42b0b815c5908347d99027159710093f72d895523611a7111758c34d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        129,
+        17,
+        1157,
+        1237
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_04",
+      "category_id": "ex",
+      "name": "芙宁娜",
+      "path": "custom_game/archive_items_v2/ex_04.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "20fbae24b141945a35a43b5ee0e6eab451e3a911354f98058febe9cec140408f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        266,
+        6,
+        1047,
+        1243
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_05",
+      "category_id": "ex",
+      "name": "神里绫华",
+      "path": "custom_game/archive_items_v2/ex_05.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "febb6b7c388ec07ec179af95256809756f71af7b183523d7809a4a15aa8ca9a9",
+      "real_alpha": true,
+      "alpha_bounds": [
+        156,
+        10,
+        1081,
+        1241
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_06",
+      "category_id": "ex",
+      "name": "2B",
+      "path": "custom_game/archive_items_v2/ex_06.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4cb3623b9883e0da3f9ab14f12c17d1946e04e38a7d5dab20fda02db85f2d9b3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        277,
+        44,
+        1231,
+        1219
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_07",
+      "category_id": "ex",
+      "name": "春田",
+      "path": "custom_game/archive_items_v2/ex_07.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3712d46e1e3faa8fe5eeaf3b306b1ebbb053aa1ad45d3560e8d6c599856d138d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        194,
+        47,
+        1115,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_08",
+      "category_id": "ex",
+      "name": "雏田",
+      "path": "custom_game/archive_items_v2/ex_08.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "578d6cfe3d2bf0d2c016c04e625d04f343173aaa3a5ef769f17beb26b1b7c7ee",
+      "real_alpha": true,
+      "alpha_bounds": [
+        234,
+        43,
+        1020,
+        1213
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_09",
+      "category_id": "ex",
+      "name": "纲手",
+      "path": "custom_game/archive_items_v2/ex_09.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7d6042fd599a1426163407c670efba42dfd89b32cd719d4527586d0fd6266144",
+      "real_alpha": true,
+      "alpha_bounds": [
+        226,
+        16,
+        1082,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_10",
+      "category_id": "ex",
+      "name": "蒂法",
+      "path": "custom_game/archive_items_v2/ex_10.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3f02954c1f95303c9d4682d947c2de3f7a0d0e4e96f9696f9f2a37a331602d71",
+      "real_alpha": true,
+      "alpha_bounds": [
+        222,
+        47,
+        947,
+        1209
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_11",
+      "category_id": "ex",
+      "name": "姬如雪",
+      "path": "custom_game/archive_items_v2/ex_11.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0b250403175ca3e958d5086af5618fcd2414b3e058be89318c4b878b9aedef18",
+      "real_alpha": true,
+      "alpha_bounds": [
+        197,
+        22,
+        1051,
+        1233
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_12",
+      "category_id": "ex",
+      "name": "爱蜜莉雅",
+      "path": "custom_game/archive_items_v2/ex_12.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4e388f7a298d572ad40f3af675119a1c899ee0fc1668b1a0c89059e71e73373a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        195,
+        57,
+        1099,
+        1210
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_13",
+      "category_id": "ex",
+      "name": "雪乃",
+      "path": "custom_game/archive_items_v2/ex_13.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0ac866c384fce9f205b105a9ee3a4b73cfde408d5d01ffb2002ff709bf77c916",
+      "real_alpha": true,
+      "alpha_bounds": [
+        292,
+        28,
+        1040,
+        1226
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_14",
+      "category_id": "ex",
+      "name": "罗宾",
+      "path": "custom_game/archive_items_v2/ex_14.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "335f45b63ff16411874ac1bb2d867d64bf6be76d2b532af71b1a8ae593cb4f2e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        390,
+        70,
+        904,
+        1195
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_15",
+      "category_id": "ex",
+      "name": "薇尔莉特",
+      "path": "custom_game/archive_items_v2/ex_15.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7d6852929542fe2d54cbe327ef3bcb020cc696d26a87cb76d0385590df8bf251",
+      "real_alpha": true,
+      "alpha_bounds": [
+        264,
+        20,
+        1022,
+        1234
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_16",
+      "category_id": "ex",
+      "name": "爱莉希雅",
+      "path": "custom_game/archive_items_v2/ex_16.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f15f3b3c2c12a1357d06f92d81108b9c811583e5ff0b82101af42466334040a5",
+      "real_alpha": true,
+      "alpha_bounds": [
+        180,
+        21,
+        1106,
+        1226
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_17",
+      "category_id": "ex",
+      "name": "符华",
+      "path": "custom_game/archive_items_v2/ex_17.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "42b9d26c679ff632a8c5ae5448123265771cdc2885837bb1368fbeeafcd21c78",
+      "real_alpha": true,
+      "alpha_bounds": [
+        190,
+        17,
+        1121,
+        1235
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_18",
+      "category_id": "ex",
+      "name": "琪亚娜",
+      "path": "custom_game/archive_items_v2/ex_18.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ffbcc606813e21a8eb2da72d04db29e95f4b2fe0c7139a336b45a63d6134888a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        108,
+        35,
+        1188,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_19",
+      "category_id": "ex",
+      "name": "银狼",
+      "path": "custom_game/archive_items_v2/ex_19.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ca04a7d01ab535ff18d1c652d4a21b12384def38ec5f0c5a8fad2f1d77202c4f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        149,
+        28,
+        1167,
+        1215
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_20",
+      "category_id": "ex",
+      "name": "镜流",
+      "path": "custom_game/archive_items_v2/ex_20.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ef39aafb805a2c25b59c5485fa538d52cfdca7195f8cf8fdffe1b23d3be70454",
+      "real_alpha": true,
+      "alpha_bounds": [
+        155,
+        28,
+        1157,
+        1216
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_21",
+      "category_id": "ex",
+      "name": "祢豆子",
+      "path": "custom_game/archive_items_v2/ex_21.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "40668d7a77930d92f70f2f8a6945a28b58204be1476150a4b0ac076e3cb2af68",
+      "real_alpha": true,
+      "alpha_bounds": [
+        128,
+        50,
+        1126,
+        1213
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_22",
+      "category_id": "ex",
+      "name": "绫波丽",
+      "path": "custom_game/archive_items_v2/ex_22.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b97a69b8d003de822136d063f76a35e80e4d83503fa4512b179b0c5bcdaa29fd",
+      "real_alpha": true,
+      "alpha_bounds": [
+        335,
+        84,
+        931,
+        1183
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_23",
+      "category_id": "ex",
+      "name": "明日香",
+      "path": "custom_game/archive_items_v2/ex_23.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a4eb5341fc14f600a121543f56bf98686235f5f1e6224eea746dfa2e72b6fa2d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        136,
+        17,
+        1170,
+        1205
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_24",
+      "category_id": "ex",
+      "name": "三笠",
+      "path": "custom_game/archive_items_v2/ex_24.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "78a92ae8cf24d83ae2d38ae3be4863e44147ae6a6f461fd9a2379dfd1f71fa34",
+      "real_alpha": true,
+      "alpha_bounds": [
+        112,
+        65,
+        1126,
+        1197
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_25",
+      "category_id": "ex",
+      "name": "蕾姆",
+      "path": "custom_game/archive_items_v2/ex_25.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9574da8e2b9aa24ffd80c7f5b924ffbda4843b394d7d5a2c7ad973a21d33ebef",
+      "real_alpha": true,
+      "alpha_bounds": [
+        353,
+        49,
+        983,
+        1213
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_26",
+      "category_id": "ex",
+      "name": "蝴蝶忍",
+      "path": "custom_game/archive_items_v2/ex_26.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0e63ba955ad910b2ba5f3b103c9940d0d3f0013943dccb5bc55c60b2b351fc8d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        261,
+        17,
+        1002,
+        1236
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_27",
+      "category_id": "ex",
+      "name": "祈",
+      "path": "custom_game/archive_items_v2/ex_27.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e160965b1737027d2f55b35068ef3523b9a4090c4c10f7de3d435f3fe5587a82",
+      "real_alpha": true,
+      "alpha_bounds": [
+        184,
+        49,
+        1121,
+        1216
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_28",
+      "category_id": "ex",
+      "name": "云韵",
+      "path": "custom_game/archive_items_v2/ex_28.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8e0d6ecd6d3ccd18370f3e2546ac8faa7d326e5f300750b50a9ff0a39ddc4b14",
+      "real_alpha": true,
+      "alpha_bounds": [
+        147,
+        23,
+        1107,
+        1234
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_29",
+      "category_id": "ex",
+      "name": "火灵儿",
+      "path": "custom_game/archive_items_v2/ex_29.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c8a7ce6ee63e098e15d7f6e1868d59ab4ed9ed711e6cf5cc942b38dce9f0b0a4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        158,
+        41,
+        1138,
+        1193
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_30",
+      "category_id": "ex",
+      "name": "宁荣荣",
+      "path": "custom_game/archive_items_v2/ex_30.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d08d259258bda9cbd4125b2539ea124417f358b4d5e831f61c0bf4980c294794",
+      "real_alpha": true,
+      "alpha_bounds": [
+        207,
+        64,
+        1123,
+        1210
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_31",
+      "category_id": "ex",
+      "name": "美杜莎女王",
+      "path": "custom_game/archive_items_v2/ex_31.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1531dfbd907338a7b87c49c197b61946fc311c3eba0b18a365f6a4e40ed5b86f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        214,
+        25,
+        1065,
+        1227
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_32",
+      "category_id": "ex",
+      "name": "涂山雅雅",
+      "path": "custom_game/archive_items_v2/ex_32.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "234a9d29d576cd2c8fdf9caa6082beaba3e3c7b55a0583ebe9b7ad3e3a9595aa",
+      "real_alpha": true,
+      "alpha_bounds": [
+        126,
+        25,
+        1130,
+        1222
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_33",
+      "category_id": "ex",
+      "name": "贞德",
+      "path": "custom_game/archive_items_v2/ex_33.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ab4f040ac2246cdd299fe2c2d77b451d8f967477094f0509f1d6bc44f134bcf6",
+      "real_alpha": true,
+      "alpha_bounds": [
+        256,
+        7,
+        1232,
+        1222
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_34",
+      "category_id": "ex",
+      "name": "阿尔托莉雅",
+      "path": "custom_game/archive_items_v2/ex_34.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "22e9ccb7880554d83af979938a609f25562f0ecff21904e514ef7e96aeaedf0e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        191,
+        21,
+        1073,
+        1215
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_35",
+      "category_id": "ex",
+      "name": "玛修",
+      "path": "custom_game/archive_items_v2/ex_35.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6a2f09e84c7e8240c9b8eeffc5407dff156acc15b2cacba0f85602340663e661",
+      "real_alpha": true,
+      "alpha_bounds": [
+        179,
+        56,
+        995,
+        1205
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_36",
+      "category_id": "ex",
+      "name": "德克萨斯",
+      "path": "custom_game/archive_items_v2/ex_36.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7abc12ca7ed537edd399d1ddb23da031e75d2648a1ade7e83ee0880248f00ce0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        169,
+        20,
+        1042,
+        1233
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_37",
+      "category_id": "ex",
+      "name": "阿米娅",
+      "path": "custom_game/archive_items_v2/ex_37.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ee993c01c8990b1c8ea564ca43945b206a71b938bd41f176c1cf4620883e09b3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        219,
+        12,
+        1035,
+        1238
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_38",
+      "category_id": "ex",
+      "name": "时崎狂三",
+      "path": "custom_game/archive_items_v2/ex_38.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "638d4daba540a536539301b7ddf71dcf71b2d2fd591749d73ff3cb1307c1201b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        98,
+        79,
+        1176,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_39",
+      "category_id": "ex",
+      "name": "宝儿姐",
+      "path": "custom_game/archive_items_v2/ex_39.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1dbb000e85bebd314d7b075756399a3733c2f905d98b33121355bc9f719c7bd0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        190,
+        42,
+        1064,
+        1217
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "ex_40",
+      "category_id": "ex",
+      "name": "小舞",
+      "path": "custom_game/archive_items_v2/ex_40.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "cfd6260ece82411dafe86bf9db0b1e9acf7636bf2c449482c377d34846db1e7f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        374,
+        147,
+        908,
+        1112
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_01",
+      "category_id": "beast",
+      "name": "散魂钟",
+      "path": "custom_game/archive_items_v2/beast_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a88c8b712ca1957fab450b262093071f6374cc12c09224e4d61b38f06ec3f146",
+      "real_alpha": true,
+      "alpha_bounds": [
+        91,
+        54,
+        1174,
+        1197
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_02",
+      "category_id": "beast",
+      "name": "落宝金钱",
+      "path": "custom_game/archive_items_v2/beast_02.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "06043eb44ccdf4f4e0e0d0aa9ace8e7e32e3710afcf4605d47ec2a37d86234c3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        113,
+        91,
+        1188,
+        1157
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_03",
+      "category_id": "beast",
+      "name": "玄水瓶",
+      "path": "custom_game/archive_items_v2/beast_03.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c5a38768511b30e351bd09d65fcccacf31fdb15eb8131f2d9c0681da081a3dc5",
+      "real_alpha": true,
+      "alpha_bounds": [
+        107,
+        24,
+        1153,
+        1209
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_04",
+      "category_id": "beast",
+      "name": "定风珠",
+      "path": "custom_game/archive_items_v2/beast_04.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "aa108c87552afa6c4362f403d70675e0aa995287a2b4d3f7155804cd2deba725",
+      "real_alpha": true,
+      "alpha_bounds": [
+        127,
+        23,
+        1134,
+        1231
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_05",
+      "category_id": "beast",
+      "name": "缚龙索",
+      "path": "custom_game/archive_items_v2/beast_05.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6c7aaa89c8abeab1f9329d0eeb809239492214c6a52dcea53c49b71afb26ba50",
+      "real_alpha": true,
+      "alpha_bounds": [
+        209,
+        50,
+        1140,
+        1193
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_06",
+      "category_id": "beast",
+      "name": "神火罩",
+      "path": "custom_game/archive_items_v2/beast_06.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f0ed10252d928dfbb443f754d31e51213b66332e4b1a02c13bfb8babd58c6259",
+      "real_alpha": true,
+      "alpha_bounds": [
+        99,
+        49,
+        1155,
+        1193
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_07",
+      "category_id": "beast",
+      "name": "琉璃瓶",
+      "path": "custom_game/archive_items_v2/beast_07.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1e5321af2ea006c4ab7b66b652aa7d2f81b3d74c9e6ace9bb7e907a857a4ac7b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        101,
+        53,
+        1147,
+        1166
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_08",
+      "category_id": "beast",
+      "name": "风雷翅",
+      "path": "custom_game/archive_items_v2/beast_08.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "14d781ee288336c1974029052fadf882ed4f9c6e7a3982019b337583fe7b876c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        93,
+        47,
+        1176,
+        1176
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_09",
+      "category_id": "beast",
+      "name": "金蛟剪",
+      "path": "custom_game/archive_items_v2/beast_09.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b1ce81eacdeb6f75ec6c0ec71f6ac559a3d7f96e0dcc4547ae2dc8a4da332331",
+      "real_alpha": true,
+      "alpha_bounds": [
+        144,
+        51,
+        1141,
+        1219
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_10",
+      "category_id": "beast",
+      "name": "乾坤图",
+      "path": "custom_game/archive_items_v2/beast_10.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0ce5e26c9247dbe059825664901c313e6183bb2455b69326c494eb80e10ab79c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        144,
+        97,
+        1145,
+        1182
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_11",
+      "category_id": "beast",
+      "name": "杏黄旗",
+      "path": "custom_game/archive_items_v2/beast_11.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d7fabdb34be626e115ee493eaaa4ce4d68943015111c8c5aea9ae826e642ef60",
+      "real_alpha": true,
+      "alpha_bounds": [
+        79,
+        46,
+        1210,
+        1195
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_12",
+      "category_id": "beast",
+      "name": "焰光旗",
+      "path": "custom_game/archive_items_v2/beast_12.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "7c9221bb31613c933d7a74582d50a4354ff1c15ff5522191b8f56afb733dfdf6",
+      "real_alpha": true,
+      "alpha_bounds": [
+        48,
+        10,
+        1240,
+        1231
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_13",
+      "category_id": "beast",
+      "name": "云界旗",
+      "path": "custom_game/archive_items_v2/beast_13.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "2c74adca12114a854ab2fd0e0108a0d458864633de56f8ffdb6ce49eb6941678",
+      "real_alpha": true,
+      "alpha_bounds": [
+        187,
+        251,
+        1120,
+        1027
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_14",
+      "category_id": "beast",
+      "name": "控水旗",
+      "path": "custom_game/archive_items_v2/beast_14.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "150d67e27abe9f8e87eaea7b1472f4a953b2c9092f491d2c1a756d295bcc4d37",
+      "real_alpha": true,
+      "alpha_bounds": [
+        173,
+        31,
+        1175,
+        1206
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_15",
+      "category_id": "beast",
+      "name": "宝色旗",
+      "path": "custom_game/archive_items_v2/beast_15.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "dad8e1f9681b31865b1acb2b9a01ed93e2426ecc848f7c8112ef2672d093b08f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        27,
+        23,
+        1228,
+        1215
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_16",
+      "category_id": "beast",
+      "name": "太极图",
+      "path": "custom_game/archive_items_v2/beast_16.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "72862a620bdfd5e4ffcf82d4170b9619f8c2e11076b4c17ff1319996e251abee",
+      "real_alpha": true,
+      "alpha_bounds": [
+        117,
+        37,
+        1142,
+        1200
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_17",
+      "category_id": "beast",
+      "name": "乾坤尺",
+      "path": "custom_game/archive_items_v2/beast_17.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c989097c8284998e973198781095402460852c7d78060c27cb8ce187a41a1a4a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        164,
+        19,
+        1150,
+        1203
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_18",
+      "category_id": "beast",
+      "name": "业火红莲",
+      "path": "custom_game/archive_items_v2/beast_18.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6ed6e802474861e4fbac7dc5188b9c7d50d4afc86e7af2369b3096de71cbd37c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        89,
+        20,
+        1168,
+        1222
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_19",
+      "category_id": "beast",
+      "name": "混元金斗",
+      "path": "custom_game/archive_items_v2/beast_19.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "94d54ac84d43bb1fb79fca3401703135386c17915da6c3b1be7c12d49fee2b61",
+      "real_alpha": true,
+      "alpha_bounds": [
+        125,
+        54,
+        1136,
+        1196
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_20",
+      "category_id": "beast",
+      "name": "定海珠",
+      "path": "custom_game/archive_items_v2/beast_20.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9d7544ee2dac7b89b3e546df1b26de8331c69def2ade413b305d6d52fc2768c3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        143,
+        97,
+        1185,
+        1146
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_21",
+      "category_id": "beast",
+      "name": "化血神刀",
+      "path": "custom_game/archive_items_v2/beast_21.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0bc9444e4c78f7bcddba899756aee33a0ddeb1d55d70ba9ce086c8af71ce9bfc",
+      "real_alpha": true,
+      "alpha_bounds": [
+        66,
+        16,
+        1242,
+        1236
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_22",
+      "category_id": "beast",
+      "name": "风火圈",
+      "path": "custom_game/archive_items_v2/beast_22.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c431321078a67371ff358d1a1f6c75ced68ad66cb862ffc4794275bf3dbba32f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        105,
+        23,
+        1177,
+        1217
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_23",
+      "category_id": "beast",
+      "name": "六魂幡",
+      "path": "custom_game/archive_items_v2/beast_23.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "727ccbf8d709b0a35f548d2262b0f37e6bf6a217666f0152a0dd598210309af2",
+      "real_alpha": true,
+      "alpha_bounds": [
+        49,
+        37,
+        1217,
+        1216
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_24",
+      "category_id": "beast",
+      "name": "灭世黑莲",
+      "path": "custom_game/archive_items_v2/beast_24.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "952e33f7d4e205103478c6e55074725617b349239bd4a10c3d5bb1c01918a009",
+      "real_alpha": true,
+      "alpha_bounds": [
+        159,
+        32,
+        1147,
+        1225
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_25",
+      "category_id": "beast",
+      "name": "功德金莲",
+      "path": "custom_game/archive_items_v2/beast_25.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a9c4615117513a0f06ed648953c4430dce4686957428279fc49906c7fb88cc8d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        140,
+        6,
+        1136,
+        1235
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_26",
+      "category_id": "beast",
+      "name": "番天印",
+      "path": "custom_game/archive_items_v2/beast_26.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "997a0bd8a139dc1705ce3e7987101ca3b8f43df4d2fd16ac55d3e93e88df026b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        112,
+        65,
+        1200,
+        1192
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_27",
+      "category_id": "beast",
+      "name": "混沌钟",
+      "path": "custom_game/archive_items_v2/beast_27.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "cb5bafa0d9f5540a1361e3129c16b8b7e92077eb2aded66c40be0e42626f1fe9",
+      "real_alpha": true,
+      "alpha_bounds": [
+        116,
+        44,
+        1155,
+        1178
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_28",
+      "category_id": "beast",
+      "name": "诛仙剑",
+      "path": "custom_game/archive_items_v2/beast_28.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "ac74ccfce55a1f814bb3e2da31afd883a22922081a0ff7841bafcde47ee13240",
+      "real_alpha": true,
+      "alpha_bounds": [
+        104,
+        69,
+        1216,
+        1209
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_29",
+      "category_id": "beast",
+      "name": "戮仙剑",
+      "path": "custom_game/archive_items_v2/beast_29.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b6c87bd2585bccb98205828f571b1cfd6bf39bb82bca30959482af2625622d8d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        117,
+        19,
+        1155,
+        1204
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_30",
+      "category_id": "beast",
+      "name": "陷仙剑",
+      "path": "custom_game/archive_items_v2/beast_30.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d6bfaab3653f45fd68661459db094e5e482b4bab91043342cf7ebde1aec60728",
+      "real_alpha": true,
+      "alpha_bounds": [
+        69,
+        30,
+        1205,
+        1210
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_31",
+      "category_id": "beast",
+      "name": "绝仙剑",
+      "path": "custom_game/archive_items_v2/beast_31.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "831e50e355229134003225a7c0efc44827a79cc72b397c1131b7697a21fd1efc",
+      "real_alpha": true,
+      "alpha_bounds": [
+        83,
+        5,
+        1221,
+        1240
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_32",
+      "category_id": "beast",
+      "name": "盘古幡",
+      "path": "custom_game/archive_items_v2/beast_32.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d20e119835b07d0bf59c00dcd673f7aef19a0e203177c31fa1c980561e01a0ab",
+      "real_alpha": true,
+      "alpha_bounds": [
+        74,
+        37,
+        1219,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_33",
+      "category_id": "beast",
+      "name": "七禽扇",
+      "path": "custom_game/archive_items_v2/beast_33.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "44feade15e106d77914b5d20ade4b4626bc261ff8a1a189a25370b5f1b3e4516",
+      "real_alpha": true,
+      "alpha_bounds": [
+        106,
+        50,
+        1181,
+        1184
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_34",
+      "category_id": "beast",
+      "name": "斩仙飞刀",
+      "path": "custom_game/archive_items_v2/beast_34.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "74f86519e89c07ea9eed49ba22f9591503d56bd42737b20f5289f1aef8c247f7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        44,
+        88,
+        1225,
+        1177
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_35",
+      "category_id": "beast",
+      "name": "七宝妙树",
+      "path": "custom_game/archive_items_v2/beast_35.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "af6d0f90f2d795e62c4feb0f4da9b1fd013d23fb8b8f8b6db09a1454caf0c2a2",
+      "real_alpha": true,
+      "alpha_bounds": [
+        119,
+        71,
+        1138,
+        1190
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_36",
+      "category_id": "beast",
+      "name": "社稷图",
+      "path": "custom_game/archive_items_v2/beast_36.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "255c080d99b2a514f00e4b9ff0c53f56af6f37a19828d328195d17d8dd5bae4b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        99,
+        76,
+        1210,
+        1189
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_37",
+      "category_id": "beast",
+      "name": "玄黄塔",
+      "path": "custom_game/archive_items_v2/beast_37.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "763d1edc328890e051162045571ec15d3ed89aa60cc081bdba48226974b2b80b",
+      "real_alpha": true,
+      "alpha_bounds": [
+        199,
+        28,
+        1167,
+        1202
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_38",
+      "category_id": "beast",
+      "name": "开天斧",
+      "path": "custom_game/archive_items_v2/beast_38.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1368f32aee512aaaf6feab3b31a69938273a75e16f22bab30006c1e996c6fb42",
+      "real_alpha": true,
+      "alpha_bounds": [
+        123,
+        64,
+        1218,
+        1222
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_39",
+      "category_id": "beast",
+      "name": "混沌珠",
+      "path": "custom_game/archive_items_v2/beast_39.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6025b698c471c812fb026ff5b4dfca7f1368c9310679e6aea6866e38aca84ab4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        167,
+        67,
+        1195,
+        1180
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "beast_40",
+      "category_id": "beast",
+      "name": "造化玉碟",
+      "path": "custom_game/archive_items_v2/beast_40.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bc445d43553254385fdb8774877369054519b614973226d405d7b7fec851fccd",
+      "real_alpha": true,
+      "alpha_bounds": [
+        39,
+        42,
+        1239,
+        1215
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_001",
+      "category_id": "fishing",
+      "name": "青萍",
+      "path": "custom_game/archive_items_v2/star_blessing_001.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "28f6972a271229bcf876cf02f699c8fbb28de1bd388bc6409075cc5322ca1f03",
+      "real_alpha": true,
+      "alpha_bounds": [
+        98,
+        89,
+        1187,
+        1195
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_002",
+      "category_id": "fishing",
+      "name": "浮玉",
+      "path": "custom_game/archive_items_v2/star_blessing_002.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a6cca19709f51d431238a7da8ba0d4397b6a9e57e01b4da204387ecaa9e2f9c0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        55,
+        116,
+        1204,
+        1153
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_003",
+      "category_id": "fishing",
+      "name": "银朱",
+      "path": "custom_game/archive_items_v2/star_blessing_003.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "da9afac0dcf35f966b9801e3c9cd69b821588b0e441e4e293ab63606fa0da94f",
+      "real_alpha": true,
+      "alpha_bounds": [
+        95,
+        61,
+        1186,
+        1186
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_004",
+      "category_id": "fishing",
+      "name": "墨影",
+      "path": "custom_game/archive_items_v2/star_blessing_004.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "17511e93af62d88c9a5d99cb230b9b6ae2030e9577635a56db9d0bc01df51a8e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        59,
+        57,
+        1209,
+        1190
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_005",
+      "category_id": "fishing",
+      "name": "雪沫",
+      "path": "custom_game/archive_items_v2/star_blessing_005.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "15fb3d4c5c22e4034b0f86f67a4dabf5a4a019c57dd4bd1f4649968a524e9c93",
+      "real_alpha": true,
+      "alpha_bounds": [
+        124,
+        100,
+        1200,
+        1182
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_006",
+      "category_id": "fishing",
+      "name": "素锦",
+      "path": "custom_game/archive_items_v2/star_blessing_006.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "23c1c78b06c3a85030e7c26dee8a6cf7df8c4a8457af0e12df264b7320049957",
+      "real_alpha": true,
+      "alpha_bounds": [
+        105,
+        68,
+        1219,
+        1183
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_007",
+      "category_id": "fishing",
+      "name": "星子",
+      "path": "custom_game/archive_items_v2/star_blessing_007.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0b20f6a5a3325968333f9808b8f8727c08716d34e8694e00e237c51fffd65cdd",
+      "real_alpha": true,
+      "alpha_bounds": [
+        117,
+        114,
+        1168,
+        1131
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_008",
+      "category_id": "fishing",
+      "name": "寸渊",
+      "path": "custom_game/archive_items_v2/star_blessing_008.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f9c54933e080181689d5d046723a52787aca3e452360d9241421a60cb2a6fcb7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        103,
+        109,
+        1179,
+        1169
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_009",
+      "category_id": "fishing",
+      "name": "秋毫",
+      "path": "custom_game/archive_items_v2/star_blessing_009.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bd42a282ad74757df7245457a9b022df44eb22eac2e8f041e4d10b75c3230db8",
+      "real_alpha": true,
+      "alpha_bounds": [
+        145,
+        64,
+        1202,
+        1204
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_010",
+      "category_id": "fishing",
+      "name": "逍遥",
+      "path": "custom_game/archive_items_v2/star_blessing_010.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a4123e2871b0cd782e4498ac2ffbab57d00001552536d41e5a0997da1ade5912",
+      "real_alpha": true,
+      "alpha_bounds": [
+        86,
+        76,
+        1215,
+        1187
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_011",
+      "category_id": "fishing",
+      "name": "从容",
+      "path": "custom_game/archive_items_v2/star_blessing_011.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "bb1a74140eceacf3f4e923e5bf8505ce7ccb9bd4ba8fc71395da15dccd5722c3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        129,
+        68,
+        1218,
+        1198
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_012",
+      "category_id": "fishing",
+      "name": "沧浪",
+      "path": "custom_game/archive_items_v2/star_blessing_012.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "b4b746052fd9634445bad2f1fa0a74581953c129abd6c27942f61ca160395f10",
+      "real_alpha": true,
+      "alpha_bounds": [
+        82,
+        73,
+        1187,
+        1162
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_013",
+      "category_id": "fishing",
+      "name": "碧虚",
+      "path": "custom_game/archive_items_v2/star_blessing_013.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f9ee653825349cde763bd1e32d4f94f21a8dba35adcf190a5963caee2385bfc6",
+      "real_alpha": true,
+      "alpha_bounds": [
+        97,
+        100,
+        1203,
+        1154
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_014",
+      "category_id": "fishing",
+      "name": "澹然",
+      "path": "custom_game/archive_items_v2/star_blessing_014.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "51489e045907064eda59fca1ab35545637b50c7e7e560c3264f24ab76dddffc3",
+      "real_alpha": true,
+      "alpha_bounds": [
+        88,
+        108,
+        1212,
+        1165
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_015",
+      "category_id": "fishing",
+      "name": "清晏",
+      "path": "custom_game/archive_items_v2/star_blessing_015.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "9614fab8a4e110e34a4ff51e56f5e983732ec3dc600e2b388e16bc5e5baa8c67",
+      "real_alpha": true,
+      "alpha_bounds": [
+        66,
+        88,
+        1202,
+        1169
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_016",
+      "category_id": "fishing",
+      "name": "云汀",
+      "path": "custom_game/archive_items_v2/star_blessing_016.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "147ac42e7d0008cdb0b068f803dd926bad9f28d17906ecc901a31e6dbe524be4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        53,
+        68,
+        1218,
+        1188
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_017",
+      "category_id": "fishing",
+      "name": "鲲息",
+      "path": "custom_game/archive_items_v2/star_blessing_017.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a1f71ee6b1a0f26aca5cd36fb849f13ee76ab17547030d1e34d1446a3269643a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        37,
+        68,
+        1221,
+        1192
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_018",
+      "category_id": "fishing",
+      "name": "负天",
+      "path": "custom_game/archive_items_v2/star_blessing_018.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f9045a2a14c2374cf132b26152f75b1ea738f8da1f07a58ff49b9d10d662671c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        137,
+        36,
+        1139,
+        1217
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_019",
+      "category_id": "fishing",
+      "name": "蓬莱",
+      "path": "custom_game/archive_items_v2/star_blessing_019.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6d1ebbce00e2bd66e5914ab240238369366341b1b10e64ca5b3a707b52060f47",
+      "real_alpha": true,
+      "alpha_bounds": [
+        44,
+        59,
+        1210,
+        1196
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_020",
+      "category_id": "fishing",
+      "name": "龙骧",
+      "path": "custom_game/archive_items_v2/star_blessing_020.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "04d31c85b01d9143a8643f0813e32d9858485619a4e8def6bd3bb4c88a0107a0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        84,
+        43,
+        1198,
+        1201
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_021",
+      "category_id": "fishing",
+      "name": "定海",
+      "path": "custom_game/archive_items_v2/star_blessing_021.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "da97ba6efbfcccc27fdf3f9c8d5a6dacacfa6c4506451d8fe5db33db92228dc8",
+      "real_alpha": true,
+      "alpha_bounds": [
+        107,
+        26,
+        1221,
+        1229
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_022",
+      "category_id": "fishing",
+      "name": "太玄",
+      "path": "custom_game/archive_items_v2/star_blessing_022.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4111b23f19d337f7fae1d8408d3b5efcfd76a58066b38d0a35e8db01259b5eee",
+      "real_alpha": true,
+      "alpha_bounds": [
+        72,
+        92,
+        1206,
+        1169
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_023",
+      "category_id": "fishing",
+      "name": "归墟",
+      "path": "custom_game/archive_items_v2/star_blessing_023.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "425a274a87a333ccbc9b3c48fd0aaa3f341843d473ec6174cdce9d7f4d679c1e",
+      "real_alpha": true,
+      "alpha_bounds": [
+        75,
+        44,
+        1211,
+        1205
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_024",
+      "category_id": "fishing",
+      "name": "坤舆",
+      "path": "custom_game/archive_items_v2/star_blessing_024.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "44a553ae2f32d8f9f550acec1f2be74f271afe1cc4749ff0d3a2c0bd6f7cb934",
+      "real_alpha": true,
+      "alpha_bounds": [
+        45,
+        69,
+        1227,
+        1202
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_025",
+      "category_id": "fishing",
+      "name": "霍云",
+      "path": "custom_game/archive_items_v2/star_blessing_025.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6d0f1523a75969bb73642bc973ff536af0e015b751377aa99d0eb19ec0b0de2a",
+      "real_alpha": true,
+      "alpha_bounds": [
+        53,
+        81,
+        1206,
+        1183
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "star_blessing_026",
+      "category_id": "fishing",
+      "name": "北冥",
+      "path": "custom_game/archive_items_v2/star_blessing_026.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "3189081d1dea54f17adc36737e7e74f0aeef52724315ef4e36af353294ff2d7c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        44,
+        41,
+        1228,
+        1214
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_01",
+      "category_id": "building",
+      "name": "玲珑心",
+      "path": "custom_game/archive_items_v2/building_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f678e8b2ec2fc06e03d5a54fd959572ab8433e40a1bd32f0c07466c71b0ff026",
+      "real_alpha": true,
+      "alpha_bounds": [
+        115,
+        52,
+        1138,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_02",
+      "category_id": "building",
+      "name": "圣剑",
+      "path": "custom_game/archive_items_v2/building_02.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "899482dc8eea330b213b08749b68c7fde635add511608e1ee8d86b3e43c5c1ea",
+      "real_alpha": true,
+      "alpha_bounds": [
+        163,
+        45,
+        1217,
+        1222
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_03",
+      "category_id": "building",
+      "name": "赤红甲",
+      "path": "custom_game/archive_items_v2/building_03.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d4a9bd57abe030fc4ef1d715227c85a0a657c80491273cad46fe16408c062d2c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        48,
+        67,
+        1205,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_04",
+      "category_id": "building",
+      "name": "大剑",
+      "path": "custom_game/archive_items_v2/building_04.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8b4175da7ebb21d0385227e120b634e27cf2f4deb777dc6a0d672fedcda0126d",
+      "real_alpha": true,
+      "alpha_bounds": [
+        13,
+        15,
+        1234,
+        1234
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_05",
+      "category_id": "building",
+      "name": "深渊之刃",
+      "path": "custom_game/archive_items_v2/building_05.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "4b3096664dd6a5a3ebe62244666448eaba418d9f26c896e4d537519761785d9c",
+      "real_alpha": true,
+      "alpha_bounds": [
+        37,
+        65,
+        1228,
+        1201
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_06",
+      "category_id": "building",
+      "name": "板甲",
+      "path": "custom_game/archive_items_v2/building_06.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "1856411b46954a9e4ee5a057ec139f6785ecff6af89ce99c99c1a9e927d578c7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        103,
+        100,
+        1179,
+        1172
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_07",
+      "category_id": "building",
+      "name": "秘法鞋",
+      "path": "custom_game/archive_items_v2/building_07.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "35008afd572f9a4a0dedf81d1b916595f6e92034d2abc64e1b252bbf88a4a8fc",
+      "real_alpha": true,
+      "alpha_bounds": [
+        99,
+        80,
+        1195,
+        1173
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_08",
+      "category_id": "building",
+      "name": "狂战斧",
+      "path": "custom_game/archive_items_v2/building_08.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "35e318be2cbcf46ff5c34dc3948c7f38c148bc507b8416c3f454f472cf417aae",
+      "real_alpha": true,
+      "alpha_bounds": [
+        149,
+        47,
+        1175,
+        1156
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "building_09",
+      "category_id": "building",
+      "name": "雷神之锤",
+      "path": "custom_game/archive_items_v2/building_09.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "428cd487beaa05860521cfd65341959ec0fe1d84c1554770e7655b8f06ece370",
+      "real_alpha": true,
+      "alpha_bounds": [
+        168,
+        49,
+        1015,
+        1192
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_weapon_growth_sword_01",
+      "category_id": "shop",
+      "name": "成长之剑",
+      "path": "custom_game/archive_items_v2/shop_weapon_growth_sword_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "a77f977b5225103cd8d13fd40e37330fd88844166b555ee2cf8f53d2eebe63f7",
+      "real_alpha": true,
+      "alpha_bounds": [
+        52,
+        28,
+        1205,
+        1220
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_item_forging_hammer",
+      "category_id": "shop",
+      "name": "锻造之锤",
+      "path": "custom_game/archive_items_v2/shop_item_forging_hammer.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "240387b6a6d673edc804a64bddf55fc302260996f824d5abe11de2f6c66cd7ec",
+      "real_alpha": true,
+      "alpha_bounds": [
+        88,
+        68,
+        1204,
+        1194
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_equipment_attack_gloves_01",
+      "category_id": "shop",
+      "name": "加速手套LV1",
+      "path": "custom_game/archive_items_v2/shop_equipment_attack_gloves_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "26578ae00d58346877670a468838f3eb0438f4547d679c18295d98c0691fba89",
+      "real_alpha": true,
+      "alpha_bounds": [
+        72,
+        96,
+        1217,
+        1157
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_equipment_burning_blade_01",
+      "category_id": "shop",
+      "name": "灼热之刃LV1",
+      "path": "custom_game/archive_items_v2/shop_equipment_burning_blade_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "8c955e165225a28ea515e7264d83cf3f10e7b5b42cf173e459968353dbe23ac0",
+      "real_alpha": true,
+      "alpha_bounds": [
+        105,
+        49,
+        1222,
+        1213
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_equipment_iron_armor_01",
+      "category_id": "shop",
+      "name": "铁甲LV1",
+      "path": "custom_game/archive_items_v2/shop_equipment_iron_armor_01.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e09ce0ff733886928efb5abba4be591428cc5ba20b0180ec62d2b51305ea4797",
+      "real_alpha": true,
+      "alpha_bounds": [
+        56,
+        78,
+        1210,
+        1190
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_item_death_mask",
+      "category_id": "shop",
+      "name": "死亡面罩",
+      "path": "custom_game/archive_items_v2/shop_item_death_mask.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e66be82fa58092647ecafbb4da6bc2e6f50817d51be1ea3a44f143bf52c199e4",
+      "real_alpha": true,
+      "alpha_bounds": [
+        79,
+        71,
+        1176,
+        1186
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_item_small_polar_crystal",
+      "category_id": "shop",
+      "name": "小极地晶石",
+      "path": "custom_game/archive_items_v2/shop_item_small_polar_crystal.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "0737a84874ef2c04a03b1cf08e7bff361ef42d4ec5c66d359ea813d803a8e695",
+      "real_alpha": true,
+      "alpha_bounds": [
+        256,
+        115,
+        1024,
+        1139
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_item_knowledge_book",
+      "category_id": "shop",
+      "name": "知识之书",
+      "path": "custom_game/archive_items_v2/shop_item_knowledge_book.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f88d868bfba3f0a3d5ce8214187fb86bcb38ed6f4f951163fc498154b68b3793",
+      "real_alpha": true,
+      "alpha_bounds": [
+        136,
+        89,
+        1126,
+        1166
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_item_super_knowledge_book",
+      "category_id": "shop",
+      "name": "超级知识之书",
+      "path": "custom_game/archive_items_v2/shop_item_super_knowledge_book.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "23c330393002ddd1ae2bde36556117a12cd563f92ac805b50eb9c96cd6cf5627",
+      "real_alpha": true,
+      "alpha_bounds": [
+        92,
+        71,
+        1184,
+        1187
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_bytes_preserved": true
+    },
+    {
+      "item_id": "shop_service_early_final_boss",
+      "category_id": "shop",
+      "name": "提前通关",
+      "path": "custom_game/archive_items_v2/shop_service_early_final_boss.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "d9ee2d61d17472d41748c04f9b620151d9f6f7a111b3aef10ee355f3d8e83575",
+      "real_alpha": true,
+      "alpha_bounds": [
+        192,
+        21,
+        1066,
+        1211
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "original_bytes_preserved": true
+    }
+  ]
+}

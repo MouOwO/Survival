@@ -1,0 +1,377 @@
+﻿category_id,item_id,tone,color,tint_icon,portrait_x,portrait_y,portrait_width,note
+points,lottery_attribute_crystal,neutral,#aebbc1,0,,,,配置品质 N
+friend,friend_01,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_01,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+points,lottery_protection_crystal,neutral,#aebbc1,0,,,,配置品质 N
+points,lottery_nature_crystal,neutral,#aebbc1,0,,,,配置品质 N
+friend,friend_02,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_03,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_02,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_03,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+points,lottery_bombardment_crystal,neutral,#aebbc1,0,,,,配置品质 N
+points,lottery_recovery_crystal,neutral,#aebbc1,0,,,,配置品质 N
+points,lottery_resistance_crystal,neutral,#aebbc1,0,,,,配置品质 N
+points,lottery_expansion_crystal,neutral,#aebbc1,0,,,,配置品质 N
+points,lottery_shooting_crystal,neutral,#aebbc1,0,,,,配置品质 N
+friend,friend_04,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_05,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_06,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_07,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_04,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_05,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_06,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_07,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+points,lottery_wealth_crystal,neutral,#aebbc1,0,,,,配置品质 N
+points,lottery_lumber_crystal,neutral,#aebbc1,0,,,,配置品质 N
+points,lottery_recovery_spirit,neutral,#aebbc1,0,,,,配置品质 N
+points,lottery_life_spirit,green,#76be91,0,,,,配置品质 R
+friend,friend_08,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_09,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_10,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_11,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_12,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_08,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_09,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_10,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_11,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_12,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+points,lottery_nature_spirit,green,#76be91,0,,,,配置品质 R
+points,lottery_sharp_spirit,green,#76be91,0,,,,配置品质 R
+points,lottery_divine_spirit,green,#76be91,0,,,,配置品质 R
+points,lottery_universal_tool,blue,#79adf0,0,,,,配置品质 SR
+points,lottery_gale_bow,blue,#79adf0,0,,,,配置品质 SR
+points,lottery_swift_emblem,blue,#79adf0,0,,,,配置品质 SR
+points,lottery_quick_dry_cement,blue,#79adf0,0,,,,配置品质 SR
+points,lottery_windspeed_bowstring,blue,#79adf0,0,,,,配置品质 SR
+points,lottery_hippogryph_onslaught,violet,#b68ae2,0,,,,配置品质 SSR
+friend,friend_13,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_14,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_15,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_16,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_17,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_18,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_19,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_20,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_13,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_14,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_15,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_16,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_17,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_18,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_19,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_20,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+points,lottery_soul_devouring_blade,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_tower_retrofit,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_steel_wall,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_gathering_grimoire,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_gathering_divine_codex,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_aaron_cannon,violet,#b68ae2,0,,,,配置品质 SSR
+friend,friend_21,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_22,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_23,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_24,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_25,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_26,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_27,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_21,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_22,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_23,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_24,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_25,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_26,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_27,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+points,lottery_darksteel_wall,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_lumber_legacy,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_titan_shield,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_reincarnation_orb,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_time_orb,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_divine_tower_blessing,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_abundance_blessing,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_omniscience_blessing,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_unbreakable_fortress,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_struggle_diary,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_chosen_hero,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_chief_god_blessing,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_ember_of_legacy,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_lumber_immortal,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_supreme_fishing_rod,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_flame_wall,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_magical_girl_juggernaut,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_forest_burning_edge,gold,#e5b758,0,,,,配置品质 UR
+friend,friend_28,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_29,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_30,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_31,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_32,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_33,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_34,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_35,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_36,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_37,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_38,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_39,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+friend,friend_40,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_28,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_29,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_30,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_31,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_32,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_33,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_34,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_35,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_36,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_37,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_38,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_39,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+ex,ex_40,,,0,,,,独立透明大头图；完整等比显示，不使用旧全身图裁剪
+points,lottery_endless_growth_ring,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_lumber_fury,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_candle_dragon_wing,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_oak_bulwark,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_seed_of_all_wood,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_sharpwood_tower_core,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_hero_medal,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_monkey_king,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_immortal_nirvana,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_soul_lock_box,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_sky_turning_seal,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_heaven_devouring_pill,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_heaven_reaching_tower_seal,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_sovereign_under_heaven,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_greenwood_rampart,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_lumber_expert,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_woodforged_thousand_arrows,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_greenwood_nirvana,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_fallen_sky_mine,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_jade_purity_sword_immortal,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_immortal_slaying_sword_array,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_investiture_of_gods,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_heavenly_puppet,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_mountain_sea_kunpeng,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_reincarnation_immortal_stele,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_ancient_pine_fortification,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_woodcraft_grandmaster,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_forestcast_thousand_bolts,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_emerald_wood_origin,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_dimensional_barrier,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_orbital_cannon_core,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_nano_cluster,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_cyber_overlord,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_neural_reconstruction_module,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_void_signal_terminal,gold,#e5b758,0,,,,配置品质 UR
+points,lottery_nitride_alloy_wall,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_data_unit,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_pulse_conduction_turret,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_cybernetic_implant,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_crystalline_armor,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_signal_hub,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_magnetic_disruption_turret,violet,#b68ae2,0,,,,配置品质 SSR
+points,lottery_rift_implant,violet,#b68ae2,0,,,,配置品质 SSR
+points,daily_growth_gem,green,#76be91,0,,,,配置品质 R
+points,daily_regen_shard,green,#76be91,0,,,,配置品质 R
+points,daily_attribute_gem,green,#76be91,0,,,,配置品质 R
+points,daily_attack_shard,green,#76be91,0,,,,配置品质 R
+points,daily_health_gem,green,#76be91,0,,,,配置品质 R
+points,daily_wood_gem,green,#76be91,0,,,,配置品质 R
+points,daily_block_shard,green,#76be91,0,,,,配置品质 R
+points,daily_attribute_shard,green,#76be91,0,,,,配置品质 R
+points,daily_gold_gem,green,#76be91,0,,,,配置品质 R
+points,daily_wealth_talisman,violet,#b68ae2,0,,,,配置品质 SSR
+points,daily_ancient_tree,violet,#b68ae2,0,,,,配置品质 SSR
+points,daily_forest_origin,violet,#b68ae2,0,,,,配置品质 SSR
+clear,clear_n1_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n1_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n1_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n2_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n2_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n2_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n2_10,gold,#e5b758,1,,,,通关 10 次
+clear,clear_n3_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n3_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n3_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n3_10,gold,#e5b758,1,,,,通关 10 次
+clear,clear_n3_20,rose,#e18ca2,1,,,,通关 20 次
+clear,clear_n4_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n4_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n4_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n4_10,gold,#e5b758,1,,,,通关 10 次
+clear,clear_n4_20,rose,#e18ca2,1,,,,通关 20 次
+clear,clear_n5_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n5_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n5_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n5_10,gold,#e5b758,1,,,,通关 10 次
+clear,clear_n5_20,rose,#e18ca2,1,,,,通关 20 次
+clear,clear_n6_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n6_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n6_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n6_10,gold,#e5b758,1,,,,通关 10 次
+clear,clear_n6_20,rose,#e18ca2,1,,,,通关 20 次
+clear,clear_n7_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n7_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n7_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n7_10,gold,#e5b758,1,,,,通关 10 次
+clear,clear_n7_20,rose,#e18ca2,1,,,,通关 20 次
+clear,clear_n8_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n8_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n8_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n8_10,gold,#e5b758,1,,,,通关 10 次
+clear,clear_n8_20,rose,#e18ca2,1,,,,通关 20 次
+clear,clear_n9_1,green,#76be91,1,,,,通关 1 次
+clear,clear_n9_3,blue,#79adf0,1,,,,通关 3 次
+clear,clear_n9_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n9_10,gold,#e5b758,1,,,,通关 10 次
+clear,clear_n9_20,rose,#e18ca2,1,,,,通关 20 次
+clear,clear_n10_5,violet,#b68ae2,1,,,,通关 5 次
+clear,clear_n10_10,gold,#e5b758,1,,,,通关 10 次
+endless,endless_1,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_2,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_3,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_4,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_5,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_6,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_7,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_8,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_9,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_10,green,#76be91,1,,,,无尽进度段 1（仅配色）
+endless,endless_11,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_12,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_13,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_14,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_15,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_16,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_17,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_18,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_19,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_20,blue,#79adf0,1,,,,无尽进度段 2（仅配色）
+endless,endless_21,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_22,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_23,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_24,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_25,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_26,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_27,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_28,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_29,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_30,violet,#b68ae2,1,,,,无尽进度段 3（仅配色）
+endless,endless_31,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_32,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_33,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_34,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_35,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_36,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_37,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_38,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_39,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_40,gold,#e5b758,1,,,,无尽进度段 4（仅配色）
+endless,endless_41,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_42,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_43,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_44,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_45,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_46,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_47,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_48,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_49,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+endless,endless_50,rose,#e18ca2,1,,,,无尽进度段 5（仅配色）
+boss,boss_1,,,0,,,,
+boss,boss_2,,,0,,,,
+boss,boss_3,,,0,,,,
+boss,boss_4,,,0,,,,
+boss,boss_5,,,0,,,,
+boss,boss_6,,,0,,,,
+boss,boss_7,,,0,,,,
+boss,boss_8,,,0,,,,
+boss,boss_9,,,0,,,,
+boss,boss_10,,,0,,,,
+boss,boss_11,,,0,,,,
+boss,boss_12,,,0,,,,
+boss,boss_13,,,0,,,,
+boss,boss_14,,,0,,,,
+boss,boss_15,,,0,,,,
+boss,boss_16,,,0,,,,
+boss,boss_17,,,0,,,,
+boss,boss_18,,,0,,,,
+boss,boss_19,,,0,,,,
+boss,boss_20,,,0,,,,
+boss,boss_21,,,0,,,,
+boss,boss_22,,,0,,,,
+boss,boss_23,,,0,,,,
+boss,boss_24,,,0,,,,
+boss,boss_25,,,0,,,,
+boss,boss_26,,,0,,,,
+boss,boss_27,,,0,,,,
+boss,boss_28,,,0,,,,
+boss,boss_29,,,0,,,,
+boss,boss_30,,,0,,,,
+boss,boss_31,,,0,,,,
+boss,boss_32,,,0,,,,
+boss,boss_33,,,0,,,,
+boss,boss_34,,,0,,,,
+map_level,map_01,,,0,,,,
+map_level,map_02,,,0,,,,
+map_level,map_03,,,0,,,,
+map_level,map_04,,,0,,,,
+map_level,map_05,,,0,,,,
+map_level,map_06,,,0,,,,
+map_level,map_07,,,0,,,,
+map_level,map_08,,,0,,,,
+map_level,map_09,,,0,,,,
+map_level,map_10,,,0,,,,
+map_level,map_11,,,0,,,,
+map_level,map_12,,,0,,,,
+map_level,map_13,,,0,,,,
+map_level,map_14,,,0,,,,
+map_level,map_15,,,0,,,,
+map_level,map_16,,,0,,,,
+map_level,map_17,,,0,,,,
+map_level,map_18,,,0,,,,
+map_level,map_19,,,0,,,,
+map_level,map_20,,,0,,,,
+map_level,map_21,,,0,,,,
+map_level,map_22,,,0,,,,
+map_level,map_23,,,0,,,,
+map_level,map_24,,,0,,,,
+map_level,map_25,,,0,,,,
+map_level,map_26,,,0,,,,
+map_level,map_27,,,0,,,,
+map_level,map_28,,,0,,,,
+map_level,map_29,,,0,,,,
+map_level,map_30,,,0,,,,
+map_level,map_31,,,0,,,,
+map_level,map_32,,,0,,,,
+map_level,map_33,,,0,,,,
+map_level,map_34,,,0,,,,
+work,work_01,work_theme_01,#e7bd78,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_02,work_theme_02,#86b7ef,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_03,work_theme_03,#89caa1,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_04,work_theme_04,#e8a2b3,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_05,work_theme_05,#dca488,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_06,work_theme_06,#7fc9c7,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_07,work_theme_07,#b9a1df,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_08,work_theme_08,#e3be83,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_09,work_theme_09,#a9c580,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_10,work_theme_10,#8cb7c9,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_11,work_theme_11,#e49393,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_12,work_theme_12,#e5c98c,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_13,work_theme_13,#ca9bd0,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_14,work_theme_14,#85c9b3,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_15,work_theme_15,#cfa67d,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_16,work_theme_16,#98b9e2,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_17,work_theme_17,#b1a6d9,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_18,work_theme_01,#e7bd78,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_19,work_theme_02,#86b7ef,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_20,work_theme_03,#89caa1,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_21,work_theme_04,#e8a2b3,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_22,work_theme_05,#dca488,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_23,work_theme_06,#7fc9c7,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_24,work_theme_07,#b9a1df,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_25,work_theme_08,#e3be83,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_26,work_theme_09,#a9c580,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_27,work_theme_10,#8cb7c9,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_28,work_theme_11,#e49393,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_29,work_theme_12,#e5c98c,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_30,work_theme_13,#ca9bd0,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_31,work_theme_14,#85c9b3,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_32,work_theme_15,#cfa67d,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_33,work_theme_16,#98b9e2,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗
+work,work_34,work_theme_17,#b1a6d9,1,,,,简洁表情大头；颜色仅区分主题，同主题后续等级复用，不改变品质和消耗

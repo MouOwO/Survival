@@ -217,7 +217,7 @@
 
 - 用户最新实机结果为 A `DirectUnitSanity=PASS`、B `portrait_world_unit Background=FAIL/黑屏`、C `Prop_dynamic Background Control=PASS`。因此 Renderer、直接英雄、background map、camera、light 和 scene packaging 均已通过分层验证，剩余失败点收敛为 B 的 `portrait_world_unit` 实体契约；ItemDef `22217` 继续暂停。
 - 审计生成后的 B 实体确认 `MapUnitName=npc_dota_hero_axe` 已正确，未发现 `unit_name`、`NPCScriptName`、`CustomNPCName`、`model` 或 `hero`；但原实体继承了 prefab 的 `m_iTeamNum=4`、`spawn_wearable_item_defs=1`、`activity`/`activity_modifier` 和 `item_def`/`style_index` 字段。
-- 更新 `spikes/portrait_world_unit_phase2a/data/axe_stages.csv`、`tools/build_portrait_world_unit_phase2a.ps1` 和 `tools/test_portrait_world_unit_phase2a_contract.ps1`：Base 使用 `base_minimal`，显式设置 `m_iTeamNum=2`、`ModelScale=1`、`StartDisabled=0`、`skip_background_entities=1`、`suppress_intro_effects=1`、`skip_pet_spawn=1`、`spawn_wearable_item_defs=0`；`parentname`/`parentAttachmentName` 为空；删除 Base 的 `EnableAutoStyles`、非必要背景/动画/courier 选项、activity、ItemDef、style 和 cosmetic 路径，并增加生成后字段/错误字段断言。
+- 更新 `ui/portrait_world_unit_phase2a/data/axe_stages.csv`、`tools/build_portrait_world_unit_phase2a.ps1` 和 `tools/test_portrait_world_unit_phase2a_contract.ps1`：Base 使用 `base_minimal`，显式设置 `m_iTeamNum=2`、`ModelScale=1`、`StartDisabled=0`、`skip_background_entities=1`、`suppress_intro_effects=1`、`skip_pet_spawn=1`、`spawn_wearable_item_defs=0`；`parentname`/`parentAttachmentName` 为空；删除 Base 的 `EnableAutoStyles`、非必要背景/动画/courier 选项、activity、ItemDef、style 和 cosmetic 路径，并增加生成后字段/错误字段断言。
 - 静态契约和生成后契约均输出 `PORTRAIT_WORLD_UNIT_PHASE2A_CONTRACT_PASS`；PowerShell 解析和限定 `git diff --check` 通过。重新生成/编译 B 时 Resource Compiler 输出 `7 compiled, 0 failed`，B `.vmap/.vpk` 非空且新鲜；C 编译汇总为 `7 compiled, 0 failed`，但 C `.vpk` 写入被当前 Dota 实例占用，选择性构建最终在 C 新鲜度检查失败，未将其误记为完整 BUILD_PASS。
 - 当前尚未对修改后的 B 做冷启动实机复测；Head `axe_head.vmap/.vpk` 仍不存在，未生成/编译/激活 Head `22217`。下一步只在用户手动关闭现有实例后冷启动 `survival_phase2a/phase2a_lab`，复测 A/B/C，并在 Base Axe 真正显示前停止。
 
@@ -238,7 +238,7 @@
 ## 2026-08-27 - Cosmetic Portrait Phase 2A 隔离尖峰实现
 
 - 先审计本机官方 `hero_showcase_wind_ranger_default_prefab.vmap` 和转换后的 DMX：确认 `portrait_world_unit` 的 `MapUnitName`、`spawn_wearable_item_defs`、`EnableAutoStyles`、`item_def0..7`、配对 `style_index0..7`、`ACT_DOTA_LOADOUT`，并确认官方 Panorama 的 `<DOTAScenePanel map="..." camera="..." />` 静态 scene-binding 形式。
-- 新增 `spikes/portrait_world_unit_phase2a/data/axe_stages.csv`，阶段严格为 Base Axe → Head `22217` → Head `22217` + Weapon `22218` → Armor `22215` + Belt `22216` + Arms `22219` 全五件；所有 ItemDef 的 style 显式为 `0`，不添加 `skin_override`。
+- 新增 `ui/portrait_world_unit_phase2a/data/axe_stages.csv`，阶段严格为 Base Axe → Head `22217` → Head `22217` + Weapon `22218` → Armor `22215` + Belt `22216` + Arms `22219` 全五件；所有 ItemDef 的 style 显式为 `0`，不添加 `skin_override`。
 - 新增隔离 `survival_phase2a` 构建源、四张 scene map 生成流程、`phase2a_lab` 入口和独立 Panorama 观察面板。Panorama 只在当前阶段加载一个静态 `DOTAScenePanel`，通过人工记录渲染、默认 wearable 替换/重叠、Style 0、动画和控制台错误；通过按钮前必须填写五项记录且满足关键通过条件，失败后锁定后续阶段，Stage 4 后不启动 Phase 2B。
 - 自动验证通过：`PORTRAIT_WORLD_UNIT_PHASE2A_CONTRACT_PASS`；PowerShell 构建器/契约解析、Lua 5.1、XML 解析、限定 `git diff --check` 均通过。Resource Compiler 最终为入口地图 `OK: 13 compiled, 0 failed`、四张 scene map 各 `OK: 9 compiled, 0 failed`，五个 Panorama 资源各 `OK: 1 compiled, 0 failed`。
 - 生成的 game 端产物位于 `D:\steam\steamapps\common\dota 2 beta\game\dota_addons\survival_phase2a`，包括 `phase2a_lab.vpk`、四张 scene VPK 和 Manifest/layout/JS/CSS 编译产物；VPK 未签名仅因本机缺少 `vpk.publickey.vdf` signing key，不是 Resource Compiler 失败。

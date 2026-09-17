@@ -1,0 +1,10 @@
+/* Row owns its separator; the scroll viewport continues to clip at its edges. */
+.ArchiveRoot #ArchiveTabs .ArchiveTab {
+    height:63.5px;min-height:63.5px;margin:0px;
+    background-size:209px 54px;background-repeat:no-repeat;
+    background-position:left top;
+}
+.ArchiveRoot #ArchiveTabs .ArchiveTab:selected {
+    background-size:209px 54px;
+}
+.ArchiveRoot #ArchiveTabs .ArchiveNavSeparator { z-index:0; }

@@ -1,4 +1,5 @@
 local event_bus = require("core/event_bus")
+local modifier_registry = require("core/modifier_registry")
 local events = require("core/events")
 local heroes = require("config/generated/hero_definitions")
 local weapons = require("config/generated/weapon_definitions")
@@ -554,10 +555,8 @@ local function recalculate(player_id, reason)
             range_modifier:SetAttackRange(attack_range)
         end
     end
-    local research_modifier = state.unit:FindModifierByName(
-        "modifier_research_technology"
-    ) or state.unit:AddNewModifier(
-        state.unit, nil, "modifier_research_technology", {}
+    local research_modifier = modifier_registry.ensure(
+        state.unit, "modifier_research_technology", {}
     )
     if research_modifier and research_modifier.SetTechnologyValues then
         research_modifier:SetTechnologyValues(
@@ -568,8 +567,8 @@ local function recalculate(player_id, reason)
             gameplay_armor_bonus
         )
     end
-    local modifier = state.unit:FindModifierByName(
-        "modifier_weapon_stat_projection"
+    local modifier = modifier_registry.ensure(
+        state.unit, "modifier_weapon_stat_projection", {player_id = player_id}
     )
     local projection_refresh_required =
         tostring(reason or "") ~= "attack_all_attribute_growth"
@@ -650,8 +649,8 @@ local function on_hero_summoned(payload)
     local function ensure_modifier(name)
         local existing = payload.unit:FindModifierByName(name)
         if existing then return existing end
-        local created = payload.unit:AddNewModifier(
-            payload.unit, nil, name, { player_id = payload.player_id }
+        local created = modifier_registry.ensure(
+            payload.unit, name, { player_id = payload.player_id }
         )
         print(string.format(
             "[SURVIVAL_MODIFIER_CREATE] name=%s entindex=%s created=%s",

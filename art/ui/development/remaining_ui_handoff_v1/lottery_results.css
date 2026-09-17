@@ -1,0 +1,24 @@
+/* Keep the existing card art and lottery timeline. Reserve separate text areas. */
+#LotteryWindow .LotteryRewardName {width:100%;height:58px;white-space:normal;text-overflow:shrink;text-align:center;padding:3px 8px;font-size:21px;}
+#LotteryWindow .LotteryDuplicateBadge {width:100%;height:38px;font-size:15px;white-space:normal;text-overflow:shrink;text-align:center;vertical-align:bottom;padding:3px 2px;}
+#LotteryWindow .LotteryRewardQuality {z-index:2;}
+#LotteryWindow .LotteryRewardIconFrame .LotteryRewardIcon {vertical-align:center;}
+#LotteryWindow #LotteryItemList.LotterySingleResult .LotteryRewardName {height:82px;font-size:29px;padding:4px 14px;}
+#LotteryWindow #LotteryItemList.LotterySingleResult .LotteryDuplicateBadge {height:46px;font-size:21px;}
+#LotteryWindow .LotteryRewardQuantity {height:28px;min-width:66px;text-align:center;text-overflow:shrink;}
+#LotteryWindow .LotteryCardCovered .LotteryDuplicateBadge {opacity:0;}
+#LotteryWindow .LotteryQuality_N .LotteryRewardQuality {color:#398754;}
+#LotteryWindow .LotteryQuality_R .LotteryRewardQuality {color:#3283c5;}
+#LotteryWindow .LotteryQuality_SR .LotteryRewardQuality {color:#a052c8;}
+#LotteryWindow .LotteryQuality_SSR .LotteryRewardQuality {color:#bd8b25;}
+#LotteryWindow .LotteryQuality_UR .LotteryRewardQuality {color:#66338f;}
+/* Keep the original ivory card; quality is carried by its outer glow. */
+#LotteryWindow #LotteryItemList .LotteryRewardIconFrame {background-color:transparent;background-image:none;border:0px;box-shadow:none;}
+#LotteryWindow #LotteryItemList .LotteryRewardQuality {background-color:transparent;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_N {border-color:#66c98b;box-shadow:#55bf7a99 0px 0px 26px 3px;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_R {border-color:#65b5ef;box-shadow:#409fdf99 0px 0px 26px 3px;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_SR {border-color:#c58bea;box-shadow:#b565ddaa 0px 0px 28px 4px;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_SSR {border-color:#efd071;box-shadow:#e8b53baa 0px 0px 28px 4px;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_UR {border-color:#8b56bd;box-shadow:#7739aaaa 0px 0px 30px 4px;}
+/* Results have a fixed one/ten-card count; allow the halo past the list bounds. */
+#LotteryWindow #LotteryItemList.LotteryTenResults,#LotteryWindow #LotteryItemList.LotterySingleResult {overflow:noclip;}

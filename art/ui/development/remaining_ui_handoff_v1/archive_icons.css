@@ -1,0 +1,31 @@
+.ArchiveRoot #ArchiveArtTrialToggle {position:514px 22px 0px;width:114px;height:29px;border:1px solid #bda97e;background-color:#1d424d;z-index:21;}
+/* A background cannot stack above item art. Foreground just the original corner;
+   retain the list viewport clipping and keep this decoration non-interactive. */
+.ArchiveRoot #ArchiveGrid .ArchiveHoverCorner {ignore-parent-flow:true;position:0px 0px 0px;width:100%;height:100%;flow-children:down;overflow:noclip;z-index:50;visibility:collapse;}
+.ArchiveRoot #ArchiveGrid .ArchiveCard {overflow:noclip;}
+.ArchiveRoot #ArchiveGrid .ArchiveCard:hover,.ArchiveRoot #ArchiveGrid .ArchiveHovered {z-index:5;}
+.ArchiveRoot #ArchiveGrid .ArchiveCard:hover .ArchiveHoverCorner,
+.ArchiveRoot #ArchiveGrid .ArchiveHovered .ArchiveHoverCorner {visibility:visible;}
+.ArchiveRoot #ArchiveArtTrialToggle:hover {brightness:1.25;}
+.ArchiveRoot #ArchiveArtTrialToggle:active {brightness:.9;}
+.ArchiveRoot #ArchiveArtTrialToggle Label {align:center center;font-size:15px;color:#f3e9d0;}
+.ArchiveRoot #ArchiveArtTrial {position:0px 81px 0px;width:655px;height:508px;padding:20px 22px;flow-children:down;z-index:20;background-image:url("file://{images}/custom_game/archive_handoff_v1/content_background.png");background-size:100% 100%;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialHeading {color:#234a58;font-size:23px;font-family:"Source Han Serif SC";}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialHint {color:#48626a;font-size:14px;margin:7px 0px;width:100%;white-space:normal;}
+.ArchiveRoot #ArchiveArtTrialGrid {width:100%;height:310px;flow-children:right-wrap;overflow:clip;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialUnit {width:143px;height:148px;flow-children:down;margin-right:8px;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialCard {width:143px;height:138px;flow-children:none;background-image:url("file://{images}/custom_game/archive_handoff_v1/interaction_components_v2_card_normal.png");background-size:100% 100%;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArt {position:25px 18px 0px;width:93px;height:74px;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveRewardIcon {width:100%;height:100%;}
+.ArchiveRoot #ArchiveGrid .ArchivePortraitViewport,.ArchiveRoot #ArchiveArtTrial .ArchivePortraitViewport {overflow:clip;}
+.ArchiveRoot #ArchiveGrid .ArchiveToneArt,.ArchiveRoot #ArchiveArtTrial .ArchiveToneArt {padding:0px;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialName {position:7px 92px 0px;width:129px;height:40px;text-align:center;color:#204957;font-size:14px;white-space:normal;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialDescription {width:143px;height:96px;margin-top:12px;white-space:normal;text-align:center;color:#37545f;font-size:15px;}
+.ArchiveRoot #ArchiveArtTrialNav {width:100%;height:37px;flow-children:right;}
+.ArchiveRoot #ArchiveArtTrialFooter {width:100%;height:33px;flow-children:right;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction {width:110px;height:29px;margin-right:10px;border:1px solid #bda97e;background-color:#1d424d;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction:hover {brightness:1.25;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction:active {brightness:.9;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction.Disabled {brightness:.68;opacity:.7;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialActionText {align:center center;color:#f3e9d0;font-size:15px;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialPageText {width:76px;height:29px;text-align:center;vertical-align:center;color:#234a58;font-size:15px;}

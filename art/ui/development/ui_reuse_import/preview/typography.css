@@ -1,0 +1,63 @@
+/* Shared font roles. Raw OTF files ship in this addon's panorama/fonts/.
+   These rules select registered faces; CSS does not load or install fonts.
+   Keep geometry/font-size in page styles. medium selects the real 500 face. */
+
+
+
+.label, input {
+    font-family: "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+}
+
+.button .label, .button .label, .button .label,
+.UIIconLabel, .UIButtonLabel, .UINavLabel, .UITabLabel,
+.UICardTitle, .UICheckboxLabel, .UIFontMedium,
+.ShopSectionTitle, .ShopCardName, .ShopModeLabel,
+.ArchiveItemName, #ArchivePageTitle, .DailySection,
+.LotteryPoolTabName, .LotteryRewardName, .LotteryDetailName, #LotterySelectedName,
+.RogueCardName, #MainHudHeroName, #SurvivalHeroName,
+.CombatStatsTitle, .GameInfoSectionTitle, .DifficultyOptionName,
+.ArrowTowerDestroyTitle, .AbilityCalibrationTitle, #WeaponGrowthName {
+    font-family: "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-weight:500;
+}
+
+.UIFontTitle, #ArchiveTitle, #ShopTitle, #LotteryBrand, #LotteryTitle,
+#LotteryResultHeading, #LotteryInfoTitle, .RogueRewardTitle, #DailyHeading,
+.HeroSkillWindowTitle, .HeroSkillChoiceTitle, #DifficultySelectionTitle,
+#CombatStatsTitle, #HeroCombatDebugTitle, #GameInfoTitle {
+    font-family: "Source Han Serif SC", "Noto Serif SC", "SimSun", serif;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    text-shadow: none;
+}
+
+/* Counts/effects must stay Regular even when nested inside a clickable card. */
+.UIFontBody, .UIFontNumber, .UIProgressBadge, .UIProgressLabel,
+.UIPrice, .UIOriginalPrice, .UIPriceMode, .UICaption, .UIUnlockLabel,
+.ArchiveCount, .ArchiveWorkCost, .ArchiveFragmentLevel,
+.LotteryRewardQuality, .LotteryRewardDescription, .LotteryRewardDuration,
+.LotteryCostLabel, #LotteryGuaranteeValue, #LotteryTicketValue, #LotteryPointValue,
+.ShopTechnologyLevel, .ShopTechnologyCode, .ShopTechnologyLockBadge,
+.MainHudStatValue, #SurvivalHeroLevelText,
+.SurvivalStatValue, .Theme_Native .SurvivalStatValue, .Theme_Native .SurvivalBarText,
+.SurvivalTakeoverAbilityCooldown, .SurvivalTakeoverAbilityLevel, .SurvivalTakeoverAbilityMana,
+.CombatStatsValue, .HeroCombatDamageValue, .HeroTechnologyLevel, .GameInfoValue,
+.GoldMineIncomeNumber, .DifficultyOptionSubtitle, .SurvivalPointTargetHint,
+.SurvivalAbilityHotkey, .SurvivalTakeoverAbilityHotkey, .AbilityCalibrationNudgeRow > .label,
+#ArchiveTooltipName, #ArchiveTooltipEffect, #LotteryTooltipName,
+#DailyTooltipName, #DailyTooltipEffect, #TreasureTooltipName, #TreasureTooltipEffect {
+    font-family: "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-weight: normal;
+}
+.Theme_Native #SurvivalHeroName, #HeroTechnologyHeader .label {
+    font-family: "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-weight:500;
+}
+
+@font-face{font-family:"Source Han Sans SC";font-weight:400;src:url("../../../panorama/fonts/Radiance-Survival-SourceHanSansSC-Regular.otf") format("opentype");}
+@font-face{font-family:"Source Han Sans SC";font-weight:500;src:url("../../../panorama/fonts/Radiance-Survival-SourceHanSansSC-Medium.otf") format("opentype");}
+@font-face{font-family:"Source Han Serif SC";font-weight:700;src:url("../../../panorama/fonts/Radiance-Survival-SourceHanSerifSC-Bold.otf") format("opentype");}

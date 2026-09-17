@@ -1,0 +1,205 @@
+/* Shared candidate theme. frame.window is a programmatic fallback pending clean approved art. */
+.UIClosed {visibility:hidden;}
+.UIModal {background-color:#EFEADF;border:1px solid #C7B88F;}
+.UIModalHeader {background-color:#173743;}
+.UIModalScrim {width:100%;height:100%;background-color:#0000008c;}
+.UIModal Label,.UIFullscreen Label,.UIHUDShell Label {text-shadow:none;}
+.UIIcon {width:28px;height:28px;align:center center;overflow:noclip;}
+.UIIconButton {width:56px;height:64px;background-color:transparent;border:0px;}
+.UIIconButton .UIIcon {vertical-align:top;margin-top:5px;}
+.UIIconButton .UIIconLabel {width:100%;vertical-align:bottom;text-align:center;font-size:16px;color:#D0D6D5;}
+.UIIconButton:hover,.UICloseButton:hover {filter:brightness(1.12);}
+.UIIconButton:active,.UICloseButton:active {filter:brightness(.9);}
+.UICloseButton {width:44px;height:44px;}
+.UIDisabled,.UIIconButton:disabled {opacity:.45;}
+.UIBusy {filter:brightness(.65);}
+.UIActionButton {width:240px;height:56px;background-size:100% 100%;background-color:transparent;border:0px;transition-property:brightness;transition-duration:.1s;}
+.UIActionButton Label {align:center center;color:#203E4A;font-size:18px;}
+.UIActionButton .UIIcon {horizontal-align:left;margin-left:20px;}
+.UIActionButton.UIIvory {background-image:url("../../../panorama/src/images/ui/shared/button/ivory/normal.png");}
+.UIActionButton.UIIvory:hover {background-image:url("../../../panorama/src/images/ui/shared/button/ivory/hover.png");}
+.UIActionButton.UIIvory:active {background-image:url("../../../panorama/src/images/ui/shared/button/ivory/pressed.png");}
+.UIActionButton.UIIvory:disabled,.UIActionButton.UIIvory.UIDisabled,.UIActionButton.UIIvory.UIBusy {background-image:url("../../../panorama/src/images/ui/shared/button/ivory/disabled.png");}
+.UIActionButton.UIGold {background-image:url("../../../panorama/src/images/ui/shared/button/gold/normal.png");}
+.UIActionButton.UIGold:hover {background-image:url("../../../panorama/src/images/ui/shared/button/gold/hover.png");}
+.UIActionButton.UIGold:active {background-image:url("../../../panorama/src/images/ui/shared/button/gold/pressed.png");}
+.UIActionButton.UIGold:disabled,.UIActionButton.UIGold.UIDisabled,.UIActionButton.UIGold.UIBusy {background-image:url("../../../panorama/src/images/ui/shared/button/gold/disabled.png");}
+.UINavToggle {width:225px;height:70px;background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/normal.png");background-size:100% 100%;border:0px;}
+.UINavToggle:hover {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/hover.png");}
+.UINavToggle:active {filter:brightness(.9);}
+.UINavToggle.checked,.UINavToggle.UISelected,.UINavToggle.checked:hover,.UINavToggle.UISelected:hover {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/selected.png");}
+.UINavToggle:disabled {opacity:.45;}
+.UINavToggle .RadioBox {visibility:hidden;}
+.UINavToggle Label {vertical-align:center;margin-left:58px;color:#D0D6D5;font-size:20px;}
+.UINavToggle.checked Label,.UINavToggle.UISelected Label {color:#203E4A;}
+.UINavToggle .UIIcon {horizontal-align:left;margin-left:20px;}
+.UITabBar {width:100%;height:56px;display:flex;flex-direction:row;}
+.UITab {width:200px;height:56px;background-color:#173743;background-position:bottom;background-repeat:no-repeat;background-size:100% 24px;}
+.UITab Label {align:center center;font-size:20px;color:#D0D6D5;}
+.UITab:hover {background-image:url("../../../panorama/src/images/ui/shared/overlay/tab_hover_overlay.png");}
+.UITab:active {filter:brightness(.9);}
+.UITab:disabled {opacity:.45;}
+.UITab.UISelected,.UITab.Selected,.UITab.UISelected:hover,.UITab.Selected:hover {background-image:url("../../../panorama/src/images/ui/shared/overlay/tab_selected_overlay.png");}
+.UITab.UISelected Label,.UITab.Selected Label {color:#fff0c8;}
+.UICard {flow-children:none;}
+.UICardSquare {width:167px;height:157px;background-image:url("../../../panorama/src/images/ui/shared/card/body/ivory.png");background-size:100% 100%;background-color:#EFEADF;border:0px;}
+.UICardSquare:hover {filter:brightness(1.04);}
+.UICardSquare.UISelected,.UICardSquare.UISelected:hover {wash-color:#fff1d0;}
+.UICardProduct {width:280px;height:170px;background-color:#EFEADF;border:1px solid #c7b88f66;display:flex;flex-direction:column;}
+.UICardProduct:hover {border-color:#C7B88F;}
+.UICardAugment:hover {transform:translateY(-4px) scale3d(1.035,1.035,1);}
+.UICardArt {width:96px;height:96px;align:center top;margin-top:8px;}
+.UICardTitle {width:100%;vertical-align:bottom;color:#203E4A;text-align:center;font-size:18px;}
+.UIProgressBadge {horizontal-align:right;vertical-align:top;color:#D0D6D5;background-image:url("../../../panorama/src/images/ui/shared/badge/progress.png");background-size:100% 100%;width:70px;height:22px;text-align:center;font-size:15px;}
+.UIUnlockLabel {vertical-align:bottom;font-size:14px;color:#203E4A;}
+.UIPriceLabel {display:flex;flex-direction:row;}
+.UIPrice,.UIPriceMode,.UIOriginalPrice,.UICaption {color:#203E4A;font-size:16px;margin-right:8px;}
+.UIOriginalPrice {text-decoration:line-through;opacity:.65;}
+.UIBundleItem {display:flex;flex-direction:row;height:36px;}
+.UIBundleArt {width:32px;height:32px;}
+.UIProgressBar {width:260px;height:20px;background-color:#173743;}
+.UIProgressFill {height:100%;background-color:#83B8AC;}
+.UIProgressLabel {width:100%;text-align:center;color:#D0D6D5;}
+.UICheckbox {width:200px;height:38px;}
+.UICheckbox .TickBox {visibility:hidden;}
+.UICheckOff,.UICheckOn {horizontal-align:left;vertical-align:center;}
+.UICheckbox .UICheckOn {visibility:hidden;}
+.UICheckbox.checked .UICheckOn {visibility:visible;}
+.UICheckbox.checked .UICheckOff {visibility:hidden;}
+.UICheckbox Label {margin-left:34px;vertical-align:center;font-size:16px;color:#D0D6D5;}
+.UICheckbox:disabled {opacity:.5;}
+.UICheckbox:hover {filter:brightness(1.12);}
+.UICheckbox:active {filter:brightness(.9);}
+.UICheckOn {background-position:center;background-repeat:no-repeat;background-size:122.2222% 122.2222%;}
+.UICheckbox.checked:hover .UICheckOn {background-image:url("../../../panorama/src/images/ui/shared/checkbox/on/hover.png");}
+.UICheckbox.checked:active .UICheckOn {background-image:url("../../../panorama/src/images/ui/shared/checkbox/on/pressed.png");}
+.UICheckbox.checked:disabled .UICheckOn,.UICheckbox.checked.UIDisabled .UICheckOn {background-image:url("../../../panorama/src/images/ui/shared/checkbox/on/disabled.png");}
+.UICheckbox.checked:hover .UICheckOn .UIIconImage,.UICheckbox.checked:active .UICheckOn .UIIconImage,.UICheckbox.checked:disabled .UICheckOn .UIIconImage,.UICheckbox.checked.UIDisabled .UICheckOn .UIIconImage {visibility:hidden;}
+/* Outline skin uses the packaged state frames without a second baked-in border. */
+.UICardSquare.UIOutlineCard {background-image:none;border:0px;}
+.UICardSquare.UIOutlineCard:hover {background-image:url("../../../panorama/src/images/ui/shared/card/border/hover.png");}
+.UICardSquare.UIOutlineCard.UISelected,.UICardSquare.UIOutlineCard.UISelected:hover {background-image:url("../../../panorama/src/images/ui/shared/card/border/selected.png");border:0px;}
+.UITooltip {background-color:#173743;border:1px solid #C7B88F;}
+.UIFilterBar {width:100%;height:42px;display:flex;flex-direction:row;}
+.UISearch {width:220px;height:36px;}
+.UIRewardGrid {width:100%;height:100%;display:flex;flex-wrap:wrap;overflow:squish scroll;}
+.UIReadingGradient {width:100%;height:100%;background-color:gradient(linear,0% 0%,100% 0%,from(#10232a55),to(#10232a00));z-index:-1;}
+/* Existing layouts keep their data slots; the shell chrome is shared. */
+#ArchiveWindow.UIModal,#CustomShopWindow.UIModal,#LotteryInfoDialog.UIModal {background-image:none;background-color:#EFEADF;border:1px solid #C7B88F;border-radius:6px;}
+#ArchiveHeader.UIModalHeader,#ShopHeader.UIModalHeader,#LotteryInfoHeader.UIModalHeader {background-image:none;background-color:#173743;border-bottom:1px solid #C7B88F;}
+#ArchiveWindow.UIModal #ArchiveHeader {width:100%;}
+#ArchiveWindow.UIModal #ArchiveTabs {background-color:#173743;}
+#ArchiveWindow.UIModal .ArchiveNineCard {visibility:hidden;}
+#ArchiveWindow.UIModal .ArchiveCard.UICardSquare {background-image:url("../../../panorama/src/images/ui/shared/card/body/ivory.png");border:0px;}
+#ArchiveWindow.UIModal .ArchiveCard.UICardSquare:hover {border-color:#C7B88F;}
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/normal.png");}
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle:hover {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/hover.png");}
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle.checked,#ArchiveWindow.UIModal .ArchiveTab.UINavToggle.checked:hover {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/selected.png");}
+#CustomShopWindow.UIModal {width:1208px;height:806px;align:center center;position:0px 0px 0px;margin:0px;padding:0px;display:flex;flex-direction:column;opacity:1;transition-duration:0s;}
+#CustomShopWindow.UIModal #ShopHeader {height:94px;width:100%;padding:14px 18px;}
+#CustomShopWindow.UIModal #ShopModeToggles {width:300px;}
+#CustomShopWindow.UIModal .ShopModeToggle {width:96px;}
+#CustomShopWindow.UIModal #ShopBody {width:100%;height:fill-parent-flow(1);margin:0px;}
+#CustomShopWindow.UIModal #ShopShelfArea {background-color:#EFEADF;border:0px;}
+#CustomShopWindow.UIModal #ShopFooter {height:62px;background-color:#173743;}
+#CustomShopWindow.UIModal .ShopShelfSlot.UICardProduct {width:96px;height:76px;flow-children:none;}
+#CustomShopWindow.UIModal #ShopTitle {color:#D0D6D5;}
+#LotteryInfoDialog.UIModal .LotteryModalSurface,#LotteryInfoDialog.UIModal .LotteryV3ModalFrame,#LotteryInfoDialog.UIModal .LotteryNineFrame {visibility:hidden;}
+#LotteryInfoDialog.UIModal #LotteryInfoHeader {width:100%;height:88px;padding:8px 26px;}
+#LotteryInfoDialog.UIModal #LotteryInfoBody {background-color:#EFEADF;}
+#LotteryInfoDialog.UIModal #LotteryInfoTitle {color:#D0D6D5;}
+.MainHudIconButton.UIIconButton .UIIcon {horizontal-align:center;vertical-align:top;position:0px 0px 0px;}
+.MainHudIconButton.UIIconButton .UIIconImage {horizontal-align:left;vertical-align:top;}
+#LotteryInfoDialog.UIModal #LotteryNineSlice {visibility:hidden;}
+#LotteryWindow .UITab .LotteryTabMark {visibility:hidden;}
+#LotteryWindow .LotteryPoolTab.UITab {background-size:100% 24px;background-position:bottom;background-color:#173743;}
+#LotteryWindow .LotteryPoolTab.UITab:hover {background-image:url("../../../panorama/src/images/ui/shared/overlay/tab_hover_overlay.png");}
+#LotteryWindow .LotteryPoolTab.UITab.Selected,#LotteryWindow .LotteryPoolTab.UITab.Selected:hover {background-image:url("../../../panorama/src/images/ui/shared/overlay/tab_selected_overlay.png");}
+#LotteryInfoDialog.UIModal .LotteryDetailRow.UICardSquare {background-image:url("../../../panorama/src/images/ui/shared/card/body/ivory.png");background-color:#EFEADF;border:0px;}
+#LotteryInfoDialog.UIModal .LotteryDetailRow.UICardSquare.Selected {wash-color:#fff1d0;}
+#ArchiveWindow.UIModal #ArchiveDraw {background-image:url("../../../panorama/src/images/ui/shared/button/gold/normal.png");}
+#ArchiveWindow.UIModal #ArchiveDraw:hover {background-image:url("../../../panorama/src/images/ui/shared/button/gold/hover.png");}
+#ArchiveWindow.UIModal #ArchiveDraw:active {background-image:url("../../../panorama/src/images/ui/shared/button/gold/pressed.png");}
+#ArchiveWindow.UIModal #ArchiveDraw:disabled {background-image:url("../../../panorama/src/images/ui/shared/button/gold/disabled.png");}
+#CustomShopWindow.UIModal #ShopRefreshButton {background-color:transparent;border:0px;}
+#CustomShopWindow.UIModal #ShopRefreshButton Label {color:#203E4A;}
+#CustomShopWindow.UIModal .ShopSectionTitle,#CustomShopWindow.UIModal #ShopLoading Label {color:#203E4A;}
+#ArchiveWindow.UIModal .ArchivePromote.UIActionButton {width:100px;height:23px;}
+#ArchiveWindow.UIModal .ArchivePromote.UIActionButton Label {font-size:13px;}
+
+
+.UIIconButton.PreviewHover,.UICloseButton.PreviewHover {filter:brightness(1.12);}
+
+.UIIconButton.PreviewPressed,.UICloseButton.PreviewPressed {filter:brightness(.9);}
+
+.UIDisabled,.UIIconButton.UIDisabled {opacity:.45;}
+
+.UIActionButton.UIIvory.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/button/ivory/hover.png");}
+
+.UIActionButton.UIIvory.PreviewPressed {background-image:url("../../../panorama/src/images/ui/shared/button/ivory/pressed.png");}
+
+.UIActionButton.UIIvory.UIDisabled,.UIActionButton.UIIvory.UIDisabled,.UIActionButton.UIIvory.UIBusy {background-image:url("../../../panorama/src/images/ui/shared/button/ivory/disabled.png");}
+
+.UIActionButton.UIGold.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/button/gold/hover.png");}
+
+.UIActionButton.UIGold.PreviewPressed {background-image:url("../../../panorama/src/images/ui/shared/button/gold/pressed.png");}
+
+.UIActionButton.UIGold.UIDisabled,.UIActionButton.UIGold.UIDisabled,.UIActionButton.UIGold.UIBusy {background-image:url("../../../panorama/src/images/ui/shared/button/gold/disabled.png");}
+
+.UINavToggle.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/hover.png");}
+
+.UINavToggle.PreviewPressed {filter:brightness(.9);}
+
+.UINavToggle.checked,.UINavToggle.UISelected,.UINavToggle.checked.PreviewHover,.UINavToggle.UISelected.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/selected.png");}
+
+.UINavToggle.UIDisabled {opacity:.45;}
+
+.UITab.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/overlay/tab_hover_overlay.png");}
+
+.UITab.PreviewPressed {filter:brightness(.9);}
+
+.UITab.UIDisabled {opacity:.45;}
+
+.UITab.UISelected,.UITab.Selected,.UITab.UISelected.PreviewHover,.UITab.Selected.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/overlay/tab_selected_overlay.png");}
+
+.UICardSquare.PreviewHover {filter:brightness(1.04);}
+
+.UICardSquare.UISelected,.UICardSquare.UISelected.PreviewHover {wash-color:#fff1d0;}
+
+.UICardProduct.PreviewHover {border-color:#C7B88F;}
+
+.UICardAugment.PreviewHover {transform:translateY(-4px) scale3d(1.035,1.035,1);}
+
+.UICheckbox.UIDisabled {opacity:.5;}
+
+.UICheckbox.PreviewHover {filter:brightness(1.12);}
+
+.UICheckbox.PreviewPressed {filter:brightness(.9);}
+
+.UICheckbox.checked.PreviewHover .UICheckOn {background-image:url("../../../panorama/src/images/ui/shared/checkbox/on/hover.png");}
+
+.UICheckbox.checked.PreviewPressed .UICheckOn {background-image:url("../../../panorama/src/images/ui/shared/checkbox/on/pressed.png");}
+
+.UICheckbox.checked.UIDisabled .UICheckOn,.UICheckbox.checked.UIDisabled .UICheckOn {background-image:url("../../../panorama/src/images/ui/shared/checkbox/on/disabled.png");}
+
+.UICheckbox.checked.PreviewHover .UICheckOn .UIIconImage,.UICheckbox.checked.PreviewPressed .UICheckOn .UIIconImage,.UICheckbox.checked.UIDisabled .UICheckOn .UIIconImage,.UICheckbox.checked.UIDisabled .UICheckOn .UIIconImage {visibility:hidden;}
+
+.UICardSquare.UIOutlineCard.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/card/border/hover.png");}
+
+.UICardSquare.UIOutlineCard.UISelected,.UICardSquare.UIOutlineCard.UISelected.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/card/border/selected.png");border:0px;}
+
+#ArchiveWindow.UIModal .ArchiveCard.UICardSquare.PreviewHover {border-color:#C7B88F;}
+
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/hover.png");}
+
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle.checked,#ArchiveWindow.UIModal .ArchiveTab.UINavToggle.checked.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/nav/toggle/selected.png");}
+
+#LotteryWindow .LotteryPoolTab.UITab.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/overlay/tab_hover_overlay.png");}
+
+#LotteryWindow .LotteryPoolTab.UITab.Selected,#LotteryWindow .LotteryPoolTab.UITab.Selected.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/overlay/tab_selected_overlay.png");}
+
+#ArchiveWindow.UIModal #ArchiveDraw.PreviewHover {background-image:url("../../../panorama/src/images/ui/shared/button/gold/hover.png");}
+
+#ArchiveWindow.UIModal #ArchiveDraw.PreviewPressed {background-image:url("../../../panorama/src/images/ui/shared/button/gold/pressed.png");}
+
+#ArchiveWindow.UIModal #ArchiveDraw.UIDisabled {background-image:url("../../../panorama/src/images/ui/shared/button/gold/disabled.png");}

@@ -1,0 +1,61 @@
+{
+  "kind": "browser_actual_code_NOT_game_capture",
+  "checks": [
+    {
+      "w": 1280,
+      "h": 720,
+      "rect": {
+        "x": 124.2933349609375,
+        "y": 70.0106201171875,
+        "width": 1031.413330078125,
+        "height": 579.978759765625
+      }
+    },
+    {
+      "w": 1920,
+      "h": 1080,
+      "rect": {
+        "x": 186.43994140625,
+        "y": 105.01593017578125,
+        "width": 1547.1201171875,
+        "height": 869.9681396484375
+      }
+    },
+    {
+      "w": 2560,
+      "h": 1440,
+      "rect": {
+        "x": 248.586669921875,
+        "y": 140.021240234375,
+        "width": 2062.82666015625,
+        "height": 1159.95751953125
+      }
+    },
+    {
+      "w": 3440,
+      "h": 1440,
+      "rect": {
+        "x": 688.586669921875,
+        "y": 140.021240234375,
+        "width": 2062.82666015625,
+        "height": 1159.95751953125
+      }
+    }
+  ],
+  "tests": [
+    "7 cards",
+    "no duplicate submission",
+    "failed retry",
+    "server confirmed claim",
+    "stale snapshot",
+    "new period",
+    "independent bonus states (preview only)",
+    "inside click",
+    "scrim close",
+    "close button"
+  ],
+  "fonts": {
+    "sans": true,
+    "serif": true
+  }
+}

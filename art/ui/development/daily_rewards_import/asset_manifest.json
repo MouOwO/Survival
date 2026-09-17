@@ -1,0 +1,2177 @@
+{
+  "version": "1.0.0",
+  "source_size": [
+    1672,
+    941
+  ],
+  "source_file": "reference/approved.png",
+  "source_sha256": "5987ca49a355adf15dab2b740e3a3424fe39fc1a941f300098e39b64331210d4",
+  "assets": {
+    "exact.window": {
+      "file": "exact/window.png",
+      "size_px": [
+        1348,
+        758
+      ],
+      "sha256": "72b8a970c2d81811256f5ad1ddf432202aef387568ebce14c21fd9a96fb4400a",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        164,
+        94,
+        1348,
+        758
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.header": {
+      "file": "exact/header.png",
+      "size_px": [
+        1344,
+        86
+      ],
+      "sha256": "a0a3911bd9a9d83a7e2da9b79d1190a38c4eccb6e7ceb187249191e2cfce0fcc",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        166,
+        97,
+        1344,
+        86
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.calendar": {
+      "file": "exact/calendar.png",
+      "size_px": [
+        45,
+        46
+      ],
+      "sha256": "85d95bf9d617bb9b6ed3f5693078ff11941539cb605a5ff172303b1de064a184",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        714,
+        120,
+        45,
+        46
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.title": {
+      "file": "exact/title.png",
+      "size_px": [
+        187,
+        53
+      ],
+      "sha256": "8b336b0fac4599a48ec9268a36b66377df97a0c4ced8460823f4b89757d9e8db",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        777,
+        115,
+        187,
+        53
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.close": {
+      "file": "exact/close.png",
+      "size_px": [
+        45,
+        46
+      ],
+      "sha256": "e14c4e550c69518ac62c8e0cae02688d90a03ac7885b231e6a96a7f8514ae773",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1430,
+        119,
+        45,
+        46
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.header_ornament_left": {
+      "file": "exact/header_ornament_left.png",
+      "size_px": [
+        81,
+        28
+      ],
+      "sha256": "c2cad7770837f8772bf06af997a309e1831779c1c6e4c3a7be7069ab837531e7",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        568,
+        130,
+        81,
+        28
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.header_ornament_right": {
+      "file": "exact/header_ornament_right.png",
+      "size_px": [
+        83,
+        28
+      ],
+      "sha256": "dfb3fd8d62daa2fff790b31c22bb3e6c2190dbcab66bda8d7c7798f69d932194",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1025,
+        130,
+        83,
+        28
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.subtitle": {
+      "file": "exact/subtitle.png",
+      "size_px": [
+        490,
+        55
+      ],
+      "sha256": "49e5e105ffb74b534e2cffe597f7e60e0ae000589b9bf7926bf2944ef8efb1a4",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        207,
+        207,
+        490,
+        55
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.pass_status": {
+      "file": "exact/pass_status.png",
+      "size_px": [
+        253,
+        54
+      ],
+      "sha256": "e3ac3597cef4fe965b5ae070160b103976a37a6473d6c1ac0fb942ba53e87780",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1221,
+        190,
+        253,
+        54
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.pass_icon": {
+      "file": "exact/pass_icon.png",
+      "size_px": [
+        40,
+        39
+      ],
+      "sha256": "9fdd549c79e29e04113cbdbcb1c203b7eb8ac2d5132a52fc1943646fb0e18712",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1254,
+        198,
+        40,
+        39
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.weekly_count": {
+      "file": "exact/weekly_count.png",
+      "size_px": [
+        182,
+        28
+      ],
+      "sha256": "6e7a42338f82c9584172f51c6ff91da2a758c558b0dfd2bfcebc48510f3aff70",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1276,
+        244,
+        182,
+        28
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day7": {
+      "file": "exact/day7.png",
+      "size_px": [
+        320,
+        405
+      ],
+      "sha256": "564b5ac6ed9384ce97f28a399f676ed6c8663f41c7f24a3cb32468693d863e67",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1160,
+        281,
+        320,
+        405
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day7_ordinary": {
+      "file": "exact/day7_ordinary.png",
+      "size_px": [
+        282,
+        120
+      ],
+      "sha256": "f25266f540d94092625459ed93e0d1188732085fe2af122d6861ad20fe67043d",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1180,
+        339,
+        282,
+        120
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day7_ticket": {
+      "file": "exact/day7_ticket.png",
+      "size_px": [
+        108,
+        97
+      ],
+      "sha256": "20ac3a22c22bbd038a27d14598c5c509e6cf0cf1c3efc2c1de3758b31501e01d",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1200,
+        356,
+        108,
+        97
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day7_weapon": {
+      "file": "exact/day7_weapon.png",
+      "size_px": [
+        203,
+        190
+      ],
+      "sha256": "9fea9afbce1ea5b3a529949177474ae0dfd81626c14db7621dd8cbe91c7158d4",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1257,
+        449,
+        203,
+        190
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.pass_badge": {
+      "file": "exact/pass_badge.png",
+      "size_px": [
+        139,
+        40
+      ],
+      "sha256": "ec92ea674ad2c3645d9ae3848b80b6e0f768d72b5ae0508ee096ae5b36a33d9f",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1176,
+        484,
+        139,
+        40
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.today_badge": {
+      "file": "exact/today_badge.png",
+      "size_px": [
+        236,
+        43
+      ],
+      "sha256": "86ddf8402f41ee9b4823ef2212026f29e053aa701b989a9b0fef3cabdacf13de",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1201,
+        631,
+        236,
+        43
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.claimed_check": {
+      "file": "exact/claimed_check.png",
+      "size_px": [
+        35,
+        34
+      ],
+      "sha256": "391d91a526420b2a55fb6f163c4eac5098429267cd5bae3c020690ebe7c493b1",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        263,
+        584,
+        35,
+        34
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.info_icon": {
+      "file": "exact/info_icon.png",
+      "size_px": [
+        37,
+        36
+      ],
+      "sha256": "34a4f572eaad5e4d7ae5de0aae7592adaa0ca6f31256c43afabfb6001173dc31",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        214,
+        708,
+        37,
+        36
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.rules_icon": {
+      "file": "exact/rules_icon.png",
+      "size_px": [
+        40,
+        43
+      ],
+      "sha256": "404c8cf036f3b2905d08d99e7039f34195d3bead988874682ac92c2784210ebf",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        205,
+        775,
+        40,
+        43
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.rules_entry": {
+      "file": "exact/rules_entry.png",
+      "size_px": [
+        160,
+        43
+      ],
+      "sha256": "4d937517d463e0b0cdfff2d331512037ac528e996c0bdfbc6ccad57cfe51f143",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        205,
+        775,
+        160,
+        43
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.claim_button": {
+      "file": "exact/claim_button.png",
+      "size_px": [
+        318,
+        70
+      ],
+      "sha256": "50ce25c896c6c4a643fc727571093f5e334f3e01a3cda9ea0e16f5f809d2c94c",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1162,
+        760,
+        318,
+        70
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.rule_text": {
+      "file": "exact/rule_text.png",
+      "size_px": [
+        921,
+        32
+      ],
+      "sha256": "835d358e8213eb4b117d7210b9a11b009af9d6f8ca3c1fac8b4f651fa792d5d5",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        262,
+        711,
+        921,
+        32
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.outside_close_hint": {
+      "file": "exact/outside_close_hint.png",
+      "size_px": [
+        260,
+        29
+      ],
+      "sha256": "dbc98ed9f91c0366b0fbddbd074995fdfd6600e734c6c1e1e8456767186119b5",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        704,
+        879,
+        260,
+        29
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.divider_top": {
+      "file": "exact/divider_top.png",
+      "size_px": [
+        1264,
+        7
+      ],
+      "sha256": "bad43558372db5326668b510b6b9f4925fe8cdc28e2d0d47945b62da9d724312",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        207,
+        270,
+        1264,
+        7
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.divider_middle": {
+      "file": "exact/divider_middle.png",
+      "size_px": [
+        1264,
+        9
+      ],
+      "sha256": "41f9c7ec65951d43e414b65dce2742a3bf07627a02f4c3033f02c51bd0f3ac1a",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        207,
+        694,
+        1264,
+        9
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.divider_footer": {
+      "file": "exact/divider_footer.png",
+      "size_px": [
+        1264,
+        9
+      ],
+      "sha256": "0bd3a375987972da37e7569468d7aa7805b2f5a77ee31a0fa0ba55c1f469bfb9",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        207,
+        747,
+        1264,
+        9
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day1": {
+      "file": "exact/day1.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "10afe233d144ee0a2be97b929e6f78a5794ddd1dcf0aaebd2ca841dc484ed417",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        207,
+        288,
+        153,
+        385
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day1_header": {
+      "file": "exact/day1_header.png",
+      "size_px": [
+        119,
+        36
+      ],
+      "sha256": "524721c82ec2b2f486afaf1793f2bee257d36d259722db4918eea3c6dcd874cb",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        224,
+        308,
+        119,
+        36
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day1_label": {
+      "file": "exact/day1_label.png",
+      "size_px": [
+        133,
+        33
+      ],
+      "sha256": "e09ba3e6cf47f856c6e5dd4f294f71b48308a85a60f62f46d1997e8f87decb1d",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        217,
+        508,
+        133,
+        33
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day1_status": {
+      "file": "exact/day1_status.png",
+      "size_px": [
+        103,
+        72
+      ],
+      "sha256": "adc6b9d882884c4204af7606a27b234d7c2372e2c38c6fd25cf4dcd2d7230468",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        232,
+        581,
+        103,
+        72
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day2": {
+      "file": "exact/day2.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "5960365a3f377165580690eea3d8ed4cfe95a4e8da3d3de9501c0b1a6aaf9cfc",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        366,
+        288,
+        153,
+        385
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day2_header": {
+      "file": "exact/day2_header.png",
+      "size_px": [
+        119,
+        36
+      ],
+      "sha256": "3b74c4481e55c777a2b9caba555c07818227f955f6def35e1be9f784cfe3f2ff",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        383,
+        308,
+        119,
+        36
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day2_label": {
+      "file": "exact/day2_label.png",
+      "size_px": [
+        133,
+        33
+      ],
+      "sha256": "298e3403d05fb42317d220059f56ae7e872fa285316fa147b879b7a4f1e37164",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        376,
+        508,
+        133,
+        33
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day2_status": {
+      "file": "exact/day2_status.png",
+      "size_px": [
+        103,
+        72
+      ],
+      "sha256": "a01418bb5f2c24d84e212c26fa9537aa59dde1aa261751e1d6abe7bacda36d53",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        391,
+        581,
+        103,
+        72
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day3": {
+      "file": "exact/day3.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "f90fb17dfc4f91b295ac948d8d51fc0b3ad3c7cd9d13587bd65566b9bfbaa6e1",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        525,
+        288,
+        153,
+        385
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day3_header": {
+      "file": "exact/day3_header.png",
+      "size_px": [
+        119,
+        36
+      ],
+      "sha256": "10888cf8d354dfb799a1e8b27545514eb8cdb43ebd57f6f2ac2f7dc66e13400e",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        542,
+        308,
+        119,
+        36
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day3_label": {
+      "file": "exact/day3_label.png",
+      "size_px": [
+        133,
+        33
+      ],
+      "sha256": "e7b41cef7c40ed16771a09652c16fe2a2a5ba47f048ad82b90760ac330da613c",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        535,
+        508,
+        133,
+        33
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day3_status": {
+      "file": "exact/day3_status.png",
+      "size_px": [
+        103,
+        72
+      ],
+      "sha256": "d1b10732b2cccf5d0dc646768002a392689ad5192fc6f7976be8f2064dc4cc8a",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        550,
+        581,
+        103,
+        72
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day4": {
+      "file": "exact/day4.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "c12cdaf6617e9888699cf78fb7d10efa000df5c1561162c44f6a111d7d0bcb4d",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        684,
+        288,
+        153,
+        385
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day4_header": {
+      "file": "exact/day4_header.png",
+      "size_px": [
+        119,
+        36
+      ],
+      "sha256": "eb2a8df5955f2f347faab90b01bd6fc01d7cfe6796496f6b8b8046c6fcb90adb",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        701,
+        308,
+        119,
+        36
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day4_label": {
+      "file": "exact/day4_label.png",
+      "size_px": [
+        133,
+        33
+      ],
+      "sha256": "cf45b8902b62dcd53eb1bbe275394a9afd1943c9a1e1b168b66fbebfcc3b2596",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        694,
+        508,
+        133,
+        33
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day4_status": {
+      "file": "exact/day4_status.png",
+      "size_px": [
+        103,
+        72
+      ],
+      "sha256": "ab0420af27451af9802acaf09a58fdbd119166f310707811cfb825a0695c01e3",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        709,
+        581,
+        103,
+        72
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day5": {
+      "file": "exact/day5.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "8b585179d52c6ae8c5040b4ba99d5ce9540a288c6064d352ddb2c525378c2086",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        843,
+        288,
+        153,
+        385
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day5_header": {
+      "file": "exact/day5_header.png",
+      "size_px": [
+        119,
+        36
+      ],
+      "sha256": "f763c4e6e861ce253998f65d1868b1a1086d03560b7a0dc7081a1d2d4bd6157e",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        860,
+        308,
+        119,
+        36
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day5_label": {
+      "file": "exact/day5_label.png",
+      "size_px": [
+        133,
+        33
+      ],
+      "sha256": "9aac8ad181100e4cea537b90449407fc8699ace93387fcbbba711c9f1a8a0dd1",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        853,
+        508,
+        133,
+        33
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day5_status": {
+      "file": "exact/day5_status.png",
+      "size_px": [
+        103,
+        72
+      ],
+      "sha256": "4039b16a2491a229b77a12ffd7b7928385a63ff95007143721c8f7b9744efcbb",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        868,
+        581,
+        103,
+        72
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day6": {
+      "file": "exact/day6.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "f3afa6b14da70b2be286ff9fd16bb7e20a19a90a75501b633173a96d64675095",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1002,
+        288,
+        153,
+        385
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day6_header": {
+      "file": "exact/day6_header.png",
+      "size_px": [
+        119,
+        36
+      ],
+      "sha256": "253394662ea9b99331d9e3933b58bfb365aebeb39ba23dcdb8527c6a2de273e7",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1019,
+        308,
+        119,
+        36
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day6_label": {
+      "file": "exact/day6_label.png",
+      "size_px": [
+        133,
+        33
+      ],
+      "sha256": "b8b787e7f97d9a169fe024eaedb0a4629076b1d1ac8d77c4b2fa8d290720abff",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1012,
+        508,
+        133,
+        33
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.day6_status": {
+      "file": "exact/day6_status.png",
+      "size_px": [
+        103,
+        72
+      ],
+      "sha256": "3452b707fc90af46127c03782bc229c7061b0dbaf7acdf3b3c0d7a60670b0d7c",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1027,
+        581,
+        103,
+        72
+      ],
+      "runtime_default": false,
+      "contains_baked_background": true
+    },
+    "exact.item.coins": {
+      "file": "exact/item_coins.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "a6f1ebaa7212c11f8ce680f5d2eecb2f372c5990137931b1aec000ed82f60432",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        209,
+        353,
+        146,
+        150
+      ],
+      "runtime_default": false
+    },
+    "daily.item.coins": {
+      "file": "runtime/items/coins_medallion.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "2a5a5eb5bec5b495d2217e22f1744d1c2051096dbcdbace48ff084e7c4481c5f",
+      "quality": "source_pixels_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        209,
+        353,
+        146,
+        150
+      ],
+      "includes_ivory_medallion": true,
+      "note": "保留原图物品及圆形底纹；圆形之外透明，非仅物品轮廓的抠图。不要再叠第二层圆底。"
+    },
+    "exact.item.wood": {
+      "file": "exact/item_wood.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "adb9c28635226545e8ecef1370f1949eee273bd6b8b71b25b57b19049e02c0cf",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        369,
+        353,
+        146,
+        150
+      ],
+      "runtime_default": false
+    },
+    "daily.item.wood": {
+      "file": "runtime/items/wood_medallion.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "0fca3154d6ae2f2cacf416b8d21792c78df4f25e2555aee2f59bf9abb054bf77",
+      "quality": "source_pixels_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        369,
+        353,
+        146,
+        150
+      ],
+      "includes_ivory_medallion": true,
+      "note": "保留原图物品及圆形底纹；圆形之外透明，非仅物品轮廓的抠图。不要再叠第二层圆底。"
+    },
+    "exact.item.book": {
+      "file": "exact/item_book.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "79ae77ddd11ec46ac029a2bbdb22cdc8b4b23ece5d8154e2c6a399435f0db921",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        529,
+        353,
+        146,
+        150
+      ],
+      "runtime_default": false
+    },
+    "daily.item.book": {
+      "file": "runtime/items/book_medallion.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "f6444fa6d37c7eaa666dffc7ad4a422e53437834b1d1ddb59bbb400c9cfa6b75",
+      "quality": "source_pixels_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        529,
+        353,
+        146,
+        150
+      ],
+      "includes_ivory_medallion": true,
+      "note": "保留原图物品及圆形底纹；圆形之外透明，非仅物品轮廓的抠图。不要再叠第二层圆底。"
+    },
+    "exact.item.ticket": {
+      "file": "exact/item_ticket.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "80892b4ad45e20944934c630448722f4fff3795f056c152b7886a7bb998bc262",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        688,
+        353,
+        146,
+        150
+      ],
+      "runtime_default": false
+    },
+    "daily.item.ticket": {
+      "file": "runtime/items/ticket_medallion.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "624c88ba42eb1a716a2a8ffad6a5889c68a8bbdf3dcca555b4708d12ef00d9ba",
+      "quality": "source_pixels_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        688,
+        353,
+        146,
+        150
+      ],
+      "includes_ivory_medallion": true,
+      "note": "保留原图物品及圆形底纹；圆形之外透明，非仅物品轮廓的抠图。不要再叠第二层圆底。"
+    },
+    "exact.item.crystals": {
+      "file": "exact/item_crystals.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "2760672b056e391f34f54b32b5a1eed11030d9d7ccb5ca4206e277380a00e66e",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        847,
+        353,
+        146,
+        150
+      ],
+      "runtime_default": false
+    },
+    "daily.item.crystals": {
+      "file": "runtime/items/crystals_medallion.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "f31a4c5fa3de27e1674520300424287107aa3d24793874db927d2af2569a63e8",
+      "quality": "source_pixels_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        847,
+        353,
+        146,
+        150
+      ],
+      "includes_ivory_medallion": true,
+      "note": "保留原图物品及圆形底纹；圆形之外透明，非仅物品轮廓的抠图。不要再叠第二层圆底。"
+    },
+    "exact.item.material": {
+      "file": "exact/item_material.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "b264f471099fbeb5b7f750175847fabea1e36f66e76efde1f6a48fe404e3d152",
+      "quality": "exact_source_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1005,
+        353,
+        146,
+        150
+      ],
+      "runtime_default": false
+    },
+    "daily.item.material": {
+      "file": "runtime/items/material_medallion.png",
+      "size_px": [
+        146,
+        150
+      ],
+      "sha256": "8f98e243fbdacf770a53c9c007adc3677935eac602717993f3b20387ef5b8fd4",
+      "quality": "source_pixels_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        1005,
+        353,
+        146,
+        150
+      ],
+      "includes_ivory_medallion": true,
+      "note": "保留原图物品及圆形底纹；圆形之外透明，非仅物品轮廓的抠图。不要再叠第二层圆底。"
+    },
+    "daily.card.body": {
+      "file": "runtime/cards/day_body.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "7da0d2bf7441cad4137c916f3f0e43619421c39ef3060c1608ce081c43c0af44",
+      "quality": "imagegen_inpainted_plate_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        207,
+        288,
+        153,
+        385
+      ],
+      "source": "generated_candidates/blank_components_plate.png",
+      "not_pixel_identical_to_original": true
+    },
+    "daily.card.week_end": {
+      "file": "runtime/cards/week_end_body.png",
+      "size_px": [
+        320,
+        405
+      ],
+      "sha256": "834d308b728c143c782b865a3db38518cf1120323cca427243c4754481706ecf",
+      "quality": "imagegen_inpainted_plate_crop",
+      "alpha_range": null,
+      "source_xywh": [
+        1160,
+        281,
+        320,
+        405
+      ],
+      "source": "generated_candidates/blank_components_plate.png",
+      "not_pixel_identical_to_original": true
+    },
+    "daily.badge.pass.active": {
+      "file": "runtime/badges/pass_active.png",
+      "size_px": [
+        253,
+        54
+      ],
+      "sha256": "b8da9c5797b9d07256091ac3523911f882daa95e074cbdee3f57f452c6dee7df",
+      "quality": "imagegen_inpainted_plate_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        1221,
+        190,
+        253,
+        54
+      ],
+      "source": "generated_candidates/blank_components_plate.png",
+      "not_pixel_identical_to_original": true
+    },
+    "daily.badge.premium": {
+      "file": "runtime/badges/premium.png",
+      "size_px": [
+        139,
+        40
+      ],
+      "sha256": "4b374bc0a5fb144d692434c76b7c6d2dad2d296dd9a367378a4731fa4a1f08ea",
+      "quality": "imagegen_inpainted_plate_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        1176,
+        484,
+        139,
+        40
+      ],
+      "source": "generated_candidates/blank_components_plate.png",
+      "not_pixel_identical_to_original": true
+    },
+    "daily.badge.today": {
+      "file": "runtime/badges/today.png",
+      "size_px": [
+        236,
+        43
+      ],
+      "sha256": "e5e116ab73fc07fc112ca14045d4bbef36c25262dbd06bf4c26c7c8dfaefaf42",
+      "quality": "imagegen_inpainted_plate_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        1201,
+        631,
+        236,
+        43
+      ],
+      "source": "generated_candidates/blank_components_plate.png",
+      "not_pixel_identical_to_original": true
+    },
+    "daily.button.claim.normal": {
+      "file": "runtime/buttons/claim_normal.png",
+      "size_px": [
+        318,
+        70
+      ],
+      "sha256": "04b318cba44f1399ef899af653e34f814dc34d83de9e2c126f633fafc1b2ee1b",
+      "quality": "imagegen_inpainted_plate_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        1162,
+        760,
+        318,
+        70
+      ],
+      "source": "generated_candidates/blank_components_plate.png",
+      "not_pixel_identical_to_original": true
+    },
+    "shared.candidate.daily_window": {
+      "file": "runtime/frame/empty_window_candidate.png",
+      "size_px": [
+        1554,
+        852
+      ],
+      "sha256": "8da3aac8503dcd34abd450fa2aebd2996078cbd74df0817b83b6fd2928a0bbfa",
+      "quality": "imagegen_inpainted_manual_alpha_clip",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "generated_candidates/empty_shell_before_alpha.png",
+      "not_pixel_identical_to_original": true,
+      "source_xywh": [
+        60,
+        42,
+        1554,
+        852
+      ],
+      "note": "原生成结果带RGB棋盘格；已按窗口轮廓裁除外部并写入真实Alpha。仅供共用窗口候选，不自动覆盖旧壳。"
+    },
+    "daily.icon.calendar.normal": {
+      "file": "runtime/icons/calendar_normal.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "05c7ae312eca50cba59d1b870e84bff6b58e6620d4724fb31e6e58b309a9c452",
+      "quality": "source_silhouette_color_matte_extraction",
+      "alpha_range": null,
+      "source_xywh": [
+        714,
+        120,
+        45,
+        46
+      ],
+      "note": "轮廓由原图提取、统一着色去底；非原像素RGB。64画布，禁止按空白边距二次缩小。"
+    },
+    "daily.icon.close_local.normal": {
+      "file": "runtime/icons/close_local_normal.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "a21fb03fc1c48d3e186ac329a5edf8b7c1833a4261fb61e07da5c4cfc3a794b0",
+      "quality": "source_silhouette_color_matte_extraction",
+      "alpha_range": null,
+      "source_xywh": [
+        1430,
+        119,
+        45,
+        46
+      ],
+      "note": "轮廓由原图提取、统一着色去底；非原像素RGB。64画布，禁止按空白边距二次缩小。"
+    },
+    "daily.icon.info.normal": {
+      "file": "runtime/icons/info_normal.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "9280bf9de890d27422b6d06b3ec309c78d5d40081433ba825708506246bacbcb",
+      "quality": "source_silhouette_color_matte_extraction",
+      "alpha_range": null,
+      "source_xywh": [
+        214,
+        708,
+        37,
+        36
+      ],
+      "note": "轮廓由原图提取、统一着色去底；非原像素RGB。64画布，禁止按空白边距二次缩小。"
+    },
+    "daily.icon.rules_local.normal": {
+      "file": "runtime/icons/rules_local_normal.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "20a5fc068c0d43402978f6991dd63325c8e581762d2f9d33e87bd13e1f795d75",
+      "quality": "source_silhouette_color_matte_extraction",
+      "alpha_range": null,
+      "source_xywh": [
+        205,
+        775,
+        40,
+        43
+      ],
+      "note": "轮廓由原图提取、统一着色去底；非原像素RGB。64画布，禁止按空白边距二次缩小。"
+    },
+    "daily.icon.pass.normal": {
+      "file": "runtime/icons/pass_normal.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "106830ec658f9670a89e1ce39c659ad5a2ddc8ce36c6c6821adf2a27ff863f3b",
+      "quality": "source_silhouette_color_matte_extraction",
+      "alpha_range": null,
+      "source_xywh": [
+        1254,
+        198,
+        40,
+        39
+      ],
+      "note": "轮廓由原图提取、统一着色去底；非原像素RGB。64画布，禁止按空白边距二次缩小。"
+    },
+    "daily.icon.claimed": {
+      "file": "runtime/icons/check_claimed.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "1be520b2cc99782bd9e94ec2751092134e741681010b89f6fa46500c28fc1d3e",
+      "quality": "source_pixels_geometric_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        263,
+        584,
+        35,
+        34
+      ]
+    },
+    "daily.item.weapon": {
+      "file": "runtime/items/weapon_estimated_alpha.png",
+      "size_px": [
+        203,
+        190
+      ],
+      "sha256": "78b2e19ab1d78a5ef6c796a5c7d6780f89c722514165994ed7c8aa8dd6a35243",
+      "quality": "source_pixels_manual_silhouette_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        1257,
+        449,
+        203,
+        190
+      ],
+      "note": "手工轮廓保留原图浅色金属边缘；原图被状态条遮挡的剑尖部分未臆造恢复。"
+    },
+    "daily.item.ticket_small": {
+      "file": "runtime/items/ticket_small_estimated_alpha.png",
+      "size_px": [
+        108,
+        97
+      ],
+      "sha256": "268c07476d0347ee53533a4d793541f41d4f50b623e4be6d1c6e26e9886c3e8d",
+      "quality": "source_pixels_manual_silhouette_alpha",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_xywh": [
+        1200,
+        356,
+        108,
+        97
+      ],
+      "note": "原图RGB和手工外轮廓Alpha；保留票面浅色区域，凹口外透明。"
+    },
+    "daily.button.claim.hover": {
+      "file": "runtime/buttons/claim_hover.png",
+      "size_px": [
+        318,
+        70
+      ],
+      "sha256": "8436b0ad5be94cb702aca940cd584e6b79d20b89b744ca8c4f3348f82218dbdc",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "base": "runtime/buttons/claim_normal.png"
+    },
+    "daily.card.week_end.hover": {
+      "file": "runtime/cards/week_end_hover.png",
+      "size_px": [
+        320,
+        405
+      ],
+      "sha256": "5429f511bae7783f5cf77b2d2e75e5b018474628f36faa2af44a764c9c4cd0d0",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/cards/week_end_body.png"
+    },
+    "daily.card.hover": {
+      "file": "runtime/cards/day_hover.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "ce0a1a54609eece74f78f0535602566d1884933a352229f23b9e4bc7bf5f639f",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/cards/day_body.png"
+    },
+    "daily.button.claim.pressed": {
+      "file": "runtime/buttons/claim_pressed.png",
+      "size_px": [
+        318,
+        70
+      ],
+      "sha256": "f626a29cc5027060edd9b35447e6c8461c10e6db02363fff03150ae7b0c06843",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "base": "runtime/buttons/claim_normal.png"
+    },
+    "daily.card.week_end.pressed": {
+      "file": "runtime/cards/week_end_pressed.png",
+      "size_px": [
+        320,
+        405
+      ],
+      "sha256": "9cc7b944801ad6fbdda1be0fc1d33c22f098ab8de996f3b65cf3b8fecc08782b",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/cards/week_end_body.png"
+    },
+    "daily.card.pressed": {
+      "file": "runtime/cards/day_pressed.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "9a910f6efbed0c9c06f15bf1832fcc0d8aa21bf73691da9ba886f383b8449ab5",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/cards/day_body.png"
+    },
+    "daily.button.claim.disabled": {
+      "file": "runtime/buttons/claim_disabled.png",
+      "size_px": [
+        318,
+        70
+      ],
+      "sha256": "35c6e36ffc06d55eac428299be12479c6b742bdf506846f724d9a74124eb5fe5",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "base": "runtime/buttons/claim_normal.png"
+    },
+    "daily.card.week_end.disabled": {
+      "file": "runtime/cards/week_end_disabled.png",
+      "size_px": [
+        320,
+        405
+      ],
+      "sha256": "a6a2647ade7cb350aed33e8df42d550e6a2af7f337a9ed75d3da173e89b75303",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/cards/week_end_body.png"
+    },
+    "daily.card.disabled": {
+      "file": "runtime/cards/day_disabled.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "8d556d1c9eb6e451b369b93ac243e010f723daaef020f1aecb815cf74ca122bb",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/cards/day_body.png"
+    },
+    "daily.icon.calendar.hover": {
+      "file": "runtime/icons/calendar_hover.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "b6eb773c17c3858b3d23d58a663864955271ac2c9a770f36078d3f107e708503",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/calendar_normal.png"
+    },
+    "daily.icon.calendar.pressed": {
+      "file": "runtime/icons/calendar_pressed.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "23128ea8b2cf906b76c847be7d35675488abc26c9ec4544c9876f23a1aa714fe",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/calendar_normal.png"
+    },
+    "daily.icon.calendar.disabled": {
+      "file": "runtime/icons/calendar_disabled.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "d7eb12b60acaf30e9c86436577654d548f04742467410733187433e108e279d7",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/calendar_normal.png"
+    },
+    "daily.icon.close_local.hover": {
+      "file": "runtime/icons/close_local_hover.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "c123452fabf3601054d1bf781a42c2ca74ada786ddc5a6fff4a882d07074c587",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/close_local_normal.png"
+    },
+    "daily.icon.close_local.pressed": {
+      "file": "runtime/icons/close_local_pressed.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "38d13b7acdc2a1c90a97c0f8d5c50b0cfa2dd9c8a41ae635cb5b58082bc66760",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/close_local_normal.png"
+    },
+    "daily.icon.close_local.disabled": {
+      "file": "runtime/icons/close_local_disabled.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "a4c8abdb3cfe2babfe8dcc63af44dc43b1688d17b34a3f680ad7f1877b6fdb17",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/close_local_normal.png"
+    },
+    "daily.icon.info.hover": {
+      "file": "runtime/icons/info_hover.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "b3f410dc823e17cb712b39781de2f724639bc5d5901f2928108dc587257f9c2f",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/info_normal.png"
+    },
+    "daily.icon.info.pressed": {
+      "file": "runtime/icons/info_pressed.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "bfc4e900f95c89afb0503777c81b966def1a82e1f50f2d1d715b345406bacd6f",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/info_normal.png"
+    },
+    "daily.icon.info.disabled": {
+      "file": "runtime/icons/info_disabled.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "019f8a464fac73a4a4be6c9be7d8f7353a2e2337445ddc02471abfec2cdce511",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/info_normal.png"
+    },
+    "daily.icon.rules_local.hover": {
+      "file": "runtime/icons/rules_local_hover.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "d8c031cf53cadebcfaec420e54df51cc2e3bc4e32d77a628fa4c5fcecf66be94",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/rules_local_normal.png"
+    },
+    "daily.icon.rules_local.pressed": {
+      "file": "runtime/icons/rules_local_pressed.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "4cefd5477a787c23a7af13a408c263443b3994017c96d9123d66b2bebab1b227",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/rules_local_normal.png"
+    },
+    "daily.icon.rules_local.disabled": {
+      "file": "runtime/icons/rules_local_disabled.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "2878670af1261b8ca58dcf08651a129a28f651dc71bfbdd9340c56b7d2771aa6",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/rules_local_normal.png"
+    },
+    "daily.icon.pass.hover": {
+      "file": "runtime/icons/pass_hover.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "6bc03901db4a497e11a89c6bedfc5583f23355ce6d5ad12c3fd9f9037f66efd7",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/pass_normal.png"
+    },
+    "daily.icon.pass.pressed": {
+      "file": "runtime/icons/pass_pressed.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "2405187dc3286c61e116a41c35932263d8c42690f96760eaa1bc94a7e3461ee3",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/pass_normal.png"
+    },
+    "daily.icon.pass.disabled": {
+      "file": "runtime/icons/pass_disabled.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "ea54b6dd069a34e9b9da9d6e41e5913c21ea369151bdd3ceaf40862c30e8f28d",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": null,
+      "base": "runtime/icons/pass_normal.png"
+    },
+    "daily.badge.pass.inactive": {
+      "file": "runtime/badges/pass_inactive.png",
+      "size_px": [
+        253,
+        54
+      ],
+      "sha256": "37b154d67f8b5e9fd865ee4ab6f49e21158cf503fb1bc6590457ca9cd75b968e",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "base": "runtime/badges/pass_active.png"
+    },
+    "daily.card.border.today": {
+      "file": "runtime/cards/today_border.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "19d573383c3a5de659b343ebfb764477612697a86e11a7bd1301c3b0c5b870af",
+      "quality": "source_border_nine_region_adaptation",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "insets": [
+        18,
+        18,
+        18,
+        18
+      ],
+      "source_xywh": [
+        1160,
+        281,
+        320,
+        405
+      ],
+      "note": "保留原高亮边缘的暖白底色；适用于本套象牙白卡底，不是纯发光特效。"
+    },
+    "icon.close": {
+      "file": "shared/icon/close.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "abf09aa54a261eaf31af405fd824c2a1bb0f8c2d797d36d94b8563a2963f79de",
+      "quality": "byte_identical_existing_shared_asset",
+      "alpha_range": [
+        0,
+        243
+      ],
+      "original_quality": "extracted_alpha_needs_edge_check",
+      "original_file": "shared/icon/close.png",
+      "original_registry": "ui_reuse_system_v1/specs/resource_registry.json"
+    },
+    "icon.pool_details": {
+      "file": "shared/icon/pool_details.png",
+      "size_px": [
+        48,
+        55
+      ],
+      "sha256": "8254c559ad31eb0cfbb39ab8aa66791fa6a69b05fb4e3a1f164751d083b28906",
+      "quality": "byte_identical_existing_shared_asset",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "original_quality": "extracted_recolored_alpha",
+      "original_file": "shared/icon/pool_details.png",
+      "original_registry": "ui_reuse_system_v1/specs/resource_registry.json"
+    },
+    "icon.history": {
+      "file": "shared/icon/history.png",
+      "size_px": [
+        53,
+        59
+      ],
+      "sha256": "d7b6605a4f7e9e5b4200f62c5ac51f8ca8234086d9a68dab18032582e3e82e27",
+      "quality": "byte_identical_existing_shared_asset",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "original_quality": "extracted_recolored_alpha",
+      "original_file": "shared/icon/history.png",
+      "original_registry": "ui_reuse_system_v1/specs/resource_registry.json"
+    },
+    "badge.locked": {
+      "file": "shared/badge/locked.png",
+      "size_px": [
+        140,
+        44
+      ],
+      "sha256": "db64c5fc43a915dd02f891929c6d454a834ac3e614ab56cde522c63cec5ec948",
+      "quality": "byte_identical_existing_shared_asset",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "original_quality": "generated_candidate",
+      "original_file": "shared/badge/locked.png",
+      "original_registry": "ui_reuse_system_v1/specs/resource_registry.json"
+    },
+    "button.ivory.normal": {
+      "file": "shared/button/ivory/normal.png",
+      "size_px": [
+        312,
+        72
+      ],
+      "sha256": "b240aa70690d62af0027a4b746d7b1a0dc9cadea48b31c654d26d19d9b01cec9",
+      "quality": "byte_identical_existing_shared_asset",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "original_quality": "existing_procedural_candidate",
+      "original_file": "shared/button/ivory/normal.png",
+      "original_registry": "ui_reuse_system_v1/specs/resource_registry.json"
+    },
+    "button.ivory.hover": {
+      "file": "shared/button/ivory/hover.png",
+      "size_px": [
+        312,
+        72
+      ],
+      "sha256": "6c404f335af47cd71cbc855ef02393d5492ccc9f150cda86ec7f06f6ff9e95a0",
+      "quality": "byte_identical_existing_shared_asset",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "original_quality": "existing_procedural_candidate",
+      "original_file": "shared/button/ivory/hover.png",
+      "original_registry": "ui_reuse_system_v1/specs/resource_registry.json"
+    },
+    "button.ivory.pressed": {
+      "file": "shared/button/ivory/pressed.png",
+      "size_px": [
+        312,
+        72
+      ],
+      "sha256": "30d6552a3f3219ee16f9e78f5544f631053164808f19533e9c08bb9b381069c5",
+      "quality": "byte_identical_existing_shared_asset",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "original_quality": "existing_procedural_candidate",
+      "original_file": "shared/button/ivory/pressed.png",
+      "original_registry": "ui_reuse_system_v1/specs/resource_registry.json"
+    },
+    "button.ivory.disabled": {
+      "file": "shared/button/ivory/disabled.png",
+      "size_px": [
+        312,
+        72
+      ],
+      "sha256": "d9854ac76c3122defd68f91e942f48ff77503b7c6d342e2103d9980f1b9d8737",
+      "quality": "byte_identical_existing_shared_asset",
+      "alpha_range": [
+        0,
+        166
+      ],
+      "original_quality": "existing_procedural_candidate",
+      "original_file": "shared/button/ivory/disabled.png",
+      "original_registry": "ui_reuse_system_v1/specs/resource_registry.json"
+    },
+    "daily.card.empty": {
+      "file": "runtime/cards/day_empty.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "1e66b47df1ef4aa92ab45526ae13684f2871f6175a4ef3b7a4b2c7ba5775b6eb",
+      "quality": "inpainted_border_with_flat_content_fill",
+      "alpha_range": [
+        255,
+        255
+      ],
+      "note": "默认可复用空卡底；只保留边框，物品圆底由原图medallion素材承担，不双叠圆底。"
+    },
+    "daily.card.empty.hover": {
+      "file": "runtime/cards/day_empty_hover.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "a5e31da888fb25e14ae292b84fc151ee6aced3beb031bf53d1b086dd5dc68c6a",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": [
+        255,
+        255
+      ],
+      "base": "runtime/cards/day_empty.png"
+    },
+    "daily.card.empty.pressed": {
+      "file": "runtime/cards/day_empty_pressed.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "2b62cbc13c7525771b842e1b0a06a37dea8cbbf08761352bb450b38f77e30b9c",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": [
+        255,
+        255
+      ],
+      "base": "runtime/cards/day_empty.png"
+    },
+    "daily.card.empty.disabled": {
+      "file": "runtime/cards/day_empty_disabled.png",
+      "size_px": [
+        153,
+        385
+      ],
+      "sha256": "843d32e832fcc4084d0068f657055299f346c6b2a445410403e46b25cfe36372",
+      "quality": "deterministic_state_from_base",
+      "alpha_range": [
+        255,
+        255
+      ],
+      "base": "runtime/cards/day_empty.png"
+    },
+    "daily.icon.lock": {
+      "file": "runtime/icons/lock.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "cc284969bebd1d614cb4c92ff91474d22b3f40499e886973f4039d5a6b5c1e5a",
+      "quality": "new_minimal_geometric_supplement",
+      "alpha_range": null,
+      "note": "原确认稿未出现的状态图标；新增统一线宽，不使用emoji。"
+    },
+    "daily.icon.clock": {
+      "file": "runtime/icons/clock.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "84b9c3a3f74561e24d1c39f54cbb17dc70b961a314db0e4abfacee0c87651c4e",
+      "quality": "new_minimal_geometric_supplement",
+      "alpha_range": null,
+      "note": "原确认稿未出现的状态图标；新增统一线宽，不使用emoji。"
+    },
+    "daily.icon.spinner": {
+      "file": "runtime/icons/spinner.png",
+      "size_px": [
+        64,
+        64
+      ],
+      "sha256": "b7e32ca8dbf839db2f98aa9ea4ef04d2c3c10d7b6b6001b3e34bc77821dd4f79",
+      "quality": "new_minimal_geometric_supplement",
+      "alpha_range": null,
+      "note": "原确认稿未出现的状态图标；新增统一线宽，不使用emoji。"
+    },
+    "shared.candidate.daily_window.r0c0": {
+      "file": "runtime/frame/nine/r0c0.png",
+      "size_px": [
+        32,
+        32
+      ],
+      "sha256": "284042f1605fcb96f3d99902f97004672791618a43fc9272b3b2d2137f9df29d",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        0,
+        0,
+        32,
+        32
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.r0c1": {
+      "file": "runtime/frame/nine/r0c1.png",
+      "size_px": [
+        1490,
+        32
+      ],
+      "sha256": "2f8be7e59f3ad5bd000f55f63d63b8ee277add3401cf650855772ef9277b2a66",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        32,
+        0,
+        1490,
+        32
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.r0c2": {
+      "file": "runtime/frame/nine/r0c2.png",
+      "size_px": [
+        32,
+        32
+      ],
+      "sha256": "0a4220675c06bffa3f946d89076738e8ec0cbec5dad96c3cbe39eea5b2e1a966",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        1522,
+        0,
+        32,
+        32
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.r1c0": {
+      "file": "runtime/frame/nine/r1c0.png",
+      "size_px": [
+        32,
+        788
+      ],
+      "sha256": "cffa8550f4296442476daa8e754a6eaadc7fc6dd837e67eb88506979294575bf",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        0,
+        32,
+        32,
+        788
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.r1c1": {
+      "file": "runtime/frame/nine/r1c1.png",
+      "size_px": [
+        1490,
+        788
+      ],
+      "sha256": "a39e31a934d8462fbd15011f460b6889c2c237b10603fdc7e39899fdbed9e4cb",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        255,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        32,
+        32,
+        1490,
+        788
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.r1c2": {
+      "file": "runtime/frame/nine/r1c2.png",
+      "size_px": [
+        32,
+        788
+      ],
+      "sha256": "8dc4e5077320c94dcf272ea50e56658042aa264865767246ed9ccee086aecb2d",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        1522,
+        32,
+        32,
+        788
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.r2c0": {
+      "file": "runtime/frame/nine/r2c0.png",
+      "size_px": [
+        32,
+        32
+      ],
+      "sha256": "23976d1471e202ff5c9b01ea114f2d0867de58908c371222d6f5296fa62a2904",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        0,
+        820,
+        32,
+        32
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.r2c1": {
+      "file": "runtime/frame/nine/r2c1.png",
+      "size_px": [
+        1490,
+        32
+      ],
+      "sha256": "e6493f6059d2cc3d9ecd7b8d21ce8f1bcc950b4daaf4dbe76d336a2762b98146",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        32,
+        820,
+        1490,
+        32
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.r2c2": {
+      "file": "runtime/frame/nine/r2c2.png",
+      "size_px": [
+        32,
+        32
+      ],
+      "sha256": "5580a247866d13040edb37190d22703b786707966ddba389bcf0c62136da8242",
+      "quality": "nine_region_of_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source": "runtime/frame/empty_window_candidate.png",
+      "source_xywh": [
+        1522,
+        820,
+        32,
+        32
+      ],
+      "note": "外围角片固定；中片包含表面和标题栏纹理。非精确原图9切，不覆盖现有共用壳。"
+    },
+    "shared.candidate.daily_window.layout": {
+      "file": "runtime/frame/window_layout_candidate.png",
+      "size_px": [
+        1348,
+        758
+      ],
+      "sha256": "d27ea539c06494e60fb1c061b4c6880b11b2e1479315320c8ee7c2f610b63741",
+      "quality": "nine_region_adapted_inpainted_shell",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "base": "runtime/frame/empty_window_candidate.png",
+      "note": "供1672×941组合预览使用；四角32×32固定，非原图逐像素空窗。"
+    }
+  }
+}

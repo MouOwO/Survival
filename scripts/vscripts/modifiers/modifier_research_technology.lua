@@ -1,5 +1,7 @@
 modifier_research_technology = class({})
 modifier_research_armor_reduction = class({})
+_G.modifier_research_technology = modifier_research_technology
+_G.modifier_research_armor_reduction = modifier_research_armor_reduction
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")

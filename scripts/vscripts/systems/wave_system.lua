@@ -652,6 +652,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         player_id = channel and channel.player_id or nil,
         member_role = row.member_role or (is_assault_boss and "assault_boss" or "normal"),
         is_boss = is_assault_boss,
+        boss_warning = row.boss_warning ~= false,
     })
     publish("enemy_spawned")
 end

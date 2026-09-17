@@ -2,7 +2,7 @@
 
 ## 交付与运行
 
-- 组件入口：`output/lottery_handoff_preview/index.html`，直接浏览器打开。包含按钮五态、十个 SVG 图标、卡背、奖励卡、长名称和奖池滚动弹窗。
+- 组件入口：`ui/lottery_handoff_preview/index.html`，直接浏览器打开。包含按钮五态、十个 SVG 图标、卡背、奖励卡、长名称和奖池滚动弹窗。
 - 同目录的 `components.png`、`home.png`、`pool.png`、`single.png`、`ten.png` 是浏览器预览截图。`single-preview.webm`、`ten-preview.webm` 是浏览器真实帧采集编码的预览录屏，**不是 Dota 游戏内录屏**。
 - 原生实现：`panorama/src/layout/custom_game/lottery_window.xml`、`panorama/src/styles/custom_game/lottery_celestial.css`、`panorama/src/scripts/custom_game/lottery_ui.js`。
 - 共用层级管理：`panorama/src/scripts/custom_game/ui_layers.js`，公开 `SurvivalUILayers.Open/Close/CloseTop/Top`。抽奖全屏窗使用 100000 起始层级（高于现有 32767 的 HUD 代理），提升祖先链，栈弹出时恢复之前的 zIndex；详情弹窗压入第二层。无需重挂节点，避免打断现有 ID 查询和回调上下文。Escape 关闭栈顶。当前只接入抽奖系统，其他窗口可逐步注册。
@@ -24,7 +24,7 @@ SVG 按钮与关闭图标已由 Dota resourcecompiler 成功编译。正常、�
 
 ## 验证与未完成项
 
-`node tools/test_lottery_ui.js` 覆盖四池、旧快照、零消耗、余额不足、双击锁、单抽/十连时序、跳过/关闭、确认不发请求、重复响应、历史与层级恢复。`output/lottery_handoff_preview/verify.cjs` 使用本机 Chrome 检查并截图、录制；道具名称和属性来自 CSV，浏览器原生物品图标以明确占位显示，游戏复用 DOTAItemImage。
+`node tools/test_lottery_ui.js` 覆盖四池、旧快照、零消耗、余额不足、双击锁、单抽/十连时序、跳过/关闭、确认不发请求、重复响应、历史与层级恢复。`ui/lottery_handoff_preview/verify.cjs` 使用本机 Chrome 检查并截图、录制；道具名称和属性来自 CSV，浏览器原生物品图标以明确占位显示，游戏复用 DOTAItemImage。
 
 - 字体：本机未找到思源字体；浏览器实际检测标题为 SimSun，正文为 Microsoft YaHei，记录于 `fonts.json`。代码按要求优先声明思源宋体/黑体，但**尚未实现指定字体在游戏中真实加载**，需补充可供 Panorama 使用的字体资源与字体注册管线。
 - 没有同模型/同分层的箱盖素材，真实箱盖开合未完成；无新音频素材，未添加来源不明音效。

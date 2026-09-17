@@ -1,0 +1,1132 @@
+{
+  "categories": [
+    {
+      "id": "weapon",
+      "label": "武器与装备"
+    },
+    {
+      "id": "item",
+      "label": "道具与材料"
+    },
+    {
+      "id": "technology",
+      "label": "科技与服务"
+    },
+    {
+      "id": "challenge",
+      "label": "挑战商店"
+    },
+    {
+      "id": "rebirth",
+      "label": "转职挑战"
+    },
+    {
+      "id": "bundles",
+      "label": "礼包"
+    }
+  ],
+  "products": [
+    {
+      "id": "preview_weapon_0",
+      "item_id": "lottery_attribute_crystal",
+      "category": "weapon",
+      "name": "属性结晶",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_attribute_crystal.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 120,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_weapon_1",
+      "item_id": "shop_weapon_growth_sword_01",
+      "category": "weapon",
+      "name": "成长之剑 · 长名称展示测试",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_weapon_growth_sword_01.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。这是一段较长的模拟效果说明，用于检查悬停层内换行和滚动，购买不会改变角色属性或背包。",
+      "prices": [
+        {
+          "amount": 12,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_weapon_2",
+      "item_id": "lottery_nature_crystal",
+      "category": "weapon",
+      "name": "自然结晶",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_nature_crystal.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 360,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "owned",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_weapon_3",
+      "item_id": "fragment_03",
+      "category": "weapon",
+      "name": "神兵-焚焰",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_03.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 24,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "soldout",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_weapon_4",
+      "item_id": "shop_equipment_attack_gloves_01",
+      "category": "weapon",
+      "name": "加速手套LV1",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_equipment_attack_gloves_01.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 600,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_weapon_5",
+      "item_id": "lottery_recovery_crystal",
+      "category": "weapon",
+      "name": "回复结晶",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_recovery_crystal.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 36,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_weapon_6",
+      "item_id": "lottery_expansion_crystal",
+      "category": "weapon",
+      "name": "膨胀结晶",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_expansion_crystal.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 840,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_weapon_7",
+      "item_id": "fragment_04",
+      "category": "weapon",
+      "name": "神兵-净魂之刃",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_04.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 48,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_item_0",
+      "item_id": "shop_equipment_attack_gloves_01",
+      "category": "item",
+      "name": "加速手套LV1",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_equipment_attack_gloves_01.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 120,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_item_1",
+      "item_id": "lottery_recovery_crystal",
+      "category": "item",
+      "name": "回复结晶 · 长名称展示测试",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_recovery_crystal.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。这是一段较长的模拟效果说明，用于检查悬停层内换行和滚动，购买不会改变角色属性或背包。",
+      "prices": [
+        {
+          "amount": 12,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_item_2",
+      "item_id": "lottery_expansion_crystal",
+      "category": "item",
+      "name": "膨胀结晶",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_expansion_crystal.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 360,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "owned",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_item_3",
+      "item_id": "fragment_04",
+      "category": "item",
+      "name": "神兵-净魂之刃",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_04.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 24,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "soldout",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_item_4",
+      "item_id": "fragment_06",
+      "category": "item",
+      "name": "神兵-碎颅锤",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_06.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 600,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_item_5",
+      "item_id": "shop_equipment_burning_blade_01",
+      "category": "item",
+      "name": "灼热之刃LV1",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_equipment_burning_blade_01.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 36,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_item_6",
+      "item_id": "shop_item_death_mask",
+      "category": "item",
+      "name": "死亡面罩",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_item_death_mask.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 840,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_item_7",
+      "item_id": "lottery_wealth_crystal",
+      "category": "item",
+      "name": "财富结晶",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_wealth_crystal.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 48,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_technology_0",
+      "item_id": "fragment_06",
+      "category": "technology",
+      "name": "神兵-碎颅锤",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_06.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 120,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_technology_1",
+      "item_id": "shop_equipment_burning_blade_01",
+      "category": "technology",
+      "name": "灼热之刃LV1 · 长名称展示测试",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_equipment_burning_blade_01.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。这是一段较长的模拟效果说明，用于检查悬停层内换行和滚动，购买不会改变角色属性或背包。",
+      "prices": [
+        {
+          "amount": 12,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_technology_2",
+      "item_id": "shop_item_death_mask",
+      "category": "technology",
+      "name": "死亡面罩",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_item_death_mask.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 360,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "owned",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_technology_3",
+      "item_id": "lottery_wealth_crystal",
+      "category": "technology",
+      "name": "财富结晶",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_wealth_crystal.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 24,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "soldout",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_technology_4",
+      "item_id": "lottery_recovery_spirit",
+      "category": "technology",
+      "name": "回复精神",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_recovery_spirit.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 600,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_technology_5",
+      "item_id": "fragment_08",
+      "category": "technology",
+      "name": "神兵-龙爪弯钩",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_08.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 36,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_technology_6",
+      "item_id": "fragment_10",
+      "category": "technology",
+      "name": "神兵-战鬼双刃",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_10.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 840,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_technology_7",
+      "item_id": "fragment_12",
+      "category": "technology",
+      "name": "神兵-魔导师密钥",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_12.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 48,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_challenge_0",
+      "item_id": "lottery_recovery_spirit",
+      "category": "challenge",
+      "name": "回复精神",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_recovery_spirit.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 120,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_challenge_1",
+      "item_id": "fragment_08",
+      "category": "challenge",
+      "name": "神兵-龙爪弯钩 · 长名称展示测试",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_08.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。这是一段较长的模拟效果说明，用于检查悬停层内换行和滚动，购买不会改变角色属性或背包。",
+      "prices": [
+        {
+          "amount": 12,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_challenge_2",
+      "item_id": "fragment_10",
+      "category": "challenge",
+      "name": "神兵-战鬼双刃",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_10.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 360,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "owned",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_challenge_3",
+      "item_id": "fragment_12",
+      "category": "challenge",
+      "name": "神兵-魔导师密钥",
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_12.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 24,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "soldout",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_challenge_4",
+      "item_id": "shop_item_super_knowledge_book",
+      "category": "challenge",
+      "name": "超级知识之书",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_item_super_knowledge_book.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 600,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_challenge_5",
+      "item_id": "lottery_nature_spirit",
+      "category": "challenge",
+      "name": "自然精神",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_nature_spirit.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 36,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_challenge_6",
+      "item_id": "lottery_divine_spirit",
+      "category": "challenge",
+      "name": "神赐精神",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_divine_spirit.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 840,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_challenge_7",
+      "item_id": "lottery_gale_bow",
+      "category": "challenge",
+      "name": "疾风弓",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_gale_bow.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 48,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_rebirth_0",
+      "item_id": "shop_item_super_knowledge_book",
+      "category": "rebirth",
+      "name": "超级知识之书",
+      "image": "file://{images}/custom_game/archive_items_v2/shop_item_super_knowledge_book.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 120,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_rebirth_1",
+      "item_id": "lottery_nature_spirit",
+      "category": "rebirth",
+      "name": "自然精神 · 长名称展示测试",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_nature_spirit.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。这是一段较长的模拟效果说明，用于检查悬停层内换行和滚动，购买不会改变角色属性或背包。",
+      "prices": [
+        {
+          "amount": 12,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_rebirth_2",
+      "item_id": "lottery_divine_spirit",
+      "category": "rebirth",
+      "name": "神赐精神",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_divine_spirit.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 360,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "owned",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_rebirth_3",
+      "item_id": "lottery_gale_bow",
+      "category": "rebirth",
+      "name": "疾风弓",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_gale_bow.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 24,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "soldout",
+      "purchasable": false,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_rebirth_4",
+      "item_id": "lottery_quick_dry_cement",
+      "category": "rebirth",
+      "name": "速干水泥",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_quick_dry_cement.png",
+      "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 600,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_rebirth_5",
+      "item_id": "lottery_hippogryph_onslaught",
+      "category": "rebirth",
+      "name": "角鹰魔攻",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_hippogryph_onslaught.png",
+      "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 36,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_rebirth_6",
+      "item_id": "lottery_tower_retrofit",
+      "category": "rebirth",
+      "name": "箭塔改造",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_tower_retrofit.png",
+      "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 840,
+          "currencyName": "积分"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    },
+    {
+      "id": "preview_rebirth_7",
+      "item_id": "lottery_gathering_grimoire",
+      "category": "rebirth",
+      "name": "采集秘典",
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_gathering_grimoire.png",
+      "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+      "prices": [
+        {
+          "amount": 48,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 9
+    }
+  ],
+  "bundles": [
+    {
+      "id": "preview_bundle_0",
+      "category": "bundles",
+      "name": "启程礼包",
+      "effect": "演示礼包，仅展示组合内容与模拟金额。",
+      "prices": [
+        {
+          "amount": 36,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 5,
+      "items": [
+        {
+          "id": "preview_weapon_0",
+          "item_id": "lottery_attribute_crystal",
+          "category": "weapon",
+          "name": "属性结晶",
+          "image": "file://{images}/custom_game/archive_items_v2/lottery_attribute_crystal.png",
+          "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 120,
+              "currencyName": "积分"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 1
+        },
+        {
+          "id": "preview_weapon_1",
+          "item_id": "shop_weapon_growth_sword_01",
+          "category": "weapon",
+          "name": "成长之剑 · 长名称展示测试",
+          "image": "file://{images}/custom_game/archive_items_v2/shop_weapon_growth_sword_01.png",
+          "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。这是一段较长的模拟效果说明，用于检查悬停层内换行和滚动，购买不会改变角色属性或背包。",
+          "prices": [
+            {
+              "amount": 12,
+              "currencyName": "U币"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 2
+        },
+        {
+          "id": "preview_weapon_2",
+          "item_id": "lottery_nature_crystal",
+          "category": "weapon",
+          "name": "自然结晶",
+          "image": "file://{images}/custom_game/archive_items_v2/lottery_nature_crystal.png",
+          "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 360,
+              "currencyName": "积分"
+            }
+          ],
+          "state": "owned",
+          "purchasable": false,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 3
+        },
+        {
+          "id": "preview_weapon_3",
+          "item_id": "fragment_03",
+          "category": "weapon",
+          "name": "神兵-焚焰",
+          "image": "file://{images}/custom_game/archive_items_v2/fragment_03.png",
+          "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 24,
+              "currencyName": "U币"
+            }
+          ],
+          "state": "soldout",
+          "purchasable": false,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 4
+        }
+      ],
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_attribute_crystal.png"
+    },
+    {
+      "id": "preview_bundle_1",
+      "category": "bundles",
+      "name": "成长礼包",
+      "effect": "演示礼包，仅展示组合内容与模拟金额。",
+      "prices": [
+        {
+          "amount": 72,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 5,
+      "items": [
+        {
+          "id": "preview_weapon_1",
+          "item_id": "shop_weapon_growth_sword_01",
+          "category": "weapon",
+          "name": "成长之剑 · 长名称展示测试",
+          "image": "file://{images}/custom_game/archive_items_v2/shop_weapon_growth_sword_01.png",
+          "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。这是一段较长的模拟效果说明，用于检查悬停层内换行和滚动，购买不会改变角色属性或背包。",
+          "prices": [
+            {
+              "amount": 12,
+              "currencyName": "U币"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 1
+        },
+        {
+          "id": "preview_weapon_2",
+          "item_id": "lottery_nature_crystal",
+          "category": "weapon",
+          "name": "自然结晶",
+          "image": "file://{images}/custom_game/archive_items_v2/lottery_nature_crystal.png",
+          "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 360,
+              "currencyName": "积分"
+            }
+          ],
+          "state": "owned",
+          "purchasable": false,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 2
+        },
+        {
+          "id": "preview_weapon_3",
+          "item_id": "fragment_03",
+          "category": "weapon",
+          "name": "神兵-焚焰",
+          "image": "file://{images}/custom_game/archive_items_v2/fragment_03.png",
+          "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 24,
+              "currencyName": "U币"
+            }
+          ],
+          "state": "soldout",
+          "purchasable": false,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 3
+        },
+        {
+          "id": "preview_weapon_4",
+          "item_id": "shop_equipment_attack_gloves_01",
+          "category": "weapon",
+          "name": "加速手套LV1",
+          "image": "file://{images}/custom_game/archive_items_v2/shop_equipment_attack_gloves_01.png",
+          "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 600,
+              "currencyName": "积分"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 4
+        }
+      ],
+      "image": "file://{images}/custom_game/archive_items_v2/shop_weapon_growth_sword_01.png"
+    },
+    {
+      "id": "preview_bundle_2",
+      "category": "bundles",
+      "name": "勇者礼包",
+      "effect": "演示礼包，仅展示组合内容与模拟金额。",
+      "prices": [
+        {
+          "amount": 108,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 5,
+      "items": [
+        {
+          "id": "preview_weapon_2",
+          "item_id": "lottery_nature_crystal",
+          "category": "weapon",
+          "name": "自然结晶",
+          "image": "file://{images}/custom_game/archive_items_v2/lottery_nature_crystal.png",
+          "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 360,
+              "currencyName": "积分"
+            }
+          ],
+          "state": "owned",
+          "purchasable": false,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 1
+        },
+        {
+          "id": "preview_weapon_3",
+          "item_id": "fragment_03",
+          "category": "weapon",
+          "name": "神兵-焚焰",
+          "image": "file://{images}/custom_game/archive_items_v2/fragment_03.png",
+          "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 24,
+              "currencyName": "U币"
+            }
+          ],
+          "state": "soldout",
+          "purchasable": false,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 2
+        },
+        {
+          "id": "preview_weapon_4",
+          "item_id": "shop_equipment_attack_gloves_01",
+          "category": "weapon",
+          "name": "加速手套LV1",
+          "image": "file://{images}/custom_game/archive_items_v2/shop_equipment_attack_gloves_01.png",
+          "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 600,
+              "currencyName": "积分"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 3
+        },
+        {
+          "id": "preview_weapon_5",
+          "item_id": "lottery_recovery_crystal",
+          "category": "weapon",
+          "name": "回复结晶",
+          "image": "file://{images}/custom_game/archive_items_v2/lottery_recovery_crystal.png",
+          "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 36,
+              "currencyName": "U币"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 4
+        }
+      ],
+      "image": "file://{images}/custom_game/archive_items_v2/lottery_nature_crystal.png"
+    },
+    {
+      "id": "preview_bundle_3",
+      "category": "bundles",
+      "name": "典藏礼包",
+      "effect": "演示礼包，仅展示组合内容与模拟金额。",
+      "prices": [
+        {
+          "amount": 144,
+          "currencyName": "U币"
+        }
+      ],
+      "state": "normal",
+      "purchasable": true,
+      "min_quantity": 1,
+      "max_quantity": 5,
+      "items": [
+        {
+          "id": "preview_weapon_3",
+          "item_id": "fragment_03",
+          "category": "weapon",
+          "name": "神兵-焚焰",
+          "image": "file://{images}/custom_game/archive_items_v2/fragment_03.png",
+          "effect": "模拟效果：提升护甲，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 24,
+              "currencyName": "U币"
+            }
+          ],
+          "state": "soldout",
+          "purchasable": false,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 1
+        },
+        {
+          "id": "preview_weapon_4",
+          "item_id": "shop_equipment_attack_gloves_01",
+          "category": "weapon",
+          "name": "加速手套LV1",
+          "image": "file://{images}/custom_game/archive_items_v2/shop_equipment_attack_gloves_01.png",
+          "effect": "模拟效果：提升攻击速度，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 600,
+              "currencyName": "积分"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 2
+        },
+        {
+          "id": "preview_weapon_5",
+          "item_id": "lottery_recovery_crystal",
+          "category": "weapon",
+          "name": "回复结晶",
+          "image": "file://{images}/custom_game/archive_items_v2/lottery_recovery_crystal.png",
+          "effect": "模拟效果：提升资源获取，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 36,
+              "currencyName": "U币"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 3
+        },
+        {
+          "id": "preview_weapon_6",
+          "item_id": "lottery_expansion_crystal",
+          "category": "weapon",
+          "name": "膨胀结晶",
+          "image": "file://{images}/custom_game/archive_items_v2/lottery_expansion_crystal.png",
+          "effect": "模拟效果：提升生命恢复，持续60秒。仅用于界面展示，不实际生效。",
+          "prices": [
+            {
+              "amount": 840,
+              "currencyName": "积分"
+            }
+          ],
+          "state": "normal",
+          "purchasable": true,
+          "min_quantity": 1,
+          "max_quantity": 9,
+          "quantity": 4
+        }
+      ],
+      "image": "file://{images}/custom_game/archive_items_v2/fragment_03.png"
+    }
+  ]
+}

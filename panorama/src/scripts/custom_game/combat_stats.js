@@ -5,6 +5,8 @@
     var contextPanel = $.GetContextPanel();
     var lifecycleGeneration = Number(customConfig.SurvivalInputLifecycleGeneration || 0);
     var contextShutdown = false;
+    var scheduledJobs = [];
+    var combatSubscriptions = [];
     var previousHotkeyController = customConfig.SurvivalAbilityHotkeys;
     if (previousHotkeyController && previousHotkeyController.Shutdown) {
         try { previousHotkeyController.Shutdown("replacement_context"); } catch (error) {}
@@ -12,19 +14,69 @@
 
     function contextActive() {
         return !contextShutdown
-            && contextPanel && contextPanel.IsValid && contextPanel.IsValid()
+            && validPortraitPanel(contextPanel)
             && Number(GameUI.CustomUIConfig().SurvivalInputLifecycleGeneration || 0)
                 === lifecycleGeneration;
     }
 
-    function scheduleActive(delay, callback) {
-        return $.Schedule(delay, function () {
+    function scheduleActive(delay, callback, taskName) {
+        if (!contextActive()) return null;
+        var job = { id: null };
+        job.id = $.Schedule(delay, function () {
+            var index = scheduledJobs.indexOf(job);
+            if (index >= 0) scheduledJobs.splice(index, 1);
             if (!contextActive()) {
                 shutdownCombatContext("context_inactive");
                 return;
             }
-            callback();
+            try {
+                callback();
+            } catch (error) {
+                // Native Panorama exceptions can contain unreadable messages and
+                // report only this trampoline. Keep the actual task and stack.
+                $.Msg("[COMBAT_STATS_CALLBACK_ERROR] task=",
+                    String(taskName || callback.name || "anonymous"),
+                    " generation=", String(lifecycleGeneration),
+                    " error=", String(error && error.message || error),
+                    " stack=", String(error && error.stack || "unavailable"));
+                throw error;
+            }
         });
+        scheduledJobs.push(job);
+        return job.id;
+    }
+
+    function guardedCombatListener(name, callback) {
+        return function () {
+            if (!contextActive()) {
+                shutdownCombatContext("listener_context_inactive");
+                return;
+            }
+            try {
+                return callback.apply(null, arguments);
+            } catch (error) {
+                $.Msg("[COMBAT_STATS_EVENT_ERROR] event=", name,
+                    " generation=", String(lifecycleGeneration),
+                    " error=", String(error && error.message || error),
+                    " stack=", String(error && error.stack || "unavailable"));
+                throw error;
+            }
+        };
+    }
+
+    function subscribeCombatTable(name, callback) {
+        if (!contextActive()) return null;
+        var id = CustomNetTables.SubscribeNetTableListener(name,
+            guardedCombatListener("nettable:" + name, callback));
+        combatSubscriptions.push({ id: id, table: true });
+        return id;
+    }
+
+    function subscribeCombatEvent(name, callback) {
+        if (!contextActive()) return null;
+        var id = GameEvents.Subscribe(name, guardedCombatListener(name, callback));
+        combatSubscriptions.push({ id: id, table: false });
+        return id;
     }
 
     var playerId = Game.GetLocalPlayerID();
@@ -118,7 +170,10 @@
 
     var officialAbilityMappings = [];
 
-    function panel(id) { return $("#" + id); }
+    function panel(id) {
+        var target = $("#" + id);
+        return validPortraitPanel(target) ? target : null;
+    }
     function setText(id, value) {
         var target = panel(id);
         if (!target) return;
@@ -241,10 +296,9 @@
     }
 
     function officialHudRoot() {
-        if (officialHudCache.root
-            && officialHudCache.root.IsValid
-            && officialHudCache.root.IsValid()) return officialHudCache.root;
+        if (validPortraitPanel(officialHudCache.root)) return officialHudCache.root;
         var root = $.GetContextPanel();
+        if (!validPortraitPanel(root)) return null;
         while (root && root.GetParent && root.GetParent()) root = root.GetParent();
         officialHudCache.root = root;
         return root;
@@ -252,15 +306,46 @@
 
     function officialPanel(id) {
         var cached = officialHudCache[id];
-        if (cached && cached.IsValid && cached.IsValid()) return cached;
+        if (validPortraitPanel(cached)) return cached;
         var root = officialHudRoot();
         cached = root && root.FindChildTraverse ? root.FindChildTraverse(id) : null;
-        if (cached) officialHudCache[id] = cached;
-        return cached;
+        officialHudCache[id] = validPortraitPanel(cached) ? cached : null;
+        return officialHudCache[id];
     }
 
     function validPortraitPanel(candidate) {
-        return !!candidate && (!candidate.IsValid || candidate.IsValid());
+        try { return !!candidate && (!candidate.IsValid || candidate.IsValid()); }
+        catch (error) { return false; }
+    }
+
+    function windowPosition(target) {
+        if (!validPortraitPanel(target) || !target.GetPositionWithinWindow) return null;
+        var position = target.GetPositionWithinWindow();
+        if (!position) return null;
+        // Native builds may expose the vector as an indexed array or x/y fields.
+        var x = position.x !== undefined ? position.x : position[0];
+        var y = position.y !== undefined ? position.y : position[1];
+        if (x === null || y === null || x === undefined || y === undefined
+            || x === "" || y === "") return null;
+        x = Number(x);
+        y = Number(y);
+        return isFinite(x) && isFinite(y) ? { x: x, y: y } : null;
+    }
+
+    function layoutScale(target, axis) {
+        var value = target["actualuiscale_" + axis];
+        if (value === undefined) return 1;
+        var scale = Number(value);
+        return isFinite(scale) && scale > 0 ? scale : NaN;
+    }
+
+    function restoredOpacity(value) {
+        // Native style setters need a concrete value. Preserve recorded zero;
+        // an unset/invalid inline value restores the normal visible state.
+        var text = String(value === undefined || value === null ? "" : value);
+        var number = Number(text);
+        return text.trim() !== "" && isFinite(number) && number >= 0 && number <= 1
+            ? String(number) : "1";
     }
 
     function towerPortraitOverlayPanel() {
@@ -309,7 +394,8 @@
         var width = Number(candidate.actuallayoutwidth || 0);
         var height = Number(candidate.actuallayoutheight || 0);
         var rootHeight = Number(root.actuallayoutheight || 0);
-        var position = candidate.GetPositionWithinWindow();
+        var position = windowPosition(candidate);
+        if (!position) return false;
         if (!isFinite(width) || !isFinite(height) || width < 64 || height < 56
             || width > 280 || height > 240) return false;
         return !rootHeight || Number(position.y || 0) >= rootHeight * 0.45;
@@ -366,7 +452,7 @@
         // current leaf-only guard existed. Remove only that exact stale value.
         if (String(group.style.opacity || "") !== "0.01") return;
         try {
-            group.style.opacity = null;
+            group.style.opacity = "1";
             $.Msg("[SURVIVAL_PORTRAIT] CLEARED_LEGACY_GROUP_OPACITY");
         } catch (error) {}
     }
@@ -378,7 +464,7 @@
         // Valve rebuilt PortraitGroup. Clear that exact stale value as well.
         if (String(current.style.opacity || "") !== "0.01") return;
         try {
-            current.style.opacity = null;
+            current.style.opacity = "1";
             $.Msg("[SURVIVAL_PORTRAIT] CLEARED_LEGACY_LEAF_OPACITY");
         } catch (error) {}
     }
@@ -392,7 +478,7 @@
 
     function portraitRect(target) {
         if (!target || !target.GetPositionWithinWindow) return null;
-        var position = target.GetPositionWithinWindow();
+        var position = windowPosition(target);
         var width = Number(target.actuallayoutwidth || 0);
         var height = Number(target.actuallayoutheight || 0);
         if (!position || !isFinite(width) || !isFinite(height)
@@ -440,7 +526,7 @@
 
     function restoreNativePortraitEntry(entry) {
         var target = entry && entry.panel;
-        if (!target || (target.IsValid && !target.IsValid())) return;
+        if (!validPortraitPanel(target)) return;
         var hasRecordedOpacity = entry
             && Object.prototype.hasOwnProperty.call(entry, "opacity");
         if (!hasRecordedOpacity && target.__survivalPortraitDimmed !== true) return;
@@ -449,16 +535,17 @@
             original = target.__survivalPortraitOriginalOpacity;
         }
         try {
-            target.style.opacity = original ? String(original) : null;
+            target.style.opacity = restoredOpacity(original);
         } catch (error) {
-            try { target.style.opacity = null; } catch (clearError) {}
+            if (!validPortraitPanel(target)) return;
+            throw error;
         }
         target.__survivalPortraitDimmed = false;
         target.__survivalPortraitOriginalOpacity = "";
     }
 
     function dimNativePortraitOpacity(anchor) {
-        if (!anchor) return;
+        if (!validPortraitPanel(anchor)) return;
         var alreadyDimmed = dimmedNativePortraits.some(function (entry) {
             return entry && entry.panel === anchor;
         });
@@ -473,7 +560,7 @@
             restoreNativePortraitEntry({ panel: anchor });
         } else if (String(anchor.style.opacity || "") === "0.01") {
             // Recover the inline value written by the previous implementation.
-            try { anchor.style.opacity = null; } catch (error) {}
+            anchor.style.opacity = "1";
         }
         var originalOpacity = String(anchor.style.opacity || "");
         dimmedNativePortraits.push({
@@ -523,7 +610,7 @@
     }
 
     function applyTowerPortraitContentScale(scene) {
-        if (!scene) return;
+        if (!validPortraitPanel(scene)) return;
         scene.style.transformOrigin = "50% 50%";
         scene.style.transform = "scale3d("
             + String(TOWER_PORTRAIT_CONTENT_SCALE) + ", "
@@ -531,9 +618,9 @@
     }
 
     function resetTowerPortraitContentScale(scene) {
-        if (!scene) return;
-        scene.style.transform = null;
-        scene.style.transformOrigin = null;
+        if (!validPortraitPanel(scene)) return;
+        scene.style.transform = "scale3d(1, 1, 1)";
+        scene.style.transformOrigin = "50% 50%";
     }
 
     function unitUsesTowerPortrait(unit) {
@@ -629,18 +716,23 @@
 
     function positionCosmeticPortrait(overlay, anchor, scene) {
         var layer = overlay && overlay.GetParent ? overlay.GetParent() : null;
-        if (!layer || !layer.GetPositionWithinWindow || !anchor.GetPositionWithinWindow) {
+        if (!validPortraitPanel(overlay) || !validPortraitPanel(anchor)
+            || !validPortraitPanel(layer)) {
             return false;
         }
-        var anchorPosition = anchor.GetPositionWithinWindow();
-        var layerPosition = layer.GetPositionWithinWindow();
-        var scaleX = Math.max(0.001, Number(layer.actualuiscale_x || 1));
-        var scaleY = Math.max(0.001, Number(layer.actualuiscale_y || 1));
+        var anchorPosition = windowPosition(anchor);
+        var layerPosition = windowPosition(layer);
+        var scaleX = layoutScale(layer, "x");
+        var scaleY = layoutScale(layer, "y");
+        if (!anchorPosition || !layerPosition || !isFinite(scaleX) || !isFinite(scaleY)) {
+            return false;
+        }
         var x = (Number(anchorPosition.x || 0) - Number(layerPosition.x || 0)) / scaleX;
         var y = (Number(anchorPosition.y || 0) - Number(layerPosition.y || 0)) / scaleY;
         var width = Number(anchor.actuallayoutwidth || 0) / scaleX;
         var height = Number(anchor.actuallayoutheight || 0) / scaleY;
-        if (!isFinite(width) || !isFinite(height) || width <= 0 || height <= 0) {
+        if (!isFinite(x) || !isFinite(y)
+            || !isFinite(width) || !isFinite(height) || width <= 0 || height <= 0) {
             $.Warning("[SURVIVAL_PORTRAIT] geometry_invalid reason=empty_anchor");
             return false;
         }
@@ -922,11 +1014,14 @@
         var anchor = nativeNumberAnchor(statPanel, preferredIds);
         if (!anchor || !anchor.GetPositionWithinWindow) return false;
 
-        var anchorPosition = anchor.GetPositionWithinWindow();
-        var parentPosition = statsContainer.GetPositionWithinWindow();
-        var parentScaleY = Number(statsContainer.actualuiscale_y || 1);
+        var anchorPosition = windowPosition(anchor);
+        var parentPosition = windowPosition(statsContainer);
+        var parentScaleY = layoutScale(statsContainer, "y");
         var anchorHeight = Number(anchor.actuallayoutheight || 20);
+        if (!anchorPosition || !parentPosition || !isFinite(parentScaleY)
+            || !isFinite(anchorHeight)) return false;
         var top = (Number(anchorPosition.y) - Number(parentPosition.y)) / parentScaleY;
+        if (!isFinite(top)) return false;
 
         // 三项权威数字完全复用攻击力文本的右对齐、宽度和原生数字行定位规则。
         var overlayWidth = 180;
@@ -942,11 +1037,14 @@
         if (!statPanel || !statsContainer || !overlay
             || !statPanel.GetPositionWithinWindow
             || !statsContainer.GetPositionWithinWindow) return false;
-        var rowPosition = statPanel.GetPositionWithinWindow();
-        var parentPosition = statsContainer.GetPositionWithinWindow();
-        var parentScaleY = Number(statsContainer.actualuiscale_y || 1);
+        var rowPosition = windowPosition(statPanel);
+        var parentPosition = windowPosition(statsContainer);
+        var parentScaleY = layoutScale(statsContainer, "y");
         var rowHeight = Number(statPanel.actuallayoutheight || 20);
+        if (!rowPosition || !parentPosition || !isFinite(parentScaleY)
+            || !isFinite(rowHeight)) return false;
         var top = (Number(rowPosition.y) - Number(parentPosition.y)) / parentScaleY;
+        if (!isFinite(top)) return false;
 
         // 官方 Text 已被隐藏；只借用属性行的纵向几何，显示的是项目自己的 Label。
         overlay.style.horizontalAlign = "right";
@@ -1113,8 +1211,8 @@
                     && child.GetPositionWithinWindow) {
                     var width = Number(child.actuallayoutwidth || 0);
                     var height = Number(child.actuallayoutheight || 0);
-                    var position = child.GetPositionWithinWindow();
-                    if (child.visible !== false && width >= 6 && height >= 6
+                    var position = windowPosition(child);
+                    if (position && child.visible !== false && width >= 6 && height >= 6
                         && width <= 40 && height <= 40) {
                         candidates.push({
                             panel: child,
@@ -1139,17 +1237,17 @@
         if (!damage || !damage.GetPositionWithinWindow
             || !statsContainer.GetPositionWithinWindow) return;
         var iconAnchor = damageIconAnchor(damage);
-        var anchor = iconAnchor
-            ? iconAnchor.GetPositionWithinWindow()
-            : damage.GetPositionWithinWindow();
-        var parent = statsContainer.GetPositionWithinWindow();
-        var scaleX = Number(statsContainer.actualuiscale_x || 1);
-        var scaleY = Number(statsContainer.actualuiscale_y || 1);
+        var anchor = windowPosition(iconAnchor || damage);
+        var parent = windowPosition(statsContainer);
+        var scaleX = layoutScale(statsContainer, "x");
+        var scaleY = layoutScale(statsContainer, "y");
+        if (!anchor || !parent || !isFinite(scaleX) || !isFinite(scaleY)) return;
         var iconX = (Number(anchor.x) - Number(parent.x)) / scaleX;
         if (!iconAnchor) {
             iconX += Math.max(0, Number(damage.actuallayoutwidth || 16) - 16);
         }
         var iconY = (Number(anchor.y) - Number(parent.y)) / scaleY;
+        if (!isFinite(iconX) || !isFinite(iconY)) return;
         [
             ["SurvivalLogicalStrengthRow", 68],
             ["SurvivalLogicalAgilityRow", 91],
@@ -1316,6 +1414,7 @@
     }
 
     function update(snapshot) {
+        if (snapshot && Number(snapshot.entindex) !== Number(displayUnit())) return;
         if (!snapshot) return;
         var snapshotUnit = Number(snapshot.entindex);
         var snapshotVersion = Number(snapshot.refresh_version || 0);
@@ -1401,6 +1500,7 @@
     }
 
     function selectedUnit() {
+        if (!contextActive()) return -1;
         var resolver = GameUI.CustomUIConfig().SurvivalSelectionResolver;
         if (resolver && resolver.Resolve) return resolver.Resolve();
         return Players.GetPlayerHeroEntityIndex(playerId);
@@ -1417,6 +1517,7 @@
     }
 
     function displayUnit() {
+        if (!contextActive()) return -1;
         var resolver = GameUI.CustomUIConfig().SurvivalSelectionResolver;
         if (resolver && resolver.ResolveDisplayUnit) return resolver.ResolveDisplayUnit();
         return selectedUnit();
@@ -1493,6 +1594,7 @@
             var unitChanged = heroPanelState.unit !== Number(unit);
             if (unitChanged) {
                 heroPanelState.unit = Number(unit);
+                ["CombatAttackValue","CombatArmorValue","CombatAttackSpeedValue","CombatStrengthValue","CombatAgilityValue","CombatIntellectValue"].forEach(function(id){setText(id,"…");});
                 selectedUnitSnapshot = null;
                 transitionCosmeticPortrait("selected_unit_changed");
                 acceptedSnapshotUnit = Number(unit);
@@ -1541,6 +1643,8 @@
             refreshHeroVitals(unit);
         } catch (error) {}
         requestSelectedUnitStats(unit);
+        var notifyHUD = GameUI.CustomUIConfig().HandoffBoundValuesChanged;
+        if (notifyHUD) notifyHUD();
     }
 
     function localSelectionEvent(payload) {
@@ -1574,11 +1678,12 @@
                 }
                 writeOfficialAttackText();
                 writeOfficialSecondaryStats();
-            });
+            }, "unit_name_transition:" + String(reason || "unknown") + ":" + String(retryIndex));
         });
     }
 
     function onUnitSelectionEvent(reason, payload) {
+        if (!contextActive()) return;
         if (!localSelectionEvent(payload)) return;
         var resolver = GameUI.CustomUIConfig().SurvivalSelectionResolver;
         if (resolver && resolver.SetDisplayIdentityMode) {
@@ -1590,10 +1695,10 @@
     }
 
     function subscribeUnitNameSelectionEvents() {
-        GameEvents.Subscribe("dota_player_update_selected_unit", function (payload) {
+        subscribeCombatEvent("dota_player_update_selected_unit", function (payload) {
             onUnitSelectionEvent("selected_unit_event", payload);
         });
-        GameEvents.Subscribe("dota_player_update_query_unit", function (payload) {
+        subscribeCombatEvent("dota_player_update_query_unit", function (payload) {
             onUnitSelectionEvent("query_unit_event", payload);
         });
     }
@@ -1649,7 +1754,8 @@
             var width = Number(anchor.actuallayoutwidth || 0);
             var height = Number(anchor.actuallayoutheight || 0);
             if (!isFinite(width) || !isFinite(height) || width <= 0 || height <= 0) continue;
-            var position = anchor.GetPositionWithinWindow();
+            var position = windowPosition(anchor);
+            if (!position) continue;
             panels.push({
                 nodeIndex: nodeIndex,
                 panel: panel,
@@ -1695,27 +1801,27 @@
     }
 
     function nativeAbilityHotkeyContainer(panel) {
-        if (!panel || !panel.FindChildTraverse) return null;
+        if (!validPortraitPanel(panel) || !panel.FindChildTraverse) return null;
         return panel.FindChildTraverse("HotkeyContainer") || null;
     }
 
     function restoreNativeAbilityHotkey(panel) {
         var hotkey = nativeAbilityHotkeyContainer(panel);
-        if (!hotkey || hotkey.__survivalHotkeySuppressed !== true) return;
-        var originalOpacity = String(hotkey.__survivalOriginalOpacity || "");
-        var validOpacity = /^(?:0(?:\.\d+)?|1(?:\.0+)?)$/.test(originalOpacity)
-            ? originalOpacity : null;
+        if (!validPortraitPanel(hotkey) || hotkey.__survivalHotkeySuppressed !== true) return;
+        var validOpacity = restoredOpacity(hotkey.__survivalOriginalOpacity);
         try {
             hotkey.style.opacity = validOpacity;
         } catch (error) {
-            // A stale Valve panel may expose a style value that cannot be written back.
-            try { hotkey.style.opacity = null; } catch (clearError) {}
+            if (!validPortraitPanel(hotkey)) return;
+            throw error;
         } finally {
-            try { hotkey.hittest = hotkey.__survivalOriginalHittest; } catch (hitError) {}
-            try {
-                hotkey.hittestchildren = hotkey.__survivalOriginalHittestChildren;
-            } catch (childrenError) {}
-            hotkey.__survivalHotkeySuppressed = false;
+            if (validPortraitPanel(hotkey)) {
+                try { hotkey.hittest = hotkey.__survivalOriginalHittest; } catch (hitError) {}
+                try {
+                    hotkey.hittestchildren = hotkey.__survivalOriginalHittestChildren;
+                } catch (childrenError) {}
+                hotkey.__survivalHotkeySuppressed = false;
+            }
         }
     }
 
@@ -1806,7 +1912,7 @@
         var unit = selectedUnit();
         if (unit === undefined || unit < 0) {
             refreshOfficialUtilityHotkeys([]);
-            $.Schedule(1.0, refreshAbilities);
+            scheduleActive(1.0, refreshAbilities);
             return;
         }
         var seen = [];
@@ -1851,15 +1957,15 @@
     }
     function clearOfficialAbilityHotkeys(abilities) {
         officialAbilityMappings = [];
-        if (!abilities || !abilities.FindChildTraverse) return;
+        if (!validPortraitPanel(abilities) || !abilities.FindChildTraverse) return;
         for (var nodeIndex = 0; nodeIndex < maxAbilityEngineSlots; nodeIndex++) {
             var abilityPanel = abilities.FindChildTraverse("Ability" + String(nodeIndex));
-            if (!abilityPanel || belongsToLegacyHud(abilityPanel)) continue;
+            if (!validPortraitPanel(abilityPanel) || belongsToLegacyHud(abilityPanel)) continue;
             restoreNativeAbilityHotkey(abilityPanel);
             ["SurvivalAbilityHotkey", "SurvivalUtilityHotkey"].forEach(function (labelId) {
                 var label = abilityPanel.FindChildTraverse
                     ? abilityPanel.FindChildTraverse(labelId) : null;
-                if (!label) return;
+                if (!validPortraitPanel(label)) return;
                 label.text = "";
                 label.style.visibility = "collapse";
             });
@@ -1869,10 +1975,33 @@
     function shutdownCombatContext(reason) {
         if (contextShutdown) return;
         contextShutdown = true;
-        hideCosmeticPortrait("context_shutdown");
-        var abilities = officialPanel("abilities")
-            || officialPanel("AbilitiesAndStatBranch");
-        clearOfficialAbilityHotkeys(abilities);
+        combatSubscriptions.forEach(function (subscription) {
+            try {
+                if (subscription.table) {
+                    if (CustomNetTables.UnsubscribeNetTableListener) {
+                        CustomNetTables.UnsubscribeNetTableListener(subscription.id);
+                    }
+                } else if (GameEvents.Unsubscribe) {
+                    GameEvents.Unsubscribe(subscription.id);
+                }
+            } catch (error) {
+                $.Msg("[COMBAT_STATS_UNSUBSCRIBE_ERROR] id=", String(subscription.id),
+                    " error=", String(error));
+            }
+        });
+        combatSubscriptions = [];
+        scheduledJobs.forEach(function (job) {
+            if ($.CancelScheduled) {
+                try { $.CancelScheduled(job.id); } catch (error) {}
+            }
+        });
+        scheduledJobs = [];
+        if (validPortraitPanel(contextPanel)) {
+            hideCosmeticPortrait("context_shutdown");
+            var abilities = officialPanel("abilities")
+                || officialPanel("AbilitiesAndStatBranch");
+            clearOfficialAbilityHotkeys(abilities);
+        }
         var config = GameUI.CustomUIConfig();
         if (config.SurvivalAbilityHotkeys
             && config.SurvivalAbilityHotkeys.Shutdown === shutdownCombatContext) {
@@ -1969,7 +2098,8 @@
                 label.style.padding = "0px 3px";
                 label.style.color = "white";
                 label.style.fontSize = "12px";
-                label.style.fontWeight = "bold";
+                label.AddClass("UIFontNumber");
+                label.style.fontWeight = "normal";
                 label.style.textAlign = "center";
                 label.style.backgroundColor = "#05080b";
                 label.style.border = "1px solid #a4b4bf";
@@ -1982,6 +2112,8 @@
             label.style.width = key === "F2" ? "27px" : "20px";
             label.text = key;
             label.style.visibility = "visible";
+            var handoffStyle = GameUI.CustomUIConfig().HandoffStyleHotkey;
+            if (handoffStyle) handoffStyle(label, abilityPanel, unit, entry.ability);
             officialAbilityMappings.push({
                 ability: entry.ability,
                 name: entry.name,
@@ -2540,7 +2672,7 @@
 
     // NetTable is the single regular synchronization path. Filter by the
     // portrait unit so the player's hero never overwrites a selected monster.
-    CustomNetTables.SubscribeNetTableListener(
+    subscribeCombatTable(
         tableName,
         function (name, key, snapshot) {
             if (key !== tableKey) return;
@@ -2555,24 +2687,24 @@
         && Number(initialCombatSnapshot.entindex) === Number(displayUnit())) {
         update(initialCombatSnapshot);
     }
-    CustomNetTables.SubscribeNetTableListener(
+    subscribeCombatTable(
         debugTableName,
         function (name, key, snapshot) {
             if (key === tableKey) renderCombatDebug(snapshot);
         }
     );
     renderCombatDebug(CustomNetTables.GetTableValue(debugTableName, tableKey));
-    GameEvents.Subscribe("ui_weapon_synthesis_snapshot", function (snapshot) {
+    subscribeCombatEvent("ui_weapon_synthesis_snapshot", function (snapshot) {
         if (snapshot && snapshot.player_id !== undefined
             && Number(snapshot.player_id) !== Number(playerId)) return;
         var hero = Number(snapshot && snapshot.hero_entindex || -1);
         if (hero < 0 || Number(displayUnit()) !== hero) return;
         requestSelectedUnitStats(hero, true);
     });
-    GameEvents.Subscribe("ui_selected_unit_stats_snapshot", function (snapshot) {
+    subscribeCombatEvent("ui_selected_unit_stats_snapshot", function (snapshot) {
         if (!snapshot || snapshot.success !== 1) return;
         if (Number(snapshot.entindex) !== Number(displayUnit())) return;
-        $.Msg("[SURVIVAL_STATS][CLIENT] SNAPSHOT unit=", String(snapshot.entindex),
+        if (GameUI.CustomUIConfig().SurvivalStatsDebug === true) $.Msg("[SURVIVAL_STATS][CLIENT] SNAPSHOT unit=", String(snapshot.entindex),
             " phase=", String(snapshot.push_phase || snapshot.source || "request"),
             " sequence=", String(snapshot.refresh_sequence || 0),
             " level=", String(snapshot.level),
@@ -2581,7 +2713,7 @@
         update(snapshot);
         refreshHeroPanel(false);
     });
-    CustomNetTables.SubscribeNetTableListener(
+    subscribeCombatTable(
         "survival_ability_runtime",
         function (name, key, value) {
             if (!contextActive()) return;
@@ -2630,7 +2762,7 @@
             }
         }
     );
-    GameEvents.Subscribe("ui_ability_cast_result", function (result) {
+    subscribeCombatEvent("ui_ability_cast_result", function (result) {
         $.Msg("[SURVIVAL_CAST][CLIENT] RESULT success=", String(result && result.success),
             " unit=", String(result && result.entindex),
             " ability=", String(result && result.ability_entindex),
@@ -2645,11 +2777,15 @@
         var unit = Number(result.entindex);
         scheduleActive(0.10, function () {
             if (Number(displayUnit()) === unit) requestSelectedUnitStats(unit, true);
-        });
+        }, "building_refresh_100ms");
         scheduleActive(0.35, function () {
             if (Number(displayUnit()) === unit) requestSelectedUnitStats(unit, true);
-        });
+        }, "building_refresh_350ms");
     });
+    GameUI.CustomUIConfig().HandoffCombat = {
+        Entries: visibleAbilityEntries,
+        RefreshSelection: function(){refreshHeroPanel();refreshAbilityHotkeysIfChanged(true);}
+    };
     bindHeroPortrait();
     bindHotkeys();
     $.Msg("[SURVIVAL_SCENE_PANEL] READY tower_portrait=true native_non_tower=true");
@@ -2657,7 +2793,7 @@
     beginUnitNameTransition("initial_load");
     scheduleActive(1.65, function () {
         if (observedSelectedUnit < 0) beginUnitNameTransition("initial_fallback");
-    });
+    }, "initial_selection_fallback");
     refreshHeroVitalsTick();
     cosmeticPortraitSentinel();
     refreshAbilities();

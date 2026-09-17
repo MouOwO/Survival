@@ -1,0 +1,9 @@
+Creating device for graphics adapter 0 'NVIDIA GeForce GTX 1050 Ti' [vendorid 0x10DE]: 32.0.15.8180
+- dota_addons\Survival\panorama\layout\custom_game\font_test.xml
+- dota_addons\survival\panorama\styles\custom_game\common\font_test.css
+- dota_addons\survival\panorama\styles\custom_game\common\ui_typography.css
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------
+Leaked KeyValues blocks: 162

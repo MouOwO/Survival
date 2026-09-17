@@ -1,0 +1,16 @@
+{
+  "invalid_source_images": [
+    "archive_ui_kit_v1/reference/components_generated.png"
+  ],
+  "source_packs": 6,
+  "scanned_image_files": 601,
+  "input_image_bytes": 174449619,
+  "exact_duplicate_groups": 21,
+  "duplicate_file_occurrences": 22,
+  "duplicate_disk_bytes": 67615873,
+  "resource_ids": 65,
+  "unique_copied_files": 65,
+  "copied_bytes": 4928792,
+  "legacy_mappings": 100,
+  "all_copies_byte_identical_to_selected_source": true
+}

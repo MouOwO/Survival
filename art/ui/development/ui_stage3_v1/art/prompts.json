@@ -1,0 +1,418 @@
+[
+  {
+    "id": "frozen_wall",
+    "name": "冰封城墙",
+    "enabled": true,
+    "type": "boss",
+    "description": "所有波次怪和挑战怪的攻击速度永久降低15%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 冰封城墙 (frozen_wall). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 所有波次怪和挑战怪的攻击速度永久降低15%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "recruit_training",
+    "name": "新兵作训",
+    "enabled": true,
+    "type": "boss",
+    "description": "基础箭塔LV1至LV4的攻击力永久翻倍。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 新兵作训 (recruit_training). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 基础箭塔LV1至LV4的攻击力永久翻倍。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "ion_shield",
+    "name": "离子护盾",
+    "enabled": true,
+    "type": "boss",
+    "description": "城墙单次受到的伤害不会超过其最大生命值的20%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 离子护盾 (ion_shield). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 城墙单次受到的伤害不会超过其最大生命值的20%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "weakening_orb",
+    "name": "虚弱宝珠",
+    "enabled": true,
+    "type": "boss",
+    "description": "下一波优先令Boss攻击力降低50%；若无Boss则作用于第一个精英怪。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 虚弱宝珠 (weakening_orb). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 下一波优先令Boss攻击力降低50%；若无Boss则作用于第一个精英怪。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "divine_wish",
+    "name": "神许愿",
+    "enabled": true,
+    "type": "boss",
+    "description": "立即从卡牌池随机获得3张卡牌的全部效果。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 神许愿 (divine_wish). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 立即从卡牌池随机获得3张卡牌的全部效果。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "tower_growth",
+    "name": "炮塔成长",
+    "enabled": true,
+    "type": "boss",
+    "description": "所有防御塔每次升级后永久提高10%攻击力。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 炮塔成长 (tower_growth). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 所有防御塔每次升级后永久提高10%攻击力。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "fortifications",
+    "name": "防御工事",
+    "enabled": true,
+    "type": "boss",
+    "description": "所有防御塔攻击速度提高6%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 防御工事 (fortifications). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 所有防御塔攻击速度提高6%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "feast",
+    "name": "盛宴",
+    "enabled": true,
+    "type": "boss",
+    "description": "当前城墙的最大生命值和当前生命值立即翻倍。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 盛宴 (feast). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 当前城墙的最大生命值和当前生命值立即翻倍。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "boss_promise",
+    "name": "老板的大饼",
+    "enabled": true,
+    "type": "boss",
+    "description": "所有伐木工攻击速度翻倍，持续120秒。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 老板的大饼 (boss_promise). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 所有伐木工攻击速度翻倍，持续120秒。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "far_sighted",
+    "name": "深谋远虑",
+    "enabled": false,
+    "type": "boss",
+    "description": "下一次选择时获得页面全部3个效果。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 深谋远虑 (far_sighted). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 下一次选择时获得页面全部3个效果。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "command_change",
+    "name": "命令更换",
+    "enabled": true,
+    "type": "boss",
+    "description": "下一次肉鸽卡牌选择额外获得1次刷新机会。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 命令更换 (command_change). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 下一次肉鸽卡牌选择额外获得1次刷新机会。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "infrastructure_maniac",
+    "name": "基建狂魔",
+    "enabled": true,
+    "type": "boss",
+    "description": "立即免费随机升级可升级建筑3次。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 基建狂魔 (infrastructure_maniac). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 立即免费随机升级可升级建筑3次。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "gunpowder_splash",
+    "name": "火药溅射",
+    "enabled": true,
+    "type": "boss",
+    "description": "所有穿透弩炮伤害永久提高30%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 火药溅射 (gunpowder_splash). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 所有穿透弩炮伤害永久提高30%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "radiant_sapling",
+    "name": "璀璨树苗",
+    "enabled": true,
+    "type": "boss",
+    "description": "立即获得当前木材数量20%的额外木材。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 璀璨树苗 (radiant_sapling). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 立即获得当前木材数量20%的额外木材。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "kick_when_down",
+    "name": "落井下石",
+    "enabled": true,
+    "type": "boss",
+    "description": "你对处于移动减速状态的怪物造成的伤害提高50%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 落井下石 (kick_when_down). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 你对处于移动减速状态的怪物造成的伤害提高50%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "tower_network",
+    "name": "炮塔串联",
+    "enabled": true,
+    "type": "boss",
+    "description": "领取时每有1座最终满阶防御塔，所有防御塔永久提高5%攻击，最多提高50%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 炮塔串联 (tower_network). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 领取时每有1座最终满阶防御塔，所有防御塔永久提高5%攻击，最多提高50%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "fiscal_subsidy",
+    "name": "财政补贴",
+    "enabled": true,
+    "type": "boss",
+    "description": "立即获得10000金币。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 财政补贴 (fiscal_subsidy). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 立即获得10000金币。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "corrosive_shield",
+    "name": "腐蚀护盾",
+    "enabled": true,
+    "type": "boss",
+    "description": "怪物每次对你的单位发动普通攻击时，自身永久降低1点护甲，可叠加。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 腐蚀护盾 (corrosive_shield). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 怪物每次对你的单位发动普通攻击时，自身永久降低1点护甲，可叠加。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "goblin_duplicator",
+    "name": "地精复制器",
+    "enabled": false,
+    "type": "boss",
+    "description": "获得一次复制防御塔的机会：49%成功，失败则目标防御塔消失。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 地精复制器 (goblin_duplicator). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 获得一次复制防御塔的机会：49%成功，失败则目标防御塔消失。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "lucky_watch",
+    "name": "幸运怀表",
+    "enabled": false,
+    "type": "boss",
+    "description": "接下来3次相关技能触发后立即结束其冷却。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 幸运怀表 (lucky_watch). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 接下来3次相关技能触发后立即结束其冷却。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "nuclear_bomb",
+    "name": "核弹",
+    "enabled": true,
+    "type": "boss",
+    "description": "建造者获得核弹道具；使用后杀死场上当前存活的所有非Boss敌方怪物。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 核弹 (nuclear_bomb). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 建造者获得核弹道具；使用后杀死场上当前存活的所有非Boss敌方怪物。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "bounty_order",
+    "name": "赏金密令",
+    "enabled": true,
+    "type": "boss",
+    "description": "接下来5次挑战建筑怪物挑战成功时，额外获得一份相同奖励。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 赏金密令 (bounty_order). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 接下来5次挑战建筑怪物挑战成功时，额外获得一份相同奖励。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "high_morale",
+    "name": "斗志昂扬",
+    "enabled": true,
+    "type": "boss",
+    "description": "我方英雄和防御塔的攻击加成提高30%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 斗志昂扬 (high_morale). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 我方英雄和防御塔的攻击加成提高30%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "in_step",
+    "name": "步调一致",
+    "enabled": true,
+    "type": "boss",
+    "description": "所有防御塔增加相当于关联英雄当前攻击力10%的攻击力。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 步调一致 (in_step). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 所有防御塔增加相当于关联英雄当前攻击力10%的攻击力。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "construction_order",
+    "name": "建造密令",
+    "enabled": true,
+    "type": "boss",
+    "description": "建造者获得一个可令任意可升级建筑免费提升1级的道具。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 建造密令 (construction_order). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 建造者获得一个可令任意可升级建筑免费提升1级的道具。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "internship_certificate",
+    "name": "实习证明",
+    "enabled": true,
+    "type": "boss",
+    "description": "初级修理工的训练上限永久增加2。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 实习证明 (internship_certificate). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 初级修理工的训练上限永久增加2。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "bloodthirst_potion",
+    "name": "渴血药剂",
+    "enabled": true,
+    "type": "boss",
+    "description": "英雄立即获得100%吸血持续60秒，随后永久获得20%吸血。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 渴血药剂 (bloodthirst_potion). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 英雄立即获得100%吸血持续60秒，随后永久获得20%吸血。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "infrastructure_outsourcing",
+    "name": "基建外包",
+    "enabled": true,
+    "type": "boss",
+    "description": "立即获得建筑数×当前难度×100金币。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 基建外包 (infrastructure_outsourcing). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 立即获得建筑数×当前难度×100金币。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "burst_potion",
+    "name": "爆发药剂",
+    "enabled": false,
+    "type": "boss",
+    "description": "给予英雄一个兴奋剂。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 爆发药剂 (burst_potion). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 给予英雄一个兴奋剂。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "iron_fist_policy",
+    "name": "铁腕政策",
+    "enabled": true,
+    "type": "boss",
+    "description": "防御塔和英雄攻击无视目标40%护甲。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 铁腕政策 (iron_fist_policy). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 防御塔和英雄攻击无视目标40%护甲。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "training_dummy",
+    "name": "训练靶子",
+    "enabled": true,
+    "type": "boss",
+    "description": "放置持续30秒的靶子；我方单位每次攻击它永久获得100攻击力。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 训练靶子 (training_dummy). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 放置持续30秒的靶子；我方单位每次攻击它永久获得100攻击力。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "wall_recovery",
+    "name": "壁垒续航",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "墙每秒增加20生命，每60秒增加1点护甲值。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 壁垒续航 (wall_recovery). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 墙每秒增加20生命，每60秒增加1点护甲值。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "wealthy_start",
+    "name": "富甲天下",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "每波获得30乘波数的金币。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 富甲天下 (wealthy_start). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 每波获得30乘波数的金币。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "sharp_volley",
+    "name": "锐利速射",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "箭塔攻击速度提高20%，每次攻击攻击力加1。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 锐利速射 (sharp_volley). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 箭塔攻击速度提高20%，每次攻击攻击力加1。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "lumberjack_assault",
+    "name": "伐木狂袭",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "伐木工攻击速度提高25%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 伐木狂袭 (lumberjack_assault). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 伐木工攻击速度提高25%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "fortified_defense",
+    "name": "坚甲固守",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "城墙获得5000生命、5点护甲和10%伤害减免。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 坚甲固守 (fortified_defense). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 城墙获得5000生命、5点护甲和10%伤害减免。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "infrastructure_maniac_start",
+    "name": "基建狂魔",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "基地升级的所有木材消耗后返还。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 基建狂魔 (infrastructure_maniac_start). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 基地升级的所有木材消耗后返还。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "precision_lumber",
+    "name": "精研伐木",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "伐木效率提高1。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 精研伐木 (precision_lumber). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 伐木效率提高1。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "peaceful_labor",
+    "name": "安居乐业",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "城墙没有被攻击时，伐木效率提高2。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 安居乐业 (peaceful_labor). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 城墙没有被攻击时，伐木效率提高2。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "woodcutting_bounty",
+    "name": "伐骨积薪",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "击杀怪物获得5乘当前波数的木材。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 伐骨积薪 (woodcutting_bounty). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 击杀怪物获得5乘当前波数的木材。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "instant_wood",
+    "name": "瞬采木料",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "立即获得100乘难度的木材。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 瞬采木料 (instant_wood). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 立即获得100乘难度的木材。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "gold_mining_secret",
+    "name": "淘金秘法",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "采矿效率提高10%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 淘金秘法 (gold_mining_secret). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 采矿效率提高10%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "hero_descent",
+    "name": "英雄降临",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "开局即可免费建造英雄祭坛。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 英雄降临 (hero_descent). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 开局即可免费建造英雄祭坛。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "population_expansion",
+    "name": "聚拢扩容",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "立刻获得人口上限5。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 聚拢扩容 (population_expansion). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 立刻获得人口上限5。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "natures_gift",
+    "name": "自然馈赠",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "每秒木材增加3。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 自然馈赠 (natures_gift). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 每秒木材增加3。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "emergency_reinforcement",
+    "name": "紧急加固",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "城墙生命值低于等于30%时，受到伤害降低20%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 紧急加固 (emergency_reinforcement). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 城墙生命值低于等于30%时，受到伤害降低20%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "wind_strategy",
+    "name": "疾风战法",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "英雄攻击速度提高400%，攻击间隔减少0.03秒。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 疾风战法 (wind_strategy). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 英雄攻击速度提高400%，攻击间隔减少0.03秒。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "allround_tempering",
+    "name": "全能淬炼",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "英雄攻击速度提高100%，攻击属性提高3。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 全能淬炼 (allround_tempering). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 英雄攻击速度提高100%，攻击属性提高3。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "heavy_hand",
+    "name": "夯大力",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "合体伐木工有5%概率暴击获得双倍木材。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 夯大力 (heavy_hand). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 合体伐木工有5%概率暴击获得双倍木材。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "first_to_strike",
+    "name": "身先士卒",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "英雄攻击大树获得的木材提高100%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 身先士卒 (first_to_strike). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 英雄攻击大树获得的木材提高100%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "endless_rebirth",
+    "name": "无限轮回",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "英雄对转生Boss的伤害提高50%。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 无限轮回 (endless_rebirth). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 英雄对转生Boss的伤害提高50%。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  },
+  {
+    "id": "long_range_volley",
+    "name": "远距齐射",
+    "enabled": true,
+    "type": "builder_start",
+    "description": "箭塔攻击距离提高500，攻击力提高800。",
+    "prompt": "Use case: stylized-concept. Production game asset: one high resolution portrait 2:3 illustration, isolated on genuinely transparent alpha. Mature fantasy RPG painterly item illustration, refined champagne gold, jade ivory and deep teal materials, with restrained subject-specific colors. Large centered readable silhouette with delicate craft details, fits within central 80 percent and 8 percent transparent margins. Subject fills height, clean transparent contour, no ground rectangle, no checkerboard. This image goes INSIDE an existing gold/ivory card: do not draw any card frame, border, lettering, numbers, UI, logos or labels. No existing game icon copied. Illustrate the concept 远距齐射 (long_range_volley). Meaning from the actual game configuration, for visual symbolism only, DO NOT DRAW ANY TEXT OR NUMBERS: 箭塔攻击距离提高500，攻击力提高800。 Give this concept its own specific subject, avoid substituting a generic star or gem."
+  }
+]

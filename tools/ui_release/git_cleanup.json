@@ -1,0 +1,258 @@
+{
+  "tracked_scanned": 1978,
+  "count": 40,
+  "bytes": 35732265,
+  "kept_reference_inputs": [
+    "output/lottery_reference_review/reference-1045.png",
+    "output/lottery_v2_preview/pool_details_reference.png"
+  ],
+  "files": [
+    {
+      "path": "output/archive_beast_preview/preview-tooltip.png",
+      "bytes": 929509,
+      "sha256": "7cf278a88991908deb3f70e07f247bf3100c53bc2012fbbcab0da6a1de567e9c",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/archive_beast_preview/preview.png",
+      "bytes": 938714,
+      "sha256": "cf15a0b87a1d59820052820b1a89d885577a826f6ec5056eaadcccca8649df28",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/archive_kit_import/compile.log",
+      "bytes": 104796,
+      "sha256": "e3d2a0f243da2e828128764be38c196402cddd7f72e755724a790ad1bf3c0320",
+      "reason": "Generated compilation log"
+    },
+    {
+      "path": "output/archive_kit_import/overlay.png",
+      "bytes": 2841551,
+      "sha256": "87f0be9d8f3cf881792a263157002ea90e7a82cda874ce1d7f0650f6e2ef37a7",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/archive_kit_import/preview.png",
+      "bytes": 795809,
+      "sha256": "4e93dd33e1da69df01fa8079362dd0e33e929b08507df3317b0ce78d9a3e65b1",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/archive_kit_import/side.png",
+      "bytes": 4354211,
+      "sha256": "7b67e502ff7acc00b9cda64038c244c651759682e7dfe0b83209e723bfac5f48",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_compact_preview/compile.log",
+      "bytes": 23931,
+      "sha256": "7a06f6948c1d68a3c3b38b0ffbe162608473326a3732fc63f90c78b2b02b6623",
+      "reason": "Generated compilation log"
+    },
+    {
+      "path": "output/lottery_compact_preview/real-grid.png",
+      "bytes": 859771,
+      "sha256": "f35e54f244b7e220404a717d936e361a027089bf781b1543e1e543d169b7e187",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_compact_preview/reference-comparison.png",
+      "bytes": 1828955,
+      "sha256": "c619a3b22b7a6a3de635fc70c534b306acd5459563d9dadbb858ed1d1ed5dbfa",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_compact_preview/selected-tab.png",
+      "bytes": 931095,
+      "sha256": "1df6b1ca0b02fa7326193a97692de7402e02f2f4eae071a6a70477f9190935c6",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_compact_preview/test-grid.png",
+      "bytes": 931723,
+      "sha256": "a8fb3a7f6f6fc26d209f69dfedf03386fce447419d5a64e2b39db53865dfd75d",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_handoff_preview/components.png",
+      "bytes": 1083405,
+      "sha256": "a936c205830fa57336b1a623e1deed29afb47621d969702fd52fb415918377db",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_handoff_preview/home-1280.png",
+      "bytes": 1740140,
+      "sha256": "923d89f6c870bc1dd2dc73123292281e3061438e14f508c6a90351d7a23bd340",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_handoff_preview/home-2560.png",
+      "bytes": 2988477,
+      "sha256": "8a26382191436eea0873fd64ab539f5cc9f9dbf4a75420e36575b874b6a1379c",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_handoff_preview/home.png",
+      "bytes": 2503582,
+      "sha256": "8f1719b59e747f36a996853858f9ace1da8b5a3f9989ace3dd1b5ae243f9e4a4",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_handoff_preview/pool.png",
+      "bytes": 1218097,
+      "sha256": "0a2da6774d0b207982636c854a3babc88b452be9e2b06b3aa43b5a820271149a",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_handoff_preview/single.png",
+      "bytes": 1936207,
+      "sha256": "303dde09d016a9de618520ab9eab214f598a4f8ff88ca3c42a7ea41b3e1a7bfb",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_handoff_preview/ten.png",
+      "bytes": 1502240,
+      "sha256": "81ff0a38ecfe444a3fc63abdacaa99a9ccab9d4ca3cef5e73fda445c2894ac48",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_reference_review/actual-1045.png",
+      "bytes": 194743,
+      "sha256": "7069b4d0e96f57540a1d5cb924c212257b18697a0e57e9be2f861902c9f06e6c",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_reference_review/compile.log",
+      "bytes": 15608,
+      "sha256": "21daa0f2bf5d1ece1736c1167a1e823dff9c038e34c818890883520a68fa276c",
+      "reason": "Generated compilation log"
+    },
+    {
+      "path": "output/lottery_reference_review/overlay-50.png",
+      "bytes": 953806,
+      "sha256": "819dcc10b89d0126d0ccb5b4fd4857e8597f4895807914c0c4babf29c5e6995d",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_reference_review/side-by-side.png",
+      "bytes": 1332128,
+      "sha256": "8eb8f9db217be5dbb0f38127c0d48a0013201c780f2087be0b4c5025e4f43194",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_v2_preview/compile.log",
+      "bytes": 15442,
+      "sha256": "c6d383b1df296aa099eb9257ca01b4679e432142323267e1cafbbca18b262f88",
+      "reason": "Generated compilation log"
+    },
+    {
+      "path": "output/lottery_v2_preview/icon-states.png",
+      "bytes": 128553,
+      "sha256": "9f26fe4c2cb043665ddb718590fd0c78e125a15c27219489c45976054d6dd849",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_v2_preview/pool-cultivation.png",
+      "bytes": 1294146,
+      "sha256": "bd6c7fdb0b96411b2012e8f5efc3b709cef8f834299ae704ec8ba5c6403b2e85",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_v2_preview/pool-dragon_knight.png",
+      "bytes": 1294132,
+      "sha256": "7bd58c3c62e9af1feb792774d6c1b0f8ff2ba4dde09f48744e5ad12448866e79",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_v2_preview/pool-map.png",
+      "bytes": 1294742,
+      "sha256": "c96f054e2f2c2c6accffc4d9d817c7474cede5852388d3d20154094fce8151da",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_v2_preview/pool-summer.png",
+      "bytes": 1293645,
+      "sha256": "d51c03f8520f8df3d137099f0524ff8d74985601cd57924d7c21b847b9cd8488",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "output/lottery_v3_import/compile.log",
+      "bytes": 50070,
+      "sha256": "cf04d7105a27a24a6b7d48a976f1c8b52fdd2542877e3abed0accbba75880ac3",
+      "reason": "Generated compilation log"
+    },
+    {
+      "path": "output/lottery_v3_import/states.png",
+      "bytes": 163310,
+      "sha256": "0fc52cd0633df94b3f55eba2a62f13272f0541a1183cf73ea94d9d2a63873ca8",
+      "reason": "Historical preview / comparison screenshot (regenerable output)"
+    },
+    {
+      "path": "tools/__pycache__/audit_n1_n5_workbook.cpython-313.pyc",
+      "bytes": 12063,
+      "sha256": "3de69a6b91fdd4d6a11b99bafd5d34d19542a4f892c054bc5f2a0fc0c8099719",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/build_configs.cpython-311.pyc",
+      "bytes": 32714,
+      "sha256": "c5cb356e97fb8187cd63883aefa838bae10b5bd14144f6b5f1d82683fc9499e9",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/build_configs.cpython-313.pyc",
+      "bytes": 46066,
+      "sha256": "9bb2332aa7ed4bf4a37ab08bab01078548f2a4f750fdc695a70e45da570cbf5f",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/build_configs.cpython-314.pyc",
+      "bytes": 43996,
+      "sha256": "85911dfbd399b962c91cc8258d887d3ace85a4d4c5296bdcfb7352f59742767a",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/build_tooltip_definitions.cpython-311.pyc",
+      "bytes": 9485,
+      "sha256": "2b77bdce299665fcc30681b61f9b4f3addcaaf4852400d05e9f7b5f26ed6e74c",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/import_n3_wave_workbook.cpython-313.pyc",
+      "bytes": 19012,
+      "sha256": "bb36081d511d0a55bc346e01c35d42be50ba9141dbf65551ac99aaaff8160adc",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/sync_lightning_frost_localization.cpython-313.pyc",
+      "bytes": 5805,
+      "sha256": "7f3f1b1b1edc7fc0bbab6264b3d9b2a5e5ae6b565c033e2c5fb99bb0ec05e0b4",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/test_hero_ball_lightning_contract.cpython-313.pyc",
+      "bytes": 5827,
+      "sha256": "5954175d91a46021b63c15fa69d491a9bbb89c3875a325b6f12637a757bfed9e",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/test_lightning_frost_magical_contract.cpython-313.pyc",
+      "bytes": 2729,
+      "sha256": "35f56a417bb02cf35783b9a6062f93848e6221e13d6327b548be17f0a6a72f50",
+      "reason": "Python generated cache"
+    },
+    {
+      "path": "tools/__pycache__/test_wave_monster_model_resources.cpython-313.pyc",
+      "bytes": 12030,
+      "sha256": "5f7664f489a020fc0e5a138ad1354fbd5fdf517657b28324f946ac9c3c4fea27",
+      "reason": "Python generated cache"
+    }
+  ],
+  "verification": {
+    "git_reports_all_40_deleted": true,
+    "release_dependency_missing": [],
+    "sources": 81,
+    "asset_sources": 2291,
+    "runtime": 1909
+  }
+}

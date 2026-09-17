@@ -228,7 +228,12 @@ local function flush(player_id)
                 bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=result.error or "存档请求被拒绝"})
             end
             send(player_id)
-            if M.send_daily and daily_viewers[player_id] then M.send_daily(player_id) end
+            if M.send_daily and daily_viewers[player_id] then
+                M.send_daily(player_id, command.kind=="daily_claim" and {
+                    target_day=command.target_day,ok=result and result.ok==true,
+                    error=result and result.error,terminal=result and result.terminal==true
+                } or nil)
+            end
         end
         if remote_provider then
             scheduler.after(35, function()
@@ -278,19 +283,26 @@ function M.record_boss(player_id,kill_id)
     archive_players[player_id]=true
     return enqueue(player_id,{id=session_id..":boss:"..tostring(kill_id),kind="boss_kill"})
 end
+local daily_sequences={}
 function M.daily_snapshot(player_id)
     local profile=profiles.get_profile(player_id)
     if not profile then return {ok=false,error="档案尚未载入"} end
     local result=require("systems/archive_daily_rewards").snapshot(profile,require("systems/archive_calendar").day(),has_pass(profile))
     result.ok=true
+    daily_sequences[player_id]=(daily_sequences[player_id] or 0)+1
+    result.sequence=daily_sequences[player_id]
     result.pending=M.has_pending(player_id) and 1 or 0
     result.purchase_enabled=result.purchase_enabled==1 and purchase_provider and 1 or 0
     return result
 end
-function M.send_daily(player_id)
+function M.send_daily(player_id,claim_result)
     if not PlayerResource or not CustomGameEventManager then return end
     local player=PlayerResource:GetPlayer(player_id)
-    if player then CustomGameEventManager:Send_ServerToPlayer(player,"survival_daily_snapshot",M.daily_snapshot(player_id)) end
+    if player then
+        local snapshot=M.daily_snapshot(player_id)
+        snapshot.claim_result=claim_result
+        CustomGameEventManager:Send_ServerToPlayer(player,"survival_daily_snapshot",snapshot)
+    end
 end
 function M.daily_claim(player_id,target)
     local today=require("systems/archive_calendar").day()
@@ -513,7 +525,7 @@ function M.init()
         daily_times[id]=now
         local result=M.daily_claim(id,payload.target_day)
         if not result.ok then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
-        M.send_daily(id)
+        M.send_daily(id,{target_day=payload.target_day,ok=result.ok==true,pending=result.pending==true,error=result.error})
     end)
     local purchase_times={}
     CustomGameEventManager:RegisterListener("survival_pass_purchase",function(_,payload)

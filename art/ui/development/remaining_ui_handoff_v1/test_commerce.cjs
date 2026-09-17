@@ -1,0 +1,30 @@
+const fs=require('fs'),p=require('path'),vm=require('vm'),assert=require('assert');
+const build=JSON.parse(fs.readFileSync(p.join(__dirname,'build.json'))),candidate=p.join(__dirname,'candidate/panorama');
+let nodes=[],jobs=new Map(),serial=0;
+class Panel{constructor(type,parent,id){this.type=type;this.parent=parent;this.children=[];this.classes=new Set();this.style={};this.events={};this.enabled=true;this.visible=true;if(parent)parent.children.push(this);nodes.push(this);}AddClass(c){this.classes.add(c)}RemoveClass(c){this.classes.delete(c)}SetHasClass(c,v){v?this.AddClass(c):this.RemoveClass(c)}SetPanelEvent(n,f){this.events[n]=f}RemoveAndDeleteChildren(){this.children=[]}Children(){return this.children}SetScaling(v){this.scaling=v}DeleteAsync(){this.visible=false}}
+const root=new Panel('Panel');root.actuallayoutwidth=1672;root.actuallayoutheight=941;
+const $=()=>null;$.CreatePanel=(t,parent,id)=>new Panel(t,parent,id);$.Schedule=(t,f)=>{jobs.set(++serial,f);return serial};$.CancelScheduled=id=>jobs.delete(id);
+const cfg={},env={$,GameUI:{CustomUIConfig:()=>cfg}};require('../../../../tools/load_shared_ui_test.cjs')(env,Panel,root);
+for(const re of [/^scripts\/custom_game\/remaining_/,/scripts.*commerce_remaining/])vm.runInNewContext(fs.readFileSync(p.join(candidate,build.inputs.find(f=>re.test(f))),'utf8'),env);
+const view=cfg.SurvivalCommerceView,all=(base,cls)=>{let found=[];function visit(n){if(n.classes.has(cls))found.push(n);n.children.forEach(visit);}visit(base);return found;},one=cls=>all(root,cls)[0],click=b=>b.events.onactivate();
+view.Open('shop');assert.equal(all(one('RCGrid'),'RCProduct').length,8);assert.equal(all(one('RCGrid'),'RCProductBuy').length,0);
+view.Open('bundles');assert.equal(all(one('RCGrid'),'RCProduct').length,4);
+view.Open('purchase');assert(!one('RCOrderConfirm').enabled);assert(!one('RCQRCode'));
+// Behavior fixture only; no fixture data is deployed to the game or sent to a payment service.
+const item={id:'test_only',name:'测试用长商品名称（不部署）',effect:'仅用于组件测试',prices:[{amount:7,currencyName:'测试积分'}],purchasable:true,min_quantity:1,max_quantity:2,payment_methods:[{id:'balance',name:'测试余额',enabled:true}]};
+let sent=[],callback;view.SetAdapter({createOrder:(req,cb)=>{sent.push(req);callback=cb;}});view.SetCatalog({products:[item]});view.Open('shop');click(one('RCProductBuy'));
+assert(!one('RCOrderConfirm').enabled,'explicit payment choice is required');click(one('RCMethod'));click(one('RCOrderConfirm'));click(one('RCOrderConfirm'));assert.equal(sent.length,1);assert.equal(sent[0].product_id,'test_only');assert(!('price' in sent[0]),'client never submits a price');
+callback({order_id:'test_order',status:'pending',sequence:1,amount_text:'服务器确认金额'});assert(one('RCOrderStatus').text.includes('等待支付'));
+view.UpdateOrder({order_id:'different',status:'complete',sequence:9});assert(one('RCOrderStatus').text.includes('等待支付'));
+view.UpdateOrder({order_id:'test_order',status:'processing',sequence:2});assert(one('RCOrderStatus').text.includes('支付处理中'));
+view.UpdateOrder({order_id:'test_order',status:'expired',sequence:3});assert(one('RCOrderStatus').text.includes('已过期'));assert(!one('RCQRCode'));
+view.UpdateOrder({order_id:'test_order',status:'pending',sequence:4});assert(one('RCOrderStatus').text.includes('已过期'));
+callback({order_id:'test_order',status:'pending',sequence:5});assert(one('RCOrderStatus').text.includes('已过期'),'a repeated create callback cannot resurrect a terminal order');
+view.Open('shop');click(one('RCProductBuy'));click(one('RCMethod'));click(one('RCOrderConfirm'));
+callback({order_id:'failed_order',status:'failed',sequence:1});assert(one('RCOrderStatus').text.includes('支付失败'));assert(!one('RCQRCode'));
+view.Open('shop');click(one('RCProductBuy'));click(one('RCMethod'));click(one('RCOrderConfirm'));
+callback({order_id:'complete_order',status:'complete',sequence:1});assert(one('RCOrderStatus').text.includes('支付完成'));assert(!one('RCQRCode'));
+view.UpdateOrder({order_id:'complete_order',status:'processing',sequence:2});assert(one('RCOrderStatus').text.includes('支付完成'));
+view.SetCatalog({products:[{...item,prices:[{amount:'7',currencyName:'测试积分'}]}]});view.Open('shop');assert(!one('RCProductBuy').enabled,'unreliable price cannot enable purchase');
+view.Dispose();assert.equal(jobs.size,0);
+console.log('COMMERCE_COMPONENT_PASS: empty states, 4x2/2x2 structures, authoritative price gate, explicit method, duplicate guard, mismatched/stale/expired order and lifecycle. No live payment tested.');

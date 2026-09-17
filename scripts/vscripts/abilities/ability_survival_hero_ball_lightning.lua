@@ -1,9 +1,20 @@
 ability_survival_hero_ball_lightning = class({})
 
 local MAX_DISTANCE = 800
-local TRAVEL_SPEED = 7000
 local destination_validation = require("systems/destination_validation_service")
 local blink_destination = require("systems/blink_destination")
+local scheduler = require("core/scheduler")
+local PARTICLE = "particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning.vpcf"
+local SOUND = "Hero_StormSpirit.BallLightning"
+
+local function flash(position, caster)
+    local particle = ParticleManager:CreateParticle(PARTICLE, PATTACH_WORLDORIGIN, caster)
+    ParticleManager:SetParticleControl(particle, 0, position)
+    scheduler.after(0.18, function()
+        ParticleManager:DestroyParticle(particle, false)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+end
 
 local function valid_destination(position, caster)
     return destination_validation.validate(position, caster)
@@ -13,10 +24,6 @@ function ability_survival_hero_ball_lightning:CastFilterResultLocation(location)
     if not IsServer() then return UF_SUCCESS end
     local caster = self:GetCaster()
     if not caster or caster:IsNull() then return UF_FAIL_CUSTOM end
-    if caster:HasModifier("modifier_survival_hero_ball_lightning") then
-        self.cast_error = "正在传送中"
-        return UF_FAIL_CUSTOM
-    end
     local target = blink_destination.clamp(
         caster:GetAbsOrigin(), location, MAX_DISTANCE
     )
@@ -65,18 +72,24 @@ function ability_survival_hero_ball_lightning:OnSpellStart()
 
     caster:Stop()
     ProjectileManager:ProjectileDodge(caster)
-    local modifier = caster:AddNewModifier(
-        caster,
-        self,
-        "modifier_survival_hero_ball_lightning",
-        {
-            x = target.x,
-            y = target.y,
-            z = target.z,
-            speed = TRAVEL_SPEED,
-        }
-    )
-    if not modifier then self:RefundTravelMana() end
+    -- Same atomic relocation as builder blink: do not traverse intermediate
+    -- terrain, acquire a motion controller or leave the hero command-restricted.
+    local moved = destination_validation.teleport(caster, target, true)
+    if not moved then
+        self:RefundTravelMana()
+        self:EndCooldown()
+        return
+    end
+    flash(origin, caster)
+    flash(caster:GetAbsOrigin(), caster)
+    caster:EmitSound(SOUND)
+    caster.survival_blink_sound_serial = (caster.survival_blink_sound_serial or 0) + 1
+    local serial = caster.survival_blink_sound_serial
+    scheduler.after(0.18, function()
+        if not caster:IsNull() and caster.survival_blink_sound_serial == serial then
+            caster:StopSound(SOUND)
+        end
+    end)
 end
 
 return ability_survival_hero_ball_lightning

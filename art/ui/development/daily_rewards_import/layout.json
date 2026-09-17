@@ -1,0 +1,170 @@
+{
+  "page": "daily_rewards",
+  "design_canvas": [
+    1672,
+    941
+  ],
+  "coordinate_space": "source pixel xywh, top-left",
+  "modal": [
+    164,
+    94,
+    1348,
+    758
+  ],
+  "outside_scrim_alpha": 0.55,
+  "background": "live_game_not_screenshot",
+  "shell_component": "ModalShell",
+  "existing_shared_namespace": "ui_reuse_system_v1",
+  "default_art_profile": "daily_approved_local_skin",
+  "shared_shell_candidate": "shared.candidate.daily_window",
+  "regions": {
+    "title": [
+      777,
+      115,
+      187,
+      53
+    ],
+    "title_icon": [
+      714,
+      120,
+      45,
+      46
+    ],
+    "close_hit_area": [
+      1420,
+      111,
+      64,
+      64
+    ],
+    "subtitle": [
+      240,
+      210,
+      490,
+      50
+    ],
+    "pass_status": [
+      1221,
+      190,
+      253,
+      54
+    ],
+    "weekly_count": [
+      1276,
+      244,
+      182,
+      28
+    ],
+    "day_cards": [
+      [
+        207,
+        288,
+        153,
+        385
+      ],
+      [
+        366,
+        288,
+        153,
+        385
+      ],
+      [
+        525,
+        288,
+        153,
+        385
+      ],
+      [
+        684,
+        288,
+        153,
+        385
+      ],
+      [
+        843,
+        288,
+        153,
+        385
+      ],
+      [
+        1002,
+        288,
+        153,
+        385
+      ]
+    ],
+    "day7": [
+      1160,
+      281,
+      320,
+      405
+    ],
+    "rule_line": [
+      262,
+      711,
+      921,
+      32
+    ],
+    "rules_entry": [
+      205,
+      775,
+      160,
+      43
+    ],
+    "claim_button": [
+      1162,
+      760,
+      318,
+      70
+    ]
+  },
+  "typography": {
+    "title": {
+      "family": "Source Han Serif SC",
+      "weight": "Bold",
+      "suggested_source_px": 38
+    },
+    "body": {
+      "family": "Source Han Sans SC",
+      "weight": "Regular",
+      "suggested_source_px": 20
+    },
+    "button": {
+      "family": "Source Han Sans SC",
+      "weight": "Medium",
+      "suggested_source_px": 24
+    },
+    "caption": {
+      "family": "Source Han Sans SC",
+      "weight": "Regular",
+      "suggested_source_px": 18
+    }
+  },
+  "scaling": {
+    "instruction": "先以1672×941做视觉对照，再转换为项目实际逻辑坐标；确认Panorama现有整体缩放，避免二次缩放。局部画布尺寸与可见图形尺寸分开，角片固定，图标等比。",
+    "uniform_fit_for_reference_only": "min(viewportWidth/1672, viewportHeight/941)",
+    "icon_canvas": [
+      64,
+      64
+    ],
+    "icon_visible_target_px": [
+      28,
+      36
+    ]
+  },
+  "z_order": [
+    "live_game",
+    "scrim",
+    "modal_surface",
+    "card_backgrounds",
+    "item_art",
+    "state_overlays",
+    "dynamic_text",
+    "tooltips"
+  ],
+  "content_rules": [
+    "不要复刻左侧导航，本弹窗没有分栏",
+    "文本和数量是Label，exact裁切里的文字不可用于实机",
+    "普通奖励与通行证奖励独立资格、独立领取状态",
+    "禁止将本周6/7误作连续签到解锁门槛"
+  ]
+}

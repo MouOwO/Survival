@@ -1,0 +1,58 @@
+{
+  "kind": "browser_preview_not_game_capture",
+  "checks": [
+    {
+      "width": 1280,
+      "height": 720,
+      "rect": {
+        "x": 170.35336303710938,
+        "y": 44.147186279296875,
+        "width": 924.293212890625,
+        "height": 616.70556640625
+      },
+      "insideClick": true,
+      "close": true
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "rect": {
+        "x": 259.280029296875,
+        "y": 77.47076416015625,
+        "width": 1386.43994140625,
+        "height": 925.0584716796875
+      },
+      "insideClick": true,
+      "close": true
+    },
+    {
+      "width": 2560,
+      "height": 1440,
+      "rect": {
+        "x": 355.70672607421875,
+        "y": 103.29437255859375,
+        "width": 1848.58642578125,
+        "height": 1233.4111328125
+      },
+      "insideClick": true,
+      "close": true
+    },
+    {
+      "width": 3440,
+      "height": 1440,
+      "rect": {
+        "x": 795.7067260742188,
+        "y": 103.29437255859375,
+        "width": 1848.58642578125,
+        "height": 1233.4111328125
+      },
+      "insideClick": true,
+      "close": true
+    }
+  ],
+  "fontChecksAreNotProofOfInstallation": true,
+  "fonts": {
+    "serif": true,
+    "sans": true
+  }
+}

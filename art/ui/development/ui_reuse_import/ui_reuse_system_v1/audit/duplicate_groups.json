@@ -1,0 +1,213 @@
+[
+  {
+    "sha256": "251a2dd1a586e03554a1935beecabcb9e33faf71944f698decf48356a44542b2",
+    "copies": 2,
+    "bytes_each": 2632703,
+    "duplicate_bytes": 2632703,
+    "sources": [
+      "lottery_ui_handoff/approved_reference.png",
+      "lottery_ui_handoff_v2/approved_reference.png"
+    ]
+  },
+  {
+    "sha256": "ce9fcc5712b16a5913df72caba6bbdc0c0dfd6aa35315c05c9d134713b1906b6",
+    "copies": 2,
+    "bytes_each": 454,
+    "duplicate_bytes": 454,
+    "sources": [
+      "lottery_ui_handoff/assets/button_gold.svg",
+      "lottery_ui_handoff_v2/assets/button_gold.svg"
+    ]
+  },
+  {
+    "sha256": "ce565765bd3be17ccf49fb367095e6a79ec0e3aeffe60096d5664f237d6067af",
+    "copies": 2,
+    "bytes_each": 1694153,
+    "duplicate_bytes": 1694153,
+    "sources": [
+      "lottery_ui_handoff/assets/button_gold_concept.png",
+      "lottery_ui_handoff_v2/assets/button_gold_concept.png"
+    ]
+  },
+  {
+    "sha256": "42e944c1ea19220a1aac569e2c391ce972213cd9786588225dce0af5a222a142",
+    "copies": 2,
+    "bytes_each": 454,
+    "duplicate_bytes": 454,
+    "sources": [
+      "lottery_ui_handoff/assets/button_ivory.svg",
+      "lottery_ui_handoff_v2/assets/button_ivory.svg"
+    ]
+  },
+  {
+    "sha256": "edde82204607a52b9999d21a90b0bb7ca11979f63f8452c2a6ace8a3b8a077d9",
+    "copies": 2,
+    "bytes_each": 1088592,
+    "duplicate_bytes": 1088592,
+    "sources": [
+      "lottery_ui_handoff/assets/button_ivory_concept.png",
+      "lottery_ui_handoff_v2/assets/button_ivory_concept.png"
+    ]
+  },
+  {
+    "sha256": "7ddbab8632b97b927c441aefcf19edebc7e39367c72b51642797b3acb41a2a58",
+    "copies": 2,
+    "bytes_each": 3098780,
+    "duplicate_bytes": 3098780,
+    "sources": [
+      "lottery_ui_handoff/assets/card_back.png",
+      "lottery_ui_handoff_v2/assets/card_back.png"
+    ]
+  },
+  {
+    "sha256": "71dcb000590225eb8f5bcbfc9bbfc587dc60cc88f23ffe5e686d2c2fa24c1950",
+    "copies": 2,
+    "bytes_each": 1912875,
+    "duplicate_bytes": 1912875,
+    "sources": [
+      "lottery_ui_handoff/assets/card_front.png",
+      "lottery_ui_handoff_v2/assets/card_front.png"
+    ]
+  },
+  {
+    "sha256": "212cf98db9094f01feabc0976f886821c05537a2565e255d9c8e5db10a832083",
+    "copies": 2,
+    "bytes_each": 1808147,
+    "duplicate_bytes": 1808147,
+    "sources": [
+      "lottery_ui_handoff/assets/pool_panel.png",
+      "lottery_ui_handoff_v2/assets/pool_panel.png"
+    ]
+  },
+  {
+    "sha256": "ed3ffd239298351b94bb0f44a064fced050ac31e8c6a7ed1e2bee197cbc65ffb",
+    "copies": 2,
+    "bytes_each": 2702458,
+    "duplicate_bytes": 2702458,
+    "sources": [
+      "lottery_ui_handoff/assets/scene_clean.png",
+      "lottery_ui_handoff_v2/assets/scene_clean.png"
+    ]
+  },
+  {
+    "sha256": "6dc28a059a6d49ec30fa614f3208e4a60f4054f4af83b25ac186cb16f991744b",
+    "copies": 2,
+    "bytes_each": 242,
+    "duplicate_bytes": 242,
+    "sources": [
+      "lottery_ui_handoff/icons/checkbox_off.svg",
+      "lottery_ui_handoff_v2/icons/checkbox_off.svg"
+    ]
+  },
+  {
+    "sha256": "5d4efdf8672828bf097e61ad31ec8bc0c1b9d060da57572462f9214f8ec04c9a",
+    "copies": 2,
+    "bytes_each": 272,
+    "duplicate_bytes": 272,
+    "sources": [
+      "lottery_ui_handoff/icons/checkbox_on.svg",
+      "lottery_ui_handoff_v2/icons/checkbox_on.svg"
+    ]
+  },
+  {
+    "sha256": "610ae85824a2fd3fd1396dc02aba6b127f62297f52b444b69e773dd4d1dd8261",
+    "copies": 2,
+    "bytes_each": 221,
+    "duplicate_bytes": 221,
+    "sources": [
+      "lottery_ui_handoff/icons/chevron.svg",
+      "lottery_ui_handoff_v2/icons/chevron.svg"
+    ]
+  },
+  {
+    "sha256": "b96b9f054a7535bb9616a0977360382a725f08cca55648226d1aa382b6b16837",
+    "copies": 2,
+    "bytes_each": 227,
+    "duplicate_bytes": 227,
+    "sources": [
+      "lottery_ui_handoff/icons/close.svg",
+      "lottery_ui_handoff_v2/icons/close.svg"
+    ]
+  },
+  {
+    "sha256": "c8db0e56d20dabb1081faad5d5d5d971e62701ed6eda517cf09c36a62fff2cdf",
+    "copies": 2,
+    "bytes_each": 298,
+    "duplicate_bytes": 298,
+    "sources": [
+      "lottery_ui_handoff/icons/history.svg",
+      "lottery_ui_handoff_v2/icons/history.svg"
+    ]
+  },
+  {
+    "sha256": "a975e95f156c1ce252d923850a3249b529ce8e1f59700cf5299fb42a0960caef",
+    "copies": 2,
+    "bytes_each": 221,
+    "duplicate_bytes": 221,
+    "sources": [
+      "lottery_ui_handoff/icons/plus.svg",
+      "lottery_ui_handoff_v2/icons/plus.svg"
+    ]
+  },
+  {
+    "sha256": "e84f59737b12c4b7461839dbf6330e8eebdb6501f43aa8c2ede4ad2568d94fba",
+    "copies": 2,
+    "bytes_each": 280,
+    "duplicate_bytes": 280,
+    "sources": [
+      "lottery_ui_handoff/icons/pool.svg",
+      "lottery_ui_handoff_v2/icons/pool.svg"
+    ]
+  },
+  {
+    "sha256": "b1c21100fd84b1dffba808354b8a12b0818c51fd9385b92003f1bef45dc330fd",
+    "copies": 3,
+    "bytes_each": 268,
+    "duplicate_bytes": 536,
+    "sources": [
+      "lottery_ui_handoff/icons/sound.svg",
+      "lottery_ui_handoff_v2/icons/announcement.svg",
+      "lottery_ui_handoff_v2/icons/sound.svg"
+    ]
+  },
+  {
+    "sha256": "16bbe1814ed06537a90c4d208542e7677278f22502d7d78b5ebd4a19bb69bcdb",
+    "copies": 2,
+    "bytes_each": 250,
+    "duplicate_bytes": 250,
+    "sources": [
+      "lottery_ui_handoff/icons/star.svg",
+      "lottery_ui_handoff_v2/icons/star.svg"
+    ]
+  },
+  {
+    "sha256": "9264ece7a632c807bf4611eabfaf0893cdf41d041ee5a40523f47065d67a2b8d",
+    "copies": 2,
+    "bytes_each": 285,
+    "duplicate_bytes": 285,
+    "sources": [
+      "lottery_ui_handoff/icons/ticket.svg",
+      "lottery_ui_handoff_v2/icons/ticket.svg"
+    ]
+  },
+  {
+    "sha256": "77968f9bbc1945cf5d5bd497e3f90e210db0f0a5b05525acb2e881bfb3f9d0df",
+    "copies": 2,
+    "bytes_each": 7737890,
+    "duplicate_bytes": 7737890,
+    "sources": [
+      "lottery_ui_handoff/single_draw_motion.svg",
+      "lottery_ui_handoff_v2/single_draw_motion.svg"
+    ]
+  },
+  {
+    "sha256": "7153425415aa09bafa517aa5644e3088f5294ed98f66de3b92a8bc41d527a52c",
+    "copies": 2,
+    "bytes_each": 44936535,
+    "duplicate_bytes": 44936535,
+    "sources": [
+      "lottery_ui_handoff/ten_draw_motion.svg",
+      "lottery_ui_handoff_v2/ten_draw_motion.svg"
+    ]
+  }
+]

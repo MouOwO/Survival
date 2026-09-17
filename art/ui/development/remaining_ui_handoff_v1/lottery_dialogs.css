@@ -1,0 +1,70 @@
+/* pool_grid_v2: 840x610 centered design; history: 1120x660. One root scale. */
+#LotteryInfoDialog.RHWindow {padding:0px;flow-children:none;overflow:noclip;}
+#LotteryInfoDialog.RHWindow #LotteryInfoHeader {position:0px 0px 0px;width:100%;height:84px;flow-children:none;border:0px;background-image:none;background-color:transparent;z-index:4;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTitle {position:0px 0px 0px;width:330px;height:64px;align:center center;text-align:center;font-family:"Source Han Serif SC";font-weight:bold;font-size:34px;color:#f4edd9;padding-top:5px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoIcon {visibility:collapse;}
+#LotteryInfoDialog.RHWindow #LotteryInfoHeader .RHTitleOrnamentLeft {position:210px 0px 0px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoHeader .RHTitleOrnamentRight {horizontal-align:right;margin-right:210px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoClose {position:0px 0px 0px;align:right top;margin:21px 25px 0px 0px;width:38px;height:38px;background-image:none;background-color:transparent;border:0px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs {position:22px 82px 0px;width:796px;height:83px;flow-children:right;overflow:noclip;z-index:3;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab {width:199px;height:56px;min-width:0px;padding:0px;margin:0px;border:0px;flow-children:none;background-image:none;background-color:transparent;box-shadow:none;overflow:noclip;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab:hover {brightness:1.12;background-color:transparent;z-index:4;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab:active {brightness:.86;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTabName {align:center center;position:0px 0px 0px;margin:0px;padding:0px;font-size:24px;color:#e5e9e2;z-index:2;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .Selected .LotteryPoolTabName {color:#fff0c6;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolBadge,#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryTabMark,#LotteryInfoDialog.RHWindow #LotteryInfoTabs .UITabGlow {visibility:collapse;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody {position:22px 139px 0px;width:796px;height:356px;flow-children:none;z-index:2;overflow:clip;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody #LotteryInfoList {position:22px 22px 0px;width:756px;height:332px;padding:0px;flow-children:down;overflow:squish scroll;background-color:transparent;}
+#LotteryInfoDialog.RHPool #LotteryInfoBody {height:382px;background-image:none;background-color:transparent;}
+.RHPoolMaterial {z-index:1;}
+.RHTabSeparator {width:1px;height:22px;align:left center;background-color:#81929b;z-index:1;}
+#LotteryInfoDialog.RHPool #LotteryInfoBody #LotteryInfoList {height:352px;flow-children:right-wrap;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow {width:171px;height:163px;min-height:0px;margin:0px 21px 13px 0px;padding:0px;flow-children:none;background-image:none;background-color:transparent;border:0px;box-shadow:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow.RHFourth {margin-right:0px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow:hover {brightness:1.06;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow.Selected .RHRewardCardBase {brightness:1.04;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailIcon {position:25px 12px 0px;width:120px;height:114px;align:left top;margin:0px;padding:0px;border:0px;box-shadow:none;background-image:none;background-color:transparent;z-index:1;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryRewardIcon {width:120px;height:92px;align:center center;background-color:transparent;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryRewardQuality,#LotteryInfoDialog .RHRewardCount {visibility:collapse;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailCopy {position:6px 126px 0px;width:159px;height:32px;flow-children:none;z-index:2;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailName {width:159px;height:30px;position:0px 0px 0px;font-size:17px;white-space:nowrap;text-overflow:shrink;text-align:center;margin:0px;color:#294d5b;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .RHRewardName {position:6px 126px 0px;width:159px;height:30px;font-size:17px;white-space:nowrap;text-overflow:shrink;text-align:center;margin:0px;color:#294d5b;z-index:2;}
+#LotteryInfoDialog.RHWindow .LotteryCardState,#LotteryInfoDialog.RHWindow .UICardBody,#LotteryInfoDialog.RHWindow .UICardBorder,#LotteryInfoDialog.RHPool .LotteryDetailDescription,#LotteryInfoDialog.RHPool .LotteryDetailMeta,#LotteryInfoDialog.RHWindow #LotteryPoolSelection,#LotteryInfoDialog.RHWindow #LotteryPoolGuarantee {visibility:collapse;}
+#LotteryInfoDialog.RHWindow #LotteryInfoNote {visibility:collapse;}
+#LotteryInfoDialog.RHWindow #LotteryInfoFooter {position:40px 534px 0px;width:760px;height:54px;padding:0px;margin:0px;border-top:1px solid #bbc6c7;flow-children:none;z-index:3;}
+#LotteryInfoDialog.RHWindow #LotteryInfoFooter > .LotteryFunctionIcon,#LotteryInfoDialog.RHWindow #LotteryInfoConfirm {visibility:collapse;}
+#LotteryInfoDialog.RHWindow #LotteryInfoRules {position:0px 8px 0px;width:760px;height:47px;font-size:16px;text-align:center;white-space:normal;overflow:squish scroll;}
+#LotteryInfoDialog.RHHistory #LotteryInfoHeader .RHTitleOrnamentLeft {position:264px 0px 0px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoHeader .RHTitleOrnamentRight {margin-right:264px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoTabs {position:24px 84px 0px;width:1072px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoTabs .LotteryPoolTab {width:268px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoBody {position:40px 208px 0px;width:1055px;height:370px;background-image:none;}
+#LotteryInfoDialog.RHHistory #LotteryInfoBody #LotteryInfoList {position:0px 0px 0px;width:1055px;height:370px;flow-children:down;}
+.RHHistoryColumns {position:40px 155px 0px;width:1040px;height:48px;border-bottom:1px solid #bdbaaa;z-index:2;flow-children:none;}
+.RHHistoryColumn {font-size:22px;color:#778991;vertical-align:center;}
+.RHCol0 {position:13px 0px 0px;}.RHCol1 {position:259px 0px 0px;}.RHCol2 {position:782px 0px 0px;}.RHCol3 {position:938px 0px 0px;}
+.RHHistoryRow {width:1040px;height:60px;flow-children:none;}
+.RHHistoryRow.RHAlternate {background-color:#819b9c12;}
+.RHHistoryTime {position:13px 0px 0px;width:207px;font-size:20px;vertical-align:center;}
+.RHHistoryRewardIcon {position:228px 5px 0px;width:55px;height:48px;}
+.RHHistoryName {position:294px 0px 0px;width:463px;font-size:22px;vertical-align:center;text-overflow:shrink;}
+.RHHistoryQuality {position:782px 0px 0px;width:90px;font-size:21px;vertical-align:center;}
+.RHHistoryQuantity {position:938px 0px 0px;width:94px;font-size:21px;vertical-align:center;text-overflow:shrink;}
+.RHWindow .RHQualityN {color:#78888c;}.RHWindow .RHQualityR {color:#568496;}.RHWindow .RHQualitySR {color:#877297;}.RHWindow .RHQualitySSR {color:#947441;}.RHWindow .RHQualityUR {color:#824da3;}
+.RHHistoryEmpty {width:100%;height:100%;}
+.RHHistoryEmptyIcon {width:90px;height:90px;align:center center;margin-bottom:75px;}
+.RHHistoryEmptyText {align:center center;margin-top:75px;font-size:24px;color:#778991;}
+#LotteryInfoDialog.RHHistory #LotteryInfoNote {visibility:visible;position:49px 597px 0px;width:730px;height:35px;font-size:18px;background-color:transparent;margin:0px;z-index:3;color:#778991;}
+#LotteryInfoDialog.RHHistory #LotteryInfoFooter {position:40px 583px 0px;width:1040px;height:54px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoRules {position:850px 10px 0px;width:190px;height:35px;text-align:right;font-size:19px;}
+#LotteryWindow #LotteryResultActions .RHAction {width:304px;height:64px;background-image:none;background-color:transparent;border:0px;flow-children:none;}
+#LotteryWindow #LotteryResultActions .RHAction Label {align:center center;margin:0px;padding:0px;font-size:29px;color:#294958;}
+#LotteryWindow #LotterySkipReveal {background-image:none;border:0px;background-color:#1d3e4ccb;}
+/* Five cards plus their margins must fit without an implicit scrollbar stealing a column. */
+#LotteryWindow #LotteryItemList.LotteryTenResults {width:1120px;height:620px;padding:0px 10px;flow-children:right-wrap;overflow:clip;}
+/* Quality accents preserve the approved card texture, including on selection. */
+.RHWindow .RHQualityN {color:#398754;}
+.RHWindow .RHQualityR {color:#3283c5;}
+.RHWindow .RHQualitySR {color:#a052c8;}
+.RHWindow .RHQualitySSR {color:#bd8b25;}
+.RHWindow .RHQualityUR {color:#66338f;}

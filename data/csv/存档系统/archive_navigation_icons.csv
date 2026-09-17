@@ -1,0 +1,8 @@
+category_id,display_name,image_path,normal_color,selected_color,design_size
+clear,通关存档,custom_game/archive_polish_v1/nav/clear.svg,#e8c98a,#000000,31
+endless,无尽存档,custom_game/archive_polish_v1/nav/endless.svg,#e8c98a,#000000,31
+map_level,地图等级,custom_game/archive_polish_v1/nav/map_level.svg,#e8c98a,#000000,31
+work,上班福利,custom_game/archive_polish_v1/nav/work.svg,#e8c98a,#000000,31
+fishing,钓鱼存档,custom_game/archive_polish_v1/nav/fishing.svg,#e8c98a,#000000,31
+building,存档建筑,custom_game/archive_polish_v1/nav/building.svg,#e8c98a,#000000,31
+boss,BOSS存档,custom_game/archive_polish_v1/nav/boss.svg,#e8c98a,#000000,31

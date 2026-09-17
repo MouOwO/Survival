@@ -1,0 +1,14 @@
+{
+  "modal_open_ms": 160,
+  "modal_close_ms": 120,
+  "hover_ms": 100,
+  "pressed_ms": 60,
+  "claimed_transition_ms": 160,
+  "claim_busy_spinner_ms_per_turn": 800,
+  "rules": [
+    "悬停仅轻微提亮，不放大奖励卡导致邻格跳动",
+    "领取结果以服务端确认为准，先显示busy，确认后转勾选",
+    "奖励粒子可选；动效降低设置下取消位移和粒子",
+    "以上为时序规范，本包不声称包含Unity或Panorama已运行的动画工程"
+  ]
+}

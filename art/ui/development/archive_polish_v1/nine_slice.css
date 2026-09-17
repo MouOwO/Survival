@@ -1,0 +1,39 @@
+.UINineSlice {width:100%;height:100%;ignore-parent-flow:true;position:0px 0px 0px;flow-children:down;overflow:clip;}
+.UINineRow {width:100%;flow-children:right;overflow:clip;}
+.UINineTile {height:100%;background-repeat:no-repeat;overflow:clip;}
+/* Row children must stay in their nine-slice flow, not legacy Image rules. */
+.UINineSlice .UINineRow,.UINineSlice .UINineTile {ignore-parent-flow:false;}
+.ArchiveRoot #ArchiveTabs .ArchiveTab:selected {background-image:none;}
+.ArchiveRoot #ArchiveTabs .ArchiveNavSelectedFrame {width:209px;height:54px;visibility:collapse;z-index:0;}
+.ArchiveRoot #ArchiveTabs .ArchiveTab:selected .ArchiveNavSelectedFrame {visibility:visible;}
+.ArchiveRoot #ArchiveTabs .ArchiveNavIcon {z-index:2;wash-color:#e8c98a;opacity:1;}
+.ArchiveRoot #ArchiveTabs .ArchiveTab:selected .ArchiveNavIcon {wash-color:#000000;opacity:1;}
+.ArchiveRoot #ArchiveTabs .ArchiveTab Label {z-index:3;}
+.ArchiveRoot #ArchiveGrid .ArchiveCard,.ArchiveRoot #ArchiveGrid .ArchiveCard:hover,.ArchiveRoot #ArchiveGrid .ArchiveHovered {background-image:none;}
+.ArchiveNormalFrame,.ArchiveSelectedFrame {z-index:0;}
+.ArchiveRoot #ArchiveGrid .ArchiveNameHost {z-index:2;}
+.ArchiveSelectedFrame {visibility:collapse;}
+.ArchiveCard:hover .ArchiveSelectedFrame,.ArchiveHovered .ArchiveSelectedFrame {visibility:visible;}
+/* Foreground star samples the same fixed UV as this nine-slice corner. */
+.ArchiveRoot .ArchivePromote,.ArchiveRoot #ArchiveDraw {background-image:none;}
+.ArchiveRoot .ArchivePromote:hover,.ArchiveRoot #ArchiveDraw:hover {background-image:none;}
+.ArchiveRoot .ArchivePromote Label,.ArchiveRoot #ArchiveDraw Label {z-index:3;}
+.ArchiveRoot #ArchiveFilters RadioButton,.ArchiveRoot #ArchiveFilters RadioButton:selected {background-image:none;}
+.ArchiveFilterFrame {z-index:0;}
+.ArchiveFilter_selected {visibility:collapse;}
+RadioButton:selected .ArchiveFilter_selected {visibility:visible;}
+.ArchiveRoot #ArchiveFilters Label {z-index:2;}
+/* The old social-page rule compressed these same controls to 26px. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent #ArchiveFilters,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent.ArchiveHasDraw #ArchiveFilters {height:31px;min-height:31px;}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent #ArchiveFilters RadioButton,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent.ArchiveHasDraw #ArchiveFilters RadioButton {width:111px;height:31px;min-height:31px;padding:0px;margin:0px 7px 0px 0px;background-image:none;}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent #ArchiveFilters #ArchiveFilter_all {width:130px;margin-right:10px;}
+#LotteryMainCanvas .PolishDrawBase {z-index:0;}
+#LotteryMainCanvas .PolishTenHover {z-index:1;opacity:0;transition-property:opacity;transition-duration:.08s;}
+#LotteryMainCanvas #LotteryTenButton:enabled:hover .PolishTenHover {opacity:1;}
+#LotteryMainCanvas .LHDrawTicket,#LotteryMainCanvas .LHDrawCaption,#LotteryMainCanvas .LHCost {z-index:3;}
+#LotteryMainCanvas .LHDrawVisual {width:100%;height:100%;}
+#LotteryMainCanvas .LHSingleHover {visibility:collapse;}
+#LotteryMainCanvas .PolishSingleHover {z-index:1;wash-color:#e8c780;opacity:0;transition-property:opacity;transition-duration:.08s;}
+#LotteryMainCanvas #LotterySingleButton:enabled:hover .PolishSingleHover {opacity:.3;}
