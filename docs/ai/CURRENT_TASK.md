@@ -1,3 +1,138 @@
+## 当前新增（2026-09-17）：熔火核心挑战房间
+
+- 按四张参考图制作 30 个自制组件、16 套颜色 / 法线 / 粗糙度 / 反射材质，组合 450 个实例、339476 三角面。玄武岩、焦痕石板、旧铜、暗铁、冷却熔岩和焦灰统一材质；按要求没有自发光、火焰、粒子或局部效果灯。
+- 完整 Blender 场景与组件库、独立 Hammer 样板地图和可编辑预制件已生成、安装编译。预览 `output/molten_core_room/index.html`，源文件 `output/molten_core_room/molten_core_room.blend`。
+- 编译模型方向、尺度、碰撞、材质输入和布局审计通过。实机入口 / 中央 / 内场导航采样通过，围墙及外侧熔岩槽样本不可行走；实际建造者完成入口、中央和四角之间六段路线，约 19.37 秒。
+- 正式主地图与挑战配置未替换。保留挑战 07 现有 entry / home / boss_spawn 标记，另有十个参考刷怪点；传送、正式刷怪及掉落流程未联调。
+- 详见 [MOLTEN_CORE_ROOM.md](MOLTEN_CORE_ROOM.md)，资源 / 实机报告位于 `output/molten_core_room/`。
+
+## 上轮新增（2026-09-17）：十字主岛模块化样板
+
+- 按四张主岛参考图制作 41 个自制组件、25 套材质、1689 个摆放实例；四方玩家平台、内岸通道、16 级阶梯、岩壁湿润水线、四色旗帜及樱树 / 原生松树组合。沿用金币练功房的组合材质流程。
+- 完整 Blender 场景与组件库、独立 Hammer 地图和预制件已生成、安装编译。预览 `output/main_island/index.html`，源文件 `output/main_island/main_island.blend`。
+- 41 个编译模型边界、材质、碰撞与布局审计通过。实机导航采样通过，实际建造者完成四方平台与中央水域之间 8 段路线，约 50.33 秒。
+- 平台高 640、水面高 400，中央浅层支撑高 396；新场景中心在原点。正式主地图、CSV 及玩家 / 战斗绑定未替换；约 149 万自制三角面，未做正式多人性能测试。
+- 详见 [MAIN_ISLAND.md](MAIN_ISLAND.md)，自动 / 实机报告与截图位于 `output/main_island/`。
+
+## 上轮新增（2026-09-16）：金币练功房模块化样板
+
+- 按四张概念与组件图制作 29 个自制模型，组合 599 个实例；石材、青铜、布料、植被等 15 套颜色 / 法线 / 反射贴图，原生松树复用。无发光、火焰或粒子。
+- 完整 Blender 场景和组件库已打包贴图并打开；预览 `output/gold_training_room/index.html`。另有独立 Hammer 地图 `gold_training_room_review.vmap` 和 `maps/prefabs/gold_training_room.vmap`，599 个道具仍独立可编辑。
+- 29 个编译模型方向、尺度、材质和碰撞审计通过。实机确认房间显示、入口 / 中央等样本可行走、墙边不可行走，实际建造者完成 900 码室内步行。修复了 FBX 导入轴转换、破损地砖被支撑面遮住和自定义地面缺少 `dota.nav.walkable` 的问题。
+- 测试相机已释放并退出测试地图。未替换正式主地图或修改玩法 CSV，传送和刷怪预留十个现有命名标记；完整金币房玩法未联调。
+- 详见 [GOLD_TRAINING_ROOM.md](GOLD_TRAINING_ROOM.md)，实际游戏截图 `output/gold_training_room/previews/runtime_complete.png`，自动 / 实机报告同目录。
+
+## 上轮新增（2026-09-16）：城墙摧毁抖动与水晶爆炸
+
+- 已接入真实城墙死亡事件：无阻挡代理抖动蓄光 1 秒，再播放白蓝闪光、扩散光环、44 片立体水晶碎片及爆裂音效；适配十阶模型的实际高度。
+- 网格、人口、计数、阻挡立即释放。原有普通模式败北延至死亡后 1.45 秒，让爆炸先显示；结算前释放服务器句柄，有限粒子自然结束。未完成建筑和断线清理不播放，重复死亡防重放，地图重置取消延迟回调。
+- 修复死亡建筑被 UI 恢复查询重新登记的问题。6 粒子、1 模型、3 材质编译通过，7 项相关 Lua 回归与编译资源审计通过。
+- Workshop 确认十阶视觉与一级真实死亡流程：0.167 秒已释放建筑状态且代理可见，1.167 秒代理已消失而游戏仍进行，随后进入结算且表现/代理/该墙阻挡均为 0。测试相机已释放。未逐一实测全部 30 级死亡。
+- 重建、测试边界、截图及报告见 [WALL_DESTRUCTION_EFFECT.md](WALL_DESTRUCTION_EFFECT.md)，资源与实机报告在 `output/wall_destruction/`。
+
+## 上轮修正（2026-09-16）：城墙材质做旧与 2.5 倍高度
+
+- 十阶城墙在网格端仅 Z 轴放大至初版 2.5 倍，保留 248 码宽度、4×4 格、实体比例 1 和 yaw=180。同步碰撞高度 295 码、三套选择盒和流光网格；实际编译尺寸与修改前清单逐款核对通过。
+- 新增 `wall_surface_materials.py`：木纹沿每根木料长轴排列，端面年轮、木结、纵裂、褪色；石材有风化凹蚀、矿物色差，金属有氧化与划痕，墙脚有积灰苔痕。颜色、法线、粗糙度由同一表面痕迹烘焙，十阶做旧强度从 1.0 递减至 0.08，高阶石面更平整、金属更干净。
+- 保持每款 2K 图集和原有面数，改善图集利用率，按 SurfaceUV 切线方向烘焙法线。已安装编译 10 材质、10 普通模型、10 流光外壳，30 级名称、经济数值与外观对应不变。
+- 编译资源审计、20 份正常/流光 FBX 回导通过；直接解码 30 张运行时颜色/法线/反射贴图，排除 UV 填充区后确认均有实际表面变化。四项相关 Lua 回归通过（城墙配置、格子对齐、施工表现、流光外壳）。报告在 `output/reference_walls/verification.json`、`fbx_verification.json`、`surface_verification.json`。
+- Workshop 分四批显示十阶模型，检查高度、材质与占地；实际一级城墙 PHYS 顶部为 295。第一批在准备阶段截图，后续截图含测试局结束提示，仅用于渲染检查，不宣称完整升级计时验收。清理确认 `WALL_V2_CLEANUP 0`，相机已释放。
+- 新预览仍为 `output/reference_walls/index.html`，新版实机报告为 `runtime_verification.json`。原始高度与旧报告保留在 `before_height_weathering/`。重建和验证说明见 [REFERENCE_WALL_MODELS.md](REFERENCE_WALL_MODELS.md)。
+
+## 上轮制作（2026-09-16）：十阶方垛城墙
+
+- 按用户十张参考图制作原木、木石、青石、青铜、苍蓝、碧玉、赤铜、紫晶、白金、天辉晶冠城墙，共十款；30 个等级每三级换一个模型，名称统一为对应前缀加 `·Ⅰ / ·Ⅱ / ·Ⅲ`。
+- 城墙保持 4×4 格（256 码）、现有 yaw=180，无新转向。模型最大宽度 248 码、比例 1.0，独立闭合碰撞体、root 权重与三套选择盒，十套 2K 颜色/法线/表面贴图。玩法数值及原有阻挡规则保留。
+- CSV、生成配置、NPC 初始模型、预载目录和施工倍率同步；十款新增流光外壳接入现有从上到下揭幕，注册表共 34 款。原有 24 款建筑不重做。
+- 十款编译资源及 FBX 回导审计、原有 24 款资源审计、14 项相关 Lua 回归通过。Workshop 分两批确认十款模型显示和网格尺寸；截图在 `output/reference_walls/runtime_01_05_fixed.png`、`runtime_06_10_visible.png`，后者实际选中建筑显示 `原木城墙·Ⅱ`。本轮未逐一实测全部等级升级/点击及完整流光计时，报告明确区分资源检查与实机范围。
+- 展示道具已清理，相机已释放，控制台确认 `WALL_REVIEW_CLEANUP 0`。预览为 `output/reference_walls/index.html`，重建入口 `tools/build_reference_walls.py`、`tools/build_building_white_shells.py`、`tools/sync_reference_wall_config.py`、`tools/install_reference_walls.ps1`。详见 [REFERENCE_WALL_MODELS.md](REFERENCE_WALL_MODELS.md)。
+
+## 上轮修正（2026-09-16）：彩色流光与从上到下揭幕
+
+- 用户确认白色轮廓可见，但要求反光、彩色光带流动，以及屋顶到地面逐渐显现。24 个外壳改用原生 `hero.vfx`，加入连续的白/青蓝/淡金/淡紫光带、细微法线、高光、边缘光和部分自发光；颜色 UV 由原生时间表达式连续滚动。
+- 外壳使用单独的 `_flow.fbx`，复制正常建筑的几何与 root 权重，仅重设高度 UV。正常模型、材质、朝南方向、模型端两倍、实体比例 1、四格占地和碰撞均保留。外壳没有 PHYS 和选择盒，不参与点选及寻路。
+- 完成时显示最终建筑，外壳在 1.5 秒内切换 48 个揭幕阶段，独立 alpha UV 让柔和边界从屋顶移向地面；全局 alpha 保持 255，不再整栋一起淡出。各阶段共享颜色、法线与透明纹理，每栋只有一个特效实体。施工/升级、死亡/取消/重置沿用现有生命周期。
+- 排查发现 `hero.vfx` 的 `F_DO_NOT_CAST_SHADOWS` 与 `F_TRANSLUCENT` 互斥，前者会让编译器丢掉透明遮罩。已移除该材质开关，保留实体级 `disableshadows=1`。实际运行纹理解码确认：低处 alpha=255、柔边 alpha=88、高处 alpha=0；颜色纹理有多色变化。
+- 实机 `template_map` 三个并排主城分别展示全流光、揭幕中段、完整建筑。截图 `output/building_presentation/flow_unpaused_a.png` 中，中间屋顶已显现而墙脚仍被流光覆盖。相隔时间的截图显示光带变化；动态区域平均 RGB 差 19.24，正常模型对照 2.68。`flow_unpaused_b.png` 包含测试局结束界面，仅作为光带变化的辅助证据。清理确认 `FLOW_CLEANUP 0 0`，相机已释放。实机范围为主城三阶段材质，完整计时及升级切模/清理由回归覆盖；此次未把测试局结束后的计时探针当成实机通过。
+- 13 项 Lua 回归、24 款外壳编译资源审计及 49 份材质检查通过。新增 `test_building_flow_material.ps1` 直接核验编译后透明开关、动态 UV 字节码、遮罩输入、各阶段偏移以及实际 VTex 像素，防止编译成功但遮罩失效。报告 `verification.json`、`white_shell_verification.json`、`flow_material_verification.json`、`flow_runtime_verification.json` 位于 `output/building_presentation/`。
+- 重建：Python `build_building_flow_materials.py` → Blender 后台 `build_building_flow_meshes.py` → Python `build_building_white_shells.py` → PowerShell `install_building_flow.ps1`。只改材质用 `-MaterialsOnly`；只编译外壳用 `-ModelsOnly`；可传 `-ModelNames` 指定外壳。普通建筑 FBX 重建后须重建对应流光 FBX。旧纯白材质与两份粒子仅保留用于非参考模型兼容。
+
+## 上轮修正（2026-09-16）：模型原生朝南与独立白光外壳
+
+- 用户再次反馈施工只有血条、没有白光，以及建筑先朝东再转向。24 款 FBX 已在网格端烘入 -90° 旋转，Source 2 中实体 yaw=0 即朝世界南方（-Y）。44 个等级及预览统一 yaw=0，创建时立即设置配置比例和角度；保持模型端 2 倍、实体比例 1、2×2 四格占地。全量生成器同步采用该网格方向。
+- 为 24 款模型分别编译 `_white_shell.vmdl`，复用同一朝南 FBX 和纯白全亮材质，无 PHYS、无选择盒。施工和升级使用独立 `prop_dynamic`，直接复制建筑世界 XYZ、比例与角度，不从隐藏单位的粒子控制点获取模型。完成时显示最终建筑，白色外壳在 0.9 秒内平滑淡出；取消、死亡、重置清理外壳。创建失败时恢复真实模型，避免再次只剩血条。旧粒子仅为非参考模型的兼容路径。
+- 本轮已连上 Workshop 并运行 template_map。实际施工服务创建的主城白光可见、与建筑重合；淡出后正门朝南，前后实体角度均 `(0,0,0)`。实机采样 alpha 从 255 降至 246 / 106，1.1 秒时外壳数为 0。截图：`output/building_presentation/white_visible_final.png`、`south_visible_final.png`。早期后台截图停帧，未作为验收证据；前台的新截图已确认画面更新。实机验证范围为一级主城施工/显现，其余模型及升级后的模型匹配由资源审计和回归覆盖。
+- 24 个正常模型、24 个白光模型编译通过；24 份 FBX 回导、44 级映射、碰撞与贴图检查通过；13 项表现回归通过。新增白光资源审计验证实际编译材质、与正常模型相同的网格边界、无物理与选择盒。报告 `output/building_presentation/verification.json`、`white_shell_verification.json`、`runtime_verification.json`。
+- 重建顺序：`build_reference_buildings.py`（或对旧 FBX 使用幂等的 `bake_reference_building_facing.py`）→ `build_building_white_shells.py` → `install_unique_buildings.ps1 -ModelsOnly` → `sync_reference_building_config.py`。白光材质仍由 `build_building_warp_particles.py` / `install_building_presentation.ps1 -ParticlesOnly` 维护。
+
+## 上轮修正（2026-09-16）：白光不可见的材质修复
+
+- 用户反馈没有白光。直接解码上版运行时材质所引用的 VTex，测得像素为 RGBA `(0,1,0,255)`；上版 `TextureColor "[1 1 1 1]"` 没有生成预期的白色纹理。已确认资源本身有问题，不能归因于未重启 Workshop Tools。
+- 改为生成并显式引用 8×8 不透明纯白纹理 `build_white_glow_color.png`，材质使用浮点 `g_flOpacityScale=1.0` 和 `g_flOverbrightFactor=3.0`。安装脚本先同步颜色贴图，再编译白光材质及两个粒子；粒子初始化失败现在输出路径和错误，避免静默失败。
+- 新增 `tools/test_building_white_material.ps1`，检查编译后材质依赖并解码实际运行时纹理的每个像素。旧资源测试失败、新资源 RGBA 最小/最大值均为 `(255,255,255,255)`；已纳入 `tools/check_building_presentation.py`，与 12 项运行时回归一起通过。
+- 证据：`output/building_presentation/white_material_before_fix.json`、`white_material_verification.json`、`verification.json`。Dota/vconsole 进程存在，但 MCP 未连接，未进行实机验收。需完整退出当前测试局和 Workshop Tools 后重新打开，确保旧材质缓存被清掉。
+
+## 已完成修正（2026-09-16）：模型端放大两倍，白光褪去显现建筑
+
+- 用户反馈四格版本外观太小，要求模型端直接两倍。已将 24 款 ModelDoc 的网格导入比例从 0.01 改为 0.02、物理导入从 1 改为 2，并将 72 组点选盒边界乘二。编译后网格最大宽度约 236 码；实体比例仍 1.0、朝南、逻辑占地仍 2×2。主城模型 PHYS 半径 96，寻路阻挡保留四格版本的 48。
+- 用户要求替换闪烁的传送效果。当前为单个稳定白色建筑轮廓，完成后 0.9 秒平滑淡出，显露最终模型。新的全亮透明材质没有原传送材质的折射；停用循环光环、光柱、微粒和开始/结束爆闪。完成先应用模型，再绑定淡出效果，升级使用成功后的模型。
+- 已编译 24 模型、2 粒子与 1 白光材质。编译后资源检查及 12 项回归通过；包含单一白光层、最终模型绑定、重复完成防重放和失败/取消清理。本轮 Dota 未连接，未宣称实机消除闪烁；需要新开一局确认。
+- 仅调整模型端尺寸的重建入口为 `tools/reference_building_modeldoc.py` 和 `tools/install_unique_buildings.ps1 -ModelsOnly`；白光入口为 `tools/build_building_warp_particles.py` 和 `tools/install_building_presentation.ps1 -ParticlesOnly`。验证报告见 `output/unique_buildings/verification.json`、`output/building_presentation/verification.json`。
+
+## 已完成修正（2026-09-16）：参考图建筑缩小为 2×2、共四格
+
+- 用户反馈模型和占地过大，要求按四个格子安排。七类参考图建筑的 44 个等级统一从 5×5 改为 2×2（128 码），模型等比例从 2.5 改为 1.0，最大宽度由约 295 缩至 118 码；各轴为上一版的 40%。
+- 同步权威 CSV、生成 Lua、NPC 初始比例、预载目录、施工比例及模型清单。主城阻挡半径按模型配置比例计算，当前从 120 缩至 48；选择盒和模型凸碰撞体随实体比例匹配，朝南和分级外观保持。
+- 预览、提交、树木检测、相邻摆放、搬迁、恢复与释放均使用四格；传送光圈半径读取新占地，建筑虚影读取新比例。本轮无需重建网格、贴图或粒子资源。
+- 12 项回归及 24 模型/44 等级资源审计通过，新增四格相邻摆放和占地外树木不阻挡的回归检查。报告 `output/building_presentation/verification.json`、`output/unique_buildings/verification.json`。需要重新开局加载；尚未实机验收本次尺寸。
+
+## 已完成修正（2026-09-16）：按《福佑大乱斗》T 传送调整建筑表现
+
+- 用户明确参考游戏为《福佑大乱斗》，效果为 T 传送。已对照 Bilibili `BV13H9PBAEUd` 的 74–81 秒画面，改为蓝白交叠光环、地面旋纹、轻光柱与建筑透明虚影。属于按画面适配，未验证参考游戏的原始脚本调用。
+- 共 10 份自定义粒子，使用 Dota 原生纹理与传送虚影材质。虚影绑定建筑自身模型，并读取配置比例及朝南角度（度）；建造时显示虚影，完成显现，升级成功播放结束闪光。没有新增可选中或碰撞实体。
+- 10 份资源重新编译、12 项回归通过；新增初始化朝向和模型绑定失败清理验证，保留完成/取消/死亡/重置时的立即销毁逻辑。报告 `output/building_presentation/verification.json`；仅重建粒子可用 `tools/install_building_presentation.ps1 -ParticlesOnly`。尚未连接实机，需要重新开局查看画面。
+
+## 已完成修正（2026-09-16）：建筑朝南、5×5 占地与传送接入
+
+- 用户认可第四版外观。本轮将七类参考图建筑的 44 个等级及预览统一设为绝对 yaw=-90，正门朝世界 -Y；占地由 2×2 改为 5×5（320 码），匹配约 295 码模型。
+- 新增 `core/building_grid_geometry.lua` 处理奇数格半格居中；服务端建造、客户端预览、搬迁和恢复保持一致，全部 25 格检查地形、树木、占用。城墙和箭塔占地保持原值。
+- 接入建造和升级的开始、持续、完成阶段；法阵按占地缩放，取消/死亡/重置清理持续特效。最初的青金色版本已由上方记录的《福佑大乱斗》蓝白传送表现替换。
+- 12 项回归、客户端吸附、完整模块加载及 24 模型/44 等级资源审计通过；粒子与 Panorama 编译通过。报告 `output/building_presentation/verification.json`，重建入口 `tools/build_building_warp_particles.py`、`tools/install_building_presentation.ps1`。本轮尚未实机验收，需要新开一局查看效果。
+
+## 历史制作（2026-09-16）：参考图建筑第四版、分级主城与 2.5 倍缩放
+
+- 用户确认第三版能够点选。本次按提供图片制作主城五级、农场五级、金矿十种外观、炼金工坊、星象高塔、英雄祭坛、挑战建筑，合计 24 款、44 个玩法等级；金矿按用户确认每 3 个玩法等级更换一次外观。
+- 全部采用亮石、青瓦、暖窗、深木与铜饰，2K 独立图集与法线；等比例 2.5 倍，去展示底板。保留 root 与选择盒，新增 24 个闭合凸碰撞体；主城运行时阻挡半径调整为 120。
+- 农场与金矿的固定一级外观覆盖已改为逐等级解析。CSV、生成配置、NPC 初始外观与预载通过专用同步脚本维护。重建入口 `tools/build_reference_buildings.py`，资源验收入口 `tools/verify_reference_buildings.py`。
+- 最终资源与验证状态查看 `output/unique_buildings/verification.json`、`runtime_verification.json` 和 `fbx_verification.json`。预览 `output/unique_buildings/index.html`；完整说明见 [UNIQUE_BUILDING_MODELS.md](UNIQUE_BUILDING_MODELS.md)。本版尚未实机确认光照、相邻建筑间距与点选手感。
+
+## 历史制作（2026-09-16）：建筑第三版与鼠标点选修复
+
+- 第二版用户实测无法点选：修正为根骨骼蒙皮与 `select_low` / `select_high` 选择盒。已在 Source 2 编译产物中检查实际骨骼和 hitbox 集合。
+- 修正双 UV 导出风险，六款改为单一 BuildingAtlas 和独立 1024 像素烘焙贴图，核验编译材质确实启用并引用法线。去除展示底板，普通研究所改为炼金工坊，高级研究所改为三翼能量核心；保持玩法配置和占地兼容。
+- 资源编译、FBX 回导、六款/39 等级模型合同与建筑外观服务检查通过。最终游戏内点选与美术效果待完全重启 Tools 后复测；不将编译产物检查标为实机验收。详见 [UNIQUE_BUILDING_MODELS.md](UNIQUE_BUILDING_MODELS.md)。
+
+## 当前制作（2026-09-16）：建筑模型第二轮细化
+
+- 六款建筑增加独立铺石、砌块、叠瓦、窗棂、矿车铁件、吊链、祭坛羽翼和角斗场看台；配套原创 512 像素颜色/法线/反射率贴图及 UV，沿用已有模型路径、124 码占地和缩放。
+- 细化模块：`tools/unique_building_detail.py`；完整预览与源模型仍位于 `output/unique_buildings/`。本轮未改玩法配置；实机材质、选择和性能仍待 Workshop 验收。
+- 第二轮六款模型、16 个材质及 48 张贴图已编译成功；资源/UV/占地检查、39 个等级模型检查、建筑外观服务和 21 个防御塔阶段回归通过。
+
+## 当前制作（2026-09-15）：五类建筑独立模型
+
+- 已原创制作并编译研究所、高级研究所、金矿、人口农场、英雄祭坛、挑战角斗场六款静态模型；配套材质、Blender 源文件、FBX、VMDL 与渲染预览位于 `output/unique_buildings/`。
+- 已通过 CSV 权威源同步初始单位、施工缩放、39 个建筑等级与启动预载；经济与玩法字段检查不变。六款模型、39 个等级合同、现有建筑外观测试及 21 个防御塔阶段回归通过，Source 2 编译通过。
+- 待完全重开 Workshop 局确认光照、点选、贴地、移动和升级表现。资源映射及重建步骤见 [UNIQUE_BUILDING_MODELS.md](UNIQUE_BUILDING_MODELS.md)，预览页为 `output/unique_buildings/index.html`。
+
+## 当前修复（2026-09-09）：进入游戏出现原生选人界面
+
+- 实机反馈上次修复后仍进入原生选人。进一步用真实模块加载入口复现 `asset_catalog duplicate asset_id: monster_wave_humanoid_red_axe`：合并后的四份生成资源配置重复包含 39 个资产、174 个组件、47 个特效及 5 个动作修饰，导致 modifier 注册过程中断、引擎 Activate/Precache 回调未定义。已调用现有 CSV 生成器定向重建四份文件，仅移除 265 条重复记录。
+- 新增 `tools/check_addon_bootstrap.lua`，只模拟加载期间需要的引擎全局，真实 require 全部入口模块并验证启动参数及 Activate/Precache 回调。完整模块加载、39 个波次外观、25 个存档外观及 21 个塔阶段回归通过；仍待 Workshop Tools 完全停止后重新 Run 实机确认，不将离线加载测试视为进场验收。
+- Lua 5.1 编译复现 `addon_game_mode.lua` 的 `initialize_services` 超过 60 个 upvalue，入口整体无法加载，文件顶部跳过选人及强制初始英雄规则无法执行。按原顺序拆分核心/UI 与玩法初始化，消除编译阻断。
+- 移除建筑系统、建筑移动、三个建筑 modifier 和建筑闪烁技能共 6 个 Lua 文件的 UTF-8 BOM；不改变业务内容。
+- 730 个 Lua 文件语法检查、`ADDON_LAUNCH_BOOTSTRAP_PASS` 和差异检查通过。启动回归测试编译完整入口，并确认业务模块加载前已设置自动指定不朽尸王及跳过选人、策略、展示阶段。
+- 保留 CSV 的 60 秒联机准备等待；待完全停止并重新 Run 地图确认直接进场和建造者初始化。
+
 ## 当前实施（2026-09-06）：存档挑战 25 项英雄外观
 
 - 已按用户清单接入虚空之影、秘法牢笼、12 项神兽狩猎及三项社交挑战；补入军团“孽龙之怒＋战鬼双刃”。

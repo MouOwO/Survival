@@ -354,6 +354,7 @@ upgrade_mine = function(payload)
     local target_data = config.level_data(target_level)
     local pending = upgrade_process.begin(state.unit, {
         duration = 1.0,
+        definition = state.definition,
         particle = state.definition and state.definition.build_particle,
         target_level = target_level,
         target_model_asset_id = target_data and target_data.model_asset_id,

@@ -4,6 +4,7 @@ local TELEPORT = "particles/items2_fx/teleport_start.vpcf"
 local GENERIC = "particles/test/building_upgrade.vpcf"
 
 PATTACH_WORLDORIGIN = 7
+PATTACH_ABSORIGIN_FOLLOW = 1
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
 
 local tasks = {}
@@ -36,6 +37,9 @@ local destroyed = {}
 local released = {}
 local next_particle = 100
 local fail_control = false
+local fail_model_binding = false
+local model_bindings = {}
+local bound_models = {}
 ParticleManager = {
     CreateParticle = function(_, path, attach, owner)
         next_particle = next_particle + 1
@@ -54,6 +58,12 @@ ParticleManager = {
             cp = cp,
             value = value,
         }
+    end,
+    SetParticleControlEnt = function(_, particle, cp, owner, attach, _, origin)
+        if fail_model_binding then error("simulated model binding failure") end
+        assert(cp==3 and attach==PATTACH_ABSORIGIN_FOLLOW and origin==owner.origin)
+        model_bindings[particle]=owner
+        bound_models[particle]=owner.model_name
     end,
     DestroyParticle = function(_, particle, immediate)
         destroyed[#destroyed + 1] = {
@@ -132,9 +142,9 @@ completion.task.callback()
 assert(completed == 1 and not process.is_active(first),
     "scheduled upgrade did not complete exactly once")
 assert(#destroyed == 1 and destroyed[1].particle == created[1].id
-        and destroyed[1].immediate == false
+        and destroyed[1].immediate == true
         and released[1] == created[1].id,
-    "completed upgrade did not gracefully destroy and release its particle")
+    "completed upgrade did not immediately destroy and release its particle")
 assert(first.survival_upgrade_in_progress == nil
         and first.survival_upgrade_target_level == nil
         and first.survival_upgrade_target_model_asset_id == nil
@@ -198,4 +208,41 @@ assert(not process.is_active(reset_first) and not process.is_active(reset_second
 assert(#destroyed == 5 and #released == 5,
     "reset did not clean up all active upgrade particles")
 
-print("BUILDING_UPGRADE_PROCESS_PASS")
+local definition=require("config/buildings_config").main_city
+local third=unit(707,900)
+third.model_name="before_upgrade"
+local before=#created
+local finished=false
+assert(process.begin(third,{duration=2,particle=definition.build_particle,definition=definition,
+    on_complete=function() finished=true; third.model_name="after_upgrade" end}).ok)
+assert(#created-before==1 and controls[#controls-1].cp==1
+    and controls[#controls-1].value.x==64 and controls[#controls-1].value.z==2)
+assert(controls[#controls].cp==2 and controls[#controls].value.x==1
+    and controls[#controls].value.y==0)
+assert(model_bindings[created[#created].id]==third,"upgrade projection bound the wrong model")
+local task=only_task()
+task.task.callback()
+assert(finished and #created-before==2 and created[#created].path==definition.build_complete_particle)
+assert(bound_models[created[#created].id]=="after_upgrade","white fade bound the previous level's model")
+task.task.callback()
+assert(#created-before==2,"stale upgrade callback replayed its reveal")
+local fourth=unit(708,1000)
+before=#created
+assert(process.begin(fourth,{duration=2,particle=definition.build_particle,definition=definition}).ok)
+fourth.alive=false
+only_task().task.callback()
+assert(#created-before==1 and not process.is_active(fourth),"dead upgrade played a reveal")
+local fifth=unit(709,1100)
+before=#created
+local destroyed_before,released_before=#destroyed,#released
+fail_model_binding=true
+assert(process.begin(fifth,{duration=2,particle=definition.build_particle,definition=definition}).ok)
+fail_model_binding=false
+assert(#created-before==1 and #destroyed-destroyed_before==1
+    and #released-released_before==1,"late model binding failure leaked upgrade particles")
+assert(process.cancel_by_entindex(709,"test_cleanup") and #destroyed-destroyed_before==1,
+    "failed projection was destroyed twice during upgrade cancellation")
+local releases={}
+for _,id in ipairs(released) do releases[id]=(releases[id] or 0)+1 end
+for _,row in ipairs(created) do assert(releases[row.id]==1,"upgrade particle leaked/released twice") end
+print("BUILDING_UPGRADE_PROCESS_PASS warp complete death stale_callback cleanup")

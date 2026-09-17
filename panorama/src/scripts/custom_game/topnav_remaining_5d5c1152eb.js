@@ -250,7 +250,7 @@
         var w=(ctx.actuallayoutwidth||1672)/(ctx.actualuiscale_x||1),h=(ctx.actuallayoutheight||941)/(ctx.actualuiscale_y||1);
         var topScale=Math.min(w/1672,h/941);place(top,(w-1672*topScale)/2,0,1672,941);style(top,{transform:"scale3d("+topScale+","+topScale+",1)"});
         var backdropBleed=(w-1672*topScale)/(2*topScale)+24;
-        place(nodes.HandoffTopBackdrop,-backdropBleed,0,1672+backdropBleed,941);
+        place(nodes.HandoffTopBackdrop,-backdropBleed-4,0,1672+backdropBleed,941);
         var count=abilityCount(),g=cfg.HandoffGeometry(w,h,count);
         var signature=[w,h,count,selectedUnit(),currentEntries.map(function(e){return e.ability;}).join(",")].join(":");
         // Reapply when the engine rebuilds its native HUD, even without a selection event.

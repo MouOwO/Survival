@@ -1,4 +1,5 @@
 local scheduler = require("core/scheduler")
+local warp = require("systems/building_warp_effects")
 local asset_preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
 
@@ -44,6 +45,7 @@ local function destroy_particle(state)
     if state.particle_id == nil then return end
     local particle_id = state.particle_id
     state.particle_id = nil
+    if warp.is_shell(particle_id) then warp.destroy(particle_id); return end
     if not ParticleManager then return end
 
     local destroy_ok, destroy_error = pcall(function()
@@ -103,6 +105,8 @@ local function remove_state(state, cleanup_reason)
     if state.task_id then scheduler.cancel(state.task_id) end
     state.task_id = nil
     destroy_particle(state)
+    warp.destroy(state.start_particle)
+    state.start_particle = nil
     clear_unit_state(state)
 end
 
@@ -123,7 +127,12 @@ local function complete_state(state)
     end
     state.finished = true
     remove_state(state, "complete")
-    safe_callback(state.options.on_complete)
+    local completed = safe_callback(state.options.on_complete)
+    if completed and valid_entity(state.unit) and state.unit:IsAlive() then
+        local definition = state.options.definition or {}
+        warp.create(definition.build_complete_particle, state.unit,
+            definition, state.duration, true)
+    end
 end
 
 local function particle_origin(unit)
@@ -136,7 +145,14 @@ local function particle_origin(unit)
 end
 
 local function start_particle(state)
+    local definition = state.options.definition or {}
+    state.start_particle = warp.create(definition.build_start_particle,
+        state.unit, definition, state.duration)
     local path = state.options.particle
+    if warp.is_white(path) then
+        state.particle_id = warp.create(path,state.unit,definition,state.duration)
+        return
+    end
     if type(path) ~= "string" or path == "" or not ParticleManager then return end
     local origin = particle_origin(state.unit)
     if not origin then return end
@@ -152,7 +168,10 @@ local function start_particle(state)
             particle_id = nil
             error("particle_control_failed")
         end
-        if path == KEEN_TELEPORT_PARTICLE then
+        if warp.is_warp(path) then
+            -- The enclosing pcall retires the handle if any projection CP fails.
+            warp.configure(particle_id, state.unit, definition, state.duration)
+        elseif path == KEEN_TELEPORT_PARTICLE then
             if not set_particle_control(
                 state,
                 particle_id,
@@ -257,6 +276,7 @@ function M.reset()
         cancel_state(state, "reset")
     end
     active_by_entindex = {}
+    warp.reset_shells()
 end
 
 M._active_for_test = function(entindex)

@@ -2,15 +2,15 @@ package.path = "scripts/vscripts/?.lua;scripts/vscripts/?/init.lua;" .. package.
 
 local buildings = require("config/buildings_config")
 local farm = assert(buildings.building_farm)
-local expected_model = "models/props_structures/radiant_ancient001.vmdl"
-local expected_scale = 0.34
+-- Regression: the old fixed-visual override must not erase per-level models.
+local expected_scale = 1
 local expected_wood = { [1] = 100, [2] = 500, [3] = 2000, [4] = 10000, [5] = 50000 }
 local expected_gold = { [1] = 0, [2] = 0, [3] = 0, [4] = 1000, [5] = 5000 }
 
 for level = 1, 5 do
     local row = assert(farm.levels[level], "missing farm level " .. tostring(level))
-    assert(row.model_name == expected_model,
-        "farm level " .. tostring(level) .. " changed model")
+    assert(row.model_name == string.format("models/survival_buildings/population_farm_lv%02d.vmdl", level),
+        "farm level " .. tostring(level) .. " lost its own model")
     assert(row.model_scale == expected_scale,
         "farm level " .. tostring(level) .. " changed model scale")
     assert(row.model_yaw == 0,
@@ -21,4 +21,4 @@ for level = 1, 5 do
         "farm level " .. tostring(level) .. " lost gold cost")
 end
 
-print("FARM_FIXED_VISUAL_PASS")
+print("FARM_LEVEL_VISUAL_PASS levels=5 economy=unchanged")

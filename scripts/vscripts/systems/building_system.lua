@@ -1,4 +1,4 @@
-﻿local event_bus = require("core/event_bus")
+local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/buildings_config")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
@@ -11,7 +11,6 @@ local team_alignment = require("core/team_alignment")
 local tower_skills = require("systems/tower_skill_runtime")
 local scheduler = require("core/scheduler")
 local grid_config = require("config/grid_config")
-local grid_placement_config = require("config/grid_placement_config")
 local building_population = require("systems/building_population_service")
 local building_hull_scale = require("systems/building_hull_scale")
 local wall_collision_barrier_service = require("systems/wall_collision_barrier_service")
@@ -19,6 +18,7 @@ local war3_armor_target = require("systems/war3_armor_target")
 local blink_destination = require("systems/blink_destination")
 local building_visual = require("systems/building_visual_service")
 local building_sound = require("systems/building_sound_service")
+local wall_destruction = require("systems/wall_destruction_visual")
 local construction_visual = require(
     "systems/building_construction_visual_service"
 )
@@ -343,6 +343,14 @@ local function apply_initial_stats(unit, definition)
         unit:SetModel(data.model_name)
         unit:SetOriginalModel(data.model_name)
     end
+    -- Apply before construction/reveal; async appearance loading must not be
+    -- responsible for the building's initial orientation or size.
+    if data.model_scale and unit.SetModelScale then
+        unit:SetModelScale(data.model_scale)
+    end
+    if data.model_yaw ~= nil and unit.SetAngles then
+        unit:SetAngles(0, data.model_yaw, 0)
+    end
     if definition.id == "arrow_tower" then
         local combat = arrow_data(1) or {}
         unit:SetBaseDamageMin(combat.base_attack_damage or data.damage)
@@ -468,23 +476,7 @@ local function public_state(state)
 end
 
 local function grid_position(position, definition)
-    local minimum = grid_placement_config.minimum_footprint or { x = 2, y = 2 }
-    local subdivision = math.max(
-        1,
-        math.floor(tonumber(grid_placement_config.footprint_subdivision) or 1)
-    )
-    local footprint = definition.footprint or minimum
-    local footprint_x = math.floor(math.max(
-        tonumber(footprint.x) or tonumber(minimum.x) or 2,
-        tonumber(minimum.x) or 2
-    )) * subdivision
-    local footprint_y = math.floor(math.max(
-        tonumber(footprint.y) or tonumber(minimum.y) or 2,
-        tonumber(minimum.y) or 2
-    )) * subdivision
-    local cell_size = tonumber(grid_placement_config.cell_size) or 64
-    return math.floor(position.x / cell_size + 0.5) - math.floor(footprint_x / 2),
-        math.floor(position.y / cell_size + 0.5) - math.floor(footprint_y / 2)
+    return require("core/building_grid_geometry").origin(position, definition.footprint)
 end
 
 local function definition_for_unit(unit)
@@ -503,6 +495,9 @@ end
 
 local function recover_building(unit)
     if not valid_entity(unit) or unit.survival_is_building ~= true then return nil end
+    -- UI queries may still reference a corpse during its destruction effect.
+    -- Never restore its released footprint, count or collision barriers.
+    if unit.IsAlive and not unit:IsAlive() then return nil end
     local entindex = unit:entindex()
     if buildings[entindex] then return buildings[entindex] end
     local definition = definition_for_unit(unit)
@@ -510,7 +505,10 @@ local function recover_building(unit)
     local origin = unit:GetAbsOrigin()
     local grid_x = tonumber(unit.survival_grid_x)
     local grid_y = tonumber(unit.survival_grid_y)
-    if grid_x == nil or grid_y == nil then
+    local saved_footprint = unit.survival_grid_footprint or {}
+    if grid_x == nil or grid_y == nil
+        or saved_footprint.x ~= definition.footprint.x
+        or saved_footprint.y ~= definition.footprint.y then
         grid_x, grid_y = grid_position(origin, definition)
     end
     local state = {
@@ -538,6 +536,9 @@ local function recover_building(unit)
     unit.survival_player_id = state.player_id
     unit.survival_grid_x = grid_x
     unit.survival_grid_y = grid_y
+    unit.survival_grid_footprint = {
+        x = definition.footprint.x, y = definition.footprint.y,
+    }
     sync_display_name(state)
     unit.survival_route_level = route_row and route_row.level or state.level
     apply_hull_radius(unit, definition)
@@ -816,11 +817,6 @@ local function start_building(payload)
         unit:SetHealth(math.max(1, math.floor(maximum_health * progress)))
         if progress < 1 then return true end
 
-        construction_visual.complete(
-            construction_visual_state,
-            unit,
-            check.definition
-        )
         anchor_building(unit, check.grid.world_position)
         unit:RemoveModifierByName("modifier_building_under_construction")
         apply_hull_radius(unit, check.definition)
@@ -835,6 +831,12 @@ local function start_building(payload)
             state.level
         )
         building_visual.apply(unit, completed_level)
+        -- Bind the reveal to the final model/facing before fading its white coat.
+        construction_visual.complete(
+            construction_visual_state,
+            unit,
+            check.definition
+        )
         unit:SetHealth(maximum_health)
         unit:SetControllableByPlayer(check.player_id, true)
         state.constructing = false
@@ -1162,6 +1164,7 @@ local function on_entity_killed(payload)
     end
     if state.cleaned then return end
     state.cleaned = true
+    local destruction_effect = wall_destruction.play(state)
     if state.building_id == "wall" then
         wall_collision_barrier_service.clear(victim)
     end
@@ -1224,7 +1227,9 @@ local function on_entity_killed(payload)
         and building_defeat_rules.should_trigger(defeat_triggered, state) then
         defeat_triggered = true
         online_time_service.finish("wall_destroyed")
-        GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
+        wall_destruction.after_burst(destruction_effect,function()
+            GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
+        end)
     end
 end
 
@@ -1338,6 +1343,7 @@ end
 function M.init()
     modifier_registry.register()
     construction_visual.reset()
+    wall_destruction.reset()
     buildings = {}
     tower_limits:reset()
     wall_ever_built = {}

@@ -4,6 +4,7 @@ local buildings = require("config/buildings_config")
 local building_definitions = require("config/generated/building_definitions")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
 local grid_config = require("config/grid_placement_config")
+local grid_geometry = require("core/building_grid_geometry")
 
 local M = {}
 local profiles_by_ability = {}
@@ -19,6 +20,9 @@ end
 
 local function prepare_preview_unit(unit, profile)
     unit.survival_is_grid_preview = true
+    if unit.SetAngles and profile and profile.preview_model_yaw ~= nil then
+        unit:SetAngles(0, profile.preview_model_yaw, 0)
+    end
     if unit.SetHullRadius then unit:SetHullRadius(0) end
     if unit.SetModelScale and profile and profile.preview_model_scale then
         unit:SetModelScale(profile.preview_model_scale)
@@ -92,14 +96,17 @@ local function ensure_preview(player_id, caster, profile, position, valid)
         if not valid_entity(unit) then return end
         preview_units[player_id] = unit
         unit:SetOwner(caster)
+        unit:AddNewModifier(unit, nil, "modifier_grid_building_preview", {})
+        if unit.SetDayTimeVisionRange then unit:SetDayTimeVisionRange(0) end
+        if unit.SetNightTimeVisionRange then unit:SetNightTimeVisionRange(0) end
+    end
+    if unit.survival_preview_profile ~= profile.ability_name then
         if profile.preview_model_name and profile.preview_model_name ~= "" then
             unit:SetModel(profile.preview_model_name)
             unit:SetOriginalModel(profile.preview_model_name)
         end
         prepare_preview_unit(unit, profile)
-        unit:AddNewModifier(unit, nil, "modifier_grid_building_preview", {})
-        if unit.SetDayTimeVisionRange then unit:SetDayTimeVisionRange(0) end
-        if unit.SetNightTimeVisionRange then unit:SetNightTimeVisionRange(0) end
+        unit.survival_preview_profile = profile.ability_name
     end
     unit:SetAbsOrigin(position)
     if unit.SetRenderAlpha then
@@ -144,6 +151,7 @@ local function build_profiles()
                 preview_model_scale = definition.id == "arrow_tower"
                     and tonumber(((arrow_tower_base.rows or {})[1] or {}).model_scale)
                     or tonumber(((definition.levels or {})[1] or {}).model_scale),
+                preview_model_yaw = tonumber((((definition.levels or {})[1] or {}).model_yaw)),
                 footprint_x = math.max(
                     2,
                     tonumber((definition.footprint or {}).x) or 2
@@ -188,10 +196,11 @@ local function force_cells_invalid(cells, reason)
     return result
 end
 
-local function request_anchor(position)
-    local size = tonumber(grid_config.cell_size) or 64
-    return math.floor(position.x / size + 0.5),
-        math.floor(position.y / size + 0.5)
+local function request_anchor(position, profile)
+    profile = profile or {}
+    local x = grid_geometry.snap_axis(position.x, profile.grid_footprint_x or 2)
+    local y = grid_geometry.snap_axis(position.y, profile.grid_footprint_y or 2)
+    return x, y
 end
 
 local function entity_diagnostic(entity)
@@ -302,7 +311,7 @@ local function register_validation_request()
             local position = x and y and z and Vector(x, y, z) or nil
             local request_anchor_x, request_anchor_y = 0, 0
             if position then
-                request_anchor_x, request_anchor_y = request_anchor(position)
+                request_anchor_x, request_anchor_y = request_anchor(position, profile)
             end
             local requested_caster = tonumber(payload.entindex)
                 and EntIndexToHScript(tonumber(payload.entindex)) or nil

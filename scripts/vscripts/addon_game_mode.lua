@@ -555,6 +555,7 @@ function M.precache(context)
     tower_magic_supreme_system.precache(context)
     sound_service.precache(context)
     building_construction_visual.precache(context)
+    require("systems/wall_destruction_visual").precache(context)
     monster_visual_service.precache_range(context, 1, 1)
     local challenge_models = {}
     for _, challenge in ipairs(building_challenge_definitions.rows or {}) do
@@ -832,7 +833,9 @@ function M.precache(context)
     require("systems/archive_challenge_service").precache(context)
 end
 
-local function initialize_services()
+-- Keep each initialization phase below Lua 5.1's 60-upvalue limit: a
+-- compile failure here prevents even the early launch rules from running.
+local function initialize_core_services()
     local unit_health_bar_service = require("systems/unit_health_bar_service")
     hero_anchor_service.init()
     require("systems/forbidden_region_service").init()
@@ -861,7 +864,10 @@ local function initialize_services()
     hero_skill_ui_service.init()
     monster_encounter_ui_service.init()
     combat_stats_ui_service.init()
+end
 
+local function initialize_services()
+    initialize_core_services()
     grid_system.init()
     resource_system.init()
     player_entitlement_service.init()
@@ -1000,6 +1006,17 @@ end
 
 function Activate()
     M.activate()
+    if GetMapName() == "survival_world_v2" then
+        require("maps/survival_world_v2_preview")
+    elseif GetMapName() == "xianxia_kit_review" then
+        require("maps/xianxia_kit_review")
+    elseif GetMapName() == "survival_basin_natural" then
+        require("maps/survival_basin_natural")
+    elseif GetMapName() == "survival_basin_native" then
+        require("maps/survival_basin_native")
+    elseif GetMapName() == "survival_basin_review" or GetMapName() == "survival_basin_edit" then
+        require("maps/survival_basin_review")
+    end
 end
 
 return M
