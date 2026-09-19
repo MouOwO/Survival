@@ -1,0 +1,428 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-19",
+  "status": "PASS",
+  "scope": "Dota 2 Workshop Tools template_map: actual entity positions, floor height, GridNav and paths",
+  "map": "template_map",
+  "source_sha256": "4adaa5f6c817ab758b957b18438ba8c6ad53ff8586cda05d8fd14726039540cd",
+  "runtime_log": {
+    "path": "output/map_arena_integration_20260919/runtime_formal.log",
+    "sha256": "c7b2eaee0a5b4a5c6e33bcecedb9f7e4ca180edba1b8f4397d18cf621fafc3e4",
+    "bytes": 17351,
+    "mtime_utc": "2026-09-19T15:59:30.078Z"
+  },
+  "execution": {
+    "observed_command": "script_reload_code tests/manual_integrated_arenas_check",
+    "observed_entry": "formal server/Workshop/template_map guarded wrapper; fresh probe module reload",
+    "repeatable_command": "script_reload_code tests/manual_integrated_arenas_check",
+    "formal_wrapper_live_run_in_this_log": true,
+    "read_only_probe": true,
+    "formal_wrapper_offline_checks": {
+      "status": "PASS",
+      "checks": [
+        "server guard",
+        "Workshop guard",
+        "template_map guard",
+        "reloads probe module before invocation"
+      ]
+    },
+    "expected_output_received": true
+  },
+  "summary": {
+    "areas": 26,
+    "checks": 207,
+    "failed": 0,
+    "unique_markers": 126,
+    "ground_and_navigation_samples": 2436,
+    "bad_ground": 0,
+    "bad_navigation": 0,
+    "entry_paths": 256,
+    "blocked_entry_paths": 0,
+    "water_samples": 104,
+    "blocked_water_samples": 104,
+    "region_pairs": 325,
+    "linked_region_pairs": 0,
+    "source_bound_overlaps": 0,
+    "legacy_rank_ten_spawn_absent": true
+  },
+  "areas": [
+    {
+      "id": "training_01",
+      "ground_and_navigation_samples": 155,
+      "ground_range": [
+        127.25,
+        127.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 15,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "training_02",
+      "ground_and_navigation_samples": 155,
+      "ground_range": [
+        127.25,
+        127.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 15,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "training_03",
+      "ground_and_navigation_samples": 155,
+      "ground_range": [
+        127.25,
+        127.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 15,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "training_04",
+      "ground_and_navigation_samples": 155,
+      "ground_range": [
+        127.25,
+        127.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 15,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "training_07",
+      "ground_and_navigation_samples": 158,
+      "ground_range": [
+        127.25,
+        127.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 18,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "training_08",
+      "ground_and_navigation_samples": 158,
+      "ground_range": [
+        127.25,
+        127.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 18,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_01",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        29.25,
+        29.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_02",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        43.25,
+        43.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_03",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_04",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        71.25,
+        71.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_05",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        85.25,
+        85.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_06",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        99.25,
+        99.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_07",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        113.25,
+        113.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_08",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        127.25,
+        127.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_09",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        141.25,
+        141.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "rebirth_10",
+      "ground_and_navigation_samples": 82,
+      "ground_range": [
+        155.25,
+        155.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_01",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_02",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_03",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_04",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_05",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_06",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_07",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_08",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_09",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    },
+    {
+      "id": "ten_realm_10",
+      "ground_and_navigation_samples": 68,
+      "ground_range": [
+        57.25,
+        57.25
+      ],
+      "bad_ground": 0,
+      "bad_nav": 0,
+      "entry_paths": 8,
+      "blocked_entry_paths": 0,
+      "water_samples": 4,
+      "blocked_water_samples": 4
+    }
+  ],
+  "compiled_source_evidence": {
+    "vpk_sha256": "48c6aedd118013a55a65f35645c35d5d950f3d6e06183232c4bf69812b970482",
+    "crc_entries": 235,
+    "model_references": 168,
+    "input_crc32": 1262649909,
+    "expected_binary_crc32": 1262649909,
+    "current_integrated_source_matches": true,
+    "actual_compiled_markers_checked": 126
+  },
+  "limitations": [
+    "No complete challenge gameplay clear, reward settlement, multiplayer or load test.",
+    "No actual teleport ability invocation or moving-unit collision traversal; paths are live GridNav queries.",
+    "Region AABBs are independently verified source/model bounds, not live prop bounds queries."
+  ]
+}

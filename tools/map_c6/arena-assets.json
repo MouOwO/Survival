@@ -1,0 +1,3918 @@
+{
+  "schema_version": 1,
+  "revision": "main_arena_integration_20260919",
+  "description": "Versioned spatial contract of the installed approved models; source manifests are provenance only, not build inputs.",
+  "namespaces": {
+    "gold_training_room": {
+      "source_manifest": "output/gold_training_room/asset_manifest.json",
+      "source_manifest_sha256": "054ecc6eddb8433dd9a058918722352f1a201703a56ac0e1ff1cbdc0b2cdbdfe",
+      "assets": [
+        {
+          "name": "b01_floor_a",
+          "model": "models/gold_training_room/b01_floor_a.vmdl",
+          "label": "标准石板 A",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b01_floor_b",
+          "model": "models/gold_training_room/b01_floor_b.vmdl",
+          "label": "标准石板 B",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.10000610351562,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b02_floor_worn",
+          "model": "models/gold_training_room/b02_floor_worn.vmdl",
+          "label": "破损石板",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.10000610351562,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0.7000046372413635
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b01_niche_floor",
+          "model": "models/gold_training_room/b01_niche_floor.vmdl",
+          "label": "弧墙内侧半圆石板",
+          "category": "floor",
+          "bounds": [
+            [
+              -253.93446350097656,
+              0.9999697208404541,
+              -14
+            ],
+            [
+              253.93446350097656,
+              253.93446350097656,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b03_wall_256",
+          "model": "models/gold_training_room/b03_wall_256.vmdl",
+          "label": "直线墙段 256",
+          "category": "wall",
+          "bounds": [
+            [
+              -128,
+              -28.000015258789062,
+              -2.795560836791992
+            ],
+            [
+              128,
+              28.000015258789062,
+              176
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b03_wall_128",
+          "model": "models/gold_training_room/b03_wall_128.vmdl",
+          "label": "直线墙段 128",
+          "category": "wall",
+          "bounds": [
+            [
+              -64,
+              -28.0000057220459,
+              0
+            ],
+            [
+              64,
+              28.0000057220459,
+              176
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b04_pillar",
+          "model": "models/gold_training_room/b04_pillar.vmdl",
+          "label": "独立墙柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -42.000003814697266,
+              -42.000003814697266,
+              0
+            ],
+            [
+              42.000003814697266,
+              42.000003814697266,
+              228
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b04_pillar_coin",
+          "model": "models/gold_training_room/b04_pillar_coin.vmdl",
+          "label": "金币墙柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -42.000003814697266,
+              -48.95105743408203,
+              0
+            ],
+            [
+              42.000003814697266,
+              42.000003814697266,
+              228
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b05_corner",
+          "model": "models/gold_training_room/b05_corner.vmdl",
+          "label": "90 度转角墙",
+          "category": "wall",
+          "bounds": [
+            [
+              -28.000003814697266,
+              -28.000015258789062,
+              -1.834708333015442
+            ],
+            [
+              128,
+              128,
+              176
+            ]
+          ],
+          "collision_hulls": 2,
+          "meta": {}
+        },
+        {
+          "name": "b06_arc_60",
+          "model": "models/gold_training_room/b06_arc_60.vmdl",
+          "label": "60 度弧形墙段",
+          "category": "wall",
+          "bounds": [
+            [
+              -141.4845428466797,
+              197.69210815429688,
+              0
+            ],
+            [
+              141.48460388183594,
+              283.8338317871094,
+              173
+            ]
+          ],
+          "collision_hulls": 5,
+          "meta": {}
+        },
+        {
+          "name": "b07_teleport_base",
+          "model": "models/gold_training_room/b07_teleport_base.vmdl",
+          "label": "传送石台与金属嵌件（无光）",
+          "category": "feature",
+          "bounds": [
+            [
+              -184.99667358398438,
+              -184.99667358398438,
+              0
+            ],
+            [
+              184.99667358398438,
+              184.99667358398438,
+              19.250003814697266
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b08_spawn_inlay",
+          "model": "models/gold_training_room/b08_spawn_inlay.vmdl",
+          "label": "中央刷怪金属地纹（无光）",
+          "category": "feature",
+          "bounds": [
+            [
+              -312,
+              -312,
+              -3.5042262077331543
+            ],
+            [
+              312,
+              312,
+              4.550008773803711
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b09_coin_stele",
+          "model": "models/gold_training_room/b09_coin_stele.vmdl",
+          "label": "金币标识碑框",
+          "category": "feature",
+          "bounds": [
+            [
+              -79.5,
+              -39.0000114440918,
+              0
+            ],
+            [
+              79.5,
+              22.000009536743164,
+              194
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b09_coin_relief",
+          "model": "models/gold_training_room/b09_coin_relief.vmdl",
+          "label": "金币浮雕嵌件",
+          "category": "feature",
+          "bounds": [
+            [
+              -46.000003814697266,
+              -59,
+              41
+            ],
+            [
+              43.999996185302734,
+              -14.99999713897705,
+              99.95105743408203
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b10_brazier_plinth",
+          "model": "models/gold_training_room/b10_brazier_plinth.vmdl",
+          "label": "青铜灯具石基",
+          "category": "feature",
+          "bounds": [
+            [
+              -39.000003814697266,
+              -39.000003814697266,
+              0
+            ],
+            [
+              39.000003814697266,
+              39.000003814697266,
+              65.5
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b10_bronze_bowl",
+          "model": "models/gold_training_room/b10_bronze_bowl.vmdl",
+          "label": "青铜火盆（无火焰）",
+          "category": "feature",
+          "bounds": [
+            [
+              -49.20000076293945,
+              -49.20000076293945,
+              0
+            ],
+            [
+              49.20000076293945,
+              49.20000076293945,
+              46.092323303222656
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_1",
+          "model": "models/gold_training_room/b11_rock_1.vmdl",
+          "label": "大岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -121.24188995361328,
+              -102.2451400756836,
+              -13.370763778686523
+            ],
+            [
+              124.38970947265625,
+              99.64376068115234,
+              286.4582824707031
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_2",
+          "model": "models/gold_training_room/b11_rock_2.vmdl",
+          "label": "中岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -78.60833740234375,
+              -81.39114379882812,
+              -5.122804641723633
+            ],
+            [
+              76.88524627685547,
+              80.2214584350586,
+              159.92367553710938
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_3",
+          "model": "models/gold_training_room/b11_rock_3.vmdl",
+          "label": "小岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -40.95656204223633,
+              -38.0564079284668,
+              -2.210289478302002
+            ],
+            [
+              45.623329162597656,
+              39.40849685668945,
+              75.49916076660156
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b12_rubble",
+          "model": "models/gold_training_room/b12_rubble.vmdl",
+          "label": "碎石散落组",
+          "category": "nature",
+          "bounds": [
+            [
+              -85.43891906738281,
+              -63.828495025634766,
+              -3.3863351345062256
+            ],
+            [
+              87.39933776855469,
+              56.07160186767578,
+              14.907554626464844
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b12_ground_patch",
+          "model": "models/gold_training_room/b12_ground_patch.vmdl",
+          "label": "不规则泥土接地片",
+          "category": "nature",
+          "bounds": [
+            [
+              -89.93768310546875,
+              -69.56928253173828,
+              -0.30000001192092896
+            ],
+            [
+              82.5046615600586,
+              79.18510437011719,
+              0.20000000298023224
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_grass_small",
+          "model": "models/gold_training_room/b13_grass_small.vmdl",
+          "label": "小草丛",
+          "category": "nature",
+          "bounds": [
+            [
+              -18.28264617919922,
+              -23.964967727661133,
+              0
+            ],
+            [
+              24.883527755737305,
+              22.54344367980957,
+              37.694366455078125
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_grass_large",
+          "model": "models/gold_training_room/b13_grass_large.vmdl",
+          "label": "大草丛",
+          "category": "nature",
+          "bounds": [
+            [
+              -35.764041900634766,
+              -36.77307891845703,
+              0
+            ],
+            [
+              42.540191650390625,
+              38.30223846435547,
+              62.33230972290039
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_fern",
+          "model": "models/gold_training_room/b13_fern.vmdl",
+          "label": "蕨类",
+          "category": "nature",
+          "bounds": [
+            [
+              -57.66080093383789,
+              -60.03081512451172,
+              -0.30873966217041016
+            ],
+            [
+              50.78065490722656,
+              61.48004150390625,
+              49.16608810424805
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b14_shrub",
+          "model": "models/gold_training_room/b14_shrub.vmdl",
+          "label": "低灌木",
+          "category": "nature",
+          "bounds": [
+            [
+              -46.26931381225586,
+              -41.05851364135742,
+              -0.4613933563232422
+            ],
+            [
+              45.37628173828125,
+              36.502685546875,
+              65.06636047363281
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b14_shrub_flowers",
+          "model": "models/gold_training_room/b14_shrub_flowers.vmdl",
+          "label": "低灌木与小花",
+          "category": "nature",
+          "bounds": [
+            [
+              -45.00777816772461,
+              -51.77779006958008,
+              -0.5445718765258789
+            ],
+            [
+              34.43024826049805,
+              44.3364143371582,
+              64.05098724365234
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b16_banner",
+          "model": "models/gold_training_room/b16_banner.vmdl",
+          "label": "青铜支架与青绿挂旗",
+          "category": "feature",
+          "bounds": [
+            [
+              -39.5,
+              -10.000001907348633,
+              0
+            ],
+            [
+              39.5,
+              20.74649429321289,
+              158
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b16_moss_patch",
+          "model": "models/gold_training_room/b16_moss_patch.vmdl",
+          "label": "独立苔痕薄片",
+          "category": "nature",
+          "bounds": [
+            [
+              -70.9305419921875,
+              -62.381553649902344,
+              0
+            ],
+            [
+              63.74720001220703,
+              67.09764862060547,
+              0.25
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "room_earth_base",
+          "model": "models/gold_training_room/room_earth_base.vmdl",
+          "label": "房间外沿土层",
+          "category": "terrain",
+          "bounds": [
+            [
+              -1330.70849609375,
+              -1451.3663330078125,
+              -27
+            ],
+            [
+              1307.627197265625,
+              1574.2501220703125,
+              -14
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        }
+      ]
+    },
+    "wood_training_room": {
+      "source_manifest": "output/wood_training_room/asset_manifest.json",
+      "source_manifest_sha256": "40873262d6647acb68c82429adcdc14e1be34225f3a24fdee63905f684de77f4",
+      "assets": [
+        {
+          "name": "b01_floor_a",
+          "model": "models/wood_training_room/b01_floor_a.vmdl",
+          "label": "错缝木板 A",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.00001525878906,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b01_floor_b",
+          "model": "models/wood_training_room/b01_floor_b.vmdl",
+          "label": "错缝木板 B",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.00001525878906,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b02_floor_worn",
+          "model": "models/wood_training_room/b02_floor_worn.vmdl",
+          "label": "磨损开裂木板",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.00001525878906,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b01_niche_floor",
+          "model": "models/wood_training_room/b01_niche_floor.vmdl",
+          "label": "传送壁龛半圆木地板",
+          "category": "floor",
+          "bounds": [
+            [
+              -253.99929809570312,
+              0.599969744682312,
+              -14
+            ],
+            [
+              253.99929809570312,
+              254,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b03_wall_256",
+          "model": "models/wood_training_room/b03_wall_256.vmdl",
+          "label": "横梁斜撑木围墙 256",
+          "category": "wall",
+          "bounds": [
+            [
+              -128,
+              -28.05001449584961,
+              0
+            ],
+            [
+              128,
+              28.05001449584961,
+              176
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b03_wall_128",
+          "model": "models/wood_training_room/b03_wall_128.vmdl",
+          "label": "横梁斜撑木围墙 128",
+          "category": "wall",
+          "bounds": [
+            [
+              -64,
+              -28.050004959106445,
+              0
+            ],
+            [
+              64,
+              28.050004959106445,
+              176
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b04_pillar",
+          "model": "models/wood_training_room/b04_pillar.vmdl",
+          "label": "铁箍木柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -42.000003814697266,
+              -42.000003814697266,
+              0
+            ],
+            [
+              42.000003814697266,
+              42.000003814697266,
+              228
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b04_pillar_coin",
+          "model": "models/wood_training_room/b04_pillar_coin.vmdl",
+          "label": "木材徽记铁箍柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -42.000003814697266,
+              -47,
+              0
+            ],
+            [
+              42.000003814697266,
+              42.000003814697266,
+              228
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b05_corner",
+          "model": "models/wood_training_room/b05_corner.vmdl",
+          "label": "直角木围墙",
+          "category": "wall",
+          "bounds": [
+            [
+              -28.050003051757812,
+              -28.05001449584961,
+              0
+            ],
+            [
+              128,
+              128,
+              176
+            ]
+          ],
+          "collision_hulls": 2,
+          "meta": {}
+        },
+        {
+          "name": "b06_arc_60",
+          "model": "models/wood_training_room/b06_arc_60.vmdl",
+          "label": "60 度立板木弧墙",
+          "category": "wall",
+          "bounds": [
+            [
+              -141.99996948242188,
+              197.4537811279297,
+              0
+            ],
+            [
+              142.00003051757812,
+              284,
+              176
+            ]
+          ],
+          "collision_hulls": 5,
+          "meta": {}
+        },
+        {
+          "name": "b07_teleport_base",
+          "model": "models/wood_training_room/b07_teleport_base.vmdl",
+          "label": "木边传送底座与金属嵌件（无光）",
+          "category": "feature",
+          "bounds": [
+            [
+              -186.1999969482422,
+              -186.1999969482422,
+              0
+            ],
+            [
+              186.1999969482422,
+              186.1999969482422,
+              19.250003814697266
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b08_spawn_inlay",
+          "model": "models/wood_training_room/b08_spawn_inlay.vmdl",
+          "label": "中央交叉斧木材地纹（无光）",
+          "category": "feature",
+          "bounds": [
+            [
+              -253.1999969482422,
+              -253.1999969482422,
+              -2.7433807849884033
+            ],
+            [
+              253.1999969482422,
+              253.1999969482422,
+              3.3433806896209717
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b09_coin_stele",
+          "model": "models/wood_training_room/b09_coin_stele.vmdl",
+          "label": "木材标识木框",
+          "category": "feature",
+          "bounds": [
+            [
+              -82.5,
+              -27.000009536743164,
+              0
+            ],
+            [
+              82.5,
+              27.000009536743164,
+              193
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b09_coin_relief",
+          "model": "models/wood_training_room/b09_coin_relief.vmdl",
+          "label": "圆木堆与斧具标识",
+          "category": "feature",
+          "bounds": [
+            [
+              -46,
+              -49.76084899902344,
+              43
+            ],
+            [
+              46,
+              -21.9999942779541,
+              170.5
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b10_brazier_plinth",
+          "model": "models/wood_training_room/b10_brazier_plinth.vmdl",
+          "label": "铁箍木灯台",
+          "category": "feature",
+          "bounds": [
+            [
+              -37.000003814697266,
+              -37.000003814697266,
+              0
+            ],
+            [
+              37.000003814697266,
+              37.000003814697266,
+              66
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b10_bronze_bowl",
+          "model": "models/wood_training_room/b10_bronze_bowl.vmdl",
+          "label": "青铜火盆（无火焰）",
+          "category": "feature",
+          "bounds": [
+            [
+              -49.20000076293945,
+              -49.20000076293945,
+              0
+            ],
+            [
+              49.20000076293945,
+              49.20000076293945,
+              46.092323303222656
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_1",
+          "model": "models/wood_training_room/b11_rock_1.vmdl",
+          "label": "大岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -121.24188995361328,
+              -102.2451400756836,
+              -13.370763778686523
+            ],
+            [
+              124.38970947265625,
+              99.64376068115234,
+              286.4582824707031
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_2",
+          "model": "models/wood_training_room/b11_rock_2.vmdl",
+          "label": "中岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -78.60833740234375,
+              -81.39114379882812,
+              -5.122804641723633
+            ],
+            [
+              76.88524627685547,
+              80.2214584350586,
+              159.92367553710938
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_3",
+          "model": "models/wood_training_room/b11_rock_3.vmdl",
+          "label": "小岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -40.95656204223633,
+              -38.0564079284668,
+              -2.210289478302002
+            ],
+            [
+              45.623329162597656,
+              39.40849685668945,
+              75.49916076660156
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b12_rubble",
+          "model": "models/wood_training_room/b12_rubble.vmdl",
+          "label": "碎石散落组",
+          "category": "nature",
+          "bounds": [
+            [
+              -85.43891906738281,
+              -63.828495025634766,
+              -3.3863351345062256
+            ],
+            [
+              87.39933776855469,
+              56.07160186767578,
+              14.907554626464844
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b12_ground_patch",
+          "model": "models/wood_training_room/b12_ground_patch.vmdl",
+          "label": "不规则泥土接地片",
+          "category": "nature",
+          "bounds": [
+            [
+              -89.93768310546875,
+              -69.56928253173828,
+              -0.30000001192092896
+            ],
+            [
+              82.5046615600586,
+              79.18510437011719,
+              0.20000000298023224
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_grass_small",
+          "model": "models/wood_training_room/b13_grass_small.vmdl",
+          "label": "小草丛",
+          "category": "nature",
+          "bounds": [
+            [
+              -18.28264617919922,
+              -23.964967727661133,
+              0
+            ],
+            [
+              24.883527755737305,
+              22.54344367980957,
+              37.694366455078125
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_grass_large",
+          "model": "models/wood_training_room/b13_grass_large.vmdl",
+          "label": "大草丛",
+          "category": "nature",
+          "bounds": [
+            [
+              -35.764041900634766,
+              -36.77307891845703,
+              0
+            ],
+            [
+              42.540191650390625,
+              38.30223846435547,
+              62.33230972290039
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_fern",
+          "model": "models/wood_training_room/b13_fern.vmdl",
+          "label": "蕨类",
+          "category": "nature",
+          "bounds": [
+            [
+              -57.66080093383789,
+              -60.03081512451172,
+              -0.30873966217041016
+            ],
+            [
+              50.78065490722656,
+              61.48004150390625,
+              49.16608810424805
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b14_shrub",
+          "model": "models/wood_training_room/b14_shrub.vmdl",
+          "label": "低灌木",
+          "category": "nature",
+          "bounds": [
+            [
+              -46.26931381225586,
+              -41.05851364135742,
+              -0.4613933563232422
+            ],
+            [
+              45.37628173828125,
+              36.502685546875,
+              65.06636047363281
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b14_shrub_flowers",
+          "model": "models/wood_training_room/b14_shrub_flowers.vmdl",
+          "label": "低灌木与小花",
+          "category": "nature",
+          "bounds": [
+            [
+              -45.00777816772461,
+              -51.77779006958008,
+              -0.5445718765258789
+            ],
+            [
+              34.43024826049805,
+              44.3364143371582,
+              64.05098724365234
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b16_banner",
+          "model": "models/wood_training_room/b16_banner.vmdl",
+          "label": "木支架木材徽记挂旗",
+          "category": "feature",
+          "bounds": [
+            [
+              -37.999996185302734,
+              -13.000001907348633,
+              9
+            ],
+            [
+              37.999996185302734,
+              20.74649429321289,
+              155.90805053710938
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b16_moss_patch",
+          "model": "models/wood_training_room/b16_moss_patch.vmdl",
+          "label": "独立苔痕薄片",
+          "category": "nature",
+          "bounds": [
+            [
+              -70.9305419921875,
+              -62.381553649902344,
+              0
+            ],
+            [
+              63.74720001220703,
+              67.09764862060547,
+              0.25
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "room_earth_base",
+          "model": "models/wood_training_room/room_earth_base.vmdl",
+          "label": "房间外沿土层",
+          "category": "terrain",
+          "bounds": [
+            [
+              -1330.70849609375,
+              -1451.3663330078125,
+              -27
+            ],
+            [
+              1307.627197265625,
+              1574.2501220703125,
+              -14
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "w17_log_stack",
+          "model": "models/wood_training_room/w17_log_stack.vmdl",
+          "label": "外围捆扎原木垛",
+          "category": "nature",
+          "bounds": [
+            [
+              -107.99999237060547,
+              -66.50000762939453,
+              0
+            ],
+            [
+              110.65577697753906,
+              66.50000762939453,
+              115.29999542236328
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "w18_sawhorse",
+          "model": "models/wood_training_room/w18_sawhorse.vmdl",
+          "label": "外围锯木架与原木",
+          "category": "nature",
+          "bounds": [
+            [
+              -110.99998474121094,
+              -37.14825439453125,
+              -2.9327774047851562
+            ],
+            [
+              110.99998474121094,
+              37.148250579833984,
+              102.99998474121094
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        }
+      ]
+    },
+    "attribute_training_room": {
+      "source_manifest": "output/attribute_training_room/asset_manifest.json",
+      "source_manifest_sha256": "ccaee281ca7bedea1879d451ad43a08c785261b8e064c0ecefada4f9c8429848",
+      "assets": [
+        {
+          "name": "b01_floor_a",
+          "model": "models/attribute_training_room/b01_floor_a.vmdl",
+          "label": "标准石板 A",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b01_floor_b",
+          "model": "models/attribute_training_room/b01_floor_b.vmdl",
+          "label": "标准石板 B",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.10000610351562,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b02_floor_worn",
+          "model": "models/attribute_training_room/b02_floor_worn.vmdl",
+          "label": "破损石板",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.10000610351562,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0.7000046372413635
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b01_niche_floor",
+          "model": "models/attribute_training_room/b01_niche_floor.vmdl",
+          "label": "弧墙内侧半圆石板",
+          "category": "floor",
+          "bounds": [
+            [
+              -253.93446350097656,
+              0.9999697208404541,
+              -14
+            ],
+            [
+              253.93446350097656,
+              253.93446350097656,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b03_wall_256",
+          "model": "models/attribute_training_room/b03_wall_256.vmdl",
+          "label": "直线墙段 256",
+          "category": "wall",
+          "bounds": [
+            [
+              -128,
+              -28.000015258789062,
+              -2.795560836791992
+            ],
+            [
+              128,
+              28.000015258789062,
+              176
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b03_wall_128",
+          "model": "models/attribute_training_room/b03_wall_128.vmdl",
+          "label": "直线墙段 128",
+          "category": "wall",
+          "bounds": [
+            [
+              -64,
+              -28.0000057220459,
+              0
+            ],
+            [
+              64,
+              28.0000057220459,
+              176
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b04_pillar",
+          "model": "models/attribute_training_room/b04_pillar.vmdl",
+          "label": "独立墙柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -42.000003814697266,
+              -42.000003814697266,
+              0
+            ],
+            [
+              42.000003814697266,
+              42.000003814697266,
+              228
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b04_pillar_coin",
+          "model": "models/attribute_training_room/b04_pillar_coin.vmdl",
+          "label": "翠玉成长纹章墙柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -42.000003814697266,
+              -43.81599807739258,
+              0
+            ],
+            [
+              42.000003814697266,
+              42.000003814697266,
+              228
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b05_corner",
+          "model": "models/attribute_training_room/b05_corner.vmdl",
+          "label": "90 度转角墙",
+          "category": "wall",
+          "bounds": [
+            [
+              -28.000003814697266,
+              -28.000015258789062,
+              -1.834708333015442
+            ],
+            [
+              128,
+              128,
+              176
+            ]
+          ],
+          "collision_hulls": 2,
+          "meta": {}
+        },
+        {
+          "name": "b06_arc_60",
+          "model": "models/attribute_training_room/b06_arc_60.vmdl",
+          "label": "60 度弧形墙段",
+          "category": "wall",
+          "bounds": [
+            [
+              -141.4845428466797,
+              197.69210815429688,
+              0
+            ],
+            [
+              141.48460388183594,
+              283.8338317871094,
+              173
+            ]
+          ],
+          "collision_hulls": 5,
+          "meta": {}
+        },
+        {
+          "name": "b07_teleport_base",
+          "model": "models/attribute_training_room/b07_teleport_base.vmdl",
+          "label": "传送石台与金属嵌件（无光）",
+          "category": "feature",
+          "bounds": [
+            [
+              -184.99667358398438,
+              -184.99667358398438,
+              0
+            ],
+            [
+              184.99667358398438,
+              184.99667358398438,
+              19.250003814697266
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b08_spawn_inlay",
+          "model": "models/attribute_training_room/b08_spawn_inlay.vmdl",
+          "label": "翠玉成长中央嵌纹（无光）",
+          "category": "feature",
+          "bounds": [
+            [
+              -310.79998779296875,
+              -310.79998779296875,
+              -2.2129580974578857
+            ],
+            [
+              310.79998779296875,
+              310.79998779296875,
+              3.1129581928253174
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b09_coin_stele",
+          "model": "models/attribute_training_room/b09_coin_stele.vmdl",
+          "label": "翠玉成长标识碑框",
+          "category": "feature",
+          "bounds": [
+            [
+              -79.5,
+              -39.0000114440918,
+              0
+            ],
+            [
+              79.5,
+              22.000009536743164,
+              194
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b09_coin_relief",
+          "model": "models/attribute_training_room/b09_coin_relief.vmdl",
+          "label": "翠玉生长叶浮雕",
+          "category": "feature",
+          "bounds": [
+            [
+              -41.76504898071289,
+              -37.52000045776367,
+              44.64910888671875
+            ],
+            [
+              41.76504135131836,
+              -33.267494201660156,
+              155.28646850585938
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b10_brazier_plinth",
+          "model": "models/attribute_training_room/b10_brazier_plinth.vmdl",
+          "label": "青铜灯具石基",
+          "category": "feature",
+          "bounds": [
+            [
+              -39.000003814697266,
+              -39.000003814697266,
+              0
+            ],
+            [
+              39.000003814697266,
+              39.000003814697266,
+              65.5
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b10_bronze_bowl",
+          "model": "models/attribute_training_room/b10_bronze_bowl.vmdl",
+          "label": "青铜火盆（无火焰）",
+          "category": "feature",
+          "bounds": [
+            [
+              -49.20000076293945,
+              -49.20000076293945,
+              0
+            ],
+            [
+              49.20000076293945,
+              49.20000076293945,
+              46.092323303222656
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_1",
+          "model": "models/attribute_training_room/b11_rock_1.vmdl",
+          "label": "大岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -121.24188995361328,
+              -102.2451400756836,
+              -13.370763778686523
+            ],
+            [
+              124.38970947265625,
+              99.64376068115234,
+              286.4582824707031
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_2",
+          "model": "models/attribute_training_room/b11_rock_2.vmdl",
+          "label": "中岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -78.60833740234375,
+              -81.39114379882812,
+              -5.122804641723633
+            ],
+            [
+              76.88524627685547,
+              80.2214584350586,
+              159.92367553710938
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_3",
+          "model": "models/attribute_training_room/b11_rock_3.vmdl",
+          "label": "小岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -40.95656204223633,
+              -38.0564079284668,
+              -2.210289478302002
+            ],
+            [
+              45.623329162597656,
+              39.40849685668945,
+              75.49916076660156
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b12_rubble",
+          "model": "models/attribute_training_room/b12_rubble.vmdl",
+          "label": "碎石散落组",
+          "category": "nature",
+          "bounds": [
+            [
+              -85.43891906738281,
+              -63.828495025634766,
+              -3.3863351345062256
+            ],
+            [
+              87.39933776855469,
+              56.07160186767578,
+              14.907554626464844
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b12_ground_patch",
+          "model": "models/attribute_training_room/b12_ground_patch.vmdl",
+          "label": "不规则泥土接地片",
+          "category": "nature",
+          "bounds": [
+            [
+              -89.93768310546875,
+              -69.56928253173828,
+              -0.30000001192092896
+            ],
+            [
+              82.5046615600586,
+              79.18510437011719,
+              0.20000000298023224
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_grass_small",
+          "model": "models/attribute_training_room/b13_grass_small.vmdl",
+          "label": "小草丛",
+          "category": "nature",
+          "bounds": [
+            [
+              -18.28264617919922,
+              -23.964967727661133,
+              0
+            ],
+            [
+              24.883527755737305,
+              22.54344367980957,
+              37.694366455078125
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_grass_large",
+          "model": "models/attribute_training_room/b13_grass_large.vmdl",
+          "label": "大草丛",
+          "category": "nature",
+          "bounds": [
+            [
+              -35.764041900634766,
+              -36.77307891845703,
+              0
+            ],
+            [
+              42.540191650390625,
+              38.30223846435547,
+              62.33230972290039
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_fern",
+          "model": "models/attribute_training_room/b13_fern.vmdl",
+          "label": "蕨类",
+          "category": "nature",
+          "bounds": [
+            [
+              -57.66080093383789,
+              -60.03081512451172,
+              -0.30873966217041016
+            ],
+            [
+              50.78065490722656,
+              61.48004150390625,
+              49.16608810424805
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b14_shrub",
+          "model": "models/attribute_training_room/b14_shrub.vmdl",
+          "label": "低灌木",
+          "category": "nature",
+          "bounds": [
+            [
+              -46.26931381225586,
+              -41.05851364135742,
+              -0.4613933563232422
+            ],
+            [
+              45.37628173828125,
+              36.502685546875,
+              65.06636047363281
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b14_shrub_flowers",
+          "model": "models/attribute_training_room/b14_shrub_flowers.vmdl",
+          "label": "低灌木与小花",
+          "category": "nature",
+          "bounds": [
+            [
+              -45.00777816772461,
+              -51.77779006958008,
+              -0.5445718765258789
+            ],
+            [
+              34.43024826049805,
+              44.3364143371582,
+              64.05098724365234
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b16_banner",
+          "model": "models/attribute_training_room/b16_banner.vmdl",
+          "label": "翠玉成长纹章挂旗",
+          "category": "feature",
+          "bounds": [
+            [
+              -39.5,
+              -10.272000312805176,
+              9
+            ],
+            [
+              39.5,
+              20.74649429321289,
+              158
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b16_moss_patch",
+          "model": "models/attribute_training_room/b16_moss_patch.vmdl",
+          "label": "独立苔痕薄片",
+          "category": "nature",
+          "bounds": [
+            [
+              -70.9305419921875,
+              -62.381553649902344,
+              0
+            ],
+            [
+              63.74720001220703,
+              67.09764862060547,
+              0.25
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "room_earth_base",
+          "model": "models/attribute_training_room/room_earth_base.vmdl",
+          "label": "房间外沿土层",
+          "category": "terrain",
+          "bounds": [
+            [
+              -1330.70849609375,
+              -1451.3663330078125,
+              -27
+            ],
+            [
+              1307.627197265625,
+              1574.2501220703125,
+              -14
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "a17_mineral_cluster_large",
+          "model": "models/attribute_training_room/a17_mineral_cluster_large.vmdl",
+          "label": "翠玉矿簇·大",
+          "category": "nature",
+          "bounds": [
+            [
+              -86.69959259033203,
+              -58.939998626708984,
+              0
+            ],
+            [
+              86.90562438964844,
+              58.144474029541016,
+              147.34031677246094
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "a17_mineral_cluster_small",
+          "model": "models/attribute_training_room/a17_mineral_cluster_small.vmdl",
+          "label": "翠玉矿簇·小",
+          "category": "nature",
+          "bounds": [
+            [
+              -50.513427734375,
+              -34.18519973754883,
+              0
+            ],
+            [
+              50.445533752441406,
+              32.18484878540039,
+              94.80127716064453
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        }
+      ]
+    },
+    "greater_attribute_training_room": {
+      "source_manifest": "output/greater_attribute_training_room/asset_manifest.json",
+      "source_manifest_sha256": "30e70ed6e4b698aaf801982afa708c05c9c470c4ef552dca1da59de863d5e996",
+      "assets": [
+        {
+          "name": "b01_floor_a",
+          "model": "models/greater_attribute_training_room/b01_floor_a.vmdl",
+          "label": "标准石板 A",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b01_floor_b",
+          "model": "models/greater_attribute_training_room/b01_floor_b.vmdl",
+          "label": "标准石板 B",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.10000610351562,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b02_floor_worn",
+          "model": "models/greater_attribute_training_room/b02_floor_worn.vmdl",
+          "label": "破损石板",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.10000610351562,
+              -128.00001525878906,
+              -15
+            ],
+            [
+              128.10000610351562,
+              128.00001525878906,
+              0.7000046372413635
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b01_niche_floor",
+          "model": "models/greater_attribute_training_room/b01_niche_floor.vmdl",
+          "label": "弧墙内侧半圆石板",
+          "category": "floor",
+          "bounds": [
+            [
+              -253.93446350097656,
+              0.9999697208404541,
+              -14
+            ],
+            [
+              253.93446350097656,
+              253.93446350097656,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b03_wall_256",
+          "model": "models/greater_attribute_training_room/b03_wall_256.vmdl",
+          "label": "直线墙段 256",
+          "category": "wall",
+          "bounds": [
+            [
+              -128,
+              -28.000015258789062,
+              -2.795560836791992
+            ],
+            [
+              128,
+              28.000015258789062,
+              176
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b03_wall_128",
+          "model": "models/greater_attribute_training_room/b03_wall_128.vmdl",
+          "label": "直线墙段 128",
+          "category": "wall",
+          "bounds": [
+            [
+              -64,
+              -28.0000057220459,
+              0
+            ],
+            [
+              64,
+              28.0000057220459,
+              176
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b04_pillar",
+          "model": "models/greater_attribute_training_room/b04_pillar.vmdl",
+          "label": "独立墙柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -42.000003814697266,
+              -42.000003814697266,
+              0
+            ],
+            [
+              42.000003814697266,
+              42.000003814697266,
+              228
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b04_pillar_coin",
+          "model": "models/greater_attribute_training_room/b04_pillar_coin.vmdl",
+          "label": "高阶紫晶纹章墙柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -42.000003814697266,
+              -45.59210968017578,
+              0
+            ],
+            [
+              42.000003814697266,
+              42.000003814697266,
+              228
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b05_corner",
+          "model": "models/greater_attribute_training_room/b05_corner.vmdl",
+          "label": "90 度转角墙",
+          "category": "wall",
+          "bounds": [
+            [
+              -28.000003814697266,
+              -28.000015258789062,
+              -1.834708333015442
+            ],
+            [
+              128,
+              128,
+              176
+            ]
+          ],
+          "collision_hulls": 2,
+          "meta": {}
+        },
+        {
+          "name": "b06_arc_60",
+          "model": "models/greater_attribute_training_room/b06_arc_60.vmdl",
+          "label": "60 度弧形墙段",
+          "category": "wall",
+          "bounds": [
+            [
+              -141.4845428466797,
+              197.69210815429688,
+              0
+            ],
+            [
+              141.48460388183594,
+              283.8338317871094,
+              173
+            ]
+          ],
+          "collision_hulls": 5,
+          "meta": {}
+        },
+        {
+          "name": "b07_teleport_base",
+          "model": "models/greater_attribute_training_room/b07_teleport_base.vmdl",
+          "label": "传送石台与金属嵌件（无光）",
+          "category": "feature",
+          "bounds": [
+            [
+              -184.99667358398438,
+              -184.99667358398438,
+              0
+            ],
+            [
+              184.99667358398438,
+              184.99667358398438,
+              19.250003814697266
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b08_spawn_inlay",
+          "model": "models/greater_attribute_training_room/b08_spawn_inlay.vmdl",
+          "label": "高阶紫晶中央嵌纹（无光）",
+          "category": "feature",
+          "bounds": [
+            [
+              -310.79998779296875,
+              -310.79998779296875,
+              -2.2129580974578857
+            ],
+            [
+              310.79998779296875,
+              310.79998779296875,
+              3.563312530517578
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b09_coin_stele",
+          "model": "models/greater_attribute_training_room/b09_coin_stele.vmdl",
+          "label": "高阶紫晶标识碑框",
+          "category": "feature",
+          "bounds": [
+            [
+              -79.5,
+              -41.65000915527344,
+              0
+            ],
+            [
+              79.5,
+              22.000009536743164,
+              194
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "b09_coin_relief",
+          "model": "models/greater_attribute_training_room/b09_coin_relief.vmdl",
+          "label": "三晶冠浮雕",
+          "category": "feature",
+          "bounds": [
+            [
+              -53.947689056396484,
+              -43.005043029785156,
+              39.80855178833008
+            ],
+            [
+              53.94768142700195,
+              -33.424991607666016,
+              156.4403076171875
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b10_brazier_plinth",
+          "model": "models/greater_attribute_training_room/b10_brazier_plinth.vmdl",
+          "label": "青铜灯具石基",
+          "category": "feature",
+          "bounds": [
+            [
+              -39.000003814697266,
+              -39.000003814697266,
+              0
+            ],
+            [
+              39.000003814697266,
+              39.000003814697266,
+              65.5
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b10_bronze_bowl",
+          "model": "models/greater_attribute_training_room/b10_bronze_bowl.vmdl",
+          "label": "青铜火盆（无火焰）",
+          "category": "feature",
+          "bounds": [
+            [
+              -49.20000076293945,
+              -49.20000076293945,
+              0
+            ],
+            [
+              49.20000076293945,
+              49.20000076293945,
+              46.092323303222656
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_1",
+          "model": "models/greater_attribute_training_room/b11_rock_1.vmdl",
+          "label": "大岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -121.24188995361328,
+              -102.2451400756836,
+              -13.370763778686523
+            ],
+            [
+              124.38970947265625,
+              99.64376068115234,
+              286.4582824707031
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_2",
+          "model": "models/greater_attribute_training_room/b11_rock_2.vmdl",
+          "label": "中岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -78.60833740234375,
+              -81.39114379882812,
+              -5.122804641723633
+            ],
+            [
+              76.88524627685547,
+              80.2214584350586,
+              159.92367553710938
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b11_rock_3",
+          "model": "models/greater_attribute_training_room/b11_rock_3.vmdl",
+          "label": "小岩石",
+          "category": "nature",
+          "bounds": [
+            [
+              -40.95656204223633,
+              -38.0564079284668,
+              -2.210289478302002
+            ],
+            [
+              45.623329162597656,
+              39.40849685668945,
+              75.49916076660156
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b12_rubble",
+          "model": "models/greater_attribute_training_room/b12_rubble.vmdl",
+          "label": "碎石散落组",
+          "category": "nature",
+          "bounds": [
+            [
+              -85.43891906738281,
+              -63.828495025634766,
+              -3.3863351345062256
+            ],
+            [
+              87.39933776855469,
+              56.07160186767578,
+              14.907554626464844
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b12_ground_patch",
+          "model": "models/greater_attribute_training_room/b12_ground_patch.vmdl",
+          "label": "不规则泥土接地片",
+          "category": "nature",
+          "bounds": [
+            [
+              -89.93768310546875,
+              -69.56928253173828,
+              -0.30000001192092896
+            ],
+            [
+              82.5046615600586,
+              79.18510437011719,
+              0.20000000298023224
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_grass_small",
+          "model": "models/greater_attribute_training_room/b13_grass_small.vmdl",
+          "label": "小草丛",
+          "category": "nature",
+          "bounds": [
+            [
+              -18.28264617919922,
+              -23.964967727661133,
+              0
+            ],
+            [
+              24.883527755737305,
+              22.54344367980957,
+              37.694366455078125
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_grass_large",
+          "model": "models/greater_attribute_training_room/b13_grass_large.vmdl",
+          "label": "大草丛",
+          "category": "nature",
+          "bounds": [
+            [
+              -35.764041900634766,
+              -36.77307891845703,
+              0
+            ],
+            [
+              42.540191650390625,
+              38.30223846435547,
+              62.33230972290039
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b13_fern",
+          "model": "models/greater_attribute_training_room/b13_fern.vmdl",
+          "label": "蕨类",
+          "category": "nature",
+          "bounds": [
+            [
+              -57.66080093383789,
+              -60.03081512451172,
+              -0.30873966217041016
+            ],
+            [
+              50.78065490722656,
+              61.48004150390625,
+              49.16608810424805
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b14_shrub",
+          "model": "models/greater_attribute_training_room/b14_shrub.vmdl",
+          "label": "低灌木",
+          "category": "nature",
+          "bounds": [
+            [
+              -46.26931381225586,
+              -41.05851364135742,
+              -0.4613933563232422
+            ],
+            [
+              45.37628173828125,
+              36.502685546875,
+              65.06636047363281
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b14_shrub_flowers",
+          "model": "models/greater_attribute_training_room/b14_shrub_flowers.vmdl",
+          "label": "低灌木与小花",
+          "category": "nature",
+          "bounds": [
+            [
+              -45.00777816772461,
+              -51.77779006958008,
+              -0.5445718765258789
+            ],
+            [
+              34.43024826049805,
+              44.3364143371582,
+              64.05098724365234
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b16_banner",
+          "model": "models/greater_attribute_training_room/b16_banner.vmdl",
+          "label": "高阶紫晶纹章挂旗",
+          "category": "feature",
+          "bounds": [
+            [
+              -39.5,
+              -12.583211898803711,
+              9
+            ],
+            [
+              39.5,
+              20.74649429321289,
+              158
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "b16_moss_patch",
+          "model": "models/greater_attribute_training_room/b16_moss_patch.vmdl",
+          "label": "独立苔痕薄片",
+          "category": "nature",
+          "bounds": [
+            [
+              -70.9305419921875,
+              -62.381553649902344,
+              0
+            ],
+            [
+              63.74720001220703,
+              67.09764862060547,
+              0.25
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "room_earth_base",
+          "model": "models/greater_attribute_training_room/room_earth_base.vmdl",
+          "label": "房间外沿土层",
+          "category": "terrain",
+          "bounds": [
+            [
+              -1330.70849609375,
+              -1451.3663330078125,
+              -27
+            ],
+            [
+              1307.627197265625,
+              1574.2501220703125,
+              -14
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "a17_mineral_cluster_large",
+          "model": "models/greater_attribute_training_room/a17_mineral_cluster_large.vmdl",
+          "label": "紫晶冠矿簇·大",
+          "category": "nature",
+          "bounds": [
+            [
+              -86.69959259033203,
+              -57.79743957519531,
+              0
+            ],
+            [
+              86.90562438964844,
+              58.144474029541016,
+              207.34031677246094
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "a17_mineral_cluster_small",
+          "model": "models/greater_attribute_training_room/a17_mineral_cluster_small.vmdl",
+          "label": "紫晶冠矿簇·小",
+          "category": "nature",
+          "bounds": [
+            [
+              -50.513427734375,
+              -33.44817352294922,
+              0
+            ],
+            [
+              50.445533752441406,
+              32.18484878540039,
+              129.6012725830078
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        }
+      ]
+    },
+    "molten_core_room": {
+      "source_manifest": "output/molten_core_room/asset_manifest.json",
+      "source_manifest_sha256": "9f4cfbb2d3cfda9714d2192dc57651b348be17efe6a427fa141cd75c2a090d86",
+      "assets": [
+        {
+          "name": "f01_floor_a",
+          "model": "models/molten_core_room/f01_floor_a.vmdl",
+          "label": "F01 标准玄武岩石板 A",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -17
+            ],
+            [
+              128.00001525878906,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f01_floor_b",
+          "model": "models/molten_core_room/f01_floor_b.vmdl",
+          "label": "F01 标准玄武岩石板 B",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -17
+            ],
+            [
+              128.00001525878906,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f02_floor_scorched",
+          "model": "models/molten_core_room/f02_floor_scorched.vmdl",
+          "label": "F02 焦痕石板",
+          "category": "floor",
+          "bounds": [
+            [
+              -128.00001525878906,
+              -128.00001525878906,
+              -17
+            ],
+            [
+              128.00001525878906,
+              128.00001525878906,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f01_niche_floor",
+          "model": "models/molten_core_room/f01_niche_floor.vmdl",
+          "label": "F01 传送龛半圆铺地",
+          "category": "floor",
+          "bounds": [
+            [
+              -253.93446350097656,
+              0.9999697208404541,
+              -14
+            ],
+            [
+              253.93446350097656,
+              253.93446350097656,
+              0
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f03_wall_256",
+          "model": "models/molten_core_room/f03_wall_256.vmdl",
+          "label": "F03 直线墙段 256",
+          "category": "wall",
+          "bounds": [
+            [
+              -128,
+              -40.0000114440918,
+              0
+            ],
+            [
+              128,
+              40.0000114440918,
+              186
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "f03_wall_128",
+          "model": "models/molten_core_room/f03_wall_128.vmdl",
+          "label": "F03 直线墙段 128",
+          "category": "wall",
+          "bounds": [
+            [
+              -64,
+              -40.00000762939453,
+              0
+            ],
+            [
+              64,
+              40.00000762939453,
+              186
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "f04_pillar_body",
+          "model": "models/molten_core_room/f04_pillar_body.vmdl",
+          "label": "F04 包铜墙柱",
+          "category": "wall",
+          "bounds": [
+            [
+              -50.25,
+              -50.250003814697266,
+              0
+            ],
+            [
+              50.25000762939453,
+              50.25000762939453,
+              214
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "f04_pillar_cap",
+          "model": "models/molten_core_room/f04_pillar_cap.vmdl",
+          "label": "F04 可拆柱顶",
+          "category": "wall",
+          "bounds": [
+            [
+              -36.500003814697266,
+              -36.500003814697266,
+              -1
+            ],
+            [
+              36.500003814697266,
+              36.500003814697266,
+              36.5
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f05_corner",
+          "model": "models/molten_core_room/f05_corner.vmdl",
+          "label": "F05 直角墙段",
+          "category": "wall",
+          "bounds": [
+            [
+              -40.000003814697266,
+              -40.0000114440918,
+              0
+            ],
+            [
+              128,
+              128,
+              186
+            ]
+          ],
+          "collision_hulls": 2,
+          "meta": {}
+        },
+        {
+          "name": "f06_arc_60",
+          "model": "models/molten_core_room/f06_arc_60.vmdl",
+          "label": "F06 弧形背墙 · 60 度",
+          "category": "wall",
+          "bounds": [
+            [
+              -147.55233764648438,
+              192.45106506347656,
+              0
+            ],
+            [
+              147.55239868164062,
+              295.8256530761719,
+              186
+            ]
+          ],
+          "collision_hulls": 5,
+          "meta": {}
+        },
+        {
+          "name": "f07_portal_ring",
+          "model": "models/molten_core_room/f07_portal_ring.vmdl",
+          "label": "F07 传送底座石环",
+          "category": "feature",
+          "bounds": [
+            [
+              -191,
+              -191,
+              0
+            ],
+            [
+              191,
+              191,
+              24
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f07_portal_inlay",
+          "model": "models/molten_core_room/f07_portal_inlay.vmdl",
+          "label": "F07 铜质青色嵌片 · 无光",
+          "category": "feature",
+          "bounds": [
+            [
+              -145,
+              -145,
+              0
+            ],
+            [
+              145,
+              145,
+              9.149999618530273
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f08_spawn_inlay",
+          "model": "models/molten_core_room/f08_spawn_inlay.vmdl",
+          "label": "F08 中央平铺铜纹 · 无光",
+          "category": "feature",
+          "bounds": [
+            [
+              -322.5,
+              -322.5,
+              0.30000001192092896
+            ],
+            [
+              322.5,
+              322.5,
+              0.550000011920929
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f09_trough_straight",
+          "model": "models/molten_core_room/f09_trough_straight.vmdl",
+          "label": "F09 熔岩槽直线外壳",
+          "category": "exterior",
+          "bounds": [
+            [
+              -128,
+              -50.50001525878906,
+              -14
+            ],
+            [
+              128,
+              50.50001525878906,
+              18
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f09_trough_end",
+          "model": "models/molten_core_room/f09_trough_end.vmdl",
+          "label": "F09 熔岩槽封闭端头",
+          "category": "exterior",
+          "bounds": [
+            [
+              -128,
+              -50.50001525878906,
+              -14
+            ],
+            [
+              128,
+              50.50001525878906,
+              18
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f09_trough_corner",
+          "model": "models/molten_core_room/f09_trough_corner.vmdl",
+          "label": "F09 熔岩槽直角外壳",
+          "category": "exterior",
+          "bounds": [
+            [
+              -80,
+              -49.00000762939453,
+              -14
+            ],
+            [
+              49.0000114440918,
+              80,
+              18
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f09_lava_straight",
+          "model": "models/molten_core_room/f09_lava_straight.vmdl",
+          "label": "F09 独立熔岩表面 · 无光",
+          "category": "exterior",
+          "bounds": [
+            [
+              -126,
+              -30.000015258789062,
+              -2
+            ],
+            [
+              126,
+              30.000015258789062,
+              -1.5
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f09_lava_corner",
+          "model": "models/molten_core_room/f09_lava_corner.vmdl",
+          "label": "F09 独立熔岩表面 · 无光转角",
+          "category": "exterior",
+          "bounds": [
+            [
+              -80,
+              -29.000003814697266,
+              -2
+            ],
+            [
+              29.000009536743164,
+              80,
+              -1.5
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f10_brazier_bracket",
+          "model": "models/molten_core_room/f10_brazier_bracket.vmdl",
+          "label": "F10 炉火灯具支架",
+          "category": "feature",
+          "bounds": [
+            [
+              -46.500003814697266,
+              -64.25,
+              -51
+            ],
+            [
+              46.500003814697266,
+              45.000003814697266,
+              38
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f10_brazier_bowl",
+          "model": "models/molten_core_room/f10_brazier_bowl.vmdl",
+          "label": "F10 暗铁铜边火盆 · 无火焰",
+          "category": "feature",
+          "bounds": [
+            [
+              -61.20000076293945,
+              -61.20000076293945,
+              0
+            ],
+            [
+              61.20000076293945,
+              61.20000076293945,
+              57.092323303222656
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f11_fire_stele",
+          "model": "models/molten_core_room/f11_fire_stele.vmdl",
+          "label": "F11 火焰标识碑主体",
+          "category": "feature",
+          "bounds": [
+            [
+              -79,
+              -43.25000762939453,
+              0
+            ],
+            [
+              79,
+              23.000009536743164,
+              194
+            ]
+          ],
+          "collision_hulls": 1,
+          "meta": {}
+        },
+        {
+          "name": "f11_flame_emblem",
+          "model": "models/molten_core_room/f11_flame_emblem.vmdl",
+          "label": "F11 独立铜质火焰徽记",
+          "category": "feature",
+          "bounds": [
+            [
+              -44.000003814697266,
+              -35.750003814697266,
+              32
+            ],
+            [
+              41.999996185302734,
+              -32.99999237060547,
+              172
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f12_rock_1",
+          "model": "models/molten_core_room/f12_rock_1.vmdl",
+          "label": "F12 大火山岩",
+          "category": "exterior",
+          "bounds": [
+            [
+              -120.17705535888672,
+              -98.91925048828125,
+              -11.474000930786133
+            ],
+            [
+              126.80343627929688,
+              107.20628356933594,
+              325.9994201660156
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f12_rock_2",
+          "model": "models/molten_core_room/f12_rock_2.vmdl",
+          "label": "F12 中火山岩",
+          "category": "exterior",
+          "bounds": [
+            [
+              -79.3661880493164,
+              -68.54145050048828,
+              -3.331721782684326
+            ],
+            [
+              78.17034912109375,
+              80.04853057861328,
+              188.78025817871094
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f12_rock_3",
+          "model": "models/molten_core_room/f12_rock_3.vmdl",
+          "label": "F12 小火山岩",
+          "category": "exterior",
+          "bounds": [
+            [
+              -38.2362174987793,
+              -44.65084457397461,
+              -1.9499297142028809
+            ],
+            [
+              48.775203704833984,
+              37.54997634887695,
+              98.21074676513672
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f12_rock_4",
+          "model": "models/molten_core_room/f12_rock_4.vmdl",
+          "label": "F12 扁平火山岩",
+          "category": "exterior",
+          "bounds": [
+            [
+              -92.29975128173828,
+              -82.56580352783203,
+              -3.631049394607544
+            ],
+            [
+              109.08892059326172,
+              94.2221908569336,
+              76.77616882324219
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f14_rubble",
+          "model": "models/molten_core_room/f14_rubble.vmdl",
+          "label": "F14 火山碎石组",
+          "category": "exterior",
+          "bounds": [
+            [
+              -93.05475616455078,
+              -47.1934700012207,
+              -2.4666261672973633
+            ],
+            [
+              93.80457305908203,
+              50.45146942138672,
+              15.681307792663574
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f14_ash_patch",
+          "model": "models/molten_core_room/f14_ash_patch.vmdl",
+          "label": "F14 不规则焦灰接地片",
+          "category": "exterior",
+          "bounds": [
+            [
+              -83.56388854980469,
+              -37.22498321533203,
+              -0.5
+            ],
+            [
+              94.25242614746094,
+              50.52426528930664,
+              -0.020051155239343643
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "f16_banner",
+          "model": "models/molten_core_room/f16_banner.vmdl",
+          "label": "F16 入口青铜挂旗",
+          "category": "feature",
+          "bounds": [
+            [
+              -30.999996185302734,
+              -6.850000858306885,
+              30
+            ],
+            [
+              30.999996185302734,
+              3.0000033378601074,
+              171
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        },
+        {
+          "name": "room_ash_base",
+          "model": "models/molten_core_room/room_ash_base.vmdl",
+          "label": "房间外围焦灰基底",
+          "category": "terrain",
+          "bounds": [
+            [
+              -1351.223388671875,
+              -1444.35791015625,
+              -27
+            ],
+            [
+              1308.2481689453125,
+              1558.94287109375,
+              -15
+            ]
+          ],
+          "collision_hulls": 0,
+          "meta": {}
+        }
+      ]
+    },
+    "ascension_arenas": {
+      "source_manifest": "output/ascension_arenas/asset_manifest.json",
+      "source_manifest_sha256": "4079842fff77c669fd9d0c1c2347fdfef1c0033d9a1a434a8ae2d6ca24965959",
+      "assets": [
+        {
+          "name": "arena_01",
+          "model": "models/ascension_arenas/arena_01.vmdl",
+          "label": "夯土试武台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -500.0000305175781,
+              -275.00006103515625,
+              0
+            ],
+            [
+              500.0000305175781,
+              275.00006103515625,
+              34
+            ]
+          ],
+          "collision_hulls": 1,
+          "collision_count": 1,
+          "meta": {
+            "rank": 1,
+            "layers": 1,
+            "deck_z": 14,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              1000,
+              550
+            ],
+            "clear_combat_size": [
+              936,
+              486
+            ]
+          }
+        },
+        {
+          "name": "arena_02",
+          "model": "models/ascension_arenas/arena_02.vmdl",
+          "label": "木垒练武台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -500.0000305175781,
+              -275.00006103515625,
+              0
+            ],
+            [
+              500.0000305175781,
+              275.00006103515625,
+              48
+            ]
+          ],
+          "collision_hulls": 2,
+          "collision_count": 2,
+          "meta": {
+            "rank": 2,
+            "layers": 2,
+            "deck_z": 28,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              997,
+              547
+            ],
+            "clear_combat_size": [
+              933,
+              483
+            ]
+          }
+        },
+        {
+          "name": "arena_03",
+          "model": "models/ascension_arenas/arena_03.vmdl",
+          "label": "青石比武台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -500.0000305175781,
+              -275.00006103515625,
+              0
+            ],
+            [
+              500.0000305175781,
+              275.00006103515625,
+              62
+            ]
+          ],
+          "collision_hulls": 3,
+          "collision_count": 3,
+          "meta": {
+            "rank": 3,
+            "layers": 3,
+            "deck_z": 42,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              994,
+              544
+            ],
+            "clear_combat_size": [
+              930,
+              480
+            ]
+          }
+        },
+        {
+          "name": "arena_04",
+          "model": "models/ascension_arenas/arena_04.vmdl",
+          "label": "砌石演武台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -500.0000305175781,
+              -275.00006103515625,
+              0
+            ],
+            [
+              500.0000305175781,
+              275.00006103515625,
+              74.5
+            ]
+          ],
+          "collision_hulls": 4,
+          "collision_count": 4,
+          "meta": {
+            "rank": 4,
+            "layers": 4,
+            "deck_z": 56,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              991,
+              541
+            ],
+            "clear_combat_size": [
+              927,
+              477
+            ]
+          }
+        },
+        {
+          "name": "arena_05",
+          "model": "models/ascension_arenas/arena_05.vmdl",
+          "label": "白石晋阶台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -500.0000305175781,
+              -275.00006103515625,
+              0
+            ],
+            [
+              500.0000305175781,
+              275.00006103515625,
+              88.5
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 5,
+            "layers": 5,
+            "deck_z": 70,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              988,
+              538
+            ],
+            "clear_combat_size": [
+              924,
+              474
+            ]
+          }
+        },
+        {
+          "name": "arena_06",
+          "model": "models/ascension_arenas/arena_06.vmdl",
+          "label": "青玉试炼台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -500.0000305175781,
+              -275.00006103515625,
+              0
+            ],
+            [
+              500.0000305175781,
+              275.00006103515625,
+              102.5
+            ]
+          ],
+          "collision_hulls": 6,
+          "collision_count": 6,
+          "meta": {
+            "rank": 6,
+            "layers": 6,
+            "deck_z": 84,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              985,
+              535
+            ],
+            "clear_combat_size": [
+              921,
+              471
+            ]
+          }
+        },
+        {
+          "name": "arena_07",
+          "model": "models/ascension_arenas/arena_07.vmdl",
+          "label": "玄晶登阶台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -500.0000305175781,
+              -275.00006103515625,
+              0
+            ],
+            [
+              500.0000305175781,
+              275.00006103515625,
+              129
+            ]
+          ],
+          "collision_hulls": 7,
+          "collision_count": 7,
+          "meta": {
+            "rank": 7,
+            "layers": 7,
+            "deck_z": 98,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              982,
+              532
+            ],
+            "clear_combat_size": [
+              918,
+              468
+            ]
+          }
+        },
+        {
+          "name": "arena_08",
+          "model": "models/ascension_arenas/arena_08.vmdl",
+          "label": "天玉凌空台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -499.1278076171875,
+              -274.13177490234375,
+              0
+            ],
+            [
+              498.9993896484375,
+              274.05096435546875,
+              124.5
+            ]
+          ],
+          "collision_hulls": 8,
+          "collision_count": 8,
+          "meta": {
+            "rank": 8,
+            "layers": 8,
+            "deck_z": 112,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              979,
+              529
+            ],
+            "clear_combat_size": [
+              915,
+              465
+            ]
+          }
+        },
+        {
+          "name": "arena_09",
+          "model": "models/ascension_arenas/arena_09.vmdl",
+          "label": "流云登仙台",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -499.1278076171875,
+              -274.13177490234375,
+              0
+            ],
+            [
+              498.9993896484375,
+              274.05096435546875,
+              144
+            ]
+          ],
+          "collision_hulls": 9,
+          "collision_count": 9,
+          "meta": {
+            "rank": 9,
+            "layers": 9,
+            "deck_z": 126,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              976,
+              526
+            ],
+            "clear_combat_size": [
+              912,
+              462
+            ]
+          }
+        },
+        {
+          "name": "arena_10",
+          "model": "models/ascension_arenas/arena_10.vmdl",
+          "label": "太虚云擂",
+          "category": "ascension_arena",
+          "bounds": [
+            [
+              -499.1278076171875,
+              -274.13177490234375,
+              0
+            ],
+            [
+              498.9993896484375,
+              274.05096435546875,
+              158
+            ]
+          ],
+          "collision_hulls": 10,
+          "collision_count": 10,
+          "meta": {
+            "rank": 10,
+            "layers": 10,
+            "deck_z": 140,
+            "footprint": [
+              1000,
+              550
+            ],
+            "deck_size": [
+              973,
+              523
+            ],
+            "clear_combat_size": [
+              909,
+              459
+            ]
+          }
+        }
+      ]
+    },
+    "ten_realm_arenas": {
+      "source_manifest": "output/ten_realm_arenas/asset_manifest.json",
+      "source_manifest_sha256": "fe54885cef7f21b0ee85283edd01a94fbcf0ad18e93e9aa21dc721595ce53d7b",
+      "assets": [
+        {
+          "name": "realm_01",
+          "model": "models/ten_realm_arenas/realm_01.vmdl",
+          "label": "黄沙古垒",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -562.0172132320538,
+              -562.2416714475049,
+              -124.34766578447285
+            ],
+            [
+              566.5626544298287,
+              565.3308007184067,
+              242
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 1,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 74,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_02",
+          "model": "models/ten_realm_arenas/realm_02.vmdl",
+          "label": "林间古环",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -565.780146783159,
+              -563.4466920528633,
+              -124.31077566426055
+            ],
+            [
+              563.7136226033193,
+              559.412138286553,
+              251.99999999999997
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 2,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 68,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_03",
+          "model": "models/ten_realm_arenas/realm_03.vmdl",
+          "label": "沼泽沉垣",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -563.1427098158907,
+              -559.7952804623468,
+              -124.44822571483478
+            ],
+            [
+              564.4618686660735,
+              564.427038851985,
+              246
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 3,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 64,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_04",
+          "model": "models/ten_realm_arenas/realm_04.vmdl",
+          "label": "赤岩断谷",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -563.1405382316517,
+              -564.6911085356184,
+              -124.49850761064526
+            ],
+            [
+              566.5657159025873,
+              562.5746768097598,
+              176.00506591796875
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 4,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 72,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_05",
+          "model": "models/ten_realm_arenas/realm_05.vmdl",
+          "label": "霜雪寒垒",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -565.464525050055,
+              -562.5152067039324,
+              -124.4601044644999
+            ],
+            [
+              561.2120045825116,
+              566.4882421843214,
+              255.99999999999997
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 5,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 72,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_06",
+          "model": "models/ten_realm_arenas/realm_06.vmdl",
+          "label": "潮礁碧湾",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -560.4148474630987,
+              -563.4586294375323,
+              -124.33449300931585
+            ],
+            [
+              564.1429867770121,
+              564.4987764361299,
+              246.99999999999997
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 6,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 64,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_07",
+          "model": "models/ten_realm_arenas/realm_07.vmdl",
+          "label": "熔岩黑岸",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -564.2358240540592,
+              -565.610111252886,
+              -124.34318929254938
+            ],
+            [
+              562.8653911438868,
+              563.9391838462248,
+              163
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 7,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 74,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_08",
+          "model": "models/ten_realm_arenas/realm_08.vmdl",
+          "label": "紫晶岩庭",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -563.1546795023055,
+              -562.5779480869215,
+              -124.46148376674095
+            ],
+            [
+              564.3336265721659,
+              566.9061165145129,
+              163
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 8,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 68,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_09",
+          "model": "models/ten_realm_arenas/realm_09.vmdl",
+          "label": "天辉圣庭",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -564.0889553664024,
+              -565.8010666131722,
+              -124.49256526937604
+            ],
+            [
+              563.0090220552408,
+              561.7032104684005,
+              247.00000000000003
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 9,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 74,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        },
+        {
+          "name": "realm_10",
+          "model": "models/ten_realm_arenas/realm_10.vmdl",
+          "label": "夜魇荒庭",
+          "category": "ten_realm_arena",
+          "bounds": [
+            [
+              -563.4412410745468,
+              -561.4613308840366,
+              -124.43498181722035
+            ],
+            [
+              562.4625926158133,
+              565.926299367075,
+              252
+            ]
+          ],
+          "collision_hulls": 5,
+          "collision_count": 5,
+          "meta": {
+            "rank": 10,
+            "deck_z": 0,
+            "footprint": [
+              700,
+              700
+            ],
+            "clear_combat_size": [
+              612,
+              612
+            ],
+            "water_z": -42,
+            "wall_height": 76,
+            "entry": [
+              0,
+              -234,
+              0
+            ],
+            "spawn": [
+              0,
+              234,
+              0
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "native": {
+    "models/props_foliage/tree_pine01.vmdl": {
+      "bounds": [
+        [
+          -176.12648,
+          -185.8786,
+          -24.533213
+        ],
+        [
+          180.24403,
+          168.04974,
+          390.0131
+        ]
+      ],
+      "sha256": "c7778c50f26636b1fec2a70dbf0ce99edda61f5ff2603435c0a7970fad4ddb94",
+      "pak_resource": "models/props_foliage/tree_pine01.vmdl_c",
+      "bounds_method": "Valve resourceinfo.exe -all MDAT m_vMinBounds/m_vMaxBounds; current pak resource SHA256 checked"
+    }
+  }
+}

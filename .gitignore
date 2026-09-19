@@ -293,6 +293,8 @@ __pycache__/
 !/scripts/vscripts/tests/manual_gold_room_review.lua
 !/scripts/vscripts/tests/manual_main_island_review.lua
 !/scripts/vscripts/tests/manual_molten_room_review.lua
+!/scripts/vscripts/tests/manual_integrated_arenas.lua
+!/scripts/vscripts/tests/manual_integrated_arenas_check.lua
 !/scripts/vscripts/tests/manual_reference_walls.lua
 !/scripts/vscripts/tests/manual_wall_destruction.lua
 !/scripts/vscripts/tests/test_building_grid_alignment.lua

@@ -4,13 +4,99 @@
 
 game 仓库保存运行 VPK、布局配置、地图生成器、预览脚本和回归测试；content 仓库保存 `maps/template_map.vmap`、`maps/survival_c6.vmap` 和固定基础模板 `maps/templates/c6_terrain_seed.vmap`。两仓应检出配套提交。基础模板独立于编辑后的主地图，删除临时 `output` 不影响重建。
 
-双击 `launch_survival_main.cmd` 查看主地图，`launch_survival_c6.cmd` 查看 C6；F7 近景、滚轮缩放。预览需要 Node.js 和本机安装的 dota2-mcp，默认查找用户目录 `.codex/tools/dota2-mcp/node_modules`，可用 `DOTA2_MCP_INSTALL` 指定其他路径。
+双击 `launch_template_map.cmd` 查看主地图（`launch_survival_main.cmd` 为同一入口），`launch_survival_c6.cmd` 查看 C6；F7 近景、F8 中央全貌、滚轮缩放。预览需要 Node.js 与本地 Dota 2 Workshop Tools。`launch.ps1` 使用仓库内 `console.cjs`，直接连接游戏开发控制台 `127.0.0.1:29000` 并用本次唯一 Lua 回显确认地图载入；当前启动流程不要求安装 MCP 或打开 VConsole。
 
 `compile-main.ps1` 和 `compile.ps1` 默认编译 content 中当前保存的对应地图；只有 `compile.ps1 -Generate` 才重新生成 C6。不要在需要保留 Hammer 手工编辑时使用 `-Generate`。`prepare-ai-check.cjs` 的优化前基准已作为 fixture 保存，仍可独立生成检查脚本。
 
 确认的设计参考与实机图位于 `art/maps/c6/`，最终验收摘要位于 `docs/ai/validation/20260919/`。一次性的快照合并、诊断脚本、旧编译输出、截图和备份已清理。下方历史章节中的 `output/...` 表示当时的临时目录，清理后不再作为构建输入或当前交付文件。
 
-## 2026-09-19 中央区域并入主地图 template_map（当前版本）
+## 2026-09-19 主地图外围 26 个场地集成
+
+主地图入口是根目录 `launch_template_map.cmd` 或 `launch_survival_main.cmd`，地图名仍是 `template_map`。六间练功房为木材、金币、属性、大属性、低阶熔火和高阶熔火；两间熔火复用同套模型，分别绑定 `challenge_07`、`challenge_08`。另有一至十转擂台和一至十戒场地，共 26 区。它们放在原外围岛位，中央池塘、四片建造区、通路和其他挑战区保留。
+
+| 场地 | 主体占地（游戏单位） | 高度与外围装饰 |
+| --- | --- | --- |
+| 六间练功房 | 900×900 正方形 | 地面 Z=128，墙高保留；外侧树、岩石和后方传送凹位会超出主体。完整模型包围范围约 1228–1298 宽、1247–1258 深。 |
+| 一至十转 | 1000×550 | 台基 Z=16，第 N 转台面 Z=16+N×14；各层自身高度保持，完整模型在该占地内。 |
+| 一至十戒 | 700×700 正方形，含围墙 | 内部净空 612×612；地面 Z=58，模型水线与主图海面 Z=16 对齐。外岸及植被完整范围约 1130×1130。 |
+
+上述主体尺寸与包含装饰的完整包围范围分开检查，不能只用 700 或 900 的方框判断模型是否重叠。训练房对所有模块的位置和模型本身同时缩放 X/Y；正交朝向交换对应局部缩放轴。后方三段弧墙统一使用 XY 等比缩放，保持弧段接缝连续并与两端墙柱搭接；地坪仍是 900×900。其他斜向装饰采用近似分轴缩放，验证读取它们最终实际变换后的包围范围。
+
+### 日常编辑、编译与打开
+
+在 Hammer 编辑并保存 `content/dota_addons/survival/maps/template_map.vmap`。先断开该地图的游戏测试，再在 game 仓库根目录执行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/map_c6/compile-main.ps1
+```
+
+此命令编译 content 中当前保存的源图，无需 `output` 中的旧资产清单或临时预览。完成后双击 `launch_template_map.cmd`；正常游戏也可在控制台执行：
+
+```text
+host_timescale 1
+r_drawpanorama 1
+dota_launch_custom_game survival template_map
+```
+
+启动器默认近景仍对准中央，F8 查看中央全貌；外围区域的可走性、传送和实机画面需要另外检查，打开中央预览不等于验收全部房间。
+
+### 一次性导入器与重新生成
+
+`integrate-arenas.cjs` 读取现有主图和 content 中的房间 prefab，输出 `output/map_arena_integration_20260919/template_integrated.vmap` 与 `integration_manifest.json`。它不安装或编译地图；遇到已经含 `arena_integration_` 实体的输入会拒绝重复导入，避免叠加两套模型。空间合同保存在可版本化的 `arena-assets.json`，其中记录源资产清单哈希和原生松树资源哈希；当前 Valve 包中的松树也必须与记录一致。
+
+普通 Hammer 编辑后直接编译即可。只有需要重新执行整套导入时，才取 **content 仓库提交 `926379c`** 中的合入前主图作为输入。这会以该历史主图重做导入，不包含之后手工编辑的改动，因此先保留当前源图。以下命令只将历史文件导出至临时目录，不切换或覆盖 content 工作区：
+
+```powershell
+git -C '../../../content/dota_addons/survival' lfs fetch origin 926379c --include='maps/template_map.vmap'
+@'
+from pathlib import Path
+import subprocess
+
+root = Path.cwd()
+content = (root / '../../../content/dota_addons/survival').resolve()
+destination = root / 'output/map_arena_rebuild/template_before_926379c.vmap'
+pointer = subprocess.check_output([
+    'git', '-C', str(content), 'show', '926379c:maps/template_map.vmap'
+])
+data = subprocess.check_output(
+    ['git', '-C', str(content), 'lfs', 'smudge'], input=pointer
+)
+if b'dmx encoding binary' not in data[:100]:
+    raise SystemExit('LFS binary map was not resolved; stop before integration.')
+destination.parent.mkdir(parents=True, exist_ok=True)
+destination.write_bytes(data)
+print(destination)
+'@ | python -B -
+
+node tools/map_c6/integrate-arenas.cjs --source=output/map_arena_rebuild/template_before_926379c.vmap
+node tools/map_c6/verify-arenas.cjs --baseline output/map_arena_integration_20260919/template_before_text.vmap
+```
+
+验证器使用导入器转换后的文本基线；不要把 Git 导出的二进制 VMAP 直接传给文本检查器。
+
+确认清单和独立静态检查后，再显式安装该输出并编译。`-SourceMap` 会备份当前主图和 VPK，再写入 content：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/map_c6/compile-main.ps1 -SourceMap output/map_arena_integration_20260919/template_integrated.vmap
+node tools/map_c6/verify-arenas.cjs --baseline output/map_arena_integration_20260919/template_before_text.vmap --vpk maps/template_map.vpk
+```
+
+本轮生成清单记录 3328 个道具、126 个新标记和 3308 个白名单可走格；替换 52 个旧目标标记，修正十转出生点旧拼写。静态检查覆盖完整模型间距、坐标边界、标记唯一性、原五个网格及非目标实体保留、地形数组修改白名单。**静态通过与 DMX 转换通过不代表实机通过**；编译结果、实际 GridNav、碰撞高度和传送结果分别以本轮验证报告为准。以下中央区域历史验收数字不代表这 26 个新增场地的实机结果。
+
+### 外围场地实机检查
+
+加载 Workshop 的 `template_map` 后，在游戏开发控制台执行：
+
+```text
+sv_cheats 1
+script_reload_code tests/manual_integrated_arenas_check
+```
+
+入口只在服务端 Workshop 主地图执行，每次重新载入探针；读取标记、地面和寻路状态，不移动或生成单位、不修改存档。输出前缀为 `[INTEGRATED_ARENAS]`，最终应为 `SUMMARY PASS areas=26 checked=207 failed=0`。保留该次完整控制台日志，以便确认检查的是当前地图；模块也将本次结果保存在 `INTEGRATED_ARENAS_LAST_REPORT`。
+
+正式入口实机日志已独立复核：26 个场地、207 项检查全部通过，覆盖 126 个实际标记、各房间地面高度与 GridNav、入口到刷怪点/四角路径、外围水域阻挡，以及 325 对区域之间的寻路隔离。摘要和原日志 SHA256 见 [arena_runtime.json](../../docs/ai/validation/20260919/arena_runtime.json)。此次运行使用上面的正式 `script_reload_code` 入口，控制台确认收到了预期输出。验证范围是地图几何与导航，未完成挑战业务通关、奖励结算、多人和压力测试。
+
+## 2026-09-19 中央区域并入主地图 template_map（外围集成前版本）
 
 主地图仍为 `template_map`。将已优化的 C6 中央区域整体平移 `(0, -5376, 0)`，中央池心位于 `(-1024, 0)`；方池 1200、四块空地约 1400×1400、A→B 距离 1500、低路 24、高地 384 均保持原尺寸。原主地图 64×64 Tile Grid、外围挑战/转生区域及 60 个原有外围标记保持不变。已迁移四组玩家/怪物出生标记、资源树与实际建造范围。合入 4545 个中央实体和 5 个地形/水底网格，保留原生植被、封闭树带与近景减面成果。
 
@@ -170,15 +256,15 @@ game 仓库保存运行 VPK、布局配置、地图生成器、预览脚本和�
 
 本次编译 443 项、0 失败，VPK 成功更新并冷启动加载。实机通过 106 项点位/水陆通路、34 处水域间隔、98 个已有挑战/转生锚点检查。记录为 `verification_resize.json`、`verification_resize_summary.log`；实机截图为 `overview_resize_c6.png` 和 `central_resize_c6.png`。全景相机更新为距离 34000、观察点 (-1024, -6500)，完整显示最南侧房间。
 
-## 打开与重新生成
+## C6 源图的打开与重新生成
 
 直接双击插件根目录的 `launch_survival_c6.cmd`，或在 CMD 执行其完整路径。默认是纯画面预览：自动加载 C6、开启白天与全图视野、切到全景、隐藏 HUD 和难度选择界面，只显示 Dota 2 窗口。
 
-启动参数保留 `-tools` 以支持本地地图与 Lua 预览，但增加引擎原生 `-noassetbrowser` 和 `+dota_launch_custom_game survival survival_c6`，冷启动直接指定地图；复用已有 Tools 进程时会隐藏 Asset Browser 窗口。VConsole 在后台保持 MCP 连接。启动器用 `Start-Process` 分别重定向 stdout/stderr 并检查退出码，兼容 CMD 默认使用的 Windows PowerShell 5.1，普通 `[relay]` 日志不会再触发 NativeCommandError。启动成功以本次唯一 Lua 回显确认地图已加载，再应用全景相机；不是仅确认命令已经发送。
+启动参数使用 `-tools -noassetbrowser` 和 `+dota_launch_custom_game survival survival_c6`，冷启动直接指定地图；复用已有 Tools 进程时会隐藏 Asset Browser 窗口。当前启动器通过 `console.cjs` 直接连接游戏控制台 TCP 端口，分别重定向 stdout/stderr 并检查退出码，兼容 Windows PowerShell 5.1。收到本次唯一 Lua 回显后才应用相机。已有 VConsole 或其他控制台客户端占用 `29000` 时，先断开该客户端再启动。
 
-预览日志：`output/map_build_c6/launcher.log`、`launcher.stderr.log`。相机设置在 `preview.json`，便于之后调整观察距离。需要恢复正常游玩时重新启动游戏，或用已有 `output/map_build_c6/mcp-restore.json` 恢复界面和相机。
+C6 预览日志为 `output/map_build_c6/launcher.log`、`launcher.stderr.log`；主地图对应日志位于 `output/map_main_merge_20260919/`。相机设置在 `preview.json`。恢复正常游玩可重新启动游戏，或执行 `host_timescale 1`、`r_drawpanorama 1` 后重新加载地图。
 
-2026-09-15 已使用 CMD → Windows PowerShell 5.1 实测入口返回 0，普通 relay stderr 存在时仍正常完成；新启动参数与复用实例的窗口检查均确认 Asset Browser 不可见。最终截图 `output/map_build_c6/preview_only_check.png` 显示全图且没有 HUD。
+历史记录：2026-09-15 曾在旧 MCP 启动方案下使用 CMD → Windows PowerShell 5.1 验证入口和窗口显示；该记录不代表当前机器安装了 MCP，也不替代当前直接 TCP 启动器的验证。
 
 Workshop Tools 控制台：
 
@@ -196,7 +282,7 @@ Hammer 可直接打开上述 content 下的 `.vmap`。生成脚本会覆盖该�
 ./tools/map_c6/compile.ps1 -Generate
 ```
 
-脚本首次运行会从现有 `template_map.vmap` 解码原生地形配置，并读取游戏 VPK 中的资源目录。编译日志、生成布局清单和点位清单在 `output/map_build_c6/`。
+生成脚本从固定的 `maps/templates/c6_terrain_seed.vmap` 解码原生地形配置，并读取游戏 VPK 中的资源目录。编译日志、生成布局清单和点位清单在 `output/map_build_c6/`。正常保存后的 C6 编译使用 `compile.ps1`，仅明确重建时才加 `-Generate`。
 
 ## 实机检查
 
@@ -226,20 +312,10 @@ script_reload_code tests/map_c6_check
 - 验证记录：`output/map_build_c6/verification_detail.log`、`verification_detail.json`；图片：`central_detail_c6.png`、`overview_detail_c6.png`。以关闭游戏后成功写入的 VPK 和冷启动实机检查作为最终验收，不能只依据资源编译统计。
 - 精修前 VMAP、VPK、生成器和截图备份在 `output/map_build_c6/before_detail_20260915/`。自动生成会覆盖 content 源地图，手工编辑时请另存。
 
-### 本机 dota2-mcp
+### 历史可选工具：dota2-mcp（2026-09-15）
 
-已安装 npm `dota2-mcp@1.6.0`，目录为 `C:/Users/Administrator/.codex/tools/dota2-mcp`，并注册全局 Codex MCP `dota2`。安装时禁用了包生命周期脚本，固定版本，避免无意自动升级丢失兼容补丁。
+旧开发环境曾使用 npm `dota2-mcp@1.6.0` 和 Codex MCP 注册；这是历史配置，不是当前机器的安装记录或启动前置条件。当前一键入口使用直接 TCP 控制台流程。
 
-`patch-mcp.cjs` 为该版本补上 VFCS 初始化握手并滤除重复 GUI 握手，原上游文件保留 `.original` 备份；VConsole 门控仍保留。VConsole 的默认 Localhost 设备禁止自动连接，新增 Localhost:29001 自动连接，避免 GUI 与 relay 同时占用 29000。首次设备值备份为 `output/map_build_c6/vconsole_device_before.json`。
-
-Codex IDE 刷新扩展后可载入新工具；本次已通过 `mcp-client.cjs` 使用标准 MCP SDK 调用同一个服务器，实测 `console_send`、`console_output`、`dota_run_lua` 与 addon 检测成功。不是仅凭 TCP 接通判定成功。`dota_status` 的 `running` 字段在此引擎版本仍可能为 unknown；用 Lua 的 `GetMapName()` 核实当前地图，勿据此反复重启。
-
-本机配置关闭 MCP 自动弹出 VConsole；使用前保持 VConsole 连接 29001。下面的 PowerShell 命令可在后台打开它：
-
-```powershell
-Start-Process 'D:/SteamLibrary/steamapps/common/dota 2 beta/game/bin/win64/vconsole2.exe' -WorkingDirectory 'D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota' -WindowStyle Hidden
-```
-
-`mcp-client.cjs` 接受一个 JSON 文件路径，内容是 `{name, arguments}` 调用数组；工具名 `list_tools` 查询服务器的实际工具定义。它不会把新 MCP 动态注入已开始的 Codex 会话。原 `console.cjs` 仅供 MCP 关闭时直接诊断；不要同时连接 29000。
+保留的 `patch-mcp.cjs`、`mcp-client.cjs` 仅供主动选择旧 MCP 方案时参考。旧方案曾补充 VFCS 握手、调整 VConsole 设备端口，并用 `GetMapName()` 回显确认地图；相关临时备份路径可能已清理。若另外部署该方案，需要自行确认其依赖、设备端口与实际工具定义，并避免与当前 `console.cjs` 同时占用 `29000`。
 
 参考：[dota2-mcp 上游](https://github.com/Demon673/dota2-mcp)、[Dota 官方地形混合说明](https://www.dota2.com.cn/wiki/Dota_2_Workshop_Tools/Level_Design/Terrain_Blending.htm)、[Codex MCP 配置](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)。

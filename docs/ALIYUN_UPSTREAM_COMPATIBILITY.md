@@ -10,7 +10,7 @@
 - test03 结算包：`9cac6534d6f5eaed17cdba596053cf0260c39655b7e0dc722101ce232b171ffb`。
 - 当前游戏/新结算包已一致：`4b28247fa0bbabf0d220b4f178a9d8379fc54d362792b031fbfcd5a71c8bf20d`；旧包保留。
 - 两个 backend 冲突已合并；18 项相关测试通过，包括真实 Lua 执行、mock RPC 下抽奖重试与回执、旧存档恢复。未做新抽奖 SQL 的真实 PG 验收。
-- test03 发布清单中所有文件 hash 保持不变；本轮无 SSH、数据库连接、部署或密码读取。
+- test03 本地发布清单中所有文件 hash 保持不变。同步后通过 SSH 只读复核：current 仍指向 `20260919-test03`，API/数据库服务均 active；服务器本机 health、数据库 readiness 和归档配置 hash 检查通过。本轮没有部署或迁移，凭据未输出。
 
 ## 接新版游戏前必须处理
 
