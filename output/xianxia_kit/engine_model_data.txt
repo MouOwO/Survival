@@ -1,0 +1,72 @@
+	Resource Type: Model [Version 1] [Header Version: 12]
+	File Size: 69509 bytes
+
+
+--- Resource External Refs: ---
+	Id:               Resource Name:                                  
+	F65EE39F8FCA27B3  materials/xianxia_kit/xx_bronze.vmat            
+	621477A35A4652A2  materials/xianxia_kit/xx_rock.vmat              
+	12CFAB6A3E65F0F5  materials/xianxia_kit/xx_stone.vmat             
+
+
+--- Resource Blocks: Count 7 ---
+	-- Block: MVTX  Size: 62962  bytes [Offset:    112]
+	-- Block: MIDX  Size: 1785   bytes [Offset:  63088]
+	-- Block: MDAT  Size: 1272   bytes [Offset:  64880]
+	-- Block: CTRL  Size: 831    bytes [Offset:  66160]
+	-- Block: RERL  Size: 164    bytes [Offset:  66992]
+	-- Block: RED2  Size: 1456   bytes [Offset:  67168]
+	-- Block: DATA  Size: 885    bytes [Offset:  68624]
+
+
+--- Data for block "DATA" ---
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	m_name = "models/xianxia_kit/t01_shore_straight.vmdl"
+	m_modelInfo = 
+	{
+		m_nFlags = 8388608
+		m_vHullMin = [ 0.0, 0.0, 0.0 ]
+		m_vHullMax = [ 0.0, 0.0, 0.0 ]
+		m_vViewMin = [ 0.0, 0.0, 0.0 ]
+		m_vViewMax = [ 0.0, 0.0, 0.0 ]
+		m_flMass = 0.0
+		m_vEyePosition = [ 0.0, 0.0, 0.0 ]
+		m_flMaxEyeDeflection = 0.0
+		m_sSurfaceProperty = ""
+		m_keyValueText = ""
+	}
+	m_ExtParts = [  ]
+	m_refMeshes = [  ]
+	m_refMeshGroupMasks = [ 18446744073709551615 ]
+	m_refPhysGroupMasks = [  ]
+	m_refLODGroupMasks = [ 255 ]
+	m_lodGroupSwitchDistances = [  ]
+	m_refPhysicsData = [  ]
+	m_refPhysicsHitboxData = [  ]
+	m_refAnimGroups = [  ]
+	m_refSequenceGroups = [  ]
+	m_meshGroups = [  ]
+	m_materialGroups = [  ]
+	m_nDefaultMeshGroupMask = 18446744073709551615
+	m_modelSkeleton = 
+	{
+		m_boneName = [  ]
+		m_nParent = [  ]
+		m_boneSphere = [  ]
+		m_nFlag = [  ]
+		m_bonePosParent = [  ]
+		m_boneRotParent = [  ]
+		m_boneScaleParent = [  ]
+	}
+	m_remappingTable = [  ]
+	m_remappingTableStarts = [ 0 ]
+	m_boneFlexDrivers = [  ]
+	m_pModelConfigList = null
+	m_BodyGroupsHiddenInTools = [  ]
+	m_refAnimIncludeModels = [  ]
+	m_AnimatedMaterialAttributes = [  ]
+	m_animGraph2Refs = [  ]
+	m_vecNmSkeletonRefs = [  ]
+}
+

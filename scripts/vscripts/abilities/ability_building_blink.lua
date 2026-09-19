@@ -1,4 +1,4 @@
-﻿-- Use an explicit global class name. Dota's ability_lua loader resolves the
+-- Use an explicit global class name. Dota's ability_lua loader resolves the
 -- ScriptFile class by the KV ability name, not only by the returned module.
 ability_building_blink = class({})
 local M = ability_building_blink

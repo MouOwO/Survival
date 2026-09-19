@@ -1,0 +1,25 @@
+{
+  "animated_color_uv": true,
+  "unique_colors": 827,
+  "compiled_texture": "materials/survival_buildings/build_flow_color_png_c58b87e5.vtex",
+  "stages": [
+    {
+      "roof_alpha": 255,
+      "floor_alpha": 255,
+      "step": 0
+    },
+    {
+      "roof_alpha": 0,
+      "floor_alpha": 255,
+      "step": 24
+    },
+    {
+      "roof_alpha": 0,
+      "floor_alpha": 0,
+      "step": 48
+    }
+  ],
+  "status": "PASS",
+  "materials": 49,
+  "separate_alpha_uv": true
+}

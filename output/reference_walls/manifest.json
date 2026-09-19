@@ -1,0 +1,252 @@
+[
+  {
+    "name": "wall_lv01",
+    "stage": 1,
+    "display_name": "原木城墙",
+    "dimensions": [
+      248.0,
+      247.74156188964844,
+      410.97149658203125
+    ],
+    "triangles": 10376,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 164.3885981106663,
+    "weathering": 1.0,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv02",
+    "stage": 2,
+    "display_name": "木石城墙",
+    "dimensions": [
+      248.0,
+      247.74156188964844,
+      410.97149658203125
+    ],
+    "triangles": 15836,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 164.3885981106663,
+    "weathering": 0.88,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv03",
+    "stage": 3,
+    "display_name": "青石城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      408.0798645019531
+    ],
+    "triangles": 15932,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 163.2319490020101,
+    "weathering": 0.76,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv04",
+    "stage": 4,
+    "display_name": "青铜城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      420.7317199707031
+    ],
+    "triangles": 22668,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 168.29268494724042,
+    "weathering": 0.64,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv05",
+    "stage": 5,
+    "display_name": "苍蓝城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      420.7317199707031
+    ],
+    "triangles": 22668,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 168.29268494724042,
+    "weathering": 0.53,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv06",
+    "stage": 6,
+    "display_name": "碧玉城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      429.5038146972656
+    ],
+    "triangles": 24956,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 171.80152671755727,
+    "weathering": 0.43,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv07",
+    "stage": 7,
+    "display_name": "赤铜城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      432.80767822265625
+    ],
+    "triangles": 25052,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 173.12307692307692,
+    "weathering": 0.34,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv08",
+    "stage": 8,
+    "display_name": "紫晶城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      469.1175842285156
+    ],
+    "triangles": 25180,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 187.64702810039958,
+    "weathering": 0.25,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv09",
+    "stage": 9,
+    "display_name": "白金城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      473.2196960449219
+    ],
+    "triangles": 25500,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 189.2878787878788,
+    "weathering": 0.16,
+    "revision": 2
+  },
+  {
+    "name": "wall_lv10",
+    "stage": 10,
+    "display_name": "天辉晶冠城墙",
+    "dimensions": [
+      248.0,
+      248.0,
+      504.0458068847656
+    ],
+    "triangles": 26684,
+    "texture_resolution": 2048,
+    "footprint": [
+      4,
+      4
+    ],
+    "runtime_scale": 1,
+    "import_scale": 0.01,
+    "baked_yaw_degrees": 0,
+    "collision_half_width": 122,
+    "collision_height": 295.0,
+    "height_multiplier": 2.5,
+    "original_height": 201.61832061068702,
+    "weathering": 0.08,
+    "revision": 2
+  }
+]

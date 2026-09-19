@@ -1,0 +1,49 @@
+{
+  "center": [
+    -1152,
+    2688
+  ],
+  "radius": 1536,
+  "islandOffset": 3456,
+  "lakeRadius": 1024,
+  "shoreSlopeWidth": 160,
+  "paint": "continuous vertex-painted meadow, soil, rock and sparse stone",
+  "patches": [
+    {
+      "name": "island_0",
+      "vertices": 3880,
+      "topFaces": 3462,
+      "closed": true
+    },
+    {
+      "name": "island_1",
+      "vertices": 3880,
+      "topFaces": 3462,
+      "closed": true
+    },
+    {
+      "name": "island_2",
+      "vertices": 3880,
+      "topFaces": 3462,
+      "closed": true
+    },
+    {
+      "name": "island_3",
+      "vertices": 3880,
+      "topFaces": 3462,
+      "closed": true
+    },
+    {
+      "name": "ocean",
+      "vertices": 46020,
+      "topFaces": 45018,
+      "closed": true
+    },
+    {
+      "name": "shallow",
+      "vertices": 4558,
+      "topFaces": 4174,
+      "closed": true
+    }
+  ]
+}

@@ -1,0 +1,703 @@
+{
+  "theme": "修仙云海",
+  "timeOfDay": 0.3,
+  "lanterns": [
+    {
+      "x": 768,
+      "y": 1856,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 768,
+      "y": 3520,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -368,
+      "y": 3472,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -256,
+      "y": 3584,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -256,
+      "y": 1792,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 1024,
+      "y": 3840,
+      "z": 896,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 1024,
+      "y": 1536,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 2816,
+      "y": 3584,
+      "z": 896,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 2816,
+      "y": 1792,
+      "z": 896,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 1536,
+      "y": 3344,
+      "z": 640,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 1536,
+      "y": 2032,
+      "z": 640,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -320,
+      "y": 4608,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -1984,
+      "y": 4608,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -1936,
+      "y": 3472,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -2048,
+      "y": 3584,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -256,
+      "y": 3584,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -2304,
+      "y": 4864,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 0,
+      "y": 4864,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -2048,
+      "y": 6656,
+      "z": 896,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -256,
+      "y": 6656,
+      "z": 896,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -1808,
+      "y": 5376,
+      "z": 640,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -496,
+      "y": 5376,
+      "z": 640,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -3072,
+      "y": 3520,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -3072,
+      "y": 1856,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -1936,
+      "y": 1904,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -2048,
+      "y": 1792,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -2048,
+      "y": 3584,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -3328,
+      "y": 1536,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -3328,
+      "y": 3840,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -5120,
+      "y": 1792,
+      "z": 640,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -5120,
+      "y": 3584,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -3840,
+      "y": 2032,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -3840,
+      "y": 3344,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -1984,
+      "y": 768,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -320,
+      "y": 768,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -368,
+      "y": 1904,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -256,
+      "y": 1792,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -2048,
+      "y": 1792,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 0,
+      "y": 512,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -2304,
+      "y": 512,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -256,
+      "y": -1280,
+      "z": 896,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -2048,
+      "y": -1280,
+      "z": 640,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -496,
+      "y": 0,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -1808,
+      "y": 0,
+      "z": 768,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -6564.66,
+      "y": -10856,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -4122.98,
+      "y": -11325.2,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -6134.33,
+      "y": -14856,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -8722.98,
+      "y": -11941.2,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -15028.66,
+      "y": 10037.6,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -15028.66,
+      "y": 6837.6,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -12268.66,
+      "y": 6837.6,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -12268.66,
+      "y": 10037.6,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -12696.92,
+      "y": -4565.6,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -14996.92,
+      "y": -7125.6,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -12696.92,
+      "y": -9685.6,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -14996.92,
+      "y": -12245.6,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 9036.24,
+      "y": 13736,
+      "z": 524,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 9036.24,
+      "y": 11016,
+      "z": 524,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 9036.24,
+      "y": 8296,
+      "z": 524,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 9036.24,
+      "y": 5576,
+      "z": 524,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 12514.3,
+      "y": -2416.8,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": 11245.92,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": 9661.92,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": 8077.92,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": 6493.92,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": 4909.920000000001,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": 3325.92,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": 1741.919999999999,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": 157.9200000000004,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": -1426.0800000000004,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9359.62,
+      "y": -3010.0800000000013,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -7866.46,
+      "y": 11052.8,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -7866.46,
+      "y": 8972.8,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -7866.46,
+      "y": 6892.8,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 4981.8,
+      "y": 1951.2,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 6039.8,
+      "y": 1951.2,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 7097.8,
+      "y": 1951.2,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 4981.8,
+      "y": 255.2000000000009,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 6039.8,
+      "y": 255.2000000000009,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 7097.8,
+      "y": 255.2000000000009,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 4981.8,
+      "y": -1440.8000000000004,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 6039.8,
+      "y": -1440.8000000000004,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 7097.8,
+      "y": -1440.8000000000004,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 4981.8,
+      "y": -3136.7999999999997,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 6039.8,
+      "y": -3136.7999999999997,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 7097.8,
+      "y": -3136.7999999999997,
+      "z": 360.5,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 4953.28,
+      "y": 4314.4,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 6701.28,
+      "y": 4314.4,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 6690.7,
+      "y": 10960.8,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9062.46,
+      "y": 14252.8,
+      "z": 268,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -7590.46,
+      "y": 14252.8,
+      "z": 268,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -6118.46,
+      "y": 14252.8,
+      "z": 268,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -4646.46,
+      "y": 14252.8,
+      "z": 268,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 689.54,
+      "y": 14252.8,
+      "z": 268,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 2161.54,
+      "y": 14252.8,
+      "z": 268,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 3633.54,
+      "y": 14252.8,
+      "z": 268,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 5105.54,
+      "y": 14252.8,
+      "z": 268,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -9062.46,
+      "y": -6067.2,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -7590.46,
+      "y": -6067.2,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -6118.46,
+      "y": -6067.2,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -4646.46,
+      "y": -6067.2,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 689.54,
+      "y": -6067.2,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 2161.54,
+      "y": -6067.2,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 3633.54,
+      "y": -6067.2,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 5105.54,
+      "y": -6067.2,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -556.14,
+      "y": -9765.6,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 2755.86,
+      "y": -9765.6,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 6067.86,
+      "y": -9765.6,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 9379.86,
+      "y": -9765.6,
+      "z": 652,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -11362.73963290153,
+      "y": 628.3636174873036,
+      "z": 396,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 1300,
+      "y": -14000,
+      "z": 740,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 650.0000000000001,
+      "y": -13237.897644669694,
+      "z": 740,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -649.9999999999997,
+      "y": -13237.897644669694,
+      "z": 740,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -1300,
+      "y": -14000,
+      "z": 740,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": -650.0000000000006,
+      "y": -14762.102355330306,
+      "z": 740,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    },
+    {
+      "x": 650.0000000000001,
+      "y": -14762.102355330306,
+      "z": 740,
+      "model": "maps/journey_assets/props/lanterns/lantern_jrny_radiant_1.vmdl"
+    }
+  ],
+  "wisps": []
+}

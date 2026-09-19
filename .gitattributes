@@ -6,3 +6,10 @@
 *.tga binary -text
 *.tif binary -text
 *.psd binary -text
+output/survival_world_v2/survival_world_v2.vmap filter=lfs diff=lfs merge=lfs -text
+output/survival_world_v2/before_cloud_integration_v2/survival_world_v2.vmap filter=lfs diff=lfs merge=lfs -text
+
+# Engine-generated assets retain their native formatting.
+output/** -whitespace
+*.vpcf -whitespace
+*.vmdl -whitespace

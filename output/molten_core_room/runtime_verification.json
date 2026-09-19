@@ -1,0 +1,56 @@
+{
+  "date": "2026-09-17",
+  "status": "PASS",
+  "map": "molten_core_room_review",
+  "compiled_map_sha256": "927F8DECDD385C4D68CAE25F0A386A26EA5FED49B10712E28269F4A7693889DD",
+  "scope": "Independent art room: rendering, no emission, boundary/navigation samples and actual builder traversal. Formal challenge gameplay not integrated.",
+  "navigation": {
+    "marker_samples": 5,
+    "interior_samples": 5,
+    "blocked_boundary_or_exterior_samples": 4,
+    "evidence": "MOLTEN_ROOM_MAP\tmolten_core_room_review\t10\nMOLTEN_ROOM_MARKER\tchallenge_07_entry\t0\t1096\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_MARKER\tchallenge_07_home\t0\t900\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_MARKER\tchallenge_07_boss_spawn\t0\t-140\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_MARKER\tchallenge_07_spawn_01\t365\t-140\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_MARKER\tchallenge_07_spawn_06\t-365\t-140\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_NAV\t0\t0\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t800\t0\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t-800\t0\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t0\t-960\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t0\t1280\ttrue\tfalse\t127.25\nMOLTEN_ROOM_MAP\tmolten_core_room_review\t10\nMOLTEN_ROOM_MARKER\tchallenge_07_entry\t0\t1096\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_MARKER\tchallenge_07_home\t0\t900\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_MARKER\tchallenge_07_boss_spawn\t0\t-140\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_MARKER\tchallenge_07_spawn_01\t365\t-140\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_MARKER\tchallenge_07_spawn_06\t-365\t-140\t152\t127.25\ttrue\tfalse\nMOLTEN_ROOM_NAV\t0\t0\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t800\t0\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t-800\t0\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t0\t-960\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t0\t1280\ttrue\tfalse\t127.25\nMOLTEN_ROOM_NAV\t1024\t0\tfalse\tfalse\t127.25\nMOLTEN_ROOM_NAV\t1104\t0\tfalse\tfalse\t99\nMOLTEN_ROOM_NAV\t0\t-1152\tfalse\tfalse\t127.25\nMOLTEN_ROOM_NAV\t0\t1450\tfalse\tfalse\t99\nMOLTEN_ROOM_NAV\t1024\t0\tfalse\tfalse\t127.25\nMOLTEN_ROOM_NAV\t1104\t0\tfalse\tfalse\t99\nMOLTEN_ROOM_NAV\t0\t-1152\tfalse\tfalse\t127.25\nMOLTEN_ROOM_NAV\t0\t1450\tfalse\tfalse\t99"
+  },
+  "walk": {
+    "unit": "npc_survival_builder_proxy",
+    "legs": 6,
+    "route": [
+      "entry",
+      "center",
+      "southwest",
+      "southeast",
+      "northeast",
+      "northwest",
+      "entry"
+    ],
+    "elapsed_game_seconds": 19.366668701172,
+    "status": "PASS",
+    "evidence": "[VScript][L2] MOLTEN_ROOM_WALK_START\n[VScript][L2] MOLTEN_ROOM_WALK_START\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t1\t0\t-107.99975585938\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t1\t0\t-107.99975585938\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t2\t-800\t-900\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t2\t-800\t-900\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t3\t781.99731445313\t-900\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t3\t781.99731445313\t-900\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t4\t799.64184570313\t863.91375732422\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t4\t799.64184570313\t863.91375732422\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t5\t-767.95727539063\t899.27709960938\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t5\t-767.95727539063\t899.27709960938\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t6\t0\t1096\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_COMPLETE\t19.366668701172\n[VScript][L2] MOLTEN_ROOM_WALK_PASS\t6\t0\t1096\t127.25\n[VScript][L2] MOLTEN_ROOM_WALK_COMPLETE\t19.366668701172"
+  },
+  "visuals": {
+    "overview": "previews/runtime_overview.png",
+    "source": "Actual Workshop screenshot during builder traversal; existing HUD retained.",
+    "blender_overview": "previews/room_overview.png",
+    "emissive_materials": 0,
+    "particle_entities": 0,
+    "effect_lights": 0
+  },
+  "blender": {
+    "file": "molten_core_room.blend",
+    "scenes": 2,
+    "packed_images": 48,
+    "all_authored_material_emission_strength_zero": true
+  },
+  "cleanup": {
+    "builder_position_and_speed_restored": true,
+    "camera_restored": 1134,
+    "temporary_anchor_removed": true,
+    "review_timers_cancelled": true,
+    "test_map_disconnected": true,
+    "evidence": "[MCP-LUA] IsServer: true\n[MCP-LUA] IsServer: true\nMOLTEN_ROOM_CLEAN\nMOLTEN_ROOM_CLEAN\nMOLTEN_ROOM_CLEAN_ANCHOR\ttrue\nMOLTEN_ROOM_CLEAN_ANCHOR\ttrue"
+  },
+  "limitations": [
+    "Formal challenge teleport, monster respawn and loot flow were not tested.",
+    "No multiplayer performance benchmark or LOD pass.",
+    "Extra spawn_01..10 markers are editing references, not an automatic change to challenge configuration."
+  ]
+}

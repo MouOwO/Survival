@@ -1,0 +1,50 @@
+{
+  "mainMapModified": false,
+  "resources": [
+    {
+      "file": "c01_cloud_sea_v2.vtex",
+      "ok": true
+    },
+    {
+      "file": "c02_cliff_cloud_v2.vtex",
+      "ok": true
+    },
+    {
+      "file": "c03_cloud_band_v2.vtex",
+      "ok": true
+    },
+    {
+      "file": "c04_thin_mist_v2.vtex",
+      "ok": true
+    },
+    {
+      "file": "c01_cloud_sea_v2.vpcf",
+      "ok": true
+    },
+    {
+      "file": "c02_cliff_cloud_v2.vpcf",
+      "ok": true
+    },
+    {
+      "file": "c03_cloud_band_v2.vpcf",
+      "ok": true
+    },
+    {
+      "file": "c04_thin_mist_v2.vpcf",
+      "ok": true
+    }
+  ],
+  "reviewMapModified": "2026-09-14T19:05:59.1213837Z",
+  "reviewMapSHA256": "308D233D0F83590B73D431A514911E8ECB10DB026CE5C6F9CF116448A6301610",
+  "runtimeReview": {
+    "newContoursVisible": true,
+    "approvedModelsAndSurfacesUnchanged": true,
+    "limitations": [
+      "Fixed camera-facing cards and baked lighting",
+      "Sparse asset-review layout, not full-map cloud placement",
+      "Some banks extend beyond the close inspection camera frame"
+    ],
+    "screenshot": "xianxia_kit_assembly_0007.tga",
+    "waterClippingFixed": true
+  }
+}

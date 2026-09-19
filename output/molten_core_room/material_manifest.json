@@ -1,0 +1,130 @@
+[
+  {
+    "name": "stone",
+    "size": 1024,
+    "color_std": 0.04667035356577609,
+    "normal_std": 0.04795926809310913,
+    "roughness_mean": 0.8637959133672521,
+    "emissive": false
+  },
+  {
+    "name": "stone_light",
+    "size": 1024,
+    "color_std": 0.05364299394046457,
+    "normal_std": 0.04817025363445282,
+    "roughness_mean": 0.8652994947810124,
+    "emissive": false
+  },
+  {
+    "name": "stone_cool",
+    "size": 1024,
+    "color_std": 0.04982540909289212,
+    "normal_std": 0.048101577907800674,
+    "roughness_mean": 0.8633804637325105,
+    "emissive": false
+  },
+  {
+    "name": "stone_edge",
+    "size": 1024,
+    "color_std": 0.06158326540594317,
+    "normal_std": 0.04958226531744003,
+    "roughness_mean": 0.8663296570073431,
+    "emissive": false
+  },
+  {
+    "name": "stone_scorched",
+    "size": 1024,
+    "color_std": 0.04617549229072136,
+    "normal_std": 0.048835307359695435,
+    "roughness_mean": 0.8653274839877246,
+    "emissive": false
+  },
+  {
+    "name": "charred",
+    "size": 1024,
+    "color_std": 0.03606700669039458,
+    "normal_std": 0.04855726286768913,
+    "roughness_mean": 0.8667593682420855,
+    "emissive": false
+  },
+  {
+    "name": "rock",
+    "size": 1024,
+    "color_std": 0.043339844109129805,
+    "normal_std": 0.04837826266884804,
+    "roughness_mean": 0.8668083290187312,
+    "emissive": false
+  },
+  {
+    "name": "mortar",
+    "size": 1024,
+    "color_std": 0.007840855978429317,
+    "normal_std": 0.00575894583016634,
+    "roughness_mean": 0.8000001311302185,
+    "emissive": false
+  },
+  {
+    "name": "bronze",
+    "size": 1024,
+    "color_std": 0.10338148039171133,
+    "normal_std": 0.01773632876574993,
+    "roughness_mean": 0.3796562259005178,
+    "emissive": false
+  },
+  {
+    "name": "copper",
+    "size": 1024,
+    "color_std": 0.16516475535422476,
+    "normal_std": 0.01731187105178833,
+    "roughness_mean": 0.3823049470316366,
+    "emissive": false
+  },
+  {
+    "name": "iron",
+    "size": 1024,
+    "color_std": 0.02770067097266253,
+    "normal_std": 0.017719969153404236,
+    "roughness_mean": 0.3309232870501985,
+    "emissive": false
+  },
+  {
+    "name": "patina",
+    "size": 1024,
+    "color_std": 0.05843360307761855,
+    "normal_std": 0.01773632876574993,
+    "roughness_mean": 0.5879914907916941,
+    "emissive": false
+  },
+  {
+    "name": "teal",
+    "size": 1024,
+    "color_std": 0.1122438833117485,
+    "normal_std": 0.0057105752639472485,
+    "roughness_mean": 0.7580248713493347,
+    "emissive": false
+  },
+  {
+    "name": "ash",
+    "size": 1024,
+    "color_std": 0.02073381468653679,
+    "normal_std": 0.005643014330416918,
+    "roughness_mean": 0.9599999785423279,
+    "emissive": false
+  },
+  {
+    "name": "lava",
+    "size": 1024,
+    "color_std": 0.08314820285255434,
+    "normal_std": 0.038812316954135895,
+    "roughness_mean": 0.7561434507369995,
+    "emissive": false
+  },
+  {
+    "name": "earth",
+    "size": 1024,
+    "color_std": 0.027445685118436813,
+    "normal_std": 0.005778402555733919,
+    "roughness_mean": 0.9599999785423279,
+    "emissive": false
+  }
+]

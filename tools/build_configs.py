@@ -836,6 +836,8 @@ def main() -> int:
     names = sorted(source.stem for source in files)
     expected_outputs = {f"{name}.lua" for name in names}
     expected_outputs.add("index.lua")
+    # Asset builders own these modules; a CSV rebuild must keep their mappings.
+    expected_outputs.update({"building_white_shells.lua", "wall_destruction_models.lua"})
     for old in OUT_ROOT.glob("*.lua"):
         if old.name not in expected_outputs:
             old.unlink()

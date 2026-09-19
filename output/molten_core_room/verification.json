@@ -1,0 +1,196 @@
+{
+  "status": "PASS",
+  "custom_modules": 30,
+  "native_models": [],
+  "material_sets": 16,
+  "walkable_support_variant": true,
+  "instances": 450,
+  "emission": false,
+  "source2_bounds_and_dependencies": [
+    {
+      "name": "f01_floor_a",
+      "bounds_error": 1.52587890625e-05,
+      "physics": false,
+      "triangles": 552
+    },
+    {
+      "name": "f01_floor_b",
+      "bounds_error": 1.52587890625e-05,
+      "physics": false,
+      "triangles": 552
+    },
+    {
+      "name": "f02_floor_scorched",
+      "bounds_error": 1.52587890625e-05,
+      "physics": false,
+      "triangles": 1280
+    },
+    {
+      "name": "f01_niche_floor",
+      "bounds_error": 1.51356735e-05,
+      "physics": false,
+      "triangles": 160
+    },
+    {
+      "name": "f03_wall_256",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 1632
+    },
+    {
+      "name": "f03_wall_128",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 1032
+    },
+    {
+      "name": "f04_pillar_body",
+      "bounds_error": 2.2999999998774e-05,
+      "physics": true,
+      "triangles": 1932
+    },
+    {
+      "name": "f04_pillar_cap",
+      "bounds_error": 4.185302735493224e-06,
+      "physics": false,
+      "triangles": 132
+    },
+    {
+      "name": "f05_corner",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 2064
+    },
+    {
+      "name": "f06_arc_60",
+      "bounds_error": 6.235351563077529e-05,
+      "physics": true,
+      "triangles": 1228
+    },
+    {
+      "name": "f07_portal_ring",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": false,
+      "triangles": 3144
+    },
+    {
+      "name": "f07_portal_inlay",
+      "bounds_error": 8.6426735e-06,
+      "physics": false,
+      "triangles": 3120
+    },
+    {
+      "name": "f08_spawn_inlay",
+      "bounds_error": 1.9191920928973705e-05,
+      "physics": false,
+      "triangles": 2712
+    },
+    {
+      "name": "f09_trough_straight",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": false,
+      "triangles": 612
+    },
+    {
+      "name": "f09_trough_end",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": false,
+      "triangles": 672
+    },
+    {
+      "name": "f09_trough_corner",
+      "bounds_error": 1.0000000003174137e-05,
+      "physics": false,
+      "triangles": 260
+    },
+    {
+      "name": "f09_lava_straight",
+      "bounds_error": 1.0000000003174137e-05,
+      "physics": false,
+      "triangles": 12
+    },
+    {
+      "name": "f09_lava_corner",
+      "bounds_error": 1.0000000003174137e-05,
+      "physics": false,
+      "triangles": 20
+    },
+    {
+      "name": "f10_brazier_bracket",
+      "bounds_error": 4.185302735493224e-06,
+      "physics": false,
+      "triangles": 352
+    },
+    {
+      "name": "f10_brazier_bowl",
+      "bounds_error": 9.23706054578588e-06,
+      "physics": false,
+      "triangles": 2224
+    },
+    {
+      "name": "f11_fire_stele",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": true,
+      "triangles": 772
+    },
+    {
+      "name": "f11_flame_emblem",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": false,
+      "triangles": 108
+    },
+    {
+      "name": "f12_rock_1",
+      "bounds_error": 1.0488281247944542e-05,
+      "physics": false,
+      "triangles": 52
+    },
+    {
+      "name": "f12_rock_2",
+      "bounds_error": 1.1821289064073426e-05,
+      "physics": false,
+      "triangles": 52
+    },
+    {
+      "name": "f12_rock_3",
+      "bounds_error": 3.2348632856837867e-06,
+      "physics": false,
+      "triangles": 52
+    },
+    {
+      "name": "f12_rock_4",
+      "bounds_error": 1.1176757809039373e-05,
+      "physics": false,
+      "triangles": 52
+    },
+    {
+      "name": "f14_rubble",
+      "bounds_error": 1.4998779299446596e-05,
+      "physics": false,
+      "triangles": 988
+    },
+    {
+      "name": "f14_ash_patch",
+      "bounds_error": 7.4501953122307896e-06,
+      "physics": false,
+      "triangles": 600
+    },
+    {
+      "name": "f16_banner",
+      "bounds_error": 2.0000000006348273e-05,
+      "physics": false,
+      "triangles": 104
+    },
+    {
+      "name": "room_ash_base",
+      "bounds_error": 0.00017109374994106474,
+      "physics": false,
+      "triangles": 188
+    }
+  ],
+  "compiled_map": "molten_core_room_review.vpk",
+  "markers": 13,
+  "main_map_modified": false,
+  "runtime_report": "runtime_verification.json",
+  "custom_instance_triangles": 339476
+}

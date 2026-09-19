@@ -1,0 +1,261 @@
+	Resource Type: Shader [Version 71] [Header Version: 12]
+	File Size: 1586 bytes
+
+
+--- (No External Resource References Found)
+
+
+--- Resource Blocks: Count 2 ---
+	-- Block: DATA  Size: 1200   bytes [Offset:     40]
+	-- Block: RED2  Size: 338    bytes [Offset:   1248]
+
+
+--- Data for block "DATA" ---
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	m_nVersion = 0
+	m_description = "Simple shader for solid sky color"
+	m_bDevShader = true
+	m_bHasShaderProgram = 
+	[
+		true, true, true, false,
+		false, false, false, false,
+	]
+	m_modeArray = 
+	[
+		{
+			m_szName = "Default"
+			m_szShaderFallback = ""
+			m_staticComboSettings = [  ]
+		},
+	]
+	m_programData = 
+	{
+		m_programHashes = 
+		[
+			{
+				m_nHashChar = #[ C5 40 C1 35 C5 F1 11 5A 9F 56 C1 AC 4B 4E 80 27 ]
+			},
+			{
+				m_nHashChar = #[ 10 A4 F7 9D 28 28 80 AD 96 31 8B E7 C1 FC A3 8C ]
+			},
+			{
+				m_nHashChar = #[ EC 7E CB 6E 8A 7E 1A 16 7E 43 F2 56 B5 FD 8F 7E ]
+			},
+			{
+				m_nHashChar = #[ 4E 82 E7 23 58 DA 49 4D 1D 25 31 B4 76 43 F3 B8 ]
+			},
+			{
+				m_nHashChar = #[ D5 E7 1B 74 74 06 1C 04 CE 38 08 61 3C 10 A1 D7 ]
+			},
+			{
+				m_nHashChar = #[ D5 E7 1B 74 74 06 1C 04 CE 38 08 61 3C 10 A1 D7 ]
+			},
+			{
+				m_nHashChar = #[ 22 ED 95 57 F6 DD A3 2A CE 6A DF B6 65 20 46 0E ]
+			},
+			{
+				m_nHashChar = #[ 22 ED 95 57 F6 DD A3 2A CE 6A DF B6 65 20 46 0E ]
+			},
+		]
+		m_variableDescriptionVersionHash = 
+		{
+			m_nHashChar = #[ 96 42 28 E5 F9 19 42 85 C5 4D 88 63 ED 41 E2 32 ]
+		}
+		m_nVariableSourceMax = 19
+		m_staticComboArray = [  ]
+		m_staticComboRuleArray = [  ]
+		m_dynamicComboArray = [  ]
+		m_dynamicComboRuleArray = [  ]
+		m_variableDescriptionArray = 
+		[
+			{
+				m_szName = "BackStencilFunc"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901791
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DepthEnable"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1F A1 D0 52 1E 04 0A 00 12 00 19 A1 D0 52 1E 02 17 00 07 00 00 00 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 9
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901776
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "DepthWriteEnable"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 9
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901777
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "StencilEnable"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1F A1 D0 52 1E 04 0A 00 12 00 19 A1 D0 52 1E 02 17 00 07 00 00 00 00 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 9
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901781
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "StencilFunc"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 5
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 1
+				m_nTypeSpecificBits = 4294901787
+				m_intDefault = [ 2, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "StencilRef"
+				m_szUiGroup = ""
+				m_uiType = 0
+				m_flUiStep = 0.0
+				m_pSourceString = ""
+				m_sourceType = 6
+				m_pCompiledExpression = #[ 1F 11 44 D9 DA 04 0A 00 12 00 19 11 44 D9 DA 02 17 00 07 00 00 80 3F 00 ]
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 5
+				m_registerType = 5
+				m_nContextStateAffectedByVariable = 256
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 4
+				m_nTypeSpecificBits = 4294901792
+				m_intDefault = [ 0, 0, 0, 0 ]
+				m_intMin = [ -999999999, -999999999, -999999999, -999999999 ]
+				m_intMax = [ 999999999, 999999999, 999999999, 999999999 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+			{
+				m_szName = "g_vSkyColor"
+				m_szUiGroup = ""
+				m_uiType = 4
+				m_flUiStep = 0.0
+				m_pSourceString = "SkyColor"
+				m_sourceType = 1
+				m_pCompiledUIVisibilityExpression = #[  ]
+				m_sourceIndex = -1
+				m_type = 4
+				m_registerType = 3
+				m_nContextStateAffectedByVariable = 8192
+				m_nRegisterOffset = 4294967295
+				m_nDescriptorSet = 4294967295
+				m_nRegisterElements = 4
+				m_nTypeSpecificBits = 4294967295
+				m_flDefault = [ 0.0, 0.0, 0.0, 0.0 ]
+				m_flMin = [ -1000000000.0, -1000000000.0, -1000000000.0, -1000000000.0 ]
+				m_flMax = [ 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0 ]
+				m_nLayerId = -1
+				m_bAllowLayerOverride = true
+				m_bIsLayerConstant = false
+			},
+		]
+		m_textureChannelProcessorArray = [  ]
+		m_vsInputSignatureArray = [  ]
+		m_staticComboData = [  ]
+		m_staticComboIDs = [  ]
+		m_byteCodeData = [  ]
+		m_attributes = [  ]
+	}
+}
+
+--- Data for block "RED2" ---
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	m_InputDependencies = [  ]
+	m_AdditionalInputDependencies = [  ]
+	m_ArgumentDependencies = [  ]
+	m_SpecialDependencies = [  ]
+	m_SpecialInputDependencies = [  ]
+	m_AdditionalRelatedFiles = [  ]
+	m_ChildResourceList = [  ]
+	m_WeakReferenceList = [  ]
+	m_SearchableUserData = null
+	m_SubassetReferences = null
+	m_SubassetDefinitions = null
+}
+

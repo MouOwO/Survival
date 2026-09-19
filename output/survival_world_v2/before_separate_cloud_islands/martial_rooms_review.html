@@ -1,0 +1,12 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>月下荒寺 · 挑战房间</title>
+<style>body{margin:0;background:#121719;color:#e4e2dc;font:17px/1.75 system-ui,sans-serif}main{max-width:1360px;margin:auto;padding:30px 24px}h1{font-size:32px;font-weight:600}p,figcaption{color:#b7bfbc}img{width:100%;display:block;border-radius:5px}figure{margin:30px 0}a{color:#d6b894}button{background:#303a3a;color:#eee;border:1px solid #64716e;border-radius:5px;padding:9px 16px;cursor:pointer;margin-right:12px}figcaption{padding:10px 0}.links a{margin-right:22px}</style>
+<main><h1>月下荒寺 · 挑战房间</h1><p>收起鲜艳树冠，让枯木、残墙、冷灰旧石与少量灯火构成更肃杀的战斗庭院。雪地、焦岩和荒土仍有各自的环境特征。</p>
+<p class="links"><a href="#training">练功房</a><a href="#boss">Boss 房</a><a href="#challenge">挑战场</a></p>
+<figure id="training"><figcaption>练功房对比 · 相同镜头</figcaption><p><button onclick="compare('training','upper_training.png',false)">调整后</button><button onclick="compare('training','upper_training.png',true)">调整前</button></p><img id="training-img" src="upper_training.png" alt="练功房前后对比"></figure>
+<figure><a href="training_close.png"><img src="training_close.png" alt="练功房近景"></a><figcaption>练功房近景 · 荒土、灰绿苔草和零散枯木，中心留空。</figcaption></figure>
+<figure id="boss"><figcaption>十诫 Boss 房对比 · 相同镜头</figcaption><p><button onclick="compare('boss','boss_islands.png',false)">调整后</button><button onclick="compare('boss','boss_islands.png',true)">调整前</button></p><img id="boss-img" src="boss_islands.png" alt="十诫 Boss 房前后对比"></figure>
+<figure><a href="boss_close.png"><img src="boss_close.png" alt="转生 Boss 房近景"></a><figcaption>转生 Boss 房 · 旧石庭院与断墙，减少边缘装饰的拥挤感。</figcaption></figure>
+<figure><a href="volcanic_arena.png"><img src="volcanic_arena.png" alt="七宗罪挑战场"></a><figcaption>七宗罪挑战场 · 炭黑焦岩、低饱和余烬与枯木。</figcaption></figure>
+<figure id="challenge"><a href="original_challenge.png"><img src="original_challenge.png" alt="原创挑战预留场"></a><figcaption>原创挑战场 · 开阔的荒寺庭院。</figcaption></figure>
+<p><a href="verification.json">查看地图检查记录</a> · <a href="martial_rooms_notes.md">本轮修改说明</a></p></main>
+<script>const stamp='?v='+Date.now();for(const img of document.images)img.src+=stamp;function compare(id,file,before){document.getElementById(id+'-img').src=(before?'before_martial_rooms/':'')+file+stamp;}</script></html>

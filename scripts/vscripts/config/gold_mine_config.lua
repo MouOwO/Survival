@@ -15,12 +15,14 @@ for _, row in ipairs(levels.rows or {}) do
 end
 
 local fixed_visual = nil
+local visual_by_level = {}
 for _, row in ipairs(building_visuals.rows or {}) do
     if row.enabled ~= false
-        and row.building_id == "building_gold_mine"
-        and (fixed_visual == nil or tonumber(row.level) == 1) then
-        fixed_visual = row
-        if tonumber(row.level) == 1 then break end
+        and row.building_id == "building_gold_mine" then
+        visual_by_level[tonumber(row.level)] = row
+        if fixed_visual == nil or tonumber(row.level) == 1 then
+            fixed_visual = row
+        end
     end
 end
 assert(fixed_visual ~= nil, "building_visual_levels.csv must define gold mine visual")
@@ -133,10 +135,11 @@ function M.level_data(level)
     if not source then return nil end
     local result = {}
     for key, value in pairs(source) do result[key] = value end
+    local visual = visual_by_level[tonumber(level)] or fixed_visual
     for _, key in ipairs({
         "model_asset_id", "model_name", "model_scale", "model_yaw",
     }) do
-        if fixed_visual[key] ~= nil then result[key] = fixed_visual[key] end
+        if visual[key] ~= nil then result[key] = visual[key] end
     end
     result.armor = armor_balance.from_war3(
         source.war3_armor or source.armor

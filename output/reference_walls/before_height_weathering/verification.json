@@ -1,0 +1,261 @@
+{
+  "status": "PASS",
+  "models": 10,
+  "playable_levels": 30,
+  "footprint": [
+    4,
+    4
+  ],
+  "world_footprint": 256,
+  "max_mesh_width": 248,
+  "model_scale": 1,
+  "existing_yaw_preserved": true,
+  "economy_unchanged": true,
+  "normal_map": true,
+  "collision_models": 10,
+  "flow_models": 10,
+  "triangles": 214852,
+  "workshop_verified": false,
+  "assets": [
+    {
+      "name": "wall_lv01",
+      "dimensions": [
+        247.74157,
+        248.0,
+        164.388607272234
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 10376,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv02",
+      "dimensions": [
+        247.74157,
+        248.0,
+        164.388607272234
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 15836,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv03",
+      "dimensions": [
+        247.99998499999998,
+        247.99997,
+        163.231957221066
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 15932,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv04",
+      "dimensions": [
+        247.99998499999998,
+        247.99997,
+        168.292707107438
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 22668,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv05",
+      "dimensions": [
+        247.99998499999998,
+        247.99997,
+        168.292707107438
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 22668,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv06",
+      "dimensions": [
+        247.99998499999998,
+        247.99997,
+        171.80154689584248
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 24956,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv07",
+      "dimensions": [
+        248.000025,
+        248.00002,
+        173.123086948887
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 25052,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv08",
+      "dimensions": [
+        247.99998499999998,
+        247.99997,
+        187.6470568958425
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 25180,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv09",
+      "dimensions": [
+        247.99998499999998,
+        247.99997,
+        189.287896843601
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 25500,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    },
+    {
+      "name": "wall_lv10",
+      "dimensions": [
+        247.99998499999998,
+        247.99997,
+        201.61833689584248
+      ],
+      "physics_bounds": [
+        [
+          -122.00004,
+          -122.00004,
+          -3.1026048e-05
+        ],
+        [
+          122.00004,
+          122.00007,
+          118.00003
+        ]
+      ],
+      "triangles": 26684,
+      "texture_dependencies": 3,
+      "selection_sets": 3,
+      "flow_groups": 49
+    }
+  ]
+}

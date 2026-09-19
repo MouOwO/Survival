@@ -1,0 +1,134 @@
+[
+  {
+    "name": "c01_cloud_sea",
+    "mips": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "c02_cliff_cloud",
+    "mips": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "c03_cloud_band",
+    "mips": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "c04_thin_mist",
+    "mips": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "c01_cloud_sea_b",
+    "mips": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ],
+    "pass": true
+  },
+  {
+    "name": "c02_cliff_cloud_b",
+    "mips": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ],
+    "pass": true
+  }
+]

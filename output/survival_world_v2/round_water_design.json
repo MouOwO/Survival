@@ -1,0 +1,13 @@
+{
+  "source": "Valve materials/blends/water_ocean_00",
+  "shader": "multiblend.vfx",
+  "features": [
+    "F_SCROLL_WAVES on ocean only",
+    "animated normals",
+    "shore-weighted foam",
+    "480-unit shallow depth color transition"
+  ],
+  "physicalWaves": false,
+  "centralShallows": "island_shallow_blend.vmat at 400; walkable floor 396; teal depth-color layer with constant reveal mask",
+  "oceanSurface": 400
+}

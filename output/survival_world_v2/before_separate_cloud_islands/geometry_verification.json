@@ -1,0 +1,14 @@
+{
+  "islandExtent": [
+    9472,
+    9472
+  ],
+  "crossExtent": [
+    4608,
+    4608
+  ],
+  "runtimeSamples": 148,
+  "shallowSamples": 66,
+  "groundRoots": 71,
+  "result": "PASS"
+}

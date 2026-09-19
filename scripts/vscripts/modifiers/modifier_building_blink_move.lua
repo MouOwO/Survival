@@ -1,4 +1,4 @@
-﻿LinkLuaModifier("modifier_building_blink_move", "modifiers/modifier_building_blink_move", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_building_blink_move", "modifiers/modifier_building_blink_move", LUA_MODIFIER_MOTION_NONE)
 modifier_building_blink_move = class({})
 local M = modifier_building_blink_move
 _G.modifier_building_blink_move = M

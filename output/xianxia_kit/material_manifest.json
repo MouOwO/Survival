@@ -1,0 +1,447 @@
+[
+  {
+    "name": "xx_stone",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.013693797629449916,
+        "interiorMean": 0.010643842924079636,
+        "file": "xx_stone_color.png"
+      },
+      "height": {
+        "wrapMean": 0.01973899043438242,
+        "interiorMean": 0.012525214335979487,
+        "file": "xx_stone_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.05928243001514738,
+        "interiorMean": 0.046425670230492926,
+        "file": "xx_stone_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 9.938487666642218e-05,
+        "interiorMean": 8.833999925110891e-05,
+        "file": "xx_stone_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 2.928676439559137e-05,
+        "interiorMean": 2.493445797727038e-05,
+        "file": "xx_stone_reflectance.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_rock",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.021780887443709946,
+        "interiorMean": 0.021133012446790153,
+        "file": "xx_rock_color.png"
+      },
+      "height": {
+        "wrapMean": 0.010824345840778026,
+        "interiorMean": 0.010371228903846242,
+        "file": "xx_rock_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.09788339044329637,
+        "interiorMean": 0.09445905355732667,
+        "file": "xx_rock_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_rock_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_rock_reflectance.png"
+      },
+      "mask": {
+        "wrapMean": 0.004103038189279154,
+        "interiorMean": 0.005016236785812646,
+        "file": "xx_rock_mask.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_roof",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.00014355593296260934,
+        "interiorMean": 0.00012760222114049067,
+        "file": "xx_roof_color.png"
+      },
+      "height": {
+        "wrapMean": 0.0005838600602334554,
+        "interiorMean": 0.00038908973463469576,
+        "file": "xx_roof_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.00023225523978173996,
+        "interiorMean": 0.00021680115773736082,
+        "file": "xx_roof_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.000397539506665688,
+        "interiorMean": 0.00035335999700443564,
+        "file": "xx_roof_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.0004447358599295205,
+        "interiorMean": 0.0003777497278160598,
+        "file": "xx_roof_reflectance.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_wood",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.0018774087356594187,
+        "interiorMean": 0.000788404292424203,
+        "file": "xx_wood_color.png"
+      },
+      "height": {
+        "wrapMean": 0.022214924305053892,
+        "interiorMean": 0.00925699829510165,
+        "file": "xx_wood_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.006361824014208464,
+        "interiorMean": 0.00414174262369416,
+        "file": "xx_wood_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_wood_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_wood_reflectance.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_grass",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.00018772698925879674,
+        "interiorMean": 0.0001668644430298724,
+        "file": "xx_grass_color.png"
+      },
+      "height": {
+        "wrapMean": 0.0177240289105712,
+        "interiorMean": 0.016865176982424884,
+        "file": "xx_grass_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.04041920192465518,
+        "interiorMean": 0.03890642053714456,
+        "file": "xx_grass_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_grass_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_grass_reflectance.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_earth",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.00016012007907367958,
+        "interiorMean": 0.0001423255543490088,
+        "file": "xx_earth_color.png"
+      },
+      "height": {
+        "wrapMean": 0.000543265198024425,
+        "interiorMean": 0.00038035483701534306,
+        "file": "xx_earth_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.0005922689226910848,
+        "interiorMean": 0.000565263392319362,
+        "file": "xx_earth_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_earth_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_earth_reflectance.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_ground_blend",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.0003625612203002758,
+        "interiorMean": 0.0003369397816701355,
+        "file": "xx_ground_blend_color.png"
+      },
+      "height": {
+        "wrapMean": 0.007619842858435981,
+        "interiorMean": 0.0036597091225671202,
+        "file": "xx_ground_blend_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.01811438186511188,
+        "interiorMean": 0.008482812609151229,
+        "file": "xx_ground_blend_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_ground_blend_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_ground_blend_reflectance.png"
+      },
+      "mask": {
+        "wrapMean": 0.0035888299213114624,
+        "interiorMean": 0.0035506966858535297,
+        "file": "xx_ground_blend_mask.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_bronze",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.00019324837129581997,
+        "interiorMean": 0.00017177222076604511,
+        "file": "xx_bronze_color.png"
+      },
+      "height": {
+        "wrapMean": 0.00038924004015563593,
+        "interiorMean": 0.00025939315642313054,
+        "file": "xx_bronze_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.0002064054950440138,
+        "interiorMean": 0.00019266720003918714,
+        "file": "xx_bronze_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.00033128292222140435,
+        "interiorMean": 0.00029446666417036303,
+        "file": "xx_bronze_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.00032761704609915584,
+        "interiorMean": 0.00027901264417525104,
+        "file": "xx_bronze_reflectance.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_array",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_array_color.png"
+      },
+      "height": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0017736404231828678,
+        "file": "xx_array_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.006178724998368898,
+        "file": "xx_array_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_array_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_array_reflectance.png"
+      },
+      "mask": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.009853557906571489,
+        "file": "xx_array_mask.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  },
+  {
+    "name": "xx_water",
+    "size": [
+      1024,
+      1024
+    ],
+    "maps": {
+      "color": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_water_color.png"
+      },
+      "height": {
+        "wrapMean": 0.0017852613392867018,
+        "interiorMean": 0.0015361674359402695,
+        "file": "xx_water_height.png"
+      },
+      "normal": {
+        "wrapMean": 0.0004940967677059199,
+        "interiorMean": 0.0004232003719131302,
+        "file": "xx_water_normal.png"
+      },
+      "roughness": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_water_roughness.png"
+      },
+      "reflectance": {
+        "wrapMean": 0.0,
+        "interiorMean": 0.0,
+        "file": "xx_water_reflectance.png"
+      }
+    },
+    "normalConvention": "tangent +Y (OpenGL), generated from periodic height, not color",
+    "colorSpace": {
+      "color": "sRGB",
+      "normal": "Non-Color",
+      "height": "Non-Color",
+      "roughness": "Non-Color",
+      "reflectance": "Non-Color",
+      "mask": "Non-Color"
+    }
+  }
+]

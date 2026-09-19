@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-16",
+  "status": "PASS_VISUAL_FIXTURE",
+  "map": "template_map",
+  "model": "main_city_lv01",
+  "scope": "Three native material-group stages on independent props over normal building geometry, plus changing light bands in two frames",
+  "stages": [0, 24, 48],
+  "observed": {
+    "full_shell_has_white_cyan_colored_bands_and_surface_shading": true,
+    "middle_stage_roof_visible_lower_walls_still_covered": true,
+    "last_stage_normal_model_visible": true,
+    "world_origin_matches_and_yaw_zero": true
+  },
+  "screenshots": ["flow_unpaused_a.png", "flow_unpaused_b.png"],
+  "motion_comparison": {
+    "flow_rectangle_xyxy": [535, 435, 675, 560],
+    "normal_rectangle_xyxy": [930, 435, 1070, 560],
+    "flow_mean_absolute_rgb_difference": 19.2414476190476,
+    "normal_mean_absolute_rgb_difference": 2.68438095238095,
+    "note": "Second frame includes the postgame UI; both sampled building regions remain unobstructed. This supports visual motion, not a frame-time benchmark."
+  },
+  "cleanup_console": "FLOW_CLEANUP 0 0",
+  "camera_released": true,
+  "limitations": [
+    "All 24 models were audited offline; only level-one main city was inspected live.",
+    "Full 1.5-second scheduler progression and upgrade/cancel/death cleanup are covered by Lua regression tests, not claimed as a successful live end-to-end run.",
+    "An additional live timed probe was attempted after the test match ended; its results were not used."
+  ]
+}

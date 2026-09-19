@@ -1,0 +1,63 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf45:version{73c3d623-a141-4df2-b548-41dd786e6300} -->
+{
+	_class = "CParticleSystemDefinition"
+	m_bShouldHitboxesFallbackToRenderBounds = false
+	m_nMaxParticles = 1
+	m_flConstantLifespan = 10.0
+	m_Operators = 
+	[
+		{
+			_class = "C_OP_BasicMovement"
+			m_Gravity = [ 0.0, 0.0, 200.0 ]
+		},
+		{
+			_class = "C_OP_SetControlPointsToParticle"
+			m_nFirstControlPoint = 4
+			m_bSetOrientation = true
+		},
+		{
+			_class = "C_OP_Decay"
+		},
+	]
+	m_Initializers = 
+	[
+		{
+			_class = "C_INIT_CreateWithinSphere"
+		},
+	]
+	m_Emitters = 
+	[
+		{
+			_class = "C_OP_InstantaneousEmitter"
+			m_nParticlesToEmit = 
+			{
+				m_nType = "PF_TYPE_LITERAL"
+				m_flLiteralValue = 1.0
+			}
+		},
+	]
+	m_Children = 
+	[
+		{
+			m_ChildRef = resource:"particles/econ/events/nexon_hero_compendium_2014/teleport_end_volume_core_nexon_hero_cp_2014.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/events/nexon_hero_compendium_2014/teleport_end_volume_magic_nexon_hero_cp_2014.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/events/nexon_hero_compendium_2014/teleport_end_volume_magic_small_nexon_hero_cp_2014.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/events/nexon_hero_compendium_2014/teleport_end_plasma_nexon_hero_cp_2014.vpcf"
+		},
+	]
+	m_PreEmissionOperators = 
+	[
+		{
+			_class = "C_OP_SetSingleControlPointPosition"
+			m_nCP1 = 3
+			m_vecCP1Pos = [ 0.0, 0.0, 0.0 ]
+		},
+	]
+	m_nBehaviorVersion = 5
+}

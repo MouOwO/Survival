@@ -1,0 +1,258 @@
+{
+  "status": "PASS",
+  "models": 41,
+  "material_sets": 25,
+  "instances": 1689,
+  "custom_instance_triangles": 1490236,
+  "compiled_assets": [
+    {
+      "name": "m01_player_platform",
+      "bounds_error": 0.0001999999999497959,
+      "collision_hulls": 0,
+      "triangles": 7568
+    },
+    {
+      "name": "m02_arm_left",
+      "bounds_error": 0.000515693359375291,
+      "collision_hulls": 0,
+      "triangles": 2624
+    },
+    {
+      "name": "m02_arm_right",
+      "bounds_error": 0.0004746582031316393,
+      "collision_hulls": 0,
+      "triangles": 2624
+    },
+    {
+      "name": "m03_stair_treads",
+      "bounds_error": 6.103515625e-05,
+      "collision_hulls": 0,
+      "triangles": 4020
+    },
+    {
+      "name": "m03_stair_cheek_left",
+      "bounds_error": 6.08498535186186e-05,
+      "collision_hulls": 1,
+      "triangles": 2040
+    },
+    {
+      "name": "m03_stair_cheek_right",
+      "bounds_error": 6.08498535186186e-05,
+      "collision_hulls": 1,
+      "triangles": 2040
+    },
+    {
+      "name": "m04_inner_bank_256",
+      "bounds_error": 3.000000000952241e-05,
+      "collision_hulls": 1,
+      "triangles": 1572
+    },
+    {
+      "name": "m05_bank_concave",
+      "bounds_error": 2.99999999811007e-05,
+      "collision_hulls": 0,
+      "triangles": 1704
+    },
+    {
+      "name": "m05_bank_convex",
+      "bounds_error": 2.99999999811007e-05,
+      "collision_hulls": 0,
+      "triangles": 1704
+    },
+    {
+      "name": "m06_outer_corner",
+      "bounds_error": 3.265624999926331e-05,
+      "collision_hulls": 0,
+      "triangles": 196
+    },
+    {
+      "name": "m07_paving_clean",
+      "bounds_error": 1.52587890625e-05,
+      "collision_hulls": 0,
+      "triangles": 288
+    },
+    {
+      "name": "m07_paving_worn",
+      "bounds_error": 1.52587890625e-05,
+      "collision_hulls": 0,
+      "triangles": 324
+    },
+    {
+      "name": "m07_paving_moss",
+      "bounds_error": 2.593261717720452e-05,
+      "collision_hulls": 0,
+      "triangles": 2088
+    },
+    {
+      "name": "m08_coping_straight",
+      "bounds_error": 9.000000000369823e-06,
+      "collision_hulls": 0,
+      "triangles": 240
+    },
+    {
+      "name": "m08_coping_corner",
+      "bounds_error": 9.000000000369823e-06,
+      "collision_hulls": 0,
+      "triangles": 240
+    },
+    {
+      "name": "m08_coping_end",
+      "bounds_error": 2.000000000279556e-06,
+      "collision_hulls": 0,
+      "triangles": 60
+    },
+    {
+      "name": "m09_cliff_straight",
+      "bounds_error": 1.6772460924130428e-05,
+      "collision_hulls": 0,
+      "triangles": 816
+    },
+    {
+      "name": "m09_cliff_bulge",
+      "bounds_error": 3.376464843540816e-05,
+      "collision_hulls": 0,
+      "triangles": 816
+    },
+    {
+      "name": "m09_cliff_recess",
+      "bounds_error": 3.000000000952241e-05,
+      "collision_hulls": 0,
+      "triangles": 816
+    },
+    {
+      "name": "m10_transition_dry",
+      "bounds_error": 1.5886230471551244e-05,
+      "collision_hulls": 0,
+      "triangles": 1976
+    },
+    {
+      "name": "m10_transition_wet",
+      "bounds_error": 2.2189941404349156e-05,
+      "collision_hulls": 0,
+      "triangles": 1976
+    },
+    {
+      "name": "m11_shore_foam",
+      "bounds_error": 1.489532470699828e-05,
+      "collision_hulls": 0,
+      "triangles": 468
+    },
+    {
+      "name": "m12_water_tile",
+      "bounds_error": 6.103515625e-05,
+      "collision_hulls": 0,
+      "triangles": 2
+    },
+    {
+      "name": "m12_vortex_surface",
+      "bounds_error": 9.999999997489795e-05,
+      "collision_hulls": 0,
+      "triangles": 4992
+    },
+    {
+      "name": "m13_lowwall_256",
+      "bounds_error": 1.0000000003174137e-05,
+      "collision_hulls": 1,
+      "triangles": 732
+    },
+    {
+      "name": "m13_short_post",
+      "bounds_error": 2.0000000006348273e-05,
+      "collision_hulls": 1,
+      "triangles": 360
+    },
+    {
+      "name": "m14_banner_post",
+      "bounds_error": 2.99999999811007e-05,
+      "collision_hulls": 0,
+      "triangles": 262
+    },
+    {
+      "name": "m14_flag_teal",
+      "bounds_error": 2.7792968751327862e-05,
+      "collision_hulls": 0,
+      "triangles": 336
+    },
+    {
+      "name": "m14_flag_blue_cloth",
+      "bounds_error": 2.7792968751327862e-05,
+      "collision_hulls": 0,
+      "triangles": 336
+    },
+    {
+      "name": "m14_flag_ochre_cloth",
+      "bounds_error": 2.7792968751327862e-05,
+      "collision_hulls": 0,
+      "triangles": 336
+    },
+    {
+      "name": "m14_flag_rose_cloth",
+      "bounds_error": 2.7792968751327862e-05,
+      "collision_hulls": 0,
+      "triangles": 336
+    },
+    {
+      "name": "m15_rock_1",
+      "bounds_error": 7.917480473906835e-06,
+      "collision_hulls": 0,
+      "triangles": 52
+    },
+    {
+      "name": "m15_rock_2",
+      "bounds_error": 1.4077148449587185e-05,
+      "collision_hulls": 0,
+      "triangles": 52
+    },
+    {
+      "name": "m15_rock_3",
+      "bounds_error": 4.985351552022621e-06,
+      "collision_hulls": 0,
+      "triangles": 52
+    },
+    {
+      "name": "m16_cherry_1",
+      "bounds_error": 3.720703125509317e-05,
+      "collision_hulls": 0,
+      "triangles": 6960
+    },
+    {
+      "name": "m16_cherry_2",
+      "bounds_error": 3.389160156075377e-05,
+      "collision_hulls": 0,
+      "triangles": 6960
+    },
+    {
+      "name": "m17_grass",
+      "bounds_error": 7.525634764249389e-06,
+      "collision_hulls": 0,
+      "triangles": 144
+    },
+    {
+      "name": "m17_fern",
+      "bounds_error": 4.259521482197215e-06,
+      "collision_hulls": 0,
+      "triangles": 1188
+    },
+    {
+      "name": "m17_shrub",
+      "bounds_error": 1.054443359294055e-05,
+      "collision_hulls": 0,
+      "triangles": 528
+    },
+    {
+      "name": "m17_flowers",
+      "bounds_error": 7.88867187395681e-06,
+      "collision_hulls": 0,
+      "triangles": 792
+    },
+    {
+      "name": "m17_moss",
+      "bounds_error": 1.1898437499269221e-05,
+      "collision_hulls": 0,
+      "triangles": 600
+    }
+  ],
+  "markers": 12,
+  "main_map_modified": false,
+  "runtime_report": "runtime_verification.json"
+}

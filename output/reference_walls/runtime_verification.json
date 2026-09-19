@@ -1,0 +1,76 @@
+{
+  "status": "PASS_WITH_SCOPED_COVERAGE",
+  "revision": 2,
+  "date": "2026-09-16",
+  "map": "template_map",
+  "models_rendered": 10,
+  "fixture_batches": [
+    [
+      1,
+      2,
+      3
+    ],
+    [
+      4,
+      5,
+      6
+    ],
+    [
+      7,
+      8,
+      9
+    ],
+    [
+      10
+    ]
+  ],
+  "height_multiplier": 2.5,
+  "model_scale": 1,
+  "preserved_yaw": 180,
+  "grid_dimensions": [
+    4,
+    4
+  ],
+  "grid_world_width": 256,
+  "live_wall_lv01_physics_top": 295.000061,
+  "screenshots": [
+    "runtime_v2_first3.png",
+    "runtime_v2_middle_verified.png",
+    "runtime_v2_high_verified.png",
+    "runtime_v2_final_verified.png"
+  ],
+  "visual_observations": [
+    "Longitudinal timber grain, cross-beam grain and end-grain visible.",
+    "Weathered masonry joints and foot grime visible in game.",
+    "Metal, colored stone and crystal stages render with distinct material finishes.",
+    "Raised wall silhouettes remain within the original 4x4 ground grid."
+  ],
+  "limitations": [
+    "First batch captured in preparation phase; later batches include a postgame banner obscuring part of the upper silhouette.",
+    "No claim of manual selection / upgrade testing for all 30 levels.",
+    "Full construction reveal timing was not tested per model; matching shell geometry and lifecycle covered by asset audit and regression."
+  ],
+  "cleanup": {
+    "temporary_wall_props_remaining": 0,
+    "camera_released": true,
+    "console_marker": "WALL_V2_CLEANUP 0"
+  },
+  "regression_tests": [
+    {
+      "test": "test_wall_visual_config",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_grid_alignment",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_construction_visual_service",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_white_shell",
+      "status": "PASS"
+    }
+  ]
+}

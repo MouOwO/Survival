@@ -1,6 +1,5 @@
-﻿local event_bus = require("core/event_bus")
+local event_bus = require("core/event_bus")
 local events = require("core/events")
-local grid_config = require("config/grid_placement_config")
 local building_system = {}
 
 function building_system.bind(get_state, public_state)
@@ -56,20 +55,7 @@ function building_system.move(unit, position)
     unit:AddNewModifier(unit, nil, "modifier_building_blink_move", {
         x = position.x, y = position.y, z = position.z,
     })
-    local footprint = state.definition.footprint or { x = 2, y = 2 }
-    local subdivision = math.max(
-        1,
-        tonumber(grid_config.footprint_subdivision) or 1
-    )
-    local footprint_x = math.max(2, tonumber(footprint.x) or 2)
-        * subdivision
-    local footprint_y = math.max(2, tonumber(footprint.y) or 2)
-        * subdivision
-    local cell_size = tonumber(grid_config.cell_size) or 64
-    state.grid_x = math.floor(position.x / cell_size + 0.5)
-        - math.floor(footprint_x / 2)
-    state.grid_y = math.floor(position.y / cell_size + 0.5)
-        - math.floor(footprint_y / 2)
+    state.grid_x, state.grid_y = grid.grid_x, grid.grid_y
     unit.survival_grid_x = state.grid_x
     unit.survival_grid_y = state.grid_y
     event_bus.request(events.GRID_OCCUPY_REQUEST, {

@@ -1,0 +1,57 @@
+{
+  "palettes": [
+    "forest",
+    "snow",
+    "thaw",
+    "volcanic",
+    "corrupt"
+  ],
+  "textures": [
+    "cliff_wall002_color",
+    "cliff_wall001_normal",
+    "grass_bumpy_00_color",
+    "grass_bumpy_00_71a7bd20_blend",
+    "grass_bumpy_00_normal",
+    "dirt_path008_color",
+    "sand_cracked001_1017aede_blend",
+    "sand_path001_normal",
+    "radiant_stone_ti10_01_color",
+    "radiant_stone_ti10_01_af3aacc6_blend",
+    "radiant_stone_ti10_01_normal",
+    "snow_directional_00_color",
+    "snow_directional_00_3a703903_blend",
+    "stone_path001_angled_color",
+    "stone_path001_angled_150d1d7b_blend",
+    "stone_path001_angled_normal",
+    "stone_path007_color",
+    "stone_path006_542effc_blend",
+    "stone001_normal",
+    "basalt_00_color",
+    "basalt_00_ec01ebeb_blend",
+    "lava_02_color",
+    "lava_02_a9d87084_blend",
+    "lava_01_color",
+    "lava_01_34ef93be_blend",
+    "water_river_oil_normal",
+    "water_noise_000",
+    "dota_flowmap_flow"
+  ],
+  "templates": [
+    {
+      "template": "radiant_basic",
+      "disabledLilyEntities": 7
+    },
+    {
+      "template": "dire_basic",
+      "disabledLilyEntities": 9
+    },
+    {
+      "template": "radiant_snow_basic",
+      "disabledLilyEntities": 5
+    },
+    {
+      "template": "radiant_autumn_basic",
+      "disabledLilyEntities": 7
+    }
+  ]
+}

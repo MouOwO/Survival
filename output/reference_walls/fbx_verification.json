@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "models": [
+    {
+      "name": "wall_lv01",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv02",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv03",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv04",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv05",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv06",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv07",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv08",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv09",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    },
+    {
+      "name": "wall_lv10",
+      "root": "root",
+      "atlas_uv_layers": 1,
+      "height_multiplier": 2.5,
+      "flow_matches_geometry": true,
+      "linear_height_uv": true
+    }
+  ]
+}

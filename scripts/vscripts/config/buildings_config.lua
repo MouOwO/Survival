@@ -56,9 +56,14 @@ local function apply_construction(definition, source_id)
         or tonumber(definition.population_cost)
         or 0
     definition.requires_building_id = builder_stage.requires_building_id
+    definition.footprint = {
+        x = tonumber(configured.footprint_x) or (definition.footprint or {}).x or 2,
+        y = tonumber(configured.footprint_y) or (definition.footprint or {}).y or 2,
+    }
     definition.build_time = tonumber(row.build_time) or 3
     definition.build_particle = row.build_particle
         or "particles/items_fx/repair_kit.vpcf"
+    definition.build_complete_particle = row.build_complete_particle
     definition.build_start_particle = row.build_start_particle
     definition.build_loop_particle = row.build_loop_particle
         or definition.build_particle
@@ -147,11 +152,15 @@ M.wall = {
     quick_upgrade_target_level = 25, -- CSV level 25 is 城墙_9_1.
 }
 
+local city_levels = level_rows("building_main_city")
 M.main_city = {
     id = "main_city", display_name = configured_name("main_city", "主城"),
     unit_name = configured_unit_name("main_city", "building_main_city"),
     build_cost = build_cost("building_main_city", 100, 50),
-    footprint = { x = 2, y = 2 }, hull_radius = 80,
+    -- Navigation stays within the requested four cells. ModelDoc independently
+    -- enlarges the rendered mesh, selection boxes and model physics by 2x.
+    footprint = { x = 2, y = 2 },
+    hull_radius = 48 * (tonumber((city_levels[1] or {}).model_scale) or 1),
     max_count = 1, show_health_bar = false, selectable = true,
     abilities = {
         "ability_upgrade_city",
@@ -159,7 +168,7 @@ M.main_city = {
         "ability_train_repairer",
         "ability_train_advanced_repairer",
     },
-    levels = level_rows("building_main_city"),
+    levels = city_levels,
 }
 
 local farm_levels = level_rows("building_farm")
@@ -168,8 +177,9 @@ farm_levels[1].health = farm_levels[1].health or 2500
 farm_levels[1].armor = farm_levels[1].armor or dota_armor(5)
 local farm_visual = (building_visual_by_id.building_farm or {})[1]
 if farm_visual then
-    for _, level_data in pairs(farm_levels) do
-        for key, value in pairs(farm_visual) do
+    for level, level_data in pairs(farm_levels) do
+        local visual = (building_visual_by_id.building_farm or {})[level] or farm_visual
+        for key, value in pairs(visual) do
             if key == "model_asset_id"
                 or key == "model_name"
                 or key == "model_scale"

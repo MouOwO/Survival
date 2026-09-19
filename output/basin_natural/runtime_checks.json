@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-09-15T11:26:32.025Z",
+  "map": "survival_basin_natural",
+  "groundChecks": [
+    "09/15 19:25:19 [VScript] [NATURAL_PATH]\tVector 00000000014C5D00 [1800.000000 0.000000 512.000000]\t511.61401367188\ttrue\ttrue",
+    "09/15 19:25:19 [VScript] [NATURAL_PATH]\tVector 00000000014C5D48 [3000.000000 0.000000 512.000000]\t512.34716796875\ttrue\ttrue",
+    "09/15 19:25:19 [VScript] [NATURAL_PATH]\tVector 00000000014C5D90 [4000.000000 -400.000000 512.000000]\t511.5146484375\ttrue\ttrue",
+    "09/15 19:25:19 [VScript] [NATURAL_PATH]\tVector 00000000014C5DD8 [4400.000000 650.000000 498.000000]\t485.21655273438\ttrue\ttrue"
+  ],
+  "allSamplePathsPass": true
+}

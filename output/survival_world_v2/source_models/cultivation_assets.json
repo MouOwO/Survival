@@ -1,0 +1,62 @@
+[
+  {
+    "name": "cultivation_pavilion",
+    "bounds": [
+      [
+        -247.11126708984375,
+        -247.11126708984375,
+        0.0
+      ],
+      [
+        247.11126708984375,
+        247.11126708984375,
+        524.0
+      ]
+    ],
+    "triangles": 10228,
+    "materials": [
+      "cultivation_stone",
+      "cultivation_wood",
+      "cultivation_roof",
+      "cultivation_trim"
+    ]
+  },
+  {
+    "name": "cultivation_cloud_0",
+    "bounds": [
+      [
+        -684.0835571289062,
+        -442.01446533203125,
+        -246.53326416015625
+      ],
+      [
+        679.3103637695312,
+        410.4093322753906,
+        386.6230163574219
+      ]
+    ],
+    "triangles": 3756,
+    "materials": [
+      "cultivation_cloud"
+    ]
+  },
+  {
+    "name": "cultivation_cloud_1",
+    "bounds": [
+      [
+        -696.85107421875,
+        -417.5393371582031,
+        -247.53099060058594
+      ],
+      [
+        703.0161743164062,
+        426.15472412109375,
+        382.9415283203125
+      ]
+    ],
+    "triangles": 3972,
+    "materials": [
+      "cultivation_cloud"
+    ]
+  }
+]

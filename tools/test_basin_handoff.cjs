@@ -1,0 +1,12 @@
+const assert=require('assert'),fs=require('fs'),path=require('path');const{worldChildren,name,merge}=require('./basin_handoff_merge.cjs');
+const base=fs.readFileSync(path.resolve(__dirname,'../output/basin_review/survival_basin_review.vmap'),'utf8');
+const w=worldChildren(base),user=w.nodes.find(s=>name(s)==='USER_90_DETAILS');assert(user,'Editable detail group missing');
+const fixture='"CMapEntity"\n{ "id" "elementid" "11111111-2222-3333-4444-555555555555" "nodeID" "int" "30000" "children" "element_array" [] "origin" "vector3" "-3600 420 640" "test_payload" "string" "user grass {do not rewrite}" }';
+const changed=user.replace(/("children" "element_array"\s*\[)/,'$1'+fixture);
+const loose=fixture.replace('30000','30001').replace('11111111-2222-3333-4444-555555555555','22222222-2222-3333-4444-555555555555');
+const old=base.replace(user,changed);const wo=worldChildren(old);const edited=old.slice(0,wo.b)+','+loose+old.slice(wo.b);
+const result=merge(base,edited);assert(result.source.includes(changed));assert(result.source.includes(loose));assert.equal(result.preserved,2);
+const ids=[...result.source.matchAll(/"nodeID"\s+"int"\s+"(\d+)"/g)].map(m=>m[1]);assert.equal(new Set(ids).size,ids.length,'ID collision after update');
+assert.throws(()=>merge(base,edited.replace('USER_90_DETAILS','unrecognized_user_group')),/User detail group absent/);
+assert.equal(merge(base,null).source,base);
+console.log('PASS: user group contents, loose additions and IDs preserved; ambiguous ownership refuses overwrite.');

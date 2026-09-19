@@ -1,0 +1,72 @@
+{
+  "status": "PASS",
+  "shake_seconds": 1.0,
+  "defeat_delay": 1.45,
+  "cleanup_seconds": 2.6,
+  "particles": [
+    {
+      "name": "charge",
+      "compiled": true,
+      "finite": true
+    },
+    {
+      "name": "sparks",
+      "compiled": true,
+      "finite": true
+    },
+    {
+      "name": "flash",
+      "compiled": true,
+      "finite": true
+    },
+    {
+      "name": "ring",
+      "compiled": true,
+      "finite": true
+    },
+    {
+      "name": "shards",
+      "compiled": true,
+      "finite": true
+    },
+    {
+      "name": "dust",
+      "compiled": true,
+      "finite": true
+    }
+  ],
+  "fragment_physics": false,
+  "fragment_hitboxes": false,
+  "profiles": 10,
+  "tests": [
+    {
+      "name": "test_wall_destruction_visual",
+      "status": "PASS"
+    },
+    {
+      "name": "test_wall_destruction_integration",
+      "status": "PASS"
+    },
+    {
+      "name": "test_tower_rebuild_after_death",
+      "status": "PASS"
+    },
+    {
+      "name": "test_wall_visual_config",
+      "status": "PASS"
+    },
+    {
+      "name": "test_building_grid_alignment",
+      "status": "PASS"
+    },
+    {
+      "name": "test_building_construction_visual_service",
+      "status": "PASS"
+    },
+    {
+      "name": "test_building_white_shell",
+      "status": "PASS"
+    }
+  ],
+  "workshop_verified": false
+}

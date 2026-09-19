@@ -1,0 +1,18 @@
+{
+  "map": "survival_basin_natural",
+  "sourceMap": "survival_basin_native",
+  "sourceHash": "13684a11cd43f1a761176db64f8f67b08b8fc4fcca6c4b606fff17d49906c318",
+  "nativeFlatCells": 156,
+  "editableMeshTriangles": 19968,
+  "props": 38,
+  "originalMapUnchanged": true,
+  "center": [
+    3328,
+    0,
+    512
+  ],
+  "waterLevel": 498,
+  "waterMaxDepth": 76,
+  "material": "independently baked periodic slate + layered dampness",
+  "notes": "Native perimeter and west staircase retained; internal floor is a Shift+V paintable Hammer mesh."
+}

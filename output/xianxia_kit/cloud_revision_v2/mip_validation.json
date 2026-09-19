@@ -1,0 +1,86 @@
+[
+  {
+    "name": "c01_cloud_sea",
+    "levels": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ]
+  },
+  {
+    "name": "c02_cliff_cloud",
+    "levels": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ]
+  },
+  {
+    "name": "c03_cloud_band",
+    "levels": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ]
+  },
+  {
+    "name": "c04_thin_mist",
+    "levels": [
+      {
+        "size": 2048,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 1024,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 512,
+        "borderAlphaMax": 0
+      },
+      {
+        "size": 256,
+        "borderAlphaMax": 0
+      }
+    ]
+  }
+]

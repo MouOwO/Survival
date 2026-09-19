@@ -1,0 +1,14 @@
+{
+  "method": "four closed rounded natural terrain bodies",
+  "closed": true,
+  "tiers": [
+    {
+      "top": 640
+    },
+    {
+      "top": 768
+    }
+  ],
+  "copingThickness": 0,
+  "entrances": "main and side stairs excluded from terrain surface"
+}

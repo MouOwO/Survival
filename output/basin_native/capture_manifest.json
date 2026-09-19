@@ -1,0 +1,30 @@
+{
+  "builtAt": "2026-09-15T08:28:14.932Z",
+  "vpkSha256": "df42a2e13bbe7f8eb2819ed5673db001ac143527dc51004af5f1288ef91d919e",
+  "captures": [
+    {
+      "key": "overview",
+      "label": "整体鸟瞰",
+      "name": "basin_native_overview_0003.tga",
+      "time": 1789461059979.474
+    },
+    {
+      "key": "basin",
+      "label": "中央盆地与浅水出怪点",
+      "name": "basin_native_basin_0003.tga",
+      "time": 1789461067984.9194
+    },
+    {
+      "key": "stair",
+      "label": "官方阶梯与坡口",
+      "name": "basin_native_stair_0003.tga",
+      "time": 1789461091979.0251
+    },
+    {
+      "key": "pine",
+      "label": "高处场地与崖边",
+      "name": "basin_native_pine_0003.tga",
+      "time": 1789461083961.8682
+    }
+  ]
+}

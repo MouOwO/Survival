@@ -1,0 +1,28 @@
+	Resource Type: Particle [Version 1] [Header Version: 12]
+	File Size: 1861 bytes
+
+
+--- Resource External Refs: ---
+	Id:               Resource Name:                                  
+	905E688CEE197BB1  materials/xianxia_kit/c02_cliff_cloud.vtex      
+
+
+--- Resource Blocks: Count 3 ---
+	-- Block: RERL  Size: 71     bytes [Offset:     52]
+	-- Block: RED2  Size: 936    bytes [Offset:    128]
+	-- Block: DATA  Size: 789    bytes [Offset:   1072]
+
+
+--- Data for block "RERL" ---
+ResourceExtRefList_t
+{
+	Struct m_resourceRefInfoList[1] =
+	[
+		ResourceReferenceInfo_t
+		{
+			uint64 m_nId = 0x905E688CEE197BB1
+			CResourceString m_pResourceName = "materials/xianxia_kit/c02_cliff_cloud.vtex"
+		}
+	]
+}
+

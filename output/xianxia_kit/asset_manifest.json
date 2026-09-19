@@ -1,0 +1,633 @@
+[
+  {
+    "name": "t01_shore_straight",
+    "category": "terrain",
+    "triangles": 1766,
+    "bounds": [
+      [
+        -259.0702819824219,
+        -79.27945709228516,
+        -248.0
+      ],
+      [
+        257.0,
+        65.0,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "512-unit sockets; top z=0, underside -248. Corners use 128-unit shore depth.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t02_shore_outer",
+    "category": "terrain",
+    "triangles": 2506,
+    "bounds": [
+      [
+        -259.0702819824219,
+        -79.27945709228516,
+        -248.0
+      ],
+      [
+        275.98358154296875,
+        321.0,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "512-unit sockets; top z=0, underside -248. Corners use 128-unit shore depth.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t03_shore_inner",
+    "category": "terrain",
+    "triangles": 2506,
+    "bounds": [
+      [
+        -259.0702819824219,
+        -332.9373779296875,
+        -248.0
+      ],
+      [
+        257.0,
+        65.0,
+        0.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "512-unit sockets; top z=0, underside -248. Corners use 128-unit shore depth.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t04_stairs",
+    "category": "terrain",
+    "triangles": 536,
+    "bounds": [
+      [
+        -218.73211669921875,
+        -136.9065704345703,
+        -128.2502899169922
+      ],
+      [
+        218.73211669921875,
+        140.9065704345703,
+        22.250286102294922
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat"
+    ],
+    "notes": "Clear width 384; rise128/run256. Use invisible gameplay ramp collision in map.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t04_ramp",
+    "category": "terrain",
+    "triangles": 216,
+    "bounds": [
+      [
+        -218.73211669921875,
+        -136.9065704345703,
+        -128.2502899169922
+      ],
+      [
+        218.73211669921875,
+        140.9065704345703,
+        22.250286102294922
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat"
+    ],
+    "notes": "Clear width 384; rise128/run256. Use invisible gameplay ramp collision in map.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t05_transition_straight",
+    "category": "terrain",
+    "triangles": 1072,
+    "bounds": [
+      [
+        -128.0,
+        -128.0,
+        -10.0
+      ],
+      [
+        128.0,
+        128.0,
+        12.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_ground_blend.vmat"
+    ],
+    "notes": "Reusable geometry paving edge with irregular missing stones; base material blend supplied separately.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t05_transition_corner",
+    "category": "terrain",
+    "triangles": 908,
+    "bounds": [
+      [
+        -128.0,
+        -128.0,
+        -10.0
+      ],
+      [
+        128.0,
+        128.0,
+        12.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_ground_blend.vmat"
+    ],
+    "notes": "Reusable geometry paving edge with irregular missing stones; base material blend supplied separately.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t05_transition_broken",
+    "category": "terrain",
+    "triangles": 964,
+    "bounds": [
+      [
+        -128.0,
+        -128.0,
+        -10.0
+      ],
+      [
+        128.0,
+        128.0,
+        12.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_ground_blend.vmat"
+    ],
+    "notes": "Reusable geometry paving edge with irregular missing stones; base material blend supplied separately.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t06_rail_straight",
+    "category": "terrain",
+    "triangles": 2468,
+    "bounds": [
+      [
+        -150.0,
+        -22.0,
+        0.0
+      ],
+      [
+        150.0,
+        22.0,
+        87.5
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_roof.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "Low railing 88 units high; no auto collision. Leave stairs clear.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t06_rail_corner",
+    "category": "terrain",
+    "triangles": 2732,
+    "bounds": [
+      [
+        -150.0,
+        -22.0,
+        0.0
+      ],
+      [
+        150.0,
+        278.0,
+        87.5
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_roof.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "Low railing 88 units high; no auto collision. Leave stairs clear.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t06_rail_post",
+    "category": "terrain",
+    "triangles": 176,
+    "bounds": [
+      [
+        -22.0,
+        -22.0,
+        0.0
+      ],
+      [
+        22.0,
+        22.0,
+        87.5
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_roof.vmat"
+    ],
+    "notes": "Low railing 88 units high; no auto collision. Leave stairs clear.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "t07_array_dais",
+    "category": "terrain",
+    "triangles": 7036,
+    "bounds": [
+      [
+        -256.0,
+        -256.0,
+        -24.0
+      ],
+      [
+        256.0,
+        256.0,
+        3.945880651473999
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "512 diameter; flat engraved-style bronze inlay above stone disc.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "a01_pavilion",
+    "category": "architecture",
+    "triangles": 38034,
+    "bounds": [
+      [
+        -263.7687683105469,
+        -327.0,
+        0.0
+      ],
+      [
+        263.7687683105469,
+        264.7703857421875,
+        560.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_roof.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "Open four-column pavilion; structural tiled hip roof, brackets, finial and bells.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "a02_gateway",
+    "category": "architecture",
+    "triangles": 28188,
+    "bounds": [
+      [
+        -420.8016052246094,
+        -140.80160522460938,
+        0.0
+      ],
+      [
+        420.8016052246094,
+        140.80160522460938,
+        593.8016357421875
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_roof.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "Clear passage 582 wide; decoration has no collision and never occupies the opening.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "a03_stone_lamp",
+    "category": "architecture",
+    "triangles": 586,
+    "bounds": [
+      [
+        -58.0,
+        -58.0,
+        0.0
+      ],
+      [
+        58.0,
+        58.0,
+        218.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_stone.vmat",
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "Unlit prop by default. No flame particle or dynamic point light attached.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "a03_censer",
+    "category": "architecture",
+    "triangles": 4708,
+    "bounds": [
+      [
+        -74.38540649414062,
+        -49.74980545043945,
+        2.2146072387695312
+      ],
+      [
+        74.38540649414062,
+        49.74980545043945,
+        127.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_bronze.vmat"
+    ],
+    "notes": "Reusable bronze censer; smoke is optional and not baked into the mesh.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v01_pine_0",
+    "category": "vegetation",
+    "triangles": 21904,
+    "bounds": [
+      [
+        -215.9962615966797,
+        -222.3004913330078,
+        -5.900416374206543
+      ],
+      [
+        266.5978698730469,
+        243.4325408935547,
+        626.4395141601562
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_leaf.vmat"
+    ],
+    "notes": "Curved tapering trunk; individually modeled foliage; no opaque canopy balls.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v01_pine_1",
+    "category": "vegetation",
+    "triangles": 21904,
+    "bounds": [
+      [
+        -177.6283416748047,
+        -217.5505828857422,
+        -11.514946937561035
+      ],
+      [
+        305.46282958984375,
+        249.6713104248047,
+        468.99993896484375
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_leaf.vmat"
+    ],
+    "notes": "Curved tapering trunk; individually modeled foliage; no opaque canopy balls.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v02_peach_0",
+    "category": "vegetation",
+    "triangles": 26428,
+    "bounds": [
+      [
+        -194.1693878173828,
+        -208.15298461914062,
+        -7.099597454071045
+      ],
+      [
+        292.3305358886719,
+        233.23951721191406,
+        546.298828125
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_blossom.vmat"
+    ],
+    "notes": "Curved tapering trunk; individually modeled foliage; no opaque canopy balls.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v02_peach_1",
+    "category": "vegetation",
+    "triangles": 26428,
+    "bounds": [
+      [
+        -151.57090759277344,
+        -190.39810180664062,
+        -13.426182746887207
+      ],
+      [
+        292.1297912597656,
+        227.0902099609375,
+        419.94775390625
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat",
+      "materials/xianxia_kit/xx_wood.vmat",
+      "materials/xianxia_kit/xx_blossom.vmat"
+    ],
+    "notes": "Curved tapering trunk; individually modeled foliage; no opaque canopy balls.",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v03_rock_0",
+    "category": "vegetation",
+    "triangles": 140,
+    "bounds": [
+      [
+        -45.14324188232422,
+        -33.19613265991211,
+        0.0
+      ],
+      [
+        49.41555404663086,
+        32.44055938720703,
+        90.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat"
+    ],
+    "notes": "",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v03_rock_1",
+    "category": "vegetation",
+    "triangles": 140,
+    "bounds": [
+      [
+        -60.01582717895508,
+        -45.273983001708984,
+        0.0
+      ],
+      [
+        67.28516387939453,
+        40.839752197265625,
+        156.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat"
+    ],
+    "notes": "",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v03_rock_2",
+    "category": "vegetation",
+    "triangles": 140,
+    "bounds": [
+      [
+        -75.60189056396484,
+        -56.18110656738281,
+        0.0
+      ],
+      [
+        88.49108123779297,
+        52.94083786010742,
+        222.0
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_rock.vmat"
+    ],
+    "notes": "",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v03_fern",
+    "category": "vegetation",
+    "triangles": 560,
+    "bounds": [
+      [
+        -44.69318771362305,
+        -41.563987731933594,
+        0.0
+      ],
+      [
+        40.22427749633789,
+        44.10374450683594,
+        16.22884750366211
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_leaf.vmat"
+    ],
+    "notes": "",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v03_grass",
+    "category": "vegetation",
+    "triangles": 200,
+    "bounds": [
+      [
+        -59.15208053588867,
+        -70.43655395507812,
+        0.0
+      ],
+      [
+        53.1063117980957,
+        64.39095306396484,
+        12.270000457763672
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_leaf.vmat"
+    ],
+    "notes": "",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  },
+  {
+    "name": "v03_shrub",
+    "category": "vegetation",
+    "triangles": 200,
+    "bounds": [
+      [
+        -31.28382682800293,
+        -37.72554016113281,
+        0.0
+      ],
+      [
+        29.29189682006836,
+        33.971492767333984,
+        13.260000228881836
+      ]
+    ],
+    "materials": [
+      "materials/xianxia_kit/xx_leaf.vmat"
+    ],
+    "notes": "",
+    "pivot": "module origin, z=0 walkway for terrain; ground for props",
+    "units": "Source units (FBX ModelDoc import_scale .01)"
+  }
+]

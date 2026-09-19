@@ -14,33 +14,8 @@ local function number(value, fallback)
     return result
 end
 
-local function normalized_footprint(source)
-    source = source or {}
-    local minimum = config.minimum_footprint or { x = 2, y = 2 }
-    local subdivision = math.max(1, math.floor(number(
-        config.footprint_subdivision,
-        1
-    )))
-    return {
-        x = math.floor(math.max(
-            number(source.x, minimum.x),
-            number(minimum.x, 2)
-        )) * subdivision,
-        y = math.floor(math.max(
-            number(source.y, minimum.y),
-            number(minimum.y, 2)
-        )) * subdivision,
-    }
-end
-
-local function snap_anchor(position)
-    local size = number(config.cell_size, 128)
-    return math.floor(position.x / size + 0.5), math.floor(position.y / size + 0.5)
-end
-
-local function start_cell(anchor, footprint)
-    return anchor - math.floor(footprint / 2)
-end
+local geometry = require("core/building_grid_geometry")
+local normalized_footprint = geometry.footprint
 
 local function cell_center(grid_x, grid_y, z)
     local size = number(config.cell_size, 128)
@@ -55,13 +30,6 @@ local function ground_height(position)
     end)
     pcall(function() height = GetGroundHeight(position, nil) end)
     return height
-end
-
-local function anchor_world(anchor_x, anchor_y)
-    local size = number(config.cell_size, 128)
-    local point = Vector(anchor_x * size, anchor_y * size, 0)
-    point.z = ground_height(point)
-    return point
 end
 
 local function within_bounds(center)
@@ -316,10 +284,10 @@ local function can_place(payload)
     if not position then return { ok = false, error = "invalid_position", cells = {} } end
     reconcile_occupied()
     local footprint = normalized_footprint(payload.footprint)
-    local anchor_x, anchor_y = snap_anchor(position)
-    local grid_x = start_cell(anchor_x, footprint.x)
-    local grid_y = start_cell(anchor_y, footprint.y)
-    local world_position = anchor_world(anchor_x, anchor_y)
+    local anchor_x, world_x, grid_x = geometry.snap_axis(position.x, footprint.x)
+    local anchor_y, world_y, grid_y = geometry.snap_axis(position.y, footprint.y)
+    local world_position = Vector(world_x, world_y, 0)
+    world_position.z = ground_height(world_position)
     local size = number(config.cell_size, 128)
     local policy_ok, policy_error = region_service.validate_building_footprint(
         grid_x * size,

@@ -1,0 +1,452 @@
+{
+  "status": "PASS",
+  "revision": 4,
+  "models": 24,
+  "playable_levels": 44,
+  "triangles": 773546,
+  "scale": 1.0,
+  "model_source_scale": 2.0,
+  "footprint": [
+    2,
+    2
+  ],
+  "texture_resolution": 2048,
+  "economy_fields": "unchanged",
+  "city_hull_radius": 48.0,
+  "city_model_physics_radius": 96.0,
+  "workshop_verified": false,
+  "assets": [
+    {
+      "name": "main_city_lv01",
+      "physics_bounds": [
+        [
+          -95.99999,
+          -95.99999,
+          -2.4413925e-05
+        ],
+        [
+          95.99999,
+          96.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 31641,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "main_city_lv02",
+      "physics_bounds": [
+        [
+          -95.99999,
+          -95.99999,
+          -2.4413925e-05
+        ],
+        [
+          95.99999,
+          96.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 37165,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "main_city_lv03",
+      "physics_bounds": [
+        [
+          -95.99999,
+          -95.99999,
+          -2.4413925e-05
+        ],
+        [
+          95.99999,
+          96.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 41957,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "main_city_lv04",
+      "physics_bounds": [
+        [
+          -95.99999,
+          -95.99999,
+          -2.4413925e-05
+        ],
+        [
+          95.99999,
+          96.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 60861,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "main_city_lv05",
+      "physics_bounds": [
+        [
+          -95.99999,
+          -95.99999,
+          -2.4413925e-05
+        ],
+        [
+          95.99999,
+          96.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 40313,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "population_farm_lv01",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 27397,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "population_farm_lv02",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          102.99326
+        ]
+      ],
+      "triangles": 29438,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "population_farm_lv03",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          103.7291
+        ]
+      ],
+      "triangles": 38906,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "population_farm_lv04",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 51358,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "population_farm_lv05",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 54223,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv01",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.00001,
+          62.320023
+        ]
+      ],
+      "triangles": 8948,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv02",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          101.148926
+        ]
+      ],
+      "triangles": 21400,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv03",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 23284,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv04",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          96.15781
+        ]
+      ],
+      "triangles": 23432,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv05",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 25580,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv06",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 29836,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv07",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 20964,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv08",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 18588,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv09",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 30044,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "gold_mine_lv10",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 40676,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "research_lab",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 26937,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "advanced_research_lab",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 34810,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "hero_altar",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          104.00002
+        ]
+      ],
+      "triangles": 19188,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    },
+    {
+      "name": "challenge_arena",
+      "physics_bounds": [
+        [
+          -83.99999,
+          -83.99999,
+          -2.1362184e-05
+        ],
+        [
+          83.99999,
+          84.000015,
+          95.566826
+        ]
+      ],
+      "triangles": 36600,
+      "runtime_width": 236.0,
+      "status": "PASS"
+    }
+  ]
+}

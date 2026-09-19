@@ -1,0 +1,15 @@
+{
+  "state": "complete",
+  "completed": [
+    "morning_billows_a",
+    "morning_billows_b",
+    "morning_ribbon_a",
+    "morning_ribbon_b"
+  ],
+  "resolution": [
+    2048,
+    1024
+  ],
+  "renderer": "Cycles 128 samples, denoised",
+  "limitation": "Fixed morning lighting and a baked oblique view; use modest angle/scale changes."
+}

@@ -1,0 +1,58 @@
+{
+  "date": "2026-09-17",
+  "map": "main_island_review",
+  "status": "PASS",
+  "scope": "Independent art map: visuals, compiled assets, collision/navigation and actual builder traversal. Production map/gameplay not integrated.",
+  "compiled_map_sha256": "4B19630AADB5DAB53C0040B752AE81685E99307F393E262B1B94B41DF1202F5B",
+  "navigation": {
+    "quadrant_samples": 28,
+    "center_traversable": true,
+    "sea_and_side_boundary_samples_traversable": false,
+    "evidence": "MAIN_ISLAND_REVIEW_CLEAN\nMAIN_ISLAND_REVIEW_CLEAN\nMAIN_ISLAND_MAP\tmain_island_review\t10\nMAIN_ISLAND_MAP\tmain_island_review\t10\nMAIN_ISLAND_NAV\t0\t3456\ttrue\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t0\t2816\ttrue\tfalse\t639.400390625\nMAIN_ISLAND_NAV\t0\t2700\ttrue\tfalse\t599.369140625\nMAIN_ISLAND_NAV\t0\t2480\ttrue\tfalse\t494.525390625\nMAIN_ISLAND_NAV\t0\t2320\ttrue\tfalse\t418.275390625\nMAIN_ISLAND_NAV\t0\t2200\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t0\t640\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t1\t3456\ttrue\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t1\t2816\ttrue\tfalse\t639.400390625\nMAIN_ISLAND_NAV\t1\t2700\ttrue\tfalse\t599.369140625\nMAIN_ISLAND_NAV\t1\t2480\ttrue\tfalse\t494.525390625\nMAIN_ISLAND_NAV\t1\t2320\ttrue\tfalse\t418.275390625\nMAIN_ISLAND_NAV\t1\t2200\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t1\t640\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t2\t3456\ttrue\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t2\t2816\ttrue\tfalse\t639.400390625\nMAIN_ISLAND_NAV\t2\t2700\ttrue\tfalse\t599.369140625\nMAIN_ISLAND_NAV\t2\t2480\ttrue\tfalse\t494.525390625\nMAIN_ISLAND_NAV\t2\t2320\ttrue\tfalse\t418.275390625\nMAIN_ISLAND_NAV\t2\t2200\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t2\t640\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t3\t3456\ttrue\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t3\t2816\ttrue\tfalse\t639.400390625\nMAIN_ISLAND_NAV\t3\t2700\ttrue\tfalse\t599.369140625\nMAIN_ISLAND_NAV\t3\t2480\ttrue\tfalse\t494.525390625\nMAIN_ISLAND_NAV\t3\t2320\ttrue\tfalse\t418.275390625\nMAIN_ISLAND_NAV\t3\t2200\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t3\t640\ttrue\tfalse\t396\nMAIN_ISLAND_EDGE\t0\t0\ttrue\t396\nMAIN_ISLAND_EDGE\t6000\t0\tfalse\t-16384\nMAIN_ISLAND_EDGE\t1536\t3456\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t0\t3456\ttrue\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t0\t2816\ttrue\tfalse\t639.400390625\nMAIN_ISLAND_NAV\t0\t2700\ttrue\tfalse\t599.369140625\nMAIN_ISLAND_NAV\t0\t2480\ttrue\tfalse\t494.525390625\nMAIN_ISLAND_NAV\t0\t2320\ttrue\tfalse\t418.275390625\nMAIN_ISLAND_NAV\t0\t2200\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t0\t640\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t1\t3456\ttrue\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t1\t2816\ttrue\tfalse\t639.400390625\nMAIN_ISLAND_NAV\t1\t2700\ttrue\tfalse\t599.369140625\nMAIN_ISLAND_NAV\t1\t2480\ttrue\tfalse\t494.525390625\nMAIN_ISLAND_NAV\t1\t2320\ttrue\tfalse\t418.275390625\nMAIN_ISLAND_NAV\t1\t2200\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t1\t640\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t2\t3456\ttrue\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t2\t2816\ttrue\tfalse\t639.400390625\nMAIN_ISLAND_NAV\t2\t2700\ttrue\tfalse\t599.369140625\nMAIN_ISLAND_NAV\t2\t2480\ttrue\tfalse\t494.525390625\nMAIN_ISLAND_NAV\t2\t2320\ttrue\tfalse\t418.275390625\nMAIN_ISLAND_NAV\t2\t2200\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t2\t640\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t3\t3456\ttrue\tfalse\t639.099609375\nMAIN_ISLAND_NAV\t3\t2816\ttrue\tfalse\t639.400390625\nMAIN_ISLAND_NAV\t3\t2700\ttrue\tfalse\t599.369140625\nMAIN_ISLAND_NAV\t3\t2480\ttrue\tfalse\t494.525390625\nMAIN_ISLAND_NAV\t3\t2320\ttrue\tfalse\t418.275390625\nMAIN_ISLAND_NAV\t3\t2200\ttrue\tfalse\t396\nMAIN_ISLAND_NAV\t3\t640\ttrue\tfalse\t396\nMAIN_ISLAND_EDGE\t0\t0\ttrue\t396\nMAIN_ISLAND_EDGE\t6000\t0\tfalse\t-16384\nMAIN_ISLAND_EDGE\t1536\t3456\tfalse\t639.099609375"
+  },
+  "actual_builder_walk": {
+    "status": "PASS",
+    "unit": "npc_survival_builder_proxy",
+    "route": [
+      "north",
+      "center",
+      "west",
+      "center",
+      "south",
+      "center",
+      "east",
+      "center",
+      "north"
+    ],
+    "legs": 8,
+    "elapsed_game_seconds": 50.33332824707,
+    "evidence": "[VScript][L2] MAIN_ISLAND_WALK_PASS\t1\t0.39317891001701\t27.992080688477\t396\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t1\t0.39317891001701\t27.992080688477\t396\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t2\t-3446.0068359375\t0.17615422606468\t639.099609375\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t2\t-3446.0068359375\t0.17615422606468\t639.099609375\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t3\t-54.700820922852\t0.9334631562233\t396\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t3\t-54.700820922852\t0.9334631562233\t396\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t4\t0.2051340341568\t-3407.7524414063\t639.099609375\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t4\t0.2051340341568\t-3407.7524414063\t639.099609375\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t5\t0\t0\t396\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t5\t0\t0\t396\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t6\t3446.2143554688\t0.21324098110199\t639.099609375\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t6\t3446.2143554688\t0.21324098110199\t639.099609375\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t7\t0\t0\t396\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t7\t0\t0\t396\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t8\t0.2126624584198\t3446.2238769531\t639.099609375\n[VScript][L2] MAIN_ISLAND_WALK_PASS\t8\t0.2126624584198\t3446.2238769531\t639.099609375\n[VScript][L2] MAIN_ISLAND_WALK_COMPLETE\t50.33332824707\n[VScript][L2] MAIN_ISLAND_WALK_COMPLETE\t50.33332824707"
+  },
+  "screenshots": [
+    "previews/runtime_overview.png",
+    "previews/runtime_platform.png"
+  ],
+  "blender": {
+    "file": "main_island.blend",
+    "scenes": [
+      "Cross Main Island - assembled",
+      "M01-M18 Modular Library"
+    ],
+    "packed_image_count": 73
+  },
+  "limitations": [
+    "Formal production gameplay and multiplayer performance not tested.",
+    "1490236 custom instance triangles, excluding native pine meshes.",
+    "Central vortex pattern uses static warped UVs; ocean shader waves scroll.",
+    "Earlier autonomous-creep probe failures were not used as traversal evidence."
+  ],
+  "cleanup": {
+    "status": "PASS",
+    "builder_speed_and_origin_restored": true,
+    "temporary_anchor_removed": true,
+    "review_timers_cancelled": true,
+    "camera_restored": 1134,
+    "test_map_disconnected": true,
+    "evidence": "[MCP-LUA] IsServer: true\n[MCP-LUA] IsServer: true\nMAIN_ISLAND_REVIEW_CLEAN\nMAIN_ISLAND_REVIEW_CLEAN\nMAIN_ISLAND_CLEAN_ANCHOR\ttrue\nMAIN_ISLAND_CLEAN_ANCHOR\ttrue"
+  }
+}

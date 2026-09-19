@@ -1,0 +1,30 @@
+{
+  "materials": [
+    "transition_forest.vmat",
+    "transition_corrupt.vmat",
+    "transition_snow.vmat",
+    "transition_thaw.vmat",
+    "transition_volcanic.vmat",
+    "transition_martial_forest.vmat",
+    "transition_martial_snow.vmat",
+    "transition_martial_volcanic.vmat",
+    "transition_ridge.vmat",
+    "island_native_paving.vmat",
+    "cultivation_stone.vmat"
+  ],
+  "grass": [
+    0.48,
+    0.59,
+    0.4
+  ],
+  "paving": [
+    0.63,
+    0.63,
+    0.59
+  ],
+  "exposure": 1.05,
+  "lightScale": 1.9,
+  "ambientScale": 1.7,
+  "bloom": "No added bloom or self illumination",
+  "cloudTextures": "Original Blender density renders; uncompressed RGBA8888 (local BC7 encoder unavailable)"
+}

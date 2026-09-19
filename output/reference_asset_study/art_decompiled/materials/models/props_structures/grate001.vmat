@@ -1,0 +1,9 @@
+"Layer0"
+{
+	"shader"	"global_lit_simple.vfx"
+	"TextureColor"	"materials/models/props_structures/grate001_color.png"
+	"Compiled Textures"
+	{
+		"g_tColor"	"materials/models/props_structures/grate001_color_psd_713a5653.vtex"
+	}
+}

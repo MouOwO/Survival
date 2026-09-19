@@ -1,0 +1,132 @@
+[
+  {
+    "name": "t01_shore_straight",
+    "baseTriangles": 1766,
+    "lod1Triangles": 794
+  },
+  {
+    "name": "t02_shore_outer",
+    "baseTriangles": 2506,
+    "lod1Triangles": 1126
+  },
+  {
+    "name": "t03_shore_inner",
+    "baseTriangles": 2506,
+    "lod1Triangles": 1126
+  },
+  {
+    "name": "t04_stairs",
+    "baseTriangles": 536,
+    "lod1Triangles": 240
+  },
+  {
+    "name": "t04_ramp",
+    "baseTriangles": 216,
+    "lod1Triangles": 216
+  },
+  {
+    "name": "t05_transition_straight",
+    "baseTriangles": 1072,
+    "lod1Triangles": 482
+  },
+  {
+    "name": "t05_transition_corner",
+    "baseTriangles": 908,
+    "lod1Triangles": 408
+  },
+  {
+    "name": "t05_transition_broken",
+    "baseTriangles": 964,
+    "lod1Triangles": 432
+  },
+  {
+    "name": "t06_rail_straight",
+    "baseTriangles": 2468,
+    "lod1Triangles": 1110
+  },
+  {
+    "name": "t06_rail_corner",
+    "baseTriangles": 2732,
+    "lod1Triangles": 1228
+  },
+  {
+    "name": "t06_rail_post",
+    "baseTriangles": 176,
+    "lod1Triangles": 176
+  },
+  {
+    "name": "t07_array_dais",
+    "baseTriangles": 7036,
+    "lod1Triangles": 3166
+  },
+  {
+    "name": "a01_pavilion",
+    "baseTriangles": 38034,
+    "lod1Triangles": 17114
+  },
+  {
+    "name": "a02_gateway",
+    "baseTriangles": 28188,
+    "lod1Triangles": 12684
+  },
+  {
+    "name": "a03_stone_lamp",
+    "baseTriangles": 586,
+    "lod1Triangles": 262
+  },
+  {
+    "name": "a03_censer",
+    "baseTriangles": 4708,
+    "lod1Triangles": 2118
+  },
+  {
+    "name": "v01_pine_0",
+    "baseTriangles": 21904,
+    "lod1Triangles": 9856
+  },
+  {
+    "name": "v01_pine_1",
+    "baseTriangles": 21904,
+    "lod1Triangles": 9856
+  },
+  {
+    "name": "v02_peach_0",
+    "baseTriangles": 26428,
+    "lod1Triangles": 11892
+  },
+  {
+    "name": "v02_peach_1",
+    "baseTriangles": 26428,
+    "lod1Triangles": 11892
+  },
+  {
+    "name": "v03_rock_0",
+    "baseTriangles": 140,
+    "lod1Triangles": 140
+  },
+  {
+    "name": "v03_rock_1",
+    "baseTriangles": 140,
+    "lod1Triangles": 140
+  },
+  {
+    "name": "v03_rock_2",
+    "baseTriangles": 140,
+    "lod1Triangles": 140
+  },
+  {
+    "name": "v03_fern",
+    "baseTriangles": 560,
+    "lod1Triangles": 252
+  },
+  {
+    "name": "v03_grass",
+    "baseTriangles": 200,
+    "lod1Triangles": 200
+  },
+  {
+    "name": "v03_shrub",
+    "baseTriangles": 200,
+    "lod1Triangles": 200
+  }
+]

@@ -1,0 +1,184 @@
+[
+  {
+    "name": "t01_shore_straight",
+    "triangles": 1766,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t02_shore_outer",
+    "triangles": 2506,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t03_shore_inner",
+    "triangles": 2506,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t04_stairs",
+    "triangles": 536,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t04_ramp",
+    "triangles": 216,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t05_transition_straight",
+    "triangles": 1072,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t05_transition_corner",
+    "triangles": 908,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t05_transition_broken",
+    "triangles": 964,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t06_rail_straight",
+    "triangles": 2468,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t06_rail_corner",
+    "triangles": 2732,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t06_rail_post",
+    "triangles": 176,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "t07_array_dais",
+    "triangles": 7036,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "a01_pavilion",
+    "triangles": 38034,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "a02_gateway",
+    "triangles": 28188,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "a03_stone_lamp",
+    "triangles": 586,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "a03_censer",
+    "triangles": 4708,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v01_pine_0",
+    "triangles": 21904,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v01_pine_1",
+    "triangles": 21904,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v02_peach_0",
+    "triangles": 26428,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v02_peach_1",
+    "triangles": 26428,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v03_rock_0",
+    "triangles": 140,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v03_rock_1",
+    "triangles": 140,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v03_rock_2",
+    "triangles": 140,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v03_fern",
+    "triangles": 560,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v03_grass",
+    "triangles": 200,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  },
+  {
+    "name": "v03_shrub",
+    "triangles": 200,
+    "zeroAreaFaces": 0,
+    "finiteVertices": true,
+    "hasUV": true
+  }
+]

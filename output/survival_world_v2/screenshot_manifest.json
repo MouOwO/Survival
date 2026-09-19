@@ -1,0 +1,127 @@
+[
+  {
+    "view": "overview",
+    "source": "world_v2_overview_0077.tga",
+    "timestamp": "2026-09-15T00:38:55.301Z"
+  },
+  {
+    "view": "central_island",
+    "source": "world_v2_central_island_0077.tga",
+    "timestamp": "2026-09-15T00:38:40.295Z"
+  },
+  {
+    "view": "upper_training",
+    "source": "world_v2_upper_training_0077.tga",
+    "timestamp": "2026-09-15T00:40:00.294Z"
+  },
+  {
+    "view": "lower_training",
+    "source": "world_v2_lower_training_0076.tga",
+    "timestamp": "2026-09-15T00:40:05.298Z"
+  },
+  {
+    "view": "snow_camps",
+    "source": "world_v2_snow_camps_0076.tga",
+    "timestamp": "2026-09-15T00:40:10.297Z"
+  },
+  {
+    "view": "boss_islands",
+    "source": "world_v2_boss_islands_0075.tga",
+    "timestamp": "2026-09-15T00:40:15.302Z"
+  },
+  {
+    "view": "tree_close",
+    "source": "world_v2_tree_close_0074.tga",
+    "timestamp": "2026-09-15T00:40:20.297Z"
+  },
+  {
+    "view": "shallow_lake",
+    "source": "world_v2_shallow_lake_0070.tga",
+    "timestamp": "2026-09-15T00:39:50.301Z"
+  },
+  {
+    "view": "volcanic_arena",
+    "source": "world_v2_volcanic_arena_0070.tga",
+    "timestamp": "2026-09-15T00:39:55.299Z"
+  },
+  {
+    "view": "camp_transition",
+    "source": "world_v2_camp_transition_0056.tga",
+    "timestamp": "2026-09-15T00:40:25.299Z"
+  },
+  {
+    "view": "mountain_canopy",
+    "source": "world_v2_mountain_canopy_0053.tga",
+    "timestamp": "2026-09-15T00:40:30.297Z"
+  },
+  {
+    "view": "grass_paving",
+    "source": "world_v2_grass_paving_0053.tga",
+    "timestamp": "2026-09-15T00:40:35.294Z"
+  },
+  {
+    "view": "prison_floor",
+    "source": "world_v2_prison_floor_0046.tga",
+    "timestamp": "2026-09-15T00:40:40.294Z"
+  },
+  {
+    "view": "hot_spring",
+    "source": "world_v2_hot_spring_0050.tga",
+    "timestamp": "2026-09-15T00:39:35.299Z"
+  },
+  {
+    "view": "camp_boundary",
+    "source": "world_v2_camp_boundary_0050.tga",
+    "timestamp": "2026-09-15T00:39:40.293Z"
+  },
+  {
+    "view": "grass_detail",
+    "source": "world_v2_grass_detail_0050.tga",
+    "timestamp": "2026-09-15T00:39:45.300Z"
+  },
+  {
+    "view": "island_levels",
+    "source": "world_v2_island_levels_0046.tga",
+    "timestamp": "2026-09-15T00:38:45.300Z"
+  },
+  {
+    "view": "island_stairs",
+    "source": "world_v2_island_stairs_0046.tga",
+    "timestamp": "2026-09-15T00:39:30.300Z"
+  },
+  {
+    "view": "training_close",
+    "source": "world_v2_training_close_0031.tga",
+    "timestamp": "2026-09-15T00:39:15.293Z"
+  },
+  {
+    "view": "boss_close",
+    "source": "world_v2_boss_close_0031.tga",
+    "timestamp": "2026-09-15T00:39:20.295Z"
+  },
+  {
+    "view": "original_challenge",
+    "source": "world_v2_original_challenge_0031.tga",
+    "timestamp": "2026-09-15T00:39:25.299Z"
+  },
+  {
+    "view": "tower_stairs",
+    "source": "world_v2_tower_stairs_0027.tga",
+    "timestamp": "2026-09-15T00:38:50.295Z"
+  },
+  {
+    "view": "cloud_edge",
+    "source": "world_v2_cloud_edge_0019.tga",
+    "timestamp": "2026-09-15T00:39:05.299Z"
+  },
+  {
+    "view": "cloud_band",
+    "source": "world_v2_cloud_band_0019.tga",
+    "timestamp": "2026-09-15T00:39:10.298Z"
+  },
+  {
+    "view": "mountain_detail",
+    "source": "world_v2_mountain_detail_0012.tga",
+    "timestamp": "2026-09-15T00:39:00.297Z"
+  }
+]

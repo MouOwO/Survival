@@ -1,0 +1,370 @@
+{
+  "roundIslandRadius": 4608,
+  "squareLakeSide": 2048,
+  "groundSurfaceZ": 396,
+  "waterZ": 416,
+  "transitionWidth": 280,
+  "groundRoots": [
+    {
+      "name": "n01_10_island",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "n11_20_center",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "n11_20_camp_0",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n11_20_camp_1",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n11_20_camp_2",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n11_20_camp_3",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n21_30_courtyard",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "n21_30_camp_0",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n21_30_camp_1",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n21_30_camp_2",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n21_30_camp_3",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n31_40_corridor",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "n31_40_camp_0",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n31_40_camp_1",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n31_40_camp_2",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n31_40_camp_3",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "n41_50_snowfield",
+      "theme": "snow",
+      "z": 524
+    },
+    {
+      "name": "n41_50_camp_0",
+      "theme": "thaw",
+      "z": 652
+    },
+    {
+      "name": "n41_50_camp_1",
+      "theme": "thaw",
+      "z": 652
+    },
+    {
+      "name": "n41_50_camp_2",
+      "theme": "thaw",
+      "z": 652
+    },
+    {
+      "name": "n41_50_camp_3",
+      "theme": "thaw",
+      "z": 652
+    },
+    {
+      "name": "n51_60_corruption",
+      "theme": "corrupt",
+      "z": 396
+    },
+    {
+      "name": "n51_60_shared_camp",
+      "theme": "forest",
+      "z": 524
+    },
+    {
+      "name": "rebirth_01",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_02",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_03",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_04",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_05",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_06",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_07",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_08",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_09",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "rebirth_10",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "flame_troll",
+      "theme": "volcanic",
+      "z": 396
+    },
+    {
+      "name": "ice_elegy",
+      "theme": "snow",
+      "z": 396
+    },
+    {
+      "name": "synthesis_gem",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_01",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_02",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_03",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_04",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_05",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_06",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_07",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_08",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_09",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_10",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_empty_10",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "commandment_empty_11",
+      "theme": "forest",
+      "z": 396
+    },
+    {
+      "name": "polar_crystal_mobs",
+      "theme": "snow",
+      "z": 396
+    },
+    {
+      "name": "molten_core_mobs",
+      "theme": "volcanic",
+      "z": 396
+    },
+    {
+      "name": "seven_sins",
+      "theme": "volcanic",
+      "z": 396
+    },
+    {
+      "name": "training_p0_wood",
+      "theme": "forest",
+      "z": 268
+    },
+    {
+      "name": "training_p0_gold",
+      "theme": "forest",
+      "z": 268
+    },
+    {
+      "name": "training_p0_attributes",
+      "theme": "snow",
+      "z": 268
+    },
+    {
+      "name": "training_p0_greater_attributes",
+      "theme": "volcanic",
+      "z": 268
+    },
+    {
+      "name": "training_p1_wood",
+      "theme": "forest",
+      "z": 268
+    },
+    {
+      "name": "training_p1_gold",
+      "theme": "forest",
+      "z": 268
+    },
+    {
+      "name": "training_p1_attributes",
+      "theme": "snow",
+      "z": 268
+    },
+    {
+      "name": "training_p1_greater_attributes",
+      "theme": "volcanic",
+      "z": 268
+    },
+    {
+      "name": "training_p2_wood",
+      "theme": "forest",
+      "z": 652
+    },
+    {
+      "name": "training_p2_gold",
+      "theme": "forest",
+      "z": 652
+    },
+    {
+      "name": "training_p2_attributes",
+      "theme": "snow",
+      "z": 652
+    },
+    {
+      "name": "training_p2_greater_attributes",
+      "theme": "volcanic",
+      "z": 652
+    },
+    {
+      "name": "training_p3_wood",
+      "theme": "forest",
+      "z": 652
+    },
+    {
+      "name": "training_p3_gold",
+      "theme": "forest",
+      "z": 652
+    },
+    {
+      "name": "training_p3_attributes",
+      "theme": "snow",
+      "z": 652
+    },
+    {
+      "name": "training_p3_greater_attributes",
+      "theme": "volcanic",
+      "z": 652
+    },
+    {
+      "name": "endless_p0",
+      "theme": "forest",
+      "z": 652
+    },
+    {
+      "name": "endless_p1",
+      "theme": "forest",
+      "z": 652
+    },
+    {
+      "name": "endless_p2",
+      "theme": "forest",
+      "z": 652
+    },
+    {
+      "name": "endless_p3",
+      "theme": "forest",
+      "z": 652
+    },
+    {
+      "name": "original_challenge_reserve",
+      "theme": "forest",
+      "z": 396
+    }
+  ],
+  "lilySource": "Native tileset entities; disabled in addon-local templates"
+}

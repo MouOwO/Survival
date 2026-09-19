@@ -1,0 +1,28 @@
+{
+  "map": "survival_basin_native",
+  "nativeTileGrid": true,
+  "activeTileSet": "radiant_basic",
+  "courtCenters": [
+    [
+      2816,
+      0
+    ],
+    [
+      0,
+      2816
+    ],
+    [
+      -2816,
+      0
+    ],
+    [
+      0,
+      -2816
+    ]
+  ],
+  "courtHeight": 512,
+  "basinLevel": 128,
+  "stairs": "native edgesPath; 128-unit height levels",
+  "addedDecorations": 0,
+  "stage": "terrain shape review; theme paint deferred"
+}

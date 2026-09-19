@@ -1,0 +1,818 @@
+[
+  {
+    "name": "main_city_lv01",
+    "revision": 4,
+    "family": "city",
+    "stage": 1,
+    "triangles": 31641,
+    "dimensions": [
+      116.27013397216797,
+      118.0,
+      75.88890075683594
+    ],
+    "minimum": [
+      -58.135066986083984,
+      -59.0,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/main_city_lv01.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 48,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "main_city_lv02",
+    "revision": 4,
+    "family": "city",
+    "stage": 2,
+    "triangles": 37165,
+    "dimensions": [
+      118.0,
+      113.97389221191406,
+      110.43273162841797
+    ],
+    "minimum": [
+      -59.0,
+      -56.98694610595703,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/main_city_lv02.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 48,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "main_city_lv03",
+    "revision": 4,
+    "family": "city",
+    "stage": 3,
+    "triangles": 41957,
+    "dimensions": [
+      118.0,
+      115.06244659423828,
+      118.6514892578125
+    ],
+    "minimum": [
+      -59.0,
+      -57.53122329711914,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/main_city_lv03.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 48,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "main_city_lv04",
+    "revision": 4,
+    "family": "city",
+    "stage": 4,
+    "triangles": 60861,
+    "dimensions": [
+      118.0,
+      112.79000854492188,
+      117.21066284179688
+    ],
+    "minimum": [
+      -59.0,
+      -56.39500427246094,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/main_city_lv04.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 48,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "main_city_lv05",
+    "revision": 4,
+    "family": "city",
+    "stage": 5,
+    "triangles": 40313,
+    "dimensions": [
+      118.0,
+      116.43717193603516,
+      111.31916046142578
+    ],
+    "minimum": [
+      -59.0,
+      -58.21858596801758,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/main_city_lv05.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 48,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "population_farm_lv01",
+    "revision": 4,
+    "family": "farm",
+    "stage": 1,
+    "triangles": 27397,
+    "dimensions": [
+      118.0,
+      117.21723937988281,
+      78.46422576904297
+    ],
+    "minimum": [
+      -59.0,
+      -58.608619689941406,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/population_farm_lv01.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "population_farm_lv02",
+    "revision": 4,
+    "family": "farm",
+    "stage": 2,
+    "triangles": 29438,
+    "dimensions": [
+      118.0,
+      117.0068130493164,
+      73.56660461425781
+    ],
+    "minimum": [
+      -59.0,
+      -58.5034065246582,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/population_farm_lv02.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 51.496623229980464,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "population_farm_lv03",
+    "revision": 4,
+    "family": "farm",
+    "stage": 3,
+    "triangles": 38906,
+    "dimensions": [
+      118.0,
+      115.65895080566406,
+      74.09219360351562
+    ],
+    "minimum": [
+      -59.0,
+      -57.82947540283203,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/population_farm_lv03.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 51.86453552246093,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "population_farm_lv04",
+    "revision": 4,
+    "family": "farm",
+    "stage": 4,
+    "triangles": 51358,
+    "dimensions": [
+      118.0,
+      113.4177474975586,
+      90.26505279541016
+    ],
+    "minimum": [
+      -59.0,
+      -56.7088737487793,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/population_farm_lv04.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "population_farm_lv05",
+    "revision": 4,
+    "family": "farm",
+    "stage": 5,
+    "triangles": 54223,
+    "dimensions": [
+      118.0,
+      113.61677551269531,
+      100.7228012084961
+    ],
+    "minimum": [
+      -59.0,
+      -56.808387756347656,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/population_farm_lv05.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv01",
+    "revision": 4,
+    "family": "mine",
+    "stage": 1,
+    "triangles": 8948,
+    "dimensions": [
+      118.0,
+      114.05388641357422,
+      44.514286041259766
+    ],
+    "minimum": [
+      -59.0,
+      -57.02694320678711,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv01.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 31.160000228881835,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv02",
+    "revision": 4,
+    "family": "mine",
+    "stage": 2,
+    "triangles": 21400,
+    "dimensions": [
+      118.0,
+      114.02521514892578,
+      72.24921417236328
+    ],
+    "minimum": [
+      -59.0,
+      -57.01260757446289,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv02.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 50.574449920654295,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv03",
+    "revision": 4,
+    "family": "mine",
+    "stage": 3,
+    "triangles": 23284,
+    "dimensions": [
+      118.0,
+      115.42536926269531,
+      75.58351135253906
+    ],
+    "minimum": [
+      -59.0,
+      -57.712684631347656,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv03.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv04",
+    "revision": 4,
+    "family": "mine",
+    "stage": 4,
+    "triangles": 23432,
+    "dimensions": [
+      118.0,
+      114.59086608886719,
+      68.68413543701172
+    ],
+    "minimum": [
+      -59.0,
+      -57.295433044433594,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv04.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 48.0788948059082,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv05",
+    "revision": 4,
+    "family": "mine",
+    "stage": 5,
+    "triangles": 25580,
+    "dimensions": [
+      118.0,
+      113.47689819335938,
+      92.05072784423828
+    ],
+    "minimum": [
+      -59.0,
+      -56.73844909667969,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv05.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv06",
+    "revision": 4,
+    "family": "mine",
+    "stage": 6,
+    "triangles": 29836,
+    "dimensions": [
+      118.0,
+      114.80504608154297,
+      94.52999114990234
+    ],
+    "minimum": [
+      -59.0,
+      -57.402523040771484,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv06.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv07",
+    "revision": 4,
+    "family": "mine",
+    "stage": 7,
+    "triangles": 20964,
+    "dimensions": [
+      118.0,
+      114.72735595703125,
+      75.65487670898438
+    ],
+    "minimum": [
+      -59.0,
+      -57.363677978515625,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv07.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv08",
+    "revision": 4,
+    "family": "mine",
+    "stage": 8,
+    "triangles": 18588,
+    "dimensions": [
+      118.0,
+      108.9089126586914,
+      105.3088607788086
+    ],
+    "minimum": [
+      -59.0,
+      -54.4544563293457,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv08.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv09",
+    "revision": 4,
+    "family": "mine",
+    "stage": 9,
+    "triangles": 30044,
+    "dimensions": [
+      118.0,
+      112.3926773071289,
+      94.73321533203125
+    ],
+    "minimum": [
+      -59.0,
+      -56.19633865356445,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv09.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "gold_mine_lv10",
+    "revision": 4,
+    "family": "mine",
+    "stage": 10,
+    "triangles": 40676,
+    "dimensions": [
+      118.0,
+      113.95336151123047,
+      99.73250579833984
+    ],
+    "minimum": [
+      -59.0,
+      -56.976680755615234,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/gold_mine_lv10.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "research_lab",
+    "revision": 4,
+    "family": "laboratory",
+    "stage": false,
+    "triangles": 26937,
+    "dimensions": [
+      118.0,
+      109.40966796875,
+      91.2681884765625
+    ],
+    "minimum": [
+      -59.0,
+      -54.704833984375,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/research_lab.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "advanced_research_lab",
+    "revision": 4,
+    "family": "laboratory",
+    "stage": true,
+    "triangles": 34810,
+    "dimensions": [
+      118.0,
+      116.52973937988281,
+      133.600830078125
+    ],
+    "minimum": [
+      -59.0,
+      -58.264869689941406,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/advanced_research_lab.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "hero_altar",
+    "revision": 4,
+    "family": "altar",
+    "stage": null,
+    "triangles": 19188,
+    "dimensions": [
+      118.0,
+      109.63291931152344,
+      110.19280242919922
+    ],
+    "minimum": [
+      -59.0,
+      -54.81645965576172,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/hero_altar.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 52,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  },
+  {
+    "name": "challenge_arena",
+    "revision": 4,
+    "family": "challenge",
+    "stage": null,
+    "triangles": 36600,
+    "dimensions": [
+      118.0,
+      115.7666015625,
+      68.26200103759766
+    ],
+    "minimum": [
+      -59.0,
+      -57.88330078125,
+      0.0
+    ],
+    "materials": [
+      "materials/survival_buildings/challenge_arena.vmat"
+    ],
+    "uv_layers": 1,
+    "texture_resolution": 2048,
+    "root_bone": "root",
+    "selection_sets": [
+      "default",
+      "select_low",
+      "select_high"
+    ],
+    "baseplate": false,
+    "runtime_scale": 1.0,
+    "collision_radius": 42,
+    "collision_height": 47.783400726318355,
+    "model_source_scale": 2.0,
+    "baked_yaw_degrees": -90
+  }
+]

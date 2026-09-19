@@ -1,0 +1,37 @@
+[
+  {
+    "test": "test_unique_building_models",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  {
+    "test": "test_farm_fixed_visual",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  {
+    "test": "test_reference_building_collision",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  {
+    "test": "test_building_visual_service",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  {
+    "test": "test_tower_hero_visual_regression",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  {
+    "test": "test_gold_mine_batch_upgrade_service",
+    "status": "PASS",
+    "exit_code": 0
+  },
+  {
+    "test": "test_gold_mine_auto_upgrade_coordinator",
+    "status": "PASS",
+    "exit_code": 0
+  }
+]

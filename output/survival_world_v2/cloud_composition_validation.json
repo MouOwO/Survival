@@ -1,0 +1,42 @@
+{
+  "grid": [
+    {
+      "name": "verticesHeight",
+      "unchanged": true,
+      "sha256": "73b7039fd5be56d9edc804e21fb1c8f5baf467dab9166f42bcb7f85a0c244083"
+    },
+    {
+      "name": "verticesWater",
+      "unchanged": true,
+      "sha256": "9bd919a5ea21abed51689db5141557119bc5cd5d46653f2cd7dfc2d98cbd312d"
+    },
+    {
+      "name": "gridnavFlags",
+      "unchanged": true,
+      "sha256": "0f02e6c98953c9137e044a30169267460a00d6ccac02efd6ddce9ac351b546f1"
+    },
+    {
+      "name": "cellsTileSet",
+      "unchanged": true,
+      "sha256": "d40833605fd05ae9b7623f01242c138b78ee94bdedce4b658493fd0b24e0631f"
+    },
+    {
+      "name": "cellsHidden",
+      "unchanged": true,
+      "sha256": "179cbd3c33358770e617cd8113b2a20e6813f06afd9f49045945ff092fd29c17"
+    }
+  ],
+  "outer": 24,
+  "inner": 10,
+  "textureVariants": [
+    "c02_cliff_cloud_v2",
+    "c01_cloud_sea_b_v2",
+    "c02_cliff_cloud_b_v2",
+    "c01_cloud_sea_v2",
+    "c03_cloud_band_v2",
+    "c04_thin_mist_v2"
+  ],
+  "minimumProjectedClearance": 182.1245226740284,
+  "backgroundOutsideGameplayGrid": true,
+  "pass": true
+}

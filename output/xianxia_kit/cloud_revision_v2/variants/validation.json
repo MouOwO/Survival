@@ -1,0 +1,22 @@
+[
+  {
+    "name": "c01_cloud_sea_b",
+    "borderAlphaMax": 0,
+    "visibleFraction": 0.18310260772705078,
+    "dimensions": [
+      2048,
+      1536
+    ],
+    "pass": true
+  },
+  {
+    "name": "c02_cliff_cloud_b",
+    "borderAlphaMax": 0,
+    "visibleFraction": 0.17275428771972656,
+    "dimensions": [
+      2048,
+      1536
+    ],
+    "pass": true
+  }
+]

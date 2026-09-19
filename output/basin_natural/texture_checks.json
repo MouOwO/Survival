@@ -1,0 +1,16 @@
+[
+  {
+    "name": "color",
+    "width": 2048,
+    "height": 2048,
+    "seamMeanX": 1.8963216145833333,
+    "seamMeanY": 1.4908854166666667
+  },
+  {
+    "name": "normal",
+    "width": 2048,
+    "height": 2048,
+    "seamMeanX": 3.4280598958333335,
+    "seamMeanY": 3.8264973958333335
+  }
+]

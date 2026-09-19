@@ -1,0 +1,122 @@
+[
+  {
+    "name": "stone",
+    "size": 1024,
+    "color_std": 0.06324091868713588,
+    "normal_std": 0.035911478102207184,
+    "roughness_mean": 0.8456458227461907,
+    "emissive": false
+  },
+  {
+    "name": "stone_light",
+    "size": 1024,
+    "color_std": 0.06996510644575762,
+    "normal_std": 0.035911478102207184,
+    "roughness_mean": 0.8456458227461907,
+    "emissive": false
+  },
+  {
+    "name": "stone_cool",
+    "size": 1024,
+    "color_std": 0.055443390858387516,
+    "normal_std": 0.035911478102207184,
+    "roughness_mean": 0.8456458227461907,
+    "emissive": false
+  },
+  {
+    "name": "mortar",
+    "size": 1024,
+    "color_std": 0.031060710549354553,
+    "normal_std": 0.00575894583016634,
+    "roughness_mean": 0.8400000929832458,
+    "emissive": false
+  },
+  {
+    "name": "rock",
+    "size": 1024,
+    "color_std": 0.061573946018145774,
+    "normal_std": 0.035911478102207184,
+    "roughness_mean": 0.8456458227461907,
+    "emissive": false
+  },
+  {
+    "name": "bronze",
+    "size": 1024,
+    "color_std": 0.14687937442594212,
+    "normal_std": 0.015410537831485271,
+    "roughness_mean": 0.35712696173477737,
+    "emissive": false
+  },
+  {
+    "name": "gold",
+    "size": 1024,
+    "color_std": 0.18591625927673988,
+    "normal_std": 0.009963580407202244,
+    "roughness_mean": 0.32693846187383,
+    "emissive": false
+  },
+  {
+    "name": "teal",
+    "size": 1024,
+    "color_std": 0.08251425623893738,
+    "normal_std": 0.0057105752639472485,
+    "roughness_mean": 0.8999998569488525,
+    "emissive": false
+  },
+  {
+    "name": "wood",
+    "size": 1024,
+    "color_std": 0.08718379350868566,
+    "normal_std": 0.04391902685165405,
+    "roughness_mean": 0.8653468361739587,
+    "emissive": false
+  },
+  {
+    "name": "earth",
+    "size": 1024,
+    "color_std": 0.07223706692457199,
+    "normal_std": 0.005778402555733919,
+    "roughness_mean": 0.8400000929832458,
+    "emissive": false
+  },
+  {
+    "name": "moss",
+    "size": 1024,
+    "color_std": 0.09004516154527664,
+    "normal_std": 0.005825786851346493,
+    "roughness_mean": 0.8400000929832458,
+    "emissive": false
+  },
+  {
+    "name": "leaf",
+    "size": 1024,
+    "color_std": 0.09906718134880066,
+    "normal_std": 0.0056455256417393684,
+    "roughness_mean": 0.8400000929832458,
+    "emissive": false
+  },
+  {
+    "name": "leaf_light",
+    "size": 1024,
+    "color_std": 0.12696398794651031,
+    "normal_std": 0.005617374088615179,
+    "roughness_mean": 0.8400000929832458,
+    "emissive": false
+  },
+  {
+    "name": "leaf_dark",
+    "size": 1024,
+    "color_std": 0.06110019236803055,
+    "normal_std": 0.005737094208598137,
+    "roughness_mean": 0.8400000929832458,
+    "emissive": false
+  },
+  {
+    "name": "flower",
+    "size": 1024,
+    "color_std": 0.11780078709125519,
+    "normal_std": 0.005769663956016302,
+    "roughness_mean": 0.8400000929832458,
+    "emissive": false
+  }
+]

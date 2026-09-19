@@ -1,0 +1,32 @@
+[
+  {
+    "id": "A",
+    "name": "大圣的新游记",
+    "note": "重点看东方园林的整体搭配：石路、岸边构件、松树与草地的比例。作为修仙风格的起点候选。",
+    "source": "https://www.dota2.com/700/monkeyking",
+    "images": [
+      "https://cdn.steamstatic.com/apps/dota2/images/700/hero/terrain_06.jpg",
+      "https://cdn.steamstatic.com/apps/dota2/images/700/hero/terrain_07.jpg"
+    ]
+  },
+  {
+    "id": "B",
+    "name": "不朽庭院",
+    "note": "重点比较石材铺装的细节与地面、植被之间的边界处理。留意规整庭院是否符合你想要的感觉。",
+    "source": "https://www.dota2.com/international2016/battlepass?l=english",
+    "images": [
+      "https://cdn.steamstatic.com/apps/dota2/images/international2016/battle_pass/colosseum_images/4.jpg",
+      "https://cdn.steamstatic.com/apps/dota2/images/international2016/battle_pass/colosseum_images/7.jpg"
+    ]
+  },
+  {
+    "id": "C",
+    "name": "官方天辉河岸 · Wandering Waters",
+    "note": "重点看自然岸坡、石块、树丛与水面如何组合。适合判断你更喜欢自然山水还是人工庭院。",
+    "source": "https://www.dota2.com/wanderingwaters",
+    "images": [
+      "https://cdn.akamai.steamstatic.com/apps/dota2/images/dota_react/patch738/comparison/radiant/new/T2Approach_R.jpg",
+      "https://cdn.steamstatic.com/apps/dota2/images/dota_react/patch738/comparison/radiant/new/BaseCorner_R.jpg"
+    ]
+  }
+]

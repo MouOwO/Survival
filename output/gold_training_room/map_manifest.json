@@ -1,0 +1,25 @@
+{
+  "review": "gold_training_room_review",
+  "prefab": "prefabs/gold_training_room",
+  "instances": 599,
+  "customAssets": 29,
+  "nativeAssets": [
+    "models/props_foliage/tree_pine01.vmdl"
+  ],
+  "markers": [
+    "challenge_02_entry",
+    "challenge_02_home",
+    "challenge_02_spawn_01",
+    "challenge_02_spawn_02",
+    "challenge_02_spawn_03",
+    "challenge_02_spawn_04",
+    "challenge_02_spawn_05",
+    "challenge_02_spawn_06",
+    "challenge_02_spawn_07",
+    "challenge_02_spawn_08"
+  ],
+  "floorZ": 128,
+  "openGridCells": 1066,
+  "emissiveEntities": 0,
+  "mainMapModified": false
+}

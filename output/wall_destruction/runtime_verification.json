@@ -1,0 +1,25 @@
+{
+  "date": "2026-09-16",
+  "map": "template_map",
+  "status": "PASS",
+  "visual_model": "wall_lv10",
+  "screenshots": ["charge_review.png", "burst_review.png"],
+  "screenshot_limitation": "Paused frames contain the pause UI; these verify rendering, not continuous motion.",
+  "continuous_samples": [
+    {"elapsed": 0.76669, "exploded": false},
+    {"elapsed": 1.13336, "exploded": true},
+    {"elapsed": 1.46667, "exploded": true}
+  ],
+  "normal_cleanup": {"sample_at": 2.8, "active": 0, "proxies": 0},
+  "registered_wall": {
+    "model": "wall_lv01",
+    "trigger": "Kill(nil, unit), native entity_killed, production building handler",
+    "samples": [
+      {"elapsed": 0.16663, "active": 1, "proxies": 1, "building_query_empty": true, "game_state": 10},
+      {"elapsed": 1.16663, "active": 1, "proxies": 0, "building_query_empty": true, "game_state": 10}
+    ],
+    "final": {"game_state": 11, "active": 0, "proxies": 0, "wall_barriers": 0}
+  },
+  "fixture_cleanup": {"active": 0, "proxies": 0, "camera_released": true, "pause_released": true},
+  "limitations": ["Live visual coverage: tier 10; registered death coverage: tier 1. Other levels covered by configuration and resource checks.", "ForceKill(false) did not fire entity_killed in this Workshop session; the final integration test used Kill and the native event."]
+}

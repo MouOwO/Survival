@@ -1,0 +1,108 @@
+{
+  "status": "PASS",
+  "models": 10,
+  "resolution": 2048,
+  "maps_per_model": 3,
+  "assets": [
+    {
+      "name": "wall_lv01",
+      "color_luminance_p95_minus_p05": 0.30457520484924316,
+      "normal_xy_std": [
+        0.02097596973180771,
+        0.011779050342738628
+      ],
+      "reflectance_p95_minus_p05": 0.011764707043766975,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv02",
+      "color_luminance_p95_minus_p05": 0.40392157435417175,
+      "normal_xy_std": [
+        0.01615753024816513,
+        0.012914586812257767
+      ],
+      "reflectance_p95_minus_p05": 0.0784313827753067,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv03",
+      "color_luminance_p95_minus_p05": 0.35294121503829956,
+      "normal_xy_std": [
+        0.014316132292151451,
+        0.013531493954360485
+      ],
+      "reflectance_p95_minus_p05": 0.011764707043766975,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv04",
+      "color_luminance_p95_minus_p05": 0.543790876865387,
+      "normal_xy_std": [
+        0.010740190744400024,
+        0.010231235064566135
+      ],
+      "reflectance_p95_minus_p05": 0.12941177189350128,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv05",
+      "color_luminance_p95_minus_p05": 0.5633987188339233,
+      "normal_xy_std": [
+        0.010235581547021866,
+        0.009840657003223896
+      ],
+      "reflectance_p95_minus_p05": 0.12941177189350128,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv06",
+      "color_luminance_p95_minus_p05": 0.5581699013710022,
+      "normal_xy_std": [
+        0.009630757384002209,
+        0.009222591295838356
+      ],
+      "reflectance_p95_minus_p05": 0.12941177189350128,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv07",
+      "color_luminance_p95_minus_p05": 0.2666666805744171,
+      "normal_xy_std": [
+        0.009734703227877617,
+        0.009161070920526981
+      ],
+      "reflectance_p95_minus_p05": 0.12941177189350128,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv08",
+      "color_luminance_p95_minus_p05": 0.35424837470054626,
+      "normal_xy_std": [
+        0.009773536585271358,
+        0.009010388515889645
+      ],
+      "reflectance_p95_minus_p05": 0.12941177189350128,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv09",
+      "color_luminance_p95_minus_p05": 0.6470588445663452,
+      "normal_xy_std": [
+        0.00953333918005228,
+        0.00861891359090805
+      ],
+      "reflectance_p95_minus_p05": 0.12941177189350128,
+      "compiled_texture_pixels_checked": true
+    },
+    {
+      "name": "wall_lv10",
+      "color_luminance_p95_minus_p05": 0.6392157673835754,
+      "normal_xy_std": [
+        0.009117066860198975,
+        0.00826052576303482
+      ],
+      "reflectance_p95_minus_p05": 0.12941177189350128,
+      "compiled_texture_pixels_checked": true
+    }
+  ]
+}
