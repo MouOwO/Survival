@@ -41,6 +41,28 @@ for _, row in ipairs(buildings.rows) do check(row, row.display_name) end
 for id, name in pairs({practice_wood_spirit="木头精",practice_gold_spirit="金币精",practice_attribute_spirit="属性精",practice_greater_attribute_spirit="大属性精"}) do
     check(archetypes.by_id[id], name)
 end
-assert(archetypes.by_id.humanoid_white_melee.unit_name == "npc_survival_wave_monster")
-assert(count == 35, tostring(count))
-print("CHALLENGE_UNIT_NAMES_PASS: 35 native names, encounter names, both locales, normal waves preserved")
+check(archetypes.by_id.humanoid_white_melee, "白发人形近战怪")
+assert(count == 36, tostring(count))
+print("CHALLENGE_UNIT_NAMES_PASS: 35 challenge names preserved, wave name follows archetype")
+local waves_checked = 0
+for _, wave in ipairs(require("config/generated/wave_definitions").rows) do
+    local definition = assert(archetypes.by_id[wave.archetype_id])
+    local boss = wave.member_role == "assault_boss" or wave.is_boss == true
+    check(definition, boss and ("波次" .. wave.wave_number .. "BOSS") or definition.display_name)
+    if boss then
+        local base_id = definition.archetype_id:gsub("_wave_name_%d+$", "")
+        local source = assert(archetypes.by_id[base_id])
+        for key, value in pairs(source) do
+            if key ~= "archetype_id" and key ~= "display_name" and key ~= "unit_name" then
+                if type(value) == "table" then
+                    assert(table.concat(value, "|") == table.concat(definition[key], "|"), key)
+                else
+                    assert(definition[key] == value, key)
+                end
+            end
+        end
+    end
+    waves_checked = waves_checked + 1
+end
+assert(waves_checked > 0)
+print("WAVE_UNIT_NAMES_PASS: " .. waves_checked .. " rows, native names, boss wave labels, combat/visual fields preserved")

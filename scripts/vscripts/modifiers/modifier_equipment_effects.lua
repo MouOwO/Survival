@@ -4,7 +4,7 @@ local hero_health_guard = require("core/hero_health_guard")
 local armor_balance = require("config/armor_balance")
 
 local M = {}
-modifier_equipment_effects = class({})
+modifier_equipment_effects = _G.modifier_equipment_effects or class({})
 _G.modifier_equipment_effects = modifier_equipment_effects
 
 local function equipment_values(player_id)

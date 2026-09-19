@@ -45,4 +45,10 @@ local M = {
     ),
 }
 
+if GetMapName and GetMapName() == "survival_c6" then
+    M.spawn_point = require("config/map_layouts/survival_c6").resource_tree
+elseif GetMapName and GetMapName() == "template_map" then
+    M.spawn_point = require("config/map_layouts/template_map").resource_tree
+end
+
 return M

@@ -257,6 +257,7 @@ __pycache__/
 
 # Regression coverage for the current gameplay/UI/HTTP integration.
 !/scripts/vscripts/tests/test_challenge_unit_names.lua
+!/scripts/vscripts/tests/test_match_inventory.lua
 !/scripts/vscripts/tests/test_hero_base_health_binding.lua
 !/scripts/vscripts/tests/test_ice_blade_counter.lua
 !/scripts/vscripts/tests/test_lottery_http_service.lua
@@ -306,3 +307,20 @@ __pycache__/
 !/scripts/vscripts/tests/test_wall_destruction_integration.lua
 
 /output/**/*_compiled.txt
+!/scripts/vscripts/tests/test_modifier_definition_scopes.lua
+!/scripts/vscripts/tests/test_visual_carrier_health_bar.lua
+!/scripts/vscripts/tests/test_match_inventory.lua
+!/scripts/vscripts/tests/map_c6_*.lua
+!/scripts/vscripts/tests/map_main_merge_check.lua
+!/scripts/vscripts/tests/test_archive_building_effects.lua
+!/scripts/vscripts/tests/test_archive_buildings.lua
+!/scripts/vscripts/tests/test_boss_warning_projection.lua
+!/scripts/vscripts/tests/test_daily_ui_snapshot.lua
+!/scripts/vscripts/tests/test_enemy_wall_order_cache.lua
+!/scripts/vscripts/tests/test_health_bar_cleanup.lua
+!/scripts/vscripts/tests/test_hero_instant_blink.lua
+!/scripts/vscripts/tests/test_projection_modifier_recovery.lua
+!/scripts/vscripts/tests/test_stat_push_coalescer.lua
+!/scripts/vscripts/tests/test_wall_engagement_cache.lua
+/scripts/vscripts/tests/map_c6_ai_check_generated.lua
+/scripts/vscripts/tests/map_c6_corner_probe.lua

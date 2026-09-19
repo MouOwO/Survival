@@ -6,9 +6,9 @@ local time, links, adds = 0, 0, 0
 GameRules={GetGameTime=function()return time end}
 LinkLuaModifier=function(name,path)
     links=links+1
-    assert(path=="modifier_bindings/"..name..".lua","must not replace engine entry with cached module")
+    assert(path=="modifiers/"..name,"must link the actual definition")
     local scope=setmetatable({}, {__index=_G})
-    local chunk=assert(loadfile("scripts/vscripts/"..path))
+    local chunk=assert(loadfile("scripts/vscripts/"..path..".lua"))
     setfenv(chunk,scope); chunk()
     assert(rawget(scope,name)==_G[name],"engine scope requires an explicit class")
 end
@@ -30,5 +30,5 @@ local broken={FindModifierByName=function()return nil end,AddNewModifier=functio
 for i=1,100 do service.apply(broken,200) end
 assert(failed==1,"binding failure must not spam every sync tick")
 time=5;service.apply(broken,200)
-assert(failed==2 and links==3,"retry refreshes engine binding")
+assert(failed==2 and links==2,"retry refreshes engine binding; new units reuse registration")
 print("HERO_BASE_HEALTH_BINDING_PASS")

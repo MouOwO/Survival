@@ -1,6 +1,6 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const bars={},tasks=[];
-let callback,valid=true,alive=true,dormant=false,origin=[0,0,0],name='hero';
+let callback,valid=true,alive=true,dormant=false,origin=[0,0,0],name='hero',failOrigin=false;
 function panel(id){return {style:{},actualuiscale_x:1,actualuiscale_y:1,
     AddClass(){},SetHasClass(){},IsValid(){return !this.deleted},DeleteAsync(){this.deleted=true}}}
 const container=panel();
@@ -9,7 +9,7 @@ $.CreatePanel=(_,parent,id)=>{const p=panel(id);if(id)bars[id]=p;return p};
 $.Schedule=(_,fn)=>tasks.push(fn);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/hero_world_health_bar.js','utf8'),{
     $,Players:{GetTeam:()=>2},Game:{GetLocalPlayerID:()=>0,WorldToScreenX:()=>100,WorldToScreenY:()=>100},
-    Entities:{IsValidEntity:()=>valid,IsAlive:()=>alive,IsDormant:()=>dormant,GetAbsOrigin:()=>origin,GetUnitName:()=>name},
+    Entities:{IsValidEntity:()=>valid,IsAlive:()=>alive,IsDormant:()=>dormant,GetAbsOrigin:()=>{if(failOrigin)throw Error('entity removed during frame');return origin},GetUnitName:()=>name},
     CustomNetTables:{GetAllTableValues:()=>({}),SubscribeNetTableListener:(_,fn)=>callback=fn}
 });
 const state={entindex:42,health:50,max_health:100,alive:1,team:2,unit_name:'hero'};
@@ -22,6 +22,9 @@ alive=true;dormant=true;tick();assert.equal(bar().style.visibility,'collapse');
 dormant=false;origin=[0,0,-10000];tick();assert.equal(bar().style.visibility,'collapse');
 origin=[0,0,0];name='thinker';tick();assert.equal(bar().style.visibility,'collapse');
 name='hero';tick();assert.equal(bar().style.visibility,'visible');
+failOrigin=true;tick();assert.equal(bar().style.visibility,'collapse');
+assert.equal(tasks.length,1,'native API failure must not stop position updates');
+failOrigin=false;origin=[10,20,0];tick();assert.equal(bar().style.visibility,'visible');
 valid=false;tick();assert(bar().deleted);
 valid=true;callback('survival_hero_health_bar','unit_42',state);tick();
 callback('survival_hero_health_bar','unit_42',{removed:1});assert(bar().deleted);

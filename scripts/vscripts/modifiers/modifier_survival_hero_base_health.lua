@@ -1,6 +1,5 @@
--- The registry links the engine-scope binding. Never overwrite it with this
--- cached module path while the engine is loading the modifier.
-modifier_survival_hero_base_health = class({})
+-- Keep the class identity when loaded by both require() and the engine.
+modifier_survival_hero_base_health = _G.modifier_survival_hero_base_health or class({})
 _G.modifier_survival_hero_base_health = modifier_survival_hero_base_health
 
 function modifier_survival_hero_base_health:IsHidden() return true end

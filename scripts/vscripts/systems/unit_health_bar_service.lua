@@ -19,9 +19,11 @@ local function is_excluded(unit)
         EXCLUDED_UNIT_NAMES[unit_name]
         or unit.survival_wall_collision_barrier
         or unit.survival_hide_custom_health_bar
+        or unit.survival_is_native_wearable_visual
         or (unit.GetClassname and unit:GetClassname() == "npc_dota_thinker")
         or (unit.HasModifier
-            and unit:HasModifier("modifier_survival_placeholder_anchor"))
+            and (unit:HasModifier("modifier_survival_placeholder_anchor")
+                or unit:HasModifier("modifier_native_wearable_visual_carrier")))
     )
 end
 
@@ -52,6 +54,7 @@ function M.exclude(unit)
     if not valid_entity(unit) then
         return false
     end
+    unit.survival_hide_custom_health_bar = true
     if unit.HasModifier and unit:HasModifier("modifier_single_health_bar")
         and unit.RemoveModifierByName then
         unit:RemoveModifierByName("modifier_single_health_bar")

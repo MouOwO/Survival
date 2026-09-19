@@ -51,6 +51,7 @@ function M:SetWallEntIndex(entindex)
         self.engagement_arrived = nil
         self.navigation_key = nil
         self.navigation_position = nil
+        self.attack_order_wall = nil
     end
     if parent and not parent:IsNull() and self.wall_entindex < 0 then
         parent:SetForceAttackTarget(nil)
@@ -91,7 +92,27 @@ function M:MoveToOnce(parent, position, navigation_key)
     end
     self.navigation_key = navigation_key
     self.navigation_position = Vector(position.x, position.y, position.z or 0)
+    self.attack_order_wall = nil
     move_to(parent, position)
+end
+
+function M:AttackWallOnce(parent, wall)
+    -- Reissuing a force target/order during an existing chase restarts native
+    -- movement work. Read the engine state so stuns or other order changes can
+    -- still recover on the next normal AI update.
+    if not parent.GetForceAttackTarget or parent:GetForceAttackTarget() ~= wall then
+        parent:SetForceAttackTarget(wall)
+    end
+    if parent:GetAttackTarget() == wall then return end
+    if self.attack_order_wall == self.wall_entindex
+        and parent.IsIdle and not parent:IsIdle() then return end
+    ExecuteOrderFromTable({
+        UnitIndex = parent:entindex(),
+        OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+        TargetIndex = wall:entindex(),
+        Queue = false,
+    })
+    self.attack_order_wall = self.wall_entindex
 end
 
 function M:UpdateGroundEngagement(parent, wall)
@@ -163,28 +184,15 @@ function M:OnIntervalThink()
     if is_ground(parent) then
         -- Engagement positions only control movement. The wall remains the
         -- unit's sole target even while it waits behind the front row.
-        parent:SetForceAttackTarget(wall)
-        self:UpdateGroundEngagement(parent, wall)
-        if parent:GetAttackTarget() ~= wall then
-            ExecuteOrderFromTable({
-                UnitIndex = parent:entindex(),
-                OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
-                TargetIndex = wall:entindex(),
-                Queue = false,
-            })
+        if not parent.GetForceAttackTarget or parent:GetForceAttackTarget() ~= wall then
+            parent:SetForceAttackTarget(wall)
         end
+        self:UpdateGroundEngagement(parent, wall)
+        self:AttackWallOnce(parent, wall)
         return
     end
 
-    parent:SetForceAttackTarget(wall)
-    if parent:GetAttackTarget() ~= wall then
-        ExecuteOrderFromTable({
-            UnitIndex = parent:entindex(),
-            OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
-            TargetIndex = wall:entindex(),
-            Queue = false,
-        })
-    end
+    self:AttackWallOnce(parent, wall)
 end
 
 function M:OnDestroy()

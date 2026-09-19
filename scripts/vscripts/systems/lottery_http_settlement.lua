@@ -19,6 +19,7 @@ local function pool_public(pool,counts,state)
     local pity={}
     for _,rule in ipairs(pool.pity_rules) do pity[#pity+1]={quality=rule.target_quality,trigger_mode=rule.trigger_mode,batch_size=rule.threshold,label=tostring(rule.threshold)..'连保底 '..string.upper(rule.target_quality)} end
     return {id=pool.id,revision=pool.revision,update_notice=pool.update_notice,
+        updated_at=tonumber(pool.update_notice.updated_at) or 0,
         update_unread=s.details_revision~=pool.revision,notice_unread=s.notice_revision~=pool.revision,
         display_name=pool.display_name,description=pool.description,pool_group=pool.pool_group,
         ticket_content_id=pool.ticket_content_id,ticket_name=config.currencies[pool.ticket_content_id].display_name,

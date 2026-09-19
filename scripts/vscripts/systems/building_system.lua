@@ -6,7 +6,6 @@ local tower_routes = require("config/tower_route_config")
 local global_rules = require("config/global_rules")
 local dev_wall_stats = require("debug/dev_wall_stats")
 local logger = require("core/logger")
-local modifier_registry = require("core/modifier_registry")
 local team_alignment = require("core/team_alignment")
 local tower_skills = require("systems/tower_skill_runtime")
 local scheduler = require("core/scheduler")
@@ -1341,7 +1340,6 @@ function M.enable_dev_wall_stats()
 end
 
 function M.init()
-    modifier_registry.register()
     construction_visual.reset()
     wall_destruction.reset()
     buildings = {}

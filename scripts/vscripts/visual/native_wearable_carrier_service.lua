@@ -1,11 +1,4 @@
-if type(LinkLuaModifier) == "function" then
-    LinkLuaModifier(
-        "modifier_native_wearable_visual_carrier",
-        "modifiers/modifier_native_wearable_visual_carrier",
-        LUA_MODIFIER_MOTION_NONE
-    )
-end
-
+-- Modifier registration is deferred to the map's Activate bootstrap.
 local catalog = require("config/asset_catalog")
 local logger = require("core/logger")
 
@@ -698,6 +691,10 @@ local function create_carrier(unit, asset)
         return nil, "carrier_create_failed"
     end
 
+    -- npc_spawned may run inside CreateUnitByName before this visual-only NPC
+    -- can be marked. Remove any bar attached by that event immediately.
+    carrier.survival_is_native_wearable_visual = true
+    require("systems/unit_health_bar_service").exclude(carrier)
     safe_call(carrier, "AddNoDraw")
     local owner_ok, owner_result = safe_call(carrier, "SetOwner", unit)
     local transform_ok = sync_transform(unit, carrier)

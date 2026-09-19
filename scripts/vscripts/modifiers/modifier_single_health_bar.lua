@@ -1,5 +1,5 @@
--- Linked through modifier_bindings by the registry; do not relink a cached module.
-modifier_single_health_bar = class({})
+-- Linked directly by the registry in both engine VMs.
+modifier_single_health_bar = _G.modifier_single_health_bar or class({})
 _G.modifier_single_health_bar = modifier_single_health_bar
 
 function modifier_single_health_bar:IsHidden() return true end
@@ -48,6 +48,8 @@ function modifier_single_health_bar:publish_state()
         return
     end
     if unit.survival_hide_custom_health_bar
+        or unit.survival_is_native_wearable_visual
+        or (unit.HasModifier and unit:HasModifier("modifier_native_wearable_visual_carrier"))
         or (unit.IsNoDraw and unit:IsNoDraw())
         or (unit.GetClassname and unit:GetClassname() == "npc_dota_thinker") then
         publish(unit, { removed = 1 })

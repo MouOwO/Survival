@@ -2,8 +2,17 @@ local logger = require("core/logger")
 
 local M = {}
 local retry_by_unit = setmetatable({}, { __mode = "k" })
+local linked = {}
 
 local modifiers = {
+    {
+        name = "modifier_native_wearable_visual_carrier",
+        path = "modifiers/modifier_native_wearable_visual_carrier",
+    },
+    {
+        name = "modifier_challenge_11_staging",
+        path = "modifiers/modifier_challenge_11_staging",
+    },
     {
         name = "modifier_wall_collision_barrier",
         path = "modifiers/modifier_wall_collision_barrier",
@@ -231,6 +240,12 @@ local function validate_definition(definition)
 end
 
 function M.register()
+    -- Module loading precedes the map's modifier replication infrastructure.
+    -- Linking there can succeed on the server while leaving clients unable to
+    -- create the modifier. Bootstrap only once Activate has a game-mode entity.
+    if GameRules and GameRules.GetGameModeEntity then
+        assert(GameRules:GetGameModeEntity(), "ModifierRegistry must register from Activate")
+    end
     retry_by_unit = setmetatable({}, { __mode = "k" })
     -- Loading a modifier can load other modifier files and replace their class
     -- tables. Finish all such work before binding any final classes to the
@@ -248,9 +263,10 @@ function M.register()
     for _, definition in ipairs(modifiers) do
         LinkLuaModifier(
             definition.name,
-            "modifier_bindings/" .. definition.name .. ".lua",
+            definition.path,
             definition.motion_type or LUA_MODIFIER_MOTION_NONE
         )
+        linked[definition.name] = true
     end
     print("[ModifierRegistry] LinkLuaModifier refreshed count=" .. tostring(#modifiers))
     logger.info(
@@ -273,8 +289,8 @@ function M.validate()
     return true, #modifiers
 end
 
--- Lua's require cache can survive an engine script reload. Rebind the exported
--- engine entry before creating a missing projection, not the definition module.
+-- Bind the actual definition script, which the engine loads in both VMs.
+-- Use the same canonical path for the server and the client script loader.
 -- Existing instances are reused; failed creation is retried at most every 5s.
 function M.ensure(unit, name, params)
     if not unit or (unit.IsNull and unit:IsNull()) then return nil end
@@ -293,8 +309,11 @@ function M.ensure(unit, name, params)
     assert(definition, "Unregistered modifier requested: " .. tostring(name))
     require(definition.path)
     validate_definition(definition)
-    LinkLuaModifier(name, "modifier_bindings/" .. name .. ".lua",
-        definition.motion_type or LUA_MODIFIER_MOTION_NONE)
+    if not linked[name] or (retries and retries[name]) then
+        LinkLuaModifier(name, definition.path,
+            definition.motion_type or LUA_MODIFIER_MOTION_NONE)
+        linked[name] = true
+    end
     local created = unit:AddNewModifier(unit, nil, name, params or {})
     if not created then
         retries = retries or {}

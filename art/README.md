@@ -1,3 +1,5 @@
+> 2026-09-19：美术快捷方式、离线网页和文件总表是含本机路径的生成文件，不提交 Git；需要时按下方“更新与跨机器使用”步骤生成。原图和交接素材保留。
+>
 > 已修正：Source 2 的 content 图片目录必须使用实体文件，不能用目录联接。美术原图仍在 art/ui/sources；每次修改后运行 tools/art_assets/sync_content_images.ps1 同步到 content，再编译。工程内 panorama/src/images 可保留兼容联接。以下旧联接说明以本条为准。
 
 # Survival 美术唯一工作入口

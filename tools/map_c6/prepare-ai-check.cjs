@@ -1,0 +1,10 @@
+const fs=require('fs'),path=require('path');
+const root=path.resolve(__dirname,'../..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const before=read('tools/map_c6/fixtures/wall_engagement_before_cache.lua');
+const after=read('scripts/vscripts/systems/wall_engagement_slots.lua');
+const test=read('scripts/vscripts/tests/test_wall_engagement_cache.lua');
+const orderTest=read('scripts/vscripts/tests/test_enemy_wall_order_cache.lua');
+const modifier=read('scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua');
+const text=`if not IsInToolsMode() then return end\nlocal sources={before=[====[${before}]====],after=[====[${after}]====]}\nlocal test=assert(loadstring([====[${test}]====]))()\ntest(sources)\nassert(loadstring([====[${orderTest}]====]))()([====[${modifier}]====])\n`;
+fs.writeFileSync(path.join(root,'scripts/vscripts/tests/map_c6_ai_check_generated.lua'),text);

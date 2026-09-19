@@ -3,11 +3,23 @@ local events = require("core/events")
 local content_id_aliases = require("config/content_id_aliases")
 local gameplay_stats_config = require("config/generated/player_gameplay_stats")
 local profile_service = require("systems/player_profile_service")
+local weapon_definitions = require("config/generated/weapon_definitions")
+local item_definitions = require("config/generated/item_definitions")
 
 local M = {}
 local inventory_by_player = {}
 local hydrated_by_player = {}
 local normalize_map
+local match_inventory_by_player = {}
+
+local function match_item(id)
+    return weapon_definitions.by_id[id] ~= nil or item_definitions.by_id[id] ~= nil
+end
+
+local function match_bucket(player_id)
+    match_inventory_by_player[player_id] = match_inventory_by_player[player_id] or {}
+    return match_inventory_by_player[player_id]
+end
 
 local function copy_map(value)
     local result = {}
@@ -74,17 +86,20 @@ local function bucket(player_id)
         local profile = profile_service.get_profile(player_id)
         local saved = profile and profile.save and profile.save.content_inventory
         inventory_by_player[player_id] = normalize_map(saved or inventory_by_player[player_id] or {})
+        for id in pairs(inventory_by_player[player_id]) do
+            if match_item(id) then inventory_by_player[player_id][id] = nil end
+        end
         hydrated_by_player[player_id] = true
     end
     inventory_by_player[player_id] = inventory_by_player[player_id] or {}
     return inventory_by_player[player_id]
 end
 
-local function persist(player_id)
+local function persist(player_id, counts)
     if type(profile_service.update_save_section) ~= "function" then return true end
     local result = profile_service.update_save_section(
-        player_id, "content_inventory", bucket(player_id), "content_inventory_changed")
-    return result and result.ok ~= false
+        player_id, "content_inventory", counts, "content_inventory_changed")
+    return result and result.ok == true, result and result.error
 end
 
 local function snapshot(player_id)
@@ -93,6 +108,9 @@ local function snapshot(player_id)
         if count > 0 then
             counts[content_id] = count
         end
+    end
+    for content_id, count in pairs(match_bucket(player_id)) do
+        if count > 0 then counts[content_id] = count end
     end
     return { player_id = player_id, counts = counts }
 end
@@ -127,6 +145,17 @@ local function grant(payload)
     if not valid_player_id(player_id) or content_id == "" or count < 0
         or (count == 0 and not apply_effects_only) then
         return { ok = false, error = "inventory_grant_invalid" }
+    end
+    if match_item(content_id) then
+        if apply_effects_only or payload.gameplay_stat_effects ~= nil
+            or payload.effect_marker_id ~= nil then
+            return { ok = false, error = "match_item_permanent_effect_invalid" }
+        end
+        local counts = match_bucket(player_id)
+        counts[content_id] = (counts[content_id] or 0) + count
+        local changes = { [content_id] = count }
+        publish(player_id, payload.reason or "match_grant", changes)
+        return { ok = true, snapshot = snapshot(player_id), changes = changes }
     end
     local counts = bucket(player_id)
     local before = tonumber(counts[content_id]) or 0
@@ -218,7 +247,17 @@ local function transaction(payload)
     end
     local consume = normalize_map(payload.consume)
     local grant_map = normalize_map(payload.grant)
-    local counts = bucket(player_id)
+    local has_match, has_permanent = false, false
+    for _, values in ipairs({consume, grant_map}) do
+        for id in pairs(values) do
+            if match_item(id) then has_match = true else has_permanent = true end
+        end
+    end
+    if has_match and has_permanent then
+        return { ok = false, error = "inventory_mixed_storage_transaction" }
+    end
+    -- Stage first: a rejected permanent write must not consume inputs locally.
+    local counts = copy_map(has_match and match_bucket(player_id) or bucket(player_id))
     for content_id, count in pairs(consume) do
         if (counts[content_id] or 0) < count then
             return {
@@ -236,7 +275,13 @@ local function transaction(payload)
         counts[content_id] = (counts[content_id] or 0) + count
         changes[content_id] = (changes[content_id] or 0) + count
     end
-    persist(player_id)
+    if has_match then
+        match_inventory_by_player[player_id] = counts
+    else
+        local saved, save_error = persist(player_id, counts)
+        if not saved then return { ok = false, error = save_error or "inventory_persist_failed" } end
+        inventory_by_player[player_id] = counts
+    end
     publish(player_id, payload.reason or "transaction", changes)
     return { ok = true, snapshot = snapshot(player_id), changes = changes }
 end
@@ -252,6 +297,7 @@ end
 function M.init()
     inventory_by_player = {}
     hydrated_by_player = {}
+    match_inventory_by_player = {}
     event_bus.handle_request(events.CONTENT_INVENTORY_GRANT_REQUEST, grant)
     event_bus.handle_request(
         events.CONTENT_INVENTORY_TRANSACTION_REQUEST,

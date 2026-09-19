@@ -1,9 +1,9 @@
--- Engine binding is owned by core/modifier_registry and modifier_bindings.
+-- Both require() and the engine load this definition; retain one class table.
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 
-modifier_weapon_stat_projection = class({})
+modifier_weapon_stat_projection = _G.modifier_weapon_stat_projection or class({})
 _G.modifier_weapon_stat_projection = modifier_weapon_stat_projection
 
 local critical_records = {}

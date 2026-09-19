@@ -842,6 +842,8 @@ def main() -> int:
         if old.name not in expected_outputs:
             old.unlink()
     build_index(files, OUT_ROOT / "index.lua")
+    # Native name tokens must follow archetype CSV edits as well as Lua config.
+    subprocess.run([sys.executable, str(ROOT / "tools/sync_wave_unit_names.py")], cwd=ROOT, check=True)
     print(f"SUCCESS: generated {len(names)} Lua config modules")
     return 0
 

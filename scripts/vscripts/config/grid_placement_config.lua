@@ -30,4 +30,10 @@ local M = {
     forbidden_markers = {},
 }
 
+if GetMapName and GetMapName() == "survival_c6" then
+    M.build_bounds = require("config/map_layouts/survival_c6").build_bounds
+elseif GetMapName and GetMapName() == "template_map" then
+    M.build_bounds = require("config/map_layouts/template_map").build_bounds
+end
+
 return M

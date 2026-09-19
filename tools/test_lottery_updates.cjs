@@ -44,5 +44,24 @@ assert(requests.slice(beforeCache).every(r=>r.p.snapshot_scope==='read'),'cached
 events.ui_lottery_snapshot({snapshot_scope:'cache_patch',selected_pool_id:'map',cache_sequence:3,base_sequence:1,chunk:1,chunks:1,changes:[{path:['selected_pool','tickets'],value:999}]});
 assert(nodes.LotteryTicketValue.text.includes('999'),'delta refreshes current pool');
 console.log('LOTTERY_CACHE_PASS: prefetched tab switching without data fetch and incremental ticket update');
+ui.CloseInfo();ui.SelectPool('map');
+let wallClock=2000;EmbeddedDate.now=()=>wallClock*1000;
+function timed(pool,stamp){const x=updated(pool,'time-'+stamp);x.selected_pool.updated_at=stamp;return x;}
+events.ui_lottery_snapshot(timed('map',1900));
+// Clear the earlier revision-only test's local record to model first use.
+Object.keys(config.SurvivalLotteryDetailReads).forEach(k=>delete config.SurvivalLotteryDetailReads[k]);
+events.ui_lottery_snapshot(timed('map',1900));assert(nodes.LotteryUpdateDot.visible);
+ui.Feature('details');assert(!nodes.LotteryUpdateDot.visible,'opening details clears immediately, before HTTP acknowledgement');
+ui.CloseInfo();events.ui_lottery_snapshot(timed('map',1900));assert(!nodes.LotteryUpdateDot.visible,'stale unread flag cannot restore the dot');
+events.ui_lottery_snapshot(timed('map',2000));assert(!nodes.LotteryUpdateDot.visible,'equal timestamp is already read');
+events.ui_lottery_snapshot(timed('map',2001));assert(nodes.LotteryUpdateDot.visible,'later pool update is unread');
+wallClock=2002;ui.Feature('details');ui.CloseInfo();assert(!nodes.LotteryUpdateDot.visible);
+ui.SelectPool('summer');events.ui_lottery_snapshot(timed('summer',1900));assert(nodes.LotteryUpdateDot.visible,'each chest has its own viewing time');
+ui.Feature('details');ui.CloseInfo();ui.SelectPool('map');events.ui_lottery_snapshot(timed('map',2001));assert(!nodes.LotteryUpdateDot.visible);
+const savedReads=config.SurvivalLotteryDetailReads;
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','utf8'),env);
+assert.strictEqual(config.SurvivalLotteryDetailReads,savedReads,'panel reload preserves local viewing times');
+config.SurvivalLottery.Open();events.ui_lottery_snapshot(timed('map',2001));assert(!nodes.LotteryUpdateDot.visible);
+console.log('LOTTERY_READ_TIME_PASS: immediate hide, stale response, equal/new timestamp, pool isolation, UI reload');
 `;
 vm.runInNewContext(suite,{require:require('module').createRequire(path.resolve('tools/test_lottery_ui.js')),console},{filename:'lottery_updates_behavior.cjs'});

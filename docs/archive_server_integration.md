@@ -1,5 +1,23 @@
 # 全存档 HTTP 联调方案
 
+## 2026-09-14：生存商店局内库存修复
+
+`content_inventory_service` 原先把生存商店的装备发放写入永久 `save.content_inventory`，因此 HTTP 模式返回 `remote_save_requires_server_transaction`。现将 `weapon_definitions` / `item_definitions` 定义的装备、材料放入独立局内库存，由游戏服务器即时结算；商店购买、重复升级、武器进化及合成沿用统一库存事件，但不调用远端保存。合并快照供现有物品栏显示；云存档刷新保留局内库存，初始化新局清空它，旧云档中的局内装备不再载入。
+
+永久内容仍由原存档路径保护，拒绝局内/永久物品混合事务。永久库存事务改为先暂存、持久化成功后再提交内存，避免写入被拒绝后仍消耗本地输入。回归验证覆盖真实商店发放路径、重复升级、进化、云档刷新、玩家隔离、新局清理、永久发放拦截和失败原子性；提前通关冷却测试、Lua 语法及局内/抽奖 ID 无交集检查通过。现有三页商店投影测试在“19 technology groups”断言失败，该科技目录断言不涉及本次库存分层修复。未代替引擎内 addhero 后购买的实测。
+
+## 2026-09-14：奖池详情本地已读时间
+
+奖池快照新增 `updated_at`（Unix 秒），来自 `data/csv/抽奖系统/lottery_pool_updates.csv`。发布某个宝箱奖池更新时须将该行时间递增到实际更新时间，并重新生成 Lottery Lua 与 HTTP bundle、重启服务。当前配置 hash 为 `4b28247fa0bbabf0d220b4f178a9d8379fc54d362792b031fbfcd5a71c8bf20d`。
+
+客户端按账号和宝箱记录详情查看时间，查看时间大于等于更新时间时立即隐藏详情按钮红点，不等待 HTTP 已读回执，旧快照的 unread 标志不能覆盖本地记录。时间保存在 CustomUIConfig 中，跨面板重载保留；跨游戏继续使用原有云端已读确认兜底，并非本地磁盘存储。缺少时间字段的旧快照兼容原版本号。宝箱 toggle 不显示红点、不弹公告。新增测试覆盖即时隐藏、旧回包、相等时间、后续更新、宝箱隔离和界面重载；后端 16 项回归通过。
+
+## 2026-09-14：关闭默认攻击成长
+
+`hero_damage_attack_growth`、`hero_basic_attack_growth`、`hero_attribute_growth` 的 CSV / 生成 Lua 默认值均改为 0，保留实际奖励的成长结算。新配置包 hash 为 `a3dd289ca22b5418e4da558a032857f6dc8a35131afa4ce6b978e9604589f255`。已通过 SQL Editor 执行 `202609140004_remove_default_attack_growth.sql`（仅改数据库默认值，未修改已有玩家行），并重启 HTTP 服务。16 项后端测试通过。
+
+用户明确确认“执行”后，已通过 SQL Editor 执行 `server/maintenance/remove_legacy_attack_growth.sql`，一次性将三字段各减 1、最低 0，增加 profile revision，以迁移记录防止重复扣减。已直接读回数据库验证：现有 6 份云档的三字段均为 0，`20260914_remove_default_attack_growth` 迁移记录已提交。旧游戏局已有累计成长不会自动撤回，应重新开局测试。
+
 ## 2026-09-14：默认木材纠正
 
 修复 `resource_system.lua` 将本地 10 与 HTTP 档案初始木材 10 重复相加的问题，档案字段现在作为完整开局数量。`player_gameplay_stats.csv` 的 `wood_per_second` 默认值从 1 改为 0；实际奖励仍可增加该字段。已执行 `202609140003_remove_default_wood_income.sql`，用一次性迁移记录扣除已有云档的旧基础 +1/s，并增加档案 revision，不反复扣减、不重置其他奖励。新配置 hash 为 `78b3d33d78e5bc4adc10dc15ae0bfe5f969f377a4ac0d6f0eadcacbbb98adb56`。

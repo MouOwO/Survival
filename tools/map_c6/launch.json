@@ -1,0 +1,8 @@
+[
+  {
+    "name": "console_send",
+    "arguments": {
+      "commands": "sv_cheats 1\nhost_timescale 1\nr_drawpanorama 1\ndota_launch_custom_game survival survival_c6"
+    }
+  }
+]

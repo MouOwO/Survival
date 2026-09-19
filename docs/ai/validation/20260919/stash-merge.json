@@ -1,0 +1,35 @@
+{
+  "branchMerges": {
+    "game": {
+      "commit": "066cfb3ad21762152c3ba78c6ed99f43f18769b5",
+      "parents": "68a31c9753fea28d899b4d3b437355af3586b849 1dee4607e20082a3cf1695c56ca1718ddf06bffb"
+    },
+    "content": {
+      "commit": "336e25cb21f3faadd81f3324b1ba3223c046406f",
+      "parents": "45abcc409f211f870614ff33e825c17daa59babf 768c3d45594861c81c8fdf0f75373e3a2dffec53"
+    }
+  },
+  "conflictsResolved": {
+    "branch": {
+      "game": 31,
+      "content": 1
+    },
+    "stash": {
+      "game": 13,
+      "content": 1
+    }
+  },
+  "uiCompileJobs": 23,
+  "syntaxChecked": 68,
+  "regressionSuites": 16,
+  "failed": 0,
+  "uiMirrorsMatch": true,
+  "approvedCentralMapHashesMatch": true,
+  "stashFilesMissing": 0,
+  "notes": [
+    "Eight deleted build logs retained locally but not re-tracked.",
+    "39 identical duplicate wave precache entries from upstream were removed.",
+    "Three locally maintained regression tests retained despite upstream deletion.",
+    "No remote push; restored stash changes remain uncommitted."
+  ]
+}

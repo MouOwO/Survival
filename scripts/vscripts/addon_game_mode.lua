@@ -59,18 +59,7 @@ print(
 
 local multiplayer_player_service = require("systems/multiplayer_player_service")
 local modifier_registry = require("core/modifier_registry")
-local modifiers_valid, modifier_count_or_error = modifier_registry.register()
-assert(modifiers_valid,
-    "modifier registry validation failed: " .. tostring(modifier_count_or_error))
-assert(modifier_single_health_bar ~= nil,
-    "modifier_single_health_bar bootstrap failed")
-assert(modifier_debug_attack_cap ~= nil,
-    "modifier_debug_attack_cap bootstrap failed")
-assert(modifier_enemy_wall_ai ~= nil,
-    "modifier_enemy_wall_ai bootstrap failed")
-print("[SURVIVAL_MODIFIER_BOOTSTRAP] registry_refreshed=true count="
-    .. tostring(modifier_count_or_error)
-    .. " health_bar=true attack_cap=true enemy_wall_ai=true")
+-- Register from Activate, after the map's game-rules entity exists.
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")

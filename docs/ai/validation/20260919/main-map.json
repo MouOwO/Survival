@@ -1,0 +1,45 @@
+{
+  "map": "template_map",
+  "compiled": {
+    "ok": 82,
+    "failed": 0,
+    "skipped": 1
+  },
+  "runtime": {
+    "sanctuary": 292,
+    "seams": 204,
+    "mainIntegration": 64,
+    "failed": 0
+  },
+  "counts": {
+    "env_global_light": 2,
+    "info_target": 93,
+    "prop_dynamic": 1,
+    "prop_static": 4102,
+    "ent_dota_tree": 418,
+    "env_wind": 1,
+    "info_player_start_badguys": 1,
+    "info_courier_spawn_radiant": 2,
+    "info_player_start_goodguys": 1,
+    "ent_dota_game_events": 1,
+    "water_lod_control": 1,
+    "env_tonemap_controller": 1,
+    "ent_dota_lightinfo": 1,
+    "env_fog_controller": 1
+  },
+  "optimizations": {
+    "noShadows": 3272,
+    "lightweightIvy": 292,
+    "heavyIvy": 0
+  },
+  "donorUnchanged": true,
+  "overviewEmbedded": [],
+  "hashes": {
+    "maps/template_map.vpk": "15396bfb117e9ed12a23e60912a5596dd2fcfd4f5b6778ac75412615e24b49e6",
+    "../../../content/dota_addons/survival/maps/template_map.vmap": "b1db0d69db26624a322bdea472d5935433073c4eaf079c592b520f5ca42ba1d8",
+    "maps/survival_c6.vpk": "32f2591c17510efc11dfb1496114f60b950f1a7534e1b347f644c8b68601330e",
+    "../../../content/dota_addons/survival/maps/survival_c6.vmap": "69a0119964ea13cc111ce2551427dbc02cd1b9becfeae0610902d46fb2ea576d",
+    "materials/overviews/template_map.vmat_c": "3f48f37f2a64e9c7c3207fd326eb32f6d30a4c25548251a1742e0e69911293f5",
+    "materials/overviews/template_map_tga_d9088edf.vtex_c": "af4e51b7d544e6dac63379a7bb137de0371d22332c6dcc50295113ad0eed0e70"
+  }
+}

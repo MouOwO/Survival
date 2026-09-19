@@ -2,7 +2,8 @@ package.path = "scripts/vscripts/?.lua;" .. package.path
 local config = require("config/buildings_config")
 local rules = require("systems/wall_upgrade_rules")
 local quote = assert(rules.quote(config.wall, 1, true))
-assert(quote.target_level == 25 and quote.data.display_name == "城墙_9_1")
+-- The merged reference-wall assets rename level 25; its upgrade tier and cost stay fixed.
+assert(quote.target_level == 25 and quote.data.display_name == "白金城墙·Ⅰ")
 assert(quote.cost.wood == 946600 and quote.cost.gold == 143860)
 assert(not rules.quote(config.wall, 2, true))
 assert(not rules.quote(config.wall, 30, false))

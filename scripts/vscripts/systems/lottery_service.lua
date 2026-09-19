@@ -393,6 +393,7 @@ local function pool_public(pool, inventory, state)
     return {
         id = pool.id,
         revision = pool.revision,
+        updated_at = tonumber(pool.update_notice.updated_at) or 0,
         update_notice = pool.update_notice,
         update_unread = state.details_revision ~= pool.revision,
         notice_unread = state.notice_revision ~= pool.revision,

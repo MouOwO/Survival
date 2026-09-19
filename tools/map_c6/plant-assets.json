@@ -1,0 +1,310 @@
+{
+  "bush_00": {
+    "asset": "models/props_nature/bush_00.vmdl",
+    "min": [
+      -75.805275,
+      -74.105576,
+      2.2455149
+    ],
+    "max": [
+      75.64151,
+      74.67119,
+      39.524082
+    ],
+    "sha256": "16f535950e6ffe31e8041436f2ba6bf0c9e483617b624f229c74fa7ab9577941"
+  },
+  "bush_01": {
+    "asset": "models/props_nature/bush_01.vmdl",
+    "min": [
+      -123.7836,
+      -129.60457,
+      2.4493904
+    ],
+    "max": [
+      118.18635,
+      131.6665,
+      56.78732
+    ],
+    "sha256": "4890303448eb0860f602ae82cd00323026f341982c38521157503cd9a37c9555"
+  },
+  "bush_autumn_00": {
+    "asset": "models/props_nature/bush_autumn_00.vmdl",
+    "min": [
+      -75.805275,
+      -74.105576,
+      2.2455149
+    ],
+    "max": [
+      75.64151,
+      74.67119,
+      39.524082
+    ],
+    "sha256": "4c6f1d867557a37ea74b7630bc6574d34edb94c3a5c213659e7e25fe722e4717"
+  },
+  "bush_autumn_01": {
+    "asset": "models/props_nature/bush_autumn_01.vmdl",
+    "min": [
+      -123.7836,
+      -129.60457,
+      2.4493904
+    ],
+    "max": [
+      118.18635,
+      131.6665,
+      56.78732
+    ],
+    "sha256": "c5118ffcb42e1d40ddb9bb42e7bd9475c3eb24d2f3aa03e41cfd090639453125"
+  },
+  "bush_spring_00": {
+    "asset": "models/props_nature/bush_spring_00.vmdl",
+    "min": [
+      -75.805275,
+      -74.10556,
+      2.2455163
+    ],
+    "max": [
+      75.64151,
+      74.6712,
+      39.524082
+    ],
+    "sha256": "0c2c2678d70410692f7fb491f758213ab5d74a0cba9885963fdf495ecf093a60"
+  },
+  "bush_spring_01": {
+    "asset": "models/props_nature/bush_spring_01.vmdl",
+    "min": [
+      -123.7836,
+      -129.60457,
+      2.4493904
+    ],
+    "max": [
+      118.18635,
+      131.6665,
+      56.78732
+    ],
+    "sha256": "f5d0c35e70bafa6790abf1bae23bd12420aa7ed36499f5711dd12e72f1f2e610"
+  },
+  "fern001": {
+    "asset": "models/props_nature/fern001.vmdl",
+    "min": [
+      -98.01008,
+      -94.5172,
+      2.02565
+    ],
+    "max": [
+      92.91481,
+      140.7742,
+      71.33735
+    ],
+    "sha256": "b861c64d1f27d0d9ea5f9c3ccbc29309a073cbd8c834e5782ade42d5f7327786"
+  },
+  "fern002": {
+    "asset": "models/props_nature/fern002.vmdl",
+    "min": [
+      -90.4159,
+      -80.40718,
+      1.1942
+    ],
+    "max": [
+      84.41481,
+      72.08833,
+      59.135803
+    ],
+    "sha256": "91e44b38204dd48f490e675dd44671db0261bf5a8eb922a10337cf7e7d5c2c4d"
+  },
+  "grass_clump_00c": {
+    "asset": "models/props_nature/grass_clump_00c.vmdl",
+    "min": [
+      -32.63441,
+      -47.32456,
+      0.65472794
+    ],
+    "max": [
+      32.104485,
+      47.51256,
+      136.4917
+    ],
+    "sha256": "a22ac6d31694dd5621a6f64a4e09c4e5f26f33bf9e7b88289fe9fdef86edc1ee"
+  },
+  "grass_clump_00d": {
+    "asset": "models/props_nature/grass_clump_00d.vmdl",
+    "min": [
+      -32.767162,
+      -43.65858,
+      1.3653965
+    ],
+    "max": [
+      31.969507,
+      43.84123,
+      41.990395
+    ],
+    "sha256": "c589d165312ac3eb8c3c9b6b35a2bad25daa28b141ee3c2bc07b8b93d656a612"
+  },
+  "ivy001": {
+    "asset": "models/props_nature/ivy001.vmdl",
+    "min": [
+      -177.6843,
+      -303.2446,
+      31.2492
+    ],
+    "max": [
+      160.2554,
+      228.5682,
+      354.2717
+    ],
+    "sha256": "b43aecc982fa03d922268e3302077db016d0b2ef162f86154a295597a4b6a235"
+  },
+  "ivy_128a": {
+    "asset": "models/props_nature/ivy_128a.vmdl",
+    "min": [
+      -80.6833,
+      -87.9808,
+      -17.859253
+    ],
+    "max": [
+      84.8251,
+      69.1202,
+      8.859245
+    ],
+    "sha256": "fc8eaae941850addc0e7bccffd7f1d8749d62a8a04c9555b2589c8ff12c2c4fc"
+  },
+  "grass_clump_00b": {
+    "asset": "models/props_nature/grass_clump_00b.vmdl",
+    "min": [
+      -36.33661,
+      -55.77396,
+      1.75
+    ],
+    "max": [
+      35.98301,
+      56.007294,
+      50.75
+    ],
+    "sha256": "7f9972728f372274f6d113c03f1fddf66a05de7d1a143ffecdac4a6e88ad9b78"
+  },
+  "grass_clump_00e": {
+    "asset": "models/props_nature/grass_clump_00e.vmdl",
+    "min": [
+      -29.762661,
+      -44.356514,
+      1.4245076
+    ],
+    "max": [
+      30.051432,
+      44.54208,
+      43.71117
+    ],
+    "sha256": "f7dbc83188608ade03a1aca0bcc6038bc2787e014fc26041334dabaecf55c741"
+  },
+  "grass_clump_00f": {
+    "asset": "models/props_nature/grass_clump_00f.vmdl",
+    "min": [
+      -29.656569,
+      -27.542673,
+      1.3885798
+    ],
+    "max": [
+      30.58461,
+      27.657898,
+      36.6575
+    ],
+    "sha256": "36d9619de4696ee9b5660838525fe0ed0bb726ec1fda7f414984578f8dc8e343"
+  },
+  "grass_clump_02b": {
+    "asset": "models/props_nature/grass_clump_02b.vmdl",
+    "min": [
+      -36.336613,
+      -55.77396,
+      1.7500001
+    ],
+    "max": [
+      35.983013,
+      56.007294,
+      50.75
+    ],
+    "sha256": "51268a0f244789dc755fc325a26f7974fba27b64f958541394c71484c54eebe9"
+  },
+  "grass_clump_02d": {
+    "asset": "models/props_nature/grass_clump_02d.vmdl",
+    "min": [
+      -32.767162,
+      -43.65858,
+      1.3653965
+    ],
+    "max": [
+      31.969511,
+      43.84123,
+      41.990395
+    ],
+    "sha256": "88ecaaffd2a42dff78bc60957f35cc80aead68527e13c857c6ea7137062fd669"
+  },
+  "fern003": {
+    "asset": "models/props_nature/fern003.vmdl",
+    "min": [
+      -66.62823,
+      -61.94524,
+      -2.1613731
+    ],
+    "max": [
+      60.76202,
+      64.15275,
+      63.89764
+    ],
+    "sha256": "bb1329add00458e6b9ff25739fa9df39820fd673b021a67defdcf80bdd497a1d"
+  },
+  "plant001": {
+    "asset": "models/props_nature/plant001.vmdl",
+    "min": [
+      -75.09794,
+      -82.565025,
+      -2.167293
+    ],
+    "max": [
+      82.37712,
+      71.330826,
+      149.97433
+    ],
+    "sha256": "921bc4b5a07d85103b431a0120e7bf2fbbd251bb767e8b5ea3df14e80b10d56d"
+  },
+  "plant002": {
+    "asset": "models/props_nature/plant002.vmdl",
+    "min": [
+      -60.7474,
+      -99.8088,
+      -1.486
+    ],
+    "max": [
+      84.4328,
+      86.694,
+      188.6502
+    ],
+    "sha256": "f61c1b940222cbe8db858be50b3a7b5b12273ef4ad19fcbb095cead1f52e20d5"
+  },
+  "flowers003": {
+    "asset": "models/props_nature/flowers003.vmdl",
+    "min": [
+      -204.1852,
+      -124.32262,
+      -2.1755757
+    ],
+    "max": [
+      188.54706,
+      147.47116,
+      26.143822
+    ],
+    "sha256": "e1ccc0c14ed024cb9e1fa3bedd05d1c6c1b96104a9c960ac951b1fac19091d7c"
+  },
+  "mushroom_wild_01": {
+    "asset": "models/props_nature/mushroom_wild_01.vmdl",
+    "min": [
+      -24.6354,
+      -12.302909,
+      0.052522898
+    ],
+    "max": [
+      8.350738,
+      18.677595,
+      43.176357
+    ],
+    "sha256": "3dfb6963c4c0e71dd8e06d6c5854c1ff652b2f6733049862b45d8a6604ea1ab1"
+  }
+}

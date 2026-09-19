@@ -1,5 +1,5 @@
-modifier_research_technology = class({})
-modifier_research_armor_reduction = class({})
+modifier_research_technology = _G.modifier_research_technology or class({})
+modifier_research_armor_reduction = _G.modifier_research_armor_reduction or class({})
 _G.modifier_research_technology = modifier_research_technology
 _G.modifier_research_armor_reduction = modifier_research_armor_reduction
 

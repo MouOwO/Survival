@@ -13,11 +13,11 @@ initial_population_cap,integer,0,population,0,,1,玩家初始人口上限。
 starjoy_points,integer,0,points,0,,1,星悦积分。
 map_level,integer,0,level,0,,1,玩家永久地图等级；等级本身是成长维度，实际加成由map_level_effect_rules派生。
 hero_initial_attack,integer,100,attack,0,,1,英雄初始攻击力。
-hero_damage_attack_growth,decimal,1,attack_per_damage,0,,1,英雄每次造成伤害后的攻击力增加量。
-hero_basic_attack_growth,decimal,1,attack_per_attack,0,,1,英雄每次普通攻击后的攻击力增加量。
+hero_damage_attack_growth,decimal,0,attack_per_damage,0,,1,默认不随伤害增加攻击力；仅计入实际获得的成长奖励。
+hero_basic_attack_growth,decimal,0,attack_per_attack,0,,1,默认不随普攻增加攻击力；仅计入实际获得的成长奖励。
 hero_final_damage_bonus_pct,percentage,0,percent,0,10000,1,英雄最终伤害增加百分比；15表示15%。
 hero_attack_armor_reduction,decimal,0,armor,0,,1,英雄攻击附带的初始减甲量。
-hero_attribute_growth,decimal,1,attribute_per_growth,0,,1,英雄攻击三围成长量。
+hero_attribute_growth,decimal,0,attribute_per_growth,0,,1,默认不随攻击增加三围；仅计入实际获得的成长奖励。
 hero_attributes_per_second,decimal,0,attributes_per_second,0,,1,星之庇佑每秒增加的英雄全属性。
 hero_critical_damage_bonus_pct,percentage,0,percent,0,10000,1,英雄暴击伤害增加百分比；25表示25%。
 hero_attack_bonus_pct,percentage,0,percent,0,10000,1,按英雄当前面板攻击力（含融合装备）计算的百分比加成；20表示20%。

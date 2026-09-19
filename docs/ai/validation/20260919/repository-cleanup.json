@@ -1,0 +1,69 @@
+{
+  "date": "2026-09-19",
+  "cleanup": {
+    "game": {
+      "RemovedFiles": 5043,
+      "Bytes": 4291411948,
+      "EmptyDirectories": 279,
+      "Skipped": []
+    },
+    "content": {
+      "RemovedFiles": 1603,
+      "Bytes": 4750632
+    },
+    "validationOutputsAndMergeResidues": {
+      "RemovedFiles": 20,
+      "Bytes": 259871000,
+      "EmptyDirectories": 1,
+      "Skipped": []
+    }
+  },
+  "syntax": {
+    "js": 24,
+    "lua": 52,
+    "powershell": 4
+  },
+  "hashes": {
+    "maps/template_map.vpk": "15396bfb117e9ed12a23e60912a5596dd2fcfd4f5b6778ac75412615e24b49e6",
+    "../../../content/dota_addons/survival/maps/template_map.vmap": "b1db0d69db26624a322bdea472d5935433073c4eaf079c592b520f5ca42ba1d8",
+    "maps/survival_c6.vpk": "32f2591c17510efc11dfb1496114f60b950f1a7534e1b347f644c8b68601330e",
+    "../../../content/dota_addons/survival/maps/survival_c6.vmap": "69a0119964ea13cc111ce2551427dbc02cd1b9becfeae0610902d46fb2ea576d",
+    "materials/overviews/template_map.vmat_c": "3f48f37f2a64e9c7c3207fd326eb32f6d30a4c25548251a1742e0e69911293f5",
+    "materials/overviews/template_map_tga_d9088edf.vtex_c": "af4e51b7d544e6dac63379a7bb137de0371d22332c6dcc50295113ad0eed0e70"
+  },
+  "c6FreshGeneration": {
+    "rooms": 47,
+    "counts": {
+      "west_main": 10,
+      "west_inner": 3,
+      "northwest": 4,
+      "northeast": 4,
+      "southwest": 4,
+      "southeast": 4,
+      "east": 4,
+      "small_southeast": 10,
+      "individual": 4
+    },
+    "entities": 7036,
+    "assets": 52,
+    "terrainFallbacks": 34
+  },
+  "aiFixtureRegression": {
+    "passed": true,
+    "output": [
+      "[C6_AI_CHECK] PASS FIFO, arrivals, release, death, promotion, retarget, reset",
+      "[C6_AI_CHECK] count=100 updates=30 before_ms=252.000 after_ms=13.000 before_resolves=588000 after_resolves=26400 before_sorts=2880 after_sorts=0",
+      "[C6_AI_CHECK] count=200 updates=30 before_ms=1071.000 after_ms=28.000 before_resolves=2376000 after_resolves=53400 before_sorts=5880 after_sorts=0",
+      "[C6_AI_CHECK] count=400 updates=30 before_ms=4397.000 after_ms=53.000 before_resolves=9552000 after_resolves=107400 before_sorts=11880 after_sorts=0",
+      "[C6_AI_CHECK] PASS attack order cache, idle recovery, navigation, retarget and invalid target"
+    ]
+  },
+  "keptLocalIgnoredFiles": 589,
+  "previousMergeChecks": "stash-merge.json",
+  "runtimeChecks": "main-map.json",
+  "notes": [
+    "Fresh C6 generation was validated without compiling over authored maps.",
+    "Generated validation outputs are removed after verification.",
+    "Original UI handoff source packages and required local server bundles are retained."
+  ]
+}
