@@ -37,7 +37,23 @@
 
 ## 材质
 
-`molten_surface_materials.py` 在项目既有 `wall_surface_materials.py` 基础上加入可平铺的矿物裂隙、玄武岩孔洞和冷却外壳。颜色、法线与粗糙度由同一套表面痕迹生成，旧铜有氧化斑和划痕，石材实体倒角使用克制的磨损亮边。
+### 材质打磨 v2
+
+按已确认的金币房材质响应方案，新增独立的 `tools/molten_room_materials.py`。玄武岩区分断面磨损、裂缝和火山孔隙；焦石覆灰区域保持哑光；铜器区分青绿氧化层与裸露磨亮铜面；暗铁保留锻造凹痕。冷却熔岩的外壳与暗橙裂隙具有不同反射，仍为普通受光材质，无自发光、火焰或粒子。
+
+引擎使用 `global_lit_simple` 的线性 R 反射遮罩，并明确设置浮点 `g_flSpecularIntensity`、`g_flBumpStrength` 与零 `g_flSpecularBloom`。法线按既有 UV 尺度生成；DirectX 法线仅在 Blender 节点中翻转一次 G。粗糙度和金属度贴图用于 Blender，未虚称引擎接受 PBR 粗糙度输入。
+
+`output/molten_core_room/material_review/index.html` 是同光照、同相机的 Blender 前后对比，另更新完整房间预览。几何、UV、碰撞、布局和地图光照均不变。新材质没有重新做实机画面对比；此前 `runtime_verification.json` 记录的是原来的导航检查，不能视为新版材质的实机验收。
+
+只刷新材质，不重建模型或地图：
+
+```powershell
+& 'D:/magic and love/软件/Blender/blender.exe' --background --python tools/refine_molten_room_materials.py
+& tools/install_molten_core_room.ps1 -MaterialsOnly
+& 'D:/magic and love/软件/Blender/5.2/python/bin/python.exe' -B -X utf8 tools/verify_molten_core_room.py
+```
+
+初版的 `molten_surface_materials.py` 在项目既有 `wall_surface_materials.py` 基础上加入可平铺的矿物裂隙、玄武岩孔洞和冷却外壳。颜色、法线与粗糙度由同一套表面痕迹生成，旧铜有氧化斑和划痕，石材实体倒角使用克制的磨损亮边。
 
 全部 VMAT 为普通 `global_lit_simple.vfx`，带法线与反射输入；没有 fullbright、自发光或纹理滚动。Blender BSDF 的 Emission Strength 为 0。预览中的照明仅为场景环境光。
 

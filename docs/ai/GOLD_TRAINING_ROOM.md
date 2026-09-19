@@ -1,5 +1,24 @@
 # 金币练功房 · 模块化样板
 
+## 材质修订：gold_surface_response_v2
+
+本次只更新金币练功房的材质与预览。几何、UV、碰撞、房间布局和地图光照保持原样；主岛、熔火核心及其他建筑未采用此修订。
+
+- 验看入口：`output/gold_training_room/material_review/index.html`，提供石材/金币、石材/铜盆的同角度前后滑动对比。对比图为同光照的 Blender Cycles 渲染，游戏截图单独标注。
+- 已查明：原编译材质已启用并绑定法线与高光。`global_lit_simple.vfx` 的 Reflectance 是线性 R 通道强度；它没有 PBR Roughness / Metallic 输入，因此 Blender 粗糙度不会直接带进游戏。旧算法让石面反射几乎恒定在约 0.025，材质之间的反射差异不足。
+- 改动：石材增加中等尺度表面起伏、矿物孔隙和磨损面的反射变化；天然岩石更粗糙；青铜和金币按氧化/磨亮区域分别控制高光；木纹凹凸加强，布料保持哑光。统一法线方向约定，Blender 端只做一次 DirectX → OpenGL 的 G 通道翻转。
+- 保留原生道具使用的 `global_lit_simple`，显式写入浮点型 `g_flSpecularIntensity` / `g_flBumpStrength`；`g_flSpecularBloom=0.0`。未添加自发光或粒子。Roughness / Metallic PNG 用于 Blender 预览，游戏读取独立的 Reflectance 遮罩；两种着色器并非完全等价。
+- 独立实现：`tools/gold_room_materials.py`。共享的 `wall_surface_materials.py` 未更改，防止其他房间重建时一起变化。
+- 已通过实际编译资源检查：29 个模型、15 套材质、599 个实例；高光浮点参数、纹理依赖、安装源文件一致性、模型边界、碰撞和可行走支撑属性均通过。实机截图及本轮验证结果见 `material_review/`；旧的 `previews/runtime_complete.png` 是上一轮基准图。
+- 本轮已加载独立游戏地图，但截图被难度选择 / 判负界面遮挡，没有完成无遮挡的游戏近景对比。此限制记录在 `material_review/runtime_verification.json`，遮挡截图不作为画质验收图，也不放进材质对比页。
+
+仅更新现有房间材质时：
+
+1. Blender 后台运行 `tools/refine_gold_room_materials.py`，更新贴图、打包场景和同条件预览。
+2. `tools/install_gold_training_room.ps1 -MaterialsOnly`，只同步本房间材质；不覆盖地图、模型和 `floor_support.vmat`。
+3. Blender 后台运行 `tools/refresh_gold_room_cards.py` 更新组件卡片；运行 `tools/verify_gold_training_room.py` 检查实际编译资源。
+4. `node tools/build_gold_material_review.cjs` 与 `node tools/build_gold_room_gallery.cjs` 更新预览页。
+
 ## 交付
 
 按用户提供的四张参考图搭建封闭练功房：后侧半圆传送台、中央金属刷怪地纹、石墙、金币标识碑、青铜火盆、外围岩石与植被。全部为可编辑网格；没有制作发光、火焰或粒子。

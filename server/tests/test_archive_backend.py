@@ -1,9 +1,12 @@
 import copy
 import hashlib
 import json
+import os
+import shutil
 from pathlib import Path
 import sys
 import threading
+import tempfile
 import unittest
 import importlib.util
 import urllib.request
@@ -11,7 +14,7 @@ import urllib.error
 from http.server import ThreadingHTTPServer
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'server'))
-from archive_backend.bundle import Bundle
+from archive_backend.bundle import Bundle, build
 from archive_backend.service import ArchiveService,ArchiveError
 
 class Database:
@@ -75,16 +78,32 @@ class App:
 class ArchiveTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        current=json.loads((ROOT/'server/bundles/current.json').read_text())
-        cls.bundle=Bundle(ROOT/'server/bundles'/current['hash'])
+        cls.lua=os.environ.get('LUA_EXECUTABLE') or shutil.which('lua5.1') or shutil.which('lua')
+        if not cls.lua:
+            raise RuntimeError('Set LUA_EXECUTABLE to run archive settlement tests')
+        # Test the current sources, without replacing a game's chosen bundle or
+        # its generated HTTP hash. A restored deployment pointer can be older.
+        cls.bundle_temp=tempfile.TemporaryDirectory(prefix='archive-backend-test-')
+        cls.addClassCleanup(cls.bundle_temp.cleanup)
+        cls.game_bundle_before=(ROOT/'scripts/vscripts/config/generated/archive_http_bundle.lua').read_bytes()
+        cls.current_before=(ROOT/'server/bundles/current.json').read_bytes()
+        destination=Path(cls.bundle_temp.name)
+        digest=build(ROOT,destination=destination,update_game_config=False)
+        cls.bundle=Bundle(destination/digest)
     def setUp(self):
         self.db=Database(self.bundle);self.app=App(self.db)
-        self.service=ArchiveService(self.app,self.bundle,r'C:\Program Files\lua\bin\lua5.1.exe')
+        self.service=ArchiveService(self.app,self.bundle,self.lua)
         self.account=self.app._database_account_id('100');self.profile=self.db.profile(self.account);self.n=0
     def command(self,kind,**values):
         self.n+=1
         return {'account_id':'100','config_hash':self.bundle.hash,'command':dict(id='testsession:op:'+str(self.n),kind=kind,**values)}
     def send(self,kind,**values):return self.service.command(self.command(kind,**values))
+    def test_separate_bundle_build_includes_lottery_without_switching_game(self):
+        self.assertIn('lottery_pool_definitions',self.bundle.configs)
+        self.assertTrue((self.bundle.directory/'systems/lottery_http_settlement.lua').is_file())
+        self.assertTrue((self.bundle.directory/'config/content_id_aliases.lua').is_file())
+        self.assertEqual((ROOT/'scripts/vscripts/config/generated/archive_http_bundle.lua').read_bytes(),self.game_bundle_before)
+        self.assertEqual((ROOT/'server/bundles/current.json').read_bytes(),self.current_before)
     def test_clear_and_lost_response(self):
         payload=self.command('clear',difficulty_id='n1',count=1)
         self.db.lose_reply=True
@@ -173,9 +192,11 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(len(results),4);self.assertTrue(all(r['ok'] for r in results))
         self.assertEqual(self.profile['save']['archive']['clear_counts']['n1'],1)
     def test_http_auth_and_command(self):
-        sys.path.insert(0,r'D:\survival_database\backend')
-        spec=importlib.util.spec_from_file_location('fishing_api.archive_staged_server',ROOT/'server/staged/fishing_api/server.py')
-        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        backend=os.environ.get('FISHING_BACKEND_ROOT')
+        if not backend:
+            raise RuntimeError('Set FISHING_BACKEND_ROOT to the backend/ directory under test')
+        sys.path.insert(0,backend)
+        from fishing_api import server as module
         self.app.archive=self.service
         server=ThreadingHTTPServer(('127.0.0.1',0),module.make_handler(self.app))
         thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
@@ -248,5 +269,14 @@ class ArchiveTests(unittest.TestCase):
         self.assertTrue(self.send('lottery_exchange',pool_id='map',item_id=item['id'],request_id='exchange_1')['ok'])
         self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],0)
         self.assertEqual(self.profile['save']['content_inventory'][item['id']],1)
+
+    def test_incomplete_recovery_never_returns_stale_profile(self):
+        payload=self.command('clear',difficulty_id='n1',count=1)
+        self.service.settle=lambda *args: (_ for _ in ()).throw(TimeoutError('worker stopped'))
+        with self.assertRaises(TimeoutError):self.service.command(payload)
+        self.service=ArchiveService(self.app,self.bundle,self.service.lua)
+        self.service.finish_prepared=lambda *args:{'ok':False,'error':'archive_busy_retry'}
+        with self.assertRaisesRegex(TimeoutError,'archive_pending_retry'):
+            self.service.profile({'account_id':'100'})
 
 if __name__=='__main__':unittest.main()

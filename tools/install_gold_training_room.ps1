@@ -1,4 +1,4 @@
-param([switch]$SkipMap)
+param([switch]$SkipMap,[switch]$MaterialsOnly)
 $ErrorActionPreference='Stop'
 $goldGame=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $goldContent=[IO.Path]::GetFullPath((Join-Path $goldGame '../../../content/dota_addons/survival'))
@@ -6,6 +6,14 @@ $goldOut=Join-Path $goldGame 'output/gold_training_room'
 $goldSource=Join-Path $goldOut 'source'
 $goldCompiler=[IO.Path]::GetFullPath((Join-Path $goldGame '../../bin/win64/resourcecompiler.exe'))
 $goldFiles=@(Get-ChildItem -LiteralPath $goldSource -Recurse -File)
+if($MaterialsOnly){
+ # A surface revision must not replace model/map edits or the navigation support.
+ $goldMaterialRoot=Join-Path $goldSource 'materials/gold_training_room'
+ $goldFiles=@(Get-ChildItem -LiteralPath $goldMaterialRoot -File | Where-Object {
+  $_.Name -ne 'floor_support.vmat' -and $_.Extension -in '.vmat','.png'
+ })
+ $SkipMap=$true
+}
 foreach($goldFile in $goldFiles){
  $goldRelative=$goldFile.FullName.Substring($goldSource.Length+1)
  $goldTarget=Join-Path $goldContent $goldRelative

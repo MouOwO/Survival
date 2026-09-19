@@ -152,7 +152,7 @@ class ArchiveService:
         for operation in pending:
             prepared=self.app.rpc_client.rpc("archive_resume",{"p_account":database_account,"p_id":operation["id"]})
             result=self.finish_prepared(database_account,operation["id"],prepared)
-            if not result.get("ok"): raise ArchiveError("archive_online_pending")
+            if not result.get("ok"): raise TimeoutError("archive_online_pending")
 
     def profile(self,payload):
         # Called after the existing profile loader initializes a new player.
@@ -160,7 +160,10 @@ class ArchiveService:
         account=self.app._database_account_id(payload["account_id"])
         self.drain_online(account)
         for pending in self.app.rpc_client.rpc("archive_pending",{"p_account":account}):
-            self.finish_prepared(account,pending["id"],self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":pending["id"]}))
+            result=self.finish_prepared(account,pending["id"],self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":pending["id"]}))
+            if not result.get("ok") and not result.get("terminal"):
+                # A contested/incomplete settlement is not a successfully loaded save.
+                raise TimeoutError("archive_pending_retry")
         value=self.app.rpc_client.rpc("get_fishing_profile",{"p_account_id":account})
         return self.app._public_response(value,account,payload["account_id"])
 
@@ -174,7 +177,7 @@ class ArchiveService:
 
 def install(application,addon_root,lua):
     root=Path(addon_root)
-    current=json.loads((root/"server/bundles/current.json").read_text())
+    current=json.loads((root/"server/bundles/current.json").read_text(encoding="utf-8"))
     service=ArchiveService(application,Bundle(root/"server/bundles"/current["hash"]),lua)
     service.sync()
     return service

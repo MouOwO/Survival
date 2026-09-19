@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Goufayu database backup
+
+[Timer]
+OnCalendar=*-*-* 03:15:00
+RandomizedDelaySec=15m
+Persistent=true
+Unit=goufayu-backup.service
+
+[Install]
+WantedBy=timers.target

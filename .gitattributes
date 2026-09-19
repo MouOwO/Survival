@@ -13,3 +13,9 @@ output/survival_world_v2/before_cloud_integration_v2/survival_world_v2.vmap filt
 output/** -whitespace
 *.vpcf -whitespace
 *.vmdl -whitespace
+
+# Linux deployment entrypoints must remain executable after a Windows checkout.
+server/aliyun/**/*.sh text eol=lf
+server/aliyun/deploy/pg-bin/* text eol=lf
+server/aliyun/deploy/*.service text eol=lf
+server/aliyun/deploy/*.timer text eol=lf

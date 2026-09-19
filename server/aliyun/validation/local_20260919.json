@@ -1,0 +1,176 @@
+{
+  "date": "2026-09-19",
+  "scope": "isolated local Windows test environment; synthetic player data only",
+  "python": "3.13.13",
+  "postgresql": "17.11",
+  "psycopg": "3.3.6",
+  "lua": "5.4.5",
+  "target_python": "3.11; syntax checked locally, ECS runtime verification pending",
+  "unit_tests": {
+    "backend": 49,
+    "archive_with_real_lua": 14,
+    "deployment_offline": 16,
+    "database_tools_offline": 8,
+    "total": 87,
+    "status": "PASS"
+  },
+  "postgres_http_integration": {
+    "tests": 8,
+    "status": "PASS",
+    "covers": [
+      "reentry",
+      "account isolation",
+      "concurrent idempotency",
+      "lost committed response",
+      "stale save vs permanent grant",
+      "content_inventory preservation",
+      "positive online outbox recovery",
+      "runtime permission denials",
+      "database outage returns HTTP503 without empty save"
+    ]
+  },
+  "http_acceptance": {
+    "format": 1,
+    "status": "PASS",
+    "code": "http_acceptance_passed",
+    "started_at": "2026-09-19T11:06:28.319801+00:00",
+    "synthetic_accounts": [
+      "9002111350388296167",
+      "9008829312315867572"
+    ],
+    "checks": {
+      "unauthorized_requests_rejected": true,
+      "authenticated_database_readiness": true,
+      "archive_config_loaded": true,
+      "two_synthetic_profiles_initialized": true,
+      "boss_command_replay_exactly_once": true,
+      "player_isolation_and_operation_scope": true,
+      "profile_reentry_over_fresh_http_connections": true,
+      "raw_save_routes_and_command_rejected": true,
+      "positive_online_interval_replay_exactly_once": true
+    },
+    "not_tested": [
+      "real_game_client",
+      "process_restart",
+      "database_outage",
+      "offsite_restore"
+    ],
+    "test_records_retained": true,
+    "finished_at": "2026-09-19T11:06:36.878966+00:00"
+  },
+  "separate_process_restart": {
+    "status": "PASS",
+    "process_restart_preserved_two_synthetic_players": true,
+    "test_scope": "separate_local_backend_process_after_HTTP_acceptance",
+    "remote_connections": false
+  },
+  "database_validation": {
+    "status": "PASS",
+    "postgres_version": "17.11",
+    "offline_tests": 8,
+    "rollback_app_integration": {
+      "status": "PASS",
+      "database": "goufayu_restore_legacy_target",
+      "csv_defaults": 97,
+      "app_privilege_denials": 5,
+      "grant_idempotency": true,
+      "archive_idempotency": true,
+      "checkpoint_final_and_idempotency": true,
+      "outbox_exactly_once": true,
+      "committed_test_rows": 0
+    },
+    "populated_current_restore": {
+      "status": "PASS",
+      "database": "goufayu_restore_acceptance",
+      "tables": 15,
+      "data_fingerprints_match": true,
+      "function_definitions_match": true,
+      "triggers_match": true,
+      "sequences": {},
+      "source_writes": false,
+      "constraints_and_indexes_match": true,
+      "runtime_acl_applied": false,
+      "note": "Full-schema restore preserves source business logic. Apply reviewed target hardening separately before runtime use."
+    },
+    "populated_current_reconcile": {
+      "status": "PASS",
+      "database": "goufayu_restore_acceptance",
+      "new_target_migrations": [],
+      "old_columns_and_rows_preserved": true,
+      "original_source_writes": false,
+      "permissions": {
+        "rpc_count": 11,
+        "table_access": false,
+        "ddl": false,
+        "role_membership": false
+      },
+      "source_dump_sha256": "44a98eec7e89e859b70fd5d42b41d18beab474844aa191d95393f71cf8c98284"
+    },
+    "legacy_restore": {
+      "status": "PASS",
+      "database": "goufayu_restore_legacy_target",
+      "tables": 9,
+      "data_fingerprints_match": true,
+      "function_definitions_match": true,
+      "triggers_match": true,
+      "sequences": {},
+      "source_writes": false,
+      "constraints_and_indexes_match": true,
+      "runtime_acl_applied": false,
+      "note": "Full-schema restore preserves source business logic. Apply reviewed target hardening separately before runtime use."
+    },
+    "legacy_reconcile": {
+      "status": "PASS",
+      "database": "goufayu_restore_legacy_target",
+      "new_target_migrations": [
+        "addon/202609060001_archive_stat_columns.sql",
+        "addon/202609060002_all_archive.sql",
+        "addon/202609060003_archive_buildings.sql",
+        "manual/202609060001_archive_fishing_inventory.sql",
+        "target/202609190001_attack_interval_semantics.sql"
+      ],
+      "old_columns_and_rows_preserved": true,
+      "original_source_writes": false,
+      "permissions": {
+        "rpc_count": 11,
+        "table_access": false,
+        "ddl": false,
+        "role_membership": false
+      },
+      "source_dump_sha256": "4c68b8dbe448a2b262a7fc7cbc1e4fc6ac7d25224e2e5f3c22730c8f09971ac2"
+    },
+    "guards": {
+      "nonempty_restore": "target_not_empty",
+      "fresh_on_reconciled": "restored_target_use_reconcile_not_fresh_migrate"
+    },
+    "remote_connections": false,
+    "original_data_modified": false,
+    "adopted_database_disaster_recovery": {
+      "status": "PASS",
+      "database": "goufayu_restore_recovery",
+      "new_target_migrations": [],
+      "old_columns_and_rows_preserved": true,
+      "original_source_writes": false,
+      "permissions": {
+        "rpc_count": 11,
+        "table_access": false,
+        "ddl": false,
+        "role_membership": false
+      },
+      "source_dump_sha256": "d5933690f1a05824d0d7229318a7a9e8573b33fc92353d42fb8294fb5dc9ff4d"
+    }
+  },
+  "remote_ecs_connected": false,
+  "supabase_exported": false,
+  "ecs_deployed": false,
+  "offsite_backup_configured": false,
+  "game_environment_switched": false,
+  "not_validated": [
+    "Alibaba Linux Python3.11 runtime",
+    "cloud Podman bridge",
+    "cloud systemd and Nginx",
+    "remote Supabase actual schema/data",
+    "real Dota game client",
+    "offsite backup and recovery"
+  ]
+}

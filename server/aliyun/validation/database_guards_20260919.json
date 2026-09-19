@@ -1,0 +1,133 @@
+{
+  "status": "PASS",
+  "remote_connections": false,
+  "cluster_reinitialized": false,
+  "original_data_modified": false,
+  "tests": [
+    {
+      "name": "complete_history_then_idempotent",
+      "status": "PASS",
+      "fresh": {
+        "status": "migrated",
+        "database": "goufayu_restore_guard_20260919204117_fresh",
+        "new_migrations": 17,
+        "recorded_migrations": 18,
+        "permissions": {
+          "rpc_count": 11,
+          "table_access": false,
+          "ddl": false,
+          "role_membership": false
+        }
+      },
+      "again": {
+        "status": "migrated",
+        "database": "goufayu_restore_guard_20260919204117_fresh",
+        "new_migrations": 0,
+        "recorded_migrations": 18,
+        "permissions": {
+          "rpc_count": 11,
+          "table_access": false,
+          "ddl": false,
+          "role_membership": false
+        }
+      }
+    },
+    {
+      "name": "migrate_wrong_database",
+      "status": "PASS",
+      "refusal": "target_database_name_refused"
+    },
+    {
+      "name": "bootstrap_wrong_database",
+      "status": "PASS",
+      "refusal": "bootstrap_database_name_refused"
+    },
+    {
+      "name": "bootstrap_pgdata_is_business_schema",
+      "status": "PASS",
+      "refusal": "bootstrap_unknown_schema"
+    },
+    {
+      "name": "empty_guard_pgdata",
+      "status": "PASS",
+      "refusal": "target_unknown_schema"
+    },
+    {
+      "name": "bootstrap_unknown_extension",
+      "status": "PASS",
+      "refusal": "bootstrap_unknown_extension"
+    },
+    {
+      "name": "empty_guard_unknown_extension",
+      "status": "PASS",
+      "refusal": "target_unknown_extension"
+    },
+    {
+      "name": "emptyledger",
+      "status": "PASS",
+      "refusal": "empty_migration_ledger_requires_review"
+    },
+    {
+      "name": "ledgerdata",
+      "status": "PASS",
+      "refusal": "empty_migration_ledger_requires_review"
+    },
+    {
+      "name": "missingschema",
+      "status": "PASS",
+      "refusal": "migration_ledger_schema_relations_mismatch"
+    },
+    {
+      "name": "nonprefix",
+      "status": "PASS",
+      "refusal": "migration_ledger_not_contiguous_prefix"
+    },
+    {
+      "name": "genuine_first_migration_prefix_resumes",
+      "status": "PASS"
+    },
+    {
+      "name": "existing_backup_restore_reconcile",
+      "status": "PASS",
+      "restore": {
+        "status": "PASS",
+        "database": "goufayu_restore_guard_20260919204117_restore",
+        "tables": 15,
+        "data_fingerprints_match": true,
+        "function_definitions_match": true,
+        "triggers_match": true,
+        "sequences": {},
+        "source_writes": false,
+        "constraints_and_indexes_match": true,
+        "runtime_acl_applied": false,
+        "note": "Full-schema restore preserves source business logic. Apply reviewed target hardening separately before runtime use."
+      },
+      "reconcile": {
+        "status": "PASS",
+        "database": "goufayu_restore_guard_20260919204117_restore",
+        "new_target_migrations": [],
+        "old_columns_and_rows_preserved": true,
+        "original_source_writes": false,
+        "permissions": {
+          "rpc_count": 11,
+          "table_access": false,
+          "ddl": false,
+          "role_membership": false
+        },
+        "source_dump_sha256": "44a98eec7e89e859b70fd5d42b41d18beab474844aa191d95393f71cf8c98284"
+      }
+    }
+  ],
+  "retained_local_databases": [
+    "goufayu_restore_guard_20260919204117_fresh",
+    "goufayu_guard_20260919204117_wrongname",
+    "goufayu_restore_guard_20260919204117_pgdata",
+    "goufayu_restore_guard_20260919204117_extension",
+    "goufayu_restore_guard_20260919204117_emptyledger",
+    "goufayu_restore_guard_20260919204117_ledgerdata",
+    "goufayu_restore_guard_20260919204117_missingschema",
+    "goufayu_restore_guard_20260919204117_nonprefix",
+    "goufayu_restore_guard_20260919204117_resume",
+    "goufayu_restore_guard_20260919204117_restore"
+  ]
+}

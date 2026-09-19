@@ -1,4 +1,4 @@
-param([switch]$SkipMap)
+param([switch]$SkipMap,[switch]$MaterialsOnly)
 $ErrorActionPreference='Stop'
 $moltenGame=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $moltenContent=[IO.Path]::GetFullPath((Join-Path $moltenGame '../../../content/dota_addons/survival'))
@@ -6,6 +6,10 @@ $moltenOut=Join-Path $moltenGame 'output/molten_core_room'
 $moltenSource=Join-Path $moltenOut 'source'
 $moltenCompiler=[IO.Path]::GetFullPath((Join-Path $moltenGame '../../bin/win64/resourcecompiler.exe'))
 $moltenFiles=@(Get-ChildItem -LiteralPath $moltenSource -Recurse -File)
+if($MaterialsOnly){
+ $moltenMaterialRoot=[IO.Path]::GetFullPath((Join-Path $moltenSource 'materials/molten_core_room'))+[IO.Path]::DirectorySeparatorChar
+ $moltenFiles=@($moltenFiles | Where-Object { $_.FullName.StartsWith($moltenMaterialRoot,[StringComparison]::OrdinalIgnoreCase) -and $_.Name -ne 'floor_support.vmat' })
+}
 foreach($moltenFile in $moltenFiles){
  $moltenRelative=$moltenFile.FullName.Substring($moltenSource.Length+1)
  $moltenTarget=Join-Path $moltenContent $moltenRelative
@@ -21,7 +25,7 @@ foreach($moltenExt in @('.vmat','.vmdl')){
   Write-Output ('Compiled '+$moltenFile.Name)
  }
 }
-if(-not $SkipMap){
+if(-not $SkipMap -and -not $MaterialsOnly){
  $moltenMap=Join-Path $moltenContent 'maps/molten_core_room_review.vmap'
  $moltenStart=Get-Date
  & $moltenCompiler -i $moltenMap -game (Join-Path $moltenGame '../../dota') -f *> (Join-Path $moltenOut 'map_compile.log')

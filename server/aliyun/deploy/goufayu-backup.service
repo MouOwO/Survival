@@ -1,0 +1,24 @@
+[Unit]
+Description=Goufayu PostgreSQL snapshot and encrypted offsite copy
+Requires=goufayu-db.service
+After=goufayu-db.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/goufayu/releases/current
+EnvironmentFile=/etc/goufayu/backup.env
+ExecStart=/bin/sh -c 'exec /opt/goufayu/releases/current/.venv/bin/python /opt/goufayu/releases/current/deploy/backup.py'
+UMask=0077
+TimeoutStartSec=3600
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=true
+StandardOutput=journal
+StandardError=journal

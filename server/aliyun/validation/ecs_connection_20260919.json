@@ -1,0 +1,29 @@
+{
+  "record_scope": "historical_initial_connection_attempt",
+  "superseded_by": "ecs_deployment_20260919.json",
+  "date": "2026-09-19",
+  "target": "47.110.238.248",
+  "ssh_user": "root",
+  "ssh_port": 22,
+  "ssh_handshake_reached": true,
+  "authenticated": false,
+  "local_user_ssh_directory": "C:/Users/li/.ssh",
+  "local_user_ssh_directory_found": false,
+  "private_keys_created_or_exported": false,
+  "strict_host_key_checking": true,
+  "connection_error": "No ED25519 host key is known; Host key verification failed",
+  "untrusted_scanned_host_fingerprint": "SHA256:3cUNJuxLSLLSw7CIDmtOis7yGlxaSt+D7DQJmc6Uno8",
+  "host_fingerprint_verified_via_cloud_console": false,
+  "host_key_added_to_known_hosts": false,
+  "remote_commands_executed": false,
+  "remote_changes_made": false,
+  "deployment_status": "blocked_pending_user_ssh_public_key_install_and_host_fingerprint_verification",
+  "unverified": [
+    "remote_operating_system_and_package_versions",
+    "existing_database_container_mounts_and_contents",
+    "remote_application_role_permissions",
+    "remote_backend_deployment_and_systemd",
+    "remote_loopback_health_and_database_read_write",
+    "remote_idempotency_and_restart_persistence"
+  ]
+}

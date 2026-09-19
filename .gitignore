@@ -324,3 +324,8 @@ __pycache__/
 !/scripts/vscripts/tests/test_wall_engagement_cache.lua
 /scripts/vscripts/tests/map_c6_ai_check_generated.lua
 /scripts/vscripts/tests/map_c6_corner_probe.lua
+
+# Isolated backend migration work, downloaded test tools, test secrets and dumps.
+/output/ecs_backend_work/
+/output/aliyun_releases/
+/server/aliyun/**/__pycache__/

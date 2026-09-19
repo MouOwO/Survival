@@ -192,5 +192,7 @@
   "markers": 13,
   "main_map_modified": false,
   "runtime_report": "runtime_verification.json",
+  "material_revision": "molten_surface_response_v2",
+  "material_runtime_verified": false,
   "custom_instance_triangles": 339476
 }

@@ -2,14 +2,14 @@
 
 blender --background --python tools/build_gold_training_room.py
 """
-import bpy,bmesh,json,math,random,sys,struct,zlib
+import bpy,bmesh,json,math,random,sys
 import numpy as np
 from pathlib import Path
 from mathutils import Vector,Matrix
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from gold_room_geometry import build_modules,PALETTE
-from wall_surface_materials import surface_maps
+from gold_room_materials import build_materials,REVISION
 OUT=ROOT/'output/gold_training_room';SOURCE=OUT/'source'
 MODELS=SOURCE/'models/gold_training_room';MATS=SOURCE/'materials/gold_training_room'
 for p in (OUT,MODELS,MATS,OUT/'previews'):p.mkdir(parents=True,exist_ok=True)
@@ -21,49 +21,8 @@ groups={}
 for name in ('01 Paving','02 Enclosure','03 Functional landmarks','04 Edge planting','05 Ground','06 Native pine'):
     groups[name]=bpy.data.collections.new(name);scene.collection.children.link(groups[name])
 library=bpy.data.scenes.new('B01-B16 Modular Library')
-materials={};matmeta=[]
-
-def png(path,pixels):
-    a=np.uint8(np.clip(pixels,0,1)*255+.5)
-    if a.ndim==2:a=np.repeat(a[:,:,None],3,axis=2)
-    h,w,c=a.shape
-    def chunk(t,d):return struct.pack('!I',len(d))+t+d+struct.pack('!I',zlib.crc32(t+d)&0xffffffff)
-    path.write_bytes(b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('!2I5B',w,h,8,2,0,0,0))+
-                     chunk(b'IDAT',zlib.compress(b''.join(b'\x00'+row.tobytes()for row in a),6))+chunk(b'IEND',b''))
-
 print('GOLD_ROOM materials',flush=True)
-for key,col in PALETTE.items():
-    source_key='wall_stone' if key.startswith('stone') or key=='rock' else key
-    color,normal,props=surface_maps(source_key,col,.22 if key=='gold' else .60)
-    if key=='gold':color=np.clip(color*np.asarray([1.12,1.22,1.3]),0,1)
-    rough=props[:,:,0]
-    if key.startswith('leaf') or key in ('flower','moss','teal','earth','mortar'):
-        rough=np.full_like(rough,.84 if key!='teal' else .90)
-    normal_dx=normal.copy();normal_dx[:,:,1]=1-normal_dx[:,:,1]
-    reflectance=.018+.30*(1-rough)**2
-    for suffix,p in [('color',color),('normal',normal_dx),('roughness',rough),('reflectance',reflectance)]:png(MATS/(key+'_'+suffix+'.png'),p)
-    canonical='materials/gold_training_room/'+key+'.vmat'
-    mat=bpy.data.materials.new(canonical);mat.use_nodes=True
-    bs=mat.node_tree.nodes.get('Principled BSDF');nodes=mat.node_tree.nodes;links=mat.node_tree.links
-    for suffix,socket in [('color','Base Color'),('roughness','Roughness')]:
-        n=nodes.new('ShaderNodeTexImage');n.image=bpy.data.images.load(str(MATS/(key+'_'+suffix+'.png')))
-        if suffix!='color':n.image.colorspace_settings.name='Non-Color'
-        links.new(n.outputs['Color'],bs.inputs[socket])
-    n=nodes.new('ShaderNodeTexImage');n.image=bpy.data.images.load(str(MATS/(key+'_normal.png')));n.image.colorspace_settings.name='Non-Color'
-    sep=nodes.new('ShaderNodeSeparateColor');combine=nodes.new('ShaderNodeCombineColor');invert=nodes.new('ShaderNodeMath')
-    invert.operation='SUBTRACT';invert.inputs[0].default_value=1
-    links.new(n.outputs['Color'],sep.inputs[0]);links.new(sep.outputs[0],combine.inputs[0]);links.new(sep.outputs[2],combine.inputs[2]);links.new(sep.outputs[1],invert.inputs[1]);links.new(invert.outputs[0],combine.inputs[1])
-    nm=nodes.new('ShaderNodeNormalMap');links.new(combine.outputs[0],nm.inputs['Color']);links.new(nm.outputs[0],bs.inputs['Normal'])
-    bs.inputs['Metallic'].default_value=.55 if key in ('gold','bronze') else 0
-    two_sided=key.startswith('leaf') or key in ('teal','flower','moss')
-    mat.use_backface_culling=not two_sided
-    text='"Layer0"\n{\n"shader" "global_lit_simple.vfx"\n"F_NORMAL_MAP" "1"\n"F_SPECULAR" "1"\n'
-    if two_sided:text+='"F_RENDER_BACKFACES" "1"\n'
-    for channel,suffix in [('Color','color'),('Normal','normal'),('Reflectance','reflectance')]:
-        text+='"Texture'+channel+'" "materials/gold_training_room/'+key+'_'+suffix+'.png"\n'
-    text+='"g_vColorTint" "[1 1 1 0]"\n}\n'
-    (MATS/(key+'.vmat')).write_text(text,encoding='utf-8');materials[key]=mat
-    matmeta.append(dict(name=key,size=1024,color_std=float(np.std(color)),normal_std=float(np.std(normal[:,:,:2])),roughness_mean=float(np.mean(rough)),emissive=False))
+materials,matmeta=build_materials(MATS)
 
 def collision_file(name,index,shape):
     if 'vertices' in shape:v=shape['vertices']
@@ -220,6 +179,7 @@ groundmesh=bpy.data.meshes.new('Preview studio ground');groundmesh.from_pydata([
 ground=bpy.data.objects.new('Preview backdrop (not exported)',groundmesh);scene.collection.objects.link(ground)
 gm=bpy.data.materials.new('Warm neutral preview background');gm.diffuse_color=(.24,.225,.205,1);groundmesh.materials.append(gm)
 scene['purpose']='Independent gold practice-room art sample; no emission. Component pivots in Source units.'
+scene['surface_revision']=REVISION
 scene['walkable_interior']='2048 x 2304; central point (0,-140); arrival (0,1096); Z=0.'
 scene['native_asset']='models/props_foliage/tree_pine01.vmdl (preview glTF only; runtime references original)'
 for screen in bpy.data.screens:

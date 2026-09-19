@@ -1,6 +1,7 @@
 """Verify actual Source 2 resources and the assembled prefab's spatial contract."""
 import json,re,subprocess
 from pathlib import Path
+from asset_validation import installed_source
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'output/gold_training_room'
 INSPECTOR=ROOT.parents[1]/'bin/win64/resourceinfo.exe'
 assets=json.loads((OUT/'asset_manifest.json').read_text(encoding='utf-8'))
@@ -25,6 +26,20 @@ for m in materials:
     assert m['name']+'_reflectance' in text,m['name']
     assert 'F_FULLBRIGHT = 1' not in text and 'F_SELF_ILLUM = 1' not in text
     assert m['normal_std']>.0001 and m['color_std']>.005
+    if m.get('revision')=='gold_surface_response_v2':
+        # Check the compiled values, not just the source flags. These parameters
+        # must survive the shader compiler; roughness is Blender-only here.
+        for parameter,expected in [('g_flSpecularIntensity',m['specular_intensity']),('g_flBumpStrength',m['bump_strength']),('g_flSpecularBloom',0)]:
+            value=re.search(r'm_name = "'+parameter+r'"\s+m_flValue = ([\d.eE+-]+)',text)
+            assert value and abs(float(value[1])-expected)<.001,(m['name'],parameter,'compiled value missing/wrong')
+        assert 'm_name = "g_tSpecular"' in text
+        for suffix in ('.vmat','_color.png','_normal.png','_reflectance.png','_roughness.png','_metallic.png'):
+            rel='materials/gold_training_room/'+m['name']+suffix
+            installed_source(OUT/'source'/rel,rel)
+        if m['name'] in ('gold','bronze'):
+            assert m['reflectance_mean']>.35 and m['reflectance_std']>.15,'metal needs polished/tarnished contrast'
+        if m['name'] in ('stone','stone_light','stone_cool','rock'):
+            assert m['normal_std']>.05 and m['reflectance_std']>.02,'stone relief/specular variation missing'
 support=dump('materials/gold_training_room/floor_support.vmat_c')
 assert 'dota.nav.walkable = 1.0' in support,'custom room floor must participate in Dota navigation'
 models={a['name']:a for a in assets}

@@ -1,0 +1,71 @@
+{
+  "format": 1,
+  "status": "PASS",
+  "validation": "local_postgres_http_process_restart",
+  "date": "2026-09-19",
+  "scope": "Local Windows PostgreSQL 17 fixture and the actual D:/survival_database Python HTTP backend; two synthetic test accounts only.",
+  "remote": false,
+  "ecs_accessed": false,
+  "http_endpoint": "http://127.0.0.1:8796",
+  "database_endpoint": "127.0.0.1:55437",
+  "database_fixture": "goufayu_test",
+  "payment_mode": "test",
+  "original_reports": {
+    "before": "output/ecs_backend_work/http_restart_before_20260919T204218.json",
+    "after": "output/ecs_backend_work/http_restart_after_20260919T204218.json",
+    "processes": "output/ecs_backend_work/http_restart_processes_20260919T204218.json",
+    "private_acl_preserved": true
+  },
+  "process_restart": {
+    "first_http_pid": 19804,
+    "second_http_pid": 25752,
+    "first_process_exited_before_second_start": true,
+    "distinct_processes_observed": true,
+    "both_http_processes_exited_after_validation": true,
+    "postgres_restarted_between_http_runs": false
+  },
+  "before": {
+    "mode": "write_test",
+    "code": "http_acceptance_passed",
+    "checks": {
+      "unauthorized_requests_rejected": true,
+      "authenticated_database_readiness": true,
+      "archive_config_loaded": true,
+      "two_synthetic_profiles_initialized": true,
+      "boss_command_replay_exactly_once": true,
+      "player_isolation_and_operation_scope": true,
+      "profile_reentry_over_fresh_http_connections": true,
+      "raw_save_routes_and_command_rejected": true,
+      "positive_online_interval_replay_exactly_once": true
+    },
+    "synthetic_player_counters": [
+      {"player": "A", "revision": 2, "boss_kills": 1, "online_seconds_total": 1, "archive_online_actual_seconds": 1},
+      {"player": "B", "revision": 1, "boss_kills": 1, "online_seconds_total": 0, "archive_online_actual_seconds": 0}
+    ]
+  },
+  "after": {
+    "mode": "verify_prior_report",
+    "code": "http_prior_report_verified",
+    "checks": {
+      "authenticated_database_readiness": true,
+      "original_archive_config_retained": true,
+      "synthetic_player_1_saved_state_retained": true,
+      "synthetic_player_2_saved_state_retained": true,
+      "stored_rewards_counters_and_account_isolation_retained": true,
+      "no_new_business_commands_submitted": true
+    },
+    "same_synthetic_accounts": true,
+    "revisions_counters_and_full_save_sha256_unchanged": true,
+    "profile_read_side_effects": "profile_may_ensure_upsert_and_drain_pending_settlements"
+  },
+  "cleanup": {
+    "temporary_http_token_removed": true,
+    "postgres_pid": 20044,
+    "postgres_stopped_after_all_agents_finished": true,
+    "shutdown_mode": "fast",
+    "pg_ctl_status": "no server running",
+    "database_data_retained": true,
+    "synthetic_test_records_retained": true
+  },
+  "not_tested": ["ECS deployment", "real game client", "database process restart or outage", "offsite restore"]
+}

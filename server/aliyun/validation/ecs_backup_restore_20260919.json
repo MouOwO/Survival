@@ -1,0 +1,221 @@
+{
+  "status": "PASS",
+  "completed_at_utc": "2026-09-19T14:18:02.940316+00:00",
+  "source": {
+    "environment": "ECS test instance",
+    "database": "goufayu_test",
+    "synthetic_accounts_only": true,
+    "backup_created_at": "2026-09-19T14:11:53.188102+00:00",
+    "same_exported_snapshot": true,
+    "source_snapshot": "00000046-00000008-1",
+    "source_writes_by_verifier": false
+  },
+  "release": "20260919-test03",
+  "artifacts": {
+    "backup_manifest.json": {
+      "sha256": "7889e588267cdecbb1d846b7e3195e3fd8805e5555987373146945a36c7e1869",
+      "remote_sha256sum_match": true,
+      "bytes": 2768
+    },
+    "database.dump": {
+      "sha256": "b87c5d76cbab3f3fbac370711d02f1600dd3a1cbf39122b2324abfe548961719",
+      "remote_sha256sum_match": true,
+      "bytes": 156663
+    },
+    "inventory.json": {
+      "sha256": "a8df75bf56fbd6103f0d22e5ed84d546313754c49915e2c5c703de5466a49694",
+      "remote_sha256sum_match": true,
+      "bytes": 79692
+    },
+    "schema.sql": {
+      "sha256": "3881b7f3d273e48293c7f3f773bd43321bbb1b11a333f95edd7616126728aacd",
+      "remote_sha256sum_match": true,
+      "bytes": 61567
+    }
+  },
+  "target": {
+    "environment": "existing isolated local PostgreSQL",
+    "database": "goufayu_restore_ecs_20260919_141802",
+    "address": "127.0.0.1",
+    "port": 55437,
+    "server_version_num": 170011,
+    "new_database": true,
+    "existing_cluster_reinitialized": false,
+    "existing_databases_modified": false,
+    "database_retained": true,
+    "started_by_verifier": true,
+    "stopped_after_verification": true
+  },
+  "restore": {
+    "status": "PASS",
+    "database": "goufayu_restore_ecs_20260919_141802",
+    "tables": 15,
+    "data_fingerprints_match": true,
+    "function_definitions_match": true,
+    "triggers_match": true,
+    "sequences": {},
+    "source_writes": false,
+    "constraints_and_indexes_match": true,
+    "runtime_acl_applied": false,
+    "note": "Full-schema restore preserves source business logic. Apply reviewed target hardening separately before runtime use."
+  },
+  "reconcile": {
+    "status": "PASS",
+    "database": "goufayu_restore_ecs_20260919_141802",
+    "new_target_migrations": [],
+    "old_columns_and_rows_preserved": true,
+    "original_source_writes": false,
+    "permissions": {
+      "rpc_count": 11,
+      "table_access": false,
+      "ddl": false,
+      "role_membership": false
+    },
+    "source_dump_sha256": "b87c5d76cbab3f3fbac370711d02f1600dd3a1cbf39122b2324abfe548961719"
+  },
+  "source_table_fingerprints": {
+    "public._goufayu_migrations": {
+      "rows": 18,
+      "sha256": "5a3c609286abf17bf38ea03b914ee198bcc6191f140d6f6270458a0a0fedb38f"
+    },
+    "public.archive_config_sets": {
+      "rows": 1,
+      "sha256": "e67d38757a5613665ce06bb2d306a4916a478184517a5a690641d194c1816fef"
+    },
+    "public.archive_entitlements": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "public.archive_online_outbox": {
+      "rows": 1,
+      "sha256": "76af5f5323f1d3e249067ff92816ed7fd7e14f03008186fac57dcfd995ff361d"
+    },
+    "public.archive_operations": {
+      "rows": 5,
+      "sha256": "19d009f8df714817626d352fbf8cd72aff3fd061cd49e11747112aed3a85e7a3"
+    },
+    "public.online_time_idempotency": {
+      "rows": 2,
+      "sha256": "0d195150db1752ca67edc282cb1c6c84abcdf4eabb500f2773de0e2460314779"
+    },
+    "public.online_time_sessions": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "public.out_of_match_reward_idempotency": {
+      "rows": 1,
+      "sha256": "6c3dd5780593a7e71d3acaa72e74c76e48389511bc61e1d80b5b87367207b604"
+    },
+    "public.player_archive_state": {
+      "rows": 4,
+      "sha256": "3ba238800003eaa5c479b66a73b1b2762b9adbc89d25da6d3a2b4214fc30f8f3"
+    },
+    "public.player_effect_totals": {
+      "rows": 1,
+      "sha256": "34323229d08f1d29caf017f0250af29e0c217aed05c61b99c2c46ac354f51cfb"
+    },
+    "public.player_gameplay_stats": {
+      "rows": 4,
+      "sha256": "c6a1f5ef08ceba614807b9307af2019508aa78352f719b7eaefbddce1789c89f"
+    },
+    "public.reward_grants": {
+      "rows": 1,
+      "sha256": "93a260d27d148034e8dfeb361fa26e7edca9ea1e2286990eea0f7b75afef1757"
+    },
+    "public.star_blessing_reward_definition_sets": {
+      "rows": 1,
+      "sha256": "ab4c7d14a118d54ff77e2cd184741f6668be1fc6a237b0b1ad2506f8f4b9dc3e"
+    },
+    "public.star_blessing_reward_definitions": {
+      "rows": 26,
+      "sha256": "44d428c59b37131db87a0839405141020a6267ba2e17f0bd7706a5017534b550"
+    },
+    "public.survival_players": {
+      "rows": 4,
+      "sha256": "6bcc1dd733e7855ea0dd7c328ce0a04fcc32755f213490fae70b8a9fbf0d84df"
+    }
+  },
+  "final_business_table_fingerprints": {
+    "public.archive_config_sets": {
+      "rows": 1,
+      "sha256": "e67d38757a5613665ce06bb2d306a4916a478184517a5a690641d194c1816fef"
+    },
+    "public.archive_entitlements": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "public.archive_online_outbox": {
+      "rows": 1,
+      "sha256": "76af5f5323f1d3e249067ff92816ed7fd7e14f03008186fac57dcfd995ff361d"
+    },
+    "public.archive_operations": {
+      "rows": 5,
+      "sha256": "19d009f8df714817626d352fbf8cd72aff3fd061cd49e11747112aed3a85e7a3"
+    },
+    "public.online_time_idempotency": {
+      "rows": 2,
+      "sha256": "0d195150db1752ca67edc282cb1c6c84abcdf4eabb500f2773de0e2460314779"
+    },
+    "public.online_time_sessions": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "public.out_of_match_reward_idempotency": {
+      "rows": 1,
+      "sha256": "6c3dd5780593a7e71d3acaa72e74c76e48389511bc61e1d80b5b87367207b604"
+    },
+    "public.player_archive_state": {
+      "rows": 4,
+      "sha256": "3ba238800003eaa5c479b66a73b1b2762b9adbc89d25da6d3a2b4214fc30f8f3"
+    },
+    "public.player_effect_totals": {
+      "rows": 1,
+      "sha256": "34323229d08f1d29caf017f0250af29e0c217aed05c61b99c2c46ac354f51cfb"
+    },
+    "public.player_gameplay_stats": {
+      "rows": 4,
+      "sha256": "c6a1f5ef08ceba614807b9307af2019508aa78352f719b7eaefbddce1789c89f"
+    },
+    "public.reward_grants": {
+      "rows": 1,
+      "sha256": "93a260d27d148034e8dfeb361fa26e7edca9ea1e2286990eea0f7b75afef1757"
+    },
+    "public.star_blessing_reward_definition_sets": {
+      "rows": 1,
+      "sha256": "ab4c7d14a118d54ff77e2cd184741f6668be1fc6a237b0b1ad2506f8f4b9dc3e"
+    },
+    "public.star_blessing_reward_definitions": {
+      "rows": 26,
+      "sha256": "44d428c59b37131db87a0839405141020a6267ba2e17f0bd7706a5017534b550"
+    },
+    "public.survival_players": {
+      "rows": 4,
+      "sha256": "6bcc1dd733e7855ea0dd7c328ce0a04fcc32755f213490fae70b8a9fbf0d84df"
+    }
+  },
+  "application_permissions": {
+    "runtime_adapter_ready": true,
+    "rpc_count": 11,
+    "denials": [
+      "direct_table_read",
+      "schema_ddl",
+      "temporary_table",
+      "owner_role",
+      "internal_function"
+    ],
+    "direct_table_access": false,
+    "ddl": false,
+    "role_membership": false
+  },
+  "post_permission_checks_business_rows_unchanged": true,
+  "sequences": {
+    "count": 0,
+    "matches_source": true
+  },
+  "remote_connections_by_verifier": false,
+  "notes": [
+    "All 15 tables matched the exported snapshot before reconciliation.",
+    "Reconciliation adds one local restore provenance entry; all original business rows and columns remain unchanged.",
+    "No credentials, account identifiers, or full archive payloads are included in this report."
+  ]
+}

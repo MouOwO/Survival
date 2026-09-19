@@ -1,0 +1,49 @@
+[Unit]
+Description=Goufayu game archive API (loopback only)
+Requires=goufayu-db.service
+After=network-online.target goufayu-db.service
+Wants=network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=goufayu
+Group=goufayu
+WorkingDirectory=/opt/goufayu/releases/current
+EnvironmentFile=/etc/goufayu/api.env
+Environment=PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+# /bin/sh exists before the first current symlink is activated. The command is
+# entirely static; secrets remain in EnvironmentFile, never shell arguments.
+ExecStart=/bin/sh -c 'exec /opt/goufayu/releases/current/.venv/bin/python /opt/goufayu/releases/current/backend/run_fishing_api.py >> /var/log/goufayu/api.log 2>&1'
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=90
+TimeoutStopSec=25
+KillMode=mixed
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ReadWritePaths=/var/log/goufayu/api.log
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=localhost
+LimitNOFILE=4096
+TasksMax=64
+MemoryMax=512M
+# journal captures failures before the shell opens append-mode logging.
+# Avoid append: syntax, which was introduced after upstream systemd 239.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

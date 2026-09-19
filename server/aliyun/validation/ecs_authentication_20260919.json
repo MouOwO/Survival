@@ -1,0 +1,22 @@
+{
+  "record_scope": "historical_pre_authorized_keys_repair",
+  "superseded_by": "ecs_deployment_20260919.json",
+  "target": "47.110.238.248",
+  "ssh_user": "root",
+  "ssh_port": 22,
+  "ssh_handshake_reached": true,
+  "host_fingerprint_verified_via_cloud_console": true,
+  "host_fingerprint": "SHA256:3cUNJuxLSLLSw7CIDmtOis7yGlxaSt+D7DQJmc6Uno8",
+  "identity_file_name": "goufayu_ecs_ed25519_v2",
+  "login_public_key_fingerprint": "SHA256:PlaHJ0IsSIkyb3KymqVAIlYForco2xFm1aAe4i2VzGA",
+  "matching_key_loaded_in_windows_agent": true,
+  "ssh_offered_matching_public_key": true,
+  "strict_host_key_checking": true,
+  "authenticated": false,
+  "connection_error": "Permission denied (publickey,gssapi-keyex,gssapi-with-mic)",
+  "remote_commands_executed": false,
+  "remote_changes_made": false,
+  "ecs_deployed": false,
+  "awaiting": "Cloud console checks of authorized_keys fingerprints, root SSH permissions and effective sshd settings",
+  "note": "Host identity is verified. Server rejection of the login key remains unresolved; do not infer whether the cause is key installation, permissions or sshd policy."
+}

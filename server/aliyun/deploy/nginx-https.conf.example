@@ -1,0 +1,38 @@
+# NOT installed/enabled automatically. Fill a real domain and certificate first.
+# Add this only after localhost verification and an authenticated TLS test.
+limit_req_zone $binary_remote_addr zone=goufayu_api:10m rate=10r/s;
+server {
+    listen 443 ssl;
+    server_name YOUR_DOMAIN;
+    ssl_certificate /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    client_max_body_size 16k;
+    client_body_timeout 10s;
+    client_header_timeout 10s;
+    keepalive_timeout 15s;
+    server_tokens off;
+    # Headers and bodies are never part of the access log. Do not log $http_authorization.
+    access_log /var/log/nginx/goufayu-access.log combined;
+    error_log /var/log/nginx/goufayu-error.log warn;
+
+    location ~ ^/v1/(profile|rewards/grant|online-time/checkpoint|archive/config|archive/command)$ {
+        # Fill the actual trusted GAME SERVER egress IP/CIDR and uncomment.
+        # allow TRUSTED_GAME_SERVER_IP;
+        deny all;
+        limit_except POST { deny all; }
+        limit_req zone=goufayu_api burst=30 nodelay;
+        proxy_pass http://127.0.0.1:8765;
+        proxy_set_header Host $host;
+        proxy_set_header Authorization $http_authorization;
+        proxy_set_header Connection "";
+        proxy_http_version 1.1;
+        proxy_request_buffering on;
+        proxy_connect_timeout 3s;
+        proxy_send_timeout 15s;
+        proxy_read_timeout 25s;
+    }
+    # Health stays local. All existing game API routes share the trusted IP gate;
+    # rewards/grant is not a public payment callback endpoint.
+    location / { return 404; }
+}
