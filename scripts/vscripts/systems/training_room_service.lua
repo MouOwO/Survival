@@ -2,7 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local actions = require("config/generated/altar_actions")
-local locations = require("config/generated/challenge_locations")
+local room_locations = require("systems/player_room_locations")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local return_home = require("systems/hero_return_home_service")
 local destination_validation = require("systems/destination_validation_service")
@@ -45,12 +45,12 @@ local function progression_for(player_id)
     return result and result.snapshot or {}
 end
 
-local function marker_for(action)
-    local location = (locations.by_id or {})[action.location_id] or {}
+local function marker_for(action, player_id)
+    local location = room_locations.resolve(action.location_id, player_id) or {}
     local preferred = tostring(location.entry_target_name or "")
     local target = preferred ~= "" and Entities:FindByName(nil, preferred) or nil
     if valid(target) then return target, preferred, false end
-    local fallback = tostring(action.fallback_target_name or "")
+    local fallback = tostring(room_locations.marker_name(action.fallback_target_name, player_id) or "")
     target = fallback ~= "" and Entities:FindByName(nil, fallback) or nil
     if valid(target) then
         print(string.format(
@@ -88,6 +88,10 @@ local function spawn_target(player_id, action, marker)
     local unit_name = tostring(action.target_unit_name or "")
     if unit_name == "" then return nil end
     local origin = marker:GetAbsOrigin() + Vector(260, 0, 0)
+    local location = room_locations.resolve(action.location_id, player_id)
+    local target_name = location and (location.spawn_target_names or {})[1]
+    local target_marker = target_name and Entities:FindByName(nil, target_name)
+    if valid(target_marker) then origin = target_marker:GetAbsOrigin() end
     local target = CreateUnitByName(
         unit_name, origin, true, nil, nil, DOTA_TEAM_BADGUYS
     )
@@ -164,7 +168,7 @@ function M.enter(player_id, action_id)
     if rebirth < required then
         return { ok = false, error = "需要英雄" .. tostring(required) .. "转" }
     end
-    local marker, marker_name = marker_for(action)
+    local marker, marker_name = marker_for(action, player_id)
     if not valid(marker) then
         return { ok = false, error = "传送地点不存在：" .. tostring(marker_name) }
     end
@@ -230,7 +234,7 @@ function M.enter(player_id, action_id)
         room_origin = position,
         room_radius = math.max(
             256,
-            tonumber(((locations.by_id or {})[action.location_id] or {}).room_radius)
+            tonumber((room_locations.resolve(action.location_id, player_id) or {}).room_radius)
                 or 1200
         ),
     }

@@ -91,8 +91,15 @@ function M.commit_replacement(player_id, hero)
     return true, nil
 end
 
-function M.abort_replacement(player_id)
+function M.abort_replacement(player_id, replacement)
     if phase_by_player[player_id] == "replacing" then
+        -- ReplaceHeroWithNoTransfer already removed the original carrier.
+        -- Keep the replacement hidden and retryable if its landing failed.
+        if valid_entity(replacement) then
+            hero_by_player[player_id] = replacement
+            replacement.survival_hero_id = nil
+            replacement.survival_display_name = nil
+        end
         phase_by_player[player_id] = "placeholder"
         M.isolate_placeholder(player_id, hero_by_player[player_id])
     end

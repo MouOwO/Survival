@@ -1,0 +1,68 @@
+{
+  "map": "template_map",
+  "layout": "V4",
+  "date": "2026-09-20",
+  "grid": 128,
+  "rooms": {
+    "ordinary": 16,
+    "endless15x": 4,
+    "rebirth": 10,
+    "rings": 10,
+    "other_model_rooms": 2
+  },
+  "native_continents": 9,
+  "dungeon_change": "Three northwest dungeons retained; challenge_06 restored as standalone native snow island; challenge_07 original model moved to east sea gap; east mode continent moved south 2048.",
+  "compile": {
+    "ok": 238,
+    "failed": 0,
+    "skipped": 1
+  },
+  "runtime": {
+    "passed": 1333,
+    "failed": 0,
+    "checks": [
+      "expected marker locations",
+      "walkable ground",
+      "8 horizontal same-height attack lanes",
+      "20 actual private-room teleports",
+      "player scoped monster marker paths",
+      "central sanctuary routes and builder floors",
+      "ocean isolation",
+      "challenge_06 and challenge_07 real teleports, internal paths, and ocean isolation"
+    ],
+    "log": "output/map_layout_v4_challenges/runtime.log"
+  },
+  "unit_tests": [
+    "test_player_room_locations",
+    "test_challenge_unit_names"
+  ],
+  "vpk_sha256": "ab8d91a7f7cfb3a8fc874ab40e47002713e414543eaaa437b48fa3e60a9f53e2",
+  "source_sha256": "25cb025fce7864a083b6045823ed42a7f7ee3d98ad1d4264d946a5a81611d0f7",
+  "before_source": "output/map_layout_v4_challenges/template_before.vmap",
+  "screenshots": [
+    "art/maps/c6/layout_v4_challenges_topdown.png",
+    "art/maps/c6/layout_v4_challenges_topdown_full.png",
+    "art/maps/c6/layout_v4_east_challenges.png"
+  ],
+  "scope_note": "New mode continents have terrain and markers; no unspecified new mode rules have been invented.",
+  "east_challenges": [
+    {
+      "id": "challenge_06",
+      "center": [
+        10624,
+        2304,
+        128
+      ],
+      "source": "original native snow island"
+    },
+    {
+      "id": "challenge_07",
+      "center": [
+        14336,
+        2304,
+        128
+      ],
+      "source": "approved original model room, no scaling"
+    }
+  ]
+}

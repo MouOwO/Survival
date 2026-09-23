@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-23",
+  "status": "PASS_WITH_LIMITATIONS",
+  "scope": "Two-stage admission and mode profile loading; observed single-player loading-screen retirement",
+  "backend_release": "20260923-mode02",
+  "evidence_attribution": {
+    "frame_analysis": "Independent reviewer compared every saved frame and visually inspected representative boundary, mode-selection and gameplay frames.",
+    "real_game_input": "Orchestrating agent performed actual client mode selection and N1 confirmation after compiling and fully restarting Dota.",
+    "backend_77": "reported_by_backend_agent; passing tool stdout confirmed by orchestrating agent, not rerun by frame reviewer",
+    "http_10": "Fixed sanitized PASS output read from output/ecs_backend_work/mode_deploy/deploy_entry_auth.log; no remote account report exported",
+    "local_lua_and_ui": "Exit statuses read from output/ecs_backend_work/mode_deploy/local_checks.json"
+  },
+  "automated_validation": {
+    "backend_tests": {
+      "passed": 77,
+      "evidence_kind": "reported_by_backend_agent"
+    },
+    "actual_ecs_http": {
+      "status": "PASS",
+      "passed": 10,
+      "checks": {
+        "login_requires_server_authentication": true,
+        "admission_only_metadata_no_mode_lock_or_save": true,
+        "pure_login_defaults_without_old_save": true,
+        "pure_retains_difficulty_permissions": true,
+        "login_idempotency_mode_lock_and_account_isolation": true,
+        "pure_new_rewards_apply_and_persist_without_old_bonuses": true,
+        "clear_replay_exactly_once_and_unlock_persisted": true,
+        "automatic_checkpoint_does_not_restore_old_bonuses": true,
+        "standard_mode_uses_complete_persistent_save": true,
+        "other_account_unchanged": true
+      },
+      "same_database_migration_manifest_as_mode01": true,
+      "new_mode02_database_migrations": 0,
+      "mode02_process_restart_persistence_retested": false
+    },
+    "final_local_checks": {
+      "lua_exit_codes": {
+        "test_startup_loading_service.lua": 0,
+        "test_player_entry_authentication.lua": 0,
+        "test_startup_order_gate.lua": 0,
+        "test_startup_ui_request_gate.lua": 0
+      },
+      "node_test_match_setup_ui_cjs_exit_code": 0,
+      "startup_ui_included_by_match_setup_suite": true,
+      "workshop_ui_build_marker": "MATCH_SETUP_UI_BUILD_PASS",
+      "build_evidence_kind": "orchestrating_agent_confirmed_tool_stdout"
+    }
+  },
+  "real_client_validation": {
+    "real_players_in_each_run": 1,
+    "mode_selection_and_n1_confirmation": {
+      "standard": true,
+      "pure": true,
+      "evidence_kind": "actual_client_input_reported_by_orchestrating_agent_and_recorded_HUD_frames"
+    },
+    "mode_views_distinct_observed_by_orchestrating_agent": true,
+    "background_positive_control": {
+      "run": "entry_run_2",
+      "confirmed_recurrences_after_first_exit": 2,
+      "recurrence_frame_indices": [41, 85],
+      "recurrence_milliseconds": [4570, 9387],
+      "visually_confirmed": true,
+      "visible_true_telemetry_after_admission": 0,
+      "lesson": "Visibility telemetry alone did not detect these actual rendered loading-screen recurrences."
+    },
+    "post_fix_runs": [
+      {
+        "run": "entry_run_4",
+        "mode": "standard",
+        "requested_capture_seconds": 120,
+        "captured_frames": 1097,
+        "all_captured_frames_foreground": true,
+        "first_game_frame_index": 164,
+        "first_game_frame_milliseconds": 17955,
+        "frames_from_first_game_frame": 933,
+        "loading_background_recurrences_observed": 0,
+        "brightness_adjusted_background_candidates": 0,
+        "mean_sample_interval_ms": 109.43795620437956,
+        "max_sample_interval_ms": 126,
+        "reviewed_frame_indices": [0, 163, 164, 500, 1096],
+        "completed_contexts_with_surface_opacity_zero_and_retired_artwork": 2,
+        "visible_true_telemetry_after_admission": 0,
+        "local_analysis": "output/ecs_backend_work/mode_deploy/analysis_run4.json"
+      },
+      {
+        "run": "entry_run_5",
+        "mode": "pure",
+        "requested_capture_seconds": 150,
+        "captured_frames": 1369,
+        "all_captured_frames_foreground": true,
+        "first_game_frame_index": 47,
+        "first_game_frame_milliseconds": 5142,
+        "frames_from_first_game_frame": 1322,
+        "loading_background_recurrences_observed": 0,
+        "brightness_adjusted_background_candidates": 0,
+        "mean_sample_interval_ms": 109.56432748538012,
+        "max_sample_interval_ms": 129,
+        "reviewed_frame_indices": [0, 46, 47, 500, 1368],
+        "completed_contexts_with_surface_opacity_zero_and_retired_artwork": 2,
+        "visible_true_telemetry_after_admission": 0,
+        "local_analysis": "output/ecs_backend_work/mode_deploy/analysis_run5.json"
+      }
+    ],
+    "analysis_method": {
+      "decoder": "System.Drawing.Bitmap",
+      "reference": "entry_run_2/frame_00000.jpg",
+      "samples_per_frame": 800,
+      "normalized_sample_region": [0.04, 0.08, 0.96, 0.73],
+      "direct_match": "Mean absolute RGB error <=25/255 and >=60% of samples within15/255",
+      "brightness_adjusted_match": "Luminance correlation >=0.90, fitted scale0.15..1.5, residual <=20/255",
+      "all_recorded_frames_compared": true,
+      "not_every_rendered_frame_captured": true
+    },
+    "excluded_run": {
+      "run": "entry_run_3",
+      "reason": "Capture ended before actual admission; all1097 frames were still loading, so this is not a post-admission flicker pass."
+    }
+  },
+  "limitations": [
+    "No loading background recurred in these captured post-fix frames; flashes entirely between roughly109ms captures cannot be excluded.",
+    "Brightness fitting detects globally dimmed artwork but does not exclude every low-opacity partial overlay over changing scenery.",
+    "Two real simultaneous players, a slow second client and real multiplayer disconnect/reconnect have not been tested in this round; simulated coverage is not a substitute.",
+    "Initial builder camera positioning still showed the sea; camera experiments were reverted and no camera fix is claimed.",
+    "mode02 actual HTTP tests passed, but process-restart persistence was previously verified on mode01, not repeated for mode02.",
+    "This entry-flow report does not claim domain/HTTPS setup, automatic off-server backups or complete gameplay acceptance."
+  ],
+  "privacy": {
+    "raw_console_copied": false,
+    "console_whitelist": "STARTUP_VISIBILITY",
+    "private_tokens_passwords_player_ids_accounts_or_saves_in_this_report": false,
+    "screenshots_and_detailed_frame_metrics_remain_in_ignored_output": true
+  }
+}

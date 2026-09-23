@@ -247,6 +247,9 @@ __pycache__/
 
 # Machine-local execution output and debugger state are not release inputs.
 /output/
+# Re-creatable installers and retired compiled UI snapshots; keep authoring sources.
+/art/ui/development/ui_reuse_import/python/runtime.zip
+/art/ui/development/remaining_ui_handoff_v1/baseline/runtime/
 /panorama_debugger.cfg
 /tools/**/*.log
 /tools/ui_release/compiled.json
@@ -314,6 +317,8 @@ __pycache__/
 !/scripts/vscripts/tests/test_match_inventory.lua
 !/scripts/vscripts/tests/map_c6_*.lua
 !/scripts/vscripts/tests/map_main_merge_check.lua
+!/scripts/vscripts/tests/map_layout128_check.lua
+!/scripts/vscripts/tests/test_player_room_locations.lua
 !/scripts/vscripts/tests/test_archive_building_effects.lua
 !/scripts/vscripts/tests/test_archive_buildings.lua
 !/scripts/vscripts/tests/test_boss_warning_projection.lua
@@ -329,5 +334,32 @@ __pycache__/
 
 # Isolated backend migration work, downloaded test tools, test secrets and dumps.
 /output/ecs_backend_work/
+/output/mode_backend_stage/
+/output/mode_auth_backend_stage/
 /output/aliyun_releases/
 /server/aliyun/**/__pycache__/
+!/scripts/vscripts/tests/test_player_profile_load_retry.lua
+!/scripts/vscripts/tests/test_startup_asset_preload_service.lua
+!/scripts/vscripts/tests/test_startup_loading_service.lua
+!/scripts/vscripts/tests/test_startup_order_gate.lua
+!/scripts/vscripts/tests/test_startup_ui_request_gate.lua
+!/scripts/vscripts/tests/test_tower_target_selection.lua
+!/scripts/vscripts/tests/test_tree_attacker_whitelist.lua
+!/scripts/vscripts/tests/test_ultimate_tower_tree_targeting.lua
+!/scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua
+!/scripts/vscripts/tests/test_tower_upgrade_targeting.lua
+!/scripts/vscripts/tests/test_io_building_ambient.lua
+!/scripts/vscripts/tests/test_monster_ground_navigation.lua
+!/scripts/vscripts/tests/manual_monster_navigation_check.lua
+!/scripts/vscripts/tests/test_tower_idle_state.lua
+!/scripts/vscripts/tests/test_tower_class_preflight.lua
+!/scripts/vscripts/tests/test_hero_summon_destination.lua
+!/scripts/vscripts/tests/test_hero_summon_flow.lua
+!/scripts/vscripts/tests/manual_hero_summon_destination.lua
+!/scripts/vscripts/tests/manual_tower_attack_recovery.lua
+!/scripts/vscripts/tests/test_match_setup_service.lua
+!/scripts/vscripts/tests/test_player_profile_modes.lua
+!/scripts/vscripts/tests/test_player_entry_authentication.lua
+!/scripts/vscripts/tests/test_pure_permanent_rewards.lua
+!/scripts/vscripts/tests/test_difficulty_unlocks.lua
+!/scripts/vscripts/tests/test_archive_difficulty_progression.lua

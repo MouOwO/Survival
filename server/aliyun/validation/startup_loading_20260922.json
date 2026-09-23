@@ -1,0 +1,45 @@
+{
+  "feature": "server_owned_startup_loading",
+  "date": "2026-09-22",
+  "checks": {
+    "panorama_compile": "passed",
+    "startup_assets_regression": "passed: 357 unique resources",
+    "startup_barrier_regression": "passed",
+    "player_profile_retry_regression": "passed",
+    "unit_order_barrier_regression": "passed",
+    "custom_ui_business_requests_regression": "passed",
+    "panorama_state_regression": "passed including wrapper visibility without CSS class evaluation"
+  },
+  "engine_observed": {
+    "map": "template_map",
+    "resources_ready": 357,
+    "resources_total": 357,
+    "resources_failed": 0,
+    "client_handshake_received": true,
+    "test_authentication_deliberately_unset": true,
+    "authentication_failed_kept_game_closed": true,
+    "game_rules_state": 2,
+    "barrier_released": false,
+    "background_and_native_ui_overlap_acceptance": "pending full loading-screen visual review"
+  },
+  "authenticated_game_verification": {
+    "map": "template_map",
+    "http_profile_read_and_checkpoint": "confirmed in actual server log, revision 3",
+    "gameplay_started": "confirmed by GAME_STARTED hero-preload completion and visible gameplay",
+    "overlay_before_fix": "HUD wrapper hiddenClass=true but visible=true at 19:59:44",
+    "overlay_after_fix": "HUD wrapper hiddenClass=true and visible=false at 20:06:30",
+    "actual_game_view": "passed: loading overlay absent; map and HUD visible",
+    "screenshot": "output/map_build_c6/startup_loading_overlay_fixed.png",
+    "fix": "Explicit wrapper visible/visibility properties; original authentication and all-player readiness conditions preserved",
+    "current_match_restarted_by_fix": false
+  },
+  "pending": [
+    "Verify the complete loading background and full-screen layout visually during a subsequent match.",
+    "Verify two actual human clients waiting for each other."
+  ],
+  "backend": {
+    "existing_ssh_tunnel_health": "passed",
+    "server_redeploy_required": false,
+    "database_modified_for_this_feature": false
+  }
+}

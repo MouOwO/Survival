@@ -1,7 +1,9 @@
 local M = {}
+local tree_damage_rules = require("systems/tree_damage_rules")
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
+        and not tree_damage_rules.is_tree(unit)
 end
 
 function M.is_flying(unit)
@@ -23,13 +25,18 @@ end
 
 function M.enemies_in_circle(caster, position, radius)
     if not valid(caster) or not position then return {} end
-    return FindUnitsInRadius(
+    local units = FindUnitsInRadius(
         caster:GetTeamNumber(), position, nil, math.max(1, radius or 1),
         DOTA_UNIT_TARGET_TEAM_ENEMY,
         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
         DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
         FIND_ANY_ORDER, false
     ) or {}
+    local result = {}
+    for _, unit in ipairs(units) do
+        if valid(unit) then result[#result + 1] = unit end
+    end
+    return result
 end
 
 local function distance_to_segment(point, start_pos, end_pos)

@@ -30,6 +30,7 @@ local queue = {}
 local queued = {}
 local background_loading_asset_id = nil
 local inflight = {}
+local resource_requests = {}
 local gradual_sessions = {}
 local stream_cursor = 1
 local stream_rows = {}
@@ -65,6 +66,7 @@ local function precache_initial_resource(resource_type, path, context)
         path,
         context
     )
+    if ok and error_message == false then ok = false end
     if not ok then
         logger.warn("AssetPreload", "initial resource failed type="
             .. tostring(resource_type) .. " path=" .. tostring(path)
@@ -184,6 +186,15 @@ function M.resources_for_models(model_paths, extra_resources)
 end
 
 function M.precache_initial(context)
+    -- First asset-preload call of the map's Precache(context) phase. A cached
+    -- Lua module must not carry another map's successes or pending callbacks
+    -- into this engine resource lifetime. init() below preserves only this run.
+    generation = generation + 1
+    initial_states, initial_resource_states = {}, {}
+    states, resource_states = {}, {}
+    ready_callbacks, failed_callbacks = {}, {}
+    queue, queued, inflight, resource_requests = {}, {}, {}, {}
+    background_loading_asset_id, gradual_sessions = nil, {}
     for _, row in ipairs(catalog.group("initial_required")) do
         precache_initial_row(row, context)
     end
@@ -193,6 +204,30 @@ function M.precache_group(context, group_name)
     for _, row in ipairs(catalog.group(group_name)) do
         precache_row_resources(row, context, false)
     end
+end
+
+-- Called only from the engine's Precache(context) phase. Unlike queue_resources,
+-- this also supports standalone attachments, particles and sound files. Keep
+-- per-resource results through init, without claiming an entire bundle ready.
+function M.precache_resources(context, resources)
+    local ready, failed, seen = 0, 0, {}
+    for _, resource in ipairs(resources or {}) do
+        local kind, path = resource.resource_type, resource.path
+        local key = tostring(kind) .. ":" .. tostring(path)
+        if type(path) == "string" and path ~= "" and not seen[key] then
+            seen[key] = true
+            local status = initial_resource_states[key]
+            if status ~= STATE.READY then
+                local ok = precache_initial_resource(kind, path, context)
+                status = ok and STATE.READY or STATE.FAILED
+            end
+            initial_resource_states[key] = status
+            resource_states[key] = status
+            if status == STATE.READY then ready = ready + 1
+            else failed = failed + 1 end
+        end
+    end
+    return failed == 0, ready, failed
 end
 
 local function sort_queue()
@@ -465,7 +500,8 @@ begin_async_request = function(asset_id, request_source)
         return false
     end
 
-    inflight[asset_id] = request_source or "background"
+    local request_token = {}
+    inflight[asset_id] = request_token
     set_state(asset_id, STATE.LOADING, { started_at = now() })
     logger.info("AssetPreload", "started id=" .. asset_id
         .. " source=" .. tostring(request_source or "background"))
@@ -487,11 +523,10 @@ begin_async_request = function(asset_id, request_source)
             finish(asset_id, false, "resource_precache_failed")
             return false
         end
-        resource_keys[#resource_keys + 1] = set_resource_state(
-            resource.resource_type,
-            resource.path,
-            STATE.LOADING
-        )
+        resource_keys[#resource_keys + 1] = resource_key
+        if resource_states[resource_key] ~= STATE.READY then
+            resource_states[resource_key] = STATE.LOADING
+        end
     end
 
     local async_name = row.async_unit_name
@@ -502,7 +537,7 @@ begin_async_request = function(asset_id, request_source)
             PrecacheUnitByNameAsync,
             async_name,
             function()
-                if request_generation == generation then
+                if request_generation == generation and inflight[asset_id] == request_token then
                     for _, key in ipairs(resource_keys) do
                         resource_states[key] = STATE.READY
                     end
@@ -685,15 +720,19 @@ function M.queue_resources(resources, options)
             and type(PrecacheUnitByNameAsync) == "function" then
             resource_states[resource.key] = STATE.LOADING
             local request_generation = generation
+            local request_token = {}
+            resource_requests[resource.key] = request_token
             local ok = pcall(PrecacheUnitByNameAsync, async_name, function()
-                if request_generation == generation then
+                if request_generation == generation and resource_requests[resource.key] == request_token then
                     resource_states[resource.key] = STATE.READY
+                    resource_requests[resource.key] = nil
                 end
             end, -1)
             if ok then
                 queued_count = queued_count + 1
             else
                 resource_states[resource.key] = STATE.FAILED
+                resource_requests[resource.key] = nil
                 failed_count = failed_count + 1
             end
         elseif resource.resource_type == "model"
@@ -710,6 +749,59 @@ function M.queue_resources(resources, options)
         return false, "resource_queue_failed", queued_count, failed_count
     end
     return true, queued_count > 0 and "queued" or "ready", queued_count, 0
+end
+
+-- Explicit recovery for callers that own a real-time deadline. Keep successes
+-- and subscribers; invalidate only the failed/timed-out request before retrying.
+-- Initial standalone resource failures need a fresh engine Precache context.
+function M.retry_resources(resources, options)
+    local eligible, assets_to_retry, direct_to_retry = {}, {}, {}
+    local blocked = false
+    for _, resource in ipairs(resources or {}) do
+        local key = tostring(resource.resource_type) .. ":" .. tostring(resource.path)
+        if resource_states[key] ~= STATE.READY then
+            local asset = resource.asset_id and catalog.resolve(resource.asset_id)
+                or (resource.resource_type == "model" and catalog.for_model(resource.path))
+                or nil
+            local safe = initial_resource_states[key] ~= STATE.FAILED
+            if asset then
+                safe = safe and type(asset.async_unit_name) == "string" and asset.async_unit_name ~= ""
+                    and (states[asset.asset_id] or {}).status ~= STATE.RETIRED
+                local expanded = {}
+                append_asset_resources(expanded, {}, asset)
+                for _, item in ipairs(expanded) do
+                    if initial_resource_states[item.resource_type .. ":" .. item.path] == STATE.FAILED then
+                        safe = false
+                    end
+                end
+                if safe then assets_to_retry[asset.asset_id] = expanded end
+            else
+                safe = safe and resource.resource_type == "model"
+                    and type(resource.async_unit_name) == "string" and resource.async_unit_name ~= ""
+                if safe then direct_to_retry[key] = true end
+            end
+            if safe then eligible[#eligible + 1] = resource else blocked = true end
+        end
+    end
+    for asset_id, expanded in pairs(assets_to_retry) do
+        inflight[asset_id] = nil
+        if background_loading_asset_id == asset_id then background_loading_asset_id = nil end
+        remove_queued_request(asset_id)
+        set_state(asset_id, STATE.NOT_REQUESTED)
+        for _, item in ipairs(expanded) do
+            local key = item.resource_type .. ":" .. item.path
+            if resource_states[key] ~= STATE.READY then resource_states[key] = STATE.NOT_REQUESTED end
+        end
+    end
+    for key in pairs(direct_to_retry) do
+        resource_requests[key] = nil
+        resource_states[key] = STATE.NOT_REQUESTED
+    end
+    local request_options = { urgent = true, retry = true }
+    for key, value in pairs(options or {}) do request_options[key] = value end
+    local ok, status, queued_count, failed_count = M.queue_resources(eligible, request_options)
+    if blocked then return false, "resource_requires_map_reload", queued_count, failed_count end
+    return ok, status, queued_count, failed_count
 end
 
 function M.is_ready(asset_id)
@@ -770,6 +862,7 @@ function M.init()
     failed_callbacks = {}
     background_loading_asset_id = nil
     inflight = {}
+    resource_requests = {}
     gradual_sessions = {}
     stream_cursor = 1
     stream_rows = {}

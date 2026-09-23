@@ -65,9 +65,8 @@
         "AttackRate"             "1.0"
         "AttackAnimationPoint"   "0.3"
         "ProjectileSpeed"        "5000"
-        // Attack acquisition must cover the real attack radius; the default 10
-        // prevents autonomous tower target search.
-        "AttackAcquisitionRange" "1000"
+        // Lua selects combat targets; native acquisition also sees resource trees.
+        "AttackAcquisitionRange" "0"
         "ArmorPhysical"          "1.666667"
         "MagicalResistance"      "0"
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
@@ -95,7 +94,7 @@
         "AttackRate"             "1.0"
         "AttackAnimationPoint"   "0.3"
         "ProjectileSpeed"        "5000"
-        "AttackAcquisitionRange" "1000"
+        "AttackAcquisitionRange" "0"
         "ArmorPhysical"          "10"
         "MagicalResistance"      "25"
         "BoundsHullName"         "DOTA_HULL_SIZE_BARRACKS"

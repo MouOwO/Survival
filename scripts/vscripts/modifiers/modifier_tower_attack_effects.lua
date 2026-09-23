@@ -20,6 +20,7 @@ local tower_combat_rules = require("config/tower_combat_rules")
 local anti_air_rules = require("systems/anti_air_rules")
 local tower_multi_damage = require("systems/tower_multi_damage")
 local tower_laser_damage = require("systems/tower_laser_damage")
+local tree_damage_rules = require("systems/tree_damage_rules")
 
 local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
     and global_rules.by_id.runtime_detailed_diagnostics.enabled ~= false
@@ -305,7 +306,8 @@ local function start_anti_air_sequence(modifier, tower, target, skill)
 end
 
 local function trigger_drag_net(caster, target, skill)
-    if not skill or not anti_air_rules.is_flying(target) then return false end
+    if not valid(caster) or not valid(target)
+        or not skill or not anti_air_rules.is_flying(target) then return false end
     local chance = math.max(
         0, math.min(100, tonumber(skill.trigger_chance_pct) or 0)
     )
@@ -383,7 +385,7 @@ function modifier_tower_attack_effects:OnDeath(params)
     if not IsServer() then return end
     local tower = self:GetParent()
     local victim = params.unit
-    if params.attacker ~= tower then return end
+    if params.attacker ~= tower or not exists(victim) then return end
 
     -- MODIFIER_EVENT_ON_DEATH is global. Tower effects must only react when
     -- this modifier's own tower is the actual killer; team/player ownership
@@ -414,6 +416,7 @@ function modifier_tower_attack_effects:OnDeath(params)
 end
 
 local function roll_tower_critical(tower, target)
+    if not valid(target) then return 1, nil end
     local special = event_bus.request(events.TOWER_CRITICAL_QUERY, {
         tower = tower,
         target = target,
@@ -446,6 +449,11 @@ end
 function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
     if not IsServer() then return 0 end
     local tower = self:GetParent()
+    if not valid(self.current_attack_target) then
+        self.pending_critical_multiplier = nil
+        self.pending_critical_source = nil
+        return 0
+    end
     if skill_matching(tower, "burning_great_arrow_")
         or uses_machine_gun_attack(tower) then
         return 0
@@ -466,7 +474,11 @@ function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
     return 0
 end
 
-exists = function(u) return u and not u:IsNull() end
+-- Trees share the engine's enemy/basic-unit queries. Reject them before any
+-- visual, reward or hit counter, including callbacks after an attack kills.
+exists = function(u)
+    return u and not u:IsNull() and not tree_damage_rules.is_tree(u)
+end
 valid = function(u) return exists(u) and u:IsAlive() end
 
 local function lightning_control_point(particle, control_point, unit,
@@ -529,6 +541,7 @@ local function deal(caster, target, amount, source_kind, tags, damage_type,
 end
 
 local function apply_machine_gun_hit_effects(modifier, tower, target)
+    if not valid(tower) or not exists(target) then return end
     local bounty = skill_matching(tower, "bounty_machine_gun_")
     if bounty then
         local gold = math.max(0, tonumber(bounty.damage_multiplier) or 0)
@@ -673,13 +686,18 @@ area_radius = function(skill, fallback)
 end
 
 enemies_in_radius = function(caster, position, radius)
-    return FindUnitsInRadius(
+    local units = FindUnitsInRadius(
         caster:GetTeamNumber(), position, nil, radius,
         DOTA_UNIT_TARGET_TEAM_ENEMY,
         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
         DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
         FIND_ANY_ORDER, false
     ) or {}
+    local result = {}
+    for _, unit in ipairs(units) do
+        if valid(unit) then result[#result + 1] = unit end
+    end
+    return result
 end
 
 local function frost_impact_particle(caster, position, radius, particle_name)
@@ -701,6 +719,7 @@ local function apply_slow(caster, target, buff_id, duration, slow_pct)
 end
 
 local function trigger_frost_attack(caster, primary, skill, damage)
+    if not valid(caster) or not exists(primary) then return end
     local radius = area_radius(skill, 100)
     local splash_multiplier = math.max(
         0, tonumber(skill.damage_multiplier) or 0.5
@@ -1155,7 +1174,19 @@ local function create_laser_segment(self, effect, now)
     update_laser_position(self, effect)
 end
 
+local function laser_target_in_range(caster, target)
+    return valid(caster) and valid(target)
+        and target:GetTeamNumber() ~= caster:GetTeamNumber()
+        and (target:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
+            -- Preserve the engine/hull tolerance used by the existing beam.
+            <= tower_combat_rules.current_attack_range(caster) + 96
+end
+
 local function start_laser(self, target, effect)
+    if not laser_target_in_range(self:GetParent(), target) then
+        reset_laser(self)
+        return false
+    end
     if self.laser_target == target then return false end
     reset_laser(self)
     self.laser_target = target
@@ -1168,6 +1199,7 @@ local function start_laser(self, target, effect)
 end
 
 local function deal_laser_tick(self, caster, target, laser, effect)
+    if not laser_target_in_range(caster, target) then return false end
     local interval = math.max(0.1, tonumber(laser.damage_interval) or 1)
     local base_multiplier = tonumber(laser.damage_multiplier) or 1
     local increment = (tonumber(effect.damage_increment_pct) or 5) / 100
@@ -1207,11 +1239,8 @@ function modifier_tower_attack_effects:OnIntervalThink()
     local target = self.laser_target
     local active_attack_target = type(caster.GetAttackTarget) == "function"
         and caster:GetAttackTarget() or self.current_attack_target
-    if not laser or not effect or not valid(caster) or not valid(target)
-        or active_attack_target ~= target
-        or target:GetTeamNumber() == caster:GetTeamNumber()
-        or (target:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
-            > caster:GetAcquisitionRange() + 96 then
+    if not laser or not effect or not laser_target_in_range(caster, target)
+        or active_attack_target ~= target then
         reset_laser(self)
         return
     end
@@ -1257,6 +1286,11 @@ function modifier_tower_attack_effects:OnAttackStart(params)
     self.current_attack_target = target
     self.pending_critical_multiplier = nil
     self.pending_critical_source = nil
+    if not valid(target) or target:GetTeamNumber() == caster:GetTeamNumber() then
+        self.current_attack_target = nil
+        reset_laser(self)
+        return
+    end
     local attack_activity = rawget(_G, "ACT_DOTA_ATTACK")
     local visual_asset = asset_catalog.get(caster.survival_model_asset_id)
     if visual_asset and visual_asset.native_wearable_stage
@@ -1311,9 +1345,7 @@ function modifier_tower_attack_effects:OnAttack(params)
     local multi = skill_matching(caster, "multi_attack_")
     if not multi then return end
     local max_targets = multi_max_targets(multi)
-    local range = caster.Script_GetAttackRange
-        and caster:Script_GetAttackRange()
-        or caster:GetAcquisitionRange()
+    local range = tower_combat_rules.current_attack_range(caster)
     local units = FindUnitsInRadius(
         caster:GetTeamNumber(), caster:GetAbsOrigin(), nil, range,
         DOTA_UNIT_TARGET_TEAM_ENEMY,
@@ -1378,6 +1410,7 @@ end
 
 function modifier_tower_attack_effects:OnAttackFail(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
+    if not exists(params.target) then return end
     self.attack_failed_diagnostic_count =
         (tonumber(self.attack_failed_diagnostic_count) or 0) + 1
     if self.attack_failed_diagnostic_count <= 20 then

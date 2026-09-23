@@ -4,6 +4,7 @@ local rules = require("config/generated/fishing_system_rules")
 
 local M = {}
 local active_rule = nil
+local logged_in = {}
 
 local function convar(name)
     if Convars and type(Convars.GetStr) == "function" then
@@ -14,6 +15,16 @@ end
 
 local function request(path, payload, on_success, on_error)
     if not active_rule then on_error("fishing_rule_missing") return end
+    local setup = require("systems/match_setup_service")
+    if path ~= "/v1/session/authenticate" and not setup.is_mode_selected() then
+        on_error("mode_not_selected") return
+    end
+    local session = setup.get_session_id()
+    if type(session) ~= "string" or #session < 8 then on_error("match_session_missing") return end
+    local body = {}
+    for key, value in pairs(payload) do body[key] = value end
+    body.match_session_id = session
+    if path == "/v1/session/login" then body.mode = setup.get_mode() end
     local token = convar("survival_fishing_api_token")
     if token == "" then on_error("fishing_api_token_missing") return end
     local http = CreateHTTPRequestScriptVM(
@@ -22,7 +33,7 @@ local function request(path, payload, on_success, on_error)
     if not http then on_error("http_request_create_failed") return end
     http:SetHTTPRequestHeaderValue("Authorization", "Bearer " .. token)
     http:SetHTTPRequestRawPostBody(
-        "application/json; charset=utf-8", json_encoder.encode(payload)
+        "application/json; charset=utf-8", json_encoder.encode(body)
     )
     if type(http.SetHTTPRequestAbsoluteTimeoutMS) == "function" then
         http:SetHTTPRequestAbsoluteTimeoutMS(30000)
@@ -48,6 +59,7 @@ end
 
 function M.init()
     active_rule = nil
+    logged_in = {}
     for _, row in ipairs(rules.rows or {}) do
         if row.enabled ~= false then active_rule = row break end
     end
@@ -65,8 +77,31 @@ function M.resolve_account_id(player_id)
 end
 
 function M.fetch_snapshot(account_id, on_success, on_error)
-    request("/v1/profile", { account_id = tostring(account_id) },
-        on_success, on_error)
+    local setup = require("systems/match_setup_service")
+    local session, mode = setup.get_session_id(), setup.get_mode()
+    local path = logged_in[tostring(account_id)] == session and "/v1/profile" or "/v1/session/login"
+    request(path, { account_id = tostring(account_id) }, function(snapshot)
+        if snapshot.account_id ~= tostring(account_id) or snapshot.match_session_id ~= session
+            or snapshot.mode ~= mode or setup.get_session_id() ~= session or setup.get_mode() ~= mode then
+            on_error("match_profile_mismatch") return
+        end
+        logged_in[tostring(account_id)] = session
+        on_success(snapshot)
+    end, on_error)
+end
+
+function M.authenticate(account_id, on_success, on_error)
+    -- Entry authentication returns only account/session identity and progression;
+    -- it must neither populate logged_in nor let mode-gated requests proceed.
+    local setup = require("systems/match_setup_service")
+    local session = setup.get_session_id()
+    request("/v1/session/authenticate", { account_id = tostring(account_id) }, function(result)
+        if result.authenticated ~= true or result.account_id ~= tostring(account_id)
+            or result.match_session_id ~= session or setup.get_session_id() ~= session then
+            on_error("authentication_identity_mismatch") return
+        end
+        on_success(result)
+    end, on_error)
 end
 
 function M.online_checkpoint(payload, on_success, on_error)

@@ -1,0 +1,250 @@
+{
+  "date": "2026-09-20",
+  "map": "template_map",
+  "tiles": [
+    128,
+    128
+  ],
+  "units_per_tile": 256,
+  "bounds": [
+    -16384,
+    -16384,
+    16384,
+    16384
+  ],
+  "source_map": "content/dota_addons/survival/maps/template_map.vmap",
+  "source_sha256": "67c5940106919972609151a59b3132dc0e0011eb5bb916464ca73b3eb4bc65dc",
+  "vpk_sha256": "29e912b90316612d92d9c2e800f41a6571163164f04abb75e76d3c9456486985",
+  "source_backup": "output/map_layout_128_20260920/template_before.vmap",
+  "layout_manifest": "output/map_layout_128_20260920/layout_manifest.json",
+  "compile": {
+    "succeeded": 229,
+    "failed": 0
+  },
+  "runtime": {
+    "arena_checks": 235,
+    "layout_checks": 38,
+    "failed": 0,
+    "logs": [
+      "output/map_layout_128_20260920/arenas_runtime.log",
+      "output/map_layout_128_20260920/layout_runtime.log"
+    ]
+  },
+  "player_rooms": [
+    {
+      "display_player": 1,
+      "engine_player_id": 0,
+      "origin": [
+        -12800,
+        11904,
+        128
+      ],
+      "markers": [
+        {
+          "name": "player_0_hero_spawn",
+          "origin": [
+            -12992,
+            11904,
+            152
+          ]
+        },
+        {
+          "name": "player_0_training_entry",
+          "origin": [
+            -12992,
+            11904,
+            152
+          ]
+        },
+        {
+          "name": "player_0_training_home",
+          "origin": [
+            -12992,
+            11904,
+            152
+          ]
+        },
+        {
+          "name": "player_0_training_target",
+          "origin": [
+            -12608,
+            11904,
+            152
+          ]
+        }
+      ]
+    },
+    {
+      "display_player": 2,
+      "engine_player_id": 1,
+      "origin": [
+        12800,
+        11904,
+        128
+      ],
+      "markers": [
+        {
+          "name": "player_1_hero_spawn",
+          "origin": [
+            12608,
+            11904,
+            152
+          ]
+        },
+        {
+          "name": "player_1_training_entry",
+          "origin": [
+            12608,
+            11904,
+            152
+          ]
+        },
+        {
+          "name": "player_1_training_home",
+          "origin": [
+            12608,
+            11904,
+            152
+          ]
+        },
+        {
+          "name": "player_1_training_target",
+          "origin": [
+            12992,
+            11904,
+            152
+          ]
+        }
+      ]
+    },
+    {
+      "display_player": 3,
+      "engine_player_id": 2,
+      "origin": [
+        -12800,
+        -11904,
+        128
+      ],
+      "markers": [
+        {
+          "name": "player_2_hero_spawn",
+          "origin": [
+            -12992,
+            -11904,
+            152
+          ]
+        },
+        {
+          "name": "player_2_training_entry",
+          "origin": [
+            -12992,
+            -11904,
+            152
+          ]
+        },
+        {
+          "name": "player_2_training_home",
+          "origin": [
+            -12992,
+            -11904,
+            152
+          ]
+        },
+        {
+          "name": "player_2_training_target",
+          "origin": [
+            -12608,
+            -11904,
+            152
+          ]
+        }
+      ]
+    },
+    {
+      "display_player": 4,
+      "engine_player_id": 3,
+      "origin": [
+        12800,
+        -11904,
+        128
+      ],
+      "markers": [
+        {
+          "name": "player_3_hero_spawn",
+          "origin": [
+            12608,
+            -11904,
+            152
+          ]
+        },
+        {
+          "name": "player_3_training_entry",
+          "origin": [
+            12608,
+            -11904,
+            152
+          ]
+        },
+        {
+          "name": "player_3_training_home",
+          "origin": [
+            12608,
+            -11904,
+            152
+          ]
+        },
+        {
+          "name": "player_3_training_target",
+          "origin": [
+            12992,
+            -11904,
+            152
+          ]
+        }
+      ]
+    }
+  ],
+  "rank_ten": [
+    {
+      "name": "rebirth_10_entry",
+      "origin": [
+        -13100,
+        4096,
+        180
+      ]
+    },
+    {
+      "name": "rebirth_10_boss_spawn",
+      "origin": [
+        -12500,
+        4096,
+        180
+      ]
+    },
+    {
+      "name": "challenge_11_stage_10_entry",
+      "origin": [
+        12544,
+        5910,
+        82
+      ]
+    },
+    {
+      "name": "challenge_11_stage_10_spawn",
+      "origin": [
+        12544,
+        6378,
+        82
+      ]
+    }
+  ],
+  "preview": "art/maps/c6/layout128-overview.png",
+  "minimap": "art/maps/c6/layout128-minimap.png",
+  "notes": [
+    "Four corner rooms reuse the approved wood-room art at its existing scale.",
+    "This revision adds arrival/target markers, not new enemy spawning rules.",
+    "Builder and wave points remain in their original central sectors, translated with the central art.",
+    "Hero summoning uses the per-player hero_spawn marker, with the existing altar fallback on other maps.",
+    "Unsaved Hammer documents must be reloaded before editing the updated source."
+  ]
+}

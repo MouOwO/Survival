@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-22",
+  "status": "LIVE_PROFILE_AND_RESOURCE_RECOVERED_BUILD_PLACEMENT_PENDING",
+  "map": "template_map",
+  "before": {
+    "tunnel_healthy": true,
+    "token_present": false,
+    "profile_loaded": false,
+    "resource_error": "profile_not_loaded",
+    "game_time_advancing": false
+  },
+  "after": {
+    "token_present": true,
+    "profile_loaded": true,
+    "resources_ready": true,
+    "resource_error": "",
+    "temporary_credential_removed": true,
+    "launcher_attach_mode_passed": true,
+    "loaded_profile_preserved_on_repeated_attach": true
+  },
+  "runtime_actions": [
+    "verified_existing_loopback_ssh_tunnel",
+    "injected_existing_test_api_token_without_console_or_repository_disclosure",
+    "requested_only_missing_player_profile_while_game_was_paused",
+    "verified_profile_and_resource_get_request_in_actual_workshop_server"
+  ],
+  "code_fix": {
+    "shared_inflight_request_generation": true,
+    "stale_callbacks_cannot_release_current_request": true,
+    "account_mismatch_calls_failure_callback": true,
+    "pending_retry_fix_active_on_next_map_load": true,
+    "current_game_service_reinitialized": false
+  },
+  "checks": {
+    "new_lua_profile_retry_regression": "PASS",
+    "resource_opening_wood_regression": "PASS",
+    "archive_and_http_lottery_regressions": "PASS (local Lua 5.4 with Lua 5.1 unpack compatibility alias)",
+    "auth_helper_security_tests": "10 PASS",
+    "powershell_launcher_parser": "PASS",
+    "actual_launcher_attach_without_map_restart": "PASS"
+  },
+  "not_verified": [
+    "actual_building_placement_after_recovery",
+    "new_launcher_cold_start_of_closed_dota"
+  ]
+}

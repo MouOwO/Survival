@@ -33,6 +33,19 @@ def copy_code(source: Path, target: Path):
         shutil.copyfile(path, destination)
 
 
+def copy_linux_deploy(source: Path, target: Path):
+    """Git autocrlf must not produce CRLF shell/logrotate files on the ECS."""
+    shutil.copytree(source, target, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    for path in target.rglob("*"):
+        if path.is_symlink():
+            raise ValueError("deployment symlink rejected")
+        if path.is_file():
+            # The deployment directory contains text sources only. Decode first
+            # so an unexpected binary addition refuses packaging.
+            content = path.read_bytes().decode("utf-8")
+            path.write_bytes(content.replace("\r\n", "\n").encode("utf-8"))
+
+
 def build(backend_root: Path, output: Path, release_id: str):
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,95}", release_id) or release_id == "current":
         raise ValueError("invalid release id")
@@ -70,8 +83,7 @@ def build(backend_root: Path, output: Path, release_id: str):
     database = load("release_database_tool", ROOT / "server/aliyun/database/dbtool.py")
     database.collect(backend_root, ROOT, release / "database")
     deploy_source = ROOT / "server/aliyun/deploy"
-    shutil.copytree(deploy_source, release / "deploy",
-                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    copy_linux_deploy(deploy_source, release / "deploy")
     for path in (ROOT / "server/aliyun/tests").glob("*.py"):
         (release / "tests").mkdir(exist_ok=True)
         shutil.copyfile(path, release / "tests" / path.name)

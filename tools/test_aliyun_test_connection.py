@@ -1,0 +1,121 @@
+from __future__ import annotations
+
+import base64
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import Mock, patch
+
+import aliyun_test_connection as tunnel
+
+
+class TunnelTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.state = self.root / "state.json"
+
+    def write_state(self):
+        command = "ssh.exe -N recorded-args"
+        state = {"version": 1, "pid": 41, "created": 123456,
+                 "executable": "c:/windows/system32/openssh/ssh.exe",
+                 "command_digest": tunnel.command_digest(command)}
+        self.state.write_text(json.dumps(state), encoding="utf-8")
+        return state, command
+
+    def test_host_key_must_match_console_pin_and_exact_target(self):
+        raw = b"test-public-key"
+        pin = "SHA256:" + base64.b64encode(hashlib.sha256(raw).digest()).decode().rstrip("=")
+        encoded = base64.b64encode(raw).decode()
+        hosts = self.root / "known_hosts"
+        with patch.object(tunnel, "HOST_FINGERPRINT", pin):
+            hosts.write_text(f"{tunnel.ECS_HOST} ssh-ed25519 {encoded}\n", encoding="utf-8")
+            tunnel.verify_known_hosts(hosts)
+            for value in (f"other-host ssh-ed25519 {encoded}",
+                          f"{tunnel.ECS_HOST} ssh-rsa {encoded}",
+                          f"{tunnel.ECS_HOST} ssh-ed25519 YWJj",
+                          f"{tunnel.ECS_HOST} ssh-ed25519 {encoded}\nother-host ssh-ed25519 {encoded}"):
+                hosts.write_text(value, encoding="utf-8")
+                with self.subTest(value=value), self.assertRaisesRegex(tunnel.TunnelError, "host_key_pin_invalid"):
+                    tunnel.verify_known_hosts(hosts)
+
+    def test_ssh_only_forwards_loopback_with_pinned_authentication(self):
+        command = tunnel.ssh_command("ssh.exe", Path("login-key"), Path("folder with spaces/known_hosts"))
+        self.assertIn("127.0.0.1:8765:127.0.0.1:8765", command)
+        for option in ("StrictHostKeyChecking=yes", "BatchMode=yes", "ExitOnForwardFailure=yes",
+                       "IdentitiesOnly=yes", "PasswordAuthentication=no", "GlobalKnownHostsFile=none"):
+            self.assertIn(option, command)
+        self.assertEqual(command[command.index("-F") + 1], "none")
+        self.assertIn('UserKnownHostsFile="folder with spaces/known_hosts"', command)
+        self.assertNotIn("0.0.0.0", " ".join(command))
+        self.assertNotIn("FISHING_API_TOKEN", " ".join(command))
+
+    def test_busy_port_does_not_launch_or_stop_any_process(self):
+        key = self.root / "key"
+        key.write_text("unused fixture", encoding="utf-8")
+        with patch.object(tunnel, "verify_known_hosts"), patch.object(tunnel.shutil, "which", return_value="ssh.exe"), \
+             patch.object(tunnel, "port_free", return_value=False), patch.object(tunnel.subprocess, "Popen") as launch, \
+             patch.object(tunnel, "ProcessHandle") as process:
+            with self.assertRaisesRegex(tunnel.TunnelError, "local_port_8765_in_use"):
+                tunnel.connect(self.state, key, self.root / "known_hosts")
+            launch.assert_not_called()
+            process.assert_not_called()
+
+    def test_stop_checks_creation_identity_before_terminating_handle(self):
+        state, command = self.write_state()
+        for field, changed in (("created", 999999), ("executable", "other.exe")):
+            identity = {"created": state["created"], "executable": state["executable"], field: changed}
+            handle = Mock()
+            handle.identity.return_value = identity
+            with patch.object(tunnel, "ProcessHandle") as factory, \
+                 patch.object(tunnel, "process_command", return_value=command):
+                factory.return_value.__enter__.return_value = handle
+                with self.subTest(field=field), self.assertRaisesRegex(tunnel.TunnelError, "tunnel_owner_mismatch"):
+                    tunnel.stop(self.state)
+                handle.terminate.assert_not_called()
+                self.assertTrue(self.state.exists())
+
+    def test_matching_pid_with_different_command_is_not_owned(self):
+        state, _ = self.write_state()
+        with self.assertRaisesRegex(tunnel.TunnelError, "tunnel_owner_mismatch"):
+            tunnel.validate_owned(state, state, "ssh.exe someone-elses-tunnel")
+
+    def test_stop_terminates_only_validated_process_handle(self):
+        state, command = self.write_state()
+        handle = Mock()
+        handle.identity.return_value = state
+        with patch.object(tunnel, "ProcessHandle") as factory, \
+             patch.object(tunnel, "process_command", return_value=command):
+            factory.return_value.__enter__.return_value = handle
+            self.assertEqual(tunnel.stop(self.state), {"ok": True, "status": "stopped"})
+            factory.assert_called_once_with(41, stopping=True)
+            handle.terminate.assert_called_once_with()
+            self.assertFalse(self.state.exists())
+
+    def test_check_refuses_unrelated_listener_even_when_http_would_be_healthy(self):
+        state, command = self.write_state()
+        handle = Mock()
+        handle.identity.return_value = state
+        with patch.object(tunnel, "ProcessHandle") as factory, \
+             patch.object(tunnel, "process_command", return_value=command), \
+             patch.object(tunnel, "listener_owned", return_value=False), patch.object(tunnel, "health") as health:
+            factory.return_value.__enter__.return_value = handle
+            with self.assertRaisesRegex(tunnel.TunnelError, "owned_tunnel_listener_missing"):
+                tunnel.check(self.state)
+            health.assert_not_called()
+
+    def test_identity_diagnostics_never_expose_command_or_secret_output(self):
+        error = subprocess.CalledProcessError(1, ["internal", "sensitive-fixture"], stderr=b"sensitive-fixture")
+        with patch.object(tunnel.subprocess, "run", side_effect=error):
+            with self.assertRaises(tunnel.TunnelError) as raised:
+                tunnel.process_command(123)
+        self.assertEqual(str(raised.exception), "process_identity_unavailable")
+        self.assertIsNone(raised.exception.__cause__)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -39,19 +39,7 @@ local function notify(state, message, level)
 end
 
 local function set_attack_range(unit, attack_range)
-    attack_range = tonumber(attack_range) or global_rules.tower_attack_range
-    if unit.Script_SetAttackRange then
-        unit:Script_SetAttackRange(attack_range)
-    elseif unit.SetAttackRange then
-        unit:SetAttackRange(attack_range)
-    end
-    if unit.SetAcquisitionRange then
-        -- Keep autonomous target acquisition at least as far as the attack range.
-        unit:SetAcquisitionRange(math.max(
-            global_rules.tower_acquisition_range,
-            attack_range
-        ))
-    end
+    tower_combat_rules.set_attack_range(unit, attack_range)
 end
 
 local function set_tower_projectile_speed(unit, configured_speed)
@@ -169,6 +157,12 @@ local function apply_research_technology(state, reason)
             tower.attack_range_bonus
         ) + (tonumber(permanent.tower_attack_range) or 0)
         set_attack_range(unit, attack_range)
+        -- Technology/profile refreshes can recover pre-existing towers without
+        -- passing through construction completion or a route upgrade.
+        if not unit:HasModifier("modifier_building_under_construction")
+            and not unit:HasModifier("modifier_tower_auto_attack") then
+            unit:AddNewModifier(unit, nil, "modifier_tower_auto_attack", {})
+        end
         unit.survival_super_tower_crit_chance =
             (tonumber(unit.survival_super_tower_crit_chance) or 0)
             + (tonumber(permanent.tower_critical_chance_pct) or 0)
@@ -529,7 +523,7 @@ end
 -- The upgrade system owns a runtime cache, while building_system owns the
 -- authoritative building state. A script reload or an early ability click can
 -- leave the cache empty even though the building is still valid.
-local function recover_state(unit)
+local function recover_state(unit, read_only)
     if not valid_entity(unit) then return nil end
 
     local entindex = unit:entindex()
@@ -538,6 +532,7 @@ local function recover_state(unit)
 
     local snapshot = event_bus.request(events.BUILDING_QUERY_REQUEST, {
         entindex = entindex,
+        read_only = read_only == true,
     })
     if not snapshot and unit:GetUnitName() == "building_arrow_tower" then
         snapshot = {
@@ -554,8 +549,10 @@ local function recover_state(unit)
                 tonumber(unit.survival_level) or 1
             ) or {}).base_attack_damage) or unit:GetBaseDamageMin(),
         }
-        print("[BuildingUpgrade] recovered unregistered arrow tower entindex="
-            .. tostring(entindex))
+        if not read_only then
+            print("[BuildingUpgrade] recovered unregistered arrow tower entindex="
+                .. tostring(entindex))
+        end
     end
     if not snapshot or not snapshot.unit or not snapshot.definition then
         return nil
@@ -577,12 +574,15 @@ local function recover_state(unit)
         tower_combat = nil,
         research_base_attack_damage = snapshot.base_attack_damage,
     }
-    buildings[entindex] = state
     if state.population_occupied == nil and state.building_id == "arrow_tower" then
         state.population_occupied = tower_routes.population_occupied(
             tower_routes.current(state)
         )
     end
+    -- Rejected quotes must not rebuild abilities, refresh models or repair
+    -- caches as a side effect (including after a script reload).
+    if read_only then return state end
+    buildings[entindex] = state
     if state.population_occupied ~= nil then
         unit.survival_population_occupied = state.population_occupied
     end
@@ -1095,36 +1095,79 @@ local function on_free_upgrade_request(payload)
     return result
 end
 
-local function on_class_request(payload)
+local function class_quote(payload)
+    payload = payload or {}
     local unit = payload.tower
-    if not valid_entity(unit) then
-        payload.result = { ok = false, error = "防御塔不存在" }
-        return payload.result
-    end
-    local state = recover_state(unit)
+    if not valid_entity(unit) then return { ok = false, error = "防御塔不存在" } end
+    local state = recover_state(unit, true)
     local function reject(message)
-        if state then notify(state, message, "error") end
-        payload.result = { ok = false, error = message }
-        return payload.result
+        return { ok = false, error = message, state = state }
     end
     if not state or state.building_id ~= "arrow_tower" then
         return reject("防御塔升级状态不存在")
     end
+    if payload.player_id ~= nil and tonumber(payload.player_id) ~= tonumber(state.player_id) then
+        return reject("只能转职自己的防御塔")
+    end
+    if unit.IsAlive and not unit:IsAlive() then return reject("防御塔不存在") end
+    if unit:HasModifier("modifier_building_under_construction") then return reject("建筑尚未建造完成") end
     if upgrade_process.is_active(unit) then return reject("建筑正在升级中") end
     if state.level < 5 then return reject("防御塔未达到5级") end
     if state.tower_class then return reject("防御塔已经完成转职") end
 
-    local class_data = state.definition.class_options[payload.class_index]
+    local index = tonumber(payload.class_index)
+    if not index or index ~= index or index < 1 or index > 7 or index ~= math.floor(index) then
+        return reject("无效的转职方向")
+    end
+    local class_data = index and (state.definition.class_options or {})[index]
     if not class_data then return reject("无效的转职方向") end
     local row = tower_routes.get(class_data.id, 1)
     if not row then return reject("路线配置缺失") end
-    local slot = reserve_tower_class_slot(state, class_data.id)
-    if not slot or not slot.ok then
+    local slot = event_bus.request(events.TOWER_CLASS_SLOT_REQUEST, {
+        operation = "snapshot", player_id = state.player_id, class_id = class_data.id,
+    })
+    if not slot or not slot.ok then return reject("转职名额暂时不可用") end
+    local maximum = tonumber(slot.maximum) or tonumber(global_rules.tower_class_max_count) or 5
+    if maximum > 0 and (tonumber(slot.count) or 0) + (tonumber(slot.pending) or 0) >= maximum then
         return reject("该转职路线数量已达上限（"
-            .. tostring(slot and slot.maximum or global_rules.tower_class_max_count)
-            .. "）")
+            .. tostring(maximum) .. "）")
     end
     local cost = tower_routes.class_change_cost(row, state)
+    if not cost then return reject("转职费用未配置") end
+    local resources = event_bus.request(events.RESOURCE_CAN_SPEND_REQUEST, {
+        player_id = state.player_id, wood = cost.wood, gold = cost.gold,
+        population = cost.population,
+    })
+    if not resources or not resources.ok then
+        local messages = {wood_not_enough = "木材不足，无法转职", gold_not_enough = "金币不足，无法转职",
+            population_not_enough = "人口不足，无法转职", profile_not_loaded = "玩家档案尚未就绪",
+            post_clear_frozen = "本局已结束，无法转职"}
+        return reject(messages[resources and resources.error] or "资源状态暂时不可用")
+    end
+    return {ok = true, state = state, class_data = class_data, row = row, cost = cost}
+end
+
+local function on_class_check(payload)
+    local quote = class_quote(payload)
+    return {ok = quote.ok, error = quote.error}
+end
+
+local function on_class_request(payload)
+    payload = payload or {}
+    local quote = class_quote(payload)
+    local state = quote.state
+    local function reject(message)
+        local recipient = tonumber(payload.player_id) or state and state.player_id
+        if recipient ~= nil then notify({player_id = recipient}, message, "error") end
+        payload.result = {ok = false, error = message}
+        return payload.result
+    end
+    if not quote.ok then return reject(quote.error) end
+    local class_data, row, cost = quote.class_data, quote.row, quote.cost
+    -- Nothing above this line changes reservations, resources, visuals or
+    -- abilities. Reserve and spend still validate again at commit time.
+    local slot = reserve_tower_class_slot(state, class_data.id)
+    if not slot or not slot.ok then return reject("该转职路线数量已达上限") end
     local result = spend(
         state,
         cost,
@@ -1134,6 +1177,9 @@ local function on_class_request(payload)
         release_tower_class_slot(state, class_data.id)
         return reject(result and result.error or "资源不足")
     end
+    -- The validated snapshot is sufficient for upgrade completion. Avoid
+    -- rebuilding the old base-tower ability bar just to populate the cache.
+    buildings[state.unit:entindex()] = state
     local previous_population = tonumber(state.population_occupied)
         or tower_routes.population_occupied(tower_routes.current(state))
     local previous_row = tower_routes.current(state)
@@ -1280,6 +1326,7 @@ function M.init()
     event_bus.handle_request(events.BUILDING_UPGRADE_REQUEST, on_upgrade_request)
     event_bus.handle_request(events.BUILDING_UPGRADE_FREE_REQUEST, on_free_upgrade_request)
     event_bus.handle_request(events.TOWER_CLASS_REQUEST, on_class_request)
+    event_bus.handle_request(events.TOWER_CLASS_CHECK_REQUEST, on_class_check)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,
         on_technology_stats_changed)

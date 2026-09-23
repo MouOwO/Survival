@@ -26,9 +26,10 @@ if ($MapName -eq 'template_map') {
     $launchFile = Join-Path $out 'launcher-launch.json'
     $previewFile = Join-Path $out 'launcher-preview.json'
     $launchText = (Get-Content -LiteralPath (Join-Path $PSScriptRoot 'launch.json') -Raw).Replace('survival survival_c6', 'survival template_map')
-    $previewText = (Get-Content -LiteralPath (Join-Path $PSScriptRoot 'preview.json') -Raw).Replace('700 6250', '700 874').Replace('-1024 5376', '-1024 0')
+    $previewText = (Get-Content -LiteralPath (Join-Path $PSScriptRoot 'preview.json') -Raw).Replace('700 6250', '700 4970').Replace('-1024 5376', '-1024 4096')
     $previewRequests = ConvertFrom-Json $previewText
     $previewRequests[0].arguments.commands = $previewRequests[0].arguments.commands.Replace("`nc6_preview_z3200`n", "`nc6_preview_z1800`n")
+    $previewRequests[0].arguments.commands += "`nbind F9 `"r_nearz 512; dota_camera_lerp_duration 0; dota_camera_distance 42000; dota_camera_set_lookatpos 0 0`"`n"
     [IO.File]::WriteAllText($launchFile, $launchText)
     [IO.File]::WriteAllText($previewFile, (ConvertTo-Json -InputObject @($previewRequests) -Depth 5))
 }
@@ -56,7 +57,16 @@ $games = @(Get-CimInstance Win32_Process -Filter "name='dota2.exe'" | Where-Obje
     $live -and -not $live.HasExited
 })
 if ($games | Where-Object { $_.CommandLine -notmatch '-addon\s+survival(?:\s|$)' }) {
-    throw 'Another Dota instance is running. Close it, then run this launcher again.'
+    # Hammer can host the survival test in a process started without -addon.
+    # Confirm the actual tools map instead of treating an absent flag as proof
+    # that another live game is running. Never replace an unverified session.
+    $verifiedToken = 'SURVIVAL_WORKSHOP_' + [Guid]::NewGuid().ToString('N')
+    $verifiedFile = Join-Path $out 'launcher-verify-workshop.json'
+    $verifyRequests = @(@{name='dota_run_lua';arguments=@{code="if IsInToolsMode() and (GetMapName() == 'template_map' or GetMapName() == 'survival_c6') then print('$verifiedToken') end"}})
+    [IO.File]::WriteAllText($verifiedFile, (ConvertTo-Json -InputObject $verifyRequests -Depth 5 -Compress))
+    if ((Invoke-PreviewClient $verifiedFile $verifiedToken) -ne 0) {
+        throw 'Another or unverified Dota instance is running. Close it, then run this launcher again.'
+    }
 }
 if ($games.Count -eq 0) {
     Start-Process (Join-Path $bin 'dota2.exe') -ArgumentList "-tools -noassetbrowser -addon survival -dev -condebug -novid -windowed -w 1600 -h 900 +dota_launch_custom_game survival $MapName" -WorkingDirectory (Join-Path $engine 'game/dota') -WindowStyle Normal

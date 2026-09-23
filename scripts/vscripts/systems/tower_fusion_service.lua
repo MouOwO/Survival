@@ -187,7 +187,9 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
     unit:SetOwner(PlayerResource:GetPlayer(player_id))
     unit:SetControllableByPlayer(player_id, true)
     unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
-    if unit.SetAcquisitionRange then unit:SetAcquisitionRange(1000) end
+    -- Share the normal tower's filtered target selection; native acquisition
+    -- otherwise starts attacking the hostile resource tree before Lua sees it.
+    if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
     unit.survival_ultimate_tower = true
     unit.survival_player_id = player_id
     unit.survival_display_name = config().display_name or "终极塔"
@@ -243,6 +245,8 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
             and selected[1].definition.footprint or { x = 2, y = 2 },
     }
     unit:AddNewModifier(unit, nil, "modifier_tower_attack_effects", {})
+    assert(unit:AddNewModifier(unit, nil, "modifier_tower_auto_attack", {}),
+        "ultimate_tower_target_filter_missing")
     for index, ability_name in ipairs(config().passive_slot_ability_ids or {}) do
         local ability = unit:AddAbility(ability_name)
         if ability then

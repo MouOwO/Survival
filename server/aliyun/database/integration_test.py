@@ -53,7 +53,8 @@ def run(service, addon_root):
                            "csv_defaults_mismatch")
             for sql in ("SELECT * FROM public.survival_players", "CREATE TABLE public.forbidden_audit(id integer)",
                         "CREATE TEMP TABLE forbidden_audit(id integer)", "SET ROLE goufayu_owner",
-                        "SELECT public.fishing_profile_json('test')"):
+                        "SELECT public.fishing_profile_json('test')",
+                        "SELECT * FROM public.survival_data_migrations"):
                 denied(sql)
 
             version = 2147000000
@@ -86,6 +87,32 @@ def run(service, addon_root):
             dbtool.require(first["profile"] == second["profile"] and first["done"], "archive_idempotency_failed")
             dbtool.require(not rpc("archive_pending", ["text"], [account]), "unexpected_pending_operation")
 
+            # The lottery commits permanent inventory and response atomically.
+            # A stale operation may not replace the latest inventory with {}.
+            lottery_id, stale_id = "lottery:" + nonce, "stale:" + nonce
+            lottery = rpc("archive_prepare", ["text", "text", "text", "text", "jsonb"],
+                          [account, lottery_id, config_hash, nonce,
+                           {"id": lottery_id, "kind": "lottery_draw"}])
+            rpc("archive_prepare", ["text", "text", "text", "text", "jsonb"],
+                [account, stale_id, config_hash, nonce, {"id": stale_id, "kind": "lottery_read"}])
+            lottery_types = ["text", "text", "bigint", "jsonb", "jsonb", "text", "jsonb", "jsonb"]
+            inventory = {"acceptance_permanent_item": 1}
+            response = {"draws": [{"item_id": "acceptance_permanent_item", "quantity": 1}]}
+            lottery_args = [account, lottery_id, lottery["profile"]["revision"], {"fixture": True}, {}, None,
+                            inventory, response]
+            first = rpc("archive_commit_lottery", lottery_types, lottery_args)
+            second = rpc("archive_commit_lottery", lottery_types, lottery_args)
+            dbtool.require(first["done"] and first["response"] == second["response"] == response and
+                           first["profile"] == second["profile"], "lottery_idempotency_failed")
+            dbtool.require(first["profile"]["save"]["content_inventory"] == inventory,
+                           "lottery_inventory_commit_failed")
+            stale = rpc("archive_commit_lottery", lottery_types,
+                        [account, stale_id, lottery["profile"]["revision"], {}, {}, None, {}, {}])
+            dbtool.require(stale.get("error") == "archive_revision_conflict", "stale_inventory_not_rejected")
+            retained = rpc("get_fishing_profile", ["text"], [account])
+            dbtool.require(retained["save"]["content_inventory"] == inventory and
+                           retained["revision"] == first["profile"]["revision"], "stale_inventory_overwrote_latest")
+
             session_id = "session:" + nonce
             types = ["text", "text", "text", "integer", "integer", "integer", "integer", "boolean"]
             rpc("checkpoint_online_time", types, [account, session_id, "first:" + nonce, 30, version, 1, 1, False])
@@ -98,8 +125,9 @@ def run(service, addon_root):
             dbtool.require(len(outbox) == 1, "checkpoint_outbox_not_exactly_once")
             dbtool.require("archive" in first.get("profile", profile)["save"] or "archive" in profile["save"], "profile_archive_missing")
             return {"status": "PASS", "database": database, "csv_defaults": len(defaults),
-                    "app_privilege_denials": 5, "grant_idempotency": True,
+                    "app_privilege_denials": 6, "grant_idempotency": True,
                     "archive_idempotency": True, "checkpoint_final_and_idempotency": True,
+                    "lottery_idempotency_and_response": True, "stale_inventory_rejected": True,
                     "outbox_exactly_once": True, "committed_test_rows": 0}
         finally:
             conn.execute("ROLLBACK")

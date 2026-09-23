@@ -15,6 +15,7 @@ local M = {
     GRID_RELEASE_REQUEST = "grid.release.request",
 
     RESOURCE_GET_REQUEST = "resource.get.request",
+    RESOURCE_CAN_SPEND_REQUEST = "resource.can_spend.request",
     RESOURCE_TRY_SPEND_REQUEST = "resource.try_spend.request",
     RESOURCE_ADD_REQUEST = "resource.add.request",
     RESOURCE_RELEASE_POP_REQUEST = "resource.release_pop.request",
@@ -27,6 +28,7 @@ local M = {
     BUILDING_UPGRADE_REQUEST = "building.upgrade.request",
     BUILDING_UPGRADE_FREE_REQUEST = "building.upgrade.free.request",
     TOWER_CLASS_REQUEST = "tower.class.request",
+    TOWER_CLASS_CHECK_REQUEST = "tower.class_check.request",
     TOWER_CLASS_SLOT_REQUEST = "tower.class_slot.request",
     TOWER_CLASS_COUNTS_CHANGED = "tower.class_counts.changed",
     BUILDING_QUERY_REQUEST = "building.query.request",

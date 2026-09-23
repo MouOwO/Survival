@@ -16,6 +16,7 @@ local monster_visual_config = require("config/monster_visual_config")
 local monster_visual_service = require("systems/monster_visual_service")
 local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
+local monster_navigation = require("systems/monster_navigation_policy")
 local monster_corpse_lifecycle_service = require(
     "systems/monster_corpse_lifecycle_service"
 )
@@ -337,6 +338,41 @@ local function wall_for_channel(channel)
     return wall_entindex
 end
 
+-- Resolve lazily: match setup and profile authentication are initialized before
+-- gameplay, and may themselves consult the wave snapshot. Missing services keep
+-- client selection closed instead of treating unavailable data as a new save.
+local function selection_context()
+    local ok, setup = pcall(require, "systems/match_setup_service")
+    if not ok or type(setup) ~= "table" then return nil, nil, nil end
+    local selector = type(setup.selector_player_id) == "function"
+        and setup.selector_player_id() or nil
+    local progression
+    local loaded, profiles = pcall(require, "systems/player_profile_service")
+    if loaded and type(profiles.get_progression) == "function" and selector ~= nil then
+        progression = profiles.get_progression(selector)
+    end
+    return setup, selector, progression
+end
+
+local function refresh_selection_state()
+    -- Selection is immutable once combat can start. Enemy spawn/death publishes
+    -- must not repeatedly deep-copy a private account profile for UI permissions.
+    if difficulty_selected and state.mode_selected ~= nil then return end
+    local setup, selector, progression = selection_context()
+    state.mode_selected = setup ~= nil and type(setup.is_mode_selected) == "function"
+        and setup.is_mode_selected() == true
+    state.game_mode = state.mode_selected and setup.get_mode() or ""
+    state.selector_player_id = tonumber(selector) or -1
+    local startup = package.loaded["systems/startup_loading_service"]
+    state.can_confirm_difficulty = startup ~= nil and type(startup.is_gameplay_ready) == "function"
+        and startup.is_gameplay_ready() == true
+    state.difficulty_options = difficulty_config.client_options(progression)
+    if game_started and not difficulty_selected then
+        state.status = state.mode_selected and "selecting_difficulty" or "selecting_mode"
+        state.timer = 0
+    end
+end
+
 local function reset()
     phase_guard.reset()
     state = { current_wave = 0, total_waves = 0, status = "waiting", timer = 0,
@@ -351,6 +387,7 @@ local function reset()
 end
 
 local function publish(reason)
+    refresh_selection_state()
     local data = {}
     for key, value in pairs(state) do data[key] = value end
     data.reason = reason
@@ -486,7 +523,7 @@ local function rebuild_waves()
     return true
 end
 
-local function apply_stats(unit, row, definition, movement_type)
+local function apply_stats(unit, row, definition)
     unit.survival_movement_type = definition.movement_type or "ground"
     unit.survival_movement_type_override = row.movement_type_override
     unit:SetBaseMaxHealth(row.health)
@@ -525,11 +562,6 @@ local function apply_stats(unit, row, definition, movement_type)
     else
         unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
     end
-    if movement_type == "flying" then
-        unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_FLY)
-    else
-        unit:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
-    end
     unit:SetModelScale((definition.model_scale or 1.0)
         * (tonumber(row.model_scale_multiplier) or 1.0))
     local model_path = model_path_for(row, definition)
@@ -538,10 +570,6 @@ local function apply_stats(unit, row, definition, movement_type)
     if unit.SetAttackCapability then
         unit:SetAttackCapability(definition.attack_type == "ranged"
             and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK)
-    end
-    if unit.SetMoveCapability then
-        unit:SetMoveCapability(movement_type == "flying"
-            and DOTA_UNIT_CAP_MOVE_FLY or DOTA_UNIT_CAP_MOVE_GROUND)
     end
     for _, ability_name in ipairs(definition.passive_skill_ids or {}) do
         if ability_name ~= "" and not unit:FindAbilityByName(ability_name) then
@@ -581,7 +609,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     monster_spawn_marker = marker
     local position = marker:GetAbsOrigin()
     position.z = GetGroundHeight(position, nil) + 32
-    local unit = CreateUnitByName(definition.unit_name, position, true, nil, nil, DOTA_TEAM_BADGUYS)
+    local unit = CreateUnitByName(definition.unit_name, position, false, nil, nil, DOTA_TEAM_BADGUYS)
     if not valid(unit) then
         state.failed_spawn = state.failed_spawn + 1
         publish("unit_create_failed")
@@ -589,10 +617,12 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         check_final_victory()
         return
     end
+    monster_navigation.apply(unit)
+    FindClearSpaceForUnit(unit, position, true)
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     monster_corpse_lifecycle_service.track(unit, "wave")
     local collision_profile = wave_monster_collision.profile(row, definition)
-    apply_stats(unit, row, definition, collision_profile.movement_type)
+    apply_stats(unit, row, definition)
     local resolved_visual = monster_visual_config.resolve(
         wave_number,
         row.member_role or "normal",
@@ -865,6 +895,7 @@ local function clear_normal_wave_enemies()
 end
 
 local function get_wave_state()
+    refresh_selection_state()
     local next_wave_number = next_wave_number_after(state.current_wave)
     local next_special_wave_number, next_special_role = next_special_target_after(
         state.current_wave
@@ -872,6 +903,12 @@ local function get_wave_state()
     return {
         ok = true,
         difficulty_id = difficulty_id,
+        difficulty_selected = difficulty_selected,
+        mode_selected = state.mode_selected,
+        game_mode = state.game_mode,
+        selector_player_id = state.selector_player_id,
+        can_confirm_difficulty = state.can_confirm_difficulty,
+        difficulty_options = state.difficulty_options,
         current_wave = state.current_wave,
         total_waves = state.total_waves,
         status = state.status,
@@ -1125,11 +1162,42 @@ end
 
 local function set_difficulty_request(payload)
     local id = tostring(payload and payload.difficulty_id or "")
+    local player_id = tonumber(payload and payload.player_id)
+    local setup = selection_context()
+    if not setup or type(setup.is_mode_selected) ~= "function"
+        or setup.is_mode_selected() ~= true then
+        return { ok = false, error = "mode_not_selected" }
+    end
+    if player_id == nil or type(setup.is_selector) ~= "function"
+        or setup.is_selector(player_id) ~= true then
+        return { ok = false, error = "difficulty_selector_required" }
+    end
+    local loaded, startup = pcall(require, "systems/startup_loading_service")
+    if not loaded or type(startup.is_player_ready) ~= "function"
+        or startup.is_player_ready(player_id) ~= true then
+        return { ok = false, error = "player_not_ready" }
+    end
+    local profile_ok, profiles = pcall(require, "systems/player_profile_service")
+    local progression = profile_ok and type(profiles.get_progression) == "function"
+        and profiles.get_progression(player_id) or nil
+    if type(progression) ~= "table" or progression.loaded ~= true then
+        return { ok = false, error = "profile_not_loaded" }
+    end
+    if not difficulty_config.get(id) then
+        return { ok = false, error = "difficulty_not_found" }
+    end
+    if not difficulty_config.is_unlocked(id, progression) then
+        return { ok = false, error = "difficulty_not_unlocked" }
+    end
     local ok, error_code = M.set_difficulty(id)
     if not ok then
         return { ok = false, error = error_code or "difficulty_not_found" }
     end
     return { ok = true, difficulty_id = difficulty_id, total_waves = state.total_waves }
+end
+
+function M.refresh_selection(reason)
+    publish(reason or "difficulty_permissions_changed")
 end
 
 function M.get_difficulty() return difficulty_id end
@@ -1156,13 +1224,15 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     local unit = CreateUnitByName(
         definition.unit_name,
         position,
-        true,
+        false,
         nil,
         nil,
         DOTA_TEAM_BADGUYS
     )
     if not valid(unit) then return nil, "unit_create_failed" end
 
+    monster_navigation.apply(unit)
+    FindClearSpaceForUnit(unit, position, true)
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "building_challenge_enemy")
     monster_corpse_lifecycle_service.track(unit, "building_challenge")
     local combat_row = {
@@ -1178,7 +1248,7 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     if definition.endless or combat_row.health > 100000000 or combat_row.attack > 100000000 then
         combat_row = require("combat/endless_stat_projection").prepare(unit, combat_row)
     end
-    apply_stats(unit, combat_row, definition, collision_profile.movement_type)
+    apply_stats(unit, combat_row, definition)
     monster_hull_scale.apply(
         unit,
         1,
@@ -1284,6 +1354,9 @@ function M.init()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)
     event_bus.handle_request(events.WAVE_STATE_GET_REQUEST, get_wave_state)
     event_bus.handle_request(events.WAVE_EARLY_FINAL_REQUEST, request_early_final)
+    event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, function()
+        if not difficulty_selected then M.refresh_selection("difficulty_permissions_changed") end
+    end)
     event_bus.subscribe(events.GAME_STARTED, function()
         game_started = true
         game_started_at = current_game_time()
@@ -1292,7 +1365,7 @@ function M.init()
             start_countdown(wave_timing_config.initial_delay_seconds)
             return
         end
-        state.status = "selecting_difficulty"
+        state.status = "selecting_mode"
         state.timer = 0
         publish("difficulty_selection_started")
     end)

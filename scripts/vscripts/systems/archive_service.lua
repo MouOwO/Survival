@@ -1,6 +1,11 @@
 local bus = require("core/event_bus")
 local events = require("core/events")
 local profiles = require("systems/player_profile_service")
+-- UI/claim eligibility is the real account; combat uses the separate match view.
+local function account_profile(id)
+    if profiles.get_account_profile then return profiles.get_account_profile(id) end
+    return profiles.get_profile(id)
+end
 local scheduler = require("core/scheduler")
 local achievements = require("config/generated/archive_achievements")
 local shadow_items = require("config/generated/archive_shadow_items")
@@ -152,7 +157,7 @@ function M.register_category(category_id, projector)
 end
 
 function M.snapshot(player_id, category_id)
-    local profile = profiles.get_profile(player_id)
+    local profile = account_profile(player_id)
     if not profile then return { ok = false, error = "profile_not_loaded" } end
     category_id = tostring(category_id or "clear")
     local category = categories.by_id[category_id]
@@ -205,7 +210,7 @@ local function send(player_id)
 end
 
 local function local_settle(player_id, command)
-    local profile = profiles.get_profile(player_id)
+    local profile = account_profile(player_id)
     if not profile then return { ok = false, error = "profile_not_loaded" } end
     local provider = profiles.get_provider()
     if not provider or type(provider.persist_save) ~= "function" then
@@ -297,7 +302,7 @@ function M.record_boss(player_id,kill_id)
 end
 local daily_sequences={}
 function M.daily_snapshot(player_id)
-    local profile=profiles.get_profile(player_id)
+    local profile=account_profile(player_id)
     if not profile then return {ok=false,error="档案尚未载入"} end
     local result=require("systems/archive_daily_rewards").snapshot(profile,require("systems/archive_calendar").day(),has_pass(profile))
     result.ok=true
@@ -379,7 +384,7 @@ function M.zaixian(context)
     if #args ~= 1 or not integer(minutes) or minutes < 1 or minutes > 1000000 then
         return false, "用法：zaixian <1..1000000分钟>（累加在线时间）"
     end
-    local profile = profiles.get_profile(context.player_id)
+    local profile = account_profile(context.player_id)
     if not profile then return false, "profile_not_loaded" end
     serial = (serial or 0) + 1
     -- A separate cursor per invocation exercises the real settlement without advancing the live clock.
@@ -493,7 +498,7 @@ function M.init()
         local id = tonumber(payload.player_id)
         if id then
             archive_players[id]=true
-            online_clock.observe(id, profiles.get_profile(id))
+            online_clock.observe(id, account_profile(id))
             send(id)
             if daily_viewers[id] then M.send_daily(id) end
             if not busy[id] then flush(id) end
@@ -508,7 +513,7 @@ function M.init()
         -- Iterate valid slots as well as profile events, so reopening the archive is never needed to earn time.
         for id = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
             if PlayerResource and PlayerResource:IsValidPlayerID(id) then
-                local profile = profiles.get_profile(id)
+                local profile = account_profile(id)
                 if profile then
                     archive_players[id] = true
                     online_clock.sample(id, profile)
@@ -521,7 +526,7 @@ function M.init()
     CustomGameEventManager:RegisterListener("survival_daily_request",function(_,payload)
         local id=tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
-        local profile=profiles.get_profile(id)
+        local profile=account_profile(id)
         if not profile then M.send_daily(id);return end
         daily_viewers[id]=true
         archive_players[id]=true
@@ -562,7 +567,7 @@ function M.init()
     end)
     scheduler.every(1,function()
         for id in pairs(archive_players) do
-            local profile=profiles.get_profile(id)
+            local profile=account_profile(id)
             if profile then
                 local pass=has_pass(profile)
                 if pass_states[id]~=pass then

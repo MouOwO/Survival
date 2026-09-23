@@ -1,6 +1,7 @@
 ﻿effect_key,asset_id,effect_group_id,effect_id,effect_role,skill_id,phase,particle_path,owner_component_id,attach_type,attachment_point,control_profile,delay_seconds,sort_order,enabled,notes
 #中文名:特效记录键,资源ID,特效组合ID,特效ID,特效角色,技能ID,阶段,粒子路径,所属组件ID,挂载类型,挂点,控制点配置,延迟秒数,排序,是否启用,备注
 #types:string,string,string,string,enum,string,enum,string,string,string,string,string,number,number,boolean,string
+tower_laser_od_blackgate:io_base_ambient,tower_laser_od_blackgate,ambient,io_base_ambient,ambient,,persistent,particles/units/heroes/hero_wisp/wisp_ambient.vpcf,,PATTACH_POINT_FOLLOW,attach_hitloc,io_base_ambient,,1,1,官方默认ItemDef 536的Io本体常驻粒子；控制点使用原生preview健康状态。
 hero_permanent_hero_blademaster:ambient,hero_permanent_hero_blademaster,ambient,arcana_ambient,ambient,,persistent,particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_ambient.vpcf,,PATTACH_ABSORIGIN_FOLLOW,,,,1,1,尊享·剑心之遗二阶段常驻灵体特效。
 hero_permanent_hero_blademaster:spawn_1,hero_permanent_hero_blademaster,spawn,arcana_spawn_1,spawn,,instant,particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_loadout_spawn_model.vpcf,,PATTACH_ABSORIGIN_FOLLOW,,,,1,1,尊享·剑心之遗加载/出生特效。
 hero_permanent_hero_blademaster:spawn_2,hero_permanent_hero_blademaster,spawn,arcana_spawn_2,spawn,,instant,particles/econ/items/juggernaut/jugg_arcana/juggernaut_arcana_loadout_spawn_model.vpcf,,PATTACH_ABSORIGIN_FOLLOW,,,,2,1,尊享·剑心之遗加载/出生特效。

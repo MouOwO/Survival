@@ -12,6 +12,7 @@ local combat_profiles = require("config/challenge_combat_profile_config")
 local difficulty_config = require("config/difficulty_config")
 local challenge_sessions = require("systems/challenge_session_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
+local monster_navigation = require("systems/monster_navigation_policy")
 local wave_monster_collision = require("systems/wave_monster_collision")
 local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 
@@ -205,7 +206,7 @@ local function start_encounter(payload)
     local unit = CreateUnitByName(
         archetype.unit_name,
         origin,
-        true,
+        false,
         nil,
         nil,
         team
@@ -214,6 +215,7 @@ local function start_encounter(payload)
         return { ok = false, error = "unit_create_failed" }
     end
 
+    monster_navigation.apply(unit)
     if archetype.model_path and archetype.model_path ~= "" then
         unit:SetModel(archetype.model_path)
         unit:SetOriginalModel(archetype.model_path)

@@ -4,6 +4,7 @@ local config = require("config/buildings_config")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
 local tower_routes = require("config/tower_route_config")
 local global_rules = require("config/global_rules")
+local tower_combat_rules = require("config/tower_combat_rules")
 local dev_wall_stats = require("debug/dev_wall_stats")
 local logger = require("core/logger")
 local team_alignment = require("core/team_alignment")
@@ -289,18 +290,7 @@ local function main_city_level(team)
     return 0
 end
 local function set_attack_range(unit, attack_range)
-    attack_range = tonumber(attack_range) or global_rules.tower_attack_range
-    if unit.Script_SetAttackRange then
-        unit:Script_SetAttackRange(attack_range)
-    elseif unit.SetAttackRange then
-        unit:SetAttackRange(attack_range)
-    end
-    if unit.SetAcquisitionRange then
-        unit:SetAcquisitionRange(math.max(
-            global_rules.tower_acquisition_range,
-            attack_range
-        ))
-    end
+    tower_combat_rules.set_attack_range(unit, attack_range)
 end
 local function arrow_data(level)
     for _, row in ipairs(arrow_tower_base.rows) do
@@ -542,6 +532,17 @@ local function recover_building(unit)
     unit.survival_route_level = route_row and route_row.level or state.level
     apply_hull_radius(unit, definition)
     anchor_building(unit, unit.survival_fixed_position or origin)
+    if state.building_id == "arrow_tower"
+        and not unit:HasModifier("modifier_building_under_construction") then
+        for _, modifier_name in ipairs({
+            "modifier_tower_auto_attack", "modifier_tower_attack_effects",
+        }) do
+            if not unit:HasModifier(modifier_name) then
+                unit:AddNewModifier(unit, nil, modifier_name, {})
+            end
+        end
+        if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
+    end
     if state.building_id == "wall" then
         local level_data = definition.levels[state.level] or definition.levels[1] or {}
         war3_armor_target.apply(
@@ -996,7 +997,7 @@ end
 local function query_building(payload)
     local entindex = tonumber(payload and payload.entindex)
     local state = entindex and buildings[entindex] or nil
-    if not state and entindex and type(EntIndexToHScript) == "function" then
+    if not state and not (payload and payload.read_only) and entindex and type(EntIndexToHScript) == "function" then
         local ok, unit = pcall(EntIndexToHScript, entindex)
         if ok then state = recover_building(unit) end
     end

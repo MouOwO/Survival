@@ -1,0 +1,358 @@
+{
+  "format": 1,
+  "verified_date": "2026-09-20",
+  "status": "SERVER_AND_TUNNEL_PASS_GAME_PENDING",
+  "server": {
+    "status": "PASS",
+    "release": "/opt/goufayu/releases/20260920-test05",
+    "api": {
+      "Restart": "on-failure",
+      "MainPID": "15959",
+      "NRestarts": "1",
+      "User": "goufayu",
+      "Group": "goufayu",
+      "ActiveState": "active",
+      "SubState": "running",
+      "UnitFileState": "enabled"
+    },
+    "database": {
+      "MainPID": "6590",
+      "ActiveState": "active",
+      "SubState": "running",
+      "UnitFileState": "enabled"
+    },
+    "backup_timer": {
+      "NextElapseUSecRealtime": "Mon 2026-09-21 03:15:38 CST",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "UnitFileState": "enabled"
+    },
+    "listening_addresses": [
+      "127.0.0.1:5432",
+      "127.0.0.1:8765"
+    ],
+    "payment_mode": "test",
+    "logrotate_configuration_valid": true,
+    "automated_offsite_backup_configured": false,
+    "whole_ecs_reboot_tested": false,
+    "real_database_service_outage_tested": false,
+    "real_game_client_tested": false
+  },
+  "upgrade": {
+    "status": "PASS",
+    "migration_attempted": true,
+    "rollback_performed": false,
+    "database": "goufayu_test",
+    "existing_history_tables_unchanged": 12,
+    "existing_player_rows": 4,
+    "wood_rows_adjusted_once": 4,
+    "immutable_history_hashes_match": true,
+    "archive_inventory_and_outbox_preserved": true,
+    "only_reviewed_player_changes": true,
+    "old_ledger_rows_preserved": true,
+    "data_marker_preserved": true,
+    "schema_migrations_applied": 4,
+    "repeat_run_all_business_rows_unchanged": false,
+    "account_data_printed": false,
+    "migration": {
+      "status": "migrated",
+      "database": "goufayu_test",
+      "new_migrations": 4,
+      "recorded_migrations": 23,
+      "permissions": {
+        "rpc_count": 12,
+        "table_access": false,
+        "ddl": false,
+        "role_membership": false
+      }
+    }
+  },
+  "repeat_upgrade": {
+    "status": "PASS",
+    "migration_attempted": true,
+    "rollback_performed": false,
+    "database": "goufayu_test",
+    "existing_history_tables_unchanged": 12,
+    "existing_player_rows": 4,
+    "wood_rows_adjusted_once": 0,
+    "immutable_history_hashes_match": true,
+    "archive_inventory_and_outbox_preserved": true,
+    "only_reviewed_player_changes": true,
+    "old_ledger_rows_preserved": true,
+    "data_marker_preserved": true,
+    "schema_migrations_applied": 0,
+    "repeat_run_all_business_rows_unchanged": true,
+    "account_data_printed": false,
+    "migration": {
+      "status": "migrated",
+      "database": "goufayu_test",
+      "new_migrations": 0,
+      "recorded_migrations": 23,
+      "permissions": {
+        "rpc_count": 12,
+        "table_access": false,
+        "ddl": false,
+        "role_membership": false
+      }
+    }
+  },
+  "transaction_database_checks": {
+    "status": "PASS",
+    "database": "goufayu_test",
+    "csv_defaults": 97,
+    "app_privilege_denials": 6,
+    "grant_idempotency": true,
+    "archive_idempotency": true,
+    "checkpoint_final_and_idempotency": true,
+    "lottery_idempotency_and_response": true,
+    "stale_inventory_rejected": true,
+    "outbox_exactly_once": true,
+    "committed_test_rows": 0
+  },
+  "acceptance_reports": {
+    "clone-upgrade": {
+      "status": "PASS"
+    },
+    "clone-repeat": {
+      "status": "PASS"
+    },
+    "test-upgrade": {
+      "status": "PASS"
+    },
+    "test-repeat": {
+      "status": "PASS"
+    },
+    "http-write": {
+      "status": "PASS",
+      "code": "http_acceptance_passed",
+      "checks": {
+        "unauthorized_requests_rejected": true,
+        "authenticated_database_readiness": true,
+        "archive_config_loaded": true,
+        "two_synthetic_profiles_initialized": true,
+        "boss_command_replay_exactly_once": true,
+        "player_isolation_and_operation_scope": true,
+        "profile_reentry_over_fresh_http_connections": true,
+        "raw_save_routes_and_command_rejected": true,
+        "positive_online_interval_replay_exactly_once": true
+      },
+      "not_tested": [
+        "real_game_client",
+        "process_restart",
+        "database_outage",
+        "offsite_restore"
+      ],
+      "mode": "write_test",
+      "finished_at": "2026-09-20T01:30:42.479378+00:00"
+    },
+    "lottery-write": {
+      "status": "PASS",
+      "code": "lottery_upgrade_acceptance_passed",
+      "checks": {
+        "authenticated_lottery_endpoint": true,
+        "two_new_synthetic_accounts_seeded": true,
+        "real_lua_map_ten_draw": true,
+        "lottery_replay_same_request_exactly_once": true,
+        "lottery_account_isolation": true,
+        "permanent_content_preserved": true,
+        "raw_save_cannot_replace_lottery_inventory": true
+      },
+      "not_tested": [
+        "actual_process_restart_requires_operator_evidence",
+        "real_database_outage",
+        "real_game_client",
+        "payment",
+        "offsite_restore"
+      ],
+      "mode": "write_test",
+      "finished_at": "2026-09-20T01:30:50.784600+00:00"
+    },
+    "focused": {
+      "status": "PASS",
+      "code": "focused_acceptance_passed",
+      "checks": {
+        "test_old_revision_cannot_overwrite_new_permanent_reward": true,
+        "test_http_database_outage_no_empty_profile_or_write": true
+      },
+      "not_tested": [
+        "real_database_outage",
+        "legacy_database_migration",
+        "real_game_client"
+      ]
+    },
+    "http-manual-restart": {
+      "status": "PASS",
+      "code": "http_prior_report_verified",
+      "checks": {
+        "authenticated_database_readiness": true,
+        "original_archive_config_retained": true,
+        "synthetic_player_1_saved_state_retained": true,
+        "synthetic_player_2_saved_state_retained": true,
+        "stored_rewards_counters_and_account_isolation_retained": true,
+        "no_new_business_commands_submitted": true
+      },
+      "not_tested": [
+        "real_game_client",
+        "process_restart",
+        "database_outage",
+        "offsite_restore"
+      ],
+      "mode": "verify_prior_report",
+      "finished_at": "2026-09-20T01:32:14.037244+00:00"
+    },
+    "lottery-manual-restart": {
+      "status": "PASS",
+      "code": "lottery_prior_report_verified",
+      "checks": {
+        "prior_written_saved_state_retained": true,
+        "lottery_snapshots_retained": true,
+        "no_new_business_commands_or_fixtures": true
+      },
+      "not_tested": [
+        "actual_process_restart_requires_operator_evidence",
+        "real_database_outage",
+        "real_game_client",
+        "payment",
+        "offsite_restore"
+      ],
+      "mode": "verify_prior_report",
+      "finished_at": "2026-09-20T01:32:16.245750+00:00"
+    },
+    "http-automatic-restart": {
+      "status": "PASS",
+      "code": "http_prior_report_verified",
+      "checks": {
+        "authenticated_database_readiness": true,
+        "original_archive_config_retained": true,
+        "synthetic_player_1_saved_state_retained": true,
+        "synthetic_player_2_saved_state_retained": true,
+        "stored_rewards_counters_and_account_isolation_retained": true,
+        "no_new_business_commands_submitted": true
+      },
+      "not_tested": [
+        "real_game_client",
+        "process_restart",
+        "database_outage",
+        "offsite_restore"
+      ],
+      "mode": "verify_prior_report",
+      "finished_at": "2026-09-20T01:32:22.750825+00:00"
+    },
+    "lottery-automatic-restart": {
+      "status": "PASS",
+      "code": "lottery_prior_report_verified",
+      "checks": {
+        "prior_written_saved_state_retained": true,
+        "lottery_snapshots_retained": true,
+        "no_new_business_commands_or_fixtures": true
+      },
+      "not_tested": [
+        "actual_process_restart_requires_operator_evidence",
+        "real_database_outage",
+        "real_game_client",
+        "payment",
+        "offsite_restore"
+      ],
+      "mode": "verify_prior_report",
+      "finished_at": "2026-09-20T01:32:24.937114+00:00"
+    },
+    "process-restarts": {
+      "status": "PASS",
+      "before": {
+        "MainPID": "15435",
+        "NRestarts": "0",
+        "ActiveState": "active"
+      },
+      "manual_restart": {
+        "MainPID": "15885",
+        "NRestarts": "0",
+        "ActiveState": "active"
+      },
+      "automatic_restart": {
+        "MainPID": "15959",
+        "NRestarts": "1",
+        "ActiveState": "active"
+      },
+      "database_service_unchanged": true,
+      "database_pid": "6590",
+      "saved_profiles_retained": 4
+    }
+  },
+  "post_upgrade_backup": {
+    "backup": "/var/backups/goufayu/postupgrade_20260920_014155Z",
+    "files": {
+      "database.dump": "e1f87fd3ae7e1132c284155a70fb9ac94e6b30543720921dac93675e04b81eab",
+      "inventory.json": "8f401f1540a44227f7ddf8c3e0f84b23b2aca9bb039216eace1929f46f263989",
+      "schema.sql": "30460941cc00887b39a3e897f02e3facb5d5ba8f7dc3f28d07063f484140d558",
+      "backup_manifest.json": "c1b67952ec90418cde48418fef2a3b82a74b66b5dc594ad9f6712954a97a1cd6"
+    }
+  },
+  "off_ecs_roundtrip": {
+    "status": "PASS",
+    "off_ecs_backup": "D:\\survival_database\\local_test_exports\\20260920-upgrade\\postupgrade_20260920_014155Z",
+    "restoration_input": "/var/lib/goufayu/restore-input-20260920/postupgrade_20260920_014155Z",
+    "local_checksums_verified": {
+      "database.dump": "e1f87fd3ae7e1132c284155a70fb9ac94e6b30543720921dac93675e04b81eab",
+      "inventory.json": "8f401f1540a44227f7ddf8c3e0f84b23b2aca9bb039216eace1929f46f263989",
+      "schema.sql": "30460941cc00887b39a3e897f02e3facb5d5ba8f7dc3f28d07063f484140d558",
+      "backup_manifest.json": "c1b67952ec90418cde48418fef2a3b82a74b66b5dc594ad9f6712954a97a1cd6"
+    },
+    "backup_git_ignored": true
+  },
+  "off_ecs_restore": {
+    "status": "PASS",
+    "database": "goufayu_restore_postupgrade_20260920",
+    "tables": 16,
+    "data_fingerprints_match": true,
+    "function_definitions_match": true,
+    "triggers_match": true,
+    "sequences": {},
+    "source_writes": false,
+    "constraints_and_indexes_match": true,
+    "runtime_acl_applied": false,
+    "note": "Full-schema restore preserves source business logic. Apply reviewed target hardening separately before runtime use."
+  },
+  "restored_database_hardening": {
+    "status": "migrated",
+    "database": "goufayu_restore_postupgrade_20260920",
+    "new_migrations": 0,
+    "recorded_migrations": 23,
+    "permissions": {
+      "rpc_count": 12,
+      "table_access": false,
+      "ddl": false,
+      "role_membership": false
+    }
+  },
+  "local_tunnel": {
+    "status": "PASS",
+    "local_address": "127.0.0.1:8765",
+    "authenticated_database_readiness": true,
+    "unauthorized_rejected": true,
+    "archive_config_matches_game": true,
+    "config_hash": "4b28247fa0bbabf0d220b4f178a9d8379fc54d362792b031fbfcd5a71c8bf20d",
+    "business_writes": false,
+    "real_game_client_tested": false
+  },
+  "evidence_scope": {
+    "per_report_not_tested": "Each report lists only its own scope. Process restarts and manual off-ECS restore are covered by separate evidence in this record.",
+    "database_failure": "Independent test HTTP instance used an intentionally failing database connection; actual database service was never stopped.",
+    "real_game_client": "Pending normal Workshop Tools game startup, server-only token injection, and actual game read/write/reentry.",
+    "synthetic_accounts": "Only synthetic test accounts used; no live Supabase player migration.",
+    "offsite": "Manual copy on the local computer, checksum checked and roundtripped for isolated restore; scheduled offsite destination is not configured."
+  },
+  "remaining": [
+    "real_game_client_read_write_reentry",
+    "domain_and_https",
+    "scheduled_offsite_backup_destination",
+    "supabase_source_business_data_migration",
+    "whole_ecs_reboot",
+    "real_database_service_outage_exercise"
+  ],
+  "payment": "test_only",
+  "rollback": {
+    "stop_preserve_database": "systemctl disable --now goufayu-api.service",
+    "old_release_direct_activation_supported": false,
+    "reason": "test03 strictly expects 11 RPCs; upgraded database grants 12. Restore a pre-upgrade copy into a new isolated database before assessing any old-version switch."
+  }
+}

@@ -30,8 +30,16 @@ function M.is_tree(unit)
 end
 
 function M.is_arrow_tower(unit)
-    return valid(unit)
-        and tostring(unit.survival_building_id or "") == "arrow_tower"
+    if not valid(unit) then return false end
+    local building_id = tostring(unit.survival_building_id or "")
+    local unit_name = unit.GetUnitName and unit:GetUnitName() or ""
+    -- Ultimate towers retain their own business identity while sharing the
+    -- stationary tower order/target restrictions. Names cover creation before
+    -- Lua identity fields have been applied to the new entity.
+    return building_id == "arrow_tower" or building_id == "ultimate_tower"
+        or unit.survival_ultimate_tower == true
+        or unit_name == "building_arrow_tower"
+        or unit_name == "npc_dota_unit_ultimate_tower"
 end
 
 function M.is_lumberjack(unit)
@@ -47,6 +55,14 @@ function M.is_real_hero(unit)
 end
 
 function M.is_allowed_tree_attacker(unit)
+    if not valid(unit) or M.is_arrow_tower(unit)
+        or unit.survival_is_building == true
+        or unit.survival_is_native_wearable_visual == true
+        or unit.survival_is_native_wearable == true then
+        return false
+    end
+    -- A native hero used only to display a tower skin is not a gameplay hero,
+    -- even when the engine reports IsRealHero().
     return M.is_lumberjack(unit) or M.is_real_hero(unit)
 end
 

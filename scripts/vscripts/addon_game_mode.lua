@@ -16,7 +16,8 @@ local function configure_survival_launch_rules()
     -- During module loading the GameModeEntity can still be unavailable; an
     -- early return before these calls would leave the default All Pick phase
     -- active whenever a later gameplay require is slow or fails.
-    GameRules:SetCustomGameSetupTimeout(configured_setup_wait_seconds())
+    -- Only the authenticated, all-player loading barrier may end setup.
+    GameRules:SetCustomGameSetupTimeout(-1)
     GameRules:SetHeroSelectionTime(0)
     GameRules:SetShowcaseTime(0)
     GameRules:SetStrategyTime(0)
@@ -25,8 +26,7 @@ local function configure_survival_launch_rules()
         configured_max_players()
     )
     GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
-    GameRules:EnableCustomGameSetupAutoLaunch(true)
-    GameRules:SetCustomGameSetupAutoLaunchDelay(configured_setup_wait_seconds())
+    GameRules:EnableCustomGameSetupAutoLaunch(false)
 
     local game_mode = GameRules:GetGameModeEntity()
     if not game_mode then
@@ -238,6 +238,8 @@ local M = {}
 local initialized = false
 local replacing_forced_hero = {}
 local ready_hero_entindex_by_player = {}
+local pending_loading_heroes = {}
+local game_started_emitted = false
 
 local function configure_game_rules()
     local launch_rules_applied, launch_error = configure_survival_launch_rules()
@@ -326,7 +328,23 @@ local function initialize_survival_hero(hero)
         return
     end
 
+    local loading = require("systems/startup_loading_service")
+    if not loading.is_gameplay_ready() then
+        local key = hero:entindex()
+        if not pending_loading_heroes[key] then
+            pending_loading_heroes[key] = true
+            loading.gameplay_gate(function()
+                pending_loading_heroes[key] = nil
+                initialize_survival_hero(hero)
+            end)
+        end
+        return
+    end
+
     local player_id = hero:GetPlayerOwnerID()
+    -- The released roster is fixed; a late, unauthenticated arrival must not
+    -- acquire a builder merely because the other players already started.
+    if not loading.is_player_ready(player_id) then return end
     local unit_name = hero:GetUnitName()
     local hero_entindex = hero:entindex()
     if ready_hero_entindex_by_player[player_id] == hero_entindex then
@@ -414,8 +432,18 @@ end
 
 local function on_game_state_changed()
     local state = GameRules:State_Get()
-    if state == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-        event_bus.emit(events.GAME_STARTED, {})
+    if state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+        if require("systems/startup_loading_service").is_ready() then
+            GameRules:FinishCustomGameSetup()
+        end
+    elseif state == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+        require("systems/startup_loading_service").gameplay_gate(function()
+            if not game_started_emitted
+                and GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+                game_started_emitted = true
+                event_bus.emit(events.GAME_STARTED, {})
+            end
+        end)
     elseif state == DOTA_GAMERULES_STATE_POST_GAME then
         print("[OnlineTime] game_state_post_game")
         require("systems/online_time_service").finish("game_rules_state_change")
@@ -832,6 +860,7 @@ function M.precache(context)
     asset_preload_service.precache_group(context, "challenge_visuals")
     hero_cosmetic_service.precache(context)
     require("systems/archive_challenge_service").precache(context)
+    require("systems/startup_asset_preload_service").precache(context)
 end
 
 -- Keep each initialization phase below Lua 5.1's 60-upvalue limit: a
@@ -935,6 +964,8 @@ function M.activate()
     initialized = true
     replacing_forced_hero = {}
     ready_hero_entindex_by_player = {}
+    pending_loading_heroes = {}
+    game_started_emitted = false
 
     print("[MULTIPLAYER_SESSION] activate map=" .. tostring(GetMapName and GetMapName() or "unknown")
         .. " max_players=" .. tostring(configured_max_players())
@@ -985,16 +1016,18 @@ function M.activate()
     ListenToGameEvent("npc_spawned", on_npc_spawned, nil)
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
     ListenToGameEvent("dota_item_picked_up", on_item_picked_up, nil)
-    -- Keep setup open for the CSV-defined join window. Connection events can
-    -- assign players during this interval; the final sweep catches players
-    -- whose connection event arrived before this listener was installed.
+    -- Authentication and asset preparation run before hero/gameplay start.
+    -- Unlike gameplay timers, this barrier progresses while game time is stopped.
     multiplayer_player_service.assign_connected_players("before_finish_setup")
-    scheduler.after(configured_setup_wait_seconds(), function()
-        multiplayer_player_service.assign_connected_players("setup_wait_elapsed")
-        GameRules:FinishCustomGameSetup()
-        print("[MULTIPLAYER_SESSION] setup_finished wait_seconds="
-            .. tostring(configured_setup_wait_seconds()))
-    end, "multiplayer_finish_custom_game_setup")
+    require("systems/startup_asset_preload_service").init()
+    require("systems/startup_loading_service").init({
+        minimum_wait_seconds = 0,
+        on_ready = function()
+            multiplayer_player_service.assign_connected_players("loading_barrier_ready")
+            on_game_state_changed()
+            print("[MULTIPLAYER_SESSION] setup_finished authentication_and_assets_ready=true")
+        end,
+    })
     logger.info(
         "Addon",
         "initialized V1.6 logical weapon growth core"

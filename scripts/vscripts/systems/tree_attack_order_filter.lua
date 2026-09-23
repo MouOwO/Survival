@@ -24,9 +24,12 @@ local function ordered_units(keys)
 end
 
 local function filter(_, keys)
+    local loading = package.loaded["systems/startup_loading_service"]
+    if loading and not loading.is_ready() then return false end
     local issuer = tonumber(keys.issuer_player_id_const)
         or tonumber(keys.issuer_player_id)
         or tonumber(keys.player_id)
+    if loading and issuer and issuer >= 0 and not loading.is_player_ready(issuer) then return false end
     local units = ordered_units(keys)
     if issuer ~= nil and issuer >= 0 then
         for _, unit in ipairs(units) do

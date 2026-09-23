@@ -19,7 +19,6 @@ function M.create(hero_id)
         end
 
         local player_id = player_id_from_caster(self:GetCaster())
-        local ability = self
         local result = event_bus.request(
             events.HERO_SUMMON_SNAPSHOT_REQUEST,
             { player_id = player_id }
@@ -60,6 +59,7 @@ function M.create(hero_id)
         end
 
         local player_id = player_id_from_caster(self:GetCaster())
+        local ability = self
         local result = event_bus.request(
             events.HERO_SUMMON_REQUEST,
             {
@@ -86,6 +86,11 @@ function M.create(hero_id)
 
         if not result or not result.ok then
             self:EndCooldown()
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = player_id,
+                message = result and result.error or "英雄召唤失败，请稍后重试",
+                level = "error",
+            })
         end
     end
 

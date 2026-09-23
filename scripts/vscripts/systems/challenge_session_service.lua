@@ -8,7 +8,7 @@ local challenges = challenge_runtime_rules.apply(
     require("config/generated/challenge_definitions")
 )
 local encounters = require("config/generated/monster_encounters")
-local locations = require("config/generated/challenge_locations")
+local room_locations = require("systems/player_room_locations")
 local members = require("config/generated/encounter_members")
 local archetypes = require("config/generated/monster_archetypes")
 local combat_profiles = require("config/challenge_combat_profile_config")
@@ -21,6 +21,7 @@ local destination_validation = require("systems/destination_validation_service")
 local monster_visual = require("systems/challenge_monster_visual_service")
 local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
+local monster_navigation = require("systems/monster_navigation_policy")
 local wave_monster_collision = require("systems/wave_monster_collision")
 local challenge_11_staging = "modifier_challenge_11_staging"
 
@@ -262,7 +263,8 @@ local function spawn_point_for(session, member, location)
         return nil, expected
     end
     if member.spawn_target_name and member.spawn_target_name ~= "" then
-        return marker(member.spawn_target_name), member.spawn_target_name
+        local name = room_locations.marker_name(member.spawn_target_name, session.player_id)
+        return marker(name), name
     end
     -- Practice rooms may intentionally expose only one marker. Units are
     -- spread by FindClearSpaceForUnit after creation, so occupancy must not
@@ -300,7 +302,7 @@ local function maintain_count_spawn_position(session, member, location, point)
 end
 
 local function spawn_member(session, member)
-    local location = locations.by_id[member.location_id]
+    local location = room_locations.resolve(member.location_id, session.player_id)
     local archetype = archetypes.by_id[member.archetype_id]
     if not location then return nil, "challenge_location_not_found" end
     if not archetype or archetype.enabled == false then
@@ -347,11 +349,10 @@ local function spawn_member(session, member)
     end
 
     local collision_profile = wave_monster_collision.profile(member, archetype)
-    local create_clear_space = not collision_profile.apply_before_placement
     local created, unit = pcall(CreateUnitByName,
         archetype.unit_name,
         position,
-        create_clear_space,
+        false,
         nil,
         nil,
         DOTA_TEAM_BADGUYS
@@ -361,6 +362,7 @@ local function spawn_member(session, member)
             .. " unit=" .. tostring(archetype.unit_name) .. " detail=" .. tostring(unit))
         return nil, "challenge_unit_create_failed:" .. tostring(archetype.unit_name)
     end
+    monster_navigation.apply(unit)
     if session.challenge.challenge_id == "challenge_11" then
         unit:AddNewModifier(unit, nil, challenge_11_staging, {})
     end
@@ -381,13 +383,6 @@ local function spawn_member(session, member)
     ] or archetype
     unit.survival_movement_type = archetype.movement_type or "ground"
     unit.survival_movement_type_override = member.movement_type_override
-    if unit.SetMoveCapability then
-        unit:SetMoveCapability(
-            (unit.survival_movement_type == "flying"
-                or unit.survival_movement_type_override == "flying")
-                and DOTA_UNIT_CAP_MOVE_FLY or DOTA_UNIT_CAP_MOVE_GROUND
-        )
-    end
     if unit.SetBaseMoveSpeed and combat_archetype.move_speed then
         unit:SetBaseMoveSpeed(tonumber(combat_archetype.move_speed) or 270)
     end
@@ -539,7 +534,7 @@ end
 
 local function current_location(session)
     local member = current_member(session) or session.members[1]
-    return member and locations.by_id[member.location_id] or nil
+    return member and room_locations.resolve(member.location_id, session.player_id) or nil
 end
 
 local function current_entry_marker_name(session)
@@ -554,10 +549,10 @@ local function current_entry_marker_name(session)
     return location and location.entry_target_name or nil
 end
 
-local function validate_member_marker(member)
-    local location = locations.by_id[member.location_id]
+local function validate_member_marker(member, player_id)
+    local location = room_locations.resolve(member.location_id, player_id)
     if not location then return false, "challenge_location_not_found" end
-    local name = member.spawn_target_name
+    local name = room_locations.marker_name(member.spawn_target_name, player_id)
     if name and name ~= "" and not marker(name) then
         return false, "hammer_marker_not_found:" .. name
     end
@@ -577,7 +572,7 @@ local function validate_session_markers(session)
         end
     end
     for _, member in ipairs(session.members) do
-        local ok, error_message = validate_member_marker(member)
+        local ok, error_message = validate_member_marker(member, session.player_id)
         if not ok then return false, error_message end
     end
     return true

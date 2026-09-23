@@ -17,7 +17,36 @@ local provider_id = nil
 local injected_provider = false
 local active_rule = nil
 local load_generation_by_player = {}
+local pending_load_generation_by_player = {}
 local revision_high_water_by_account = {}
+local account_profiles_by_player = {}
+local authenticated_by_player = {}
+local authentication_generation_by_player = {}
+local pending_authentication_by_player = {}
+
+local function active_session_id()
+    if injected_provider then return "injected_fixture" end
+    local session = require("systems/match_setup_service").get_session_id()
+    return type(session) == "string" and #session >= 8 and session or nil
+end
+
+local function selected_match()
+    -- Offline tests explicitly inject a provider; live HTTP has no default mode.
+    if injected_provider then return "standard", "injected_fixture" end
+    local setup = require("systems/match_setup_service")
+    if not setup.is_mode_selected() then return nil, nil, "mode_not_selected" end
+    local mode, session = setup.get_mode(), setup.get_session_id()
+    if (mode ~= "pure" and mode ~= "standard") or type(session) ~= "string" or #session < 8 then
+        return nil, nil, "match_session_missing"
+    end
+    return mode, session
+end
+
+local function matches_current_match(profile)
+    if injected_provider then return true end
+    local mode, session = selected_match()
+    return mode ~= nil and profile and profile.mode == mode and profile.match_session_id == session
+end
 
 local function register_server_convar(name, default_value)
     if Convars and type(Convars.RegisterConvar) == "function" then
@@ -85,6 +114,25 @@ end
 
 local function integer(value)
     return type(value) == "number" and value >= 0 and value == math.floor(value)
+end
+
+local function validate_progression(progression)
+    if type(progression) ~= "table" or progression == json_decoder.null or progression.loaded ~= true
+        or type(progression.clear_counts) ~= "table" or progression.clear_counts == json_decoder.null then
+        return false
+    end
+    for key, count in pairs(progression.clear_counts) do
+        local difficulty = tonumber(tostring(key):match("^n(%d+)$"))
+        if not difficulty or difficulty < 1 or difficulty > 20 or not integer(count)
+            or count == math.huge then return false end
+    end
+    return true
+end
+
+local function current_account_id(player_id)
+    if not provider or type(provider.resolve_account_id) ~= "function" then return nil end
+    local ok, account = pcall(provider.resolve_account_id, player_id)
+    return ok and type(account) == "string" and account ~= "" and account or nil
 end
 
 local function validate_entitlements(value)
@@ -391,10 +439,19 @@ local function commit_snapshot(player_id, snapshot, reason)
         achievements = copy(snapshot.achievements),
         save = copy(snapshot.save),
         public = copy(snapshot.public),
+        mode = snapshot.mode,
+        match_session_id = snapshot.match_session_id,
+        progression = copy(snapshot.progression),
         processed_update_ids = {},
         processed_update_order = {},
     }
     profiles_by_player[player_id] = profile
+    if type(snapshot.account_profile) == "table" then
+        account_profiles_by_player[player_id] = copy(snapshot.account_profile)
+    elseif not previous or previous.account_id ~= profile.account_id
+        or previous.match_session_id ~= profile.match_session_id then
+        account_profiles_by_player[player_id] = nil
+    end
     player_by_account[profile.account_id] = player_id
     revision_high_water_by_account[profile.account_id] = math.max(
         tonumber(revision_high_water_by_account[profile.account_id]) or 0,
@@ -429,10 +486,24 @@ function M.apply_snapshot(player_id, snapshot, reason)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
     end
+    if not matches_current_match(snapshot) then
+        return { ok = false, error = "match_profile_mismatch" }
+    end
     local account_id = tostring(snapshot and snapshot.account_id or "")
     local ok, validation_error = validate_snapshot(snapshot, account_id)
     if not ok then
         return { ok = false, error = validation_error }
+    end
+    if not injected_provider then
+        if not validate_progression(snapshot.progression) then
+            return { ok = false, error = "profile_progression_invalid" }
+        end
+    end
+    if snapshot.account_profile ~= nil then
+        local business_ok = validate_snapshot(snapshot.account_profile, account_id)
+        if not business_ok or snapshot.account_profile.revision ~= snapshot.revision then
+            return { ok = false, error = "account_profile_invalid" }
+        end
     end
     local existing_player_id = player_by_account[account_id]
     if existing_player_id ~= nil and existing_player_id ~= player_id then
@@ -451,11 +522,101 @@ function M.apply_snapshot(player_id, snapshot, reason)
     return { ok = true, account_id = account_id, revision = snapshot.revision }
 end
 
+-- Entry authentication is deliberately separate from a loaded gameplay profile.
+-- A successful receipt grants access to mode/difficulty selection only. It does
+-- not replace entitlements, publish profile events or create a mode baseline.
+function M.authenticate_player(player_id, reason, callback)
+    player_id = tonumber(player_id)
+    local function immediate(result)
+        result.pending = false
+        if type(callback) == "function" then callback(copy(result)) end
+        return result
+    end
+    if not integer(player_id) or player_id == math.huge then
+        return immediate({ ok = false, error = "player_id_invalid" })
+    end
+    local session = active_session_id()
+    if not session then return immediate({ ok = false, error = "match_session_missing" }) end
+    local provider_ok, provider_error = ensure_provider()
+    if not provider_ok then return immediate({ ok = false, error = tostring(provider_error) }) end
+    local account = current_account_id(player_id)
+    if not account then return immediate({ ok = false, error = "account_id_unavailable" }) end
+    if M.is_authenticated_for_account(player_id, account) then
+        local result = copy(authenticated_by_player[player_id])
+        result.ok, result.cached = true, true
+        return immediate(result)
+    end
+    if type(provider.authenticate) ~= "function" then
+        return immediate({ ok = false, error = "authentication_provider_unavailable" })
+    end
+    local generation = (authentication_generation_by_player[player_id] or 0) + 1
+    authentication_generation_by_player[player_id] = generation
+    pending_authentication_by_player[player_id] = { generation = generation, account_id = account, match_session_id = session }
+    authenticated_by_player[player_id] = nil
+    local completed = false
+    local result = { ok = true, pending = true, generation = generation }
+    local function finish(value)
+        if completed or authentication_generation_by_player[player_id] ~= generation then return end
+        completed = true
+        pending_authentication_by_player[player_id] = nil
+        result = value
+        result.pending = false
+        if type(callback) == "function" then callback(copy(result)) end
+    end
+    local called = pcall(provider.authenticate, account, function(receipt)
+        if completed or authentication_generation_by_player[player_id] ~= generation then return end
+        if active_session_id() ~= session or current_account_id(player_id) ~= account
+            or type(receipt) ~= "table" or receipt.authenticated ~= true
+            or receipt.account_id ~= account or receipt.match_session_id ~= session then
+            finish({ ok = false, error = "authentication_identity_mismatch" }) return
+        end
+        if not validate_progression(receipt.progression) then
+            finish({ ok = false, error = "authentication_progression_invalid" }) return
+        end
+        -- Copy an allowlist, never a provider's full response/save into this cache.
+        local confirmed = { authenticated = true, account_id = account, match_session_id = session,
+            progression = copy(receipt.progression) }
+        authenticated_by_player[player_id] = confirmed
+        local outcome = copy(confirmed)
+        outcome.ok = true
+        finish(outcome)
+    end, function(error_code)
+        finish({ ok = false, error = tostring(error_code or "authentication_failed") })
+    end)
+    if not called and not completed then
+        finish({ ok = false, error = "authentication_provider_failed" })
+    end
+    return result
+end
+
+function M.is_authenticating(player_id)
+    player_id = tonumber(player_id)
+    local pending = pending_authentication_by_player[player_id]
+    return pending ~= nil and pending.match_session_id == active_session_id()
+        and pending.account_id == current_account_id(player_id)
+end
+
+function M.is_authenticated_for_account(player_id, account_id)
+    player_id = tonumber(player_id)
+    local entry = authenticated_by_player[player_id]
+    return entry ~= nil and entry.match_session_id == active_session_id()
+        and entry.account_id == tostring(account_id) and entry.account_id == current_account_id(player_id)
+end
+
+function M.get_authenticated_progression(player_id)
+    player_id = tonumber(player_id)
+    local entry = authenticated_by_player[player_id]
+    if entry and M.is_authenticated_for_account(player_id, entry.account_id) then return copy(entry.progression) end
+    return nil
+end
+
 function M.load_player(player_id, reason, on_success, on_error)
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
     end
+    local mode, _, match_error = selected_match()
+    if not mode then return { ok = false, error = match_error } end
     invalidate_player(player_id, "loading")
     local provider_ok, provider_error = ensure_provider()
     if not provider_ok then
@@ -474,6 +635,10 @@ function M.load_player(player_id, reason, on_success, on_error)
     end
     local generation = (load_generation_by_player[player_id] or 0) + 1
     load_generation_by_player[player_id] = generation
+    -- Preload, HERO_READY and explicit retries share the same in-flight state.
+    -- A replacement request must not leave the preloader waiting for a stale
+    -- callback that generation validation deliberately discards.
+    pending_load_generation_by_player[player_id] = generation
     local completed = false
     local result = { ok = true, pending = true, generation = generation }
     local fetch_ok, fetch_error = pcall(provider.fetch_snapshot, account_id, function(snapshot)
@@ -481,9 +646,11 @@ function M.load_player(player_id, reason, on_success, on_error)
             return
         end
         completed = true
+        pending_load_generation_by_player[player_id] = nil
         if tostring(snapshot and snapshot.account_id or "") ~= tostring(account_id) then
             result = { ok = false, pending = false, error = "account_id_mismatch" }
             logger.warn("PlayerProfile", result.error)
+            if type(on_error) == "function" then on_error(result.error) end
             return
         end
         result = M.apply_snapshot(
@@ -503,6 +670,7 @@ function M.load_player(player_id, reason, on_success, on_error)
             return
         end
         completed = true
+        pending_load_generation_by_player[player_id] = nil
         result = { ok = false, pending = false, error = tostring(fetch_error_message) }
         logger.warn("PlayerProfile", tostring(fetch_error_message))
         if type(on_error) == "function" then on_error(result.error) end
@@ -510,6 +678,7 @@ function M.load_player(player_id, reason, on_success, on_error)
     if not fetch_ok and load_generation_by_player[player_id] == generation
         and not completed then
         completed = true
+        pending_load_generation_by_player[player_id] = nil
         result = {
             ok = false,
             pending = false,
@@ -535,6 +704,9 @@ function M.apply_incremental(update)
     if type(update) ~= "table"
         or tonumber(update.schema_version) ~= tonumber(active_rule.schema_version) then
         return { ok = false, error = "schema_version_unsupported" }
+    end
+    if not matches_current_match(update) then
+        return { ok = false, error = "match_profile_mismatch" }
     end
     local account_id = tostring(update.account_id or "")
     local player_id = player_by_account[account_id]
@@ -650,9 +822,37 @@ function M.get_provider()
     return provider
 end
 
+function M.is_loading(player_id)
+    return pending_load_generation_by_player[tonumber(player_id)] ~= nil
+end
+
 function M.get_profile(player_id)
     local profile = profiles_by_player[tonumber(player_id)]
-    return profile and copy(profile) or nil
+    return profile and matches_current_match(profile) and copy(profile) or nil
+end
+
+-- Account eligibility/UI only. Combat consumers must use get_profile instead.
+function M.get_account_profile(player_id)
+    local profile = M.get_profile(player_id)
+    if not profile then return nil end
+    return copy(account_profiles_by_player[tonumber(player_id)] or profile)
+end
+
+function M.get_progression(player_id)
+    local profile = M.get_profile(player_id)
+    if not profile then return M.get_authenticated_progression(player_id) end
+    if profile.progression then return copy(profile.progression) end
+    if injected_provider then
+        return { loaded = true, clear_counts = copy(profile.save.archive and profile.save.archive.clear_counts or {}) }
+    end
+    return nil
+end
+
+-- Readiness checks run on player orders; avoid copying the private save for a
+-- boolean account check. Never expose the mutable profile through this API.
+function M.is_loaded_for_account(player_id, account_id)
+    local profile = profiles_by_player[tonumber(player_id)]
+    return profile ~= nil and matches_current_match(profile) and tostring(profile.account_id) == tostring(account_id)
 end
 
 -- Atomically replace one or more private save subsections. The candidate is
@@ -736,8 +936,13 @@ end
 
 function M.init(options)
     profiles_by_player = {}
+    authenticated_by_player = {}
+    authentication_generation_by_player = {}
+    pending_authentication_by_player = {}
+    account_profiles_by_player = {}
     player_by_account = {}
     load_generation_by_player = {}
+    pending_load_generation_by_player = {}
     revision_high_water_by_account = {}
     register_server_convar("survival_player_profile_provider", "")
     register_server_convar("survival_fishing_api_token", "")
@@ -769,17 +974,17 @@ function M.init(options)
     event_bus.handle_request(events.PLAYER_PROFILE_GET_REQUEST, get_profile_request)
     -- Start account loading while the map/player is connecting, before hero selection.
     if GameRules and type(GameRules.GetGameModeEntity)=='function' then
-        local loading, next_retry = {}, {}
+        local next_retry = {}
         require('core/scheduler').every(1,function()
+            if not selected_match() then return end
             for id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do
                 if PlayerResource and PlayerResource:IsValidPlayerID(id)
                     and tonumber(PlayerResource:GetSteamAccountID(id) or 0)>0
-                    and not profiles_by_player[id] and not loading[id]
+                    and not M.get_profile(id) and not pending_load_generation_by_player[id]
                     and GameRules:GetGameTime()>=(next_retry[id] or -math.huge) then
                     local player_id=id
-                    loading[player_id]=true
                     local function finished()
-                        loading[player_id]=nil;next_retry[player_id]=GameRules:GetGameTime()+5
+                        next_retry[player_id]=GameRules:GetGameTime()+5
                     end
                     local result=M.load_player(player_id,'map_loading',finished,finished)
                     if not result.pending then finished() end
@@ -789,7 +994,7 @@ function M.init(options)
     end
     if active_rule.load_on_hero_ready ~= false then
         event_bus.subscribe(events.HERO_READY, function(payload)
-            if profiles_by_player[payload.player_id] then
+            if M.get_profile(payload.player_id) then
                 event_bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=payload.player_id,reason='hero_ready_cached'})
             else M.load_player(payload.player_id, "hero_ready") end
         end)

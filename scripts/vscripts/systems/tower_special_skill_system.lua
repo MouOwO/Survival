@@ -5,6 +5,7 @@ local geometry = require("systems/tower_skill_geometry")
 local sound_service = require("core/sound_service")
 local anti_air_rules = require("systems/anti_air_rules")
 local tower_skill_damage_rules = require("config/generated/tower_skill_damage_rules")
+local tree_damage_rules = require("systems/tree_damage_rules")
 
 local M = {}
 local death_state = {}
@@ -30,10 +31,11 @@ local asset_catalog = require("config/asset_catalog")
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
+        and not tree_damage_rules.is_tree(unit)
 end
 
 local function exists(unit)
-    return unit and not unit:IsNull()
+    return unit and not unit:IsNull() and not tree_damage_rules.is_tree(unit)
 end
 
 local function skill_matching(skills, prefix)
@@ -114,6 +116,9 @@ end
 
 local function deal(attacker, victim, damage, tag, ability, damage_type,
         physical_armor_ignore_pct)
+    if not valid(attacker) or not valid(victim) then
+        return { success = false, error = "invalid_tower_skill_target" }
+    end
     local secondary = tag == "lightning_diffusion"
     return event_bus.request(events.TOWER_SKILL_DAMAGE_REQUEST, {
         attacker = attacker,
@@ -141,7 +146,9 @@ end
 
 local function critical_query(payload)
     local tower = payload.tower
-    if not valid(tower) then return nil end
+    if not valid(tower) or tree_damage_rules.is_tree(payload.target) then
+        return nil
+    end
     local skills = payload.skills or {}
     local bone = skill_matching(skills, "bone_cannon_")
     local state = death_data(tower)

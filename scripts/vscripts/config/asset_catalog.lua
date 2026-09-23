@@ -434,7 +434,13 @@ for _, asset in ipairs(M.rows) do
         append_unique(asset.particle_resources, particle_seen, effect.particle_path)
         if effect.effect_role == "ambient" then
             asset.environment_particles[#asset.environment_particles + 1]
-                = effect.particle_path
+                = {
+                    path = effect.particle_path,
+                    owner = effect.owner_component_id,
+                    attach_type = effect.attach_type,
+                    attachment_point = effect.attachment_point,
+                    control_profile = effect.control_profile,
+                }
             asset.environment_particle_owners[#asset.environment_particle_owners + 1]
                 = effect.owner_component_id or ""
         end

@@ -202,9 +202,14 @@ local function unit_combat_snapshot(unit)
 end
 
 local function valid_player_id(player_id)
-    return player_id ~= nil
-       and player_id >= 0
-       and PlayerResource:IsValidPlayerID(player_id)
+    if player_id == nil or player_id < 0 or not PlayerResource:IsValidPlayerID(player_id) then
+        return false
+    end
+    -- Custom events bypass engine unit-order filters. Hold all gameplay UI
+    -- requests (difficulty, building, rewards, etc.) behind the same barrier.
+    -- Loading handshakes/retries have their own listener outside this router.
+    local loading = package.loaded["systems/startup_loading_service"]
+    return not loading or loading.is_player_ready(player_id)
 end
 
 local function source_player_id(payload)
@@ -979,9 +984,8 @@ local function register_ability_cast_request()
                 or not ability:IsFullyCastable() then
                 direct_result = { ok = false, error = "防御塔转职技能当前不可用" }
             else
-                ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
-                direct_cooldown_started = true
                 local request = {
+                    player_id = player_id,
                     tower = unit,
                     class_index = tower_class_index,
                     source_ability = ability,
@@ -989,6 +993,10 @@ local function register_ability_cast_request()
                 direct_result = event_bus.request(events.TOWER_CLASS_REQUEST, request)
                     or request.result
                     or { ok = false, error = "防御塔转职无响应" }
+                if direct_result.ok == true and ability and not ability:IsNull() then
+                    ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
+                    direct_cooldown_started = true
+                end
                 print("[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index="
                     .. tostring(tower_class_index))
             end

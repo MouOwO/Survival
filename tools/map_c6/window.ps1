@@ -26,7 +26,16 @@ public class HandoffWindow {
 '@
 $game=Get-Process dota2 -ErrorAction Stop | Select-Object -First 1
 $details=Get-CimInstance Win32_Process -Filter "ProcessId=$($game.Id)"
-if($details.CommandLine -notmatch '-addon\s+survival(?:\s|$)'){throw 'Not the isolated test addon; refusing to show/capture another game'}
+if($details.CommandLine -notmatch '-addon\s+survival(?:\s|$)'){
+    $proofToken='SURVIVAL_WINDOW_'+[Guid]::NewGuid().ToString('N')
+    $proofDir=Join-Path $PSScriptRoot '../../output/map_window_check'
+    New-Item -ItemType Directory -Force -Path $proofDir | Out-Null
+    $proofFile=Join-Path $proofDir 'request.json'
+    $requests=@(@{name='dota_run_lua';arguments=@{code="if IsInToolsMode() and (GetMapName() == 'template_map' or GetMapName() == 'survival_c6') then print('$proofToken') end"}})
+    [IO.File]::WriteAllText($proofFile,(ConvertTo-Json -InputObject $requests -Depth 5 -Compress))
+    & node (Join-Path $PSScriptRoot 'console.cjs') --file $proofFile --timeout-ms 2000 --expect $proofToken | Out-Null
+    if($LASTEXITCODE -ne 0){throw 'Not a verified survival Workshop session; refusing to show/capture another game'}
+}
 $script:gameWindows=@()
 [HandoffWindow]::EnumWindows({param($handle,$arg)
     $owner=0;[void][HandoffWindow]::GetWindowThreadProcessId($handle,[ref]$owner)

@@ -40,6 +40,83 @@ class DatabaseToolTests(unittest.TestCase):
         self.assertEqual(dbtool.applied_prefix(manifest, {"b": "sha-b", "a": "sha-a",
                           "security/harden.sql": "harden"}), manifest["entries"][:2])
 
+    def test_new_hardening_preserves_old_hash_and_requires_unchanged_applied_patches(self):
+        manifest = self.manifest()
+        manifest["hardening_patches"] = [{"id": "security/harden_lottery.sql", "path": "harden_lottery.sql", "sha256": "v2"}]
+        old = {"a": "sha-a", "b": "sha-b", "security/harden.sql": "harden"}
+        self.assertEqual(len(dbtool.applied_prefix(manifest, old)), 2)
+        latest = dict(old, c="sha-c")
+        latest["security/harden_lottery.sql"] = "v2"
+        self.assertEqual(len(dbtool.applied_prefix(manifest, latest)), 3)
+        latest["security/harden_lottery.sql"] = "changed"
+        with self.assertRaisesRegex(dbtool.Refused, "checksum"):
+            dbtool.applied_prefix(manifest, latest)
+
+    def test_collect_appends_new_sql_after_the_complete_test03_prefix(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            legacy, addon, target = root / "legacy", root / "addon", root / "release"
+            (legacy / "supabase/migrations").mkdir(parents=True)
+            (addon / "server/migrations").mkdir(parents=True)
+            (addon / "tools/sql").mkdir(parents=True)
+            sql = b"-- preserve CRLF\r\nBEGIN; SELECT 1; COMMIT;\r\n"
+            for name in dbtool.LEGACY_FILES:
+                (legacy / "supabase/migrations" / name).write_bytes(sql)
+            for name in (*dbtool.ARCHIVE_FILES, *(name for name, _ in dbtool.UPGRADE_FILES)):
+                (addon / "server/migrations" / name).write_bytes(sql)
+                (legacy / "supabase/migrations" / name).write_bytes(sql)
+            (addon / "tools/sql/202609060001_archive_fishing_inventory.sql").write_bytes(sql)
+            result = dbtool.collect(legacy, addon, target)
+            self.assertEqual(result["migrations"], 22)
+            manifest = dbtool.load_bundle(target)
+            old_entries = manifest["entries"][:17]
+            self.assertEqual([e["group"] for e in old_entries], ["legacy"] * 12 + ["addon"] * 3 + ["manual", "target"])
+            self.assertEqual(old_entries[-1]["id"], "target/202609190001_attack_interval_semantics.sql")
+            applied = {e["id"]: e["sha256"] for e in old_entries}
+            applied["security/harden.sql"] = manifest["harden_sha256"]
+            self.assertEqual(dbtool.applied_prefix(manifest, applied), old_entries)
+            self.assertEqual(manifest["entries"][-1]["id"], "target/202609230001_match_profile_sessions.sql")
+            # All deployed test05 entries remain a complete unchanged prefix.
+            latest_applied = {e["id"]: e["sha256"] for e in manifest["entries"][:21]}
+            latest_applied["security/harden.sql"] = manifest["harden_sha256"]
+            self.assertEqual(len(dbtool.applied_prefix(manifest, latest_applied)), 21)
+            for entry in manifest["entries"][:16] + manifest["entries"][17:21]:
+                self.assertEqual((target / entry["path"]).read_bytes(), sql)
+            (addon / "server/migrations/unreviewed.sql").write_bytes(sql)
+            with self.assertRaisesRegex(dbtool.Refused, "unreviewed_addon"):
+                dbtool.collect(legacy, addon, target)
+
+    def test_new_backup_inventory_includes_migration_marker_and_lottery_function(self):
+        self.assertIn("survival_data_migrations", dbtool.TABLES)
+        self.assertIn("archive_commit_lottery", dbtool.FUNCTIONS)
+        self.assertIn("match_profile_sessions", dbtool.TABLES)
+        self.assertIn("match_profile_login", dbtool.FUNCTIONS)
+
+    def test_git_crlf_restores_exact_historical_hash_and_rejects_real_edits(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "harden.sql"
+            original = dbtool.release_bytes(dbtool.HERE / "harden.sql")
+            target.write_bytes(original.replace(b"\n", b"\r\n"))
+            self.assertEqual(dbtool.release_bytes(target), original)
+            target.write_bytes(original + b"-- changed\n")
+            with self.assertRaisesRegex(dbtool.Refused, "historical_test03_sql_modified"):
+                dbtool.release_bytes(target)
+
+    def test_hardening_patch_is_checked_before_use(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "harden.sql").write_text("SELECT 1;", encoding="utf-8")
+            (root / "harden_lottery.sql").write_text("SELECT 2;", encoding="utf-8")
+            manifest = {"format": 1, "postgres_major": 17, "entries": [],
+                        "harden_sha256": dbtool.sha256(root / "harden.sql"), "hardening_patches": [
+                            {"id": "security/harden_lottery.sql", "path": "harden_lottery.sql",
+                             "sha256": dbtool.sha256(root / "harden_lottery.sql")}]}
+            dbtool.write_json(root / "migration_manifest.json", manifest)
+            self.assertEqual(dbtool.load_bundle(root), manifest)
+            (root / "harden_lottery.sql").write_text("SELECT 3;", encoding="utf-8")
+            with self.assertRaisesRegex(dbtool.Refused, "patch_checksum"):
+                dbtool.load_bundle(root)
+
     def test_schema_contract_tracks_removed_relations_and_literal_function_drop(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -128,8 +205,8 @@ class DatabaseToolTests(unittest.TestCase):
         self.assertIn("default_transaction_read_only=on", run.call_args.kwargs["env"]["PGOPTIONS"])
 
     def test_app_grants_match_adapter_contract(self):
-        sql = (dbtool.HERE / "harden.sql").read_text(encoding="utf-8")
-        self.assertEqual(len(dbtool.RPC_SIGNATURES), 11)
+        sql = "\n".join((dbtool.HERE / name).read_text(encoding="utf-8") for name in ("harden.sql", *dbtool.HARDEN_PATCHES))
+        self.assertEqual(len(dbtool.RPC_SIGNATURES), 14)
         for signature in dbtool.RPC_SIGNATURES:
             self.assertIn("public." + signature, sql)
         self.assertIn("pg_catalog,public,extensions,pg_temp", sql)

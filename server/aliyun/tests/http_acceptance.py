@@ -382,7 +382,7 @@ def validate_verification_report(value):
     return value
 
 
-def load_verification_report(path):
+def load_private_report(path, validator):
     path = Path(path)
     try:
         require(not path.is_symlink(), "verification_report_symlink_refused")
@@ -411,12 +411,16 @@ def load_verification_report(path):
         def reject_constant(constant):
             raise AcceptanceFailure("verification_report_json_invalid")
 
-        return validate_verification_report(json.loads(data.decode("utf-8"),
+        return validator(json.loads(data.decode("utf-8"),
             object_pairs_hook=unique_pairs, parse_constant=reject_constant))
     except AcceptanceFailure:
         raise
     except (OSError, UnicodeError, ValueError, RecursionError):
         raise AcceptanceFailure("verification_report_unreadable_or_invalid") from None
+
+
+def load_verification_report(path):
+    return load_private_report(path, validate_verification_report)
 
 
 def verify_previous_run(client, source, report):

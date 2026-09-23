@@ -95,7 +95,16 @@ local function refresh(payload)
             copy(save.permanent_effects), save.gameplay_stats
         ))
     end
-    local _, boss_effects=require("systems/archive_boss_rewards").project(profile)
+    local boss_effects
+    if profile and profile.mode == "pure" then
+        -- The backend projects newly crossed account thresholds relative to
+        -- this match's immutable baseline. Subtracting kill counts alone loses
+        -- awards such as an existing 9 kills becoming 10 in the pure match.
+        boss_effects = copy(save.match_boss_effects)
+    else
+        local _
+        _, boss_effects = require("systems/archive_boss_rewards").project(profile)
+    end
     if frozen then
         for field,value in pairs(boss_effects_by_player[player_id] or {}) do
             totals_by_player[player_id][field]=(totals_by_player[player_id][field] or 0)-value

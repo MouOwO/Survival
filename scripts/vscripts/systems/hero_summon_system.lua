@@ -7,6 +7,7 @@ local cosmetic_service = require("systems/hero_cosmetic_service")
 local projection = require("systems/hero_summon_projection")
 local hero_anchor_service = require("systems/hero_anchor_service")
 local destination_validation = require("systems/destination_validation_service")
+local summon_destination = require("systems/hero_summon_destination")
 local hero_asset_preload = require("systems/hero_asset_preload_service")
 
 local M = {}
@@ -75,12 +76,6 @@ local function publish(player_id, reason)
     })
 end
 
-local function summon_position(anchor, definition)
-    local offset = tonumber(definition.spawn_offset) or 260
-    return anchor:GetAbsOrigin()
-        + anchor:GetForwardVector() * offset
-end
-
 local function preserve_and_hide_native_abilities(unit)
     local count = math.max(0, tonumber(unit:GetAbilityCount()) or 0)
     for index = 0, count - 1 do
@@ -113,8 +108,7 @@ local function diagnose_drow_visible_modifiers(unit)
     end
 end
 
-local function initialize_replacement(player_id, team, altar, definition)
-    local position = summon_position(altar, definition)
+local function initialize_replacement(player_id, team, altar, definition, position)
     local placeholder, begin_error = hero_anchor_service.begin_replacement(player_id)
     if not placeholder then
         return nil, begin_error
@@ -161,6 +155,7 @@ local function initialize_replacement(player_id, team, altar, definition)
     unit.survival_hero_id = definition.hero_id
     local moved, move_error = destination_validation.teleport(unit, position, false)
     if not moved then
+        hero_anchor_service.abort_replacement(player_id, unit)
         return nil, move_error
     end
     if not unit:HasModifier("modifier_single_health_bar") then
@@ -178,6 +173,7 @@ local function initialize_replacement(player_id, team, altar, definition)
         unit
     )
     if not committed then
+        hero_anchor_service.abort_replacement(player_id, unit)
         return nil, commit_error
     end
     return unit, nil
@@ -217,21 +213,28 @@ local function validate(player_id, hero_id, debug_bypass)
     if not definition or definition.enabled == false then
         return nil, nil, "英雄配置不存在"
     end
-    local spawn = summon_position(altar, definition)
-    spawn.z = GetGroundHeight(spawn, altar)
-    local destination_ok, destination_error =
-        destination_validation.validate_hero_position(spawn)
-    if not destination_ok then
-        return nil, nil, destination_error
-    end
-
     local entitlement = projection.entitlements(player_id)
     if definition.vip_required == true
         and not debug_bypass
         and entitlement.vip ~= 1 then
         return nil, nil, "需要VIP权限"
     end
-    return altar, definition, nil
+    -- Resolve before replacing the hidden carrier. The exact grounded result
+    -- is also used for placement; do not recompute the old, possibly blocked
+    -- marker after validation. Pending asset loads call validate again.
+    local position, destination_error, destination_info =
+        summon_destination.resolve(altar, definition, player_id)
+    if destination_info and (not position or destination_info.attempts > 1) then
+        print(string.format(
+            "[HeroSummonDestination] player=%s source=%s attempts=%s last_rejection=%s position=%s",
+            tostring(player_id), tostring(destination_info.source or "none"),
+            tostring(destination_info.attempts), tostring(destination_info.last_reason or "none"),
+            position and string.format("%.2f,%.2f,%.2f", position.x, position.y, position.z) or "none"))
+    end
+    if not position then
+        return nil, nil, destination_error
+    end
+    return altar, definition, nil, position
 end
 
 local function complete_pending(player_id, generation, result)
@@ -314,7 +317,7 @@ end
 summon = function(payload)
     local player_id = tonumber(payload.player_id)
     local hero_id = tostring(payload.hero_id or "")
-    local altar, definition, error_code =
+    local altar, definition, error_code, position =
         validate(player_id, hero_id, payload.debug_bypass == true)
     if error_code then
         return { ok = false, error = error_code }
@@ -330,7 +333,8 @@ summon = function(payload)
         player_id,
         team,
         altar,
-        definition
+        definition,
+        position
     )
     if not unit then
         replacing_by_player[player_id] = nil

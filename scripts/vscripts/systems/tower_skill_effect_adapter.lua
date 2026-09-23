@@ -2,11 +2,13 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local damage_service = require("combat/damage_service")
 local buff_manager = require("systems/buff_manager")
+local tree_damage_rules = require("systems/tree_damage_rules")
 
 local M = {}
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
+        and not tree_damage_rules.is_tree(unit)
 end
 
 local function deal_damage(payload)

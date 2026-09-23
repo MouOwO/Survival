@@ -1,5 +1,52 @@
 # C6 地图第一版
 
+## 小地图更新（2026-09-23）
+
+地图编译不会重新拍摄小地图。`template_map` 当前使用 `resource/overviews/template_map.txt` → `materials/overviews/template_map.vmat` → `template_map.tga`，只重新编译旧 TGA 仍会显示旧布局。
+
+保存 Hammer 地图后，先关闭当前地图测试，运行 `tools/map_c6/compile-main.ps1`，再用 `launch_template_map.cmd` 打开刚编译的地图。确认 Workshop 已进入 `template_map`，在 game 仓库根目录执行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/repair_minimap_client.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/verify_minimap_sync.ps1 -ExpectedOutputSize 2048 -CheckCompilerDependencies
+```
+
+修复脚本确认当前地图后，备份现有小地图资源到忽略的 `output/minimap_refresh_*/before/`，调用引擎重新拍摄 2048×2048 TGA，必要时只编译当前小地图材质。它会检查真实材质依赖、完整像素、生成时间、世界坐标范围及编译依赖，确认 VMAP 和 VPK 在生成期间未变，并写入 `after.json`。它不会执行 Git 恢复、覆盖源地图或重编整张地图。`-WhatIf` 可检查操作计划，不连接控制台或生成资源。
+
+当前世界范围为 ±16384，overview 的 `pos_x=-16384`、`pos_y=16384`、`scale=32`；输出像素数量与该世界坐标映射分别校验。脚本通过后还需在游戏中核对海岸、房间轮廓及玩家标记位置；资源检查不代替视觉或寻路验收。客户端仍缓存旧图时，退出本次测试后重新打开地图。
+
+离线脚本回归：`powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_minimap_sync.ps1`。
+
+## 当前：V4 布局（2026-09-20）
+
+`template_map.vmap` 按确认的 V4 重排，维持 128×128 格、每格 256 单位。中央完成稿位置及内部结构保持不变。三个副本改在左上方一列，中心约为 (-5248,10752)、(-5248,8704)、(-5120,6656)，对应合成宝石、冰烬挽歌、火焰巨魔；避开中央环岛岸线。
+
+普通练功房为 **4 位玩家 × 4 类房间**，左上/右上/左下/右下分别对应引擎玩家 0/1/2/3。每排依次木材、金币、属性、大属性。左侧 1～10 转排成一列，右侧十戒为两列五排。右下另有四间 15 倍练功房和四座独立火山岛。
+
+右侧两大陆之间另有两个独立挑战岛：冰之幽魂（06，中心 10624,2304）恢复原雪地岛，熔火核心 Lv1–3（07，中心 14336,2304）保持已完成模型的原尺寸。右侧模式大陆整体南移 2048，范围改为 X=8960～15872、Y=-6144～0；七宗罪入口和刷怪点同步移动。06 不再借用右上雪地大陆，07 不再占用右下第一座火山岛。左侧火焰巨魔（08）保持原位置。
+
+新原生大陆包含夜魇左上、雪地右上、天辉左下 A、四向连通的左下 B、右侧模式区。雪地与左下 A 各四块 1792×1536 的场地，依次靠右、左、右、左；对应出怪点在另一侧，同 Y、同高度，入口预留 480 单位缺口。出怪点/入口/中心名为 `v4_northeast_field_N_spawn/gate/center` 和 `v4_southwest_a_field_N_spawn/gate/center`。这些模式区域提供地图标记；不凭布局新增尚未定义的模式战斗规则。
+
+普通挑战入口、归位点及怪物出生点由 `systems/player_room_locations.lua` 解析到 `player_N_challenge_01..04_*`；15 倍房使用 `player_N_endless_cycle_sanctum_*`。公共 Boss 与老地图兼容名保留。英雄召唤使用各组木材房内的 `player_N_hero_spawn`。
+
+`build-layout-v4.cjs` 是有备份输入的单次布局迁移器，不是覆盖 Hammer 后续手工修改的常规构建命令。输入备份和输出清单位于 `output/map_layout_v4/`；日常编译仍运行 `compile-main.ps1`。测试使用 `lua scripts/vscripts/tests/test_player_room_locations.lua` 和实机命令 `script_reload_code tests/map_c6_layout_v4_check`。下方 128 布局一节记录的是 V4 之前的中间版本，旧坐标及旧测试不作为当前验收标准。
+
+大陆基底保留原生 Tile Grid；天辉铺装、草雪场地使用带顶点混合通道的可编辑 Hammer 面片，已完成的小型房间继续使用原有模型。最终编译 238 成功、0 失败，实机点位、导航、传送、路径及岛间隔离检查 1333 项通过。实际俯视图见 `art/maps/c6/layout_v4_challenges_topdown.png`，2048 原图见 `layout_v4_challenges_topdown_full.png`，验收记录见 `docs/ai/validation/20260920/map-layout-v4.json`。
+
+## 2026-09-20 主地图 128×128 布局
+
+当前 `template_map` 已扩展为 128×128 原生地形格，每格 256 单位，边界为 ±16384。空白区统一为原生水域，海底同步扩展。中央完成稿整体向北平移 4096，建造边界、资源树、建造者点和出怪点同步迁移。公共场地只移动位置，保留已有模型、材质、碰撞和内部间距。
+
+四角新增尺寸相同的独立练功房，复用木材房完整组件；本轮按“每位玩家一间”实施。显示 player1～4 对应引擎 ID 0～3，依次为左上、右上、左下、右下。英雄召唤优先使用 `player_N_hero_spawn`，各房另有 `player_N_training_entry/home/target` 标记。没有专属标记的其他地图继续使用祭坛附近出生。此轮没有新增房内刷怪规则。
+
+十转入口为 `rebirth_10_entry`，左侧 (-13100,4096)；十戒入口为 `challenge_11_stage_10_entry`，右侧 (12544,5910)。原公共挑战入口名保持不变，小地图范围已同步。
+
+双击 `launch_template_map.cmd` 打开实机；F7 近景、F8 中央全貌、F9 整张地图鸟瞰。从 Hammer 启动的无 `-addon` 参数进程通过实际 Workshop 地图回显确认后也可复用。若 Hammer 仍显示修改前的文档，应关闭该旧文档并从磁盘重新打开，避免旧内容覆盖新布局。
+
+验证：地图编译 229 成功、0 失败；`tests/manual_integrated_arenas_check` 对 30 场地检查 235 项，`tests/map_layout128_check` 检查四玩家实际传送、中央入口、原生挑战路径及海域阻挡 38 项，全部通过。记录见 `docs/ai/validation/20260920/map-layout128.json`。
+
+`relayout-128.cjs` 是本次快照迁移工具，输入为当天备份和原集成清单；不能作为日常地图生成命令重复覆盖后续 Hammer 编辑。正常修改仍使用 `compile-main.ps1` 编译当前源地图。
+
 ## 清理后的正式文件与重建
 
 game 仓库保存运行 VPK、布局配置、地图生成器、预览脚本和回归测试；content 仓库保存 `maps/template_map.vmap`、`maps/survival_c6.vmap` 和固定基础模板 `maps/templates/c6_terrain_seed.vmap`。两仓应检出配套提交。基础模板独立于编辑后的主地图，删除临时 `output` 不影响重建。

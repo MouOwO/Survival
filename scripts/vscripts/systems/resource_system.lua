@@ -181,19 +181,34 @@ local function handle_get(payload)
     return snapshot(player_id)
 end
 
-local function handle_spend(payload)
+local function check_spend(payload)
     local account, player_id, error_code = require_account(payload)
-    if not account then return { ok = false, error = error_code } end
-    if phase_guard.post_clear_frozen() then return { ok = false, error = "post_clear_frozen" } end
+    if not account then return nil, player_id, error_code end
+    if phase_guard.post_clear_frozen() then return nil, player_id, "post_clear_frozen" end
     local wood = math.max(0, tonumber(payload.wood) or 0)
     local gold = math.max(0, tonumber(payload.gold) or 0)
     local population = math.max(0, tonumber(payload.population) or 0)
     if not account.debug_mode then
-        if account.wood < wood then return { ok = false, error = "wood_not_enough" } end
-        if account.gold < gold then return { ok = false, error = "gold_not_enough" } end
+        if account.wood < wood then return nil, player_id, "wood_not_enough" end
+        if account.gold < gold then return nil, player_id, "gold_not_enough" end
         if account.population + population > account.max_population then
-            return { ok = false, error = "population_not_enough" }
+            return nil, player_id, "population_not_enough"
         end
+    end
+    return account, player_id, nil, wood, gold, population
+end
+
+local function handle_can_spend(payload)
+    local account, _, error_code = check_spend(payload)
+    return { ok = account ~= nil, error = error_code }
+end
+
+local function handle_spend(payload)
+    -- Share the exact eligibility rules with read-only preflight, and recheck
+    -- against current balances when the operation actually commits.
+    local account, player_id, error_code, wood, gold, population = check_spend(payload)
+    if not account then return { ok = false, error = error_code } end
+    if not account.debug_mode then
         account.wood = account.wood - wood
         account.gold = account.gold - gold
         account.population = account.population + population
@@ -254,6 +269,7 @@ function M.init()
     accounts = {}
     version = 0
     event_bus.handle_request(events.RESOURCE_GET_REQUEST, handle_get)
+    event_bus.handle_request(events.RESOURCE_CAN_SPEND_REQUEST, handle_can_spend)
     event_bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST, handle_spend)
     event_bus.handle_request(events.RESOURCE_ADD_REQUEST, handle_add)
     event_bus.handle_request(events.RESOURCE_RELEASE_POP_REQUEST, handle_release_pop)

@@ -109,13 +109,14 @@ function M.append_resources_for_wave(wave_number, result, seen)
     result = result or {}
     seen = seen or {}
     if not wave then return result, seen end
-    for _, asset_id in ipairs({
-        wave.main_visual_asset_id,
-        wave.support_visual_asset_id,
-        wave.mini_boss_visual_asset_id,
-        wave.stage_boss_visual_asset_id,
+    -- Optional support slots must not truncate later boss resources.
+    for _, field in ipairs({
+        "main_visual_asset_id",
+        "support_visual_asset_id",
+        "mini_boss_visual_asset_id",
+        "stage_boss_visual_asset_id",
     }) do
-        local asset = M.asset(asset_id)
+        local asset = M.asset(wave[field])
         if asset then
             add_resource(result, seen, "model", asset.model_path,
                 asset.async_unit_name)

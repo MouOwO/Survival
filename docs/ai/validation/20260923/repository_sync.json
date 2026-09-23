@@ -1,0 +1,1088 @@
+{
+  "date": "2026-09-23",
+  "scope": "Local game/content resource cleanup, stash/pull/pop, compilation and repository delivery",
+  "cleanup": {
+    "removed_files": 154,
+    "removed_bytes": 108555192,
+    "backup_verified_entries": 154,
+    "backup_sha256": "2c0269700184a2ee4a15c1e4efb3cd3b4e5913496f0777723ce686d0a9ba7fea",
+    "backup_location": "Local external-to-repository Temp ZIP; exact path retained in ignored output/repository_cleanup_20260923/cleanup_backup.json",
+    "retained": [
+      "referenced runtime resources",
+      "authoring models, textures and map sources",
+      "embedded Python standard library",
+      "required map generation inputs"
+    ],
+    "removed": [
+      {
+        "path": "art/ui/development/ui_reuse_import/python/runtime.zip",
+        "bytes": 10922561,
+        "sha256": "f6cca216a359be84797cabb54149ce5e062afb16cc7567eb7fc51cacb2d86b65",
+        "reason": "redundant embedded-Python installer; extracted runtime retained"
+      },
+      {
+        "path": ".cline_tmp/scripts_items_items_game.txt",
+        "bytes": 51802687,
+        "sha256": "b1ff4c9f96a0d2261950567605d60fc36f3ebafcaac338a9fce7eecd8220afb0",
+        "reason": "regenerable Valve package extraction/string cache"
+      },
+      {
+        "path": ".cline_tmp/pak01_strings.txt",
+        "bytes": 36934197,
+        "sha256": "e8ee93916286cfd9f9a8d4c9d75c4197d0383d58e0597ef6807026237f61c240",
+        "reason": "regenerable Valve package extraction/string cache"
+      },
+      {
+        "path": ".cline_tmp/resource_localization_items_schinese.txt",
+        "bytes": 4216559,
+        "sha256": "001dce7048e90f3c37e547a46ef55a5664ae7175de33b654391ad29459c5d232",
+        "reason": "regenerable Valve package extraction/string cache"
+      },
+      {
+        "path": ".cline_tmp/scripts_npc_npc_heroes.txt",
+        "bytes": 919435,
+        "sha256": "03375c615ae05cc71ffedf3a9df407ba9925d31d42d864e6e449423bccad1b6f",
+        "reason": "regenerable Valve package extraction/string cache"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/ability_tooltip.vcss_c",
+        "bytes": 17364,
+        "sha256": "8212e88a93157b697b3157b80af9163701f0d057e25d02b5ccdeae101c7ced25",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive.vcss_c",
+        "bytes": 21382,
+        "sha256": "a2c5368a793cf6f685890b5717cbf6b9d6cbdb3f020ca6e9e18ebcfc65b7a61e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_difficulty.vcss_c",
+        "bytes": 1311,
+        "sha256": "c2de95f6fa1f5a0637723633054ce7346a81783980f62257ac7887abc9859ab4",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_gothic.vcss_c",
+        "bytes": 17024,
+        "sha256": "c82a072251a40316e94105f155e0bea14bcc4c66e5e8a8f6c48cae8d13ee21a6",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_handoff.vcss_c",
+        "bytes": 36255,
+        "sha256": "9437326b5caf717870dc3db94a9516a8a040947b4301eed01f2c3db082595361",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_handoff_180de7e38b.vcss_c",
+        "bytes": 36271,
+        "sha256": "1a72b418a0519043131f86bcdfcdf7325387e2df5e31454d6685639877a3e4a5",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_handoff_67a5db276f.vcss_c",
+        "bytes": 36195,
+        "sha256": "e60282b360b7a3a173e4ba5471ac38835ae0a0cd650adf22dd63d20bb5205546",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_handoff_69e4b7ae06.vcss_c",
+        "bytes": 35015,
+        "sha256": "53a76a0370c15c70a1ca1fd428f13894a02e49d6fd6f909ca4c9ac4844977b05",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_handoff_7d12726fe1.vcss_c",
+        "bytes": 36195,
+        "sha256": "d83396f2f8d58e2130f7f9500a00905e97b866426ff464134e9533f2c1dace05",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_handoff_95b24dbef9.vcss_c",
+        "bytes": 36271,
+        "sha256": "791b42de41e37c8ddc79441d586c998815ce4a3951727ed24ffd19f6d20e1015",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_handoff_c799d725d6.vcss_c",
+        "bytes": 35066,
+        "sha256": "fa42d6e9f4f32bdb94aaf257b8bd1f1f1e00896c3561876d0662a391553bcf83",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_handoff_fae43f5733.vcss_c",
+        "bytes": 35614,
+        "sha256": "58769718adbbde09422ca0d6020a3dfc724a4b315b20a678ca1dc06769e5b803",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_kit.vcss_c",
+        "bytes": 48673,
+        "sha256": "a29aba374682d07b4eb36de626604becdd1a8ac365ad10d2f9c5d51359c35289",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_typography_180de7e38b.vcss_c",
+        "bytes": 2962,
+        "sha256": "e6fc49afc8b45448823bbd3a9d9e45b798d308abf6dce816cb2efbdf28d93965",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_typography_67a5db276f.vcss_c",
+        "bytes": 2962,
+        "sha256": "1be690b3d25dde6fc966db2380e854cf1027f5247f6cbe01d65daebeefaa538a",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_typography_7d12726fe1.vcss_c",
+        "bytes": 2962,
+        "sha256": "06c3dd7ca09ec5142d26f5246920aa8f3629a4577d6fb2aa433f7b5b29258412",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_typography_95b24dbef9.vcss_c",
+        "bytes": 2962,
+        "sha256": "c6319f97c10d2bfbeeceeec5ec05af36c81f707cd61a192567faf5884f9bd0c8",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/archive_typography_fae43f5733.vcss_c",
+        "bytes": 2962,
+        "sha256": "5443106d9f47c5d7177b27ee0d85c3c20c887113bf638eaddfc5740ffcfa9e9b",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/combat_stats.vcss_c",
+        "bytes": 8270,
+        "sha256": "528260a31537581455c94cb4d82fe1d774b99342e9b0397ebf21697a7bafbeea",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/daily_assets.vcss_c",
+        "bytes": 30319,
+        "sha256": "c19f01b8d4f1602ac39a4b6ecd8a206dbf3bbd7d8ac4e0ee2f733dec78fdc7ff",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/daily_rewards.vcss_c",
+        "bytes": 13585,
+        "sha256": "605838579c293db7b691c35db10503e452784b6bc03477c381ecf59f5a8c9387",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/game_info_panel.vcss_c",
+        "bytes": 4778,
+        "sha256": "b2c03e77da60f78242d14829ddead340e65d9de61c806c8a4b3010c6bd827542",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/gold_mine_income_numbers.vcss_c",
+        "bytes": 1935,
+        "sha256": "91f5fb289d2a887152829ea742b63f52ba892188b780d459748590477eaab9cb",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/handoff_assets.vcss_c",
+        "bytes": 30411,
+        "sha256": "2519fd9188b3d20deab066f5b0d2a5d22e9596068e66300f2413420513d787db",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/handoff_v1.vcss_c",
+        "bytes": 3257,
+        "sha256": "21b1cbcbc4b0a652b11056442d88f728632799067f071b30dcc296d4e86fe8c7",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/hero_skill_ui.vcss_c",
+        "bytes": 12541,
+        "sha256": "0bad80782478ae8400b4e4c949145aea404cc4cf1073830bca3007d36e756a80",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/hero_world_health_bar.vcss_c",
+        "bytes": 4201,
+        "sha256": "2dda6257243c47d6fe457c0217ba572aa3694e989f396c484dcffedb02b30cf4",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/inventory_tooltip.vcss_c",
+        "bytes": 4670,
+        "sha256": "a0d9ebfba67e8d07ab391ef1c6c35c4e146e56a99d4128689975105cbcd5a514",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/lottery.vcss_c",
+        "bytes": 20344,
+        "sha256": "ba7a994082c7d1655af038a833bf4dd8a65d84ac50c936452bea574781f57bc4",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/lottery_celestial.vcss_c",
+        "bytes": 98386,
+        "sha256": "fc1af5a2bdc104107aae066ca2d99b0a0899b0b9cf3edcbd72e0e6a389e39aa7",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/lottery_handoff_03454b44a8.vcss_c",
+        "bytes": 21022,
+        "sha256": "f33bc5c05d78f1f06b7363159023148cb2d1f027f630e5d499913b691c84158d",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/lottery_handoff_0d1f57e430.vcss_c",
+        "bytes": 22579,
+        "sha256": "caeffa91710d841c5460f95c4a9bf0a0a88e3d74e23a1d64b1f6715ad86fce6c",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/lottery_handoff_79478c4dbf.vcss_c",
+        "bytes": 20306,
+        "sha256": "6716a3d18e43a2844da9d7688d0ee51b2cfb7850b25379c4bee6cac6e1b8c22a",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/lottery_handoff_80e56f7ad0.vcss_c",
+        "bytes": 20511,
+        "sha256": "250ef71221a8088df52ab62032f24f99cf8e556c13b426146e0dbf5495b8333d",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/lottery_handoff_bb9968eef7.vcss_c",
+        "bytes": 23510,
+        "sha256": "4833dc649cb70648595c2510bcf26f5e5ae78d33817d4c0fcf6e581ebf1e699a",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/lottery_handoff_ef48d27640.vcss_c",
+        "bytes": 22579,
+        "sha256": "6929a7e85e0b8b9816ad0fe5075d5cbef83502d0d7582126469879f196f3e383",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/main_hud_assets.vcss_c",
+        "bytes": 32612,
+        "sha256": "b4aea2c1a1c3341a14a60f682f09c20dc026f9fadf96ac3f6a982b44f390252d",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/main_hud_skin.vcss_c",
+        "bytes": 12129,
+        "sha256": "d17b82b5ba19c3e2f1d525a73c7c9c23c442575fcdb427821c507c6f68a4d68a",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/rogue_reward_ui.vcss_c",
+        "bytes": 7695,
+        "sha256": "84828080b835f463707a4f7ff3c43f036305860a5d90b9be164cce07ac561c3a",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/shop.vcss_c",
+        "bytes": 16403,
+        "sha256": "7d5d86d44c6bc9242d53d8df9f1441665ce5bc552f3088198b6d15e5834ad71b",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/survival_dota_theme.vcss_c",
+        "bytes": 1657,
+        "sha256": "5837fb8b76e04851a9d238ade9cd28ab169d4c4fdd34edce12d2478033734734",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/survival_grid_placement.vcss_c",
+        "bytes": 3379,
+        "sha256": "430f4d85299bc43f329dc386ec534944b48037e380b5ef7fee0abfc16eba9863",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/survival_hud.vcss_c",
+        "bytes": 27592,
+        "sha256": "8b16f77e70fcb669c327f0fa473582ea68841f59003e2a4eb265e350340c51bb",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/survival_hud_native.vcss_c",
+        "bytes": 14689,
+        "sha256": "ae4ea25fd5a9016d5dbaf56217dcf2fb9abe4fdc82ac1fdc00340d12ef024c3f",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/survival_hud_st2_local.vcss_c",
+        "bytes": 23460,
+        "sha256": "4d5ec975a16e21bc1e3c92b7cbf5afd0c60a078fd10555a83709f6fd8d319e02",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/weapon_growth_hud.vcss_c",
+        "bytes": 3794,
+        "sha256": "1b773277bdd038d4190176c3def50dd670ba7817ee32bd7626f582a24713d5f6",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/common/font_test.vcss_c",
+        "bytes": 3907,
+        "sha256": "f324c25f10bef98b79b2689ff97354931a11a5bccb6ef53e2ce339ec663621fa",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/common/ui_assets.vcss_c",
+        "bytes": 109182,
+        "sha256": "cb97b8779642a6446e5d2286f566e182d43b2f41d0054b2bd221c426b7c495d9",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/common/ui_components.vcss_c",
+        "bytes": 23508,
+        "sha256": "125e2f54856dc75ac48d72b89c644920a62d8d0111147aacf8c39be862c5ee87",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/styles/custom_game/common/ui_typography.vcss_c",
+        "bytes": 4047,
+        "sha256": "fb20c191079590a02afeda4410197650d9f4306d6e7ddd022b654ad9166941fc",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/ability_tooltip.vjs_c",
+        "bytes": 101484,
+        "sha256": "2761cacf4b22a1f006b0e46ed7afb60d0944ee43ff746da66a68265f3ff3073e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive.vjs_c",
+        "bytes": 18676,
+        "sha256": "8862a4240723cb018717b7f2775d490e7f569ada07f148685f4e43ec6219a490",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_180de7e38b.vjs_c",
+        "bytes": 18692,
+        "sha256": "dc2ec8204f35e30c12b127e641cc7f5f7d76ec9a77845045dde8616afe31fbc6",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_67a5db276f.vjs_c",
+        "bytes": 18692,
+        "sha256": "e095f375305850c7c743b7cbf0513323a45613076b28325ca2e9b2a604286990",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_69e4b7ae06.vjs_c",
+        "bytes": 18692,
+        "sha256": "8e0e1a064224c76def3551676f86077b89ff62a3cbbf816554301da6a0f6c67e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_7d12726fe1.vjs_c",
+        "bytes": 18692,
+        "sha256": "988da9a5afd9d94c82c9c0c8f21d9966730a8efdb714f193c9a324206e757171",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_95b24dbef9.vjs_c",
+        "bytes": 18692,
+        "sha256": "d1cbe9fbe631f1b1937772c4a82c15db06d0d770de08622ac514398cfa667814",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_c799d725d6.vjs_c",
+        "bytes": 18692,
+        "sha256": "bf8ff40655842138fc66875f3241ce822a59bf6a3e74d6867fea5e65fe2dc4f5",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_fae43f5733.vjs_c",
+        "bytes": 18692,
+        "sha256": "26c01e4bcb3fd9137ac4a47fbd28052e337e34acc07c5d3434ccca167a9c0515",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff.vjs_c",
+        "bytes": 12423,
+        "sha256": "6c4e5daadc60c8518439f796b5407c1f4c74f22f042ea9150b62fe95459a64e7",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff_180de7e38b.vjs_c",
+        "bytes": 11355,
+        "sha256": "15a802e18c04248d281e18fa9bfad13c6c56eb42ebade2291fa27ef2ef2d6e1e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff_67a5db276f.vjs_c",
+        "bytes": 11311,
+        "sha256": "fadabca7988adf59757d16ec21cc75331a1ddd2d0a5a39b04981b100a7d56b0e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff_69e4b7ae06.vjs_c",
+        "bytes": 11187,
+        "sha256": "2afcacf6ce12ec15f557266d4e638483a0f362b45ffb7b3672e041b9f38b6d7d",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff_7d12726fe1.vjs_c",
+        "bytes": 11311,
+        "sha256": "2429f2512691374863f5424c0ff9b327903999bc070b972021c10eef4d80e519",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff_95b24dbef9.vjs_c",
+        "bytes": 11311,
+        "sha256": "111342ff0a26e76e481ad9979f948f5894110e52278644433289bdf4e51b758b",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff_assets.vjs_c",
+        "bytes": 5116,
+        "sha256": "ea1d0b3b8b618bf680fb16f3346ebe8bd3ba6a8821458238cef5afba08b83dfc",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff_c799d725d6.vjs_c",
+        "bytes": 11141,
+        "sha256": "e742182548ca03a291a12413ef39c3c06ff8d3cd802ae7b29c0bacfcea655b2e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/archive_handoff_fae43f5733.vjs_c",
+        "bytes": 12439,
+        "sha256": "521c4775c46b399597c84b6c2164d2d15c2b06cc29f4f9a2dc3c3ab328a31819",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/attack_range_input.vjs_c",
+        "bytes": 2264,
+        "sha256": "9506d2e2bbf20fd01252adefcaeef4d9c4bce8425497f171bfddd484cbc347f3",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/building_move.vjs_c",
+        "bytes": 7973,
+        "sha256": "345d8456113931d1047b0c9d3076a4111320b295d4760f5b89394049feee62b0",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats.vjs_c",
+        "bytes": 128611,
+        "sha256": "09d17427ef731a0e9efb282a107449aeefbf22f4452e11ede196b6a3fdc43715",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v10.vjs_c",
+        "bytes": 126054,
+        "sha256": "858f40d3f9ac3f32b774d33e850a925eeea794d942b6dfc085d3c1a289f6f34a",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v11.vjs_c",
+        "bytes": 126054,
+        "sha256": "1b943126465e2daa9ea49336730db7685d747199bff118e2ad61c7b0751b1df8",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v12.vjs_c",
+        "bytes": 126054,
+        "sha256": "8c7967b1ce0aef67ead45a7e1a2b359699753101a965adfb983ef2553c635b7f",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v13.vjs_c",
+        "bytes": 126054,
+        "sha256": "f6ee6763ab5216cc2143c7838d83cc0b35a93460f79a5ec10a7580a7de7f55bf",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v14.vjs_c",
+        "bytes": 126054,
+        "sha256": "13f17a948c1ce86f2c7afb6d0e885a51186326d715c1939c7237abdb15ebb208",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v16.vjs_c",
+        "bytes": 126054,
+        "sha256": "17f5b3352f9681ee4473b8803ebfc679d1a3293696c431df05e0659794da57af",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v17.vjs_c",
+        "bytes": 126054,
+        "sha256": "0254f1e9ec11b10fd21b4fd28322f09e5928c5e77b00974c5e7129d2ffded020",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v9.vjs_c",
+        "bytes": 126054,
+        "sha256": "dbce5f803c3e55f85c28b569c1fe59a54270982be6db30d893a2509c513a8f48",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/combat_stats_handoff_v9b.vjs_c",
+        "bytes": 126070,
+        "sha256": "f612d04e14c504062aa00615195a0837734e95e9e37c63e6aab2cf0991b46e1f",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/daily_resources.vjs_c",
+        "bytes": 15558,
+        "sha256": "8bbf6cbb5ab6de86e25259a256d6bb01cc8c0f428fb412003cff7dd3e779d9fd",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/daily_rewards.vjs_c",
+        "bytes": 10361,
+        "sha256": "8a957d2af394b4ae10053109015314226746c513143f7cd011cbb6e1ec2a3a77",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/game_info_panel.vjs_c",
+        "bytes": 6689,
+        "sha256": "1d0d1dc2ab393191c138df6f73a8e78da26855ee1813558fd6506cde84cfc550",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/gold_mine_income_numbers.vjs_c",
+        "bytes": 4087,
+        "sha256": "b845080516731dbe6f96ac706e3a599d5f9cde04b5fc985ea9839d77b17126cf",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_assets.vjs_c",
+        "bytes": 8207,
+        "sha256": "cb3566741bd0d8c6ee227f2fb3076d6b376c16c3a1ba0d1fdf5b9ea2c1506f5c",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_boot.vjs_c",
+        "bytes": 1313,
+        "sha256": "9ae095d50ad33c05550436606cf8339eab3ee4d21faac504da2f1e3a09ad0c60",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry.vjs_c",
+        "bytes": 1853,
+        "sha256": "079dfc5acd35902ab8dbecf2815fb2f7f29fd52477e9b9ecc565e58666bb2aba",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v10.vjs_c",
+        "bytes": 1771,
+        "sha256": "8f8fa8539b55e633ea50a167d67272df68ae9b0008350059d7cc8b199c772b86",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v11.vjs_c",
+        "bytes": 1771,
+        "sha256": "566ea595d7dd5b82eda76c072c0eb1dfba4a4283e117efc64a0a0c204be6276f",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v12.vjs_c",
+        "bytes": 1771,
+        "sha256": "bc209c7c8b759db0c2b3df83f099c4deb913560e7402647481105bce259302b2",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v13.vjs_c",
+        "bytes": 1771,
+        "sha256": "167dc1abfeb18f6a6d2caa372fee8d76b9ef7c765b54d23dc666b74b5f5d6b60",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v14.vjs_c",
+        "bytes": 1771,
+        "sha256": "cfdaa43a523e190abdb2ef5a2df434ce7ec40e0e81f68644585b3ebef9d3833e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v15.vjs_c",
+        "bytes": 1853,
+        "sha256": "bbc7628dddc3b2b991e85c114fee8ee90318ded1422fc214334cc8a9f0943424",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v16.vjs_c",
+        "bytes": 1853,
+        "sha256": "e7de4d8bad6893dacf3ce608446cfa5ead0591b6a278b54774f737600e2c50dc",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v17.vjs_c",
+        "bytes": 1853,
+        "sha256": "350ab30cfdc22fe446b934f6dc75c50f299c9a9485443ce30b26ca02d1d3997c",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v9.vjs_c",
+        "bytes": 1771,
+        "sha256": "5b6d3dddb20090a54fc5bca055b13af41751e1e35ab031f5462200ff0a47c383",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_geometry_handoff_v9b.vjs_c",
+        "bytes": 1771,
+        "sha256": "44604b5c9e4810b4d0c8a57ce362e918993c89ae25ec286d455fd197a3f13bab",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud.vjs_c",
+        "bytes": 27067,
+        "sha256": "0cfdd002737c3a396766cee3302bf0845c18603eb60b6cd7780cd90b4d0d804b",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v10.vjs_c",
+        "bytes": 28613,
+        "sha256": "1870f701b3db0f30b61efb3e524192e60ffbf4b0b67d06e952ed0a41aa909014",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v11.vjs_c",
+        "bytes": 28645,
+        "sha256": "dacdd7a90f74cf82f8b8f5fff3e47cf71bcc34de8960750e6900dce46c26bad1",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v12.vjs_c",
+        "bytes": 28856,
+        "sha256": "0dedf076370a9f902c28838e83db75b7eea49df3d65c871b0e4fa37c3585aa5e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v13.vjs_c",
+        "bytes": 28882,
+        "sha256": "3c6924765316914fd922dc45e02c57e1826643df30bdc791c9d8522c3ce8725d",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v14.vjs_c",
+        "bytes": 29641,
+        "sha256": "a4805e0f4808c139235506aee901cdeedd3730bfee612ab6e44ab1ce1dab535d",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v16.vjs_c",
+        "bytes": 30087,
+        "sha256": "13abe12866a437eff3c7346b8a3e14d940f4c9cd960f6e89f797924201a99628",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v17.vjs_c",
+        "bytes": 30895,
+        "sha256": "a549da5071e49294b81c0729decfbc1615b4cf867cc465eefd3144a6876493a4",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v9.vjs_c",
+        "bytes": 27909,
+        "sha256": "ab5fe0dd3b4a4a5304b9bbf594e71554003420a95db1e9b43c816a1752f777e0",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/handoff_hud_handoff_v9b.vjs_c",
+        "bytes": 28613,
+        "sha256": "7ec1ad24b9bdbdadfdc2e4b2fe9cec1aa6c8a9c9febf36285237eac32c4cea59",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/hero_skill_ui.vjs_c",
+        "bytes": 9638,
+        "sha256": "4ff8a67f8951cfd568d5dcec0701c128d7e07b2c7ff9aad7ab803e3dbc39c584",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/hero_world_health_bar.vjs_c",
+        "bytes": 7526,
+        "sha256": "8ddf9cc99603307d78184bcfb4a210bca8df8e9e1acff3702835813fad7795cb",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/hud_takeover.vjs_c",
+        "bytes": 70670,
+        "sha256": "6407fa873a710d0820d053a1fb0219b9c0d6de3e2c7441dfc290a0b6c73520b4",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/inventory_tooltip.vjs_c",
+        "bytes": 10680,
+        "sha256": "9efc41fb3e79661091ff4e9b978252ee2ee3b15dc2007c9a074d0e9e91ec6eb6",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_handoff_03454b44a8.vjs_c",
+        "bytes": 3801,
+        "sha256": "f0c818e8962213df0d7f4ed87bb4da6e5485c8421115c17584ab7d470534ba51",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_handoff_0d1f57e430.vjs_c",
+        "bytes": 4942,
+        "sha256": "2a7ebbd4d13285023892aa9f92dcdc52db004518647dcf6be5a6bec2d7d38998",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_handoff_79478c4dbf.vjs_c",
+        "bytes": 3624,
+        "sha256": "591d0c8e57a7c5ab0f6062bc76f4d3717b5156ef18908aa4984fc52e9d7b777f",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_handoff_80e56f7ad0.vjs_c",
+        "bytes": 3801,
+        "sha256": "287d2e06ef03811df1161c4e93c85dbafd17ae9a2e13a497b09a48f3b2a90113",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_handoff_bb9968eef7.vjs_c",
+        "bytes": 4942,
+        "sha256": "e17f147b95ff44cf2d067a83638ef55fd5b72b331b28fe1f7bc160ee1a8e1ed8",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_handoff_ef48d27640.vjs_c",
+        "bytes": 4631,
+        "sha256": "56de9fa529dce62f4752578ba140952396653d94f11ad699fd092018607c2589",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_ui.vjs_c",
+        "bytes": 32572,
+        "sha256": "cf3c96f7d5f50d17b77dfe5113917fb69733edcb2d77dcbe03653a94c4232b06",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_ui_handoff_03454b44a8.vjs_c",
+        "bytes": 32691,
+        "sha256": "fe25916d459e139b18a63a13edda68f2bcef4396f7c0dcc8b5826a7c3841f0f2",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_ui_handoff_0d1f57e430.vjs_c",
+        "bytes": 32815,
+        "sha256": "26ab0d0f039ba802cddc86b787a13d062fbe665ac8daf5e865283aea2a5d31dd",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_ui_handoff_79478c4dbf.vjs_c",
+        "bytes": 32679,
+        "sha256": "79bb000a250d5bdcb3bfdf4978d74e012e31ca5ceee03bfe0bf0acb8c257940d",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_ui_handoff_80e56f7ad0.vjs_c",
+        "bytes": 32691,
+        "sha256": "5d96f81cde9a56e5a0d3b4edefc37c8dd908b39fd2987bca1e725adb82d0fa67",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_ui_handoff_bb9968eef7.vjs_c",
+        "bytes": 32815,
+        "sha256": "4ef84e19f1ec9a20b2604e24ae6866ce1b3b7dcc27239d6f02cfa6096f473d2f",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/lottery_ui_handoff_ef48d27640.vjs_c",
+        "bytes": 32815,
+        "sha256": "3fa5fc03d286318c945d099cf4cb24eb649e5b6327836336e288d96f87457754",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/main_hud_assets.vjs_c",
+        "bytes": 5569,
+        "sha256": "94b28c844c8893c442ab3bab7acafa4437ecbe9ce7e9c1dfc3403c42f99d9781",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/main_hud_skin.vjs_c",
+        "bytes": 16231,
+        "sha256": "d5acc1e6ad34a2dbb8f32201ef418efbfceb1f6ea18a5301b344501bf701e845",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/portrait_camera_editor.vjs_c",
+        "bytes": 6859,
+        "sha256": "6d9bc353715eb7c405f3da6aef57c57f313232e3265e7f22acdeed0d1384322f",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/reward_presentation.vjs_c",
+        "bytes": 2043,
+        "sha256": "29a43db1507f193a4f59428df5b69c23d0bc20c81d3074d18318e598406943d9",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/rogue_reward_ui.vjs_c",
+        "bytes": 7950,
+        "sha256": "26c754b92475d1e2da3c04d542c25e7cf6a92dc559f25aa22938832381261189",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/shop_debug.vjs_c",
+        "bytes": 1553,
+        "sha256": "feb57875ebf2a5b09c5e0d490adffc8ef0a29adafd0716e5187cc1414f414985",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/shop_tooltip.vjs_c",
+        "bytes": 8631,
+        "sha256": "dcd07a7349dbcc04fe275e672d6e20e74bcc78b2aff46355ca37d18106d4e24e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/shop_ui.vjs_c",
+        "bytes": 36030,
+        "sha256": "3e05d7768df8a4fa191ecc460a70205ee8b0420891116546f4697b0c911f548d",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/survival_grid_placement.vjs_c",
+        "bytes": 25730,
+        "sha256": "c96fb0c9d1c4369e509eb4d206d8d261c927cea4b3ad99da46168137e8a10bba",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/survival_ui.vjs_c",
+        "bytes": 17719,
+        "sha256": "9fa3632343cf5f3d7d08dc9a70c583576a3dd1a9d4735f5ca767afd4f1006817",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/tooltip_position.vjs_c",
+        "bytes": 5858,
+        "sha256": "249574ba5c5dc542fd9752d2575f5b790054dad70fdf18436145e14a0eebba21",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/treasure_history.vjs_c",
+        "bytes": 2777,
+        "sha256": "898cf727ac9bb2c6319281a179be222fd5eafc95f7df9e226779363da551c511",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/ui_bootstrap.vjs_c",
+        "bytes": 17516,
+        "sha256": "eb34f3d62d5267d5e025aa43105fb10c8696aba7e5e897c483ad297a4c89f302",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/ui_layers.vjs_c",
+        "bytes": 2614,
+        "sha256": "08f59182df5d887217cc47c86b201fdf94573a7458ad74ee6526e1f0ee88ee16",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/weapon_growth_hud.vjs_c",
+        "bytes": 4149,
+        "sha256": "12c0a5abb1eb6f398f0f342c3928bc45b5db964d6fa6320e940f7da88f7f1bf4",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/common/ui_components.vjs_c",
+        "bytes": 17103,
+        "sha256": "f070f3caf8903fb8fecb0ae5503c96d94ce795899d78ec64a8510ffdb9312086",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/common/ui_registry.vjs_c",
+        "bytes": 162476,
+        "sha256": "54468cb71a4f2914ce88dfb2d570a48e73714742d07f6cadd8303245af37dec4",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/scripts/custom_game/common/ui_typography.vjs_c",
+        "bytes": 2136,
+        "sha256": "f9ffff2c0d51bb07ed352f4a88ef74f4aefb742df83611de2d4426d31f828485",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/layout/custom_game/archive.vxml_c",
+        "bytes": 4746,
+        "sha256": "37c2085627bdc000bfc64359f4dc6aed3718cbe020047778991c013dec7f8b1e",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/layout/custom_game/custom_ui_manifest.vxml_c",
+        "bytes": 1493,
+        "sha256": "9b29a8954616dabe63a37e6997d5f1edbc981291c8992b9b8306620b01057713",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/layout/custom_game/font_test.vxml_c",
+        "bytes": 2701,
+        "sha256": "b0cff13fc4c00333cecae8d7c203fcb04c909b7b674fa60f9646a71c66541594",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/layout/custom_game/hero_skill_ui.vxml_c",
+        "bytes": 2436,
+        "sha256": "b56c0f50a7c2dbc2017b696b5f0ac6a97156f5b2cc4cebab20d7811c8e4f76ec",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/layout/custom_game/rogue_reward_ui.vxml_c",
+        "bytes": 2040,
+        "sha256": "3166ae2fda8aa3c791d55fbe9d4c4afbc5a7bb80d45061481547b2c3bceff7a1",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/layout/custom_game/survival_grid_placement.vxml_c",
+        "bytes": 1717,
+        "sha256": "d468e037f8f1e51633feb9cdd9236c2d2a4b6a8331d5179e391109eaa0a7745a",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      },
+      {
+        "path": "art/ui/development/remaining_ui_handoff_v1/baseline/runtime/layout/custom_game/survival_hud.vxml_c",
+        "bytes": 16459,
+        "sha256": "7f0860cae0c38f4dea943050ca898a711d5c38cd31907847f81c54c01e9241d9",
+        "reason": "obsolete compiled baseline; source baseline/content retained"
+      }
+    ]
+  },
+  "sync": {
+    "game": {
+      "branch": "dev",
+      "head_before": "23f07f62b015801ee6ab1cfda295e1c261e4a303",
+      "head_after_pull": "23f07f62b015801ee6ab1cfda295e1c261e4a303",
+      "pull_exit": 0,
+      "pop_exit": 0,
+      "conflicts": []
+    },
+    "content": {
+      "branch": "master",
+      "head_before": "565a1174113647b4b0d5d7906466193fcc400dbc",
+      "head_after_pull": "565a1174113647b4b0d5d7906466193fcc400dbc",
+      "pull_exit": 0,
+      "pop_exit": 0,
+      "conflicts": []
+    }
+  },
+  "validation": {
+    "gameplay_and_ui_suites": {
+      "lua": 23,
+      "node": 8,
+      "passed": 31,
+      "failed": 0
+    },
+    "backend_offline_tests": {
+      "suites": 9,
+      "tests": 102,
+      "skipped": 0,
+      "status": "PASS"
+    },
+    "minimap_tool_offline_regression": "PASS",
+    "map_compile": {
+      "compiled": 314,
+      "failed": 0,
+      "skipped": 1,
+      "package": "maps/template_map.vpk",
+      "sha256": "0f55488ac363c392ee0a43caff9df96982d2949dea06cdce09ac6f4d4981c5e7"
+    }
+  },
+  "minimap": {
+    "schema": 1,
+    "status": "resource_chain_pass",
+    "map": "template_map",
+    "material": "materials/overviews/template_map.vmat",
+    "texture": "materials/overviews/template_map.tga",
+    "source_image": "materials/overviews/template_map.tga",
+    "compiled_texture": "materials/overviews/template_map_tga_d9088edf.vtex_c",
+    "settings": "materials/overviews/template_map.txt",
+    "tga": {
+      "width": 2048,
+      "height": 2048,
+      "bits_per_pixel": 24
+    },
+    "bounds": {
+      "pos_x": -16384,
+      "pos_y": 16384,
+      "scale": 32,
+      "reference_pixels": 1024,
+      "min_x": -16384,
+      "max_x": 16384,
+      "min_y": -16384,
+      "max_y": 16384
+    },
+    "compiler_dependencies_checked": true,
+    "visual_current_map_verified": true,
+    "navigation_verified": false,
+    "source_files": [
+      {
+        "path": "materials/overviews/template_map.vmat",
+        "bytes": 109,
+        "sha256": "d6a143ec8e2206cf37a9405df67ec6f0f6652ae6d51ee45f26de7d92e7600d24",
+        "modified_utc": "2026-09-23T11:31:38.4698752Z"
+      },
+      {
+        "path": "materials/overviews/template_map.tga",
+        "bytes": 12582930,
+        "sha256": "2e68438c4c9843f23edf28336dcbd7334dd395c64fc9d8706865145309074e49",
+        "modified_utc": "2026-09-23T11:31:38.4658747Z"
+      },
+      {
+        "path": "maps/template_map.vmap",
+        "bytes": 76329855,
+        "sha256": "12d786e6d0aa72d5cf733c799f7926e76bf6a9f0e83e452fe37f9d9f40d7fe20",
+        "modified_utc": "2026-09-23T11:07:59.3378223Z"
+      },
+      {
+        "path": "materials/overviews/template_map.txt",
+        "bytes": 83,
+        "sha256": "19f1af4a24489c3276c414ec35ace7a0e3cb0bf3b5ff63ff7029425d442bb507",
+        "modified_utc": "2026-09-23T11:31:38.4688743Z"
+      }
+    ],
+    "game_files": [
+      {
+        "path": "resource/overviews/template_map.txt",
+        "bytes": 115,
+        "sha256": "77164a99d1c6b6ba91c707416ba9c95b31f203cd3abeeb26fec62eeecf6ea877",
+        "modified_utc": "2026-09-23T11:31:39.0172985Z"
+      },
+      {
+        "path": "maps/template_map.vpk",
+        "bytes": 65130243,
+        "sha256": "0f55488ac363c392ee0a43caff9df96982d2949dea06cdce09ac6f4d4981c5e7",
+        "modified_utc": "2026-09-23T11:15:52.1975634Z"
+      },
+      {
+        "path": "materials/overviews/template_map.vmat_c",
+        "bytes": 2265,
+        "sha256": "6a2a5360199f65c557093ea416870c6f6fb1e2ced14610090523cda4c730d3bf",
+        "modified_utc": "2026-09-23T11:31:38.9737999Z"
+      },
+      {
+        "path": "materials/overviews/template_map_tga_d9088edf.vtex_c",
+        "bytes": 16779300,
+        "sha256": "c3c616c12b3d206f2b066e6152e5502ad540b73957e7706c1ef3d50d00db836c",
+        "modified_utc": "2026-09-23T11:31:38.9718005Z"
+      }
+    ],
+    "generation_observed": true,
+    "tools_map_confirmed": true,
+    "directed_compile_required": false,
+    "map_source_and_package_unchanged": true,
+    "source_image_visual_review": {
+      "passed": true,
+      "features": [
+        "four player groups of training rooms",
+        "ten rebirth platforms on the left",
+        "ten arena platforms on the right",
+        "current central island and surrounding landmasses"
+      ],
+      "evidence": "Original source TGA corresponding to sha256 in source_files, converted losslessly to PNG for review."
+    },
+    "test_fixture_safety": "Offline fake VPK fixtures moved out of the game directory to system TEMP; test generator now always uses system TEMP.",
+    "visual_verification_scope": "Generated source minimap reviewed against the current Workshop map overview; HUD/player marker alignment was not tested.",
+    "hud_alignment_verified": false,
+    "hud_verification_limit": "Art preview launcher does not supply the test backend authentication credentials; the startup gate covered the HUD. No authentication bypass was applied.",
+    "current_map_overview_screenshot_sha256": "fab1f2d6516228b6d50d3954ce5e85b117c210faff9197f8f8d5d338d2100018"
+  },
+  "limits": [
+    "No ECS deployment, Supabase mutation or game backend switch performed by this repository sync.",
+    "Offline backend tests do not claim live database acceptance."
+  ],
+  "paired_content_commit": "ec9f25d6ccd594ba564e5cee811e260bc1575c80",
+  "paired_content_pushed": true
+}

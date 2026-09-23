@@ -78,8 +78,10 @@ local function apply_activity_modifiers(unit, asset)
     if #applied > 0 then activity_modifiers_by_unit[entindex] = applied end
 end
 
-local function clear_particles(unit)
-    for _, particle in ipairs(particles_by_unit[unit:entindex()] or {}) do
+local function clear_particles(unit, replacing_owner)
+    local state = particles_by_unit[unit:entindex()]
+    if state and state.owner ~= unit and not replacing_owner then return end
+    for _, particle in ipairs(state and state.particles or {}) do
         pcall(function()
             ParticleManager:DestroyParticle(particle, false)
             ParticleManager:ReleaseParticleIndex(particle)
@@ -137,36 +139,100 @@ local function normalize_particle(asset, entry, index)
     if type(entry) == "string" then
         local owner_id = asset and asset.environment_particle_owners
             and asset.environment_particle_owners[index]
-        return entry, owner_id
+        return { path = entry, owner = owner_id }
     end
     if type(entry) == "table" then
-        return entry.path, entry.owner
+        return entry
     end
-    return nil, nil
+    return nil
+end
+
+local function configure_particle(particle, owner, descriptor)
+    if descriptor.attachment_point == ""
+        and descriptor.control_profile ~= "io_base_ambient" then return end
+    local origin = owner:GetAbsOrigin()
+    local point_follow = rawget(_G, "PATTACH_POINT_FOLLOW") or 5
+    if descriptor.attachment_point ~= "" then
+        ParticleManager:SetParticleControlEnt(particle, 0, owner,
+            point_follow, descriptor.attachment_point, origin, true)
+    end
+    if descriptor.control_profile == "io_base_ambient" then
+        -- Valve's default item 536 creates this body effect independently of
+        -- wisp.vmdl. Use the native particle's preview control points: CP11=1
+        -- suppresses the red low-health child instead of showing it at CP11=0.
+        ParticleManager:SetParticleControlEnt(particle, 1, owner,
+            rawget(_G, "PATTACH_ABSORIGIN_FOLLOW") or 1, "", origin, true)
+        ParticleManager:SetParticleControl(particle, 10, Vector(1, 1, 0))
+        ParticleManager:SetParticleControl(particle, 11, Vector(1, 0, 0))
+        ParticleManager:SetParticleControl(particle, 13, Vector(0, 1, 1))
+    end
+end
+
+local function same_particles(state, unit, asset_id, desired)
+    if not state or state.owner ~= unit or state.asset_id ~= asset_id
+        or #state.effects ~= #desired then return false end
+    for index, effect in ipairs(desired) do
+        local previous = state.effects[index]
+        if previous.path ~= effect.path or previous.owner ~= effect.owner
+            or previous.attach_type ~= effect.attach_type
+            or previous.attachment_point ~= effect.attachment_point
+            or previous.control_profile ~= effect.control_profile then
+            return false
+        end
+    end
+    return true
 end
 
 local function apply_particles(unit, asset, components)
-    clear_particles(unit)
-    local spawned = {}
-    local attach_type = rawget(_G, "PATTACH_ABSORIGIN_FOLLOW") or 1
+    local desired = {}
     for index, entry in ipairs(asset and asset.environment_particles or {}) do
-        local particle_path, owner_id = normalize_particle(asset, entry, index)
-        local owner = components and components[owner_id] or unit
+        local descriptor = normalize_particle(asset, entry, index)
+        if descriptor and descriptor.path and descriptor.path ~= "" then
+            desired[#desired + 1] = {
+                path = descriptor.path,
+                owner = components and components[descriptor.owner] or unit,
+                attach_type = rawget(_G, descriptor.attach_type
+                    or "PATTACH_ABSORIGIN_FOLLOW")
+                    or rawget(_G, "PATTACH_ABSORIGIN_FOLLOW") or 1,
+                attachment_point = descriptor.attachment_point or "",
+                control_profile = descriptor.control_profile or "",
+            }
+        end
+    end
+    local asset_id = asset and asset.asset_id or "legacy_path"
+    if same_particles(particles_by_unit[unit:entindex()], unit, asset_id, desired) then
+        return
+    end
+    clear_particles(unit, true)
+    local state = { owner = unit, asset_id = asset_id, effects = {}, particles = {} }
+    for _, descriptor in ipairs(desired) do
         local ok, particle = pcall(
             ParticleManager.CreateParticle,
             ParticleManager,
-            particle_path,
-            attach_type,
-            owner
+            descriptor.path,
+            descriptor.attach_type,
+            descriptor.owner
         )
         if ok and particle then
-            table.insert(spawned, particle)
-        else
+            local configured = pcall(configure_particle,
+                particle, descriptor.owner, descriptor)
+            if configured then
+                table.insert(state.particles, particle)
+                table.insert(state.effects, descriptor)
+            else
+                pcall(ParticleManager.DestroyParticle, ParticleManager, particle, false)
+                pcall(ParticleManager.ReleaseParticleIndex, ParticleManager, particle)
+                ok = false
+            end
+        end
+        if not ok or not particle then
             logger.warn("BuildingVisual", "particle failed: "
-                .. tostring(particle_path))
+                .. tostring(descriptor.path))
         end
     end
-    if #spawned > 0 then particles_by_unit[unit:entindex()] = spawned end
+    -- Cache only successfully configured descriptors so failed effects are
+    -- retried on the next apply. Attribute-only refreshes retain healthy loops.
+    particles_by_unit[unit:entindex()] = state
 end
 
 function M.resolve(data)

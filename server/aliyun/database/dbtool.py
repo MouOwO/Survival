@@ -27,14 +27,14 @@ TABLES = {
     "online_time_sessions", "online_time_idempotency",
     "star_blessing_reward_definition_sets", "star_blessing_reward_definitions",
     "archive_config_sets", "player_archive_state", "archive_entitlements",
-    "archive_operations", "archive_online_outbox", LEDGER,
+    "archive_operations", "archive_online_outbox", "survival_data_migrations", "match_profile_sessions", LEDGER,
 }
 FUNCTIONS = {
     "reject_fishing_immutable_mutation", "fishing_profile_json", "get_fishing_profile",
     "ensure_player_gameplay_stats", "sync_star_blessing_reward_definitions",
     "grant_out_of_match_reward", "checkpoint_online_time", "archive_sync_config",
     "archive_resume", "archive_prepare", "archive_commit", "archive_capture_online",
-    "archive_online_pending", "archive_pending",
+    "archive_online_pending", "archive_pending", "archive_commit_lottery", "match_profile_login", "match_profile_context",
 }
 RPC_SIGNATURES = (
     "get_fishing_profile(text)", "ensure_player_gameplay_stats(text,jsonb)",
@@ -45,7 +45,34 @@ RPC_SIGNATURES = (
     "archive_prepare(text,text,text,text,jsonb)",
     "archive_commit(text,text,bigint,jsonb,jsonb,text)",
     "archive_online_pending(text,text)", "archive_pending(text)",
+    "archive_commit_lottery(text,text,bigint,jsonb,jsonb,text,jsonb,jsonb)",
+    "match_profile_login(text,text,text,jsonb)", "match_profile_context(text,text)",
 )
+LEGACY_FILES = (
+    "202608170001_fishing_rewards.sql", "202608200001_player_gameplay_stats.sql",
+    "202608210001_out_of_match_reward_grants.sql", "202608210002_online_time_checkpoints.sql",
+    "202608220003_fix_reward_grant_pgcrypto_search_path.sql", "202608230001_star_blessing_reward_definitions.sql",
+    "202608230002_sync_star_blessing_v3.sql", "202608230003_remove_legacy_fishing_persistence.sql",
+    "202608230004_add_star_blessing_gameplay_stats.sql", "202608230005_fix_gameplay_stats_attack_interval.sql",
+    "202608230006_include_definition_version_in_online_grant_id.sql", "202608230007_finalize_online_time_session.sql",
+)
+ARCHIVE_FILES = ("202609060001_archive_stat_columns.sql", "202609060002_all_archive.sql",
+                 "202609060003_archive_buildings.sql")
+UPGRADE_FILES = (
+    ("202609140001_http_lottery.sql", "202609200001_http_lottery.sql"),
+    ("202609140002_gameplay_stats_csv_bounds.sql", "202609200002_gameplay_stats_csv_bounds.sql"),
+    ("202609140003_remove_default_wood_income.sql", "202609200003_remove_default_wood_income.sql"),
+    ("202609140004_remove_default_attack_growth.sql", "202609200004_remove_default_attack_growth.sql"),
+)
+HARDEN_PATCHES = ("harden_lottery.sql", "harden_match_sessions.sql")
+# These two files were created with LF for test03. Git autocrlf can change the
+# checkout bytes; only restore the exact reviewed release hash, never accept
+# arbitrary normalization or mutate a deployed ledger to fit edited SQL.
+TEST03_LF_HASHES = {
+    "202609190001_attack_interval_semantics.sql": "7408538108d179f876c2be1dd773ea3c5e7fb93153cd878f2aa1548cd705c378",
+    "harden.sql": "f0b7f186873de70d745fe1ccec306afa416d2c73a6f8b8c49be558c001d6426f",
+}
+WOOD_MARKER = "20260914_remove_default_wood_income"
 SERVICE_RE = re.compile(r"[A-Za-z0-9_.-]{1,100}\Z")
 TRIAL_RE = re.compile(r"(?:goufayu_test|goufayu_restore_[a-z0-9_]{1,48})\Z")
 FORBIDDEN_DEPENDENCY = re.compile(r"\b(?:auth|storage|realtime|vault|graphql|net)\s*\.", re.I)
@@ -66,6 +93,16 @@ def sha256(path):
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             result.update(block)
     return result.hexdigest()
+
+
+def release_bytes(source):
+    source = Path(source)
+    raw = source.read_bytes()
+    if source.name in TEST03_LF_HASHES:
+        raw = raw.replace(b"\r\n", b"\n")
+        require(hashlib.sha256(raw).hexdigest() == TEST03_LF_HASHES[source.name],
+                "historical_test03_sql_modified")
+    return raw
 
 
 def write_json(path, value):
@@ -123,34 +160,50 @@ def run_client(argv, *, readonly=False):
 
 def collect(legacy_root, addon_root, destination):
     legacy_root, addon_root, destination = map(Path, (legacy_root, addon_root, destination))
-    sources = [("legacy", p) for p in sorted((legacy_root / "supabase/migrations").glob("*.sql"))]
-    require(len(sources) == 12, "historical_legacy_migration_inventory_changed")
-    sources += [("addon", p) for p in sorted((addon_root / "server/migrations").glob("*.sql"))]
-    require(len(sources) == 15, "historical_addon_migration_inventory_changed")
+    # Freeze the deployed 17-entry sequence. Sorting all newly pulled legacy
+    # SQL would insert files before the recorded addon/manual/target entries.
+    legacy_dir, addon_dir = legacy_root / "supabase/migrations", addon_root / "server/migrations"
+    known = set(LEGACY_FILES) | set(ARCHIVE_FILES) | {name for name, _ in UPGRADE_FILES}
+    require({p.name for p in legacy_dir.glob("*.sql")} <= known, "unreviewed_legacy_migration")
+    require({p.name for p in addon_dir.glob("*.sql")} <= set(ARCHIVE_FILES) | {name for name, _ in UPGRADE_FILES},
+            "unreviewed_addon_migration")
+    sources = [("legacy", legacy_dir / name, name) for name in LEGACY_FILES]
+    sources += [("addon", addon_dir / name, name) for name in ARCHIVE_FILES]
     # The manual inventory patch is already incorporated in all_archive, and
     # remains a no-op if replayed last. Preserve it rather than lose provenance.
-    sources.append(("manual", addon_root / "tools/sql/202609060001_archive_fishing_inventory.sql"))
-    sources += [("target", p) for p in sorted((HERE / "target").glob("*.sql"))]
+    sources.append(("manual", addon_root / "tools/sql/202609060001_archive_fishing_inventory.sql",
+                    "202609060001_archive_fishing_inventory.sql"))
+    # Freeze the already deployed target prefix; append later target migrations
+    # only after the 20260920 upgrades, never insert ahead of their ledger entries.
+    sources += [("target", HERE / "target/202609190001_attack_interval_semantics.sql",
+                 "202609190001_attack_interval_semantics.sql")]
+    sources += [("target", addon_dir / name, target_name) for name, target_name in UPGRADE_FILES]
+    sources += [("target", p, p.name) for p in sorted((HERE / "target").glob("*.sql"))
+                if p.name != "202609190001_attack_interval_semantics.sql"]
     entries = []
-    for group, source in sources:
+    for group, source, filename in sources:
         require(source.is_file(), "migration_source_missing")
-        relative = Path("migrations") / group / source.name
+        relative = Path("migrations") / group / filename
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        source_hash = sha256(source)
+        raw = release_bytes(source)
+        source_hash = hashlib.sha256(raw).hexdigest()
         if target.exists():
             require(sha256(target) == source_hash, "existing_bundle_migration_differs")
         else:
-            shutil.copyfile(source, target)
-        entries.append({"id": group + "/" + source.name, "path": relative.as_posix(), "group": group,
-                        "sha256": source_hash, "bytes": source.stat().st_size})
+            target.write_bytes(raw)
+        entries.append({"id": group + "/" + filename, "path": relative.as_posix(), "group": group,
+                        "sha256": source_hash, "bytes": len(raw)})
     for name in ("dbtool.py", "init_roles.sql", "harden.sql", "requirements.txt", "README.md",
-                 "test_dbtool.py", "integration_test.py"):
+                 "test_dbtool.py", "integration_test.py", "verify_upgrade.py", "test_verify_upgrade.py",
+                 "rollback_match_session_privileges.sql", *HARDEN_PATCHES):
         source, target = HERE / name, destination / name
         if source.exists() and source.resolve() != target.resolve():
-            shutil.copyfile(source, target)
+            target.write_bytes(release_bytes(source))
     manifest = {"format": 1, "postgres_major": 17, "entries": entries,
-                "harden_sha256": sha256(HERE / "harden.sql")}
+                "harden_sha256": sha256(destination / "harden.sql"),
+                "hardening_patches": [{"id": "security/" + name, "path": name,
+                                       "sha256": sha256(HERE / name)} for name in HARDEN_PATCHES]}
     write_json(destination / "migration_manifest.json", manifest)
     return {"status": "collected", "migrations": len(entries)}
 
@@ -167,7 +220,26 @@ def load_bundle(bundle):
         seen.add(entry["id"])
         require(path.is_file() and sha256(path) == entry["sha256"], "migration_checksum_mismatch")
     require(sha256(bundle / "harden.sql") == manifest["harden_sha256"], "hardening_checksum_mismatch")
+    for patch in manifest.get("hardening_patches", []):
+        path = (bundle / patch["path"]).resolve()
+        require(path.is_relative_to(bundle) and path.suffix == ".sql" and
+                patch["id"] == "security/" + path.name and patch["id"] not in seen and
+                patch["id"] != "security/harden.sql", "hardening_patch_invalid")
+        seen.add(patch["id"])
+        require(path.is_file() and sha256(path) == patch["sha256"], "hardening_patch_checksum_mismatch")
     return manifest
+
+
+def security_entries(manifest):
+    return [{"id": "security/harden.sql", "path": "harden.sql", "sha256": manifest["harden_sha256"]},
+            *manifest.get("hardening_patches", [])]
+
+
+def apply_hardening(conn, bundle, manifest):
+    for entry in security_entries(manifest):
+        conn.execute((Path(bundle) / entry["path"]).read_text(encoding="utf-8"))
+        conn.execute("INSERT INTO public._goufayu_migrations(migration_id,sha256) VALUES(%s,%s) ON CONFLICT DO NOTHING",
+                     (entry["id"], entry["sha256"]))
 
 
 def transaction_body(raw):
@@ -231,18 +303,48 @@ def applied_prefix(manifest, applied):
     require(bool(applied), "empty_migration_ledger_requires_review")
     entries = manifest["entries"]
     expected = {e["id"]: e["sha256"] for e in entries}
-    expected["security/harden.sql"] = manifest["harden_sha256"]
+    security = {e["id"]: e["sha256"] for e in security_entries(manifest)}
+    expected.update(security)
     require(all(key in expected and expected[key] == value for key, value in applied.items()),
             "applied_migration_checksum_mismatch")
     count = sum(e["id"] in applied for e in entries)
     require(count > 0 and {e["id"] for e in entries[:count]} ==
-            set(applied) - {"security/harden.sql"}, "migration_ledger_not_contiguous_prefix")
+            set(applied) - set(security), "migration_ledger_not_contiguous_prefix")
     # Hardening can precede an appended target-only upgrade; it cannot precede
     # any of the historical legacy/addon/manual schema.
-    if "security/harden.sql" in applied:
+    if set(security) & set(applied):
+        require("security/harden.sql" in applied, "hardening_patch_without_base")
         require(all(e.get("group") == "target" for e in entries[count:]),
                 "hardening_before_business_schema")
     return entries[:count]
+
+
+def upgrade_plan(bundle, target_service):
+    """Inspect an existing ledger and aggregate impact; never emit player rows."""
+    bundle = Path(bundle)
+    manifest = load_bundle(bundle)
+    with connect(target_service, readonly=True) as conn:
+        database = target_identity(conn)
+        verify_ledger_structure(conn)
+        applied = dict(conn.execute("SELECT migration_id,sha256 FROM public._goufayu_migrations"))
+        prefix = applied_prefix(manifest, applied)
+        verify_ledger_schema(conn, bundle, prefix)
+        pending = [e["id"] for e in manifest["entries"] if e["id"] not in applied]
+        marker_table = conn.execute("SELECT to_regclass('public.survival_data_migrations') IS NOT NULL").fetchone()[0]
+        marker = marker_table and bool(conn.execute(
+            "SELECT 1 FROM public.survival_data_migrations WHERE migration_id=%s", (WOOD_MARKER,)).fetchone())
+        count = conn.execute("SELECT count(*) FROM public.player_gameplay_stats WHERE wood_per_second>0").fetchone()[0]
+        wood_pending = "target/202609200003_remove_default_wood_income.sql" in pending and not marker
+        result = {"status": "planned", "database": database, "writes": False,
+                  "pending_migrations": pending,
+                  "wood_default_removal_already_recorded": bool(marker),
+                  "wood_rows_to_reduce_once": count if wood_pending else 0,
+                  "wood_change": "greatest(0, wood_per_second-1); affected profile_revision +1",
+                  "attack_growth_existing_values_changed": False,
+                  "reward_grants_changed": False,
+                  "expected_runtime_rpc_count": len(RPC_SIGNATURES)}
+        conn.execute("ROLLBACK")
+        return result
 
 
 def expected_prefix_objects(bundle, entries):
@@ -326,7 +428,7 @@ def migrate(bundle, target_service):
         prefix = applied_prefix(manifest, applied)
         verify_ledger_schema(conn, bundle, prefix)
         expected = {e["id"]: e["sha256"] for e in manifest["entries"]}
-        expected["security/harden.sql"] = manifest["harden_sha256"]
+        expected.update({e["id"]: e["sha256"] for e in security_entries(manifest)})
         for entry in manifest["entries"]:
             if entry["id"] in applied:
                 continue
@@ -337,9 +439,7 @@ def migrate(bundle, target_service):
                              (entry["id"], entry["sha256"]))
             count += 1
         with conn.transaction():
-            conn.execute((bundle / "harden.sql").read_text(encoding="utf-8"))
-            conn.execute("INSERT INTO public._goufayu_migrations(migration_id,sha256) VALUES(%s,%s) ON CONFLICT DO NOTHING",
-                         ("security/harden.sql", manifest["harden_sha256"]))
+            apply_hardening(conn, bundle, manifest)
         permissions = verify_permissions(conn)
         return {"status": "migrated", "database": database, "new_migrations": count,
                 "recorded_migrations": len(expected), "permissions": permissions}
@@ -600,9 +700,10 @@ def reconcile(target_service, backup, bundle):
                 conn.execute("INSERT INTO public._goufayu_migrations(migration_id,sha256) VALUES(%s,%s)",
                              (entry["id"], entry["sha256"]))
                 applied.append(entry["id"])
-            conn.execute((bundle / "harden.sql").read_text(encoding="utf-8"))
-            conn.execute("INSERT INTO public._goufayu_migrations(migration_id,sha256) VALUES(%s,%s) ON CONFLICT DO NOTHING",
-                         ("security/harden.sql", migrations["harden_sha256"]))
+            for entry in security_entries(migrations):
+                require(entry["id"] not in previous or previous[entry["id"]] == entry["sha256"],
+                        "restored_hardening_checksum_mismatch")
+            apply_hardening(conn, bundle, migrations)
             if previous.get("restore/source"):
                 conn.execute("INSERT INTO public._goufayu_migrations(migration_id,sha256) VALUES(%s,%s) ON CONFLICT DO NOTHING",
                              ("restore/history/" + previous["restore/source"], previous["restore/source"]))
@@ -632,6 +733,9 @@ def main(argv=None):
     p = commands.add_parser("migrate")
     p.add_argument("--bundle", required=True)
     p.add_argument("--target-service", required=True)
+    p = commands.add_parser("plan-upgrade")
+    p.add_argument("--bundle", required=True)
+    p.add_argument("--target-service", required=True)
     for command in ("audit", "export"):
         p = commands.add_parser(command)
         p.add_argument("--source-service", required=True)
@@ -650,6 +754,8 @@ def main(argv=None):
             result = collect(args.legacy_root, args.addon_root, args.destination)
         elif args.command == "migrate":
             result = migrate(args.bundle, args.target_service)
+        elif args.command == "plan-upgrade":
+            result = upgrade_plan(args.bundle, args.target_service)
         elif args.command == "audit":
             result = audit(args.source_service, args.output, args.source_role)
         elif args.command == "export":

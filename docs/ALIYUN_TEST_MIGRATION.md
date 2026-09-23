@@ -1,6 +1,6 @@
 # 阿里云测试后端迁移手册
 
-**当前状态：ECS 测试后端 test03 已部署并验收，详见第 12 节。** 当前游戏地址未切换，支付仍为 `PAYMENT_MODE=test`。后续拉取的游戏新增了 HTTP 抽奖协议，不能直接连接旧 test03；接入前必须按[新版兼容性检查](ALIYUN_UPSTREAM_COMPATIBILITY.md)适配并验证。第 10、11 节为连接前的历史记录。
+**当前状态：ECS 测试后端 `20260920-test05` 已部署，新版存档、抽奖及重启持久化已验收，详见第 13 节。** 当前游戏和后端结算包哈希一致，但真实游戏客户端联调尚未完成。数据库为 23 项迁移/加固记录、12 个应用 RPC；支付仍为 `PAYMENT_MODE=test`，Supabase 原环境未修改。旧 test03 不能直接接入已升级数据库，回退边界见[新版兼容性检查](ALIYUN_UPSTREAM_COMPATIBILITY.md)。第 10～12 节为历史记录。
 
 ## 1. 固定边界与目录
 
@@ -98,12 +98,12 @@ ssh-add -l
 在项目工作目录本地构建（不改游戏默认 URL 或生成配置）：
 
 ```text
-python tools/build_aliyun_release.py --backend-root D:/survival_database --release-id 20260919-test02
+python tools/build_aliyun_release.py --backend-root D:/survival_database --release-id 20260920-test05
 ```
 
 生成目录带 `release_manifest.json` 的逐文件 SHA256，`.tar.gz` 旁另有 `.sha256`。`game-config/archive_http_bundle.lua` 是随包待部署候选，须等联调/切换时与服务器包一起更新。
 
-上传本地生成并校验过的发布包，先核对生成器的 SHA256/manifest，解包到一个**新的**发布目录。只使用自己生成的包，不覆盖 `current` 正在使用的目录。所有发布源文件由 root 持有且其他用户不可写，普通目录 `0755`、文件 `0644`；凭据不在包中。以下 `20260919-test02` 只是示例版本号。
+上传本地生成并校验过的发布包，先核对生成器的 SHA256/manifest，解包到一个**新的**发布目录。只使用自己生成的包，不覆盖 `current` 正在使用的目录。所有发布源文件由 root 持有且其他用户不可写，普通目录 `0755`、文件 `0644`；凭据不在包中。以下 `20260920-test05` 只是示例版本号。
 
 服务器先准备接收目录：
 
@@ -114,24 +114,24 @@ install -d -m 0700 /root/goufayu_upload
 本地电脑上传发布包和旁边的校验文件（版本号与实际产物一致）：
 
 ```powershell
-scp -i "$env:USERPROFILE/.ssh/goufayu_ecs_ed25519" ./output/aliyun_releases/20260919-test02.tar.gz ./output/aliyun_releases/20260919-test02.tar.gz.sha256 root@47.110.238.248:/root/goufayu_upload/
+scp -i "$env:USERPROFILE/.ssh/goufayu_ecs_ed25519" ./output/aliyun_releases/20260920-test05.tar.gz ./output/aliyun_releases/20260920-test05.tar.gz.sha256 root@47.110.238.248:/root/goufayu_upload/
 ```
 
 服务器验证并解压：
 
 ```sh
 cd /root/goufayu_upload
-sha256sum -c 20260919-test02.tar.gz.sha256
+sha256sum -c 20260920-test05.tar.gz.sha256
 install -d -m 0755 /opt/goufayu/releases
-tar --keep-old-files -xzf 20260919-test02.tar.gz -C /opt/goufayu/releases
+tar --keep-old-files -xzf 20260920-test05.tar.gz -C /opt/goufayu/releases
 ```
 
 ```sh
-cd /opt/goufayu/releases/20260919-test02
+cd /opt/goufayu/releases/20260920-test05
 bash deploy/preflight_host.sh
 # 先审查上一步的现状，再执行下列安装步骤。
 bash deploy/provision_host.sh --install-os-packages
-python3.11 deploy/manage.py prepare --release /opt/goufayu/releases/20260919-test02
+python3.11 deploy/manage.py prepare --release /opt/goufayu/releases/20260920-test05
 ```
 
 `preflight_host.sh` 只读检查 OS、软件版本、服务状态、监听端口、目录权限、容器挂载、数据库角色和各表精确行数；不创建角色、不安装软件、不重启服务。复用 `/etc/goufayu/postgres-password`，以环境变量名称转交容器内客户端，不输出密码、连接密钥或玩家行内容。SQL 使用只读事务；若管理员不是 `postgres`，显式传 `--db-admin-user <role>`。登录后也可先通过 SSH stdin 执行本地这份脚本，完成检查后再上传发布包。
@@ -199,13 +199,13 @@ python3.11 deploy/manage.py configure \
 
 ```sh
 .venv/bin/python deploy/manage.py db-init \
-  --release /opt/goufayu/releases/20260919-test02 --confirm-empty
+  --release /opt/goufayu/releases/20260920-test05 --confirm-empty
 export PGSERVICEFILE=/etc/goufayu/pg_service.conf
 export PGPASSFILE=/etc/goufayu/migrator.pgpass
 .venv/bin/python database/dbtool.py migrate --bundle database --target-service goufayu_migrator
 ```
 
-`db-init` 只对空目标初始化安全角色；新建登录角色才设置 `configure` 保存的密码，既有角色只验证、不轮换。迁移按 manifest 重放 **16 份历史 SQL**（12 份后端、3 份扩展、1 份已并入逻辑的手工补丁），再加 1 份目标兼容调整和 1 份权限收紧，共 18 项账本，逐条校验哈希。应用账号只得到 11 个 RPC 执行权，没有表写入、CREATE、BYPASSRLS 或 owner 成员资格。
+`db-init` 只对空目标初始化安全角色；新建登录角色才设置 `configure` 保存的密码，既有角色只验证、不轮换。当前发布迁移按 manifest 重放 **16 份历史 SQL**（12 份后端、3 份扩展、1 份已并入逻辑的手工补丁），再加 1 份原目标兼容调整、4 份本次业务升级和 2 份权限收紧，共 **23 项账本**，逐条校验哈希。应用账号只得到 **12 个 RPC** 执行权，没有表写入、CREATE、BYPASSRLS 或 owner 成员资格。已存在旧账本的库保留历史记录，仅追加审核后的新迁移；不能对现有 `goufayu_test` 重做空库初始化。
 
 **分支 B：迁移源 Supabase 的现有玩家数据。** 先做第 5 节的只读导出、独立恢复演练和 reconcile 验证。**不要先执行分支 A 的 `migrate` 建表。** 演练通过后，最终复用已有 `goufayu_test`：它仍为空才允许 `db-init` 仅配角色，然后 `trial-restore` 导入该空库，最后 `reconcile`。若 `goufayu_test` 已有业务对象，必须拒绝覆盖并保留，另做明确的数据合并/切换计划；不 `--clean`、不清库重试，也不默认把应用改指演练库。
 
@@ -239,10 +239,10 @@ python database/dbtool.py --pg-bin <PG17-bin> export --source-service legacy_rea
 
 ```sh
 .venv/bin/python deploy/manage.py trial-restore \
-  --release /opt/goufayu/releases/20260919-test02 \
+  --release /opt/goufayu/releases/20260920-test05 \
   --backup /var/backups/goufayu/source_export_20260919 \
   --name goufayu_restore_trial_20260919 \
-  --pg-bin /opt/goufayu/releases/20260919-test02/deploy/pg-bin
+  --pg-bin /opt/goufayu/releases/20260920-test05/deploy/pg-bin
 ```
 
 入口只新建指定 `goufayu_restore_*`，目标已存在即拒绝；不复用、不 drop、不清空原 `goufayu_test`。创建前先验证已存在的专用登录角色及密码；首次部署尚无 `goufayu_owner` 时，由管理员创建新库，再初始化安全角色和 schema，并仅为本次新建角色设置 `configure` 保存的密码，不要求先跑分支 A。恢复比较表指纹、字段、索引/约束、函数和触发器。报告保留在导出目录 `<db>_restore_verification.json`，部署入口另写 `/var/lib/goufayu/restore/<db>/result.json`。失败时保留现场，不自动删除数据库。
@@ -255,7 +255,7 @@ export PGPASSFILE=/etc/goufayu/migrator.pgpass
 .venv/bin/python database/dbtool.py reconcile \
   --target-service goufayu_trial \
   --backup /var/backups/goufayu/source_export_20260919 \
-  --bundle /opt/goufayu/releases/20260919-test02/database
+  --bundle /opt/goufayu/releases/20260920-test05/database
 ```
 
 审阅 `database/README.md` 和实际 reconcile 报告。不能在无账本的既有对象上直接运行 `migrate` 强行认领，也不能把恢复 PASS 当作 reconcile 已通过。
@@ -269,23 +269,23 @@ systemctl stop goufayu-api.service  # 若尚未安装该 unit，略过此行；�
 export PGSERVICEFILE=/etc/goufayu/pg_service.conf
 export PGPASSFILE=/etc/goufayu/migrator.pgpass
 .venv/bin/python deploy/manage.py db-init \
-  --release /opt/goufayu/releases/20260919-test02 --confirm-empty
+  --release /opt/goufayu/releases/20260920-test05 --confirm-empty
 .venv/bin/python database/dbtool.py --pg-bin deploy/pg-bin trial-restore \
   --target-service goufayu_migrator --backup /var/backups/goufayu/final_source_export
 .venv/bin/python database/dbtool.py reconcile \
   --target-service goufayu_migrator --backup /var/backups/goufayu/final_source_export \
-  --bundle /opt/goufayu/releases/20260919-test02/database
+  --bundle /opt/goufayu/releases/20260920-test05/database
 ```
 
-确认真实目标名、报告、原玩家数据指纹、11 RPC 权限后再启应用。`goufayu_app` 保持 `dbname=goufayu_test`。独立 `goufayu_restore_*` 只用于演练，不是默认上线目标。
+确认真实目标名、报告、原玩家数据指纹、12 RPC 权限后再启应用。`goufayu_app` 保持 `dbname=goufayu_test`。独立 `goufayu_restore_*` 只用于演练，不是默认上线目标。
 
 ## 6. 本机启动与验收
 
 完成 schema/权限验收后，安装 unit 模板，再显式激活：
 
 ```sh
-.venv/bin/python deploy/manage.py install-units --release /opt/goufayu/releases/20260919-test02
-.venv/bin/python deploy/manage.py activate --release /opt/goufayu/releases/20260919-test02
+.venv/bin/python deploy/manage.py install-units --release /opt/goufayu/releases/20260920-test05
+.venv/bin/python deploy/manage.py activate --release /opt/goufayu/releases/20260920-test05
 .venv/bin/python deploy/manage.py health
 systemctl status goufayu-api.service --no-pager
 ss -lntp
@@ -301,7 +301,7 @@ ss -lntp
   --report /var/lib/goufayu/http-acceptance.json
 ```
 
-它默认不写库，只有显式确认后才用两个随机 `900` 开头合成账号执行。PASS 只覆盖该报告中的 HTTP 测试，不代表真实游戏、进程重启持久化或异地恢复已验收；当前未在 ECS 执行。
+它默认不写库，只有显式确认后才用两个随机 `900` 开头合成账号执行。PASS 只覆盖该报告中的 HTTP 测试，不代表真实游戏、进程重启持久化或异地恢复已验收；本次 ECS 实际执行与独立重启证据见第 13 节。新版抽奖另使用 [lottery_upgrade_acceptance.py 操作说明](../server/aliyun/tests/LOTTERY_ACCEPTANCE.md)。
 
 首次验收生成格式 2 的受限权限报告，保存合成账号、操作编号、计数和存档摘要，不保存 token 或完整档案。随后记录进程身份并实际重启，再复验**同一批**账号：
 
@@ -326,13 +326,13 @@ systemctl show goufayu-api.service --property=MainPID,InvocationID
 
 `activate` 切换 `current`，记录旧链接，启动服务并限时检测；未就绪会停服务，不自动降级数据库或切回旧版本继续写。
 
-主服务依赖现有 `goufayu-db.service`；失败自动重启带退避和启动频率限制。非 root、只读系统、私有临时目录、512 MiB 内存及 64 任务上限、网络只允许 localhost。新 unit 是否被当前 systemd/cgroup 支持，应以服务器 `verify` 和运行日志为准。
+主服务依赖现有 `goufayu-db.service`；失败自动重启带退避和启动频率限制。非 root、只读系统、私有临时目录、512 MiB 内存及 64 任务上限。API 和数据库仅绑定 localhost；当前宿主机不支持 unit 的 BPF/cgroup 网络限制，因此不能声称已经限制进程所有出站连接。unit 支持情况以服务器 `verify` 和运行日志为准。
 
 验收分开记录：
 
 1. 5432 与 8765 只监听 loopback；外部不能直连。安全组和防火墙不开放这两个端口。
 2. 正确身份/权限、schema 与 RPC 校验通过；应用不是管理员/migrator。
-3. `/health` 200 是进程存活；`manage health` 另外使用 Bearer 认证访问 `/ready`，要求实际数据库探测返回 `database=ready`，再校验 archive 配置哈希。数据库可连仍不等于可恢复。
+3. `/health` 需 HTTP 200 且 JSON `ok=true`，表示进程存活；`manage health` 另外使用 Bearer 认证访问 `/ready`，要求 HTTP 200、`ok=true` 及实际数据库探测 `database=ready`，再校验 archive 配置哈希。该 API 不返回用于验收的 `status="ok"` 字段。数据库可连仍不等于可恢复。
 4. 使用专门测试账号做 profile、在线检查点、存档指令、重试幂等性与断线恢复；测试数据记录清楚，不拿真实玩家随意发奖励。
 5. Lua 结算兼容、CSV version 对齐、包哈希与游戏 Lua 一致。
 6. 本机备份、异地副本、独立恢复三个状态分别记录。
@@ -398,7 +398,7 @@ restic restore <EXACT_SNAPSHOT_ID> --target /var/backups/goufayu/offsite_drill_2
 |---|---|
 | URL | `data/csv/玩家档案系统/fishing_system_rules.csv` 的 `api_base_url`，生成 `scripts/vscripts/config/generated/fishing_system_rules.lua`；当前 `http://127.0.0.1:8765` |
 | token | 仅 Dota 服务器 ConVar `survival_fishing_api_token`，不能写进 Panorama 客户端 |
-| provider | `player_profile_rules.csv` 默认 `local_fixture`；服务器显式覆盖 `survival_player_profile_provider=http_fishing` |
+| provider | `player_profile_rules.csv` 当前默认 `http_fishing`，禁止自动回退本地模拟档案；服务器 ConVar 为 `survival_player_profile_provider` |
 | 存档 HTTP | 服务器 `survival_archive_http_enabled=1`，后台 `SURVIVAL_ARCHIVE_HTTP=1` |
 | 测试 fixture | `survival_fishing_reward_fixture` 在正常测试迁移中留空；`automation_9001`/`production_60s` 是工具测试配置 |
 
@@ -415,7 +415,7 @@ restic restore <EXACT_SNAPSHOT_ID> --target /var/backups/goufayu/offsite_drill_2
 3. 若既有 `goufayu_test` 仍空，按第 5 节最终恢复步骤复用该库，再 reconcile、核对指纹和权限；若非空，停止并保留，不擅自覆盖。备份原 service/env/版本链接，目标仍是 `goufayu_test`，保持 pepper 和 token。
 4. 先限制到测试服务器/测试玩家进行读取与幂等写验收，再开放预定测试范围；同一玩家不得同时向两套数据库写入。
 5. 记录第一笔目标新写入时间。若发现问题，先停写并备份新目标，不立刻把 URL 切回旧库。
-6. **尚无新写入**时，可按记录恢复旧 URL/env/current 并启动原服务；**已有新写入**时，必须先对差异做受审的迁回/对账与重放，确认目标新增记录、幂等回执和在线 outbox 都保留后才能切回。直接回旧快照会丢数据。
+6. **尚无新写入且旧代码与当前数据库权限、结构已验证兼容**时，才可按记录恢复旧 URL/env/current 并启动原服务；**已有新写入**时，必须先对差异做受审的迁回/对账与重放，确认目标新增记录、幂等回执和在线 outbox 都保留后才能切回。直接回旧快照会丢数据。当前 test03 严格要求旧 11-RPC 权限，与升级后的 12-RPC 数据库不兼容，不能直接激活回退。
 7. 代码版本回退与数据库回退分开。`previous-release` 只记录旧代码位置，不保证旧代码兼容新 schema；部署工具不会自动清库、执行 down migration 或删除新发布。
 
 ## 10. 第一阶段本地检查（历史记录）
@@ -435,13 +435,13 @@ bash -n server/aliyun/deploy/provision_host.sh
 - 带数据完整库恢复、仅旧 9 表的源库恢复后升级、已升级库再次灾备恢复均通过。比较内容指纹、结构、函数、触发器，旧列数据未改变；拒绝覆盖非空库。
 - Python 3.11 语法及 shell 语法通过。本地运行实际使用 Python 3.13.13、Lua 5.4.5、psycopg 3.3.6。
 
-本节记录连接 ECS 前的本地验证，不能用于判断当前部署状态。最新状态见第 12 节。
+本节记录连接 ECS 前的本地验证，不能用于判断当前部署状态。最新状态见第 13 节。
 
 待完成：专用 SSH 公钥安装和指纹核验、目标机 Python/Lua 和 PG 客户端检查、源 Supabase 连接/只读导出、隔离恢复与权限验收、实际本机联调、域名/HTTPS、独立异地仓库和从异地恢复。当前没有进行云端切换。
 
 ## 11. 首次连接受阻时的准备记录（历史，2026-09-19）
 
-**以下是公钥修复前的历史记录，当前部署状态见第 12 节。** 当时 Windows OpenSSH 可用，已到达 `47.110.238.248:22` 的 SSH 握手阶段；实际检查 `C:/Users/li/.ssh` 不存在。严格主机验证返回 `No ED25519 host key is known` / `Host key verification failed`，当时没有成功认证或执行远端命令。
+**以下是公钥修复前的历史记录，当前部署状态见第 13 节。** 当时 Windows OpenSSH 可用，已到达 `47.110.238.248:22` 的 SSH 握手阶段；实际检查 `C:/Users/li/.ssh` 不存在。严格主机验证返回 `No ED25519 host key is known` / `Host key verification failed`，当时没有成功认证或执行远端命令。
 
 候选公开主机指纹为 `SHA256:3cUNJuxLSLLSw7CIDmtOis7yGlxaSt+D7DQJmc6Uno8`，**尚未经阿里云控制台确认，不作为可信主机记录**。先完成第 2 节的本地密钥生成、服务器追加公钥及控制台指纹核对。当前无需为了此次连接另开安全组端口。工具进程的默认 SSH home 与 Windows 用户 home 可能不同，实际部署命令应显式指定 `C:/Users/li/.ssh` 下的 IdentityFile、UserKnownHostsFile，避免读错配置。
 
@@ -471,7 +471,9 @@ bash -n server/aliyun/deploy/provision_host.sh
 
 当前没有远端变更，无需服务器回退。后续若测试部署验收失败，先停止 `goufayu-api.service`；保留数据库、测试数据、原密码和发布目录。只有确认旧代码兼容当前数据库后才切回记录的旧发布，涉及新写入时按第 9 节处理，不恢复旧快照覆盖新数据。
 
-## 12. ECS 实际部署（2026-09-19）
+## 12. ECS 首次部署（历史记录，2026-09-19）
+
+**本节记录当时 test03 的部署和旧数据库状态；当前版本及回退约束见第 13 节。不要把下文的旧迁移/RPC 数量当成当前值。**
 
 公钥修复后已通过严格主机验证连接 ECS，用户在控制台核对过服务器主机指纹。实际登录使用本机 `goufayu_ecs_ed25519_v2`，私钥保留在本机 SSH agent 中。
 
@@ -522,8 +524,170 @@ systemctl disable --now goufayu-api.service
 
 恢复测试后端运行：`systemctl enable --now goufayu-api.service`，再执行上述 health 检查。
 
-`/var/lib/goufayu/previous-release` 记录 test02。test03 与 test02 数据库结构一致，但 **test02 的备份桥接有已知缺陷**，不建议常规回退到该版本。如果仅为 API 排障必须切回 test02，先停止 `goufayu-backup.timer`，再使用 test02 的 `deploy/manage.py activate --release /opt/goufayu/releases/20260919-test02` 切换并检查 health；备份修复版恢复后才重新启用 timer。版本切换机制已在 test02→test03 实际执行，反向回退未演练。
+当时 `/var/lib/goufayu/previous-release` 记录 test02，test03 与 test02 的数据库结构一致；但 test02 的备份桥接有已知缺陷。该记录不适用于本次升级后的数据库，**现在不得直接激活 test02/test03 回退**。版本路径记录不保证旧后端与当前权限兼容，按第 13 节隔离恢复及保留新增数据的步骤处理。
 
 不执行 down migration，不还原旧快照覆盖新写入，不删除 `/data/postgres17`。以后若切换真实游戏或迁入 Supabase 数据，仍必须执行第 9 节的停写、最终一致性备份、对账和防丢数据回退流程。
 
 **仍缺配置 / 未验收：** 测试域名、Nginx/HTTPS、自动异地备份仓库（OSS/S3 兼容或独立 SFTP 主机）及从该仓库恢复；Supabase 源业务数据迁移、真实游戏客户端联调、整台 ECS 重启和真实数据库停机演练。当前没有向公网开放 API，没有开启真实支付。
+
+## 13. 新版存档与抽奖实际升级（2026-09-20）
+
+### 当前部署
+
+| 项目 | 已验证结果 |
+|---|---|
+| 发布目录 | `/opt/goufayu/releases/20260920-test05` |
+| 当前链接 | `/opt/goufayu/releases/current` → `20260920-test05` |
+| 后端服务 | `goufayu-api.service`，`active/running`，开机自启 `enabled`，用户 `goufayu`，`Restart=on-failure` |
+| 后端监听 | `127.0.0.1:8765` |
+| 数据库 | 复用 `goufayu_test`、`goufayu-db`、PG 17.11、`127.0.0.1:5432`、`/data/postgres17` |
+| 迁移和权限 | 23 项迁移/加固账本记录，应用仅有 12 个 RPC；无表访问、DDL 或 owner 角色成员资格 |
+| 服务器报告 | `/var/lib/goufayu/upgrade-20260920` |
+| 支付 / Supabase | `PAYMENT_MODE=test`，未接真实收款；Supabase 原数据未修改、未导入 |
+
+发布包 SHA256：`bd497cf2114d2c81f7d96eb61b03165d13d270660b999243b9022b13ad0a21d3`。
+游戏 `scripts/vscripts/config/generated/archive_http_bundle.lua` 与 test05 的结算包一致：
+`4b28247fa0bbabf0d220b4f178a9d8379fc54d362792b031fbfcd5a71c8bf20d`。
+历史结算包仍保留，以支持旧未完成回执恢复。
+
+### 备份、试迁移和目标升级
+
+1. API 停止期间对现有测试库做一致性备份，目录
+   `/var/backups/goufayu/preupgrade_20260920_005800Z`；15 张表来自同一导出快照。
+   `database.dump` SHA256 为 `65f4b1670cb063ae1ef76db26105bf9711d846cb86ea77ebcc9daa7cddf97f32`。
+2. 恢复到新的独立库 `goufayu_restore_upgrade_20260920`，表内容指纹、函数、触发器、
+   约束和索引比对通过。保留原 `goufayu_test`，未重新初始化集群、数据目录或管理员密码。
+3. 在恢复库先执行 4 项审核业务升级及独立抽奖权限加固；验收通过后对 `goufayu_test`
+   执行相同升级。保留旧 SQL 与迁移账本校验值，新增账本到 23 项。两个库重复执行
+   均新增 0 项迁移，所有业务行保持不变。
+4. 原有 4 个合成账号的木材默认秒产各减少一次，最低为 0，对应 revision 增加；
+   重复执行不会继续扣减。攻击/属性成长仅调整默认值，已有玩家值、奖励历史、
+   内容库存及在线 outbox 保留。
+5. 恢复库和目标库各通过真实 PG 回滚事务验收：97 项 CSV 默认值、6 项越权拒绝、
+   领奖/存档/在线检查点幂等、抽奖回执和库存原子提交、旧 revision 拒绝及 outbox
+   只结算一次。该 SQL 检查提交测试行数为 0。
+
+### 实际 API、抽奖与重启验收
+
+- `manage.py health` 通过：`/health` HTTP 200 且 `ok=true`；认证 `/ready`
+  HTTP 200 且 `ok=true, database=ready`；归档配置哈希与当前发布相同。
+- HTTP 存档 **9 项**通过：鉴权、建档、读写、相同指令重试一次结算、玩家隔离、
+  重新连接存档保留、拒绝原始存档上传及正数在线时长检查点幂等。
+- 真实 HTTP + Lua 抽奖 **7 项**通过：两个新合成账号各取得普通地图券后十连；
+  真实扣券、结果和回执持久化、相同完整 command ID 重放不重复扣发、玩家隔离、
+  永久内容保留以及旧存档上传拒绝。没有充值特殊券或启用支付。
+- 非 root 运行账号完成 **2 项**保护检查：旧 revision 不能覆盖新永久奖励；独立
+  测试 HTTP 实例连接失败数据库时返回 503，不返回空 profile/save，原健康库数据不变。
+  该测试未停止数据库，也不代表真实数据库服务停机已演练。
+- 手动重启 API：PID `15435 → 15885`。之后模拟 API 进程异常，systemd 自动拉起：
+  PID `15885 → 15959`，`NRestarts: 0 → 1`。两次恢复均验证原 4 个合成账号完整
+  存档摘要、revision 和抽奖快照保持一致；数据库服务 PID 始终为 `6590`。
+
+这些结果使用合成账号，**不等同于真实游戏客户端已连接成功**。验收报告只保存
+合成 ID、摘要和结果，不保存密码、token、完整玩家存档或密钥。
+
+本地脱敏过程日志在 `output/ecs_upgrade_20260920/`：`backup_before_upgrade.log`、
+`restore_before_upgrade.log`、`upgrade_clone.log`、`upgrade_test_database.log`、
+`activate_test05.log`、`http_acceptance_test05.log`、`restart_test05.log`。
+该目录和私有数据库备份均不提交仓库。
+
+### 升级后的异地副本与恢复验收
+
+新备份为 `/var/backups/goufayu/postupgrade_20260920_014155Z`，16 张表使用同一
+一致性快照，dump SHA256 为
+`e1f87fd3ae7e1132c284155a70fb9ac94e6b30543720921dac93675e04b81eab`。
+
+4 个备份文件已下载到本地电脑
+`D:/survival_database/local_test_exports/20260920-upgrade/postupgrade_20260920_014155Z`，
+逐一校验 SHA256；目录访问权限受限且被 Git 忽略。随后从**该本地副本**重新上传到
+`/var/lib/goufayu/restore-input-20260920/postupgrade_20260920_014155Z`，恢复到新的
+独立库 `goufayu_restore_postupgrade_20260920`。16 张表数据指纹、表结构、函数、
+触发器、约束和索引全部相同；再施加权限加固，新增迁移为 0、账本 23 项、
+12 个应用 RPC，应用无直接表访问、DDL 或角色成员权限。原 `goufayu_test` 未被覆盖。
+
+`goufayu-backup.timer` 保持 enabled/active；日志轮转配置解析通过。
+**自动异地同步尚未配置**，手动副本及其恢复验证不等于定时异地备份完成。
+详情见 [脱敏验收记录](../server/aliyun/validation/ecs_upgrade_20260920.json)。
+
+### 本地电脑操作：游戏测试隧道
+
+游戏默认 provider 为 `http_fishing`，CSV URL 保持 `http://127.0.0.1:8765`；
+该 localhost 是运行游戏服务器的电脑。本次已建立匹配端口的 SSH 隧道，
+通过它验证了健康检查、认证 `/ready`、未认证请求拒绝和游戏配置哈希。
+Python 和数据库端口在 ECS 上仍只绑定 loopback。
+
+在项目根目录 PowerShell 中执行以下命令可检查隧道：
+
+```powershell
+& output/ecs_backend_work/.venv/Scripts/python.exe -B tools/aliyun_test_connection.py check
+```
+
+如电脑重启或隧道退出，将 `check` 改成 `connect`；结束联调时改成 `stop`。
+该工具仅管理自己创建且身份校验匹配的 SSH 进程，不会终止占用同端口的其他程序。
+需要本机 ssh-agent 已解锁专用密钥，以及已经核对过服务器指纹的
+`output/ecs_backend_work/ecs_hostkey_candidate.pub`。这些本机文件不提交仓库。
+
+下一步在 Dota 2 Workshop Tools 正常启动 `survival` 游戏并进入测试地图。
+`launch_template_map.cmd` 是美术预览入口，会改变时速和 UI，不能作为正常存档验收入口。
+认证口令仅在本机 Tools 服务器内传入；不粘贴到控制台或聊天、不提交仓库。
+真实游戏内存档写入、退出重进、抽奖与界面反馈**尚未验证**。
+
+进入可操作英雄的正常游戏后，可在项目根目录 PowerShell 执行：
+
+```powershell
+& output/ecs_backend_work/.venv/Scripts/python.exe -B tools/aliyun_game_test_auth.py probe
+& output/ecs_backend_work/.venv/Scripts/python.exe -B tools/aliyun_game_test_auth.py inject
+```
+
+`probe` 只检查本工具管理的隧道和正常 `template_map` Tools 服务器。
+`inject` 从本机现有 `.env` 选择 API token，先验认证 `/ready`，再通过访问权限
+受限、Git 忽略的临时 KV 文件传给服务器 ConVar，并在成功或失败后删除临时文件。
+命令行、请求 JSON、生成 Lua 和工具输出均不包含口令，不传入账户 pepper。
+ConVar 仍可被本机开发者查询，此工具仅用于本机联调，不是正式游戏的凭据分发方式。
+本工具尚待实际游戏运行验证；能力探测失败时不会读取或写入认证口令。
+
+首次空 token 导致的档案加载失败会在正常游戏时间推进后重试（间隔约 5 个游戏秒）。
+不要重复调用档案服务 `init`；暂停状态或美术预览极慢时速会延迟重试。
+
+域名、Nginx/HTTPS、自动异地备份仓库及该仓库恢复、Supabase 源玩家迁移仍未完成；
+整台 ECS 重启和真实数据库停机也未演练，真实支付保持关闭。
+
+### 当前安全回退方式
+
+出现问题先停 API 写入，保留数据库和全部备份：
+
+```sh
+systemctl stop goufayu-api.service
+```
+
+需一并关闭开机自启时使用 `systemctl disable --now goufayu-api.service`。
+只恢复当前 test05 运行，可使用 `systemctl enable --now goufayu-api.service`，随后执行：
+
+```sh
+/opt/goufayu/releases/current/.venv/bin/python -B /opt/goufayu/releases/current/deploy/manage.py health
+```
+
+**不要直接 `activate` test03/test02。** 旧后端严格校验 11 个 RPC，当前数据库
+已授予 12 个 RPC，因此旧代码不能直接连接当前已升级库。`previous-release` 只记录
+代码路径，不能证明数据库可回退。需要旧版行为时先备份当前新写入，另建独立库恢复
+上述升级前备份，验证旧后端和权限后再制定测试连接切换、新增数据保留和对账方案。
+不得将旧快照覆盖 `goufayu_test`，不得删除数据目录或自动执行 down migration。
+
+## 14. 游戏建造提示 profile_not_loaded（2026-09-22）
+
+实际定位：ECS 和 SSH 隧道正常，但当前游戏进程未设置认证 token，因此档案和资源
+账户均未初始化。游戏还处于暂停，按游戏时间调度的加载重试没有推进。
+安全注入认证后，只为尚未加载档案的玩家触发正常读取，当前玩家档案和资源账户
+已恢复；未使用本地空存档替代远端存档，未重置当前对局或已加载的档案。
+
+以后测试请双击项目根目录 `launch_aliyun_test_game.cmd`。它依次连接 ECS 隧道、
+打开正常 `survival/template_map` Tools 游戏、等待游戏就绪、配置认证，并请求缺失档案。
+如果 Dota 已打开，只尝试接入现有游戏，不重开地图。工具只回显状态，认证临时文件
+用后删除；本机密钥仍由 ssh-agent 管理，不在仓库保存密钥或 token。
+
+附加修复：档案预加载、英雄就绪和显式重试统一记录正在进行的请求，避免新请求替代
+旧请求后，旧回包被丢弃却永久阻塞后续重试。错账号响应继续拒绝，同时正确结束本次
+尝试。回归测试覆盖认证恢复、失败间隔、过时响应、账户隔离和已有永久物品保留。
+该 Lua 修复在下次正常加载地图时生效；本次未热重载或重新初始化正在玩的档案服务。
+
+当前确认的是档案与建造资源恢复，最终建筑落地结果仍需实际游戏操作确认。
