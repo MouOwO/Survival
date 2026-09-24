@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-24",
+  "root_cause": "Hammer Run Map bypassed the CMD launcher's connection and runtime credential injection. Actual Tools/template_map server had an empty API token despite a healthy owned ECS tunnel.",
+  "current_hammer_match": {
+    "before": {"tools": true, "map": "template_map", "token_configured": false, "loading_phase": "error"},
+    "after": {"tools": true, "map": "template_map", "token_configured": true, "loading_phase": "ready", "players": 1, "authenticated_players": 1},
+    "map_restarted": false,
+    "mode_selected_by_agent": false,
+    "profile_reset": false
+  },
+  "installed": {
+    "task": "Goufayu-Hammer-Test-Backend",
+    "trigger": "current-user Windows sign-in",
+    "run_level": "Limited",
+    "window": "hidden PowerShell wrapper and Python console interpreter; Blender venv lacks a base pythonw interpreter",
+    "status": "running",
+    "single_active_instance": "verified against real Windows byte lock",
+    "graceful_restart": "verified",
+    "temporary_credential_files_remaining": 0
+  },
+  "tests": {
+    "test_hammer_backend_bridge": 13,
+    "test_aliyun_test_connection": 18,
+    "test_aliyun_game_test_auth": 11,
+    "lua_regressions": ["test_player_entry_authentication", "test_player_profile_load_retry", "test_startup_loading_service"],
+    "powershell_parse": "PASS",
+    "diff_check": "PASS"
+  },
+  "limits": [
+    "Current session recovery and resident helper were tested; user map was not restarted for another Hammer Run Map test.",
+    "Windows sign-out/reboot was not performed.",
+    "Existing key did not authenticate with IdentityAgent=none. SSH agent is currently running with Manual startup; changing it to Automatic was rejected by automatic approval review and remains pending explicit user approval.",
+    "This is a localhost development bridge, not the public production HTTPS/credential distribution setup."
+  ],
+  "rollback": "Run tools/setup_hammer_backend.ps1 -Action Uninstall. Existing map, SSH tunnel, ECS services and data remain intact.",
+  "server_changes": "none"
+}

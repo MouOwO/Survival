@@ -98,16 +98,22 @@ function M.return_unit(hero, player_id)
         return { ok = false, error = "return_position_not_found" }
     end
 
-    event_bus.request(events.TRAINING_ROOM_EXIT_REQUEST, {
-        player_id = player_id,
-        reason = "return_home",
-    })
-
     hero:Stop()
     ProjectileManager:ProjectileDodge(hero)
     local moved, move_error = destination_validation.teleport(hero, position, false)
     if not moved then return { ok = false, error = move_error } end
     position = hero:GetAbsOrigin()
+    -- Leave rooms only once movement succeeds. A blocked home destination must
+    -- not cancel the player's current encounter or begin its retry cooldown.
+    event_bus.request(events.TRAINING_ROOM_EXIT_REQUEST, {
+        player_id = player_id,
+        reason = "return_home",
+    })
+    event_bus.emit(events.HERO_RETURNED_HOME, {
+        player_id = player_id,
+        hero = hero,
+        position = position,
+    })
     follow_hero_camera(hero, player_id, position)
     notify(player_id, "已返回主城")
     return { ok = true, position = position }

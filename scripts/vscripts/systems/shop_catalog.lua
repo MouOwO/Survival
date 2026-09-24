@@ -356,8 +356,14 @@ local function project_entry(player_id, entry, context)
         disabled_reason_code = ok and "" or "condition_not_met",
         purchase_condition_text = entry.condition_text,
         owned_count = count,
-        purchase_limit = entry.purchase_limit,
-        purchase_cooldown_seconds = tonumber(entry.purchase_cooldown_seconds) or 0,
+        -- Rebirth has a completion limit, not an attempt/stock limit. Reporting
+        -- 1 here makes the UI mark a failed attempt as sold out during retry.
+        purchase_limit = entry.contenttype == "rebirth"
+            and entry.grant_type == "start_encounter" and 0 or entry.purchase_limit,
+        purchase_cooldown_seconds = context.purchase_cooldowns
+            and context.purchase_cooldowns[entry.entryid]
+            and context.purchase_cooldowns[entry.entryid].total
+            or tonumber(entry.purchase_cooldown_seconds) or 0,
         purchase_cooldown_remaining = context.purchase_cooldowns
             and context.purchase_cooldowns[entry.entryid]
             and context.purchase_cooldowns[entry.entryid].remaining or 0,

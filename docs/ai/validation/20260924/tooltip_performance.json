@@ -1,0 +1,82 @@
+{
+  "date": "2026-09-24",
+  "scope": "Client-side selection tooltip binding and combat hotkey refresh",
+  "sourceFiles": [
+    "panorama/src/scripts/custom_game/ability_tooltip.js",
+    "panorama/src/scripts/custom_game/combat_stats.js"
+  ],
+  "tests": [
+    {
+      "file": "tools/test_ability_tooltip_recovery.cjs",
+      "passed": true,
+      "output": "  full binds=2, scans=2, ability reads=28, unit metadata reads=7\nPASS stable four-ability selection stops full recovery and avoids duplicate scans\nPASS HUD panels arriving at 0.35s still recover\nPASS HUD panels arriving at 0.6s still recover\nPASS late native HUD replacement refreshes stable proxy geometry\nPASS same-unit ability replacement updates bindings and restores a real hover\nPASS rapid selection switches cannot bind stale unit data\nPASS duplicate same-unit selection events coalesce\nPASS shutdown cancels pending recovery and prevents future work\nPASS late per-ability runtime arrives without changing the unit slot signature\nPASS diagnostics can be enabled and disabled without a lingering cursor probe\nPASS native unit with no visible abilities settles without creating proxies\nABILITY_TOOLTIP_RECOVERY_PASS\n"
+    },
+    {
+      "file": "tools/test_ability_tooltip_stability.cjs",
+      "passed": true,
+      "output": "ABILITY_TOOLTIP_STABILITY_PASS: fixed bottom across heights, synchronous skill switch, pooled fields, stale hide cancelled\n"
+    },
+    {
+      "file": "tools/test_ability_hover_bounds.cjs",
+      "passed": true,
+      "output": "ABILITY_HOVER_BOUNDS_PASS: scaled icon interior/bottom/right/healthbar at 3 resolutions and 3 skill counts\n"
+    },
+    {
+      "file": "tools/test_hero_skill_upgrade.cjs",
+      "passed": true,
+      "output": "HERO_SKILL_UPGRADE_PASS: native slot placement, ownership, points, response ordering, duplicate clicks, retry, selection and reload; old management removed, reward choice retained\n"
+    },
+    {
+      "file": "tools/test_combat_selection_recovery.cjs",
+      "passed": true,
+      "output": "COMBAT_SELECTION_RECOVERY_PASS: merged events, single mapping discovery, stable shortcuts, late/rebuilt HUD, runtime reconciliation, key assignments and shutdown\n"
+    },
+    {
+      "file": "tools/test_combat_stats_callbacks.cjs",
+      "passed": true,
+      "output": "COMBAT_CALLBACK_TEST_PASS: timer/event lifecycle, stale queued snapshots, unsubscribe, native styles, coordinate vectors, scaling and recovery\n"
+    }
+  ],
+  "mockComparison": {
+    "workload": "One four-ability unit switch after startup settled; 11 simulated seconds; same mocked engine for both sources",
+    "before": {
+      "fullBinds": 8,
+      "panelScans": 16,
+      "abilityReads": 1288,
+      "unitMetadataReads": 1610,
+      "scheduledCallbacks": 220,
+      "logLines": 17
+    },
+    "after": {
+      "fullBinds": 2,
+      "panelScans": 2,
+      "abilityReads": 20,
+      "unitMetadataReads": 5,
+      "scheduledCallbacks": 12,
+      "logLines": 0
+    },
+    "metricsAreRealFrameTimes": false
+  },
+  "compiled": {
+    "script": "tools/build_tooltip_performance.ps1",
+    "passed": true,
+    "sourceHashesMatchContent": true,
+    "backup": "output/tooltip_perf_20260924/build_20260924_160623",
+    "artifacts": [
+      "panorama/scripts/custom_game/ability_tooltip.vjs_c",
+      "panorama/scripts/custom_game/combat_stats.vjs_c"
+    ]
+  },
+  "liveVerification": {
+    "verified": false,
+    "reason": "Local console connection refused at 127.0.0.1:29000; user asked to enter test map. No FPS or memory improvement claimed."
+  },
+  "protectedBehavior": [
+    "Late native HUD panels and rebuilt panels",
+    "Late per-ability runtime tables with unchanged engine slots",
+    "Skill replacement while hovering",
+    "Native skill point upgrades",
+    "F2/research/building hotkeys",
+    "Rapid selection and context shutdown"
+  ]
+}

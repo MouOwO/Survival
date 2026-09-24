@@ -1,0 +1,81 @@
+{
+  "date": "2026-09-23",
+  "scope": "Kill retarget, player-city hero summon, rebirth abandonment retry, passive point buttons on the native ability bar, retired passive management window",
+  "implementation": {
+    "tower": "Select and order the next legal target immediately on target death, without Stop/disarm between enemies. Recover an interrupted order on the next 0.25-second think. Preserve tree exclusion and explicit idle when no enemy exists.",
+    "summon": "Resolve the live completed main city belonging to the requesting player; search nearby grounded, navigable, unoccupied positions with hero clearance. Fail before charging if no safe position exists.",
+    "rebirth": "Successful F2 return or challenger death cancels the owned rebirth attempt without completion rewards. Retry after 2 seconds. Actual progression, rather than attempt count, locks completed tiers.",
+    "passive_points": "Gold plus above an eligible passive in the existing native ability bar. Server validates actor, hero entity, observed level, ownership, lock, max level and available points before spending. Duplicate observed-level requests cannot spend twice.",
+    "removed_ui": "Upper-left passive button, management window, its tooltip/list rendering, and its state request/push logic removed. Actual skills and reward choice UI retained."
+  },
+  "regression_pass": {
+    "lua": [
+      "test_tower_idle_state", "test_tower_target_selection", "test_tower_upgrade_targeting",
+      "test_tower_skill_tree_exclusion", "test_tree_attacker_whitelist", "test_ultimate_tower_tree_targeting",
+      "test_hero_summon_destination", "test_hero_summon_flow", "test_rebirth_return_retry",
+      "test_monster_ground_navigation", "test_shop_early_final_cooldown", "test_challenge_unit_names",
+      "test_hero_instant_blink", "test_hero_skill_point_upgrade"
+    ],
+    "javascript": [
+      "test_hero_skill_upgrade.cjs", "test_ability_tooltip_stability.cjs",
+      "test_ability_hover_bounds.cjs", "test_combat_stats_callbacks.cjs"
+    ],
+    "ui_compilation": "8 source entry points compiled, 0 failures; game authoring copies and content sources match 8/8",
+    "whitespace": "git diff --check passed"
+  },
+  "live": {
+    "environment": "Local survival Workshop template_map, authenticated test backend, pure mode, N1; single local player",
+    "tower": {
+      "result": "PASS",
+      "next_attack_after_kill_seconds": 0.067,
+      "native_attack_interval_seconds": 0.4,
+      "tree_attack_starts": 0,
+      "tree_damage": 0,
+      "stop_recovery": "PASS",
+      "idle_when_only_tree_remains": "PASS",
+      "remaining_probe_handles": 0
+    },
+    "summon": {
+      "result": "PASS",
+      "hero": "hero_doom",
+      "own_main_city_level": 3,
+      "actual_spawn_distance": 256,
+      "destination_probe_checks_passed": 11,
+      "nearby_reachable_directions": 8,
+      "remaining_probe_handles": 0
+    },
+    "rebirth": {
+      "result": "PASS",
+      "flow": "Real shop purchase -> F2 return ability -> early retry rejected -> 2-second cooldown -> second real purchase -> F2 return ability",
+      "both_bosses_removed": true,
+      "home_distance": 420,
+      "completion_events": 0,
+      "kill_reward_events": 0,
+      "progression_and_pending_rewards_unchanged": true
+    },
+    "passive_plus": {
+      "result": "PASS",
+      "skill": "proto_flame_burst",
+      "method": "Physical clicks in the verified 1600x900 Dota test window",
+      "observations": [
+        {"level": 1, "points": 2, "plus_visible": true},
+        {"level": 2, "points": 1, "plus_visible": true},
+        {"level": 3, "points": 0, "plus_visible": false}
+      ],
+      "upper_left_passive_entry_absent": true
+    }
+  },
+  "limits": [
+    "Multiplayer ownership/isolation cases are covered by regression tests; no multi-client live session was run.",
+    "The tower live probe uses real engine attacks and KV/modifier behavior in an isolated area; it does not establish timing for every tower class or network latency.",
+    "Test-only setup paused wave spawning and cancelled the unbuilt-wall defeat timer; neither production rule was changed. Fixture builder and buildings received temporary protection.",
+    "Test-only builder positioning was assisted after validating work points, so construction pathfinding is not claimed as validated. Hero summoning and both challenge purchases used the normal business interfaces.",
+    "Test evidence folder name contains 20260924; actual run date is 2026-09-23."
+  ],
+  "local_evidence": {
+    "directory": "output/gameplay_fixes_20260924",
+    "logs": ["tower_live.log", "setup_live.log", "rebirth_live.log", "skill_before.log", "skill_after.log", "skill_zero.log"],
+    "screenshots": {"plus_visible": "live_0004.jpg", "after_first_click": "live_0005.jpg", "no_points_plus_hidden": "live_0006.jpg"},
+    "build": "output/hero_skill_upgrade/before_*/"
+  }
+}

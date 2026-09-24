@@ -1,5 +1,18 @@
 # C6 地图第一版
 
+## 当前源文件与编译包校验（2026-09-24）
+
+`compile-main.ps1` 只编译当前已保存的 Hammer 地图，完成后检查源文件在构建期间没有变化，并逐项校验 VPK 资源 CRC、包内记录的 VMAP 源 CRC。校验不通过时构建命令报错，不能仅以 VPK 修改时间作为同步依据。需要本机 Node.js；报告位于 `output/map_main_merge_20260919/package_verification.json`。
+
+只检查现有地图、不重编译：
+
+```powershell
+node tools/map_c6/verify-map-package.cjs --report output/map_package_verification.json
+node tools/map_c6/verify-map-package.cjs --self-test
+```
+
+此检查不代替游戏内的视觉、寻路和小地图拍摄验证。编译包已同步后，已运行的测试局仍需退出并重新加载地图。
+
 ## 小地图更新（2026-09-23）
 
 地图编译不会重新拍摄小地图。`template_map` 当前使用 `resource/overviews/template_map.txt` → `materials/overviews/template_map.vmat` → `template_map.tga`，只重新编译旧 TGA 仍会显示旧布局。

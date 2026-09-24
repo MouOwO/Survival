@@ -245,6 +245,7 @@ local wave_monster = unit("npc_survival_wave_monster", 700)
 wave_monster.survival_is_wave_monster = true
 local recovery_tower, recovery_modifier, recovery_calls = tower_fixture()
 local explicit_orders = 0
+local drop_next_order = false
 function recovery_tower:FindModifierByName(name)
     if name == "modifier_tower_auto_attack" then return recovery_modifier end
 end
@@ -255,18 +256,12 @@ function recovery_tower:MoveToTargetToAttack(target)
         units = { [0] = self:entindex() }, entindex_target = target:entindex(),
         issuer_player_id_const = -1,
     }), "legitimate automatic recovery order was rejected")
-    self.target = target
+    if drop_next_order then drop_next_order = false else self.target = target end
 end
 candidates = { tree, wave_monster }
 recovery_modifier:OnIntervalThink()
-assert(recovery_tower.forced == wave_monster and recovery_tower.target == nil)
-local force_before_retry = recovery_calls.force
-for _ = 1, 3 do recovery_modifier:OnIntervalThink() end
-assert(recovery_calls.force == force_before_retry and explicit_orders == 0,
-    "do not spam orders while the engine may still be accepting the first attack")
-recovery_modifier:OnIntervalThink()
 assert(explicit_orders == 1 and recovery_tower.target == wave_monster,
-    "same remembered forced target must recover if no actual engine attack began")
+    "first acquired monster must receive a real attack order immediately")
 assert(recovery_modifier.manual_target == nil,
     "execute-order-filter reentry must not convert auto selection to a manual target")
 before = snapshot(recovery_calls)
@@ -278,19 +273,58 @@ assert(explicit_orders == 1)
 -- immobile tower permanently passive, nor cause healthy attacks to restart.
 recovery_tower:Stop()
 assert(recovery_modifier.forced_target == wave_monster and recovery_tower.target == nil)
-for _ = 1, 4 do recovery_modifier:OnIntervalThink() end
+recovery_modifier:OnIntervalThink()
 assert(explicit_orders == 2 and recovery_tower.target == wave_monster)
 assert(recovery_tower.acquisition == 0 and recovery_tower.idle_acquire == false)
 
--- A target dying during the recovery delay never receives a delayed attack.
--- Tree-only idle must retain the pre-attack disarm and gesture protections.
-recovery_tower:Stop()
-recovery_modifier:OnIntervalThink()
+-- The target dies while more monsters are available. Retarget in the death
+-- callback with no intermediate Stop/disarm/gesture reset and no polling delay.
+local second_monster = unit("npc_survival_wave_monster", 750)
+local third_monster = unit("npc_survival_wave_monster", 800)
+local stops_before_kill, stacks_before_kill = recovery_calls.stop, recovery_calls.stack
 wave_monster.alive = false
-candidates = { tree }
+candidates = { tree, wave_monster, second_monster, third_monster }
+recovery_modifier:OnDeath({ unit = wave_monster })
+assert(recovery_tower.target == second_monster and explicit_orders == 3,
+    "kill must issue the next valid attack before returning from OnDeath")
+assert(recovery_calls.stop == stops_before_kill and recovery_calls.stack == stacks_before_kill,
+    "continuous combat must not pass through Stop or disarm between victims")
+before = snapshot(recovery_calls)
 recovery_modifier:OnDeath({ unit = wave_monster })
 for _ = 1, 8 do recovery_modifier:OnIntervalThink() end
-idle(recovery_tower, recovery_modifier, "stalled target died before retry")
-assert(explicit_orders == 2, "no delayed order may be issued at a dead monster or resource tree")
+unchanged(recovery_calls, before, "kill retarget remains stable")
+assert(explicit_orders == 3)
 
-print("TOWER_IDLE_STATE_PASS: pre-attack idle gate, stable attacks, dropped-order/Stop recovery, real order-filter reentry, immediate death/reset/anti-air idle, tree exclusions")
+-- A projectile from an old victim can land after an engine/manual target
+-- switch. Repairing stale Lua bookkeeping must not restart that healthy attack.
+recovery_modifier.forced_target = wave_monster
+recovery_modifier:OnDeath({ unit = wave_monster })
+assert(recovery_modifier.forced_target == second_monster and explicit_orders == 3,
+    "an old projectile kill must preserve the ongoing next-target attack")
+assert(recovery_calls.stop == stops_before_kill and recovery_calls.stack == stacks_before_kill)
+
+-- OnDeath can run before the engine has removed the deceased unit from radius
+-- results/IsAlive state. Its explicit event identity must exclude it regardless.
+drop_next_order = true
+candidates = { tree, second_monster, third_monster }
+recovery_modifier:OnDeath({ unit = second_monster })
+second_monster.alive = false
+assert(recovery_modifier.forced_target == third_monster and explicit_orders == 4,
+    "the death callback must not select its deceased unit from stale engine data")
+recovery_tower.target = nil -- emulate an engine clear after a rejected command
+assert(recovery_modifier.interval == 0.25)
+recovery_modifier:OnIntervalThink()
+assert(recovery_tower.target == third_monster and explicit_orders == 5,
+    "dropped retarget order must recover on the next 0.25s tick, not after 1s")
+
+-- Tree-only idle retains its pre-attack disarm and gesture protections, and
+-- no remembered command survives a final target death before recovery.
+recovery_tower:Stop()
+third_monster.alive = false
+candidates = { tree }
+recovery_modifier:OnDeath({ unit = third_monster })
+for _ = 1, 8 do recovery_modifier:OnIntervalThink() end
+idle(recovery_tower, recovery_modifier, "stalled target died before retry")
+assert(explicit_orders == 5, "no delayed order may be issued at a dead monster or resource tree")
+
+print("TOWER_IDLE_STATE_PASS: immediate first/kill attack, no Stop/disarm between victims, next-tick dropped-order recovery, stable attacks, real order-filter reentry, tree-only idle")

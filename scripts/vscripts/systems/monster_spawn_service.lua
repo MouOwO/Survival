@@ -1,6 +1,8 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local logger = require("core/logger")
+local scheduler = require("core/scheduler")
+local challenge_rules = require("config/challenge_runtime_rules")
 local armor_balance = require("config/armor_balance")
 
 local archetypes = require("config/generated/monster_archetypes")
@@ -21,6 +23,16 @@ local M = {}
 local active_by_entindex = {}
 local active_by_encounter = {}
 local marker_cache = {}
+local retry_until_by_player = {}
+
+local function game_time()
+    return GameRules and GameRules.GetGameTime and GameRules:GetGameTime() or 0
+end
+
+local function retry_remaining(player_id, encounter_id)
+    local owned = retry_until_by_player[tonumber(player_id)] or {}
+    return math.max(0, (owned[encounter_id] or 0) - game_time())
+end
 
 local TEAM_BY_NAME = {
     DOTA_TEAM_GOODGUYS = DOTA_TEAM_GOODGUYS,
@@ -160,6 +172,10 @@ local function start_encounter(payload)
     if not encounter or encounter.enabled == false then
         return { ok = false, error = "encounter_not_found" }
     end
+    local remaining = retry_remaining(payload.player_id, encounter_id)
+    if remaining > 0 then
+        return { ok = false, error = "purchase_cooldown", cooldown_remaining = remaining }
+    end
     if is_active(encounter_id) then
         return { ok = false, error = "encounter_already_active" }
     end
@@ -296,6 +312,7 @@ local function start_encounter(payload)
     local player_id = tonumber(payload.player_id)
     local meta = {
         unit = unit,
+        challenger_hero = hero_entry and hero_for(player_id) or nil,
         encounter_id = encounter_id,
         player_id = valid_player_id(player_id) and player_id or -1,
         team = tonumber(payload.team) or DOTA_TEAM_GOODGUYS,
@@ -351,6 +368,7 @@ local function query_encounter(payload)
     return {
         ok = true,
         active = meta ~= nil and tonumber(meta.player_id) == player_id,
+        retry_cooldown_remaining = retry_remaining(player_id, encounter_id),
         encounter = project_encounter(encounter),
     }
 end
@@ -364,6 +382,10 @@ local function reenter_encounter(payload)
     local player_id = tonumber(payload.player_id)
     if not valid_player_id(player_id) then
         return { ok = false, error = "player_id_invalid" }
+    end
+    local remaining = retry_remaining(player_id, encounter_id)
+    if remaining > 0 then
+        return { ok = false, error = "purchase_cooldown", cooldown_remaining = remaining }
     end
     local meta = active_meta(encounter_id)
     if not meta then
@@ -395,10 +417,64 @@ local function reenter_encounter(payload)
     }
 end
 
+local function cancel_rebirth_attempts(player_id, hero, reason)
+    if not valid_player_id(player_id) then return end
+    local cancelled = {}
+    for entindex, meta in pairs(active_by_entindex) do
+        if meta.player_id == player_id and meta.challenger_hero == hero
+            and meta.projection.encounter_type == "rebirth_boss" then
+            cancelled[#cancelled + 1] = { entindex = entindex, meta = meta }
+        end
+    end
+    for _, entry in ipairs(cancelled) do
+        local meta, entindex = entry.meta, entry.entindex
+        -- Detach before removal: even if the engine emits a death callback,
+        -- leaving an encounter cannot grant a kill reward or rebirth level.
+        active_by_entindex[entindex] = nil
+        if active_by_encounter[meta.encounter_id] == entindex then
+            active_by_encounter[meta.encounter_id] = nil
+        end
+        if valid_entity(meta.unit) then
+            monster_hero_visual_service.clear(meta.unit)
+            meta.unit:Stop()
+            UTIL_Remove(meta.unit)
+        end
+        local duration = math.max(0, tonumber(challenge_rules.rebirth_retry_seconds) or 2)
+        retry_until_by_player[player_id] = retry_until_by_player[player_id] or {}
+        local until_time = game_time() + duration
+        retry_until_by_player[player_id][meta.encounter_id] = until_time
+        event_bus.emit(events.MONSTER_ENCOUNTER_CHANGED, {
+            player_id = player_id,
+            status = "cancelled",
+            reason = reason,
+            retry_cooldown_seconds = duration,
+            encounter = meta.projection,
+        })
+        scheduler.after(duration, function()
+            local owned = retry_until_by_player[player_id] or {}
+            if owned[meta.encounter_id] ~= until_time then return end
+            owned[meta.encounter_id] = nil
+            event_bus.emit(events.MONSTER_ENCOUNTER_CHANGED, {
+                player_id = player_id,
+                status = "retry_ready",
+                encounter = meta.projection,
+            })
+        end, "rebirth_retry:" .. player_id .. ":" .. meta.encounter_id)
+        event_bus.emit(events.UI_NOTIFICATION, {
+            player_id = player_id,
+            message = "已退出转职挑战，" .. tostring(duration) .. "秒后可重新挑战",
+            level = "info",
+        })
+    end
+end
+
 local function on_entity_killed(payload)
     local victim = payload.victim
     if not valid_entity(victim) then
         return
+    end
+    if victim.GetPlayerOwnerID then
+        cancel_rebirth_attempts(tonumber(victim:GetPlayerOwnerID()), victim, "hero_died")
     end
 
     local entindex = victim:entindex()
@@ -450,6 +526,7 @@ function M.init()
     active_by_entindex = {}
     active_by_encounter = {}
     marker_cache = {}
+    retry_until_by_player = {}
 
     event_bus.handle_request(
         events.MONSTER_ENCOUNTER_START_REQUEST,
@@ -464,6 +541,9 @@ function M.init()
         reenter_encounter
     )
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
+    event_bus.subscribe(events.HERO_RETURNED_HOME, function(payload)
+        cancel_rebirth_attempts(tonumber(payload.player_id), payload.hero, "return_home")
+    end)
     event_bus.subscribe(events.GAME_STARTED, validate_all_markers)
 end
 

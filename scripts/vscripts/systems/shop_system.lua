@@ -42,6 +42,7 @@ local function reset_state()
         research_source_entindex_by_player = {},
         auto_research_by_team = {},
         purchase_cooldown_until_by_player = {},
+        purchase_cooldown_total_by_player = {},
         stock_by_player = {},
     }
 end
@@ -97,18 +98,20 @@ local function owned_content(player_id)
     return result
 end
 local function purchase_cooldown_remaining(player_id, entry)
-    local duration = tonumber(entry and entry.purchase_cooldown_seconds) or 0
-    if duration <= 0 then return 0 end
     local by_entry = state.purchase_cooldown_until_by_player[player_id] or {}
     return math.max(0, (by_entry[entry.entryid] or 0) - game_time())
 end
-local function set_purchase_cooldown(player_id, entry)
-    local duration = tonumber(entry and entry.purchase_cooldown_seconds) or 0
+local function set_purchase_cooldown(player_id, entry, override_duration)
+    local duration = tonumber(override_duration)
+        or tonumber(entry and entry.purchase_cooldown_seconds) or 0
     if duration <= 0 then return end
     state.purchase_cooldown_until_by_player[player_id] =
         state.purchase_cooldown_until_by_player[player_id] or {}
     state.purchase_cooldown_until_by_player[player_id][entry.entryid] =
         game_time() + duration
+    state.purchase_cooldown_total_by_player[player_id] =
+        state.purchase_cooldown_total_by_player[player_id] or {}
+    state.purchase_cooldown_total_by_player[player_id][entry.entryid] = duration
     scheduler.after(duration, function()
         if purchase_cooldown_remaining(player_id, entry) <= 0
             and state.opened_players[player_id] then
@@ -124,7 +127,8 @@ local function purchase_cooldown_snapshot(player_id)
         if remaining > 0 then
             result[entry.entryid] = {
                 remaining = remaining,
-                total = tonumber(entry.purchase_cooldown_seconds) or 0,
+                total = (state.purchase_cooldown_total_by_player[player_id] or {})
+                    [entry.entryid] or tonumber(entry.purchase_cooldown_seconds) or 0,
                 until_time = game_time() + remaining,
             }
         end
@@ -1127,6 +1131,23 @@ function M.init()
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_player_changed)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_player_changed)
     event_bus.subscribe(events.MONSTER_KILLED, on_monster_killed)
+    event_bus.subscribe(events.MONSTER_ENCOUNTER_CHANGED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if not valid_player_id(player_id) then return end
+        if payload.status ~= "cancelled" and payload.status ~= "retry_ready" then
+            return
+        end
+        local encounter_id = payload.encounter and payload.encounter.encounter_id
+        for _, entry in ipairs(catalog.entries()) do
+            if entry.contenttype == "rebirth" and entry.encounter_id == encounter_id then
+                if payload.status == "cancelled" then
+                    set_purchase_cooldown(player_id, entry, payload.retry_cooldown_seconds)
+                end
+                push_snapshot(player_id, "rebirth_" .. payload.status)
+                return
+            end
+        end
+    end)
     event_bus.subscribe(research_events.LEVEL_CHANGED, on_research_level_changed)
     event_bus.subscribe(events.GAME_STARTED, function()
         scheduler.after(0.1, function()

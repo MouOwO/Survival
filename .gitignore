@@ -363,3 +363,5 @@ __pycache__/
 !/scripts/vscripts/tests/test_pure_permanent_rewards.lua
 !/scripts/vscripts/tests/test_difficulty_unlocks.lua
 !/scripts/vscripts/tests/test_archive_difficulty_progression.lua
+!/scripts/vscripts/tests/test_hero_skill_point_upgrade.lua
+!/scripts/vscripts/tests/test_rebirth_return_retry.lua

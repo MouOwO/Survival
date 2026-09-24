@@ -161,6 +161,40 @@ if not IsServer or not IsServer() or not IsInToolsMode or not IsInToolsMode()
 """
 
 
+def recovery_lua() -> str:
+    """Resume the existing admission/profile flow without resetting game state."""
+    return """
+    local profiles = require('systems/player_profile_service')
+    local setup = require('systems/match_setup_service')
+    for id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do
+      if PlayerResource:IsValidPlayerID(id)
+        and not PlayerResource:IsFakeClient(id)
+        and PlayerResource:GetTeam(id) ~= (DOTA_TEAM_SPECTATOR or 1)
+        and PlayerResource:GetPlayer(id) ~= nil then
+        local steam = tonumber(PlayerResource:GetSteamAccountID(id) or 0)
+        if steam and steam > 0 then
+          local account = string.format('%.0f', steam)
+          -- Entry authentication is independent of mode selection. Do not
+          -- supersede an in-flight request on every watcher/launcher attempt.
+          if not profiles.is_authenticated_for_account(id, account)
+            and not profiles.is_authenticating(id) then
+            profiles.authenticate_player(id, 'ecs_test_auth_ready')
+          end
+          -- Pure mode must keep its existing baseline, and neither mode may
+          -- reload a loaded profile or replace an already pending load.
+          if setup.is_mode_selected()
+            and profiles.is_authenticated_for_account(id, account)
+            and not profiles.get_profile(id) and not profiles.is_loading(id) then
+            profiles.load_player(id, 'ecs_test_auth_ready')
+          end
+        end
+      end
+    end
+    local loading = package.loaded['systems/startup_loading_service']
+    if loading and type(loading.tick) == 'function' then loading.tick() end
+"""
+
+
 def send_lua(code: str, nonce: str, request_path: Path) -> None:
     node = shutil.which("node.exe") or shutil.which("node")
     if not node:
@@ -227,16 +261,7 @@ local ok = pcall(function()
   local applied = Convars:GetStr('survival_fishing_api_token') == value.token
   value.token = nil
   if applied then
-    -- Loading retries use game time, which can be stopped by a paused game.
-    -- Request only missing profiles; never reinitialize or replace loaded ones.
-    local profiles = require('systems/player_profile_service')
-    for id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do
-      if PlayerResource:IsValidPlayerID(id)
-        and tonumber(PlayerResource:GetSteamAccountID(id) or 0)>0
-        and not profiles.get_profile(id) then
-        profiles.load_player(id, 'ecs_test_auth_ready')
-      end
-    end
+{recovery_lua()}
     print('{nonce}')
   end
 end)

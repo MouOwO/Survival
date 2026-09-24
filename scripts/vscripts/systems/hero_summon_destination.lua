@@ -1,23 +1,12 @@
 local destination_validation = require("systems/destination_validation_service")
 local placement = require("config/grid_placement_config")
+local event_bus = require("core/event_bus")
+local events = require("core/events")
 
 local M = {}
-local SEARCH_RADIUS, STEP, HERO_RADIUS, MAX_HEIGHT_DELTA = 384, 64, 32, 64
-local NO_DESTINATION = "英雄出生点和祭坛周围没有安全落点，请清理附近障碍后重试"
-local offsets, clearance = {}, {}
-for x = -SEARCH_RADIUS, SEARCH_RADIUS, STEP do
-    for y = -SEARCH_RADIUS, SEARCH_RADIUS, STEP do
-        local squared = x * x + y * y
-        if squared <= SEARCH_RADIUS * SEARCH_RADIUS then
-            offsets[#offsets + 1] = {x = x, y = y, squared = squared}
-        end
-    end
-end
-table.sort(offsets, function(a, b)
-    if a.squared ~= b.squared then return a.squared < b.squared end
-    if a.x ~= b.x then return a.x < b.x end
-    return a.y < b.y
-end)
+local SEARCH_RADIUS, STEP, HERO_RADIUS, MAX_HEIGHT_DELTA = 640, 64, 32, 64
+local NO_DESTINATION = "主城周围没有安全落点，请清理附近障碍后重试"
+local clearance = {}
 for index = 0, 7 do
     local angle = index * math.pi / 4
     clearance[#clearance + 1] = {x = math.cos(angle) * HERO_RADIUS, y = math.sin(angle) * HERO_RADIUS}
@@ -32,6 +21,22 @@ end
 local function copied_position(position)
     if not position or not finite(position.x) or not finite(position.y) or not finite(position.z) then return nil end
     return Vector(position.x, position.y, position.z)
+end
+local function player_main_city(player_id)
+    local id = tonumber(player_id)
+    if not id or id < 0 or id ~= math.floor(id) then return nil end
+    -- Query live building state instead of a map marker or cached position.
+    -- Filtering ownership here also protects games with shared player teams.
+    local result = event_bus.request(events.BUILDING_LIST_REQUEST, {player_id = id})
+    for _, building in ipairs(result and result.ok and result.buildings or {}) do
+        local unit = building.unit
+        if building.building_id == "main_city" and tonumber(building.player_id) == id
+            and not building.constructing and valid(unit)
+            and type(unit.IsAlive) == "function" and unit:IsAlive() then
+            return unit
+        end
+    end
+    return nil
 end
 local function method_true(unit, method)
     if type(unit[method]) ~= "function" then return false end
@@ -50,9 +55,9 @@ local function phased(unit)
     end
     return false
 end
-local function nearby_obstacles(origin, altar)
+local function nearby_obstacles(origin, anchor)
     if type(FindUnitsInRadius) ~= "function" then return nil, "occupancy_unavailable" end
-    local team = valid(altar) and altar:GetTeamNumber() or DOTA_TEAM_GOODGUYS
+    local team = valid(anchor) and anchor:GetTeamNumber() or DOTA_TEAM_GOODGUYS
     local ok, units = pcall(FindUnitsInRadius, team, origin, nil,
         SEARCH_RADIUS + HERO_RADIUS + (tonumber(placement.max_unit_hull_radius) or 512),
         DOTA_UNIT_TARGET_TEAM_BOTH,
@@ -85,8 +90,8 @@ local function grounded(position, anchor_height)
     local validation_ok, accepted, reason = pcall(destination_validation.validate_hero_position, position)
     if not validation_ok then return nil, "destination_validation_failed" end
     if not accepted then return nil, reason or "invalid_destination" end
-    -- Compare with the authored anchor height, not the potentially underwater
-    -- ground directly beneath an invalid marker or altar-front candidate.
+    -- Compare with the live city height, not potentially underwater ground
+    -- directly beneath a rejected candidate at the edge of the player island.
     if math.abs(height - anchor_height) > MAX_HEIGHT_DELTA then return nil, "destination_height_mismatch" end
     return position
 end
@@ -114,45 +119,43 @@ function M.resolve(altar, definition, player_id)
         metadata.last_reason = reason
         metadata.rejected[reason] = (metadata.rejected[reason] or 0) + 1
     end
-    local function search(origin, anchor_height, source)
-        local obstacles, reason = nearby_obstacles(origin, altar)
-        if not obstacles then rejected(reason); return nil end
-        for _, offset in ipairs(offsets) do
+    local city = player_main_city(player_id)
+    if not city then
+        rejected("main_city_not_found")
+        return nil, "玩家主城尚未建造，无法召唤英雄", metadata
+    end
+    metadata.source = "main_city"
+    local origin = copied_position(city:GetAbsOrigin())
+    if not origin then rejected("spawn_anchor_unavailable"); return nil, NO_DESTINATION, metadata end
+    local obstacles, reason = nearby_obstacles(origin, city)
+    if not obstacles then rejected(reason); return nil, NO_DESTINATION, metadata end
+    local hull = tonumber(city.survival_hull_radius)
+        or (type(city.GetHullRadius) == "function" and tonumber(city:GetHullRadius())) or 0
+    if not finite(hull) or hull < 0 then hull = 0 end
+    -- Keep the hero visibly outside the city. Expand concentric rings on all
+    -- sides, starting in front; never spill into a distant altar/training room.
+    local first_radius = math.ceil(math.max(256, hull + HERO_RADIUS + STEP) / STEP) * STEP
+    local forward = type(city.GetForwardVector) == "function" and city:GetForwardVector() or nil
+    local fx, fy = 1, 0
+    if forward and finite(forward.x) and finite(forward.y) then
+        local length = math.sqrt(forward.x * forward.x + forward.y * forward.y)
+        if length > 0 then fx, fy = forward.x / length, forward.y / length end
+    end
+    for radius = first_radius, SEARCH_RADIUS, STEP do
+        for index = 0, 15 do
+            local angle = index * math.pi / 8
+            local c, s = math.cos(angle), math.sin(angle)
+            local offset = {x = (fx * c - fy * s) * radius, y = (fy * c + fx * s) * radius}
             metadata.attempts = metadata.attempts + 1
-            local position, failure = candidate(origin, offset, anchor_height, obstacles)
+            local position, failure = candidate(origin, offset, origin.z, obstacles)
             if position then
-                metadata.source, metadata.grounded = source, true
-                metadata.distance = math.sqrt(offset.squared)
-                return position
+                metadata.grounded, metadata.distance = true, radius
+                return position, nil, metadata
             end
             rejected(failure)
         end
     end
-    local id = tonumber(player_id)
-    if id and id >= 0 and id == math.floor(id) and Entities and type(Entities.FindByName) == "function" then
-        local ok, marker = pcall(Entities.FindByName, Entities, nil, "player_" .. tostring(id) .. "_hero_spawn")
-        if ok and valid(marker) then
-            local origin = copied_position(marker:GetAbsOrigin())
-            if origin then
-                local position = search(origin, origin.z, "marker")
-                if position then return position, nil, metadata end
-            end
-        end
-    end
-    if valid(altar) then
-        local origin = copied_position(altar:GetAbsOrigin())
-        local forward = altar:GetForwardVector()
-        if origin and forward and finite(forward.x) and finite(forward.y) then
-            local length = math.sqrt(forward.x * forward.x + forward.y * forward.y)
-            local offset = tonumber(definition and definition.spawn_offset) or 260
-            if length > 0 and finite(offset) and offset >= 0 then
-                local position = search(Vector(origin.x + forward.x / length * offset,
-                    origin.y + forward.y / length * offset, origin.z), origin.z, "altar")
-                if position then return position, nil, metadata end
-            end
-        end
-    end
-    metadata.last_reason = metadata.last_reason or "spawn_anchor_unavailable"
+    metadata.last_reason = metadata.last_reason or "main_city_clearance_exceeds_search"
     return nil, NO_DESTINATION, metadata
 end
 

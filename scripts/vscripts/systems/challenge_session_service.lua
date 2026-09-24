@@ -1359,6 +1359,12 @@ function M.init()
         on_foreground_encounter_changed
     )
     event_bus.subscribe(events.SEVEN_SINS_COMPLETED, on_seven_sins_completed)
+    event_bus.subscribe(events.HERO_RETURNED_HOME, function(payload)
+        -- Repeatable rooms retain their progress and existing free re-entry.
+        -- Their delayed completion must not teleport a player back after F2.
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id then foreground_encounter_by_player[player_id] = nil end
+    end)
     event_bus.subscribe(events.HERO_READY, start_auto_tests)
     event_bus.subscribe(events.HERO_SUMMONED, prepare_after_hero_summoned)
 end

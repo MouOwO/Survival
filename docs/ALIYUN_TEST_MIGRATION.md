@@ -691,3 +691,66 @@ systemctl stop goufayu-api.service
 该 Lua 修复在下次正常加载地图时生效；本次未热重载或重新初始化正在玩的档案服务。
 
 当前确认的是档案与建造资源恢复，最终建筑落地结果仍需实际游戏操作确认。
+
+## 15. Hammer 直接运行地图的自动认证（2026-09-24）
+
+本次实测根因：Hammer 启动的 `template_map` 是正确的 Tools 服务器，现有
+SSH 隧道健康，但 `survival_fishing_api_token` 为空，加载状态为 `error`。
+CMD 入口会额外执行隧道连接与安全令牌注入；Hammer 自己不会执行该脚本。
+
+新增当前 Windows 用户运行的隐藏助手，由计划任务
+`Goufayu-Hammer-Test-Backend` 启动。助手识别正常 `survival/template_map` 的新会话，
+连接或复用已有 ECS 测试隧道，再复用受限临时 KV 传入认证。它不启动游戏、不换图、
+不改模式或难度、不重置档案；未选模式时只认证，选模式后才请求缺失档案。
+已有档案和正在进行的请求均保留。只支持当前正式测试地图，不向其他地图或非 Tools
+会话传入令牌。
+
+### 本地电脑操作
+
+这台电脑已安装并启动助手，以后继续在 Hammer 中运行地图即可。其他开发电脑
+准备好原有专用密钥、已核对的主机指纹、本机 `.env` 与 Python 运行环境后，可运行
+根目录 `setup_hammer_backend.cmd` 安装助手。
+
+项目根目录 PowerShell 中的管理命令：
+
+```powershell
+& tools/setup_hammer_backend.ps1 -Action Status
+& tools/setup_hammer_backend.ps1 -Action Start
+& tools/setup_hammer_backend.ps1 -Action Stop
+& tools/setup_hammer_backend.ps1 -Action Uninstall
+```
+
+- `Status` 显示后台任务和脱敏状态。正常为 `connected`；未开游戏时等待 Workshop。
+- `Start` 安全重启助手、启用登录启动；可以用于本机认证配置更新后重读配置。
+- `Stop` 停止助手并禁用登录启动；`Start` 可恢复。正在传入认证时会等临时文件清理。
+- `Uninstall` 移除助手任务。两种停止操作均保留当前游戏、现有 SSH 隧道和数据库。
+- `output/hammer_backend/bridge.log` 是轮转日志，`bridge_status.json` 是脱敏心跳；
+  不记录令牌、SSH 密钥、原始控制台内容或玩家账号。
+
+助手使用现有 Python 解释器的隐藏子进程，兼容此电脑 Blender 自带 Python 没有
+基础 `pythonw.exe` 的情况。任务仅以当前用户的普通权限运行，不保存 Windows 密码。
+隧道恢复能处理重启后的旧 PID 被复用，不会终止不属于本工具的进程。
+
+**SSH agent 前提：** 当前专用密钥仍需要已解锁的 SSH agent。本次没有改变其
+Windows 服务启动设置；当前为 `Running / Manual`。助手的登录启动与 SSH agent
+是否能在重启后就绪是两件事。若重启后提示 `ssh_public_key_authentication_failed`，
+在本地管理员 PowerShell 启动 `Start-Service ssh-agent`，必要时在本地终端通过
+`ssh-add "$env:USERPROFILE\.ssh\goufayu_ecs_ed25519_v2"` 解锁，口令只在本地输入。
+随后助手会自动重试。将 SSH agent 改为开机启动需要用户另行明确同意。
+
+### 验证与范围
+
+- 当前 Hammer 对局已从空令牌、认证错误恢复为 `loading_phase=ready`，
+  后台观察到 1 名玩家、1 名已认证；未代替用户选择模式。
+- 隐藏助手实际运行、优雅重启、重复启动只保留单个活动实例已验证；临时凭证文件为 0。
+- 42 项 Python 测试通过，另有 3 套已有 Lua 回归通过；覆盖新会话、已有档案、纯净模式、
+  pending 请求、错误地图拒绝、端口被占用、旧 PID 复用及 Windows 字节锁。
+- 没有重开用户当前地图，也没有重启 Windows。因此下一次真实 Hammer Play 与
+  Windows 重新登录的端到端流程仍需分别观察；相关状态转换已有回归测试。
+- 此助手用于本机 Hammer 联调。公网正式运行时的 HTTPS 地址与服务端凭据配置仍按
+  部署计划单独完成，不能把 `127.0.0.1` 隧道当作公网发布方案。
+
+### 服务器操作
+
+这次无需服务器手动操作。复用当前 ECS API、PostgreSQL 和 SSH 隧道；未更改
+数据库、Supabase、支付或公网监听设置。

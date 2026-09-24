@@ -5,7 +5,7 @@
 local M = {}
 local ACTIVE_KEY = "SURVIVAL_MANUAL_TOWER_ATTACK_RECOVERY"
 local FIXTURE_MODIFIER = "modifier_manual_tower_attack_recovery_fixture"
-local MAX_SECONDS, SAFE_RADIUS = 14, 1200
+local MAX_SECONDS, SAFE_RADIUS = 18, 1200
 
 local function valid(unit)
     return unit ~= nil and not unit:IsNull()
@@ -15,6 +15,29 @@ local function log(tag, values)
     local fields = { "[TOWER_RUNTIME_TEST]", tag }
     for _, value in ipairs(values or {}) do fields[#fields + 1] = tostring(value) end
     print(table.concat(fields, " "))
+end
+
+local function log_exception(phase, value)
+    -- Fixture/native API errors only; keep one bounded line rather than a raw
+    -- console dump or arbitrary gameplay state.
+    log("EXCEPTION", { "phase=" .. tostring(phase),
+        "error=" .. tostring(value):gsub("[\r\n\t]", " "):sub(1, 320) })
+end
+
+local function attack_interval(tower, state)
+    -- GetSecondsPerAttack is absent in current server builds (the UI adapter
+    -- treats it as an optional legacy fallback). Use the server's existing APS
+    -- signature; an observed fixture cadence is a fallback without that API.
+    if tower.GetAttacksPerSecond then
+        local ok, rate = pcall(tower.GetAttacksPerSecond, tower, false)
+        if ok and tonumber(rate) and tonumber(rate) > 0 then
+            return 1 / tonumber(rate), "server_attacks_per_second"
+        end
+    end
+    if state.observed_attack_interval then
+        return state.observed_attack_interval, "observed_attack_starts"
+    end
+    error("fixture_attack_interval_unavailable")
 end
 
 local function foreign_units(origin, owned)
@@ -69,20 +92,43 @@ end
 local function install_fixture_modifier()
     LinkLuaModifier(FIXTURE_MODIFIER, "tests/manual_tower_attack_recovery",
         LUA_MODIFIER_MOTION_NONE)
-    if _G[FIXTURE_MODIFIER] then return end
-    local fixture = class({})
+    -- Re-running after require-cache reset must also update this probe's
+    -- callbacks. Production modifiers and unrelated unit classes are untouched.
+    local fixture = _G[FIXTURE_MODIFIER] or class({})
     _G[FIXTURE_MODIFIER] = fixture
     function fixture:IsHidden() return true end
     function fixture:IsPurgable() return false end
     function fixture:CheckState() return { [MODIFIER_STATE_ROOTED] = true } end
-    function fixture:DeclareFunctions() return { MODIFIER_EVENT_ON_ATTACK_START } end
+    function fixture:DeclareFunctions() return { MODIFIER_EVENT_ON_ATTACK_START, MODIFIER_EVENT_ON_DEATH } end
     function fixture:OnAttackStart(event)
         if not IsServer() or event.attacker ~= self:GetParent() then return end
         local state = self:GetParent().survival_manual_attack_fixture
         if not state or state.finished then return end
         if event.target == state.tree then state.tree_attack_starts = state.tree_attack_starts + 1 end
-        if event.target == state.enemy then state.enemy_attack_starts = state.enemy_attack_starts + 1 end
+        if event.target == state.enemy then
+            state.enemy_attack_starts = state.enemy_attack_starts + 1
+            local now = GameRules:GetGameTime()
+            if state.last_enemy_attack_at then
+                local elapsed = now - state.last_enemy_attack_at
+                if elapsed > 0 then
+                    state.observed_attack_interval = math.min(
+                        state.observed_attack_interval or elapsed, elapsed)
+                end
+            end
+            state.last_enemy_attack_at = now
+        end
+        if event.target == state.next_enemy then
+            state.next_enemy_attack_starts = state.next_enemy_attack_starts + 1
+            state.next_attack_at = state.next_attack_at or GameRules:GetGameTime()
+        end
         if not state.owned[event.target] then state.interference = true end
+    end
+    function fixture:OnDeath(event)
+        if not IsServer() then return end
+        local state = self:GetParent().survival_manual_attack_fixture
+        if state and not state.finished and event.unit == state.enemy then
+            state.kill_at = state.kill_at or GameRules:GetGameTime()
+        end
     end
 end
 
@@ -105,7 +151,8 @@ function M.run()
         return { ok = false, error = "gameplay_not_ready" }
     end
     local state = { owned = {}, units = {}, tree_attack_starts = 0,
-        enemy_attack_starts = 0, phase = "initial_damage", started = GameRules:GetGameTime() }
+        enemy_attack_starts = 0, next_enemy_attack_starts = 0,
+        phase = "initial_damage", started = GameRules:GetGameTime() }
     _G[ACTIVE_KEY] = state
     local function cleanup(reason, passed)
         if state.finished then return end
@@ -123,10 +170,11 @@ function M.run()
             "seconds=" .. string.format("%.2f", GameRules:GetGameTime() - state.started),
             "tree_attack_starts=" .. state.tree_attack_starts,
             "enemy_attack_starts=" .. state.enemy_attack_starts,
+            "next_enemy_attack_starts=" .. state.next_enemy_attack_starts,
             "remaining_handles=" .. remaining })
         log("DONE")
     end
-    local ok = pcall(function()
+    local ok, setup_error = pcall(function()
         local origin, tree_point, enemy_point = select_location()
         if not origin then cleanup("no_safe_ground", false); return end
         state.origin = origin
@@ -167,7 +215,7 @@ function M.run()
             "deadline_seconds=" .. MAX_SECONDS })
         GameRules:GetGameModeEntity():SetContextThink(prefix, function()
             if state.finished then return nil end
-            local tick_ok = pcall(function()
+            local tick_ok, tick_error = pcall(function()
                 local now = GameRules:GetGameTime()
                 if now - state.started >= MAX_SECONDS then cleanup("timeout_" .. state.phase, false); return end
                 if not valid(state.tower) or not valid(state.tree) then cleanup("fixture_lost", false); return end
@@ -175,7 +223,8 @@ function M.run()
                 if state.tree:GetHealth() ~= state.tree_hp or state.tree_attack_starts > 0 then
                     cleanup("tree_was_attacked", false); return
                 end
-                if state.phase ~= "idle" and (not valid(state.enemy) or not state.enemy:IsAlive()) then
+                if state.phase ~= "idle" and state.phase ~= "kill_retarget"
+                    and (not valid(state.enemy) or not state.enemy:IsAlive()) then
                     cleanup("enemy_fixture_lost", false); return
                 end
                 if state.phase == "initial_damage" and state.enemy:GetHealth() < state.enemy_hp then
@@ -185,6 +234,10 @@ function M.run()
                     state.tower:SetForceAttackTarget(nil)
                     state.tower:Stop()
                     state.phase, state.phase_at = "await_stop", now
+                    if state.tower:GetAttackTarget() == nil then
+                        state.phase = "settle_projectile"
+                        log("STOP_CONFIRMED", { "target_nil=true", "cached_enemy=true" })
+                    end
                     log("STOP", { "target_cleared=" .. tostring(state.tower:GetAttackTarget() == nil),
                         "cached_enemy=" .. tostring(state.auto.forced_target == state.enemy) })
                 elseif state.phase == "await_stop" then
@@ -200,22 +253,48 @@ function M.run()
                     state.resume_hp, state.phase = state.enemy:GetHealth(), "resume_damage"
                 elseif state.phase == "resume_damage" and state.enemy:GetHealth() < state.resume_hp then
                     log("RECOVERED_DAMAGE", { "hp_drop=" .. state.resume_hp - state.enemy:GetHealth(), "tree_unchanged=true" })
-                    UTIL_Remove(state.enemy)
-                    state.phase, state.phase_at = "idle", now
+                    local next_point = ground(origin + Vector(330, 0, 0))
+                    if not usable(next_point) or math.abs(next_point.z - origin.z) >= 24 then
+                        cleanup("next_target_no_safe_ground", false); return
+                    end
+                    state.next_enemy = spawn("npc_survival_wave_monster", "next_enemy", next_point, DOTA_TEAM_BADGUYS)
+                    state.next_enemy:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+                    state.next_enemy:SetIdleAcquire(false)
+                    state.next_enemy:SetAcquisitionRange(0)
+                    state.next_enemy_hp = state.next_enemy:GetHealth()
+                    state.attack_interval, state.attack_interval_source = attack_interval(state.tower, state)
+                    state.enemy:SetHealth(1) -- the production tower must land the killing attack
+                    state.phase, state.phase_at = "kill_retarget", now
+                elseif state.phase == "kill_retarget" and state.kill_at and state.next_attack_at then
+                    local gap = state.next_attack_at - state.kill_at
+                    if gap > state.attack_interval + 0.4 then
+                        cleanup("retarget_delay_exceeds_natural_attack_interval", false); return
+                    end
+                    if state.next_enemy:GetHealth() < state.next_enemy_hp then
+                        log("KILL_RETARGET", { "seconds_after_kill=" .. string.format("%.3f", gap),
+                            "natural_attack_interval=" .. string.format("%.3f", state.attack_interval),
+                            "attack_interval_source=" .. state.attack_interval_source,
+                            "next_target_damaged=true", "tree_unchanged=true" })
+                        UTIL_Remove(state.next_enemy)
+                        state.phase, state.phase_at = "idle", now
+                    end
                 elseif state.phase == "idle" and now - state.phase_at >= 1.25 then
                     local idle = state.auto:GetStackCount() == 0 and state.tower:IsDisarmed()
                         and state.tower:GetAttackTarget() == nil
                     log("IDLE", { "stack=" .. state.auto:GetStackCount(),
                         "disarmed=" .. tostring(state.tower:IsDisarmed()),
                         "target_nil=" .. tostring(state.tower:GetAttackTarget() == nil), "tree_unchanged=true" })
-                    cleanup(idle and "attack_stop_recovery_tree_idle" or "idle_gate_failed", idle)
+                    cleanup(idle and "attack_kill_retarget_stop_recovery_tree_idle" or "idle_gate_failed", idle)
                 end
             end)
-            if not tick_ok then cleanup("tick_exception_" .. state.phase, false) end
+            if not tick_ok then
+                log_exception(state.phase, tick_error)
+                cleanup("tick_exception_" .. state.phase, false)
+            end
             return not state.finished and 0.1 or nil
         end, 0.1)
     end)
-    if not ok then cleanup("setup_exception", false) end
+    if not ok then log_exception("setup", setup_error); cleanup("setup_exception", false) end
     return { ok = ok and not state.finished, pending = ok and not state.finished }
 end
 

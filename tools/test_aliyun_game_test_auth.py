@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from contextlib import ExitStack
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
@@ -77,6 +80,7 @@ class AuthTests(unittest.TestCase):
             self.assertNotIn("must-not-enter-game", code + captured[0].read_text(encoding="utf-8"))
             self.assertIn("LoadKeyValues", code)
             self.assertIn("Convars:SetStr", code)
+            self.assertIn(auth.recovery_lua(), code)
         self.setup_injection(send)
         self.stack.enter_context(patch.object(auth, "private_acl", side_effect=protected))
         result = auth.inject(self.root / "state", self.environment())
@@ -141,6 +145,115 @@ class AuthTests(unittest.TestCase):
             with self.assertRaisesRegex(auth.AuthError, "reparse_path_refused"):
                 auth.read_api_token(self.root / ".env")
             opener.assert_not_called()
+
+    def test_recovery_lua_preserves_pending_loaded_and_pure_mode_state(self):
+        lua = shutil.which("lua.exe") or shutil.which("lua")
+        if not lua:
+            packages = Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft/WinGet/Packages"
+            lua = next((str(path) for path in packages.glob("DEVCOM.Lua_*/bin/lua.exe")), None)
+        if not lua:
+            self.skipTest("Lua interpreter is required for the generated recovery behavior test")
+        fixture = r"""
+local selected_mode, auth_calls, load_calls, tick_calls = nil, {}, {}, 0
+local authenticated, pending_auth, pending_load, loaded = {}, {}, {}, {}
+DOTA_MAX_TEAM_PLAYERS, DOTA_TEAM_SPECTATOR = 10, 1
+PlayerResource = {
+  IsValidPlayerID = function(_, id) return id ~= 5 end,
+  IsFakeClient = function(_, id) return id == 4 end,
+  GetTeam = function(_, id) return id == 7 and 1 or 2 end,
+  GetPlayer = function(_, id) return id ~= 8 and {} or nil end,
+  GetSteamAccountID = function(_, id) return id == 6 and 0 or 9000 + id end,
+}
+local function forbidden() error('recovery must not reset or reinitialize any game service') end
+local profiles = {
+  init = forbidden, reset = forbidden,
+  is_authenticated_for_account = function(id, account)
+    assert(account == tostring(9000 + id), 'authentication must use the current Steam account')
+    return authenticated[id] == true
+  end,
+  is_authenticating = function(id) return pending_auth[id] == true end,
+  authenticate_player = function(id, reason)
+    assert(not authenticated[id] and not pending_auth[id], 'authentication retry replaced healthy state')
+    assert(reason == 'ecs_test_auth_ready')
+    auth_calls[#auth_calls + 1] = id
+    pending_auth[id] = true
+  end,
+  get_profile = function(id) return loaded[id] end,
+  is_loading = function(id) return pending_load[id] == true end,
+  load_player = function(id, reason)
+    assert(selected_mode ~= nil, 'profile requested before choosing mode')
+    assert(authenticated[id], 'profile requested before authentication completed')
+    assert(not loaded[id] and not pending_load[id], 'existing profile/pending load overwritten')
+    assert(reason == 'ecs_test_auth_ready')
+    load_calls[#load_calls + 1] = { id = id, mode = selected_mode }
+    pending_load[id] = true
+  end,
+}
+local setup = { init = forbidden, reset = forbidden,
+  select_mode = forbidden, get_mode = function() return selected_mode end,
+  is_mode_selected = function() return selected_mode ~= nil end }
+package.loaded['systems/player_profile_service'] = profiles
+package.loaded['systems/match_setup_service'] = setup
+package.loaded['systems/startup_loading_service'] = {
+  init = forbidden, reset = forbidden, tick = function() tick_calls = tick_calls + 1 end,
+}
+local recovery = function()
+""" + auth.recovery_lua() + r"""
+end
+local function reset(mode)
+  selected_mode, auth_calls, load_calls, tick_calls = mode, {}, {}, 0
+  authenticated, pending_auth, pending_load, loaded = {}, {}, {}, {}
+  -- 0: missing auth; 1: pending auth; 2: authed/missing profile;
+  -- 3: existing profile; 4: fake; 5: invalid; 6: no Steam account;
+  -- 7: spectator; 8: no player entity; 9: authed/pending profile load.
+  pending_auth[1] = true
+  authenticated[2], authenticated[3], authenticated[9] = true, true, true
+  pending_load[9] = true
+  loaded[3] = { mode = mode or 'pure', revision = 42, permanent_items = { 'keep' } }
+end
+reset(nil)
+local original = loaded[3]
+recovery()
+assert(#auth_calls == 1 and auth_calls[1] == 0, 'only a missing human auth may start')
+assert(#load_calls == 0, 'mode-free entry must authenticate without loading a profile')
+assert(tick_calls == 1 and loaded[3] == original and original.revision == 42)
+recovery()
+assert(#auth_calls == 1 and #load_calls == 0 and tick_calls == 2,
+  'repeated recovery must not supersede in-flight authentication')
+
+-- Authentication may finish asynchronously; a later recovery respects selected
+-- pure mode and never replaces the existing pure profile with account defaults.
+authenticated[0], pending_auth[0], selected_mode = true, false, 'pure'
+recovery()
+assert(#load_calls == 2 and load_calls[1].id == 0 and load_calls[2].id == 2)
+assert(load_calls[1].mode == 'pure' and load_calls[2].mode == 'pure')
+assert(loaded[3] == original and original.permanent_items[1] == 'keep')
+recovery()
+assert(#load_calls == 2 and #auth_calls == 1 and pending_auth[1],
+  'recovery must preserve both kinds of pending request')
+loaded[0], loaded[2], loaded[9] = { revision = 1 }, { revision = 2 }, { revision = 3 }
+pending_load[0], pending_load[2], pending_load[9] = nil, nil, nil
+recovery()
+assert(#load_calls == 2 and loaded[3] == original, 'completed profiles must remain cached')
+
+-- Conventional mode uses the same missing-only policy, without special default
+-- loading or an automatic mode switch inserted by the injection helper.
+reset('standard')
+recovery()
+assert(#auth_calls == 1 and #load_calls == 1 and load_calls[1].id == 2)
+assert(load_calls[1].mode == 'standard' and loaded[3].mode == 'standard')
+
+-- Early attachment must not require/init the loading module merely to tick it.
+package.loaded['systems/startup_loading_service'] = nil
+recovery()
+assert(tick_calls == 1 and #auth_calls == 1 and #load_calls == 1)
+print('AUTH_RECOVERY_LUA_PASS')
+"""
+        script = self.root / "recovery.lua"
+        script.write_text(fixture, encoding="utf-8")
+        result = subprocess.run([lua, str(script)], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(result.stdout.strip(), "AUTH_RECOVERY_LUA_PASS")
 
 
 if __name__ == "__main__":

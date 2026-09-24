@@ -72,15 +72,17 @@ function M.evaluate(player_id, entry, context)
                 or "该内容暂不可购买",
             count
     end
-    local active_rebirth = entry.contenttype == "rebirth"
-        and context.active_challenge_encounters
-        and context.active_challenge_encounters[entry.encounter_id] == true
+    -- Buying an attempt is not completing a rebirth. Its progression check
+    -- below is authoritative; an abandoned/failed attempt must remain retryable
+    -- even after its boss or active-session record has been removed.
+    local rebirth_attempt = entry.contenttype == "rebirth"
+        and entry.grant_type == "start_encounter"
     if entry.requires_hero_summoned
         and context.hero_summoned ~= true
         and context.debug_all_unlocked ~= true then
         return false, "请先在英雄祭坛召唤英雄", count
     end
-    if limit > 0 and count >= limit and not active_rebirth then
+    if limit > 0 and count >= limit and not rebirth_attempt then
         return false, "已达到购买上限", count
     end
     if entry.contentid == "service_early_final_boss" then

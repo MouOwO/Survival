@@ -38,7 +38,7 @@ end
 
 local current_attack_range = tower_combat_rules.current_attack_range
 local THINK_INTERVAL = 0.25
-local ATTACK_ORDER_RETRY_SECONDS = 1
+local ATTACK_ORDER_RETRY_SECONDS = THINK_INTERVAL
 
 local function disable_native_acquisition(tower)
     if tower.SetIdleAcquire then tower:SetIdleAcquire(false) end
@@ -75,7 +75,7 @@ local function is_training_dummy(unit)
     return unit and unit.survival_is_training_dummy == true
 end
 
-local function find_target(tower)
+local function find_target(tower, excluded_target)
     local attack_range = current_attack_range(tower)
     local radius = math.max(attack_range + 64, 700)
     local units = FindUnitsInRadius(
@@ -89,7 +89,7 @@ local function find_target(tower)
         local distance = valid(unit)
             and (unit:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
             or 99999
-        if valid(unit) and not tree_damage_rules.is_tree(unit)
+        if unit ~= excluded_target and valid(unit) and not tree_damage_rules.is_tree(unit)
             and unit:GetTeamNumber() ~= tower:GetTeamNumber()
             and anti_air_rules.can_attack(tower, unit)
             and distance <= attack_range + 64 then
@@ -123,7 +123,19 @@ function modifier_tower_auto_attack:OnDeath(params)
     local tower = self:GetParent()
     if params.unit and (params.unit == self.forced_target or params.unit == self.manual_target
         or (valid(tower) and params.unit == tower:GetAttackTarget())) then
-        self:EnterIdle()
+        if not valid(tower) then return end
+        -- A kill is a target change, not an idle transition. Disarming/Stop here
+        -- interrupted the next attack, then a forced-target hint could spend a
+        -- whole second waiting for the retry while native acquisition was off.
+        local target = self:SelectTarget(params.unit)
+        if target then
+            self:SetAttackEnabled(true)
+            if self.forced_target ~= target or tower:GetAttackTarget() ~= target then
+                self:IssueAttackTarget(target, tower:GetAttackTarget() ~= target)
+            end
+        else
+            self:EnterIdle()
+        end
     end
 end
 
@@ -169,22 +181,48 @@ function modifier_tower_auto_attack:SetManualTarget(target)
         tostring(tower:entindex()), tostring(target:entindex())))
 end
 
-function modifier_tower_auto_attack:IssueAttackTarget(target, recover)
+function modifier_tower_auto_attack:IssueAttackTarget(target, issue_order)
     local tower = self:GetParent()
     if not valid(tower) or not valid(target) or tree_damage_rules.is_tree(target) then return end
     self.forced_target, self.attack_order_wait = target, 0
     self.issuing_attack_order = true
     local ok = pcall(function()
         tower:SetForceAttackTarget(target)
-        -- SetForceAttackTarget can leave only a forced-target hint when the
-        -- engine has just rejected/cleared an attack. Idle acquisition is off,
-        -- so restart that stalled target with an explicit single-target order.
-        if recover and tower.MoveToTargetToAttack and valid(target) then
+        -- Idle acquisition is disabled. On a new automatic target, issue the
+        -- actual order immediately instead of waiting for a forced-target hint
+        -- to turn into an attack. Manual targeting already has an engine order.
+        if issue_order and tower.MoveToTargetToAttack and valid(target) then
             tower:MoveToTargetToAttack(target)
         end
     end)
     self.issuing_attack_order = false
     if not ok then self.forced_target = nil end
+end
+
+function modifier_tower_auto_attack:SelectTarget(excluded_target)
+    local tower = self:GetParent()
+    local attack_range = current_attack_range(tower)
+    local function legal(target)
+        return target ~= excluded_target and valid(target) and not tree_damage_rules.is_tree(target)
+            and anti_air_rules.can_attack(tower, target)
+            and target:GetTeamNumber() ~= tower:GetTeamNumber()
+            and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D() <= attack_range + 96
+    end
+    if not legal(self.manual_target) then self.manual_target = nil end
+    -- Keep a legal player selection or ongoing engine target. Training dummies
+    -- still yield to real enemies; no target leaves the tower explicitly idle.
+    local target = self.manual_target or tower:GetAttackTarget()
+    if not legal(target) then target = nil end
+    if not target and legal(self.forced_target) then target = self.forced_target end
+    if target and is_training_dummy(target) then
+        local preferred = find_target(tower, excluded_target)
+        if preferred ~= target then
+            self.manual_target = nil
+            target = preferred
+        end
+    end
+    if not target then target = find_target(tower, excluded_target) end
+    return target
 end
 
 function modifier_tower_auto_attack:OnIntervalThink()
@@ -199,26 +237,7 @@ function modifier_tower_auto_attack:OnIntervalThink()
         self:EnterIdle(true)
     end
 
-    local attack_range = current_attack_range(tower)
-    local function legal(target)
-        return valid(target) and not tree_damage_rules.is_tree(target)
-            and anti_air_rules.can_attack(tower, target)
-            and target:GetTeamNumber() ~= tower:GetTeamNumber()
-            and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D() <= attack_range + 96
-    end
-    if not legal(self.manual_target) then self.manual_target = nil end
-    -- Keep a legal player selection or ongoing engine target. Training dummies
-    -- still yield to real enemies; no target leaves the tower explicitly idle.
-    local target = self.manual_target or tower:GetAttackTarget()
-    if not legal(target) then target = nil end
-    if target and is_training_dummy(target) then
-        local preferred = find_target(tower)
-        if preferred ~= target then
-            self.manual_target = nil
-            target = preferred
-        end
-    end
-    if not target then target = find_target(tower) end
+    local target = self:SelectTarget()
     if not valid(target) then
         self:EnterIdle()
         return
@@ -229,7 +248,7 @@ function modifier_tower_auto_attack:OnIntervalThink()
     -- another Stop(), or an interrupted initial order can leave the tower idle.
     self:SetAttackEnabled(true)
     if self.forced_target ~= target then
-        self:IssueAttackTarget(target, false)
+        self:IssueAttackTarget(target, tower:GetAttackTarget() ~= target)
     elseif tower:GetAttackTarget() == target then
         self.attack_order_wait = 0
     else

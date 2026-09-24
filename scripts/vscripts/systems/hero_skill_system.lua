@@ -98,14 +98,13 @@ local function snapshot(player_id)
 
     local projected = {}
     for index, skill_id in ipairs(state.order) do
-        table.insert(
-            projected,
-            skill_projection(
-                skill_id,
-                state.levels[skill_id],
-                state.locked[skill_id]
-            )
-        )
+        local item = skill_projection(skill_id, state.levels[skill_id], state.locked[skill_id])
+        local definition = skills.by_id[skill_id]
+        item.can_upgrade = definition and definition.enabled ~= false
+            and definition.is_public == true and item.passive == 1
+            and item.locked == 0 and item.level > 0 and item.level < item.max_level
+            and (state.skill_points or 0) > 0 and 1 or 0
+        table.insert(projected, item)
     end
 
     return {
@@ -465,6 +464,13 @@ local function upgrade_with_skill_point_request(payload)
     if not state then
         return { ok = false, error = "combat_hero_not_ready" }
     end
+    if not valid_entity(state.unit) then
+        return { ok = false, error = "combat_hero_not_ready" }
+    end
+    if payload.unit_entindex ~= nil
+        and tonumber(payload.unit_entindex) ~= state.unit:entindex() then
+        return { ok = false, error = "combat_hero_changed" }
+    end
     local skill_id = tostring(payload.skill_id or "")
     local skill_definition = skills.by_id[skill_id]
     if not skill_definition or skill_definition.enabled == false
@@ -476,6 +482,12 @@ local function upgrade_with_skill_point_request(payload)
         return { ok = false, error = "passive_skill_invalid" }
     end
     local current = tonumber(state.levels[skill_id]) or 0
+    if payload.expected_level ~= nil and tonumber(payload.expected_level) ~= current then
+        return { ok = false, error = "skill_level_changed" }
+    end
+    if state.locked[skill_id] == true then
+        return { ok = false, error = "skill_locked" }
+    end
     if current <= 0 then
         return { ok = false, error = "skill_not_owned" }
     end

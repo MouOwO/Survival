@@ -1,18 +1,27 @@
 from __future__ import annotations
 
 import base64
+from contextlib import ExitStack, contextmanager
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import aliyun_test_connection as tunnel
 
 
 class TunnelTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "nt", "Windows byte lock")
+    def test_live_byte_lock_reports_busy_instead_of_read_permission_error(self):
+        with tunnel.state_lock(self.state):
+            with self.assertRaisesRegex(tunnel.TunnelError, "tunnel_operation_in_progress"):
+                with tunnel.state_lock(self.state):
+                    self.fail("second helper acquired the active lock")
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -26,6 +35,42 @@ class TunnelTests(unittest.TestCase):
                  "command_digest": tunnel.command_digest(command)}
         self.state.write_text(json.dumps(state), encoding="utf-8")
         return state, command
+
+    @contextmanager
+    def connect_fixture(self, *, old_identity=None, old_command="ssh.exe -N recorded-args",
+                        old_error=None, free=True):
+        """Simulate SSH and Windows handles without touching real processes."""
+        key, hosts = self.root / "fixture-key", self.root / "fixture-known-hosts"
+        key.write_text("unused fixture", encoding="utf-8")
+        command = tunnel.ssh_command(str(Path("ssh.exe").resolve()), key.resolve(), hosts.resolve())
+        new_command = subprocess.list2cmdline(command)
+        old_handle, new_handle = Mock(), Mock()
+        old_handle.identity.return_value = old_identity
+        new_handle.identity.return_value = {
+            "created": 654321, "executable": "c:/windows/system32/openssh/ssh.exe"}
+        child = Mock(pid=42)
+        child.poll.return_value = None
+
+        def process_handle(pid, **kwargs):
+            if pid == 41 and old_error:
+                raise tunnel.TunnelError(old_error)
+            wrapper = MagicMock()
+            wrapper.__enter__.return_value = old_handle if pid == 41 else new_handle
+            return wrapper
+
+        with ExitStack() as stack:
+            stack.enter_context(patch.object(tunnel, "verify_known_hosts"))
+            stack.enter_context(patch.object(tunnel.shutil, "which", return_value="ssh.exe"))
+            availability = stack.enter_context(patch.object(tunnel, "port_free", return_value=free))
+            factory = stack.enter_context(patch.object(tunnel, "ProcessHandle", side_effect=process_handle))
+            process_command = stack.enter_context(patch.object(
+                tunnel, "process_command", side_effect=lambda pid: old_command if pid == 41 else new_command))
+            launch = stack.enter_context(patch.object(tunnel.subprocess, "Popen", return_value=child))
+            stack.enter_context(patch.object(tunnel, "health", return_value=True))
+            stack.enter_context(patch.object(tunnel, "listener_owned", return_value=True))
+            yield {"key": key, "hosts": hosts, "old": old_handle, "new": new_handle,
+                   "child": child, "launch": launch, "factory": factory,
+                   "free": availability, "process_command": process_command}
 
     def test_host_key_must_match_console_pin_and_exact_target(self):
         raw = b"test-public-key"
@@ -115,6 +160,124 @@ class TunnelTests(unittest.TestCase):
                 tunnel.process_command(123)
         self.assertEqual(str(raised.exception), "process_identity_unavailable")
         self.assertIsNone(raised.exception.__cause__)
+
+    def test_connect_recovers_reused_pid_metadata_only_when_port_is_free(self):
+        for field, changed in (("created", 999999), ("executable", "other.exe"),
+                               ("command", "unrelated.exe --private-fixture")):
+            with self.subTest(field=field):
+                state, command = self.write_state()
+                identity = {"created": state["created"], "executable": state["executable"]}
+                if field == "command":
+                    command = changed
+                else:
+                    identity[field] = changed
+                log = self.state.with_suffix(".stderr")
+                log.write_text("old log", encoding="utf-8")
+                with self.connect_fixture(old_identity=identity, old_command=command) as fixture:
+                    result = tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+                    self.assertEqual(result["status"], "connected")
+                    self.assertEqual(json.loads(self.state.read_text())["pid"], 42)
+                    fixture["old"].terminate.assert_not_called()
+                    fixture["new"].terminate.assert_not_called()
+                    fixture["child"].terminate.assert_not_called()
+                    fixture["launch"].assert_called_once()
+                    self.assertGreaterEqual(fixture["free"].call_count, 2)
+                    if field != "command":
+                        self.assertNotIn(41, [call.args[0] for call in fixture["process_command"].call_args_list])
+
+    def test_connect_recovers_exited_process_without_termination(self):
+        for error in ("tunnel_process_unavailable", "tunnel_process_exited"):
+            with self.subTest(error=error):
+                self.write_state()
+                with self.connect_fixture(old_error=error) as fixture:
+                    result = tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+                    self.assertTrue(result["ok"])
+                    fixture["old"].terminate.assert_not_called()
+
+    def test_connect_keeps_matching_live_process_without_listener(self):
+        state, _ = self.write_state()
+        with self.connect_fixture(old_identity=state) as fixture:
+            with self.assertRaisesRegex(tunnel.TunnelError, "existing_tunnel_has_no_listener"):
+                tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+            fixture["launch"].assert_not_called()
+            fixture["old"].terminate.assert_not_called()
+            self.assertEqual(json.loads(self.state.read_text()), state)
+
+    def test_connect_keeps_state_when_process_identity_is_unavailable(self):
+        state, _ = self.write_state()
+        with self.connect_fixture(old_error="process_identity_unavailable") as fixture:
+            with self.assertRaisesRegex(tunnel.TunnelError, "process_identity_unavailable"):
+                tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+            fixture["launch"].assert_not_called()
+            self.assertEqual(json.loads(self.state.read_text()), state)
+
+    def test_recovery_rechecks_free_port_before_changing_metadata(self):
+        state, _ = self.write_state()
+        log = self.state.with_suffix(".stderr")
+        log.write_text("preserve", encoding="utf-8")
+        with self.connect_fixture(old_identity={**state, "created": 999999}) as fixture:
+            fixture["free"].side_effect = [True, False]
+            with self.assertRaisesRegex(tunnel.TunnelError, "local_port_8765_in_use"):
+                tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+            fixture["launch"].assert_not_called()
+            fixture["old"].terminate.assert_not_called()
+            self.assertEqual(json.loads(self.state.read_text()), state)
+            self.assertEqual(log.read_text(), "preserve")
+
+    def test_busy_port_with_reused_pid_never_discards_metadata(self):
+        state, _ = self.write_state()
+        with self.connect_fixture(old_identity={**state, "created": 999999}, free=False) as fixture:
+            with self.assertRaisesRegex(tunnel.TunnelError, "tunnel_owner_mismatch"):
+                tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+            fixture["launch"].assert_not_called()
+            fixture["old"].terminate.assert_not_called()
+            self.assertEqual(json.loads(self.state.read_text()), state)
+
+    def test_recovery_does_not_truncate_or_remove_an_open_stderr_log(self):
+        state, _ = self.write_state()
+        log = self.state.with_suffix(".stderr")
+        log.write_text("preserve other handle", encoding="utf-8")
+        original_unlink = Path.unlink
+
+        def locked_unlink(path, *args, **kwargs):
+            if path == log:
+                raise PermissionError("sensitive-fixture")
+            return original_unlink(path, *args, **kwargs)
+
+        with self.connect_fixture(old_identity={**state, "created": 999999}) as fixture, \
+             patch.object(Path, "unlink", locked_unlink):
+            with self.assertRaises(tunnel.TunnelError) as raised:
+                tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+            self.assertEqual(str(raised.exception), "stale_tunnel_log_unavailable")
+            self.assertIsNone(raised.exception.__cause__)
+            fixture["launch"].assert_not_called()
+            fixture["old"].terminate.assert_not_called()
+            self.assertEqual(json.loads(self.state.read_text()), state)
+            self.assertEqual(log.read_text(), "preserve other handle")
+
+    def test_new_launch_never_truncates_existing_unowned_log(self):
+        log = self.state.with_suffix(".stderr")
+        log.write_text("preserve unknown log", encoding="utf-8")
+        with self.connect_fixture() as fixture:
+            with self.assertRaisesRegex(tunnel.TunnelError, "tunnel_log_unavailable"):
+                tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+            fixture["launch"].assert_not_called()
+            fixture["factory"].assert_not_called()
+            self.assertEqual(log.read_text(), "preserve unknown log")
+
+    def test_incomplete_state_is_not_treated_as_proven_pid_reuse(self):
+        for field, invalid in (("version", 2), ("created", None), ("executable", ""),
+                               ("command_digest", "invalid")):
+            with self.subTest(field=field):
+                state, _ = self.write_state()
+                state[field] = invalid
+                self.state.write_text(json.dumps(state), encoding="utf-8")
+                with self.connect_fixture() as fixture:
+                    with self.assertRaisesRegex(tunnel.TunnelError, "tunnel_state_invalid"):
+                        tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+                    fixture["launch"].assert_not_called()
+                    fixture["factory"].assert_not_called()
+                    self.assertEqual(json.loads(self.state.read_text()), state)
 
 
 if __name__ == "__main__":

@@ -188,7 +188,13 @@ def read_state(path: Path) -> dict | None:
         if path.is_symlink() or path.stat().st_size > 8192:
             raise ValueError
         state = json.loads(path.read_text(encoding="utf-8"))
-        if not isinstance(state, dict) or type(state.get("pid")) is not int or state["pid"] <= 0:
+        if (not isinstance(state, dict) or state.get("version") != 1
+                or type(state.get("pid")) is not int or state["pid"] <= 0
+                or type(state.get("created")) is not int or state["created"] <= 0
+                or not isinstance(state.get("executable"), str) or not state["executable"]
+                or not isinstance(state.get("command_digest"), str)
+                or len(state["command_digest"]) != 64
+                or any(char not in "0123456789abcdef" for char in state["command_digest"])):
             raise ValueError
         return state
     except (OSError, ValueError):
@@ -200,8 +206,10 @@ def state_lock(path: Path):
     import msvcrt
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.with_suffix(".lock").open("a+b") as handle:
-        handle.seek(0)
-        if not handle.read(1):
+        # Reading byte zero before locking raises PermissionError on Windows
+        # when another process owns the byte. Inspect metadata instead, so a
+        # second helper reports the intended operation-in-progress result.
+        if os.fstat(handle.fileno()).st_size == 0:
             handle.write(b"0")
             handle.flush()
         handle.seek(0)
@@ -258,18 +266,40 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
     if old is not None:
         try:
             with ProcessHandle(old["pid"]) as handle:
-                validate_owned(old, handle.identity(), process_command(old["pid"]))
+                identity = handle.identity()
+                # After a reboot the recorded PID may belong to another process.
+                # A creation/image mismatch is sufficient to reject ownership;
+                # do not require access to that unrelated process's command line.
+                if (identity.get("created") != old["created"]
+                        or identity.get("executable") != old["executable"]):
+                    raise TunnelError("tunnel_owner_mismatch")
+                validate_owned(old, identity, process_command(old["pid"]))
             raise TunnelError("existing_tunnel_has_no_listener")
         except TunnelError as exc:
-            if str(exc) not in {"tunnel_process_unavailable", "tunnel_process_exited"}:
+            if str(exc) not in {"tunnel_process_unavailable", "tunnel_process_exited",
+                                "tunnel_owner_mismatch"}:
                 raise
+        # Recover only stale metadata, never terminate the reused PID. Recheck
+        # immediately before removing anything in case a listener appeared.
+        if not port_free():
+            raise TunnelError("local_port_8765_in_use")
+        try:
+            path.with_suffix(".stderr").unlink(missing_ok=True)
+        except OSError:
+            # Windows may refuse deletion while another process holds this log.
+            # Keep the state for a later retry and never truncate an open log.
+            raise TunnelError("stale_tunnel_log_unavailable") from None
         path.unlink()
     command = ssh_command(str(Path(ssh).resolve()), key.resolve(), known_hosts.resolve())
     # stderr remains a private temporary log; only classified codes are printed.
     error_path = path.with_suffix(".stderr")
     process = None
     try:
-        with error_path.open("w+b") as errors:
+        try:
+            errors = error_path.open("x+b")
+        except OSError:
+            raise TunnelError("tunnel_log_unavailable") from None
+        with errors:
             process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                        stderr=errors, creationflags=HIDDEN)
             deadline = time.monotonic() + 15

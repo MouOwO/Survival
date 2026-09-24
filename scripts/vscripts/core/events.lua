@@ -229,6 +229,7 @@ local M = {
     UNIT_COMBAT_STATS_CHANGED = "unit.combat_stats.changed",
 
     MONSTER_ENCOUNTER_START_REQUEST = "monster.encounter.start.request",
+    HERO_RETURNED_HOME = "hero.returned_home",
     MONSTER_ENCOUNTER_QUERY_REQUEST = "monster.encounter.query.request",
     MONSTER_ENCOUNTER_REENTER_REQUEST = "monster.encounter.reenter.request",
     MONSTER_ENCOUNTER_CHANGED = "monster.encounter.changed",

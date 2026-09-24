@@ -2,6 +2,10 @@
 -- listed: they remain one-time progression challenges.
 local M = {}
 
+-- An unsuccessful rebirth attempt may be retried, but completion is still
+-- restricted by the hero's current rebirth level. Match room respawn pacing.
+M.rebirth_retry_seconds = 2
+
 M.rows = {}
 M.by_id = {}
 

@@ -1,0 +1,62 @@
+{
+  "date": "2026-09-24",
+  "scope": "Commit useful game/content changes, remove regenerable intermediates, compile the current saved Hammer map",
+  "paired_content_commit": "d55d707e34a68f24a9dbcfe4dfa8ec9d7af5a80d",
+  "map": {
+    "source": "content/dota_addons/survival/maps/template_map.vmap",
+    "source_bytes": 76148171,
+    "source_sha256": "ced3e8e21a7772fb881bf97d60a643f247363395aa229abc13b8ce865dec6d9d",
+    "source_edited_by_this_task": false,
+    "output": "game/dota_addons/survival/maps/template_map.vpk",
+    "output_bytes": 65668149,
+    "output_sha256": "33d936a3edf98d6fc3208e54fa4ead0df4b1d0ab21f859ae2c31cb157675e011",
+    "compiler_result": "318 compiled, 0 failed, 1 skipped",
+    "package_crc_entries_checked": 323,
+    "source_and_compiled_dependency_crc32": 3418668246,
+    "source_matches_compiled_package": true,
+    "rollback_directory": "output/resource_sync_20260924/build_162019",
+    "verification_tool": "tools/map_c6/verify-map-package.cjs",
+    "verification_self_test": "PASS: VPK versions, preload, corruption, truncation, REDI, RED2, wrong source, text source rejection",
+    "build_wrapper": "Checks the source hash before/after compilation and invokes the package verifier; PowerShell parse and the exact post-build verifier command passed. The compiler itself ran before adding this post-build guard.",
+    "runtime_verified": false,
+    "minimap_recaptured": false
+  },
+  "cleanup": {
+    "old_untracked_ignored_files_removed": 45,
+    "old_removed_bytes": 962221926,
+    "categories": ["4 reproducible DMX text/roundtrip maps", "41 Python bytecode caches with existing source files"],
+    "temporary_audit_decodes_removed": 6,
+    "temporary_audit_decode_bytes": 530883093,
+    "preserved": ["authoring models and textures", "review maps", "current rollback backups", "active Python environment", "Hammer backend credentials and live locks", "live asset-browser caches"],
+    "content_unused_files_proven": 0,
+    "details": "output/resource_sync_20260924/cleanup.json"
+  },
+  "resources": {
+    "ui_source_pairs_sha256_matching": 9,
+    "ui_compiled_input_crc_matching": 9,
+    "card_images": "12 referenced compiled textures retained. Main pixel payloads are unchanged; source CRC metadata reflects CRLF bytes. Three textures have tiny fallback-data changes.",
+    "cloud_material": "Referenced material retained; shader data unchanged, current source CRC metadata refreshed."
+  },
+  "regressions": {
+    "lua_behavior_suites": 13,
+    "lua_syntax_files": 18,
+    "lua_version": "5.4.5",
+    "python_offline_tests": 43,
+    "tooltip_and_selection_node_suites": 6,
+    "console_socket_tests": 5,
+    "result": "PASS",
+    "real_server_requests_in_this_task": false,
+    "real_frame_time_measured": false
+  },
+  "remaining_engine_warnings": {
+    "origin": "4 engine-owned content/dota/maps/tilesets files, not the addon map",
+    "current_map_entities_checked": 17069,
+    "current_map_numeric_fields_valid": true,
+    "invalid_native_prototype_fields": 21,
+    "native_prototypes_with_bad_grass_radius": 19,
+    "repeated_entity_suppression_log_lines": 1284,
+    "other_missing_engine_resources": ["scripts/nav_hulls.vdata_c", "soundevents/soundevents_test.vsndevts_c"],
+    "action": "Recorded without altering engine files or overriding native tilesets. Some native decoration prototypes are suppressed by the compiler; visual and navigation checks in a fresh game remain necessary.",
+    "details": "output/resource_sync_20260924/native_tileset_warnings.json"
+  }
+}

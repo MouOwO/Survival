@@ -7,6 +7,7 @@ const crypto = require('node:crypto');
 const path = require('node:path');
 // The engine rejects long CMND lines; leave room below its observed limit.
 const MAX_COMMAND_BYTES = 390;
+const CLOSE_DRAIN_MS = 250;
 
 function packet(type, body) {
   const buffer = Buffer.alloc(12 + body.length);
@@ -126,16 +127,29 @@ function send(options) {
     let input = Buffer.alloc(0), outputTail = '', sent = 0, matched = false, done = false;
     let startedSending = false, initialPrintFrames = 0;
     let bufferedHistory = false, historyDeadline = 0;
-    let sendTimer, responseTimer;
+    let sendTimer, responseTimer, closeTimer;
     const connectTimer = setTimeout(() => finish(new Error('Console connection timed out')), options.timeout);
     function finish(error) {
       if (done) return;
       done = true;
       clearTimeout(connectTimer); clearTimeout(sendTimer); clearTimeout(responseTimer);
-      socket.destroy();
-      if (error) reject(error);
-      else resolve({sent, expected_output_received: options.expect ? matched : null,
-        initial_print_frames_suppressed: initialPrintFrames});
+      input = Buffer.alloc(0);
+      function settle() {
+        clearTimeout(closeTimer);
+        if (error) reject(error);
+        else resolve({sent, expected_output_received: options.expect ? matched : null,
+          initial_print_frames_suppressed: initialPrintFrames});
+      }
+      if (error || socket.destroyed) {
+        socket.destroy();
+        settle();
+        return;
+      }
+      // Finish successful sessions with FIN, then consume any remaining engine
+      // output until it closes. Never leave a hung peer holding this tool open.
+      socket.once('close', settle);
+      closeTimer = setTimeout(() => { socket.destroy(); settle(); }, CLOSE_DRAIN_MS);
+      socket.end();
     }
     function transmit() {
       if (done) return;
@@ -162,6 +176,7 @@ function send(options) {
       sendTimer = setTimeout(transmit, 350);
     });
     socket.on('data', bytes => {
+      if (done) return; // Drain late output without logging or retaining it.
       input = Buffer.concat([input, bytes]);
       while (!done && input.length >= 12) {
         const size = input.readUInt32BE(6);

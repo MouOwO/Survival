@@ -1,6 +1,6 @@
 -- Tools server: script require("tests/manual_hero_summon_destination").run()
--- Read authored markers and call the production resolver. Teleport only owned
--- temporary creeps; never summon/replace a player's hero or modify map markers.
+-- Build a main city first. Read real owned cities and call the production
+-- resolver. Only teleport temporary creeps; never replace a player's hero.
 local M = {}
 local function valid(unit) return unit and not unit:IsNull() end
 local function copy(point) return Vector(point.x, point.y, point.z) end
@@ -38,32 +38,27 @@ function M.run()
     local ok = pcall(function()
         local resolver = require("systems/hero_summon_destination")
         local destination = require("systems/destination_validation_service")
-        for slot = 0, 3 do
-            local marker = Entities:FindByName(nil, "player_" .. slot .. "_hero_spawn")
-            local builder = Entities:FindByName(nil, "player_" .. slot .. "_builder_spawn")
-            if check(slot, "markers_present", valid(marker) and valid(builder)) then
-                local authored, builder_position = copy(marker:GetAbsOrigin()), copy(builder:GetAbsOrigin())
-                local forward = builder.GetForwardVector and builder:GetForwardVector() or Vector(1, 0, 0)
-                local anchor = {
-                    IsNull = function() return false end,
-                    GetAbsOrigin = function() return copy(builder_position) end,
-                    GetForwardVector = function() return copy(forward) end,
-                    GetTeamNumber = function() return DOTA_TEAM_GOODGUYS end,
-                }
-                local original_ok, original_reason = destination.validate_hero_position(authored)
-                local point, _, metadata = resolver.resolve(anchor, { spawn_offset = 260 }, slot)
+        local listed = require("core/event_bus").request(require("core/events").BUILDING_LIST_REQUEST, {})
+        local city_count = 0
+        for _, building in ipairs(listed and listed.ok and listed.buildings or {}) do
+            local city, slot = building.unit, tonumber(building.player_id)
+            if building.building_id == "main_city" and slot and valid(city) and city:IsAlive() then
+                city_count = city_count + 1
+                local authored = copy(city:GetAbsOrigin())
+                local point, _, metadata = resolver.resolve(city, {}, slot)
                 metadata = metadata or {}
                 log("RESOLVE", { "slot=" .. slot,
-                    "authored_valid=" .. tostring(original_ok == true),
-                    "authored_reason=" .. code(original_reason),
                     "source=" .. code(metadata.source),
                     "attempts=" .. tostring(tonumber(metadata.attempts) or 0),
                     "search_distance=" .. string.format("%.2f", tonumber(metadata.distance) or 0),
                     "last_rejection=" .. code(metadata.last_reason) })
                 if check(slot, "resolved", point ~= nil) then
+                    local city_dx, city_dy = point.x - authored.x, point.y - authored.y
+                    check(slot, "near_own_city", metadata.source == "main_city"
+                        and city_dx * city_dx + city_dy * city_dy <= 640 * 640 + 1)
                     check(slot, "candidate_navigation", destination.validate_hero_position(point) == true)
                     local unit = CreateUnitByName("npc_dota_creep_goodguys_melee",
-                        point, false, nil, nil, DOTA_TEAM_GOODGUYS)
+                        point, false, nil, nil, city:GetTeamNumber())
                     if check(slot, "probe_created", valid(unit)) then
                         owned[#owned + 1] = unit
                         unit:SetEntityName("manual_altar_destination_" .. math.floor(Time() * 1000) .. "_" .. slot)
@@ -106,15 +101,16 @@ function M.run()
                         check(slot, "nearby_path_128", reachable > 0,
                             { "reachable_directions=" .. reachable,
                                 "full_room_navigation_verified=false" })
-                        -- The source marker is never corrected or moved by this test.
-                        local after = marker:GetAbsOrigin()
-                        check(slot, "marker_unchanged", after.x == authored.x
+                        local after = city:GetAbsOrigin()
+                        check(slot, "city_unchanged", after.x == authored.x
                             and after.y == authored.y and after.z == authored.z)
                         UTIL_Remove(unit)
                     end
                 end
             end
         end
+        check(-1, "built_main_city_required", city_count > 0,
+            { "eligible_cities=" .. city_count })
     end)
     if not ok then failed = failed + 1; log("EXCEPTION", { "fixture_aborted" }) end
     cleanup()
