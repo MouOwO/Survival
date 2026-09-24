@@ -365,3 +365,16 @@ __pycache__/
 !/scripts/vscripts/tests/test_archive_difficulty_progression.lua
 !/scripts/vscripts/tests/test_hero_skill_point_upgrade.lua
 !/scripts/vscripts/tests/test_rebirth_return_retry.lua
+!/scripts/vscripts/tests/manual_spawn_land_check.lua
+!/scripts/vscripts/tests/test_archive_challenge_hub_positions.lua
+!/scripts/vscripts/tests/test_debug_spawn_positions.lua
+!/scripts/vscripts/tests/test_tree_hit_scan_coalescing.lua
+!/scripts/vscripts/tests/test_resource_ui_coalescing.lua
+!/scripts/vscripts/tests/test_ui_snapshot_scheduling.lua
+!/scripts/vscripts/tests/manual_combat_performance.lua
+!/scripts/vscripts/tests/test_combat_performance_capture.lua
+!/scripts/vscripts/tests/manual_tree_impact_api_probe.lua
+!/scripts/vscripts/tests/test_building_upgrade_lifecycle.lua
+!/scripts/vscripts/tests/test_builder_tower_rebuild.lua
+!/scripts/vscripts/tests/test_building_death_visual.lua
+!/scripts/vscripts/tests/test_tower_destruction_rebuild.lua

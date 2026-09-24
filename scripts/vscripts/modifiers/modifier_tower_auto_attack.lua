@@ -27,6 +27,7 @@ end
 
 function modifier_tower_auto_attack:SetAttackEnabled(enabled)
     local count = enabled and 1 or 0
+    self.attack_enabled = enabled == true
     if self:GetStackCount() == count then return end
     self:SetStackCount(count)
     self:ForceRefresh()
@@ -40,9 +41,12 @@ local current_attack_range = tower_combat_rules.current_attack_range
 local THINK_INTERVAL = 0.25
 local ATTACK_ORDER_RETRY_SECONDS = THINK_INTERVAL
 
-local function disable_native_acquisition(tower)
+local function disable_native_acquisition(tower, modifier, force)
+    if not force and modifier.native_acquisition_disabled
+        and (not tower.GetAcquisitionRange or tower:GetAcquisitionRange() == 0) then return end
     if tower.SetIdleAcquire then tower:SetIdleAcquire(false) end
     if tower.SetAcquisitionRange then tower:SetAcquisitionRange(0) end
+    modifier.native_acquisition_disabled = true
 end
 
 local function clear_attack_gestures(tower)
@@ -77,22 +81,20 @@ end
 
 local function find_target(tower, excluded_target)
     local attack_range = current_attack_range(tower)
+    local origin, team = tower:GetAbsOrigin(), tower:GetTeamNumber()
     local radius = math.max(attack_range + 64, 700)
     local units = FindUnitsInRadius(
-        tower:GetTeamNumber(), tower:GetAbsOrigin(), nil, radius,
+        team, origin, nil, radius,
         DOTA_UNIT_TARGET_TEAM_ENEMY,
         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
         DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
         FIND_CLOSEST, false)
     local training_dummy = nil
     for _, unit in ipairs(units or {}) do
-        local distance = valid(unit)
-            and (unit:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
-            or 99999
         if unit ~= excluded_target and valid(unit) and not tree_damage_rules.is_tree(unit)
-            and unit:GetTeamNumber() ~= tower:GetTeamNumber()
+            and unit:GetTeamNumber() ~= team
             and anti_air_rules.can_attack(tower, unit)
-            and distance <= attack_range + 64 then
+            and (unit:GetAbsOrigin() - origin):Length2D() <= attack_range + 64 then
             if is_training_dummy(unit) then
                 training_dummy = training_dummy or unit
             else
@@ -112,14 +114,17 @@ function modifier_tower_auto_attack:OnAttackStart(params)
     if valid(target) and target:GetTeamNumber() ~= tower:GetTeamNumber()
         and self:GetStackCount() ~= 0 and not tree_damage_rules.is_tree(target)
         and anti_air_rules.can_attack(tower, target)
-        and (not is_training_dummy(target) or find_target(tower) == target) then
+        and (not is_training_dummy(target) or self.forced_target == target) then
         return
     end
     self:EnterIdle(true)
 end
 
 function modifier_tower_auto_attack:OnDeath(params)
-    if not IsServer() then return end
+    if not IsServer() or not params or not params.unit then return end
+    if self.attack_enabled == false and self.forced_target == nil and self.manual_target == nil then
+        return
+    end
     local tower = self:GetParent()
     if params.unit and (params.unit == self.forced_target or params.unit == self.manual_target
         or (valid(tower) and params.unit == tower:GetAttackTarget())) then
@@ -145,7 +150,7 @@ function modifier_tower_auto_attack:OnCreated()
     self.idle_initialized = false
     local tower = self:GetParent()
     if valid(tower) then
-        disable_native_acquisition(tower)
+        disable_native_acquisition(tower, self, true)
     end
     self:EnterIdle(true)
     self:StartIntervalThink(THINK_INTERVAL)
@@ -155,7 +160,7 @@ function modifier_tower_auto_attack:ResetTarget()
     if not IsServer() then return end
     local tower = self:GetParent()
     if valid(tower) then
-        disable_native_acquisition(tower)
+        disable_native_acquisition(tower, self, true)
     end
     self:EnterIdle()
 end
@@ -218,8 +223,8 @@ function modifier_tower_auto_attack:SelectTarget(excluded_target)
         local preferred = find_target(tower, excluded_target)
         if preferred ~= target then
             self.manual_target = nil
-            target = preferred
         end
+        return preferred
     end
     if not target then target = find_target(tower, excluded_target) end
     return target
@@ -232,7 +237,7 @@ function modifier_tower_auto_attack:OnIntervalThink()
 
     -- Idle acquisition is distinct from acquisition radius. Disable both;
     -- approved combat targets below are still attacked explicitly.
-    disable_native_acquisition(tower)
+    disable_native_acquisition(tower, self)
     if tree_damage_rules.is_tree(tower:GetAttackTarget()) then
         self:EnterIdle(true)
     end

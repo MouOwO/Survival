@@ -60,15 +60,11 @@ local function filter(_, keys)
     end
     if order_type ~= tonumber(DOTA_UNIT_ORDER_ATTACK_TARGET) then return true end
     local target = entity(keys.entindex_target)
+    local target_is_tree = tree_damage_rules.is_tree(target)
     for _, unit in ipairs(units) do
-        if tree_damage_rules.is_arrow_tower(unit) then
-            local owner = player_context.owner_player_id(unit)
-            if issuer ~= nil and issuer >= 0 and owner ~= nil
-                and issuer ~= owner then
-                return false
-            end
-        end
-        if tree_damage_rules.is_tree(target)
+        -- Ownership was already checked for every ordered unit above.
+        local is_tower = tree_damage_rules.is_arrow_tower(unit)
+        if target_is_tree
             and not tree_damage_rules.is_allowed_tree_attacker(unit) then
             return false
         end
@@ -76,8 +72,7 @@ local function filter(_, keys)
             and not anti_air_rules.is_flying(target) then
             return false
         end
-        if tree_damage_rules.is_arrow_tower(unit)
-            and target and not tree_damage_rules.is_tree(target)
+        if is_tower and target and not target_is_tree
             and anti_air_rules.can_attack(unit, target)
             and target:GetTeamNumber() ~= unit:GetTeamNumber() then
             local modifier = unit:FindModifierByName("modifier_tower_auto_attack")

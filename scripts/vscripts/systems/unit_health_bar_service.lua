@@ -40,7 +40,8 @@ local function is_unit(unit)
 end
 
 local function publish_removed(unit)
-    if not CustomNetTables or not valid_entity(unit) or not unit.entindex then
+    if not CustomNetTables or type(CustomNetTables.SetTableValue) ~= "function"
+        or not valid_entity(unit) or not unit.entindex then
         return
     end
     CustomNetTables:SetTableValue(

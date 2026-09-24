@@ -4,11 +4,15 @@ local logger = require("core/logger")
 local appearance = require("visual/model_appearance_service")
 -- Only used to clean up carriers left by an older script version.
 local native_carrier = require("visual/native_wearable_carrier_service")
+local scheduler = require("core/scheduler")
 
 local M = {}
 local activity_modifiers_by_unit = {}
 local particles_by_unit = {}
 local bodygroups_by_unit = {}
+local visual_owners_by_unit = {}
+local deaths_by_unit = {}
+local DEATH_VISUAL_SECONDS = 4
 local NATIVE_TOWER_MODELS = {
     ["models/props_structures/tower_dragon_black.vmdl"] = true,
     ["models/props_structures/rock_golem/tower_radiant_rock_golem.vmdl"] = true,
@@ -264,6 +268,16 @@ end
 
 function M.apply(unit, data)
     if not valid_entity(unit) then return false, "invalid_entity" end
+    if unit.survival_building_death_visual or unit.survival_building_destroyed
+        or (unit.IsAlive and not unit:IsAlive()) then return false, "building_dead" end
+    local unit_index = unit:entindex()
+    if visual_owners_by_unit[unit_index] ~= unit then
+        -- A new entity can reuse a recently removed corpse's index. It must
+        -- receive its own activity/bodygroup writes, even for the same asset.
+        activity_modifiers_by_unit[unit_index] = nil
+        bodygroups_by_unit[unit_index] = nil
+        visual_owners_by_unit[unit_index] = unit
+    end
     local model_path, asset, requested_asset_id = M.resolve(data)
     if not model_path or model_path == "" then return false, "model_missing" end
     if unit.survival_upgrade_skip_model_path == model_path then
@@ -288,6 +302,7 @@ function M.apply(unit, data)
             urgent = true,
             on_ready = function()
                 if valid_entity(unit)
+                    and not unit.survival_building_death_visual
                     and unit.survival_model_asset_id == requested_asset_id then
                     unit.survival_pending_model_asset_id = nil
                     unit.survival_pending_previous_model_asset_id = nil
@@ -296,6 +311,7 @@ function M.apply(unit, data)
             end,
             on_failed = function()
                 if valid_entity(unit)
+                    and not unit.survival_building_death_visual
                     and unit.survival_pending_model_asset_id == requested_asset_id then
                     unit.survival_model_asset_id =
                         unit.survival_pending_previous_model_asset_id
@@ -381,12 +397,114 @@ function M.apply(unit, data)
 end
 
 function M.clear(unit)
+    if not unit then return end
+    -- A clear requested by teardown supersedes the deferred corpse cleanup.
+    -- Match the captured handle, since entindexes may be reused by new towers.
+    for index, state in pairs(deaths_by_unit) do
+        if state.owner == unit then
+            scheduler.cancel(state.task_id)
+            deaths_by_unit[index] = nil
+        end
+    end
     if valid_entity(unit) then
+        local index = unit:entindex()
+        if visual_owners_by_unit[index] and visual_owners_by_unit[index] ~= unit then
+            appearance.Clear(unit)
+            return
+        end
         clear_activity_modifiers(unit)
         appearance.Clear(unit)
         native_carrier.Clear(unit)
         clear_particles(unit)
         clear_bodygroups(unit)
+        visual_owners_by_unit[index] = nil
+    else
+        -- The engine can remove a corpse before our one-shot deadline.
+        appearance.Clear(unit)
+    end
+end
+
+-- The caller must release gameplay state/grid/counts immediately before this
+-- visual-only tail. Keep the dead original body and its bone-merged wearables;
+-- spawning a second tower NPC would run spawn/reward/limit code again.
+function M.play_death(unit)
+    if not valid_entity(unit) then return false, "invalid_entity" end
+    local alive_ok, alive = safe_call(unit, "IsAlive")
+    if not alive_ok or alive ~= false then return false, "unit_not_dead" end
+    local index_ok, index = safe_call(unit, "entindex")
+    if not index_ok or not index then return false, "invalid_entindex" end
+    local previous = deaths_by_unit[index]
+    if previous and previous.owner == unit then return true, "already_playing" end
+    if previous then
+        scheduler.cancel(previous.task_id)
+        appearance.Clear(previous.owner)
+    end
+
+    unit.survival_building_death_visual = true
+    unit.survival_pending_model_asset_id = nil
+    unit.survival_pending_previous_model_asset_id = nil
+    safe_call(unit, "SetForceAttackTarget", nil)
+    safe_call(unit, "SetIdleAcquire", false)
+    safe_call(unit, "SetAcquisitionRange", 0)
+    safe_call(unit, "SetHullRadius", 0)
+    safe_call(unit, "SetSolid", rawget(_G, "SOLID_NONE") or 0)
+    local owner_ok, player_id = safe_call(unit, "GetPlayerOwnerID")
+    player_id = tonumber(player_id)
+    if owner_ok and player_id and player_id >= 0 then
+        safe_call(unit, "SetControllableByPlayer", player_id, false)
+    end
+    -- Dead NPCs are not selectable/attackable in the engine; also remove our
+    -- custom bar rather than leaving a zero-HP overlay on the now-free tile.
+    require("systems/unit_health_bar_service").exclude(unit)
+    clear_particles(unit)
+    local death_activity = rawget(_G, "ACT_DOTA_DIE")
+    if death_activity ~= nil then safe_call(unit, "StartGesture", death_activity) end
+    -- If the model does not expose this gesture, ForceKill/native death has
+    -- already selected its own sequence. Do not reset an unknown model to idle.
+    safe_call(unit, "SetPlaybackRate", 1)
+
+    local state = {
+        owner = unit,
+        task_id = "building_death_visual_" .. tostring(index),
+        activity_modifiers = activity_modifiers_by_unit[index],
+        bodygroups = bodygroups_by_unit[index],
+    }
+    deaths_by_unit[index] = state
+    scheduler.after(DEATH_VISUAL_SECONDS, function()
+        if deaths_by_unit[index] ~= state then return end
+        deaths_by_unit[index] = nil
+        -- Each cache comparison also protects a replacement with a reused
+        -- entindex, even if this original corpse handle is already invalid.
+        if activity_modifiers_by_unit[index] == state.activity_modifiers then
+            if valid_entity(unit) then safe_call(unit, "ClearActivityModifiers") end
+            activity_modifiers_by_unit[index] = nil
+        end
+        if bodygroups_by_unit[index] == state.bodygroups then
+            if valid_entity(unit) then clear_bodygroups(unit)
+            else bodygroups_by_unit[index] = nil end
+        end
+        if visual_owners_by_unit[index] == unit then visual_owners_by_unit[index] = nil end
+        appearance.Clear(unit)
+        if valid_entity(unit) then
+            native_carrier.Clear(unit)
+            if type(UTIL_Remove) == "function" then pcall(UTIL_Remove, unit)
+            else safe_call(unit, "RemoveSelf") end
+        end
+    end, state.task_id)
+    return true, "native_death"
+end
+
+function M.init()
+    -- Tools can retain Lua modules between map runs. Dispose only pending dead
+    -- bodies here; living buildings continue to be owned by building_system.
+    local pending = {}
+    for _, state in pairs(deaths_by_unit) do pending[#pending + 1] = state.owner end
+    for _, unit in ipairs(pending) do
+        M.clear(unit)
+        if valid_entity(unit) then
+            if type(UTIL_Remove) == "function" then pcall(UTIL_Remove, unit)
+            else safe_call(unit, "RemoveSelf") end
+        end
     end
 end
 

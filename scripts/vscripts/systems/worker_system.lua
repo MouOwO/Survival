@@ -183,12 +183,12 @@ local function candidate_is_traversable(position)
     local ok_traversable, traversable = pcall(function()
         return GridNav:IsTraversable(position)
     end)
-    if ok_traversable and not traversable then return false end
+    if not ok_traversable or traversable ~= true then return false end
 
     local ok_blocked, blocked = pcall(function()
         return GridNav:IsBlocked(position)
     end)
-    if ok_blocked and blocked then return false end
+    if not ok_blocked or blocked ~= false then return false end
     return true
 end
 
@@ -207,8 +207,31 @@ local function candidate_has_clearance(city, position)
     return #units == 0
 end
 
+local function worker_ground_height(position, city)
+    local ok, height = pcall(GetGroundHeight, position, city)
+    if not ok or type(height) ~= "number" or height ~= height
+        or height == math.huge or height == -math.huge then return nil end
+    return height
+end
+
+local function candidate_has_ground_clearance(city, position)
+    -- Water can have traversable navigation. Check the worker's footprint so
+    -- a valid center cannot leave part of the unit over a cliff or shoreline.
+    for _, offset in ipairs({ {32, 0}, {-32, 0}, {0, 32}, {0, -32} }) do
+        local edge = position + Vector(offset[1], offset[2], 0)
+        local height = worker_ground_height(edge, city)
+        if height == nil or math.abs(height - position.z) > 32 then return false end
+        edge.z = height
+        if not candidate_is_traversable(edge) then return false end
+    end
+    return true
+end
+
 local function find_worker_spawn_position(city)
     local origin = city:GetAbsOrigin()
+    -- The model origin may be above the terrain; compare against real ground.
+    local city_height = worker_ground_height(origin, city)
+    if city_height == nil then return nil end
     local min_radius = config.spawn_radius_min or 420
     if city.GetHullRadius then
         min_radius = math.max(
@@ -229,17 +252,20 @@ local function find_worker_spawn_position(city)
             math.sin(angle) * radius,
             0
         )
-        candidate.z = GetGroundHeight(candidate, city)
+        local height = worker_ground_height(candidate, city)
+        candidate.z = height or origin.z
 
-        if candidate_is_traversable(candidate)
-            and candidate_has_clearance(city, candidate) then
+        if height ~= nil and math.abs(height - city_height) <= 64
+            and candidate_is_traversable(candidate)
+            and candidate_has_clearance(city, candidate)
+            and candidate_has_ground_clearance(city, candidate) then
             return candidate
         end
     end
 
-    local fallback = origin + Vector(max_radius, 0, 0)
-    fallback.z = GetGroundHeight(fallback, city)
-    return fallback
+    -- A forced east-side fallback can land in water after terrain edits.
+    -- Leave training unchanged when every nearby candidate is unavailable.
+    return nil
 end
 
 local function notify(player_id, message, level)
@@ -704,6 +730,13 @@ local function train_worker_one(payload)
         end
     end
 
+    local spawn_position = find_worker_spawn_position(city)
+    if not spawn_position then
+        local error_message = "主城周围没有可通行的空地，无法训练工人，请先腾出空间"
+        notify(city_state.player_id, error_message, "error")
+        return { ok = false, error = error_message }
+    end
+
     local wood_cost = payload.wood_cost_override ~= nil
         and math.max(0, tonumber(payload.wood_cost_override) or 0)
         or tonumber(training.wood_cost) or 0
@@ -723,7 +756,6 @@ local function train_worker_one(payload)
         return spend
     end
 
-    local spawn_position = find_worker_spawn_position(city)
     local worker = CreateUnitByName(
         training.unit_name or config.unit_name,
         spawn_position,

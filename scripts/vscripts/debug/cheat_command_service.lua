@@ -7,6 +7,7 @@ local logger = require("core/logger")
 local weapon_cheats = require("debug/weapon_cheat_handlers")
 local attack_speed_cheat = require("debug/attack_speed_cheat")
 local wave_system = require("systems/wave_system")
+local player_context = require("systems/player_context_service")
 local research_test = require("debug/research_technology_test")
 local dev_asset_preload = require("debug/dev_asset_preload")
 local health_cheat = require("debug/health_cheat")
@@ -28,7 +29,6 @@ local hero_skill_pool_members = require(
 
 local M = {}
 
-local ADD_MONSTER_POSITION = Vector(-1280, 1088, 64)
 local ADD_MONSTER_DEFAULT_ARGS = { "1000000000", "200", "1", "1" }
 local ADD_MONSTER_MOVE_SPEED = 600
 local MONKEY_KING_E_SKILL = "skill_monkey_king_swiftness"
@@ -491,6 +491,39 @@ local function attack_flag(value)
     return nil
 end
 
+local function grounded_debug_position(position)
+    if not position or type(GetGroundPosition) ~= "function" or not GridNav then
+        return nil, "测试出生点地面信息不可用，请等待地图加载完成"
+    end
+    local ok, ground = pcall(GetGroundPosition, position, nil)
+    if not ok or not ground or not finite_number(ground.x)
+        or not finite_number(ground.y) or not finite_number(ground.z) then
+        return nil, "测试出生点地面信息不可用，请等待地图加载完成"
+    end
+    local traversable_ok, traversable = pcall(function() return GridNav:IsTraversable(ground) end)
+    local blocked_ok, blocked = pcall(function() return GridNav:IsBlocked(ground) end)
+    if not traversable_ok or traversable ~= true or not blocked_ok or blocked ~= false then
+        return nil, "本玩家出怪点没有可通行的地面，请检查地图出生点"
+    end
+    return ground
+end
+
+local function debug_monster_position(player_id)
+    local marker = wave_system.get_player_spawn_marker(player_id)
+    if not marker or marker:IsNull() then
+        -- Chat commands can run before wave channels initialize. Resolve only
+        -- this player's configured marker, never the old shared coordinates.
+        local slot = player_context.slot(player_id)
+        local name = slot and slot.wave_spawn_marker
+        marker = name and Entities and Entities.FindByName
+            and Entities:FindByName(nil, name) or nil
+    end
+    if not marker or marker:IsNull() then
+        return nil, "未找到本玩家的出怪点，无法生成测试怪，请检查地图出生点"
+    end
+    return grounded_debug_position(marker:GetAbsOrigin())
+end
+
 local function add_monster(context)
     local args = context.args
     if #args == 0 then args = ADD_MONSTER_DEFAULT_ARGS end
@@ -503,17 +536,19 @@ local function add_monster(context)
         return false,
             "usage: addmonster <health> <armor> <true|false> <attack>"
     end
+    local position, position_error = debug_monster_position(context.player_id)
+    if not position then return false, position_error end
     local hero = nil
     if can_attack then
         hero = summoned_hero(context.player_id)
     end
     health = math.max(1, math.floor(health))
     local unit = CreateUnitByName(
-        "npc_survival_wave_monster", ADD_MONSTER_POSITION, true,
+        "npc_survival_wave_monster", position, true,
         nil, nil, DOTA_TEAM_BADGUYS
     )
     if not unit or unit:IsNull() then return false, "unit_create_failed" end
-    FindClearSpaceForUnit(unit, ADD_MONSTER_POSITION, true)
+    FindClearSpaceForUnit(unit, position, true)
     monster_corpse_lifecycle_service.track(unit, "debug")
     unit:SetBaseMaxHealth(health)
     unit:SetMaxHealth(health)
@@ -566,9 +601,21 @@ local function run_armor_engine_diagnostic(context)
     if not wave_system.is_dev_mode() then
         return false, "dev_mode_required: run dev first"
     end
+    local position, position_error = debug_monster_position(context.player_id)
+    if not position then return false, position_error end
+    -- Match the diagnostic's attacker and 3 x 3 target layout before creating
+    -- anything. A valid center does not guarantee space beside a shoreline.
+    for index = 0, 9 do
+        local x = index == 0 and -300 or ((index - 1) % 3) * 180
+        local y = index == 0 and 0 or math.floor((index - 1) / 3) * 180
+        local ground = grounded_debug_position(position + Vector(x, y, 0))
+        if not ground or math.abs(ground.z - position.z) > 64 then
+            return false, "本玩家出怪点周围空地不足，无法安全生成护甲诊断单位"
+        end
+    end
     local ok, result_or_error = armor_engine_diagnostic.run({
         player_id = context.player_id,
-        origin = ADD_MONSTER_POSITION,
+        origin = position,
     })
     if not ok then return false, result_or_error end
     notify(context, string.format(
@@ -1282,6 +1329,8 @@ function M.init()
 end
 
 M._test = {
+    add_monster = add_monster,
+    run_armor_engine_diagnostic = run_armor_engine_diagnostic,
     unlock_skill = unlock_skill,
     show_rogue_offer = show_rogue_offer,
     grant_fishing_reward = grant_fishing_reward,

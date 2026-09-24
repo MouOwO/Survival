@@ -30,6 +30,17 @@ local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
 
+local function live_building(unit)
+    return valid_entity(unit)
+        and unit.survival_building_destroyed ~= true
+        and (not unit.IsAlive or unit:IsAlive())
+end
+
+local function active_state(state)
+    return state and live_building(state.unit)
+        and buildings[state.unit:entindex()] == state
+end
+
 local function notify(state, message, level)
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = state.player_id,
@@ -105,7 +116,7 @@ end
 
 local function apply_research_technology(state, reason)
     local unit = state.unit
-    if not valid_entity(unit) then return end
+    if not active_state(state) then return end
     local player_id = state.player_id
     local technology = technology_stat_manager.get(player_id).final
     local profile = player_profile_service.get_profile(player_id)
@@ -242,7 +253,7 @@ local function team_city_level(team)
     local level = 0
     for _, building in pairs(buildings) do
         if building.team == team and building.building_id == "main_city"
-            and valid_entity(building.unit) then
+            and active_state(building) then
             level = math.max(level, tonumber(building.level) or 0)
         end
     end
@@ -252,7 +263,7 @@ end
 local function refresh_farm_upgrade_ability(state)
     if not state or (state.building_id ~= "farm"
         and state.building_id ~= "building_farm")
-        or not valid_entity(state.unit) then return end
+        or not active_state(state) then return end
     local ability = state.unit:FindAbilityByName("ability_upgrade_farm")
     if ability then
         local has_next_level = state.definition.levels[(state.level or 1) + 1] ~= nil
@@ -321,14 +332,15 @@ local function apply_tower(unit, data, level)
 end
 
 local function set_class_buttons(unit, active)
+    if not live_building(unit) then return end
     local state = buildings[unit:entindex()]
-    if not state then return end
+    if not active_state(state) or state.unit ~= unit then return end
     tower_ability_sync.sync(state, tower_routes.current(state), true)
 end
 
 local function refresh_class_buttons(state, tower_class_counts)
     if not state or state.tower_class or state.level < 5
-        or not valid_entity(state.unit) then
+        or not active_state(state) then
         return
     end
     tower_ability_sync.sync(state, tower_routes.current(state), true)
@@ -356,12 +368,16 @@ local function configured_display_name(state, route_row)
 end
 
 publish = function(state, reason)
+    -- Corpses remain valid during their death animation. Expired callbacks
+    -- must not publish them or overwrite a replacement using the same index.
+    if not active_state(state) then return end
     wall_upgrade_rules.sync(state, upgrade_process.is_active(state.unit))
     local route_row = state.building_id == "arrow_tower"
         and tower_routes.current(state) or nil
     local display_name = configured_display_name(state, route_row)
     state.unit.survival_display_name = display_name
     event_bus.emit(events.BUILDING_CHANGED, {
+        unit = state.unit,
         entindex = state.unit:entindex(),
         team = state.team,
         player_id = state.player_id,
@@ -489,6 +505,7 @@ local function start_upgrade(
             publish(state, "upgrade_visual_" .. tostring(status))
         end,
         on_complete = function()
+            if not active_state(state) then return end
             local ok, error_message = pcall(on_complete)
             if ok then
                 notify(state, "升级完成")
@@ -524,11 +541,12 @@ end
 -- authoritative building state. A script reload or an early ability click can
 -- leave the cache empty even though the building is still valid.
 local function recover_state(unit, read_only)
-    if not valid_entity(unit) then return nil end
+    if not live_building(unit) then return nil end
 
     local entindex = unit:entindex()
     local state = buildings[entindex]
-    if state then return state end
+    if state and state.unit == unit and active_state(state) then return state end
+    if state and not read_only then buildings[entindex] = nil end
 
     local snapshot = event_bus.request(events.BUILDING_QUERY_REQUEST, {
         entindex = entindex,
@@ -554,7 +572,8 @@ local function recover_state(unit, read_only)
                 .. tostring(entindex))
         end
     end
-    if not snapshot or not snapshot.unit or not snapshot.definition then
+    if not snapshot or snapshot.unit ~= unit or not live_building(snapshot.unit)
+        or not snapshot.definition then
         return nil
     end
 
@@ -612,11 +631,10 @@ local function recover_player_towers(player_id)
     local units = Entities:FindAllByClassname("npc_dota_creature") or {}
     local player_team = PlayerResource:GetTeam(player_id)
     for _, unit in ipairs(units) do
-        local owned = tonumber(unit.survival_player_id) == player_id
-            or unit:GetPlayerOwnerID() == player_id
-            or unit:GetTeamNumber() == player_team
-        if valid_entity(unit) and unit:GetUnitName() == "building_arrow_tower"
-            and owned then
+        if live_building(unit) and unit:GetUnitName() == "building_arrow_tower"
+            and (tonumber(unit.survival_player_id) == player_id
+                or unit:GetPlayerOwnerID() == player_id
+                or unit:GetTeamNumber() == player_team) then
             local state = recover_state(unit)
             if state and (tonumber(state.player_id) or -1) < 0 then
                 state.player_id = player_id
@@ -629,8 +647,11 @@ local function on_technology_stats_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
     recover_player_towers(player_id)
-    for _, state in pairs(buildings) do
-        if tonumber(state.player_id) == player_id then
+    for entindex, state in pairs(buildings) do
+        if not active_state(state) then
+            -- Use the cache key: querying entindex() on this handle is unsafe.
+            buildings[entindex] = nil
+        elseif tonumber(state.player_id) == player_id then
             apply_research_technology(state, payload.reason)
             publish(state, "technology_stats_changed")
         end
@@ -646,7 +667,7 @@ local function upgrade_wall(state, mode)
         for _, building in pairs(buildings) do
             if building.team == state.team
                 and building.building_id == "main_city"
-                and valid_entity(building.unit) then
+                and active_state(building) then
                 city_level = math.max(city_level, building.level or 0)
             end
         end
@@ -772,6 +793,7 @@ local function route_unit_data(state, row)
 end
 
 sync_tower_abilities = function(state, row)
+    if not active_state(state) then return end
     tower_ability_sync.sync(state, row)
 end
 
@@ -788,6 +810,7 @@ local function apply_model(unit, row)
 end
 
 local function apply_tower_level(state, row, level, change_model)
+    if not active_state(state) then return false end
     apply_tower(state.unit, route_unit_data(state, row), level)
     state.research_base_attack_damage = state.unit:GetBaseDamageMin()
     -- Route rows are authoritative for the model. Reapply on every route-level
@@ -839,7 +862,7 @@ local function restore_tower_level(state, row, level, tower_class, population)
     state.tower_class = tower_class
     state.level = level
     state.population_occupied = population
-    if not valid_entity(state.unit) or not row then return false end
+    if not active_state(state) or not row then return false end
     local ok, error_message = pcall(
         apply_tower_level,
         state,
@@ -1226,6 +1249,7 @@ local function on_class_request(payload)
 end
 
 local function on_created(payload)
+    if not live_building(payload.unit) then return end
     local state = {
         unit = payload.unit,
         definition = payload.definition,
@@ -1268,14 +1292,17 @@ local function on_created(payload)
 end
 
 local function on_destroyed(payload)
-    upgrade_process.cancel_by_entindex(payload.entindex, "building_destroyed")
+    local state = buildings[payload.entindex]
+    if state and payload.unit and state.unit ~= payload.unit then return end
     buildings[payload.entindex] = nil
+    upgrade_process.cancel_by_entindex(payload.entindex, "building_destroyed")
     if payload.building_id == "main_city" then refresh_team_farms(payload.team) end
 end
 
 local function on_building_changed(payload)
     local state = buildings[payload.entindex]
-    if state then
+    if state and payload.unit and state.unit ~= payload.unit then return end
+    if active_state(state) then
         state.level = tonumber(payload.level) or state.level
         state.fusion_participated = payload.fusion_participated == 1
             or state.fusion_participated == true
@@ -1303,7 +1330,7 @@ local function on_tower_fusion_state_changed(payload)
     if player_id == nil then return end
     for _, state in pairs(buildings) do
         if tonumber(state.player_id) == player_id
-            and state.building_id == "arrow_tower" then
+            and state.building_id == "arrow_tower" and active_state(state) then
             local row = tower_routes.current(state) or arrow_data(state.level)
             if row then sync_tower_abilities(state, row) end
             publish(state, "tower_fusion_eligibility_changed")

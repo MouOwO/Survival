@@ -1,0 +1,704 @@
+{
+  "date": "2026-09-24",
+  "game_branch": "dev",
+  "content_branch": "master",
+  "cleanup": {
+    "deleted_files": 133,
+    "deleted_bytes": 1459367161,
+    "files": [
+      {
+        "path": "output/aliyun_releases/20260919-test03/backend/fishing_api/__pycache__/__init__.cpython-313.pyc",
+        "size": 286
+      },
+      {
+        "path": "output/aliyun_releases/20260919-test03/backend/fishing_api/__pycache__/application.cpython-313.pyc",
+        "size": 10142
+      },
+      {
+        "path": "output/aliyun_releases/20260919-test03/backend/fishing_api/__pycache__/config.cpython-313.pyc",
+        "size": 11499
+      },
+      {
+        "path": "output/aliyun_releases/20260919-test03/backend/fishing_api/__pycache__/definitions.cpython-313.pyc",
+        "size": 7033
+      },
+      {
+        "path": "output/aliyun_releases/20260919-test03/backend/fishing_api/__pycache__/gameplay_stats.cpython-313.pyc",
+        "size": 4592
+      },
+      {
+        "path": "output/aliyun_releases/20260919-test03/backend/fishing_api/__pycache__/postgres.cpython-313.pyc",
+        "size": 18757
+      },
+      {
+        "path": "output/aliyun_releases/20260919-test03/backend/fishing_api/__pycache__/server.cpython-313.pyc",
+        "size": 21559
+      },
+      {
+        "path": "output/aliyun_releases/20260919-test03/backend/fishing_api/__pycache__/supabase.cpython-313.pyc",
+        "size": 5372
+      },
+      {
+        "path": "output/aliyun_releases/20260919-test03/database/__pycache__/dbtool.cpython-313.pyc",
+        "size": 51614
+      },
+      {
+        "path": "output/combat_performance_20260924/capture_explicit_request.json",
+        "size": 449
+      },
+      {
+        "path": "output/combat_performance_20260924/capture_request.json",
+        "size": 250
+      },
+      {
+        "path": "output/combat_performance_20260924/tower_request.json",
+        "size": 354
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_allround_tempering.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_allround_tempering.vtex_c.RED2.txt",
+        "size": 2945
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_bounty_order.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_bounty_order.vtex_c.DATA.txt",
+        "size": 649
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_bounty_order.vtex_c.RED2.txt",
+        "size": 2957
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_cloud_horizon.vmat_c",
+        "size": 2842
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_cloud_horizon.vmat_c.RED2.txt",
+        "size": 2901
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_command_change.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_command_change.vtex_c.RED2.txt",
+        "size": 2924
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_corrosive_shield.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_corrosive_shield.vtex_c.RED2.txt",
+        "size": 2977
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_divine_wish.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_divine_wish.vtex_c.RED2.txt",
+        "size": 2952
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_emergency_reinforcement.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_emergency_reinforcement.vtex_c.DATA.txt",
+        "size": 649
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_emergency_reinforcement.vtex_c.RED2.txt",
+        "size": 2970
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_feast.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_feast.vtex_c.RED2.txt",
+        "size": 2920
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_frozen_wall.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_frozen_wall.vtex_c.RED2.txt",
+        "size": 2952
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_gold_mining_secret.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_gold_mining_secret.vtex_c.RED2.txt",
+        "size": 2945
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_ion_shield.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_ion_shield.vtex_c.DATA.txt",
+        "size": 649
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_ion_shield.vtex_c.RED2.txt",
+        "size": 2947
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_kick_when_down.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_kick_when_down.vtex_c.RED2.txt",
+        "size": 2966
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_wall_recovery.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/HEAD_wall_recovery.vtex_c.RED2.txt",
+        "size": 2920
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_allround_tempering.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_allround_tempering.vtex_c.RED2.txt",
+        "size": 2945
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_bounty_order.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_bounty_order.vtex_c.DATA.txt",
+        "size": 649
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_bounty_order.vtex_c.RED2.txt",
+        "size": 2915
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_cloud_horizon.vmat_c",
+        "size": 2842
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_cloud_horizon.vmat_c.RED2.txt",
+        "size": 2901
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_command_change.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_command_change.vtex_c.RED2.txt",
+        "size": 2924
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_corrosive_shield.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_corrosive_shield.vtex_c.RED2.txt",
+        "size": 2934
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_divine_wish.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_divine_wish.vtex_c.RED2.txt",
+        "size": 2909
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_emergency_reinforcement.vtex_c",
+        "size": 1575136
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_emergency_reinforcement.vtex_c.DATA.txt",
+        "size": 649
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_emergency_reinforcement.vtex_c.RED2.txt",
+        "size": 2970
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_feast.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_feast.vtex_c.RED2.txt",
+        "size": 2880
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_frozen_wall.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_frozen_wall.vtex_c.RED2.txt",
+        "size": 2910
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_gold_mining_secret.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_gold_mining_secret.vtex_c.RED2.txt",
+        "size": 2944
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_ion_shield.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_ion_shield.vtex_c.DATA.txt",
+        "size": 649
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_ion_shield.vtex_c.RED2.txt",
+        "size": 2905
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_kick_when_down.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_kick_when_down.vtex_c.RED2.txt",
+        "size": 2925
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_wall_recovery.vtex_c",
+        "size": 1575120
+      },
+      {
+        "path": "output/compiled_resource_audit_20260924/WORK_wall_recovery.vtex_c.RED2.txt",
+        "size": 2919
+      },
+      {
+        "path": "output/ecs_backend_work/__pycache__/ecs_ssh.cpython-313.pyc",
+        "size": 2344
+      },
+      {
+        "path": "output/ecs_backend_work/__pycache__/tower_engine_smoke.cpython-313.pyc",
+        "size": 6262
+      },
+      {
+        "path": "output/ecs_backend_work/__pycache__/tower_readonly_diagnostic.cpython-313.pyc",
+        "size": 4770
+      },
+      {
+        "path": "output/ecs_backend_work/backend/archive_backend/__pycache__/__init__.cpython-313.pyc",
+        "size": 278
+      },
+      {
+        "path": "output/ecs_backend_work/backend/archive_backend/__pycache__/bundle.cpython-313.pyc",
+        "size": 8323
+      },
+      {
+        "path": "output/ecs_backend_work/backend/archive_backend/__pycache__/service.cpython-313.pyc",
+        "size": 16428
+      },
+      {
+        "path": "output/ecs_backend_work/backend/fishing_api/__pycache__/__init__.cpython-313.pyc",
+        "size": 271
+      },
+      {
+        "path": "output/ecs_backend_work/backend/fishing_api/__pycache__/application.cpython-313.pyc",
+        "size": 10127
+      },
+      {
+        "path": "output/ecs_backend_work/backend/fishing_api/__pycache__/config.cpython-313.pyc",
+        "size": 11484
+      },
+      {
+        "path": "output/ecs_backend_work/backend/fishing_api/__pycache__/definitions.cpython-313.pyc",
+        "size": 7018
+      },
+      {
+        "path": "output/ecs_backend_work/backend/fishing_api/__pycache__/gameplay_stats.cpython-313.pyc",
+        "size": 4577
+      },
+      {
+        "path": "output/ecs_backend_work/backend/fishing_api/__pycache__/postgres.cpython-313.pyc",
+        "size": 18742
+      },
+      {
+        "path": "output/ecs_backend_work/backend/fishing_api/__pycache__/server.cpython-313.pyc",
+        "size": 21544
+      },
+      {
+        "path": "output/ecs_backend_work/backend/fishing_api/__pycache__/supabase.cpython-313.pyc",
+        "size": 5357
+      },
+      {
+        "path": "output/ecs_backend_work/backend/tests/__pycache__/test_fishing_api.cpython-313.pyc",
+        "size": 36970
+      },
+      {
+        "path": "output/ecs_backend_work/backend/tests/__pycache__/test_postgres_adapter.cpython-313.pyc",
+        "size": 32857
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/archive_backend/__pycache__/__init__.cpython-313.pyc",
+        "size": 310
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/archive_backend/__pycache__/bundle.cpython-313.pyc",
+        "size": 8717
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/archive_backend/__pycache__/service.cpython-313.pyc",
+        "size": 18957
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/__init__.cpython-313.pyc",
+        "size": 278
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/application.cpython-313.pyc",
+        "size": 10134
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/config.cpython-313.pyc",
+        "size": 11491
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/definitions.cpython-313.pyc",
+        "size": 7025
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/gameplay_stats.cpython-313.pyc",
+        "size": 4584
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/match_profiles.cpython-313.pyc",
+        "size": 14902
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/postgres.cpython-313.pyc",
+        "size": 19145
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/server.cpython-313.pyc",
+        "size": 22280
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/fishing_api/__pycache__/supabase.cpython-313.pyc",
+        "size": 5364
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/tests/__pycache__/test_archive_merge.cpython-313.pyc",
+        "size": 10979
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/tests/__pycache__/test_fishing_api.cpython-313.pyc",
+        "size": 37073
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/tests/__pycache__/test_match_profiles.cpython-313.pyc",
+        "size": 30866
+      },
+      {
+        "path": "output/mode_auth_backend_stage/backend/tests/__pycache__/test_postgres_adapter.cpython-313.pyc",
+        "size": 41711
+      },
+      {
+        "path": "output/mode_backend_stage/backend/archive_backend/__pycache__/__init__.cpython-313.pyc",
+        "size": 305
+      },
+      {
+        "path": "output/mode_backend_stage/backend/archive_backend/__pycache__/bundle.cpython-313.pyc",
+        "size": 8712
+      },
+      {
+        "path": "output/mode_backend_stage/backend/archive_backend/__pycache__/service.cpython-313.pyc",
+        "size": 18952
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/__init__.cpython-313.pyc",
+        "size": 273
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/application.cpython-313.pyc",
+        "size": 10129
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/config.cpython-313.pyc",
+        "size": 11486
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/definitions.cpython-313.pyc",
+        "size": 7020
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/gameplay_stats.cpython-313.pyc",
+        "size": 4579
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/match_profiles.cpython-313.pyc",
+        "size": 13465
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/postgres.cpython-313.pyc",
+        "size": 19140
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/server.cpython-313.pyc",
+        "size": 22120
+      },
+      {
+        "path": "output/mode_backend_stage/backend/fishing_api/__pycache__/supabase.cpython-313.pyc",
+        "size": 5359
+      },
+      {
+        "path": "output/mode_backend_stage/backend/tests/__pycache__/test_archive_merge.cpython-313.pyc",
+        "size": 10974
+      },
+      {
+        "path": "output/mode_backend_stage/backend/tests/__pycache__/test_fishing_api.cpython-313.pyc",
+        "size": 37068
+      },
+      {
+        "path": "output/mode_backend_stage/backend/tests/__pycache__/test_match_profiles.cpython-313.pyc",
+        "size": 24133
+      },
+      {
+        "path": "output/mode_backend_stage/backend/tests/__pycache__/test_postgres_adapter.cpython-313.pyc",
+        "size": 41706
+      },
+      {
+        "path": "output/spawn_land_20260924/candidate.vmap",
+        "size": 76154632
+      },
+      {
+        "path": "output/spawn_land_20260924/candidates_request.json",
+        "size": 115017
+      },
+      {
+        "path": "output/spawn_land_20260924/clearance_request.json",
+        "size": 20685
+      },
+      {
+        "path": "output/spawn_land_20260924/connected_request.json",
+        "size": 3769
+      },
+      {
+        "path": "output/spawn_land_20260924/current_performance_check.vmap",
+        "size": 336583832
+      },
+      {
+        "path": "output/spawn_land_20260924/current_text.vmap",
+        "size": 336559408
+      },
+      {
+        "path": "output/spawn_land_20260924/grid_request.json",
+        "size": 513
+      },
+      {
+        "path": "output/spawn_land_20260924/map_resource_dump.txt",
+        "size": 147386
+      },
+      {
+        "path": "output/spawn_land_20260924/patched_text.vmap",
+        "size": 334486613
+      },
+      {
+        "path": "output/spawn_land_20260924/paths_request.json",
+        "size": 17621
+      },
+      {
+        "path": "output/spawn_land_20260924/plan_probe_request.json",
+        "size": 5085
+      },
+      {
+        "path": "output/spawn_land_20260924/ramp_request.json",
+        "size": 464
+      },
+      {
+        "path": "output/spawn_land_20260924/roundtrip.vmap",
+        "size": 336583831
+      },
+      {
+        "path": "output/spawn_land_20260924/state_request.json",
+        "size": 700
+      },
+      {
+        "path": "output/tower_destruction_20260924/probe.json",
+        "size": 250
+      }
+    ],
+    "skipped": [],
+    "preserved": [
+      "current authored map and game VPK",
+      "before backups and approved art source",
+      "final verification reports and screenshots",
+      "local deployment configuration and Python environment",
+      "active Workshop caches/logs"
+    ]
+  },
+  "compile_noise": {
+    "restored_files": [
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_attack_shard.vtex_c",
+        "before_sha256": "38b161f966adb3bdfb32be23968df5298bb5a0165bfe5b62adde41810743e6d0",
+        "after_sha256": "4d3a5d17a8f8e58ab1cedc004ad4a05782a569897520e5a1a990e50fa7a4040a"
+      },
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_attribute_gem.vtex_c",
+        "before_sha256": "e31233e34afcc80e00d37c427539aa32d123ae2954058d37d8c106e42fdaa75b",
+        "after_sha256": "1e0256775fd5bc099825773a08cca40c2dc0b28b57d2e8a6928e53bd4ffe076f"
+      },
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_attribute_shard.vtex_c",
+        "before_sha256": "8bdcb0ca5eeafa597fa69e0d0b87e22ec2b981991ccdf4c8dd4c1b8da0d035d6",
+        "after_sha256": "621db3e6580ceb69af6fae7bd49962e10571d801987c577b6e59b0eb05347f11"
+      },
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_block_shard.vtex_c",
+        "before_sha256": "0037c613c1f111e6c44e61e3f0a321bfe1de204707bf6cfd7649193a6df85eb2",
+        "after_sha256": "c3ae1d011fbe2d240a84ec564b511afbf246b3e5ef17ee6052457fa862458aaa"
+      },
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_gold_gem.vtex_c",
+        "before_sha256": "16e2215cb92445e95fcdf2034ec1ec4a81597f7fe40d5c2eab86130e5b52c2af",
+        "after_sha256": "e2b18687c64fe7904adf7b85f113317ca15b773044966dd927c01e766061ecee"
+      },
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_growth_gem.vtex_c",
+        "before_sha256": "ef310bc534d476aef229a30cdb2498e7357e36d7b3ac652410ff2e50240f0584",
+        "after_sha256": "8066e89076ffc1e27a937974075dbb708f8e8c93de9f439dd17864082a340d64"
+      },
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_health_gem.vtex_c",
+        "before_sha256": "5634a79a29b46673d73fb4f45969409fd0a5cc1357569334f8d99d4e0eac9a15",
+        "after_sha256": "c30ba2986af2640327c7690c5fe299b8c925358ede31c4f20bd6c810b9c0ec69"
+      },
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_regen_shard.vtex_c",
+        "before_sha256": "ea0649b8f0cc371ca93cea6c01f3877d8e7ab2485623ec32044d51a74e7a3e5d",
+        "after_sha256": "ea9057a7211e682c59ef77af3d053c10e71ebf53a2304910cc7ed49be0a52b4a"
+      },
+      {
+        "path": "panorama/images/custom_game/archive_gpu_regular/daily_wood_gem.vtex_c",
+        "before_sha256": "027ee15cdcdb3dbfd7d032d1cb855943a6f8530fb615e055226268dcd5ca0f4e",
+        "after_sha256": "0b107ea3e29f0848752c95ec7e8f26da3757563e7d0ed45804606ba66af965d3"
+      },
+      {
+        "path": "panorama/images/custom_game/rogue_cards_gpu/construction_order.vtex_c",
+        "before_sha256": "75a8cc54fb1f98e9ccce86c2fec7c7693d23ae7641a950630bcfdec8f6743c9a",
+        "after_sha256": "693d09e31fbc10b09184cf32bb24174f42e79ba196c3f2d07b60b7d9fbd0c47b"
+      },
+      {
+        "path": "panorama/images/custom_game/rogue_cards_gpu/high_morale.vtex_c",
+        "before_sha256": "fcb8b26ff0e036c4cf70c1e566d44b0125cc0c626691b21abcea3524a3cba0cb",
+        "after_sha256": "0130dfdea5866863903a4ab174adb9715f27cf3a59b561eca12bd5a932a651a9"
+      },
+      {
+        "path": "panorama/images/custom_game/rogue_cards_gpu/in_step.vtex_c",
+        "before_sha256": "6a7917d232562dd59205980440f451e708e646fb26be9d5f3c65f89a3e0d3b8d",
+        "after_sha256": "e5d2b8ebadb78d428ce4abdc4a2d66da4981aac7303d6d787be9e1d1a0fd6344"
+      },
+      {
+        "path": "panorama/images/custom_game/rogue_cards_gpu/iron_fist_policy.vtex_c",
+        "before_sha256": "edf2cec89d6b017c554676dfbf9820656331bb12a8f6bda84650494565d6575c",
+        "after_sha256": "418f6036667096d793e74996e40cc7bd50b0aca2fc4b233dc1a660feabdfe042"
+      },
+      {
+        "path": "panorama/images/custom_game/rogue_cards_gpu/nuclear_bomb.vtex_c",
+        "before_sha256": "e49b56222b0cd6bdf4cc5688991af019bd079ecb7e145e186d7808977dc7ec87",
+        "after_sha256": "d9387a63ccaad696cce628278901eae807855937f0ba6642dd6fa359d8cd3419"
+      },
+      {
+        "path": "panorama/images/custom_game/rogue_cards_gpu/tower_growth.vtex_c",
+        "before_sha256": "681fdbd17b596f3584eb30935d314c1cd06d10403d0e6b81debba3a7a915af91",
+        "after_sha256": "41208464d54e9bfa5852844e8f2d7e95532c10e6314e5ee42a5267c51699d7e7"
+      },
+      {
+        "path": "panorama/images/custom_game/rogue_cards_gpu/weakening_orb.vtex_c",
+        "before_sha256": "1ae2e60ab35214be1d31854a330621b6c10044918e4dc11c9f8a6ee1415c0e21",
+        "after_sha256": "c63b0e5b2a739a496402425e5ec067ee4360b1218562762e28f0f5e829f21522"
+      },
+      {
+        "path": "panorama/layout/custom_game/lottery_pool_scene_assets.vxml_c",
+        "before_sha256": "61f807eb23177c1e60494fc454e7db0a93ed09d295ecf0b739501c40bfd7671e",
+        "after_sha256": "c8d6d3c9610a81b3a1863677b75628ea8380ca3928896b0a2479b1e21e5ab801"
+      }
+    ],
+    "reason": "Source PNG bytes and normalized layout/texture definitions match HEAD. Main image payloads match; compiler source CRC/newline/path metadata and tiny fallback texture bits differ."
+  },
+  "validation": {
+    "passed_lua_count": 28,
+    "passed_lua_tests": [
+      "test_archive_challenge_hub_positions",
+      "test_builder_tower_rebuild",
+      "test_building_death_visual",
+      "test_building_upgrade_lifecycle",
+      "test_combat_performance_capture",
+      "test_debug_spawn_positions",
+      "test_health_bar_cleanup",
+      "test_hero_summon_destination",
+      "test_io_building_ambient",
+      "test_monster_ground_navigation",
+      "test_resource_ui_coalescing",
+      "test_shop_early_final_cooldown",
+      "test_stat_push_coalescer",
+      "test_tower_class_preflight",
+      "test_tower_destruction_rebuild",
+      "test_tower_idle_state",
+      "test_tower_skill_tree_exclusion",
+      "test_tower_target_selection",
+      "test_tower_upgrade_targeting",
+      "test_tree_attacker_whitelist",
+      "test_tree_health_projection",
+      "test_tree_hit_scan_coalescing",
+      "test_ui_snapshot_delta",
+      "test_ui_snapshot_scheduling",
+      "test_ultimate_tower_tree_targeting",
+      "test_visual_carrier_health_bar",
+      "test_wall_quick_upgrade",
+      "test_worker_system_training"
+    ],
+    "passed_node_tests": [
+      "tools/test_ui_snapshot_cache.cjs",
+      "tools/test_world_health_bar.js"
+    ],
+    "lua_syntax": {
+      "command": "luac -p <each changed/new Lua file>",
+      "files": 37,
+      "failed": 0
+    },
+    "baseline_failure": {
+      "test": "tools/check_addon_bootstrap.lua",
+      "assertion": "line 41: auto launch missing",
+      "working_tree_exit_code": 1,
+      "head_overlay_exit_code": 1,
+      "comparison": "Replaced every tracked modified Lua module with HEAD source through package.preload; identical assertion failed after successful full module loading.",
+      "conclusion": "Existing bootstrap test mismatch, not introduced by current working-tree Lua modifications."
+    },
+    "map": {
+      "crc_entries": 323,
+      "source_sha256": "bdd74fb708163f3c88c5e368ed57a886db4440288c5d28c7dba4e7a822be97c0",
+      "vpk_sha256": "ec48d0c7cd66706c659df503049dc213bd811b3449957696bdded0ad3c06c235",
+      "source_crc32": 1639005593,
+      "source_matches_compiled": true
+    }
+  },
+  "limitations": [
+    "No new live-game visual/FPS verification during this cleanup.",
+    "Existing bootstrap auto-launch assertion fails on HEAD too; no unrelated behavior changed."
+  ],
+  "content_commit": "f0d8380945969012d66d6a6bee44521b5ae79875",
+  "remote_push_performed": false
+}

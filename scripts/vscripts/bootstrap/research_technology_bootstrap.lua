@@ -1,4 +1,5 @@
 local event_bus = require("core/event_bus")
+local scheduler = require("core/scheduler")
 local events = require("core/events")
 local event_names = require("research/research_event_names")
 local Repository = require("research/research_technology_repository")
@@ -9,6 +10,7 @@ local M = {}
 local repository
 local effects
 local service
+local pending_resource_refresh = {}
 
 local function valid_player(player_id)
     return player_id ~= nil and player_id >= 0
@@ -87,6 +89,19 @@ local function each_team_player(team, callback)
     end
 end
 
+local function queue_resource_refresh(player_id)
+    if not valid_player(player_id) or pending_resource_refresh[player_id] then return end
+    local pending = pending_resource_refresh
+    pending[player_id] = true
+    scheduler.after(0.1, function()
+        if pending ~= pending_resource_refresh then return end
+        pending[player_id] = nil
+        if valid_player(player_id) then
+            sync_client(player_id, service:BuildClientSnapshot(player_id))
+        end
+    end, "research_resource_refresh_" .. player_id)
+end
+
 local function register_handlers()
     event_bus.handle_request(event_names.UPGRADE_REQUESTED, function(payload)
         return service:RequestUpgrade(payload)
@@ -147,6 +162,10 @@ local function register_handlers()
 end
 
 function M.init()
+    for player_id in pairs(pending_resource_refresh) do
+        scheduler.cancel("research_resource_refresh_" .. player_id)
+    end
+    pending_resource_refresh = {}
     repository = Repository.new({ resolve_team = team_for })
     effects = EffectService.new(repository)
     service = Service.new({ repository = repository, effects = effects,
@@ -188,9 +207,12 @@ function M.init()
         end)
     end)
     event_bus.subscribe(events.RESOURCE_CHANGED, function(payload)
-        each_team_player(payload.team, function(player_id)
-            sync_client(player_id, service:BuildClientSnapshot(player_id))
-        end)
+        local player_id = tonumber(payload and payload.player_id)
+        if valid_player(player_id) then
+            queue_resource_refresh(player_id)
+        elseif payload and payload.team then
+            each_team_player(payload.team, queue_resource_refresh)
+        end
     end)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)

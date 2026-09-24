@@ -100,15 +100,31 @@ local function ensure_hub_abilities(unit, index)
         if valid(finish) then finish:SetLevel(1) end
     end
 end
+local function hub_position(player_id, index)
+    -- Keep buildings on their own player platform even when the monster lane
+    -- moves. Older maps retain the original offsets around the wave marker.
+    local marker = Entities and Entities.FindByName
+        and Entities:FindByName(nil, "player_" .. player_id .. "_archive_hub_" .. index)
+    local position = valid(marker) and marker:GetAbsOrigin()
+    if position then
+        if type(GetGroundPosition) == "function" then
+            local ok, ground = pcall(GetGroundPosition, position, nil)
+            if ok and ground then return ground end
+        end
+        return position
+    end
+    local channel = wave.get_player_spawn_marker(player_id)
+    local origin = valid(channel) and channel:GetAbsOrigin()
+    if not origin then return nil end
+    return Vector(origin.x + (index - 2) * rule.building_spacing,
+        origin.y + rule.building_offset_y, origin.z)
+end
 local function create_hubs(state)
     if state.finished then return end
-    local channel = wave.get_player_spawn_marker(state.player_id)
-    if not valid(channel) then return false end
-    local origin = channel:GetAbsOrigin()
     for index = 1, 3 do
         if not valid(state.hubs[index]) then
-            local position = Vector(origin.x + (index - 2) * rule.building_spacing,
-                origin.y + rule.building_offset_y, origin.z)
+            local position = hub_position(state.player_id, index)
+            if not position then return false end
             local unit = CreateUnitByName("npc_archive_challenge_" .. index, position, true, nil, nil, DOTA_TEAM_GOODGUYS)
             if not valid(unit) then return false end
             unit.survival_archive_hub = index
@@ -155,7 +171,7 @@ function M.begin(payload)
         players[id] = state
         ensure_hubs(state)
         bus.emit(events.UI_NOTIFICATION, { player_id = id, level = "info",
-            message = "通关成功！出怪口旁已开放存档挑战，完成后可在存档挑战3结束本局。" })
+            message = "通关成功！已开放存档挑战，完成后可在存档挑战3结束本局。" })
     end
     return { ok = true, keep_running = true }
 end

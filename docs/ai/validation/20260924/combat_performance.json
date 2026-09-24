@@ -1,0 +1,228 @@
+{
+  "date": "2026-09-24",
+  "scope": "Lua combat/harvest/UI workload and current main-map stair navigation",
+  "reported_load": {
+    "lumberjacks": "7+",
+    "stopped_harvest_comparison_provided": false,
+    "towers": "approximately 4+"
+  },
+  "tests": [
+    {
+      "test": "test_tree_hit_scan_coalescing",
+      "passed": true,
+      "output": "TREE_HIT_SCAN_COALESCING_PASS: 200 hits retain exact player rewards; 1 shared scan and 2 wall lookups per frame"
+    },
+    {
+      "test": "test_health_bar_cleanup",
+      "passed": true,
+      "output": "HEALTH_BAR_CLEANUP_PASS: 200 stable units/100 polls => 200 initial writes, 0 repeated writes; damage/heal/scale/remove/reuse/transport recovery"
+    },
+    {
+      "test": "test_visual_carrier_health_bar",
+      "passed": true,
+      "output": "VISUAL_CARRIER_HEALTH_BAR_PASS: spawn race, explicit cleanup, respawn, recovered carrier, hero retained"
+    },
+    {
+      "test": "test_resource_ui_coalescing",
+      "passed": true,
+      "output": "RESOURCE_UI_COALESCING_PASS: ability/research/shop burst/latest wallet/owner isolation/fixed deadline/structural updates/destruction/generation/closed shop"
+    },
+    {
+      "test": "test_ui_snapshot_scheduling",
+      "passed": true,
+      "output": "UI_SNAPSHOT_SCHEDULING_PASS: initial/owner-team/burst/fixed deadline/reentrant dirty/explicit resync/generation/no idle polling"
+    },
+    {
+      "test": "test_resource_opening_wood",
+      "passed": true,
+      "output": "OPENING_WOOD_PASS: 10 once, no default income, refresh idempotent, earned bonuses preserved"
+    },
+    {
+      "test": "test_shop_early_final_cooldown",
+      "passed": true,
+      "output": "SHOP_EARLY_FINAL_COOLDOWN_PASS"
+    },
+    {
+      "test": "test_stat_push_coalescer",
+      "passed": true,
+      "output": "STAT_PUSH_PASS: burst100->1, latest value, unchanged skip, unselected skip, switch, two players, reset, sustained updates"
+    },
+    {
+      "test": "test_enemy_wall_order_cache",
+      "passed": true,
+      "output": ""
+    },
+    {
+      "test": "test_wall_engagement_cache",
+      "passed": true,
+      "output": ""
+    },
+    {
+      "test": "test_monster_ground_navigation",
+      "passed": true,
+      "output": "MONSTER_GROUND_NAVIGATION_PASS: 12 real spawn flows, pre-placement ground pathing, flying combat/visuals, practice hull and challenge collision preserved"
+    },
+    {
+      "test": "test_tower_target_selection",
+      "passed": true,
+      "output": "[TOWER_MANUAL_TARGET] tower=101 target=101 action=set\nTOWER_TARGET_SELECTION_PASS: native/stale/manual trees rejected; enemy, dummy, anti-air and upgraded ranges preserved"
+    },
+    {
+      "test": "test_ultimate_tower_tree_targeting",
+      "passed": true,
+      "output": "[TowerFusion] completed player=0 entindex=200\n[TOWER_MANUAL_TARGET] tower=200 target=302 action=set\n[TowerFusion] ultimate initialization failed: scripts/vscripts/systems/tower_fusion_service.lua:248: ultimate_tower_target_filter_missing\n[TowerFusion] failed player=0 error=fusion_create_runtime_error\nULTIMATE_TOWER_TREE_TARGETING_PASS: real fusion, modifier installation, ordinary targets, automatic/manual tree rejection, order filter and failed-init rollback"
+    },
+    {
+      "test": "test_tower_skill_tree_exclusion",
+      "passed": true,
+      "output": "TOWER_SKILL_TREE_EXCLUSION_PASS"
+    },
+    {
+      "test": "test_tree_attacker_whitelist",
+      "passed": true,
+      "output": "TREE_EVIDENCE_HOTPATH_PASS: 100 trees x 100 unrelated attacks cleanup calls=0; owned record cleanup=1\nTREE_EVIDENCE_LIFETIME_PASS: invalid attacker/parent cleanup and reused entity indices stay isolated\nTREE_EVIDENCE_EXPIRY_PASS: 1000 canceled nil-record starts bounded to 3 seconds; live projectiles preserved\nTREE_ATTACKER_WHITELIST_PASS: real heroes/workers, pre-identity towers, ultimate/hero-model towers, visual carriers, attack evidence and normal combat"
+    },
+    {
+      "test": "test_tower_idle_state",
+      "passed": true,
+      "output": "[TOWER_MANUAL_TARGET] tower=4 target=2 action=set\n[TOWER_MANUAL_TARGET] tower=6 target=5 action=set\n[TOWER_MANUAL_TARGET] tower=8 target=7 action=set\n[TOWER_MANUAL_TARGET] tower=10 target=9 action=set\nTOWER_HOTPATH_PASS: stable acquisition writes=0; 100 approved dummy attacks radius scans=0\nTOWER_IDLE_STATE_PASS: immediate first/kill attack, no Stop/disarm between victims, next-tick dropped-order recovery, stable attacks, real order-filter reentry, tree-only idle"
+    },
+    {
+      "test": "test_tree_health_projection",
+      "passed": true,
+      "output": "TREE_HEALTH_PROJECTION_PASS: all 100 levels fit native health and preserve logical health/damage ratios"
+    },
+    {
+      "test": "test_building_upgrade_lifecycle",
+      "passed": true,
+      "output": "[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\nBUILDING_UPGRADE_LIFECYCLE_PASS: native removal/late publish/cache eviction/invalid scan/live rewards/normal destroy/index reuse"
+    },
+    {
+      "test": "test_tower_upgrade_targeting",
+      "passed": true,
+      "output": "[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix\n[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\n[BuildingSystem] recovered entindex=2 id=main_city level=1 route_level=1 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path\n[BuildingAbility] add begin unit=3 ability=ability_upgrade_tower_lv01\n[BuildingAbility] AddAbility OK unit=3 ability=ability_upgrade_tower_lv01 index=0\n[BuildingAbility] add begin unit=3 ability=ability_upgrade_tower_max\n[BuildingAbility] AddAbility OK unit=3 ability=ability_upgrade_tower_max index=0\n[BuildingAbility] add begin unit=3 ability=ability_building_blink\n[BuildingAbility] AddAbility OK unit=3 ability=ability_building_blink index=0\n[BuildingAbility] add begin unit=3 ability=ability_destroy_arrow_tower\n[BuildingAbility] AddAbility OK unit=3 ability=ability_destroy_arrow_tower index=0\n[BuildingAbility] add begin unit=3 ability=ability_upgrade_tower_lv01\n[BuildingAbility] AddAbility OK unit=3 ability=ability_upgrade_tower_lv01 index=0\n[BuildingAbility] add begin unit=3 ability=ability_upgrade_tower_max\n[BuildingAbility] AddAbility OK unit=3 ability=ability_upgrade_tower_max index=0\n[BuildingAbility] add begin unit=3 ability=ability_building_blink\n[BuildingAbility] AddAbility OK unit=3 ability=ability_building_blink index=0\n[BuildingAbility] add begin unit=3 ability=ability_destroy_arrow_tower\n[BuildingAbility] AddAbility OK unit=3 ability=ability_destroy_arrow_tower index=0\n[TowerUpgradeReady] tower=3 ability=ability_upgrade_tower_lv01 entindex=103 level=1 activated=true\n[TowerUpgradeReady] tower=3 ability=ability_upgrade_tower_max entindex=103 level=1 activated=true\n[BuildingAbility] add begin unit=3 ability=ability_upgrade_tower_lv01\n[BuildingAbility] AddAbility OK unit=3 ability=ability_upgrade_tower_lv01 index=0\n[BuildingAbility] add begin unit=3 ability=ability_upgrade_tower_max\n[BuildingAbility] AddAbility OK unit=3 ability=ability_upgrade_tower_max index=0\n[BuildingAbility] add begin unit=3 ability=ability_building_blink\n[BuildingAbility] AddAbility OK unit=3 ability=ability_building_blink index=0\n[BuildingAbility] add begin unit=3 ability=ability_destroy_arrow_tower\n[BuildingAbility] AddAbility OK unit=3 ability=ability_destroy_arrow_tower index=0\n[TOWER_PERMANENT_APPLIED] player=0 tower=3 base=151 flat=0 pct=0 final=151.0 reason=lottery_test\n[BuildingUpgrade] recovered unregistered arrow tower entindex=3\n[BuildingSystem] recovered entindex=2 id=main_city level=1 route_level=1 class=nil\n[BuildingSystem] recovered entindex=3 id=arrow_tower level=2 route_level=2 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=2\nTOWER_UPGRADE_TARGETING_PASS: actual construction, upgrade completion, technology/permanent range changes, technology-only and building recovery, zero native acquisition and ordinary-enemy targeting"
+    },
+    {
+      "test": "test_tower_class_preflight",
+      "passed": true,
+      "output": "[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix\n[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=4 route_level=4 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=4 route_level=4 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[Survival][INFO][BuildingSystem] initialized recovered=0\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[SURVIVAL_CAST][SERVER] RECV player=0 unit=1 ability=10001\n[SURVIVAL_CAST][SERVER] CHECK name=ability_tower_class_1 unit_valid=true ability_valid=true caster_matches=true owner=0 owner_matches=true passive=false behavior=0 level=1 cooldown=0 castable=true\n[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index=1\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[SURVIVAL_CAST][SERVER] RECV player=0 unit=1 ability=10001\n[SURVIVAL_CAST][SERVER] CHECK name=ability_tower_class_1 unit_valid=true ability_valid=true caster_matches=true owner=0 owner_matches=true passive=false behavior=0 level=1 cooldown=0 castable=true\n[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index=1\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[BuildingSystem] recovered entindex=2 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=2\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\n[Survival][INFO][BuildingSystem] initialized recovered=1\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\nTOWER_CLASS_PREFLIGHT_PASS: cached/uncached failure has no side effects; real wallet/route limits; UI cooldown and native filter; completion, competition, cancellation and debug semantics"
+    },
+    {
+      "test": "test_combat_performance_capture",
+      "passed": true,
+      "output": "COMBAT_PERFORMANCE_CAPTURE_PASS: tools gate, bounded capture, returns/errors, no stacked hooks, cleanup/reload"
+    }
+  ],
+  "lua_syntax": {
+    "passed": true,
+    "production_and_probe_files_checked": true,
+    "test_interpreter": "Lua 5.4.5; production changes use Lua 5.1-compatible syntax"
+  },
+  "simulation": {
+    "harvest": {
+      "shared_creature_scans": 1,
+      "exact_reward_settlements": 200,
+      "hits": 200,
+      "two_player_wall_lookups": 2
+    },
+    "real_frame_times": false,
+    "tree_record_cleanup": {
+      "trees": 100,
+      "unrelated_record_events": 100,
+      "cleanup_calls_after": 0
+    },
+    "health_bars": {
+      "stable_units": 200,
+      "initial_writes": 200,
+      "polls_per_unit": 100,
+      "subsequent_writes": 0
+    }
+  },
+  "map": {
+    "failed": 0,
+    "package_sha256": "ec48d0c7cd66706c659df503049dc213bd811b3449957696bdded0ad3c06c235",
+    "compiled": 318,
+    "skipped": 1,
+    "crc_entries": 323,
+    "crowd_trajectory_verified": false,
+    "source_sha256": "bdd74fb708163f3c88c5e368ed57a886db4440288c5d28c7dba4e7a822be97c0",
+    "runtime_navigation": {
+      "ok": true,
+      "expected_source_markers": 432,
+      "expected_runtime_markers": 430,
+      "runtime_unique_markers": 430,
+      "matching_runtime_coordinates": 430,
+      "runtime_duplicate_lines_ignored": 0,
+      "active_landings_expected": 395,
+      "active_landings_checked": 395,
+      "active_landings_passed": 395,
+      "landing_samples_checked": 3555,
+      "paths_expected": 272,
+      "paths_checked": 272,
+      "paths_passed": 272,
+      "path_duplicate_lines_ignored": 0,
+      "source_only_courier_markers": 2,
+      "source_only_runtime_verified": false,
+      "failure_count": 0
+    },
+    "source_match": {
+      "source_name": "maps/template_map.vmap",
+      "compiled_search_path": "dota_addons/survival",
+      "raw_source_crc32": 1639005593,
+      "compiled_source_crc32": 1639005593,
+      "matches": true
+    }
+  },
+  "runtime": {
+    "before_after_fps_verified": false,
+    "building_invalid_handle_fix": {
+      "unit_test_passed": true,
+      "post_fix_engine_verified": false
+    },
+    "game_loaded": true,
+    "reported_stutter_reproduced": false,
+    "memory_exhaustion_confirmed": false,
+    "tree_api_probe": {
+      "blood_visual_verified": false,
+      "blood_visual_fixed": false,
+      "output": [
+        "[TREE_IMPACT_API] {\"classes\":{\"CBaseEntity\":[],\"CBaseModelEntity\":[],\"CDOTA_BaseNPC\":[],\"CDOTA_Modifier_Lua\":[]},\"globals\":[],\"modified_game_state\":false,\"units\":[{\"classname\":\"npc_dota_creature\",\"entindex\":585,\"methods\":{\"GetBloodColor\":false,\"GetBloodType\":false,\"GetKeyValue\":false,\"GetSuppressDamageEffects\":false,\"GetUnitKeyValues\":false,\"SetBloodColor\":false,\"SetBloodType\":false,\"SetKeyValue\":false,\"SetSuppressDamageEffects\":false,\"SetUnitKeyValues\":false},\"model\":\"models/props_tree/mango_tree.vmdl\",\"selected_kv\":[]}],\"visual_effect_verified\":false}"
+      ]
+    },
+    "initial_call_capture": {
+      "tasks_end": 16,
+      "completed": true,
+      "tasks_start": 16,
+      "event_emits": 105,
+      "workload": "fresh N1 test session; not the reported multi-worker load",
+      "event_requests": 255,
+      "transport_completion_marker": "Initial capture completed but CLI expected a substring instead of full line; marker subsequently corrected",
+      "seconds": 15.2,
+      "health_bar_polls": 152
+    },
+    "tower_isolated_fixture": {
+      "passed": true,
+      "output": [
+        "[TOWER_RUNTIME_TEST] START isolated_ground=true clearance=1200 range=1000 deadline_seconds=18",
+        "[TOWER_RUNTIME_TEST] INITIAL_DAMAGE hp_drop=71 tree_unchanged=true",
+        "[TOWER_RUNTIME_TEST] STOP target_cleared=false cached_enemy=true",
+        "[TOWER_RUNTIME_TEST] STOP_CONFIRMED target_nil=true cached_enemy=true",
+        "[TOWER_RUNTIME_TEST] RECOVERED_DAMAGE hp_drop=71 tree_unchanged=true",
+        "[TOWER_RUNTIME_TEST] KILL_RETARGET seconds_after_kill=0.667 natural_attack_interval=1.000 attack_interval_source=server_attacks_per_second next_target_damaged=true tree_unchanged=true",
+        "[TOWER_RUNTIME_TEST] IDLE stack=0 disarmed=true target_nil=true tree_unchanged=true",
+        "[TOWER_RUNTIME_TEST] PASS attack_kill_retarget_stop_recovery_tree_idle seconds=5.00 tree_attack_starts=0 enemy_attack_starts=3 next_enemy_attack_starts=1 remaining_handles=0",
+        "[TOWER_RUNTIME_TEST] DONE"
+      ]
+    },
+    "test_backend_authentication": "GAME_AUTH_READY after one attach retry",
+    "followup_capture": {
+      "reason": "Subsequent console context had no GameRules (no active match); no further live checks claimed",
+      "verified": false
+    }
+  },
+  "remaining": [
+    "Controlled actual frame-time comparison with 7+ workers and 4+ towers, then workers stopped",
+    "Tree blood visual comparison and local effect solution",
+    "Post-fix engine verification for invalid building cache and crowd movement"
+  ]
+}

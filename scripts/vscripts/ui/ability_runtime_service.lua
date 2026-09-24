@@ -1,4 +1,5 @@
 local event_bus = require("core/event_bus")
+local scheduler = require("core/scheduler")
 local events = require("core/events")
 local builder = require("ui/ability_runtime_builder")
 local ability_utils = require("core/ability_utils")
@@ -17,6 +18,7 @@ local hero_runtime_trace_by_unit = {}
 local hero_skill_by_ability = {}
 local research_transaction_by_team = {}
 local builder_slot_order_by_ability = {}
+local pending_resource_refresh = {}
 
 for _, row in ipairs(builder_ability_stages.rows or {}) do
     if row.enabled ~= false and row.ability_name then
@@ -438,11 +440,13 @@ local function clear_unit(payload)
     end
 end
 
-local function on_resources(payload)
+local function refresh_resources(payload)
+    local player_id = tonumber(payload.player_id)
     local refreshed = 0
     local tower_transitions = 0
     for _, state in pairs(state_by_unit) do
-        if state.team == payload.team then
+        if (player_id ~= nil and player_id >= 0 and tonumber(state.player_id) == player_id)
+            or ((player_id == nil or player_id < 0) and state.team == payload.team) then
             tower_transitions = tower_transitions + (publish(state) or 0)
             refreshed = refreshed + 1
         end
@@ -459,6 +463,25 @@ local function on_resources(payload)
             tostring(tower_transitions)
         ))
     end
+end
+
+local function on_resources(payload)
+    if not payload then return end
+    local player_id = tonumber(payload.player_id)
+    local key = player_id and player_id >= 0 and ("player:" .. player_id)
+        or ("team:" .. tostring(payload.team))
+    local queued = pending_resource_refresh[key] ~= nil
+    pending_resource_refresh[key] = payload
+    if queued then return end
+    -- First event sets the deadline. Continuous harvesting must not postpone
+    -- it; transactions stay synchronous and this flush reads the latest wallet.
+    local pending = pending_resource_refresh
+    scheduler.after(0.1, function()
+        if pending ~= pending_resource_refresh then return end
+        local latest = pending[key]
+        pending[key] = nil
+        if latest then refresh_resources(latest) end
+    end, "ability_resource_refresh_" .. key)
 end
 
 local function on_worker_changed(payload)
@@ -564,6 +587,10 @@ local function on_builder_ready(payload)
 end
 
 function M.init()
+    for key in pairs(pending_resource_refresh) do
+        scheduler.cancel("ability_resource_refresh_" .. key)
+    end
+    pending_resource_refresh = {}
     state_by_unit = {}
     ability_keys_by_unit = {}
     tower_trace_by_ability = {}

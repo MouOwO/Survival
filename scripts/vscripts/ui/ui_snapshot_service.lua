@@ -5,6 +5,8 @@ local scheduler = require("core/scheduler")
 local M = {}
 local sequence = 0
 local dirty_teams = {}
+local flush_pending = false
+local generation = 0
 
 local function valid_player(player_id)
     return PlayerResource:IsValidPlayerID(player_id)
@@ -40,21 +42,32 @@ local function publish_team(team)
 end
 
 local function flush_dirty()
-    if dirty_teams.all then
+    -- Detach the batch first: events raised while building a snapshot must
+    -- survive for the next flush instead of being cleared at the end.
+    local batch = dirty_teams
+    dirty_teams = {}
+    flush_pending = false
+    if batch.all then
         for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
             publish_player(player_id)
         end
     else
-        for team, _ in pairs(dirty_teams) do
+        for team, _ in pairs(batch) do
             publish_team(team)
         end
     end
-    dirty_teams = {}
 end
 
 local function on_dirty(payload)
     if payload.team then dirty_teams[payload.team] = true
     else dirty_teams.all = true end
+    if flush_pending then return end
+    flush_pending = true
+    local current_generation = generation
+    scheduler.after(0.25, function()
+        if current_generation ~= generation then return end
+        flush_dirty()
+    end, "ui_snapshot_flush")
 end
 
 local function on_snapshot_requested(payload)
@@ -62,14 +75,14 @@ local function on_snapshot_requested(payload)
 end
 
 function M.init()
+    scheduler.cancel("ui_snapshot_flush")
+    generation = generation + 1
+    flush_pending = false
     sequence = 0
-    dirty_teams = { all = true }
+    dirty_teams = {}
     event_bus.subscribe(events.UI_DIRTY, on_dirty)
     event_bus.subscribe(events.UI_SNAPSHOT_REQUESTED, on_snapshot_requested)
-    scheduler.every(0.25, function()
-        flush_dirty()
-        return true
-    end, "ui_snapshot_flush")
+    on_dirty({})
 end
 
 function M.publish_player(player_id)

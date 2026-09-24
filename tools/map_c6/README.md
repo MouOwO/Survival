@@ -359,6 +359,27 @@ script_reload_code tests/map_c6_check
 
 仅查看美术时可执行 `script_reload_code tests/map_c6_preview`，启用白天和全图视野。全景相机需先执行 `r_farz 100000`，否则远处地形会被裁剪。正常游玩恢复 `r_farz -1` 和 `dota_camera_distance 1200`。
 
+## 当前主地图的保存与出生点检查
+
+`template_map.vmap` 以 Hammer 中保存的当前文件为准。手工修缮后使用
+`./tools/map_c6/compile-main.ps1`；不要用早期布局生成器覆盖现有地形。
+编译前退出占用该地图的测试对局，编译脚本会校验源文件哈希及 VPK 中的资源 CRC。
+
+进入当前主地图后，可执行只读检查：
+
+```text
+script_reload_code tests/manual_spawn_land_check
+```
+
+它输出出生/传送标记的实际地面高度、可通行状态，以及周围 32、64、128 单位的采样。
+水底有时也可通行，必须同时核对地面高度和实际地形；不能仅凭 `IsTraversable` 判断陆地。
+1–10 转擂台的导航格只开放在实体地板内部。存档挑战建筑使用各玩家的
+`player_<id>_archive_hub_<1..3>` 标记，与怪物波次点独立。
+
+检查编译包时直接读取 VPK，或将提取文件放在游戏目录之外的临时目录；
+不要在插件的 `output` 目录遗留同名松散 `template_map.vmap_c` 等编译资源。
+2026-09-24 曾因临时提取文件出现 `VPK directory ... corrupt` 弹窗，移除后已恢复进入游戏。
+
 ## 第一版范围
 
 已有挑战/转生的入口与生成锚点已布置。房间里的斧王和石头人为展示比例的模型；新增房间的玩法、独立天气与怪物配置尚需按后续玩法分配。原有建造范围和资源树配置仅在 `survival_c6` 下切换到新坐标。

@@ -1,0 +1,102 @@
+{
+  "date": "2026-09-24",
+  "scope": "Tower logical destruction, immediate grid reuse, build availability and native death visual lifetime",
+  "tests": [
+    {
+      "name": "test_builder_tower_rebuild",
+      "exit_code": 0,
+      "last_line": "BUILDER_TOWER_REBUILD_PASS: seven-base cap, synchronous death re-enable, duplicate events, class counts, recovery, player isolation, fusion does not permanently disable construction"
+    },
+    {
+      "name": "test_building_death_visual",
+      "exit_code": 0,
+      "last_line": "BUILDING_DEATH_VISUAL_PASS: native corpse, no collision/acquisition/bar, async guard, reuse safety, teardown"
+    },
+    {
+      "name": "test_building_upgrade_lifecycle",
+      "exit_code": 0,
+      "last_line": "BUILDING_UPGRADE_LIFECYCLE_PASS: expired handle/corpse exclusion/logical death/late publish/scan recovery/live rewards/index reuse/old-event isolation"
+    },
+    {
+      "name": "test_tower_destruction_rebuild",
+      "exit_code": 0,
+      "last_line": "TOWER_DESTRUCTION_REBUILD_PASS: synchronous manual cleanup, live cap, immediate rebuild, delayed duplicate, natural death, visual failures, all route reservations"
+    },
+    {
+      "name": "test_tower_class_preflight",
+      "exit_code": 0,
+      "last_line": "TOWER_CLASS_PREFLIGHT_PASS: cached/uncached failure has no side effects; real wallet/route limits; UI cooldown and native filter; completion, competition, cancellation and debug semantics"
+    },
+    {
+      "name": "test_tower_upgrade_targeting",
+      "exit_code": 0,
+      "last_line": "TOWER_UPGRADE_TARGETING_PASS: actual construction, upgrade completion, technology/permanent range changes, technology-only and building recovery, zero native acquisition and ordinary-enemy targeting"
+    },
+    {
+      "name": "test_tower_idle_state",
+      "exit_code": 0,
+      "last_line": "TOWER_IDLE_STATE_PASS: immediate first/kill attack, no Stop/disarm between victims, next-tick dropped-order recovery, stable attacks, real order-filter reentry, tree-only idle"
+    },
+    {
+      "name": "test_io_building_ambient",
+      "exit_code": 0,
+      "last_line": "IO_BUILDING_AMBIENT_PASS: native controls, initial preload, refresh reuse, stage/owner cleanup, legacy and retry"
+    },
+    {
+      "name": "test_visual_carrier_health_bar",
+      "exit_code": 0,
+      "last_line": "VISUAL_CARRIER_HEALTH_BAR_PASS: spawn race, explicit cleanup, respawn, recovered carrier, hero retained"
+    },
+    {
+      "name": "test_wall_quick_upgrade",
+      "exit_code": 0,
+      "last_line": "WALL_QUICK_UPGRADE_PASS: cumulative cost, paid quick upgrade, completion stats, hide after one level/max, busy rejection, cancellation/start refunds, insufficient resources"
+    }
+  ],
+  "syntax": [
+    {
+      "file": "systems/building_system.lua",
+      "exit_code": 0
+    },
+    {
+      "file": "systems/builder_progression_system.lua",
+      "exit_code": 0
+    },
+    {
+      "file": "systems/building_upgrade_system.lua",
+      "exit_code": 0
+    },
+    {
+      "file": "systems/building_visual_service.lua",
+      "exit_code": 0
+    },
+    {
+      "file": "visual/model_appearance_service.lua",
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_builder_tower_rebuild.lua",
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_building_death_visual.lua",
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_tower_destruction_rebuild.lua",
+      "exit_code": 0
+    },
+    {
+      "file": "tests/test_building_upgrade_lifecycle.lua",
+      "exit_code": 0
+    }
+  ],
+  "runtime": {
+    "probe": "GameRules=nil",
+    "active_match": false,
+    "native_death_visual_verified": false,
+    "note": "No gameplay entities changed; per-model animation appearance remains unverified."
+  },
+  "map_recompiled": false,
+  "committed_or_pushed": false
+}

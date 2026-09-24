@@ -316,7 +316,8 @@ end
 local function schedule_verification(unit, appearance, generation)
     local entindex = unit:entindex()
     local ok = pcall(scheduler.after, VERIFY_DELAY_SECONDS, function()
-        if generation_by_unit[entindex] ~= generation or not valid(unit) then return end
+        if generation_by_unit[entindex] ~= generation or not valid(unit)
+            or unit.survival_building_death_visual then return end
         local state = states_by_unit[entindex]
         if not state or state.owner ~= unit or state.generation ~= generation then return end
         local invalid_component = false
@@ -391,6 +392,7 @@ function M.Apply(unit, appearance)
     if not valid(unit) or type(unit.entindex) ~= "function" then
         return false, "invalid_entity", nil
     end
+    if unit.survival_building_death_visual then return false, "building_dead", nil end
     remove_legacy_carriers(unit)
     local entindex = unit:entindex()
     local previous = states_by_unit[entindex]

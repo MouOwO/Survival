@@ -21,7 +21,8 @@ FIND_CLOSEST = 0
 local auto = require("modifiers/modifier_tower_auto_attack")
 local tree_rules = require("systems/tree_damage_rules")
 local candidates = {}
-FindUnitsInRadius = function() return candidates end
+local radius_queries = 0
+FindUnitsInRadius = function() radius_queries = radius_queries + 1; return candidates end
 local next_index = 0
 local entities = {}
 EntIndexToHScript = function(index) return entities[tonumber(index)] end
@@ -50,7 +51,8 @@ local function tower_fixture(class_id)
     tower.survival_building_id = "arrow_tower"
     tower.survival_tower_class = class_id
     tower.range, tower.acquisition, tower.idle_acquire = 1000, 1000, true
-    local calls = { stop = 0, force = 0, fade = 0, stack = 0, refresh = 0, order = {} }
+    local calls = { stop = 0, force = 0, fade = 0, stack = 0, refresh = 0,
+        acquisition_writes = 0, idle_acquire_writes = 0, order = {} }
     local modifier = setmetatable({ stack_count = 0 }, { __index = auto })
     local function record(event) calls.order[#calls.order + 1] = event end
     function modifier:GetParent() return tower end
@@ -67,9 +69,15 @@ local function tower_fixture(class_id)
     function modifier:StartIntervalThink(interval) self.interval = interval end
     function tower:Script_GetAttackRange() return self.range end
     function tower:GetAttackRange() return self.range end
-    function tower:SetAcquisitionRange(value) self.acquisition = value end
+    function tower:SetAcquisitionRange(value)
+        self.acquisition = value
+        calls.acquisition_writes = calls.acquisition_writes + 1
+    end
     function tower:GetAcquisitionRange() return self.acquisition end
-    function tower:SetIdleAcquire(value) self.idle_acquire = value end
+    function tower:SetIdleAcquire(value)
+        self.idle_acquire = value
+        calls.idle_acquire_writes = calls.idle_acquire_writes + 1
+    end
     function tower:GetAttackTarget() return self.target end
     function tower:GetForceAttackTarget() return self.forced end
     function tower:SetForceAttackTarget(target)
@@ -111,7 +119,8 @@ local function idle(tower, modifier, message)
     assert(tower.forced == nil and tower.target == nil, message .. ": stale engine target")
 end
 local function snapshot(calls)
-    return table.concat({ calls.stop, calls.force, calls.fade, calls.stack, calls.refresh }, ":")
+    return table.concat({ calls.stop, calls.force, calls.fade, calls.stack, calls.refresh,
+        calls.acquisition_writes, calls.idle_acquire_writes }, ":")
 end
 local function unchanged(calls, before, message)
     assert(snapshot(calls) == before, message .. ": redundant engine state/order/gesture work")
@@ -326,5 +335,24 @@ recovery_modifier:OnDeath({ unit = third_monster })
 for _ = 1, 8 do recovery_modifier:OnIntervalThink() end
 idle(recovery_tower, recovery_modifier, "stalled target died before retry")
 assert(explicit_orders == 5, "no delayed order may be issued at a dead monster or resource tree")
+
+-- Dummy priority is evaluated by target selection, not an extra radius search
+-- for every attack animation. An approaching real enemy still wins next tick.
+local dummy = unit("training_dummy", 100)
+dummy.survival_is_training_dummy = true
+local dummy_tower, dummy_modifier = tower_fixture()
+candidates = { tree, dummy }
+dummy_modifier:OnIntervalThink()
+dummy_tower.target = dummy
+local searches_before = radius_queries
+for _ = 1, 100 do dummy_modifier:OnAttackStart({ attacker = dummy_tower, target = dummy }) end
+assert(radius_queries == searches_before, "approved dummy attacks must not trigger per-attack radius scans")
+assert(dummy_modifier.forced_target == dummy and dummy_modifier:GetStackCount() == 1)
+local approaching = unit("enemy_wave", 400)
+candidates = { tree, dummy, approaching }
+dummy_modifier:OnIntervalThink()
+assert(dummy_modifier.forced_target == approaching, "real enemies must still preempt the training dummy")
+
+print("TOWER_HOTPATH_PASS: stable acquisition writes=0; 100 approved dummy attacks radius scans=0")
 
 print("TOWER_IDLE_STATE_PASS: immediate first/kill attack, no Stop/disarm between victims, next-tick dropped-order recovery, stable attacks, real order-filter reentry, tree-only idle")

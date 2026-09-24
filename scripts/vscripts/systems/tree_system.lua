@@ -10,32 +10,56 @@ local current_tree = nil
 local main_city = nil
 local tree_level = 1
 local reserved_grid = nil
+local wall_attack_frame = nil
+local walls_by_player = {}
+local attacked_targets = nil
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
 
-local function wall_is_under_attack(player_id)
+local function find_player_wall(player_id)
     local response = event_bus.request(events.BUILDING_LIST_REQUEST, {
         player_id = player_id,
     }) or {}
-    local wall = nil
     for _, building in ipairs(response.buildings or response) do
         if building.building_id == "wall" and valid_entity(building.unit) then
-            wall = building.unit
-            break
+            return building.unit
         end
     end
-    if not wall or not Entities or not Entities.FindAllByClassname then return false end
+    return nil
+end
+
+local function wall_is_under_attack(player_id)
+    -- Many workers can land attacks in one simulation frame. Their peaceful
+    -- harvest check shares the wall lookup and the same live enemy snapshot;
+    -- the next frame sees target changes without delaying resource settlement.
+    local frame = GameRules and GameRules.GetGameTime and GameRules:GetGameTime()
+    if frame == nil or frame ~= wall_attack_frame then
+        wall_attack_frame = frame
+        walls_by_player = {}
+        attacked_targets = nil
+    end
+    local wall
+    if player_id ~= nil then wall = walls_by_player[player_id] end
+    if wall == nil then
+        wall = find_player_wall(player_id)
+        if frame ~= nil and player_id ~= nil then walls_by_player[player_id] = wall or false end
+    end
+    if not valid_entity(wall) or not Entities or not Entities.FindAllByClassname then return false end
+    if attacked_targets then return attacked_targets[wall] == true end
+    local targets = {}
     for _, unit in ipairs(Entities:FindAllByClassname("npc_dota_creature") or {}) do
         if valid_entity(unit) and unit:IsAlive()
             and (unit.survival_is_wave_monster == true
                 or unit.survival_is_challenge_monster == true)
-            and unit.GetAttackTarget and unit:GetAttackTarget() == wall then
-            return true
+            and unit.GetAttackTarget then
+            local target = unit:GetAttackTarget()
+            if target then targets[target] = true end
         end
     end
-    return false
+    if frame ~= nil then attacked_targets = targets end
+    return targets[wall] == true
 end
 
 local function level_row(level)
@@ -303,6 +327,9 @@ function M.init()
     main_city = nil
     tree_level = 1
     reserved_grid = nil
+    wall_attack_frame = nil
+    walls_by_player = {}
+    attacked_targets = nil
     reserve_tree_grid("survival_tree_reserved")
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.TREE_HIT, on_tree_hit)

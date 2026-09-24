@@ -32,6 +32,7 @@ local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
 local buildings = {}
+local on_entity_killed
 local fusion_replacements = {}
 local fusion_replacement_sequence = 0
 local tower_limits = player_tower_limits.new(function()
@@ -486,7 +487,7 @@ local function recover_building(unit)
     if not valid_entity(unit) or unit.survival_is_building ~= true then return nil end
     -- UI queries may still reference a corpse during its destruction effect.
     -- Never restore its released footprint, count or collision barriers.
-    if unit.IsAlive and not unit:IsAlive() then return nil end
+    if unit.survival_building_destroyed or (unit.IsAlive and not unit:IsAlive()) then return nil end
     local entindex = unit:entindex()
     if buildings[entindex] then return buildings[entindex] end
     local definition = definition_for_unit(unit)
@@ -501,6 +502,7 @@ local function recover_building(unit)
         grid_x, grid_y = grid_position(origin, definition)
     end
     local state = {
+        entindex = entindex,
         unit = unit,
         definition = definition,
         team = unit:GetTeamNumber(),
@@ -856,7 +858,7 @@ local function start_building(payload)
         -- Keep ability entity indexes stable for runtime tooltip data. Activate
         -- once now and once after the construction modifier state has replicated.
         scheduler.after(0.1, function()
-            if valid_entity(unit) then
+            if not state.cleaned and valid_entity(unit) and unit:IsAlive() then
                 add_building_abilities(unit, check.definition, true)
             end
         end, "activate_building_abilities_" .. tostring(unit:entindex()))
@@ -1001,7 +1003,8 @@ local function query_building(payload)
         local ok, unit = pcall(EntIndexToHScript, entindex)
         if ok then state = recover_building(unit) end
     end
-    if not state or state.constructing or not valid_entity(state.unit) then return nil end
+    if not state or state.cleaned or state.constructing or not valid_entity(state.unit)
+        or (state.unit.IsAlive and not state.unit:IsAlive()) then return nil end
     return public_state(state)
 end
 local function list_buildings(payload)
@@ -1009,6 +1012,8 @@ local function list_buildings(payload)
     local player_id = tonumber(payload and payload.player_id)
     for _, state in pairs(buildings) do
         if valid_entity(state.unit)
+            and not state.cleaned
+            and (not state.unit.IsAlive or state.unit:IsAlive())
             and not state.constructing
             and (player_id == nil or state.player_id == player_id) then
             result[#result + 1] = public_state(state)
@@ -1073,6 +1078,11 @@ local function destroy_arrow_tower_state(state)
     end
     -- This is the same destruction lifecycle used by the confirmed G action.
     state.unit:ForceKill(false)
+    -- Engine death delivery can be deferred. Release gameplay state before
+    -- returning to the caller so a replacement can be placed immediately.
+    if valid_entity(state.unit) and not state.unit:IsAlive() then
+        on_entity_killed({ victim = state.unit })
+    end
     return true, nil
 end
 
@@ -1105,7 +1115,9 @@ end
 
 local function on_building_changed(payload)
     local state = buildings[payload.entindex]
-    if not state then return end
+    if not state or state.cleaned or not valid_entity(state.unit)
+        or (state.unit.IsAlive and not state.unit:IsAlive())
+        or (payload.unit and payload.unit ~= state.unit) then return end
     local previous_class = class_id_for_state(state)
     local next_class = payload.tower_class
     if type(next_class) ~= "string"
@@ -1151,39 +1163,42 @@ local function on_building_changed(payload)
     dev_wall_stats.apply(state)
     apply_hull_radius(state.unit, state.definition)
 end
-local function on_entity_killed(payload)
+on_entity_killed = function(payload)
     local victim = payload.victim
     if not valid_entity(victim) then return end
+    if victim.survival_building_destroyed then return end
     rollback_build_cooldown(victim.survival_build_task)
     clear_build_task(victim, victim.survival_build_task)
-    construction_visual.cancel(victim)
     local state = buildings[victim:entindex()]
     if not state then
         release_grid_for_unit(victim)
+        pcall(construction_visual.cancel, victim)
         return
     end
+    if state.unit ~= victim then return end
     if state.cleaned then return end
     state.cleaned = true
-    local destruction_effect = wall_destruction.play(state)
+    victim.survival_building_destroyed = true
+    local entindex = state.entindex or victim:entindex()
+    -- Counts and grid ownership are gameplay state. Retire them before any
+    -- visual cleanup or subscriber can fail/re-enter/rebuild this footprint.
+    buildings[entindex] = nil
+    local class_id = class_id_for_state(state)
+    change_count(state.player_id, class_id or state.building_id, -1)
+    release_grid_for_state(state, victim)
     if state.building_id == "wall" then
         wall_collision_barrier_service.clear(victim)
     end
     local reservation_cleared = false
     for class_index = 1, 7 do
         local class_id = "class_" .. tostring(class_index)
-        reservation_cleared = reservation_cleared or tower_limits:release(
-            state.player_id, class_id, victim:entindex()
+        local released = tower_limits:release(
+            state.player_id, class_id, entindex
         )
+        reservation_cleared = released or reservation_cleared
     end
     if reservation_cleared then
         publish_tower_class_counts(state.player_id, "tower_destroyed_during_class_change")
-    end
-    building_visual.clear(victim)
-    buildings[victim:entindex()] = nil
-    local class_id = class_id_for_state(state)
-    change_count(state.player_id, class_id or state.building_id, -1)
-    if class_id then
-        tower_limits:release(state.player_id, class_id, victim:entindex())
     end
     if class_id then publish_tower_class_counts(state.player_id, "tower_destroyed") end
     if state.building_id == "arrow_tower" then
@@ -1192,7 +1207,6 @@ local function on_entity_killed(payload)
             reason = "tower_destroyed",
         })
     end
-    release_grid_for_state(state, victim)
     if not state.constructing then
         event_bus.emit(events.BUILDING_DESTROYED, public_state(state))
     end
@@ -1209,6 +1223,22 @@ local function on_entity_killed(payload)
             state.build_cost = nil
         end
         rollback_build_cooldown(state.build_task)
+    end
+    -- Optional visuals cannot prevent footprint, count or population release.
+    local construction_ok = pcall(construction_visual.cancel, victim)
+    if not construction_ok then logger.warn("BuildingSystem", "construction visual cleanup failed") end
+    local destruction_effect
+    if state.building_id == "arrow_tower" then
+        local ok, playing = pcall(function()
+            return building_visual.play_death and building_visual.play_death(victim)
+        end)
+        if not ok or not playing then
+            pcall(building_visual.clear, victim)
+            if not ok then logger.warn("BuildingSystem", "tower death visual failed") end
+        end
+    else
+        destruction_effect = wall_destruction.play(state)
+        building_visual.clear(victim)
     end
     local endless_wall = state.building_id == "wall"
         and victim.survival_disconnect_cleanup ~= true
@@ -1341,6 +1371,7 @@ function M.enable_dev_wall_stats()
 end
 
 function M.init()
+    if building_visual.init then building_visual.init() end
     construction_visual.reset()
     wall_destruction.reset()
     buildings = {}

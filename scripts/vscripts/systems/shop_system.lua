@@ -409,8 +409,12 @@ local function publish_snapshot(player_id, reason)
 end
 push_snapshot = function(player_id, reason)
     if not state.opened_players[player_id] then return end
+    local queued = state.pending_push_reason[player_id] ~= nil
     state.pending_push_reason[player_id] = reason or "changed"
+    if queued then return end
+    local current_state = state
     scheduler.after(0.05, function()
+        if current_state ~= state then return end
         local pending_reason = state.pending_push_reason[player_id]
         state.pending_push_reason[player_id] = nil
         if pending_reason then publish_snapshot(player_id, pending_reason) end
@@ -1036,7 +1040,12 @@ local function on_player_changed(payload)
     push_snapshot(payload.player_id, payload.reason or "player_changed")
 end
 local function on_resource_changed(payload)
-    push_team(payload.team, "resource_changed")
+    local player_id = tonumber(payload and payload.player_id)
+    if valid_player_id(player_id) then
+        push_snapshot(player_id, "resource_changed")
+    elseif payload and payload.team then
+        push_team(payload.team, "resource_changed")
+    end
 end
 local function on_monster_killed(payload)
     local player_id = tonumber(payload and payload.player_id)
@@ -1102,6 +1111,9 @@ local function on_research_level_changed(payload)
 end
 
 function M.init()
+    for player_id in pairs(state.pending_push_reason or {}) do
+        scheduler.cancel("shop_snapshot_push_" .. tostring(player_id))
+    end
     reset_state()
     require("debug/technology_cheat_handler").register(
         state, push_snapshot

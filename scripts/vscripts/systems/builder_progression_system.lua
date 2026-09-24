@@ -151,9 +151,6 @@ local function count_limit_reached(state, row)
 end
 
 local function should_show(state, row)
-    if state.fusion_completed and row.building_id == "arrow_tower" then
-        return false
-    end
     if row.ability_name == BUILDER_ROGUE_ABILITY and rogue_consumed(state) then
         return false
     end
@@ -182,25 +179,32 @@ local function change_count(state, building_id, delta)
 end
 
 local function apply_tower_identity(state, payload, delta)
-    if payload.building_id ~= "arrow_tower" then return end
+    if payload.building_id ~= "arrow_tower" then return false end
     local entindex = tonumber(payload.entindex)
-    if not entindex then return end
+    if not entindex then return false end
     local previous = state.tower_class_by_entindex[entindex]
     local next_class = valid_tower_class(payload.tower_class)
         and payload.tower_class or nil
     local previous_key = count_key_for_tower(previous)
     local next_key = count_key_for_tower(next_class)
     if delta > 0 then
-        state.tower_class_by_entindex[entindex] = next_class
+        if previous ~= nil then return false end
+        -- Store the base identity too: nil means this entity is not counted.
+        -- Death can be delivered both synchronously and by the engine later.
+        state.tower_class_by_entindex[entindex] = next_key
         change_count(state, next_key, 1)
     elseif delta < 0 then
+        if previous == nil then return false end
         change_count(state, previous_key, -1)
         state.tower_class_by_entindex[entindex] = nil
-    elseif previous_key ~= next_key then
+    elseif previous ~= nil and previous_key ~= next_key then
         change_count(state, previous_key, -1)
         change_count(state, next_key, 1)
-        state.tower_class_by_entindex[entindex] = next_class
+        state.tower_class_by_entindex[entindex] = next_key
+    else
+        return false
     end
+    return true
 end
 
 local function rebuild_building_counts(state)
@@ -549,8 +553,7 @@ local function on_building_created(payload)
     if not state then return end
     local building_id = tostring(payload.building_id or "")
     if building_id == "arrow_tower" then
-        apply_tower_identity(state, payload, 1)
-        sync(state)
+        if apply_tower_identity(state, payload, 1) then sync(state) end
         return
     end
     state.counts[building_id] = count(state, building_id) + 1
@@ -567,8 +570,7 @@ local function on_building_changed(payload)
     local state = state_by_player[tonumber(payload.player_id)]
     if not state then return end
     if payload.building_id == "arrow_tower" then
-        apply_tower_identity(state, payload, 0)
-        sync(state)
+        if apply_tower_identity(state, payload, 0) then sync(state) end
         return
     end
     if payload.building_id == "main_city" then
@@ -582,8 +584,7 @@ local function on_building_destroyed(payload)
     if not state then return end
     local building_id = tostring(payload.building_id or "")
     if building_id == "arrow_tower" then
-        apply_tower_identity(state, payload, -1)
-        sync(state)
+        if apply_tower_identity(state, payload, -1) then sync(state) end
         return
     end
     state.counts[building_id] = math.max(0, count(state, building_id) - 1)
@@ -600,17 +601,6 @@ local function on_hero_summoned(payload)
     sync(state)
 end
 
-local function on_fusion_completed(payload)
-    if not payload or payload.reason ~= "fusion_completed" then return end
-    local player_id = tonumber(payload and payload.player_id)
-    for _, state in pairs(state_by_player) do
-        if state.player_id == player_id then
-            state.fusion_completed = true
-            sync(state)
-        end
-    end
-end
-
 function M.init()
     state_by_player = {}
     managed_abilities = {}
@@ -619,7 +609,6 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
-    event_bus.subscribe(events.TOWER_FUSION_STATE_CHANGED, on_fusion_completed)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
         if player_id ~= nil then state_by_player[player_id] = nil end
