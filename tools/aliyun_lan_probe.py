@@ -22,8 +22,14 @@ local status, count = 'gate_not_ready', 0
 if loading and type(loading.snapshot) == 'function' and type(loading.is_ready) == 'function'
   and PlayerResource and type(PlayerResource.GetConnectionState) == 'function' then
   local snapshot = loading.snapshot()
-  if Convars:GetStr('survival_fishing_api_token') ~= '' or loading.is_ready() then
-    status = 'already_released'
+  -- A configured credential is not proof that player authentication succeeded.
+  -- Both cases make credential withholding unsafe as a LAN join barrier, but
+  -- distinguish them without ever exporting the credential itself.
+  if loading.is_ready() then
+    status = 'admission_released'
+  elseif Convars:GetStr('survival_fishing_api_token') ~= ''
+    and not (type(loading.is_party_waiting) == 'function' and loading.is_party_waiting()) then
+    status = 'credential_present'
   elseif type(snapshot) == 'table' and snapshot.started then
     status = 'waiting_players'
     local accounts = {}
@@ -49,14 +55,18 @@ def parse_result(output: bytes, nonce: str) -> dict:
     if nonce not in [line.strip() for line in lines]:
         raise auth.AuthError("tools_server_confirmation_missing")
     for line in reversed(lines):
-        match = re.fullmatch(re.escape(nonce) + r":(waiting_players|gate_not_ready|already_released):([0-9]{1,2})", line.strip())
+        match = re.fullmatch(re.escape(nonce) + r":(waiting_players|gate_not_ready|already_released|admission_released|credential_present):([0-9]{1,2})", line.strip())
         if not match:
             continue
         status, count = match[1], int(match[2])
         if not 0 <= count <= 24:
             break
-        if status == "already_released":
-            raise auth.AuthError("lan_session_already_authenticated_restart_without_bridge")
+        if status in {"already_released", "admission_released", "credential_present"}:
+            return {"ok": False,
+                    "error": "lan_session_already_authenticated_restart_without_bridge",
+                    "reason": {"already_released": "session_already_configured_or_released",
+                               "admission_released": "admission_already_released",
+                               "credential_present": "credential_already_present"}[status]}
         return {"ok": True, "status": status, "players": count}
     raise auth.AuthError("lan_probe_invalid_response")
 

@@ -22,7 +22,8 @@ FILES = (
     "tools/map_c6/console.cjs", "tools/deploy/goufayu_test_known_hosts",
     "tools/test_aliyun_local_config.py", "tools/test_aliyun_test_host.py", "tools/test_aliyun_lan_probe.py",
     "tools/test_aliyun_game_test_auth.py", "tools/test_aliyun_test_connection.py",
-    "tools/test_hammer_backend_bridge.py", "tools/test_setup_aliyun_test_host.py", "tools/build_test_host_bundle.py",
+    "tools/test_hammer_backend_bridge.py", "tools/test_setup_aliyun_test_host.py",
+    "tools/test_launch_aliyun_test_game.py", "tools/build_test_host_bundle.py",
     "docs/NEW_PC_LAN_TEST_GUIDE.md", "docs/ALIYUN_TEST_MIGRATION.md",
 )
 

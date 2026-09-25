@@ -199,6 +199,9 @@ def recovery_lua() -> str:
     return """
     local profiles = require('systems/player_profile_service')
     local setup = require('systems/match_setup_service')
+    local loading = package.loaded['systems/startup_loading_service']
+    local party_waiting = loading and type(loading.is_party_waiting) == 'function' and loading.is_party_waiting()
+    if not party_waiting then
     for id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do
       if PlayerResource:IsValidPlayerID(id)
         and not PlayerResource:IsFakeClient(id)
@@ -223,7 +226,7 @@ def recovery_lua() -> str:
         end
       end
     end
-    local loading = package.loaded['systems/startup_loading_service']
+    end
     if loading and type(loading.tick) == 'function' then loading.tick() end
 """
 

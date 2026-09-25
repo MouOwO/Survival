@@ -495,3 +495,22 @@ for (const [name, source] of [["startup_loading", xml], ["custom_loading_screen"
 }
 console.log("STARTUP_LOADING_UI_PASS: five fresh phases, nested wrapper visibility, bounded snapshot grace, no post-release flashes, session/player isolation, genuine image handshake, auth/resource gates, authoritative progress and in-track percentage");
 module.exports = {harness, loading, ready, visible, assertHidden, assertShown};
+
+{
+    const state = loading({phase: "party_waiting", selector_player_id: 0,
+        players: [{player_id: 0, status: "party_waiting"}, {player_id: 1, status: "party_waiting"}]});
+    const host = harness({state}), guest = harness({state, localId: 1});
+    assert.equal(host.nodes.StartupPartyStart.enabled, true);
+    assert.equal(guest.nodes.StartupPartyStart.enabled, false);
+    assert.equal(host.nodes.StartupLoadingPercent.text, "0%");
+    assert.equal(host.nodes.StartupLoadingReadyCount.text, "2 人已加入");
+    host.nodes.StartupPartyStart.events.onactivate();
+    guest.nodes.StartupPartyStart.events.onactivate();
+    assert(host.requests.some(r => r.name === "survival_party_start"));
+    assert(!guest.requests.some(r => r.name === "survival_party_start"));
+    host.advance(90);
+    assertShown(host, "party room never auto-starts on timeout");
+    host.setState(loading());
+    assert(host.nodes.StartupPartyStart.BHasClass("StartupLoadingHidden"));
+    console.log("STARTUP_PARTY_UI_PASS");
+}

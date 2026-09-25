@@ -53,9 +53,16 @@ class LanProbeTests(unittest.TestCase):
         self.assertEqual(lan.parse_result(output, NONCE)["players"], 1)
 
     def test_parser_rejects_already_authenticated_or_released_session(self):
-        with self.assertRaisesRegex(lan.auth.AuthError,
-                                    "lan_session_already_authenticated_restart_without_bridge"):
-            lan.parse_result((NONCE + ":already_released:0\n" + NONCE + "\n").encode(), NONCE)
+        for status, reason in (
+                ("already_released", "session_already_configured_or_released"),
+                ("admission_released", "admission_already_released"),
+                ("credential_present", "credential_already_present")):
+            with self.subTest(status=status):
+                self.assertEqual(lan.parse_result(
+                    (NONCE + ":" + status + ":0\n" + NONCE + "\n").encode(), NONCE),
+                    {"ok": False,
+                     "error": "lan_session_already_authenticated_restart_without_bridge",
+                     "reason": reason})
         self.assertEqual(lan.parse_result(
             (NONCE + ":gate_not_ready:0\n" + NONCE + "\n").encode(), NONCE)["status"],
             "gate_not_ready")
@@ -132,6 +139,14 @@ class LanProbeTests(unittest.TestCase):
                 self.assertEqual(result, {"ok": False, "error": expected})
                 self.assertNotIn("private console payload", output.getvalue())
 
+    def test_main_preserves_rejection_reason_and_nonzero_exit(self):
+        rejection = lan.parse_result(
+            (NONCE + ":credential_present:0\n" + NONCE + "\n").encode(), NONCE)
+        with patch.object(lan, "probe", return_value=rejection), \
+                redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(lan.main(), 1)
+            self.assertEqual(json.loads(output.getvalue()), rejection)
+
     def test_generated_lua_counts_connected_unique_humans_and_never_prints_token(self):
         lua = shutil.which("lua.exe") or shutil.which("lua")
         if not lua:
@@ -182,9 +197,15 @@ expect('waiting_players', 2)
 started = false
 expect('gate_not_ready', 0)
 started, released = true, true
-expect('already_released', 0)
+expect('admission_released', 0)
 released, token = false, 'fixture-private-token-must-not-leave-process'
-expect('already_released', 0)
+expect('credential_present', 0)
+loading.is_party_waiting = function() return true end
+expect('waiting_players', 2)
+loading.is_party_waiting = nil
+released = true
+expect('admission_released', 0)
+released = false
 token = ''
 package.loaded['systems/startup_loading_service'] = nil
 expect('gate_not_ready', 0)

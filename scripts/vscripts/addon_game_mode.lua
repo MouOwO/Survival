@@ -1019,9 +1019,10 @@ function M.activate()
     -- Authentication and asset preparation run before hero/gameplay start.
     -- Unlike gameplay timers, this barrier progresses while game time is stopped.
     multiplayer_player_service.assign_connected_players("before_finish_setup")
-    require("systems/startup_asset_preload_service").init()
     require("systems/startup_loading_service").init({
         minimum_wait_seconds = 0,
+        wait_for_party = type(IsInToolsMode) == "function" and IsInToolsMode(),
+        on_load_start = function() require("systems/startup_asset_preload_service").init() end,
         on_ready = function()
             multiplayer_player_service.assign_connected_players("loading_barrier_ready")
             on_game_state_changed()

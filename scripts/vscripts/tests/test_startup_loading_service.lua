@@ -534,3 +534,43 @@ success(requests[2]) service.tick()
 assert_admitted(service)
 
 print("STARTUP_LOADING_SERVICE_PASS: independent admission, all-player auth, mode-profile gameplay gate, monotonic completion, identity, retries, reconnect, session isolation")
+
+-- Tools party room: no timer, stale UI event, or joining client may start it.
+local dispatched = 0
+local party = fixture(3, { wait_for_party = true,
+    on_load_start = function() dispatched = dispatched + 1 end })
+assert(party.is_party_waiting() and party.snapshot().party_count == 3)
+time = 1000
+party.tick()
+assert(#requests == 0 and dispatched == 0 and not party.is_ready())
+ui(party, 0)
+local sid = party.snapshot().session_id
+listeners.survival_party_start(201, {session_id=sid, PlayerID=0})
+listeners.survival_party_start(200, {session_id='stale-session'})
+assert(party.is_party_waiting() and dispatched == 0)
+humans[2].state = 3
+disconnected[2] = true
+party.tick()
+assert(party.snapshot().party_count == 2)
+Convars = { GetStr = function() return '' end }
+listeners.survival_party_start(200, {session_id=sid})
+assert(not party.is_party_waiting() and dispatched == 1 and #requests == 0)
+assert(party.snapshot().phase == 'connecting_backend' and #party.snapshot().players == 2)
+time = time + 60
+party.tick()
+assert(party.snapshot().error == 'backend_connection_pending' and #requests == 0)
+Convars = { GetStr = function() return 'test-credential-present' end }
+party.tick()
+assert(#requests == 2 and dispatched == 1)
+listeners.survival_party_start(200, {session_id=sid})
+assert(#requests == 2 and dispatched == 1, 'double click cannot repeat loading')
+for _, request in ipairs(requests) do success(request) end
+ui(party, 1)
+assets_done()
+party.tick()
+assert_admitted(party)
+Convars = nil
+local solo_dispatch = 0
+local solo = fixture(1, { on_load_start = function() solo_dispatch = solo_dispatch + 1 end })
+assert(not solo.is_party_waiting() and solo_dispatch == 1 and #requests == 1)
+print('STARTUP_PARTY_ROOM_PASS: host authority, no early auth, disconnect cleanup, backend wait, once-only dispatch')

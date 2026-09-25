@@ -35,7 +35,9 @@ function Stop-BridgeGracefully {
 }
 switch ($Action) {
     'Install' {
-        if ($existing -and $existing.State -eq 'Running') { Stop-BridgeGracefully }
+        # A manual resident helper can own the instance lock even when the
+        # scheduled task is Ready or missing. Drain it before removing STOP.
+        Stop-BridgeGracefully
         Remove-Item -LiteralPath $stopFile -Force -ErrorAction SilentlyContinue
         $launch = New-ScheduledTaskAction -Execute $powershell -Argument $arguments -WorkingDirectory $repo
         $trigger = New-ScheduledTaskTrigger -AtLogOn -User $user
@@ -51,7 +53,7 @@ switch ($Action) {
     }
     'Start' {
         if (-not $existing) { throw 'Run Install first.' }
-        if ($existing.State -eq 'Running') { Stop-BridgeGracefully }
+        Stop-BridgeGracefully
         Remove-Item -LiteralPath $stopFile -Force -ErrorAction SilentlyContinue
         Enable-ScheduledTask -TaskName $taskName | Out-Null
         Start-ScheduledTask -TaskName $taskName

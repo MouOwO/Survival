@@ -30,6 +30,7 @@ TUNNEL_STATE = ROOT / "output/ecs_backend_work/test_tunnel.json"
 KNOWN_HOSTS = ROOT / "output/ecs_backend_work/ecs_hostkey_candidate.pub"
 PREFIX = "GOUFAYU_HAMMER_STATE:"
 HIDDEN = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+STOP_WAIT_SECONDS = 55.0
 
 
 def inspection_lua() -> str:
@@ -48,6 +49,10 @@ local function inspect()
   local session = setup.get_session_id()
   if type(session) ~= 'string' or #session < 8 then return end
   result.session = session
+  if type(loading.is_party_waiting) == 'function' and loading.is_party_waiting() then
+    result.status = 'waiting_for_party'
+    return
+  end
   result.status = Convars:GetStr('survival_fishing_api_token') == ''
     and 'authentication_required' or 'configured'
   result.players, result.authenticated, result.loaded = 0, 0, 0
@@ -105,7 +110,7 @@ def inspect_game() -> dict:
             if value.get("status") == "waiting_for_map":
                 return {"status": "waiting_for_map"}
             session = value.get("session")
-            if value.get("status") not in {"configured", "authentication_required"} \
+            if value.get("status") not in {"configured", "authentication_required", "waiting_for_party"} \
                     or not isinstance(session, str) or not 8 <= len(session) <= 512:
                 continue
             counts = {key: value.get(key, 0) for key in ("players", "authenticated", "loaded")}
@@ -168,14 +173,46 @@ def publish(value: dict) -> dict:
     return result
 
 
+def stop() -> dict:
+    """Pause future runs and wait for any in-flight injection to finish safely."""
+    deadline = time.monotonic() + STOP_WAIT_SECONDS
+    instance = OUTPUT / "bridge_instance.json"
+    for path in (OUTPUT, STOP, STATUS, instance, instance.with_suffix(".lock")):
+        auth.no_reparse(path)
+    for path in (STOP, STATUS, instance.with_suffix(".lock")):
+        auth.ignored(path)
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    STOP.write_text("stop\n", encoding="ascii")
+    # The resident and one-shot bridge both hold this lock across safe_step(),
+    # including auth.inject's credential-file finally block. Observing a PID or
+    # scheduled task alone cannot establish that the injection has finished.
+    while True:
+        try:
+            with tunnel.state_lock(instance):
+                return publish({"ok": True, "status": "stopped", "stop_confirmed": True})
+        except tunnel.TunnelError as exc:
+            if str(exc) != "tunnel_operation_in_progress":
+                raise
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                # Leave STOP set. The worker still cleans up normally; callers
+                # must not restart/reload a game on an unconfirmed stop.
+                raise auth.AuthError("bridge_stop_timeout") from None
+            time.sleep(min(0.25, remaining))
+
+
 def _run_locked(bridge: Bridge, *, once: bool = False) -> dict:
     auth.no_reparse(OUTPUT)
     OUTPUT.mkdir(parents=True, exist_ok=True)
     auth.ignored(STATUS)
     # Separate from the short-lived SSH state lock. Multiple bridge startup
     # attempts must not race to inspect/inject into the same game.
+    instance = OUTPUT / "bridge_instance.json"
+    auth.no_reparse(instance)
+    auth.no_reparse(instance.with_suffix(".lock"))
+    auth.ignored(instance.with_suffix(".lock"))
     try:
-        with tunnel.state_lock(OUTPUT / "bridge_instance.json"):
+        with tunnel.state_lock(instance):
             auth.no_reparse(STOP)
             logger = logging.getLogger("hammer_backend")
             auth.no_reparse(OUTPUT / "bridge.log")
@@ -186,7 +223,7 @@ def _run_locked(bridge: Bridge, *, once: bool = False) -> dict:
             previous, retry_delay = None, 2
             try:
                 while True:
-                    if not once and STOP.exists():
+                    if STOP.exists():
                         return publish({"ok": True, "status": "stopped"})
                     value = safe_step(bridge)
                     publish(value)
@@ -246,9 +283,7 @@ def main() -> int:
             if result.get("status") != "stopped" and time.time() - result.get("updated_at", 0) > 90:
                 result = {"ok": False, "status": "heartbeat_expired"}
         elif args.action == "stop":
-            auth.no_reparse(STOP)
-            STOP.write_text("stop\n", encoding="ascii")
-            result = {"ok": True, "status": "stop_requested"}
+            result = stop()
         else:
             settings = local_config.load(ROOT)
             result = run(Bridge(

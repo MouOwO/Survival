@@ -1,6 +1,39 @@
 # 新电脑复制与局域网联调
 
-更新：2026-09-25。适用于 Windows 上的 `survival/template_map` Workshop Tools 测试，后端为现有阿里云测试环境。
+更新：2026-09-26。适用于 Windows 上的 `survival/template_map` Workshop Tools 测试，后端为现有阿里云测试环境。
+
+## 当前推荐：直接从 Hammer 开组队房
+
+1. 主机完成本机 Setup/OnlineCheck，并双击 `setup_hammer_backend.cmd` 安装或重新启用助手。
+   之前 LAN 启动器可能暂停过它；只安装过一次不代表现在还在运行。
+2. 保存地图，退出旧 Dota 测试进程。主机关闭 VConsole GUI，避免与认证助手争用 29000；
+   不需要关闭 Hammer。由 Hammer 运行正式 `template_map`。
+3. 新局显示“组队等待”，列出已连接玩家，不自动开始。房主先等其他电脑加入。
+4. 加入者启动自己的 survival Tools 客户端，在自己的控制台执行
+   `connect <主机局域网IPv4>:<实际游戏端口>`，不用安装主机认证助手。
+5. 房主确认名单后点击“队友到齐，开始加载”。单人也能直接点击。
+   只有服务端确认的房主可以开始，重复点击和伪造 PlayerID 不会重复执行加载。
+6. 助手在组队阶段返回 `waiting_for_party`，不会请求认证；开始后连接现有 ECS 测试后端，
+   所有人认证及启动资源准备完成才进入模式/难度选择。
+
+引擎加载地图必需的 Precache 和基础资源仍在进入房间前完成；本次延后的是玩家认证及
+启动资源服务的动态批量加载。不能用一个后置 UI 按钮推迟引擎本身的地图加载。
+组队时离开的玩家不会永久卡住后续屏障；正式加载开始后的断线仍保留原来的重连等待规则。
+
+本机已重新安装并启动助手，12 项离线检查与实际 ECS `/ready` 检查通过。新版 Lua、
+Panorama 行为测试、94 项 Python 相关回归通过，界面源码已同步 content 并编译到 game。
+用户已完整退出旧进程并从 Hammer 重开，确认出现组队按钮；本机实际助手状态为
+`waiting_for_party`，未提前认证。点击开始后的完整入场、双机加入和档案读写仍待实机验收。
+此功能涉及游戏 Lua 和编译 UI，其他电脑必须同步完整相关 game 更新，不能只覆盖工具 ZIP。
+Git commit/push 本身不是联机条件；它只便于各电脑同步同一版本。手动同步同一组运行文件
+也可以联调。该自定义组队按钮仅在 Tools 测试启用，正常游廊使用官方大厅先组队再开局。
+
+### VConsole 灰点
+
+灰点是控制台与本机游戏的连接状态，不是 ECS 认证结果。无 relay 时目标应为本机实际
+监听的 `127.0.0.1:29000`，历史 MCP 配置可能仍指向 `29001`。加入者的控制台连自己，
+主机 LAN IP 只出现在随后输入的 `connect` 命令中。主机等待助手认证时关闭 GUI 避免争用。
+读取不到进程命令行时，不应据此断定游戏未使用 `-tools`；应检查实际监听和工具回显。
 
 ## 先区分两种电脑
 
@@ -209,10 +242,11 @@ SSH 登录凭据和游戏 API 凭据是两件事。测试 API token 必须与现
 双击 `launch_aliyun_test_game.cmd`，保持游戏及命令窗口打开，等待：
 
 ```text
-GAME_AUTH_READY: missing profiles requested; loaded profiles preserved.
+GAME_AUTH_READY: backend credential applied; existing profiles preserved.
 ```
 
-该输出表示认证已传入，并已请求缺失档案，不代表所有业务验证自动完成。继续验收：
+该输出表示凭据已传入，不代表玩家认证、档案或所有业务验证完成。新版 Tools 组队等待房中，
+房主还需点击“开始加载”，然后才请求认证并进入后续准备。继续验收：
 
 1. 进入模式和难度选择，完成后正常进入可操作状态。
 2. 建造建筑，不再出现 `profile_not_loaded`。
@@ -229,7 +263,7 @@ GAME_AUTH_READY: missing profiles requested; loaded profiles preserved.
 & .\tools\setup_hammer_backend.ps1 -Action Status
 ```
 
-助手会主动注入认证，因此进行下一节“先等玩家、再认证”的 LAN 测试前，需要停止助手。结束 LAN 测试后可恢复：
+助手会主动注入认证，因此下一节的 LAN 启动器会先调用现有 Stop 流程，自动暂停助手，再等待玩家。也可以手动停止。结束 LAN 测试后可恢复：
 
 ```powershell
 & .\tools\setup_hammer_backend.ps1 -Action Stop
@@ -254,11 +288,12 @@ GAME_AUTH_READY: missing profiles requested; loaded profiles preserved.
 
 ### 主机 A
 
-1. 停止 Hammer 自动认证助手，并完全退出旧 Dota/Tools 游戏进程，使新会话不带旧 token。
-2. 双击根目录 `launch_aliyun_lan_host.cmd`。它默认等待 **2 名玩家，包含主机自己**，最长等待 600 秒。
+1. 完全退出旧 Dota/Tools 游戏进程，使新会话不带旧 token。只退回菜单、重载地图或停止助手，不会清除旧游戏进程中的认证配置。
+2. 双击根目录 `launch_aliyun_lan_host.cmd`。它先自动优雅暂停 Hammer 认证助手；停止失败则中止，不强杀进程。它默认等待 **2 名玩家，包含主机自己**，最长等待 600 秒。
 3. 保持地图和命令窗口开启；启动器先等待真实玩家加入，人数足够后才传入认证。当前代码由认证和资源加载屏障决定何时开始，**不能依赖旧 CSV 的 60 秒设置来保证固定加入窗口**。
 4. 在主机游戏控制台查看 `status`，确认本次游戏服务端的 LAN 地址/端口。使用主机的局域网 IPv4，不使用 ECS 公网 IP，也不使用 `127.0.0.1`，把该地址交给 B。
-5. B 加入后，启动器确认实际玩家人数达到要求，再自动执行现有认证流程。等待 `GAME_AUTH_READY`，由游戏内屏障确认参与者准备完成，再完成模式/难度选择。
+5. B 加入后，启动器确认实际玩家人数达到要求并传入认证凭据。看到 `GAME_AUTH_READY` 后，
+   房主在组队界面点击“队友到齐，开始加载”。由游戏内屏障确认参与者准备完成，再完成模式/难度选择。
 
 三人或四人测试在 PowerShell 指定人数，例如：
 
@@ -268,7 +303,7 @@ GAME_AUTH_READY: missing profiles requested; loaded profiles preserved.
 
 人数检查排除机器人、观战、断线、无 Steam 身份和重复身份，不把“打开了几个游戏窗口”当成人数。它不改玩家数据、创建角色或重新初始化游戏服务。
 
-如果 Hammer 助手还在运行，LAN 启动器会要求先停用它；如果当前地图已经认证/放行，会要求冷启动新局。不要同时运行单机启动器绕过等待。等待人数超时后，先检查加入者连接结果，再重试 LAN 启动器，已有未放行的地图可继续接入。
+如果当前地图已经配置认证凭据或放行，启动器会分别显示 `credential_already_present` 或 `admission_already_released`，并要求完全退出旧游戏后重新双击 LAN 入口。前者只表示有凭据，不证明服务器认证成功；在等待人数时它可能随时触发开局，因此也不能继续使用这局。启动器不会清空凭据、重置存档、强退或重载当前游戏。不要同时运行单机启动器或重新启动 Hammer 助手。等待人数超时后，先检查加入者连接结果，再重试 LAN 启动器，已有未配置凭据且未放行的地图可继续接入。
 
 如果主机在 B 加入前已经放行，或日志出现 `assignment_window_closed`，不要通过反复认证强行补造活动玩家槽位。退出后重新按顺序开局，先让所有玩家入局再放行。
 
@@ -321,7 +356,9 @@ connect 192.168.1.134:27015
 | `api_environment_missing` | 本机还未配置 API 凭据 | 执行 `Credential` 或通过 Setup 指定现有 `-EnvironmentFile` |
 | `ssh_key_not_loaded_in_current_user_agent` | agent 中没有当前配置对应的密钥 | 在运行游戏的同一 Windows 用户下加载该密钥 |
 | `compiled_template_map_missing` | 游戏目录没有编译后的主地图 | 同步正确的 `.vpk`，不能只复制 `.vmap` |
-| `lan_session_already_authenticated_restart_without_bridge` | 这局已认证或已放行，无法再充当人数等待阶段 | 停助手、退出旧游戏，再用 LAN 主机入口冷启动 |
+| `lan_session_already_authenticated_restart_without_bridge` | 旧版将凭据非空与已放行合并为一个错误；新版同时显示具体 reason | 完全退出旧 Dota，再用 LAN 主机入口冷启动；新版自动暂停助手 |
+| `credential_already_present` | 游戏进程已配置认证凭据，可能来自单人启动器、Hammer 助手或旧局；不等于认证成功 | 完全退出旧 Dota 后重开 LAN；不要手动清 token 或重置玩家数据 |
+| `admission_already_released` | 这局已经越过加载准入阶段，不能再补加开局人数等待 | 完全退出旧 Dota 后重开 LAN，所有参与者放行前加入 |
 
 已经实测：新电脑重建 Python 环境、修复 ACL 后，用户确认出现 `GAME_AUTH_READY`。ACL 修复保留可信所有者，只收紧访问规则；token 在空文件权限校验通过后才写入，使用后删除。没有修改 ECS 数据库、管理员密码或 Supabase 原数据。
 
@@ -332,6 +369,11 @@ connect 192.168.1.134:27015
 开局屏障模拟。模拟与本机工具测试不替代两台电脑的实际游戏连接。
 当前开发电脑还以正常桌面用户运行了完整离线 `Check`：12 个检查项全部通过，
 包括真实 agent 身份、凭据格式和凭据目录权限；未因此连接或修改 ECS。
+
+后续针对 LAN 旧局错误的修复已通过 **99 项相关自动化回归**：连接/认证/配置/探针
+71 项、助手 23 项、真实 PowerShell 隔离启动流程 5 项。覆盖手动助手等待停止、停止超时
+不继续启动、旧局不重置、两人到齐才认证及单人兼容。测试未连接 ECS 或启动真实游戏；
+修复后的双机实连仍待验收。原 85 项为上一版工具整合的历史记录。
 
 可分发工具包：`output/test_host_bundle/goufayu_test_host_tools.zip`。包内
 `TEST_HOST_TOOLS_MANIFEST.json` 列出文件及 SHA256；它只装入固定清单中的公共工具、

@@ -417,9 +417,16 @@ assert(#auth_calls == 1 and #load_calls == 1 and load_calls[1].id == 2)
 assert(load_calls[1].mode == 'standard' and loaded[3].mode == 'standard')
 
 -- Early attachment must not require/init the loading module merely to tick it.
+reset('standard')
+package.loaded['systems/startup_loading_service'].is_party_waiting = function() return true end
+recovery()
+assert(#auth_calls == 0 and #load_calls == 0 and tick_calls == 1, 'party wait must not authenticate or load archives')
+package.loaded['systems/startup_loading_service'].is_party_waiting = function() return false end
+recovery()
+assert(#auth_calls == 1 and #load_calls == 1 and tick_calls == 2)
 package.loaded['systems/startup_loading_service'] = nil
 recovery()
-assert(tick_calls == 1 and #auth_calls == 1 and #load_calls == 1)
+assert(tick_calls == 2 and #auth_calls == 1 and #load_calls == 1)
 print('AUTH_RECOVERY_LUA_PASS')
 """
         script = self.root / "recovery.lua"

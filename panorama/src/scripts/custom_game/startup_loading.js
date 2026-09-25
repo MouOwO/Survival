@@ -148,6 +148,8 @@
         return resourceProgress * 0.6 + authentication + client;
     }
     function statusText(row) {
+        if (row.status === "party_waiting") return "已加入";
+        if (row.status === "connecting_backend") return "连接测试后端中";
         if (row.status === "disconnected") return "等待重新连接";
         if (row.status === "auth_error") return "需要重试";
         return playerReady(row) ? "已就绪" : "加载中……";
@@ -265,25 +267,33 @@
         background.style.opacity = !hidden && !artworkRetired && imageReady && !imageError ? "1" : "0";
         nativeSetupVisibility(!released());
         // Neither timers nor image events assert authenticated / server-ready.
-        var progress = personalProgress(local);
+        var party = !!state && state.phase === "party_waiting";
+        var host = party && localId >= 0 && state.selector_player_id === localId;
+        $("#StartupPartyStart").SetHasClass("StartupLoadingHidden", !party);
+        $("#StartupPartyStart").enabled = host && !imageError && roster.length > 0;
+        $("#StartupPartyStartText").text = host ? "队友到齐，开始加载" : "等待房主开始";
+        var progress = party ? 0 : personalProgress(local);
         $("#StartupLoadingProgressFill").style.width = progress.toFixed(1) + "%";
         $("#StartupLoadingPercent").text = Math.floor(progress) + "%";
-        $("#StartupLoadingStatus").text = late ? "本局已开始" :
+        $("#StartupLoadingStatus").text = party ? "组队等待 · 等待玩家加入" : late ? "本局已开始" :
             (reload ? "需要重新载入地图" : (mineReady && !failed ? "等待其他玩家" : "加载中……"));
         var detail = "正在准备游戏";
-        if (late) detail = "本局不支持中途加入";
+        if (party) detail = host ? "请先让队友连接本局，到齐后点击开始；单人也可直接开始。" : "已加入房间，等待房主开始加载。";
+        else if (late) detail = "本局不支持中途加入";
         else if (reload) detail = "部分初始资源加载失败";
         else if (imageError) detail = "加载画面尚未准备完成";
+        else if (state && state.phase === "connecting_backend") detail = "正在连接测试后端，请保持主机认证助手运行。";
         else if (failed) detail = "游戏准备暂时遇到问题";
         else if (mineReady) detail = "你的准备已完成，请稍候";
         else if (state && !assetsReady()) detail = "正在准备场景资源";
         else if (local && !yes(local.authenticated)) detail = "正在验证玩家身份";
         else if (state) detail = "正在完成准备";
         $("#StartupLoadingDetail").text = detail;
-        $("#StartupLoadingReadyCount").text = roster.length ? count + " / " + roster.length + " 已就绪" : "等待玩家连接";
+        $("#StartupLoadingReadyCount").text = party ? roster.length + " 人已加入" : roster.length ? count + " / " + roster.length + " 已就绪" : "等待玩家连接";
         var showError = late || reload || imageError || failed || stateTimeout;
         $("#StartupLoadingErrorBox").SetHasClass("StartupLoadingHidden", !showError);
         var errorMessages = {
+            backend_connection_pending: "测试后端连接尚未就绪。主机请运行 setup_hammer_backend.cmd，检查助手状态后等待重试。",
             backend_authentication_failed: "服务端认证失败，请检查测试连接后重试。",
             profile_load_failed: "玩家档案读取失败，请检查连接后重试。",
             profile_load_timeout: "玩家档案读取超时，请重试。"
@@ -362,6 +372,10 @@
         readState(); render(); $.Schedule(0.5, poll);
     }
     $("#StartupLoadingRetry").SetPanelEvent("onactivate", retry);
+    $("#StartupPartyStart").SetPanelEvent("onactivate", function () {
+        if (state && state.phase === "party_waiting" && state.selector_player_id === playerId())
+            send("survival_party_start");
+    });
     $.RegisterEventHandler("ImageLoaded", background, imageLoaded);
     $.RegisterEventHandler("ImageFailedLoad", background, imageFailed);
     try {
