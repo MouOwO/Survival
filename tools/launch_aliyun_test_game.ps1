@@ -1,6 +1,8 @@
 param(
     [switch]$AttachOnly,
-    [ValidateRange(10,600)][int]$WaitSeconds = 180
+    [ValidateRange(10,600)][int]$WaitSeconds = 180,
+    [ValidateRange(1,4)][int]$ExpectedPlayers = 1,
+    [ValidateRange(10,1800)][int]$JoinWaitSeconds = 600
 )
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -21,6 +23,12 @@ function Invoke-Check([string]$Script, [string]$Action) {
 
 Push-Location $repo
 try {
+    if ($ExpectedPlayers -gt 1) {
+        $bridgeTask = Get-ScheduledTask -TaskName 'Goufayu-Hammer-Test-Backend' -ErrorAction SilentlyContinue
+        if ($bridgeTask -and $bridgeTask.State -eq 'Running') {
+            throw 'Stop the Hammer backend helper before a LAN cold start: tools/setup_hammer_backend.ps1 -Action Stop. It would authenticate before all players join.'
+        }
+    }
     $connected = Invoke-Check $tunnel 'connect'
     if (-not $connected.ok) { throw ('SSH connection: ' + $connected.error) }
     Write-Host 'ECS tunnel ready: 127.0.0.1:8765'
@@ -55,6 +63,26 @@ try {
     } while ($timer.Elapsed.TotalSeconds -lt $WaitSeconds)
     if (-not $ready) {
         throw 'Normal template_map is not ready. Open Workshop Tools survival, then run: host_timescale 1; r_drawpanorama 1; dota_launch_custom_game survival template_map'
+    }
+    if ($ExpectedPlayers -gt 1) {
+        Write-Host ('LAN_WAITING_PLAYERS: expected ' + $ExpectedPlayers + '. Clients join this host; do not launch separate maps. Authentication waits until everyone joins.')
+        $joinTimer = [Diagnostics.Stopwatch]::StartNew()
+        $arrived = $false
+        $lastCount = -1
+        do {
+            $roster = Invoke-Check (Join-Path $PSScriptRoot 'aliyun_lan_probe.py') 'probe'
+            if (-not $roster.ok) { throw ('LAN roster: ' + $roster.error) }
+            if ($roster.players -ne $lastCount) {
+                $lastCount = $roster.players
+                Write-Host ('LAN_PLAYERS: ' + $lastCount + '/' + $ExpectedPlayers)
+            }
+            if ($roster.status -eq 'waiting_players' -and $roster.players -ge $ExpectedPlayers) {
+                $arrived = $true
+                break
+            }
+            Start-Sleep -Seconds 2
+        } while ($joinTimer.Elapsed.TotalSeconds -lt $JoinWaitSeconds)
+        if (-not $arrived) { throw 'LAN join timed out. No credentials were applied by this launcher; the current map was preserved.' }
     }
     $applied = Invoke-Check $auth 'inject'
     if (-not $applied.ok) { throw ('Game authentication: ' + $applied.error) }

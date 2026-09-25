@@ -22,6 +22,8 @@ import subprocess
 import sys
 import time
 
+import aliyun_local_config as local_config
+
 
 ECS_HOST = "47.110.238.248"
 PORT = 8765
@@ -341,19 +343,23 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("connect", "check", "stop"))
-    parser.add_argument("--key", type=Path, default=Path.home() / ".ssh/goufayu_ecs_ed25519_v2")
-    parser.add_argument("--known-hosts", type=Path,
-                        default=ROOT / "output/ecs_backend_work/ecs_hostkey_candidate.pub")
+    parser.add_argument("--key", type=Path)
+    parser.add_argument("--known-hosts", type=Path)
     parser.add_argument("--state", type=Path,
                         default=ROOT / "output/ecs_backend_work/test_tunnel.json")
     args = parser.parse_args()
     try:
         if os.name != "nt":
             raise TunnelError("windows_only")
+        if args.action == "connect":
+            settings = local_config.load(ROOT)
+            args.key = args.key if args.key is not None else settings["ssh_key"]
+            args.known_hosts = (args.known_hosts if args.known_hosts is not None
+                                else settings["known_hosts"])
         with state_lock(args.state):
             result = (connect(args.state, args.key, args.known_hosts) if args.action == "connect"
                       else check(args.state) if args.action == "check" else stop(args.state))
-    except TunnelError as exc:
+    except (TunnelError, local_config.ConfigError) as exc:
         result = {"ok": False, "error": str(exc)}
     except (OSError, ValueError, subprocess.SubprocessError):
         result = {"ok": False, "error": "local_tunnel_operation_failed"}

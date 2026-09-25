@@ -19,6 +19,7 @@ import time
 
 import aliyun_game_test_auth as auth
 import aliyun_test_connection as tunnel
+import aliyun_local_config as local_config
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output/hammer_backend"
@@ -229,7 +230,9 @@ def run(bridge: Bridge, *, once: bool = False) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("run", "once", "status", "stop"))
-    parser.add_argument("--key", type=Path, default=Path.home() / ".ssh/goufayu_ecs_ed25519_v2")
+    parser.add_argument("--key", type=Path)
+    parser.add_argument("--environment", type=Path)
+    parser.add_argument("--known-hosts", type=Path)
     args = parser.parse_args()
     try:
         if os.name != "nt":
@@ -247,8 +250,13 @@ def main() -> int:
             STOP.write_text("stop\n", encoding="ascii")
             result = {"ok": True, "status": "stop_requested"}
         else:
-            result = run(Bridge(key=args.key), once=args.action == "once")
-    except (auth.AuthError, tunnel.TunnelError) as exc:
+            settings = local_config.load(ROOT)
+            result = run(Bridge(
+                key=args.key if args.key is not None else settings["ssh_key"],
+                environment=args.environment if args.environment is not None else settings["environment"],
+                known_hosts=args.known_hosts if args.known_hosts is not None else settings["known_hosts"]),
+                once=args.action == "once")
+    except (auth.AuthError, tunnel.TunnelError, local_config.ConfigError) as exc:
         result = {"ok": False, "error": str(exc)}
     except Exception:
         result = {"ok": False, "error": "local_bridge_operation_failed"}
