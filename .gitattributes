@@ -3,6 +3,8 @@
 *.vpk binary -text
 *.vmat_c binary -text
 *.vtex_c binary -text
+# Texture dependency CRCs include line endings; keep recipes identical across PCs.
+*.vtex text eol=lf
 *.tga binary -text
 *.tif binary -text
 *.psd binary -text
