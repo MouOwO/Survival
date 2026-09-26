@@ -9,6 +9,7 @@ assert(!/<Panel\b[^>]*\bid=/.test(xml.match(/<Panel\b[^>]*>/)[0]), "Panorama lay
 
 function harness(options = {}) {
     const nodes = {}, requests = [], scheduled = [], handlers = {}, subscriptions = [], messages = [], visibilityWrites = [], eventHandlers = {};
+    const nativeRuleCalls = [], nativePlayerInfoCalls = [];
     const config = options.sharedConfig || {};
     let now = 0, state = options.state, startupState = options.startupState, localId = options.localId === undefined ? 0 : options.localId;
     class Panel {
@@ -58,8 +59,10 @@ function harness(options = {}) {
     // IDs misses the engine ContextPanel versus XML root visibility regression.
     const stack = [];
     let authoredRoot;
-    const markup = (options.hud ? fs.readFileSync("panorama/src/layout/custom_game/survival_hud.xml", "utf8")
+    let markup = (options.hud ? fs.readFileSync("panorama/src/layout/custom_game/survival_hud.xml", "utf8")
         : options.nativeLoading ? loadingXml : xml).replace(/<!--[\s\S]*?-->/g, "");
+    if (options.omitPartyButton) markup = markup.replace(/<Button id="StartupPartyStart"[\s\S]*?<\/Button>/, "");
+    if (options.omitRetryButton) markup = markup.replace(/<Button id="StartupLoadingRetry"[\s\S]*?<\/Button>/, "");
     for (const match of markup.matchAll(/<\/?(Panel|Image|Label|Button)\b[^>]*>/g)) {
         const tag = match[0];
         if (tag.startsWith("</")) { assert(stack.length); stack.pop(); continue; }
@@ -90,14 +93,21 @@ function harness(options = {}) {
     if (!options.noGameApis) {
         if (options.sharedConfig || options.loadSharedUI || options.hud) env.GameUI = {CustomUIConfig: () => config};
         env.Game = {
-            GetLocalPlayerID: () => options.fallbackId ? -1 : localId,
-            GetLocalPlayerInfo: () => ({player_id: localId}),
-            GetPlayerInfo: id => ({player_name: options.name || "玩家" + id})
+            GetLocalPlayerID: () => localId,
+            GetLocalPlayerInfo: () => { nativePlayerInfoCalls.push("GetLocalPlayerInfo"); throw new Error("native player resource unavailable"); },
+            GetPlayerInfo: () => { nativePlayerInfoCalls.push("GetPlayerInfo"); throw new Error("native player resource unavailable"); }
         };
         env.Game.GetGameTime = () => now;
         if (options.enginePhase !== undefined) {
             env.Game.GetState = () => options.enginePhase;
             env.DOTA_GameState = {DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP: 2, DOTA_GAMERULES_STATE_HERO_SELECTION: 3};
+        }
+        if (options.unavailableRules) {
+            env.DOTA_GameState = {DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP: 2, DOTA_GAMERULES_STATE_HERO_SELECTION: 3};
+            for (const name of ["GetState", "GameStateIsAfter"]) {
+                env.Game[name] = () => { nativeRuleCalls.push(name); throw new Error("client GameRules unavailable"); };
+            }
+            if (options.legacyRulesApi) delete env.Game.GetState;
         }
         env.Entities = {IsValidEntity: () => false};
         env.Players = {GetSelectedEntities: () => [], GetLocalPlayerPortraitUnit: () => -1};
@@ -117,7 +127,7 @@ function harness(options = {}) {
     }
     vm.runInContext(options.hud ? fs.readFileSync("panorama/src/scripts/custom_game/survival_ui.js", "utf8") : script, context);
     return {
-        nodes, root, authoredRoot, requests, messages, config,
+        nodes, root, authoredRoot, requests, messages, config, nativeRuleCalls, nativePlayerInfoCalls,
         emit: (name, payload) => { if (eventHandlers[name]) eventHandlers[name](payload); },
         visibilityWrites: () => visibilityWrites.slice(initialVisibilityWriteCount),
         imageLoaded: () => handlers.ImageLoaded(),
@@ -147,6 +157,68 @@ function loading(overrides = {}) {
 function readyPlayer(id) { return {player_id: id, authenticated: true, client_ready: true, ready: true, status: "ready"}; }
 function ready(overrides = {}) { return loading({phase: "ready", progress: 100, all_ready: true,
     assets: {total: 10, ready: 10, failed: 0, progress: 100, complete: true}, players: [readyPlayer(0)], ...overrides}); }
+// LAN may replicate loading state before native PlayerResource. A caught JS
+// exception is not protection against the native null dereference, so count
+// every attempted call, even ones hidden by try/catch.
+for (const nativeLoading of [false, true]) {
+    const ui = harness({nativeLoading, engineWrapper: true, localId: -1});
+    ui.imageLoaded(); ui.advance(1);
+    ui.setState(loading({players: [readyPlayer(0), {...readyPlayer(1), client_ready: false, ready: false}]}));
+    ui.advance(1);
+    assert.equal(ui.requests.length, 0, "unknown identity cannot acknowledge loading");
+    ui.setLocalId(1); ui.advance(0.5);
+    assert.equal(ui.requests.at(-1).name, "survival_loading_client_ready");
+    assert.equal(ui.nodes.StartupLoadingPlayers.children[1].children[1].text, "玩家 2（你）");
+    ui.setState(ready({players: [readyPlayer(0), readyPlayer(1)], admission_complete: true}));
+    assertHidden(ui, "native player queries are unnecessary for admission");
+    assert.deepEqual(ui.nativePlayerInfoCalls, [], "loading must never enter native player-info functions");
+}
+// A stale compiled/content layout on a joining PC must not abort initialization
+// before it subscribes to the current server and acknowledges the actual image.
+for (const nativeLoading of [false, true]) {
+    for (const omitRetryButton of [false, true]) {
+        const ui = harness({omitPartyButton: true, omitRetryButton, nativeLoading, engineWrapper: true,
+            state: loading({phase: "party_waiting", selector_player_id: 0})});
+        assertShown(ui, "legacy layout remains visible instead of aborting on null SetPanelEvent");
+        assert(ui.nodes.StartupPartyStart && ui.nodes.StartupPartyStartText && ui.nodes.StartupLoadingRetry);
+        assert.equal(ui.nodes.StartupPartyStart.enabled, true);
+        ui.nodes.StartupPartyStart.events.onactivate();
+        assert.equal(ui.requests.at(-1).name, "survival_party_start");
+        ui.imageLoaded();
+        assert.equal(ui.requests.at(-1).name, "survival_loading_client_ready");
+        ui.setState(loading({phase: "party_waiting", selector_player_id: 1}));
+        const sent = ui.requests.length;
+        ui.nodes.StartupPartyStart.events.onactivate();
+        assert.equal(ui.requests.length, sent, "compatibility controls must preserve host authority");
+        ui.setState(ready({admission_complete: true}));
+        assertHidden(ui, "legacy layout still obeys server admission");
+    }
+}
+// Remote loading starts before the native client GameRules object exists.
+// Count unsafe native calls even if application code catches the JS fixture
+// exception: a real C++ access violation cannot be caught by JS try/catch.
+for (const legacyRulesApi of [false, true]) {
+    const config = {};
+    const ui = harness({unavailableRules: true, legacyRulesApi, engineWrapper: true, sharedConfig: config});
+    ui.imageLoaded(); ui.advance(25);
+    assertShown(ui, "remote loading without a snapshot must remain pending");
+    assert.equal(ui.requests.length, 0);
+    ui.setState(loading()); ui.advance(1);
+    ui.setState(ready({admission_complete: true}));
+    assertHidden(ui, "server admission retires loading without native state calls");
+    const next = harness({unavailableRules: true, legacyRulesApi, engineWrapper: true, sharedConfig: config});
+    next.imageLoaded(); next.advance(25);
+    assertHidden(next, "admitted phase retains no-flash presentation through missing snapshot");
+    next.setState(loading({session_id: "remote-next-match", phase: "error", error: "backend_authentication_failed", admission_complete: false}));
+    assertShown(next, "a new rejected session is not hidden by previous admission");
+    ui.root.valid = false; ui.advance(1);
+    assert.deepEqual(ui.nativeRuleCalls, []);
+    assert.deepEqual(next.nativeRuleCalls, []);
+}
+{
+    const ui = harness({state: loading(), enginePhase: 4});
+    assertShown(ui, "engine phase alone cannot hide pending server admission");
+}
 // Deliberately do not implement CSS class selectors: an engine-owned wrapper
 // can carry StartupLoadingHidden without being in the layout stylesheet scope.
 function panelVisible(panel) { return panel.visible !== false && panel.style.visibility !== "collapse"; }
@@ -387,16 +459,20 @@ for (const phase of ["LoadingScreen", "GameSetup", "HeroSelection", "PregameStra
     assert(!ui.nodes.StartupLoadingError.text.includes("private"), "never display raw internal errors");
 }
 {
-    const ui = harness({state: loading(), localId: -1, fallbackId: true}); ui.imageLoaded();
+    const ui = harness({state: loading(), localId: -1}); ui.imageLoaded();
     assert.equal(ui.requests.length, 0);
     ui.setLocalId(0); ui.advance(0.5);
-    assert.equal(ui.requests.length, 1, "GameSetup player_info fallback works after connection");
+    assert.equal(ui.requests.length, 1, "handshake waits for the local player ID without querying native player info");
+    assert.deepEqual(ui.nativePlayerInfoCalls, []);
 }
 {
-    const ui = harness({state: loading(), name: '<font color="red">untrusted</font>\nname'});
+    const ui = harness({state: loading({players: [{...readyPlayer(0),
+        player_name: '<font color="red">untrusted</font>\nname'}]})});
     const name = ui.nodes.StartupLoadingPlayers.children[0].children[1];
     assert.equal(name.html, false, "nicknames are plain text labels");
     assert(!name.text.includes("\n"));
+    assert(name.text.includes("untrusted"), "display name comes from the server roster");
+    assert.deepEqual(ui.nativePlayerInfoCalls, []);
     ui.setState(loading({players: {"0": readyPlayer(0), "1": readyPlayer(1)}, progress: NaN, assets: {progress: NaN}}));
     assert.equal(ui.nodes.StartupLoadingPlayers.children.length, 2, "KV object roster is accepted");
     assert.equal(ui.nodes.StartupLoadingPercent.text, "40%", "invalid resource percentage contributes zero; server authentication and client acknowledgement each contribute 20");

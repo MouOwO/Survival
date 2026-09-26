@@ -618,10 +618,9 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         return
     end
     monster_navigation.apply(unit)
-    FindClearSpaceForUnit(unit, position, true)
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     monster_corpse_lifecycle_service.track(unit, "wave")
-    local collision_profile = wave_monster_collision.profile(row, definition)
+    local collision_profile = wave_monster_collision.profile(row, definition, true)
     apply_stats(unit, row, definition)
     local resolved_visual = monster_visual_config.resolve(
         wave_number,
@@ -654,6 +653,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         wall_entindex = wall_for_channel(channel),
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
+    FindClearSpaceForUnit(unit, position, true)
     local is_assault_boss = row.member_role == "assault_boss"
         or (row.member_role == nil and row.is_boss == true)
     unit.survival_is_boss = is_assault_boss
@@ -1232,7 +1232,6 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     if not valid(unit) then return nil, "unit_create_failed" end
 
     monster_navigation.apply(unit)
-    FindClearSpaceForUnit(unit, position, true)
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "building_challenge_enemy")
     monster_corpse_lifecycle_service.track(unit, "building_challenge")
     local combat_row = {
@@ -1269,6 +1268,7 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
         wall_entindex = wall_by_player[player_id] or -1,
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
+    FindClearSpaceForUnit(unit, position, true)
     event_bus.emit(events.MONSTER_SPAWNED, {
         unit = unit,
         entindex = unit:entindex(),

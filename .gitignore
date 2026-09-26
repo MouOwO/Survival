@@ -369,6 +369,7 @@ __pycache__/
 !/scripts/vscripts/tests/test_archive_challenge_hub_positions.lua
 !/scripts/vscripts/tests/test_debug_spawn_positions.lua
 !/scripts/vscripts/tests/test_tree_hit_scan_coalescing.lua
+!/scripts/vscripts/tests/test_multiplayer_trees.lua
 !/scripts/vscripts/tests/test_resource_ui_coalescing.lua
 !/scripts/vscripts/tests/test_ui_snapshot_scheduling.lua
 !/scripts/vscripts/tests/manual_combat_performance.lua

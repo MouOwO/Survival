@@ -26,6 +26,7 @@ local function fixture(count, settings)
         IsValidPlayerID = function(_, id) return humans[id] and humans[id].valid end,
         IsFakeClient = function(_, id) return humans[id] and humans[id].fake end,
         GetSteamAccountID = function(_, id) return humans[id] and humans[id].account end,
+        GetPlayerName = function(_, id) return "Player\n" .. id end,
         GetPlayer = function(_, id) return humans[id] and humans[id].player end,
         GetConnectionState = function(_, id) return humans[id] and humans[id].state end,
         GetTeam = function(_, id) return humans[id] and humans[id].team or 2 end,
@@ -43,6 +44,10 @@ local function fixture(count, settings)
     CustomNetTables = { SetTableValue = function(_, name, key, value)
         assert(name == "survival_loading" and key == "state")
         published = value
+        for _, player in ipairs(value.players or {}) do
+            assert(player.player_name == "Player " .. player.player_id, "every loading phase publishes a safe display name")
+            assert(player.account == nil and player.account_id == nil, "public roster must not expose private authentication records")
+        end
         history[#history + 1] = value
     end }
     CustomGameEventManager = {

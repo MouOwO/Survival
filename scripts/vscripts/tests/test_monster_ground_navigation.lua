@@ -67,6 +67,12 @@ local env = setmetatable({
         assert(unit.capability == DOTA_UNIT_CAP_MOVE_GROUND,
             "first placement must already use ground navigation")
         assert(unit.survival_navigation_type == "ground")
+        if unit.survival_is_wave_monster or unit.survival_is_challenge_monster then
+            assert(unit.modifiers.modifier_enemy_wall_ai.no_unit_collision == 1,
+                "unit collision must be disabled before placing into an occupied spawn")
+            assert(unit.hull == unit.survival_monster_hull_radius,
+                "the final hull must be applied before placement")
+        end
         unit.placements = unit.placements + 1
         unit.placement_hull = unit.hull
         unit.position = position
@@ -196,6 +202,7 @@ for _, case in ipairs({ { "ground", "normal" }, { "flying", "normal" },
         and "flying.vmdl" or "boss.vmdl"
     check(created[#created], definition, case[3], expected_model)
     assert(created[#created].survival_wave_movement_type == (case[3] or case[1]))
+    assert(created[#created].survival_wave_no_unit_collision == true)
 end
 
 set_upvalue(wave.spawn_challenge_monster, "wave_channels", { [0] = { marker = marker } })

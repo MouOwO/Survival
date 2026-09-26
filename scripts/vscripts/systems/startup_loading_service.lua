@@ -198,6 +198,13 @@ local function asset_snapshot()
 end
 
 local function publish(value)
+    -- Joining clients may receive this roster before their native
+    -- PlayerResource exists. Send display names instead of requiring the
+    -- loading UI to call Game.GetPlayerInfo during that unsafe interval.
+    for _, player in ipairs(value.players or {}) do
+        local name = resource("GetPlayerName", player.player_id)
+        player.player_name = type(name) == "string" and string.gsub(name, "[%c]", " ") or nil
+    end
     latest = value
     if CustomNetTables and type(CustomNetTables.SetTableValue) == "function" then
         CustomNetTables:SetTableValue("survival_loading", "state", copy(value))

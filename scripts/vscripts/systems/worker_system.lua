@@ -12,8 +12,10 @@ local personality_definitions = require("config/generated/lumberjack_personality
 
 local M = {}
 local workers = {}
-local current_tree_entindex = -1
-local tree_lumber_efficiency_buff = 0
+local trees_by_player = {}
+local function player_tree(player_id)
+    return trees_by_player[player_id] or { entindex = -1, lumber_efficiency_buff = 0 }
+end
 local population_training_counts = {}
 local lumberjack_training = worker_training_progress.create(training_definitions)
 local repairer_training = worker_training_progress.create(
@@ -556,12 +558,14 @@ local function on_tree_depleted(payload)
     })
 end
 
-local function update_worker_efficiency()
+local function update_worker_efficiency(player_id)
     for entindex, state in pairs(workers) do
         if valid_entity(state.unit) then
-            if state.worker_type == "lumberjack" then
+            if state.worker_type == "lumberjack"
+                and (player_id == nil or state.player_id == player_id) then
                 local multiplier = tonumber(state.technology_multiplier) or 1
-                state.tree_lumber_efficiency_buff = tree_lumber_efficiency_buff * multiplier
+                state.tree_lumber_efficiency_buff =
+                    player_tree(state.player_id).lumber_efficiency_buff * multiplier
                 state.lumber_efficiency = (state.base_lumber_efficiency or 0)
                     + state.tree_lumber_efficiency_buff
                     + (state.technology_efficiency or 0)
@@ -585,15 +589,16 @@ local function update_worker_efficiency()
     end
 end
 
-local function update_worker_targets()
+local function update_worker_targets(player_id)
     for entindex, state in pairs(workers) do
         if valid_entity(state.unit) then
-            if state.worker_type == "lumberjack" then
+            if state.worker_type == "lumberjack"
+                and (player_id == nil or state.player_id == player_id) then
                 local modifier = state.unit:FindModifierByName(
                     "modifier_lumberjack_ai"
                 )
                 if modifier and modifier.SetTreeEntIndex then
-                    modifier:SetTreeEntIndex(current_tree_entindex)
+                    modifier:SetTreeEntIndex(player_tree(state.player_id).entindex)
                 end
             end
         else
@@ -854,10 +859,10 @@ local function train_worker_one(payload)
         local lumberjack = technology_stat_manager.get(city_state.player_id).final.lumberjack or {}
         technology_efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
         worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
-            tree_entindex = current_tree_entindex,
+            tree_entindex = player_tree(city_state.player_id).entindex,
             base_lumber_efficiency = tonumber(training.wood_per_hit)
                 or config.wood_per_hit or 1,
-            tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
+            tree_lumber_efficiency_buff = player_tree(city_state.player_id).lumber_efficiency_buff,
             technology_lumber_efficiency = technology_efficiency,
             technology_crit_chance = tonumber(lumberjack.critical_chance_pct) or 0,
             technology_armor_reduction = tonumber(lumberjack.armor_reduction_per_attack) or 0,
@@ -878,10 +883,10 @@ local function train_worker_one(payload)
         base_attack_speed = attack_speed,
         base_attack_range = attack_range,
         base_lumber_efficiency = tonumber(training.wood_per_hit) or 0,
-        tree_lumber_efficiency_buff = tree_lumber_efficiency_buff,
+        tree_lumber_efficiency_buff = player_tree(city_state.player_id).lumber_efficiency_buff,
         technology_efficiency = technology_efficiency,
         lumber_efficiency = (tonumber(training.wood_per_hit) or 0)
-            + tree_lumber_efficiency_buff
+            + player_tree(city_state.player_id).lumber_efficiency_buff
             + technology_efficiency,
     }
     if not is_repairer then
@@ -993,9 +998,9 @@ function M.register_fused_lumberjack(worker, data)
         worker, "tree_damage_chance_pct"
     )
     worker:AddNewModifier(worker, nil, "modifier_lumberjack_ai", {
-        tree_entindex = current_tree_entindex,
+        tree_entindex = player_tree(player_id).entindex,
         base_lumber_efficiency = wood_per_hit,
-        tree_lumber_efficiency_buff = tree_lumber_efficiency_buff * fusion_count,
+        tree_lumber_efficiency_buff = player_tree(player_id).lumber_efficiency_buff * fusion_count,
         technology_lumber_efficiency = technology_efficiency,
         technology_crit_chance = lumberjack.critical_chance_pct,
         technology_armor_reduction = (tonumber(lumberjack.armor_reduction_per_attack) or 0)
@@ -1025,7 +1030,7 @@ function M.register_fused_lumberjack(worker, data)
         fusion_interval_reduction = tonumber(data.fusion_interval_reduction) or 0,
         technology_multiplier = fusion_count,
         base_lumber_efficiency = wood_per_hit,
-        tree_lumber_efficiency_buff = tree_lumber_efficiency_buff * fusion_count,
+        tree_lumber_efficiency_buff = player_tree(player_id).lumber_efficiency_buff * fusion_count,
         technology_efficiency = technology_efficiency,
         personality_attack_growth = 0,
         personality_attack_growth_per_hit = personality_attack_growth_per_hit,
@@ -1034,7 +1039,7 @@ function M.register_fused_lumberjack(worker, data)
         personality_wood_total_bonus_pct = personality_wood_total_bonus_pct,
         personality_attack_interval_flat = personality_interval_flat,
         personality_wood_per_hit_flat = personality_wood_flat,
-        lumber_efficiency = wood_per_hit + tree_lumber_efficiency_buff
+        lumber_efficiency = wood_per_hit + player_tree(player_id).lumber_efficiency_buff * fusion_count
             + technology_efficiency + personality_wood_flat,
     }
     refresh_worker_technology(player_id)
@@ -1113,21 +1118,22 @@ function M.rollback_fused_lumberjack(target)
 end
 
 local function on_tree_spawned(payload)
-    current_tree_entindex = payload.entindex or -1
-    tree_lumber_efficiency_buff = math.max(
-        0, tonumber(payload.lumber_efficiency_buff) or 0
-    )
-    update_worker_targets()
-    update_worker_efficiency()
+    local player_id = tonumber(payload.player_id)
+    if player_id == nil or player_id < 0 then return end
+    trees_by_player[player_id] = {
+        entindex = payload.entindex or -1,
+        lumber_efficiency_buff = math.max(0, tonumber(payload.lumber_efficiency_buff) or 0),
+    }
+    update_worker_targets(player_id)
+    update_worker_efficiency(player_id)
 end
 
 local function on_tree_destroyed(payload)
-    current_tree_entindex = -1
-    tree_lumber_efficiency_buff = math.max(
-        0, tonumber(payload and payload.lumber_efficiency_buff) or 0
-    )
-    update_worker_targets()
-    update_worker_efficiency()
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    trees_by_player[player_id] = nil
+    update_worker_targets(player_id)
+    update_worker_efficiency(player_id)
 end
 
 local function remove_worker(worker, entindex, reason)
@@ -1259,8 +1265,7 @@ end
 
 function M.init()
     workers = {}
-    current_tree_entindex = -1
-    tree_lumber_efficiency_buff = 0
+    trees_by_player = {}
     population_training_counts = {}
     lumberjack_training:reset()
     repairer_training:reset()

@@ -9,8 +9,9 @@
 2. 保存地图，退出旧 Dota 测试进程。主机关闭 VConsole GUI，避免与认证助手争用 29000；
    不需要关闭 Hammer。由 Hammer 运行正式 `template_map`。
 3. 新局显示“组队等待”，列出已连接玩家，不自动开始。房主先等其他电脑加入。
-4. 加入者启动自己的 survival Tools 客户端，在自己的控制台执行
-   `connect <主机局域网IPv4>:<实际游戏端口>`，不用安装主机认证助手。
+4. 加入者使用下面的冷启动对照入口 `join_lan_game.cmd`，输入主机局域网 IPv4；
+   不先在加入者上运行自己的地图，不用安装主机认证助手。
+   旧的“先开本地地图再 connect”流程发生客户端崩溃，当前正在验证替代入口。
 5. 房主确认名单后点击“队友到齐，开始加载”。单人也能直接点击。
    只有服务端确认的房主可以开始，重复点击和伪造 PlayerID 不会重复执行加载。
 6. 助手在组队阶段返回 `waiting_for_party`，不会请求认证；开始后连接现有 ECS 测试后端，
@@ -28,7 +29,140 @@ Panorama 行为测试、94 项 Python 相关回归通过，界面源码已同步
 Git commit/push 本身不是联机条件；它只便于各电脑同步同一版本。手动同步同一组运行文件
 也可以联调。该自定义组队按钮仅在 Tools 测试启用，正常游廊使用官方大厅先组队再开局。
 
-### VConsole 灰点
+### 2026-09-26 双机连接崩溃排查记录
+
+- 用户确认使用不同 Steam 账号，连接时 Dota 窗口关闭、进程退出，并非仅退回菜单。
+- 主机本次转储 `dota2_2026_0926_002927_0_accessviolation.mdmp` 的异常为
+  `0xc0000005`，异常指令位于 `client.dll + 0x1b51544`。这只定位到崩溃模块，
+  尚不能确定是客户端切换地图、资源、界面还是其他引擎路径触发。
+- 旧 WER 记录的 `wintab32.dll` 崩溃时间不同，不能当成本次原因。
+- 检查时 Dota 已退出，无法验证实际游戏监听端口。助手为 `waiting_for_workshop`。
+- 本机以太网地址为 `192.168.1.170`，网络为 Public；已有启用的 Dota 入站允许规则
+  覆盖 Public，因此没有关闭防火墙或盲目添加端口规则。
+- 下一步固定一台主机，在组队等待阶段核验 Dota 所属 UDP 端口，再由加入者连接一次；
+  记录双方版本、地图哈希、连接前后日志及崩溃时间。20% 进度本身不证明已加入远端对局。
+
+后续已确认：加入者 `192.168.1.134` 的 00:37 转储也为 `client.dll + 0x1b51544`、
+`0xc0000005`。双方当前安装版本为 `11041083`、项目提交 `24700a3c`，地图 SHA256
+为 `EC48D0C7CD66706C659DF503049DC213BD811B3449957696BDDED0AD3C06C235`。
+这不证明崩溃时运行的 DLL 版本一致，也不保证所有未提交资源一致，但支持先检查共同路径。
+加入者日志确认已连到 `.170:27015` 并收到地图及两名玩家信息；故该次不能归因于端口不通。
+
+新增 `join_lan_game.cmd` / `tools/join_lan_game.ps1` 冷启动对照入口：
+
+1. 主机从 Hammer 开正式地图，停在组队等待。
+2. 加入者保存自己 Hammer 的编辑，完全退出自己的 Dota/Tools；不要退出主机游戏。
+3. 加入者双击 `join_lan_game.cmd`，输入主机 IPv4。默认端口 27015；非默认端口可执行
+   `tools/join_lan_game.ps1 -ServerAddress 192.168.1.170 -Port <实际端口>`。
+4. 启动器保留 Tools/addon 模式，直接 `+connect`，不创建本地地图、不接触后端凭据。
+   已有 Dota 进程时停止并提示，不杀进程、不重载地图。`-DryRun` 只展示计划。
+5. 此入口用于隔离“从本地对局切换到远端”的影响；参数、无副作用预览、已有进程保护及
+   地址校验已测试。用户随后确认冷启动仍秒退、主机出现无响应，故此入口没有解决崩溃，
+   不应继续把重复启动当成修复办法。
+
+### 2026-09-26 加载界面原生状态查询修复（双机待验收）
+
+检查旧转储确认异常读取地址 `0x670`，异常指令字节为 `3b9170060000`，
+即读取空 RCX 指针加该偏移。只能证明原生空指针访问，不能直接确定 C++ 对象类型。
+当前磁盘上的 DLL 时间戳与该旧转储不同，不能以旧偏移直接定位新版本函数。
+
+发现加载界面在没有服务端快照时仍轮询 `Game.GetState()` /
+`Game.GameStateIsAfter()`（包括诊断日志）。这可能在远端客户端规则对象尚未建立或
+正被销毁时进入原生查询；JS try/catch 不能捕获 C++ 访问异常。现已移除这两类调用，
+界面显示只使用服务端 admission 状态和按 session/player 隔离的完成记录。
+这是修复已发现的调用时序风险，并非已有符号栈证实的唯一崩溃根因。
+
+验证：Panorama 行为回归通过，覆盖无规则对象、旧 API 回退环境、组队、认证失败、
+新旧会话隔离、跨界面状态缺失及防闪烁；官方编译器 `1 compiled, 0 failed`。
+content 同步了单个 JS，game 已更新其 vjs_c。补丁包
+`output/lan_loading_fix_20260926/lan_loading_ui_fix.zip` 的 install.cmd 接收另一台的
+game addon 路径，先检查文件哈希和游戏是否退出，备份后同步 game 源文件、编译资源及
+已有 content 源文件，避免旧 content 自动覆盖修复。安装复制及三文件备份已用隔离目录验证。
+
+为排除轮询干扰，主机 `setup_hammer_backend.ps1 -Action Stop` 已执行并确认停止，
+原 SSH 隧道和游戏保留。此时不要点击开始加载；先验收双方在组队阶段稳定连接，再执行
+`tools/setup_hammer_backend.ps1 -Action Start` 恢复认证助手。未恢复助手时后端加载等待是预期行为。
+
+安装器验证曾误把包含 18 字节占位 `template_map.vpk` 的测试目录留在 addon 的
+`output/lan_loading_fix_20260926/installer_test_e3a98fb4cda94ed08b17d2290507d168`。
+Workshop 更新依赖时会扫描它，导致 `VPK directory ... corrupt`，这与 LAN 客户端
+`client.dll` 崩溃是不同的问题。现已核对路径后删除整个测试目录，正式地图 SHA256
+保持不变，并检查 output 内剩余 33 个 VPK 的基础文件头均有效（不等于完整资源校验）。
+后续含虚拟 VPK/vmap_c 的测试必须放在游戏和 content 搜索路径外的系统临时目录，
+并在 finally 中清理；`.gitignore` 和 `output` 目录名不能阻止引擎扫描。
+
+后续双机实测：修复包安装后截图显示两名玩家，进入 `connecting_backend`。
+已恢复主机 Hammer 助手；首次返回 `ssh_public_key_authentication_failed`，检查发现本机
+`ssh-agent` 为 Stopped。启动该服务后既有身份仍可用，不需要重新发送密钥或输入口令，
+助手确认 `players=2, authenticated_players=2`。
+随后只读快照确认 `357/357` 资源就绪、失败数 0；玩家 0 已 client_ready，玩家 1
+仍为 client_loading，admission_complete=false。模式尚未选择，loaded_profiles=0
+不能在此阶段直接判为存档异常。自动认证助手已恢复运行；完整双机入场仍待验证。
+
+### 加入者黑屏：缺失按钮导致脚本中止
+
+加入者随后返回原生 Dota 黑底画面，日志在 remoteconnect 和 CUSTOM_GAME_SETUP 阶段
+均有 `Cannot read properties of null (reading 'SetPanelEvent')`。主机只读核验双方
+connection=2、team=2、游戏 state=2；网络及认证正常，加入者未完成界面握手。
+
+本地用缺失 StartupPartyStart 的旧布局复现了同一类异常，执行点为绑定开始按钮。
+startup_loading.js 现在会补齐缺失的开始/重试按钮与标题，再绑定及渲染；兼容路径不
+修改玩家身份、房主权限或服务端入场条件。新增回归覆盖两种加载布局、缺少开始按钮、
+同时缺少重试按钮、真实图片握手、非房主不能开始及服务端放行后隐藏。
+
+上一版单 JS 补丁不足以处理不同步的旧布局。新版包为
+`output/lan_loading_fix_20260926/lan_loading_ui_layout_fix_v2.zip`，同步 5 组源/编译资源，
+含 startup_loading.js、startup_loading.xml、custom_loading_screen.xml、custom_ui_manifest.xml、
+startup_loading.css；存在 content 时也同步其对应 5 个源码，共 15 个目标文件。
+安装前备份并检查游戏退出、包哈希；安装器的隔离复制测试使用系统临时目录并 finally 清理。
+官方编译检查、Panorama 回归及 15 文件安装验证通过。双机黑屏修复效果仍待实际确认。
+
+### 2026-09-26 12:04 原生闪退：加载期玩家资料查询
+
+加入者诊断确认 v2 四个 UI 编译文件的哈希与主机一致，且这次没有 SetPanelEvent
+异常；仍在 INIT 阶段崩溃，client.dll + 0x1B51804，模块时间戳 0x6AB6F416。
+因此 v1/v2 不能作为“已修复双机闪退”的结论。
+
+本地旧转储 00:29 的异常指令位于 client.dll + 0x1B51544，RCX=0，读取地址
+0x670；栈顶返回地址为 client.dll + 0x1F1188D。当前版本对应指令为
+`cmp edx, [rcx+0x670]`，仍缺少空指针保护。当前 DLL 的接口注册代码将
+GetPlayerInfo 绑定到 RVA 0x1F11B10，该函数在 0x1F11B48 调用出错的
+辅助函数 0x1B517E0。旧转储其余栈内模块地址包含 v8.dll（这些是候选地址，
+不是完整符号化堆栈）。新加入者转储目前只有异常元数据，尚未核对其完整调用栈。
+
+加载页此前反复调用 Game.GetPlayerInfo 读取昵称，且 local ID 未就绪时回退到
+Game.GetLocalPlayerInfo。JS try/catch 无法保护这些调用里的原生访问异常。
+现在删除两种查询：只用 GetLocalPlayerID，未就绪则继续等待；昵称由主机
+startup_loading_service 的公开 roster 同步，旧主机未提供名字时显示“玩家 N”。
+名字只用于显示，身份、认证、房主权限和握手仍由原有服务端逻辑确定。
+
+回归包括：无状态、无 local ID、roster 先到、ID 后到、实际图片握手、旧主机无
+昵称、名字控制字符处理、各加载阶段零次 native player-info 调用。新测试对旧 v2
+脚本实际失败，对修复版通过；Lua 加载/组队测试通过。正式编译资源已检查不含
+这两种调用，SHA256 为
+`59DB8EC8A8FFF6E4A7492337890F90375BF7C454427C80A11FC273CB53F84995`。
+
+分发包：`output/lan_loading_fix_20260926/lan_loading_player_info_fix_v3.zip`。
+两台电脑完全退出 Dota 后解压运行 install.cmd，分别填各自实际 addon 路径。
+包包含前两版 UI 修复及本次 Lua 昵称同步，共 11 个 game 文件；存在 content 时另
+同步 5 个 UI 源文件。安装前备份，失败回滚；不含地图 VPK、私钥、环境文件或存档。
+主机重新运行 template_map，等待队友；加入者用 join_lan_game.cmd 输入主机 IP。
+安装成功、自动化测试通过均不代表双机游戏验收通过，必须实际验证连接及开局。
+
+后续安装截图显示 Get-FileHash 在项目根目录寻找 `server/startup_loading_service.lua`
+失败。这是补丁源文件缺失，并不是游戏正式路径
+`scripts/vscripts/systems/startup_loading_service.lua` 缺失；原 ZIP 检查完整且包含源文件，
+远端具体解压/复制方式尚未确认。安装器现在会明确报告 PATCH_PACKAGE_INCOMPLETE。
+
+为避免依赖用户完整复制目录，新增单文件分发入口：
+`output/lan_loading_fix_20260926/install_lan_loading_fix_v3.cmd`。
+只复制这个 CMD 到目标电脑即可，双击后填写目标 addon 路径。全部补丁嵌入文件内部，
+先校验 SHA256，在系统临时目录自动解压后执行相同的备份/安装流程，结束时清理临时
+目录。支持 `--check` 仅检查。已实测单文件独立复制、含空格路径、不同工作目录、
+无 content 情况、错误目标路径返回失败及临时目录清理；原 16 文件安装回归通过。
+本次仅解决补丁分发问题，双机闪退修复仍需使用已安装的 v3 实机验收。
+
+### VConsole 连接说明
 
 灰点是控制台与本机游戏的连接状态，不是 ECS 认证结果。无 relay 时目标应为本机实际
 监听的 `127.0.0.1:29000`，历史 MCP 配置可能仍指向 `29001`。加入者的控制台连自己，

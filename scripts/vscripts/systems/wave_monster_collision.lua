@@ -1,7 +1,7 @@
 local M = {}
 local global_rules = require("config/global_rules")
 
-function M.profile(row, definition)
+function M.profile(row, definition, is_wave)
     row = row or {}
     definition = definition or {}
     local movement_type = row.movement_type_override
@@ -27,7 +27,9 @@ function M.profile(row, definition)
     return {
         movement_type = movement_type,
         base_hull_radius = base_hull_radius,
-        no_unit_collision = challenge_monster,
+        -- Engine state avoids both occupied-spawn overlaps and crossing queues
+        -- without scanning nearby units. Ground navigation remains unchanged.
+        no_unit_collision = challenge_monster or is_wave == true,
         apply_before_placement = collision_profile == "practice",
     }
 end
