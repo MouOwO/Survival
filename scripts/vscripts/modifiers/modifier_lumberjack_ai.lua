@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local sound_service = require("core/sound_service")
+local tree_damage_rules = require("systems/tree_damage_rules")
 
 modifier_lumberjack_ai = class({})
 local M = modifier_lumberjack_ai
@@ -196,8 +197,10 @@ function M:OnAttackLanded(keys)
     if keys.attacker ~= parent then return end
     local target = keys.target
     if not target or target:IsNull() then return end
-    if target:entindex() ~= self.tree_entindex then return end
-    self.manual_control = false
+    if not tree_damage_rules.is_tree(target) then return end
+    -- Harvest any player's tree, but keep an explicit foreign-tree order until
+    -- the worker becomes idle. Automatic harvesting still uses its own tree.
+    self.manual_control = target:entindex() ~= self.tree_entindex
     self.manual_idle_since = nil
     if target:GetHealth() <= 1 then
         event_bus.emit(events.TREE_DEPLETED, {

@@ -294,7 +294,7 @@ def validate_build_regions(
     required = {
         "region_id", "region_type", "shape", "p1_x", "p1_y", "p2_x",
         "p2_y", "p3_x", "p3_y", "p4_x", "p4_y", "center_x",
-        "center_y", "radius", "enabled",
+        "center_y", "radius", "map_name", "enabled",
     }
     missing = required.difference(headers)
     if missing:

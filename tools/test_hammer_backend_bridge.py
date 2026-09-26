@@ -1,4 +1,5 @@
-from contextlib import nullcontext
+from contextlib import ExitStack, nullcontext, redirect_stdout
+import io
 import json
 from pathlib import Path
 import socket
@@ -30,7 +31,7 @@ class BridgeTests(unittest.TestCase):
         self.addCleanup(lock.stop)
 
     def test_waiting_or_other_map_does_not_open_tunnel_or_read_credentials(self):
-        for state in ('waiting_for_workshop', 'waiting_for_map'):
+        for state in ('waiting_for_workshop', 'waiting_for_map', 'waiting_for_party'):
             self.inspect_game.return_value = {'status': state}
             self.assertEqual(self.worker.step(), {'ok': True, 'status': state})
         self.connect.assert_not_called()
@@ -113,6 +114,34 @@ class InspectionTests(unittest.TestCase):
                 self.assertTrue(stop.exists())
                 step.assert_not_called()
 
+    def test_paused_one_shot_never_inspects_or_injects(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            stop = root / 'bridge.stop'
+            stop.write_text('stop\n')
+            with patch.object(bridge, 'OUTPUT', root), patch.object(bridge, 'STOP', stop), \
+                    patch.object(bridge, 'STATUS', root / 'bridge_status.json'), \
+                    patch.object(bridge.auth, 'ignored'), \
+                    patch.object(bridge.tunnel, 'state_lock', return_value=nullcontext()), \
+                    patch.object(bridge, 'safe_step') as step:
+                result = bridge.run(Mock(), once=True)
+                self.assertEqual(result['status'], 'stopped')
+                self.assertTrue(stop.exists())
+                step.assert_not_called()
+
+    def test_unpaused_one_shot_runs_normally_once(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with patch.object(bridge, 'OUTPUT', root), patch.object(bridge, 'STOP', root / 'bridge.stop'), \
+                    patch.object(bridge, 'STATUS', root / 'bridge_status.json'), \
+                    patch.object(bridge.auth, 'ignored'), \
+                    patch.object(bridge.tunnel, 'state_lock', return_value=nullcontext()), \
+                    patch.object(bridge, 'safe_step', return_value={
+                        'ok': True, 'status': 'authentication_applied'}) as step:
+                result = bridge.run(Mock(), once=True)
+                self.assertEqual(result['status'], 'authentication_applied')
+                step.assert_called_once()
+
     def test_probe_uses_existing_strict_guard_and_loaded_survival_modules(self):
         code = bridge.inspection_lua()
         for value in ("IsInToolsMode()", "IsServer()", "'template_map'", 'host_timescale',
@@ -161,6 +190,114 @@ class InspectionTests(unittest.TestCase):
             raw_probe.assert_not_called()
             run.assert_called_once()
             self.assertFalse((Path(tmp) / 'bridge_probe.json').exists())
+
+
+class StopTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.stack = ExitStack()
+        self.addCleanup(self.stack.close)
+        for name, value in (('OUTPUT', self.root), ('STOP', self.root / 'bridge.stop'),
+                            ('STATUS', self.root / 'bridge_status.json')):
+            self.stack.enter_context(patch.object(bridge, name, value))
+        self.ignored = self.stack.enter_context(patch.object(bridge.auth, 'ignored'))
+        self.lock = self.stack.enter_context(patch.object(bridge.tunnel, 'state_lock',
+                                                         side_effect=lambda _: nullcontext()))
+        self.monotonic = self.stack.enter_context(patch.object(bridge.time, 'monotonic', return_value=100))
+        self.sleep = self.stack.enter_context(patch.object(bridge.time, 'sleep'))
+
+    def test_no_worker_confirms_stop_and_never_reads_api_or_process_state(self):
+        with patch.object(bridge.auth, 'inject') as inject, \
+                patch.object(bridge.local_config, 'load') as config, \
+                patch.object(bridge.tunnel, 'read_state') as read_state:
+            result = bridge.stop()
+        self.assertTrue(result['ok'])
+        self.assertTrue(result['stop_confirmed'])
+        self.assertEqual(result['status'], 'stopped')
+        self.assertEqual(bridge.STOP.read_text(encoding='ascii'), 'stop\n')
+        self.lock.assert_called_once_with(self.root / 'bridge_instance.json')
+        inject.assert_not_called()
+        config.assert_not_called()
+        read_state.assert_not_called()
+        self.sleep.assert_not_called()
+        for path in (bridge.STOP, bridge.STATUS, self.root / 'bridge_instance.lock'):
+            self.assertIn(unittest.mock.call(path), self.ignored.call_args_list)
+
+    def test_busy_worker_must_release_instance_lock_before_stop_is_confirmed(self):
+        attempts = []
+
+        def enter(path):
+            self.assertTrue(bridge.STOP.exists(), 'request stop before waiting for worker')
+            self.assertFalse(bridge.STATUS.exists(), 'must not publish stopped while worker owns lock')
+            attempts.append(path)
+            if len(attempts) < 3:
+                raise bridge.tunnel.TunnelError('tunnel_operation_in_progress')
+            return nullcontext()
+
+        self.lock.side_effect = enter
+        result = bridge.stop()
+        self.assertTrue(result['stop_confirmed'])
+        self.assertEqual(len(attempts), 3)
+        self.assertEqual(self.sleep.call_count, 2)
+        self.assertEqual(json.loads(bridge.STATUS.read_text())['status'], 'stopped')
+
+    def test_persistent_busy_times_out_without_force_kill_or_false_confirmation(self):
+        self.lock.side_effect = bridge.tunnel.TunnelError('tunnel_operation_in_progress')
+        self.monotonic.side_effect = [100, 154.9, 155]
+        with patch.object(bridge, 'publish') as publish, \
+                patch.object(bridge.subprocess, 'run') as process_call:
+            with self.assertRaisesRegex(bridge.auth.AuthError, '^bridge_stop_timeout$'):
+                bridge.stop()
+            publish.assert_not_called()
+            process_call.assert_not_called()
+        self.assertTrue(bridge.STOP.exists())
+        self.assertFalse(bridge.STATUS.exists())
+        self.assertEqual(self.lock.call_count, 2)
+        self.assertLessEqual(self.sleep.call_args.args[0], 0.25)
+        self.assertLessEqual(bridge.STOP_WAIT_SECONDS, 55)
+
+    def test_unexpected_lock_failure_propagates_without_stopped_status(self):
+        self.lock.side_effect = bridge.tunnel.TunnelError('fixture_lock_invalid')
+        with self.assertRaisesRegex(bridge.tunnel.TunnelError, '^fixture_lock_invalid$'):
+            bridge.stop()
+        self.assertTrue(bridge.STOP.exists())
+        self.assertFalse(bridge.STATUS.exists())
+        self.sleep.assert_not_called()
+
+    def test_stop_validates_marker_and_actual_lock_before_any_write(self):
+        for rejected in (bridge.STOP, self.root / 'bridge_instance.lock'):
+            with self.subTest(path=rejected.name):
+                calls = []
+
+                def validate(path):
+                    calls.append(path)
+                    if path == rejected:
+                        raise bridge.auth.AuthError('reparse_path_refused')
+
+                with patch.object(bridge.auth, 'no_reparse', side_effect=validate):
+                    with self.assertRaisesRegex(bridge.auth.AuthError, 'reparse_path_refused'):
+                        bridge.stop()
+                self.assertIn(rejected, calls)
+                self.assertFalse(bridge.STOP.exists())
+                self.lock.assert_not_called()
+
+    def test_stop_rejects_nonignored_output_before_writing_marker(self):
+        self.ignored.side_effect = bridge.auth.AuthError('temporary_auth_file_not_git_ignored')
+        with self.assertRaisesRegex(bridge.auth.AuthError, 'temporary_auth_file_not_git_ignored'):
+            bridge.stop()
+        self.assertFalse(bridge.STOP.exists())
+        self.lock.assert_not_called()
+
+    def test_cli_timeout_returns_fixed_error_and_preserves_pending_stop(self):
+        with patch('sys.argv', ['hammer_backend_bridge.py', 'stop']), \
+                patch.object(bridge, 'stop', side_effect=bridge.auth.AuthError('bridge_stop_timeout')) as stop, \
+                redirect_stdout(io.StringIO()) as output:
+            result = bridge.main()
+        stop.assert_called_once()
+        self.assertEqual(result, 1)
+        self.assertEqual(json.loads(output.getvalue()), {'ok': False, 'error': 'bridge_stop_timeout'})
 
 
 if __name__ == '__main__':

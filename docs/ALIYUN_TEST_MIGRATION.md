@@ -754,3 +754,151 @@ Windows 服务启动设置；当前为 `Running / Manual`。助手的登录启�
 
 这次无需服务器手动操作。复用当前 ECS API、PostgreSQL 和 SSH 隧道；未更改
 数据库、Supabase、支付或公网监听设置。
+
+## 16. 新电脑联调：Python 环境与临时认证权限（2026-09-25）
+
+### 已观察到的问题
+
+- 新电脑曾报 `Game authentication: temporary_auth_acl_failed`。此处位于 SSH 隧道、
+  Tools 会话探测、认证 `/ready` 检查之后；失败的是本地临时文件权限检查。
+  该次尝试尚未将 token 写入 KV，空文件由 `finally` 删除。游戏窗口出现不等于认证完成。
+- 后续空文件诊断报 `did not find executable at 'D:\magic and love\...\Blender\5.2\python\bin\python.exe'`。
+  这说明复制到新电脑的虚拟环境仍指向旧电脑的基础 Python，诊断未执行。
+  `.venv` 不能直接作为跨电脑运行环境同步，需要在新电脑创建。
+- 用户在新电脑保留旧环境、用本机 Python **3.13.15** 重建后，原脚本空文件检查已返回
+  `ACL_EXIT: 0`、`PRIVATE_ACL_READY`、`ACL_TEST_OK`，但重跑启动器仍失败。
+  子目录中的测试不能代表父目录直接创建文件的权限；随后同目录空文件复测确认
+  `[IO.File]::SetAccessControl` 抛出 `UnauthorizedAccessException`。
+- 原实现对每个新文件执行 `SetOwner($sid)`。即使文件所有者已经是当前用户，.NET
+  仍将它作为所有权修改提交，需要额外的 `WRITE_OWNER`，而目录继承的 Modify
+  不一定包含此权限。当前工作区实际复现：同目录空文件已属于调用者，原写法
+  返回 `0x80070005`，仅去掉多余所有权写入后成功。
+  修复先确认现有所有者属于当前用户、SYSTEM 或 Administrators（均是私有 ACL
+  原本允许 FullControl 的主体），只写 DACL，并验证所有者未变及全部权限符合要求。
+  不接受任意所有者，也不放开目录权限。
+- 原 ACL 实现设置 `Console.InputEncoding`，隐藏子进程没有控制台时可能失败。
+  现改为直接用 UTF-8 `StreamReader` 解码标准输入，不改变控制台编码；仍严格校验
+  当前用户、SYSTEM、Administrators 的受保护 ACL，不通过就不写入凭据。
+  已向用户提供仅修改所有者处理的局部补丁，新电脑执行时先备份认证工具，再重试启动器。
+  编码兼容改动和 `check-acl` 新命令仍需同步工作区的新版本才能使用。
+- 新电脑已确认输出 `ACL_FIX_APPLIED`；随后启动器报 `tools_server_confirmation_missing`。
+  用户说明游戏已打开但被手动关闭，关闭后独立诊断返回 `tools_console_unavailable`。
+  需要保持游戏开启重新运行完整流程，不能将游戏退出后的控制台不可用归因于 SSH 或 ACL。
+- **新电脑最终验收：** 用户保持游戏开启重新运行后，已返回
+  `GAME_AUTH_READY: missing profiles requested; loaded profiles preserved.` 及
+  `No password is required. The SSH tunnel remains active after this window closes.`。
+  确认该电脑的 CMD 入口已完成游戏侧认证配置与档案恢复请求；没有重置已有档案。
+  此结果来自用户新电脑的实际输出，不是当前工作区代替新电脑的验证。
+
+### 本地电脑操作
+
+先在新电脑检查 Python，而不是再次更换 SSH 密钥：
+
+```powershell
+Get-Command py.exe,python.exe -ErrorAction SilentlyContinue | Select-Object Name,Source
+py -0p
+```
+
+在确认 `py -3` 能运行新电脑已安装的 Python 3.10 或更新版本后，关闭使用这个环境的
+联调脚本；若 Hammer 助手正在运行，先通过其 `Stop` 操作等待退出。在项目根目录将
+旧 `.venv` 改名保留，再执行 `py -3 -m venv output/ecs_backend_work/.venv`。
+这几个游戏联调 Python 工具仅用标准库，不需要安装后端的数据库依赖。
+不要复制旧电脑的虚拟环境、进程状态文件和后台任务代替新电脑安装过程。
+
+同步更新后的 `tools/aliyun_game_test_auth.py` 后，在项目根目录执行无凭据检查：
+
+```powershell
+& .\output\ecs_backend_work\.venv\Scripts\python.exe -B tools/aliyun_game_test_auth.py check-acl
+```
+
+该检查只在正式临时凭据目录创建唯一的空文件，验证 Git 忽略、NTFS、非重解析路径
+及私有 ACL，完成后删除测试文件；不读取 `.env`，不连接 ECS，不向游戏发送命令。
+成功输出 `temporary_auth_acl_ready` 后，再运行 `launch_aliyun_test_game.cmd`；
+已有正确地图时会直接接入，不必再次开启一局。完成标志是 `GAME_AUTH_READY`。
+
+如仍失败，反馈固定错误码即可：
+
+- `temporary_auth_acl_failed:read_path:0x…`：读取空文件路径失败。
+- `temporary_auth_acl_failed:set_acl:0x…`：Windows 拒绝写入文件权限，需要排查该目录 ACL。
+- `temporary_auth_acl_failed:verify_acl:0x…`：实际权限未达到预期，不能跳过验证。
+- `temporary_auth_acl_failed:timeout` 或 `powershell_unavailable`：本机 Windows PowerShell 未能完成启动或执行。
+
+错误输出仅包含固定阶段与 HRESULT，不输出路径中的文件内容、API token 或私钥。
+权限测试通过后，Hammer 自动连接仍须在新电脑当前 Windows 用户下安装
+`setup_hammer_backend.cmd`，并确保该用户的 ssh-agent 已加载专用密钥。
+
+### 服务器操作与验证范围
+
+本次本地环境与权限兼容性修复无需更改 ECS、数据库或 `authorized_keys`。
+本地 **48 项 Python 回归通过**（认证/隧道 34 项、Hammer 助手 14 项），覆盖真实 Windows
+隐藏子进程权限设置、空格/中文路径、失败不写凭据和清理。新增真实权限回归明确禁止
+当前用户修改所有者：原逻辑失败，修复后保留所有者并成功设置严格 ACL，无跳过。
+正式临时目录中的 `check-acl` 也已在原先失败的受限上下文通过。
+新电脑 CMD 入口的真实认证已由用户输出确认通过。Hammer 自动助手在该电脑的启动、
+游戏内建造与存档读写/重进保留尚未验证；认证完成标记不能替代这些业务验收。
+
+如需撤回本次本机工具变更，先结束联调脚本，再恢复工具备份；无需回滚 ECS 或数据库。
+用户新电脑的原工具备份为
+`output/ecs_backend_work/aliyun_game_test_auth.before_acl_4dd07e7ddd31.py`；
+恢复它会恢复原来的 ACL 兼容性问题。旧虚拟环境仅作为备份，不应重新作为新电脑运行环境。
+
+## 17. 多主机复用与 LAN 准备（2026-09-25）
+
+完整操作顺序见 [新电脑复制与局域网联调](NEW_PC_LAN_TEST_GUIDE.md)。本次把已通过的
+新电脑认证流程集成为 `setup_aliyun_test_host.cmd` 与本地预检：自动保留/重建失效虚拟环境、
+核验当前用户 agent 中的指定密钥、校验固定 ECS 主机公钥、检查真实临时目录 ACL，
+并支持单独验证隧道及认证 `/ready`。后端、数据库和安全组未改动。
+
+`output/ecs_backend_work/local_config.json` 只存本机路径。认证工具、隧道和 Hammer 助手
+统一读取此配置；新主机无需创建 D 盘或复制后端整个 `.env`。默认继续兼容已有电脑。
+API 凭据可通过隐藏终端输入单独保存到受保护的 `game-test.env`，不进入命令参数或工具包。
+
+`launch_aliyun_lan_host.cmd` 默认等待包含主机在内的两名真实连接玩家，人数到齐再认证；
+三/四人可用 `-ExpectedPlayers`。它拒绝已认证/已放行的旧局，不改变游戏存档和分配逻辑。
+测试前停用 Hammer 自动认证助手，加入者只加入同一局，不需要主机的 SSH/API 凭据。
+
+85 项自动化测试通过，包含 Windows 真实权限/虚拟环境测试与 Lua 人数/屏障模拟。
+当前开发电脑以正常桌面用户执行的完整离线预检 12 项通过。
+此前用户新电脑单机入口已实际输出 `GAME_AUTH_READY`；本次新入口的双机/四机端到端
+联调尚未进行，按指南验收表记录后才能确认多人通过。
+
+## 18. LAN 旧局与自动认证冲突修复（2026-09-25）
+
+用户实机遇到 `lan_session_already_authenticated_restart_without_bridge`。该错误来自
+本机 LAN 探针，不是 ECS 登录失败：旧实现将“凭据 Convar 非空”和“准入屏障已放行”
+合并判断。凭据可能仍来自旧局、单人启动器或 Hammer 助手；非空本身不能证明认证成功。
+当前游戏默认注册空凭据，未发现内置 token 回退来源；仅凭旧错误无法确定是哪条路径。
+
+- LAN 启动器先通过现有 Stop 流程暂停 Hammer 助手，保留 SSH 隧道和游戏。
+- Stop 写入停止标记后等待实际助手的实例锁释放，覆盖手动运行的助手；不强杀进程。
+  已暂停时一次性诊断 `once` 也不再重新注入认证。恢复 Hammer 自动认证用 `Start`。
+- 探针保持只读，并分别返回 `credential_already_present`、`admission_already_released`。
+  两者仍拒绝以旧局充当 LAN 开局等待阶段，错误同时给出完整退出 Dota 后重开的步骤。
+- 未清 token、重置玩家数据、重载地图或修改 ECS；单人启动保留原流程。
+
+本次相关 99 项自动化回归通过，含 5 项真实 PowerShell 隔离启动测试与 Lua 探针行为测试。
+验证范围与操作步骤见 [新电脑复制与局域网联调](NEW_PC_LAN_TEST_GUIDE.md)。
+自动化验证不替代新一轮双机实际加入，真实加入、双方存档与战斗同步仍需按验收表确认。
+
+## 19. Hammer 组队等待阶段（2026-09-26）
+
+Tools 地图在 startup_loading_service 中增加显式 `party_waiting` 阶段：服务端发布已连接
+玩家名单，只有当前房主的有效事件源及正确 session 可发起 `survival_party_start`。
+重复开始不会重复加载；等待阶段不请求玩家认证，不启动 startup_asset_preload_service
+动态队列，不依赖“空 token”或固定倒计时阻止开局。引擎基础 Precache 仍须先执行。
+
+开始后先等待测试后端凭据；缺失时显示连接中，超时提示恢复助手，不反复提交缺 token
+认证请求。原所有玩家认证、资源和 UI 握手屏障保持，完成后才进入模式/难度选择。
+Hammer 助手和直接认证恢复代码都尊重组队等待；旧进程的缓存 token 不能越过显式屏障。
+Install/Start 无论计划任务是否 Running，都先优雅停止同目录手动助手，避免旧进程占锁。
+
+已在本机同步并编译 Panorama；99 项 Python 回归、加载服务/组队房、UI、资产预载、
+玩家认证、UI 请求及指令门禁行为测试通过。当前用户离线 12 项检查和实际 ECS `/ready`
+检查通过，助手已重新安装并启动。未写入玩家档案、未修改 ECS 或 Supabase。
+
+实机初次反馈“20%无按钮”时仍是 23:20 的旧 Dota 进程，VConsole 占用 29000 并尝试
+旧 29001 转发端口；用户确认只重新运行地图。已要求保存 Hammer 后完整退出 Dota 与
+主机 VConsole 再运行地图。读取不到进程命令行，不能断定缺 `-tools`。
+随后用户完整退出旧进程并从 Hammer 重开，确认组队按钮可见；实际 Dota 进程已更换，
+助手阶段为 `waiting_for_party`。点击开始后的完整入场及双机业务仍待验收，
+不要将健康检查或组队房显示正常当作游戏全流程成功。

@@ -15,6 +15,7 @@ import http.client
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import shutil
 import socket
@@ -59,10 +60,19 @@ def private_acl(path: Path) -> None:
     # Only a path reaches PowerShell stdin. The API token is never passed to it.
     script = r"""
 $ErrorActionPreference='Stop'
-[Console]::InputEncoding=New-Object Text.UTF8Encoding($false)
-$p=[Console]::In.ReadToEnd()
+$ProgressPreference='SilentlyContinue'
+$stage='read_path'
+try {
+# CREATE_NO_WINDOW may have no console code page to change. Decode the pipe
+# directly instead of setting Console.InputEncoding (which calls SetConsoleCP).
+$reader=[IO.StreamReader]::new([Console]::OpenStandardInput(),[Text.UTF8Encoding]::new($false,$true),$false)
+try { $p=$reader.ReadToEnd() } finally { $reader.Dispose() }
+$stage='build_acl'
 $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User
 $acl=New-Object Security.AccessControl.FileSecurity
+# Changing an already trusted owner needlessly requires WRITE_OWNER. A newly
+# created file may allow DACL changes but not owner changes in a copied tree.
+# Accept only principals that will also have FullControl in the private DACL.
 $owner=[IO.File]::GetAccessControl($p).GetOwner([Security.Principal.SecurityIdentifier])
 if ($owner.Value -notin @($sid.Value,'S-1-5-18','S-1-5-32-544')) { throw 'acl_owner_untrusted' }
 $acl.SetAccessRuleProtection($true,$false)
@@ -72,7 +82,9 @@ foreach ($value in $allowed) {
   $rule=New-Object Security.AccessControl.FileSystemAccessRule($identity,'FullControl','Allow')
   $acl.AddAccessRule($rule)
 }
+$stage='set_acl'
 [IO.File]::SetAccessControl($p,$acl)
+$stage='verify_acl'
 $actual=[IO.File]::GetAccessControl($p)
 if ($actual.GetOwner([Security.Principal.SecurityIdentifier]).Value -ne $owner.Value) { throw 'acl_owner_changed' }
 if (-not $actual.AreAccessRulesProtected) { throw 'acl_not_protected' }
@@ -85,12 +97,31 @@ foreach ($rule in $rules) {
   }
 }
 [Console]::Out.Write('PRIVATE_ACL_READY')
+exit 0
+} catch {
+  # Report only a fixed stage and numeric error, never raw exception text.
+  $code=$_.Exception.GetBaseException().HResult.ToString('X8')
+  [Console]::Out.Write('PRIVATE_ACL_FAILED|' + $stage + '|' + $code)
+  exit 1
+}
 """
     encoded = base64.b64encode(script.encode("utf-16-le")).decode("ascii")
-    result = subprocess.run(["powershell.exe", "-NoLogo", "-NoProfile", "-NonInteractive",
-                             "-EncodedCommand", encoded], input=str(path).encode("utf-8"),
-                            capture_output=True, timeout=15, creationflags=HIDDEN)
+    powershell = (Path(os.environ.get("SystemRoot", "C:/Windows")) /
+                  "System32/WindowsPowerShell/v1.0/powershell.exe")
+    try:
+        result = subprocess.run([str(powershell), "-NoLogo", "-NoProfile", "-NonInteractive",
+                                 "-EncodedCommand", encoded], input=str(path).encode("utf-8"),
+                                capture_output=True, timeout=15, creationflags=HIDDEN)
+    except subprocess.TimeoutExpired:
+        raise AuthError("temporary_auth_acl_failed:timeout") from None
+    except OSError:
+        raise AuthError("temporary_auth_acl_failed:powershell_unavailable") from None
     if result.returncode != 0 or result.stdout.strip() != b"PRIVATE_ACL_READY":
+        failure = re.fullmatch(rb"PRIVATE_ACL_FAILED\|(read_path|build_acl|set_acl|verify_acl)\|([0-9A-F]{8})",
+                               result.stdout.strip())
+        if failure:
+            stage, code = (part.decode("ascii") for part in failure.groups())
+            raise AuthError(f"temporary_auth_acl_failed:{stage}:0x{code}")
         raise AuthError("temporary_auth_acl_failed")
 
 
@@ -168,6 +199,9 @@ def recovery_lua() -> str:
     return """
     local profiles = require('systems/player_profile_service')
     local setup = require('systems/match_setup_service')
+    local loading = package.loaded['systems/startup_loading_service']
+    local party_waiting = loading and type(loading.is_party_waiting) == 'function' and loading.is_party_waiting()
+    if not party_waiting then
     for id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do
       if PlayerResource:IsValidPlayerID(id)
         and not PlayerResource:IsFakeClient(id)
@@ -192,7 +226,7 @@ def recovery_lua() -> str:
         end
       end
     end
-    local loading = package.loaded['systems/startup_loading_service']
+    end
     if loading and type(loading.tick) == 'function' then loading.tick() end
 """
 
@@ -223,11 +257,9 @@ def probe(state: Path) -> dict:
     status = tunnel.check(state)
     if not status.get("ok"):
         raise AuthError("owned_ecs_tunnel_not_ready")
-    try:
-        with socket.create_connection(("127.0.0.1", 29000), timeout=1):
-            pass
-    except OSError:
-        raise AuthError("tools_console_unavailable") from None
+    # The protocol-aware client can reuse an existing VConsole relay. A raw
+    # connect/close on 29000 both consumes a connection slot and incorrectly
+    # rejects a healthy game whose console is already owned by that relay.
     nonce = "GOUFAYU_AUTH_PROBE_" + secrets.token_hex(16)
     send_lua(capabilities() + f"\nprint('{nonce}')\n", nonce, OUTPUT / (nonce + ".json"))
     return {"ok": True, "status": "tools_server_and_tunnel_ready"}
@@ -276,17 +308,44 @@ end)
             temporary.unlink(missing_ok=True)
 
 
+def check_acl() -> dict:
+    """Check the real credential directory with an empty file; no network/secrets."""
+    temporary = GENERATED / ("GOUFAYU_ACL_PROBE_" + secrets.token_hex(16) + ".kv")
+    no_reparse(temporary)
+    ignored(temporary)
+    require_ntfs(temporary)
+    temporary.parent.mkdir(parents=True, exist_ok=True)
+    created = False
+    try:
+        with temporary.open("x", encoding="utf-8"):
+            created = True
+        private_acl(temporary)
+        return {"ok": True, "status": "temporary_auth_acl_ready", "temporary_file_removed": True}
+    finally:
+        if created:
+            temporary.unlink(missing_ok=True)
+
+
 def main() -> int:
+    import aliyun_local_config as local_config
+
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("probe", "inject"))
-    parser.add_argument("--environment", type=Path, default=Path("D:/survival_database/.env"))
+    parser.add_argument("action", choices=("probe", "inject", "check-acl"))
+    parser.add_argument("--environment", type=Path)
     parser.add_argument("--state", type=Path, default=OUTPUT / "test_tunnel.json")
     args = parser.parse_args()
     try:
         if os.name != "nt":
             raise AuthError("windows_only")
-        result = probe(args.state) if args.action == "probe" else inject(args.state, args.environment)
-    except AuthError as exc:
+        if args.action == "check-acl":
+            result = check_acl()
+        elif args.action == "probe":
+            result = probe(args.state)
+        else:
+            settings = local_config.load(ROOT)
+            environment = args.environment if args.environment is not None else settings["environment"]
+            result = inject(args.state, environment)
+    except (AuthError, local_config.ConfigError) as exc:
         result = {"ok": False, "error": str(exc)}
     except tunnel.TunnelError:
         result = {"ok": False, "error": "owned_ecs_tunnel_not_ready"}

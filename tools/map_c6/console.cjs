@@ -1,4 +1,5 @@
-// Local Source 2 console transport. No MCP package or relay is required.
+// Local Source 2 console transport. Reuses an existing authenticated relay when
+// available; otherwise connects directly. No MCP package or relay is required.
 // Existing usage remains: node console.cjs "echo hello" 3500
 // Request files use the console_send / dota_run_lua format of launch.json.
 const fs = require('node:fs');
@@ -218,7 +219,7 @@ async function main(argv) {
     return;
   }
   writeLuaFiles(options.luaFiles);
-  const result = await send(options);
+  const result = await require('./console-relay.cjs').sendWithTransport(options, send);
   console.log('\n' + JSON.stringify(result));
 }
 

@@ -45,10 +45,36 @@ local M = {
     ),
 }
 
+local layout
 if GetMapName and GetMapName() == "survival_c6" then
-    M.spawn_point = require("config/map_layouts/survival_c6").resource_tree
+    layout = require("config/map_layouts/survival_c6")
 elseif GetMapName and GetMapName() == "template_map" then
-    M.spawn_point = require("config/map_layouts/template_map").resource_tree
+    layout = require("config/map_layouts/template_map")
+end
+if layout then M.spawn_point = layout.resource_tree end
+
+local bounds = layout and layout.build_bounds
+M.region_center = {
+    x = bounds and (bounds.min_x + bounds.max_x) / 2 or 0,
+    y = bounds and (bounds.min_y + bounds.max_y) / 2 or 0,
+}
+-- Rotate the existing northeast tree location with the four island courts.
+-- Reserve four separate fixed sockets per court for players sharing a base.
+M.spawn_regions = {}
+local region_ids = { "northeast", "southeast", "southwest", "northwest" }
+local offsets = { {0, 0}, {-192, 0}, {0, -192}, {-192, -192} }
+for rotation, region_id in ipairs(region_ids) do
+    local points = {}
+    for _, offset in ipairs(offsets) do
+        local x = M.spawn_point.x - M.region_center.x + offset[1]
+        local y = M.spawn_point.y - M.region_center.y + offset[2]
+        for _ = 2, rotation do x, y = y, -x end
+        points[#points + 1] = {
+            x = M.region_center.x + x, y = M.region_center.y + y,
+            z = M.spawn_point.z,
+        }
+    end
+    M.spawn_regions[region_id] = points
 end
 
 return M

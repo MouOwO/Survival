@@ -6,10 +6,9 @@ local rogue_effect_state = require("systems/rogue_effect_state_service")
 local tree_damage_rules = require("systems/tree_damage_rules")
 
 local M = {}
-local current_tree = nil
-local main_city = nil
-local tree_level = 1
-local reserved_grid = nil
+local trees_by_player = {}
+local trees_by_entity = {}
+local region_slots = {}
 local wall_attack_frame = nil
 local walls_by_player = {}
 local attacked_targets = nil
@@ -69,8 +68,8 @@ local function level_row(level)
     )]
 end
 
-local function tree_grid()
-    local point = config.spawn_point
+local function tree_grid(point)
+    point = point or config.spawn_point
     local footprint = config.footprint
     local size = tonumber(config.grid_cell_size) or 64
     local anchor_x = math.floor(point.x / size + 0.5)
@@ -86,12 +85,16 @@ local function lumber_efficiency_buff(level)
     return math.max(
         0,
         tonumber(config.lumber_efficiency_buff_per_level) or 0
-    ) * math.max(0, (tonumber(level) or tree_level) - 1)
+    ) * math.max(0, (tonumber(level) or 1) - 1)
 end
 
-local function tree_snapshot()
+local function tree_snapshot(state)
+    local tree_level = state.level
     local row = level_row(tree_level)
     return {
+        player_id = state.player_id,
+        region_id = state.region_id,
+        entindex = valid_entity(state.unit) and state.unit:entindex() or -1,
         level = tree_level,
         max_level = config.max_level,
         health = row.health,
@@ -103,11 +106,9 @@ local function tree_snapshot()
     }
 end
 
-local function publish_changed(reason)
-    local snapshot = tree_snapshot()
+local function publish_changed(state, reason)
+    local snapshot = tree_snapshot(state)
     snapshot.reason = reason or "unknown"
-    snapshot.entindex = valid_entity(current_tree)
-        and current_tree:entindex() or -1
     event_bus.emit(events.TREE_CHANGED, snapshot)
 end
 
@@ -119,7 +120,7 @@ local function clear_armor_reduction(tree)
 end
 
 local function apply_level(tree, level)
-    tree_level = math.max(
+    local tree_level = math.max(
         1,
         math.min(config.max_level, tonumber(level) or 1)
     )
@@ -138,8 +139,8 @@ local function apply_level(tree, level)
     tree:SetHealth(projected.health)
 end
 
-local function reserve_tree_grid(entindex)
-    reserved_grid = reserved_grid or tree_grid()
+local function reserve_tree_grid(point, entindex)
+    local reserved_grid = tree_grid(point)
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
         grid_x = reserved_grid.grid_x,
         grid_y = reserved_grid.grid_y,
@@ -149,25 +150,39 @@ local function reserve_tree_grid(entindex)
 end
 
 local function upgrade_tree(tree)
-    if not valid_entity(tree) or tree ~= current_tree then return end
-    local previous_level = tree_level
-    local next_level = math.min(config.max_level, tree_level + 1)
+    local state = trees_by_entity[tree]
+    if not valid_entity(tree) or not state then return end
+    local previous_level = state.level
+    local next_level = math.min(config.max_level, state.level + 1)
     apply_level(tree, next_level)
-    reserve_tree_grid(tree:entindex())
+    state.level = next_level
     local reason = next_level > previous_level
         and "tree_level_up" or "tree_max_level_reset"
-    publish_changed(reason)
+    publish_changed(state, reason)
 end
 
 local function spawn_tree(payload)
-    local city = payload and payload.unit or main_city
+    local city = payload and payload.unit
     if not valid_entity(city) then
         print("[TreeSystem] main city entity is unavailable")
         return
     end
-    if valid_entity(current_tree) then return end
-
-    local point = config.spawn_point
+    local player_id = tonumber(payload.player_id or city.survival_player_id)
+    if player_id == nil or player_id < 0 then return end
+    if trees_by_player[player_id] then return end
+    local origin = city:GetAbsOrigin()
+    local center = config.region_center
+    local region_id = (origin.y >= center.y and "north" or "south")
+        .. (origin.x >= center.x and "east" or "west")
+    local slots = region_slots[region_id]
+    local slot, point
+    for index, candidate in ipairs(config.spawn_regions[region_id]) do
+        if slots[index] == nil then slot, point = index, candidate; break end
+    end
+    if not point then
+        print("[TreeSystem] no free tree socket in " .. region_id)
+        return
+    end
     local position = Vector(point.x, point.y, point.z)
     local tree = CreateUnitByName(
         config.unit_name,
@@ -187,26 +202,27 @@ local function spawn_tree(payload)
     tree:SetOriginalModel(config.model_name)
     tree:SetModelScale(config.model_scale)
     tree:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
+    tree.survival_tree_owner_id = player_id
     tree.survival_tree_depleted_callback = upgrade_tree
-    apply_level(tree, tree_level)
+    apply_level(tree, 1)
     if not tree:HasModifier("modifier_tree_progression") then
         require("core/modifier_registry").ensure(tree, "modifier_tree_progression", {})
     end
-    current_tree = tree
-    reserve_tree_grid(tree:entindex())
+    local state = { unit = tree, player_id = player_id, level = 1,
+        region_id = region_id, slot = slot, point = point }
+    trees_by_player[player_id] = state
+    trees_by_entity[tree] = state
+    slots[slot] = player_id
+    reserve_tree_grid(point, tree:entindex())
 
-    local snapshot = tree_snapshot()
-    snapshot.entindex = tree:entindex()
+    local snapshot = tree_snapshot(state)
     event_bus.emit(events.TREE_SPAWNED, snapshot)
-    publish_changed("tree_spawned")
+    publish_changed(state, "tree_spawned")
 end
 
 local function on_tree_hit(payload)
-    if not valid_entity(current_tree) then return end
-    if not payload.target
-        or payload.target:entindex() ~= current_tree:entindex() then
-        return
-    end
+    local current_tree = payload.target
+    if not valid_entity(current_tree) or not trees_by_entity[current_tree] then return end
     local attacker = payload.attacker
     if not valid_entity(attacker) then return end
     if not tree_damage_rules.is_allowed_tree_attacker(attacker) then return end
@@ -231,7 +247,8 @@ local function on_tree_hit(payload)
         end
     end
     local efficiency = math.max(0, math.floor(
-        (tonumber(base_efficiency) or 0) + lumber_efficiency_buff(tree_level)
+        (tonumber(base_efficiency) or 0) + lumber_efficiency_buff(
+            (trees_by_player[payload.player_id] or {}).level)
             * math.max(1, tonumber(payload.fusion_count) or 1)
     ))
     if hero_wood_bonus_pct > 0 then
@@ -318,33 +335,49 @@ end
 local function on_building_created(payload)
     if not payload or payload.building_id ~= "main_city" then return end
     if not valid_entity(payload.unit) then return end
-    main_city = payload.unit
     spawn_tree(payload)
 end
 
+local function on_player_disconnected(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local state = player_id and trees_by_player[player_id]
+    if not state then return end
+    trees_by_player[player_id] = nil
+    trees_by_entity[state.unit] = nil
+    region_slots[state.region_id][state.slot] = nil
+    reserve_tree_grid(state.point)
+    if valid_entity(state.unit) and UTIL_Remove then UTIL_Remove(state.unit) end
+    event_bus.emit(events.TREE_DESTROYED, {
+        player_id = player_id, entindex = -1, lumber_efficiency_buff = 0,
+    })
+end
+
 function M.init()
-    current_tree = nil
-    main_city = nil
-    tree_level = 1
-    reserved_grid = nil
+    trees_by_player = {}
+    trees_by_entity = {}
+    region_slots = {}
     wall_attack_frame = nil
     walls_by_player = {}
     attacked_targets = nil
-    reserve_tree_grid("survival_tree_reserved")
+    for region_id, points in pairs(config.spawn_regions) do
+        region_slots[region_id] = {}
+        for _, point in ipairs(points) do reserve_tree_grid(point) end
+    end
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.TREE_HIT, on_tree_hit)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
 end
 
 M._level_row_for_test = level_row
 M._tree_grid_for_test = tree_grid
 M._apply_level_for_test = apply_level
 M._upgrade_tree_for_test = function(tree)
-    current_tree = tree
     upgrade_tree(tree)
 end
-M._reset_for_test = function(level, tree)
-    tree_level = tonumber(level) or 1
-    current_tree = tree
+M._reset_for_test = function(level, tree, player_id)
+    local state = { level = tonumber(level) or 1, unit = tree, player_id = player_id or 0 }
+    trees_by_player[state.player_id] = state
+    trees_by_entity[tree] = state
 end
 
 M._lumber_efficiency_buff_for_test = lumber_efficiency_buff

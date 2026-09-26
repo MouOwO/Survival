@@ -22,6 +22,8 @@ import subprocess
 import sys
 import time
 
+import aliyun_local_config as local_config
+
 
 ECS_HOST = "47.110.238.248"
 PORT = 8765
@@ -63,6 +65,42 @@ def ssh_command(ssh: str, key: Path, known_hosts: Path) -> list[str]:
             "-o", "ControlMaster=no", "-o", "ControlPath=none",
             "-o", "LogLevel=ERROR", "-L", f"127.0.0.1:{PORT}:127.0.0.1:{PORT}",
             f"root@{ECS_HOST}"]
+
+
+def ensure_agent_running() -> None:
+    """Restore the Windows agent after reboot before public-key SSH starts.
+
+    A key that needs its agent otherwise appears to the caller as a remote
+    public-key rejection. Starting the service is harmless when already up.
+    Leave an unstartable service alone so SSH can still try an unencrypted key.
+    """
+    if agent_failure_code() != "ssh_agent_unavailable":
+        return
+    try:
+        subprocess.run(["sc.exe", "start", "ssh-agent"], capture_output=True,
+                       timeout=10, creationflags=HIDDEN)
+        for _ in range(10):
+            if agent_failure_code() != "ssh_agent_unavailable":
+                return
+            time.sleep(0.2)
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+
+def agent_failure_code() -> str:
+    agent = shutil.which("ssh-add.exe")
+    if not agent:
+        return "ssh_public_key_authentication_failed"
+    try:
+        result = subprocess.run([agent, "-l"], capture_output=True,
+                                timeout=5, creationflags=HIDDEN)
+    except (OSError, subprocess.SubprocessError):
+        return "ssh_public_key_authentication_failed"
+    if result.returncode == 2 or b"Error connecting to agent" in result.stderr:
+        return "ssh_agent_unavailable"
+    if result.returncode == 1:
+        return "ssh_key_not_loaded_in_current_user_agent"
+    return "ssh_public_key_authentication_failed"
 
 
 def port_free() -> bool:
@@ -290,6 +328,7 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
             # Keep the state for a later retry and never truncate an open log.
             raise TunnelError("stale_tunnel_log_unavailable") from None
         path.unlink()
+    ensure_agent_running()
     command = ssh_command(str(Path(ssh).resolve()), key.resolve(), known_hosts.resolve())
     # stderr remains a private temporary log; only classified codes are printed.
     error_path = path.with_suffix(".stderr")
@@ -311,7 +350,7 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
                 errors.seek(0)
                 detail = errors.read(8192).decode("utf-8", errors="replace")
                 if "Permission denied" in detail:
-                    raise TunnelError("ssh_public_key_authentication_failed")
+                    raise TunnelError(agent_failure_code())
                 if "Host key verification failed" in detail:
                     raise TunnelError("ssh_host_key_verification_failed")
                 if "Address already in use" in detail or "cannot listen to port" in detail:
@@ -341,19 +380,23 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("connect", "check", "stop"))
-    parser.add_argument("--key", type=Path, default=Path.home() / ".ssh/goufayu_ecs_ed25519_v2")
-    parser.add_argument("--known-hosts", type=Path,
-                        default=ROOT / "output/ecs_backend_work/ecs_hostkey_candidate.pub")
+    parser.add_argument("--key", type=Path)
+    parser.add_argument("--known-hosts", type=Path)
     parser.add_argument("--state", type=Path,
                         default=ROOT / "output/ecs_backend_work/test_tunnel.json")
     args = parser.parse_args()
     try:
         if os.name != "nt":
             raise TunnelError("windows_only")
+        if args.action == "connect":
+            settings = local_config.load(ROOT)
+            args.key = args.key if args.key is not None else settings["ssh_key"]
+            args.known_hosts = (args.known_hosts if args.known_hosts is not None
+                                else settings["known_hosts"])
         with state_lock(args.state):
             result = (connect(args.state, args.key, args.known_hosts) if args.action == "connect"
                       else check(args.state) if args.action == "check" else stop(args.state))
-    except TunnelError as exc:
+    except (TunnelError, local_config.ConfigError) as exc:
         result = {"ok": False, "error": str(exc)}
     except (OSError, ValueError, subprocess.SubprocessError):
         result = {"ok": False, "error": "local_tunnel_operation_failed"}

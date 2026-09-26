@@ -1,0 +1,611 @@
+{
+  "date": "2026-09-25",
+  "base_commit": "5ee5a8ba5d612c0908edf8543f14628b744307c7",
+  "scope": "framework review, runtime lifecycle fixes, focused workload reductions; first implementation batch",
+  "validation_levels": [
+    "STATIC",
+    "UNIT",
+    "SIMULATION"
+  ],
+  "regression": {
+    "passed": 81,
+    "failed": 0,
+    "interpreters": {
+      "lua": "Lua 5.1.5  Copyright (C) 1994-2012 Lua.org, PUC-Rio",
+      "ui": "v24.21.0"
+    },
+    "tests": [
+      {
+        "test": "scripts/vscripts/tests/test_archive_building_effects.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_archive_buildings.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_archive_challenge_hub_positions.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_archive_difficulty_progression.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_archive_service.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_boss_warning_projection.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_builder_tower_rebuild.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_building_death_visual.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_building_upgrade_lifecycle.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_challenge_unit_names.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_combat_performance_capture.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_custom_monster_armor.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_daily_ui_snapshot.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_debug_spawn_positions.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_difficulty_unlocks.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_enemy_wall_order_cache.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_event_bus_lifecycle.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_health_bar_cleanup.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_hero_base_health_binding.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_hero_instant_blink.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_hero_skill_point_upgrade.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_hero_summon_destination.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_hero_summon_flow.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_ice_blade_counter.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_io_building_ambient.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_lottery_http_service.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_match_inventory.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_match_setup_service.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_modifier_definition_scopes.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_modifier_registry.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_monster_ground_navigation.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_online_time_lifecycle.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_online_time_profile_integration.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_player_entry_authentication.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_player_profile_lifecycle.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_player_profile_load_retry.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_player_profile_modes.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_player_room_locations.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_post_clear_freeze.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_practice_difficulty_profiles.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_projection_modifier_recovery.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_pure_permanent_rewards.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_rebirth_return_retry.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_resource_opening_wood.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_resource_ui_coalescing.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_scheduler_lifecycle.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_shop_early_final_cooldown.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_startup_asset_preload_service.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_startup_loading_service.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_startup_order_gate.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_startup_ui_request_gate.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_stat_push_coalescer.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_targeted_area_pickup.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tower_class_preflight.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tower_destruction_rebuild.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tower_effect_thinker_lifecycle.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tower_idle_state.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tower_target_selection.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tower_upgrade_targeting.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_attacker_whitelist.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_health_projection.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_hit_scan_coalescing.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_ui_snapshot_delta.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_ui_snapshot_scheduling.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_ultimate_tower_tree_targeting.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_visual_carrier_health_bar.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_wall_engagement_cache.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_wall_quick_upgrade.lua",
+        "passed": true
+      },
+      {
+        "test": "scripts/vscripts/tests/test_worker_system_training.lua",
+        "passed": true
+      },
+      {
+        "test": "tools/check_addon_bootstrap.lua",
+        "passed": true
+      },
+      {
+        "test": "tools/test_game_info_lifecycle.cjs",
+        "passed": true
+      },
+      {
+        "test": "tools/test_shared_ui.cjs",
+        "passed": true
+      },
+      {
+        "test": "tools/test_combat_selection_recovery.cjs",
+        "passed": true
+      },
+      {
+        "test": "tools/test_combat_stats_callbacks.cjs",
+        "passed": true
+      },
+      {
+        "test": "tools/test_ui_snapshot_cache.cjs",
+        "passed": true
+      },
+      {
+        "test": "tools/test_archive_cache.cjs",
+        "passed": true
+      },
+      {
+        "test": "tools/test_startup_loading_ui.js",
+        "passed": true
+      },
+      {
+        "test": "tools/test_match_setup_ui.cjs",
+        "passed": true
+      },
+      {
+        "test": "tools/test_hero_skill_upgrade.cjs",
+        "passed": true
+      },
+      {
+        "test": "tools/test_multiselect_portraits.cjs",
+        "passed": true
+      }
+    ]
+  },
+  "backend_tests": {
+    "independent_backend": {
+      "passed": 77,
+      "duration_seconds": 11.173,
+      "command": "python -B -m unittest discover -s D:/survival_database/backend/tests -p test_*.py",
+      "environment": {
+        "SURVIVAL_ADDON_ROOT": "<game addon root>"
+      }
+    },
+    "archive_backend": {
+      "passed": 18,
+      "duration_seconds": 5.125,
+      "command": "python -B -m unittest discover -s server/tests -p test_archive_backend.py",
+      "environment": {
+        "FISHING_BACKEND_ROOT": "D:/survival_database/backend"
+      }
+    },
+    "database_mode": "fixtures and local temporary HTTP; no live database",
+    "evidence": "parallel reliability agent tool session 49323 and chunk 867bdd; not rerun against ECS"
+  },
+  "benchmarks": {
+    "scheduler": {
+      "before": {
+        "kind": "offline_lua_simulation",
+        "tasks": 1000,
+        "idle_ticks": 200,
+        "idle_entries_visited": 200000,
+        "callbacks_at_deadline": 1000,
+        "timed_idle_ticks": 10000,
+        "cpu_ms": 286.0
+      },
+      "after": {
+        "kind": "offline_lua_simulation",
+        "tasks": 1000,
+        "idle_ticks": 200,
+        "idle_entries_visited": 0,
+        "callbacks_at_deadline": 1000,
+        "timed_idle_ticks": 10000,
+        "cpu_ms": 0.0
+      },
+      "cpu_timing_note": "Host os.clock granularity may round short measurements to 0 ms; no zero-cost/FPS claim. Use operation counts for deterministic comparison."
+    },
+    "event_bus": {
+      "before": {
+        "kind": "offline_lua_simulation",
+        "emissions": 10000,
+        "listeners": 8,
+        "delivered": 80000,
+        "snapshot_handler_copies": 80000
+      },
+      "after": {
+        "kind": "offline_lua_simulation",
+        "emissions": 10000,
+        "listeners": 8,
+        "delivered": 80000,
+        "snapshot_handler_copies": 8
+      }
+    },
+    "game_info": [
+      {
+        "revision": "HEAD",
+        "hiddenCallbacks60Seconds": 60,
+        "snapshotBurst100": {
+          "created": 900,
+          "removed": 900,
+          "textWrites": 600
+        },
+        "reloads20": {
+          "pendingTimers": 21,
+          "tableListeners": 21
+        }
+      },
+      {
+        "revision": "working",
+        "hiddenCallbacks60Seconds": 0,
+        "snapshotBurst100": {
+          "created": 0,
+          "removed": 0,
+          "textWrites": 1
+        },
+        "reloads20": {
+          "pendingTimers": 0,
+          "tableListeners": 1
+        }
+      }
+    ],
+    "tower_effects": {
+      "before": [
+        "TOWER_EFFECT_WORKLOAD towers=4 simulated_seconds=15 callbacks=2000 aura_writes=2000 radius_scans=0",
+        "TOWER_EFFECT_WORKLOAD towers=28 simulated_seconds=15 callbacks=14000 aura_writes=14000 radius_scans=0",
+        "TOWER_EFFECT_LASER callbacks=101 hits=4 damage=120,125,130,135 particles=31 destroyed=31"
+      ],
+      "after": [
+        "TOWER_EFFECT_WORKLOAD towers=4 simulated_seconds=15 callbacks=0 aura_writes=0 radius_scans=0",
+        "TOWER_EFFECT_WORKLOAD towers=28 simulated_seconds=15 callbacks=0 aura_writes=0 radius_scans=0",
+        "TOWER_EFFECT_LASER callbacks=101 hits=4 damage=120,125,130,135 particles=31 destroyed=31",
+        "TOWER_EFFECT_THINKER_LIFECYCLE_PASS: construction, upgrade, fusion, removal, relocation, native attack events and laser cleanup"
+      ]
+    }
+  },
+  "syntax": [
+    {
+      "file": "panorama/src/scripts/custom_game/game_info_panel.js",
+      "checker": "node --check",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/core/event_bus.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/core/scheduler.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/modifiers/modifier_tower_attack_effects.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/systems/online_time_service.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/systems/player_profile_service.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/systems/tower_skill_runtime.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/manual_combat_performance.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_combat_performance_capture.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_event_bus_lifecycle.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_online_time_lifecycle.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_online_time_profile_integration.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_player_profile_lifecycle.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_projection_modifier_recovery.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_scheduler_lifecycle.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_tower_effect_thinker_lifecycle.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "tools/benchmark_event_bus.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "tools/benchmark_scheduler.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "tools/check_addon_bootstrap.lua",
+      "checker": "luac 5.1",
+      "passed": true
+    },
+    {
+      "file": "tools/run_runtime_regression.py",
+      "checker": "ast.parse",
+      "passed": true
+    },
+    {
+      "file": "tools/test_game_info_lifecycle.cjs",
+      "checker": "node --check",
+      "passed": true
+    }
+  ],
+  "diff_check": true,
+  "ui_build": {
+    "compiled": 1,
+    "failed": 0,
+    "source_equals_content": true,
+    "artifact": "panorama/scripts/custom_game/game_info_panel.vjs_c",
+    "artifact_sha256": "fd2e732e242045b9d4af9e6ed0e004c0d6bfbc1b7f5a08aa024d9864b1060b90",
+    "backup": "output/runtime_refactor_20260925/ui_before"
+  },
+  "preexisting_artifacts_preserved": [
+    "panorama/images/custom_game/archive_gpu_regular/daily_growth_gem.vtex_c",
+    "panorama/images/custom_game/rogue_cards_gpu/fortifications.vtex_c",
+    "panorama/images/custom_game/rogue_cards_gpu/gunpowder_splash.vtex_c"
+  ],
+  "changed_files_sha256": {
+    ".gitignore": "1bb5b70d4dbd9e80b921ce6ef81551716b0092a5e7af20f9adadc9fc0cdabd93",
+    "docs/COMBAT_PERFORMANCE.md": "c8a8f1f7a364de63ee4bf96a608d410f409b4e6c9c10c66d923421a2b6583a53",
+    "docs/RUNTIME_REFACTOR.md": "1179b078e1e1014cd8580b0963d152d03b184ec99582b1197097f5c258249651",
+    "docs/ai/CURRENT_TASK.md": "abc9683fd871a303442bb65090cbc4053949d4dccee1b85a2220c3f61273369d",
+    "docs/ai/FISHING_REWARD_INTEGRATION.md": "62cfa581f2bf80a9a9089726f744c858fdd9760b01ae2c1bd28f2cfb8325e562",
+    "docs/ai/PROJECT_CONTEXT.md": "76bc01f27655b3f3d152a331507f8127c384c5d9649e661c7277841d64912597",
+    "docs/ai/START_HERE.md": "7870d8f5cf8ad1f1fb9b961f092468539276f3f59ba454e401d8aad6a428017d",
+    "panorama/scripts/custom_game/game_info_panel.vjs_c": "fd2e732e242045b9d4af9e6ed0e004c0d6bfbc1b7f5a08aa024d9864b1060b90",
+    "panorama/src/scripts/custom_game/game_info_panel.js": "52fd5bb3a7706cc16ebf6e956a54eb4fc4f0bd629ee1cf110d02c5b638291b46",
+    "scripts/vscripts/core/event_bus.lua": "41cc440db9b4e0dfa59d3796167990d3a74b6dbc758e03a842d94853d7417a48",
+    "scripts/vscripts/core/scheduler.lua": "ffe2ab1d8eb85ea891031d95782f78154b006c5ca67a62dc83c6b576e0c8f058",
+    "scripts/vscripts/modifiers/modifier_tower_attack_effects.lua": "46a9437175e3707748d99918c801a6d3f59334e60cf3556cdae07fd1fd159633",
+    "scripts/vscripts/systems/online_time_service.lua": "bcc58768900b9ef0128dd976c7705a66a9ced93d571afcb6ed0f593dba09222e",
+    "scripts/vscripts/systems/player_profile_service.lua": "bd1f0ea5af49237c32509b2ffab8e08cd7106e5bafda06694366850f592a083f",
+    "scripts/vscripts/systems/tower_skill_runtime.lua": "12a33d63dc83d862e7cc19092ea0cc54f99c87e89bd10e0b8a0b95439fdb8050",
+    "scripts/vscripts/tests/manual_combat_performance.lua": "e35278f4067e8f7ec8623d66a838024f6265c37f21bae27e85643e4257af05d6",
+    "scripts/vscripts/tests/test_combat_performance_capture.lua": "ebad3da077263591648a9455649cdfa67ff29a2ca61dcf6c3e066088ca275f7c",
+    "scripts/vscripts/tests/test_event_bus_lifecycle.lua": "548406194d49189daf3d57201b451d4ccf418222c324cbd309acb568cc05644f",
+    "scripts/vscripts/tests/test_online_time_lifecycle.lua": "7130cb57456956f42aa33f1b1076ef51502edc941512d2bcf6233c1c63c9c0c9",
+    "scripts/vscripts/tests/test_online_time_profile_integration.lua": "1241aa759b9ab0a30c4a076f3a3ef44959bbff4491ee483a4753b3d65dedbae0",
+    "scripts/vscripts/tests/test_player_profile_lifecycle.lua": "034633979c1157b5f1d5768c097a96e7538fd17aabeebecc0e4d1854dde4b3f0",
+    "scripts/vscripts/tests/test_projection_modifier_recovery.lua": "87919b5b7c51db2c269fb4d72f4f1950e0c8d67f58a12eacf0a826590c320a9b",
+    "scripts/vscripts/tests/test_scheduler_lifecycle.lua": "5ac5a3fe68fad03aad940fb37e90a99120df546bba633c79f1a504f5e5d2b017",
+    "scripts/vscripts/tests/test_tower_effect_thinker_lifecycle.lua": "daec8cd864af2ce53df6437f197b8f255eced02411c8520c8cfd368ae64d91a5",
+    "tools/benchmark_event_bus.lua": "12ddb6c448f908fb9dba4ef0e95a75523e28fda06124704cc395d51a6b83da56",
+    "tools/benchmark_scheduler.lua": "4faf6b2fedaaef64ea5183be45e3e6ceca178b46871a5502aa9386f9da1c7a14",
+    "tools/check_addon_bootstrap.lua": "408d440f873edf288e7cd6c041e145b2a896af4ae1b0ea822943610af17251c1",
+    "tools/run_runtime_regression.py": "9748ea858af97548a69ec1f3b534263f67bb48579a8e16c486d4edfeeccf9d14",
+    "tools/test_game_info_lifecycle.cjs": "c0f092ba2807346c65322f02f8ef43e09390ca4865ea22ab96e9b3681cf609fc"
+  },
+  "not_verified": [
+    "actual client FPS/frame time and CPU/GPU split",
+    "four-player live synchronization and reconnect",
+    "long-session memory/particle growth",
+    "resolution screenshots",
+    "live ECS persistence and backup restore in this turn"
+  ],
+  "not_performed": [
+    "database schema migration",
+    "ECS deployment",
+    "map recompilation",
+    "real payments",
+    "git commit or push"
+  ],
+  "followup": "docs/RUNTIME_REFACTOR.md"
+}

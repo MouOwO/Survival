@@ -246,11 +246,11 @@ assert(foreign.unit.survival_attack_min==foreign_before,"growth stays player-pri
 -- Unscoped research still changes speed/range/modifiers.
 bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
 assert(range_writes>0 and modifier_lookups>0)
-bus.emit(events.TREE_CHANGED,{entindex=900,lumber_efficiency_buff=99})
+bus.emit(events.TREE_CHANGED,{player_id=0,entindex=900,lumber_efficiency_buff=99})
 modifier_lookups=0
-for i=1,200 do bus.emit(events.TREE_CHANGED,{entindex=900,lumber_efficiency_buff=99,reason="tree_max_level_reset"}) end
+for i=1,200 do bus.emit(events.TREE_CHANGED,{player_id=0,entindex=900,lumber_efficiency_buff=99,reason="tree_max_level_reset"}) end
 assert(modifier_lookups==0,"same capped tree must not walk all worker modifiers again")
-bus.emit(events.TREE_CHANGED,{entindex=901,lumber_efficiency_buff=99})
+bus.emit(events.TREE_CHANGED,{player_id=0,entindex=901,lumber_efficiency_buff=99})
 assert(modifier_lookups>0,"replacement tree still updates targets")
 assert(#errors==0,table.concat(errors,"\n")); print=prior_print
 print("LUMBERJACK_GROWTH_FAST_PATH_PASS: 200 immediate shared growth hits; 400 attack writes; zero range/timer/modifier resets; player isolation; capped-tree skip")
