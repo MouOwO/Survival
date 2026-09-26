@@ -3,6 +3,10 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 
 local listeners, packets, admitted = {}, {}, {}
+local defeated = {}
+package.loaded["systems/multiplayer_player_service"] = {
+    is_defeated = function(id) return defeated[id] == true end,
+}
 local player_handles = { [0] = {}, [1] = {} }
 PlayerResource = {
     IsValidPlayerID = function(_, id) return player_handles[id] ~= nil end,
@@ -120,6 +124,22 @@ for _, packet in ipairs(packets) do
     expected[packet.name] = nil
 end
 assert(next(expected) == nil)
+
+-- Defeat blocks every mutation above while allowing private snapshots for spectating.
+defeated[0] = true
+invoke_all(0)
+assert(calls.difficulty == 1 and calls.place == 1 and calls.build == 1)
+assert(calls.draw == 1 and calls.exchange == 1 and #packets == 4)
+local snapshot_requested = false
+bus.subscribe(events.UI_SNAPSHOT_REQUESTED, function(payload)
+    snapshot_requested = payload.player_id == 0
+end)
+listeners.ui_request_full_snapshot(nil, { PlayerID = 0, request_id = "spectating" })
+assert(snapshot_requested and #packets == 5)
+assert(packets[5].player == player_handles[0] and packets[5].name == "ui_operation_result")
+assert(packets[5].payload.success == 1)
+table.remove(packets)
+defeated[0] = nil
 
 -- Losing current admission (disconnect / missing matching profile) also closes
 -- the custom-event path after the global startup barrier has been released.

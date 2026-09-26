@@ -25,7 +25,16 @@ local function collect_asset_ids()
             and (member.encounter_id == "encounter_challenge_10"
                 or member.encounter_id == "encounter_challenge_11") then
             local archetype = archetypes_by_id[member.archetype_id]
-            local asset = archetype and catalog.for_model(archetype.model_path)
+            -- Multiple outfits can share one body model. Resolve the same
+            -- declared bundle as spawn_member, including every wearable.
+            local declared_id = archetype and (archetype.model_asset_id
+                or archetype.default_wearable_asset_id)
+            if declared_id == "" and archetype then
+                declared_id = archetype.default_wearable_asset_id
+            end
+            local asset = declared_id and declared_id ~= ""
+                and catalog.resolve(declared_id)
+                or (archetype and catalog.for_model(archetype.model_path))
             if asset and not seen[asset.asset_id] then
                 seen[asset.asset_id] = true
                 result[#result + 1] = asset.asset_id

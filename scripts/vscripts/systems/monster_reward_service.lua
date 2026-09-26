@@ -83,6 +83,9 @@ local function grant_reward(payload)
     end
 
     local player_id = tonumber(payload.player_id)
+    if require("systems/player_context_service").is_defeated(player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "reward_player_invalid" }
     end

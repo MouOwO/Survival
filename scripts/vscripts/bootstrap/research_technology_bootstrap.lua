@@ -175,37 +175,8 @@ function M.init()
         get_access_state = research_access_state,
         sync_client = sync_client })
     register_handlers()
-    event_bus.subscribe(event_names.LEVEL_CHANGED, function(payload)
-        if payload.team_propagated == true then return end
-        local source_player_id = tonumber(payload and payload.player_id)
-        local team = source_player_id ~= nil and team_for(source_player_id) or nil
-        if team == nil then return end
-        each_team_player(team, function(player_id)
-            if player_id == source_player_id then return end
-            local projection = effects:Recalculate(player_id)
-            local propagated = {
-                player_id = player_id,
-                tech_id = payload.tech_id,
-                old_level = payload.old_level,
-                new_level = payload.new_level,
-                gold_cost = payload.gold_cost,
-                wood_cost = payload.wood_cost,
-                levels = repository:GetAllLevels(player_id),
-                legacy_levels = repository:GetLegacyLevels(player_id),
-                effects = projection,
-                reason = "team_research_level_changed",
-                team_propagated = true,
-            }
-            event_bus.emit(event_names.LEVEL_CHANGED, propagated)
-            event_bus.emit(event_names.EFFECTS_CHANGED, {
-                player_id = player_id,
-                tech_id = payload.tech_id,
-                snapshot = projection,
-                team_propagated = true,
-            })
-            sync_client(player_id, service:BuildClientSnapshot(player_id))
-        end)
-    end)
+    -- Levels/effects belong to the purchasing player. Team research broadcasts
+    -- would change another player's pending target while its timer is running.
     event_bus.subscribe(events.RESOURCE_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
         if valid_player(player_id) then

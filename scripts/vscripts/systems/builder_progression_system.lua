@@ -97,13 +97,6 @@ local function rogue_row()
     return nil
 end
 
-local function rogue_consumed(state)
-    return event_bus.request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, {
-        player_id = state.player_id,
-        reward_type = "builder_start",
-    }) == true
-end
-
 local function free_hero_altar(state)
     return require("systems/rogue_effect_state_service").numeric(
         state.player_id, "builder_free_hero_altar") > 0
@@ -151,9 +144,6 @@ local function count_limit_reached(state, row)
 end
 
 local function should_show(state, row)
-    if row.ability_name == BUILDER_ROGUE_ABILITY and rogue_consumed(state) then
-        return false
-    end
     if count_limit_reached(state, row) then return false end
     if row.building_id == "hero_altar" and free_hero_altar(state) then
         return true
@@ -320,7 +310,7 @@ end
 
 local function ensure_rogue_ability(state, builder)
     local row = rogue_row()
-    if not row or rogue_consumed(state) then
+    if not row then
         if builder:FindAbilityByName(BUILDER_ROGUE_ABILITY) then
             builder:RemoveAbility(BUILDER_ROGUE_ABILITY)
         end
@@ -447,10 +437,6 @@ end
 local function configure_layout(state, stage_rows)
     local builder = state.builder
     if not valid_entity(builder) then return end
-    if rogue_consumed(state)
-        and builder:FindAbilityByName(BUILDER_ROGUE_ABILITY) then
-        builder:RemoveAbility(BUILDER_ROGUE_ABILITY)
-    end
     local entries, reported_count = enumerate_abilities(builder)
     local domain_start = management_domain_start(entries, reported_count)
     local desired = desired_layout(state, stage_rows, domain_start)

@@ -42,6 +42,7 @@ local function request_number(payload, key)
 end
 
 local function accept_preview_request(player_id, payload, request_ids)
+    if require("systems/player_context_service").is_defeated(player_id) then return false end
     local session_id = request_number(payload, "session_id")
     local request_id = request_number(payload, "request_id")
     if not session_id or session_id <= 0 or not request_id or request_id <= 0 then
@@ -123,7 +124,7 @@ local function valid_player_id(player_id)
 end
 
 local function source_player_id(payload)
-    return tonumber(payload and (payload.PlayerID or payload.player_id))
+    return tonumber(payload and payload.PlayerID)
 end
 
 local function send(player_id, event_name, payload)
@@ -264,6 +265,9 @@ local function validate_preview(player_id, payload, profile, position)
             y = profile.footprint_y,
         },
         team = caster:GetTeamNumber(),
+        -- Only the already authenticated builder may move out of its own
+        -- requested footprint. Never trust an ignore list from the client.
+        ignore_entindex = caster:entindex(),
     }) or { ok = false, error = "grid_validation_failed", cells = {} }
     local business = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
         caster = caster,
@@ -478,6 +482,9 @@ function M.init()
     preview_sessions = {}
     closed_preview_sessions = {}
     preview_request_ids = {}
+    event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
+        destroy_preview(tonumber(payload.player_id))
+    end)
     build_profiles()
     register_profile_request()
     register_validation_request()

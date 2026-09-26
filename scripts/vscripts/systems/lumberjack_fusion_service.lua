@@ -141,6 +141,14 @@ local function fuse(payload)
         or tonumber(caster.survival_player_id) == nil then
         return { ok = false, error = "invalid_caster" }
     end
+    if payload.player_id ~= nil
+        and tonumber(payload.player_id) ~= tonumber(caster.survival_player_id) then
+        return { ok = false, error = "fusion_not_owned" }
+    end
+    if ability:GetCaster() ~= caster
+        or caster:FindAbilityByName(ability:GetAbilityName()) ~= ability then
+        return { ok = false, error = "fusion_ability_not_owned" }
+    end
     local row = row_for_ability(ability:GetAbilityName())
     if not row then return { ok = false, error = "fusion_definition_invalid" } end
     if tonumber(caster.survival_lumberjack_level) ~= tonumber(row.level) then
@@ -203,9 +211,36 @@ local function fuse(payload)
     return { ok = true, entindex = target:entindex(), fusion_id = row.fusion_id }
 end
 
+local function request_fusion(payload)
+    local result = fuse(payload)
+    if not result.ok then
+        local ability = payload and payload.ability
+        local row = ability and row_for_ability(ability:GetAbilityName()) or {}
+        local messages = {
+            fusion_city_level_not_enough = "主城达到LV" .. tostring(row.required_city_level or 0) .. "后才能合体",
+            fusion_material_not_enough = "合体需要" .. tostring(row.required_count or 0)
+                .. "个自己的普通LV" .. tostring(row.level or 0) .. "伐木工",
+            wood_not_enough = "合体木材不足，需要" .. tostring(row.wood_cost or 0) .. "木材",
+            gold_not_enough = "合体金币不足，需要" .. tostring(row.gold_cost or 0) .. "金币",
+            fusion_pending = "伐木工正在合体中",
+            fusion_not_owned = "只能合体自己的伐木工",
+            fusion_ability_not_owned = "伐木工合体技能不匹配",
+        }
+        result.message = messages[result.error] or "伐木工合体失败，请检查单位和资源后重试"
+        local caster = payload and payload.caster
+        local player_id = caster and tonumber(caster.survival_player_id)
+        if player_id ~= nil then
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = player_id, message = result.message, level = "error",
+            })
+        end
+    end
+    return result
+end
+
 function M.init()
     pending_by_caster = {}
-    event_bus.handle_request(events.LUMBERJACK_FUSION_REQUEST, fuse)
+    event_bus.handle_request(events.LUMBERJACK_FUSION_REQUEST, request_fusion)
 end
 
 M._fuse_for_test = fuse

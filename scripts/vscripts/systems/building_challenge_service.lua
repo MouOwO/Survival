@@ -172,6 +172,9 @@ local function start_lifecycle(meta)
 end
 
 local function summon(state, definition, source_ability)
+    if require("systems/player_context_service").is_defeated(state.player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     if living_unit(state, definition.challenge_id) then
         return { ok = false, error = "challenge_monster_already_alive" }
     end
@@ -378,6 +381,19 @@ function M.init()
     event_bus.handle_request(events.BUILDING_CHALLENGE_AUTO_REQUEST, auto_request)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
+        if not payload or payload.defeat_cleanup ~= true then return end
+        local player_id = tonumber(payload and payload.player_id)
+        for entindex, meta in pairs(monster_meta) do
+            if meta.player_id == player_id then
+                settle(meta, "player_defeated")
+                if valid(meta.unit) then UTIL_Remove(meta.unit) end
+            end
+        end
+        for entindex, state in pairs(states) do
+            if state.player_id == player_id then states[entindex] = nil end
+        end
+    end)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     scheduler.every(1, auto_tick, TASK_ID)
 end

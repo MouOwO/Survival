@@ -1,0 +1,71 @@
+{
+  "root_cause": "Every lumberjack attack-growth hit broadcast unrestricted technology refresh, causing unrelated building world scans, hero recalculation, gold mine refresh, and resetting unchanged worker stats. UI growth snapshots were emitted once per hit.",
+  "baseline_regressions": [
+    {
+      "module": "systems/worker_system",
+      "old_version": "expected failure",
+      "evidence": "[string \"<python>\"]:239: growth must not reset attack timers/ranges or all modifiers"
+    },
+    {
+      "module": "systems/building_upgrade_system",
+      "old_version": "expected failure",
+      "evidence": "[string \"<python>\"]:209: harvest growth must not rescan/rebuild unrelated buildings"
+    },
+    {
+      "module": "systems/gold_mine_system",
+      "old_version": "expected failure",
+      "evidence": "[string \"<python>\"]:45: wood attack growth must not reschedule gold production or republish mine stats"
+    },
+    {
+      "module": "systems/technology_stat_manager",
+      "old_version": "expected failure",
+      "evidence": "[string \"<python>\"]:42: growth presentation is coalesced"
+    },
+    {
+      "module": "systems/hero_combat_stat_service",
+      "old_version": "expected failure",
+      "evidence": "[string \"<python>\"]:76: wood growth must not recompute hero/equipment"
+    }
+  ],
+  "changed_runtime_files": [
+    "scripts\\vscripts\\systems\\building_upgrade_system.lua",
+    "scripts\\vscripts\\systems\\gold_mine_system.lua",
+    "scripts\\vscripts\\systems\\hero_combat_stat_service.lua",
+    "scripts\\vscripts\\systems\\technology_stat_manager.lua",
+    "scripts\\vscripts\\systems\\worker_system.lua",
+    "scripts\\vscripts\\ui\\combat_stats_ui_service.lua",
+    "scripts\\vscripts\\ui\\game_info_service.lua"
+  ],
+  "lua51_syntax_passed": 7,
+  "workshop_fps_verified": false,
+  "tests_passed": [
+    "test_lumberjack_training_queue_integration",
+    "test_building_upgrade_lifecycle",
+    "test_gold_mine_reward_upgrade",
+    "test_lumberjack_growth_ui",
+    "test_tree_hit_scan_coalescing",
+    "test_tree_health_projection",
+    "test_resource_ui_coalescing",
+    "test_tree_attacker_whitelist",
+    "test_worker_system_training",
+    "test_production_ui_router"
+  ],
+  "metrics": {
+    "tree_hit_events": 200,
+    "immediate_attack_writes_for_two_workers": 400,
+    "unrelated_building_scans": 0,
+    "worker_attack_timer_range_modifier_resets": 0,
+    "ui_growth_events": 280,
+    "ui_packets_two_players_two_tables": 4
+  },
+  "preserved": "Immediate per-hit resource settlement and shared growth; fusion multiplier and personality bonuses; ordinary research; player isolation; tree replacement/upgrade; existing dirty changes.",
+  "runtime_sha256": {
+    "scripts\\vscripts\\systems\\building_upgrade_system.lua": "90dae6b7f3b9bd0e8c875e4f54a4fe4c03ce9141ee4ec9a39fb6e75276f5a2de",
+    "scripts\\vscripts\\systems\\gold_mine_system.lua": "2fea07ef7948c434438c4b9ed87d15fb58e07fc56a9d44bac65d6746a856733c",
+    "scripts\\vscripts\\systems\\hero_combat_stat_service.lua": "e7a5228d79e7b5a5b912f20828457d40d84b63c505db35955cd20eed6ad32ea5",
+    "scripts\\vscripts\\systems\\technology_stat_manager.lua": "0ffc3275e4718507bc8685f391f006320989e3673c30ef65b9885a7c797051c2",
+    "scripts\\vscripts\\systems\\worker_system.lua": "68239fd54242cd87d03f2a64859554f33ce96038b8cd75cfcd046de834b9f5a7",
+    "scripts\\vscripts\\ui\\combat_stats_ui_service.lua": "f1a78c1f8cb1791defcb79ac6616e7edbbbbed1e8cf8a4cacf4d619e1817c936",
+    "scripts\\vscripts\\ui\\game_info_service.lua": "a28b4fed72ceacca6f4ef77a5389871dedd8cebf2b9091c772d830b793b56068"
+  }
+}

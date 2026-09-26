@@ -363,6 +363,29 @@ SPECS = {
 }
 
 
+
+# A costume bundle only lists purchased slots. Generic creature NPCs do not
+# automatically equip the hero's remaining default wearable slots.
+SPECS["ten_sin_03"]["components"] += [
+    c("head", "123", "models/heroes/alchemist/alchemist_goblin_head.vmdl", "Required default goblin head"),
+    c("body_head", "124", "models/heroes/alchemist/alchemist_ogre_head.vmdl", "Required default ogre head"),
+]
+SPECS["ten_sin_06"]["components"] += [
+    c("weapon", "47", "models/heroes/pudge/righthook.vmdl", "Required default slot"),
+    c("offhand", "259", "models/heroes/pudge/leftweapon.vmdl", "Required default slot"),
+    c("shoulder", "260", "models/heroes/pudge/leftarm.vmdl", "Required default slot"),
+    c("arms", "261", "models/heroes/pudge/bracer.vmdl", "Required default slot"),
+    c("head", "262", "models/heroes/pudge/hair.vmdl", "Required default slot"),
+    c("belt", "470", "models/heroes/pudge/belt.vmdl", "Required default slot"),
+]
+# Official item 12930 replaces default legs with the Arcana refit.
+SPECS["ten_sin_09"]["components"] += [
+    c("legs", "781", "models/items/queenofpain/queenofpain_arcana/queenofpain_arcana_legs.vmdl", "Official Arcana model remap"),
+]
+# Official item 7756's red/default style uses body skin 1, wearables skin 0.
+SPECS["ten_sin_06"]["model_skin"] = "1"
+SPECS["ten_sin_06"]["component_skin"] = "0"
+
 def read_csv_document(path: Path):
     raw = path.read_bytes()
     bom = raw.startswith(b"\xef\xbb\xbf")
@@ -428,6 +451,7 @@ def catalog_rows() -> list[dict[str, str]]:
             "primary_model": spec["body"],
             "default_sequence": "idle",
             "model_scale": "1",
+            "model_skin": spec.get("model_skin", ""),
             "load_group": "monster_default_wearables",
             "load_order": str(order),
             "priority": str(690 - (order - 30)),
@@ -454,6 +478,7 @@ def component_rows() -> list[dict[str, str]]:
                 "attach_mode": "bone_merge",
                 "default_sequence": "idle",
                 "model_scale": "1",
+                "model_skin": spec.get("component_skin", ""),
                 "sort_order": str(order),
                 "enabled": "1",
                 "notes": f"{archetype_id}官方饰品 ItemDef {item_def}" + (f"；{note}" if note else ""),

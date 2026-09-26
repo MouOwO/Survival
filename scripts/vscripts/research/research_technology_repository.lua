@@ -11,13 +11,13 @@ end
 
 function M.new(deps)
     return setmetatable({
-        levels_by_team = {},
+        levels_by_player = {},
         resolve_team = assert(deps.resolve_team, "resolve_team is required"),
     }, M)
 end
 
 function M:Reset()
-    self.levels_by_team = {}
+    self.levels_by_player = {}
 end
 
 function M:GetTeam(player_id)
@@ -27,7 +27,7 @@ end
 function M:GetLevel(player_id, tech_id)
     local team = self:GetTeam(player_id)
     if team == nil then return 0 end
-    return tonumber((self.levels_by_team[team] or {})[tech_id]) or 0
+    return tonumber((self.levels_by_player[player_id] or {})[tech_id]) or 0
 end
 
 function M:SetLevel(player_id, tech_id, level)
@@ -38,14 +38,14 @@ function M:SetLevel(player_id, tech_id, level)
         or level < 0 or level > definition.max_level then
         return false
     end
-    self.levels_by_team[team] = self.levels_by_team[team] or {}
-    self.levels_by_team[team][tech_id] = math.floor(level)
+    self.levels_by_player[player_id] = self.levels_by_player[player_id] or {}
+    self.levels_by_player[player_id][tech_id] = math.floor(level)
     return true
 end
 
 function M:GetAllLevels(player_id)
     local team = self:GetTeam(player_id)
-    return copy(team ~= nil and self.levels_by_team[team] or {})
+    return copy(team ~= nil and self.levels_by_player[player_id] or {})
 end
 
 function M:GetLegacyLevels(player_id)

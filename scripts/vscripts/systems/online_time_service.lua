@@ -268,6 +268,7 @@ end
 
 local function start(player_id)
     player_id = tonumber(player_id)
+    if require("systems/player_context_service").is_defeated(player_id) then return end
     if player_id == nil or player_id < 0 then return end
     local current = sessions[player_id]
     if current then

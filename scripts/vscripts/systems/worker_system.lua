@@ -10,7 +10,12 @@ local armor_balance = require("config/armor_balance")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 local personality_definitions = require("config/generated/lumberjack_personality_definitions")
 
+local scheduler = require("core/scheduler")
+local worker_training_queue = require("systems/worker_training_queue_service")
+
 local M = {}
+local training_queue
+local disconnected_players = {}
 local workers = {}
 local current_tree_entindex = -1
 local tree_lumber_efficiency_buff = 0
@@ -285,10 +290,6 @@ local function required_city_level(training)
     )) or 1
 end
 
-local function lumberjack_training_state(team)
-    return lumberjack_training:get(team)
-end
-
 local function population_training_state(team)
     local key = tonumber(team) or team
     local counts = population_training_counts[key] or {}
@@ -486,6 +487,23 @@ end
 local function on_technology_stats_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
+    if payload.changed_section == "lumberjack" and payload.changed_field == "attack" then
+        -- Each hit grows the shared attack pool immediately. Only attack changed:
+        -- do not reset every worker's range, attack timer, yield and modifiers.
+        local attack = technology_stat_manager.get(player_id).final.lumberjack.attack_flat or 0
+        for entindex, state in pairs(workers) do
+            if state.worker_type == "lumberjack" and state.player_id == player_id
+                and valid_entity(state.unit) then
+                apply_lumberjack_attack(state, attack)
+                state.technology_attack_growth = attack * (tonumber(state.technology_multiplier) or 1)
+                event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+                    unit = state.unit, entindex = entindex, player_id = player_id,
+                    reason = payload.reason or "lumberjack_attack_growth",
+                })
+            end
+        end
+        return
+    end
     refresh_worker_technology(player_id, payload.reason)
 end
 
@@ -619,6 +637,9 @@ local function train_worker_one(payload)
         return { ok = false, error = "training_building_missing" }
     end
 
+    if require("systems/player_context_service").is_defeated(city_state.player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     local training_id = tostring(
         payload.training_id or "train_lumberjack_auto"
     )
@@ -640,11 +661,16 @@ local function train_worker_one(payload)
     local is_repairer_request = training_id == "train_repairer_auto"
         or string.match(training_id, "^train_repairer_") ~= nil
     if is_lumberjack_request then
-        local current = lumberjack_training:current(city_state.team)
-        if not current then
-            return { ok = false, error = "lumberjack_training_missing" }
+        if training_id == "train_lumberjack_auto" then
+            local current = lumberjack_training:current(city_state.player_id)
+            if not current then return { ok = false, error = "lumberjack_training_missing" } end
+            training_id = current.training_id
         end
-        training_id = current.training_id
+        local progress = lumberjack_training:get_for(city_state.player_id, training_id)
+        if not progress then return {ok = false, error = "training_definition_invalid"} end
+        if progress.completed == 1 and payload.allow_extra_slot ~= true then
+            return {ok = false, error = "training_max_count_reached"}
+        end
     elseif is_repairer_request then
         if training_id == "train_repairer_auto" then
             training_id = "train_repairer_01"
@@ -743,7 +769,8 @@ local function train_worker_one(payload)
     local gold_cost = payload.gold_cost_override ~= nil
         and math.max(0, tonumber(payload.gold_cost_override) or 0)
         or tonumber(training.gold_cost) or 0
-    local spend = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+    local spend = payload.prepaid == true and {ok = true}
+        or event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         player_id = city_state.player_id,
         team = city_state.team,
         wood = wood_cost,
@@ -765,19 +792,21 @@ local function train_worker_one(payload)
         city_state.team
     )
     if not worker then
-        event_bus.request(events.RESOURCE_ADD_REQUEST, {
-            player_id = city_state.player_id,
-            team = city_state.team,
-            wood = wood_cost,
-            gold = gold_cost,
-            reason = "train_refund:" .. training_id,
-        })
-        event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
-            player_id = city_state.player_id,
-            team = city_state.team,
-            population = tonumber(training.population_cost) or 0,
-            reason = "train_refund:" .. training_id,
-        })
+        if payload.prepaid ~= true then
+            event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                player_id = city_state.player_id,
+                team = city_state.team,
+                wood = wood_cost,
+                gold = gold_cost,
+                reason = "train_refund:" .. training_id,
+            })
+            event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+                player_id = city_state.player_id,
+                team = city_state.team,
+                population = tonumber(training.population_cost) or 0,
+                reason = "train_refund:" .. training_id,
+            })
+        end
         return { ok = false, error = "worker_create_failed" }
     end
 
@@ -795,6 +824,9 @@ local function train_worker_one(payload)
     local base_attack = tonumber(training.base_attack)
     worker.survival_lumberjack_level = is_lumberjack
         and tonumber(training.level) or nil
+    worker.survival_display_name = is_lumberjack
+        and ("伐木工LV" .. tostring(tonumber(training.level) or 1))
+        or training.name
     worker.survival_base_attack = base_attack or 0
     worker.survival_base_wood_per_hit = tonumber(training.wood_per_hit) or 0
     if base_attack ~= nil then
@@ -889,9 +921,9 @@ local function train_worker_one(payload)
         refresh_cheer_buffs(city_state.player_id)
     end
     local training_progress = nil
-    if is_lumberjack then
-        training_progress = lumberjack_training:record_success(
-            city_state.team,
+    if is_lumberjack and payload.skip_training_progress ~= true then
+        training_progress = lumberjack_training:record_independent(
+            city_state.player_id,
             training_id
         )
     elseif is_repairer and payload.skip_training_progress ~= true then
@@ -921,6 +953,161 @@ local function train_worker_one(payload)
     }
 end
 
+local function training_source_valid(job)
+    local city = job.city
+    if not valid_entity(city) or (city.IsAlive and not city:IsAlive()) then
+        return false, "training_building_missing"
+    end
+    local state = event_bus.request(events.BUILDING_QUERY_REQUEST, {entindex = city:entindex()})
+    if not state or state.building_id ~= "main_city" then return false, "not_main_city" end
+    if tonumber(state.player_id) ~= job.player_id or state.team ~= job.team then
+        return false, "training_owner_mismatch"
+    end
+    if disconnected_players[job.player_id] then return false, "player_disconnected" end
+    if require("systems/player_context_service").is_defeated(job.player_id) then
+        return false, "player_defeated"
+    end
+    if (tonumber(state.level) or 1) < required_city_level(job.definition) then
+        return false, "training_city_level_required"
+    end
+    return true
+end
+
+local function initialize_training_queue()
+    if training_queue then training_queue:reset() end
+    training_queue = worker_training_queue.create({
+        capacity = 7,
+        now = function() return GameRules:GetGameTime() end,
+        schedule = scheduler.after,
+        cancel = scheduler.cancel,
+        validate = training_source_valid,
+        reserve = function(job)
+            local before = event_bus.request(events.RESOURCE_GET_REQUEST, {player_id = job.player_id})
+            local spent = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
+                player_id = job.player_id, team = job.team,
+                wood = job.wood_cost, gold = job.gold_cost, population = job.population,
+                reason = "training_queue:" .. job.training_id,
+            })
+            -- Debug resource mode can accept a purchase without charging it.
+            -- Refund only its actual reservation when the resource service
+            -- provides the authoritative post-spend snapshot.
+            if spent and spent.ok and before and spent.snapshot then
+                job.refund_wood = math.max(0, (tonumber(before.wood) or 0) - (tonumber(spent.snapshot.wood) or 0))
+                job.refund_gold = math.max(0, (tonumber(before.gold) or 0) - (tonumber(spent.snapshot.gold) or 0))
+                job.refund_population = math.max(0, (tonumber(spent.snapshot.population) or 0) - (tonumber(before.population) or 0))
+            end
+            return spent
+        end,
+        refund = function(job, reason)
+            event_bus.request(events.RESOURCE_ADD_REQUEST, {
+                player_id = job.player_id, team = job.team,
+                wood = job.refund_wood or job.wood_cost, gold = job.refund_gold or job.gold_cost,
+                reason = "training_queue_refund:" .. job.training_id,
+            })
+            event_bus.request(events.RESOURCE_RELEASE_POP_REQUEST, {
+                player_id = job.player_id, team = job.team, population = job.refund_population or job.population,
+                reason = "training_queue_refund:" .. job.training_id,
+            })
+            if reason ~= "player_disconnected" and reason ~= "player_defeated" then
+                notify(job.player_id, "训练已取消，资源和人口已退还", "error")
+            end
+        end,
+        finish = function(job)
+            return train_worker_one({city = job.city, training_id = job.training_id,
+                player_id = job.player_id, prepaid = true})
+        end,
+        changed = function(player_id, team, source_entindex)
+            event_bus.emit(events.WORKER_CHANGED, {player_id = player_id, team = team,
+                source_entindex = source_entindex, training_queue_changed = 1})
+        end,
+    })
+end
+
+local function enqueue_lumberjack(payload)
+    local city = payload.city
+    if not valid_entity(city) then return {ok = false, error = "invalid_city"} end
+    local state = event_bus.request(events.BUILDING_QUERY_REQUEST, {entindex = city:entindex()})
+    if not state or state.building_id ~= "main_city" then return {ok = false, error = "not_main_city"} end
+    local player_id = tonumber(state.player_id)
+    if player_id == nil or (payload.player_id ~= nil and tonumber(payload.player_id) ~= player_id) then
+        return {ok = false, error = "training_owner_mismatch"}
+    end
+    local training_id = tostring(payload.training_id or "train_lumberjack_auto")
+    local allowed, next_training_id, slots = {}, nil, 0
+    for _, progress in ipairs(lumberjack_training:get_all(player_id)) do
+        if progress.completed ~= 1 then
+            slots = slots + 1
+            if slots <= 4 then allowed[progress.training_id] = true end
+            if not next_training_id and (progress.max_count < 0
+                or progress.count + training_queue:reserved(player_id, progress.training_id) < progress.max_count) then
+                next_training_id = progress.training_id
+            end
+        end
+    end
+    if training_id == "train_lumberjack_auto" then training_id = next_training_id end
+    if not training_id or not allowed[training_id] then
+        return {ok = false, error = "training_not_available"}
+    end
+    local progress = lumberjack_training:get_for(player_id, training_id)
+    local reserved = training_queue:reserved(player_id, training_id)
+    if progress.max_count >= 0 and progress.count + reserved >= progress.max_count then
+        return {ok = false, error = "training_max_count_reached"}
+    end
+    local row = training_definitions.by_id[training_id]
+    return training_queue:enqueue({city = city, source_entindex = city:entindex(),
+        player_id = player_id, team = state.team, training_id = training_id,
+        level = progress.level, name = progress.name, definition = row,
+        duration = math.max(0.05, tonumber(row.training_duration_seconds) or 1),
+        wood_cost = math.max(0, tonumber(row.wood_cost) or 0),
+        gold_cost = math.max(0, tonumber(row.gold_cost) or 0),
+        population = math.max(0, tonumber(row.population_cost) or 0),
+    })
+end
+
+local function lumberjack_training_state(payload)
+    local player_id = tonumber(payload.player_id)
+    if player_id == nil then return {ok = false, error = "player_id_invalid", options = {}} end
+    local source_entindex = tonumber(payload.source_entindex)
+    local state = source_entindex and event_bus.request(events.BUILDING_QUERY_REQUEST, {
+        entindex = source_entindex,
+    }) or nil
+    if state and (tonumber(state.player_id) ~= player_id or state.building_id ~= "main_city") then
+        return {ok = false, error = "training_owner_mismatch", options = {}}
+    end
+    local result = lumberjack_training:get(player_id)
+    local queue = training_queue:snapshot(source_entindex, player_id)
+    for key, value in pairs(queue) do result[key] = value end
+    result.player_id, result.source_entindex = player_id, source_entindex or -1
+    result.options = lumberjack_training:get_all(player_id)
+    local slots = 0
+    for _, option in ipairs(result.options) do
+        option.queued_count = training_queue:reserved(player_id, option.training_id)
+        option.cost_gold, option.cost_wood = option.gold_cost, option.wood_cost
+        option.population = option.population_cost
+        option.train_duration = math.max(0.05, option.train_duration)
+        option.available, option.reason = 1, ""
+        if option.completed ~= 1 then slots = slots + 1 end
+        if option.completed == 1 or (option.max_count >= 0 and option.count + option.queued_count >= option.max_count) then
+            option.available, option.reason = 0, "training_max_count_reached"
+        elseif slots > 4 then option.available, option.reason = 0, "training_not_available"
+        elseif not state then option.available, option.reason = 0, "training_building_missing"
+        elseif (tonumber(state.level) or 1) < option.requires_city_level then
+            option.available, option.reason = 0, "training_city_level_required"
+        elseif queue.queue_count >= queue.queue_capacity then
+            option.available, option.reason = 0, "training_queue_full"
+        elseif require("systems/player_context_service").is_defeated(player_id) or disconnected_players[player_id] then
+            option.available, option.reason = 0, "player_defeated"
+        else
+            local spend = event_bus.request(events.RESOURCE_CAN_SPEND_REQUEST, {
+                player_id = player_id, team = state.team, wood = option.cost_wood,
+                gold = option.cost_gold, population = option.population,
+            })
+            if spend and not spend.ok then option.available, option.reason = 0, spend.error end
+        end
+    end
+    return result
+end
+
 function M.register_fused_lumberjack(worker, data)
     if not valid_entity(worker) or not data then
         return { ok = false, error = "fused_worker_invalid" }
@@ -940,6 +1127,7 @@ function M.register_fused_lumberjack(worker, data)
     worker.survival_worker_type = "lumberjack"
     worker.survival_super_lumberjack = true
     worker.survival_lumberjack_level = level
+    worker.survival_display_name = "超级伐木工LV" .. tostring(level)
     worker.survival_lumberjack_fusion_count = fusion_count
     worker.survival_player_id = player_id
     worker.survival_base_attack = base_attack
@@ -1113,12 +1301,15 @@ function M.rollback_fused_lumberjack(target)
 end
 
 local function on_tree_spawned(payload)
-    current_tree_entindex = payload.entindex or -1
-    tree_lumber_efficiency_buff = math.max(
-        0, tonumber(payload.lumber_efficiency_buff) or 0
-    )
-    update_worker_targets()
-    update_worker_efficiency()
+    local next_entindex = payload.entindex or -1
+    local next_efficiency = math.max(0, tonumber(payload.lumber_efficiency_buff) or 0)
+    local target_changed = current_tree_entindex ~= next_entindex
+    local efficiency_changed = tree_lumber_efficiency_buff ~= next_efficiency
+    current_tree_entindex = next_entindex
+    tree_lumber_efficiency_buff = next_efficiency
+    -- A full-health reset at the level cap keeps the same tree and yield.
+    if target_changed then update_worker_targets() end
+    if target_changed or efficiency_changed then update_worker_efficiency() end
 end
 
 local function on_tree_destroyed(payload)
@@ -1191,6 +1382,10 @@ end
 
 local function train_worker(payload)
     payload = payload or {}
+    local training_id = tostring(payload.training_id or "train_lumberjack_auto")
+    if payload.source ~= "rogue_reward" and training_id:match("^train_lumberjack_") then
+        return enqueue_lumberjack(payload)
+    end
     local count = payload.source == "rogue_reward"
         and math.max(1, math.floor(tonumber(payload.count) or 1)) or 1
     if count == 1 then return train_worker_one(payload) end
@@ -1243,6 +1438,8 @@ end
 local function on_player_disconnected(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
+    disconnected_players[player_id] = true
+    if training_queue then training_queue:cancel_player(player_id, "player_disconnected") end
     local targets = {}
     for _, state in pairs(workers) do
         if state.player_id == player_id and valid_entity(state.unit) then
@@ -1264,6 +1461,8 @@ function M.init()
     population_training_counts = {}
     lumberjack_training:reset()
     repairer_training:reset()
+    disconnected_players = {}
+    initialize_training_queue()
     event_bus.handle_request(events.WORKER_TRAIN_REQUEST, train_worker)
     event_bus.handle_request(events.WORKER_DISMISS_REQUEST, dismiss_worker)
     event_bus.handle_request(events.WORKER_LIST_REQUEST, function(payload)
@@ -1278,6 +1477,9 @@ function M.init()
         return result
     end)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
+    event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
+        training_queue:cancel_player(tonumber(payload.player_id), "player_defeated")
+    end)
     event_bus.handle_request(
         events.WORKER_TRAINING_GET_REQUEST,
         function(payload)
@@ -1303,7 +1505,7 @@ function M.init()
                     and progress.count >= progress.max_count and 1 or 0
                 return progress
             end
-            return lumberjack_training_state(payload.team)
+            return lumberjack_training_state(payload)
         end
     )
     event_bus.subscribe(events.TREE_SPAWNED, on_tree_spawned)
@@ -1316,11 +1518,20 @@ function M.init()
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,
         on_technology_stats_changed)
     event_bus.subscribe(events.BUILDING_CREATED, function(payload)
+        local city = payload and payload.unit
+        if payload and payload.building_id == "main_city" and valid_entity(city)
+            and city.FindAbilityByName then
+            local ability = city:FindAbilityByName("ability_train_lumberjack")
+            if ability and ability.SetHidden then ability:SetHidden(true) end
+        end
         if payload and payload.player_id ~= nil then
             refresh_cheer_buffs(tonumber(payload.player_id))
         end
     end)
     event_bus.subscribe(events.BUILDING_DESTROYED, function(payload)
+        if payload and payload.entindex then
+            training_queue:cancel_city(payload.entindex, "training_building_missing")
+        end
         if payload and payload.player_id ~= nil then
             refresh_cheer_buffs(tonumber(payload.player_id))
         end

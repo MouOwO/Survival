@@ -421,6 +421,15 @@ local function load_marker_regions()
     end
 end
 
+-- Read-only point occupancy for builder work positions. This does not bypass
+-- building placement policy and never changes an occupied cell.
+function M.is_position_occupied(position)
+    if not position then return true end
+    local size = number(config.cell_size, 128)
+    local x, y = math.floor(position.x / size), math.floor(position.y / size)
+    return occupied_by_other(x, y, nil)
+end
+
 function M.init()
     occupied = {}
     load_marker_regions()

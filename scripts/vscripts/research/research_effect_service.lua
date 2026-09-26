@@ -80,13 +80,13 @@ function M:Recalculate(player_id)
         legacy = legacy_projection(values),
     }
     local team = self.repository:GetTeam(player_id)
-    if team ~= nil then self.snapshots[team] = snapshot end
+    if team ~= nil then self.snapshots[player_id] = snapshot end
     return snapshot
 end
 
 function M:Get(player_id)
     local team = self.repository:GetTeam(player_id)
-    return team ~= nil and self.snapshots[team] or self:Recalculate(player_id)
+    return team ~= nil and self.snapshots[player_id] or self:Recalculate(player_id)
 end
 
 return M

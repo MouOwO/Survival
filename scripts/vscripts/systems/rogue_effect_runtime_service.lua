@@ -237,6 +237,9 @@ end
 function M.grant(player_id, card_id, grant_id, reward_type)
     player_id = tonumber(player_id)
     card_id = tostring(card_id or "")
+    if require("systems/player_context_service").is_defeated(player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     if player_id == nil or player_id < 0 or not PlayerResource:GetPlayer(player_id) then
         return { ok = false, error = "player_invalid" }
     end
@@ -316,6 +319,11 @@ function M.init()
     next_phase_instance_id, next_target_binding_id = 0, 0
     effect_state.reset()
     builder_effects.init()
+    subscriptions[#subscriptions + 1] = event_bus.subscribe(require("core/events").PLAYER_DEFEATED, function(payload)
+        for _, instance in pairs(instances_by_player[tonumber(payload.player_id)] or {}) do
+            deactivate(instance, "player_defeated")
+        end
+    end)
     rebuild_config()
     local subscribed = {}
     for _, rules in pairs(rules_by_effect) do

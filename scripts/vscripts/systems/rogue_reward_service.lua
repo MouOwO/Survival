@@ -63,6 +63,8 @@ local function publish(player_id, reason, reward_type_id)
     local pool_state = pool_for(state, reward_type_id)
     local offer = pool_state.offer
     local payload = { active = offer and 1 or 0, reason = reason or "changed", history = state.history }
+    payload.builder_talent = state.builder_talent or {}
+    payload.talent_pending = state.builder_talent and 0 or 1
     if offer then
         payload.token = offer.token
         payload.rerolls_remaining = offer.rerolls_remaining
@@ -258,13 +260,27 @@ end
 
 local function open(payload)
     local player_id = tonumber(payload and payload.player_id)
+    if require("systems/player_context_service").is_defeated(player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     if player_id == nil or player_id < 0 then return { ok = false, error = "player_invalid" } end
     local state = state_for(player_id)
     local source = tostring(payload.source or "unknown")
     local reward_type_id = reward_type(payload)
     local pool_state = pool_for(state, reward_type_id)
     if reward_type_id == BUILDER_REWARD_TYPE and pool_state.consumed then
-        return { ok = false, error = "builder_reward_consumed" }
+        if state.builder_talent then
+            event_bus.emit(events.UI_NOTIFICATION, {player_id = player_id, level = "info",
+                message = tostring(state.builder_talent.name) .. "：" .. tostring(state.builder_talent.description)})
+            return {ok = true, selected = state.builder_talent.card_id}
+        end
+        -- Reopening must reuse the existing token, never add a second reward.
+        if pool_state.offer and (not state.visible_reward_type
+            or state.visible_reward_type == BUILDER_REWARD_TYPE) then
+            state.visible_reward_type = BUILDER_REWARD_TYPE
+            publish(player_id, "talent_reopened", BUILDER_REWARD_TYPE)
+        end
+        return {ok = true, queued = state.visible_reward_type ~= BUILDER_REWARD_TYPE}
     end
     local visible_offer = state.visible_reward_type
         and pool_for(state, state.visible_reward_type).offer or nil
@@ -288,6 +304,9 @@ end
 
 local function valid_offer(payload)
     local player_id = tonumber(payload and payload.player_id)
+    if require("systems/player_context_service").is_defeated(player_id) then
+        return nil, nil, nil, nil, { ok = false, error = "player_defeated" }
+    end
     local state = player_id and state_for(player_id) or nil
     if not state then
         return nil, nil, nil, nil, { ok = false, error = "offer_stale" }
@@ -360,10 +379,14 @@ local function select_card(payload)
     end
     pool_state.claimed[card_id] = true
     local selected = (cards.by_id or {})[card_id]
+    if selected and offer.reward_type == BUILDER_REWARD_TYPE then
+        state.builder_talent = {card_id = card_id, name = selected.display_name,
+            description = selected.description, icon_name = "survival/native/talent_" .. card_id}
+    end
     if selected then
         table.insert(state.history, 1, {card_id=card_id, name=selected.display_name,
-            description=selected.description, reward_type=offer.reward_type})
-        while #state.history > 4 do table.remove(state.history) end
+            description=selected.description, icon_name=selected.icon_name, reward_type=offer.reward_type})
+        while #state.history > 20 do table.remove(state.history) end
     end
     pool_state.offer = nil
     if state.visible_reward_type == offer.reward_type then
@@ -389,6 +412,14 @@ end
 
 function M.init()
     state_by_player = {}; next_token = 0; effects.init()
+    event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
+        local player_id = tonumber(payload.player_id)
+        local state = state_by_player[player_id]
+        if not state then return end
+        for _, pool in pairs(state.pools) do pool.offer, pool.queue = nil, {} end
+        state.visible_reward_type = nil
+        publish(player_id, "player_defeated")
+    end)
     event_bus.handle_request(events.ROGUE_REWARD_OPEN_REQUEST, open)
     event_bus.handle_request(events.ROGUE_REWARD_SELECT_REQUEST, select_card)
     event_bus.handle_request(events.ROGUE_REWARD_REROLL_REQUEST, reroll)

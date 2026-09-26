@@ -6,6 +6,10 @@ local linked = {}
 
 local modifiers = {
     {
+        name = "modifier_survival_builder_phase",
+        path = "modifiers/modifier_survival_builder_phase",
+    },
+    {
         name = "modifier_native_wearable_visual_carrier",
         path = "modifiers/modifier_native_wearable_visual_carrier",
     },

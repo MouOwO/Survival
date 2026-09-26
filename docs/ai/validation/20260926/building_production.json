@@ -1,0 +1,174 @@
+{
+  "lua_behavior_tests": [
+    "scripts/vscripts/tests/test_production_ui_router.lua",
+    "scripts/vscripts/tests/test_grid_builder_preview.lua",
+    "scripts/vscripts/tests/test_worker_training_queue.lua",
+    "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+    "scripts/vscripts/tests/test_worker_system_training.lua",
+    "scripts/vscripts/tests/test_research_production_auto.lua",
+    "scripts/vscripts/tests/test_research_runtime_projection.lua",
+    "scripts/vscripts/tests/test_resource_ui_coalescing.lua",
+    "scripts/vscripts/tests/test_shop_early_final_cooldown.lua",
+    "scripts/vscripts/tests/test_lumberjack_fusion.lua",
+    "scripts/vscripts/tests/test_lumberjack_fusion_ui.lua",
+    "scripts/vscripts/tests/test_rogue_item_rewards.lua",
+    "scripts/vscripts/tests/test_startup_ui_request_gate.lua",
+    "scripts/vscripts/tests/test_tower_destruction_rebuild.lua",
+    "scripts/vscripts/tests/test_stat_push_coalescer.lua",
+    "scripts/vscripts/tests/test_building_upgrade_lifecycle.lua",
+    "scripts/vscripts/tests/test_builder_work_position.lua",
+    "scripts/vscripts/tests/test_builder_yield_construction.lua",
+    "scripts/vscripts/tests/test_builder_tower_rebuild.lua"
+  ],
+  "lua_behavior_pass": 19,
+  "lua_syntax_utf8_files": [
+    "scripts/vscripts/core/events.lua",
+    "scripts/vscripts/core/modifier_registry.lua",
+    "scripts/vscripts/systems/worker_system.lua",
+    "scripts/vscripts/systems/worker_training_queue_service.lua",
+    "scripts/vscripts/systems/worker_training_progress.lua",
+    "scripts/vscripts/systems/building_system.lua",
+    "scripts/vscripts/systems/builder_service.lua",
+    "scripts/vscripts/systems/builder_work_position_service.lua",
+    "scripts/vscripts/systems/grid_placement_system.lua",
+    "scripts/vscripts/modifiers/modifier_survival_builder_phase.lua",
+    "scripts/vscripts/systems/shop_system.lua",
+    "scripts/vscripts/systems/shop_catalog.lua",
+    "scripts/vscripts/systems/research_lab_ability_sync.lua",
+    "scripts/vscripts/ui/production_ui_service.lua",
+    "scripts/vscripts/ui/ui_request_router.lua",
+    "scripts/vscripts/ui/grid_placement_router.lua",
+    "scripts/vscripts/ui/ability_runtime_service.lua",
+    "scripts/vscripts/ui/ability_runtime_builder.lua",
+    "scripts/vscripts/tests/test_production_ui_router.lua",
+    "scripts/vscripts/tests/test_grid_builder_preview.lua",
+    "scripts/vscripts/tests/test_worker_training_queue.lua",
+    "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+    "scripts/vscripts/tests/test_worker_system_training.lua",
+    "scripts/vscripts/tests/test_research_production_auto.lua",
+    "scripts/vscripts/tests/test_research_runtime_projection.lua",
+    "scripts/vscripts/tests/test_resource_ui_coalescing.lua",
+    "scripts/vscripts/tests/test_shop_early_final_cooldown.lua",
+    "scripts/vscripts/tests/test_lumberjack_fusion.lua",
+    "scripts/vscripts/tests/test_lumberjack_fusion_ui.lua",
+    "scripts/vscripts/tests/test_rogue_item_rewards.lua",
+    "scripts/vscripts/tests/test_startup_ui_request_gate.lua",
+    "scripts/vscripts/tests/test_tower_destruction_rebuild.lua",
+    "scripts/vscripts/tests/test_stat_push_coalescer.lua",
+    "scripts/vscripts/tests/test_building_upgrade_lifecycle.lua",
+    "scripts/vscripts/tests/test_builder_work_position.lua",
+    "scripts/vscripts/tests/test_builder_yield_construction.lua",
+    "scripts/vscripts/tests/test_builder_tower_rebuild.lua"
+  ],
+  "lua_syntax_utf8_pass": 37,
+  "log": "output/production_research_20260926/followup_lua_regressions.log",
+  "updated_at": "2026-09-26T11:24:16.326141+08:00",
+  "task": "building training/research FIFO, live sorted levels, larger text, stronger upgrade icon sizes, builder phasing and move-aside construction",
+  "validation_level": [
+    "STATIC",
+    "CONTRACT",
+    "SIMULATION",
+    "RESOURCE_COMPILER"
+  ],
+  "workshop_new_match_verified": false,
+  "node_behavior_tests": [
+    "tools/test_production_hud.cjs",
+    "tools/test_handoff_refresh.cjs",
+    "tools/test_world_overlay_visibility.cjs"
+  ],
+  "node_behavior_pass": 3,
+  "node_log": "output/production_research_20260926/followup_node_regressions.log",
+  "js_syntax_pass": 6,
+  "compile": [
+    {
+      "entry": "survival_hud.xml",
+      "compiled": 15,
+      "failed": 0,
+      "log": "output/production_research_20260926/compile_followup_survival_hud.xml.log"
+    },
+    {
+      "entry": "building_upgrade_assets.xml",
+      "compiled": 3,
+      "failed": 0,
+      "log": "output/production_research_20260926/compile_followup_building_upgrade_assets.xml.log"
+    }
+  ],
+  "source_content_sync": [
+    {
+      "source": "panorama/src/layout/custom_game/survival_hud.xml",
+      "sha256": "0934e23c3dc961ab53c9c0212c422995c188b9e57453769e60c78a1b5e16c286"
+    },
+    {
+      "source": "panorama/src/layout/custom_game/building_upgrade_assets.xml",
+      "sha256": "581e13aa4d90ca10b4f2f4a1033f87fbf8ecbe6dfee7ab5ee5bcd9e17cda23c9"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/production_progress.js",
+      "sha256": "1859ca9a6c22637ecfd3e3ddb9c756e164ad2d3464765fb49f92232b2f718b39"
+    },
+    {
+      "source": "panorama/src/styles/custom_game/production_progress.css",
+      "sha256": "19e7acc536d8f1cb688756cc06a61ad9859961f503bfc80c58cd38c85b294a3d"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/combat_stats.js",
+      "sha256": "ae746aafa93068395e454026fee6dd258ee475d8f38651c28070efe6441dcf20"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/hud_takeover.js",
+      "sha256": "ea04e8b1b6d814b24943a3833ea9d60b057514d12cba921502badc34100168da"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/ability_tooltip.js",
+      "sha256": "ff92d2e67382f02e5630dbaf90bf73f29d6ebd2e45ebb543e2cc42e456905fe3"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+      "sha256": "2eed35d401c1f7f26490ec758e619e57b67b126feaf46aab2ddde8cd3ccdece9"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/world_overlay_visibility.js",
+      "sha256": "758ff8ced1a84a77bcdb56c29eb3b146c7141ebb4c98aa22652d9bdcc299de9c"
+    },
+    {
+      "source": "panorama/src/images/spellicons/survival/building_upgrade.png",
+      "sha256": "16609b5172b36f789a98ebb0b3e8076d7256da86c3f075b18c1a24dc8766e6bd"
+    },
+    {
+      "source": "panorama/src/images/spellicons/survival/building_upgrade_max.png",
+      "sha256": "f42c3a3cda8a35368fe22605c8bdc325bcf8ed71b63e88fb88d3b4d4c79a1233"
+    }
+  ],
+  "upgrade_icons": [
+    {
+      "asset": "building_upgrade.png",
+      "width": 1254,
+      "height": 1254,
+      "gold_subject_width": 0.36921850079744817,
+      "gold_subject_height": 0.4864433811802233,
+      "sha256": "16609B5172B36F789A98EBB0B3E8076D7256DA86C3F075B18C1A24DC8766E6BD"
+    },
+    {
+      "asset": "building_upgrade_max.png",
+      "width": 1254,
+      "height": 1254,
+      "gold_subject_width": 0.6539074960127592,
+      "gold_subject_height": 0.759170653907496,
+      "sha256": "F42C3A3CDA8A35368FE22605C8BDC325BCF8ED71B63E88FB88D3B4D4C79A1233"
+    }
+  ],
+  "image_generation_prompts": "docs/ai/validation/20260926/building_upgrade_queue_icon_prompts.json",
+  "behavior": {
+    "worker": "1 second; 1 active + 4 waiting; live ascending first four uncompleted tiers; prepaid reservation, actual successful completion counts",
+    "research": "2 seconds; 1 active + 4 waiting; repeated technology queues consecutive levels; costs charged at start; FIFO blocked head retained; manual priority; auto waits full 1 second after completion",
+    "authority": "trusted PlayerID; authenticated building source; normal labs owned, advanced labs same team; private player levels/costs/queues; no client cost/free/source forwarding",
+    "builder": "permanent NO_UNIT_COLLISION with ground movement; only own authenticated builder ignored during preview; nearest reachable safe point; actual movement then full target validation before one payment/create",
+    "ui": "25 percent larger fonts; production scale minimum 0.5; true scaled world-overlay bounds; current icon plus four waiting icons"
+  },
+  "whitespace_check": "pass excluding pre-existing unrelated tools/aliyun_game_test_auth.py newline issue",
+  "known_verification_limits": [
+    "New Lua requires a new Workshop Tools match.",
+    "Native building phasing, foot placement and final visual readability need in-game verification.",
+    "Terrain/map static obstacles remain governed by ground navigation."
+  ]
+}

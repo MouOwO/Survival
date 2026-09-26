@@ -21,15 +21,21 @@ for _, row in ipairs(builder_ability_stages.rows or {}) do
             tonumber(row.slot_order) or 0
     end
 end
-local function rogue_reward_runtime()
+local function rogue_reward_runtime(state)
+    local snapshot = CustomNetTables and CustomNetTables.GetTableValue
+        and CustomNetTables:GetTableValue("survival_rogue_reward", tostring(state.player_id)) or {}
+    local talent = snapshot and snapshot.builder_talent or {}
+    local selected = talent.card_id ~= nil and talent.card_id ~= ""
     local row = (tooltip_definitions.by_id or {})["ability:ability_survival_rogue_reward"] or {}
     return {
         available = 1,
         can_afford = 1,
         builder_slot_order = builder_slot_order_by_ability["ability_survival_rogue_reward"] or 7,
-        display_name = row.name or "肉鸽奖励",
-        upgrade_description = row.desc or "打开肉鸽三选一奖励。",
-        status_text = "可打开三选一奖励",
+        display_name = "天赋",
+        talent_pending = selected and 0 or 1,
+        icon_name = selected and talent.icon_name or "survival/native/talent_question",
+        upgrade_description = selected and talent.description or "选择一项开局天赋。",
+        status_text = selected and ("已选择：" .. tostring(talent.name)) or "尚未选择天赋",
         fields = {{ label = "快捷键", value = "G" }},
     }
 end
@@ -118,6 +124,8 @@ local function default_lumberjack_training()
 end
 local function lumberjack_training(state, resources)
     local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
+        player_id = state.player_id,
+        source_entindex = state.unit and state.unit.entindex and state.unit:entindex(),
         team = state.team,
     }) or default_lumberjack_training()
     local required = tonumber(training.requires_city_level) or 1
@@ -156,8 +164,9 @@ local function lumberjack_training(state, resources)
 end
 local function repairer_training(state, resources, training_id)
     local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
-        team = state.team,
         player_id = state.player_id,
+        source_entindex = state.unit and state.unit.entindex and state.unit:entindex(),
+        team = state.team,
         training_type = "repairer",
         training_id = training_id,
     }) or {}
@@ -209,6 +218,8 @@ local function repairer_training(state, resources, training_id)
 end
 local function population_training(state, resources)
     local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
+        player_id = state.player_id,
+        source_entindex = state.unit and state.unit.entindex and state.unit:entindex(),
         team = state.team,
         training_type = "population_upgrade",
     }) or {}
@@ -264,7 +275,7 @@ local function population_training(state, resources)
 end
 local function build_ability(ability_name, state, resources)
     if ability_name == "ability_survival_rogue_reward" then
-        return rogue_reward_runtime()
+        return rogue_reward_runtime(state)
     end
     local definitions = {
         ability_build_wall = buildings.wall,
@@ -340,8 +351,11 @@ local function research_upgrade(ability_name, state, resources)
     local levels = state.research_levels or {}
     local current = tonumber(levels[mapping.technology_group]) or 0
     local maximum = tonumber(definition.max_level) or 0
-    local target = current + 1
     local transaction = state.research_transaction or {}
+    local reserved = tonumber((transaction.reserved_levels or {})[mapping.technology_group]) or 0
+    local target = math.max(current, reserved) + 1
+    local queue_count = tonumber(transaction.queue_count) or (transaction.researching == 1 and 1 or 0)
+    local queue_capacity = tonumber(transaction.capacity) or 7
     local researching = transaction.researching == 1
     local required = definition.prerequisite or {}
     local prerequisite_met = true
@@ -354,17 +368,20 @@ local function research_upgrade(ability_name, state, resources)
     prerequisite_met = prerequisite_met
         and (tonumber(state.reincarnation_level) or 0)
             >= (tonumber(required.reincarnation_level) or 0)
-    if current >= maximum then
+    if target > maximum then
         return {
             research_upgrade = 1,
+            auto_research_available = current < maximum and 1 or 0,
+            auto_research_enabled = transaction.auto_research
+                and transaction.auto_research[mapping.technology_group] and 1 or 0,
             display_name = mapping.display_name,
             available = 0,
             can_afford = 0,
             current_level = current,
             next_level = current,
             max_level = maximum,
-            research_status_code = "max_level",
-            status_text = "科技已满级",
+            research_status_code = current >= maximum and "max_level" or "queued_max_level",
+            status_text = current >= maximum and "科技已满级" or "已排队至最高等级",
             upgrade_description = research_description.build(definition, current, current),
             cost_wood = 0,
             cost_gold = 0,
@@ -383,19 +400,36 @@ local function research_upgrade(ability_name, state, resources)
     local status_code = "available"
     local status = "可以研究"
     local available = true
-    if researching then
+    if queue_count >= queue_capacity then
         available = false
-        status_code = transaction.research_group == mapping.technology_group
-            and "researching_current" or "researching_other"
-        status = status_code == "researching_current"
-            and "正在研究此科技" or "团队已有科技正在研究"
+        status_code = "research_queue_full"
+        status = "研究队列已满（1个研究中＋6个等待）"
     elseif not prerequisite_met then
-        available = false
-        status_code = "prerequisite_not_met"
-        status = "前置条件未满足"
+        status_code = "queue_waiting_prerequisite"
+        status = "可加入队列，轮到时等待前置条件；开始研究时扣费"
+    elseif queue_count > 0 then
+        status_code = "queue_available"
+        status = "可加入研究队列；开始研究时扣费"
+    else
+        status = "可以研究；开始研究时扣费"
     end
     local data = {
         research_upgrade = 1,
+        auto_research_available = 1,
+        auto_research_enabled = transaction.auto_research
+            and transaction.auto_research[mapping.technology_group] and 1 or 0,
+        researching = researching and 1 or 0,
+        research_group = transaction.research_group or "",
+        research_name = transaction.display_name or "",
+        research_target_level = transaction.target_level or 0,
+        research_started_at = transaction.started_at or 0,
+        research_until = transaction.finish_at or 0,
+        research_total = transaction.duration or 2,
+        auto_research_next_at = transaction.next_start_at or 0,
+        research_queue_count = queue_count,
+        research_queue_capacity = queue_capacity,
+        reserved_level = reserved,
+        cost_timing_text = "开始研究时扣费，排队未扣费",
         display_name = mapping.display_name,
         available = available and 1 or 0,
         current_level = current,
@@ -403,7 +437,8 @@ local function research_upgrade(ability_name, state, resources)
         max_level = maximum,
         research_status_code = status_code,
         status_text = status,
-        upgrade_description = research_description.build(definition, current, target),
+        upgrade_description = research_description.build(definition, current, target)
+            .. "\n加入研究队列，开始研究时扣费。",
         fields = research_description.fields(definition, current, target),
         research_effect_current = research_effect_value(definition, current),
         research_effect_next = research_effect_value(definition, target),
@@ -772,13 +807,20 @@ function M.build(ability_name, state, resources)
         return population_training(state, resources)
     end
     if ability_name == "ability_upgrade_farm" then
-        return upgrade_level(
-            buildings.farm,
-            state.level,
-            resources,
-            state,
-            { health = false, armor = false }
-        )
+        local result = upgrade_level(buildings.farm, state.level, resources,
+            state, {health = false, armor = false})
+        if result.next_level then
+            local target = buildings.farm.levels[result.next_level] or {}
+            local required = tonumber(target.requires_city_level) or result.next_level
+            result.fields[#result.fields + 1] = {label = "升级前置", value = "主城LV" .. tostring(required)}
+            local quote = state.unit and event_bus.request(events.BUILDING_UPGRADE_QUOTE_REQUEST,
+                {building = state.unit, player_id = state.player_id})
+            if quote and not quote.ok then
+                result.available = 0
+                result.status_text = quote.error or ("需要主城LV" .. tostring(required))
+            end
+        end
+        return result
     end
     if ability_name == "ability_upgrade_tower"
         or ability_name == "ability_upgrade_tower_lv01"

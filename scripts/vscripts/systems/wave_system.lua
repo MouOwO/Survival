@@ -49,12 +49,15 @@ local DEV_PRELOAD_POLL_INTERVAL = 0.05
 local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
 local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
 local ARCHIVE_CHALLENGE_RETRY_TASK_ID = "archive_challenge_begin_retry"
+local OVERFLOW_TASK_ID = "wave_monster_overflow"
 local wave_resource_sessions = {}
 local wave_model_leases = {}
 local dev_resident_models = {}
 local next_wave_resource_session_id = 0
 local wave_channels = {}
 local disconnected_players = {}
+local player_populations = {}
+local overflow_end_listener = nil
 
 local function movement_type_for(row)
     local definition = archetypes.by_id[row.archetype_id] or {}
@@ -383,20 +386,165 @@ local function reset()
         final_wave_generation_completed = false,
         early_final_used = false,
         victory_settled = false,
+        defeat_settled = false,
+        alive_limit = math.max(0, tonumber(global_rules.wave_alive_limit) or 90),
+        overflow_grace_seconds = math.max(0, tonumber(global_rules.wave_overflow_grace_seconds) or 10),
+        overflow_active = false, overflow_remaining = 0, overflow_deadline = nil,
         post_clear_frozen = false }
-end
-
-local function publish(reason)
-    refresh_selection_state()
-    local data = {}
-    for key, value in pairs(state) do data[key] = value end
-    data.reason = reason
-    event_bus.emit(events.WAVE_CHANGED, data)
 end
 
 local function current_game_time()
     return GameRules and GameRules.GetGameTime
         and tonumber(GameRules:GetGameTime()) or 0
+end
+
+local function game_has_ended()
+    return GameRules and GameRules.State_Get and DOTA_GAMERULES_STATE_POST_GAME
+        and GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME
+end
+
+local function population_player_id(value)
+    local id = tonumber(value)
+    if id == nil or id < 0 or id ~= math.floor(id) then return nil end
+    return id
+end
+
+local function population_for(player_id, create)
+    player_id = population_player_id(player_id)
+    if player_id == nil then return nil end
+    local population = player_populations[player_id]
+    if population == nil and create then
+        population = { player_id = player_id, alive = 0, overflow_active = false,
+            overflow_remaining = 0, player_defeated = false, defeat_reason = "" }
+        player_populations[player_id] = population
+    end
+    return population
+end
+
+local function change_player_alive(player_id, delta)
+    local population = population_for(player_id, delta > 0)
+    if population then population.alive = math.max(0, population.alive + delta) end
+end
+
+local function clear_player_overflow(player_id, population)
+    population = population or population_for(player_id, false)
+    if not population then return end
+    if population.overflow_active or population.overflow_deadline then
+        scheduler.cancel(OVERFLOW_TASK_ID .. ":" .. tostring(player_id))
+    end
+    population.overflow_active, population.overflow_remaining = false, 0
+    population.overflow_deadline = nil
+end
+
+local function clear_overflow()
+    scheduler.cancel(OVERFLOW_TASK_ID) -- retire the former shared timer on hot reload
+    for player_id, population in pairs(player_populations) do
+        clear_player_overflow(player_id, population)
+    end
+    -- Global wave state is used for final-wave completion, never for an overflow clock.
+    state.overflow_active, state.overflow_remaining = false, 0
+    state.overflow_deadline = nil
+end
+
+local function unregister_enemy(entindex, reason)
+    local meta = enemies[entindex]
+    if not meta then return nil end
+    enemies[entindex] = nil
+    state.alive = math.max(0, state.alive - 1)
+    change_player_alive(meta.player_id, -1)
+    local session = meta.wave_resource_session_id
+        and wave_resource_sessions[meta.wave_resource_session_id] or nil
+    if session then session.alive = math.max(0, session.alive - 1) end
+    release_wave_model_resources(session, reason or "enemy_removed")
+    if meta.is_boss then
+        state.boss_alive = false
+        for _, remaining in pairs(enemies) do
+            if remaining.is_boss then state.boss_alive = true; break end
+        end
+    end
+    return meta
+end
+
+local function prune_invalid_enemies()
+    local removed = 0
+    for entindex, meta in pairs(enemies) do
+        if not valid(meta.unit) or not meta.unit:IsAlive() then
+            unregister_enemy(entindex, "invalid_enemy_removed")
+            removed = removed + 1
+        end
+    end
+    return removed
+end
+
+local publish
+local function update_population_limit()
+    -- Every player's assault lane has its own allowance and uninterrupted grace period.
+    -- Global alive remains solely the aggregate used to finish the last wave.
+    if state.defeat_settled or state.post_clear_frozen or game_has_ended() then
+        clear_overflow()
+        return {}
+    end
+    local expired = {}
+    for player_id, population in pairs(player_populations) do
+        if population.player_defeated or disconnected_players[player_id]
+            or population.alive <= state.alive_limit then
+            clear_player_overflow(player_id, population)
+        else
+            if not population.overflow_active then
+                population.overflow_active = true
+                population.overflow_deadline = current_game_time() + state.overflow_grace_seconds
+                local timer_player_id, timer_population = player_id, population
+                scheduler.every(1, function()
+                    if player_populations[timer_player_id] ~= timer_population then return false end
+                    prune_invalid_enemies()
+                    publish("monster_limit_countdown")
+                    return timer_population.overflow_active == true
+                end, OVERFLOW_TASK_ID .. ":" .. tostring(player_id))
+            end
+            population.overflow_remaining = math.max(0,
+                math.ceil(population.overflow_deadline - current_game_time()))
+            if population.overflow_remaining <= 0 then expired[#expired + 1] = player_id end
+        end
+    end
+    return expired
+end
+
+local function stop_defeated_match()
+    if state.defeat_settled then return end
+    state.defeat_settled = true
+    state.status, state.timer, state.pending = "defeat", 0, 0
+    state.post_clear_frozen = true
+    phase_guard.set_post_clear_frozen(true)
+    clear_overflow()
+    generation_token = generation_token + 1
+    scheduler.cancel("wave_countdown")
+    scheduler.cancel("wave_generation_complete")
+    scheduler.cancel(DEV_PRELOAD_TASK_ID)
+    scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
+    scheduler.cancel(ARCHIVE_CHALLENGE_RETRY_TASK_ID)
+    cancel_pending_wave_resource_sessions("all_players_defeated", false)
+end
+
+publish = function(reason)
+    refresh_selection_state()
+    local expired_players = update_population_limit()
+    -- Mark every expired player before dispatching cleanup, which can synchronously
+    -- publish or check final-wave completion through PLAYER_DISCONNECTED.
+    for _, player_id in ipairs(expired_players) do
+        local population = player_populations[player_id]
+        population.player_defeated = true
+        population.defeat_reason = "monster_limit_exceeded"
+        clear_player_overflow(player_id, population)
+        wave_channels[player_id] = nil
+    end
+    for _, player_id in ipairs(expired_players) do
+        require("systems/multiplayer_player_service").defeat(player_id, "monster_limit_exceeded")
+        reason = "monster_limit_exceeded"
+    end
+    local data = {}
+    for key, value in pairs(state) do data[key] = value end
+    data.reason = reason
+    event_bus.emit(events.WAVE_CHANGED, data)
 end
 
 local function early_final_remaining()
@@ -408,7 +556,7 @@ local function early_final_remaining()
 end
 
 local function settle_victory_once()
-    if state.victory_settled then return false end
+    if state.victory_settled or state.defeat_settled or game_has_ended() then return false end
     state.victory_settled = true
     state.status = "cleared"
     state.post_clear_frozen = true
@@ -441,7 +589,7 @@ local function settle_victory_once()
         state.status = "archive_challenges_pending"
         publish("archive_challenges_pending")
         scheduler.every(1, function()
-            if not state.post_clear_frozen then return false end
+            if not state.post_clear_frozen or game_has_ended() then return false end
             archive_players = {}
             for _, player_id in ipairs(player_context.active_player_ids()) do
                 if disconnected_players[player_id] ~= true then
@@ -459,6 +607,7 @@ local function settle_victory_once()
 end
 
 local function check_final_victory()
+    if state.defeat_settled or game_has_ended() then return end
     local terminal_wave = state.current_wave == FINAL_WAVE_NUMBER
         or (state.early_final_used ~= true
             and state.current_wave == state.total_waves)
@@ -480,12 +629,11 @@ local function set_wall(enemy)
 end
 
 local function update_targets()
-    for entindex, meta in pairs(enemies) do
-        if valid(meta.unit) and meta.unit:IsAlive() then
-            set_wall(meta.unit)
-        else
-            enemies[entindex] = nil
-        end
+    local removed = prune_invalid_enemies()
+    for _, meta in pairs(enemies) do set_wall(meta.unit) end
+    if removed > 0 then
+        publish("invalid_enemies_removed")
+        check_final_victory()
     end
 end
 
@@ -657,6 +805,8 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     local is_assault_boss = row.member_role == "assault_boss"
         or (row.member_role == nil and row.is_boss == true)
     unit.survival_is_boss = is_assault_boss
+    -- Entity indices may be reused after an engine-side removal without a death event.
+    unregister_enemy(unit:entindex(), "entity_index_reused")
     enemies[unit:entindex()] = {
         unit = unit,
         is_boss = is_assault_boss,
@@ -670,6 +820,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     }
     state.spawned = state.spawned + 1
     state.alive = state.alive + 1
+    change_player_alive(channel and channel.player_id, 1)
     if session and not session.released then
         session.alive = session.alive + 1
     end
@@ -694,7 +845,7 @@ local function spawn_callback(row, token, wave_number, normal_instance_index, se
 end
 
 local function start_countdown(seconds)
-    if dev_mode then return end
+    if dev_mode or state.defeat_settled or state.victory_settled or game_has_ended() then return end
     state.status = "countdown"
     state.timer = seconds
     local target_wave = next_wave_number_after(state.current_wave)
@@ -722,20 +873,26 @@ local function start_countdown(seconds)
         queue_target_wave("lead_review")
     end
     publish("countdown_started")
+    if state.defeat_settled or game_has_ended() then return end
     scheduler.cancel("wave_countdown")
     scheduler.every(1.0, function()
+        if state.defeat_settled or state.victory_settled or game_has_ended() then return false end
         state.timer = math.max(0, state.timer - 1)
         if state.timer <= preload_lead and not preload_reviewed then
             preload_reviewed = true
             queue_target_wave("lead_review")
         end
         publish("countdown_tick")
+        if state.defeat_settled or game_has_ended() then return false end
         if state.timer <= 0 then event_bus.emit(events.WAVE_START_NEXT, {}); return false end
         return true
     end, "wave_countdown")
 end
 
 local function start_wave(number, reason)
+    if state.defeat_settled or state.victory_settled or game_has_ended() then
+        return false, "match_ended"
+    end
     local wave = waves[number]
     if not wave then return false, "wave_not_found" end
     scheduler.cancel("wave_countdown")
@@ -765,6 +922,7 @@ local function start_wave(number, reason)
         #channels
     )
     publish(reason or "wave_started")
+    if state.defeat_settled then return false, "monster_limit_exceeded" end
     if number < state.total_waves then
         start_countdown(wave_timing_config.interval_after_wave(number))
     end
@@ -802,6 +960,7 @@ local function start_wave(number, reason)
             state.final_wave_generation_completed = true
         end
         publish("wave_generation_completed")
+        if state.defeat_settled then return end
         report_memory("generation_completed")
         if state.current_wave >= state.total_waves then
             state.status = "all_waves_spawned"
@@ -814,7 +973,7 @@ local function start_wave(number, reason)
 end
 
 local function start_next_wave()
-    if dev_mode then return end
+    if dev_mode or state.defeat_settled or state.victory_settled or game_has_ended() then return end
     if state.current_wave >= state.total_waves then
         state.status = "all_waves_spawned"
         publish("all_waves_spawned")
@@ -828,26 +987,16 @@ end
 
 local function on_killed(payload)
     local victim = payload.victim
-    if not valid(victim) then return end
-    local entindex = victim:entindex()
-    local meta = enemies[entindex]
-    if not meta then return end
-    monster_hero_visual_service.on_death(victim)
-    monster_visual_service.cleanup(victim)
-    enemies[entindex] = nil
-    state.alive = math.max(0, state.alive - 1)
-    local resource_session = meta.wave_resource_session_id
-        and wave_resource_sessions[meta.wave_resource_session_id] or nil
-    if resource_session then
-        resource_session.alive = math.max(0, resource_session.alive - 1)
-        release_wave_model_resources(resource_session, "all_monsters_finished")
+    local entindex = tonumber(payload.victim_entindex) or (valid(victim) and victim:entindex())
+    local meta = entindex and enemies[entindex]
+    if not meta or (victim and meta.unit ~= victim) then return end
+    if valid(meta.unit) then
+        monster_hero_visual_service.on_death(meta.unit)
+        monster_visual_service.cleanup(meta.unit)
     end
+    unregister_enemy(entindex, "all_monsters_finished")
     state.killed = state.killed + 1
     if meta.is_boss then
-        state.boss_alive = false
-        for _, remaining in pairs(enemies) do
-            if remaining.is_boss then state.boss_alive = true; break end
-        end
         local reward_players = {}
         if meta.player_id ~= nil and meta.player_id >= 0 then
             reward_players[1] = meta.player_id
@@ -877,7 +1026,7 @@ local function clear_normal_wave_enemies()
     scheduler.cancel("wave_generation_complete")
     local removed = 0
     for entindex, meta in pairs(enemies) do
-        enemies[entindex] = nil
+        unregister_enemy(entindex, "forced_wave_cleanup")
         local unit = meta and meta.unit
         if valid(unit) then
             unit.survival_wave_cleanup = true
@@ -890,12 +1039,16 @@ local function clear_normal_wave_enemies()
     state.alive = 0
     state.pending = 0
     state.boss_alive = false
+    for _, population in pairs(player_populations) do population.alive = 0 end
+    clear_overflow()
     force_release_all_wave_resource_sessions("forced_wave_cleanup")
     return removed
 end
 
-local function get_wave_state()
+local function get_wave_state(payload)
     refresh_selection_state()
+    local player_id = population_player_id(type(payload) == "table" and payload.player_id)
+    local population = population_for(player_id, false)
     local next_wave_number = next_wave_number_after(state.current_wave)
     local next_special_wave_number, next_special_role = next_special_target_after(
         state.current_wave
@@ -911,6 +1064,15 @@ local function get_wave_state()
         difficulty_options = state.difficulty_options,
         current_wave = state.current_wave,
         total_waves = state.total_waves,
+        player_id = player_id,
+        alive = player_id ~= nil and (population and population.alive or 0) or state.alive,
+        alive_limit = state.alive_limit,
+        overflow_active = population and population.overflow_active == true or false,
+        overflow_remaining = population and population.overflow_remaining or 0,
+        overflow_grace_seconds = state.overflow_grace_seconds,
+        player_defeated = population and population.player_defeated == true or false,
+        defeat_reason = population and population.defeat_reason or "",
+        defeat_settled = state.defeat_settled == true,
         status = state.status,
         game_started = game_started == true,
         early_final_used = state.early_final_used == true,
@@ -933,7 +1095,7 @@ local function request_early_final()
     if state.early_final_used then
         return { ok = false, error = "本局已购买提前通关" }
     end
-    if state.victory_settled or state.current_wave >= FINAL_WAVE_NUMBER then
+    if state.victory_settled or state.defeat_settled or state.current_wave >= FINAL_WAVE_NUMBER then
         return { ok = false, error = "最终波已经开始" }
     end
     local remaining = early_final_remaining()
@@ -1347,9 +1509,21 @@ function M.init()
     next_wave_resource_session_id = 0
     scheduler.cancel(DEV_PRELOAD_TASK_ID)
     scheduler.cancel(DEV_WAVE_COMPLETE_TASK_ID)
+    scheduler.cancel(ARCHIVE_CHALLENGE_RETRY_TASK_ID)
+    clear_overflow()
+    player_populations = {}
     reset(); enemies = {}; wall_entindex = -1; wall_by_player = {}
     wave_channels = {}; disconnected_players = {}
     generation_token = 0; dev_mode = false
+    if overflow_end_listener and StopListeningToGameEvent then
+        StopListeningToGameEvent(overflow_end_listener)
+        overflow_end_listener = nil
+    end
+    if not overflow_end_listener and ListenToGameEvent then
+        overflow_end_listener = ListenToGameEvent("game_rules_state_change", function()
+            if game_has_ended() then clear_overflow() end
+        end, nil)
+    end
     rebuild_waves()
     event_bus.handle_request(events.WAVE_DIFFICULTY_SET_REQUEST, set_difficulty_request)
     event_bus.handle_request(events.WAVE_STATE_GET_REQUEST, get_wave_state)
@@ -1387,6 +1561,18 @@ function M.init()
         if wall_entindex == payload.entindex then wall_entindex = -1 end
         update_targets()
     end)
+    event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
+        local player_id = population_player_id(payload and payload.player_id)
+        if player_id == nil then return end
+        local population = population_for(player_id, true)
+        population.player_defeated = true
+        population.defeat_reason = tostring(payload.reason or "unknown")
+        clear_player_overflow(player_id, population)
+        wave_channels[player_id] = nil
+        if require("systems/multiplayer_player_service").all_participants_defeated() then
+            stop_defeated_match()
+        end
+    end)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
         if player_id == nil then return end
@@ -1396,20 +1582,18 @@ function M.init()
         local removed = 0
         for entindex, meta in pairs(enemies) do
             if meta.player_id == player_id then
-                enemies[entindex] = nil
-                state.alive = math.max(0, state.alive - 1)
-                local session = meta.wave_resource_session_id
-                    and wave_resource_sessions[meta.wave_resource_session_id] or nil
-                if session then session.alive = math.max(0, session.alive - 1) end
+                unregister_enemy(entindex, "player_disconnected")
                 if valid(meta.unit) then
                     meta.unit.survival_wave_cleanup = true
                     monster_visual_service.cleanup(meta.unit)
                     if UTIL_Remove then UTIL_Remove(meta.unit) end
                 end
-                release_wave_model_resources(session, "player_disconnected")
                 removed = removed + 1
             end
         end
+        local population = population_for(player_id, false)
+        if population then population.alive = 0 end
+        clear_player_overflow(player_id, population)
         print(string.format(
             "[PLAYER_WAVE_CHANNEL] player=%s active=false monsters_removed=%s",
             tostring(player_id), tostring(removed)))

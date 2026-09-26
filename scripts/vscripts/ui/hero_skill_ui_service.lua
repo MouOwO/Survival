@@ -28,6 +28,7 @@ local function register_choice_request()
         "ui_hero_skill_choice_select",
         function(_, payload)
             local player_id = tonumber(payload.PlayerID)
+            if require("systems/player_context_service").is_defeated(player_id) then return end
             local result = event_bus.request(
                 events.HERO_SKILL_CHOICE_SELECT_REQUEST,
                 {
@@ -49,7 +50,7 @@ local function register_upgrade_request()
         function(_, payload)
             payload = payload or {}
             local player_id = tonumber(payload.PlayerID)
-            if not valid_player(player_id) then return end
+            if not valid_player(player_id) or require("systems/player_context_service").is_defeated(player_id) then return end
             -- The button is anchored to a specific owned hero/skill level.
             -- Reject stale HUD requests and retries before spending a point.
             if tonumber(payload.unit_entindex) == nil

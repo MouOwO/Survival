@@ -4,7 +4,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const source=fs.readFileSync(process.argv[2]||'panorama/src/scripts/custom_game/combat_stats.js','utf8');
 const seam='    // NetTable is the single regular synchronization path.';
 assert(source.includes(seam));
-const instrumented=source.replace(seam,`    __test({scheduleActive:scheduleActive, cosmeticPortraitSentinel:cosmeticPortraitSentinel,
+const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbilityRuntime,scheduleActive:scheduleActive, cosmeticPortraitSentinel:cosmeticPortraitSentinel,
         resetScale:resetTowerPortraitContentScale, applyScale:applyTowerPortraitContentScale,
         restoreHotkey:restoreNativeAbilityHotkey, suppressHotkey:suppressNativeAbilityHotkey,
         refreshAbilities:refreshAbilities, shutdown:shutdownCombatContext,
@@ -14,21 +14,21 @@ const instrumented=source.replace(seam,`    __test({scheduleActive:scheduleActiv
     return;
 `+seam);
 function setup(){
- const cfg={},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api;
+ const cfg={},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api,time=0;const runtime={};
  class Panel{
   constructor(id,parent){this.id=id;this.parent=parent;this.children=[];this.alive=true;this.hittest=true;this.hittestchildren=true;this.values={};if(parent)parent.children.push(this);
    this.style=new Proxy(this.values,{set:(o,k,v)=>{if(!this.alive)throw Error('native panel destroyed');if(v===null||v===undefined||/NaN|Infinity/.test(String(v)))throw Error('native style rejected '+k+'='+v);o[k]=v;return true;}});
   }
   IsValid(){if(this.alive==='throw')throw Error('native handle released');return this.alive}
   GetParent(){return this.parent}FindChildTraverse(id){if(this.id===id)return this;for(const c of this.children){const p=c.FindChildTraverse(id);if(p)return p;}return null}
-  AddClass(){} GetChildCount(){return this.children.length}GetChild(i){return this.children[i]}
+  AddClass(){} SetHasClass(){} SetImage(uri){this.image=uri;} GetChildCount(){return this.children.length}GetChild(i){return this.children[i]}
  }
  const root=new Panel('Hud'),context=new Panel('Context',root),overlay=new Panel('SurvivalTowerPortraitOverlay',context),scene=new Panel('SurvivalTowerPortraitScene',overlay);
- const $=id=>context.FindChildTraverse(id.slice(1));$.GetContextPanel=()=>context;$.Schedule=(delay,fn)=>{const id=++serial;jobs.set(id,{delay,fn});return id};$.CancelScheduled=id=>jobs.delete(id);$.Msg=(...s)=>messages.push(s.join(''));$.Warning=$.Msg;
+ const $=id=>context.FindChildTraverse(id.slice(1));$.CreatePanel=(type,parent,id)=>new Panel(id,parent);$.GetContextPanel=()=>context;$.Schedule=(delay,fn)=>{const id=++serial;jobs.set(id,{delay,fn});return id};$.CancelScheduled=id=>jobs.delete(id);$.Msg=(...s)=>messages.push(s.join(''));$.Warning=$.Msg;
  const subscribe=(name,fn)=>{const id=++serial;subscriptions.set(id,{name,fn});return id};
- vm.runInNewContext(instrumented,{$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0},Players:{GetPlayerHeroEntityIndex:()=>-1},Entities:{},CustomNetTables:{GetTableValue:()=>null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},GameEvents:{Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},__test:x=>api=x},{filename:'combat_stats.js'});
+ vm.runInNewContext(instrumented,{$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,GetGameTime:()=>time},Players:{GetPlayerHeroEntityIndex:()=>-1},Entities:{},CustomNetTables:{GetTableValue:(name,key)=>runtime[key]||null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},GameEvents:{Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},__test:x=>api=x},{filename:'combat_stats.js'});
  function run(id){const job=jobs.get(id);assert(job);jobs.delete(id);job.fn()}
- return {api,root,context,overlay,scene,cfg,jobs,messages,subscriptions,run,Panel};
+ return {api,root,context,overlay,scene,cfg,jobs,messages,subscriptions,run,Panel,runtime,setTime:t=>time=t};
 }
 // The reported callback entry is used by the 0.1s portrait sentinel. Hiding a
 // scene must not pass null to a native style setter or kill the next tick.
@@ -102,3 +102,19 @@ const eventId=f.api.subscribeEvent('stats_probe',()=>{throw eventError});
 assert.throws(()=>f.subscriptions.get(eventId).fn(),x=>x===eventError);
 assert(f.messages.some(s=>s.includes('[COMBAT_STATS_EVENT_ERROR] event=stats_probe')&&s.includes('native event failure')));
 console.log('COMBAT_CALLBACK_TEST_PASS: timer/event lifecycle, stale queued snapshots, unsubscribe, native styles, coordinate vectors, scaling and recovery');
+
+const talentUI=setup(),button=new talentUI.Panel('TalentButton',talentUI.root);
+new talentUI.Panel('AbilityImage',button);
+talentUI.runtime[42]={talent_pending:1,icon_name:'survival/native/talent_question'};
+talentUI.api.applyAbilityRuntime(button,42);
+const icon=button.__survivalTalentIcon,brightness=icon.style.brightness;
+assert(icon.visible && !icon.hittest && !icon.hittestchildren,'art must preserve the native button input');
+talentUI.setTime(.3);talentUI.api.applyAbilityRuntime(button,42);
+assert.notEqual(icon.style.brightness,brightness,'unselected talent pulses over time');
+talentUI.runtime[42]={talent_pending:0,icon_name:'survival/native/talent_wall_recovery'};
+talentUI.api.applyAbilityRuntime(button,42);
+assert(icon.image.endsWith('/talent_wall_recovery.png') && icon.style.brightness==='1','successful selection switches icon and stops flashing');
+talentUI.api.applyAbilityRuntime(button,43);assert(!icon.visible,'native slot reuse must hide stale talent art');
+icon.alive='throw';talentUI.api.applyAbilityRuntime(button,42);
+assert(button.__survivalTalentIcon!==icon && button.__survivalTalentIcon.visible,'a released image handle can be recreated safely');
+console.log('TALENT_NATIVE_ICON_PASS: input isolation, pulse, selection, slot reuse, stale handle');

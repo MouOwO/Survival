@@ -247,12 +247,14 @@ local function ensure_state(player_id)
     return state
 end
 
-local function publish(player_id, reason)
+local function publish(player_id, reason, changed_section, changed_field)
     local state = ensure_state(player_id)
     event_bus.emit(events.TECHNOLOGY_STATS_CHANGED, {
         player_id = player_id,
         snapshot = snapshot(state),
         reason = reason or "technology_changed",
+        changed_section = changed_section,
+        changed_field = changed_field,
     })
 end
 
@@ -315,7 +317,7 @@ local function add_growth(payload)
     end
     state.growth[section][field] = state.growth[section][field] + amount
     state.snapshot = nil
-    publish(player_id, payload.reason or "runtime_growth")
+    publish(player_id, payload.reason or "runtime_growth", section, field)
     return { ok = true, snapshot = snapshot(state) }
 end
 

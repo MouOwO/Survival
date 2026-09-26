@@ -77,7 +77,19 @@ function M.pickup_candidate(caster, candidate)
         return { ok = false, error = "inventory_full", full = true }
     end
     caster:AddItem(candidate.item)
-    local picked = item_slot(caster, candidate.item) >= 0
+    -- AddItem may bypass dota_item_picked_up; commit ground rewards here too.
+    if valid(candidate.item) and candidate.item.survival_ground_reward == true
+        and candidate.item.survival_claimed ~= true
+        and type(candidate.item.Claim) == "function" then
+        if candidate.item:Claim(caster) == false then
+            if valid(candidate.item) and caster.DropItemAtPositionImmediate then
+                caster:DropItemAtPositionImmediate(candidate.item, caster:GetAbsOrigin())
+            end
+            return { ok = false, error = "ground_reward_claim_failed" }
+        end
+        return { ok = true }
+    end
+    local picked = (valid(candidate.item) and item_slot(caster, candidate.item) >= 0)
         or candidate.item.survival_claimed == true
     return {
         ok = picked,

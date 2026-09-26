@@ -1,0 +1,42 @@
+{
+  "updated_at": "2026-09-26T13:47:36.805470+08:00",
+  "request": "Bind F1 to select own hero.",
+  "validation_level": [
+    "STATIC",
+    "SIMULATION",
+    "RESOURCE_COMPILER"
+  ],
+  "workshop_verified": false,
+  "behavior": {
+    "F1": "Select current own formally summoned hero; focus camera only while alive.",
+    "SPACE": "Select own builder (unchanged).",
+    "F2": "Return own hero to own main city (unchanged)."
+  },
+  "identity_source": "survival_hero_skills/player_N hero_ready, unit_entindex and hero_id matched against the local engine hero",
+  "test": {
+    "file": "tools/test_minimap_shortcut_input.cjs",
+    "passed": true,
+    "covers": [
+      "F1 native and fallback binding",
+      "selection from building",
+      "duplicate callback debounce",
+      "hidden failed summon rejection",
+      "current replacement identity",
+      "dead hero selection without camera move",
+      "chat/modal/legacy confirm/startup/defeat guards",
+      "stale Workshop closure",
+      "Space and F2 preserved"
+    ]
+  },
+  "content_sync": {
+    "file": "panorama/src/scripts/custom_game/ui_bootstrap.js",
+    "sha256": "42829c87b6cbb10537925272c84be249eb1c0011db589fc16e359e7525335a2a"
+  },
+  "compile": {
+    "compiled": 15,
+    "failed": 0,
+    "log": "output/hero_f1_20260926/compile_hud.log"
+  },
+  "compiled_script_sha256": "f10eeadca0d923d56dc9c279c54a0968e577b5680746f6dc4acf8d038071045d",
+  "scoped_diff_and_utf8_check": "passed"
+}

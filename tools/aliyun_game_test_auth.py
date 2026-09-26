@@ -63,7 +63,8 @@ $ErrorActionPreference='Stop'
 $p=[Console]::In.ReadToEnd()
 $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User
 $acl=New-Object Security.AccessControl.FileSecurity
-$acl.SetOwner($sid)
+$owner=[IO.File]::GetAccessControl($p).GetOwner([Security.Principal.SecurityIdentifier])
+if ($owner.Value -notin @($sid.Value,'S-1-5-18','S-1-5-32-544')) { throw 'acl_owner_untrusted' }
 $acl.SetAccessRuleProtection($true,$false)
 $allowed=@($sid.Value,'S-1-5-18','S-1-5-32-544') | Select-Object -Unique
 foreach ($value in $allowed) {
@@ -73,6 +74,7 @@ foreach ($value in $allowed) {
 }
 [IO.File]::SetAccessControl($p,$acl)
 $actual=[IO.File]::GetAccessControl($p)
+if ($actual.GetOwner([Security.Principal.SecurityIdentifier]).Value -ne $owner.Value) { throw 'acl_owner_changed' }
 if (-not $actual.AreAccessRulesProtected) { throw 'acl_not_protected' }
 $rules=@($actual.GetAccessRules($true,$true,[Security.Principal.SecurityIdentifier]))
 if ($rules.Count -ne $allowed.Count) { throw 'acl_count_invalid' }

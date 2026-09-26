@@ -9,6 +9,7 @@ local function valid(unit) return unit and not unit:IsNull() end
 local function now() return GameRules:GetGameTime() end
 function M.is_running(id) return runs[id] and runs[id].status == "running" or false end
 function M.can_rebuild_wall(id)
+    if require("systems/player_context_service").is_defeated(id) then return false end
     return runs[id] and runs[id].started == true or false
 end
 function M.on_wall_destroyed(id)
@@ -83,6 +84,7 @@ local function spawn_wave(run, number)
     return true
 end
 function M.start(id, difficulty)
+    if require("systems/player_context_service").is_defeated(id) then return false, "player_defeated" end
     if M.is_running(id) then return false, "无尽挑战正在进行" end
     if runs[id] and runs[id].started then return false, "本局已开启无尽挑战" end
     if not config.wave(difficulty, 1) then return false, "该难度无尽属性尚未配置" end
@@ -118,6 +120,9 @@ end
 function M.init(on_changed)
     runs, enemies, changed = {}, {}, on_changed
     bus.subscribe(events.ENGINE_ENTITY_KILLED, killed)
+    bus.subscribe(events.PLAYER_DEFEATED, function(payload)
+        M.cancel(tonumber(payload.player_id), "本局失败")
+    end)
     scheduler.every(0.1, function()
         for _, run in pairs(runs) do
             if run.status == "running" and run.remaining > 0 and not run.spawning then

@@ -60,6 +60,14 @@ function M.initial_slice_players()
     return math.max(1, math.floor(tonumber(rule and rule.initial_slice_players) or 1))
 end
 
+function M.is_defeated(player_id)
+    -- Lazy lookup avoids a dependency cycle during addon boot and preserves
+    -- isolated read-only configuration tools that do not run a multiplayer match.
+    local multiplayer = package.loaded["systems/multiplayer_player_service"]
+    return type(multiplayer) == "table" and type(multiplayer.is_defeated) == "function"
+        and multiplayer.is_defeated(player_id) == true or false
+end
+
 function M.active_player_ids()
     local result = {}
     if not PlayerResource then return result end
@@ -70,7 +78,7 @@ function M.active_player_ids()
             and PlayerResource:GetPlayer(player_id) or nil
         local team = PlayerResource.GetTeam
             and PlayerResource:GetTeam(player_id) or nil
-        if valid and player and team == DOTA_TEAM_GOODGUYS then
+        if valid and player and team == DOTA_TEAM_GOODGUYS and not M.is_defeated(player_id) then
             result[#result + 1] = player_id
         end
     end
@@ -140,7 +148,7 @@ function M.register_unit(player_id, unit, identity)
     return true, nil
 end
 
-function M.owner_player_id(unit)
+function M.owner_player_id(unit, authoritative_only)
     if not valid_entity(unit) then return nil end
     local entity_owner = normalized_player_id(unit.survival_player_id)
     local entindex = tonumber(unit:entindex())
@@ -151,6 +159,7 @@ function M.owner_player_id(unit)
     end
     local authoritative = registered_owner or entity_owner
     if authoritative ~= nil then return authoritative end
+    if authoritative_only then return nil end
     local engine_owner = nil
     if unit.GetPlayerOwnerID then
         local ok, value = pcall(unit.GetPlayerOwnerID, unit)

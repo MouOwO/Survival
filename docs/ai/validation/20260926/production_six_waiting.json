@@ -1,0 +1,113 @@
+{
+  "updated_at": "2026-09-26T13:11:27.816835",
+  "user_confirmation": "6 个等待格＋1 项进行中",
+  "queue_capacity": 7,
+  "waiting_slots": 6,
+  "active_slots": 1,
+  "applies_to": [
+    "lumberjack_training",
+    "normal_research",
+    "advanced_research"
+  ],
+  "validation_level": [
+    "STATIC",
+    "CONTRACT",
+    "SIMULATION",
+    "RESOURCE_COMPILER"
+  ],
+  "workshop_new_match_verified": false,
+  "lua_behavior_tests": [
+    "scripts/vscripts/tests/test_worker_training_queue.lua",
+    "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+    "scripts/vscripts/tests/test_research_production_auto.lua",
+    "scripts/vscripts/tests/test_research_runtime_projection.lua"
+  ],
+  "lua_tests_pass": 4,
+  "lua_syntax_pass": 10,
+  "node_tests": [
+    "test_production_hud.cjs",
+    "test_handoff_refresh.cjs",
+    "test_world_overlay_visibility.cjs"
+  ],
+  "node_tests_pass": 3,
+  "compile": [
+    {
+      "entry": "survival_hud.xml",
+      "compiled": 15,
+      "failed": 0,
+      "log": "output/production_six_waiting_20260926/compile_survival_hud.xml.log"
+    },
+    {
+      "entry": "building_upgrade_assets.xml",
+      "compiled": 3,
+      "failed": 0,
+      "log": "output/production_six_waiting_20260926/compile_building_upgrade_assets.xml.log"
+    }
+  ],
+  "icons": [
+    {
+      "asset": "building_upgrade_one_v4.png",
+      "width": 1254,
+      "height": 1254,
+      "gold_subject_width": 0.36921850079744817,
+      "gold_subject_height": 0.4864433811802233,
+      "sha256": "16609B5172B36F789A98EBB0B3E8076D7256DA86C3F075B18C1A24DC8766E6BD"
+    },
+    {
+      "asset": "building_upgrade_five_v4.png",
+      "width": 1254,
+      "height": 1254,
+      "gold_subject_width": 0.7472089314194578,
+      "gold_subject_height": 0.7400318979266348,
+      "sha256": "5717B41534A38961E7E3C9AAFCA81A42764096CAF471A71510E9DF23060E336E"
+    }
+  ],
+  "icon_width_ratio": 2.023758099352052,
+  "runtime_icons": [
+    {
+      "file": "panorama/images/spellicons/survival/building_upgrade_one_v4_png.vtex_c",
+      "sha256": "5ad6e9824ab762a481dd504a1df8c310faeac51c38babdc3575a3f5cc7832aec",
+      "bytes": 1794235
+    },
+    {
+      "file": "panorama/images/spellicons/survival/building_upgrade_five_v4_png.vtex_c",
+      "sha256": "6acbeee595e67c503930d6269e285a0ff19d8fc9caf17a1b68f5ef92e48169a4",
+      "bytes": 1678610
+    }
+  ],
+  "imagegen_prompts": "docs/ai/validation/20260926/upgrade_icon_v4_prompts.json",
+  "content_sync": [
+    {
+      "source": "panorama/src/scripts/custom_game/production_progress.js",
+      "sha256": "f06d54f1cae950abac392906f925ed4811cffc31170ddc4fb7ec7bbdf9c76f04"
+    },
+    {
+      "source": "panorama/src/styles/custom_game/production_progress.css",
+      "sha256": "33a37ecf7f627fc3517c1edcc95aeb4382254203b8a60830766e20930b2a0c9b"
+    },
+    {
+      "source": "panorama/src/layout/custom_game/building_upgrade_assets.xml",
+      "sha256": "3853bbe4883153ac65993b3344649b72e9d43d2981c45624cdb223affe7cc41f"
+    },
+    {
+      "source": "panorama/src/images/spellicons/survival/building_upgrade_one_v4.png",
+      "sha256": "16609b5172b36f789a98ebb0b3e8076d7256da86c3f075b18c1a24dc8766e6bd"
+    },
+    {
+      "source": "panorama/src/images/spellicons/survival/building_upgrade_five_v4.png",
+      "sha256": "5717b41534a38961e7e3c9aafca81a42764096caf471a71510e9df23060e336e"
+    }
+  ],
+  "behavior": [
+    "seventh task accepted; eighth rejected before payment",
+    "blocked research head plus six waiting preserved",
+    "normal and same-team shared advanced lab queues private per player/source",
+    "six waiting cells and larger actual font size on all three panels",
+    "long names do not auto-shrink; full hover text; compact large cost with full value tooltip",
+    "new distinct icon paths, 9 ordinary/1 five-level upgrade bindings"
+  ],
+  "icon_diagnosis": "No same-texture mapping found; source/content identical and prior runtime textures distinct. Fresh resource basenames rule out prior-name caches without claiming cache cause proved.",
+  "verification_limits": [
+    "Native new icon appearance requires Workshop restart and fresh match; not verified in game this turn."
+  ]
+}

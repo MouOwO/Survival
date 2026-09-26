@@ -16,7 +16,6 @@ local ability_keys_by_unit = {}
 local tower_trace_by_ability = {}
 local hero_runtime_trace_by_unit = {}
 local hero_skill_by_ability = {}
-local research_transaction_by_team = {}
 local builder_slot_order_by_ability = {}
 local pending_resource_refresh = {}
 
@@ -290,8 +289,10 @@ local function publish(state)
         })
         state.research_levels = research_state and research_state.ok == true
             and research_state.legacy_levels or {}
-        state.research_transaction = research_transaction_by_team[state.team]
-            or { researching = 0 }
+        local production = event_bus.request(events.TECHNOLOGY_STATE_GET_REQUEST, {
+            player_id = state.player_id, source_entindex = unit_key,
+        })
+        state.research_transaction = production and production.research or { researching = 0 }
         local progression = event_bus.request(events.HERO_PROGRESSION_GET_REQUEST, {
             player_id = state.player_id,
         })
@@ -543,25 +544,24 @@ local function on_hero_progression_changed(payload)
     end
 end
 
-local function refresh_research_team(team)
+local function refresh_research_player(player_id, source_entindex)
     for _, state in pairs(state_by_unit) do
-        if state.team == team and (state.building_id == "building_research_lab"
-            or state.building_id == "building_advanced_research_lab") then
+        if tonumber(state.player_id) == tonumber(player_id)
+            and (not source_entindex or state.unit:entindex() == tonumber(source_entindex))
+            and (state.building_id == "building_research_lab"
+                or state.building_id == "building_advanced_research_lab") then
             publish(state)
         end
     end
 end
 
 local function on_research_state_changed(payload)
-    research_transaction_by_team[payload.team] = payload.researching == 1
-        and payload or nil
-    refresh_research_team(payload.team)
+    refresh_research_player(payload.player_id, payload.source_entindex)
 end
 
 local function on_research_level_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
-    local team = player_id ~= nil and PlayerResource:GetTeam(player_id) or nil
-    if team ~= nil then refresh_research_team(team) end
+    if player_id ~= nil then refresh_research_player(player_id) end
 end
 
 
@@ -595,8 +595,12 @@ function M.init()
     ability_keys_by_unit = {}
     tower_trace_by_ability = {}
     hero_runtime_trace_by_unit = {}
-    research_transaction_by_team = {}
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
+    event_bus.subscribe(events.ROGUE_REWARD_CHANGED, function(payload)
+        for _, state in pairs(state_by_unit) do
+            if tonumber(state.player_id) == tonumber(payload.player_id) then publish(state) end
+        end
+    end)
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)
     event_bus.subscribe(events.BUILDING_DESTROYED, clear_unit)

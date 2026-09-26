@@ -70,9 +70,9 @@ end
 local function destroy(player_id)
     local particle = player_id ~= nil and active[player_id] or nil
     if not particle then return end
+    active[player_id] = nil
     ParticleManager:DestroyParticle(particle, true)
     ParticleManager:ReleaseParticleIndex(particle)
-    active[player_id] = nil
 end
 
 local function show(player_id, payload)

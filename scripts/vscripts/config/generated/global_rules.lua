@@ -12,6 +12,8 @@ M.rows = {
     { rule_id = "monster_war3_armor_damage_enabled", value = 0, description = "废弃兼容字段；怪物物理伤害固定使用项目War3护甲公式", enabled = false },
     { rule_id = "wave_monster_round_robin_enabled", value = 1, description = "每波普通怪按类型循环；地面飞行混合时按两地面一飞行（0关闭1开启）", enabled = true },
     { rule_id = "wave_ground_monster_hull_radius", value = 32, description = "正式波次及默认地面怪统一基础碰撞半径", enabled = true },
+    { rule_id = "wave_alive_limit", value = 90, description = "每位玩家所属进攻怪物安全数量上限；个人超过上限独立倒计时且继续出怪", enabled = true },
+    { rule_id = "wave_overflow_grace_seconds", value = 10, description = "个人进攻怪持续超限宽限秒数；回到上限以内重置；到期仅该玩家失败", enabled = true },
     { rule_id = "practice_monster_hull_radius", value = 12, description = "练功房怪物统一基础碰撞半径", enabled = true },
     { rule_id = "repair_detection_range", value = 99999, description = "修理师自动感知受损建筑的范围", enabled = true },
     { rule_id = "building_challenge_hull_radius", value = 0, description = "所有挑战怪的基础碰撞半径", enabled = true },

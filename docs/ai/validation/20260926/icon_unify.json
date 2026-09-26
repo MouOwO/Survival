@@ -1,0 +1,38 @@
+{
+  "freeze_unchanged": 53,
+  "excluded_scope_unchanged": 1725,
+  "csv_only_icon_columns": [
+    "data\\csv\\公共规则\\tooltip_definitions.csv",
+    "data\\csv\\建筑与工人系统\\research_lab_abilities.csv",
+    "data\\csv\\建筑与工人系统\\technology_definitions.csv",
+    "data\\csv\\建筑与工人系统\\worker_skill_definitions.csv",
+    "data\\csv\\肉鸽奖励系统\\rogue_reward_cards.csv",
+    "data\\csv\\英雄系统\\hero_skill_definitions.csv"
+  ],
+  "shared_csv_excluded_rows_unchanged": 90,
+  "npc_abilities_custom_only_texture_changed": true,
+  "npc_items_custom_only_texture_changed": true,
+  "lua51_syntax": 12,
+  "node_syntax": 6,
+  "source_compiled_content_assets": 249,
+  "new_generated_icons": 116,
+  "image_generation": "built-in image_gen; one call per asset; resized to 256x256",
+  "preview": "output/icon_unify_20260926/preview.html",
+  "visual_review": "Inspected contact sheet at 80px/40px; distinct upgrade sizes; readable silhouettes.",
+  "tests": [
+    "test_inventory_original_icons",
+    "test_handoff_refresh",
+    "test_production_hud",
+    "test_minimap_shortcuts",
+    "test_minimap_shortcut_input",
+    "test_combat_stats_callbacks",
+    "test_combat_selection_recovery",
+    "test_rogue_reward_history"
+  ],
+  "compiler": {
+    "assets": 250,
+    "hud": 13,
+    "failures": 0
+  },
+  "workshop_playtest": "not performed"
+}

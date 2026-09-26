@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 
 local M = {}
 local providers = {}
@@ -223,10 +224,33 @@ local function publish_payload(payload)
     if player_id ~= nil then M.publish_player(player_id, payload.reason) end
 end
 
+local pending_growth = {}
+local function publish_growth(player_id)
+    if pending_growth[player_id] then return end
+    local token = {}
+    pending_growth[player_id] = token
+    scheduler.after(0.1, function()
+        if pending_growth[player_id] ~= token then return end
+        pending_growth[player_id] = nil
+        publish_payload({player_id = player_id, reason = "lumberjack_attack_growth"})
+    end, "lumberjack_publish_growth_" .. tostring(player_id))
+end
+
 function M.init()
+    for player_id in pairs(pending_growth) do
+        scheduler.cancel("lumberjack_publish_growth_" .. tostring(player_id))
+    end
+    pending_growth = {}
     event_bus.subscribe(events.HERO_SUMMONED, publish_payload)
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, publish_payload)
-    event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, publish_payload)
+    event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
+        if payload and payload.changed_section == "lumberjack" then
+            local player_id = tonumber(payload.player_id)
+            if player_id ~= nil then publish_growth(player_id) end
+        else
+            publish_payload(payload)
+        end
+    end)
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, publish_payload)
     event_bus.subscribe(events.EQUIPMENT_STATS_CHANGED, publish_payload)
     CustomGameEventManager:RegisterListener("ui_game_info_request", function(_, payload)

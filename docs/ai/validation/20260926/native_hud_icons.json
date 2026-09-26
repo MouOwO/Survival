@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-26",
+  "status": "STATIC_CONTRACT_SIMULATION_COMPILE_PASS",
+  "workshop_new_match_verified": false,
+  "assets": 106,
+  "ability_icon_mappings": 47,
+  "compile": {
+    "native_hud_icon_assets": {
+      "compiled": 107,
+      "failed": 0
+    },
+    "survival_hud": {
+      "compiled": 15,
+      "failed": 0
+    }
+  },
+  "lua51_tests": [
+    "test_hero_player_loadout_precache",
+    "test_hero_summon_flow",
+    "test_hero_summon_player_isolation",
+    "test_rogue_reward_history",
+    "test_builder_tower_rebuild",
+    "test_worker_system_training",
+    "test_worker_training_queue",
+    "test_building_upgrade_lifecycle",
+    "test_research_runtime_projection"
+  ],
+  "node_tests": [
+    "test_production_hud",
+    "test_combat_stats_callbacks (including talent native icon)",
+    "test_combat_selection_recovery",
+    "test_inventory_original_icons"
+  ],
+  "csv_changed_columns": {
+    "research_lab_abilities": 18,
+    "technology_definitions": 480,
+    "training_definitions": 8,
+    "rogue_reward_rules": 3,
+    "builder_ability_stages": 1,
+    "tooltip_definitions": 18
+  },
+  "evidence_dir": "output/native_hud_refresh_20260926",
+  "engine_limitations": [
+    "Reopen a Workshop Tools match to load updated NPC KV and Lua.",
+    "Validate actual hero loadout ERROR disappearance and final native HUD image placement in engine."
+  ]
+}

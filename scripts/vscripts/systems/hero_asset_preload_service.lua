@@ -12,6 +12,8 @@ local ASSET_PREFIX = "hero_permanent_"
 
 local hero_to_asset = {}
 local preload_started = false
+local player_loadouts = {}
+local loadout_generation = 0
 
 local function asset_id_for(hero_id)
     return hero_to_asset[tostring(hero_id or "")]
@@ -52,6 +54,49 @@ function M.start()
     return ok, status, snapshot
 end
 
+-- A proxy unit preloads the map's costume, but cannot preload the player's
+-- equipped native items. The engine still creates those items on ReplaceHeroWith.
+-- Keep the player-specific native hero dependency behind the summon boundary.
+local function loadout_key(hero_id, player_id)
+    return tostring(player_id) .. ":" .. tostring(hero_id)
+end
+
+local function request_loadout(hero_id, player_id, callbacks)
+    if player_id == nil then
+        if callbacks.on_ready then callbacks.on_ready() end
+        return
+    end
+    local key = loadout_key(hero_id, player_id)
+    local existing = player_loadouts[key]
+    if existing and existing.ready then
+        if callbacks.on_ready then callbacks.on_ready() end
+        return
+    end
+    if existing then
+        existing.waiters[#existing.waiters + 1] = callbacks
+        return
+    end
+    local definition = (heroes.by_id or {})[hero_id]
+    local pending = {waiters = {callbacks}, generation = loadout_generation}
+    player_loadouts[key] = pending
+    local function finish(ok, reason)
+        if pending.generation ~= loadout_generation or player_loadouts[key] ~= pending then return end
+        player_loadouts[key] = ok and {ready = true} or nil
+        for _, waiter in ipairs(pending.waiters) do
+            local callback
+            if ok then callback = waiter.on_ready else callback = waiter.on_failed end
+            if callback then pcall(callback, reason) end
+        end
+    end
+    if not definition or type(PrecacheUnitByNameAsync) ~= "function" then
+        finish(false, "player_loadout_precache_unavailable")
+        return
+    end
+    local ok, result = pcall(PrecacheUnitByNameAsync, definition.unit_name,
+        function() finish(true) end, player_id)
+    if not ok or result == false then finish(false, "player_loadout_precache_failed") end
+end
+
 function M.request(hero_id, callbacks)
     callbacks = callbacks or {}
     local asset_id = asset_id_for(hero_id)
@@ -63,7 +108,9 @@ function M.request(hero_id, callbacks)
     return asset_preload.queue(asset_id, {
         urgent = true,
         retry = true,
-        on_ready = callbacks.on_ready,
+        on_ready = function()
+            request_loadout(hero_id, tonumber(callbacks.player_id), callbacks)
+        end,
         on_failed = callbacks.on_failed,
     })
 end
@@ -78,11 +125,16 @@ function M.status(hero_id)
     return asset_preload.status(asset_id).status
 end
 
-function M.is_ready(hero_id)
-    return M.status(hero_id) == asset_preload.STATE.READY
+function M.is_ready(hero_id, player_id)
+    if M.status(hero_id) ~= asset_preload.STATE.READY then return false end
+    if player_id == nil then return true end
+    local state = player_loadouts[loadout_key(hero_id, player_id)]
+    return state ~= nil and state.ready == true
 end
 
 function M.init()
+    player_loadouts = {}
+    loadout_generation = loadout_generation + 1
     hero_to_asset = {}
     preload_started = false
     collect_asset_ids()

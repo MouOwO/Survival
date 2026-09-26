@@ -103,6 +103,63 @@ function M.participating_player_ids()
     return result
 end
 
+function M.is_defeated(player_id)
+    local state = player_states[normalized_player_id(player_id) or -1]
+    return state ~= nil and state.status == "defeated"
+end
+
+-- A defeated player stays connected to receive snapshots and spectate. Keep
+-- native hero identity, but remove its ability to respawn or issue orders.
+function M.reject_defeated_unit(unit)
+    if not unit or unit:IsNull() then return false end
+    local context = require("systems/player_context_service")
+    local real_hero = unit.IsRealHero and unit:IsRealHero()
+    -- npc_spawned can precede the factory's ownership registration. A creature's
+    -- native owner getter can incorrectly report slot 0 during that window.
+    local player_id = context.owner_player_id(unit, not real_hero)
+    if not M.is_defeated(player_id) then return false end
+    unit.survival_disconnect_cleanup = true
+    unit.survival_wave_cleanup = true
+    unit.survival_player_defeated = true
+    if unit.Stop then unit:Stop() end
+    if unit.SetControllableByPlayer then unit:SetControllableByPlayer(player_id, false) end
+    if unit.IsRealHero and unit:IsRealHero() then
+        if unit.SetRespawnsDisabled then unit:SetRespawnsDisabled(true) end
+        if unit.AddNoDraw then unit:AddNoDraw() end
+        if unit.IsAlive and unit:IsAlive() and unit.ForceKill then unit:ForceKill(false) end
+    elseif UTIL_Remove then
+        UTIL_Remove(unit)
+    end
+    return true
+end
+
+local function cleanup_remaining_units(player_id)
+    local units, seen = {}, {}
+    local function collect(unit)
+        if unit and not unit:IsNull() and not seen[unit] then
+            seen[unit] = true
+            units[#units + 1] = unit
+        end
+    end
+    if PlayerResource and PlayerResource.GetSelectedHeroEntity then
+        collect(PlayerResource:GetSelectedHeroEntity(player_id))
+    end
+    if HeroList and HeroList.GetAllHeroes then
+        for _, unit in ipairs(HeroList:GetAllHeroes() or {}) do collect(unit) end
+    end
+    if Entities and Entities.FindAllByClassname then
+        for _, unit in ipairs(Entities:FindAllByClassname("npc_dota_creature") or {}) do collect(unit) end
+    end
+    local context = require("systems/player_context_service")
+    for _, unit in ipairs(units) do
+        if not unit:IsNull() and context.owner_player_id(unit,
+            not (unit.IsRealHero and unit:IsRealHero())) == player_id then
+            M.reject_defeated_unit(unit)
+        end
+    end
+    context.unregister_player(player_id)
+end
+
 function M.is_disconnected(player_id)
     local state = player_states[normalized_player_id(player_id) or -1]
     return state ~= nil and state.status == "disconnected"
@@ -126,6 +183,8 @@ function M.defeat(player_id, reason)
     state.defeat_reason = tostring(reason or "unknown")
     player_states[player_id] = state
     scheduler.cancel("player_disconnect_defeat_" .. tostring(player_id))
+    -- Finalize only this player's session. Other participants keep checkpointing.
+    require("systems/online_time_service").disconnect(player_id)
     event_bus.emit(events.PLAYER_DEFEATED, {
         player_id = player_id,
         reason = state.defeat_reason,
@@ -134,6 +193,14 @@ function M.defeat(player_id, reason)
         player_id = player_id,
         reason = state.defeat_reason,
         defeat_cleanup = true,
+    })
+    cleanup_remaining_units(player_id)
+    event_bus.emit(events.UI_NOTIFICATION, {
+        player_id = player_id,
+        message = state.defeat_reason == "monster_limit_exceeded"
+            and "进攻怪物持续超限，本局失败，可继续观战"
+            or "本局失败，可继续观战",
+        level = "error",
     })
     print(string.format("[PLAYER_DEFEAT] player=%s reason=%s",
         tostring(player_id), state.defeat_reason))

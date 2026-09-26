@@ -12,13 +12,13 @@ end
 function M.clear(unit)
     local state = unit and unit.survival_monster_cosmetic_details
     if not state then return end
+    unit.survival_monster_cosmetic_details = nil
     for _, particle in ipairs(state.particles) do
         call(ParticleManager, "DestroyParticle", particle, false)
         call(ParticleManager, "ReleaseParticleIndex", particle)
     end
     if state.original_skin ~= nil then call(unit, "SetSkin", state.original_skin) end
     if state.has_activities then call(unit, "ClearActivityModifiers") end
-    unit.survival_monster_cosmetic_details = nil
 end
 
 function M.apply(unit, asset, components)

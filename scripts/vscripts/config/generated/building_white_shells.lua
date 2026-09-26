@@ -34,4 +34,9 @@ return {
     ["models/survival_buildings/wall_lv08.vmdl"] = "models/survival_buildings/wall_lv08_white_shell.vmdl",
     ["models/survival_buildings/wall_lv09.vmdl"] = "models/survival_buildings/wall_lv09_white_shell.vmdl",
     ["models/survival_buildings/wall_lv10.vmdl"] = "models/survival_buildings/wall_lv10_white_shell.vmdl",
+    ["models/survival_buildings/arrow_tower_lv01.vmdl"] = "models/survival_buildings/arrow_tower_lv01_white_shell.vmdl",
+    ["models/survival_buildings/arrow_tower_lv02.vmdl"] = "models/survival_buildings/arrow_tower_lv02_white_shell.vmdl",
+    ["models/survival_buildings/arrow_tower_lv03.vmdl"] = "models/survival_buildings/arrow_tower_lv03_white_shell.vmdl",
+    ["models/survival_buildings/arrow_tower_lv04.vmdl"] = "models/survival_buildings/arrow_tower_lv04_white_shell.vmdl",
+    ["models/survival_buildings/arrow_tower_lv05.vmdl"] = "models/survival_buildings/arrow_tower_lv05_white_shell.vmdl",
 }

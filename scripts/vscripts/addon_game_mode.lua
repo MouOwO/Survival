@@ -342,6 +342,7 @@ local function initialize_survival_hero(hero)
     end
 
     local player_id = hero:GetPlayerOwnerID()
+    if multiplayer_player_service.reject_defeated_unit(hero) then return end
     -- The released roster is fixed; a late, unauthenticated arrival must not
     -- acquire a builder merely because the other players already started.
     if not loading.is_player_ready(player_id) then return end
@@ -380,6 +381,7 @@ local function on_hero_picked(keys)
     if not hero or hero:IsNull() then
         return
     end
+    if multiplayer_player_service.reject_defeated_unit(hero) then return end
 
     local player_id = hero:GetPlayerOwnerID()
     local unit_name = hero:GetUnitName()
@@ -411,6 +413,7 @@ end
 local function on_npc_spawned(keys)
     local unit = keys.entindex
         and EntIndexToHScript(keys.entindex) or nil
+    if unit and not unit:IsNull() and multiplayer_player_service.reject_defeated_unit(unit) then return end
     if not unit or unit:IsNull()
         or unit:GetUnitName() ~= SURVIVAL_FORCE_HERO then
         return

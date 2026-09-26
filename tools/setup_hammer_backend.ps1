@@ -1,7 +1,8 @@
 param([ValidateSet('Install','Start','Status','Stop','Uninstall')][string]$Action = 'Install')
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$python = Join-Path $repo 'output/ecs_backend_work/.venv/Scripts/python.exe'
+. (Join-Path $PSScriptRoot 'backend_python.ps1')
+$python = Resolve-SurvivalBackendPython -RepoRoot $repo
 $bridge = Join-Path $PSScriptRoot 'hammer_backend_bridge.py'
 $runner = Join-Path $PSScriptRoot 'run_hammer_backend.ps1'
 $powershell = Join-Path $env:SystemRoot 'System32/WindowsPowerShell/v1.0/powershell.exe'

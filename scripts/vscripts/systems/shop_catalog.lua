@@ -446,6 +446,8 @@ local function project_entry(player_id, entry, context)
     if research then
         local target_level = tonumber(item.next_technology_level) or 0
         local current_level = tonumber(item.technology_level) or 0
+        local reserved_level = tonumber(context.research and context.research.reserved_levels
+            and context.research.reserved_levels[research.legacy_group]) or 0
         local base_cost = research_config.cost_for_level(research, target_level)
         local cost = research_cost_service.for_player(
             base_cost, event_bus, events, player_id
@@ -497,7 +499,7 @@ local function project_entry(player_id, entry, context)
         item.prerequisite_text = prerequisite_text
         local locked_reason = nil
         local locked_reason_code = nil
-        if target_level ~= current_level + 1
+        if target_level ~= math.max(current_level, reserved_level) + 1
             or current_level >= research.max_level then
             locked_reason = "已达到最高等级"
             locked_reason_code = "max_level_reached"
@@ -523,13 +525,22 @@ local function project_entry(player_id, entry, context)
             item.disabled_reason = locked_reason
             item.disabled_reason_code = locked_reason_code
         end
-        if item.purchasable == 1
-            and (tonumber(context.technology_cooldown_remaining) or 0) > 0 then
-            item.purchasable = 0
-            item.disabled_reason = "科技购买冷却中（"
-                .. string.format("%.1f", context.technology_cooldown_remaining)
-                .. "秒）"
-            item.disabled_reason_code = "technology_purchase_cooldown"
+        if context.research and tonumber(context.research.source_entindex or -1) > 0
+            and entry.enabled ~= false then
+            local queue_count = tonumber(context.research.queue_count) or 0
+            local capacity = tonumber(context.research.capacity) or 7
+            item.cost_timing_text = "开始研究时扣费，排队未扣费"
+            item.purchase_condition_text = item.purchase_condition_text
+                .. "；开始研究时扣费"
+            item.purchasable = queue_count < capacity
+                and math.max(current_level, reserved_level) < research.max_level and 1 or 0
+            if queue_count >= capacity then
+                item.disabled_reason = "研究队列已满（1个研究中＋6个等待）"
+                item.disabled_reason_code = "research_queue_full"
+            elseif reserved_level >= research.max_level then
+                item.disabled_reason = "已排队至最高等级"
+                item.disabled_reason_code = "queued_max_level"
+            end
         end
     end
     return item
@@ -624,7 +635,9 @@ function M.build_snapshot(player_id, context)
                 or M.max_technology_level(group)
             if not projected_technology_groups[group]
                 and tonumber(entry.definition.level) == 1 then
-                local target_level = math.min(current + 1, max_level)
+                local reserved_level = tonumber(context.research and context.research.reserved_levels
+                    and context.research.reserved_levels[group]) or 0
+                local target_level = math.min(math.max(current, reserved_level) + 1, max_level)
                 local target_entry = M.find_technology_entry(group, target_level)
                     or entry
                 item = project_entry(player_id, target_entry, context)
@@ -640,8 +653,9 @@ function M.build_snapshot(player_id, context)
                 item.technology_group = group
                 item.technology_id = authoritative_research
                     and authoritative_research.tech_id or ""
-                item.auto_research_available = context.research_scope == "advanced"
-                    and 1 or 0
+                item.auto_research_available = authoritative_research
+                    and (context.research_scope == "advanced"
+                        or context.research_scope == "normal") and 1 or 0
                 item.auto_research_enabled = context.auto_research
                     and context.auto_research[group] and 1 or 0
                 item.level_text = "Lv." .. tostring(current)
@@ -655,13 +669,10 @@ function M.build_snapshot(player_id, context)
                         and research_config.by_legacy_group[group].display_name
                         or item.name) .. "（已满级）"
                     item.disabled_reason_code = "max_level_reached"
-                elseif item.purchasable == 1
-                    and (tonumber(context.technology_cooldown_remaining) or 0) > 0 then
+                elseif reserved_level >= max_level then
                     item.purchasable = 0
-                    item.disabled_reason = "科技购买冷却中（"
-                        .. string.format("%.1f", context.technology_cooldown_remaining)
-                        .. "秒）"
-                    item.disabled_reason_code = "technology_purchase_cooldown"
+                    item.disabled_reason = "已排队至最高等级"
+                    item.disabled_reason_code = "queued_max_level"
                 end
                 projected_technology_groups[group] = true
             end
@@ -685,6 +696,7 @@ function M.build_snapshot(player_id, context)
         end
     end
     return {
+        research = context.research,
         schema_version = 2,
         sequence = context.sequence,
         config_version = 2,

@@ -102,6 +102,8 @@ local function clear_cosmetics(hero_entindex)
     if not state then
         return
     end
+    -- Retire ownership before engine cleanup can synchronously re-enter.
+    cosmetics_by_hero[hero_entindex] = nil
     for _, particle_id in ipairs(state.particles or {}) do
         destroy_particle(particle_id)
     end
@@ -114,7 +116,6 @@ local function clear_cosmetics(hero_entindex)
     for _, wearable in ipairs(state.wearables or {}) do
         remove_entity(wearable)
     end
-    cosmetics_by_hero[hero_entindex] = nil
 end
 
 local function walk_children(hero, visitor)

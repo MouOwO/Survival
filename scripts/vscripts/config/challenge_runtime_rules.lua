@@ -24,6 +24,9 @@ for index = 1, 10 do
     add(string.format("challenge_%02d", index))
 end
 add("challenge_11", 10)
+for _, id in ipairs({"challenge_06", "challenge_07", "challenge_11"}) do
+    M.by_id[id].respawn_seconds = 1
+end
 
 function M.apply(config)
     for _, challenge in ipairs(config and config.rows or {}) do

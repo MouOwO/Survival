@@ -79,7 +79,13 @@ const kvPath='scripts/npc/npc_units_custom.txt';let kv=read(kvPath);
 const template=kv.match(/"npc_survival_wave_monster"\s*(\{[^{}]*\})/);assert(template);
 const begin='// BEGIN GENERATED CHALLENGE UNIT NAMES',end='// END GENERATED CHALLENGE UNIT NAMES';
 kv=kv.replace(new RegExp('\\s*'+begin+'[\\s\\S]*?'+end),'');
-const block=[begin,...[...units.keys()].map(id=>'    "npc_survival_named_'+id+'"\n    '+template[1]),end].join('\n');
+const block=[begin,...[...units.keys()].map(id=>{
+ // Start with the declared body, rather than loading Undying before SetModel.
+ const archetype=archetypes.rows.find(r=>r.data.archetype_id===id);
+ let body=template[1];
+ if(archetype&&archetype.data.model_path)body=body.replace(/("Model"\s*)"[^"]*"/,'$1'+JSON.stringify(archetype.data.model_path));
+ return '    "npc_survival_named_'+id+'"\n    '+body;
+}),end].join('\n');
 const close=kv.lastIndexOf('}');write(kvPath,kv.slice(0,close)+'\n'+block+'\n'+kv.slice(close));
 for(const p of ['resource/addon_schinese.txt','resource/localization/addon_schinese.txt']){
  let s=read(p).replace(new RegExp('\\s*'+begin+'[\\s\\S]*?'+end),'');

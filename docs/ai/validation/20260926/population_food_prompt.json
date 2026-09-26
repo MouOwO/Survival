@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "selected_candidate": 1,
+  "asset": "panorama/src/images/custom_game/survival/food_population.png",
+  "prompt": "Create the production-ready standalone game UI resource icon for the APPROVED food choice: one roasted CHICKEN DRUMSTICK, like classic hand-painted fantasy RTS / Warcraft III inventory artwork. A plump, compact golden caramel-brown roasted chicken leg with chunky simple painterly highlights, and a clearly visible creamy ivory bone with two rounded knuckles. The meaty end points toward upper right and the bone points toward lower left, on a roughly 45-degree diagonal. Warm appetizing amber/orange-brown roasted skin, subtle dark brown contour and soft edge shading, ivory bone for strong tiny-size readability. Broad clean silhouette, restrained large highlights, avoid dense fine texture. Important: this will appear at only 32x32 pixels in a navy-and-gold HUD, so read clearly at that size. Center the complete single drumstick on a square canvas, occupy about 86% of canvas, leave equal modest padding; meat and bone are intact and uncropped. Genuine transparent RGBA background, absolutely no blue or black square, no checkerboard baked in, no frame, no number, no text, no plate, no garnish, no other foods. One single standalone icon, matching the selected chicken-drumstick concept."
+}

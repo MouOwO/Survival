@@ -9,15 +9,17 @@ local hero_anchor_service = require("systems/hero_anchor_service")
 local destination_validation = require("systems/destination_validation_service")
 local summon_destination = require("systems/hero_summon_destination")
 local hero_asset_preload = require("systems/hero_asset_preload_service")
+local player_context = require("systems/player_context_service")
 
 local M = {}
 
-local altar_by_team = {}
+local altar_by_player = {}
 local builder_by_player = {}
-local city_level_by_team = {}
+local city_level_by_player = {}
 local summoned_by_player = {}
 local replacing_by_player = {}
 local pending_by_player = {}
+local unavailable_by_player = {}
 local pending_generation = 0
 local summon
 
@@ -31,6 +33,16 @@ local function valid_player_id(player_id)
        and PlayerResource:IsValidPlayerID(player_id)
 end
 
+local function unavailable_reason(player_id)
+    if player_context.is_defeated(player_id) then return "player_defeated" end
+    return unavailable_by_player[player_id]
+end
+
+local function event_player_id(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    return valid_player_id(player_id) and player_id or nil
+end
+
 local function rule()
     return summon_rules.rows and summon_rules.rows[1] or {
         max_summoned_heroes = 1,
@@ -40,16 +52,16 @@ local function rule()
 end
 
 local function current_summon(player_id)
+    if unavailable_reason(player_id) then return nil end
     local state = summoned_by_player[player_id]
     return state and valid_entity(state.unit) and state or nil
 end
 
 local function snapshot(player_id)
-    local team = PlayerResource:GetTeam(player_id)
     return projection.build(
         player_id,
-        altar_by_team[team],
-        city_level_by_team[team] or 0,
+        altar_by_player[player_id],
+        city_level_by_player[player_id] or 0,
         current_summon(player_id)
     )
 end
@@ -59,10 +71,9 @@ local function publish(player_id, reason)
         return
     end
 
-    local team = PlayerResource:GetTeam(player_id)
     projection.update_altar(
         player_id,
-        altar_by_team[team],
+        altar_by_player[player_id],
         current_summon(player_id) ~= nil
     )
 
@@ -108,7 +119,20 @@ local function diagnose_drow_visible_modifiers(unit)
     end
 end
 
+local function abort_unavailable_replacement(player_id, unit)
+    local reason = unavailable_reason(player_id)
+    if not reason then return nil end
+    hero_anchor_service.abort_replacement(player_id, unit)
+    local multiplayer = package.loaded["systems/multiplayer_player_service"]
+    if valid_entity(unit) and multiplayer and multiplayer.reject_defeated_unit then
+        multiplayer.reject_defeated_unit(unit)
+    end
+    return reason
+end
+
 local function initialize_replacement(player_id, team, altar, definition, position)
+    local blocked = unavailable_reason(player_id)
+    if blocked then return nil, blocked end
     local placeholder, begin_error = hero_anchor_service.begin_replacement(player_id)
     if not placeholder then
         return nil, begin_error
@@ -130,6 +154,10 @@ local function initialize_replacement(player_id, team, altar, definition, positi
         return nil, "hero_replacement_failed"
     end
 
+    -- Native hero replacement may synchronously emit engine callbacks. A defeat
+    -- during that call must not unhide or commit its newly created hero.
+    blocked = abort_unavailable_replacement(player_id, unit)
+    if blocked then return nil, blocked end
     unit:RemoveNoDraw()
     if unit.SetPlayerID then unit:SetPlayerID(player_id) end
     local player = PlayerResource:GetPlayer(player_id)
@@ -168,6 +196,8 @@ local function initialize_replacement(player_id, team, altar, definition, positi
     end
     cosmetic_service.apply(unit, definition.hero_id)
     diagnose_drow_visible_modifiers(unit)
+    blocked = abort_unavailable_replacement(player_id, unit)
+    if blocked then return nil, blocked end
     local committed, commit_error = hero_anchor_service.commit_replacement(
         player_id,
         unit
@@ -183,6 +213,8 @@ local function validate(player_id, hero_id, debug_bypass)
     if not valid_player_id(player_id) then
         return nil, nil, "player_id_invalid"
     end
+    local blocked = unavailable_reason(player_id)
+    if blocked then return nil, nil, blocked end
     if current_summon(player_id) then
         return nil, nil, "已经召唤过英雄"
     end
@@ -190,8 +222,7 @@ local function validate(player_id, hero_id, debug_bypass)
         return nil, nil, "hero_replacement_in_progress"
     end
 
-    local team = PlayerResource:GetTeam(player_id)
-    local altar = altar_by_team[team]
+    local altar = altar_by_player[player_id]
     if debug_bypass and not valid_entity(altar) then
         altar = builder_by_player[player_id]
         if not valid_entity(altar) then
@@ -204,7 +235,7 @@ local function validate(player_id, hero_id, debug_bypass)
     if not valid_entity(altar) then
         return nil, nil, "英雄祭坛尚未建造"
     end
-    if not debug_bypass and (city_level_by_team[team] or 0)
+    if not debug_bypass and (city_level_by_player[player_id] or 0)
         < (tonumber(rule().requires_city_level) or 3) then
         return nil, nil, "主城等级不足"
     end
@@ -282,6 +313,7 @@ local function queue_pending_summon(payload, definition)
     notify_preload(player_id, "英雄资源准备中，完成后将自动召唤")
 
     local queued, status = hero_asset_preload.request(definition.hero_id, {
+        player_id = player_id,
         on_ready = function()
             local pending = pending_by_player[player_id]
             if not pending or pending.generation ~= generation then return end
@@ -294,6 +326,8 @@ local function queue_pending_summon(payload, definition)
             complete_pending(player_id, generation, result)
         end,
         on_failed = function(reason)
+            local pending = pending_by_player[player_id]
+            if not pending or pending.generation ~= generation then return end
             local result = {
                 ok = false,
                 error = "hero_resource_load_failed:" .. tostring(reason),
@@ -323,7 +357,7 @@ summon = function(payload)
         return { ok = false, error = error_code }
     end
 
-    if not hero_asset_preload.is_ready(hero_id) then
+    if not hero_asset_preload.is_ready(hero_id, player_id) then
         return queue_pending_summon(payload, definition)
     end
 
@@ -341,6 +375,11 @@ summon = function(payload)
         return { ok = false, error = replacement_error or "hero_replacement_failed" }
     end
 
+    local blocked = abort_unavailable_replacement(player_id, unit)
+    if blocked then
+        replacing_by_player[player_id] = nil
+        return { ok = false, error = blocked }
+    end
     summoned_by_player[player_id] = {
         unit = unit,
         hero_id = hero_id,
@@ -358,6 +397,8 @@ summon = function(payload)
         unit_name = definition.unit_name,
         display_name = definition.display_name,
     })
+    blocked = abort_unavailable_replacement(player_id, unit)
+    if blocked then return { ok = false, error = blocked } end
     local player = PlayerResource:GetPlayer(player_id)
     if player and CustomGameEventManager then
         CustomGameEventManager:Send_ServerToPlayer(player, "survival_select_unit", {
@@ -399,39 +440,60 @@ local function get_summoned(payload)
 end
 
 local function on_builder_ready(payload)
-    builder_by_player[payload.player_id] = payload.builder
-    city_level_by_team[payload.team] =
-        city_level_by_team[payload.team] or 0
-    publish(payload.player_id, "builder_ready")
+    local player_id = event_player_id(payload)
+    if player_id == nil or unavailable_reason(player_id) then return end
+    builder_by_player[player_id] = payload.builder
+    city_level_by_player[player_id] = city_level_by_player[player_id] or 0
+    publish(player_id, "builder_ready")
 end
 
 local function on_building_created(payload)
+    local player_id = event_player_id(payload)
+    if player_id == nil or unavailable_reason(player_id) then return end
     if payload.building_id == "hero_altar" then
-        altar_by_team[payload.team] = payload.unit
-        publish(payload.player_id, "altar_built")
+        altar_by_player[player_id] = payload.unit
+        publish(player_id, "altar_built")
     elseif payload.building_id == "main_city" then
-        city_level_by_team[payload.team] = payload.level or 1
+        city_level_by_player[player_id] = payload.level or 1
     end
 end
 
 local function on_building_changed(payload)
+    local player_id = event_player_id(payload)
+    if player_id == nil or unavailable_reason(player_id) then return end
     if payload.building_id == "main_city" then
-        city_level_by_team[payload.team] = payload.level or 0
-        if payload.player_id ~= nil then
-            publish(payload.player_id, "city_level_changed")
-        end
+        city_level_by_player[player_id] = payload.level or 0
+        publish(player_id, "city_level_changed")
     end
 end
 
 local function on_building_destroyed(payload)
+    local player_id = event_player_id(payload)
+    if player_id == nil then return end
     if payload.building_id == "hero_altar" then
-        altar_by_team[payload.team] = nil
-        if payload.player_id ~= nil then
-            publish(payload.player_id, "altar_destroyed")
-        end
+        local current = altar_by_player[player_id]
+        if payload.unit and current ~= payload.unit then return end
+        altar_by_player[player_id] = nil
+        publish(player_id, "altar_destroyed")
     elseif payload.building_id == "main_city" then
-        city_level_by_team[payload.team] = 0
+        city_level_by_player[player_id] = 0
     end
+end
+
+local function on_player_unavailable(payload, defeated)
+    local player_id = event_player_id(payload)
+    if player_id == nil then return end
+    local reason = (defeated or player_context.is_defeated(player_id)) and "player_defeated"
+        or payload.defeat_cleanup and "player_defeated" or "player_disconnected"
+    unavailable_by_player[player_id] = reason
+    local pending = pending_by_player[player_id]
+    if pending then
+        complete_pending(player_id, pending.generation, { ok = false, error = reason })
+    end
+    replacing_by_player[player_id], summoned_by_player[player_id] = nil, nil
+    builder_by_player[player_id], altar_by_player[player_id] = nil, nil
+    city_level_by_player[player_id] = 0
+    publish(player_id, reason)
 end
 
 local function on_entitlement_changed(payload)
@@ -440,25 +502,26 @@ end
 
 local function on_hero_progression_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
-    if not valid_player_id(player_id) then
+    if not valid_player_id(player_id) or unavailable_reason(player_id) then
         return
     end
-    local team = PlayerResource:GetTeam(player_id)
     projection.update_altar(
         player_id,
-        altar_by_team[team],
+        altar_by_player[player_id],
         current_summon(player_id) ~= nil
     )
 end
 
 function M.init()
-    altar_by_team = {}
+    altar_by_player = {}
     builder_by_player = {}
-    city_level_by_team = {}
+    city_level_by_player = {}
     summoned_by_player = {}
     replacing_by_player = {}
     pending_by_player = {}
-    pending_generation = 0
+    unavailable_by_player = {}
+    -- Old resource callbacks may arrive after a new Tools session initializes.
+    pending_generation = pending_generation + 1
 
     event_bus.handle_request(
         events.HERO_SUMMON_SNAPSHOT_REQUEST,
@@ -470,6 +533,10 @@ function M.init()
         get_summoned
     )
 
+    event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
+        on_player_unavailable(payload, true)
+    end)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_unavailable)
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)

@@ -36,7 +36,7 @@
         return frame;
     }
     // End shared uniform slot outline.
-    function art(parent,id,key) {if(key==="top_gold"||key==="top_wood"||key==="top_population"){
+    function art(parent,id,key) {/* survival unified icon art */var unified={"top_gold":"gold","top_wood":"wood","top_population":"population","top_wave":"skill_morale","top_return_64":"nav_back","top_treasure_64":"nav_treasure","top_benefit_64":"gold_stack","top_shop_64":"talent_wealthy_start","stat_attack":"broadsword","stat_armor":"platemail","stat_attack_speed":"gloves","stat_strength":"reaver","stat_agility":"swift_blink","stat_intelligence":"arcane_blink","top_settings_64":"nav_settings","top_social_64":"nav_social"};if(unified[key]){var refined=create("Image",parent,id,false);refined.SetImage("file://{images}/spellicons/survival/native/"+unified[key]+".png");return refined;}if(key==="top_gold"||key==="top_wood"||key==="top_population"){
  var resource=create("Panel",parent,id,false);
  function part(x,y,w,h,values){var q=create("Panel",resource,"",false);place(q,x,y,w,h);style(q,values);return q;}
  if(key==="top_gold"){

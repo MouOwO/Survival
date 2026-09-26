@@ -1,0 +1,80 @@
+{
+  "date": "2026-09-25",
+  "levels": [
+    "STATIC",
+    "CONTRACT",
+    "SIMULATION"
+  ],
+  "workshop_verified": false,
+  "lua51_tests_passed": [
+    "test_wave_population_endgame",
+    "test_difficulty_unlocks",
+    "test_monster_ground_navigation",
+    "test_archive_challenge_hub_positions",
+    "test_shop_early_final_cooldown",
+    "test_lumberjack_fusion",
+    "test_lumberjack_fusion_ui",
+    "test_rogue_item_rewards",
+    "test_gold_mine_reward_upgrade",
+    "test_worker_system_training",
+    "test_builder_tower_rebuild",
+    "test_rogue_reward_history"
+  ],
+  "node_tests_passed": [
+    "test_treasure_history",
+    "test_world_overlay_visibility",
+    "test_hud_wave_counter",
+    "test_world_health_bar",
+    "test_handoff_refresh",
+    "test_shared_ui",
+    "test_inventory_tooltip_stability",
+    "test_ability_tooltip_stability"
+  ],
+  "compile": {
+    "source_content_sync": "verified",
+    "treasure_and_arrow_assets": "passed",
+    "hud_failed": 0,
+    "hud_forced_compiled": 15
+  },
+  "gameplay": {
+    "archive_entry_min_difficulty": 1,
+    "overflow_comparison": "alive > 90",
+    "treasure_history_capacity": 20,
+    "count_scope": "each player separately, identified by assault monster owner player_id",
+    "alive_limit": 90,
+    "builder_hull_radius": 0,
+    "overflow_grace_seconds": 10,
+    "overflow_defeat_scope": "only the over-limit player; others continue"
+  },
+  "workshop_probe": {
+    "match_restarted": false,
+    "authentication_bypassed": false,
+    "console_echo": "passed",
+    "server_lua": "GameRules unavailable"
+  },
+  "known_existing_issues": [
+    "aliyun_game_test_auth.py had CRCRLF changes before this task; global diff whitespace check fails there",
+    "building_challenge_definitions.csv omits trailing optional empty CSV fields; full strict shape check remains blocked"
+  ],
+  "backend_bundle_changed": false,
+  "committed": false,
+  "pushed": false,
+  "scoped_diff_check": "passed (existing aliyun_game_test_auth.py excluded)",
+  "source_content_files_verified": [
+    "panorama/src/images/spellicons/survival/building_upgrade.png",
+    "panorama/src/images/spellicons/survival/building_upgrade_max.png",
+    "panorama/src/layout/custom_game/archive.xml",
+    "panorama/src/layout/custom_game/building_upgrade_assets.xml",
+    "panorama/src/layout/custom_game/survival_hud.xml",
+    "panorama/src/scripts/custom_game/gold_mine_income_numbers.js",
+    "panorama/src/scripts/custom_game/hero_world_health_bar.js",
+    "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+    "panorama/src/scripts/custom_game/treasure_history.js",
+    "panorama/src/scripts/custom_game/world_overlay_visibility.js",
+    "panorama/src/styles/custom_game/archive.css",
+    "panorama/src/styles/custom_game/gold_mine_income_numbers.css",
+    "panorama/src/styles/custom_game/handoff_v1.css",
+    "panorama/src/styles/custom_game/hero_world_health_bar.css"
+  ],
+  "followup_validation": "per_player_wave_limit.json"
+}

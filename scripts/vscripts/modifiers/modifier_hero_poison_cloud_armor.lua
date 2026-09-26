@@ -46,7 +46,7 @@ function modifier_hero_poison_cloud_armor:IsHidden() return false end
 function modifier_hero_poison_cloud_armor:IsDebuff() return true end
 function modifier_hero_poison_cloud_armor:IsPurgable() return false end
 function modifier_hero_poison_cloud_armor:RemoveOnDeath() return true end
-function modifier_hero_poison_cloud_armor:GetTexture() return "viper_nethertoxin" end
+function modifier_hero_poison_cloud_armor:GetTexture() return "survival/native/skill_poison" end
 
 function modifier_hero_poison_cloud_armor:OnCreated(params)
     self:SetPoisonValues(params)

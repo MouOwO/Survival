@@ -13,6 +13,11 @@ if (wall_stage/'manifest.json').exists():
     walls=json.loads((wall_stage/'manifest.json').read_text(encoding='utf-8'))
     for entry in walls:entry['_stage']=wall_stage
     manifest+=walls
+tower_stage=ROOT/'output/tower_models_20260926'
+if (tower_stage/'manifest.json').exists():
+    towers=json.loads((tower_stage/'manifest.json').read_text(encoding='utf-8'))
+    for entry in towers:entry['_stage']=tower_stage
+    manifest+=towers
 HEADER='<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc28:version{fb63b6ca-f435-4aa0-a2c7-c66ddc651dca} -->\n'
 registry=['-- Generated from output/unique_buildings/manifest.json by build_building_white_shells.py.','return {']
 for entry in manifest:

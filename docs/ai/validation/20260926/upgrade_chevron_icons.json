@@ -1,0 +1,40 @@
+{
+  "date": "2026-09-26",
+  "task": "Reference-style stacked gold upgrade chevrons",
+  "generation_tool": "built-in image_gen",
+  "prompts": "upgrade_icon_prompts.json",
+  "assets": [
+    {
+      "source": "panorama/src/images/spellicons/survival/building_upgrade.png",
+      "sha256": "8a118f9f345da954afac27b6b845f49a3c137e4ac6e5031eccce59304e519894",
+      "width": 1254,
+      "height": 1254,
+      "core_width_percent": 58.1,
+      "transparent_background": true,
+      "soft_alpha_edges": true
+    },
+    {
+      "source": "panorama/src/images/spellicons/survival/building_upgrade_max.png",
+      "sha256": "98cf8815ccc4051d16452acbd5b1f31c9534c1c770b7d851a5e8f2ef8b809180",
+      "width": 1254,
+      "height": 1254,
+      "core_width_percent": 84.3,
+      "transparent_background": true,
+      "soft_alpha_edges": true
+    }
+  ],
+  "ability_references": {
+    "normal": 9,
+    "large": 1
+  },
+  "compile": {
+    "compiled": 3,
+    "failed": 0
+  },
+  "source_content_sync": "identical",
+  "old_svg_sources": "archived in output/upgrade_chevrons_20260925/before; removed from current author directories",
+  "gameplay_logic_changed": false,
+  "workshop_verified": false,
+  "backup": "output/upgrade_chevrons_20260925/before/manifest.json",
+  "committed": false
+}

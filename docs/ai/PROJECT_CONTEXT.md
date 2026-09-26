@@ -69,6 +69,7 @@ Supabase PostgreSQL
 - 多人 Builder progression、建筑数量、普通波次 Marker、怪物城墙目标和断线生命周期均以数字 `player_id` 隔离；同属 `DOTA_TEAM_GOODGUYS` 不能作为共享或所有权依据。
 - 玩家命令统一经过唯一 ExecuteOrderFilter；真实玩家命令的全部单位必须解析为该玩家 owner，系统/AI issuer `-1` 保持放行。服务端注册身份和 `survival_player_id` 优先于普通 creature 不可靠的引擎 owner getter。
 - 普通波次出生点由 `player_slots.csv::wave_spawn_marker` 权威映射。玩家断线后该槽位本局不再生成波次怪，其他玩家通道继续运行。
+- 小地图快捷入口复用统一输入分发：空格取本人服务器建造师身份并选中；F2 经服务器正式英雄校验，使用本人活主城附近的共享安全落点解析器，不能按队伍选城。见 `../MINIMAP_SHORTCUTS.md`。
 
 ## Current Development Phase
 

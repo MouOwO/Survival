@@ -3,7 +3,7 @@ local M = {
     encounter_id = "encounter_challenge_07",
     content_id = "material_molten_core_01",
     max_alive = 10,
-    respawn_seconds = 0.5,
+    respawn_seconds = 1,
     drop_chance_pct = 20,
 }
 

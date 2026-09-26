@@ -230,6 +230,16 @@ M.arrow_tower = {
     },
 }
 
+-- Initial construction uses this adapter; upgrades read the same CSV models.
+-- Keep visual progression independent of the existing combat balance values.
+for _, row in ipairs(arrow_tower_base.rows or {}) do
+    local level = M.arrow_tower.pre_class_levels[tonumber(row.level)]
+    if row.enabled ~= false and level then
+        level.model_name = row.model_name
+        level.model_asset_id = row.model_asset_id
+    end
+end
+
 local research_lab_levels = level_rows("building_research_lab")
 research_lab_levels[1] = research_lab_levels[1] or {}
 research_lab_levels[1].health = research_lab_levels[1].health or 2500

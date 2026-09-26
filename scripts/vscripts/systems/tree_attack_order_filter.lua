@@ -30,6 +30,7 @@ local function filter(_, keys)
         or tonumber(keys.issuer_player_id)
         or tonumber(keys.player_id)
     if loading and issuer and issuer >= 0 and not loading.is_player_ready(issuer) then return false end
+    if issuer and issuer >= 0 and player_context.is_defeated(issuer) then return false end
     local units = ordered_units(keys)
     if issuer ~= nil and issuer >= 0 then
         for _, unit in ipairs(units) do

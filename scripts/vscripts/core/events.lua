@@ -105,6 +105,7 @@ local M = {
     TECHNOLOGY_STATS_CHALLENGE_ADD_REQUEST = "technology.stats.challenge_add.request",
     TECHNOLOGY_STATS_ROGUE_ADD_REQUEST = "technology.stats.rogue_add.request",
     TECHNOLOGY_RESEARCH_STATE_CHANGED = "technology.research_state.changed",
+    SHOP_AUTO_PURCHASE_TOGGLE_REQUEST = "shop.auto_purchase_toggle.request",
     SHOP_AUTO_RESEARCH_TOGGLE_REQUEST = "shop.auto_research_toggle.request",
     TECHNOLOGY_CHEAT_SET_REQUEST = "technology.cheat_set.request",
     TECHNOLOGY_CHANGED = "technology.changed",

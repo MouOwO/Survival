@@ -290,12 +290,16 @@ local function spawn(appearance, component, model_path)
     )
     local data = {
         model = model_path,
-        DefaultAnim = component and component.default_sequence
-            or appearance and appearance.default_sequence or "idle",
         solid = "0",
         spawnflags = "256",
         DisableBoneFollowers = "1",
     }
+    -- Bone-merged wearables inherit the owner's pose. Many official pieces
+    -- (including Fractal Horns) have no standalone idle sequence.
+    if not component or component.attach_mode ~= "bone_merge" then
+        data.DefaultAnim = component and component.default_sequence
+            or appearance and appearance.default_sequence or "idle"
+    end
     local ok, wearable = pcall(
         SpawnEntityFromTableSynchronous,
         entity_class,

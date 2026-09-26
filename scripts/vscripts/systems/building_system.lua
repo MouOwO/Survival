@@ -10,7 +10,6 @@ local logger = require("core/logger")
 local team_alignment = require("core/team_alignment")
 local tower_skills = require("systems/tower_skill_runtime")
 local scheduler = require("core/scheduler")
-local grid_config = require("config/grid_config")
 local building_population = require("systems/building_population_service")
 local building_hull_scale = require("systems/building_hull_scale")
 local wall_collision_barrier_service = require("systems/wall_collision_barrier_service")
@@ -28,6 +27,7 @@ local player_tower_limits = require("systems/player_tower_limit_service")
 local building_count_limits = require("systems/building_count_limit_service")
 local building_defeat_rules = require("systems/building_defeat_rules")
 local online_time_service = require("systems/online_time_service")
+local builder_work = require("systems/builder_work_position_service")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
@@ -76,53 +76,6 @@ local function release_grid_for_unit(unit)
         footprint = footprint,
         entindex = unit:entindex(),
     })
-end
-local function position_is_clear(position)
-    local traversable = true
-    local blocked = false
-    pcall(function() traversable = GridNav:IsTraversable(position) end)
-    pcall(function() blocked = GridNav:IsBlocked(position) end)
-    return traversable and not blocked
-end
-local function builder_work_position(caster, definition, origin)
-    if not valid_entity(caster) then return nil end
-    local footprint = definition.footprint or { x = 1, y = 1 }
-    local cell_size = tonumber(grid_config.cell_size) or 128
-    local building_radius = math.max(footprint.x, footprint.y) * cell_size * 0.5
-    local hull = caster.GetHullRadius and (caster:GetHullRadius() or 0) or 0
-    local safe_radius = building_radius + hull + 160
-    local direction = caster:GetAbsOrigin() - origin
-    direction.z = 0
-    if direction:Length2D() < 1 then
-        direction = caster:GetForwardVector()
-    end
-    direction = direction:Normalized()
-    for step = 0, 11 do
-        local angle = math.rad(step * 30)
-        local candidate_direction = Vector(
-            direction.x * math.cos(angle) - direction.y * math.sin(angle),
-            direction.x * math.sin(angle) + direction.y * math.cos(angle),
-            0
-        )
-        local candidate = origin + candidate_direction * safe_radius
-        candidate.z = GetGroundHeight(candidate, caster)
-        if position_is_clear(candidate) then
-            return candidate
-        end
-    end
-    return origin + Vector(safe_radius, 0, 0)
-end
-local function builder_ready(caster, definition, origin, work_position)
-    if not valid_entity(caster) then return false end
-    if not work_position then return false end
-    local distance = (caster:GetAbsOrigin() - origin):Length2D()
-    local work_distance = (caster:GetAbsOrigin() - work_position):Length2D()
-    local cell_size = tonumber(grid_config.cell_size) or 128
-    local footprint = definition.footprint or { x = 1, y = 1 }
-    local hull = caster.GetHullRadius and (caster:GetHullRadius() or 0) or 0
-    local safe_radius = math.max(footprint.x, footprint.y) * cell_size * 0.5
-        + hull + 160
-    return distance >= safe_radius - 48 and work_distance <= 48
 end
 local function notify(player_id, message, level)
     event_bus.emit(events.UI_NOTIFICATION, {
@@ -361,7 +314,11 @@ local function add_ability(unit, ability_name, active)
         return false
     end
     ability:SetLevel(1)
-    if ability.SetHidden then ability:SetHidden(false) end
+    -- Lumberjack training is exposed by the four production-panel entries.
+    -- Keep the engine ability for compatibility, including delayed ability setup.
+    if ability.SetHidden then
+        ability:SetHidden(ability_name == "ability_train_lumberjack")
+    end
     ability:SetActivated(active ~= false)
     print("[BuildingAbility] AddAbility OK unit=" .. tostring(unit:entindex()) .. " ability=" .. tostring(ability_name) .. " index=" .. tostring(ability:GetAbilityIndex()))
     return true
@@ -596,7 +553,10 @@ require("systems/building_relocation").bind(
     function(entindex) return buildings[entindex] end,
     public_state
 )
-local function can_place(payload)
+local function can_place(payload, require_clear_builder)
+    if require("systems/player_context_service").is_defeated(payload and payload.player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     local definition = config[payload.building_id]
     local caster = payload.caster
     if not definition or not valid_entity(caster) then
@@ -650,6 +610,10 @@ local function can_place(payload)
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = payload.position,
         footprint = definition.footprint,
+        team = team,
+        -- Preview/approach may overlap this authenticated builder only. At
+        -- the actual spend/create boundary every unit is checked again.
+        ignore_entindex = not require_clear_builder and caster.entindex and caster:entindex() or nil,
     })
     if not grid or not grid.ok then
         return grid or { ok = false, error = "建造位置验证失败" }
@@ -664,7 +628,7 @@ local function can_place(payload)
 end
 local function start_building(payload)
     print("[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path")
-    local check = can_place(payload)
+    local check = can_place(payload, true)
     if not check.ok then
         notify(tonumber(payload.player_id) or -1, check.error, "error")
         return check
@@ -931,15 +895,17 @@ local function queue_building(payload)
         clear_build_task(caster, caster.survival_build_task)
     end
     local target = check.grid.world_position
-    local work_position = builder_work_position(caster, check.definition, target)
+    local work_position = builder_work.find(caster, check.definition, target)
     if not work_position then
-        return { ok = false, error = "找不到可建造位置" }
+        return { ok = false, error = "建筑周围没有可安全到达的施工位置" }
     end
     local task = {
         building_id = payload.building_id,
         target = target,
         work_position = work_position,
         source_ability = payload.source_ability,
+        timeout_at = GameRules:GetGameTime() + math.max(15,
+            (caster:GetAbsOrigin() - work_position):Length2D() / 100 + 5),
     }
     caster.survival_build_task = task
     caster.survival_build_internal_order = true
@@ -960,10 +926,19 @@ local function queue_building(payload)
             rollback_build_cooldown(task)
             return false
         end
-        if caster.survival_build_task ~= task then return false end
+        if caster.survival_build_task ~= task then
+            rollback_build_cooldown(task)
+            return false
+        end
         if caster.IsAlive and not caster:IsAlive() then
             clear_build_task(caster, task)
             rollback_build_cooldown(task)
+            return false
+        end
+        if GameRules:GetGameTime() >= task.timeout_at then
+            clear_build_task(caster, task)
+            rollback_build_cooldown(task)
+            notify(check.player_id, "建造者未能到达安全施工位置，请重新选择位置", "error")
             return false
         end
         local current = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
@@ -978,7 +953,7 @@ local function queue_building(payload)
             rollback_build_cooldown(task)
             return false
         end
-        if not builder_ready(
+        if not builder_work.ready(
             caster,
             current.definition,
             target,
@@ -1277,8 +1252,11 @@ local function on_player_disconnected(payload)
         if valid_entity(unit) then
             removed = removed + 1
             unit.survival_disconnect_cleanup = true
-            if unit.ForceKill then unit:ForceKill(false)
-            elseif UTIL_Remove then UTIL_Remove(unit) end
+            -- Kill first so death visuals see the correct state, then retire
+            -- logical ownership synchronously even if the engine event is late.
+            if unit.ForceKill then unit:ForceKill(false) end
+            on_entity_killed({ victim = unit })
+            if not unit.ForceKill and UTIL_Remove then UTIL_Remove(unit) end
         end
     end
     print(string.format(

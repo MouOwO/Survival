@@ -172,4 +172,20 @@ for index = 1, 7 do
     assert(slot("class_" .. tostring(index)).pending == expected_pending, "released incorrect route reservation")
 end
 assert(#destroyed == 1 and #pop_releases == 1)
+-- Individual defeat releases only the owner's buildings, counts and cells.
+victim = fixture()
+local survivor = tower(25)
+survivor.survival_player_id = 1
+assert(query(survivor) and occupied(survivor) == survivor:entindex())
+bus.emit(events.PLAYER_DISCONNECTED, {player_id = 0, defeat_cleanup = true})
+assert(base_count() == 0 and #destroyed == 8 and #pop_releases == 7)
+assert(not victim:IsAlive() and occupied(victim) == nil and query(victim) == nil)
+assert(survivor:IsAlive() and query(survivor) and occupied(survivor) == survivor:entindex())
+assert(building._building_limit_for_test.count_for(1, "arrow_tower") == 1)
+for _, unit in ipairs(units) do
+    if unit.survival_player_id == 0 then
+        bus.emit(events.ENGINE_ENTITY_KILLED, {victim = unit})
+    end
+end
+assert(#destroyed == 8 and #pop_releases == 7, "late cleanup events cannot release resources twice")
 print("TOWER_DESTRUCTION_REBUILD_PASS: synchronous manual cleanup, live cap, immediate rebuild, delayed duplicate, natural death, visual failures, all route reservations")

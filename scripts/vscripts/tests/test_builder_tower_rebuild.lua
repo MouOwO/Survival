@@ -48,7 +48,8 @@ bus.reset()
 bus.handle_request(events.BUILDING_LIST_REQUEST, function(payload)
     return { buildings = listed[payload.player_id] }
 end)
-bus.handle_request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, function() return false end)
+local talent_consumed = false
+bus.handle_request(events.ROGUE_REWARD_CONSUMED_GET_REQUEST, function() return talent_consumed end)
 local notifications = {}
 bus.subscribe(events.BUILDER_UNLOCK_CHANGED, function(payload)
     notifications[payload.player_id] = (notifications[payload.player_id] or 0) + 1
@@ -156,3 +157,12 @@ assert(can_build(0), "base construction must remain governed by the current coun
 bus.emit(events.BUILDING_CREATED, tower(601))
 assert(count(0, "arrow_tower") == 7 and not can_build(0))
 print("BUILDER_TOWER_REBUILD_PASS: seven-base cap, synchronous death re-enable, duplicate events, class counts, recovery, player isolation, fusion does not permanently disable construction")
+
+-- The chosen talent is a permanent icon, including after construction rebuilds.
+talent_consumed = true
+for player_id = 0, 1 do
+    bus.emit(events.ROGUE_REWARD_CHANGED, {player_id = player_id})
+    local talent = builders[player_id]:FindAbilityByName("ability_survival_rogue_reward")
+    assert(talent and not talent.hidden and talent.active, "consuming the offer must retain the talent icon")
+end
+print("BUILDER_TALENT_RETENTION_PASS")

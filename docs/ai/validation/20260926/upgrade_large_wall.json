@@ -1,0 +1,82 @@
+{
+  "updated_at": "2026-09-26T13:22:14.279971",
+  "request": "Reduce large tower upgrade arrow subject by 20% and reuse for the second wall upgrade icon.",
+  "asset": "panorama/src/images/spellicons/survival/building_upgrade_large_v5.png",
+  "validation_level": [
+    "STATIC",
+    "RESOURCE_COMPILER"
+  ],
+  "workshop_new_match_verified": false,
+  "bindings": {
+    "ability_upgrade_tower_max": "survival/building_upgrade_large_v5",
+    "ability_upgrade_wall_9_1": "survival/building_upgrade_large_v5",
+    "ability_upgrade_wall": "survival/building_upgrade_one_v4",
+    "ability_upgrade_tower_lv01": "survival/building_upgrade_one_v4"
+  },
+  "small_binding_count": 8,
+  "large_binding_count": 2,
+  "metrics": [
+    {
+      "asset": "building_upgrade_five_v4.png",
+      "width": 1254,
+      "height": 1254,
+      "gold_subject_width": 0.7472089314194578,
+      "gold_subject_height": 0.817384370015949,
+      "sha256": "5717B41534A38961E7E3C9AAFCA81A42764096CAF471A71510E9DF23060E336E"
+    },
+    {
+      "asset": "building_upgrade_large_v5.png",
+      "width": 1254,
+      "height": 1254,
+      "gold_subject_width": 0.5893141945773525,
+      "gold_subject_height": 0.6562998405103668,
+      "sha256": "0A4AB654E224D9850A3DACF73144A1360CF5326AC17118F9695BCF920ED9E1E9"
+    },
+    {
+      "asset": "building_upgrade_one_v4.png",
+      "width": 1254,
+      "height": 1254,
+      "gold_subject_width": 0.36921850079744817,
+      "gold_subject_height": 0.48724082934609253,
+      "sha256": "16609B5172B36F789A98EBB0B3E8076D7256DA86C3F075B18C1A24DC8766E6BD"
+    }
+  ],
+  "new_vs_previous_large_subject_linear_ratio": {
+    "width": 0.7886872998932764,
+    "height": 0.8029268292682926
+  },
+  "measurement": "Read-only gold pixel bounding box within frame exclusion ROI; 2px sampling.",
+  "non_icon_kv_and_xml_content_unchanged": true,
+  "content_sync": [
+    {
+      "file": "panorama/src/layout/custom_game/building_upgrade_assets.xml",
+      "sha256": "29013805ea1cf61f1e7b26f047cba62003f8aa9293f9b2a73dd5e670946ee548"
+    },
+    {
+      "file": "panorama/src/images/spellicons/survival/building_upgrade_large_v5.png",
+      "sha256": "0a4ab654e224d9850a3dacf73144a1360cf5326ac17118f9695bcf920ed9e1e9"
+    },
+    {
+      "file": "panorama/src/images/spellicons/survival/building_upgrade_one_v4.png",
+      "sha256": "16609b5172b36f789a98ebb0b3e8076d7256da86c3f075b18c1a24dc8766e6bd"
+    }
+  ],
+  "compiled_runtime": {
+    "file": "panorama/images/spellicons/survival/building_upgrade_large_v5_png.vtex_c",
+    "sha256": "484c4d41b499a1b869ee8d2e23d36e9decc1e0e8ccbaf1bf7c8214cf81a00c35"
+  },
+  "compile": {
+    "compiled": 3,
+    "failed": 0,
+    "log": "output/upgrade_large_wall_20260926/compile_icons.log"
+  },
+  "image_generation": {
+    "tool": "built-in image_gen",
+    "prompts": [
+      "Use case: precise-object-edit. Edit target: the last displayed square golden double-chevron upgrade icon preview. This is a production icon for a Dota 2 custom game. Make one exact proportional size change: scale ONLY the two gold arrow chevrons together to 80% of their current linear width and height, centered at the exact same center. The original gold arrow subject occupies about 75% of the square canvas width and 82% of canvas height; the edited chevron subject must occupy about 60% of the entire canvas width and 66% of canvas height, centered. Keep both chevrons' shape, proportions, stacked layout, spacing proportional to the 80% scale, metallic golden yellow color, bevels and smooth highlights. Preserve the full-size dark teal opaque background and outer gold square border UNCHANGED, same border position, width and softly glowing edges. This change is NOT a zoom of the full image: the square frame must stay the same size; fill the newly vacated surrounding region with the same dark teal background. Large arrows stay clearly larger than a separate small-icon variant that is 37% canvas width. Exactly two upward gold chevrons. No letters, words, numbers, symbols, text, labels, watermark, mockup, added arrows or transparency. One high resolution square icon. Center the resulting arrow stack with generous dark space all around, with its extrema at x=20% and x=80%, y=17% and y=83% of the canvas.",
+      "Use case: precise-object-edit. Edit target: last displayed golden double-chevron square icon. Precision size correction ONLY. The arrow stack in this particular preview is currently too small: it is 55% of canvas width and 60% of canvas height. Increase the size of ONLY the two golden chevrons together by 10% linearly, centered, to reach 60% of the ENTIRE outer canvas width and 66% of the ENTIRE outer canvas height. On the 400x400 reference preview, the final stack should span x=80 through x=320 (240px width), top at y=68, bottom at y=332 (264px total height). This is slightly LARGER than the provided preview, not smaller. Important: percentages apply to the entire image including the border, not just the interior panel. Keep the full-size square gold frame exactly in place, same thickness and glow; keep the dark teal opaque background unchanged. Preserve exactly the two upward chevrons, their shape, proportions, color, metallic texture, 3D bevels and highlights. No changes to frame, palette, number of arrows or other details. No words, numbers, captions, symbols, watermark or extra elements. Export one high-resolution square icon with opaque dark teal background."
+    ],
+    "asset": "panorama/src/images/spellicons/survival/building_upgrade_large_v5.png",
+    "selected_generated_source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-ddbf72e9-099e-4bd9-8c02-9b287fc16d56.png"
+  }
+}

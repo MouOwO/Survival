@@ -1,0 +1,102 @@
+[
+  {
+    "name": "arrow_tower_lv01",
+    "level": 1,
+    "triangles": 21698,
+    "dimensions": [
+      87.57963562011719,
+      80.626708984375,
+      129.1272735595703
+    ],
+    "height": 129.1272735595703,
+    "attack_origin": [
+      46,
+      0,
+      125
+    ],
+    "material": "materials/survival_buildings/arrow_tower_lv01.vmat",
+    "model": "models/survival_buildings/arrow_tower_lv01.vmdl",
+    "model_scale": 0.8,
+    "import_scale": 0.01
+  },
+  {
+    "name": "arrow_tower_lv02",
+    "level": 2,
+    "triangles": 33878,
+    "dimensions": [
+      95.57911682128906,
+      95.57911682128906,
+      166.1272735595703
+    ],
+    "height": 166.1272735595703,
+    "attack_origin": [
+      46,
+      0,
+      162
+    ],
+    "material": "materials/survival_buildings/arrow_tower_lv02.vmat",
+    "model": "models/survival_buildings/arrow_tower_lv02.vmdl",
+    "model_scale": 0.8,
+    "import_scale": 0.01
+  },
+  {
+    "name": "arrow_tower_lv03",
+    "level": 3,
+    "triangles": 36482,
+    "dimensions": [
+      95.91477966308594,
+      94.85163879394531,
+      175.1272735595703
+    ],
+    "height": 175.1272735595703,
+    "attack_origin": [
+      46,
+      0,
+      171
+    ],
+    "material": "materials/survival_buildings/arrow_tower_lv03.vmat",
+    "model": "models/survival_buildings/arrow_tower_lv03.vmdl",
+    "model_scale": 0.8,
+    "import_scale": 0.01
+  },
+  {
+    "name": "arrow_tower_lv04",
+    "level": 4,
+    "triangles": 42918,
+    "dimensions": [
+      101.57998657226562,
+      100.23204040527344,
+      197.1272735595703
+    ],
+    "height": 197.1272735595703,
+    "attack_origin": [
+      46,
+      0,
+      193
+    ],
+    "material": "materials/survival_buildings/arrow_tower_lv04.vmat",
+    "model": "models/survival_buildings/arrow_tower_lv04.vmdl",
+    "model_scale": 0.8,
+    "import_scale": 0.01
+  },
+  {
+    "name": "arrow_tower_lv05",
+    "level": 5,
+    "triangles": 61934,
+    "dimensions": [
+      103.75090026855469,
+      105.49803161621094,
+      219.1272735595703
+    ],
+    "height": 219.1272735595703,
+    "attack_origin": [
+      46,
+      0,
+      215
+    ],
+    "material": "materials/survival_buildings/arrow_tower_lv05.vmat",
+    "model": "models/survival_buildings/arrow_tower_lv05.vmdl",
+    "model_scale": 0.8,
+    "import_scale": 0.01
+  }
+]

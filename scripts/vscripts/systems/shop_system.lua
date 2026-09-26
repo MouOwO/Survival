@@ -7,11 +7,20 @@ local challenge_definitions = require("config/generated/challenge_definitions")
 local rebirth_challenges = require("config/generated/rebirth_challenges")
 local research_config = require("config/research_technology_config")
 local research_events = require("research/research_event_names")
+local research_abilities = require("config/generated/research_lab_abilities")
+local ability_by_research_group = {}
+for _, mapping in ipairs(research_abilities.rows or {}) do
+    ability_by_research_group[mapping.technology_group] = mapping.ability_name
+end
 local M = {}
 local state = {}
 local TECHNOLOGY_RESEARCH_DURATION = 2
 local AUTO_RESEARCH_RETRY_INTERVAL = 1
+local RESEARCH_QUEUE_CAPACITY = 7
 local queue_auto_research
+local enqueue_research
+local run_research_queue
+local queue_research
 local push_snapshot
 
 local function game_time()
@@ -33,14 +42,10 @@ local function reset_state()
         snapshot_cache_by_player = {},
         pending_push_reason = {},
         debug_all_unlocked = {},
-        technology_cooldown_until_by_team = {},
-        technology_cooldown_source_group_by_team = {},
-        technology_cooldown_source_entry_by_team = {},
-        technology_cooldown_sequence_by_team = {},
-        technology_research_transaction_by_team = {},
+        research_lanes = {},
+        auto_research_next_at_by_player = {},
         research_scope_by_player = {},
         research_source_entindex_by_player = {},
-        auto_research_by_team = {},
         purchase_cooldown_until_by_player = {},
         purchase_cooldown_total_by_player = {},
         stock_by_player = {},
@@ -54,21 +59,114 @@ end
 local function player_team(player_id)
     return PlayerResource:GetTeam(player_id)
 end
-local function team_player(team)
-    local limit = tonumber(DOTA_MAX_TEAM_PLAYERS) or 24
-    for player_id = 0, limit - 1 do
-        if valid_player_id(player_id) and player_team(player_id) == team then
-            return player_id
-        end
-    end
-    return nil
-end
 local function notify(player_id, message, level)
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = player_id,
         message = message,
         level = level or "info",
     })
+end
+-- Each player has an independent production slot at each research building.
+-- Public advanced labs retain team access without sharing another player's timer.
+local function research_lane(player_id, source_entindex, create)
+    local key = tostring(player_id) .. ":" .. tostring(tonumber(source_entindex) or -1)
+    local lane = state.research_lanes[key]
+    if not lane and create then
+        lane = { key = key, player_id = player_id,
+            source_entindex = tonumber(source_entindex) or -1,
+            auto_research = {}, next_start_at = 0, sequence = 0,
+            queued = {}, next_job_id = 0, blocked_reason = "" }
+        state.research_lanes[key] = lane
+    end
+    return lane
+end
+local function auto_research_start_at(lane, group)
+    local deadlines = state.auto_research_next_at_by_player[lane.player_id] or {}
+    return math.max(lane.next_start_at or 0, deadlines[group] or 0)
+end
+local function project_research_job(job)
+    if not job then return {} end
+    return { job_id = job.job_id, group = job.technology_group,
+        technology_group = job.technology_group, display_name = job.display_name,
+        target_level = job.target_level, icon_name = job.icon_name or "",
+        ability_name = ability_by_research_group[job.technology_group] or "",
+        entry_id = job.entry_id }
+end
+local function research_job_count(lane)
+    return (lane.pending and 1 or 0) + #(lane.queued or {})
+end
+local function research_snapshot(player_id, source_entindex)
+    local lane = research_lane(player_id, source_entindex, false) or {}
+    local blocked_head = not lane.pending and (lane.queued or {})[1] or nil
+    local pending = lane.pending or blocked_head or {}
+    local queued, reserved_levels = {}, {}
+    if lane.pending then
+        reserved_levels[lane.pending.technology_group] = lane.pending.target_level
+    end
+    for index, job in ipairs(lane.queued or {}) do
+        reserved_levels[job.technology_group] = math.max(
+            reserved_levels[job.technology_group] or 0, job.target_level)
+        if not blocked_head or index > 1 then
+            queued[#queued + 1] = project_research_job(job)
+        end
+    end
+    local enabled, next_start_at = {}, nil
+    for group in pairs(lane.auto_research or {}) do
+        enabled[group] = 1
+        local deadline = auto_research_start_at(lane, group)
+        next_start_at = next_start_at and math.min(next_start_at, deadline) or deadline
+    end
+    return {
+        player_id = player_id, team = player_team(player_id),
+        source_entindex = tonumber(source_entindex) or -1,
+        researching = lane.pending and 1 or 0,
+        research_group = pending.technology_group or "",
+        display_name = pending.display_name or "",
+        target_level = pending.target_level or 0,
+        research_target_level = pending.target_level or 0,
+        started_at = pending.started_at or 0,
+        finish_at = pending.finish_at or 0,
+        duration = TECHNOLOGY_RESEARCH_DURATION,
+        auto_enabled = next(enabled) and 1 or 0,
+        auto_research = enabled,
+        next_start_at = next_start_at or 0,
+        sequence = lane.sequence or 0,
+        entry_id = pending.entry_id or "",
+        icon_name = pending.icon_name or "",
+        ability_name = ability_by_research_group[pending.technology_group] or "",
+        active_job = project_research_job(lane.pending),
+        blocked_head = project_research_job(blocked_head),
+        blocked_reason = lane.blocked_reason or "",
+        queued = queued,
+        queued_count = #queued,
+        queue_count = research_job_count(lane),
+        capacity = RESEARCH_QUEUE_CAPACITY,
+        queue_capacity = RESEARCH_QUEUE_CAPACITY,
+        reserved_levels = reserved_levels,
+        cost_timing_text = "开始研究时扣费，排队未扣费",
+    }
+end
+local function publish_research(lane)
+    event_bus.emit(events.TECHNOLOGY_RESEARCH_STATE_CHANGED,
+        research_snapshot(lane.player_id, lane.source_entindex))
+end
+local function cancel_research(lane, reason)
+    scheduler.cancel("shop_technology_research:" .. lane.key)
+    scheduler.cancel("shop_auto_research:" .. lane.key)
+    scheduler.cancel("shop_research_queue:" .. lane.key)
+    local pending = lane.pending
+    lane.pending = nil
+    lane.auto_research = {}
+    lane.queued = {}
+    lane.blocked_reason = ""
+    lane.next_start_at = 0
+    if pending then
+        event_bus.request(research_events.UPGRADE_ROLLBACK_REQUESTED, {
+            transaction_id = pending.transaction_id,
+            error_code = reason or "research_source_removed",
+        })
+    end
+    publish_research(lane)
 end
 local function building_counts(team)
     state.building_counts_by_team[team] =
@@ -240,7 +338,7 @@ local function active_challenge_encounters(player_id)
     end
     return result
 end
-local function snapshot_context(player_id, reason, mode)
+local function snapshot_context(player_id, reason, mode, source_entindex)
     local team = player_team(player_id)
     local summon = summon_snapshot(player_id)
     local entitlement = entitlement_snapshot(player_id)
@@ -258,6 +356,9 @@ local function snapshot_context(player_id, reason, mode)
     state.sequence_by_player[player_id] =
         (state.sequence_by_player[player_id] or 0) + 1
     local wave_state = event_bus.request(events.WAVE_STATE_GET_REQUEST, {}) or {}
+    source_entindex = tonumber(source_entindex)
+        or state.research_source_entindex_by_player[player_id]
+    local research = research_snapshot(player_id, source_entindex)
     return {
         sequence = state.sequence_by_player[player_id],
         reason = reason,
@@ -278,17 +379,14 @@ local function snapshot_context(player_id, reason, mode)
         research_unlocked = state.research_unlocked[player_id] == true,
         advanced_researcher_unlocked = state.advanced_researcher_unlocked[player_id] == true,
         debug_all_unlocked = state.debug_all_unlocked[player_id] == true,
-        technology_cooldown_remaining = math.max(0,
-            (state.technology_cooldown_until_by_team[team] or 0)
-                - game_time()),
-        technology_cooldown_total = TECHNOLOGY_RESEARCH_DURATION,
-        technology_cooldown_until = state.technology_cooldown_until_by_team[team] or 0,
-        technology_cooldown_source_group = state.technology_cooldown_source_group_by_team
-            and state.technology_cooldown_source_group_by_team[team] or "",
-        technology_cooldown_source_entry = state.technology_cooldown_source_entry_by_team
-            and state.technology_cooldown_source_entry_by_team[team] or "",
-        technology_cooldown_sequence = state.technology_cooldown_sequence_by_team
-            and state.technology_cooldown_sequence_by_team[team] or 0,
+        technology_cooldown_remaining = math.max(0, research.finish_at - game_time()),
+        technology_cooldown_total = research.duration,
+        technology_cooldown_until = research.finish_at,
+        technology_cooldown_source_group = research.research_group,
+        technology_cooldown_source_entry = research.entry_id,
+        technology_cooldown_sequence = research.sequence,
+        auto_research = research.auto_research,
+        research = research,
         wave_state = wave_state,
         ui_mode = mode or state.opened_players[player_id] or "shop",
         research_scope = state.research_scope_by_player[player_id] or "",
@@ -363,6 +461,7 @@ local function build_patch(previous, current)
         technology_cooldown_source_group = current.technology_cooldown_source_group,
         technology_cooldown_source_entry = current.technology_cooldown_source_entry,
         technology_cooldown_sequence = current.technology_cooldown_sequence,
+        research = current.research,
         purchase_cooldowns = current.purchase_cooldowns,
         shop_stock = current.shop_stock,
     }
@@ -380,7 +479,8 @@ local function build_patch(previous, current)
         or not values_equal(previous.categories or {}, current.categories or {}) then
         patch.categories = current.categories
     end
-    local changed_any = patch.resources ~= nil or patch.categories ~= nil
+    local changed_any = not values_equal(previous.research, current.research)
+        or patch.resources ~= nil or patch.categories ~= nil
         or patch.purchase_cooldowns ~= nil
         or patch.shop_stock ~= nil
         or #changed > 0 or #removed > 0
@@ -624,25 +724,41 @@ local function purchase(payload)
             } or (resumed or { ok = false, error = "encounter_resume_failed" })
         end
     end
+    if entry.contenttype == "technology" and research_definition
+        and payload.source ~= "advanced_auto_research"
+        and payload.research_queue_start ~= true then
+        return enqueue_research({ player_id = player_id,
+            source_entindex = payload.source_entindex,
+            technology_group = technology_group, request_id = request_id })
+    end
+    local lane
     if entry.contenttype == "technology" and research_definition then
-        local research_remaining = math.max(0,
-            (state.technology_cooldown_until_by_team[team] or 0)
-                - game_time())
-        if research_remaining > 0
-            or state.technology_research_transaction_by_team[team] then
-            return {
-                ok = false,
-                error = "已有科技正在研究中",
+        lane = research_lane(player_id, payload.source_entindex, true)
+        local conflicting = lane.pending
+        for _, other in pairs(state.research_lanes) do
+            if other.player_id == player_id then
+                if other.pending and other.pending.technology_group == technology_group then
+                    conflicting = other.pending
+                end
+                if other ~= lane then
+                    for _, job in ipairs(other.queued or {}) do
+                        if job.technology_group == technology_group then conflicting = job end
+                    end
+                end
+            end
+        end
+        if conflicting then
+            return { ok = false, error = "该研究所已有科技正在研究中",
                 error_code = "technology_research_in_progress",
-                cooldown_remaining = research_remaining,
-            }
+                cooldown_remaining = math.max(0, (conflicting.finish_at or 0) - game_time()) }
         end
     end
     local context = snapshot_context(
         player_id,
         "purchase_validation",
         gold_mine_ability and "gold_mine"
-            or state.opened_players[player_id] or "shop"
+            or state.opened_players[player_id] or "shop",
+        payload.source_entindex
     )
     context.gold_mine_ability = gold_mine_ability
     context.validated_research_source = validated_research_source
@@ -716,17 +832,13 @@ local function purchase(payload)
         if not started or started.success ~= true then
             local failure = started and started.error_code
                 or "resource_commit_failed"
-            notify(player_id, failure, "error")
+            if not silent_notification then notify(player_id, failure, "error") end
             return { ok = false, error = failure, research_result = started }
         end
-        state.technology_cooldown_until_by_team[team] =
-            game_time() + TECHNOLOGY_RESEARCH_DURATION
-        state.technology_cooldown_source_group_by_team[team] = technology_group
-        state.technology_cooldown_source_entry_by_team[team] = entry.entryid
-        state.technology_cooldown_sequence_by_team[team] =
-            (state.technology_cooldown_sequence_by_team[team] or 0) + 1
-        local research_sequence = state.technology_cooldown_sequence_by_team[team]
-        state.technology_research_transaction_by_team[team] = {
+        lane.sequence = lane.sequence + 1
+        local research_sequence = lane.sequence
+        local current_state = state
+        lane.pending = {
             transaction_id = started.transaction_id,
             player_id = player_id,
             entry_id = entry.entryid,
@@ -734,61 +846,95 @@ local function purchase(payload)
             display_name = research_definition.display_name,
             target_level = started.new_level,
             sequence = research_sequence,
+            started_at = game_time(),
+            finish_at = game_time() + TECHNOLOGY_RESEARCH_DURATION,
+            icon_name = entry.icon or "",
+            job_id = payload.research_job_id,
+            manual = payload.research_queue_start == true,
         }
-        event_bus.emit(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, {
-            team = team,
-            researching = 1,
-            research_group = technology_group,
-            research_target_level = started.new_level,
-            source_entindex = tonumber(payload.source_entindex),
-        })
+        lane.blocked_reason = ""
+        publish_research(lane)
         notify(player_id, "正在研究：" .. research_definition.display_name
             .. " Lv." .. tostring(started.new_level))
-        push_team(team, "technology_research_started")
+        push_snapshot(player_id, "technology_research_started")
         scheduler.after(TECHNOLOGY_RESEARCH_DURATION, function()
-            local pending = state.technology_research_transaction_by_team[team]
+            if current_state ~= state then return end
+            local pending = lane.pending
             if not pending or pending.sequence ~= research_sequence
-                or pending.transaction_id ~= started.transaction_id then
+                or pending.transaction_id ~= started.transaction_id then return end
+            local source = validate_research_source(player_id,
+                lane.source_entindex, research_definition)
+            if not source then
+                cancel_research(lane, "research_source_removed")
+                push_snapshot(player_id, "research_source_removed")
                 return
             end
-            local completed = event_bus.request(
-                research_events.UPGRADE_COMMIT_REQUESTED,
-                { transaction_id = pending.transaction_id }
-            )
+            -- This absolute deadline cannot be bypassed by a resource event,
+            -- another right click, or a previously scheduled retry.
+            lane.next_start_at = game_time() + AUTO_RESEARCH_RETRY_INTERVAL
+            state.auto_research_next_at_by_player[player_id] =
+                state.auto_research_next_at_by_player[player_id] or {}
+            state.auto_research_next_at_by_player[player_id][technology_group] =
+                lane.next_start_at
+            local completed = event_bus.request(research_events.UPGRADE_COMMIT_REQUESTED,
+                { transaction_id = pending.transaction_id })
             if not completed then
-                event_bus.request(
-                    research_events.UPGRADE_ROLLBACK_REQUESTED,
-                    {
-                        transaction_id = pending.transaction_id,
-                        error_code = "research_completion_failed",
-                    }
-                )
+                event_bus.request(research_events.UPGRADE_ROLLBACK_REQUESTED, {
+                    transaction_id = pending.transaction_id,
+                    error_code = "research_completion_failed",
+                })
             end
-            state.technology_research_transaction_by_team[team] = nil
-            state.technology_cooldown_until_by_team[team] = 0
-            state.technology_cooldown_source_group_by_team[team] = ""
-            state.technology_cooldown_source_entry_by_team[team] = ""
-            event_bus.emit(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, {
-                team = team,
-                researching = 0,
-            })
+            lane.pending = nil
             if completed and completed.success == true then
-                state.purchased_count[pending.player_id] =
-                    state.purchased_count[pending.player_id] or {}
-                state.purchased_count[pending.player_id][pending.entry_id] = 1
-                notify(pending.player_id, "已完成研究：" .. pending.display_name
-                    .. " Lv." .. tostring(completed.new_level))
-                push_team(team, "research_upgrade_completed")
-                if next(state.auto_research_by_team[team] or {}) then
-                    queue_auto_research(team, 0)
+                state.purchased_count[player_id] = state.purchased_count[player_id] or {}
+                state.purchased_count[player_id][pending.entry_id] = 1
+                merge_technology_levels(player_id, {
+                    [technology_group] = completed.new_level or pending.target_level })
+                if (tonumber(completed.new_level) or pending.target_level)
+                    >= (tonumber(research_definition.max_level) or 0) then
+                    lane.auto_research[technology_group] = nil
                 end
-                return
+                notify(player_id, "已完成研究：" .. pending.display_name
+                    .. " Lv." .. tostring(completed.new_level))
+            else
+                if pending.manual then
+                    table.insert(lane.queued, 1, {
+                        job_id = pending.job_id, technology_group = pending.technology_group,
+                        display_name = pending.display_name, target_level = pending.target_level,
+                        entry_id = pending.entry_id, icon_name = pending.icon_name,
+                    })
+                    lane.blocked_reason = "研究失败已退款，等待重试；开始研究时扣费"
+                end
+                notify(player_id, "研究失败："
+                    .. tostring(completed and completed.error_code
+                        or "research_completion_failed"), "error")
             end
-            local failure = completed and completed.error_code
-                or "research_completion_failed"
-            notify(pending.player_id, "研究失败：" .. failure, "error")
-            push_team(team, "research_upgrade_failed")
-        end, "shop_technology_cooldown:" .. tostring(team))
+            publish_research(lane)
+            -- Other public labs may have this player's same technology enabled.
+            -- Publish their shared per-technology deadline even when selected
+            -- there, so switching buildings cannot hide or bypass the pause.
+            for _, other in pairs(state.research_lanes) do
+                if other ~= lane and other.player_id == player_id
+                    and other.auto_research[technology_group] then
+                    if completed and completed.success == true
+                        and (tonumber(completed.new_level) or pending.target_level)
+                            >= (tonumber(research_definition.max_level) or 0) then
+                        other.auto_research[technology_group] = nil
+                    end
+                    publish_research(other)
+                end
+            end
+            push_snapshot(player_id, "research_upgrade_completed")
+            if #lane.queued > 0 then
+                if completed and completed.success == true then
+                    run_research_queue(lane.key)
+                else
+                    queue_research(lane.key, AUTO_RESEARCH_RETRY_INTERVAL)
+                end
+            elseif next(lane.auto_research) then
+                queue_auto_research(lane.key, AUTO_RESEARCH_RETRY_INTERVAL)
+            end
+        end, "shop_technology_research:" .. lane.key)
         local result = { ok = true, entry_id = entry.entryid,
             research_started = true, research_result = started }
         remember_result(player_id, request_id, result)
@@ -851,11 +997,133 @@ local function purchase(payload)
     return result
 end
 
+local function research_wait_reason(result)
+    local code = result and (result.error_code or result.error) or "research_start_failed"
+    local messages = {
+        insufficient_gold = "金币不足", insufficient_wood = "木材不足",
+        prerequisite_not_met = "前置科技未满足", reincarnation_not_met = "转职要求未满足",
+        research_access_not_met = "研究所不可用", resource_commit_failed = "资源不足或扣费失败",
+        technology_research_in_progress = "同科技正在其他研究所处理",
+    }
+    return (messages[code] or tostring(code)) .. "；开始研究时扣费"
+end
+
+queue_research = function(key, delay)
+    local current_state = state
+    scheduler.after(delay or 0, function()
+        if state == current_state then run_research_queue(key) end
+    end, "shop_research_queue:" .. key)
+end
+
+run_research_queue = function(key)
+    local lane = state.research_lanes[key]
+    if not lane or lane.pending then return end
+    local current_state = event_bus.request(research_events.STATE_GET_REQUESTED,
+        { player_id = lane.player_id })
+    merge_technology_levels(lane.player_id,
+        current_state and current_state.legacy_levels or {})
+    while #lane.queued > 0 do
+        local job = lane.queued[1]
+        local definition = research_config.by_legacy_group[job.technology_group]
+        if not validate_research_source(lane.player_id, lane.source_entindex, definition) then
+            cancel_research(lane, "research_source_removed")
+            push_snapshot(lane.player_id, "research_source_removed")
+            return
+        end
+        local current = tonumber((state.technology_by_player[lane.player_id] or {})
+            [job.technology_group]) or 0
+        if current >= job.target_level then
+            -- A debug/external upgrade may already have completed a queued target.
+            table.remove(lane.queued, 1)
+        else
+            table.remove(lane.queued, 1)
+            local result = purchase({ player_id = lane.player_id,
+                source_entindex = lane.source_entindex, entry_id = job.entry_id,
+                source = "research_lab_ability", silent_notification = true,
+                research_queue_start = true, research_job_id = job.job_id })
+            if result and result.ok then return end
+            table.insert(lane.queued, 1, job)
+            lane.blocked_reason = research_wait_reason(result)
+            publish_research(lane)
+            push_snapshot(lane.player_id, "research_queue_waiting")
+            queue_research(key, AUTO_RESEARCH_RETRY_INTERVAL)
+            return
+        end
+    end
+    lane.blocked_reason = ""
+    publish_research(lane)
+    push_snapshot(lane.player_id, "research_queue_empty")
+    if next(lane.auto_research) then queue_auto_research(key, 0) end
+end
+
+enqueue_research = function(payload)
+    local player_id = tonumber(payload.player_id)
+    local group = tostring(payload.technology_group or "")
+    local request_id = tostring(payload.request_id or "")
+    if not valid_player_id(player_id) then return { ok = false, error = "player_id_invalid" } end
+    local cached = cached_result(player_id, request_id)
+    if cached then return cached end
+    local definition = research_config.by_legacy_group[group]
+    local source = tonumber(payload.source_entindex or payload.entindex)
+    local building, source_error = validate_research_source(player_id, source, definition)
+    if not building then return { ok = false, error = source_error } end
+    local lane = research_lane(player_id, source, true)
+    if research_job_count(lane) >= RESEARCH_QUEUE_CAPACITY then
+        return { ok = false, error = "研究队列已满（1个研究中＋6个等待）",
+            error_code = "research_queue_full" }
+    end
+    for _, other in pairs(state.research_lanes) do
+        if other ~= lane and other.player_id == player_id then
+            local occupied = other.pending and other.pending.technology_group == group
+            for _, job in ipairs(other.queued or {}) do
+                occupied = occupied or job.technology_group == group
+            end
+            if occupied then return { ok = false, error = "同科技已在其他研究所排队或研究",
+                error_code = "technology_research_in_progress" } end
+        end
+    end
+    local current_state = event_bus.request(research_events.STATE_GET_REQUESTED,
+        { player_id = player_id })
+    merge_technology_levels(player_id, current_state and current_state.legacy_levels or {})
+    local target = tonumber((state.technology_by_player[player_id] or {})[group]) or 0
+    if lane.pending and lane.pending.technology_group == group then
+        target = math.max(target, lane.pending.target_level)
+    end
+    for _, job in ipairs(lane.queued) do
+        if job.technology_group == group then target = math.max(target, job.target_level) end
+    end
+    target = target + 1
+    if target > (tonumber(definition.max_level) or 0) then
+        return { ok = false, error = "该科技已研究或排队至最高等级", error_code = "max_level_reached" }
+    end
+    local entry = catalog.find_technology_entry(group, target)
+    if not entry or entry.enabled == false then
+        return { ok = false, error = "研究配置不可用", error_code = "research_config_invalid" }
+    end
+    lane.next_job_id = lane.next_job_id + 1
+    local job = { job_id = lane.key .. ":" .. tostring(lane.next_job_id),
+        technology_group = group, display_name = definition.display_name,
+        target_level = target, entry_id = entry.entryid, icon_name = entry.icon or "" }
+    lane.queued[#lane.queued + 1] = job
+    if not lane.pending then run_research_queue(lane.key) else publish_research(lane) end
+    local result = { ok = true, queued = true, job_id = job.job_id, target_level = target,
+        entry_id = entry.entryid, research_started = lane.pending
+            and lane.pending.job_id == job.job_id or false,
+        research = research_snapshot(player_id, source) }
+    remember_result(player_id, request_id, result)
+    push_snapshot(player_id, "research_enqueued")
+    return result
+end
+
 local function purchase_next_technology(payload)
     local player_id = tonumber(payload.player_id)
     local group = tostring(payload.technology_group or "")
     if not valid_player_id(player_id) or group == "" then
         return { ok = false, error = "technology_request_invalid" }
+    end
+    if research_config.by_legacy_group[group]
+        and payload.source ~= "advanced_auto_research" then
+        return enqueue_research(payload)
     end
     local research_state = event_bus.request(research_events.STATE_GET_REQUESTED, {
         player_id = player_id,
@@ -887,59 +1155,61 @@ local function purchase_next_technology(payload)
     })
 end
 
-local function run_auto_research(team)
-    if state.technology_research_transaction_by_team[team] then
-        queue_auto_research(team, AUTO_RESEARCH_RETRY_INTERVAL)
+local function run_auto_research(key)
+    local lane = state.research_lanes[key]
+    if not lane or not next(lane.auto_research) then return end
+    if lane.pending then return end -- Completion schedules the next attempt.
+    if #lane.queued > 0 then run_research_queue(key); return end
+    if game_time() < lane.next_start_at then
+        queue_auto_research(key, lane.next_start_at - game_time())
         return
     end
-    local bucket = state.auto_research_by_team[team] or {}
+    local player_id = lane.player_id
+    local research_state = event_bus.request(research_events.STATE_GET_REQUESTED,
+        { player_id = player_id })
+    merge_technology_levels(player_id,
+        research_state and research_state.legacy_levels or {})
+    local retry_delay = AUTO_RESEARCH_RETRY_INTERVAL
     for _, definition in ipairs(research_config.technologies) do
         local group = definition.legacy_group
-        local enabled = bucket[group]
-        if enabled then
-            local player_id = tonumber(enabled.player_id) or team_player(team)
-            local building, source_error = validate_research_source(
-                player_id,
-                enabled.source_entindex,
-                definition
-            )
-            if not building or definition.building_id ~= "advanced_research_lab" then
-                bucket[group] = nil
+        if lane.auto_research[group] then
+            local building = validate_research_source(player_id,
+                lane.source_entindex, definition)
+            if not building then
+                cancel_research(lane, "research_source_removed")
+                push_snapshot(player_id, "research_source_removed")
+                return
+            end
+            local current = tonumber((state.technology_by_player[player_id] or {})[group]) or 0
+            if current >= (tonumber(definition.max_level) or 0) then
+                lane.auto_research[group] = nil
+                publish_research(lane)
+                push_snapshot(player_id, "auto_research_max_level")
+            elseif game_time() < auto_research_start_at(lane, group) then
+                retry_delay = math.min(retry_delay,
+                    auto_research_start_at(lane, group) - game_time())
             else
-                local research_state = event_bus.request(
-                    research_events.STATE_GET_REQUESTED,
-                    { player_id = player_id }
-                )
-                merge_technology_levels(
-                    player_id,
-                    research_state and research_state.legacy_levels or {}
-                )
-                local current = tonumber((state.technology_by_player[player_id]
-                    or {})[group]) or 0
-                if current >= (tonumber(definition.max_level) or 0) then
-                    bucket[group] = nil
-                else
-                    local result = purchase_next_technology({
-                        player_id = player_id,
-                        technology_group = group,
-                        source_entindex = enabled.source_entindex,
-                        source = "advanced_auto_research",
-                        silent_notification = true,
-                    })
-                    if not result or result.ok ~= true then
-                        queue_auto_research(team, AUTO_RESEARCH_RETRY_INTERVAL)
-                    end
-                    return
-                end
+                local result = purchase_next_technology({
+                    player_id = player_id, technology_group = group,
+                    source_entindex = lane.source_entindex,
+                    source = "advanced_auto_research", silent_notification = true,
+                })
+                if result and result.ok == true then return end
+                -- Keep the choice enabled while waiting for resources or prerequisites.
+                -- Other enabled technologies at this building may still be affordable.
             end
         end
     end
+    if next(lane.auto_research) then
+        queue_auto_research(key, retry_delay)
+    end
 end
 
-queue_auto_research = function(team, delay)
+queue_auto_research = function(key, delay)
+    local current_state = state
     scheduler.after(delay or 0, function()
-        run_auto_research(team)
-    end, "shop_auto_research:" .. tostring(team))
+        if current_state == state then run_auto_research(key) end
+    end, "shop_auto_research:" .. key)
 end
 
 local function toggle_auto_research(payload)
@@ -947,29 +1217,35 @@ local function toggle_auto_research(payload)
     local group = tostring(payload and payload.technology_group or "")
     local definition = research_config.by_legacy_group[group]
     if not valid_player_id(player_id) or not definition
-        or definition.building_id ~= "advanced_research_lab" then
+        or not research_building_id(definition) then
         return { ok = false, error = "auto_research_request_invalid" }
     end
-    local building, source_error = validate_research_source(
-        player_id,
-        payload.source_entindex,
-        definition
-    )
+    local building, source_error = validate_research_source(player_id,
+        payload.source_entindex, definition)
     if not building then return { ok = false, error = source_error } end
-    local team = player_team(player_id)
-    state.auto_research_by_team[team] = state.auto_research_by_team[team] or {}
-    local bucket = state.auto_research_by_team[team]
-    if bucket[group] then
-        bucket[group] = nil
+    local lane = research_lane(player_id, payload.source_entindex, true)
+    if lane.auto_research[group] then
+        lane.auto_research[group] = nil
     else
-        bucket[group] = {
-            player_id = player_id,
-            source_entindex = building.entindex,
-        }
-        queue_auto_research(team, 0)
+        local research_state = event_bus.request(research_events.STATE_GET_REQUESTED,
+            { player_id = player_id })
+        merge_technology_levels(player_id,
+            research_state and research_state.legacy_levels or {})
+        if (tonumber((state.technology_by_player[player_id] or {})[group]) or 0)
+            >= (tonumber(definition.max_level) or 0) then
+            return { ok = false, error = "科技已满级", error_code = "max_level_reached" }
+        end
+        lane.auto_research[group] = true
+        local next_at = research_snapshot(player_id, lane.source_entindex).next_start_at
+        queue_auto_research(lane.key, math.max(0, next_at - game_time()))
     end
-    push_team(team, "auto_research_toggled")
-    return { ok = true, enabled = bucket[group] ~= nil }
+    if not next(lane.auto_research) then
+        scheduler.cancel("shop_auto_research:" .. lane.key)
+    end
+    publish_research(lane)
+    push_snapshot(player_id, "auto_research_toggled")
+    return { ok = true, enabled = lane.auto_research[group] == true,
+        research = research_snapshot(player_id, payload.source_entindex) }
 end
 
 local function change_building_count(payload, delta)
@@ -1008,6 +1284,11 @@ local function on_building_changed(payload)
     push_team(payload.team, "building_changed")
 end
 local function on_building_destroyed(payload)
+    for _, lane in pairs(state.research_lanes) do
+        if tonumber(lane.source_entindex) == tonumber(payload.entindex) then
+            cancel_research(lane, "research_source_destroyed")
+        end
+    end
     change_building_count(payload, -1)
     if payload.building_id == "main_city" then
         state.city_level_by_team[payload.team] = 0
@@ -1025,6 +1306,15 @@ local function on_building_destroyed(payload)
         end
     end
     push_team(payload.team, "building_destroyed")
+end
+local function on_player_removed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    for _, lane in pairs(state.research_lanes) do
+        if lane.player_id == player_id then
+            cancel_research(lane, "research_player_removed")
+        end
+    end
+    if player_id then close_shop({ player_id = player_id }) end
 end
 local function on_player_changed(payload)
     -- Abyss weapon synthesis happens synchronously on the boss kill. Delay its
@@ -1084,6 +1374,7 @@ local function get_technology_state(payload)
         advanced_researcher_unlocked =
             state.advanced_researcher_unlocked[player_id] == true,
         levels = state.technology_by_player[player_id] or {},
+        research = research_snapshot(player_id, payload.source_entindex),
     }
 end
 
@@ -1111,10 +1402,14 @@ local function on_research_level_changed(payload)
 end
 
 function M.init()
+    for _, lane in pairs(state.research_lanes or {}) do
+        cancel_research(lane, "research_session_reset")
+    end
     for player_id in pairs(state.pending_push_reason or {}) do
         scheduler.cancel("shop_snapshot_push_" .. tostring(player_id))
     end
     reset_state()
+    require("systems/book_auto_purchase_service").init(purchase)
     require("debug/technology_cheat_handler").register(
         state, push_snapshot
     )
@@ -1134,6 +1429,8 @@ function M.init()
         events.TECHNOLOGY_STATE_GET_REQUEST,
         get_technology_state
     )
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_removed)
+    event_bus.subscribe(events.PLAYER_DEFEATED, on_player_removed)
     event_bus.subscribe(events.RESOURCE_CHANGED, on_resource_changed)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)

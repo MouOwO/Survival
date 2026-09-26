@@ -2,6 +2,12 @@
 
 Last Verified: 2026-08-26
 
+## User Collaboration Preferences (2026-09-25)
+
+- 用户明确希望尽量直接执行已提出任务所需的修改、调试、编译和验证，避免对已授权事项反复确认。仍遵守当前会话的系统权限和强制审批规则；这条偏好不改变平台权限。
+- 实际任务完成后，主助手在最终答复前执行一次 `powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File .\tools\notify_task_complete.ps1`，播放本机 Windows 完成提示音。子代理不播放；尚未完成或等待用户输入时不播放。
+- 用户于 2026-09-26 要求完成提示音更大：脚本优先同步播放较响的 `Windows Notify System Generic.wav`（本机音频 RMS 比原 `Windows Notify.wav` 高约 10.4 dB），缺失时回退原提示音及 `ding.wav`。不修改系统主音量；播放失败如实说明。此约定通过助手主动调用项目脚本执行。
+
 ## Project
 
 SurvivalContent 是 Dota 2 Arcade 生存塔防项目，包含英雄成长、防御塔、工人、波次、挑战和永久玩家数据。

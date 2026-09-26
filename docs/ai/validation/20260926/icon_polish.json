@@ -1,0 +1,50 @@
+{
+  "generated_icons": 22,
+  "native_portraits_added": 8,
+  "ordinary_challenges_mapped": 11,
+  "source_dimension": "256x256",
+  "icon_compile": {
+    "compiled": 115,
+    "failed": 0
+  },
+  "hud_compile": {
+    "compiled": 15,
+    "failed": 0
+  },
+  "checks": [
+    "challenge IDs/shop aliases and image input passthrough",
+    "original inventory icon regression",
+    "only challenge icon_name CSV values changed",
+    "large archive atlas unchanged",
+    "source-content byte equality",
+    "compiled texture existence",
+    "Lua 5.1 generated config syntax",
+    "48px browser visual review",
+    "research lab Chinese labels UTF-8"
+  ],
+  "workshop_verified": false,
+  "sha256": {
+    "wood": "22f07745d3b0f1f8058f9bf438c8c69dc2a3c997b499b4bda23512db273aac1f",
+    "wood_stack": "6a60ef472ca76221da2e20ef17d2cdf648c1e6a8cc21aaabc6babc6a126e49f4",
+    "gold": "f39bf4de369c935784d5cd48654f37b0438b5ad259dcd5a70229a24376c74c12",
+    "gold_stack": "6f69c38d627165c92de4982c1d1aa441834151858e5c5a288578c75fe1531f04",
+    "population": "891567e7380ee8c74086426f840d0c6374be49aa0878807ed714fc57f8b9ee3b",
+    "gloves": "2dd8b63f5f19032edbf34822c52146e7e634068bbffcda8603617d8109aa7c75",
+    "vitality_booster": "56bc8cf6c648e036dd47acd64b89c8215aea6751d0d039949aefb250f1302c28",
+    "hyperstone": "0508f89ae84cec2c11bab5c8eb2ed8802aa735eed4ce4e4b68a3a867b3006f85",
+    "reaver": "0efaa349f81f34423abea7d6813c6c0f47486ec382d83ac7fa4edc67db3be30b",
+    "lesser_crit": "2901a257517aae0624932a8bd59457c2754e0e8e1b0c90c78a47f462d2beac02",
+    "javelin": "b5197784b63e287b71a352a1fe0ea599a3ed9aab80cbbe4e357e94e43db9c6e5",
+    "desolator": "51d972492cc3c5fc29d7361c8b677ab23b9c7dbcff2cc4c08efe7d41649ebde6",
+    "heart": "b73d6da53b98aeeed507fb4eac93604b5ed7b37ad6f77aa7ad746a4e7e551a6a",
+    "shivas_guard": "7a5dc471dc01a88e462e59b70d583b9adc29cf90ef6f9f93333248a24b880931",
+    "greater_crit": "848ce3ce0e5dc0ac5be8a2b0313949ba360c0a0d354fef297489378095c61906",
+    "overwhelming_blink": "04d2418b49e4fc52a1eaf33851c0335297102bb3fb15bf2a71b424a19095df1a",
+    "swift_blink": "8dd6b752e357fb7331ed093a0f16fb495429880a682d30ad17a9e68e52d58a7a",
+    "arcane_blink": "3304e25cd89c4dc7eadfa6c78bc0e4e3b0a840438b03b935f8672ab5b510a05d",
+    "building_research_lab": "1d04c22b3fa42f39aa96269f89acc7518e41a4aba5e1206f59f535e766e406c1",
+    "building_advanced_research_lab": "853a2eaf2e0a70e3321bf0da25da8060e4c8c945cc1fb02b666d0b281cf3fad9",
+    "building_farm": "b58553772bac257822e62db07780fc17faf270ae0c139596ddc8c7cfb6fe6e52",
+    "building_gold_mine": "b1ac44366ada026d5ea85e8b6bea2fbf4dbf9c1c442fe8056bc2e951f9814c4e"
+  }
+}

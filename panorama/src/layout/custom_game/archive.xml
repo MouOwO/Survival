@@ -8,11 +8,20 @@
         </Button>
         <Label id="EndlessStatus" class="ArchiveHidden" hittest="false" />
         <Button id="TreasureEntry" onactivate="GameUI.CustomUIConfig().SurvivalTreasure.Toggle()"><Label text="宝物" /></Button>
+        <Button id="TreasureScrim" class="ArchiveHidden" onactivate="GameUI.CustomUIConfig().SurvivalTreasure.Close()" />
         <Panel id="TreasureWindow" class="ArchiveHidden">
-            <Panel id="TreasureHeader"><Label text="最近获得的宝物" /><Button onactivate="GameUI.CustomUIConfig().SurvivalTreasure.Toggle()"><Label text="×" /></Button></Panel>
-            <Label id="TreasureHint" text="本局最近4次肉鸽选择 · 最新在前" />
+            <Panel id="TreasureHeader">
+                <Panel id="TreasureEmblem" hittest="false"><Label text="宝" /></Panel>
+                <Panel id="TreasureHeading" hittest="false"><Label id="TreasureTitle" text="本局宝物" /><Label id="TreasureSubtitle" text="征途所得 · 助阵守城" /></Panel>
+                <Label id="TreasureCount" text="0 / 20" hittest="false" />
+                <Button id="TreasureClose" onactivate="GameUI.CustomUIConfig().SurvivalTreasure.Close()"><Label text="×" /></Button>
+            </Panel>
+            <Label id="TreasureHint" text="本局最近20次肉鸽选择 · 最新在前" hittest="false" />
             <Panel id="TreasureCards" />
-            <Panel id="TreasureTooltip" class="ArchiveHidden" hittest="false" hittestchildren="false"><Label id="TreasureTooltipName" /><Label id="TreasureTooltipEffect" /></Panel>
+            <Panel id="TreasureDetail" hittest="false" hittestchildren="false">
+                <Label id="TreasureDetailHint" text="悬停宝物，查看获得的效果" />
+                <Panel id="TreasureTooltip" class="ArchiveHidden"><Label id="TreasureTooltipName" /><Label id="TreasureTooltipEffect" /></Panel>
+            </Panel>
         </Panel>
         <Button id="DailyEntry" onactivate="GameUI.CustomUIConfig().SurvivalDaily.Open(false)">
             <Panel id="DailyChest"><Panel class="ChestLid" /><Panel class="ChestBase" /><Panel class="ChestLock" /></Panel><Label text="每日奖励" />

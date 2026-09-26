@@ -24,9 +24,9 @@ function modifier_hero_passive_skill_effect:Configure(params)
 end
 
 function modifier_hero_passive_skill_effect:GetTexture()
-    if self.effect_type == "skill_vulnerability" then return "skywrath_mage_ancient_seal" end
-    if self.effect_type == "attack_slow" then return "crystal_maiden_frostbite" end
-    return "crystal_maiden_crystal_nova"
+    if self.effect_type == "skill_vulnerability" then return "survival/native/skill_arcane_eye" end
+    if self.effect_type == "attack_slow" then return "survival/native/skill_frost" end
+    return "survival/native/skill_frost"
 end
 
 function modifier_hero_passive_skill_effect:DeclareFunctions()

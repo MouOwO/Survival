@@ -778,6 +778,7 @@ local function get_stats(payload)
 end
 
 local function on_technology_stats_changed(payload)
+    if payload and payload.changed_section == "lumberjack" then return end
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
     recalculate(player_id, "technology_stats_changed")

@@ -164,6 +164,9 @@ local function current_difficulty_id()
 end
 
 local function start_encounter(payload)
+    if require("systems/player_context_service").is_defeated(payload and payload.player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     local encounter_id = tostring(payload.encounter_id or "")
     if challenge_sessions.handles(encounter_id) then
         return challenge_sessions.start(payload)
@@ -374,6 +377,9 @@ local function query_encounter(payload)
 end
 
 local function reenter_encounter(payload)
+    if require("systems/player_context_service").is_defeated(payload and payload.player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     local encounter_id = tostring(payload.encounter_id or "")
     local encounter = encounters.by_id[encounter_id]
     if not encounter or encounter.encounter_type ~= "rebirth_boss" then
@@ -540,6 +546,25 @@ function M.init()
         events.MONSTER_ENCOUNTER_REENTER_REQUEST,
         reenter_encounter
     )
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
+        if not payload or payload.defeat_cleanup ~= true then return end
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id == nil then return end
+        for entindex, meta in pairs(active_by_entindex) do
+            if meta.player_id == player_id then
+                active_by_entindex[entindex] = nil
+                if active_by_encounter[meta.encounter_id] == entindex then
+                    active_by_encounter[meta.encounter_id] = nil
+                end
+                scheduler.cancel("rebirth_retry:" .. player_id .. ":" .. meta.encounter_id)
+                if valid_entity(meta.unit) then
+                    monster_hero_visual_service.clear(meta.unit)
+                    UTIL_Remove(meta.unit)
+                end
+            end
+        end
+        retry_until_by_player[player_id] = nil
+    end)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     event_bus.subscribe(events.HERO_RETURNED_HOME, function(payload)
         cancel_rebirth_attempts(tonumber(payload.player_id), payload.hero, "return_home")

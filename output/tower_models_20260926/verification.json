@@ -1,0 +1,118 @@
+{
+  "status": "PASS",
+  "models": [
+    {
+      "name": "arrow_tower_lv01",
+      "scale": 0.8,
+      "minimum": [
+        -41.57964,
+        -39.101597,
+        -8.355438e-22
+      ],
+      "maximum": [
+        46.0,
+        41.525112,
+        129.12727
+      ],
+      "shell_aligned": true,
+      "attack_origin": [
+        46.0,
+        0.0,
+        125.0
+      ],
+      "root_forward": "+X",
+      "idle": true
+    },
+    {
+      "name": "arrow_tower_lv02",
+      "scale": 0.8,
+      "minimum": [
+        -47.78956,
+        -47.78956,
+        -9.174722e-22
+      ],
+      "maximum": [
+        47.78956,
+        47.78956,
+        166.12726
+      ],
+      "shell_aligned": true,
+      "attack_origin": [
+        46.0,
+        0.0,
+        162.0
+      ],
+      "root_forward": "+X",
+      "idle": true
+    },
+    {
+      "name": "arrow_tower_lv03",
+      "scale": 0.8,
+      "minimum": [
+        -48.63535,
+        -46.804512,
+        -9.783125e-22
+      ],
+      "maximum": [
+        47.279434,
+        48.047123,
+        175.12726
+      ],
+      "shell_aligned": true,
+      "attack_origin": [
+        46.0,
+        0.0,
+        171.0
+      ],
+      "root_forward": "+X",
+      "idle": true
+    },
+    {
+      "name": "arrow_tower_lv04",
+      "scale": 0.8,
+      "minimum": [
+        -50.48957,
+        -50.406216,
+        -1.0432262e-21
+      ],
+      "maximum": [
+        51.09041,
+        49.825825,
+        197.12726
+      ],
+      "shell_aligned": true,
+      "attack_origin": [
+        46.0,
+        0.0,
+        193.0
+      ],
+      "root_forward": "+X",
+      "idle": true
+    },
+    {
+      "name": "arrow_tower_lv05",
+      "scale": 0.8,
+      "minimum": [
+        -52.750896,
+        -52.99803,
+        -1.03988e-21
+      ],
+      "maximum": [
+        51.0,
+        52.5,
+        219.12726
+      ],
+      "shell_aligned": true,
+      "attack_origin": [
+        46.0,
+        0.0,
+        215.0
+      ],
+      "root_forward": "+X",
+      "idle": true
+    }
+  ],
+  "combat_csv_unchanged": true,
+  "existing_portraits_unchanged": true,
+  "new_portraits": 5
+}

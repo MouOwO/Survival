@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-26",
+  "task": "Replace population HUD icon with approved chicken drumstick",
+  "generation_tool": "built-in image_gen",
+  "prompt_file": "population_food_prompt.json",
+  "asset": "panorama/src/images/custom_game/survival/food_population.png",
+  "compiled_texture": "panorama/images/custom_game/survival/food_population_png.vtex_c",
+  "display_size": [
+    32,
+    32
+  ],
+  "transparent_background": true,
+  "image_measurement": {
+    "Path": "F:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\survival\\food_population.png",
+    "Width": 1254,
+    "Height": 1254,
+    "TransparentPixels": 1070324,
+    "SoftAlphaPixels": 501492,
+    "CoreBounds": [
+      88,
+      117,
+      1174,
+      1143
+    ],
+    "CoreWidth": 1087,
+    "CoreHeight": 1027
+  },
+  "population_value_and_limit_logic_changed": false,
+  "display_alignment_preserved": true,
+  "compile": {
+    "compiled": 3,
+    "failed": 0
+  },
+  "source_content_identical": [
+    "scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+    "layout/custom_game/population_food_assets.xml",
+    "images/custom_game/survival/food_population.png"
+  ],
+  "node_tests_passed": [
+    "test_hud_wave_counter",
+    "test_handoff_refresh"
+  ],
+  "js_syntax": "passed",
+  "workshop_verified": false,
+  "backup": "output/population_food_20260926/before/manifest.json",
+  "committed": false
+}

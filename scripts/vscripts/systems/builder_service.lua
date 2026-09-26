@@ -39,6 +39,7 @@ end
 local function create_builder(payload)
     local player_id = tonumber(payload.player_id)
     local hero = payload.hero
+    if player_context.is_defeated(player_id) then return end
     if player_id == nil or player_id < 0 or not valid_entity(hero)
         or initialized_player[player_id] then
         return
@@ -80,6 +81,9 @@ local function create_builder(payload)
     builder:SetModel(config.model_name)
     builder:SetOriginalModel(config.model_name)
     builder:SetModelScale(tonumber(config.model_scale) or 1)
+    -- The builder must not occupy a navigation hull or push nearby units.
+    builder:SetHullRadius(0)
+    require("core/modifier_registry").ensure(builder, "modifier_survival_builder_phase", {})
     builder.survival_display_name = config.display_name
     builder.survival_builder_id = config.builder_id
     builder.survival_player_id = player_id

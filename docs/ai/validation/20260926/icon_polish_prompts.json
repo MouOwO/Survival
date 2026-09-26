@@ -1,0 +1,116 @@
+{
+  "tool": "image_gen built-in",
+  "art_direction": "暗青底、立体材质、柔和光影；保留原技能物品含义",
+  "icons": [
+    {
+      "key": "wood",
+      "prompt": "Create ONE production-ready square ability icon for a Dota 2 custom game: ONE thick freshly cut hardwood log, diagonal composition from lower left to upper right, rugged dark chestnut bark, warm amber cut end showing realistic irregular wood rings. Dota 2 item icon art direction: richly sculpted hand-painted 3D, realistic material separation, cinematic but restrained warm key light from upper left, cool teal subtle rim, dark desaturated charcoal-teal vignette background, strong readable silhouette filling 82 percent of image. Looks like a premium contemporary Dota inventory asset at 48px, not a flat cartoon emoji, not War3 low resolution, not generic mobile RPG. Subtle weathered texture, tactile volume, no polished plastic, no excessive glow, no sparkles. Square edge-to-edge image, no text, no border, no UI or watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/wood.png"
+    },
+    {
+      "key": "wood_stack",
+      "prompt": "Create ONE square production game skill icon. Subject: A tightly composed pyramid stack of exactly THREE freshly cut hardwood logs, rugged chestnut bark, richly shaded golden amber cut ends with irregular wood rings, visually reads as upgraded lumber efficiency. Dota 2 premium inventory art direction: sculpted three-dimensional hand-painted realism, dramatic directional light, restrained cool teal edge light, dark charcoal-teal vignette background. Hero object fills 80-85 percent of image, readable at 48px. Sophisticated tactile materials, bold simple silhouette, atmospheric depth. No flat emoji/cartoon treatment, plastic toy materials, white backdrop, garish mobile RPG glow, sparkles, pedestal, frame, text or watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/wood_stack.png"
+    },
+    {
+      "key": "gold",
+      "prompt": "Create ONE square production game skill icon. Subject: Exactly THREE heavy ancient gold coins, one coin leaning towards viewer and two overlapping below, true rich warm yellow gold, embossed simple sun insignia, milled edge, slightly worn metal, realistic thickness. Dota 2 premium inventory art direction: sculpted three-dimensional hand-painted realism, dramatic directional light, restrained cool teal edge light, dark charcoal-teal vignette background. Hero object fills 80-85 percent of image, readable at 48px. Sophisticated tactile materials, bold simple silhouette, atmospheric depth. No flat emoji/cartoon treatment, plastic toy materials, white backdrop, garish mobile RPG glow, sparkles, pedestal, frame, text or watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/gold.png"
+    },
+    {
+      "key": "gold_stack",
+      "prompt": "Create ONE square production game skill icon. Subject: A compact abundant pile of 12 thick ancient gold coins, overlapping and stacked at different angles, simple embossed sun marks, rich warm yellow gold with deep brown shadows and restrained highlights, clearly richer than an icon with three coins. Dota 2 premium inventory art direction: sculpted three-dimensional hand-painted realism, dramatic directional light, restrained cool teal edge light, dark charcoal-teal vignette background. Hero object fills 80-85 percent of image, readable at 48px. Sophisticated tactile materials, bold simple silhouette, atmospheric depth. No flat emoji/cartoon treatment, plastic toy materials, white backdrop, garish mobile RPG glow, sparkles, pedestal, frame, text or watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/gold_stack.png"
+    },
+    {
+      "key": "population",
+      "prompt": "ONE square production ability icon for a Dota 2 custom game. A single roast chicken drumstick as fantasy food supply, golden brown crisp textured skin, ivory bone pointing to lower left, appetizing warm highlights and deep brown shadows, not a rubber cartoon drumstick. Premium contemporary Dota 2 item art: sculpted three-dimensional hand-painted realism, tactile material, strong readable bold silhouette at 48px, fills 82 percent. Warm directional key light with understated cool rim, dark desaturated charcoal-teal vignette backdrop. Sophisticated subdued palette with one strong subject color. No white backdrop, no cartoon emoji, no plastic, no excessive sparkles or bloom, no mobile-RPG gaudy decoration, no text, no frame, no watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/population.png"
+    },
+    {
+      "key": "gloves",
+      "prompt": "ONE square production ability icon for a Dota 2 custom game. Gloves of Haste: a pair of dark forest-green supple leather combat gloves with articulated fingers, aged bronze plates and buckles, small oval emerald inset, diagonal poised fist composition. No giant glowing trails. Premium contemporary Dota 2 item art: sculpted three-dimensional hand-painted realism, tactile material, strong readable bold silhouette at 48px, fills 82 percent. Warm directional key light with understated cool rim, dark desaturated charcoal-teal vignette backdrop. Sophisticated subdued palette with one strong subject color. No white backdrop, no cartoon emoji, no plastic, no excessive sparkles or bloom, no mobile-RPG gaudy decoration, no text, no frame, no watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/gloves.png"
+    },
+    {
+      "key": "vitality_booster",
+      "prompt": "ONE square production ability icon for a Dota 2 custom game. Vitality Booster: one deep crimson translucent orb held within a robust dark silver four-pronged armor mount, inner blood-red light, finely scratched forged metal, believable faceted/crystalline depth rather than a flat red ball. Premium contemporary Dota 2 item art: sculpted three-dimensional hand-painted realism, tactile material, strong readable bold silhouette at 48px, fills 82 percent. Warm directional key light with understated cool rim, dark desaturated charcoal-teal vignette backdrop. Sophisticated subdued palette with one strong subject color. No white backdrop, no cartoon emoji, no plastic, no excessive sparkles or bloom, no mobile-RPG gaudy decoration, no text, no frame, no watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/vitality_booster.png"
+    },
+    {
+      "key": "hyperstone",
+      "prompt": "ONE square production ability icon for a Dota 2 custom game. Hyperstone: one thick bright green faceted magical ring-shaped gemstone, nested concentric carved stone planes, emerald inner energy softly illuminating the bevels, dark edges and rich depth, restrained glow. Premium contemporary Dota 2 item art: sculpted three-dimensional hand-painted realism, tactile material, strong readable bold silhouette at 48px, fills 82 percent. Warm directional key light with understated cool rim, dark desaturated charcoal-teal vignette backdrop. Sophisticated subdued palette with one strong subject color. No white backdrop, no cartoon emoji, no plastic, no excessive sparkles or bloom, no mobile-RPG gaudy decoration, no text, no frame, no watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/hyperstone.png"
+    },
+    {
+      "key": "reaver",
+      "prompt": "ONE square production ability icon for a Dota 2 custom game. Reaver axe: one heavy brutal crescent war axe with two thick ochre-gold jagged blades and dark blood-red central metal socket, short wrapped handle, imposing asymmetrical silhouette. Premium contemporary Dota 2 item art: sculpted three-dimensional hand-painted realism, tactile material, strong readable bold silhouette at 48px, fills 82 percent. Warm directional key light with understated cool rim, dark desaturated charcoal-teal vignette backdrop. Sophisticated subdued palette with one strong subject color. No white backdrop, no cartoon emoji, no plastic, no excessive sparkles or bloom, no mobile-RPG gaudy decoration, no text, no frame, no watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/reaver.png"
+    },
+    {
+      "key": "lesser_crit",
+      "prompt": "ONE square production ability icon for a Dota 2 custom game. Crystalys crystal sword: one diagonal short magical sword with a broad pale silver blade, deep ruby-red crystalline core, angular silver guard and dark leather hilt, sharp facets and clean dark separation. Premium contemporary Dota 2 item art: sculpted three-dimensional hand-painted realism, tactile material, strong readable bold silhouette at 48px, fills 82 percent. Warm directional key light with understated cool rim, dark desaturated charcoal-teal vignette backdrop. Sophisticated subdued palette with one strong subject color. No white backdrop, no cartoon emoji, no plastic, no excessive sparkles or bloom, no mobile-RPG gaudy decoration, no text, no frame, no watermark. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/lesser_crit.png"
+    },
+    {
+      "key": "javelin",
+      "prompt": "ONE square premium skill icon for a Dota 2 custom game. Subject: Javelin: one diagonal long spear with broad polished steel arrowhead, worn gold collar, dark wood shaft and russet red leather binding. Clear sharp silhouette. Rich sculpted three-dimensional hand-painted Dota 2 item art, realistic tactile material and dramatic but tasteful lighting. Strong simple shape fills 85% of image, legible when displayed 48 pixels. Dark charcoal-teal vignette background, deep ambient shadows, clear material separation, restrained highlights, warm key and subtle cool rim. No garish mobile-RPG glow, sparkles, plastic toy finish, emoji, frame, text, watermark, pedestals or unrelated props. Exactly one icon.",
+      "target": "panorama/src/images/spellicons/survival/native/javelin.png"
+    },
+    {
+      "key": "desolator",
+      "prompt": "ONE square premium skill icon for a Dota 2 custom game. Subject: Desolator: a curved demonic double-ended crimson blade, deep red forged steel with silver cutting edges, black grip and subtle red inner heat. Strong recognizable crescent silhouette. Rich sculpted three-dimensional hand-painted Dota 2 item art, realistic tactile material and dramatic but tasteful lighting. Strong simple shape fills 85% of image, legible when displayed 48 pixels. Dark charcoal-teal vignette background, deep ambient shadows, clear material separation, restrained highlights, warm key and subtle cool rim. No garish mobile-RPG glow, sparkles, plastic toy finish, emoji, frame, text, watermark, pedestals or unrelated props. Exactly one icon.",
+      "target": "panorama/src/images/spellicons/survival/native/desolator.png"
+    },
+    {
+      "key": "heart",
+      "prompt": "ONE square premium skill icon for a Dota 2 custom game. Subject: Heart of Tarrasque: a heavy crimson living heart armored with jagged dark horn plates and gold-brown ridges, subtle molten red light between ridges. Fantasy artifact, no blood or gore. Rich sculpted three-dimensional hand-painted Dota 2 item art, realistic tactile material and dramatic but tasteful lighting. Strong simple shape fills 85% of image, legible when displayed 48 pixels. Dark charcoal-teal vignette background, deep ambient shadows, clear material separation, restrained highlights, warm key and subtle cool rim. No garish mobile-RPG glow, sparkles, plastic toy finish, emoji, frame, text, watermark, pedestals or unrelated props. Exactly one icon.",
+      "target": "panorama/src/images/spellicons/survival/native/heart.png"
+    },
+    {
+      "key": "shivas_guard",
+      "prompt": "ONE square premium skill icon for a Dota 2 custom game. Subject: Shiva's Guard: a symmetrical ancient pale blue steel breastplate with silver sculpted face motif and thick icy blue crystal edges. Dense layered armor, subtle frost and cool white highlights. Rich sculpted three-dimensional hand-painted Dota 2 item art, realistic tactile material and dramatic but tasteful lighting. Strong simple shape fills 85% of image, legible when displayed 48 pixels. Dark charcoal-teal vignette background, deep ambient shadows, clear material separation, restrained highlights, warm key and subtle cool rim. No garish mobile-RPG glow, sparkles, plastic toy finish, emoji, frame, text, watermark, pedestals or unrelated props. Exactly one icon.",
+      "target": "panorama/src/images/spellicons/survival/native/shivas_guard.png"
+    },
+    {
+      "key": "greater_crit",
+      "prompt": "ONE square premium skill icon for a Dota 2 custom game. Subject: Daedalus: an imposing ornate red-and-dark-steel fantasy crossbow, diagonal strong silhouette, gilded mechanical arms, a clear crimson bolt at its center. Readable weapon, not a sword. Rich sculpted three-dimensional hand-painted Dota 2 item art, realistic tactile material and dramatic but tasteful lighting. Strong simple shape fills 85% of image, legible when displayed 48 pixels. Dark charcoal-teal vignette background, deep ambient shadows, clear material separation, restrained highlights, warm key and subtle cool rim. No garish mobile-RPG glow, sparkles, plastic toy finish, emoji, frame, text, watermark, pedestals or unrelated props. Exactly one icon.",
+      "target": "panorama/src/images/spellicons/survival/native/greater_crit.png"
+    },
+    {
+      "key": "overwhelming_blink",
+      "prompt": "ONE square premium skill icon for a Dota 2 custom game. Subject: Overwhelming Blink: a stout curved volcanic dagger with blackened iron and warm burnt-orange faceted blade, solid heavy carved guard, restrained inner ember glow. Clearly a dagger. Rich sculpted three-dimensional hand-painted Dota 2 item art, realistic tactile material and dramatic but tasteful lighting. Strong simple shape fills 85% of image, legible when displayed 48 pixels. Dark charcoal-teal vignette background, deep ambient shadows, clear material separation, restrained highlights, warm key and subtle cool rim. No garish mobile-RPG glow, sparkles, plastic toy finish, emoji, frame, text, watermark, pedestals or unrelated props. Exactly one icon.",
+      "target": "panorama/src/images/spellicons/survival/native/overwhelming_blink.png"
+    },
+    {
+      "key": "swift_blink",
+      "prompt": "ONE square premium skill icon for a Dota 2 custom game. Subject: Swift Blink: a sleek sharply hooked pale-gold dagger with ivory-yellow bright cutting edge, dark bronze hilt, subtle golden wisps tightly hugging the blade. Clearly a dagger. Rich sculpted three-dimensional hand-painted Dota 2 item art, realistic tactile material and dramatic but tasteful lighting. Strong simple shape fills 85% of image, legible when displayed 48 pixels. Dark charcoal-teal vignette background, deep ambient shadows, clear material separation, restrained highlights, warm key and subtle cool rim. No garish mobile-RPG glow, sparkles, plastic toy finish, emoji, frame, text, watermark, pedestals or unrelated props. Exactly one icon.",
+      "target": "panorama/src/images/spellicons/survival/native/swift_blink.png"
+    },
+    {
+      "key": "arcane_blink",
+      "prompt": "ONE square premium skill icon for a Dota 2 custom game. Subject: Arcane Blink: a gracefully curved violet crystal dagger with metallic dark purple and silver hilt, a purple gem at its guard, faint violet inner energy. Clearly a dagger. Rich sculpted three-dimensional hand-painted Dota 2 item art, realistic tactile material and dramatic but tasteful lighting. Strong simple shape fills 85% of image, legible when displayed 48 pixels. Dark charcoal-teal vignette background, deep ambient shadows, clear material separation, restrained highlights, warm key and subtle cool rim. No garish mobile-RPG glow, sparkles, plastic toy finish, emoji, frame, text, watermark, pedestals or unrelated props. Exactly one icon.",
+      "target": "panorama/src/images/spellicons/survival/native/arcane_blink.png"
+    },
+    {
+      "key": "building_research_lab",
+      "prompt": "Create ONE new square construction ability icon for a Dota 2 custom game. Architecture: A fantasy research workshop, steep pitched dark teal shingle roof over timber-framed pale stone walls, bronze ridge trims, small round bronze rooftop observatory on its right rear, small side annexe, warmly illuminated arched entrance. Three-quarter isometric view. Premium contemporary Dota 2 sculpted hand-painted 3D fantasy art, rich dimensional weathered stone and timber, gently patinated bronze, refined tactile materials, bold silhouette occupying 85 percent of image readable at 48 pixels. Dark charcoal-teal atmospheric vignette background instead of a gray model viewer, directional warm key light, subtle cool rim, deep ambient occlusion. No plastic toy finish, flat War3 texture, snowy white background, oversized pedestal, excessive decoration, sparkles, text, border or watermark. Keep the entire recognizable building in frame. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/building_research_lab.png"
+    },
+    {
+      "key": "building_advanced_research_lab",
+      "prompt": "Create ONE new square construction ability icon for a Dota 2 custom game. Architecture: An advanced fantasy research workshop: tall pale stone clocktower beside a small steep dark teal shingle-roof laboratory, a large brass armillary sphere and dark teal conical cap at tower summit, bronze structural braces, subtle blue energy in observatory. Three-quarter isometric view. Premium contemporary Dota 2 sculpted hand-painted 3D fantasy art, rich dimensional weathered stone and timber, gently patinated bronze, refined tactile materials, bold silhouette occupying 85 percent of image readable at 48 pixels. Dark charcoal-teal atmospheric vignette background instead of a gray model viewer, directional warm key light, subtle cool rim, deep ambient occlusion. No plastic toy finish, flat War3 texture, snowy white background, oversized pedestal, excessive decoration, sparkles, text, border or watermark. Keep the entire recognizable building in frame. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/building_advanced_research_lab.png"
+    },
+    {
+      "key": "building_farm",
+      "prompt": "Create ONE new square construction ability icon for a Dota 2 custom game. Architecture: A compact medieval fantasy farm: timber-framed stone farmhouse with a steep dark teal shingled gable roof on left, adjoining round stone grain silo with a golden straw conical roof on right, a small timber fence and a few ripe grain sheaves. Three-quarter isometric view. Premium contemporary Dota 2 sculpted hand-painted 3D fantasy art, rich dimensional weathered stone and timber, gently patinated bronze, refined tactile materials, bold silhouette occupying 85 percent of image readable at 48 pixels. Dark charcoal-teal atmospheric vignette background instead of a gray model viewer, directional warm key light, subtle cool rim, deep ambient occlusion. No plastic toy finish, flat War3 texture, snowy white background, oversized pedestal, excessive decoration, sparkles, text, border or watermark. Keep the entire recognizable building in frame. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/building_farm.png"
+    },
+    {
+      "key": "building_gold_mine",
+      "prompt": "Create ONE new square construction ability icon for a Dota 2 custom game. Architecture: A squat rocky gold mine: broad low gray stone mound with a timber-braced dark entrance at front, warm amber light within, rich gold ore seams framing the entrance and a small timber support beside it. Three-quarter isometric view. The mound and illuminated cave entrance are the main mass, not a castle. Premium contemporary Dota 2 sculpted hand-painted 3D fantasy art, rich dimensional weathered stone and timber, gently patinated bronze, refined tactile materials, bold silhouette occupying 85 percent of image readable at 48 pixels. Dark charcoal-teal atmospheric vignette background instead of a gray model viewer, directional warm key light, subtle cool rim, deep ambient occlusion. No plastic toy finish, flat War3 texture, snowy white background, oversized pedestal, excessive decoration, sparkles, text, border or watermark. Keep the entire recognizable building in frame. One single icon.",
+      "target": "panorama/src/images/spellicons/survival/native/building_gold_mine.png"
+    }
+  ]
+}

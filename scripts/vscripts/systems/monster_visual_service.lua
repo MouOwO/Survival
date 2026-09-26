@@ -28,6 +28,7 @@ end
 local function clear_state(entindex)
     local visual_state = state_by_unit[entindex]
     if not visual_state then return end
+    state_by_unit[entindex] = nil
     for _, particle in ipairs(visual_state.particles or {}) do
         pcall(function()
             ParticleManager:DestroyParticle(particle, true)
@@ -37,7 +38,6 @@ local function clear_state(entindex)
     for _, attachment in ipairs(visual_state.attachments or {}) do
         remove_entity(attachment)
     end
-    state_by_unit[entindex] = nil
 end
 
 function M.cleanup(unit_or_entindex)

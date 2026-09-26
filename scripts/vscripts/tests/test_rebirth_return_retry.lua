@@ -22,6 +22,7 @@ GameRules = { GetGameTime = function() return now end }
 DOTA_TEAM_GOODGUYS, DOTA_TEAM_BADGUYS, DOTA_TEAM_NEUTRALS = 2,3,4
 DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 0,1,2
 DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER = 0,0
+DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_INVULNERABLE = 4,16
 PlayerResource = {
     IsValidPlayerID = function(_,id) return id == 0 or id == 1 end,
     GetTeam = function(_,id) return 2 + id end,
@@ -72,6 +73,7 @@ ProjectileManager = {ProjectileDodge=noop}
 package.loaded["systems/building_system"] = {main_city_for_team=function() return city end}
 package.loaded["systems/destination_validation_service"] = {
     validate=function() return not blocked, "destination_not_traversable" end,
+    validate_hero_position=function() return not blocked, "destination_not_traversable" end,
     teleport=function(u,p)
         if failed_teleport then return false, "destination_not_traversable" end
         u.origin=p; return true
@@ -88,7 +90,10 @@ local home = require("systems/hero_return_home_service")
 local catalog = require("systems/shop_catalog")
 bus.reset(); scheduler.clear(); spawn.init(); shop.init()
 bus.handle_request(events.WAVE_STATE_GET_REQUEST, function() return {ok=true,difficulty_id="N1"} end)
-bus.handle_request(events.HERO_SUMMON_GET_REQUEST, function(p) return {unit=heroes[p.player_id]} end)
+bus.handle_request(events.HERO_SUMMON_GET_REQUEST, function(p) return {ok=true,unit=heroes[p.player_id]} end)
+bus.handle_request(events.BUILDING_LIST_REQUEST, function(p)
+    return {ok=true,buildings={{building_id="main_city",player_id=p.player_id,unit=city}}}
+end)
 bus.handle_request(events.HERO_SUMMON_SNAPSHOT_REQUEST, function() return {snapshot={hero_summoned=1}} end)
 bus.handle_request(events.HERO_PROGRESSION_GET_REQUEST, function(p) return {snapshot={rebirth_level=progression[p.player_id]}} end)
 bus.handle_request(events.RESOURCE_GET_REQUEST, function() return {wood=1000000,gold=1000000} end)

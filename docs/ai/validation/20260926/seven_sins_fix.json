@@ -1,0 +1,29 @@
+{
+  "asset_catalog": [
+    "challenge_monster_terrorblade_fractal_horns"
+  ],
+  "asset_components": [
+    "challenge_monster_terrorblade_fractal_horns:weapon",
+    "challenge_monster_terrorblade_fractal_horns:back",
+    "challenge_monster_terrorblade_fractal_horns:armor"
+  ],
+  "topnav_previous_renderer": true,
+  "models_verified": 4,
+  "lua_syntax": true,
+  "hud_compile": {
+    "compiled": 13,
+    "failed": 0
+  },
+  "live_game_verified": false,
+  "legacy_contract": "NON_TOWER_SCENE_PANEL_REMAINED: unchanged hidden portrait editor scene also counted",
+  "tests_passed": [
+    "seven_sins_visuals",
+    "ten_sin_visuals",
+    "startup_asset_preload",
+    "building_death_visual",
+    "seven_sins_portrait",
+    "combat_stats_callbacks",
+    "combat_selection_recovery",
+    "multiselect_portraits"
+  ]
+}

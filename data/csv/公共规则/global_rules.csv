@@ -1,4 +1,4 @@
-﻿rule_id,value,description,enabled
+rule_id,value,description,enabled
 #中文名:规则ID,数值,说明,是否启用
 #types:string,number,string,boolean
 tower_attack_range,1000,所有防御塔统一基础攻击距离,1
@@ -11,6 +11,8 @@ base_arrow_tower_cannot_miss,1,未转职基础箭塔普通攻击必中（0关闭
 monster_war3_armor_damage_enabled,0,废弃兼容字段；怪物物理伤害固定使用项目War3护甲公式,0
 wave_monster_round_robin_enabled,1,每波普通怪按类型循环；地面飞行混合时按两地面一飞行（0关闭1开启）,1
 wave_ground_monster_hull_radius,32,正式波次及默认地面怪统一基础碰撞半径,1
+wave_alive_limit,90,每位玩家所属进攻怪物安全数量上限；个人超过上限独立倒计时且继续出怪,1
+wave_overflow_grace_seconds,10,个人进攻怪持续超限宽限秒数；回到上限以内重置；到期仅该玩家失败,1
 practice_monster_hull_radius,12,练功房怪物统一基础碰撞半径,1
 repair_detection_range,99999,修理师自动感知受损建筑的范围,1
 building_challenge_hull_radius,0,所有挑战怪的基础碰撞半径,1

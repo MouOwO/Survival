@@ -230,7 +230,23 @@ local function publish(payload)
     -- requests still use their direct response event for immediate feedback.
 end
 
+local pending_growth = {}
+local function publish_growth_debug(player_id)
+    if pending_growth[player_id] then return end
+    local token = {}
+    pending_growth[player_id] = token
+    scheduler.after(0.1, function()
+        if pending_growth[player_id] ~= token then return end
+        pending_growth[player_id] = nil
+        publish_debug(player_id)
+    end, "lumberjack_publish_growth_debug_" .. tostring(player_id))
+end
+
 function M.init()
+    for player_id in pairs(pending_growth) do
+        scheduler.cancel("lumberjack_publish_growth_debug_" .. tostring(player_id))
+    end
+    pending_growth = {}
     debug_state = {}
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, publish)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
@@ -250,7 +266,11 @@ function M.init()
             skill_last_ability_name = "",
             levels = {},
         }
-        publish_debug(player_id)
+        if payload.changed_section == "lumberjack" then
+            publish_growth_debug(player_id)
+        else
+            publish_debug(player_id)
+        end
     end)
 end
 

@@ -1,0 +1,19 @@
+{
+  "portraits": 52,
+  "fitted_frusta_checked": 47,
+  "ten_sin_bodies": 10,
+  "ten_sin_components": 52,
+  "verified_models": 62,
+  "kv_parse": true,
+  "scope_check": true,
+  "live_game_verified": false,
+  "regressions": [
+    "test_ten_sin_visuals",
+    "test_startup_asset_preload_service",
+    "test_challenge_unit_names",
+    "test_player_challenge_cleanup",
+    "test_building_death_visual",
+    "test_multiselect_portraits"
+  ],
+  "baseline_missing_parts_reproduced": true
+}

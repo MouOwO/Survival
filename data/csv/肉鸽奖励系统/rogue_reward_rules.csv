@@ -1,4 +1,4 @@
 rule_id,choice_count,free_reroll_count,exclude_claimed,unique_within_offer,enabled,tooltip_name,tooltip_desc,tooltip_icon,notes
 #中文名:规则ID,候选数量,免费重抽次数,排除已领取卡,同次选项不重复,是否启用,提示名称,提示描述,提示图标,备注
 #types:string,number,number,boolean,boolean,boolean,string,string,string,string
-default_rogue_reward,3,1,1,1,1,肉鸽奖励,打开肉鸽三选一奖励。建造者开局固定显示在G键槽位，成功打开后移除。,invoker_invoke,正式Boss与开局技能共用；未选择和被重抽的卡不会永久排除。
+default_rogue_reward,3,1,1,1,1,天赋,选择一项开局天赋。未选择时问号闪烁，选择后显示该天赋图标。,survival/native/talent_question,正式Boss与开局技能共用；未选择和被重抽的卡不会永久排除。

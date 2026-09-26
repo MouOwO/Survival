@@ -55,18 +55,18 @@ local function phased(unit)
     end
     return false
 end
-local function nearby_obstacles(origin, anchor)
+local function nearby_obstacles(origin, anchor, moving_unit, hero_radius)
     if type(FindUnitsInRadius) ~= "function" then return nil, "occupancy_unavailable" end
     local team = valid(anchor) and anchor:GetTeamNumber() or DOTA_TEAM_GOODGUYS
     local ok, units = pcall(FindUnitsInRadius, team, origin, nil,
-        SEARCH_RADIUS + HERO_RADIUS + (tonumber(placement.max_unit_hull_radius) or 512),
+        SEARCH_RADIUS + hero_radius + (tonumber(placement.max_unit_hull_radius) or 512),
         DOTA_UNIT_TARGET_TEAM_BOTH,
         DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_BUILDING,
         DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
     if not ok or type(units) ~= "table" then return nil, "occupancy_query_failed" end
     local result = {}
     for _, unit in ipairs(units) do
-        if valid(unit) and not unit.survival_is_grid_preview
+        if valid(unit) and unit ~= moving_unit and not unit.survival_is_grid_preview
             and (not unit.IsAlive or method_true(unit, "IsAlive")) and not phased(unit) then
             local hull = tonumber(unit.survival_hull_radius)
             if hull == nil and type(unit.GetHullRadius) == "function" then
@@ -76,7 +76,7 @@ local function nearby_obstacles(origin, anchor)
             if finite(hull) and hull > 0 then
                 local position_ok, position = pcall(unit.GetAbsOrigin, unit)
                 position = position_ok and copied_position(position) or nil
-                if position then result[#result + 1] = {position = position, radius = hull + HERO_RADIUS} end
+                if position then result[#result + 1] = {position = position, radius = hull + hero_radius} end
             end
         end
     end
@@ -95,11 +95,12 @@ local function grounded(position, anchor_height)
     if math.abs(height - anchor_height) > MAX_HEIGHT_DELTA then return nil, "destination_height_mismatch" end
     return position
 end
-local function candidate(origin, offset, anchor_height, obstacles)
+local function candidate(origin, offset, anchor_height, obstacles, hero_radius)
     local position, reason = grounded(Vector(origin.x + offset.x, origin.y + offset.y, origin.z), anchor_height)
     if not position then return nil, reason end
     for _, sample in ipairs(clearance) do
-        local edge, edge_reason = grounded(Vector(position.x + sample.x, position.y + sample.y, position.z), anchor_height)
+        local edge, edge_reason = grounded(Vector(position.x + sample.x * hero_radius / HERO_RADIUS,
+            position.y + sample.y * hero_radius / HERO_RADIUS, position.z), anchor_height)
         if not edge then return nil, "clearance_" .. tostring(edge_reason) end
         if math.abs(edge.z - position.z) > MAX_HEIGHT_DELTA then return nil, "clearance_height_mismatch" end
     end
@@ -113,7 +114,7 @@ local function candidate(origin, offset, anchor_height, obstacles)
     return position
 end
 
-function M.resolve(altar, definition, player_id)
+function M.resolve(altar, definition, player_id, moving_unit)
     local metadata = {attempts = 0, rejected = {}, grounded = false}
     local function rejected(reason)
         metadata.last_reason = reason
@@ -127,14 +128,23 @@ function M.resolve(altar, definition, player_id)
     metadata.source = "main_city"
     local origin = copied_position(city:GetAbsOrigin())
     if not origin then rejected("spawn_anchor_unavailable"); return nil, NO_DESTINATION, metadata end
-    local obstacles, reason = nearby_obstacles(origin, city)
+    local hero_radius = HERO_RADIUS
+    if valid(moving_unit) then
+        local moving_hull = tonumber(moving_unit.survival_hull_radius)
+        if moving_hull == nil and type(moving_unit.GetHullRadius) == "function" then
+            local hull_ok, value = pcall(moving_unit.GetHullRadius, moving_unit)
+            if hull_ok then moving_hull = tonumber(value) end
+        end
+        if finite(moving_hull) and moving_hull > hero_radius then hero_radius = moving_hull end
+    end
+    local obstacles, reason = nearby_obstacles(origin, city, moving_unit, hero_radius)
     if not obstacles then rejected(reason); return nil, NO_DESTINATION, metadata end
     local hull = tonumber(city.survival_hull_radius)
         or (type(city.GetHullRadius) == "function" and tonumber(city:GetHullRadius())) or 0
     if not finite(hull) or hull < 0 then hull = 0 end
     -- Keep the hero visibly outside the city. Expand concentric rings on all
     -- sides, starting in front; never spill into a distant altar/training room.
-    local first_radius = math.ceil(math.max(256, hull + HERO_RADIUS + STEP) / STEP) * STEP
+    local first_radius = math.ceil(math.max(256, hull + hero_radius + STEP) / STEP) * STEP
     local forward = type(city.GetForwardVector) == "function" and city:GetForwardVector() or nil
     local fx, fy = 1, 0
     if forward and finite(forward.x) and finite(forward.y) then
@@ -147,7 +157,7 @@ function M.resolve(altar, definition, player_id)
             local c, s = math.cos(angle), math.sin(angle)
             local offset = {x = (fx * c - fy * s) * radius, y = (fy * c + fx * s) * radius}
             metadata.attempts = metadata.attempts + 1
-            local position, failure = candidate(origin, offset, origin.z, obstacles)
+            local position, failure = candidate(origin, offset, origin.z, obstacles, hero_radius)
             if position then
                 metadata.grounded, metadata.distance = true, radius
                 return position, nil, metadata

@@ -302,6 +302,9 @@ local function maintain_count_spawn_position(session, member, location, point)
 end
 
 local function spawn_member(session, member)
+    if require("systems/player_context_service").is_defeated(session.player_id) then
+        return nil, "player_defeated"
+    end
     local location = room_locations.resolve(member.location_id, session.player_id)
     local archetype = archetypes.by_id[member.archetype_id]
     if not location then return nil, "challenge_location_not_found" end
@@ -391,11 +394,18 @@ local function spawn_member(session, member)
     end
     apply_combat_stats(unit, combat_archetype, combat_profile)
     monster_visual.apply(unit, archetype)
-    pcall(monster_hero_visual_service.apply, unit, archetype, {
-        challenge = true,
-        allow_outside_formal_wave = true,
-        model_path = archetype.model_path,
-    })
+    local visual_call_ok, visual_ok, visual_detail = pcall(
+        monster_hero_visual_service.apply, unit, archetype, {
+            challenge = true,
+            allow_outside_formal_wave = true,
+            model_path = archetype.model_path,
+        })
+    if session.challenge.challenge_id == "challenge_11"
+        and (not visual_call_ok or not visual_ok) then
+        print("[TEN_SINS_VISUAL_FAILED] member=" .. tostring(member.member_id)
+            .. " model=" .. tostring(archetype.model_path)
+            .. " detail=" .. tostring(visual_call_ok and visual_detail or visual_ok))
+    end
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
 
     local home = nil
@@ -755,30 +765,6 @@ local function complete_session(session)
         return
     end
 
-    -- Ten-sins bosses are already staged in the room. Advance and teleport in
-    -- the kill callback instead of waiting for a zero-second scheduler task.
-    if session.challenge.challenge_id == "challenge_11" then
-        session.status = "active"
-        session.generation = DoUniqueString("challenge_completion")
-        session.killed_members = 0
-        session.completion_drop_position = nil
-        local ok, error_message = fill_initial(session)
-        if not ok then
-            block_session(session, error_message)
-            return
-        end
-        if should_teleport_after_completion(session) then
-            ok, error_message = teleport_to_current(session)
-            if not ok then
-                destroy_session_monsters(session)
-                block_session(session, error_message)
-                return
-            end
-        end
-        publish(session, "active", { reward_result = reward_result or {} })
-        return
-    end
-
     session.status = "waiting_respawn"
     session.generation = DoUniqueString("challenge_completion")
     local scheduled_generation = session.generation
@@ -832,6 +818,9 @@ function M.query(encounter_id, player_id)
 end
 
 function M.start(payload)
+    if require("systems/player_context_service").is_defeated(payload and payload.player_id) then
+        return { ok = false, error = "player_defeated" }
+    end
     local encounter_id = tostring(payload.encounter_id or "")
     local challenge = challenge_for_encounter(encounter_id)
     local encounter = encounters.by_id[encounter_id]
@@ -1346,6 +1335,27 @@ local function prepare_after_hero_summoned(payload)
     )
 end
 
+local function on_player_disconnected(payload)
+    if not payload or payload.defeat_cleanup ~= true then return end
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    local owned = sessions[player_id] or {}
+    -- Detach first: every delayed respawn/next-stage callback verifies identity.
+    sessions[player_id] = nil
+    foreground_encounter_by_player[player_id] = nil
+    for encounter_id, session in pairs(owned) do
+        session.status = "cancelled"
+        scheduler.cancel("challenge_respawn:" .. player_id .. ":" .. encounter_id)
+        scheduler.cancel("challenge_next:" .. player_id .. ":" .. encounter_id)
+        destroy_session_monsters(session)
+        publish(session, "cancelled", { reason = "player_defeated" })
+    end
+    local prepared = challenge_11_prepared_by_player[player_id]
+    challenge_11_prepared_by_player[player_id] = nil
+    if prepared then destroy_session_monsters(prepared) end
+    scheduler.cancel("challenge_auto_test:" .. player_id)
+end
+
 function M.init()
     sessions = {}
     foreground_encounter_by_player = {}
@@ -1354,6 +1364,7 @@ function M.init()
     abyss_cleared_stage_by_player = {}
     challenge_11_prepared_by_player = {}
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
     event_bus.subscribe(
         events.MONSTER_ENCOUNTER_CHANGED,
         on_foreground_encounter_changed

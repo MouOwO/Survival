@@ -1,0 +1,56 @@
+{
+  "updated_at": "2026-09-26T11:28:09.471406",
+  "queue_capacity": 6,
+  "active_slots": 1,
+  "waiting_slots": 5,
+  "applies_to": [
+    "lumberjack_training",
+    "technology_research"
+  ],
+  "training_entry_buttons": 4,
+  "validation_level": [
+    "STATIC",
+    "SIMULATION",
+    "RESOURCE_COMPILER"
+  ],
+  "workshop_verified": false,
+  "lua_tests": [
+    "scripts/vscripts/tests/test_worker_training_queue.lua",
+    "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+    "scripts/vscripts/tests/test_research_production_auto.lua",
+    "scripts/vscripts/tests/test_research_runtime_projection.lua"
+  ],
+  "lua_tests_pass": 4,
+  "lua_syntax_utf8_pass": 10,
+  "node_tests": [
+    "tools/test_production_hud.cjs"
+  ],
+  "node_tests_pass": 1,
+  "compile": {
+    "entry": "survival_hud.xml",
+    "compiled": 15,
+    "failed": 0,
+    "log": "output/production_queue_capacity_6_20260926/compile_hud.log"
+  },
+  "boundary_checks": [
+    "sixth task accepted",
+    "seventh task rejected before charge",
+    "five waiting slots visible and within panel",
+    "blocked research head retains five following jobs",
+    "worker tier lifetime quota remains independent from queue capacity"
+  ],
+  "hashes": {
+    "scripts/vscripts/systems/worker_training_queue_service.lua": "f739664e3baf1fa6e201c5acd66628d6a076328a51039e9c9afa82c77d93e2b0",
+    "scripts/vscripts/systems/worker_system.lua": "9605bde02a2e80bbcea17e7961ad3cbe6ef28af57e061e8f61dc8065543adaf9",
+    "scripts/vscripts/systems/shop_system.lua": "e4a23de5cfae5cfe9f7599d5ec397e7157092366560267c58e0d1f0a9773b5ab",
+    "scripts/vscripts/systems/shop_catalog.lua": "02af07a4f2a2001dbd63e3408822e5dc292cc6c9b776ddffbdab383f2c4202bc",
+    "scripts/vscripts/systems/research_lab_ability_sync.lua": "4488bbc61503c1f57bb6b051e3b7263ce5b496a821c0395918057a8adbc1a8c2",
+    "scripts/vscripts/ui/ability_runtime_builder.lua": "a54383c7f169b0c3646be8ea05e32ee53fdd7b60397ff2b33ad9b10c7792f5e7",
+    "scripts/vscripts/tests/test_worker_training_queue.lua": "8fe9b9de4b8a26654866b899d1cafca94ebf8f28bcee8250095094a030445843",
+    "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua": "4b036cfb76edbd13798af1ce8e3461112b106637e84c1f6caccffc284839203f",
+    "scripts/vscripts/tests/test_research_production_auto.lua": "406701a02e2ff4b66829a86710d29c6482c554fc36b89d41e4ce4d4c59544e6b",
+    "scripts/vscripts/tests/test_research_runtime_projection.lua": "e1c0b87e0486d156de14194fd002e04d7d6dfb0b8e9a6ec96d5fe5f13413d97d",
+    "panorama/src/scripts/custom_game/production_progress.js": "de7081aa1ced7de06f8b01c90b456f2e0ff69b95d351d01fd006fcef1d0dca61",
+    "tools/test_production_hud.cjs": "78a99b330aeec484087a556ce1716b02835183c4f0760b591ef6d704a9bfd03a"
+  }
+}

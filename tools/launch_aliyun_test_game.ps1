@@ -4,10 +4,10 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$python = Join-Path $repo 'output/ecs_backend_work/.venv/Scripts/python.exe'
+. (Join-Path $PSScriptRoot 'backend_python.ps1')
+$python = Resolve-SurvivalBackendPython -RepoRoot $repo
 $tunnel = Join-Path $PSScriptRoot 'aliyun_test_connection.py'
 $auth = Join-Path $PSScriptRoot 'aliyun_game_test_auth.py'
-if (-not (Test-Path -LiteralPath $python)) { throw 'The local deployment Python environment is missing.' }
 
 function Invoke-Check([string]$Script, [string]$Action) {
     # These helpers emit fixed status codes; credentials never enter arguments.

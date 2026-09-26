@@ -29,6 +29,29 @@
 
 直接启动 Workshop Tools 后出现 `fishing_api_token_missing` 表示本地游戏服还没有测试 API 认证配置。加载界面应保持关闭开局门禁；先运行上述启动器，不要改用空档案或本地假档案绕过。
 
+### 换电脑后启动器提示缺少 Python（2026-09-25）
+
+旧启动器只使用 `output/ecs_backend_work/.venv/Scripts/python.exe`。此目录不进入 Git，复制的虚拟环境也可能依赖原电脑已安装的 Python，因此该错误发生在连接 ECS 之前，不能据此判断云端是否停机。
+
+三个测试入口现在共用 `tools/backend_python.ps1`：优先使用显式 `SURVIVAL_PYTHON`，否则依次检测原虚拟环境、`py -0p` 列出的已装解释器、PATH 和 Windows Python 注册表。解释器必须实际通过 Windows Python 3.10+ 和标准库检查；损坏的虚拟环境会继续回退，WindowsApps 的 Python 占位程序不会执行。工具只使用标准库，无需安装整套数据库部署依赖。
+
+新电脑需要独立准备以下环境，仅同步游戏工程不能代替这些配置：
+
+- 可运行的 Python 3.10+、Node.js、Git 和 Windows OpenSSH。
+- 当前用户的专用 SSH 密钥及已解锁的 SSH agent。
+- 已核验的主机公钥文件 `output/ecs_backend_work/ecs_hostkey_candidate.pub`。
+- 本机 `D:/survival_database/.env` 中的既有测试认证配置；该文件和私钥不进入仓库。
+- 保留 `.git` 与 `.gitignore`，认证工具需要验证临时认证文件处于忽略目录。
+
+Python 已安装但未被自动找到时，可在项目根目录 PowerShell 中显式指定实际路径，再启动：
+
+```powershell
+$env:SURVIVAL_PYTHON = 'C:\实际安装目录\python.exe'
+.\launch_aliyun_test_game.cmd
+```
+
+该环境变量只对当前终端及其子进程生效。后台助手通过计划任务独立启动，若需要显式路径，应在 Windows 用户环境变量中配置 `SURVIVAL_PYTHON`，重新登录后再安装或启动助手。其余连接准备完成后，先用 `launch_aliyun_test_game.cmd` 验证；需要 Hammer 自动认证时再运行 `setup_hammer_backend.cmd`。
+
 UI 源文件在 `panorama/src`，背景原稿在 `art/ui/sources/custom_game/loading`。运行：
 
 ```powershell

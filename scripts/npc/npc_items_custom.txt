@@ -1,11 +1,29 @@
 "DOTAAbilities"
 {
     "Version" "1"
+    "item_survival_rogue_building_upgrade"
+    {
+        "BaseClass" "item_lua"
+        "ScriptFile" "items/item_survival_rogue_building_upgrade"
+        "AbilityTextureName" "survival_unified/recipe"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+        "AbilityUnitTargetTeam" "DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+        "AbilityUnitTargetType" "DOTA_UNIT_TARGET_ALL"
+        "AbilityCastRange" "99999"
+        "AbilityCastPoint" "0.0"
+        "ItemCost" "0"
+        "ItemPurchasable" "0"
+        "ItemSellable" "0"
+        "ItemDroppable" "0"
+        "ItemPermanent" "0"
+        "ItemInitialCharges" "1"
+        "ItemStackable" "0"
+    }
     "item_survival_rogue_nuclear_bomb"
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_rogue_actions"
-        "AbilityTextureName" "techies_suicide"
+        "AbilityTextureName" "survival_unified/skill_destroy"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -17,7 +35,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_challenge_reward_runtime"
-        "AbilityTextureName" "item_ultimate_orb"
+        "AbilityTextureName" "survival_unified/ultimate_orb"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -277,7 +295,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "survival_shop_v2/swords_10"
+        "AbilityTextureName" "survival_unified/extreme_cold_blade_v2"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -290,7 +308,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "survival_shop_v2/swords_11"
+        "AbilityTextureName" "survival_unified/extreme_cold_blade_v2"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -303,7 +321,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "survival_shop_v2/swords_12"
+        "AbilityTextureName" "survival_unified/extreme_cold_blade_v2"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -316,7 +334,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "survival_shop_v2/swords_13"
+        "AbilityTextureName" "survival_unified/extreme_cold_blade_v2"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -329,7 +347,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_weapon_shell"
-        "AbilityTextureName" "survival_shop_v2/swords_14"
+        "AbilityTextureName" "survival_unified/extreme_cold_blade_v2"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE"
         "ItemCost" "0"
         "ItemPurchasable" "0"
@@ -641,7 +659,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_seven_sins_essence"
-        "AbilityTextureName" "item_demon_edge"
+        "AbilityTextureName" "survival_unified/demon_edge"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
         "AbilityCooldown" "0"
         "AbilityManaCost" "0"
@@ -656,7 +674,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_seven_sins_essence"
-        "AbilityTextureName" "item_gloves"
+        "AbilityTextureName" "survival_unified/gloves"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
         "AbilityCooldown" "0"
         "AbilityManaCost" "0"
@@ -671,7 +689,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_seven_sins_essence"
-        "AbilityTextureName" "item_ultimate_orb"
+        "AbilityTextureName" "survival_unified/ultimate_orb"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
         "AbilityCooldown" "0"
         "AbilityManaCost" "0"
@@ -686,7 +704,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_seven_sins_essence"
-        "AbilityTextureName" "item_skadi"
+        "AbilityTextureName" "survival_unified/skadi"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
         "AbilityCooldown" "0"
         "AbilityManaCost" "0"
@@ -701,7 +719,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_seven_sins_essence"
-        "AbilityTextureName" "item_reaver"
+        "AbilityTextureName" "survival_unified/reaver"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
         "AbilityCooldown" "0"
         "AbilityManaCost" "0"
@@ -716,7 +734,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_seven_sins_essence"
-        "AbilityTextureName" "item_eagle"
+        "AbilityTextureName" "survival_unified/gold_stack"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
         "AbilityCooldown" "0"
         "AbilityManaCost" "0"
@@ -731,7 +749,7 @@
     {
         "BaseClass" "item_lua"
         "ScriptFile" "items/item_survival_seven_sins_essence"
-        "AbilityTextureName" "item_blades_of_attack"
+        "AbilityTextureName" "survival_unified/broadsword"
         "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
         "AbilityCooldown" "0"
         "AbilityManaCost" "0"

@@ -1,0 +1,72 @@
+{
+  "updated_at": "2026-09-26T15:36:12.048066+08:00",
+  "request": "Compact minimap shortcuts: remove right-side titles and wide frames; builder icon over Space; castle icon over F2.",
+  "validation_level": [
+    "STATIC",
+    "SIMULATION",
+    "RESOURCE_COMPILER",
+    "BROWSER_ASSET_PREVIEW"
+  ],
+  "workshop_verified": false,
+  "dimensions": {
+    "panel_width": 64,
+    "panel_height": 158,
+    "button_height": 76,
+    "icon_size": 52,
+    "key_font_size": 20,
+    "gap": 6
+  },
+  "behavior_unchanged": [
+    "SPACE builder selection",
+    "F1 hero selection",
+    "F2 hero return home",
+    "shared click/keyboard guards"
+  ],
+  "castle_asset": {
+    "file": "panorama/src/images/custom_game/minimap_shortcuts/return_castle.svg",
+    "method": "Editable vector asset matching existing repository navigation SVG approach",
+    "browser_preview": "output/minimap_compact_20260926/castle_preview.png",
+    "compiled_sha256": "9d08d62485a5966c12fe4d7e81913c70ce9d0202b9d6ce8f93b7f92b53d6128d"
+  },
+  "checks": [
+    {
+      "file": "tools/test_minimap_shortcuts.cjs",
+      "passed": true,
+      "output": "MINIMAP_SHORTCUTS_PASS: two shared actions, missing APIs, live guards, modal/unavailable states, map/portrait/production avoidance, scaled world mask and HUD load order"
+    },
+    {
+      "file": "tools/test_world_overlay_visibility.cjs",
+      "passed": true,
+      "output": "WORLD_OVERLAY_VISIBILITY_PASS: native HUD, partial overlap, movement, modal close, tooltip visibility, scaling, production CSS-transform bounds"
+    },
+    {
+      "file": "tools/test_minimap_shortcut_input.cjs",
+      "passed": true,
+      "output": "MINIMAP_SHORTCUT_INPUT_PASS: shared button/key actions, builder identity, F1 current hero selection, F2 sender-only request, focus/modal/startup/defeat gates, cooldown, duplicate callbacks, reload"
+    }
+  ],
+  "source_content_sync": [
+    {
+      "file": "panorama/src/scripts/custom_game/minimap_shortcuts.js",
+      "sha256": "11ea67feecca32c6bcb411b086f5837ad3a8b19fed072b2e93770e72aaf10a08"
+    },
+    {
+      "file": "panorama/src/styles/custom_game/minimap_shortcuts.css",
+      "sha256": "dc8eba40a9a06a3f02fcd77dc8f0e431b6b0ddaea3d5c636227868d79512e625"
+    },
+    {
+      "file": "panorama/src/images/custom_game/minimap_shortcuts/return_castle.svg",
+      "sha256": "cc4a36d90543a048228124f2b622464d483e0d4eb8e37455e7d4937d86b427d1"
+    },
+    {
+      "file": "panorama/src/layout/custom_game/survival_hud.xml",
+      "sha256": "8003257c5492fbd88b14cfc7744bbb48c1e661da331eb3121f90db412cfae580"
+    }
+  ],
+  "compile": {
+    "compiled": 15,
+    "failed": 0,
+    "log": "output/minimap_compact_20260926/compile_hud.log"
+  },
+  "scoped_diff_utf8_check": "passed"
+}

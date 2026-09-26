@@ -105,7 +105,8 @@ function M.sync(unit, building_id, levels, transaction, reincarnation_level)
         end
     end
 
-    local researching = transaction and transaction.researching == 1
+    local queue_count = tonumber(transaction and transaction.queue_count) or 0
+    local queue_capacity = tonumber(transaction and transaction.capacity) or 7
     for _, row in ipairs(desired) do
         local ability = unit:FindAbilityByName(row.ability_name)
             or unit:AddAbility(row.ability_name)
@@ -113,9 +114,10 @@ function M.sync(unit, building_id, levels, transaction, reincarnation_level)
             local current = tonumber(levels[row.technology_group]) or 0
             ability:SetLevel(1)
             ability:SetHidden(false)
-            ability:SetActivated(not researching
-                and current < maximum(row)
-                and prerequisite_met(row, levels, reincarnation_level))
+            local reserved = tonumber(transaction and transaction.reserved_levels
+                and transaction.reserved_levels[row.technology_group]) or 0
+            ability:SetActivated(queue_count < queue_capacity
+                and math.max(current, reserved) < maximum(row))
             if ability.SetAbilityIndex then
                 ability:SetAbilityIndex(math.max(0, (tonumber(row.slot_order) or 1) - 1))
             end
@@ -150,6 +152,10 @@ end
 
 local function sync_building(building, transaction)
     if not building or not is_research_building(building.building_id) then return end
+    local current = event_bus.request(events.TECHNOLOGY_STATE_GET_REQUEST, {
+        player_id = building.player_id, source_entindex = building.entindex,
+    })
+    transaction = current and current.research or transaction
     M.sync(
         building.unit,
         building.building_id,
@@ -159,10 +165,12 @@ local function sync_building(building, transaction)
     )
 end
 
-local function sync_team(team, transaction)
+local function sync_player(player_id, source_entindex, transaction)
     local result = event_bus.request(events.BUILDING_LIST_REQUEST, {})
     for _, building in ipairs(result and result.buildings or {}) do
-        if tonumber(building.team) == tonumber(team) then
+        if tonumber(building.player_id) == tonumber(player_id)
+            and (not source_entindex
+                or tonumber(building.entindex) == tonumber(source_entindex)) then
             sync_building(building, transaction)
         end
     end
@@ -173,17 +181,15 @@ function M.init()
         sync_building(payload, { researching = 0 })
     end)
     event_bus.subscribe(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, function(payload)
-        sync_team(payload.team, payload)
+        sync_player(payload.player_id, payload.source_entindex, payload)
     end)
     event_bus.subscribe(research_events.LEVEL_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
-        local team = player_id ~= nil and PlayerResource:GetTeam(player_id) or nil
-        if team ~= nil then sync_team(team, { researching = 0 }) end
+        if player_id ~= nil then sync_player(player_id) end
     end)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
-        local team = player_id ~= nil and PlayerResource:GetTeam(player_id) or nil
-        if team ~= nil then sync_team(team, { researching = 0 }) end
+        if player_id ~= nil then sync_player(player_id) end
     end)
 end
 

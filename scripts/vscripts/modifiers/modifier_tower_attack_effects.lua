@@ -1606,7 +1606,7 @@ _G.modifier_tower_frost_slow = modifier_tower_frost_slow
 function modifier_tower_frost_slow:IsHidden() return false end
 function modifier_tower_frost_slow:IsDebuff() return true end
 function modifier_tower_frost_slow:IsPurgable() return true end
-function modifier_tower_frost_slow:GetTexture() return "lich_frost_nova" end
+function modifier_tower_frost_slow:GetTexture() return "survival/native/skill_frost" end
 function modifier_tower_frost_slow:OnCreated(params)
     initialize_slow(self, params, FROST_SLOW_PCT)
 end
@@ -1626,7 +1626,7 @@ _G.modifier_tower_blizzard_slow = modifier_tower_blizzard_slow
 function modifier_tower_blizzard_slow:IsHidden() return false end
 function modifier_tower_blizzard_slow:IsDebuff() return true end
 function modifier_tower_blizzard_slow:IsPurgable() return true end
-function modifier_tower_blizzard_slow:GetTexture() return "crystal_maiden_freezing_field" end
+function modifier_tower_blizzard_slow:GetTexture() return "survival/native/skill_frost" end
 function modifier_tower_blizzard_slow:OnCreated(params)
     initialize_slow(self, params, BLIZZARD_SLOW_PCT)
 end
@@ -1647,7 +1647,7 @@ function modifier_tower_explosive_gatling_buff:IsHidden() return false end
 function modifier_tower_explosive_gatling_buff:IsDebuff() return false end
 function modifier_tower_explosive_gatling_buff:IsPurgable() return false end
 function modifier_tower_explosive_gatling_buff:GetTexture()
-    return "drow_ranger_marksmanship"
+    return "survival/native/skill_multi_arrow"
 end
 
 function modifier_tower_explosive_gatling_buff:OnCreated(params)

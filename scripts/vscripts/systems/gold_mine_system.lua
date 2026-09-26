@@ -337,7 +337,12 @@ end
 
 upgrade_mine = function(payload)
     local state = state_from_payload(payload)
-    if not state then return { ok = false, error = "金矿不存在" } end
+    if not state or not valid(state.unit) or not state.unit:IsAlive() then
+        return { ok = false, error = "金矿不存在" }
+    end
+    if payload.player_id ~= nil and tonumber(payload.player_id) ~= tonumber(state.player_id) then
+        return { ok = false, error = "只能升级自己的金矿" }
+    end
     if upgrade_process.is_active(state.unit) then
         return { ok = false, error = "金矿正在升级中" }
     end
@@ -348,7 +353,9 @@ upgrade_mine = function(payload)
     if not cost then
         return { ok = false, error = "金矿下一等级升级费用未配置" }
     end
-    local result = spend(state, cost, "gold_mine_level_upgrade")
+    -- Only server-owned reward items supply this flag; UI requests never forward it.
+    local result = payload.system_free_upgrade == true and { ok = true }
+        or spend(state, cost, "gold_mine_level_upgrade")
     if not result or not result.ok then return result end
     local target_level = state.mine_level + 1
     local target_data = config.level_data(target_level)
@@ -532,6 +539,7 @@ function M.init()
     event_bus.handle_request(events.GOLD_MINE_LEVEL_UPGRADE_REQUEST, upgrade_mine)
     event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
+        if payload and payload.changed_section == "lumberjack" then return end
         for _, state in pairs(state_by_entindex) do
             if state.player_id == tonumber(payload and payload.player_id) then
                 publish(state)

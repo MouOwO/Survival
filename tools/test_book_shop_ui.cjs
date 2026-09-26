@@ -1,0 +1,29 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');const nodes={},events={},requests=[],jobs=new Map();let serial=0;
+class Panel{constructor(t,p,id){this.type=t;this.parent=p;this.id=id;this.children=[];this.classes=new Set();this.style={};this.events={};this.attrs={};if(p)p.children.push(this);if(id)nodes[id]=this;}AddClass(c){this.classes.add(c)}RemoveClass(c){this.classes.delete(c)}SetHasClass(c,on){on?this.AddClass(c):this.RemoveClass(c)}SetPanelEvent(n,fn){this.events[n]=fn}RemoveAndDeleteChildren(){this.children=[]}SetAttributeString(k,v){this.attrs[k]=v}GetAttributeString(k,f){return this.attrs[k]||f}}
+Panel.prototype.SetScaling=function(v){this.scaling=v;};Panel.prototype.Children=function(){return this.children;};const root=new Panel('Panel',null,'root');root.actuallayoutwidth=1920;root.actuallayoutheight=1080;for(const m of fs.readFileSync('panorama/src/layout/custom_game/survival_hud.xml','utf8').matchAll(/id="([^"]+)"/g))new Panel('Panel',root,m[1]);function $(id){return nodes[id.slice(1)]}$.GetContextPanel=()=>root;$.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.DispatchEvent=()=>{};$.Msg=()=>{};$.RegisterForUnhandledEvent=()=>{};$.Schedule=(delay,fn)=>{jobs.set(++serial,fn);return serial};$.CancelScheduled=id=>jobs.delete(id);
+const tableListeners={};let autoState={};const cfg={},env={$,GameUI:{CustomUIConfig:()=>cfg},CustomNetTables:{GetTableValue:()=>autoState,SubscribeNetTableListener:(name,fn)=>tableListeners[name]=fn},Game:{GetLocalPlayerID:()=>0,GetGameTime:()=>0},GameEvents:{Subscribe:(n,fn)=>events[n]=fn,SendCustomGameEventToServer:(n,p)=>requests.push({n,p})}};require('./load_shared_ui_test.cjs')(env,Panel,root);vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/ui_layers.js','utf8'),env);vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/remaining_5d5c1152eb.js','utf8'),env);vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/shop_remaining_5d5c1152eb.js','utf8'),env);
+const U=cfg.SurvivalUI,shop=cfg.SurvivalShop;shop.Open();assert.equal(requests.length,0,'locked shop does not send open');shop.SetUnlocks({shop:true});shop.Open();assert.equal(cfg.SurvivalUILayers.Top(),'shop');assert(nodes.CustomShopWindow.BHasClass('UIModal'));assert.equal(requests.at(-1).n,'ui_shop_open_request');
+const good={entry_id:'real_item',visible:1,purchasable:1,name:'真实道具',content_type:'item',icon:'item_blink',stock:3,stock_max:8},locked={...good,entry_id:'locked',purchasable:0,disabled_reason:'余额不足'};events.ui_shop_snapshot({sequence:1,full:1,ui_mode:'shop',entries:[good,locked],categories:[],resources:{wood:123,gold:45}});const cards=()=>nodes.ShopItemList.children.filter(p=>p.BHasClass('UICardProduct'));assert.equal(cards().length,2);assert.equal(cards()[0].children[0].children[0].itemname,'item_blink');assert(nodes.ShopResourceSummary.text.includes('123'));cards()[0].events.oncontextmenu();assert.equal(requests.at(-1).n,'ui_shop_purchase_request');assert.equal(requests.at(-1).p.entry_id,'real_item');const before=requests.length;cards()[1].events.oncontextmenu();assert.equal(requests.length,before);assert(nodes.ShopStatus.text.includes('余额不足'));
+events.ui_shop_snapshot({sequence:1,ui_mode:'shop',entries:[],resources:{gold:999}});assert.equal(cards().length,2,'stale data ignored');shop.OpenChallenge();assert.equal(requests.at(-1).p.mode,'challenge');shop.OpenResearch(123);assert.equal(requests.at(-1).p.source_entindex,123);shop.Close();assert.equal(cfg.SurvivalUILayers.Top(),null);assert(nodes.CustomShopWindow.BHasClass('UIClosed'));for(const [id,fn] of [...jobs]){jobs.delete(id);fn();}assert.equal(jobs.size,0);assert.equal(requests.at(-1).n,'ui_shop_close_request');
+console.log('SHOP_SHARED_UI_PASS: original unlock, modes, currency, native reward art, purchase routing, insufficient balance, stale data, modal close and cleanup');
+
+shop.OpenChallenge();shop.Close();shop.ToggleShop();assert.equal(requests.at(-1).p.mode,'challenge','HUD reopen remembers challenge');
+shop.SelectShop();assert.equal(requests.at(-1).p.mode,'shop','explicit tab still selects shop');
+shop.OpenResearch(123);shop.Close();shop.Open();assert.equal(requests.at(-1).p.mode,'shop','research must not overwrite the remembered shop tab');
+const books=['shop_item_knowledge_book','shop_item_super_knowledge_book'].map(entry_id=>({...good,entry_id,content_id:entry_id.slice(5)}));
+events.ui_shop_snapshot({sequence:2,full:1,ui_mode:'shop',entries:books,categories:[],resources:{gold:1}});
+const buttons=cards().map(card=>card.children.find(p=>p.BHasClass('AutoBookButton')));
+assert.equal(buttons.length,2);assert(buttons.every(Boolean));
+buttons[0].events.onactivate();assert.equal(requests.at(-1).n,'ui_shop_auto_purchase_toggle_request');assert.equal(requests.at(-1).p.entry_id,books[0].entry_id);
+buttons[1].events.onactivate();assert.equal(requests.at(-1).p.entry_id,books[1].entry_id);
+autoState={[books[0].entry_id]:1};tableListeners.survival_shop_config('', 'auto_purchase_0', autoState);
+assert(buttons[0].BHasClass('AutoBookEnabled'));assert(!buttons[1].BHasClass('AutoBookEnabled'));
+events.ui_shop_snapshot({sequence:3,full:1,ui_mode:'shop',entries:books,categories:[],resources:{gold:2}});
+autoState={};tableListeners.survival_shop_config('', 'auto_purchase_0', autoState);
+assert(!buttons[0].BHasClass('AutoBookEnabled'),'same-layout refresh preserves live toggle bindings');
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/item_art_remaining_5d5c1152eb.js','utf8'),env);
+for(const suffix of ['01','02','03','04','max'])for(const prefix of ['weapon_','item_survival_']){
+ const icon=cfg.SurvivalItemArt.Create(root,{content_id:prefix+'ice_blade_'+suffix},'icon');
+ assert(icon.image.endsWith('/extreme_cold_blade_v2.png'));
+}
+console.log('BOOK_SHOP_UI_PASS: both toggles, live state, retained bindings, tab memory, all blade levels');

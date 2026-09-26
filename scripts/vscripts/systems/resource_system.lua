@@ -80,6 +80,7 @@ local function start_income_task(player_id, account)
     scheduler.cancel(task_id)
     scheduler.every(1, function()
         if accounts[player_id] ~= account or not account.initialized then return false end
+        if require("systems/player_context_service").is_defeated(player_id) then return false end
         if phase_guard.post_clear_frozen() then return true end
         local wood_exact = account.wood_per_second + account.wood_fraction
         local gold_exact = account.gold_per_second + account.gold_fraction
@@ -184,6 +185,7 @@ end
 local function check_spend(payload)
     local account, player_id, error_code = require_account(payload)
     if not account then return nil, player_id, error_code end
+    if require("systems/player_context_service").is_defeated(player_id) then return nil, player_id, "player_defeated" end
     if phase_guard.post_clear_frozen() then return nil, player_id, "post_clear_frozen" end
     local wood = math.max(0, tonumber(payload.wood) or 0)
     local gold = math.max(0, tonumber(payload.gold) or 0)

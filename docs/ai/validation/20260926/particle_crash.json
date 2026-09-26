@@ -1,0 +1,12 @@
+{
+  "status": "code_defects_fixed_native_crash_unconfirmed",
+  "dumps": 3,
+  "fault": "particles.dll+0x42428",
+  "access": "write",
+  "address": "0x8f0",
+  "pre_fix_test": "duplicate_destroy_reproduced",
+  "lua51_tests": 4,
+  "workshop_verified": false,
+  "changed_cleanup_owners": 4,
+  "localization_keys_per_language": 4
+}

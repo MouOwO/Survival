@@ -1,0 +1,163 @@
+{
+  "updated_at": "2026-09-26T13:43:01.233420+08:00",
+  "request": "Add builder selection [Space] and hero return home [F2] hints/buttons to the right of minimap.",
+  "validation_level": [
+    "STATIC",
+    "CONTRACT",
+    "SIMULATION",
+    "RESOURCE_COMPILER"
+  ],
+  "workshop_new_match_verified": false,
+  "node_checks": [
+    {
+      "test": "tools/test_minimap_shortcut_input.cjs",
+      "exit_code": 0,
+      "stdout": "MINIMAP_SHORTCUT_INPUT_PASS: shared button/key actions, builder identity, F2 sender-only request, focus/modal/startup/defeat gates, cooldown, duplicate callbacks, reload",
+      "stderr": ""
+    },
+    {
+      "test": "tools/test_minimap_shortcuts.cjs",
+      "exit_code": 0,
+      "stdout": "MINIMAP_SHORTCUTS_PASS: two shared actions, missing APIs, live guards, modal/unavailable states, map/portrait/production avoidance, scaled world mask and HUD load order",
+      "stderr": ""
+    },
+    {
+      "test": "tools/test_combat_selection_recovery.cjs",
+      "exit_code": 0,
+      "stdout": "COMBAT_SELECTION_RECOVERY_PASS: merged events, single mapping discovery, stable shortcuts, late/rebuilt HUD, runtime reconciliation, key assignments and shutdown",
+      "stderr": ""
+    },
+    {
+      "test": "tools/test_world_overlay_visibility.cjs",
+      "exit_code": 0,
+      "stdout": "WORLD_OVERLAY_VISIBILITY_PASS: native HUD, partial overlap, movement, modal close, tooltip visibility, scaling, production CSS-transform bounds",
+      "stderr": ""
+    },
+    {
+      "test": "tools/test_handoff_refresh.cjs",
+      "exit_code": 0,
+      "stdout": "HANDOFF_REFRESH_PASS: initial and periodic refresh keep geometry and reach HUD reveal; unready geometry is safe",
+      "stderr": ""
+    },
+    {
+      "test": "tools/test_production_hud.cjs",
+      "exit_code": 0,
+      "stdout": "PRODUCTION_HUD_PASS: queue routing and private snapshots, six waiting cells plus current task, ordinary/advanced parity, full long-name tooltip, readable compact costs, larger physical text and exact occlusion",
+      "stderr": ""
+    }
+  ],
+  "input_rechecked_after_builder_identity_adjustment": true,
+  "lua51_tests": [
+    {
+      "file": "scripts/vscripts/tests/test_hero_return_home.lua",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_return_home_ui_router.lua",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_hero_summon_destination.lua",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_hero_summon_player_isolation.lua",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_rebirth_return_retry.lua",
+      "passed": true
+    },
+    {
+      "file": "scripts/vscripts/tests/test_production_ui_router.lua",
+      "passed": true
+    }
+  ],
+  "lua51_syntax_files": [
+    "scripts/vscripts/systems/hero_return_home_service.lua",
+    "scripts/vscripts/systems/hero_summon_destination.lua",
+    "scripts/vscripts/tests/test_hero_return_home.lua",
+    "scripts/vscripts/tests/test_return_home_ui_router.lua",
+    "scripts/vscripts/tests/test_rebirth_return_retry.lua"
+  ],
+  "content_sync": [
+    {
+      "file": "panorama/src/scripts/custom_game/ui_bootstrap.js",
+      "sha256": "70bde804c01d184f017b3fb4429a86448735b24c32e5e4903a5fbdbdadd8278c"
+    },
+    {
+      "file": "panorama/src/scripts/custom_game/combat_stats.js",
+      "sha256": "9e1f4da8c87d246593df910cb33af1dee4230389ce3674823a35e9fa8d75d14b"
+    },
+    {
+      "file": "panorama/src/scripts/custom_game/minimap_shortcuts.js",
+      "sha256": "0bd6cfa4c88be6691c8d9e7a3d8881621379e08813b0743d610619518625c771"
+    },
+    {
+      "file": "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+      "sha256": "9ac6aa5de509a51b4b1a9ba79d905160f458c586452f8eea804ee33bfdb867a4"
+    },
+    {
+      "file": "panorama/src/scripts/custom_game/world_overlay_visibility.js",
+      "sha256": "ac357ed61d575a7ea87915f2fb423053757c45b2619011b7ba7de4f45c045441"
+    },
+    {
+      "file": "panorama/src/styles/custom_game/minimap_shortcuts.css",
+      "sha256": "49270b011a62bec9c88d172eaf8f925862185c0f66c01f828e00fef633eed8b0"
+    },
+    {
+      "file": "panorama/src/layout/custom_game/survival_hud.xml",
+      "sha256": "c88fe94554c005acbcef0c3e5da5ebd8a3c3845064da89601f43e8822ca03234"
+    }
+  ],
+  "compile": {
+    "compiled": 15,
+    "failed": 0,
+    "log": "output/minimap_shortcuts_20260926/compile_hud.log"
+  },
+  "runtime_artifacts": [
+    {
+      "file": "panorama/scripts/custom_game/minimap_shortcuts.vjs_c",
+      "sha256": "0ad043e4fc4c5601204dddbfe0040c72eedf9fb52645779ff8c63a4383fa7c8e"
+    },
+    {
+      "file": "panorama/scripts/custom_game/ui_bootstrap.vjs_c",
+      "sha256": "ead856cd904950ea32b983da4fb831cf1c99f145fa92861c1e5936597d5cbba0"
+    },
+    {
+      "file": "panorama/scripts/custom_game/combat_stats.vjs_c",
+      "sha256": "40aa1283955f821de1aae4b8ee3fbcf7106c913634b5b5398bd09f9638a27d5e"
+    },
+    {
+      "file": "panorama/styles/custom_game/minimap_shortcuts.vcss_c",
+      "sha256": "8078bbd1d776a9986aa2d3a18c822cab51797ad01e03bad0506122a786899744"
+    },
+    {
+      "file": "panorama/layout/custom_game/survival_hud.vxml_c",
+      "sha256": "e9d1ec2e6439433d9b3ffd93f42777187a07c7b8b58461edeea2ab0a136e7f13"
+    }
+  ],
+  "api_evidence": {
+    "source": "Installed game/dota/bin/win64/client.dll Panorama registration table (read-only)",
+    "confirmed": [
+      "Panel.BHasKeyFocus",
+      "Panel.BHasDescendantKeyFocus",
+      "Entities.IsAlive",
+      "Entities.GetPlayerOwnerID",
+      "Abilities.GetLevel",
+      "Abilities.GetCooldownTimeRemaining",
+      "DOTAHeroImage.heroimagestyle"
+    ],
+    "not_used": "Unconfirmed $.GetFocus"
+  },
+  "scope_notes": [
+    "Space consumes only builder selection; server NetTable identity is authoritative for creature ownership.",
+    "F2 and clicks send no actor or coordinates; existing engine PlayerID and normal ability cast remain authoritative.",
+    "Return resolves own live constructed city, excludes moving hero and validates radius/buildings/water/regions.",
+    "Existing 1 second ability cooldown and successful return challenge exit remain unchanged.",
+    "No database, economy, CSV, deployment or network protocol changes."
+  ],
+  "scoped_diff_check": "passed",
+  "utf8_and_newline_check": "passed",
+  "new_test_files_not_ignored": true
+}

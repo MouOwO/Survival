@@ -5,6 +5,30 @@ local item_config = require("config/item_config")
 local content_catalog = require("config/generated/content_catalog")
 local weapon_config = require("config/generated/weapon_definitions")
 local tower_skill_config = require("config/generated/tower_skill_definitions")
+
+local tower_icon_by_family = {
+    critical_strike = "survival/native/greater_crit",
+    bone_cannon = "survival/native/skill_bone_cannon",
+    death_grenade = "survival/native/skill_grenade",
+    laser = "survival/native/skill_laser",
+    arcane_cannon = "survival/native/skill_arcane",
+    arcane_eye = "survival/native/skill_arcane_eye",
+    lightning_strike = "survival/native/skill_lightning",
+    lightning_storm = "survival/native/skill_lightning",
+    lightning_diffusion = "survival/native/skill_network",
+    machine_gun = "survival/native/skill_machine_gun",
+    bounty_machine_gun = "survival/native/skill_bounty_gun",
+    explosive_gatling = "survival/native/skill_flak_cannon",
+    multi_attack = "survival/native/skill_multi_arrow",
+    piercing_ballista = "survival/native/skill_ballista",
+    burning_great_arrow = "survival/native/skill_searing_arrow",
+    frost_attack = "survival/native/skill_frost",
+    ice_blizzard = "survival/native/skill_frost",
+    polar_obelisk = "survival/native/skill_ice_obelisk",
+    anti_air_missile = "survival/native/skill_missile",
+    drag_net = "survival/native/skill_net",
+    airspace_overlord = "survival/native/skill_air_overlord",
+}
 local tooltip_config = require("config/generated/tooltip_definitions")
 local seven_sins_essences = require("config/seven_sins_essences")
 local equipment_levels = require("config/equipment_level_definitions")
@@ -143,7 +167,8 @@ local function publish_abilities()
                 abilityname = definition.skill_name,
                 abilitydesc = definition.description,
                 abilityicon = definition.ability_icon
-                    or "drow_ranger_marksmanship",
+                    or tower_icon_by_family[tostring(definition.skill_id):gsub("_lv%d+$", "")]
+                    or "survival/native/skill_multi_arrow",
                 skill_type = definition.trigger_type or "passive",
                 is_active = 0,
             })

@@ -43,6 +43,7 @@ local function snapshot(state, row)
         wood_cost = row and (tonumber(row.wood_cost) or 0) or 0,
         gold_cost = row and (tonumber(row.gold_cost) or 0) or 0,
         population_cost = row and (tonumber(row.population_cost) or 0) or 0,
+        train_duration = row and (tonumber(row.training_duration_seconds) or 1) or 1,
         wood_per_hit = row and (tonumber(row.wood_per_hit) or 0) or 0,
         base_attack = row and (tonumber(row.base_attack) or 0) or 0,
         repair_max_health_pct_per_second = row
@@ -116,6 +117,13 @@ function M.create(definitions, prefix, error_prefix)
         return result
     end
 
+    function tracker:get_all(owner_key)
+        local state = state_for(owner_key)
+        local result = {}
+        for _, row in ipairs(self.rows) do result[#result + 1] = snapshot(state, row) end
+        return result
+    end
+
     function tracker:record_explicit(team, training_id)
         local state = state_for(team)
         for _, row in ipairs(self.rows) do
@@ -130,6 +138,23 @@ function M.create(definitions, prefix, error_prefix)
             end
         end
         return nil, error_prefix .. "_training_not_found"
+    end
+
+    -- Independent entrances can finish in any order. Keep the legacy current
+    -- tier on the first unfinished tier, without changing repairer tracking.
+    function tracker:record_independent(owner_key, training_id)
+        local result, error_code = self:record_explicit(owner_key, training_id)
+        if not result then return nil, error_code end
+        local state = state_for(owner_key)
+        local previous_index = state.current_index
+        while state.current_index < #self.rows do
+            local current = self.rows[state.current_index]
+            local maximum = maximum_for(current)
+            if maximum < 0 or (state.counts[current.training_id] or 0) < maximum then break end
+            state.current_index = state.current_index + 1
+        end
+        result.advanced = state.current_index ~= previous_index and 1 or 0
+        return result
     end
 
     return tracker

@@ -118,7 +118,7 @@ resource(0); run(id, 0.4)
 assert(#writes == 2)
 
 -- Research bootstrap: mocked domain service still fetches wallet via its real
--- injected get_resources callback; team propagation is not resource ownership.
+-- injected get_resources callback; personal research changes stay private.
 package.loaded["research/research_technology_repository"] = {new = function()
     return {GetAllLevels = function() return {} end, GetLegacyLevels = function() return {} end,
         SetLevel = function() return true end}
@@ -148,7 +148,10 @@ writes = {}; resource(0)
 bus.emit(events.HERO_READY, {player_id = 0})
 assert(#writes == 1, "hero readiness is not delayed by resource queue")
 local set_result = bus.request(research_events.LEVEL_SET_REQUESTED, {player_id = 0, tech_id = "mock", level = 1})
-assert(set_result and set_result.ok and find_value("survival_research", "1"), "research team propagation remains immediate")
+assert(set_result and set_result.ok and find_value("survival_research", "0"),
+    "personal research update remains immediate")
+assert(not find_value("survival_research", "1"),
+    "researching must not update a same-team player's technology snapshot")
 stale = tasks[id].callback
 bus.reset()
 bus.handle_request(events.RESOURCE_GET_REQUEST, function(payload) return {wood = wallet[payload.player_id]} end)

@@ -1,0 +1,133 @@
+{
+  "date": "2026-09-25",
+  "scope": "Per-player assault monster limits and individual elimination",
+  "levels": [
+    "STATIC",
+    "CONTRACT",
+    "SIMULATION"
+  ],
+  "workshop_verified": false,
+  "rules": {
+    "count_owner": "monster player_id",
+    "alive_limit_per_player": 90,
+    "safe_comparison": "alive <= 90",
+    "overflow_grace_game_seconds": 10,
+    "countdown_text": "digits only",
+    "reset_when_safe": true,
+    "defeat_scope": "only the expired player; survivors continue",
+    "global_defeat": "all participants defeated",
+    "global_alive_retained_for_final_wave": true
+  },
+  "hud": {
+    "counter": "recipient player only, above minimap",
+    "defeated_text": "本局失败 / 可继续观战",
+    "same_team_building_worker_cache": "isolated by player_id"
+  },
+  "elimination": [
+    "only own online session finalized",
+    "only own units/buildings/challenges cleaned",
+    "delayed summon/respawn and gameplay requests blocked",
+    "private snapshots retained for spectating",
+    "survivors continue waves, rewards and final-wave challenges"
+  ],
+  "lua51_tests_passed": [
+    "test_archive_challenge_hub_positions",
+    "test_boss_warning_projection",
+    "test_builder_tower_rebuild",
+    "test_difficulty_unlocks",
+    "test_gold_mine_reward_upgrade",
+    "test_hero_summon_flow",
+    "test_hero_summon_player_isolation",
+    "test_lumberjack_fusion",
+    "test_lumberjack_fusion_ui",
+    "test_monster_ground_navigation",
+    "test_personal_wave_projection",
+    "test_player_challenge_cleanup",
+    "test_player_elimination",
+    "test_resource_opening_wood",
+    "test_resource_ui_coalescing",
+    "test_rogue_item_rewards",
+    "test_rogue_reward_history",
+    "test_shop_early_final_cooldown",
+    "test_startup_order_gate",
+    "test_startup_ui_request_gate",
+    "test_tower_destruction_rebuild",
+    "test_ui_snapshot_scheduling",
+    "test_wave_population_endgame",
+    "test_worker_system_training"
+  ],
+  "lua51_test_count": 24,
+  "node_tests_passed": [
+    "test_hud_wave_counter"
+  ],
+  "compile": {
+    "forced_compiled": 2,
+    "failed": 0,
+    "source_content_identical": [
+      "scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+      "styles/custom_game/handoff_v1.css"
+    ]
+  },
+  "static": {
+    "unchanged_existing_unicode_replacement_literals": {
+      "scripts/vscripts/config/generated/rogue_reward_effects.lua": 85
+    },
+    "lua51_syntax_utf8_files": 38,
+    "syntax_files": [
+      "scripts/vscripts/addon_game_mode.lua",
+      "scripts/vscripts/config/generated/archive_challenge_rules.lua",
+      "scripts/vscripts/config/generated/global_rules.lua",
+      "scripts/vscripts/config/generated/rogue_reward_effects.lua",
+      "scripts/vscripts/config/global_rules.lua",
+      "scripts/vscripts/systems/archive_endless_service.lua",
+      "scripts/vscripts/systems/archive_online_clock.lua",
+      "scripts/vscripts/systems/builder_service.lua",
+      "scripts/vscripts/systems/building_challenge_service.lua",
+      "scripts/vscripts/systems/building_system.lua",
+      "scripts/vscripts/systems/challenge_session_service.lua",
+      "scripts/vscripts/systems/gold_mine_system.lua",
+      "scripts/vscripts/systems/hero_summon_system.lua",
+      "scripts/vscripts/systems/lumberjack_fusion_service.lua",
+      "scripts/vscripts/systems/monster_reward_service.lua",
+      "scripts/vscripts/systems/monster_spawn_service.lua",
+      "scripts/vscripts/systems/multiplayer_player_service.lua",
+      "scripts/vscripts/systems/online_time_service.lua",
+      "scripts/vscripts/systems/player_context_service.lua",
+      "scripts/vscripts/systems/resource_system.lua",
+      "scripts/vscripts/systems/rogue_effect_registry.lua",
+      "scripts/vscripts/systems/rogue_effect_runtime_service.lua",
+      "scripts/vscripts/systems/rogue_reward_service.lua",
+      "scripts/vscripts/systems/tree_attack_order_filter.lua",
+      "scripts/vscripts/systems/wave_system.lua",
+      "scripts/vscripts/systems/worker_system.lua",
+      "scripts/vscripts/tests/test_startup_order_gate.lua",
+      "scripts/vscripts/tests/test_startup_ui_request_gate.lua",
+      "scripts/vscripts/tests/test_tower_destruction_rebuild.lua",
+      "scripts/vscripts/ui/grid_placement_router.lua",
+      "scripts/vscripts/ui/hero_skill_ui_service.lua",
+      "scripts/vscripts/ui/ui_projection.lua",
+      "scripts/vscripts/ui/ui_request_router.lua",
+      "scripts/vscripts/tests/test_personal_wave_projection.lua",
+      "scripts/vscripts/tests/test_wave_population_endgame.lua",
+      "scripts/vscripts/tests/test_hero_summon_player_isolation.lua",
+      "scripts/vscripts/tests/test_player_elimination.lua",
+      "scripts/vscripts/tests/test_player_challenge_cleanup.lua"
+    ],
+    "source_content_identical": [
+      "scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+      "styles/custom_game/handoff_v1.css"
+    ],
+    "scoped_diff_check": "passed; preexisting aliyun_game_test_auth.py excluded"
+  },
+  "evidence_paths": [
+    "output/per_player_wave_limit_20260925/wave_population_test.log",
+    "output/per_player_wave_limit_20260925/static_verification.json",
+    "output/player_elimination_20260925/verification.json",
+    "output/player_elimination_20260925/test_run.log",
+    "output/hero_summon_isolation_20260925/verification.json"
+  ],
+  "backend_bundle_changed": false,
+  "committed": false,
+  "pushed": false,
+  "remaining_acceptance": "Restart Workshop Tools and open a fresh multiplayer match to verify in-engine HUD, individual elimination and survivor continuation."
+}

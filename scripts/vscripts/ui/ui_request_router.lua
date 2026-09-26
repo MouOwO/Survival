@@ -13,6 +13,7 @@ local building_batch_upgrade = require("systems/building_batch_upgrade_service")
 local gold_mine_batch_upgrade = require("systems/gold_mine_batch_upgrade_service")
 local tree_config = require("config/tree_config")
 local research_lab_abilities = require("config/generated/research_lab_abilities")
+local production_ui = require("ui/production_ui_service")
 
 local M = {}
 local synthesis_requests = {}
@@ -114,10 +115,17 @@ local function apply_portrait_metadata(unit, snapshot)
     -- decorated body in-world.
     local is_boss_portrait = asset.load_group == "monster_default_wearables"
         and tostring(asset.portrait_unit_name or "") ~= ""
-    local is_split_hero_portrait = asset.asset_id
-        == "hero_permanent_hero_blademaster"
+    local is_split_hero_portrait = (asset.asset_id == "hero_permanent_hero_blademaster"
+        or asset.asset_id == "hero_permanent_hero_doom")
         and tostring(asset.portrait_unit_name or "") ~= ""
+    local is_seven_sins_portrait = asset.asset_id
+        == "challenge_monster_terrorblade_fractal_horns"
+        and asset.portrait_unit_name == "npc_dota_hero_terrorblade"
+    local is_challenge_portrait = tostring(asset.asset_id or ""):find("challenge_monster_", 1, true) == 1
+        and tostring(asset.portrait_unit_name or ""):find("npc_dota_hero_", 1, true) == 1
     if asset.native_wearable_stage == nil
+        and not is_challenge_portrait
+        and not is_seven_sins_portrait
         and not is_boss_portrait
         and not is_split_hero_portrait then
         return snapshot
@@ -201,10 +209,11 @@ local function unit_combat_snapshot(unit)
     })
 end
 
-local function valid_player_id(player_id)
+local function valid_player_id(player_id, allow_defeated)
     if player_id == nil or player_id < 0 or not PlayerResource:IsValidPlayerID(player_id) then
         return false
     end
+    if not allow_defeated and require("systems/player_context_service").is_defeated(player_id) then return false end
     -- Custom events bypass engine unit-order filters. Hold all gameplay UI
     -- requests (difficulty, building, rewards, etc.) behind the same barrier.
     -- Loading handshakes/retries have their own listener outside this router.
@@ -219,7 +228,7 @@ local function source_player_id(payload)
 end
 
 local function send_to_player(event_name, player_id, payload)
-    if not valid_player_id(player_id) then return end
+    if not valid_player_id(player_id, true) then return end
     local player = PlayerResource:GetPlayer(player_id)
     if player then
         CustomGameEventManager:Send_ServerToPlayer(player, event_name, payload)
@@ -244,7 +253,7 @@ local function register_client_diagnostic()
     CustomGameEventManager:RegisterListener("ui_client_diagnostic", function(_, payload)
         local player_id = source_player_id(payload)
         local stage = diagnostic_value(payload and payload.stage)
-        if not valid_player_id(player_id) or not CLIENT_DIAGNOSTIC_STAGES[stage] then
+        if not valid_player_id(player_id, true) or not CLIENT_DIAGNOSTIC_STAGES[stage] then
             return
         end
         print("[SURVIVAL_CLIENT_DIAGNOSTIC] player=" .. tostring(player_id)
@@ -304,7 +313,7 @@ end
 local function register_selected_unit_stats_request()
     CustomGameEventManager:RegisterListener("ui_selected_unit_stats_request", function(_, payload)
         local player_id = source_player_id(payload)
-        if not valid_player_id(player_id) then return end
+        if not valid_player_id(player_id, true) then return end
         local entindex = tonumber(payload and payload.entindex)
         local ok, unit = pcall(EntIndexToHScript, entindex or -1)
         if not ok or not unit or unit:IsNull() then
@@ -327,6 +336,7 @@ local function register_selected_unit_stats_request()
             return
         end
         local snapshot = combat_stat_projection.for_ui(unit_combat_snapshot(unit))
+        production_ui.decorate(player_id, unit, snapshot)
         snapshot.success = 1
         send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
     end)
@@ -338,7 +348,7 @@ local function publish_selected_tree_snapshot(payload)
     local ok, unit = pcall(EntIndexToHScript, entindex)
     if not ok or not unit or unit:IsNull() then return end
     for player_id, selected_entindex in pairs(selected_unit_by_player) do
-        if tonumber(selected_entindex) == entindex and valid_player_id(player_id) then
+        if tonumber(selected_entindex) == entindex and valid_player_id(player_id, true) then
             local snapshot = combat_stat_projection.for_ui(unit_combat_snapshot(unit))
             snapshot.success = 1
             snapshot.reason = payload.reason or "tree_changed"
@@ -362,7 +372,7 @@ local function on_unit_combat_stats_changed(payload)
         unit = resolved
     end
     for player_id, selected_entindex in pairs(selected_unit_by_player) do
-        if tonumber(selected_entindex) == entindex and valid_player_id(player_id) then
+        if tonumber(selected_entindex) == entindex and valid_player_id(player_id, true) then
             local snapshot = hero_ui_snapshot(player_id, entindex, unit)
                 or combat_stat_projection.for_ui(unit_combat_snapshot(unit))
             -- Hero snapshots intentionally own stable equipment armor, but
@@ -405,7 +415,7 @@ end
 local function on_hero_combat_stats_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     local snapshot = payload and payload.snapshot
-    if not valid_player_id(player_id) or type(snapshot) ~= "table" then return end
+    if not valid_player_id(player_id, true) or type(snapshot) ~= "table" then return end
     local selected_entindex = tonumber(selected_unit_by_player[player_id])
     if selected_entindex ~= tonumber(snapshot.entindex) then return end
     local ok, unit = pcall(EntIndexToHScript, selected_entindex)
@@ -424,7 +434,7 @@ end
 local function build_building_snapshot(payload)
     local player_id = tonumber(payload and payload.player_id)
     local entindex = tonumber(payload and payload.entindex)
-    if not valid_player_id(player_id) or not entindex then return end
+    if not valid_player_id(player_id, true) or not entindex then return end
     local ok, unit = pcall(EntIndexToHScript, entindex)
     if not ok or not unit or unit:IsNull() then return end
     local snapshot = unit_combat_snapshot(unit)
@@ -445,6 +455,7 @@ local function build_building_snapshot(payload)
         or snapshot.runtime_armor
     snapshot.attack_speed = tonumber(payload.attack_speed) or snapshot.attack_speed
     snapshot.push_phase = "coalesced"
+    production_ui.decorate(player_id, unit, snapshot)
     snapshot = combat_stat_projection.for_ui(snapshot)
     return snapshot
 end
@@ -452,7 +463,7 @@ end
 building_push_coalescer = require("ui/stat_push_coalescer").new({
     scheduler = scheduler,
     is_selected = function(player_id, entindex)
-        return valid_player_id(player_id)
+        return valid_player_id(player_id, true)
             and tonumber(selected_unit_by_player[player_id]) == entindex
     end,
     build = build_building_snapshot,
@@ -481,7 +492,7 @@ end
 local function register_snapshot_request()
     CustomGameEventManager:RegisterListener("ui_request_full_snapshot", function(_, payload)
         local player_id = source_player_id(payload)
-        if not valid_player_id(player_id) then return end
+        if not valid_player_id(player_id, true) then return end
         event_bus.emit(events.UI_SNAPSHOT_REQUESTED, {
             player_id = player_id,
             request_id = payload.request_id,
@@ -522,7 +533,7 @@ end
 local function register_shop_open_request()
     CustomGameEventManager:RegisterListener("ui_shop_open_request", function(_, payload)
         local player_id = source_player_id(payload)
-        if not valid_player_id(player_id) then return end
+        if not valid_player_id(player_id, true) then return end
         local result = event_bus.request(events.SHOP_OPEN_REQUEST, {
             player_id = player_id,
             request_id = payload.request_id,
@@ -546,7 +557,7 @@ end
 local function register_shop_close_request()
     CustomGameEventManager:RegisterListener("ui_shop_close_request", function(_, payload)
         local player_id = source_player_id(payload)
-        if not valid_player_id(player_id) then return end
+        if not valid_player_id(player_id, true) then return end
         event_bus.request(events.SHOP_CLOSE_REQUEST, {
             player_id = player_id,
             request_id = payload.request_id,
@@ -595,6 +606,16 @@ local function register_shop_purchase_request()
     end)
 end
 
+local function register_shop_auto_purchase_toggle_request()
+    CustomGameEventManager:RegisterListener("ui_shop_auto_purchase_toggle_request", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        event_bus.request(events.SHOP_AUTO_PURCHASE_TOGGLE_REQUEST, {
+            player_id = player_id, entry_id = tostring(payload.entry_id or ""),
+        })
+    end)
+end
+
 local function register_shop_auto_research_toggle_request()
     CustomGameEventManager:RegisterListener(
         "ui_shop_auto_research_toggle_request",
@@ -625,7 +646,7 @@ local function register_research_requests()
         "ui_research_snapshot_request",
         function(_, payload)
             local player_id = source_player_id(payload)
-            if not valid_player_id(player_id) then return end
+            if not valid_player_id(player_id, true) then return end
             event_bus.request(research_events.CLIENT_SNAPSHOT_REQUESTED, {
                 player_id = player_id,
             })
@@ -699,7 +720,7 @@ local function register_weapon_snapshot_request()
         "ui_weapon_snapshot_request",
         function(_, payload)
             local player_id = source_player_id(payload)
-            if not valid_player_id(player_id) then return end
+            if not valid_player_id(player_id, true) then return end
             weapon_snapshot.publish_player(player_id, "client_request")
         end
     )
@@ -890,6 +911,9 @@ local function register_ability_cast_request()
         local tower_fusion_matches = ability_name == "ability_tower_fusion"
             and unit_valid and ability_valid
             and unit:FindAbilityByName(ability_name) == ability
+        local lumberjack_fusion_matches = string.match(ability_name, "^ability_fuse_lumberjack_0[1-8]$") ~= nil
+            and unit_valid and ability_valid and unit.survival_worker_type == "lumberjack"
+            and unit:FindAbilityByName(ability_name) == ability
         local building_upgrade_action = ({
             ability_upgrade_wall = true,
             ability_upgrade_wall_9_1 = true,
@@ -1022,6 +1046,21 @@ local function register_ability_cast_request()
                 .. tostring(direct_result and direct_result.ok == true)
                 .. " error="
                 .. tostring(direct_result and direct_result.error or ""))
+        elseif lumberjack_fusion_matches and owner_matches and not passive
+            and not is_point_target then
+            -- Use the same authoritative service as the native hotkey. Dynamic
+            -- creature abilities can accept a cast order without OnSpellStart.
+            handled_directly = true
+            direct_result_required = true
+            if not ability:IsActivated() or ability:IsHidden()
+                or not ability:IsFullyCastable() then
+                direct_result = { ok = false, error = "伐木工合体技能当前不可用" }
+            else
+                direct_result = event_bus.request(events.LUMBERJACK_FUSION_REQUEST, {
+                    player_id = player_id, caster = unit, ability = ability,
+                    source = "ui_ability_cast_request",
+                }) or { ok = false, error = "伐木工合体请求无响应" }
+            end
         elseif gold_mine_ability_matches and owner_matches and not passive
             and not is_point_target then
             handled_directly = true
@@ -1095,8 +1134,7 @@ local function register_ability_cast_request()
             if not building
                 or building.building_id ~= research_upgrade.building_id
                 or tonumber(building.player_id) ~= player_id
-                or not ability:IsActivated() or ability:IsHidden()
-                or not ability:IsFullyCastable() then
+                or ability:IsHidden() then
                 direct_result = { ok = false, error = "research_source_invalid" }
             else
                 direct_result = event_bus.request(
@@ -1367,7 +1405,7 @@ end
 local function register_lottery_requests()
     CustomGameEventManager:RegisterListener("ui_lottery_snapshot_request", function(_, payload)
         local player_id = source_player_id(payload)
-        if not valid_player_id(player_id) then return end
+        if not valid_player_id(player_id, true) then return end
         local function complete(result)
             local snapshot={}
             for k,v in pairs(result and result.snapshot or {ok=false,error=result and result.error or 'lottery_snapshot_failed'}) do snapshot[k]=v end
@@ -1435,7 +1473,15 @@ function M.init()
     register_shop_open_request()
     register_shop_close_request()
     register_shop_purchase_request()
+    register_shop_auto_purchase_toggle_request()
     register_shop_auto_research_toggle_request()
+    production_ui.init({
+        source_player_id = source_player_id,
+        valid_player_id = valid_player_id,
+        send = send_to_player,
+        selected = function(player_id) return selected_unit_by_player[player_id] end,
+        push = publish_building_snapshot,
+    })
     register_research_requests()
     register_weapon_synthesis_request()
     register_weapon_snapshot_request()

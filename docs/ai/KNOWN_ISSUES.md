@@ -115,3 +115,19 @@ Last Reviewed: 2026-08-27
 **Next Action:** 当前结论固定为 `PORTRAIT_RUNTIME_ENTITY_MISSING` 并停止 Phase 2A。除非另立任务取得官方 portrait world 运行时加载/实体系统契约的新证据，否则不再调整 B、不加载 Head `22217`、Weapon、其它 ItemDef 或 Phase 2B，也不修改正式 `survival`。
 
 **Last Verified:** 2026-08-27；`DATA_INVALID` 已消失并出现单 Base `[PHASE2A] LOAD`。A=PASS、B=FAIL/黑屏、C=PASS；编译实体 lump 含目标 classname、Axe unit name 和 targetname，但两条只读 `ent_find` 均为 0。`HEAD_RESOURCE_COUNT=0`，未加载 `22217`。
+
+## ISSUE-008
+
+**Status:** TESTING
+
+**Priority:** P1
+
+**Symptom:** 2026-09-26偶发客户端闪退，三份转储均为 `particles.dll+0x42428` 空指针写入 `0x8f0`；不限于高级研究所操作。
+
+**Known Cause:** 粒子链表摘除路径访问异常已确认；具体资源及项目侧触发源UNKNOWN。四处清理重入重复释放缺陷已由模拟复现，但不能当作三次native崩溃的已证实唯一原因。
+
+**Current Workaround:** 四处清理先撤销记录再调用引擎；保留英雄账号饰品预载门禁，补齐研究所名称。
+
+**Next Action:** 退出Dota和Workshop Tools后新局复测；若复发，按新转储签名和完整日志单独隔离特效来源。详见 `docs/CRASH_20260926.md`。
+
+**Last Verified:** 2026-09-26；4项Lua5.1、攻击范围契约及静态检查通过，未完成Workshop验收。

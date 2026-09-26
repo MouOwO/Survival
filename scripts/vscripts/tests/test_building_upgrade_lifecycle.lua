@@ -173,3 +173,41 @@ for _, payload in ipairs(published) do
 end
 assert(found_reused and #errors == 0, table.concat(errors, "\n"))
 print("BUILDING_UPGRADE_LIFECYCLE_PASS: expired handle/corpse exclusion/logical death/late publish/scan recovery/live rewards/index reuse/old-event isolation")
+
+-- A teammate's LV5 city never unlocks another owner's farm upgrades.
+local own_city, other_city, farm = make_unit(1001), make_unit(1002), make_unit(1003)
+function own_city:GetUnitName() return "building_main_city" end
+function other_city:GetUnitName() return "building_main_city" end
+function farm:GetUnitName() return "building_farm" end
+function farm:FindAbilityByName() return nil end
+local function register_level(unit, owner, kind, level)
+    bus.emit(events.BUILDING_CREATED, {unit = unit, entindex = unit.index,
+        definition = kind == "main_city" and config.main_city or config.farm,
+        building_id = kind, level = level, team = 2, player_id = owner})
+end
+register_level(other_city, 1, "main_city", 5)
+for target = 2, 5 do
+    assert(config.farm.levels[target].requires_city_level == target)
+    register_level(own_city, 0, "main_city", target - 1)
+    register_level(farm, 0, "building_farm", target - 1)
+    local denied = bus.request(events.BUILDING_UPGRADE_QUOTE_REQUEST, {building = farm, player_id = 0})
+    assert(denied and not denied.ok, "requires owner's city LV" .. target)
+    register_level(own_city, 0, "main_city", target)
+    local allowed = bus.request(events.BUILDING_UPGRADE_QUOTE_REQUEST, {building = farm, player_id = 0})
+    assert(allowed and allowed.ok and allowed.target_level == target, "unlocks at own city LV" .. target)
+end
+assert(#errors == 0, table.concat(errors, "\n"))
+print("FARM_CITY_GATE_PASS: LV1-5 and same-team owner isolation")
+
+
+local scans=0
+Entities.FindAllByClassname=function() scans=scans+1;return world end
+published={}
+for i=1,200 do
+    bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,changed_section="lumberjack",changed_field="attack",reason="lumberjack_attack_growth"})
+end
+assert(scans==0 and #published==0,"harvest growth must not rescan/rebuild unrelated buildings")
+bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
+assert(scans>0 and #published>0,"normal research must still refresh buildings")
+assert(#errors==0,table.concat(errors,"\n"))
+print("LUMBERJACK_BUILDING_ISOLATION_PASS: 200 growth hits cause zero world scans and building refreshes")

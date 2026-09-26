@@ -249,10 +249,11 @@ local function apply_research_technology(state, reason)
     end
 end
 
-local function team_city_level(team)
+local function team_city_level(team, player_id)
     local level = 0
     for _, building in pairs(buildings) do
         if building.team == team and building.building_id == "main_city"
+            and (player_id == nil or tonumber(building.player_id) == tonumber(player_id))
             and active_state(building) then
             level = math.max(level, tonumber(building.level) or 0)
         end
@@ -268,7 +269,7 @@ local function refresh_farm_upgrade_ability(state)
     if ability then
         local has_next_level = state.definition.levels[(state.level or 1) + 1] ~= nil
         ability:SetActivated(
-            has_next_level and (state.level or 1) < team_city_level(state.team)
+            has_next_level and (state.level or 1) < team_city_level(state.team, state.player_id)
         )
     end
 end
@@ -644,6 +645,7 @@ local function recover_player_towers(player_id)
 end
 
 local function on_technology_stats_changed(payload)
+    if payload and payload.changed_section == "lumberjack" then return end
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
     recover_player_towers(player_id)
@@ -743,7 +745,7 @@ local function upgrade_city(state)
 end
 
 local function upgrade_farm(state)
-    local city_level = team_city_level(state.team)
+    local city_level = team_city_level(state.team, state.player_id)
     if state.level >= city_level then
         return { ok = false, error = "农场等级不能高于主城等级" }
     end
@@ -1007,7 +1009,7 @@ local function upgrade_quote(payload)
             }
         end
         if (state.building_id == "building_farm" or state.building_id == "farm")
-            and state.level >= team_city_level(state.team) then
+            and state.level >= team_city_level(state.team, state.player_id) then
             return { ok = false, error = "农场等级不能高于主城等级" }
         end
         cost = data.upgrade_cost

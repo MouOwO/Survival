@@ -98,11 +98,12 @@ local function builder_for(instance)
     return result.builder or result.unit
 end
 
-local function grant_item(instance, item_name)
+local function grant_item(instance, item_name, charges)
     local builder = builder_for(instance)
     if not valid(builder) then return false, "builder_unavailable" end
     local item = CreateItem(item_name, builder, builder)
     if not item then return false, "item_create_failed" end
+    if charges and item.SetCurrentCharges then item:SetCurrentCharges(charges) end
     local added = builder:AddItem(item)
     if not added then
         UTIL_Remove(item)
@@ -201,14 +202,8 @@ handlers.random_building_upgrade_count = {
 handlers.grant_building_upgrade_action = {
     apply = function(instance)
         local count = math.max(0, math.floor(tonumber(instance.params.count) or 1))
-        if not effect_state.add_numeric(
-            instance.player_id,
-            instance.effect.effect_type,
-            count
-        ) then
-            return false, "construction_order_state_failed"
-        end
-        return true
+        if count < 1 then return false, "construction_order_count_invalid" end
+        return grant_item(instance, "item_survival_rogue_building_upgrade", count)
     end,
 }
 

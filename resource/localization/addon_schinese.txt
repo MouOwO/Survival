@@ -3,6 +3,10 @@
     "Language" "schinese"
     "Tokens"
     {
+        "DOTA_Tooltip_ability_item_survival_rogue_nuclear_bomb" "核弹"
+        "DOTA_Tooltip_ability_item_survival_rogue_nuclear_bomb_Description" "建造者获得核弹道具；使用后杀死场上当前存活的所有非Boss敌方怪物。"
+        "DOTA_Tooltip_ability_item_survival_rogue_building_upgrade" "建造密令"
+        "DOTA_Tooltip_ability_item_survival_rogue_building_upgrade_Description" "令自己的一座可升级建筑免费提升1级。需要满足原有升级条件，成功开始升级后消耗。"
 // BEGIN GENERATED WAVE UNIT NAMES
         "npc_survival_wave_named_armored_horned_large" "大型灰黑重甲角兽人"
         "npc_survival_wave_named_armored_horned_small" "小型灰黑重甲角兽人"

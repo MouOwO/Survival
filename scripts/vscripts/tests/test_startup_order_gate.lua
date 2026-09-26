@@ -3,6 +3,7 @@ package.path = "scripts/vscripts/?.lua;" .. package.path
 -- Exercise the actual engine order filter. Loading must stop commands before
 -- repair/lumberjack side effects, then preserve ownership and movement checks.
 local ready, admitted = false, { [0] = true }
+local defeated = {}
 local effects = { lumber = 0, repair = 0, destination = 0 }
 local units = {
     [101] = { owner = 0, constrained = true },
@@ -33,6 +34,7 @@ package.loaded["systems/destination_validation_service"] = {
 package.loaded["systems/anti_air_rules"] = { is_anti_air_tower = function() return false end }
 package.loaded["systems/player_context_service"] = {
     owner_player_id = function(unit) return unit.owner end,
+    is_defeated = function(id) return defeated[id] == true end,
 }
 DOTA_UNIT_ORDER_MOVE_TO_POSITION = 1
 DOTA_UNIT_ORDER_ATTACK_MOVE = 2
@@ -75,6 +77,11 @@ destination_allowed = true
 repair_handled = true
 assert(installed(move(0)) == false, "handled repair commands still consume the native order")
 repair_handled = false
+defeated[0] = true
+local defeated_before = effects.lumber
+assert(installed(move(0)) == false, "defeated connected player cannot issue orders")
+assert(effects.lumber == defeated_before, "defeat rejects before any side effects")
+defeated[0] = nil
 admitted[0] = false
 local before = effects.lumber
 assert(installed(move(0)) == false, "a disconnected or identity-changed player cannot continue ordering")

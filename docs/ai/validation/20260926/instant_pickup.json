@@ -1,0 +1,16 @@
+{
+  "ability": "ability_survival_pickup_materials",
+  "changed_fields": [
+    "AbilityBehavior",
+    "AbilityCastAnimation"
+  ],
+  "behavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_DONT_CANCEL_MOVEMENT",
+  "cast_animation": "ACT_INVALID",
+  "range": 700,
+  "radius": 300,
+  "cast_point": 0,
+  "cooldown": 0.5,
+  "workshop_attack_animation_verified": false,
+  "native_reference": "installed_valve_ability_reference.json",
+  "regression": "test_targeted_area_pickup.lua passed"
+}

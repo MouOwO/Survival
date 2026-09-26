@@ -4,6 +4,7 @@ local M = {}
 local states, submit, session = {}, nil, nil
 
 local function connected(id)
+    if require("systems/player_context_service").is_defeated(id) then return false end
     return PlayerResource and PlayerResource.GetConnectionState
         and PlayerResource:GetConnectionState(id) == (DOTA_CONNECTION_STATE_CONNECTED or 2)
 end
