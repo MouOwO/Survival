@@ -1,6 +1,6 @@
-(function () {
-    "use strict";
-
+(function () {
+    "use strict";
+
     var config = GameUI.CustomUIConfig();
     var previous = config.SurvivalGameInfo;
     if (previous && previous.Dispose) previous.Dispose();
@@ -13,12 +13,12 @@
     var structureKey = "";
     var renderedColumns = null;
     var playerId = Game.GetLocalPlayerID();
-    var tableName = "survival_game_info";
-    var tableKey = "player_" + playerId;
-    var snapshot = null;
-    var open = false;
-    var lastToggleTime = -100;
-    var rowById = {};
+    var tableName = "survival_game_info";
+    var tableKey = "player_" + playerId;
+    var snapshot = null;
+    var open = false;
+    var lastToggleTime = -100;
+    var rowById = {};
     var generation = Number(config.SurvivalGameInfoGeneration || 0) + 1;
     config.SurvivalGameInfoGeneration = generation;
 
@@ -51,43 +51,43 @@
         if (target.text !== value) target.text = value;
     }
 
-    function collectionValues(collection) {
-        var result = [];
-        if (!collection) return result;
-        Object.keys(collection).forEach(function (key) {
-            if (collection[key] !== undefined && collection[key] !== null) {
-                result.push(collection[key]);
-            }
-        });
-        return result;
-    }
-
-    function formatNumber(value) {
-        var formatter = GameUI.CustomUIConfig().SurvivalNumberFormatter;
-        if (formatter && formatter.Format) return formatter.Format(Number(value || 0));
-        var number = Number(value || 0);
-        return Math.abs(number - Math.round(number)) < 0.001
-            ? String(Math.round(number)) : number.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
-    }
-
-    function valueText(entry) {
-        var value = entry && entry.value;
-        var text = typeof value === "number" ? formatNumber(value) : String(value || "");
-        return text + String(entry && entry.suffix || "");
-    }
-
-    function createRow(entry, parent) {
-        var row = $.CreatePanel("Panel", parent, "");
-        row.AddClass("GameInfoRow");
-        var label = $.CreatePanel("Label", row, "");
-        label.AddClass("GameInfoLabel");
-        var value = $.CreatePanel("Label", row, "");
-        value.AddClass("GameInfoValue");
-        value.AddClass("MonoNumbersFont");
-        rowById[entry.id] = { row: row, label: label, value: value, entry: entry };
-        return rowById[entry.id];
-    }
-
+    function collectionValues(collection) {
+        var result = [];
+        if (!collection) return result;
+        Object.keys(collection).forEach(function (key) {
+            if (collection[key] !== undefined && collection[key] !== null) {
+                result.push(collection[key]);
+            }
+        });
+        return result;
+    }
+
+    function formatNumber(value) {
+        var formatter = GameUI.CustomUIConfig().SurvivalNumberFormatter;
+        if (formatter && formatter.Format) return formatter.Format(Number(value || 0));
+        var number = Number(value || 0);
+        return Math.abs(number - Math.round(number)) < 0.001
+            ? String(Math.round(number)) : number.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+    }
+
+    function valueText(entry) {
+        var value = entry && entry.value;
+        var text = typeof value === "number" ? formatNumber(value) : String(value || "");
+        return text + String(entry && entry.suffix || "");
+    }
+
+    function createRow(entry, parent) {
+        var row = $.CreatePanel("Panel", parent, "");
+        row.AddClass("GameInfoRow");
+        var label = $.CreatePanel("Label", row, "");
+        label.AddClass("GameInfoLabel");
+        var value = $.CreatePanel("Label", row, "");
+        value.AddClass("GameInfoValue");
+        value.AddClass("MonoNumbersFont");
+        rowById[entry.id] = { row: row, label: label, value: value, entry: entry };
+        return rowById[entry.id];
+    }
+
     function render(nextSnapshot) {
         if (!active() || !open) return;
         snapshot = nextSnapshot || snapshot;
@@ -182,9 +182,9 @@
         if (open && nextOpen) return true;
         open = nextOpen;
         root.SetHasClass("GameInfoOpen", open);
-        root.SetHasClass("GameInfoClosed", !open);
-        root.hittest = open;
-        root.hittestchildren = open;
+        root.SetHasClass("GameInfoClosed", !open);
+        root.hittest = open;
+        root.hittestchildren = open;
         if (open) {
             requestSnapshot();
             render(CustomNetTables.GetTableValue(tableName, tableKey));
@@ -194,37 +194,37 @@
             dynamicPending = false;
             renderPending = false;
         }
-        $.Msg("[GAME_INFO][CLIENT] state=", open ? "open" : "closed",
-            " source=", String(source || "unknown"));
-        return true;
-    }
-
+        $.Msg("[GAME_INFO][CLIENT] state=", open ? "open" : "closed",
+            " source=", String(source || "unknown"));
+        return true;
+    }
+
     function toggle(source) {
         if (!active()) { dispose(); return false; }
-        var now = Game.GetGameTime ? Number(Game.GetGameTime()) : 0;
-        if (now - lastToggleTime < 0.08) return true;
-        lastToggleTime = now;
-        return setOpen(!open, source);
-    }
-
-    function close() { return setOpen(false, "close_button"); }
-
-    function bindTab() {
+        var now = Game.GetGameTime ? Number(Game.GetGameTime()) : 0;
+        if (now - lastToggleTime < 0.08) return true;
+        lastToggleTime = now;
+        return setOpen(!open, source);
+    }
+
+    function close() { return setOpen(false, "close_button"); }
+
+    function bindTab() {
         var handler = function (key, down) {
-            if (!down || String(key).toUpperCase() !== "TAB") return false;
-            return toggle("key_dispatch");
-        };
-        var dispatcher = config.SurvivalInputDispatcher;
-        if (dispatcher && dispatcher.RegisterKeyHandler) {
-            dispatcher.RegisterKeyHandler("game_info", handler, 40);
-        }
-        $.Msg("[GAME_INFO][CLIENT] TAB_BOUND generation=", String(generation));
-    }
-
+            if (!down || String(key).toUpperCase() !== "TAB") return false;
+            return toggle("key_dispatch");
+        };
+        var dispatcher = config.SurvivalInputDispatcher;
+        if (dispatcher && dispatcher.RegisterKeyHandler) {
+            dispatcher.RegisterKeyHandler("game_info", handler, 40);
+        }
+        $.Msg("[GAME_INFO][CLIENT] TAB_BOUND generation=", String(generation));
+    }
+
     config.SurvivalGameInfo = {
-        Open: function () { return setOpen(true, "api"); },
-        Close: close,
-        Toggle: function () { return toggle("api"); },
+        Open: function () { return setOpen(true, "api"); },
+        Close: close,
+        Toggle: function () { return toggle("api"); },
         IsOpen: function () { return active() && open; },
         Refresh: requestSnapshot,
         Dispose: dispose
@@ -235,8 +235,8 @@
         if (key !== tableKey) return;
         snapshot = value;
         if (open) queueRender();
-    });
-    snapshot = CustomNetTables.GetTableValue(tableName, tableKey);
-    setOpen(false, "initialize");
-    bindTab();
+    });
+    snapshot = CustomNetTables.GetTableValue(tableName, tableKey);
+    setOpen(false, "initialize");
+    bindTab();
 })();

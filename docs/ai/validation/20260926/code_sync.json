@@ -1,0 +1,15 @@
+{
+  "validation": "STATIC / UNIT / SIMULATION; not an in-game acceptance",
+  "syntax": {
+    "lua": 140,
+    "python": 22
+  },
+  "regressions_passed": 55,
+  "regressions_failed": 0,
+  "conflicts_resolved": 3,
+  "title_feature_absent": true,
+  "remote_dev": "3aa3f90b",
+  "local_changes_commit": "f4271ce1",
+  "merge_commit": "c2b9f647",
+  "resolution": "Preserved private tree targets with no-op reset deduplication; kept launcher fixes; rebuilt texture; recovered game-info source from shipped upstream DATA and normalized line endings."
+}
