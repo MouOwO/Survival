@@ -257,11 +257,9 @@ def probe(state: Path) -> dict:
     status = tunnel.check(state)
     if not status.get("ok"):
         raise AuthError("owned_ecs_tunnel_not_ready")
-    try:
-        with socket.create_connection(("127.0.0.1", 29000), timeout=1):
-            pass
-    except OSError:
-        raise AuthError("tools_console_unavailable") from None
+    # The protocol-aware client can reuse an existing VConsole relay. A raw
+    # connect/close on 29000 both consumes a connection slot and incorrectly
+    # rejects a healthy game whose console is already owned by that relay.
     nonce = "GOUFAYU_AUTH_PROBE_" + secrets.token_hex(16)
     send_lua(capabilities() + f"\nprint('{nonce}')\n", nonce, OUTPUT / (nonce + ".json"))
     return {"ok": True, "status": "tools_server_and_tunnel_ready"}

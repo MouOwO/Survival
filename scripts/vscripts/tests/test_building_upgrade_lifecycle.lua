@@ -103,6 +103,17 @@ bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id = 0})
 assert(replacement.damage == 119 and #published == 1 and published[1].entindex == 10)
 assert(#errors == 0, table.concat(errors, "\n"))
 
+-- Per-hit lumberjack growth changes no tower stat. It must not rescan towers,
+-- write combat stats or publish a BUILDING_CHANGED fan-out for each tree hit.
+local tower_writes = replacement.stat_writes
+published = {}
+bus.emit(events.TECHNOLOGY_STATS_CHANGED, {
+    player_id = 0, reason = "lumberjack_attack_growth",
+})
+assert(replacement.stat_writes == tower_writes and #published == 0,
+    "lumberjack hit must not refresh towers")
+assert(#errors == 0, table.concat(errors, "\n"))
+
 -- A tower corpse is still a valid engine entity for several seconds. Neither
 -- availability events nor fallback scans may restore its modifiers/stats/UI.
 local corpse = make_unit(50)

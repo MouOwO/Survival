@@ -67,6 +67,42 @@ def ssh_command(ssh: str, key: Path, known_hosts: Path) -> list[str]:
             f"root@{ECS_HOST}"]
 
 
+def ensure_agent_running() -> None:
+    """Restore the Windows agent after reboot before public-key SSH starts.
+
+    A key that needs its agent otherwise appears to the caller as a remote
+    public-key rejection. Starting the service is harmless when already up.
+    Leave an unstartable service alone so SSH can still try an unencrypted key.
+    """
+    if agent_failure_code() != "ssh_agent_unavailable":
+        return
+    try:
+        subprocess.run(["sc.exe", "start", "ssh-agent"], capture_output=True,
+                       timeout=10, creationflags=HIDDEN)
+        for _ in range(10):
+            if agent_failure_code() != "ssh_agent_unavailable":
+                return
+            time.sleep(0.2)
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+
+def agent_failure_code() -> str:
+    agent = shutil.which("ssh-add.exe")
+    if not agent:
+        return "ssh_public_key_authentication_failed"
+    try:
+        result = subprocess.run([agent, "-l"], capture_output=True,
+                                timeout=5, creationflags=HIDDEN)
+    except (OSError, subprocess.SubprocessError):
+        return "ssh_public_key_authentication_failed"
+    if result.returncode == 2 or b"Error connecting to agent" in result.stderr:
+        return "ssh_agent_unavailable"
+    if result.returncode == 1:
+        return "ssh_key_not_loaded_in_current_user_agent"
+    return "ssh_public_key_authentication_failed"
+
+
 def port_free() -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
         if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
@@ -292,6 +328,7 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
             # Keep the state for a later retry and never truncate an open log.
             raise TunnelError("stale_tunnel_log_unavailable") from None
         path.unlink()
+    ensure_agent_running()
     command = ssh_command(str(Path(ssh).resolve()), key.resolve(), known_hosts.resolve())
     # stderr remains a private temporary log; only classified codes are printed.
     error_path = path.with_suffix(".stderr")
@@ -313,7 +350,7 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
                 errors.seek(0)
                 detail = errors.read(8192).decode("utf-8", errors="replace")
                 if "Permission denied" in detail:
-                    raise TunnelError("ssh_public_key_authentication_failed")
+                    raise TunnelError(agent_failure_code())
                 if "Host key verification failed" in detail:
                     raise TunnelError("ssh_host_key_verification_failed")
                 if "Address already in use" in detail or "cannot listen to port" in detail:

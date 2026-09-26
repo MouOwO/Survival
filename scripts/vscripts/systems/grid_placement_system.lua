@@ -98,6 +98,11 @@ local function terrain_clear(center)
         if not traversable_ok or traversable ~= true
             or not blocked_ok or blocked ~= false then return false, "terrain_blocked" end
         local height = ground_height(sample)
+        local build_height = number(config.build_ground_height, nil)
+        if build_height and math.abs(height - build_height)
+            > number(config.build_ground_height_tolerance, 0) then
+            return false, "terrain_not_build_level"
+        end
         lowest = lowest and math.min(lowest, height) or height
         highest = highest and math.max(highest, height) or height
     end

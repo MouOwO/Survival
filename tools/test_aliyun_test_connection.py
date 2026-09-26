@@ -60,6 +60,7 @@ class TunnelTests(unittest.TestCase):
 
         with ExitStack() as stack:
             stack.enter_context(patch.object(tunnel, "verify_known_hosts"))
+            stack.enter_context(patch.object(tunnel, "ensure_agent_running"))
             stack.enter_context(patch.object(tunnel.shutil, "which", return_value="ssh.exe"))
             availability = stack.enter_context(patch.object(tunnel, "port_free", return_value=free))
             factory = stack.enter_context(patch.object(tunnel, "ProcessHandle", side_effect=process_handle))
@@ -98,6 +99,33 @@ class TunnelTests(unittest.TestCase):
         self.assertIn('UserKnownHostsFile="folder with spaces/known_hosts"', command)
         self.assertNotIn("0.0.0.0", " ".join(command))
         self.assertNotIn("FISHING_API_TOKEN", " ".join(command))
+
+    def test_connection_restarts_windows_agent_without_exposing_its_output(self):
+        with patch.object(tunnel, "agent_failure_code", side_effect=[
+                "ssh_agent_unavailable", "ssh_agent_unavailable",
+                "ssh_public_key_authentication_failed"]), \
+             patch.object(tunnel.time, "sleep"), \
+             patch.object(tunnel.subprocess, "run", return_value=Mock(returncode=0)) as run:
+            tunnel.ensure_agent_running()
+        self.assertEqual(run.call_args.args[0], ["sc.exe", "start", "ssh-agent"])
+        self.assertTrue(run.call_args.kwargs["capture_output"])
+
+    def test_running_agent_is_not_restarted(self):
+        with patch.object(tunnel, "agent_failure_code", return_value="ssh_public_key_authentication_failed"), \
+             patch.object(tunnel.subprocess, "run") as run:
+            tunnel.ensure_agent_running()
+        run.assert_not_called()
+
+    def test_public_key_failure_distinguishes_stopped_or_empty_agent(self):
+        with patch.object(tunnel.shutil, "which", return_value="ssh-add.exe"), \
+             patch.object(tunnel.subprocess, "run") as run:
+            for code, expected in ((2, "ssh_agent_unavailable"),
+                                   (1, "ssh_key_not_loaded_in_current_user_agent"),
+                                   (0, "ssh_public_key_authentication_failed")):
+                with self.subTest(code=code):
+                    run.return_value.returncode = code
+                    run.return_value.stderr = b""
+                    self.assertEqual(tunnel.agent_failure_code(), expected)
 
     def test_busy_port_does_not_launch_or_stop_any_process(self):
         key = self.root / "key"

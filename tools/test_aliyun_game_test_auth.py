@@ -54,13 +54,20 @@ class AuthTests(unittest.TestCase):
             with self.subTest(encoding=encoding):
                 self.assertEqual(auth.read_api_token(path), raw)
 
-    def test_unavailable_console_probe_does_not_write_a_request(self):
+    def test_console_probe_uses_protocol_transport_even_if_direct_port_is_owned(self):
         with patch.object(auth.tunnel, "check", return_value={"ok": True}), \
-             patch.object(auth.socket, "create_connection", side_effect=ConnectionRefusedError), \
+             patch.object(auth.socket, "create_connection", side_effect=ConnectionRefusedError) as raw_probe, \
              patch.object(auth, "send_lua") as sender:
-            with self.assertRaisesRegex(auth.AuthError, "tools_console_unavailable"):
+            self.assertTrue(auth.probe(self.root / "state")["ok"])
+            raw_probe.assert_not_called()
+            sender.assert_called_once()
+            self.assertIn("IsInToolsMode()", sender.call_args.args[0])
+
+    def test_missing_current_server_confirmation_still_rejects_probe(self):
+        with patch.object(auth.tunnel, "check", return_value={"ok": True}), \
+             patch.object(auth, "send_lua", side_effect=auth.AuthError("tools_server_confirmation_missing")):
+            with self.assertRaisesRegex(auth.AuthError, "tools_server_confirmation_missing"):
                 auth.probe(self.root / "state")
-            sender.assert_not_called()
 
     def setup_injection(self, sender):
         self.stack.enter_context(patch.object(auth, "probe"))

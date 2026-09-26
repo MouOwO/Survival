@@ -351,8 +351,10 @@ end
 local function compile_regions()
     hero_movable_regions = {}
     building_forbidden_regions = {}
+    local map_name = GetMapName and GetMapName() or ""
     for _, row in ipairs(definitions.rows or {}) do
-        local region = compile(row)
+        local scope = tostring(row.map_name or "")
+        local region = (scope == "" or scope == map_name) and compile(row) or nil
         if region then
             if region.region_type == "hero_movable" then
                 table.insert(hero_movable_regions, region)

@@ -34,6 +34,10 @@ if GetMapName and GetMapName() == "survival_c6" then
     M.build_bounds = require("config/map_layouts/survival_c6").build_bounds
 elseif GetMapName and GetMapName() == "template_map" then
     M.build_bounds = require("config/map_layouts/template_map").build_bounds
+    -- The four building lawns are at Z=384. Stairs and the lower approach
+    -- remain walkable for monsters but are not construction surfaces.
+    M.build_ground_height = 384
+    M.build_ground_height_tolerance = 16
 end
 
 return M

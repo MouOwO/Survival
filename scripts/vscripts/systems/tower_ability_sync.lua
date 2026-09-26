@@ -35,12 +35,6 @@ local function ability_signature(state, row, fusion_enabled)
     }, "|")
 end
 
-local function debug_time()
-    if not GameRules or type(GameRules.GetGameTime) ~= "function" then return 0 end
-    local ok, value = pcall(function() return GameRules:GetGameTime() end)
-    return ok and tonumber(value) or 0
-end
-
 local function add_ability(unit, ability_name)
     local ability = unit:FindAbilityByName(ability_name)
         or unit:AddAbility(ability_name)
@@ -167,10 +161,6 @@ local function sync_now(state, row, force)
     if not force
         and type(state.unit.survival_tower_managed_ability_names) == "table"
         and state.unit.survival_tower_ability_signature == signature then
-        print(string.format(
-            "[TowerAbilitySync] skip entindex=%s signature=%s time=%.3f",
-            tostring(state.unit:entindex()), signature, debug_time()
-        ))
         state.unit.survival_tower_ability_sync_pending = nil
         event_bus.emit(events.TOWER_ABILITY_SYNC_COMPLETED, {
             unit = state.unit,
@@ -179,12 +169,6 @@ local function sync_now(state, row, force)
         })
         return false
     end
-
-    local started_at = debug_time()
-    print(string.format(
-        "[TowerAbilitySync] start entindex=%s signature=%s time=%.3f",
-        tostring(state.unit:entindex()), signature, started_at
-    ))
 
     -- Dynamic abilities on npc_dota_creature do not reliably accept
     -- SetAbilityIndex(). Rebuild only the managed tower abilities instead, so
@@ -243,10 +227,6 @@ local function sync_now(state, row, force)
         entindex = state.unit:entindex(),
         signature = signature,
     })
-    print(string.format(
-        "[TowerAbilitySync] end entindex=%s signature=%s elapsed=%.3f",
-        tostring(state.unit:entindex()), signature, debug_time() - started_at
-    ))
     return true
 end
 

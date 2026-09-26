@@ -19,7 +19,7 @@ FILES = (
     "tools/aliyun_game_test_auth.py", "tools/aliyun_test_connection.py", "tools/hammer_backend_bridge.py",
     "tools/setup_aliyun_test_host.ps1", "tools/launch_aliyun_test_game.ps1",
     "tools/launch_aliyun_lan_host.ps1", "tools/setup_hammer_backend.ps1", "tools/run_hammer_backend.ps1",
-    "tools/map_c6/console.cjs", "tools/deploy/goufayu_test_known_hosts",
+    "tools/map_c6/console.cjs", "tools/map_c6/console-relay.cjs", "tools/deploy/goufayu_test_known_hosts",
     "tools/test_aliyun_local_config.py", "tools/test_aliyun_test_host.py", "tools/test_aliyun_lan_probe.py",
     "tools/test_aliyun_game_test_auth.py", "tools/test_aliyun_test_connection.py",
     "tools/test_hammer_backend_bridge.py", "tools/test_setup_aliyun_test_host.py",

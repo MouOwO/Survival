@@ -68,8 +68,9 @@ local env = setmetatable({
             "first placement must already use ground navigation")
         assert(unit.survival_navigation_type == "ground")
         if unit.survival_is_wave_monster or unit.survival_is_challenge_monster then
-            assert(unit.modifiers.modifier_enemy_wall_ai.no_unit_collision == 1,
-                "unit collision must be disabled before placing into an occupied spawn")
+            assert(unit.modifiers.modifier_enemy_wall_ai.no_unit_collision
+                == (unit.survival_is_challenge_monster and 1 or 0),
+                "formal waves must collide; challenge monsters keep their policy")
             assert(unit.hull == unit.survival_monster_hull_radius,
                 "the final hull must be applied before placement")
         end
@@ -202,7 +203,9 @@ for _, case in ipairs({ { "ground", "normal" }, { "flying", "normal" },
         and "flying.vmdl" or "boss.vmdl"
     check(created[#created], definition, case[3], expected_model)
     assert(created[#created].survival_wave_movement_type == (case[3] or case[1]))
-    assert(created[#created].survival_wave_no_unit_collision == true)
+    assert(created[#created].survival_wave_no_unit_collision == false)
+    assert(created[#created].hull == require("config/global_rules").wave_ground_monster_hull_radius,
+        "boss, ground and flying wave monsters share one collision radius")
 end
 
 set_upvalue(wave.spawn_challenge_monster, "wave_channels", { [0] = { marker = marker } })
@@ -247,4 +250,4 @@ for index, kind in ipairs({ "ground", "flying" }) do
 end
 
 assert(#created == 12, "all production spawn paths must be exercised")
-print("MONSTER_GROUND_NAVIGATION_PASS: 12 real spawn flows, pre-placement ground pathing, flying combat/visuals, practice hull and challenge collision preserved")
+print("MONSTER_GROUND_NAVIGATION_PASS: 12 spawn flows, wave collision and shared hull, challenge/practice policies preserved")

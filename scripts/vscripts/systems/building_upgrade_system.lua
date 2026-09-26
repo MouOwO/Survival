@@ -646,6 +646,9 @@ end
 local function on_technology_stats_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
+    -- A lumberjack's per-hit attack growth changes only the worker section.
+    -- Refreshing every tower here fans out into ability sync on each tree hit.
+    if payload.reason == "lumberjack_attack_growth" then return end
     recover_player_towers(player_id)
     for entindex, state in pairs(buildings) do
         if not active_state(state) then
