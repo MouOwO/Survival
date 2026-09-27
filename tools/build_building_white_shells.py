@@ -18,6 +18,13 @@ if (tower_stage/'manifest.json').exists():
     towers=json.loads((tower_stage/'manifest.json').read_text(encoding='utf-8'))
     for entry in towers:entry['_stage']=tower_stage
     manifest+=towers
+# The approved concept revision replaces the existing model paths. Its final-size
+# FBX uses .01 import instead of the older buildings' .02, including flow shells.
+concept_stage=ROOT/'output/building_models_20260927'
+if (concept_stage/'manifest.json').exists():
+    concepts=json.loads((concept_stage/'manifest.json').read_text(encoding='utf-8'))
+    replacements={entry['name']:dict(entry,_stage=concept_stage) for entry in concepts}
+    manifest=[replacements.get(entry['name'],entry) for entry in manifest]
 HEADER='<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc28:version{fb63b6ca-f435-4aa0-a2c7-c66ddc651dca} -->\n'
 registry=['-- Generated from output/unique_buildings/manifest.json by build_building_white_shells.py.','return {']
 for entry in manifest:

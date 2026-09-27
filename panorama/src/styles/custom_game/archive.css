@@ -74,41 +74,63 @@
 #ArchiveDraw Label { horizontal-align: center; vertical-align: center; color: #fff0c9; font-size: 18px; }
 #ArchiveDraw:disabled { saturation: 0; brightness: 0.45; }
 #ArchiveTickets, #ArchiveDrawResult { margin-left: 14px; vertical-align: center; color: #e5cf9f; font-size: 17px; }
+/* Treasure uses the same chest artwork, warm labels and metal trim as the HUD. */
 #TreasureEntry { margin-left: 532px; margin-top: 154px; width: 80px; height: 52px; background-color: #182d32ee; border: 1px solid #a28b56; }
-#TreasureEntry Label { align: center center; color: #f3dfae; font-size: 19px; }
-#TreasureScrim { width: 100%; height: 100%; background-color: #02081099; }
-#TreasureWindow { align: center center; width: 840px; height: 710px; padding: 20px 22px; flow-children: down; background-color: gradient(linear, 0% 0%, 100% 100%, from(#173748ff), color-stop(0.25, #0b202dff), to(#05131fff)); border: 2px solid #b59b59; box-shadow: #000000cc 0px 8px 30px 4px; }
-#TreasureWindow Label { font-family: "Source Han Sans SC"; }
-#TreasureHeader { width: 100%; height: 64px; flow-children: right; border-bottom: 1px solid #aa925b66; }
-#TreasureEmblem { width: 44px; height: 44px; vertical-align: top; margin: 3px 15px 0px 0px; border: 1px solid #bfa45d; background-color: gradient(linear, 0% 0%, 0% 100%, from(#264957), to(#0a202d)); }
-#TreasureEmblem Label { align: center center; font-family: "Source Han Serif SC"; font-size: 27px; color: #f2d999; }
-#TreasureHeading { width: fill-parent-flow(1); flow-children: down; }
-#TreasureTitle { font-family: "Source Han Serif SC"; font-size: 29px; font-weight: bold; color: #f8e4b0; letter-spacing: 3px; }
-#TreasureSubtitle { margin-top: 2px; font-size: 13px; color: #8faeb8; letter-spacing: 2px; }
-#TreasureCount { vertical-align: center; margin: 0px 22px 9px 0px; font-size: 19px; color: #d9c389; }
-#TreasureClose { width: 34px; height: 34px; margin-top: 3px; border: 1px solid #8f8054; background-color: #091c27; }
-#TreasureClose Label { align: center center; color: #d9c389; font-size: 28px; }
-#TreasureClose:hover { brightness: 1.5; border-color: #e8cd84; }
-#TreasureHint { height: 37px; padding-top: 10px; font-size: 14px; color: #91aeb8; }
-#TreasureCards { width: 100%; height: 472px; flow-children: right-wrap; }
-.TreasureCard { width: 148px; height: 110px; margin: 0px 8px 8px 0px; padding: 7px 8px; flow-children: down; background-color: gradient(linear, 0% 0%, 0% 100%, from(#1b3748), to(#0a1b28)); border: 1px solid #526772; }
-.TreasureCard:hover { border-color: #ebce81; background-color: gradient(linear, 0% 0%, 0% 100%, from(#294b59), to(#102939)); }
-.TreasureOrder { ignore-parent-flow: true; align: left top; font-size: 11px; color: #7894a2; }
-.TreasureArt { width: 64px; height: 59px; horizontal-align: center; margin-bottom: 7px; padding: 3px; border: 1px solid #887c51; background-color: #071823; box-shadow: #07101999 0px 2px 5px 0px; }
-.TreasureIcon { width: 100%; height: 100%; }
-.TreasureGlyph { align: center center; font-family: "Source Han Serif SC"; font-size: 31px; color: #e4c779; }
-.TreasureName { width: 100%; height: 23px; text-align: center; color: #e8dcb9; font-size: 16px; white-space: nowrap; text-overflow: shrink; }
-.TreasureLatest { border-color: #c6ab63; }
-.TreasureLatestBadge { ignore-parent-flow: true; align: right top; font-size: 11px; color: #f9df96; }
-.TreasureVacant { background-color: #0a1a26; border-color: #2f4856; }
-.TreasureVacant .TreasureArt { border-color: #395363; background-color: #0c2230; box-shadow: none; }
-.TreasureVacant .TreasureGlyph { color: #456878; }
-.TreasureVacant .TreasureName { color: #6e8996; }
-#TreasureDetail { width: 100%; height: fill-parent-flow(1); padding: 10px 13px; border-top: 1px solid #aa925b77; background-color: #061521cc; }
-#TreasureDetailHint { align: center center; font-size: 15px; color: #718f9d; }
+#TreasureEntry Label { align: center center; color: #f3ecdb; font-size: 19px; }
+#TreasureScrim { width: 100%; height: 100%; background-color: #00000088; }
+#TreasureWindow {
+    align: center center; width: 840px; height: 760px; padding: 0px; flow-children: none;
+    background-color: gradient(linear, 0% 0%, 0% 100%, from(#1c2a2dfc), color-stop(0.35, #131e22fc), to(#0d1519fc));
+    border: 0px; box-shadow: #000000bb 0px 10px 32px 0px;
+}
+#TreasureWindow Label { font-family: "Source Han Sans SC"; text-shadow: 0px 1px 2px 2.0 #00000090; }
+#TreasureFrame { width: 100%; height: 100%; z-index: 3; }
+#TreasureFrame Panel { background-size: 100% 100%; background-repeat: no-repeat; }
+.TreasureFrameTopLeft { align: left top; width: 18px; height: 18px; background-image: url("file://{images}/ui/page_assets/frame/hud/tl.png"); }
+.TreasureFrameTop { align: center top; width: 804px; height: 18px; background-image: url("file://{images}/ui/page_assets/frame/hud/top.png"); }
+.TreasureFrameTopRight { align: right top; width: 18px; height: 18px; background-image: url("file://{images}/ui/page_assets/frame/hud/tr.png"); }
+.TreasureFrameLeft { align: left center; width: 18px; height: 724px; background-image: url("file://{images}/ui/page_assets/frame/hud/left.png"); }
+.TreasureFrameRight { align: right center; width: 18px; height: 724px; background-image: url("file://{images}/ui/page_assets/frame/hud/right.png"); }
+.TreasureFrameBottomLeft { align: left bottom; width: 18px; height: 18px; background-image: url("file://{images}/ui/page_assets/frame/hud/bl.png"); }
+.TreasureFrameBottom { align: center bottom; width: 804px; height: 18px; background-image: url("file://{images}/ui/page_assets/frame/hud/bottom.png"); }
+.TreasureFrameBottomRight { align: right bottom; width: 18px; height: 18px; background-image: url("file://{images}/ui/page_assets/frame/hud/br.png"); }
+#TreasureContent { width: 100%; height: 100%; padding: 24px; flow-children: down; }
+#TreasureHeader { width: 100%; height: 76px; flow-children: right; border-bottom: 1px solid #9a895c66; }
+#TreasureEmblem { width: 64px; height: 64px; margin-right: 15px; vertical-align: top; }
+#TreasureHeading { width: fill-parent-flow(1); vertical-align: center; flow-children: down; margin-bottom: 10px; }
+#TreasureTitle { font-size: 28px; font-weight: medium; color: #f3ecdb; letter-spacing: 2px; }
+#TreasureSubtitle { margin-top: 3px; font-size: 16px; color: #a6aaa0; letter-spacing: 2px; }
+#TreasureCount { vertical-align: center; margin: 0px 18px 8px 0px; font-size: 20px; color: #dbc99f; }
+#TreasureClose { width: 38px; height: 38px; margin-top: 8px; background-color: transparent; border: 0px; }
+#TreasureClose Image { width: 30px; height: 30px; align: center center; }
+#TreasureClose:hover { brightness: 1.5; }
+#TreasureClose:active { brightness: 0.8; }
+#TreasureHint { width: 100%; height: 36px; padding-top: 8px; font-size: 16px; color: #a0aaa8; }
+#TreasureCards { width: 100%; height: 472px; flow-children: right-wrap; padding-left: 1px; }
+.TreasureCard { width: 148px; height: 110px; margin: 0px 10px 8px 0px; padding: 0px; flow-children: down; background-color: transparent; border: 0px; }
+.TreasureArt {
+    width: 82px; height: 82px; horizontal-align: center; margin-bottom: 3px; padding: 5px;
+    background-image: url("file://{images}/custom_game/handoff_v1/bottom/slot_frame.png");
+    background-size: 100% 100%; background-repeat: no-repeat; background-color: #101b20;
+}
+.TreasureIcon { width: 100%; height: 100%; border: 1px solid #0a1417; }
+.TreasureOrder { ignore-parent-flow: true; align: left top; margin: 2px 0px 0px 5px; font-size: 12px; color: #77827d; }
+.TreasureGlyph { align: center center; font-family: "Source Han Sans SC"; font-size: 26px; color: #d6c59e; }
+.TreasureName { width: 100%; height: 25px; text-align: center; color: #e9e2cf; font-size: 18px; white-space: nowrap; text-overflow: shrink; }
+.TreasureCard:hover .TreasureArt { brightness: 1.25; box-shadow: #cdb17b33 0px 0px 10px 0px; }
+.TreasureCard:hover .TreasureName { color: #ffebbb; }
+.TreasureLatest .TreasureName { color: #ebd39a; }
+.TreasureLatestBadge { ignore-parent-flow: true; align: right top; margin-right: 2px; padding: 2px 4px; font-size: 12px; color: #f2deb0; background-color: #29281ee8; border: 1px solid #a28b55; }
+.TreasureVacant .TreasureArt { opacity: 0.38; saturation: 0.4; background-color: #101a1d; }
+.TreasureVacant .TreasureGlyph { color: #64736f; font-size: 22px; }
+.TreasureVacant .TreasureName { color: #72817e; font-size: 16px; }
+.TreasureVacant:hover .TreasureArt { brightness: 1; box-shadow: none; }
+.TreasureVacant:hover .TreasureName { color: #72817e; }
+#TreasureDetail { width: 100%; height: fill-parent-flow(1); padding: 13px 16px; border-top: 1px solid #9a895c66; background-color: #08121666; }
+#TreasureDetailHint { align: center center; font-size: 17px; color: #8d9d98; }
 #TreasureTooltip { width: 100%; height: 100%; flow-children: down; }
-#TreasureTooltipName { width: 100%; font-size: 19px; color: #f8dda0; margin-bottom: 5px; }
-#TreasureTooltipEffect { width: 100%; white-space: normal; font-size: 16px; color: #c1d5dd; }
+#TreasureTooltipName { width: 100%; font-size: 21px; color: #ecd9a9; margin-bottom: 6px; }
+#TreasureTooltipEffect { width: 100%; white-space: normal; font-size: 18px; color: #ced4c9; }
 .ArchiveWorkCard { height: 135px; }
 .ArchiveWorkCost { horizontal-align: center; color: #b8aaa0; font-size: 13px; }
 .ArchiveWorkAvailable { background-color: #8e75301c; }
