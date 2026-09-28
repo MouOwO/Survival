@@ -1,3 +1,4 @@
+local ParticleManager = require("systems/combat_effect_visibility").manager()
 ability_survival_hero_ball_lightning = class({})
 
 local MAX_DISTANCE = 800

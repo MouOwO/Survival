@@ -90,3 +90,28 @@ snapshots.publish_player(0)
 assert(sent[0].wave.alive==0 and not sent[0].wave.overflow_active,
     "missing player state cannot fall back to a global defeat warning")
 print("PERSONAL_WAVE_PROJECTION_PASS: four same-team recipients, independent timers, personal defeat, global lifecycle, no shared mutation")
+local challenge={active=1,ended=0,remaining_seconds=1800,deadline=1825}
+bus.handle_request("archive.challenge_state",function() return challenge end)
+bus.emit(events.WAVE_CHANGED,{status="archive_challenges",current_wave=30,total_waves=30})
+for id=0,3 do snapshots.publish_player(id);assert(sent[id].wave.challenge_remaining_seconds==1800) end
+challenge.remaining_seconds=1799
+bus.emit("archive.challenge_timer_changed",challenge)
+tasks.ui_snapshot_flush()
+for id=0,3 do assert(sent[id].wave.challenge_remaining_seconds==1799 and sent[id].wave.challenge_deadline==1825) end
+challenge.active=0;challenge.ended=1;challenge.remaining_seconds=0
+bus.emit("archive.challenge_timer_changed",challenge);tasks.ui_snapshot_flush()
+for id=0,3 do assert(sent[id].wave.challenge_ended==1 and sent[id].wave.challenge_remaining_seconds==0) end
+print("SHARED_CHALLENGE_TIMER_UI_PASS: shared phase transitions reach all four private snapshots")
+
+sent,tasks={},{}
+for i=1,1000 do bus.emit(events.RESOURCE_CHANGED,{player_id=1,team=2,gold=i,wood=0})end
+tasks.ui_snapshot_flush()
+assert(sent[1] and sent[1].resources.gold==1000 and sent[0]==nil and sent[2]==nil and sent[3]==nil)
+sent,tasks={},{}
+bus.emit(events.WAVE_CHANGED,{status="countdown",countdown_deadline=60,timer=35,hud_clock_only=true})
+assert(next(tasks)==nil,"clock-only ticks do not rebuild HUD")
+bus.emit(events.WAVE_CHANGED,{status="countdown",countdown_deadline=60,timer=34,hud_player_id=2})
+tasks.ui_snapshot_flush()
+assert(sent[2] and sent[0]==nil and sent[1]==nil and sent[3]==nil)
+assert(sent[2].wave.countdown_deadline==60)
+print("PERSONAL_PROJECTION_PASS: resource and enemy updates target owner; countdown ticks do not schedule snapshots")

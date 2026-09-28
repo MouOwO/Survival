@@ -104,6 +104,37 @@ class ArchiveTests(unittest.TestCase):
         self.assertTrue((self.bundle.directory/'config/content_id_aliases.lua').is_file())
         self.assertEqual((ROOT/'scripts/vscripts/config/generated/archive_http_bundle.lua').read_bytes(),self.game_bundle_before)
         self.assertEqual((ROOT/'server/bundles/current.json').read_bytes(),self.current_before)
+    def test_endless_floor_backfill_is_atomic_and_idempotent(self):
+        self.profile['save']['archive']['endless_best_wave']=461
+        before=copy.deepcopy(self.profile['save']['gameplay_stats'])
+        command=self.command('endless_reconcile')
+        self.db.lose_reply=True
+        # A transport failure after commit must never double-apply rewards.
+        try: self.service.command(command)
+        except TimeoutError: pass
+        self.db.lose_reply=False
+        self.assertTrue(self.service.command(command)['ok'])
+        current=self.profile['save']
+        self.assertEqual(sum(bool(current['archive']['completed'].get('endless_'+str(i))) for i in range(51,83)),32)
+        self.assertFalse(current['archive']['completed'].get('endless_1'))
+        self.assertEqual(current['gameplay_stats']['hero_attribute_bonus_pct']-before['hero_attribute_bonus_pct'],52)
+        self.assertEqual(current['gameplay_stats']['hero_damage_wood_flat']-before['hero_damage_wood_flat'],2)
+        self.assertEqual(current['gameplay_stats']['hero_attributes_per_damage']-before['hero_attributes_per_damage'],13)
+        settled=copy.deepcopy(current['gameplay_stats'])
+        self.assertTrue(self.send('endless_reconcile')['ok'])
+        self.assertEqual(current['gameplay_stats'],settled)
+
+    def test_endless_reconcile_rejects_client_progress(self):
+        with self.assertRaises(ArchiveError):
+            self.service.command(self.command('endless_reconcile',wave=461))
+        self.assertFalse(self.profile['save']['archive'].get('completed'))
+
+    def test_endless_floor_strict_boundary(self):
+        self.assertTrue(self.send('endless',wave=10,difficulty=10)['ok'])
+        self.assertFalse(self.profile['save']['archive']['completed'].get('endless_51'))
+        self.assertTrue(self.send('endless',wave=11,difficulty=10)['ok'])
+        self.assertTrue(self.profile['save']['archive']['completed']['endless_51'])
+
     def test_clear_and_lost_response(self):
         payload=self.command('clear',difficulty_id='n1',count=1)
         self.db.lose_reply=True

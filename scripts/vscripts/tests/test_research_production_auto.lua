@@ -316,11 +316,18 @@ tick(3); eq(snapshot(0, 10).research_group, "lumberjack_efficiency")
 eq(snapshot(0, 10).finish_at, 5)
 
 fixture()
+local before_locked = resources[0].wood
+eq(manual(0, 10, "advanced_lumberjack_speed").error_code, "prerequisite_not_met")
+eq(snapshot(0, 10).queue_count, 0, "locked prerequisite does not enter queue")
+eq(resources[0].wood, before_locked, "rejected job costs nothing")
+research.repository():SetLevel(0, "RS-01", config.by_id["RS-01"].max_level - 1)
+assert(manual(0, 10, "lumberjack_speed").ok)
+eq(manual(0, 10, "advanced_lumberjack_speed").error_code, "prerequisite_not_met",
+    "queued final prerequisite level is not completion")
+eq(snapshot(0, 10).queue_count, 1)
+tick(2)
 assert(manual(0, 10, "advanced_lumberjack_speed").ok)
-eq(snapshot(0, 10).researching, 0)
-assert(snapshot(0, 10).blocked_head.job_id)
-research.repository():SetLevel(0, "RS-01", config.by_id["RS-01"].max_level)
-tick(1); eq(snapshot(0, 10).researching, 1, "queued prerequisite starts after it becomes valid")
+eq(snapshot(0, 10).researching, 1, "completed prerequisite permits admission")
 
 fixture()
 research.repository():SetLevel(0, "RS-01", config.by_id["RS-01"].max_level - 1)

@@ -8,6 +8,7 @@ local armor_balance = require("config/armor_balance")
 
 local M = {}
 local pending_by_caster = {}
+local roster_cache = {}
 
 local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
@@ -38,17 +39,31 @@ local function ability_names(row)
     return { pool[index].ability_name, skill_id = pool[index].skill_id }
 end
 
-local function collect_materials(caster, row)
+local function collect_materials(caster, row, selected_entindexes)
     local player_id = tonumber(caster.survival_player_id)
     if player_id == nil then return {} end
     local listed = event_bus.request(events.WORKER_LIST_REQUEST, {
         player_id = player_id,
     }) or {}
+    local allowed = nil
+    if selected_entindexes ~= nil then
+        allowed = {}
+        if type(selected_entindexes) ~= "table" then return {} end
+        local count = 0
+        for _, value in pairs(selected_entindexes) do
+            count = count + 1
+            if count > 64 then return {} end
+            local id = tonumber(value)
+            if id and id >= 0 and id == math.floor(id) then allowed[id] = true end
+        end
+        if not allowed[caster:entindex()] then return {} end
+    end
     local result = { caster }
     local caster_entindex = caster:entindex()
     for _, state in ipairs(listed) do
         local unit = state.unit
         if valid(unit) and unit:entindex() ~= caster_entindex
+            and (not allowed or allowed[unit:entindex()])
             and state.team == caster:GetTeamNumber()
             and tonumber(state.player_id) == player_id
             and state.worker_type == "lumberjack"
@@ -72,6 +87,37 @@ local function main_city_level(player_id)
         end
     end
     return 0
+end
+
+-- Reuse owner roster counts across ability snapshots; resource ticks do not
+-- rescan the entire worker list for every worker ability.
+local function fusion_status(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local row = row_for_ability(payload and payload.ability_name)
+    if player_id == nil or not row then return {available=0} end
+    local roster = roster_cache[player_id]
+    if not roster then
+        roster = {counts={}, city=main_city_level(player_id)}
+        local listed = event_bus.request(events.WORKER_LIST_REQUEST,{player_id=player_id}) or {}
+        for _, state in ipairs(listed) do
+            local unit = state.unit
+            if valid(unit) and tonumber(state.player_id)==player_id
+                and state.worker_type=="lumberjack" and not unit.survival_super_lumberjack
+                and not unit.survival_lumberjack_fusion_pending then
+                local level = tonumber(unit.survival_lumberjack_level)
+                if level then roster.counts[level]=(roster.counts[level] or 0)+1 end
+            end
+        end
+        roster_cache[player_id] = roster
+    end
+    local count = roster.counts[tonumber(row.level)] or 0
+    local city_ready = roster.city >= (tonumber(row.required_city_level) or 0)
+    local count_ready = count >= (tonumber(row.required_count) or 0)
+    return {available=city_ready and count_ready and 1 or 0,
+        fusion_count=count, fusion_city_ready=city_ready and 1 or 0,
+        fusion_city_level=roster.city, fusion_required_city_level=row.required_city_level,
+        status_text=not city_ready and ("主城需要LV"..tostring(row.required_city_level))
+            or not count_ready and ("同级普通伐木工不足："..count.."/"..row.required_count) or "可合体"}
 end
 
 local function fusion_cost(row)
@@ -116,7 +162,7 @@ local function target_data(row, materials, fusion_ability_name)
         fusion_count = #materials,
         base_attack = attack,
         wood_per_hit = wood_per_hit,
-        attack_speed = tonumber(source.attack_rate) or 0.5,
+        attack_speed = tonumber(source.attack_rate) or (2 / 3),
         fusion_interval_reduction = 0.5,
         attack_range = tonumber(source.attack_range) or 400,
         move_speed = tonumber(source.move_speed) or 300,
@@ -127,7 +173,7 @@ local function target_data(row, materials, fusion_ability_name)
         ability_names = ability_names(row),
         fusion_ability_name = fusion_ability_name,
         model_name = source.model_name,
-        model_scale = 1.5,
+        model_scale = (tonumber(source.model_scale) or 1) * 1.5,
     }
 end
 
@@ -165,7 +211,7 @@ local function fuse(payload)
         pending_by_caster[caster_key] = nil
         return { ok = false, error = "fusion_city_level_not_enough" }
     end
-    local materials = collect_materials(caster, row)
+    local materials = collect_materials(caster, row, payload.selected_entindexes)
     if #materials < tonumber(row.required_count) then
         pending_by_caster[caster_key] = nil
         return { ok = false, error = "fusion_material_not_enough" }
@@ -198,6 +244,8 @@ local function fuse(payload)
         pending_by_caster[caster_key] = nil
         return data or { ok = false, error = "fusion_target_config_failed" }
     end
+    local consumed_entindexes = {}
+    for _, material in ipairs(materials) do consumed_entindexes[#consumed_entindexes + 1] = material:entindex() end
     local committed = worker_system.commit_lumberjack_fusion(materials, target, data)
     if not committed or not committed.ok then
         refund_cost(player_id, caster:GetTeamNumber(), cost)
@@ -208,7 +256,7 @@ local function fuse(payload)
         return committed or { ok = false, error = "fusion_commit_failed" }
     end
     pending_by_caster[caster_key] = nil
-    return { ok = true, entindex = target:entindex(), fusion_id = row.fusion_id }
+    return { ok = true, entindex = target:entindex(), fusion_id = row.fusion_id, consumed_entindexes = consumed_entindexes }
 end
 
 local function request_fusion(payload)
@@ -239,8 +287,20 @@ local function request_fusion(payload)
 end
 
 function M.init()
-    pending_by_caster = {}
+    pending_by_caster, roster_cache = {}, {}
     event_bus.handle_request(events.LUMBERJACK_FUSION_REQUEST, request_fusion)
+    event_bus.handle_request(events.LUMBERJACK_FUSION_STATUS_REQUEST, fusion_status)
+    local function invalidate(payload)
+        local player = tonumber(payload.player_id)
+        if player then roster_cache[player] = nil else roster_cache = {} end
+    end
+    event_bus.subscribe(events.WORKER_CHANGED, invalidate)
+    local function city_changed(payload)
+        if payload.building_id=="main_city" then invalidate(payload) end
+    end
+    event_bus.subscribe(events.BUILDING_CHANGED, city_changed)
+    event_bus.subscribe(events.BUILDING_CREATED, city_changed)
+    event_bus.subscribe(events.BUILDING_DESTROYED, city_changed)
 end
 
 M._fuse_for_test = fuse

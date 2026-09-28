@@ -38,11 +38,7 @@ local function stat_tooltips(projected)
                 projected.armor_mapping_version
             ),
         },
-        attack_speed = {
-            attacks_per_second = attack_speed,
-            attack_interval = attack_speed > 0 and (1 / attack_speed) or 0,
-            unit = "attacks_per_second",
-        },
+        attack_speed = require("combat/attack_cadence").project(projected.attack_cadence, attack_speed),
         attributes = {
             strength = tonumber(projected.strength) or 0,
             agility = tonumber(projected.agility) or 0,
@@ -82,6 +78,7 @@ function M.for_ui(snapshot)
         projected.stat_units_version = 2
     end
     projected.stat_tooltips = stat_tooltips(projected)
+    projected.attack_speed_percentage = projected.stat_tooltips.attack_speed.percentage
     return projected
 end
 

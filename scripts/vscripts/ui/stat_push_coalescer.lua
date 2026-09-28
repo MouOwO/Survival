@@ -14,10 +14,12 @@ local function equal(a,b)
 end
 function M.new(options)
     local latest, queued, sent, generation = {}, {}, {}, 0
+    local prefix = options.task_prefix or "building_ui_push_"
+    local interval = options.interval or 0.15
     local api = {}
     function api.reset()
         generation = generation + 1
-        for player in pairs(queued) do options.scheduler.cancel("building_ui_push_"..player) end
+        for player in pairs(queued) do options.scheduler.cancel(prefix..player) end
         latest, queued, sent = {}, {}, {}
     end
     function api.push(payload)
@@ -26,11 +28,14 @@ function M.new(options)
         if not player or not unit or not options.is_selected(player,unit) then return end
         local copy = {}
         for k,v in pairs(payload) do copy[k] = v end
+        if options.merge and latest[player] and latest[player].entindex == copy.entindex then
+            options.merge(latest[player], copy)
+        end
         latest[player] = copy
         if queued[player] then return end
         queued[player] = true
         local current_generation = generation
-        options.scheduler.after(0.15,function()
+        options.scheduler.after(interval,function()
             if generation ~= current_generation then return end
             queued[player] = nil
             local value = latest[player]; latest[player] = nil
@@ -40,7 +45,7 @@ function M.new(options)
             if sent[player] and equal(sent[player],snapshot) then return end
             sent[player] = snapshot
             options.send(player,snapshot)
-        end,"building_ui_push_"..player)
+        end,prefix..player)
     end
     return api
 end

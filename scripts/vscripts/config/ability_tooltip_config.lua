@@ -183,13 +183,13 @@ ability_summon_drow_ranger = {
 ability_summon_monkey_king = {
     abilityid = "ability_summon_monkey_king",
     abilityname = "召唤齐天大圣（VIP）",
-    abilitydesc = "召唤齐天大圣。需要VIP权限，攻击距离1000，清除原版技能后初始获得4个项目技能。",
+    abilitydesc = "需购买激活",
     abilityicon = "survival/native/portrait_monkey_king",
 },
 ability_summon_blademaster = {
     abilityid = "ability_summon_blademaster",
     abilityname = "召唤剑圣（VIP）",
-    abilitydesc = "召唤剑圣。需要VIP权限；当前使用Sven作为测试载体，初始获得4个项目技能。",
+    abilitydesc = "需购买激活",
     abilityicon = "survival/native/portrait_juggernaut",
 },
 }

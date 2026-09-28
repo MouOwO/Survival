@@ -25,3 +25,16 @@ for(const [asset,unit] of Object.entries({beastmaster_legacy:'beastmaster',morph
 }
 assert(context.updateCosmeticPortrait({...data,model_asset_id:'hero_permanent_hero_doom',portrait_unit_name:'npc_dota_hero_doom_bringer'}));
 console.log('CHALLENGE_DOOM_PORTRAIT_PASS: five complete challenge heroes and Doom');
+
+vm.runInContext(s.slice(s.indexOf('    function withPortraitMetadata('),s.indexOf('    function update(snapshot)')),context);
+let previous={...data,model_asset_id:'hero_permanent_hero_doom',portrait_unit_name:'npc_dota_hero_doom_bringer'};
+const before=calls.length,hiddenBefore=hidden.length;
+for(let i=0;i<60;i++){
+ previous=context.withPortraitMetadata(i%2 ? {...data,model_asset_id:'hero_permanent_hero_doom',portrait_unit_name:'npc_dota_hero_doom_bringer'} : {entindex:7,health:100-i},previous);
+ assert(context.updateCosmeticPortrait(previous));
+}
+assert.equal(calls.length,before,'periodic updates must not reconstruct Doom portrait');
+assert.equal(hidden.length,hiddenBefore,'periodic updates must not expose the underlying world portrait');
+assert.equal(context.withPortraitMetadata({entindex:8},previous).portrait_unit_name,undefined);
+assert.equal(context.withPortraitMetadata({entindex:7,portrait_unit_name:''},previous).portrait_unit_name,'');
+console.log('DOOM_PERIODIC_PORTRAIT_PASS: 60 alternating snapshots, no rebuild/hide, explicit reset, entity isolation');

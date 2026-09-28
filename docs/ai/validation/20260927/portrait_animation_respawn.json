@@ -1,0 +1,79 @@
+{
+  "portrait_profiles": 1048,
+  "camera_lighting_and_other_fields_unchanged": true,
+  "background_texture_size": [
+    512,
+    512
+  ],
+  "background_texture": "materials/survival_ui/portrait_studio_png_84e75b1e.vtex_c",
+  "source_runtime_synced": true,
+  "lua_syntax_files": [
+    "scripts/vscripts/addon_game_mode.lua",
+    "scripts/vscripts/modifiers/modifier_challenge_11_staging.lua",
+    "scripts/vscripts/systems/building_visual_service.lua",
+    "scripts/vscripts/systems/hero_return_home_service.lua",
+    "scripts/vscripts/systems/hero_summon_system.lua",
+    "scripts/vscripts/systems/monster_hero_visual_service.lua",
+    "scripts/vscripts/tests/test_hero_summon_player_isolation.lua",
+    "scripts/vscripts/ui/combat_stats_ui_service.lua",
+    "scripts/vscripts/ui/ui_request_router.lua",
+    "scripts/vscripts/ui/portrait_metadata.lua",
+    "tools/test_portrait_metadata_sync.lua",
+    "tools/test_challenge_portrait_visuals.lua"
+  ],
+  "regressions": [
+    {
+      "name": "test_hero_summon_flow",
+      "exit": 0
+    },
+    {
+      "name": "test_hero_summon_player_isolation",
+      "exit": 0
+    },
+    {
+      "name": "test_hero_return_home",
+      "exit": 0
+    },
+    {
+      "name": "test_hero_summon_destination",
+      "exit": 0
+    },
+    {
+      "name": "test_seven_sins_visuals",
+      "exit": 0
+    },
+    {
+      "name": "test_challenge_respawn_pacing",
+      "exit": 0
+    },
+    {
+      "name": "test_player_challenge_cleanup",
+      "exit": 0
+    },
+    {
+      "name": "test_portrait_metadata_sync",
+      "exit": 0
+    },
+    {
+      "name": "test_seven_sins_portrait",
+      "exit": 0
+    },
+    {
+      "name": "test_combat_stats_callbacks",
+      "exit": 0
+    },
+    {
+      "name": "test_multiselect_portraits",
+      "exit": 0
+    },
+    {
+      "name": "test_portrait_camera_visibility",
+      "exit": 0
+    },
+    {
+      "name": "test_ten_sin_visuals",
+      "exit": 0
+    }
+  ],
+  "in_game_visual_acceptance": "pending; Dota 2 not running"
+}

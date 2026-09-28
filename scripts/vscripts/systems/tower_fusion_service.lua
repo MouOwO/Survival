@@ -37,11 +37,14 @@ local function refresh_inherited_hero_stats(state, snapshot)
         or not hero_r_active(state.player_id)
         or not snapshot then return end
     local attack = (tonumber(state.fused_base_attack) or 0)
+        + (tonumber(state.unit.survival_tower_personal_attack_growth) or 0)
         + ((tonumber(snapshot.engine_attack_min) or 0)
         + (tonumber(snapshot.engine_attack_max) or 0)) * 0.5
     state.unit:SetBaseDamageMin(math.max(0, attack))
     state.unit:SetBaseDamageMax(math.max(0, attack))
     state.base_attack = math.max(0, attack)
+    state.unit.survival_attack_min, state.unit.survival_attack_max = state.base_attack, state.base_attack
+    state.applied_personal_growth = tonumber(state.unit.survival_tower_personal_attack_growth) or 0
     state.unit.survival_inherited_critical_chance_pct = math.max(0,
         tonumber(snapshot.critical_chance_pct) or 0)
     state.unit.survival_inherited_critical_damage_pct = math.max(100,
@@ -639,12 +642,27 @@ local function on_hero_combat_stats_changed(payload)
     end
 end
 
+local function on_personal_growth(payload)
+    local unit=payload and payload.tower
+    if not valid(unit) then return end
+    local state=state_by_entindex[unit:entindex()]
+    if not state or state.unit~=unit then return end
+    local growth=tonumber(unit.survival_tower_personal_attack_growth) or 0
+    local damage=(state.base_attack or 0)+growth-(state.applied_personal_growth or 0)
+    state.base_attack,state.applied_personal_growth=damage,growth
+    unit:SetBaseDamageMin(damage);unit:SetBaseDamageMax(damage)
+    unit.survival_attack_min,unit.survival_attack_max=damage,damage
+    event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED,{unit=unit,entindex=unit:entindex(),
+        player_id=state.player_id,reason="tower_personal_growth"})
+end
+
 function M.init()
     ultimate_by_player = {}
     state_by_entindex = {}
     wall_by_player = {}
     group_at_wall_by_player = {}
     fusion_in_progress = {}
+    event_bus.subscribe("tower.personal_attack_changed",on_personal_growth)
     event_bus.handle_request(events.TOWER_FUSION_REQUEST, fuse)
     event_bus.handle_request(events.TOWER_FUSION_MOVE_REQUEST, move_for_player)
     event_bus.handle_request(events.TOWER_FUSION_DESTROY_REQUEST,

@@ -1,0 +1,428 @@
+/* Archive-only low-luminance palette. Item art and all archive behavior stay native. */
+.ArchiveRoot #ArchiveWindow #ArchiveContentBacking { visibility:collapse; }
+.ArchiveRoot #ArchiveWindow #ArchiveContent {
+    background-image:none;
+    background-color:{{surface_52}};
+    border:1px solid {{surface_18}};
+    border-left:1px solid {{surface_19}};
+    box-shadow:none;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveHeaderArt { brightness:0.62; saturation:0.72; }
+.ArchiveRoot #ArchiveWindow #ArchiveSidebarBacking { brightness:0.72; saturation:0.72; }
+.ArchiveRoot #ArchiveWindow #ArchiveTitle { color:{{heading}}; text-shadow:none; }
+.ArchiveRoot #ArchiveWindow #ArchiveSubtitle { color:{{surface_20}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveContent Label { color:{{body}}; text-shadow:none; }
+.ArchiveRoot #ArchiveWindow #ArchivePageTitle { color:{{heading}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveSummary,
+.ArchiveRoot #ArchiveWindow #ArchiveHint,
+.ArchiveRoot #ArchiveWindow #ArchiveStatus,
+.ArchiveRoot #ArchiveWindow #ArchiveEmpty { color:{{muted}}; }
+
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveTab { background-image:none; background-color:transparent; box-shadow:none; }
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveTab:hover { background-image:none; background-color:{{surface_21}}; brightness:1; }
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveTab:selected {
+    background-image:none; background-color:{{surface_22}};
+    border-left:3px solid {{surface_23}}; brightness:1; box-shadow:none;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveTab Label { color:{{surface_24}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveTab:selected Label { color:{{surface_25}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveNavSeparator { opacity:0.40; }
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveNavIcon { brightness:0.82; saturation:0.8; }
+
+.ArchiveRoot #ArchiveWindow #ArchiveFilters RadioButton {
+    background-image:none; background-color:{{surface_26}};
+    border:1px solid {{surface_27}}; border-radius:3px; box-shadow:none; brightness:1;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveFilters RadioButton:hover { background-image:none; background-color:{{surface_28}}; brightness:1; }
+.ArchiveRoot #ArchiveWindow #ArchiveFilters RadioButton:selected { background-image:none; background-color:{{surface_29}}; border-color:{{surface_30}}; brightness:1; }
+.ArchiveRoot #ArchiveWindow #ArchiveFilters Label { color:{{surface_31}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveFilters RadioButton:selected Label { color:{{selected}}; }
+
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveCard,
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialCard {
+    background-image:none;
+    background-color:{{surface_52}};
+    border:1px solid {{surface_34}}; border-radius:3px; box-shadow:none; brightness:1;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveCard:hover,
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveHovered {
+    background-image:none; background-color:{{surface_35}}; border-color:{{surface_36}};
+    brightness:1; box-shadow:none;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveHoverCorner,
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveCard:hover .ArchiveHoverCorner,
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveHovered .ArchiveHoverCorner { visibility:collapse; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveItemName { color:{{name}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveUnlockBadge { background-image:none; border:0px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveUnlockBadge.Unlocked { background-image:none; background-color:{{surface_38}}; color:{{surface_39}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveUnlockBadge.Locked { background-image:none; background-color:{{surface_40}}; color:{{surface_41}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveFragmentLevel,
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveWorkCost,
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveMissingArtText { color:{{number}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveWorkAvailable .ArchiveWorkCost { color:{{surface_42}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchivePromote { background-image:none; background-color:{{button}}; border:1px solid {{surface_43}}; box-shadow:none; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchivePromote Label { color:{{surface_44}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchivePromote:enabled:hover { background-color:{{surface_45}}; brightness:1; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid VerticalScrollBar { background-image:none; background-color:{{surface_46}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid VerticalScrollBar .ScrollThumb { background-image:none; background-color:{{surface_47}}; border:0px; }
+
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial { background-image:none; background-color:{{surface_16}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialHeading { color:{{heading}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialHint,
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialDescription,
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialPageText { color:{{muted}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialName { color:{{body}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrialToggle,
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialAction { background-color:{{surface_48}}; border-color:{{surface_49}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrialToggle:hover,
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialAction:hover { background-color:{{surface_50}}; brightness:1; }
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrialToggle Label,
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArtTrialActionText { color:{{surface_51}}; }
+
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipFrame {
+    border-image-source:none; background-image:none; background-color:{{surface_52}};
+    border:1px solid {{surface_53}}; box-shadow:none;
+}
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipName,
+.ArchiveRoot #ArchiveTooltip .ArchiveDetailHeading { color:{{heading}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipEffect,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipCondition { color:{{body}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipStateText,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgressRow Label { color:{{surface_54}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgressRow #ArchiveTooltipProgress { color:{{surface_55}}; }
+
+/* Nine-slice child images otherwise cover the dark parent backgrounds. */
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveNavSelectedFrame,
+.ArchiveRoot #ArchiveWindow #ArchiveFilters .ArchiveFilterFrame,
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveNormalFrame,
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveSelectedFrame { visibility:collapse; }
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveTab:selected .ArchiveNavIcon { wash-color:{{surface_56}}; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveFilters Label { font-size:18px; color:{{surface_57}}; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveFilters RadioButton:selected Label { color:{{selected}}; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveItemName { font-size:16px; color:{{name}}; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveUnlockBadge {
+    font-size:16px; font-weight:medium; height:24px; border-radius:3px;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveUnlockBadge.Unlocked { background-color:{{surface_58}}; color:{{surface_59}}; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveUnlockBadge.Locked { background-color:{{surface_60}}; color:{{surface_61}}; }
+
+/* Readable archive card foregrounds: no glow, pure white, or disabled washout. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveFilters Label,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveItemName,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveUnlockBadge,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote Label {
+    font-family:{{tooltip_font}}; font-weight:medium; text-shadow:none; opacity:1;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentLevel {
+    color:{{number}}; font-family:{{tooltip_font}}; font-weight:normal;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote {
+    background-image:none; background-color:{{button}}; border:1px solid {{surface_43}};
+    opacity:1; saturation:1; brightness:1; box-shadow:none;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote Label { color:{{surface_44}}; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote:enabled:hover { background-color:{{surface_45}}; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote:disabled {
+    background-image:none; background-color:{{button_disabled}}; border-color:{{surface_64}}; opacity:1; brightness:1;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote:disabled Label { color:{{surface_65}}; }
+
+/* Compact archive: five columns, clear body text, no redundant page banner. */
+.ArchiveRoot #ArchiveWindow Label,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff Label,
+.ArchiveRoot #ArchiveTooltip Label {
+    font-family:{{tooltip_font}}; font-style:normal; font-weight:normal;
+    text-shadow:none; opacity:1; wash-color:none;
+}
+.ArchiveRoot #ArchiveWindow #ArchivePageHeader,
+.ArchiveRoot #ArchiveWindow #ArchiveHint,
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrialToggle { visibility:collapse; }
+.ArchiveRoot #ArchiveWindow #ArchiveContent #ArchiveFilters { position:18px 16px 0px; width:600px; height:32px; }
+.ArchiveRoot #ArchiveWindow #ArchiveFilters #ArchiveFilter_all { width:150px; }
+.ArchiveRoot #ArchiveWindow #ArchiveFilters Label { font-size:16px; }
+.ArchiveRoot #ArchiveWindow #ArchiveContext { position:423px 21px 0px; width:193px; height:24px; text-align:right; font-size:15px; color:{{number}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveContent #ArchiveGrid { position:18px 58px 0px; width:619px; height:506px; padding:0px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveCard { width:112px; height:108px; margin:0px 6px 4px 0px; padding:0px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveArt { position:20px 9px 0px; width:72px; height:56px; margin:0px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveNameHost { position:3px 66px 0px; width:104px; height:20px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveItemName { position:0px 0px 0px; width:104px; height:20px; font-size:15px; text-align:center; white-space:nowrap; text-overflow:ellipsis; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveUnlockBadge { position:15px 86px 0px; width:80px; height:18px; font-size:14px; text-align:center; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveFragmentCard,
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveWorkCard { height:122px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveFragmentLevel { position:5px 104px 0px; width:27px; height:17px; font-size:12px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchivePromote { position:34px 103px 0px; width:72px; height:18px; padding:0px; opacity:1; saturation:1; brightness:1; wash-color:none; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchivePromote Label { align:center center; margin:0px; font-size:12px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchivePromote:disabled { background-image:none; background-color:{{button_disabled}}; opacity:1; saturation:1; brightness:1; wash-color:none; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchivePromote:disabled Label { color:{{button_disabled_text}}; opacity:1; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveWorkCost { position:3px 104px 0px; width:104px; height:17px; font-size:12px; }
+.ArchiveRoot #ArchiveWindow #ArchiveFooter { position:18px 568px 0px; width:614px; height:20px; }
+.ArchiveRoot #ArchiveWindow #ArchiveStatus { width:614px; height:20px; font-size:12px; }
+.ArchiveRoot #ArchiveWindow #ArchiveContent.ArchiveHasDraw #ArchiveGrid { height:438px; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipName { font-family:{{tooltip_font}}; font-size:21px; color:{{heading}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipEffect { font-family:{{tooltip_font}}; font-size:17px; color:{{body}}; line-height:25px; }
+/* Names begin directly below the artwork at its left edge. */
+.ArchiveRoot #TreasureWindow .TreasureCard { flow-children:none; }
+.ArchiveRoot #TreasureWindow .TreasureArt { position:33px 0px 0px; horizontal-align:left; margin:0px; }
+.ArchiveRoot #TreasureWindow .TreasureName { position:33px 85px 0px; width:115px; height:25px; align:left top; margin:0px; padding:0px; text-align:left; white-space:nowrap; text-overflow:ellipsis; font-family:{{tooltip_font}}; font-size:16px; color:{{body}}; }
+
+/* Navigation owns its text box: native RadioButton label padding/shrink must
+   not squeeze the new font into a few pixels. Card compactness is independent. */
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveTab .ArchiveNavLabel {
+    position:64px 11px 0px; width:137px; height:34px;
+    margin:0px; padding:0px; align:left top;
+    font-family:{{tooltip_font}}; font-size:21px; font-weight:normal;
+    font-style:normal; font-stretch:normal; letter-spacing:0px;
+    line-height:30px; white-space:nowrap; text-overflow:ellipsis;
+    text-align:left; color:{{tab}}; text-shadow:none; opacity:1;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveTabs .ArchiveTab:selected .ArchiveNavLabel { color:{{selected}}; }
+
+/* Tooltip text wraps at its natural font size; never shrink an entire paragraph. */
+.ArchiveRoot #ArchiveTooltip Label {
+    font-family:{{tooltip_font}}; font-size:17px;
+    font-weight:normal; font-style:normal; font-stretch:normal;
+    letter-spacing:0px; padding:0px; text-overflow:clip;
+}
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipName {
+    width:100%; height:fit-children; font-size:23px; line-height:30px;
+    white-space:normal; margin:0px 0px 10px;
+}
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipEffect,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipCondition {
+    width:100%; height:fit-children; font-size:18px; line-height:27px;
+    white-space:normal; margin:0px 0px 14px;
+}
+.ArchiveRoot #ArchiveTooltip .ArchiveDetailHeading { font-size:17px; height:fit-children; line-height:25px; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipState { height:26px; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipStateText,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgressRow Label { font-size:16px; height:25px; line-height:23px; white-space:nowrap; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgressRow { height:28px; }
+
+/* Final drawing layer: share the actual ability-tooltip surface, without the old artwork. */
+.ArchiveRoot #ArchiveTooltip { background-image:none; background-color:{{surface_52}}; border:1px solid {{surface_53}}; box-shadow:{{tooltip_shadow}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipFrame { visibility:collapse; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveNameHost { position:3px 68px 0px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveNameHost .ArchiveItemName { position:0px 0px 0px; align:center top; width:104px; max-width:104px; height:20px; margin:0px; padding:0px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveArt { overflow:clip; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchivePromote .RHActionArt,
+.ArchiveRoot #ArchiveWindow #ArchiveDraw .RHActionArt { visibility:collapse; }
+.ArchiveRoot #ArchiveWindow #ArchiveContent #ArchiveDrawBar {
+    position:18px 502px 0px; width:600px; height:54px; flow-children:none;
+    margin:0px; padding:0px; background-color:{{surface_17}}; border:1px solid {{surface_27}};
+}
+.ArchiveRoot #ArchiveWindow #ArchiveDrawBar #ArchiveTickets { position:10px 5px 0px; width:445px; height:22px; margin:0px; align:left top; font-size:16px; color:{{number}}; text-overflow:ellipsis; }
+.ArchiveRoot #ArchiveWindow #ArchiveDrawBar #ArchiveDrawResult { position:10px 28px 0px; width:445px; height:20px; margin:0px; align:left top; font-size:14px; color:{{body}}; text-overflow:ellipsis; }
+.ArchiveRoot #ArchiveWindow #ArchiveDrawBar #ArchiveDraw { position:464px 10px 0px; width:124px; height:32px; margin:0px; align:left top; opacity:1; saturation:1; brightness:1; }
+.ArchiveRoot #ArchiveWindow #ArchiveDraw Label { font-size:16px; align:center center; margin:0px; padding:0px; color:{{button_text}}; text-overflow:clip; }
+.ArchiveRoot #ArchiveWindow #ArchiveDraw:disabled Label { color:{{button_disabled_text}}; }
+.ArchiveRoot #ArchiveWindow #ArchiveStatus { font-size:13px; white-space:nowrap; text-overflow:ellipsis; }
+.ArchiveRoot #ArchiveWindow #ArchiveFaith { visibility:collapse; }
+
+/* Wide counters keep large map/score requirements readable at the compact size. */
+/* Quiet collection cards: separate art, name and progress; no repeated status row.
+   The two state shapes remain distinct even without their color difference. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveArt,
+.ArchiveRoot #ArchiveWindow #ArchiveArtTrial .ArchiveArt {
+    background-image:none; background-color:{{icon_surface}};
+    border:1px solid {{icon_border}}; box-shadow:none;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveArt { position:20px 7px 0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveRewardIcon { saturation:0.8; brightness:1; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveNameHost .ArchiveItemName {
+    font-family:{{tooltip_font}}; font-weight:normal; font-size:15px;
+    text-shadow:none; color:{{name}};
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveStateIcon {
+    position:5px 8px 0px; width:12px; height:12px; margin:0px;
+    opacity:1; background-image:none; background-color:transparent; border:0px;
+    wash-color:{{state_locked}};
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveStateIcon.Unlocked { wash-color:{{state_unlocked}}; }
+
+/* Reference typography: steady text/card appearance, gold values, no hover glow. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff Label,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveTabs .ArchiveTab .ArchiveNavLabel,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveNameHost .ArchiveItemName,
+.ArchiveRoot #ArchiveTooltip Label,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipName,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipEffect {
+    font-family:{{tooltip_font}}; font-weight:normal;
+    font-style:normal; text-shadow:none; opacity:1; wash-color:none;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard:hover,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveHovered {
+    background-image:none;
+    background-color:{{surface_52}};
+    border:1px solid {{surface_34}}; brightness:1; saturation:1; box-shadow:none;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveArt { position:19px 7px 0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveNameHost { position:3px 66px 0px; height:22px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveNameHost .ArchiveItemName { font-size:16px; height:22px; color:{{name}}; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard { height:154px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveArt { position:7px 7px 0px; width:96px; height:76px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveRewardIcon { saturation:1; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveNameHost { position:3px 86px 0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentLevel { position:5px 132px 0px; height:20px; font-size:14px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote { position:34px 129px 0px; width:72px; height:22px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote Label { font-size:14px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveWorkCost { font-size:14px; color:{{number}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipName { font-size:26px; line-height:32px; color:{{heading}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipEffect,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipCondition { font-size:20px; line-height:28px; color:{{body}}; }
+.ArchiveRoot #ArchiveTooltip .ArchiveDetailHeading { font-size:18px; color:{{detail_heading}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipStateText,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgressRow Label { font-size:18px; color:{{muted}}; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgress { color:{{progress}}; }
+
+/* Same opaque drawing surface and typography as the ability tooltip.
+   This detached popup uses native UI scale, not the archive window's extra fit. */
+.ArchiveRoot #ArchiveTooltip {
+    width:{{tooltip_width}}; background-color:{{surface_52}}; opacity:1;
+    brightness:1; saturation:1; wash-color:none;
+}
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipBody {
+    padding:{{tooltip_padding}}; background-image:none; background-color:{{surface_52}};
+}
+.ArchiveRoot #ArchiveTooltip Label,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipName,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipEffect,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipCondition {
+    font-family:{{tooltip_font}}; font-weight:normal; font-style:normal;
+    font-stretch:normal; text-shadow:none; opacity:1; wash-color:none;
+}
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipName { font-size:{{tooltip_title_size}}; line-height:36px; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipEffect,
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipCondition { font-size:{{tooltip_body_size}}; line-height:32px; }
+.ArchiveRoot #ArchiveTooltip .ArchiveDetailHeading { font-size:{{tooltip_field_size}}; line-height:28px; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipStateText { font-size:{{tooltip_meta_size}}; line-height:25px; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgressRow { height:30px; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgressRow Label { font-size:{{tooltip_field_size}}; height:30px; line-height:28px; }
+
+/* Count centering uses actual label bounds inside a shared icon-center host.
+   No full-width label text-align dependency, and no old corner-badge offsets. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard { height:120px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveNameHost { position:3px 65px 0px; height:25px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveNameHost .ArchiveItemName { font-size:{{tooltip_field_size}}; height:25px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCountHost {
+    position:3px 91px 0px; width:104px; height:25px; flow-children:none;
+    margin:0px; padding:0px; align:left top;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCountHost .ArchiveCount {
+    position:0px 0px 0px; width:fit-children; max-width:104px; height:25px;
+    align:center center; margin:0px; padding:0px; text-align:center;
+    font-family:{{tooltip_font}}; font-size:{{tooltip_field_size}}; font-weight:normal; font-style:normal;
+    line-height:25px; letter-spacing:0px; color:{{number}}; text-shadow:none;
+    white-space:nowrap; text-overflow:ellipsis; background-image:none; background-color:transparent; border:0px;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveWorkCard { height:146px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveWorkCost { position:3px 120px 0px; height:22px; font-size:16px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard { height:164px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveNameHost { position:3px 85px 0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveCountHost { position:3px 111px 0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveCountHost .ArchiveCount { position:0px 0px 0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentLevel { position:5px 139px 0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchivePromote { position:34px 137px 0px; }
+
+/* Final reference surfaces: remove tinted plates beneath text instead of
+   compensating their tint with another foreground palette. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveTabs,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveTitleBlock,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveArt {
+    background-image:none; background-color:{{surface_52}};
+    opacity:1; brightness:1; saturation:1; wash-color:none;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveSidebarBacking,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContentBacking { visibility:collapse; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveTabs .ArchiveNavLabel,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveFilters Label {
+    font-family:{{tooltip_font}}; font-size:{{tooltip_field_size}};
+    font-weight:normal; font-style:normal; text-shadow:none; color:{{body}};
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveTitle {
+    font-family:{{tooltip_font}}; font-weight:normal; text-shadow:none;
+}
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipState { height:28px; }
+.ArchiveRoot #ArchiveTooltip #ArchiveTooltipProgressRow #ArchiveTooltipProgress {
+    width:fit-children; margin-left:10px; text-align:left;
+}
+
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveHeaderArt { visibility:collapse; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveHeader {
+    background-image:none; background-color:{{surface_52}}; border:1px solid {{surface_53}};
+}
+
+/* The header supplies the gradient; do not restart it behind the title. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveTitleBlock { background-color:transparent; }
+
+/* Fragment art is square source imagery: height must grow with width.
+   Four wider columns let the weapon grow without cropping its tip or handle. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard { width:144px; height:204px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveArt { position:7px 7px 0px; width:128px; height:112px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveRewardIcon { width:100%; height:100%; margin:0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveNameHost { position:3px 123px 0px; width:136px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveNameHost .ArchiveItemName { width:136px; max-width:136px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveCountHost { position:3px 150px 0px; width:136px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveCountHost .ArchiveCount { max-width:136px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveFragmentLevel { position:7px 181px 0px; width:44px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchivePromote { position:62px 179px 0px; width:74px; }
+
+/* Card text matches the accepted popup; only artwork follows modal fit.
+   Native glyph sizes are set once per fit change by nativeCardTypography. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveNameHost .ArchiveItemName,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveCountHost .ArchiveCount,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveFragmentLevel,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveWorkCost,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchivePromote Label {
+    font-family:{{tooltip_font}}; font-weight:normal; font-style:normal;
+    font-stretch:normal; letter-spacing:0px; text-shadow:none; opacity:1; wash-color:none;
+}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard { height:132px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveNameHost { height:32px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveNameHost .ArchiveItemName { height:32px; line-height:32px; align:center center; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveCountHost { position:3px 98px 0px; height:30px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveCountHost .ArchiveCount { height:30px; line-height:28px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveWorkCard { height:158px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveWorkCard .ArchiveWorkCost { position:3px 130px 0px; height:28px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard { height:218px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveCountHost { position:3px 156px 0px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveFragmentLevel { position:7px 188px 0px; height:28px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchivePromote { position:62px 186px 0px; height:28px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchivePromote Label { height:25px; line-height:25px; }
+
+/* Untransformed sibling of ArchiveWindow and ArchiveTooltip: same glyph raster. */
+.ArchiveRoot #ArchiveNativeCardText { flow-children:none; overflow:clip; }
+.ArchiveRoot #ArchiveNativeCardText .ArchiveNativeText {
+    width:100%; height:fit-children; align:center center; margin:0px; padding:0px;
+    font-family:{{tooltip_font}}; font-weight:normal; font-style:normal; font-stretch:normal;
+    text-shadow:none; letter-spacing:0px; white-space:nowrap; text-overflow:ellipsis;
+    text-align:center; opacity:1; wash-color:none; transform:none;
+}
+.ArchiveRoot #ArchiveNativeCardText .ArchiveNativeName { font-size:{{tooltip_title_size}}; line-height:36px; }
+.ArchiveRoot #ArchiveNativeCardText .ArchiveNativeNumber { font-size:{{tooltip_field_size}}; line-height:28px; }
+.ArchiveRoot #ArchiveNativeCardText .ArchiveNativeMeta { font-size:{{tooltip_meta_size}}; line-height:25px; }
+.ArchiveRoot #ArchiveNativeCardText .ArchiveNativeLeft { text-align:left; }
+
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveFragmentCard .ArchiveLevelHost { position:7px 188px 0px; width:44px; height:28px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveWorkCard .ArchiveCostHost { position:3px 130px 0px; width:104px; height:28px; }
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveLevelHost .ArchiveFragmentLevel,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveGrid .ArchiveCard .ArchiveCostHost .ArchiveWorkCost { position:0px 0px 0px; width:100%; height:100%; }
+
+/* One opaque body closes the exposed strip between header and sidebar. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveBody {
+    background-image:none; background-color:{{surface_52}};
+}
+.ArchiveRoot #ArchiveTooltip Label,
+.ArchiveRoot #ArchiveNativeCardText .ArchiveNativeText {
+    font-size:{{archive_text_size}}; line-height:25px;
+}
+/* Endless uses a distinct, resolution-independent infinity emblem. */
+.ArchiveRoot .ArchiveEndlessEmblem { width:72px; height:56px; overflow:clip; }
+.ArchiveRoot .ArchiveEndlessRing {
+    width:35px; height:28px; border:4px solid #cfb879; border-radius:50%;
+    background-color:transparent;
+}
+.ArchiveRoot .ArchiveEndlessRingLeft { position:6px 14px 0px; transform:rotateZ(28deg); }
+.ArchiveRoot .ArchiveEndlessRingRight { position:31px 14px 0px; transform:rotateZ(-28deg); }

@@ -12,6 +12,7 @@ local function new_state(player_id)
         player_id = player_id,
         rebirth_level = 0,
         all_attributes = 0,
+        display_all_attributes = 0,
         attack_flat = 0,
         attack_all_attribute_gain = 0,
         split_multishot_unlocked = false,
@@ -62,6 +63,7 @@ local function apply_effect(state, player_id, effect)
     end
     if effect_type == "add_all_attributes" then
         state.all_attributes = state.all_attributes + value
+        state.display_all_attributes = (state.display_all_attributes or 0) + value
         return
     end
     if effect_type == "add_attack_flat" then

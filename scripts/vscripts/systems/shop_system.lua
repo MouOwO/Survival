@@ -1085,6 +1085,21 @@ enqueue_research = function(payload)
     local current_state = event_bus.request(research_events.STATE_GET_REQUESTED,
         { player_id = player_id })
     merge_technology_levels(player_id, current_state and current_state.legacy_levels or {})
+    -- Only completed prerequisites count; reservations do not unlock research.
+    local required = definition.prerequisite or {}
+    local prerequisite = required.tech_id and research_config.by_id[required.tech_id]
+    local completed = current_state and current_state.legacy_levels or {}
+    if required.tech_id and (not prerequisite
+        or (tonumber(completed[prerequisite.legacy_group]) or 0) < (tonumber(required.required_level) or 0)) then
+        return { ok = false, error = "前置科技未达到要求，不能加入队列", error_code = "prerequisite_not_met" }
+    end
+    if (tonumber(required.reincarnation_level) or 0) > 0 then
+        local progression = event_bus.request(events.HERO_PROGRESSION_GET_REQUEST, { player_id = player_id })
+        if (tonumber(progression and progression.snapshot and progression.snapshot.rebirth_level) or 0)
+            < tonumber(required.reincarnation_level) then
+            return { ok = false, error = "转职要求未满足，不能加入队列", error_code = "reincarnation_not_met" }
+        end
+    end
     local target = tonumber((state.technology_by_player[player_id] or {})[group]) or 0
     if lane.pending and lane.pending.technology_group == group then
         target = math.max(target, lane.pending.target_level)

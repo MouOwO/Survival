@@ -1,0 +1,31 @@
+{
+  "live_connected": true,
+  "doom_line_before": "output/portrait_live_20260927/doom_focused.png",
+  "doom_line_removed": "output/portrait_live_20260927/badges_hidden_focused.png",
+  "actual_background_probe": "output/portrait_live_20260927/panorama_probe.png",
+  "background_material_probe_did_not_change_ui": true,
+  "actual_panorama_background_probe_visible": true,
+  "temporary_probe_colors_restored": true,
+  "runtime_mutation_commands_removed_from_source": true,
+  "cause": "Native DOTAXP / DOTAUnitHeroBadge rendered over custom-sized portrait; real backdrop is Panorama container",
+  "status_display_ms": 3000,
+  "status_fade_ms": 250,
+  "regressions": [
+    {
+      "name": "test_portrait_presentation.cjs",
+      "passed": true
+    },
+    {
+      "name": "test_combat_stats_callbacks.cjs",
+      "passed": true
+    },
+    {
+      "name": "test_multiselect_portraits.cjs",
+      "passed": true
+    },
+    {
+      "name": "test_seven_sins_portrait.cjs",
+      "passed": true
+    }
+  ]
+}

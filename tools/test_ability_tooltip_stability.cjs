@@ -6,13 +6,32 @@ const tooltip={style:{},GetParent:()=>parent};let schedules=0;
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/tooltip_position.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg},$:{Schedule:()=>schedules++}});
 for(const height of [80,350,120,260]){tooltip.actuallayoutheight=height;cfg.SurvivalTooltipPosition.PlaceAbilityAbove(tooltip,source,337);assert.equal(tooltip.style.marginBottom,'185px');assert.equal(tooltip.style.verticalAlign,'bottom');}
 const oldX=tooltip.style.position;x=900;cfg.SurvivalTooltipPosition.PlaceAbilityAbove(tooltip,source,337);assert.notEqual(oldX,tooltip.style.position);assert.equal(tooltip.style.marginBottom,'185px');assert.equal(schedules,0,'position must settle synchronously');
-let created=0;class Panel{constructor(){this.style={};this.visible=true;}AddClass(){}SetImage(v){this.image=v;}}
+let created=0;class Panel{constructor(){this.style={};this.valid=true;this.visible=true;}IsValid(){return this.valid;}set visible(v){assert(this.valid,'Underlying panel is deleted!');this._visible=v;}get visible(){return this._visible;}AddClass(){}SetImage(v){this.image=v;}}
 const env={$:{CreatePanel:()=>{created++;return new Panel();}},propertyIcon:label=>label==='attack'?{type:'item',name:'item_broadsword'}:null,localizedFieldLabel:v=>v,localizedFieldValue:(_,v)=>v};
 const code=fs.readFileSync('panorama/src/scripts/custom_game/ability_tooltip.js','utf8');
 vm.runInNewContext(code.slice(code.indexOf('    function addField('),code.indexOf('    function render(')),env);
 const fields={};env.addField(fields,'attack',12);env.addField(fields,'speed',15);const firstCreated=created,firstRow=fields.__fieldRows[0];
 for(let i=0;i<10;i++){fields.__fieldCursor=0;fields.__fieldRows.forEach(r=>r.visible=false);env.addField(fields,'attack',i);}
 assert.equal(created,firstCreated);assert.strictEqual(firstRow,fields.__fieldRows[0]);assert(!fields.__fieldRows[1].visible);assert.equal(firstRow.__right.text,'9');
+// Hot reload preserves the container's JS cache but destroys dynamic rows.
+let cleared=0;
+fields.RemoveAndDeleteChildren=()=>{cleared++;for(const row of fields.__fieldRows||[])row.valid=false;};
+firstRow.valid=false;
+assert.doesNotThrow(()=>env.resetFieldRows(fields));
+assert.equal(cleared,1);assert.equal(fields.__fieldRows.length,0);
+env.addField(fields,'attack',30);
+assert.equal(fields.__fieldRows[0].__right.text,'30');
+assert.notStrictEqual(fields.__fieldRows[0],firstRow);
+// Partially rebuilt children and icons also invalidate the pool.
+fields.__fieldRows[0].__right.valid=false;
+env.resetFieldRows(fields);env.addField(fields,'attack',31);
+fields.__fieldRows[0].__icons.DOTAItemImage.valid=false;
+env.resetFieldRows(fields);env.addField(fields,'attack',32);
+assert.equal(cleared,3);
+const stableCreated=created;
+for(let i=0;i<10;i++){env.resetFieldRows(fields);env.addField(fields,'attack',i);}
+assert.equal(created,stableCreated,'Valid fields must still be reused');
+assert.equal(cleared,3,'Steady hover must not rebuild the field pool');
 const pending=[],tip={owner:'selective_proxy',classes:new Set(),style:{},BHasClass(c){return this.classes.has(c)},AddClass(c){this.classes.add(c)},RemoveClass(c){this.classes.delete(c)}};tip.__survivalTooltipOwner='selective_proxy';
 const fadeEnv={setExternalProxyHighlight:()=>{},activeSourcePanel:{},externalHoverExitSerial:0,nativeTooltipSuppressionSerial:0,activeAbilityIndex:1,activeAbilityName:'test',byId:()=>tip,selectiveTooltipOwner:'selective_proxy',tooltipAnimationSerial:0,tooltipFadeDuration:.1,tooltipAnimationFrame:.016,scheduleActive:(d,f)=>pending.push(f),releaseSelectiveTooltip:()=>{tip.__survivalTooltipOwner='';}};
 vm.runInNewContext(code.slice(code.indexOf('    function hideCustomTooltip('),code.indexOf('    function showNativeAbilityTooltip(')),fadeEnv);

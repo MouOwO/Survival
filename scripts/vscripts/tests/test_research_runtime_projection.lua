@@ -100,3 +100,24 @@ transactions[10] = { player_id = 0, source_entindex = 10, researching = 0,
 bus.emit(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, transactions[10])
 assert(buildings[1].unit.abilities[name].active, "completion activates manual research")
 print("RESEARCH_RUNTIME_PROJECTION_PASS: source-specific activation, unrelated completion, right-click state, absolute timing")
+
+-- Every research prerequisite is checked consistently by runtime and native activation.
+local mappings = require("config/generated/research_lab_abilities")
+local checked = 0
+for _, row in ipairs(mappings.rows) do
+    local definition = config.by_legacy_group[row.technology_group]
+    local required = definition and definition.prerequisite or {}
+    if row.enabled ~= false and required.tech_id then
+        local owner = unit(90)
+        local result = builder.build(row.ability_name, { player_id = 0, building_id = row.building_id,
+            unit = owner, research_levels = {}, research_transaction = {}, reincarnation_level = 10 }, {})
+        assert(result.available == 0 and result.research_status_code == "prerequisite_not_met", row.ability_name)
+        if row.building_id == "building_advanced_research_lab" then
+            sync.sync(owner, row.building_id, {}, {}, 10)
+            assert(not owner.abilities[row.ability_name].active, "native locked research must be inactive")
+        end
+        checked = checked + 1
+    end
+end
+assert(checked > 0)
+print("RESEARCH_PREREQUISITE_GREY_PASS " .. checked .. " dependent technologies")

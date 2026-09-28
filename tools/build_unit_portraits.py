@@ -88,9 +88,11 @@ def kv(data, indent=0):
 
 
 def portrait_background():
-    return dict(PortraitBackgroundTexture='materials/vgui/hud/heroportraits/portraitbackground_gradient_top.vmat',
-        PortraitBackgroundColor1='0.055 0.09 0.105', PortraitBackgroundColor2='0.055 0.09 0.105',
-        PortraitBackgroundColor3='0.025 0.045 0.055', PortraitBackgroundColor4='0.025 0.045 0.055',
+    return dict(PortraitBackgroundTexture='materials/survival_ui/portrait_slate_backdrop.vmat',
+        PortraitBackgroundColor1='1 1 1', PortraitBackgroundColor2='1 1 1',
+        PortraitBackgroundColor3='1 1 1', PortraitBackgroundColor4='1 1 1',
+        PortraitGroundShadowScale='0', PortraitHideDropShadow='1',
+        PortraitBackgroundModel='', PortraitBackgroundMap='', PortraitParticle='',
         PortraitHideParticles='1', PortraitDesaturateHero='0')
 
 
@@ -124,6 +126,10 @@ def main():
         else:
             camera=fitted_camera(lo,hi,kind!='worker')
             method='compiled_mesh_fit'
+        if kind == 'building':
+            # Focus the architectural body instead of reserving so much sky and
+            # platform around it; narrower FOV makes the native portrait ~38% larger.
+            camera['PortraitFOV'] = '22'
         height=hi[2]-lo[2]
         lighting=max(height,120)
         entry={

@@ -1,3 +1,4 @@
+local ParticleManager = require("systems/combat_effect_visibility").manager()
 local config = require("config/hero_cosmetics_config")
 local asset_catalog = require("config/asset_catalog")
 local scheduler = require("core/scheduler")

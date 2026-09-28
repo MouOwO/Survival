@@ -108,6 +108,17 @@ function M.init(options)
             reason = "production_changed",
         })
     end
+    event_bus.subscribe(events.WORKER_CHANGED, function(payload)
+        if not payload or not payload.super_lumberjack or not payload.removed_entindexes then return end
+        local player = PlayerResource:GetPlayer(tonumber(payload.player_id))
+        if not player then return end
+        local consumed = { payload.entindex }
+        for _, id in ipairs(payload.removed_entindexes) do consumed[#consumed + 1] = id end
+        -- Covers engine casts as well as custom HUD requests, including death replication races.
+        CustomGameEventManager:Send_ServerToPlayer(player, "survival_lumberjack_fused", {
+            target_entindex = payload.entindex, consumed_entindexes = consumed,
+        })
+    end)
     event_bus.subscribe(events.WORKER_CHANGED, refresh)
     event_bus.subscribe(events.RESOURCE_CHANGED, refresh)
     event_bus.subscribe(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, refresh)

@@ -6,7 +6,6 @@ local weapon_snapshot = require("ui/weapon_synthesis_snapshot_service")
 local unit_display_names = require("config/generated/unit_display_names")
 local research_events = require("research/research_event_names")
 local combat_stat_projection = require("ui/combat_stat_projection")
-local asset_catalog = require("config/asset_catalog")
 local armor_balance = require("config/armor_balance")
 local hero_summon_projection = require("systems/hero_summon_projection")
 local building_batch_upgrade = require("systems/building_batch_upgrade_service")
@@ -20,6 +19,7 @@ local synthesis_requests = {}
 local building_snapshot_sequence = 0
 local selected_unit_by_player = {}
 local building_push_coalescer
+local combat_push_coalescer
 
 local function safe_number(entity, method_name, fallback, ...)
     local method = entity and entity[method_name]
@@ -36,7 +36,7 @@ local function effective_attack_speed(unit)
     -- which made a freshly selected tower panel show the old speed.
     local project_speed = tonumber(unit and unit.survival_attack_speed)
     if project_speed and unit.survival_building_id == "arrow_tower" then
-        return project_speed
+        return project_speed * (1 + (tonumber(unit.survival_cheer_attack_speed_pct) or 0)/100)
     end
     -- 非英雄单位需要反映光环等临时 Modifier。false 表示不忽略临时攻速；
     -- 自定义英雄仍由 hero_ui_snapshot 的配置权威链路接管。
@@ -54,7 +54,7 @@ local function effective_attack_speed(unit)
     if seconds_per_attack and seconds_per_attack > 0 then
         return 1 / seconds_per_attack
     end
-    return project_speed
+    return project_speed and project_speed * (1 + (tonumber(unit.survival_cheer_attack_speed_pct) or 0)/100)
         or (1 / math.max(0.01,
             safe_number(unit, "GetBaseAttackTime", 2)))
 end
@@ -78,61 +78,10 @@ local function base_damage_outgoing_pct(unit)
     return total
 end
 
+local portrait_metadata = require("ui/portrait_metadata")
+local building_stat_display = require("ui/building_stat_display")
 local function apply_portrait_metadata(unit, snapshot)
-    snapshot = snapshot or {}
-    snapshot.model_asset_id = ""
-    snapshot.portrait_unit_name = ""
-    snapshot.portrait_item_def = ""
-
-    if not unit then return snapshot end
-    local asset_id = tostring(unit.survival_model_asset_id or "")
-    if asset_id == "" then
-        -- Monster hero visuals keep their asset identity separately from the
-        -- building model_asset_id field; use it for the independent portrait
-        -- ScenePanel without changing the world appearance ownership.
-        asset_id = tostring(unit.survival_monster_default_wearable_asset_id or "")
-    end
-    local asset = asset_catalog.get(asset_id)
-    if not asset then
-        local hero_id = tostring(unit.survival_hero_id or "")
-        if hero_id == "" then hero_id = tostring(snapshot.hero_id or "") end
-        if hero_id ~= "" then
-            asset_id = "hero_permanent_" .. hero_id
-            asset = asset_catalog.get(asset_id)
-        end
-    end
-    if not asset and unit.survival_monkey_king_clone == true then
-        asset_id = "hero_permanent_hero_monkey_king"
-        asset = asset_catalog.get(asset_id)
-    end
-    if not asset then return snapshot end
-
-    snapshot.model_asset_id = tostring(asset.asset_id or asset_id or "")
-    -- Native wearable tower stages, Boss hero bundles, and explicitly opted-in
-    -- permanent heroes use the custom portrait ScenePanel. Their world model is
-    -- intentionally independent of the portrait unit, so the client can render
-    -- the standard Valve hero portrait while the selected entity keeps its
-    -- decorated body in-world.
-    local is_boss_portrait = asset.load_group == "monster_default_wearables"
-        and tostring(asset.portrait_unit_name or "") ~= ""
-    local is_split_hero_portrait = (asset.asset_id == "hero_permanent_hero_blademaster"
-        or asset.asset_id == "hero_permanent_hero_doom")
-        and tostring(asset.portrait_unit_name or "") ~= ""
-    local is_seven_sins_portrait = asset.asset_id
-        == "challenge_monster_terrorblade_fractal_horns"
-        and asset.portrait_unit_name == "npc_dota_hero_terrorblade"
-    local is_challenge_portrait = tostring(asset.asset_id or ""):find("challenge_monster_", 1, true) == 1
-        and tostring(asset.portrait_unit_name or ""):find("npc_dota_hero_", 1, true) == 1
-    if asset.native_wearable_stage == nil
-        and not is_challenge_portrait
-        and not is_seven_sins_portrait
-        and not is_boss_portrait
-        and not is_split_hero_portrait then
-        return snapshot
-    end
-    snapshot.portrait_unit_name = tostring(asset.portrait_unit_name or "")
-    snapshot.portrait_item_def = tostring(asset.portrait_item_def or "")
-    return snapshot
+    return portrait_metadata.apply(unit, building_stat_display.apply(unit, snapshot))
 end
 
 local function unit_combat_snapshot(unit)
@@ -201,6 +150,11 @@ local function unit_combat_snapshot(unit)
         -- attack_speed 表示当前每秒攻击次数，不是 BAT，也不是 Dota
         -- 百分比攻速；非英雄单位必须包含光环等临时 Modifier。
         attack_speed = effective_attack_speed(unit),
+        attack_cadence = unit.survival_attack_cadence or {
+            base_interval=safe_number(unit,"GetBaseAttackTime",nil),
+            reduced_interval=safe_number(unit,"GetBaseAttackTime",nil),
+            percentage=safe_number(unit,"GetAttackSpeed",1,false)*100,
+        },
         attack_speed_stat = safe_number(unit, "GetAttackSpeed", 100),
         strength = strength,
         agility = agility,
@@ -303,6 +257,20 @@ local function hero_ui_snapshot(player_id, entindex, unit)
         snapshot.display_name = unit.survival_display_name
             or snapshot.display_name
     end
+    -- Cheer is a temporary engine modifier; use its explicit authoritative
+    -- amount without replacing stable hero values with transient engine reads.
+    if snapshot.attack_cadence and not is_monkey_clone then
+        local old = tonumber(snapshot.attack_cadence.cheer_bonus) or 0
+        local current = tonumber(unit.survival_cheer_attack_speed_pct) or 0
+        snapshot.attack_speed = (tonumber(snapshot.attack_speed) or 0)
+            * math.max(1,100+current) / math.max(1,100+old)
+        local native_speed = safe_number(unit,"GetAttackSpeed",nil,false)
+        local engine_interval = tonumber(snapshot.attack_cadence.engine_interval)
+        if native_speed and native_speed > 0 and engine_interval and engine_interval > 0
+            and not (tonumber(snapshot.debug_attack_speed_override) and tonumber(snapshot.debug_attack_speed_override)>0) then
+            snapshot.attack_speed = native_speed / engine_interval
+        end
+    end
     -- The hero combat snapshot is authoritative and internally consistent.
     -- Never replace one field with a transient engine-frame value here: doing
     -- so made request responses alternate between projected armor and zero
@@ -362,73 +330,79 @@ local function register_selected_tree_snapshot_push()
     event_bus.subscribe(events.TREE_CHANGED, publish_selected_tree_snapshot)
 end
 
+local function build_unit_combat_push(payload)
+    local player_id, entindex = tonumber(payload.player_id), tonumber(payload.entindex)
+    local ok, unit = pcall(EntIndexToHScript, entindex)
+    if not ok or not unit or unit:IsNull() then return nil end
+    local snapshot = hero_ui_snapshot(player_id, entindex, unit)
+        or combat_stat_projection.for_ui(unit_combat_snapshot(unit))
+    -- Hero snapshots intentionally own stable equipment armor, but
+    -- temporary armor debuffs must show the same effective engine armor
+    -- used by damage resolution without replacing other authoritative
+    -- hero fields.
+    local reason = tostring(payload.reason or "")
+    if payload.refresh_runtime_armor or reason:match("^poison_cloud_armor_")
+        or reason == "research_armor_reduction" then
+        local custom_war3_armor = tonumber(
+            unit.survival_armor_mapping_version
+        ) == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
+        if custom_war3_armor then
+            -- Custom War3 targets deliberately keep native armor at
+            -- zero. Their effective project-owned value is the one
+            -- used by damage resolution and must remain authoritative.
+            snapshot.runtime_armor = 0
+            snapshot.armor = tonumber(
+                unit.survival_effective_war3_armor
+            ) or tonumber(unit.survival_war3_armor) or 0
+            snapshot.effective_war3_armor = snapshot.armor
+        else
+            local runtime_armor = safe_number(
+                unit, "GetPhysicalArmorValue", nil, false
+            )
+            snapshot.runtime_armor = runtime_armor
+            snapshot.armor = armor_balance.to_war3(runtime_armor)
+        end
+        snapshot.armor_unit = "war3_display"
+        snapshot.stat_units_version = 2
+    end
+    snapshot.success = 1
+    snapshot.reason = payload.reason or "unit_combat_stats_changed"
+    snapshot.push_phase = "coalesced"
+    return snapshot
+end
+
+combat_push_coalescer = require("ui/stat_push_coalescer").new({
+    scheduler = scheduler, interval = 0.1, task_prefix = "combat_ui_push_",
+    is_selected = function(player_id, entindex)
+        return valid_player_id(player_id, true)
+            and tonumber(selected_unit_by_player[player_id]) == entindex
+    end,
+    merge = function(previous, latest)
+        latest.refresh_runtime_armor = previous.refresh_runtime_armor or latest.refresh_runtime_armor
+    end,
+    build = build_unit_combat_push,
+    send = function(player_id, snapshot)
+        send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
+    end,
+})
+
 local function on_unit_combat_stats_changed(payload)
     local entindex = tonumber(payload and payload.entindex)
-    local unit = payload and payload.unit
     if not entindex then return end
-    if not unit or unit:IsNull() then
-        local ok, resolved = pcall(EntIndexToHScript, entindex)
-        if not ok or not resolved or resolved:IsNull() then return end
-        unit = resolved
-    end
-    for player_id, selected_entindex in pairs(selected_unit_by_player) do
-        if tonumber(selected_entindex) == entindex and valid_player_id(player_id, true) then
-            local snapshot = hero_ui_snapshot(player_id, entindex, unit)
-                or combat_stat_projection.for_ui(unit_combat_snapshot(unit))
-            -- Hero snapshots intentionally own stable equipment armor, but
-            -- temporary armor debuffs must show the same effective engine armor
-            -- used by damage resolution without replacing other authoritative
-            -- hero fields.
+    for player_id, selected in pairs(selected_unit_by_player) do
+        if tonumber(selected) == entindex then
             local reason = tostring(payload.reason or "")
-            if reason:match("^poison_cloud_armor_")
-                or reason == "research_armor_reduction" then
-                local custom_war3_armor = tonumber(
-                    unit.survival_armor_mapping_version
-                ) == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
-                if custom_war3_armor then
-                    -- Custom War3 targets deliberately keep native armor at
-                    -- zero. Their effective project-owned value is the one
-                    -- used by damage resolution and must remain authoritative.
-                    snapshot.runtime_armor = 0
-                    snapshot.armor = tonumber(
-                        unit.survival_effective_war3_armor
-                    ) or tonumber(unit.survival_war3_armor) or 0
-                    snapshot.effective_war3_armor = snapshot.armor
-                else
-                    local runtime_armor = safe_number(
-                        unit, "GetPhysicalArmorValue", nil, false
-                    )
-                    snapshot.runtime_armor = runtime_armor
-                    snapshot.armor = armor_balance.to_war3(runtime_armor)
-                end
-                snapshot.armor_unit = "war3_display"
-                snapshot.stat_units_version = 2
-            end
-            snapshot.success = 1
-            snapshot.reason = payload.reason or "unit_combat_stats_changed"
-            snapshot.push_phase = "immediate"
-            send_to_player("ui_selected_unit_stats_snapshot", player_id, snapshot)
+            combat_push_coalescer.push({player_id=player_id, entindex=entindex, reason=reason,
+                refresh_runtime_armor=reason:match("^poison_cloud_armor_") ~= nil or reason=="research_armor_reduction"})
         end
     end
 end
 
 local function on_hero_combat_stats_changed(payload)
-    local player_id = tonumber(payload and payload.player_id)
     local snapshot = payload and payload.snapshot
-    if not valid_player_id(player_id, true) or type(snapshot) ~= "table" then return end
-    local selected_entindex = tonumber(selected_unit_by_player[player_id])
-    if selected_entindex ~= tonumber(snapshot.entindex) then return end
-    local ok, unit = pcall(EntIndexToHScript, selected_entindex)
-    if not ok or not unit or unit:IsNull() then return end
-    local decorated = {}
-    for key, value in pairs(snapshot) do decorated[key] = value end
-    apply_portrait_metadata(unit, decorated)
-    local projected = combat_stat_projection.for_ui(decorated)
-    projected.success = 1
-    projected.reason = payload.reason or snapshot.reason
-        or "hero_combat_stats_changed"
-    projected.push_phase = "immediate"
-    send_to_player("ui_selected_unit_stats_snapshot", player_id, projected)
+    if type(snapshot) ~= "table" then return end
+    combat_push_coalescer.push({player_id=payload.player_id, entindex=snapshot.entindex,
+        reason=payload.reason or snapshot.reason or "hero_combat_stats_changed"})
 end
 
 local function build_building_snapshot(payload)
@@ -612,6 +586,23 @@ local function register_shop_auto_purchase_toggle_request()
         if not valid_player_id(player_id) then return end
         event_bus.request(events.SHOP_AUTO_PURCHASE_TOGGLE_REQUEST, {
             player_id = player_id, entry_id = tostring(payload.entry_id or ""),
+        })
+    end)
+end
+
+local function register_tower_auto_upgrade_toggle_request()
+    CustomGameEventManager:RegisterListener("ui_tower_auto_upgrade_toggle_request", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        local result = event_bus.request(events.TOWER_AUTO_UPGRADE_TOGGLE_REQUEST, {
+            player_id = player_id, entindex = tonumber(payload.entindex),
+        })
+        event_bus.emit(events.UI_NOTIFICATION, {
+            player_id = player_id,
+            message = result and result.ok and (result.enabled
+                and "已开启当前阶段自动升级，资源不足时等待" or "已取消自动升级")
+                or (result and result.error or "自动升级设置失败"),
+            level = result and result.ok and "info" or "error",
         })
     end)
 end
@@ -1058,6 +1049,7 @@ local function register_ability_cast_request()
             else
                 direct_result = event_bus.request(events.LUMBERJACK_FUSION_REQUEST, {
                     player_id = player_id, caster = unit, ability = ability,
+                    selected_entindexes = payload.fusion_queue_request_id and payload.selected_entindexes or nil,
                     source = "ui_ability_cast_request",
                 }) or { ok = false, error = "伐木工合体请求无响应" }
             end
@@ -1250,6 +1242,9 @@ local function register_ability_cast_request()
             ability_entindex = ability_entindex or -1,
             ability_name = ability_name,
             behavior = behavior,
+            fusion_queue_request_id = payload.fusion_queue_request_id,
+            fusion_consumed_entindexes = direct_result and direct_result.consumed_entindexes,
+            fusion_target_entindex = lumberjack_fusion_matches and direct_result and direct_result.entindex,
             error = response_error,
         })
     end)
@@ -1461,6 +1456,7 @@ end
 
 function M.init()
     building_push_coalescer.reset()
+    combat_push_coalescer.reset()
     synthesis_requests = {}
     building_snapshot_sequence = 0
     selected_unit_by_player = {}
@@ -1475,6 +1471,7 @@ function M.init()
     register_shop_purchase_request()
     register_shop_auto_purchase_toggle_request()
     register_shop_auto_research_toggle_request()
+    register_tower_auto_upgrade_toggle_request()
     production_ui.init({
         source_player_id = source_player_id,
         valid_player_id = valid_player_id,

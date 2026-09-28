@@ -407,3 +407,21 @@ __pycache__/
 
 # Local engine exception report.
 /exceptions.txt
+
+# Regression tests for current gameplay and UI changes.
+!/scripts/vscripts/tests/test_archive_challenge_timer.lua
+!/scripts/vscripts/tests/test_archive_endless_rewards.lua
+!/scripts/vscripts/tests/test_book_auto_purchase.lua
+!/scripts/vscripts/tests/test_challenge_respawn_pacing.lua
+!/scripts/vscripts/tests/test_combat_effect_visibility.lua
+!/scripts/vscripts/tests/test_game_info_growth_coalescing.lua
+!/scripts/vscripts/tests/test_ground_core_synthesis.lua
+!/scripts/vscripts/tests/test_hero_summon_runtime_availability.lua
+!/scripts/vscripts/tests/test_lumberjack_growth_ui.lua
+!/scripts/vscripts/tests/test_portrait_metadata_sync.lua
+!/scripts/vscripts/tests/test_seven_sins_visuals.lua
+!/scripts/vscripts/tests/test_ten_sin_visuals.lua
+!/scripts/vscripts/tests/test_tower_auto_upgrade.lua
+!/scripts/vscripts/tests/test_tower_upgrade_visual.lua
+!/scripts/vscripts/tests/test_tower_utility_visibility.lua
+!/scripts/vscripts/tests/test_worker_visuals.lua

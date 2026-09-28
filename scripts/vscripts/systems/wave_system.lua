@@ -496,8 +496,8 @@ local function update_population_limit()
                 local timer_player_id, timer_population = player_id, population
                 scheduler.every(1, function()
                     if player_populations[timer_player_id] ~= timer_population then return false end
-                    prune_invalid_enemies()
-                    publish("monster_limit_countdown")
+                    local removed=prune_invalid_enemies()
+                    publish(removed>0 and "invalid_enemies_removed" or "monster_limit_countdown")
                     return timer_population.overflow_active == true
                 end, OVERFLOW_TASK_ID .. ":" .. tostring(player_id))
             end
@@ -525,7 +525,7 @@ local function stop_defeated_match()
     cancel_pending_wave_resource_sessions("all_players_defeated", false)
 end
 
-publish = function(reason)
+publish = function(reason, hud_player_id)
     refresh_selection_state()
     local expired_players = update_population_limit()
     -- Mark every expired player before dispatching cleanup, which can synchronously
@@ -544,6 +544,9 @@ publish = function(reason)
     local data = {}
     for key, value in pairs(state) do data[key] = value end
     data.reason = reason
+    data.hud_player_id = #expired_players==0 and hud_player_id or nil
+    data.hud_clock_only = #expired_players==0
+        and (reason=="countdown_tick" or reason=="monster_limit_countdown")
     event_bus.emit(events.WAVE_CHANGED, data)
 end
 
@@ -835,7 +838,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         is_boss = is_assault_boss,
         boss_warning = row.boss_warning ~= false,
     })
-    publish("enemy_spawned")
+    publish("enemy_spawned", channel and channel.player_id)
 end
 
 local function spawn_callback(row, token, wave_number, normal_instance_index, session, channel)
@@ -848,6 +851,7 @@ local function start_countdown(seconds)
     if dev_mode or state.defeat_settled or state.victory_settled or game_has_ended() then return end
     state.status = "countdown"
     state.timer = seconds
+    state.countdown_deadline = current_game_time() + seconds
     local target_wave = next_wave_number_after(state.current_wave)
     local preload_lead = wave_timing_config.formal_wave_preload_lead_seconds
     local preload_reviewed = target_wave == nil or target_wave <= 1
@@ -877,7 +881,7 @@ local function start_countdown(seconds)
     scheduler.cancel("wave_countdown")
     scheduler.every(1.0, function()
         if state.defeat_settled or state.victory_settled or game_has_ended() then return false end
-        state.timer = math.max(0, state.timer - 1)
+        state.timer = math.max(0, state.countdown_deadline - current_game_time())
         if state.timer <= preload_lead and not preload_reviewed then
             preload_reviewed = true
             queue_target_wave("lead_review")
@@ -1011,7 +1015,7 @@ local function on_killed(payload)
             })
         end
     end
-    publish("enemy_killed")
+    publish("enemy_killed", meta.player_id)
     if state.alive == 0 and state.pending == 0
         and memory_cleared_wave ~= state.current_wave then
         memory_cleared_wave = state.current_wave
@@ -1069,6 +1073,7 @@ local function get_wave_state(payload)
         alive_limit = state.alive_limit,
         overflow_active = population and population.overflow_active == true or false,
         overflow_remaining = population and population.overflow_remaining or 0,
+        overflow_deadline = population and population.overflow_deadline or 0,
         overflow_grace_seconds = state.overflow_grace_seconds,
         player_defeated = population and population.player_defeated == true or false,
         defeat_reason = population and population.defeat_reason or "",

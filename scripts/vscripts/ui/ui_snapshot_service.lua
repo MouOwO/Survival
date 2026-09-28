@@ -5,6 +5,7 @@ local scheduler = require("core/scheduler")
 local M = {}
 local sequence = 0
 local dirty_teams = {}
+local dirty_players = {}
 local flush_pending = false
 local generation = 0
 
@@ -33,33 +34,27 @@ local function publish_player(player_id)
     return true
 end
 
-local function publish_team(team)
-    for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
-        if valid_player(player_id) and PlayerResource:GetTeam(player_id) == team then
-            publish_player(player_id)
-        end
-    end
-end
-
 local function flush_dirty()
-    -- Detach the batch first: events raised while building a snapshot must
-    -- survive for the next flush instead of being cleared at the end.
-    local batch = dirty_teams
-    dirty_teams = {}
+    -- Detach both sets before publishing: reentrant changes belong to the next batch.
+    local teams, players = dirty_teams, dirty_players
+    dirty_teams, dirty_players = {}, {}
     flush_pending = false
-    if batch.all then
-        for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+    for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+        if valid_player(player_id) and (teams.all or players[player_id]
+            or teams[PlayerResource:GetTeam(player_id)]) then
             publish_player(player_id)
-        end
-    else
-        for team, _ in pairs(batch) do
-            publish_team(team)
         end
     end
 end
 
 local function on_dirty(payload)
-    if payload.team then dirty_teams[payload.team] = true
+    payload = payload or {}
+    if payload.player_id ~= nil then
+        local player_id = tonumber(payload.player_id)
+        -- An invalid personal recipient must never fall back to broadcasting.
+        if not player_id or not valid_player(player_id) then return end
+        dirty_players[player_id] = true
+    elseif payload.team ~= nil then dirty_teams[payload.team] = true
     else dirty_teams.all = true end
     if flush_pending then return end
     flush_pending = true
@@ -79,7 +74,7 @@ function M.init()
     generation = generation + 1
     flush_pending = false
     sequence = 0
-    dirty_teams = {}
+    dirty_teams, dirty_players = {}, {}
     event_bus.subscribe(events.UI_DIRTY, on_dirty)
     event_bus.subscribe(events.UI_SNAPSHOT_REQUESTED, on_snapshot_requested)
     on_dirty({})

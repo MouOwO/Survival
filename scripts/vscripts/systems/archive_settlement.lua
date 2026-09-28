@@ -54,12 +54,10 @@ function M.settle(profile, command, pass)
         if not config.wave(command.difficulty, command.wave) then return { ok = false, terminal = true, error = "endless_wave_invalid" } end
         archive.endless_score = (tonumber(archive.endless_score) or 0) + config.score(command.wave)
         archive.endless_best_wave = math.max(tonumber(archive.endless_best_wave) or 0, command.wave)
-        for _, item in ipairs(require("config/generated/archive_endless_achievements").rows) do
-            if item.enabled and archive.endless_score >= item.required_score and not archive.completed[item.achievement_id] then
-                apply_effects(stats, item)
-                archive.completed[item.achievement_id] = true
-            end
-        end
+        require("systems/archive_endless_rewards").reconcile(archive, stats, apply_effects)
+    elseif command.kind == "endless_reconcile" then
+        -- Only persisted server progress is considered; this command has no progress input.
+        require("systems/archive_endless_rewards").reconcile(archive, stats, apply_effects)
     elseif command.kind == "challenge" then
         local ok, reason = challenge_rewards.apply(command, archive, stats, pass, apply_effects)
         if not ok then return { ok = false, error = reason } end

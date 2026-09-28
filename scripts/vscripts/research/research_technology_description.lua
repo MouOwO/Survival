@@ -32,7 +32,7 @@ local EFFECTS = {
     lumberjack_wood_crit_chance_pct = { label = "采集暴击率", kind = "percent" },
     lumberjack_wood_per_gather_flat = { label = "每次采集木材", kind = "flat" },
     lumberjack_wood_per_gather_advanced_flat = { label = "每次采集木材", kind = "flat" },
-    lumberjack_attack_growth_per_hit = { label = "每次有效攻击永久攻击", kind = "flat" },
+    lumberjack_attack_growth_per_hit = { label = "每次有效攻击增加自身攻击", kind = "flat" },
     lumberjack_wood_per_gather_growth_flat = { label = "每次采集木材", kind = "flat" },
     tree_armor_shred_per_hit = { label = "每次攻击大树减甲", kind = "flat", absolute = true },
     tower_attack_flat = { label = "攻击力", kind = "flat" },

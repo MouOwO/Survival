@@ -606,6 +606,7 @@ function M.init()
         end
     end)
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, function(payload)
+        if payload and payload.changed_section then return end -- Combat growth cannot change production/unlocks.
         local player_id = tonumber(payload and payload.player_id)
         local state = player_id ~= nil and state_by_player[player_id] or nil
         if state then sync(state) end

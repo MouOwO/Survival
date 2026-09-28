@@ -1,0 +1,35 @@
+{
+  "portrait_profiles": 1048,
+  "camera_and_light_fields_preserved": true,
+  "matched_backdrop": "materials/survival_ui/portrait_hud_backdrop.vmat",
+  "background_texture_verified_512": true,
+  "native_source_evidence": {
+    "RightSideHeroBlur": "Image src=panel://portraitHUD; stock 175x175 with translateY(-16px), while the custom portrait is 264x264",
+    "SilenceIcon": "UnitSilenced -> portrait_silenced_png.vtex",
+    "MutedIcon": "UnitMuted -> portrait_muted_png.vtex"
+  },
+  "regressions_passed": [
+    "test_portrait_presentation.cjs",
+    "test_combat_stats_callbacks.cjs",
+    "test_multiselect_portraits.cjs",
+    "test_seven_sins_portrait.cjs"
+  ],
+  "compilation": [
+    {
+      "name": "background",
+      "exit": 0,
+      "zero_failed": true
+    },
+    {
+      "name": "hud",
+      "exit": 0,
+      "zero_failed": true
+    },
+    {
+      "name": "legacy_hud",
+      "exit": 0,
+      "zero_failed": true
+    }
+  ],
+  "in_game_acceptance": "pending"
+}

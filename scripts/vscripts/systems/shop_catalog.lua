@@ -533,6 +533,7 @@ local function project_entry(player_id, entry, context)
             item.purchase_condition_text = item.purchase_condition_text
                 .. "；开始研究时扣费"
             item.purchasable = queue_count < capacity
+                and prerequisite_met and reincarnation_met
                 and math.max(current_level, reserved_level) < research.max_level and 1 or 0
             if queue_count >= capacity then
                 item.disabled_reason = "研究队列已满（1个研究中＋6个等待）"

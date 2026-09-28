@@ -17,7 +17,10 @@ end
 function modifier_challenge_11_staging:CheckState()
     return {
         [MODIFIER_STATE_INVULNERABLE] = true,
-        [MODIFIER_STATE_STUNNED] = true,
+        -- Idle presentation stays alive; disable combat/orders without a stun pose.
+        [MODIFIER_STATE_DISARMED] = true,
+        [MODIFIER_STATE_SILENCED] = true,
+        [MODIFIER_STATE_MUTED] = true,
         [MODIFIER_STATE_ROOTED] = true,
         [MODIFIER_STATE_COMMAND_RESTRICTED] = true,
     }

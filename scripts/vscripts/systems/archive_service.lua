@@ -17,6 +17,7 @@ local challenge_rewards = require("systems/archive_challenge_rewards")
 local challenge_rules = require("config/generated/archive_challenge_rules").by_id.default
 local M = {}
 local pending, busy, selected, throttles = {}, {}, {}, {}
+local finalizing = false
 local session_id, serial, remote_provider
 local server_clock
 local daily_viewers, purchase_provider = {}, nil
@@ -98,17 +99,8 @@ renderers.friend = function(_, archive) return require("systems/archive_social_r
 renderers.ex = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "ex") end
 renderers.beast = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "beast") end
 renderers.boss = function(profile) return (require("systems/archive_boss_rewards").project(profile)) end
-renderers.endless = function(profile, archive)
-    local rows = {}
-    for _, item in ipairs(require("config/generated/archive_endless_achievements").rows) do
-        if item.enabled then
-            rows[#rows + 1] = { id = item.achievement_id, name = item.display_name .. "（" .. item.required_score .. "分）",
-                description = item.description, icon_style = "seal", quality = "gold", rune = "∞",
-                count = archive.endless_score or 0, target = item.required_score,
-                completed = archive.completed[item.achievement_id] and 1 or 0 }
-        end
-    end
-    return rows
+renderers.endless = function(_, archive)
+    return require("systems/archive_endless_rewards").rows(archive)
 end
 renderers.fragment = challenge_rewards.fragment_rows
 renderers.pet = challenge_rewards.cage_rows
@@ -274,6 +266,7 @@ local function flush(player_id)
 end
 
 local function enqueue(player_id, command)
+    if finalizing then return {ok=false,error="正在保存本局奖励，请等待结算"} end
     local adapter = require("systems/archive_http_adapter")
     if adapter.enabled() then remote_provider = adapter end
     player_id = tonumber(player_id)
@@ -483,7 +476,16 @@ function M.cheat(context)
     return result.ok, result.error
 end
 
+function M.begin_finalization()
+    if finalizing then return end
+    local clock = require("systems/archive_online_clock")
+    for id in pairs(archive_players) do clock.flush(id) end
+    finalizing = true
+    for id in pairs(pending) do flush(id) end
+end
+
 function M.init()
+    finalizing = false
     sent_pages = {}
     pending, busy, selected, throttles = {}, {}, {}, {}
     daily_viewers = {}
@@ -499,6 +501,12 @@ function M.init()
         if id then
             archive_players[id]=true
             online_clock.observe(id, account_profile(id))
+            -- The server's saved best floor can unlock newly added milestones.
+            -- Never trust a floor/count supplied by the UI or award it on reads.
+            local profile = account_profile(id)
+            if profile and require("systems/archive_endless_rewards").needs_reconcile(profile.save.archive) then
+                enqueue(id, {id=session_id..":endless_reconcile", kind="endless_reconcile"})
+            end
             send(id)
             if daily_viewers[id] then M.send_daily(id) end
             if not busy[id] then flush(id) end
@@ -509,7 +517,7 @@ function M.init()
         if id then online_clock.disconnect(id) end
     end)
     scheduler.every(1, function()
-        if http_adapter.enabled() then return end -- Remote online credit consumes the existing DB checkpoint only.
+        if finalizing or http_adapter.enabled() then return end -- Remote online credit consumes the existing DB checkpoint only.
         -- Iterate valid slots as well as profile events, so reopening the archive is never needed to earn time.
         for id = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
             if PlayerResource and PlayerResource:IsValidPlayerID(id) then

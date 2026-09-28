@@ -14,7 +14,7 @@ class ArchiveError(ValueError):
 
 FIELDS = {
     "clear": {"difficulty_id","count","day_key"}, "boss_kill": set(),
-    "endless": {"wave","difficulty"},
+    "endless": {"wave","difficulty"}, "endless_reconcile": set(),
     "challenge": {"challenge_id","kill_sequence","difficulty_id","day_key"},
     "social_draw": {"pool_id"}, "promotion": {"fragment_id","day_key"},
     "daily_init": {"today"}, "daily_claim": {"today","target_day"},
@@ -89,6 +89,7 @@ class ArchiveService:
         match=c["id"].split(":",1)[0]
         if kind=="clear": c["id"]=match+":clear"
         if kind=="endless": c["id"]=match+":endless:"+str(c["wave"])
+        if kind=="endless_reconcile": c["id"]=match+":endless_reconcile"
         if kind=="challenge": c["id"]=match+":challenge_kind:"+c["challenge_id"]
         return c
 

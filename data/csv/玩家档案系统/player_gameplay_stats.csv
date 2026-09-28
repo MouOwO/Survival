@@ -39,7 +39,7 @@ wall_initial_health,integer,1000,health,0,,1,城墙初始生命值。
 wall_armor,decimal,0,armor,0,,1,城墙初始护甲值。
 wall_health_bonus_pct,percentage,0,percent,0,10000,1,城墙生命值加成百分比；20表示20%；直接等价于初级城墙强化科技。
 wall_health_per_second,decimal,0,health_per_second,0,,1,城墙每秒生命值增加量。
-lumberjack_attack_growth,decimal,1,attack_per_growth,0,,1,伐木工每次攻击后的攻击力成长量。
+lumberjack_attack_growth,decimal,0,attack_per_growth,0,,1,默认无固定攻击成长；实际获得的每次攻击成长仅增加攻击者自身攻击力。
 lumberjack_attack_speed_bonus_pct,percentage,0,percent,0,10000,1,伐木工攻速加成百分比；20表示20%。
 online_seconds_total,integer,0,seconds,0,,1,玩家永久累计在线时长；只累计同一session租约内的有效相邻心跳秒数，不计算掉线间隔。
 hero_initial_attributes,decimal,0,attributes,0,,1,英雄初始全属性；力量、敏捷、智力同步增加，英雄无升级时也作为基础属性使用。

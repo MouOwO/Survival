@@ -33,7 +33,7 @@ local function follow_hero_camera(hero, player_id, position)
     )
 end
 
-function M.return_unit(hero, player_id)
+function M.return_unit(hero, player_id, options)
     player_id = tonumber(player_id)
     if not player_id or player_id < 0 or player_id ~= math.floor(player_id) then
         return { ok = false, error = "player_id_invalid" }
@@ -85,7 +85,9 @@ function M.return_unit(hero, player_id)
         position = position,
     })
     follow_hero_camera(hero, player_id, position)
-    notify(player_id, "已返回自己的主基地旁")
+    if not (options and options.silent) then
+        notify(player_id, "已返回自己的主基地旁")
+    end
     return { ok = true, position = position }
 end
 

@@ -1,3 +1,4 @@
+local ParticleManager = require("systems/combat_effect_visibility").manager()
 local catalog = require("config/asset_catalog")
 local preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
@@ -135,6 +136,12 @@ local function reset_main_animation(unit, asset)
     if asset and NATIVE_TOWER_MODELS[tostring(asset.primary_model or "")] then
         sequence = ""
     end
+    -- Hero bodies select their own ACT_DOTA_IDLE/attack/run sequences. Arcana
+    -- models use names such as wk_sk_idle and qop_arc_idle, not literal "idle".
+    local model = tostring(asset and asset.primary_model or "")
+    local hero_body = model:find("models/heroes/", 1, true) == 1
+        or tostring(asset and asset.portrait_unit_name or ""):find("npc_dota_hero_", 1, true) == 1
+    if sequence == "idle" and hero_body then sequence = "" end
     if sequence ~= "" then safe_call(unit, "ResetSequence", sequence) end
     safe_call(unit, "SetPlaybackRate", 1)
 end

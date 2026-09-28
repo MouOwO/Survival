@@ -1,0 +1,13 @@
+# Worker presentation, 2026-09-28
+
+Repairers use Clockwerk (0.7 scale) and Tinker (0.65 scale), with Valve default bone-merged components. Components are precached and cleaned up when workers are removed. Training icons retain their existing keys, but use official hero portraits cropped to 128x128 exactly like altar portraits.
+
+Training CSV is the authoritative model/scale/component source. Lumberjack scales normalize compiled mesh heights to the level-1 Radiant melee model (136.794 units). Fusion uses the configured base scale multiplied by 1.5 once. The measured scale report is output/worker_visual_sizes_0928.json.
+
+Compact worker HUD hides the single-unit portrait, inventory, health/mana, armor and attributes. The final revision restores the native multiselection thumbnail grid for lumberjacks, reserving a separate 320-unit-wide portrait column; repairers remain compact. Repairers show only self-destruct. Lumberjacks show attack/speed and fusion; fused personality effects continue running but their icons are hidden. Worker names remain above the frame, and the selected fusion queue leader retains attack/speed while multiselected. The existing queue logic is preserved.
+
+Validation passed: test_building_hud.cjs, test_unit_stat_visibility.cjs, test_worker_ability_visibility.cjs, test_combat_stats_callbacks.cjs, test_combat_selection_recovery.cjs, test_lumberjack_fusion_queue.cjs; Lua 5.1 test_worker_visuals.lua, test_worker_system_training.lua, test_worker_training_queue.lua, test_lumberjack_fusion.lua, test_lumberjack_fusion_ui.lua. Resource compiler: 252 icon dependencies and 13 HUD dependencies, zero failures. Content mirror and no-BOM checks passed.
+
+Live session readback still reported previous model scales/configuration, and the new HUD inspect command did not appear after hud_reloadscheme. No match restart or unit selection was forced. Full behavior requires a fresh game; in-game visual acceptance of these changes remains pending.
+
+Final cadence correction: the user clarified the ordinary no-bonus baseline is a 1.5-second interval at 100% attack speed, or 2/3 attacks per second. All eight training rows, generated configuration, fallback and unit KV now agree. The earlier one-second baseline was a misunderstanding and is superseded. Fusion retains its existing 0.5-second interval reduction, resulting in 1 attack/second without other bonuses. Actual research, permanent rewards, personality and cheer bonuses remain active. Fusion alone does not explain 1.6 attacks/second. See COMBAT_PERFORMANCE_REVIEW_20260928.md for verification and remaining live-match checks.

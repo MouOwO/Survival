@@ -286,9 +286,12 @@ clock = 2
 spawn_lane(1, 11)
 assert(snapshot(1).overflow_active and snapshot(1).overflow_remaining == 10)
 tick(3.2, 0)
+assert(last_projection.hud_clock_only==true,"clock ticks do not request HUD rebuilds")
+assert(snapshot(0).overflow_deadline==10 and snapshot(1).overflow_deadline==12,"absolute personal deadlines are exposed")
 assert(snapshot(0).overflow_remaining == 7 and snapshot(1).overflow_remaining == 9,
     "a later owner's timer must not inherit the first owner's deadline")
 kill(lanes[2][1])
+assert(last_projection.hud_player_id==2,"enemy count change targets its lane owner")
 assert(snapshot(2).alive == 79 and snapshot(0).overflow_active and snapshot(1).overflow_active,
     "another player's death must not cancel a player's overflow")
 local unrelated = unit("practice_or_archive_monster")

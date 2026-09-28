@@ -166,3 +166,12 @@ selected[0]=999 -- ordinary hero/tree selections must never receive building-sta
 bus.emit(events.RESOURCE_CHANGED,{player_id=0})
 assert(#pushes==3)
 print("PRODUCTION_UI_ROUTER_PASS: trusted sender, ownership, startup/defeat, one paid unit per click, private source snapshots and targeted refresh")
+local before_fusion = #sent
+bus.emit(events.WORKER_CHANGED, { player_id = 1, super_lumberjack = true,
+    entindex = 300, removed_entindexes = {301, 302} })
+assert(#sent == before_fusion + 1)
+local notice = sent[#sent]
+assert(notice.player == handles[1] and notice.name == "survival_lumberjack_fused")
+assert(notice.payload.target_entindex == 300)
+assert(table.concat(notice.payload.consumed_entindexes, ",") == "300,301,302")
+print("FUSION_PRIVATE_SELECTION_EVENT_PASS")

@@ -12,6 +12,7 @@ local research_cost_service = require("research/research_cost_service")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local building_count_limits = require("systems/building_count_limit_service")
+local lumberjack_fusions = require("config/generated/lumberjack_fusion_definitions")
 local M = {}
 local builder_slot_order_by_ability = {}
 local tooltip_definitions = require("config/generated/tooltip_definitions")
@@ -405,8 +406,9 @@ local function research_upgrade(ability_name, state, resources)
         status_code = "research_queue_full"
         status = "研究队列已满（1个研究中＋6个等待）"
     elseif not prerequisite_met then
-        status_code = "queue_waiting_prerequisite"
-        status = "可加入队列，轮到时等待前置条件；开始研究时扣费"
+        available = false
+        status_code = "prerequisite_not_met"
+        status = "前置科技或转职要求未满足，不能加入研究队列"
     elseif queue_count > 0 then
         status_code = "queue_available"
         status = "可加入研究队列；开始研究时扣费"
@@ -501,20 +503,21 @@ local function upgrade_level(definition, current_level, resources, state, displa
     ), state)
 end
 local function tower_upgrade(ability_name, state, resources)
+    local current_row = tower_routes.current(state)
+    local display_level = current_row and current_row.level or state.level
     local mode = ability_name == "ability_upgrade_tower_max" and "max" or "one"
     if not state.tower_class and state.level >= 5 then
-        return { available = 0, can_afford = 0, current_level = state.level, status_text = "请先选择一个转职方向" }
+        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level, status_text = "请先选择一个转职方向" }
     end
     local target = mode == "max" and tower_routes.stage_end_level(state) or state.level + 1
     local row = tower_routes.row_at_level(state, target)
-    local current_row = tower_routes.current(state)
     if mode == "max" and current_row and current_row.rarity
         and current_row.rarity ~= "" and current_row.rarity ~= "N" then
-        return { available = 0, can_afford = 0, current_level = state.level, status_text = "当前稀有度不可升满" }
+        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level, status_text = "当前稀有度不可升满" }
     end
     local cost = tower_routes.cost_to(state, target)
     if target <= state.level or not row or not cost then
-        return { available = 0, can_afford = 0, current_level = state.level, status_text = "已达最高等级" }
+        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level, status_text = "已达最高等级" }
     end
     local tower_name = tower_routes.display_name(row)
     local attack_delta = (row.base_attack_damage or 0)
@@ -525,16 +528,17 @@ local function tower_upgrade(ability_name, state, resources)
         .. tostring(tower_name) .. "。升级后攻击力 +"
         .. tostring(attack_delta) .. "。"
     local result = merge({
-        available = 1, current_level = state.level, next_level = target,
+        available = 1, current_level = state.level, display_current_level = display_level, next_level = target,
         status_text = (mode == "max" and "升满至" or "升级至")
             .. tower_name,
         tower_name = tower_name, skill_ids = row.skill_ids,
         upgrade_description = description,
         target_level = target,
+        display_target_level = row.level or target,
         upgrade_attack_delta = attack_delta,
         population = cost.population or 0,
         fields = {
-            { label = "目标等级", value = target },
+            { label = "目标等级", value = row.level or target },
             { label = "升级目标", value = tower_name },
             { label = "攻击提升", value = "+" .. tostring(attack_delta) },
             { label = "攻击速度", value = value_delta(
@@ -749,6 +753,45 @@ local function altar_travel(ability_name, state, resources)
     }
 end
 function M.build(ability_name, state, resources)
+    if string.match(ability_name or "", "^ability_summon_") then
+        local projection = require("systems/hero_summon_projection")
+        local hero_id = projection.hero_id_for_summon_ability(ability_name)
+        if hero_id then
+            local player_id = state and state.player_id
+            local response = event_bus.request(events.HERO_SUMMON_SNAPSHOT_REQUEST, { player_id = player_id })
+            local snapshot = response and response.snapshot
+            local option
+            for _, candidate in pairs(snapshot and snapshot.heroes or {}) do
+                if candidate.hero_id == hero_id then option = candidate; break end
+            end
+            local allowed = snapshot and snapshot.altar_built == 1
+                and snapshot.hero_summoned ~= 1 and option and option.available == 1
+            local status = not snapshot and "英雄权限同步中"
+                or (snapshot.hero_summoned == 1 and "已经召唤过英雄")
+                or (snapshot.altar_built ~= 1 and "英雄祭坛不可用")
+                or (option and option.vip_required == 1 and option.available ~= 1 and "需购买激活")
+                or (allowed and "可以召唤" or "当前不可召唤")
+            return { available = allowed and 1 or 0, can_afford = 1,
+                hero_summon = 1, summon_player_id = player_id,
+                status_text = status }
+        end
+    end
+    if string.match(ability_name or "", "^ability_fuse_lumberjack_%d+$") then
+        for _, row in ipairs(lumberjack_fusions.rows or {}) do
+            if row.enabled ~= false and row.ability_id == ability_name then
+                local status = event_bus.request(events.LUMBERJACK_FUSION_STATUS_REQUEST, {
+                    player_id=state and state.player_id, ability_name=ability_name,
+                }) or {available=0, status_text="合体状态同步中"}
+                status.fusion_level, status.fusion_required_count = row.level, row.required_count
+                status.cost_wood, status.cost_gold = row.wood_cost, row.gold_cost
+                status.fields = {
+                    {label="合体材料",value=tostring(status.fusion_count or 0).."/"..row.required_count.." 个普通LV"..row.level.."伐木工"},
+                    {label="主城等级",value=tostring(status.fusion_city_level or 0).."/"..row.required_city_level},
+                }
+                return with_affordability(status,{wood=row.wood_cost,gold=row.gold_cost},0,resources)
+            end
+        end
+    end
     local build = build_ability(ability_name, state, resources)
     if build then
         return build
@@ -825,7 +868,17 @@ function M.build(ability_name, state, resources)
     if ability_name == "ability_upgrade_tower"
         or ability_name == "ability_upgrade_tower_lv01"
         or ability_name == "ability_upgrade_tower_max" then
-        return tower_upgrade(ability_name, state, resources)
+        local result = tower_upgrade(ability_name, state, resources)
+        if ability_name ~= "ability_upgrade_tower_max" then
+            local row = tower_routes.current(state)
+            local next_row = tower_routes.row_at_level(state, state.level + 1)
+            result.tower_auto_upgrade = 1
+            result.auto_upgrade_enabled = state.unit
+                and state.unit.survival_tower_auto_upgrade and 1 or 0
+            result.auto_upgrade_available = state.tower_class and row and next_row and 1 or 0
+            result.auto_upgrade_visible = state.tower_class and 1 or 0
+        end
+        return result
     end
     if ability_name == "ability_upgrade_gold_mine" then
         return mine_level_upgrade(state, resources)

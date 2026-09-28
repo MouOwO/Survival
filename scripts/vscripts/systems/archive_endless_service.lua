@@ -52,6 +52,8 @@ function M.cancel(id, reason)
     if M.is_running(id) then stop(runs[id], reason or "主动结束") end
 end
 local function spawn_wave(run, number)
+    local phase = bus.request("archive.challenge_state", {})
+    if phase and phase.expired == 1 then stop(run, "挑战阶段时间已到"); return false, "挑战阶段时间已到" end
     local row = config.wave(run.difficulty, number)
     if not row then stop(run, "已完成全部配置波次"); return true end
     run.wave, run.row, run.remaining, run.units = number, row, 0, {}
@@ -102,6 +104,8 @@ local function killed(payload)
     if not meta or (unit and unit ~= meta.unit) then return end
     local run = meta.run
     if run.status ~= "running" or run.spawning then return end
+    local phase = bus.request("archive.challenge_state", {})
+    if phase and phase.expired == 1 then stop(run, "挑战阶段时间已到"); return end
     if now() >= run.deadline then stop(run, "本波60秒超时"); return end
     enemies[id], run.units[id] = nil, nil
     run.remaining = run.remaining - 1

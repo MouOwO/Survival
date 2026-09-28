@@ -18,6 +18,7 @@ local hero_runtime_trace_by_unit = {}
 local hero_skill_by_ability = {}
 local builder_slot_order_by_ability = {}
 local pending_resource_refresh = {}
+local pending_fusion_refresh = {}
 
 for _, row in ipairs(builder_ability_stages.rows or {}) do
     if row.enabled ~= false and row.ability_name then
@@ -39,6 +40,8 @@ end
 
 local function ensure_tower_upgrade_active(ability, runtime)
     if runtime.available ~= 1 then
+        if ability:IsActivated() then ability:SetActivated(false) end
+        runtime.engine_activated = 0
         return
     end
     if ability:GetLevel() < 1 then
@@ -52,7 +55,7 @@ local function ensure_tower_upgrade_active(ability, runtime)
 end
 
 local function sync_research_ability_active(ability, runtime)
-    if runtime.research_upgrade ~= 1 then return end
+    if runtime.research_upgrade ~= 1 and runtime.hero_summon ~= 1 then return end
     if ability:GetLevel() < 1 then ability:SetLevel(1) end
     local active = runtime.available == 1
     if ability:IsActivated() ~= active then ability:SetActivated(active) end
@@ -485,8 +488,23 @@ local function on_resources(payload)
     end, "ability_resource_refresh_" .. key)
 end
 
+local function queue_fusion_refresh(payload)
+    local player = tonumber(payload and payload.player_id)
+    if player == nil or pending_fusion_refresh[player] then return end
+    local token = {}
+    pending_fusion_refresh[player] = token
+    scheduler.after(0.1,function()
+        if pending_fusion_refresh[player] ~= token then return end
+        pending_fusion_refresh[player] = nil
+        for _, state in pairs(state_by_unit) do
+            if tonumber(state.player_id)==player and state.building_id=="lumberjack" then publish(state) end
+        end
+    end,"ability_fusion_refresh_"..tostring(player))
+end
+
 local function on_worker_changed(payload)
     if not payload then return end
+    queue_fusion_refresh(payload)
     for _, entindex in ipairs(payload.removed_entindexes or {}) do
         clear_unit({ entindex = tonumber(entindex) })
     end
@@ -526,9 +544,8 @@ local function on_hero_summon_state(payload)
     if player_id == nil or player_id < 0 then
         return
     end
-    local team = PlayerResource:GetTeam(player_id)
     for _, state in pairs(state_by_unit) do
-        if state.team == team then
+        if tonumber(state.player_id) == player_id then
             state.hero_summoned =
                 tonumber(payload.hero_summoned) or 0
             publish(state)
@@ -587,6 +604,14 @@ local function on_builder_ready(payload)
 end
 
 function M.init()
+    for player in pairs(pending_fusion_refresh) do scheduler.cancel("ability_fusion_refresh_"..tostring(player)) end
+    pending_fusion_refresh = {}
+    local function city_changed(payload)
+        if payload.building_id=="main_city" then queue_fusion_refresh(payload) end
+    end
+    event_bus.subscribe(events.BUILDING_CHANGED, city_changed)
+    event_bus.subscribe(events.BUILDING_CREATED, city_changed)
+    event_bus.subscribe(events.BUILDING_DESTROYED, city_changed)
     for key in pairs(pending_resource_refresh) do
         scheduler.cancel("ability_resource_refresh_" .. key)
     end

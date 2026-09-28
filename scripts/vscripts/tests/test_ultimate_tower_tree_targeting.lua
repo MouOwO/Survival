@@ -121,7 +121,7 @@ assert(tower.target == nil, "manual selection cannot target the tree")
 package.loaded["systems/repair_order_service"] = {process = function() return false end}
 package.loaded["systems/lumberjack_order_service"] = {process = function() end}
 package.loaded["systems/destination_validation_service"] = {is_constrained_hero = function() return false end}
-package.loaded["systems/player_context_service"] = {owner_player_id = function() return 0 end}
+package.loaded["systems/player_context_service"] = {owner_player_id = function() return 0 end,is_defeated=function()return false end}
 package.loaded["systems/startup_loading_service"] = {is_ready = function() return true end,
     is_player_ready = function(id) return id == 0 end}
 local filter = require("systems/tree_attack_order_filter")._filter_for_test
@@ -131,6 +131,14 @@ assert(filter(nil, keys) == false, "real order filter denies ultimate tower orde
 keys.entindex_target = enemy:entindex()
 assert(filter(nil, keys) == true and tower.target == enemy, "normal enemy orders still acquire the target")
 
+local grown=created
+local before=fusion._test.player_ultimates(0)[1].base_attack
+for i=1,100 do
+ grown.survival_tower_personal_attack_growth=i*2
+ bus.emit("tower.personal_attack_changed",{tower=grown,player_id=0})
+ assert(grown.survival_attack_min==before+i*2)
+end
+print("ULTIMATE_PERSONAL_GROWTH_PASS: 100 hits, no repeated inheritance")
 fail_modifier = true; initialize()
 result = bus.request(events.TOWER_FUSION_REQUEST, {caster = material[1].unit})
 assert(result and not result.ok and created.removed and consumed == 0,

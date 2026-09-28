@@ -225,11 +225,13 @@ assert(profiles[5].save.archive.endless_score == 1, "wave score dedup")
 for wave = 2, 60 do assert(archive.record_endless_wave(5, wave, 10).ok) end
 assert(profiles[5].save.archive.endless_score == 1110)
 assert(profiles[5].save.archive.completed.endless_1)
-assert(profiles[5].save.gameplay_stats.lumberjack_efficiency == stats.by_id.lumberjack_efficiency.default_value + 1)
+assert(profiles[5].save.gameplay_stats.lumberjack_efficiency == stats.by_id.lumberjack_efficiency.default_value + 2)
 assert(not archive.record_endless_wave(5, 1001, 10).ok)
 local endless_rows = archive.snapshot(5, "endless").rows
-assert(#endless_rows == 50 and endless_rows[1].completed == 1 and endless_rows[2].completed == 0)
+assert(#endless_rows == 82 and endless_rows[1].completed == 1 and endless_rows[2].completed == 0)
 assert(endless_rows[1].count == 1110)
+assert(endless_rows[51].count == 60 and endless_rows[51].target == 11 and endless_rows[51].completed == 1)
+assert(endless_rows[56].target == 61 and endless_rows[56].completed == 0)
 for _, row in ipairs(require("config/generated/archive_endless_achievements").rows) do
     for _, field in ipairs(row.effect_ids) do assert(stats.by_id[field], field) end
 end
@@ -342,3 +344,21 @@ timestamp=25000*86400+16*3600-1
 assert(calendar.day()==25000)
 timestamp=timestamp+1
 assert(calendar.day()==25001,"UTC+8 midnight")
+
+local closing_commands,closing_done={},nil
+archive.set_provider({submit=function(id,command,done)
+ closing_commands[#closing_commands+1]=command;closing_done=done
+end})
+assert(cheat(0,"n2",1))
+archive.begin_finalization()
+assert(archive.has_pending(0),"finalization keeps in-flight reward")
+closing_done({ok=false,error="temporary_network_failure"})
+assert(archive.has_pending(0),"failed write remains queued")
+tasks.archive_retry()
+assert(#closing_commands==2 and closing_commands[1].id==closing_commands[2].id)
+closing_done({ok=true})
+assert(not archive.has_pending(0),"only confirmed completion drains queue")
+local before=#closing_commands
+local allowed=cheat(0,"n2",1)
+assert(not allowed and #closing_commands==before,"no new reward mutations during finalization")
+print("ARCHIVE_FINALIZATION_RETRY_PASS: pending preserved, retry same id, no new rewards, confirmed completion")

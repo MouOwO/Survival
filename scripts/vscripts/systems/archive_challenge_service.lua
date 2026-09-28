@@ -10,8 +10,22 @@ local scheduler = require("core/scheduler")
 local M = {}
 local players, hubs, bosses = {}, {}, {}
 local sequence, active = 0, false
+local deadline, ended, expired = nil, false, false
+local TIMER_ID = "archive_challenge_phase_timer"
+local SAVE_TIMER_ID = "archive_challenge_save_barrier"
+local settling, winner_sent = false, false
 local function valid(unit) return unit and not unit:IsNull() end
 local function now() return GameRules:GetGameTime() end
+function M.phase_snapshot()
+    return {active = active and 1 or 0, ended = ended and 1 or 0,
+        saving = settling and 1 or 0,
+        expired = (expired or (active and deadline and now() >= deadline)) and 1 or 0,
+        deadline = deadline or 0,
+        remaining_seconds = active and deadline and math.max(0, math.ceil(deadline - now())) or 0}
+end
+local function publish_phase()
+    bus.emit("archive.challenge_timer_changed", M.phase_snapshot())
+end
 local function notify(id, message)
     bus.emit(events.UI_NOTIFICATION, { player_id = id, message = message, level = "error" })
 end
@@ -82,6 +96,44 @@ local function cleanup(state)
     end
     state.hubs = {}
 end
+local function finish_when_saved()
+    for id in pairs(players) do
+        if archive.has_pending(id) then return true end
+    end
+    if not winner_sent then
+        winner_sent, settling = true, false
+        publish_phase()
+        GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
+    end
+    return false
+end
+local function end_phase(timed_out)
+    if ended then return end
+    active, ended, expired = false, true, timed_out == true
+    scheduler.cancel(TIMER_ID)
+    -- Mark everyone finished before removing monsters; late death events cannot award rewards.
+    for _, state in pairs(players) do state.finished = true end
+    for _, state in pairs(players) do
+        local ok, reason = pcall(cleanup, state)
+        if not ok then print("[ArchiveChallenge] final cleanup failed: " .. tostring(reason)) end
+    end
+    settling = true
+    if archive.begin_finalization then archive.begin_finalization() end
+    publish_phase()
+    if finish_when_saved() then
+        for id in pairs(players) do
+            bus.emit(events.UI_NOTIFICATION, {player_id=id, level="info",
+                message="挑战已结束，正在保存奖励。保存成功后自动结算，请勿退出。"})
+        end
+        -- Never abandon an earned reward because of a timer. The archive queue
+        -- keeps its original idempotency keys and retries failed/slow writes.
+        scheduler.every(0.25, finish_when_saved, SAVE_TIMER_ID)
+    end
+end
+local function expire_if_due()
+    if active and deadline and now() >= deadline then end_phase(true); return true end
+    return expired
+end
 local function ensure_hub_abilities(unit, index)
     for _, definition in ipairs(definitions.rows) do
         if definition.enabled and definition.building_id == index then
@@ -119,6 +171,9 @@ local function hub_position(player_id, index)
     return Vector(origin.x + (index - 2) * rule.building_spacing,
         origin.y + rule.building_offset_y, origin.z)
 end
+local function hub_model(index)
+    return rule["building_model_" .. tostring(index)] or rule.building_model
+end
 local function create_hubs(state)
     if state.finished then return end
     for index = 1, 3 do
@@ -131,10 +186,11 @@ local function create_hubs(state)
             unit.survival_display_name = "存档挑战" .. index
             unit:SetControllableByPlayer(state.player_id, true)
             context.register_unit(state.player_id, unit, "archive_challenge")
-            unit:SetModel(rule.building_model)
-            unit:SetOriginalModel(rule.building_model)
+            unit:SetModel(hub_model(index))
+            unit:SetOriginalModel(hub_model(index))
             unit:SetModelScale(rule.building_model_scale)
             unit:AddNewModifier(unit, nil, "modifier_invulnerable", {})
+            unit:AddNewModifier(unit, nil, "modifier_building_no_health_bar", {})
             state.hubs[index] = unit
             hubs[unit:entindex()] = { state = state, unit = unit, index = index }
         end
@@ -157,6 +213,7 @@ local function ensure_hubs(state)
     return false
 end
 function M.begin(payload)
+    if ended then return {ok = true, keep_running = false} end
     local difficulty = tonumber(tostring(payload.difficulty_id):match("[Nn](%d+)")) or 0
     if difficulty < rule.building_unlock_difficulty then return { ok = true, keep_running = false } end
     if active then
@@ -165,17 +222,23 @@ function M.begin(payload)
     end
     if not payload.player_ids or #payload.player_ids == 0 then return { ok = false } end
     active = true
+    deadline = now() + (tonumber(rule.phase_duration_seconds) or 1800)
+    scheduler.after(math.max(0, deadline-now()), function()
+        if active then expire_if_due() end
+    end, TIMER_ID)
+    publish_phase()
     for _, id in ipairs(payload.player_ids) do
         local state = { player_id = id, difficulty_id = payload.difficulty_id,
             difficulty = difficulty, hubs = {}, cooldowns = {}, used = {}, finished = false }
         players[id] = state
         ensure_hubs(state)
         bus.emit(events.UI_NOTIFICATION, { player_id = id, level = "info",
-            message = "通关成功！已开放存档挑战，完成后可在存档挑战3结束本局。" })
+            message = "通关成功！存档挑战限时30分钟，到时自动结束；也可在存档挑战3提前结束。" })
     end
     return { ok = true, keep_running = true }
 end
 function M.summon(caster, challenge_id, ability)
+    if expire_if_due() then return false, "挑战阶段时间已到" end
     local hub = valid(caster) and hubs[caster:entindex()]
     local definition = definitions.by_id[challenge_id]
     if not active or not hub or hub.unit ~= caster or not valid(ability)
@@ -213,10 +276,11 @@ function M.summon(caster, challenge_id, ability)
     return true
 end
 local function killed(payload)
+    if not active or expire_if_due() then return end
     local unit = payload and payload.victim
     local id = tonumber(payload and payload.victim_entindex) or (valid(unit) and unit:entindex())
     local meta = id and bosses[id]
-    if not meta or (unit and meta.unit ~= unit) then return end
+    if not meta or meta.state.finished or (unit and meta.unit ~= unit) then return end
     bosses[id] = nil
     meta.state.active_boss = nil
     require("systems/monster_hero_visual_service").on_death(meta.unit)
@@ -225,10 +289,10 @@ local function killed(payload)
 end
 local function finish_if_all()
     for _, state in pairs(players) do if not state.finished then return end end
-    active = false
-    GameRules:SetGameWinner(DOTA_TEAM_GOODGUYS)
+    end_phase(false)
 end
 function M.finish(caster)
+    if expire_if_due() then return false, "挑战阶段时间已到" end
     local hub = valid(caster) and hubs[caster:entindex()]
     if not active or not hub or hub.index ~= 3 then return false, "结束入口无效" end
     local state = hub.state
@@ -239,6 +303,7 @@ function M.finish(caster)
     return true
 end
 function M.start_endless(caster, ability)
+    if expire_if_due() then return false, "挑战阶段时间已到" end
     local hub = valid(caster) and hubs[caster:entindex()]
     if not active or not hub or hub.unit ~= caster or hub.index ~= 2 or not valid(ability)
         or ability:GetCaster() ~= caster or ability:GetAbilityName() ~= "ability_archive_endless" then return false, "无尽入口无效" end
@@ -268,7 +333,7 @@ function M.precache(precache_context)
     local function add(path)
         if not seen[path] then PrecacheResource("model", path, precache_context); seen[path] = true end
     end
-    add(rule.building_model)
+    for index = 1, 3 do add(hub_model(index)) end
     add(require("systems/archive_endless_config").rules.model_path)
     local catalog = require("config/asset_catalog")
     for _, row in ipairs(definitions.rows) do
@@ -291,6 +356,11 @@ end
 function M.init()
     players, hubs, bosses = {}, {}, {}
     sequence, active = 0, false
+    deadline, ended, expired = nil, false, false
+    settling, winner_sent = false, false
+    scheduler.cancel(SAVE_TIMER_ID)
+    scheduler.cancel(TIMER_ID)
+    bus.handle_request("archive.challenge_state", M.phase_snapshot)
     require("systems/archive_endless_service").init(function(id)
         if players[id] then publish(players[id]) end
     end)

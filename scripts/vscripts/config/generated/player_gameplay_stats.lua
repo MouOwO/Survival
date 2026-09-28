@@ -40,7 +40,7 @@ M.rows = {
     { field_id = "wall_armor", storage_type = "decimal", default_value = 0, unit = "armor", min_value = 0, enabled = true, notes = "城墙初始护甲值。" },
     { field_id = "wall_health_bonus_pct", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 10000, enabled = true, notes = "城墙生命值加成百分比；20表示20%；直接等价于初级城墙强化科技。" },
     { field_id = "wall_health_per_second", storage_type = "decimal", default_value = 0, unit = "health_per_second", min_value = 0, enabled = true, notes = "城墙每秒生命值增加量。" },
-    { field_id = "lumberjack_attack_growth", storage_type = "decimal", default_value = 1, unit = "attack_per_growth", min_value = 0, enabled = true, notes = "伐木工每次攻击后的攻击力成长量。" },
+    { field_id = "lumberjack_attack_growth", storage_type = "decimal", default_value = 0, unit = "attack_per_growth", min_value = 0, enabled = true, notes = "默认无固定攻击成长；实际获得的每次攻击成长仅增加攻击者自身攻击力。" },
     { field_id = "lumberjack_attack_speed_bonus_pct", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 10000, enabled = true, notes = "伐木工攻速加成百分比；20表示20%。" },
     { field_id = "online_seconds_total", storage_type = "integer", default_value = 0, unit = "seconds", min_value = 0, enabled = true, notes = "玩家永久累计在线时长；只累计同一session租约内的有效相邻心跳秒数，不计算掉线间隔。" },
     { field_id = "hero_initial_attributes", storage_type = "decimal", default_value = 0, unit = "attributes", min_value = 0, enabled = true, notes = "英雄初始全属性；力量、敏捷、智力同步增加，英雄无升级时也作为基础属性使用。" },

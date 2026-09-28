@@ -414,6 +414,7 @@ local function on_npc_spawned(keys)
     local unit = keys.entindex
         and EntIndexToHScript(keys.entindex) or nil
     if unit and not unit:IsNull() and multiplayer_player_service.reject_defeated_unit(unit) then return end
+    hero_summon_system.on_npc_spawned(unit)
     if not unit or unit:IsNull()
         or unit:GetUnitName() ~= SURVIVAL_FORCE_HERO then
         return
@@ -571,6 +572,7 @@ local function on_item_picked_up(keys)
 end
 
 function M.precache(context)
+    PrecacheResource("particle", "particles/generic_hero_status/hero_levelup.vpcf", context)
     -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
     tower_magic_supreme_system.precache(context)
     sound_service.precache(context)
@@ -669,6 +671,9 @@ function M.precache(context)
     local training_definitions = require("config/generated/training_definitions")
     local precached_worker_models = {}
     for _, row in ipairs(training_definitions.rows or {}) do
+        for _, component in ipairs(row.model_components or {}) do
+            PrecacheResource("model", component, context)
+        end
         local model_name = tostring(row.model_name or "")
         if model_name ~= "" and not precached_worker_models[model_name] then
             PrecacheResource("model", model_name, context)
@@ -893,6 +898,7 @@ local function initialize_core_services()
     ability_runtime_service.init()
     ui_snapshot_service.init()
     ui_request_router.init()
+    require("systems/combat_effect_visibility").init()
     hero_summon_ui_service.init()
     hero_skill_ui_service.init()
     monster_encounter_ui_service.init()

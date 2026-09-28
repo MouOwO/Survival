@@ -1,3 +1,4 @@
+local ParticleManager = require("systems/combat_effect_visibility").manager()
 LinkLuaModifier("modifier_tower_attack_effects", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_explosive_gatling_buff", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_frost_slow", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)

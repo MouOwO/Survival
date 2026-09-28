@@ -3,8 +3,8 @@
     "npc_archive_challenge_1"
     {
         "BaseClass" "npc_dota_creature"
-        "Model" "models/props_structures/radiant_ancient001.vmdl"
-        "ModelScale" "0.3"
+        "Model" "models/survival_buildings/archive_challenge_01.vmdl"
+        "ModelScale" "1"
         "Level" "1"
         "ConsideredHero" "0"
         "HasInventory" "0"
@@ -22,8 +22,8 @@
     "npc_archive_challenge_2"
     {
         "BaseClass" "npc_dota_creature"
-        "Model" "models/props_structures/radiant_ancient001.vmdl"
-        "ModelScale" "0.3"
+        "Model" "models/survival_buildings/archive_challenge_02.vmdl"
+        "ModelScale" "1"
         "Level" "1"
         "ConsideredHero" "0"
         "HasInventory" "0"
@@ -41,8 +41,8 @@
     "npc_archive_challenge_3"
     {
         "BaseClass" "npc_dota_creature"
-        "Model" "models/props_structures/radiant_ancient001.vmdl"
-        "ModelScale" "0.3"
+        "Model" "models/survival_buildings/archive_challenge_03.vmdl"
+        "ModelScale" "1"
         "Level" "1"
         "ConsideredHero" "0"
         "HasInventory" "0"

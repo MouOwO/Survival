@@ -40,7 +40,7 @@ function $(id) { return nodes[id.slice(1)]; }
 $.GetContextPanel = () => ctx; $.CreatePanel = (type, parent, id) => panel(id, parent, type);
 $.DispatchEvent = (...args) => dispatched.push(args); $.Schedule = (delay, fn) => scheduled.push(fn);
 vm.runInNewContext(fs.readFileSync(sourcePath, 'utf8'), env);
-const hud = cfg.SurvivalProductionHUD, g = {x: 350, y: 700, scale: .5, heroWidth: 453, centerWidth: 498};
+const hud = cfg.SurvivalProductionHUD, g = {x: 350, y: 700, scale: .5, height:330, minimapSize:220, heroWidth: 453, centerWidth: 498};
 const freshOptions = () => options.map(v => ({...v, count: 0, queued_count: 0}));
 function snapshot(training, extra = {}) { callbacks.ui_selected_unit_stats_snapshot({success: 1, player_id: 0, entindex: unit, training, ...extra}); }
 function refresh(entries = []) { return hud.Refresh(g, unit, true, entries); }
@@ -98,7 +98,7 @@ unit = 11; refresh(); snapshot({options: freshOptions(), queued: []});
 assert.deepEqual(Array.from(hud.Inspect().slots), ['worker_1', 'worker_2', 'worker_3', 'worker_4'], 'cities retain independent entry slots');
 unit = 99; refresh(); assert.equal(nodes.SurvivalProductionPanel.visible, false, 'nonproduction units have no panel');
 unit = 20; refresh();
-runtime[201] = {owner_entindex: 20, technology_group: 'worker_attack', auto_research_available: 1, auto_research_enabled: 1};
+runtime[201] = {ability_name: 'ability_research_worker_attack', owner_entindex: 20, technology_group: 'worker_attack', auto_research_available: 1, auto_research_enabled: 1};
 const research = {researching: 1, display_name: '伐木效率', ability_name: 'ability_research_worker_attack', target_level: 2, started_at: 10, finish_at: 12, duration: 2, auto_enabled: 1, auto_research: {worker_attack: 1}};
 snapshot(undefined, {research});
 refresh([{ability: 201, name: 'ability_research_worker_attack'}]);
@@ -131,6 +131,9 @@ const sixthCellRight = Number(nodes.ProductionQueueSlot5.style.position.split('p
 assert(sixthCellRight < Number(nodes.SurvivalProductionPanel.style.width.replace('px','')), 'six full-size waiting cells fit the panel width');
 
 runtime[201].available = 0;
+snapshot(undefined, {research: {...research, abilities_by_name: {
+ ability_research_worker_attack: {available: 1, technology_group: 'worker_attack'}
+}}});
 assert.equal(hud.QueueResearch(201, 20), true, 'a busy research ability can add another queue task');
 assert.equal(sent.at(-1).name, 'ui_research_queue_request');
 assert.equal(sent.at(-1).payload.source_entindex, 20);
@@ -220,7 +223,7 @@ assert.equal(nodes.SurvivalProductionPanel.__survivalWindowHeight,232.875,'publi
 ctx.actualuiscale_x=1;ctx.actualuiscale_y=1;
 // Exercise the real advanced-laboratory unit name and its dense native HUD geometry.
 const geometry = require('../panorama/src/scripts/custom_game/geometry_remaining_5d5c1152eb.js');
-const advancedGeometry = geometry(1920,1080,10);
+const advancedGeometry = geometry(1920,1080,10,true);
 snapshot(undefined,{research:{...research,queued:waiting,queue_capacity:7}});
 unit=21;hud.Refresh(advancedGeometry,unit,true,[]);
 const longTechnologyName='高阶伐木工训练及全军远程攻击强化科技';
@@ -245,7 +248,8 @@ for(const [name,oldFont] of [['ProductionTitle',34],['ProductionJobName',31],['P
 assert(Number(nodes.ProductionJobName.style.height.replace('px',''))>=fontSize('ProductionJobName')*2,'job row reserves height for two full-size text lines');
 const panelPos=nodes.SurvivalProductionPanel.style.position.split(' ').map(parseFloat);
 const panelHeight=Number(nodes.SurvivalProductionPanel.style.height.replace('px',''));
-assert(panelPos[1]+panelHeight*displayScale<advancedGeometry.y,'wider production panel stays above the portrait nameplate');
+assert(panelPos[0]+parseFloat(nodes.SurvivalProductionPanel.style.width)*displayScale<advancedGeometry.x,'queue is to the left of the building HUD');
+assert(panelPos[1]>=0,'queue remains on screen');
 assert.equal(nodes.SurvivalProductionPanel.__survivalWindowHeight,panelHeight*displayScale,'world occlusion follows the actual enlarged display bounds');
 callbacks.ui_selected_unit_stats_snapshot({success:1,player_id:1,entindex:21,research:{...research,queued:[],queue_capacity:7}});
 assert.equal(nodes.ProductionQueue.text,'等待 6/6','another player cannot overwrite the viewer private advanced-lab queue');
@@ -271,3 +275,10 @@ for(let index=0;index<textRows.length-1;index++) {
 }
 assert(parseFloat(textRows[2].style.position.split(' ')[1])+parseFloat(textRows[2].style.height)<=parseFloat(card.style.height),'the last enlarged text row fits inside the card');
 console.log('PRODUCTION_HUD_PASS: queue routing and private snapshots, six waiting cells plus current task, ordinary/advanced parity, full long-name tooltip, readable compact costs, larger physical text and exact occlusion');
+unit=20; refresh();
+const beforeLockedQueue=sent.length;
+snapshot(undefined, {research: {...research, abilities_by_name: {
+ ability_research_worker_attack: {available: 0, technology_group: 'worker_attack', research_status_code: 'prerequisite_not_met', status_text: '前置科技未满足'}
+}}});
+assert.equal(hud.QueueResearch(201,20),true);
+assert.equal(sent.length,beforeLockedQueue,'locked research consumes click without sending an enqueue request');

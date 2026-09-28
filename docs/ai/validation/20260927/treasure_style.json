@@ -1,0 +1,7 @@
+{
+  "scope": "Treasure window style only",
+  "style": "Existing top-navigation chest and HUD metal frame / warm labels / native item thumbnail slots",
+  "grid": "5 x 4, 20 slots",
+  "logic": "Reward data and script unchanged; hover, modal close and all 52 textures passed existing test",
+  "validation": "XML, asset paths, default-hidden state, CSS scope and Source 2 compilation passed. Browser layout preview inspected; not an in-game screenshot."
+}

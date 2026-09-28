@@ -10,25 +10,25 @@ local research_unlocked_by_player = {}
 local advanced_research_unlocked_by_player = {}
 local shop_unlocked_by_player = {}
 
-local function mark_dirty(team)
-    event_bus.emit(events.UI_DIRTY, { team = team })
+local function mark_dirty(team, player_id)
+    event_bus.emit(events.UI_DIRTY, { team = team, player_id = player_id })
 end
 
 local function on_resource_changed(payload)
     resource_by_player[payload.player_id] = payload
-    mark_dirty(payload.team)
+    mark_dirty(payload.team, payload.player_id)
 end
 
 local function on_building_changed(payload)
-    if payload.player_id == nil then mark_dirty(payload.team); return end
+    if payload.player_id == nil then mark_dirty(payload.team, payload.player_id); return end
     if payload.building_id == "main_city" then
         city_level_by_player[payload.player_id] = payload.level
     end
-    mark_dirty(payload.team)
+    mark_dirty(payload.team, payload.player_id)
 end
 
 local function on_building_created(payload)
-    if payload.player_id == nil then mark_dirty(payload.team); return end
+    if payload.player_id == nil then mark_dirty(payload.team, payload.player_id); return end
     if payload.building_id == "building_research_lab" then
         research_unlocked_by_player[payload.player_id] = true
     elseif payload.building_id == "building_advanced_research_lab" then
@@ -38,7 +38,7 @@ local function on_building_created(payload)
 end
 
 local function on_building_destroyed(payload)
-    if payload.player_id == nil then mark_dirty(payload.team); return end
+    if payload.player_id == nil then mark_dirty(payload.team, payload.player_id); return end
     if payload.building_id == "main_city" then
         city_level_by_player[payload.player_id] = 0
     elseif payload.building_id == "building_research_lab" then
@@ -46,27 +46,29 @@ local function on_building_destroyed(payload)
     elseif payload.building_id == "building_advanced_research_lab" then
         advanced_research_unlocked_by_player[payload.player_id] = false
     end
-    mark_dirty(payload.team)
+    mark_dirty(payload.team, payload.player_id)
 end
 
 local function on_hero_summon_changed(payload)
     shop_unlocked_by_player[payload.player_id] = payload.shop_unlocked == 1
         or payload.hero_summoned == 1
-    mark_dirty(payload.team)
+    mark_dirty(payload.team, payload.player_id)
 end
 
 local function on_worker_changed(payload)
-    if payload.player_id == nil then mark_dirty(payload.team); return end
+    if payload.player_id == nil then mark_dirty(payload.team, payload.player_id); return end
     worker_count_by_player[payload.player_id] = math.max(
         0,
         (worker_count_by_player[payload.player_id] or 0) + (payload.count_delta or 0)
     )
-    mark_dirty(payload.team)
+    mark_dirty(payload.team, payload.player_id)
 end
 
 local function on_wave_changed(payload)
     wave = payload
-    mark_dirty(nil)
+    if payload.hud_clock_only then return end
+    if payload.hud_player_id ~= nil then mark_dirty(nil,payload.hud_player_id)
+    else mark_dirty(nil) end
 end
 
 local function player_wave_snapshot(player_id)
@@ -85,11 +87,19 @@ local function player_wave_snapshot(player_id)
     snapshot.alive = math.max(0, tonumber(personal.alive) or 0)
     snapshot.overflow_active = personal.overflow_active == true
     snapshot.overflow_remaining = tonumber(personal.overflow_remaining) or 0
+    snapshot.overflow_deadline = tonumber(personal.overflow_deadline) or 0
     snapshot.player_defeated = personal.player_defeated == true
     snapshot.defeat_reason = personal.defeat_reason
     if personal.alive_limit ~= nil then snapshot.alive_limit = personal.alive_limit end
     if personal.overflow_grace_seconds ~= nil then
         snapshot.overflow_grace_seconds = personal.overflow_grace_seconds
+    end
+    local challenge = event_bus.request("archive.challenge_state", {})
+    if challenge and (challenge.active == 1 or challenge.ended == 1) then
+        snapshot.challenge_remaining_seconds = challenge.remaining_seconds
+        snapshot.challenge_saving = challenge.saving or 0
+        snapshot.challenge_deadline = challenge.deadline
+        snapshot.challenge_ended = challenge.ended
     end
     return snapshot
 end
@@ -151,6 +161,7 @@ function M.init()
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.WORKER_CHANGED, on_worker_changed)
     event_bus.subscribe(events.WAVE_CHANGED, on_wave_changed)
+    event_bus.subscribe("archive.challenge_timer_changed", function() mark_dirty(nil) end)
     event_bus.subscribe(events.HERO_SUMMON_STATE_CHANGED, on_hero_summon_changed)
     event_bus.handle_request("ui.projection.build_snapshot", build_snapshot)
 end

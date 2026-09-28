@@ -261,7 +261,7 @@
         "AbilityTextureName" "survival/native/population"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.5"
+        "AbilityCooldown"    "0"
         "AbilityManaCost"    "0"
     }
 

@@ -32,6 +32,21 @@ def read_icons():
         original = next((entry for entry in rows(source) if entry.get(source_key) == row['item_id']), None)
         if not original or original['display_name'] != row['display_name']:
             raise ValueError(f'Item missing or display name differs from real configuration: {key}')
+        if row.get('art_status') == 'valve_native':
+            from build_wave_monster_cosmetics import Vpk
+            native = json.loads((ROOT/'data/ui/archive_native_icons.json').read_text(encoding='utf-8'))[row['item_id']]
+            if row['icon_path'] != native['icon_path']: raise ValueError('Native icon CSV differs from verified mapping')
+            if not hasattr(read_icons, '_native_vpk'):
+                read_icons._native_vpk = Vpk(ROOT.parents[1]/'dota/pak01_dir.vpk')
+            asset = 'panorama/images/' + row['icon_path'][:-4] + '_png.vtex_c'
+            blob = read_icons._native_vpk.read(asset)
+            row.update(display_width=int(row['display_width']),display_height=int(row['display_height']),
+                runtime_uri=native['runtime_uri'],small_runtime_uri=native['runtime_uri'],
+                official_item_definition=native['item_definition'],sha256=hashlib.sha256(blob).hexdigest(),
+                description=original.get('description') or original.get('source_method',''),
+                quality=original.get('quality',''),content_id=original.get('content_id',''))
+            result.append(row)
+            continue
         image_root = ROOT / 'panorama/src/images'
         file = (image_root / row['icon_path']).resolve()
         if not file.is_relative_to(image_root.resolve()):
