@@ -4,6 +4,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh;
     var cfg = GameUI.CustomUIConfig(), disposed = false, subscriptions = [];
     if (cfg.SurvivalPayments && cfg.SurvivalPayments.Dispose) cfg.SurvivalPayments.Dispose();
     var products = [], selected = "", orders = {}, busy = false, opened = false, generation = 0, lastMatrix = "", ticks = 0;
+    var gameValues={}, wallet={}, matchFrozen=false;
     var entry = $("#PaymentEntry"), dialog = $("#PaymentDialog"), status = $("#PaymentStatus"), buy = $("#PaymentBuy");
     function rows(value) {
         if (Array.isArray(value)) return value;
@@ -11,6 +12,20 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh;
     }
     function current() { return products.filter(function(p){return p.sku === selected;})[0]; }
     function money(fen) { return "¥" + (Number(fen) / 100).toFixed(2); }
+    function number(value) { return String(Math.round(Number(value)*10000)/10000); }
+    function valuesText(p,order) {
+        if (!p) return "";
+        var effect=rows(p.stat_preview)[0]; if (!effect) return "";
+        var field=effect.field_id, receipt=order && order.state==="delivered" && order.effect_changes && order.effect_changes[field];
+        var text=receipt ? "本单存档："+number(receipt.before)+" → "+number(receipt.after)+"（+"+number(receipt.delta)+"）"
+            : p.owned>0 ? "当前存档："+number(effect.value)+" · 已购买"
+            : "存档："+number(effect.value)+" → "+number(effect.after)+"（购买后）";
+        if (gameValues[field]!==undefined) text+="\n本局属性合计："+number(gameValues[field]);
+        var resource=field==="initial_wood"?"wood":field==="initial_gold"?"gold":null;
+        if (resource && wallet[resource]!==undefined) text+=" · 当前"+(resource==="wood"?"木材":"金币")+"："+number(wallet[resource]);
+        if (matchFrozen) text+="\n本局已结算冻结，新奖励下局生效。";
+        return text;
+    }
     function validURL(url) { return typeof url === "string" && /^https:\/\/pay\.xiaofengnet\.com\/checkout\?order=WX[0-9a-f]{30}&token=[0-9a-f]{64}$/.test(url); }
     function terminal(state) { return ["delivered", "paid_review", "closed"].indexOf(state) >= 0; }
     function drawQR(matrix) {
@@ -38,6 +53,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh;
         $("#PaymentTitle").text = p ? p.title : "正在加载商品";
         $("#PaymentDescription").text = p ? p.description : "请先完成对局登录";
         $("#PaymentPrice").text = p ? money(p.amount_fen) : "";
+        $("#PaymentValues").text = valuesText(p,order);
         buy.enabled = !busy && !!p && !!p.enabled && (!order || order.state === "closed");
         $("#PaymentBuyLabel").text = p ? "微信购买 " + money(p.amount_fen) : "加载中";
         var canOpen = order && order.state === "pending" && !order.expired && validURL(order.checkout_url);
@@ -52,7 +68,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh;
                 closed:"订单已关闭，可以重新购买。"};
             status.text = order.expired && !terminal(order.state) ? "付款码已过期，正在核对最终状态。" : labels[order.state] || "正在查询…";
             if (order.state === "created") buy.enabled = !busy && !!p && !!p.enabled;
-        } else status.text = p && p.owned > 0 ? "已拥有此商品。" : "永久存档道具 ×1，到账后由服务器自动发放。";
+        } else status.text = p && p.owned > 0 ? "已拥有此商品。" : "永久属性奖励，到账后自动刷新。";
         products.forEach(function(item) {
             if (item.panel) {
                 item.panel.SetHasClass("Selected", item.sku === selected);
@@ -120,6 +136,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh;
             status.text=messages[data.error]||"暂时无法完成请求，请稍后重试。"; return;
         }
         entry.style.visibility="visible";
+        gameValues=data.game_values||gameValues; wallet=data.wallet||wallet; matchFrozen=!!data.match_frozen;
         if (data.action==="reset") {
             orders={}; lastMatrix=""; render(); status.text="远端测试数据已清理，正在更新商品列表。";
             $.Schedule(1.1,refreshCatalog); return;

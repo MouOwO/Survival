@@ -8,11 +8,26 @@ local M = {}
 local busy, last, orders, refreshed, resets = {}, {}, {}, {}, {}
 local serial, initialized = 0, false
 local products = {
+    wood_100_test_50_v3=true, gold_100_test_50_v3=true, wall_armor_100_test_50_v3=true,
+    wall_health_100_test_50_v3=true, tower_attack_100_test_50_v3=true,
+    -- Keep status polling for receipts created before the catalog replacement.
     monkey_test_50_v2 = true, wall_test_50_v2 = true, data_test_50_v2 = true,
     turret_test_50_v2 = true, implant_test_50_v2 = true,
 }
 local function send(id, result)
     if not id or not PlayerResource:IsValidPlayerID(id) then return end
+    if result.ok then
+        local profile=profiles.get_profile(id)
+        local projection=bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,{player_id=id})
+        local stats=projection and projection.totals or (profile and profile.save and profile.save.gameplay_stats) or {}
+        result.game_values={}
+        for _,field in ipairs({"initial_wood","initial_gold","wall_armor","wall_initial_health","tower_attack_flat"}) do
+            result.game_values[field]=tonumber(stats[field]) or 0
+        end
+        local wallet=bus.request(events.RESOURCE_GET_REQUEST,{player_id=id})
+        if wallet then result.wallet={wood=wallet.wood,gold=wallet.gold} end
+        result.match_frozen=require("systems/gameplay_phase_guard").post_clear_frozen()
+    end
     local player = PlayerResource:GetPlayer(id)
     if player then CustomGameEventManager:Send_ServerToPlayer(player, "survival_payment_result", result) end
 end

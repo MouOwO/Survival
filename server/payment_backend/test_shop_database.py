@@ -7,7 +7,7 @@ ACCOUNT, OTHER = 'f7'*32, 'f8'*32
 SESSION = 'payment_shop_fixture_session'
 
 
-def run_checks(conn, defaults):
+def run_checks(conn, defaults, products=PRODUCTS, single_field=False):
     def call(name, *args):
         return conn.execute('SELECT payments.'+name+'('+','.join(['%s']*len(args))+')',args).fetchone()[0]
     def order(number): return 'WX'+f'{number:030x}'
@@ -30,10 +30,10 @@ def run_checks(conn, defaults):
     assert call('begin_reset',OTHER,SESSION,'refreshdata','test_reset_0')['error']=='test_reset_disabled'
     catalog=call('catalog',ACCOUNT,SESSION)
     assert len(catalog['products'])==5 and all(p['amount_fen']==5000 for p in catalog['products'])
-    assert call('create_order',ACCOUNT,'missing_session',order(1),PRODUCTS[0][0])['error']=='match_session_missing'
+    assert call('create_order',ACCOUNT,'missing_session',order(1),products[0][0])['error']=='match_session_missing'
     assert call('create_order',ACCOUNT,SESSION,order(1),'fake_product')['error']=='product_unavailable'
     before=stats()
-    for i,(sku,item,*_) in enumerate(PRODUCTS,1):
+    for i,(sku,item,*_) in enumerate(products,1):
         made=call('create_order',ACCOUNT,SESSION,order(i),sku)
         assert made['amount']==5000 and made['reward']['item_id']==item
         assert call('create_order',ACCOUNT,SESSION,order(100+i),sku)['order_id']==order(i)
@@ -42,9 +42,19 @@ def run_checks(conn, defaults):
                 try:call('deliver',order(i),transaction(i),10,'wx164e25a570fb636a','1117928493')
                 except Exception:pass
                 else:raise AssertionError('old 10-fen amount accepted for 50-yuan product')
+        prior=stats()
         receipt=call('deliver',order(i),transaction(i),5000,'wx164e25a570fb636a','1117928493')
         assert receipt['state']=='delivered' and inventory()[item]==1
         state=stats()
+        if single_field:
+            effects=made['reward']['effects']
+            assert len(effects)==1 and list(effects.values())==[100]
+            field=next(iter(effects))
+            assert Decimal(str(state[field]))-Decimal(str(prior[field]))==100
+            assert receipt['effect_changes'][field]=={'before':prior[field],'after':state[field],'delta':100}
+            assert all(state[k]==prior[k] for k in prior if k not in (field,'updated_at'))
+            preview=call('catalog',ACCOUNT,SESSION)['products'][i-1]['stat_preview']
+            assert len(preview)==1 and preview[0]['field_id']==field and preview[0]['value']==state[field]
         call('deliver',order(i),transaction(i),5000,'wx164e25a570fb636a','1117928493')
         assert stats()==state
         assert call('create_order',ACCOUNT,SESSION,order(200+i),sku)['error']=='already_owned'
@@ -60,19 +70,19 @@ def run_checks(conn, defaults):
     assert baseline['save']['content_inventory']=={'keep_item':3}
     for field,value in defaults.items():assert Decimal(str(baseline['save']['gameplay_stats'][field]))==Decimal(str(value)),field
     call('deliver',order(1),transaction(1),5000,'wx164e25a570fb636a','1117928493')
-    assert 'lottery_monkey_king' not in inventory(), 'late receipt restored cleared item'
-    assert call('create_order',ACCOUNT,SESSION,order(20),PRODUCTS[0][0])['order_id']==order(20)
+    assert products[0][1] not in inventory(), 'late receipt restored cleared item'
+    assert call('create_order',ACCOUNT,SESSION,order(20),products[0][0])['order_id']==order(20)
     # Reset blocks new order creation and waits for verified gateway closure.
     assert call('begin_reset',ACCOUNT,SESSION,'refreshmoney','reset_pending_fixture')['orders']
     assert call('finish_reset',ACCOUNT,SESSION,'refreshmoney','reset_pending_fixture')['error']=='pending_payment_unresolved'
-    assert call('create_order',ACCOUNT,SESSION,order(21),PRODUCTS[1][0])['error']=='reset_in_progress'
+    assert call('create_order',ACCOUNT,SESSION,order(21),products[1][0])['error']=='reset_in_progress'
     call('update_gateway',order(20),'closed',None)
     assert call('finish_reset',ACCOUNT,SESSION,'refreshmoney','reset_pending_fixture')['ok']
     assert call('deliver',order(20),transaction(20),5000,'wx164e25a570fb636a','1117928493')['state']=='paid_review'
-    assert 'lottery_monkey_king' not in inventory(), 'pre-reset intent granted in a new reset generation'
+    assert products[0][1] not in inventory(), 'pre-reset intent granted in a new reset generation'
     # Production mode ignores empty inventory and enforces historical purchase cap.
     conn.execute('UPDATE payments.test_settings SET enabled=false')
-    assert call('create_order',ACCOUNT,SESSION,order(22),PRODUCTS[1][0])['error']=='purchase_limit_reached'
+    assert call('create_order',ACCOUNT,SESSION,order(22),products[1][0])['error']=='purchase_limit_reached'
     assert call('begin_reset',ACCOUNT,SESSION,'refreshdata','reset_disabled_fixture')['error']=='test_reset_disabled'
     conn.execute('UPDATE payments.test_settings SET enabled=true')
     conn.execute("INSERT INTO public.archive_entitlements(account_id,entitlement_id,active) VALUES(%s,'vip',true)",(ACCOUNT,))

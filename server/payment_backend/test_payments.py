@@ -184,5 +184,12 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(validate_success(receipt,original),receipt['transaction_id'])
         with self.assertRaises(PaymentError):validate_success(receipt,order())
 
+    def test_public_receipt_exposes_only_recorded_stat_changes(self):
+        row=order();row['state']='delivered'
+        row['effect_changes']={'initial_wood':{'before':80,'after':180,'delta':100}}
+        result=self.app.public(row)
+        self.assertEqual(result['effect_changes'],row['effect_changes'])
+        self.assertNotIn('account_id',result)
+
 
 if __name__=='__main__':unittest.main()

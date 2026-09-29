@@ -7,7 +7,7 @@
     <Panel id="PaymentDialog" class="PaymentDialog" hittest="true">
       <Panel class="PaymentHeader">
         <Label class="PaymentHeading" text="商品商城" />
-        <Label class="PaymentSubtitle" text="联调商品 · 微信扫码支付 · 永久存档" />
+        <Label class="PaymentSubtitle" text="属性测试商品 · 每件只加一项 · 永久存档" />
         <Button class="PaymentClose" onactivate="PaymentToggle()"><Label text="×" /></Button>
       </Panel>
       <Panel class="PaymentBody">
@@ -16,6 +16,7 @@
           <Label id="PaymentTitle" class="PaymentTitle" text="正在加载商品" />
           <Label id="PaymentDescription" class="PaymentDescription" text="请先完成对局登录" />
           <Label id="PaymentPrice" class="PaymentPrice" text="" />
+          <Label id="PaymentValues" class="PaymentValues" text="" />
           <Panel id="PaymentQR" class="PaymentQR" hittest="false" />
           <Label id="PaymentStatus" class="PaymentDescription" text="付款后自动发放到当前游戏账号。" />
           <Button id="PaymentBuy" class="PaymentAction" onactivate="PaymentBuy()"><Label id="PaymentBuyLabel" text="加载中" /></Button>

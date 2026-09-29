@@ -89,7 +89,8 @@ class Payments:
         result = {'ok':True,'sku':order['sku'],'title':order['reward'].get('title',TITLE),
             'amount_fen':order['amount'],'currency':order['currency'],
             'order_id':order['order_id'],'state':order['state'],'expires_at':order['expires_at'],
-            'expired':expired(order), 'checkout_url':ORIGIN+'/checkout?order='+order['order_id']+'&token='+self.token(order['order_id'])}
+            'expired':expired(order), 'effect_changes':order.get('effect_changes',{}),
+            'checkout_url':ORIGIN+'/checkout?order='+order['order_id']+'&token='+self.token(order['order_id'])}
         if order['state']=='pending' and order.get('code_url') and not result['expired']:
             result['qr_matrix']=qr_matrix(order['code_url'])
         return result

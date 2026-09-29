@@ -2,7 +2,7 @@ package.path='scripts/vscripts/?.lua;'..package.path
 local handlers,sent,requests={},{},{}
 local loaded=true
 local refreshed=0
-local profile={save={content_inventory={}}}
+local profile={save={content_inventory={},gameplay_stats={initial_wood=180}}}
 local provider={resolve_account_id=function(id)return id==0 and '123' or '456' end}
 package.loaded['systems/player_profile_service']={get_provider=function()return provider end,
  get_profile=function()return loaded and profile or nil end,
@@ -26,20 +26,21 @@ CreateHTTPRequestScriptVM=function(method,url)
 end
 local service=require('systems/payment_service');service.init();service.init()
 local handle=handlers.survival_payment_request
-handle(0,{PlayerID=0,action='create',sku='monkey_test_50_v2',account_id='attacker',amount=1})
+handle(0,{PlayerID=0,action='create',sku='wood_100_test_50_v3',account_id='attacker',amount=1})
 local body=require('core/json_decoder').decode(requests[1].body)
 assert(body.account_id=='123' and body.amount==nil and body.match_session_id=='safe_session')
-handle(0,{PlayerID=0,action='create',sku='monkey_test_50_v2'});assert(#requests==1,'in-flight duplicate blocked')
-requests[1].done({StatusCode=200,Body='{"ok":true,"sku":"monkey_test_50_v2","order_id":"WX111111111111111111111111111111","state":"pending"}'})
-handle(0,{PlayerID=0,action='status',sku='monkey_test_50_v2',order_id='other_player_order'})
+handle(0,{PlayerID=0,action='create',sku='wood_100_test_50_v3'});assert(#requests==1,'in-flight duplicate blocked')
+requests[1].done({StatusCode=200,Body='{"ok":true,"sku":"wood_100_test_50_v3","order_id":"WX111111111111111111111111111111","state":"pending"}'})
+handle(0,{PlayerID=0,action='status',sku='wood_100_test_50_v3',order_id='other_player_order'})
 body=require('core/json_decoder').decode(requests[2].body)
 assert(body.order_id=='WX111111111111111111111111111111')
-requests[2].done({StatusCode=200,Body='{"ok":true,"sku":"monkey_test_50_v2","order_id":"WX111111111111111111111111111111","state":"delivered"}'})
+requests[2].done({StatusCode=200,Body='{"ok":true,"sku":"wood_100_test_50_v3","order_id":"WX111111111111111111111111111111","state":"delivered"}'})
 assert(refreshed==1)
-handle(0,{PlayerID=0,action='status',sku='monkey_test_50_v2'})
-requests[3].done({StatusCode=200,Body='{"ok":true,"sku":"monkey_test_50_v2","order_id":"WX111111111111111111111111111111","state":"delivered"}'})
+assert(sent[#sent].game_values.initial_wood==180,"UI must receive the refreshed match stat")
+handle(0,{PlayerID=0,action='status',sku='wood_100_test_50_v3'})
+requests[3].done({StatusCode=200,Body='{"ok":true,"sku":"wood_100_test_50_v3","order_id":"WX111111111111111111111111111111","state":"delivered"}'})
 assert(refreshed==1,'duplicate success must not grant or repeatedly reload')
-loaded=false;handle(0,{PlayerID=0,action='create',sku='monkey_test_50_v2'});assert(#requests==3)
+loaded=false;handle(0,{PlayerID=0,action='create',sku='wood_100_test_50_v3'});assert(#requests==3)
 loaded=true
 IsInToolsMode=function()return false end
 local ok=service.reset_player({player_id=0,args={}},'refreshdata')
@@ -58,7 +59,7 @@ assert(require('core/json_decoder').decode(requests[5].body).request_id==reset.r
  'uncertain reset retries must use the same operation identity')
 requests[5].done({StatusCode=200,Body='{"ok":true,"kind":"refreshmoney","revision":99}'})
 assert(refreshed==2,'remote reset must load the authoritative profile')
-handle(0,{PlayerID=0,action='status',sku='monkey_test_50_v2'})
+handle(0,{PlayerID=0,action='status',sku='wood_100_test_50_v3'})
 assert(#requests==5,'reset must forget old paid checkout references')
 assert(service.reset_player({player_id=0,args={}},'refreshdata'))
 assert(require('core/json_decoder').decode(requests[6].body).request_id~=reset.request_id)
