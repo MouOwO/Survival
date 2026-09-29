@@ -22,6 +22,11 @@ if name == 'aliyun_test_connection.py':
     event, result = 'tunnel:' + action, {'ok': True}
 elif name == 'aliyun_game_test_auth.py':
     event, result = 'auth:' + action, {'ok': True}
+    if action == 'probe':
+        previous = events.read_text() if events.exists() else ''
+        index = previous.splitlines().count('auth:probe')
+        choices = scenario.get('probes', [{'ok': True}])
+        result = choices[min(index, len(choices) - 1)]
 elif name == 'aliyun_lan_probe.py':
     previous = events.read_text() if events.exists() else ''
     index = sum(line.startswith('roster:') for line in previous.splitlines())
@@ -45,8 +50,11 @@ function Record-Event([string]$Value) {
 function Get-Process {
     [CmdletBinding()]param([string]$Name)
     if ($Name -ne 'dota2') { throw 'Unexpected process query' }
+    $eventsFile = Join-Path $PSScriptRoot 'events.txt'
+    $previous = if (Test-Path -LiteralPath $eventsFile) { @(Get-Content -LiteralPath $eventsFile) } else { @() }
     Record-Event 'process:get'
-    if ($global:GoufayuFixtureScenario.game_running) { return [pscustomobject]@{Id=12345} }
+    if ($global:GoufayuFixtureScenario.game_exited_while_waiting -and $previous -contains 'auth:probe') { return }
+    if ($global:GoufayuFixtureScenario.game_running -or $previous -contains 'game:start') { return [pscustomobject]@{Id=12345} }
 }
 function Start-Process {
     param($FilePath, $WorkingDirectory, $WindowStyle, $ArgumentList)
@@ -184,6 +192,50 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(code, 0, output)
         self.assertEqual(events, ['bridge:Stop', 'tunnel:connect', 'process:get', 'auth:probe',
                                   'roster:2', 'sleep:2', 'roster:2', 'auth:inject'])
+
+    def test_slow_startup_reports_stages_and_authenticates_only_when_ready(self):
+        code, output, events = self.run_launcher(expected=1, probes=[
+            {'ok': False, 'error': 'tools_console_unavailable'},
+            {'ok': False, 'error': 'tools_server_confirmation_missing'},
+            {'ok': True},
+        ])
+        self.assertEqual(code, 0, output)
+        self.assertIn('Waiting for the Workshop Tools console', output)
+        self.assertIn('test map has not confirmed readiness', output)
+        self.assertEqual(events.count('game:start'), 1)
+        self.assertEqual(events.count('auth:probe'), 3)
+        self.assertEqual(events[-1], 'auth:inject')
+
+    def test_client_exit_stops_waiting_without_authentication_or_relaunch(self):
+        code, output, events = self.run_launcher(
+            expected=1, game_exited_while_waiting=True,
+            probes=[{'ok': False, 'error': 'tools_console_unavailable'}])
+        self.assertEqual(code, 31, output)
+        self.assertIn('GAME_CLIENT_EXITED', output)
+        self.assertEqual(events.count('game:start'), 1)
+        self.assertNotIn('auth:inject', events)
+
+    def test_existing_unready_game_times_out_with_actionable_help_and_is_preserved(self):
+        code, output, events = self.run_launcher(
+            expected=1, game_running=True,
+            probes=[{'ok': False, 'error': 'tools_server_confirmation_missing'}])
+        self.assertEqual(code, 31, output)
+        self.assertIn('GAME_MAP_WAIT_TIMEOUT', output)
+        self.assertIn('Dota was already running', output)
+        self.assertIn('double-click launch_aliyun_test_game.cmd', output)
+        self.assertNotIn('game:start', events)
+        self.assertNotIn('auth:inject', events)
+
+    def test_existing_empty_tools_game_gets_one_guarded_launch_before_authentication(self):
+        code, output, events = self.run_launcher(expected=1, game_running=True, probes=[
+            {'ok': False, 'error': 'tools_server_confirmation_missing'},
+            {'ok': False, 'error': 'tools_server_confirmation_missing'},
+            {'ok': True},
+        ])
+        self.assertEqual(code, 0, output)
+        self.assertEqual(events.count('auth:start-empty'), 1)
+        self.assertNotIn('game:start', events)
+        self.assertEqual(events[-1], 'auth:inject')
 
 
 if __name__ == '__main__':

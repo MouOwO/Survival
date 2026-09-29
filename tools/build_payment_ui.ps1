@@ -1,0 +1,18 @@
+$ErrorActionPreference='Stop'
+$repo=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$engine=(Resolve-Path (Join-Path $repo '../../..')).Path
+$content=Join-Path $engine 'content/dota_addons/survival/panorama'
+$compiler=Join-Path $engine 'game/bin/win64/resourcecompiler.exe'
+$files=@('scripts/custom_game/payment_test.js','styles/custom_game/payment_test.css','layout/custom_game/payment_test.xml','layout/custom_game/custom_ui_manifest.xml')
+$backup=Join-Path $repo ('output/payment_ui_backup/'+(Get-Date -Format 'yyyyMMdd_HHmmss'))
+foreach($relative in $files){
+ $from=Join-Path $repo ('panorama/src/'+$relative)
+ $to=Join-Path $content $relative
+ if(Test-Path -LiteralPath $to){$old=Join-Path $backup $relative;New-Item -ItemType Directory -Force (Split-Path $old)|Out-Null;Copy-Item -LiteralPath $to -Destination $old}
+ New-Item -ItemType Directory -Force (Split-Path $to)|Out-Null
+ Copy-Item -LiteralPath $from -Destination $to -Force
+ $result=@(& $compiler -i $to -game (Join-Path $engine 'game/dota') -nop4)
+ $result|Where-Object{$_ -match 'ERROR:|FAIL|WARNING|OK:|Failed to'}|Write-Output
+ if($LASTEXITCODE -ne 0){throw "Payment UI compilation failed: $relative"}
+}
+Write-Output 'PAYMENT_UI_BUILD_PASS'

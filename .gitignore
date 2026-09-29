@@ -407,3 +407,5 @@ __pycache__/
 
 # Local engine exception report.
 /exceptions.txt
+!/scripts/vscripts/tests/test_payment_service.lua
+!/scripts/vscripts/tests/test_paid_hero_unlock.lua

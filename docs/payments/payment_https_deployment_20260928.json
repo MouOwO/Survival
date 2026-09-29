@@ -1,0 +1,102 @@
+{
+  "recordedDate": "2026-09-28",
+  "domain": "pay.xiaofengnet.com",
+  "serverIp": "47.110.238.248",
+  "dnsAddressVerified": "47.110.238.248",
+  "deploymentScript": "server/aliyun/deploy/payment_https.py",
+  "packagesInstalled": [
+    "nginx",
+    "certbot"
+  ],
+  "tlsCertificateLocation": "/etc/letsencrypt/live/pay.xiaofengnet.com",
+  "tlsPrivateKeyRemainsOnServer": true,
+  "nginxConfig": "/etc/nginx/nginx.conf",
+  "previousNginxConfigBackup": "/etc/goufayu-payment-https/nginx.original.conf",
+  "stateFile": "/etc/goufayu-payment-https/state.json",
+  "renewalService": "goufayu-payment-cert-renew.service",
+  "renewalTimer": "goufayu-payment-cert-renew.timer",
+  "renewalDryRunPassed": true,
+  "renewalEnabled": true,
+  "renewalActive": true,
+  "renewalHookSyntaxPassed": true,
+  "nginxConfigTestPassed": true,
+  "backendHealth": 200,
+  "backendPidBefore": "122374",
+  "backendPidAfter": "122374",
+  "databasePidBefore": "6590",
+  "databasePidAfter": "6590",
+  "paymentApiKeysUploaded": false,
+  "gameOrDatabaseRestarted": false,
+  "actualPaymentRoutesEnabled": false,
+  "callbackPlaceholderStatus": 503,
+  "internalRewardRoutePublicStatus": 404,
+  "ordersCreated": 0,
+  "paymentsInitiated": 0,
+  "rewardsGranted": 0,
+  "publicChecks": {
+    "check": "payment_https_external_checks",
+    "checkedAt": "2026-09-28T04:06:26.031Z",
+    "ok": true,
+    "results": [
+      {
+        "name": "https_connection",
+        "httpStatus": 200,
+        "expected": 200,
+        "passed": true,
+        "tlsPeerAuthorized": true,
+        "certificate": {
+          "subjectCN": "pay.xiaofengnet.com",
+          "issuerCN": "YR1",
+          "validFrom": "Sep 28 03:07:05 2026 GMT",
+          "validTo": "Dec 27 03:07:04 2026 GMT"
+        },
+        "bodyMatches": true
+      },
+      {
+        "name": "http_redirect",
+        "httpStatus": 301,
+        "expected": 301,
+        "passed": true,
+        "redirectMatches": true
+      },
+      {
+        "name": "acme_webroot",
+        "httpStatus": 200,
+        "expected": 200,
+        "passed": true
+      },
+      {
+        "name": "wechat_not_enabled",
+        "httpStatus": 503,
+        "expected": 503,
+        "passed": true,
+        "tlsPeerAuthorized": true,
+        "paymentNotReady": true
+      },
+      {
+        "name": "alipay_not_enabled",
+        "httpStatus": 503,
+        "expected": 503,
+        "passed": true,
+        "tlsPeerAuthorized": true,
+        "paymentNotReady": true
+      },
+      {
+        "name": "internal_reward_route_not_exposed",
+        "httpStatus": 404,
+        "expected": 404,
+        "passed": true,
+        "tlsPeerAuthorized": true
+      }
+    ],
+    "ordersCreated": 0,
+    "rewardsGranted": 0
+  },
+  "remainingWork": [
+    "Implement persistent authenticated orders and payment providers.",
+    "Implement verified callback handling, durable payment states and idempotent reward delivery.",
+    "Validate WeChat AppID binding and APIv3 callback decryption with a controlled payment.",
+    "Complete Alipay production application online status and verify the receiving merchant ID.",
+    "Test the 0.10 CNY product and lottery_monkey_king x1 reward in the game."
+  ]
+}

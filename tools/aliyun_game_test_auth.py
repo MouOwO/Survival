@@ -265,6 +265,28 @@ def probe(state: Path) -> dict:
     return {"ok": True, "status": "tools_server_and_tunnel_ready"}
 
 
+def start_empty_lua(nonce: str) -> str:
+    """Queue the test map only in a positively identified idle Tools world."""
+    return """
+if not IsServer or not IsServer() or not IsInToolsMode or not IsInToolsMode()
+  or not GetMapName then return end
+if GetMapName() == '<empty>' then
+  if type(SendToServerConsole) ~= 'function' then return end
+  SendToServerConsole('host_timescale 1')
+  SendToServerConsole('r_drawpanorama 1')
+  SendToServerConsole('dota_launch_custom_game survival template_map')
+end
+""" + f"\nprint('{nonce}')\n"
+
+
+def start_empty(state: Path) -> dict:
+    if not tunnel.check(state).get("ok"):
+        raise AuthError("owned_ecs_tunnel_not_ready")
+    nonce = "GOUFAYU_EMPTY_TOOLS_" + secrets.token_hex(16)
+    send_lua(start_empty_lua(nonce), nonce, OUTPUT / (nonce + ".json"))
+    return {"ok": True, "status": "empty_tools_launch_checked"}
+
+
 def inject(state: Path, environment: Path) -> dict:
     probe(state)
     token = read_api_token(environment)
@@ -330,7 +352,7 @@ def main() -> int:
     import aliyun_local_config as local_config
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("probe", "inject", "check-acl"))
+    parser.add_argument("action", choices=("probe", "inject", "check-acl", "start-empty"))
     parser.add_argument("--environment", type=Path)
     parser.add_argument("--state", type=Path, default=OUTPUT / "test_tunnel.json")
     args = parser.parse_args()
@@ -341,6 +363,8 @@ def main() -> int:
             result = check_acl()
         elif args.action == "probe":
             result = probe(args.state)
+        elif args.action == "start-empty":
+            result = start_empty(args.state)
         else:
             settings = local_config.load(ROOT)
             environment = args.environment if args.environment is not None else settings["environment"]

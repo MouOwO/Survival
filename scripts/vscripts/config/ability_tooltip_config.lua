@@ -182,8 +182,8 @@ ability_summon_drow_ranger = {
 },
 ability_summon_monkey_king = {
     abilityid = "ability_summon_monkey_king",
-    abilityname = "召唤齐天大圣（VIP）",
-    abilitydesc = "召唤齐天大圣。需要VIP权限，攻击距离1000，清除原版技能后初始获得4个项目技能。",
+    abilityname = "召唤齐天大圣",
+    abilitydesc = "拥有本局可用的齐天大圣存档道具或VIP权限后可召唤。专属技能随转职等级激活。",
     abilityicon = "survival/native/portrait_monkey_king",
 },
 ability_summon_blademaster = {

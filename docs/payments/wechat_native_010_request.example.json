@@ -1,0 +1,11 @@
+{
+  "appid": "wx164e25a570fb636a",
+  "mchid": "1117928493",
+  "description": "齐天大圣测试商品",
+  "out_trade_no": "GENERATE_UNIQUE_ORDER_ID",
+  "notify_url": "https://example.invalid/v1/payments/wechat/notify",
+  "amount": {
+    "total": 10,
+    "currency": "CNY"
+  }
+}

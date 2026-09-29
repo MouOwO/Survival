@@ -1,0 +1,21 @@
+"use strict";
+const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm");
+const panels={},requests=[],urls=[];let handler;
+function $(id){return panels[id]||(panels[id]={style:{},enabled:true,text:"",SetHasClass(name,value){this[name]=value;},RemoveAndDeleteChildren(){},AddClass(){}});}
+$.CreatePanel=()=>({style:{},AddClass(){}});
+$.Schedule=()=>1;$.CancelScheduled=()=>{};$.DispatchEvent=(name,url)=>urls.push(url);
+const subscriptions={};
+const scope={$,GameEvents:{SendCustomGameEventToServer:(name,data)=>requests.push(data),Subscribe:(name,callback)=>{subscriptions[name]=callback;if(name==="survival_payment_result")handler=callback;}}};
+vm.createContext(scope);vm.runInContext(fs.readFileSync("panorama/src/scripts/custom_game/payment_test.js","utf8"),scope);
+scope.PaymentToggle();scope.PaymentBuy();scope.PaymentBuy();
+assert.equal(requests.filter(x=>x.action==="create").length,1);
+assert.deepEqual(Object.keys(requests[1]),["action"]);
+const order={ok:true,action:"create",state:"pending",order_id:"WX"+"1".repeat(30),checkout_url:"https://pay.xiaofengnet.com/checkout?order=WX"+"1".repeat(30)+"&token="+"a".repeat(64)};
+handler(order);assert.equal(urls.length,0);assert.equal($("#PaymentDialog").Open,true);assert.equal($("#PaymentBuy").enabled,false);
+scope.PaymentOpen();assert.equal(urls.length,1);
+handler({...order,qr_matrix:Array(29).fill("0".repeat(29)).join("|")});assert.equal($("#PaymentQR").style.visibility,"visible");
+handler({...order,checkout_url:"https://evil.example/"});scope.PaymentOpen();assert.equal(urls.length,1);
+handler({...order,action:"status",state:"delivered"});assert.match($("#PaymentStatus").text,/存档/);assert.equal($("#PaymentOpen").style.visibility,"collapse");
+handler({ok:false,action:"create",error:"test_account_required"});assert.equal($("#PaymentEntry").style.visibility,"collapse");
+subscriptions.survival_payment_open();assert.equal($("#PaymentDialog").Open,true);
+console.log("PAYMENT_UI_PASS: duplicate clicks, fixed request fields, trusted checkout origin, delivery status, allowlist");

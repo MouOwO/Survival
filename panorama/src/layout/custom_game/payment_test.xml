@@ -1,0 +1,20 @@
+<root>
+  <styles><include src="file://{resources}/styles/custom_game/payment_test.css" /></styles>
+  <scripts><include src="file://{resources}/scripts/custom_game/payment_test.js" /></scripts>
+  <Panel class="PaymentRoot" hittest="false">
+    <Button id="PaymentEntry" class="PaymentEntry" onactivate="PaymentToggle()"><Label text="微信支付测试" /></Button>
+    <Panel id="PaymentDialog" class="PaymentDialog" hittest="true">
+      <Button class="PaymentClose" onactivate="PaymentToggle()"><Label text="×" /></Button>
+      <Label class="PaymentHeading" text="齐天大圣" />
+      <Label class="PaymentDescription" text="永久存档奖励 ×1 · 测试商品" />
+      <Label class="PaymentPrice" text="¥0.10" />
+      <Panel id="PaymentQR" class="PaymentQR" hittest="false" />
+      <Label id="PaymentStatus" class="PaymentDescription" text="付款后由服务器发放，每个账号最多拥有 1 个。" />
+      <Button id="PaymentBuy" class="PaymentAction" onactivate="PaymentBuy()"><Label text="生成微信付款码 ¥0.10" /></Button>
+      <Button id="PaymentOpen" class="PaymentAction Secondary" onactivate="PaymentOpen()"><Label text="备用：在浏览器打开" /></Button>
+      <Button id="PaymentRefresh" class="PaymentAction Secondary" onactivate="PaymentRefresh()"><Label text="查询付款结果" /></Button>
+      <TextEntry id="PaymentLink" class="PaymentLink" multiline="false" />
+      <Label class="PaymentHint" text="用手机微信直接扫上方二维码。也可复制链接到电脑浏览器。支付宝暂未开放。" />
+    </Panel>
+  </Panel>
+</root>

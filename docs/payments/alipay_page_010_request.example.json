@@ -1,0 +1,12 @@
+{
+  "app_id": "2021007102660118",
+  "method": "alipay.trade.page.pay",
+  "sign_type": "RSA2",
+  "notify_url": "https://pay.xiaofengnet.com/v1/payments/alipay/notify",
+  "biz_content": {
+    "out_trade_no": "GENERATE_AND_PERSIST_UNIQUE_ORDER_ID",
+    "product_code": "FAST_INSTANT_TRADE_PAY",
+    "total_amount": "0.10",
+    "subject": "齐天大圣测试商品"
+  }
+}

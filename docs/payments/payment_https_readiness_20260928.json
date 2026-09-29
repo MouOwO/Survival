@@ -1,0 +1,70 @@
+{
+  "recordedDate": "2026-09-28",
+  "inspectionMode": "read_only",
+  "sshHostKeyVerification": "StrictHostKeyChecking=yes using previously verified project known-host entry",
+  "server": {
+    "check": "payment_https_readiness_read_only",
+    "target": "47.110.238.248",
+    "api_service": {
+      "exit_code": 0,
+      "output": "active"
+    },
+    "nginx_installed": false,
+    "nginx_service": {
+      "exit_code": 3,
+      "output": "inactive"
+    },
+    "certbot_installed": false,
+    "relevant_listeners": [
+      "LISTEN 0      16     127.0.0.1:8765 0.0.0.0:*"
+    ],
+    "tls_certificate_directory_names": [],
+    "local_api_health_http_status": 200
+  },
+  "dns": {
+    "paymentHost": "pay.xiaofengnet.com",
+    "paymentHostStatus": "NXDOMAIN",
+    "websiteHost": "www.xiaofengnet.com",
+    "websiteAddress": "47.116.11.179",
+    "nameservers": [
+      "dns15.hichina.com",
+      "dns16.hichina.com"
+    ]
+  },
+  "alipay": {
+    "check": "read_only_alipay_trade_query",
+    "httpStatus": 200,
+    "platformSignatureVerified": true,
+    "responseHasSignature": true,
+    "signedResponseShapeRecognized": true,
+    "code": "40003",
+    "subCode": "isv.not-online-app",
+    "expectedMissingTrade": false,
+    "ordersCreated": 0,
+    "paymentsInitiated": 0,
+    "rewardsGranted": 0,
+    "credentialDirectory": "D:/magic and love/alipay",
+    "note": "Latest signed production response still reports application not online."
+  },
+  "wechat": {
+    "readOnlyQueryAndResponseSignatureVerified": true,
+    "evidence": "wechat_connection_check_20260928.json",
+    "apiV3SecretUserReported": "not_saved",
+    "apiV3SecretOriginalValueKnown": "unknown",
+    "appIdBindingVerified": false,
+    "nativeCreatePermissionVerified": false
+  },
+  "proposedUrls": {
+    "base": "https://pay.xiaofengnet.com",
+    "wechatNotify": "https://pay.xiaofengnet.com/v1/payments/wechat/notify",
+    "alipayNotify": "https://pay.xiaofengnet.com/v1/payments/alipay/notify"
+  },
+  "runtimePaymentMode": "test_only_in_local_backend",
+  "paymentRoutesImplemented": false,
+  "dnsChanged": false,
+  "serverModified": false,
+  "certificatesInstalled": false,
+  "ordersCreated": 0,
+  "paymentsInitiated": 0,
+  "rewardsGranted": 0
+}

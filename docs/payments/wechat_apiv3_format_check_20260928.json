@@ -1,0 +1,10 @@
+{
+  "check": "wechat_api_v3_key_format_only",
+  "checkedAt": "2026-09-28T00:19:16.619Z",
+  "file": "D:\\magic and love\\wechatpay\\api_v3_key.txt",
+  "formatValid": true,
+  "characterCount": 32,
+  "platformValueMatchVerified": false,
+  "secretPrintedOrCopied": false,
+  "networkRequests": 0
+}
