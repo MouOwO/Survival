@@ -1729,10 +1729,12 @@
     }
 
     function abilityRuntime(abilityIndex) {
-        return CustomNetTables.GetTableValue(
+        var runtime = CustomNetTables.GetTableValue(
             "survival_ability_runtime",
             String(abilityIndex)
         ) || {};
+        var guard = GameUI.CustomUIConfig().SurvivalHeroSummonAvailability;
+        return guard ? guard(abilityIndex, runtime) : runtime;
     }
 
     function applyAbilityRuntime(panel, abilityIndex) {

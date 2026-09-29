@@ -126,6 +126,8 @@
             }
             value = bindingSnapshot.tables[cacheKey];
         }
+        var guard = GameUI.CustomUIConfig().SurvivalHeroSummonAvailability;
+        if (name === "survival_ability_runtime" && guard) value = guard(Number(key), value);
         var production = GameUI.CustomUIConfig().SurvivalProductionHUD;
         if (name === "survival_ability_runtime" && production && production.GetResearchRuntime) {
             return production.GetResearchRuntime(Number(key),

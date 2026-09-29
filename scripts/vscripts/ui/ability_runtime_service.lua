@@ -269,6 +269,16 @@ local function publish(state)
     reconcile_authoritative_unit_state(state)
     local unit_key = unit:entindex()
     state_by_unit[unit_key] = state
+    if state.building_id == "hero_altar" then
+        -- Fetch once for all six buttons, including the first building publish.
+        -- Never reuse an old decision across profile changes or player owners.
+        local result = event_bus.request(events.HERO_SUMMON_SNAPSHOT_REQUEST, {
+            player_id = state.player_id,
+        })
+        state.hero_summon_snapshot = result and result.ok and result.snapshot or nil
+        state.hero_summoned = state.hero_summon_snapshot
+            and state.hero_summon_snapshot.hero_summoned or 0
+    end
     if state.building_id == "arrow_tower"
         and unit.survival_tower_ability_sync_pending then
         CustomNetTables:SetTableValue(
@@ -526,9 +536,8 @@ local function on_hero_summon_state(payload)
     if player_id == nil or player_id < 0 then
         return
     end
-    local team = PlayerResource:GetTeam(player_id)
     for _, state in pairs(state_by_unit) do
-        if state.team == team then
+        if tonumber(state.player_id) == player_id then
             state.hero_summoned =
                 tonumber(payload.hero_summoned) or 0
             publish(state)

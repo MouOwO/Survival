@@ -464,3 +464,20 @@
     $.Schedule(1.00, applyDefaultUIProfile);
     $.Schedule(3.00, applyDefaultUIProfile);
 })();
+
+// BEGIN hero summon initial availability
+(function(){
+    var cfg=GameUI.CustomUIConfig();
+    cfg.SurvivalHeroSummonAvailability=function(ability, runtime){
+        runtime=runtime||{};
+        var name='';
+        try{name=Abilities.GetAbilityName(Number(ability))||runtime.ability_name||'';}catch(e){name=runtime.ability_name||'';}
+        if(name!=='ability_summon_monkey_king' && name!=='ability_summon_blademaster')return runtime;
+        if(runtime.hero_summon===1 && Number(runtime.summon_player_id)===Game.GetLocalPlayerID())return runtime;
+        // Absence of an explicit per-player decision never grants paid access.
+        var locked={};Object.keys(runtime).forEach(function(key){locked[key]=runtime[key];});
+        locked.ability_name=name;locked.available=0;locked.status_text='英雄权限同步中';
+        return locked;
+    };
+})();
+// END hero summon initial availability
