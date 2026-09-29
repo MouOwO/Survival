@@ -63,5 +63,59 @@ vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui_
 assert.strictEqual(config.SurvivalLotteryDetailReads,savedReads,'panel reload preserves local viewing times');
 config.SurvivalLottery.Open();events.ui_lottery_snapshot(timed('map',2001));assert(!nodes.LotteryUpdateDot.visible);
 console.log('LOTTERY_READ_TIME_PASS: immediate hide, stale response, equal/new timestamp, pool isolation, UI reload');
+
+// A rejected prefetch used to be forgotten when details opened later, leaving
+// an empty list and a permanent loading message even though the pool exists.
+const currentUI=config.SurvivalLottery;
+currentUI.CloseInfo();
+events.ui_lottery_snapshot({ok:false,error:'archive_config_mismatch'});
+currentUI.Feature('details');
+assert.equal(nodes.LotteryInfoList.children.length,0);
+assert(nodes.LotteryInfoRules.text.includes('游戏与服务器配置版本不一致'));
+assert.equal(nodes.LotterySelectedName.text,'奖池暂时无法加载');
+assert(!nodes.LotterySingleButton.enabled,'failed loading cannot enable drawing');
+currentUI.CloseInfo();currentUI.Feature('details');
+assert(nodes.LotteryInfoRules.text.includes('游戏与服务器配置版本不一致'),'reopening must preserve the actual failure');
+events.ui_lottery_snapshot(timed('map',2001));
+assert.equal(nodes.LotteryInfoList.children.length,5,'a successful response restores the existing rewards');
+assert(!nodes.LotteryInfoRules.text.includes('加载失败'));
+currentUI.SelectPool('summer');
+const failedDetailRequest=requests.at(-1).p;
+events.ui_lottery_snapshot({snapshot_scope:'details',snapshot_request_id:failedDetailRequest.snapshot_request_id,ok:false,error:'archive_config_mismatch'});
+assert.equal(nodes.LotteryInfoList.children.length,0,'failed detail tab must not retain another pool rewards');
+assert(nodes.LotteryInfoRules.text.includes('游戏与服务器配置版本不一致'));
+currentUI.SelectPool('map');
+const recoveredRequest=requests.at(-1).p;
+events.ui_lottery_snapshot({...timed('map',2001),snapshot_scope:'details',snapshot_request_id:recoveredRequest.snapshot_request_id});
+assert.equal(nodes.LotteryInfoList.children.length,5,'a different valid tab is unaffected');
+console.log('LOTTERY_LOAD_ERROR_PASS: prefetch error, reopen, retry recovery and independent detail tabs');
+currentUI.CloseInfo();currentUI.SelectPool('summer');events.ui_lottery_snapshot(timed('summer',2001));
+let ticketPool=null;
+config.SurvivalCommerceView={OpenTicketPurchase:pool=>{ticketPool=pool.id;return true;}};
+currentUI.Feature('purchase');assert.equal(ticketPool,'summer');
+config.SurvivalCommerceView.OpenTicketPurchase=()=>false;
+currentUI.Feature('purchase');assert(nodes.LotteryStatus.text.includes('抽奖券购买暂未开放'));
+delete config.SurvivalCommerceView;
+console.log('LOTTERY_TICKET_ENTRY_PASS: special-pool routing and visible unavailable message');
 `;
+// Optional read-only HTTP fixture: verify the actual server payload through the
+// same Panorama presenter, without issuing a draw, exchange or purchase.
+if(process.env.LOTTERY_SNAPSHOT_FIXTURE){
+suite+=`
+const live=JSON.parse(fs.readFileSync(${JSON.stringify(path.resolve(process.env.LOTTERY_SNAPSHOT_FIXTURE))},'utf8'));
+assert.equal(live.ok,true);assert.equal(live.snapshots.length,4);
+const liveUI=config.SurvivalLottery;liveUI.CloseInfo();
+live.snapshots.forEach((data,index)=>{
+ assert.equal(data.items.length,88,'existing enabled rewards must remain complete');
+ events.ui_lottery_snapshot({...data,snapshot_scope:'cache',cache_sequence:100+index});
+ liveUI.SelectPool(data.selected_pool_id);liveUI.Feature('details');
+ assert.equal(nodes.LotteryInfoList.children.length,data.items.length);
+ assert(nodes.LotterySelectedName.text.length>0);
+ assert(!nodes.LotteryInfoRules.text.includes('加载失败'));
+ liveUI.CloseInfo();
+});
+assert(!requests.some(r=>r.n==='ui_lottery_draw_request'||r.n==='ui_lottery_exchange_request'));
+console.log('LOTTERY_LIVE_SNAPSHOT_PASS: 4 pools, 88 real rewards each, no draw/exchange/purchase');
+`;
+}
 vm.runInNewContext(suite,{require:require('module').createRequire(path.resolve('tools/test_lottery_ui.js')),console},{filename:'lottery_updates_behavior.cjs'});

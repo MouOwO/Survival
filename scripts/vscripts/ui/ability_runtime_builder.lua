@@ -13,6 +13,8 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local building_count_limits = require("systems/building_count_limit_service")
 local lumberjack_fusions = require("config/generated/lumberjack_fusion_definitions")
+local hero_summon_projection = require("systems/hero_summon_projection")
+local hero_summon_rules = require("config/generated/hero_summon_rules")
 local M = {}
 local builder_slot_order_by_ability = {}
 local tooltip_definitions = require("config/generated/tooltip_definitions")
@@ -752,30 +754,42 @@ local function altar_travel(ability_name, state, resources)
         },
     }
 end
-function M.build(ability_name, state, resources)
-    if string.match(ability_name or "", "^ability_summon_") then
-        local projection = require("systems/hero_summon_projection")
-        local hero_id = projection.hero_id_for_summon_ability(ability_name)
-        if hero_id then
-            local player_id = state and state.player_id
-            local response = event_bus.request(events.HERO_SUMMON_SNAPSHOT_REQUEST, { player_id = player_id })
-            local snapshot = response and response.snapshot
-            local option
-            for _, candidate in pairs(snapshot and snapshot.heroes or {}) do
-                if candidate.hero_id == hero_id then option = candidate; break end
+local function hero_summon_runtime(ability_name, state)
+    local hero_id = hero_summon_projection.hero_id_for_summon_ability(ability_name)
+    if not hero_id then return nil end
+    local player_id = tonumber(state and state.player_id) or -1
+    local result = {
+        hero_summon = 1,
+        summon_player_id = player_id,
+        available = 0,
+        can_afford = 1,
+        status_text = "英雄权限同步中",
+    }
+    local snapshot = state and state.hero_summon_snapshot
+    if player_id < 0 or not snapshot
+        or tonumber(snapshot.player_id) ~= player_id then return result end
+    local rule = hero_summon_rules.rows and hero_summon_rules.rows[1] or {}
+    if snapshot.hero_summoned == 1 then
+        result.status_text = "本局已经召唤英雄"
+    elseif snapshot.altar_built ~= 1 then
+        result.status_text = "英雄祭坛尚未建造"
+    elseif (tonumber(snapshot.city_level) or 0) < (tonumber(rule.requires_city_level) or 3) then
+        result.status_text = "主城等级不足"
+    else
+        for _, option in ipairs(snapshot.heroes or {}) do
+            if option.hero_id == hero_id then
+                result.available = option.available == 1 and 1 or 0
+                result.status_text = result.available == 1 and "可召唤"
+                    or option.disabled_reason or "英雄尚未解锁"
+                break
             end
-            local allowed = snapshot and snapshot.altar_built == 1
-                and snapshot.hero_summoned ~= 1 and option and option.available == 1
-            local status = not snapshot and "英雄权限同步中"
-                or (snapshot.hero_summoned == 1 and "已经召唤过英雄")
-                or (snapshot.altar_built ~= 1 and "英雄祭坛不可用")
-                or (option and option.vip_required == 1 and option.available ~= 1 and "需购买激活")
-                or (allowed and "可以召唤" or "当前不可召唤")
-            return { available = allowed and 1 or 0, can_afford = 1,
-                hero_summon = 1, summon_player_id = player_id,
-                status_text = status }
         end
     end
+    return result
+end
+function M.build(ability_name, state, resources)
+    local summon = hero_summon_runtime(ability_name, state)
+    if summon then return summon end
     if string.match(ability_name or "", "^ability_fuse_lumberjack_%d+$") then
         for _, row in ipairs(lumberjack_fusions.rows or {}) do
             if row.enabled ~= false and row.ability_id == ability_name then

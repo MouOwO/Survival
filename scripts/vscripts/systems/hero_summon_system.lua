@@ -5,6 +5,7 @@ local summon_rules = require("config/generated/hero_summon_rules")
 local stat_adapter = require("systems/hero_stat_adapter")
 local cosmetic_service = require("systems/hero_cosmetic_service")
 local projection = require("systems/hero_summon_projection")
+local summon_access = require("systems/hero_summon_access")
 local hero_anchor_service = require("systems/hero_anchor_service")
 local destination_validation = require("systems/destination_validation_service")
 local summon_destination = require("systems/hero_summon_destination")
@@ -249,10 +250,11 @@ local function validate(player_id, hero_id, debug_bypass)
         return nil, nil, "英雄配置不存在"
     end
     local entitlement = projection.entitlements(player_id)
-    if definition.vip_required == true
-        and not debug_bypass
-        and entitlement.vip ~= 1 then
-        return nil, nil, "需要VIP权限"
+    local unlocked, unlock_error = summon_access.check(
+        definition, summon_access.context(player_id, entitlement)
+    )
+    if not debug_bypass and not unlocked then
+        return nil, nil, unlock_error
     end
     -- Resolve before replacing the hidden carrier. The exact grounded result
     -- is also used for placement; do not recompute the old, possibly blocked
@@ -504,6 +506,12 @@ local function on_entitlement_changed(payload)
     publish(payload.player_id, "entitlement_changed")
 end
 
+local function on_profile_changed(payload)
+    local player_id = event_player_id(payload)
+    if player_id == nil or unavailable_reason(player_id) then return end
+    publish(player_id, "profile_changed")
+end
+
 local function on_hero_progression_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     if not valid_player_id(player_id) or unavailable_reason(player_id) then
@@ -589,6 +597,7 @@ function M.init()
         events.PLAYER_ENTITLEMENT_CHANGED,
         on_entitlement_changed
     )
+    event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, on_profile_changed)
     event_bus.subscribe(
         events.HERO_PROGRESSION_CHANGED,
         on_hero_progression_changed

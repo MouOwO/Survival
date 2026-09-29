@@ -20,4 +20,14 @@ bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0})
 assert(balance()==37,'earned initial resource bonus is applied once')
 tasks['resource_income:0']()
 assert(balance()==39,'legitimate earned income remains available')
+local function gold()return bus.request(events.RESOURCE_GET_REQUEST,{player_id=0}).gold end
+local original_gold=gold()
+stats.initial_wood=140;stats.initial_gold=100
+bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0,reason='payment_delivered'})
+assert(balance()==139 and gold()==original_gold+100,'payment profile reload grants exactly the +100 opening deltas')
+bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0,reason='payment_delivered'})
+assert(balance()==139 and gold()==original_gold+100,'duplicate payment refresh cannot refill resources')
+stats.initial_wood=40;stats.initial_gold=0
+bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0,reason='payment_test_reset'})
+assert(balance()==39 and gold()==original_gold,'test reset reverses the opening-resource payment contribution')
 print('OPENING_WOOD_PASS: 10 once, no default income, refresh idempotent, earned bonuses preserved')

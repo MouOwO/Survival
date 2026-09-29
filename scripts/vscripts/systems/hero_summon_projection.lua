@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local heroes = require("config/generated/hero_definitions")
 local altar_actions = require("config/generated/altar_actions")
+local summon_access = require("systems/hero_summon_access")
 
 local M = {}
 
@@ -59,9 +60,9 @@ function M.hero_id_for_summon_ability(ability_name)
     return HERO_BY_SUMMON_ABILITY[tostring(ability_name or "")]
 end
 
-local function option(definition, entitlement)
+local function option(definition, access)
     local vip_required = definition.vip_required == true
-    local available = not vip_required or entitlement.vip == 1
+    local available, disabled_reason = summon_access.check(definition, access)
     return {
         hero_id = definition.hero_id,
         unit_name = definition.unit_name,
@@ -69,7 +70,7 @@ local function option(definition, entitlement)
         primary_attribute = definition.primary_attribute,
         vip_required = vip_required and 1 or 0,
         available = available and 1 or 0,
-        disabled_reason = available and "" or "需要VIP权限",
+        disabled_reason = disabled_reason,
         attack_range = tonumber(definition.attack_range) or 0,
         all_attributes_bonus =
             tonumber(definition.all_attributes_bonus) or 0,
@@ -90,10 +91,11 @@ end
 
 function M.build(player_id, altar, city_level, summoned)
     local entitlement = M.entitlements(player_id)
+    local access = summon_access.context(player_id, entitlement)
     local options = {}
     for _, definition in ipairs(heroes.rows or {}) do
         if definition.enabled ~= false then
-            table.insert(options, option(definition, entitlement))
+            table.insert(options, option(definition, access))
         end
     end
     table.sort(options, function(a, b)
@@ -120,15 +122,15 @@ function M.update_altar(player_id, altar, already_summoned)
     end
 
     local entitlement = M.entitlements(player_id)
+    local access = summon_access.context(player_id, entitlement)
     local current_rebirth_level = rebirth_level(player_id)
     for hero_id, ability_name in pairs(SUMMON_ABILITIES) do
         local ability = altar:FindAbilityByName(ability_name)
         local definition = heroes.by_id[hero_id]
         if ability and definition then
-            local vip_ok = definition.vip_required ~= true
-                or entitlement.vip == 1
+            local unlocked = summon_access.check(definition, access)
             ability:SetActivated(
-                not already_summoned and vip_ok
+                not already_summoned and unlocked
             )
             ability:SetHidden(already_summoned == true)
         end

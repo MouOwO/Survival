@@ -1,0 +1,9 @@
+﻿category_id,display_name,sort_order,enabled
+#中文名:分类ID,分类名称,排序,启用
+#types:string,string,number,boolean
+weapon,武器与装备,10,1
+item,道具与材料,20,1
+technology,科技与服务,30,1
+challenge,挑战商店,40,1
+rebirth,转职挑战,50,1
+bundles,礼包,60,1

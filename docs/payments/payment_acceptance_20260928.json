@@ -1,0 +1,42 @@
+{
+  "order_id": "WXc88cec410468174b092819e4fc0f1c",
+  "state": "delivered",
+  "amount_fen": 10,
+  "currency": "CNY",
+  "player_binding_correct": true,
+  "appid": "wx164e25a570fb636a",
+  "mchid": "1117928493",
+  "paid_at": "2026-09-28 07:47:57.145509+00:00",
+  "granted_at": "2026-09-28 07:47:57.145509+00:00",
+  "wechat_transaction_present": true,
+  "reward_count": 1,
+  "delivered_orders_for_account": 1,
+  "callback_statuses": [
+    {
+      "status": 503,
+      "time": "28/Sep/2026:12:06:28 +0800"
+    },
+    {
+      "status": 401,
+      "time": "28/Sep/2026:14:10:50 +0800"
+    },
+    {
+      "status": 204,
+      "time": "28/Sep/2026:15:47:57 +0800"
+    }
+  ],
+  "checked_at": "2026-09-28",
+  "account_id": "1014036256",
+  "runtime_release": "20260928-payment04",
+  "local_python_tests": 15,
+  "postgres_checks": 12,
+  "lua_test": "passed",
+  "panorama_test": "passed",
+  "game_screenshot": "output/payment_game_ui.png",
+  "notes": [
+    "Actual WeChat Native payment, verified production callback returned HTTP 204.",
+    "One delivered order and one persistent lottery_monkey_king item.",
+    "Game screenshot shows authoritative profile-refresh success.",
+    "Alipay remains disabled."
+  ]
+}

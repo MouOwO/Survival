@@ -962,6 +962,7 @@ local function initialize_services()
     require("systems/fishing_service").init()
     require("systems/building_challenge_service").init()
     shop_system.init()
+    require("systems/payment_service").init()
     cheat_command_service.init()
     require("systems/monster_corpse_lifecycle_service").init()
 end

@@ -69,6 +69,42 @@ class AuthTests(unittest.TestCase):
             with self.assertRaisesRegex(auth.AuthError, "tools_server_confirmation_missing"):
                 auth.probe(self.root / "state")
 
+    def test_empty_tools_launch_preserves_active_maps_and_non_tools_clients(self):
+        lua = shutil.which('lua') or shutil.which('lua.exe')
+        if not lua:
+            self.skipTest('Lua interpreter is unavailable')
+        fixture = """
+local tools, server, map = true, true, '<empty>'
+local sent, notices = {}, {}
+IsInToolsMode = function() return tools end
+IsServer = function() return server end
+GetMapName = function() return map end
+SendToServerConsole = function(command) sent[#sent+1] = command end
+print = function(message) notices[#notices+1] = message end
+local start = function()
+""" + auth.start_empty_lua('confirmed') + """
+end
+for _, current in ipairs({'template_map', 'dota', 'other_map', '', '<unknown>'}) do
+  map = current
+  start()
+  assert(#sent == 0, 'an active or unknown map must never be replaced')
+end
+map, tools = '<empty>', false
+start()
+assert(#sent == 0, 'ordinary client must not be modified')
+tools, server = true, false
+start()
+assert(#sent == 0, 'client-side VM must not start a map')
+server = true
+start()
+assert(#sent == 3 and sent[3] == 'dota_launch_custom_game survival template_map')
+assert(notices[#notices] == 'confirmed')
+"""
+        script = self.root / 'start-empty.lua'
+        script.write_text(fixture, encoding='utf-8')
+        result = subprocess.run([lua, str(script)], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+
     def setup_injection(self, sender):
         self.stack.enter_context(patch.object(auth, "probe"))
         self.stack.enter_context(patch.object(auth, "ready"))

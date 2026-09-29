@@ -121,7 +121,7 @@ local function initialize_from_profile(payload)
             - (tonumber(account.profile_initial_gold) or 0)
         local population_delta = profile_initial_population_cap
             - (tonumber(account.profile_initial_population_cap) or 0)
-        if payload and payload.reason == "incremental" then
+        if payload and (payload.reason == "incremental" or payload.reason == "payment_test_reset") then
             account.wood = math.max(0, account.wood + wood_delta)
             account.gold = math.max(0, account.gold + gold_delta)
         else
@@ -137,7 +137,7 @@ local function initialize_from_profile(payload)
         account.profile_initial_population_cap = profile_initial_population_cap
         account.wood_per_second = math.max(0, tonumber(stats.wood_per_second) or 0)
         account.gold_per_second = math.max(0, tonumber(stats.gold_per_second) or 0)
-        if payload and payload.reason == "incremental" then
+        if payload and (payload.reason == "incremental" or payload.reason == "payment_test_reset") then
             account.max_population = math.max(account.population,
                 account.max_population + population_delta)
         else

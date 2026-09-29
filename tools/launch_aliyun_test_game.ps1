@@ -1,6 +1,6 @@
 param(
     [switch]$AttachOnly,
-    [ValidateRange(10,600)][int]$WaitSeconds = 180,
+    [ValidateRange(10,600)][int]$WaitSeconds = 300,
     [ValidateRange(1,4)][int]$ExpectedPlayers = 1,
     [ValidateRange(10,1800)][int]$JoinWaitSeconds = 600
 )
@@ -41,7 +41,8 @@ try {
     if (-not $connected.ok) { throw ('SSH connection: ' + $connected.error) }
     Write-Host 'ECS tunnel ready: 127.0.0.1:8765'
     $games = @(Get-Process -Name dota2 -ErrorAction SilentlyContinue)
-    if ($games.Count -eq 0) {
+    $startedGame = $games.Count -eq 0
+    if ($startedGame) {
         if ($AttachOnly) { throw 'Open the survival Workshop Tools game first.' }
         $engineGame = (Resolve-Path (Join-Path $repo '../..')).Path
         $executable = Join-Path $engineGame 'bin/win64/dota2.exe'
@@ -57,20 +58,51 @@ try {
         )
     } else {
         Write-Host 'Attaching to the current game; its map and match will be preserved.'
+        Write-Host 'If this is the ordinary Dota main menu, exit Dota and run launch_aliyun_test_game.cmd again to start the survival Tools game.'
     }
     Write-Host 'Waiting for the normal survival/template_map Tools server...'
     $timer = [Diagnostics.Stopwatch]::StartNew()
     $ready = $false
+    $lastWaitError = ''
+    $nextWaitUpdate = 0
+    $emptyToolsChecked = $false
     do {
         $probe = Invoke-Check $auth 'probe'
         if ($probe.ok) { $ready = $true; break }
         if ($probe.error -notin @('tools_console_unavailable', 'tools_server_confirmation_missing')) {
             throw ('Game connection: ' + $probe.error)
         }
+        if (@(Get-Process -Name dota2 -ErrorAction SilentlyContinue).Count -eq 0) {
+            throw 'GAME_CLIENT_EXITED: Dota closed before the test map was ready. Keep Steam running, then retry launch_aliyun_test_game.cmd. The ECS tunnel is already connected.'
+        }
+        if (-not $startedGame -and -not $AttachOnly -and -not $emptyToolsChecked) {
+            $emptyTools = Invoke-Check $auth 'start-empty'
+            if ($emptyTools.ok) {
+                $emptyToolsChecked = $true
+                Write-Host 'EMPTY_TOOLS_CHECKED: an idle Tools world was asked to open template_map; any active map was preserved.'
+            } elseif ($emptyTools.error -notin @('tools_console_unavailable', 'tools_server_confirmation_missing')) {
+                throw ('Game preparation: ' + $emptyTools.error)
+            }
+        }
+        if ($probe.error -ne $lastWaitError -or $timer.Elapsed.TotalSeconds -ge $nextWaitUpdate) {
+            $stage = if ($probe.error -eq 'tools_console_unavailable') {
+                'Waiting for the Workshop Tools console. Check the Dota window; if VConsole is connected, disconnect it while this launcher runs.'
+            } else {
+                'The test map has not confirmed readiness. Check whether Dota is still loading, in its main menu, or its developer console is busy.'
+            }
+            Write-Host ('GAME_WAITING: {0}s/{1}s. {2}' -f [int]$timer.Elapsed.TotalSeconds, $WaitSeconds, $stage)
+            $lastWaitError = $probe.error
+            $nextWaitUpdate = $timer.Elapsed.TotalSeconds + 15
+        }
         Start-Sleep -Seconds 2
     } while ($timer.Elapsed.TotalSeconds -lt $WaitSeconds)
     if (-not $ready) {
-        throw 'Normal template_map is not ready. Open Workshop Tools survival, then run: host_timescale 1; r_drawpanorama 1; dota_launch_custom_game survival template_map'
+        $hint = if ($startedGame) {
+            'The launcher started Dota, but loading or the developer console did not become ready. Check the visible game window and disconnect VConsole if it owns the console connection. If the map is still loading, rerun this launcher to keep waiting without restarting it.'
+        } else {
+            'Dota was already running, so this launcher preserved its current map. If it is in the ordinary main menu or another map, exit Dota yourself, then double-click launch_aliyun_test_game.cmd to start the correct test game.'
+        }
+        throw ('GAME_MAP_WAIT_TIMEOUT: survival/template_map was not confirmed within {0} seconds (last status: {1}). {2} The ECS tunnel is connected; no game was closed or map replaced.' -f $WaitSeconds, $lastWaitError, $hint)
     }
     if ($ExpectedPlayers -gt 1) {
         Write-Host ('LAN_WAITING_PLAYERS: expected ' + $ExpectedPlayers + '. Clients join this host; do not launch separate maps. Authentication waits until everyone joins.')

@@ -1,0 +1,16 @@
+﻿reward_id,sku,reward_type,target_id,amount,display_name,enabled
+#中文名:奖励行ID,所属商品ID,奖励类型stat或item或entitlement,属性或道具或权限ID,数值或数量,显示名称,启用
+#types:string,string,string,string,number,string,boolean
+reward_1,wood_100_test_50_v3,stat,initial_wood,100,初始木材,1
+reward_2,gold_100_test_50_v3,stat,initial_gold,100,初始金币,1
+reward_3,wall_armor_100_test_50_v3,stat,wall_armor,100,城墙初始护甲,1
+reward_4,wall_health_100_test_50_v3,stat,wall_initial_health,100,城墙初始血量,1
+reward_5,tower_attack_100_test_50_v3,stat,tower_attack_flat,100,箭塔固定攻击力,1
+bundle_stat_1,starter_bundle_v4,stat,initial_wood,100,初始木材,1
+bundle_stat_2,starter_bundle_v4,stat,initial_gold,100,初始金币,1
+bundle_stat_3,starter_bundle_v4,stat,wall_armor,100,城墙初始护甲,1
+bundle_stat_4,starter_bundle_v4,stat,wall_initial_health,100,城墙初始血量,1
+bundle_stat_5,starter_bundle_v4,stat,tower_attack_flat,100,箭塔固定攻击力,1
+bundle_vip,starter_bundle_v4,entitlement,vip,1,VIP英雄召唤权限,1
+bundle_ticket,starter_bundle_v4,item,special_lottery_ticket,10,特殊抽奖券,1
+special_ticket_single,special_lottery_ticket_single,item,special_lottery_ticket,1,特殊抽奖券,1

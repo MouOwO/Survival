@@ -1,0 +1,30 @@
+{
+  "recorded_date": "2026-09-27",
+  "environment": "production",
+  "app_id": "2021007102660118",
+  "gateway": "https://openapi.alipay.com/gateway.do",
+  "check": "read_only_query_after_user_replaced_alipay_public_key",
+  "method": "alipay.trade.query",
+  "order_reference_kind": "random_CONFIGCHECK_identifier_not_created_as_order",
+  "http_status": 200,
+  "platform_response_has_signature": true,
+  "platform_response_signature_verified": true,
+  "code": "40003",
+  "sub_code": "isv.not-online-app",
+  "business_query_succeeded": false,
+  "request_private_key_registration_verified": false,
+  "payment_product_permission_verified_by_live_payment": false,
+  "proposed_notify_host": "pay.xiaofengnet.com",
+  "proposed_notify_host_dns_result": "NXDOMAIN",
+  "orders_created": 0,
+  "payments_initiated": 0,
+  "rewards_granted": 0,
+  "private_key_uploaded": false,
+  "key_files_modified_by_agent": false,
+  "backend_payment_routes_deployed": false,
+  "next_steps": [
+    "Complete production application review and online status, then repeat the read-only signed query.",
+    "Configure and verify the payment subdomain DNS, HTTPS certificate and dedicated notification route.",
+    "Implement order ownership, amount validation, persistent idempotent reward delivery and game-side result refresh before accepting payment."
+  ]
+}
