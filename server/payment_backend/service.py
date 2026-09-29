@@ -23,7 +23,8 @@ from .wechat import APPID, MCHID, ORIGIN, SKU, TITLE, WeChat, PaymentError, deco
 
 LOG = logging.getLogger('payments')
 ORDER = re.compile(r'WX[0-9a-f]{30}\Z')
-CALLS = {'catalog':2,'create_order':3,'get_order':1,'pending':0,'update_gateway':3,'deliver':5}
+CALLS = {'catalog':2,'create_order':4,'get_order':1,'pending':0,'update_gateway':3,'deliver':5,
+    'begin_reset':4,'finish_reset':4}
 
 
 @lru_cache(maxsize=128)
@@ -85,7 +86,8 @@ class Payments:
         return hmac.new(self.config['checkout_key'].encode(),('checkout:'+order_id).encode(),hashlib.sha256).hexdigest()
 
     def public(self, order):
-        result = {'ok':True,'sku':SKU,'title':TITLE,'amount_fen':10,'currency':'CNY',
+        result = {'ok':True,'sku':order['sku'],'title':order['reward'].get('title',TITLE),
+            'amount_fen':order['amount'],'currency':order['currency'],
             'order_id':order['order_id'],'state':order['state'],'expires_at':order['expires_at'],
             'expired':expired(order), 'checkout_url':ORIGIN+'/checkout?order='+order['order_id']+'&token='+self.token(order['order_id'])}
         if order['state']=='pending' and order.get('code_url') and not result['expired']:
@@ -98,7 +100,7 @@ class Payments:
             raise PaymentError('order_id_invalid')
         order = self.db.call('get_order',order_id)
         transaction_id = validate_success(transaction,order)
-        result = self.db.call('deliver',order_id,transaction_id,10,APPID,MCHID)
+        result = self.db.call('deliver',order_id,transaction_id,order['amount'],APPID,MCHID)
         LOG.info('payment_confirmed order=%s state=%s',order_id,result['state'])
         return result
 
@@ -130,12 +132,39 @@ class Payments:
         return self.db.call('get_order',order_id)
 
     def game(self, path, body):
-        allowed = {'account_id','match_session_id'} | ({'order_id'} if path=='status' else set())
+        fields = {'catalog':set(),'create':{'sku'},'status':{'order_id'},'reset':{'kind','request_id'}}
+        if path not in fields:raise PaymentError('route_not_found',404)
+        allowed = {'account_id','match_session_id'} | fields[path]
         if set(body)!=allowed:
             raise PaymentError('request_fields_invalid')
         account,session,catalog = self.identity(body)
         if path=='catalog':
-            return {'ok':True,'enabled':catalog['owned']<1,'owned':catalog['owned'],'title':TITLE,'sku':SKU,'amount_fen':10,'wechat':True,'alipay':False}
+            return {**catalog,'wechat':True,'alipay':False}
+        if path=='reset':
+            # TODO(PAYMENT_TEST_ONLY): disabled by default, both HTTP and SQL gates required.
+            if self.config.get('test_reset_enabled') is not True:
+                raise PaymentError('test_reset_disabled',403)
+            kind,request=body['kind'],body['request_id']
+            if kind not in ('refreshdata','refreshmoney') or not isinstance(request,str) or not re.fullmatch(r'[A-Za-z0-9_.:-]{8,128}',request):
+                raise PaymentError('reset_invalid')
+            started=self.db.call('begin_reset',account,session,kind,request)
+            if started.get('completed'):return started
+            for pending in started.get('orders',[]):
+                with self.lock(pending['order_id']):
+                    order=self.reconcile(self.db.call('get_order',pending['order_id']))
+                    if order['state'] in ('created','pending'):
+                        try:self.wechat.close(order['order_id'])
+                        except PaymentError as exc:
+                            if exc.code=='ORDER_NOT_EXIST':
+                                # Verified missing order, no payment can be made for it.
+                                pass
+                            elif exc.code=='ORDERPAID':
+                                order=self.reconcile(order)
+                                if order['state'] not in ('delivered','paid_review'):raise
+                                continue
+                            else:raise
+                        self.db.call('update_gateway',order['order_id'],'closed',None)
+            return self.db.call('finish_reset',account,session,kind,request)
         if path=='status':
             order_id=body['order_id']
             if not isinstance(order_id,str) or not ORDER.fullmatch(order_id):
@@ -146,7 +175,9 @@ class Payments:
             return self.public(order)
         if path!='create':
             raise PaymentError('route_not_found',404)
-        order=self.db.call('create_order',account,session,'WX'+secrets.token_hex(15))
+        if not isinstance(body['sku'],str) or not re.fullmatch(r'[a-z0-9_]{4,64}',body['sku']):
+            raise PaymentError('product_unavailable')
+        order=self.db.call('create_order',account,session,'WX'+secrets.token_hex(15),body['sku'])
         with self.lock(order['order_id']):
             order=self.db.call('get_order',order['order_id'])
             if order['state']=='created' or expired(order):
@@ -181,10 +212,10 @@ class Payments:
             time.sleep(10)
 
 
-PAGE = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>齐天大圣 · 微信支付</title>
-<link rel="stylesheet" href="/checkout.css"><main><p class="eyebrow">游戏测试商品</p><h1>齐天大圣</h1><p>存档奖励 ×1 · 永久 · 每个账号最多拥有 1 个</p><strong class="price">¥0.10</strong><p>使用微信扫一扫，支付后自动发到下单的游戏账号。</p><img id="qr" width="256" height="256" alt="正在加载微信付款码"><p id="status" role="status">正在查询订单…</p><p id="order" class="muted"></p><button id="refresh">刷新付款状态</button><p class="muted">到账确认可能需要数秒。请勿重复付款；可返回游戏查看存档。</p><p class="muted">支付宝暂未开放。</p></main><script src="/checkout.js"></script></html>'''
+PAGE = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>商品商城 · 微信支付</title>
+<link rel="stylesheet" href="/checkout.css"><main><p class="eyebrow">游戏测试商品</p><h1 id="title">正在加载商品</h1><p>存档奖励 ×1 · 永久 · 每个账号最多拥有 1 个</p><strong id="price" class="price">—</strong><p>使用微信扫一扫，支付后自动发到下单的游戏账号。</p><img id="qr" width="256" height="256" alt="正在加载微信付款码"><p id="status" role="status">正在查询订单…</p><p id="order" class="muted"></p><button id="refresh">刷新付款状态</button><p class="muted">到账确认可能需要数秒。请勿重复付款；可返回游戏查看存档。</p><p class="muted">支付宝暂未开放。</p></main><script src="/checkout.js"></script></html>'''
 CSS = '''body{margin:0;background:#101725;color:#e8edf6;font:16px system-ui,sans-serif;line-height:1.6}main{max-width:460px;margin:5vh auto;padding:32px;text-align:center;background:#1b263b;border-radius:20px}h1{font-size:32px;margin:8px}.eyebrow,.muted{color:#aab6cc;font-size:13px}.price{display:block;font-size:44px;color:#ffd68a}img{background:white;border-radius:10px;margin:10px auto;display:block}button{padding:10px 24px;border:0;border-radius:8px;background:#72d5ac;color:#102820;font:inherit;cursor:pointer}button:disabled{opacity:.5}#status{min-height:26px;color:#ffd68a}'''
-JS = '''(function(){"use strict";var query=location.search,qr=document.getElementById("qr"),status=document.getElementById("status"),busy=false,done=false;qr.src="/checkout/qr"+query;function poll(){if(busy)return;busy=true;fetch("/checkout/status"+query,{cache:"no-store"}).then(function(r){if(!r.ok)throw Error();return r.json();}).then(function(d){document.getElementById("order").textContent="订单号："+d.order_id;var labels={created:"订单正在准备，请返回游戏重试。",pending:"等待微信付款…",delivered:"支付成功，齐天大圣 ×1 已写入存档。返回游戏即可查看。",paid_review:"已收到付款，但账号已拥有该奖励。请保留订单号联系开发者处理退款，请勿重复付款。",closed:"订单已关闭，请返回游戏重新下单。"};status.textContent=labels[d.state]||"正在确认付款…";done=["delivered","paid_review","closed"].indexOf(d.state)>=0;if(done||d.expired){qr.style.display="none";if(!done)status.textContent="付款码已过期，正在确认最终状态。请勿重复付款。";}}).catch(function(){status.textContent="暂时无法查询，请稍后刷新；请勿重复付款。";}).finally(function(){busy=false;});}document.getElementById("refresh").onclick=poll;poll();setInterval(function(){if(!done)poll();},4000);}());'''
+JS = '''(function(){"use strict";var query=location.search,qr=document.getElementById("qr"),status=document.getElementById("status"),busy=false,done=false;qr.src="/checkout/qr"+query;function poll(){if(busy)return;busy=true;fetch("/checkout/status"+query,{cache:"no-store"}).then(function(r){if(!r.ok)throw Error();return r.json();}).then(function(d){document.getElementById("title").textContent=d.title;document.getElementById("price").textContent="¥"+(d.amount_fen/100).toFixed(2);document.getElementById("order").textContent="订单号："+d.order_id;var labels={created:"订单正在准备，请返回游戏重试。",pending:"等待微信付款…",delivered:"支付成功，"+d.title+" ×1 已写入存档。返回游戏即可查看。",paid_review:"已收到付款，但账号已拥有该奖励。请保留订单号联系开发者处理退款，请勿重复付款。",closed:"订单已关闭，请返回游戏重新下单。"};status.textContent=labels[d.state]||"正在确认付款…";done=["delivered","paid_review","closed"].indexOf(d.state)>=0;if(done||d.expired){qr.style.display="none";if(!done)status.textContent="付款码已过期，正在确认最终状态。请勿重复付款。";}}).catch(function(){status.textContent="暂时无法查询，请稍后刷新；请勿重复付款。";}).finally(function(){busy=false;});}document.getElementById("refresh").onclick=poll;poll();setInterval(function(){if(!done)poll();},4000);}());'''
 
 
 def handler(app):
@@ -240,7 +271,7 @@ def handler(app):
             self.send(200,output.getvalue(),'image/svg+xml')
         def do_POST(self):self.run(self.post)
         def post(self):
-            paths={x:'/v1/payments/'+x for x in ('catalog','create','status')}
+            paths={x:'/v1/payments/'+x for x in ('catalog','create','status','reset')}
             is_notice=self.path=='/v1/payments/wechat/notify'
             if not is_notice:
                 if self.path not in paths.values():raise PaymentError('route_not_found',404)

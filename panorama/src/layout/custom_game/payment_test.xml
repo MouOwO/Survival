@@ -2,19 +2,31 @@
   <styles><include src="file://{resources}/styles/custom_game/payment_test.css" /></styles>
   <scripts><include src="file://{resources}/scripts/custom_game/payment_test.js" /></scripts>
   <Panel class="PaymentRoot" hittest="false">
-    <Button id="PaymentEntry" class="PaymentEntry" onactivate="PaymentToggle()"><Label text="微信支付测试" /></Button>
+    <Button id="PaymentEntry" class="PaymentEntry" onactivate="PaymentToggle()"><Label text="商品商城" /></Button>
+    <Button id="PaymentScrim" class="PaymentScrim" onactivate="PaymentToggle()" />
     <Panel id="PaymentDialog" class="PaymentDialog" hittest="true">
-      <Button class="PaymentClose" onactivate="PaymentToggle()"><Label text="×" /></Button>
-      <Label class="PaymentHeading" text="齐天大圣" />
-      <Label class="PaymentDescription" text="永久存档奖励 ×1 · 测试商品" />
-      <Label class="PaymentPrice" text="¥0.10" />
-      <Panel id="PaymentQR" class="PaymentQR" hittest="false" />
-      <Label id="PaymentStatus" class="PaymentDescription" text="付款后由服务器发放，每个账号最多拥有 1 个。" />
-      <Button id="PaymentBuy" class="PaymentAction" onactivate="PaymentBuy()"><Label text="生成微信付款码 ¥0.10" /></Button>
-      <Button id="PaymentOpen" class="PaymentAction Secondary" onactivate="PaymentOpen()"><Label text="备用：在浏览器打开" /></Button>
-      <Button id="PaymentRefresh" class="PaymentAction Secondary" onactivate="PaymentRefresh()"><Label text="查询付款结果" /></Button>
-      <TextEntry id="PaymentLink" class="PaymentLink" multiline="false" />
-      <Label class="PaymentHint" text="用手机微信直接扫上方二维码。也可复制链接到电脑浏览器。支付宝暂未开放。" />
+      <Panel class="PaymentHeader">
+        <Label class="PaymentHeading" text="商品商城" />
+        <Label class="PaymentSubtitle" text="联调商品 · 微信扫码支付 · 永久存档" />
+        <Button class="PaymentClose" onactivate="PaymentToggle()"><Label text="×" /></Button>
+      </Panel>
+      <Panel class="PaymentBody">
+        <Panel class="PaymentCatalog"><Label class="PaymentSection" text="精选商品 / 5 项" /><Panel id="PaymentProducts" class="PaymentProducts" /></Panel>
+        <Panel class="PaymentCheckout">
+          <Label id="PaymentTitle" class="PaymentTitle" text="正在加载商品" />
+          <Label id="PaymentDescription" class="PaymentDescription" text="请先完成对局登录" />
+          <Label id="PaymentPrice" class="PaymentPrice" text="" />
+          <Panel id="PaymentQR" class="PaymentQR" hittest="false" />
+          <Label id="PaymentStatus" class="PaymentDescription" text="付款后自动发放到当前游戏账号。" />
+          <Button id="PaymentBuy" class="PaymentAction" onactivate="PaymentBuy()"><Label id="PaymentBuyLabel" text="加载中" /></Button>
+          <Panel class="PaymentActions">
+            <Button id="PaymentRefresh" class="PaymentAction Secondary" onactivate="PaymentRefresh()"><Label text="查询付款结果" /></Button>
+            <Button id="PaymentOpen" class="PaymentAction Secondary" onactivate="PaymentOpen()"><Label text="浏览器付款" /></Button>
+          </Panel>
+          <TextEntry id="PaymentLink" class="PaymentLink" multiline="false" />
+          <Label class="PaymentHint" text="请核对商品及金额后付款。支付宝暂未开放。" />
+        </Panel>
+      </Panel>
     </Panel>
   </Panel>
 </root>

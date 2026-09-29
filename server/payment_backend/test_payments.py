@@ -13,16 +13,17 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
+from .catalog import DEFAULT_SKU
 from .service import Payments, qr_matrix
 from .wechat import APPID,MCHID,PUBLIC_ID,PaymentError,WeChat,decode_json,validate_success
 
 ID='WX'+'a'*30
 def order():
-    return {'order_id':ID,'account_id':'b'*64,'amount':10,'state':'created','code_url':None,
+    return {'order_id':ID,'account_id':'b'*64,'amount':5000,'currency':'CNY','sku':DEFAULT_SKU,'reward':{'title':'齐天大圣','item_id':'lottery_monkey_king'},'state':'created','code_url':None,
         'expires_at':(datetime.now(timezone.utc)+timedelta(minutes=30)).isoformat()}
 def paid():
     return {'out_trade_no':ID,'appid':APPID,'mchid':MCHID,'trade_state':'SUCCESS','trade_type':'NATIVE',
-        'transaction_id':'4200000123456789012345678901','amount':{'total':10,'currency':'CNY'}}
+        'transaction_id':'4200000123456789012345678901','amount':{'total':5000,'currency':'CNY'}}
 
 
 class CryptoTests(unittest.TestCase):
@@ -86,10 +87,17 @@ class CryptoTests(unittest.TestCase):
 
 
 class FakeDB:
-    def __init__(self):self.row=order();self.deliveries=0
+    def __init__(self):self.row=order();self.deliveries=0;self.resets=0
     def call(self,name,*args):
-        if name=='catalog':return {'ok':True,'owned':0}
-        if name=='create_order':self.row['account_id']=args[0]
+        if name=='catalog':return {'ok':True,'products':[]}
+        if name=='begin_reset':return {'ok':True,'completed':self.resets>0,'orders':[deepcopy(self.row)]}
+        if name=='finish_reset':
+            if self.row['state'] not in ('closed','delivered','paid_review'):raise PaymentError('pending_payment_unresolved')
+            self.resets+=1
+            return {'ok':True,'revision':10}
+        if name=='create_order':
+            if args[3]!=DEFAULT_SKU:raise PaymentError('product_unavailable')
+            self.row['account_id']=args[0]
         if name=='update_gateway':
             if args[1]!='checked':self.row['state']=args[1]
             if args[2]:self.row['code_url']=args[2]
@@ -105,7 +113,7 @@ class ServiceTests(unittest.TestCase):
         self.wx.query.side_effect=PaymentError('ORDER_NOT_EXIST',502)
         self.wx.create.return_value='weixin://wxpay/bizpayurl?test=1'
         self.app=Payments({'allowed_accounts':['123'],'pepper':'p'*32,'checkout_key':'c'*32},self.db,self.wx)
-        self.body={'account_id':'123','match_session_id':'session_test'}
+        self.body={'account_id':'123','match_session_id':'session_test','sku':DEFAULT_SKU}
     def test_price_and_account_cannot_be_overridden(self):
         for body in [dict(self.body,amount=1),dict(self.body,sku='other'),dict(self.body,account_id='456')]:
             with self.assertRaises(PaymentError):self.app.game('create',body)
@@ -134,7 +142,7 @@ class ServiceTests(unittest.TestCase):
         for query in ('order='+ID+'&token=bad','order='+ID+'&token='+self.app.token(ID)+'&token=again'):
             with self.assertRaises(PaymentError):self.app.checkout(query)
     def test_status_is_bound_to_player(self):
-        with self.assertRaises(PaymentError):self.app.game('status',dict(self.body,order_id=ID))
+        with self.assertRaises(PaymentError):self.app.game('status',{'account_id':'123','match_session_id':'session_test','order_id':ID})
     def test_mismatch_never_calls_delivery(self):
         bad=paid();bad['amount']['total']=1
         with self.assertRaises(PaymentError):self.app.success(bad)
@@ -147,6 +155,34 @@ class ServiceTests(unittest.TestCase):
         self.db.row['state']='pending';self.wx.query.side_effect=PaymentError('wechat_signature_invalid',401)
         with self.assertRaises(PaymentError):self.app.reconcile(self.db.row)
         self.assertEqual(self.db.row['state'],'pending');self.assertEqual(self.db.deliveries,0)
+    def reset_body(self):
+        return {'account_id':'123','match_session_id':'session_test','kind':'refreshmoney','request_id':'reset_test_request'}
+    def test_reset_requires_explicit_server_switch(self):
+        with self.assertRaises(PaymentError) as error:self.app.game('reset',self.reset_body())
+        self.assertEqual(error.exception.code,'test_reset_disabled')
+        self.assertEqual(self.db.resets,0);self.wx.close.assert_not_called()
+    def test_reset_closes_pending_and_retries_are_idempotent(self):
+        self.app.config['test_reset_enabled']=True
+        self.assertTrue(self.app.game('reset',self.reset_body())['ok'])
+        self.wx.close.assert_called_once_with(ID)
+        self.app.game('reset',self.reset_body())
+        self.assertEqual(self.db.resets,1)
+    def test_failed_close_does_not_clear_reward(self):
+        self.app.config['test_reset_enabled']=True
+        self.wx.close.side_effect=PaymentError('gateway_unavailable',503)
+        with self.assertRaises(PaymentError):self.app.game('reset',self.reset_body())
+        self.assertEqual(self.db.resets,0)
+    def test_reset_settles_already_paid_before_clear(self):
+        self.app.config['test_reset_enabled']=True
+        self.wx.query.side_effect=None;self.wx.query.return_value=paid()
+        self.assertTrue(self.app.game('reset',self.reset_body())['ok'])
+        self.assertEqual(self.db.deliveries,1);self.assertEqual(self.db.resets,1)
+        self.wx.close.assert_not_called()
+    def test_previous_ten_fen_receipt_still_uses_original_amount(self):
+        receipt=paid();receipt['amount']['total']=10
+        original=order();original['amount']=10
+        self.assertEqual(validate_success(receipt,original),receipt['transaction_id'])
+        with self.assertRaises(PaymentError):validate_success(receipt,order())
 
 
 if __name__=='__main__':unittest.main()

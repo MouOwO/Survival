@@ -115,10 +115,10 @@ class WeChat:
 
     def create(self, order):
         result = self.request('POST','/v3/pay/transactions/native',{
-            'appid':APPID,'mchid':MCHID,'description':TITLE,'out_trade_no':order['order_id'],
+            'appid':APPID,'mchid':MCHID,'description':order['reward']['title'],'out_trade_no':order['order_id'],
             'notify_url':ORIGIN+'/v1/payments/wechat/notify',
             'time_expire':datetime.fromisoformat(order['expires_at']).isoformat(timespec='seconds'),
-            'amount':{'total':10,'currency':'CNY'}})
+            'amount':{'total':order['amount'],'currency':order['currency']}})
         code = result.get('code_url','')
         if not isinstance(code,str) or not code.startswith('weixin://wxpay/bizpayurl?') or len(code)>2048:
             raise PaymentError('wechat_code_invalid',502)
@@ -151,7 +151,7 @@ def validate_success(value, order):
     if (value.get('appid')!=APPID or value.get('mchid')!=MCHID or value.get('out_trade_no')!=order['order_id']
             or value.get('trade_state')!='SUCCESS' or value.get('trade_type')!='NATIVE'
             or not isinstance(amount,dict) or type(amount.get('total')) is not int
-            or amount['total']!=10 or amount.get('currency')!='CNY'
+            or amount['total']!=order['amount'] or amount.get('currency')!=order['currency']
             or not re.fullmatch(r'[0-9]{20,64}',str(value.get('transaction_id','')))):
         raise PaymentError('payment_mismatch')
     return value['transaction_id']
