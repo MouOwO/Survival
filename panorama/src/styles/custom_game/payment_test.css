@@ -10,17 +10,18 @@
 .PaymentSubtitle { margin-top:39px; font-size:14px; color:#97a9c4; }
 .PaymentClose { horizontal-align:right; width:30px; height:30px; }
 .PaymentClose Label { color:#b9c7da; font-size:27px; }
-.PaymentBody { width:100%; flow-children:right; }
+.PaymentBody { width:100%; height:640px; flow-children:right; }
 .PaymentCatalog { width:320px; padding:16px 18px 16px 0; flow-children:down; }
 .PaymentSection { color:#97a9c4; font-size:14px; margin-bottom:12px; }
-.PaymentProducts { width:100%; flow-children:down; }
+.PaymentProducts { width:100%; height:550px; flow-children:down; overflow:squish scroll; margin-top:12px; }
 .PaymentProduct { width:100%; height:80px; margin-bottom:10px; padding:14px; background-color:#1c2d40; border:1px solid #40526955; border-radius:6px; }
 .PaymentProduct:hover { brightness:1.2; }
 .PaymentProduct.Selected { background-color:#23443f; border:1px solid #77d6b6; }
 .PaymentProductNumber { color:#8ba6bd; font-size:13px; width:27px; }
 .PaymentProductTitle { color:#eff5ff; font-size:19px; margin-left:29px; }
 .PaymentProductOwned { color:#e4c997; font-size:15px; margin-left:29px; margin-top:29px; }
-.PaymentCheckout { width:484px; padding:12px 22px; background-color:#17273b; flow-children:down; border-radius:8px; }
+.PaymentCheckout { width:484px; height:100%; padding:12px 22px; background-color:#17273b; flow-children:down; border-radius:8px; overflow:squish scroll; }
+.PaymentRewards { width:100%; max-height:150px; overflow:squish scroll; }
 .PaymentTitle { width:100%; text-align:center; font-size:27px; color:#fff1cf; }
 .PaymentDescription { width:100%; text-align:center; font-size:16px; color:#d1dbee; margin-top:10px; white-space:normal; }
 .PaymentPrice { horizontal-align:center; color:#ffd68a; font-size:34px; margin:10px 0; }

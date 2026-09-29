@@ -2,21 +2,21 @@
   <styles><include src="file://{resources}/styles/custom_game/payment_test.css" /></styles>
   <scripts><include src="file://{resources}/scripts/custom_game/payment_test.js" /></scripts>
   <Panel class="PaymentRoot" hittest="false">
-    <Button id="PaymentEntry" class="PaymentEntry" onactivate="PaymentToggle()"><Label text="商品商城" /></Button>
+    <Button id="PaymentEntry" class="PaymentEntry" onactivate="PaymentShop()"><Label text="商品商城" /></Button>
     <Button id="PaymentScrim" class="PaymentScrim" onactivate="PaymentToggle()" />
     <Panel id="PaymentDialog" class="PaymentDialog" hittest="true">
       <Panel class="PaymentHeader">
-        <Label class="PaymentHeading" text="商品商城" />
-        <Label class="PaymentSubtitle" text="属性测试商品 · 每件只加一项 · 永久存档" />
+        <Label class="PaymentHeading" text="订单确认" />
+        <Label class="PaymentSubtitle" text="请核对商品、金额和全部奖励" />
         <Button class="PaymentClose" onactivate="PaymentToggle()"><Label text="×" /></Button>
       </Panel>
       <Panel class="PaymentBody">
-        <Panel class="PaymentCatalog"><Label class="PaymentSection" text="精选商品 / 5 项" /><Panel id="PaymentProducts" class="PaymentProducts" /></Panel>
+        <Panel class="PaymentCatalog"><Button class="PaymentAction" onactivate="PaymentShop()"><Label text="返回商城" /></Button><Panel id="PaymentProducts" class="PaymentProducts" /></Panel>
         <Panel class="PaymentCheckout">
           <Label id="PaymentTitle" class="PaymentTitle" text="正在加载商品" />
           <Label id="PaymentDescription" class="PaymentDescription" text="请先完成对局登录" />
           <Label id="PaymentPrice" class="PaymentPrice" text="" />
-          <Label id="PaymentValues" class="PaymentValues" text="" />
+          <Panel class="PaymentRewards"><Label id="PaymentValues" class="PaymentValues" text="" /></Panel>
           <Panel id="PaymentQR" class="PaymentQR" hittest="false" />
           <Label id="PaymentStatus" class="PaymentDescription" text="付款后自动发放到当前游戏账号。" />
           <Button id="PaymentBuy" class="PaymentAction" onactivate="PaymentBuy()"><Label id="PaymentBuyLabel" text="加载中" /></Button>

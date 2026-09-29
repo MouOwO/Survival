@@ -7,13 +7,10 @@ local events = require("core/events")
 local M = {}
 local busy, last, orders, refreshed, resets = {}, {}, {}, {}, {}
 local serial, initialized = 0, false
-local products = {
-    wood_100_test_50_v3=true, gold_100_test_50_v3=true, wall_armor_100_test_50_v3=true,
-    wall_health_100_test_50_v3=true, tower_attack_100_test_50_v3=true,
-    -- Keep status polling for receipts created before the catalog replacement.
-    monkey_test_50_v2 = true, wall_test_50_v2 = true, data_test_50_v2 = true,
-    turret_test_50_v2 = true, implant_test_50_v2 = true,
-}
+-- Catalog membership and all prices/rewards are checked by the payment server.
+local function valid_sku(sku)
+    return type(sku)=="string" and #sku>=4 and #sku<=64 and sku:match("^[a-z0-9_]+$")~=nil
+end
 local function send(id, result)
     if not id or not PlayerResource:IsValidPlayerID(id) then return end
     if result.ok then
@@ -23,6 +20,18 @@ local function send(id, result)
         result.game_values={}
         for _,field in ipairs({"initial_wood","initial_gold","wall_armor","wall_initial_health","tower_attack_flat"}) do
             result.game_values[field]=tonumber(stats[field]) or 0
+        end
+        for field in pairs(result.effects or {}) do
+            if tonumber(stats[field]) then result.game_values[field]=tonumber(stats[field]) end
+        end
+        for _,product in pairs(result.products or {}) do
+            for _,effect in pairs(product.stat_preview or {}) do
+                if tonumber(stats[effect.field_id]) then result.game_values[effect.field_id]=tonumber(stats[effect.field_id]) end
+            end
+        end
+        result.game_entitlements={}
+        for _,key in ipairs({"vip","archive_pass"}) do
+            result.game_entitlements[key]=profile and profile.entitlements and profile.entitlements[key] or {active=false}
         end
         local wallet=bus.request(events.RESOURCE_GET_REQUEST,{player_id=id})
         if wallet then result.wallet={wood=wallet.wood,gold=wallet.gold} end
@@ -89,7 +98,7 @@ local function request(id, action, sku, kind)
             if action=="reset" then notify(id,"清理尚未完成，请稍后再次输入同一命令重试。未确认的付款会先核对并关闭。","error") end
             send(id,result); return
         end
-        if type(result.order_id)=="string" and products[result.sku] then
+        if type(result.order_id)=="string" and valid_sku(result.sku) then
             orders[id]=orders[id] or {}
             orders[id][result.sku]={account=account,session=session,order_id=result.order_id}
         end
@@ -115,7 +124,7 @@ function M.handle(payload)
     local action=tostring(payload.action or "")
     if action~="catalog" and action~="create" and action~="status" then return end
     local sku=tostring(payload.sku or "")
-    if action~="catalog" and not products[sku] then
+    if action~="catalog" and not valid_sku(sku) then
         send(tonumber(payload.PlayerID),{ok=false,action=action,error="product_unavailable"});return
     end
     return request(tonumber(payload.PlayerID),action,sku)

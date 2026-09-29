@@ -45,6 +45,25 @@ assert.equal($("#PaymentBuy").enabled,true,"reset must discard old delivered-ord
 scope.PaymentBuy();assert.equal(requests.at(-1).sku,"wood_100_test_50_v3");
 handler({ok:false,action:"create",error:"purchase_limit_reached"});assert.match($("#PaymentStatus").text,/次数限制/);
 handler({ok:false,action:"catalog",error:"test_account_required"});assert.equal($("#PaymentEntry").style.visibility,"collapse");
+const bundle={sku:"mixed_bundle",title:"完整礼包",description:"全部发放",amount_fen:777,enabled:true,owned:0,
+ reward_lines:[{kind:"stat",id:"initial_wood",quantity:100,label:"初始木材"},{kind:"stat",id:"wall_armor",quantity:100,label:"城墙护甲"},{kind:"entitlement",id:"vip",quantity:1,label:"VIP权限"}],
+ stat_preview:[{field_id:"initial_wood",value:10,after:110,delta:100},{field_id:"wall_armor",value:0,after:100,delta:100}]};
+handler({ok:true,action:"catalog",products:[bundle]});
+assert.equal($("#PaymentPrice").text,"¥7.77");assert.match($("#PaymentValues").text,/10 → 110/);assert.match($("#PaymentValues").text,/0 → 100/);assert.match($("#PaymentValues").text,/VIP权限/);
+scope.PaymentBuy();assert.equal(requests.at(-1).sku,"mixed_bundle");
+const bundleOrder={...order,...bundle,effects:{initial_wood:100,wall_armor:100}};
+handler(bundleOrder);
+handler({ok:true,action:"catalog",products:[{...bundle,amount_fen:999,title:"已修改的新商品",reward_lines:[]}]});
+assert.equal($("#PaymentPrice").text,"¥7.77","pending checkout must keep its original price");assert.equal($("#PaymentTitle").text,"完整礼包");assert.match($("#PaymentValues").text,/VIP权限/);
+handler({ok:true,action:"catalog",products:[]});
+assert.equal($("#PaymentProducts").children.length,1,"delisting cannot hide an existing checkout");
+handler({...bundleOrder,action:"status",state:"delivered",effect_changes:{initial_wood:{before:10,after:110,delta:100},wall_armor:{before:0,after:100,delta:100}},game_entitlements:{vip:{active:true}}});
+assert.match($("#PaymentValues").text,/本单存档：10 → 110/);assert.match($("#PaymentValues").text,/本单存档：0 → 100/);assert.match($("#PaymentValues").text,/本局已生效/);
+handler({ok:true,action:"catalog",products:[{...bundle,owned:1,enabled:true}]});
+assert.equal($("#PaymentBuy").enabled,true,"server may permit another purchase of a repeatable product");
+scope.PaymentBuy();assert.equal(requests.at(-1).sku,"mixed_bundle");
+let storeOpened=false;config.SurvivalCommerceView={Open:()=>{storeOpened=true;}};
+scope.PaymentShop();assert(storeOpened);assert.equal($("#PaymentDialog").Open,false);
 config.SurvivalPayments.Dispose();assert.equal(topLayer,null);assert.equal($("#PaymentScrim").Open,false);
 const count=requests.length;scheduled.forEach(x=>x.fn());assert.equal(requests.length,count,"disposed UI must stop all scheduled requests");
-console.log("PAYMENT_UI_PASS: five ¥50 products, SKU selection, bound QR, owned state, reset/rebuy, no client prices");
+console.log("PAYMENT_UI_PASS: variable prices, complete bundle receipts, immutable pending checkout, delisting recovery, repeat purchases, shop routing, trusted QR");

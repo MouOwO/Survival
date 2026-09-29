@@ -1,0 +1,9 @@
+﻿sku,display_name,category_id,product_type,price_yuan,purchase_limit,enabled,sort_order,icon,description,ownership_id
+#中文名:商品ID,商品名,分类ID,类型single或bundle,人民币价格元,累计购买上限0不限,启用,排序,图标相对路径,商品说明,持有标记勿改
+#types:string,string,string,string,number,number,boolean,number,string,string,string
+wood_100_test_50_v3,初始木材 +100,technology,single,50.00,1,1,10,custom_game/archive_items_v2/lottery_lumber_crystal.png,永久增加初始木材 100。本局到账后补加 100 木材，新对局也享受此加成。,payment_test_initial_wood_100
+gold_100_test_50_v3,初始金币 +100,technology,single,50.00,1,1,20,custom_game/archive_items_v2/lottery_wealth_crystal.png,永久增加初始金币 100。本局到账后补加 100 金币，新对局也享受此加成。,payment_test_initial_gold_100
+wall_armor_100_test_50_v3,城墙初始护甲 +100,technology,single,50.00,1,1,30,custom_game/archive_items_v2/lottery_protection_crystal.png,永久增加城墙护甲 100。查看城墙护甲；已建城墙也会刷新。,payment_test_wall_armor_100
+wall_health_100_test_50_v3,城墙初始血量 +100,technology,single,50.00,1,1,40,custom_game/archive_items_v2/lottery_life_spirit.png,永久增加城墙生命上限 100。查看生命上限；受伤城墙保持原血量比例。,payment_test_wall_health_100
+tower_attack_100_test_50_v3,箭塔固定攻击力 +100,technology,single,50.00,1,1,50,custom_game/archive_items_v2/lottery_sharp_spirit.png,永久增加箭塔固定攻击力 100。最终攻击面板还会叠加已有科技及百分比加成。,payment_test_tower_attack_100
+starter_bundle_v4,启程礼包,bundles,bundle,50.00,1,0,60,custom_game/archive_items_v2/lottery_attribute_crystal.png,礼包样例：五项初始属性各+100、VIP召唤权限、特殊抽奖券10张。确认配置后将启用改为1。,pay_starter_bundle_v4

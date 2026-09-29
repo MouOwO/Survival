@@ -21,6 +21,13 @@ for path in source.iterdir():
         destination=target/('deploy.py' if path.name=='deploy.py' else 'payment_backend/'+path.name)
         destination.parent.mkdir(exist_ok=True)
         destination.write_bytes(path.read_bytes().replace(b'\r\n',b'\n'))
+import sys
+sys.path.insert(0,str(ROOT/'server'))
+from payment_backend.csv_catalog import SOURCES
+for name in SOURCES:
+    destination=target/'reference_csv'/name
+    destination.parent.mkdir(parents=True,exist_ok=True)
+    destination.write_bytes((ROOT/'data/csv'/name).read_bytes().replace(b'\r\n',b'\n'))
 manifest={p.relative_to(target).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in target.rglob('*') if p.is_file()}
 (target/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 archive=target.with_suffix('.tar.gz')
