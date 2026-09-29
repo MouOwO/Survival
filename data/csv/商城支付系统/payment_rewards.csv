@@ -13,3 +13,4 @@ bundle_stat_4,starter_bundle_v4,stat,wall_initial_health,100,城墙初始血量,
 bundle_stat_5,starter_bundle_v4,stat,tower_attack_flat,100,箭塔固定攻击力,1
 bundle_vip,starter_bundle_v4,entitlement,vip,1,VIP英雄召唤权限,1
 bundle_ticket,starter_bundle_v4,item,special_lottery_ticket,10,特殊抽奖券,1
+special_ticket_single,special_lottery_ticket_single,item,special_lottery_ticket,1,特殊抽奖券,1

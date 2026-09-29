@@ -7,5 +7,6 @@
     <Image src="file://{images}/custom_game/archive_items_v2/lottery_protection_crystal.png" />
     <Image src="file://{images}/custom_game/archive_items_v2/lottery_sharp_spirit.png" />
     <Image src="file://{images}/custom_game/archive_items_v2/lottery_wealth_crystal.png" />
+    <Image src="file://{images}/custom_game/lottery_handoff_v1/ticket_illustrated.png" />
   </Panel>
 </root>

@@ -619,7 +619,8 @@
             var commerce = GameUI.CustomUIConfig().SurvivalCommerceView;
             hideTooltip();
             if (commerce && commerce.OpenTicketPurchase && selectedTicketPool) {
-                commerce.OpenTicketPurchase({id:selectedTicketPool.id || selectedPoolId,display_name:selectedTicketPool.display_name || selectedPoolId,ticket_name:selectedTicketPool.ticket_name || "抽奖券"});
+                var handled=commerce.OpenTicketPurchase({id:selectedTicketPool.id || selectedPoolId,display_name:selectedTicketPool.display_name || selectedPoolId,ticket_name:selectedTicketPool.ticket_name || "抽奖券"});
+                if(!handled)setText("LotteryStatus",selectedPoolId==="map"?"地图抽奖券通过游戏玩法获得":"抽奖券购买暂未开放，请稍后重试");
             } else { setText("LotteryStatus", "抽奖券购买暂未开放"); }
             return;
         }

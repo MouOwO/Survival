@@ -5,12 +5,12 @@
     if (cfg.SurvivalCommerceView) cfg.SurvivalCommerceView.Dispose();
     delete cfg.SurvivalCommercePreviewData;
     if (!U || !R) { delete cfg.SurvivalCommerceView; return; }
-    var disposed=false, category="", catalog={products:[],categories:[]}, revision="", opened=false;
+    var disposed=false, category="", catalog={products:[],categories:[]}, revision="", opened=false, ticketRequest=false;
     function rows(value) { return Array.isArray(value)?value:Object.keys(value||{}).sort(function(a,b){return Number(a)-Number(b);}).map(function(k){return value[k];}); }
     function panel(type,parent,cls) { var n=$.CreatePanel(type,parent,""); if(cls)n.AddClass(cls); return n; }
     function text(parent,value,cls) { var n=panel("Label",parent,cls);n.text=String(value);n.hittest=false;return n; }
     function action(parent,label,fn,cls) { var n=U.ActionButton(parent,{label:label,action:fn});R.Action(n,true);n.AddClass(cls);return n; }
-    function close() { opened=false;store.shell.Close(); }
+    function close() { opened=false;ticketRequest=false;store.shell.Close(); }
     function modal() {
         var scrim=panel("Button",root,"RCBackdrop"),p=panel("Panel",root,"RCWindow"),header=panel("Panel",p,"RCHeader"),title=text(header,"商城","RCTitle"),x=panel("Button",header,"RCClose");
         var shell=U.ModalShell.Adopt({id:"commerce",root:root,panel:p,header:header,titlePanel:title,scrim:scrim,closeButton:x,width:1210,height:810,fit:{reference:[1672,941]},onClose:close});
@@ -28,6 +28,14 @@
         close();cfg.SurvivalPayments.Checkout(item.sku);return true;
     }
     function purchaseLabel(item) { return item.enabled?"查看 / 购买":item.owned>0?"已拥有 · 查看":"查看奖励"; }
+    function singleTicket() {
+        // A bundle containing tickets is not a single-ticket purchase.
+        return rows(catalog.products).filter(function(p){
+            var rewards=rows(p.reward_lines);
+            return p.product_type==="single" && rewards.length===1 && rewards[0].kind==="item"
+                && rewards[0].id==="special_lottery_ticket" && Number(rewards[0].quantity)===1;
+        })[0];
+    }
     function rewardText(item) { return rows(item.reward_lines).map(function(r){return r.label+" ×"+r.quantity;}).join("\n"); }
     function render() {
         if(disposed)return;
@@ -63,15 +71,27 @@
         // Keep hovered cards stable when only numeric previews have changed.
         var next=JSON.stringify({categories:catalog.categories,error:catalog.error,hash:catalog.catalog_hash,products:rows(catalog.products).map(function(p){return [p.sku,p.enabled,p.owned,p.amount_fen,p.disabled_reason];})});
         if(next!==revision){revision=next;render();}
+        if(ticketRequest){
+            ticketRequest=false;
+            var item=singleTicket();
+            if(!item || !checkout(item))notice.text=catalog.error || "特殊抽奖券暂未上架，请稍后重试。";
+        }
     }
     cfg.SurvivalCommerceView={
         Open:function(){if(disposed)return;opened=true;if(cfg.SurvivalPayments && cfg.SurvivalPayments.GetCatalog)update(cfg.SurvivalPayments.GetCatalog());render();store.shell.Open();if(cfg.SurvivalPayments && cfg.SurvivalPayments.RefreshCatalog)cfg.SurvivalPayments.RefreshCatalog();},
         Close:close,UpdateCatalog:update,
         OpenTicketPurchase:function(pool){
-            if(typeof pool==="object")pool=pool.id;
-            if(!pool || pool==="map")return false;
-            var item=rows(catalog.products).filter(function(p){return p.enabled && rows(p.reward_lines).some(function(r){return r.id==="special_lottery_ticket";});})[0];
-            return checkout(item);
+            if(pool && typeof pool==="object")pool=pool.id;
+            var payments=cfg.SurvivalPayments;
+            if(disposed || !pool || pool==="map" || !payments || !payments.Checkout)return false;
+            if(payments.GetCatalog)update(payments.GetCatalog());
+            var item=singleTicket();
+            if(item)return checkout(item);
+            if(!payments.RefreshCatalog)return false;
+            // Opening directly from lottery can precede the first shop snapshot.
+            // Show progress and continue to checkout when that catalog arrives.
+            category="item";opened=true;render();store.shell.Open();ticketRequest=true;
+            notice.text="正在加载特殊抽奖券商品…";payments.RefreshCatalog();return true;
         },
         Inspect:function(){var path=[],p=store.panel;while(p && p.IsValid() && path.length<10){path.push({id:p.id,visible:p.visible,width:p.actuallayoutwidth,height:p.actuallayoutheight,visibility:p.style.visibility,opacity:p.style.opacity});p=p.GetParent();}
             return {category:category,opened:opened,valid:store.panel.IsValid(),visible:store.panel.visible,

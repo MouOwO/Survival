@@ -7,3 +7,4 @@ wall_armor_100_test_50_v3,城墙初始护甲 +100,technology,single,50.00,1,1,30
 wall_health_100_test_50_v3,城墙初始血量 +100,technology,single,50.00,1,1,40,custom_game/archive_items_v2/lottery_life_spirit.png,永久增加城墙生命上限 100。查看生命上限；受伤城墙保持原血量比例。,payment_test_wall_health_100
 tower_attack_100_test_50_v3,箭塔固定攻击力 +100,technology,single,50.00,1,1,50,custom_game/archive_items_v2/lottery_sharp_spirit.png,永久增加箭塔固定攻击力 100。最终攻击面板还会叠加已有科技及百分比加成。,payment_test_tower_attack_100
 starter_bundle_v4,启程礼包,bundles,bundle,50.00,1,0,60,custom_game/archive_items_v2/lottery_attribute_crystal.png,礼包样例：五项初始属性各+100、VIP召唤权限、特殊抽奖券10张。确认配置后将启用改为1。,pay_starter_bundle_v4
+special_lottery_ticket_single,特殊抽奖券 ×1,item,single,50.00,0,1,70,custom_game/lottery_handoff_v1/ticket_illustrated.png,每次购买获得1张特殊抽奖券，可用于特殊奖池。50元一张，可重复购买；付款成功后自动到账。,pay_special_lottery_ticket_single

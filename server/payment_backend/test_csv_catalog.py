@@ -9,6 +9,13 @@ class CatalogTests(unittest.TestCase):
         self.package=build(ROOT);self.tables=copy.deepcopy(self.package['tables'])
         self.reference={k:(ROOT/'data/csv'/k).read_text(encoding='utf-8-sig') for k in SOURCES}
     def compile(self):return compile_catalog(self.tables,self.reference)
+    def test_single_special_ticket_costs_50_yuan_and_is_repeatable(self):
+        p=next(p for p in self.compile()['products'] if p['sku']=='special_lottery_ticket_single')
+        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],5000)
+        self.assertEqual(p['purchase_limit'],0);self.assertEqual(p['product_type'],'single')
+        self.assertEqual(p['effects'],{});self.assertEqual(p['grants']['entitlements'],[])
+        self.assertEqual(p['grants']['items'],{'special_lottery_ticket':1})
+        self.assertEqual(len(p['grants']['lines']),1)
     def test_real_csv_bundle_is_complete_and_not_accidentally_listed(self):
         data=self.compile();p=next(p for p in data['products'] if p['sku']=='starter_bundle_v4')
         self.assertFalse(p['enabled']);self.assertEqual(len(p['effects']),5)

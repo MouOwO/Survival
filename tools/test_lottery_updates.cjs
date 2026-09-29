@@ -89,6 +89,14 @@ const recoveredRequest=requests.at(-1).p;
 events.ui_lottery_snapshot({...timed('map',2001),snapshot_scope:'details',snapshot_request_id:recoveredRequest.snapshot_request_id});
 assert.equal(nodes.LotteryInfoList.children.length,5,'a different valid tab is unaffected');
 console.log('LOTTERY_LOAD_ERROR_PASS: prefetch error, reopen, retry recovery and independent detail tabs');
+currentUI.CloseInfo();currentUI.SelectPool('summer');events.ui_lottery_snapshot(timed('summer',2001));
+let ticketPool=null;
+config.SurvivalCommerceView={OpenTicketPurchase:pool=>{ticketPool=pool.id;return true;}};
+currentUI.Feature('purchase');assert.equal(ticketPool,'summer');
+config.SurvivalCommerceView.OpenTicketPurchase=()=>false;
+currentUI.Feature('purchase');assert(nodes.LotteryStatus.text.includes('抽奖券购买暂未开放'));
+delete config.SurvivalCommerceView;
+console.log('LOTTERY_TICKET_ENTRY_PASS: special-pool routing and visible unavailable message');
 `;
 // Optional read-only HTTP fixture: verify the actual server payload through the
 // same Panorama presenter, without issuing a draw, exchange or purchase.
