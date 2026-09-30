@@ -1,0 +1,11 @@
+profile_id,core,detail,crown,color,radius_r,radius_sr,radius_ssr,radius_ur,alpha,enabled
+#中文名:职业,基础图案,进阶外圈,高阶浮光,颜色,转职半径,二阶半径,三阶半径,终极半径,透明度,启用
+#types:string,string,string,string,list,number,number,number,number,number,boolean
+class_1,death,detail_runes,detail_motes,146|80|230,96,112,128,144,0.55,1
+class_2,mystery,detail_runes,detail_motes,180|110|255,96,112,128,144,0.48,1
+class_3,lightning,detail_runes,detail_motes,100|185|255,96,112,128,144,0.62,1
+class_4,machine,detail_runes,detail_motes,255|174|72,96,112,128,144,0.55,1
+class_5,multi,detail_runes,detail_motes,132|222|148,96,112,128,144,0.48,1
+class_6,frost,detail_runes,detail_motes,150|225|255,96,112,128,144,0.58,1
+class_7,anti_air,detail_runes,detail_motes,130|222|234,96,112,128,144,0.52,1
+ultimate,ultimate,detail_runes,detail_motes,255|214|126,96,112,128,144,0.65,1

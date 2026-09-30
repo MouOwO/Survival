@@ -1,0 +1,118 @@
+{
+  "date": "2026-09-30",
+  "validation_level": [
+    "STATIC",
+    "CONTRACT",
+    "SIMULATION",
+    "WORKSHOP_ISOLATED_FIXTURE"
+  ],
+  "workshop_verified": true,
+  "native_reference": "Rubick Arcana cube geometry with four Invoker warm-flight children",
+  "unchanged_gameplay": {
+    "fall_seconds": 0.8,
+    "radius": 500,
+    "lava_seconds": 3,
+    "lava_ticks": 3,
+    "second_meteor_delay": 0.5,
+    "second_meteor_scale": 0.8
+  },
+  "lava_presentation": {
+    "same_cast_ground_systems": 1,
+    "level5_visual_seconds": 3.5,
+    "rationale": "Two meteors at one cast position formerly created identical coplanar lava systems. Share only the ground visual through the final lava expiry; damage and slow retain separate per-meteor timers.",
+    "before_evidence": "output/map_build_c6/meteor_frame_04.png",
+    "shared_only_workshop_result": "Horizontal lines persisted in output/map_build_c6/meteor_fixed_05.png; duplicate systems were not the sole cause.",
+    "ground_layer_heights": [
+      32,
+      40
+    ],
+    "previous_ground_layer_heights": [
+      7,
+      9
+    ],
+    "depth_testing": "native defaults preserved",
+    "position_operator": "C_OP_SetToCP / native FLOAT offset vectors; legacy PositionOffset removed only from the two ground layers",
+    "height_only_workshop_result": "Horizontal lines persisted with legacy PositionOffset at 32/40; compiled vectors remained INT. Replaced with the same CP operator used by verified tower bases.",
+    "texture_check": "Decoded Valve lava/crack textures do not contain the horizontal line band.",
+    "after_workshop_verification": "PASS: angular Rubick cube, warm Invoker flames and impact render; lava horizontal line band is absent after the C_OP_SetToCP plus FLOAT-offset fix."
+  },
+  "compile": {
+    "compiled": 6,
+    "failed": 0
+  },
+  "native_dependencies_checked": 10,
+  "simulation": "scripts/vscripts/tests/test_meteor_visual_timing.lua: all five tiers, unchanged damage/timing/slow/lock, one shared ground visual through final lava expiry, VFX allocation/control errors and cleanup/reentry passed",
+  "tests": [
+    "node tools/test_meteor_visual_resources.cjs",
+    "lua5.1 scripts/vscripts/tests/test_meteor_visual_timing.lua"
+  ],
+  "runtime_precache": [
+    "particles/survival/skills/meteor_cube_fall.vpcf",
+    "particles/survival/skills/meteor_impact.vpcf",
+    "particles/survival/skills/meteor_lava.vpcf"
+  ],
+  "records": [
+    {
+      "resource": "particles/survival/skills/meteor_lava.vpcf",
+      "bytes": 2417,
+      "source_sha256": "f20305bd2fcb8b4691bbee106b8826ac2051b41c704044fd36d2c310d0fc2832",
+      "compiled_sha256": "206ab73a06caf249fe33b12a9b472b013cac0995d905bd93b8f2611c40f19528"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_lava_cracks.vpcf",
+      "bytes": 2248,
+      "source_sha256": "55c4346fadde81de2e18c29bcaf042e55d17389534247ed9cc9203310023251a",
+      "compiled_sha256": "52114d736c9ff61ffe4c0647f181c203311baa58912e7f78485c27d913520053"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_lava_embers.vpcf",
+      "bytes": 2374,
+      "source_sha256": "4338a8fd0ac5132a07fee8dee9ee84676d8df8e911caace69d50566318bbc68f",
+      "compiled_sha256": "a23425413cb5f0d0660692c1aec5b395b7dd44e4baac2dd0c9e8c7efcf31103c"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_impact_sparks.vpcf",
+      "bytes": 2224,
+      "source_sha256": "402119a3d0989199f00646ac41359c638d328f60b2688a6805a96084e06175d8",
+      "compiled_sha256": "5f061aee8aef3879e895c41d503275e23b93b44c56793d41205ed9f306521227"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_impact.vpcf",
+      "bytes": 2539,
+      "source_sha256": "fd254f9508bdf050a285b533f3545ac04dcb972d1ed7526ca8337363abc80b80",
+      "compiled_sha256": "7d86ed1516c62aaaa691dd41baf4840b7dd85386fd4c3ff4a184076b8254a123"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_cube_fall.vpcf",
+      "bytes": 2791,
+      "source_sha256": "6cfd8bfbd6b0ea2a5ce777ce613e0ecf98b65fa7aff3573ea83010bb35103a5c",
+      "compiled_sha256": "e93629926e252665c5b8e3dc537b41c3d970a4742b63e1e16e50c16af28c2cb7"
+    }
+  ],
+  "workshop": {
+    "status": "PASS",
+    "verified_on": "2026-10-01",
+    "scope": "Cold-start isolated manual_meteor_visual_review fixture using the real presentation runner with zero attribute damage and no gameplay slow; not normal hero full-combat or multiplayer acceptance.",
+    "result": "PASS: angular Rubick cube, warm Invoker flames and impact render; lava horizontal line band is absent after the C_OP_SetToCP plus FLOAT-offset fix.",
+    "evidence": [
+      "art/effects/review/meteor_impact_verified.png",
+      "art/effects/review/meteor_ground_verified.png"
+    ],
+    "original_captures": [
+      "output/map_build_c6/meteor_cp_03.png",
+      "output/map_build_c6/meteor_cp_06.png",
+      "output/map_build_c6/meteor_cp_10.png"
+    ],
+    "observations": [
+      "Cold-start level-5 double-meteor playback uses one ground visual through the final lava expiry.",
+      "The cube retains its native green model surface; its surrounding fire, smoke and sparks use the warm native Invoker children.",
+      "Frames 06 and 10 have no horizontal line band after replacing the legacy offset initializer with native SetToCP at the existing 32/40 heights."
+    ],
+    "causal_boundary": "The operator replacement and explicit FLOAT-vector combination is verified effective. This does not prove integer vectors were the unique underlying engine cause.",
+    "excluded": [
+      "normal hero full-combat acceptance",
+      "all terrain and camera cases",
+      "multiplayer performance"
+    ]
+  }
+}

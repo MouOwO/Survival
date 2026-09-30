@@ -356,7 +356,8 @@ end
 
 local function configured_display_name(state, route_row)
     if state.building_id == "arrow_tower" then
-        return state.unit.survival_display_name
+        return (route_row and tower_routes.display_name(route_row))
+            or state.unit.survival_display_name
             or state.tower_class_name
             or (route_row and route_row.name)
             or state.definition.display_name
@@ -823,7 +824,7 @@ local function apply_tower_level(state, row, level, change_model)
     -- update so an engine refresh or entity model reset cannot restore the shell.
     apply_model(state.unit, row)
     state.level = level
-    state.tower_class_name = state.tower_class and tower_routes.display_name(row) or row.name
+    state.tower_class_name = tower_routes.display_name(row)
     state.unit.survival_level = level
     state.unit.survival_route_level = tonumber(row.level) or level
     state.unit.survival_tower_stage_id = row.stage_id

@@ -1,0 +1,116 @@
+{
+  "validation": [
+    "STATIC: all three compiled resources present; all RERL dependencies found in Valve package",
+    "SIMULATION: final test_weapon_visual_service.lua passed; main-hand isolation, normalized progression, cooldown, exception-safe cleanup, partial rollback, model/attachment rebinding and re-init",
+    "SIMULATION: final test_manual_weapon_visual_fixture.lua passed with the observed Juggernaut attachment layout (attack1/weapon absent, sword=2, hitloc=5); five profiles use attach_sword and 2/2/3/3/3 persistent handles",
+    "STATIC: Lua 5.1 syntax passed for production service, Tools fixture and both regression files",
+    "WORKSHOP: latest cold-start native Juggernaut display verified by root; all five profiles use attach_sword and 2/2/3/3/3 handles, with small colored glows visible near the sword grip",
+    "COMPILE: all targets zero failed; source format vpcf45 intentionally triggers legacy operator migration",
+    "DATA: all sphere initializers migrated to CreateWithinSphereTransform; no zero-default legacy operator; C_OP_SetFloat continuously reads alpha from CP1.z"
+  ],
+  "resources": [
+    {
+      "resource": "particles/survival/weapons/weapon_glow.vpcf_c",
+      "bytes": 2348,
+      "sha256": "7a550d0082865ccce75617dcf512cdd0659ac25a2d3f069be54d37fc0052e4c5",
+      "dependencies": [
+        "materials/particle/particle_glow_01.vtex"
+      ],
+      "data_dump": "output/effect_reference/compiled_validation/weapon_glow.txt"
+    },
+    {
+      "resource": "particles/survival/weapons/weapon_trail.vpcf_c",
+      "bytes": 2626,
+      "sha256": "300e8656799093acf537639f91510c11cd52ec26aafc0e18b7a02171795989d4",
+      "dependencies": [
+        "materials/particle/particle_glow_01.vtex"
+      ],
+      "data_dump": "output/effect_reference/compiled_validation/weapon_trail.txt"
+    },
+    {
+      "resource": "particles/survival/weapons/weapon_shards.vpcf_c",
+      "bytes": 2541,
+      "sha256": "1464457527dbd776d32963d85462dff3bceec304c66168b3795f78e3e8e2e179",
+      "dependencies": [
+        "materials/particle/snowflake/snowflakes_01.vtex"
+      ],
+      "data_dump": "output/effect_reference/compiled_validation/weapon_shards.txt"
+    }
+  ],
+  "cp_contract": {
+    "0": "first valid hero attachment in attack1, weapon, sword, hitloc order; fallback hero origin only after its model is ready",
+    "1": "radius, emission/sec, alpha",
+    "2": "RGB 0..255"
+  },
+  "particle_budget": {
+    "persistent_handles_per_hero": 3,
+    "max_total_particles_per_hero": 65,
+    "max_emission_per_second_per_hero": 38
+  },
+  "limitations": [
+    "Weapon profiles cover current main_hand series only; accessories keep existing gameplay effects.",
+    "No changes to attack damage, speed, projectile name or flight timing.",
+    "Attachment priority is attach_attack1, attach_weapon, attach_sword, attach_hitloc; no child-wearable search is implemented. Native Juggernaut sword=2 is the only newly confirmed hand attachment in Workshop; other heroes are not claimed as visually verified.",
+    "An empty native model delays particle creation. Model path, selected attachment name and bone index are polled every 0.25 seconds; changes rebind once, stable bindings retain their particle IDs.",
+    "Latest cold-start native Juggernaut comparison verifies small colored grip glows. It does not establish elaborate whole-blade effects, every hero attachment, normal equipment progression or every movement/attack trail combination."
+  ],
+  "runtime_validation": {
+    "date": "2026-10-01",
+    "lua_frozen_after_final_checks": true,
+    "latest_workshop_verified": true,
+    "workshop_verified_scope": "Isolated native Juggernaut Tools displays using all five production profiles; actual attach_sword binding and small colored grip glows only.",
+    "workshop_pending": "Other heroes, normal equipment progression and complete movement/attack-trail visual comparisons remain outside this Workshop acceptance scope.",
+    "workshop_evidence": {
+      "reported_by": "root actual Workshop observation",
+      "screenshot": "art/effects/review/weapons_verified.png",
+      "hash_manifest": "art/effects/review/screenshots_manifest.json",
+      "all_five_anchors": "attach_sword",
+      "persistent_handle_counts": [
+        2,
+        2,
+        3,
+        3,
+        3
+      ],
+      "integration_report": "docs/ai/validation/20260930/presentation_integration.json"
+    },
+    "attachment_lookup_observed_in_workshop": {
+      "model": "models/heroes/juggernaut/juggernaut.vmdl",
+      "attach_attack1": 0,
+      "attach_weapon": 0,
+      "attach_sword": 2,
+      "attach_hitloc": 5,
+      "scope": "Observed native Juggernaut attachment layout. Final five-profile grip-glow rendering is recorded separately above; all-hero compatibility is not claimed."
+    },
+    "checks": [
+      {
+        "level": "SIMULATION",
+        "command": "lua5.1 scripts/vscripts/tests/test_weapon_visual_service.lua",
+        "result": "PASS",
+        "log": "output/effect_reference/weapon_service_final_test.log",
+        "coverage": "Success-path parameters/layer counts, slot and player isolation, stage normalization, impact cooldown, death/respawn/re-init, partial-layer rollback, invalid allocation, independent Destroy/Release attempts, impact setup failure, expiry cleanup, empty-model wait, late/bone-changed attachments, model swaps, stable reuse, sword-before-hitloc and Tools recovery. Injected failure messages in this log are expected assertions."
+      },
+      {
+        "level": "SIMULATION",
+        "command": "lua5.1 scripts/vscripts/tests/test_manual_weapon_visual_fixture.lua",
+        "result": "PASS",
+        "log": "output/effect_reference/weapon_fixture_final_test.log",
+        "coverage": "Tools guard, normal traversable/unoccupied placement, async precache cancellation, empty native model wait, observed sword=2/hitloc=5 layout, all five production profiles, movement/gesture, no gameplay equipment events, cleanup and old-world callback/timeout rejection. Expected rejection messages are deliberate test cases."
+      },
+      {
+        "level": "STATIC",
+        "command": "luac5.1 -p scripts/vscripts/systems/weapon_visual_service.lua scripts/vscripts/tests/manual_weapon_visual_review.lua scripts/vscripts/tests/test_weapon_visual_service.lua scripts/vscripts/tests/test_manual_weapon_visual_fixture.lua",
+        "result": "PASS",
+        "log": "output/effect_reference/weapon_syntax_final_test.log"
+      }
+    ]
+  },
+  "total_bytes": 7515,
+  "review_fixes": [
+    "Alpha-only sprite masks use native alpha blending, not RGB-only additive blending (target glyphs, ground symbols, leaves and snowflakes).",
+    "Tower radius now writes actual particle radius for culling/occlusion; renderer radius multiplier remains 1.",
+    "Electrical base uses a full circular texture; rope/half-rune strips are excluded from sprite disks.",
+    "Weapon CP scalar inputs explicitly map by multiplier 1; glow/trail use particle_glow_01 with soft RGB and alpha, not a white-RGB alpha-only mask.",
+    "Weapon visuals retain depth testing; Workshop confirmed body attachment occlusion, so runtime binds the actual sword attachment instead of rendering through the hero."
+  ]
+}

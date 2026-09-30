@@ -572,6 +572,8 @@ end
 
 function M.precache(context)
     require("systems/valley_environment_service").precache(context)
+    require("systems/tower_visual_service").precache(context)
+    require("systems/weapon_visual_service").precache(context)
     -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
     tower_magic_supreme_system.precache(context)
     sound_service.precache(context)
@@ -742,11 +744,13 @@ function M.precache(context)
         "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf",
         context
     )
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf",
-        context
-    )
+    for _, particle in ipairs({
+        "particles/survival/skills/meteor_cube_fall.vpcf",
+        "particles/survival/skills/meteor_impact.vpcf",
+        "particles/survival/skills/meteor_lava.vpcf",
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_warlock/warlock_rain_of_chaos_explosion.vpcf",
@@ -928,6 +932,8 @@ local function initialize_services()
     building_system.init()
     grid_placement_router.init()
     building_upgrade_system.init()
+    require("systems/tower_rank_presentation_service").init()
+    require("systems/tower_visual_service").init()
     tree_system.init()
     worker_system.init()
     require("systems/lumberjack_fusion_service").init()
@@ -946,6 +952,7 @@ local function initialize_services()
     equipment_instance_service.init()
     equipment_growth_service.init()
     weapon_equipment_service.init()
+    require("systems/weapon_visual_service").init()
     weapon_synthesis_service.init()
     weapon_growth_service.init()
     weapon_synthesis_snapshot_service.init()

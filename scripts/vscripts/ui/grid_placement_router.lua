@@ -182,6 +182,18 @@ local function build_profiles()
             }
         end
     end
+    local tower = buildings.arrow_tower
+    if tower then
+        local footprint = tower.footprint or {x=2,y=2}
+        local subdivision = math.max(1, tonumber(grid_config.footprint_subdivision) or 1)
+        profiles_by_ability.ability_building_blink = {
+            ability_name="ability_building_blink", building_id="arrow_tower",
+            display_name="防御塔移动", placement_action="relocate", preview_model=1,
+            footprint_x=footprint.x, footprint_y=footprint.y,
+            grid_footprint_x=footprint.x*subdivision,
+            grid_footprint_y=footprint.y*subdivision,
+        }
+    end
 end
 
 local function profile_list()
@@ -218,6 +230,12 @@ local function resolve_profile_caster(player_id, payload, profile, allow_fallbac
     local ability_entindex = tonumber(payload and payload.ability_entindex)
     local caster = entindex and EntIndexToHScript(entindex) or nil
     local ability = ability_entindex and EntIndexToHScript(ability_entindex) or nil
+    if profile.placement_action == "relocate" then
+        local resolved, reason = require("systems/tower_relocation_service").resolve(
+            player_id, entindex, ability_entindex)
+        if not resolved then return nil, nil, reason end
+        return resolved.unit, resolved.ability
+    end
     local registered = event_bus.request(events.BUILDER_GET_REQUEST, {
         player_id = player_id,
         caster = valid_entity(caster) and caster or nil,
@@ -272,6 +290,11 @@ local function validate_preview(player_id, payload, profile, position)
     )
     if not caster then
         return nil, nil, { ok = false, error = caster_error, cells = {} }
+    end
+    if profile.placement_action == "relocate" then
+        local grid = require("systems/tower_relocation_service").validate(
+            player_id, caster:entindex(), position, payload.ability_entindex)
+        return caster, grid, grid
     end
     -- The building service already checks the exact grid when business rules
     -- pass. Reuse that result rather than performing the same scan twice.
@@ -494,6 +517,16 @@ local function register_commit_request()
                 return
             end
             local position = Vector(x, y, z)
+            if profile.placement_action == "relocate" then
+                local result = require("systems/tower_relocation_service").move(
+                    player_id, caster:entindex(), position, ability:entindex())
+                close_preview_session(player_id, session_id)
+                send(player_id, "ui_grid_placement_commit_result", {
+                    success=result.ok and 1 or 0, error=result.error or "",
+                    building_id=profile.building_id, placement_action="relocate",
+                })
+                return
+            end
             local check = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
                 caster = caster,
                 player_id = player_id,

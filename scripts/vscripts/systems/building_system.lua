@@ -348,7 +348,9 @@ local function level_display_name(definition, level)
 end
 local function state_display_name(state)
     if state.building_id == "arrow_tower" then
-        return state.unit.survival_display_name
+        local row = tower_routes.current(state)
+        return (row and tower_routes.display_name(row))
+            or state.unit.survival_display_name
             or state.tower_class_name
             or ((arrow_data(state.level) or {}).name)
             or state.definition.display_name

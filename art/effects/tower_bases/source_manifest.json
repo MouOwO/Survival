@@ -1,0 +1,147 @@
+{
+  "control_points": {
+    "0": "tower ground origin via ABSORIGIN_FOLLOW",
+    "1": "x=radius; z=alpha (0..1); both continuously read from CP",
+    "2": "RGB 0..255; ignored only by black void underlay"
+  },
+  "attachment": "PATTACH_ABSORIGIN_FOLLOW; SetParticleControlEnt CP0; internal SetToCP keeps all layers attached after D relocation.",
+  "ground_offset": "All sprites WORLD_Z_ALIGNED and ground origin +12..16 units.",
+  "cleanup": "DestroyParticle(false), ReleaseParticleIndex; endcaps last at most 0.15 seconds.",
+  "resources": [
+    {
+      "name": "death",
+      "resource": "particles/survival/towers/death.vpcf",
+      "internal": false,
+      "total_max_particles": 2,
+      "texture": "materials/particle/vortex/vortex1.vtex",
+      "blend": "additive",
+      "description": "Rotating gravitational swirl over a small dark center; 2 particles total."
+    },
+    {
+      "name": "mystery",
+      "resource": "particles/survival/towers/mystery.vpcf",
+      "internal": false,
+      "total_max_particles": 1,
+      "texture": "materials/particle/rune/witch_rune.vtex",
+      "blend": "additive",
+      "description": "Full purple arcane rune disk, resized for the build grid."
+    },
+    {
+      "name": "lightning",
+      "resource": "particles/survival/towers/lightning.vpcf",
+      "internal": false,
+      "total_max_particles": 2,
+      "texture": "materials/particle/auras/aura_vlads.vtex",
+      "blend": "additive",
+      "description": "Electrical branches from reference aura_dark inside a visible thin circular boundary; 2 particles total."
+    },
+    {
+      "name": "machine",
+      "resource": "particles/survival/towers/machine.vpcf",
+      "internal": false,
+      "total_max_particles": 1,
+      "texture": "materials/particle/auras/aura_assaultc.vtex",
+      "blend": "additive",
+      "description": "Reference aura_durable native mechanical Assault Cuirass ring."
+    },
+    {
+      "name": "multi",
+      "resource": "particles/survival/towers/multi.vpcf",
+      "internal": false,
+      "total_max_particles": 4,
+      "texture": "materials/particle/auras/aura_endurance.vtex",
+      "blend": "additive",
+      "description": "Three outward leaf-arrow shapes in a fine radial ring; 4 particles total."
+    },
+    {
+      "name": "frost",
+      "resource": "particles/survival/towers/frost.vpcf",
+      "internal": false,
+      "total_max_particles": 2,
+      "texture": "materials/particle/groundcracks_light.vtex",
+      "blend": "additive",
+      "description": "Fine radial ice cracks with an open thin ring; no solid snowflake sprite. 2 particles total."
+    },
+    {
+      "name": "anti_air",
+      "resource": "particles/survival/towers/anti_air.vpcf",
+      "internal": false,
+      "total_max_particles": 1,
+      "texture": "materials/particle/gyro/gyro_ti10_immortal_missile/gyro_ti10_immortal_missile_target.vtex",
+      "blend": "alpha",
+      "description": "Native Gyrocopter cosmetic missile crosshair, static to retain targeting identity."
+    },
+    {
+      "name": "ultimate",
+      "resource": "particles/survival/towers/ultimate.vpcf",
+      "internal": false,
+      "total_max_particles": 1,
+      "texture": "materials/particle/juggernaut/arcana/jugg_arcana_ground_symbol.vtex",
+      "blend": "alpha",
+      "description": "Arcana ground seal, also reused by the reference durable aura; no unit/model dependency."
+    },
+    {
+      "name": "detail_runes",
+      "resource": "particles/survival/towers/detail_runes.vpcf",
+      "internal": false,
+      "total_max_particles": 1,
+      "texture": "materials/particle/rune/witch_rune.vtex",
+      "blend": "additive",
+      "description": "Thin counter-rotating outer rune; reusable extra SR/SSR/UR layer."
+    },
+    {
+      "name": "detail_motes",
+      "resource": "particles/survival/towers/detail_motes.vpcf",
+      "internal": false,
+      "total_max_particles": 1,
+      "texture": "materials/particle/auras/aura_endurance.vtex",
+      "blend": "additive",
+      "description": "Sparse radial glints with moderate overbright; reusable third layer."
+    },
+    {
+      "name": "base_death_void",
+      "resource": "particles/survival/towers/base_death_void.vpcf",
+      "internal": true,
+      "total_max_particles": 1,
+      "texture": "materials/particle/particle_modulate_03.vtex",
+      "blend": "modulate2x",
+      "description": "Soft dark center using the exact texture and MOD2X blend from native enigma_blackhole_m; no flat black tint or primitive white texture."
+    },
+    {
+      "name": "base_multi_leaf_a",
+      "resource": "particles/survival/towers/base_multi_leaf_a.vpcf",
+      "internal": true,
+      "total_max_particles": 1,
+      "texture": "materials/particle/leaf/leaf_grayscale.vtex",
+      "blend": "alpha",
+      "description": "Static leaf child for multi-shot base."
+    },
+    {
+      "name": "base_multi_leaf_b",
+      "resource": "particles/survival/towers/base_multi_leaf_b.vpcf",
+      "internal": true,
+      "total_max_particles": 1,
+      "texture": "materials/particle/leaf/leaf_grayscale.vtex",
+      "blend": "alpha",
+      "description": "Static leaf child for multi-shot base."
+    },
+    {
+      "name": "base_multi_leaf_c",
+      "resource": "particles/survival/towers/base_multi_leaf_c.vpcf",
+      "internal": true,
+      "total_max_particles": 1,
+      "texture": "materials/particle/leaf/leaf_grayscale.vtex",
+      "blend": "alpha",
+      "description": "Static leaf child for multi-shot base."
+    },
+    {
+      "name": "base_thin_ring",
+      "resource": "particles/survival/towers/base_thin_ring.vpcf",
+      "internal": true,
+      "total_max_particles": 1,
+      "texture": "materials/particle/particle_ring_softouter.vtex",
+      "blend": "alpha",
+      "description": "Soft low-alpha boundary shared by lightning and frost, using native Enigma soft outer ring texture."
+    }
+  ]
+}

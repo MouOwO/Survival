@@ -375,3 +375,43 @@ console.log('GRID_FAST_MOTION_PASS sweep_frames=20 validation_requests=0 project
 console.log('GRID_STREAM_RENDER_PASS peak_new_tiles/frame='+peakNewTiles);
 console.log('GRID_PERF_FIXTURE: visible='+visibleOverview.length+' stationary projection calls/frame='+(stationaryCalls/30));
 console.log('GRID_PLACEMENT_CLIENT_PASS: colors, footprint, icon, circle, throttling, stale response and missing cursor');
+
+// Relocation is the same preview/commit controller; a second D must replace the
+// old session even when ability, tower and cursor anchor are unchanged.
+shared.SurvivalSelectionResolver = {Resolve: () => 10};
+shared.SurvivalPointTargetInput = {
+    Begin(ability, unit) { shared.SurvivalPointTargetState = {
+        active: true, name: 'ability_building_blink', ability, unit}; return true; },
+    Cancel() { shared.SurvivalPointTargetState.active = false; }
+};
+listeners.ui_grid_placement_profiles({cell_size:64,profiles:[{
+    ability_name:'ability_building_blink',building_id:'arrow_tower',placement_action:'relocate',
+    grid_footprint_x:2,grid_footprint_y:2,preview_model:0
+}]});
+world=[129,191,384]; now+=1;
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+const oldMove = requests().at(-1).data;
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+const newMove = requests().at(-1).data;
+assert(Number(newMove.session_id)>Number(oldMove.session_id));
+assert(sent.some(e=>e.name==='ui_grid_placement_preview_end' && e.data.session_id===oldMove.session_id));
+const moveResponse = request => ({session_id:request.session_id,request_id:request.request_id,
+    ability_name:'ability_building_blink',success:1,request_anchor_x:2,request_anchor_y:3,
+    anchor_x:2,anchor_y:3,world_x:128,world_y:192,world_z:384,area:'',cells:[]});
+listeners.ui_grid_placement_validation(moveResponse(oldMove));
+const priorCommits=sent.filter(e=>e.name==='ui_grid_placement_commit').length;
+mouse('pressed',0);
+assert.equal(sent.filter(e=>e.name==='ui_grid_placement_commit').length,priorCommits,
+    'old green response cannot authorize a restarted D session');
+listeners.ui_grid_placement_validation(moveResponse(newMove));
+mouse('pressed',0);
+const relocationCommit=sent.filter(e=>e.name==='ui_grid_placement_commit').at(-1).data;
+assert.equal(relocationCommit.ability_name,'ability_building_blink');
+assert.deepEqual([relocationCommit.x,relocationCommit.y,relocationCommit.z],[128,192,384]);
+assert(!shared.SurvivalPointTargetState.active && !shared.SurvivalGridPlacement.IsRelocating(10));
+assert(!sent.some(e=>e.name==='ui_building_move_request'),'never send an unsnapped movement request');
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+shared.SurvivalSelectionResolver.Resolve=()=>11; update();
+assert(!shared.SurvivalGridPlacement.IsRelocating(10) && !shared.SurvivalPointTargetState.active,
+    'changing selection cancels the movement and its grid');
+console.log('TOWER_RELOCATION_CLIENT_PASS repeated D session, stale response, exact commit and selection cancel');

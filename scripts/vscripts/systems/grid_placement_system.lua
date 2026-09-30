@@ -415,6 +415,7 @@ local function occupied_entity_is_valid(unit)
     if unit_is_dead(unit) then return false end
     return unit.survival_is_building == true
         or unit.survival_building_id ~= nil
+        or unit.survival_tree_owner_id ~= nil
 end
 
 reconcile_occupied = function()
@@ -424,9 +425,14 @@ reconcile_occupied = function()
         for _, entindex in pairs(column) do
             if entindex ~= nil and not checked[entindex] then
                 checked[entindex] = true
-                local ok, unit = pcall(EntIndexToHScript, entindex)
-                if not ok or not occupied_entity_is_valid(unit) then
-                    clear_occupied_entindex(entindex)
+                -- Tree locations reserve named cells before their entity is
+                -- spawned. These markers are not stale entity handles.
+                local entity_index = tonumber(entindex)
+                if entity_index then
+                    local ok, unit = pcall(EntIndexToHScript, entity_index)
+                    if not ok or not occupied_entity_is_valid(unit) then
+                        clear_occupied_entindex(entindex)
+                    end
                 end
             end
         end

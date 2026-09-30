@@ -1,0 +1,32 @@
+{
+  "generated_by": "tools/map_c6/build-meteor-visual-particles.cjs",
+  "source_reference": "Valve rubick_chaos_meteor_fly: rubick_arcana_cube model, travel time 1.5 seconds",
+  "runtime_fall_duration": "unchanged skill config 0.8 seconds; CP1 extended to cross ground at impact",
+  "lava_particle_budget": 26,
+  "impact_custom_particle_budget": 25,
+  "lava_ground_layer_heights": [
+    32,
+    40
+  ],
+  "lava_position_operator": "C_OP_SetToCP with explicit FLOAT vector offsets",
+  "native_resources": [
+    "materials/particle/lava/lava_radial/lava_radial_alphablend.vtex",
+    "materials/particle/groundcracks_light.vtex",
+    "materials/particle/particle_glow_05.vtex",
+    "materials/particle/ring01.vtex",
+    "particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_flash.vpcf",
+    "models/items/rubick/rubick_arcana/rubick_arcana_cube.vmdl",
+    "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly_fire.vpcf",
+    "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly_glow.vpcf",
+    "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly_smoke.vpcf",
+    "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly_sparks.vpcf"
+  ],
+  "outputs": [
+    "particles/survival/skills/meteor_lava.vpcf",
+    "particles/survival/skills/meteor_lava_cracks.vpcf",
+    "particles/survival/skills/meteor_lava_embers.vpcf",
+    "particles/survival/skills/meteor_impact_sparks.vpcf",
+    "particles/survival/skills/meteor_impact.vpcf",
+    "particles/survival/skills/meteor_cube_fall.vpcf"
+  ]
+}

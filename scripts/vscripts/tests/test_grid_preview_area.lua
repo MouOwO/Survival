@@ -214,3 +214,35 @@ for _,v in ipairs(decode(grid.preview_area({position=Vector(10000,10000,384),tea
 end
 assert(terrain_calls==0,"permanently forbidden ocean requires zero terrain checks")
 print("GRID_WALL_NEIGHBORS_PASS exact footprint, preview parity, release, retired barriers, ocean zero scans")
+
+-- Startup tree markers have no entity yet. Reconciliation must preserve them
+-- and live resource trees, while still clearing dead or missing buildings.
+local tree_alive=true
+local tree={survival_tree_owner_id=0,IsNull=function() return false end,
+    IsAlive=function() return tree_alive end}
+local entity_lookups=0
+EntIndexToHScript=function(index)
+    assert(type(index)=="number","named reservation must never reach the engine entity API")
+    entity_lookups=entity_lookups+1
+    if index==88 then return tree end
+    return nil
+end
+local named={grid_x=8,grid_y=8,footprint={x=2,y=2},entindex="survival_tree_reserved"}
+local living={grid_x=10,grid_y=8,footprint={x=2,y=2},entindex=88}
+local stale={grid_x=12,grid_y=8,footprint={x=2,y=2},entindex=99}
+assert(bus.request(events.GRID_OCCUPY_REQUEST,named))
+assert(bus.request(events.GRID_OCCUPY_REQUEST,living))
+assert(bus.request(events.GRID_OCCUPY_REQUEST,stale))
+grid._reconcile_occupied_for_test()
+local cells=grid._occupied_for_test()
+assert(cells[8][8]=="survival_tree_reserved","keep future tree location reserved")
+assert(cells[10][8]==88,"live tree is a valid grid occupant")
+assert(cells[12]==nil,"missing building occupancy is still removed")
+assert(entity_lookups==2,"resolve each numeric occupant once, never static markers")
+assert(not grid._can_place_for_test({position=Vector(576,576,384),footprint={x=2,y=2},team=2}).ok,
+    "authoritative placement cannot overlap a future tree")
+tree_alive=false
+grid._reconcile_occupied_for_test()
+assert(cells[10]==nil and cells[8][8]=="survival_tree_reserved",
+    "dead tree handle expires independently of persistent startup marker")
+print("GRID_TREE_RESERVATION_PASS named startup markers, live tree, stale/dead cleanup")
