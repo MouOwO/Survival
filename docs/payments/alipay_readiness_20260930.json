@@ -1,0 +1,21 @@
+{
+  "date": "2026-09-30",
+  "release": "20260930-payment17",
+  "appid": "2021007102660118",
+  "seller_id": "2088980017268461",
+  "production_query_signature_verified": true,
+  "https_catalog": {"wechat": true, "alipay": true, "products": 6, "all_amount_fen": 5000},
+  "catalog_hash": "a2cf08b4eed05993d22b9a6219a379967cdc1fd1db091f10835cf51a96645b4b",
+  "official_cashier": {"host": "excashier.alipay.com", "qr_canvas_width": 256, "qr_canvas_height": 256, "dark_pixels": 34572, "light_pixels": 30964},
+  "probe_order": {"sku": "special_lottery_ticket_single", "amount_fen": 5000, "state": "closed", "paid": false, "rewards_granted": 0},
+  "forged_notify_http_status": 401,
+  "unauthorized_cancel_http_status": 401,
+  "python_tests_passed": 34,
+  "ui_lua_tests_passed": true,
+  "database_tests_rolled_back": true,
+  "mixed_bundle_stats_items_entitlements_verified": true,
+  "existing_wechat_delivered_orders": 3,
+  "game_api_not_restarted": true,
+  "real_account_resets": 0,
+  "real_alipay_payment_acceptance": "pending_player_payment"
+}

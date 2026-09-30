@@ -1,10 +1,11 @@
-var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop;
+var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, PaymentChannel, PaymentCancel;
 (function () {
     "use strict";
     var cfg = GameUI.CustomUIConfig(), disposed = false, subscriptions = [];
     if (cfg.SurvivalPayments && cfg.SurvivalPayments.Dispose) cfg.SurvivalPayments.Dispose();
     var products = [], selected = "", orders = {}, busy = false, opened = false, generation = 0, lastMatrix = "", ticks = 0;
     var gameValues={}, gameEntitlements={}, wallet={}, matchFrozen=false, catalog={products:[],categories:[]};
+    var channel="wechat";
     var entry = $("#PaymentEntry"), dialog = $("#PaymentDialog"), status = $("#PaymentStatus"), buy = $("#PaymentBuy");
     function rows(value) {
         if (Array.isArray(value)) return value;
@@ -39,7 +40,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop;
         if(matchFrozen)text.push("本局已结算冻结，新奖励下局生效。");
         return text.join("\n");
     }
-    function validURL(url) { return typeof url === "string" && /^https:\/\/pay\.xiaofengnet\.com\/checkout\?order=WX[0-9a-f]{30}&token=[0-9a-f]{64}$/.test(url); }
+    function validURL(url) { return typeof url === "string" && /^https:\/\/pay\.xiaofengnet\.com\/checkout(?:\?order=WX|\/alipay\?order=AL)[0-9a-f]{30}&token=[0-9a-f]{64}$/.test(url); }
     function terminal(state) { return ["delivered", "paid_review", "closed"].indexOf(state) >= 0; }
     function drawQR(matrix) {
         var parent = $("#PaymentQR");
@@ -63,20 +64,30 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop;
     function render() {
         if (disposed) return;
         var p = current(), order = orders[selected];
+        var active=order && !terminal(order.state), shownChannel=active?(order.provider||"wechat"):channel;
+        ["wechat","alipay"].forEach(function(value){
+            var button=$(value==="wechat"?"#PaymentWeChat":"#PaymentAlipay");
+            button.enabled=!busy && !active && (value==="wechat"?catalog.wechat!==false:catalog.alipay===true);
+            button.SetHasClass("Selected",shownChannel===value);
+        });
         var shown=order && order.state!=="closed" ? order : p;
         $("#PaymentTitle").text = shown ? shown.title : "正在加载商品";
         $("#PaymentDescription").text = shown ? shown.description||"" : "请先完成对局登录";
         $("#PaymentPrice").text = shown ? money(shown.amount_fen) : "";
         $("#PaymentValues").text = valuesText(shown,order);
         buy.enabled = !busy && !!p && !!p.enabled && (!order || order.state === "closed" || order.state==="delivered");
-        $("#PaymentBuyLabel").text = p ? (order && order.state==="delivered"?"再次购买 ":"微信购买 ")+money(order && !terminal(order.state)?order.amount_fen:p.amount_fen) : "加载中";
+        buy.enabled=buy.enabled && (shownChannel==="wechat"?catalog.wechat!==false:catalog.alipay===true);
+        $("#PaymentBuyLabel").text = p ? (shownChannel==="alipay"?"支付宝购买 ":"微信购买 ")+money(active?order.amount_fen:p.amount_fen) : "加载中";
         var canOpen = order && order.state === "pending" && !order.expired && validURL(order.checkout_url);
         $("#PaymentOpen").style.visibility = canOpen ? "visible" : "collapse";
+        $("#PaymentOpenLabel").text=shownChannel==="alipay"?"打开支付宝收银台":"浏览器付款";
+        $("#PaymentCancel").style.visibility=active?"visible":"collapse";
+        $("#PaymentCancel").enabled=!busy;
         $("#PaymentLink").style.visibility = canOpen ? "visible" : "collapse";
         if (canOpen) $("#PaymentLink").text = order.checkout_url;
-        drawQR(canOpen ? order.qr_matrix : null);
+        drawQR(canOpen && shownChannel==="wechat" ? order.qr_matrix : null);
         if (order) {
-            var labels = {created:"订单正在确认，请查询结果后重试。", pending:"用手机微信扫描上方二维码。付款后自动发放并刷新存档。",
+            var labels = {created:"订单正在确认，请查询结果后重试。", pending:shownChannel==="alipay"?"点击“打开支付宝收银台”，在浏览器页面扫码付款。到账后自动刷新存档。":"用手机微信扫描上方二维码。付款后自动发放并刷新存档。",
                 delivered:"支付成功：" + order.title + " 的全部奖励已写入存档。",
                 paid_review:"已收到付款，该订单需要人工核对。请保留订单号联系开发者。",
                 closed:"订单已关闭，可以重新购买。"};
@@ -95,6 +106,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop;
         busy = true; render();
         var ticket = ++generation, body = {action:action};
         if (sku) body.sku = sku;
+        if(action==="create")body.provider=channel;
         GameEvents.SendCustomGameEventToServer("survival_payment_request", body);
         $.Schedule(32, function() {
             if (!disposed && ticket === generation && busy) { busy=false; render(); status.text="请求超时，请查询结果后重试。"; }
@@ -104,6 +116,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop;
     function refreshCatalog() { if (!disposed && !busy) request("catalog"); }
     function buildList(data) {
         catalog=data;
+        if(channel==="alipay" && data.alipay!==true)channel="wechat";
         products = rows(data.products).filter(function(p) {
             return p && typeof p.sku === "string" && Number(p.amount_fen)>0 && Number(p.amount_fen)<=1000000 && Number(p.amount_fen)%1===0;
         });
@@ -144,11 +157,16 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop;
     PaymentBuy=function(){
         var p=current(), order=orders[selected];
         if (!p || !p.enabled || busy || (order && order.state!=="closed" && order.state!=="created" && order.state!=="delivered")) return;
-        if (request("create",selected)) status.text="正在创建 " + money(p.amount_fen) + " 微信订单…";
+        if(channel==="alipay" && catalog.alipay!==true)return;
+        if (request("create",selected)) status.text="正在创建 " + money(p.amount_fen) + (channel==="alipay"?" 支付宝":" 微信")+"订单…";
     };
-    PaymentOpen=function(){var order=orders[selected];if(order && order.state==="pending" && validURL(order.checkout_url))$.DispatchEvent("ExternalBrowserGoToURL",order.checkout_url);};
+    PaymentChannel=function(value){var order=orders[selected];if(busy || (order && !terminal(order.state)))return;if(value==="wechat" || (value==="alipay" && catalog.alipay===true)){channel=value;render();}};
+    PaymentCancel=function(){var order=orders[selected];if(order && !terminal(order.state) && request("cancel",selected))status.text="正在核对并关闭订单，请稍候…";};
+    PaymentOpen=function(){var order=orders[selected];if(order && order.state==="pending" && !order.expired && validURL(order.checkout_url))$.DispatchEvent("ExternalBrowserGoToURL",order.checkout_url);};
     PaymentRefresh=function(){request(orders[selected]?"status":"catalog",orders[selected]?selected:null);};
     var messages={test_account_required:"商城当前仅对指定测试账号开放。",already_owned:"你已经拥有此商品。",
+        payment_channel_unavailable:"此支付方式尚未开放，请选择已开放的方式。",
+        payment_close_pending:"支付宝尚未生成可关闭的交易。为防止重复付款，请等待此订单到期后再切换支付方式。",
         component_already_owned:"礼包内有道具已达持有上限，不能重复购买。",entitlement_already_owned:"礼包内有权限已生效，不能重复购买。",
         attribute_limit_reached:"购买后有属性会超过上限，暂不可购买。",
         purchase_limit_reached:"此商品已达到账号购买次数限制。",profile_not_ready:"请先进入对局，等待存档加载。",
@@ -178,7 +196,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop;
             products.forEach(function(p){if(p.sku===data.sku){p.owned=1;p.enabled=false;}});
             $.Schedule(1.1,refreshCatalog);
         }
-        if (data.action==="create") {selected=data.sku;setOpen(true);}
+        if (data.action==="create") {selected=data.sku;setOpen(true);if(data.provider==="alipay" && opened)PaymentOpen();}
         render();
     }));
     subscriptions.push(GameEvents.Subscribe("survival_payment_open",openShop));
