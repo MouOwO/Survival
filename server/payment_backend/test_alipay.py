@@ -11,8 +11,8 @@ from pathlib import Path
 import tempfile
 import threading
 import unittest
-from unittest.mock import Mock
-from urllib.parse import urlencode
+from unittest.mock import Mock, MagicMock, patch
+from urllib.parse import urlencode, parse_qs
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from .alipay import Alipay, APPID, canonical
@@ -50,10 +50,10 @@ class AlipayTests(unittest.TestCase):
         params=dict(params or paid(),sign_type='RSA2',charset='utf-8',subject='礼包 & + 中文')
         params['sign']=self.signature(canonical(params,True))
         return urlencode(params).encode()
-    def response(self,value):
+    def response(self,value,method='alipay.trade.query'):
         # Preserve whitespace and escaped non-ASCII characters inside the signed object.
         raw=json.dumps(value,ensure_ascii=True,indent=2).encode()
-        return b'{"alipay_trade_query_response": '+raw+b',"sign":'+json.dumps(self.signature(raw)).encode()+b'}'
+        return b'{'+json.dumps(method.replace('.','_')+'_response').encode()+b': '+raw+b',"sign":'+json.dumps(self.signature(raw)).encode()+b'}'
     def setUp(self):
         self.db=FakeDB();self.db.row=order()
         self.app=Payments(dict(allowed_accounts=['123'],pepper='p'*32,checkout_key='c'*32,game_token='g'*32),self.db,Mock(),self.ali)
@@ -78,6 +78,68 @@ class AlipayTests(unittest.TestCase):
         self.assertEqual(error.exception.code,'ACQ.TRADE_NOT_EXIST')
         with self.assertRaises(PaymentError):self.ali.verified_response('alipay.trade.query',b'{"alipay_trade_query_response":{"code":"40004","sub_code":"ACQ.TRADE_NOT_EXIST"}}')
         with self.assertRaises(PaymentError):self.ali.verified_response('alipay.trade.query',raw[:-1]+b',"sign":"fake"}')
+    def test_precreate_signed_qr_price_identity_expiry_and_notify(self):
+        code='https://qr.alipay.com/bax1234567890'
+        response=MagicMock();response.__enter__.return_value=response
+        response.read.return_value=self.response(dict(code='10000',out_trade_no=ID,qr_code=code),'alipay.trade.precreate')
+        with patch.object(self.ali,'opener') as opener:
+            opener.open.return_value=response
+            self.assertEqual(self.ali.precreate(order()),code)
+            request=opener.open.call_args.args[0]
+        params={k:v[0] for k,v in parse_qs(request.data.decode()).items()}
+        self.merchant.public_key().verify(base64.b64decode(params['sign']),canonical(params),padding.PKCS1v15(),hashes.SHA256())
+        self.assertEqual(params['method'],'alipay.trade.precreate')
+        self.assertEqual(params['notify_url'],'https://pay.xiaofengnet.com/v1/payments/alipay/notify')
+        business=json.loads(params['biz_content'])
+        self.assertEqual(business['out_trade_no'],ID);self.assertEqual(business['seller_id'],PID)
+        self.assertEqual(business['total_amount'],'50.00');self.assertIn('time_expire',business)
+        self.assertNotIn('return_url',params);self.assertNotIn('product_code',business)
+    def test_precreate_rejects_untrusted_qr_and_preserves_permission_error(self):
+        base=dict(code='10000',out_trade_no=ID,qr_code='https://qr.alipay.com/abc123')
+        for change in ({'out_trade_no':'another'}, {'qr_code':'https://qr.alipay.com.evil.example/abc'},
+                       {'qr_code':'https://evil.example/abc'}, {'qr_code':'https://qr.alipay.com/abc?next=bad'},
+                       {'qr_code':'alipay:page_pay'}, {'qr_code':None}):
+            with self.subTest(change=change),patch.object(self.ali,'request',return_value=dict(base,**change)),self.assertRaises(PaymentError):
+                self.ali.precreate(order())
+        raw=self.response({'code':'40004','sub_code':'ACQ.ACCESS_FORBIDDEN'},'alipay.trade.precreate')
+        with self.assertRaises(PaymentError) as error:self.ali.verified_response('alipay.trade.precreate',raw)
+        self.assertEqual(error.exception.code,'ACQ.ACCESS_FORBIDDEN')
+        with self.assertRaises(PaymentError):self.ali.verified_response('alipay.trade.precreate',raw.replace(b'40004',b'10000'))
+    def test_native_creation_retries_same_order_and_keeps_legacy_pending_order(self):
+        self.app.alipay_mode='precreate'
+        gateway=Mock(wraps=self.ali);gateway.app_id=APPID;gateway.seller_id=PID;self.app.alipay=gateway
+        gateway.query.side_effect=PaymentError('ACQ.TRADE_NOT_EXIST',502)
+        gateway.precreate.side_effect=[PaymentError('alipay_gateway_unavailable',503),'https://qr.alipay.com/testqr123']
+        self.db.row.update(state='created',code_url=None)
+        body=dict(account_id='123',match_session_id='test_session',sku='ticket_test',provider='alipay')
+        with self.assertRaises(PaymentError):self.app.game('create',body)
+        public=self.app.game('create',body)
+        self.assertEqual(public['checkout_mode'],'qr');self.assertIn('qr_matrix',public)
+        self.assertEqual([x.args[0]['order_id'] for x in gateway.precreate.call_args_list],[ID,ID])
+        self.assertEqual(self.app.game('create',body)['order_id'],ID)
+        self.assertEqual(gateway.precreate.call_count,2);self.assertEqual(self.db.deliveries,0)
+        matrix=public['qr_matrix'].split('|');self.assertTrue(29<=len(matrix)<=65)
+        self.assertTrue(all(len(row)==len(matrix) for row in matrix))
+        self.assertTrue(all(set(row)=={'0'} for row in matrix[:4]+matrix[-4:]))
+        self.db.row=order()
+        legacy=self.app.game('create',body)
+        self.assertEqual(legacy['checkout_mode'],'page_pay');self.assertNotIn('qr_matrix',legacy)
+        self.assertEqual(gateway.precreate.call_count,2)
+        self.db.row.update(code_url='https://qr.alipay.com/testqr123',state='delivered')
+        self.assertNotIn('qr_matrix',self.app.public(self.db.row))
+        self.db.row.update(state='pending',expires_at=(datetime.now(timezone.utc)-timedelta(seconds=1)).isoformat())
+        self.assertNotIn('qr_matrix',self.app.public(self.db.row))
+    def test_native_permission_failure_never_falls_back_to_web_checkout(self):
+        self.app.alipay_mode='precreate'
+        gateway=Mock(wraps=self.ali);gateway.app_id=APPID;gateway.seller_id=PID;self.app.alipay=gateway
+        gateway.query.side_effect=PaymentError('ACQ.TRADE_NOT_EXIST',502)
+        gateway.precreate.side_effect=PaymentError('ACQ.ACCESS_FORBIDDEN',502)
+        self.db.row.update(state='created',code_url=None)
+        with self.assertRaises(PaymentError) as error:
+            self.app.game('create',dict(account_id='123',match_session_id='test_session',sku='ticket_test',provider='alipay'))
+        self.assertEqual(error.exception.code,'ACQ.ACCESS_FORBIDDEN')
+        self.assertIsNone(self.db.row['code_url']);self.assertEqual(self.db.row['state'],'created')
+        gateway.page.assert_not_called();self.assertEqual(self.db.deliveries,0)
     def test_notice_identity_amount_and_repeated_delivery(self):
         raw=self.notice();self.app.alipay_notice(raw);self.app.alipay_notice(raw)
         self.assertEqual(self.db.deliveries,1)
@@ -131,6 +193,16 @@ class AlipayTests(unittest.TestCase):
             self.assertIn('https://unitradeprod.alipay.com',headers['Content-Security-Policy'])
             self.assertNotIn(b'PRIVATE KEY',body)
             self.assertEqual(request('GET','/checkout/qr?order='+ID+'&token='+self.app.token(ID))[0],409)
+            self.db.row['code_url']='https://qr.alipay.com/native123'
+            status,headers,body=request('GET',url)
+            self.assertEqual(status,200);self.assertNotIn(b'alipay-form',body)
+            self.assertIn("form-action 'none'",headers['Content-Security-Policy'])
+            result=request('GET','/checkout/qr?order='+ID+'&token='+self.app.token(ID))
+            self.assertEqual(result[0],200);self.assertIn(b'<svg',result[2])
+            self.assertEqual(request('GET','/checkout/qr?order='+ID+'&token=invalid')[0],404)
+            self.db.row.update(state='created',code_url=None)
+            self.assertNotIn(b'alipay-form',request('GET',url)[2])
+            self.db.row.update(state='pending',code_url='https://qr.alipay.com/native123')
             self.assertEqual(request('GET','/checkout/return?trade_status=TRADE_SUCCESS')[0],200)
             self.assertEqual(self.db.deliveries,0)
             self.assertEqual(request('POST','/v1/payments/alipay/notify',b'sign=x',{'Content-Type':'application/x-www-form-urlencoded'})[0],400)

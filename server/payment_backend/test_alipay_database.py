@@ -56,8 +56,20 @@ def run_checks(conn,defaults,seller):
     assert make(775,'alipay_fixture_bundle',channel='wechat').get('error')=='already_owned'
     conn.execute("UPDATE public.player_archive_state SET content_inventory=content_inventory-'pay_alipay_fixture_bundle' WHERE account_id=%s",(ACCOUNT,))
     assert make(775,'alipay_fixture_bundle',channel='wechat').get('error')=='purchase_limit_reached'
+    # Both checkout modes use exactly the same immutable order and delivery path.
+    make(776)
+    for invalid in ('weixin://wxpay/bizpayurl?pr=example','https://qr.alipay.com.evil.example/pay','https://qr.alipay.com/a?next=bad'):
+        try:
+            with conn.transaction():call('update_gateway',oid(776),'pending',invalid)
+        except Exception:pass
+        else:raise AssertionError('wrong provider QR accepted')
+    native=call('update_gateway',oid(776),'pending','https://qr.alipay.com/test_precreate')
+    assert native['code_url']=='https://qr.alipay.com/test_precreate'
+    assert pay(776)['state']=='delivered'
+    assert profile()['save']['content_inventory']['special_lottery_ticket']==5
+    assert pay(776)['state']=='delivered' and profile()['save']['content_inventory']['special_lottery_ticket']==5
     assert not conn.execute("SELECT has_table_privilege('goufayu_payment','payments.providers','SELECT')").fetchone()[0]
     assert conn.execute("SELECT has_function_privilege('goufayu_payment','payments.create_order_channel(text,text,text,text,text)','EXECUTE')").fetchone()[0]
     return dict(alipay_ticket=True,wechat_after_alipay=True,cross_channel_pending_reused=True,
         wrong_identity_and_amount_rejected=True,duplicate_notice_safe=True,mixed_bundle_all_grants=True,
-        cross_channel_purchase_limit=True,real_accounts_modified=False)
+        cross_channel_purchase_limit=True,alipay_native_qr=True,real_accounts_modified=False)

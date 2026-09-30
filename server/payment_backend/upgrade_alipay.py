@@ -34,9 +34,10 @@ def migrate(conn,seller):
         rows=conn.execute('SELECT provider,appid,mchid,enabled FROM payments.providers ORDER BY provider').fetchall()
         if rows!=[('alipay','2021007102660118',seller,True),('wechat','wx164e25a570fb636a','1117928493',True)]:
             raise RuntimeError('provider_configuration_mismatch')
-        return
-    conn.execute("SELECT set_config('payments.alipay_seller',%s,true)",(seller,))
-    conn.execute((ROOT/'payment_backend/upgrade_alipay.sql').read_text())
+    else:
+        conn.execute("SELECT set_config('payments.alipay_seller',%s,true)",(seller,))
+        conn.execute((ROOT/'payment_backend/upgrade_alipay.sql').read_text())
+    conn.execute((ROOT/'payment_backend/upgrade_alipay_qr.sql').read_text())
 
 def nginx_config(original):
     if '# Managed by survival/server/aliyun/deploy/payment_https.py' not in original:raise RuntimeError('unmanaged_nginx_refused')

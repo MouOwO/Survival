@@ -62,11 +62,11 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     function terminal(state) { return ["delivered", "paid_review", "closed"].indexOf(state) >= 0; }
     function drawQR(matrix) {
         var parent = $("#PaymentQR");
-        if (typeof matrix !== "string" || !/^[01|]+$/.test(matrix)) { parent.style.visibility = "collapse"; return; }
+        if (typeof matrix !== "string" || !/^[01|]+$/.test(matrix)) { parent.style.visibility = "collapse"; return false; }
         var qr = matrix.split("|"), size = qr.length;
-        if (size < 29 || size > 65 || qr.some(function(row){return row.length !== size;})) { parent.style.visibility = "collapse"; return; }
+        if (size < 29 || size > 65 || qr.some(function(row){return row.length !== size;})) { parent.style.visibility = "collapse"; return false; }
         parent.style.visibility = "visible";
-        if (lastMatrix === matrix) return;
+        if (lastMatrix === matrix) return true;
         lastMatrix = matrix; parent.RemoveAndDeleteChildren();
         var cell = Math.max(4, Math.floor(260 / size));
         parent.style.width = (size * cell) + "px"; parent.style.height = (size * cell) + "px";
@@ -78,6 +78,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
                 run.style.backgroundColor=bits[start]==="1"?"#000000":"#ffffff"; start=end;
             }
         });
+        return true;
     }
     function render() {
         if (disposed) return;
@@ -98,14 +99,17 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         $("#PaymentBuyLabel").text = p ? (shownChannel==="alipay"?"支付宝购买 ":"微信购买 ")+money(active?order.amount_fen:p.amount_fen) : "加载中";
         var canOpen = order && order.state === "pending" && !order.expired && validURL(order.checkout_url);
         $("#PaymentOpen").style.visibility = canOpen ? "visible" : "collapse";
-        $("#PaymentOpenLabel").text=shownChannel==="alipay"?"打开支付宝收银台":"浏览器付款";
+        $("#PaymentOpenLabel").text=shownChannel==="alipay" && order && order.checkout_mode!=="qr"?"打开支付宝收银台":"浏览器备用付款页";
         $("#PaymentCancel").style.visibility=active?"visible":"collapse";
         $("#PaymentCancel").enabled=!busy;
         $("#PaymentLink").style.visibility = canOpen ? "visible" : "collapse";
         if (canOpen) $("#PaymentLink").text = order.checkout_url;
-        drawQR(canOpen && shownChannel==="wechat" ? order.qr_matrix : null);
+        var hasQR=drawQR(canOpen ? order.qr_matrix : null);
         if (order) {
-            var labels = {created:"订单正在确认，请查询结果后重试。", pending:shownChannel==="alipay"?"点击“打开支付宝收银台”，在浏览器页面扫码付款。到账后自动刷新存档。":"用手机微信扫描上方二维码。付款后自动发放并刷新存档。",
+            var pendingText=hasQR?"用手机"+(shownChannel==="alipay"?"支付宝":"微信")+"扫描上方二维码。付款后自动发放并刷新存档。"
+                : shownChannel==="alipay" && order.checkout_mode!=="qr"?"此订单使用网页收银台，点击“打开支付宝收银台”付款。内置二维码需商户开通扫码支付。"
+                : "二维码暂未显示，请查询付款结果或打开备用付款页。";
+            var labels = {created:"订单正在确认，请查询结果后重试。", pending:pendingText,
                 delivered:"支付成功：" + order.title + " 的全部奖励已写入存档。",
                 paid_review:"已收到付款，该订单需要人工核对。请保留订单号联系开发者。",
                 closed:"订单已关闭，可以重新购买。"};
@@ -187,6 +191,8 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     PaymentRefresh=function(){request(orders[selected]?"status":"catalog",orders[selected]?selected:null);};
     var messages={test_account_required:"商城当前仅对指定测试账号开放。",already_owned:"你已经拥有此商品。",
         payment_channel_unavailable:"此支付方式尚未开放，请选择已开放的方式。",
+        "ACQ.ACCESS_FORBIDDEN":"支付宝扫码支付权限尚未开通，请联系商户开通后再试。",
+        "isv.insufficient-isv-permissions":"支付宝应用尚无扫码支付接口权限，请联系商户完成配置。",
         payment_close_pending:"支付宝尚未生成可关闭的交易。为防止重复付款，请等待此订单到期后再切换支付方式。",
         component_already_owned:"礼包内有道具已达持有上限，不能重复购买。",entitlement_already_owned:"礼包内有权限已生效，不能重复购买。",
         attribute_limit_reached:"购买后有属性会超过上限，暂不可购买。",
@@ -217,7 +223,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
             products.forEach(function(p){if(p.sku===data.sku){p.owned=1;p.enabled=false;}});
             $.Schedule(1.1,refreshCatalog);
         }
-        if (data.action==="create") {selected=data.sku;setOpen(true);if(data.provider==="alipay" && opened)PaymentOpen();}
+        if (data.action==="create") {selected=data.sku;setOpen(true);}
         render();
     }));
     subscriptions.push(GameEvents.Subscribe("survival_payment_open",openShop));

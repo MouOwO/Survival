@@ -1,4 +1,4 @@
-"""Alipay production page-pay, RSA2 notices and signed query/close responses.
+"""Alipay production QR/page-pay, RSA2 notices and signed gateway responses.
 
 Protocol references: official alipay/alipay-sdk-python-all and
 https://developer.alibaba.com/docs/doc.htm?articleId=105902&docType=1&treeId=193
@@ -22,6 +22,10 @@ from .wechat import PaymentError, NoRedirect, ORIGIN, decode_json
 APPID = '2021007102660118'
 GATEWAY = 'https://openapi.alipay.com/gateway.do'
 CHINA = timezone(timedelta(hours=8))
+
+
+def is_qr_code(value):
+    return isinstance(value, str) and re.fullmatch(r'https://qr\.alipay\.com/[A-Za-z0-9_-]{1,192}', value) is not None
 
 
 def key_bytes(path, private=False):
@@ -104,8 +108,8 @@ class Alipay:
             raise PaymentError(code, 502)
         return result
 
-    def request(self, method, business):
-        req = urllib.request.Request(GATEWAY, data=urlencode(self.params(method, business)).encode(),
+    def request(self, method, business, **extra):
+        req = urllib.request.Request(GATEWAY, data=urlencode(self.params(method, business, **extra)).encode(),
             headers={'Content-Type':'application/x-www-form-urlencoded; charset=utf-8', 'Accept':'application/json'})
         try:
             with self.opener.open(req, timeout=8) as response:
@@ -121,13 +125,25 @@ class Alipay:
         if result.get('out_trade_no') != order_id: raise PaymentError('payment_mismatch')
         return result
 
-    def page_params(self, order):
-        if not self.seller_id or order.get('provider') != 'alipay' or order['appid'] != self.app_id or order['mchid'] != self.seller_id:
+    def business(self, order):
+        if not self.seller_id or order.get('provider') != 'alipay' or order['appid'] != self.app_id or order['mchid'] != self.seller_id or order['currency'] != 'CNY':
             raise PaymentError('payment_mismatch')
-        return self.params('alipay.trade.page.pay', dict(out_trade_no=order['order_id'], seller_id=self.seller_id,
+        return dict(out_trade_no=order['order_id'], seller_id=self.seller_id,
             total_amount=f"{order['amount']//100}.{order['amount']%100:02d}", subject=order['reward']['title'],
-            product_code='FAST_INSTANT_TRADE_PAY', qr_pay_mode='4', qrcode_width=256,
-            time_expire=datetime.fromisoformat(order['expires_at']).astimezone(CHINA).strftime('%Y-%m-%d %H:%M:%S')),
+            time_expire=datetime.fromisoformat(order['expires_at']).astimezone(CHINA).strftime('%Y-%m-%d %H:%M:%S'))
+
+    def precreate(self, order):
+        # Requires separately granted alipay.trade.precreate permission. Never
+        # replace a failed call with a page-pay URL disguised as a payment QR.
+        result = self.request('alipay.trade.precreate', self.business(order),
+            notify_url=ORIGIN+'/v1/payments/alipay/notify')
+        if result.get('out_trade_no') != order['order_id'] or not is_qr_code(result.get('qr_code')):
+            raise PaymentError('alipay_qr_invalid', 502)
+        return result['qr_code']
+
+    def page_params(self, order):
+        return self.params('alipay.trade.page.pay', dict(self.business(order),
+            product_code='FAST_INSTANT_TRADE_PAY', qr_pay_mode='4', qrcode_width=256),
             notify_url=ORIGIN+'/v1/payments/alipay/notify', return_url=ORIGIN+'/checkout/return')
 
     def page(self, order):
