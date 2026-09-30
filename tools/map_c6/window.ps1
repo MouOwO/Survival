@@ -98,6 +98,7 @@ if($PreviewInput) {
 }
 if($Screenshot) {
     if([IO.Path]::GetFileName($Screenshot) -ne $Screenshot){throw 'Screenshot must be a file name'}
+    if([HandoffWindow]::GetForegroundWindow() -ne $window.Handle){throw 'Test game is not foreground; refusing desktop capture'}
     $bitmap=[Drawing.Bitmap]::new($window.Width,$window.Height);$graphics=[Drawing.Graphics]::FromImage($bitmap)
     try {$graphics.CopyFromScreen($origin.X,$origin.Y,0,0,$bitmap.Size);$folder=Join-Path $PSScriptRoot '../../output/map_build_c6';New-Item -ItemType Directory -Force $folder | Out-Null;$bitmap.Save((Join-Path $folder $Screenshot),[Drawing.Imaging.ImageFormat]::Png)}finally{$graphics.Dispose();$bitmap.Dispose()}
 }

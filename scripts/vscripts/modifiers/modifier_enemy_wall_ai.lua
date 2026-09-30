@@ -69,7 +69,10 @@ function M:OnCreated(params)
     if self.SetHasCustomTransmitterData then self:SetHasCustomTransmitterData(true) end
     self.wall_entindex = tonumber(params.wall_entindex) or -1
     self.ai_state="idle"
-    self:StartIntervalThink(0.5) -- Observe state; this is NOT an order timer.
+    -- Let the spawn caller finish FindClearSpaceForUnit, then issue the first
+    -- goal on the next server frame instead of waiting half a second.
+    self.first_observation = true
+    self:StartIntervalThink(0)
 end
 
 function M:CheckState()
@@ -214,6 +217,10 @@ end
 
 function M:OnIntervalThink()
     if not IsServer() then return end
+    if self.first_observation then
+        self.first_observation = false
+        self:StartIntervalThink(0.5) -- Observe state; never reissue orders on a timer.
+    end
     local parent = self:GetParent()
     if not parent or parent:IsNull() or not parent:IsAlive() then return end
 

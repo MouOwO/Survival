@@ -1,4 +1,79 @@
+## 2026-09-30 稳定版同步正式地图
+
+V3 已同步到正式 `maps/template_map.vmap`，运行包 `maps/template_map.vpk`。独立预览及素材样板继续保留；下文各试验阶段的“主图未覆盖”仅描述当时状态。正式地图编译与309项资源CRC匹配通过；实机116项通行检查通过。出生口粒子由 `systems/valley_environment_service.lua` 在正式地图自动绑定，`tools/valley_reference_portals.lua` 只作预览兼容入口。正常启动不设置预览相机、视野或加载门禁。
+
 # C6 地图第一版
+
+## 当前预览：大石板过道与参考传送门试版（2026-09-30）
+
+用户指出低洼过道需要大块不规则石板。已对照指定视频 https://www.bilibili.com/video/BV13oLszLE9z/ 的时间轴画面（480×270，非连续高清播放）及参考 VPK，找到实际引用的 `maps/ti10_assets/blends/mod_radiant_ti10_angled_000.vmat`。其石板层为 `materials/stone/stone_path001_angled_color_psd_150d1d7b.vtex`，不是上一版 `tile_ground004` 扇形小砖。参考聚合地表模型 Z144–160 也低于相邻 Colosseum 地表。
+
+四条过道改用原版 angled 材质，铺装加宽并延伸，保留草缝和不规则边缘。最终仍为 4 个无碰撞贴地网格，共 5368 四边形；原地形与既有对象不变，地面采样为 Z129.5。主图未覆盖。Hammer 搜索 `mod_radiant_ti10_angled_000`，注意混合材质缩略图可能显示草层；可直接打开 content 下 `maps/prefabs/valley_large_slab_paths.vmap` 复制四条道路。样板源文保存在 `art/maps/c6/stone_paths_v2/valley_large_slab_paths.vmap`。
+
+出生口试用原 VPK 的 `particles/imagine_assets/environments_fx/portal_fx/act2_portal.vpcf`，由 `import-valley-reference-portals.cjs` 原样提取 6 个粒子文件，依赖 3 张官方贴图。只在工具模式的独立预览预加载，并由 `tools/valley_review.lua` 调用 `tools/valley_reference_portals.lua`，停止旧绿圈后创建 4 个蓝紫传送门。尚未确认与视频出怪口是同一粒子及相同控制参数；参考 Lua 加密，未执行或解密其游戏脚本。不能将此试版表述为一比一复刻。
+
+307 项编译、0 failed，312 项资源 CRC 和源图 CRC 通过；冷启动后 116 项通行检查、4 个粒子创建及实机检查通过。截图在 `art/maps/c6/stone_paths_v2/`，证据在 `output/valley_path_identify/`，验收摘要为 `docs/ai/validation/20260930/valley_stone_paths_v2.json`。入口仍为 `launch_valley_decor_review.cmd`。
+
+## 石板过道第一版（已由大石板版替代）（2026-09-30）
+
+四条中央过道已增加连续石板铺装，出生门处略加宽，两侧和末端混入草地。沿用当前 Colosseum 原材质，最终实现为 4 块可在 Hammer 中编辑的顶点混合网格，共 3392 个四边形，physicsType 为 none。原有地形网格、实体和网格对象均逐项保留；主图未覆盖。实际地面采样由 Z128 变为 Z129.5，116 项出生口通行检查通过。
+
+实机图片：`art/maps/c6/stone_paths/path_preview.png`、`overview.png`。验证记录：`docs/ai/validation/20260930/valley_stone_paths.json`。306 项编译、0 failed，311 项包内资源 CRC 和源图 CRC 均通过。
+
+生成工具为 `build-valley-stone-paths.cjs`，输入是本轮独立预览快照 `output/valley_stone_paths/before.vmap`；不要用它覆盖后续 Hammer 修改。此前仅修改 tile-grid 绘制数组未获得预期实机效果，原因尚未确定，最终版本已恢复原 tile-grid 数据并使用贴地铺装。修改前预览包为 `output/valley_stone_paths/before.vpk`。
+
+## 原材质替换试验（2026-09-30）
+
+按用户要求先单独验证材质差异。`valley_decor_review` 当前使用参考地图 `dota_heroes_td_colosseum_new.vpk` 确实引用的 `materials/blends/mod_radiant_coloseum_000.vmat`，直接读取 Dota 原包资源，未调色或重制贴图。该材质使用 `grass_long_00/01`，与 V2 的 `grass_ti10_01/02` 不同；尚未证明用户视频截图的具体地面一定对应这套材质。
+
+只替换独立 tileset `survival_valley_ti10.vmap` 中 237 处材质引用，预览地图源文件、地形混合权重、模型、光照均不变。主地图未替换。原材质的其他层也会生效，例如原先部分石地显示为土石，这是本次直接套用材质的结果，未再改涂刷权重掩盖差异。早期导出材质的混合遮罩通道还原错误，已放弃该导出版本，恢复 V2 的 `meadow_soft` 资源并清理试验贴图；当前地图直接引用原版路径。
+
+实机已显示原草纹与材质自带红花点，但仍比参考截图偏亮、偏黄绿，保留此单变量版本让用户评估。最终编译 306 项、0 failed；311 项包内资源 CRC 和源图 CRC 校验通过，冷启动后 116 项通道检查通过。图片：`art/maps/c6/material_trial/colosseum_preview.png`、`colosseum_overview.png`。记录：`docs/ai/validation/20260930/valley_material_trial.json`。
+
+入口仍为 `launch_valley_decor_review.cmd`。回到 V2 时，关闭测试游戏，恢复 `output/valley_material_trial/before/tileset.vmap` 至上述 content tileset 路径，并恢复同目录的 `valley_decor_review.vpk`；两者须配套恢复。V2 生成器也会重新使用旧材质，因此不要在此试验后直接覆盖当前 tileset。
+
+## 自然地表与出生门 V2（2026-09-30）
+
+入口仍是 `launch_valley_decor_review.cmd`，加载独立地图 `valley_decor_review`。F6 看地表细节，F7 看庭院，F8 看中央全景，F9 看出生门。此版从本轮保存的主图重新制作，不叠加上一版零散蕨类；主图 `template_map` 未替换。
+
+新增柔和灰绿草地、红色为主的细碎花点、局部露出的石地、半埋碎石板、四块 TI10 环形雕纹和四组石拱出生门。每组出生门包含烛台、低矮花丛与青绿地面脉冲效果。所有新增模型设置 `solid=0`。原有实体、网格、出生标记、地形高度和导航数组由构建脚本逐项比对保留。草地使用独立 tileset `maps/tilesets/survival_valley_ti10.vmap`，不覆盖原版地形资源。
+
+### Hammer 中查找和复用
+
+以下路径均相对于 **content/dota_addons/survival**：
+
+材质浏览器搜索 `survival_valley`。原版模型需要显示 Dota 全部资源，不能只筛选当前 addon。打开样板后可选中场景分组并聚焦查看，再复制所需分组。
+
+| 内容 | 路径或搜索词 |
+| --- | --- |
+| 完整预览源图 | `maps/valley_decor_review.vmap` |
+| 可复制的植物、雕纹、出生门样板 | `maps/prefabs/valley_detail_palette.vmap` |
+| 草地混合材质 | `materials/survival_valley/meadow_soft.vmat` |
+| 草地花点材质 | `materials/survival_valley/flowers_red.vmat`、`flowers_ivory.vmat`、`flowers_mauve.vmat` |
+| 可手工摆放的红花片材质 | `materials/survival_valley/flowers_ground_red.vmat` |
+| 环形石雕贴花 | `materials/survival_valley/stone_aegis.vmat` |
+| 场景对象分组 | `valley_v2_border_`、`valley_v2_stones_`、`valley_v2_ground_emblem_`、`valley_v2_red_flower_scatter_`、`valley_v2_spawn_` |
+| 原版灌木和花丛模型 | `maps/ti10_assets/bushes/`、`maps/ti10_assets/flowers/` |
+| 原版石板模型 | `models/props_stone/colosseum_wall/colosseum_slab01.vmdl` 等 |
+| 原版出生门框模型 | `models/architecture/crypt/crypt_door_01_frame.vmdl` |
+
+细碎花点包含地形草卡和可编辑花片，不能只按普通模型来找。使用新的 TI10 tileset，在地形 Paint 中调节草密度和混合层；V2 在草地的 layer 1 / 2 开启红、浅黄、淡紫花点，庭院内部用 `red_flower_scatter` 网格组补足分布，物理类型为 none。环形图案是 Static Overlay：推荐从样板复制整块雕纹再调整位置/旋转，保留投射参数和 UV。大块灌木、石板、出生门可直接按模型路径搜索；边缘灌木使用 `models/props_nature/bush_spring_01.vmdl`。
+
+源码材质及贴图保存在 game 仓库的 `art/maps/c6/valley_v2/materials/survival_valley/`，可复制到同名 content 路径后编译。样板源文件也保存在该 art 目录下。生成器 `build-valley-v2.cjs` 的输入是 `output/valley_decor_v2/before.vmap`、当前 TI10 tileset 快照及已提取的 Valve 源材质；它是本轮修订工具，不能用旧快照覆盖后续 Hammer 编辑。构建日志及布置清单在 `output/valley_decor_v2/`。
+
+V2 验证：最终 306 项编译、0 failed；实际写入的 VPK 共 311 项资源 CRC 通过，源图 CRC 一致。冷启动后 116 项出生口和通道检查通过。实机截图为 `art/maps/c6/valley_v2/ground_preview.png`、`spawn_preview.png`，拍摄时关闭预览雾效。新增 116 个无碰撞模型、4 个地表雕纹、558 个无物理碰撞的可编辑红花片和 4 处出生光圈。验收摘要：`docs/ai/validation/20260930/valley_decor_v2.json`。曾因旧预览占用 VPK 导致写包失败，已退出该进程并重新构建、校验；不能把编译器的“0 failed”单独当作写包成功。
+
+## 第一版记录（2026-09-30，预览现已更新为 V2）
+
+独立地图为 `valley_decor_review`，入口 `launch_valley_decor_review.cmd`；F7 近景、F8 中央全景。源图由当前保存的 `template_map` 增量生成，保留已有白石立柱和藤蔓，新增 256 件不带碰撞的低矮植物/河石、四个出生口青绿脉冲圈，调整中央 12070 个草地混合采样。几何、原有实体、出生点、地形高度、导航和波次配置不变。主地图未替换；这是供用户看效果的独立小样。不要直接对主图执行旧布局生成器。
+
+生成工具：`valley-decor.cjs` 生成确定性布置及可清理的临时实机探针；`finalize-valley-decor.cjs` 读取实机地面高度后写出增量 VMAP，并验证旧实体、网格和导航未变。`valley-spawn.vpcf` 是自制出生点特效源，安装到 content 的 `particles/survival_environment/valley_spawn.vpcf`。工作快照、编译记录及研究证据在 `output/valley_decor_v1/`。源图基线 `before.vmap` 仅用于这一轮小样，不应覆盖之后的 Hammer 手工编辑。
+
+参考包 `3164617180.vpk` 的 `scripts/npc/general/game_config/wave.kv` 有 67 条可读记录：常规波存在 47 只 / 0.7–0.8 秒间隔的配置，特殊波存在 7 只 / 5.5 秒间隔以及金币波 1 只的配置，另有标题/说明/图片字段。`WaitTime` 可读，但实际计时语义及出生调度、寻路、目标选择不能从配置推定：`mechanics/spawner.lua` 经 `decryptModule` 加密，未解密或执行参考脚本。地图包可见 TI10 植被、花丛、河石、藤蔓柱等资源；本小样使用当前安装的 Valve 植物和自制特效，不复制参考地图的私有脚本或模型。
+
+适合本项目的方向：通过已有 `wave_definitions.csv` / `spawn_interval` 试验密集普通波和稀疏特殊波的节奏差异；复用 `wave_system.lua` 的逐只调度、玩家通道与退出清理，以及 `wave_spawn_sequence.lua` 的混合队列。数量、速度及奖励属于平衡决策，本次未改。出生口视觉保持四个固定特效，避免每只普通怪携带常驻传送效果。
+
+验证：地图 293 项、粒子 1 项编译，0 failed；独立 VPK 297 个资源 CRC 及源图 CRC 匹配。Workshop 实际载入后确认光圈/植物显示，116 项出生口、通道采样与路径检查通过。实机近景及全景在 `art/maps/c6/valley_decor_close.png`、`valley_decor_overview.png`；验收摘要 `docs/ai/validation/20260930/valley_decor.json`。本轮属于视觉/地图通行验证，未改动或验证参考游戏的加密战斗算法。
 
 ## 当前源文件与编译包校验（2026-09-24）
 
@@ -379,6 +454,20 @@ script_reload_code tests/manual_spawn_land_check
 检查编译包时直接读取 VPK，或将提取文件放在游戏目录之外的临时目录；
 不要在插件的 `output` 目录遗留同名松散 `template_map.vmap_c` 等编译资源。
 2026-09-24 曾因临时提取文件出现 `VPK directory ... corrupt` 弹窗，移除后已恢复进入游戏。
+
+## 2026-09-30 守望轮回谷参考细化 V3
+
+在 Hammer 打开 `content/dota_addons/survival/maps/valley_decor_review.vmap` 查看本次独立预览；素材样板是 `maps/prefabs/valley_reference_asset_palette.vmap`。分组以 `valley_v3_` 开头，可以分别选择草地、空地花丛、过道点缀、修剪灌木和四个出生池。`template_map` 未覆盖。
+
+参考资源来自用户指定的 Workshop `3164617180.vpk`。`inspect-valley-reference.cjs` 从内层地图 world node 读取实例矩阵、颜色和 draw-call；`import-valley-reference-props.cjs` 只导入选中的单网格模型及资源依赖。三个修剪灌木网格由 `split-reference-topiary.cjs` 从 Source 2 Viewer 导出的 glTF 中拆分，ModelDoc/OBJ 源文件位于 content 的 `models/survival_valley/`。导入后的模型边界已与参考网格核对，不能把包含三个形状的 aggregate 整体当成一棵树摆放。
+
+本版 318 个装饰实体采用参考花丛颜色、模型、旋转和局部分布，按现有四向场地适配；不是整张原地图的一比一复制。出生池使用参考石门和双雕像，保留现有出怪标记。大石板过道保留，四块高地增加可编辑的草石混合网格，边缘按 Workshop 的实际地面高度采样裁切。原生 tile grid 的高度和导航数组保持不变；新增可见地面会使查询到的表面高度略升（出生池 131）。
+
+`build-valley-reference-v3.cjs` 使用 `output/valley_reference_v3/before.vmap`、参考实例和实测 `ground_probe.log` 重建本版。该输入是本轮开始时的快照，后续在 Hammer 手工编辑后不要直接重跑旧快照生成器覆盖新编辑。草地权重、导入清单、摆放清单和构建记录均在同一 output 目录。
+
+四个粒子使用参考 `act2_portal` 资源，控制点改为贴地旋涡的轴向；`valley_reference_portals.lua` 仅在工具模式的预览地图自动绑定，并清理重复实例。通常在 Hammer 看到的是编辑用标记，最终粒子朝向以游戏预览为准。
+
+怪物初始停顿的明确原因是 `modifier_enemy_wall_ai` 首次判断等待 0.5 秒。现改为完成出生定位后的下一服务器帧首次判断，再恢复 0.5 秒的状态观察频率。不会持续重发追击/攻击命令，也不跳过真实眩晕。现有状态机回归通过；`tests/manual_valley_spawn_latency.lua` 为显式工具测试，比较四个口的新旧首次间隔，三秒后清理临时单位并还原加载门禁。实测首次命令约 0.033 秒、首次移动约 0.133 秒；旧首次命令为 0.5 秒（部分旧样本会被原生自动索敌提前移动）。这些结果来自普通测试怪，不代表所有英雄模型的出生动画都逐一验收。参考 Lua 为加密内容，没有声称取得其原始 AI 实现。
 
 ## 第一版范围
 

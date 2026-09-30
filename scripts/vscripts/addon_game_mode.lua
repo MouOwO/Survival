@@ -571,6 +571,7 @@ local function on_item_picked_up(keys)
 end
 
 function M.precache(context)
+    require("systems/valley_environment_service").precache(context)
     -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
     tower_magic_supreme_system.precache(context)
     sound_service.precache(context)
@@ -994,6 +995,7 @@ function M.activate()
     event_bus.reset()
     configure_game_rules()
     scheduler.init()
+    require("systems/valley_environment_service").init()
     event_bus.subscribe(events.GAME_STARTED, function()
         schedule_unbuilt_wall_defeat_check()
     end)

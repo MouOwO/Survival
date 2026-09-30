@@ -37,10 +37,13 @@ return function(source)
     function parent:GetAttacksPerSecond() return self.rate end
     function parent:IsStunned() return self.stunned end
     function parent:IsDisarmed() return self.disarmed end
-    local ai=setmetatable({GetParent=function() return parent end,StartIntervalThink=function() end},{__index=M})
+    local intervals={}
+    local ai=setmetatable({GetParent=function() return parent end,StartIntervalThink=function(_,dt) intervals[#intervals+1]=dt end},{__index=M})
     parent.ai=ai;ai:OnCreated({wall_entindex=1})
+    assert(intervals[1]==0 and #orders==0,'first observation must run next frame, after spawn placement')
     local function tick(dt) clock=clock+(dt or .5);ai:OnIntervalThink() end
-    tick()
+    tick(1/30)
+    assert(#orders==1 and intervals[2]==0.5,'first frame must issue a goal and restore the normal observation cadence')
     for i=1,30 do parent.p={x=parent.p.x-10,y=40};tick() end
     assert(#orders==1 and force_writes==1 and stops==0,'ongoing chase must not restart')
     plan={point={x=-192,y=40},claimed=true};tick()
