@@ -2,37 +2,91 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local buildings = require("config/buildings_config")
 local building_definitions = require("config/generated/building_definitions")
-local arrow_tower_base = require("config/generated/arrow_tower_base")
 local grid_config = require("config/grid_placement_config")
 local grid_geometry = require("core/building_grid_geometry")
+local scheduler = require("core/scheduler")
+local send
 
 local M = {}
 local profiles_by_ability = {}
-local preview_units = {}
 local preview_sessions = {}
 local closed_preview_sessions = {}
 local preview_request_ids = {}
-local PREVIEW_UNIT_NAME = "npc_survival_grid_preview_proxy"
+local preview_pose_ids = {}
+local preview_areas = {}
+local preview_terrain_caches = {}
+local last_area_perf_log = -100
+local static_area=""
+local static_area_players={}
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
 end
 
-local function prepare_preview_unit(unit, profile)
-    unit.survival_is_grid_preview = true
-    if unit.SetAngles and profile and profile.preview_model_yaw ~= nil then
-        unit:SetAngles(0, profile.preview_model_yaw, 0)
-    end
-    if unit.SetHullRadius then unit:SetHullRadius(0) end
-    if unit.SetModelScale and profile and profile.preview_model_scale then
-        unit:SetModelScale(profile.preview_model_scale)
-    end
+local function destroy_preview(player_id)
+    scheduler.cancel("grid_preview_area:" .. tostring(player_id))
+    preview_areas[player_id] = nil
+    require("systems/grid_preview_model_service").clear(player_id)
 end
 
-local function destroy_preview(player_id)
-    local unit = preview_units[player_id]
-    preview_units[player_id] = nil
-    if valid_entity(unit) then UTIL_Remove(unit) end
+local function preview_area(player_id, caster, position, profile, session_id)
+    local now = GameRules and GameRules:GetGameTime() or 0
+    local cached = preview_areas[player_id]
+    local interval = tonumber((grid_config.preview_visual or {}).area_refresh_interval) or 0.30
+    if cached and cached.caster == caster:entindex() and (cached.job or now - cached.time < interval)
+        and (position.x - cached.x)^2 + (position.y - cached.y)^2 < 256^2 then
+        return cached.complete_area or cached.area, cached.complete_area and 1 or 0
+    end
+    local state = {time = now, x = position.x, y = position.y,
+        caster = caster:entindex(), area = cached and cached.area or "",
+        complete_area = cached and cached.complete_area or nil}
+    preview_areas[player_id] = state
+    local team, caster_index = caster:GetTeamNumber(), caster:entindex()
+    preview_terrain_caches[player_id] = preview_terrain_caches[player_id] or {}
+    local perf_clock = type(Time) == "function" and Time or os.clock
+    local started, batches, max_batch_ms = perf_clock(), 0, 0
+    state.job = coroutine.create(function()
+        return require("systems/grid_placement_system").preview_area({
+            position = position, team = team, ignore_entindex = caster_index, yield_after = 128,
+            time_budget = 0.002, terrain_cache = preview_terrain_caches[player_id],
+        })
+    end)
+    local function step()
+        if preview_areas[player_id] ~= state or preview_sessions[player_id] ~= session_id then return end
+        local batch_start = perf_clock()
+        local ok, result = coroutine.resume(state.job)
+        batches = batches+1
+        max_batch_ms = math.max(max_batch_ms,(perf_clock()-batch_start)*1000)
+        if not ok then
+            state.job = nil
+            print("[GridPlacement] background area failed: " .. tostring(result))
+            return
+        end
+        local complete = coroutine.status(state.job) == "dead"
+        if type(result) == "string" and (result ~= state.area or complete) then
+            state.area = result
+            -- The inline batch travels with the exact validation response.
+            if batches > 1 and (complete or not state.complete_area) then send(player_id, "ui_grid_placement_area", {
+                session_id = session_id, ability_name = profile.ability_name, area = result,
+                complete = complete and 1 or 0,
+            }) end
+        end
+        if not complete then return 0.05 end
+        state.job = nil
+        state.complete_area = result
+        state.time = GameRules:GetGameTime()
+        if state.time-last_area_perf_log >= 5 then
+            last_area_perf_log = state.time
+            print(string.format("[GridPlacement][PERF] area batches=%d elapsed_ms=%.1f max_batch_ms=%.2f bytes=%d",
+                batches,(perf_clock()-started)*1000,max_batch_ms,#state.area))
+        end
+    end
+    -- Only one small batch runs inline; the exact footprint reply never waits
+    -- for the rest of the circle. Cancel/re-enter cannot resurrect an old scan.
+    scheduler.cancel("grid_preview_area:" .. tostring(player_id))
+    local delay = step()
+    if delay then scheduler.after(delay, step, "grid_preview_area:" .. tostring(player_id)) end
+    return state.complete_area or state.area, state.complete_area and 1 or 0
 end
 
 local function request_number(payload, key)
@@ -57,6 +111,7 @@ local function accept_preview_request(player_id, payload, request_ids)
         destroy_preview(player_id)
         preview_sessions[player_id] = session_id
         preview_request_ids[player_id] = 0
+        preview_pose_ids[player_id] = 0
     end
     if request_id <= (request_ids[player_id] or 0) then
         return false, session_id
@@ -79,45 +134,6 @@ local function close_preview_session(player_id, session_id)
     return false
 end
 
-local function ensure_preview(player_id, caster, profile, position, valid)
-    local unit = preview_units[player_id]
-    if valid_entity(unit) and unit:GetUnitName() ~= PREVIEW_UNIT_NAME then
-        destroy_preview(player_id)
-        unit = nil
-    end
-    if not valid_entity(unit) then
-        unit = CreateUnitByName(
-            PREVIEW_UNIT_NAME,
-            position,
-            false,
-            caster,
-            caster,
-            caster:GetTeamNumber()
-        )
-        if not valid_entity(unit) then return end
-        preview_units[player_id] = unit
-        unit:SetOwner(caster)
-        unit:AddNewModifier(unit, nil, "modifier_grid_building_preview", {})
-        if unit.SetDayTimeVisionRange then unit:SetDayTimeVisionRange(0) end
-        if unit.SetNightTimeVisionRange then unit:SetNightTimeVisionRange(0) end
-    end
-    if unit.survival_preview_profile ~= profile.ability_name then
-        if profile.preview_model_name and profile.preview_model_name ~= "" then
-            unit:SetModel(profile.preview_model_name)
-            unit:SetOriginalModel(profile.preview_model_name)
-        end
-        prepare_preview_unit(unit, profile)
-        unit.survival_preview_profile = profile.ability_name
-    end
-    unit:SetAbsOrigin(position)
-    if unit.SetRenderAlpha then
-        unit:SetRenderAlpha(tonumber(
-            (grid_config.preview_visual or {}).preview_alpha
-        ) or 125)
-    end
-    if unit.SetRenderColor then unit:SetRenderColor(235, 245, 255) end
-end
-
 local function valid_player_id(player_id)
     return player_id ~= nil and player_id >= 0
         and PlayerResource:IsValidPlayerID(player_id)
@@ -127,7 +143,7 @@ local function source_player_id(payload)
     return tonumber(payload and payload.PlayerID)
 end
 
-local function send(player_id, event_name, payload)
+send = function(player_id, event_name, payload)
     if not valid_player_id(player_id) then return end
     local player = PlayerResource:GetPlayer(player_id)
     if player then
@@ -146,13 +162,7 @@ local function build_profiles()
                 building_id = definition.id,
                 display_name = definition.display_name,
                 unit_name = definition.unit_name,
-                preview_model_name = definition.id == "arrow_tower"
-                    and (((arrow_tower_base.rows or {})[1] or {}).model_name)
-                    or (((definition.levels or {})[1] or {}).model_name),
-                preview_model_scale = definition.id == "arrow_tower"
-                    and tonumber(((arrow_tower_base.rows or {})[1] or {}).model_scale)
-                    or tonumber(((definition.levels or {})[1] or {}).model_scale),
-                preview_model_yaw = tonumber((((definition.levels or {})[1] or {}).model_yaw)),
+                preview_model = 1,
                 footprint_x = math.max(
                     2,
                     tonumber((definition.footprint or {}).x) or 2
@@ -182,18 +192,6 @@ local function profile_list()
     table.sort(result, function(left, right)
         return left.ability_name < right.ability_name
     end)
-    return result
-end
-
-local function force_cells_invalid(cells, reason)
-    local result = {}
-    for _, cell in ipairs(cells or {}) do
-        local copy = {}
-        for key, value in pairs(cell) do copy[key] = value end
-        copy.ok = false
-        copy.reason = reason or copy.reason or "build_validation_failed"
-        table.insert(result, copy)
-    end
     return result
 end
 
@@ -248,6 +246,23 @@ local function resolve_profile_caster(player_id, payload, profile, allow_fallbac
     return caster, ability, nil
 end
 
+-- Separate, cheap pose channel: fast mouse movement may pause validation,
+-- but must never leave the model at an old validation response position.
+local function register_preview_pose()
+    CustomGameEventManager:RegisterListener("ui_grid_placement_pose", function(_, payload)
+        local player_id = source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        local profile = profiles_by_ability[tostring(payload.ability_name or "")]
+        local x, y, z = tonumber(payload.x), tonumber(payload.y), tonumber(payload.z)
+        local function finite(v) return v and v == v and math.abs(v) <= 32768 end
+        if not profile or not finite(x) or not finite(y) or not finite(z) then return end
+        local caster = resolve_profile_caster(player_id, payload, profile, false)
+        if not caster then return end
+        if not accept_preview_request(player_id, payload, preview_pose_ids) then return end
+        require("systems/grid_preview_model_service").update(player_id, caster, profile, Vector(x,y,z))
+    end)
+end
+
 local function validate_preview(player_id, payload, profile, position)
     local caster, _, caster_error = resolve_profile_caster(
         player_id,
@@ -258,7 +273,16 @@ local function validate_preview(player_id, payload, profile, position)
     if not caster then
         return nil, nil, { ok = false, error = caster_error, cells = {} }
     end
-    local geometry = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
+    -- The building service already checks the exact grid when business rules
+    -- pass. Reuse that result rather than performing the same scan twice.
+    local business = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
+        caster = caster,
+        player_id = player_id,
+        building_id = profile.building_id,
+        position = position,
+    }) or { ok = false, error = "build_validation_failed" }
+    local geometry = business.grid or (business.world_position and business)
+        or event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = position,
         footprint = {
             x = profile.footprint_x,
@@ -269,15 +293,7 @@ local function validate_preview(player_id, payload, profile, position)
         -- requested footprint. Never trust an ignore list from the client.
         ignore_entindex = caster:entindex(),
     }) or { ok = false, error = "grid_validation_failed", cells = {} }
-    local business = event_bus.request(events.BUILD_CAN_PLACE_REQUEST, {
-        caster = caster,
-        player_id = player_id,
-        building_id = profile.building_id,
-        position = position,
-    }) or { ok = false, error = "build_validation_failed" }
-    if not business.ok then
-        geometry.cells = force_cells_invalid(geometry.cells, business.error)
-    end
+    -- Keep per-cell results; business errors still reject success/commit.
     return caster, business, geometry
 end
 
@@ -286,14 +302,32 @@ local function register_profile_request()
         "ui_grid_placement_profiles_request",
         function(_, payload)
             local player_id = source_player_id(payload)
+            if player_id~=nil then static_area_players[player_id]=true end
             send(player_id, "ui_grid_placement_profiles", {
                 profiles = profile_list(),
                 cell_size = tonumber(grid_config.cell_size) or 64,
                 preview_visual = grid_config.preview_visual or {},
-                version = "GridPlacement_V2.2_PerBuildingFootprint",
+                -- Fixed white geometry; independent of cursor scans and
+                -- advisory red/green occupancy packets.
+                static_grid = {bounds=grid_config.grid_display_bounds or grid_config.build_bounds,
+                    build_bounds=grid_config.build_bounds,
+                    height=tonumber(grid_config.build_ground_height) or 0},
+                version = "GridPlacement_V3_StaticWhiteGrid",
             })
+            if static_area~="" then send(player_id,"ui_grid_placement_static_area",{area=static_area}) end
         end
     )
+end
+
+local function preview_cells(cells)
+    -- The client derives the snapped rectangle from cell centers. Ground
+    -- corners, policy reasons and grid indices stay server-side; transmitting
+    -- four terrain corners for each of 16 cells duplicated most of the reply.
+    local result = {}
+    for _, cell in ipairs(cells or {}) do
+        result[#result+1] = {x=cell.x,y=cell.y,z=cell.z,ok=cell.ok and 1 or 0}
+    end
+    return result
 end
 
 local function register_validation_request()
@@ -317,16 +351,18 @@ local function register_validation_request()
             if position then
                 request_anchor_x, request_anchor_y = request_anchor(position, profile)
             end
-            local requested_caster = tonumber(payload.entindex)
-                and EntIndexToHScript(tonumber(payload.entindex)) or nil
-            local requested_ability = tonumber(payload.ability_entindex)
-                and EntIndexToHScript(tonumber(payload.ability_entindex)) or nil
-            print(string.format(
-                "[GridPlacement][SERVER] VALIDATE player=%s session=%s request=%s ability_name=%s caster=%s ability=%s world=%.1f,%.1f,%.1f anchor=%s:%s",
-                tostring(player_id), tostring(session_id), tostring(payload.request_id),
-                tostring(payload.ability_name), entity_diagnostic(requested_caster),
-                entity_diagnostic(requested_ability), x or 0, y or 0, z or 0,
-                tostring(request_anchor_x), tostring(request_anchor_y)))
+            if (grid_config.preview_visual or {}).debug_requests then
+                local requested_caster = tonumber(payload.entindex)
+                    and EntIndexToHScript(tonumber(payload.entindex)) or nil
+                local requested_ability = tonumber(payload.ability_entindex)
+                    and EntIndexToHScript(tonumber(payload.ability_entindex)) or nil
+                print(string.format(
+                    "[GridPlacement][SERVER] VALIDATE player=%s session=%s request=%s ability_name=%s caster=%s ability=%s world=%.1f,%.1f,%.1f anchor=%s:%s",
+                    tostring(player_id), tostring(session_id), tostring(payload.request_id),
+                    tostring(payload.ability_name), entity_diagnostic(requested_caster),
+                    entity_diagnostic(requested_ability), x or 0, y or 0, z or 0,
+                    tostring(request_anchor_x), tostring(request_anchor_y)))
+            end
             if not profile or not x or not y or not z then
                 send(player_id, "ui_grid_placement_validation", {
                     session_id = session_id,
@@ -351,11 +387,11 @@ local function register_validation_request()
             )
             local success = business and business.ok and geometry.ok
             local world = geometry.world_position or position
-            if caster then
-                ensure_preview(player_id, caster, profile, world, success)
-            else
-                destroy_preview(player_id)
-            end
+            -- Validation never repositions the model; the independent pose
+            -- channel follows the latest snapped cursor even during fast sweeps.
+            if not caster then destroy_preview(player_id) end
+            local area,area_complete="",0
+            if caster then area,area_complete=preview_area(player_id,caster,position,profile,session_id) end
             send(player_id, "ui_grid_placement_validation", {
                 session_id = session_id,
                 request_id = payload.request_id or "",
@@ -373,20 +409,37 @@ local function register_validation_request()
                 world_x = world.x,
                 world_y = world.y,
                 world_z = world.z,
-                cells = geometry.cells or {},
+                cells = preview_cells(geometry.cells),
+                area = area,
+                area_complete = area_complete,
+                cursor_x = position.x,
+                cursor_y = position.y,
             })
-            print(string.format(
+            if (grid_config.preview_visual or {}).debug_requests then print(string.format(
                 "[GridPlacement][SERVER] VALIDATE_RESULT player=%s session=%s request=%s success=%s error=%s resolved_caster=%s geometry_anchor=%s:%s cells=%s",
                 tostring(player_id), tostring(session_id), tostring(payload.request_id),
                 tostring(success), tostring(success and "" or ((business and business.error)
                     or geometry.error or "invalid_position")), entity_diagnostic(caster),
                 tostring(geometry.anchor_x), tostring(geometry.anchor_y),
-                tostring(#(geometry.cells or {}))))
+                tostring(#(geometry.cells or {})))) end
         end
     )
 end
 
 local function register_preview_end()
+    CustomGameEventManager:RegisterListener("ui_grid_placement_pause_area",function(_,payload)
+        local player_id=source_player_id(payload)
+        if not valid_player_id(player_id) then return end
+        local session_id=request_number(payload,"session_id")
+        local request_id=request_number(payload,"request_id")
+        if not session_id or session_id ~= preview_sessions[player_id] or not request_id
+            or request_id < (preview_request_ids[player_id] or 0)
+            or session_id <= (closed_preview_sessions[player_id] or 0) then return end
+        -- Preserve the terrain cache, discard only the now irrelevant scan.
+        -- The next settled validation starts a new scan at the latest cursor.
+        scheduler.cancel("grid_preview_area:"..tostring(player_id))
+        preview_areas[player_id]=nil
+    end)
     CustomGameEventManager:RegisterListener(
         "ui_grid_placement_preview_end",
         function(_, payload)
@@ -477,24 +530,45 @@ local function register_commit_request()
 end
 
 function M.init()
-    for player_id, _ in pairs(preview_units) do destroy_preview(player_id) end
-    preview_units = {}
+    for player_id, _ in pairs(preview_areas) do destroy_preview(player_id) end
+    preview_areas = {}
+    preview_terrain_caches = {}
+    last_area_perf_log = -100
     preview_sessions = {}
     closed_preview_sessions = {}
     preview_request_ids = {}
+    preview_pose_ids = {}
+    require("systems/grid_preview_model_service").clear_all()
+    static_area="";static_area_players={}
+    scheduler.cancel("grid_static_terrain")
+    local grid=require("systems/grid_placement_system")
+    if grid.static_preview then
+        local job=coroutine.create(function()
+            return grid.static_preview({yield_after=128,time_budget=0.002})
+        end)
+        scheduler.after(0.05,function()
+            local ok,result=coroutine.resume(job)
+            if not ok then print("[GridPlacement] static terrain failed: "..tostring(result));return end
+            if coroutine.status(job)~="dead" then return 0.05 end
+            static_area=type(result)=="string" and result or ""
+            for player_id in pairs(static_area_players) do
+                send(player_id,"ui_grid_placement_static_area",{area=static_area})
+            end
+            print("[GridPlacement] static terrain ready bytes="..#static_area)
+        end,"grid_static_terrain")
+    end
     event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
         destroy_preview(tonumber(payload.player_id))
     end)
     build_profiles()
     register_profile_request()
+    register_preview_pose()
     register_validation_request()
     register_preview_end()
     register_commit_request()
     print("[GridPlacement] UI router initialized")
 end
 
-M._prepare_preview_unit_for_test = prepare_preview_unit
-M._preview_unit_name_for_test = PREVIEW_UNIT_NAME
 M._build_profiles_for_test = build_profiles
 M._profiles_for_test = function() return profiles_by_ability end
 

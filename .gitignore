@@ -398,6 +398,7 @@ __pycache__/
 !/scripts/vscripts/tests/test_worker_training_queue.lua
 !/scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua
 !/scripts/vscripts/tests/test_grid_builder_preview.lua
+!/scripts/vscripts/tests/test_grid_preview_area.lua
 !/scripts/vscripts/tests/test_builder_work_position.lua
 !/scripts/vscripts/tests/test_builder_yield_construction.lua
 !/scripts/vscripts/tests/test_hero_return_home.lua
@@ -407,5 +408,13 @@ __pycache__/
 
 # Local engine exception report.
 /exceptions.txt
+/tmp/
+!/scripts/vscripts/tests/test_wall_melee_contact.lua
+!/scripts/vscripts/tests/test_wall_navigation.lua
+!/scripts/vscripts/tests/test_wall_slot_limit.lua
+!/scripts/vscripts/tests/test_building_upgrade_effect.lua
+!/scripts/vscripts/tests/manual_wall_four_contacts.lua
+!/scripts/vscripts/tests/manual_wall_contact_replacement.lua
+!/scripts/vscripts/tests/wall_contact_probe_modifier.lua
 !/scripts/vscripts/tests/test_payment_service.lua
 !/scripts/vscripts/tests/test_paid_hero_unlock.lua

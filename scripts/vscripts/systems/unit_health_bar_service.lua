@@ -4,6 +4,7 @@ local initialized = false
 local TABLE = "survival_hero_health_bar"
 local EXCLUDED_UNIT_NAMES = {
     npc_survival_upgrade_material = true,
+    npc_survival_grid_preview_proxy = true,
 }
 
 local function valid_entity(unit)

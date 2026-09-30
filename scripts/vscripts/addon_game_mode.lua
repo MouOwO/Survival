@@ -576,6 +576,8 @@ function M.precache(context)
     sound_service.precache(context)
     building_construction_visual.precache(context)
     require("systems/wall_destruction_visual").precache(context)
+    require("systems/wall_hit_effect").precache(context)
+    require("systems/building_upgrade_effect").precache(context)
     monster_visual_service.precache_range(context, 1, 1)
     local challenge_models = {}
     for _, challenge in ipairs(building_challenge_definitions.rows or {}) do
@@ -621,6 +623,7 @@ function M.precache(context)
         "building_gold_mine",
         "building_hero_altar",
         "npc_survival_upgrade_material",
+        "npc_survival_grid_preview_proxy",
         "npc_survival_lumberjack",
         "npc_survival_super_lumberjack_01",
         "npc_survival_super_lumberjack_02",
@@ -836,6 +839,11 @@ function M.precache(context)
     PrecacheResource(
         "particle",
         "particles/ui_mouseactions/range_finder_tower_aoe.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/ui_mouseactions/range_display.vpcf",
         context
     )
     PrecacheResource(

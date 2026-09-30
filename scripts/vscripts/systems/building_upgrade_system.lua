@@ -506,7 +506,7 @@ local function start_upgrade(
             publish(state, "upgrade_visual_" .. tostring(status))
         end,
         on_complete = function()
-            if not active_state(state) then return end
+            if not active_state(state) then return false end
             local ok, error_message = pcall(on_complete)
             if ok then
                 notify(state, "升级完成")
@@ -521,6 +521,7 @@ local function start_upgrade(
                     "error"
                 )
             end
+            return ok
         end,
         on_cancel = function(cancel_reason)
             if on_cancel then on_cancel(cancel_reason) end

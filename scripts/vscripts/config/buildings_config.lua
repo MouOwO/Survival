@@ -145,7 +145,9 @@ M.wall = {
     id = "wall", display_name = configured_name("wall", "城墙"),
     unit_name = configured_unit_name("wall", "building_wall"),
     build_cost = build_cost("building_wall", 100, 0),
-    footprint = { x = 4, y = 4 }, hull_radius = 256,
+    -- Match the model. A shallow navigation crossbar seals side gaps without
+    -- inflating melee target distance or construction occupancy.
+    footprint = { x = 4, y = 4 }, hull_radius = 128,
     max_count = 1, build_once = true,
     show_health_bar = true, selectable = true,
     abilities = { "ability_upgrade_wall", "ability_upgrade_wall_9_1" }, levels = wall_levels,

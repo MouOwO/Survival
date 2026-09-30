@@ -733,6 +733,7 @@ local function start_building(payload)
         entindex = unit:entindex(),
     })
     buildings[state.entindex] = state
+    if state.building_id == "wall" then wall_collision_barrier_service.create(unit) end
     dev_wall_stats.apply(state)
     local maximum_health = unit:GetMaxHealth()
     local build_time = math.max(0.1, tonumber(check.definition.build_time) or 3)
@@ -1349,6 +1350,7 @@ function M.enable_dev_wall_stats()
 end
 
 function M.init()
+    if wall_collision_barrier_service.clear_all then wall_collision_barrier_service.clear_all() end
     if building_visual.init then building_visual.init() end
     construction_visual.reset()
     wall_destruction.reset()
