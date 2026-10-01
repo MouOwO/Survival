@@ -58,6 +58,7 @@ local exists
 local valid
 local area_radius
 local enemies_in_radius
+local reset_laser
 
 local LIGHTNING_ASSET_ID = "tower_zuus"
 local MACHINE_GUN_ASSET_IDS = {
@@ -385,6 +386,9 @@ function modifier_tower_attack_effects:OnDeath(params)
     if not IsServer() then return end
     local tower = self:GetParent()
     local victim = params.unit
+    if victim == tower or victim == self.laser_target then
+        reset_laser(self)
+    end
     if params.attacker ~= tower or not exists(victim) then return end
 
     -- MODIFIER_EVENT_ON_DEATH is global. Tower effects must only react when
@@ -1127,51 +1131,138 @@ local function continue_lightning_chain(caster, source_unit, source_position,
     end)
 end
 
-local function destroy_particle(self)
-    for _, segment in ipairs(self.laser_particles or {}) do
-        ParticleManager:DestroyParticle(segment.index, false)
-        ParticleManager:ReleaseParticleIndex(segment.index)
-    end
-    self.laser_particles = {}
+local function laser_visual_error(self, message)
+    if self.laser_visual_error_logged then return end
+    self.laser_visual_error_logged = true
+    print("[TowerLaser] optional visual failed: " .. tostring(message))
 end
 
-local function reset_laser(self)
+local function dispose_laser_particle(self, index)
+    local destroyed, destroy_error = pcall(ParticleManager.DestroyParticle,
+        ParticleManager, index, true)
+    local released, release_error = pcall(ParticleManager.ReleaseParticleIndex,
+        ParticleManager, index)
+    if not destroyed or not released then
+        laser_visual_error(self, (not destroyed and destroy_error) or release_error)
+    end
+end
+
+local function destroy_particle(self)
+    local segments = self.laser_particles or {}
+    self.laser_particles = {}
+    for _, segment in ipairs(segments) do
+        dispose_laser_particle(self, segment.index)
+    end
+end
+
+reset_laser = function(self)
     destroy_particle(self)
     self.laser_target = nil
     self.laser_elapsed = 0
     self.laser_visual_elapsed = 0
 end
 
+local function bind_laser_control(index, control, unit, attachments, position)
+    if type(unit.ScriptLookupAttachment) == "function"
+        and type(ParticleManager.SetParticleControlEnt) == "function" then
+        for _, attachment in ipairs(attachments) do
+            local ok, found = pcall(unit.ScriptLookupAttachment, unit, attachment)
+            if ok and (tonumber(found) or 0) > 0 then
+                local bound = pcall(ParticleManager.SetParticleControlEnt,
+                    ParticleManager, index, control, unit, PATTACH_POINT_FOLLOW,
+                    attachment, position, true
+                )
+                if bound then return true end
+            end
+        end
+    end
+    -- Models without these attachments retain the configured height fallback.
+    ParticleManager:SetParticleControl(index, control, position)
+    return false
+end
+
 local function update_laser_position(self, effect)
     if not valid(self.laser_target) then return end
     local caster = self:GetParent()
-    local source = caster:GetAbsOrigin()
-        + Vector(0, 0, tonumber(effect.source_offset_z) or 160)
-    local target = self.laser_target:GetAbsOrigin()
-        + Vector(0, 0, tonumber(effect.target_offset_z) or 70)
-    -- Tinker laser reads control 9 as its source. Keep control 0 synchronized
-    -- for alternate particle resources configured by CSV.
-    for _, segment in ipairs(self.laser_particles or {}) do
-        ParticleManager:SetParticleControl(segment.index, 9, source)
-        ParticleManager:SetParticleControl(segment.index, 0, source)
-        ParticleManager:SetParticleControl(segment.index, 1, target)
+    local source, target
+    -- Never overwrite entity-bound CPs with server snapshots. The native
+    -- MaintainSequentialPath operator follows CP9 -> CP1 on the client; CP0
+    -- supplies the source for child effects and alternate CSV particles.
+    local segments = self.laser_particles or {}
+    for i = #segments, 1, -1 do
+        local segment, updated = segments[i], true
+        if not segment.source_follows then
+            source = source or caster:GetAbsOrigin()
+                + Vector(0, 0, tonumber(effect.source_offset_z) or 160)
+            if not segment.source9_follows then
+                updated = pcall(ParticleManager.SetParticleControl,
+                    ParticleManager, segment.index, 9, source) and updated
+            end
+            if not segment.source0_follows then
+                updated = pcall(ParticleManager.SetParticleControl,
+                    ParticleManager, segment.index, 0, source) and updated
+            end
+        end
+        if not segment.target_follows then
+            target = target or self.laser_target:GetAbsOrigin()
+                + Vector(0, 0, tonumber(effect.target_offset_z) or 70)
+            updated = pcall(ParticleManager.SetParticleControl,
+                ParticleManager, segment.index, 1, target) and updated
+        end
+        if not updated then
+            table.remove(segments, i)
+            dispose_laser_particle(self, segment.index)
+            laser_visual_error(self, "control update failed")
+        end
     end
 end
 
 local function create_laser_segment(self, effect, now)
-    local index = ParticleManager:CreateParticle(
+    local caster, target = self:GetParent(), self.laser_target
+    local created, index = pcall(ParticleManager.CreateParticle, ParticleManager,
         effect.particle_name or
             "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
         PATTACH_CUSTOMORIGIN, self:GetParent()
     )
-    table.insert(self.laser_particles, {
+    if not created or type(index) ~= "number" or index < 0 then
+        laser_visual_error(self, created and "particle creation returned no valid ID" or index)
+        return false
+    end
+    local segment = {
         index = index,
         expires_at = effect.beam_mode == "continuous" and math.huge
             or now + math.max(
                 0.03, tonumber(effect.visual_segment_duration) or 0.18
             ),
-    })
-    update_laser_position(self, effect)
+    }
+    -- Own the handle before any optional engine binding can throw.
+    table.insert(self.laser_particles, segment)
+    local configured, error_message = pcall(function()
+        local source_position = caster:GetAbsOrigin()
+            + Vector(0, 0, tonumber(effect.source_offset_z) or 160)
+        local target_position = target:GetAbsOrigin()
+            + Vector(0, 0, tonumber(effect.target_offset_z) or 70)
+        local source_attachments = { "attach_attack1", "attach_hitloc" }
+        segment.source9_follows = bind_laser_control(
+            index, 9, caster, source_attachments, source_position
+        )
+        segment.source0_follows = bind_laser_control(
+            index, 0, caster, source_attachments, source_position
+        )
+        segment.source_follows = segment.source9_follows and segment.source0_follows
+        segment.target_follows = bind_laser_control(
+            index, 1, target, { "attach_hitloc" }, target_position
+        )
+    end)
+    if not configured then
+        for i, owned in ipairs(self.laser_particles) do
+            if owned == segment then table.remove(self.laser_particles, i); break end
+        end
+        dispose_laser_particle(self, index)
+        laser_visual_error(self, error_message)
+        return false
+    end
+    return true
 end
 
 local function laser_target_in_range(caster, target)
@@ -1257,8 +1348,9 @@ function modifier_tower_attack_effects:OnIntervalThink()
             if segment.expires_at > now then
                 table.insert(visible, segment)
             else
-                ParticleManager:DestroyParticle(segment.index, false)
-                ParticleManager:ReleaseParticleIndex(segment.index)
+                -- Retiring a segment must not leave unowned 0.7 s Tinker
+                -- tails which can outlive a target switch or relocation.
+                dispose_laser_particle(self, segment.index)
             end
         end
         self.laser_particles = visible
@@ -1267,7 +1359,11 @@ function modifier_tower_attack_effects:OnIntervalThink()
             update_interval, tonumber(effect.visual_refresh_interval) or 0.12
         )
         if self.laser_visual_elapsed + 0.001 >= visual_interval then
-            self.laser_visual_elapsed = self.laser_visual_elapsed % visual_interval
+            -- The comparison admits a small floating-point undershoot. Clamp
+            -- it before modulo, or a near-full remainder emits again next think.
+            self.laser_visual_elapsed = math.max(
+                0, self.laser_visual_elapsed - visual_interval
+            ) % visual_interval
             create_laser_segment(self, effect, now)
         end
     end

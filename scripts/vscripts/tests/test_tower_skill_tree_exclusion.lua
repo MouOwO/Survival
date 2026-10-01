@@ -6,6 +6,8 @@ local events = require("core/events")
 local handlers, subscribers = {}, {}
 local emitted, requested, damage, buffs, particles, destroyed = {}, {}, {}, {}, {}, {}
 local tracking, linear, sounds, scheduled = {}, {}, {}, {}
+local control_writes, control_entities, particle_releases = {}, {}, {}
+local immediate_destroys = {}
 local native_attacks = {}
 local gestures = {}
 local candidates, last_radius = {}, nil
@@ -57,9 +59,22 @@ ParticleManager = {
         particles[#particles + 1] = { path = path, owner = owner }
         return #particles
     end,
-    SetParticleControl = function() end,
-    DestroyParticle = function(_, id) destroyed[#destroyed + 1] = id end,
-    ReleaseParticleIndex = function() end,
+    SetParticleControl = function(_, id, cp, position)
+        control_writes[#control_writes + 1] = { id = id, cp = cp, position = position }
+    end,
+    SetParticleControlEnt = function(_, id, cp, owner, attach, point, fallback)
+        control_entities[#control_entities + 1] = {
+            id = id, cp = cp, owner = owner, attach = attach,
+            point = point, fallback = fallback,
+        }
+    end,
+    DestroyParticle = function(_, id, immediate)
+        destroyed[#destroyed + 1] = id
+        immediate_destroys[id] = immediate
+    end,
+    ReleaseParticleIndex = function(_, id)
+        particle_releases[id] = (particle_releases[id] or 0) + 1
+    end,
 }
 ProjectileManager = {
     CreateTrackingProjectile = function(_, info)
@@ -191,6 +206,7 @@ end
 local function clear()
     emitted, requested, damage, buffs, particles, destroyed = {}, {}, {}, {}, {}, {}
     tracking, linear, sounds, scheduled = {}, {}, {}, {}
+    control_writes, control_entities, particle_releases, immediate_destroys = {}, {}, {}, {}
     native_attacks = {}
     gestures = {}
     candidates = {}
@@ -324,6 +340,217 @@ now = now + 1
 m:OnIntervalThink()
 assert(m.laser_target == nil and #damage == 2)
 dummy.position = vector(150, 0, 0)
+
+-- The engine owns both laser endpoints between server thinks. Movement must
+-- not write world-space snapshots over an entity CP or advance damage ticks.
+clear()
+local function attachment_lookup(_, name)
+    return name == "attach_hitloc" and 5 or name == "attach_attack1" and 10 or 0
+end
+tower.ScriptLookupAttachment = attachment_lookup
+dummy.ScriptLookupAttachment = attachment_lookup
+second.ScriptLookupAttachment = attachment_lookup
+m = modifier({ laser })
+tower.attack_target = dummy
+m:OnAttackStart({ attacker = tower, target = dummy })
+assert(#control_entities == 3 and #control_writes == 0)
+assert(control_entities[1].cp == 9 and control_entities[1].owner == tower
+    and control_entities[1].point == "attach_attack1")
+assert(control_entities[2].cp == 0 and control_entities[2].owner == tower)
+assert(control_entities[3].cp == 1 and control_entities[3].owner == dummy
+    and control_entities[3].point == "attach_hitloc")
+for _, cp in ipairs(control_entities) do assert(cp.attach == PATTACH_POINT_FOLLOW) end
+local first_segment = m.laser_particles[1].index
+tower.position = vector(20, 15, 10)
+dummy.position = vector(260, 90, 40)
+now = now + 0.06
+m:OnIntervalThink()
+assert(#control_entities == 3 and #control_writes == 0 and #damage == 1)
+now = now + 0.06
+m:OnIntervalThink()
+assert(#particles == 2 and #control_entities == 6 and #damage == 1,
+    "visual replay changed damage frequency")
+now = now + 0.07
+m:OnIntervalThink()
+assert(immediate_destroys[first_segment] == true and particle_releases[first_segment] == 1,
+    "expired beam left a detached native fade-out tail")
+now = now + 0.81
+m:OnIntervalThink()
+assert(#damage == 2 and damage[1].base_damage == 100 and damage[2].base_damage == 105,
+    "native follow changed the one-second damage ramp")
+assert(#control_writes == 0, "moving attachments were overwritten by polling")
+
+-- Switching attacks retires every old segment and binds the new body once.
+tower.attack_target = second
+m:OnAttackStart({ attacker = tower, target = second })
+assert(m.laser_target == second and #damage == 3 and damage[3].base_damage == 100)
+assert(control_entities[#control_entities].owner == second)
+for id = 1, #particles - 1 do
+    assert(immediate_destroys[id] == true and particle_releases[id] == 1)
+end
+local death_segment = m.laser_particles[1].index
+second.alive = false
+m:OnDeath({ attacker = dummy, unit = second })
+assert(m.laser_target == nil and #m.laser_particles == 0,
+    "another attacker's kill did not immediately detach the beam")
+assert(immediate_destroys[death_segment] == true and particle_releases[death_segment] == 1)
+second.alive = true
+
+-- Tower relocation and destruction clean entity-bound segments exactly once.
+tower.attack_target = dummy
+m:OnAttackStart({ attacker = tower, target = dummy })
+local moved_segment = m.laser_particles[1].index
+m:ResetAfterRelocation()
+assert(m.laser_target == nil and #m.laser_particles == 0)
+assert(immediate_destroys[moved_segment] == true and particle_releases[moved_segment] == 1)
+m:OnDestroy()
+assert(particle_releases[moved_segment] == 1, "relocation cleanup double-released a beam")
+
+-- Count the real modifier's engine calls for thirty seconds; no extra Lua
+-- think or per-frame CP writes are needed to move supported attachments.
+clear()
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+local count_start = now
+local peak_live = 0
+for step = 1, 1000 do
+    now = count_start + step * 0.03
+    m:OnIntervalThink()
+    peak_live = math.max(peak_live, #m.laser_particles)
+end
+assert(#control_writes == 0 and #control_entities == #particles * 3)
+assert(#particles == 251 and peak_live <= 2, "visual replay drifted from its 0.12-second cadence")
+assert(#damage == 31, "beam following accelerated the thirty-second damage schedule")
+print(string.format("LASER_FOLLOW_CALLS seconds=30 create=%d destroy=%d bind=%d setcp=%d peak_live=%d",
+    #particles, #destroyed, #control_entities, #control_writes, peak_live))
+m:OnDestroy()
+assert(#destroyed == #particles, "laser segment leaked on modifier removal")
+for id = 1, #particles do assert(particle_releases[id] == 1) end
+
+-- A model without an attack socket still follows its body. With no sockets,
+-- keep the legacy configured heights and update only the unsupported end.
+clear()
+tower.ScriptLookupAttachment = function(_, name) return name == "attach_hitloc" and 5 or 0 end
+dummy.ScriptLookupAttachment = nil
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+assert(#control_entities == 2 and control_entities[1].point == "attach_hitloc")
+assert(#control_writes == 1 and control_writes[1].cp == 1
+    and control_writes[1].position.z == dummy.position.z + beam.target_offset_z)
+dummy.position = vector(275, 90, 50)
+now = now + 0.03
+m:OnIntervalThink()
+assert(#control_writes == 2 and control_writes[2].cp == 1
+    and control_writes[2].position.z == 120)
+m:OnDestroy()
+tower.ScriptLookupAttachment = nil
+second.ScriptLookupAttachment = nil
+tower.position = vector(0, 0, 0)
+dummy.position = vector(150, 0, 0)
+
+-- Optional engine visuals cannot suspend the real laser's damage clock.
+local particle_api = {}
+for name, method in pairs(ParticleManager) do particle_api[name] = method end
+local function restore_particle_api()
+    for name, method in pairs(particle_api) do ParticleManager[name] = method end
+end
+clear()
+tower.ScriptLookupAttachment, dummy.ScriptLookupAttachment = attachment_lookup, attachment_lookup
+ParticleManager.CreateParticle = function() error("injected CreateParticle failure") end
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+now = now + 1
+m:OnIntervalThink()
+assert(#damage == 2 and #m.laser_particles == 0 and #particles == 0,
+    "particle creation failure blocked the damage clock")
+restore_particle_api()
+now = now + 0.12
+m:OnIntervalThink()
+assert(#m.laser_particles == 1 and #damage == 2, "visual retry reset damage timing")
+m:OnDestroy()
+
+-- Failure of only CP0 must not overwrite the successfully bound CP9 source.
+clear()
+ParticleManager.SetParticleControlEnt = function(self, id, cp, ...)
+    if cp == 0 then error("injected CP0 attachment failure") end
+    return particle_api.SetParticleControlEnt(self, id, cp, ...)
+end
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+assert(m.laser_particles[1].source9_follows and not m.laser_particles[1].source0_follows)
+now = now + 0.03
+m:OnIntervalThink()
+assert(#control_writes == 2 and control_writes[1].cp == 0 and control_writes[2].cp == 0,
+    "fallback for a failed CP overwrote a working attachment")
+ParticleManager.SetParticleControl = function() error("injected fallback update failure") end
+now = now + 0.03
+m:OnIntervalThink()
+assert(#m.laser_particles == 0 and particle_releases[1] == 1,
+    "failed fallback update stranded its particle")
+restore_particle_api()
+m:OnDestroy()
+
+-- Failed binding AND fallback must roll back an already registered handle.
+clear()
+ParticleManager.SetParticleControlEnt = function()
+    assert(#m.laser_particles == 1, "particle was not owned before binding")
+    error("injected attachment failure")
+end
+ParticleManager.SetParticleControl = function() error("injected fallback binding failure") end
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+assert(#damage == 1 and #m.laser_particles == 0 and #particles == 1)
+assert(immediate_destroys[1] == true and particle_releases[1] == 1)
+now = now + 1
+m:OnIntervalThink()
+assert(#damage == 2 and #m.laser_particles == 0,
+    "CP binding failure suspended subsequent damage ticks")
+assert(#destroyed == #particles, "binding rollback leaked a particle")
+restore_particle_api()
+m:OnDestroy()
+
+-- Destroy and Release errors are independent, including expiration during a
+-- damage tick. Remaining IDs still receive exactly one cleanup attempt.
+clear()
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+now = now + 0.12
+m:OnIntervalThink()
+assert(#m.laser_particles == 2)
+ParticleManager.DestroyParticle = function(self, id, immediate)
+    particle_api.DestroyParticle(self, id, immediate)
+    if id == 1 then error("injected DestroyParticle failure") end
+end
+ParticleManager.ReleaseParticleIndex = function(self, id)
+    particle_api.ReleaseParticleIndex(self, id)
+    if id == 2 then error("injected ReleaseParticleIndex failure") end
+end
+now = now + 0.88
+m:OnIntervalThink()
+assert(#damage == 2 and particle_releases[1] == 1 and particle_releases[2] == 1)
+m:OnDestroy()
+assert(#m.laser_particles == 0 and #destroyed == #particles)
+for id = 1, #particles do assert(particle_releases[id] == 1) end
+restore_particle_api()
+clear()
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+now = now + 0.12
+m:OnIntervalThink()
+ParticleManager.DestroyParticle = function(self, id, immediate)
+    assert(#m.laser_particles == 0, "terminal cleanup retained particle ownership")
+    particle_api.DestroyParticle(self, id, immediate)
+    if id == 1 then error("injected terminal destroy failure") end
+end
+ParticleManager.ReleaseParticleIndex = function(self, id)
+    particle_api.ReleaseParticleIndex(self, id)
+    if id == 1 then error("injected terminal release failure") end
+end
+m:OnDestroy()
+assert(#destroyed == 2 and particle_releases[1] == 1 and particle_releases[2] == 1,
+    "one cleanup failure prevented release or cleanup of the remaining ID")
+restore_particle_api()
+tower.ScriptLookupAttachment, dummy.ScriptLookupAttachment = nil, nil
 
 -- Legal bounty hits still award gold once; a queued hit must recheck its target.
 clear()

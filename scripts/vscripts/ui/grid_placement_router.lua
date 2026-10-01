@@ -91,7 +91,7 @@ end
 
 local function request_number(payload, key)
     local value = tonumber(payload and payload[key])
-    if value == nil then return nil end
+    if value == nil or value ~= value or value == math.huge or value == -math.huge then return nil end
     return math.floor(value)
 end
 
@@ -121,7 +121,7 @@ local function accept_preview_request(player_id, payload, request_ids)
 end
 
 local function close_preview_session(player_id, session_id)
-    session_id = math.floor(tonumber(session_id) or 0)
+    session_id = request_number({session_id=session_id}, "session_id") or 0
     if session_id <= 0 then return false end
     closed_preview_sessions[player_id] = math.max(
         closed_preview_sessions[player_id] or 0,
@@ -481,22 +481,31 @@ local function register_commit_request()
             local player_id = source_player_id(payload)
             if not valid_player_id(player_id) then return end
             local session_id = request_number(payload, "session_id")
-            if not session_id
-                or session_id ~= (preview_sessions[player_id] or 0)
+            local profile = profiles_by_ability[tostring(payload.ability_name or "")]
+            -- The first relocation click may precede every preview/ghost reply.
+            -- Only a tower move can open a session at commit; ownership and
+            -- the actual landing cell are still checked below on the server.
+            local fresh_relocation = profile and profile.placement_action == "relocate"
+                and session_id and session_id > (preview_sessions[player_id] or 0)
+            local function reply(result)
+                result.session_id = session_id
+                send(player_id, "ui_grid_placement_commit_result", result)
+            end
+            if not session_id or session_id <= 0
+                or (session_id ~= (preview_sessions[player_id] or 0) and not fresh_relocation)
                 or session_id <= (closed_preview_sessions[player_id] or 0) then
-                send(player_id, "ui_grid_placement_commit_result", {
+                reply({
                     success = 0,
                     error = "stale_preview_session",
                 })
                 return
             end
-            local profile = profiles_by_ability[tostring(payload.ability_name or "")]
             local x = tonumber(payload.x)
             local y = tonumber(payload.y)
             local z = tonumber(payload.z)
             if not profile or not x or not y or not z then
                 close_preview_session(player_id, session_id)
-                send(player_id, "ui_grid_placement_commit_result", {
+                reply({
                     success = 0,
                     error = "invalid_commit_request",
                 })
@@ -510,7 +519,7 @@ local function register_commit_request()
             )
             if not caster then
                 close_preview_session(player_id, session_id)
-                send(player_id, "ui_grid_placement_commit_result", {
+                reply({
                     success = 0,
                     error = ability_error,
                 })
@@ -518,10 +527,16 @@ local function register_commit_request()
             end
             local position = Vector(x, y, z)
             if profile.placement_action == "relocate" then
+                if fresh_relocation then
+                    destroy_preview(player_id)
+                    preview_sessions[player_id] = session_id
+                    preview_request_ids[player_id] = 0
+                    preview_pose_ids[player_id] = 0
+                end
                 local result = require("systems/tower_relocation_service").move(
                     player_id, caster:entindex(), position, ability:entindex())
                 close_preview_session(player_id, session_id)
-                send(player_id, "ui_grid_placement_commit_result", {
+                reply({
                     success=result.ok and 1 or 0, error=result.error or "",
                     building_id=profile.building_id, placement_action="relocate",
                 })
@@ -535,7 +550,7 @@ local function register_commit_request()
             }) or { ok = false, error = "build_validation_failed" }
             if not check.ok then
                 close_preview_session(player_id, session_id)
-                send(player_id, "ui_grid_placement_commit_result", {
+                reply({
                     success = 0,
                     error = check.error or "build_validation_failed",
                 })
@@ -552,7 +567,7 @@ local function register_commit_request()
                 ability:StartCooldown(ability:GetCooldown(ability:GetLevel()))
             end
             close_preview_session(player_id, session_id)
-            send(player_id, "ui_grid_placement_commit_result", {
+            reply({
                 success = result and result.ok and 1 or 0,
                 error = result and result.ok and ""
                     or (result and result.error or "build_request_failed"),

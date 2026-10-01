@@ -1,6 +1,8 @@
 local M = {}
 
-M.debug_enabled = true
+-- Explicit opt-in for per-transaction diagnosis; normal combat stays quiet.
+-- Set true temporarily when full [CombatDamage] traces are needed.
+M.debug_enabled = false
 M.maximum_recursion_depth = 6
 M.minimum_post_multiplier = 0.10
 M.global_post_bonus_pct = 0.0

@@ -384,10 +384,15 @@ shared.SurvivalPointTargetInput = {
         active: true, name: 'ability_building_blink', ability, unit}; return true; },
     Cancel() { shared.SurvivalPointTargetState.active = false; }
 };
-listeners.ui_grid_placement_profiles({cell_size:64,profiles:[{
+const moveProfiles = {cell_size:64,profiles:[{
     ability_name:'ability_building_blink',building_id:'arrow_tower',placement_action:'relocate',
-    grid_footprint_x:2,grid_footprint_y:2,preview_model:0
-}]});
+    grid_footprint_x:2,grid_footprint_y:2,preview_model:1
+}]};
+listeners.ui_grid_placement_profiles(moveProfiles);
+const commits = () => sent.filter(e=>e.name==='ui_grid_placement_commit');
+const poses = () => sent.filter(e=>e.name==='ui_grid_placement_pose');
+const commitResult = (request, success) => listeners.ui_grid_placement_commit_result({
+    session_id:request.session_id,success,error:success?'':'build_cell_occupied'});
 world=[129,191,384]; now+=1;
 assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
 const oldMove = requests().at(-1).data;
@@ -399,19 +404,117 @@ const moveResponse = request => ({session_id:request.session_id,request_id:reque
     ability_name:'ability_building_blink',success:1,request_anchor_x:2,request_anchor_y:3,
     anchor_x:2,anchor_y:3,world_x:128,world_y:192,world_z:384,area:'',cells:[]});
 listeners.ui_grid_placement_validation(moveResponse(oldMove));
-const priorCommits=sent.filter(e=>e.name==='ui_grid_placement_commit').length;
+const priorCommits=commits().length, priorPoses=poses().length;
+world=[129,319,384]; // click a new cell before any new validation or ghost
 mouse('pressed',0);
-assert.equal(sent.filter(e=>e.name==='ui_grid_placement_commit').length,priorCommits,
-    'old green response cannot authorize a restarted D session');
-listeners.ui_grid_placement_validation(moveResponse(newMove));
-mouse('pressed',0);
-const relocationCommit=sent.filter(e=>e.name==='ui_grid_placement_commit').at(-1).data;
+assert.equal(commits().length,priorCommits+1,'first click submits without validation/ghost readiness');
+assert.equal(poses().length,priorPoses,'model creation is not a prerequisite for a valid click');
+const relocationCommit=commits().at(-1).data;
+assert.equal(relocationCommit.session_id,newMove.session_id);
 assert.equal(relocationCommit.ability_name,'ability_building_blink');
-assert.deepEqual([relocationCommit.x,relocationCommit.y,relocationCommit.z],[128,192,384]);
+assert.deepEqual([relocationCommit.x,relocationCommit.y,relocationCommit.z],[128,320,384],
+    'commit snaps the click position, never a stale green response');
+mouse('pressed',0);
+update();
+assert.equal(commits().length,priorCommits+1,'in-flight click is sent exactly once');
+assert.equal(poses().length,priorPoses,'no late ghost requests while commit is in flight');
+commitResult(oldMove,1);
+assert(shared.SurvivalGridPlacement.IsRelocating(10),'old commit reply cannot close a newer D');
+commitResult(relocationCommit,1);
 assert(!shared.SurvivalPointTargetState.active && !shared.SurvivalGridPlacement.IsRelocating(10));
 assert(!sent.some(e=>e.name==='ui_building_move_request'),'never send an unsnapped movement request');
+
+// A rejected real landing (e.g. a unit enters it) keeps placement usable.
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+mouse('pressed',0);
+const rejectedCommit=commits().at(-1).data;
+commitResult(rejectedCommit,0);
+assert(shared.SurvivalGridPlacement.IsRelocating(10));
+world=[383,257,384]; mouse('pressed',0);
+const correctedCommit=commits().at(-1).data;
+assert(Number(correctedCommit.session_id)>Number(rejectedCommit.session_id));
+assert.deepEqual([correctedCommit.x,correctedCommit.y],[384,256]);
+commitResult(rejectedCommit,0);
+mouse('pressed',0);
+assert.equal(commits().at(-1).data,correctedCommit,'late rejection cannot duplicate the corrected click');
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+const repeatSession=requests().at(-1).data.session_id;
+commitResult(correctedCommit,1);
+assert(shared.SurvivalGridPlacement.IsRelocating(10),'D during in-flight move ignores old success');
+mouse('pressed',0);
+assert.equal(commits().at(-1).data.session_id,repeatSession);
+commitResult(commits().at(-1).data,1);
+
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+world=[0,0,384]; now+=1; update();
+world=[768,128,384]; now+=0.035; update();
+const sweepCommits=commits().length;
+mouse('pressed',0);
+assert.equal(commits().length,sweepCommits+1,'fast sweep cannot swallow a relocation click');
+assert.deepEqual([commits().at(-1).data.x,commits().at(-1).data.y],[768,128]);
+commitResult(commits().at(-1).data,1);
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+const invalidCommits=commits().length;
+for(const invalidWorld of [null,[NaN,0,384],[Infinity,0,384]]) {
+    world=invalidWorld; mouse('pressed',0);
+    assert.equal(commits().length,invalidCommits,'invalid cursor coordinates are never submitted');
+}
+world=[65,191,384]; mouse('pressed',0);
+assert.equal(commits().length,invalidCommits+1,'a valid click still works after invalid cursor samples');
+commitResult(commits().at(-1).data,1);
+
 assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
 shared.SurvivalSelectionResolver.Resolve=()=>11; update();
 assert(!shared.SurvivalGridPlacement.IsRelocating(10) && !shared.SurvivalPointTargetState.active,
     'changing selection cancels the movement and its grid');
-console.log('TOWER_RELOCATION_CLIENT_PASS repeated D session, stale response, exact commit and selection cancel');
+shared.SurvivalSelectionResolver.Resolve=()=>10;
+
+// First cold D can precede both profile delivery and the custom-input module.
+listeners.ui_grid_placement_profiles({profiles:[]});
+const pointInput=shared.SurvivalPointTargetInput;
+delete shared.SurvivalPointTargetInput;
+const coldCommitCount=commits().length, coldPoseCount=poses().length;
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+world=[129,191,384]; mouse('pressed',0);
+world=[513,641,384]; mouse('pressed',0);
+assert.equal(commits().length,coldCommitCount);
+listeners.ui_grid_placement_profiles(moveProfiles);
+assert.equal(commits().length,coldCommitCount,'still waiting for the actual input module');
+shared.SurvivalPointTargetInput=pointInput; update();
+assert.equal(commits().length,coldCommitCount+1,'cold click resumes exactly once');
+const coldCommit=commits().at(-1).data;
+assert.deepEqual([coldCommit.x,coldCommit.y,coldCommit.z],[128,192,384],
+    'cold click saves raw coordinates until the real cell size is loaded');
+assert.equal(poses().length,coldPoseCount,'cold queued click commits before starting a ghost');
+commitResult(coldCommit,1); update();
+assert.equal(commits().length,coldCommitCount+1);
+
+// Repeated D, Escape, right-click and selection changes invalidate cold intent.
+listeners.ui_grid_placement_profiles({profiles:[]});
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+world=[129,191,384]; mouse('pressed',0);
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+listeners.ui_grid_placement_profiles(moveProfiles);
+assert.equal(commits().length,coldCommitCount+1,'repeated D discards an old queued click');
+world=[193,319,384]; mouse('pressed',0);
+commitResult(commits().at(-1).data,1);
+for(const cancel of [() => keyboard('ESCAPE',true), () => mouse('pressed',1), () => {
+    shared.SurvivalSelectionResolver.Resolve=()=>11; update();
+}]) {
+    listeners.ui_grid_placement_profiles({profiles:[]});
+    const countBefore=commits().length;
+    assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+    mouse('pressed',0); cancel();
+    shared.SurvivalSelectionResolver.Resolve=()=>10;
+    listeners.ui_grid_placement_profiles(moveProfiles); update();
+    assert.equal(commits().length,countBefore,'canceled cold click never resumes');
+    assert(!shared.SurvivalGridPlacement.IsRelocating(10));
+}
+listeners.ui_grid_placement_profiles({profiles:[]});
+const retiredCommitCount=commits().length;
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+mouse('pressed',0);
+shared.SurvivalGridControllerEpoch++;
+listeners.ui_grid_placement_profiles(moveProfiles);
+assert.equal(commits().length,retiredCommitCount,'retired controller cannot replay a queued cold click');
+console.log('TOWER_RELOCATION_CLIENT_PASS immediate/once-only click, fresh target, cold profile+input queue, retry, stale replies, D/Esc/right/selection cancel, retired controller');
