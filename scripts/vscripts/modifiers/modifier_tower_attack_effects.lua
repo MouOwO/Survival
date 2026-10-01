@@ -1137,6 +1137,8 @@ local function laser_visual_error(self, message)
     print("[TowerLaser] optional visual failed: " .. tostring(message))
 end
 
+local LASER_VISUAL_RETRY_SECONDS = 0.5
+
 local function dispose_laser_particle(self, index)
     local destroyed, destroy_error = pcall(ParticleManager.DestroyParticle,
         ParticleManager, index, true)
@@ -1160,6 +1162,7 @@ reset_laser = function(self)
     self.laser_target = nil
     self.laser_elapsed = 0
     self.laser_visual_elapsed = 0
+    self.laser_next_visual_retry = nil
 end
 
 local function bind_laser_control(index, control, unit, attachments, position)
@@ -1218,6 +1221,9 @@ local function update_laser_position(self, effect)
 end
 
 local function create_laser_segment(self, effect, now)
+    -- A missing continuous collection can recover from optional engine errors
+    -- without retrying each think or resetting the independent damage clock.
+    self.laser_next_visual_retry = now + LASER_VISUAL_RETRY_SECONDS
     local caster, target = self:GetParent(), self.laser_target
     local created, index = pcall(ParticleManager.CreateParticle, ParticleManager,
         effect.particle_name or
@@ -1342,7 +1348,11 @@ function modifier_tower_attack_effects:OnIntervalThink()
         self.current_update_interval = update_interval
         self:StartIntervalThink(update_interval)
     end
-    if effect.beam_mode ~= "continuous" then
+    if effect.beam_mode == "continuous" then
+        if #self.laser_particles == 0 and now >= (self.laser_next_visual_retry or 0) then
+            create_laser_segment(self, effect, now)
+        end
+    else
         local visible = {}
         for _, segment in ipairs(self.laser_particles or {}) do
             if segment.expires_at > now then

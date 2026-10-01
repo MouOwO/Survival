@@ -106,9 +106,14 @@ bus.handle_request(events.BUILDING_LIST_REQUEST, function(payload)
 end)
 local service = require("systems/tower_visual_service")
 service.precache({})
-local precache_count = 0
-for _ in pairs(precached) do precache_count = precache_count + 1 end
-assert(precache_count == 11, "eight cores, two shared layers and native projectile")
+local expected_precache = {["particles/base_attacks/ranged_goodguy.vpcf"] = true}
+for _, profile in ipairs(profiles.rows) do
+    for _, field in ipairs({"core", "detail", "detail_ssr", "crown"}) do
+        expected_precache["particles/survival/towers/" .. profile[field] .. ".vpcf"] = true
+    end
+end
+for name in pairs(expected_precache) do assert(precached[name], "missing profile precache: " .. name) end
+for name in pairs(precached) do assert(expected_precache[name], "unexpected profile precache: " .. name) end
 service.init()
 assert(service.debug_snapshot().particles == 0 and live_count() == 0)
 
@@ -129,6 +134,22 @@ for class_number = 1, 7 do
         local payload = state(u, case[1], "class_" .. class_number)
         assert(service.apply(payload))
         assert(live_count() == case[2] and service.debug_snapshot().particles == case[2])
+        local profile = profiles.by_id[payload.tower_class]
+        local rarity = case[1] <= 10 and "r" or case[1] <= 15 and "sr" or "ssr"
+        local ids = service.debug_snapshot(u.index).particle_ids
+        local radius = profile["radius_" .. rarity]
+        assert(particles[ids[1]].controls[1].x == radius, "core keeps the profile radius")
+        if case[2] >= 2 then
+            local field = rarity == "ssr" and "detail_ssr" or "detail"
+            assert(particles[ids[2]].name == "particles/survival/towers/" .. profile[field] .. ".vpcf",
+                "SR and SSR must use their own profession detail")
+            assert(particles[ids[2]].controls[1].x <= radius, "detail cannot widen the core footprint")
+            assert(particles[ids[2]].controls[1].z <= profile.alpha * 0.5, "detail remains subdued")
+        end
+        if case[2] == 3 then
+            assert(particles[ids[3]].controls[1].x < radius * 0.8, "red-star accent stays inside the core")
+            assert(particles[ids[3]].controls[1].z < profile.alpha * 0.4)
+        end
         local before_created, before_destroyed = created, #destroyed
         u.origin = Vector(300, -400, 384) -- D moves this same entity and style.
         bus.emit(events.BUILDING_CHANGED, payload)

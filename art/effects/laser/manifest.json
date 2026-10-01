@@ -1,0 +1,44 @@
+{
+  "generated_by": "tools/map_c6/build-laser-visual-particles.cjs",
+  "native_structure_references": [
+    "particles/units/heroes/hero_phoenix/phoenix_sunray_beam_core.vpcf",
+    "particles/units/heroes/hero_wisp/wisp_tether.vpcf"
+  ],
+  "control_points": {
+    "0": "source child anchor",
+    "1": "target body attachment",
+    "9": "source attachment"
+  },
+  "lifecycle": "Instantaneous nodes persist; no normal-state decay/fade. Lua immediately destroys on target exit.",
+  "custom_particle_budget": 26,
+  "lua_particle_handles_per_target": 1,
+  "art": "20-radius white-blue core, 38-radius saturated envelope; 13/22-radius impact, depth-tested.",
+  "native_textures": [
+    "materials/particle/beam_hotwhite.vtex",
+    "materials/particle/beam_hotblue2.vtex",
+    "materials/particle/particle_glow_05.vtex",
+    "materials/particle/particle_flares/particle_flare_001.vtex"
+  ],
+  "outputs": [
+    {
+      "resource": "particles/survival/towers/laser_beam.vpcf",
+      "max_particles": 12,
+      "sha256": "cfe795b6e17afd9e6d0f21fad900eeb882208ae7a90c1300d51214901e9e5f2e"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_envelope.vpcf",
+      "max_particles": 12,
+      "sha256": "7a3d52448e9e539784648117bc2c4d007f660204597510728b4356e898571a2e"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_hit.vpcf",
+      "max_particles": 1,
+      "sha256": "da626ecf3e6de5aaace73194fc9e225e60535ed6361856887914a347493ecdba"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_hit_flare.vpcf",
+      "max_particles": 1,
+      "sha256": "b94807d9f6bbd4865f26b20fe48460464adac7ab9563fde70e66cf9e2ae43afc"
+    }
+  ]
+}

@@ -13,11 +13,28 @@ const towerSource = JSON.parse(fs.readFileSync(path.join(root, 'art/effects/towe
 const weapons = ['weapon_glow', 'weapon_trail', 'weapon_shards'].map(name => ({
   resource: 'particles/survival/weapons/' + name + '.vpcf', name,
 }));
+const sha256 = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
+function sameTowerEvidence(previous, records, inputs) {
+  if (!previous || !Array.isArray(previous.records) || previous.records.length !== records.length
+      || !previous.art_inputs || JSON.stringify(previous.art_inputs) !== JSON.stringify(inputs)) return false;
+  const old = new Map(previous.records.map(row => [row.resource, row]));
+  return old.size === records.length && records.every(row => {
+    const before = old.get(row.resource);
+    return before && row.source_sha256 && before.source_sha256 === row.source_sha256 && before.sha256 === row.sha256;
+  });
+}
 function verify(rows, family) {
   const records = [];
   for (const row of rows) {
     const resource = row.resource + '_c', absolute = path.join(root, resource);
     const bytes = fs.readFileSync(absolute);
+    let sourceSha;
+    if (family === 'towers') {
+      const source = fs.readFileSync(path.join(root, 'art/effects/tower_bases/source', row.resource));
+      const content = fs.readFileSync(path.resolve(root, '../../../content/dota_addons/survival', row.resource));
+      if (!source.equals(content)) throw Error('Tower source/content mismatch: ' + row.resource);
+      sourceSha = sha256(source);
+    }
     for (const dep of references(bytes)) {
       if (!fs.existsSync(path.join(root, dep + '_c')) && !packs.valve.entries.has(dep + '_c')) {
         throw Error('Unresolved particle dependency: ' + dep);
@@ -41,6 +58,15 @@ function verify(rows, family) {
     }
     if (family === 'towers' && (data.match(/_class = "C_OP_SetFloat"/g) || []).length < 2) {
       throw Error('Tower size must update the actual particle radius as well as alpha: ' + resource);
+    }
+    // Resource serialization omits the native 1.0 default on alpha/MOD2X
+    // renderers. Compare the effective value instead of requiring that line.
+    const overbright = Number(data.match(/m_flOverbrightFactor = ([\d.]+)/)?.[1] || 1);
+    if (family === 'towers' && (!data.includes(row.texture)
+        || Math.abs(overbright - row.overbright) > 0.00001
+        || data.includes('m_bDisableZBuffering = true')
+        || !data.includes('C_OP_SetToCP'))) {
+      throw Error('Compiled tower must retain current texture, bounded bloom, depth testing and CP follow: ' + resource);
     }
     if ((row.blend === 'alpha' || row.name === 'weapon_shards')
         && data.includes('PARTICLE_OUTPUT_BLEND_MODE_ADD')) {
@@ -67,23 +93,46 @@ function verify(rows, family) {
       throw Error('Failed compile log: ' + logName);
     }
     records.push({ resource, bytes: bytes.length,
-      sha256: crypto.createHash('sha256').update(bytes).digest('hex'),
+      sha256: sha256(bytes), ...(sourceSha ? { source_sha256: sourceSha } : {}),
       dependencies: references(bytes), total_max_particles: row.total_max_particles,
       data_dump: path.relative(root, dump).replace(/\\/g, '/') });
   }
   return records;
 }
-const towerRecords = verify(towerSource.resources, 'towers');
-const weaponRecords = verify(weapons, 'weapons');
+function main() {
+const familyIndex = process.argv.indexOf('--family');
+const family = familyIndex < 0 ? 'all' : process.argv[familyIndex + 1];
+if (!['all', 'towers', 'weapons'].includes(family)) throw Error('--family must be all, towers or weapons');
+const towerRecords = family === 'weapons' ? [] : verify(towerSource.resources, 'towers');
+const weaponRecords = family === 'towers' ? [] : verify(weapons, 'weapons');
 for (const [folder, records] of [['tower_bases', towerRecords], ['weapon_visuals', weaponRecords]]) {
+  if (!records.length) continue;
   const file = path.join(root, 'art/effects', folder, 'validation.json');
   const previous = JSON.parse(fs.readFileSync(file));
+  if (folder === 'tower_bases') {
+    const inputs = {
+      manifest_sha256: sha256(fs.readFileSync(path.join(root, 'art/effects/tower_bases/source_manifest.json'))),
+      profiles_sha256: sha256(fs.readFileSync(path.join(root, 'data/csv/资源系统/tower_visual_profiles.csv'))),
+      service_sha256: sha256(fs.readFileSync(path.join(root, 'scripts/vscripts/systems/tower_visual_service.lua'))),
+    };
+    const keepWorkshop = sameTowerEvidence(previous, records, inputs)
+      && previous.workshop && /^PASS/.test(previous.workshop.result || '');
+    if (!keepWorkshop) {
+      if (previous.workshop && /^PASS/.test(previous.workshop.result || '')) {
+        previous.previous_art_workshop = previous.workshop;
+      }
+      previous.workshop = { result: 'NOT_VERIFIED', reason: 'No Workshop acceptance matches the current source, compiled resources and profile/service hashes.' };
+      previous.validation = previous.validation.filter(line => !line.startsWith('WORKSHOP:'));
+    }
+    previous.art_revision = towerSource.art_revision;
+    previous.art_inputs = inputs;
+  }
   previous.validation = previous.validation.filter(line => !line.startsWith('COMPILE:') && !line.startsWith('DATA:'));
   previous.validation = previous.validation.map(line => line.replace('CP1.x dynamic renderer radius', 'CP1.x dynamic particle radius'));
   if (folder === 'tower_bases') {
     previous.validation = previous.validation.map(line => line
       .replace(/all \d+ compiled VPCFs/, 'all ' + towerRecords.length + ' compiled VPCFs')
-      .replace('Z+4..8', 'Z+12..16'));
+      .replace(/Z\+\d+\.\.\d+/, 'Z+12..18'));
   }
   previous.validation.push('COMPILE: all targets zero failed; source format vpcf45 intentionally triggers legacy operator migration');
   previous.validation.push('DATA: all sphere initializers migrated to CreateWithinSphereTransform; no zero-default legacy operator; C_OP_SetFloat continuously reads alpha from CP1.z');
@@ -93,7 +142,8 @@ for (const [folder, records] of [['tower_bases', towerRecords], ['weapon_visuals
     'Electrical base uses a full circular texture; rope/half-rune strips are excluded from sprite disks.',
   ];
   if (folder === 'tower_bases') previous.review_fixes.push(
-    'Cold Workshop review: R/SR/SSR/UR radii are 96/112/128/144; ground layers are raised to +12..16 to reduce grass occlusion.',
+    'Source refinement: R/SR/SSR/UR radii are 96/100/112/128; additive overbright is 1.2; ground layers remain +12..18 with normal depth testing. New appearance requires cold Workshop review.',
+    'Anti-air uses native ping_world_crosshairs3 circular aiming art. SR/SSR select contained profession-specific details; only mystery uses witch_rune. Red-star/UR glints remain inside the main circle.',
     'Death center uses native Enigma particle_modulate_03/MOD2X at 0.65x radius; the screenshot rectangle was separately confirmed to be the N5 tower model shadow.',
     'Frost uses fine native ground cracks; lightning/frost boundary uses Enigma softouter texture at 0.20x profile alpha instead of a hard ring.');
   else previous.review_fixes.push(
@@ -106,3 +156,6 @@ for (const [folder, records] of [['tower_bases', towerRecords], ['weapon_visuals
 }
 console.log(JSON.stringify({ verified: towerRecords.length + weaponRecords.length,
   towers: towerRecords.length, weapons: weaponRecords.length, format: 'vpcf45 -> engine Transform operators' }));
+}
+if (require.main === module) main();
+module.exports = { sameTowerEvidence };

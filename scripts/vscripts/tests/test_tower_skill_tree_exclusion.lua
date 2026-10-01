@@ -285,6 +285,11 @@ tower.survival_model_asset_id = nil
 
 local laser = { skill_id = "laser_lv01", damage_interval = 1, damage_multiplier = 1 }
 local beam = require("config/generated/tower_laser_effects").by_id["laser_lv01:default"]
+assert(beam.beam_mode == "continuous" and beam.particle_name == "particles/survival/towers/laser_beam.vpcf",
+    "production laser CSV must select the persistent beam resource")
+-- Retain the existing segmented-mode regressions as a supported fallback.
+-- The production continuous contract is exercised separately below.
+beam.beam_mode = "segmented"
 local bounty = { skill_id = "bounty_machine_gun_lv01", damage_multiplier = 3 }
 local gatling = { skill_id = "explosive_gatling_lv01", buff_id = "gatling", damage_multiplier = 0.2 }
 local arcane = { skill_id = "arcane_cannon_lv01", buff_id = "arcane", damage_multiplier = 0.2 }
@@ -551,6 +556,92 @@ assert(#destroyed == 2 and particle_releases[1] == 1 and particle_releases[2] ==
     "one cleanup failure prevented release or cleanup of the remaining ID")
 restore_particle_api()
 tower.ScriptLookupAttachment, dummy.ScriptLookupAttachment = nil, nil
+
+-- Production continuous beams create once and remain owned well beyond the
+-- original native 0.7-second lifespan; all movement comes from attachments.
+beam.beam_mode = "continuous"
+clear()
+tower.ScriptLookupAttachment, dummy.ScriptLookupAttachment = attachment_lookup, attachment_lookup
+second.ScriptLookupAttachment = attachment_lookup
+tower.attack_target = dummy
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+local continuous_start = now
+for step = 1, 3000 do
+    now = continuous_start + step * 0.03
+    dummy.position = vector(150 + step % 200, step % 80, 0)
+    m:OnIntervalThink()
+end
+assert(#particles == 1 and #destroyed == 0 and #control_entities == 3 and #control_writes == 0,
+    "continuous beam was replayed or its native attachments were overwritten")
+assert(#m.laser_particles == 1 and m.laser_particles[1].expires_at == math.huge)
+assert(#damage == 91, "continuous resource changed the ninety-second damage clock")
+assert(damage[1].base_damage == 100 and damage[2].base_damage == 105)
+m:OnAttackStart({ attacker = tower, target = dummy })
+assert(#particles == 1 and #damage == 91, "same-target attack restarted a continuous beam")
+print(string.format("LASER_CONTINUOUS_CALLS seconds=90 create=%d destroy=%d bind=%d setcp=%d ticks=%d",
+    #particles, #destroyed, #control_entities, #control_writes, #damage))
+tower.attack_target = second
+m:OnAttackStart({ attacker = tower, target = second })
+assert(#particles == 2 and particle_releases[1] == 1 and #m.laser_particles == 1)
+assert(#damage == 92 and damage[92].base_damage == 100)
+m:ResetAfterRelocation()
+m:OnDestroy()
+assert(particle_releases[2] == 1 and #m.laser_particles == 0 and m.laser_next_visual_retry == nil,
+    "continuous relocation cleanup retained a handle or retry deadline")
+
+-- Persistent effects must recover on the same target after a visual failure,
+-- while repeated failures stay throttled and never delay a real damage tick.
+clear()
+tower.attack_target = dummy
+dummy.position = vector(150, 0, 0)
+local attempts = 0
+ParticleManager.CreateParticle = function()
+    attempts = attempts + 1
+    error("injected persistent creation failure")
+end
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+local retry_start = now
+for step = 1, 40 do
+    now = retry_start + step * 0.03
+    m:OnIntervalThink()
+end
+assert(attempts == 3 and #damage == 2 and #m.laser_particles == 0,
+    "continuous visual retries ran each think or interrupted the damage clock")
+restore_particle_api()
+now = retry_start + 1.6
+m:OnIntervalThink()
+assert(#particles == 1 and #m.laser_particles == 1 and #damage == 2,
+    "same-target continuous beam did not recover without resetting damage")
+now = retry_start + 2.01
+m:OnIntervalThink()
+assert(#particles == 1 and #damage == 3 and math.abs(damage[3].base_damage - 110) < 0.00001)
+m:OnDeath({ attacker = second, unit = dummy })
+assert(m.laser_target == nil and #m.laser_particles == 0 and particle_releases[1] == 1)
+now = retry_start + 3
+m:OnIntervalThink()
+assert(#particles == 1 and #damage == 3, "dead-target continuous beam was resurrected by retry")
+
+-- Failure during a fallback coordinate update also recovers through that
+-- bounded retry path; the successfully bound source is never overwritten.
+clear()
+dummy.ScriptLookupAttachment = nil
+m = modifier({ laser })
+m:OnAttackStart({ attacker = tower, target = dummy })
+ParticleManager.SetParticleControl = function() error("injected persistent fallback failure") end
+now = now + 0.03
+m:OnIntervalThink()
+assert(#m.laser_particles == 0 and particle_releases[1] == 1)
+restore_particle_api()
+dummy.ScriptLookupAttachment = attachment_lookup
+now = now + 0.5
+m:OnIntervalThink()
+assert(#particles == 2 and #m.laser_particles == 1 and #damage == 1)
+assert(m.laser_particles[1].source_follows and m.laser_particles[1].target_follows)
+m:OnDestroy()
+assert(particle_releases[1] == 1 and particle_releases[2] == 1)
+tower.ScriptLookupAttachment, dummy.ScriptLookupAttachment, second.ScriptLookupAttachment = nil, nil, nil
 
 -- Legal bounty hits still award gold once; a queued hit must recheck its target.
 clear()

@@ -80,10 +80,13 @@ function M.apply(state)
     local ok, err = pcall(function()
         add(entry, profile.core, radius, profile.alpha, profile.color)
         if rank.rarity ~= "R" then
-            add(entry, profile.detail, radius * 1.08, profile.alpha * 0.65, profile.color)
+            local detail = rank.rarity == "SSR" and profile.detail_ssr or profile.detail
+            -- Profession detail stays inside the core footprint. SSR changes
+            -- its pattern/rhythm without allocating additional outer rings.
+            add(entry, detail, radius, profile.alpha * 0.48, profile.color)
         end
         if rank.rarity == "UR" or rank.red_stars > 0 then
-            add(entry, profile.crown, radius * 0.78, profile.alpha * 0.55, profile.color)
+            add(entry, profile.crown, radius * 0.78, profile.alpha * 0.38, profile.color)
         end
     end)
     if not ok then
@@ -98,7 +101,7 @@ function M.precache(context)
     local seen = {}
     for _, row in ipairs(profiles.rows) do
         if row.enabled ~= false then
-            for _, key in ipairs({"core", "detail", "crown"}) do
+            for _, key in ipairs({"core", "detail", "detail_ssr", "crown"}) do
                 local name = row[key]
                 if name and name ~= "" and not seen[name] then
                     PrecacheResource("particle", prefix .. name .. ".vpcf", context)

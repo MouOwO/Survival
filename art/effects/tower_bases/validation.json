@@ -1,12 +1,353 @@
 {
   "validation": [
-    "STATIC: all 15 compiled VPCFs resolve their complete local/Valve RERL dependency closure",
-    "STATIC: resourceinfo confirms WORLD_Z_ALIGNED, CP1.x dynamic particle radius, SetToCP follow and Z+12..16",
-    "WORKSHOP: root verified cold-loaded R effects after camera absence over 60 seconds, SR and SSR displays, and death cleanup with tracked=false / zero handles",
+    "STATIC: all 29 compiled VPCFs resolve their complete local/Valve RERL dependency closure",
+    "STATIC: resourceinfo confirms WORLD_Z_ALIGNED, CP1.x dynamic particle radius, SetToCP follow and Z+12..18",
     "COMPILE: all targets zero failed; source format vpcf45 intentionally triggers legacy operator migration",
     "DATA: all sphere initializers migrated to CreateWithinSphereTransform; no zero-default legacy operator; C_OP_SetFloat continuously reads alpha from CP1.z"
   ],
   "workshop": {
+    "result": "NOT_VERIFIED",
+    "reason": "No Workshop acceptance matches the current source, compiled resources and profile/service hashes."
+  },
+  "records": [
+    {
+      "resource": "particles/survival/towers/bases/death.vpcf_c",
+      "bytes": 2735,
+      "sha256": "4b3b9010ac022f98432b42eb4d6b3a680a76de2c21e4eb3908736cb7c559bfe0",
+      "source_sha256": "9b25c6973ee27dcf0649e212c6b77399d9003a293dfc7a18995e3a7bc88b2247",
+      "dependencies": [
+        "materials/particle/vortex/vortex1.vtex",
+        "particles/survival/towers/bases/base_death_void.vpcf"
+      ],
+      "total_max_particles": 2,
+      "data_dump": "output/effect_reference/compiled_validation/death.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/mystery.vpcf_c",
+      "bytes": 2597,
+      "sha256": "04785beb65b4bceda2024d0ccb7f95ce0f836ded708193df8d076bbe2c8016f0",
+      "source_sha256": "d36311c2581c3c68b926c48b1a23787358394d9cfb6f7267b87f706793adf5e4",
+      "dependencies": [
+        "materials/particle/rune/witch_rune.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/mystery.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/lightning.vpcf_c",
+      "bytes": 2739,
+      "sha256": "af7e5b6002b4bcb4c35f32f28418d22d34ba43aa5a506efd0a7aea61e6af8bbe",
+      "source_sha256": "5bfbce1380d501d4ecc6dc32ef231a1158e34decf3bc064922739e97a6fc9a0c",
+      "dependencies": [
+        "materials/particle/auras/aura_vlads.vtex",
+        "particles/survival/towers/bases/base_thin_ring.vpcf"
+      ],
+      "total_max_particles": 2,
+      "data_dump": "output/effect_reference/compiled_validation/lightning.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/machine.vpcf_c",
+      "bytes": 2601,
+      "sha256": "475fb6d0c5a8fe88fba69adfcdfa32e95d6f237c26c3fe746e6ba8832c018927",
+      "source_sha256": "1c00e5b53cf77418b536a0b8cc6c045c5a83179f23cd2428f2e65e85097ac5e6",
+      "dependencies": [
+        "materials/particle/auras/aura_assaultc.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/machine.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/multi.vpcf_c",
+      "bytes": 2824,
+      "sha256": "cbdf2620c1b1ac2c90dd890b57c5f114b6716ebb028874e188377098dea4f51a",
+      "source_sha256": "d49e0c14c899b61d224d84bb0da43d76eb5829cb9d3b71f9175648226a8d36f6",
+      "dependencies": [
+        "materials/particle/auras/aura_endurance.vtex",
+        "particles/survival/towers/bases/base_multi_leaf_a.vpcf",
+        "particles/survival/towers/bases/base_multi_leaf_b.vpcf",
+        "particles/survival/towers/bases/base_multi_leaf_c.vpcf"
+      ],
+      "total_max_particles": 4,
+      "data_dump": "output/effect_reference/compiled_validation/multi.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/frost.vpcf_c",
+      "bytes": 2628,
+      "sha256": "301649eb76c9ed9801cb2d9083d9949c5a7c1f7e220ddbbed401b169bd84e45b",
+      "source_sha256": "25fb9632e49c44f4b4fa8fdf91e074038f71f5f480016066c72f1cee7c47f422",
+      "dependencies": [
+        "materials/particle/groundcracks_light.vtex",
+        "particles/survival/towers/bases/base_thin_ring.vpcf"
+      ],
+      "total_max_particles": 2,
+      "data_dump": "output/effect_reference/compiled_validation/frost.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/anti_air.vpcf_c",
+      "bytes": 2502,
+      "sha256": "18f414bce2710919cef890991d0ae1887eec609f7544d1a4e570a4550144afe5",
+      "source_sha256": "be83bf384ea53f1cfa099d7f99776f3badf46e1d18f48deaf997a4f65b16a27b",
+      "dependencies": [
+        "materials/particle/ping_world_crosshairs3.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/anti_air.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/ultimate.vpcf_c",
+      "bytes": 2587,
+      "sha256": "a2266980a800568a5641aab8bfd4cf42d34158685c24ce27a8bec9da0b885da1",
+      "source_sha256": "68ba012d3646bfc2b94d2cad624b54b0ccb7082347d7ff56273abf7374263d10",
+      "dependencies": [
+        "materials/particle/juggernaut/arcana/jugg_arcana_ground_symbol.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/ultimate.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_ultimate.vpcf_c",
+      "bytes": 2635,
+      "sha256": "ccf38ad78508c9397841d21d4c2ee7e72acd654ed3037affbbffb4323a38f154",
+      "source_sha256": "e7bdb538ce14bfd6300cb17e7104c9543ea8215b7ff6d994d20760ec0661cee6",
+      "dependencies": [
+        "materials/particle/auras/aura_assaultc.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_ultimate.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_motes.vpcf_c",
+      "bytes": 2614,
+      "sha256": "cfc5fc6a1b833cab6a7a4839e994ddd102ee7057d87f056182a3f3b1c865b647",
+      "source_sha256": "61a491907ab1fdf2b28c25c155aee0c8d040ca4d0bc6c52bdf12c46f3a440a86",
+      "dependencies": [
+        "materials/particle/auras/aura_endurance.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_motes.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_death_void.vpcf_c",
+      "bytes": 2375,
+      "sha256": "8e18633c88536cb48467015f85f246b1374106393b9b23aeb891a021a4087def",
+      "source_sha256": "9423dfda0f69dcd6f01e69e1cd940919d39aff31edd66789f556377497641684",
+      "dependencies": [
+        "materials/particle/particle_modulate_03.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/base_death_void.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_multi_leaf_a.vpcf_c",
+      "bytes": 2445,
+      "sha256": "deb1b55465599469c6b51a4fdd25c478065683e9e73f30f8779228b561609d7e",
+      "source_sha256": "0eabc20b8091117dc87e9b492fe890924a6f78b9ee74cdc7d8d34e2d7f38c78f",
+      "dependencies": [
+        "materials/particle/leaf/leaf_grayscale.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/base_multi_leaf_a.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_multi_leaf_b.vpcf_c",
+      "bytes": 2451,
+      "sha256": "0f65bdea9eb51d61ff4031509dae8d82527f0de62a66ed9e15922567fa3d9a1a",
+      "source_sha256": "ca15fae8f5318f3f49ecd13b556446c019de5f731b6687b30af935508f6bc8a6",
+      "dependencies": [
+        "materials/particle/leaf/leaf_grayscale.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/base_multi_leaf_b.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_multi_leaf_c.vpcf_c",
+      "bytes": 2452,
+      "sha256": "89372a08e9ff6ab44010ad03bc94cc3eed7c0d91a135939277aa95a7fbbf2e24",
+      "source_sha256": "cf98078809dd73becf60d5c5f9fb5eeeccae337f03fcf87333684c23c1c21122",
+      "dependencies": [
+        "materials/particle/leaf/leaf_grayscale.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/base_multi_leaf_c.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_thin_ring.vpcf_c",
+      "bytes": 2437,
+      "sha256": "9cd1f49c461b13ece19291bc504c6acb516918f0504727791835c55e5301e13e",
+      "source_sha256": "a5876773c1e4b530ad715e4185bc4baa1711f8738b03f4091080d0984a3885a7",
+      "dependencies": [
+        "materials/particle/particle_ring_softouter.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/base_thin_ring.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_death_sr.vpcf_c",
+      "bytes": 2637,
+      "sha256": "40e27bdb25c713941929e5bfe52b7ca7aafd00d2533f683d9801e82cd338bce0",
+      "source_sha256": "28d6f0d33f4bb5446a7f7379c559868d6965617ecc0f7c12767dbcf3e4c91db9",
+      "dependencies": [
+        "materials/particle/vortex/vortex1.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_death_sr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_death_ssr.vpcf_c",
+      "bytes": 2638,
+      "sha256": "f77717c6d79f833fcf2db5fd6364c2f1b7543faaddccd20c0086f5e88b0b123e",
+      "source_sha256": "8da5959b4b41ac33a51077944f7921453d298d744642113a8aca9f069694aa37",
+      "dependencies": [
+        "materials/particle/vortex/vortex1.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_death_ssr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_mystery_sr.vpcf_c",
+      "bytes": 2644,
+      "sha256": "cc75a6907896b8791ab1f63ddac447f9a44659738afd79ff5ab98a5e850c312b",
+      "source_sha256": "1d85d05db5ff80824575c9e0cc2ac0f4564510eac108ea6e1989e22eef06ea7b",
+      "dependencies": [
+        "materials/particle/rune/witch_rune.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_mystery_sr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_mystery_ssr.vpcf_c",
+      "bytes": 2642,
+      "sha256": "4583265bc8f41f6d485509f6f3308a9c3b9662f2f736cc085c68fb2df3d58479",
+      "source_sha256": "281c65de943941ff31eda9861f880f782dc7bd34278d2af930934aa77ef39836",
+      "dependencies": [
+        "materials/particle/rune/witch_rune.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_mystery_ssr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_lightning_sr.vpcf_c",
+      "bytes": 2644,
+      "sha256": "5d0b7cd6f54a59ca749a997b6d83e0ee94f4e9cc8a9fa079a59d3d2c7509c9e1",
+      "source_sha256": "506475ef85e8af3300c5923ca77fa251cac0031fa189b0c7ca174e73f1ac403e",
+      "dependencies": [
+        "materials/particle/auras/aura_vlads.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_lightning_sr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_lightning_ssr.vpcf_c",
+      "bytes": 2647,
+      "sha256": "ad87a27cfb461903da6cf999959760ef113093eb796490b85c3e34a496813fcd",
+      "source_sha256": "8099977aaae6ecee4e5254a5b9ed85e1c37a2a5c1fdc2b1847994998b24172c4",
+      "dependencies": [
+        "materials/particle/auras/aura_vlads.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_lightning_ssr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_machine_sr.vpcf_c",
+      "bytes": 2648,
+      "sha256": "bf42a0df680bf6775b09cd79bbfc6dfd8ffb0deb6c4bca6e3e2b221e1d67166f",
+      "source_sha256": "cd99c6b3f26c3f92b1783a66a00dcfd05cbc4c52463865c6422762c5dc476dea",
+      "dependencies": [
+        "materials/particle/auras/aura_assaultc.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_machine_sr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_machine_ssr.vpcf_c",
+      "bytes": 2648,
+      "sha256": "cbec9627c37e759c0fa8b779a979a7b0496e2d1629d0b9fa803072a2f0451633",
+      "source_sha256": "cf874a8958daceb761ba116ddf4e9293d0d6145db4b35ab5d5ad908e0d0c175b",
+      "dependencies": [
+        "materials/particle/auras/aura_assaultc.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_machine_ssr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_multi_sr.vpcf_c",
+      "bytes": 2650,
+      "sha256": "2b0c1ffbbfaa221e5087063b722079d160bffcb665b13f48d4cb13e33d0468e5",
+      "source_sha256": "788105a836525a476499488b43fb617c6abab3396f7abe0d9a03e06306f72371",
+      "dependencies": [
+        "materials/particle/auras/aura_endurance.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_multi_sr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_multi_ssr.vpcf_c",
+      "bytes": 2650,
+      "sha256": "46a6552ca0b5aeefb25d5317de4f949bf8331d4c5789959db0d3d1ef8644cbf9",
+      "source_sha256": "9488775acb47655d6e692017eab8001b82f99d6180d58424741bfd343443f8a0",
+      "dependencies": [
+        "materials/particle/auras/aura_endurance.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_multi_ssr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_frost_sr.vpcf_c",
+      "bytes": 2535,
+      "sha256": "8b837f25e8f035a880f123f332f0c121b784716278366ef02bd3f80774075f09",
+      "source_sha256": "35c61d52a26ee29bacbe58778bd8cd6f3c1e92c3e30e23ce7271ab0364566c7a",
+      "dependencies": [
+        "materials/particle/groundcracks_light.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_frost_sr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_frost_ssr.vpcf_c",
+      "bytes": 2535,
+      "sha256": "e3f6d96132619df7a9c912efe8e70f25cb575a468c95b8fbe033bf4931a1f167",
+      "source_sha256": "fbe51c2431383c3a3fb5964684fd55b356def98829844ff62e78ca3b5b25d28e",
+      "dependencies": [
+        "materials/particle/groundcracks_light.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_frost_ssr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_anti_air_sr.vpcf_c",
+      "bytes": 2543,
+      "sha256": "1a67df20d9f7d591d66a371e6bd67721382f43bfdd487644d622fb12f9dd0ea9",
+      "source_sha256": "d01b780cedb78383d0b3135b2bfd6f2620c1ce6d00c3256271b121813d190e77",
+      "dependencies": [
+        "materials/particle/ping_world_crosshairs3.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_anti_air_sr.txt"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_anti_air_ssr.vpcf_c",
+      "bytes": 2541,
+      "sha256": "a57e402a9a52ba4c3e8685807089411e4cc212b37e079a34f3a2bf632b2c063e",
+      "source_sha256": "abbd658f687216d1110746653775539fc2703cae4267474c657e2bef92ccbfed",
+      "dependencies": [
+        "materials/particle/ping_world_crosshairs3.vtex"
+      ],
+      "total_max_particles": 1,
+      "data_dump": "output/effect_reference/compiled_validation/detail_anti_air_ssr.txt"
+    }
+  ],
+  "total_bytes": 75224,
+  "no_gameplay_changes": true,
+  "review_fixes": [
+    "Alpha-only sprite masks use native alpha blending, not RGB-only additive blending (target glyphs, ground symbols, leaves and snowflakes).",
+    "Tower radius now writes actual particle radius for culling/occlusion; renderer radius multiplier remains 1.",
+    "Electrical base uses a full circular texture; rope/half-rune strips are excluded from sprite disks.",
+    "Source refinement: R/SR/SSR/UR radii are 96/100/112/128; additive overbright is 1.2; ground layers remain +12..18 with normal depth testing. New appearance requires cold Workshop review.",
+    "Anti-air uses native ping_world_crosshairs3 circular aiming art. SR/SSR select contained profession-specific details; only mystery uses witch_rune. Red-star/UR glints remain inside the main circle.",
+    "Death center uses native Enigma particle_modulate_03/MOD2X at 0.65x radius; the screenshot rectangle was separately confirmed to be the N5 tower model shadow.",
+    "Frost uses fine native ground cracks; lightning/frost boundary uses Enigma softouter texture at 0.20x profile alpha instead of a hard ring."
+  ],
+  "previous_art_workshop": {
     "result": "PASS_WITH_DISPLAY_FIXTURE_SCOPE",
     "reported_by": "root actual Workshop observation",
     "integration_report": "docs/ai/validation/20260930/presentation_integration.json",
@@ -31,172 +372,10 @@
       "Actual multiplayer or UR D relocation is not claimed; those relocation paths retain simulation coverage."
     ]
   },
-  "records": [
-    {
-      "resource": "particles/survival/towers/death.vpcf_c",
-      "bytes": 2731,
-      "sha256": "9834b20d31ed6fd4f53b04ce2de68ea3d77b5a003a52ecc5dc4e1ef38365a018",
-      "dependencies": [
-        "materials/particle/vortex/vortex1.vtex",
-        "particles/survival/towers/base_death_void.vpcf"
-      ],
-      "total_max_particles": 2,
-      "data_dump": "output/effect_reference/compiled_validation/death.txt"
-    },
-    {
-      "resource": "particles/survival/towers/mystery.vpcf_c",
-      "bytes": 2597,
-      "sha256": "e2a3098e7bfd3b69677af3c253685c57daff229e6256e36cf0bf4103704007a4",
-      "dependencies": [
-        "materials/particle/rune/witch_rune.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/mystery.txt"
-    },
-    {
-      "resource": "particles/survival/towers/lightning.vpcf_c",
-      "bytes": 2733,
-      "sha256": "abc841b35a00f217e361cc9a84e7b3cf38464fdc342cb01ec5a350c410dd3afb",
-      "dependencies": [
-        "materials/particle/auras/aura_vlads.vtex",
-        "particles/survival/towers/base_thin_ring.vpcf"
-      ],
-      "total_max_particles": 2,
-      "data_dump": "output/effect_reference/compiled_validation/lightning.txt"
-    },
-    {
-      "resource": "particles/survival/towers/machine.vpcf_c",
-      "bytes": 2600,
-      "sha256": "42fc7e81fb19400d44b7e0c86081d9873747c25fa3bd3f0cfb5016bc158d8433",
-      "dependencies": [
-        "materials/particle/auras/aura_assaultc.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/machine.txt"
-    },
-    {
-      "resource": "particles/survival/towers/multi.vpcf_c",
-      "bytes": 2790,
-      "sha256": "2d7962acc9ff3bdca6ba16106404ff3bfb694fb1ae48af35baad9db43882648d",
-      "dependencies": [
-        "materials/particle/auras/aura_endurance.vtex",
-        "particles/survival/towers/base_multi_leaf_a.vpcf",
-        "particles/survival/towers/base_multi_leaf_b.vpcf",
-        "particles/survival/towers/base_multi_leaf_c.vpcf"
-      ],
-      "total_max_particles": 4,
-      "data_dump": "output/effect_reference/compiled_validation/multi.txt"
-    },
-    {
-      "resource": "particles/survival/towers/frost.vpcf_c",
-      "bytes": 2627,
-      "sha256": "41444dc07e5cfd58f76d7815bf102af2324311328fe2c7b844a99b0f6422fccd",
-      "dependencies": [
-        "materials/particle/groundcracks_light.vtex",
-        "particles/survival/towers/base_thin_ring.vpcf"
-      ],
-      "total_max_particles": 2,
-      "data_dump": "output/effect_reference/compiled_validation/frost.txt"
-    },
-    {
-      "resource": "particles/survival/towers/anti_air.vpcf_c",
-      "bytes": 2498,
-      "sha256": "738205518e696ec985b2b9c5e8ed47f8a67930cd042dfa500ec2d016d4b5a551",
-      "dependencies": [
-        "materials/particle/gyro/gyro_ti10_immortal_missile/gyro_ti10_immortal_missile_target.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/anti_air.txt"
-    },
-    {
-      "resource": "particles/survival/towers/ultimate.vpcf_c",
-      "bytes": 2587,
-      "sha256": "d2d212e4117d99d951e722b049177c00db7551c620dc08284d72521a13519387",
-      "dependencies": [
-        "materials/particle/juggernaut/arcana/jugg_arcana_ground_symbol.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/ultimate.txt"
-    },
-    {
-      "resource": "particles/survival/towers/detail_runes.vpcf_c",
-      "bytes": 2606,
-      "sha256": "d539ba5064ba8a0c8516ccbedbeabe40eaed34f7c26af8e66a7d3038e68dca98",
-      "dependencies": [
-        "materials/particle/rune/witch_rune.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/detail_runes.txt"
-    },
-    {
-      "resource": "particles/survival/towers/detail_motes.vpcf_c",
-      "bytes": 2607,
-      "sha256": "75b1d20fc71b639c3ff3e16e8e3d77ff895d19249778f5b2a408aea4dc519b56",
-      "dependencies": [
-        "materials/particle/auras/aura_endurance.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/detail_motes.txt"
-    },
-    {
-      "resource": "particles/survival/towers/base_death_void.vpcf_c",
-      "bytes": 2375,
-      "sha256": "70407fd7d9001dc42c85721edbc9ae0a5b49a96bd694a0e8cd591dcf59b55e1a",
-      "dependencies": [
-        "materials/particle/particle_modulate_03.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/base_death_void.txt"
-    },
-    {
-      "resource": "particles/survival/towers/base_multi_leaf_a.vpcf_c",
-      "bytes": 2448,
-      "sha256": "5f4e75cb4e12c9be4045642394eb2ab5f2bedf36158c626067b41143058d3d61",
-      "dependencies": [
-        "materials/particle/leaf/leaf_grayscale.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/base_multi_leaf_a.txt"
-    },
-    {
-      "resource": "particles/survival/towers/base_multi_leaf_b.vpcf_c",
-      "bytes": 2454,
-      "sha256": "b1358b0807f6b5e07df40cf4070d00ad689c37a47b5a710e238198a87ab72c00",
-      "dependencies": [
-        "materials/particle/leaf/leaf_grayscale.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/base_multi_leaf_b.txt"
-    },
-    {
-      "resource": "particles/survival/towers/base_multi_leaf_c.vpcf_c",
-      "bytes": 2455,
-      "sha256": "9c03bc64559bd27153bef465f0d37d445bf7cdd03b23fae9388d9cd09e48e561",
-      "dependencies": [
-        "materials/particle/leaf/leaf_grayscale.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/base_multi_leaf_c.txt"
-    },
-    {
-      "resource": "particles/survival/towers/base_thin_ring.vpcf_c",
-      "bytes": 2437,
-      "sha256": "1374c353f81b3571902451eb101dafcc35ee0f71d778adbad113d353f7f59668",
-      "dependencies": [
-        "materials/particle/particle_ring_softouter.vtex"
-      ],
-      "total_max_particles": 1,
-      "data_dump": "output/effect_reference/compiled_validation/base_thin_ring.txt"
-    }
-  ],
-  "total_bytes": 38545,
-  "no_gameplay_changes": true,
-  "review_fixes": [
-    "Alpha-only sprite masks use native alpha blending, not RGB-only additive blending (target glyphs, ground symbols, leaves and snowflakes).",
-    "Tower radius now writes actual particle radius for culling/occlusion; renderer radius multiplier remains 1.",
-    "Electrical base uses a full circular texture; rope/half-rune strips are excluded from sprite disks.",
-    "Cold Workshop review: R/SR/SSR/UR radii are 96/112/128/144; ground layers are raised to +12..16 to reduce grass occlusion.",
-    "Death center uses native Enigma particle_modulate_03/MOD2X at 0.65x radius; the screenshot rectangle was separately confirmed to be the N5 tower model shadow.",
-    "Frost uses fine native ground cracks; lightning/frost boundary uses Enigma softouter texture at 0.20x profile alpha instead of a hard ring."
-  ]
+  "art_revision": "20261001_contained_profession_details",
+  "art_inputs": {
+    "manifest_sha256": "a3c7258f3bfb6a4176dc365a581d3bef761f7abe80467f638c21b6e39014d196",
+    "profiles_sha256": "a991aa2d045f6f4831993dbeecd97ccc881af504991dd6968226725c4671abb9",
+    "service_sha256": "99085fae71f7e61aa1be358f37bfa20eff9476441ce98161ba2194799d85d88b"
+  }
 }

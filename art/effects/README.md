@@ -13,9 +13,11 @@
 
 ## 塔底座和武器
 
-塔底座资源在 `particles/survival/towers/`。公开入口为 `death`、`mystery`、`lightning`、`machine`、`multi`、`frost`、`anti_air`、`ultimate`、`detail_runes`、`detail_motes`。统一 CP0 跟随塔、CP1.x 半径、CP1.z 透明度、CP2 RGB；光环平铺在地面，小层数、低粒子数量。模型移动时更新粒子位置，不留下整屏拖尾。
+2026-10-01 最新底座使用 `particles/survival/towers/bases/`，配置入口见 `tower_visual_profiles.csv`。R/SR/SSR/UR 半径为 96/100/112/128，降低加法泛光和透明度；SR/SSR 使用各职业独立的内圈纹样，防空改为圆形准心，神秘塔保留奥术符纹。N 无底座；普通 R/SR/SSR 为 1/2/2 个顶层句柄，红星 SSR 与 UR 最多 3 个，计入子系统最多 6 个 sprite，维持旧版上限。29 个资源已编译并核对 source/content、编译 DATA 和依赖，生命周期模拟通过；本版草地观感与实际战斗仍待冷启验收，旧截图不作为新版证据。细节与重建入口见 [tower_bases/README.md](tower_bases/README.md)。
 
-冷启截图发现初版半径 64 的光环容易被塔身和草丛遮住，已将 CSV 中 R/SR/SSR/UR 半径调整为 96/112/128/144，粒子离地高度调整为 12–16。死亡黑心半径为主环的 0.65 倍；使用官方 `enigma_blackhole_m` 已采用的 `particle_modulate_03` 纹理和 MOD2X 混合，维持软暗中心。霜底座使用原生 `groundcracks_light` 细冰裂纹；霜与雷电边圈使用原生 `particle_ring_softouter`，透明度仅为主图案的 0.20，避免硬质选中圈观感。截图中独立矩形暗块经移动 N5 石塔后同步移动，已确认是石塔模型阴影，并非粒子缺陷（`output/map_build_c6/tower_shadow_probe.png`）。最终冷启已检查 R、SR、SSR 展示，截图保存在 [review](review/screenshots_manifest.json)；SSR 第 3 槽缺席是死亡测试的预期结果。该验收覆盖正式表现服务的显示样本，不代表已实测正常付费升级或多人、UR 迁移流程。
+统一 CP0 跟随塔、CP1.x 半径、CP1.z 透明度、CP2 RGB；光环平铺在地面。D 移动跟随原实体，不重建同样式底座。上一级旧资源保留兼容，当前对局不会热替换它们。
+
+旧版冷启截图发现半径 64 的光环容易被塔身和草丛遮住，当时将 R/SR/SSR/UR 调为 96/112/128/144，粒子离地高度为 12–16。死亡黑心半径为主环的 0.65 倍；使用官方 `enigma_blackhole_m` 已采用的 `particle_modulate_03` 纹理和 MOD2X 混合，维持软暗中心。霜底座使用原生 `groundcracks_light` 细冰裂纹；霜与雷电边圈使用原生 `particle_ring_softouter`，透明度仅为主图案的 0.20，避免硬质选中圈观感。截图中独立矩形暗块经移动 N5 石塔后同步移动，已确认是石塔模型阴影，并非粒子缺陷（`output/map_build_c6/tower_shadow_probe.png`）。旧版冷启已检查 R、SR、SSR 展示，截图保存在 [review](review/screenshots_manifest.json)；SSR 第 3 槽缺席是死亡测试的预期结果。该验收覆盖旧版正式表现服务的显示样本，不代表已实测正常付费升级或多人、UR 迁移流程。
 
 武器资源在 `particles/survival/weapons/weapon_{glow,trail,shards}.vpcf`。真实主手装备的系列与等级决定颜色、半径、发射量和层数；不修改攻击伤害或覆盖现有武器技能的投射物。5 个系列末阶的辉光半径分别为 10 / 15 / 20 / 25 / 30，常驻系统数分别为 2 / 2 / 3 / 3 / 3。
 
@@ -32,6 +34,19 @@ node tools/map_c6/verify-visual-particles.cjs
 ```
 
 先将生成的 vpcf 源同步到 content 工程对应目录并用 Valve resourcecompiler 编译，再执行最后一个命令。验证器检查依赖存在、算子迁移、颜色/透明度/半径契约、混合模式，并写入 [tower_bases/validation.json](tower_bases/validation.json) 和 [weapon_visuals/validation.json](weapon_visuals/validation.json)。编译通过与模拟通过不代表实际画面验收通过，需冷启 Tools 后确认。
+
+## 持续激光
+
+2026-10-01 新入口为 `particles/survival/towers/laser_beam.vpcf`。使用 Valve 原生 Phoenix sunray / Wisp tether 已核实的持续路径结构，配合 `beam_hotwhite` 束芯、`beam_hotblue2` 蓝色外沿和两个小型命中光点。CP9 绑定塔攻击挂点，CP1 绑定目标身体挂点，由粒子引擎逐帧维护路径；缺少挂点时保留原有高度回退。没有普通淡出或分段重播，换目标、死亡、D 重置时立即销毁；暂时创建失败时每 0.5 秒重试，不重置伤害计时。
+
+五行 `tower_laser_effects.csv` 改用 `continuous`；`addon_game_mode.precache` 从生成配置去重预载激光资源。原有伤害、射程、0.03 秒状态观察不变，CSV 的 0.12/0.18 秒分段参数仍保留供旧模式兼容，新模式不使用。整束为 1 个 Lua 句柄、4 个集合、最多 26 个节点；90 秒模拟创建 1 次，持续期间销毁 0 次，命中含首击共 91 次，绑定成功后无世界坐标覆盖。上述为编译/模拟结论，未测得新版 FPS 或实际视觉质量。
+
+```text
+node tools/map_c6/build-laser-visual-particles.cjs
+node tools/map_c6/verify-laser-visual.cjs --compiled --log-dir output/tower_vfx_polish_20261001
+```
+
+生成后先同步到 content，再以 Valve resourcecompiler 编译四个资源。源清单见 [laser/manifest.json](laser/manifest.json)，验证见 [laser/validation.json](laser/validation.json)。当前用户的暂停对局保留，必须完整重启 Tools 后开新局验收；旧四塔移动截图只证明上一版跟随能力，不证明新光束的观感。
 
 ## 武器实机预览
 

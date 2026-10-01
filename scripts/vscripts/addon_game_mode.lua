@@ -694,11 +694,14 @@ function M.precache(context)
             end
         end
     end
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
-        context
-    )
+    local precached_lasers = {}
+    for _, row in ipairs(require("config/generated/tower_laser_effects").rows or {}) do
+        local particle = tostring(row.particle_name or "")
+        if row.enabled ~= false and particle ~= "" and not precached_lasers[particle] then
+            PrecacheResource("particle", particle, context)
+            precached_lasers[particle] = true
+        end
+    end
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning.vpcf",
