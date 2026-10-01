@@ -1,0 +1,275 @@
+{
+  "status": "PASS",
+  "tower_rows": 20,
+  "asset_rows": 3,
+  "only_changed_field": "projectile resource",
+  "damage_speed_skills_unchanged": true,
+  "projectile": "particles/units/heroes/hero_lich/lich_chain_frost.vpcf",
+  "resources": [
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost.vpcf",
+      "sha256": "dcc99a4b4fc453820e95d2d9dc49c4437a9974d1fcd14bdc7f39b9015be0f7bc"
+    },
+    {
+      "resource": "models/particle/sphere.vmdl",
+      "sha256": "2951e2237f448c4dd63748712c0e955d6259a798f3e74d9398dd99ab146b869f"
+    },
+    {
+      "resource": "materials/models/particle/sphere_hotblue2.vmat",
+      "sha256": "54558e09f6bae8458e7cd3b6d6a4a3c3f9f75b8cabc0719efb74e31be83d57bb"
+    },
+    {
+      "resource": "materials/models/particle/sphere_hotblue2_color_tga_5c3a6ddd.vtex",
+      "sha256": "0e364303e8423b42b7eff9d94e1d8cf79f72858c8161f85192cf38d9264b4ad7"
+    },
+    {
+      "resource": "materials/default/default_fresnelwarprim_tga_d9279d65.vtex",
+      "sha256": "55d9fe78c721b011fed77c808c2845c7349bea0c58ed172f71dc3c2b82df9a97"
+    },
+    {
+      "resource": "materials/models/development/flatnormal_normal_psd_b51689c6.vtex",
+      "sha256": "2b8883e03e93abf439a86143ba97a4d576ec563a603e5146be0ea6e2d2402ced"
+    },
+    {
+      "resource": "materials/models/particle/sphere_blood.vmat",
+      "sha256": "b0e5c1e701887e42d09e294d23ca2b891bf4cf127c4309a4b59c5b01b43bacd9"
+    },
+    {
+      "resource": "materials/particle/beam_blood_01_color_tga_973ad5a0.vtex",
+      "sha256": "bd1d769935784ec137df8c1202c5c4eaa5ef09570917c82a5e86060420a67fcf"
+    },
+    {
+      "resource": "materials/particle/beam_liquid_02_normal_psd_1b8a4f77.vtex",
+      "sha256": "018f953756557ebc0892c5693a43280a173b2a3408d558d84dbccff5bbb4639b"
+    },
+    {
+      "resource": "materials/models/particle/sphere_fire2.vmat",
+      "sha256": "dededd770ec7b229f762736445c6dfc599539a5973c216b53049088af9702a65"
+    },
+    {
+      "resource": "materials/particle/beam_fire_02_color_psd_fca31548.vtex",
+      "sha256": "069fd2b569defa0521606ad23bdff96cca61caaa6088eac043ba5b6c95f192ea"
+    },
+    {
+      "resource": "materials/models/particle/sphere_electric1.vmat",
+      "sha256": "9c26916fed640b883192a4690b7ec69e1676cbefb0c352aef5fe595e71bc423a"
+    },
+    {
+      "resource": "materials/particle/bendibeam2_color_psd_dc29541f.vtex",
+      "sha256": "ce593eeb770fc5de5c2572886dd31548d859d37ef75498409db40c3901f44a92"
+    },
+    {
+      "resource": "materials/models/particle/sphere_frozen.vmat",
+      "sha256": "875efc1f816b3f327c45353327f886d6206fb7dd223e048b3f229870b542d235"
+    },
+    {
+      "resource": "materials/models/heroes/statuseffects/frozen_color_psd_77069d7b.vtex",
+      "sha256": "7fc37ca8e67bd25d0b2b4dfe369152ff1fbb6a01a2358cfdffc1abbe1db36b2f"
+    },
+    {
+      "resource": "materials/default/dota_default_cube_tga_c95513b9.vtex",
+      "sha256": "625d75dcc584ca856d439c88006015b201920f4b74b4ccbb2c0f4a37cc8fde37"
+    },
+    {
+      "resource": "materials/models/particle/sphere_frozen_vmat_g_tmasks1_b9053fff.vtex",
+      "sha256": "5dcf286a35f77a480c9bad92bfe1790ff7e03be02c88dd2d8d5f076e8da4de7d"
+    },
+    {
+      "resource": "materials/default/default_specmask_tga_885e1d6b.vtex",
+      "sha256": "50af5d97123514e2c9e02bcd4804c4b5cddbff9603f14034a66b711647f0789c"
+    },
+    {
+      "resource": "materials/default/default_normal_tga_7652cb.vtex",
+      "sha256": "69016f40d5615c3344f570ead66bb679f26d745bce2ba5221956dd18ab1148eb"
+    },
+    {
+      "resource": "materials/models/heroes/bane/bane_specularwarp_specwarp_psd_f2ffaaf5.vtex",
+      "sha256": "d8c2b48782e45426b611bf328bde27b6f09816615d83ff4b4959e30ed7574782"
+    },
+    {
+      "resource": "materials/models/particle/sphere_wavy_1.vmat",
+      "sha256": "40528c6d0786fc4cbd74634cebae797215ee8da96e174558307bed048aa6a9cf"
+    },
+    {
+      "resource": "materials/models/particle/sphere_wavy_1_color_tga_afc14092.vtex",
+      "sha256": "e96fa6f61d136ba1275e6be532d5d6c3f37168b90460d6920cce87788dfa18dc"
+    },
+    {
+      "resource": "materials/models/particle/sphere_solid_1.vmat",
+      "sha256": "74d31fb4fb4f12cc1561d8a41230b7b435f51ebdd5ba8d1725de7a5a77739518"
+    },
+    {
+      "resource": "materials/models/particle/sphere_solid_1_color_tga_d2cbb68a.vtex",
+      "sha256": "b4251cb034e989fd1240fe23d402f001c2ceb72e856c2b5c0641a3873fd670d4"
+    },
+    {
+      "resource": "materials/models/particle/sphere_warp1.vmat",
+      "sha256": "d542e95d431a717c372f7c5948d8dd5fa08633eb4ab0080e53b0c00cf809a2e3"
+    },
+    {
+      "resource": "materials/particle/beam_generic_2_color_psd_2657cedb.vtex",
+      "sha256": "655009bbef7d46e2dce5cb33d7ed9128189ec5367b8ffd54e4f3e6b1b3f41ac3"
+    },
+    {
+      "resource": "materials/models/particle/sphere_cloak.vmat",
+      "sha256": "fd4842f69e807e9523ad140566c85238e283fdd311269cb20fed30eb7b583f89"
+    },
+    {
+      "resource": "materials/particle/beam_generic_2_color_psd_30c4609d.vtex",
+      "sha256": "81019acf85bb0227b0237b844d6b2b858f6932b7fe1b5f41ddb66cc54401a9d9"
+    },
+    {
+      "resource": "materials/default/default_detail2_tga_70788555.vtex",
+      "sha256": "8006a7447538c02e9945f255f5bca5f825b2df2ef843c186b4d561d2930961fd"
+    },
+    {
+      "resource": "materials/models/particle/sphere_lightglow.vmat",
+      "sha256": "fea2c56bcc41738842607429422f197e422aa76f1948463efc5a1e13d6249c8f"
+    },
+    {
+      "resource": "materials/models/particle/sphere_lightglow_color_psd_bd832d78.vtex",
+      "sha256": "7ca8c75cc12cfe3a09e9db93c57d9ea55f9e7287e26c0fe54e3156dcf79efaa6"
+    },
+    {
+      "resource": "materials/models/particle/sphere_lightglow_addself.vmat",
+      "sha256": "90d01057edcde6b39881fbe415eb35430eabe93ceca7c94589d008d47d9464f8"
+    },
+    {
+      "resource": "materials/models/particle/sphere_lightglow_add_color_psd_f5c01776.vtex",
+      "sha256": "acde99a80ca07adfedaa0e3b510d7f9be465d51ed25818d8b3194de036631e51"
+    },
+    {
+      "resource": "materials/models/particle/sphere_lightglow_refractblr.vmat",
+      "sha256": "ae4bd5e62cb409660b5c02a5b54786098d7adf9804d3da433bb0ff7d871ca887"
+    },
+    {
+      "resource": "materials/models/development/flatnormal_normal_psd_c69b49b8.vtex",
+      "sha256": "390b36e560d4955a04ff9e772bf6bfa009cb7f135c5ea76e50ee4107ab146c1a"
+    },
+    {
+      "resource": "materials/models/particle/sphere_shield.vmat",
+      "sha256": "a65f4a61a9c89a86ee47a4347c02f52b73bf66435f2d3f5cca3f60c15013321b"
+    },
+    {
+      "resource": "materials/particle/sphere_shield_trans_psd_c078e305.vtex",
+      "sha256": "b3c234d3b6ed2a62f6e224602b33e473fc7578cf2163ca7e175cfc2a082958ad"
+    },
+    {
+      "resource": "materials/models/particle/sphere_hotblue3.vmat",
+      "sha256": "3c6b531bdff71c04737bc57197d143d020430965309daaa329a756d53a0f0704"
+    },
+    {
+      "resource": "materials/models/particle/sphere_hotblue3_color_psd_bfb40a28.vtex",
+      "sha256": "90cb239e402a9f0152cc01443e5bb2a7722f6fcbc99c8bf558f32263c52da67d"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_e.vpcf",
+      "sha256": "16bbbf27969610eec8b90bf30af205ae5943c35e623512fdb9616db38fd6ea97"
+    },
+    {
+      "resource": "materials/particle/smoke3/smoke3b.vtex",
+      "sha256": "68a4629525fb249b36f591f753a68bddbbaab5a27aeb0af98958de23f9a18ccf"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_c.vpcf",
+      "sha256": "47b9c917980292cac24cb965f990d8122141a30522faa34c51d2e2ac5162fffd"
+    },
+    {
+      "resource": "materials/particle/particle_ring_wavy4.vtex",
+      "sha256": "07378130e89df61b74cf52556d1d7d942b685faf2acb8df19c459461db092def"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_f.vpcf",
+      "sha256": "9419008d926eb64dedebe5497d97554b73de93699d6204a0c80b244c87a625ac"
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_002.vtex",
+      "sha256": "8ea0bd795adb4b27870faa6be1ab774b16371aedd3ce6ac37b474ab1d06ce71c"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_g.vpcf",
+      "sha256": "319aeea6615627a4fd839a8231269044455b60eac808370ae12354afba03d8f5"
+    },
+    {
+      "resource": "materials/particle/particle_modulate_04.vtex",
+      "sha256": "216ea4690ffe803caccb86c65ef9808c821a8bf7e2863a6e6a5131fbca0be63b"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_light.vpcf",
+      "sha256": "fac2ef961755da10ddff89d8567ae82b591c667dc0878e350eeab3516ee7e82e"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode.vpcf",
+      "sha256": "ae5a7bbc2a28b9d996484ac2e662452c83e3fe0f0acf44ac522ee4d2ac5db034"
+    },
+    {
+      "resource": "materials/particle/impact/fleks3.vtex",
+      "sha256": "3104f7900f1ce2ff310870f5291f66420949dab8a52f42d4c7e392b8ddfcce5a"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode_d.vpcf",
+      "sha256": "8bf81561082686559799786d7f619c2c134079ea072cebc6b70001574ea538b8"
+    },
+    {
+      "resource": "materials/particle/sparks/sparks.vtex",
+      "sha256": "f6a32d59a41ab1e61339814b48e910874730e8b840cb6af98181a4d04dafa988"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode_b.vpcf",
+      "sha256": "f70b866374cd107675719f4f0be3eaf4ce073c315a195954bcb413e9e0db520a"
+    },
+    {
+      "resource": "materials/particle/particle_cone_gradient_1.vtex",
+      "sha256": "7288c1368e07c11517b8b806a3dbc06ca1f38f7047cab437793f73cf32f4b532"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode_c.vpcf",
+      "sha256": "719ae3514aecc266ed63c7dfa4f97503eaa6321d7bfac9040379c1d867c63ed6"
+    },
+    {
+      "resource": "materials/particle/particle_flares/aircraft_white.vtex",
+      "sha256": "73a9253264dd712ab3b37db36eb65ee6d422ccf9e0522397014f161f0d103c34"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_launch.vpcf",
+      "sha256": "28377892a38f381f1a166501965ac187c2540e18075fa74065ad11d8e332a2d3"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_launch_b.vpcf",
+      "sha256": "64bb0eedea69571b29291f531754a55cd239f4b39550aa35ee2948880b90870a"
+    },
+    {
+      "resource": "materials/particle/particle_glow_04.vtex",
+      "sha256": "295c706a5ae2a254fe848f6df4359177725309e18af768da2ea4b1683254b7b1"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_trail.vpcf",
+      "sha256": "b01f6a929eebbad0742ef663dd5fb981fbab9524d1fc81a056b3d5fb49360109"
+    },
+    {
+      "resource": "materials/particle/particle_flares/aircraft_white_v2.vtex",
+      "sha256": "1fb98406cbe60358a41d55fb93bbf29ba99c4093fab6e6ad3db4628efd971434"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode_beam.vpcf",
+      "sha256": "fa6bdfd9b5be5683c7daa31e33cbd0062d49cf7ae0ecd94f70c4ce6001dea5bb"
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_006_white.vtex",
+      "sha256": "a7daa048d6b71712aa26a070a92aa1aa3457f2f98b58cca25a326fe30acbfc09"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_flakes.vpcf",
+      "sha256": "1a4ef6b10bf0f2a4a10fa697e59f80063d0f95a56d9347a664d88c591d997254"
+    },
+    {
+      "resource": "particles/units/heroes/hero_lich/lich_chain_frost_mist.vpcf",
+      "sha256": "643c4aac9d0ca00c1656f8b71925a61ce5b6a014efdf1c8633a7058e7802a44d"
+    },
+    {
+      "resource": "materials/particle/smoke/static/static_smoke.vtex",
+      "sha256": "b4db32c0fb5cf71a6cda967c958ec062d3bac6fe05c15846c542fb9d467224db"
+    }
+  ],
+  "in_game_visual_verified": false
+}

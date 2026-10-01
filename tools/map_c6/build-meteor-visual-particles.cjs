@@ -1,6 +1,6 @@
 'use strict';
 // CP0 world origin; CP1=(gameplay radius, lava duration, reserved). No damage or
-// timing rules live here. Falling cube separately uses the native CP0/1/2 path.
+// damage rules live here. Phoenix egg uses the native CP0/1/2 path at 0.4s.
 const fs=require('fs'), path=require('path'), L=require('./lib.cjs');
 const root=path.resolve(__dirname,'../..');
 const out=path.join(root,'art/effects/skill_visuals/source/particles/survival/skills');
@@ -75,31 +75,33 @@ definitions.meteor_impact={_class:'CParticleSystemDefinition',m_nBehaviorVersion
     m_Operators:[{_class:'C_OP_BasicMovement'},{_class:'C_OP_Decay'},
         {_class:'C_OP_FadeOutSimple',m_flFadeOutTime:0.8},
         {_class:'C_OP_InterpolateRadius',m_flStartScale:0.08,m_flEndScale:1}],
-    m_Children:[child('meteor_impact_sparks'),{m_ChildRef:nativeRef('particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_flash.vpcf')} ]};
-// Rubick's actual angular model and native path solver, with only four warm
-// Invoker children. No green Rubick fire/lens, rolling meteor or screen flash.
-definitions.meteor_cube_fall={_class:'CParticleSystemDefinition',m_nBehaviorVersion:5,
+    m_Children:[child('meteor_impact_sparks'),{m_ChildRef:nativeRef('particles/units/heroes/hero_phoenix/phoenix_supernova_reborn_sphere.vpcf')} ],
+    m_PreEmissionOperators:[{_class:'C_OP_HSVShiftToCP',m_DefaultHSVColor:[226,158,0,255]}]};
+// Actual Supernova egg model plus its native moving-core fire and glow.
+// Both children follow CP3. Ground rings and full-screen flare stay out of flight.
+definitions.meteor_phoenix_fall={_class:'CParticleSystemDefinition',m_nBehaviorVersion:5,
     m_nMaxParticles:1,m_flConstantRadius:1,m_bShouldSort:false,
     m_Renderers:[{_class:'C_OP_RenderModels',m_flAnimationRate:0,m_bOrientZ:true,
-        m_ModelList:[{m_model:nativeRef('models/items/rubick/rubick_arcana/rubick_arcana_cube.vmdl')}],
+        m_ModelList:[{m_model:nativeRef('models/heroes/phoenix/phoenix_egg.vmdl')}],
         m_bAnimated:true,m_nLOD:1,m_bForceLoopingAnimation:true}],
     m_Operators:[{_class:'C_OP_BasicMovement'},
         {_class:'C_OP_SetControlPointsToParticle',m_nFirstControlPoint:3,m_bSetOrientation:true},
         {_class:'C_OP_RemapCPOrientationToYaw',m_nCP:3},{_class:'C_OP_SpinUpdate'}],
-    m_Initializers:[{_class:'C_INIT_CreateWithinSphere'},init(3,literal(0.65))],
+    m_Initializers:[{_class:'C_INIT_CreateWithinSphere'},init(3,literal(1.25))],
     m_Emitters:[{_class:'C_OP_InstantaneousEmitter',m_nParticlesToEmit:literal(1)}],
-    m_Constraints:[{_class:'C_OP_ConstrainDistanceToPath',m_flTravelTime:1.5,m_flMaxDistance0:0,m_flMaxDistance1:0,
+    m_Constraints:[{_class:'C_OP_ConstrainDistanceToPath',m_flTravelTime:0.4,m_flMaxDistance0:0,m_flMaxDistance1:0,
         m_PathParameters:{m_nEndControlPointNumber:1}}],
-    m_Children:['fire','glow','smoke','sparks'].map(suffix=>({m_ChildRef:nativeRef(
-        'particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly_'+suffix+'.vpcf')})),
-    m_PreEmissionOperators:[{_class:'C_OP_StopAfterCPDuration',m_flDuration:{m_nType:'PF_TYPE_CONTROL_POINT_COMPONENT',
+    m_Children:['glow','lava'].map(suffix=>({m_ChildRef:nativeRef(
+        'particles/units/heroes/hero_phoenix/phoenix_supernova_egg_'+suffix+'.vpcf')})),
+    m_PreEmissionOperators:[{_class:'C_OP_HSVShiftToCP',m_DefaultHSVColor:[230,123,1,255]},
+        {_class:'C_OP_StopAfterCPDuration',m_flDuration:{m_nType:'PF_TYPE_CONTROL_POINT_COMPONENT',
         m_nControlPoint:2,m_nVectorComponent:0}}]};
 fs.mkdirSync(out,{recursive:true});
 for(const [name,value] of Object.entries(definitions))fs.writeFileSync(path.join(out,name+'.vpcf'),header+kv(value)+'\n');
 fs.writeFileSync(path.join(root,'art/effects/skill_visuals/manifest.json'),JSON.stringify({
     generated_by:'tools/map_c6/build-meteor-visual-particles.cjs',
-    source_reference:'Valve rubick_chaos_meteor_fly: rubick_arcana_cube model, travel time 1.5 seconds',
-    runtime_fall_duration:'unchanged skill config 0.8 seconds; CP1 extended to cross ground at impact',
+    source_reference:'Valve Phoenix Supernova egg model, native egg glow/lava (with steam) and reborn sphere; native path solver',
+    runtime_fall_duration:'0.4 seconds, down from 0.8; unchanged radius, per-cast damage, lava and second-meteor interval',
     lava_particle_budget:26,impact_custom_particle_budget:25,
     lava_ground_layer_heights:[lavaGroundHeight,lavaCrackHeight],
     lava_position_operator:'C_OP_SetToCP with explicit FLOAT vector offsets',

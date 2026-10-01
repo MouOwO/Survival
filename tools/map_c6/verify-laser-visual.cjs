@@ -39,6 +39,52 @@ function allRefs(text) {
   return [...text.matchAll(/resource:"([^"]+)"/g)].map(match => match[1]);
 }
 function contract(text, row, label) {
+  assert(!text.includes('m_bDisableZBuffering = true'), label + ': effects must respect depth');
+  if (/laser_afterglow(?:_arcs)?\.vpcf$/.test(row.resource)) {
+    assert(text.includes('C_OP_InstantaneousEmitter') && !text.includes('C_OP_ContinuousEmitter'), label + ': death tail must emit once');
+    assert(text.includes('C_OP_Decay') && text.includes('C_OP_FadeOutSimple'), label + ': death tail must fade and expire');
+    assert(/m_flConstantLifespan\s*=\s*0\.3\b/.test(text), label + ': tail must last 0.3 seconds');
+    assert(!text.includes('C_OP_LockToBone') && !text.includes('laser_target_electric') && !text.includes('laser_beam_io_electric'), label + ': tail must not depend on a corpse or continuous child');
+    assert(new RegExp('m_nMaxParticles\\s*=\\s*' + row.max_particles + '\\b').test(text), label + ': tail budget drift');
+    if (row.resource.endsWith('laser_afterglow.vpcf')) {
+      assert(text.includes('C_OP_MaintainSequentialPath') && /m_nStartControlPointNumber\s*=\s*9\b/.test(text)
+        && /m_nEndControlPointNumber\s*=\s*1\b/.test(text), label + ': detached tail must preserve the beam path');
+    }
+    return;
+  }
+  if (/laser_(beam_io_electric|target_electric)\.vpcf$/.test(row.resource)) {
+    assert(text.includes('C_OP_ContinuousEmitter') && text.includes('C_OP_Decay')
+      && text.includes('C_OP_FadeOutSimple'), label + ': native arcs need bounded continuous emission');
+    assert(new RegExp('m_nMaxParticles\\s*=\\s*' + row.max_particles + '\\b').test(text), label + ': arc budget drift');
+    if (row.resource.includes('target_electric')) {
+      assert(text.includes('C_INIT_CreateOnModel') && text.includes('C_OP_LockToBone'), label + ': arcs must follow enemy model');
+      if (label.startsWith('compiled ')) {
+        // Valve migrates the legacy CP field to separate model/transform inputs.
+        assert.equal((text.match(/m_nControlPoint\s*=\s*7\b/g) || []).length, 4, label + ': model and transform inputs must all use CP7');
+        assert.equal((text.match(/PM_TYPE_CONTROL_POINT/g) || []).length, 2, label + ': both operators need entity models');
+      } else {
+        assert.equal((text.match(/m_nControlPointNumber\s*=\s*7\b/g) || []).length, 2, label + ': model spawn and lock must both use CP7');
+      }
+      assert(text.includes('materials/particle/electrical_arc/electrical_arc.vtex'), label + ': Zeus arc texture missing');
+    } else {
+      assert(text.includes('C_OP_LockToSavedSequentialPath'), label + ': Io electric strand must follow the beam');
+      assert.equal((text.match(/m_nStartControlPointNumber\s*=\s*9\b/g) || []).length, 2, label + ': electric path must start at orb');
+      assert(text.includes('materials/particle/electricity/electricity_beam_white_a.vtex'), label + ': Io electric texture missing');
+    }
+    return;
+  }
+  if (/laser_(blood|beam_motes|beam_sparks|beam_pulse|beam_strike|charge_feed)\.vpcf$/.test(row.resource)) {
+    assert(text.includes('C_OP_Decay') && text.includes('C_OP_FadeOutSimple'), label + ': finite particles must expire');
+    assert(text.includes('C_OP_BasicMovement') || (row.resource.includes('beam_strike') && text.includes('C_OP_SetToCP')), label + ': missing motion/impact anchor');
+    if (/beam_(motes|pulse)/.test(row.resource)) {
+      assert(text.includes('C_OP_ConstrainDistanceToPath'), label + ': directed travel missing');
+      assert(/m_nStartControlPointNumber\s*=\s*9\b/.test(text) && /m_nEndControlPointNumber\s*=\s*1\b/.test(text), label + ': pulses must travel from orb to enemy');
+      const seconds = row.resource.includes('motes') ? '0.14' : '0.18';
+      assert(text.includes('m_flTravelTime = ' + seconds), label + ': travel time changed');
+    }
+    assert(new RegExp('m_nMaxParticles\\s*=\\s*' + row.max_particles + '\\b').test(text), label + ': budget drift');
+    return;
+  }
   assert(text.includes('C_OP_InstantaneousEmitter'), label + ': emitter must allocate once');
   assert(!text.includes('C_OP_ContinuousEmitter'), label + ': no endless particle churn');
   assert(!text.includes('C_OP_Decay') && !text.includes('C_OP_FadeOutSimple')
@@ -47,7 +93,7 @@ function contract(text, row, label) {
   assert(/m_flConstantLifespan\s*=\s*999999(?:\.0)?/.test(text), label + ': sustained lifespan missing');
   assert(new RegExp('m_nMaxParticles\\s*=\\s*' + row.max_particles + '\\b').test(text), label + ': particle budget drift');
   assert(!text.includes('m_bDisableZBuffering = true'), label + ': endpoint glow must respect depth');
-  if (row.resource.endsWith('laser_beam.vpcf') || row.resource.endsWith('laser_beam_envelope.vpcf')) {
+  if (/laser_beam(?:_envelope|_filament)?\.vpcf$/.test(row.resource)) {
     assert(text.includes('C_OP_RenderRopes') && text.includes('C_OP_MaintainSequentialPath'),
       label + ': missing native rope/follow operator');
     assert(text.includes('C_INIT_CreateSequentialPath'), label + ': path initializer missing');
@@ -57,8 +103,7 @@ function contract(text, row, label) {
       label + ': solid beam must not taper out or restart a long fade');
   } else {
     assert(text.includes('C_OP_RenderSprites'), label + ': hit sprite missing');
-    assert(/_class\s*=\s*"C_OP_SetToCP"\s+m_nControlPointNumber\s*=\s*1\b/.test(text),
-      label + ': hit point must stay pinned to body CP1');
+    assert(text.includes('C_OP_SetToCP'), label + ': sprite must follow its anchor');
   }
 }
 for (const row of manifest.outputs) {
@@ -105,20 +150,33 @@ for (const row of manifest.outputs) {
   }
   records.push(record);
 }
-assert.equal(total, 26, 'Total live particle budget changed');
-assert.equal(known.size, 4, 'Persistent beam closure must contain four collections');
+assert.equal(total, 187, 'Resource closure budget (163 plus one 24-particle death tail) changed');
+assert.equal(known.size, 14, 'Io beam, electric strands, model-bound arcs, impact, blood, compact charge and finite death tail closure');
+const rootSource = fs.readFileSync(isSource('particles/survival/towers/laser_beam.vpcf'), 'utf8');
+assert(!/laser_beam_(envelope|filament)/.test(rootSource), 'Broad light curtain must not be linked');
+assert(rootSource.includes('materials/particle/beam_hotblue.vtex') && /m_flConstantRadius\s*=\s*96\.0/.test(rootSource), 'Use actual Io core texture and width');
+assert(!rootSource.includes('C_OP_RemapCPtoVector'), 'Io core must not become a thin red line');
+assert(rootSource.includes('laser_target_electric') && rootSource.includes('laser_beam_io_electric'), 'Electric layers must be owned by the beam');
+const charge = fs.readFileSync(isSource('particles/survival/towers/laser_charge.vpcf'), 'utf8');
+assert(!charge.includes('laser_charge_fluid') && !charge.includes('C_OP_RemapCPtoVector')
+  && !charge.includes('particle_glow_05') && !charge.includes('C_OP_OscillateScalar'), 'Overhead red glow curtain must be removed');
+assert(/m_flConstantRadius\s*=\s*10\.0/.test(charge), 'Legacy source must remain small');
+assert(rootSource.includes('laser_beam_motes') && rootSource.includes('laser_beam_sparks'),
+  'Removing the curtain must preserve discrete light particles');
 const csv = fs.readFileSync(path.join(root, 'data/csv/建筑与工人系统/防御塔/tower_laser_effects.csv'), 'utf8');
 const rows = csv.trim().split(/\r?\n/).filter(line => /^laser_lv/.test(line)).map(line => line.split(','));
-assert.equal(rows.length, 5);
+assert.equal(rows.length, 20);
 for (const row of rows) {
-  assert.equal(row[3], 'particles/survival/towers/laser_beam.vpcf');
-  assert.equal(row[4], 'continuous');
-  assert.deepEqual(row.slice(5, 14), ['0', '0.03', '0.12', '0.18', '160', '70', '5', '5', '1'],
+  assert(native.entries.has(row[3] + '_c') && row[3].includes('tinker'), 'Production must use an existing native Tinker effect');
+  assert.equal(row[4], 'native');
+  assert.equal(row[15], '1', 'production laser must use head surface');
+  assert.equal(row[19], '1', 'production source must be the orb');
+  assert.deepEqual(row.slice(5, 14), ['0', '0.03', '0.24', '0.48', '185', '70', '5', '5', '1'],
     'CSV timing/range/fallback/damage values drifted');
 }
 const lua = fs.readFileSync(path.join(root, 'scripts/vscripts/config/generated/tower_laser_effects.lua'), 'utf8');
-assert.equal((lua.match(/beam_mode = "continuous"/g) || []).length, 5, 'CSV generated Lua is stale');
-assert.equal((lua.match(/particle_name = "particles\/survival\/towers\/laser_beam\.vpcf"/g) || []).length, 5);
+assert.equal((lua.match(/beam_mode = "native"/g) || []).length, rows.length, 'CSV generated Lua is stale');
+for (const row of rows) assert(lua.includes('particle_name = "' + row[3] + '"'), 'Native generated path missing');
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, compiled ? 'compiled_validation.json' : 'source_validation.json'),
   JSON.stringify({ status: 'PASS', compiled, custom_particle_budget: total, records }, null, 2) + '\n');

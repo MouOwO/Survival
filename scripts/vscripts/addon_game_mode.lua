@@ -695,6 +695,9 @@ function M.precache(context)
         end
     end
     local precached_lasers = {}
+    require("systems/zeus_lightning_visual").precache(context)
+    PrecacheResource("particle", "particles/units/heroes/hero_siren/siren_net.vpcf", context)
+    PrecacheResource("particle", "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact.vpcf", context)
     for _, row in ipairs(require("config/generated/tower_laser_effects").rows or {}) do
         local particle = tostring(row.particle_name or "")
         if row.enabled ~= false and particle ~= "" and not precached_lasers[particle] then
@@ -748,7 +751,7 @@ function M.precache(context)
         context
     )
     for _, particle in ipairs({
-        "particles/survival/skills/meteor_cube_fall.vpcf",
+        "particles/survival/skills/meteor_phoenix_fall.vpcf",
         "particles/survival/skills/meteor_impact.vpcf",
         "particles/survival/skills/meteor_lava.vpcf",
     }) do
@@ -761,7 +764,8 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+        "particles/survival/skills/wyvern_blizzard_snow.vpcf",
         context
     )
     PrecacheResource(

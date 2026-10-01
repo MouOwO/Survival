@@ -28,6 +28,7 @@ local building_count_limits = require("systems/building_count_limit_service")
 local building_defeat_rules = require("systems/building_defeat_rules")
 local online_time_service = require("systems/online_time_service")
 local builder_work = require("systems/builder_work_position_service")
+local grid_config = require("config/grid_placement_config")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
@@ -697,6 +698,14 @@ local function start_building(payload)
         {}
     )
     apply_initial_stats(unit, check.definition)
+    -- The real entity reserves collision from the beginning, even while its
+    -- render model is hidden. Completion restores the building's normal hull.
+    local footprint = check.definition.footprint or {}
+    local construction_radius = math.min(tonumber(footprint.x) or 2,
+        tonumber(footprint.y) or 2) * (tonumber(grid_config.cell_size) or 64) * 0.5
+    construction_radius = math.max(tonumber(unit.survival_hull_radius) or 0, construction_radius)
+    unit:SetHullRadius(construction_radius)
+    unit.survival_hull_radius = construction_radius
     add_building_abilities(unit, check.definition, false)
     local state = {
         entindex = unit:entindex(),
@@ -800,7 +809,7 @@ local function start_building(payload)
             state.level
         )
         building_visual.apply(unit, completed_level)
-        -- Bind the reveal to the final model/facing before fading its white coat.
+        -- Only reveal after the authoritative construction deadline and final model apply.
         construction_visual.complete(
             construction_visual_state,
             unit,

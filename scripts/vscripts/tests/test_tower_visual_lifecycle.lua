@@ -21,7 +21,7 @@ for line in csv:lines() do
                 if key == "enabled" then assert(row[key] == (fields[i] == "1"))
                 elseif key == "color" then assert(table.concat(row[key], "|") == fields[i])
                 elseif key:find("^radius_") or key == "alpha" then assert(row[key] == tonumber(fields[i]))
-                else assert(row[key] == fields[i], "CSV/generated mismatch: " .. key) end
+                else assert((row[key] or "") == fields[i], "CSV/generated mismatch: " .. key) end
             end
             assert(row.radius_r > 0 and row.radius_r < row.radius_sr and row.radius_sr < row.radius_ssr)
             assert(row.alpha > 0 and row.alpha <= 1)
@@ -32,6 +32,7 @@ csv:close()
 assert(records == 8 and #profiles.rows == records)
 
 PATTACH_ABSORIGIN_FOLLOW = 10
+PATTACH_POINT_FOLLOW = 11
 DOTA_GAMERULES_STATE_POST_GAME = 8
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
 local world, phase = {}, 6
@@ -52,13 +53,17 @@ function ParticleManager:CreateParticle(name, attach, unit)
     particles[id] = { name = name, unit = unit, controls = {}, world = world }
     return id
 end
-function ParticleManager:SetParticleControlEnt(id, cp, unit, attach)
-    assert(cp == 0 and attach == PATTACH_ABSORIGIN_FOLLOW)
+function ParticleManager:SetParticleControlEnt(id, cp, unit, attach, attachment)
+    assert((cp == 0 and attach == PATTACH_ABSORIGIN_FOLLOW)
+        or (cp == 1 and attach == PATTACH_ABSORIGIN_FOLLOW and attachment == "")
+        or (cp == 1 and attach == PATTACH_POINT_FOLLOW and attachment == "attach_hitloc"))
     particles[id].bound_unit = unit
+    particles[id].bindings = particles[id].bindings or {}
+    particles[id].bindings[cp] = { unit = unit, attachment = attachment }
 end
 function ParticleManager:SetParticleControl(id, cp, value)
     if created == fail_control_at then error("injected control failure") end
-    assert(cp == 1 or cp == 2, "only size/alpha and color are constant CPs")
+    assert(cp == 1 or cp == 2 or cp == 62, "only size/alpha, color and native HSV are constant CPs")
     particles[id].controls[cp] = value
 end
 function ParticleManager:DestroyParticle(id, immediate)
@@ -107,9 +112,28 @@ end)
 local service = require("systems/tower_visual_service")
 service.precache({})
 local expected_precache = {["particles/base_attacks/ranged_goodguy.vpcf"] = true}
+local shadow_path = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
+local mystery_base_path = "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash.vpcf"
+expected_precache[mystery_base_path] = true
+expected_precache[shadow_path] = true
+local machine_base_paths = {
+    "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_dark.vpcf",
+    "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_timer.vpcf",
+}
+for _, path in ipairs(machine_base_paths) do expected_precache[path] = true end
+local anti_air_base_paths = {
+    "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings.vpcf",
+    "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf",
+}
+for _, path in ipairs(anti_air_base_paths) do expected_precache[path] = true end
+expected_precache["particles/survival/towers/laser_charge.vpcf"] = true
+expected_precache["particles/survival/towers/laser_blood.vpcf"] = true
+expected_precache["particles/survival/towers/laser_afterglow.vpcf"] = true
 for _, profile in ipairs(profiles.rows) do
     for _, field in ipairs({"core", "detail", "detail_ssr", "crown"}) do
-        expected_precache["particles/survival/towers/" .. profile[field] .. ".vpcf"] = true
+        if profile[field] and profile[field] ~= "" then
+            expected_precache["particles/survival/towers/" .. profile[field] .. ".vpcf"] = true
+        end
     end
 end
 for name in pairs(expected_precache) do assert(precached[name], "missing profile precache: " .. name) end
@@ -127,17 +151,62 @@ assert(live_count() == 0 and base.projectile == "particles/base_attacks/ranged_g
 base:SetRangedProjectileName(base.survival_projectile_model) -- deferred D refresh
 assert(base.projectile == "particles/base_attacks/ranged_goodguy.vpcf")
 service.remove(1)
+-- Native Tinker mode has no Io orb/model overhead, including after upgrades.
+local laser_skills = require("systems/tower_skill_runtime")
+laser_skills.apply(base, { "laser_lv01" })
+service.apply(state(base, 1, "class_2"))
+assert(live_count() == 0)
+laser_skills.apply(base, { "laser_lv03" })
+service.apply(state(base, 3, "class_2"))
+assert(live_count() == 0)
+service.remove(1)
+laser_skills.apply(base, {})
+assert(live_count() == 0)
 local cases = {{6,1}, {10,1}, {11,2}, {15,2}, {16,2}, {20,2}, {21,3}, {25,3}}
 for class_number = 1, 7 do
     local u = unit(10 + class_number)
     for _, case in ipairs(cases) do
         local payload = state(u, case[1], "class_" .. class_number)
         assert(service.apply(payload))
-        assert(live_count() == case[2] and service.debug_snapshot().particles == case[2])
+        local replaced = class_number == 2 or class_number == 4 or class_number == 7
+        local expected_count = class_number == 2 and 1
+            or ((class_number == 4 or class_number == 7) and 2 or case[2])
+        assert(live_count() == expected_count and service.debug_snapshot().particles == expected_count)
         local profile = profiles.by_id[payload.tower_class]
         local rarity = case[1] <= 10 and "r" or case[1] <= 15 and "sr" or "ssr"
         local ids = service.debug_snapshot(u.index).particle_ids
+        if replaced then
+            for _, field in ipairs({"core", "detail", "detail_ssr", "crown"}) do
+                assert(not profile[field] or profile[field] == "", "replaced base must remove all old image layers")
+            end
+            for _, id in ipairs(ids) do
+                assert(not particles[id].name:find("/bases/", 1, true), "old base must never stack with replacement")
+            end
+        end
+        if class_number == 2 then
+            local effect = particles[ids[1]]
+            assert(effect.name == mystery_base_path and effect.bindings[1].unit == u)
+            assert(effect.bindings[1].attachment == "" and next(effect.controls) == nil)
+        end
+        if class_number == 4 then
+            for offset, path in ipairs(machine_base_paths) do
+                local effect = particles[ids[offset]]
+                assert(effect.name == path and effect.bindings[0].unit == u)
+                assert(effect.bindings[0].attachment == "", "base must bind at feet")
+                assert(next(effect.controls) == nil, "preserve native foot radius/color")
+            end
+        end
+        if class_number == 7 then
+            for offset, path in ipairs(anti_air_base_paths) do
+                local effect = particles[ids[offset]]
+                assert(effect.name == path and effect.bindings[0].unit == u)
+                assert(effect.bindings[0].attachment == "")
+                local hsv = effect.controls[62]
+                assert(hsv.x == 0 and hsv.y == 1 and hsv.z == 1, "trap rings need neutral HSV")
+            end
+        end
         local radius = profile["radius_" .. rarity]
+        if not replaced then
         assert(particles[ids[1]].controls[1].x == radius, "core keeps the profile radius")
         if case[2] >= 2 then
             local field = rarity == "ssr" and "detail_ssr" or "detail"
@@ -150,12 +219,24 @@ for class_number = 1, 7 do
             assert(particles[ids[3]].controls[1].x < radius * 0.8, "red-star accent stays inside the core")
             assert(particles[ids[3]].controls[1].z < profile.alpha * 0.4)
         end
+        end
         local before_created, before_destroyed = created, #destroyed
-        u.origin = Vector(300, -400, 384) -- D moves this same entity and style.
         bus.emit(events.BUILDING_CHANGED, payload)
-        assert(created == before_created and #destroyed == before_destroyed, "D must not rebuild attached effects")
+        assert(created == before_created, "unchanged state must not duplicate base effects")
+        u.origin = Vector(u.origin.x + 300, u.origin.y - 400, 384)
+        bus.emit(events.BUILDING_CHANGED, payload)
+        if class_number == 7 then
+            assert(created == before_created + expected_count and #destroyed == before_destroyed + expected_count,
+                "relocation must replace stationary native trap rings and retire old positions")
+            assert(live_count() == expected_count)
+        else
+            assert(created == before_created and #destroyed == before_destroyed, "D must not rebuild attached effects")
+        end
         for _, effect in pairs(particles) do
-            if effect.world == world and not effect.released then
+            if effect.world == world and not effect.released
+                and effect.name ~= mystery_base_path
+                and effect.name ~= machine_base_paths[1] and effect.name ~= machine_base_paths[2]
+                and effect.name ~= anti_air_base_paths[1] and effect.name ~= anti_air_base_paths[2] then
                 assert(effect.bound_unit == u and effect.controls[1].x > 0)
                 assert(effect.controls[1].z > 0 and effect.controls[1].z <= 1)
                 assert(effect.controls[2].x == tonumber(profiles.by_id[payload.tower_class].color[1]))
@@ -171,6 +252,13 @@ service.apply(state(u, 21, "class_1"))
 local before_destroyed = #destroyed
 service.apply(state(u, 21, "class_3"))
 assert(#destroyed == before_destroyed + 3 and live_count() == 3, "cross-route swap must retire every old layer")
+before_destroyed = #destroyed
+service.apply(state(u, 21, "class_2"))
+assert(#destroyed == before_destroyed + 3 and live_count() == 1,
+    "replacement base retires core, detail and red-star layers")
+assert(particles[service.debug_snapshot(u.index).particle_ids[1]].name == mystery_base_path)
+service.apply(state(u, 21, "class_4"))
+assert(live_count() == 2, "switching native bases must retire the old native root")
 local replacement = unit(30)
 service.apply(state(replacement, 11, "class_6"))
 assert(live_count() == 2)
@@ -189,9 +277,22 @@ service.remove(30)
 local ultimate = unit(40)
 local ultimate_state = {unit = ultimate, entindex = 40, building_id = "ultimate_tower", level = 1, player_id = 1}
 bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED, ultimate_state)
-assert(live_count() == 3)
+assert(live_count() == 4)
+local shadow_id = service.debug_snapshot(40).particle_ids[4]
+assert(particles[shadow_id].name == shadow_path)
+assert(particles[shadow_id].bindings[1].unit == ultimate)
+assert(particles[shadow_id].bindings[1].attachment == "attach_hitloc")
+local shadow_created = created
+ultimate.origin = Vector(700, -200, 384)
+for _ = 1, 20 do
+    bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED, ultimate_state)
+    service._sweep_for_test()
+end
+assert(created == shadow_created and live_count() == 4,
+    "persistent smoke survives idle/move/refresh without recreating")
 bus.emit(events.TOWER_FUSION_RUNTIME_REMOVED, { entindex = 40 })
 assert(live_count() == 0)
+assert(particles[shadow_id].destroyed and particles[shadow_id].released)
 
 -- A failed setup rolls back partial ownership; cleanup continues if one
 -- renderer destroy throws, including releasing that same index.
@@ -216,16 +317,16 @@ assert(live_count() == 0)
 replacement.null = false
 listed = {state(replacement, 11, "class_6"), ultimate_state}
 service.init()
-assert(live_count() == 5 and service.debug_snapshot().towers == 2)
+assert(live_count() == 6 and service.debug_snapshot().towers == 2)
 before_destroyed = #destroyed
 service.init()
-assert(#destroyed == before_destroyed + 5 and live_count() == 5,
-    "same-world init must destroy the old five layers before rebuilding")
+assert(#destroyed == before_destroyed + 6 and live_count() == 6,
+    "same-world init must destroy all old layers including smoke before rebuilding")
 assert(scheduler.task_count() == 1)
 local before_created = created
 bus.emit(events.BUILDING_CHANGED, state(replacement, 21, "class_6"))
 assert(created == before_created + 3, "old generation subscriptions must stay inactive")
-assert(live_count() == 6)
+assert(live_count() == 7)
 
 before_destroyed = #destroyed
 world, next_id, listed = {}, 0, {}
@@ -233,7 +334,7 @@ service.init()
 assert(#destroyed == before_destroyed and live_count() == 0,
     "new world init must forget the old world's particle IDs")
 service.apply(ultimate_state)
-assert(live_count() == 3)
+assert(live_count() == 4)
 phase = DOTA_GAMERULES_STATE_POST_GAME
 assert(service._sweep_for_test() == false and live_count() == 0)
 assert(service.debug_snapshot().towers == 0)

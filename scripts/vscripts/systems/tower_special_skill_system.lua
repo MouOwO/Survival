@@ -27,6 +27,8 @@ local LIGHTNING_ASSET_ID = "tower_zuus"
 local DEFAULT_DIFFUSION_PARTICLE =
     "particles/units/heroes/hero_razor/razor_plasmafield.vpcf"
 local DIFFUSION_PARTICLE_DURATION = 0.4
+local CRITICAL_BLOOD_PARTICLE =
+    "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact.vpcf"
 local asset_catalog = require("config/asset_catalog")
 
 local function valid(unit)
@@ -212,6 +214,38 @@ local function update_bone_counter(payload)
     end
 end
 
+local function play_critical_blood(payload)
+    local tower, target = payload.tower, payload.target
+    local origin = target:GetAbsOrigin()
+    local position = origin + Vector(0, 0, 60)
+    if target.ScriptLookupAttachment and target.GetAttachmentOrigin then
+        local attachment = target:ScriptLookupAttachment("attach_hitloc")
+        if attachment and attachment > 0 then position = target:GetAttachmentOrigin(attachment) end
+    end
+    local from = tower:GetAbsOrigin() - origin
+    local length = from:Length2D()
+    -- Native blood launches along negative local X, away from the attacker.
+    local forward = length > 0.01 and Vector(from.x / length, from.y / length, 0)
+        or Vector(1, 0, 0)
+    local right = Vector(forward.y, -forward.x, 0)
+    local particle
+    local ok, err = pcall(function()
+        -- World-space snapshots let the native burst finish even after a
+        -- lethal hit removes the target. Native lifetime owns cleanup.
+        particle = ParticleManager:CreateParticle(CRITICAL_BLOOD_PARTICLE, PATTACH_WORLDORIGIN, nil)
+        assert(type(particle) == "number" and particle >= 0, "critical blood returned no valid ID")
+        for _, cp in ipairs({0, 1}) do
+            ParticleManager:SetParticleControl(particle, cp, position)
+            ParticleManager:SetParticleControlOrientation(particle, cp, forward, right, Vector(0, 0, 1))
+        end
+    end)
+    if type(particle) == "number" and particle >= 0 then
+        if not ok then pcall(ParticleManager.DestroyParticle, ParticleManager, particle, true) end
+        ParticleManager:ReleaseParticleIndex(particle)
+    end
+    if not ok then print("[TowerCritical] optional blood effect failed: " .. tostring(err)) end
+end
+
 local function trigger_death_critical_particle(payload)
     if not payload.critical then return end
     local source = tostring(payload.critical_source or "")
@@ -223,6 +257,7 @@ local function trigger_death_critical_particle(payload)
             sound_cue, payload.tower, payload.target,
             payload.target:GetAbsOrigin()
         )
+        play_critical_blood(payload)
     end
     local asset_id = DEATH_CRITICAL_ASSET_IDS[source]
     if not asset_id then return end
@@ -461,6 +496,7 @@ local function on_lightning_hit(payload)
 end
 
 function M.init()
+    require("systems/wyvern_blizzard_visual").clear()
     local wave_ids = {}
     for wave_id in pairs(active_waves) do wave_ids[#wave_ids + 1] = wave_id end
     for _, wave_id in ipairs(wave_ids) do clear_wave(wave_id, true) end

@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "rarities": {
+    "R": "Existing chain effect unchanged",
+    "SR": "Tempest Revelation complete native Arc Lightning",
+    "SSR": "Golden Immortal Pantheon native golden branch and complete victim-bound static field; includes red stars"
+  },
+  "user_clarification": "User selected Righteous Thunderbolt W with full bolt and ground cracks after confirming Tempest Revelation replaces Q only",
+  "strike_callers": ["tower lightning storm visual strikes", "hero proto_chain_lightning / fury thunder"],
+  "crack": {"lifetime_seconds": [7, 8], "anchor": "terrain at impact", "normal_cleanup": "Release handle only; native finite child decay", "extra_timers": 0},
+  "native_resources": {"roots": 5, "particle_systems": 51, "dependencies": 78, "evidence": "art/effects/lightning/reference/manifest.json", "native_modifications": false},
+  "tests": {
+    "test_tower_skill_tree_exclusion.lua": "PASS: R/SR/SSR through levels 6-25, all bounces, unchanged 90/80 damage decay, model-bound golden impacts, W residue after storm end",
+    "test_zeus_lightning_visual.lua": "PASS: five fury tiers, damage and mark totals, 0.12-second followups, ground anchors, native residue, visual failure cleanup, precache",
+    "verify_zeus_visual_resources.cjs": "PASS: item provenance, native dependencies, complete crack subtree, lifetime and ground placement",
+    "damage_baseline": "PASS: fury run_chain, continue_lightning_chain and apply_lightning_storm_damage identical to HEAD",
+    "lua_syntax": "PASS",
+    "diff_check": "PASS"
+  },
+  "in_game_visual_verified": false
+}

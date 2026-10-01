@@ -61,6 +61,60 @@
         delete panels[key];
     }
 
+    function predictedLoss(forecasts, now) {
+        var loss = 0;
+        for (var i = 0; i < forecasts.length; i++) {
+            var f = forecasts[i];
+            loss += f.fraction * Math.max(0, Math.min(1, (now - f.start) / (f.due - f.start)));
+        }
+        return loss;
+    }
+
+    function setForecast(bar, value, health, maximum) {
+        bar.__healthFraction = Math.min(1, health / maximum);
+        bar.__forecasts = [];
+        var input = value.laser_forecast || {};
+        Object.keys(input).forEach(function (key) {
+            var f = input[key] || {};
+            var start = Number(f.start), due = Number(f.due), fraction = Number(f.fraction);
+            if (isFinite(start) && isFinite(due) && due > start && isFinite(fraction) && fraction > 0) {
+                bar.__forecasts.push({start:start, due:due, fraction:fraction});
+            }
+        });
+        bar.__forecasts.sort(function (a,b) { return a.due - b.due; });
+        // Cap the last predicted hit across its full remaining interval, so an
+        // overkill hit empties the bar at settlement, never partway through it.
+        var cumulative = 0;
+        bar.__forecastScale = 1;
+        for (var i = 0; i < bar.__forecasts.length; i++) {
+            cumulative += bar.__forecasts[i].fraction;
+            if (cumulative >= bar.__healthFraction) {
+                bar.__forecastScale = bar.__healthFraction /
+                    Math.max(0.000001, predictedLoss(bar.__forecasts, bar.__forecasts[i].due));
+                break;
+            }
+        }
+    }
+
+    function renderHealth(bar, value) {
+        var fraction = bar.__healthFraction;
+        var forecasts = bar.__forecasts || [];
+        var now = Game.GetGameTime ? Number(Game.GetGameTime()) : NaN;
+        if (forecasts.length && isFinite(now)) {
+            // Game time freezes during pause. Never extrapolate a missed tick
+            // indefinitely; server corrections/stop notices reset the baseline.
+            if (now <= forecasts[0].due + 0.15) {
+                fraction -= predictedLoss(forecasts, now) * bar.__forecastScale;
+            }
+        }
+        if (Number(value.alive) !== 1) fraction = 0;
+        var width = (Math.max(0, Math.min(1, fraction)) * 100).toFixed(3) + "%";
+        if (width !== bar.__width) {
+            bar.__fill.style.width = width;
+            bar.__width = width;
+        }
+    }
+
     function applyState(key, value) {
         if (!value || Number(value.removed) === 1) {
             delete states[key];
@@ -72,14 +126,18 @@
         if (!bar) return;
         var health = Math.max(0, Number(value.health) || 0);
         var maximum = Math.max(1, Number(value.max_health) || 1);
-        var percent = Math.max(0, Math.min(100, 100 * health / maximum));
         var unitTeam = Number(value.team);
         var playerTeam = localTeam();
         bar.SetHasClass(
             "SurvivalEnemyHealthBar",
             unitTeam >= 0 && playerTeam >= 0 && unitTeam !== playerTeam
         );
-        bar.__fill.style.width = percent.toFixed(3) + "%";
+        // Forecast only the upcoming server hit, using the existing frame loop.
+        // A trailing CSS tween would again leave visible health at lethal time.
+        bar.__fill.style.transitionDuration = "0s";
+        setForecast(bar, value, health, maximum);
+        renderHealth(bar, value);
+        if (Number(value.alive) !== 1 || health <= 0) hide(key);
     }
 
     function onTableChanged(tableName, key, value) {
@@ -152,6 +210,7 @@
             if(visibility&&visibility.Overlaps(occlusion,screenX-31*scaleX,screenY-26*scaleY,62*scaleX,11*scaleY)){
                 hide(key);return;
             }
+            if (bar.__forecasts && bar.__forecasts.length) renderHealth(bar, state);
             bar.style.position = localX.toFixed(2) + "px "
                 + localY.toFixed(2) + "px 0px";
             bar.style.visibility = "visible";

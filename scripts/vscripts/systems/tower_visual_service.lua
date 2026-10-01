@@ -4,11 +4,26 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local projection = require("systems/tower_rank_projection")
 local profiles = require("config/generated/tower_visual_profiles")
+local laser_effect_selector = require("systems/tower_laser_effect_selector")
+local tower_skills = require("systems/tower_skill_runtime")
+local laser_visual = require("systems/tower_laser_visual")
 local M = {}
 local tracked = {}
 local generation, bound_world = 0, nil
 local base_projectile = "particles/base_attacks/ranged_goodguy.vpcf"
 local prefix = "particles/survival/towers/"
+local mystery_base = prefix .. "leshrac_base/leshrac_diabolic_groundflash.vpcf"
+-- Native Shadow Dance smoke bundle, without Slark-specific eye attachments.
+local ultimate_shadow = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
+-- Bulldoze's persistent foot layers; omit its body/hand effects and cast flash.
+local machine_base = {
+    "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_dark.vpcf",
+    "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_timer.vpcf",
+}
+local anti_air_base = {
+    "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings.vpcf",
+    "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf",
+}
 
 local function valid(unit)
     return unit and not unit:IsNull()
@@ -45,6 +60,59 @@ local function add(entry, name, radius, alpha, color)
         tonumber(color[1]) or 255, tonumber(color[2]) or 255, tonumber(color[3]) or 255))
 end
 
+local function add_ultimate_shadow(entry)
+    local unit = entry.unit
+    local id = ParticleManager:CreateParticle(ultimate_shadow,
+        PATTACH_ABSORIGIN_FOLLOW, unit)
+    assert(type(id) == "number" and id >= 0, "ultimate shadow returned no valid ID")
+    entry.particles[#entry.particles + 1] = id
+    local origin = unit:GetAbsOrigin()
+    ParticleManager:SetParticleControlEnt(id, 0, unit,
+        PATTACH_ABSORIGIN_FOLLOW, "", origin, true)
+    -- All native smoke layers emit around CP1. Bind to the torso so the
+    -- cloud surrounds the model and follows relocation without a Lua thinker.
+    ParticleManager:SetParticleControlEnt(id, 1, unit,
+        PATTACH_POINT_FOLLOW, "attach_hitloc",
+        Vector(origin.x, origin.y, origin.z + 80), true)
+end
+
+local function add_machine_base(entry)
+    for _, path in ipairs(machine_base) do
+        local id = ParticleManager:CreateParticle(path,
+            PATTACH_ABSORIGIN_FOLLOW, entry.unit)
+        assert(type(id) == "number" and id >= 0, "machine base returned no valid ID")
+        entry.particles[#entry.particles + 1] = id
+        -- Native layers supply their own ground offset (18/20 units) and size.
+        -- Binding at the origin keeps the ring at the feet, not at attach_hitloc.
+        ParticleManager:SetParticleControlEnt(id, 0, entry.unit,
+            PATTACH_ABSORIGIN_FOLLOW, "", entry.unit:GetAbsOrigin(), true)
+    end
+end
+
+local function add_mystery_base(entry)
+    local id = ParticleManager:CreateParticle(mystery_base, PATTACH_ABSORIGIN_FOLLOW, entry.unit)
+    assert(type(id) == "number" and id >= 0, "mystery base returned no valid ID")
+    entry.particles[#entry.particles + 1] = id
+    for _, cp in ipairs({0, 1}) do
+        ParticleManager:SetParticleControlEnt(id, cp, entry.unit,
+            PATTACH_ABSORIGIN_FOLLOW, "", entry.unit:GetAbsOrigin(), true)
+    end
+end
+
+local function add_anti_air_base(entry)
+    for _, path in ipairs(anti_air_base) do
+        local id = ParticleManager:CreateParticle(path,
+            PATTACH_ABSORIGIN_FOLLOW, entry.unit)
+        assert(type(id) == "number" and id >= 0, "anti-air base returned no valid ID")
+        entry.particles[#entry.particles + 1] = id
+        ParticleManager:SetParticleControlEnt(id, 0, entry.unit,
+            PATTACH_ABSORIGIN_FOLLOW, "", entry.unit:GetAbsOrigin(), true)
+        -- These native children normally receive neutral HSV from the trap
+        -- parent. Zero saturation/value would make the standalone rings dark.
+        ParticleManager:SetParticleControl(id, 62, Vector(0, 1, 1))
+    end
+end
+
 function M.apply(state)
     local rank = projection.project(state)
     local unit = state and state.unit
@@ -62,6 +130,24 @@ function M.apply(state)
     local profile = profiles.by_id[profile_id]
     local key = tostring(profile_id) .. ":" .. rank.rarity
         .. ":" .. tostring(rank.red_stars > 0)
+        .. ":" .. tostring(profile and profile.native_base or "")
+    if profile_id == "class_7" then
+        -- Native trap rings initialize world-space particles, without position
+        -- lock. Recreate on the existing move event; no polling/update timer.
+        local origin = unit:GetAbsOrigin()
+        key = key .. ":" .. tostring(origin.x) .. ":" .. tostring(origin.y)
+            .. ":" .. tostring(origin.z)
+    end
+    local laser
+    for id in pairs(tower_skills.get(unit) or {}) do
+        local effect = laser_effect_selector.get(unit, id, state)
+        if effect and effect.enabled ~= false then laser = effect; break end
+    end
+    key = key .. ":" .. tostring(laser and laser.effect_key or "")
+    if laser then
+        unit.survival_projectile_model = ""
+        unit:SetRangedProjectileName("")
+    end
     if rank.rarity ~= "N" and (not profile or profile.enabled == false) then
         M.remove(index)
         return false
@@ -71,6 +157,13 @@ function M.apply(state)
     M.remove(index)
     local entry = { unit = unit, key = key, particles = {} }
     tracked[index] = entry
+    if laser and laser.beam_mode ~= "native" then
+        local ok, err = pcall(function()
+            add(entry, "laser_charge", 1, 1, { laser.color_r, laser.color_g, laser.color_b })
+            ParticleManager:SetParticleControl(entry.particles[#entry.particles], 2, laser_visual.color(laser))
+        end)
+        if not ok then M.remove(index); print("[TowerVisual] laser charge failed: " .. tostring(err)); return false end
+    end
     if rank.rarity == "N" then
         -- Reference low-tier towers also use this native projectile. Only its
         -- art changes; native attack timing/speed and damage remain untouched.
@@ -78,6 +171,10 @@ function M.apply(state)
     end
     local radius = profile["radius_" .. string.lower(rank.rarity)] or profile.radius_ssr
     local ok, err = pcall(function()
+        -- A replacement owns the whole base, including former detail/crown art.
+        if profile.native_base == "leshrac_edict" then add_mystery_base(entry); return end
+        if profile.native_base == "bulldoze" then add_machine_base(entry); return end
+        if profile.native_base == "psionic_trap" then add_anti_air_base(entry); return end
         add(entry, profile.core, radius, profile.alpha, profile.color)
         if rank.rarity ~= "R" then
             local detail = rank.rarity == "SSR" and profile.detail_ssr or profile.detail
@@ -88,6 +185,7 @@ function M.apply(state)
         if rank.rarity == "UR" or rank.red_stars > 0 then
             add(entry, profile.crown, radius * 0.78, profile.alpha * 0.38, profile.color)
         end
+        if rank.rarity == "UR" then add_ultimate_shadow(entry) end
     end)
     if not ok then
         M.remove(index)
@@ -98,6 +196,13 @@ end
 
 function M.precache(context)
     PrecacheResource("particle", base_projectile, context)
+    PrecacheResource("particle", ultimate_shadow, context)
+    PrecacheResource("particle", mystery_base, context)
+    for _, path in ipairs(machine_base) do PrecacheResource("particle", path, context) end
+    for _, path in ipairs(anti_air_base) do PrecacheResource("particle", path, context) end
+    PrecacheResource("particle", prefix .. "laser_charge.vpcf", context)
+    PrecacheResource("particle", prefix .. "laser_blood.vpcf", context)
+    PrecacheResource("particle", prefix .. "laser_afterglow.vpcf", context)
     local seen = {}
     for _, row in ipairs(profiles.rows) do
         if row.enabled ~= false then

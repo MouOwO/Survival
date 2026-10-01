@@ -94,7 +94,7 @@ pending_load();pending_load()
 assert(#units==2 and fixture.casts_started==1,"one caster and target, duplicate callback safe")
 local active=service._test.active_meteor_casts()[fixture.caster_key]
 assert(active.context.player_id==-1 and active.context.attributes.all_attributes==0)
-assert(active.radius==500 and active.fall_duration==0.8 and active.move_slow_pct==0)
+assert(active.radius==500 and active.fall_duration==0.4 and active.move_slow_pct==0)
 assert(definition.lava_move_slow_pct[5]==30,"preview cannot mutate production definition")
 assert(fixture_api.cleanup().pending)
 advance(2.4)

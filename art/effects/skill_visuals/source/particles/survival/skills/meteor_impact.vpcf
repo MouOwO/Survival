@@ -61,6 +61,10 @@
  m_Children = [ {
  m_ChildRef = resource:"particles/survival/skills/meteor_impact_sparks.vpcf"
 }, {
- m_ChildRef = resource:"particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_flash.vpcf"
+ m_ChildRef = resource:"particles/units/heroes/hero_phoenix/phoenix_supernova_reborn_sphere.vpcf"
+} ]
+ m_PreEmissionOperators = [ {
+ _class = "C_OP_HSVShiftToCP"
+ m_DefaultHSVColor = [ 226, 158, 0, 255 ]
 } ]
 }

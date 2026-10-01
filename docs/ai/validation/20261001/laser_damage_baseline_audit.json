@@ -1,0 +1,254 @@
+{
+  "status": "FAIL_TOTAL_DAMAGE_INVARIANCE",
+  "basis": "fixed attack 100, raw damage before mitigation, original immediate hit and each due whole-second hit included; arithmetic audit, not engine health measurement",
+  "cause": "Previous continuous change removed immediate full hit and integrated the preceding multiplier window rather than matching the original cumulative schedule.",
+  "fix_semantics": "User chose exact original timing with cosmetic health smoothing. Historical failing records below are retained; resolved by laser_health_visual_only.json.",
+  "resolved_by": "laser_health_visual_only.json",
+  "records": [
+    {
+      "level": 1,
+      "seconds": 0,
+      "old_damage": 120,
+      "current_damage": 0,
+      "difference": -120
+    },
+    {
+      "level": 1,
+      "seconds": 0.2,
+      "old_damage": 120,
+      "current_damage": 24,
+      "difference": -96
+    },
+    {
+      "level": 1,
+      "seconds": 0.8,
+      "old_damage": 120,
+      "current_damage": 96,
+      "difference": -24
+    },
+    {
+      "level": 1,
+      "seconds": 1,
+      "old_damage": 245,
+      "current_damage": 120,
+      "difference": -125
+    },
+    {
+      "level": 1,
+      "seconds": 5,
+      "old_damage": 795,
+      "current_damage": 650,
+      "difference": -145
+    },
+    {
+      "level": 1,
+      "seconds": 10,
+      "old_damage": 1595,
+      "current_damage": 1425,
+      "difference": -170
+    },
+    {
+      "level": 1,
+      "seconds": 90,
+      "old_damage": 30870,
+      "current_damage": 30370,
+      "difference": -500
+    },
+    {
+      "level": 2,
+      "seconds": 0,
+      "old_damage": 140,
+      "current_damage": 0,
+      "difference": -140
+    },
+    {
+      "level": 2,
+      "seconds": 0.2,
+      "old_damage": 140,
+      "current_damage": 28,
+      "difference": -112
+    },
+    {
+      "level": 2,
+      "seconds": 0.8,
+      "old_damage": 140,
+      "current_damage": 112,
+      "difference": -28
+    },
+    {
+      "level": 2,
+      "seconds": 1,
+      "old_damage": 285,
+      "current_damage": 140,
+      "difference": -145
+    },
+    {
+      "level": 2,
+      "seconds": 5,
+      "old_damage": 915,
+      "current_damage": 750,
+      "difference": -165
+    },
+    {
+      "level": 2,
+      "seconds": 10,
+      "old_damage": 1815,
+      "current_damage": 1625,
+      "difference": -190
+    },
+    {
+      "level": 2,
+      "seconds": 90,
+      "old_damage": 32360,
+      "current_damage": 31860,
+      "difference": -500
+    },
+    {
+      "level": 3,
+      "seconds": 0,
+      "old_damage": 160,
+      "current_damage": 0,
+      "difference": -160
+    },
+    {
+      "level": 3,
+      "seconds": 0.2,
+      "old_damage": 160,
+      "current_damage": 32,
+      "difference": -128
+    },
+    {
+      "level": 3,
+      "seconds": 0.8,
+      "old_damage": 160,
+      "current_damage": 128,
+      "difference": -32
+    },
+    {
+      "level": 3,
+      "seconds": 1,
+      "old_damage": 325,
+      "current_damage": 160,
+      "difference": -165
+    },
+    {
+      "level": 3,
+      "seconds": 5,
+      "old_damage": 1035,
+      "current_damage": 850,
+      "difference": -185
+    },
+    {
+      "level": 3,
+      "seconds": 10,
+      "old_damage": 2035,
+      "current_damage": 1825,
+      "difference": -210
+    },
+    {
+      "level": 3,
+      "seconds": 90,
+      "old_damage": 33770,
+      "current_damage": 33270,
+      "difference": -500
+    },
+    {
+      "level": 4,
+      "seconds": 0,
+      "old_damage": 180,
+      "current_damage": 0,
+      "difference": -180
+    },
+    {
+      "level": 4,
+      "seconds": 0.2,
+      "old_damage": 180,
+      "current_damage": 36,
+      "difference": -144
+    },
+    {
+      "level": 4,
+      "seconds": 0.8,
+      "old_damage": 180,
+      "current_damage": 144,
+      "difference": -36
+    },
+    {
+      "level": 4,
+      "seconds": 1,
+      "old_damage": 365,
+      "current_damage": 180,
+      "difference": -185
+    },
+    {
+      "level": 4,
+      "seconds": 5,
+      "old_damage": 1155,
+      "current_damage": 950,
+      "difference": -205
+    },
+    {
+      "level": 4,
+      "seconds": 10,
+      "old_damage": 2255,
+      "current_damage": 2025,
+      "difference": -230
+    },
+    {
+      "level": 4,
+      "seconds": 90,
+      "old_damage": 35100,
+      "current_damage": 34600,
+      "difference": -500
+    },
+    {
+      "level": 5,
+      "seconds": 0,
+      "old_damage": 180,
+      "current_damage": 0,
+      "difference": -180
+    },
+    {
+      "level": 5,
+      "seconds": 0.2,
+      "old_damage": 180,
+      "current_damage": 36,
+      "difference": -144
+    },
+    {
+      "level": 5,
+      "seconds": 0.8,
+      "old_damage": 180,
+      "current_damage": 144,
+      "difference": -36
+    },
+    {
+      "level": 5,
+      "seconds": 1,
+      "old_damage": 365,
+      "current_damage": 180,
+      "difference": -185
+    },
+    {
+      "level": 5,
+      "seconds": 5,
+      "old_damage": 1155,
+      "current_damage": 950,
+      "difference": -205
+    },
+    {
+      "level": 5,
+      "seconds": 10,
+      "old_damage": 2255,
+      "current_damage": 2025,
+      "difference": -230
+    },
+    {
+      "level": 5,
+      "seconds": 90,
+      "old_damage": 35100,
+      "current_damage": 34600,
+      "difference": -500
+    }
+  ]
+}

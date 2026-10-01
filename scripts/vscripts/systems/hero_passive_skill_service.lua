@@ -7,6 +7,7 @@ local skill_definitions = require("config/generated/hero_skill_definitions")
 local hero_definitions = require("config/generated/hero_definitions")
 local buff_manager = require("systems/buff_manager")
 local exclusive_passives = require("systems/hero_exclusive_passive_service")
+local storm_visual = require("systems/disruptor_storm_visual")
 
 local M = {}
 M.sound_service = require("core/sound_service")
@@ -68,12 +69,10 @@ local ICE_CONE_SNOW_PARTICLE =
     "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf"
 local ICE_CONE_IMPACT_PARTICLE =
     "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf"
-local FURY_THUNDER_PARTICLE =
-    "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
 local MOVING_ICE_BALL_PARTICLE =
     "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf"
 local METEOR_FALL_PARTICLE =
-    "particles/survival/skills/meteor_cube_fall.vpcf"
+    "particles/survival/skills/meteor_phoenix_fall.vpcf"
 local METEOR_EXPLOSION_PARTICLE =
     "particles/survival/skills/meteor_impact.vpcf"
 local METEOR_LAVA_PARTICLE =
@@ -81,7 +80,7 @@ local METEOR_LAVA_PARTICLE =
 local METEOR_LAVA_SLOW_BUFF = "debuff_hero_meteor_lava_move_slow"
 local METEOR_THINK_INTERVAL = 0.05
 local METEOR_FALL_HEIGHT = 1200
-local METEOR_FLY_PARTICLE_TRAVEL_TIME = 1.5
+local METEOR_FLY_PARTICLE_TRAVEL_TIME = 0.4
 local MOVING_ICE_BALL_EXPLOSION_PARTICLE = "particles/basic_projectile/basic_projectile_explosion.vpcf"
 local MOVING_ICE_BALL_THINK_INTERVAL = 0.05
 local MOVING_ICE_BALL_VISUAL_HEIGHT = 120
@@ -1527,32 +1526,11 @@ local function run_frost(context, definition)
     return true
 end
 
-local function fury_thunder_visual(context, position)
+local function fury_thunder_visual(context, position, radius, previous)
     M.sound_service.play("hero_fury_thunder_strike", {
         source = context.attacker, position = position,
     })
-    local particle = nil
-    local visual_ok, visual_error = pcall(function()
-        particle = ParticleManager:CreateParticle(
-            FURY_THUNDER_PARTICLE,
-            PATTACH_WORLDORIGIN, context.attacker
-        )
-        ParticleManager:SetParticleControl(
-            particle, 0, position + Vector(0, 0, 900)
-        )
-        ParticleManager:SetParticleControl(particle, 1, position)
-        ParticleManager:ReleaseParticleIndex(particle)
-    end)
-    if not visual_ok then
-        if particle then
-            pcall(function()
-                ParticleManager:DestroyParticle(particle, true)
-                ParticleManager:ReleaseParticleIndex(particle)
-            end)
-        end
-        print("[HeroPassiveSkill] fury thunder visual failed: "
-            .. tostring(visual_error))
-    end
+    return storm_visual.play(context.attacker, position, radius, nil, previous)
 end
 
 local function run_chain(context, definition)
@@ -1575,12 +1553,15 @@ local function run_chain(context, definition)
     end
     while #strike_targets < strike_count do strike_targets[#strike_targets + 1] = primary end
     local target_hit_counts = {}
+    local storm_by_target = {}
 
     local function execute_strike(target, strike_multiplier)
         if not alive(target) or not valid(context.attacker) then return end
         local position = unit_position(target)
         if not position then return end
-        fury_thunder_visual(context, position)
+        local visual_key = tostring(target:entindex())
+        storm_by_target[visual_key] = fury_thunder_visual(context, position, radius,
+            storm_by_target[visual_key])
 
         local was_marked = context.level >= 2
             and buff_manager.has(target, "debuff_hero_fury_thunder_mark")
@@ -2277,10 +2258,9 @@ local function meteor_create_fall_particle(cast)
     local start_position = copy_position(cast.position)
     start_position.z = start_position.z + METEOR_FALL_HEIGHT
 
-    -- The angular Rubick cube uses Valve's CP0 -> CP1 path solver at 1.5s.
-    -- Its children are warm native Invoker flames, without Rubick's green tint.
-    -- Extend CP1 below the ground so it crosses the authoritative impact point
-    -- at this skill's unchanged 0.8s fall duration.
+    -- Supernova's egg and native fire follow the engine's CP0 -> CP1 path.
+    -- Production takes 0.4s; retain endpoint compensation so other configured
+    -- durations still cross the fixed ground point at the actual damage time.
     local visual_end = copy_position(start_position)
     visual_end.z = start_position.z - METEOR_FALL_HEIGHT
         * METEOR_FLY_PARTICLE_TRAVEL_TIME / cast.fall_duration
@@ -2465,7 +2445,7 @@ local function run_meteor(context, definition)
     if GetGroundPosition then position = GetGroundPosition(position, nil) end
 
     local fall_duration = math.max(0.01,
-        level_value(definition, "fall_duration", context.level, 0.8))
+        level_value(definition, "fall_duration", context.level, 0.4))
     local lava_duration = level_value(
         definition, "lava_duration", context.level
     )
@@ -3622,6 +3602,7 @@ function M.init()
     clear_moving_ice_balls()
     clear_poison_clouds()
     clear_meteors()
+    storm_visual.clear()
     processed_attacks = {}
     exclusive_passives.init({ deal_group = deal_group })
     refresh_tokens = {}

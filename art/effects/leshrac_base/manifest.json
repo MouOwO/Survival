@@ -1,0 +1,24 @@
+{
+  "root": "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash.vpcf",
+  "outputs": [
+    {
+      "resource": "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash.vpcf",
+      "native": "particles/units/heroes/hero_leshrac/leshrac_diabolic_groundflash.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash_lines.vpcf",
+      "native": "particles/units/heroes/hero_leshrac/leshrac_diabolic_groundflash_lines.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash_lines2.vpcf",
+      "native": "particles/units/heroes/hero_leshrac/leshrac_diabolic_groundflash_lines2.vpcf"
+    }
+  ],
+  "emission_rates": [
+    4,
+    4,
+    8
+  ],
+  "max_particles": 8,
+  "control_point": 1
+}

@@ -1,0 +1,120 @@
+
+		"23655"
+		{
+			"name"		"Tremors of the Tandem Storm"
+			"prefab"		"wearable"
+			"creation_date"		"2022-06-28"
+			"event_id"		"EVENT_ID_INTERNATIONAL_2022"
+			"image_inventory"		"econ/items/disruptor/dis_2022_immortal_mount/dis_2022_immortal_mount"
+			"item_description"		"#DOTA_Item_Desc_Tremors_of_the_Tandem_Storm"
+			"item_name"		"#DOTA_Item_Tremors_of_the_Tandem_Storm"
+			"item_rarity"		"immortal"
+			"item_slot"		"legs"
+			"item_type_name"		"#DOTA_WearableType_Legs"
+			"model_player"		"models/items/disruptor/dis_2022_immortal_mount/dis_2022_immortal_mount.vmdl"
+			"portraits"
+			{
+				"icon"
+				{
+					"PortraitLightPosition"		"136.351532 365.476807 322.592194"
+					"PortraitLightAngles"		"29.328003 246.357422 0.000000"
+					"PortraitLightFOV"		"69"
+					"PortraitLightDistance"		"514.270020"
+					"PortraitLightColor"		"254 254 254"
+					"PortraitShadowColor"		"97 97 97"
+					"PortraitShadowScale"		"5"
+					"PortraitGroundShadowScale"		"1.500000"
+					"PortraitAmbientColor"		"148 148 148"
+					"PortraitAmbientScale"		"5"
+					"PortraitSpecularColor"		"251 74 84"
+					"PortraitSpecularDirection"		"0.000000 0.000000 -1.000000"
+					"PortraitSpecularPower"		"16"
+					"PortraitBackgroundColor1"		"0.700000 0.500000 1.000000"
+					"PortraitBackgroundColor2"		"0.300000 0.500000 1.000000"
+					"PortraitBackgroundColor3"		"0.100000 0.200000 1.000000"
+					"PortraitBackgroundColor4"		"0.300000 0.500000 1.000000"
+					"PortraitBackgroundTexture"		"materials/vgui/econ/item_icon_bg.vmat"
+					"PortraitAnimationActivity"		"ACT_DOTA_RUN"
+					"PortraitAnimationCycle"		"0"
+					"PortraitAnimationRate"		"0"
+					"PortraitHideHero"		"1"
+					"PortraitLightScale"		"2.764000"
+					"PortraitAmbientDirection"		"0.766 -0.404 -0.499"
+					"cameras"
+					{
+						"default"
+						{
+							"PortraitPosition"		"227.371429 306.219696 110.860428"
+							"PortraitAngles"		"3.047993 234.896545 0.000000"
+							"PortraitFOV"		"54"
+							"PortraitFar"		"1000"
+						}
+					}
+					"PortraitHideParticles"		"0"
+					"PortraitHideDropShadow"		"0"
+					"PortraitDesaturateParticles"		"0"
+					"PortraitPlayIdleExpression"		"0"
+					"PortraitDesaturateHero"		"1"
+					"PortraitVignetteItem"		"0"
+				}
+			}
+			"static_attributes"
+			{
+				"tradable after date"		"1698865200"
+				"webm preview url"		"apps/dota2/videos/dota_react/international2022/immortals/disruptor_client.webm"
+				"can_equip_as_ability_effects"		"4"
+			}
+			"used_by_heroes"
+			{
+				"npc_dota_hero_disruptor"		"1"
+			}
+			"visuals"
+			{
+				"asset_modifier"
+				{
+					"type"		"activity"
+					"asset"		"ALL"
+					"modifier"		"dis_2022"
+				}
+				"skip_model_combine"		"1"
+				"asset_modifier"
+				{
+					"type"		"particle"
+					"asset"		"particles/units/heroes/hero_disruptor/disruptor_static_storm.vpcf"
+					"modifier"		"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm.vpcf"
+					"apply_when_equipped_in_ability_effects_slot"		"4"
+				}
+				"asset_modifier"
+				{
+					"type"		"particle_create"
+					"modifier"		"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_ambient.vpcf"
+					"spawn_in_loadout_only"		"1"
+				}
+				"asset_modifier"
+				{
+					"type"		"particle"
+					"asset"		"particles/units/heroes/hero_disruptor/disruptor_static_storm_bolt_hero.vpcf"
+					"modifier"		"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_hero_debuff.vpcf"
+					"apply_when_equipped_in_ability_effects_slot"		"4"
+				}
+				"asset_modifier"
+				{
+					"type"		"particle_create"
+					"spawn_in_loadout_only"		"2"
+					"modifier"		"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_ambient_game.vpcf"
+				}
+				"asset_modifier"
+				{
+					"type"		"ability_icon"
+					"asset"		"disruptor_static_storm"
+					"modifier"		"disruptor/dis_2022_immortal/dis_2022_immortal_static_storm"
+					"apply_when_equipped_in_ability_effects_slot"		"4"
+				}
+				"asset_modifier"
+				{
+					"type"		"particle"
+					"asset"		"particles/econ/events/anniversary_10th/anniversary_10th_hat_ambient_npc_dota_hero_disruptor.vpcf"
+					"modifier"		"particles/econ/events/anniversary_10th/anniversary_10th_hat_ambient_npc_dota_hero_disruptor_2022_immortal.vpcf"
+				}
+			}
+		}

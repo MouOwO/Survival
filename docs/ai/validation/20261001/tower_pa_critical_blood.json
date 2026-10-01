@@ -1,0 +1,302 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "source": "Local Valve Dota/core VPK",
+  "particle": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact.vpcf",
+  "rule": "Only actual landed critical_strike / bone_cannon hits. World-space CP0/CP1 snapshots at victim hitloc; negative local X sprays away from attacker. Full native blood and ground stain; release immediately for native finite lifetime. No damage/probability changes or extra timers.",
+  "resources": [
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact.vpcf",
+      "sha256": "4e8eb7a44517d45cfbc75852342a9503e8105c090df2cbf463d83441ebaa70b2",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_lv.vpcf",
+        "materials/particle/blood_decal/blood_splatter2_projected.vmat",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial_2.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_blobs.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_b.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drips_b.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drops_b.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mist.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_spurt.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_bloodstain.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_c.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_d.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_lv.vpcf",
+      "sha256": "ae897f522503298bbbd27d15fcad29250881c9dad992f7d0d6b5d033877f7af8",
+      "dependencies": [
+        "materials/particle/blood_decal/blood_splatter2_projected.vmat",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mechanical_burst_c.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mechanical_burst.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_sparks_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_blobs_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_b_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drips_b_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drops_b_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mist_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_spurt_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_d_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mechanical_sparks.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_bloodstain_lv.vpcf",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial_lv.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/blood_decal/blood_splatter2_projected.vmat",
+      "sha256": "b8f2bcf0bed42c3013bb4cf6d2616b4c8303fb02ce5b0a5264c7ea0988f972fb",
+      "dependencies": [
+        "materials/particle/blood_decal/blood_splatter2_color_psd_691d8528.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/blood_decal/blood_splatter2_color_psd_691d8528.vtex",
+      "sha256": "b9b041d1d308bb3afe933a019a6a33dc95107458dde80b7847ab0bb6a82b65d4"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mechanical_burst_c.vpcf",
+      "sha256": "58f65cfb5391ed9b19af96b093ff07da2f2eadc7579892f7b92a0090a7465900",
+      "dependencies": [
+        "materials/particle/warp_flare_02.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/warp_flare_02.vtex",
+      "sha256": "d22f5fefcd414469dc216982063c061dc9e1585f273b4d26f6a9d7b42ef667ea"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mechanical_burst.vpcf",
+      "sha256": "87bf97b950b4613c265db2c8ea3f774f470d79b30118512fd61f20843ead35c9",
+      "dependencies": [
+        "materials/particle/particle_debris_burst/particle_debris_burst_002.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_debris_burst/particle_debris_burst_002.vtex",
+      "sha256": "29e2da813a03a2aadbfd334e4796664dc844eb4936f77514865402bb8995a9b1"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_sparks_lv.vpcf",
+      "sha256": "e52041be8b4a7bd2ed8ed8b3162052f94abe1b18962ab93eab6b36334eee8842",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/sparks/sparks.vtex",
+      "sha256": "f6a32d59a41ab1e61339814b48e910874730e8b840cb6af98181a4d04dafa988"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_blobs_lv.vpcf",
+      "sha256": "930d8d2220f213d8be5f80757a16b03f69ed0d414cecd548a30f2ac1710a5015",
+      "dependencies": [
+        "materials/particle/water_splash/water_splash.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/water_splash/water_splash.vtex",
+      "sha256": "5016bd7f2907331cbdce3e82d82c9d75b0921fc95980ee57fabcc955a7d61f85"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_b_lv.vpcf",
+      "sha256": "464727d58640ef63a19463232e70ce89d9aa360c6fe891437032ea7fdd46b577",
+      "dependencies": [
+        "materials/particle/spray1/spray1.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/spray1/spray1.vtex",
+      "sha256": "a220c48bddc643a5471069563b434c3aa66e78910d7fc0d618614aed4f71e8fa"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drips_b_lv.vpcf",
+      "sha256": "e832fbfbe26db861f4cb7eb1a12d7a938df29b08fae181c7ada5869fd9f07f71",
+      "dependencies": [
+        "materials/particle/water_splash/water_splash.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drops_b_lv.vpcf",
+      "sha256": "596dc0b0c5ef01b1599e00d407a76f4daf97f070f6ad699e7ece9010206b086e",
+      "dependencies": [
+        "materials/particle/water_splash/water_splash.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mist_lv.vpcf",
+      "sha256": "cf320b19819ca8af97fe974b1e7787d1c823d7c771fb429e69948a204420ed13",
+      "dependencies": [
+        "materials/particle/water_splash/water_splash.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_spurt_lv.vpcf",
+      "sha256": "4248cc65846ca2e0c7aedab37c682ffca786dc224a17cd29986bfafbbb99b786",
+      "dependencies": [
+        "materials/particle/spray1/spray1.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_d_lv.vpcf",
+      "sha256": "98504a990da91f09e7d612b6d74faf1076cc966f319e79a4747a6148edda5469",
+      "dependencies": [
+        "materials/particle/particle_cone_gradient_1.vtex",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_e_lv.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_cone_gradient_1.vtex",
+      "sha256": "7288c1368e07c11517b8b806a3dbc06ca1f38f7047cab437793f73cf32f4b532"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_e_lv.vpcf",
+      "sha256": "dbb894dcc3644ceb1a7c81d56271bf701f820ad8bd47443fe772630ae5462a6b",
+      "dependencies": [
+        "materials/particle/particle_glow_irregular1.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_glow_irregular1.vtex",
+      "sha256": "73a4fad2a325a83f8ac53bd868f267133f81f9a880b811b27efb3146a888cd4a"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mechanical_sparks.vpcf",
+      "sha256": "692a4649ad95a86c03c521d73a1c6a9e13fbbb57336ade7b080ba06a6772cb28",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_bloodstain_lv.vpcf",
+      "sha256": "71e973180f8e3cc1dccb8b24943765f4fc2f48d8122ecb8aeab50e8580e18663",
+      "dependencies": [
+        "materials/particle/blood_decal/blood_decal.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/blood_decal/blood_decal.vtex",
+      "sha256": "241c23bc163096ae407ba100130c22ff7028a492b170440b4c5d1918c9ca66fe"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial_lv.vpcf",
+      "sha256": "81cb0146671e5c3b4736ff924c232dfeb2d750d64e8454c77805cbed02396e48",
+      "dependencies": [
+        "materials/particle/beam_blood_01.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_blood_01.vtex",
+      "sha256": "8bdf72855e1cae1cc379591edcc6a3e331fbf531ef735d67b8054419b60515fd"
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial.vpcf",
+      "sha256": "4e5774ffca26ac777a32aea96ea4fcff71d90caf980151df7a8ed12a4ebda55a",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial_lv.vpcf",
+        "materials/particle/beam_blood_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial_2.vpcf",
+      "sha256": "381c821692cc19c9a78e56736d4036801ff48bfa3f646aa10a4b0ba38ca5b9fd",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial_2_lv.vpcf",
+        "materials/particle/beam_blood_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_arterial_2_lv.vpcf",
+      "sha256": "27f9d2de377f00e574b4b9c3e139164abca7c5e3ffd2f1d6d4b32ed8661c54ea",
+      "dependencies": [
+        "materials/particle/beam_blood_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_blobs.vpcf",
+      "sha256": "c9f255365d592e17d7df6f8827d494c91d21f2398bfeeddc45661dd10ef647d3",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_blobs_lv.vpcf",
+        "materials/particle/water_splash/water_splash.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_b.vpcf",
+      "sha256": "bd4650b2d9df842e3ba7bc70beabf91bcfb5ad65ec87abab82269a3a519cba07",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_b_lv.vpcf",
+        "materials/particle/spray1/spray1.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drips_b.vpcf",
+      "sha256": "275e94f41c6676d2e86670312694798a1fb7060907ac0e958abf0724e7866e4d",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drips_b_lv.vpcf",
+        "materials/particle/water_splash/water_splash.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drops_b.vpcf",
+      "sha256": "db81ed9b64dc0bfba5a7df6bd51d3e0841ab3395ecfac2a4e277d83e5f901a7b",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_drops_b_lv.vpcf",
+        "materials/particle/water_splash/water_splash.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mist.vpcf",
+      "sha256": "3859ebdec18fa76fcfd7bd6f15f9b09a201c68c566d5137ca1078bfb73f25170",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_mist_lv.vpcf",
+        "materials/particle/water_splash/water_splash.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_spurt.vpcf",
+      "sha256": "013c28a3cd8f99cc17749188bfbceb8b501080d79aa98f4d98bc4bc0d81ebad8",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_spurt_lv.vpcf",
+        "materials/particle/spray1/spray1.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_bloodstain.vpcf",
+      "sha256": "b058e382a0aa959ac0b83423a08a163d64f3e3f21a1146467da346829092fef9",
+      "dependencies": [
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_bloodstain_lv.vpcf",
+        "materials/particle/blood_decal/blood_decal.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_c.vpcf",
+      "sha256": "5ea6e0034a2f4ca7cc5f39cc9278f945acbc9619f138b5471dca524e7d666546",
+      "dependencies": [
+        "materials/particle/warp_flare_02.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_d.vpcf",
+      "sha256": "8476cde3bcc5684967a9405a0d1218b399d9fb769b69f3cdb2742c7d55122376",
+      "dependencies": [
+        "materials/particle/particle_cone_gradient_1.vtex",
+        "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_e.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact_burst_e.vpcf",
+      "sha256": "9ac8d4adef343c705dd554e1b28899a1182cf9c6340056d5c0e7dc61d59a2752",
+      "dependencies": [
+        "materials/particle/particle_glow_irregular1.vtex"
+      ]
+    }
+  ],
+  "tests": [
+    "Five critical tiers x surviving/lethal victims PASS, original5x multiplier",
+    "No blood on critical query, normal hits, misses or unrelated critical sources PASS",
+    "Bone critical, world-space/no corpse attachment, native lifecycle release PASS",
+    "Lua syntax and native dependency closure PASS"
+  ],
+  "in_game_visual_verified": false
+}

@@ -39,7 +39,7 @@ end)
 local service=require("systems/hero_passive_skill_service")
 local scheduler=require("core/scheduler")
 local definition=require("config/hero_passive_skill_definitions").by_id.proto_meteor
-local fly="particles/survival/skills/meteor_cube_fall.vpcf"
+local fly="particles/survival/skills/meteor_phoenix_fall.vpcf"
 local impact="particles/survival/skills/meteor_impact.vpcf"
 local lava="particles/survival/skills/meteor_lava.vpcf"
 local function context(level)
@@ -61,13 +61,13 @@ for level=1,5 do
     assert(not service._test.runners.proto_meteor(context(level),definition),"active cast blocks retrigger")
     advance(0)
     local fall=particles[first]
-    assert(fall.name==fly and fall.controls[2].x==0.8)
-    assert(fall.controls[0].z==1584 and fall.controls[1].z==-666)
-    assert(math.abs(fall.controls[0].z+(fall.controls[1].z-fall.controls[0].z)*0.8/1.5-384)<0.0001,
-        "angular model crosses actual ground exactly at unchanged impact time")
-    advance(0.5);advance(0.799)
-    assert(#damage==0,"never apply damage before 0.8 seconds")
-    advance(0.8)
+    assert(fall.name==fly and fall.controls[2].x==0.4)
+    assert(fall.controls[0].z==1584 and fall.controls[1].z==384)
+    assert(math.abs(fall.controls[0].z+(fall.controls[1].z-fall.controls[0].z)*0.4/0.4-384)<0.0001,
+        "Phoenix egg reaches actual ground at the faster impact time")
+    advance(0.2);advance(0.399)
+    assert(#damage==0,"never apply damage before 0.4 seconds")
+    advance(0.4)
     assert(#damage==1 and damage[1].amount==300 and fall.destroy==1 and fall.immediate)
     local impacts,lavas,lava_id=0,0,nil
     for id=first,#particles do
@@ -81,7 +81,9 @@ for level=1,5 do
     end
     assert(impacts==1 and lavas==(level>=2 and 1 or 0))
     assert((slow[target]==true)==(level>=3),"slow tier threshold unchanged")
-    advance(1.3);advance(1.8);advance(2.3);advance(2.8);advance(3.3);advance(3.8)
+    advance(0.5);advance(0.899)
+    assert(#damage==1,"second meteor must retain its half-second impact gap")
+    advance(0.9);advance(1.4);advance(1.9);advance(2.4);advance(2.9);advance(3.4)
     if level==5 then
         assert(particles[lava_id].destroy==0,"first lava expiry must not remove the second meteor's shared visual")
         assert(service._test.meteor_locked("10"),"second meteor still owns its final half second")
@@ -89,12 +91,12 @@ for level=1,5 do
         for id=first,#particles do if particles[id].name==lava then lava_count=lava_count+1 end end
         assert(lava_count==1,"same-cast meteors must not create duplicate coplanar lava systems")
     end
-    advance(4.3)
+    advance(3.9)
     local total=0;for _,hit in ipairs(damage) do total=total+hit.amount end
     assert(#damage==(level==1 and 1 or level==5 and 8 or 4))
     assert(total==(level==1 and 300 or level==5 and 1080 or 600),"tier damage totals unchanged")
     if level==5 then
-        assert(damage[2].time==1.3 and math.abs(damage[2].amount-240)<0.0001)
+        assert(damage[2].time==0.9 and math.abs(damage[2].amount-240)<0.0001)
         assert(damage[4].amount==80 and damage[6].amount==80 and damage[8].amount==80)
     end
     assert(not service._test.meteor_locked("10") and next(slow)==nil)
@@ -106,7 +108,7 @@ for _,failure in ipairs({impact,lava,fly,"control"}) do
     clock=10;damage={};local first=#particles+1
     fail_particle=failure;fail_control=failure=="control"
     assert(service._test.runners.proto_meteor(context(2),definition))
-    advance(10);advance(10.8);advance(11.8);advance(12.8);advance(13.8);advance(16)
+    advance(10);advance(10.4);advance(11.4);advance(12.4);advance(13.4);advance(16)
     assert(#damage==4,"missing visual must preserve explosion and all three DoT ticks")
     service._test.clear_meteors();once(first)
     fail_particle=nil;fail_control=false
@@ -129,4 +131,4 @@ assert(particles[interrupted_lava].destroy==1 and particles[interrupted_lava].re
 assert(not service._test.meteor_locked("10"))
 -- Already emitted impact flashes keep their independent short cleanup timer.
 advance(32.1);once(first)
-print("METEOR_VISUAL_TIMING_PASS 5 tiers, exact 0.8s crossing, 500 radius, 3s per-meteor damage / shared 3.5s dual visual, 80% second meteor, VFX failures, cleanup")
+print("METEOR_VISUAL_TIMING_PASS 5 tiers, Phoenix 0.4s fall, unchanged 500 radius / totals / 3s lava / 0.5s gap / 80% second meteor, VFX failures, cleanup")

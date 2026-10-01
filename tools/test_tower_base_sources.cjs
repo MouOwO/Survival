@@ -56,6 +56,14 @@ for (const values of rows) {
   const row = Object.fromEntries(headers.map((key, i) => [key, values[i]]));
   assert.deepEqual(['r', 'sr', 'ssr', 'ur'].map(tier => +row['radius_' + tier]), [96, 100, 112, 128]);
   assert(+row.alpha > 0 && +row.alpha <= 0.56);
+  if (row.native_base) {
+    assert(['leshrac_edict','bulldoze','psionic_trap'].includes(row.native_base));
+    for (const key of ['core','detail','detail_ssr','crown']) assert.equal(row[key], '', 'replaced base retains legacy image');
+    budgets.push({profile:row.profile_id,native_base:row.native_base,legacy_sprites:0,
+      handles:{n:0,r:row.native_base==='leshrac_edict'?1:2,sr:row.native_base==='leshrac_edict'?1:2,
+        ssr:row.native_base==='leshrac_edict'?1:2,red_ssr_or_ur:row.native_base==='leshrac_edict'?1:2}});
+    continue;
+  }
   const core = spriteCount(row.core), sr = core + spriteCount(row.detail), ssr = core + spriteCount(row.detail_ssr);
   const red = ssr + spriteCount(row.crown);
   assert(core <= oldCoreSprites[row.profile_id] && sr <= oldCoreSprites[row.profile_id] + 1);
@@ -72,7 +80,7 @@ const result = { status: 'SOURCE_AND_NATIVE_DEPENDENCIES_PASS', art_revision: ma
   scope: 'Source/preflight only; compile and cold Workshop visual acceptance are separate and not performed by this test.',
   csv_sha256: hash(csv), service_sha256: hash(fs.readFileSync(path.join(root, 'scripts/vscripts/systems/tower_visual_service.lua'))),
   resources: records.length, native_textures: new Set(records.map(r => r.texture)).size,
-  profession_details: seenDetails.size, max_actual_sprites_per_tower: Math.max(...budgets.map(b => b.red_ssr_or_ur)),
+  profession_details: seenDetails.size, max_legacy_sprites_per_tower: Math.max(...budgets.map(b => b.red_ssr_or_ur || 0)),
   max_top_level_handles: 3, budgets, records };
 // Re-running static checks must never carry old manual acceptance onto changed
 // source, compiled output, runtime mapping or profile values.

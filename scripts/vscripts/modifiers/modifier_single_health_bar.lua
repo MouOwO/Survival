@@ -10,6 +10,7 @@ function modifier_single_health_bar:GetAttributes()
 end
 
 local TABLE = "survival_hero_health_bar"
+local laser_prediction = require("systems/tower_laser_health_prediction")
 
 local function publish(unit, value, cached_entindex)
     if not CustomNetTables
@@ -75,10 +76,13 @@ function modifier_single_health_bar:publish_state()
     local alive = unit:IsAlive() and 1 or 0
     local team = unit:GetTeamNumber()
     local unit_name = unit.GetUnitName and unit:GetUnitName() or nil
+    local forecast, revision = laser_prediction.snapshot(unit, max_health,
+        GameRules and GameRules:GetGameTime() or 0)
     local previous = self.health_bar_last_sample
     if previous and previous.health == health and previous.max_health == max_health
         and previous.scale == scale and previous.alive == alive
-        and previous.team == team and previous.unit_name == unit_name then
+        and previous.team == team and previous.unit_name == unit_name
+        and previous.forecast_revision == revision then
         return
     end
 
@@ -91,10 +95,11 @@ function modifier_single_health_bar:publish_state()
         alive = alive,
         team = team,
         unit_name = unit_name,
+        laser_forecast = forecast,
     })
     if sent then
         self.health_bar_last_sample = { health = health, max_health = max_health,
-            scale = scale, alive = alive, team = team, unit_name = unit_name }
+            scale = scale, alive = alive, team = team, unit_name = unit_name, forecast_revision = revision }
         self.health_bar_published_removed = false
     end
 end

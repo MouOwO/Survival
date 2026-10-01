@@ -132,10 +132,14 @@ assert(caster.position.x==0 and caster.position.y==0,"request issues movement wi
 tick(0.1);assert(paid==0 and created==0,"remaining inside footprint cannot spend or construct")
 arrived();tick(0.2)
 assert(paid==1 and created==1 and refunded==0)
+assert(by_id[11].survival_hull_radius>0 and by_id[11]:HasModifier("modifier_building_under_construction"),
+    "invisible construction must reserve a physical hull before completion")
 assert(account.wood==10000-config.main_city.build_cost.wood)
 assert(not build().ok and paid==1,"duplicate request cannot construct a second city")
 tick(20);assert(paid==1 and created==1)
 local city=by_id[11]
+assert(not city:HasModifier("modifier_building_under_construction") and city.survival_hull_radius>0,
+    "completed city retains its ordinary collision")
 assert(city.abilities.ability_train_lumberjack.hidden==true,"preserve the production-panel skill hiding fix")
 
 reset();assert(build().ok);assert(build().ok);assert(paid==0)

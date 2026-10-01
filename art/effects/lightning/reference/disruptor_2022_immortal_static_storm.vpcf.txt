@@ -1,0 +1,172 @@
+--- vpcf block DATA (1388 bytes) ---
+{
+	_class = "CParticleSystemDefinition"
+	m_bShouldHitboxesFallbackToRenderBounds = false
+	m_nMaxParticles = 0
+	m_ConstantColor = [ 118, 221, 222, 255 ]
+	m_nBehaviorVersion = 12
+	m_nFirstMultipleOverride_BackwardCompat = 7
+	m_controlPointConfigurations =
+	[
+		{
+			m_name = "preview"
+			m_drivers =
+			[
+				{
+					m_iAttachType = "PATTACH_WORLDORIGIN"
+					m_entityName = "self"
+				},
+				{
+					m_iControlPoint = 1
+					m_iAttachType = "PATTACH_WORLDORIGIN"
+					m_vecOffset = [ 500.0, 1.0, 1.0 ]
+					m_entityName = "self"
+				},
+				{
+					m_iControlPoint = 2
+					m_iAttachType = "PATTACH_WORLDORIGIN"
+					m_vecOffset = [ 500.0, 0.0, 0.0 ]
+					m_entityName = "self"
+				},
+				{
+					m_iControlPoint = 60
+					m_iAttachType = "PATTACH_WORLDORIGIN"
+					m_vecOffset = [ 8.0, 229.0, 96.0 ]
+					m_entityName = "self"
+				},
+				{
+					m_iControlPoint = 61
+					m_iAttachType = "PATTACH_WORLDORIGIN"
+					m_entityName = "self"
+				},
+				{
+					m_iControlPoint = 62
+					m_iAttachType = "PATTACH_WORLDORIGIN"
+					m_entityName = "self"
+				},
+				{
+					m_iControlPoint = 4
+					m_iAttachType = "PATTACH_WORLDORIGIN"
+					m_entityName = "self"
+				},
+			]
+		},
+	]
+	m_PreEmissionOperators =
+	[
+		{
+			_class = "C_OP_HSVShiftToCP"
+			m_DefaultHSVColor = [ 76, 93, 166 ]
+		},
+		{
+			_class = "C_OP_StopAfterCPDuration"
+			m_flDuration =
+			{
+				m_nType = "PF_TYPE_CONTROL_POINT_COMPONENT"
+				m_nControlPoint = 2
+				m_nVectorComponent = 0
+				m_nMapType = "PF_MAP_TYPE_MULT"
+				m_flMultFactor = 1.05
+			}
+		},
+	]
+	m_Emitters =
+	[
+		{
+			_class = "C_OP_ContinuousEmitter"
+			m_flEmitRate =
+			{
+				m_nType = "PF_TYPE_LITERAL"
+				m_flLiteralValue = 65.0
+			}
+		},
+	]
+	m_Operators =
+	[
+		{
+			_class = "C_OP_Decay"
+		},
+	]
+	m_Children =
+	[
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_charge_electricity.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_aoe_edge.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill_red.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_01.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_under.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside_edge.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_particles.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_iconic_stuff_outside.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_outside.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_outside_01.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_flash.vpcf"
+			m_bEndCap = true
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_idle.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_nosuck_idle.vpcf"
+			m_flDelay = 0.25
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_large_suck.vpcf"
+			m_flDelay = 0.2
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_lightning.vpcf"
+			m_flDelay = 0.25
+		},
+	]
+}
