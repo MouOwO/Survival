@@ -63,7 +63,8 @@ function modifier_single_health_bar:publish_state()
     end
     if unit.survival_hide_custom_health_bar
         or unit.survival_is_native_wearable_visual
-        or (unit.HasModifier and unit:HasModifier("modifier_native_wearable_visual_carrier"))
+        or (unit.HasModifier and (unit:HasModifier("modifier_native_wearable_visual_carrier")
+            or unit:HasModifier("modifier_building_under_construction")))
         or (unit.IsNoDraw and unit:IsNoDraw())
         or (unit.GetClassname and unit:GetClassname() == "npc_dota_thinker") then
         publish_removed(self, unit)

@@ -3,6 +3,8 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local weapons = require("config/generated/weapon_definitions")
 local profiles = require("config/generated/weapon_visual_profiles")
+local owned_visual = require("systems/weapon_owned_visual")
+local hero_weapon = require("systems/hero_weapon_cosmetic_service")
 
 local M = {}
 local states = {}
@@ -166,6 +168,7 @@ end
 local function on_equipped(payload)
     local id = player_id(payload.player_id)
     if not id or payload.slot ~= "main_hand" then return end
+    hero_weapon.on_equipped(payload)
     local current = state(id)
     local content_id = tostring(payload.content_id or "")
     if current.content_id == content_id then return end
@@ -176,6 +179,8 @@ end
 local function on_hero(payload)
     local id = player_id(payload.player_id)
     if not id or not owner_matches(payload.unit, id) then return end
+    owned_visual.on_hero_summoned(payload)
+    hero_weapon.on_hero_summoned(payload)
     local current = state(id)
     clear(current)
     current.hero = payload.unit
@@ -259,6 +264,8 @@ end
 local function lifecycle()
     poll_states(states)
     poll_states(preview_states)
+    owned_visual.poll()
+    hero_weapon.poll()
 end
 
 -- A Tools display uses exactly the production profile, stage normalization,
@@ -327,6 +334,8 @@ function M.preview(hero, content_id)
 end
 
 function M.precache(context)
+    owned_visual.precache(context)
+    hero_weapon.precache(context)
     for _, path in pairs(particle_paths) do PrecacheResource("particle", path, context) end
     local seen = {}
     for _, profile in ipairs(profiles.rows) do
@@ -338,9 +347,16 @@ function M.precache(context)
     end
 end
 
+local function on_player_unavailable(payload)
+    owned_visual.on_unavailable(payload)
+    hero_weapon.on_unavailable(payload)
+end
+
 function M.init()
     local current_world = GameRules.GetGameModeEntity
         and GameRules:GetGameModeEntity() or GameRules
+    owned_visual.reset(current_world == world_token)
+    hero_weapon.reset(current_world == world_token)
     if current_world == world_token then
         for _, current in pairs(states) do clear(current) end
         for _, current in pairs(preview_states) do clear(current) end
@@ -377,6 +393,9 @@ function M.init()
         [events.WEAPON_EQUIPPED_CHANGED] = on_equipped,
         [events.HERO_SUMMONED] = on_hero,
         [events.HERO_MAIN_ATTACK_LANDED] = on_attack,
+        [events.CONTENT_INVENTORY_CHANGED] = owned_visual.on_inventory_changed,
+        [events.PLAYER_DEFEATED] = on_player_unavailable,
+        [events.PLAYER_DISCONNECTED] = on_player_unavailable,
     }) do
         local callback = handler
         event_bus.subscribe(event_name, function(payload)

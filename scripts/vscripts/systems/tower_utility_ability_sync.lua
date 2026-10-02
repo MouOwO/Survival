@@ -29,7 +29,8 @@ end
 
 local function visible_non_utility_count(unit)
     local count = 0
-    for index = 0, 23 do
+    local slots = math.max(0, tonumber(unit:GetAbilityCount()) or 0)
+    for index = 0, slots - 1 do
         local ability = unit:GetAbilityByIndex(index)
         if ability and not ability:IsNull() then
             local name = ability:GetAbilityName()

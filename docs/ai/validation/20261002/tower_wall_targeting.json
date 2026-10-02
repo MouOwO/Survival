@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "date": "2026-10-02",
+  "policy": {
+    "priority": "Nearest own living wall among legal enemies within actual tower range",
+    "metric": "dx*dx + dy*dy, horizontal only; no square root",
+    "candidates": "FIND_ANY_ORDER, one pass, no sorting",
+    "owner": "survival_player_id, with GetPlayerOwnerID fallback",
+    "tie_break": "Entity index only for exactly equal wall distances, not spawn order",
+    "no_living_wall": "Squared distance to tower"
+  },
+  "range": "Authoritative Script_GetAttackRange including technology/permanent bonuses; no old +64/+96 tolerance",
+  "handoff": {
+    "death": "Immediate callback, single next-frame recovery",
+    "out_of_range": "Invalid even during windup; choose highest-priority eligible enemy",
+    "relocation": "Immediate selection at new position and after existing 0.06-second network refresh",
+    "burst": "Machine gun and anti-air remaining shots use same priority; preserve damage, counts, timing and gold"
+  },
+  "timing": {
+    "ordinary_scan_seconds": 0.25,
+    "new_periodic_timers": 0,
+    "native_attack_cooldown_changed": false
+  },
+  "tests": [
+    {
+      "test": "test_tower_wall_targeting",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_seamless_targets",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_target_selection",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_idle_state",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_upgrade_targeting",
+      "status": "PASS"
+    },
+    {
+      "test": "test_ultimate_tower_tree_targeting",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_skill_tree_exclusion",
+      "status": "PASS"
+    }
+  ],
+  "lua_51_syntax": "PASS, 4 runtime modules and 7 tests",
+  "git_diff_check": "PASS",
+  "live_hotfix": {
+    "status": "PASS",
+    "tower_count": 2,
+    "player": 0,
+    "wall_entindex": 591,
+    "hp_and_attacks_per_second_unchanged": true,
+    "relocation_state_binding_preserved": true,
+    "paused": false,
+    "in_range_enemies_during_probe": 0,
+    "live_combat_priority_verified": false
+  },
+  "map_reload_required_for_current_targeting_change": false,
+  "resource_compilation_required": false
+}

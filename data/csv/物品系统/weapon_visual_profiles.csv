@@ -1,8 +1,8 @@
-series_id,enabled,primary_rgb,secondary_rgb,glow_radius_min,glow_radius_max,trail_radius_min,trail_radius_max,emission_min,emission_max,alpha_min,alpha_max,shards,impact_particle,impact_cooldown,notes
-#中文名:武器系列,启用,主色RGB,辅色RGB,初始光晕半径,最高光晕半径,初始尾迹半径,最高尾迹半径,初始每秒发射数,最高每秒发射数,初始透明度,最高透明度,冰晶层,命中特效,命中特效冷却,备注
-#types:string,boolean,list,list,number,number,number,number,number,number,number,number,boolean,string,number,string
-growth_sword,1,185|215|255,140|180|255,6,10,1.2,2.2,6,10,0.2,0.35,0,,0.8,仅主手；轻量银蓝光晕与短尾迹。
-frost_blade,1,90|175|255,165|225|255,10,15,2,3.5,10,15,0.3,0.45,0,particles/items2_fx/skadi_projectile_explosion.vpcf,0.65,霜之剑刃；只加视觉不改变攻击弹道或伤害。
-ice_blade,1,75|200|255,210|240|255,15,20,3,4.5,14,20,0.35,0.5,1,particles/items2_fx/skadi_projectile_explosion.vpcf,0.55,极寒之刃；增加低频冰晶碎片。
-epic_icefire,1,255|135|45,70|195|255,20,25,4,5.5,20,26,0.4,0.55,1,particles/units/heroes/hero_jakiro/jakiro_liquid_fire_explosion.vpcf,0.45,冰火双配色；暖色核心与冰蓝尾迹。
-legend_abyss,1,195|90|255,95|190|255,25,30,5,7,24,32,0.45,0.6,1,particles/items_fx/desolator_projectile_explosion.vpcf,0.4,深渊紫色核心与蓝色尾迹；最多三个常驻粒子。
+series_id,enabled,primary_rgb,secondary_rgb,glow_radius_min,glow_radius_max,trail_radius_min,trail_radius_max,emission_min,emission_max,alpha_min,alpha_max,shards,impact_particle,impact_cooldown,notes,owned_particle
+#中文名:武器系列,启用,主色RGB,辅色RGB,初始光晕半径,最高光晕半径,初始尾迹半径,最高尾迹半径,初始每秒发射数,最高每秒发射数,初始透明度,最高透明度,冰晶层,命中特效,命中特效冷却,备注,持有时脚底常驻特效
+#types:string,boolean,list,list,number,number,number,number,number,number,number,number,boolean,string,number,string,string
+growth_sword,1,185|215|255,140|180|255,6,10,1.2,2.2,6,10,0.2,0.35,0,,0.8,仅主手；轻量银蓝光晕与短尾迹。,
+frost_blade,1,90|175|255,165|225|255,10,15,2,3.5,10,15,0.3,0.45,0,particles/items2_fx/skadi_projectile_explosion.vpcf,0.65,霜之剑刃；只加视觉不改变攻击弹道或伤害。,
+ice_blade,1,75|200|255,210|240|255,15,20,3,4.5,14,20,0.35,0.5,1,particles/items2_fx/skadi_projectile_explosion.vpcf,0.55,极寒之刃；增加低频冰晶碎片。,
+epic_icefire,1,255|135|45,70|195|255,20,25,4,5.5,20,26,0.4,0.55,1,particles/units/heroes/hero_jakiro/jakiro_liquid_fire_explosion.vpcf,0.45,冰火双配色；暖色核心与冰蓝尾迹。,
+legend_abyss,1,195|90|255,95|190|255,25,30,5,7,24,32,0.45,0.6,1,particles/items_fx/desolator_projectile_explosion.vpcf,0.4,深渊紫色核心与蓝色尾迹；三个主手常驻根加一个库存持有神杖脚底根（含原生子层）。,particles/items4_fx/scepter_aura.vpcf

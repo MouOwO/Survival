@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "presets": [
+    {
+      "preset": "B",
+      "stages": 21,
+      "visible_components": 105,
+      "combat_unchanged": true,
+      "precache_pass": true
+    },
+    {
+      "preset": "C",
+      "stages": 21,
+      "visible_components": 105,
+      "combat_unchanged": true,
+      "precache_pass": true
+    },
+    {
+      "preset": "A",
+      "stages": 21,
+      "visible_components": 104,
+      "combat_unchanged": true,
+      "precache_pass": true
+    }
+  ],
+  "active": "A",
+  "in_game_visual_verified": false,
+  "date": "2026-10-02",
+  "compiled_particles": 16,
+  "particle_dependency_files": 376,
+  "checks": [
+    "three presets switch/load/restore A",
+    "140 tower combat rows unchanged",
+    "native wearable projection and skins",
+    "Lua 5.1 syntax 20 files",
+    "full Precache entry with strict API signatures",
+    "startup asset preload",
+    "tower base lifecycle and failures",
+    "native/tracking particle dependencies",
+    "laser immediate hit and cumulative damage",
+    "laser health prediction",
+    "tower skill timing/radius/tree exclusion",
+    "Naga root semantics",
+    "git diff --check"
+  ],
+  "visual_verification_note": "Local console TCP connection was refused; no screenshot/appearance acceptance claimed.",
+  "price_verification": "Steam pages checked for key premium items; complete live prices of alternate mixed outfits unavailable; no invented total costs.",
+  "guide": "docs/tower_effect_design_20261002.md"
+}

@@ -1,7 +1,7 @@
 LinkLuaModifier("modifier_tower_auto_attack", "modifiers/modifier_tower_auto_attack", LUA_MODIFIER_MOTION_NONE)
-local tower_combat_rules = require("config/tower_combat_rules")
 local tree_damage_rules = require("systems/tree_damage_rules")
 local anti_air_rules = require("systems/anti_air_rules")
+local targeting = require("systems/tower_targeting")
 modifier_tower_auto_attack = class({})
 _G.modifier_tower_auto_attack = modifier_tower_auto_attack
 
@@ -10,7 +10,7 @@ function modifier_tower_auto_attack:IsPurgable() return false end
 function modifier_tower_auto_attack:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
 function modifier_tower_auto_attack:DeclareFunctions()
-    return { MODIFIER_EVENT_ON_ATTACK_START, MODIFIER_EVENT_ON_DEATH,
+    return { MODIFIER_EVENT_ON_ATTACK_START, MODIFIER_EVENT_ON_ATTACK, MODIFIER_EVENT_ON_DEATH,
         MODIFIER_PROPERTY_DISABLE_AUTOATTACK }
 end
 
@@ -37,7 +37,6 @@ local function valid(unit)
     return unit and not unit:IsNull() and unit:IsAlive()
 end
 
-local current_attack_range = tower_combat_rules.current_attack_range
 local THINK_INTERVAL = 0.25
 local ATTACK_ORDER_RETRY_SECONDS = THINK_INTERVAL
 
@@ -66,6 +65,7 @@ function modifier_tower_auto_attack:EnterIdle(force_stop)
     -- nearby hostile tree between the previous target and the next AI update.
     self:SetAttackEnabled(false)
     self.forced_target, self.manual_target = nil, nil
+    self.windup_target = nil
     self.attack_order_wait = 0
     if valid(tower) and needs_stop then
         tower:SetForceAttackTarget(nil)
@@ -80,29 +80,7 @@ local function is_training_dummy(unit)
 end
 
 local function find_target(tower, excluded_target)
-    local attack_range = current_attack_range(tower)
-    local origin, team = tower:GetAbsOrigin(), tower:GetTeamNumber()
-    local radius = math.max(attack_range + 64, 700)
-    local units = FindUnitsInRadius(
-        team, origin, nil, radius,
-        DOTA_UNIT_TARGET_TEAM_ENEMY,
-        DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-        DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
-        FIND_CLOSEST, false)
-    local training_dummy = nil
-    for _, unit in ipairs(units or {}) do
-        if unit ~= excluded_target and valid(unit) and not tree_damage_rules.is_tree(unit)
-            and unit:GetTeamNumber() ~= team
-            and anti_air_rules.can_attack(tower, unit)
-            and (unit:GetAbsOrigin() - origin):Length2D() <= attack_range + 64 then
-            if is_training_dummy(unit) then
-                training_dummy = training_dummy or unit
-            else
-                return unit
-            end
-        end
-    end
-    return training_dummy
+    return targeting.select(tower, excluded_target)
 end
 
 function modifier_tower_auto_attack:OnAttackStart(params)
@@ -115,9 +93,34 @@ function modifier_tower_auto_attack:OnAttackStart(params)
         and self:GetStackCount() ~= 0 and not tree_damage_rules.is_tree(target)
         and anti_air_rules.can_attack(tower, target)
         and (not is_training_dummy(target) or self.forced_target == target) then
+        if params.no_attack_cooldown ~= true and params.no_attack_cooldown ~= 1 then
+            self.windup_target = target
+        end
         return
     end
     self:EnterIdle(true)
+end
+
+-- A higher-priority enemy must not repeatedly cancel an existing shot windup.
+-- Once the shot is released, select by proximity to the player's wall.
+function modifier_tower_auto_attack:OnAttack(params)
+    if not IsServer() or params.attacker ~= self:GetParent() then return end
+    if params.no_attack_cooldown == true or params.no_attack_cooldown == 1 then return end
+    if self.windup_target == params.target then self.windup_target = nil end
+end
+
+function modifier_tower_auto_attack:VerifyTargetNextFrame(target)
+    local tower = self:GetParent()
+    if not tower.SetContextThink then return end
+    tower:SetContextThink("SurvivalTowerVerifyTarget", function()
+        if self.destroyed or not valid(tower) or self.forced_target ~= target then return nil end
+        -- The engine may clear its old attack order after dispatching OnDeath.
+        -- Recheck once next frame, without waiting for the 0.25s idle scan.
+        if targeting.valid(tower, target) and tower:GetAttackTarget() ~= target then
+            self:IssueAttackTarget(target, true)
+        end
+        return nil
+    end, 0)
 end
 
 function modifier_tower_auto_attack:OnDeath(params)
@@ -129,6 +132,7 @@ function modifier_tower_auto_attack:OnDeath(params)
     if params.unit and (params.unit == self.forced_target or params.unit == self.manual_target
         or (valid(tower) and params.unit == tower:GetAttackTarget())) then
         if not valid(tower) then return end
+        if self.windup_target == params.unit then self.windup_target = nil end
         -- A kill is a target change, not an idle transition. Disarming/Stop here
         -- interrupted the next attack, then a forced-target hint could spend a
         -- whole second waiting for the retry while native acquisition was off.
@@ -138,6 +142,7 @@ function modifier_tower_auto_attack:OnDeath(params)
             if self.forced_target ~= target or tower:GetAttackTarget() ~= target then
                 self:IssueAttackTarget(target, tower:GetAttackTarget() ~= target)
             end
+            self:VerifyTargetNextFrame(target)
         else
             self:EnterIdle()
         end
@@ -147,6 +152,7 @@ end
 function modifier_tower_auto_attack:OnCreated()
     if not IsServer() then return end
     self.forced_target, self.manual_target = nil, nil
+    self.windup_target, self.destroyed = nil, false
     self.idle_initialized = false
     local tower = self:GetParent()
     if valid(tower) then
@@ -175,8 +181,7 @@ function modifier_tower_auto_attack:SetManualTarget(target)
         or tree_damage_rules.is_tree(target)
         or not anti_air_rules.can_attack(tower, target)
         or target:GetTeamNumber() == tower:GetTeamNumber()
-        or (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
-            > current_attack_range(tower) + 96 then
+        or not targeting.in_range(tower, target) then
         return
     end
     self.manual_target = target
@@ -192,6 +197,15 @@ function modifier_tower_auto_attack:IssueAttackTarget(target, issue_order)
     self.forced_target, self.attack_order_wait = target, 0
     self.issuing_attack_order = true
     local ok = pcall(function()
+        -- These are stationary towers. Face the next victim immediately so a
+        -- hero model's turn animation cannot add a separate targeting delay.
+        if tower.SetForwardVector then
+            local direction = target:GetAbsOrigin()-tower:GetAbsOrigin()
+            direction.z = 0
+            if direction.x*direction.x + direction.y*direction.y > 0 and direction.Normalized then
+                tower:SetForwardVector(direction:Normalized())
+            end
+        end
         tower:SetForceAttackTarget(target)
         -- Idle acquisition is disabled. On a new automatic target, issue the
         -- actual order immediately instead of waiting for a forced-target hint
@@ -206,28 +220,16 @@ end
 
 function modifier_tower_auto_attack:SelectTarget(excluded_target)
     local tower = self:GetParent()
-    local attack_range = current_attack_range(tower)
     local function legal(target)
-        return target ~= excluded_target and valid(target) and not tree_damage_rules.is_tree(target)
-            and anti_air_rules.can_attack(tower, target)
-            and target:GetTeamNumber() ~= tower:GetTeamNumber()
-            and (target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D() <= attack_range + 96
+        return targeting.valid(tower, target, excluded_target)
     end
     if not legal(self.manual_target) then self.manual_target = nil end
-    -- Keep a legal player selection or ongoing engine target. Training dummies
-    -- still yield to real enemies; no target leaves the tower explicitly idle.
-    local target = self.manual_target or tower:GetAttackTarget()
-    if not legal(target) then target = nil end
-    if not target and legal(self.forced_target) then target = self.forced_target end
-    if target and is_training_dummy(target) then
-        local preferred = find_target(tower, excluded_target)
-        if preferred ~= target then
-            self.manual_target = nil
-        end
-        return preferred
-    end
-    if not target then target = find_target(tower, excluded_target) end
-    return target
+    if self.manual_target and not is_training_dummy(self.manual_target) then return self.manual_target end
+    -- Keep only the current windup; subsequent automatic selection uses the wall.
+    if legal(self.windup_target) and tower:GetAttackTarget() == self.windup_target
+        and not is_training_dummy(self.windup_target) then return self.windup_target end
+    self.windup_target = nil
+    return find_target(tower, excluded_target)
 end
 
 function modifier_tower_auto_attack:OnIntervalThink()
@@ -266,6 +268,7 @@ end
 
 function modifier_tower_auto_attack:OnDestroy()
     if IsServer() then
+        self.destroyed = true
         local tower = self:GetParent()
         if valid(tower) then
             tower:SetForceAttackTarget(nil)

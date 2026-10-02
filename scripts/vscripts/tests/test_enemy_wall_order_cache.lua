@@ -10,6 +10,7 @@ return function(source)
     env.DOTA_TEAM_BADGUYS=3
     local plan=nil
     local contact={release=function() end,resolve=function() return plan end,attack_range=function() return 210 end}
+    contact.arrived=require('systems/wall_melee_contact').arrived
     env.require=function(name)
         if name=='systems/wall_melee_contact' then return contact end
         return {are_enemies=function() return true end,enforce=function() error('unnecessary team update') end}

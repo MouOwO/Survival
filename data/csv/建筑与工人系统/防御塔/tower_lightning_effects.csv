@@ -2,5 +2,6 @@ effect_key,particle_name,impact_particle,cast_particle,enabled,notes,visual_dura
 #中文名:特效记录键,主特效,命中特效,施法特效,启用,备注,视觉持续时间
 #types:string,string,string,string,boolean,string,number
 SR,particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc.vpcf,,,1,风暴之示ItemDef12323；完整Q；同品质五级共用；R沿用原资源。,
-SSR,particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf,,,1,第三阶段改回宙斯原生连锁闪电；取消金色连线与附加金色命中；含红星进阶。,
-strike,particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm.vpcf,,,1,风暴串联之震ItemDef23655原生R全套；CP1为技能半径；怒雷视觉1.2秒；塔雷暴沿用技能持续时间；不产生原生技能伤害或沉默。,1.2
+SSR,particles/survival/towers/trial/lightning_ssr_arc.vpcf,,,1,SSR 原生白蓝连锁闪电加强版；主干宽度1.8倍，保留原生子层，取消金雷；本阶五级与红星共用。,
+strike,particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm.vpcf,,,1,塔雷暴使用风暴串联之震ItemDef23655原生R全套；CP1为技能半径；沿用技能持续时间；不产生原生技能伤害或沉默。,1.2
+hero_strike,particles/econ/items/zeus/lightning_weapon_fx/zuus_lightning_bolt_immortal_lightning.vpcf,,particles/econ/items/zeus/lightning_weapon_fx/zuus_lb_cfx_il.vpcf,1,英雄怒雷使用真霹实雳ItemDef5412原生W完整落雷与施法效果；主资源自带地面裂痕与火焰；自然消退保留秒杀残影。,

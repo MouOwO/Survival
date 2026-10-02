@@ -54,14 +54,19 @@ const oldCoreSprites = { class_1: 2, class_2: 1, class_3: 2, class_4: 1, class_5
 for (const values of rows) {
   assert.equal(values.length, headers.length);
   const row = Object.fromEntries(headers.map((key, i) => [key, values[i]]));
-  assert.deepEqual(['r', 'sr', 'ssr', 'ur'].map(tier => +row['radius_' + tier]), [96, 100, 112, 128]);
-  assert(+row.alpha > 0 && +row.alpha <= 0.56);
+  assert.deepEqual(['r', 'sr', 'ssr', 'ur'].map(tier => +row['radius_' + tier]), row.profile_id === 'ultimate' ? [96, 100, 112, 128] : [96, 108, 120, 128]);
+  assert(+row.alpha > 0 && +row.alpha <= 0.95);
   if (row.native_base) {
-    assert(['leshrac_edict','bulldoze','psionic_trap'].includes(row.native_base));
+    assert(['leshrac_edict','bulldoze','psionic_trap','dazzle_weave','willow_shadow_realm','kinetic_markers','clinkz_embers','ice_vortex'].includes(row.native_base));
+    if (row.native_base === 'willow_shadow_realm') {
+      assert.equal(row.profile_id, 'class_1', 'Shadow Realm ground belongs only to the death route');
+      assert.deepEqual([row.color_r, row.color_sr, row.color_ssr], ['25|219|241', '180|95|255', '255|52|83']);
+      assert.equal(row.alpha, '0.95');
+    }
     for (const key of ['core','detail','detail_ssr','crown']) assert.equal(row[key], '', 'replaced base retains legacy image');
     budgets.push({profile:row.profile_id,native_base:row.native_base,legacy_sprites:0,
-      handles:{n:0,r:row.native_base==='leshrac_edict'?1:2,sr:row.native_base==='leshrac_edict'?1:2,
-        ssr:row.native_base==='leshrac_edict'?1:2,red_ssr_or_ur:row.native_base==='leshrac_edict'?1:2}});
+      handles:{n:0,r:['bulldoze','psionic_trap'].includes(row.native_base)?2:1,sr:['bulldoze','psionic_trap'].includes(row.native_base)?2:1,
+        ssr:['bulldoze','psionic_trap'].includes(row.native_base)?2:1,red_ssr_or_ur:['bulldoze','psionic_trap'].includes(row.native_base)?2:1}});
     continue;
   }
   const core = spriteCount(row.core), sr = core + spriteCount(row.detail), ssr = core + spriteCount(row.detail_ssr);

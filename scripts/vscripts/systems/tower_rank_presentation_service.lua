@@ -22,17 +22,35 @@ function M.remove(entindex, unit)
     write("unit_" .. entindex, { removed = 1, session = session })
 end
 
+local function display_name(state, unit)
+    local name = state.display_name or unit.survival_display_name
+        or state.tower_class_name or (state.definition and state.definition.display_name)
+        or unit:GetUnitName()
+    -- Quality and upgrade stars already have their own overhead UI elements.
+    return tostring(name):gsub("^【.-】", ""):gsub("（进阶 %d+/5）$", "")
+end
+
 function M.publish(state)
     local rank = projection.project(state)
     local unit = state and state.unit
     if not rank or not valid(unit) or (unit.IsAlive and not unit:IsAlive()) then return end
     local entindex = unit:entindex()
+    if state.constructing == true or tonumber(state.constructing) == 1
+        or (unit.HasModifier and unit:HasModifier("modifier_building_under_construction"))
+        or (unit.IsNoDraw and unit:IsNoDraw()) then
+        -- Completed buildings normally enter through BUILDING_CREATED only.
+        -- Also retire an old entry if Tools reloads or construction reuse expose it.
+        M.remove(entindex, unit)
+        return
+    end
     local player_id = tonumber(state.player_id or unit.survival_player_id)
     if not player_id or player_id < 0 then return end
     rank.entindex = entindex
     rank.player_id = player_id
     rank.team = tonumber(state.team) or unit:GetTeamNumber()
     rank.unit_name = unit:GetUnitName()
+    rank.display_name = display_name(state, unit)
+    rank.constructing = 0
     rank.session = session
     rank.removed = 0
     local previous = tracked[entindex]
@@ -42,6 +60,8 @@ function M.publish(state)
         and previous.rank.stars == rank.stars
         and previous.rank.red_stars == rank.red_stars
         and previous.rank.unit_name == rank.unit_name
+        and previous.rank.display_name == rank.display_name
+        and previous.rank.constructing == rank.constructing
         and previous.rank.player_id == rank.player_id
         and previous.rank.team == rank.team then return end
     write("unit_" .. entindex, rank)

@@ -47,7 +47,7 @@ local function apply_slot(fixture, slot)
     -- A proxy name also avoids the upgrade service's legacy recovery-by-name.
     -- Main building state uses the explicit false flag; neither may recover it.
     if state.building_id == "ultimate_tower" then
-        unit.survival_display_name = "【UR】终极之塔"
+        unit.survival_display_name = "【UR】" .. fusion.by_id.ultimate_tower.display_name
         local expected_generation = slot.model_generation
         local model = assert(fusion.by_id.ultimate_tower.model_name)
         slot.model_status = "loading"

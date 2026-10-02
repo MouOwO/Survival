@@ -1,0 +1,183 @@
+{
+  "status": "PASS",
+  "source": "installed Dota VPK and compiled addon sound event",
+  "enabled_cues": 25,
+  "coin_feedback": {
+    "event": "Survival.Tower.Coins",
+    "native_sample": "sounds/ui/coins.vsnd",
+    "volume": 0.22,
+    "particle": "particles/generic_gameplay/lasthit_coins.vpcf",
+    "position": "tower head; CP0 and CP1",
+    "max_native_concurrent": 1
+  },
+  "in_game_audio_verified": false,
+  "records": [
+    {
+      "cue": "tower_basic_attack",
+      "event": "Creep_Good_Range.Attack",
+      "resource": "soundevents/game_sounds_creeps.vsndevts"
+    },
+    {
+      "cue": "tower_critical_strike",
+      "event": "Hero_TemplarAssassin.Meld.Attack",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_templar_assassin.vsndevts"
+    },
+    {
+      "cue": "tower_bone_cannon",
+      "event": "Hero_Nevermore.Shadowraze",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_nevermore.vsndevts"
+    },
+    {
+      "cue": "tower_death_grenade",
+      "event": "Hero_Warlock.RainOfChaos",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_warlock.vsndevts"
+    },
+    {
+      "cue": "tower_laser",
+      "event": "Hero_Tinker.Laser",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_tinker.vsndevts"
+    },
+    {
+      "cue": "tower_arcane_cannon",
+      "event": "Hero_ObsidianDestroyer.ArcaneOrb.Impact",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_obsidian_destroyer.vsndevts"
+    },
+    {
+      "cue": "tower_arcane_eye",
+      "event": "Hero_KeeperOfTheLight.Illuminate.Discharge",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_keeper_of_the_light.vsndevts"
+    },
+    {
+      "cue": "tower_lightning_strike",
+      "event": "Hero_Zuus.ArcLightning.Cast",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_zuus.vsndevts"
+    },
+    {
+      "cue": "tower_lightning_storm",
+      "event": "Hero_Disruptor.StaticStorm",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_disruptor.vsndevts"
+    },
+    {
+      "cue": "tower_lightning_diffusion",
+      "event": "Ability.PlasmaField",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_razor.vsndevts"
+    },
+    {
+      "cue": "tower_machine_gun",
+      "event": "Hero_Sniper.Attack.DT20",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_sniper.vsndevts"
+    },
+    {
+      "cue": "tower_bounty_machine_gun",
+      "event": "Survival.Tower.Coins",
+      "resource": "soundevents/survival_tower_feedback.vsndevts"
+    },
+    {
+      "cue": "tower_explosive_gatling",
+      "event": "Ability.Focusfire.Arcana",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_windrunner.vsndevts"
+    },
+    {
+      "cue": "tower_multi_attack",
+      "event": "Hero_Clinkz.Attack",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_clinkz.vsndevts"
+    },
+    {
+      "cue": "tower_piercing_ballista",
+      "event": "Hero_DrowRanger.FrostArrows",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_drowranger.vsndevts"
+    },
+    {
+      "cue": "tower_burning_great_arrow",
+      "event": "Hero_VengefulSpirit.WaveOfTerror",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_vengefulspirit.vsndevts"
+    },
+    {
+      "cue": "tower_frost_attack",
+      "event": "Ability.FrostNova",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_lich.vsndevts"
+    },
+    {
+      "cue": "tower_ice_blizzard",
+      "event": "Hero_Winter_Wyvern.WintersCurse.Cast",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_winter_wyvern.vsndevts"
+    },
+    {
+      "cue": "tower_polar_obelisk",
+      "event": "Hero_Ancient_Apparition.IceVortexCast",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_ancient_apparition.vsndevts"
+    },
+    {
+      "cue": "tower_magic_finger",
+      "event": "Hero_Lion.FingerOfDeath",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_lion.vsndevts"
+    },
+    {
+      "cue": "tower_magic_laguna",
+      "event": "Ability.LagunaBlade",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+    },
+    {
+      "cue": "tower_arcane_supremacy",
+      "event": "Hero_Rubick.FadeBolt.Cast",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_rubick.vsndevts"
+    },
+    {
+      "cue": "tower_death_attack",
+      "event": "Hero_Nevermore.Attack",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_nevermore.vsndevts"
+    },
+    {
+      "cue": "tower_frost_launch",
+      "event": "Hero_Lich.Attack",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_lich.vsndevts"
+    },
+    {
+      "cue": "tower_anti_air_attack",
+      "event": "Hero_SkywrathMage.Attack",
+      "resource": "soundevents/game_sounds_heroes/game_sounds_skywrath_mage.vsndevts"
+    }
+  ],
+  "date": "2026-10-02",
+  "active_preset": "B",
+  "machine_gun": {
+    "configured_hits_by_level": [
+      6,
+      7,
+      8,
+      8,
+      8
+    ],
+    "visual_projectiles_per_hit": 1,
+    "attack_gestures_per_round": 1,
+    "tier_projectiles_match_all_20_rows": true,
+    "damage_timing_and_total_preserved": true,
+    "gold_per_hit_preserved": true,
+    "tested_speed_bonus_pct": [
+      0,
+      100
+    ],
+    "failed_presentation_does_not_block_gameplay": true,
+    "lethal_hit_projectile_requested_before_damage": true
+  },
+  "base": {
+    "machine_gun_enabled": false,
+    "preset_writer_preserves_disable": true,
+    "lifecycle_regression": "PASS"
+  },
+  "validation": {
+    "attack_regression": "PASS",
+    "audio_routing_and_limiter": "PASS",
+    "native_audio_resource_audit": "PASS",
+    "generated_tables_match": 3,
+    "addon_precache": "PASS",
+    "audio_compile": {
+      "compiled": 1,
+      "failed": 0
+    },
+    "laser_damage_baseline": "PASS",
+    "diff_check": "PASS"
+  },
+  "in_game_visual_verified": false,
+  "map_reload_required": true
+}

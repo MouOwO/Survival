@@ -1,5 +1,5 @@
-// Run the actual module functions against a strict Panorama-style setter and
-// destroyed native panels. No copies of production callback/portrait logic.
+// Execute the production module through a seam that only suppresses unrelated
+// startup work. Native portrait hide/mount/position/update/sentinel are real.
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const source=fs.readFileSync(process.argv[2]||'panorama/src/scripts/custom_game/combat_stats.js','utf8');
 const seam='    // NetTable is the single regular synchronization path.';
@@ -10,26 +10,74 @@ const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbi
         refreshAbilities:refreshAbilities, shutdown:shutdownCombatContext,
         positionNumber:positionRelativeToNativeNumber, positionRow:positionRelativeToStatRow,
         positionAttributes:positionLogicalAttributeOverlay, positionPortrait:positionCosmeticPortrait,
+        portraitRect:portraitRect, portraitUpdate:updateCosmeticPortrait, updateSnapshot:update,
+        portraitHide:hideCosmeticPortrait, portraitTransition:transitionCosmeticPortrait,
+        portraitState:function(){return {key:activePortraitKey,mode:activePortraitMode,unit:activePortraitUnit,
+            entity:activePortraitEntity,scene:activePortraitScene,geometry:portraitGeometrySignature,
+            snapshot:selectedUnitSnapshot,acceptedVersion:acceptedSnapshotVersion};},
         subscribeTable:subscribeCombatTable, subscribeEvent:subscribeCombatEvent});
     return;
 `+seam);
-function setup(){
- const cfg={},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api,time=0;const runtime={};
+function setup(options={}){
+ const cfg={},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api,time=0,selected=options.portrait?7:-1,multi=false;
+ const runtime={},unitNames=new Map([[7,'npc_dota_hero_doom_bringer']]);
+ const metrics={setUnit:[],parents:0,order:0,geometryWrites:0,visibilityTransitions:0};
  class Panel{
-  constructor(id,parent){this.id=id;this.parent=parent;this.children=[];this.alive=true;this.hittest=true;this.hittestchildren=true;this.values={};if(parent)parent.children.push(this);
-   this.style=new Proxy(this.values,{set:(o,k,v)=>{if(!this.alive)throw Error('native panel destroyed');if(v===null||v===undefined||/NaN|Infinity/.test(String(v)))throw Error('native style rejected '+k+'='+v);o[k]=v;return true;}});
+  constructor(id,parent,type='Panel'){
+   this.id=id;this.parent=parent;this.paneltype=type;this.children=[];this.alive=true;this.visible=true;
+   this.hittest=true;this.hittestchildren=true;this.values={};this.actualuiscale_x=this.actualuiscale_y=1;
+   this.actuallayoutwidth=this.actuallayoutheight=128;this.point={x:0,y:0};
+   if(parent)parent.children.push(this);
+   this.style=new Proxy(this.values,{set:(o,k,v)=>{
+    if(this.alive!==true)throw Error('native panel destroyed');
+    if(v===null||v===undefined||/NaN|Infinity/.test(String(v)))throw Error('native style rejected '+k+'='+v);
+    if(['position','width','height'].includes(k)&&this.id==='SurvivalTowerPortraitOverlay'){
+     const numbers=String(v).match(/[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/gi)||[];
+     assert(numbers.every(n=>Number.isFinite(Number(n))&&Math.abs(Number(n))<1e6),'invalid portrait layout must not reach native setter');
+     metrics.geometryWrites++;
+    }
+    if(k==='visibility'&&o[k]!==v&&['SurvivalTowerPortraitOverlay','SurvivalTowerPortraitScene'].includes(this.id))metrics.visibilityTransitions++;
+    o[k]=v;return true;
+   }});
   }
   IsValid(){if(this.alive==='throw')throw Error('native handle released');return this.alive}
-  GetParent(){return this.parent}FindChildTraverse(id){if(this.id===id)return this;for(const c of this.children){const p=c.FindChildTraverse(id);if(p)return p;}return null}
-  AddClass(){} SetHasClass(){} SetImage(uri){this.image=uri;} GetChildCount(){return this.children.length}GetChild(i){return this.children[i]}
+  GetParent(){return this.parent}
+  FindChildTraverse(id){if(this.alive!==true)return null;if(this.id===id)return this;for(const c of this.children){const p=c.FindChildTraverse(id);if(p)return p;}return null}
+  GetPositionWithinWindow(){if(this.point==='throw')throw Error('layout not ready');return this.point}
+  SetParent(parent){assert(parent&&parent.alive===true);if(this.parent)this.parent.children=this.parent.children.filter(c=>c!==this);this.parent=parent;parent.children.push(this);metrics.parents++}
+  MoveChildAfter(child,anchor){this.children=this.children.filter(c=>c!==child);this.children.splice(this.children.indexOf(anchor)+1,0,child);metrics.order++}
+  SetUnit(...args){assert(this.alive===true);metrics.setUnit.push({panel:this,args});if(this.setUnitFailure==='throw')throw Error('SetUnit unavailable');if(this.setUnitFailure==='false')return false}
+  AddClass(){}SetHasClass(){}SetImage(uri){this.image=uri}
+  GetChildCount(){return this.children.length}GetChild(i){return this.children[i]}
  }
- const root=new Panel('Hud'),context=new Panel('Context',root),overlay=new Panel('SurvivalTowerPortraitOverlay',context),scene=new Panel('SurvivalTowerPortraitScene',overlay);
- const $=id=>context.FindChildTraverse(id.slice(1));$.CreatePanel=(type,parent,id)=>new Panel(id,parent);$.GetContextPanel=()=>context;$.Schedule=(delay,fn)=>{const id=++serial;jobs.set(id,{delay,fn});return id};$.CancelScheduled=id=>jobs.delete(id);$.Msg=(...s)=>messages.push(s.join(''));$.Warning=$.Msg;
+ const root=new Panel('Hud');root.actuallayoutwidth=1920;root.actuallayoutheight=1080;
+ const context=new Panel('Context',root),overlay=new Panel('SurvivalTowerPortraitOverlay',context),scene=new Panel('SurvivalTowerPortraitScene',overlay,'DOTAScenePanel');
+ let nativeHost,nativeScene;
+ function mountNative(){
+  nativeHost=new Panel('PortraitContainer',new Panel('PortraitGroup',root));
+  nativeHost.point={x:100,y:800};nativeScene=new Panel('portraitHUD',nativeHost,'DOTAScenePanel');
+  nativeScene.point={x:120,y:820};nativeScene.values.opacity='0.35';
+  return nativeScene;
+ }
+ if(options.portrait)mountNative();
+ cfg.SurvivalSelectionResolver={Resolve:()=>selected,ResolveDisplayUnit:()=>selected};
+ cfg.SurvivalMultiSelectionPortraits={IsActive:()=>multi};
+ const $=id=>context.FindChildTraverse(id.slice(1));
+ $.CreatePanel=(type,parent,id)=>new Panel(id,parent,type);$.GetContextPanel=()=>context;
+ $.Schedule=(delay,fn)=>{const id=++serial;jobs.set(id,{delay,fn});return id};$.CancelScheduled=id=>jobs.delete(id);
+ $.Msg=(...s)=>messages.push(s.join(''));$.Warning=$.Msg;$.Localize=s=>s;
  const subscribe=(name,fn)=>{const id=++serial;subscriptions.set(id,{name,fn});return id};
- vm.runInNewContext(instrumented,{$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,GetGameTime:()=>time},Players:{GetPlayerHeroEntityIndex:()=>-1},Entities:{},CustomNetTables:{GetTableValue:(name,key)=>runtime[key]||null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},GameEvents:{Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},__test:x=>api=x},{filename:'combat_stats.js'});
+ vm.runInNewContext(instrumented,{$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,GetGameTime:()=>time},
+  Players:{GetPlayerHeroEntityIndex:()=>selected},
+  Entities:{GetUnitName:id=>unitNames.get(Number(id))||'npc_dota_hero_test',GetAbility:()=>-1,GetLevel:()=>1,IsHero:()=>true},
+  CustomNetTables:{GetTableValue:(name,key)=>runtime[key]||null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},
+  GameEvents:{Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},__test:x=>api=x},{filename:'combat_stats.js'});
  function run(id){const job=jobs.get(id);assert(job);jobs.delete(id);job.fn()}
- return {api,root,context,overlay,scene,cfg,jobs,messages,subscriptions,run,Panel,runtime,setTime:t=>time=t};
+ return {api,root,context,overlay,scene,cfg,jobs,messages,subscriptions,run,Panel,runtime,metrics,mountNative,
+  native:()=>nativeScene,nativeHost:()=>nativeHost,setTime:t=>time=t,select:(id,name)=>{selected=id;if(name)unitNames.set(id,name)},setMulti:value=>{multi=value}};
 }
+module.exports={setup};
+if(require.main===module){
 // The reported callback entry is used by the 0.1s portrait sentinel. Hiding a
 // scene must not pass null to a native style setter or kill the next tick.
 const a=setup();a.api.applyScale(a.scene);
@@ -118,3 +166,129 @@ talentUI.api.applyAbilityRuntime(button,43);assert(!icon.visible,'native slot re
 icon.alive='throw';talentUI.api.applyAbilityRuntime(button,42);
 assert(button.__survivalTalentIcon!==icon && button.__survivalTalentIcon.visible,'a released image handle can be recreated safely');
 console.log('TALENT_NATIVE_ICON_PASS: input isolation, pulse, selection, slot reuse, stale handle');
+
+// Stable authoritative updates and the existing sentinel share one real scene.
+const doomSnapshot=(version=1)=>({entindex:7,refresh_version:version,model_asset_id:'hero_permanent_hero_doom',
+ portrait_unit_name:'npc_dota_hero_doom_bringer',portrait_item_def:'',attack_min:10,attack_max:10});
+function portraitGeometry(panel){return {position:panel.values.position,width:panel.values.width,height:panel.values.height}}
+{
+ const t=setup({portrait:true});t.api.updateSnapshot(doomSnapshot());
+ assert.equal(t.metrics.setUnit.length,1);assert.equal(t.overlay.GetParent(),t.nativeHost());
+ assert.equal(t.native().values.opacity,'0');assert.equal(t.overlay.values.visibility,'visible');
+ const baseline={parents:t.metrics.parents,order:t.metrics.order,geometryWrites:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions};
+ t.api.cosmeticPortraitSentinel();assert.equal(t.jobs.size,1);
+ for(let frame=0;frame<300;frame++){
+  t.setTime((frame+1)*.1);t.api.updateSnapshot(doomSnapshot(frame+2));t.run([...t.jobs.keys()][0]);
+  assert.equal(t.jobs.size,1);
+ }
+ assert.equal(t.metrics.setUnit.length,1,'stable updates/sentinel must not restart SetUnit');
+ assert.deepStrictEqual({parents:t.metrics.parents,order:t.metrics.order,geometryWrites:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions},baseline,
+  'stable frames cannot reparent home, reorder, hide or rewrite geometry');
+ assert(!t.messages.some(m=>m.includes('HIDE ')||m.includes('TRANSITION_MASK')));
+ const before=t.api.portraitState();
+ for(const snapshot of [null,{...doomSnapshot(300),model_asset_id:''},{...doomSnapshot(500),entindex:8}]){
+  t.api.updateSnapshot(snapshot);
+  assert.equal(t.api.portraitState().snapshot,before.snapshot,'null/stale/other-selection snapshot must not supersede accepted data');
+ }
+ assert.equal(t.api.portraitState().acceptedVersion,301);
+ // A genuinely accepted unsupported snapshot still restores the native portrait;
+ // this fix does not invent metadata or keep a stale custom portrait indefinitely.
+ t.api.updateSnapshot({entindex:7,refresh_version:302});
+ assert.equal(t.api.portraitState().key,'');assert.equal(t.api.portraitState().scene,null);
+ assert.equal(t.overlay.GetParent(),t.context);assert.equal(t.native().values.opacity,'0.35');
+ assert.equal(t.overlay.values.visibility,'collapse');
+ t.api.updateSnapshot(doomSnapshot(303));assert.equal(t.metrics.setUnit.length,2);
+ t.api.shutdown('test');assert.equal(t.jobs.size,0);
+}
+// Unlaid-out finite sentinels and overflow from tiny scale cannot reach styles
+// or replace the last accepted geometry signature. A valid next frame recovers.
+for(const scale of [1,.75]){
+ const t=setup({portrait:true});t.nativeHost().actualuiscale_x=t.nativeHost().actualuiscale_y=scale;
+ t.api.updateSnapshot(doomSnapshot());const anchor=t.native(),host=t.nativeHost();
+ const original={point:anchor.point,width:anchor.actuallayoutwidth,height:anchor.actuallayoutheight,hostPoint:host.point};
+ const before=portraitGeometry(t.overlay),signature=t.api.portraitState().geometry;
+ for(const point of [null,{},[0],{x:0,y:NaN},{x:Infinity,y:820},{x:1.95e38,y:820},{x:-1.95e38,y:820},
+  {x:1000000,y:820},{x:120,y:-1000000},'throw']){
+  anchor.point=point;assert.equal(t.api.positionPortrait(t.overlay,anchor,t.scene),false);
+  assert.deepStrictEqual(portraitGeometry(t.overlay),before);assert.equal(t.api.portraitState().geometry,signature);
+ }
+ anchor.point=original.point;
+ for(const [field,value]of [['actuallayoutwidth',0],['actuallayoutheight',0],['actuallayoutwidth',NaN],
+  ['actuallayoutheight',Infinity],['actuallayoutwidth',1.95e38],['actuallayoutheight',1000000]]){
+  anchor[field]=value;assert.equal(t.api.positionPortrait(t.overlay,anchor,t.scene),false);
+  assert.deepStrictEqual(portraitGeometry(t.overlay),before);
+  anchor.actuallayoutwidth=original.width;anchor.actuallayoutheight=original.height;
+ }
+ for(const bad of [0,-1,NaN,Infinity,'invalid',1e-12]){
+  host.actualuiscale_x=host.actualuiscale_y=bad;assert.equal(t.api.positionPortrait(t.overlay,anchor,t.scene),false);
+  assert.deepStrictEqual(portraitGeometry(t.overlay),before);assert.equal(t.api.portraitState().geometry,signature);
+ }
+ host.actualuiscale_x=host.actualuiscale_y=scale;
+ anchor.point={x:900000,y:820};host.point={x:-900000,y:800};
+ assert.equal(t.api.positionPortrait(t.overlay,anchor,t.scene),false,'individually finite coordinates can overflow the computed layout');
+ assert.deepStrictEqual(portraitGeometry(t.overlay),before);
+ anchor.point=original.point;host.point=original.hostPoint;
+ assert(t.api.positionPortrait(t.overlay,anchor,t.scene));
+ const sets=t.metrics.setUnit.length;t.api.updateSnapshot(doomSnapshot(2));assert.equal(t.metrics.setUnit.length,sets);
+ // Collapsed/hidden/released and finite enormous diagnostics read as none.
+ for(const panel of [t.overlay,t.scene]){
+  for(const mode of ['collapse','hidden','position','width','released']){
+   const point=panel.point,width=panel.actuallayoutwidth,visible=panel.visible,visibility=panel.values.visibility;
+   if(mode==='collapse')panel.values.visibility='collapse';
+   if(mode==='hidden')panel.visible=false;
+   if(mode==='position')panel.point={x:1.95e38,y:1.95e38};
+   if(mode==='width')panel.actuallayoutwidth=1.95e38;
+   if(mode==='released')panel.alive='throw';
+   assert.equal(t.api.portraitRect(panel),null);
+   panel.alive=true;panel.point=point;panel.actuallayoutwidth=width;panel.visible=visible;panel.values.visibility=visibility;
+  }
+ }
+ t.overlay.point={x:1.95e38,y:1.95e38};t.scene.point={x:1.95e38,y:1.95e38};
+ assert(t.api.positionPortrait(t.overlay,anchor,t.scene),'invalid actual diagnostics do not turn a valid anchor placement into a scene reset');
+ assert(t.messages.some(m=>m.includes('overlay_actual=none')&&m.includes('scene_rect=none')));
+ assert(!t.messages.some(m=>/1\.95e\+?38/.test(m)));
+ t.api.shutdown('test');
+}
+// Recreated Scene objects require one SetUnit despite identical asset identity.
+{
+ const t=setup({portrait:true});t.api.updateSnapshot(doomSnapshot());
+ const old=t.scene,before=JSON.stringify(old.values);old.alive=false;
+ const scene=new t.Panel('SurvivalTowerPortraitScene',t.overlay,'DOTAScenePanel');
+ t.api.updateSnapshot(doomSnapshot(2));
+ assert.equal(t.metrics.setUnit.length,2);assert.equal(t.metrics.setUnit[1].panel,scene);
+ assert.equal(t.api.portraitState().scene,scene);assert.equal(JSON.stringify(old.values),before);
+ for(let frame=3;frame<30;frame++)t.api.updateSnapshot(doomSnapshot(frame));
+ assert.equal(t.metrics.setUnit.length,2);assert.equal(t.metrics.parents,1);
+ t.api.shutdown('test');
+}
+// Anchor replacement restores a still-valid old leaf and dims the new leaf,
+// without recreating the same Scene or returning the overlay to its home.
+{
+ const t=setup({portrait:true});t.api.updateSnapshot(doomSnapshot());const old=t.native();
+ old.GetParent().children=old.GetParent().children.filter(child=>child!==old);old.parent=null;
+ const next=t.mountNative();t.api.updateSnapshot(doomSnapshot(2));
+ assert.equal(old.values.opacity,'0.35');assert.equal(next.values.opacity,'0');
+ assert.equal(t.overlay.GetParent(),next.GetParent());assert.equal(t.metrics.setUnit.length,1);
+ assert.equal(t.metrics.parents,2);assert.equal(t.metrics.order,2);
+ t.api.shutdown('test');assert.equal(next.values.opacity,'0.35');
+}
+// Real unit and multi-selection transitions must release the native layer;
+// late old snapshots and scheduled callbacks cannot resurrect the old view.
+{
+ const t=setup({portrait:true});t.api.updateSnapshot(doomSnapshot());
+ t.select(8,'npc_dota_hero_juggernaut');t.api.portraitTransition('selection_transition');
+ t.api.updateSnapshot({entindex:8,refresh_version:1,model_asset_id:'hero_permanent_hero_blademaster',portrait_unit_name:'npc_dota_hero_juggernaut'});
+ assert.equal(t.metrics.setUnit.length,2);assert.equal(t.api.portraitState().entity,8);
+ t.api.updateSnapshot(doomSnapshot(1000));assert.equal(t.metrics.setUnit.length,2);
+ t.setMulti(true);t.api.cosmeticPortraitSentinel();
+ assert.equal(t.overlay.values.visibility,'collapse');assert.equal(t.overlay.GetParent(),t.context);
+ assert.equal(t.native().values.opacity,'0.35');assert.equal(t.api.portraitState().scene,null);
+ t.setMulti(false);t.select(9,'npc_dota_hero_lina');t.api.updateSnapshot({entindex:9,refresh_version:1,model_asset_id:'hero_permanent_hero_lina'});
+ assert.equal(t.overlay.values.visibility,'collapse');assert.equal(t.metrics.setUnit.length,2);
+ t.select(-1);t.api.portraitTransition('no_selection');assert.equal(t.native().values.opacity,'0.35');
+ const late=[...t.jobs.values()][0].fn;t.api.shutdown('test');late();
+ assert.equal(t.jobs.size,0);assert.equal(t.metrics.setUnit.length,2);
+}
+console.log('PORTRAIT_FLICKER_CLIENT_PASS: real metadata updates/sentinel, 300 stable frames, unsupported and stale snapshot semantics, finite layout sentinels, recovery, Scene/anchor replacement and true transition cleanup; rendered pixels not simulated');
+
+}

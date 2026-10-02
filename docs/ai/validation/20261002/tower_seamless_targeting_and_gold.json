@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "date": "2026-10-02",
+  "targeting": {
+    "automatic_priority": "nearest eligible enemy; training dummy fallback",
+    "manual_target_preserved": true,
+    "native_windup_preserved": true,
+    "kill_handoff": "same death callback, one next-frame order verification",
+    "turn_delay": "stationary tower faces new victim immediately",
+    "native_attack_cooldown_reset": false,
+    "extra_attack_created": false
+  },
+  "bursts": {
+    "machine_gun_hits_by_level": [
+      6,
+      7,
+      8,
+      8,
+      8
+    ],
+    "remaining_hits_retarget": true,
+    "anti_air_remaining_missiles_retarget": true,
+    "existing_intervals_preserved": true
+  },
+  "gold_numbers": {
+    "style": "OVERHEAD_ALERT_GOLD",
+    "owner": "tower",
+    "amount": "sum of successful gold grants in the completed or interrupted round",
+    "fusion_aggregation_seconds": 0.8,
+    "wallet_timing_changed": false
+  },
+  "validation": {
+    "test_tower_target_selection.lua": "PASS",
+    "test_tower_idle_state.lua": "PASS",
+    "test_tower_seamless_targets.lua": "PASS; base, seven classes, fusion",
+    "test_tower_skill_tree_exclusion.lua": "PASS; also full and partial burst gold, retargeted machine gun and anti-air shots",
+    "test_tower_gold_numbers.lua": "PASS",
+    "test_tower_attack_audio.lua": "PASS",
+    "test_tower_upgrade_targeting.lua": "PASS",
+    "test_ultimate_tower_tree_targeting.lua": "PASS",
+    "test_laser_damage_baseline.cjs": "PASS",
+    "diff_check": "PASS"
+  },
+  "live_hotfix": {
+    "applied": true,
+    "towers": 1,
+    "attack_and_death_callback_bindings_verified": true,
+    "health_and_actual_attack_rate_preserved": true,
+    "native_gold_number_api_available": true,
+    "match_paused": false
+  },
+  "in_game_visual_verified": false,
+  "native_attack_interval_preserved": true,
+  "asset_recompile_required": false,
+  "source_sha256": {
+    "scripts/vscripts/modifiers/modifier_tower_auto_attack.lua": "5ed3b27616331c6ec95fc82397a685885e75239c07a8e598427540a2856df66e",
+    "scripts/vscripts/modifiers/modifier_tower_attack_effects.lua": "2d653f1888c8dcffa6925be0d7687718b957658548c30a0c61cce90353edc585",
+    "scripts/vscripts/systems/tower_targeting.lua": "26c87c161de0e380c460ae0bbacd83d18893da494ef7e69baf080b36024f6a94",
+    "scripts/vscripts/systems/tower_machine_gun_feedback.lua": "6e4ae09f3811f600a22f581198af5a252b2ce4974f13386787f79ec03fe5529c"
+  }
+}

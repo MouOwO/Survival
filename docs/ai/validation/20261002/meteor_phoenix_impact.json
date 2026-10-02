@@ -1,0 +1,372 @@
+{
+  "status": "PASS_OFFLINE_AND_COMPILED",
+  "checked_at_utc": "2026-10-02T16:02:36.499924+00:00",
+  "task_started": "2026-10-02",
+  "scope": "Full native Phoenix successful Supernova rebirth impact; spatial adaptation only; old custom explosion retired.",
+  "native_root": "particles/units/heroes/hero_phoenix/phoenix_supernova_reborn.vpcf",
+  "runtime_root": "particles/survival/skills/meteor_phoenix_impact.vpcf",
+  "fixed_visual_radius": 500,
+  "native_impact_layers": 17,
+  "compiled_cp0_distance_constraints": 16,
+  "maximum_numeric_world_geometry_allocation": 496.97056274847716,
+  "control_points": {
+    "root": "particles/survival/skills/meteor_phoenix_impact.vpcf",
+    "cp0": "Fixed landing snapshot",
+    "cp1": [
+      1,
+      1,
+      1
+    ],
+    "cp3": "Fixed landing snapshot + Vector(0,0,100)",
+    "cp60_61_62_unmodified": true,
+    "full_native_tail_seconds": 7,
+    "independent_cleanup_seconds": 8,
+    "fatal_hit_particle_precedes_damage": true,
+    "distant_moved_target_snapshot_checked": true
+  },
+  "gameplay": {
+    "levels": 5,
+    "trigger_chance": 0.12,
+    "radius": 500,
+    "fall_seconds": 0.4,
+    "second_impact_seconds": 0.9,
+    "second_scale": 0.8,
+    "all_attributes_fixture": 100,
+    "total_damage_by_level": [
+      300,
+      600,
+      600,
+      600,
+      1080
+    ],
+    "damage_segments_by_level": [
+      1,
+      4,
+      4,
+      4,
+      8
+    ],
+    "lava_duration_seconds": 3,
+    "lava_tick_interval_seconds": 1,
+    "slow_percent_from_level_3": 30,
+    "level_5_damage_clocks": [
+      0.4,
+      0.9,
+      1.4,
+      1.9,
+      2.4,
+      2.9,
+      3.4,
+      3.9
+    ],
+    "each_clock_amount_and_secondary_tag_checked": true,
+    "one_shared_lava_visual": true,
+    "cast_unlock_does_not_wait_for_tail": true
+  },
+  "gameplay_scope_report": "output/meteor_phoenix_20261002/gameplay_scope.json",
+  "unchanged_fall_and_lava_files": [
+    {
+      "path": "art/effects/skill_visuals/source/particles/survival/skills/meteor_phoenix_fall.vpcf",
+      "sha256": "deb6bea3df8f6f0114857365084057f629db5e025e4323560cb821d17ba37922",
+      "comparison": "byte_equal_after_crlf_normalization",
+      "raw_byte_equal": false
+    },
+    {
+      "path": "particles/survival/skills/meteor_phoenix_fall.vpcf_c",
+      "sha256": "a95efb3e04737cd8a4136725fb4910319554b9e492a76dadae3a136ed1c22ed0",
+      "comparison": "byte_equal",
+      "raw_byte_equal": true
+    },
+    {
+      "path": "art/effects/skill_visuals/source/particles/survival/skills/meteor_lava.vpcf",
+      "sha256": "f20305bd2fcb8b4691bbee106b8826ac2051b41c704044fd36d2c310d0fc2832",
+      "comparison": "byte_equal_after_crlf_normalization",
+      "raw_byte_equal": true
+    },
+    {
+      "path": "particles/survival/skills/meteor_lava.vpcf_c",
+      "sha256": "206ab73a06caf249fe33b12a9b472b013cac0995d905bd93b8f2611c40f19528",
+      "comparison": "byte_equal",
+      "raw_byte_equal": true
+    },
+    {
+      "path": "art/effects/skill_visuals/source/particles/survival/skills/meteor_lava_cracks.vpcf",
+      "sha256": "55c4346fadde81de2e18c29bcaf042e55d17389534247ed9cc9203310023251a",
+      "comparison": "byte_equal_after_crlf_normalization",
+      "raw_byte_equal": true
+    },
+    {
+      "path": "particles/survival/skills/meteor_lava_cracks.vpcf_c",
+      "sha256": "52114d736c9ff61ffe4c0647f181c203311baa58912e7f78485c27d913520053",
+      "comparison": "byte_equal",
+      "raw_byte_equal": true
+    },
+    {
+      "path": "art/effects/skill_visuals/source/particles/survival/skills/meteor_lava_embers.vpcf",
+      "sha256": "4338a8fd0ac5132a07fee8dee9ee84676d8df8e911caace69d50566318bbc68f",
+      "comparison": "byte_equal_after_crlf_normalization",
+      "raw_byte_equal": true
+    },
+    {
+      "path": "particles/survival/skills/meteor_lava_embers.vpcf_c",
+      "sha256": "a23425413cb5f0d0660692c1aec5b395b7dd44e4baac2dd0c9e8c7efcf31103c",
+      "comparison": "byte_equal",
+      "raw_byte_equal": true
+    }
+  ],
+  "retired_old_explosion_files": [
+    {
+      "category": "repo_source",
+      "file": "meteor_impact.vpcf",
+      "backup": "output/meteor_phoenix_20261002/retired/repo_source/meteor_impact.vpcf",
+      "backup_sha256": "f016d21fd6c58020b95d4c3ba837ad07790891da0f1c3035d6aef64d2a57f932"
+    },
+    {
+      "category": "repo_compiled",
+      "file": "meteor_impact.vpcf_c",
+      "backup": "output/meteor_phoenix_20261002/retired/repo_compiled/meteor_impact.vpcf_c",
+      "backup_sha256": "502e865066fb3644cb69b52254fc78d1da37a26fb7964209697288c199c5233b"
+    },
+    {
+      "category": "content_source",
+      "file": "meteor_impact.vpcf",
+      "backup": "output/meteor_phoenix_20261002/retired/content_source/meteor_impact.vpcf",
+      "backup_sha256": "09101f46a2ad18ffceb338fc899143a2e3a1625a45d952c2c2e6fe3335f8396e"
+    },
+    {
+      "category": "repo_source",
+      "file": "meteor_impact_sparks.vpcf",
+      "backup": "output/meteor_phoenix_20261002/retired/repo_source/meteor_impact_sparks.vpcf",
+      "backup_sha256": "402119a3d0989199f00646ac41359c638d328f60b2688a6805a96084e06175d8"
+    },
+    {
+      "category": "repo_compiled",
+      "file": "meteor_impact_sparks.vpcf_c",
+      "backup": "output/meteor_phoenix_20261002/retired/repo_compiled/meteor_impact_sparks.vpcf_c",
+      "backup_sha256": "5f061aee8aef3879e895c41d503275e23b93b44c56793d41205ed9f306521227"
+    },
+    {
+      "category": "content_source",
+      "file": "meteor_impact_sparks.vpcf",
+      "backup": "output/meteor_phoenix_20261002/retired/content_source/meteor_impact_sparks.vpcf",
+      "backup_sha256": "402119a3d0989199f00646ac41359c638d328f60b2688a6805a96084e06175d8"
+    }
+  ],
+  "compilation": {
+    "compiled": 17,
+    "failed": 0,
+    "logs": [
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact.log",
+        "sha256": "a06261b61413db302a41a0a917cdcf20efd8d2702f29d82b0e000122375d13b6",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_embers.log",
+        "sha256": "4d374645fa74f1a95cd88979da805063e2644661e85a6fcf4d37514b0ea8cb12",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_flek.log",
+        "sha256": "d9f1ce29d475b70ee656a00ef550b5a82df4940c1bb3b7b84432d98c78cce60d",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_glow.log",
+        "sha256": "1ac212d402bf117bb314ad550bef1649b81851dba4e3e4b61e949d2b9d2e1f30",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_ground_flare.log",
+        "sha256": "f13c46727276071040d2856f14bfa69cc2440806e7104ac99890f0347b309972",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_light.log",
+        "sha256": "1a5f8a5ec8676eef891c10869bb87b0c0912ef33badeb8c798b82877375153e6",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_scorch.log",
+        "sha256": "dcb12b501980f982e5bed8f0061705cb15c7a743deaf251dfa40644bec09488e",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_scorch_b.log",
+        "sha256": "786de238715442e54ef54c4032f1c64dac47381e2762fe782d904ca170d99375",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_shake.log",
+        "sha256": "8fcb5b6dddb67d0ea178e46fdcbfbaa47a6fd51a315c0f144e76f722ae1fe63c",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_shockwave.log",
+        "sha256": "c908ae5b264ae9b4111e69bb2c3da75a5c69cd9b269239bf6ad133ea4d30f839",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_shockwave_dust.log",
+        "sha256": "50c912b64200ffbeb7a2f671e3d93da49159dce9a58d3939df587f087ad1e65c",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_shockwave_dust_glow.log",
+        "sha256": "05dfcf360032a13315882dd2e4780f0c97acfae7630690dee84428976bac06f9",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_sparks.log",
+        "sha256": "7ad1c2b69dc5f92a0baf9cd08581c24b166cd14a3eda09c6dca77b558acad9fe",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_sphere.log",
+        "sha256": "e79522c059686667f46c08567396f50907cb2f772abb7efe29e48b23bc462c3c",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_sphere_model.log",
+        "sha256": "eadb14e3f8b224e492cbf4c81315eb229124c58b0dfc7ba5d145c3deaa29b367",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_sphere_shockwave.log",
+        "sha256": "ef2f18da05dacd9e0c55d2d0ae2c8763a3488c282679726ae18529d77b1d00b1",
+        "compiled": 1,
+        "failed": 0
+      },
+      {
+        "log": "output/meteor_phoenix_20261002/compile/20261002_235048/meteor_phoenix_impact_star_sphere.log",
+        "sha256": "3cf8f52aee42d63179458161c0b0fdcb6d4765f03888f56f0acce0b9ed13f1ea",
+        "compiled": 1,
+        "failed": 0
+      }
+    ]
+  },
+  "resource_verification": {
+    "report": "compiled_resources.json",
+    "compiled_outputs_checked": 21,
+    "new_impact_layers": 17,
+    "compiled_cp0_constraints": 16,
+    "native_dependencies_checked": 90,
+    "native_graph_emission_lifespan_colors_and_assets_preserved": true,
+    "absolute_cp3_writers_removed": 2,
+    "old_custom_explosion_not_generated_or_precached": true,
+    "compile_logs_reported_by_root": "output/meteor_phoenix_20261002/compile/20261002_235048",
+    "resource_checker_compiles": false
+  },
+  "tests": [
+    {
+      "command": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_meteor_visual_timing.lua",
+      "exit_code": 0,
+      "log": "meteor_visual_timing.log"
+    },
+    {
+      "command": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_manual_meteor_visual_fixture.lua",
+      "exit_code": 0,
+      "log": "manual_meteor_visual_fixture.log"
+    },
+    {
+      "command": "& 'C:/Program Files/lua/bin/lua5.1.exe' tools/test_addon_precache.lua",
+      "exit_code": 0,
+      "log": "addon_precache.log"
+    },
+    {
+      "command": "& 'C:/Program Files/nodejs/node.exe' tools/test_meteor_visual_resources.cjs",
+      "exit_code": 0,
+      "log": "meteor_visual_resources.log"
+    },
+    {
+      "command": "Lua5.1 loadfile syntax check for the six production/fixture/test Lua paths",
+      "exit_code": 0,
+      "log": "lua_syntax.log"
+    },
+    {
+      "command": "& 'C:/Program Files/nodejs/node.exe' --check tools/test_meteor_visual_resources.cjs",
+      "exit_code": 0,
+      "log": "node_syntax.log"
+    },
+    {
+      "command": "git diff --check -- scripts/vscripts/tests/test_meteor_visual_timing.lua scripts/vscripts/tests/test_manual_meteor_visual_fixture.lua tools/test_meteor_visual_resources.cjs tools/test_addon_precache.lua; final main-test diff check after damage-clock assertions",
+      "exit_code": 0,
+      "log": "diff_check.log"
+    }
+  ],
+  "fault_cases": {
+    "strict_create_and_cp_failure_cases": 20,
+    "levels_checked": [
+      2,
+      5
+    ],
+    "cases": [
+      "nil/false/negative/fractional/NaN/infinite IDs",
+      "CP false/throw including CP3 after prior controls succeeded",
+      "clear and same-world allocation reset reentry",
+      "independent Destroy/Release false and throw cleanup",
+      "old-world timer cannot touch reused ID",
+      "Destroy switching world skips Release of fresh owner",
+      "allocation and CP rollback cannot touch new-world owner"
+    ],
+    "all_damage_clocks_preserved": true
+  },
+  "source_sha256": {
+    "tools/map_c6/build-meteor-visual-particles.cjs": "da2f6ee60bb3858a7631a3ddbf42ae54fae92556c218fa88b3a3951f51ec98cd",
+    "scripts/vscripts/config/hero_passive_skill_definitions.lua": "a2ae9923f511ab3da08a9cc837f5a67b4e22449a4b9569ef3bac71495932577e",
+    "tools/test_meteor_visual_resources.cjs": "5aee8db3ad364de542952d01423fb0ef39caf166aab293dd765edc561cc4b3ad",
+    "scripts/vscripts/tests/manual_meteor_visual_review.lua": "1119465cb863480a5400bf5b30b85adf313f3f527a1784d08e0f0369c36bf8d7",
+    "scripts/vscripts/tests/test_meteor_visual_timing.lua": "89e7000f6ecae60ff856fb0bf0e134ed48e630a8b5c8325ac7e8b35deea5f807",
+    "output/meteor_phoenix_20261002/compiled_resources.json": "22e9c2604610cefd53717d36c52191e52d6aad7885b28fdee09ab70d4269cc5e",
+    "tools/map_c6/build-phoenix-meteor-impact.cjs": "fee574edc5e6228503b88e7a22e346ddb920cebcd46bbd81b8fab46ac4ec4226",
+    "output/meteor_phoenix_20261002/impact_manifest.json": "24e6fb2e224ca1dc65672e5de17269e4483ab2242c416e15e000f7b6df649b7c",
+    "tools/test_addon_precache.lua": "898ac20954d761903fe21bc65093a242c6cbdbcbb284008144ec75ca59c2f93e",
+    "scripts/vscripts/systems/meteor_phoenix_impact_visual.lua": "2bce893e4c0d937b7f6555f7c2b75120e3d191a4888b91fefb9e0f67069edca9",
+    "scripts/vscripts/tests/test_manual_meteor_visual_fixture.lua": "1d80f73a927d261065e165181ac9baa7deee35d9026263e367615b2cffcab60d",
+    "tools/build_phoenix_meteor.ps1": "b10700069477a22e46a95f214b65ecb3aa3031a06dbbb67a4933137ec999b75b",
+    "scripts/vscripts/systems/hero_passive_skill_service.lua": "b1fea97f5da8fd0aec96150f238e3e9814834bb765999a527b83bff8cfbdec5e",
+    "art/effects/skill_visuals/manifest.json": "91dd665d89cde0b082e09fd1041ac0a1cad48c60555c50c324057ac980183f9d",
+    "scripts/vscripts/addon_game_mode.lua": "24276330f8ef6f6eb6d55cc945c8692e40ffff0a107f745c2125f1f07aa9dcd3"
+  },
+  "reports": {
+    "runtime_validation.json": {
+      "path": "output/meteor_phoenix_20261002/runtime_validation.json",
+      "sha256": "80a07d907c9b3614328011959aed3c7a1713d14aa12437d45b79a726f700d08e"
+    },
+    "compiled_resources.json": {
+      "path": "output/meteor_phoenix_20261002/compiled_resources.json",
+      "sha256": "22e9c2604610cefd53717d36c52191e52d6aad7885b28fdee09ab70d4269cc5e"
+    },
+    "gameplay_scope.json": {
+      "path": "output/meteor_phoenix_20261002/gameplay_scope.json",
+      "sha256": "8dd61237c45067df699ebe37fec1b1e6e182c4a1f3450034a3121e943096ce39"
+    },
+    "post_compile_spatial_review.json": {
+      "path": "output/meteor_phoenix_20261002/post_compile_spatial_review.json",
+      "sha256": "01edf2f0bc52fd05ae0411f09f17399cd24adba108bdf264140272ffc3edf215"
+    },
+    "impact_manifest.json": {
+      "path": "output/meteor_phoenix_20261002/impact_manifest.json",
+      "sha256": "24e6fb2e224ca1dc65672e5de17269e4483ab2242c416e15e000f7b6df649b7c"
+    }
+  },
+  "generated_manifest_validation_note": "PENDING is the generation-time status; current official compilation and compiled DATA are independently verified by the referenced fresh reports.",
+  "in_game_visual_verified": false,
+  "live_acceptance": "pending",
+  "limitations": "Lua mocks establish clocks, damage and API ownership contracts. Compiled numeric radius allocations/constraints do not prove final bloom, projected materials, screen shake or spline/trail pixels remain within 500; native engine appearance still needs in-game review."
+}

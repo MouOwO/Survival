@@ -64,8 +64,8 @@
 		},
 		{
 			_class = "C_INIT_RandomColor"
-			m_ColorMin = [ 187, 187, 255, 255 ]
-			m_ColorMax = [ 199, 199, 255, 255 ]
+			m_ColorMin = [ 255, 209.1, 40.800000000000004, 255 ]
+			m_ColorMax = [ 255, 209.1, 40.800000000000004, 255 ]
 			m_flTintPerc = 0.35000000000000003
 			m_TintMax = [ 141, 141, 141, 255 ]
 			m_flUpdateThreshold = 128.0

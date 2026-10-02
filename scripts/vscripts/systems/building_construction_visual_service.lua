@@ -37,6 +37,12 @@ local function entindex_for(unit)
     return nil
 end
 
+local function refresh_health_bar(unit)
+    if not valid_entity(unit) or not unit.FindModifierByName then return end
+    local ok, bar = pcall(unit.FindModifierByName, unit, "modifier_single_health_bar")
+    if ok and bar and bar.publish_state then pcall(bar.publish_state, bar) end
+end
+
 local function hide_model(unit)
     if not valid_entity(unit) or type(unit.AddNoDraw) ~= "function" then
         return false
@@ -55,6 +61,7 @@ local function show_model(unit)
     if type(unit.SetRenderAlpha) == "function" then
         pcall(unit.SetRenderAlpha, unit, 255)
     end
+    refresh_health_bar(unit)
     return restored
 end
 
@@ -90,6 +97,7 @@ function M.start(unit, definition)
     M.cancel(entindex)
     -- Reveal the completed building only after the construction transaction.
     hide_model(unit)
+    refresh_health_bar(unit)
 
     definition = definition or {}
     local start_path = definition and definition.build_start_particle

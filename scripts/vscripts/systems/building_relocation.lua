@@ -64,6 +64,7 @@ function building_system.move(unit, position)
         entindex = unit:entindex(),
     })
     event_bus.emit(events.BUILDING_CHANGED, building_system.public_state(state))
+    if auto_attack and auto_attack.OnIntervalThink then auto_attack:OnIntervalThink() end
     GameRules:GetGameModeEntity():SetContextThink(
         "building_relocation_refresh_" .. tostring(unit:entindex()),
         function()
@@ -79,6 +80,9 @@ function building_system.move(unit, position)
             if effects and effects.ResetAfterRelocation then
                 effects:ResetAfterRelocation()
             end
+            local auto = unit:FindModifierByName("modifier_tower_auto_attack")
+            if auto and auto.ResetTarget then auto:ResetTarget() end
+            if auto and auto.OnIntervalThink then auto:OnIntervalThink() end
             print(string.format(
                 "[BuildingBlink] network refresh ent=%d actual=(%.1f,%.1f,%.1f)",
                 unit:entindex(), unit:GetAbsOrigin().x,

@@ -3,7 +3,7 @@ const fs=require('fs'),path=require('path'),cp=require('child_process'),crypto=r
 const {Vpk}=require('./map_c6/lib.cjs');
 const root=path.resolve(__dirname,'..'),native=new Vpk(path.resolve(root,'../../dota/pak01_dir.vpk')),
     core=new Vpk(path.resolve(root,'../../core/pak01_dir.vpk'));
-const ground='particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf';
+const ground='particles/survival/skills/blizzard_ground.vpcf';
 const snow='particles/survival/skills/wyvern_blizzard_snow.vpcf';
 const temp=path.join(root,'output/wyvern_blizzard/audit');fs.mkdirSync(temp,{recursive:true});
 const records=new Map(),texts=new Map();
@@ -23,17 +23,16 @@ function inspect(resource){
     for(const dependency of record.dependencies)inspect(dependency);
 }
 inspect(ground);inspect(snow);
-assert.equal([...texts.get(ground).matchAll(/m_ChildRef/g)].length,7);
-const projection=ground.replace('_ground.vpcf','_proj.vpcf');
-assert(texts.get(projection).includes('m_nControlPoint = 2'));
-assert(texts.get(snow).includes('m_nMaxParticles = 128'));
-assert(texts.get(snow).includes('m_flLiteralValue = 64.0'));
+assert.equal([...texts.get(ground).matchAll(/m_ChildRef/g)].length,1);
+assert(texts.get(ground).includes('m_nControlPoint = 2')&&texts.get(ground).includes('C_OP_SetFloat'));
+assert(texts.get(snow).includes('m_nMaxParticles = 192'));
+assert(texts.get(snow).includes('m_flLiteralValue = 96.0'));
 assert(!texts.get(snow).includes('m_ChildRef'));
-const report={date:'2026-10-01',status:'PASS',roots:[ground,snow],resources:[...records.values()],
-    visuals:'Native Winter\'s Curse ground root including seven children, CP2 radius; native-derived isolated snowfall, 64/s, max 128, CP1 radius. No native ability states.',
-    damage:'Five levels tested: four 50% attack snapshots, radius 300, 25% slow with 1.1s refresh; original twelve 0.03s fall callbacks retained (nominal hit times 1.60/2.60/3.60/4.60 with 50ms think).',
-    lifecycle:'Two world-owned roots per proc; final wave/dead caster/session init clean up. No added per-frame visual timer or particle control writes.',
-    tests:['test_tower_skill_tree_exclusion.lua','Lua 5.1 syntax','native dependency closure','resourcecompiler: 1 compiled, 0 failed'],
+for(const resource of [ground,snow,'particles/survival/skills/blizzard_wind.vpcf'])assert(!texts.get(resource).includes('m_bDisableZBuffering = true'));
+const report={date:'2026-10-02',status:'PASS',roots:[ground,snow],resources:[...records.values()],
+    visuals:'Crystal Maiden frost projection and wind; CP2 radius. Isolated snowfall CP1 radius, 96/s, max 192. Five-second visual duration. No native ability states.',
+    damage:'Original four damage waves and old fall clock retained pending user range/duration decision.',
+    lifecycle:'Two world-owned roots per proc; five-second expiry/dead caster/session init clean up; no per-frame visual update.',
     in_game_visual_verified:false};
-fs.writeFileSync(path.join(root,'docs/ai/validation/20261001/wyvern_blizzard.json'),JSON.stringify(report,null,2)+'\n');
+fs.writeFileSync(path.join(root,'docs/ai/validation/20261002/blizzard_visual.json'),JSON.stringify(report,null,2)+'\n');
 console.log('WYVERN_BLIZZARD_RESOURCES_PASS dependencies='+records.size);

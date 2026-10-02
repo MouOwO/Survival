@@ -67,6 +67,9 @@ bus.emit=function()emitted=emitted+1 end
 bus.handle_request(require("combat/combat_events").DEAL_REQUEST,function()error("empty preview cannot deal damage")end)
 local service=require("systems/hero_passive_skill_service")
 local scheduler=require("core/scheduler")
+local impact_visual=require("systems/meteor_phoenix_impact_visual")
+local impact_path="particles/survival/skills/meteor_phoenix_impact.vpcf"
+assert(impact_visual.duration()==8)
 local definition=require("config/hero_passive_skill_definitions").by_id.proto_meteor
 local fixture_api=require("tests/manual_meteor_visual_review")
 local function advance(seconds)
@@ -98,15 +101,30 @@ assert(active.radius==500 and active.fall_duration==0.4 and active.move_slow_pct
 assert(definition.lava_move_slow_pct[5]==30,"preview cannot mutate production definition")
 assert(fixture_api.cleanup().pending)
 advance(2.4)
-assert(fixture.finished and fixture.casts_started==1 and units[1].removed and units[2].removed)
+assert(not fixture.finished and not units[1].removed and not units[2].removed,
+    "isolated preview keeps owners through the complete native tail, past the former 1.2s cutoff")
 assert(service._test.active_meteor_casts()["9000"],"cleanup must not clear another caster")
-advance(3)
+local impacts=0
+for _,p in ipairs(particles) do
+    assert(p.name~="particles/survival/skills/meteor_impact.vpcf","preview cannot emit the retired custom explosion")
+    if p.name==impact_path then
+        impacts=impacts+1
+        assert(not p.destroyed and not p.released)
+        assert(p.cp[1].x==1 and p.cp[1].y==1 and p.cp[1].z==1)
+        assert(p.cp[3].x==p.cp[0].x and p.cp[3].y==p.cp[0].y and p.cp[3].z==p.cp[0].z+100,
+            "preview uses a vertical normal based on its own fixed world-position snapshot")
+    end
+end
+assert(impacts==3,"one level-one fixture impact and two independent external level-five impacts")
+advance(impact_visual.duration())
+assert(fixture.finished and fixture.casts_started==1 and units[1].removed and units[2].removed)
 assert(next(service._test.active_meteor_casts())==nil)
+assert(next(impact_visual.active())==nil)
 for _,p in ipairs(particles)do assert(p.destroyed and p.released)end
 local repeat_fixture=fixture_api.run({level=5,count=2})
 pending_load()
 assert(repeat_fixture.casts_started==1)
-advance(10.5)
+advance(2*(0.4+0.5+impact_visual.duration()+0.7))
 assert(repeat_fixture.finished and repeat_fixture.phase=="complete"
     and repeat_fixture.casts_started==2,"bounded repeats use real cast cooldown")
 assert(emitted==0,"empty isolated real runner must not emit global skill/equipment/hero events")
@@ -117,4 +135,4 @@ fixture_api.cleanup()
 local stale=fixture_api.run()
 world={};pending_load();stale:cleanup()
 assert(#units==4,"old-world async request must not create proxies")
-print("MANUAL_METEOR_FIXTURE_PASS real_runner/timing/zero_stats/no_events/isolated_cleanup/repeats/async/world")
+print("MANUAL_METEOR_FIXTURE_PASS real_runner/complete_8s_tail/zero_stats/no_events/isolated_cleanup/repeats/async/world")

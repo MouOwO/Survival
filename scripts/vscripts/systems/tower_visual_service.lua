@@ -12,7 +12,14 @@ local tracked = {}
 local generation, bound_world = 0, nil
 local base_projectile = "particles/base_attacks/ranged_goodguy.vpcf"
 local prefix = "particles/survival/towers/"
-local mystery_base = prefix .. "leshrac_base/leshrac_diabolic_groundflash.vpcf"
+local trial_bases = {
+    dazzle_weave = "trial/death_ground",
+    willow_shadow_realm = "death_willow/shadow_ground",
+    leshrac_edict = "trial/mystery_ground",
+    kinetic_markers = "trial/lightning_ground",
+    clinkz_embers = "trial/multi_ground",
+    ice_vortex = "trial/frost_ground",
+}
 -- Native Shadow Dance smoke bundle, without Slark-specific eye attachments.
 local ultimate_shadow = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
 -- Bulldoze's persistent foot layers; omit its body/hand effects and cast flash.
@@ -89,16 +96,6 @@ local function add_machine_base(entry)
     end
 end
 
-local function add_mystery_base(entry)
-    local id = ParticleManager:CreateParticle(mystery_base, PATTACH_ABSORIGIN_FOLLOW, entry.unit)
-    assert(type(id) == "number" and id >= 0, "mystery base returned no valid ID")
-    entry.particles[#entry.particles + 1] = id
-    for _, cp in ipairs({0, 1}) do
-        ParticleManager:SetParticleControlEnt(id, cp, entry.unit,
-            PATTACH_ABSORIGIN_FOLLOW, "", entry.unit:GetAbsOrigin(), true)
-    end
-end
-
 local function add_anti_air_base(entry)
     for _, path in ipairs(anti_air_base) do
         local id = ParticleManager:CreateParticle(path,
@@ -128,9 +125,26 @@ function M.apply(state)
     end
     local profile_id = rank.rarity == "UR" and "ultimate" or state.tower_class
     local profile = profiles.by_id[profile_id]
+    local radius, color
+    if profile then
+        local tier = string.lower(rank.rarity)
+        radius = profile["radius_" .. tier] or profile.radius_ssr
+        local tier_color = profile["color_" .. tier]
+        color = type(tier_color) == "table" and #tier_color >= 3
+            and tier_color or profile.color
+    end
+    -- The replacement has no red-star crown; all ten SSR upgrades share its
+    -- color and lifetime. Other profiles retain their existing accent policy.
+    local red_accent = rank.red_stars > 0
+        and not (profile and profile.native_base == "willow_shadow_realm")
     local key = tostring(profile_id) .. ":" .. rank.rarity
-        .. ":" .. tostring(rank.red_stars > 0)
+        .. ":" .. tostring(red_accent)
         .. ":" .. tostring(profile and profile.native_base or "")
+    if profile then
+        -- A same-tier visual configuration update must retire the old ring.
+        key = key .. ":" .. tostring(radius) .. ":" .. tostring(profile.alpha)
+            .. ":" .. table.concat(color or {}, ",")
+    end
     if profile_id == "class_7" then
         -- Native trap rings initialize world-space particles, without position
         -- lock. Recreate on the existing move event; no polling/update timer.
@@ -169,21 +183,25 @@ function M.apply(state)
         -- art changes; native attack timing/speed and damage remain untouched.
         return true
     end
-    local radius = profile["radius_" .. string.lower(rank.rarity)] or profile.radius_ssr
     local ok, err = pcall(function()
         -- A replacement owns the whole base, including former detail/crown art.
-        if profile.native_base == "leshrac_edict" then add_mystery_base(entry); return end
-        if profile.native_base == "bulldoze" then add_machine_base(entry); return end
-        if profile.native_base == "psionic_trap" then add_anti_air_base(entry); return end
-        add(entry, profile.core, radius, profile.alpha, profile.color)
+        local trial = trial_bases[profile.native_base]
+        if trial then add(entry, trial, radius, profile.alpha, color); return end
+        if profile.native_base == "bulldoze" then
+            add(entry, "trial/valley_durable", radius, profile.alpha, color)
+            add_machine_base(entry); return end
+        if profile.native_base == "psionic_trap" then
+            add(entry, "trial/valley_evil", radius, profile.alpha, color)
+            add_anti_air_base(entry); return end
+        add(entry, profile.core, radius, profile.alpha, color)
         if rank.rarity ~= "R" then
             local detail = rank.rarity == "SSR" and profile.detail_ssr or profile.detail
             -- Profession detail stays inside the core footprint. SSR changes
             -- its pattern/rhythm without allocating additional outer rings.
-            add(entry, detail, radius, profile.alpha * 0.48, profile.color)
+            add(entry, detail, radius, profile.alpha * 0.48, color)
         end
         if rank.rarity == "UR" or rank.red_stars > 0 then
-            add(entry, profile.crown, radius * 0.78, profile.alpha * 0.38, profile.color)
+            add(entry, profile.crown, radius * 0.78, profile.alpha * 0.38, color)
         end
         if rank.rarity == "UR" then add_ultimate_shadow(entry) end
     end)
@@ -196,8 +214,14 @@ end
 
 function M.precache(context)
     PrecacheResource("particle", base_projectile, context)
+    PrecacheResource("particle", "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf", context)
     PrecacheResource("particle", ultimate_shadow, context)
-    PrecacheResource("particle", mystery_base, context)
+    for _, name in pairs(trial_bases) do
+        PrecacheResource("particle", prefix .. name .. ".vpcf", context)
+    end
+    for _, style in ipairs({"dark", "durable", "evil"}) do
+        PrecacheResource("particle", prefix .. "trial/valley_" .. style .. ".vpcf", context)
+    end
     for _, path in ipairs(machine_base) do PrecacheResource("particle", path, context) end
     for _, path in ipairs(anti_air_base) do PrecacheResource("particle", path, context) end
     PrecacheResource("particle", prefix .. "laser_charge.vpcf", context)

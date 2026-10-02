@@ -1,0 +1,198 @@
+{
+  "status": "PASS, implementation and offline validation; live visual acceptance pending",
+  "date": "2026-10-02",
+  "layout": {
+    "rarity": "Left of health bar, vertical centers aligned",
+    "icon_size": [
+      20,
+      20
+    ],
+    "icon_to_bar_gap": 2,
+    "name": "Bottom edge touches health bar top, horizontally centered",
+    "stars": "Above name, centered on health bar",
+    "level_badge": false,
+    "row_size": [
+      108,
+      47.5
+    ],
+    "health_bar_in_row": [
+      23,
+      32,
+      62,
+      11
+    ],
+    "name_in_row": [
+      0,
+      14,
+      108,
+      18
+    ],
+    "icon_in_row": [
+      1,
+      27.5,
+      20,
+      20
+    ],
+    "bounds_include_icon_lower_edge": true,
+    "construction_hidden_until_completion": true
+  },
+  "names": {
+    "base": "见习守望",
+    "ultimate": "万象归一",
+    "routes_R_SR_SSR": {
+      "death": [
+        "噬魂术士",
+        "冥火判官",
+        "阎狱君王"
+      ],
+      "mystery": [
+        "追光学徒",
+        "聚能博士",
+        "歼星神光"
+      ],
+      "lightning": [
+        "引雷术士",
+        "风暴裁决",
+        "九霄雷罚"
+      ],
+      "machine_gun": [
+        "火线哨兵",
+        "弹幕狂徒",
+        "末日交响"
+      ],
+      "multi": [
+        "逐风弩手",
+        "裂空游侠",
+        "万箭天罚"
+      ],
+      "frost": [
+        "霜语学徒",
+        "暴雪领主",
+        "永冻君王"
+      ],
+      "anti_air": [
+        "烟火工坊",
+        "追星炮手",
+        "苍穹终结"
+      ]
+    },
+    "same_rank_levels_share_name": true,
+    "red_stars_retain_SSR_name": true,
+    "old_LV_suffix_removed": true
+  },
+  "configuration": {
+    "upgrade_rows": 145,
+    "class_change_targets": 7,
+    "career_upgrade_targets": 133,
+    "csv_and_generated_parity": 12,
+    "preexisting_ids_order_and_gameplay_unchanged": true,
+    "existing_icons_preserved": true,
+    "added_ui_rows": 1,
+    "initial_cost": {
+      "wood": 50,
+      "gold": 0,
+      "lua_type": "number"
+    },
+    "localized_tower_tokens_updated": 104,
+    "class_options_and_tooltips_derive_route_names": true
+  },
+  "tests": [
+    {
+      "test": "test_tower_rank_ui.cjs",
+      "status": "PASS"
+    },
+    {
+      "test": "test_world_health_bar.js",
+      "status": "PASS"
+    },
+    {
+      "test": "test_world_overlay_visibility.cjs",
+      "status": "PASS"
+    },
+    {
+      "test": "test_combat_selection_recovery.cjs",
+      "status": "PASS"
+    },
+    {
+      "test": "test_combat_stats_callbacks.cjs",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_rank_presentation.lua",
+      "status": "PASS"
+    },
+    {
+      "test": "test_tower_class_preflight.lua",
+      "status": "PASS"
+    },
+    {
+      "test": "test_manual_tower_presentation_fixture.lua",
+      "status": "PASS"
+    },
+    {
+      "test": "test_building_astral_construction.lua",
+      "status": "PASS"
+    },
+    {
+      "test": "test_health_bar_cleanup.lua",
+      "status": "PASS"
+    },
+    {
+      "test": "fresh_require_both_orders_and_cross_layer_names",
+      "status": "PASS"
+    },
+    {
+      "test": "CSV_field_and_generated_projection_audits",
+      "status": "PASS"
+    }
+  ],
+  "performance": {
+    "kind": "offline production JS call counts, not FPS",
+    "towers": 40,
+    "frames_per_scenario": 300,
+    "stable_style_writes": 0,
+    "blocked_native_calls": 0,
+    "blocked_projection_calls": 0,
+    "empty_overlay_captures": 0,
+    "new_periodic_loops": 0
+  },
+  "compilation": {
+    "status": "PASS, 0 failures",
+    "files": [
+      {
+        "file": "scripts/custom_game/tower_rank_ui.js",
+        "source_content_parity": true,
+        "compiled_sha256": "7b3003c81d425ec74bb1265a5c6caf15736b00c924a9f8a681bc28584a25ec9e"
+      },
+      {
+        "file": "styles/custom_game/tower_rank_ui.css",
+        "source_content_parity": true,
+        "compiled_sha256": "20431aa7c731f0a9b6adeef056612cfdde99998833063855ba7dbfd4acfc7268"
+      },
+      {
+        "file": "layout/custom_game/tower_rank_ui.xml",
+        "source_content_parity": true,
+        "compiled_sha256": "3c7cfb813eca655a819d70ddcd68705dcdf38e9ccb8bd958ff42a63b00364120"
+      },
+      {
+        "file": "scripts/custom_game/world_health_bar_anchor.js",
+        "source_content_parity": true,
+        "compiled_sha256": "b3124b34a52401ab0af511f010b4f505625d785d38ff8e6854d91693d91aeb40"
+      },
+      {
+        "file": "scripts/custom_game/combat_stats.js",
+        "source_content_parity": true,
+        "compiled_sha256": "16e38cc6851702e50aa1c4deb18644756c59baad2136b3276a37d097931bf31d"
+      }
+    ]
+  },
+  "live_visual_validation": {
+    "status": "NOT_RUN",
+    "reason": "Dota process has no listening debug console; 127.0.0.1:29000 refused the connection",
+    "hot_update_applied": false,
+    "map_restarted": false,
+    "new_screenshot": null
+  },
+  "evidence_dir": "output/tower_names_20261002",
+  "damage_settlement_changed": false
+}

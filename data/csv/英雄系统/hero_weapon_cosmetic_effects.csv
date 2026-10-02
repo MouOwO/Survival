@@ -1,0 +1,11 @@
+effect_id,cosmetic_id,path,attach_type,snapshot,snapshot_cp,enabled
+#中文名:效果ID,饰品映射ID,原生常驻粒子,创建挂点类型,武器轮廓快照,快照控制点,启用
+#types:string,string,string,string,string,number,boolean
+hero_monkey_king:frost_blade:ambient_1,hero_monkey_king:frost_blade,particles/econ/items/monkey_king/mk_ti9_immortal/mk_ti9_immortal_weapon_ambient.vpcf,PATTACH_ABSORIGIN_FOLLOW,,,1
+hero_monkey_king:ice_blade:ambient_1,hero_monkey_king:ice_blade,particles/econ/items/monkey_king/ti7_weapon/mk_ti7_immortal_weapon_ambient.vpcf,PATTACH_ABSORIGIN_FOLLOW,,,1
+hero_monkey_king:epic_icefire:ambient_1,hero_monkey_king:epic_icefire,particles/econ/items/monkey_king/ti7_weapon/mk_ti7_golden_immortal_weapon_ambient.vpcf,PATTACH_ABSORIGIN_FOLLOW,,,1
+hero_monkey_king:legend_abyss:ambient_1,hero_monkey_king:legend_abyss,particles/econ/items/monkey_king/ti7_weapon/mk_10th_anniversary_weapon_ambient.vpcf,PATTACH_ABSORIGIN_FOLLOW,,,1
+hero_blademaster:default:ambient_1,hero_blademaster:default,particles/units/heroes/hero_juggernaut/juggernaut_blade_generic.vpcf,PATTACH_ABSORIGIN_FOLLOW,,,1
+hero_blademaster:ice_blade:ambient_1,hero_blademaster:ice_blade,particles/econ/items/juggernaut/jugg_ti10_cache/jugg_ti10_cache_weapon.vpcf,PATTACH_ABSORIGIN_FOLLOW,,,1
+hero_blademaster:epic_icefire:ambient_1,hero_blademaster:epic_icefire,particles/econ/items/juggernaut/jugg_ti8_sword/jugg_ti8_sword_ambient.vpcf,PATTACH_ABSORIGIN_FOLLOW,,,1
+hero_blademaster:legend_abyss:ambient_1,hero_blademaster:legend_abyss,particles/econ/items/juggernaut/jugg_ti8_sword/jugg_ti8_crimson_sword_ambient.vpcf,PATTACH_ABSORIGIN_FOLLOW,,,1

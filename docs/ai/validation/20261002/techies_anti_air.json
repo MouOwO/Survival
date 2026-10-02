@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "active_preset": "B",
+  "hero": "npc_dota_hero_techies",
+  "tiers": [
+    {
+      "tier": "R",
+      "outfit": "原生默认装束",
+      "projectile": "particles/survival/towers/techies/techies_r_missile.vpcf"
+    },
+    {
+      "tier": "SR",
+      "outfit": "灵象硝骑",
+      "projectile": "particles/survival/towers/techies/techies_sr_missile.vpcf"
+    },
+    {
+      "tier": "SSR",
+      "outfit": "沉舰豚炮捆绑包",
+      "projectile": "particles/survival/towers/techies/techies_ssr_missile.vpcf"
+    }
+  ],
+  "checks": [
+    "Three missile resources compiled: 0 failures",
+    "All ABC presets passed strict precache and component checks",
+    "343 recursively resolved resources",
+    "140 combat rows unchanged vs pre-change snapshot",
+    "Other six tower route tables unchanged",
+    "Native attack events and Arcana fuse attachment exist",
+    "Anti-air burst/air-only targeting and seamless switching regression passed"
+  ],
+  "in_game_visual_verified": false,
+  "reload_map_required": true
+}

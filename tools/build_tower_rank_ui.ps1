@@ -6,6 +6,7 @@ $rankContent = Join-Path $rankEngine 'content/dota_addons/survival/panorama'
 $rankCompiler = Join-Path $rankEngine 'game/bin/win64/resourcecompiler.exe'
 $rankOutput = Join-Path $rankRepo ('output/tower_rank_build/' + (Get-Date -Format 'yyyyMMdd_HHmmss'))
 $rankFiles = @(
+    'scripts/custom_game/world_health_bar_anchor.js',
     'scripts/custom_game/tower_rank_ui.js',
     'styles/custom_game/tower_rank_ui.css',
     'layout/custom_game/tower_rank_ui.xml'
@@ -25,7 +26,7 @@ foreach ($rankRelative in $rankFiles) {
 }
 New-Item -ItemType Directory -Force -Path $rankOutput | Out-Null
 foreach ($rankRelative in $rankFiles) {
-    $rankLog = @(& $rankCompiler -i (Join-Path $rankContent $rankRelative) -game (Join-Path $rankEngine 'game/dota') -nop4 2>&1)
+    $rankLog = @(& $rankCompiler -i (Join-Path $rankContent $rankRelative) -game (Join-Path $rankEngine 'game/dota') -f -nop4 2>&1)
     $rankLog | Set-Content (Join-Path $rankOutput ([IO.Path]::GetFileName($rankRelative) + '.log'))
     $rankLog | Where-Object { $_ -match 'RESOURCE COMPILE|OK:|ERROR:|failed' } | Write-Output
     if ($LASTEXITCODE -ne 0 -or -not ($rankLog -match '0 failed')) { throw "Rank UI compilation failed: $rankRelative" }

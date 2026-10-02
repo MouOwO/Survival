@@ -16,14 +16,16 @@ function M:OnCreated(params)
         tonumber(params.repair_max_health_pct_per_second) or 0
     )
     self.repair_range = math.max(64, tonumber(params.repair_range) or 200)
-    self.detection_range = math.max(
-        self.repair_range,
-        tonumber(params.detection_range) or FIND_UNITS_EVERYWHERE
-    )
+    local detection_range = tonumber(params.detection_range) or FIND_UNITS_EVERYWHERE
+    -- The engine's all-map sentinel is -1; clamping it would silently restrict
+    -- builders without an explicit scan range to their melee repair radius.
+    self.detection_range = detection_range == FIND_UNITS_EVERYWHERE
+        and detection_range or math.max(self.repair_range, detection_range)
     self.repair_target_entindex = nil
     self.manual_repair_target_entindex = nil
     self.approaching_manual_target = false
     self.repair_fractional_remainder = 0
+    self.approach_retry = 0
     self:StartIntervalThink(THINK_INTERVAL)
 end
 
@@ -46,14 +48,14 @@ local function same_owner(parent, building)
         or parent_player_id == building_player_id
 end
 
-local function repairable_building(parent, building)
+local function repairable_building(parent, building, allow_full)
     return valid_entity(building)
         and building.survival_is_building == true
         and building:IsAlive()
         and building:GetTeamNumber() == parent:GetTeamNumber()
         and same_owner(parent, building)
         and not building:HasModifier("modifier_building_under_construction")
-        and building:GetHealth() < building:GetMaxHealth()
+        and (allow_full or building:GetHealth() < building:GetMaxHealth())
 end
 
 local function issue_internal_order(parent, order)
@@ -66,10 +68,11 @@ end
 function M:SetManualRepairTarget(building)
     if not IsServer() then return false end
     local parent = self:GetParent()
-    if not repairable_building(parent, building) then return false end
+    if not repairable_building(parent, building, true) then return false end
     local build_task = parent.survival_build_task
     if build_task and build_task.constructing then return false end
     if build_task then parent.survival_build_task = nil end
+    self.approach_retry = 0
     local entindex = building:entindex()
     if self.manual_repair_target_entindex ~= entindex then
         self.manual_repair_target_entindex = entindex
@@ -110,7 +113,9 @@ local function damaged_building(parent, detection_range)
         nil,
         detection_range,
         DOTA_UNIT_TARGET_TEAM_FRIENDLY,
-        DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_HERO,
+        -- Walls use npc_dota_building; BASIC/HERO only sees creature-backed
+        -- buildings, regardless of the wall model or survival_is_building tag.
+        DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BUILDING,
         DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
         FIND_CLOSEST,
         false
@@ -141,7 +146,7 @@ function M:OnIntervalThink()
     local manual_target = self.manual_repair_target_entindex ~= nil
     local building = manual_target
         and entity(self.manual_repair_target_entindex) or nil
-    if manual_target and not repairable_building(parent, building) then
+    if manual_target and not repairable_building(parent, building, true) then
         self:ClearManualRepairTarget("target_invalid")
         return
     end
@@ -171,13 +176,28 @@ function M:OnIntervalThink()
         center_distance - parent_hull - building_hull
     )
     if edge_distance > self.repair_range then
-        if manual_target then self.approaching_manual_target = true end
-        issue_internal_order(parent, {
-            UnitIndex = parent:entindex(),
-            OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
-            Position = building:GetAbsOrigin(),
-            Queue = false,
-        })
+        self.approach_retry = math.max(0, (self.approach_retry or 0) - THINK_INTERVAL)
+        if self.approach_retry <= 0 then
+            -- Find a reachable point outside the wall footprint, never its blocked center.
+            local point = require("systems/builder_work_position_service").find(parent, {
+                footprint = building.survival_grid_footprint or {x = 2, y = 2},
+                hull_radius = building_hull,
+            }, building:GetAbsOrigin(), {
+                -- Leave arrival tolerance so native movement may stop just
+                -- short of the point and still be inside the repair radius.
+                max_center_distance = self.repair_range + parent_hull + building_hull - 16,
+            })
+            self.approach_retry = 1
+            if point then
+                if manual_target then self.approaching_manual_target = true end
+                issue_internal_order(parent, {
+                    UnitIndex = parent:entindex(),
+                    OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+                    Position = point,
+                    Queue = false,
+                })
+            end
+        end
         return
     end
 
@@ -190,6 +210,10 @@ function M:OnIntervalThink()
         self.approaching_manual_target = false
     end
 
+    if building:GetHealth() >= building:GetMaxHealth() then
+        self.repair_fractional_remainder = 0
+        return -- Keep the explicitly assigned wall; resume when it takes damage.
+    end
     parent:FaceTowards(building:GetAbsOrigin())
     parent:StartGesture(ACT_DOTA_ATTACK)
     local amount, remainder = repair_math.whole_amount_for_interval(
@@ -203,7 +227,7 @@ function M:OnIntervalThink()
     building:SetHealth(next_health)
     if next_health >= max_health then
         if manual_target then
-            self:ClearManualRepairTarget("target_full")
+            self.repair_fractional_remainder = 0
         else
             self.repair_target_entindex = nil
             self.repair_fractional_remainder = 0

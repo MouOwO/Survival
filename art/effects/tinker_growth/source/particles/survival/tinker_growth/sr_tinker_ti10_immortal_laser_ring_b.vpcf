@@ -56,7 +56,7 @@
 		},
 		{
 			_class = "C_OP_ColorInterpolate"
-			m_ColorFade = [ 33, 26, 35, 255 ]
+			m_ColorFade = [ 35, 28.7, 5.6000000000000005, 255 ]
 			m_flFadeStartTime = 0.25
 		},
 	]
@@ -116,8 +116,8 @@
 		},
 		{
 			_class = "C_INIT_RandomColor"
-			m_ColorMax = [ 84, 115, 255, 255 ]
-			m_ColorMin = [ 150, 115, 255, 255 ]
+			m_ColorMax = [ 255, 209.1, 40.800000000000004, 255 ]
+			m_ColorMin = [ 255, 209.1, 40.800000000000004, 255 ]
 		},
 		{
 			_class = "C_INIT_NormalAlignToCP"
@@ -227,5 +227,5 @@
 			]
 		},
 	]
-	m_ConstantColor = [ 75, 115, 255, 255 ]
+	m_ConstantColor = [ 255, 209.1, 40.800000000000004, 255 ]
 }

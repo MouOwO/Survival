@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "cause": "PATH python.exe resolved to Microsoft WindowsApps Store alias instead of installed Python 3.14",
+  "fix": "Shared PowerShell launcher locates actual Python installations, logs stdout/stderr and forwards exit status",
+  "tested": "Actual CMD -> Windows PowerShell -> installed Python from an external working directory; B, C, A switches passed; combat digest unchanged",
+  "active_preset": "A"
+}

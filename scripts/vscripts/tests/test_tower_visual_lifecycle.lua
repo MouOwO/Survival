@@ -19,7 +19,7 @@ for line in csv:lines() do
             local row = assert(profiles.by_id[fields[1]], "generated profile missing")
             for i, key in ipairs(headers) do
                 if key == "enabled" then assert(row[key] == (fields[i] == "1"))
-                elseif key == "color" then assert(table.concat(row[key], "|") == fields[i])
+                elseif key == "color" or key:find("^color_") then assert(table.concat(row[key] or {}, "|") == fields[i])
                 elseif key:find("^radius_") or key == "alpha" then assert(row[key] == tonumber(fields[i]))
                 else assert((row[key] or "") == fields[i], "CSV/generated mismatch: " .. key) end
             end
@@ -112,9 +112,18 @@ end)
 local service = require("systems/tower_visual_service")
 service.precache({})
 local expected_precache = {["particles/base_attacks/ranged_goodguy.vpcf"] = true}
+expected_precache["particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf"] = true
+local trial_base_paths = {
+    [1] = "particles/survival/towers/death_willow/shadow_ground.vpcf",
+    [2] = "particles/survival/towers/trial/mystery_ground.vpcf",
+    [3] = "particles/survival/towers/trial/lightning_ground.vpcf",
+    [5] = "particles/survival/towers/trial/multi_ground.vpcf",
+    [6] = "particles/survival/towers/trial/frost_ground.vpcf",
+}
+for _, path in pairs(trial_base_paths) do expected_precache[path] = true end
+expected_precache["particles/survival/towers/trial/death_ground.vpcf"] = true -- compatible old-profile transition
+for _, name in ipairs({"dark", "durable", "evil"}) do expected_precache["particles/survival/towers/trial/valley_" .. name .. ".vpcf"] = true end
 local shadow_path = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
-local mystery_base_path = "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash.vpcf"
-expected_precache[mystery_base_path] = true
 expected_precache[shadow_path] = true
 local machine_base_paths = {
     "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_dark.vpcf",
@@ -162,19 +171,122 @@ assert(live_count() == 0)
 service.remove(1)
 laser_skills.apply(base, {})
 assert(live_count() == 0)
+
+-- One attached Shadow Realm ground root replaces every legacy death layer.
+-- Tier changes rebuild once; stars, relocation and the red-star band do not.
+local death, death_profile = unit(9), profiles.by_id.class_1
+assert(death_profile.native_base == "willow_shadow_realm")
+local tier_colors = {r = {25, 219, 241}, sr = {180, 95, 255}, ssr = {255, 52, 83}}
+local previous_id, previous_tier
+for level = 6, 25 do
+    local tier = level <= 10 and "r" or level <= 15 and "sr" or "ssr"
+    local before_created = created
+    assert(service.apply(state(death, level, "class_1")))
+    local ids = service.debug_snapshot(death.index).particle_ids
+    assert(#ids == 1 and live_count() == 1, "death has one root, including red-star levels")
+    local effect = particles[ids[1]]
+    assert(effect.name == trial_base_paths[1])
+    assert(effect.bindings[0].unit == death and effect.bindings[0].attachment == "")
+    assert(effect.controls[1].x == death_profile["radius_" .. tier] and effect.controls[1].z == 0.95)
+    local color = effect.controls[2]
+    assert(color.x == tier_colors[tier][1] and color.y == tier_colors[tier][2] and color.z == tier_colors[tier][3])
+    if tier == previous_tier then
+        assert(created == before_created and ids[1] == previous_id, "same-tier stars must retain the root")
+    else
+        assert(created == before_created + 1, "entering a tier creates exactly one root")
+        if previous_id then assert(particles[previous_id].destroyed and particles[previous_id].released) end
+    end
+    previous_id, previous_tier = ids[1], tier
+    death.origin = Vector(level * 100, -level * 10, 384)
+    bus.emit(events.BUILDING_CHANGED, state(death, level, "class_1"))
+    assert(service.debug_snapshot(death.index).particle_ids[1] == previous_id, "attached ground follows relocation")
+end
+
+-- Same-tier live configuration changes must not retain stale colors/size/alpha.
+local saved_sr, saved_radius, saved_alpha = death_profile.color_sr, death_profile.radius_sr, death_profile.alpha
+local function refresh_death(expected_color, radius, alpha)
+    local old_id = service.debug_snapshot(death.index).particle_ids[1]
+    local before_created, before_destroyed, before_released = created, #destroyed, #released
+    assert(service.apply(state(death, 11, "class_1")))
+    local id = service.debug_snapshot(death.index).particle_ids[1]
+    assert(id ~= old_id and created == before_created + 1)
+    assert(#destroyed == before_destroyed + 1 and #released == before_released + 1)
+    local effect = particles[id]
+    assert(effect.controls[1].x == radius and effect.controls[1].z == alpha)
+    local color = effect.controls[2]
+    assert(color.x == tonumber(expected_color[1]) and color.y == tonumber(expected_color[2]) and color.z == tonumber(expected_color[3]))
+end
+death_profile.color_sr = nil
+refresh_death(death_profile.color, saved_radius, saved_alpha)
+local fallback_id, before_created = service.debug_snapshot(death.index).particle_ids[1], created
+death_profile.color_sr = {}
+assert(service.apply(state(death, 11, "class_1")))
+assert(created == before_created and service.debug_snapshot(death.index).particle_ids[1] == fallback_id,
+    "missing and empty tier colors share the legacy profile color")
+death_profile.color_sr = saved_sr
+refresh_death(saved_sr, saved_radius, saved_alpha)
+death_profile.color_sr = {181, 96, 254}
+refresh_death(death_profile.color_sr, saved_radius, saved_alpha)
+death_profile.radius_sr = saved_radius + 1
+refresh_death(death_profile.color_sr, saved_radius + 1, saved_alpha)
+death_profile.alpha = 0.9
+refresh_death(death_profile.color_sr, saved_radius + 1, 0.9)
+death_profile.color_sr, death_profile.radius_sr, death_profile.alpha = saved_sr, saved_radius, saved_alpha
+refresh_death(saved_sr, saved_radius, saved_alpha)
+
+-- Compatible old native rings and all three former image layers are retired.
+death_profile.native_base = "dazzle_weave"
+assert(service.apply(state(death, 11, "class_1")))
+local old_native = service.debug_snapshot(death.index).particle_ids[1]
+assert(particles[old_native].name == "particles/survival/towers/trial/death_ground.vpcf")
+death_profile.native_base = "willow_shadow_realm"
+assert(service.apply(state(death, 11, "class_1")))
+assert(particles[old_native].destroyed and particles[old_native].released and live_count() == 1)
+local external = ParticleManager:CreateParticle("particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_ambient.vpcf",
+    PATTACH_ABSORIGIN_FOLLOW, death)
+local saved_layers = {}
+for _, field in ipairs({"core", "detail", "detail_ssr", "crown"}) do saved_layers[field] = death_profile[field] or "" end
+death_profile.native_base = ""
+death_profile.core, death_profile.detail, death_profile.detail_ssr, death_profile.crown =
+    "bases/ultimate", "bases/detail_ultimate", "bases/detail_ultimate", "bases/detail_motes"
+assert(service.apply(state(death, 21, "class_1")))
+local legacy_ids = service.debug_snapshot(death.index).particle_ids
+assert(#legacy_ids == 3 and live_count() == 4)
+death_profile.native_base = "willow_shadow_realm"
+for field, value in pairs(saved_layers) do death_profile[field] = value end
+assert(service.apply(state(death, 21, "class_1")))
+assert(#service.debug_snapshot(death.index).particle_ids == 1 and live_count() == 2)
+for _, id in ipairs(legacy_ids) do assert(particles[id].destroyed and particles[id].released) end
+service.remove(death.index)
+assert(not particles[external].destroyed and not particles[external].released and live_count() == 1,
+    "base replacement and removal must preserve separately owned hero ornaments")
+ParticleManager:DestroyParticle(external, true)
+ParticleManager:ReleaseParticleIndex(external)
+
+invalid_create_at = created + 1
+assert(not service.apply(state(death, 6, "class_1")) and live_count() == 0)
+invalid_create_at = nil
+fail_control_at = created + 1
+assert(not service.apply(state(death, 6, "class_1")) and live_count() == 0)
+fail_control_at = nil
+assert(service.apply(state(death, 6, "class_1")) and live_count() == 1)
+service.remove(death.index)
+assert(live_count() == 0)
+
 local cases = {{6,1}, {10,1}, {11,2}, {15,2}, {16,2}, {20,2}, {21,3}, {25,3}}
 for class_number = 1, 7 do
     local u = unit(10 + class_number)
     for _, case in ipairs(cases) do
         local payload = state(u, case[1], "class_" .. class_number)
-        assert(service.apply(payload))
-        local replaced = class_number == 2 or class_number == 4 or class_number == 7
-        local expected_count = class_number == 2 and 1
-            or ((class_number == 4 or class_number == 7) and 2 or case[2])
+        local applied = service.apply(payload)
+        assert((class_number == 4 and not applied) or (class_number ~= 4 and applied))
+        local replaced = true
+        local expected_count = class_number == 4 and 0 or class_number == 7 and 3 or 1
         assert(live_count() == expected_count and service.debug_snapshot().particles == expected_count)
         local profile = profiles.by_id[payload.tower_class]
         local rarity = case[1] <= 10 and "r" or case[1] <= 15 and "sr" or "ssr"
-        local ids = service.debug_snapshot(u.index).particle_ids
+        local snapshot = service.debug_snapshot(u.index)
+        local ids = snapshot and snapshot.particle_ids or {}
         if replaced then
             for _, field in ipairs({"core", "detail", "detail_ssr", "crown"}) do
                 assert(not profile[field] or profile[field] == "", "replaced base must remove all old image layers")
@@ -183,22 +295,12 @@ for class_number = 1, 7 do
                 assert(not particles[id].name:find("/bases/", 1, true), "old base must never stack with replacement")
             end
         end
-        if class_number == 2 then
-            local effect = particles[ids[1]]
-            assert(effect.name == mystery_base_path and effect.bindings[1].unit == u)
-            assert(effect.bindings[1].attachment == "" and next(effect.controls) == nil)
-        end
         if class_number == 4 then
-            for offset, path in ipairs(machine_base_paths) do
-                local effect = particles[ids[offset]]
-                assert(effect.name == path and effect.bindings[0].unit == u)
-                assert(effect.bindings[0].attachment == "", "base must bind at feet")
-                assert(next(effect.controls) == nil, "preserve native foot radius/color")
-            end
+            assert(profile.enabled == false and #ids == 0, "machine gun must have no foot effects")
         end
         if class_number == 7 then
             for offset, path in ipairs(anti_air_base_paths) do
-                local effect = particles[ids[offset]]
+                local effect = particles[ids[offset+1]]
                 assert(effect.name == path and effect.bindings[0].unit == u)
                 assert(effect.bindings[0].attachment == "")
                 local hsv = effect.controls[62]
@@ -206,16 +308,17 @@ for class_number = 1, 7 do
             end
         end
         local radius = profile["radius_" .. rarity]
-        if not replaced then
+        if expected_count > 0 and trial_base_paths[class_number] then
+        assert(particles[ids[1]].name == trial_base_paths[class_number])
         assert(particles[ids[1]].controls[1].x == radius, "core keeps the profile radius")
-        if case[2] >= 2 then
+        if expected_count >= 2 then
             local field = rarity == "ssr" and "detail_ssr" or "detail"
             assert(particles[ids[2]].name == "particles/survival/towers/" .. profile[field] .. ".vpcf",
                 "SR and SSR must use their own profession detail")
             assert(particles[ids[2]].controls[1].x <= radius, "detail cannot widen the core footprint")
             assert(particles[ids[2]].controls[1].z <= profile.alpha * 0.5, "detail remains subdued")
         end
-        if case[2] == 3 then
+        if expected_count == 3 then
             assert(particles[ids[3]].controls[1].x < radius * 0.8, "red-star accent stays inside the core")
             assert(particles[ids[3]].controls[1].z < profile.alpha * 0.4)
         end
@@ -239,7 +342,9 @@ for class_number = 1, 7 do
                 and effect.name ~= anti_air_base_paths[1] and effect.name ~= anti_air_base_paths[2] then
                 assert(effect.bound_unit == u and effect.controls[1].x > 0)
                 assert(effect.controls[1].z > 0 and effect.controls[1].z <= 1)
-                assert(effect.controls[2].x == tonumber(profiles.by_id[payload.tower_class].color[1]))
+                local color = profile["color_" .. rarity] or profile.color
+                assert(effect.controls[2].x == tonumber(color[1]) and effect.controls[2].y == tonumber(color[2])
+                    and effect.controls[2].z == tonumber(color[3]))
             end
         end
     end
@@ -251,20 +356,20 @@ local u = unit(30)
 service.apply(state(u, 21, "class_1"))
 local before_destroyed = #destroyed
 service.apply(state(u, 21, "class_3"))
-assert(#destroyed == before_destroyed + 3 and live_count() == 3, "cross-route swap must retire every old layer")
+assert(#destroyed == before_destroyed + 1 and live_count() == 1, "cross-route swap must retire every old layer")
 before_destroyed = #destroyed
 service.apply(state(u, 21, "class_2"))
-assert(#destroyed == before_destroyed + 3 and live_count() == 1,
+assert(#destroyed == before_destroyed + 1 and live_count() == 1,
     "replacement base retires core, detail and red-star layers")
-assert(particles[service.debug_snapshot(u.index).particle_ids[1]].name == mystery_base_path)
+assert(particles[service.debug_snapshot(u.index).particle_ids[1]].name == trial_base_paths[2])
 service.apply(state(u, 21, "class_4"))
-assert(live_count() == 2, "switching native bases must retire the old native root")
+assert(live_count() == 0, "disabled machine-gun base must retire the previous route's effects")
 local replacement = unit(30)
 service.apply(state(replacement, 11, "class_6"))
-assert(live_count() == 2)
+assert(live_count() == 1)
 u.alive = false
 bus.emit(events.ENGINE_ENTITY_KILLED, { victim = u })
-assert(live_count() == 2, "late death of reused entindex must not clear replacement")
+assert(live_count() == 1, "late death of reused entindex must not clear replacement")
 replacement.alive = false
 bus.emit(events.ENGINE_ENTITY_KILLED, { victim = replacement })
 assert(live_count() == 0)
@@ -297,15 +402,15 @@ assert(particles[shadow_id].destroyed and particles[shadow_id].released)
 -- A failed setup rolls back partial ownership; cleanup continues if one
 -- renderer destroy throws, including releasing that same index.
 invalid_create_at = created + 2
-assert(not service.apply(state(replacement, 21, "class_6")))
+assert(not service.apply(state(replacement, 21, "class_7")))
 assert(live_count() == 0 and service.debug_snapshot().towers == 0)
 invalid_create_at = nil
 fail_control_at = created + 2
-assert(not service.apply(state(replacement, 21, "class_6")))
+assert(not service.apply(state(replacement, 21, "class_7")))
 assert(live_count() == 0)
 fail_control_at = nil
-service.apply(state(replacement, 21, "class_6"))
-fail_destroy_id = next_id - 3
+service.apply(state(replacement, 21, "class_7"))
+fail_destroy_id = next_id - 2
 service.remove(30)
 assert(live_count() == 0 and #destroyed == #released)
 fail_destroy_id = nil
@@ -317,16 +422,16 @@ assert(live_count() == 0)
 replacement.null = false
 listed = {state(replacement, 11, "class_6"), ultimate_state}
 service.init()
-assert(live_count() == 6 and service.debug_snapshot().towers == 2)
+assert(live_count() == 5 and service.debug_snapshot().towers == 2)
 before_destroyed = #destroyed
 service.init()
-assert(#destroyed == before_destroyed + 6 and live_count() == 6,
+assert(#destroyed == before_destroyed + 5 and live_count() == 5,
     "same-world init must destroy all old layers including smoke before rebuilding")
 assert(scheduler.task_count() == 1)
 local before_created = created
 bus.emit(events.BUILDING_CHANGED, state(replacement, 21, "class_6"))
-assert(created == before_created + 3, "old generation subscriptions must stay inactive")
-assert(live_count() == 7)
+assert(created == before_created + 1, "old generation subscriptions must stay inactive")
+assert(live_count() == 5)
 
 before_destroyed = #destroyed
 world, next_id, listed = {}, 0, {}

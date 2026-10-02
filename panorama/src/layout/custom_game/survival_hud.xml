@@ -23,6 +23,7 @@
         <include src="file://{resources}/scripts/custom_game/reward_presentation.js" /><include src="file://{resources}/scripts/custom_game/item_art_remaining_5d5c1152eb.js"/>
         <include src="file://{resources}/scripts/custom_game/ui_bootstrap.js" />
         <include src="file://{resources}/scripts/custom_game/world_overlay_visibility.js" />
+        <include src="file://{resources}/scripts/custom_game/world_health_bar_anchor.js" />
         <include src="file://{resources}/scripts/custom_game/hero_world_health_bar.js" />
         <include src="file://{resources}/scripts/custom_game/building_construction_progress.js" />
         <include src="file://{resources}/scripts/custom_game/attack_range_input.js" />

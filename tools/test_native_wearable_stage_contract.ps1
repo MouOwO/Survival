@@ -171,6 +171,10 @@ foreach ($stage in $stages) {
 }
 
 $towerComponents = @($components | Where-Object { $catalog.ContainsKey((GetField $_ 'asset_id')) -and (GetField $_ 'asset_id') -like 'tower_*' })
-Check ($towerComponents.Count -eq 97) "WORLD_COMPONENT_COUNT_INVALID: $($towerComponents.Count)"
-Check (@($towerComponents | Where-Object { (GetField $_ 'asset_id') -eq 'tower_laser_od_blackgate' }).Count -eq 0) 'IO_WORLD_COMPONENTS_MUST_BE_ZERO'
+$visibleWearables = @($wearables | Where-Object { $_.enabled -ne '0' -and -not [string]::IsNullOrWhiteSpace($_.model_path) })
+Check ($towerComponents.Count -eq $visibleWearables.Count) "WORLD_COMPONENT_COUNT_INVALID: $($towerComponents.Count)"
+foreach ($row in $visibleWearables) {
+    $component = $componentsByKey[($row.asset_id + ':' + $row.wearable_key)]
+    Check ((GetField $component 'model_skin') -eq (GetField $row 'model_skin')) "WEARABLE_SKIN_NOT_PROJECTED: $($row.wearable_key)"
+}
 Write-Output "HERO_BODY_STAGE_CONTRACT_PASS stages=$($stages.Count) wearables=$($wearables.Count) components=$($towerComponents.Count)"

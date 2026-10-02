@@ -752,7 +752,7 @@ function M.precache(context)
     )
     for _, particle in ipairs({
         "particles/survival/skills/meteor_phoenix_fall.vpcf",
-        "particles/survival/skills/meteor_impact.vpcf",
+        "particles/survival/skills/meteor_phoenix_impact.vpcf",
         "particles/survival/skills/meteor_lava.vpcf",
     }) do
         PrecacheResource("particle", particle, context)
@@ -762,12 +762,12 @@ function M.precache(context)
         "particles/units/heroes/hero_warlock/warlock_rain_of_chaos_explosion.vpcf",
         context
     )
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+    for _, particle in ipairs({
+        "particles/survival/skills/blizzard_ground.vpcf",
         "particles/survival/skills/wyvern_blizzard_snow.vpcf",
-        context
-    )
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
     PrecacheResource(
         "particle",
         "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf",
@@ -838,6 +838,7 @@ function M.precache(context)
         "particles/units/heroes/hero_nevermore/nevermore_shadowraze.vpcf",
         context
     )
+    require("systems/keeper_blinding_light_visual").precache(context)
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_axe/axe_attack_blur_counterhelix.vpcf",

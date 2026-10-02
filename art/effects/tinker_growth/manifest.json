@@ -9,7 +9,9 @@
     "SR": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vpcf",
     "SSR": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs.vpcf"
   },
-  "width_control": 60,
+  "native_width": true,
+  "persistent_core": true,
+  "sr_color": "yellow",
   "outputs": [
     {
       "resource": "materials/survival/tinker_growth/cable.png",

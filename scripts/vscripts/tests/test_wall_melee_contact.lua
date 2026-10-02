@@ -24,9 +24,9 @@ local wall=unit(1,0,0,128)
 local front={}
 local chosen={}
 for i=1,4 do
-    front[i]=unit(i+1,-400,(i-2.5)*80)
+    front[i]=unit(i+1,-400,(i-2.5)*64)
     local p=assert(contact.resolve(wall,front[i]))
-    assert(p.claimed and p.point.x==-192 and p.point.y==(i-2.5)*80,
+    assert(p.claimed and p.point.x==-192 and p.point.y==(i-2.5)*64,
         "each monster gets its nearest lane on the reachable face")
     chosen[i]=p.point;front[i].p=p.point
     local reach=contact.attack_range(front[i],wall)
@@ -46,14 +46,14 @@ assert(contact.resolve(wall,other_side).point.x==-192,
     "a full engaged face never sends overflow through the gate to the rear")
 front[3].dead=true
 local refill=contact.resolve(wall,fifth)
-assert(refill.claimed and refill.point.y==40,"dead front unit is replaced in its vacated lane")
+assert(refill.claimed and refill.point.y==32,"dead front unit is replaced in its vacated lane")
 -- No first-arrival orientation: a new wall is approached from any valid side.
 contact.reset()
 local far=unit(10,-900,0)
 assert(contact.resolve(wall,far)==nil,"spawn-distance units cannot reserve contacts")
 local north=unit(11,40,400)
 local p=contact.resolve(wall,north)
-assert(p.claimed and p.point.y==192 and p.point.x==40)
+assert(p.claimed and p.point.y==192 and p.point.x==32)
 contact.release(1,11)
 -- Nearest geometric point can be unreachable; choose the shortest real path.
 GridNav.FindPathLength=function(_,a,b)

@@ -13,11 +13,8 @@ local function nonempty(value)
     return type(value) == "string" and value ~= ""
 end
 
--- A generic npc_dota_creature does not always restart the animation graph
--- after SetModel replaces its body with a hero model. Explicitly enter the
--- looping idle sequence for both the body and bone-merged components. Keep
--- this local and best-effort so older engine builds without one of the
--- CBaseAnimating methods remain compatible.
+-- Prop components need an initial sequence before bone merging. The NPC body
+-- must stay under the engine's activity graph for walking/attack/death changes.
 local function play_idle(entity, sequence)
     if not valid(entity) then return false end
     sequence = nonempty(sequence) and sequence or "idle"
@@ -98,7 +95,9 @@ function M.apply(unit, archetype, options)
         return false, status or "appearance_apply_failed"
     end
     cosmetic_details.apply(unit, asset, components)
-    play_idle(unit, asset.default_sequence)
+    -- The NPC animation graph owns idle, locomotion and attack transitions.
+    -- ResetSequence on the body can leave a manually selected idle after SetModel.
+    if type(unit.SetPlaybackRate) == "function" then unit:SetPlaybackRate(1) end
     for component_id, component in pairs(components or {}) do
         local declaration = nil
         for _, candidate in ipairs(asset.components or {}) do
