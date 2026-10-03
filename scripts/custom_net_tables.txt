@@ -10,6 +10,7 @@
         "survival_item_tooltips",
         "survival_inventory_item_identity",
         "survival_hero_skills",
+        "survival_tower_rank",
         "survival_hero_skill_choice",
         "survival_combat_stats",
         "survival_combat_debug",

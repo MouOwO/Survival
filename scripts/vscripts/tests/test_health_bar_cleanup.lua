@@ -34,6 +34,21 @@ assert(values.unit_42.health == 50 and writes == 1 and projections == 2)
 for _ = 1, 100 do modifier:OnIntervalThink() end
 assert(writes == 1 and projections == 2, "stable samples skip publishing and formatting")
 
+local clock = 10
+GameRules = {GetGameTime = function() return clock end}
+local prediction = require("systems/tower_laser_health_prediction")
+local owner = {laser_target=unit,last_interval_time=clock,laser_elapsed=0}
+prediction.record(owner, unit, 100, 1, 1.1, 1)
+modifier:OnIntervalThink()
+assert(values.unit_42.laser_forecast[1].due == 11 and values.unit_42.health == 50)
+assert(math.abs(values.unit_42.laser_forecast[1].fraction - 0.55) < 0.00001)
+local smooth_writes = writes
+for _ = 1, 10 do modifier:OnIntervalThink() end
+assert(writes == smooth_writes, "active smoothing does not add repeated writes")
+clock = 12
+modifier:OnIntervalThink()
+assert(#values.unit_42.laser_forecast == 0 and values.unit_42.health == 50)
+
 for _, change in ipairs({
     {"health", 40}, {"health", 70}, {"max_health", 120},
     {"alive", false}, {"alive", true}, {"team", 3}, {"name", "upgraded_worker"},

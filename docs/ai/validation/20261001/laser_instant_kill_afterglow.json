@@ -1,0 +1,22 @@
+{
+  "status": "COMPILED_DATA_AND_REGRESSIONS_PASS",
+  "cause": "Immediate laser damage invokes death cleanup within the creation frame, destroying the continuous beam before the client can display it.",
+  "fix": "Snapshot live beam coordinates before damage. On target death create an independent world-space finite beam and electric burst; immediately clean up the original beam.",
+  "duration_seconds": 0.3,
+  "particle_cap_per_death_tail": 24,
+  "budget_note": "A 16-node beam plus 8 arc sprites per death; recent kills may overlap for 0.3 seconds. Resource closure sum 187 is not a global battle cap.",
+  "added_lua_timers": 0,
+  "corpse_dependencies": 0,
+  "damage_timing_changes": 0,
+  "checks": [
+    "Synchronous death and corpse removal within Deal still create a released tail without reading the removed entity",
+    "Next target retains immediate first hit while residue exists",
+    "Duplicate death does not replay residue",
+    "Original beam destruction does not destroy released residue",
+    "Failed optional tail setup destroys/releases the partial resource",
+    "Original damage baseline and cumulative totals",
+    "Compiled DATA: instant emitters, 0.3 second lifetimes, decay/fade and no continuous or model-bound child"
+  ],
+  "compile": {"resources": 14, "failed": 0},
+  "live_rendered_validation": false
+}

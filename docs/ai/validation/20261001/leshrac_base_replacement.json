@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "root": "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash.vpcf",
+  "max_live_particles": 8,
+  "implementation": "Native Diabolic Edict groundflash with both ground-line children; continuous engine emission, CP1 foot lock. No Lua effect loop or ability gameplay.",
+  "replacements": [
+    "class_2: Leshrac W ground",
+    "class_4: Spirit Breaker W feet",
+    "class_7: Templar Assassin trap rings"
+  ],
+  "legacy_layers": "Core/detail/detail_ssr/crown removed from all three replaced profiles; exclusive runtime branch; existing particles retired on visual key change.",
+  "tests": [
+    "tower visual lifecycle simulation",
+    "base source preflight",
+    "resourcecompiler: three targets, zero failures",
+    "Lua 5.1 syntax"
+  ],
+  "resources": [
+    {
+      "resource": "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash.vpcf",
+      "sha256": "4ce9da360cc0217cb46e23a5849082f52c654582360aa9066972f1b53a800fb0",
+      "dependencies": [
+        "materials/particle/juggernaut/juggernaut_blade_fury.vtex",
+        "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash_lines.vpcf",
+        "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash_lines2.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/juggernaut/juggernaut_blade_fury.vtex",
+      "sha256": "d82293f6f1adbaf1d9e1cfc907f153d96190708272f29501635d53dae0f680da"
+    },
+    {
+      "resource": "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash_lines.vpcf",
+      "sha256": "8e7250a14e6a4667658fd4b3fbed2c59d92d3eeb9c4f6b1ac1da6d455396003f",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_001.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_001.vtex",
+      "sha256": "0678bc5b83672a4f388eb2a2ba475a5eae57e09961bccda75a6360e7c0ae3016"
+    },
+    {
+      "resource": "particles/survival/towers/leshrac_base/leshrac_diabolic_groundflash_lines2.vpcf",
+      "sha256": "7f4c81724771a485182381e10482ed903523accfe08029c438bda1d3f14f500d",
+      "dependencies": [
+        "materials/particle/particle_ring_wavy4.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_ring_wavy4.vtex",
+      "sha256": "07378130e89df61b74cf52556d1d7d942b685faf2acb8df19c459461db092def"
+    }
+  ],
+  "in_game_visual_verified": false
+}

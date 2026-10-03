@@ -2,7 +2,7 @@ local M = {}
 local states = {}
 local SLOT_COUNT = 4
 local SLOT_SPACING = 80
-local NORMAL_OFFSET = 288
+local NORMAL_OFFSET = 176 -- wall radius 128 + monster hull 32 + clearance 16
 local QUEUE_SPACING = 160
 
 local function valid(entity)

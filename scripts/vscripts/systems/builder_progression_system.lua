@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local stages = require("config/generated/builder_ability_stages")
 local training = require("config/generated/training_definitions")
 local building_count_limits = require("systems/building_count_limit_service")
@@ -45,6 +46,7 @@ local function create_state()
         city_level = 0,
         hero_summoned = false,
         counts = {},
+        occupied_counts = {},
         tower_class_by_entindex = {},
     }
 end
@@ -62,6 +64,15 @@ end
 
 local function count(state, building_id)
     return state.counts[building_id] or 0
+end
+
+local function limit_count(state, building_id, maximum)
+    -- Occupying a unique slot hides its entry, but only a completed building
+    -- may advance the stage or satisfy another building's prerequisite.
+    if maximum == 1 then
+        return state.occupied_counts[building_id] or count(state, building_id)
+    end
+    return count(state, building_id)
 end
 
 local function stage_for(state)
@@ -120,7 +131,7 @@ local function can_activate(state, row)
     local maximum = building_count_limits.maximum(
         row.max_building_count, row.building_id, state.player_id
     )
-    if maximum > 0 and count(state, row.building_id) >= maximum then
+    if maximum > 0 and limit_count(state, row.building_id, maximum) >= maximum then
         return false
     end
     local prerequisite = tostring(row.requires_building_id or "")
@@ -135,9 +146,12 @@ local function can_activate(state, row)
 end
 
 local function count_limit_reached(state, row)
+    local maximum = building_count_limits.maximum(
+        row.max_building_count, row.building_id, state.player_id
+    )
     return building_count_limits.reached(
         row.max_building_count,
-        count(state, row.building_id),
+        limit_count(state, row.building_id, maximum),
         row.building_id,
         state.player_id
     )
@@ -513,6 +527,10 @@ local function on_builder_ready(payload)
     state.builder = payload.builder
     state.player_id = payload.player_id
     rebuild_building_counts(state)
+    local occupied = event_bus.request(events.BUILDING_COUNTS_REQUEST, {
+        player_id = state.player_id,
+    }) or {}
+    state.occupied_counts = occupied.counts or {}
     local repair = (training.by_id or {}).train_repairer_01 or {}
     if valid_entity(payload.builder)
         and not payload.builder:HasModifier("modifier_repair_worker_ai") then
@@ -532,6 +550,40 @@ local function on_builder_ready(payload)
         managed_abilities[row.ability_name] = true
     end
     sync(state)
+end
+
+local function on_building_counts_changed(payload)
+    local state = state_by_player[tonumber(payload and payload.player_id)]
+    if not state or type(payload.counts) ~= "table" then return end
+    local previous = state.occupied_counts
+    state.occupied_counts = payload.counts
+    local changed = false
+    for _, row in ipairs(stages.rows or {}) do
+        local maximum = building_count_limits.maximum(
+            row.max_building_count, row.building_id, state.player_id
+        )
+        if row.enabled ~= false and maximum == 1 then
+            local before = previous[row.building_id] or count(state, row.building_id)
+            local after = limit_count(state, row.building_id, maximum)
+            if before ~= after then changed = true end
+            if valid_entity(state.builder) and after >= maximum then
+                local ability = state.builder:FindAbilityByName(row.ability_name)
+                if ability then
+                    ability:SetHidden(true)
+                    ability:SetActivated(false)
+                end
+            end
+        end
+    end
+    if not changed or state.count_sync_task then return end
+    -- Placement callers still finish cooldown setup after BUILD_REQUEST.
+    -- Hide immediately, then replace the skill with its placeholder after
+    -- that call has returned so they never use an invalid ability handle.
+    state.count_sync_task = scheduler.after(0, function()
+        state.count_sync_task = nil
+        if state_by_player[state.player_id] == state then sync(state) end
+        return false
+    end, "builder_unique_count_sync_" .. tostring(state.player_id))
 end
 
 local function on_building_created(payload)
@@ -588,16 +640,24 @@ local function on_hero_summoned(payload)
 end
 
 function M.init()
+    for _, state in pairs(state_by_player) do
+        if state.count_sync_task then scheduler.cancel(state.count_sync_task) end
+    end
     state_by_player = {}
     managed_abilities = {}
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
+    event_bus.subscribe(events.BUILDING_COUNTS_CHANGED, on_building_counts_changed)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
-        if player_id ~= nil then state_by_player[player_id] = nil end
+        if player_id ~= nil then
+            local state = state_by_player[player_id]
+            if state and state.count_sync_task then scheduler.cancel(state.count_sync_task) end
+            state_by_player[player_id] = nil
+        end
     end)
     event_bus.subscribe(events.ROGUE_REWARD_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
@@ -618,6 +678,8 @@ function M._state_snapshot_for_test(player_id)
     if not state then return nil end
     local counts = {}
     for key, value in pairs(state.counts) do counts[key] = value end
+    local occupied_counts = {}
+    for key, value in pairs(state.occupied_counts) do occupied_counts[key] = value end
     return {
         player_id = state.player_id,
         team = state.team,
@@ -625,6 +687,7 @@ function M._state_snapshot_for_test(player_id)
         wall_built_once = state.wall_built_once,
         city_level = state.city_level,
         counts = counts,
+        occupied_counts = occupied_counts,
     }
 end
 

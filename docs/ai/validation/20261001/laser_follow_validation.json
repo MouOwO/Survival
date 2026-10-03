@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-01",
+  "scope": "Laser attachment following, optional-visual failure isolation, and a Tools-only native-attack fixture",
+  "production_files": ["scripts/vscripts/modifiers/modifier_tower_attack_effects.lua"],
+  "unchanged_contract": {
+    "particle": "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
+    "beam_update_seconds": 0.03,
+    "segment_refresh_seconds": 0.12,
+    "segment_owned_seconds": 0.18,
+    "damage_interval_seconds": 1,
+    "damage_increment_per_second": 0.05,
+    "maximum_damage_multiplier": 5,
+    "unchanged": ["damage calculation", "first damage hit", "target range", "production target selection", "attack order retry interval", "CSV configuration"]
+  },
+  "native_resource_evidence": {
+    "source": "Valve dota/pak01_dir.vpk: particles/units/heroes/hero_tinker/tinker_laser.vpcf_c",
+    "decoded_audit": "output/laser_follow_audit/particles/units/heroes/hero_tinker/tinker_laser.vpcf_c.txt",
+    "observations": [
+      "C_OP_MaintainSequentialPath follows CP9 to CP1.",
+      "Native initial lifetime is 0.7 seconds; DestroyParticle(false) lets segments fade after script ownership ends at 0.18 seconds.",
+      "Old world-coordinate endpoints could freeze during that unowned fade. The change binds CP9/CP0 to source and CP1 to target with PATTACH_POINT_FOLLOW, then retires old segments immediately."
+    ]
+  },
+  "unit_tests": {
+    "test_tower_skill_tree_exclusion": "PASS",
+    "test_manual_laser_follow_fixture": "PASS",
+    "lua_syntax": "PASS",
+    "coverage": [
+      "Native source and target attachment binding; no world-CP overwrite while bound",
+      "Attachment fallback, including partial source binding",
+      "Damage interval and multiplier unaffected",
+      "Target switch, target killed by another attacker, relocation reset and destruction",
+      "CreateParticle/binding/fallback-update/DestroyParticle/ReleaseParticleIndex failures do not interrupt damage or release of other owned handles",
+      "Tools-only fixture guard, rejected arbitrary shell option, empty-area preflight, no player/building registration/global events/direct ApplyDamage",
+      "Async cancellation, delayed callbacks, loading deadline, runtime timeout and independent cleanup",
+      "Native movement retries only when the existing movement stopped, with 0.35-second throttle",
+      "Default native ranged shell removes modifier_creep_piercing and receives production mystery row, skills, modifiers and Storm visuals"
+    ],
+    "simulated_30_seconds": {
+      "create": 251,
+      "destroy_before_final_cleanup": 249,
+      "set_control_ent": 753,
+      "set_world_control": 0,
+      "peak_owned_segments": 2,
+      "damage_ticks_including_initial_hit": 31,
+      "all_251_particle_ids_released_once_after_cleanup": true,
+      "note": "Deterministic Lua mock call counts, not engine frame-time measurements."
+    }
+  },
+  "engine_validation": {
+    "successful_run": {
+      "local_start": "2026-10-01 08:14:49",
+      "local_end": "2026-10-01 08:15:07",
+      "source_shell": "npc_dota_creep_goodguys_ranged",
+      "production_model": "models/heroes/storm_spirit/storm_spirit.vmdl",
+      "tower_entity": 649,
+      "enemy_entity": 652,
+      "sample_at_12_seconds": {
+        "native_attack_target": 652,
+        "attacking": true,
+        "enemy_moving": true,
+        "source_position": [12196, -3072, 640],
+        "damage_ticks": 12,
+        "hp_drop": 33800,
+        "owned_segments": 2,
+        "source_and_target_follow_flags": true,
+        "target_distance_travelled": 3020,
+        "target_turns": 16,
+        "dropped_motion_retries": 1
+      },
+      "at_natural_end": {
+        "damage_ticks": 18,
+        "hp_drop": 54467,
+        "target_turns": 25,
+        "target_distance_travelled": 4520,
+        "owned_segments_before_cleanup": 2,
+        "remaining_owned_units_after_cleanup": 0
+      },
+      "note": "This first successful engine run still had the native creep damage-class modifier. The final fixture removes it; do not treat these HP drops as a balance baseline."
+    },
+    "rejected_hypotheses": [
+      "Stopping only the production auto-attack retry think for 5 seconds did not make the NO_ATTACK proxy attack.",
+      "Changing only that proxy to MOVE_GROUND for 5 seconds did not help.",
+      "Explicit facing, an X-aligned moving route, and stopping the target also failed for that proxy.",
+      "Replacing only the initial unit shell with a native ranged attacker succeeded with the same production AI, modifiers, visuals and Y-axis moving route. No production AI change was made."
+    ],
+    "four_tower_confirmation": {
+      "log": "output/tower_responsiveness_20261001/quiet_four_native.log",
+      "source_entities": [658, 667, 676, 685],
+      "target_entities": [661, 670, 679, 688],
+      "shell": "npc_dota_creep_goodguys_ranged",
+      "creep_damage_modifier_removed": "The root test script removed modifier_creep_piercing one frame after START; the final fixture removes it at creation.",
+      "sample_at_8_seconds_per_tower": {
+        "damage_ticks": 8,
+        "hp_drop": 14133,
+        "enemy_moving": true,
+        "owned_segments": 1,
+        "source_and_target_follow_flags": true,
+        "target_turns": 11,
+        "target_distance_travelled": 2060
+      },
+      "sample_at_31_seconds_per_tower": {
+        "damage_ticks": 31,
+        "hp_drop": 71021,
+        "enemy_moving": true,
+        "owned_segments": 2,
+        "source_and_target_follow_flags": true,
+        "target_turns": 44,
+        "target_distance_travelled": 7970,
+        "dropped_motion_retries": 0
+      }
+    },
+    "final_fixture_visual_confirmation": {
+      "log": "output/tower_responsiveness_20261001/final_visual_capture.log",
+      "configured_towers": 4,
+      "configured_duration_seconds": 30,
+      "source_entities": [694, 703, 712, 721],
+      "target_entities": [697, 706, 715, 724],
+      "creep_damage_modifier_removed": "By the final fixture at creation, before production attack modifiers start.",
+      "sample_at_8_seconds_per_tower": {
+        "damage_ticks": 8,
+        "hp_drop": 14133,
+        "enemy_moving": true,
+        "owned_segments": 1,
+        "source_and_target_follow_flags": true,
+        "target_turns": 11,
+        "target_distance_travelled": 2060
+      },
+      "screenshots": [
+        "art/effects/review/20261001/laser_four_follow_a.png",
+        "art/effects/review/20261001/laser_four_follow_b.png"
+      ]
+    },
+    "limitation": "This validates real native attacks, moving targets, entity CP binding and isolated fixture cleanup. It does not validate production economic upgrades or full-wave performance. Frame-time measurements are recorded separately by the root integration task."
+  },
+  "final_fixture": {
+    "file": "scripts/vscripts/tests/manual_laser_follow_review.lua",
+    "default_shell": "npc_dota_creep_goodguys_ranged",
+    "origin": [12416, -3072, 640],
+    "one_tower": "require('tests/manual_laser_follow_review').run({count=1,seconds=25})",
+    "four_towers": "require('tests/manual_laser_follow_review').run({count=4,seconds=90})",
+    "status": "SURVIVAL_LASER_FOLLOW_REVIEW:status()",
+    "cleanup": "require('tests/manual_laser_follow_review').cleanup()"
+  }
+}

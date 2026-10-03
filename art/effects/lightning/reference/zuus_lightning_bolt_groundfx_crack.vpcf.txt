@@ -1,0 +1,159 @@
+--- vpcf block DATA (1612 bytes) ---
+{
+	_class = "CParticleSystemDefinition"
+	m_bShouldHitboxesFallbackToRenderBounds = false
+	m_nMaxParticles = 18
+	m_flConstantRadius = 128.0
+	m_ConstantColor = [ 127, 238, 255, 255 ]
+	m_Renderers =
+	[
+		{
+			_class = "C_OP_RenderSprites"
+			m_flOverbrightFactor = 3.0
+			m_nOrientationType = "PARTICLE_ORIENTATION_WORLD_Z_ALIGNED"
+			m_flAnimationRate = 4.0
+			m_vecTexturesInput =
+			[
+				{
+					m_hTexture = resource:"materials/particle/ground/crack_growth_01.vtex"
+				},
+			]
+		},
+	]
+	m_Operators =
+	[
+		{
+			_class = "C_OP_Decay"
+		},
+		{
+			_class = "C_OP_EndCapTimedDecay"
+			m_flDecayTime = 0.25
+			m_bDisableOperator = true
+		},
+		{
+			_class = "C_OP_FadeInSimple"
+			m_flFadeInTime = 0.010000000000000002
+		},
+		{
+			_class = "C_OP_FadeOutSimple"
+			m_flFadeOutTime = 0.75
+		},
+		{
+			_class = "C_OP_EndCapTimedDecay"
+			m_flDecayTime = 0.125
+		},
+		{
+			_class = "C_OP_LerpEndCapScalar"
+			m_flLerpTime = 0.125
+			m_nFieldOutput = 16
+			m_flOutput = 0.0
+		},
+		{
+			_class = "C_OP_LerpEndCapScalar"
+			m_flLerpTime = 0.125
+			m_nFieldOutput = 7
+			m_flOutput = 0.0
+		},
+		{
+			_class = "C_OP_ColorInterpolate"
+			m_ColorFade = [ 0, 0, 0, 255 ]
+			m_flFadeEndTime = 0.1
+		},
+	]
+	m_Initializers =
+	[
+		{
+			_class = "C_INIT_CreateWithinSphere"
+			m_nControlPointNumber = 3
+		},
+		{
+			_class = "C_INIT_InitFloat"
+			m_InputValue =
+			{
+				m_nType = "PF_TYPE_RANDOM_UNIFORM"
+				m_flRandomMin = 96.0
+				m_flRandomMax = 128.0
+				m_nRandomMode = "PF_RANDOM_MODE_CONSTANT"
+			}
+		},
+		{
+			_class = "C_INIT_InitFloat"
+			m_InputValue =
+			{
+				m_nType = "PF_TYPE_RANDOM_UNIFORM"
+				m_flRandomMin = 0.0
+				m_flRandomMax = 270.0
+				m_nRandomMode = "PF_RANDOM_MODE_CONSTANT"
+				m_bHasRandomSignFlip = true
+			}
+			m_nOutputField = 4
+		},
+		{
+			_class = "C_INIT_InitFloat"
+			m_InputValue =
+			{
+				m_nType = "PF_TYPE_RANDOM_UNIFORM"
+				m_flRandomMin = 0.2509804
+				m_flRandomMax = 1.0
+				m_nRandomMode = "PF_RANDOM_MODE_CONSTANT"
+			}
+			m_nOutputField = 7
+		},
+		{
+			_class = "C_INIT_InitFloat"
+			m_InputValue =
+			{
+				m_nType = "PF_TYPE_RANDOM_UNIFORM"
+				m_flRandomMin = 7.0
+				m_flRandomMax = 8.0
+				m_nRandomMode = "PF_RANDOM_MODE_CONSTANT"
+			}
+			m_nOutputField = 1
+		},
+		{
+			_class = "C_INIT_PositionPlaceOnGround"
+			m_flOffset = 4.0
+			m_flMaxTraceLength = 2048.0
+			m_CollisionGroupName = "DEBRIS"
+		},
+		{
+			_class = "C_INIT_RandomYawFlip"
+		},
+	]
+	m_Emitters =
+	[
+		{
+			_class = "C_OP_InstantaneousEmitter"
+			m_nParticlesToEmit =
+			{
+				m_nType = "PF_TYPE_LITERAL"
+				m_flLiteralValue = 3.0
+			}
+		},
+	]
+	m_Children =
+	[
+		{
+			m_ChildRef = resource:"particles/econ/items/zeus/lightning_weapon_fx/zuus_lightning_bolt_groundfx_fire.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/econ/items/zeus/lightning_weapon_fx/zuus_lightning_bolt_groundfx_crack_light.vpcf"
+		},
+	]
+	m_controlPointConfigurations =
+	[
+		{
+			m_name = "preview"
+			m_drivers =
+			[
+				{
+					m_iControlPoint = 3
+					m_iAttachType = "PATTACH_WORLDORIGIN"
+					m_entityName = "self"
+				},
+			]
+		},
+	]
+	m_nBehaviorVersion = 4
+	m_nFirstMultipleOverride_BackwardCompat = 5
+}

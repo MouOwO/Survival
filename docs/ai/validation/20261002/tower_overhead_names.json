@@ -1,0 +1,72 @@
+{
+  "status": "PASS",
+  "date": "2026-10-02",
+  "scope": "Tower rarity icon and business name above the health bar, matching the supplied reference layout",
+  "layout": {
+    "order_top_to_bottom": ["stars", "rarity icon and business name", "health bar"],
+    "rank_row_width": 136,
+    "rank_row_height": 38,
+    "health_bar_gap": 2,
+    "right_level_badge": false,
+    "shared_world_health_anchor": true,
+    "fallback_world_height": 190,
+    "native_image_paths": "panorama/images/custom_game/survival_tower_rank/rareicon_<n|r|sr|ssr>_png.vtex",
+    "ur_label_preserved": true,
+    "independent_hud_root_z_index": 1
+  },
+  "construction": {
+    "server_guards": ["constructing state", "modifier_building_under_construction", "IsNoDraw"],
+    "client_guard": "constructing=1 hides the existing row immediately and prevents new panels",
+    "previous_entry_removed": true,
+    "completion_restores_entry": true,
+    "simulation_status": "PASS",
+    "live_new_construction_visual_verified": false
+  },
+  "tests": [
+    "test_tower_rank_ui.cjs: native images, names, shared anchor, construction, no level badge, scaled geometry, occlusion and hot reload PASS",
+    "test_world_health_bar.js: shared anchor, delayed XML child, hot reload, 5s lethal forecast and entity lifecycle PASS",
+    "test_world_overlay_visibility.cjs: HUD overlap, modal, tooltip and production transform bounds PASS",
+    "test_tower_rank_presentation.lua: 7 routes, 25 levels, names, construction, ownership and lifecycle PASS",
+    "test_tower_class_preflight.lua PASS",
+    "test_manual_tower_presentation_fixture.lua PASS",
+    "test_building_astral_construction.lua PASS",
+    "test_health_bar_cleanup.lua PASS"
+  ],
+  "lua_51_syntax": "PASS",
+  "git_diff_check": "PASS",
+  "performance": {
+    "measurement": "Offline production JavaScript call counts; not engine FPS or CPU/GPU time",
+    "towers": 40,
+    "frames_per_scenario": 300,
+    "stable_style_writes": 0,
+    "fully_blocked_native_calls": 0,
+    "fully_blocked_projection_calls": 0,
+    "no_tower_overlay_captures": 0,
+    "new_periodic_loops": 0
+  },
+  "compilation": {
+    "compiler": "Official Dota resourcecompiler, forced rebuild",
+    "status": "PASS, 0 failures",
+    "source_content_parity": "PASS, all 7 UI source files",
+    "nonempty_runtime_resources": 7,
+    "final_rank_css_sha256": "d862e3135a3980155982ae651565ba4e650cbec27a930b3232ef859aa89672df"
+  },
+  "live_validation": {
+    "status": "PASS",
+    "towers": [
+      {"entindex": 622, "rarity": "SR", "display_name": "防空火炮LV1", "visible": true},
+      {"entindex": 791, "rarity": "N", "display_name": "箭塔1-1", "visible": true}
+    ],
+    "viewport": "1600x900, UI scale 0.8333333",
+    "full_hud_restored_and_labels_visible": true,
+    "hp_and_attacks_per_second_unchanged": true,
+    "rank_service_listeners": 6,
+    "map_restarted": false,
+    "game_focus_camera_pause_unchanged": true,
+    "screenshot": "output/tower_overhead_names/tower_overhead_names_final_20261002_0005.png",
+    "client_diagnostic": "output/tower_overhead_names/debug_rank_layer.log",
+    "server_hotfix_log": "output/tower_overhead_names/hotfix.log"
+  },
+  "damage_settlement_changed": false,
+  "map_reload_required_for_current_change": false
+}

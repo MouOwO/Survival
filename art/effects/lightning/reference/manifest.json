@@ -1,0 +1,986 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "source": "Local Valve Dota/core VPK; original native resources unmodified",
+  "items": [
+    {
+      "id": 12323,
+      "name": "风暴之示",
+      "key": "Tempest_Revelation",
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc.vpcf"
+    },
+    {
+      "id": 23655,
+      "name": "风暴串联之震",
+      "key": "Tremors_of_the_Tandem_Storm",
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm.vpcf"
+    }
+  ],
+  "rarity_rule": "R unchanged; SR full Tempest Revelation Q; SSR default Zeus Arc Lightning including red stars, no extra golden hit effects",
+  "strike_rule": "Tremors of the Tandem Storm native Static Storm replaces falling bolts; CP1.x is gameplay radius, CP2.x duration. Hero same-target repeat strikes share one area; tower uses one area for its configured duration.",
+  "native_roots": [
+    "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc.vpcf",
+    "particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
+    "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm.vpcf"
+  ],
+  "particle_systems": 72,
+  "resources": [
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc.vpcf",
+      "sha256": "3569c8000e0ea68b9a46defcf2c385f8b4dd86041131f5340ad162b62fde67af",
+      "children": [
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_impact.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_ground.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_light.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_thin.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_light_b.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_glow.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_smoke.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_dark.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_electric.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_b.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_c.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_spark.vpcf"
+      ],
+      "dependencies": [
+        "materials/particle/beam_jagged_02.vtex",
+        "materials/particle/beam_hotblue.vtex",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_impact.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_ground.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_light.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_thin.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_light_b.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_glow.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_smoke.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_dark.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_electric.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_b.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_c.vpcf",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_spark.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_jagged_02.vtex",
+      "sha256": "f824d897eabc956664978ea68955c227575870ad16f7edef62310c2059a7f133",
+      "children": []
+    },
+    {
+      "resource": "materials/particle/beam_hotblue.vtex",
+      "sha256": "80f07e3be7662ac9680a6d0a13c447024659875c5136646c2ad6194d9797341e",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_impact.vpcf",
+      "sha256": "3022442c8afeea0716d9c4393976464aed3d5175a0641549025a674c64d88fb4",
+      "children": [
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_impact_b.vpcf"
+      ],
+      "dependencies": [
+        "materials/particle/ground/ground_cracks_alpha.vtex",
+        "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_impact_b.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/ground/ground_cracks_alpha.vtex",
+      "sha256": "6051116ce51083b1e9e3198cf46a6e9430fcb8130f8cb035593168b215a868c4",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_impact_b.vpcf",
+      "sha256": "9302effce11830265ee531841e39d4cd321f1de732640f7ddbab177f399ad0b6",
+      "children": [],
+      "dependencies": [
+        "materials/particle/electrical_arc_smooth/electrical_arc_smooth.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electrical_arc_smooth/electrical_arc_smooth.vtex",
+      "sha256": "8df7c1d376ce37435b8c2de06cef3b157ebc666bed42df61b7104a372b2895ea",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_ground.vpcf",
+      "sha256": "cb043db984b3d196abfcf0bc448932ab386208e6710bbc159290d1a091e89d58",
+      "children": [],
+      "dependencies": [
+        "materials/particle/lava_pool_glow.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/lava_pool_glow.vtex",
+      "sha256": "c9d7952fbe88e3d568d94e5ca99496aeb39bf4a1bfcf7a061d44c98d7c5a26f3",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_light.vpcf",
+      "sha256": "35ca43a954e777a0f7b99d32d8187377e842751e474dfa6dcc746ff8504f4305",
+      "children": [],
+      "dependencies": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_thin.vpcf",
+      "sha256": "b3b95d738bf44d96559fef50c6d2499cbfdbad1aa05bde44e9dbff18ede4865e",
+      "children": [],
+      "dependencies": [
+        "materials/particle/electricity/electricity_22_a.vtex",
+        "materials/particle/beam_plasma_01.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electricity/electricity_22_a.vtex",
+      "sha256": "7fc0e123a5001fb730321dca86f788e40cb911b6a238aaf95121b8c7cf6a2cc8",
+      "children": []
+    },
+    {
+      "resource": "materials/particle/beam_plasma_01.vtex",
+      "sha256": "692a4bd54805fbfd4445f76fb4c8a12b9e33936dc9bf42231342c9f313e4c99a",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_light_b.vpcf",
+      "sha256": "c4cf315ea06d3a698d4755939114908d131cb02cd70644ee3febee9948371f6d",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_hotwhite.vtex",
+      "sha256": "ecb4c7de4411792b24905f5c5acfa62edf0d90aa63d70f075459f9cfe2037864",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_glow.vpcf",
+      "sha256": "09145d52bdff88cef43e25bcde013ba1d0bff885bb4d73421cab8be4bcee80a1",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_flares/aircraft_white_v3.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/aircraft_white_v3.vtex",
+      "sha256": "4b0ffb7af4657ff6cb25a45a3fb604ef64e7ea4c53daaa82a41d887f7c2df7d4",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_smoke.vpcf",
+      "sha256": "a69fe8cc75bd4ab1a6188dcc10da0a1a6a2852b55b0f14c328cedb21bfe0a122",
+      "children": [],
+      "dependencies": [
+        "materials/particle/smoke/curls/smoke_curls.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke/curls/smoke_curls.vtex",
+      "sha256": "e3626f5926317f0d14a3914b142bf8caae9ab134e709e70aa6142e393cc3ea58",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_dark.vpcf",
+      "sha256": "e0c2c9cb6d34c1b9333083491c72c5ff751bdeed93f1419784add23de0ced47f",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_modulate_04.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_modulate_04.vtex",
+      "sha256": "216ea4690ffe803caccb86c65ef9808c821a8bf7e2863a6e6a5131fbca0be63b",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_electric.vpcf",
+      "sha256": "c1514c65ae114362ef4296093ce804390bed9b495d4bb53c789d8271c082f0f4",
+      "children": [],
+      "dependencies": [
+        "materials/particle/electrical_arc_smooth/electrical_arc_smooth.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_b.vpcf",
+      "sha256": "526d58359a91494d1e8bea733c9aff8863330f42f7af4b87bd968358f79a4a36",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_jagged_02.vtex",
+        "materials/particle/beam_hotblue.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_beam_c.vpcf",
+      "sha256": "2bad7c2b1d24d29da1ae6c22b377304dddf02ca77da45ec58fc8d0318f3e4285",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_jagged_02.vtex",
+        "materials/particle/beam_hotblue.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc_spark.vpcf",
+      "sha256": "85c70d295cea2543f3154cde0785d55280a6ae5f0f3e4138fef3bd77b4746ca8",
+      "children": [],
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/sparks/sparks.vtex",
+      "sha256": "f6a32d59a41ab1e61339814b48e910874730e8b840cb6af98181a4d04dafa988",
+      "children": []
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
+      "sha256": "de859e9924078881603fae283f71a6e78d99146223681a7c59c7142ab065121d",
+      "children": [
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_b.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_c.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_d.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_light.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_e.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_e.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_f.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_g.vpcf"
+      ],
+      "dependencies": [
+        "materials/particle/bendibeam2.vtex",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_b.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_c.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_d.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_light.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_e.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_f.vpcf",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_g.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/bendibeam2.vtex",
+      "sha256": "7fc939dab9a10d78c9acc639d41bbda7ca3855810f205f2da5366652ed613258",
+      "children": []
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_b.vpcf",
+      "sha256": "1f755274fe6cafe8f514254e4d88dd10f1c983d40fe86476be254153274d3a6f",
+      "children": [],
+      "dependencies": [
+        "materials/particle/electrical_arc/electrical_arc.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electrical_arc/electrical_arc.vtex",
+      "sha256": "a7f1fdb04abeb29e571dcff7c66c3f7785fcb61494ae4a157c09a22f796d4cec",
+      "children": []
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_c.vpcf",
+      "sha256": "67dc111e552262e43d43e33babb87dc0d239580ac56006f65c1faebb57601d3b",
+      "children": [],
+      "dependencies": [
+        "materials/particle/spark_glow_01.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/spark_glow_01.vtex",
+      "sha256": "24a4bbffa729726395057fd3a9673ec5e6c4f229f5b86768b73ae50358474f45",
+      "children": []
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_d.vpcf",
+      "sha256": "1952823c275b93197dc23f744a6f14a65e58d0da8470379998817ca0c18a074b",
+      "children": [],
+      "dependencies": [
+        "materials/particle/bendibeam2.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact.vpcf",
+      "sha256": "e6a222842d7bead77dd08021e372b4c2893a3c5b03f77fda00f2958f8a7d7480",
+      "children": [
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact_b.vpcf"
+      ],
+      "dependencies": [
+        "materials/particle/particle_glow_04.vtex",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact_b.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_glow_04.vtex",
+      "sha256": "295c706a5ae2a254fe848f6df4359177725309e18af768da2ea4b1683254b7b1",
+      "children": []
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact_b.vpcf",
+      "sha256": "508895eca3ac62fdde0cf82963f21afa0c9132066b40c8e30347d3c9176c63a3",
+      "children": [],
+      "dependencies": [
+        "materials/particle/electrical_arc/electrical_arc.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_light.vpcf",
+      "sha256": "b1c3e251aeae166f3f0b6bd53819268fb129338a29ce09e34cfe9b4db674b73d",
+      "children": [],
+      "dependencies": [
+        "materials/particle/electrical_arc/electrical_arc.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_e.vpcf",
+      "sha256": "92d6aba0f5af4c55cf2646d85bbd005a28ae89afdeb5550e3c69fbe448bf5efa",
+      "children": [
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_e_flash.vpcf"
+      ],
+      "dependencies": [
+        "materials/particle/electricity/electricity_22_a.vtex",
+        "particles/units/heroes/hero_zuus/zuus_arc_lightning_e_flash.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_e_flash.vpcf",
+      "sha256": "135709c1ab3ab7b1fbc2e2c203dbf9ad43b3fab450eb607982977d04cc19b7ab",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_f.vpcf",
+      "sha256": "86afdf2011cb91c10751b2bcb9402b3bd7d35d938c8085952efccf6976d74326",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_g.vpcf",
+      "sha256": "de6750dd94358af076a3f05ed403d1f08ecdb44a05a6c3d1dbf404166f193984",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm.vpcf",
+      "sha256": "3eeb8dd18fc5f9d8a06480e5aab9a000b1d6a0f18867b7cfe37e47c603a4190f",
+      "children": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_charge_electricity.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_aoe_edge.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill_red.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_01.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_under.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside_edge.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_particles.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_iconic_stuff_outside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_outside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_outside_01.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_flash.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_idle.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_nosuck_idle.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_large_suck.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_lightning.vpcf"
+      ],
+      "dependencies": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_charge_electricity.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_aoe_edge.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill_red.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_01.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_under.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside_edge.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_particles.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_iconic_stuff_outside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_outside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_outside_01.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_flash.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_idle.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_nosuck_idle.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_large_suck.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_lightning.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_charge_electricity.vpcf",
+      "sha256": "8c51c9d102a9a81a9846805da4a626c5f46819d43df24e030eb34d9d150394ab",
+      "children": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_charge_electricity_d.vpcf"
+      ],
+      "dependencies": [
+        "materials/particle/lava_blasts/lava_glow.vtex",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_charge_electricity_d.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/lava_blasts/lava_glow.vtex",
+      "sha256": "f84958c6dfa69f14a8bd3d4c2b02980638da4d6d5752ba4582c05a9602be90bf",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_charge_electricity_d.vpcf",
+      "sha256": "3be2af72687fbe0f222c0a28bfc14db053da04c8fae6ab1585971176f981ac04",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_modulate_01_projected.vmat"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_modulate_01_projected.vmat",
+      "sha256": "2f367760cd0daa2edaf17dd554201df2f7e8c992b1ffd640835df03674152163",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap.vpcf",
+      "sha256": "cb4b4a92b510fe4788bf71e56232bf2eeaac6925028fec66094b0067d450960f",
+      "children": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_ground_cracks.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_ground_rubble_big_endcap.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_ground_leaf_endcap.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_ground_cracks_lightning.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_windywind.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_windywind_slow.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin.vpcf"
+      ],
+      "dependencies": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_ground_cracks.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_ground_rubble_big_endcap.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_ground_leaf_endcap.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_ground_cracks_lightning.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_windywind.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_windywind_slow.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_ground_cracks.vpcf",
+      "sha256": "b51bf52b066db8f12a5afb55d9133755541aed84d254d8543886e49b5bbc7811",
+      "children": [],
+      "dependencies": [
+        "materials/particle/ground/ground_cracks_mod.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/ground/ground_cracks_mod.vtex",
+      "sha256": "078d4979c81bd2e7db98b26e88d8f8e2b125c2cf7e18b1667350b29cbce142bf",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_ground_rubble_big_endcap.vpcf",
+      "sha256": "e65458da81448ba198b7d7fd1b407acffd57058e4e2d0454333a9c42be45a483",
+      "children": [],
+      "dependencies": [
+        "materials/particle/impact/fleks.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/impact/fleks.vtex",
+      "sha256": "b23e1e8b292fcb3f24f845c26a4c7b6b1d53d7ab738d6058c10f30934331442f",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_ground_leaf_endcap.vpcf",
+      "sha256": "f0f3842fbbf81c57377588c90566c42e8eeafb182e6f713409294051825525f8",
+      "children": [],
+      "dependencies": [
+        "materials/particle/leaf/leaf.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/leaf/leaf.vtex",
+      "sha256": "caad33e88358a14ca163b99a531787085add9c6b35e228bb805354c85ce6155b",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_ground_cracks_lightning.vpcf",
+      "sha256": "5c631e69cb70ab80e21f3da4e221e938b8180769aa508b5b5244c870e4392144",
+      "children": [],
+      "dependencies": [
+        "materials/particle/electrical_arc3/electrical_arc3.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electrical_arc3/electrical_arc3.vtex",
+      "sha256": "e59479eee2f954937dee49dcacdca42e54a889010f90a510752aa7e8b8bcf0ee",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_windywind.vpcf",
+      "sha256": "b2a2d6df2c3346346a80178a07e7b71ca2ce62b8f982c1c333ed4d9c3483b02a",
+      "children": [],
+      "dependencies": [
+        "materials/particle/tile/tile_noise_cellular_painted.vtex",
+        "materials/particle/beam_plasma_08.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/tile/tile_noise_cellular_painted.vtex",
+      "sha256": "935333b3c40c47ee433645f8b7c7acb83849ef45dca42ccb9e24fc09ea16bff9",
+      "children": []
+    },
+    {
+      "resource": "materials/particle/beam_plasma_08.vtex",
+      "sha256": "71aed315bc8e9edf86ba52e40a444d7600e5a72ac5b4d36948e23f12aafedc86",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_windywind_slow.vpcf",
+      "sha256": "d5c39885b126bd778121700c40b9e4a59f81957d75938b2e557cb5fac5a5172e",
+      "children": [],
+      "dependencies": [
+        "materials/particle/tile/tile_noise_cellular_painted.vtex",
+        "materials/particle/beam_plasma_08.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin.vpcf",
+      "sha256": "c5953aa8654773fa19a7e4238ef0dc17add97bb072c93c8189d0fc106ceabec1",
+      "children": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_lightning_bolts.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase_inside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase_particles.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_flash.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_flash_linger.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum.vpcf"
+      ],
+      "dependencies": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_lightning_bolts.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase_inside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase_particles.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_flash.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_flash_linger.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_lightning_bolts.vpcf",
+      "sha256": "f03200e4a021164330f61bd284e89b47cadaf2f013e4359d90f90cbd61d088d9",
+      "children": [],
+      "dependencies": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase_inside.vpcf",
+      "sha256": "c93af65315e53d4f751719202847b345ed2737084b9fe89720caecabfc3d73c4",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/beam_plasma_08.vtex",
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/clouds/cloud_beam_brights_01.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_generic_7.vtex",
+      "sha256": "a90d9a64be3b92465344b10e987ee80087dc96b1d3eb35d2dcf77fc1b86fb769",
+      "children": []
+    },
+    {
+      "resource": "materials/particle/clouds/cloud_beam_01.vtex",
+      "sha256": "268ac2dd0ba0c99e3993b9daebbcf4f13e35d41cc6abc2228e4dc1ea8cca8acd",
+      "children": []
+    },
+    {
+      "resource": "materials/particle/clouds/cloud_beam_brights_01.vtex",
+      "sha256": "3fb1639e5f7b41c85f7c09ac514d4567a764ae644c0a9709b6c102c6159a64ea",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase_particles.vpcf",
+      "sha256": "3dafaf56a2e64c1c81d477ab81e5ae60f5b97b5e8638af6e6c04dfa93a38837c",
+      "children": [],
+      "dependencies": [
+        "materials/particle/mask/cloud_mask.vtex",
+        "materials/dev/fow_clouds_01.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/mask/cloud_mask.vtex",
+      "sha256": "db932905436c28622ccf0878ed292f417d397ec942fd369416946eeaca824c9f",
+      "children": []
+    },
+    {
+      "resource": "materials/dev/fow_clouds_01.vtex",
+      "sha256": "fc84f7cd7dbe7897e92be2df755ea71ee64238acf3ae7fca584e7789c00b54aa",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_cloudbase.vpcf",
+      "sha256": "dd9f39cb4729de8861f5c0b97e77976ca88e869c3c0347b90bab2a9b140402f0",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/clouds/cloud_beam_lightning_01.vtex",
+        "materials/particle/clouds/cloud_beam_mask_01.vtex",
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/beam_plasma_08.vtex",
+        "materials/particle/clouds/cloud_beam_brights_01.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/clouds/cloud_beam_lightning_01.vtex",
+      "sha256": "73372b1ef7952bacb218b477f7dd69017f51bd5de3ac4e1dba514b923957fd01",
+      "children": []
+    },
+    {
+      "resource": "materials/particle/clouds/cloud_beam_mask_01.vtex",
+      "sha256": "0ebeea3548425508c3f13e32e2693702d296231660dc6f0aee574d97292b727c",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_flash.vpcf",
+      "sha256": "8448d4f07e29df0726ca8aeef6600df645cd5daab0d267dc9ac260e3296381a3",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_glow_08.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_glow_08.vtex",
+      "sha256": "33a7d6436bb29a8caa4813d10e6e348e9cd94a2f70f2ee6ceaf55579cab99d87",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_suckin_flash_linger.vpcf",
+      "sha256": "bbe3ea3144b463b113d9ecab17259d23eb60fc44f2987f31212e998df3c68b69",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_glow_08.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum.vpcf",
+      "sha256": "d877e77f8cae7957c42d4a45f386481db5cda619612951d519b7e928a5800703",
+      "children": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum_c.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum_flare.vpcf"
+      ],
+      "dependencies": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum_c.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum_flare.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum_c.vpcf",
+      "sha256": "aceab0ffb3c7a25c41f35c76dd431094009a9e4f531a17deed032332493de268",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_cone_gradient_1.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_cone_gradient_1.vtex",
+      "sha256": "7288c1368e07c11517b8b806a3dbc06ca1f38f7047cab437793f73cf32f4b532",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_start_suckin_vacuum_flare.vpcf",
+      "sha256": "77ad45fd33fec499b9b779a8b0cfb9d990c396a749ff410179e0e97914e1ed49",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_flares/anam_blue.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/anam_blue.vtex",
+      "sha256": "32321d22aefdd8eb3cc36264d1d7219a2c3279552975d008a8b16b4a4b934c5c",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_aoe_edge.vpcf",
+      "sha256": "0d7219a626b33e0f0e55b21559f9f4bfdeb38b54ec1f3d80152a68312b244c56",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam/beam_aoe_gradient.vtex",
+        "materials/dev/fow_clouds_01.vtex",
+        "materials/particle/beam_plasma_08.vtex",
+        "materials/particle/particle_glow_04.vtex",
+        "materials/particle/particle_glow_08.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam/beam_aoe_gradient.vtex",
+      "sha256": "1f910a0c8fe53825dd5ceb82eef544ee2308e7fe4a33ede85f7d2841aee09a61",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill_red.vpcf",
+      "sha256": "0fa888211874c3eb5e7bdb662ea7bd851cb2c1007ce6f8eb07f52928e4695569",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloud_underfill.vpcf",
+      "sha256": "d1f03907be4e517120bb007710e408b08ecfe07212933860420ec0891aa95c35",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_01.vpcf",
+      "sha256": "60a79989920f3118e34e9e5a9c3438f879e025d5e7084a5cd908fec3ed9a675f",
+      "children": [],
+      "dependencies": [
+        "materials/particle/tile/tile_noise_cellular_painted.vtex",
+        "materials/particle/beam_edge_06.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_edge_06.vtex",
+      "sha256": "a25b0ffa062a9baff30b358b6b7739c1822ab60a39faa075c267fbc2bf63f821",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_under.vpcf",
+      "sha256": "ba9a826a8bac301c8b14604d8cdcc56d51b15e318a9f8edd2a83803d5c366fc3",
+      "children": [],
+      "dependencies": [
+        "materials/particle/tile/tile_noise_cellular_painted.vtex",
+        "materials/particle/beam_plasma_08.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start.vpcf",
+      "sha256": "b8d983e89334fe6585d163ed4fea2cb477c014b14a1f701174f3bba920008d52",
+      "children": [
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_lightning_bolts.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloud_underfill.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_underfill_red.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_inside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_outside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_particles.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_flash.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_flash_linger.vpcf"
+      ],
+      "dependencies": [
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/beam_plasma_08.vtex",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_lightning_bolts.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloud_underfill.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_underfill_red.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_inside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_outside.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_particles.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_flash.vpcf",
+        "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_flash_linger.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_lightning_bolts.vpcf",
+      "sha256": "9e58e97d1696bc601379ef59c465055c931746f64cb0926fb64d9a7f60ccf31d",
+      "children": [],
+      "dependencies": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloud_underfill.vpcf",
+      "sha256": "eaa67f98080ec884dfea876c61a394888c7364d59c70a3c60671a7de33bf8fad",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_underfill_red.vpcf",
+      "sha256": "a4b3374a5fa17afc39cdafa890fc99673a06749c2cd99cff5226ce7b0c6618ce",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_inside.vpcf",
+      "sha256": "d4e66f50d0120e7ceade31ca194a320040b5c541e909cb69f14de1dbade11464",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/beam_plasma_08.vtex",
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/clouds/cloud_beam_brights_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_outside.vpcf",
+      "sha256": "0961e865eb90cca7f675499edd95bc9740255d0848ca20470296f8723496a6a9",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/clouds/cloud_beam_lightning_01.vtex",
+        "materials/particle/clouds/cloud_beam_mask_01.vtex",
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/clouds/cloud_beam_brights_01.vtex",
+        "materials/particle/beam_plasma_08.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase_particles.vpcf",
+      "sha256": "8ed618a95dad400ca9254e6fcf055ccdcf37acd912374276d035762e08bf11da",
+      "children": [],
+      "dependencies": [
+        "materials/particle/mask/cloud_mask.vtex",
+        "materials/dev/fow_clouds_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_cloudbase.vpcf",
+      "sha256": "5f1171f2050ff5fa40fff3ce2357e6a00cd38a1f974ecb5e950d4b949198eadd",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/clouds/cloud_beam_lightning_01.vtex",
+        "materials/particle/clouds/cloud_beam_mask_01.vtex",
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/beam_plasma_08.vtex",
+        "materials/particle/clouds/cloud_beam_brights_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_flash.vpcf",
+      "sha256": "e9a5febbffbf27f2d161c8cf7b1636bb66cdd65370d9a7fc4eb2dc24e18a5524",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_glow_08.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_start_flash_linger.vpcf",
+      "sha256": "7ecb6c5251f34915e7512c418cea3b99ffadc75627ee0540178d6e21e5043932",
+      "children": [],
+      "dependencies": [
+        "materials/particle/particle_glow_08.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside_edge.vpcf",
+      "sha256": "e50be3866674512663f1aede7d48b87ab250f9494157855c89fedc80d1e3d273",
+      "children": [],
+      "dependencies": [
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/beam_edge_06.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_particles.vpcf",
+      "sha256": "49f6c226b850d866b46e73e9de5b9e842cb3db938ff88b821d5758164a270666",
+      "children": [],
+      "dependencies": [
+        "materials/particle/mask/cloud_mask.vtex",
+        "materials/dev/fow_clouds_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_inside.vpcf",
+      "sha256": "f10c41065621ba5b9378598b2809aaf91cdbec1c76093ef7a690d5800d03be71",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/beam_plasma_08.vtex",
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/clouds/cloud_beam_brights_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_iconic_stuff_outside.vpcf",
+      "sha256": "6b28174cbfcbeef1e2589d5af7ebb46ff6eecb197a19a135813af8c22db7a52d",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_plasma_04.vtex",
+        "materials/particle/tile/tile_noise_cellular_painted.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_plasma_04.vtex",
+      "sha256": "30d68c6cc13b927eed7aeca1240ea026b9920e6007069c5ed0f48511fe80871c",
+      "children": []
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_outside.vpcf",
+      "sha256": "116aa868fa927220fd293815311fa31e5e32f70a533f5792fe1744a22f882ef2",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/clouds/cloud_beam_lightning_01.vtex",
+        "materials/particle/clouds/cloud_beam_mask_01.vtex",
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/clouds/cloud_beam_brights_01.vtex",
+        "materials/particle/beam_plasma_08.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase_windy_outside_01.vpcf",
+      "sha256": "89237f5e4bd458f4b729178cd93de1a452be4afc4822d0b165884626f9b46a7d",
+      "children": [],
+      "dependencies": [
+        "materials/particle/tile/tile_noise_cellular_painted.vtex",
+        "materials/particle/beam_plasma_08.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_cloudbase.vpcf",
+      "sha256": "01d9d42790f67feb83e391dccabf9a53b71877a9c9de7d28fccadbd800d6c6d1",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/clouds/cloud_beam_lightning_01.vtex",
+        "materials/particle/clouds/cloud_beam_mask_01.vtex",
+        "materials/particle/clouds/cloud_beam_01.vtex",
+        "materials/particle/beam_plasma_08.vtex",
+        "materials/particle/clouds/cloud_beam_brights_01.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_endcap_flash.vpcf",
+      "sha256": "1b349ba20cd747696a82e2e30b3b2189917f5743e050d87690eab1d596bccf9d",
+      "children": [],
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_idle.vpcf",
+      "sha256": "775d045ad502b29765d08560775ec90d77dbe281d2d70a9508e72cb984ce8384",
+      "children": [],
+      "dependencies": [
+        "materials/particle/leaf/leaf.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_nosuck_idle.vpcf",
+      "sha256": "9e4898252f95674f2d2e7e9438702c0818f12e28ab12d58de35f409d56b518a6",
+      "children": [],
+      "dependencies": [
+        "materials/particle/leaf/leaf.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_staticstorm_leaf_large_suck.vpcf",
+      "sha256": "46efa452d48e6f9e2a481c46910575425634fec0dbba6e552dba54223a64a204",
+      "children": [],
+      "dependencies": [
+        "materials/particle/leaf/leaf.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm_lightning.vpcf",
+      "sha256": "a7287c20a945c1cdd666d3c7440a6c24ccf7c2da9246438f5b73db8e19aaeb11",
+      "children": [],
+      "dependencies": [
+        "materials/particle/electrical_arc3/electrical_arc3.vtex"
+      ]
+    }
+  ],
+  "in_game_visual_verified": false
+}

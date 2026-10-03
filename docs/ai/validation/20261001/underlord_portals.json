@@ -1,0 +1,260 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "source": "Local Valve Dota/core VPK",
+  "particle": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient.vpcf",
+  "model": "models/heroes/abyssal_underlord/abyssal_underlord_portal_model.vmdl",
+  "animation": "au_portal_chanelling",
+  "directions": [
+    {
+      "marker": "monsterborn_player1",
+      "lane": "east",
+      "yaw": 0
+    },
+    {
+      "marker": "monsterborn_player2",
+      "lane": "south",
+      "yaw": 270
+    },
+    {
+      "marker": "monsterborn_player3",
+      "lane": "west",
+      "yaw": 180
+    },
+    {
+      "marker": "monsterborn_player4",
+      "lane": "north",
+      "yaw": 90
+    }
+  ],
+  "bindings": "CP0 origin; CP1 native attach_portal follows model transform; CP2 origin; CP4 and CP61 zero native idle style",
+  "collision": "prop_dynamic solid=0; no gameplay unit or obstruction created",
+  "resources": [
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient.vpcf",
+      "sha256": "0942b60326b56d628355e8872b0d7aa17f845b3a1b36e31de4482195bb0ba958",
+      "dependencies": [
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_shadow.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_twirl.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_galaxy.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_spikes.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_light.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_shadow.vpcf",
+      "sha256": "384b5d7e057340a5dc0315586064944d8af9deedb66fbde4868bbeb0f3a4a18e",
+      "dependencies": [
+        "materials/particle/dirt/ground_decay/ground_decay01.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/dirt/ground_decay/ground_decay01.vtex",
+      "sha256": "7e7e48c994cd43e8dab671af8f249dd4720e8398a69b434e439d6eb4e3ea3702"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void.vpcf",
+      "sha256": "b9e24dfc3e67aaac63a5aac5fff1c06bc6ee51b17a9452d441b249479d162656",
+      "dependencies": [
+        "materials/particle/lens_flare/lens_flare.vtex",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/lens_flare/lens_flare.vtex",
+      "sha256": "a59aab7301fbbbf0202f2dab8874895c1997f973c1ecfe90a138dc0dd8f7b598"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge.vpcf",
+      "sha256": "0c211e4e0890967ff3f67de2d013d9e10ff21b37b287b0678a17851341db41ee",
+      "dependencies": [
+        "materials/particle/particle_heroring_6_crisp.vtex",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_glow.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_heroring_6_crisp.vtex",
+      "sha256": "a063429ca95ed86a6b5d82b39e86537d127751844560898e4bce869e22ad82e7"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_glow.vpcf",
+      "sha256": "b5c473f2579dc72e105e290a3c24a214572a0a217a25e6f6003f00d7b4a60f99",
+      "dependencies": [
+        "materials/particle/bendibeam4.vtex",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_glow_animated.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/bendibeam4.vtex",
+      "sha256": "293859853fa6a3d67c17d39298b0ac95c71284513e6280a3cbdc4feccfe57749"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_glow_animated.vpcf",
+      "sha256": "020f2a2481bd91e14d2de441327ab52eb1f5311367b2a65babe3437ba55992a6",
+      "dependencies": [
+        "materials/particle/beam_generic_2.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_generic_2.vtex",
+      "sha256": "40c86e9cbff0e4b6ad1d10c000c37ffa21c95a98dc4df7ba78dc4b2961df319c"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_twirl.vpcf",
+      "sha256": "d8d9729c6f11f1d7c36ba2ad43634f7b3fe2f14c988d23ef70e0d43acd5baa4a",
+      "dependencies": [
+        "materials/particle/electricity/electricity_22_d.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electricity/electricity_22_d.vtex",
+      "sha256": "2f30c91cb327232f81591b689df40e5d2158635b338a636fd1896403a77924ca"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_galaxy.vpcf",
+      "sha256": "398682d2a153b5ae19a204f60aba0b9d6e0685f3d2fff19f45b9b7ad8471d7c9",
+      "dependencies": [
+        "materials/particle/particle_flares/anam_white.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/anam_white.vtex",
+      "sha256": "8750f0baeae9d4ab1be52dc71d73114c4368ae6ae7957c701dabd1455bbcf63d"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_spikes.vpcf",
+      "sha256": "60ddddae3e34b636ab1f2f06fb50572261086f84026f06fad075aefa3c59e959",
+      "dependencies": [
+        "materials/particle/particle_flares/combined_flare.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/combined_flare.vtex",
+      "sha256": "10f544eea8a24017580c44b78ba0599ad7a8feba42a2e75654e0579428275ca4"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_light.vpcf",
+      "sha256": "87743030451e00fbd3dbb544ecd4bca9c8c12fa933ad6674d33316a73a5bf9bd",
+      "dependencies": [
+        "materials/particle/light_masks/particle_light_mask_circfade_player.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/light_masks/particle_light_mask_circfade_player.vtex",
+      "sha256": "191d08d2f251fdb7410e12bd230af9a5651032cbcf1529ba31cf6da38022c2b3"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer.vpcf",
+      "sha256": "70bb145782b7daf68eee4ff4c4fbf9fa8777c0b78ab8c375eedd2c96680797c0",
+      "dependencies": [
+        "materials/models/heroes/abyssal_underlord/underlord_portal_cable.vmat",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_core.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_line.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_stars.vpcf",
+        "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_energy.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/models/heroes/abyssal_underlord/underlord_portal_cable.vmat",
+      "sha256": "e203e9d1cce0635873ce7a9302a46c7812299405a7f14d3ff3274e4a925b8b26",
+      "dependencies": [
+        "materials/particle/beam_blood_02_tga_18d13f60.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_blood_02_tga_18d13f60.vtex",
+      "sha256": "509e0d7130ec343464880aa1790f6704e90152e84ceac9223fe87fa1f9b3f204"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_core.vpcf",
+      "sha256": "26854c9262fed76e612505625239f68dcc80682a2530c644cc4d2fa28509f59b",
+      "dependencies": [
+        "materials/models/heroes/abyssal_underlord/underlord_portal_cable.vmat"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_line.vpcf",
+      "sha256": "4332b6fc4944212c7d593cda0f84953fe228acd6e4c261d6bb2c74169f6b6590",
+      "dependencies": [
+        "materials/particle/electricity/electricity_beam_a.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electricity/electricity_beam_a.vtex",
+      "sha256": "7a3c0f5ca452b0f93f7add023139dbb1841f014623d25f0e0a1ce02b4243d38e"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_stars.vpcf",
+      "sha256": "eb989d58ac0f5dc0147f2fea087dc2756b30556d99697124184b2e5ee98a1bd7",
+      "dependencies": [
+        "materials/particle/yellowflare2.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/yellowflare2.vtex",
+      "sha256": "9dec6cb6b0846873ebba0215892c34b2198050fbbf2dc3f6df4d5b5c937f40fb"
+    },
+    {
+      "resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_energy.vpcf",
+      "sha256": "ad6a60ed15c1637b504280287082c7f60f9dcf136202fed0f645d9eaaea99ecc",
+      "dependencies": [
+        "materials/particle/electricity/electricity_22_c.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electricity/electricity_22_c.vtex",
+      "sha256": "286eac0afee62abf72036861c75b7d9e815075b3048e639475f97bc7494b0a99"
+    },
+    {
+      "resource": "models/heroes/abyssal_underlord/abyssal_underlord_portal_model.vmdl",
+      "sha256": "2522228ce1fbaaec3acb83fe843f5c533e6e56538ab1c08f27c218950a22d736",
+      "dependencies": [
+        "materials/models/heroes/abyssal_underlord/underlord_portal.vmat"
+      ]
+    },
+    {
+      "resource": "materials/models/heroes/abyssal_underlord/underlord_portal.vmat",
+      "sha256": "8ea3d87980a5e50fbf3f9953f05221ea5ba38446f3dea76ca0291f666fd3e720",
+      "dependencies": [
+        "materials/default/default_fresnelwarprim_tga_d9279d65.vtex",
+        "materials/default/default_detail2_tga_70788555.vtex",
+        "materials/models/heroes/abyssal_underlord/underlord_portal_metalnessmask_png_85a2fe70.vtex",
+        "materials/models/heroes/abyssal_underlord/underlord_portal_specmask_png_ca044ddc.vtex",
+        "materials/models/heroes/abyssal_underlord/underlord_portal_color_png_40fbac39.vtex",
+        "materials/models/heroes/abyssal_underlord/underlord_portal_normal_png_998f527a.vtex"
+      ]
+    },
+    {
+      "resource": "materials/default/default_fresnelwarprim_tga_d9279d65.vtex",
+      "sha256": "55d9fe78c721b011fed77c808c2845c7349bea0c58ed172f71dc3c2b82df9a97"
+    },
+    {
+      "resource": "materials/default/default_detail2_tga_70788555.vtex",
+      "sha256": "8006a7447538c02e9945f255f5bca5f825b2df2ef843c186b4d561d2930961fd"
+    },
+    {
+      "resource": "materials/models/heroes/abyssal_underlord/underlord_portal_metalnessmask_png_85a2fe70.vtex",
+      "sha256": "273b2af2ef5a6d40e35b868220b6aca433390c4d45f0be069c5913cbe14d202d"
+    },
+    {
+      "resource": "materials/models/heroes/abyssal_underlord/underlord_portal_specmask_png_ca044ddc.vtex",
+      "sha256": "a6624cf404f1733ada4981da38e91c8c457bb6436425c6f1dd78d9345c724342"
+    },
+    {
+      "resource": "materials/models/heroes/abyssal_underlord/underlord_portal_color_png_40fbac39.vtex",
+      "sha256": "72d9c0e704cb940bfb988618dbd54bd46f732f6f3ecbab60798900218103642a"
+    },
+    {
+      "resource": "materials/models/heroes/abyssal_underlord/underlord_portal_normal_png_998f527a.vtex",
+      "sha256": "b69d4db172034b48df919f51a34c97d266dfc5fa33b25de69e81c435c3720a18"
+    }
+  ],
+  "validation": [
+    "test_valley_environment_portals.lua PASS: four lanes, native attachment, nonsolid, reapply, missing marker, failure cleanup, world generations, supported maps",
+    "luac5.1 syntax PASS",
+    "git diff --check PASS"
+  ],
+  "in_game_visual_verified": false
+}

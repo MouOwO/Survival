@@ -1,0 +1,2848 @@
+{
+  "date": "2026-09-30",
+  "phase": "stable_scene_main_sync",
+  "status": "PASS",
+  "map": "template_map",
+  "source_preview_sha256": "63ded48784244540739b593d6d7139528f263dea62042d5853a46b8e66db8c73",
+  "source_sha256": "7281e776fcad583c22144e85f39e22b530a3d1b91ee480eb1f902ba920dc24fd",
+  "package_sha256": "d5f4491b4a273552892864d107b07bf0eaba7f81a90b84eb5bb01136e6f46cff",
+  "compile": {
+    "compiled": 304,
+    "failed": 0,
+    "skipped": 1
+  },
+  "package_validation": {
+    "status": "PASS",
+    "compiled_verified": true,
+    "runtime_verified": false,
+    "checked_at": "2026-09-30T15:33:13.484Z",
+    "source_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\maps\\template_map.vmap",
+    "package_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\maps\\template_map.vpk",
+    "source": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\maps\\template_map.vmap",
+      "bytes": 72449688,
+      "sha256": "7281e776fcad583c22144e85f39e22b530a3d1b91ee480eb1f902ba920dc24fd",
+      "raw_crc32": 3385704505,
+      "converted": false
+    },
+    "package": {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\maps\\template_map.vpk",
+      "bytes": 65831898,
+      "sha256": "d5f4491b4a273552892864d107b07bf0eaba7f81a90b84eb5bb01136e6f46cff",
+      "version": 2,
+      "crc_entries": 309,
+      "payload_bytes": 65815247,
+      "entries": [
+        {
+          "path": "maps/template_map/worldnodes/n0.vwnod_c",
+          "bytes": 428506,
+          "archive_index": 32767,
+          "expected_crc32": 3112942102,
+          "actual_crc32": 3112942102,
+          "crc_matches": true,
+          "sha256": "63186f5041a24d0722f652d94a021c60969f611542e092bc5e89959d4fa7e971"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0.vgrass",
+          "bytes": 2381116,
+          "archive_index": 32767,
+          "expected_crc32": 327971456,
+          "actual_crc32": 327971456,
+          "crc_matches": true,
+          "sha256": "b39080100f5289fbb373f1f8b09866a123ce350464149dedae6c6aae4c8cbfab"
+        },
+        {
+          "path": "maps/template_map/world_visibility.vvis_c",
+          "bytes": 1056,
+          "archive_index": 32767,
+          "expected_crc32": 268458440,
+          "actual_crc32": 268458440,
+          "crc_matches": true,
+          "sha256": "b2bc8e7bc2054f59f796545409306750fc29f050c2136d5f2a50fcc9b0f71c37"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c9_s_mesh_overlay9.vmdl_c",
+          "bytes": 4665,
+          "archive_index": 32767,
+          "expected_crc32": 423706434,
+          "actual_crc32": 423706434,
+          "crc_matches": true,
+          "sha256": "969547dda3fd289956bde551c5c4d5819311946ec2128825e8f9528e75f77efb"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c8_s_mesh_overlay8.vmdl_c",
+          "bytes": 4889,
+          "archive_index": 32767,
+          "expected_crc32": 3524150383,
+          "actual_crc32": 3524150383,
+          "crc_matches": true,
+          "sha256": "2aed4262fc10f5e4263e12b49393cf733a5c278959d5d294e50b8a1b53d7a232"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c7_s_mesh_overlay7.vmdl_c",
+          "bytes": 4825,
+          "archive_index": 32767,
+          "expected_crc32": 18892262,
+          "actual_crc32": 18892262,
+          "crc_matches": true,
+          "sha256": "a7614372ab43b22fda2534ca229cfa68c2395075179562d398e4bb9733484dd8"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c6_s_mesh_overlay6.vmdl_c",
+          "bytes": 4921,
+          "archive_index": 32767,
+          "expected_crc32": 716239881,
+          "actual_crc32": 716239881,
+          "crc_matches": true,
+          "sha256": "18bd93b1ba679d579deeb713408d8ebacd89ce3bde000e837d493302041b080c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c64_s_mesh_overlay64.vmdl_c",
+          "bytes": 11865,
+          "archive_index": 32767,
+          "expected_crc32": 1144431501,
+          "actual_crc32": 1144431501,
+          "crc_matches": true,
+          "sha256": "30d3598eb9d78ac078532f6beea9710e639313c3297728803368a46198cdc030"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c63_s_mesh_overlay63.vmdl_c",
+          "bytes": 12521,
+          "archive_index": 32767,
+          "expected_crc32": 3764393674,
+          "actual_crc32": 3764393674,
+          "crc_matches": true,
+          "sha256": "259f0fce93904a3bbffd91ad8b9474ef8b2b4bf78f310ba7e7f516bfc4875695"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c62_s_mesh_overlay62.vmdl_c",
+          "bytes": 12201,
+          "archive_index": 32767,
+          "expected_crc32": 2666657931,
+          "actual_crc32": 2666657931,
+          "crc_matches": true,
+          "sha256": "ff540790eeacdeb688c927b2b05e0f93883787a4e9427c8b823cd86e5c0677fb"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c61_s_mesh_overlay61.vmdl_c",
+          "bytes": 12041,
+          "archive_index": 32767,
+          "expected_crc32": 1888907162,
+          "actual_crc32": 1888907162,
+          "crc_matches": true,
+          "sha256": "cc009043eb9010b32828fc45cd54362139ebf3ee4ad5a0f71e531487c4654af9"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c60_s_mesh_overlay60.vmdl_c",
+          "bytes": 5881,
+          "archive_index": 32767,
+          "expected_crc32": 1984359367,
+          "actual_crc32": 1984359367,
+          "crc_matches": true,
+          "sha256": "f191a78d73885b21abdb1a157c0c6fe1f3e93e2885706ac1b34041a155dce6c5"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c5_s_mesh_overlay5.vmdl_c",
+          "bytes": 4793,
+          "archive_index": 32767,
+          "expected_crc32": 292729966,
+          "actual_crc32": 292729966,
+          "crc_matches": true,
+          "sha256": "2579a79f9a6c3753845b031181fc2f25fc77f395e61ae0c75b6a9cc7728ce6ca"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c59_s_mesh_overlay59.vmdl_c",
+          "bytes": 5945,
+          "archive_index": 32767,
+          "expected_crc32": 155826493,
+          "actual_crc32": 155826493,
+          "crc_matches": true,
+          "sha256": "372b826054f1e5d80a907cf5dbc45fe05d890947e978553ac94615230f3b9b84"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c58_s_mesh_overlay58.vmdl_c",
+          "bytes": 5945,
+          "archive_index": 32767,
+          "expected_crc32": 3898981275,
+          "actual_crc32": 3898981275,
+          "crc_matches": true,
+          "sha256": "a82f7ba7d30e05266720866ad240193db2ecdc08fcf271118112010b6a4d9a74"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c57_s_mesh_overlay57.vmdl_c",
+          "bytes": 5881,
+          "archive_index": 32767,
+          "expected_crc32": 67229806,
+          "actual_crc32": 67229806,
+          "crc_matches": true,
+          "sha256": "4111402196356d5edf21270f077c030273f01f46259ed5def20169b771e7b16e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c56_s_mesh_overlay56.vmdl_c",
+          "bytes": 26681,
+          "archive_index": 32767,
+          "expected_crc32": 3278412930,
+          "actual_crc32": 3278412930,
+          "crc_matches": true,
+          "sha256": "4fac6cbe3c076c5d7c5c0a6e5df2fbacd916c757b4d8fb5abf20fa5582085d9d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c55_s_mesh_overlay55.vmdl_c",
+          "bytes": 26649,
+          "archive_index": 32767,
+          "expected_crc32": 3062462891,
+          "actual_crc32": 3062462891,
+          "crc_matches": true,
+          "sha256": "40c0f37fff899d45ec1ab3e17ad409f48673d1504d7c3f4bfe65d97f6ab230a4"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c54_s_mesh_overlay54.vmdl_c",
+          "bytes": 16137,
+          "archive_index": 32767,
+          "expected_crc32": 3554034613,
+          "actual_crc32": 3554034613,
+          "crc_matches": true,
+          "sha256": "c89c8b92c971140efe84b7e8987f42df2582208adc18e6c1a1a5bed3c146f135"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c53_s_mesh_overlay53.vmdl_c",
+          "bytes": 15577,
+          "archive_index": 32767,
+          "expected_crc32": 26246941,
+          "actual_crc32": 26246941,
+          "crc_matches": true,
+          "sha256": "a604ea8a4cda8c1be4a430d241b7f501aa6e9753103039dbdb39eab8a68b45b0"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c52_s_mesh_overlay52.vmdl_c",
+          "bytes": 15657,
+          "archive_index": 32767,
+          "expected_crc32": 4120128069,
+          "actual_crc32": 4120128069,
+          "crc_matches": true,
+          "sha256": "1ef97795f44c1ab446fc52d28df26b94ed70f17ec4c1e9b8187610998000a9b4"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c51_s_mesh_overlay51.vmdl_c",
+          "bytes": 15737,
+          "archive_index": 32767,
+          "expected_crc32": 1037187254,
+          "actual_crc32": 1037187254,
+          "crc_matches": true,
+          "sha256": "4d41908e6e1112571945d19535d18f92ee6332ef3febcf17ebb281100695fdc8"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c50_s_mesh_overlay50.vmdl_c",
+          "bytes": 5865,
+          "archive_index": 32767,
+          "expected_crc32": 3039817090,
+          "actual_crc32": 3039817090,
+          "crc_matches": true,
+          "sha256": "b11f20eab0daced2732dd8155898e72ce34c23941bf7bb4789a6b9e65ae2fa05"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c4_s_mesh_overlay4.vmdl_c",
+          "bytes": 4489,
+          "archive_index": 32767,
+          "expected_crc32": 201999553,
+          "actual_crc32": 201999553,
+          "crc_matches": true,
+          "sha256": "df9fc5abb2ce111ffa8a04eec6f4c8f6486c1aab3e16973f7c2005ad11f12c37"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c49_s_mesh_overlay49.vmdl_c",
+          "bytes": 5881,
+          "archive_index": 32767,
+          "expected_crc32": 1325855372,
+          "actual_crc32": 1325855372,
+          "crc_matches": true,
+          "sha256": "6bdfd11036a4d01cd6a1866cb4fc8757d389a39cf36a43ae7c2e8c4462c74a0d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c48_s_mesh_overlay48.vmdl_c",
+          "bytes": 5833,
+          "archive_index": 32767,
+          "expected_crc32": 3667566050,
+          "actual_crc32": 3667566050,
+          "crc_matches": true,
+          "sha256": "daf7cbc7739cb547da1de4c85849351e5bcfdcd3fc8cec40d25799f5debdde24"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c47_s_mesh_overlay47.vmdl_c",
+          "bytes": 5993,
+          "archive_index": 32767,
+          "expected_crc32": 433324747,
+          "actual_crc32": 433324747,
+          "crc_matches": true,
+          "sha256": "27a858e77ee37153ecc8b536b0499a6d90172ce6295e7cf8a2b694cc045345f8"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c46_s_mesh_overlay46.vmdl_c",
+          "bytes": 16153,
+          "archive_index": 32767,
+          "expected_crc32": 1504432489,
+          "actual_crc32": 1504432489,
+          "crc_matches": true,
+          "sha256": "679b6b09947e7d961309ed63b98999c1c511a828c38bff4cfbde270bd1f3132f"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c45_s_mesh_overlay45.vmdl_c",
+          "bytes": 16425,
+          "archive_index": 32767,
+          "expected_crc32": 1881068572,
+          "actual_crc32": 1881068572,
+          "crc_matches": true,
+          "sha256": "ed942a6c3ff9754f17c9e59d8d7f9bebbb4861a69a492c6dcb5c8b4ac7062477"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c44_s_mesh_overlay44.vmdl_c",
+          "bytes": 27849,
+          "archive_index": 32767,
+          "expected_crc32": 1000538842,
+          "actual_crc32": 1000538842,
+          "crc_matches": true,
+          "sha256": "5b46608307cb513f0f733e83f6c0d680dbbffefda33276c549c928f5f9d09d20"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c43_s_mesh_overlay43.vmdl_c",
+          "bytes": 16377,
+          "archive_index": 32767,
+          "expected_crc32": 1589947446,
+          "actual_crc32": 1589947446,
+          "crc_matches": true,
+          "sha256": "92affbb8cc9675c195b742f76d1d0769ca3297abd959bae3d1a1f6063a048562"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c42_s_mesh_overlay42.vmdl_c",
+          "bytes": 16249,
+          "archive_index": 32767,
+          "expected_crc32": 3146923346,
+          "actual_crc32": 3146923346,
+          "crc_matches": true,
+          "sha256": "6a39ab137dc6913d0bd82d38cd8e63c80c8f4f04a96547b6d7695addbc6c166b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c41_s_mesh_overlay41.vmdl_c",
+          "bytes": 27849,
+          "archive_index": 32767,
+          "expected_crc32": 1551383832,
+          "actual_crc32": 1551383832,
+          "crc_matches": true,
+          "sha256": "f430be313fe0722a5e5659d7b6a5aea5d6db85590436b329c14a1de3ac2b6521"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c40_s_mesh_overlay40.vmdl_c",
+          "bytes": 5913,
+          "archive_index": 32767,
+          "expected_crc32": 605282008,
+          "actual_crc32": 605282008,
+          "crc_matches": true,
+          "sha256": "fc81175dc34644e5f78978788f957f4099591f690d7f115784262207673e4c92"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c3_s_mesh_overlay3.vmdl_c",
+          "bytes": 5737,
+          "archive_index": 32767,
+          "expected_crc32": 4026429181,
+          "actual_crc32": 4026429181,
+          "crc_matches": true,
+          "sha256": "ddbca66d34f0efb16db01cc02c360e7d66094bd248e2c30a0be8f1e88b49327d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c39_s_mesh_overlay39.vmdl_c",
+          "bytes": 8569,
+          "archive_index": 32767,
+          "expected_crc32": 3911100227,
+          "actual_crc32": 3911100227,
+          "crc_matches": true,
+          "sha256": "01765e964628844034f64fcc2e4703f5769e7df591033613c36c549fa29d6172"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c38_s_mesh_overlay38.vmdl_c",
+          "bytes": 4425,
+          "archive_index": 32767,
+          "expected_crc32": 295106470,
+          "actual_crc32": 295106470,
+          "crc_matches": true,
+          "sha256": "fcc040d3910a66675e669c21077e66c5cc29ea38d10c805a642f2f7812daa869"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c37_s_mesh_overlay37.vmdl_c",
+          "bytes": 5513,
+          "archive_index": 32767,
+          "expected_crc32": 348711836,
+          "actual_crc32": 348711836,
+          "crc_matches": true,
+          "sha256": "2eed6bd80afe39bf85535fd23886819f2db5bdd63d3b91c62d5c944caac1fefc"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c36_s_mesh_overlay36.vmdl_c",
+          "bytes": 5049,
+          "archive_index": 32767,
+          "expected_crc32": 1115854412,
+          "actual_crc32": 1115854412,
+          "crc_matches": true,
+          "sha256": "034f7985c6b6925d3c10fdf2ae9d9b2351097ffb1aadbc1c7b7c4a605b8b5752"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c35_s_mesh_overlay35.vmdl_c",
+          "bytes": 5241,
+          "archive_index": 32767,
+          "expected_crc32": 161363030,
+          "actual_crc32": 161363030,
+          "crc_matches": true,
+          "sha256": "5675a6f1a585a7d07032ee4e009986d5f39885dbf827d6aac9b67771fa72f5de"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c34_s_mesh_overlay34.vmdl_c",
+          "bytes": 4889,
+          "archive_index": 32767,
+          "expected_crc32": 3425019306,
+          "actual_crc32": 3425019306,
+          "crc_matches": true,
+          "sha256": "349842f8718152e17d25ddadd2f1526329bb79dd59758532816e20ccb3bbdb8e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c33_s_mesh_overlay33.vmdl_c",
+          "bytes": 5497,
+          "archive_index": 32767,
+          "expected_crc32": 1073673280,
+          "actual_crc32": 1073673280,
+          "crc_matches": true,
+          "sha256": "1f0e09a8bef47fab8e8137a7e9d1f6e776c01cbca4fcc627a83027220fb9a288"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c32_s_mesh_overlay32.vmdl_c",
+          "bytes": 6457,
+          "archive_index": 32767,
+          "expected_crc32": 1648700536,
+          "actual_crc32": 1648700536,
+          "crc_matches": true,
+          "sha256": "7bdd43c1c8d4e53e6c80caf9b201c044a8bb3e317081f8789805d2c7a121888e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c31_s_mesh_overlay31.vmdl_c",
+          "bytes": 5081,
+          "archive_index": 32767,
+          "expected_crc32": 1501606040,
+          "actual_crc32": 1501606040,
+          "crc_matches": true,
+          "sha256": "8bb08bf37a79df9bd40f80a4cab74a61ab409f9d0779b189b8040aea03d7e391"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c30_s_mesh_overlay30.vmdl_c",
+          "bytes": 7017,
+          "archive_index": 32767,
+          "expected_crc32": 564397007,
+          "actual_crc32": 564397007,
+          "crc_matches": true,
+          "sha256": "7300832f363b47f8daa1f3ca8fc10ffb1d78c157b2a39e31401e4d9c97260fb2"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c2_s_mesh_overlay2.vmdl_c",
+          "bytes": 5097,
+          "archive_index": 32767,
+          "expected_crc32": 2645891976,
+          "actual_crc32": 2645891976,
+          "crc_matches": true,
+          "sha256": "381945eb3c3a94242edbda92c8c9f84ff4f36fd688eb908881a51b2fbd6639fa"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c2_s_cb_mesh.vmdl_c",
+          "bytes": 4833,
+          "archive_index": 32767,
+          "expected_crc32": 3487255241,
+          "actual_crc32": 3487255241,
+          "crc_matches": true,
+          "sha256": "6621ad17739c6618c4cd219dd7acd8aa9bc4e6c110b164c43d2cbcd66c15d145"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c29_s_mesh_overlay29.vmdl_c",
+          "bytes": 5369,
+          "archive_index": 32767,
+          "expected_crc32": 2876695135,
+          "actual_crc32": 2876695135,
+          "crc_matches": true,
+          "sha256": "3486bc6e71eef97b94a4f2b3f239f79daa6f2ed20fac860ebc1ec11c19315b65"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c28_s_mesh_overlay28.vmdl_c",
+          "bytes": 6169,
+          "archive_index": 32767,
+          "expected_crc32": 1873532694,
+          "actual_crc32": 1873532694,
+          "crc_matches": true,
+          "sha256": "b304e5a86d120fc60265e2dc70fa30df5803ab23e25f127c97cd3655c5346ff4"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c27_s_mesh_overlay27.vmdl_c",
+          "bytes": 7481,
+          "archive_index": 32767,
+          "expected_crc32": 3220650834,
+          "actual_crc32": 3220650834,
+          "crc_matches": true,
+          "sha256": "bdf4a1d813da5c060543ed24e9ded44d9f0f5c2c7cf89f62c05980dd2be105ac"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c26_s_mesh_overlay26.vmdl_c",
+          "bytes": 4873,
+          "archive_index": 32767,
+          "expected_crc32": 83472052,
+          "actual_crc32": 83472052,
+          "crc_matches": true,
+          "sha256": "6310ce783bc142edcb51b36eed73bd2522dfed236a73d06edd6936c02e385228"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c25_s_mesh_overlay25.vmdl_c",
+          "bytes": 5385,
+          "archive_index": 32767,
+          "expected_crc32": 278684827,
+          "actual_crc32": 278684827,
+          "crc_matches": true,
+          "sha256": "c593f2495ca925abc3b42b31362e0bd1cbf546e71d7468ce2db00fbf5a151aca"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c24_s_mesh_overlay24.vmdl_c",
+          "bytes": 7529,
+          "archive_index": 32767,
+          "expected_crc32": 688784994,
+          "actual_crc32": 688784994,
+          "crc_matches": true,
+          "sha256": "cac109ecb39d1adac064f96a6ad4a21ea5675ba4f9f95111ed14a9e2fe836334"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c23_s_mesh_overlay23.vmdl_c",
+          "bytes": 5721,
+          "archive_index": 32767,
+          "expected_crc32": 1979936935,
+          "actual_crc32": 1979936935,
+          "crc_matches": true,
+          "sha256": "bce3853cbb3889be9fe78677f91ae77d692d099a6219e471aef926eca6bddc84"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c22_s_mesh_overlay22.vmdl_c",
+          "bytes": 7337,
+          "archive_index": 32767,
+          "expected_crc32": 1132420610,
+          "actual_crc32": 1132420610,
+          "crc_matches": true,
+          "sha256": "e1568b397be839ba3495c9bdb8bc2bcfbb6014459ad7be7f68059388825c58ae"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c21_s_mesh_overlay21.vmdl_c",
+          "bytes": 5369,
+          "archive_index": 32767,
+          "expected_crc32": 1232880303,
+          "actual_crc32": 1232880303,
+          "crc_matches": true,
+          "sha256": "b7d2d91470b9749136e31fc52307545dbf6d20c8f09d1a527318b9a758769da0"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c20_s_mesh_overlay20.vmdl_c",
+          "bytes": 5449,
+          "archive_index": 32767,
+          "expected_crc32": 2210336485,
+          "actual_crc32": 2210336485,
+          "crc_matches": true,
+          "sha256": "92e524ffb2f417bad1edbc98a084a67d0b515aa7fd6e574aa7d7c1560e356b48"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c1_s_mesh_overlay1.vmdl_c",
+          "bytes": 4937,
+          "archive_index": 32767,
+          "expected_crc32": 2070583450,
+          "actual_crc32": 2070583450,
+          "crc_matches": true,
+          "sha256": "d140096689752185323d1da0e5dfc1e5e22ecc93fd2f72d887617a1d233e02a6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c19_s_mesh_overlay19.vmdl_c",
+          "bytes": 5673,
+          "archive_index": 32767,
+          "expected_crc32": 1689775314,
+          "actual_crc32": 1689775314,
+          "crc_matches": true,
+          "sha256": "f79431de2d98c038d933d59991fd1194757f0b6d8ef561d0aa63caae259f1672"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c18_s_mesh_overlay18.vmdl_c",
+          "bytes": 8249,
+          "archive_index": 32767,
+          "expected_crc32": 3090785720,
+          "actual_crc32": 3090785720,
+          "crc_matches": true,
+          "sha256": "a0f2e10a59454d783ad9dc5d1f6d0f634cc15dcdae0a0a9ad4b0a704d1f637f9"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c17_s_mesh_overlay17.vmdl_c",
+          "bytes": 6505,
+          "archive_index": 32767,
+          "expected_crc32": 3984650070,
+          "actual_crc32": 3984650070,
+          "crc_matches": true,
+          "sha256": "ff51b88e38b29651a7a5d19c2813d43b117733bee08765347ce96e32b427777d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c16_s_mesh_overlay16.vmdl_c",
+          "bytes": 5929,
+          "archive_index": 32767,
+          "expected_crc32": 393930311,
+          "actual_crc32": 393930311,
+          "crc_matches": true,
+          "sha256": "de4f97727894282d8d096e84491ef880e3a89bf55a017868e6903bc66e4618d8"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c15_s_mesh_overlay15.vmdl_c",
+          "bytes": 6553,
+          "archive_index": 32767,
+          "expected_crc32": 4056921217,
+          "actual_crc32": 4056921217,
+          "crc_matches": true,
+          "sha256": "119474d9ba7f83233851b267b841d87186e406629dcc2b92ad54fff892b57cbf"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c14_s_mesh_overlay14.vmdl_c",
+          "bytes": 5001,
+          "archive_index": 32767,
+          "expected_crc32": 4172379584,
+          "actual_crc32": 4172379584,
+          "crc_matches": true,
+          "sha256": "6f8e407c634565a7510da739aa3d2be5d174ee9df0d3ebbe228305455de3c26a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c13_s_mesh_overlay13.vmdl_c",
+          "bytes": 4937,
+          "archive_index": 32767,
+          "expected_crc32": 491597115,
+          "actual_crc32": 491597115,
+          "crc_matches": true,
+          "sha256": "4675f56cfe00e86355ea617dd228b597e7236a8fb72fcc8151d206b5b2bb1df3"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c12_s_mesh_overlay12.vmdl_c",
+          "bytes": 4825,
+          "archive_index": 32767,
+          "expected_crc32": 1809516778,
+          "actual_crc32": 1809516778,
+          "crc_matches": true,
+          "sha256": "692b72fa97b3c6e5657dcf86987ff7ecfcbc42cf843e36b655960e2b80e6220d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c11_s_mesh_overlay11.vmdl_c",
+          "bytes": 4793,
+          "archive_index": 32767,
+          "expected_crc32": 3843628444,
+          "actual_crc32": 3843628444,
+          "crc_matches": true,
+          "sha256": "cdbf936aa1c5ebcea2511658801503c6546d789c79d62c41e862c8bc9f8be10b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c10_s_mesh_overlay10.vmdl_c",
+          "bytes": 4889,
+          "archive_index": 32767,
+          "expected_crc32": 1824354950,
+          "actual_crc32": 1824354950,
+          "crc_matches": true,
+          "sha256": "2d73dc7851d971b5f51e4530e14d3d0081f6f9497b71e9c8e7b761ed7887b22b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_mesh_overlay0.vmdl_c",
+          "bytes": 4937,
+          "archive_index": 32767,
+          "expected_crc32": 1578661215,
+          "actual_crc32": 1578661215,
+          "crc_matches": true,
+          "sha256": "e049fd7e2ec1ea07b12e2593c422915b14e5ecd29824d0aabe782248fdff5380"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge9_water_ti10_000.vmdl_c",
+          "bytes": 5701,
+          "archive_index": 32767,
+          "expected_crc32": 1570192699,
+          "actual_crc32": 1570192699,
+          "crc_matches": true,
+          "sha256": "d3d00a78cf6b56162fb31f009c4447ad799c5da6a56c8697c3e2da9d9826ae66"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge8_water_ti10_000.vmdl_c",
+          "bytes": 4677,
+          "archive_index": 32767,
+          "expected_crc32": 4278018759,
+          "actual_crc32": 4278018759,
+          "crc_matches": true,
+          "sha256": "95804de81122d98675f4bfc1ed37d8febfa4021bb93b13788e546c23097a3132"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge7_water_ti10_000.vmdl_c",
+          "bytes": 5285,
+          "archive_index": 32767,
+          "expected_crc32": 668265715,
+          "actual_crc32": 668265715,
+          "crc_matches": true,
+          "sha256": "157629d912e98e5ae623b06b6dd51708a5469c87e13f576bf41983a80b78d9ba"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge6_water_ti10_000.vmdl_c",
+          "bytes": 190101,
+          "archive_index": 32767,
+          "expected_crc32": 2798414801,
+          "actual_crc32": 2798414801,
+          "crc_matches": true,
+          "sha256": "6e9faf1324f19a969c0990af30f0089fd952de3d21ac0eb2988efe6037618cf8"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge5_water_journey_000.vmdl_c",
+          "bytes": 11817,
+          "archive_index": 32767,
+          "expected_crc32": 1095371987,
+          "actual_crc32": 1095371987,
+          "crc_matches": true,
+          "sha256": "060992041ae51c69e4b881d5ceae3fd6406cc01f4d1e85f31a4984045179e654"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge4_water_ti10_000.vmdl_c",
+          "bytes": 4437,
+          "archive_index": 32767,
+          "expected_crc32": 1547166234,
+          "actual_crc32": 1547166234,
+          "crc_matches": true,
+          "sha256": "9b35b8002272d301b639df67cbd4378c2777c2d95960acdded2bec137158ddcf"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge3_water_ti10_000.vmdl_c",
+          "bytes": 4517,
+          "archive_index": 32767,
+          "expected_crc32": 3025314902,
+          "actual_crc32": 3025314902,
+          "crc_matches": true,
+          "sha256": "84a6b529f5de86649cfe4d58c0c0bd0b2b02308264187d8aed25fad4d6bc0aff"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge2_water_ti10_000.vmdl_c",
+          "bytes": 5013,
+          "archive_index": 32767,
+          "expected_crc32": 2919093636,
+          "actual_crc32": 2919093636,
+          "crc_matches": true,
+          "sha256": "8f008a0efa988d2d4de614bb2f34d88f2f7a0a59993e1e7cd1a2bdb6d71f1809"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge22_water_ti10_000.vmdl_c",
+          "bytes": 4469,
+          "archive_index": 32767,
+          "expected_crc32": 1224308704,
+          "actual_crc32": 1224308704,
+          "crc_matches": true,
+          "sha256": "911b9ccc0d0d161cbdcadf9c0151c79c62151c842110bc6e804fcd1a9db40058"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge21_water_ti10_000.vmdl_c",
+          "bytes": 4565,
+          "archive_index": 32767,
+          "expected_crc32": 1339197661,
+          "actual_crc32": 1339197661,
+          "crc_matches": true,
+          "sha256": "b36dc0c854bd9ea558d0b702ccb8e78ad544c122fda8a181c64b0de6c59f3d63"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge20_water_ti10_000.vmdl_c",
+          "bytes": 4677,
+          "archive_index": 32767,
+          "expected_crc32": 3251393845,
+          "actual_crc32": 3251393845,
+          "crc_matches": true,
+          "sha256": "453a20711d0d77b77851fb187ca93ad5cd34dccb8aeb1e618bc2370e7c31fe75"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge1_water_ti10_000.vmdl_c",
+          "bytes": 4757,
+          "archive_index": 32767,
+          "expected_crc32": 819783074,
+          "actual_crc32": 819783074,
+          "crc_matches": true,
+          "sha256": "4e8d3cdab563b5dc28b23c884d9365debe3f149939dde8d44f1d89cab69f7c8a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge19_water_ti10_000.vmdl_c",
+          "bytes": 4501,
+          "archive_index": 32767,
+          "expected_crc32": 3261584989,
+          "actual_crc32": 3261584989,
+          "crc_matches": true,
+          "sha256": "5d9c1ec106fa2e8f7664565ba489d2a52b8604a15ec99a4e45460952c2288771"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge18_water_ti10_000.vmdl_c",
+          "bytes": 4613,
+          "archive_index": 32767,
+          "expected_crc32": 1652444640,
+          "actual_crc32": 1652444640,
+          "crc_matches": true,
+          "sha256": "47ed35e11262fb25565af9503f9f1042deb9a886018dc0ed0178f31e2fe3b018"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge17_water_jungle_000.vmdl_c",
+          "bytes": 14697,
+          "archive_index": 32767,
+          "expected_crc32": 1279086497,
+          "actual_crc32": 1279086497,
+          "crc_matches": true,
+          "sha256": "aba5d45552cf135f5344b39eb32f492cb5f3f3289bc678d0d72eea04369ff067"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge16_water_ti10_000.vmdl_c",
+          "bytes": 4501,
+          "archive_index": 32767,
+          "expected_crc32": 219854556,
+          "actual_crc32": 219854556,
+          "crc_matches": true,
+          "sha256": "34afcd3e216de587ee766c0fca1ea1bdec4dad0520a7613b2df3d6321cd16039"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge15_water_ti10_000.vmdl_c",
+          "bytes": 4517,
+          "archive_index": 32767,
+          "expected_crc32": 217877424,
+          "actual_crc32": 217877424,
+          "crc_matches": true,
+          "sha256": "2c95d4ff3c0af1c75c17200c48a0ae4284ab9bd814918e357c2fdad1f4c39736"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge14_water_ti10_000.vmdl_c",
+          "bytes": 4677,
+          "archive_index": 32767,
+          "expected_crc32": 2115136009,
+          "actual_crc32": 2115136009,
+          "crc_matches": true,
+          "sha256": "f71f93c908b750cac2cdc3160ef9bd7dcb47836fd89c0ba02a2f06bbf2448598"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge13_water_ti10_000.vmdl_c",
+          "bytes": 4501,
+          "archive_index": 32767,
+          "expected_crc32": 2564794004,
+          "actual_crc32": 2564794004,
+          "crc_matches": true,
+          "sha256": "6bd63f69586aa5863bffadb994cecfb4800d981db3e9369d00fbe481a3201f2b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge12_water_ti10_000.vmdl_c",
+          "bytes": 4485,
+          "archive_index": 32767,
+          "expected_crc32": 3770142120,
+          "actual_crc32": 3770142120,
+          "crc_matches": true,
+          "sha256": "16e2872e8edfdb6adf243557a7fc0f2337553c5148980c1cc2419f5cec7963c6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge11_water_ti10_000.vmdl_c",
+          "bytes": 4501,
+          "archive_index": 32767,
+          "expected_crc32": 1827345081,
+          "actual_crc32": 1827345081,
+          "crc_matches": true,
+          "sha256": "6197b2d2bfcfff2c7dce15a6710967fce12d51d7e154dce9312b20f3b8436c8c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge10_water_ti10_000.vmdl_c",
+          "bytes": 4437,
+          "archive_index": 32767,
+          "expected_crc32": 3315807661,
+          "actual_crc32": 3315807661,
+          "crc_matches": true,
+          "sha256": "aa7026fd5d552dead61cd7cdcb7439aef17a65b1e7ac36fb412bd3032530a4e0"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_nomerge0_water_ti10_000.vmdl_c",
+          "bytes": 4517,
+          "archive_index": 32767,
+          "expected_crc32": 2674252097,
+          "actual_crc32": 2674252097,
+          "crc_matches": true,
+          "sha256": "14c28bfd9899e46a558909886187d80f0a81adcdebd2ad63339c0f9d0c00d441"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_c0_s_cb_mesh_worldspace_texture_blend.vmdl_c",
+          "bytes": 704168,
+          "archive_index": 32767,
+          "expected_crc32": 985868078,
+          "actual_crc32": 985868078,
+          "crc_matches": true,
+          "sha256": "9a2546e96c6efc10475020a680b9265c44cb69c1efeaaf34d6d971ead98b1742"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_light_2.vmdl_c",
+          "bytes": 152458,
+          "archive_index": 32767,
+          "expected_crc32": 2382985459,
+          "actual_crc32": 2382985459,
+          "crc_matches": true,
+          "sha256": "0d6320366af458a9537648e3863ee0c61d87a6102957fed78f7c221083f4aafe"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_light_1.vmdl_c",
+          "bytes": 13226,
+          "archive_index": 32767,
+          "expected_crc32": 2491569630,
+          "actual_crc32": 2491569630,
+          "crc_matches": true,
+          "sha256": "c0e6f0afd9bb321dc2ef4e3d1620f49a369eb76d2570d82effe0abe5b6117809"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_light_0.vmdl_c",
+          "bytes": 1602282,
+          "archive_index": 32767,
+          "expected_crc32": 3536621402,
+          "actual_crc32": 3536621402,
+          "crc_matches": true,
+          "sha256": "7e9417bab27980b51a5480b28fb8d036f5d078c12f232a109c223daac18e4d07"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_end_2.vmdl_c",
+          "bytes": 38730,
+          "archive_index": 32767,
+          "expected_crc32": 568115703,
+          "actual_crc32": 568115703,
+          "crc_matches": true,
+          "sha256": "cfb4d8389fdc4799310f5dabbb64876cfaa429511b03d4f39f3bf53741a8f15c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_end_1.vmdl_c",
+          "bytes": 632154,
+          "archive_index": 32767,
+          "expected_crc32": 2421604564,
+          "actual_crc32": 2421604564,
+          "crc_matches": true,
+          "sha256": "049a1873278c0d6b218068e9e55e810c6c81c9ac84d9517b3eebaab7805e9207"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_end_0.vmdl_c",
+          "bytes": 8090,
+          "archive_index": 32767,
+          "expected_crc32": 1276682172,
+          "actual_crc32": 1276682172,
+          "crc_matches": true,
+          "sha256": "13ceea7d99ddb7b11e4fcd5e9658d488a391c31efe6c0c0e40f7f12ca30866df"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_5.vmdl_c",
+          "bytes": 14086,
+          "archive_index": 32767,
+          "expected_crc32": 324799826,
+          "actual_crc32": 324799826,
+          "crc_matches": true,
+          "sha256": "f0e64ed569c4f48e2e6531c74922af6d91aea00f1dc1602865ad4f2da66b33a9"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_4.vmdl_c",
+          "bytes": 14118,
+          "archive_index": 32767,
+          "expected_crc32": 2843103586,
+          "actual_crc32": 2843103586,
+          "crc_matches": true,
+          "sha256": "e739cce1b8791decfcefbf226d8b131bf8319eeba200397f81ce7e2402628ba3"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_3.vmdl_c",
+          "bytes": 14118,
+          "archive_index": 32767,
+          "expected_crc32": 1925338003,
+          "actual_crc32": 1925338003,
+          "crc_matches": true,
+          "sha256": "3bc66686d4888d8653569005ffcf57aa52c39498afe1c39357b3d425bf265619"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_2.vmdl_c",
+          "bytes": 157766,
+          "archive_index": 32767,
+          "expected_crc32": 4232807509,
+          "actual_crc32": 4232807509,
+          "crc_matches": true,
+          "sha256": "8a5168618010ffe71bce9d6a278248a68886f0d89386cf23be79e5a5c21086fe"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_1.vmdl_c",
+          "bytes": 24854,
+          "archive_index": 32767,
+          "expected_crc32": 1271068675,
+          "actual_crc32": 1271068675,
+          "crc_matches": true,
+          "sha256": "2cf92dcc67996e764b7e8f4bf4672021b6d728a4a3906c13308b69469b2ee574"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wood_0.vmdl_c",
+          "bytes": 1418198,
+          "archive_index": 32767,
+          "expected_crc32": 713802040,
+          "actual_crc32": 713802040,
+          "crc_matches": true,
+          "sha256": "2fd1ce77e5b1988541a2301bfc28b5c2d95e05a8aad2915acf3f4eaabe7ad678"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_water_creep_camp_torch_0.vmdl_c",
+          "bytes": 107205,
+          "archive_index": 32767,
+          "expected_crc32": 1156064662,
+          "actual_crc32": 1156064662,
+          "crc_matches": true,
+          "sha256": "0faba6e4ccc871843edc057e0f7d44747015a76a83fa840c2670bcb863c5831d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_water_creep_camp_lily_pads_0.vmdl_c",
+          "bytes": 225193,
+          "archive_index": 32767,
+          "expected_crc32": 3856417213,
+          "actual_crc32": 3856417213,
+          "crc_matches": true,
+          "sha256": "7239447ead9f170c7d6a702d8b0a2116260bb1f1a87b86589668f29a5b520aa2"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wall384_0.vmdl_c",
+          "bytes": 49338,
+          "archive_index": 32767,
+          "expected_crc32": 3544130547,
+          "actual_crc32": 3544130547,
+          "crc_matches": true,
+          "sha256": "add8773760c3c1a7da1b16eb8ced2e496a1edc0a4db8a3858a52d1984e3ff19d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wall256_composite_0.vmdl_c",
+          "bytes": 186673,
+          "archive_index": 32767,
+          "expected_crc32": 1888807352,
+          "actual_crc32": 1888807352,
+          "crc_matches": true,
+          "sha256": "700096ed4f33e56ddc271f59ea4b55c98f52291e8f1b33a2ab90e9ff2c5de1c5"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_wall128_composite_0.vmdl_c",
+          "bytes": 61057,
+          "archive_index": 32767,
+          "expected_crc32": 1950105835,
+          "actual_crc32": 1950105835,
+          "crc_matches": true,
+          "sha256": "ea9d3aa0c3744d371700e0c94e54421e154a10cae49303f262a43bf9b86533f2"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_urn001_0.vmdl_c",
+          "bytes": 34758,
+          "archive_index": 32767,
+          "expected_crc32": 423294028,
+          "actual_crc32": 423294028,
+          "crc_matches": true,
+          "sha256": "c45f4739344e98d683b563095bb48440f01194143b611bfba161a88392a93b1c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_tree_roots_01_0.vmdl_c",
+          "bytes": 35534,
+          "archive_index": 32767,
+          "expected_crc32": 3607718537,
+          "actual_crc32": 3607718537,
+          "crc_matches": true,
+          "sha256": "dfc420ef63e58eac5dbea7bb215f7888e974b84f7ee1f81f3a67ca2dec4ab3ac"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_tree_pine01_0.vmdl_c",
+          "bytes": 13902,
+          "archive_index": 32767,
+          "expected_crc32": 961302479,
+          "actual_crc32": 961302479,
+          "crc_matches": true,
+          "sha256": "c7bcb53c41973e0fa041cdc9a56e376cee2740edd398cd5957389d7ee288a6be"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_tree_cypress001_block_0.vmdl_c",
+          "bytes": 7078,
+          "archive_index": 32767,
+          "expected_crc32": 102000447,
+          "actual_crc32": 102000447,
+          "crc_matches": true,
+          "sha256": "409c9d46d8642f65f8cc06dda86fb118c08011b5bb04e3343e4de7a8b9e3a92f"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_tree_cypress001_0.vmdl_c",
+          "bytes": 50514,
+          "archive_index": 32767,
+          "expected_crc32": 491820613,
+          "actual_crc32": 491820613,
+          "crc_matches": true,
+          "sha256": "33b4d9092f13ef05e103d1ab9d71a98f4fd9c1c7051b5ac311ae50289b2fc69e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_ti10_tileset_misc_0.vmdl_c",
+          "bytes": 9922,
+          "archive_index": 32767,
+          "expected_crc32": 3554743404,
+          "actual_crc32": 3554743404,
+          "crc_matches": true,
+          "sha256": "734f064bbdce712c8c25cb01b6d43ca53b9f813b895c0172e6ba9995bfba6717"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_ti10_tileset_cliffs_0.vmdl_c",
+          "bytes": 28118,
+          "archive_index": 32767,
+          "expected_crc32": 3403339048,
+          "actual_crc32": 3403339048,
+          "crc_matches": true,
+          "sha256": "a7f27601df3dd7612775b7d52d5b0779a517631a53b9e22d518468bbca55e069"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_temple_stairs_blocks002_0.vmdl_c",
+          "bytes": 21785,
+          "archive_index": 32767,
+          "expected_crc32": 2811876023,
+          "actual_crc32": 2811876023,
+          "crc_matches": true,
+          "sha256": "6622a021ab6337a6655a2523586c96dfb6b15ff0fd44aea9f1e01dd278d483e1"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_temple_stairs001_0.vmdl_c",
+          "bytes": 173841,
+          "archive_index": 32767,
+          "expected_crc32": 3484653711,
+          "actual_crc32": 3484653711,
+          "crc_matches": true,
+          "sha256": "a00f78ca3fc9b599b3606531484d60ce3f24ddaed03532446b6066aa219c48a4"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_temple_snow_0.vmdl_c",
+          "bytes": 30845,
+          "archive_index": 32767,
+          "expected_crc32": 2770623731,
+          "actual_crc32": 2770623731,
+          "crc_matches": true,
+          "sha256": "8cead3e5bb70fc5f0f419851fa5140ee6ed8ef2a239fbdc985e7fa25e7562249"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_teal_4.vmdl_c",
+          "bytes": 13702,
+          "archive_index": 32767,
+          "expected_crc32": 501432832,
+          "actual_crc32": 501432832,
+          "crc_matches": true,
+          "sha256": "2f2193a9fb38c8970763725b153e6b3e2787200c38cad247c2fcbe800ed32e0e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_teal_3.vmdl_c",
+          "bytes": 15318,
+          "archive_index": 32767,
+          "expected_crc32": 665652493,
+          "actual_crc32": 665652493,
+          "crc_matches": true,
+          "sha256": "a53dc8268d0969d7bef5b6b75b1835c1e46add2f0cc645fedcf1e95b0697e2ab"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_teal_2.vmdl_c",
+          "bytes": 40950,
+          "archive_index": 32767,
+          "expected_crc32": 3300249740,
+          "actual_crc32": 3300249740,
+          "crc_matches": true,
+          "sha256": "286c6d021ae9129601416b09544b9680a5fba087829ef12a141d92eb4d849ae6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_teal_1.vmdl_c",
+          "bytes": 12566,
+          "archive_index": 32767,
+          "expected_crc32": 1973956229,
+          "actual_crc32": 1973956229,
+          "crc_matches": true,
+          "sha256": "dcdd6f327dc822bb33623d7342e7287c2dd7260c4ef6fa0c1c57c47129173737"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_teal_0.vmdl_c",
+          "bytes": 13686,
+          "archive_index": 32767,
+          "expected_crc32": 3248035619,
+          "actual_crc32": 3248035619,
+          "crc_matches": true,
+          "sha256": "3bc8db2424b88ec7533c93b5246f58226afdf774f54cd6badbc4b057845e6a72"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_light_5.vmdl_c",
+          "bytes": 82046,
+          "archive_index": 32767,
+          "expected_crc32": 1633310491,
+          "actual_crc32": 1633310491,
+          "crc_matches": true,
+          "sha256": "6cd04d2987e056036fedfe189ab238325ea4519755c948106b500ac1c8ca1d3d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_light_4.vmdl_c",
+          "bytes": 83502,
+          "archive_index": 32767,
+          "expected_crc32": 3388388296,
+          "actual_crc32": 3388388296,
+          "crc_matches": true,
+          "sha256": "b174f7f281182fcd919647739ea4eb66479b61d560dd1ab8484bd8d4e68209e7"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_light_3.vmdl_c",
+          "bytes": 78126,
+          "archive_index": 32767,
+          "expected_crc32": 4208435831,
+          "actual_crc32": 4208435831,
+          "crc_matches": true,
+          "sha256": "4a0a9d7a4b114e9605a33f5342036e2139ed47cc93ddc06c6bff5dca761be3ef"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_light_2.vmdl_c",
+          "bytes": 658078,
+          "archive_index": 32767,
+          "expected_crc32": 1716662787,
+          "actual_crc32": 1716662787,
+          "crc_matches": true,
+          "sha256": "5d0f8a215dd8caf15ca1db2c86ee4f9573d405826a104f22c676cf5c0684f89e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_light_1.vmdl_c",
+          "bytes": 37406,
+          "archive_index": 32767,
+          "expected_crc32": 3105328933,
+          "actual_crc32": 3105328933,
+          "crc_matches": true,
+          "sha256": "d5cd2c906748e4eec00d49bc2aaac6ad8ce48a5b899c992276b23533ade3b19e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_light_0.vmdl_c",
+          "bytes": 14494,
+          "archive_index": 32767,
+          "expected_crc32": 1303493260,
+          "actual_crc32": 1303493260,
+          "crc_matches": true,
+          "sha256": "3afbfd23507e84a2cb8b13e0760f9e62691e034e7a36e56c7479dec63439c198"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_dark_0.vmdl_c",
+          "bytes": 538714,
+          "archive_index": 32767,
+          "expected_crc32": 696637912,
+          "actual_crc32": 696637912,
+          "crc_matches": true,
+          "sha256": "d7591aafd9dc88667013b88a074c8c0e2f40abaa7e90701ca3e4474dbb703d77"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_cool_4.vmdl_c",
+          "bytes": 10090,
+          "archive_index": 32767,
+          "expected_crc32": 3528880947,
+          "actual_crc32": 3528880947,
+          "crc_matches": true,
+          "sha256": "cb279c0172faa974a38c034f49d356a4b5bf567f6d70fd11a32654e0c7fce273"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_cool_3.vmdl_c",
+          "bytes": 65802,
+          "archive_index": 32767,
+          "expected_crc32": 2548422935,
+          "actual_crc32": 2548422935,
+          "crc_matches": true,
+          "sha256": "9d73a067c1130363eb7caa05863d8e1b6076f12415dbab7d48657062b4ce311d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_cool_2.vmdl_c",
+          "bytes": 1006138,
+          "archive_index": 32767,
+          "expected_crc32": 3779758816,
+          "actual_crc32": 3779758816,
+          "crc_matches": true,
+          "sha256": "def68a5e0768d3abb96431244f787c2ef42f98d741cd9a8ba375be32144dc425"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_cool_1.vmdl_c",
+          "bytes": 55642,
+          "archive_index": 32767,
+          "expected_crc32": 3291262574,
+          "actual_crc32": 3291262574,
+          "crc_matches": true,
+          "sha256": "7f081e74fb7358e22cb00b47dafcbcbdcdf6e7f1c70d3f650ce97d7409a7a64a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_cool_0.vmdl_c",
+          "bytes": 65786,
+          "archive_index": 32767,
+          "expected_crc32": 2994755368,
+          "actual_crc32": 2994755368,
+          "crc_matches": true,
+          "sha256": "4ac87bbf86ed42414e527de4a2d8e532db5c07ef1a3748c650404e57be1272ef"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_5.vmdl_c",
+          "bytes": 70470,
+          "archive_index": 32767,
+          "expected_crc32": 2337744504,
+          "actual_crc32": 2337744504,
+          "crc_matches": true,
+          "sha256": "03ba43da563a3d5d0e5759c360c679ce62ede94a5ef002735452e98c9aa08919"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_4.vmdl_c",
+          "bytes": 424102,
+          "archive_index": 32767,
+          "expected_crc32": 349218026,
+          "actual_crc32": 349218026,
+          "crc_matches": true,
+          "sha256": "6080b3b13314e1bb3f01068fd7ba0f8f4df6a020ed7e5cefc4081b86780d03a6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_3.vmdl_c",
+          "bytes": 25862,
+          "archive_index": 32767,
+          "expected_crc32": 1334161544,
+          "actual_crc32": 1334161544,
+          "crc_matches": true,
+          "sha256": "a337b7a5c928d6477a0e53f17d365434840f86f2be9bcdb1bd5e5479bc972f3b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_2.vmdl_c",
+          "bytes": 72550,
+          "archive_index": 32767,
+          "expected_crc32": 2402467550,
+          "actual_crc32": 2402467550,
+          "crc_matches": true,
+          "sha256": "dc79345522efce838882102484b2b6c79465512ef620b97d49bd1357e9378869"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_1.vmdl_c",
+          "bytes": 627174,
+          "archive_index": 32767,
+          "expected_crc32": 1473121069,
+          "actual_crc32": 1473121069,
+          "crc_matches": true,
+          "sha256": "b6c266faf94ede7d5801bde6e41439cd5f8c955b1692044a8aa9400ff36db262"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_stone_0.vmdl_c",
+          "bytes": 76246,
+          "archive_index": 32767,
+          "expected_crc32": 3544293519,
+          "actual_crc32": 3544293519,
+          "crc_matches": true,
+          "sha256": "9703d325ac1aa7954fe3acfa54b4b0631a7ee57cdd57202a59fcc4bf9bcdd0f2"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_snow_debris001_0.vmdl_c",
+          "bytes": 9918,
+          "archive_index": 32767,
+          "expected_crc32": 1718922398,
+          "actual_crc32": 1718922398,
+          "crc_matches": true,
+          "sha256": "f7d6ef8e01f47c298ac564ce9bb9c421956f1b2dfff6fbcd78a7ec7c33b2f528"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_snow_0.vmdl_c",
+          "bytes": 822310,
+          "archive_index": 32767,
+          "expected_crc32": 3985318803,
+          "actual_crc32": 3985318803,
+          "crc_matches": true,
+          "sha256": "30b7694210c0e5f96dbad7f8c089ff12efb6fbcc9c0c6e7d185cce66da2de356"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_slate_wet_0.vmdl_c",
+          "bytes": 552233,
+          "archive_index": 32767,
+          "expected_crc32": 3062155923,
+          "actual_crc32": 3062155923,
+          "crc_matches": true,
+          "sha256": "6c833d5fbdc6248262510772ee4850d1bfc127c5dbb333c1a2ee28abd2ecb59e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_slate_0.vmdl_c",
+          "bytes": 1090197,
+          "archive_index": 32767,
+          "expected_crc32": 3750629759,
+          "actual_crc32": 3750629759,
+          "crc_matches": true,
+          "sha256": "6f439665d0ecc5597107b8266bb9ca899145de2cc612257dffaad711c0621a3b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_silver_0.vmdl_c",
+          "bytes": 72758,
+          "archive_index": 32767,
+          "expected_crc32": 908279017,
+          "actual_crc32": 908279017,
+          "crc_matches": true,
+          "sha256": "f362c78a7f9b5502dc3e25647747cbd5b92448a4ee38f9f0df0d54b7b29770de"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_shell_sand_0.vmdl_c",
+          "bytes": 272938,
+          "archive_index": 32767,
+          "expected_crc32": 1989648966,
+          "actual_crc32": 1989648966,
+          "crc_matches": true,
+          "sha256": "4d30c97d81a61e1024c3866be759db8b78fe5f26f2fefa0ed2b4eef57745e08d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_schist_0.vmdl_c",
+          "bytes": 847622,
+          "archive_index": 32767,
+          "expected_crc32": 4095958300,
+          "actual_crc32": 4095958300,
+          "crc_matches": true,
+          "sha256": "4a71338b73d43fe724cfc57ab859bb764581f9a7f5d3e0604871eb22b4e7d40a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_sandstone_light_0.vmdl_c",
+          "bytes": 267442,
+          "archive_index": 32767,
+          "expected_crc32": 2182381493,
+          "actual_crc32": 2182381493,
+          "crc_matches": true,
+          "sha256": "2205b25c4f724a13053bc1caeecba4372d20be7bdf11e73ac7e3596326f4377f"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_sandstone_0.vmdl_c",
+          "bytes": 875802,
+          "archive_index": 32767,
+          "expected_crc32": 1089990478,
+          "actual_crc32": 1089990478,
+          "crc_matches": true,
+          "sha256": "089bc90f914e73f940f2fd8826e2d73f2bc86d374aa5d249c115473e90b83e49"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_sand_wet_0.vmdl_c",
+          "bytes": 268970,
+          "archive_index": 32767,
+          "expected_crc32": 3069006233,
+          "actual_crc32": 3069006233,
+          "crc_matches": true,
+          "sha256": "3077a9c90b244a159b9ce5dd33af4c76d0a67a0e9628780646b3c10b15b2e694"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_sand_0.vmdl_c",
+          "bytes": 17334,
+          "archive_index": 32767,
+          "expected_crc32": 2772416224,
+          "actual_crc32": 2772416224,
+          "crc_matches": true,
+          "sha256": "7538c69a5d778a0c4f0391cdb3544fc62700c7bc0e49a97ac21da70aaa3cd643"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_rock_wet_0.vmdl_c",
+          "bytes": 795722,
+          "archive_index": 32767,
+          "expected_crc32": 3324601565,
+          "actual_crc32": 3324601565,
+          "crc_matches": true,
+          "sha256": "f8194787de19db8c53cf8453a3ad869303e78e787a43facc77d1badd1e652d3e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_rock_4.vmdl_c",
+          "bytes": 36054,
+          "archive_index": 32767,
+          "expected_crc32": 865237231,
+          "actual_crc32": 865237231,
+          "crc_matches": true,
+          "sha256": "b9c6e3a4ff30ec1a8033e201f1062457573b78a498c3df973d5dce29e112859d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_rock_3.vmdl_c",
+          "bytes": 40310,
+          "archive_index": 32767,
+          "expected_crc32": 3428383371,
+          "actual_crc32": 3428383371,
+          "crc_matches": true,
+          "sha256": "c29e9e37056fd1fb2a859e387d47044b695247cdef535405d119e0c37e478685"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_rock_2.vmdl_c",
+          "bytes": 36054,
+          "archive_index": 32767,
+          "expected_crc32": 2944349715,
+          "actual_crc32": 2944349715,
+          "crc_matches": true,
+          "sha256": "e2d055586965a828d6a60439d996e88102d25cb7c92bd02da2518e3474df1e25"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_rock_1.vmdl_c",
+          "bytes": 925174,
+          "archive_index": 32767,
+          "expected_crc32": 3138244664,
+          "actual_crc32": 3138244664,
+          "crc_matches": true,
+          "sha256": "5b3066274b0cab281e01dfaeff70da6ac77a81f45a09b2216692ee3d40c2d683"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_rock_0.vmdl_c",
+          "bytes": 40326,
+          "archive_index": 32767,
+          "expected_crc32": 3418486501,
+          "actual_crc32": 3418486501,
+          "crc_matches": true,
+          "sha256": "e1afba224b26bc672068883a7e906bd39e8e9c074d065114ca908e967d7bc69e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_riveredge_rocks_small_0.vmdl_c",
+          "bytes": 7444,
+          "archive_index": 32767,
+          "expected_crc32": 345224278,
+          "actual_crc32": 345224278,
+          "crc_matches": true,
+          "sha256": "c3f8615fd74e7e90f0a4f9125fac3ed579fca4da61a2d3292fb32eda6c31816b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_river_rocks001_0.vmdl_c",
+          "bytes": 22748,
+          "archive_index": 32767,
+          "expected_crc32": 3117597229,
+          "actual_crc32": 3117597229,
+          "crc_matches": true,
+          "sha256": "3318010a0c0a27beae40579943e519fb90f1d2ea83ef95da59c131b31aca8a5b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_redstone_light_0.vmdl_c",
+          "bytes": 296510,
+          "archive_index": 32767,
+          "expected_crc32": 331009446,
+          "actual_crc32": 331009446,
+          "crc_matches": true,
+          "sha256": "fa4f29508f7b4a93c3aa7168c11464d4b735c7c3d212e891274bc79a34120bf0"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_redstone_0.vmdl_c",
+          "bytes": 1074234,
+          "archive_index": 32767,
+          "expected_crc32": 943134835,
+          "actual_crc32": 943134835,
+          "crc_matches": true,
+          "sha256": "992dc355851b171de6498a1c8f6dc90c9a7ffeda0296b770938f31b78fe419ed"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_red_gravel_0.vmdl_c",
+          "bytes": 262298,
+          "archive_index": 32767,
+          "expected_crc32": 2532532752,
+          "actual_crc32": 2532532752,
+          "crc_matches": true,
+          "sha256": "ef36d4e488a8d883ab9e65c04ea8949b017b591f2a850cd9d8c706780935394e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_red_cloth_0.vmdl_c",
+          "bytes": 6250,
+          "archive_index": 32767,
+          "expected_crc32": 660357336,
+          "actual_crc32": 660357336,
+          "crc_matches": true,
+          "sha256": "b6b4f4091f9430e226514e93383d5e0d5d065636020260caa711d91d869507a1"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_ramps001_0.vmdl_c",
+          "bytes": 54074,
+          "archive_index": 32767,
+          "expected_crc32": 1618219655,
+          "actual_crc32": 1618219655,
+          "crc_matches": true,
+          "sha256": "db5e7fbb3bef21aa8823ad419e8fd37025e15cdaabb519c4c9d78fbbfb52afae"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_quartz_0.vmdl_c",
+          "bytes": 182038,
+          "archive_index": 32767,
+          "expected_crc32": 1280979598,
+          "actual_crc32": 1280979598,
+          "crc_matches": true,
+          "sha256": "2285d6abce8b0b905c1809bdd4d1af58fa9097712497319e777d15d8e209fe10"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_plants_jungle_001_0.vmdl_c",
+          "bytes": 21202,
+          "archive_index": 32767,
+          "expected_crc32": 1435171423,
+          "actual_crc32": 1435171423,
+          "crc_matches": true,
+          "sha256": "5b0ff11990f4acca1cb18e63936a30253afe6fd3a0e3956fcb6a6943d28f8d6c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_plants_journey_001_0.vmdl_c",
+          "bytes": 17954,
+          "archive_index": 32767,
+          "expected_crc32": 2339211165,
+          "actual_crc32": 2339211165,
+          "crc_matches": true,
+          "sha256": "928f061850da449996b59a33a69fc85078c16f00a99bb1ffe74920478c2d762e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_plants001_snow_0.vmdl_c",
+          "bytes": 18734,
+          "archive_index": 32767,
+          "expected_crc32": 4033985045,
+          "actual_crc32": 4033985045,
+          "crc_matches": true,
+          "sha256": "414da6f3fffc41a452cf0899b6adcc584f8bacd9525542e2e8cd428eec025034"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_pink_light_0.vmdl_c",
+          "bytes": 175450,
+          "archive_index": 32767,
+          "expected_crc32": 3895373577,
+          "actual_crc32": 3895373577,
+          "crc_matches": true,
+          "sha256": "32fb3c48fdb159d2503374253ca0e33327c85e0c520b54d705a2cb501f0c9e01"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_pink_0.vmdl_c",
+          "bytes": 55286,
+          "archive_index": 32767,
+          "expected_crc32": 1918503793,
+          "actual_crc32": 1918503793,
+          "crc_matches": true,
+          "sha256": "599823482968e15770b357e5b17dadfcf5285482a9f4957105d9e928fd3b977e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_peat_0.vmdl_c",
+          "bytes": 18150,
+          "archive_index": 32767,
+          "expected_crc32": 3467453295,
+          "actual_crc32": 3467453295,
+          "crc_matches": true,
+          "sha256": "a89b1ecebf6378e48311b6a36de37a192528181c504d1ee4a1a94d177457fcf4"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mud_0.vmdl_c",
+          "bytes": 275446,
+          "archive_index": 32767,
+          "expected_crc32": 2355674259,
+          "actual_crc32": 2355674259,
+          "crc_matches": true,
+          "sha256": "1ff1ac18a9068d3b9af090b5c69cfdd663c3580344f3b12e918768cf7318e5a5"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_moss_4.vmdl_c",
+          "bytes": 99414,
+          "archive_index": 32767,
+          "expected_crc32": 3874503150,
+          "actual_crc32": 3874503150,
+          "crc_matches": true,
+          "sha256": "9ece71f3db96f89d27d01944d2b342c2fe396eca53e9807703445ce359fbf96c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_moss_3.vmdl_c",
+          "bytes": 99382,
+          "archive_index": 32767,
+          "expected_crc32": 2386626234,
+          "actual_crc32": 2386626234,
+          "crc_matches": true,
+          "sha256": "a9f3a0c8ea70721a569c051f9393ae51cc9630efab7b7262da12cfe9c67d19fc"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_moss_2.vmdl_c",
+          "bytes": 99398,
+          "archive_index": 32767,
+          "expected_crc32": 1271164099,
+          "actual_crc32": 1271164099,
+          "crc_matches": true,
+          "sha256": "d986a63f9e5a3cbd6daabde511a37f94e5871b0d5aa2189a5709f53003b70f04"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_moss_1.vmdl_c",
+          "bytes": 1256214,
+          "archive_index": 32767,
+          "expected_crc32": 1152994243,
+          "actual_crc32": 1152994243,
+          "crc_matches": true,
+          "sha256": "1c2f10485c31502ebaebb296e5495e852e507d1f27cbab1f82d7bc2b629dcae5"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_moss_0.vmdl_c",
+          "bytes": 38214,
+          "archive_index": 32767,
+          "expected_crc32": 1721702344,
+          "actual_crc32": 1721702344,
+          "crc_matches": true,
+          "sha256": "f517da57d1f68bebb068073cdec8b7b3bc57dbc892b479df6605c8a94e3e8df9"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mortar_4.vmdl_c",
+          "bytes": 17062,
+          "archive_index": 32767,
+          "expected_crc32": 2568286008,
+          "actual_crc32": 2568286008,
+          "crc_matches": true,
+          "sha256": "1ddd9c5f13a4bef3598b4ffca5cd5b7cbbea8e732a58d3395559781373071e84"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mortar_3.vmdl_c",
+          "bytes": 42070,
+          "archive_index": 32767,
+          "expected_crc32": 554727602,
+          "actual_crc32": 554727602,
+          "crc_matches": true,
+          "sha256": "9bb529cec46947cc4b4ca83325736913416bcac56da277debd39f1423d0edb92"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mortar_2.vmdl_c",
+          "bytes": 23702,
+          "archive_index": 32767,
+          "expected_crc32": 4158142911,
+          "actual_crc32": 4158142911,
+          "crc_matches": true,
+          "sha256": "9337f8d44801b33723d224c377b19be732de2f517eaa17c1be59e00edc187a1a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mortar_1.vmdl_c",
+          "bytes": 23670,
+          "archive_index": 32767,
+          "expected_crc32": 1474791926,
+          "actual_crc32": 1474791926,
+          "crc_matches": true,
+          "sha256": "80c84bececd93583f2b074faa246fea5d841493e78ab75f8c7fca68ef18e234c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mortar_0.vmdl_c",
+          "bytes": 23670,
+          "archive_index": 32767,
+          "expected_crc32": 3247528849,
+          "actual_crc32": 3247528849,
+          "crc_matches": true,
+          "sha256": "e261daa78c8b02b1ea8ff7f0be9434c62cb3d3c5880b772a728277e9d70b7bb6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mineral_stone_0.vmdl_c",
+          "bytes": 223230,
+          "archive_index": 32767,
+          "expected_crc32": 2975259880,
+          "actual_crc32": 2975259880,
+          "crc_matches": true,
+          "sha256": "4be2a1220175d6c63ab46bce5f61e862a6533e155181db30239e791bc238b0ca"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mineral_dark_1.vmdl_c",
+          "bytes": 35790,
+          "archive_index": 32767,
+          "expected_crc32": 909013934,
+          "actual_crc32": 909013934,
+          "crc_matches": true,
+          "sha256": "3e34393a9a1ec43746a87090dab8390a389cd670fd62ef3e15b9d5516a9df00f"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mineral_dark_0.vmdl_c",
+          "bytes": 23982,
+          "archive_index": 32767,
+          "expected_crc32": 4203579805,
+          "actual_crc32": 4203579805,
+          "crc_matches": true,
+          "sha256": "14788f215a291ce64ce0aa4d93a51a5b3508b5d42e4e6937b864b4188167700d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mineral_1.vmdl_c",
+          "bytes": 16602,
+          "archive_index": 32767,
+          "expected_crc32": 675965587,
+          "actual_crc32": 675965587,
+          "crc_matches": true,
+          "sha256": "5fd6f6ac56041e5cf2bb596417dfc75d1851e3fd1cb389828296becac06199d1"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_mineral_0.vmdl_c",
+          "bytes": 14922,
+          "archive_index": 32767,
+          "expected_crc32": 3241122935,
+          "actual_crc32": 3241122935,
+          "crc_matches": true,
+          "sha256": "7de653a3b09d6f519b93e0c84f946548f3ed79340f518e07290ba83771c0fb0a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_metal_light_1.vmdl_c",
+          "bytes": 48110,
+          "archive_index": 32767,
+          "expected_crc32": 2182446245,
+          "actual_crc32": 2182446245,
+          "crc_matches": true,
+          "sha256": "6502dc5d982f8c1d3c46aac867a5c1aa436664d5d2d25e690bab464c4bfa6e5b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_metal_light_0.vmdl_c",
+          "bytes": 66542,
+          "archive_index": 32767,
+          "expected_crc32": 1552306224,
+          "actual_crc32": 1552306224,
+          "crc_matches": true,
+          "sha256": "aaec3e84e59a3ec079af8c1720198546cc36500a0fbcfc962fd2952570e567d6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_log_end_01_0.vmdl_c",
+          "bytes": 5050,
+          "archive_index": 32767,
+          "expected_crc32": 3418823494,
+          "actual_crc32": 3418823494,
+          "crc_matches": true,
+          "sha256": "18e8d409187eb8ca97e0727b824619b7805378e8fb010537870f3b71039cdaff"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_log002_0.vmdl_c",
+          "bytes": 12870,
+          "archive_index": 32767,
+          "expected_crc32": 2056589123,
+          "actual_crc32": 2056589123,
+          "crc_matches": true,
+          "sha256": "7d13d4d88be7fac168bceeeecce00190b1c83e7876f0ffe9a08dd66d0a0a753b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_lilypad_ti10_01_0.vmdl_c",
+          "bytes": 5106,
+          "archive_index": 32767,
+          "expected_crc32": 4098508423,
+          "actual_crc32": 4098508423,
+          "crc_matches": true,
+          "sha256": "5023c8677e0127397f1cc8b73ab5f60efc88d51ad2f48175753ca9603d6df943"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_lily_flower_00_0.vmdl_c",
+          "bytes": 10286,
+          "archive_index": 32767,
+          "expected_crc32": 96632571,
+          "actual_crc32": 96632571,
+          "crc_matches": true,
+          "sha256": "568e23cc599d771c032db09e245f8aedcf98654183db16a5e8cc7766b516542c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_light_4.vmdl_c",
+          "bytes": 53642,
+          "archive_index": 32767,
+          "expected_crc32": 3702543608,
+          "actual_crc32": 3702543608,
+          "crc_matches": true,
+          "sha256": "e77a1addcc82027d0ffe9fd3bdcd4701ca3c9c4065ea64066f59ec0d8d71885a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_light_3.vmdl_c",
+          "bytes": 3220618,
+          "archive_index": 32767,
+          "expected_crc32": 2575225374,
+          "actual_crc32": 2575225374,
+          "crc_matches": true,
+          "sha256": "bb842e60a670f117285c919f9614b4edc2c668b6522f07fa27edb9b63f610d1c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_light_2.vmdl_c",
+          "bytes": 53642,
+          "archive_index": 32767,
+          "expected_crc32": 3767467277,
+          "actual_crc32": 3767467277,
+          "crc_matches": true,
+          "sha256": "214aaad7309626d9402ad700716d67b1731dc8e424ad9b0752109fce525b28d9"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_light_1.vmdl_c",
+          "bytes": 53610,
+          "archive_index": 32767,
+          "expected_crc32": 3441453616,
+          "actual_crc32": 3441453616,
+          "crc_matches": true,
+          "sha256": "83623b8765d26d3a5561998fade88e5842ce88a4e6843898d77c405777648dca"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_light_0.vmdl_c",
+          "bytes": 53610,
+          "archive_index": 32767,
+          "expected_crc32": 882249645,
+          "actual_crc32": 882249645,
+          "crc_matches": true,
+          "sha256": "1854b16e69e73986b2cbc32ebca797b3dff3b57df81ddeec0a15841f9c9a6379"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_dark_4.vmdl_c",
+          "bytes": 30714,
+          "archive_index": 32767,
+          "expected_crc32": 3787647056,
+          "actual_crc32": 3787647056,
+          "crc_matches": true,
+          "sha256": "cb5863ba2541011f054cbbfe337f6a322b95281769c6571ab2f195ff736a93e4"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_dark_3.vmdl_c",
+          "bytes": 30746,
+          "archive_index": 32767,
+          "expected_crc32": 3613600181,
+          "actual_crc32": 3613600181,
+          "crc_matches": true,
+          "sha256": "9635a065bbff388d723f9bd8f6f9bccb23d913fbfaf42b623c5488f2a6603c84"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_dark_2.vmdl_c",
+          "bytes": 30746,
+          "archive_index": 32767,
+          "expected_crc32": 3595906040,
+          "actual_crc32": 3595906040,
+          "crc_matches": true,
+          "sha256": "c2870599cea9b616c9b3125fbc4a13a047ac48bca0b4b7f479334a3cc3ba4070"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_dark_1.vmdl_c",
+          "bytes": 30714,
+          "archive_index": 32767,
+          "expected_crc32": 2003590071,
+          "actual_crc32": 2003590071,
+          "crc_matches": true,
+          "sha256": "5bff59bf9b040567949f3dc3c959ff3e092fae5b776271fa75327e9ce868b5d1"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_dark_0.vmdl_c",
+          "bytes": 1992410,
+          "archive_index": 32767,
+          "expected_crc32": 3136953301,
+          "actual_crc32": 3136953301,
+          "crc_matches": true,
+          "sha256": "17bdc781ae74766b20aacac1faea2a252f47c51799f764e5bcbe962b7cbe4243"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_4.vmdl_c",
+          "bytes": 29686,
+          "archive_index": 32767,
+          "expected_crc32": 3735857796,
+          "actual_crc32": 3735857796,
+          "crc_matches": true,
+          "sha256": "45c9d325a3f0f079badf03aff61af1778a475190f90c6e015486a45f580e2240"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_3.vmdl_c",
+          "bytes": 29686,
+          "archive_index": 32767,
+          "expected_crc32": 3486436447,
+          "actual_crc32": 3486436447,
+          "crc_matches": true,
+          "sha256": "d880b8f9355ac2b76e247df5f76690f48865e5a5bbc6fcc4667dfbad7c869a73"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_2.vmdl_c",
+          "bytes": 29686,
+          "archive_index": 32767,
+          "expected_crc32": 3210664525,
+          "actual_crc32": 3210664525,
+          "crc_matches": true,
+          "sha256": "b392f3054a018605644a79066c60c77164ff3b123b7ab8b278c9a4c45028e7fe"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_1.vmdl_c",
+          "bytes": 29718,
+          "archive_index": 32767,
+          "expected_crc32": 1509859235,
+          "actual_crc32": 1509859235,
+          "crc_matches": true,
+          "sha256": "8e96d26f6a3084cc858eae648910574a86f6c4874e2a7769720059a03928d596"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_leaf_0.vmdl_c",
+          "bytes": 1452646,
+          "archive_index": 32767,
+          "expected_crc32": 1831027772,
+          "actual_crc32": 1831027772,
+          "crc_matches": true,
+          "sha256": "d341891602b7f1bbbf80a818f04ed12a6ea5f58b75778ef52eefa7ab222e9942"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_jungle_temple_wall01_0.vmdl_c",
+          "bytes": 168405,
+          "archive_index": 32767,
+          "expected_crc32": 3767204243,
+          "actual_crc32": 3767204243,
+          "crc_matches": true,
+          "sha256": "123ebfc3116d7185f025912a272bd5e2d8d6313307da8df2a6d14c9a083f15dc"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_jungle_temple_upperwall01_0.vmdl_c",
+          "bytes": 19673,
+          "archive_index": 32767,
+          "expected_crc32": 4142199427,
+          "actual_crc32": 4142199427,
+          "crc_matches": true,
+          "sha256": "b42a6d298ff4e9b389051205f95ce64db1ff13fb3c1a354b93205901e906094f"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_jungle_temple_statue_01_0.vmdl_c",
+          "bytes": 9625,
+          "archive_index": 32767,
+          "expected_crc32": 3414738526,
+          "actual_crc32": 3414738526,
+          "crc_matches": true,
+          "sha256": "087c6db363305d05c1933f82b01bc2aa84c5c27e71fccf0c3cccc46b6b5500bc"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_jungle_temple_rubble_0.vmdl_c",
+          "bytes": 49685,
+          "archive_index": 32767,
+          "expected_crc32": 1235536060,
+          "actual_crc32": 1235536060,
+          "crc_matches": true,
+          "sha256": "4f8cd87e57ba3042ef5efc6b4096ebc75db490c8ae6e0096af2ef2f95950f16a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_jungle_temple_endpiece_0.vmdl_c",
+          "bytes": 8869,
+          "archive_index": 32767,
+          "expected_crc32": 549052557,
+          "actual_crc32": 549052557,
+          "crc_matches": true,
+          "sha256": "fe46cd9eeb9df73ac1c4cbb20baea60a0bcd3470657e856dee37f117586c659e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_jungle_temple_corner01_0.vmdl_c",
+          "bytes": 43509,
+          "archive_index": 32767,
+          "expected_crc32": 4136474015,
+          "actual_crc32": 4136474015,
+          "crc_matches": true,
+          "sha256": "776447341009d57e4784fdc76b683610dac020ef1393076302c49dee98e38a0d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_journey_ivy001_0.vmdl_c",
+          "bytes": 11310,
+          "archive_index": 32767,
+          "expected_crc32": 349363527,
+          "actual_crc32": 349363527,
+          "crc_matches": true,
+          "sha256": "8c526699488c2db01fb86b9e58895493950b098eafc64889a2371bcc56a6dbb0"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_jade_light_0.vmdl_c",
+          "bytes": 798762,
+          "archive_index": 32767,
+          "expected_crc32": 988846682,
+          "actual_crc32": 988846682,
+          "crc_matches": true,
+          "sha256": "7271fcea7f8751a5dc88ecd3f31dbb06ae840565380d3d0cbcf11b84a0268a0a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_jade_0.vmdl_c",
+          "bytes": 625590,
+          "archive_index": 32767,
+          "expected_crc32": 3328029310,
+          "actual_crc32": 3328029310,
+          "crc_matches": true,
+          "sha256": "14db6fd44e60c550319b810046bff27a5f08e49dab88a52eeec1881f95524c21"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_ivory_light_0.vmdl_c",
+          "bytes": 170430,
+          "archive_index": 32767,
+          "expected_crc32": 1251308604,
+          "actual_crc32": 1251308604,
+          "crc_matches": true,
+          "sha256": "1171919d40e5dd4d648bc8c3268c713fe7155405229efed827aedf93147f108b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_ivory_1.vmdl_c",
+          "bytes": 710694,
+          "archive_index": 32767,
+          "expected_crc32": 617503129,
+          "actual_crc32": 617503129,
+          "crc_matches": true,
+          "sha256": "5fc8c0a1f9b0ac898b8aa8df74118177773e42174b61175b1fec412ebc48d9ee"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_ivory_0.vmdl_c",
+          "bytes": 709462,
+          "archive_index": 32767,
+          "expected_crc32": 4114689797,
+          "actual_crc32": 4114689797,
+          "crc_matches": true,
+          "sha256": "99a3b6b7b13710d454179ff02202d96b040a1b3b2800b095769aa9984890616e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_iron_2.vmdl_c",
+          "bytes": 56358,
+          "archive_index": 32767,
+          "expected_crc32": 4071506123,
+          "actual_crc32": 4071506123,
+          "crc_matches": true,
+          "sha256": "cb8eb54e83c04a5eb40b40a4c8790e539c7898cad01f7e6012878464794cd6a9"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_iron_1.vmdl_c",
+          "bytes": 234838,
+          "archive_index": 32767,
+          "expected_crc32": 3055557588,
+          "actual_crc32": 3055557588,
+          "crc_matches": true,
+          "sha256": "7c56772368c25a231b0319167ddbbbe66874aa8f92b6f7cb28cbf07970686ea7"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_iron_0.vmdl_c",
+          "bytes": 44006,
+          "archive_index": 32767,
+          "expected_crc32": 3241156413,
+          "actual_crc32": 3241156413,
+          "crc_matches": true,
+          "sha256": "c0372910c8bc033b891fbfe5ed5477c509f0eec8b1722d258ebeb2282ff74c61"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_ice_0.vmdl_c",
+          "bytes": 394806,
+          "archive_index": 32767,
+          "expected_crc32": 1936471219,
+          "actual_crc32": 1936471219,
+          "crc_matches": true,
+          "sha256": "36c62c0a7faeee8056720eafa17bf7a5171d3558975a6812871e25a126c194c6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_gold_5.vmdl_c",
+          "bytes": 1132230,
+          "archive_index": 32767,
+          "expected_crc32": 2103012741,
+          "actual_crc32": 2103012741,
+          "crc_matches": true,
+          "sha256": "a5a6f7c92c82da70d2944efb0a8628318926bd6415772e1eec9047fec9c2eef8"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_gold_4.vmdl_c",
+          "bytes": 46790,
+          "archive_index": 32767,
+          "expected_crc32": 735209341,
+          "actual_crc32": 735209341,
+          "crc_matches": true,
+          "sha256": "5123d0cc1a1ead370e93e7c29ca8cfab5328a3badbe8ba31d7d04c31509f9f40"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_gold_3.vmdl_c",
+          "bytes": 108326,
+          "archive_index": 32767,
+          "expected_crc32": 3893916687,
+          "actual_crc32": 3893916687,
+          "crc_matches": true,
+          "sha256": "498fed08843ef21629e12c10cefc786b584bdfe52ebca1f729d8cc94b212f9c1"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_gold_2.vmdl_c",
+          "bytes": 167190,
+          "archive_index": 32767,
+          "expected_crc32": 3038678901,
+          "actual_crc32": 3038678901,
+          "crc_matches": true,
+          "sha256": "27ed38c50166095f5d2e9a70ccc9c18fa239ddb2544ec68ed693220657435e1d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_gold_1.vmdl_c",
+          "bytes": 1398966,
+          "archive_index": 32767,
+          "expected_crc32": 2629712673,
+          "actual_crc32": 2629712673,
+          "crc_matches": true,
+          "sha256": "1df5973ba97bb5db222817f56a2a9d34852bab73c59b000214baf6f676d2e238"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_gold_0.vmdl_c",
+          "bytes": 107606,
+          "archive_index": 32767,
+          "expected_crc32": 1258925682,
+          "actual_crc32": 1258925682,
+          "crc_matches": true,
+          "sha256": "be80af9a6f885a264c5804685762878729c5186e00209d7ebbad9e64300f9e3d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_forest_earth_0.vmdl_c",
+          "bytes": 25870,
+          "archive_index": 32767,
+          "expected_crc32": 3029339776,
+          "actual_crc32": 3029339776,
+          "crc_matches": true,
+          "sha256": "6bfbf21679e66648fd19b0f43ae5213f295e4e0223a551a296ea16c360536b0d"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_foam_0.vmdl_c",
+          "bytes": 94390,
+          "archive_index": 32767,
+          "expected_crc32": 1459650033,
+          "actual_crc32": 1459650033,
+          "crc_matches": true,
+          "sha256": "447caf8826b4a45a463222d3aa85a9b4f8fd08d2d80d0dc3766e54471a575805"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_flowers_ti10_01_0.vmdl_c",
+          "bytes": 6642,
+          "archive_index": 32767,
+          "expected_crc32": 3110722055,
+          "actual_crc32": 3110722055,
+          "crc_matches": true,
+          "sha256": "1408487ce1c767fed18d65fa2c59db33197312efc64d1b833f37e9a5a0a7fff7"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_flowers_01_0.vmdl_c",
+          "bytes": 5866,
+          "archive_index": 32767,
+          "expected_crc32": 187878629,
+          "actual_crc32": 187878629,
+          "crc_matches": true,
+          "sha256": "ee63fb7f89ee72d8310babef5bb7baad804ce40f9c37fccb0f615be7a8e181b2"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_flower_set_0.vmdl_c",
+          "bytes": 7402,
+          "archive_index": 32767,
+          "expected_crc32": 2042884667,
+          "actual_crc32": 2042884667,
+          "crc_matches": true,
+          "sha256": "cc3506a6cbcb8d086cf69b9f4e838ed26735c14881e54d97b72185f9e3b622ed"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_flower_4.vmdl_c",
+          "bytes": 146582,
+          "archive_index": 32767,
+          "expected_crc32": 2602502630,
+          "actual_crc32": 2602502630,
+          "crc_matches": true,
+          "sha256": "bac17ce3dd60594f5a367c458a527cb33a87f623628618a2ed55cc75b48b7c50"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_flower_3.vmdl_c",
+          "bytes": 9734,
+          "archive_index": 32767,
+          "expected_crc32": 1648585896,
+          "actual_crc32": 1648585896,
+          "crc_matches": true,
+          "sha256": "7312ddd985beea8a10b5c4c0f633721c54e343847e3dbb60b6c97eee4a8879fb"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_flower_2.vmdl_c",
+          "bytes": 9718,
+          "archive_index": 32767,
+          "expected_crc32": 435153980,
+          "actual_crc32": 435153980,
+          "crc_matches": true,
+          "sha256": "8ef8832ab35c90d553e66f5ef793fd6925d70be4be93bc9a01b7beaddce22e41"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_flower_1.vmdl_c",
+          "bytes": 9702,
+          "archive_index": 32767,
+          "expected_crc32": 999282061,
+          "actual_crc32": 999282061,
+          "crc_matches": true,
+          "sha256": "f77f28b6d16b14ef1cde05618b951aca7bd5b96bef9b33991257a3662d041563"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_flower_0.vmdl_c",
+          "bytes": 9702,
+          "archive_index": 32767,
+          "expected_crc32": 1336579861,
+          "actual_crc32": 1336579861,
+          "crc_matches": true,
+          "sha256": "20b5475e002886f6743f32d493ba9ba6c47f8869563f60cdd13cff3ef69ff87e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_earth_edge_0.vmdl_c",
+          "bytes": 160538,
+          "archive_index": 32767,
+          "expected_crc32": 3899960833,
+          "actual_crc32": 3899960833,
+          "crc_matches": true,
+          "sha256": "6046e3e8e2724f1cda006df07e74cfb482434611a31af66efeee266169a6af2a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_earth_4.vmdl_c",
+          "bytes": 11398,
+          "archive_index": 32767,
+          "expected_crc32": 5449808,
+          "actual_crc32": 5449808,
+          "crc_matches": true,
+          "sha256": "e2376d973a83dd51c748efa866526ba7a8f5f9dbd820c66ba8f561fd8a7c9433"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_earth_3.vmdl_c",
+          "bytes": 11366,
+          "archive_index": 32767,
+          "expected_crc32": 2794923866,
+          "actual_crc32": 2794923866,
+          "crc_matches": true,
+          "sha256": "92573145f634877fb0c4368d2e781f2915099c956318944101aefc5b67799ad6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_earth_2.vmdl_c",
+          "bytes": 11366,
+          "archive_index": 32767,
+          "expected_crc32": 405364439,
+          "actual_crc32": 405364439,
+          "crc_matches": true,
+          "sha256": "0898ee2d702ea459059a5539fc2fb125c11dcca1fc63f39fc26280082e043ff3"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_earth_1.vmdl_c",
+          "bytes": 11382,
+          "archive_index": 32767,
+          "expected_crc32": 2752570559,
+          "actual_crc32": 2752570559,
+          "crc_matches": true,
+          "sha256": "7fd509f1646440355d8bf74744092feadbb354aa4d0c993b648f44eed514f6d6"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_earth_0.vmdl_c",
+          "bytes": 7366,
+          "archive_index": 32767,
+          "expected_crc32": 1871789207,
+          "actual_crc32": 1871789207,
+          "crc_matches": true,
+          "sha256": "38e358a9940ba42aec8f5815188d9b91156fff0d8b73366d15180b1a79f610cc"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_dressed_stone_0.vmdl_c",
+          "bytes": 513342,
+          "archive_index": 32767,
+          "expected_crc32": 3264759990,
+          "actual_crc32": 3264759990,
+          "crc_matches": true,
+          "sha256": "b01bae123fb989ae6ec155f069fcd6c217595fd7a74a5d2ed91ae0b1bc5ed1f3"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_crystal_0.vmdl_c",
+          "bytes": 8170,
+          "archive_index": 32767,
+          "expected_crc32": 2621840243,
+          "actual_crc32": 2621840243,
+          "crc_matches": true,
+          "sha256": "45e1e9d87ebcc3e0046712b45d061594e7c2d176ee53ae3373269a32b3aafc28"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_crypt_statue_01_0.vmdl_c",
+          "bytes": 32082,
+          "archive_index": 32767,
+          "expected_crc32": 2397079187,
+          "actual_crc32": 2397079187,
+          "crc_matches": true,
+          "sha256": "670112c8f2e18d42c50cf37a1a9ed0816ea2010d1c592a6462037643d9087cd7"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_crypt_door_01_0.vmdl_c",
+          "bytes": 11758,
+          "archive_index": 32767,
+          "expected_crc32": 2587242197,
+          "actual_crc32": 2587242197,
+          "crc_matches": true,
+          "sha256": "27ce64e33b0e19dc06764e35e65988a08fde56a10f63507f2b43e3d9ac237f52"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_coral_light_0.vmdl_c",
+          "bytes": 378222,
+          "archive_index": 32767,
+          "expected_crc32": 1735587557,
+          "actual_crc32": 1735587557,
+          "crc_matches": true,
+          "sha256": "5b8e0df3b0f79202d7d473831cf6b6744d02255a99815e8f7920bfb547c3447f"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_coral_0.vmdl_c",
+          "bytes": 1000774,
+          "archive_index": 32767,
+          "expected_crc32": 1473469267,
+          "actual_crc32": 1473469267,
+          "crc_matches": true,
+          "sha256": "eca4170788d79bde94e4bc4839ed07d2323124ae301f911248167d7da8ff7d40"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_cloud_shadow_0.vmdl_c",
+          "bytes": 384622,
+          "archive_index": 32767,
+          "expected_crc32": 1997034318,
+          "actual_crc32": 1997034318,
+          "crc_matches": true,
+          "sha256": "d8ea121219f4473e4a410b3c67a7ecbf4cd99acd3b53fb539f8beb4e8fbeef61"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_cloud_pearl_0.vmdl_c",
+          "bytes": 352558,
+          "archive_index": 32767,
+          "expected_crc32": 264214047,
+          "actual_crc32": 264214047,
+          "crc_matches": true,
+          "sha256": "12bb087bc11f2694b576daf30ee73b636e7bb61ef34a3494a16f398f906b0c18"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_cloud_0.vmdl_c",
+          "bytes": 667926,
+          "archive_index": 32767,
+          "expected_crc32": 77193706,
+          "actual_crc32": 77193706,
+          "crc_matches": true,
+          "sha256": "20d92b02b8c93cf36549c55f35ae435c728e699f64037d670c45d52cb677af18"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_candles003_0.vmdl_c",
+          "bytes": 21034,
+          "archive_index": 32767,
+          "expected_crc32": 862678202,
+          "actual_crc32": 862678202,
+          "crc_matches": true,
+          "sha256": "b835677c4e9d399ab64855d528e224a2728eaa8ca92daef2a347265a1c135383"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_candles001_0.vmdl_c",
+          "bytes": 25610,
+          "archive_index": 32767,
+          "expected_crc32": 3206733041,
+          "actual_crc32": 3206733041,
+          "crc_matches": true,
+          "sha256": "17883647959503616c43b5f4d6762b3e36ea826bca770dd9fbfaf7fa993bfc9c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_campfire_rocks001_0.vmdl_c",
+          "bytes": 9922,
+          "archive_index": 32767,
+          "expected_crc32": 866381968,
+          "actual_crc32": 866381968,
+          "crc_matches": true,
+          "sha256": "407c7800c6cf9a55d96f44eec1a95e6769086ec519b8ab9306aa8b56ba156706"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bush_ti10_01_0.vmdl_c",
+          "bytes": 27998,
+          "archive_index": 32767,
+          "expected_crc32": 2274831886,
+          "actual_crc32": 2274831886,
+          "crc_matches": true,
+          "sha256": "2bf2f14f6450bb8519832deef10177bc4408905554526dd5a5e21409269ce993"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bush_spring_02_0.vmdl_c",
+          "bytes": 5950,
+          "archive_index": 32767,
+          "expected_crc32": 724795146,
+          "actual_crc32": 724795146,
+          "crc_matches": true,
+          "sha256": "0a2a1e60d479921cebc607303ca1bf34f03621fb304b5e68a9d9ae309436cda5"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bush_spring_01_0.vmdl_c",
+          "bytes": 6798,
+          "archive_index": 32767,
+          "expected_crc32": 3045762841,
+          "actual_crc32": 3045762841,
+          "crc_matches": true,
+          "sha256": "7ea1b185ff22c988dba64baba66a1758b6d3b3d093f49a53aa09ef65b9c135eb"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bush_snow_00_0.vmdl_c",
+          "bytes": 8094,
+          "archive_index": 32767,
+          "expected_crc32": 1767515588,
+          "actual_crc32": 1767515588,
+          "crc_matches": true,
+          "sha256": "c6a9b89f58b1681a1e7fc97baaa03895bbdfbd82c2b5ec31dd704f614b9f0057"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bush_nettle_a_01_0.vmdl_c",
+          "bytes": 8258,
+          "archive_index": 32767,
+          "expected_crc32": 3756160091,
+          "actual_crc32": 3756160091,
+          "crc_matches": true,
+          "sha256": "f866a137668c985351041bf4054a9459101beb981b7b7ea3b6fd32427432033b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bush_journey_02_0.vmdl_c",
+          "bytes": 9090,
+          "archive_index": 32767,
+          "expected_crc32": 4063528875,
+          "actual_crc32": 4063528875,
+          "crc_matches": true,
+          "sha256": "c63f2f5d34dbf6390a59369d6c2fa864ed81421b3bac4ee206bf11befac638de"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bush_dire_summer_02_0.vmdl_c",
+          "bytes": 8118,
+          "archive_index": 32767,
+          "expected_crc32": 437676107,
+          "actual_crc32": 437676107,
+          "crc_matches": true,
+          "sha256": "49980bba18778aa0193925e88141c80bcc4094cb1e8c00c5342a7675c6584ed8"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bronze_5.vmdl_c",
+          "bytes": 99670,
+          "archive_index": 32767,
+          "expected_crc32": 1963229394,
+          "actual_crc32": 1963229394,
+          "crc_matches": true,
+          "sha256": "6dadd35de39c1c5ea1b2f6292d942d51622456fd0e866a43fc66e70a756a1f14"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bronze_4.vmdl_c",
+          "bytes": 136006,
+          "archive_index": 32767,
+          "expected_crc32": 3747451403,
+          "actual_crc32": 3747451403,
+          "crc_matches": true,
+          "sha256": "f713d266d5b5c96fe154d225c40ab572fc57631861bbcece5761b8fd91f3fe88"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bronze_3.vmdl_c",
+          "bytes": 140758,
+          "archive_index": 32767,
+          "expected_crc32": 4204222858,
+          "actual_crc32": 4204222858,
+          "crc_matches": true,
+          "sha256": "b78b9179d010fd9da05910de263a2e14d143428b3d0ec796b37cba960a6546f3"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bronze_2.vmdl_c",
+          "bytes": 99654,
+          "archive_index": 32767,
+          "expected_crc32": 3438036679,
+          "actual_crc32": 3438036679,
+          "crc_matches": true,
+          "sha256": "9406e32aa21cc379defcdfb9dcb8ac6f90c03e6ce11746da94eb8632ccc77cce"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bronze_1.vmdl_c",
+          "bytes": 208646,
+          "archive_index": 32767,
+          "expected_crc32": 2402840615,
+          "actual_crc32": 2402840615,
+          "crc_matches": true,
+          "sha256": "8ffc4ae26a69b37315fd9526d5bb3758d9d6a9f832a33653387df22943463f18"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bronze_0.vmdl_c",
+          "bytes": 1574870,
+          "archive_index": 32767,
+          "expected_crc32": 4097775963,
+          "actual_crc32": 4097775963,
+          "crc_matches": true,
+          "sha256": "1d3a1fbf2413f4ddd44cb840e70fdacece0606833fafb37d57235fc493adb9cb"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bones_tintable_002_0.vmdl_c",
+          "bytes": 70016,
+          "archive_index": 32767,
+          "expected_crc32": 3960579446,
+          "actual_crc32": 3960579446,
+          "crc_matches": true,
+          "sha256": "1a82fac40863515a426dff5f68e127b0e21ab03b39fc8cecfa0a892d360e3df1"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bone_0.vmdl_c",
+          "bytes": 419045,
+          "archive_index": 32767,
+          "expected_crc32": 2427136341,
+          "actual_crc32": 2427136341,
+          "crc_matches": true,
+          "sha256": "61b5a2310de786c8c33672bdec23f8fd2408caed45104067fe3896f170285161"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_basalt_wet_0.vmdl_c",
+          "bytes": 284314,
+          "archive_index": 32767,
+          "expected_crc32": 2658558999,
+          "actual_crc32": 2658558999,
+          "crc_matches": true,
+          "sha256": "e9dc2b62d0466ed10009b688c29fb9c22421b1b860480d41325f68e8a709721a"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_basalt_0.vmdl_c",
+          "bytes": 876358,
+          "archive_index": 32767,
+          "expected_crc32": 1451778748,
+          "actual_crc32": 1451778748,
+          "crc_matches": true,
+          "sha256": "8b36a44d780988f9bfb5fee2d52ee76f37a913eb9e606a97998892ef1db36d24"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bark_1.vmdl_c",
+          "bytes": 623142,
+          "archive_index": 32767,
+          "expected_crc32": 1669662909,
+          "actual_crc32": 1669662909,
+          "crc_matches": true,
+          "sha256": "13b4303488d8fdf1a32cae190bd019a67a657f519da5f850bdbca81aa503b1af"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_bark_0.vmdl_c",
+          "bytes": 11510,
+          "archive_index": 32767,
+          "expected_crc32": 483352684,
+          "actual_crc32": 483352684,
+          "crc_matches": true,
+          "sha256": "bebeba6700ffc8e8f0e54c2f075a44365e8d950f8f48c3b0ea06fc9545b9040c"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_prop_amethyst_0.vmdl_c",
+          "bytes": 417898,
+          "archive_index": 32767,
+          "expected_crc32": 233341083,
+          "actual_crc32": 233341083,
+          "crc_matches": true,
+          "sha256": "00665c71e821ec6c56e55c2043d4b489744d5abface1f65c654517ebff4bfdd4"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_radiant_jungle_01_0.vmdl_c",
+          "bytes": 72818,
+          "archive_index": 32767,
+          "expected_crc32": 4202386332,
+          "actual_crc32": 4202386332,
+          "crc_matches": true,
+          "sha256": "b45468c2246cdf1d5bb8a7708e980ef1ce62f6f87cd5b2a8ea5a1c28aa511ce2"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_radiant_winter_riverbed_path_000_0.vmdl_c",
+          "bytes": 53396,
+          "archive_index": 32767,
+          "expected_crc32": 533323081,
+          "actual_crc32": 533323081,
+          "crc_matches": true,
+          "sha256": "223e6b212e6f703aaf2afe2047c7439e78c3909564c2df12fa84f64030b62223"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_radiant_winter_path_000_0.vmdl_c",
+          "bytes": 345102,
+          "archive_index": 32767,
+          "expected_crc32": 253772711,
+          "actual_crc32": 253772711,
+          "crc_matches": true,
+          "sha256": "4231350d19b64449190cec54131a7d909ebba4a3b9f7ddd9f7f45a437c6ade2e"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_radiant_winter_000_0.vmdl_c",
+          "bytes": 1018554,
+          "archive_index": 32767,
+          "expected_crc32": 382487724,
+          "actual_crc32": 382487724,
+          "crc_matches": true,
+          "sha256": "86ecdba0f237932fc317ed3e29e28a8f5d4e847aee8df40ce35de97e16f3e165"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_radiant_ti10_riverbed_path_000_0.vmdl_c",
+          "bytes": 1190868,
+          "archive_index": 32767,
+          "expected_crc32": 2378947393,
+          "actual_crc32": 2378947393,
+          "crc_matches": true,
+          "sha256": "5a6f9622ad4d8304de18da677f2fd5250575f5a18f5b72ace138931da5ed1ef0"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_radiant_ti10_angled_000_0.vmdl_c",
+          "bytes": 188798,
+          "archive_index": 32767,
+          "expected_crc32": 3928289095,
+          "actual_crc32": 3928289095,
+          "crc_matches": true,
+          "sha256": "0e801d50426f8929f73c2b22ebf35485aa772f4cb0b971da54441222ca11b340"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_radiant_coloseum_000_0.vmdl_c",
+          "bytes": 298394,
+          "archive_index": 32767,
+          "expected_crc32": 811881819,
+          "actual_crc32": 811881819,
+          "crc_matches": true,
+          "sha256": "c98df9b186fe9cdc4c941d59949e0d8524c5b4fb10e00fa1ac6f10b90c7a3858"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_dire_path_000_0.vmdl_c",
+          "bytes": 5842,
+          "archive_index": 32767,
+          "expected_crc32": 4090496314,
+          "actual_crc32": 4090496314,
+          "crc_matches": true,
+          "sha256": "ae25b199ed1f455c879912c70dcf4ae79beda77dfa1cbe035d7438ae31f75b4b"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_dire_journey_riverbed_path_000_0.vmdl_c",
+          "bytes": 74740,
+          "archive_index": 32767,
+          "expected_crc32": 257315349,
+          "actual_crc32": 257315349,
+          "crc_matches": true,
+          "sha256": "59f959c7ba6913ba39f045e598950e0a475b1657f09b01bb6ec87e80d551f6f7"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_mod_dire_journey_path_000_0.vmdl_c",
+          "bytes": 468058,
+          "archive_index": 32767,
+          "expected_crc32": 3634015796,
+          "actual_crc32": 3634015796,
+          "crc_matches": true,
+          "sha256": "e488c1f998991182fc578ea70d07bdbda75687b388a2362b8e04b4eaae476ff0"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_floor_support_3.vmdl_c",
+          "bytes": 9998,
+          "archive_index": 32767,
+          "expected_crc32": 2142945871,
+          "actual_crc32": 2142945871,
+          "crc_matches": true,
+          "sha256": "47eef5e63f3769d48b96e5b359718649a99f023be23cdf75a002048a1dfb37d0"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_floor_support_2.vmdl_c",
+          "bytes": 15374,
+          "archive_index": 32767,
+          "expected_crc32": 1341573676,
+          "actual_crc32": 1341573676,
+          "crc_matches": true,
+          "sha256": "8b9617ddade00c063c67788864718c3567904d6dbeda0a16f76534c7f931c04f"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_floor_support_1.vmdl_c",
+          "bytes": 9966,
+          "archive_index": 32767,
+          "expected_crc32": 2293821989,
+          "actual_crc32": 2293821989,
+          "crc_matches": true,
+          "sha256": "e1211fd6f8d87bcd7641c1319d7cfc522be77986bcd6f1051a838e6e568a6d66"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_floor_support_0.vmdl_c",
+          "bytes": 9966,
+          "archive_index": 32767,
+          "expected_crc32": 3793928467,
+          "actual_crc32": 3793928467,
+          "crc_matches": true,
+          "sha256": "68e551830abf8db2efe715ebdb6df0085e8b94ea0e54f532649379db219f7653"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0_lr0_agg_merge_dire_jungle_01_0.vmdl_c",
+          "bytes": 107634,
+          "archive_index": 32767,
+          "expected_crc32": 1875993887,
+          "actual_crc32": 1875993887,
+          "crc_matches": true,
+          "sha256": "51e9fed4a6aed1047922dd939a03e73c6b73412ce103614be04e6b2103f3088e"
+        },
+        {
+          "path": "maps/template_map/world_physics.vmdl_c",
+          "bytes": 5067388,
+          "archive_index": 32767,
+          "expected_crc32": 1002126729,
+          "actual_crc32": 1002126729,
+          "crc_matches": true,
+          "sha256": "b291a14eb2e1dc0804deb3421083edfa455d7eec5105da2287ce2327b8314b8b"
+        },
+        {
+          "path": "maps/template_map/world.vwrld_c",
+          "bytes": 1499,
+          "archive_index": 32767,
+          "expected_crc32": 470700024,
+          "actual_crc32": 470700024,
+          "crc_matches": true,
+          "sha256": "506a7586869a406c0d04c59e60e23ef065dc383ad381c2b21932b3f7192a35b5"
+        },
+        {
+          "path": "maps/template_map/worldnodes/n0.vrman_c",
+          "bytes": 922,
+          "archive_index": 32767,
+          "expected_crc32": 2647005090,
+          "actual_crc32": 2647005090,
+          "crc_matches": true,
+          "sha256": "bf0a1a0f96bd51d9f8b787005753f42eba1cd883e0616fbed31d5b14af30fe35"
+        },
+        {
+          "path": "maps/template_map/world_physics.vrman_c",
+          "bytes": 921,
+          "archive_index": 32767,
+          "expected_crc32": 2180198986,
+          "actual_crc32": 2180198986,
+          "crc_matches": true,
+          "sha256": "fec9ec9299fa78d792a92982f1cb243d0fffedbdc2f2a764b6bb41c2049057f5"
+        },
+        {
+          "path": "maps/template_map/world.vrman_c",
+          "bytes": 936,
+          "archive_index": 32767,
+          "expected_crc32": 1007745749,
+          "actual_crc32": 1007745749,
+          "crc_matches": true,
+          "sha256": "269b228e26f875ca129c14c289dd2e0231270f7554d1868d0f424dbd0c2f7648"
+        },
+        {
+          "path": "maps/template_map/water_flow_map.vtex_c",
+          "bytes": 2099252,
+          "archive_index": 32767,
+          "expected_crc32": 1689680259,
+          "actual_crc32": 1689680259,
+          "crc_matches": true,
+          "sha256": "b2d21f66f893eaa8e13cc47dfd21b27503a3549e579332d72cb7727739d44d4d"
+        },
+        {
+          "path": "maps/template_map/fog_opacity_map.vtex_c",
+          "bytes": 2099252,
+          "archive_index": 32767,
+          "expected_crc32": 1673392303,
+          "actual_crc32": 1673392303,
+          "crc_matches": true,
+          "sha256": "ee8db089cc041c3c4c4e80d9fa0be9a5d81745124331560f7525c69ce85ac9c8"
+        },
+        {
+          "path": "maps/template_map/fog_flow_map.vtex_c",
+          "bytes": 2099252,
+          "archive_index": 32767,
+          "expected_crc32": 4219630136,
+          "actual_crc32": 4219630136,
+          "crc_matches": true,
+          "sha256": "b50bf3d09f498b9af2be244a56910c0c8e936e172c19d0bb5e937febb181cad7"
+        },
+        {
+          "path": "maps/template_map/entities/default_ents.vents_c",
+          "bytes": 83357,
+          "archive_index": 32767,
+          "expected_crc32": 233012025,
+          "actual_crc32": 233012025,
+          "crc_matches": true,
+          "sha256": "3a37b35b1859c9d0d1c74367bc3e6e6de0b9ccb4b5922e81eba99062964c0dee"
+        },
+        {
+          "path": "maps/template_map.vmap_c",
+          "bytes": 56928,
+          "archive_index": 32767,
+          "expected_crc32": 438983096,
+          "actual_crc32": 438983096,
+          "crc_matches": true,
+          "sha256": "9c60948f2d713b459981fc1b29d942f04d0240a51785c203498888537ddb8ff5"
+        },
+        {
+          "path": "maps/template_map.vhcg",
+          "bytes": 1791926,
+          "archive_index": 32767,
+          "expected_crc32": 957977274,
+          "actual_crc32": 957977274,
+          "crc_matches": true,
+          "sha256": "13b137d8a7e6d0a4e5d0928e5c327db5e19d7057afae1903baed7880cf15558c"
+        },
+        {
+          "path": "maps/template_map.trm",
+          "bytes": 9317,
+          "archive_index": 32767,
+          "expected_crc32": 2528273414,
+          "actual_crc32": 2528273414,
+          "crc_matches": true,
+          "sha256": "5ed27b81506739007f36a1c45ae921f3583b2fb5425478aa56edabd418985506"
+        },
+        {
+          "path": "maps/template_map.gnv",
+          "bytes": 262176,
+          "archive_index": 32767,
+          "expected_crc32": 134526302,
+          "actual_crc32": 134526302,
+          "crc_matches": true,
+          "sha256": "d9c078d0409b7bfae2fee3a71948e1cef36fc7e97b86bfc6c8a6f70048fdac67"
+        }
+      ]
+    },
+    "compiled_map": {
+      "path": "maps/template_map.vmap_c",
+      "bytes": 56928,
+      "sha256": "9c60948f2d713b459981fc1b29d942f04d0240a51785c203498888537ddb8ff5",
+      "dependency_block": "RED2"
+    },
+    "source_match": {
+      "source_name": "maps/template_map.vmap",
+      "compiled_search_path": "dota_addons/survival",
+      "raw_source_crc32": 3385704505,
+      "compiled_source_crc32": 3385704505,
+      "matches": true
+    },
+    "external_archives": [],
+    "note": "All VPK entry CRCs and the raw binary VMAP source CRC match. Engine behavior and map layout were not tested."
+  },
+  "workshop": {
+    "loaded_map": "template_map",
+    "navigation": {
+      "checked": 116,
+      "failed": 0
+    },
+    "portal_count": 4,
+    "ground_height": 131
+  },
+  "limitations": [
+    "Gameplay and new presentation features are verified separately."
+  ],
+  "backup": "output/map_main_merge_20260919/before_compile_20260930_232832"
+}

@@ -1,0 +1,26 @@
+{
+  "status": "COMPILED_AND_SIMULATION_PASS_RENDER_REVIEW_PENDING",
+  "reference_pack": "D:/SteamLibrary/steamapps/workshop/content/570/3164617180/3164617180.vpk",
+  "reference_evidence": "art/effects/laser/reference_manifest.json",
+  "reference_components": ["tinker_1/big_laser/tinker_laser: layered beam", "tinker_laser_g: path flecks and velocity noise", "laser_cutter_sparks: cutting trails", "keeper_of_the_light_illuminate_charge_b: attracted energy motes"],
+  "video": {"url": "https://www.bilibili.com/video/BV13oLszLE9z/", "accessible": false},
+  "changes": {
+    "emission_origin": "tower origin +185, matching the orb; no hand socket",
+    "orb": "persistent halo + rotating fluid core",
+    "energy_feed": "52 torso motes/sec, 48 live cap, torso CP3 (+70) attracted to orb CP4 (+185), derived from entity-follow CP0",
+    "beam": "three rope layers, 100 path motes/sec (96 cap), 90 impact trails/sec (40 cap)",
+    "pose": "laser capability lifetime, survives target death/idle/new target/relocation; 0.35 cast activity, Wisp idle; removed on capability loss or owner modifier destruction",
+    "native_projectile": "hidden on laser towers",
+    "retained": ["five level colors", "near-head surface impact", "actual-damage-scaled blood", "existing damage clock"]
+  },
+  "validation": {
+    "compiled_resources": 11,
+    "compile_failures": 0,
+    "resource_data_dependencies_and_source_hashes": "PASS",
+    "max_particles_in_resource_closure": 256,
+    "tests": ["test_tower_skill_tree_exclusion.lua including kill-idle-retarget-pose and orb source", "test_tower_visual_lifecycle.cjs", "test_tower_laser_visual.lua", "Lua 5.1 syntax", "git diff --check"],
+    "engine_pose_api": {"override_animation": 152, "override_rate": 153, "cast_ability_1": 1510, "attack": 1503, "attack2": 1504},
+    "runtime_query": {"map": "template_map", "state": 10, "paused": true},
+    "runtime_actions": "read-only state and API query; no unpause/restart; no new render or FPS claim"
+  }
+}

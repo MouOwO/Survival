@@ -1,5 +1,6 @@
 local arrow = require("config/generated/arrow_tower_base")
 local asset_catalog = require("config/asset_catalog")
+local rank_projection = require("systems/tower_rank_projection")
 local modules = {
     class_1 = require("config/generated/tower_class_death"),
     class_2 = require("config/generated/tower_class_mystery"),
@@ -11,6 +12,17 @@ local modules = {
 }
 
 local M = {}
+-- CSV rarity still controls existing gameplay (e.g. stage-max upgrades). UI
+-- rank comes from the actual route position, shared with the overhead stars.
+local presentation_level_by_id = {}
+for index, row in ipairs(arrow.rows) do
+    presentation_level_by_id[row.record_id] = index
+end
+for _, module in pairs(modules) do
+    for index, row in ipairs(module.rows) do
+        presentation_level_by_id[row.record_id] = index + 5
+    end
+end
 
 function M.get_route(class_id)
     local module = modules[class_id]
@@ -112,8 +124,25 @@ end
 
 function M.display_name(row)
     if not row then return "" end
-    if not row.rarity or row.rarity == "" then return row.name end
-    return "【" .. row.rarity .. "】" .. row.name
+    local level = presentation_level_by_id[row.record_id]
+    return rank_projection.display_name({ building_id = "arrow_tower", level = level }, row.name)
+        or row.name
+end
+
+function M.display_name_for_unit(unit)
+    if not unit then return nil end
+    if unit.survival_building_id == "arrow_tower" then
+        local row = M.current({
+            level = tonumber(unit.survival_level) or 1,
+            tower_class = unit.survival_tower_class,
+        })
+        return row and M.display_name(row) or nil
+    end
+    if unit.survival_ultimate_tower == true or unit.survival_building_id == "ultimate_tower" then
+        return rank_projection.display_name({ building_id = "ultimate_tower", level = 1 },
+            unit.survival_display_name or "终极之塔")
+    end
+    return nil
 end
 
 return M

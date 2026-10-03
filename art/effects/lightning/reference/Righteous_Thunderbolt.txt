@@ -1,0 +1,126 @@
+
+		"5412"
+		{
+			"name"		"Righteous Thunderbolt"
+			"prefab"		"wearable"
+			"creation_date"		"2015-04-27"
+			"image_inventory"		"econ/items/zeus/lightning_weapon/mesh/zeus_lightning_weapon_model"
+			"item_description"		"#DOTA_Item_Desc_Righteous_Thunderbolt"
+			"item_name"		"#DOTA_Item_Righteous_Thunderbolt"
+			"item_rarity"		"immortal"
+			"model_player"		"models/items/zeus/lightning_weapon/mesh/zeus_lightning_weapon_model.vmdl"
+			"override_attack_attachments"		"1"
+			"particle_folder"		"particles/econ/items/zeus/lightning_weapon_fx"
+			"portraits"
+			{
+				"icon"
+				{
+					"PortraitLightPosition"		"-80.069107 172.940186 194.650589"
+					"PortraitLightAngles"		"25.323486 297.564697 0.000000"
+					"PortraitLightFOV"		"40"
+					"PortraitLightDistance"		"259"
+					"PortraitLightColor"		"254 254 254"
+					"PortraitShadowColor"		"97 97 97"
+					"PortraitShadowScale"		"5"
+					"PortraitGroundShadowScale"		"1.500000"
+					"PortraitAmbientColor"		"148 148 148"
+					"PortraitAmbientScale"		"5"
+					"PortraitSpecularColor"		"251 74 84"
+					"PortraitSpecularDirection"		"0.000000 0.000000 -1.000000"
+					"PortraitSpecularPower"		"16"
+					"PortraitBackgroundColor1"		"1.000000 0.500000 0.300000"
+					"PortraitBackgroundColor2"		"0.000000 0.100000 0.000000"
+					"PortraitBackgroundColor3"		"1.000000 0.000000 0.000000"
+					"PortraitBackgroundColor4"		"1.000000 0.000000 0.000000"
+					"PortraitBackgroundTexture"		"materials/vgui/econ/item_icon_bg.vmat"
+					"PortraitAnimationActivity"		"ACT_DOTA_IDLE"
+					"PortraitAnimationCycle"		"0"
+					"PortraitAnimationRate"		"0"
+					"PortraitHideHero"		"0"
+					"PortraitLightScale"		"1.750000"
+					"PortraitAmbientDirection"		"-14.090 -6.340 8.790"
+					"cameras"
+					{
+						"default"
+						{
+							"PortraitPosition"		"161.880981 -431.812714 306.675354"
+							"PortraitAngles"		"22.971848 109.339668 0.000000"
+							"PortraitFOV"		"20.135000"
+							"PortraitFar"		"1000"
+						}
+					}
+					"PortraitHideParticles"		"0"
+					"PortraitHideDropShadow"		"0"
+					"PortraitDesaturateParticles"		"0"
+				}
+			}
+			"static_attributes"
+			{
+				"can_equip_as_ability_effects"
+				{
+					"attribute_class"		"can_equip_as_ability_effects"
+					"value"		"2"
+				}
+			}
+			"used_by_heroes"
+			{
+				"npc_dota_hero_zuus"		"1"
+			}
+			"visuals"
+			{
+				"asset_modifier0"
+				{
+					"type"		"activity"
+					"asset"		"ALL"
+					"modifier"		"lightning"
+				}
+				"asset_modifier1"
+				{
+					"type"		"particle"
+					"asset"		"particles/units/heroes/hero_zuus/zuus_base_attack.vpcf"
+					"modifier"		"particles/econ/items/zeus/lightning_weapon_fx/zuus_base_attack_immortal_lightning.vpcf"
+					"apply_when_equipped_in_ability_effects_slot"		"2"
+				}
+				"asset_modifier2"
+				{
+					"type"		"particle"
+					"asset"		"particles/units/heroes/hero_zuus/zuus_lightning_bolt.vpcf"
+					"modifier"		"particles/econ/items/zeus/lightning_weapon_fx/zuus_lightning_bolt_immortal_lightning.vpcf"
+					"apply_when_equipped_in_ability_effects_slot"		"2"
+				}
+				"skip_model_combine"		"1"
+				"asset_modifier4"
+				{
+					"type"		"particle"
+					"asset"		"particles/units/heroes/hero_zuus/zuus_lightning_bolt_castfx.vpcf"
+					"modifier"		"particles/econ/items/zeus/lightning_weapon_fx/zuus_lb_cfx_il.vpcf"
+					"apply_when_equipped_in_ability_effects_slot"		"2"
+				}
+				"asset_modifier3"
+				{
+					"type"		"ability_icon"
+					"asset"		"zuus_lightning_bolt"
+					"modifier"		"zuus_lightning_bolt_immortal"
+					"apply_when_equipped_in_ability_effects_slot"		"2"
+				}
+				"asset_modifier5"
+				{
+					"type"		"sound"
+					"asset"		"Hero_Zuus.LightningBolt.Cast"
+					"modifier"		"Hero_Zuus.LightningBolt.Cast.Righteous"
+					"apply_when_equipped_in_ability_effects_slot"		"2"
+				}
+				"asset_modifier6"
+				{
+					"type"		"sound"
+					"asset"		"Hero_Zuus.LightningBolt"
+					"modifier"		"Hero_Zuus.LightningBolt.Righteous"
+					"apply_when_equipped_in_ability_effects_slot"		"2"
+				}
+				"asset_modifier7"
+				{
+					"type"		"particle_create"
+					"modifier"		"particles/econ/items/zeus/lightning_weapon_fx/zues_immortal_lightning_weapon.vpcf"
+				}
+			}
+		}

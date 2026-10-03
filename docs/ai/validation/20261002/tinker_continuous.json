@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "rows": 20,
+  "persistent_layers": 9,
+  "dependency_files": 67,
+  "native_width": true,
+  "colors": [
+    "R blue",
+    "SR yellow",
+    "SSR red"
+  ],
+  "in_game_visual_verified": false
+}

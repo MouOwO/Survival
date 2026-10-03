@@ -21,7 +21,7 @@ function setup() {
     let api, now = 0, nextJob = 0, selected = 10;
     const jobs = new Map(), definitions = new Map(), runtimes = new Map();
     const metrics = { searches: 0, labelWrites: 0, labelsCreated: 0 };
-    const messages = [], requests = [];
+    const messages = [], requests = [], nativeErrors = [], nativeCasts = [];
     class Panel {
         constructor(id, parent, type = 'Panel') {
             this.id = id;
@@ -100,8 +100,9 @@ function setup() {
         }
         return {};
     };
-    vm.runInNewContext(instrumented, {
-        $, GameUI: { CustomUIConfig: () => cfg },
+    const sandbox = {
+        $, GameUI: { CustomUIConfig: () => cfg,
+            GetCursorPosition: () => [100,100], GetScreenWorldPosition: () => [128,192,384] },
         Game: { GetLocalPlayerID: () => 0 },
         Players: { GetPlayerHeroEntityIndex: () => selected },
         Entities: {
@@ -114,6 +115,8 @@ function setup() {
             GetAbilityName: id => getAbility(id).name || '',
             GetBehavior: id => getAbility(id).behavior || 0,
             IsHidden: id => !!getAbility(id).hidden,
+            GetCooldownTimeRemaining: id => getAbility(id).cooldown || 0,
+            ExecuteAbility: (...args) => nativeCasts.push(args),
         },
         CustomNetTables: {
             GetTableValue(table, key) {
@@ -125,9 +128,13 @@ function setup() {
                 return runtimes.get(Number(key)) || null;
             },
         },
-        GameEvents: { SendCustomGameEventToServer: (name, data) => requests.push({ name, data }) },
+        GameEvents: { SendCustomGameEventToServer: (name, data) => requests.push({ name, data }),
+            Subscribe: () => 1,
+            SendEventClientSide: (name,data) => nativeErrors.push({name,data}) },
         __test: value => { api = value; },
-    }, { filename: 'combat_stats.js' });
+    };
+    const executionContext = vm.createContext(sandbox);
+    vm.runInContext(instrumented, executionContext, { filename: 'combat_stats.js' });
     function define(unit, name, skills) {
         definitions.set(unit, { name, skills });
         for (const skill of skills) runtimes.set(skill.id, {
@@ -181,7 +188,10 @@ function setup() {
     define(10, 'npc_dota_hero_test', [{ id: 101, name: 'test_spell' }]);
     mount(1);
     return {
-        api, cfg, jobs, metrics, messages, requests, define, mount, runUntil, key, native, assertKeys,
+        api, cfg, jobs, metrics, messages, requests, nativeErrors, nativeCasts,
+        define, mount, runUntil, key, native, assertKeys,
+        loadScript: path => vm.runInContext(fs.readFileSync(path,'utf8'),executionContext,{filename:path}),
+        cooldown: (id,value) => { getAbility(id).cooldown=value; },
         select: unit => { selected = unit; },
         panel: index => abilities.FindChildTraverse('Ability' + index),
         runtime: (id, value) => Object.assign(runtimes.get(id), value),
@@ -371,4 +381,39 @@ for (const example of [
     assert.equal(t.metrics.labelsCreated, 0);
 }
 
+// combat_stats replaces the tooltip module's temporary input dispatcher. Real
+// managed-button clicks must still use the tower adapter after that replacement.
+{
+    const t=setup(), gridCalls=[];
+    t.define(10,'building_arrow_tower',[
+        {id:101,name:'ability_building_blink',behavior:16,cooldown:5},
+        {id:102,name:'ability_destroy_arrow_tower',behavior:4},
+    ]);
+    t.cfg.SurvivalGridPlacement={BeginRelocation(ability,unit){gridCalls.push({ability,unit});return true;},
+        CancelRelocation(){},IsRelocating:()=>true};
+    t.loadScript('panorama/src/scripts/custom_game/building_move.js');
+    assert(t.cfg.SurvivalAbilityInput.ExecuteAbility(101),'cooldown button input is consumed');
+    assert.equal(gridCalls.length,0,'final generic button dispatcher rejects move cooldown before grid entry');
+    assert(!t.cfg.SurvivalPointTargetState?.active,'button rejection does not activate point targeting');
+    assert.equal(t.nativeErrors.at(-1).data.message,'移动防御塔CD中');
+    assert.equal(t.cfg.SurvivalPointTargetInput.Begin(101,10),false,
+        'direct generic point Begin cannot bypass move cooldown');
+    assert(!t.cfg.SurvivalPointTargetState?.active);
+    t.cooldown(101,0);
+    assert(t.cfg.SurvivalAbilityInput.ExecuteAbility(101));
+    assert.deepEqual(gridCalls,[{ability:101,unit:10}],
+        'ready managed button uses the same relocation adapter as D');
+    assert(t.cfg.SurvivalPointTargetInput.Begin(101,10),'ready direct Begin remains available');
+    assert(t.cfg.SurvivalPointTargetState.active);
+    t.cfg.SurvivalPointTargetInput.Cancel('test');
+    assert(t.cfg.SurvivalAbilityInput.ExecuteAbility(102),'generic destroy button retains confirmation route');
+    assert.equal(t.requests.length,0,'tower buttons do not send generic ability casts');
+    assert.equal(t.nativeCasts.length,0);
+    // A stale runtime disabled snapshot must not swallow the requested CD hint.
+    t.cooldown(101,3); t.runtime(101,{available:0});
+    assert(t.cfg.SurvivalAbilityInput.ExecuteAbility(101));
+    assert.equal(t.nativeErrors.at(-1).data.message,'移动防御塔CD中');
+    assert.equal(gridCalls.length,1);
+}
+console.log('COMBAT_TOWER_INPUT_PASS final button dispatcher, direct point Begin, native cooldown hint, stale runtime snapshot, ready recovery and destroy confirmation');
 console.log('COMBAT_SELECTION_RECOVERY_PASS: merged events, single mapping discovery, stable shortcuts, late/rebuilt HUD, runtime reconciliation, key assignments and shutdown');

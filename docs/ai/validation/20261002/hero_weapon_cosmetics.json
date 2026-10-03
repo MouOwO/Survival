@@ -1,0 +1,178 @@
+{
+  "status": "PASS_OFFLINE_LIVE_ACCEPTANCE_PENDING",
+  "checked_at_utc": "2026-10-02T15:11:18.139339+00:00",
+  "request": "按当前主手武器系列切换齐天大圣与主宰的指定武器饰品，空手与成长之剑使用各自默认武器。",
+  "mapping": [
+    {
+      "series": "空手／成长之剑",
+      "monkey": "齐天大圣武器",
+      "monkey_item_def": 609,
+      "juggernaut": "主宰的武器",
+      "juggernaut_item_def": 7
+    },
+    {
+      "series": "霜之剑刃",
+      "monkey": "伏魔行者战棍",
+      "monkey_item_def": 13546,
+      "juggernaut": "霜望好战者武器",
+      "juggernaut_item_def": 23327
+    },
+    {
+      "series": "极寒之刃",
+      "monkey": "鲧禹之钺",
+      "monkey_item_def": 9212,
+      "juggernaut": "暴风领主的血统 - 武器",
+      "juggernaut_item_def": 13185
+    },
+    {
+      "series": "冰火裁决",
+      "monkey": "纯金鲧禹之钺",
+      "monkey_item_def": 9453,
+      "juggernaut": "奇门之锋",
+      "juggernaut_item_def": 9984
+    },
+    {
+      "series": "深渊审判",
+      "monkey": "十周年 鲧禹之钺",
+      "monkey_item_def": 29347,
+      "juggernaut": "猩红奇门之锋",
+      "juggernaut_item_def": 12417
+    }
+  ],
+  "implementation": {
+    "authoritative_configuration": "Three new CSVs; generated Lua and exactly three scoped registry entries",
+    "weapon_only": true,
+    "body_and_other_components_preserved": true,
+    "native_models_skins_materials_cp_bindings": true,
+    "atomic_swap_failure_preserves_previous_weapon": true,
+    "same_series_all_strengthening_stages_reuse_handles": true,
+    "normal_death_preserves_cosmetic": true,
+    "poll_interval_seconds": 0.25,
+    "new_periodic_loops": 0,
+    "offset_attachment": "One hidden native child anchor for Juggernaut TI8/crimson CP15 local offset; no Lua position updater",
+    "gameplay_stats_damage_attack_clock_skills_projectiles_unchanged": true,
+    "legend_owned_scepter_aura_retained": true
+  },
+  "verification": {
+    "matrix_cases": 66,
+    "real_definitions_per_hero": 33,
+    "strict_failure_cases": 14,
+    "cleanup_reentry_cases": 4,
+    "successful_and_failed_locked_defeat_replacement": "PASS",
+    "invalid_old_hero_cached_cleanup": "PASS",
+    "world_particle_id_reuse": "PASS",
+    "generated_byte_consistency": true,
+    "native_mapping_and_cp_consistency": true,
+    "runtime_suites": [
+      {
+        "test_script": "scripts/vscripts/tests/test_hero_weapon_cosmetics.lua",
+        "status": "PASS",
+        "retained_pass_before_final_boundary_guards": false
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_weapon_visual_service.lua",
+        "status": "PASS",
+        "retained_pass_before_final_boundary_guards": true
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_weapon_owned_visual.lua",
+        "status": "PASS",
+        "retained_pass_before_final_boundary_guards": false
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_particle_cleanup_reentry.lua",
+        "status": "PASS",
+        "retained_pass_before_final_boundary_guards": true
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_hero_player_loadout_precache.lua",
+        "status": "PASS",
+        "retained_pass_before_final_boundary_guards": true
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_hero_summon_flow.lua",
+        "status": "PASS",
+        "retained_pass_before_final_boundary_guards": true
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_manual_weapon_visual_fixture.lua",
+        "status": "PASS",
+        "retained_pass_before_final_boundary_guards": true
+      }
+    ],
+    "baseline_bom_adaptation": "Pre-existing loadout precache test BOM removed only in read-only loadstring runner; source unchanged",
+    "old_owned_visual_test_mock": "Authorized fixture change allows .vmdl model precache; retains particle checks and one scepter aura root",
+    "lua51_syntax": "PASS",
+    "final_git_diff_check": "PASS",
+    "native_audit_graph": {
+      "particle_systems": 378,
+      "compiled_dependencies": 688,
+      "scope": "Full audit also includes old body cosmetics and native skill graphs, not the runtime precache list"
+    },
+    "actual_new_runtime_precache": {
+      "unique_weapon_models": 7,
+      "ambient_roots": 8
+    }
+  },
+  "limits": [
+    "霜望好战者专用snapshot在本机官方VPK及守望轮回谷完整目录均不存在；保留准确武器模型与现有冰光，未使用不匹配的默认刀形或Workshop自定义快照。",
+    "未启动地图、未重新加载用户游戏、未实机验收武器姿态、材质与光效画面。",
+    "调用现有原生编译资源；本轮无新增待编译美术资源。"
+  ],
+  "live_acceptance": [
+    "重新进图，两英雄逐系列装备，核对武器形状和原身体保持",
+    "纯金／猩红／十周年颜色与常驻武器光效",
+    "空手恢复默认、同系列强化不闪烁、死亡复活恢复、深渊持有脚底光圈保留"
+  ],
+  "source_sha256": {
+    "scripts/vscripts/systems/hero_weapon_cosmetic_service.lua": "6a92a080ba5f3b8925b79efc7bae87788b3c1f000135590a931e0c10f8a7df43",
+    "scripts/vscripts/visual/hero_weapon_slot.lua": "6bda68f59cd7746eaf147c86edc7bed43847fea13f14e8fe0f04b36932cca1ff",
+    "scripts/vscripts/systems/hero_cosmetic_service.lua": "f2147e13d88b9d6ba5295c82337f9a4c9bffff5a320f0680ac33f3db654cff0f",
+    "scripts/vscripts/systems/weapon_visual_service.lua": "bfcab7246e76a8799539e5b8dc73bd37fa9f65bc32ba3f6907751ddca942dea6",
+    "scripts/vscripts/systems/weapon_owned_visual.lua": "c56d44b3b7309635a6204ff31e2d40af0aa237b210148ed9ed4da49ef65a83af",
+    "scripts/vscripts/systems/content_inventory_service.lua": "658ec67deb2c470657f744a811189a0f5db93bb56df88eb44b2a473b5bda74c8",
+    "scripts/vscripts/systems/weapon_equipment_service.lua": "653bbf21206fb137b8e43fdc6356ff8cd8afe42b0fc7d57b8f17c99eacceb652",
+    "scripts/vscripts/systems/hero_summon_system.lua": "a234492c67746bbe65b323ffcaee7b345987e52f93ae35acd3681b617a7cfb60",
+    "scripts/vscripts/config/hero_cosmetics_config.lua": "ddb57195ae33badb1f1548e3b6fb26a6067cc17818a06cf613b078fc8d5fde45",
+    "scripts/vscripts/config/generated/hero_weapon_cosmetics.lua": "444639c1e720ca8092b1719fb16ceadfdd2e81f0625d25af6923995686025cf8",
+    "scripts/vscripts/config/generated/hero_weapon_cosmetic_effects.lua": "bfbc52abe03004ddf1fbc4e04406e8b750e4f317ab179d6e23724453c8b48d4b",
+    "scripts/vscripts/config/generated/hero_weapon_cosmetic_control_points.lua": "4cc9d9955483bfdd45a2b9fe129ef569bc4b81b877069fe85c83f18e2cf7062f",
+    "scripts/vscripts/config/generated/weapon_definitions.lua": "8a96621c06fffb0ef44aeb1d0f775707badd99af19cbb964bcbdfafe1e28a522",
+    "scripts/vscripts/config/generated/weapon_visual_profiles.lua": "264a92ce3abc01a64cf60fe945f8c38023df8e4cce5fd4b5b34800e0da999187",
+    "scripts/vscripts/config/generated/asset_components.lua": "3d89becce49fb35d3e7d219ec220422928dd5bc86df79a21db05e4ad7387816d",
+    "scripts/vscripts/config/generated/asset_effects.lua": "ee8d9daac57cbf6f5059bd8fcce87ff5331b442ccceb6119e4d07112871ca1ae",
+    "scripts/vscripts/core/event_bus.lua": "c96e398f002ff7594fe86c5b1ebdf96a832e33984e56f7157fd297c4cab20a1f",
+    "scripts/vscripts/core/events.lua": "9c2e681159a09a1362be2d85487dd8bfe5d4cd34e0ab166f6e219b1b0f47f382",
+    "scripts/vscripts/core/scheduler.lua": "0f2d6ecd2818ff93504bf944d1bdfef76811d3d0c9983f77ab347d51795e9657",
+    "scripts/vscripts/tests/test_hero_weapon_cosmetics.lua": "e49377466c4622d3dcb001ccaac5e83ddea2abc126a3171fa74e3503546e0136",
+    "scripts/vscripts/tests/test_weapon_owned_visual.lua": "326b79ced349d382e4024e67a0b274c6b91b0096acccf800903f17ecdc21fc48",
+    ".gitignore": "5a29c7ff76472eb94ee5b52082d494f489db591da9d300945e209684909d2db2",
+    "output/weapon_hero_cosmetics_20261002/weapon_mapping.json": "011ed142d679690f6aa2bb2a9d3d211bfe70c752ed289615f2d3d04d55d35f55",
+    "data/csv/英雄系统/hero_weapon_cosmetics.csv": "b37333474131db8fe76bc628640a5c5525d9fc2c91c601ad319e2c7645b95bac",
+    "data/csv/英雄系统/hero_weapon_cosmetic_effects.csv": "d28af0268a20dfcad9f2fda1ca5268664050cadd25d1c1138b7dc656e71890c0",
+    "data/csv/英雄系统/hero_weapon_cosmetic_control_points.csv": "1512eda8828b520e5c6756e158f71b7adc390cfeb52029bda347cd6bb4204a04"
+  },
+  "evidence": {
+    "runtime_validation.json": {
+      "path": "output/weapon_hero_cosmetics_20261002/runtime_validation.json",
+      "sha256": "489930c600b8c773dfbebb2b1deee5b7bed7fc0faa4dc992d4ebc22cc348ca18"
+    },
+    "config_validation.json": {
+      "path": "output/weapon_hero_cosmetics_20261002/config_validation.json",
+      "sha256": "15a034d8bae6d6f05e5b752726c1b354974144569d5e2c6cc7b1dd0e5cb95c39"
+    },
+    "native_resources.json": {
+      "path": "output/weapon_hero_cosmetics_20261002/native_resources.json",
+      "sha256": "a24363d28d18a575b6ad8b895c5aad62a4ffc978a3ed67b28e948b3e7e2c8ce0"
+    },
+    "frost_snapshot_fallback.json": {
+      "path": "output/weapon_hero_cosmetics_20261002/frost_snapshot_fallback.json",
+      "sha256": "9dfd02d04e16c26c660c911ff217e96bce8da4486a831efd715b7185669a72d8"
+    },
+    "slot_review.json": {
+      "path": "output/weapon_hero_cosmetics_20261002/slot_review.json",
+      "sha256": "dd768432c9254b1f09cc86274dfab092d64bd9d35341192a9e7de40ff8384c0a"
+    }
+  },
+  "git_scope": "Existing unrelated uncommitted changes preserved; no commit/push this turn"
+}

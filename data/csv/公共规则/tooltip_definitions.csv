@@ -48,7 +48,7 @@ ability:ability_survival_monkey_king_fury,ability,ability_survival_monkey_king_f
 ability:ability_survival_monkey_king_swiftness,ability,ability_survival_monkey_king_swiftness,齐天大圣专属：齐天,0,0,六转激活。暴击率增加20%，最终攻击力使用独立三倍乘区；仅本体主普通攻击实际暴击时对主目标追加全属性×5纯粹伤害。,survival/native/skill_monkey_agility,skill_monkey_king_swiftness
 ability:ability_survival_poison_cloud,ability,ability_survival_poison_cloud,毒云·被动,0,0,等级1：普通攻击命中时，12%概率在目标位置生成400范围毒云，持续5秒；第1至第5秒各造成一次触发时全属性总和×1纯粹伤害。毒云活动期间同一英雄不会再次触发毒云。 等级2：毒云每次整秒伤害命中使敌人的实时总护甲降低20%，最多3层（60%）；离开毒云或毒云消失时立即恢复毒云降低的护甲。 等级3：触发概率提高至20%，毒云持续时间增加至7秒，因此第1至第7秒各造成一次伤害。 等级4：完整继承等级3效果，无额外变化。 等级5：毒云中的敌人死亡时，以死亡位置为中心对300范围造成一次触发时全属性总和×3纯粹伤害；死亡爆炸可继续引发毒云内敌人的连锁爆炸。,survival/native/skill_poison,proto_poison_cloud
 ability:ability_survival_rogue_reward,ability,ability_survival_rogue_reward,天赋,0,0,选择一项开局天赋。未选择时问号闪烁，选择后显示该天赋图标。,survival/native/talent_question,builder_rogue_reward
-ability:ability_survival_shadow_fiend_raze,ability,ability_survival_shadow_fiend_raze,影魔专属：影压,0,0,一转后激活。普通攻击命中时有10%概率在目标位置释放250范围影压。影压先增加1层再造成纯粹伤害，1至5层分别为全属性×27.5、×30、×32.5、×35、×37.5；最多5层，每层独立持续3秒。,survival/native/skill_shadowraze,skill_shadow_fiend_raze
+ability:ability_survival_shadow_fiend_raze,ability,ability_survival_shadow_fiend_raze,光法专属：致盲之光,0,0,一转后激活。普通攻击命中时有10%概率在目标位置释放250范围致盲之光。先增加1层再造成纯粹伤害，1至5层分别为全属性×27.5、×30、×32.5、×35、×37.5；最多5层，每层独立持续3秒。,keeper_of_the_light_blinding_light,skill_shadow_fiend_raze
 ability:ability_survival_void_pulse,ability,ability_survival_void_pulse,虚空震爆·被动,0,0,等级1：普通攻击命中时有15%概率从攻击者位置释放龙卷风。龙卷风以500速度追踪原攻击目标，第一次到达后附着跟随目标；目标死亡则停在死亡位置。持续3秒，在生成时及第1、2秒实时读取全属性，对中心300范围造成全属性×2纯粹伤害。 等级2：完整继承等级1效果，无额外变化。 等级3：龙卷风中心600范围内的敌人持续降低20%移动速度；被主龙卷伤害命中的敌人在仍处于该范围时额外降低15%，总计35%，离开范围立即移除。 等级4：完整继承等级3效果，无额外变化。 等级5：主龙卷结束时，按仍存活的已命中不同目标数量在结束位置生成小龙卷。小龙卷随机选择这些目标的方向，以相同速度移动2秒，每秒造成主龙卷60%的实时属性伤害，并仅施加20%范围减速。,survival/native/skill_void,proto_void_pulse
 ability:airspace_overlord_lv01,ability,airspace_overlord_lv01,空域霸主LV1,0,0,500范围内敌方单位最终承伤提高20%；飞行敌人攻击速度额外降低20%,,airspace_overlord_lv01
 ability:anti_air_missile_lv01,ability,anti_air_missile_lv01,防空炮LV1,0,0,每秒一轮对同一飞行目标发射4枚普通攻击飞弹；相邻发射间隔0.333秒；每枚对空伤害提高90%,,anti_air_missile_lv01
@@ -79,11 +79,11 @@ ability:critical_strike_lv03,ability,critical_strike_lv03,致命一击LV3,0,0,19
 ability:critical_strike_lv04,ability,critical_strike_lv04,致命一击LV4,0,0,22%概率造成5倍普通攻击伤害,,critical_strike_lv04
 ability:critical_strike_lv05,ability,critical_strike_lv05,致命一击LV5,0,0,22%概率造成5倍普通攻击伤害,,critical_strike_lv05
 ability:death_grenade_lv01,ability,death_grenade_lv01,死神榴弹炮Lv1,0,0,暴击时有10%概率对原目标追加一次等同于该次暴击的物理伤害,,death_grenade_lv01
-ability:drag_net_lv01,ability,drag_net_lv01,防空火炮LV1,0,0,每枚普通攻击命中飞行单位时有2%概率眩晕3秒,,drag_net_lv01
-ability:drag_net_lv02,ability,drag_net_lv02,防空火炮LV2,0,0,每枚普通攻击命中飞行单位时有3%概率眩晕3秒,,drag_net_lv02
-ability:drag_net_lv03,ability,drag_net_lv03,防空火炮LV3,0,0,每枚普通攻击命中飞行单位时有4%概率眩晕3秒,,drag_net_lv03
-ability:drag_net_lv04,ability,drag_net_lv04,防空火炮LV4,0,0,每枚普通攻击命中飞行单位时有5%概率眩晕3秒,,drag_net_lv04
-ability:drag_net_lv05,ability,drag_net_lv05,防空火炮LV5,0,0,每枚普通攻击命中飞行单位时有5%概率眩晕3秒,,drag_net_lv05
+ability:drag_net_lv01,ability,drag_net_lv01,防空诱捕LV1,0,0,每枚普通攻击命中飞行单位时独立有2%概率诱捕2秒；无法移动和隐身，仍可攻击和施法,,drag_net_lv01
+ability:drag_net_lv02,ability,drag_net_lv02,防空诱捕LV2,0,0,每枚普通攻击命中飞行单位时独立有3%概率诱捕2秒；无法移动和隐身，仍可攻击和施法,,drag_net_lv02
+ability:drag_net_lv03,ability,drag_net_lv03,防空诱捕LV3,0,0,每枚普通攻击命中飞行单位时独立有4%概率诱捕2秒；无法移动和隐身，仍可攻击和施法,,drag_net_lv03
+ability:drag_net_lv04,ability,drag_net_lv04,防空诱捕LV4,0,0,每枚普通攻击命中飞行单位时独立有5%概率诱捕2秒；无法移动和隐身，仍可攻击和施法,,drag_net_lv04
+ability:drag_net_lv05,ability,drag_net_lv05,防空诱捕LV5,0,0,每枚普通攻击命中飞行单位时独立有5%概率诱捕2秒；无法移动和隐身，仍可攻击和施法,,drag_net_lv05
 ability:explosive_gatling_lv01,ability,explosive_gatling_lv01,爆矢加特林LV1,0,0,同一目标攻击5次或击杀后攻速+20%，持续3秒，不可叠加可刷新,,explosive_gatling_lv01
 ability:frost_attack_lv01,ability,frost_attack_lv01,冰霜攻击LV1,0,0,攻击对主目标造成全额伤害，并对半径100码内其他目标造成50%物理伤害；范围内目标减速25%，持续2秒,,frost_attack_lv01
 ability:frost_attack_lv02,ability,frost_attack_lv02,冰霜攻击LV2,0,0,攻击对主目标造成全额伤害，并对半径150码内其他目标造成50%物理伤害；范围内目标减速25%，持续2秒,,frost_attack_lv02
@@ -95,11 +95,11 @@ ability:ice_blizzard_lv02,ability,ice_blizzard_lv02,寒冰尖塔LV2,0,0,攻击�
 ability:ice_blizzard_lv03,ability,ice_blizzard_lv03,寒冰尖塔LV3,0,0,攻击时14%概率触发落冰，每秒对300码范围造成触发时攻击力50%的物理伤害并减速25%，共4波,,ice_blizzard_lv03
 ability:ice_blizzard_lv04,ability,ice_blizzard_lv04,寒冰尖塔LV4,0,0,攻击时16%概率触发落冰，每秒对300码范围造成触发时攻击力50%的物理伤害并减速25%，共4波,,ice_blizzard_lv04
 ability:ice_blizzard_lv05,ability,ice_blizzard_lv05,寒冰尖塔LV5,0,0,攻击时16%概率触发落冰，每秒对300码范围造成触发时攻击力50%的物理伤害并减速25%，共4波,,ice_blizzard_lv05
-ability:laser_lv01,ability,laser_lv01,激光LV1,0,0,每1秒造成攻击力100%伤害，同目标每秒递增5%，最高500%,,laser_lv01
-ability:laser_lv02,ability,laser_lv02,激光LV2,0,0,每1秒造成攻击力120%伤害，同目标每秒递增5%，最高500%,,laser_lv02
-ability:laser_lv03,ability,laser_lv03,激光LV3,0,0,每1秒造成攻击力140%伤害，同目标每秒递增5%，最高500%,,laser_lv03
-ability:laser_lv04,ability,laser_lv04,激光LV4,0,0,每1秒造成攻击力160%伤害，同目标每秒递增5%，最高500%,,laser_lv04
-ability:laser_lv05,ability,laser_lv05,激光LV5,0,0,每1秒造成攻击力180%伤害，同目标每秒递增5%，最高500%,,laser_lv05
+ability:laser_lv01,ability,laser_lv01,激光LV1,0,0,立即造成攻击力120%伤害，之后每秒结算，同目标每秒递增5个百分点，最高500%,,laser_lv01
+ability:laser_lv02,ability,laser_lv02,激光LV2,0,0,立即造成攻击力140%伤害，之后每秒结算，同目标每秒递增5个百分点，最高500%,,laser_lv02
+ability:laser_lv03,ability,laser_lv03,激光LV3,0,0,立即造成攻击力160%伤害，之后每秒结算，同目标每秒递增5个百分点，最高500%,,laser_lv03
+ability:laser_lv04,ability,laser_lv04,激光LV4,0,0,立即造成攻击力180%伤害，之后每秒结算，同目标每秒递增5个百分点，最高500%,,laser_lv04
+ability:laser_lv05,ability,laser_lv05,激光LV5,0,0,立即造成攻击力180%伤害，之后每秒结算，同目标每秒递增5个百分点，最高500%,,laser_lv05
 ability:lightning_diffusion_lv01,ability,lightning_diffusion_lv01,雷电扩散LV1,0,0,落雷命中时30%几率触发电圈，对半径200码造成该次物理伤害200%；电圈伤害为物理伤害且不会递归,,lightning_diffusion_lv01
 ability:lightning_storm_lv01,ability,lightning_storm_lv01,闪电魔塔LV1,0,0,闪电打击击杀敌方单位时，以死亡位置为中心立即对300范围内全部敌人造成触发时攻击力110%的物理伤害；随后1秒内随机落下5道仅视觉雷柱,,lightning_storm_lv01
 ability:lightning_storm_lv02,ability,lightning_storm_lv02,闪电魔塔LV2,0,0,闪电打击击杀敌方单位时，以死亡位置为中心立即对300范围内全部敌人造成触发时攻击力120%的物理伤害；随后1秒内随机落下6道仅视觉雷柱,,lightning_storm_lv02
@@ -127,13 +127,13 @@ ability:piercing_ballista_lv03,ability,piercing_ballista_lv03,穿透弩炮LV3,0,
 ability:piercing_ballista_lv04,ability,piercing_ballista_lv04,穿透弩炮LV4,0,0,攻击无视敌人30%护甲,,piercing_ballista_lv04
 ability:piercing_ballista_lv05,ability,piercing_ballista_lv05,穿透弩炮LV5,0,0,攻击无视敌人30%护甲,,piercing_ballista_lv05
 ability:polar_obelisk_lv01,ability,polar_obelisk_lv01,极地方尖碑LV1,0,0,半径400码范围敌人攻击速度降低20%,,polar_obelisk_lv01
-ability:ultimate_tower_passive_1,ability,ultimate_tower_passive_1,终极塔·普通攻击强化,0,0,由多个技能复合而成：包含对空塔、死亡塔和多重塔的普通攻击强化技能。,survival/native/skill_network,ultimate_tower_passive_1
-ability:ultimate_tower_passive_2,ability,ultimate_tower_passive_2,终极塔·攻击触发,0,0,由多个技能复合而成：包含机枪塔、冰霜塔和神秘塔的攻击触发技能。,survival/native/skill_network,ultimate_tower_passive_2
-ability:ultimate_tower_passive_3,ability,ultimate_tower_passive_3,终极塔·面板被动,0,0,由多个技能复合而成：包含冰霜塔和死亡塔的面板被动技能。,survival/native/skill_machine_gun,ultimate_tower_passive_3
-ability:ultimate_tower_passive_4,ability,ultimate_tower_passive_4,终极塔·光环,0,0,由多个技能复合而成：包含冰霜塔的范围光环技能。,survival/native/skill_blink,ultimate_tower_passive_4
-ability:ultimate_tower_passive_5,ability,ultimate_tower_passive_5,终极塔·次生技能,0,0,由多个技能复合而成：包含闪电塔的闪电链、风暴和扩散技能。,survival/native/point_booster,ultimate_tower_passive_5
+ability:ultimate_tower_passive_1,ability,ultimate_tower_passive_1,万象归一·普通攻击强化,0,0,由多个技能复合而成：包含对空塔、死亡塔和多重塔的普通攻击强化技能。,survival/native/skill_network,ultimate_tower_passive_1
+ability:ultimate_tower_passive_2,ability,ultimate_tower_passive_2,万象归一·攻击触发,0,0,由多个技能复合而成：包含机枪塔、冰霜塔和神秘塔的攻击触发技能。,survival/native/skill_network,ultimate_tower_passive_2
+ability:ultimate_tower_passive_3,ability,ultimate_tower_passive_3,万象归一·面板被动,0,0,由多个技能复合而成：包含冰霜塔和死亡塔的面板被动技能。,survival/native/skill_machine_gun,ultimate_tower_passive_3
+ability:ultimate_tower_passive_4,ability,ultimate_tower_passive_4,万象归一·光环,0,0,由多个技能复合而成：包含冰霜塔的范围光环技能。,survival/native/skill_blink,ultimate_tower_passive_4
+ability:ultimate_tower_passive_5,ability,ultimate_tower_passive_5,万象归一·次生技能,0,0,由多个技能复合而成：包含闪电塔的闪电链、风暴和扩散技能。,survival/native/point_booster,ultimate_tower_passive_5
 inventory_item:building_advanced_research_lab,inventory_item,building_advanced_research_lab,高级研究所,0,0,,,building_advanced_research_lab
-inventory_item:building_arrow_tower,inventory_item,building_arrow_tower,箭塔,0,0,箭塔5级后进入五选一转职。,,building_arrow_tower
+inventory_item:building_arrow_tower,inventory_item,building_arrow_tower,见习守望,0,0,见习守望达到5星后，可选择七条转职路线之一。,,building_arrow_tower
 inventory_item:building_farm,inventory_item,building_farm,人口农场,0,0,,,building_farm
 inventory_item:building_gold_mine,inventory_item,building_gold_mine,金矿,0,0,主城3级解锁；具体建造费用由building_levels或正式配置补充。,,building_gold_mine
 inventory_item:building_hero_altar,inventory_item,building_hero_altar,英雄祭坛,0,0,祭坛建造前置为主城3级；祭坛被使用后shop_root_visible=true。,,building_hero_altar
@@ -341,3 +341,4 @@ inventory_item:weapon_legend_abyss_07,inventory_item,weapon_legend_abyss_07,传�
 inventory_item:weapon_legend_abyss_08,inventory_item,weapon_legend_abyss_08,传说：深渊审判+8,0,0,增加属性  - 140W攻击力  - 400%攻速  - 100%吸血  - 140W生命值  - 850护甲  - 全属性+700000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_08
 inventory_item:weapon_legend_abyss_09,inventory_item,weapon_legend_abyss_09,传说：深渊审判+9,0,0,增加属性  - 150W攻击力  - 400%攻速  - 100%吸血  - 150W生命值  - 850护甲  - 全属性+800000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_09
 inventory_item:weapon_legend_abyss_10,inventory_item,weapon_legend_abyss_10,传说：深渊审判+10,0,0,增加属性  - 200W攻击力  - 400%攻速  - 100%吸血  - 200W生命值  - 850护甲  - 全属性+900000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害,item_rapier,weapon_legend_abyss_10
+ability:ability_build_arrow_tower,ability,ability_build_arrow_tower,建造见习守望,50,0,建造可自动攻击敌人的见习守望。达到5星后，可选择七条转职路线之一。,survival/native/building_arrow_tower,arrow_tower

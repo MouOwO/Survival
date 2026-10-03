@@ -1,0 +1,25 @@
+{
+  "status": "COMPILE_CONTRACT_PASS_DYNAMIC_RENDER_PENDING",
+  "reference": "3164617180 / particles/rebuild/spell/tinker_1/big_laser/effect/tinker_laser_f.vpcf_c",
+  "reference_evidence": "art/effects/laser/reference_manifest.json",
+  "reference_mechanism": "C_OP_ConstrainDistanceToPath, CP9 to CP1, 0.1s travel",
+  "implementation": {
+    "trails": {"travel_seconds": 0.14, "radius": 3, "max_length": 48, "rate": 100, "cap": 32},
+    "pulses": {"travel_seconds": 0.18, "radius": 11, "rate": 9, "cap": 8},
+    "impact_flash": {"start_seconds": 0.18, "lifetime_seconds": 0.09, "rate": 9, "cap": 4},
+    "steady_hit_flare_radius": 24,
+    "wide_light_curtain": false,
+    "gameplay_changed": false
+  },
+  "validation": {
+    "compiled_resources": 11,
+    "compile_failures": 0,
+    "actual_compiled_travel_direction_and_times": "PASS",
+    "source_hashes_and_dependencies": "PASS",
+    "finite_particle_decay_and_caps": "PASS",
+    "root_excludes_envelope_and_filament": "PASS",
+    "total_resource_particle_cap": 180,
+    "diff_check": "PASS",
+    "dynamic_visual_acceptance": "NOT_RUN"
+  }
+}

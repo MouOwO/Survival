@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-02",
+  "status": "PASS: resource compile and offline integration; live visual acceptance pending",
+  "request": "Permanent Dark Willow W ground effect on the death tower route, with rank differentiation; audit real cosmetic variants first",
+  "source_audit": {
+    "official_schema": "scripts/items/items_game.txt in installed game/dota/pak01_dir.vpk",
+    "schema_sha256": "84751c6a565186300ec92a0bc92a336804dab645bc40f133143a44de12c2f2ac",
+    "all_items": 26522,
+    "dark_willow_items": 92,
+    "dark_willow_asset_modifiers": 34,
+    "shadow_realm_schema_mentions": 0,
+    "official_shadow_realm_particles": 25,
+    "cosmetic_shadow_realm_particle_paths": 0,
+    "verdict": "No installed official cosmetic replacement for Shadow Realm root, ground or ground_soft",
+    "scope": "Installed official resources; no claim about future updates",
+    "evidence": "output/death_reference_base_20261002/server_source_audit/audit_summary.json"
+  },
+  "native_layers": [
+    "particles/units/heroes/hero_dark_willow/dark_willow_shadow_realm_ground.vpcf",
+    "particles/units/heroes/hero_dark_willow/dark_willow_shadow_realm_ground_soft.vpcf"
+  ],
+  "native_texture": "materials/particle/dark_willow/dark_willow_symbol.vtex",
+  "implementation": {
+    "route": "class_1",
+    "profile_base": "willow_shadow_realm",
+    "root": "particles/survival/towers/death_willow/shadow_ground.vpcf",
+    "child": "particles/survival/towers/death_willow/shadow_ground_soft.vpcf",
+    "rank_colors_RGB": {
+      "R": [25, 219, 241],
+      "SR": [180, 95, 255],
+      "SSR": [255, 52, 83]
+    },
+    "color_policy": "Adapted rank colors on the native W shape, not official immortal W variants",
+    "rank_radius": {"R": 96, "SR": 108, "SSR": 120},
+    "radius_is_decoration_not_damage_range": true,
+    "alpha": 0.95,
+    "same_rank_levels_share_color_and_handle": true,
+    "red_stars_retain_SSR": true,
+    "preserved_native_layers": ["sharp sigil atlas", "soft glow atlas", "renderers", "rotation"],
+    "removed_native_charge_behavior": ["five-second duration", "charge-based green-to-red interpolation", "body smoke", "overhead alerts", "burst effects"],
+    "max_sprites_per_tower": 2,
+    "handles_per_tower": 1,
+    "new_Lua_timers": 0,
+    "normal_depth_testing": true,
+    "particle_controls_reapplied_by_engine": true,
+    "CSV_authoritative_and_single_generated_module": true,
+    "old_base_layers_retired": true,
+    "independent_wearable_ambient_preserved": true,
+    "same_rank_color_radius_alpha_config_refresh": true,
+    "fallback_to_profile_color_when_tier_color_missing": true,
+    "presets_ABC_preserve_new_death_base": true,
+    "current_active_preset": "B",
+    "gameplay_changes": false
+  },
+  "validation": [
+    {
+      "check": "Official resourcecompiler: both new systems",
+      "status": "PASS: 2 compiled, 0 failed",
+      "evidence": "output/death_reference_base_20261002/compile/"
+    },
+    {
+      "check": "tools/verify_death_willow_base.cjs: actual compiled DATA, native hashes/texture, child graph, persistent controls, depth, sprite cap",
+      "status": "PASS",
+      "evidence": "output/death_reference_base_20261002/compiled_audit/validation.json"
+    },
+    {
+      "check": "scripts/vscripts/tests/test_tower_visual_lifecycle.lua: actual service, CSV parity, seven routes, rank reuse, relocation, old-layer cleanup, failures, reinitialization",
+      "status": "PASS",
+      "validated_by": "overhead_ui_validation agent"
+    },
+    {
+      "check": "tools/test_death_base_presets.py: actual preset writer and Lua generator, A/B/C with old and new schemas",
+      "status": "PASS: 6 cases, production CSV/Lua/active.json unchanged during test",
+      "evidence": "output/death_willow_contract/preset_validation.json"
+    },
+    {
+      "check": "tools/test_tower_base_sources.cjs",
+      "status": "PASS",
+      "evidence": "output/tower_base_refine/source_preflight.json"
+    },
+    {
+      "check": "Python AST and git diff --check",
+      "status": "PASS"
+    }
+  ],
+  "reference_video": {
+    "url": "https://www.bilibili.com/video/BV1Jg411C7Fm/?t=1635",
+    "requested_time": "27:15",
+    "exact_frame_decoded": false,
+    "public_preview_neighbors": ["27:12", "27:18"],
+    "particle_identity": "Explicit user identification, confirmed native resources; not independently inferred from the low-resolution video previews"
+  },
+  "live_visual": {
+    "status": "NOT_RUN for this revision",
+    "next_load_checks": ["R cyan, SR purple, SSR red", "stays visible past native five-second charge duration", "relocation follows tower", "rank upgrade has one base with no old layer residue", "A/B/C retain base"]
+  }
+}

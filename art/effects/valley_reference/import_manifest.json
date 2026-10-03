@@ -1,0 +1,159 @@
+{
+  "workshop_id": "3164617180",
+  "reference_pack": "D:/SteamLibrary/steamapps/workshop/content/570/3164617180/3164617180.vpk",
+  "validation": "STATIC: RERL dependency closure and exact SHA256 import; no runtime binding inferred from encrypted Lua.",
+  "selected": [
+    "particles/units/towers/aura_dark.vpcf",
+    "particles/units/towers/aura_durable.vpcf",
+    "particles/units/towers/aura_evil.vpcf",
+    "particles/units/towers/qualification_build_t04_base.vpcf"
+  ],
+  "records": [
+    {
+      "resource": "particles/units/towers/aura_dark_a.vpcf_c",
+      "bytes": 2286,
+      "sha256": "b0b5ef395d1848a25f652fd251f902e1a366a288f14339a041fc3bc5fb7b658b",
+      "dependencies": [
+        "materials/particle/auras/aura_vlads.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/aura_dark_b.vpcf_c",
+      "bytes": 2885,
+      "sha256": "f1b40933a9c23e9d47a5d97c6e16555ab19356d0e0d6d546c08f09b3bc8706aa",
+      "dependencies": [
+        "materials/particle/beam_jagged_04.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/aura_dark.vpcf_c",
+      "bytes": 2628,
+      "sha256": "c27dcc4b8dc8d2711e2adf01b97f87d00ef5b7abc269cb71184a5446966cea09",
+      "dependencies": [
+        "materials/particle/auras/aura_vlads.vtex",
+        "materials/particle/legion/legion_overwhelming_odds.vtex",
+        "particles/units/towers/aura_dark_a.vpcf",
+        "particles/units/towers/aura_dark_b.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/aura_durable_a.vpcf_c",
+      "bytes": 2291,
+      "sha256": "feb00c6d2e2725045c58f461276d01191ac9434087527ec768caba228d7f54fc",
+      "dependencies": [
+        "materials/particle/auras/aura_assaultc.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/aura_durable_b.vpcf_c",
+      "bytes": 2882,
+      "sha256": "0989aab66630e826094addb6bde0734280bd82dbdf1fd92b7a6f9f60f3906287",
+      "dependencies": [
+        "materials/particle/beam_edge_05.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/aura_durable.vpcf_c",
+      "bytes": 2657,
+      "sha256": "7530b3efc846b627757ccd717e834944d8b4f71e82b52ea84a7f25bc2186952c",
+      "dependencies": [
+        "materials/particle/auras/aura_assaultc.vtex",
+        "materials/particle/juggernaut/arcana/jugg_arcana_ground_symbol.vtex",
+        "particles/units/towers/aura_durable_a.vpcf",
+        "particles/units/towers/aura_durable_b.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/aura_evil_a.vpcf_c",
+      "bytes": 2312,
+      "sha256": "09e6c5ce91cfde1498aa680899d466855fd2cd61cd01ff97e38dce38a86581a3",
+      "dependencies": [
+        "materials/particle/elder_titan/elder_titan_ti7_immortal_ground.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/aura_evil_b.vpcf_c",
+      "bytes": 2594,
+      "sha256": "2d4f9191a8cae48bea00e102253ec438a0bfd4bdf6c19893e3fb5c63a101112a",
+      "dependencies": [
+        "materials/particle/elder_titan/elder_titan_ti7_immortal_ground.vtex",
+        "materials/particle/orb_tintable/particle_energy_orb_fluid_tintable.vtex",
+        "particles/units/towers/aura_evil_a.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/aura_evil.vpcf_c",
+      "bytes": 3271,
+      "sha256": "5b03f6ab576dcc1fd31b675e86c8cb53250f0e027eafbc49193a2e7e5f89af6e",
+      "dependencies": [
+        "materials/particle/water/caustic/caustic.vtex",
+        "particles/units/towers/aura_evil_b.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/qualification_build_t04_base_crystal_chain.vpcf_c",
+      "bytes": 3130,
+      "sha256": "f3bef9ce18f69ac6e4e22a8203f77c90f0831041566bc3ffe9a5f37474617d6b",
+      "dependencies": [
+        "materials/particle/crystal/crystal.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/qualification_build_t04_base_crystal_grow.vpcf_c",
+      "bytes": 2314,
+      "sha256": "de3c753864bffa950597520ca51547c1a13860e6feb3955d89cb95e2e6273482",
+      "dependencies": [
+        "particles/units/towers/qualification_build_t04_base_crystal_chain.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/qualification_build_t04_base_edge.vpcf_c",
+      "bytes": 3138,
+      "sha256": "3c67bdb644b726b9c79cebc0d9a3da2e2022d53c25d4c712129a071fc912362b",
+      "dependencies": [
+        "materials/particle/juggernaut/juggernaut_blade_fury.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/qualification_build_t04_base_inner_edge.vpcf_c",
+      "bytes": 3279,
+      "sha256": "b6e256324b1ddc6e4180cfaa92231f2f2d11ea93c3ab338aef96613ee3d121b0",
+      "dependencies": [
+        "materials/particle/orb_tintable/particle_energy_orb_fluid_tintable.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/qualification_build_t04_base_proj.vpcf_c",
+      "bytes": 2904,
+      "sha256": "f62432341e2a8cd3388ddbe1005b27bf0f4f5d337ef59bdda54a5f66337f8dac",
+      "dependencies": [
+        "materials/particle/particle_modulate_04_projected.vmat"
+      ]
+    },
+    {
+      "resource": "particles/units/towers/qualification_build_t04_base.vpcf_c",
+      "bytes": 1845,
+      "sha256": "da2b5ca8f35e11cc8c3045ef778d808fbc80bfb319432032c2b9947cdf016642",
+      "dependencies": [
+        "particles/units/towers/qualification_build_t04_base_crystal_grow.vpcf",
+        "particles/units/towers/qualification_build_t04_base_edge.vpcf",
+        "particles/units/towers/qualification_build_t04_base_inner_edge.vpcf",
+        "particles/units/towers/qualification_build_t04_base_proj.vpcf"
+      ]
+    }
+  ],
+  "native_dependencies": [
+    "materials/particle/auras/aura_assaultc.vtex_c",
+    "materials/particle/auras/aura_vlads.vtex_c",
+    "materials/particle/beam_edge_05.vtex_c",
+    "materials/particle/beam_jagged_04.vtex_c",
+    "materials/particle/crystal/crystal.vtex_c",
+    "materials/particle/elder_titan/elder_titan_ti7_immortal_ground.vtex_c",
+    "materials/particle/juggernaut/arcana/jugg_arcana_ground_symbol.vtex_c",
+    "materials/particle/juggernaut/juggernaut_blade_fury.vtex_c",
+    "materials/particle/legion/legion_overwhelming_odds.vtex_c",
+    "materials/particle/orb_tintable/particle_energy_orb_fluid_tintable.vtex_c",
+    "materials/particle/particle_modulate_04_projected.vmat_c",
+    "materials/particle/water/caustic/caustic.vtex_c"
+  ]
+}

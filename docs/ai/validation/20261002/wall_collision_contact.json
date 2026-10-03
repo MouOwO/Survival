@@ -1,0 +1,175 @@
+{
+  "date": "2026-10-02",
+  "status": "IMPLEMENTED_AND_OFFLINE_VALIDATED",
+  "user_report": "Only two monsters attack, stalled front reservations and monsters entering a gap beside the wall",
+  "diagnosis": {
+    "formal_wave_radius": 32,
+    "model_changes_precede_final_hull_setting": true,
+    "nonwave_policy_radii": {
+      "practice": 12,
+      "nonwave_flying": 10,
+      "wall_challenge": 0
+    },
+    "wall_body_already_square": true,
+    "old_lane_geometry_required_width": 304,
+    "unarrived_claim_protection_disagreed_with_ai_arrival": true,
+    "gate_side_and_continuous_height_gaps_can_remain": true
+  },
+  "implementation": {
+    "max_contacts": 4,
+    "hull32_lane_offsets": [
+      -96,
+      -32,
+      32,
+      96
+    ],
+    "larger_and_mixed_hulls_respect_actual_radii": true,
+    "arrival_shared_between_ai_and_claims": true,
+    "stalled_unarrived_release_seconds": 3,
+    "controlled_and_arrived_units_protected": true,
+    "navigation_cache_seconds": 2,
+    "square_body": [
+      256,
+      256
+    ],
+    "gate_seam_limit_half_width": 384,
+    "seam_axis_from_static_navigation_and_height": true,
+    "four_sections_both_sides_must_agree": true,
+    "actual_tile_edges_must_join_terrain_banks": true,
+    "open_single_side_t_junction_staggered_and_oversized_terrain_not_expanded": true,
+    "all_walls_reject_current_hull_rectangle_penetration": true,
+    "observed_swept_crossing_only_for_confirmed_enclosed_gates": true,
+    "open_floor_legal_corner_arc_preserved": true,
+    "blocked_correction_falls_back_to_legal_previous_position": true,
+    "existing_observation_seconds": 0.5,
+    "new_periodic_timers": 0,
+    "normal_boundary_observation_nav_queries_orders_or_placement": 0,
+    "failed_creation_rolls_back_obstacles_and_refs": true,
+    "missing_obstacles_rebuilt": true,
+    "retarget_and_destroy_clear_boundary_snapshot": true,
+    "base_damage_attack_speed_spawn_hull_config_unchanged": true
+  },
+  "verification": {
+    "coverage": {
+      "archetypes_navigation": 78,
+      "actual_wave_batches": 873,
+      "ordinary": 550,
+      "wave_leader": 264,
+      "assault_boss": 59,
+      "flying_movement_profile": 266,
+      "actual_visual_replacements": 89,
+      "synthetic_policy_cases": 13,
+      "formal_wave_radius": 32,
+      "formal_hull_after_last_visual_call": true,
+      "formal_hull_before_clear_space": true,
+      "nonwave_policy_radii": [
+        0,
+        10,
+        12,
+        32
+      ],
+      "geometry_matrix_cases": 76,
+      "boundary_classes": [
+        "ground",
+        "ranged",
+        "flying",
+        "challenge_no_unit_collision",
+        "large_hull"
+      ],
+      "open_floor_corner_arc_preserved": true,
+      "all_wall_actual_overlap_corrected": true,
+      "confirmed_gate_crossing_corrected": true
+    },
+    "final_affected_runs": [
+      {
+        "name": "gate_fix_monster_ground_navigation",
+        "cmd": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_monster_ground_navigation.lua",
+        "exit_code": 0
+      },
+      {
+        "name": "gate_fix_wave_native_models",
+        "cmd": "& 'C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe' tools/test_wave_native_models.py",
+        "exit_code": 0
+      },
+      {
+        "name": "gate_fix_wall_melee_contact",
+        "cmd": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_wall_melee_contact.lua",
+        "exit_code": 0
+      },
+      {
+        "name": "gate_fix_wall_navigation",
+        "cmd": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_wall_navigation.lua",
+        "exit_code": 0
+      },
+      {
+        "name": "gate_fix_wall_native_ai",
+        "cmd": "& 'C:/Program Files/lua/bin/lua5.1.exe' -e 'MODIFIER_STATE_NO_HEALTH_BAR=7; dofile(\"scripts/vscripts/tests/test_wall_slot_limit.lua\")'",
+        "exit_code": 0
+      },
+      {
+        "name": "gate_fix_enemy_wall_order_cache",
+        "cmd": "& 'C:/Program Files/lua/bin/lua5.1.exe' -e 'package.path=\"scripts/vscripts/?.lua;\"..package.path; local f=assert(io.open(\"scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua\",\"r\")); local source=f:read(\"*a\"); f:close(); dofile(\"scripts/vscripts/tests/test_enemy_wall_order_cache.lua\")(source)'",
+        "exit_code": 0
+      },
+      {
+        "name": "final_gate_navigation_geometry_76_cases",
+        "cmd": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_wall_navigation_geometry.lua",
+        "exit_code": 0
+      },
+      {
+        "name": "final_gate_diff_check",
+        "cmd": "git diff --check -- scripts/vscripts/tests/test_monster_ground_navigation.lua scripts/vscripts/systems/wall_navigation_service.lua scripts/vscripts/systems/wall_navigation_geometry.lua scripts/vscripts/systems/wall_melee_contact.lua scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua scripts/vscripts/tests/test_wall_melee_contact.lua scripts/vscripts/tests/test_enemy_wall_order_cache.lua",
+        "exit_code": 0
+      },
+      {
+        "name": "final_enemy_wall_boundary_ai_real_modules",
+        "cmd": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_enemy_wall_boundary_ai.lua",
+        "exit_code": 0
+      },
+      {
+        "name": "gate_scope_review_counterexample",
+        "cmd": "& 'C:/Program Files/lua/bin/lua5.1.exe' -e 'package.path=\"scripts/vscripts/?.lua;\"..package.path; Vector=function(x,y,z) return {x=x,y=y,z=z or 0} end; local g=require(\"systems/wall_navigation_geometry\"); local b={min_x=-128,max_x=128,min_y=-128,max_y=128}; local a=Vector(-162,80); local c=Vector(-80,162); assert(g.outside(b,a,nil,32)==nil and g.outside(b,c,nil,32)==nil); assert(g.outside(b,c,a,32,false)==nil); local r=assert(g.outside(b,Vector(0,0),a,32,false)); assert(r.x==-162); local _,_,lawn=g.seams(Vector(0,0),function() return true end); local _,_,gate=g.seams(Vector(0,0),function(p) return math.abs(p.y)<128 end); assert(lawn==false and gate==true); assert(g.outside(b,Vector(400,0),Vector(-400,0),32,true)); print(\"GATE_SCOPE_REVIEW_PASS open-arc preserved, all-wall overlap restored, lawn gate=false, body-only enclosed gate=true, gate crossing restored\")'",
+        "exit_code": 0
+      }
+    ],
+    "contact_deadlock_real_modules": "PASS",
+    "all_class_boundary_ai_real_modules": "PASS",
+    "lua51_parse": "PASS",
+    "scoped_diff_check": "PASS",
+    "current_hash_records_checked": 62,
+    "historical_pre_review_hashes_retained_in_audit_not_treated_as_current": true
+  },
+  "evidence": {
+    "monster_audit": "output/wall_collision_contact_20261002/monster_collision_audit.json",
+    "monster_runtime": "output/wall_collision_contact_20261002/monster_runtime_validation.json",
+    "contact_runtime": "output/wall_collision_contact_20261002/contact_runtime_validation.json",
+    "formal_map_static_audit": "output/wall_geometry_audit_20261002/README.md",
+    "current_map_gnv_sections": "output/wall_geometry_audit_20261002/formal_nav_cross_sections.json"
+  },
+  "validated_inputs_sha256": {
+    "scripts/vscripts/systems/wall_navigation_geometry.lua": "2a17b91460e6bec1a8078c02920d17562b01443f7a5347ee78971a538b34d309",
+    "scripts/vscripts/systems/wall_navigation_service.lua": "b5feee7c476e176d395cc44449224d9c89685f563b0f93ac09d45848331b218a",
+    "scripts/vscripts/systems/wall_melee_contact.lua": "2ce236a0eee618c3683f08490b07b8e9d5383932c3cfc129bc527a80132f0c66",
+    "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua": "7dace8090058b8b644992922d50d01e9cd65e44a81bbdf3ec60d17955f7b2c99",
+    "scripts/vscripts/tests/test_wall_navigation_geometry.lua": "d30410ee5ae201c12fe3c37f020cf39ce7cd4f95bf9232bfc632911b8f8f289b",
+    "scripts/vscripts/tests/test_wall_contact_deadlock.lua": "7bb63e3aff30f9f13478bf05a13ba85ae242ca1c07c5b51e422019c89c4307c8",
+    "scripts/vscripts/tests/test_enemy_wall_boundary_ai.lua": "87d9d8f24234599854dd200b189d7c7ff76b6dd53bc9c2d71e7d5879934ed2b9",
+    "scripts/vscripts/tests/test_wall_melee_contact.lua": "cdaec16c2591783a14e767973d7c9b565eb87e007343604879a1f46bc790c616",
+    "scripts/vscripts/tests/test_enemy_wall_order_cache.lua": "5f6a56cfb3a308820bec51d0632ce7c110120bfbbb4c7b80da5498875164b587",
+    "scripts/vscripts/tests/test_monster_ground_navigation.lua": "5b733f4e9a7684b848f15bdadf662ac371f63c6f1302f834128ab70869f3c5de"
+  },
+  "acceptance": {
+    "live_gameplay": false,
+    "exact_screenshot_reproduced": false,
+    "native_group_push_measured": false,
+    "new_compilation_required": false,
+    "game_restarted_or_hot_reloaded": false,
+    "next_step": "Reload map; inspect four ordinary front attackers, death replacement and sealed gate corners"
+  },
+  "limitations": [
+    "Offline real Lua modules with mocked nav/movement; the exact screenshot coordinates and live debug hull multiplier are unknown",
+    "Unrecognized or oversized/inconsistent terrain intentionally does not receive wider shoulders",
+    "Existing unrelated challenge CSV width and retired maintain-spawn contract failures are recorded separately",
+    "Old slot fixture needs missing NO_HEALTH_BAR mock constant; adapted command is recorded without claiming unmodified fixture PASS"
+  ]
+}

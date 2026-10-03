@@ -28,10 +28,12 @@ local building_count_limits = require("systems/building_count_limit_service")
 local building_defeat_rules = require("systems/building_defeat_rules")
 local online_time_service = require("systems/online_time_service")
 local builder_work = require("systems/builder_work_position_service")
+local grid_config = require("config/grid_placement_config")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
 local buildings = {}
+local pending_unique_builds = {}
 local on_entity_killed
 local fusion_replacements = {}
 local fusion_replacement_sequence = 0
@@ -87,8 +89,70 @@ end
 local function count_for(player_id, building_id)
     return tower_limits:count(player_id, building_id)
 end
-local function change_count(player_id, building_id, delta)
+local function building_counts_snapshot(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return { ok = false, error = "invalid_player" } end
+    local counts = {}
+    for building_id, definition in pairs(config) do
+        if type(definition) == "table" and definition.id == building_id then
+            counts[building_id] = count_for(player_id, building_id)
+        end
+    end
+    for building_id, value in pairs(tower_limits.counts[player_id] or {}) do
+        counts[building_id] = value
+    end
+    for _, reservation in pairs(pending_unique_builds) do
+        if reservation.player_id == player_id then
+            local building_id = reservation.building_id
+            counts[building_id] = (counts[building_id] or 0) + 1
+        end
+    end
+    return { ok = true, player_id = player_id, counts = counts }
+end
+local function publish_building_counts(player_id, reason)
+    local snapshot = building_counts_snapshot({ player_id = player_id })
+    if not snapshot.ok then return end
+    snapshot.reason = reason
+    event_bus.emit(events.BUILDING_COUNTS_CHANGED, snapshot)
+end
+local function release_pending_unique_build(task, defer_publish)
+    local reservation = task and pending_unique_builds[task] or nil
+    if not reservation then return false end
+    pending_unique_builds[task] = nil
+    if not defer_publish then
+        publish_building_counts(reservation.player_id, "build_order_released")
+    end
+    return true
+end
+local function pending_unique_count(player_id, building_id, caster, own_task)
+    local count = 0
+    for task, reservation in pairs(pending_unique_builds) do
+        if reservation.player_id == player_id and reservation.building_id == building_id then
+            local authenticated_own_task = task == own_task
+                and reservation.caster == caster
+                and valid_entity(caster) and caster.survival_build_task == task
+            if not authenticated_own_task then count = count + 1 end
+        end
+    end
+    return count
+end
+local function reserve_pending_unique_build(task, check, caster)
+    if building_count_limits.maximum(
+        check.definition.max_count, check.definition.id, check.player_id
+    ) ~= 1 then return end
+    pending_unique_builds[task] = {
+        player_id = check.player_id,
+        building_id = check.definition.id,
+        caster = caster,
+    }
+    publish_building_counts(check.player_id, "build_order_accepted")
+end
+local function change_count(player_id, building_id, delta, defer_publish)
+    local previous = count_for(player_id, building_id)
     tower_limits:change(player_id, building_id, delta)
+    if not defer_publish and count_for(player_id, building_id) ~= previous then
+        publish_building_counts(player_id, "building_count_changed")
+    end
 end
 local function class_id_for_state(state)
     if not state or state.building_id ~= "arrow_tower" then return nil end
@@ -224,6 +288,8 @@ local function anchor_building(unit, position)
     return true
 end
 local function clear_build_task(caster, task)
+    local pending_task = task or (valid_entity(caster) and caster.survival_build_task)
+    release_pending_unique_build(pending_task)
     if valid_entity(caster)
         and (task == nil or caster.survival_build_task == task) then
         caster.survival_build_task = nil
@@ -348,7 +414,9 @@ local function level_display_name(definition, level)
 end
 local function state_display_name(state)
     if state.building_id == "arrow_tower" then
-        return state.unit.survival_display_name
+        local row = tower_routes.current(state)
+        return (row and tower_routes.display_name(row))
+            or state.unit.survival_display_name
             or state.tower_class_name
             or ((arrow_data(state.level) or {}).name)
             or state.definition.display_name
@@ -582,8 +650,11 @@ local function can_place(payload, require_clear_builder)
             and require("systems/archive_endless_service").can_rebuild_wall(builder.player_id)) then
         return { ok = false, error = "城墙整局只能建造一次" }
     end
-    if building_limit_reached(definition,
-        count_for(builder.player_id, definition.id), builder.player_id) then
+    local occupied_count = count_for(builder.player_id, definition.id)
+        + pending_unique_count(
+            builder.player_id, definition.id, caster, payload.build_task
+        )
+    if building_limit_reached(definition, occupied_count, builder.player_id) then
         return { ok = false, error = "建筑数量已达上限" }
     end
     if definition.id == "building_challenge"
@@ -695,6 +766,14 @@ local function start_building(payload)
         {}
     )
     apply_initial_stats(unit, check.definition)
+    -- The real entity reserves collision from the beginning, even while its
+    -- render model is hidden. Completion restores the building's normal hull.
+    local footprint = check.definition.footprint or {}
+    local construction_radius = math.min(tonumber(footprint.x) or 2,
+        tonumber(footprint.y) or 2) * (tonumber(grid_config.cell_size) or 64) * 0.5
+    construction_radius = math.max(tonumber(unit.survival_hull_radius) or 0, construction_radius)
+    unit:SetHullRadius(construction_radius)
+    unit.survival_hull_radius = construction_radius
     add_building_abilities(unit, check.definition, false)
     local state = {
         entindex = unit:entindex(),
@@ -725,7 +804,10 @@ local function start_building(payload)
     }
     unit.survival_route_level = 1
     unit.survival_population_occupied = state.population_occupied
-    change_count(check.player_id, check.definition.id, 1)
+    -- Transfer the accepted order to the real construction entity without
+    -- publishing an empty allowance between the two ownership states.
+    change_count(check.player_id, check.definition.id, 1, true)
+    release_pending_unique_build(payload.build_task, true)
     event_bus.request(events.GRID_OCCUPY_REQUEST, {
         grid_x = state.grid_x,
         grid_y = state.grid_y,
@@ -733,6 +815,8 @@ local function start_building(payload)
         entindex = unit:entindex(),
     })
     buildings[state.entindex] = state
+    publish_building_counts(check.player_id, "construction_started")
+    if state.building_id == "wall" then wall_collision_barrier_service.create(unit) end
     dev_wall_stats.apply(state)
     local maximum_health = unit:GetMaxHealth()
     local build_time = math.max(0.1, tonumber(check.definition.build_time) or 3)
@@ -797,7 +881,7 @@ local function start_building(payload)
             state.level
         )
         building_visual.apply(unit, completed_level)
-        -- Bind the reveal to the final model/facing before fading its white coat.
+        -- Only reveal after the authoritative construction deadline and final model apply.
         construction_visual.complete(
             construction_visual_state,
             unit,
@@ -921,12 +1005,15 @@ local function queue_building(payload)
         logger.warn("BuildingSystem", "builder move order failed: " .. tostring(order_error))
         return { ok = false, error = "builder_move_order_failed" }
     end
+    reserve_pending_unique_build(task, check, caster)
     scheduler.every(0.1, function()
         if not valid_entity(caster) then
+            clear_build_task(caster, task)
             rollback_build_cooldown(task)
             return false
         end
         if caster.survival_build_task ~= task then
+            clear_build_task(caster, task)
             rollback_build_cooldown(task)
             return false
         end
@@ -946,6 +1033,7 @@ local function queue_building(payload)
             player_id = check.player_id,
             building_id = payload.building_id,
             position = target,
+            build_task = task,
         })
         if not current or not current.ok then
             clear_build_task(caster, task)
@@ -1241,6 +1329,16 @@ end
 local function on_player_disconnected(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
+    local pending = {}
+    for task, reservation in pairs(pending_unique_builds) do
+        if reservation.player_id == player_id then
+            pending[#pending + 1] = { task = task, caster = reservation.caster }
+        end
+    end
+    for _, entry in ipairs(pending) do
+        rollback_build_cooldown(entry.task)
+        clear_build_task(entry.caster, entry.task)
+    end
     local removed = 0
     local targets = {}
     for _, state in pairs(buildings) do
@@ -1349,10 +1447,12 @@ function M.enable_dev_wall_stats()
 end
 
 function M.init()
+    if wall_collision_barrier_service.clear_all then wall_collision_barrier_service.clear_all() end
     if building_visual.init then building_visual.init() end
     construction_visual.reset()
     wall_destruction.reset()
     buildings = {}
+    pending_unique_builds = {}
     tower_limits:reset()
     wall_ever_built = {}
     defeat_triggered = false
@@ -1360,6 +1460,7 @@ function M.init()
     event_bus.handle_request(events.BUILD_CAN_PLACE_REQUEST, can_place)
     event_bus.handle_request(events.BUILDING_QUERY_REQUEST, query_building)
     event_bus.handle_request(events.BUILDING_LIST_REQUEST, list_buildings)
+    event_bus.handle_request(events.BUILDING_COUNTS_REQUEST, building_counts_snapshot)
     event_bus.handle_request(
         events.BUILDING_FUSION_CONSUME_REQUEST, consume_for_fusion
     )

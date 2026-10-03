@@ -42,14 +42,14 @@ for index = 2, 4 do
         "Hull 32 monsters would overlap in the attack row")
 end
 for _, position in ipairs(positions) do
-    assert(math.abs(position.x) + 32 <= 224 and math.abs(position.y) == 288,
+    assert(math.abs(position.x) + 32 <= 224 and math.abs(position.y) == 176,
         "four monster hulls must fit within the 448-wide passage")
 end
 
 local fifth = entity(6, Vector(0, -500, 0))
 assert(slots.claim(wall, fifth) == nil, "fifth monster must wait for an attack slot")
 local waiting = slots.queue_position(wall, fifth)
-assert(waiting and math.abs(waiting.y) == 448,
+assert(waiting and math.abs(waiting.y) == 336,
     "waiting row must remain behind the four attack positions")
 
 print("WAVE_FOUR_LANE_COLLISION_PASS: four non-overlapping Hull 32 slots in 448 passage; fifth queues")

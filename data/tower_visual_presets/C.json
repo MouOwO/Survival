@@ -1,0 +1,564 @@
+{
+  "preset": "C",
+  "name": "华丽典礼",
+  "stages": [
+    {
+      "preset": "C",
+      "route": "death",
+      "tier": "R",
+      "asset_id": "tower_death_templar_assassin",
+      "hero": "npc_dota_hero_nevermore",
+      "body_model": "models/heroes/shadow_fiend/shadow_fiend.vmdl",
+      "outfit": "原生默认装束",
+      "purchased_item_defs": [],
+      "wearable_item_defs": [
+        "387",
+        "486",
+        "488",
+        "509",
+        "826"
+      ],
+      "projectile": "particles/units/heroes/hero_nevermore/nevermore_base_attack.vpcf",
+      "projectile_policy": "native_hero",
+      "market_links": [],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "death",
+      "tier": "SR",
+      "asset_id": "tower_death_nevermore_sundered_souls",
+      "hero": "npc_dota_hero_nevermore",
+      "body_model": "models/heroes/shadow_fiend/shadow_fiend.vmdl",
+      "outfit": "黯影臂",
+      "purchased_item_defs": [
+        "8259"
+      ],
+      "wearable_item_defs": [
+        "387",
+        "486",
+        "8259",
+        "509",
+        "826"
+      ],
+      "projectile": "particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation.vpcf",
+      "projectile_policy": "native_cosmetic",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Arms%20of%20Desolation"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "death",
+      "tier": "SSR",
+      "asset_id": "tower_death_warlock_seam_ripper",
+      "hero": "npc_dota_hero_nevermore",
+      "body_model": "models/heroes/shadow_fiend/shadow_fiend_arcana.vmdl",
+      "outfit": "暮光雕像 / 黯影臂 / 噬魔之王",
+      "purchased_item_defs": [
+        "21752",
+        "8259",
+        "6996"
+      ],
+      "wearable_item_defs": [
+        "18035",
+        "18036",
+        "8259",
+        "509",
+        "6996"
+      ],
+      "projectile": "particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation_fire_arcana.vpcf",
+      "projectile_policy": "native_cosmetic_combination",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Twilight%20Effigy",
+        "https://steamcommunity.com/market/listings/570/Arms%20of%20Desolation",
+        "https://steamcommunity.com/market/listings/570/Demon%20Eater"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "mystery",
+      "tier": "R",
+      "asset_id": "tower_keeper_of_the_light",
+      "hero": "npc_dota_hero_tinker",
+      "body_model": "models/heroes/tinker/tinker.vmdl",
+      "outfit": "原生默认装束",
+      "purchased_item_defs": [],
+      "wearable_item_defs": [
+        "367",
+        "463",
+        "464",
+        "465",
+        "466",
+        "467",
+        "515",
+        "618"
+      ],
+      "projectile": "particles/units/heroes/hero_tinker/tinker_base_attack.vpcf",
+      "projectile_policy": "suppressed_by_continuous_laser",
+      "market_links": [],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "mystery",
+      "tier": "SR",
+      "asset_id": "tower_laser_od_blackgate",
+      "hero": "npc_dota_hero_tinker",
+      "body_model": "models/heroes/tinker/tinker.vmdl",
+      "outfit": "秘奥共振光束",
+      "purchased_item_defs": [
+        "13777"
+      ],
+      "wearable_item_defs": [
+        "13777",
+        "463",
+        "464",
+        "465",
+        "466",
+        "467",
+        "515",
+        "618"
+      ],
+      "projectile": "particles/units/heroes/hero_tinker/tinker_base_attack.vpcf",
+      "projectile_policy": "suppressed_by_continuous_laser",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Arcanic%20Resonance%20Beam"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "mystery",
+      "tier": "SSR",
+      "asset_id": "tower_laser_death_prophet_brightshroud",
+      "hero": "npc_dota_hero_tinker",
+      "body_model": "models/heroes/tinker/tinker.vmdl",
+      "outfit": "湮灭危机 / 秘奥共振光束 / MK-III机甲远行鞋 / 辊珠钢颚",
+      "purchased_item_defs": [
+        "21110",
+        "13777",
+        "6224",
+        "7143"
+      ],
+      "wearable_item_defs": [
+        "13777",
+        "9264",
+        "9266",
+        "7143",
+        "466",
+        "9268",
+        "515",
+        "6224"
+      ],
+      "projectile": "particles/units/heroes/hero_tinker/tinker_base_attack.vpcf",
+      "projectile_policy": "suppressed_by_continuous_laser",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Submerged%20Hazard",
+        "https://steamcommunity.com/market/listings/570/Arcanic%20Resonance%20Beam",
+        "https://steamcommunity.com/market/listings/570/Mecha%20Boots%20of%20Travel%20Mk%20III",
+        "https://steamcommunity.com/market/listings/570/Rollermawster"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "lightning",
+      "tier": "R",
+      "asset_id": "tower_lightning_zeus_tempest",
+      "hero": "npc_dota_hero_zuus",
+      "body_model": "models/heroes/zeus/zeus.vmdl",
+      "outfit": "原生默认装束",
+      "purchased_item_defs": [],
+      "wearable_item_defs": [
+        "589",
+        "593",
+        "604",
+        "605",
+        "606",
+        "607"
+      ],
+      "projectile": "particles/units/heroes/hero_zuus/zuus_base_attack.vpcf",
+      "projectile_policy": "replaced_by_ranked_lightning",
+      "market_links": [],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "lightning",
+      "tier": "SR",
+      "asset_id": "tower_lightning_leshrac",
+      "hero": "npc_dota_hero_zuus",
+      "body_model": "models/heroes/zeus/zeus.vmdl",
+      "outfit": "风暴之示",
+      "purchased_item_defs": [
+        "12323"
+      ],
+      "wearable_item_defs": [
+        "12323",
+        "593",
+        "604",
+        "605",
+        "606",
+        "607"
+      ],
+      "projectile": "particles/units/heroes/hero_zuus/zuus_base_attack.vpcf",
+      "projectile_policy": "replaced_by_ranked_lightning",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Tempest%20Revelation"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "lightning",
+      "tier": "SSR",
+      "asset_id": "tower_lightning_razor_voidstorm",
+      "hero": "npc_dota_hero_zuus",
+      "body_model": "models/heroes/zeus/zeus_arcana.vmdl",
+      "outfit": "尊王之傲 / 风暴之示 / 雷霆神盔 / 真霹实雳",
+      "purchased_item_defs": [
+        "24196",
+        "12323",
+        "6914",
+        "5412"
+      ],
+      "wearable_item_defs": [
+        "12323",
+        "5412",
+        "6914",
+        "605",
+        "24151",
+        "24197"
+      ],
+      "projectile": "particles/units/heroes/hero_zuus/zuus_base_attack.vpcf",
+      "projectile_policy": "replaced_by_ranked_lightning",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Sire%27s%20Pride",
+        "https://steamcommunity.com/market/listings/570/Tempest%20Revelation",
+        "https://steamcommunity.com/market/listings/570/Tempest%20Helm%20of%20the%20Thundergod",
+        "https://steamcommunity.com/market/listings/570/Righteous%20Thunderbolt"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "machine_gun",
+      "tier": "R",
+      "asset_id": "tower_machine_gun_sniper_occultist",
+      "hero": "npc_dota_hero_sniper",
+      "body_model": "models/heroes/sniper/sniper.vmdl",
+      "outfit": "原生默认装束",
+      "purchased_item_defs": [],
+      "wearable_item_defs": [
+        "281",
+        "282",
+        "283",
+        "284",
+        "285"
+      ],
+      "projectile": "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf",
+      "projectile_policy": "native_hero",
+      "market_links": [],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "machine_gun",
+      "tier": "SR",
+      "asset_id": "tower_machine_gun_bounty_heartless",
+      "hero": "npc_dota_hero_sniper",
+      "body_model": "models/heroes/sniper/sniper.vmdl",
+      "outfit": "女巫追猎 / 全径之幸",
+      "purchased_item_defs": [
+        "21777",
+        "9197"
+      ],
+      "wearable_item_defs": [
+        "18138",
+        "9197",
+        "18139",
+        "18142",
+        "18141"
+      ],
+      "projectile": "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack.vpcf",
+      "projectile_policy": "native_cosmetic",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Witch%20Hunt",
+        "https://steamcommunity.com/market/listings/570/Full-Bore%20Bonanza"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "machine_gun",
+      "tier": "SSR",
+      "asset_id": "tower_machine_gun_windranger_rising_gale",
+      "hero": "npc_dota_hero_sniper",
+      "body_model": "models/heroes/sniper/sniper.vmdl",
+      "outfit": "呼啸狂狼之灵套装 / 亚达兰封锁舰传说",
+      "purchased_item_defs": [
+        "20321",
+        "21654"
+      ],
+      "wearable_item_defs": [
+        "14971",
+        "14972",
+        "14968",
+        "14970",
+        "14969"
+      ],
+      "projectile": "particles/econ/items/sniper/sniper_fall20_immortal/sniper_fall20_immortal_base_attack.vpcf",
+      "projectile_policy": "native_cosmetic",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Spirit%20of%20the%20Howling%20Wolf%20Set",
+        "https://steamcommunity.com/market/listings/570/Tales%20of%20the%20Ardalan%20Interdictor"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "multi",
+      "tier": "R",
+      "asset_id": "tower_multi_medusa_anamnessa",
+      "hero": "npc_dota_hero_clinkz",
+      "body_model": "models/heroes/clinkz/clinkz.vmdl",
+      "outfit": "原生默认装束",
+      "purchased_item_defs": [],
+      "wearable_item_defs": [
+        "56",
+        "57",
+        "58",
+        "59",
+        "60",
+        "61",
+        "523",
+        "685"
+      ],
+      "projectile": "particles/units/heroes/hero_clinkz/clinkz_base_attack.vpcf",
+      "projectile_policy": "native_hero",
+      "market_links": [],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "multi",
+      "tier": "SR",
+      "asset_id": "tower_multi_drow_dread_retribution",
+      "hero": "npc_dota_hero_clinkz",
+      "body_model": "models/heroes/clinkz/clinkz.vmdl",
+      "outfit": "魔头之命",
+      "purchased_item_defs": [
+        "13009"
+      ],
+      "wearable_item_defs": [
+        "56",
+        "13009",
+        "58",
+        "59",
+        "60",
+        "61",
+        "523",
+        "685"
+      ],
+      "projectile": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf",
+      "projectile_policy": "fallback_native_skill",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Maraxiform%27s%20Fate"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "multi",
+      "tier": "SSR",
+      "asset_id": "tower_multi_vengeful_shen_screeauk",
+      "hero": "npc_dota_hero_clinkz",
+      "body_model": "models/heroes/clinkz/clinkz.vmdl",
+      "outfit": "失落群山套装 / 魔头之命 / 炎魔之怒",
+      "purchased_item_defs": [
+        "20207",
+        "13009",
+        "9162"
+      ],
+      "wearable_item_defs": [
+        "56",
+        "13009",
+        "5155",
+        "9162",
+        "5154",
+        "5153",
+        "523",
+        "685"
+      ],
+      "projectile": "particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow.vpcf",
+      "projectile_policy": "native_cosmetic_skill_as_attack",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Lost%20Hills%20Set",
+        "https://steamcommunity.com/market/listings/570/Maraxiform%27s%20Fate",
+        "https://steamcommunity.com/market/listings/570/Maraxiform%27s%20Ire"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "frost",
+      "tier": "R",
+      "asset_id": "tower_frost_lich_rime_lord",
+      "hero": "npc_dota_hero_lich",
+      "body_model": "models/heroes/lich/lich.vmdl",
+      "outfit": "原生默认装束",
+      "purchased_item_defs": [],
+      "wearable_item_defs": [
+        "331",
+        "332",
+        "333",
+        "334",
+        "506",
+        "571"
+      ],
+      "projectile": "particles/units/heroes/hero_lich/lich_chain_frost.vpcf",
+      "projectile_policy": "fallback_native_skill",
+      "market_links": [],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "frost",
+      "tier": "SR",
+      "asset_id": "tower_frost_crystal_maiden_winter_raven",
+      "hero": "npc_dota_hero_lich",
+      "body_model": "models/heroes/lich/lich.vmdl",
+      "outfit": "暴君之视",
+      "purchased_item_defs": [
+        "9756"
+      ],
+      "wearable_item_defs": [
+        "331",
+        "332",
+        "9756",
+        "334",
+        "506",
+        "571"
+      ],
+      "projectile": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost.vpcf",
+      "projectile_policy": "native_cosmetic_skill_as_attack",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Glare%20of%20the%20Tyrant"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "frost",
+      "tier": "SSR",
+      "asset_id": "tower_frost_ancient_apparition",
+      "hero": "npc_dota_hero_lich",
+      "body_model": "models/heroes/lich/lich.vmdl",
+      "outfit": "雾凇领主的霜威 / 暴君之视 / 碎冰之积",
+      "purchased_item_defs": [
+        "21273",
+        "9756",
+        "7576"
+      ],
+      "wearable_item_defs": [
+        "9561",
+        "7576",
+        "9756",
+        "9560",
+        "506",
+        "12638"
+      ],
+      "projectile": "particles/survival/towers/trial/frost_ssr_chain.vpcf",
+      "projectile_policy": "fallback_custom",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Ascendance%20of%20the%20Rime%20Lord",
+        "https://steamcommunity.com/market/listings/570/Glare%20of%20the%20Tyrant",
+        "https://steamcommunity.com/market/listings/570/Shearing%20Deposition"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "anti_air",
+      "tier": "R",
+      "asset_id": "tower_anti_air_gyro_swooping",
+      "hero": "npc_dota_hero_techies",
+      "body_model": "models/heroes/techies/techies.vmdl",
+      "outfit": "原生默认装束",
+      "purchased_item_defs": [],
+      "wearable_item_defs": [
+        "394",
+        "487",
+        "489",
+        "490",
+        "491",
+        "492",
+        "499",
+        "827"
+      ],
+      "projectile": "particles/survival/towers/techies/techies_r_missile.vpcf",
+      "projectile_policy": "adapted_native_missile",
+      "market_links": [],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "anti_air",
+      "tier": "SR",
+      "asset_id": "tower_anti_air_batrider_empiric",
+      "hero": "npc_dota_hero_techies",
+      "body_model": "models/heroes/techies/techies.vmdl",
+      "outfit": "灵象硝骑",
+      "purchased_item_defs": [
+        "21424"
+      ],
+      "wearable_item_defs": [
+        "394",
+        "13530",
+        "13529",
+        "13527",
+        "13526",
+        "13528",
+        "499",
+        "827"
+      ],
+      "projectile": "particles/survival/towers/techies/techies_sr_missile.vpcf",
+      "projectile_policy": "adapted_native_missile",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Pachyderm%20Powderwagon"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    },
+    {
+      "preset": "C",
+      "route": "anti_air",
+      "tier": "SSR",
+      "asset_id": "tower_anti_air_skywrath_empyrean",
+      "hero": "npc_dota_hero_techies",
+      "body_model": "models/heroes/techies/techies.vmdl",
+      "outfit": "沉舰豚炮捆绑包",
+      "purchased_item_defs": [
+        "20610"
+      ],
+      "wearable_item_defs": [
+        "394",
+        "7011",
+        "489",
+        "6879",
+        "7009",
+        "6911",
+        "499",
+        "827"
+      ],
+      "projectile": "particles/survival/towers/techies/techies_ssr_missile.vpcf",
+      "projectile_policy": "adapted_native_missile",
+      "market_links": [
+        "https://steamcommunity.com/market/listings/570/Swine%20of%20the%20Sunken%20Galley%20Bundle"
+      ],
+      "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
+    }
+  ]
+}

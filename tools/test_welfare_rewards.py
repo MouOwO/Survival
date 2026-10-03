@@ -74,6 +74,6 @@ if __name__=='__main__':
  lua=LuaRuntime(unpack_returned_tuples=True)
  lua.execute((ROOT/'scripts/vscripts/tests/test_welfare_rewards.lua').read_text(encoding='utf-8-sig'))
  rows=lua.eval("require('systems/archive_welfare_rewards').rows({clear_counts={n1=5}})")
- out=ROOT/'output/welfare_victory_20261003';out.mkdir(exist_ok=True)
+ out=ROOT/'output/welfare_victory_20261003';out.mkdir(exist_ok=True,parents=True)
  (out/'rows.json').write_text(json.dumps([dict(rows[i]) for i in range(1,len(rows)+1)],ensure_ascii=False),encoding='utf-8')
  unittest.main()

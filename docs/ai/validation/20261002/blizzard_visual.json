@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-02",
+  "status": "PASS",
+  "roots": [
+    "particles/survival/skills/blizzard_ground.vpcf",
+    "particles/survival/skills/wyvern_blizzard_snow.vpcf"
+  ],
+  "resources": [
+    {
+      "resource": "particles/survival/skills/blizzard_ground.vpcf",
+      "sha256": "127ee78940f03fba0d3acd83a632f0188669652f71149c3d4012177cbe513f70",
+      "dependencies": [
+        "materials/particle/frost_add_projected.vmat",
+        "particles/survival/skills/blizzard_wind.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/frost_add_projected.vmat",
+      "sha256": "e95022c47e51b2ab27f829346ca542d341d48dd2b1709291463db63366c86b1a",
+      "dependencies": [
+        "materials/particle/frost_add_projected_color_psd_e16f0483.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/frost_add_projected_color_psd_e16f0483.vtex",
+      "sha256": "2387b1f36da52f650009238f47a0d6f1b8b7927b9d54f8699892752bb7df1995"
+    },
+    {
+      "resource": "particles/survival/skills/blizzard_wind.vpcf",
+      "sha256": "2fddaeb2e115d6980d37c57d39f2acc11df1dc1dcfecf112c5748916dec9f72a",
+      "dependencies": [
+        "materials/particle/smoke3/smoke3b.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke3/smoke3b.vtex",
+      "sha256": "68a4629525fb249b36f591f753a68bddbbaab5a27aeb0af98958de23f9a18ccf"
+    },
+    {
+      "resource": "particles/survival/skills/wyvern_blizzard_snow.vpcf",
+      "sha256": "6ea69763aebe0c97c73577f9d87cdf6fc727786d06079f9ec1d4512f02a23ba1",
+      "dependencies": [
+        "materials/particle/impact/fleks3.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/impact/fleks3.vtex",
+      "sha256": "3104f7900f1ce2ff310870f5291f66420949dab8a52f42d4c7e392b8ddfcce5a"
+    }
+  ],
+  "visuals": "Crystal Maiden frost projection and wind; CP2 radius. Isolated snowfall CP1 radius, 96/s, max 192. Five-second visual duration. No native ability states.",
+  "damage": "Original four damage waves and old fall clock retained pending user range/duration decision.",
+  "lifecycle": "Two world-owned roots per proc; five-second expiry/dead caster/session init clean up; no per-frame visual update.",
+  "in_game_visual_verified": false
+}

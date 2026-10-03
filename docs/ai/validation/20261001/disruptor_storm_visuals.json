@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "item": {"id": 23655, "name": "风暴串联之震", "english": "Tremors of the Tandem Storm"},
+  "resource": "particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm.vpcf",
+  "scope": ["hero fury thunder / proto_chain_lightning", "tower lightning storm"],
+  "controls": {"CP0": "ground position", "CP1": "actual skill radius, 1, 1", "CP2": "visual duration, 0, 0", "CP4": "ground position"},
+  "hero": {"current_radius": 400, "visual_seconds": 1.2, "repeat_same_target": "reuse one storm and update its position", "damage_timing": "unchanged, followups at 0.12s and 0.24s"},
+  "tower": {"radius": "skill.area", "duration": "skill.duration", "systems_per_cast": 1, "independent_falling_bolts": 0, "damage": "original single settlement unchanged"},
+  "cleanup": "Owned timer per area; DestroyParticle(false) plus ReleaseParticleIndex at duration; reset/failure cleanup; old-world guard",
+  "native_gameplay_applied": false,
+  "validation": {
+    "test_zeus_lightning_visual.lua": "PASS: five hero tiers, original totals, 400 radius and 1.2s duration, same-target reuse, radius 125/750, natural endcap, failure/reset cleanup, precache",
+    "test_tower_skill_tree_exclusion.lua": "PASS: R/SR/SSR chain effects, one tower storm at configured 300 radius/1s fixture duration, no falling bolts or extra damage",
+    "verify_zeus_visual_resources.cjs": "PASS: item mapping, native duration CP2 and radius CP1, complete native tree; 4 roots, 70 particle systems, 109 resources across current lightning effects",
+    "damage_baseline": "PASS: hero fury run_chain identical after excluding visual-only statements; tower storm damage and chain bounce functions identical to HEAD",
+    "lua_syntax": "PASS",
+    "diff_check": "PASS"
+  },
+  "native_evidence": "art/effects/lightning/reference/manifest.json",
+  "new_particle_compile_required": false,
+  "in_game_visual_verified": false
+}

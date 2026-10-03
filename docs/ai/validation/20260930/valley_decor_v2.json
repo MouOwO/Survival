@@ -1,0 +1,53 @@
+{
+  "status": "PREVIEW_READY",
+  "revision": 2,
+  "map": "valley_decor_review",
+  "main_map_replaced": false,
+  "main_source_sha256": "e2faf32913ac1652bca714d67771c5794ac7fa267782e8ce176c2ae2d1845fdd",
+  "source_sha256": "4b1e6f046faa779c3c346b394cc9cc6c83d4d04490c227ed8f9a69c1ee249c85",
+  "package_sha256": "240b5672e6e72da3463daac66706e9546cba6e634b84966ef3941ffa35b446c7",
+  "compile": {
+    "resources": 306,
+    "failed": 0,
+    "log": "output/valley_decor_v2/map_compile_retry.log",
+    "earlier_locked_package_retry_resolved": true
+  },
+  "package": {
+    "crc_entries": 311,
+    "source_crc_matches": true
+  },
+  "static": {
+    "existing_entities_and_meshes_preserved": true,
+    "height_and_navigation_arrays_preserved": true,
+    "models": 116,
+    "spawn_effects": 4,
+    "ground_overlays": 4,
+    "editable_flower_quads": 558,
+    "flower_mesh_physics": "none",
+    "paint_samples": 12357
+  },
+  "runtime": {
+    "cold_started": true,
+    "spawn_and_lane_checks": 116,
+    "failed": 0,
+    "log": "output/valley_decor_v2/runtime.log",
+    "visually_inspected": [
+      "soft_grass",
+      "red_flower_scatter",
+      "ground_aegis",
+      "border_plants",
+      "stone_spawn_frames",
+      "spawn_ring"
+    ],
+    "preview_fog_disabled": true
+  },
+  "hammer": {
+    "map": "content/dota_addons/survival/maps/valley_decor_review.vmap",
+    "palette": "content/dota_addons/survival/maps/prefabs/valley_detail_palette.vmap",
+    "material_search": "survival_valley"
+  },
+  "screenshots": [
+    "art/maps/c6/valley_v2/ground_preview.png",
+    "art/maps/c6/valley_v2/spawn_preview.png"
+  ]
+}

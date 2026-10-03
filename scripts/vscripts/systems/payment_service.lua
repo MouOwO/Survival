@@ -44,7 +44,7 @@ local function notify(id, message, level)
     bus.emit(events.UI_NOTIFICATION, {player_id=id, message=message, level=level or "info"})
 end
 local function session_id() return require("systems/match_setup_service").get_session_id() end
-local function request(id, action, sku, kind)
+local function request(id, action, sku, kind, channel)
     if not id or id ~= math.floor(id) or not PlayerResource:IsValidPlayerID(id)
         or PlayerResource:IsFakeClient(id) then return false, "player_id_invalid" end
     if busy[id] then send(id,{ok=false,action=action,error="payment_busy"}); return false,"payment_busy" end
@@ -62,8 +62,11 @@ local function request(id, action, sku, kind)
     if token=="" then send(id,{ok=false,action=action,error="payment_not_configured"}); return false,"payment_not_configured" end
     local session = session_id()
     local body = {account_id=account,match_session_id=session}
-    if action=="create" then body.sku=sku end
-    if action=="status" then
+    if action=="create" then
+        body.sku=sku
+        if channel then body.provider=channel end
+    end
+    if action=="status" or action=="cancel" then
         local order=orders[id] and orders[id][sku]
         if not order or order.account~=account or order.session~=session then
             send(id,{ok=false,action=action,error="order_not_in_session",sku=sku}); return false,"order_not_in_session"
@@ -122,12 +125,16 @@ local function request(id, action, sku, kind)
 end
 function M.handle(payload)
     local action=tostring(payload.action or "")
-    if action~="catalog" and action~="create" and action~="status" then return end
+    if action~="catalog" and action~="create" and action~="status" and action~="cancel" then return end
     local sku=tostring(payload.sku or "")
     if action~="catalog" and not valid_sku(sku) then
         send(tonumber(payload.PlayerID),{ok=false,action=action,error="product_unavailable"});return
     end
-    return request(tonumber(payload.PlayerID),action,sku)
+    local channel=payload.provider
+    if action=="create" and channel~=nil and channel~="wechat" and channel~="alipay" then
+        send(tonumber(payload.PlayerID),{ok=false,action=action,error="payment_channel_unavailable"});return
+    end
+    return request(tonumber(payload.PlayerID),action,sku,nil,channel)
 end
 function M.reset_player(context, kind)
     -- TODO(PAYMENT_TEST_ONLY): remove chat reset entry points before public release.

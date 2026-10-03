@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-01",
+  "status": "COMPILED_AND_SIMULATION_PASS_WORKSHOP_PENDING",
+  "scope": "Thicker colored laser, beam motes, near-head impact, damage-scaled blood, charge orb and slow casting pose",
+  "gameplay_damage_changed": false,
+  "resources": {"compiled": 7, "failed": 0, "compiled_data_and_dependencies_verified": true},
+  "colors_by_laser_skill_level": ["warm white", "white", "blue", "purple", "red"],
+  "beam": {"core_radius": 38, "envelope_radius": 76, "persistent_nodes": 26, "max_live_motes": 20},
+  "head": {"sockets": ["attach_head", "head", "attach_eye", "attach_eyes"], "fallback": "88% of bounding height, then configured height", "surface_offset": "toward tower, half hull radius clamped to 6..28", "update_seconds": 0.03},
+  "blood": {"source": "successful final_damage, engine_damage fallback", "strength": "clamp(1 + log10(1 + damage/800), 1, 4)", "max_droplets": 32, "ownership": "finite burst released once; rollback destroys failed setup", "adds_aoe_damage": false},
+  "charge": {"sprites": 1, "origin_offset_z": 185, "available_from_first_laser_level": true, "color": "same as beam"},
+  "pose": {"activity": "ACT_DOTA_CAST_ABILITY_1", "rate": 0.12, "wisp_fallback": "ACT_DOTA_IDLE", "lifecycle": "active beam only; reset/death/relocation destroys pose modifier"},
+  "tests_passed": ["test_tower_laser_visual.lua", "test_tower_skill_tree_exclusion.lua including production head/color/blood/pose path", "test_tower_visual_lifecycle.cjs including N laser orb and upgrade", "verify-laser-visual.cjs --compiled --log-dir output/laser_head_polish", "Lua 5.1 syntax", "git diff --check"],
+  "limits": ["Current Dota process was not restarted or modified", "New particle appearance and casting activities require a fresh Workshop game", "Head surface uses socket/bounds plus hull approximation, not animated mesh intersection", "No FPS claim; bounded motes and blood increase particle work"]
+}

@@ -1,0 +1,2108 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "config": {
+    "status": "PASS",
+    "routes": [
+      {
+        "route": "death",
+        "rows": 20,
+        "combat_columns_unchanged": true,
+        "projectiles": [
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack.vpcf"
+        ]
+      },
+      {
+        "route": "machine_gun",
+        "rows": 20,
+        "combat_columns_unchanged": true,
+        "projectiles": [
+          "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf",
+          "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack.vpcf",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack.vpcf"
+        ]
+      },
+      {
+        "route": "multi",
+        "rows": 20,
+        "combat_columns_unchanged": true,
+        "projectiles": [
+          "particles/units/heroes/hero_mirana/mirana_base_attack.vpcf",
+          "particles/survival/towers/mars_crimson_ballista.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
+        ]
+      },
+      {
+        "route": "frost",
+        "rows": 20,
+        "combat_columns_unchanged": true,
+        "projectiles": [
+          "particles/units/heroes/hero_lich/lich_chain_frost.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost.vpcf",
+          "particles/survival/towers/trial/frost_ssr_comet.vpcf"
+        ]
+      },
+      {
+        "route": "anti_air",
+        "rows": 20,
+        "combat_columns_unchanged": true,
+        "projectiles": [
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack.vpcf",
+          "particles/survival/towers/trial/anti_air_sr_rocket.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2.vpcf"
+        ]
+      }
+    ],
+    "linear_skill_combat_unchanged": true,
+    "generated_configs_match": true,
+    "in_game_visual_verified": false
+  },
+  "resources": {
+    "status": "PASS",
+    "compiled_outputs": 11,
+    "dependencies": 302,
+    "resources": [
+      {
+        "resource": "particles/survival/towers/trial/death_ground.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/beam_hotwhite.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/beam_hotwhite.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/lightning_ground.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_blue.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/aircraft_blue.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/multi_embers.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/sparks/sparks.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/multi_ground.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/juggernaut/juggernaut_blade_fury.vtex",
+          "particles/survival/towers/trial/multi_embers.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/juggernaut/juggernaut_blade_fury.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/frost_flecks.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/impact/fleks3.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/impact/fleks3.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/frost_ground.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/frost_add_projected.vmat",
+          "particles/survival/towers/trial/frost_flecks.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/frost_add_projected.vmat",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/anti_air_sr_rocket.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/models/projectiles/arrows.vtex",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_explosion.vpcf",
+          "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_launch.vpcf",
+          "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_model.vpcf",
+          "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_smoke.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/models/projectiles/arrows.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_explosion.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_explosion_b.vpcf",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_explosion_flash.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/smoke1/smoke1.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_explosion_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/impact/fleks.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_explosion_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_burning_character/fire_burning_character.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/fire_burning_character/fire_burning_character.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/smoke3/smoke3.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_model.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/heroes/rattletrap/rattletrap_rocket.vmdl"
+        ]
+      },
+      {
+        "resource": "models/heroes/rattletrap/rattletrap_rocket.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_smoke_01.vtex",
+          "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_flame.vpcf",
+          "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_sparks.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/beam_smoke_01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_flame.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_particle_4/fire_particle_4_flat.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/fire_particle_4/fire_particle_4_flat.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare_sparks.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_yellow.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/aircraft_yellow.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/frost_comet_main.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_blue2.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/aircraft_blue2.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/frost_comet_ice_b.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/crystal/crystal.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/crystal/crystal.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/frost_ssr_comet.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "particles/survival/towers/trial/frost_comet_main.vpcf",
+          "particles/survival/towers/trial/frost_comet_ice_b.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_explode.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks3.vtex",
+          "particles/units/heroes/hero_lich/lich_chain_frost_explode_d.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_explode_b.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_explode_c.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode_d.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_cone_gradient_1.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_cone_gradient_1.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode_c.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/aircraft_white.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/survival/towers/trial/lightning_ssr_arc.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "materials/particle/bendibeam2.vtex",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_b.vpcf",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_c.vpcf",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_d.vpcf",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact.vpcf",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_light.vpcf",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_e.vpcf",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_f.vpcf",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_g.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/bendibeam2.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/electrical_arc/electrical_arc.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/electrical_arc/electrical_arc.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_c.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/spark_glow_01.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/spark_glow_01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_d.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/bendibeam2.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_glow_04.vtex",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact_b.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_glow_04.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_impact_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/electrical_arc/electrical_arc.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_light.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/electrical_arc/electrical_arc.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_e.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/electricity/electricity_22_a.vtex",
+          "particles/units/heroes/hero_zuus/zuus_arc_lightning_e_flash.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/electricity/electricity_22_a.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_e_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_hotwhite.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_f.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_hotwhite.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_zuus/zuus_arc_lightning_g.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_hotwhite.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_a.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_b.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_c.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_e.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_h.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_g.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_parent.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_halo.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_core.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_a.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/maya_wispy/wispy_v2.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/smoke/maya_wispy/wispy_v2.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/static/static_smoke.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/smoke/static/static_smoke.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_c.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_red.vtex",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_beam.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/aircraft_red.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_beam.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_square_gradient_2.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_square_gradient_2.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_e.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_swirl_04b.vtex",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_f.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_swirl_04b.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_f.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_sphere_mod.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_sphere_mod.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_h.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_red.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_g.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/maya_wispy/wispy_v2.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_parent.vpcf",
+        "source": "native",
+        "dependencies": [
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_trail.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_crack_01.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/beam_crack_01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_halo.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_ring_wavy4.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_ring_wavy4.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact_glow.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact_smoke.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact_flash.vpcf",
+          "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact_light.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact_glow.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/lava_blasts/lava_glow.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/lava_blasts/lava_glow.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/static/static_smoke.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_002.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/particle_flare_002.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_impact_light.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_002.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_nevermore/nevermore_base_attack_core.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_glow_oval01.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_glow_oval01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_skull.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_i.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_f.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_e.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_h.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_b.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_g.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_sphere_glow.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_launch.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_d.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_detail.vpcf",
+          "particles/units/heroes/hero_skeletonking/wraith_king_spirits_2.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_sphere_glow_b.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_skull.vpcf",
+        "source": "native",
+        "dependencies": [
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_skull_lv.vpcf",
+          "models/heroes/necrolyte/necrolyte_skull.vmdl"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_skull_lv.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/particle/sphere.vmdl"
+        ]
+      },
+      {
+        "resource": "models/particle/sphere.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "models/heroes/necrolyte/necrolyte_skull.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_i.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/steam/steam.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/smoke/steam/steam.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_f.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3b.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/smoke3/smoke3b.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_e.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/bendibeam2.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/maya_wispy/wispy_v2.vtex",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_b.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_c.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_ember_b.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_d.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_e.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_light.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_f.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_ember.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_c.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_ember_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks3.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_d.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_e.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/maya_wispy/wispy_v2.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_light.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_particle_2/fire_particle_2.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/fire_particle_2/fire_particle_2.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_explosion_f.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3b.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_ember.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/yellowflare.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/yellowflare.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_h.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks3.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/water_splash/water_splash.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/water_splash/water_splash.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_g.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/yellowflare.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_sphere_glow.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3b.vtex",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_launch_smoke.vpcf",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_launch_b.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_launch_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3b.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_launch_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_d.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_plasma_03.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/beam_plasma_03.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_detail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/static/static_smoke.vtex",
+          "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_detail_b.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_trail_detail_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/lava_blasts/lava_glow.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/wraith_king_spirits_2.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_yellow.vtex",
+          "models/particle/sphere3.vmdl",
+          "particles/units/heroes/hero_skeletonking/wraith_king_spirit_trail_c.vpcf"
+        ]
+      },
+      {
+        "resource": "models/particle/sphere3.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/wraith_king_spirit_trail_c.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_plasma_03.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_skeletonking/skeletonking_hellfireblast_sphere_glow_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_core_trail.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_parent.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_trail_fat.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_smoke.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_launch.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_core.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_ring.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_core_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire/scenes/ground_ember.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/fire/scenes/ground_ember.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_parent.vpcf",
+        "source": "native",
+        "dependencies": [
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_trail.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_generic_4.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/beam_generic_4.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_trail_fat.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_plasma_03.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_red.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_core.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire/scenes/ground_ember.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_ring.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/lava_pool_glow.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/lava_pool_glow.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_glow.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_smoke.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_flash.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_light.vpcf",
+          "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_fire.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_glow.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/lava_blasts/lava_glow.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/static/static_smoke.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_002.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_light.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_002.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_base_attack_impact_fire.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_particle_10/fire_particle_10_low.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/fire_particle_10/fire_particle_10_low.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex",
+          "particles/units/heroes/hero_sniper/sniper_base_attack_launch.vpcf",
+          "particles/units/heroes/hero_sniper/sniper_base_attack_explosion.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_sniper/sniper_base_attack_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex",
+          "particles/units/heroes/hero_sniper/sniper_base_attack_launch_fire.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_sniper/sniper_base_attack_launch_fire.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_burning_character/fire_burning_character.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_sniper/sniper_base_attack_explosion.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex",
+          "particles/units/heroes/hero_sniper/sniper_base_attack_explosion_b.vpcf",
+          "particles/units/heroes/hero_sniper/sniper_base_attack_explosion_flash.vpcf",
+          "particles/units/heroes/hero_sniper/sniper_base_attack_explosion_fire.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_sniper/sniper_base_attack_explosion_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_sniper/sniper_base_attack_explosion_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_glow_05.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_glow_05.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_sniper/sniper_base_attack_explosion_fire.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_burning_character/fire_burning_character.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex",
+          "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack_launch.vpcf",
+          "particles/units/heroes/hero_sniper/sniper_base_attack_explosion.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex",
+          "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack_launch_elec.vpcf",
+          "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack_launch_fire.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack_launch_elec.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/electrical_arc/electrical_arc.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack_launch_fire.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_burning_character/fire_burning_character.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/metal_sphere.vtex",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_glow.vpcf",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_highlight.vpcf",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_launch.vpcf",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_explosion.vpcf",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_trail.vpcf",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_trail_b.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/metal_sphere.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_glow.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_glow_01.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_glow_01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_highlight.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_sphere_mod.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex",
+          "particles/units/heroes/hero_gyrocopter/gyro_base_attack_launch_fire.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_launch_fire.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_burning_character/fire_burning_character.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_gyrocopter/gyro_base_attack_trail_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_plasma_04.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/beam_plasma_04.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_mirana/mirana_base_attack.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/projectiles/mirana_arrow.vmdl",
+          "particles/units/heroes/hero_mirana/mirana_base_attack_explosion.vpcf",
+          "particles/units/heroes/hero_mirana/mirana_base_attack_launch.vpcf",
+          "particles/units/heroes/hero_mirana/mirana_base_attack_trail_c.vpcf"
+        ]
+      },
+      {
+        "resource": "models/projectiles/mirana_arrow.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_mirana/mirana_base_attack_explosion.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/vistasmokev1/vistasmokev1.vtex",
+          "particles/units/heroes/hero_mirana/mirana_base_attack_explosion_flash.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/vistasmokev1/vistasmokev1.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_mirana/mirana_base_attack_explosion_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_blue.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_mirana/mirana_base_attack_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/burst01.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/burst01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_mirana/mirana_base_attack_trail_c.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_smoke_01.vtex"
+        ]
+      },
+      {
+        "resource": "particles/survival/towers/mars_crimson_ballista.vpcf",
+        "source": "survival",
+        "dependencies": [
+          "models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_ability.vmdl",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_outline.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail_b.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge_b.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_flash.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_sparks.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end.vpcf"
+        ]
+      },
+      {
+        "resource": "models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_ability.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_outline.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+          "materials/particle/beam_liquid_04.vtex",
+          "materials/particle/electricity/electricity_22_d.vtex",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_light.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_embers.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "materials/particle/beam_liquid_04.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "materials/particle/electricity/electricity_22_d.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_light.vpcf",
+        "source": "native",
+        "dependencies": []
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_embers.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_004.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/particle_flare_004.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_generic_7.vtex",
+          "materials/particle/electricity/electricity_22_d.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/beam_generic_7.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_generic_7.vtex",
+          "materials/particle/electricity/electricity_22_d.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/electricity/electricity_28_a.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/electricity/electricity_28_a.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/bendibeam5.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/bendibeam5.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_004b_mod.vtex",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_elec.vpcf"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/particle_flare_004b_mod.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_elec.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/electrical_arc/electrical_arc02.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/electrical_arc/electrical_arc02.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_sparks.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end.vpcf",
+        "source": "native",
+        "dependencies": [
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_smoke.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_light.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_flash.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_burst.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_soot.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_embers.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_elec.vpcf",
+          "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_flek.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_light.vpcf",
+        "source": "native",
+        "dependencies": []
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particles/light_flare/light_glow_01.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particles/light_flare/light_glow_01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_burst.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/steam/steam.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_soot.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_embers.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_red.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_elec.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/electrical_arc/electrical_arc02.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_flek.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/heroes/clinkz/clinkz_arrow.vmdl",
+          "particles/units/heroes/hero_clinkz/clinkz_base_attack_launch.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_base_attack_explosion.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_flame.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_trail.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_trail_ember.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_smoke.vpcf"
+        ]
+      },
+      {
+        "resource": "models/heroes/clinkz/clinkz_arrow.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_base_attack_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_base_attack_explosion.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_red.vtex",
+          "particles/units/heroes/hero_clinkz/clinkz_base_attack_explosion_flash.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_base_attack_explosion_sparks.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_base_attack_explosion_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_modulate_01.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_modulate_01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_base_attack_explosion_sparks.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_flame.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_particle_10/fire_particle_10_low.vtex",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_glow.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_glow_halo.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_flame_cloud.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_glow.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white_v2.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/aircraft_white_v2.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_glow_halo.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white_v2.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_flame_cloud.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire/flame_ball/fire_particle_1.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/fire/flame_ball/fire_particle_1.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_smoke_01.vtex",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_trail_fat.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_trail_fat.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/bendibeam.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/bendibeam.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_trail_ember.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_001.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/particle_flare_001.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/particle/sphere.vmdl",
+          "particles/units/heroes/hero_lich/lich_chain_frost_e.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_c.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_f.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_g.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_light.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_explode.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_launch.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_trail.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_explode_beam.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_flakes.vpcf",
+          "particles/units/heroes/hero_lich/lich_chain_frost_mist.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_e.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3b.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_c.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_ring_wavy4.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_f.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_002.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_g.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_modulate_04.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_modulate_04.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_light.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_002.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/particle/sphere.vmdl",
+          "particles/units/heroes/hero_lich/lich_chain_frost_launch_b.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_launch_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_glow_04.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white_v2.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_explode_beam.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_006_white.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/particle_flare_006_white.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_flakes.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks3.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_lich/lich_chain_frost_mist.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/static/static_smoke.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost.vpcf",
+        "source": "native",
+        "dependencies": [
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_dark_trail.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_dark.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_mist.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_light.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_flek_dark.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_flare.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_model.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_dark_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3b.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_dark.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3b.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_mist.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke/static/static_smoke.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_light.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_002.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_flek_dark.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks5.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/impact/fleks5.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_flare.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_blue2.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_model.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_ability.vmdl",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_dark_edge.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_bright_edge.vpcf"
+        ]
+      },
+      {
+        "resource": "models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_ability.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_dark_edge.vpcf",
+        "source": "native",
+        "dependencies": [
+          "particles/models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_ability_fx.vsnap"
+        ]
+      },
+      {
+        "resource": "particles/models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_ability_fx.vsnap",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_bright_edge.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_005.vtex",
+          "particles/models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_ability_fx.vsnap"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/particle_flare_005.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode.vpcf",
+        "source": "native",
+        "dependencies": [
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_smoke_b.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_smoke.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_dark.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_sparks.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_rays.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_flek.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_ice.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_shards.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_ring.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_flash.vpcf",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_flare.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_smoke_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fluidexplosions/smoke_gr_burst_10.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/fluidexplosions/smoke_gr_burst_10.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/dust/large_swirl_dust.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/dust/large_swirl_dust.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_dark.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke3/smoke3b.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_sparks.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_rays.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_cone_gradient_1.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_flek.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks3.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_ice.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/crystal/crystal.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_shards.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_ice_shards.vmdl",
+          "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_shards_b.vpcf"
+        ]
+      },
+      {
+        "resource": "models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_ice_shards.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_shards_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_ice_shards.vmdl"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_ring.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_ring_wavy4.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_flash.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_blue.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_explode_flare.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_blue2.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/bendibeam2.vtex",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_explosion.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_proj_head.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_launch_darks.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_launch.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_trail_wavy.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_trail.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_detail.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_emissive.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_sizzle.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_explosion.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_hotwhite.vtex",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_explosion_flash_b.vpcf",
+          "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_explosion_b.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_explosion_flash_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_modulate_01.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_explosion_b.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_proj_head.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_glow_08.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_glow_08.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_launch_darks.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/impact/fleks5.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_launch.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_white_v3.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_flares/aircraft_white_v3.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_trail_wavy.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/tile/tile_beam_squigly.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/tile/tile_beam_squigly.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_smoke_01.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_detail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_plasma_08.vtex",
+          "materials/particle/tile/tile_noise_gaussian.vtex",
+          "materials/particle/beam_ethereal.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/beam_plasma_08.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "materials/particle/tile/tile_noise_gaussian.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "materials/particle/beam_ethereal.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_emissive.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_generic_7.vtex"
+        ]
+      },
+      {
+        "resource": "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2_sizzle.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_glow_08.vtex",
+          "materials/particle/lightning/lightning_strike.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/lightning/lightning_strike.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/heroes/clinkz/clinkz_arrow.vmdl",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_endcap.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_glow_directional.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_dark.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_base_attack_launch.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_flame.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_trail.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_embers.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_smoke.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_pierce_streak.vpcf",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_cone.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_endcap.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/aircraft_yellow.vtex",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_endcap_sparks.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_endcap_sparks.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/sparks/sparks.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_glow_directional.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_glow_irregular1.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_glow_irregular1.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_dark.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/void/beam_void.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/void/beam_void.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_flame.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/fire_particle_10/fire_particle_10_low.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_trail.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/beam_smoke_01.vtex",
+          "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_trail_fat.vpcf"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_trail_fat.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/bendibeam.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_embers.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_flares/particle_flare_001.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_smoke.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/smoke1/smoke1.vtex"
+        ]
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_pierce_streak.vpcf",
+        "source": "native",
+        "dependencies": [
+          "materials/particle/particle_cone_gradient_sharp_01.vtex"
+        ]
+      },
+      {
+        "resource": "materials/particle/particle_cone_gradient_sharp_01.vtex",
+        "source": "native"
+      },
+      {
+        "resource": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj_cone.vpcf",
+        "source": "native",
+        "dependencies": [
+          "models/items/phoenix/phoenix_ti10_immortal_back/phoenix_ti10_immortal_icarus_dive_fx.vmdl",
+          "materials/particle/clinkz/clinkz_piercing_shot.vmat"
+        ]
+      },
+      {
+        "resource": "models/items/phoenix/phoenix_ti10_immortal_back/phoenix_ti10_immortal_icarus_dive_fx.vmdl",
+        "source": "native"
+      },
+      {
+        "resource": "materials/particle/clinkz/clinkz_piercing_shot.vmat",
+        "source": "native"
+      }
+    ],
+    "in_game_visual_verified": false
+  },
+  "checks": [
+    "tower visual lifecycle",
+    "base source preflight",
+    "tower skills timing and damage",
+    "lightning storm",
+    "laser damage totals",
+    "laser health prediction",
+    "12 modified Lua files syntax"
+  ],
+  "in_game_visual_verified": false
+}

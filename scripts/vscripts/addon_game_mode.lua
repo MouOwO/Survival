@@ -573,12 +573,17 @@ end
 
 function M.precache(context)
     PrecacheResource("particle", "particles/generic_hero_status/hero_levelup.vpcf", context)
+    require("systems/valley_environment_service").precache(context)
+    require("systems/tower_visual_service").precache(context)
+    require("systems/weapon_visual_service").precache(context)
     -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
     tower_magic_supreme_system.precache(context)
     sound_service.precache(context)
     building_construction_visual.precache(context)
     require("systems/wall_destruction_visual").precache(context)
     require("systems/challenge_guardian_visual_service").precache(context)
+    require("systems/wall_hit_effect").precache(context)
+    require("systems/building_upgrade_effect").precache(context)
     monster_visual_service.precache_range(context, 1, 1)
     local challenge_models = {}
     for _, challenge in ipairs(building_challenge_definitions.rows or {}) do
@@ -624,6 +629,7 @@ function M.precache(context)
         "building_gold_mine",
         "building_hero_altar",
         "npc_survival_upgrade_material",
+        "npc_survival_grid_preview_proxy",
         "npc_survival_lumberjack",
         "npc_survival_super_lumberjack_01",
         "npc_survival_super_lumberjack_02",
@@ -694,11 +700,17 @@ function M.precache(context)
             end
         end
     end
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
-        context
-    )
+    local precached_lasers = {}
+    require("systems/zeus_lightning_visual").precache(context)
+    PrecacheResource("particle", "particles/units/heroes/hero_siren/siren_net.vpcf", context)
+    PrecacheResource("particle", "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact.vpcf", context)
+    for _, row in ipairs(require("config/generated/tower_laser_effects").rows or {}) do
+        local particle = tostring(row.particle_name or "")
+        if row.enabled ~= false and particle ~= "" and not precached_lasers[particle] then
+            PrecacheResource("particle", particle, context)
+            precached_lasers[particle] = true
+        end
+    end
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_stormspirit/stormspirit_ball_lightning.vpcf",
@@ -714,11 +726,12 @@ function M.precache(context)
         "particles/basic_explosion/basic_explosion.vpcf",
         context
     )
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_skywrath_mage/skywrath_mage_mystic_flare.vpcf",
-        context
-    )
+    for _, particle in ipairs({
+        "particles/units/heroes/hero_snapfire/snapfire_lizard_blobs_arced.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger.vpcf",
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf",
@@ -741,29 +754,42 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf",
+        "particles/survival/skills/poison_sullen_shroud.vpcf",
         context
     )
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf",
-        context
-    )
+    for _, particle in ipairs({
+        "particles/survival/skills/meteor_phoenix_fall.vpcf",
+        "particles/survival/skills/meteor_phoenix_impact.vpcf",
+        "particles/survival/skills/meteor_lava.vpcf",
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_warlock/warlock_rain_of_chaos_explosion.vpcf",
         context
     )
-    PrecacheResource(
-        "particle",
-        "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf",
-        context
-    )
-    PrecacheResource(
-        "particle",
-        "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf",
-        context
-    )
+    for _, particle in ipairs({
+        "particles/survival/skills/blizzard_ground.vpcf",
+        "particles/survival/skills/wyvern_blizzard_snow.vpcf",
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
+    for _, particle in ipairs({
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_lizard_blobs_arced.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_impact.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_shockwave.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_burst.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_shockwave.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_glow.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_torns.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_sparks.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse.vpcf",
+        "particles/status_fx/status_effect_wyvern_curse_target.vpcf",
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf",
@@ -771,7 +797,12 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf",
+        "particles/survival/skills/tusk_snowball_fixed_size.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_tusk/tusk_snowball_impact.vpcf",
         context
     )
     PrecacheResource(
@@ -791,7 +822,12 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_hoodwink/hoodwink_acorn_shot_tracking.vpcf",
+        "particles/survival/skills/magic_slingshot_arcane_orb.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit.vpcf",
         context
     )
     PrecacheResource(
@@ -811,7 +847,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf",
+        "particles/survival/skills/blade_swashbuckle.vpcf",
         context
     )
     PrecacheResource(
@@ -829,6 +865,7 @@ function M.precache(context)
         "particles/units/heroes/hero_nevermore/nevermore_shadowraze.vpcf",
         context
     )
+    require("systems/keeper_blinding_light_visual").precache(context)
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_axe/axe_attack_blur_counterhelix.vpcf",
@@ -842,6 +879,11 @@ function M.precache(context)
     PrecacheResource(
         "particle",
         "particles/ui_mouseactions/range_finder_tower_aoe.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/ui_mouseactions/range_display.vpcf",
         context
     )
     PrecacheResource(
@@ -927,6 +969,8 @@ local function initialize_services()
     require("systems/challenge_guardian_visual_service").init()
     grid_placement_router.init()
     building_upgrade_system.init()
+    require("systems/tower_rank_presentation_service").init()
+    require("systems/tower_visual_service").init()
     tree_system.init()
     worker_system.init()
     require("systems/lumberjack_fusion_service").init()
@@ -945,6 +989,7 @@ local function initialize_services()
     equipment_instance_service.init()
     equipment_growth_service.init()
     weapon_equipment_service.init()
+    require("systems/weapon_visual_service").init()
     weapon_synthesis_service.init()
     weapon_growth_service.init()
     weapon_synthesis_snapshot_service.init()
@@ -994,6 +1039,7 @@ function M.activate()
     event_bus.reset()
     configure_game_rules()
     scheduler.init()
+    require("systems/valley_environment_service").init()
     event_bus.subscribe(events.GAME_STARTED, function()
         schedule_unbuilt_wall_defeat_check()
     end)

@@ -393,7 +393,7 @@ end
 
 local function remove_unwanted_clone_abilities(clone)
     local names = {}
-    for index = 0, math.max(0, clone:GetAbilityCount() - 1) do
+    for index = 0, math.max(0, clone:GetAbilityCount()) - 1 do
         local clone_ability = clone:GetAbilityByIndex(index)
         if clone_ability and not clone_ability:IsNull()
             and clone_ability:GetAbilityName() ~= Q_ABILITY then

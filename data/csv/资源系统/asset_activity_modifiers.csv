@@ -1,4 +1,4 @@
-﻿modifier_key,asset_id,modifier_name,sort_order,enabled,notes
+modifier_key,asset_id,modifier_name,sort_order,enabled,notes
 #中文名:动作修饰记录键,资源ID,动作修饰名,排序,是否启用,备注
 #types:string,string,string,number,boolean,string
 challenge_monster_primal_beast_svarog:less_brow,challenge_monster_primal_beast_svarog,less_brow,1,1,Svarog头部官方动作修饰。
@@ -35,3 +35,10 @@ monster_boss_ten_sin_06_abscession:arcana,monster_boss_ten_sin_06_abscession,arc
 monster_boss_ten_sin_06_abscession:arcana_back,monster_boss_ten_sin_06_abscession,arcana_back,2,1,Official Arcana activity modifier; complete challenge appearance
 monster_boss_ten_sin_09_eminence_ristul:arcana,monster_boss_ten_sin_09_eminence_ristul,arcana,1,1,Official Arcana activity modifier; complete challenge appearance
 tower_lightning_zeus_tempest:arcana,tower_lightning_zeus_tempest,arcana,1,1,原版ItemDef 6914雷霆神盔的至宝动作修饰。
+tower_death_nevermore_sundered_souls:desolation,tower_death_nevermore_sundered_souls,desolation,1,1,所选饰品原生活动修饰
+tower_death_warlock_seam_ripper:desolation,tower_death_warlock_seam_ripper,desolation,1,1,所选饰品原生活动修饰
+tower_lightning_razor_voidstorm:arcana,tower_lightning_razor_voidstorm,arcana,4,1,所选饰品原生活动修饰
+tower_lightning_razor_voidstorm:lightning,tower_lightning_razor_voidstorm,lightning,5,1,所选饰品原生活动修饰
+tower_frost_crystal_maiden_winter_raven:ti8,tower_frost_crystal_maiden_winter_raven,ti8,1,1,所选饰品原生活动修饰
+tower_frost_ancient_apparition:ti8,tower_frost_ancient_apparition,ti8,1,1,所选饰品原生活动修饰
+tower_anti_air_skywrath_empyrean:techies_arcana,tower_anti_air_skywrath_empyrean,techies_arcana,3,1,所选饰品原生活动修饰

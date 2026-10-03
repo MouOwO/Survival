@@ -57,7 +57,7 @@ local function is_repairable_target(unit, target)
         and target:GetTeamNumber() == unit:GetTeamNumber()
         and same_owner(unit, target)
         and not target:HasModifier("modifier_building_under_construction")
-        and target:GetHealth() < target:GetMaxHealth()
+        -- An explicit repair order also stations the worker at a full wall.
 end
 
 local function is_target_order(order_type)

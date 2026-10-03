@@ -1,0 +1,155 @@
+{
+  "date": "2026-10-02",
+  "status": "PASS: implementation, compiled resources and offline layout contracts; live visual acceptance pending",
+  "request": "Center the tower name over the health bar and move stars down to touch the name",
+  "geometry": {
+    "row_width": 108,
+    "row_height": 43.5,
+    "bar_top": 28,
+    "name": {
+      "width": "fit-children",
+      "max_width": 108,
+      "horizontal_align": "center",
+      "local_top": 14,
+      "height": 14
+    },
+    "stars": {
+      "row_height": 12,
+      "local_top": 2,
+      "sprite_height": 12,
+      "row_shift_from_previous_health_anchor": 6,
+      "sprite_shift_from_previous_health_anchor": 5,
+      "sprite_to_name_box_gap": 0
+    },
+    "rarity": {
+      "width": 20,
+      "height": 20,
+      "local_top": 23.5,
+      "screen_position_unchanged": true
+    },
+    "health_bar": {
+      "width": 62,
+      "height": 11,
+      "screen_anchor_unchanged": true
+    }
+  },
+  "resource_compile": {
+    "status": "PASS",
+    "compiled": 4,
+    "failed": 0,
+    "source_and_engine_content_equal": true,
+    "logs": "output/tower_rank_build/20261002_204312",
+    "resources": [
+      {
+        "source": "scripts/custom_game/world_health_bar_anchor.js",
+        "source_sha256": "65f52c9e6e8ad9aec1ed12b0d1517ff50a2b006478815f9a7ca0fa22df0821d1",
+        "compiled": "scripts/custom_game/world_health_bar_anchor.vjs_c",
+        "compiled_sha256": "b3124b34a52401ab0af511f010b4f505625d785d38ff8e6854d91693d91aeb40"
+      },
+      {
+        "source": "scripts/custom_game/tower_rank_ui.js",
+        "source_sha256": "7805a4b45f5da53b84bf92c977a99b86b1a56b17cc4bb2183c3bf81328cd013e",
+        "compiled": "scripts/custom_game/tower_rank_ui.vjs_c",
+        "compiled_sha256": "be1f3f6d4551da65641b90ddba47f337b2dd188ce6327621c73d81bf11a1c4cb"
+      },
+      {
+        "source": "styles/custom_game/tower_rank_ui.css",
+        "source_sha256": "2c41bd8c8cb744d54581ffb9c7834576693f6fd0552ba1a8be98c66c261bde42",
+        "compiled": "styles/custom_game/tower_rank_ui.vcss_c",
+        "compiled_sha256": "1b2be9df6e844adf3bc479e1c356e6b0b1d3bfb666a6877487f8b7905e95f839"
+      },
+      {
+        "source": "layout/custom_game/tower_rank_ui.xml",
+        "source_sha256": "88412528778ede4e1b47b3a6fe0ba277a1a08b7ce5fe804debb081341cef3ec7",
+        "compiled": "layout/custom_game/tower_rank_ui.vxml_c",
+        "compiled_sha256": "3c7cfb813eca655a819d70ddcd68705dcdf38e9ccb8bd958ff42a63b00364120"
+      }
+    ]
+  },
+  "validation": {
+    "checks": [
+      {
+        "script": "tools/test_tower_rank_ui.cjs",
+        "status": "PASS",
+        "marker": "TOWER_RANK_UI_SIMULATION_PASS",
+        "rerun_after_final_star_adjustment": true,
+        "coverage": [
+          "Synthetic natural Label widths 32/56/84/168 remain centered",
+          "max-width clamps the 168px Label block to 108px",
+          "Star row moves down 6 UI pixels and its sprite moves down 5 UI pixels relative to the same health bar",
+          "12px star sprite fills its 12px row and directly touches the name box without overlap",
+          "Health and rarity screen anchors are retained",
+          "Names update after upgrades",
+          "Complete conservative 108px caption screen and occlusion bounds",
+          "Scale/window offsets and health offset fallback",
+          "Construction hides caption until completion",
+          "Native rarity images and no level circle",
+          "Entity lifecycle, hot reload and one active frame/listener"
+        ]
+      },
+      {
+        "script": "tools/test_combat_selection_recovery.cjs",
+        "status": "PASS",
+        "marker": "COMBAT_SELECTION_RECOVERY_PASS",
+        "retained_previous_check": true
+      },
+      {
+        "script": "tools/test_world_overlay_visibility.cjs",
+        "status": "PASS",
+        "marker": "WORLD_OVERLAY_VISIBILITY_PASS",
+        "retained_previous_check": true
+      },
+      {
+        "script": "tools/test_world_health_bar.js",
+        "status": "PASS",
+        "marker": "WORLD_HEALTH_BAR_PASS",
+        "retained_previous_check": true
+      },
+      {
+        "command": "git -c core.safecrlf=false diff --check -- tools/test_tower_rank_ui.cjs",
+        "status": "PASS"
+      }
+    ],
+    "call_count_measurement": {
+      "script": "tools/test_tower_rank_ui.cjs --measure",
+      "status": "PASS",
+      "rerun_after_final_star_adjustment": true,
+      "towers": 40,
+      "frames_per_scenario": 300,
+      "stable": {
+        "native_calls": 60000,
+        "projection_calls": 24000,
+        "style_writes": 0,
+        "overlay_captures": 300,
+        "panel_searches": 0
+      },
+      "full_screen_blocked": {
+        "native_calls": 0,
+        "projection_calls": 0,
+        "style_writes": 0,
+        "overlay_captures": 300,
+        "panel_searches": 0
+      },
+      "no_towers": {
+        "native_calls": 0,
+        "projection_calls": 0,
+        "style_writes": 0,
+        "overlay_captures": 0,
+        "panel_searches": 0
+      },
+      "block_transition_style_writes": 40
+    },
+    "limits": [
+      "Natural Label widths are supplied test inputs, not measured Chinese text shaping or visible font pixels.",
+      "The mock applies the required fit-children, max-width and horizontal/vertical alignment rules, not the complete Panorama layout engine.",
+      "The zero gap is between the star sprite panel and name Label box; transparent texture margins and font baselines are not rendered by the VM.",
+      "Call counts are not FPS, CPU/GPU frame time or measured Dota performance.",
+      "No debug port was available for this round; the user screenshot was not used as evidence of the resulting layout."
+    ]
+  },
+  "evidence": {
+    "ui": "output/tower_name_centering_20261002/ui_validation.json",
+    "compiled": "output/tower_name_centering_20261002/compiled_resources.json"
+  },
+  "live_visual_verified": false
+}

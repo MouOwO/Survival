@@ -6,7 +6,7 @@ const tooltip=panel('CustomAbilityTooltip',ctx);tooltip.position={x:60,y:60};too
 const cfg={HandoffWorldOcclusion:[],SurvivalUILayers:{Top:()=>modal}};
 const $=id=>nodes[id.slice(1)];$.GetContextPanel=()=>ctx;$.CreatePanel=(_,parent,id)=>panel(id,parent);$.Schedule=(_,f)=>jobs.push(f);
 const env={$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,WorldToScreenX:()=>screenX,WorldToScreenY:()=>screenY},Players:{GetTeam:()=>2},Entities:{IsValidEntity:()=>true,IsAlive:()=>true,IsDormant:()=>false,GetAbsOrigin:()=>[0,0,0],GetUnitName:()=> 'monster'},CustomNetTables:{GetAllTableValues:()=>({}),SubscribeNetTableListener:(_,f)=>onTable=f}};
-for(const file of ['world_overlay_visibility.js','hero_world_health_bar.js'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file,'utf8'),env);
+for(const file of ['world_overlay_visibility.js','world_health_bar_anchor.js','hero_world_health_bar.js'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file,'utf8'),env);
 onTable('survival_hero_health_bar','unit_7',{entindex:7,health:50,max_health:100,alive:1,team:3,unit_name:'monster'});
 const tick=()=>jobs.shift()(),bar=()=>nodes.SurvivalHeroWorldHealth_unit_7;
 tick();assert.equal(bar().style.visibility,'visible','world bar stays visible away from HUD');

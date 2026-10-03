@@ -1,0 +1,23 @@
+{
+  "control_points": "CP0 launch; CP1 moving target; CP2 existing attack speed; CP3 native flight children. No Lua particle update timer.",
+  "outputs": [
+    {
+      "resource": "particles/survival/towers/techies/techies_r_missile.vpcf",
+      "native": "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare.vpcf",
+      "tier": "r",
+      "role": "tracking_projectile"
+    },
+    {
+      "resource": "particles/survival/towers/techies/techies_sr_missile.vpcf",
+      "native": "particles/econ/items/clockwerk/clockwerk_2022_cc/clockwerk_2022_cc_rocket_flare.vpcf",
+      "tier": "sr",
+      "role": "tracking_projectile"
+    },
+    {
+      "resource": "particles/survival/towers/techies/techies_ssr_missile.vpcf",
+      "native": "particles/econ/items/clockwerk/clockwerk_paraflare/clockwerk_para_rocket_flare.vpcf",
+      "tier": "ssr",
+      "role": "tracking_projectile"
+    }
+  ]
+}

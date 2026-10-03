@@ -1,0 +1,219 @@
+{
+  "root": "particles/survival/skills/poison_sullen_shroud.vpcf",
+  "native_root": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud.vpcf",
+  "cosmetic": {
+    "item_definition": 12932,
+    "english": "Sullen Rampart",
+    "chinese": "愠怒之界",
+    "ability": "Ghost Shroud (W)",
+    "slot": "legs",
+    "year": 2019
+  },
+  "controls": {
+    "0": "fixed target ground position; no hero attachment required",
+    "1": "x = poison radius 400"
+  },
+  "configured_radius": 400,
+  "radius_multiplier": "CP1.x / 750; initializer multiplies native randomized radius field 3",
+  "native_birth_radii": {
+    "projection_dark": [
+      550,
+      550
+    ],
+    "projection": [
+      700,
+      700
+    ],
+    "rings": [
+      400,
+      750
+    ],
+    "rings_b": [
+      250,
+      275
+    ],
+    "warp": [
+      650,
+      738
+    ],
+    "burst": [
+      400,
+      750
+    ],
+    "ray": [
+      200,
+      400
+    ],
+    "ray_b": [
+      325,
+      355
+    ],
+    "motes": [
+      10,
+      20
+    ],
+    "bubbles": [
+      8,
+      20
+    ],
+    "core": [
+      160,
+      180
+    ],
+    "caustic": [
+      275,
+      325
+    ],
+    "model": [
+      1,
+      1.3
+    ]
+  },
+  "size_choices": {
+    "largest_ring_and_startup_burst": "CP1.x",
+    "projection": "700 / 750 * CP1.x; deferred light radius scale 1.0",
+    "warp": "maximum birth radius 738 / 750 * CP1.x plus scatter 12 / 750 * CP1.x",
+    "model": "native radius 1-1.3 multiplied by CP1.x / 750",
+    "motes_center_limit": "0.96 * CP1.x (384 at radius400)",
+    "bubbles_center_limit": "0.94 * CP1.x (376 at radius400)"
+  },
+  "ghost_animation_geometry": {
+    "resource": "models/items/necrolyte/necro_ti9_immortal_skirt/necro_ti9_immortal_ghost.vmdl",
+    "sequences": [
+      "ghost_grab",
+      "ghost_crawl",
+      "ghost_breach",
+      "ghost_leap"
+    ],
+    "native_max_particle_scale": 1.3,
+    "worst_native_horizontal_animated_extent": 186.783845,
+    "conservative_extent_at_native_max_scale": 188,
+    "geometry_budget_fraction": 0.25066666666666665,
+    "center_budget_fraction": 0.7493333333333334,
+    "center_constraint_at_radius400": 299.73333333333335,
+    "ring_radius_fraction": 0.1,
+    "radial_speed_min_fraction": 0.13333333333333333,
+    "radial_speed_max_fraction": 0.32,
+    "individual_lifetime_seconds": 2,
+    "maximum_undragged_center_at_radius400": 296,
+    "maximum_animated_reach_at_radius400": 396.26666666666665
+  },
+  "movement": "stationary CP0; native local layer movement, noise and ghost animations retained and reduced to the skill footprint",
+  "spatial_literals": "Offsets, vector noise, curl noise, gravity and plane offset scale to configured radius 400; particle sizes, ring radii/speeds, radial repulsion, sphere scatter and distance constraints use CP1.x",
+  "lifetime": "Native continuous emitters have no expiry; individual particles recycle. Native startup burst emits for 0.1s. Caller destroys immediately at skill expiry 5/7s and releases the particle index.",
+  "cleanup": "DestroyParticle(index, true), then ReleaseParticleIndex; no independent endcap children",
+  "impact": "Existing poison death explosion remains unchanged in the gameplay service",
+  "excluded_branches": [
+    "hero debuff",
+    "status effect",
+    "equipped cosmetic ambient and loadout"
+  ],
+  "graph_notes": [
+    "Main aura and all thirteen native children retained",
+    "Native ghost model, material, four animations, model renderer, color ranges, projected materials, textures, fades, emitter rates and individual lifetimes preserved",
+    "No control point position writers or CP aliases added",
+    "Nominal radii and conservative ghost geometry are verified numerically; texture alpha, refraction, bloom and final appearance need in-game visual validation"
+  ],
+  "outputs": [
+    "particles/survival/skills/poison_sullen_shroud.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_projection_dark.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_projection.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_rings.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_rings_b.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_warp.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_burst.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_ray.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_ray_b.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_motes.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_bubbles.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_core.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_caustic.vpcf",
+    "particles/survival/skills/poison_sullen_shroud_model.vpcf"
+  ],
+  "layers": [
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud.vpcf",
+      "native_data_sha256": "be970906425dd02c3a3de8df7cf5c45598558dd62ab8558d6bcef532819bad0f",
+      "source_sha256": "179cb3c0fefe2f54322472130652b66d198cb69ebeb0f0e70c8e244083260b5e"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_projection_dark.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_projection_dark.vpcf",
+      "native_data_sha256": "2711463f083e283510d7889e6d6038eba792f0bb550e21db4d3e8bc4c38e76c8",
+      "source_sha256": "fbeea953672ba5c520da000d66af418fa4cb7c1300d746c17c7be929f6315e6d"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_projection.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_projection.vpcf",
+      "native_data_sha256": "887af40184eb4b2b82b8a6769116edd5712bbd056f359d3110a9958ab4c06ddf",
+      "source_sha256": "d66d1ee8cb06690e230b6048d21d3f0b4a1b01e0b518477aebbb4dfc19f42750"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_rings.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_rings.vpcf",
+      "native_data_sha256": "83d9029d58e313e25d7c81583965c2782667ff7e92aad6eab09d21a306b27d89",
+      "source_sha256": "33c2e08b0c84986232cb886dabb50ed26f08d01741b006fb2e53a2f4b73bdd63"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_rings_b.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_rings_b.vpcf",
+      "native_data_sha256": "92c85e09999334b5762126520a03611a6ccb00427bcbf07c5b882f7addcb28ae",
+      "source_sha256": "1190cdef3fab0ade07966d5c1644137d6ea0d1ce9637b45bedfa3f01094e616f"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_warp.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_warp.vpcf",
+      "native_data_sha256": "de960500b3697f5774d0b49fa335c8e5cf5401b30f5b0725de2f3212e3f79bf5",
+      "source_sha256": "3a56b9acce66a1beacbfd3ba3f94c866fb1084742c792e38e01b1caa92c20085"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_burst.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_burst.vpcf",
+      "native_data_sha256": "f4269766bba36d39dd9e4259bd6cb48fb0277dbd51a384fcb5f9f0243618715e",
+      "source_sha256": "1d6b1ee0cce586bbc83171686b7a48aee6b4e4e79a499d354d2bef3e6c4d8b56"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_ray.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_ray.vpcf",
+      "native_data_sha256": "3c223a399cdb32c609daa8b5fe7b0328a4dceec68dbb09d89f9df7d92f4a0db2",
+      "source_sha256": "2e0e785997cee0f8280091fb11c7d186e9958f0448eb6abb1818df9dc8b4da4c"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_ray_b.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_ray_b.vpcf",
+      "native_data_sha256": "dd7dac24a367a19c803859303318d7a7fd5da9ef11e272cbd1ed0096b2767075",
+      "source_sha256": "6e06e86eca87a744c87036013dbe7e94b65c4cd33dcfeeddb06c0a5d50958952"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_motes.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_motes.vpcf",
+      "native_data_sha256": "9704eca7744439c7fa4f341ff7bd78357683353cc758815b2eef0b9c00730af6",
+      "source_sha256": "ba08693f33313995e09dbd21b5107b8567125bc2b1e1b9930630cbd146838b55"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_bubbles.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_bubbles.vpcf",
+      "native_data_sha256": "2b03979669e2bcb5b136adb302de1e537038744bcc8ac6fc5d9dfe4645874c99",
+      "source_sha256": "c2dc6b76441479ceb5371b548621083d698399a18aa41c89b372a157d0636d94"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_core.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_core.vpcf",
+      "native_data_sha256": "ef1e0f20ba7de8339e7fed10bd995977c1e724f72c9e1a65f93550637da430d5",
+      "source_sha256": "3a05bcb61e9868e742da6da4c447b1e55ea932760d571e2d1998a77cc033cd76"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_caustic.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_caustic.vpcf",
+      "native_data_sha256": "96ce44584c9ee81db219a1cabd23f14f913f77bfa48aec1027af302017c7386f",
+      "source_sha256": "74060fe467cd46d9da332a3be0a606e426edf0cfdfba6e0bd3a70ea4e5287168"
+    },
+    {
+      "native_resource": "particles/econ/items/necrolyte/necro_ti9_immortal/necro_ti9_immortal_shroud_model.vpcf",
+      "resource": "particles/survival/skills/poison_sullen_shroud_model.vpcf",
+      "native_data_sha256": "60c572fb8e3d3226c3729cc49ef9fd1b93ad29e955b90ebde4455273b2215250",
+      "source_sha256": "65f5580009ee2458c2d79467b4ae329a0584f42b9d302362e1b4323fbd544fde"
+    }
+  ]
+}

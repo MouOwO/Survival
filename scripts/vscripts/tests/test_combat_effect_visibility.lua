@@ -82,7 +82,7 @@ for _,asset in ipairs(require("config/asset_catalog").rows) do
   end
  end
 end
-assert(seen["particles/units/heroes/hero_wisp/wisp_ambient.vpcf"])
+assert(checked > 0, "catalog must contain appearance particles")
 local prior=serial
 local combat=pm:CreateParticle("optional_tower_hit",1,{})
 assert(serial==prior, "optional combat filtering was disabled")

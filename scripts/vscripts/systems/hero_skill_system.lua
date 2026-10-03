@@ -173,6 +173,7 @@ local function remove_unmanaged_abilities(state, desired)
 end
 
 local function ability_layout_matches(unit, desired)
+    if #desired > (tonumber(unit:GetAbilityCount()) or 0) then return false end
     for index, name in ipairs(desired) do
         local ability = unit:GetAbilityByIndex(index - 1)
         if not ability or ability:IsNull()

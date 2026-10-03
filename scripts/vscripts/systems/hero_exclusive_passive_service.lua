@@ -10,8 +10,7 @@ local deal_group = nil
 local exclusive_summons = {}
 local shadow_raze_stacks = {}
 
-local SHADOW_RAZE_PARTICLE =
-    "particles/units/heroes/hero_nevermore/nevermore_shadowraze.vpcf"
+local blinding_light_visual = require("systems/keeper_blinding_light_visual")
 local COUNTER_HELIX_PARTICLE =
     "particles/units/heroes/hero_axe/axe_attack_blur_counterhelix.vpcf"
 
@@ -243,6 +242,7 @@ local function particle_at(name, owner, position)
 end
 
 function M.runners.skill_shadow_fiend_raze(context, definition)
+    -- Retain the existing skill/save ID and combat math for the replaced hero.
     local radius = level_value(definition, "radius", context.level, 250)
     local duration = level_value(definition, "stack_duration", context.level, 3)
     local maximum = level_value(definition, "max_stacks", context.level, 5)
@@ -253,7 +253,7 @@ function M.runners.skill_shadow_fiend_raze(context, definition)
         definition, "damage_per_stack_pct", context.level, 10
     )
     local position = context.target:GetAbsOrigin()
-    particle_at(SHADOW_RAZE_PARTICLE, context.attacker, position)
+    blinding_light_visual.play(position, radius)
     M.sound_service.play("hero_shadow_raze_impact", {
         source = context.attacker,
         position = position,

@@ -48,6 +48,7 @@ def main():
     waves = read_table('wave_definitions')
     by_id = {row['archetype_id']: row for row in archetypes[3]}
     units = {}
+    models = {}
     for wave in waves[3]:
         row = by_id[wave['archetype_id']]
         boss = wave['member_role'] == 'assault_boss' or wave['is_boss'] == '1'
@@ -60,6 +61,11 @@ def main():
             identity = base_id + '_wave_name_' + str(wave_number)
             named = dict(source, archetype_id=identity, display_name=f'波次{wave_number}BOSS')
             if identity in by_id:
+                # Per-wave outfits may intentionally differ from the generic boss.
+                # Preserve those visual columns while refreshing shared combat data.
+                for field in ('model_path', 'normal_flying_model_path',
+                              'model_asset_id', 'default_wearable_asset_id'):
+                    named[field] = by_id[identity].get(field, named.get(field, ''))
                 by_id[identity].update(named)
             else:
                 by_id[identity] = named
@@ -68,6 +74,7 @@ def main():
             wave['archetype_id'] = identity
         row['unit_name'] = 'npc_survival_wave_named_' + row['archetype_id']
         units[row['unit_name']] = row['display_name']
+        models[row['unit_name']] = row['model_path']
     write_table(archetypes)
     write_table(waves)
     for table in (archetypes, waves):
@@ -75,7 +82,13 @@ def main():
     path = ROOT / 'scripts/npc/npc_units_custom.txt'
     text = path.read_text(encoding='utf-8-sig')
     template = re.search(r'"npc_survival_wave_monster"\s*(\{[^{}]*\})', text).group(1)
-    block = '\n'.join([BEGIN] + [f'    "{key}"\n    {template}' for key in sorted(units)] + [END])
+    definitions = []
+    for key in sorted(units):
+        # Spawn with the matching skeleton so the native movement graph initializes
+        # correctly; copying the generic Undying model requires a late body swap.
+        body = re.sub(r'("Model"\s*)"[^"]+"', lambda m: m[1] + '"' + models[key] + '"', template)
+        definitions.append(f'    "{key}"\n    {body}')
+    block = '\n'.join([BEGIN] + definitions + [END])
     if BEGIN in text:
         text = replace_block(text, block)
     else:

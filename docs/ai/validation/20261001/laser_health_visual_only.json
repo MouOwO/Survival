@@ -1,0 +1,33 @@
+{
+  "status": "BASELINE_AND_UI_SIMULATIONS_PASS_COMPILED",
+  "decision": "Preserve original authoritative damage at all times; smooth only the observed health bar loss.",
+  "baseline": "bab1753e",
+  "restored": ["immediate first hit", "one-second settlement", "tick-based multiplier and cap", "original target switching and elapsed-time handling", "per-hit TOWER_LASER_HIT event"],
+  "raw_damage_basis": "fixed attack 100, before mitigation, includes immediate hit and each due boundary hit; arithmetic and mocked production tests, not in-engine HP measurements",
+  "lv1_totals": [
+    {"seconds": 0, "baseline": 120, "restored": 120},
+    {"seconds": 1, "baseline": 245, "restored": 245},
+    {"seconds": 5, "baseline": 795, "restored": 795},
+    {"seconds": 10, "baseline": 1595, "restored": 1595},
+    {"seconds": 90, "baseline": 30870, "restored": 30870}
+  ],
+  "display": {
+    "transition_seconds": 0.9,
+    "laser_marker_seconds": 1.15,
+    "predict_future_damage": false,
+    "new_timers": 0,
+    "instant": ["initial sample", "healing", "maximum health changes", "death"],
+    "note": "Mixed-source health losses within the laser marker window also animate. Stable samples do not cancel existing transitions."
+  },
+  "checks": [
+    "tools/test_laser_damage_baseline.cjs",
+    "tools/test_world_health_bar.js",
+    "scripts/vscripts/tests/test_tower_laser_damage.lua",
+    "scripts/vscripts/tests/test_health_bar_cleanup.lua",
+    "scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua"
+  ],
+  "compile": {"compiled": 2, "failed": 0, "logs": "output/laser_health_ui"},
+  "limitations": "No live rendered validation or frame-time measurements in this change; the active match was not restarted or unpaused.",
+  "supersedes": "laser_smooth_damage.json",
+  "resolves": "laser_damage_baseline_audit.json"
+}

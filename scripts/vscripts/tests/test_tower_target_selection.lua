@@ -8,6 +8,7 @@ DOTA_UNIT_TARGET_HERO = 1
 DOTA_UNIT_TARGET_BASIC = 2
 DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES = 1
 FIND_CLOSEST = 0
+FIND_ANY_ORDER = 1
 
 local rules = require("config/tower_combat_rules")
 local auto = require("modifiers/modifier_tower_auto_attack")
@@ -18,7 +19,7 @@ end
 local function unit(name, distance, team)
     return {
         name = name, alive = true, team = team or 3,
-        pos = setmetatable({ x = distance or 0 }, vector_meta),
+        pos = setmetatable({ x = distance or 0, y = 0, z = 0 }, vector_meta),
         IsNull = function() return false end,
         IsAlive = function(self) return self.alive end,
         GetUnitName = function(self) return self.name end,

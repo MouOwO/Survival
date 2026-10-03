@@ -5,6 +5,7 @@ local technology_definitions = require("config/generated/technology_definitions"
 local technology_effects = require("config/technology_effect_config")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local combat_stat_projection = require("ui/combat_stat_projection")
+local portrait_metadata = require("ui/portrait_metadata")
 
 local portrait_metadata = require("ui/portrait_metadata")
 
@@ -223,10 +224,25 @@ local function publish(payload)
     if player_id == nil or not payload.snapshot then
         return
     end
+    -- Both selected-unit responses and regular stat updates must carry the
+    -- same portrait identity. Decorate only the projected copy, leaving the
+    -- authoritative combat snapshot and its version untouched.
+    local projected = combat_stat_projection.for_ui(payload.snapshot)
+    local entindex = tonumber(projected.entindex)
+    local unit
+    if entindex and entindex >= 0 and entindex < math.huge
+        and entindex == math.floor(entindex) then
+        local ok, resolved = pcall(function()
+            local entity = EntIndexToHScript(entindex)
+            if entity and not entity:IsNull() then return entity end
+        end)
+        if ok then unit = resolved end
+    end
+    portrait_metadata.apply(unit, projected)
     CustomNetTables:SetTableValue(
         "survival_combat_stats",
         "player_" .. tostring(player_id),
-        portrait_metadata.apply(nil, combat_stat_projection.for_ui(payload.snapshot))
+        projected
     )
     -- NetTable is the single regular synchronization path. Selected-unit
     -- requests still use their direct response event for immediate feedback.

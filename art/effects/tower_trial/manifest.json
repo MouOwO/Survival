@@ -1,0 +1,101 @@
+{
+  "revision": "skin_presets_20261002",
+  "control_points": "Ground: CP0 feet, CP1 x radius/z alpha, CP2 RGB. Tracking: native CP0 source/CP1 target/CP2 speed.",
+  "outputs": [
+    {
+      "resource": "particles/survival/towers/trial/valley_dark.vpcf",
+      "native": "particles/units/towers/aura_dark.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/valley_durable.vpcf",
+      "native": "particles/units/towers/aura_durable.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/valley_evil.vpcf",
+      "native": "particles/units/towers/aura_evil_b.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/death_ground.vpcf",
+      "native": "particles/units/heroes/hero_dazzle/dazzle_weave_circle_trace.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/lightning_ground.vpcf",
+      "native": "particles/units/heroes/hero_disruptor/disruptor_kineticfield_formation_markers.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/multi_embers.vpcf",
+      "native": "particles/units/heroes/hero_clinkz/clinkz_burning_army_ground_sparks.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/multi_ground.vpcf",
+      "native": "particles/units/heroes/hero_clinkz/clinkz_burning_army_ground_swirl.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_flecks.vpcf",
+      "native": "particles/units/heroes/hero_ancient_apparition/ancient_ice_vortex_f.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_ground.vpcf",
+      "native": "particles/units/heroes/hero_ancient_apparition/ancient_ice_vortex_d.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/mystery_ground.vpcf",
+      "native": "particles/units/heroes/hero_leshrac/leshrac_diabolic_edict.vpcf",
+      "role": "persistent_ground"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_ssr_chain_model.vpcf",
+      "native": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_model.vpcf",
+      "role": "projectile_child"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_ssr_chain_flare.vpcf",
+      "native": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_flare.vpcf",
+      "role": "projectile_child"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_ssr_chain_light.vpcf",
+      "native": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost_light.vpcf",
+      "role": "projectile_child"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_ssr_chain.vpcf",
+      "native": "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost.vpcf",
+      "role": "tracking_projectile"
+    },
+    {
+      "resource": "particles/survival/towers/trial/anti_air_sr_rocket.vpcf",
+      "native": "particles/units/heroes/hero_rattletrap/rattletrap_rocket_flare.vpcf",
+      "role": "tracking_projectile"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_comet_main.vpcf",
+      "native": "particles/units/heroes/hero_ancient_apparition/ancient_apparition_ice_blast_main.vpcf",
+      "role": "projectile_child"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_comet_ice_b.vpcf",
+      "native": "particles/units/heroes/hero_ancient_apparition/ancient_apparition_ice_blast_ice_b.vpcf",
+      "role": "projectile_child"
+    },
+    {
+      "resource": "particles/survival/towers/trial/frost_ssr_comet.vpcf",
+      "native": "particles/units/heroes/hero_ancient_apparition/ancient_apparition_ice_blast_final.vpcf",
+      "role": "tracking_projectile"
+    },
+    {
+      "resource": "particles/survival/towers/trial/lightning_ssr_arc.vpcf",
+      "native": "particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
+      "role": "native_beam_variant"
+    }
+  ]
+}
