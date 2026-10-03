@@ -1,4 +1,4 @@
-param([switch]$CheckOnly)
+param([switch]$CheckOnly, [switch]$Repair)
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $engine = [IO.Path]::GetFullPath((Join-Path $repo '../../..'))
@@ -6,6 +6,14 @@ $content = Join-Path $engine 'content/dota_addons/survival/panorama/images/custo
 $masters = Join-Path $repo 'art/ui/sources/custom_game'
 $compiler = Join-Path $engine 'game/bin/win64/resourcecompiler.exe'
 $work = Join-Path $repo 'output/archive_texture_fix'
+if ($Repair -and $CheckOnly) { throw 'Choose Repair or CheckOnly, not both.' }
+if (-not $CheckOnly -and (Get-Process dota2 -ErrorAction SilentlyContinue)) {
+    throw 'Close Dota 2 / Workshop Tools before offline compilation. Then run repair_archive_textures.cmd.'
+}
+if ($Repair) {
+    & (Join-Path $PSScriptRoot 'sync_archive_texture_sources.ps1')
+}
+& (Join-Path $PSScriptRoot 'sync_archive_texture_sources.ps1') -CheckOnly
 New-Item -ItemType Directory -Path $work -Force | Out-Null
 $inputs = @()
 foreach ($group in @('archive_gpu_regular', 'archive_gpu_small')) {
@@ -24,6 +32,14 @@ $fileList = Join-Path $work 'inputs.txt'
 [IO.File]::WriteAllLines($fileList, $inputs, [Text.UTF8Encoding]::new($false))
 $compilerArgs = @('-filelist', $fileList, '-game', (Join-Path $engine 'game/dota'), '-nop4')
 if (-not $CheckOnly) {
+    # Preserve pre-existing local build outputs before the compiler updates them.
+    $backup = Join-Path $work ('compiled_backup_'+[Guid]::NewGuid().ToString('N'))
+    foreach ($group in @('archive_gpu_regular', 'archive_gpu_small')) {
+        $saved = Join-Path $backup $group
+        $null = New-Item -ItemType Directory -Path $saved -Force
+        Get-ChildItem -LiteralPath (Join-Path $repo "panorama/images/custom_game/$group") -Filter '*.vtex_c' -File |
+            Copy-Item -Destination $saved
+    }
     $buildLog = Join-Path $work 'compile.log'
     & $compiler @compilerArgs *> $buildLog
     if ($LASTEXITCODE -ne 0 -or -not (Select-String -LiteralPath $buildLog -Pattern 'OK: \d+ compiled, 0 failed,' -Quiet)) {

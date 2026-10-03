@@ -5,6 +5,15 @@ $engineRoot=[IO.Path]::GetFullPath((Join-Path $repoRoot '../../..'))
 $source=Join-Path $repoRoot 'art/ui/sources'
 $destination=[IO.Path]::GetFullPath((Join-Path $engineRoot 'content/dota_addons/Survival/panorama/images'))
 if (-not (Test-Path -LiteralPath $source -PathType Container)) {throw 'Missing master images'}
+# Git attributes do not rewrite files already present in a Windows checkout.
+# Refuse to copy CRLF recipes back over content prepared with canonical LF.
+foreach ($group in @('archive_gpu_regular', 'archive_gpu_small')) {
+    foreach ($recipe in Get-ChildItem -LiteralPath (Join-Path $source "custom_game/$group") -Filter '*.vtex' -File) {
+        if ([IO.File]::ReadAllText($recipe.FullName).Contains("`r")) {
+            throw 'Archive recipes must use LF. Close Dota and run repair_archive_textures.cmd first.'
+        }
+    }
+}
 $isJunction=$false
 if (Test-Path -LiteralPath $destination) {
     $entry=Get-Item -LiteralPath $destination
