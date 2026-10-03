@@ -11,10 +11,24 @@ $poolOutput = Join-Path $lotteryRoot 'lottery_pool_items.csv'
 $catalogOutput = Join-Path $repo 'data\csv\物品系统\content_catalog.csv'
 $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 $existingMaxOwned = @{}
+$existingItemEconomy = @{}
+$screenshotOverrides = @{}
+foreach ($referenceFile in (Get-ChildItem -LiteralPath (Join-Path $repo "data/lottery") -Filter '*_pool_reference_*.json' | Sort-Object Name)) {
+    foreach ($entry in ((Get-Content -LiteralPath $referenceFile.FullName -Raw -Encoding UTF8 | ConvertFrom-Json).items)) {
+        $id = [string]$entry.item_id
+        if ($screenshotOverrides.ContainsKey($id) -and (
+            $screenshotOverrides[$id].display_name -ne $entry.display_name -or
+            $screenshotOverrides[$id].quality -ne $entry.quality)) {
+            throw "Conflicting screenshot item definition: $id"
+        }
+        $screenshotOverrides[$id] = $entry
+    }
+}
 if (Test-Path -LiteralPath $itemOutput) {
     foreach ($existing in (Import-Csv -LiteralPath $itemOutput | Where-Object {
         $_.item_id -and -not ([string]$_.item_id).StartsWith('#')
     })) {
+        $existingItemEconomy[[string]$existing.item_id] = $existing
         $configuredMax = 0
         if ([int]::TryParse([string]$existing.max_owned, [ref]$configuredMax) `
             -and $configuredMax -ge 1) {
@@ -308,6 +322,15 @@ for ($sourceRow = 5; $sourceRow -le 93; $sourceRow++) {
     $effectIds = @($effectTokens | ForEach-Object { ($_ -split '=', 2)[0] })
     $effectValues = @($effectTokens | ForEach-Object { ($_ -split '=', 2)[1] })
     $itemId = $itemIds[$sourceRow - 5]
+    if ($screenshotOverrides.ContainsKey($itemId)) {
+        $name = [string]$screenshotOverrides[$itemId].display_name
+        $rarity = [string]$screenshotOverrides[$itemId].quality
+    }
+    $duplicatePoints = $duplicateByRarity[$rarity]
+    if ($screenshotOverrides.ContainsKey($itemId) -and $existingItemEconomy.ContainsKey($itemId)) {
+        $duplicatePoints = [int]$existingItemEconomy[$itemId].duplicate_points
+        $exchangePoints = [int]$existingItemEconomy[$itemId].exchange_points
+    }
     $maxOwned = if ($existingMaxOwned.ContainsKey($itemId)) {
         $existingMaxOwned[$itemId]
     } else { 1 }
@@ -315,7 +338,7 @@ for ($sourceRow = 5; $sourceRow -le 93; $sourceRow++) {
         item_id=$itemId; display_name=$name; item_type='积分道具'
         duration_type='permanent'; duration_text='永久'; description=$description
         quality=$rarity; icon_type='item'; icon=(Icon-For $description)
-        duplicate_points=$duplicateByRarity[$rarity]; exchange_points=$exchangePoints
+        duplicate_points=$duplicatePoints; exchange_points=$exchangePoints
         exchange_enabled=$(if ($enabled) { 1 } else { 0 })
         max_owned=$maxOwned
         effect_ids=($effectIds -join '|'); effect_values=($effectValues -join '|')
@@ -351,7 +374,10 @@ $poolLines = @(
     'dragon_knight_all,dragon_knight,*,1,1,needs_confirmation,特殊池暂时共用全部已启用积分道具。'
     'summer_all,summer,*,1,1,needs_confirmation,特殊池暂时共用全部已启用积分道具。'
 )
-[IO.File]::WriteAllText($poolOutput, ($poolLines -join "`n") + "`n", $utf8NoBom)
+# Existing themed memberships are authoritative; workbook imports must not reset them.
+if (-not (Test-Path -LiteralPath $poolOutput)) {
+    [IO.File]::WriteAllText($poolOutput, ($poolLines -join "`n") + "`n", $utf8NoBom)
+}
 
 $catalogLines = [Collections.Generic.List[string]]::new()
 foreach ($line in [IO.File]::ReadAllLines($catalogOutput)) {

@@ -1,0 +1,137 @@
+{
+  "pool_id": "cultivation",
+  "source": "用户2026-09-30两张修仙宝箱图鉴截图；共26种，无N；概率由用户另行提供。",
+  "probability_status": "pending_user_values",
+  "items": [
+    {
+      "item_id": "lottery_fallen_sky_mine",
+      "display_name": "陨落天矿",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_jade_purity_sword_immortal",
+      "display_name": "玉清剑仙",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_immortal_slaying_sword_array",
+      "display_name": "诛仙剑阵",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_investiture_of_gods",
+      "display_name": "封神榜",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_heavenly_puppet",
+      "display_name": "天道傀儡",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_mountain_sea_kunpeng",
+      "display_name": "山海鲲鹏",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_reincarnation_immortal_stele",
+      "display_name": "轮回仙碑",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_ancient_pine_fortification",
+      "display_name": "苍松固城",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_woodcraft_grandmaster",
+      "display_name": "研木宗师",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_forestcast_thousand_bolts",
+      "display_name": "林铸千矢",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_emerald_wood_origin",
+      "display_name": "翠木归元",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_gathering_divine_codex",
+      "display_name": "采集神典",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_aaron_cannon",
+      "display_name": "亚伦巨炮",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_darksteel_wall",
+      "display_name": "玄铁城墙",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_lumber_legacy",
+      "display_name": "伐木传承",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_titan_shield",
+      "display_name": "泰坦巨盾",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_windspeed_bowstring",
+      "display_name": "风速弓弦",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_quick_dry_cement",
+      "display_name": "速干水泥",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_swift_emblem",
+      "display_name": "快速纹盘",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_gale_bow",
+      "display_name": "疾风弓",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_universal_tool",
+      "display_name": "万能工具",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_divine_spirit",
+      "display_name": "神赐精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_sharp_spirit",
+      "display_name": "锋锐精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_nature_spirit",
+      "display_name": "自然精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_life_spirit",
+      "display_name": "生命精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_recovery_spirit",
+      "display_name": "回复精粹",
+      "quality": "r"
+    }
+  ]
+}

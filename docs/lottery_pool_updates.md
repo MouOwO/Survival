@@ -6,9 +6,9 @@
 
 ## 配置入口
 
-- `data/csv/抽奖系统/lottery_pool_items.csv`：每行填写唯一 membership_id、宝箱 pool_id、道具 item_id、同品质权重 item_weight 和 enabled。自由增删各宝箱成员；精确配置前先删除该宝箱的 `item_id=*` 通配行，避免重复成员。当前保留原有四个奖池内容。
+- `data/csv/抽奖系统/lottery_pool_items.csv`：每行填写唯一 membership_id、宝箱 pool_id、道具 item_id、同品质权重 item_weight 和 enabled。自由增删各宝箱成员；精确配置前先删除该宝箱的 `item_id=*` 通配行，避免重复成员。地图宝箱按2026-09-29截图限定30种，修仙宝箱按2026-09-30截图限定26种；第三宝箱按截图登记27种（龙骑尖兵01型待补效果，暂禁用），前三池均使用显式成员。第四宝箱24种已登记到data/lottery草案，但因10种新增物品（含全部UR）效果缺失，暂不替换运行成员表。
 - `lottery_item_definitions.csv`：道具名称、品质、图标、效果等定义。
-- `lottery_pool_updates.csv`：保留的更新元数据表，目前不展示公告，也不提供定时生效功能。
+- `lottery_pool_updates.csv`：更新元数据及公开公告。`single_draw_probabilities`存放用户确认的单次抽奖概率文案，“开奖公告”读取当前奖池快照中的该字段；空值显示尚未公布。此字段不包含十连保底，保底说明单独展示。不提供定时生效功能。
 - `lottery_pool_definitions.csv`、`lottery_quality_weights.csv`、`lottery_pity_rules.csv`：宝箱名称、消耗、概率和保底。
 
 修改后运行 `pwsh -NoProfile -File tools/build_lottery_configs.ps1`，完整重开测试局加载服务端配置。服务端自动计算各宝箱配置指纹，成员、道具、概率、保底或公告变化都会再次提示；无需手动维护版本号。概率与权重仍留在服务端。

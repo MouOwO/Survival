@@ -1,0 +1,163 @@
+{
+  "pool_id": "map",
+  "source": "用户2026-09-29提供的两张地图宝箱图鉴截图；名称取卡片下方标签，品质取卡框顶部。",
+  "items": [
+    {
+      "item_id": "lottery_hippogryph_onslaught",
+      "display_name": "角鹰魔攻",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_soul_devouring_blade",
+      "display_name": "噬魂灵剑",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_tower_retrofit",
+      "display_name": "箭塔改造",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_steel_wall",
+      "display_name": "钢铁城墙",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_gathering_grimoire",
+      "display_name": "采集秘典",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_hero_medal",
+      "display_name": "英雄勋章",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_sharpwood_tower_core",
+      "display_name": "锐木塔源",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_seed_of_all_wood",
+      "display_name": "万木之种",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_oak_bulwark",
+      "display_name": "橡木壁垒",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_supreme_fishing_rod",
+      "display_name": "极品钓鱼杆",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_windspeed_bowstring",
+      "display_name": "风速弓弦",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_quick_dry_cement",
+      "display_name": "速干水泥",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_swift_emblem",
+      "display_name": "快速纹盘",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_gale_bow",
+      "display_name": "疾风弓",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_universal_tool",
+      "display_name": "万能工具",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_divine_spirit",
+      "display_name": "神赐精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_sharp_spirit",
+      "display_name": "锋锐精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_nature_spirit",
+      "display_name": "自然精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_life_spirit",
+      "display_name": "生命精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_recovery_spirit",
+      "display_name": "回复精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_lumber_crystal",
+      "display_name": "伐木结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_wealth_crystal",
+      "display_name": "财富结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_shooting_crystal",
+      "display_name": "射击结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_expansion_crystal",
+      "display_name": "膨胀结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_resistance_crystal",
+      "display_name": "抵抗结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_bombardment_crystal",
+      "display_name": "炮击结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_recovery_crystal",
+      "display_name": "回复结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_nature_crystal",
+      "display_name": "自然结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_protection_crystal",
+      "display_name": "防护结晶",
+      "quality": "n"
+    },
+    {
+      "item_id": "lottery_attribute_crystal",
+      "display_name": "属性结晶",
+      "quality": "n"
+    }
+  ],
+  "probability_status": "confirmed_by_user_20260930",
+  "single_draw_probabilities": {
+    "ssr": 1.5,
+    "sr": 4,
+    "r": 25,
+    "n": 69.5
+  }
+}

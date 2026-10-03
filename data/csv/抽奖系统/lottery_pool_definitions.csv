@@ -1,7 +1,7 @@
-pool_id,display_name,description,ticket_content_id,single_cost,ten_cost,pool_group,ui_order,enabled,review_status,notes
-#中文名:奖池ID,显示名称,客户端描述,消耗券内容ID,单抽消耗,十连消耗,奖池分组,UI排序,是否启用,审核状态,备注
-#types:string,string,string,string,number,number,string,number,boolean,string,string
-map,地图抽奖,N/R/SR/SSR/UR综合奖池 · 十连保底SR,lottery_ticket,1,10,map,1,1,ok,UR基础概率0.1%；保底补位固定为SR且不会提升为UR；连续十次单抽不保底。
-cultivation,修仙宝箱,特殊奖池 · 十连至少UR,special_lottery_ticket,1,10,special,2,1,needs_confirmation,当前与其他特殊池共用联调道具；仅直接十连触发至少UR。
-dragon_knight,龙骑宝箱,特殊奖池 · 十连至少UR,special_lottery_ticket,1,10,special,3,1,needs_confirmation,当前与其他特殊池共用联调道具；仅直接十连触发至少UR。
-summer,暑期宝箱,特殊奖池 · 十连至少UR,special_lottery_ticket,1,10,special,4,1,needs_confirmation,当前与其他特殊池共用联调道具；仅直接十连触发至少UR。
+pool_id,display_name,description,ticket_content_id,single_cost,ten_cost,pool_group,ui_order,enabled,review_status,notes,unlock_pool_id,unlock_draws
+#中文名:奖池ID,显示名称,客户端描述,消耗券内容ID,单抽消耗,十连消耗,奖池分组,UI排序,是否启用,审核状态,备注,前置宝箱ID,前置累计开启次数
+#types:string,string,string,string,number,number,string,number,boolean,string,string,string,number
+map,地图抽奖,普通抽奖券 · 十连保底SSR,lottery_ticket,1,10,map,1,1,ok,按用户截图限定30种道具，无UR；十连未自然获得SSR时固定补SSR；连续十次单抽不保底。,,0
+cultivation,修仙宝箱,普通抽奖券 · 地图宝箱累计开启100次解锁 · 十连保底SSR,lottery_ticket,1,10,normal,2,1,needs_confirmation,解锁按地图宝箱累计开启次数计算；单抽计1次，十连计10次。,map,100
+dragon_knight,龙骑宝箱,金色抽奖券 · 无前置解锁条件 · 十连至少UR,special_lottery_ticket,1,10,special,3,1,needs_confirmation,持有足够金色抽奖券即可抽取，不依赖其他宝箱进度。,,0
+summer,暑期宝箱,金色抽奖券 · 无前置解锁条件 · 十连至少UR,special_lottery_ticket,1,10,special,4,1,needs_confirmation,持有足够金色抽奖券即可抽取，不依赖其他宝箱进度。,,0
