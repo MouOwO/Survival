@@ -1,0 +1,74 @@
+{
+  "scope": "Persistent tower laser visual, 2026-10-01 polish",
+  "native_structure": {
+    "references": [
+      "particles/units/heroes/hero_phoenix/phoenix_sunray_beam_core.vpcf",
+      "particles/units/heroes/hero_wisp/wisp_tether.vpcf"
+    ],
+    "verified_from": "Local Valve pak01_dir.vpk and resourceinfo DATA dumps under output/laser_continuous_audit",
+    "method": "InstantaneousEmitter creates a fixed path once; MaintainSequentialPath updates CP9 to CP1 in the native particle simulation; normal-state decay and fades are absent; only native endcap cleanup remains."
+  },
+  "visual": {
+    "beam_mode": "continuous",
+    "root": "particles/survival/towers/laser_beam.vpcf",
+    "collections": 4,
+    "maximum_live_nodes": 26,
+    "beam_core": "12 path nodes, 20-radius white-blue hotwhite core, renderer radiusScale 0.5",
+    "beam_envelope": "12 path nodes, 38-radius saturated blue hotblue2 envelope, renderer radiusScale 0.5",
+    "impact": "Two depth-tested CP1-pinned sprites at radius 13 and 22; no screen-wide bloom",
+    "lifetime": "999999-second constant lifespan and no normal-state decay; Lua owns and immediately destroys the collection when the valid target ends"
+  },
+  "gameplay_unchanged": [
+    "First laser damage hit",
+    "1-second damage interval",
+    "5-percent-per-second ramp",
+    "Maximum multiplier 5",
+    "Attack point",
+    "Source and target height fallbacks",
+    "Target range",
+    "Production target selection and native attack orders"
+  ],
+  "runtime": {
+    "entity_control_points": {
+      "0": "source child anchor",
+      "1": "target hitloc",
+      "9": "source attack attachment/body fallback"
+    },
+    "world_coordinate_overwrites_when_bound": 0,
+    "failure_retry_seconds": 0.5,
+    "retry_rule": "Only when the target remains valid and the continuous handle list is empty; every attempt schedules the next allowed retry; damage timing is independent."
+  },
+  "tests": {
+    "source_csv_contract": "PASS",
+    "compiled_contract": "PASS: final FLOAT-normalized sources match content; all four compiled DATA operator, CP, persistence, depth and dependency checks pass",
+    "test_tower_skill_tree_exclusion": "PASS",
+    "test_manual_laser_follow_fixture": "PASS",
+    "test_tower_idle_state": "PASS",
+    "test_tower_target_selection": "PASS",
+    "test_tower_destruction_rebuild": "PASS",
+    "luac_syntax": "PASS",
+    "git_diff_check": "PASS",
+    "continuous_90_second_mock": {
+      "create": 1,
+      "destroy_during_stable_target": 0,
+      "entity_control_bindings": 3,
+      "world_control_writes": 0,
+      "live_handles": 1,
+      "damage_ticks_including_first_hit": 91
+    },
+    "failure_cases": [
+      "Repeated CreateParticle failure is limited to 3 attempts over 1.2 seconds while damage advances",
+      "Same-target visuals recover when ParticleManager works again without resetting the damage clock",
+      "A repeated OnAttackStart for the same target does not recreate the beam",
+      "Target switch resets the damage ramp and releases the old beam once",
+      "Target killed by another attacker cannot be resurrected by the visual retry",
+      "Relocation reset and destruction clean the continuous handle and retry state once",
+      "Fallback coordinate-write failure disposes its handle and recovers through bounded retry",
+      "Existing segmented binding, cleanup failure and no-attachment fallback regressions still pass"
+    ]
+  },
+  "rebuild": "node tools/map_c6/build-laser-visual-particles.cjs",
+  "compiled_validation": "node tools/map_c6/verify-laser-visual.cjs --compiled --log-dir output/tower_vfx_polish_20261001",
+  "compiled_validation_output": "output/laser_continuous_audit/compiled/compiled_validation.json",
+  "engine_visual_review": "Pending root cold-start review; no new live appearance or full-wave performance claim."
+}

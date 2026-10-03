@@ -5,7 +5,7 @@
     // is divided by 3 before it reaches this engine-facing fallback config.
     "building_wall"
     {
-        "BaseClass"              "npc_dota_creature"
+        "BaseClass"              "npc_dota_building"
         "Model"                  "models/survival_buildings/wall_lv01.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
@@ -364,7 +364,7 @@
         "HasInventory"           "0"
         "StatusHealth"           "1"
         "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_GROUND"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_FLY"
         "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
         "MovementSpeed"          "1"
         "ArmorPhysical"          "0"

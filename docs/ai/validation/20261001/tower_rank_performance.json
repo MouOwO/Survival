@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-01",
+  "status": "SIMULATION_BUILD_AND_WORKSHOP_SMOKE_PASS",
+  "kind": "offline_production_js_call_counts",
+  "scope": "Tower rank UI only: empty-state capture skip, full-screen occlusion early exit, redundant position/visibility writes removed. Camera/entity following remains once per Panorama frame.",
+  "before_source_sha256": "3d2c05fccb64aed5d24f1feeca78b76d5c1529d4c17ab0b6b04c3585d9b5d9cb",
+  "after_source_sha256": "7360af397c2edfaa8db6d66859d5ebc7b0fd24145bfd52919a8d1c92e0832784",
+  "before": {
+    "kind": "offline_production_js_call_counts",
+    "source": "output/tower_rank_performance_20261001/tower_rank_ui.before.js",
+    "towers": 40,
+    "frames_per_scenario": 300,
+    "stable": {
+      "native_calls": 60000,
+      "projection_calls": 24000,
+      "style_writes": 24000,
+      "overlay_captures": 300,
+      "panel_searches": 0
+    },
+    "full_screen_blocked": {
+      "native_calls": 60000,
+      "projection_calls": 24000,
+      "style_writes": 12000,
+      "overlay_captures": 300,
+      "panel_searches": 0
+    },
+    "block_transition_style_writes": 40,
+    "no_towers": {
+      "native_calls": 0,
+      "projection_calls": 0,
+      "style_writes": 0,
+      "overlay_captures": 300,
+      "panel_searches": 0
+    },
+    "caveat": "Call counts only; not FPS, CPU/GPU frame time or measured Dota speedup."
+  },
+  "after": {
+    "kind": "offline_production_js_call_counts",
+    "source": "panorama/src/scripts/custom_game/tower_rank_ui.js",
+    "towers": 40,
+    "frames_per_scenario": 300,
+    "stable": {
+      "native_calls": 60000,
+      "projection_calls": 24000,
+      "style_writes": 0,
+      "overlay_captures": 300,
+      "panel_searches": 0
+    },
+    "full_screen_blocked": {
+      "native_calls": 0,
+      "projection_calls": 0,
+      "style_writes": 0,
+      "overlay_captures": 300,
+      "panel_searches": 0
+    },
+    "block_transition_style_writes": 40,
+    "no_towers": {
+      "native_calls": 0,
+      "projection_calls": 0,
+      "style_writes": 0,
+      "overlay_captures": 0,
+      "panel_searches": 0
+    },
+    "caveat": "Call counts only; not FPS, CPU/GPU frame time or measured Dota speedup."
+  },
+  "behavior_tests": {
+    "command": "node tools/test_tower_rank_ui.cjs",
+    "status": "PASS",
+    "coverage": [
+      "real empty XML/CSS",
+      "empty state skips HUD capture",
+      "full-screen block hides already shown panels",
+      "same-value styles do not repeat",
+      "origin change while blocked resumes on next visible frame",
+      "offscreen and death",
+      "UI scale",
+      "missing optional engine APIs",
+      "exception recovery",
+      "session restore",
+      "hot reload single schedule and listeners",
+      "UR visibility transitions"
+    ]
+  },
+  "build": {
+    "status": "PASS",
+    "content_synchronized": true,
+    "compiled": true,
+    "compiled_count": 1,
+    "failed_count": 0,
+    "source_and_content_sha256": "7360af397c2edfaa8db6d66859d5ebc7b0fd24145bfd52919a8d1c92e0832784",
+    "compiled_sha256": "3d971cdcccb984930a892ef129e8a539a09e081525aec09539e3e9b45722e89c",
+    "deployment_record": "output/relocation_input_20261001/deploy_two_panorama.json",
+    "compile_log": "output/relocation_input_20261001/tower_rank_ui.js.compile.log"
+  },
+  "workshop_verified": true,
+  "workshop": {
+    "status": "SMOKE_PASS",
+    "reported_by": "root agent, 2026-10-01",
+    "scope": "Cold-started compiled UI; N rank label follows a real tower after normal D relocation.",
+    "full_screen_occlusion_and_zero_tower_runtime_capture": "not independently measured in Workshop",
+    "fps_or_frame_time_speedup": "not measured; offline counts must not be interpreted as FPS"
+  },
+  "limits": [
+    "Counts are simulated calls, not native execution times, FPS or GPU duration.",
+    "No changing origin or health-bar height is cached.",
+    "Public world_overlay_visibility implementation unchanged."
+  ]
+}

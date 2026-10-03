@@ -1,0 +1,30 @@
+{
+  "workshop": "3164617180",
+  "origin": "Reference overhead.vcss_c RarityImage selectors",
+  "resources": [
+    {
+      "source": "panorama/images/custom_game/rareicon_n_png.vtex_c",
+      "dest": "panorama/images/custom_game/survival_tower_rank/rareicon_n_png.vtex_c",
+      "bytes": 6132,
+      "sha256": "a68ee4f76454600b227d6c2fbdd48c5f07d3bf5dac528b21ada713278fde10bb"
+    },
+    {
+      "source": "panorama/images/custom_game/rareicon_r_png.vtex_c",
+      "dest": "panorama/images/custom_game/survival_tower_rank/rareicon_r_png.vtex_c",
+      "bytes": 6132,
+      "sha256": "6a9a290b9f022527480444b6dfdc2d009aa92e2dfe8c26ac2cc79f87c291cd5c"
+    },
+    {
+      "source": "panorama/images/custom_game/rareicon_sr_png.vtex_c",
+      "dest": "panorama/images/custom_game/survival_tower_rank/rareicon_sr_png.vtex_c",
+      "bytes": 6132,
+      "sha256": "cd9dd5bb1dbb209ddd36ea4a179b964617d581518fc8dca78887ba9cdaa56d54"
+    },
+    {
+      "source": "panorama/images/custom_game/rareicon_ssr_png.vtex_c",
+      "dest": "panorama/images/custom_game/survival_tower_rank/rareicon_ssr_png.vtex_c",
+      "bytes": 6132,
+      "sha256": "e40d73cb60a0a9a184f6301bae6f5df8cec61c3f02c4d53fa6ec8ddcdfdb99c5"
+    }
+  ]
+}

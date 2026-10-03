@@ -61,7 +61,9 @@ return function(sources)
         record(M.position(wall2,2,3))
         return table.concat(trace,'|')
     end
-    assert(scenario(sources.before)==scenario(sources.after),'slot/queue behavior changed')
+    -- Compare caching with identical geometry; the wall radius intentionally shrank.
+    local before_geometry = sources.before:gsub('local NORMAL_OFFSET = 288', 'local NORMAL_OFFSET = 176')
+    assert(scenario(before_geometry)==scenario(sources.after),'slot/queue behavior changed')
     print('[C6_AI_CHECK] PASS FIFO, arrivals, release, death, promotion, retarget, reset')
     local function bench(source,count)
         local M,entity,clock,counters=sandbox(source)

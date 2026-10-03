@@ -1,0 +1,90 @@
+{
+  "date": "2026-09-30",
+  "last_validated_at": "2026-10-01T00:48:49+08:00",
+  "feature": "tower D uses shared construction grid placement",
+  "validation_level": ["STATIC", "UNIT", "SIMULATION", "CONTRACT", "WORKSHOP"],
+  "workshop_verified": true,
+  "workshop_verified_scope": "Owned normally constructed N tower: D grid, repeated D, occupied destination rejection, green-cell movement and ghost cleanup. Other cases retain their explicitly listed simulation-only or pending status.",
+  "changes": [
+    "Every D press and move-button click starts a fresh shared placement session.",
+    "Preview and commit use the same snapped grid position and existing tower footprint.",
+    "Server rechecks ownership, alive/defeated state, ability, cooldown, finite coordinates, range and occupancy.",
+    "Out-of-range snapped cells are rejected instead of silently clamping to another cell.",
+    "Ordinary and UR towers retain existing movement implementations and all gameplay state.",
+    "Ghost model follows the current tower model, scale and yaw; skin uses an available GetSkin getter, otherwise the current applied asset model_skin, otherwise 0. Real Dota NPCs may expose SetSkin without GetSkin.",
+    "Switching towers retires the old ghost; proxy configuration failure removes the tracked proxy before the next update.",
+    "Grid reconciliation preserves named future-tree reservations without passing strings to EntIndexToHScript, and retains live resource-tree occupancy."
+  ],
+  "passed": [
+    "Lua 5.1 syntax for six changed runtime modules and new relocation service/test",
+    "scripts/vscripts/tests/test_tower_relocation_grid.lua",
+    "scripts/vscripts/tests/test_grid_preview_model.lua",
+    "scripts/vscripts/tests/test_grid_builder_preview.lua",
+    "scripts/vscripts/tests/test_grid_preview_area.lua",
+    "scripts/vscripts/tests/test_manual_tower_grid_review.lua: actual generated CSV initial wood 10, lumberjack cost 10, arrow tower cost 50, native harvesting/build queues, reuse and 240-second timeout",
+    "tools/test_grid_placement_client.cjs",
+    "tools/test_building_move_grid.cjs",
+    "tools/test_tower_grid_release_contract.ps1",
+    "Panorama building_move.js and survival_grid_placement.js source sync and compilation: 2 compiled, 0 failed"
+  ],
+  "workshop_evidence": {
+    "environment": "Normal authenticated Workshop match after mode/difficulty selection; no grants, fake registration, reset or teleport for the tested tower.",
+    "normal_construction": {
+      "helper": "scripts/vscripts/tests/manual_tower_grid_review.lua",
+      "wall_entindex": 633,
+      "main_city_entindex": 649,
+      "lumberjack_entindex": 664,
+      "tower_entindex": 667,
+      "move_ability_entindex": 670,
+      "completed_at": "2026-10-01T00:40:57+08:00",
+      "elapsed_seconds": 95.87,
+      "source_position": [256, 4736, 385.5],
+      "costs": "Opening 10 wood paid for the native lumberjack; its real harvest supplied the 50 wood for the arrow tower. Wall and city use their normal zero-wood price."
+    },
+    "grid_first_press": {
+      "level": "WORKSHOP",
+      "screenshot": "output/map_build_c6/d_grid_first.png",
+      "observed": "D shows the shared placement grid. This initial capture predates the GetSkin compatibility hotfix; it is not evidence of a successful preview-model setup."
+    },
+    "grid_repeated_press": {
+      "level": "WORKSHOP",
+      "screenshot": "output/map_build_c6/d_grid_repeated.png",
+      "observed": "Repeated D reopens the placement grid rather than toggling placement off."
+    },
+    "preview_api_fix": {
+      "level": "WORKSHOP",
+      "loaded_at": "2026-10-01T00:47:40+08:00",
+      "log_marker": "GRID_PREVIEW_FIXED 517",
+      "observed": "Missing GetSkin was reproduced in the real engine, then fixed and explicitly hotloaded after cancelling placement. Prior untracked preview entities were removed. No new GetSkin or grid-preview runtime errors were found from this marker through the successful move at 00:48:49."
+    },
+    "occupied_destination": {
+      "level": "WORKSHOP",
+      "screenshot": "output/map_build_c6/d_move_completed.png",
+      "observed": "An enemy entered the destination, making it red. Clicking did not relocate the tower; the preview remained active.",
+      "server_checked_at": "2026-10-01T00:48:15+08:00",
+      "server_position": [256, 4736, 385.5],
+      "ghost_count": 1
+    },
+    "green_destination": {
+      "level": "WORKSHOP",
+      "screenshot": "output/map_build_c6/d_move_green_result.png",
+      "observed": "A subsequent green-cell placement completed at the snapped destination and retired the preview.",
+      "server_checked_at": "2026-10-01T00:48:49+08:00",
+      "server_position": [960, 4928, 385.5],
+      "ghost_count": 0,
+      "log_markers": ["D_MOVE_REAL 960 4928 385.5", "D_GHOST_COUNT 0"]
+    }
+  },
+  "simulation_only": [
+    "Multiplayer ownership/isolation and rejection of another player's tower; no multi-player Workshop migration was performed.",
+    "UR relocation delegates to the existing ultimate-tower path and preserves its state; no real UR relocation was performed.",
+    "Class-transferred/current-model ghost changes, cooldown/range/finite-coordinate checks and stale-reply rejection.",
+    "GetSkin asset fallback/default skin, proxy setup error cleanup and recovery.",
+    "Named future-tree reservation retention, live-tree occupancy and stale/dead entity cleanup."
+  ],
+  "workshop_checks_pending": [
+    "Cold-start confirmation of the named-tree reservation/live-tree occupancy fix; the active match used the existing grid service state.",
+    "Forbidden lower lane and out-of-range destination rejection in a real match.",
+    "Multi-player isolation and real class-transferred/UR relocation, including selection-change and right-click cancellation."
+  ]
+}

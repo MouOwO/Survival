@@ -1,0 +1,384 @@
+{
+  "status": "STATIC_AND_SIMULATION_PASS_WORKSHOP_PARTIAL",
+  "release_date": "2026-09-30",
+  "reviewed_on": "2026-10-01",
+  "scope": "Tower overhead rarity/stars, selected-unit display names, resource provenance, initialization and lifecycle safety. No console connection or gameplay changes were made by the reviewing agent.",
+  "mapping": {
+    "authority": "scripts/vscripts/systems/tower_rank_projection.lua",
+    "gameplay_csv_unchanged": true,
+    "absolute_levels": [
+      {
+        "from": 1,
+        "to": 5,
+        "rarity": "N",
+        "gold_stars": "level",
+        "red_stars": 0
+      },
+      {
+        "from": 6,
+        "to": 10,
+        "rarity": "R",
+        "gold_stars": "level - 5",
+        "red_stars": 0
+      },
+      {
+        "from": 11,
+        "to": 15,
+        "rarity": "SR",
+        "gold_stars": "level - 10",
+        "red_stars": 0
+      },
+      {
+        "from": 16,
+        "to": 20,
+        "rarity": "SSR",
+        "gold_stars": "level - 15",
+        "red_stars": 0
+      },
+      {
+        "from": 21,
+        "to": 25,
+        "rarity": "SSR",
+        "gold_stars": "25 - level",
+        "red_stars": "level - 20",
+        "total_slots": 5
+      }
+    ],
+    "ultimate": {
+      "rarity": "UR",
+      "stars": "clamp(actual level, 1, 5)",
+      "current_gameplay_level": 1
+    },
+    "final_form_example": "Absolute level 21 / existing final-form LV6 = SSR, four gold stars and one red star. Level 25 / LV10 = SSR, five red stars.",
+    "display_names": "Route names, building snapshots and selected-unit UI share the projection. Existing final-form LV6-LV10 names remain intact; an advance X/5 suffix explains red stars. CSV rarity used by gameplay eligibility is not rewritten."
+  },
+  "resources": {
+    "reference_archive": "D:/SteamLibrary/steamapps/workshop/content/570/3164617180/3164617180.vpk",
+    "reference_manifest": "art/ui/sources/custom_game/survival_tower_rank/resource_manifest.json",
+    "reference_rarities_present": [
+      "N",
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "reference_ur_art_present": false,
+    "ultimate_art": "Local native Panorama UR Label; no claim that the reference supplied an UR texture.",
+    "reference_logic_imported": false,
+    "native_star": {
+      "archive": "game/dota/pak01_dir.vpk",
+      "resource": "panorama/images/control_icons/starfilled_psd.vtex_c",
+      "uri": "s2r://panorama/images/control_icons/starfilled_psd.vtex",
+      "bytes": 6548,
+      "sha256": "d2c73351f217253b9f62de7bed18b7e8ac305fb72fd543686b9e111708e9bb19",
+      "exists_in_valve_archive": true,
+      "incorrect_starfilled_png_exists_in_valve_archive": false,
+      "compiled_css_references_psd_and_not_png": true,
+      "stars_container": "70x14 px; five 14x14 px slots"
+    },
+    "reference_copies": [
+      {
+        "source": "panorama/images/custom_game/rareicon_n_png.vtex_c",
+        "dest": "panorama/images/custom_game/survival_tower_rank/rareicon_n_png.vtex_c",
+        "bytes": 6132,
+        "sha256": "a68ee4f76454600b227d6c2fbdd48c5f07d3bf5dac528b21ada713278fde10bb",
+        "copy_matches_reference": true
+      },
+      {
+        "source": "panorama/images/custom_game/rareicon_r_png.vtex_c",
+        "dest": "panorama/images/custom_game/survival_tower_rank/rareicon_r_png.vtex_c",
+        "bytes": 6132,
+        "sha256": "6a9a290b9f022527480444b6dfdc2d009aa92e2dfe8c26ac2cc79f87c291cd5c",
+        "copy_matches_reference": true
+      },
+      {
+        "source": "panorama/images/custom_game/rareicon_sr_png.vtex_c",
+        "dest": "panorama/images/custom_game/survival_tower_rank/rareicon_sr_png.vtex_c",
+        "bytes": 6132,
+        "sha256": "cd9dd5bb1dbb209ddd36ea4a179b964617d581518fc8dca78887ba9cdaa56d54",
+        "copy_matches_reference": true
+      },
+      {
+        "source": "panorama/images/custom_game/rareicon_ssr_png.vtex_c",
+        "dest": "panorama/images/custom_game/survival_tower_rank/rareicon_ssr_png.vtex_c",
+        "bytes": 6132,
+        "sha256": "e40d73cb60a0a9a184f6301bae6f5df8cec61c3f02c4d53fa6ec8ddcdfdb99c5",
+        "copy_matches_reference": true
+      }
+    ]
+  },
+  "production_review": {
+    "result": "No additional production blocker found in reviewed rank paths; remaining visual acceptance is listed separately.",
+    "server_initialization": "Initialized after building_system and building_upgrade_system. BUILDING_LIST_REQUEST with {} actually returns all owners' living, completed buildings; verified with the real request handler and two owners.",
+    "server_lifecycle": [
+      "Generation guards invalidate earlier subscriptions on repeated init.",
+      "Unique nettable session invalidates stale replicated entries across restarts.",
+      "Publish deduplicates unchanged presentation state without entity scanning.",
+      "Death/removal events and one-second invalid-entity/post-game sweep write tombstones.",
+      "Owned entity handle check prevents a late ordinary death/removal event clearing a reused entity index."
+    ],
+    "client_recovery": [
+      "Restores both map-shaped and key/value-array nettable snapshots.",
+      "A session arriving after unit records triggers snapshot restoration.",
+      "Missing child container retries rather than permanently stopping after XML hot reload.",
+      "Entities.IsDormant is optional: current Workshop build does not expose it.",
+      "Entities.GetHealthBarOffset is optional and exception guarded, with a 180-unit fallback.",
+      "Physical screen coordinates are converted using Panorama UI scale; viewport and shared HUD occlusion hide covered/offscreen ranks.",
+      "Per-entity errors hide that panel, frame errors hide all panels, and subsequent frames continue.",
+      "Hot reload stops the old schedule/listeners and deletes its panels before starting a new instance."
+    ],
+    "debug": {
+      "read_only": true,
+      "client_entry": "GameUI.CustomUIConfig().SurvivalTowerRanks.DebugSnapshot()",
+      "server_event": "survival_tower_rank_debug_request",
+      "reports": "Session, state/panel/visible counts, hidden reasons, API availability, layout/occlusion, last exception and UR label text/visibility/measured dimensions."
+    },
+    "no_damage_orders_inventory_economy_or_auth_changes": true,
+    "manual_fixture_safety": "Explicit Tools-only module, not loaded by production. Creates npc_survival_grid_preview_proxy, sets survival_is_building=false, does not publish BUILDING_CREATED or set survival_building_id. This excludes both name-based upgrade recovery and normal building recovery. Owns and cleans only its display units.",
+    "development_limitations": [
+      "Calling only rank_service.init() manually in a live world restores ordinary towers from BUILDING_LIST, but an existing ultimate is not in that list. Production normal initialization and subsequent fusion events are supported; isolated server reinit after an existing ultimate needs republishing that ultimate.",
+      "Mock tests do not establish native font rendering, engine particle behavior or absence of engine crashes."
+    ],
+    "native_death_route": {
+      "status": "STATIC_REVIEW_PASS",
+      "source": "scripts/vscripts/addon_game_mode.lua:456",
+      "payload": "Native entity_killed keys.entindex_killed -> payload.victim handle plus payload.victim_entindex; rank and effects subscribe to the same events.ENGINE_ENTITY_KILLED constant and read victim.",
+      "fallback": "A rapidly removed non-building proxy can yield a nil/invalid victim handle; effect and rank lifecycle sweeps retire invalid entries at 0.5 s / 1 s.",
+      "normal_building": "building_system additionally emits BUILDING_DESTROYED(public_state) for registered completed buildings. Normal G destruction retires state synchronously if native death delivery is deferred. The display fixture intentionally does not enter this gameplay registration path."
+    },
+    "manual_fixture_death_assertion": {
+      "delay_seconds": 1.25,
+      "cached_entindex": true,
+      "queries_dead_unit": false,
+      "checks": [
+        "zero tracked effect handles",
+        "rank removed tombstone or absent entry"
+      ],
+      "simulation": "PASS with native-style entity removal before delayed cleanup; pending callbacks cancelled on fixture cleanup.",
+      "workshop": "PASS within the isolated display-fixture scope: root observed DEATH_FLAG true and DEATH_HANDLES false 0 around 2026-10-01 01:49. DEATH_FLAG is fixture.last_death_passed from the 1.25-second callback, which requires both untracked/zero effect handles and absent/removed rank replication. The deliberately killed slot 3 is absent in the final SSR capture. No normal paid upgrade transaction is claimed."
+    }
+  },
+  "postmortem": {
+    "reviewed": "docs/ai/TITLE_REMOVAL_POSTMORTEM_20260926.md",
+    "old_title_feature_restored": false,
+    "initial_layout": "Real tower_rank_ui.xml contains no Image or Label; display panels are instantiated only after a valid state and drawable world position, with parent visibility collapse before children are created.",
+    "covered_in_tests": [
+      "empty initial XML/CSS",
+      "first state",
+      "UI scale",
+      "offscreen",
+      "death",
+      "session change",
+      "hot reload",
+      "nettable tombstone",
+      "entity index reuse"
+    ],
+    "item_lifecycle": "Rank production path does not create, consume or remove items; the former synchronous active-item deletion path is absent.",
+    "evidence_boundary": "Compilation and simulations are recorded separately from Workshop screenshots. The old crash was not proven to have a unique Lua cause; this report makes no contrary claim."
+  },
+  "manifest_baseline": {
+    "tower_hud_added": true,
+    "previous_source_payment_test_entry": true,
+    "previous_compiled_payment_test_entry": false,
+    "current_payment_test_enabled": false,
+    "decision": "Per coordinating agent instruction, retain the payment_test XML entry as an explanatory comment to match the pre-existing running baseline. Do not delete payment code or enable the unfinished payment entry during this release.",
+    "compiled_dependency_evidence": "output/tower_rank_reference/compiled_manifest.xml"
+  },
+  "verification": {
+    "simulations": [
+      {
+        "command": "node tools/test_tower_rank_ui.cjs",
+        "status": "PASS",
+        "scope": "Production JS plus real initial XML/CSS; empty layout, scale, offscreen/occlusion, death, missing optional APIs, errors and recovery, UR label visibility transitions, sessions and single-loop hot reload."
+      },
+      {
+        "command": "lua5.1.exe scripts/vscripts/tests/test_tower_rank_presentation.lua",
+        "status": "PASS",
+        "scope": "Seven real routes across all 25 levels, selected names, unchanged rows, all-player recovery, lifecycle, deduplication and restarts."
+      },
+      {
+        "command": "lua5.1.exe scripts/vscripts/tests/test_tower_class_preflight.lua",
+        "status": "PASS",
+        "scope": "Existing integration plus actual all-player list payload, event-driven R publication and selected-unit prefix despite stale cached name.",
+        "log": "output/tower_rank_reference/class_preflight.log"
+      },
+      {
+        "command": "lua5.1.exe scripts/vscripts/tests/test_manual_tower_presentation_fixture.lua",
+        "status": "PASS",
+        "scope": "Explicit Tools guard, neutral display proxy, no building registration, ten models, late UR model preload, level switching, same-handle move, death/cleanup and no async resurrection. Corrected delayed death checks cover both sweep periods, do not query a removed entity, verify the rank tombstone, and are cancelled on cleanup."
+      }
+    ],
+    "syntax_and_resources": "PASS: Lua/JS syntax, scoped git diff --check, Valve star presence, reference-copy hashes, content/source equality and compiled CSS star dependency.",
+    "build": {
+      "command": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File tools/build_tower_rank_ui.ps1 -SkipManifest",
+      "status": "PASS",
+      "note": "The Tools resource watcher compiled changed sources before the explicit incremental check; latest explicit calls reported 0 failed / 1 skipped for each of JS, CSS and XML. Compiled file contents and source/content equality were checked separately.",
+      "sources": [
+        {
+          "path": "panorama/src/scripts/custom_game/tower_rank_ui.js",
+          "sha256": "3d2c05fccb64aed5d24f1feeca78b76d5c1529d4c17ab0b6b04c3585d9b5d9cb",
+          "content_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\tower_rank_ui.js",
+          "content_matches": true
+        },
+        {
+          "path": "panorama/src/styles/custom_game/tower_rank_ui.css",
+          "sha256": "e46d5a635c291904552442d307dab19eba7c5d6fd1268e6bc9d6415e8c49117d",
+          "content_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\styles\\custom_game\\tower_rank_ui.css",
+          "content_matches": true
+        },
+        {
+          "path": "panorama/src/layout/custom_game/tower_rank_ui.xml",
+          "sha256": "8f1a2c5c4e951c139893e7effece62616698dbb43804ce7a046d7eb45d03ef6e",
+          "content_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\layout\\custom_game\\tower_rank_ui.xml",
+          "content_matches": true
+        },
+        {
+          "path": "panorama/src/layout/custom_game/custom_ui_manifest.xml",
+          "sha256": "53a053794eb847671450048c961683e5cf6b9b7d2c16834dd2916bac6f0167d6",
+          "content_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\layout\\custom_game\\custom_ui_manifest.xml",
+          "content_matches": true
+        }
+      ],
+      "compiled": [
+        {
+          "path": "panorama/scripts/custom_game/tower_rank_ui.vjs_c",
+          "bytes": 12340,
+          "sha256": "8200c7f7bccb6d451e021e8290117441c495124b707cfe22472227671fa66175"
+        },
+        {
+          "path": "panorama/styles/custom_game/tower_rank_ui.vcss_c",
+          "bytes": 4311,
+          "sha256": "a83e794de7f06e7e18fda93164424980579728d853a6aaa810f002d3a7b93561"
+        },
+        {
+          "path": "panorama/layout/custom_game/tower_rank_ui.vxml_c",
+          "bytes": 1485,
+          "sha256": "2e6067009bf1f8055aadfa0ea6152a59eff4a1dda44d4b949f173af99c738185"
+        },
+        {
+          "path": "panorama/layout/custom_game/custom_ui_manifest.vxml_c",
+          "bytes": 1606,
+          "sha256": "43ff765c03352b5f1f2f5d274716ad7ef653e8feea731c049a1c02f9fb3afba7"
+        }
+      ],
+      "latest_log_directory": "output/tower_rank_build/20261001_004207"
+    },
+    "workshop": [
+      {
+        "status": "PASS",
+        "scope": "Actual API compatibility and visible N/R overhead panels",
+        "evidence": [
+          "output/presentation_20260930/rank_debug_play.log",
+          "output/map_build_c6/presentation_towers_r_fixed.png"
+        ],
+        "observed": "10 states, 10 panels, 10 visible; is_dormant=false, health_bar_offset=true; no current exception. This older screenshot preceded the native star fix and is not star/UR acceptance."
+      },
+      {
+        "status": "PASS",
+        "scope": "Cold-start native N1/N5/R1 stars and isolated display fixture",
+        "evidence": [
+          "output/map_build_c6/presentation_r_final.png"
+        ],
+        "observed": "N1, N5 and R1 native gold stars visibly render. Display fixture leaves the ordinary economy at 10 wood and 0 population. UR had a star but no letter in this screenshot."
+      },
+      {
+        "status": "PASS",
+        "scope": "UR Label after explicit dimensions and visibility fix",
+        "evidence": [
+          "output/map_build_c6/presentation_sr_interim.png"
+        ],
+        "observed": "Native UR text plus a gold star now visibly renders after the compiled explicit-size/state-visibility update. Seven class towers also show SR art and one gold star; N1/N5 remain correct. This validates the fix without claiming a unique native layout root cause."
+      },
+      {
+        "status": "PENDING",
+        "scope": "Intermediate red-star steps 1-4 and full empty-start/restart lifecycle matrix in Workshop",
+        "evidence": [],
+        "observed": "Simulations cover these remaining transitions. Native level-25 SSR five-red-star rendering, camera-away/return persistence and the final fixture death cleanup have passed separately below. These observations do not cover every intermediate red-star count or the complete restart matrix."
+      },
+      {
+        "status": "PASS",
+        "scope": "Seven class towers at absolute level 25 show SSR with five red stars",
+        "evidence": [
+          "output/map_build_c6/presentation_ssr_red_interim.png"
+        ],
+        "observed": "SSR reference art and five red star slots visibly render; UR1 and N1/N5 remain unchanged."
+      },
+      {
+        "status": "PASS",
+        "scope": "Display fixture direct movement preserves active particle handles",
+        "evidence": [],
+        "reported_by": "Coordinating agent Workshop console result",
+        "observed": "move(3,150,0) returned FOLLOW_PASS with unchanged particle IDs 124,125,126. This is a fixture SetAbsOrigin movement check, not real D-grid validation."
+      },
+      {
+        "status": "PASS_WITH_DISPLAY_FIXTURE_SCOPE",
+        "scope": "Final cold-loaded R/SR/SSR displays and R camera-away/return persistence",
+        "evidence": [
+          "art/effects/review/towers_r_verified.png",
+          "art/effects/review/towers_sr_verified.png",
+          "art/effects/review/towers_ssr_actual.png"
+        ],
+        "reported_by": "root actual Workshop observation",
+        "observed": "R effects remained visible after more than 60 seconds away from the camera. SR and SSR displays were inspected; SSR slot 3 is intentionally absent following the death test. Display progression uses production projection but does not claim normal paid upgrade transactions."
+      },
+      {
+        "status": "PASS_WITH_DISPLAY_FIXTURE_SCOPE",
+        "scope": "Final fixture death callback validates rank tombstone and effect teardown",
+        "evidence": [
+          "art/effects/review/towers_ssr_actual.png",
+          "docs/ai/validation/20260930/presentation_integration.json"
+        ],
+        "reported_by": "root Workshop console observation around 2026-10-01 01:49",
+        "observed": "DEATH_FLAG true is fixture.last_death_passed, requiring both rank absent/removed and untracked zero effect handles after 1.25 seconds; DEATH_HANDLES false 0 separately confirms the effect snapshot. The dead fixture is absent from the final SSR row. The earlier 0.1-second helper timing problem is not treated as the final result."
+      }
+    ],
+    "unrelated_test_not_claimed_as_pass": "test_tower_upgrade_targeting.lua stopped in its existing construction-position fixture before rank code, initially missing DOTA_UNIT_TARGET_BUILDING and then lacking a safe construction position; it is not included among passing checks."
+  },
+  "submission_paths": {
+    "new_game_and_source": [
+      "scripts/vscripts/systems/tower_rank_projection.lua",
+      "scripts/vscripts/systems/tower_rank_presentation_service.lua",
+      "panorama/src/layout/custom_game/tower_rank_ui.xml",
+      "panorama/src/scripts/custom_game/tower_rank_ui.js",
+      "panorama/src/styles/custom_game/tower_rank_ui.css",
+      "panorama/layout/custom_game/tower_rank_ui.vxml_c",
+      "panorama/scripts/custom_game/tower_rank_ui.vjs_c",
+      "panorama/styles/custom_game/tower_rank_ui.vcss_c",
+      "panorama/images/custom_game/survival_tower_rank/rareicon_n_png.vtex_c",
+      "panorama/images/custom_game/survival_tower_rank/rareicon_r_png.vtex_c",
+      "panorama/images/custom_game/survival_tower_rank/rareicon_sr_png.vtex_c",
+      "panorama/images/custom_game/survival_tower_rank/rareicon_ssr_png.vtex_c",
+      "art/ui/sources/custom_game/survival_tower_rank/rareicon_n_png.png",
+      "art/ui/sources/custom_game/survival_tower_rank/rareicon_r_png.png",
+      "art/ui/sources/custom_game/survival_tower_rank/rareicon_sr_png.png",
+      "art/ui/sources/custom_game/survival_tower_rank/rareicon_ssr_png.png",
+      "art/ui/sources/custom_game/survival_tower_rank/resource_manifest.json",
+      "tools/build_tower_rank_ui.ps1",
+      "tools/test_tower_rank_ui.cjs",
+      "docs/ai/validation/20260930/tower_rank_ui.json"
+    ],
+    "shared_modified": [
+      "scripts/custom_net_tables.txt",
+      "scripts/vscripts/config/tower_route_config.lua",
+      "scripts/vscripts/systems/building_system.lua",
+      "scripts/vscripts/systems/building_upgrade_system.lua",
+      "scripts/vscripts/ui/ui_request_router.lua",
+      "scripts/vscripts/addon_game_mode.lua",
+      "panorama/src/layout/custom_game/custom_ui_manifest.xml",
+      "panorama/layout/custom_game/custom_ui_manifest.vxml_c",
+      "scripts/vscripts/tests/test_tower_class_preflight.lua"
+    ],
+    "shared_file_warning": "ui_request_router.lua and addon_game_mode.lua also contain work from the coordinating agent/grid work; do not replace them wholesale from a rank-only snapshot.",
+    "ignored_tests_require_explicit_add": [
+      "scripts/vscripts/tests/test_tower_rank_presentation.lua",
+      "scripts/vscripts/tests/manual_tower_presentation_review.lua",
+      "scripts/vscripts/tests/test_manual_tower_presentation_fixture.lua",
+      "scripts/vscripts/tests/test_tower_visual_lifecycle.lua"
+    ],
+    "ignore_rule": ".gitignore:90 /scripts/vscripts/tests/*; the already tracked test_tower_class_preflight.lua remains tracked.",
+    "related_visual_review_files": [
+      "scripts/vscripts/systems/tower_visual_service.lua",
+      "tools/test_tower_visual_lifecycle.cjs"
+    ],
+    "content_sync": "panorama/src/* is the versioned source; corresponding content/dota_addons/survival/panorama/* files are synchronized and byte-equal. The build helper performs the scoped sync and compile."
+  }
+}

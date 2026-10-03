@@ -149,6 +149,7 @@ local function cleanup_remaining_units(player_id)
     end
     if Entities and Entities.FindAllByClassname then
         for _, unit in ipairs(Entities:FindAllByClassname("npc_dota_creature") or {}) do collect(unit) end
+        for _, unit in ipairs(Entities:FindAllByClassname("npc_dota_building") or {}) do collect(unit) end
     end
     local context = require("systems/player_context_service")
     for _, unit in ipairs(units) do

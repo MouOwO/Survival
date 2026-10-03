@@ -1824,11 +1824,11 @@
     "anti_air_missile_lv03" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_missile" "MaxLevel" "1" "AbilityManaCost" "0" }
     "anti_air_missile_lv04" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_missile" "MaxLevel" "1" "AbilityManaCost" "0" }
     "anti_air_missile_lv05" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_missile" "MaxLevel" "1" "AbilityManaCost" "0" }
-    "drag_net_lv01" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_net" "MaxLevel" "1" "AbilityManaCost" "0" }
-    "drag_net_lv02" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_net" "MaxLevel" "1" "AbilityManaCost" "0" }
-    "drag_net_lv03" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_net" "MaxLevel" "1" "AbilityManaCost" "0" }
-    "drag_net_lv04" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_net" "MaxLevel" "1" "AbilityManaCost" "0" }
-    "drag_net_lv05" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_net" "MaxLevel" "1" "AbilityManaCost" "0" }
+    "drag_net_lv01" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "naga_siren_ensnare" "MaxLevel" "1" "AbilityManaCost" "0" }
+    "drag_net_lv02" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "naga_siren_ensnare" "MaxLevel" "1" "AbilityManaCost" "0" }
+    "drag_net_lv03" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "naga_siren_ensnare" "MaxLevel" "1" "AbilityManaCost" "0" }
+    "drag_net_lv04" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "naga_siren_ensnare" "MaxLevel" "1" "AbilityManaCost" "0" }
+    "drag_net_lv05" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "naga_siren_ensnare" "MaxLevel" "1" "AbilityManaCost" "0" }
     "airspace_overlord_lv01" { "BaseClass" "ability_lua" "ScriptFile" "abilities/ability_tower_passive" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_PASSIVE" "AbilityTextureName" "survival/native/skill_air_overlord" "MaxLevel" "1" "AbilityManaCost" "0" }
     "ability_building_blink"
     {

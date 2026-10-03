@@ -1,0 +1,162 @@
+{
+  "_class": "CParticleSystemDefinition",
+  "m_bShouldHitboxesFallbackToRenderBounds": false,
+  "m_nMaxParticles": 32,
+  "m_Renderers": [
+    {
+      "_class": "C_OP_RenderSprites",
+      "m_flOverbrightFactor": {
+        "float": 3
+      },
+      "m_nHSVShiftControlPoint": 62,
+      "m_vecTexturesInput": [
+        {
+          "m_hTexture": {
+            "resource": "materials/particle/electrical_arc/electrical_arc.vtex"
+          }
+        }
+      ],
+      "m_nOutputBlendMode": "PARTICLE_OUTPUT_BLEND_MODE_ADD"
+    }
+  ],
+  "m_Operators": [
+    {
+      "_class": "C_OP_Decay"
+    },
+    {
+      "_class": "C_OP_BasicMovement"
+    },
+    {
+      "_class": "C_OP_InterpolateRadius",
+      "m_flEndScale": {
+        "float": 2
+      },
+      "m_flBias": {
+        "float": 0.7000000000000001
+      }
+    },
+    {
+      "_class": "C_OP_FadeOutSimple"
+    },
+    {
+      "_class": "C_OP_LockToBone"
+    },
+    {
+      "_class": "C_OP_OscillateScalarSimple",
+      "m_nField": 16,
+      "m_Rate": {
+        "float": -250
+      },
+      "m_Frequency": {
+        "float": 8
+      }
+    },
+    {
+      "_class": "C_OP_Spin",
+      "m_nSpinRateDegrees": 900
+    }
+  ],
+  "m_Initializers": [
+    {
+      "_class": "C_INIT_InitFloat",
+      "m_InputValue": {
+        "m_nType": "PF_TYPE_RANDOM_UNIFORM",
+        "m_flRandomMin": {
+          "float": 0
+        },
+        "m_flRandomMax": {
+          "float": 360
+        },
+        "m_nRandomMode": "PF_RANDOM_MODE_CONSTANT",
+        "m_bHasRandomSignFlip": true
+      },
+      "m_nOutputField": 4
+    },
+    {
+      "_class": "C_INIT_RandomSequence",
+      "m_nSequenceMax": 3
+    },
+    {
+      "_class": "C_INIT_InitFloat",
+      "m_InputValue": {
+        "m_nType": "PF_TYPE_RANDOM_UNIFORM",
+        "m_flRandomMin": {
+          "float": 0.25
+        },
+        "m_flRandomMax": {
+          "float": 0.5
+        },
+        "m_nRandomMode": "PF_RANDOM_MODE_CONSTANT"
+      },
+      "m_nOutputField": 1
+    },
+    {
+      "_class": "C_INIT_InitFloat",
+      "m_InputValue": {
+        "m_nType": "PF_TYPE_RANDOM_UNIFORM",
+        "m_flRandomMin": {
+          "float": 16
+        },
+        "m_flRandomMax": {
+          "float": 32
+        },
+        "m_nRandomMode": "PF_RANDOM_MODE_CONSTANT"
+      }
+    },
+    {
+      "_class": "C_INIT_InitFloat",
+      "m_InputValue": {
+        "m_nType": "PF_TYPE_RANDOM_UNIFORM",
+        "m_flRandomMin": {
+          "float": 0.1254902
+        },
+        "m_flRandomMax": {
+          "float": 1
+        },
+        "m_nRandomMode": "PF_RANDOM_MODE_CONSTANT"
+      },
+      "m_nOutputField": 7
+    },
+    {
+      "_class": "C_INIT_CreateOnModel",
+      "m_vecDirectionBias": [
+        {
+          "float": 0
+        },
+        {
+          "float": 0
+        },
+        {
+          "float": 0.1
+        }
+      ]
+    },
+    {
+      "_class": "C_INIT_RandomColor",
+      "m_ColorMax": [
+        140,
+        140,
+        231,
+        255
+      ],
+      "m_ColorMin": [
+        209,
+        201,
+        254,
+        255
+      ]
+    }
+  ],
+  "m_Emitters": [
+    {
+      "_class": "C_OP_InstantaneousEmitter",
+      "m_nParticlesToEmit": {
+        "m_nType": "PF_TYPE_LITERAL",
+        "m_flLiteralValue": {
+          "float": 24
+        }
+      }
+    }
+  ],
+  "m_nBehaviorVersion": 5
+}

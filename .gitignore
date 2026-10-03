@@ -88,6 +88,9 @@
 /tatus --short --untracked-files=no  grep -E 'ability_tooltipcontent_catalogchallenge_definitionsshop_entriestooltip_definitions'  head -40
 /total 148
 /scripts/vscripts/tests/*
+!/scripts/vscripts/tests/test_tower_laser_visual.lua
+!/scripts/vscripts/tests/test_tower_laser_damage.lua
+!/scripts/vscripts/tests/test_tower_laser_health_prediction.lua
 !/scripts/vscripts/tests/test_native_wearable_carrier_service.lua
 !/scripts/vscripts/tests/test_tower_rebuild_after_death.lua
 !/scripts/vscripts/tests/generated_fishing_reward_definitions.lua
@@ -398,8 +401,11 @@ __pycache__/
 !/scripts/vscripts/tests/test_worker_training_queue.lua
 !/scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua
 !/scripts/vscripts/tests/test_grid_builder_preview.lua
+!/scripts/vscripts/tests/test_grid_preview_area.lua
 !/scripts/vscripts/tests/test_builder_work_position.lua
 !/scripts/vscripts/tests/test_builder_yield_construction.lua
+!/scripts/vscripts/tests/test_building_astral_construction.lua
+!/scripts/vscripts/tests/test_zeus_lightning_visual.lua
 !/scripts/vscripts/tests/test_hero_return_home.lua
 !/scripts/vscripts/tests/test_return_home_ui_router.lua
 !/scripts/vscripts/tests/test_hero_player_loadout_precache.lua
@@ -407,5 +413,15 @@ __pycache__/
 
 # Local engine exception report.
 /exceptions.txt
+/tmp/
+!/scripts/vscripts/tests/test_wall_melee_contact.lua
+!/scripts/vscripts/tests/test_wall_navigation.lua
+!/scripts/vscripts/tests/test_wall_slot_limit.lua
+!/scripts/vscripts/tests/test_building_upgrade_effect.lua
+!/scripts/vscripts/tests/manual_wall_four_contacts.lua
+!/scripts/vscripts/tests/manual_wall_contact_replacement.lua
+!/scripts/vscripts/tests/wall_contact_probe_modifier.lua
 !/scripts/vscripts/tests/test_payment_service.lua
 !/scripts/vscripts/tests/test_paid_hero_unlock.lua
+!/scripts/vscripts/tests/test_tower_drag_net.lua
+!/scripts/vscripts/tests/test_valley_environment_portals.lua

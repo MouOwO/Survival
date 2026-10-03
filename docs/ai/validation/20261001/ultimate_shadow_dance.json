@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "source": "Local Valve Dota/core VPK",
+  "root": "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf",
+  "rule": "One persistent native Slark R smoke bundle per ultimate tower; CP0 follows origin, CP1 follows attach_hitloc; no Slark eye attachments. Native continuous emitters, no Lua per-frame updates or refresh timer.",
+  "resources": [
+    {
+      "resource": "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf",
+      "sha256": "931f1e024587bf47c10acfaee73b2390bd5565e581d247c613487e0d0f12f459",
+      "dependencies": [
+        "particles/units/heroes/hero_slark/slark_shadow_dance_start.vpcf",
+        "particles/units/heroes/hero_slark/slark_shadow_dance_body.vpcf",
+        "particles/units/heroes/hero_slark/slark_shadow_dance_trail_pnt.vpcf",
+        "particles/units/heroes/hero_slark/slark_shadow_dance_body_pyro.vpcf",
+        "particles/units/heroes/hero_slark/slark_shadow_dance_outer_smoke.vpcf",
+        "particles/units/heroes/hero_slark/slark_shadow_dance_poof.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_slark/slark_shadow_dance_start.vpcf",
+      "sha256": "eb0588331a1a958b3d565428c7b6eb9a4c74e192774f702be894e1b2a6b6a984",
+      "dependencies": [
+        "materials/particle/dust/large_swirl_dust.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/dust/large_swirl_dust.vtex",
+      "sha256": "317053e9bb103f3e386d81ec03cc4e3c998a1e202db50f4e2f6b37277af01457"
+    },
+    {
+      "resource": "particles/units/heroes/hero_slark/slark_shadow_dance_body.vpcf",
+      "sha256": "3f2e526754d94b8228e1d6eb1c9be54c9d0bcc267c4594f496d02861eb490871",
+      "dependencies": [
+        "materials/particle/smoke/steam/steam.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke/steam/steam.vtex",
+      "sha256": "093263df747d0464ab8bf96abaf815ce73ce0508941fb693a200d4b04137438a"
+    },
+    {
+      "resource": "particles/units/heroes/hero_slark/slark_shadow_dance_trail_pnt.vpcf",
+      "sha256": "5de7d4f60ec89a23a94985c402c859e2f9c88c8a90da8c28c187869ceccf57e1",
+      "dependencies": [
+        "materials/lights/white.vtex",
+        "particles/units/heroes/hero_slark/slark_shadow_dance_trail.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/lights/white.vtex",
+      "sha256": "4b6d77e5b85e4a5b831251961ce4305b04644b15e75bd6879b3fda92adb1dd9f"
+    },
+    {
+      "resource": "particles/units/heroes/hero_slark/slark_shadow_dance_trail.vpcf",
+      "sha256": "96f6248c56d3bec2c0894500a66c388ef67f21bbf18facb9df5f457cd6beed19",
+      "dependencies": [
+        "materials/particle/beam_blood_02.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_blood_02.vtex",
+      "sha256": "5fc4b9e542f75410ee68bd8a3a6973968dd1737091eb474f8dc58a0d0f48094c"
+    },
+    {
+      "resource": "particles/units/heroes/hero_slark/slark_shadow_dance_body_pyro.vpcf",
+      "sha256": "db7ff0bae272f69b3f3752ba45f7d1ae214608186a1012c4203827569b34b4bf",
+      "dependencies": [
+        "materials/particle/pyroclastic/pyroclastic.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/pyroclastic/pyroclastic.vtex",
+      "sha256": "881a5770b7832870d287634b17dde79c0c55f91836fcf72864deb54726c742c8"
+    },
+    {
+      "resource": "particles/units/heroes/hero_slark/slark_shadow_dance_outer_smoke.vpcf",
+      "sha256": "1d84c87c6316ea7b80deeba5078fa4d120f52f3a6b308017948f937b5bd2f693",
+      "dependencies": [
+        "materials/particle/dust/large_swirl_dust.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_slark/slark_shadow_dance_poof.vpcf",
+      "sha256": "3c641d5aa00d44a76f272af3494835499a7c00689140c2c658b21ad4432e660d",
+      "dependencies": [
+        "materials/particle/smoke/falling_mist/falling_mist.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke/falling_mist/falling_mist.vtex",
+      "sha256": "f994e0eecb9e42ba36ac9389dfb5dd3139f9898b035650f83504a0eb3a586d4f"
+    }
+  ],
+  "tests": [
+    "test_tower_visual_lifecycle.cjs PASS: idle, relocation, repeated apply, removal, reinit, shutdown, ordinary tower regression",
+    "luac5.1 syntax PASS"
+  ],
+  "in_game_visual_verified": false
+}

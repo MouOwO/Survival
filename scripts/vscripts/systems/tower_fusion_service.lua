@@ -560,6 +560,14 @@ local function fuse(payload)
     return { ok = true, unit = state.unit }
 end
 
+-- Read-only identity/footprint lookup for the shared placement preview. Engine
+-- ownership alone is insufficient for player isolation on creature towers.
+function M.relocation_state(player_id, entindex)
+    local state = state_by_entindex[tonumber(entindex) or -1]
+    if not state or state.player_id ~= tonumber(player_id) or not alive(state.unit) then return nil end
+    return {unit=state.unit, player_id=state.player_id, footprint=state.footprint}
+end
+
 function M.teleport_for_player(player_id, hero)
     player_id = tonumber(player_id)
     local states = player_ultimates(player_id)

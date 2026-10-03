@@ -1,0 +1,6 @@
+effect_key,particle_name,impact_particle,cast_particle,enabled,notes,visual_duration
+#中文名:特效记录键,主特效,命中特效,施法特效,启用,备注,视觉持续时间
+#types:string,string,string,string,boolean,string,number
+SR,particles/econ/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arc.vpcf,,,1,风暴之示ItemDef12323；完整Q；同品质五级共用；R沿用原资源。,
+SSR,particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf,,,1,第三阶段改回宙斯原生连锁闪电；取消金色连线与附加金色命中；含红星进阶。,
+strike,particles/econ/items/disruptor/disruptor_2022_immortal/disruptor_2022_immortal_static_storm.vpcf,,,1,风暴串联之震ItemDef23655原生R全套；CP1为技能半径；怒雷视觉1.2秒；塔雷暴沿用技能持续时间；不产生原生技能伤害或沉默。,1.2

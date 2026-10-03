@@ -1,0 +1,236 @@
+{
+  "status": "PASS",
+  "date": "2026-09-30",
+  "preview_map": "valley_decor_review",
+  "compiled": {
+    "files": 304,
+    "failed": 0,
+    "crc_entries": 309,
+    "source_sha256": "63ded48784244540739b593d6d7139528f263dea62042d5853a46b8e66db8c73",
+    "package_sha256": "fa359cf667de1cccd21cd45c13f618638883a85b46374dbf295e876729122d87"
+  },
+  "main_map_unchanged": true,
+  "main_map_sha256": "b92f2eb0e21bbc7cb995d866adc10e3439bc47a3351627b835207284b13611d1",
+  "props": 318,
+  "groups": {
+    "meadow_reference": 247,
+    "corridor_reference": 29,
+    "topiary_reference": 14,
+    "spawn_reference_0": 8,
+    "spawn_reference_1": 8,
+    "spawn_reference_2": 8,
+    "spawn_reference_3": 8,
+    "meadow_ground_0": 1,
+    "meadow_ground_1": 1,
+    "meadow_ground_2": 1,
+    "meadow_ground_3": 1
+  },
+  "resource_import": {
+    "workshop": "3164617180",
+    "selected": [
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop1_lr0_agg9_38_bush_spring_01.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop3_lr0_agg11_75_bush_nettle_a_01.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop9_lr0_agg17_126_flower_set_a_leaf.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop11_lr0_agg19_20_flowers_ti10_01.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop20_lr0_agg28_16_crypt_door_01.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop23_lr0_agg31_88_stone_wall002.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop31_lr0_agg39_8_crypt_statue_01.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop35_lr0_agg43_12_bush_spring_02.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop37_lr0_agg45_4_flowers_01.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop40_lr0_agg48_88_lilyflowers_ti10_01.vmdl",
+      "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop57_lr0_agg65_407_flower_set.vmdl"
+    ],
+    "records": [
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop1_lr0_agg9_38_bush_spring_01.vmdl_c",
+        "bytes": 5886,
+        "sha256": "1773ee98e8b76ff18c0c3024bdce726afdf816139530395d314ac5559232d477"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop3_lr0_agg11_75_bush_nettle_a_01.vmdl_c",
+        "bytes": 7505,
+        "sha256": "9774198e9e3c91668e45a1de99a69fd4ebae61c73c75c2444b26cbaf3f0b9aec"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/bush/bush_nettle_a_01.vmat_c",
+        "bytes": 3590,
+        "sha256": "9aeaa34b3286f58c5ac276bab27f9a20391f2dc6bea7b08d85a9c724a0413db8"
+      },
+      {
+        "resource": "materials/default/default_mask_tga_4528a0a9.vtex_c",
+        "bytes": 2136,
+        "sha256": "badc7f81b62a8b4895b304ab5411c12343496c7689a96acb4fab23bc9fd8b7d9"
+      },
+      {
+        "resource": "materials/dev/two_channel_noise_psd_93f8d443.vtex_c",
+        "bytes": 12764,
+        "sha256": "02c3fb07287c70b4c7b0dbe575923204ca7d85ac2ba87511f89abce80bf1c6ea"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/bush/bush_nettle_a_01_color_tga_1b7124bd.vtex_c",
+        "bytes": 46084,
+        "sha256": "91c8bf31269ea01674f9a09b55d71d7dd462ad49c5386aa19257f72b5c846a77"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/bush/bush_nettle_a_01_normal_tga_90fbfab4.vtex_c",
+        "bytes": 45780,
+        "sha256": "a1ea1f7a0610e7d22434d576af8d47b1b9802a966048458429cf23b4533413ca"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop9_lr0_agg17_126_flower_set_a_leaf.vmdl_c",
+        "bytes": 17219,
+        "sha256": "f8164ae281d2a6881d809e7d60a7d3ad4689681282769d2ff0ad61c5c6bdb99e"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/flower_set/flower_set_a_leaf.vmat_c",
+        "bytes": 3605,
+        "sha256": "c65fca99f1cd1bda0b94d0192be893bd1ec59d30b778f4d969613b60113de59f"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/flower_set/flower_set_a_leaf_color_tga_5f1146af.vtex_c",
+        "bytes": 177220,
+        "sha256": "754a884f9259d3990d9aca4b0a4619f79cdb6cb3c5b7b0b5440d12ccbc90270c"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/flower_set/flower_set_a_leaf_vmat_g_tspecular_bff1a92f.vtex_c",
+        "bytes": 2108,
+        "sha256": "115bc8e88de542768b79bed67b7f0434892ea75e0e2c8794cc2aba161801ccbc"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop11_lr0_agg19_20_flowers_ti10_01.vmdl_c",
+        "bytes": 5777,
+        "sha256": "4890a0cc78449d53b68b189c6128f4e3ac1b3bb6040218f9beb2272bf9be0631"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop20_lr0_agg28_16_crypt_door_01.vmdl_c",
+        "bytes": 11055,
+        "sha256": "a47518a012a08c87e77a45baa77fda4478a995f403d3ee6562dceb4f388b8b12"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop23_lr0_agg31_88_stone_wall002.vmdl_c",
+        "bytes": 18815,
+        "sha256": "b87f092a1defa0bec3060c68f57ad7ee4dfa234d515d8125a1f271e17b96c7d7"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop31_lr0_agg39_8_crypt_statue_01.vmdl_c",
+        "bytes": 31936,
+        "sha256": "cfa6e2a170b8e92e2fedba4963c06043950586969bc37ed71b6675c3463e48ac"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop35_lr0_agg43_12_bush_spring_02.vmdl_c",
+        "bytes": 5008,
+        "sha256": "ee2106dac43426cee2e012d37b2836bb06638b2a772168ab3eb58628d7e41bdb"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop37_lr0_agg45_4_flowers_01.vmdl_c",
+        "bytes": 4955,
+        "sha256": "36d60a6d66fb9e7b90fd2ba8eb5753c4df59d64f93550a5ebe63dc18c817e922"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop40_lr0_agg48_88_lilyflowers_ti10_01.vmdl_c",
+        "bytes": 6293,
+        "sha256": "4c88a6d4ab10928aa8875f5b779022fe4bcb8ce082e73ccb2168a99deffb1731"
+      },
+      {
+        "resource": "maps/dota_heroes_td_colosseum_new/worldnodes/node000_prop57_lr0_agg65_407_flower_set.vmdl_c",
+        "bytes": 6477,
+        "sha256": "c67f2782ea5d7836eacfd1f70981828bd1d86974e7f86098ab33f3477775bd34"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/flower_set/flower_set.vmat_c",
+        "bytes": 3910,
+        "sha256": "6868c28cf1d7938c1f979f2419b1bac6623bf78b62e503d4a3a62df8667d827a"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/flower_set/flower_set_a_leaf_normal_tga_19216443.vtex_c",
+        "bytes": 176884,
+        "sha256": "61d38ac0df0b40d83ccad14fc2f17ba3c5f209133987a872d4bfd4dfceb06c29"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/flower_set/flower_set_color_tga_8a6a6857.vtex_c",
+        "bytes": 177156,
+        "sha256": "57151ff34fe898ee64a0c1ab68da374c03555183f65f38ee843f35aaf6cc6c83"
+      },
+      {
+        "resource": "materials/imagine_assets/nature/flower_set/flower_set_vmat_g_tspecular_bff1a92f.vtex_c",
+        "bytes": 2108,
+        "sha256": "115bc8e88de542768b79bed67b7f0434892ea75e0e2c8794cc2aba161801ccbc"
+      }
+    ]
+  },
+  "navigation": {
+    "samples": 116,
+    "failed": 0,
+    "log": "output/valley_reference_v3/runtime_final.log"
+  },
+  "spawn_latency": {
+    "samples": [
+      {
+        "lane": 1,
+        "mode": "old_500ms",
+        "first_order_seconds": 0.5,
+        "first_move_seconds": 0.16668701171875
+      },
+      {
+        "lane": 1,
+        "mode": "next_frame",
+        "first_order_seconds": 0.0333251953125,
+        "first_move_seconds": 0.13336181640625
+      },
+      {
+        "lane": 2,
+        "mode": "old_500ms",
+        "first_order_seconds": 0.5,
+        "first_move_seconds": 0.5999755859375
+      },
+      {
+        "lane": 2,
+        "mode": "next_frame",
+        "first_order_seconds": 0.0333251953125,
+        "first_move_seconds": 0.13336181640625
+      },
+      {
+        "lane": 3,
+        "mode": "old_500ms",
+        "first_order_seconds": 0.5,
+        "first_move_seconds": 0.5999755859375
+      },
+      {
+        "lane": 3,
+        "mode": "next_frame",
+        "first_order_seconds": 0.0333251953125,
+        "first_move_seconds": 0.13336181640625
+      },
+      {
+        "lane": 4,
+        "mode": "old_500ms",
+        "first_order_seconds": 0.5,
+        "first_move_seconds": 0.20001220703125
+      },
+      {
+        "lane": 4,
+        "mode": "next_frame",
+        "first_order_seconds": 0.0333251953125,
+        "first_move_seconds": 0.13336181640625
+      }
+    ],
+    "fixture": "scripts/vscripts/tests/manual_valley_spawn_latency.lua",
+    "log": "output/valley_reference_v3/latency_final.log",
+    "note": "Same normal unit, original auto-acquisition enabled; some baseline units acquire targets before first Lua order. This does not verify every hero model animation."
+  },
+  "ai_unit_regression": "PASS: first-frame order, stable chase, 60 attack ticks, stun/cooldown, bounded recovery, waiting, retarget/death",
+  "portal_orientation": "Ground-facing basis validated in Workshop; same basis applied to all four.",
+  "screenshot": "art/maps/c6/reference_v3/spawn.png",
+  "palette": "content/dota_addons/survival/maps/prefabs/valley_reference_asset_palette.vmap",
+  "limits": [
+    "Reference geometry/colors and local compositions fitted to existing four-lane layout; not a pixel-identical map clone.",
+    "Reference Lua is encrypted; no claim that reference AI source was recovered.",
+    "Runtime particles auto-bind only in Tools mode on valley_decor_review."
+  ],
+  "backup": "output/valley_reference_v3/before_binary.vmap",
+  "screenshots": [
+    "art/maps/c6/reference_v3/meadow.png",
+    "art/maps/c6/reference_v3/spawn.png"
+  ],
+  "capture_method": "Foreground-validated Dota viewport capture; each delivered image inspected."
+}

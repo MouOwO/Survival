@@ -1,0 +1,32 @@
+{
+  "status": "PREVIEW_READY",
+  "active_material": "materials/blends/mod_radiant_coloseum_000.vmat",
+  "reference_region_identity": "Referenced by the reference map; exact screenshot surface assignment not established.",
+  "implementation": "Direct native material path; exported trial assets removed.",
+  "changed_material_references": 237,
+  "preview_source_sha256": "4b1e6f046faa779c3c346b394cc9cc6c83d4d04490c227ed8f9a69c1ee249c85",
+  "preview_source_unchanged_from_v2": true,
+  "main_source_written_by_this_task": false,
+  "main_source_note": "Current main source differs from the previous turn hash; preserved without overwriting.",
+  "geometry_paint_lighting_props_unchanged": true,
+  "compile": {
+    "compiled": 306,
+    "failed": 0
+  },
+  "package": {
+    "crc_entries": 311,
+    "sha256": "0e1d306d7c342bf6c1ef147b0953bbdc2da2f1f6230235aebf89ecc3e7c02032",
+    "source_crc_match": true
+  },
+  "runtime": {
+    "loaded": true,
+    "spawn_lane_checks": 116,
+    "failed": 0,
+    "visual_inspected": true
+  },
+  "screenshots": [
+    "art/maps/c6/material_trial/colosseum_preview.png",
+    "art/maps/c6/material_trial/colosseum_overview.png"
+  ],
+  "observation": "Original grass and built-in red flowers now visible; appearance remains brighter and more yellow-green than supplied reference."
+}

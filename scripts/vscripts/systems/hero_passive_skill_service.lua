@@ -7,6 +7,7 @@ local skill_definitions = require("config/generated/hero_skill_definitions")
 local hero_definitions = require("config/generated/hero_definitions")
 local buff_manager = require("systems/buff_manager")
 local exclusive_passives = require("systems/hero_exclusive_passive_service")
+local storm_visual = require("systems/disruptor_storm_visual")
 
 local M = {}
 M.sound_service = require("core/sound_service")
@@ -24,7 +25,7 @@ local active_meteor_casts = {}
 local meteor_slowed_units = {}
 local meteor_task = nil
 local meteor_explosion_visuals = {
-    active = {}, cast_sequence = 0, sequence = 0, duration = 3.1,
+    active = {}, cast_sequence = 0, sequence = 0, duration = 1.2,
 }
 local active_moving_ice_balls = {}
 local moving_ice_ball_sequence = 0
@@ -68,20 +69,18 @@ local ICE_CONE_SNOW_PARTICLE =
     "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf"
 local ICE_CONE_IMPACT_PARTICLE =
     "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf"
-local FURY_THUNDER_PARTICLE =
-    "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
 local MOVING_ICE_BALL_PARTICLE =
     "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf"
 local METEOR_FALL_PARTICLE =
-    "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf"
+    "particles/survival/skills/meteor_phoenix_fall.vpcf"
 local METEOR_EXPLOSION_PARTICLE =
-    "particles/units/heroes/hero_warlock/warlock_rain_of_chaos_explosion.vpcf"
+    "particles/survival/skills/meteor_impact.vpcf"
 local METEOR_LAVA_PARTICLE =
-    "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf"
+    "particles/survival/skills/meteor_lava.vpcf"
 local METEOR_LAVA_SLOW_BUFF = "debuff_hero_meteor_lava_move_slow"
 local METEOR_THINK_INTERVAL = 0.05
 local METEOR_FALL_HEIGHT = 1200
-local METEOR_FLY_PARTICLE_TRAVEL_TIME = 1.3
+local METEOR_FLY_PARTICLE_TRAVEL_TIME = 0.4
 local MOVING_ICE_BALL_EXPLOSION_PARTICLE = "particles/basic_projectile/basic_projectile_explosion.vpcf"
 local MOVING_ICE_BALL_THINK_INTERVAL = 0.05
 local MOVING_ICE_BALL_VISUAL_HEIGHT = 120
@@ -1527,32 +1526,11 @@ local function run_frost(context, definition)
     return true
 end
 
-local function fury_thunder_visual(context, position)
+local function fury_thunder_visual(context, position, radius, previous)
     M.sound_service.play("hero_fury_thunder_strike", {
         source = context.attacker, position = position,
     })
-    local particle = nil
-    local visual_ok, visual_error = pcall(function()
-        particle = ParticleManager:CreateParticle(
-            FURY_THUNDER_PARTICLE,
-            PATTACH_WORLDORIGIN, context.attacker
-        )
-        ParticleManager:SetParticleControl(
-            particle, 0, position + Vector(0, 0, 900)
-        )
-        ParticleManager:SetParticleControl(particle, 1, position)
-        ParticleManager:ReleaseParticleIndex(particle)
-    end)
-    if not visual_ok then
-        if particle then
-            pcall(function()
-                ParticleManager:DestroyParticle(particle, true)
-                ParticleManager:ReleaseParticleIndex(particle)
-            end)
-        end
-        print("[HeroPassiveSkill] fury thunder visual failed: "
-            .. tostring(visual_error))
-    end
+    return storm_visual.play(context.attacker, position, radius, nil, previous)
 end
 
 local function run_chain(context, definition)
@@ -1575,12 +1553,15 @@ local function run_chain(context, definition)
     end
     while #strike_targets < strike_count do strike_targets[#strike_targets + 1] = primary end
     local target_hit_counts = {}
+    local storm_by_target = {}
 
     local function execute_strike(target, strike_multiplier)
         if not alive(target) or not valid(context.attacker) then return end
         local position = unit_position(target)
         if not position then return end
-        fury_thunder_visual(context, position)
+        local visual_key = tostring(target:entindex())
+        storm_by_target[visual_key] = fury_thunder_visual(context, position, radius,
+            storm_by_target[visual_key])
 
         local was_marked = context.level >= 2
             and buff_manager.has(target, "debuff_hero_fury_thunder_mark")
@@ -2225,13 +2206,15 @@ end
 local function meteor_release_cast(attacker_key)
     local cast = active_meteor_casts[attacker_key]
     if not cast then return end
-    for _, meteor in ipairs(cast.meteors) do
-        meteor_destroy_particle(meteor.fall_particle, true)
-        meteor_destroy_particle(meteor.lava_particle, false)
-        meteor.fall_particle = nil
-        meteor.lava_particle = nil
-    end
     active_meteor_casts[attacker_key] = nil
+    local lava_particle = cast.lava_particle
+    cast.lava_particle = nil
+    for _, meteor in ipairs(cast.meteors) do
+        local fall = meteor.fall_particle
+        meteor.fall_particle = nil
+        meteor_destroy_particle(fall, true)
+    end
+    meteor_destroy_particle(lava_particle, false)
 end
 
 local function clear_meteors()
@@ -2252,13 +2235,16 @@ local function clear_meteors()
     meteor_task = nil
 end
 
-local function meteor_create_particle(name, position, attacker)
+local function meteor_create_particle(name, position, attacker, controls)
     local particle = nil
     local ok, failure = pcall(function()
         particle = ParticleManager:CreateParticle(
             name, PATTACH_WORLDORIGIN, attacker
         )
         ParticleManager:SetParticleControl(particle, 0, position)
+        for point, value in pairs(controls or {}) do
+            ParticleManager:SetParticleControl(particle, point, value)
+        end
     end)
     if not ok then
         meteor_destroy_particle(particle, true)
@@ -2272,9 +2258,9 @@ local function meteor_create_fall_particle(cast)
     local start_position = copy_position(cast.position)
     start_position.z = start_position.z + METEOR_FALL_HEIGHT
 
-    -- Valve's Chaos Meteor fly particle always traverses CP0 -> CP1 in 1.3s.
-    -- Extend CP1 below the ground so it crosses the authoritative impact point
-    -- at this skill's unchanged 0.8s fall duration.
+    -- Supernova's egg and native fire follow the engine's CP0 -> CP1 path.
+    -- Production takes 0.4s; retain endpoint compensation so other configured
+    -- durations still cross the fixed ground point at the actual damage time.
     local visual_end = copy_position(start_position)
     visual_end.z = start_position.z - METEOR_FALL_HEIGHT
         * METEOR_FLY_PARTICLE_TRAVEL_TIME / cast.fall_duration
@@ -2301,7 +2287,8 @@ end
 
 local function meteor_explosion_visual(cast)
     local particle = meteor_create_particle(
-        METEOR_EXPLOSION_PARTICLE, cast.position, cast.context.attacker
+        METEOR_EXPLOSION_PARTICLE, cast.position, cast.context.attacker,
+        {[1]=Vector(cast.radius, 0, 0)}
     )
     if not particle then return end
 
@@ -2328,8 +2315,9 @@ end
 local function meteor_impact(cast, meteor)
     if meteor.landed then return end
     meteor.landed = true
-    meteor_destroy_particle(meteor.fall_particle, true)
+    local fall_particle = meteor.fall_particle
     meteor.fall_particle = nil
+    meteor_destroy_particle(fall_particle, true)
 
     meteor_explosion_visual(cast)
     M.sound_service.play("hero_meteor_impact", {
@@ -2347,12 +2335,14 @@ local function meteor_impact(cast, meteor)
     end
 
     if cast.lava_duration > 0 then
-        meteor.lava_particle = meteor_create_particle(
-            METEOR_LAVA_PARTICLE, cast.position, cast.context.attacker
-        )
-        if meteor.lava_particle then
-            ParticleManager:SetParticleControl(
-                meteor.lava_particle, 1, Vector(cast.radius, 0, 0)
+        -- All meteors in this cast share one fixed impact point. Two identical
+        -- ground quads otherwise overlap at the same depth during the second lava.
+        -- Only the ground visual is shared; each meteor keeps its own damage
+        -- ticks, scale, expiry and slow timing below.
+        if not cast.lava_particle then
+            cast.lava_particle = meteor_create_particle(
+                METEOR_LAVA_PARTICLE, cast.position, cast.context.attacker,
+                {[1]=Vector(cast.radius, cast.unlock_at - meteor.land_at, 0)}
             )
         end
         meteor.lava_expires_at = meteor.land_at + cast.lava_duration
@@ -2402,10 +2392,7 @@ sync_meteors = function()
                         meteor.next_lava_tick_at = meteor.next_lava_tick_at
                             + cast.lava_interval
                     end
-                    if now + 0.0001 >= meteor.lava_expires_at then
-                        meteor_destroy_particle(meteor.lava_particle, false)
-                        meteor.lava_particle = nil
-                    elseif cast.move_slow_pct > 0 then
+                    if now + 0.0001 < meteor.lava_expires_at and cast.move_slow_pct > 0 then
                         for _, target in ipairs(enemies_touching_radius(
                             cast.context.attacker, cast.position, cast.radius
                         )) do
@@ -2458,7 +2445,7 @@ local function run_meteor(context, definition)
     if GetGroundPosition then position = GetGroundPosition(position, nil) end
 
     local fall_duration = math.max(0.01,
-        level_value(definition, "fall_duration", context.level, 0.8))
+        level_value(definition, "fall_duration", context.level, 0.4))
     local lava_duration = level_value(
         definition, "lava_duration", context.level
     )
@@ -3615,6 +3602,7 @@ function M.init()
     clear_moving_ice_balls()
     clear_poison_clouds()
     clear_meteors()
+    storm_visual.clear()
     processed_attacks = {}
     exclusive_passives.init({ deal_group = deal_group })
     refresh_tokens = {}

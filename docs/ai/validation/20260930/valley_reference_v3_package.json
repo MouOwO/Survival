@@ -1,0 +1,2821 @@
+{
+  "status": "PASS",
+  "compiled_verified": true,
+  "runtime_verified": false,
+  "checked_at": "2026-09-30T14:54:03.612Z",
+  "source_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\maps\\valley_decor_review.vmap",
+  "package_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\maps\\valley_decor_review.vpk",
+  "source": {
+    "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\maps\\valley_decor_review.vmap",
+    "bytes": 72449688,
+    "sha256": "63ded48784244540739b593d6d7139528f263dea62042d5853a46b8e66db8c73",
+    "raw_crc32": 2530904969,
+    "converted": false
+  },
+  "package": {
+    "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\maps\\valley_decor_review.vpk",
+    "bytes": 65838860,
+    "sha256": "fa359cf667de1cccd21cd45c13f618638883a85b46374dbf295e876729122d87",
+    "version": 2,
+    "crc_entries": 309,
+    "payload_bytes": 65822111,
+    "entries": [
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0.vwnod_c",
+        "bytes": 430954,
+        "archive_index": 32767,
+        "expected_crc32": 2960661048,
+        "actual_crc32": 2960661048,
+        "crc_matches": true,
+        "sha256": "5ca85f933d73f23b20d9a8dc0ad9cdbf351f4662d5148b5159659c81bb5ec9b2"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0.vgrass",
+        "bytes": 2381116,
+        "archive_index": 32767,
+        "expected_crc32": 2922631317,
+        "actual_crc32": 2922631317,
+        "crc_matches": true,
+        "sha256": "c27c338ad6fc409dd16a140953fe606f714d409e1a9c54a0e86b91941b944074"
+      },
+      {
+        "path": "maps/valley_decor_review/world_visibility.vvis_c",
+        "bytes": 1056,
+        "archive_index": 32767,
+        "expected_crc32": 4198119600,
+        "actual_crc32": 4198119600,
+        "crc_matches": true,
+        "sha256": "bb2f51c88d25a3b38a84b4619dd8135595a8b75da1accb91e7be6bccf72c6df7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c9_s_mesh_overlay9.vmdl_c",
+        "bytes": 4669,
+        "archive_index": 32767,
+        "expected_crc32": 3328790192,
+        "actual_crc32": 3328790192,
+        "crc_matches": true,
+        "sha256": "a41c30e448c6d76b22bf5320ac8e58115bc4c1f6be261e31a065dcd88f82fc39"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c8_s_mesh_overlay8.vmdl_c",
+        "bytes": 4893,
+        "archive_index": 32767,
+        "expected_crc32": 4091785155,
+        "actual_crc32": 4091785155,
+        "crc_matches": true,
+        "sha256": "292181571f087353193635ca89d154a0148e52f663d2238ec9a85152cb2650af"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c7_s_mesh_overlay7.vmdl_c",
+        "bytes": 4829,
+        "archive_index": 32767,
+        "expected_crc32": 1844012640,
+        "actual_crc32": 1844012640,
+        "crc_matches": true,
+        "sha256": "e4a8f7803780ecb1c9aca539cf14d8250854822eb54324339fd0db90d54e39e0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c6_s_mesh_overlay6.vmdl_c",
+        "bytes": 4925,
+        "archive_index": 32767,
+        "expected_crc32": 1010786267,
+        "actual_crc32": 1010786267,
+        "crc_matches": true,
+        "sha256": "93be06504a5da8f65379808e3bcb9fc6174516c9425de8c93f69db71fcdd4ce9"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c64_s_mesh_overlay64.vmdl_c",
+        "bytes": 11873,
+        "archive_index": 32767,
+        "expected_crc32": 22850088,
+        "actual_crc32": 22850088,
+        "crc_matches": true,
+        "sha256": "684119d69661fe5a4b3ac8f2fac9b68ae3317620712f6581e1fabdaab70cb5e3"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c63_s_mesh_overlay63.vmdl_c",
+        "bytes": 12529,
+        "archive_index": 32767,
+        "expected_crc32": 3401776666,
+        "actual_crc32": 3401776666,
+        "crc_matches": true,
+        "sha256": "ca5d19547223979b1eeb80dd98917bfcc56d1073beba793100293e96a8bf535d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c62_s_mesh_overlay62.vmdl_c",
+        "bytes": 12209,
+        "archive_index": 32767,
+        "expected_crc32": 3616376541,
+        "actual_crc32": 3616376541,
+        "crc_matches": true,
+        "sha256": "26b62181b001e204ecf931ac73d1439f8c0a2077b0d506b756e27d377a238659"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c61_s_mesh_overlay61.vmdl_c",
+        "bytes": 12049,
+        "archive_index": 32767,
+        "expected_crc32": 266914227,
+        "actual_crc32": 266914227,
+        "crc_matches": true,
+        "sha256": "4739d48d00d9f53da2e81a44c61dc9c52368f535f0512f397a05882aadd98de6"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c60_s_mesh_overlay60.vmdl_c",
+        "bytes": 5889,
+        "archive_index": 32767,
+        "expected_crc32": 179914066,
+        "actual_crc32": 179914066,
+        "crc_matches": true,
+        "sha256": "c2ce039abcc2aa8ce716aa86b71fdf4dd17189d4c10d4a0a4dffed7504ab7a0e"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c5_s_mesh_overlay5.vmdl_c",
+        "bytes": 4797,
+        "archive_index": 32767,
+        "expected_crc32": 278068611,
+        "actual_crc32": 278068611,
+        "crc_matches": true,
+        "sha256": "a5c3ceddf7acf2b125efe052ad6897b55f502f206a640513313d8fc237156abe"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c59_s_mesh_overlay59.vmdl_c",
+        "bytes": 5953,
+        "archive_index": 32767,
+        "expected_crc32": 3252655230,
+        "actual_crc32": 3252655230,
+        "crc_matches": true,
+        "sha256": "3c702393af8c24069170c21d474817ac8f5f9fc298e3fd622d1b76c500a60793"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c58_s_mesh_overlay58.vmdl_c",
+        "bytes": 5953,
+        "archive_index": 32767,
+        "expected_crc32": 4219735687,
+        "actual_crc32": 4219735687,
+        "crc_matches": true,
+        "sha256": "d295eacee90ea6762d809c794eda5326756254b8a109e5ab65edefb4a2aef4e6"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c57_s_mesh_overlay57.vmdl_c",
+        "bytes": 5889,
+        "archive_index": 32767,
+        "expected_crc32": 3944150647,
+        "actual_crc32": 3944150647,
+        "crc_matches": true,
+        "sha256": "8e1922d75618c052be864e4f287242311b67626512f64dac0ddab8212d12c762"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c56_s_mesh_overlay56.vmdl_c",
+        "bytes": 26689,
+        "archive_index": 32767,
+        "expected_crc32": 2882710549,
+        "actual_crc32": 2882710549,
+        "crc_matches": true,
+        "sha256": "0ccf040bdc9eaee73671f9aad4505e73b91197eefa2846a82e0001f3324dc998"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c55_s_mesh_overlay55.vmdl_c",
+        "bytes": 26657,
+        "archive_index": 32767,
+        "expected_crc32": 3999641788,
+        "actual_crc32": 3999641788,
+        "crc_matches": true,
+        "sha256": "7b0fceb86c24a68cf54da785aec1a18946b269559b3feea8f4a877437c76641a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c54_s_mesh_overlay54.vmdl_c",
+        "bytes": 16145,
+        "archive_index": 32767,
+        "expected_crc32": 2402651881,
+        "actual_crc32": 2402651881,
+        "crc_matches": true,
+        "sha256": "45bce2798605d5ce6ad7a78fed2fae67c2af4e3b014f9915ff9b89ba76dcb438"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c53_s_mesh_overlay53.vmdl_c",
+        "bytes": 15585,
+        "archive_index": 32767,
+        "expected_crc32": 1791875644,
+        "actual_crc32": 1791875644,
+        "crc_matches": true,
+        "sha256": "ef56dddb049c9453a6c0993def88c7af3342f82ef524103e5a8d40a36751a7ce"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c52_s_mesh_overlay52.vmdl_c",
+        "bytes": 15665,
+        "archive_index": 32767,
+        "expected_crc32": 4231078791,
+        "actual_crc32": 4231078791,
+        "crc_matches": true,
+        "sha256": "44bcaa811cce668d5e7340e074768966ca4883604e48cadc1a2d94ed750b34eb"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c51_s_mesh_overlay51.vmdl_c",
+        "bytes": 15745,
+        "archive_index": 32767,
+        "expected_crc32": 4236165312,
+        "actual_crc32": 4236165312,
+        "crc_matches": true,
+        "sha256": "2a23d4d61871900cf78334c6d82c11a8cf62a4d4bd33d4d791c8639db4938dcf"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c50_s_mesh_overlay50.vmdl_c",
+        "bytes": 5873,
+        "archive_index": 32767,
+        "expected_crc32": 3490140583,
+        "actual_crc32": 3490140583,
+        "crc_matches": true,
+        "sha256": "866a0e4a5cc823b8acd133fb7ecb58f0c89927fae6928bc9a75a6e8cb4f8d059"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c4_s_mesh_overlay4.vmdl_c",
+        "bytes": 4493,
+        "archive_index": 32767,
+        "expected_crc32": 1421882286,
+        "actual_crc32": 1421882286,
+        "crc_matches": true,
+        "sha256": "12059b91ce1b631574dda0f07736cb1e96f5a53bb626298c1616a55498e85136"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c49_s_mesh_overlay49.vmdl_c",
+        "bytes": 5889,
+        "archive_index": 32767,
+        "expected_crc32": 4162016052,
+        "actual_crc32": 4162016052,
+        "crc_matches": true,
+        "sha256": "de2e86cf994e11ca9deacdaa63d5139f2c35bfd48a1ef3d7b9d00833ed0efc1c"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c48_s_mesh_overlay48.vmdl_c",
+        "bytes": 5841,
+        "archive_index": 32767,
+        "expected_crc32": 325098249,
+        "actual_crc32": 325098249,
+        "crc_matches": true,
+        "sha256": "2e517b44fcafff7547252330af845b12e2d4164efaa9e1e0cea0d2236720b32b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c47_s_mesh_overlay47.vmdl_c",
+        "bytes": 6001,
+        "archive_index": 32767,
+        "expected_crc32": 2520914487,
+        "actual_crc32": 2520914487,
+        "crc_matches": true,
+        "sha256": "5a40dd6689f65fb9bd09fa784e24367a8928a4d59196bfcf66a309b945da5393"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c46_s_mesh_overlay46.vmdl_c",
+        "bytes": 16161,
+        "archive_index": 32767,
+        "expected_crc32": 1350191196,
+        "actual_crc32": 1350191196,
+        "crc_matches": true,
+        "sha256": "513a06c2dbe25869ab4a476c9b46d10e3ca790050a28db78d510381da7986859"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c45_s_mesh_overlay45.vmdl_c",
+        "bytes": 16433,
+        "archive_index": 32767,
+        "expected_crc32": 947256554,
+        "actual_crc32": 947256554,
+        "crc_matches": true,
+        "sha256": "21c4507c88ff0c6352b47ff48d7b2383eadee95981ca3e2695bf32d63c2b8dfb"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c44_s_mesh_overlay44.vmdl_c",
+        "bytes": 27857,
+        "archive_index": 32767,
+        "expected_crc32": 2266673325,
+        "actual_crc32": 2266673325,
+        "crc_matches": true,
+        "sha256": "6da7f23788bb69aba6c417fbea6002b3d47f37de45944aac22dbd009b1f4714c"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c43_s_mesh_overlay43.vmdl_c",
+        "bytes": 16385,
+        "archive_index": 32767,
+        "expected_crc32": 2294462278,
+        "actual_crc32": 2294462278,
+        "crc_matches": true,
+        "sha256": "5aecb4d4c376a6d719315e78a07c6303c4af15dccfa325098aee013eedf033cb"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c42_s_mesh_overlay42.vmdl_c",
+        "bytes": 16257,
+        "archive_index": 32767,
+        "expected_crc32": 2221029683,
+        "actual_crc32": 2221029683,
+        "crc_matches": true,
+        "sha256": "6e6fd6206b862448cc56395dea3dde11e3898ac4b0c40e049cca147182de5c98"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c41_s_mesh_overlay41.vmdl_c",
+        "bytes": 27857,
+        "archive_index": 32767,
+        "expected_crc32": 3943111987,
+        "actual_crc32": 3943111987,
+        "crc_matches": true,
+        "sha256": "a9cb6c13291e58ed2444101238b8796e2dedae3d89cbc1e47ee7748013954852"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c40_s_mesh_overlay40.vmdl_c",
+        "bytes": 5921,
+        "archive_index": 32767,
+        "expected_crc32": 2873638723,
+        "actual_crc32": 2873638723,
+        "crc_matches": true,
+        "sha256": "b6d699f26fb3d99481f7e1637bc66559385bd8d3bc1cc0d4d580f44b7aff0e27"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c3_s_mesh_overlay3.vmdl_c",
+        "bytes": 5741,
+        "archive_index": 32767,
+        "expected_crc32": 3080115018,
+        "actual_crc32": 3080115018,
+        "crc_matches": true,
+        "sha256": "da2d2bbade4ef4f60ef3aae236225ac692c9662af7eae283274482737126f702"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c39_s_mesh_overlay39.vmdl_c",
+        "bytes": 8577,
+        "archive_index": 32767,
+        "expected_crc32": 4009285304,
+        "actual_crc32": 4009285304,
+        "crc_matches": true,
+        "sha256": "5e453b06047048b3525fa57dce54db71a230d8310a673b2482e5a385ee3bf45b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c38_s_mesh_overlay38.vmdl_c",
+        "bytes": 4433,
+        "archive_index": 32767,
+        "expected_crc32": 2459444254,
+        "actual_crc32": 2459444254,
+        "crc_matches": true,
+        "sha256": "65e7e285692c37982c8caa5364ab593aeaa4371995669948dc113703ae6575de"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c37_s_mesh_overlay37.vmdl_c",
+        "bytes": 5521,
+        "archive_index": 32767,
+        "expected_crc32": 1988369253,
+        "actual_crc32": 1988369253,
+        "crc_matches": true,
+        "sha256": "067fd548ef44e39468d7bac8748add4eb431eeec54558dc3acc4350796009b55"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c36_s_mesh_overlay36.vmdl_c",
+        "bytes": 5057,
+        "archive_index": 32767,
+        "expected_crc32": 3784071807,
+        "actual_crc32": 3784071807,
+        "crc_matches": true,
+        "sha256": "71da27be2c03e836762016d4946a7a6035a858d81d34d5c976a607f14a15ce37"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c35_s_mesh_overlay35.vmdl_c",
+        "bytes": 5249,
+        "archive_index": 32767,
+        "expected_crc32": 318994680,
+        "actual_crc32": 318994680,
+        "crc_matches": true,
+        "sha256": "19cda35c83bc3db5186285900d6af3cb2b37ecf37fd95b0bda3eb5e1fc975fc6"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c34_s_mesh_overlay34.vmdl_c",
+        "bytes": 4897,
+        "archive_index": 32767,
+        "expected_crc32": 922734542,
+        "actual_crc32": 922734542,
+        "crc_matches": true,
+        "sha256": "507edf8106cf0b841788d3537a5c2bdb1a0b3362162a40c01e8581f3d84304b0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c33_s_mesh_overlay33.vmdl_c",
+        "bytes": 5505,
+        "archive_index": 32767,
+        "expected_crc32": 2327524043,
+        "actual_crc32": 2327524043,
+        "crc_matches": true,
+        "sha256": "e129787159b87c7a0baff6d555ebd19b289721b1bfea887293a707769e48fc2f"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c32_s_mesh_overlay32.vmdl_c",
+        "bytes": 6465,
+        "archive_index": 32767,
+        "expected_crc32": 1624639607,
+        "actual_crc32": 1624639607,
+        "crc_matches": true,
+        "sha256": "c2f1f6b3447406efde2c1ec692b3ba83bdc3eade0b1ed5795a200631291aa77e"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c31_s_mesh_overlay31.vmdl_c",
+        "bytes": 5089,
+        "archive_index": 32767,
+        "expected_crc32": 1633000303,
+        "actual_crc32": 1633000303,
+        "crc_matches": true,
+        "sha256": "3b437fa615ea4d9048d9107f30ca930e84f93e6adde03b59d6465deae37a9f03"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c30_s_mesh_overlay30.vmdl_c",
+        "bytes": 7025,
+        "archive_index": 32767,
+        "expected_crc32": 990168014,
+        "actual_crc32": 990168014,
+        "crc_matches": true,
+        "sha256": "160a3b0dc19ca4d64e5a88bf2a9279e41c94b9f1a4255f4272e06fe864627c11"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c2_s_mesh_overlay2.vmdl_c",
+        "bytes": 5101,
+        "archive_index": 32767,
+        "expected_crc32": 3533272419,
+        "actual_crc32": 3533272419,
+        "crc_matches": true,
+        "sha256": "44d02f64250d861f685c6a91faa77c952df0e4c9b5beada79618f3bfd3994b2a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c2_s_cb_mesh.vmdl_c",
+        "bytes": 4841,
+        "archive_index": 32767,
+        "expected_crc32": 1309820020,
+        "actual_crc32": 1309820020,
+        "crc_matches": true,
+        "sha256": "c3cefc775610d7ada5a0ff55651792c24779c9821168e10cad30814ffc3baffe"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c29_s_mesh_overlay29.vmdl_c",
+        "bytes": 5377,
+        "archive_index": 32767,
+        "expected_crc32": 248097309,
+        "actual_crc32": 248097309,
+        "crc_matches": true,
+        "sha256": "8ebeea66acab43da2f16f90d877658647ba2e404ab03b780add4466baddb30c9"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c28_s_mesh_overlay28.vmdl_c",
+        "bytes": 6177,
+        "archive_index": 32767,
+        "expected_crc32": 3511853429,
+        "actual_crc32": 3511853429,
+        "crc_matches": true,
+        "sha256": "68482fc94360e4e2f53f638ef5998b7b024686d7997cb05944c9a2d5c018e6fd"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c27_s_mesh_overlay27.vmdl_c",
+        "bytes": 7489,
+        "archive_index": 32767,
+        "expected_crc32": 1101307722,
+        "actual_crc32": 1101307722,
+        "crc_matches": true,
+        "sha256": "ea02176e55baa8ca5522c94911fd090b7fb65d9e9cb68662a6d92d0717ac75ca"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c26_s_mesh_overlay26.vmdl_c",
+        "bytes": 4881,
+        "archive_index": 32767,
+        "expected_crc32": 4271467381,
+        "actual_crc32": 4271467381,
+        "crc_matches": true,
+        "sha256": "57e2687bd058744542e6097ac0156bf05fbf156831ec1f204b9958cf550f1bac"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c25_s_mesh_overlay25.vmdl_c",
+        "bytes": 5393,
+        "archive_index": 32767,
+        "expected_crc32": 1582068877,
+        "actual_crc32": 1582068877,
+        "crc_matches": true,
+        "sha256": "ff542b4e5d402ecd2f48ab79fdc9e4bfd160d79e4efadd8200ef8dbaee18ccbc"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c24_s_mesh_overlay24.vmdl_c",
+        "bytes": 7537,
+        "archive_index": 32767,
+        "expected_crc32": 2368393938,
+        "actual_crc32": 2368393938,
+        "crc_matches": true,
+        "sha256": "2cbae142c4907dd192c57ed7e3e26968539d3f80ae648e520a5a071d677202c9"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c23_s_mesh_overlay23.vmdl_c",
+        "bytes": 5729,
+        "archive_index": 32767,
+        "expected_crc32": 4060985171,
+        "actual_crc32": 4060985171,
+        "crc_matches": true,
+        "sha256": "2ad0f0dde7ea6ede9d9e1206b86ff6b487de843fab6f90cfd68dc19dbf3d20b0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c22_s_mesh_overlay22.vmdl_c",
+        "bytes": 7345,
+        "archive_index": 32767,
+        "expected_crc32": 1936168792,
+        "actual_crc32": 1936168792,
+        "crc_matches": true,
+        "sha256": "bbd4a9b1ead173c35bf0455702910c14d736f8d7684f734241f4563110d81296"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c21_s_mesh_overlay21.vmdl_c",
+        "bytes": 5377,
+        "archive_index": 32767,
+        "expected_crc32": 1681112815,
+        "actual_crc32": 1681112815,
+        "crc_matches": true,
+        "sha256": "f19373a2bc19330c8e79c33889569b6763403dee105af0ffedcfecac1fb20e91"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c20_s_mesh_overlay20.vmdl_c",
+        "bytes": 5457,
+        "archive_index": 32767,
+        "expected_crc32": 1239030482,
+        "actual_crc32": 1239030482,
+        "crc_matches": true,
+        "sha256": "0b0e559ce793bb6d5de5f05c5f6a923cff5a5aeec2ea22103c226eb5c821dfc5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c1_s_mesh_overlay1.vmdl_c",
+        "bytes": 4941,
+        "archive_index": 32767,
+        "expected_crc32": 162703443,
+        "actual_crc32": 162703443,
+        "crc_matches": true,
+        "sha256": "a8498e0e8c2755382873eac4d098be1a92d6d76f2669fd160bbfa3c4abcde357"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c19_s_mesh_overlay19.vmdl_c",
+        "bytes": 5681,
+        "archive_index": 32767,
+        "expected_crc32": 239019337,
+        "actual_crc32": 239019337,
+        "crc_matches": true,
+        "sha256": "90132849e39faa861186af845385b409eec71c6889130e4f63276d68c841cad4"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c18_s_mesh_overlay18.vmdl_c",
+        "bytes": 8257,
+        "archive_index": 32767,
+        "expected_crc32": 1321012006,
+        "actual_crc32": 1321012006,
+        "crc_matches": true,
+        "sha256": "4b777832d026c8f9c047c72d91f2ee65952010cf85aae5735fbf89ca001602b0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c17_s_mesh_overlay17.vmdl_c",
+        "bytes": 6513,
+        "archive_index": 32767,
+        "expected_crc32": 859282165,
+        "actual_crc32": 859282165,
+        "crc_matches": true,
+        "sha256": "ea33e6c6cb04eaddb0fd2c6570c80255dee97fd15517eac64578f1fe046de243"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c16_s_mesh_overlay16.vmdl_c",
+        "bytes": 5937,
+        "archive_index": 32767,
+        "expected_crc32": 497166159,
+        "actual_crc32": 497166159,
+        "crc_matches": true,
+        "sha256": "0bfac9f4dc73588be4d4d97e25dd9f9e3aedf6ff0aed8e66e5cd2e4d4282a9ee"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c15_s_mesh_overlay15.vmdl_c",
+        "bytes": 6561,
+        "archive_index": 32767,
+        "expected_crc32": 3227630105,
+        "actual_crc32": 3227630105,
+        "crc_matches": true,
+        "sha256": "813dab0348eb9069f9436be218b85c4a0f6cbd72165a873c739d1b8e32c9c611"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c14_s_mesh_overlay14.vmdl_c",
+        "bytes": 5009,
+        "archive_index": 32767,
+        "expected_crc32": 2348533995,
+        "actual_crc32": 2348533995,
+        "crc_matches": true,
+        "sha256": "b0e8d0399f933d9815ec148448b6d55bbeb92267e1bb93876a38997ce81c6d28"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c13_s_mesh_overlay13.vmdl_c",
+        "bytes": 4945,
+        "archive_index": 32767,
+        "expected_crc32": 3673880914,
+        "actual_crc32": 3673880914,
+        "crc_matches": true,
+        "sha256": "6b37ba8d16ebf19c556d5cedf50d682043c3d5f1a29394a3fc85cfcd0144d04b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c12_s_mesh_overlay12.vmdl_c",
+        "bytes": 4833,
+        "archive_index": 32767,
+        "expected_crc32": 3762040748,
+        "actual_crc32": 3762040748,
+        "crc_matches": true,
+        "sha256": "30c6e63d025678ec3880a79744b8b35abf8a690257d8f1b49816e4abdfd1edef"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c11_s_mesh_overlay11.vmdl_c",
+        "bytes": 4801,
+        "archive_index": 32767,
+        "expected_crc32": 1392802493,
+        "actual_crc32": 1392802493,
+        "crc_matches": true,
+        "sha256": "8a4d7421da5fd52eae49200a387f84263767713ed6ae3b2dbe00c09185586f09"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c10_s_mesh_overlay10.vmdl_c",
+        "bytes": 4897,
+        "archive_index": 32767,
+        "expected_crc32": 3637072942,
+        "actual_crc32": 3637072942,
+        "crc_matches": true,
+        "sha256": "acb25315a9d4c5daa93be5de10f2094e112fa9f642bf751cab8dae220822561d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_mesh_overlay0.vmdl_c",
+        "bytes": 4941,
+        "archive_index": 32767,
+        "expected_crc32": 3508944772,
+        "actual_crc32": 3508944772,
+        "crc_matches": true,
+        "sha256": "a54622ab445214492300c60fc0f26ac4b06a7262c878290052432eeab7c469d1"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge9_water_ti10_000.vmdl_c",
+        "bytes": 5709,
+        "archive_index": 32767,
+        "expected_crc32": 3887210716,
+        "actual_crc32": 3887210716,
+        "crc_matches": true,
+        "sha256": "eb46a4be649c5edb3415d3d64be7463d8134e6e2d85a5358fe8fb892b362a9b5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge8_water_ti10_000.vmdl_c",
+        "bytes": 4685,
+        "archive_index": 32767,
+        "expected_crc32": 1701045739,
+        "actual_crc32": 1701045739,
+        "crc_matches": true,
+        "sha256": "377c65406da65c05948d2f68b2f90496d28d587a221c5ec17d49308c8f4762a5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge7_water_ti10_000.vmdl_c",
+        "bytes": 5293,
+        "archive_index": 32767,
+        "expected_crc32": 565607222,
+        "actual_crc32": 565607222,
+        "crc_matches": true,
+        "sha256": "35161326f95b7ffd0d4abdf376187d08ba2c20eb5ca63f1c77775c5149dd581c"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge6_water_ti10_000.vmdl_c",
+        "bytes": 190109,
+        "archive_index": 32767,
+        "expected_crc32": 454213711,
+        "actual_crc32": 454213711,
+        "crc_matches": true,
+        "sha256": "fd16764a2be5cfef64e84564c021b489d8fa2628b48911a0ce255f5c9f34fa38"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge5_water_journey_000.vmdl_c",
+        "bytes": 11821,
+        "archive_index": 32767,
+        "expected_crc32": 1097909303,
+        "actual_crc32": 1097909303,
+        "crc_matches": true,
+        "sha256": "ebab02c5a4d15d3d2f14f67fd018e0ce55165735ba57ae5e9fc8f2474a8901a8"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge4_water_ti10_000.vmdl_c",
+        "bytes": 4445,
+        "archive_index": 32767,
+        "expected_crc32": 182318880,
+        "actual_crc32": 182318880,
+        "crc_matches": true,
+        "sha256": "b9313f4aaee697b7232e571e2b1f99c07cde0e91a4b2ec6f337aabfc0598d459"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge3_water_ti10_000.vmdl_c",
+        "bytes": 4525,
+        "archive_index": 32767,
+        "expected_crc32": 3536265095,
+        "actual_crc32": 3536265095,
+        "crc_matches": true,
+        "sha256": "feb3fdf293ce19eb14405afc321db63da46a2e4145cba8b347a7e9d0ea680591"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge2_water_ti10_000.vmdl_c",
+        "bytes": 5021,
+        "archive_index": 32767,
+        "expected_crc32": 3722213174,
+        "actual_crc32": 3722213174,
+        "crc_matches": true,
+        "sha256": "c40acd946940bd8620e9525aa1d5660d5a1d5d63683bd4db2dc5626803aa56cb"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge22_water_ti10_000.vmdl_c",
+        "bytes": 4477,
+        "archive_index": 32767,
+        "expected_crc32": 998642375,
+        "actual_crc32": 998642375,
+        "crc_matches": true,
+        "sha256": "58aee2ce417bcca25236c01587db650db1c4e04f709d571c662167f0c8e38ac4"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge21_water_ti10_000.vmdl_c",
+        "bytes": 4573,
+        "archive_index": 32767,
+        "expected_crc32": 1481083924,
+        "actual_crc32": 1481083924,
+        "crc_matches": true,
+        "sha256": "dc2bbe8fdb50fa3143e01c65f98351694227920de0853576b1551d9499010cd7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge20_water_ti10_000.vmdl_c",
+        "bytes": 4685,
+        "archive_index": 32767,
+        "expected_crc32": 367786052,
+        "actual_crc32": 367786052,
+        "crc_matches": true,
+        "sha256": "06b5e22ec3657bf5736a1c75eb11c808939e41e414badc0e8285ca3339c4d874"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge1_water_ti10_000.vmdl_c",
+        "bytes": 4765,
+        "archive_index": 32767,
+        "expected_crc32": 3381423454,
+        "actual_crc32": 3381423454,
+        "crc_matches": true,
+        "sha256": "4b2e7d7c5be6a2fa0dcba28fe95bfb15541b3bd86d9d1c6ef3c5d87853c23a75"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge19_water_ti10_000.vmdl_c",
+        "bytes": 4509,
+        "archive_index": 32767,
+        "expected_crc32": 3711685993,
+        "actual_crc32": 3711685993,
+        "crc_matches": true,
+        "sha256": "ea7e3bfcd21a11d0eb0667cd36bdfd26fc717a462eb72cd4def3def47ebc030e"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge18_water_ti10_000.vmdl_c",
+        "bytes": 4621,
+        "archive_index": 32767,
+        "expected_crc32": 3724555311,
+        "actual_crc32": 3724555311,
+        "crc_matches": true,
+        "sha256": "6b9fe0be998c7e8fa93db346f27d0551c705042162f72aa2487dc1987c31b67e"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge17_water_jungle_000.vmdl_c",
+        "bytes": 14701,
+        "archive_index": 32767,
+        "expected_crc32": 2164216119,
+        "actual_crc32": 2164216119,
+        "crc_matches": true,
+        "sha256": "a6d4418e10f9a41b04651234b804459db736ebe7dd2ea69a49a8ae741871af2f"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge16_water_ti10_000.vmdl_c",
+        "bytes": 4509,
+        "archive_index": 32767,
+        "expected_crc32": 2878551900,
+        "actual_crc32": 2878551900,
+        "crc_matches": true,
+        "sha256": "6686fd678ee28a2bad64fcae4af1d984f746c68498a6331bd169037b16e3d54f"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge15_water_ti10_000.vmdl_c",
+        "bytes": 4525,
+        "archive_index": 32767,
+        "expected_crc32": 417274109,
+        "actual_crc32": 417274109,
+        "crc_matches": true,
+        "sha256": "bc8dcd32e1056d08e8a8aa7beacd6835071c98fa5330ef0e368fa87a25b6b78f"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge14_water_ti10_000.vmdl_c",
+        "bytes": 4685,
+        "archive_index": 32767,
+        "expected_crc32": 3488999272,
+        "actual_crc32": 3488999272,
+        "crc_matches": true,
+        "sha256": "97a49d114f71976e982137500305164f1103f3d140e3cd456040074a6056baa0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge13_water_ti10_000.vmdl_c",
+        "bytes": 4509,
+        "archive_index": 32767,
+        "expected_crc32": 81499090,
+        "actual_crc32": 81499090,
+        "crc_matches": true,
+        "sha256": "8116836f0483d63118344e6d1ad1ba720a1b46f20a8e57b14e3f9400c21aedbb"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge12_water_ti10_000.vmdl_c",
+        "bytes": 4493,
+        "archive_index": 32767,
+        "expected_crc32": 4288644463,
+        "actual_crc32": 4288644463,
+        "crc_matches": true,
+        "sha256": "aeb07870c87684931c7189d83a5e0659a2010c7484c7b2c1280e76cb8ffb7e54"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge11_water_ti10_000.vmdl_c",
+        "bytes": 4509,
+        "archive_index": 32767,
+        "expected_crc32": 3331386291,
+        "actual_crc32": 3331386291,
+        "crc_matches": true,
+        "sha256": "ccd76c30dd82f84b21f9b3f8aa21b466b8677bf11c997ce98c65ea1d09598be0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge10_water_ti10_000.vmdl_c",
+        "bytes": 4445,
+        "archive_index": 32767,
+        "expected_crc32": 876588934,
+        "actual_crc32": 876588934,
+        "crc_matches": true,
+        "sha256": "46d6204e901b7ea7509120d48bf76cca4f21dee85ddcc215053c649e7d3ced52"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_nomerge0_water_ti10_000.vmdl_c",
+        "bytes": 4525,
+        "archive_index": 32767,
+        "expected_crc32": 3324477319,
+        "actual_crc32": 3324477319,
+        "crc_matches": true,
+        "sha256": "63457999861d8e9178cd3cebadfb5df9175f79db1d2f6c11188971ddcea39606"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_c0_s_cb_mesh_worldspace_texture_blend.vmdl_c",
+        "bytes": 704176,
+        "archive_index": 32767,
+        "expected_crc32": 2993535668,
+        "actual_crc32": 2993535668,
+        "crc_matches": true,
+        "sha256": "84756ac48110c181e8b456012c46a212d9c1cef83696a92e318bc24ee0c73172"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_light_2.vmdl_c",
+        "bytes": 1602290,
+        "archive_index": 32767,
+        "expected_crc32": 2933595347,
+        "actual_crc32": 2933595347,
+        "crc_matches": true,
+        "sha256": "db54ef64256115c0e3b4383aa3b931cdae205a7e9504af226d7432e3ecbfd160"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_light_1.vmdl_c",
+        "bytes": 152466,
+        "archive_index": 32767,
+        "expected_crc32": 2717343406,
+        "actual_crc32": 2717343406,
+        "crc_matches": true,
+        "sha256": "3bd062cedea38568ca3238af6b2a615392a93f14a5b2b84653fcd0ea2a43c49b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_light_0.vmdl_c",
+        "bytes": 13234,
+        "archive_index": 32767,
+        "expected_crc32": 869399810,
+        "actual_crc32": 869399810,
+        "crc_matches": true,
+        "sha256": "8f9bc075ec53cad7734623ff9a326ef0e820549daffc47133cf1194ee19727bb"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_end_2.vmdl_c",
+        "bytes": 632162,
+        "archive_index": 32767,
+        "expected_crc32": 259111794,
+        "actual_crc32": 259111794,
+        "crc_matches": true,
+        "sha256": "f61caed4ea5525d0c4211658a1e65d2d6208fa5d1abbc71cc617768b54fbf97a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_end_1.vmdl_c",
+        "bytes": 8098,
+        "archive_index": 32767,
+        "expected_crc32": 2253513530,
+        "actual_crc32": 2253513530,
+        "crc_matches": true,
+        "sha256": "75e375f4365f477021a9033dd729056ae10a8be8ae4c0f7a8a01446dac222315"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_end_0.vmdl_c",
+        "bytes": 38738,
+        "archive_index": 32767,
+        "expected_crc32": 3762893590,
+        "actual_crc32": 3762893590,
+        "crc_matches": true,
+        "sha256": "012f337df5a6d3284245afa8f88c9ab216050b3f00149b8b47b53132f7055e1a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_5.vmdl_c",
+        "bytes": 14094,
+        "archive_index": 32767,
+        "expected_crc32": 1603781200,
+        "actual_crc32": 1603781200,
+        "crc_matches": true,
+        "sha256": "9eb919d48e7d68e5757a910d9179613321df0aadf936a0e2ba5d2d33bb3ec8d8"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_4.vmdl_c",
+        "bytes": 1418206,
+        "archive_index": 32767,
+        "expected_crc32": 764005599,
+        "actual_crc32": 764005599,
+        "crc_matches": true,
+        "sha256": "ac7ea5cc82a9dc89b8b94a4bbf292a550c809fd4f54a835413cae7ed63dd8f99"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_3.vmdl_c",
+        "bytes": 24862,
+        "archive_index": 32767,
+        "expected_crc32": 2242670020,
+        "actual_crc32": 2242670020,
+        "crc_matches": true,
+        "sha256": "3f8c36e6b68874ab9ae0ca6f543195e534686df6752661bcd570c5c6f6e3c9b5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_2.vmdl_c",
+        "bytes": 157774,
+        "archive_index": 32767,
+        "expected_crc32": 3822336567,
+        "actual_crc32": 3822336567,
+        "crc_matches": true,
+        "sha256": "3ef5e228b3742fefe80ac8dce7a750e909b8791bcb7c20ab441ce35c802992a0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_1.vmdl_c",
+        "bytes": 14126,
+        "archive_index": 32767,
+        "expected_crc32": 93003878,
+        "actual_crc32": 93003878,
+        "crc_matches": true,
+        "sha256": "49f1fd85f57c8c3cb6ff5dee278d4b9b92191e4291b99e0ba3e5b30f552d3f15"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wood_0.vmdl_c",
+        "bytes": 14126,
+        "archive_index": 32767,
+        "expected_crc32": 3352001568,
+        "actual_crc32": 3352001568,
+        "crc_matches": true,
+        "sha256": "afb0dee6aa3b107314b3b7589fb5b77fdc457244fd7a07388b61e9d4d3ae8fe2"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_water_creep_camp_torch_0.vmdl_c",
+        "bytes": 107213,
+        "archive_index": 32767,
+        "expected_crc32": 3258170958,
+        "actual_crc32": 3258170958,
+        "crc_matches": true,
+        "sha256": "3be07b4254dc0c42aa362aaf4ffacfb332e929019fbbdd38c4ad0ceb9160932a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_water_creep_camp_lily_pads_0.vmdl_c",
+        "bytes": 225201,
+        "archive_index": 32767,
+        "expected_crc32": 274552840,
+        "actual_crc32": 274552840,
+        "crc_matches": true,
+        "sha256": "89c7ba435ddd98b05fbf713c677305e220aee25aeb949ecd63a27dc3a661b8fb"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wall384_0.vmdl_c",
+        "bytes": 49342,
+        "archive_index": 32767,
+        "expected_crc32": 2453536130,
+        "actual_crc32": 2453536130,
+        "crc_matches": true,
+        "sha256": "6a6c9bd3f50dbb7949f1cab8edd254f91547e04a34a67479843dbda784060e05"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wall256_composite_0.vmdl_c",
+        "bytes": 186681,
+        "archive_index": 32767,
+        "expected_crc32": 708604098,
+        "actual_crc32": 708604098,
+        "crc_matches": true,
+        "sha256": "3f5956b63f7d41e71cc5b6671c0c068bc48f09a01ffa1cff71accd834c5febb0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_wall128_composite_0.vmdl_c",
+        "bytes": 61065,
+        "archive_index": 32767,
+        "expected_crc32": 2976018143,
+        "actual_crc32": 2976018143,
+        "crc_matches": true,
+        "sha256": "628319d544984438cce499c187ef4cfa712357e0f1cde6bb59e17710ed305f16"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_urn001_0.vmdl_c",
+        "bytes": 34766,
+        "archive_index": 32767,
+        "expected_crc32": 515288826,
+        "actual_crc32": 515288826,
+        "crc_matches": true,
+        "sha256": "658abe825d360a7666bcc89bd7eefeceba8a950ced231d5bab9fce980f51eb92"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_tree_roots_01_0.vmdl_c",
+        "bytes": 35542,
+        "archive_index": 32767,
+        "expected_crc32": 3355194990,
+        "actual_crc32": 3355194990,
+        "crc_matches": true,
+        "sha256": "f2d77fe7ba916c84f5170995d871c315f068c3f159650e6b0346088bafea285e"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_tree_pine01_0.vmdl_c",
+        "bytes": 13906,
+        "archive_index": 32767,
+        "expected_crc32": 2123968886,
+        "actual_crc32": 2123968886,
+        "crc_matches": true,
+        "sha256": "59a7bb7626ea44ca6793507b15c891d699a6d424007815daba92aebdfeb5bdd7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_tree_cypress001_block_0.vmdl_c",
+        "bytes": 7086,
+        "archive_index": 32767,
+        "expected_crc32": 2158403628,
+        "actual_crc32": 2158403628,
+        "crc_matches": true,
+        "sha256": "52670700914eaeff62af7a0a7fc1f3165f08f81e2c9dbd41b9c6f8c9bd2ac639"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_tree_cypress001_0.vmdl_c",
+        "bytes": 50518,
+        "archive_index": 32767,
+        "expected_crc32": 2547254165,
+        "actual_crc32": 2547254165,
+        "crc_matches": true,
+        "sha256": "0547068a3803206628170d491d8bd72a0a26257591e32ebf910d86acffeabefd"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_ti10_tileset_misc_0.vmdl_c",
+        "bytes": 9930,
+        "archive_index": 32767,
+        "expected_crc32": 2776772772,
+        "actual_crc32": 2776772772,
+        "crc_matches": true,
+        "sha256": "91e059676a562d9b3d59529c3c04e888de14701529d4d8605a9bf6f43d4c2630"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_ti10_tileset_cliffs_0.vmdl_c",
+        "bytes": 28122,
+        "archive_index": 32767,
+        "expected_crc32": 2523674426,
+        "actual_crc32": 2523674426,
+        "crc_matches": true,
+        "sha256": "e749ab03637ac0aa855f4d9ea514ce736eb3fc4b76168794db106fff0fcc9a17"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_temple_stairs_blocks002_0.vmdl_c",
+        "bytes": 21790,
+        "archive_index": 32767,
+        "expected_crc32": 3660158925,
+        "actual_crc32": 3660158925,
+        "crc_matches": true,
+        "sha256": "665070d0333c2f6d3b99d4b4bc11ecd9ee90e3b2f668caac22f9bc02de25d4d5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_temple_stairs001_0.vmdl_c",
+        "bytes": 173850,
+        "archive_index": 32767,
+        "expected_crc32": 2850233771,
+        "actual_crc32": 2850233771,
+        "crc_matches": true,
+        "sha256": "b27589200889106eeecb3023369e00c33c66a1efe8ed7692c3fe7d07f59d3d71"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_temple_snow_0.vmdl_c",
+        "bytes": 30850,
+        "archive_index": 32767,
+        "expected_crc32": 3762766617,
+        "actual_crc32": 3762766617,
+        "crc_matches": true,
+        "sha256": "70bef770c2dbdf510b8188d5102836627ffdf41f46801f793689d2fe71f767d0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_teal_4.vmdl_c",
+        "bytes": 13710,
+        "archive_index": 32767,
+        "expected_crc32": 1524674751,
+        "actual_crc32": 1524674751,
+        "crc_matches": true,
+        "sha256": "2cbd04d5098691f70d4d9bd701344b2bbe5c533f03904b62959de436ef89dab8"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_teal_3.vmdl_c",
+        "bytes": 15326,
+        "archive_index": 32767,
+        "expected_crc32": 1339931688,
+        "actual_crc32": 1339931688,
+        "crc_matches": true,
+        "sha256": "196759250802cfcab07a7f4b3289d2b7117bf8d881c55c1a649c030c48bc6e39"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_teal_2.vmdl_c",
+        "bytes": 12574,
+        "archive_index": 32767,
+        "expected_crc32": 3189966990,
+        "actual_crc32": 3189966990,
+        "crc_matches": true,
+        "sha256": "b3d7a886e2ad9905f64e06523baa530a7846999c4ceb40773b4c7b5a609a8371"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_teal_1.vmdl_c",
+        "bytes": 13694,
+        "archive_index": 32767,
+        "expected_crc32": 464011869,
+        "actual_crc32": 464011869,
+        "crc_matches": true,
+        "sha256": "112b844d26186bb22aff69cea1519fce29c59b11ac0f16a42a2a2fe19d8a0ab3"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_teal_0.vmdl_c",
+        "bytes": 40958,
+        "archive_index": 32767,
+        "expected_crc32": 3993345818,
+        "actual_crc32": 3993345818,
+        "crc_matches": true,
+        "sha256": "064940cfa21d3ac9febe027fce1d9b43f35e574970d868fe794fc6b364b45ed3"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_light_5.vmdl_c",
+        "bytes": 83506,
+        "archive_index": 32767,
+        "expected_crc32": 430362945,
+        "actual_crc32": 430362945,
+        "crc_matches": true,
+        "sha256": "3ed2a06a7cbf6dfd9532b644c7a3af81e30975fc30f2d7425c1a88482f712c1b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_light_4.vmdl_c",
+        "bytes": 78130,
+        "archive_index": 32767,
+        "expected_crc32": 830641711,
+        "actual_crc32": 830641711,
+        "crc_matches": true,
+        "sha256": "4be398ad437e6012e0fd8284ef98fe625e28a42886775bc82ade0cfbf932aaec"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_light_3.vmdl_c",
+        "bytes": 658082,
+        "archive_index": 32767,
+        "expected_crc32": 4220091258,
+        "actual_crc32": 4220091258,
+        "crc_matches": true,
+        "sha256": "71fe438517fc9dd2966885cc54b87a0682e6451019918be668c802c88c65d144"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_light_2.vmdl_c",
+        "bytes": 82050,
+        "archive_index": 32767,
+        "expected_crc32": 1272492270,
+        "actual_crc32": 1272492270,
+        "crc_matches": true,
+        "sha256": "4bcedf909dad2ec5daa879d25b6ac990fcfdab7aa66c6489d61ca76d4e4f14db"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_light_1.vmdl_c",
+        "bytes": 14498,
+        "archive_index": 32767,
+        "expected_crc32": 1779891429,
+        "actual_crc32": 1779891429,
+        "crc_matches": true,
+        "sha256": "131240e173a259f92ef641682dffe12f01168c20b4760903b1aa2aa2993bb277"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_light_0.vmdl_c",
+        "bytes": 37410,
+        "archive_index": 32767,
+        "expected_crc32": 1394542758,
+        "actual_crc32": 1394542758,
+        "crc_matches": true,
+        "sha256": "e0b70cc8321c8509d1ee83620c94937c3e6e09c417c741aafaf9d88f3638992a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_dark_0.vmdl_c",
+        "bytes": 538722,
+        "archive_index": 32767,
+        "expected_crc32": 2481705194,
+        "actual_crc32": 2481705194,
+        "crc_matches": true,
+        "sha256": "c9de44e86d52798f818b6224d57822c2bdadc59552555ae7f5c9a4b2e279e170"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_cool_4.vmdl_c",
+        "bytes": 1006146,
+        "archive_index": 32767,
+        "expected_crc32": 4021794267,
+        "actual_crc32": 4021794267,
+        "crc_matches": true,
+        "sha256": "ebf6f146e3ebe4d89861a91335e15aca410740c8182b848355f3ed09df95888a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_cool_3.vmdl_c",
+        "bytes": 65794,
+        "archive_index": 32767,
+        "expected_crc32": 4111554472,
+        "actual_crc32": 4111554472,
+        "crc_matches": true,
+        "sha256": "b0d3094bb96f75c94304a0228ea41fa80d3824649cb3206f6beb8c01c73e0b63"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_cool_2.vmdl_c",
+        "bytes": 10098,
+        "archive_index": 32767,
+        "expected_crc32": 2462396742,
+        "actual_crc32": 2462396742,
+        "crc_matches": true,
+        "sha256": "ea2de12369bb8458397e33bc28b185cd99aafec2f66d9fe206f51f247c6f97e7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_cool_1.vmdl_c",
+        "bytes": 55650,
+        "archive_index": 32767,
+        "expected_crc32": 3135852297,
+        "actual_crc32": 3135852297,
+        "crc_matches": true,
+        "sha256": "d2c71ee5d9b15adf6ecc70f7de31178b3b3a8c4dccc970b4123575fa0da5562a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_cool_0.vmdl_c",
+        "bytes": 65810,
+        "archive_index": 32767,
+        "expected_crc32": 3501188041,
+        "actual_crc32": 3501188041,
+        "crc_matches": true,
+        "sha256": "d1ecd57d5bbc04a5d4a7c7436059fd3f40d85ee2a4f11b2e87401fd12a74862b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_5.vmdl_c",
+        "bytes": 70478,
+        "archive_index": 32767,
+        "expected_crc32": 2002896105,
+        "actual_crc32": 2002896105,
+        "crc_matches": true,
+        "sha256": "2e143478326ea8357b362d1e9b6e17b04d0cd54a9221801d9de29eeb144d1437"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_4.vmdl_c",
+        "bytes": 72558,
+        "archive_index": 32767,
+        "expected_crc32": 1517712787,
+        "actual_crc32": 1517712787,
+        "crc_matches": true,
+        "sha256": "df03c2de8bb7a748cd48410ff6f4060cb3e997b5689b3a81bb06bc7412e54390"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_3.vmdl_c",
+        "bytes": 627182,
+        "archive_index": 32767,
+        "expected_crc32": 972540954,
+        "actual_crc32": 972540954,
+        "crc_matches": true,
+        "sha256": "95bd551151bce87f796c9abddd2843ef2c7212ff86f7fb228627d36aabffbd28"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_2.vmdl_c",
+        "bytes": 424110,
+        "archive_index": 32767,
+        "expected_crc32": 583798448,
+        "actual_crc32": 583798448,
+        "crc_matches": true,
+        "sha256": "9e2a47b4343e7e259e379929e359bb9936501f4d023aec8cde8a8fd98d9b1f4d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_1.vmdl_c",
+        "bytes": 25870,
+        "archive_index": 32767,
+        "expected_crc32": 548961808,
+        "actual_crc32": 548961808,
+        "crc_matches": true,
+        "sha256": "428132d917c133a3908ff248eef3e26dbbe3f5a20fa5d84045cf17174018858e"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_stone_0.vmdl_c",
+        "bytes": 76254,
+        "archive_index": 32767,
+        "expected_crc32": 3329827935,
+        "actual_crc32": 3329827935,
+        "crc_matches": true,
+        "sha256": "1f0876e3ae91cb1b825c1916983850be88fabfdac26a90accc63e4a4a0171cda"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_snow_debris001_0.vmdl_c",
+        "bytes": 9926,
+        "archive_index": 32767,
+        "expected_crc32": 2504526160,
+        "actual_crc32": 2504526160,
+        "crc_matches": true,
+        "sha256": "ec176a0a700ef8d8ddebcc0b9c0e8213b98111d6c3ddc2b27e229d3ff9cd028a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_snow_0.vmdl_c",
+        "bytes": 822318,
+        "archive_index": 32767,
+        "expected_crc32": 3743609997,
+        "actual_crc32": 3743609997,
+        "crc_matches": true,
+        "sha256": "c9bad1dcc78d383b2e45285f57fe6c6cf24c8dcbb19fe1787bced1df937c903f"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_slate_wet_0.vmdl_c",
+        "bytes": 552242,
+        "archive_index": 32767,
+        "expected_crc32": 1728993180,
+        "actual_crc32": 1728993180,
+        "crc_matches": true,
+        "sha256": "e041522b36a3d97cb62a8ceb070671194fb937ef1f6afc8dba90b148b99b37e9"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_slate_0.vmdl_c",
+        "bytes": 1090206,
+        "archive_index": 32767,
+        "expected_crc32": 4177472345,
+        "actual_crc32": 4177472345,
+        "crc_matches": true,
+        "sha256": "9560f019e794d9ac2d0172a9898163471a68c050ef3dd353387dc474b5ca625b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_silver_0.vmdl_c",
+        "bytes": 72766,
+        "archive_index": 32767,
+        "expected_crc32": 1058723235,
+        "actual_crc32": 1058723235,
+        "crc_matches": true,
+        "sha256": "007488566b18cadd2edf5f24ee8c0cbce28f6f36d4d7efa5f868dd4e78002b60"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_shell_sand_0.vmdl_c",
+        "bytes": 272946,
+        "archive_index": 32767,
+        "expected_crc32": 1443324186,
+        "actual_crc32": 1443324186,
+        "crc_matches": true,
+        "sha256": "b2594ce8f85f7b34a25ce920f6b8daf655c65017abcde7e10d263d278bcbbc51"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_schist_0.vmdl_c",
+        "bytes": 847630,
+        "archive_index": 32767,
+        "expected_crc32": 2851944303,
+        "actual_crc32": 2851944303,
+        "crc_matches": true,
+        "sha256": "a3f22c8f5ca00772c0858026813f2d03783650ea0b961c8682ded9c3684c8d5d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_sandstone_light_0.vmdl_c",
+        "bytes": 267446,
+        "archive_index": 32767,
+        "expected_crc32": 3223504562,
+        "actual_crc32": 3223504562,
+        "crc_matches": true,
+        "sha256": "87b5828b739d56e3c5ca8c8cf1c2f4ee4cb044e717234582578ceedefd20b6ee"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_sandstone_0.vmdl_c",
+        "bytes": 875810,
+        "archive_index": 32767,
+        "expected_crc32": 3214966831,
+        "actual_crc32": 3214966831,
+        "crc_matches": true,
+        "sha256": "56f9f3612d1f845fba1dea29f7534b62acea2e11dcc304ab0f87c8f2971731ae"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_sand_wet_0.vmdl_c",
+        "bytes": 268978,
+        "archive_index": 32767,
+        "expected_crc32": 130894634,
+        "actual_crc32": 130894634,
+        "crc_matches": true,
+        "sha256": "66139ea9b247efd321aad69d879e89695073366f857ad914407f5130442b494f"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_sand_0.vmdl_c",
+        "bytes": 17342,
+        "archive_index": 32767,
+        "expected_crc32": 3093206337,
+        "actual_crc32": 3093206337,
+        "crc_matches": true,
+        "sha256": "ed42695a8a43b55fb7da8a32fa909f945a6bf332558287de73c82798967fcd52"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_rock_wet_0.vmdl_c",
+        "bytes": 795730,
+        "archive_index": 32767,
+        "expected_crc32": 380454641,
+        "actual_crc32": 380454641,
+        "crc_matches": true,
+        "sha256": "6817eb7ebb7451dc4c4d5a944fb788b7a5f642377587a927a4ca4a01033587bf"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_rock_4.vmdl_c",
+        "bytes": 36062,
+        "archive_index": 32767,
+        "expected_crc32": 26797239,
+        "actual_crc32": 26797239,
+        "crc_matches": true,
+        "sha256": "65fb37f64531bb346abc5e8d6d31a03d515b11cba78cc9df0fec1a955a7c7731"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_rock_3.vmdl_c",
+        "bytes": 36062,
+        "archive_index": 32767,
+        "expected_crc32": 432115865,
+        "actual_crc32": 432115865,
+        "crc_matches": true,
+        "sha256": "4b767d1131e9f8a067f413e60195a1133fbd1dd154131d72a3813a99ac5badcd"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_rock_2.vmdl_c",
+        "bytes": 40334,
+        "archive_index": 32767,
+        "expected_crc32": 2314299270,
+        "actual_crc32": 2314299270,
+        "crc_matches": true,
+        "sha256": "67ae982dab82a5bc5b3934c68740aef33a07b95635945d1e8f232e283937ab29"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_rock_1.vmdl_c",
+        "bytes": 925182,
+        "archive_index": 32767,
+        "expected_crc32": 2786511395,
+        "actual_crc32": 2786511395,
+        "crc_matches": true,
+        "sha256": "6cd5000912906c85907fd2e613c53a5d4eb39c93dc3fa9c9d936f1e0a8fe6ce5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_rock_0.vmdl_c",
+        "bytes": 40318,
+        "archive_index": 32767,
+        "expected_crc32": 751636338,
+        "actual_crc32": 751636338,
+        "crc_matches": true,
+        "sha256": "85fdd6bd60f6a27d005e828a86a6d93e732457e811929c23bba9b947c8672b59"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_riveredge_rocks_small_0.vmdl_c",
+        "bytes": 7452,
+        "archive_index": 32767,
+        "expected_crc32": 3098231891,
+        "actual_crc32": 3098231891,
+        "crc_matches": true,
+        "sha256": "3da75a0a92c7da31565480cb042347f4a107b565b195bf1e53134bfa25f5e195"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_river_rocks001_0.vmdl_c",
+        "bytes": 22756,
+        "archive_index": 32767,
+        "expected_crc32": 2700373909,
+        "actual_crc32": 2700373909,
+        "crc_matches": true,
+        "sha256": "51494ff3b5da6577d118a6daef5f98ca1a346701e2b6c45af30ba9caefe2c916"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_redstone_light_0.vmdl_c",
+        "bytes": 296518,
+        "archive_index": 32767,
+        "expected_crc32": 3597821632,
+        "actual_crc32": 3597821632,
+        "crc_matches": true,
+        "sha256": "51ff324a9a0a36ec3d0e69274acfa2f8c8b73486ec3eaa3e59612c67d52ccc15"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_redstone_0.vmdl_c",
+        "bytes": 1074242,
+        "archive_index": 32767,
+        "expected_crc32": 120106300,
+        "actual_crc32": 120106300,
+        "crc_matches": true,
+        "sha256": "54ae2b9cf04a9ac38f21c6425f184938cf28fa130319b3806dc63d51e108c4e6"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_red_gravel_0.vmdl_c",
+        "bytes": 262306,
+        "archive_index": 32767,
+        "expected_crc32": 36036276,
+        "actual_crc32": 36036276,
+        "crc_matches": true,
+        "sha256": "d964ff4439b42189970fde09ac84e4235b6b189704d678266f3ee26b77f1afb7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_red_cloth_0.vmdl_c",
+        "bytes": 6258,
+        "archive_index": 32767,
+        "expected_crc32": 3574942825,
+        "actual_crc32": 3574942825,
+        "crc_matches": true,
+        "sha256": "2568cc4d9295d79adf3c9b3c10e4d1059402faf923f3f8170c14493858078627"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_ramps001_0.vmdl_c",
+        "bytes": 54082,
+        "archive_index": 32767,
+        "expected_crc32": 1887598828,
+        "actual_crc32": 1887598828,
+        "crc_matches": true,
+        "sha256": "2645a44d7f68d8574d9c8804597aed04da1dc18389032c5c57940312573d1b55"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_quartz_0.vmdl_c",
+        "bytes": 182046,
+        "archive_index": 32767,
+        "expected_crc32": 543845287,
+        "actual_crc32": 543845287,
+        "crc_matches": true,
+        "sha256": "98bd0bb9fdad04f9287efb9ef9debd17357e37767d8d089bce3fa0d110ec3395"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_plants_jungle_001_0.vmdl_c",
+        "bytes": 21210,
+        "archive_index": 32767,
+        "expected_crc32": 144513769,
+        "actual_crc32": 144513769,
+        "crc_matches": true,
+        "sha256": "e055a26364e129286e4cacf12edc8c95ca9b6b037f4b9ea88ea33d741190fca7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_plants_journey_001_0.vmdl_c",
+        "bytes": 17962,
+        "archive_index": 32767,
+        "expected_crc32": 204141687,
+        "actual_crc32": 204141687,
+        "crc_matches": true,
+        "sha256": "0e3674522657ac3bead54648e185d8590f46092c8eb9944bb28a1f5287b2e12b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_plants001_snow_0.vmdl_c",
+        "bytes": 18742,
+        "archive_index": 32767,
+        "expected_crc32": 2479212597,
+        "actual_crc32": 2479212597,
+        "crc_matches": true,
+        "sha256": "f3ac7fb02e452f9079ea79849477911eba4cb6e39b580297be7f217090ec543d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_pink_light_0.vmdl_c",
+        "bytes": 175458,
+        "archive_index": 32767,
+        "expected_crc32": 2129205736,
+        "actual_crc32": 2129205736,
+        "crc_matches": true,
+        "sha256": "85588231244d69455eeea08b4a1eecfb35bc93ea0d96d6ab039fb6b7ab0283a0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_pink_0.vmdl_c",
+        "bytes": 55294,
+        "archive_index": 32767,
+        "expected_crc32": 2899842913,
+        "actual_crc32": 2899842913,
+        "crc_matches": true,
+        "sha256": "60e12dc33345370a2d82c66882dc82abad7f8c7f24a19568133fd6768891cd0b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_peat_0.vmdl_c",
+        "bytes": 18158,
+        "archive_index": 32767,
+        "expected_crc32": 4267076702,
+        "actual_crc32": 4267076702,
+        "crc_matches": true,
+        "sha256": "66089365d5353e2597ec5ee2c8f6f395a26a2eed83c2419266052ae9673f3590"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mud_0.vmdl_c",
+        "bytes": 275450,
+        "archive_index": 32767,
+        "expected_crc32": 1804826676,
+        "actual_crc32": 1804826676,
+        "crc_matches": true,
+        "sha256": "c580c7b886f1ac89688254198c9d2e738cc7ef647fea3d87563456ab16c20100"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_moss_4.vmdl_c",
+        "bytes": 38222,
+        "archive_index": 32767,
+        "expected_crc32": 2124598508,
+        "actual_crc32": 2124598508,
+        "crc_matches": true,
+        "sha256": "8f2f3d315f63cdda86b3268378d5771a85875362e0b97b9ebb28f0023013d0fa"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_moss_3.vmdl_c",
+        "bytes": 99406,
+        "archive_index": 32767,
+        "expected_crc32": 2705689819,
+        "actual_crc32": 2705689819,
+        "crc_matches": true,
+        "sha256": "79cfd143de465255b034453c0a26c9568ecfac623403a4594e63210099cdc079"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_moss_2.vmdl_c",
+        "bytes": 99422,
+        "archive_index": 32767,
+        "expected_crc32": 3053096622,
+        "actual_crc32": 3053096622,
+        "crc_matches": true,
+        "sha256": "f5a2297ffa112a271c94de5c02fc331fc53394479869179ea62de825c2a80626"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_moss_1.vmdl_c",
+        "bytes": 99390,
+        "archive_index": 32767,
+        "expected_crc32": 2852566911,
+        "actual_crc32": 2852566911,
+        "crc_matches": true,
+        "sha256": "a60d61127ceaa0cfb69974975317b2207d94251c6d7a05e95e759bf5830e7325"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_moss_0.vmdl_c",
+        "bytes": 1256222,
+        "archive_index": 32767,
+        "expected_crc32": 407361029,
+        "actual_crc32": 407361029,
+        "crc_matches": true,
+        "sha256": "00daf3a8c64e76fe5fae6427065d14e106bded3972845ebbc02a5dcc230dec41"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mortar_4.vmdl_c",
+        "bytes": 17070,
+        "archive_index": 32767,
+        "expected_crc32": 2194033670,
+        "actual_crc32": 2194033670,
+        "crc_matches": true,
+        "sha256": "d0991aa5f33c6888f3bea78c563c4350f2bbbc943274a42f4121a45c2a6a6e2c"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mortar_3.vmdl_c",
+        "bytes": 42078,
+        "archive_index": 32767,
+        "expected_crc32": 3608217314,
+        "actual_crc32": 3608217314,
+        "crc_matches": true,
+        "sha256": "d34f121b2e6b2f877e0287973cf302bfcdc606f57b17590f7bd7f8aa04f65d06"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mortar_2.vmdl_c",
+        "bytes": 23678,
+        "archive_index": 32767,
+        "expected_crc32": 4057235032,
+        "actual_crc32": 4057235032,
+        "crc_matches": true,
+        "sha256": "eaf2cec50a7d24d8a1d6d5680545b67ca7c437d44b6c826d079ca3ccdb94d283"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mortar_1.vmdl_c",
+        "bytes": 23710,
+        "archive_index": 32767,
+        "expected_crc32": 486385670,
+        "actual_crc32": 486385670,
+        "crc_matches": true,
+        "sha256": "6896f1eee08e549b33faf32bc3ebf2772826aecce126366831ec86cc67d43e81"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mortar_0.vmdl_c",
+        "bytes": 23678,
+        "archive_index": 32767,
+        "expected_crc32": 3055134008,
+        "actual_crc32": 3055134008,
+        "crc_matches": true,
+        "sha256": "9fc2a7328195880e300f9726bcdea16b55f0b66c7e9e5dca5fcd0fd622502772"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mineral_stone_0.vmdl_c",
+        "bytes": 223238,
+        "archive_index": 32767,
+        "expected_crc32": 2614606297,
+        "actual_crc32": 2614606297,
+        "crc_matches": true,
+        "sha256": "3682ee6e51f7e660141e695c7926cd8ea13a3ccc3f795cdcc9ba4831460f5926"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mineral_dark_1.vmdl_c",
+        "bytes": 23990,
+        "archive_index": 32767,
+        "expected_crc32": 1110386652,
+        "actual_crc32": 1110386652,
+        "crc_matches": true,
+        "sha256": "abbff6338b933099a1954a56bc4075da65ea463089d9af4b6f3cf473c02b61f2"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mineral_dark_0.vmdl_c",
+        "bytes": 35798,
+        "archive_index": 32767,
+        "expected_crc32": 2555547601,
+        "actual_crc32": 2555547601,
+        "crc_matches": true,
+        "sha256": "b7d681169fde557e1d0b0fbac39b75e142a9ddf2adbba372f4992b6ab9f45282"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mineral_1.vmdl_c",
+        "bytes": 16606,
+        "archive_index": 32767,
+        "expected_crc32": 678708442,
+        "actual_crc32": 678708442,
+        "crc_matches": true,
+        "sha256": "df5e84bdfb5983b101cce7ee1f70f750048f4eda344d054cd2fad9ec0a7b9b3b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_mineral_0.vmdl_c",
+        "bytes": 14926,
+        "archive_index": 32767,
+        "expected_crc32": 3287123034,
+        "actual_crc32": 3287123034,
+        "crc_matches": true,
+        "sha256": "44982a7d926680e75a70fc2c776270e08b50e0034e9366aa4239f31e7ce125d0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_metal_light_1.vmdl_c",
+        "bytes": 66546,
+        "archive_index": 32767,
+        "expected_crc32": 3408768729,
+        "actual_crc32": 3408768729,
+        "crc_matches": true,
+        "sha256": "8d2aa532252568fd843c1c61c01a2b66880d2d3b8dbe3e58d0f9c6ffb6252a89"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_metal_light_0.vmdl_c",
+        "bytes": 48114,
+        "archive_index": 32767,
+        "expected_crc32": 2095585147,
+        "actual_crc32": 2095585147,
+        "crc_matches": true,
+        "sha256": "10ddee4d542296ac52bdf26074daacebc48503d7245ce5a8a3a7168b1e4cbaab"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_log_end_01_0.vmdl_c",
+        "bytes": 5058,
+        "archive_index": 32767,
+        "expected_crc32": 2901005296,
+        "actual_crc32": 2901005296,
+        "crc_matches": true,
+        "sha256": "c3056aa23ae2c1c800458ee732e0e150e37752db8941b7cc2782cb36f91e8890"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_log002_0.vmdl_c",
+        "bytes": 12878,
+        "archive_index": 32767,
+        "expected_crc32": 1515348223,
+        "actual_crc32": 1515348223,
+        "crc_matches": true,
+        "sha256": "b2401d1b63d60607f6e829074d218e9c2fa47417431b6b3ed30bfde1f7d50812"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_lilypad_ti10_01_0.vmdl_c",
+        "bytes": 5110,
+        "archive_index": 32767,
+        "expected_crc32": 521042424,
+        "actual_crc32": 521042424,
+        "crc_matches": true,
+        "sha256": "0ae1146b284cdf2a05821cc56456dca7c0d0e10a29d20204a6a3bba08e098abf"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_lily_flower_00_0.vmdl_c",
+        "bytes": 10294,
+        "archive_index": 32767,
+        "expected_crc32": 268549102,
+        "actual_crc32": 268549102,
+        "crc_matches": true,
+        "sha256": "739914721466cb481d9daad0740f3a14bd84f0170e46c5c66593d85dab41851c"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_light_4.vmdl_c",
+        "bytes": 3220626,
+        "archive_index": 32767,
+        "expected_crc32": 827559551,
+        "actual_crc32": 827559551,
+        "crc_matches": true,
+        "sha256": "d3d3ff28ee8bc7544d2b6406edaf2ebfd2416526aab12e8d1e5b938d08fdf1b4"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_light_3.vmdl_c",
+        "bytes": 53618,
+        "archive_index": 32767,
+        "expected_crc32": 1773000925,
+        "actual_crc32": 1773000925,
+        "crc_matches": true,
+        "sha256": "9df4ddc660016293f4e2b5a90387f63ab10124f097ca88a781d89c478584e6fe"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_light_2.vmdl_c",
+        "bytes": 53650,
+        "archive_index": 32767,
+        "expected_crc32": 3026291212,
+        "actual_crc32": 3026291212,
+        "crc_matches": true,
+        "sha256": "88175daa760f5dbaf973c68bd1a085c6e94ca753ba50f59a0c7a6ae6876e9469"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_light_1.vmdl_c",
+        "bytes": 53650,
+        "archive_index": 32767,
+        "expected_crc32": 1862322124,
+        "actual_crc32": 1862322124,
+        "crc_matches": true,
+        "sha256": "a2d6635346d1b759ee0c95899da8ace6a9a6a756adf120f68447d46604bb4f4c"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_light_0.vmdl_c",
+        "bytes": 53618,
+        "archive_index": 32767,
+        "expected_crc32": 2359328693,
+        "actual_crc32": 2359328693,
+        "crc_matches": true,
+        "sha256": "8ea6217310483f1a6803563bf808f219e3d1d2b7956700678e37158307081fd8"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_dark_4.vmdl_c",
+        "bytes": 30754,
+        "archive_index": 32767,
+        "expected_crc32": 226395050,
+        "actual_crc32": 226395050,
+        "crc_matches": true,
+        "sha256": "f966f474a9438ec7595c69b9b5c7686f0e9c84610b1351a190d4b7f283fdfbe7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_dark_3.vmdl_c",
+        "bytes": 30722,
+        "archive_index": 32767,
+        "expected_crc32": 611804621,
+        "actual_crc32": 611804621,
+        "crc_matches": true,
+        "sha256": "174aebc8a7abe3e9df1a747ae3a731b08c5ba20b2c3ef62f5a9a4228e13145a9"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_dark_2.vmdl_c",
+        "bytes": 30722,
+        "archive_index": 32767,
+        "expected_crc32": 18539506,
+        "actual_crc32": 18539506,
+        "crc_matches": true,
+        "sha256": "a0589519ebe9f36b99c83526a780e57cb3e6a2e7012174f756ca8bb4684574b3"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_dark_1.vmdl_c",
+        "bytes": 1992418,
+        "archive_index": 32767,
+        "expected_crc32": 4036366938,
+        "actual_crc32": 4036366938,
+        "crc_matches": true,
+        "sha256": "a12b4b4215d824daa3e677eaa6a0cb9d9db61881fe8a4f1d0e9ffb263353f32c"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_dark_0.vmdl_c",
+        "bytes": 30754,
+        "archive_index": 32767,
+        "expected_crc32": 2265819548,
+        "actual_crc32": 2265819548,
+        "crc_matches": true,
+        "sha256": "cb13a99b2641c8ab1ca6e1169b4370e99269d44f8d5794c92382cbe5b1d3b8e5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_4.vmdl_c",
+        "bytes": 29726,
+        "archive_index": 32767,
+        "expected_crc32": 2563097574,
+        "actual_crc32": 2563097574,
+        "crc_matches": true,
+        "sha256": "1caadcf16ef98d3bdb709744ed01b0d210c7f05e3fe4551761baf2b5f390e75e"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_3.vmdl_c",
+        "bytes": 29694,
+        "archive_index": 32767,
+        "expected_crc32": 2033330547,
+        "actual_crc32": 2033330547,
+        "crc_matches": true,
+        "sha256": "a90eee761e93e3c56d9a014da8ac3c2815d43e4ccd276675a5309c5c2849a931"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_2.vmdl_c",
+        "bytes": 29694,
+        "archive_index": 32767,
+        "expected_crc32": 547138733,
+        "actual_crc32": 547138733,
+        "crc_matches": true,
+        "sha256": "c92d3d4ca6ca549f0f17cccece51219074cb7d72dd25aa17d5d9dc41b3a7011b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_1.vmdl_c",
+        "bytes": 1452654,
+        "archive_index": 32767,
+        "expected_crc32": 675351034,
+        "actual_crc32": 675351034,
+        "crc_matches": true,
+        "sha256": "b7a5a0e413d4f7fc371d44d6c2a171b706b1ae2fb13201b31cd46caeeb419824"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_leaf_0.vmdl_c",
+        "bytes": 29694,
+        "archive_index": 32767,
+        "expected_crc32": 2395639722,
+        "actual_crc32": 2395639722,
+        "crc_matches": true,
+        "sha256": "831514bf9cadf5cd88b5d268ce86ee8997baaa3504a92bfc731cf1de1264e1aa"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_jungle_temple_wall01_0.vmdl_c",
+        "bytes": 168414,
+        "archive_index": 32767,
+        "expected_crc32": 3365250599,
+        "actual_crc32": 3365250599,
+        "crc_matches": true,
+        "sha256": "6cf746ecaae13b9c2371b87fac2d060acd8437137358bd2364172cb8acaa1cea"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_jungle_temple_upperwall01_0.vmdl_c",
+        "bytes": 19682,
+        "archive_index": 32767,
+        "expected_crc32": 1993564039,
+        "actual_crc32": 1993564039,
+        "crc_matches": true,
+        "sha256": "28e6ff0f2607ddefb50ce6cf0d6028d15d771ca143b54db9390f33d63d7b8863"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_jungle_temple_statue_01_0.vmdl_c",
+        "bytes": 9630,
+        "archive_index": 32767,
+        "expected_crc32": 2116537958,
+        "actual_crc32": 2116537958,
+        "crc_matches": true,
+        "sha256": "6e58fa8fdcdc0951596b5ec571138fc28fc383d331d98dcbddfc5a1ca27b7534"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_jungle_temple_rubble_0.vmdl_c",
+        "bytes": 49694,
+        "archive_index": 32767,
+        "expected_crc32": 1048035497,
+        "actual_crc32": 1048035497,
+        "crc_matches": true,
+        "sha256": "0ff8febba00a2e5922dacbc1942ae0d7f12fcf725e3de992ff20f922fcd5a417"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_jungle_temple_endpiece_0.vmdl_c",
+        "bytes": 8878,
+        "archive_index": 32767,
+        "expected_crc32": 3419912600,
+        "actual_crc32": 3419912600,
+        "crc_matches": true,
+        "sha256": "d531cb2597146bc93e3fcd388b4d4defc5f99ed9639342c3d7600671223eb620"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_jungle_temple_corner01_0.vmdl_c",
+        "bytes": 43518,
+        "archive_index": 32767,
+        "expected_crc32": 3907101942,
+        "actual_crc32": 3907101942,
+        "crc_matches": true,
+        "sha256": "6fd749760d5cc5588fe7a0b6c0175c61f1b9337f074d4f412368c88101bd9b60"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_journey_ivy001_0.vmdl_c",
+        "bytes": 11318,
+        "archive_index": 32767,
+        "expected_crc32": 3949071291,
+        "actual_crc32": 3949071291,
+        "crc_matches": true,
+        "sha256": "cf09d42b549e8f4c7b4f97536fab40e624467907182b474d7f1dc72f29088f89"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_jade_light_0.vmdl_c",
+        "bytes": 798770,
+        "archive_index": 32767,
+        "expected_crc32": 4098307543,
+        "actual_crc32": 4098307543,
+        "crc_matches": true,
+        "sha256": "4abcb096c31581f9b10cd81968b98fea959b89c302d11fadea7207851885af87"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_jade_0.vmdl_c",
+        "bytes": 625598,
+        "archive_index": 32767,
+        "expected_crc32": 1268897395,
+        "actual_crc32": 1268897395,
+        "crc_matches": true,
+        "sha256": "6949e9188f0e447172b1d231039e03801effa901dec199d771ed72d852dbc36d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_ivory_light_0.vmdl_c",
+        "bytes": 170434,
+        "archive_index": 32767,
+        "expected_crc32": 3857076858,
+        "actual_crc32": 3857076858,
+        "crc_matches": true,
+        "sha256": "f5bdaad8f61eb0ee70fcb504490ab81ef50f6dd7d05b7b133dbf6d03f5b295fc"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_ivory_1.vmdl_c",
+        "bytes": 710702,
+        "archive_index": 32767,
+        "expected_crc32": 2123853852,
+        "actual_crc32": 2123853852,
+        "crc_matches": true,
+        "sha256": "692fd2d70ff0b0e121dcbdae422089c4bc2902698ad5638ddb908cd73adbdd2d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_ivory_0.vmdl_c",
+        "bytes": 709470,
+        "archive_index": 32767,
+        "expected_crc32": 4029461719,
+        "actual_crc32": 4029461719,
+        "crc_matches": true,
+        "sha256": "ec9e41c4925140ae4639aa707fe259e5d9dbee77f945b66f919ec11fdfa39c11"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_iron_2.vmdl_c",
+        "bytes": 56366,
+        "archive_index": 32767,
+        "expected_crc32": 3381629237,
+        "actual_crc32": 3381629237,
+        "crc_matches": true,
+        "sha256": "05d8003c2e38c4f2c9d34dd27a7efb7e9f646538002e81a76def5d028242d06a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_iron_1.vmdl_c",
+        "bytes": 234846,
+        "archive_index": 32767,
+        "expected_crc32": 103785838,
+        "actual_crc32": 103785838,
+        "crc_matches": true,
+        "sha256": "24972fa74130f5dde487622d62b6dcebb8f77de4cf45038e03ef19ed18d98e04"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_iron_0.vmdl_c",
+        "bytes": 44014,
+        "archive_index": 32767,
+        "expected_crc32": 1092222344,
+        "actual_crc32": 1092222344,
+        "crc_matches": true,
+        "sha256": "f741af797bdbbadbd1903684e330e0b26a6080262a1b6dbb9f9f528512330a59"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_ice_0.vmdl_c",
+        "bytes": 394810,
+        "archive_index": 32767,
+        "expected_crc32": 3502098719,
+        "actual_crc32": 3502098719,
+        "crc_matches": true,
+        "sha256": "2a306c9c62347ef3567fdb9ee48a1feabd32a670eb0c7ef937c762ea91794d53"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_gold_5.vmdl_c",
+        "bytes": 1398974,
+        "archive_index": 32767,
+        "expected_crc32": 217392927,
+        "actual_crc32": 217392927,
+        "crc_matches": true,
+        "sha256": "5e220fcd824aade00e5589867643be3aa72ee1c3d62ac01da80b9133e604d8c8"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_gold_4.vmdl_c",
+        "bytes": 167198,
+        "archive_index": 32767,
+        "expected_crc32": 3656961574,
+        "actual_crc32": 3656961574,
+        "crc_matches": true,
+        "sha256": "235c686f76ed5a67b106a70aaae97a8e9e17a49d193845bc6d912a60d4e4c2ee"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_gold_3.vmdl_c",
+        "bytes": 107614,
+        "archive_index": 32767,
+        "expected_crc32": 2388782010,
+        "actual_crc32": 2388782010,
+        "crc_matches": true,
+        "sha256": "fd77a191bca4e4b8b0b5378dd17fc78ab6b7bc4c09c5759c4df03afadf5dfb6b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_gold_2.vmdl_c",
+        "bytes": 1132238,
+        "archive_index": 32767,
+        "expected_crc32": 471301245,
+        "actual_crc32": 471301245,
+        "crc_matches": true,
+        "sha256": "43cf5d985f2e82d00839f15837dd40d9f1f75f5ae346d4bb48309f2f2404de71"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_gold_1.vmdl_c",
+        "bytes": 108334,
+        "archive_index": 32767,
+        "expected_crc32": 1962513547,
+        "actual_crc32": 1962513547,
+        "crc_matches": true,
+        "sha256": "5c5cb010a55dd5aa2be9970aedf14b5467884fa7c14c309996135f50b9048866"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_gold_0.vmdl_c",
+        "bytes": 46798,
+        "archive_index": 32767,
+        "expected_crc32": 2067545266,
+        "actual_crc32": 2067545266,
+        "crc_matches": true,
+        "sha256": "3f04a4b8711b6e6df552df74772f81834218a76abe3935d81e48046faa7bc657"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_forest_earth_0.vmdl_c",
+        "bytes": 25878,
+        "archive_index": 32767,
+        "expected_crc32": 801343823,
+        "actual_crc32": 801343823,
+        "crc_matches": true,
+        "sha256": "f99773629e45c42f48ae4fd35cda8bd5bb4408088d780a1ad2471853893872cc"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_foam_0.vmdl_c",
+        "bytes": 94398,
+        "archive_index": 32767,
+        "expected_crc32": 3803470455,
+        "actual_crc32": 3803470455,
+        "crc_matches": true,
+        "sha256": "7d010b4fdb699387c9fda2ad322394f6fcb4fee119e28ce4e1c3388af8cc35f0"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_flowers_ti10_01_0.vmdl_c",
+        "bytes": 6646,
+        "archive_index": 32767,
+        "expected_crc32": 1284238137,
+        "actual_crc32": 1284238137,
+        "crc_matches": true,
+        "sha256": "f441da56e6cdda11e18baa8ac94b4614f157c2475fd42fd3866134ae7f6b9319"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_flowers_01_0.vmdl_c",
+        "bytes": 5874,
+        "archive_index": 32767,
+        "expected_crc32": 669154086,
+        "actual_crc32": 669154086,
+        "crc_matches": true,
+        "sha256": "c01f08c1262eb1426e869cad8534d74a71f3dc9f3823357cad3d1d051c7f6b2d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_flower_set_0.vmdl_c",
+        "bytes": 7410,
+        "archive_index": 32767,
+        "expected_crc32": 22062006,
+        "actual_crc32": 22062006,
+        "crc_matches": true,
+        "sha256": "ffdad3195b8847c8dfaad4a2a67e70c64052462d0adda71e772defbf196615ff"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_flower_4.vmdl_c",
+        "bytes": 9742,
+        "archive_index": 32767,
+        "expected_crc32": 372741797,
+        "actual_crc32": 372741797,
+        "crc_matches": true,
+        "sha256": "8623d096c0a967617d238b95b9ddffdfb3c48072f82cc0a1aeaab046121c878e"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_flower_3.vmdl_c",
+        "bytes": 9710,
+        "archive_index": 32767,
+        "expected_crc32": 874630629,
+        "actual_crc32": 874630629,
+        "crc_matches": true,
+        "sha256": "e5b99774f00b185ac4bb9f53d9f2624f4f24802c200a6ca0b554a511da7b402a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_flower_2.vmdl_c",
+        "bytes": 9726,
+        "archive_index": 32767,
+        "expected_crc32": 2262681089,
+        "actual_crc32": 2262681089,
+        "crc_matches": true,
+        "sha256": "cd1d4b8accd585a7ce634e5b699caf908fc236d162f5da5ab59b89ebd409354d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_flower_1.vmdl_c",
+        "bytes": 146590,
+        "archive_index": 32767,
+        "expected_crc32": 4249296112,
+        "actual_crc32": 4249296112,
+        "crc_matches": true,
+        "sha256": "f1347145be0643747c0abf3409de5b81318fc12930602bc0c0585dfd83e464d7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_flower_0.vmdl_c",
+        "bytes": 9710,
+        "archive_index": 32767,
+        "expected_crc32": 1095922485,
+        "actual_crc32": 1095922485,
+        "crc_matches": true,
+        "sha256": "e06a9d2ba741e9bf65655e1ca6b01f9d6874b2f3e685cb713916f2422f6d223b"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_earth_edge_0.vmdl_c",
+        "bytes": 160546,
+        "archive_index": 32767,
+        "expected_crc32": 538201072,
+        "actual_crc32": 538201072,
+        "crc_matches": true,
+        "sha256": "e7cf135b54e6ff13984373912c034b2566cb1ce11206c2df71d940bae3252c00"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_earth_4.vmdl_c",
+        "bytes": 7374,
+        "archive_index": 32767,
+        "expected_crc32": 1133368911,
+        "actual_crc32": 1133368911,
+        "crc_matches": true,
+        "sha256": "003a26bdef03698cd5231733fc90d6d08900b77afe7e702f2dc4574e2080d318"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_earth_3.vmdl_c",
+        "bytes": 11406,
+        "archive_index": 32767,
+        "expected_crc32": 3224364679,
+        "actual_crc32": 3224364679,
+        "crc_matches": true,
+        "sha256": "d2e796070115ae14a42f0267d2ef467bd7e933386be2630417d8ae37d199a45a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_earth_2.vmdl_c",
+        "bytes": 11390,
+        "archive_index": 32767,
+        "expected_crc32": 2388807755,
+        "actual_crc32": 2388807755,
+        "crc_matches": true,
+        "sha256": "2b8c1b45bb0b6e9993e22c0400ca631add643066fa06dfe6b153765fd1ee2f08"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_earth_1.vmdl_c",
+        "bytes": 11374,
+        "archive_index": 32767,
+        "expected_crc32": 286896090,
+        "actual_crc32": 286896090,
+        "crc_matches": true,
+        "sha256": "41493d84f737031f4d06eda43f77dfd4fa7a76335b0178a3935fa5937fb85676"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_earth_0.vmdl_c",
+        "bytes": 11374,
+        "archive_index": 32767,
+        "expected_crc32": 2913946824,
+        "actual_crc32": 2913946824,
+        "crc_matches": true,
+        "sha256": "c618b54e7f1d32617429ba5eaf08dd9e8abe5d7013a8bec982ee6afe87ac3e97"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_dressed_stone_0.vmdl_c",
+        "bytes": 513350,
+        "archive_index": 32767,
+        "expected_crc32": 1624343249,
+        "actual_crc32": 1624343249,
+        "crc_matches": true,
+        "sha256": "b54a1cd8aa5825bdb2ec252c2e6ef1571c4229c84f4b3c09adf4d2f8d3324b65"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_crystal_0.vmdl_c",
+        "bytes": 8174,
+        "archive_index": 32767,
+        "expected_crc32": 2906107381,
+        "actual_crc32": 2906107381,
+        "crc_matches": true,
+        "sha256": "5a9ef23a6e83cf085015f70829340b54e2bba097394f6d943235cf7f94c660c9"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_crypt_statue_01_0.vmdl_c",
+        "bytes": 32086,
+        "archive_index": 32767,
+        "expected_crc32": 1938250625,
+        "actual_crc32": 1938250625,
+        "crc_matches": true,
+        "sha256": "e4385ab3327a68bc33c2dca28139378e73a352e62d3cd2d73ae54e150026a34d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_crypt_door_01_0.vmdl_c",
+        "bytes": 11766,
+        "archive_index": 32767,
+        "expected_crc32": 670761613,
+        "actual_crc32": 670761613,
+        "crc_matches": true,
+        "sha256": "e4501be8b17c17710ea33c7720c4522578255513d70e52c011b001bbbc98bfc5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_coral_light_0.vmdl_c",
+        "bytes": 378226,
+        "archive_index": 32767,
+        "expected_crc32": 2587802215,
+        "actual_crc32": 2587802215,
+        "crc_matches": true,
+        "sha256": "97f50f692a5f5fbb3f9fa9876efb0b49e2f7023189834df8d213f36f17b3cdcd"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_coral_0.vmdl_c",
+        "bytes": 1000782,
+        "archive_index": 32767,
+        "expected_crc32": 3643624840,
+        "actual_crc32": 3643624840,
+        "crc_matches": true,
+        "sha256": "aaec7f82c355a65a10a1137b21e59f9ae17d806eb5388fe5246eb427a089f6a1"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_cloud_shadow_0.vmdl_c",
+        "bytes": 384630,
+        "archive_index": 32767,
+        "expected_crc32": 84168258,
+        "actual_crc32": 84168258,
+        "crc_matches": true,
+        "sha256": "74dd5639a5bbe5e2948d718adf887e34c6f9ea9d15fcbc8c8f84718c5b8e0099"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_cloud_pearl_0.vmdl_c",
+        "bytes": 352562,
+        "archive_index": 32767,
+        "expected_crc32": 653342376,
+        "actual_crc32": 653342376,
+        "crc_matches": true,
+        "sha256": "b0af8559ea7b4c2514cff0b1791e323bcac070e3eca845e143e1d2434be728ad"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_cloud_0.vmdl_c",
+        "bytes": 667934,
+        "archive_index": 32767,
+        "expected_crc32": 3683437382,
+        "actual_crc32": 3683437382,
+        "crc_matches": true,
+        "sha256": "7e6f4ab94e2e382ec4944224141465df4c8246f27757c5f47ef1cfca33819ff7"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_candles003_0.vmdl_c",
+        "bytes": 21042,
+        "archive_index": 32767,
+        "expected_crc32": 1732420316,
+        "actual_crc32": 1732420316,
+        "crc_matches": true,
+        "sha256": "2d83d9779af7af6eb9ca122d056b8d2cd4e38ecbbc1812d34f253e9903499b84"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_candles001_0.vmdl_c",
+        "bytes": 25618,
+        "archive_index": 32767,
+        "expected_crc32": 840465455,
+        "actual_crc32": 840465455,
+        "crc_matches": true,
+        "sha256": "dc4b80cc2335f462dbe2cd06fb3ac20b6cbc4a6b853ea3ca3b0de52e81d43fa5"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_campfire_rocks001_0.vmdl_c",
+        "bytes": 9930,
+        "archive_index": 32767,
+        "expected_crc32": 2960131720,
+        "actual_crc32": 2960131720,
+        "crc_matches": true,
+        "sha256": "ec986c503fe5dfa3cf588965e85a92de72d242c5832b1aa9e608baf17d914b87"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bush_ti10_01_0.vmdl_c",
+        "bytes": 28006,
+        "archive_index": 32767,
+        "expected_crc32": 2821109949,
+        "actual_crc32": 2821109949,
+        "crc_matches": true,
+        "sha256": "0c0765aa9d979007c2fc61c30130910f19c9f0af1244c7e610fd3139c6485c05"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bush_spring_02_0.vmdl_c",
+        "bytes": 5958,
+        "archive_index": 32767,
+        "expected_crc32": 893351548,
+        "actual_crc32": 893351548,
+        "crc_matches": true,
+        "sha256": "cd75db58d5f0b1b747636eb41d8c2c0262acf50e2e5f10842e2f6599655f60aa"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bush_spring_01_0.vmdl_c",
+        "bytes": 6806,
+        "archive_index": 32767,
+        "expected_crc32": 914493518,
+        "actual_crc32": 914493518,
+        "crc_matches": true,
+        "sha256": "7203e7b773d56975ba05bc547293109c3200375e04a0636b27a989b5cc6b99d4"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bush_snow_00_0.vmdl_c",
+        "bytes": 8102,
+        "archive_index": 32767,
+        "expected_crc32": 3519709197,
+        "actual_crc32": 3519709197,
+        "crc_matches": true,
+        "sha256": "3412360aca59181bf91297eade52fba2ccbaa64237d26c26ae682e16c5483b9f"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bush_nettle_a_01_0.vmdl_c",
+        "bytes": 8266,
+        "archive_index": 32767,
+        "expected_crc32": 1188367925,
+        "actual_crc32": 1188367925,
+        "crc_matches": true,
+        "sha256": "82bdc3e144ee4ba872c124d1a794d79ca75c0e5964c36ef51dbee756a278931a"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bush_journey_02_0.vmdl_c",
+        "bytes": 9094,
+        "archive_index": 32767,
+        "expected_crc32": 3508808297,
+        "actual_crc32": 3508808297,
+        "crc_matches": true,
+        "sha256": "9a54e0567cdb7d2f62bee5e9a77f85c243a924b6f2afe23aa53bb8c17cf7f6ee"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bush_dire_summer_02_0.vmdl_c",
+        "bytes": 8122,
+        "archive_index": 32767,
+        "expected_crc32": 1395147524,
+        "actual_crc32": 1395147524,
+        "crc_matches": true,
+        "sha256": "42acad93589eaa5d6f884675086517216ab26f32a3ccd6fa8e588396d9620292"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bronze_5.vmdl_c",
+        "bytes": 99678,
+        "archive_index": 32767,
+        "expected_crc32": 4212032523,
+        "actual_crc32": 4212032523,
+        "crc_matches": true,
+        "sha256": "29fc03ad987b0580166f70da3da673a8b7ebbfef4f2f426a9c72a9db5bfd9801"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bronze_4.vmdl_c",
+        "bytes": 99662,
+        "archive_index": 32767,
+        "expected_crc32": 2209074957,
+        "actual_crc32": 2209074957,
+        "crc_matches": true,
+        "sha256": "63a5e478305a4fe01d376814947bbcabccdc0415f4836817902286535a0f5ece"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bronze_3.vmdl_c",
+        "bytes": 1574878,
+        "archive_index": 32767,
+        "expected_crc32": 1314763549,
+        "actual_crc32": 1314763549,
+        "crc_matches": true,
+        "sha256": "e9a3a67dd8ee6cd31ecfecef41a9d75a1532a055d200a81776dae23eacce1286"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bronze_2.vmdl_c",
+        "bytes": 140766,
+        "archive_index": 32767,
+        "expected_crc32": 3780825385,
+        "actual_crc32": 3780825385,
+        "crc_matches": true,
+        "sha256": "8e2d12410586de21064eeec9a392283156ae4b0a7bb54c3cd9b3a6d7ef939177"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bronze_1.vmdl_c",
+        "bytes": 136014,
+        "archive_index": 32767,
+        "expected_crc32": 2280593966,
+        "actual_crc32": 2280593966,
+        "crc_matches": true,
+        "sha256": "1d12a80227875ce4740c479f8e30bfa36a2e7717a548c9dec37dee8976cf3a71"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bronze_0.vmdl_c",
+        "bytes": 208654,
+        "archive_index": 32767,
+        "expected_crc32": 1007021705,
+        "actual_crc32": 1007021705,
+        "crc_matches": true,
+        "sha256": "0a913ba645dc53484e5ad7284a7725ec146bc5723a407fda2e4e39ba49819306"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bones_tintable_002_0.vmdl_c",
+        "bytes": 70024,
+        "archive_index": 32767,
+        "expected_crc32": 3304828544,
+        "actual_crc32": 3304828544,
+        "crc_matches": true,
+        "sha256": "0a615408a0f002aacfba2898c848f656cdbd5f5c49fd28262f2779c6da269ce1"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bone_0.vmdl_c",
+        "bytes": 419053,
+        "archive_index": 32767,
+        "expected_crc32": 3038417920,
+        "actual_crc32": 3038417920,
+        "crc_matches": true,
+        "sha256": "8fc81fb0efbc4d87bee53a38116c6507e933f9a9f2e8932bf032276b224fbab3"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_basalt_wet_0.vmdl_c",
+        "bytes": 284322,
+        "archive_index": 32767,
+        "expected_crc32": 2056471865,
+        "actual_crc32": 2056471865,
+        "crc_matches": true,
+        "sha256": "4e0a498426fa80095818c86c394b967b1b54adfe3235b9d6a05bd41b59afb5aa"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_basalt_0.vmdl_c",
+        "bytes": 876366,
+        "archive_index": 32767,
+        "expected_crc32": 894844365,
+        "actual_crc32": 894844365,
+        "crc_matches": true,
+        "sha256": "9f20035d675353009ea652ec69236f9ea80da569202f8701ecc5c9a1b2f693e1"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bark_1.vmdl_c",
+        "bytes": 623150,
+        "archive_index": 32767,
+        "expected_crc32": 3254504148,
+        "actual_crc32": 3254504148,
+        "crc_matches": true,
+        "sha256": "2fb794f607d2f6dc6b52eb553fa3449635e10e3352d263691be56b1e0fe3f0be"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_bark_0.vmdl_c",
+        "bytes": 11518,
+        "archive_index": 32767,
+        "expected_crc32": 2758862870,
+        "actual_crc32": 2758862870,
+        "crc_matches": true,
+        "sha256": "0864d18165bb34e347ab3fd00526e7f501e8898fd818c36a3ec92049811da3cc"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_prop_amethyst_0.vmdl_c",
+        "bytes": 417906,
+        "archive_index": 32767,
+        "expected_crc32": 2274846347,
+        "actual_crc32": 2274846347,
+        "crc_matches": true,
+        "sha256": "f2a35a699be8cf9d13eb26075958543128970335ec6e4ed3ef141c13a3f235b1"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_radiant_jungle_01_0.vmdl_c",
+        "bytes": 72826,
+        "archive_index": 32767,
+        "expected_crc32": 2363239939,
+        "actual_crc32": 2363239939,
+        "crc_matches": true,
+        "sha256": "ce36063a1605e2ea6d23948a9340d2a54254679adffe1add3b729ab5786b26b9"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_radiant_winter_riverbed_path_000_0.vmdl_c",
+        "bytes": 53404,
+        "archive_index": 32767,
+        "expected_crc32": 2634348850,
+        "actual_crc32": 2634348850,
+        "crc_matches": true,
+        "sha256": "91b3581acff9e03f9277867727d866b31f2e8f17b583d1ddf75217c72272428d"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_radiant_winter_path_000_0.vmdl_c",
+        "bytes": 345110,
+        "archive_index": 32767,
+        "expected_crc32": 1351923847,
+        "actual_crc32": 1351923847,
+        "crc_matches": true,
+        "sha256": "4dbbcf45125bd09f73f85a6940e32ccd2a67cc4bbba40f3a66267aae442f5413"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_radiant_winter_000_0.vmdl_c",
+        "bytes": 1018558,
+        "archive_index": 32767,
+        "expected_crc32": 2905943980,
+        "actual_crc32": 2905943980,
+        "crc_matches": true,
+        "sha256": "05a5d1fcf90536691dae53c237717bdcc1e3f0b3525c0c7dc13c28a58d875181"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_radiant_ti10_riverbed_path_000_0.vmdl_c",
+        "bytes": 1190872,
+        "archive_index": 32767,
+        "expected_crc32": 1708700108,
+        "actual_crc32": 1708700108,
+        "crc_matches": true,
+        "sha256": "857acc63f17f9b59c7db125e13856de8f8f1191542567eba39f178e520192e19"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_radiant_ti10_angled_000_0.vmdl_c",
+        "bytes": 188806,
+        "archive_index": 32767,
+        "expected_crc32": 687068945,
+        "actual_crc32": 687068945,
+        "crc_matches": true,
+        "sha256": "f57d6399c62766553157e51e3c4b4d0cef76c3dd28cbcbe3d533bf78ee3e04c3"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_radiant_coloseum_000_0.vmdl_c",
+        "bytes": 298402,
+        "archive_index": 32767,
+        "expected_crc32": 1186007319,
+        "actual_crc32": 1186007319,
+        "crc_matches": true,
+        "sha256": "3f74f29fc22ab27754e1e7909ccaa744fa2a03ecb8db732892c4e6b5aefcb282"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_dire_path_000_0.vmdl_c",
+        "bytes": 5850,
+        "archive_index": 32767,
+        "expected_crc32": 2132454933,
+        "actual_crc32": 2132454933,
+        "crc_matches": true,
+        "sha256": "d2da47dac195eb1a5c6881064322982fb7db0c49df3be7bc64461e25fb09b490"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_dire_journey_riverbed_path_000_0.vmdl_c",
+        "bytes": 74744,
+        "archive_index": 32767,
+        "expected_crc32": 2402819837,
+        "actual_crc32": 2402819837,
+        "crc_matches": true,
+        "sha256": "3480d2fb5ede2729ffebeb2ed223007b1a6a4a032dd4b489941c9dcc13403b15"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_mod_dire_journey_path_000_0.vmdl_c",
+        "bytes": 468066,
+        "archive_index": 32767,
+        "expected_crc32": 589832631,
+        "actual_crc32": 589832631,
+        "crc_matches": true,
+        "sha256": "accc80f008a53afba3724d5a172c9b26b25b56f445032fcf393b37d4e6a5b762"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_floor_support_3.vmdl_c",
+        "bytes": 10006,
+        "archive_index": 32767,
+        "expected_crc32": 2144468503,
+        "actual_crc32": 2144468503,
+        "crc_matches": true,
+        "sha256": "db008b35eb1701c120dd91e32b0e76db83a30d04a11d213497f04f9a91892610"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_floor_support_2.vmdl_c",
+        "bytes": 15382,
+        "archive_index": 32767,
+        "expected_crc32": 2971305212,
+        "actual_crc32": 2971305212,
+        "crc_matches": true,
+        "sha256": "b953a8b79c228d4544e7289309db2e029601c606aa2403b0d3b7dbdf853e7887"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_floor_support_1.vmdl_c",
+        "bytes": 9974,
+        "archive_index": 32767,
+        "expected_crc32": 683712213,
+        "actual_crc32": 683712213,
+        "crc_matches": true,
+        "sha256": "853a4467d3174a0749ec5b563f81df3bc02bc9b83c50a4110b3330b7d8aa98ba"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_floor_support_0.vmdl_c",
+        "bytes": 9974,
+        "archive_index": 32767,
+        "expected_crc32": 3661656447,
+        "actual_crc32": 3661656447,
+        "crc_matches": true,
+        "sha256": "3382c8df1905d870a6f5f0a200852e82d56dc44070c906e3460fdf9199a5b317"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0_lr0_agg_merge_dire_jungle_01_0.vmdl_c",
+        "bytes": 107638,
+        "archive_index": 32767,
+        "expected_crc32": 1342161894,
+        "actual_crc32": 1342161894,
+        "crc_matches": true,
+        "sha256": "e306793990ec1047d8ca37d8aed3351b664e95ca17add6529edef9e350837bdf"
+      },
+      {
+        "path": "maps/valley_decor_review/world_physics.vmdl_c",
+        "bytes": 5067396,
+        "archive_index": 32767,
+        "expected_crc32": 1494378701,
+        "actual_crc32": 1494378701,
+        "crc_matches": true,
+        "sha256": "8481ac8ac1b6de536d22c542cc9e8356f8ec8ecf33b51cb2fe18d1d2b432d4ac"
+      },
+      {
+        "path": "maps/valley_decor_review/world.vwrld_c",
+        "bytes": 1526,
+        "archive_index": 32767,
+        "expected_crc32": 311409030,
+        "actual_crc32": 311409030,
+        "crc_matches": true,
+        "sha256": "bd7633328e79b2562e9255b9660163012fb5458f4dea65ac924635cbf4a62910"
+      },
+      {
+        "path": "maps/valley_decor_review/worldnodes/n0.vrman_c",
+        "bytes": 929,
+        "archive_index": 32767,
+        "expected_crc32": 3659909232,
+        "actual_crc32": 3659909232,
+        "crc_matches": true,
+        "sha256": "fb1d9351f8a65d21cc418ed03e7f706502fff75f7a4f434b6017bec8db5138a6"
+      },
+      {
+        "path": "maps/valley_decor_review/world_physics.vrman_c",
+        "bytes": 928,
+        "archive_index": 32767,
+        "expected_crc32": 3263582963,
+        "actual_crc32": 3263582963,
+        "crc_matches": true,
+        "sha256": "926373153c3798204feee0072b1fd426233bce447f05f6ceb3c66f2a4c3c7e7b"
+      },
+      {
+        "path": "maps/valley_decor_review/world.vrman_c",
+        "bytes": 989,
+        "archive_index": 32767,
+        "expected_crc32": 3975204338,
+        "actual_crc32": 3975204338,
+        "crc_matches": true,
+        "sha256": "57f302aab076325e711f3395c0b5155d80da5a0e2ea0848a35a41ccb52bad573"
+      },
+      {
+        "path": "maps/valley_decor_review/water_flow_map.vtex_c",
+        "bytes": 2099252,
+        "archive_index": 32767,
+        "expected_crc32": 949535405,
+        "actual_crc32": 949535405,
+        "crc_matches": true,
+        "sha256": "8860d1b3b4e112b6b22dc3c5ebeee55372a76771f509317cf88da2f25eb37c81"
+      },
+      {
+        "path": "maps/valley_decor_review/fog_opacity_map.vtex_c",
+        "bytes": 2099252,
+        "archive_index": 32767,
+        "expected_crc32": 724252884,
+        "actual_crc32": 724252884,
+        "crc_matches": true,
+        "sha256": "add4063b2f0775fa56904d3bbe502fc0d291753a927aa7e9b0a04f436e3cf01b"
+      },
+      {
+        "path": "maps/valley_decor_review/fog_flow_map.vtex_c",
+        "bytes": 2099252,
+        "archive_index": 32767,
+        "expected_crc32": 58560459,
+        "actual_crc32": 58560459,
+        "crc_matches": true,
+        "sha256": "ce69de421493632e96c1f883efbc96d27ad99c2b52d53a22d0ff705e9c200d21"
+      },
+      {
+        "path": "maps/valley_decor_review/entities/default_ents.vents_c",
+        "bytes": 83352,
+        "archive_index": 32767,
+        "expected_crc32": 430984293,
+        "actual_crc32": 430984293,
+        "crc_matches": true,
+        "sha256": "699eb8a30ae24a5ecf4eae837f0d23f13f3961b3ae64e72f97681435530c1b9a"
+      },
+      {
+        "path": "maps/valley_decor_review.vmap_c",
+        "bytes": 59072,
+        "archive_index": 32767,
+        "expected_crc32": 3662813320,
+        "actual_crc32": 3662813320,
+        "crc_matches": true,
+        "sha256": "3c538eacd6bdd6542844377b2597a9982f70bac5cc628bb1f91b2922d6dd4653"
+      },
+      {
+        "path": "maps/valley_decor_review.vhcg",
+        "bytes": 1791926,
+        "archive_index": 32767,
+        "expected_crc32": 957977274,
+        "actual_crc32": 957977274,
+        "crc_matches": true,
+        "sha256": "13b137d8a7e6d0a4e5d0928e5c327db5e19d7057afae1903baed7880cf15558c"
+      },
+      {
+        "path": "maps/valley_decor_review.trm",
+        "bytes": 9317,
+        "archive_index": 32767,
+        "expected_crc32": 2528273414,
+        "actual_crc32": 2528273414,
+        "crc_matches": true,
+        "sha256": "5ed27b81506739007f36a1c45ae921f3583b2fb5425478aa56edabd418985506"
+      },
+      {
+        "path": "maps/valley_decor_review.gnv",
+        "bytes": 262176,
+        "archive_index": 32767,
+        "expected_crc32": 134526302,
+        "actual_crc32": 134526302,
+        "crc_matches": true,
+        "sha256": "d9c078d0409b7bfae2fee3a71948e1cef36fc7e97b86bfc6c8a6f70048fdac67"
+      }
+    ]
+  },
+  "compiled_map": {
+    "path": "maps/valley_decor_review.vmap_c",
+    "bytes": 59072,
+    "sha256": "3c538eacd6bdd6542844377b2597a9982f70bac5cc628bb1f91b2922d6dd4653",
+    "dependency_block": "RED2"
+  },
+  "source_match": {
+    "source_name": "maps/valley_decor_review.vmap",
+    "compiled_search_path": "dota_addons/survival",
+    "raw_source_crc32": 2530904969,
+    "compiled_source_crc32": 2530904969,
+    "matches": true
+  },
+  "external_archives": [],
+  "note": "All VPK entry CRCs and the raw binary VMAP source CRC match. Engine behavior and map layout were not tested."
+}

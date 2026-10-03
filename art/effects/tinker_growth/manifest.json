@@ -1,0 +1,83 @@
+{
+  "roots": {
+    "R": "particles/survival/tinker_growth/r_tinker_laser.vpcf",
+    "SR": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf",
+    "SSR": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf"
+  },
+  "native_roots": {
+    "R": "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
+    "SR": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vpcf",
+    "SSR": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs.vpcf"
+  },
+  "width_control": 60,
+  "outputs": [
+    {
+      "resource": "materials/survival/tinker_growth/cable.png",
+      "compile": false
+    },
+    {
+      "resource": "materials/survival/tinker_growth/sr_cable.vmat"
+    },
+    {
+      "resource": "materials/survival/tinker_growth/pulse.png",
+      "compile": false
+    },
+    {
+      "resource": "materials/survival/tinker_growth/sr_pulse.vmat"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/r_tinker_laser_e.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/r_tinker_laser_b.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact_smoke.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_spot.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_spot_b.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact_burst.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_embers.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_ring_b.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_ring.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_core.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_pulse.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_burn.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs_core.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs_burn.vpcf"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf"
+    }
+  ]
+}

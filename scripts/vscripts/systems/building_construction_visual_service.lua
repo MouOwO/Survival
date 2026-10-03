@@ -5,6 +5,17 @@ local construction_rules = require(
 local M = {}
 local active_by_entindex = {}
 local warp = require("systems/building_warp_effects")
+local function publish_progress(state, removed)
+    if not CustomNetTables or not CustomNetTables.SetTableValue then return end
+    local value = {removed=1}
+    if not removed then
+        local origin = state.unit:GetAbsOrigin()
+        value = {entindex=state.entindex, start=state.started_at, duration=state.duration,
+            team=state.unit:GetTeamNumber(), x=origin.x, y=origin.y, z=origin.z, text="建造中"}
+    end
+    pcall(CustomNetTables.SetTableValue, CustomNetTables,
+        "survival_ui_state", "construction_" .. state.entindex, value)
+end
 
 local function nonempty(value)
     return type(value) == "string" and value ~= ""
@@ -67,6 +78,7 @@ local function retire(state, reveal_model)
     state.loop_particles = {}
     warp.destroy(state.start_particle)
     state.start_particle = nil
+    publish_progress(state, true)
     if reveal_model then show_model(state.unit) end
     return true
 end
@@ -94,14 +106,15 @@ function M.start(unit, definition)
         definition = definition,
         start_particle = start_particle,
         duration = duration,
+        started_at = GameRules:GetGameTime(),
         loop_particles = {},
         retired = false,
     }
     local particle = warp.create(loop_path, unit, definition, duration)
     if particle ~= nil then state.loop_particles[1] = particle end
-    -- Never leave only a health bar if a visual resource fails to spawn.
-    if particle == nil and warp.is_white(loop_path) then show_model(unit) end
+    -- Failed optional particles must not reveal an unfinished building.
     active_by_entindex[entindex] = state
+    publish_progress(state, false)
     return state
 end
 

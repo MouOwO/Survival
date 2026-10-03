@@ -65,7 +65,12 @@ function M.create(path, unit, definition, duration, one_shot)
     local ok, error_message = pcall(function()
         local origin = unit:GetAbsOrigin()
         if not origin then return end
-        particle = ParticleManager:CreateParticle(path, PATTACH_WORLDORIGIN, unit)
+        local astral = path:find("particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_prison", 1, true) == 1
+        -- Native W's visual only: a world anchor remains visible while the
+        -- building is NoDraw. Never apply the OutOfGame/imprisonment modifier.
+        local owner = unit
+        if astral then owner = nil end
+        particle = ParticleManager:CreateParticle(path, PATTACH_WORLDORIGIN, owner)
         if particle == nil then return end
         ParticleManager:SetParticleControl(particle, 0, origin)
         if M.is_warp(path) then

@@ -7,7 +7,7 @@ local regions = require("systems/forbidden_region_service")
 regions.init()
 
 local movable, forbidden = regions.counts()
-assert(movable == 0 and forbidden == 4)
+assert(movable == 0 and forbidden == 0)
 
 for _, stair in ipairs({
     { "east", 1280, 4544 },
@@ -19,7 +19,7 @@ for _, stair in ipairs({
     local ok, reason = regions.validate_building_footprint(
         x - 128, y - 128, x + 128, y + 128
     )
-    assert(not ok and reason == "building_forbidden_region:main_stair_" .. stair[1])
+    assert(ok and reason == nil, "legacy rectangle must not veto live terrain")
 end
 
 local lawn_ok = regions.validate_building_footprint(268, 5084, 524, 5340)
@@ -27,7 +27,7 @@ assert(lawn_ok)
 
 -- This is the south stair's upper landing, where the wall preview was legal.
 local landing_ok = regions.validate_building_footprint(-198, 1564, 58, 1820)
-assert(not landing_ok)
+assert(landing_ok)
 
 current_map = "survival_dev"
 regions.init()

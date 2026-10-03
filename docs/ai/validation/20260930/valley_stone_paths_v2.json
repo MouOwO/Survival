@@ -1,0 +1,44 @@
+{
+  "status": "PREVIEW_READY",
+  "map": "valley_decor_review",
+  "material": "maps/ti10_assets/blends/mod_radiant_ti10_angled_000.vmat",
+  "stone_texture": "materials/stone/stone_path001_angled_color_psd_150d1d7b.vtex",
+  "evidence": "output/valley_path_identify/material_evidence.json",
+  "meshes": 4,
+  "quads": 5368,
+  "physics": "none",
+  "ground_sample_height": 129.5,
+  "original_ground_sample_height": 128,
+  "main_source_unchanged": true,
+  "main_source_sha256": "b92f2eb0e21bbc7cb995d866adc10e3439bc47a3351627b835207284b13611d1",
+  "compile": {
+    "compiled": 307,
+    "failed": 0
+  },
+  "package": {
+    "sha256": "599d3e4bcb1441d6e477d9243357f6de7954a3fc7d0e39f58d17c68301833c4b",
+    "crc_entries": 312,
+    "source_crc_match": true
+  },
+  "runtime": {
+    "cold_start": true,
+    "checks": 116,
+    "failed": 0,
+    "portals": 4,
+    "visual_inspected": true
+  },
+  "portal": {
+    "source": "Workshop 3164617180",
+    "resource": "particles/imagine_assets/environments_fx/portal_fx/act2_portal.vpcf",
+    "imported_resources": 6,
+    "official_texture_dependencies": 3,
+    "scope": "IsInToolsMode and valley_decor_review only",
+    "exact_video_effect_and_control_parameters_confirmed": false
+  },
+  "prefab": "maps/prefabs/valley_large_slab_paths.vmap",
+  "screenshots": [
+    "art/maps/c6/stone_paths_v2/path_preview.png",
+    "art/maps/c6/stone_paths_v2/spawn_preview.png",
+    "art/maps/c6/stone_paths_v2/overview.png"
+  ]
+}

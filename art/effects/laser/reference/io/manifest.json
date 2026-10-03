@@ -1,0 +1,23 @@
+{
+  "source": "Dota native pak01_dir.vpk",
+  "records": [
+    {
+      "resource": "particles/units/heroes/hero_wisp/wisp_tether.vpcf_c",
+      "sha256": "675836dbd68d30af5afc5907f477fd0407ce9e02eb2221cccc15b4bfdb61e52e",
+      "data": "wisp_tether.txt",
+      "parsed": "wisp_tether.json"
+    },
+    {
+      "resource": "particles/units/heroes/hero_wisp/wisp_tether_c.vpcf_c",
+      "sha256": "e71a2a4f24b77d771772ac5996e4e41121198a94f495d98bb5dec40ae3912956",
+      "data": "wisp_tether_c.txt",
+      "parsed": "wisp_tether_c.json"
+    },
+    {
+      "resource": "particles/units/heroes/hero_zuus/zuus_static_field_b.vpcf_c",
+      "sha256": "5a3310fe713ddaddfe2290fc7af4625d3e518c12d4a09abfca729d83e6af4cf1",
+      "data": "zuus_static_field_b.txt",
+      "parsed": "zuus_static_field_b.json"
+    }
+  ]
+}
