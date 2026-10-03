@@ -1,0 +1,219 @@
+{
+  "date": "2026-10-03",
+  "task": "Four admitted wall contacts must actually attack under crowd pressure",
+  "changed_runtime_modules": [
+    "scripts/vscripts/systems/wall_melee_contact.lua",
+    "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua"
+  ],
+  "source_hashes": [
+    {
+      "Path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\scripts\\vscripts\\systems\\wall_melee_contact.lua",
+      "Hash": "426582658F37C2AEF95FC87D402F447F3A42CE03E1C3086861FB1B1051D4FD10"
+    },
+    {
+      "Path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\scripts\\vscripts\\modifiers\\modifier_enemy_wall_ai.lua",
+      "Hash": "89AB3B8AC4414C4C5A4410C7887D356772AD81CC18BA05BDAB9D8863C27F1720"
+    }
+  ],
+  "confirmed_code_defects": [
+    "Diameter64 contacts allowed independent lateral20 offsets before rooting, leaving no guaranteed room for four in a256 gate",
+    "Overflow moved toward occupied contacts and blocked other admitted units",
+    "Previous ideal-position tests skipped native arrival tolerance and crowd collision",
+    "Native IsPhased/IsDisarmed remain false on the same frame after mode/stack changes; the immediate MOVE can plan with old collision and stop",
+    "Contact lease expires after3 seconds before the equally delayed movement recovery can run"
+  ],
+  "original_user_session": "Dota exited before read-only live state could be collected; its exact inactive unit states were not measured",
+  "engine_attack_shape": "No claim that rectangular navigation is also the native attack shape. Each locked contact uses actual center distance plus8; both outer contacts landed native attacks.",
+  "implementation": [
+    "Four exclusive admissions; phased ground movement and phased rooted contacts",
+    "One bounded locally validated alignment at entry; waiters retain normal collision and stand160 behind",
+    "No mid-move reservation stealing; blocked candidates remain disarmed",
+    "Stable attacks retain their native clock; explicit noninitializing OnRefresh",
+    "Existing0.5-second observation,2-second navigation cache and failed-path backoff",
+    "First admitted MOVE is deferred exactly one server frame; existing think immediately returns to0.5-second cadence",
+    "One early recovery for an idle nonprogressing approach before lease expiry; actual move transitions clear force target explicitly",
+    "Short alignment permits only monotonic escape from existing peripheral overlap; center path and final hull must remain safe"
+  ],
+  "offline": {
+    "interpreter": "Lua5.1.5",
+    "tests": [
+      {
+        "name": "test_wall_melee_contact",
+        "exit_code": 0,
+        "output": "WALL_MELEE_CONTACT_PASS four reachable lanes, range at corners, bounded path work, death/stale release, directional paths"
+      },
+      {
+        "name": "test_wall_contact_deadlock",
+        "exit_code": 0,
+        "output": "WALL_CONTACT_DEADLOCK_PASS narrow four contacts, mixed/large hulls, exclusive admission, bounded stall recovery, control protection, stable attacks"
+      },
+      {
+        "name": "test_wall_contact_crowd",
+        "exit_code": 0,
+        "output": "WALL_CONTACT_CROWD_PASS units=90 four_attackers_by=2.5s cancelled_moves=2 one_retry_same_claim stable_orders=0 stable_position_writes=0 stable_paths=0 stable_nav=200 total_paths=23 total_nav=2438"
+      },
+      {
+        "name": "test_wall_contact_alignment",
+        "exit_code": 0,
+        "output": "WALL_CONTACT_ALIGNMENT_PASS existing bank/wall overlap recovery, exact endpoint validation, center obstacles/heights, no new peripheral penetration, released admission"
+      },
+      {
+        "name": "test_wall_navigation",
+        "exit_code": 0,
+        "output": "WALL_NAVIGATION_PASS square body, no protruding shoulders, no duplicate creation, terrain separation, overlap release\nWALL_METAL_HIT_PASS official asset, face position, burst limit, particle release"
+      },
+      {
+        "name": "test_wall_navigation_geometry",
+        "exit_code": 0,
+        "output": "WALL_NAVIGATION_GEOMETRY_PASS cases=76 4 directions, 256-768 gates, hull0-128, corner crossings, legal routes, height cliffs, refs and spawn rollback"
+      },
+      {
+        "name": "test_enemy_wall_boundary_ai",
+        "exit_code": 0,
+        "output": "ENEMY_WALL_BOUNDARY_AI_PASS ground/ranged/flying/challenge/large hull protection, stable orders, bounded nav work, retarget cleanup"
+      },
+      {
+        "name": "test_wall_slot_limit",
+        "exit_code": 0,
+        "output": "WALL_NATIVE_PATH_PASS eight native attackers, no queue/disarm, no repeated orders, death release, immediate collision, legacy cleanup"
+      },
+      {
+        "name": "test_monster_ground_navigation",
+        "exit_code": 0,
+        "output": "MONSTER_GROUND_NAVIGATION_PASS: 13 policy scenarios + 873 actual wave batches (normal=550, wave_leader=264, assault_boss=59, flying=266, visual_swaps=89); shared radius32 after model swaps; challenge/practice policies preserved"
+      },
+      {
+        "name": "test_wave_four_lane_collision",
+        "exit_code": 0,
+        "output": "WAVE_FOUR_LANE_COLLISION_PASS: four non-overlapping Hull 32 slots in 448 passage; fifth queues"
+      }
+    ],
+    "fsm": "PASS: native phase becomes active next frame; dropped first MOVE recovers once on the same claim; target cancellation restores0.5-second cadence;60 stable attack checks; controls and cleanup",
+    "exact_head_negative_control": "PASS: original HEAD contact and AI produce exactly2 attackers in the same90-monster movement simulation",
+    "negative_log": "output/wall_contact_admission_20261003/negative_control.log",
+    "steady_10_seconds": {
+      "position_writes": 0,
+      "attackers": 4,
+      "navigation_checks": 200,
+      "monsters": 90,
+      "new_orders": 0,
+      "path_queries": 0
+    }
+  },
+  "native_engine": {
+    "status": "PASS_THREE_CONSECUTIVE_STRICT_ROUNDS",
+    "isolated_addon": "survival_wall_contact_probe_20261003",
+    "map": "template_map",
+    "origin": [
+      1536,
+      2560,
+      385.5
+    ],
+    "native_corridor_width": 256,
+    "population_per_round": 90,
+    "center_first": true,
+    "initial_hit_deadline_seconds": 8,
+    "replacement_hit_deadline_seconds": 8,
+    "all_four_first_landed_seconds": [
+      2.3333332538605,
+      2.2999992370605,
+      2.3333320617676
+    ],
+    "replacement_after_vacancy_approx_seconds": [
+      1.63,
+      2.6,
+      1.7
+    ],
+    "result_elapsed_seconds": [
+      21.700001955032,
+      22.200002670288,
+      21.700000762939
+    ],
+    "distinct_attackers_after_one_vacancy_each_round": 5,
+    "invalid_or_overflow_hits_each_round": 0,
+    "wall_death_released_monsters_each_round": 89,
+    "attack_orders_unchanged_after_first_hit": true,
+    "final_state_cleanup_counts": [
+      0,
+      0,
+      0
+    ],
+    "native_force_getter_nil_and_idle_true_can_coexist_with_sustained_attacks": true,
+    "outer_contact": {
+      "relative_y": [
+        -96,
+        96
+      ],
+      "relative_x": -192,
+      "range": 223,
+      "center_distance": 214.66252583998
+    },
+    "middle_contact": {
+      "relative_y": [
+        -32,
+        32
+      ],
+      "relative_x": -192,
+      "range": 203,
+      "center_distance": 194.64840096954
+    },
+    "raw_log": "output/wall_contact_probe_20261003/native_final_3rounds.log",
+    "tested_hashes": "output/wall_contact_probe_20261003/final_engine_sources.json",
+    "hash_matches_workspace": true,
+    "native_state_race_log": "output/wall_contact_probe_20261003/native_phase_move_diagnostic.log",
+    "idle_unarrived_claim_log": "output/wall_contact_probe_20261003/native_approach_diagnostic.log",
+    "cleanup_log": "output/wall_contact_probe_20261003/native_final_cleanup.log",
+    "profile_archive_http_services_loaded": false,
+    "limits": "Controlled native corridor on the actual map; original user session had exited. This does not certify every map choke point or special control skill.",
+    "isolated_process_closed": true,
+    "shutdown_log": "output/wall_contact_probe_20261003/native_shutdown.log"
+  },
+  "native_center_first_comparison": {
+    "status": "PASS_OLD_TWO_NEW_FOUR_WITH_TIMELY_REPLACEMENT",
+    "same_map_and_origin": true,
+    "population": 90,
+    "corridor_width": 256,
+    "initial_middle_units": [
+      [
+        -224,
+        -42
+      ],
+      [
+        -224,
+        42
+      ]
+    ],
+    "before_source": "HEAD versions of contact and AI, copied only to isolated test addon",
+    "before_observation_seconds": 20.200000524521,
+    "before_actual_attackers": 2,
+    "before_steady_samples_seconds": [
+      5.7,
+      10.7,
+      15.7
+    ],
+    "before_actual_locked_positions": [
+      [
+        -215.8671875,
+        -43.8173828125
+      ],
+      [
+        -168,
+        32.000244140625
+      ]
+    ],
+    "before_log": "output/wall_contact_probe_20261003/native_before_center_first.log",
+    "before_invalid_hits_note": "The35 invalid_hits are baseline attacks outside the new exact-position requirement; they do not mean35 distinct rear attackers.",
+    "after_log": "output/wall_contact_probe_20261003/native_final_3rounds.log"
+  },
+  "checks": {
+    "targeted_diff_check": "PASS",
+    "lua51_syntax": "PASS"
+  },
+  "rejected_intermediate_version": {
+    "total_elapsed_seconds": 74.200003862381,
+    "log": "output/wall_contact_probe_20261003/native_after_center_first.log",
+    "replacement_first_hit_elapsed_seconds": 69.400000810623,
+    "reason": "Eventually four attacks is insufficient; rejected for delayed admission before native frame-state fix",
+    "fourth_hit_seconds": 41.866667985916
+  }
+}

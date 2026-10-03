@@ -77,12 +77,18 @@ function M:OnCreated(params)
     self:StartIntervalThink(0)
 end
 
+-- State refreshes must never reinitialize the target, timers or attack clock.
+function M:OnRefresh() end
+
 function M:CheckState()
     local state = {}
-    if self.no_unit_collision then state[MODIFIER_STATE_NO_UNIT_COLLISION] = true end
     local mode=self.GetStackCount and self:GetStackCount() or
-        (self.contact_locked and 2 or (self.contact_waiting and 1 or 0))
-    if mode==1 then state[MODIFIER_STATE_DISARMED] = true end
+        (self.contact_locked and 2 or (self.contact_advancing and 3 or (self.contact_waiting and 1 or 0)))
+    -- Only the four admitted contacts phase through units. GridNav and the
+    -- square wall boundary remain active. Keep phasing while rooted so a
+    -- waiting unit cannot push an exact front-row contact sideways again.
+    if self.no_unit_collision or mode==2 or mode==3 then state[MODIFIER_STATE_NO_UNIT_COLLISION] = true end
+    if mode==1 or mode==3 then state[MODIFIER_STATE_DISARMED] = true end
     if mode==2 then state[MODIFIER_STATE_ROOTED] = true end
     return state
 end
@@ -106,8 +112,9 @@ end
 -- Each modifier owns its state and goal. Only entries/goal changes issue an
 -- order. In particular, a transient nil attack target is not an idle state.
 function M:SetContactMode(mode)
-    local changed=self.contact_waiting~=(mode==1) or self.contact_locked~=(mode==2)
-    self.contact_waiting,self.contact_locked=mode==1,mode==2
+    local changed=self.contact_mode~=mode
+    self.contact_mode=mode
+    self.contact_waiting,self.contact_locked,self.contact_advancing=(mode==1 or mode==3),mode==2,mode==3
     if changed and self.SetStackCount then
         self:SetStackCount(mode)
         if self.ForceRefresh then self:ForceRefresh() end
@@ -121,6 +128,10 @@ function M:SetWallEntIndex(entindex)
     local previous=self.wall_entindex
     self.wall_entindex=next_index
     self.boundary_position=nil
+    if self.phase_order_frame then
+        self.phase_order_frame=nil
+        self:StartIntervalThink(0.5)
+    end
     if not parent or parent:IsNull() then return end
     contact.release(previous,parent:entindex())
     self:SetContactMode(0)
@@ -147,9 +158,9 @@ function M:IssueStateOrder(parent,wall)
         ExecuteOrderFromTable({UnitIndex=parent:entindex(),OrderType=DOTA_UNIT_ORDER_ATTACK_TARGET,
             TargetIndex=wall:entindex(),Queue=false})
     else
-        if not parent.GetForceAttackTarget or parent:GetForceAttackTarget()~=nil then
-            parent:SetForceAttackTarget(nil)
-        end
+        -- The native getter can be nil while an attack order is still active.
+        -- Clear explicitly on a real move transition, never on stable ticks.
+        parent:SetForceAttackTarget(nil)
         ExecuteOrderFromTable({UnitIndex=parent:entindex(),OrderType=DOTA_UNIT_ORDER_MOVE_TO_POSITION,
             Position=self.contact_move,Queue=false})
     end
@@ -172,13 +183,25 @@ function M:EnterState(state,parent,wall,point)
     self.last_progress_time=now()
     self.recovery_delay=3
     self.recovery_after=nil
-    local mode=state=="attack" and 2 or ((state=="approach" or state=="waiting") and 1 or 0)
+    self.approach_retry_done=false
+    local mode=state=="attack" and 2 or (state=="approach" and 3 or (state=="waiting" and 1 or 0))
     self:SetContactMode(mode)
     self:UpdateContactRange(parent,state=="attack" and wall or false)
     -- Cancel the old move exactly once at arrival. Previously this Stop was
     -- repeated on every think whenever the engine briefly hid its attack target.
     if state=="attack" and (previous=="approach" or previous=="waiting") then parent:Stop() end
-    self:IssueStateOrder(parent,wall)
+    if state=="approach" then
+        -- Stack/state changes become native phase/root/disarm flags on the
+        -- next server frame. Issuing MOVE here uses the OLD collision state
+        -- and can silently abandon the order in a crowd. Wait exactly one
+        -- engine frame, using this modifier's existing think callback.
+        parent:SetForceAttackTarget(nil)
+        self.order_pending=true
+        self.phase_order_frame=true
+        self:StartIntervalThink(0)
+    else
+        self:IssueStateOrder(parent,wall)
+    end
     return true
 end
 
@@ -194,14 +217,26 @@ function M:MonitorState(parent,wall)
         return
     end
     if self.order_pending then self:IssueStateOrder(parent,wall);return end
-    -- Native movement waits on unit collision. Never keep reissuing an approach
-    -- to an occupied front. Receiving a free contact is the wake-up transition.
+    -- Rear units hold behind the contact row. Only a vacant claim wakes them.
     if self.ai_state=="waiting" then return end
     local p=parent:GetAbsOrigin()
     if not self.progress_position or distance_squared(p,self.progress_position)>=64 then
         self.progress_position=p
         self.last_progress_time=stamp
         self.recovery_delay=3
+    end
+    -- Native movement can silently finish/fail while still far from its goal
+    -- (including the frame that phasing becomes active). Repair that idle move
+    -- once BEFORE the three-second reservation expires. The old three-second
+    -- monitor lost the claim first and therefore could never retry its move.
+    if self.ai_state=="approach" and not self.approach_retry_done
+        and stamp-(self.last_order_time or stamp)>=0.5
+        and stamp-(self.last_progress_time or stamp)>=0.5
+        and parent.IsIdle and parent:IsIdle()
+        and not (parent.IsRooted and parent:IsRooted()) then
+        self.approach_retry_done=true
+        self:IssueStateOrder(parent,wall)
+        return
     end
     local attacking=self.ai_state=="attack"
     local latest=math.max(self.last_order_time or stamp,self.last_progress_time or stamp,
@@ -220,8 +255,9 @@ end
 
 function M:OnIntervalThink()
     if not IsServer() then return end
-    if self.first_observation then
+    if self.first_observation or self.phase_order_frame then
         self.first_observation = false
+        self.phase_order_frame = nil
         self:StartIntervalThink(0.5) -- Observe state; never reissue orders on a timer.
     end
     local parent = self:GetParent()
@@ -248,9 +284,6 @@ function M:OnIntervalThink()
     if navigation.enforce_boundary then
         navigation.enforce_boundary(wall,parent,self.boundary_position)
     end
-    local boundary_position=parent:GetAbsOrigin()
-    self.boundary_position={x=boundary_position.x,y=boundary_position.y,z=boundary_position.z}
-
     local desired,point="chase",nil
     local ground=(parent.survival_wave_movement_type or parent.survival_movement_type or "ground") == "ground"
     local melee=parent.GetAttackCapability and parent:GetAttackCapability()==DOTA_UNIT_CAP_MELEE_ATTACK
@@ -258,22 +291,26 @@ function M:OnIntervalThink()
         local plan=contact.resolve(wall,parent)
         if plan then
             point=plan.point
-            local retained=self.ai_state=="attack" and self.goal_wall==wall
-            -- Small exit hysteresis prevents terrain/collision rounding from
-            -- oscillating a settled unit between rooted and disarmed states.
-            local arrived=contact.arrived(wall,parent,point,retained)
+            local retained=self.ai_state=="attack" and self.goal_wall==wall and same_point(point,self.contact_move)
+            local arrived=plan.claimed and retained and contact.arrived(wall,parent,point,true)
+            if plan.claimed and not arrived and not self.contact_locked then
+                arrived=contact.settle(wall,parent,point)
+            end
             desired=not plan.claimed and "waiting" or (arrived and "attack" or "approach")
         end
     else
         contact.release(self.wall_entindex,parent:entindex())
     end
     if not self:EnterState(desired,parent,wall,point) then self:MonitorState(parent,wall) end
+    local settled=parent:GetAbsOrigin()
+    self.boundary_position={x=settled.x,y=settled.y,z=settled.z}
 end
 
 function M:OnDestroy()
     if not IsServer() then return end
     self.boundary_position=nil
     local parent = self:GetParent()
+    self:SetContactMode(0)
     if parent and not parent:IsNull() then
         contact.release(self.wall_entindex,parent:entindex())
         self:UpdateContactRange(parent,false)

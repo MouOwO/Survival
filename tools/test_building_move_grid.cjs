@@ -2,7 +2,8 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const keys = {}, mouse = {}, sent = [], calls = [];
-let selected=10, moving=false, cancelled=0;
+let selected=10, moving=false, cancelled=0, cooldown=0;
+const errors=[];
 const shared = {
     SurvivalSelectionResolver:{Resolve:()=>selected},
     SurvivalInputDispatcher:{RegisterMouseHandler:(id,fn)=>mouse[id]=fn,
@@ -18,8 +19,9 @@ vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/building_mo
     $,GameUI:{CustomUIConfig:()=>shared},
     Entities:{GetUnitName:()=> 'building_arrow_tower',GetAbility:(_,slot)=>slot<2 ? 20+slot : -1},
     Abilities:{GetAbilityName:id=>id===20 ? 'ability_building_blink' : 'ability_destroy_arrow_tower',
-        IsHidden:()=>false},
-    GameEvents:{Subscribe:()=>{},SendCustomGameEventToServer:(name,data)=>sent.push({name,data})}
+        IsHidden:()=>false, GetCooldownTimeRemaining:()=>cooldown},
+    GameEvents:{Subscribe:()=>{},SendCustomGameEventToServer:(name,data)=>sent.push({name,data}),
+        SendEventClientSide:(name,data)=>errors.push({name,data})}
 });
 assert(keys.building_move('D',true));
 assert(keys.building_move('d',true));
@@ -31,4 +33,18 @@ assert(shared.SurvivalArrowTowerTools.TriggerAbility('ability_building_blink',10
 assert.equal(calls.length,3,'ability button and D use same grid entry');
 selected=11;scheduled[0]();
 assert.equal(cancelled,1,'selection change retires the placement session');
-console.log('BUILDING_MOVE_GRID_PASS D repeats, button parity, no raw coordinates, selection cancellation');
+cooldown=5;
+assert(keys.building_move('D',true),'cooldown input is consumed');
+assert(shared.SurvivalArrowTowerTools.TriggerAbility('ability_building_blink',11));
+assert.equal(calls.length,3,'cooldown blocks both keyboard and ability button previews');
+assert.equal(errors.length,2);
+assert.equal(errors[0].name,'dota_hud_error_message');
+assert.equal(errors[0].data.message,'移动防御塔CD中');
+cooldown=0;
+assert(keys.building_move('D',true));
+assert.equal(calls.length,4,'preview becomes available when cooldown ends');
+cooldown=2;
+assert(keys.building_move('D',true));
+assert.equal(moving,false,'cooldown rejection also clears an existing relocation');
+assert.equal(cancelled,2);
+console.log('BUILDING_MOVE_GRID_PASS D repeats, button parity, cooldown rejection and recovery, native error, selection cancellation');

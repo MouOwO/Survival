@@ -54,8 +54,16 @@ local tornado_sequence = 0
 local tornado_task = nil
 local tornado_slow_units = {}
 
-local ARCANE_MYSTIC_FLARE_PARTICLE =
-    "particles/units/heroes/hero_skywrath_mage/skywrath_mage_mystic_flare.vpcf"
+local arcane_snapfire_visual = {
+    -- The complete original Mortimer Kisses projectile owns its model,
+    -- child birth timing, light and CP3/CP4 movement internally.
+    flight = "particles/units/heroes/hero_snapfire/snapfire_lizard_blobs_arced.vpcf",
+    impact = "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact.vpcf",
+    linger = "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger.vpcf",
+    fall_height = 1800,
+    fall_duration = 0.8,
+    active = {},
+}
 local FLAME_MAIN_EXPLOSION_PARTICLE =
     "particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf"
 local FLAME_SMALL_FIREBALL_PARTICLE =
@@ -66,12 +74,33 @@ local FLAME_BURN_PARTICLE =
     "particles/units/heroes/hero_huskar/huskar_burning_spear_debuff.vpcf"
 local FLAME_BURN_THINK_INTERVAL = 0.05
 local ARCANE_MAX_HULL_RADIUS = 256
-local ICE_CONE_SNOW_PARTICLE =
-    "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1.vpcf"
-local ICE_CONE_IMPACT_PARTICLE =
-    "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf"
+local ice_cone_visual = {
+    flight = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_lizard_blobs_arced.vpcf",
+    impact = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_impact.vpcf",
+    -- Native impact owns the explosion sphere; the remaining burst, shockwaves
+    -- and ice debris belong to the cosmetic linger graph. Keep those finite
+    -- effects per missile while Winter's Curse supplies the shared ground.
+    landing_effects = {
+        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_shockwave.vpcf" },
+        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_burst.vpcf" },
+        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_shockwave.vpcf" },
+        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_glow.vpcf" },
+        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_torns.vpcf" },
+        { particle = "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_sparks.vpcf", delay = 0.2 },
+    },
+    field = "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+    field_duration = 5,
+    field_fade_duration = 1,
+    impact_radius = 75,
+    fall_duration_scale = 2,
+    fall_speed_multiplier = 0.7,
+    first_impact_delay = 0.8 / 0.7,
+    max_flights = 20,
+    max_lateness = 0.15,
+    active = {},
+}
 local MOVING_ICE_BALL_PARTICLE =
-    "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf"
+    "particles/survival/skills/tusk_snowball_fixed_size.vpcf"
 local METEOR_FALL_PARTICLE =
     "particles/survival/skills/meteor_phoenix_fall.vpcf"
 local METEOR_LAVA_PARTICLE =
@@ -80,11 +109,12 @@ local METEOR_LAVA_SLOW_BUFF = "debuff_hero_meteor_lava_move_slow"
 local METEOR_THINK_INTERVAL = 0.05
 local METEOR_FALL_HEIGHT = 1200
 local METEOR_FLY_PARTICLE_TRAVEL_TIME = 0.4
-local MOVING_ICE_BALL_EXPLOSION_PARTICLE = "particles/basic_projectile/basic_projectile_explosion.vpcf"
+local MOVING_ICE_BALL_EXPLOSION_PARTICLE = "particles/units/heroes/hero_tusk/tusk_snowball_impact.vpcf"
 local MOVING_ICE_BALL_THINK_INTERVAL = 0.05
-local MOVING_ICE_BALL_VISUAL_HEIGHT = 120
-local MAGIC_SLINGSHOT_PROJECTILE_PARTICLE =
-    "particles/units/heroes/hero_hoodwink/hoodwink_acorn_shot_tracking.vpcf"
+local magic_slingshot_visual = {
+    projectile = "particles/survival/skills/magic_slingshot_arcane_orb.vpcf",
+    impact = "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit.vpcf",
+}
 local MAGIC_SLINGSHOT_RUBBLE_PARTICLE =
     "particles/units/heroes/hero_tiny/tiny_avalanche.vpcf"
 local MAGIC_SLINGSHOT_SLOW_BUFF = "debuff_hero_magic_slingshot_move_slow"
@@ -96,13 +126,16 @@ local SPIRIT_BOMB_PROJECTILE_PARTICLE =
 local SPIRIT_BOMB_EXPLOSION_PARTICLE =
     "particles/units/heroes/hero_sven/sven_storm_bolt_projectile_explosion.vpcf"
 local POISON_CLOUD_PARTICLE =
-    "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf"
+    "particles/survival/skills/poison_sullen_shroud.vpcf"
 local POISON_CLOUD_EXPLOSION_PARTICLE =
     "particles/basic_explosion/basic_explosion.vpcf"
 local POISON_CLOUD_ARMOR_MODIFIER = "modifier_hero_poison_cloud_armor"
 local POISON_CLOUD_THINK_INTERVAL = 0.05
-local BLADE_PULSE_PARTICLE =
-    "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf"
+local blade_pulse_visual = {
+    particle = "particles/survival/skills/blade_swashbuckle.vpcf",
+    native_sword_forward_extent = 805.9557,
+    native_sword_radius = 1.1,
+}
 local BLADE_PULSE_CLEANUP_GRACE = 0.25
 echo_slash.particle =
     "particles/survival_echo_slash/survival_echo_slash_follow.vpcf"
@@ -117,8 +150,9 @@ earth_rock.visual_particle =
 earth_rock.explosion_particle =
     "particles/basic_projectile/basic_projectile_explosion.vpcf"
 earth_rock.cleanup_grace = 0.25
-local TORNADO_PARTICLE =
-    "particles/survival_tornado/survival_tornado_follow.vpcf"
+local tornado_visual = {
+    particle = "particles/survival_tornado/survival_tornado_follow.vpcf",
+}
 local TORNADO_THINK_INTERVAL = 0.05
 
 local function valid(unit)
@@ -142,12 +176,128 @@ local function game_time()
     return GameRules and GameRules.GetGameTime and GameRules:GetGameTime() or 0
 end
 
+function arcane_snapfire_visual.release_particle(particle)
+    if particle == nil then return end
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle, true)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not destroy_ok or not release_ok then
+        print("[HeroPassiveSkill] arcane barrage particle cleanup failed: "
+            .. tostring(destroy_error or release_error))
+    end
+end
+
+function arcane_snapfire_visual.release_flight(missile)
+    local particle = missile.particle
+    missile.particle = nil
+    arcane_snapfire_visual.active[missile] = nil
+    arcane_snapfire_visual.release_particle(particle)
+end
+
+function arcane_snapfire_visual.clear_barrage(barrage)
+    for _, missile in ipairs(barrage.missiles or {}) do
+        arcane_snapfire_visual.release_flight(missile)
+    end
+end
+
+function arcane_snapfire_visual.clear()
+    if arcane_snapfire_visual.task then
+        scheduler.cancel(arcane_snapfire_visual.task)
+    end
+    for _, barrage in pairs(active_arcane_barrages) do
+        arcane_snapfire_visual.clear_barrage(barrage)
+    end
+    for missile in pairs(arcane_snapfire_visual.active) do
+        arcane_snapfire_visual.release_flight(missile)
+    end
+    arcane_snapfire_visual.active = {}
+    arcane_snapfire_visual.task = nil
+    active_arcane_barrages = {}
+end
+
+function arcane_snapfire_visual.configure_flight(missile)
+    local sky = missile.position + Vector(0, 0, arcane_snapfire_visual.fall_height)
+    ParticleManager:SetParticleControl(missile.particle, 0, sky)
+    ParticleManager:SetParticleControl(missile.particle, 1, missile.position)
+    ParticleManager:SetParticleControl(missile.particle, 2,
+        Vector(arcane_snapfire_visual.fall_height / arcane_snapfire_visual.fall_duration, 0, 0))
+    -- Seed the child origin once, then let the native parent write CP3/4.
+    -- Sky height exceeds its native 1250-unit arc offset for a downward shot.
+    ParticleManager:SetParticleControl(missile.particle, 3, sky)
+end
+
+function arcane_snapfire_visual.ensure_task()
+    if arcane_snapfire_visual.task then return end
+    local active_flights = arcane_snapfire_visual.active
+    arcane_snapfire_visual.task = scheduler.after(0.03, function()
+        if arcane_snapfire_visual.active ~= active_flights then return false end
+        for _, barrage in pairs(active_arcane_barrages) do
+            if not valid(barrage.context.attacker) then
+                arcane_snapfire_visual.clear_barrage(barrage)
+            end
+        end
+        for missile in pairs(active_flights) do
+            if active_arcane_barrages[missile.attacker_key] ~= missile.barrage
+                or not valid(missile.attacker) then
+                arcane_snapfire_visual.release_flight(missile)
+            end
+        end
+        if next(active_flights) == nil then
+            arcane_snapfire_visual.task = nil
+            return false
+        end
+        return 0.03
+    end)
+end
+
+function arcane_snapfire_visual.launch(missile)
+    local now = game_time()
+    if missile.landed or now >= missile.land_at
+        or active_arcane_barrages[missile.attacker_key] ~= missile.barrage
+        or not valid(missile.attacker) then return end
+    missile.flight_started_at = now
+    local ok, message = pcall(function()
+        missile.particle = ParticleManager:CreateParticle(
+            arcane_snapfire_visual.flight, PATTACH_WORLDORIGIN, missile.attacker
+        )
+        arcane_snapfire_visual.configure_flight(missile)
+    end)
+    if not ok then
+        arcane_snapfire_visual.release_flight(missile)
+        print("[HeroPassiveSkill] arcane barrage flight visual failed: " .. tostring(message))
+        return
+    end
+    arcane_snapfire_visual.active[missile] = true
+    arcane_snapfire_visual.ensure_task()
+end
+
+function arcane_snapfire_visual.landing_particle(path, attacker, position)
+    local particle = nil
+    local ok, message = pcall(function()
+        particle = ParticleManager:CreateParticle(path, PATTACH_WORLDORIGIN, attacker)
+        ParticleManager:SetParticleControl(particle, 0, position)
+        -- Native liquid splash uses CP1 as its repulsion origin.
+        ParticleManager:SetParticleControl(particle, 1, position)
+        ParticleManager:SetParticleControl(particle, 3, position)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not ok then
+        arcane_snapfire_visual.release_particle(particle)
+        print("[HeroPassiveSkill] arcane barrage landing visual failed: " .. tostring(message))
+    end
+    return ok
+end
+
 local function arcane_barrage_locked(attacker_key)
     local active = attacker_key and active_arcane_barrages[attacker_key] or nil
     if not active then return false end
     local current_time = GameRules and GameRules.GetGameTime
         and GameRules:GetGameTime() or 0
     if current_time >= (tonumber(active.unlock_at) or math.huge) then
+        arcane_snapfire_visual.clear_barrage(active)
         active_arcane_barrages[attacker_key] = nil
         return false
     end
@@ -160,11 +310,7 @@ local function ice_cone_locked(attacker_key)
     local current_time = GameRules and GameRules.GetGameTime
         and GameRules:GetGameTime() or 0
     if current_time >= (tonumber(active.unlock_at) or math.huge) then
-        if active.snow_particle then
-            ParticleManager:DestroyParticle(active.snow_particle, false)
-            ParticleManager:ReleaseParticleIndex(active.snow_particle)
-        end
-        active_ice_cones[attacker_key] = nil
+        ice_cone_visual.finish_cast(active)
         return false
     end
     return true
@@ -659,8 +805,9 @@ local function release_poison_cloud(attacker_key)
     local cloud = active_poison_clouds[attacker_key]
     if not cloud then return end
     if cloud.particle then
-        ParticleManager:DestroyParticle(cloud.particle, false)
+        ParticleManager:DestroyParticle(cloud.particle, true)
         ParticleManager:ReleaseParticleIndex(cloud.particle)
+        cloud.particle = nil
     end
     active_poison_clouds[attacker_key] = nil
     for target_key, member in pairs(cloud.members) do
@@ -781,6 +928,10 @@ local function create_poison_cloud(context, position, definition)
         ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
     end)
     if not visual_ok then
+        if particle ~= nil then
+            pcall(function() ParticleManager:DestroyParticle(particle, true) end)
+            pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+        end
         particle = nil
         print("[HeroPassiveSkill] poison cloud visual failed: "
             .. tostring(visual_error))
@@ -1237,12 +1388,21 @@ local function moving_ice_ball_periodic_multiplier(state)
 end
 
 local function sync_moving_ice_ball_particle(state)
-    if not state or not state.particle then return end
-    ParticleManager:SetParticleControl(
-        state.particle,
-        3,
-        state.position + Vector(0, 0, MOVING_ICE_BALL_VISUAL_HEIGHT)
-    )
+    if not state or state.particle == nil then return end
+    local ok, message = pcall(function()
+        -- Native Tusk moves its model toward CP1 and writes its own CP4.
+        -- CP0 is only the spawn position, never a manually moved carrier.
+        local destination = state.target_death_position or state.end_position
+        if state.homing and alive(state.target) then destination = state.target:GetAbsOrigin() end
+        ParticleManager:SetParticleControl(state.particle, 1, destination)
+    end)
+    if not ok then
+        local particle = state.particle
+        state.particle = nil
+        pcall(function() ParticleManager:DestroyParticle(particle, true) end)
+        pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+        print("[HeroPassiveSkill] moving ice ball visual sync failed: " .. tostring(message))
+    end
 end
 
 local function moving_ice_ball_random_target(attacker, origin, radius, primary_target)
@@ -1267,25 +1427,53 @@ end
 local function release_moving_ice_ball(ball_id, explode)
     local state = active_moving_ice_balls[ball_id]
     if not state then return end
-    if state.particle then
-        ParticleManager:DestroyParticle(state.particle, false)
-        ParticleManager:ReleaseParticleIndex(state.particle)
+    active_moving_ice_balls[ball_id] = nil
+    local particle = state.particle
+    state.particle = nil
+    local shattered = false
+    if particle ~= nil then
+        if explode then
+            pcall(function() ParticleManager:SetParticleControl(particle, 1, state.position) end)
+        end
+        local ok, message = pcall(function()
+            -- Non-immediate destruction runs Tusk's native destroy/impact
+            -- endcaps; the shattering model inherits the actual parent ball.
+            ParticleManager:DestroyParticle(particle, not explode)
+        end)
+        shattered = ok and explode
+        local release_ok, release_error = pcall(function()
+            ParticleManager:ReleaseParticleIndex(particle)
+        end)
+        if not ok or not release_ok then
+            print("[HeroPassiveSkill] moving ice ball cleanup failed: "
+                .. tostring(message or release_error))
+        end
     end
     if explode and valid(state.context.attacker) then
         M.sound_service.play("hero_frost_explode", {
             source = state.context.attacker, position = state.position,
         })
-        local visual_ok, visual_error = pcall(function()
-            local particle = ParticleManager:CreateParticle(
-                MOVING_ICE_BALL_EXPLOSION_PARTICLE,
-                PATTACH_WORLDORIGIN, state.context.attacker
-            )
-            ParticleManager:SetParticleControl(particle, 0, state.position)
-            ParticleManager:ReleaseParticleIndex(particle)
-        end)
-        if not visual_ok then
-            print("[HeroPassiveSkill] moving ice ball explosion failed: "
-                .. tostring(visual_error))
+        if not shattered then
+            -- If the optional rolling visual failed, retain a native hit
+            -- flash. Normal hits already receive it from the root endcap.
+            local impact_particle
+            local visual_ok, visual_error = pcall(function()
+                impact_particle = ParticleManager:CreateParticle(
+                    MOVING_ICE_BALL_EXPLOSION_PARTICLE,
+                    PATTACH_WORLDORIGIN, state.context.attacker
+                )
+                ParticleManager:SetParticleControl(impact_particle, 0, state.position)
+                ParticleManager:SetParticleControl(impact_particle, 1, state.position)
+                ParticleManager:ReleaseParticleIndex(impact_particle)
+            end)
+            if not visual_ok then
+                if impact_particle ~= nil then
+                    pcall(function() ParticleManager:DestroyParticle(impact_particle, true) end)
+                    pcall(function() ParticleManager:ReleaseParticleIndex(impact_particle) end)
+                end
+                print("[HeroPassiveSkill] moving ice ball explosion failed: "
+                    .. tostring(visual_error))
+            end
         end
         if state.explosion_multiplier > 0 then
             deal_group(
@@ -1298,7 +1486,6 @@ local function release_moving_ice_ball(ball_id, explode)
             )
         end
     end
-    active_moving_ice_balls[ball_id] = nil
 end
 
 local function moving_ice_ball_collisions(state, start_position, end_position)
@@ -1312,30 +1499,42 @@ local function moving_ice_ball_collisions(state, start_position, end_position)
     )
     local broad_radius = step_length * 0.5 + state.collision_width
         + ARCANE_MAX_HULL_RADIUS
-    local reached_target = false
+    local first_progress, first_target
     for _, target in ipairs(enemies_in_radius(
         state.context.attacker, center, broad_radius
     )) do
-        if alive(target) then
+        if is_enemy(state.context.attacker, target) then
             local hull_radius = target.GetHullRadius
                 and math.max(0, tonumber(target:GetHullRadius()) or 0) or 0
             local hit_radius = state.collision_width + hull_radius
-            if moving_ice_ball_point_segment_distance_sq(
-                target:GetAbsOrigin(), start_position, end_position
-            ) <= hit_radius * hit_radius then
-                local key = unit_key(target)
-                if key and not state.collided[key] then
-                    state.collided[key] = true
-                    state.collision_stacks = math.min(
-                        state.collision_max_stacks,
-                        state.collision_stacks + 1
-                    )
+            local target_position = target:GetAbsOrigin()
+            local offset_x = start_position.x - target_position.x
+            local offset_y = start_position.y - target_position.y
+            local outside = offset_x * offset_x + offset_y * offset_y - hit_radius * hit_radius
+            local progress
+            if outside <= 0 then
+                progress = 0
+            elseif step_length > 0.0001 then
+                local projection = offset_x * dx + offset_y * dy
+                local discriminant = projection * projection - step_length * step_length * outside
+                if discriminant >= 0 then
+                    local entry = (-projection - math.sqrt(discriminant)) / (step_length * step_length)
+                    if entry >= 0 and entry <= 1 then progress = entry end
                 end
-                if target == state.target then reached_target = true end
+            end
+            if progress and (not first_progress or progress < first_progress) then
+                first_progress, first_target = progress, target
             end
         end
     end
-    return reached_target
+    if first_target then
+        local key = unit_key(first_target)
+        if key and not state.collided[key] then
+            state.collided[key] = true
+            state.collision_stacks = math.min(state.collision_max_stacks, state.collision_stacks + 1)
+        end
+    end
+    return first_progress
 end
 
 local function sync_moving_ice_balls()
@@ -1385,16 +1584,16 @@ local function sync_moving_ice_balls()
                 remaining_distance
             )
             local start_position = copy_position(state.position)
-            state.position = state.position + direction * move_distance
-            state.distance_travelled = state.distance_travelled + move_distance
+            local next_position = state.position + direction * move_distance
+            local hit_progress = moving_ice_ball_collisions(state, start_position, next_position)
+            local actual_distance = move_distance * (hit_progress or 1)
+            state.position = state.position + direction * actual_distance
+            state.distance_travelled = state.distance_travelled + actual_distance
             if GetGroundPosition then
                 state.position = GetGroundPosition(state.position, nil)
             end
             sync_moving_ice_ball_particle(state)
 
-            local reached_target = moving_ice_ball_collisions(
-                state, start_position, state.position
-            )
             while active_moving_ice_balls[ball_id]
                 and now + 0.0001 >= state.next_damage_at do
                 deal_group(
@@ -1410,7 +1609,7 @@ local function sync_moving_ice_balls()
 
             local reached_destination = remaining_to_destination <= move_distance + 0.01
             local exhausted_distance = remaining_distance <= move_distance + 0.01
-            if reached_target or reached_destination or exhausted_distance then
+            if hit_progress ~= nil or reached_destination or exhausted_distance then
                 release_moving_ice_ball(ball_id, true)
             end
         end
@@ -1505,14 +1704,22 @@ local function run_frost(context, definition)
         state.particle = ParticleManager:CreateParticle(
             MOVING_ICE_BALL_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
         )
+        ParticleManager:SetParticleControl(state.particle, 0, origin)
+        ParticleManager:SetParticleControl(
+            state.particle, 2, Vector(state.move_speed, 0, 0)
+        )
+        -- Preserve the level's initial size. The native root's sole variant
+        -- keeps radius interpolation at its starting scale (0.3), while its
+        -- original rolling, snow layers and shattering endcaps are retained.
+        ParticleManager:SetParticleControl(
+            state.particle, 3, Vector(state.radius, state.radius, state.radius)
+        )
         sync_moving_ice_ball_particle(state)
     end)
     if not visual_ok then
-        if state.particle then
-            pcall(function()
-                ParticleManager:DestroyParticle(state.particle, true)
-                ParticleManager:ReleaseParticleIndex(state.particle)
-            end)
+        if state.particle ~= nil then
+            pcall(function() ParticleManager:DestroyParticle(state.particle, true) end)
+            pcall(function() ParticleManager:ReleaseParticleIndex(state.particle) end)
         end
         state.particle = nil
         print("[HeroPassiveSkill] moving ice ball failed: " .. tostring(visual_error))
@@ -1615,6 +1822,51 @@ local function run_poison(context, definition)
     return create_poison_cloud(context, position, definition)
 end
 
+function blade_pulse_visual.release(state, immediate)
+    if not state or state.particle == nil then return end
+    local particle = state.particle
+    state.particle = nil
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle, immediate == true)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not destroy_ok or not release_ok then
+        print("[HeroPassiveSkill] blade swashbuckle cleanup failed: "
+            .. tostring(destroy_error or release_error))
+    end
+end
+
+function blade_pulse_visual.create(state, speed, duration)
+    local visual_duration = math.min(duration, state.visual_distance / speed)
+    local visual_ok, visual_error = pcall(function()
+        state.particle = ParticleManager:CreateParticle(
+            blade_pulse_visual.particle, PATTACH_WORLDORIGIN, state.context.attacker
+        )
+        ParticleManager:SetParticleControl(state.particle, 0, state.origin)
+        ParticleManager:SetParticleControlForward(state.particle, 0, state.direction)
+        ParticleManager:SetParticleControl(state.particle, 1, state.direction * speed)
+        -- The native sword stays at the launch origin; scale its full length
+        -- to the hero's range instead of adding it to the carrier's travel.
+        ParticleManager:SetParticleControl(state.particle, 2, Vector(
+            state.visual_distance / (blade_pulse_visual.native_sword_forward_extent
+                * blade_pulse_visual.native_sword_radius), 0, 0
+        ))
+        ParticleManager:SetParticleControl(state.particle, 3, state.origin)
+        ParticleManager:SetParticleControlForward(state.particle, 3, state.direction)
+    end)
+    if not visual_ok then
+        blade_pulse_visual.release(state, true)
+        print("[HeroPassiveSkill] blade swashbuckle visual failed: " .. tostring(visual_error))
+        return
+    end
+    scheduler.after(visual_duration, function()
+        -- End the entire graph at the attack-range boundary, including sparks.
+        blade_pulse_visual.release(state, true)
+    end)
+end
+
 local function blade_pulse_damage_multiplier(state, target)
     local multiplier = state.base_multiplier
     if state.maximum_distance_multiplier > 1 then
@@ -1641,6 +1893,7 @@ local function blade_pulse_projectile_hit(ability, target, projectile_id)
     local state = projectile_id and blade_pulse_projectiles[projectile_id] or nil
     if not state then return false end
     if not target then
+        blade_pulse_visual.release(state, true)
         blade_pulse_projectiles[projectile_id] = nil
         return false
     end
@@ -1673,7 +1926,8 @@ local function run_blade(context, definition)
     local direction = Vector(forward.x, forward.y, 0)
     if direction:Length2D() <= 0.001 then return false end
     direction = direction:Normalized()
-    local distance = current_attack_range(context.attacker)
+    local attack_range = current_attack_range(context.attacker)
+    local distance = attack_range
         * level_value(definition, "range_multiplier", context.level)
     local duration = level_value(definition, "pulse_duration", context.level)
     local half_width = level_value(definition, "pulse_width", context.level) * 0.5
@@ -1695,12 +1949,13 @@ local function run_blade(context, definition)
     for _ = 1, pulse_count do
         blade_pulse_sequence = blade_pulse_sequence + 1
         local projectile_id = blade_pulse_sequence
-        blade_pulse_projectiles[projectile_id] = {
+        local state = {
             ability = ability,
             context = context,
             origin = copy_position(origin),
             direction = direction,
             distance = distance,
+            visual_distance = math.min(distance, attack_range),
             base_multiplier = level_value(
                 definition, "damage_multiplier", context.level
             ),
@@ -1713,9 +1968,11 @@ local function run_blade(context, definition)
             first_target_hit = false,
             hit = {},
         }
+        blade_pulse_projectiles[projectile_id] = state
         ProjectileManager:CreateLinearProjectile({
             Ability = ability,
-            EffectName = BLADE_PULSE_PARTICLE,
+            -- Swashbuckle needs its own velocity and moving CP3 controls.
+            EffectName = "",
             Source = context.attacker,
             vSpawnOrigin = origin,
             vVelocity = direction * speed,
@@ -1729,8 +1986,12 @@ local function run_blade(context, definition)
             bProvidesVision = false,
             ExtraData = { blade_pulse_projectile_id = projectile_id },
         })
+        blade_pulse_visual.create(state, speed, duration)
         scheduler.after(distance / speed + BLADE_PULSE_CLEANUP_GRACE, function()
-            blade_pulse_projectiles[projectile_id] = nil
+            blade_pulse_visual.release(state, true)
+            if blade_pulse_projectiles[projectile_id] == state then
+                blade_pulse_projectiles[projectile_id] = nil
+            end
         end)
     end
     return true
@@ -2495,17 +2756,20 @@ local function run_arcane(context, definition)
     local missile_window = level_value(definition, "missile_window", context.level)
     local damage_multiplier = level_value(definition, "damage_multiplier", context.level)
     local total_missiles = missile_count * barrage_count
-    local cast_duration = (barrage_count - 1) * barrage_interval + missile_window
+    local cast_duration = (barrage_count - 1) * barrage_interval
+        + (missile_count - 1) / missile_count * missile_window
+        + arcane_snapfire_visual.fall_duration
     local current_time = GameRules and GameRules.GetGameTime
         and GameRules:GetGameTime() or 0
 
     arcane_barrage_sequence = arcane_barrage_sequence + 1
-    local token = arcane_barrage_sequence
-    active_arcane_barrages[attacker_key] = {
-        token = token,
+    local barrage_state = {
+        token = arcane_barrage_sequence,
+        context = context,
         remaining_missiles = total_missiles,
         unlock_at = current_time + cast_duration + 0.25,
     }
+    active_arcane_barrages[attacker_key] = barrage_state
     M.sound_service.play("hero_arcane_cast", {
         source = context.attacker, position = position,
     })
@@ -2526,31 +2790,36 @@ local function run_arcane(context, definition)
 
     local function finish_missile()
         local active = active_arcane_barrages[attacker_key]
-        if not active or active.token ~= token then return end
+        if active ~= barrage_state then return end
         active.remaining_missiles = active.remaining_missiles - 1
         if active.remaining_missiles <= 0 then
+            arcane_snapfire_visual.clear_barrage(active)
             active_arcane_barrages[attacker_key] = nil
         end
     end
 
-    local function impact(landing_position)
+    local function impact(missile)
+        if missile.landed or active_arcane_barrages[attacker_key] ~= barrage_state then
+            return false
+        end
+        missile.landed = true
+        arcane_snapfire_visual.release_flight(missile)
+        local landing_position = missile.position
         if valid(context.attacker) then
             M.sound_service.play("hero_arcane_impact", {
                 source = context.attacker, position = landing_position,
             })
-            local visual_ok, visual_error = pcall(function()
-                local flare = ParticleManager:CreateParticle(
-                    ARCANE_MYSTIC_FLARE_PARTICLE,
-                    PATTACH_WORLDORIGIN,
-                    context.attacker
-                )
-                ParticleManager:SetParticleControl(flare, 0, landing_position)
-                ParticleManager:ReleaseParticleIndex(flare)
-            end)
-            if not visual_ok then
-                print("[HeroPassiveSkill] arcane barrage mystic flare visual failed: "
-                    .. tostring(visual_error))
-            end
+            arcane_snapfire_visual.landing_particle(
+                arcane_snapfire_visual.impact, context.attacker,
+                landing_position
+            )
+            -- Every landing needs the full native ground expansion and pool.
+            -- Merging nearby pools suppresses this animation on later missiles;
+            -- replaying only the short bursts cannot restore the missing floor.
+            arcane_snapfire_visual.landing_particle(
+                arcane_snapfire_visual.linger, context.attacker,
+                landing_position
+            )
 
             local damage_ok, damage_error = pcall(function()
                 deal_group(
@@ -2576,31 +2845,55 @@ local function run_arcane(context, definition)
     for barrage = 1, barrage_count do
         local barrage_delay = (barrage - 1) * barrage_interval
         for missile = 1, missile_count do
-            local missile_delay = (missile / missile_count) * missile_window
-            local impact_delay = barrage_delay + missile_delay
+            local missile_delay = ((missile - 1) / missile_count) * missile_window
             impacts[#impacts + 1] = {
-                delay = impact_delay,
+                launch_delay = barrage_delay + missile_delay,
                 position = random_landing_position(),
+                radius = explosion_radius,
+                attacker = context.attacker,
+                attacker_key = attacker_key,
+                barrage = barrage_state,
             }
         end
     end
-    table.sort(impacts, function(a, b) return a.delay < b.delay end)
-    local next_impact = 1
-    local function run_next_impact()
-        local current = impacts[next_impact]
-        if not current then return false end
-        impact(current.position)
-        next_impact = next_impact + 1
-        local following = impacts[next_impact]
-        if not following then return false end
-        local now = GameRules and GameRules.GetGameTime
-            and GameRules:GetGameTime() or current_time
-        return math.max(0, current_time + following.delay - now)
+    table.sort(impacts, function(a, b) return a.launch_delay < b.launch_delay end)
+    barrage_state.missiles = impacts
+    local function launch_missile(missile)
+        if missile.launched then return end
+        missile.launched = true
+        -- Start a full flight even when this launch's scheduler tick is late.
+        -- Visual allocation failure does not cancel its scheduled damage.
+        missile.land_at = game_time() + arcane_snapfire_visual.fall_duration
+        barrage_state.unlock_at = math.max(barrage_state.unlock_at, missile.land_at + 0.25)
+        arcane_snapfire_visual.launch(missile)
+        scheduler.after(arcane_snapfire_visual.fall_duration, function()
+            return impact(missile)
+        end)
     end
-    scheduler.after(impacts[1].delay, run_next_impact)
+    local next_launch = 1
+    local function run_next_launch()
+        if active_arcane_barrages[attacker_key] ~= barrage_state then return false end
+        local now = game_time()
+        while impacts[next_launch] and current_time + impacts[next_launch].launch_delay <= now do
+            launch_missile(impacts[next_launch])
+            next_launch = next_launch + 1
+        end
+        local following = impacts[next_launch]
+        if not following then return false end
+        return math.max(0, current_time + following.launch_delay - game_time())
+    end
+    -- The native model appears 0.1 seconds after its root. Give even the first
+    -- shell the full 0.8-second descent instead of compressing it into 1/N.
+    local launch_delay = run_next_launch()
+    if type(launch_delay) == "number" then
+        scheduler.after(launch_delay, run_next_launch)
+    end
     scheduler.after(cast_duration + 0.5, function()
         local active = active_arcane_barrages[attacker_key]
-        if active and active.token == token then
+        if active == barrage_state then
+            local remaining = active.unlock_at + 0.25 - game_time()
+            if remaining > 0 then return remaining end
+            arcane_snapfire_visual.clear_barrage(active)
             active_arcane_barrages[attacker_key] = nil
             print("[HeroPassiveSkill] arcane barrage lock released by failsafe")
         end
@@ -2666,6 +2959,34 @@ local function create_magic_slingshot_rubble(context, position, definition)
     return true
 end
 
+function magic_slingshot_visual.hit(context, target, location)
+    local position = location or unit_position(target)
+    if not position then return end
+    local particle = nil
+    local visual_ok, visual_error = pcall(function()
+        particle = ParticleManager:CreateParticle(
+            magic_slingshot_visual.impact, PATTACH_WORLDORIGIN, context.attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, position)
+        ParticleManager:SetParticleControl(particle, 3, position)
+        -- The burst uses CP3, while its sparks and energy sample the victim's
+        -- model and bones through CP1. Bind it before a lethal damage result.
+        ParticleManager:SetParticleControlEnt(
+            particle, 1, target, PATTACH_ABSORIGIN_FOLLOW, "",
+            unit_position(target) or position, false
+        )
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not visual_ok then
+        if particle ~= nil then
+            pcall(function() ParticleManager:DestroyParticle(particle, true) end)
+            pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+        end
+        print("[HeroPassiveSkill] magic slingshot impact visual failed: "
+            .. tostring(visual_error))
+    end
+end
+
 local function magic_slingshot_projectile_hit(ability, target, location, projectile_id)
     projectile_id = tonumber(projectile_id)
     local state = projectile_id and magic_slingshot_projectiles[projectile_id] or nil
@@ -2681,6 +3002,7 @@ local function magic_slingshot_projectile_hit(ability, target, location, project
         tostring(target:entindex())
     ))
     local was_stunned = is_stunned(target)
+    magic_slingshot_visual.hit(state.context, target, location)
     M.sound_service.play("hero_slingshot_impact", {
         source = state.context.attacker, unit = target,
     })
@@ -2753,7 +3075,9 @@ local function run_magic_slingshot(context, definition)
                 Target = target,
                 Source = context.attacker,
                 Ability = ability,
-                EffectName = MAGIC_SLINGSHOT_PROJECTILE_PARTICLE,
+                -- The native Q hit endcap is removed from this root; the
+                -- validated hit callback above plays the impact exactly once.
+                EffectName = magic_slingshot_visual.projectile,
                 iMoveSpeed = level_value(definition, "projectile_speed", context.level),
                 bDodgeable = false,
                 bProvidesVision = false,
@@ -2931,6 +3255,257 @@ local function run_holy(context, definition)
     return launched > 0
 end
 
+function ice_cone_visual.release_particle(particle, immediate)
+    if particle == nil then return end
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle, immediate ~= false)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not destroy_ok or not release_ok then
+        print("[HeroPassiveSkill] ice cone particle cleanup failed: "
+            .. tostring(destroy_error or release_error))
+    end
+end
+
+function ice_cone_visual.release_flight(missile, immediate)
+    local particle = missile.particle
+    missile.particle = nil
+    if missile.state.flights[missile] then
+        missile.state.flights[missile] = nil
+        missile.state.flight_count = missile.state.flight_count - 1
+    end
+    ice_cone_visual.release_particle(particle, immediate)
+end
+
+function ice_cone_visual.release_field(state, immediate)
+    local field = state.snow_particle
+    state.snow_particle = nil
+    state.field_fade_at = nil
+    ice_cone_visual.release_particle(field, immediate)
+end
+
+function ice_cone_visual.release(state)
+    ice_cone_visual.release_field(state)
+    for missile in pairs(state.flights or {}) do
+        ice_cone_visual.release_flight(missile)
+    end
+    state.hail_stopped = true
+    ice_cone_visual.active[state] = nil
+end
+
+function ice_cone_visual.clear()
+    if ice_cone_visual.task then scheduler.cancel(ice_cone_visual.task) end
+    for _, state in pairs(active_ice_cones) do ice_cone_visual.release(state) end
+    -- Finished casts may still own their ground effect or slower final shells.
+    for state in pairs(ice_cone_visual.active) do ice_cone_visual.release(state) end
+    ice_cone_visual.active = {}
+    ice_cone_visual.task = nil
+end
+
+function ice_cone_visual.create_field(state, position, radius)
+    if not ice_cone_visual.field then return end
+    ice_cone_visual.release_field(state)
+    local ok, message = pcall(function()
+        state.snow_particle = ParticleManager:CreateParticle(
+            ice_cone_visual.field, PATTACH_WORLDORIGIN, state.attacker
+        )
+        ParticleManager:SetParticleControl(state.snow_particle, 0, position)
+        -- Full native ground graph: frost, crystals, dust, lights and opening
+        -- beams. Unit-bound ice belongs exclusively to the freeze modifier.
+        ParticleManager:SetParticleControl(state.snow_particle, 2, Vector(radius, radius, 0))
+        ParticleManager:SetParticleControl(state.snow_particle, 61, Vector(0, 0, 0))
+        -- The native projection's endcap fades alpha over roughly one second.
+        -- Include that fade in the five-second field, independently of the
+        -- three/five-wave cast lock. Faint native frost finishes naturally.
+        state.field_fade_at = game_time() + ice_cone_visual.field_duration
+            - ice_cone_visual.field_fade_duration
+    end)
+    if not ok then
+        local particle = state.snow_particle
+        state.snow_particle = nil
+        state.field_fade_at = nil
+        ice_cone_visual.release_particle(particle)
+        print("[HeroPassiveSkill] ice cone snow field failed: " .. tostring(message))
+    end
+end
+
+function ice_cone_visual.configure_flight(missile, now)
+    local duration = missile.travel_duration
+    local sky = missile.position + Vector(0, 0, missile.height)
+    ParticleManager:SetParticleControl(missile.particle, 0, sky)
+    ParticleManager:SetParticleControl(missile.particle, 1, missile.position)
+    ParticleManager:SetParticleControl(missile.particle, 2, Vector(missile.height / duration, 0, 0))
+    ParticleManager:SetParticleControl(missile.particle, 3, sky)
+end
+
+function ice_cone_visual.ensure_task()
+    if ice_cone_visual.task then return end
+    local active_hail = ice_cone_visual.active
+    ice_cone_visual.task = scheduler.after(0.03, function()
+        if ice_cone_visual.active ~= active_hail then return false end
+        local now = game_time()
+        for state in pairs(active_hail) do
+            ice_cone_visual.update_hail(state, now)
+        end
+        if next(active_hail) == nil then
+            ice_cone_visual.task = nil
+            return false
+        end
+        return 0.03
+    end)
+end
+
+function ice_cone_visual.random(state)
+    state.visual_seed = (state.visual_seed * 48271) % 2147483647
+    return state.visual_seed / 2147483647
+end
+
+function ice_cone_visual.prepare_hail(state, current_time, impact_count, impact_interval)
+    for wave = 1, impact_count do
+        local wave_start = current_time + (wave - 1) * impact_interval
+        for ball = 1, 10 do
+            local sequence = #state.hail + 1
+            local radial_jitter = ice_cone_visual.random(state)
+            local angle_jitter = ice_cone_visual.random(state) - 0.5
+            local distance = math.sqrt(((sequence - 1) % 13 + radial_jitter) / 13)
+                * math.max(0, state.radius - ice_cone_visual.impact_radius)
+            local angle = sequence * 2.399963229728653 + angle_jitter * 0.45
+            local position = state.position + Vector(math.cos(angle) * distance, math.sin(angle) * distance, 0)
+            if GetGroundPosition then position = GetGroundPosition(position, nil) end
+            local travel_time = (0.40 + ice_cone_visual.random(state) * 0.08)
+                * ice_cone_visual.fall_duration_scale / ice_cone_visual.fall_speed_multiplier
+            local launch_at = wave_start + (ball - 1) * 0.008
+            state.hail[sequence] = {
+                state = state,
+                position = position,
+                height = 1800 + ice_cone_visual.random(state) * 400,
+                wave = wave,
+                launch_at = launch_at,
+                travel_duration = travel_time,
+                land_at = launch_at + travel_time,
+            }
+        end
+    end
+    table.sort(state.hail, function(a, b)
+        return a.launch_at == b.launch_at and a.land_at < b.land_at or a.launch_at < b.launch_at
+    end)
+end
+
+function ice_cone_visual.spawn(state, missile, now)
+    if state.flight_count >= ice_cone_visual.max_flights or now >= missile.land_at
+        or now - missile.launch_at > ice_cone_visual.max_lateness then return end
+    missile.flight_started_at = now
+    -- A late engine tick delays arrival, never speeds up the native shell.
+    missile.land_at = now + missile.travel_duration
+    local first_landing = state.wave_landings[missile.wave]
+    if not first_landing or missile.land_at < first_landing then
+        state.wave_landings[missile.wave] = missile.land_at
+    end
+    local ok, message = pcall(function()
+        missile.particle = ParticleManager:CreateParticle(
+            ice_cone_visual.flight, PATTACH_WORLDORIGIN, state.attacker
+        )
+        ice_cone_visual.configure_flight(missile, now)
+    end)
+    if not ok then
+        ice_cone_visual.release_flight(missile)
+        print("[HeroPassiveSkill] ice cone flight visual failed: " .. tostring(message))
+        return
+    end
+    state.flights[missile] = true
+    state.flight_count = state.flight_count + 1
+end
+
+function ice_cone_visual.landing_particle(path, attacker, position)
+    local particle = nil
+    local ok, message = pcall(function()
+        particle = ParticleManager:CreateParticle(
+            path, PATTACH_WORLDORIGIN, attacker
+        )
+        ParticleManager:SetParticleControl(particle, 0, position)
+        ParticleManager:SetParticleControl(particle, 3, position)
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not ok then
+        ice_cone_visual.release_particle(particle)
+        print("[HeroPassiveSkill] ice cone impact failed: " .. tostring(message))
+    end
+    return ok
+end
+
+function ice_cone_visual.landing(attacker, position, radius)
+    ice_cone_visual.landing_particle(ice_cone_visual.impact, attacker, position)
+    local generation = ice_cone_visual.active
+    for _, effect in ipairs(ice_cone_visual.landing_effects) do
+        local path = effect.particle
+        if (effect.delay or 0) > 0 then
+            -- The native crystal spray begins after the initial blast. A
+            -- completed cast/recast keeps it; resetting the game cancels it.
+            scheduler.after(effect.delay, function()
+                if ice_cone_visual.active == generation and valid(attacker) then
+                    ice_cone_visual.landing_particle(path, attacker, position)
+                end
+                return false
+            end)
+        else
+            ice_cone_visual.landing_particle(path, attacker, position)
+        end
+    end
+end
+
+function ice_cone_visual.update_hail(state, now)
+    if state.hail_stopped or (not state.cast_finished
+        and active_ice_cones[state.attacker_key] ~= state)
+        or not valid(state.attacker) then
+        ice_cone_visual.release(state)
+        return
+    end
+    if state.snow_particle ~= nil and state.field_fade_at
+        and now + 0.000001 >= state.field_fade_at then
+        -- Keep the complete native endcap; Destroy(true) cuts off its fade.
+        ice_cone_visual.release_field(state, false)
+    end
+    for missile in pairs(state.flights) do
+        if now >= missile.land_at then
+            local landed_on_time = now - missile.land_at <= ice_cone_visual.max_lateness
+            -- A real landing keeps the native shrinking shell, snow and
+            -- ribbon endcaps. Cancellation still removes the graph immediately.
+            ice_cone_visual.release_flight(missile, not landed_on_time)
+            if landed_on_time then
+                ice_cone_visual.landing(state.attacker, missile.position, ice_cone_visual.impact_radius)
+            end
+        end
+    end
+    while not state.cast_finished and state.hail[state.next_launch]
+        and state.hail[state.next_launch].launch_at <= now + 0.000001 do
+        local missile = state.hail[state.next_launch]
+        ice_cone_visual.spawn(state, missile, now)
+        state.next_launch = state.next_launch + 1
+    end
+    if state.cast_finished and state.flight_count == 0 and state.snow_particle == nil
+        and (state.pending_impacts or 0) == 0 then
+        ice_cone_visual.release(state)
+    end
+end
+
+function ice_cone_visual.start_hail(state)
+    ice_cone_visual.active[state] = true
+    ice_cone_visual.update_hail(state, game_time())
+    ice_cone_visual.ensure_task()
+end
+
+function ice_cone_visual.finish_cast(state)
+    state.cast_finished = true
+    if active_ice_cones[state.attacker_key] == state then
+        active_ice_cones[state.attacker_key] = nil
+    end
+    -- Unlock combat on time; the native ground fade and final shells each
+    -- finish on their own clocks without cutting off landing explosions.
+    ice_cone_visual.update_hail(state, game_time())
+end
+
 local function run_ice_cone(context, definition)
     local position = unit_position(context.target)
     local attacker_key = unit_key(context.attacker)
@@ -2957,57 +3532,41 @@ local function run_ice_cone(context, definition)
         and GameRules:GetGameTime() or 0
 
     ice_cone_sequence = ice_cone_sequence + 1
-    local token = ice_cone_sequence
-    local snow_particle = nil
-    local visual_ok, visual_error = pcall(function()
-        snow_particle = ParticleManager:CreateParticle(
-            ICE_CONE_SNOW_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
-        )
-        ParticleManager:SetParticleControl(snow_particle, 0, position)
-        ParticleManager:SetParticleControl(snow_particle, 1, Vector(radius, 0, 0))
-    end)
-    if not visual_ok then
-        snow_particle = nil
-        print("[HeroPassiveSkill] ice cone snow field failed: "
-            .. tostring(visual_error))
-    end
-    active_ice_cones[attacker_key] = {
-        token = token,
+    local state = {
+        token = ice_cone_sequence,
         unlock_at = current_time + cast_duration,
-        snow_particle = snow_particle,
+        attacker = context.attacker,
+        attacker_key = attacker_key,
+        position = position,
+        radius = radius,
+        flights = {},
+        flight_count = 0,
+        hail = {},
+        next_launch = 1,
+        pending_impacts = impact_count,
+        wave_landings = {},
+        visual_seed = (ice_cone_sequence * 7919 + 17) % 2147483647,
     }
+    active_ice_cones[attacker_key] = state
+    ice_cone_visual.create_field(state, position, radius)
+    ice_cone_visual.prepare_hail(state, current_time, impact_count, impact_interval)
+    ice_cone_visual.start_hail(state)
     M.sound_service.play("hero_ice_cone_cast", {
         source = context.attacker, position = position,
     })
 
     local function release_active()
         local active = active_ice_cones[attacker_key]
-        if not active or active.token ~= token then return end
-        if active.snow_particle then
-            ParticleManager:DestroyParticle(active.snow_particle, false)
-            ParticleManager:ReleaseParticleIndex(active.snow_particle)
-        end
-        active_ice_cones[attacker_key] = nil
+        if active ~= state then return end
+        ice_cone_visual.finish_cast(active)
     end
 
     local function impact()
+        if state.hail_stopped or not ice_cone_visual.active[state] then return end
         if not valid(context.attacker) then return end
         M.sound_service.play("hero_ice_cone_impact", {
             source = context.attacker, position = position,
         })
-        local impact_visual_ok, impact_visual_error = pcall(function()
-            local particle = ParticleManager:CreateParticle(
-                ICE_CONE_IMPACT_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
-            )
-            ParticleManager:SetParticleControl(particle, 0, position)
-            ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
-            ParticleManager:ReleaseParticleIndex(particle)
-        end)
-        if not impact_visual_ok then
-            print("[HeroPassiveSkill] ice cone impact failed: "
-                .. tostring(impact_visual_error))
-        end
-
         local damage_ok, damage_error = pcall(function()
             local targets = enemies_touching_radius(context.attacker, position, radius)
             for _, target in ipairs(targets) do
@@ -3024,7 +3583,10 @@ local function run_ice_cone(context, definition)
                 end
                 if alive(target) and freeze_chance > 0
                     and RandomFloat(0, 1) < freeze_chance then
-                    stun(context.attacker, target, freeze_duration)
+                    target:AddNewModifier(context.attacker, nil,
+                        "modifier_hero_ice_cone_freeze", {
+                            duration = math.max(0.01, freeze_duration),
+                        })
                 end
             end
         end)
@@ -3034,21 +3596,67 @@ local function run_ice_cone(context, definition)
         end
     end
 
-    impact()
-    local next_impact = 2
+    -- Damage follows the slower shells, including the last wave after the
+    -- original cast lock ends. The visual registry also guards reset/recast.
+    local next_impact = 1
     local function run_next_impact()
+        if state.hail_stopped or not ice_cone_visual.active[state] then return false end
         if next_impact > impact_count then return false end
+        -- Each wave's random fall times and late launch ticks can move its
+        -- first arrival. Wait for that shell, even if its visual failed to load.
+        local now = game_time()
+        local first_landing = state.wave_landings[next_impact]
+        if first_landing and now + 0.000001 < first_landing then
+            return first_landing - now
+        end
         impact()
+        state.pending_impacts = math.max(0, state.pending_impacts - 1)
         next_impact = next_impact + 1
         if next_impact > impact_count then return false end
-        local now = GameRules and GameRules.GetGameTime
-            and GameRules:GetGameTime() or current_time
-        local following_time = current_time + (next_impact - 1) * impact_interval
+        local following_time = current_time + ice_cone_visual.first_impact_delay
+            + (next_impact - 1) * impact_interval
         return math.max(0, following_time - now)
     end
-    if impact_count > 1 then scheduler.after(impact_interval, run_next_impact) end
+    scheduler.after(ice_cone_visual.first_impact_delay, run_next_impact)
     scheduler.after(cast_duration, release_active)
     return true
+end
+
+function tornado_visual.release(state)
+    if not state or state.particle == nil then return end
+    local particle = state.particle
+    state.particle = nil
+    local destroy_ok, destroy_error = pcall(function()
+        ParticleManager:DestroyParticle(particle, true)
+    end)
+    local release_ok, release_error = pcall(function()
+        ParticleManager:ReleaseParticleIndex(particle)
+    end)
+    if not destroy_ok or not release_ok then
+        print("[HeroPassiveSkill] tornado particle cleanup failed: "
+            .. tostring(destroy_error or release_error))
+    end
+end
+
+function tornado_visual.sync(state)
+    if state.particle == nil then return end
+    -- Native Invoker funnel/base follow CP3, while the dust follows CP0.
+    -- Lua owns movement; the wrapper omits the native straight-line mover.
+    ParticleManager:SetParticleControl(state.particle, 0, state.position)
+    ParticleManager:SetParticleControl(state.particle, 3, state.position)
+end
+
+function tornado_visual.create(state)
+    local visual_ok, visual_error = pcall(function()
+        state.particle = ParticleManager:CreateParticle(
+            tornado_visual.particle, PATTACH_WORLDORIGIN, state.context.attacker
+        )
+        tornado_visual.sync(state)
+    end)
+    if not visual_ok then
+        tornado_visual.release(state)
+        print("[HeroPassiveSkill] tornado visual failed: " .. tostring(visual_error))
+    end
 end
 
 local function tornado_refresh_attributes(state)
@@ -3134,11 +3742,7 @@ local function tornado_damage(state)
 end
 
 local function tornado_release(state)
-    if state.particle then
-        ParticleManager:DestroyParticle(state.particle, false)
-        ParticleManager:ReleaseParticleIndex(state.particle)
-        state.particle = nil
-    end
+    tornado_visual.release(state)
     tornado_log(state, "finish")
     active_tornadoes[state.id] = nil
 end
@@ -3180,17 +3784,7 @@ local function tornado_spawn_small(parent, target)
     M.sound_service.play("hero_tornado_small", {
         source = state.context.attacker, position = state.position,
     })
-    local visual_ok, visual_error = pcall(function()
-        state.particle = ParticleManager:CreateParticle(
-            TORNADO_PARTICLE, PATTACH_WORLDORIGIN, state.context.attacker
-        )
-        ParticleManager:SetParticleControl(state.particle, 0, state.position)
-        ParticleManager:SetParticleControl(state.particle, 3, state.position)
-    end)
-    if not visual_ok then
-        state.particle = nil
-        print("[HeroPassiveSkill] small tornado visual failed: " .. tostring(visual_error))
-    end
+    tornado_visual.create(state)
     tornado_log(state, "spawn")
     tornado_refresh_attributes(state)
     tornado_damage(state)
@@ -3281,10 +3875,7 @@ local function sync_tornadoes()
             if GetGroundPosition then
                 state.position = GetGroundPosition(state.position, nil)
             end
-            if state.particle then
-                ParticleManager:SetParticleControl(state.particle, 0, state.position)
-                ParticleManager:SetParticleControl(state.particle, 3, state.position)
-            end
+            tornado_visual.sync(state)
             if state.area_slow_pct > 0 then
                 for _, target in ipairs(enemies_touching_radius(
                     state.context.attacker, state.position, state.effect_radius
@@ -3325,6 +3916,7 @@ local function sync_tornadoes()
     end
     tornado_sync_slow_units(desired_area, desired_hit)
     if not has_active or next(active_tornadoes) == nil then
+        tornado_sync_slow_units({ values = {} }, { values = {} })
         tornado_task = nil
         return false
     end
@@ -3384,17 +3976,7 @@ local function run_void(context, definition)
         source = context.attacker, position = state.position,
     })
     tornado_damage(state)
-    local visual_ok, visual_error = pcall(function()
-        state.particle = ParticleManager:CreateParticle(
-            TORNADO_PARTICLE, PATTACH_WORLDORIGIN, context.attacker
-        )
-        ParticleManager:SetParticleControl(state.particle, 0, state.position)
-        ParticleManager:SetParticleControl(state.particle, 3, state.position)
-    end)
-    if not visual_ok then
-        state.particle = nil
-        print("[HeroPassiveSkill] tornado visual failed: " .. tostring(visual_error))
-    end
+    tornado_visual.create(state)
     tornado_log(state, "spawn")
     ensure_tornado_task()
     return true
@@ -3570,6 +4152,8 @@ function M.init()
     clear_moving_ice_balls()
     clear_poison_clouds()
     clear_meteors()
+    arcane_snapfire_visual.clear()
+    ice_cone_visual.clear()
     processed_attacks = {}
     exclusive_passives.init({ deal_group = deal_group })
     refresh_tokens = {}
@@ -3602,6 +4186,9 @@ function M.init()
     poison_cloud_units = {}
     poison_cloud_deaths = {}
     poison_cloud_task = nil
+    for _, state in pairs(blade_pulse_projectiles) do
+        blade_pulse_visual.release(state, true)
+    end
     blade_pulse_projectiles = {}
     blade_pulse_sequence = 0
     echo_slash.projectiles = {}

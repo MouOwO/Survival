@@ -35,7 +35,7 @@ end
 
 function M:GetCustomCastErrorLocation()
     if self.cast_error == "relocation_out_of_range" then return "移动距离不能超过1000" end
-    if self.cast_error == "move_ability_cooldown" then return "移动技能冷却中" end
+    if self.cast_error == "move_ability_cooldown" then return "移动防御塔CD中" end
     return "请选择网格内可放置的位置"
 end
 

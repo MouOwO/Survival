@@ -90,6 +90,10 @@
 /scripts/vscripts/tests/*
 !/scripts/vscripts/tests/test_wall_navigation_geometry.lua
 !/scripts/vscripts/tests/test_wall_contact_deadlock.lua
+!/scripts/vscripts/tests/test_wall_contact_crowd.lua
+!/scripts/vscripts/tests/test_wall_contact_alignment.lua
+!/scripts/vscripts/tests/manual_wall_crowd_contacts.lua
+!/scripts/vscripts/tests/wall_crowd_probe_modifier.lua
 !/scripts/vscripts/tests/test_enemy_wall_boundary_ai.lua
 !/scripts/vscripts/tests/test_tower_laser_visual.lua
 !/scripts/vscripts/tests/test_tower_laser_damage.lua

@@ -82,6 +82,10 @@ local modifiers = {
         path = "modifiers/modifier_hero_passive_skill_effects",
     },
     {
+        name = "modifier_hero_ice_cone_freeze",
+        path = "modifiers/modifier_hero_ice_cone_freeze",
+    },
+    {
         name = "modifier_hero_poison_cloud_armor",
         path = "modifiers/modifier_hero_poison_cloud_armor",
     },
