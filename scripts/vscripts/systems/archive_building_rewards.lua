@@ -27,11 +27,11 @@ function M.apply(command, archive, stats, apply_effects)
         return true
     end
     local item = items.by_id[command.item_id]
-    if not item or not item.enabled then return false, "存档建筑不存在" end
+    if not item or not item.enabled then return false, "存档神器不存在" end
     local s = state(archive)
     local level = s.levels[item.item_id] or 0
-    if level >= item.max_level then return false, "存档建筑已满级" end
-    if command.expected_level ~= level then return false, "建筑等级已更新，请重试" end
+    if level >= item.max_level then return false, "存档神器已满级" end
+    if command.expected_level ~= level then return false, "神器等级已更新，请重试" end
     if s.faith < item.cost then return false, "信仰值不足" end
     s.faith = s.faith - item.cost
     s.levels[item.item_id] = level + 1

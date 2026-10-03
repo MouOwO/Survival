@@ -49,7 +49,8 @@ local function add(stats,field,delta)
     local value=old+delta
     if spec.min_value then value=math.max(value,spec.min_value) end
     if spec.max_value then value=math.min(value,spec.max_value) end
-    stats[field]=value
+    if field=="starjoy_points" then require("systems/archive_starjoy_rewards").change(stats,old,value)
+    else stats[field]=value end
     if field=='map_level' then
         for _,rule in ipairs(require('config/generated/map_level_effect_rules').rows) do
             if rule.enabled~=false and rule.source_field_id==field then add(stats,rule.target_field_id,(value-old)*rule.value_per_level) end
@@ -79,6 +80,7 @@ function M.settle(profile,command)
     if command.kind=='lottery_snapshot' then return {ok=true,snapshots=M.snapshots(profile)} end
     local pool=config.pools[command.pool_id];if not pool then return {ok=false,error='lottery_pool_invalid'} end
     local archive=copy(profile.save.archive or {});local counts=copy(profile.save.content_inventory or {});local stats=copy(profile.save.gameplay_stats or {})
+    require("systems/archive_starjoy_rewards").reconcile(stats)
     archive.lottery_state=archive.lottery_state or {pools={}};local state=archive.lottery_state
     state.pools=state.pools or {};state.pools[pool.id]=state.pools[pool.id] or {draws=0};local current=state.pools[pool.id]
     local response={ok=true,pool_id=pool.id,request_id=command.request_id}

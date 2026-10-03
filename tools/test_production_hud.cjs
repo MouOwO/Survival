@@ -211,15 +211,15 @@ const activateSource = takeoverSource.slice(takeoverSource.indexOf('    function
 const takeoverEnv = {config: routedCfg, selectedUnit: () => 20}; vm.runInNewContext(activateSource, takeoverEnv);
 takeoverEnv.activate({name: 'ability_research_worker_attack', ability: 201});
 assert.equal(routedQueueCalls, 2, 'fallback input uses the same research queue admission route');
-assert.equal(nodes.SurvivalProductionPanel.style.transform, 'scale3d(0.575,0.575,1)');
+assert(parseFloat(nodes.SurvivalProductionPanel.style.transform.split('(')[1])>0);
 hud.Refresh({...g, scale: .32}, unit, true, []);
-assert.equal(nodes.SurvivalProductionPanel.style.transform, 'scale3d(0.575,0.575,1)', 'dense native ability rows cannot shrink production labels below the readable panel scale');
-assert.equal(nodes.SurvivalProductionPanel.__survivalWindowWidth, 345);
-assert.equal(nodes.SurvivalProductionPanel.__survivalWindowHeight, 155.25);
+assert.equal(nodes.SurvivalProductionPanel.style.transform, 'scale3d('+(328/600)+','+(328/600)+',1)', 'narrow left column fits without moving above the HUD');
+assert.equal(nodes.SurvivalProductionPanel.__survivalWindowWidth, 328);
+assert.equal(nodes.SurvivalProductionPanel.__survivalWindowHeight, 147.6);
 ctx.actualuiscale_x=2;ctx.actualuiscale_y=1.5;
 hud.Refresh({...g,scale:.32},unit,true,[]);
-assert.equal(nodes.SurvivalProductionPanel.__survivalWindowWidth,690,'published physical width includes both the panel transform and viewport scale');
-assert.equal(nodes.SurvivalProductionPanel.__survivalWindowHeight,232.875,'published physical height includes viewport scaling exactly once');
+assert.equal(nodes.SurvivalProductionPanel.__survivalWindowWidth,656,'published physical width includes both the panel transform and viewport scale');
+assert(Math.abs(nodes.SurvivalProductionPanel.__survivalWindowHeight-221.4)<.00001,'published physical height includes viewport scaling exactly once');
 ctx.actualuiscale_x=1;ctx.actualuiscale_y=1;
 // Exercise the real advanced-laboratory unit name and its dense native HUD geometry.
 const geometry = require('../panorama/src/scripts/custom_game/geometry_remaining_5d5c1152eb.js');
@@ -248,7 +248,7 @@ for(const [name,oldFont] of [['ProductionTitle',34],['ProductionJobName',31],['P
 assert(Number(nodes.ProductionJobName.style.height.replace('px',''))>=fontSize('ProductionJobName')*2,'job row reserves height for two full-size text lines');
 const panelPos=nodes.SurvivalProductionPanel.style.position.split(' ').map(parseFloat);
 const panelHeight=Number(nodes.SurvivalProductionPanel.style.height.replace('px',''));
-assert(panelPos[0]+parseFloat(nodes.SurvivalProductionPanel.style.width)*displayScale<advancedGeometry.x,'queue is to the left of the building HUD');
+assert(Math.abs(panelPos[0]+parseFloat(nodes.SurvivalProductionPanel.style.width)*displayScale-(advancedGeometry.x-14))<.001,'queue sits fourteen pixels left of the building HUD');
 assert(panelPos[1]>=0,'queue remains on screen');
 assert.equal(nodes.SurvivalProductionPanel.__survivalWindowHeight,panelHeight*displayScale,'world occlusion follows the actual enlarged display bounds');
 callbacks.ui_selected_unit_stats_snapshot({success:1,player_id:1,entindex:21,research:{...research,queued:[],queue_capacity:7}});
@@ -282,3 +282,56 @@ snapshot(undefined, {research: {...research, abilities_by_name: {
 }}});
 assert.equal(hud.QueueResearch(201,20),true);
 assert.equal(sent.length,beforeLockedQueue,'locked research consumes click without sending an enqueue request');
+
+// Reproduce asynchronous queue repaints while Panorama's root measurements are
+// stale/partial. The already displayed bottom HUD remains our sole anchor.
+unit=20; refresh();
+const anchoredPosition=nodes.SurvivalProductionPanel.style.position;
+for(const [height,scale] of [[1,1],[270,.5],[0,0],[1080,2],[2160,1.5]]) {
+    ctx.actuallayoutheight=height;ctx.actualuiscale_y=scale;
+    snapshot(undefined,{research});
+    assert.equal(nodes.SurvivalProductionPanel.style.position,anchoredPosition,'snapshot repaint must not jump when context measurement changes');
+}
+for(const [w,h] of [[842,441],[1280,720],[1920,1080],[2560,1440],[3440,1440]]) {
+    for(const count of [6,10]) {
+        const anchor=geometry(w,h,count,true,false,{wall:false,tower:false});
+        for(const training of [false,true]) {
+            const p=model.PanelGeometry(anchor,training);
+            assert(p&&Number.isFinite(p.x)&&Number.isFinite(p.y));
+            assert(p.x>=8&&p.y>=8);
+            assert(p.y+p.height*p.scale<=h,'panel fits viewport');
+            assert(p.x+p.width*p.scale<=anchor.x-4||p.y+p.height*p.scale<=anchor.y-8,'panel clears bottom ability row');
+            assert(Math.abs(p.x+p.width*p.scale-(anchor.x-14))<.001,'panel stays immediately left of the action bar');
+            assert(Math.abs(p.y+p.height*p.scale-(anchor.y+anchor.height*anchor.scale))<.001,'panel bottom aligns with the action bar');
+        }
+        unit=count===6?20:21;hud.Refresh(anchor,unit,true,[]);
+        const position=nodes.SurvivalProductionPanel.style.position;
+        ctx.actuallayoutheight=1; snapshot(undefined,{research});
+        assert.equal(nodes.SurvivalProductionPanel.style.position,position,'ordinary/advanced selection and async updates retain the current viewport anchor');
+    }
+}
+hud.Refresh({...g,scale:NaN},unit,true,[]);
+assert.equal(nodes.SurvivalProductionPanel.visible,false,'incomplete geometry never exposes a panel at its default origin');
+refresh();assert.equal(nodes.SurvivalProductionPanel.visible,true,'valid geometry restores the panel');
+console.log('PRODUCTION_POSITION_PASS: transient context size/scale, private repaint, laboratory switching, five resolutions, minimap and skill-row clearance');
+
+// The private response for the new laboratory can beat the main HUD layout.
+unit=11;refresh();snapshot({options:freshOptions(),queued:[]});
+unit=20;snapshot(undefined,{research});
+assert.equal(nodes.SurvivalProductionPanel.visible,false,'new selection snapshot must wait for that unit layout instead of using the prior city anchor');
+refresh();assert.equal(nodes.SurvivalProductionPanel.visible,true);
+unit=21;callbacks.dota_player_update_selected_unit({PlayerID:0});
+while(scheduled.length)scheduled.shift()();
+assert.equal(nodes.SurvivalProductionPanel.visible,false,'selection event must hide the prior laboratory until layout catches up');
+hud.Refresh(advancedGeometry,unit,true,[]);
+assert.equal(nodes.SurvivalProductionPanel.visible,true,'advanced research returns with its own anchor');
+unit=99;callbacks.dota_player_update_selected_unit({PlayerID:0});
+while(scheduled.length)scheduled.shift()();
+assert.equal(nodes.SurvivalProductionPanel.visible,false,'switching away cannot leave a stale production panel visible');
+console.log('PRODUCTION_SELECTION_ANCHOR_PASS: snapshot-before-layout and selection-before-layout ordering');
+
+unit=20;refresh();
+const productionOffset=hud.Refresh(advancedGeometry,unit,true,[]);
+const dock=model.PanelGeometry(advancedGeometry,false);
+assert.equal(productionOffset,0,'side panel preserves normal buff positions');
+console.log('PRODUCTION_LEFT_PASS: fourteen-pixel horizontal gap, matching bottom edge, buff positions preserved');

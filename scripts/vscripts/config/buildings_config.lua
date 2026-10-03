@@ -194,7 +194,7 @@ M.building_farm = {
     unit_name = configured_unit_name("building_farm", "building_farm"),
     build_cost = build_cost("building_farm", 100, 0),
     footprint = { x = 2, y = 2 }, max_count = 1,
-    unlock_city_level = 1, show_health_bar = true, selectable = true,
+    unlock_city_level = 1, show_health_bar = false, selectable = true,
     abilities = {
         "ability_upgrade_farm",
         "ability_train_population",
@@ -312,7 +312,7 @@ M.building_advanced_research_lab = {
 }
 
 
-M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = true, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
+M.gold_mine = { id = "gold_mine", display_name = configured_name("gold_mine", "金矿"), unit_name = configured_unit_name("gold_mine", "building_gold_mine"), build_cost = build_cost("building_gold_mine", 2000, 0), footprint = { x = 2, y = 2 }, max_count = 5, population_cost = 2, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_upgrade_gold_mine", "ability_upgrade_gold_mine_efficiency", "ability_upgrade_gold_mine_crit", "ability_gold_mine_auto_upgrade", "ability_gold_mine_stop_auto_upgrade" }, levels = level_rows("building_gold_mine") }
 local gold_mine_visual = (building_visual_by_id.building_gold_mine or {})[1]
 if gold_mine_visual then
     M.gold_mine.levels[1] = M.gold_mine.levels[1] or {}

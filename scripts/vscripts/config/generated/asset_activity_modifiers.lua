@@ -35,6 +35,7 @@ M.rows = {
     { modifier_key = "monster_boss_ten_sin_06_abscession:arcana", asset_id = "monster_boss_ten_sin_06_abscession", modifier_name = "arcana", sort_order = 1, enabled = true, notes = "Official Arcana activity modifier; complete challenge appearance" },
     { modifier_key = "monster_boss_ten_sin_06_abscession:arcana_back", asset_id = "monster_boss_ten_sin_06_abscession", modifier_name = "arcana_back", sort_order = 2, enabled = true, notes = "Official Arcana activity modifier; complete challenge appearance" },
     { modifier_key = "monster_boss_ten_sin_09_eminence_ristul:arcana", asset_id = "monster_boss_ten_sin_09_eminence_ristul", modifier_name = "arcana", sort_order = 1, enabled = true, notes = "Official Arcana activity modifier; complete challenge appearance" },
+    { modifier_key = "tower_lightning_zeus_tempest:arcana", asset_id = "tower_lightning_zeus_tempest", modifier_name = "arcana", sort_order = 1, enabled = true, notes = "原版ItemDef 6914雷霆神盔的至宝动作修饰。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

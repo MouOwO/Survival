@@ -1,0 +1,56 @@
+{
+  "building_01": {
+    "item_definition": "item_octarine_core",
+    "icon_path": "items/octarine_core.png",
+    "runtime_uri": "s2r://panorama/images/items/octarine_core_png.vtex",
+    "sha256": "a9b885801c1826c508b67c1c816cebd99f201f584f40b304cc334f08487292ea"
+  },
+  "building_02": {
+    "item_definition": "item_rapier",
+    "icon_path": "items/rapier.png",
+    "runtime_uri": "s2r://panorama/images/items/rapier_png.vtex",
+    "sha256": "028cb9ae13187d133ee6a2c4809f20512e1fd78ecc8cb44b13daf5bf14d85335"
+  },
+  "building_03": {
+    "item_definition": "item_crimson_guard",
+    "icon_path": "items/crimson_guard.png",
+    "runtime_uri": "s2r://panorama/images/items/crimson_guard_png.vtex",
+    "sha256": "81244dbe8835e246a2d22d9d01ef14fb0ec750aaee01cbd390302f99a9f95b20"
+  },
+  "building_04": {
+    "item_definition": "item_claymore",
+    "icon_path": "items/claymore.png",
+    "runtime_uri": "s2r://panorama/images/items/claymore_png.vtex",
+    "sha256": "9daef3288d17934cdf19e957e01db826d366a3ffecef1464e1922deb64a43be4"
+  },
+  "building_05": {
+    "item_definition": "item_abyssal_blade",
+    "icon_path": "items/abyssal_blade.png",
+    "runtime_uri": "s2r://panorama/images/items/abyssal_blade_png.vtex",
+    "sha256": "f3d51bbec4b688bd25ff1a5c1bdb0996d5662230b6e0a3ac251d276b442d9c1f"
+  },
+  "building_06": {
+    "item_definition": "item_platemail",
+    "icon_path": "items/platemail.png",
+    "runtime_uri": "s2r://panorama/images/items/platemail_png.vtex",
+    "sha256": "9f93ed3f7fa8d51db03d0551cbdb847a2092a049aa99e35e254ffd896289b71d"
+  },
+  "building_07": {
+    "item_definition": "item_arcane_boots",
+    "icon_path": "items/arcane_boots.png",
+    "runtime_uri": "s2r://panorama/images/items/arcane_boots_png.vtex",
+    "sha256": "17687546b5674bd29c2fc9919bd0b1e7c0f80418ad3afdecf379cc6db1407528"
+  },
+  "building_08": {
+    "item_definition": "item_bfury",
+    "icon_path": "items/bfury.png",
+    "runtime_uri": "s2r://panorama/images/items/bfury_png.vtex",
+    "sha256": "212ba63ecc68ee070071a3b8ba583b84434cd6afce311a7bea3a7b17bdd27a84"
+  },
+  "building_09": {
+    "item_definition": "item_mjollnir",
+    "icon_path": "items/mjollnir.png",
+    "runtime_uri": "s2r://panorama/images/items/mjollnir_png.vtex",
+    "sha256": "0a6124e974682ced62edd936ab336a37ea6946815ebd02f5379a8bb59f107825"
+  }
+}

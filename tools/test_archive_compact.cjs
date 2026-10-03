@@ -153,7 +153,7 @@ assert.equal(hostedCard.children.find(p=>p.BHasClass('ArchiveCountHost')).childr
 assert.equal(hostedCard.children.find(p=>p.BHasClass('ArchiveNameHost')).children[0],cardName);
 console.log('ARCHIVE_COUNT_HOST_PASS: actual card wrapper reparents count and name without skipping children');
 
-for(const key of ['surface_16','surface_17','surface_32','surface_33','surface_35','surface_37','icon_surface'])
+for(const key of ['surface_16','surface_17','surface_32','surface_33','surface_35','surface_37'])
  assert.equal(cfg.SurvivalArchiveColors[key],cfg.SurvivalArchiveColors.surface_52,key+' must share the training-panel background');
 assert.equal(cfg.SurvivalArchiveColors.tooltip_width,'460px');
 console.log('ARCHIVE_REFERENCE_SURFACES_PASS: text/card/icon/popup backgrounds share the training-panel gradient');
@@ -168,3 +168,31 @@ for(const fit of [0.8,1,1080/941,1.4]) {
 }
 assert(css.includes('.ArchiveNativeText'));assert(css.includes('transform:none;'));
 console.log('ARCHIVE_CARD_NATIVE_TEXT_PASS: untransformed text layer preserves scaled card positions at four fits');
+
+assert.equal(cfg.SurvivalArchiveColors.icon_surface,'transparent');
+for(const id of ['ArchiveContent','ArchiveGrid','ArchiveTabs']){
+ const p=new Panel('Panel',id);cfg.ArchiveTheme.Apply(p);assert.equal(p.style.backgroundColor,'transparent');
+}
+const surface=new Panel('Panel','ArchiveBody');cfg.ArchiveTheme.Apply(surface);
+assert.equal(surface.style.backgroundColor,tip.style.backgroundColor,'content body uses exact accepted popup gradient');
+const quietCard=new Panel('Panel');quietCard.AddClass('ArchiveCard');cfg.ArchiveTheme.Apply(quietCard);assert.equal(quietCard.style.backgroundColor,'transparent');
+assert.equal(cfg.SurvivalArchiveColors.archive_title_size,'36px');
+assert.equal(cfg.SurvivalArchiveColors.archive_nav_size,'25px');
+assert.equal(cfg.SurvivalArchiveColors.tooltip_body_size,'19px');
+console.log('ARCHIVE_CONTINUOUS_SURFACE_PASS: exact popup surface, transparent cells and larger header/navigation');
+
+// Currency explanations remain visible independently of the intentionally hidden banner.
+env.current='building';env.filterMode='all';
+env.render({category_id:'building',categories:[],rows:[],buildings:{faith:1234,per_clear:400,daily_cap:4000,earned_today:800}});
+assert(panel('ArchiveCurrencySource').visible);
+assert(panel('ArchiveCurrencySource').text.includes('4000'));
+assert(panel('ArchiveCurrencySource').text.includes('800'));
+assert(panel('ArchiveCurrencySource').text.includes('通行证不加成'));
+assert(panel('ArchiveContent').BHasClass('ArchiveHasCurrencySource'));
+env.current='work';env.render({category_id:'work',categories:[],rows:[],online:{coins:30}});
+assert(panel('ArchiveCurrencySource').text.replace(/<[^>]+>/g,'').includes('每满 1 分钟 +1'));
+assert(panel('ArchiveCurrencySource').text.includes('通行证不翻倍'));
+env.current='clear';env.render(data);
+assert(!panel('ArchiveCurrencySource').visible);
+assert(!panel('ArchiveContent').BHasClass('ArchiveHasCurrencySource'));
+console.log('ARCHIVE_CURRENCY_SOURCE_PASS: live faith limits and earned values, online currency explanation, page switching');

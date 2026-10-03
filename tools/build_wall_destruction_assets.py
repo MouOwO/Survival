@@ -73,7 +73,11 @@ model_header='<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0
 (MODELS/'wall_death_shard.vmdl').write_text(model_header+'{rootNode={_class="RootNode" children=[{_class="RenderMeshList" children=[{_class="RenderMeshFile" filename="models/survival_buildings/wall_death_shard.fbx" import_scale=0.01}]}]}}',encoding='utf-8')
 profiles=json.loads((ROOT/'output/reference_walls/manifest.json').read_text(encoding='utf-8'))
 registry=['-- Generated wall render heights for the death effect; gameplay bounds are separate.','return {']
-for wall in profiles:registry.append('    ["models/survival_buildings/'+wall['name']+'.vmdl"] = '+str(round(wall['dimensions'][2],4))+',')
+override_path=ROOT/'tools/wall_visual_heights.json'
+overrides=json.loads(override_path.read_text(encoding='utf-8'))['models'] if override_path.exists() else {}
+for wall in profiles:
+    model='models/survival_buildings/'+wall['name']+'.vmdl'
+    registry.append('    ["'+model+'"] = '+str(round(overrides.get(model,wall['dimensions'][2]),4))+',')
 registry.append('}')
 (ROOT/'scripts/vscripts/config/generated/wall_destruction_models.lua').write_text('\n'.join(registry)+'\n',encoding='utf-8')
 (OUT/'manifest.json').write_text(json.dumps(dict(particles=6,fragment_model='wall_death_shard',fragment_triangles=8,shake_seconds=1.,burst_seconds=.34,fragment_max_lifetime=1.45,cleanup_seconds=2.6),indent=2),encoding='utf-8')

@@ -45,6 +45,11 @@ colors['tooltip_width']=tooltip_property('width')
 # Every surface directly behind archive text/art uses the reference's opaque base.
 for role in ['surface_16','surface_17','surface_32','surface_33','surface_35','surface_37','icon_surface']:
     colors[role]=colors['surface_52']
+# Child plates reveal the single opaque body surface instead of restarting its gradient.
+colors['icon_surface']='transparent'
+colors['archive_title_size']='36px'
+colors['archive_subtitle_size']='22px'
+colors['archive_nav_size']='25px'
 colors['tab']=colors['body']
 
 

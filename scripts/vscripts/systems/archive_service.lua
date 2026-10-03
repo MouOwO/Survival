@@ -21,6 +21,7 @@ local finalizing = false
 local session_id, serial, remote_provider
 local server_clock
 local daily_viewers, purchase_provider = {}, nil
+local vip_viewers = {}
 local archive_players = {}
 local sent_pages = {}
 
@@ -91,6 +92,8 @@ local function enabled_categories()
 end
 
 local renderers = {}
+renderers.gift = function(_, archive) return require("systems/archive_welfare_rewards").rows(archive) end
+renderers.starjoy_points = function(profile) return require("systems/archive_starjoy_rewards").project(profile) end
 renderers.fishing = function(profile) return (require("systems/archive_fishing_view").project(profile)) end
 renderers.map_level = function(_, archive) return require("systems/archive_online_rewards").rows(archive, "map_level") end
 renderers.building = function(_, archive) return require("systems/archive_building_rewards").rows(archive) end
@@ -148,6 +151,15 @@ function M.register_category(category_id, projector)
     renderers[category_id] = projector
 end
 
+local function upgrade_pending(player_id, category_id)
+    local kind = category_id == "work" and "work_upgrade" or category_id == "building" and "building_upgrade"
+    if not kind then return 0 end
+    for _, command in pairs(pending[player_id] or {}) do
+        if command.kind == kind then return 1 end
+    end
+    return 0
+end
+
 function M.snapshot(player_id, category_id)
     local profile = account_profile(player_id)
     if not profile then return { ok = false, error = "profile_not_loaded" } end
@@ -161,6 +173,8 @@ function M.snapshot(player_id, category_id)
     end
     return { ok = true, category_id = category_id, revision = profile.revision,
         fishing = fishing,
+        starjoy = category_id == "starjoy_points" and require("systems/archive_starjoy_rewards").info(profile) or nil,
+        upgrade_pending = upgrade_pending(player_id, category_id),
         buildings = category_id == "building" and require("systems/archive_building_rewards").info(saved(profile), require("systems/archive_calendar").day()) or nil,
         categories = enabled_categories(), has_pass = has_pass(profile) and 1 or 0,
         rows = projector and projector(profile, saved(profile)) or {},
@@ -225,7 +239,18 @@ local function flush(player_id)
     if busy[player_id] then return end
     local queue = pending[player_id]
     if not queue then return end
-    for id, command in pairs(queue) do
+    -- A retrying background reward must not starve an explicit purchase.
+    -- Keep every queued command; serialize purchases through the same provider.
+    local ordered = {}
+    for id, command in pairs(queue) do ordered[#ordered + 1] = { id = id, command = command } end
+    table.sort(ordered, function(a, b)
+        local ap = a.command.kind == "work_upgrade" or a.command.kind == "building_upgrade"
+        local bp = b.command.kind == "work_upgrade" or b.command.kind == "building_upgrade"
+        if ap ~= bp then return ap end
+        return a.id < b.id
+    end)
+    for _, entry in ipairs(ordered) do
+        local id, command = entry.id, entry.command
         local attempt = {}
         busy[player_id] = attempt
         local function complete(result)
@@ -237,6 +262,7 @@ local function flush(player_id)
                 bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=result.error or "存档请求被拒绝"})
             end
             send(player_id)
+            if vip_viewers[player_id] then M.send_vip(player_id,result) end
             if M.send_daily and daily_viewers[player_id] then
                 M.send_daily(player_id, command.kind=="daily_claim" and {
                     target_day=command.target_day,ok=result and result.ok==true,
@@ -274,6 +300,26 @@ local function enqueue(player_id, command)
     pending[player_id] = pending[player_id] or {}
     pending[player_id][command.id] = pending[player_id][command.id] or command
     return flush(player_id) or { ok = true, pending = true }
+end
+
+function M.send_vip(player_id,result)
+    if not PlayerResource or not CustomGameEventManager then return end
+    local player=PlayerResource:GetPlayer(player_id)
+    if player then
+        local snapshot=require("systems/archive_vip_rewards").snapshot(account_profile(player_id))
+        snapshot.pending=M.has_pending(player_id) and 1 or 0
+        if result then snapshot.action_result={ok=result.ok==true,error=result.error,terminal=result.terminal==true} end
+        CustomGameEventManager:Send_ServerToPlayer(player,"survival_vip_snapshot",snapshot)
+    end
+end
+function M.vip_action(player_id,kind,reward_id)
+    local row=require("config/generated/archive_vip_rewards").by_id[tostring(reward_id or "")]
+    if not row or not row.enabled then return {ok=false,error="VIP奖励不存在"} end
+    if (kind~="vip_claim" or row.group_id~="privileges") and (kind~="vip_purchase" or row.group_id~="packages") then
+        return {ok=false,error="VIP领取方式无效"}
+    end
+    serial=(serial or 0)+1
+    return enqueue(player_id,{id=session_id..":"..kind..":"..row.reward_id..":"..serial,kind=kind,reward_id=row.reward_id})
 end
 
 function M.set_provider(provider)
@@ -325,10 +371,11 @@ function M.set_purchase_provider(provider)
     purchase_provider=provider
 end
 
-function M.record_clear(player_id, difficulty_id)
+function M.record_clear(player_id, difficulty_id, cooperative_win)
     local difficulty = string.lower(tostring(difficulty_id or ""))
     return enqueue(player_id, { id = session_id .. ":clear", kind = "clear",
-        difficulty_id = difficulty, count = 1, day_key = tostring(require("systems/archive_calendar").day()) })
+        difficulty_id = difficulty, count = 1, cooperative_win = cooperative_win == 1 and 1 or 0,
+        day_key = tostring(require("systems/archive_calendar").day()) })
 end
 
 function M.record_endless_wave(player_id, wave_number, difficulty)
@@ -489,6 +536,7 @@ function M.init()
     sent_pages = {}
     pending, busy, selected, throttles = {}, {}, {}, {}
     daily_viewers = {}
+    vip_viewers = {}
     archive_players = {}
     serial = 0
     session_id = runtime_id()
@@ -504,11 +552,18 @@ function M.init()
             -- The server's saved best floor can unlock newly added milestones.
             -- Never trust a floor/count supplied by the UI or award it on reads.
             local profile = account_profile(id)
+            if profile and require("systems/archive_starjoy_rewards").needs_reconcile(profile.save.gameplay_stats) then
+                enqueue(id, {id=session_id..":starjoy_reconcile", kind="starjoy_reconcile"})
+            end
+            if profile and require("systems/archive_welfare_rewards").needs_reconcile(profile.save.archive) then
+                enqueue(id, {id=session_id..":welfare_reconcile", kind="welfare_reconcile"})
+            end
             if profile and require("systems/archive_endless_rewards").needs_reconcile(profile.save.archive) then
                 enqueue(id, {id=session_id..":endless_reconcile", kind="endless_reconcile"})
             end
             send(id)
             if daily_viewers[id] then M.send_daily(id) end
+            if vip_viewers[id] then M.send_vip(id) end
             if not busy[id] then flush(id) end
         end
     end)
@@ -530,6 +585,18 @@ function M.init()
         end
     end, "archive_online_clock")
     bus.subscribe("archive.wave_boss_killed",function(payload) M.record_boss(payload.player_id,payload.kill_id) end)
+    local vip_times={}
+    CustomGameEventManager:RegisterListener("survival_vip_request",function(_,payload)
+        local id=tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local now=GameRules:GetGameTime()
+        if vip_times[id] and now-vip_times[id]<0.3 then return end
+        vip_times[id]=now;vip_viewers[id]=true
+        if payload.action=="claim" or payload.action=="purchase" then
+            local result=M.vip_action(id,payload.action=="claim" and "vip_claim" or "vip_purchase",payload.reward_id)
+            M.send_vip(id,result)
+        else M.send_vip(id) end
+    end)
     local daily_times, pass_states = {}, {}
     CustomGameEventManager:RegisterListener("survival_daily_request",function(_,payload)
         local id=tonumber(payload.PlayerID)
@@ -587,7 +654,7 @@ function M.init()
         end
     end,"archive_daily_clock")
     bus.subscribe("archive.final_wave_cleared", function(payload)
-        M.record_clear(payload.player_id, payload.difficulty_id)
+        M.record_clear(payload.player_id, payload.difficulty_id, payload.cooperative_win)
     end)
     scheduler.every(2, function()
         for id in pairs(pending) do flush(id) end

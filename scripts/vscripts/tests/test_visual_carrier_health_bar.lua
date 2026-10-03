@@ -41,3 +41,33 @@ assert(service._clear_excluded_for_test(recovered))
 assert(published.unit_3.removed == 1, "existing carrier modifier must also be excluded")
 assert(attaches == 2)
 print("VISUAL_CARRIER_HEALTH_BAR_PASS: spawn race, explicit cleanup, respawn, recovered carrier, hero retained")
+
+-- Existing building projections must be cleared without affecting actual health
+-- or the overhead bars on combat units and unrequested building types.
+package.loaded["core/modifier_registry"].ensure = function(u, name)
+    if name == "modifier_single_health_bar" then u.bar = true
+    elseif name == "modifier_building_no_health_bar" then u.native_hidden = true
+    else error("unexpected modifier: " .. name) end
+    return {}
+end
+for index, name in ipairs({"building_main_city", "building_gold_mine",
+    "building_challenge", "building_research_lab", "building_advanced_research_lab",
+    "building_hero_altar", "building_farm"}) do
+    local u = unit(10 + index)
+    u.GetUnitName = function() return name end
+    assert(not service._attach_for_test(u), "new building must not receive a custom bar")
+    u.bar = true -- Existing published bar before applying the change.
+    assert(service._clear_excluded_for_test(u))
+    assert(not u.bar and u.native_hidden and u.survival_hide_custom_health_bar)
+    assert(published["unit_" .. (10 + index)].removed == 1)
+    assert(u:GetHealth() == 100 and u:GetMaxHealth() == 100)
+    assert(not service._attach_for_test(u), "respawn must keep the bar hidden")
+end
+for index, name in ipairs({"building_wall", "building_arrow_tower",
+    "npc_dota_hero_monkey_king", "npc_survival_worker", "npc_survival_monster"}) do
+    local u = unit(30 + index)
+    u.GetUnitName = function() return name end
+    assert(not service._clear_excluded_for_test(u))
+    assert(service._attach_for_test(u) and u.bar and not u.native_hidden)
+end
+print("BUILDING_HEALTH_BAR_SCOPE_PASS: seven hidden building types including farms; walls/towers/hero/workers/monsters retained")

@@ -1,5 +1,6 @@
 -- Viewer-local cosmetic filtering. Projectiles, damage, targeting and timing
 -- remain native. Only selected hero/tower particle creation sites use this proxy.
+local model_visual_particles = require("config/model_visual_particles")
 local M = {}
 local reduced, records, serial = {}, {}, 1000000000
 local last_toggle = {}
@@ -32,7 +33,8 @@ local function create_children(record)
     local pm=native()
     record.children={}
     if not valid_handle(record.owner) then return end
-    if filtered() and pm.CreateParticleForPlayer then
+    if not model_visual_particles.contains(record.path)
+        and filtered() and pm.CreateParticleForPlayer then
         for id,player in pairs(viewers) do
             if not reduced[id] then
                 local handle=pm:CreateParticleForPlayer(record.path,record.attach,record.owner,player)
@@ -91,10 +93,12 @@ function M.set_reduced(id,value)
     value = value == true
     if (reduced[id] == true) == value then return end
     reduced[id]=value;refresh_viewers(true)
-    -- Persistent areas switch immediately. One-shot effects already released
+    -- Model appearance particles are always visible and keep their handles.
+    -- Persistent combat areas switch immediately. One-shot effects already released
     -- finish naturally; never touch a released native particle twice.
     for _,record in pairs(records) do
-        if not record.released and not record.destroyed then
+        if not record.released and not record.destroyed
+            and not model_visual_particles.contains(record.path) then
             for _,handle in ipairs(record.children) do
                 native():DestroyParticle(handle,true);native():ReleaseParticleIndex(handle)
             end

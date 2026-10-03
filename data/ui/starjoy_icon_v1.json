@@ -1,0 +1,9 @@
+{
+  "tool": "image_gen.imagegen",
+  "prompt": "Use case: stylized-concept. Create one finished square inventory emblem icon for a fantasy RTS game's Starjoy Points progression page. A single chunky burnished GOLD coin-medallion with a prominent five-point golden star in the center, a small deep sapphire blue gem inset at the star center, and a restrained circular engraved rim. Classic hand-painted fantasy strategy game item art, rich warm gold, dark recessed shading, crisp broad bevel highlights, visually readable at 64 and 84 pixels. Front view with a slight three-quarter dimensional thickness. One isolated emblem centered, occupies 80 percent of square, full silhouette inside clean margins. Genuinely transparent background. No letters, no numbers, no text, no level badge, no additional items, no card plate, no scenery, no ground shadow, no detached sparkles. The application will apply greyscale to locked tiers; make the colored original vivid and readable.",
+  "transparent_background": true,
+  "source": "C:/Users/Administrator/.codex/generated_images/01a0d3df-1dce-7281-87d8-b638b036c938/exec-861ec287-f7d2-47bf-951c-b9f77a9db552.png",
+  "asset": "panorama/src/images/custom_game/starjoy_v1/starjoy.png",
+  "runtime": "s2r://panorama/images/custom_game/starjoy_v1/starjoy.vtex",
+  "sha256": "be2cc0603801bf7eb842a250cf5f2526167a5bee2658641cbfadc197e3c0061b"
+}

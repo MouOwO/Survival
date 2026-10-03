@@ -1,0 +1,34 @@
+﻿const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const harness=fs.readFileSync('tools/test_archive_compact.cjs','utf8').split('const data=')[0];
+const test=`
+env.Game={AddCommand(){}};env.$.Msg=()=>{};env.$.GetContextPanel=()=>root;
+root.FindChildTraverse=panel;
+vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/archive_handoff_180de7e38b.js','utf8'),env);
+const real=cfg.ArchiveHandoff;env.A.Unlocked=real.Unlocked;
+env.icon=(card,item)=>{const art=new Panel('Panel');art.AddClass('ArchiveArt');card.children.push(art);label(card,real.CardProgress(item,'gift'),'ArchiveCount');};
+env.current='gift';
+const rows=JSON.parse(fs.readFileSync('output/welfare_victory_20261003/rows.json','utf8'));
+const data={category_id:'gift',categories:[{id:'gift',name:'福利礼包',renderer:'achievements'}],rows};
+function snapshot(wins,cooperative){rows.forEach(r=>{r.count=r.progress_kind==='cooperative'?cooperative:wins;r.completed=r.count>=r.target?1:0;});env.render(data);}
+snapshot(5,0);
+assert.equal(Object.keys(env.rowCards).length,36);
+assert.equal(panel('ArchiveFilterAllLabel').text,'全部（5/36）');
+assert.equal(panel('ArchiveContext').text,'累计胜利 5 次 · 合作 0 次');
+rows.forEach((r,i)=>{const c=env.rowCards['gift:'+i].panel;assert.equal(c.BHasClass('ArchiveContentLocked'),!r.completed);assert.equal(c.children.find(p=>p.BHasClass('ArchiveArt')).style.brightness,r.completed?'1':'0.6');assert.equal(real.CardProgress(r,'gift'),r.count+' / '+r.target);assert(real.Condition(r,'gift').includes(String(r.target)));});
+env.filterMode='unlocked';env.render(data);assert.equal(Object.values(env.rowCards).filter(c=>c.panel.visible).length,5);
+env.filterMode='locked';env.render(data);assert.equal(Object.values(env.rowCards).filter(c=>c.panel.visible).length,31);
+env.filterMode='all';snapshot(6,5);
+assert.equal(panel('ArchiveFilterAllLabel').text,'全部（7/36）');
+assert.equal(panel('ArchiveContext').text,'累计胜利 6 次 · 合作 5 次');
+assert.equal(env.rowCards['gift:13'].panel.children.find(p=>p.BHasClass('ArchiveArt')).style.brightness,'1');
+assert.equal(env.rowCards['gift:14'].panel.children.find(p=>p.BHasClass('ArchiveArt')).style.brightness,'0.6');
+snapshot(9,5);assert.equal(env.rowCards['gift:23'].panel.children.find(p=>p.BHasClass('ArchiveArt')).style.brightness,'0.6');
+snapshot(10,5);assert.equal(panel('ArchiveFilterAllLabel').text,'全部（12/36）');
+assert.equal(env.rowCards['gift:23'].panel.children.find(p=>p.BHasClass('ArchiveArt')).style.brightness,'1');
+assert.equal(env.rowCards['gift:24'].panel.children.find(p=>p.BHasClass('ArchiveArt')).style.brightness,'0.6');
+assert.equal(panel('ArchiveFilters').BHasClass('ArchiveHidden'),false);
+snapshot(130,50);assert.equal(panel('ArchiveFilterAllLabel').text,'全部（36/36）');
+assert.equal(Object.values(env.rowCards).filter(c=>c.panel.visible).length,36);
+console.log('PASS welfare UI: 36 cards, separate progress, filters, third-batch 9/10 boundary, all 36 unlocked');
+`;
+new Function('require',harness+test)(require);

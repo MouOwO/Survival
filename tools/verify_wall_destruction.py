@@ -32,9 +32,11 @@ for name in ('cyan','deep','white'):
     material=dump('materials/survival_buildings/wall_death_'+name+'.vmat_c')
     assert 'F_FULLBRIGHT = 1' in material and 'build_white_glow_color' in material
 profiles=(ROOT/'scripts/vscripts/config/generated/wall_destruction_models.lua').read_text(encoding='utf-8')
+override_path=ROOT/'tools/wall_visual_heights.json'
+overrides=json.loads(override_path.read_text(encoding='utf-8'))['models'] if override_path.exists() else {}
 for wall in json.loads((ROOT/'output/reference_walls/manifest.json').read_text(encoding='utf-8')):
     value=float(re.search(r'/'+wall['name']+r'\.vmdl"\] = ([\d.]+)',profiles)[1])
-    assert abs(value-wall['dimensions'][2])<.001
+    assert abs(value-overrides.get('models/survival_buildings/'+wall['name']+'.vmdl',wall['dimensions'][2]))<.001
 tests=[]
 for name in ('test_wall_destruction_visual','test_wall_destruction_integration','test_tower_rebuild_after_death',
              'test_wall_visual_config','test_building_grid_alignment','test_building_construction_visual_service','test_building_white_shell'):

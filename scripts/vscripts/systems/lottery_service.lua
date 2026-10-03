@@ -654,7 +654,7 @@ local function exchange(payload)
         reason = "lottery_points_exchange:" .. pool.id,
     })
     if not grant or grant.ok ~= true then
-        stats_order.order(player_id, config.starjoy_stat_id, cost)
+        stats_order.order(player_id, config.starjoy_stat_id, cost, true)
         local failed = { ok = false, error = "lottery_exchange_grant_failed" }
         exchange_cache[player_id][request_id] = failed
         busy_by_player[player_id] = nil

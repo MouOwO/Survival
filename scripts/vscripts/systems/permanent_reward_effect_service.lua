@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local armor_balance = require("config/armor_balance")
 local map_level_effect_rules = require("config/generated/map_level_effect_rules")
 local phase_guard = require("systems/gameplay_phase_guard")
+local lottery_dynamic_effects = require("systems/lottery_dynamic_effects")
 
 local M = {}
 local totals_by_player = {}
@@ -92,6 +93,7 @@ local function refresh(payload)
         totals_by_player[player_id] = apply_map_level_effects(add_values(
             copy(save.permanent_effects), save.gameplay_stats
         ))
+        add_values(totals_by_player[player_id], lottery_dynamic_effects.project(save))
     end
     local boss_effects
     if profile and profile.mode == "pure" then
@@ -557,6 +559,14 @@ function M.init()
     event_bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, get)
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, refresh)
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
+    -- A combat effect, not progression: it continues using the frozen reward
+    -- totals after clearing, including subsequent archive challenge bosses.
+    event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id == nil then return end
+        require("systems/hero_execution_service").try_execute(payload,
+            M.value(player_id, "hero_execute_health_threshold_pct"))
+    end)
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_hero_attack)
     event_bus.subscribe(events.TOWER_ATTACK_LANDED, on_tower_attack)
     event_bus.subscribe(events.MONSTER_SPAWNED, function(payload)

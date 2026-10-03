@@ -53,3 +53,26 @@ assert.equal(nodes.HandoffStat_armor.style.visibility,'collapse');
 name='npc_survival_repairer';env.mirror();
 for(const a of stats)assert.equal(nodes['HandoffStat_'+a[0]].style.visibility,'collapse');
 console.log('WORKER_STATS_PASS: repairers none, lumberjacks attack/speed only, including selection queue');
+
+// Cover the actual named wave/practice/challenge definitions, not only examples.
+const unitDefinitions=fs.readFileSync('scripts/npc/npc_units_custom.txt','utf8');
+const monsterNames=[...unitDefinitions.matchAll(/^    "((?:npc_survival_(?:wave_|named_|rogue_training_dummy)|asset_proxy_(?:monster_|wave_)|zombie_)[^"]*)"/gm)].map(m=>m[1]);
+assert(monsterNames.length>50);
+env.cfg.HandoffCombat.Snapshot=()=>null;building=false;hero=false;multi=false;
+for(const n of monsterNames){
+ name=n;const shown=env.statVisibility(1);
+ assert.equal(shown.monster,true,n);assert.equal(shown.attributes,false,n);assert.equal(shown.combat,true,n);
+ env.mirror();
+ for(let i=0;i<stats.length;i++)assert.equal(nodes['HandoffStat_'+stats[i][0]].style.visibility,i<3?'visible':'collapse',n);
+}
+name='npc_dota_hero_axe';hero=true;
+env.Entities.GetTeamNumber=()=>3;
+assert.equal(env.statVisibility(1).monster,true);
+env.mirror();assert.equal(nodes.HandoffStat_strength.style.visibility,'collapse');
+env.Entities.GetTeamNumber=()=>2;
+assert.equal(env.statVisibility(1).monster,false);
+env.mirror();assert.equal(nodes.HandoffStat_strength.style.visibility,'visible');
+for(const n of ['enemy_tree','npc_survival_lumberjack','npc_survival_repairer','npc_survival_doom_infernal','npc_survival_drow_companion','npc_archive_challenge_1']){
+ name=n;hero=false;assert(!env.statVisibility(1).monster,n+' must retain its own presentation');
+}
+console.log('MONSTER_CLASSIFICATION_PASS: '+monsterNames.length+' wave/challenge definitions, native hero enemies, friendly units and selection recovery');

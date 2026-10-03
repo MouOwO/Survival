@@ -2,11 +2,11 @@
 -- Source: building_visual_levels.csv
 local M = {}
 M.rows = {
-    { visual_id = "main_city_visual_lv01", building_id = "building_main_city", level = 1, model_name = "models/survival_buildings/main_city_lv01.vmdl", model_scale = 1.0, model_yaw = 0, enabled = true, notes = "主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。" },
-    { visual_id = "main_city_visual_lv02", building_id = "building_main_city", level = 2, model_name = "models/survival_buildings/main_city_lv02.vmdl", model_scale = 1.0, model_yaw = 0, enabled = true, notes = "主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。" },
-    { visual_id = "main_city_visual_lv03", building_id = "building_main_city", level = 3, model_name = "models/survival_buildings/main_city_lv03.vmdl", model_scale = 1.0, model_yaw = 0, enabled = true, notes = "主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。" },
-    { visual_id = "main_city_visual_lv04", building_id = "building_main_city", level = 4, model_name = "models/survival_buildings/main_city_lv04.vmdl", model_scale = 1.0, model_yaw = 0, enabled = true, notes = "主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。" },
-    { visual_id = "main_city_visual_lv05", building_id = "building_main_city", level = 5, model_name = "models/survival_buildings/main_city_lv05.vmdl", model_scale = 1.0, model_yaw = 0, enabled = true, notes = "主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。" },
+    { visual_id = "main_city_visual_lv01", building_id = "building_main_city", level = 1, model_name = "models/survival_buildings/main_city_lv01.vmdl", model_scale = 1.0, model_yaw = 270, enabled = true, notes = "蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。" },
+    { visual_id = "main_city_visual_lv02", building_id = "building_main_city", level = 2, model_name = "models/survival_buildings/main_city_lv02.vmdl", model_scale = 1.0, model_yaw = 270, enabled = true, notes = "蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。" },
+    { visual_id = "main_city_visual_lv03", building_id = "building_main_city", level = 3, model_name = "models/survival_buildings/main_city_lv03.vmdl", model_scale = 1.0, model_yaw = 270, enabled = true, notes = "蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。" },
+    { visual_id = "main_city_visual_lv04", building_id = "building_main_city", level = 4, model_name = "models/survival_buildings/main_city_lv04.vmdl", model_scale = 1.0, model_yaw = 270, enabled = true, notes = "蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。" },
+    { visual_id = "main_city_visual_lv05", building_id = "building_main_city", level = 5, model_name = "models/survival_buildings/main_city_lv05.vmdl", model_scale = 1.0, model_yaw = 270, enabled = true, notes = "蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。" },
     { visual_id = "hero_altar_visual_lv01", building_id = "building_hero_altar", level = 1, model_name = "models/survival_buildings/hero_altar.vmdl", model_scale = 1.0, model_yaw = 0, enabled = true, notes = "英雄祭坛；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。" },
     { visual_id = "research_lab_visual_lv01", building_id = "building_research_lab", level = 1, model_name = "models/survival_buildings/research_lab.vmdl", model_scale = 1.0, model_yaw = 0, enabled = true, notes = "研究所·炼金工坊；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。" },
     { visual_id = "challenge_visual_lv01", building_id = "building_challenge", level = 1, model_name = "models/survival_buildings/challenge_arena.vmdl", model_scale = 1.0, model_yaw = 0, enabled = true, notes = "挑战竞技场；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。" },

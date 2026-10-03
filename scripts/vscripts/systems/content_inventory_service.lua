@@ -64,7 +64,9 @@ local function apply_gameplay_effects(stats, effects)
             and next_value > tonumber(definition.max_value) then
             return nil, nil, "gameplay_stat_above_max:" .. field_id
         end
-        next_stats[field_id] = next_value
+        if field_id == "starjoy_points" then
+            require("systems/archive_starjoy_rewards").change(next_stats, old_value, next_value)
+        else next_stats[field_id] = next_value end
         changes[#changes + 1] = {
             field_id = field_id,
             delta = delta,

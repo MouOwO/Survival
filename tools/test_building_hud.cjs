@@ -107,3 +107,35 @@ for(const stat of ['attack','attack_speed'])for(const prefix of ['HandoffStatNam
  const r=nodes[prefix+stat].rect;assert(r.x>=0 && r.x+r.w<=wg.width);assert(r.y>=177 && r.y+r.h<wg.height);
 }
 console.log('COMPACT_WORKER_HUD_PASS: single portrait hidden, lumberjack multi grid restored, inventory/health/mana hidden, queue title and stat bounds');
+
+// Monster selection uses hero visual metrics but removes all inventory layers.
+for(const [w,h] of [[1280,720],[1920,1080],[2560,1440]])for(const count of [0,1,4,10]){
+ const heroGeometry=geometry(w,h,count,false,false,{attributes:true});
+ const monsterGeometry=geometry(w,h,count,false,false,{monster:true});
+ assert.equal(monsterGeometry.width,monsterGeometry.attributeX);
+ for(const key of ['scale','heroWidth','portraitSize','centerWidth','barWidth','x','y'])assert.equal(monsterGeometry[key],heroGeometry[key],key);
+ assert(monsterGeometry.x+monsterGeometry.width*monsterGeometry.scale<=w);
+ env.geometry=monsterGeometry;
+ for(const multi of [false,true]){
+  env.buildingPresentation({monster:true,combat:true,attributes:false},multi);
+  for(const id of ['inventory','inventory_composition_layer_container'])assert.equal(natives[id].style.visibility,'collapse',id);
+  assert.equal(nodes.HandoffInventoryBase.style.visibility,'collapse');
+  assert.equal(slices.HandoffAttributesPlate.style.visibility,'collapse');
+  assert.equal(slices.HandoffCombatPlate.style.visibility,'visible');
+  assert.equal(natives.PortraitGroup.style.visibility,'visible');
+  assert.equal(nodes.HandoffLevelPlate.visible,false);
+  for(const slot of slots)assert.equal(slot.style.visibility,'collapse');
+  for(const suffix of ['_track','_fill','_valueBounds']){
+   assert.equal(nodes['Handoff_hp'+suffix].style.visibility,'visible');
+   assert.equal(nodes['Handoff_mp'+suffix].style.visibility,'collapse');
+  }
+ }
+ env.geometry=heroGeometry;env.buildingPresentation({attributes:true,combat:true},false);
+ for(const id of ['inventory','inventory_composition_layer_container'])assert.equal(natives[id].style.visibility,'visible');
+ assert.equal(nodes.HandoffInventoryBase.style.visibility,'visible');
+ assert.equal(slices.HandoffAttributesPlate.style.visibility,'visible');
+ assert.equal(nodes.Handoff_mp_track.style.visibility,'visible');
+ assert.equal(nodes.HandoffLevelPlate.visible,true);
+ for(const slot of slots)assert.equal(slot.style.visibility,'visible');
+}
+console.log('MONSTER_HUD_PASS: no inventory/backplates/slots/mana/attributes/level; shared hero metrics, reduced bounds, hero recovery');

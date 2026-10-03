@@ -20,6 +20,11 @@ GameRules = { GetGameTime = function() return 0 end }
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
 PATTACH_ABSORIGIN_FOLLOW = 1
 PATTACH_POINT_FOLLOW = 5
+local viewers = {[0] = {}, [1] = {}}
+PlayerResource = {
+    IsValidPlayerID = function(_, id) return viewers[id] ~= nil end,
+    GetPlayer = function(_, id) return viewers[id] end,
+}
 local static = {}
 PrecacheResource = function(kind, path)
     local key = kind .. ":" .. path
@@ -51,6 +56,14 @@ ParticleManager = {
         released[id] = true
     end,
 }
+ParticleManager.CreateParticleForPlayer = function(self, path, attach, owner, player)
+    local id = self:CreateParticle(path, attach, owner)
+    created[id].viewer = player
+    return id
+end
+local visibility = require("systems/combat_effect_visibility")
+visibility.set_reduced(0, true)
+visibility.set_reduced(1, true)
 local function building(index)
     return {
         index = index, origin = Vector(100, 200, 30), components = {},
@@ -115,6 +128,12 @@ local tower = building(7)
 local data = { model_asset_id = io_asset_id }
 assert(visual.apply(tower, data))
 assert(#created == 1 and created[1].path == path and created[1].owner == tower)
+assert(created[1].viewer == nil, "Io body must be visible to both reduced-effects viewers")
+visibility.set_reduced(0, false)
+visibility.set_reduced(1, false)
+visibility.set_reduced(0, true)
+visibility.set_reduced(1, true)
+assert(#created == 1 and not destroyed[1], "effect toggles must not hide or recreate Io's body")
 assert(created[1].attach == PATTACH_POINT_FOLLOW)
 assert(created[1].follow[0].owner == tower and created[1].follow[0].point == "attach_hitloc")
 assert(created[1].follow[0].attach == PATTACH_POINT_FOLLOW)
@@ -157,6 +176,8 @@ assert(not destroyed[4], "old owner's cleanup destroyed a replacement entity's p
 visual.clear(replacement)
 
 -- Legacy strings keep their owner component and receive no Io control points.
+visibility.set_reduced(0, false)
+visibility.set_reduced(1, false)
 local old_tower = building(8)
 local crown = building(9)
 old_tower.components.crown = crown
@@ -185,4 +206,4 @@ assert(visual.apply(retry_tower, data))
 assert(#created == 8)
 visual.clear(retry_tower)
 assert(destroyed[8] and released[8])
-print("IO_BUILDING_AMBIENT_PASS: native controls, initial preload, refresh reuse, stage/owner cleanup, legacy and retry")
+print("IO_BUILDING_AMBIENT_PASS: reduced-effects body visibility, toggle stability, native controls, initial preload, refresh reuse, stage/owner cleanup, legacy and retry")

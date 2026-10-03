@@ -8,6 +8,8 @@ DOTA_GAMERULES_STATE_POST_GAME = 8
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
 local scheduled, winners, finalized, created, granted, archive_clears
 local active_players, markers_ready, reward_pending, last_projection, defeated, personal_finalized
+local cooperative_payloads, fake_players = {}, {}
+PlayerResource = { IsFakeClient = function(_, id) return fake_players[id] == true end }
 local serial, state_listener = 0, nil
 local noop = function() end
 local function marker(id)
@@ -140,6 +142,7 @@ local function upvalue(wanted)
 end
 local function restart(difficulty, without_archive, players)
     clock, engine_state, serial = 0, 7, 0
+    cooperative_payloads, fake_players = {}, {}
     scheduled, winners, finalized, created, granted, archive_clears = {}, {}, {}, {}, {}, {}
     active_players, markers_ready, reward_pending = players or {0, 1}, true, {}
     defeated, last_projection, personal_finalized = {}, nil, {}
@@ -159,6 +162,7 @@ local function restart(difficulty, without_archive, players)
     bus.subscribe(events.WAVE_CHANGED, function(payload) last_projection = payload end)
     bus.subscribe("archive.final_wave_cleared", function(payload)
         archive_clears[#archive_clears + 1] = payload.player_id
+        cooperative_payloads[payload.player_id] = payload.cooperative_win
     end)
     assert(wave.set_difficulty(difficulty or "N1"))
     return upvalue("state"), upvalue("enemies")
@@ -216,6 +220,7 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     kill(tail)
     assert(state.victory_settled and state.status == "archive_challenges")
     assert(#winners == 0 and #created == 8 and #archive_clears == 2)
+    assert(cooperative_payloads[0] == 1 and cooperative_payloads[1] == 1, "both winning human teammates count")
     final_check()
     assert(#created == 8 and #archive_clears == 2, "handoff/rewards must be idempotent")
     local players = archive._test.players()
@@ -237,6 +242,65 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     assert(not archive.finish(hero_hub) and #winners == 0, "pending rewards delay final exit")
     reward_pending[1] = false
     assert(archive.finish(hero_hub) and #winners == 1 and winners[1] == DOTA_TEAM_GOODGUYS)
+end
+
+-- Early completion uses the selected difficulty's real final wave and full batches.
+for difficulty_number = 1, 10 do
+    local difficulty = "N" .. difficulty_number
+    local last_wave = difficulty_number == 1 and 25 or 30
+    local state, enemies = restart(difficulty, false, {0})
+    local configured = upvalue("waves")
+    assert(state.total_waves == last_wave)
+    if difficulty == "N1" then assert(configured[30] == nil, "N1 must not borrow N2 wave 30") end
+    assert(not bus.request(events.WAVE_EARLY_FINAL_REQUEST, {}).ok)
+    bus.emit(events.GAME_STARTED, {})
+    clock = 59
+    assert(not bus.request(events.WAVE_EARLY_FINAL_REQUEST, {}).ok)
+    state.current_wave = last_wave - 1
+    local old_enemy = spawn_lane(0, 1)[1]
+    clock = 60
+    local result = bus.request(events.WAVE_EARLY_FINAL_REQUEST, {})
+    assert(result.ok and result.final_wave == last_wave, difficulty .. " early final target")
+    assert(state.current_wave == last_wave and state.total_waves == last_wave)
+    assert(result.removed_normal_enemies == 1 and old_enemy.removed)
+    assert(not state.victory_settled and not state.final_wave_generation_completed)
+    local expected_count = 0
+    for _, row in ipairs(configured[last_wave].batches) do
+        expected_count = expected_count + row.monster_count
+        assert(row.difficulty_id == difficulty, "must use this difficulty's final-wave stats")
+    end
+    assert(state.planned == expected_count)
+    local callbacks = {}
+    for key, callback in pairs(scheduled) do
+        if type(key) == "number" then callbacks[#callbacks + 1] = callback end
+    end
+    for _, callback in ipairs(callbacks) do callback() end
+    assert(state.spawned == expected_count and state.alive == expected_count)
+    local victims, final_bosses = {}, 0
+    for _, meta in pairs(enemies) do
+        assert(meta.wave_number == last_wave)
+        if meta.is_final_boss then final_bosses = final_bosses + 1 end
+        victims[#victims + 1] = meta.unit
+    end
+    assert(final_bosses > 0, "early final boss must retain final-boss classification")
+    scheduled.wave_generation_complete()
+    assert(state.final_wave_generation_completed and not state.victory_settled)
+    assert(not bus.request(events.WAVE_EARLY_FINAL_REQUEST, {}).ok)
+    for index = 1, #victims - 1 do kill(victims[index]) end
+    assert(not state.victory_settled, "early clear must wait for the entire final wave")
+    kill(victims[#victims])
+    assert(state.victory_settled and state.status == "archive_challenges")
+    assert(#archive_clears == 1 and #winners == 0)
+    assert(cooperative_payloads[0] == 0, "solo early final is not a cooperative win")
+    final_check()
+    assert(#archive_clears == 1, "early completion grants the clear only once")
+
+    state = restart(difficulty, false, {0})
+    bus.emit(events.GAME_STARTED, {})
+    clock = 60
+    state.current_wave = last_wave
+    assert(not bus.request(events.WAVE_EARLY_FINAL_REQUEST, {}).ok)
+    assert(not state.early_final_used, "cannot buy early completion once final wave has started")
 end
 
 -- Missing handler/assets/markers keep the game alive and retry, never show native victory.
@@ -401,6 +465,7 @@ local surviving_challenges = archive._test.players()
 assert(surviving_challenges[0] == nil and surviving_challenges[1] ~= nil,
     "final challenge handoff must exclude the defeated player")
 assert(#archive_clears == 1 and archive_clears[1] == 1)
+assert(cooperative_payloads[1] == 0, "defeated teammate cannot turn a lone winner into cooperative victory")
 assert(archive.finish(surviving_challenges[1].hubs[3]))
 assert(#winners == 1 and winners[1] == DOTA_TEAM_GOODGUYS)
 -- Expiring inside other scheduler callbacks must not resurrect tasks after the last player's loss.
@@ -459,3 +524,22 @@ state = restart("N1", false, {0, 1})
 assert(snapshot().alive == 0)
 for id = 0, 1 do assert(snapshot(id).alive == 0 and not snapshot(id).overflow_active) end
 print("PASS wave population/endgame: N1/N2/N3 challenge handoff, global tail survivors, four independent lane counts/deadlines, death/disconnect recovery, personal defeat, surviving lane generation, all-player defeat once, terminal cleanup")
+
+-- Cooperative victory uses the final connected human roster, not the number of lanes at start.
+for _, case in ipairs({
+    {players={0}, expected={[0]=0}},
+    {players={0,1}, fake={[1]=true}, expected={[0]=0,[1]=0}},
+    {players={0,1,2}, fake={[2]=true}, expected={[0]=1,[1]=1,[2]=0}},
+    {players={0,1,2,3}, expected={[0]=1,[1]=1,[2]=1,[3]=1}},
+    {players={0,1}, disconnected=1, expected={[0]=0}},
+}) do
+    local state=restart("N1",false,case.players)
+    fake_players=case.fake or {}
+    if case.disconnected then upvalue("disconnected_players")[case.disconnected]=true end
+    final_ready(state);final_check()
+    assert(state.victory_settled)
+    for id, expected in pairs(case.expected) do assert(cooperative_payloads[id]==expected) end
+    if case.disconnected then assert(cooperative_payloads[case.disconnected]==nil) end
+    local count=#archive_clears;final_check();assert(#archive_clears==count)
+end
+print("PASS cooperative winner roster: solo, two humans, four humans, bots, defeated/disconnected teammate, duplicate victory")

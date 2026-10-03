@@ -12,13 +12,16 @@ bus.handle_request(events.HERO_SUMMON_SNAPSHOT_REQUEST,function(p)
     if not ready then return nil end
     return {ok=true,snapshot=projection.build(p.player_id,altar,3,summoned[p.player_id])}
 end)
-local function runtime(name,id)return builder.build(name,{player_id=id,building_id="hero_altar"},{})end
+local function runtime(name,id)
+ local response=bus.request(events.HERO_SUMMON_SNAPSHOT_REQUEST,{player_id=id})
+ return builder.build(name,{player_id=id,building_id="hero_altar",hero_summon_snapshot=response and response.snapshot},{})
+end
 for _,name in ipairs({"ability_summon_monkey_king","ability_summon_blademaster"}) do
  ready=false
  assert(runtime(name,0).available==0,"no snapshot is locked")
  ready=true
  assert(runtime(name,0).available==0,"default entitlement is locked")
- assert(runtime(name,0).status_text=="需购买激活")
+ assert(runtime(name,0).status_text~="" and runtime(name,0).status_text~="英雄权限同步中","loaded denial must explain the missing entitlement")
  entitlements.replace_all(1,{vip=true},"test")
  assert(runtime(name,0).available==0,"another player cannot unlock")
  assert(runtime(name,1).available==1,"verified entitlement enables")

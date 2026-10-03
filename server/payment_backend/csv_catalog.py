@@ -72,7 +72,7 @@ def compile_catalog(tables,reference):
         effects={};inventory={};limits={};entitlements=[];lines=[]
         def add(field,value):
             rule=stats.get(field)
-            if not rule or not flag(rule['enabled']) or field=='online_seconds_total':raise ValueError(sku+': 不支持的属性 '+field)
+            if not rule or not flag(rule['enabled']) or field in {'online_seconds_total','vip_level','vip_recharge_total_fen'}:raise ValueError(sku+': 不支持的属性 '+field)
             amount=number(value,rule['storage_type']=='integer',0)
             if not amount:raise ValueError(sku+': 奖励必须大于0')
             total=Decimal(str(effects.get(field,0)))+Decimal(str(amount))

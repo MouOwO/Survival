@@ -44,7 +44,6 @@ local monster_hull_multiplier = 1
 local game_started_at = nil
 local memory_cleared_wave = -1
 local EARLY_FINAL_UNLOCK_SECONDS = 1 * 60
-local FINAL_WAVE_NUMBER = 30
 local DEV_PRELOAD_POLL_INTERVAL = 0.05
 local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
 local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
@@ -571,10 +570,23 @@ local function settle_victory_once()
         for _, player_id in ipairs(player_context.active_player_ids()) do
             if disconnected_players[player_id] ~= true then
                 archive_players[#archive_players + 1] = player_id
-                event_bus.emit("archive.final_wave_cleared", {
-                    player_id = player_id, difficulty_id = difficulty_id,
-                })
             end
+        end
+        -- Determine the complete winning roster before emitting any per-player rewards.
+        -- Active players are allied, non-defeated participants; disconnected lanes were excluded above.
+        local human_winners, human_count = {}, 0
+        for _, player_id in ipairs(archive_players) do
+            if PlayerResource and PlayerResource.IsFakeClient
+                and not PlayerResource:IsFakeClient(player_id) then
+                human_winners[player_id] = true
+                human_count = human_count + 1
+            end
+        end
+        for _, player_id in ipairs(archive_players) do
+            event_bus.emit("archive.final_wave_cleared", {
+                player_id = player_id, difficulty_id = difficulty_id,
+                cooperative_win = human_winners[player_id] and human_count >= 2 and 1 or 0,
+            })
         end
     end
     local function begin_archive_phase()
@@ -611,9 +623,7 @@ end
 
 local function check_final_victory()
     if state.defeat_settled or game_has_ended() then return end
-    local terminal_wave = state.current_wave == FINAL_WAVE_NUMBER
-        or (state.early_final_used ~= true
-            and state.current_wave == state.total_waves)
+    local terminal_wave = state.current_wave == state.total_waves
     if terminal_wave
         and state.final_wave_generation_completed == true
         and state.failed_spawn <= 0
@@ -656,19 +666,6 @@ local function rebuild_waves()
             wait_seconds = batches[1] and batches[1].wait_seconds or 30,
             batches = batches,
         }
-    end
-    if not waves[FINAL_WAVE_NUMBER] then
-        local final_source = wave_difficulty_builder.build(wave_rows.rows, "N2")
-        local final_batches = final_source
-            and final_source.waves[FINAL_WAVE_NUMBER] or nil
-        if final_batches then
-            waves[FINAL_WAVE_NUMBER] = {
-                wave_number = FINAL_WAVE_NUMBER,
-                wait_seconds = final_batches[1]
-                    and final_batches[1].wait_seconds or 30,
-                batches = final_batches,
-            }
-        end
     end
     state.total_waves = built.total_waves
     return true
@@ -814,8 +811,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         unit = unit,
         is_boss = is_assault_boss,
         wave_number = wave_number,
-        is_final_boss = is_assault_boss and (wave_number == FINAL_WAVE_NUMBER
-            or (state.early_final_used ~= true and wave_number == state.total_waves)),
+        is_final_boss = is_assault_boss and wave_number == state.total_waves,
         base_hull_radius = base_hull_radius,
         player_id = channel and channel.player_id or nil,
         wall_entindex = wall_for_channel(channel),
@@ -958,9 +954,7 @@ local function start_wave(number, reason)
         resource_session.pending = 0
         resource_session.generation_completed = true
         release_wave_model_resources(resource_session, "generation_completed")
-        if state.current_wave == FINAL_WAVE_NUMBER
-            or (state.early_final_used ~= true
-                and state.current_wave == state.total_waves) then
+        if state.current_wave == state.total_waves then
             state.final_wave_generation_completed = true
         end
         publish("wave_generation_completed")
@@ -1094,13 +1088,15 @@ local function get_wave_state(payload)
 end
 
 local function request_early_final()
+    -- Use the selected difficulty's actual last wave, including its own batches.
+    local final_wave = state.total_waves
     if not game_started then
         return { ok = false, error = "游戏尚未开始" }
     end
     if state.early_final_used then
         return { ok = false, error = "本局已购买提前通关" }
     end
-    if state.victory_settled or state.defeat_settled or state.current_wave >= FINAL_WAVE_NUMBER then
+    if state.victory_settled or state.defeat_settled or state.current_wave >= final_wave then
         return { ok = false, error = "最终波已经开始" }
     end
     local remaining = early_final_remaining()
@@ -1111,14 +1107,13 @@ local function request_early_final()
             remaining_seconds = remaining,
         }
     end
-    if not waves[FINAL_WAVE_NUMBER] then
+    if not waves[final_wave] then
         return { ok = false, error = "最终波配置缺失" }
     end
     state.early_final_used = true
     local removed = clear_normal_wave_enemies()
-    state.total_waves = math.max(state.total_waves, FINAL_WAVE_NUMBER)
     local ok, error_code = start_wave(
-        FINAL_WAVE_NUMBER,
+        final_wave,
         "early_final_wave_started"
     )
     if not ok then
@@ -1127,7 +1122,7 @@ local function request_early_final()
     end
     return {
         ok = true,
-        final_wave = FINAL_WAVE_NUMBER,
+        final_wave = final_wave,
         removed_normal_enemies = removed,
     }
 end

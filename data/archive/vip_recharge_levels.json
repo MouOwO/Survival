@@ -1,0 +1,64 @@
+{
+  "levels": [
+    {
+      "level": 1,
+      "required_recharge_yuan": 50,
+      "required_recharge_fen": 5000
+    },
+    {
+      "level": 2,
+      "required_recharge_yuan": 100,
+      "required_recharge_fen": 10000
+    },
+    {
+      "level": 3,
+      "required_recharge_yuan": 250,
+      "required_recharge_fen": 25000
+    },
+    {
+      "level": 4,
+      "required_recharge_yuan": 500,
+      "required_recharge_fen": 50000
+    },
+    {
+      "level": 5,
+      "required_recharge_yuan": 1000,
+      "required_recharge_fen": 100000
+    },
+    {
+      "level": 6,
+      "required_recharge_yuan": 1500,
+      "required_recharge_fen": 150000
+    },
+    {
+      "level": 7,
+      "required_recharge_yuan": 2500,
+      "required_recharge_fen": 250000
+    },
+    {
+      "level": 8,
+      "required_recharge_yuan": 4000,
+      "required_recharge_fen": 400000
+    },
+    {
+      "level": 9,
+      "required_recharge_yuan": 6000,
+      "required_recharge_fen": 600000
+    },
+    {
+      "level": 10,
+      "required_recharge_yuan": 7500,
+      "required_recharge_fen": 750000
+    },
+    {
+      "level": 11,
+      "required_recharge_yuan": 10000,
+      "required_recharge_fen": 1000000
+    },
+    {
+      "level": 12,
+      "required_recharge_yuan": 12500,
+      "required_recharge_fen": 1250000
+    }
+  ]
+}

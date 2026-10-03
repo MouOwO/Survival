@@ -8,6 +8,7 @@ for name,config in pairs(input.configs) do
     for _,row in ipairs(config.rows) do module.by_id[row[config.key]]=row end
     package.loaded["config/generated/"..name]=module
 end
+if input.server_time then require("systems/archive_calendar").set_clock(function() return input.server_time end) end
 local seed=assert(tonumber(input.seed))
 RandomInt=function(a,b)
     seed=(seed*48271)%2147483647

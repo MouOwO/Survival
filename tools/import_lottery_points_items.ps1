@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$Workbook = 'C:\Users\Administrator\Desktop\通关存档效果.xlsx'
 )
 
@@ -349,6 +349,18 @@ for ($sourceRow = 5; $sourceRow -le 93; $sourceRow++) {
 }
 if ($items.Count -ne 89 -or $itemIds.Count -ne 89) {
     throw "item count mismatch: rows=$($items.Count) ids=$($itemIds.Count)"
+}
+
+# User-confirmed screenshot attributes override the older workbook, including new IDs.
+$summerAttributes = Join-Path $repo 'data/lottery/summer_item_attributes_20261003.json'
+if (Test-Path -LiteralPath $summerAttributes) {
+    $confirmed = (Get-Content -LiteralPath $summerAttributes -Raw -Encoding UTF8 | ConvertFrom-Json).items
+    foreach ($row in $confirmed) {
+        for ($i = $items.Count - 1; $i -ge 0; $i--) {
+            if ($items[$i].item_id -eq $row.item_id) { $items.RemoveAt($i) }
+        }
+        $items.Add($row)
+    }
 }
 
 $headers = @('item_id','display_name','item_type','duration_type','duration_text',

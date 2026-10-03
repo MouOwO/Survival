@@ -89,6 +89,7 @@ local function cleanup(state)
     remove_boss(state)
     for _, unit in pairs(state.hubs) do
         if valid(unit) then
+            require("systems/challenge_guardian_visual_service").clear(unit)
             hubs[unit:entindex()] = nil
             context.unregister_unit(unit)
             UTIL_Remove(unit)
@@ -194,6 +195,7 @@ local function create_hubs(state)
             state.hubs[index] = unit
             hubs[unit:entindex()] = { state = state, unit = unit, index = index }
         end
+        require("systems/challenge_guardian_visual_service").apply(state.hubs[index])
         ensure_hub_abilities(state.hubs[index], index)
     end
     publish(state)

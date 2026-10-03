@@ -1,10 +1,10 @@
-﻿visual_id,building_id,level,model_name,model_scale,model_yaw,enabled,notes
+visual_id,building_id,level,model_name,model_scale,model_yaw,enabled,notes
 #types:string,string,number,string,number,number,boolean,string
-main_city_visual_lv01,building_main_city,1,models/survival_buildings/main_city_lv01.vmdl,1.0,0,1,主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。
-main_city_visual_lv02,building_main_city,2,models/survival_buildings/main_city_lv02.vmdl,1.0,0,1,主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。
-main_city_visual_lv03,building_main_city,3,models/survival_buildings/main_city_lv03.vmdl,1.0,0,1,主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。
-main_city_visual_lv04,building_main_city,4,models/survival_buildings/main_city_lv04.vmdl,1.0,0,1,主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。
-main_city_visual_lv05,building_main_city,5,models/survival_buildings/main_city_lv05.vmdl,1.0,0,1,主城；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。
+main_city_visual_lv01,building_main_city,1,models/survival_buildings/main_city_lv01.vmdl,1.0,270,1,蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。
+main_city_visual_lv02,building_main_city,2,models/survival_buildings/main_city_lv02.vmdl,1.0,270,1,蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。
+main_city_visual_lv03,building_main_city,3,models/survival_buildings/main_city_lv03.vmdl,1.0,270,1,蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。
+main_city_visual_lv04,building_main_city,4,models/survival_buildings/main_city_lv04.vmdl,1.0,270,1,蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。
+main_city_visual_lv05,building_main_city,5,models/survival_buildings/main_city_lv05.vmdl,1.0,270,1,蓝瓦灰石城堡预览；大门朝南；实体比例1.0；沿用主基地占地与碰撞。
 hero_altar_visual_lv01,building_hero_altar,1,models/survival_buildings/hero_altar.vmdl,1.0,0,1,英雄祭坛；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。
 research_lab_visual_lv01,building_research_lab,1,models/survival_buildings/research_lab.vmdl,1.0,0,1,研究所·炼金工坊；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。
 challenge_visual_lv01,building_challenge,1,models/survival_buildings/challenge_arena.vmdl,1.0,0,1,挑战竞技场；模型资源等比例放大2倍；实体比例1.0；正门朝南；2×2格居中。

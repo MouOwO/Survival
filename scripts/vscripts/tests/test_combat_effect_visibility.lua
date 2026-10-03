@@ -57,3 +57,34 @@ local before=serial
 service.set_reduced(1,false)
 assert(serial==before,"removed owners are not reattached to effects")
 pm:DestroyParticle(d,true);pm:ReleaseParticleIndex(d)
+
+-- All persistent model appearances survive the same switch which still filters
+-- optional combat bursts. Use the production catalog, including Io's body.
+service.set_reduced(0,true)
+service.set_reduced(1,true)
+local checked, seen = 0, {}
+for _,asset in ipairs(require("config/asset_catalog").rows) do
+ for _,effect in ipairs(asset.enabled ~= false and asset.environment_particles or {}) do
+  local path=type(effect)=="table" and effect.path or effect
+  if not seen[path] then
+   seen[path]=true
+   local prior=serial
+   local handle=pm:CreateParticle(path,1,{})
+   assert(serial==prior+1 and particles[serial].audience=="all", "model body filtered: "..path)
+   local native_handle=serial
+   pm:SetParticleControl(handle,1,321)
+   service.set_reduced(0,false)
+   service.set_reduced(0,true)
+   assert(serial==native_handle and not particles[native_handle].destroyed, "body recreated by toggle: "..path)
+   pm:DestroyParticle(handle,true);pm:ReleaseParticleIndex(handle)
+   assert(particles[native_handle].destroyed and particles[native_handle].released)
+   checked=checked+1
+  end
+ end
+end
+assert(seen["particles/units/heroes/hero_wisp/wisp_ambient.vpcf"])
+local prior=serial
+local combat=pm:CreateParticle("optional_tower_hit",1,{})
+assert(serial==prior, "optional combat filtering was disabled")
+pm:DestroyParticle(combat,true);pm:ReleaseParticleIndex(combat)
+print("MODEL_PARTICLE_VISIBILITY_PASS: "..checked.." catalog appearances remain visible; combat remains filtered")

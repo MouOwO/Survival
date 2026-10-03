@@ -16,8 +16,8 @@ dragon_knight_r,dragon_knight,r,8450,1,needs_confirmation,仅本地联调临时�
 dragon_knight_sr,dragon_knight,sr,400,1,needs_confirmation,特殊池临时联调概率4%。
 dragon_knight_ssr,dragon_knight,ssr,150,1,needs_confirmation,特殊池临时联调概率1.5%。
 dragon_knight_ur,dragon_knight,ur,1000,1,needs_confirmation,特殊池临时联调概率10%；正式数值待确认。
-summer_n,summer,n,5950,1,needs_confirmation,特殊池临时联调概率59.5%。
-summer_r,summer,r,2500,1,needs_confirmation,特殊池临时联调概率25%。
+summer_n,summer,n,0,0,needs_confirmation,截图第四宝箱无N；沿用其他特殊池联调规则，N临时权重并入R。正式概率待用户确认，暂不发布。
+summer_r,summer,r,8450,1,needs_confirmation,截图第四宝箱无N；沿用其他特殊池联调规则，N临时权重并入R。正式概率待用户确认，暂不发布。
 summer_sr,summer,sr,400,1,needs_confirmation,特殊池临时联调概率4%。
 summer_ssr,summer,ssr,150,1,needs_confirmation,特殊池临时联调概率1.5%。
 summer_ur,summer,ur,1000,1,needs_confirmation,特殊池临时联调概率10%；正式数值待确认。

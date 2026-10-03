@@ -7,6 +7,8 @@ local sound_service = require("core/sound_service")
 local anti_air_rules = require("systems/anti_air_rules")
 local tower_skill_damage_rules = require("config/generated/tower_skill_damage_rules")
 local tree_damage_rules = require("systems/tree_damage_rules")
+local tower_critical = require("systems/tower_attack_critical")
+local tower_skills = require("systems/tower_skill_runtime")
 
 local M = {}
 local death_state = {}
@@ -372,15 +374,26 @@ function M.on_burning_wave_projectile_hit(ability, target, _, extra_data)
         local multiplier = wave.base_multiplier
             * math.pow(wave.penetration_decay, wave.hit_count)
         wave.hit_count = wave.hit_count + 1
-        deal(
+        local critical_multiplier, critical_source = tower_critical.roll(wave.tower, target)
+        local amount = wave.damage * multiplier * critical_multiplier
+        local result = deal(
             wave.tower,
             target,
-            wave.damage * multiplier,
+            amount,
             "burning_great_arrow",
             wave.ability,
             nil,
             wave.armor_ignore_pct
         )
+        if result and result.success == true then
+            event_bus.emit(events.TOWER_ATTACK_LANDED, {
+                tower=wave.tower, target=target,
+                damage=tonumber(result.final_damage) or amount,
+                critical=critical_multiplier > 1,
+                critical_multiplier=critical_multiplier, critical_source=critical_source,
+                skills=tower_skills.get(wave.tower),
+            })
+        end
     end
     -- A linear projectile only pierces subsequent units when every unit-hit
     -- callback declines deletion.

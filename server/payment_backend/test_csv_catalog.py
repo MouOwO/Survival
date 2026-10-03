@@ -22,6 +22,12 @@ class CatalogTests(unittest.TestCase):
         self.assertTrue(all(x==100 for x in p['effects'].values()))
         self.assertEqual(p['grants']['items'],{'special_lottery_ticket':10})
         self.assertEqual(p['grants']['entitlements'],['vip'])
+    def test_vip_recharge_counters_cannot_be_sold_as_rewards(self):
+        for field in ('vip_level','vip_recharge_total_fen'):
+            self.tables=copy.deepcopy(self.package['tables'])
+            self.tables['payment_rewards']=self.tables['payment_rewards'].replace('stat,initial_wood','stat,'+field)
+            with self.assertRaises(ValueError): self.compile()
+
     def test_money_is_exact_fen(self):
         self.tables['payment_products']=self.tables['payment_products'].replace('50.00','7.77')
         self.assertTrue(all(p['amount']==777 for p in self.compile()['products']))

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import base64
+import ctypes
+import socket
+import struct
 from contextlib import ExitStack, contextmanager
 import hashlib
 import json
@@ -168,6 +171,51 @@ class TunnelTests(unittest.TestCase):
             factory.assert_called_once_with(41, stopping=True)
             handle.terminate.assert_called_once_with()
             self.assertFalse(self.state.exists())
+
+    def native_listener_query(self, rows, *, growing=False, error=0):
+        payload = struct.pack("<I", len(rows)) + b"".join(
+            struct.pack("<6I", state, int.from_bytes(socket.inet_aton(address), "little"),
+                        socket.htons(port), 0, 0, pid)
+            for state, address, port, pid in rows)
+        calls = []
+
+        def query(buffer, size_pointer, *args):
+            size = ctypes.cast(size_pointer, ctypes.POINTER(tunnel.wintypes.DWORD))
+            calls.append(buffer is None)
+            if error:
+                return error
+            if buffer is None or (growing and len(calls) == 2):
+                size.contents.value = len(payload) if buffer is not None or not growing else 4
+                return 122
+            ctypes.memmove(buffer, payload, len(payload))
+            size.contents.value = len(payload)
+            return 0
+
+        return Mock(side_effect=query)
+
+    def test_native_listener_requires_exact_pid_loopback_port_and_listen_state(self):
+        for rows, expected in (([(2, "127.0.0.1", tunnel.PORT, 41)], True),
+                               ([(2, "127.0.0.1", tunnel.PORT, 99)], False),
+                               ([(2, "0.0.0.0", tunnel.PORT, 41)], False),
+                               ([(2, "127.0.0.1", 9999, 41)], False),
+                               ([(5, "127.0.0.1", tunnel.PORT, 41)], False),
+                               ([], False)):
+            with self.subTest(rows=rows), patch.object(tunnel.ctypes, "WinDLL", create=True) as dll:
+                dll.return_value.GetExtendedTcpTable = self.native_listener_query(rows)
+                self.assertEqual(tunnel.listener_owned(41), expected)
+
+    def test_native_listener_retries_when_table_grows(self):
+        with patch.object(tunnel.ctypes, "WinDLL", create=True) as dll:
+            query = self.native_listener_query([(2, "127.0.0.1", tunnel.PORT, 41)], growing=True)
+            dll.return_value.GetExtendedTcpTable = query
+            self.assertTrue(tunnel.listener_owned(41))
+            self.assertEqual(query.call_count, 3)
+
+    def test_native_listener_failure_remains_closed(self):
+        with patch.object(tunnel.ctypes, "WinDLL", create=True) as dll:
+            dll.return_value.GetExtendedTcpTable = self.native_listener_query([], error=5)
+            with self.assertRaisesRegex(tunnel.TunnelError, "listener_identity_unavailable"):
+                tunnel.listener_owned(41)
 
     def test_check_refuses_unrelated_listener_even_when_http_would_be_healthy(self):
         state, command = self.write_state()

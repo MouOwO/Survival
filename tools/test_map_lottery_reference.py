@@ -16,7 +16,7 @@ def verify(bundle, lua, reference):
     expected_counts = {"map": {"n": 10, "r": 5, "sr": 5, "ssr": 10},
                        "cultivation": {"r": 5, "sr": 5, "ssr": 9, "ur": 7},
                        "dragon_knight": {"r": 5, "sr": 5, "ssr": 10, "ur": 7},
-                       "summer": {"r": 5, "sr": 5, "ssr": 8, "ur": 6}}[pool]
+                       "summer": {"r": 5, "sr": 5, "ssr": 8, "ur": 5}}[pool]
     assert Counter(r["quality"] for r in wanted.values()) == expected_counts
     pending = set(definition.get("pending_items", {}))
     if definition.get("configuration_status") == "draft_missing_effects":
@@ -56,7 +56,7 @@ def verify(bundle, lua, reference):
     for key in pending:
         assert not items[key]["enabled"] and not items[key]["exchange_enabled"]
         assert items[key]["effect_status"] == "missing_source"
-    guarantee = "ur" if pool == "dragon_knight" else "ssr"
+    guarantee = "ur" if pool in ("dragon_knight", "summer") else "ssr"
     weights = {r["quality"]: r["weight"] for r in configs["lottery_quality_weights"]["rows"] if r["pool_id"] == pool and r.get("enabled", True)}
     assert sum(weights.values()) == 10000
     if definition.get("single_draw_probabilities"):

@@ -99,6 +99,12 @@ M.rows = {
     { field_id = "hero_attack_pct_per_minute", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 100, enabled = true, notes = "每60秒累计增加英雄攻击加成百分比。" },
     { field_id = "tower_attack_pct_per_minute", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 100, enabled = true, notes = "每60秒累计增加箭塔攻击加成百分比。" },
     { field_id = "hero_attributes_pct_per_minute", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 100, enabled = true, notes = "每60秒累计增加英雄全属性加成百分比。" },
+    { field_id = "starjoy_points_earned", storage_type = "integer", default_value = 0, unit = "points", min_value = 0, enabled = true, notes = "累计获得星悦积分；兑换不扣减；旧存档以余额初始化。" },
+    { field_id = "starjoy_reward_level", storage_type = "integer", default_value = 0, unit = "level", min_value = 0, max_value = 24, enabled = true, notes = "已结算的星悦奖励等级；每阶段奖励只发一次。" },
+    { field_id = "hero_execute_health_threshold_pct", storage_type = "percentage", default_value = 0, unit = "percent", min_value = 0, max_value = 100, enabled = true, notes = "英雄有效伤害后斩杀生命比例严格低于该值的敌人；包含BOSS；非光环。" },
+    { field_id = "vip_level", storage_type = "integer", default_value = 0, unit = "count", min_value = 0, max_value = 12, enabled = true, notes = "VIP等级缓存；支付服务根据累计实付充值更新，领取时按累计充值额重新判定。" },
+    { field_id = "shop_paid_currency", storage_type = "integer", default_value = 0, unit = "count", min_value = 0, max_value = 2147483647, enabled = true, notes = "商城付费币余额；仅经支付验证后入账，VIP礼包结算原子扣款；不同于软妹币。" },
+    { field_id = "vip_recharge_total_fen", storage_type = "integer", default_value = 0, unit = "count", min_value = 0, max_value = 9007199254740991, enabled = true, notes = "累计已验证充值金额，单位分；支付回执去重入账，不随付费币消费扣减。" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

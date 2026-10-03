@@ -2,7 +2,7 @@
 -- Source: global_rules.csv
 local M = {}
 M.rows = {
-    { rule_id = "tower_attack_range", value = 1000, description = "所有防御塔统一基础攻击距离", enabled = true },
+    { rule_id = "tower_attack_range", value = 800, description = "所有防御塔统一基础攻击距离", enabled = true },
     { rule_id = "tower_acquisition_range", value = 1000, description = "所有防御塔统一基础索敌距离", enabled = true },
     { rule_id = "tower_base_projectile_speed", value = 5000, description = "基础箭塔原始弹道速度", enabled = true },
     { rule_id = "tower_route_default_projectile_speed", value = 1250, description = "无独立配置转职塔的原始弹道速度", enabled = true },
